@@ -22,7 +22,7 @@
   },
   "topbarCtaButton": {
     "type": "github",
-    "url": "https://github.com/anthropics/claude-code"
+    "url": "https://github.com/claude-code-best/claude-code"
   },
   "search": {
     "prompt": "搜索 Claude Code 架构文档..."

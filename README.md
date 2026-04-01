@@ -1,4 +1,4 @@
-# Claude Code Best V2 (CCB)
+# Claude Code Best V3 (CCB)
 
 Anthropic 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 工具的源码反编译/逆向还原项目。目标是将 Claude Code 大部分功能及工程化能力复现。虽然很难绷, 但是它叫做 CCB(踩踩背)...
 
@@ -115,9 +115,14 @@ bun run build
 | BriefTool | ✅ | 简短消息 + 附件发送 |
 | TaskOutputTool | ✅ | 后台任务输出读取 |
 | TaskStopTool | ✅ | 后台任务停止 |
-| ListMcpResourcesTool | ✅ | MCP 资源列表 |
-| ReadMcpResourceTool | ✅ | MCP 资源读取 |
-| SyntheticOutputTool | ✅ | 非交互会话结构化输出 |
+| ListMcpResourcesTool | ⚠️ | MCP 资源列表（被 specialTools 过滤，特定条件下加入） |
+| ReadMcpResourceTool | ⚠️ | MCP 资源读取（同上） |
+| SyntheticOutputTool | ⚠️ | 仅在非交互会话（SDK/pipe 模式）下创建 |
+| CronCreateTool | ✅ | 定时任务创建（已移除 AGENT_TRIGGERS gate） |
+| CronDeleteTool | ✅ | 定时任务删除 |
+| CronListTool | ✅ | 定时任务列表 |
+| EnterWorktreeTool | ✅ | 进入 Git Worktree（`isWorktreeModeEnabled()` 已硬编码为 true） |
+| ExitWorktreeTool | ✅ | 退出 Git Worktree |
 
 ### 工具 — 条件启用
 
@@ -129,8 +134,6 @@ bun run build
 | TaskGetTool | ⚠️ | 同上 |
 | TaskUpdateTool | ⚠️ | 同上 |
 | TaskListTool | ⚠️ | 同上 |
-| EnterWorktreeTool | ⚠️ | `isWorktreeModeEnabled()` |
-| ExitWorktreeTool | ⚠️ | 同上 |
 | TeamCreateTool | ⚠️ | `isAgentSwarmsEnabled()` |
 | TeamDeleteTool | ⚠️ | 同上 |
 | ToolSearchTool | ⚠️ | `isToolSearchEnabledOptimistic()` |
@@ -143,7 +146,6 @@ bun run build
 | 工具 | Feature Flag |
 |------|-------------|
 | SleepTool | `PROACTIVE` / `KAIROS` |
-| CronCreate/Delete/ListTool | `AGENT_TRIGGERS` |
 | RemoteTriggerTool | `AGENT_TRIGGERS_REMOTE` |
 | MonitorTool | `MONITOR_TOOL` |
 | SendUserFileTool | `KAIROS` |
@@ -152,7 +154,7 @@ bun run build
 | WebBrowserTool | `WEB_BROWSER_TOOL` |
 | SnipTool | `HISTORY_SNIP` |
 | WorkflowTool | `WORKFLOW_SCRIPTS` |
-| PushNotificationTool | `KAIROS` |
+| PushNotificationTool | `KAIROS` / `KAIROS_PUSH_NOTIFICATION` |
 | SubscribePRTool | `KAIROS_GITHUB_WEBHOOKS` |
 | ListPeersTool | `UDS_INBOX` |
 | CtxInspectTool | `CONTEXT_COLLAPSE` |
@@ -194,7 +196,7 @@ bun run build
 | `/extra-usage` | ✅ | 额外用量信息 |
 | `/fast` | ✅ | 切换 fast 模式 |
 | `/feedback` | ✅ | 反馈 |
-| `/files` | ✅ | 已跟踪文件 |
+| `/loop` | ✅ | 定时循环执行（bundled skill，可通过 `CLAUDE_CODE_DISABLE_CRON` 关闭） |
 | `/heapdump` | ✅ | Heap dump（调试） |
 | `/help` | ✅ | 帮助 |
 | `/hooks` | ✅ | Hook 管理 |
@@ -248,7 +250,7 @@ bun run build
 | `/proactive` | `PROACTIVE` / `KAIROS` |
 | `/brief` | `KAIROS` / `KAIROS_BRIEF` |
 | `/assistant` | `KAIROS` |
-| `/bridge` | `BRIDGE_MODE` |
+| `/remote-control` (alias `rc`) | `BRIDGE_MODE` |
 | `/remote-control-server` | `DAEMON` + `BRIDGE_MODE` |
 | `/force-snip` | `HISTORY_SNIP` |
 | `/workflows` | `WORKFLOW_SCRIPTS` |
@@ -262,7 +264,7 @@ bun run build
 
 ### 斜杠命令 — ANT-ONLY（不可用）
 
-`/tag` `/backfill-sessions` `/break-cache` `/bughunter` `/commit` `/commit-push-pr` `/ctx_viz` `/good-claude` `/issue` `/init-verifiers` `/mock-limits` `/bridge-kick` `/version` `/reset-limits` `/onboarding` `/share` `/summary` `/teleport` `/ant-trace` `/perf-issue` `/env` `/oauth-refresh` `/debug-tool-call` `/agents-platform` `/autofix-pr`
+`/files` `/tag` `/backfill-sessions` `/break-cache` `/bughunter` `/commit` `/commit-push-pr` `/ctx_viz` `/good-claude` `/issue` `/init-verifiers` `/mock-limits` `/bridge-kick` `/version` `/reset-limits` `/onboarding` `/share` `/summary` `/teleport` `/ant-trace` `/perf-issue` `/env` `/oauth-refresh` `/debug-tool-call` `/agents-platform` `/autofix-pr`
 
 ### CLI 子命令
 
@@ -290,7 +292,7 @@ bun run build
 | 服务 | 状态 | 说明 |
 |------|------|------|
 | API 客户端 (`services/api/`) | ✅ | 3400+ 行，4 个 provider |
-| MCP (`services/mcp/`) | ✅ | 24 个文件，12000+ 行 |
+| MCP (`services/mcp/`) | ✅ | 34 个文件，12000+ 行 |
 | OAuth (`services/oauth/`) | ✅ | 完整 OAuth 流程 |
 | 插件 (`services/plugins/`) | ✅ | 基础设施完整，无内置插件 |
 | LSP (`services/lsp/`) | ⚠️ | 实现存在，默认关闭 |
@@ -307,17 +309,17 @@ bun run build
 
 | 包 | 状态 | 说明 |
 |------|------|------|
-| `color-diff-napi` | ✅ | 997 行完整 TypeScript 实现（语法高亮 diff） |
-| `audio-capture-napi` | ❌ | stub，`isNativeAudioAvailable()` 返回 false |
-| `image-processor-napi` | ❌ | stub，`getNativeModule()` 返回 null |
-| `modifiers-napi` | ❌ | stub，`isModifierPressed()` 返回 false |
+| `color-diff-napi` | ✅ | 1006 行完整 TypeScript 实现（语法高亮 diff） |
+| `audio-capture-napi` | ✅ | 151 行完整实现（跨平台音频录制，使用 SoX/arecord） |
+| `image-processor-napi` | ✅ | 125 行完整实现（macOS 剪贴板图片读取，使用 osascript + sharp） |
+| `modifiers-napi` | ✅ | 67 行完整实现（macOS 修饰键检测，bun:ffi + CoreGraphics） |
 | `url-handler-napi` | ❌ | stub，`waitForUrlEvent()` 返回 null |
 | `@ant/claude-for-chrome-mcp` | ❌ | stub，`createServer()` 返回 null |
-| `@ant/computer-use-mcp` | ❌ | stub，`buildTools()` 返回 [] |
-| `@ant/computer-use-input` | ❌ | stub，仅类型声明 |
-| `@ant/computer-use-swift` | ❌ | stub，仅类型声明 |
+| `@ant/computer-use-mcp` | ⚠️ | 类型安全 stub（265 行，完整类型定义但函数返回空值） |
+| `@ant/computer-use-input` | ✅ | 183 行完整实现（macOS 键鼠模拟，AppleScript/JXA/CGEvent） |
+| `@ant/computer-use-swift` | ✅ | 388 行完整实现（macOS 显示器/应用管理/截图，JXA/screencapture） |
 
-### Feature Flags（30 个，全部返回 `false`）
+### Feature Flags（31 个，全部返回 `false`）
 
 `ABLATION_BASELINE` `AGENT_MEMORY_SNAPSHOT` `BG_SESSIONS` `BRIDGE_MODE` `BUDDY` `CCR_MIRROR` `CCR_REMOTE_SETUP` `CHICAGO_MCP` `COORDINATOR_MODE` `DAEMON` `DIRECT_CONNECT` `EXPERIMENTAL_SKILL_SEARCH` `FORK_SUBAGENT` `HARD_FAIL` `HISTORY_SNIP` `KAIROS` `KAIROS_BRIEF` `KAIROS_CHANNELS` `KAIROS_GITHUB_WEBHOOKS` `LODESTONE` `MCP_SKILLS` `PROACTIVE` `SSH_REMOTE` `TORCH` `TRANSCRIPT_CLASSIFIER` `UDS_INBOX` `ULTRAPLAN` `UPLOAD_USER_SETTINGS` `VOICE_MODE` `WEB_BROWSER_TOOL` `WORKFLOW_SCRIPTS`
 
