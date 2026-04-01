@@ -15,13 +15,36 @@
       "light": "#FFFFFF"
     }
   },
+  "metadata": {
+    "og:image": "https://ccb.agent-aura.top/docs/images/og-cover.png",
+    "twitter:image": "https://ccb.agent-aura.top/docs/images/og-cover.png",
+    "twitter:card": "summary_large_image"
+  },
+  "topbarCtaButton": {
+    "type": "github",
+    "url": "https://github.com/claude-code-best/claude-code"
+  },
+  "search": {
+    "prompt": "搜索 Claude Code 架构文档..."
+  },
+  "redirects": [
+    {
+      "source": "/docs/introduction",
+      "destination": "/docs/introduction/what-is-claude-code"
+    }
+  ],
   "navigation": [
     {
       "group": "开始",
       "pages": [
-        "docs/introduction/what-is-claude-code",
-        "docs/introduction/why-this-whitepaper",
-        "docs/introduction/architecture-overview"
+        {
+          "group": "介绍",
+          "pages": [
+            "docs/introduction/what-is-claude-code",
+            "docs/introduction/why-this-whitepaper",
+            "docs/introduction/architecture-overview"
+          ]
+        }
       ]
     },
     {
@@ -75,6 +98,16 @@
         "docs/extensibility/hooks",
         "docs/extensibility/skills",
         "docs/extensibility/custom-agents"
+      ]
+    },
+    {
+      "group": "揭秘：隐藏功能与内部机制",
+      "pages": [
+        "docs/internals/three-tier-gating",
+        "docs/internals/feature-flags",
+        "docs/internals/growthbook-ab-testing",
+        "docs/internals/hidden-features",
+        "docs/internals/ant-only-world"
       ]
     }
   ],

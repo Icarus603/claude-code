@@ -1,63 +1,175 @@
 ---
-title: "MCP：开放的工具生态"
-description: "通过标准协议对接任何外部能力——数据库、API、自定义服务"
+title: "MCP 协议 - 连接管理、工具发现与执行链路"
+description: "从源码角度解析 Claude Code 的 MCP 集成：7 种传输层实现、connectToServer 的 memoize 缓存、工具发现的 LRU 策略、认证状态机、以及 MCP 工具如何进入权限检查链路。"
+keywords: ["MCP", "Model Context Protocol", "工具扩展", "MCP 客户端", "工具发现"]
 ---
 
-{/* 本章目标：解释 MCP 协议如何扩展 AI 的能力边界 */}
+{/* 本章目标：从源码角度揭示 MCP 客户端的连接管理、工具发现协议和执行链路 */}
 
-## 内置工具的局限
+## 架构总览：从配置到可用工具
 
-Claude Code 内置了 50+ 工具，覆盖了通用的软件开发需求。但每个团队都有特殊需求：
+```
+settings.json: { mcpServers: { "my-db": { command: "npx", args: [...] } } }
+  ↓
+getAllMcpConfigs()                    ← 合并 user/project/local 三级配置
+  ↓
+useManageMCPConnections()             ← React Hook 管理连接生命周期
+  ↓
+connectToServer(name, config)         ← memoize 缓存（lodash memoize）
+  ├── 创建 Transport（stdio/sse/http/...）
+  ├── new Client()                    ← @modelcontextprotocol/sdk
+  ├── client.connect(transport)       ← 超时控制（MCP_TIMEOUT, 默认 30s）
+  └── 返回 MCPServerConnection        ← { connected | failed | needs-auth | pending }
+  ↓
+fetchToolsForClient(client)           ← LRU(20) 缓存
+  ├── client.request({ method: 'tools/list' })
+  └── 每个工具包装为 MCPTool            ← 统一 Tool 接口
+  ↓
+assembleToolPool()                    ← 合并内置工具 + MCP 工具
+  ↓
+工具名格式: mcp__<serverName>__<toolName>  ← buildMcpToolName()
+```
 
-- 连接内部数据库查询数据
-- 调用公司内部 API
-- 操作特定的 DevOps 工具
-- 访问私有的知识库
+## 7 种传输层实现
 
-不可能把所有人的需求都内置进去。
+`connectToServer()`（`client.ts:596-1643`）根据 `config.type` 分发到不同的 Transport 实现：
 
-## MCP：一个标准的"插头"
+| 传输类型 | Transport 类 | 适用场景 | 认证方式 |
+|----------|-------------|---------|---------|
+| `stdio`（默认） | `StdioClientTransport` | 本地子进程 | 无 |
+| `sse` | `SSEClientTransport` | 远程 SSE 服务 | `ClaudeAuthProvider` + OAuth |
+| `http` | `StreamableHTTPClientTransport` | HTTP 流 | `ClaudeAuthProvider` + OAuth |
+| `sse-ide` | `SSEClientTransport` | IDE 集成 | lockfile token |
+| `ws-ide` | `WebSocketTransport` | IDE WebSocket | `X-Claude-Code-Ide-Authorization` |
+| `ws` | `WebSocketTransport` | WebSocket 服务 | session ingress token |
+| `claudeai-proxy` | `StreamableHTTPClientTransport` | claude.ai 代理 | OAuth bearer + 401 重试 |
 
-**Model Context Protocol**（模型上下文协议）是 Anthropic 提出的开放标准，定义了 AI 与外部工具之间的通信方式。
+### stdio 传输的进程管理
 
-类比：USB 是电脑连接外设的标准接口。MCP 是 AI 连接外部能力的标准接口。
+stdio 类型的 MCP 服务器作为子进程运行，cleanup 时采用 **信号升级策略**（`client.ts:1431-1564`）：
 
-## 工作原理
+```
+SIGINT (100ms) → SIGTERM (400ms) → SIGKILL
+```
 
-<Steps>
-  <Step title="启动 MCP Server">
-    开发者编写一个 MCP Server，暴露自定义工具（比如"查询数据库"、"发送 Slack 消息"）
-  </Step>
-  <Step title="Claude Code 连接">
-    在配置文件中声明要连接的 MCP Server
-  </Step>
-  <Step title="工具自动发现">
-    连接后，MCP Server 提供的工具自动出现在 AI 的可用工具列表中
-  </Step>
-  <Step title="透明调用">
-    AI 像使用内置工具一样使用 MCP 工具——无需知道底层实现
-  </Step>
-</Steps>
+总清理时间上限 600ms，防止 MCP 服务器关闭阻塞 CLI 退出。
 
-## 三种连接方式
+### 远程传输的认证状态机
 
-| 方式 | 适用场景 |
-|------|---------|
-| **stdio** | MCP Server 作为子进程运行，通过标准输入/输出通信。最简单 |
-| **SSE** | 通过 HTTP Server-Sent Events 通信。适合远程服务 |
-| **StreamableHTTP** | 基于 HTTP 流的双向通信。适合复杂的交互场景 |
+SSE/HTTP 类型使用 `ClaudeAuthProvider` 实现 OAuth 认证流程。认证失败时进入 `needs-auth` 状态，并写入 15 分钟 TTL 的缓存文件（`mcp-needs-auth-cache.json`），避免重复弹出认证提示。
 
-## 权限一视同仁
+```
+连接尝试 → 401 Unauthorized
+  ↓
+handleRemoteAuthFailure()
+  ├── logEvent('tengu_mcp_server_needs_auth')
+  ├── setMcpAuthCacheEntry(name)         ← 写入 15min TTL 缓存
+  └── return { type: 'needs-auth' }      ← UI 显示认证提示
+```
 
-MCP 提供的工具和内置工具一样受权限系统管控：
+## 连接缓存与重连机制
 
-- 需要用户确认才能调用
-- 可以设置 allow/deny 规则
-- 支持沙箱限制
+`connectToServer` 使用 lodash `memoize` 缓存连接对象，缓存 key 为 `${name}-${JSON.stringify(config)}`。
 
-这确保了第三方工具不会绕过安全边界。
+### 缓存失效触发
 
-## 实际例子
+当连接关闭时（`client.onclose`），清除所有相关缓存（`client.ts:1376-1404`）：
+
+```typescript
+client.onclose = () => {
+  const key = getServerCacheKey(name, serverRef)
+  fetchToolsForClient.cache.delete(name)      // 工具缓存
+  fetchResourcesForClient.cache.delete(name)  // 资源缓存
+  fetchCommandsForClient.cache.delete(name)   // 命令缓存
+  connectToServer.cache.delete(key)           // 连接缓存
+}
+```
+
+### 连接降级检测
+
+远程传输有 **连续错误计数器**（`client.ts:1229`）：
+
+```typescript
+let consecutiveConnectionErrors = 0
+const MAX_ERRORS_BEFORE_RECONNECT = 3
+```
+
+遇到终端错误（ECONNRESET、ETIMEDOUT、EPIPE 等）连续 3 次后，主动关闭 transport 触发重连。对于 HTTP 传输，还检测 session 过期（404 + JSON-RPC code -32001）。
+
+### 请求级超时保护
+
+每个 HTTP 请求使用独立的 `setTimeout` 超时（`wrapFetchWithTimeout`，`client.ts:493`），而非共享 `AbortSignal.timeout()`。原因是 Bun 对 AbortSignal.timeout 的 GC 是惰性的——每个请求约 2.4KB 原生内存，即使请求毫秒级完成也要等 60s 才回收。
+
+```typescript
+const controller = new AbortController()
+const timer = setTimeout(c => c.abort(...), MCP_REQUEST_TIMEOUT_MS, controller)
+timer.unref?.()  // 不阻止进程退出
+```
+
+## 工具发现：从 MCP 到 Tool 接口
+
+`fetchToolsForClient()`（`client.ts:1745-2000`）使用 `memoizeWithLRU` 缓存（上限 20），将 MCP 工具转换为 Claude Code 的统一 Tool 接口：
+
+```typescript
+const fullyQualifiedName = buildMcpToolName(client.name, tool.name)
+// 结果: "mcp__my-db__query"
+```
+
+### 工具描述截断
+
+MCP 工具描述上限 2048 字符（`MAX_MCP_DESCRIPTION_LENGTH`）。OpenAPI 生成的 MCP 服务器曾观察到 15-60KB 的描述文档。
+
+### 工具能力标注
+
+每个 MCP 工具根据 `tool.annotations` 自动标注：
+
+| 注解 | 映射到 | 含义 |
+|------|--------|------|
+| `readOnlyHint` | `isReadOnly()` + `isConcurrencySafe()` | 只读，可并行 |
+| `destructiveHint` | `isDestructive()` | 破坏性操作 |
+| `openWorldHint` | `isOpenWorld()` | 开放世界（不可枚举） |
+| `title` | `userFacingName()` | 显示名称 |
+
+### MCP 工具的权限检查
+
+MCP 工具默认返回 `{ behavior: 'passthrough' }`（`client.ts:1816-1834`），意味着它们始终进入权限确认流程。工具名使用 `mcp__` 前缀精确匹配权限规则。
+
+## MCP 工具的执行链路
+
+```
+AI 生成 tool_use: { name: "mcp__my-db__query", input: { sql: "..." } }
+  ↓
+MCPTool.call()                               ← client.ts:1835
+  ├── ensureConnectedClient()                ← 确保连接有效（重连）
+  ├── callMCPToolWithUrlElicitationRetry()   ← 带 Elicitation 重试
+  │   ├── client.request({ method: 'tools/call' })
+  │   ├── 处理图片结果（resize + persist）
+  │   └── 内容截断（mcpContentNeedsTruncation）
+  ├── McpSessionExpiredError → 重试一次
+  └── 返回 { data: content, mcpMeta }
+```
+
+### Session 过期自动重试
+
+HTTP 传输的 MCP session 可能过期。检测到 `McpSessionExpiredError` 后自动重试一次（`client.ts:1862`），因为 `ensureConnectedClient()` 已经清除了缓存并建立了新连接。
+
+### 内容截断与持久化
+
+大型 MCP 工具输出通过 `truncateMcpContentIfNeeded` 截断，二进制内容（图片）通过 `persistBinaryContent` 写入文件并返回文件路径。图片自动 resize（`maybeResizeAndDownsampleImageBuffer`）。
+
+## MCP 连接的并发控制
+
+```typescript
+// 本地服务器并发连接数
+getMcpServerConnectionBatchSize()    // 默认 3
+
+// 远程服务器并发连接数
+getRemoteMcpServerConnectionBatchSize()  // 默认 20
+```
+
+本地 MCP 服务器（stdio）是重量级的子进程，默认限制 3 个并发连接。远程服务器是轻量级 HTTP 请求，允许 20 个并发。
+
+## 实际配置示例
 
 ```json
 // settings.json 中的 MCP 配置
@@ -67,9 +179,13 @@ MCP 提供的工具和内置工具一样受权限系统管控：
       "command": "npx",
       "args": ["@my-org/db-mcp-server"],
       "env": { "DB_URL": "postgres://..." }
+    },
+    "remote-api": {
+      "type": "http",
+      "url": "https://api.example.com/mcp"
     }
   }
 }
 ```
 
-配置后，AI 就多了"查询数据库"这个能力——用自然语言描述需求，AI 自动生成查询并执行。
+配置后，AI 的工具列表中会出现 `mcp__my-database__query` 和 `mcp__remote-api__*` 工具——与内置工具使用相同的权限检查链路和 UI 渲染。

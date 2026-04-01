@@ -1,6 +1,6 @@
 {
   "name": "claude-js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Reverse-engineered Anthropic Claude Code CLI — interactive AI coding assistant in the terminal",
   "type": "module",
   "author": "claude-code-best <claude-code-best@proton.me>",

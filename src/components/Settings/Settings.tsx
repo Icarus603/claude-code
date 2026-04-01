@@ -95,8 +95,7 @@ export function Settings(t0) {
   }
   let t7;
   if ($[13] !== contentHeight) {
-    const GatesComponent = Gates as any;
-    t7 = false ? [<Tab key="gates" title="Gates"><GatesComponent onOwnsEscChange={setGatesOwnsEsc} contentHeight={contentHeight} /></Tab>] : [];
+    t7 = [];
     $[13] = contentHeight;
     $[14] = t7;
   } else {

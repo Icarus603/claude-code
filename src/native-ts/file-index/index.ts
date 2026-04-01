@@ -211,47 +211,88 @@ export class FileIndex {
 
       const haystack = caseSensitive ? paths[i]! : lowerPaths[i]!
 
-      // Fused indexOf scan: find positions (SIMD-accelerated in JSC/V8) AND
-      // accumulate gap/consecutive terms inline. The greedy-earliest positions
-      // found here are identical to what the charCodeAt scorer would find, so
-      // we score directly from them — no second scan.
-      let pos = haystack.indexOf(needleChars[0]!)
-      if (pos === -1) continue
-      posBuf[0] = pos
-      let gapPenalty = 0
-      let consecBonus = 0
-      let prev = pos
-      for (let j = 1; j < nLen; j++) {
-        pos = haystack.indexOf(needleChars[j]!, prev + 1)
-        if (pos === -1) continue outer
-        posBuf[j] = pos
-        const gap = pos - prev - 1
-        if (gap === 0) consecBonus += BONUS_CONSECUTIVE
-        else gapPenalty += PENALTY_GAP_START + gap * PENALTY_GAP_EXTENSION
-        prev = pos
+      // Greedy-leftmost indexOf gives fast but suboptimal positions when the
+      // first needle char appears early (e.g. 's' in "src/") while the real
+      // match lives deeper (e.g. "settings/"). We score from multiple start
+      // positions — the leftmost hit plus every word-boundary occurrence of
+      // needle[0] — and keep the best. Typical paths have 2–4 boundary starts,
+      // so the overhead is minimal.
+
+      // Collect candidate start positions for needle[0]
+      const firstChar = needleChars[0]!
+      let startCount = 0
+      // startPositions is stack-allocated (reused array would add complexity
+      // for marginal gain; paths rarely have >8 boundary starts)
+      const startPositions: number[] = []
+
+      // Always try the leftmost occurrence
+      const firstPos = haystack.indexOf(firstChar)
+      if (firstPos === -1) continue
+      startPositions[startCount++] = firstPos
+
+      // Also try every word-boundary position where needle[0] occurs
+      for (let bp = firstPos + 1; bp < haystack.length; bp++) {
+        if (haystack.charCodeAt(bp) !== firstChar.charCodeAt(0)) continue
+        // Check if this position is at a word boundary
+        const prevCode = haystack.charCodeAt(bp - 1)
+        if (
+          prevCode === 47 || // /
+          prevCode === 92 || // \
+          prevCode === 45 || // -
+          prevCode === 95 || // _
+          prevCode === 46 || // .
+          prevCode === 32    // space
+        ) {
+          startPositions[startCount++] = bp
+        }
       }
 
-      // Gap-bound reject: if the best-case score (all boundary bonuses) minus
-      // known gap penalties can't beat threshold, skip the boundary pass.
-      if (
-        topK.length === limit &&
-        scoreCeiling + consecBonus - gapPenalty <= threshold
-      ) {
-        continue
-      }
-
-      // Boundary/camelCase scoring: check the char before each match position.
-      const path = paths[i]!
+      const originalPath = paths[i]!
       const hLen = pathLens[i]!
-      let score = nLen * SCORE_MATCH + consecBonus - gapPenalty
-      score += scoreBonusAt(path, posBuf[0]!, true)
-      for (let j = 1; j < nLen; j++) {
-        score += scoreBonusAt(path, posBuf[j]!, false)
+      const lengthBonus = Math.max(0, 32 - (hLen >> 2))
+      let bestScore = -Infinity
+
+      for (let si = 0; si < startCount; si++) {
+        posBuf[0] = startPositions[si]!
+        let gapPenalty = 0
+        let consecBonus = 0
+        let prev = posBuf[0]!
+        let matched = true
+        for (let j = 1; j < nLen; j++) {
+          const pos = haystack.indexOf(needleChars[j]!, prev + 1)
+          if (pos === -1) { matched = false; break }
+          posBuf[j] = pos
+          const gap = pos - prev - 1
+          if (gap === 0) consecBonus += BONUS_CONSECUTIVE
+          else gapPenalty += PENALTY_GAP_START + gap * PENALTY_GAP_EXTENSION
+          prev = pos
+        }
+        if (!matched) continue
+
+        // Gap-bound reject for this start position
+        if (
+          topK.length === limit &&
+          scoreCeiling + consecBonus - gapPenalty + lengthBonus <= threshold
+        ) {
+          continue
+        }
+
+        // Boundary/camelCase scoring
+        let score = nLen * SCORE_MATCH + consecBonus - gapPenalty
+        score += scoreBonusAt(originalPath, posBuf[0]!, true)
+        for (let j = 1; j < nLen; j++) {
+          score += scoreBonusAt(originalPath, posBuf[j]!, false)
+        }
+        score += lengthBonus
+
+        if (score > bestScore) bestScore = score
       }
-      score += Math.max(0, 32 - (hLen >> 2))
+
+      if (bestScore === -Infinity) continue
+      const score = bestScore
 
       if (topK.length < limit) {
-        topK.push({ path, fuzzScore: score })
+        topK.push({ path: originalPath, fuzzScore: score })
         if (topK.length === limit) {
           topK.sort((a, b) => a.fuzzScore - b.fuzzScore)
           threshold = topK[0]!.fuzzScore
@@ -264,7 +305,7 @@ export class FileIndex {
           if (topK[mid]!.fuzzScore < score) lo = mid + 1
           else hi = mid
         }
-        topK.splice(lo, 0, { path, fuzzScore: score })
+        topK.splice(lo, 0, { path: originalPath, fuzzScore: score })
         topK.shift()
         threshold = topK[0]!.fuzzScore
       }
