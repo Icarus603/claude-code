@@ -18,16 +18,9 @@ description: "为什么 Claude Code 的回答是'打字机效果'而不是一整
 
 一次 AI 响应中可能同时包含文字和工具调用。流式系统需要处理这种交织：
 
-```
-AI 开始输出文字 → "我来看看这个文件的内容..."
-AI 发出工具调用 → [FileRead: src/main.ts]
-           ↓ 暂停流式输出
-     工具执行中... 
-     结果返回给 AI
-           ↓ 恢复流式输出
-AI 继续输出 → "这个文件里有一个 bug，第 42 行..."
-AI 发出下一个工具调用 → [FileEdit: src/main.ts]
-```
+<Frame caption="流式输出与工具调用的交织时间线">
+  <img src="/docs/images/streaming-timeline.png" alt="流式响应时间线" />
+</Frame>
 
 ## 流式工具执行
 
