@@ -1,8 +1,8 @@
 # Claude Code Best V3 (CCB)
 
-Anthropic 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 工具的源码反编译/逆向还原项目。目标是将 Claude Code 大部分功能及工程化能力复现。虽然很难绷, 但是它叫做 CCB(踩踩背)...
+牢 A (Anthropic) 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 工具的源码反编译/逆向还原项目。目标是将 Claude Code 大部分功能及工程化能力复现。虽然很难绷, 但是它叫做 CCB(踩踩背)...
 
-[项目解析文档在这里, 支持投稿 PR](https://ccb.agent-aura.top/)
+[文档在这里, 支持投稿 PR](https://ccb.agent-aura.top/)
 
 赞助商占位符
 
@@ -17,15 +17,16 @@ Anthropic 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) C
 >
 > 这个项目更新很快, 后台有 Opus 持续优化, 所以你可以提 issues, 但是 PR 暂时不会接受;
 >
-> Claude 已经烧了 600$ 以上, 如果你个人想赞助, 请随便找个机构捐款, 然后截图在 issues, 大家的力量是温暖的;
+> Claude 已经烧了 800$ 以上, 如果你个人想赞助, 请随便找个机构捐款, 然后截图在 issues, 大家的力量是温暖的;
 >
 > 某些模型提供商想要赞助, 那么请私发一个 1w 额度以上的账号到 <claude-code-best@proton.me>; 我们会在赞助商栏直接给你最亮的位置
 
 存活记录:
 
-1. 开源后 15 小时: 完成了构建产物的 node 支持, 现在是完全体了; star 快到 3k 了; 等待牢 A 的邮件
-2. 开源后 12 小时: 愚人节, star 破 1k, 并且牢 A 没有发邮件搞这个项目
-3. 如果你想要私人咨询服务, 那么可以发送邮件到 <claude-code-best@proton.me>, 备注咨询与联系方式即可; 由于后续工作非常多, 可能会忽略邮件, 半天没回复, 可以多发;
+1. 开源后 24 小时: 突破 6k Star, 感谢各位支持. 完成 docs 文档的站点构建, 达到 v3 版本, 后续开始进行测试用例维护, 完成之后可以接受 PR; 看来牢 A 是不想理我们了;
+2. 开源后 15 小时: 完成了构建产物的 node 支持, 现在是完全体了; star 快到 3k 了; 等待牢 A 的邮件
+3. 开源后 12 小时: 愚人节, star 破 1k, 并且牢 A 没有发邮件搞这个项目
+4. 如果你想要私人咨询服务, 那么可以发送邮件到 <claude-code-best@proton.me>, 备注咨询与联系方式即可; 由于后续工作非常多, 可能会忽略邮件, 半天没回复, 可以多发;
 
 ## 快速开始
 
