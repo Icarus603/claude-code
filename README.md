@@ -2,22 +2,22 @@
 
 Anthropic 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 工具的源码反编译/逆向还原项目。目标是将 Claude Code 大部分功能及工程化能力复现。虽然很难绷, 但是它叫做 CCB(踩踩背)...
 
-> V1 会完成跑通及基本的类型检查通过; 
+> V1 会完成跑通及基本的类型检查通过;
 >
-> V2 会完整实现工程化配套设施; 
+> V2 会完整实现工程化配套设施;
 >
-> V3 会实现多层级解耦, 很多比如 UI 包, Agent 包都可以独立优化; 
+> V3 会实现多层级解耦, 很多比如 UI 包, Agent 包都可以独立优化;
 >
 > V4 会完成大量的测试文件, 以提高稳定性
 >
 > 我不知道这个项目还会存在多久, fork 不好使, git clone 或者下载 .zip 包才稳健;
-> 
+>
 > 这个项目更新很快, 后台有 Opus 持续优化, 所以你可以提 issues, 但是 PR 暂时不会接受;
 >
 > 存活记录:
 > 开源后 12 小时: 愚人节, star 破 1k, 并且牢 A 没有发邮件搞这个项目
 >
-> 如果你想要私人咨询服务, 那么可以发送邮件到 claude-code-best@proton.me, 备注咨询与联系方式即可; 由于后续工作非常多, 可能会忽略邮件, 半天没回复, 可以多发;
+> 如果你想要私人咨询服务, 那么可以发送邮件到 <claude-code-best@proton.me>, 备注咨询与联系方式即可; 由于后续工作非常多, 可能会忽略邮件, 半天没回复, 可以多发;
 
 ## 快速开始
 
@@ -26,8 +26,7 @@ Anthropic 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) C
 一定要最新版本的 bun 啊, 不然一堆奇奇怪怪的 BUG!!! bun upgrade!!!
 
 - [Bun](https://bun.sh/) >= 1.3.11
-- Node.js >= 18（部分依赖需要）
-- 有效的 Anthropic API Key（或 Bedrock / Vertex 凭据）
+- 常规的配置 CC 的方式, 各大提供商都有自己的配置方式
 
 ### 安装
 
@@ -41,17 +40,11 @@ bun install
 # 开发模式, 看到版本号 888 说明就是对了
 bun run dev
 
-# 直接运行
-bun run src/entrypoints/cli.tsx
-
-# 管道模式（-p）
-echo "say hello" | bun run src/entrypoints/cli.tsx -p
-
 # 构建
 bun run build
 ```
 
-构建产物输出到 `dist/cli.js`（~25.75 MB，5326 模块）。
+构建产物会输出到 `dist/cli.js`, 构建出的版本 bun 和 node 都可以启动, 你 publish 到私有源可以直接启动
 
 ## 能力清单
 
@@ -301,7 +294,6 @@ bun run build
 ### Feature Flags（30 个，全部返回 `false`）
 
 `ABLATION_BASELINE` `AGENT_MEMORY_SNAPSHOT` `BG_SESSIONS` `BRIDGE_MODE` `BUDDY` `CCR_MIRROR` `CCR_REMOTE_SETUP` `CHICAGO_MCP` `COORDINATOR_MODE` `DAEMON` `DIRECT_CONNECT` `EXPERIMENTAL_SKILL_SEARCH` `FORK_SUBAGENT` `HARD_FAIL` `HISTORY_SNIP` `KAIROS` `KAIROS_BRIEF` `KAIROS_CHANNELS` `KAIROS_GITHUB_WEBHOOKS` `LODESTONE` `MCP_SKILLS` `PROACTIVE` `SSH_REMOTE` `TORCH` `TRANSCRIPT_CLASSIFIER` `UDS_INBOX` `ULTRAPLAN` `UPLOAD_USER_SETTINGS` `VOICE_MODE` `WEB_BROWSER_TOOL` `WORKFLOW_SCRIPTS`
-
 
 ## 项目结构
 

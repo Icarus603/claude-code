@@ -1,5 +1,3 @@
-import { dlopen, FFIType, suffix } from "bun:ffi";
-
 const FLAG_SHIFT = 0x20000;
 const FLAG_CONTROL = 0x40000;
 const FLAG_OPTION = 0x80000;
@@ -23,12 +21,13 @@ function loadFFI(): void {
   }
 
   try {
-    const lib = dlopen(
+    const ffi = require("bun:ffi") as typeof import("bun:ffi");
+    const lib = ffi.dlopen(
       `/System/Library/Frameworks/Carbon.framework/Carbon`,
       {
         CGEventSourceFlagsState: {
-          args: [FFIType.i32],
-          returns: FFIType.u64,
+          args: [ffi.FFIType.i32],
+          returns: ffi.FFIType.u64,
         },
       }
     );
