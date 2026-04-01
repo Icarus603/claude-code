@@ -9,9 +9,10 @@
 		"includes": ["**", "!!**/dist", "!!**/packages/@ant"]
 	},
 	"formatter": {
-		"enabled": false,
-		"indentStyle": "tab",
-		"lineWidth": 120
+		"enabled": true,
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineWidth": 80
 	},
 	"linter": {
 		"enabled": true,
@@ -75,11 +76,38 @@
 			}
 		}
 	},
-	"javascript": {
+	"json": {
 		"formatter": {
-			"quoteStyle": "double"
+			"enabled": false
 		}
 	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"semicolons": "asNeeded",
+			"arrowParentheses": "asNeeded",
+			"trailingCommas": "all"
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.tsx"],
+			"javascript": {
+				"formatter": {
+					"semicolons": "always"
+				}
+			},
+			"formatter": {
+				"lineWidth": 120
+			}
+		},
+		{
+			"includes": ["scripts/**", "packages/**", "**/*.js", "**/*.mjs", "**/*.jsx"],
+			"formatter": {
+				"enabled": false
+			}
+		}
+	],
 	"assist": {
 		"enabled": false
 	}
