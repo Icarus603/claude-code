@@ -12,7 +12,14 @@
     "scripts": {
         "build": "bun build src/entrypoints/cli.tsx --outdir dist --target bun",
         "dev": "bun run src/entrypoints/cli.tsx",
-        "prepublishOnly": "bun run build"
+        "prepublishOnly": "bun run build",
+        "lint": "biome lint src/",
+        "lint:fix": "biome lint --fix src/",
+        "format": "biome format --write src/",
+        "prepare": "git config core.hooksPath .githooks",
+        "test": "bun test",
+        "check:unused": "knip-bun",
+        "health": "bun run scripts/health-check.ts"
     },
     "dependencies": {
         "@alcalzone/ansi-tokenize": "^0.3.0",
@@ -127,6 +134,7 @@
         "@types/react-reconciler": "^0.33.0",
         "@types/sharp": "^0.32.0",
         "@types/turndown": "^5.0.6",
+        "knip": "^6.1.1",
         "typescript": "^6.0.2"
     }
 }
