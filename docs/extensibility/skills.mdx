@@ -1,0 +1,60 @@
+---
+title: "Skills：预制的能力包"
+description: "把常用的工作流封装成可复用的技能"
+---
+
+{/* 本章目标：解释 Skills 系统的设计思想 */}
+
+## Tool vs Skill
+
+| | Tool | Skill |
+|---|---|---|
+| 粒度 | 单个原子操作（读文件、执行命令） | 一套完整的工作流（代码审查、创建 PR） |
+| 触发方式 | AI 自主选择 | 用户主动调用（`/skill-name`）或 AI 根据场景推荐 |
+| 本质 | 执行逻辑 | 预制的 Prompt + 工具权限配置 |
+
+## Skill 的三个来源
+
+<CardGroup cols={3}>
+  <Card title="内置 Skill" icon="box">
+    编译进 CLI 的技能包。如 `/commit`、`/review`、`/debug`
+  </Card>
+  <Card title="项目 Skill" icon="folder-open">
+    项目 `.claude/skills/` 目录中的 Markdown 文件。团队共享
+  </Card>
+  <Card title="MCP Skill" icon="plug">
+    通过 MCP Server 提供的技能。动态发现
+  </Card>
+</CardGroup>
+
+## 一个 Skill 包含什么
+
+每个 Skill 本质上是一个"AI 行为的预设"：
+
+| 组成部分 | 作用 |
+|----------|------|
+| **名称和描述** | 告诉 AI 和用户这个技能做什么 |
+| **whenToUse** | 什么场景下应该使用这个技能（AI 据此自动推荐） |
+| **Prompt 模板** | 注入给 AI 的详细指令——相当于"操作手册" |
+| **allowedTools** | 这个技能允许使用哪些工具（能力边界） |
+| **model** | 可选指定使用的模型 |
+
+## 设计精妙之处
+
+Skill 的核心洞见是：**很多复杂任务的关键不在于代码逻辑，而在于 Prompt 的质量**。
+
+一个好的代码审查，不是写了什么代码来审查，而是：
+- 告诉 AI 审查的标准是什么
+- 告诉 AI 按什么顺序审查
+- 告诉 AI 输出什么格式的报告
+- 限制 AI 只能用读取类工具（不要边审查边改代码）
+
+Skill 把这些"经验"封装起来，任何人都能一键调用。
+
+## 技能发现
+
+当可用技能很多时，AI 可以通过 **SkillTool** 搜索匹配的技能：
+
+- 用户说"帮我做代码审查"
+- AI 搜索已注册的技能，发现 `code-review` 匹配
+- AI 调用该技能，按预设的流程执行

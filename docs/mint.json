@@ -1,0 +1,84 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Claude Code Architecture",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#D97706",
+    "light": "#F59E0B",
+    "dark": "#B45309",
+    "background": {
+      "dark": "#0F172A",
+      "light": "#FFFFFF"
+    }
+  },
+  "navigation": [
+    {
+      "group": "开始",
+      "pages": [
+        "introduction/what-is-claude-code",
+        "introduction/why-this-whitepaper",
+        "introduction/architecture-overview"
+      ]
+    },
+    {
+      "group": "对话是如何运转的",
+      "pages": [
+        "conversation/the-loop",
+        "conversation/streaming",
+        "conversation/multi-turn"
+      ]
+    },
+    {
+      "group": "工具：AI 的双手",
+      "pages": [
+        "tools/what-are-tools",
+        "tools/file-operations",
+        "tools/shell-execution",
+        "tools/search-and-navigation",
+        "tools/task-management"
+      ]
+    },
+    {
+      "group": "安全与权限",
+      "pages": [
+        "safety/why-safety-matters",
+        "safety/permission-model",
+        "safety/sandbox",
+        "safety/plan-mode"
+      ]
+    },
+    {
+      "group": "上下文工程",
+      "pages": [
+        "context/system-prompt",
+        "context/project-memory",
+        "context/compaction",
+        "context/token-budget"
+      ]
+    },
+    {
+      "group": "多 Agent 协作",
+      "pages": [
+        "agent/sub-agents",
+        "agent/worktree-isolation",
+        "agent/coordinator-and-swarm"
+      ]
+    },
+    {
+      "group": "可扩展性",
+      "pages": [
+        "extensibility/mcp-protocol",
+        "extensibility/hooks",
+        "extensibility/skills",
+        "extensibility/custom-agents"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/anthropics/claude-code"
+  }
+}

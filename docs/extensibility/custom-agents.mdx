@@ -1,0 +1,56 @@
+---
+title: "自定义 Agent"
+description: "定义你自己的 AI 角色——不同的人格、能力和边界"
+---
+
+{/* 本章目标：解释自定义 Agent 定义的设计 */}
+
+## 为什么需要自定义 Agent
+
+默认的 Claude Code 是一个"全能型"助手。但有些场景需要更专门化的角色：
+
+- 一个只负责代码审查、不会修改代码的 Agent
+- 一个专门处理 DevOps 任务的 Agent
+- 一个面向初学者、回答更详细的 Agent
+
+## Agent 定义
+
+自定义 Agent 通过 Markdown 文件定义，放在 `.claude/agents/` 目录：
+
+| 配置项 | 说明 |
+|--------|------|
+| **名称** | Agent 的标识和显示名 |
+| **描述** | 这个 Agent 的职责说明 |
+| **System Prompt** | 自定义的角色指令——替换或追加到默认 System Prompt |
+| **允许的工具** | 这个 Agent 可以使用哪些工具 |
+| **模型** | 使用哪个 AI 模型 |
+
+## 与子 Agent 的关系
+
+自定义 Agent 可以作为子 Agent 被启动：
+
+- 主 Agent 说"这个任务需要安全审查"
+- 系统启动一个自定义的"安全审查 Agent"
+- 该 Agent 只有阅读权限，使用专门的安全审查 Prompt
+
+这实现了**角色分离**——不同的任务由不同"人格"的 Agent 处理。
+
+## 复用与共享
+
+<CardGroup cols={2}>
+  <Card title="项目级" icon="folder">
+    放在项目的 `.claude/agents/` 目录，团队所有人可用
+  </Card>
+  <Card title="用户级" icon="user">
+    放在 `~/.claude/agents/` 目录，跨项目可用
+  </Card>
+</CardGroup>
+
+## 实际应用
+
+| Agent | 角色 | 工具限制 |
+|-------|------|---------|
+| `reviewer` | 代码审查员 | 只允许 Read、Glob、Grep |
+| `devops` | DevOps 工程师 | 允许 Bash，限制在 infra/ 目录 |
+| `tutor` | 编程导师 | 全部工具，但 Prompt 强调教学 |
+| `security` | 安全审计员 | 只允许搜索和阅读，输出安全报告 |

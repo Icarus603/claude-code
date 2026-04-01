@@ -1,0 +1,74 @@
+---
+title: "工具：AI 的双手"
+description: "理解 Tool 这个核心抽象——AI 是怎么从'说'变成'做'的"
+---
+
+{/* 本章目标：让读者理解 Tool 抽象的设计思想 */}
+
+## AI 为什么需要工具
+
+大语言模型本质上只能做一件事：**根据输入文本，生成输出文本**。
+
+它不能读文件、不能执行命令、不能搜索代码。要让 AI 真正"动手"，需要一个桥梁——这就是 **Tool**（工具）。
+
+工具是 AI 的双手。AI 说"我想读这个文件"，工具系统替它真正去读；AI 说"我想执行这条命令"，工具系统替它真正去跑。
+
+## 一个工具长什么样
+
+每个工具都是一个标准化的"能力单元"，包含四个要素：
+
+| 要素 | 说明 | 示例（FileRead 工具） |
+|------|------|----------------------|
+| **名称** | 工具的唯一标识 | `Read` |
+| **描述** | 告诉 AI 这个工具能做什么（AI 据此决定是否使用） | "读取本地文件系统中的文件" |
+| **参数定义** | 工具接受什么输入 | `file_path`（必填）、`offset`、`limit` |
+| **执行逻辑** | 工具被调用时实际做什么 | 读取文件内容并返回 |
+
+## AI 如何选择工具
+
+AI 不是从下拉菜单里选工具——它是根据**工具描述**和**当前任务**自主决策的：
+
+1. 系统把所有可用工具的名称、描述、参数告诉 AI
+2. AI 在思考过程中决定"我需要用某个工具"
+3. AI 生成一个结构化的工具调用请求（工具名 + 参数）
+4. 系统执行工具，将结果返回给 AI
+
+<Note>
+工具描述的质量直接影响 AI 的决策准确性。一段好的描述不仅说明"能做什么"，还说明"什么时候该用、什么时候不该用"。
+</Note>
+
+## 50+ 内置工具
+
+Claude Code 内置了覆盖软件开发全流程的工具集：
+
+<CardGroup cols={3}>
+  <Card title="文件操作" icon="file">
+    Read / Write / Edit / Glob / Grep / NotebookEdit
+  </Card>
+  <Card title="命令执行" icon="terminal">
+    Bash / PowerShell
+  </Card>
+  <Card title="对话管理" icon="comments">
+    Agent / SendMessage / AskUserQuestion
+  </Card>
+  <Card title="任务追踪" icon="list-check">
+    TaskCreate / TaskUpdate / TaskList / TaskGet
+  </Card>
+  <Card title="Web 能力" icon="globe">
+    WebFetch / WebSearch
+  </Card>
+  <Card title="规划与版本" icon="map">
+    EnterPlanMode / Worktree / TodoWrite
+  </Card>
+</CardGroup>
+
+## 工具的可视化渲染
+
+工具不仅能"做事"，还能"展示"。每个工具可以定义自己的 UI 渲染方式：
+
+- **FileEdit** → 在终端里展示语法高亮的 diff 视图
+- **Bash** → 实时显示命令输出，带进度指示
+- **Grep** → 高亮匹配结果，显示文件路径和行号链接
+- **Agent** → 显示子 Agent 的进度条和状态
+
+这让用户能直观地看到"AI 在做什么、做到哪了"。

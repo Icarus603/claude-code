@@ -1,0 +1,72 @@
+---
+title: "Hooks：生命周期钩子"
+description: "在 AI 的关键行为节点插入你自己的逻辑"
+---
+
+{/* 本章目标：解释 Hooks 系统的设计和应用场景 */}
+
+## 什么是 Hooks
+
+Hooks 是用户定义的 shell 命令，在 Claude Code 生命周期的特定时刻自动执行。
+
+类比：React 的 `useEffect` 让你在组件渲染后执行自定义逻辑。Claude Code 的 Hooks 让你在 AI 的关键行为前后执行自定义脚本。
+
+## 可用的 Hook 事件
+
+| 事件 | 触发时机 | 典型用途 |
+|------|---------|---------|
+| **PreToolUse** | 工具调用前 | 拦截危险操作、自定义审批逻辑 |
+| **PostToolUse** | 工具调用后 | 记录日志、触发通知、自动格式化 |
+| **PreCompact** | 上下文压缩前 | 标记不可丢失的信息 |
+| **PostCompact** | 上下文压缩后 | 验证关键信息是否保留 |
+| **Notification** | AI 发出通知时 | 自定义通知渠道（Slack、邮件等） |
+| **StopFailure** | AI 循环异常停止时 | 自定义错误处理 |
+
+## Hook 的能力
+
+Hook 脚本不仅能"观察"，还能"干预"：
+
+<CardGroup cols={2}>
+  <Card title="拦截操作" icon="hand">
+    返回特定信号可以阻止工具调用执行
+  </Card>
+  <Card title="修改行为" icon="pen">
+    返回结构化的 JSON 输出，影响 Claude Code 的后续行为
+  </Card>
+  <Card title="注入上下文" icon="syringe">
+    向 AI 的对话中注入额外信息
+  </Card>
+  <Card title="触发外部流程" icon="bolt">
+    调用 CI/CD、发送通知、更新 Issue tracker
+  </Card>
+</CardGroup>
+
+## 配置方式
+
+Hooks 在 `settings.json` 中配置：
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": { "tool_name": "Write" },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $CLAUDE_FILE_PATH"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+这个例子：每当 AI 写入一个文件后，自动用 Prettier 格式化。
+
+## 安全控制
+
+- 托管设置（企业管理员）的 Hooks 优先级最高，用户不能覆盖
+- Hook 执行有超时限制
+- Hook 的输出会被解析和验证，防止注入攻击

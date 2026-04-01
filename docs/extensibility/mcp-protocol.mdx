@@ -1,0 +1,75 @@
+---
+title: "MCP：开放的工具生态"
+description: "通过标准协议对接任何外部能力——数据库、API、自定义服务"
+---
+
+{/* 本章目标：解释 MCP 协议如何扩展 AI 的能力边界 */}
+
+## 内置工具的局限
+
+Claude Code 内置了 50+ 工具，覆盖了通用的软件开发需求。但每个团队都有特殊需求：
+
+- 连接内部数据库查询数据
+- 调用公司内部 API
+- 操作特定的 DevOps 工具
+- 访问私有的知识库
+
+不可能把所有人的需求都内置进去。
+
+## MCP：一个标准的"插头"
+
+**Model Context Protocol**（模型上下文协议）是 Anthropic 提出的开放标准，定义了 AI 与外部工具之间的通信方式。
+
+类比：USB 是电脑连接外设的标准接口。MCP 是 AI 连接外部能力的标准接口。
+
+## 工作原理
+
+<Steps>
+  <Step title="启动 MCP Server">
+    开发者编写一个 MCP Server，暴露自定义工具（比如"查询数据库"、"发送 Slack 消息"）
+  </Step>
+  <Step title="Claude Code 连接">
+    在配置文件中声明要连接的 MCP Server
+  </Step>
+  <Step title="工具自动发现">
+    连接后，MCP Server 提供的工具自动出现在 AI 的可用工具列表中
+  </Step>
+  <Step title="透明调用">
+    AI 像使用内置工具一样使用 MCP 工具——无需知道底层实现
+  </Step>
+</Steps>
+
+## 三种连接方式
+
+| 方式 | 适用场景 |
+|------|---------|
+| **stdio** | MCP Server 作为子进程运行，通过标准输入/输出通信。最简单 |
+| **SSE** | 通过 HTTP Server-Sent Events 通信。适合远程服务 |
+| **StreamableHTTP** | 基于 HTTP 流的双向通信。适合复杂的交互场景 |
+
+## 权限一视同仁
+
+MCP 提供的工具和内置工具一样受权限系统管控：
+
+- 需要用户确认才能调用
+- 可以设置 allow/deny 规则
+- 支持沙箱限制
+
+这确保了第三方工具不会绕过安全边界。
+
+## 实际例子
+
+```json
+// settings.json 中的 MCP 配置
+{
+  "mcpServers": {
+    "my-database": {
+      "command": "npx",
+      "args": ["@my-org/db-mcp-server"],
+      "env": { "DB_URL": "postgres://..." }
+    }
+  }
+}
+```
+
+配置后，AI 就多了"查询数据库"这个能力——用自然语言描述需求，AI 自动生成查询并执行。

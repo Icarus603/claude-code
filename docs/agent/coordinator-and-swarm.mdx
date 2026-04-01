@@ -1,0 +1,58 @@
+---
+title: "协调者与蜂群"
+description: "从单兵作战到团队协作——多 Agent 的高级编排模式"
+---
+
+{/* 本章目标：介绍 Coordinator Mode 和 Agent Swarms */}
+
+## 两种协作模式
+
+子 Agent 是"临时帮手"——主 Agent 派出去做一件事就回来。对于更复杂的协作需求，Claude Code 提供了两种高级模式：
+
+## Coordinator Mode：一个指挥，多个执行
+
+就像一个团队 leader 带着几个开发者：
+
+- **Coordinator**（协调者）：负责理解需求、拆解任务、分配工作、汇总结果
+- **Workers**（执行者）：各自领取任务独立执行，通过邮箱向 Coordinator 汇报
+
+```
+        ┌─── Worker A (重构 API)
+        │
+Coordinator ──┼─── Worker B (更新测试)
+        │
+        └─── Worker C (更新文档)
+```
+
+Coordinator 不自己写代码，它的职责是**编排**——确保所有 Worker 的工作能拼合在一起。
+
+## Agent Swarms：蜂群式协作
+
+比 Coordinator 更松散的协作模式：
+
+- 多个 Agent 以对等身份同时工作
+- 没有中心化的指挥者
+- 通过消息邮箱互相通信和协调
+- 适合"各自负责一块、偶尔需要沟通"的场景
+
+## Teammate 机制
+
+进程内的"队友"——一种更轻量的协作方式：
+
+- 在同一个进程内运行，共享部分基础设施状态
+- 有独立的对话上下文和工具权限
+- 适合"我需要一个搭档帮忙看看这段代码"的场景
+
+## 任务类型
+
+支撑多 Agent 协作的是丰富的任务类型：
+
+| 任务类型 | 用途 |
+|----------|------|
+| **LocalAgentTask** | 本地子 Agent 任务 |
+| **LocalShellTask** | 后台 shell 命令 |
+| **InProcessTeammateTask** | 进程内队友 |
+| **RemoteAgentTask** | 远程 Agent |
+| **DreamTask** | 后台自主任务 |
+
+每种任务类型都有自己的生命周期管理、状态追踪和通信方式。

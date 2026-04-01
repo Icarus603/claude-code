@@ -1,0 +1,55 @@
+---
+title: "Worktree 隔离"
+description: "给子 Agent 一个独立的工作空间，互不污染"
+---
+
+{/* 本章目标：解释 git worktree 在多 Agent 协作中的作用 */}
+
+## 问题：多个 Agent 改同一份代码
+
+当多个 Agent 同时修改项目文件时，冲突在所难免：
+
+- Agent A 修改了 `config.ts`，Agent B 也在改同一个文件
+- Agent A 的测试需要某个状态，Agent B 的修改破坏了它
+- 半完成的修改混在一起，无法分辨哪些是哪个 Agent 做的
+
+## 解决方案：Git Worktree
+
+Git 原生支持 **worktree**（工作树）——在同一个仓库中创建多个独立的工作目录，每个目录在自己的分支上独立工作。
+
+Claude Code 利用这个特性为子 Agent 提供隔离的工作空间：
+
+| | 共享工作目录 | Worktree 隔离 |
+|---|---|---|
+| 文件冲突 | 多个 Agent 可能互相覆盖 | 每个 Agent 在自己的目录中工作 |
+| 分支 | 都在同一个分支上 | 每个 Agent 有自己的分支 |
+| 测试 | 互相干扰 | 完全独立 |
+| 合并 | 需要手动处理冲突 | 通过 git merge 有序合并 |
+
+## 工作流程
+
+<Steps>
+  <Step title="创建 Worktree">
+    AI 启动带隔离模式的子 Agent，系统自动在 `.claude/worktrees/` 下创建新的工作目录
+  </Step>
+  <Step title="独立工作">
+    子 Agent 在自己的 worktree 中自由修改文件、执行命令
+  </Step>
+  <Step title="完成任务">
+    子 Agent 完成后，变更留在 worktree 的分支上
+  </Step>
+  <Step title="合并或丢弃">
+    主 Agent（或用户）决定：合并这些变更到主分支，还是丢弃
+  </Step>
+  <Step title="清理">
+    不再需要的 worktree 会被自动清理
+  </Step>
+</Steps>
+
+## 安全网
+
+Worktree 还充当了一个安全网：
+
+- 子 Agent 的实验性修改不会影响主分支
+- 如果方案不可行，整个 worktree 可以直接丢弃
+- 多个方案可以在不同 worktree 中并行尝试，最后选最好的

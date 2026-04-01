@@ -1,0 +1,69 @@
+---
+title: "子 Agent：分身术"
+description: "当一个 AI 不够用时，它会召唤更多的自己"
+---
+
+{/* 本章目标：解释子 Agent 机制的设计和应用场景 */}
+
+## 为什么需要子 Agent
+
+有些任务太大，一个 AI 实例忙不过来：
+
+- "在 5 个不同的文件中分别找到并修复同类 bug"
+- "一边重构后端 API，一边更新前端调用"
+- "研究这个库的用法，同时修改我们的代码"
+
+## 分身术的运作方式
+
+Claude Code 中的 Agent 工具让 AI 能够**启动另一个 AI 实例**来处理子任务：
+
+<Steps>
+  <Step title="主 Agent 分析任务">
+    主 Agent 判断任务可以被拆解为独立的子任务
+  </Step>
+  <Step title="启动子 Agent">
+    通过 Agent 工具创建一个或多个子 Agent，每个子 Agent 收到一个清晰的子任务描述
+  </Step>
+  <Step title="并行执行">
+    多个子 Agent 可以同时工作，互不干扰
+  </Step>
+  <Step title="结果汇总">
+    子 Agent 完成后，结果返回给主 Agent，主 Agent 汇总并呈现给用户
+  </Step>
+</Steps>
+
+## 子 Agent 的边界
+
+子 Agent 不是和主 Agent 完全一样的——它有明确的能力边界：
+
+| 特性 | 主 Agent | 子 Agent |
+|------|---------|---------|
+| 可用工具 | 全部工具 | 受限子集（不能再启动子 Agent 等） |
+| 上下文 | 完整的会话历史 | 只有主 Agent 给的任务描述 |
+| 权限 | 用户设定 | 继承主 Agent 的权限，或更严格 |
+| 状态 | 可修改全局状态 | 隔离的状态空间 |
+
+## 通信方式
+
+主 Agent 和子 Agent 之间通过**消息邮箱**通信：
+
+- 主 Agent 通过 `Agent` 工具启动子 Agent
+- 子 Agent 通过 `SendMessage` 工具向主 Agent 报告进度
+- 这种松耦合的通信方式让 Agent 可以异步协作
+
+## 适用场景
+
+<CardGroup cols={2}>
+  <Card title="并行研究" icon="magnifying-glass">
+    多个子 Agent 同时搜索不同方向的信息
+  </Card>
+  <Card title="分治修改" icon="code-branch">
+    把大规模修改拆分到多个子 Agent 并行执行
+  </Card>
+  <Card title="前后台配合" icon="layer-group">
+    一个子 Agent 在后台运行测试，主 Agent 继续写代码
+  </Card>
+  <Card title="隔离实验" icon="flask">
+    在 worktree 中启动子 Agent 尝试一个方案，不影响主分支
+  </Card>
+</CardGroup>

@@ -1,0 +1,59 @@
+---
+title: "架构全景"
+description: "五层架构，一条数据流"
+---
+
+{/* 本章目标：一张图讲清楚整体架构，为后续章节建立坐标系 */}
+
+## 五层架构
+
+Claude Code 从上到下分为五个层次，每一层职责清晰、边界分明：
+
+| 层次 | 职责 | 关键词 |
+|------|------|--------|
+| **交互层** | 终端 UI、用户输入、消息展示 | React/Ink、REPL |
+| **编排层** | 管理多轮对话、会话生命周期、成本追踪 | QueryEngine、会话持久化 |
+| **核心循环层** | 单轮对话：发请求 → 拿响应 → 执行工具 → 再发请求 | Agentic Loop |
+| **工具层** | AI 的"双手"——读写文件、执行命令、搜索代码 | Tool System、MCP |
+| **通信层** | 与 Claude API 的流式通信、多云 Provider 适配 | Streaming、Bedrock/Vertex |
+
+## 一条主数据流
+
+{/* TODO: 插入数据流序列图 */}
+
+整个系统的运转可以浓缩为一条核心数据流：
+
+<Steps>
+  <Step title="用户输入">
+    用户在终端键入自然语言需求
+  </Step>
+  <Step title="上下文组装">
+    系统自动拼接项目信息、git 状态、配置文件、记忆，形成完整的 System Prompt
+  </Step>
+  <Step title="API 调用">
+    将 System Prompt + 对话历史发送给 Claude API，流式接收响应
+  </Step>
+  <Step title="工具调用循环">
+    若 AI 返回工具调用请求 → 权限检查 → 执行工具 → 结果回传 → AI 继续思考 → 循环
+  </Step>
+  <Step title="任务完成">
+    AI 不再调用工具，输出最终回答，等待用户下一条输入
+  </Step>
+</Steps>
+
+## 四个核心设计原则
+
+<AccordionGroup>
+  <Accordion title="流式优先 (Streaming-first)">
+    所有 API 通信都是流式的——用户看到 AI "逐字打出"回答，而不是等待完整响应。工具执行结果也实时反馈。这不仅提升体验，更是处理长时间任务的工程必需。
+  </Accordion>
+  <Accordion title="工具即能力 (Tool as Capability)">
+    AI 的每一项"动手能力"都被抽象为一个 Tool。想让 AI 能做新事情？注册一个新 Tool 就好。统一的接口让能力可插拔、可组合。
+  </Accordion>
+  <Accordion title="权限即边界 (Permission as Boundary)">
+    AI 能操作真实环境是强大的，也是危险的。每个工具调用都经过权限系统的裁决——该放行的自动放行，该拦截的坚决拦截。
+  </Accordion>
+  <Accordion title="上下文即记忆 (Context as Memory)">
+    AI 没有真正的记忆，但通过精心的 System Prompt 组装、对话压缩、持久化记忆文件，系统营造出"AI 理解你的项目"的效果。这是上下文工程的核心。
+  </Accordion>
+</AccordionGroup>

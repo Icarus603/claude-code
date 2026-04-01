@@ -1,0 +1,53 @@
+---
+title: "命令执行"
+description: "让 AI 在你的终端里运行命令——安全地"
+---
+
+{/* 本章目标：介绍 Bash 工具的能力与安全设计 */}
+
+## AI 能执行命令意味着什么
+
+这是 Claude Code 最强大也最敏感的能力。AI 可以：
+
+- 运行构建命令（`npm run build`、`cargo build`）
+- 执行测试（`pytest`、`jest`）
+- 使用 git（`git status`、`git commit`）
+- 调用系统工具（`curl`、`docker`、`kubectl`）
+
+几乎你在终端里能做的事，AI 都能做。
+
+## 安全设计
+
+强大的能力需要严格的控制：
+
+<AccordionGroup>
+  <Accordion title="权限确认">
+    默认情况下，每条命令执行前都需要用户手动确认。用户可以设置白名单规则，让特定命令自动放行。
+  </Accordion>
+  <Accordion title="沙箱隔离">
+    在支持的平台上，命令可以运行在沙箱环境中——限制文件系统访问范围、禁止网络请求、阻止危险操作。
+  </Accordion>
+  <Accordion title="超时控制">
+    每条命令都有超时限制（默认 2 分钟，最长 10 分钟），防止 AI 启动一个永远不会结束的进程。
+  </Accordion>
+  <Accordion title="输出截断">
+    命令输出过长时自动截断，避免把海量日志全部塞进 AI 的上下文。
+  </Accordion>
+</AccordionGroup>
+
+## 前台与后台
+
+有些命令需要等待结果（比如 `git status`），有些适合在后台运行（比如 `npm install`）：
+
+- **前台执行**：AI 等待命令完成，拿到输出后继续思考
+- **后台执行**：命令在后台运行，AI 可以继续做其他事，稍后再检查结果
+
+## 为什么用专用工具而不是直接调 shell
+
+<Note>
+Claude Code 为文件读写、代码搜索等操作提供了专用工具（Read、Grep、Glob），而不是让 AI 用 `cat`、`grep` 等 shell 命令。原因有三：
+</Note>
+
+1. **权限粒度更细**：`Read` 是只读操作可以自动放行，但 `Bash: cat file` 需要审批整条命令
+2. **输出结构化**：专用工具的返回值是结构化的，方便 UI 渲染（高亮、diff 视图等）
+3. **性能优化**：专用工具可以做缓存、分页、token 预算控制，shell 命令做不到
