@@ -1,3 +1,4 @@
+#!/usr/bin/env bun
 // Runtime polyfill for bun:bundle (build-time macros)
 const feature = (_name: string) => false;
 if (typeof globalThis.MACRO === "undefined") {
