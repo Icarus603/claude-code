@@ -76,6 +76,16 @@
         "docs/extensibility/skills",
         "docs/extensibility/custom-agents"
       ]
+    },
+    {
+      "group": "揭秘：隐藏功能与内部机制",
+      "pages": [
+        "docs/internals/three-tier-gating",
+        "docs/internals/feature-flags",
+        "docs/internals/growthbook-ab-testing",
+        "docs/internals/hidden-features",
+        "docs/internals/ant-only-world"
+      ]
     }
   ],
   "footerSocials": {
