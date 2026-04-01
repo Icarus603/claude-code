@@ -1,8 +1,8 @@
 import {
   getCompanion,
-  roll,
+  rollWithSeed,
+  generateSeed,
   type Roll,
-  companionUserId,
 } from '../../buddy/companion.js'
 import {
   type StoredCompanion,
@@ -133,7 +133,8 @@ export const call: LocalCommandCall = async (args, _context) => {
       }
     }
 
-    const r = roll(companionUserId())
+    const seed = generateSeed()
+    const r = rollWithSeed(seed)
     const name = SPECIES_NAMES[r.bones.species] ?? 'Buddy'
     const personality =
       SPECIES_PERSONALITY[r.bones.species] ?? 'Mysterious and code-savvy.'
@@ -141,6 +142,7 @@ export const call: LocalCommandCall = async (args, _context) => {
     const stored: StoredCompanion = {
       name,
       personality,
+      seed,
       hatchedAt: Date.now(),
     }
 
@@ -212,7 +214,8 @@ export const call: LocalCommandCall = async (args, _context) => {
 
   // /buddy rehatch — re-roll a new companion (replaces existing)
   if (sub === 'rehatch') {
-    const r = roll(companionUserId())
+    const seed = generateSeed()
+    const r = rollWithSeed(seed)
     const name = SPECIES_NAMES[r.bones.species] ?? 'Buddy'
     const personality =
       SPECIES_PERSONALITY[r.bones.species] ?? 'Mysterious and code-savvy.'
@@ -220,6 +223,7 @@ export const call: LocalCommandCall = async (args, _context) => {
     const stored: StoredCompanion = {
       name,
       personality,
+      seed,
       hatchedAt: Date.now(),
     }
 
