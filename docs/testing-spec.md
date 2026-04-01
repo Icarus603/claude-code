@@ -298,7 +298,64 @@ bun test --watch
 - [ ] 测试可独立运行，无顺序依赖
 - [ ] `bun test` 本地全部通过后再提交
 
-## 11. 参考
+## 11. 当前测试覆盖状态
+
+> 更新日期：2026-04-01 | 总计：**517 tests, 25 files, 0 failures**
+
+### P0 — 核心模块
+
+| 测试计划 | 测试文件 | 测试数 | 覆盖范围 |
+|----------|----------|--------|----------|
+| 01 - Tool 系统 | `src/__tests__/Tool.test.ts` | 25 | buildTool, toolMatchesName, findToolByName, getEmptyToolPermissionContext, filterToolProgressMessages |
+| | `src/__tests__/tools.test.ts` | 5 | parseToolPreset |
+| | `src/tools/shared/__tests__/gitOperationTracking.test.ts` | 16 | parseGitCommitId, detectGitOperation |
+| 02 - Utils 纯函数 | `src/utils/__tests__/array.test.ts` | 12 | intersperse, count, uniq |
+| | `src/utils/__tests__/set.test.ts` | 12 | difference, intersects, every, union |
+| | `src/utils/__tests__/xml.test.ts` | 9 | escapeXml, escapeXmlAttr |
+| | `src/utils/__tests__/hash.test.ts` | 12 | djb2Hash, hashContent, hashPair |
+| | `src/utils/__tests__/stringUtils.test.ts` | 35 | escapeRegExp, capitalize, plural, firstLineOf, countCharInString, normalizeFullWidthDigits/Space, safeJoinLines, EndTruncatingAccumulator, truncateToLines |
+| | `src/utils/__tests__/semver.test.ts` | 21 | gt, gte, lt, lte, satisfies, order |
+| | `src/utils/__tests__/uuid.test.ts` | 6 | validateUuid |
+| | `src/utils/__tests__/format.test.ts` | 24 | formatFileSize, formatSecondsShort, formatDuration, formatNumber, formatTokens, formatRelativeTime |
+| | `src/utils/__tests__/frontmatterParser.test.ts` | 28 | parseFrontmatter, splitPathInFrontmatter, parsePositiveIntFromFrontmatter, parseBooleanFrontmatter, parseShellFrontmatter |
+| | `src/utils/__tests__/file.test.ts` | 17 | convertLeadingTabsToSpaces, addLineNumbers, stripLineNumberPrefix, normalizePathForComparison, pathsEqual |
+| | `src/utils/__tests__/glob.test.ts` | 6 | extractGlobBaseDirectory |
+| | `src/utils/__tests__/diff.test.ts` | 8 | adjustHunkLineNumbers, getPatchFromContents |
+| 03 - Context 构建 | `src/utils/__tests__/claudemd.test.ts` | 16 | stripHtmlComments, isMemoryFilePath, getLargeMemoryFiles |
+| | `src/utils/__tests__/systemPrompt.test.ts` | 9 | buildEffectiveSystemPrompt |
+
+### P1 — 重要模块
+
+| 测试计划 | 测试文件 | 测试数 | 覆盖范围 |
+|----------|----------|--------|----------|
+| 04 - 权限系统 | `src/utils/permissions/__tests__/permissionRuleParser.test.ts` | 25 | escapeRuleContent, unescapeRuleContent, permissionRuleValueFromString, permissionRuleValueToString, normalizeLegacyToolName |
+| 05 - 模型路由 | `src/utils/model/__tests__/aliases.test.ts` | 16 | isModelAlias, isModelFamilyAlias |
+| | `src/utils/model/__tests__/model.test.ts` | 14 | firstPartyNameToCanonical |
+| | `src/utils/model/__tests__/providers.test.ts` | 10 | getAPIProvider, isFirstPartyAnthropicBaseUrl |
+| 06 - 消息处理 | `src/utils/__tests__/messages.test.ts` | 56 | createAssistantMessage, createUserMessage, isSyntheticMessage, getLastAssistantMessage, hasToolCallsInLastAssistantTurn, extractTag, isNotEmptyMessage, normalizeMessages, deriveUUID, isClassifierDenial 等 |
+
+### P2 — 补充模块
+
+| 测试计划 | 测试文件 | 测试数 | 覆盖范围 |
+|----------|----------|--------|----------|
+| 07 - Cron 调度 | `src/utils/__tests__/cron.test.ts` | 38 | parseCronExpression, computeNextCronRun, cronToHuman |
+| 08 - Git 工具 | `src/utils/__tests__/git.test.ts` | 18 | normalizeGitRemoteUrl (SSH/HTTPS/ssh:///代理URL/大小写规范化) |
+| 09 - 配置与设置 | `src/utils/settings/__tests__/config.test.ts` | 62 | SettingsSchema, PermissionsSchema, AllowedMcpServerEntrySchema, MCP 类型守卫, 设置常量函数, filterInvalidPermissionRules, validateSettingsFileContent, formatZodError |
+
+### 已知限制
+
+以下模块因 ESM 重依赖链导致测试挂起，尚未编写测试：
+
+| 模块 | 问题 | 依赖链 |
+|------|------|--------|
+| `src/utils/json.ts` | 导入时挂起 | `json.ts` → `log.ts` → `logError` → analytics/bootstrap |
+| `src/utils/config.ts` | 导入时挂起 | `config.ts` → `log.ts` → analytics/bootstrap |
+| `src/utils/messages.ts` 部分函数 | 需 mock 重依赖 | `withMemoryCorrectionHint` → `getFeatureValue_CACHED_MAY_BE_STALE` |
+| `src/tools.ts` 部分函数 | 需 mock 重依赖 | `getAllBaseTools`、`getTools` → 全量 tool 注册 |
+
+**解决方向**：使用 `mock.module()` 在导入前 mock 掉 `log.ts`、`bootstrap/state.ts` 等重依赖模块。
+
+## 12. 参考
 
 - [Bun Test 文档](https://bun.sh/docs/cli/test)
 - 现有测试示例：`src/utils/__tests__/set.test.ts`, `src/utils/__tests__/array.test.ts`
