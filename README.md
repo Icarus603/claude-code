@@ -10,7 +10,7 @@ Anthropic 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) C
 - [x] V2 会完整实现工程化配套设施;
   - [ ] Biome 格式化可能不会先实施, 避免代码冲突
   - [x] 构建流水线完成, 产物 Node/Bun 都可以运行
-- [ ] V3 会实现多层级解耦, 很多比如 UI 包, Agent 包都可以独立优化;
+- [ ] V3 会写大量文档, 完善文档站点
 - [ ] V4 会完成大量的测试文件, 以提高稳定性
 
 > 我不知道这个项目还会存在多久, fork 不好使, git clone 或者下载 .zip 包才稳健;
@@ -53,6 +53,10 @@ bun run build
 ```
 
 构建采用 code splitting 多文件打包（`build.ts`），产物输出到 `dist/` 目录（入口 `dist/cli.js` + 约 450 个 chunk 文件）。构建出的版本 bun 和 node 都可以启动, 你 publish 到私有源可以直接启动
+
+## 相关文档及网站
+
+<https://deepwiki.com/claude-code-best/claude-code>
 
 ## Star History
 
