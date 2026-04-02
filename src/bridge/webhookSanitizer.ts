@@ -5,7 +5,7 @@
  * Strips known secret patterns (tokens, API keys, credentials) while preserving
  * the meaningful content (PR titles, descriptions, commit messages, etc.).
  *
- * Must be synchronous and never throw — on error, returns the original content.
+ * Must be synchronous and never throw — on error, returns a safe placeholder.
  */
 
 /** Patterns that match known secret/token formats. */
@@ -37,21 +37,21 @@ export function sanitizeInboundWebhookContent(content: string): string {
 
     let sanitized = content
 
-    // Truncate excessively large payloads
-    if (sanitized.length > MAX_CONTENT_LENGTH) {
-      sanitized = sanitized.slice(0, MAX_CONTENT_LENGTH) + '\n... [truncated]'
-    }
-
-    // Redact known secret patterns
+    // Redact known secret patterns first (before truncation to avoid
+    // splitting a secret across the truncation boundary)
     for (const { pattern, replacement } of SECRET_PATTERNS) {
-      // Reset lastIndex for global regexes
       pattern.lastIndex = 0
       sanitized = sanitized.replace(pattern, replacement)
     }
 
+    // Truncate excessively large payloads after redaction
+    if (sanitized.length > MAX_CONTENT_LENGTH) {
+      sanitized = sanitized.slice(0, MAX_CONTENT_LENGTH) + '\n... [truncated]'
+    }
+
     return sanitized
   } catch {
-    // Never throw — return original content on any error
-    return content
+    // Never throw, never return raw content — return a safe placeholder
+    return '[webhook content redacted due to sanitization error]'
   }
 }

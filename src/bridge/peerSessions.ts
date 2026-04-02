@@ -18,7 +18,7 @@ import { toCompatSessionId } from './sessionIdCompat.js'
 export async function postInterClaudeMessage(
   target: string,
   message: string,
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
     const handle = getReplBridgeHandle()
     if (!handle) {
