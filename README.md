@@ -17,6 +17,7 @@
   - [x] 所有 Feature 现在可以通过环境变量配置, 而不是垃圾的 bun --feature
   - [x] 移除牢 A 的反蒸馏代码!!!
   - [x] 补全 web search 能力(用的 Bing 搜索)!!!
+  - [x] 支持 Debug
 - [ ] V5 大规模重构石山代码, 全面模块分包
   - [ ] V5 将会为全新分支, 届时 main 分支将会封存为历史版本
 
@@ -65,6 +66,24 @@ bun run build
 构建出的版本 bun 和 node 都可以启动, 你 publish 到私有源可以直接启动
 
 如果遇到 bug 请直接提一个 issues, 我们优先解决
+
+## VS Code 调试
+
+TUI (REPL) 模式需要真实终端，无法直接通过 VS Code launch 启动调试。使用 **attach 模式**：
+
+### 步骤
+
+1. **终端启动 inspect 服务**：
+   ```bash
+   bun run dev:inspect
+   ```
+   会输出类似 `ws://localhost:8888/xxxxxxxx` 的地址。
+
+2. **VS Code 附着调试器**：
+   - 在 `src/` 文件中打断点
+   - F5 → 选择 **"Attach to Bun (TUI debug)"**
+
+> 注意：`dev:inspect` 和 `launch.json` 中的 WebSocket 地址会在每次启动时变化，需要同步更新两处。
 
 ## 相关文档及网站
 
