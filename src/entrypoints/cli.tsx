@@ -1,11 +1,6 @@
 #!/usr/bin/env bun
 import { feature } from 'bun:bundle';
 
-// eslint-disable-next-line custom-rules/no-top-level-side-effects
-if (feature('TRANSCRIPT_CLASSIFIER')) {
-  // eslint-disable-next-line custom-rules/no-console, custom-rules/no-top-level-side-effects
-  console.log('[dev] feature TRANSCRIPT_CLASSIFIER enabled');
-}
 
 // Bugfix for corepack auto-pinning, which adds yarnpkg to peoples' package.jsons
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
