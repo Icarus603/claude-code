@@ -1,5 +1,39 @@
 # DEV-LOG
 
+## WebSearch Bing 适配器补全 (2026-04-03)
+
+原始 `WebSearchTool` 仅支持 Anthropic API 服务端搜索（`web_search_20250305` server tool），在非官方 API 端点（第三方代理）下搜索功能不可用。本次改动引入适配器架构，新增 Bing 搜索页面解析作为 fallback。
+
+**新增文件：**
+
+| 文件 | 说明 |
+|------|------|
+| `src/tools/WebSearchTool/adapters/types.ts` | 适配器接口定义：`WebSearchAdapter`、`SearchResult`、`SearchOptions`、`SearchProgress` |
+| `src/tools/WebSearchTool/adapters/apiAdapter.ts` | API 适配器 — 将原有 `queryModelWithStreaming` 逻辑封装为 `ApiSearchAdapter` |
+| `src/tools/WebSearchTool/adapters/bingAdapter.ts` | Bing 适配器 — 直接抓取 Bing HTML，正则提取搜索结果 |
+| `src/tools/WebSearchTool/adapters/index.ts` | 适配器工厂 — 根据环境变量 / API Base URL 选择后端 |
+| `src/tools/WebSearchTool/__tests__/bingAdapter.test.ts` | Bing 适配器单元测试（32 cases：decodeHtmlEntities、extractBingResults、search mock） |
+| `src/tools/WebSearchTool/__tests__/bingAdapter.integration.ts` | Bing 适配器集成测试 — 真实网络请求验证 |
+
+**重构文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `src/tools/WebSearchTool/WebSearchTool.ts` | 从直接调用 API 改为 `createAdapter()` 工厂模式；`isEnabled()` 始终返回 true；删除 ~200 行内联 API 调用逻辑 |
+| `src/tools/WebFetchTool/utils.ts` | `skipWebFetchPreflight` 默认值从 `!undefined`（即 true）改为显式 `=== false`，使域名预检默认启用 |
+
+**Bing 适配器关键技术细节：**
+
+1. **反爬绕过**：使用完整 Edge 浏览器请求头（含 `Sec-Ch-Ua`、`Sec-Fetch-*` 等 13 个标头），避免 Bing 返回 JS 渲染的空页面；`setmkt=en-US` 参数强制美式英语市场，避免 IP 地理定位导致的区域化结果（德语论坛、新加坡金价等不相关内容）
+2. **URL 解码**（`resolveBingUrl()`）：Bing 返回的重定向 URL（`bing.com/ck/a?...&u=a1aHR0cHM6Ly9...`）中 `u` 参数为 base64 编码的真实 URL，需解码后使用
+3. **摘要提取**（`extractSnippet()`）：三级降级策略 — `b_lineclamp` → `b_caption <p>` → `b_caption` 直接文本
+4. **HTML 实体解码**（`decodeHtmlEntities()`）：处理 7 种常见 HTML 实体
+5. **域过滤**：客户端侧 `allowedDomains` / `blockedDomains` 过滤，支持子域名匹配
+
+**当前状态**：`adapters/index.ts` 中 `createAdapter()` 硬编码返回 `BingSearchAdapter`，跳过了 API/Bing 自动选择逻辑（原逻辑被注释保留）。未来可通过取消注释恢复自动选择。
+
+---
+
 ## 移除反蒸馏机制 (2026-04-02)
 
 项目中发现三处 anti-distillation 相关代码，全部移除。
