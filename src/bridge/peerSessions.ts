@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { logForDebugging } from '../utils/debug.js'
 import { errorMessage } from '../utils/errors.js'
+import { getBridgeAccessToken } from './bridgeConfig.js'
 import { getReplBridgeHandle } from './replBridgeHandle.js'
 import { toCompatSessionId } from './sessionIdCompat.js'
 
@@ -29,6 +30,11 @@ export async function postInterClaudeMessage(
       return { ok: false, error: 'No target session specified' }
     }
 
+    const accessToken = getBridgeAccessToken()
+    if (!accessToken) {
+      return { ok: false, error: 'No access token available' }
+    }
+
     const compatTarget = toCompatSessionId(target)
     const from = toCompatSessionId(handle.bridgeSessionId)
     const baseUrl = handle.sessionIngressUrl
@@ -44,6 +50,7 @@ export async function postInterClaudeMessage(
       },
       {
         headers: {
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
           'anthropic-version': '2023-06-01',
         },
