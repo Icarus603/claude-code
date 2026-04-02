@@ -174,6 +174,74 @@ Plan mode 默认使用 auto mode 语义（`getUseAutoModeDuringPlan()`，默认 
 - 向 AI 发送消息："{model} is temporarily unavailable, so auto mode cannot determine the safety of {toolName} right now."
 - 确定性错误（如对话过长）不重试，直接降级
 
+## 分类器 Prompt 模板
+
+分类器的行为由三个 prompt 文件控制，位于 `src/utils/permissions/yolo-classifier-prompts/`。这些文件在构建时通过 `require()` 内联为字符串常量，运行时不可修改。
+
+### auto_mode_system_prompt.txt
+
+主系统提示词，定义分类器的角色、分类流程和决策类别。包含：
+
+- **分类流程**：理解操作 → 检查用户意图 → 评估风险
+- **BLOCK 始终阻止**：外部代码执行、不可逆删除、未授权持久化、安全削弱、提权、网络服务
+- **BLOCK 除非明确意图**：CWD 外写入、系统包管理、git push、大规模变更
+- **ALLOW 安全操作**：读文件、搜索、git 只读命令、测试/lint/构建、CWD 内编辑
+- `<permissions_template>` 占位符 — 运行时替换为具体权限模板（external 或 anthropic）
+- 末尾 `Use the classify_result tool to report your classification.` — XML 模式下被替换为 `<block>` 标签格式说明
+
+### permissions_external.txt
+
+外部用户版本的权限模板。三个 `<user_*_to_replace>` 标签内包裹默认规则（bullet 格式），用户自定义规则**整体替换**默认值：
+
+```
+<user_allow_rules_to_replace>
+- 默认 allow 规则 1
+- 默认 allow 规则 2
+</user_allow_rules_to_replace>
+```
+
+- **allow**：9 条默认规则（只读命令、版本检查、git 只读、测试/lint/构建、包安装、CWD 内文件操作等）
+- **soft_deny**：10 条默认规则（外部代码执行、递归删除、shell 配置修改、提权、网络服务等）
+- **environment**：4 条环境描述（终端环境、auto mode 上下文、开发工具可用、语言/框架不限）
+
+`getDefaultExternalAutoModeRules()` 从此文件提取 bullet 项，供 `claude auto-mode defaults` 命令输出。
+
+### permissions_anthropic.txt
+
+Anthropic 内部版本的权限模板。默认规则在标签**外部**，标签内为空，用户自定义规则以**追加**方式叠加：
+
+```
+- 默认规则（在标签外，始终生效）
+<user_allow_rules_to_replace>
+</user_allow_rules_to_replace>
+```
+
+相比 external 版本，额外包含：
+- 云 CLI 只读命令（aws describe, gcloud describe, kubectl get 等）
+- 基础设施即代码 plan 命令（terraform plan, pulumi preview 等）
+- 对应的 deny 规则（云资源创建/修改/删除、IaC apply、生产环境访问等）
+
+### 模板替换流程
+
+```
+buildYoloSystemPrompt()
+  ├── BASE_PROMPT.replace('<permissions_template>', EXTERNAL/ANTHROPIC_TEMPLATE)
+  ├── .replace(<user_allow_rules_to_replace>, userAllow ?? defaults)
+  ├── .replace(<user_deny_rules_to_replace>, userDeny ?? defaults)
+  └── .replace(<user_environment_to_replace>, userEnvironment ?? defaults)
+```
+
+- 外部模板：用户设置非空时**替换**对应标签内容，否则保留默认值
+- 内部模板：用户设置**追加**到默认值之后（标签在末尾为空）
+
+## 当前状态说明
+
+> **注意**：auto mode 的完整代码逻辑已存在于代码库中，但依赖 `feature('TRANSCRIPT_CLASSIFIER')` feature flag。
+> 在当前反编译版本中，`feature()` 始终返回 `false`，因此 auto mode 不可用。
+> 要启用需将 `feature('TRANSCRIPT_CLASSIFIER')` 改为 `true`，并确保 GrowthBook 配置源有合理的 fallback 默认值。
+
+Prompt 模板文件为**重建产物**——原始文件在反编译过程中丢失，已根据代码逻辑和 `yoloClassifier.ts` 中的替换模式重新编写。
+
 ## 相关源码索引
 
 | 文件 | 职责 |
@@ -184,6 +252,12 @@ Plan mode 默认使用 auto mode 语义（`getUseAutoModeDuringPlan()`，默认 
 | `src/utils/permissions/dangerousPatterns.ts` | 危险命令模式列表 |
 | `src/utils/permissions/classifierDecision.ts` | 分类器决策处理 |
 | `src/utils/permissions/classifierShared.ts` | 分类器共享逻辑 |
-| `src/utils/messages.ts` | Auto mode 系统提示词 |
+| `src/utils/permissions/bashClassifier.ts` | Bash 命令分类规则 |
+| `src/utils/permissions/bypassPermissionsKillswitch.ts` | bypass 权限熔断器 |
+| `src/utils/permissions/yolo-classifier-prompts/auto_mode_system_prompt.txt` | 分类器主系统提示词 |
+| `src/utils/permissions/yolo-classifier-prompts/permissions_external.txt` | 外部权限模板 |
+| `src/utils/permissions/yolo-classifier-prompts/permissions_anthropic.txt` | 内部权限模板 |
+| `src/cli/handlers/autoMode.ts` | CLI `auto-mode` 子命令处理 |
+| `src/utils/messages.ts` | Auto mode 系统提示词注入 |
 | `src/types/permissions.ts` | 权限类型定义 |
 | `src/utils/betas.ts` | 模型 auto mode 支持检测 |
