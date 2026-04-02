@@ -300,7 +300,7 @@ bun test --watch
 
 ## 11. 当前测试覆盖状态
 
-> 更新日期：2026-04-02 | 总计：**968 tests, 52 files, 0 failures**
+> 更新日期：2026-04-02 | 总计：**1177 tests, 64 files, 0 failures**
 
 ### P0 — 核心模块
 
@@ -383,6 +383,23 @@ bun test --watch
 | `src/tools/BashTool/__tests__/destructiveCommandWarning.test.ts` | 22 | getDestructiveCommandWarning (git/rm/database/infrastructure patterns) |
 | `src/tools/BashTool/__tests__/commandSemantics.test.ts` | 11 | interpretCommandResult (grep/diff/test/rg/find exit code semantics) |
 
+### P6 — Phase 5 扩展覆盖
+
+| 测试文件 | 测试数 | 覆盖范围 |
+|----------|--------|----------|
+| `src/utils/__tests__/tokenBudget.test.ts` | 20 | parseTokenBudget, findTokenBudgetPositions, getBudgetContinuationMessage |
+| `src/utils/__tests__/displayTags.test.ts` | 17 | stripDisplayTags, stripDisplayTagsAllowEmpty, stripIdeContextTags |
+| `src/utils/__tests__/taggedId.test.ts` | 10 | toTaggedId (prefix/uniqueness/format) |
+| `src/utils/__tests__/controlMessageCompat.test.ts` | 15 | normalizeControlMessageKeys (snake_case→camelCase 转换) |
+| `src/services/mcp/__tests__/normalization.test.ts` | 11 | normalizeNameForMCP (特殊字符/截断/空字符串/Unicode) |
+| `src/services/mcp/__tests__/envExpansion.test.ts` | 14 | expandEnvVarsInString ($VAR/${VAR}/嵌套/未定义/转义) |
+| `src/utils/git/__tests__/gitConfigParser.test.ts` | 20 | parseConfigString (key=value/section/subsection/多行/注释/引号) |
+| `src/utils/__tests__/formatBriefTimestamp.test.ts` | 10 | formatBriefTimestamp (秒/分/时/天/周/月/年) |
+| `src/utils/__tests__/hyperlink.test.ts` | 10 | createHyperlink (OSC 8 序列/file:///path/fallback) |
+| `src/utils/__tests__/windowsPaths.test.ts` | 20 | windowsPathToPosixPath, posixPathToWindowsPath (驱动器/UNC/相对路径) |
+| `src/utils/__tests__/notebook.test.ts` | 14 | parseCellId, mapNotebookCellsToToolResult (code/markdown/output) |
+| `src/utils/__tests__/effort.test.ts` | 38 | isEffortLevel, parseEffortValue, isValidNumericEffort, convertEffortValueToLevel, getEffortLevelDescription, resolvePickerEffortPersistence |
+
 ### 已知限制
 
 以下模块因 Bun 运行时限制或极重依赖链，暂时无法或不适合测试：
@@ -405,14 +422,20 @@ bun test --watch
 | `src/utils/slowOperations.ts` | tokens.ts, permissions.ts, memoize.ts, PermissionMode.ts |
 | `src/utils/debug.ts` | envValidation.ts, outputLimits.ts |
 | `src/utils/bash/commands.ts` | commandSemantics.ts |
+| `src/utils/thinking.js` | effort.ts |
+| `src/utils/settings/settings.js` | effort.ts |
+| `src/utils/auth.js` | effort.ts |
+| `src/services/analytics/growthbook.js` | effort.ts, tokenBudget.ts |
+| `src/utils/model/modelSupportOverrides.js` | effort.ts |
 
 **关键约束**：`mock.module()` 必须在每个测试文件中内联调用，不能从共享 helper 导入（Bun 在 mock 生效前就解析了 helper 的导入）。
 
 ## 12. 后续测试覆盖计划
 
-> **已完成** — 实际增加 321 tests，从 647 → 968 tests / 52 files
+> **已完成** — Phase 1-4 增加 321 tests (647 → 968)，Phase 5 增加 209 tests (968 → 1177)
 >
 > Phase 1-4 全部完成，详见上方 P3-P5 表格。
+> Phase 5 新增 12 个测试文件覆盖：effort、tokenBudget、displayTags、taggedId、controlMessageCompat、MCP normalization/envExpansion、gitConfigParser、formatBriefTimestamp、hyperlink、windowsPaths、notebook，详见 P6 表格。
 > 实际调整：Phase 3 中 `context.ts` 因极重依赖链（bootstrap/state + claudemd + git 等）且 `getGitStatus` 在 test 环境直接返回 null，替换为 `envValidation.ts`（更实用）；Phase 4 中 GlobTool 纯函数不足，替换为 `commandSemantics.ts` + `destructiveCommandWarning.ts`。
 
 ### 不纳入计划的模块
