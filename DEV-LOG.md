@@ -1,5 +1,25 @@
 # DEV-LOG
 
+## Buddy 命令合入 + Feature Flag 规范修正 (2026-04-02)
+
+合入 `pr/smallflyingpig/36` 分支（支持 buddy 命令 + 修复 rehatch），并修正 feature flag 使用方式。
+
+**合入内容（来自 PR）：**
+- `src/commands/buddy/buddy.ts` — 新增 `/buddy` 命令，支持 hatch / rehatch / pet / mute / unmute 子命令
+- `src/commands/buddy/index.ts` — 从 stub 改为正确的 `Command` 类型导出
+- `src/buddy/companion.ts` — 新增 `generateSeed()`，`getCompanion()` 支持 seed 驱动的可复现 rolling
+- `src/buddy/types.ts` — `CompanionSoul` 增加 `seed?` 字段
+
+**合并后修正：**
+- `src/entrypoints/cli.tsx` — PR 硬编码了 `const feature = (name) => name === "BUDDY"`，违反 feature flag 规范，恢复为标准 `import { feature } from 'bun:bundle'`
+- `src/commands.ts` — PR 用静态 `import buddy` 绕过了 feature gate，恢复为 `feature('BUDDY') ? require(...) : null` + 条件展开
+- `src/commands/buddy/buddy.ts` — 删除未使用的 `companionInfoText` 函数和多余的 `Roll`/`SPECIES` import
+- `CLAUDE.md` — 重写 Feature Flag System 章节，明确规范：代码中统一用 `import { feature } from 'bun:bundle'`，启用走环境变量 `FEATURE_<NAME>=1`
+
+**用法：** `FEATURE_BUDDY=1 bun run dev`
+
+---
+
 ## Auto Mode 补全 (2026-04-02)
 
 反编译丢失了 auto mode 分类器的三个 prompt 模板文件，代码逻辑完整但无法运行。

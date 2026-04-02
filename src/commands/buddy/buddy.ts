@@ -2,13 +2,11 @@ import {
   getCompanion,
   rollWithSeed,
   generateSeed,
-  type Roll,
 } from '../../buddy/companion.js'
 import {
   type StoredCompanion,
   RARITY_STARS,
   STAT_NAMES,
-  SPECIES,
 } from '../../buddy/types.js'
 import { renderSprite } from '../../buddy/sprites.js'
 import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
@@ -69,25 +67,6 @@ function renderStats(stats: Record<string, number>): string {
     return `  ${name.padEnd(10)} ${bar} ${val}`
   })
   return lines.join('\n')
-}
-
-function companionInfoText(roll: Roll): string {
-  const { bones } = roll
-  const sprite = renderSprite(bones, 0)
-  const stars = RARITY_STARS[bones.rarity]
-  const name = SPECIES_NAMES[bones.species] ?? 'Buddy'
-  const shiny = bones.shiny ? '  ✨ Shiny!' : ''
-
-  return [
-    sprite.join('\n'),
-    '',
-    `  ${name} the ${speciesLabel(bones.species)}${shiny}`,
-    `  Rarity: ${stars} (${bones.rarity})`,
-    `  Eye: ${bones.eye}  Hat: ${bones.hat}`,
-    '',
-    '  Stats:',
-    renderStats(bones.stats),
-  ].join('\n')
 }
 
 export const call: LocalCommandCall = async (args, _context) => {
@@ -177,7 +156,6 @@ export const call: LocalCommandCall = async (args, _context) => {
       }
     }
 
-    // Import setAppState dynamically to update companionPetAt
     try {
       const { setAppState } = await import('../../state/AppStateStore.js')
       setAppState(prev => ({
@@ -185,7 +163,7 @@ export const call: LocalCommandCall = async (args, _context) => {
         companionPetAt: Date.now(),
       }))
     } catch {
-      // If AppState is not available (non-interactive), just show text
+      // non-interactive mode — AppState not available
     }
 
     return {
