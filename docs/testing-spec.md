@@ -300,7 +300,7 @@ bun test --watch
 
 ## 11. 当前测试覆盖状态
 
-> 更新日期：2026-04-02 | 总计：**647 tests, 32 files, 0 failures**
+> 更新日期：2026-04-02 | 总计：**1177 tests, 64 files, 0 failures**
 
 ### P0 — 核心模块
 
@@ -348,6 +348,58 @@ bun test --watch
 | 08 - Git 工具 | `src/utils/__tests__/git.test.ts` | 18 | normalizeGitRemoteUrl (SSH/HTTPS/ssh:///代理URL/大小写规范化) |
 | 09 - 配置与设置 | `src/utils/settings/__tests__/config.test.ts` | 62 | SettingsSchema, PermissionsSchema, AllowedMcpServerEntrySchema, MCP 类型守卫, 设置常量函数, filterInvalidPermissionRules, validateSettingsFileContent, formatZodError |
 
+### P3 — Phase 1 纯函数扩展
+
+| 测试文件 | 测试数 | 覆盖范围 |
+|----------|--------|----------|
+| `src/utils/__tests__/errors.test.ts` | 28 | ClaudeError, AbortError, ConfigParseError, ShellError, TelemetrySafeError, isAbortError, hasExactErrorMessage, toError, errorMessage, getErrnoCode, isENOENT, getErrnoPath, shortErrorStack, isFsInaccessible, classifyAxiosError |
+| `src/utils/permissions/__tests__/shellRuleMatching.test.ts` | 22 | permissionRuleExtractPrefix, hasWildcards, matchWildcardPattern, parsePermissionRule, suggestionForExactCommand, suggestionForPrefix |
+| `src/utils/__tests__/argumentSubstitution.test.ts` | 18 | parseArguments, parseArgumentNames, generateProgressiveArgumentHint, substituteArguments |
+| `src/utils/__tests__/CircularBuffer.test.ts` | 12 | CircularBuffer class: add, addAll, getRecent, toArray, clear, length |
+| `src/utils/__tests__/sanitization.test.ts` | 14 | partiallySanitizeUnicode, recursivelySanitizeUnicode |
+| `src/utils/__tests__/slashCommandParsing.test.ts` | 8 | parseSlashCommand |
+| `src/utils/__tests__/contentArray.test.ts` | 6 | insertBlockAfterToolResults |
+| `src/utils/__tests__/objectGroupBy.test.ts` | 5 | objectGroupBy |
+
+### P4 — Phase 2 轻 Mock 扩展
+
+| 测试文件 | 测试数 | 覆盖范围 |
+|----------|--------|----------|
+| `src/utils/__tests__/envUtils.test.ts` | 34 | isEnvTruthy, isEnvDefinedFalsy, parseEnvVars, hasNodeOption, getAWSRegion, getDefaultVertexRegion, getVertexRegionForModel, isBareMode, shouldMaintainProjectWorkingDir, getClaudeConfigHomeDir |
+| `src/utils/__tests__/sleep.test.ts` | 14 | sleep (abort, throwOnAbort, abortError), withTimeout, sequential |
+| `src/utils/__tests__/memoize.test.ts` | 16 | memoizeWithTTL, memoizeWithTTLAsync (dedup/cache/clear), memoizeWithLRU (eviction/cache methods) |
+| `src/utils/__tests__/groupToolUses.test.ts` | 10 | applyGrouping (verbose, grouping, result collection, mixed messages) |
+| `src/utils/permissions/__tests__/dangerousPatterns.test.ts` | 7 | CROSS_PLATFORM_CODE_EXEC, DANGEROUS_BASH_PATTERNS 常量验证 |
+| `src/utils/shell/__tests__/outputLimits.test.ts` | 7 | getMaxOutputLength, BASH_MAX_OUTPUT_UPPER_LIMIT, BASH_MAX_OUTPUT_DEFAULT |
+
+### P5 — Phase 3 补全 + Phase 4 工具模块
+
+| 测试文件 | 测试数 | 覆盖范围 |
+|----------|--------|----------|
+| `src/utils/__tests__/zodToJsonSchema.test.ts` | 9 | zodToJsonSchema (string/number/object/enum/optional/array/boolean + caching) |
+| `src/utils/permissions/__tests__/PermissionMode.test.ts` | 19 | PERMISSION_MODES, permissionModeFromString, permissionModeTitle, permissionModeShortTitle, permissionModeSymbol, getModeColor, isDefaultMode, toExternalPermissionMode, isExternalPermissionMode |
+| `src/utils/__tests__/envValidation.test.ts` | 9 | validateBoundedIntEnvVar (default/valid/capped/invalid/boundary) |
+| `src/services/mcp/__tests__/mcpStringUtils.test.ts` | 18 | mcpInfoFromString, getMcpPrefix, buildMcpToolName, getMcpDisplayName, getToolNameForPermissionCheck, extractMcpToolDisplayName |
+| `src/tools/BashTool/__tests__/destructiveCommandWarning.test.ts` | 22 | getDestructiveCommandWarning (git/rm/database/infrastructure patterns) |
+| `src/tools/BashTool/__tests__/commandSemantics.test.ts` | 11 | interpretCommandResult (grep/diff/test/rg/find exit code semantics) |
+
+### P6 — Phase 5 扩展覆盖
+
+| 测试文件 | 测试数 | 覆盖范围 |
+|----------|--------|----------|
+| `src/utils/__tests__/tokenBudget.test.ts` | 20 | parseTokenBudget, findTokenBudgetPositions, getBudgetContinuationMessage |
+| `src/utils/__tests__/displayTags.test.ts` | 17 | stripDisplayTags, stripDisplayTagsAllowEmpty, stripIdeContextTags |
+| `src/utils/__tests__/taggedId.test.ts` | 10 | toTaggedId (prefix/uniqueness/format) |
+| `src/utils/__tests__/controlMessageCompat.test.ts` | 15 | normalizeControlMessageKeys (snake_case→camelCase 转换) |
+| `src/services/mcp/__tests__/normalization.test.ts` | 11 | normalizeNameForMCP (特殊字符/截断/空字符串/Unicode) |
+| `src/services/mcp/__tests__/envExpansion.test.ts` | 14 | expandEnvVarsInString ($VAR/${VAR}/嵌套/未定义/转义) |
+| `src/utils/git/__tests__/gitConfigParser.test.ts` | 20 | parseConfigString (key=value/section/subsection/多行/注释/引号) |
+| `src/utils/__tests__/formatBriefTimestamp.test.ts` | 10 | formatBriefTimestamp (秒/分/时/天/周/月/年) |
+| `src/utils/__tests__/hyperlink.test.ts` | 10 | createHyperlink (OSC 8 序列/file:///path/fallback) |
+| `src/utils/__tests__/windowsPaths.test.ts` | 20 | windowsPathToPosixPath, posixPathToWindowsPath (驱动器/UNC/相对路径) |
+| `src/utils/__tests__/notebook.test.ts` | 14 | parseCellId, mapNotebookCellsToToolResult (code/markdown/output) |
+| `src/utils/__tests__/effort.test.ts` | 38 | isEffortLevel, parseEffortValue, isValidNumericEffort, convertEffortValueToLevel, getEffortLevelDescription, resolvePickerEffortPersistence |
+
 ### 已知限制
 
 以下模块因 Bun 运行时限制或极重依赖链，暂时无法或不适合测试：
@@ -365,13 +417,39 @@ bun test --watch
 
 | 被 Mock 模块 | 解锁的测试 |
 |-------------|-----------|
-| `src/utils/log.ts` | json.ts, tokens.ts, FileEditTool/utils.ts, permissions.ts |
+| `src/utils/log.ts` | json.ts, tokens.ts, FileEditTool/utils.ts, permissions.ts, memoize.ts, PermissionMode.ts |
 | `src/services/tokenEstimation.ts` | tokens.ts |
-| `src/utils/slowOperations.ts` | tokens.ts, permissions.ts |
+| `src/utils/slowOperations.ts` | tokens.ts, permissions.ts, memoize.ts, PermissionMode.ts |
+| `src/utils/debug.ts` | envValidation.ts, outputLimits.ts |
+| `src/utils/bash/commands.ts` | commandSemantics.ts |
+| `src/utils/thinking.js` | effort.ts |
+| `src/utils/settings/settings.js` | effort.ts |
+| `src/utils/auth.js` | effort.ts |
+| `src/services/analytics/growthbook.js` | effort.ts, tokenBudget.ts |
+| `src/utils/model/modelSupportOverrides.js` | effort.ts |
 
 **关键约束**：`mock.module()` 必须在每个测试文件中内联调用，不能从共享 helper 导入（Bun 在 mock 生效前就解析了 helper 的导入）。
 
-## 12. 参考
+## 12. 后续测试覆盖计划
+
+> **已完成** — Phase 1-4 增加 321 tests (647 → 968)，Phase 5 增加 209 tests (968 → 1177)
+>
+> Phase 1-4 全部完成，详见上方 P3-P5 表格。
+> Phase 5 新增 12 个测试文件覆盖：effort、tokenBudget、displayTags、taggedId、controlMessageCompat、MCP normalization/envExpansion、gitConfigParser、formatBriefTimestamp、hyperlink、windowsPaths、notebook，详见 P6 表格。
+> 实际调整：Phase 3 中 `context.ts` 因极重依赖链（bootstrap/state + claudemd + git 等）且 `getGitStatus` 在 test 环境直接返回 null，替换为 `envValidation.ts`（更实用）；Phase 4 中 GlobTool 纯函数不足，替换为 `commandSemantics.ts` + `destructiveCommandWarning.ts`。
+
+### 不纳入计划的模块
+
+| 模块 | 原因 |
+|------|------|
+| `query.ts` / `QueryEngine.ts` | 核心循环，需集成测试环境 |
+| `services/api/claude.ts` | 需 mock SDK 流式响应 |
+| `spawnMultiAgent.ts` | 50+ 依赖，mock 不可行 |
+| `modelCost.ts` | 依赖 bootstrap/state + analytics |
+| `mcp/dateTimeParser.ts` | 调用 Haiku API |
+| `screens/` / `components/` | UI 组件，需 Ink 渲染测试 |
+
+## 13. 参考
 
 - [Bun Test 文档](https://bun.sh/docs/cli/test)
 - 现有测试示例：`src/utils/__tests__/set.test.ts`, `src/utils/__tests__/array.test.ts`

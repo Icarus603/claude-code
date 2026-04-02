@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
+
+import { feature } from 'bun:bundle'
 // Runtime polyfill for bun:bundle (build-time macros)
 const feature = (name: string) => name === "BUDDY";
 if (typeof globalThis.MACRO === "undefined") {
