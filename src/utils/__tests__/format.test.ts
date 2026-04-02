@@ -82,20 +82,17 @@ describe("formatNumber", () => {
   });
 
   test("formats thousands with k suffix", () => {
-    const result = formatNumber(1321);
-    expect(result).toContain("k");
+    expect(formatNumber(1321)).toBe("1.3k");
   });
 
   test("formats millions", () => {
-    const result = formatNumber(1500000);
-    expect(result).toContain("m");
+    expect(formatNumber(1500000)).toBe("1.5m");
   });
 });
 
 describe("formatTokens", () => {
   test("removes .0 from formatted number", () => {
-    const result = formatTokens(1000);
-    expect(result).not.toContain(".0");
+    expect(formatTokens(1000)).toBe("1k");
   });
 
   test("formats small numbers", () => {
@@ -108,26 +105,20 @@ describe("formatRelativeTime", () => {
 
   test("formats seconds ago", () => {
     const date = new Date("2026-01-15T11:59:30Z");
-    const result = formatRelativeTime(date, { now });
-    expect(result).toContain("30");
-    expect(result).toContain("ago");
+    expect(formatRelativeTime(date, { now })).toBe("30s ago");
   });
 
   test("formats minutes ago", () => {
     const date = new Date("2026-01-15T11:55:00Z");
-    const result = formatRelativeTime(date, { now });
-    expect(result).toContain("5");
-    expect(result).toContain("ago");
+    expect(formatRelativeTime(date, { now })).toBe("5m ago");
   });
 
   test("formats future time", () => {
     const date = new Date("2026-01-15T13:00:00Z");
-    const result = formatRelativeTime(date, { now });
-    expect(result).toContain("in");
+    expect(formatRelativeTime(date, { now })).toBe("in 1h");
   });
 
   test("handles zero difference", () => {
-    const result = formatRelativeTime(now, { now });
-    expect(result).toContain("0");
+    expect(formatRelativeTime(now, { now })).toBe("0s ago");
   });
 });

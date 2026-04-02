@@ -28,6 +28,32 @@ describe("CROSS_PLATFORM_CODE_EXEC", () => {
     expect(CROSS_PLATFORM_CODE_EXEC).toContain("bash");
     expect(CROSS_PLATFORM_CODE_EXEC).toContain("sh");
   });
+
+  test("has no duplicate entries", () => {
+    expect(new Set(CROSS_PLATFORM_CODE_EXEC).size).toBe(
+      CROSS_PLATFORM_CODE_EXEC.length
+    );
+  });
+
+  test("contains expected interpreters", () => {
+    const expected = [
+      "node",
+      "python",
+      "python3",
+      "ruby",
+      "perl",
+      "php",
+      "lua",
+      "deno",
+      "npx",
+      "bunx",
+      "tsx",
+    ];
+    const set = new Set(CROSS_PLATFORM_CODE_EXEC);
+    for (const entry of expected) {
+      expect(set.has(entry)).toBe(true);
+    }
+  });
 });
 
 describe("DANGEROUS_BASH_PATTERNS", () => {
@@ -50,6 +76,18 @@ describe("DANGEROUS_BASH_PATTERNS", () => {
   test("all elements are strings", () => {
     for (const p of DANGEROUS_BASH_PATTERNS) {
       expect(typeof p).toBe("string");
+    }
+  });
+
+  test("has no duplicate entries", () => {
+    expect(new Set(DANGEROUS_BASH_PATTERNS).size).toBe(
+      DANGEROUS_BASH_PATTERNS.length
+    );
+  });
+
+  test("empty string does not match any pattern", () => {
+    for (const pattern of DANGEROUS_BASH_PATTERNS) {
+      expect("".startsWith(pattern)).toBe(false);
     }
   });
 });

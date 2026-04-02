@@ -62,6 +62,19 @@ describe("stripHtmlComments", () => {
     expect(result.content).toContain("<!-- inline -->");
     expect(result.stripped).toBe(false);
   });
+
+  test("leaves unclosed HTML comment unchanged", () => {
+    const result = stripHtmlComments("<!-- no close some text");
+    expect(result.content).toBe("<!-- no close some text");
+    expect(result.stripped).toBe(false);
+  });
+
+  test("strips comment and keeps same-line residual content", () => {
+    const result = stripHtmlComments("<!-- note -->some text");
+    expect(result.content).toContain("some text");
+    expect(result.content).not.toContain("<!--");
+    expect(result.stripped).toBe(true);
+  });
 });
 
 describe("isMemoryFilePath", () => {
@@ -87,6 +100,14 @@ describe("isMemoryFilePath", () => {
 
   test("returns false for .claude directory non-rules file", () => {
     expect(isMemoryFilePath("/project/.claude/settings.json")).toBe(false);
+  });
+
+  test("returns false for lowercase claude.md (case-sensitive match)", () => {
+    expect(isMemoryFilePath("/project/claude.md")).toBe(false);
+  });
+
+  test("returns false for non-.md file in .claude/rules/", () => {
+    expect(isMemoryFilePath(".claude/rules/foo.txt")).toBe(false);
   });
 });
 
@@ -119,5 +140,9 @@ describe("getLargeMemoryFiles", () => {
     ];
     const result = getLargeMemoryFiles(files);
     expect(result).toHaveLength(1);
+  });
+
+  test("returns empty array for empty input", () => {
+    expect(getLargeMemoryFiles([])).toEqual([]);
   });
 });

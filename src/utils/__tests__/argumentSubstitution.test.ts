@@ -29,6 +29,14 @@ describe("parseArguments", () => {
     ]);
   });
 
+  test("handles escaped quotes inside quoted strings", () => {
+    expect(parseArguments('foo "hello \\"world\\"" baz')).toEqual([
+      "foo",
+      'hello "world"',
+      "baz",
+    ]);
+  });
+
   test("returns empty for empty string", () => {
     expect(parseArguments("")).toEqual([]);
   });
@@ -98,6 +106,16 @@ describe("substituteArguments", () => {
   test("replaces shorthand $0, $1", () => {
     expect(substituteArguments("$0 and $1", "hello world")).toBe(
       "hello and world"
+    );
+  });
+
+  test("replaces out-of-range index with empty string", () => {
+    expect(substituteArguments("$5", "hello world")).toBe("");
+  });
+
+  test("reuses same placeholder multiple times", () => {
+    expect(substituteArguments("cmd $0 $1 $0", "alpha beta")).toBe(
+      "cmd alpha beta alpha"
     );
   });
 

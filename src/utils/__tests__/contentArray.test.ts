@@ -52,4 +52,21 @@ describe("insertBlockAfterToolResults", () => {
     expect(content[0]).toEqual({ type: "text", text: "new" });
     expect(content[1]).toEqual({ type: "text", text: "only" });
   });
+
+  test("inserts after last tool_result with mixed interleaving", () => {
+    const content: any[] = [
+      { type: "tool_result", content: "r1" },
+      { type: "text", text: "mid1" },
+      { type: "tool_result", content: "r2" },
+      { type: "text", text: "mid2" },
+      { type: "tool_result", content: "r3" },
+      { type: "text", text: "end" },
+    ];
+    insertBlockAfterToolResults(content, { type: "text", text: "inserted" });
+    // Inserted after r3 (index 4), so at index 5
+    expect(content[5]).toEqual({ type: "text", text: "inserted" });
+    // Original end text should shift to index 6
+    expect(content[6]).toEqual({ type: "text", text: "end" });
+    expect(content).toHaveLength(7);
+  });
 });

@@ -2,12 +2,25 @@ import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import { getAPIProvider, isFirstPartyAnthropicBaseUrl } from "../providers";
 
 describe("getAPIProvider", () => {
-  const originalEnv = { ...process.env };
+  const envKeys = [
+    "CLAUDE_CODE_USE_BEDROCK",
+    "CLAUDE_CODE_USE_VERTEX",
+    "CLAUDE_CODE_USE_FOUNDRY",
+  ] as const;
+  const savedEnv: Record<string, string | undefined> = {};
+
+  beforeEach(() => {
+    for (const key of envKeys) savedEnv[key] = process.env[key];
+  });
 
   afterEach(() => {
-    delete process.env.CLAUDE_CODE_USE_BEDROCK;
-    delete process.env.CLAUDE_CODE_USE_VERTEX;
-    delete process.env.CLAUDE_CODE_USE_FOUNDRY;
+    for (const key of envKeys) {
+      if (savedEnv[key] !== undefined) {
+        process.env[key] = savedEnv[key];
+      } else {
+        delete process.env[key];
+      }
+    }
   });
 
   test('returns "firstParty" by default', () => {
@@ -36,6 +49,28 @@ describe("getAPIProvider", () => {
     process.env.CLAUDE_CODE_USE_BEDROCK = "1";
     process.env.CLAUDE_CODE_USE_VERTEX = "1";
     expect(getAPIProvider()).toBe("bedrock");
+  });
+
+  test("bedrock wins when all three env vars are set", () => {
+    process.env.CLAUDE_CODE_USE_BEDROCK = "1";
+    process.env.CLAUDE_CODE_USE_VERTEX = "1";
+    process.env.CLAUDE_CODE_USE_FOUNDRY = "1";
+    expect(getAPIProvider()).toBe("bedrock");
+  });
+
+  test('"true" is truthy', () => {
+    process.env.CLAUDE_CODE_USE_BEDROCK = "true";
+    expect(getAPIProvider()).toBe("bedrock");
+  });
+
+  test('"0" is not truthy', () => {
+    process.env.CLAUDE_CODE_USE_BEDROCK = "0";
+    expect(getAPIProvider()).toBe("firstParty");
+  });
+
+  test('empty string is not truthy', () => {
+    process.env.CLAUDE_CODE_USE_BEDROCK = "";
+    expect(getAPIProvider()).toBe("firstParty");
   });
 });
 
@@ -80,5 +115,20 @@ describe("isFirstPartyAnthropicBaseUrl", () => {
     process.env.ANTHROPIC_BASE_URL = "https://api-staging.anthropic.com";
     process.env.USER_TYPE = "ant";
     expect(isFirstPartyAnthropicBaseUrl()).toBe(true);
+  });
+
+  test("returns true for URL with path", () => {
+    process.env.ANTHROPIC_BASE_URL = "https://api.anthropic.com/v1";
+    expect(isFirstPartyAnthropicBaseUrl()).toBe(true);
+  });
+
+  test("returns true for trailing slash", () => {
+    process.env.ANTHROPIC_BASE_URL = "https://api.anthropic.com/";
+    expect(isFirstPartyAnthropicBaseUrl()).toBe(true);
+  });
+
+  test("returns false for subdomain attack", () => {
+    process.env.ANTHROPIC_BASE_URL = "https://evil-api.anthropic.com";
+    expect(isFirstPartyAnthropicBaseUrl()).toBe(false);
   });
 });

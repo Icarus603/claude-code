@@ -43,7 +43,7 @@ tests/
 
 ## 4. 当前覆盖状态
 
-> 更新日期：2026-04-02 | **1177 tests, 64 files, 0 fail, 837ms**
+> 更新日期：2026-04-02 | **1297 tests, 68 files, 0 fail, 980ms**
 
 ### 4.1 可靠度评分
 
@@ -228,21 +228,34 @@ Spec 定义的三个集成测试均未创建：
 
 **约束**：`mock.module()` 必须在每个测试文件内联调用，不能从共享 helper 导入。
 
-## 6. 改进计划
+## 6. 完成状态
 
-### 优先级排序
+> 更新日期：2026-04-02 | **1297 tests, 68 files, 0 fail, 980ms**
 
-| 优先级 | 任务 | 预期效果 |
-|--------|------|----------|
-| **高** | 修复 8 个 WEAK 文件的断言缺陷 | 消除假阳性风险 |
-| **高** | 补 `gitOperationTracking.test.ts` 的 analytics mock | 消除测试副作用 |
-| **高** | 验证 `envValidation.test.ts` 潜在 bug | 排除源码缺陷 |
-| **中** | 搭建 `tests/mocks/` 基础设施 | 为集成测试铺路 |
-| **中** | 编写 `tests/integration/tool-chain.test.ts` | 覆盖 Tool 注册→发现→执行链路 |
-| **中** | 补 `truncate.test.ts` CJK/emoji 测试 | 覆盖核心场景 |
-| **低** | 补 `claudemd.test.ts` 核心逻辑 | 提升 P0 模块覆盖率 |
-| **低** | 补 CLI 参数测试 (`main.tsx`) | 完成 P1 覆盖 |
-| **低** | 运行 `bun test --coverage` 建立基线 | 量化覆盖率 |
+### 已完成
+
+| 计划 | 状态 | 新增测试 | 说明 |
+|------|------|---------|------|
+| Plan 12 — Mock 可靠性 | **已完成** | +9 | PermissionMode ant false 路径、providers env 快照恢复 |
+| Plan 10 — WEAK 修复 | **已完成** | +15 | format 断言精确化、envValidation 修正、zodToJsonSchema/destructors/notebook 加固 |
+| Plan 13 — CJK/Emoji | **已完成** | +17 | truncate CJK/emoji 宽度感知测试 |
+| Plan 11 — ACCEPTABLE 加强 | **已完成** | +62 | diff/uuid/hash/semver/path/claudemd/fileEdit/providers/messages 等 15 文件 |
+| Plan 14 — 集成测试 | **已完成** | +43 | 搭建 tests/mocks/ + tool-chain/context-build/message-pipeline/cli-arguments |
+| Plan 15 — CLI + 覆盖率 | **已完成** | +11 | Commander.js 参数解析、覆盖率基线 |
+
+### 覆盖率基线
+
+| 指标 | 数值 |
+|------|------|
+| 总测试数 | 1297 |
+| 测试文件数 | 68 |
+| 失败数 | 0 |
+| 断言数 | 1990 |
+| 运行耗时 | ~1s |
+| Tool.ts 行覆盖率 | 100% |
+| 整体行覆盖率 | ~33%（Bun coverage 限制：`mock.module` 模式下的模块不报告） |
+
+> **注意**：Bun `--coverage` 仅报告测试 import 链中直接加载的文件。使用 `mock.module()` + `await import()` 模式的源文件（大多数 `src/utils/` 纯函数）不显示在覆盖率报告中。实际测试覆盖率高于报告值。
 
 ### 不纳入计划
 
