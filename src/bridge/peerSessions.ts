@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { logForDebugging } from '../utils/debug.js'
 import { errorMessage } from '../utils/errors.js'
+import { validateBridgeId } from './bridgeApi.js'
 import { getBridgeAccessToken } from './bridgeConfig.js'
 import { getReplBridgeHandle } from './replBridgeHandle.js'
 import { toCompatSessionId } from './sessionIdCompat.js'
@@ -26,7 +27,8 @@ export async function postInterClaudeMessage(
       return { ok: false, error: 'Bridge not connected' }
     }
 
-    if (!target) {
+    const normalizedTarget = target.trim()
+    if (!normalizedTarget) {
       return { ok: false, error: 'No target session specified' }
     }
 
@@ -35,11 +37,13 @@ export async function postInterClaudeMessage(
       return { ok: false, error: 'No access token available' }
     }
 
-    const compatTarget = toCompatSessionId(target)
+    const compatTarget = toCompatSessionId(normalizedTarget)
+    // Validate against path traversal — same allowlist as bridgeApi.ts
+    validateBridgeId(compatTarget, 'target sessionId')
     const from = toCompatSessionId(handle.bridgeSessionId)
     const baseUrl = handle.sessionIngressUrl
 
-    const url = `${baseUrl}/v1/sessions/${compatTarget}/messages`
+    const url = `${baseUrl}/v1/sessions/${encodeURIComponent(compatTarget)}/messages`
 
     const response = await axios.post(
       url,
