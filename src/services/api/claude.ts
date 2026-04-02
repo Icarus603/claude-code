@@ -299,20 +299,6 @@ export function getExtraBodyParams(betaHeaders?: string[]): JsonObject {
     }
   }
 
-  // Anti-distillation: send fake_tools opt-in for 1P CLI only
-  if (
-    feature('ANTI_DISTILLATION_CC')
-      ? process.env.CLAUDE_CODE_ENTRYPOINT === 'cli' &&
-        shouldIncludeFirstPartyOnlyBetas() &&
-        getFeatureValue_CACHED_MAY_BE_STALE(
-          'tengu_anti_distill_fake_tool_injection',
-          false,
-        )
-      : false
-  ) {
-    result.anti_distillation = ['fake_tools']
-  }
-
   // Handle beta headers if provided
   if (betaHeaders && betaHeaders.length > 0) {
     if (result.anthropic_beta && Array.isArray(result.anthropic_beta)) {
