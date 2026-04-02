@@ -8,6 +8,11 @@ const outdir = "dist";
 const { rmSync } = await import("fs");
 rmSync(outdir, { recursive: true, force: true });
 
+// Collect FEATURE_* env vars → Bun.build features
+const features = Object.keys(process.env)
+    .filter(k => k.startsWith("FEATURE_"))
+    .map(k => k.replace("FEATURE_", ""));
+
 // Step 2: Bundle with splitting
 const result = await Bun.build({
     entrypoints: ["src/entrypoints/cli.tsx"],
@@ -15,6 +20,7 @@ const result = await Bun.build({
     target: "bun",
     splitting: true,
     define: getMacroDefines(),
+    features,
 });
 
 if (!result.success) {

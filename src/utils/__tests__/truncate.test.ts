@@ -17,8 +17,7 @@ describe("truncateToWidth", () => {
 
   test("truncates long string with ellipsis", () => {
     const result = truncateToWidth("hello world", 8);
-    expect(result.endsWith("…")).toBe(true);
-    expect(result.length).toBeLessThanOrEqual(9); // 8 visible + ellipsis char
+    expect(result).toBe("hello w…");
   });
 
   test("returns ellipsis for maxWidth 1", () => {
@@ -27,6 +26,37 @@ describe("truncateToWidth", () => {
 
   test("handles empty string", () => {
     expect(truncateToWidth("", 10)).toBe("");
+  });
+
+  // ── CJK / wide-character tests ──
+
+  test("truncates CJK string at width boundary (2 per char)", () => {
+    expect(truncateToWidth("你好世界", 4)).toBe("你…");
+  });
+
+  test("truncates CJK string preserving full characters", () => {
+    expect(truncateToWidth("你好世界", 6)).toBe("你好…");
+  });
+
+  test("passes through CJK string when within limit", () => {
+    expect(truncateToWidth("你好", 4)).toBe("你好");
+  });
+
+  test("handles mixed ASCII + CJK", () => {
+    expect(truncateToWidth("hello你好", 8)).toBe("hello你…");
+  });
+
+  test("passes through mixed ASCII + CJK at exact limit", () => {
+    expect(truncateToWidth("hello你好", 9)).toBe("hello你好");
+  });
+
+  test("truncates string containing emoji", () => {
+    const result = truncateToWidth("hello 👋 world", 10);
+    expect(result).toBe("hello 👋 …");
+  });
+
+  test("passes through single emoji at sufficient width", () => {
+    expect(truncateToWidth("👋", 2)).toBe("👋");
   });
 });
 
@@ -38,12 +68,19 @@ describe("truncateStartToWidth", () => {
   });
 
   test("truncates from start with ellipsis prefix", () => {
-    const result = truncateStartToWidth("hello world", 8);
-    expect(result.startsWith("…")).toBe(true);
+    expect(truncateStartToWidth("hello world", 8)).toBe("…o world");
   });
 
   test("returns ellipsis for maxWidth 1", () => {
     expect(truncateStartToWidth("hello", 1)).toBe("…");
+  });
+
+  test("truncates CJK from start", () => {
+    expect(truncateStartToWidth("你好世界", 4)).toBe("…界");
+  });
+
+  test("truncates CJK from start preserving characters", () => {
+    expect(truncateStartToWidth("你好世界", 6)).toBe("…世界");
   });
 });
 
@@ -62,6 +99,10 @@ describe("truncateToWidthNoEllipsis", () => {
 
   test("returns empty for maxWidth 0", () => {
     expect(truncateToWidthNoEllipsis("hello", 0)).toBe("");
+  });
+
+  test("truncates CJK without ellipsis", () => {
+    expect(truncateToWidthNoEllipsis("你好世界", 4)).toBe("你好");
   });
 });
 
@@ -89,8 +130,11 @@ describe("truncatePathMiddle", () => {
   });
 
   test("handles short maxLength < 5", () => {
-    const result = truncatePathMiddle("src/components/foo.ts", 4);
-    expect(result).toContain("…");
+    expect(truncatePathMiddle("src/components/foo.ts", 4)).toBe("src…");
+  });
+
+  test("handles very short maxLength 1", () => {
+    expect(truncatePathMiddle("/a/b", 1)).toBe("…");
   });
 });
 

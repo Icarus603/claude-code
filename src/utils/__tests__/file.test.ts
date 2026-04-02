@@ -34,10 +34,7 @@ describe("convertLeadingTabsToSpaces", () => {
 describe("addLineNumbers", () => {
   test("adds line numbers starting from 1", () => {
     const result = addLineNumbers({ content: "a\nb\nc", startLine: 1 });
-    expect(result).toContain("1");
-    expect(result).toContain("a");
-    expect(result).toContain("b");
-    expect(result).toContain("c");
+    expect(result).toMatch(/^\s*1[→\t]a\n\s*2[→\t]b\n\s*3[→\t]c$/);
   });
 
   test("returns empty string for empty content", () => {
@@ -46,7 +43,7 @@ describe("addLineNumbers", () => {
 
   test("respects startLine offset", () => {
     const result = addLineNumbers({ content: "hello", startLine: 10 });
-    expect(result).toContain("10");
+    expect(result).toMatch(/^\s*10[→\t]hello$/);
   });
 });
 

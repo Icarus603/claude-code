@@ -20,7 +20,11 @@ describe("djb2Hash", () => {
 
   test("returns 32-bit integer", () => {
     const hash = djb2Hash("some long string to hash");
-    expect(hash).toBe(hash | 0); // bitwise OR with 0 preserves 32-bit int
+    expect(Number.isSafeInteger(hash)).toBe(true);
+  });
+
+  test("has known answer for 'hello'", () => {
+    expect(djb2Hash("hello")).toBe(99162322);
   });
 });
 
@@ -35,6 +39,14 @@ describe("hashContent", () => {
 
   test("different strings produce different hashes", () => {
     expect(hashContent("abc")).not.toBe(hashContent("def"));
+  });
+
+  test("returns numeric string for empty string", () => {
+    expect(hashContent("")).toMatch(/^\d+$/);
+  });
+
+  test("returns numeric string format", () => {
+    expect(hashContent("hello")).toMatch(/^\d+$/);
   });
 });
 
@@ -53,5 +65,12 @@ describe("hashPair", () => {
 
   test("disambiguates different splits", () => {
     expect(hashPair("ts", "code")).not.toBe(hashPair("tsc", "ode"));
+  });
+
+  test("handles empty strings", () => {
+    expect(hashPair("", "")).toMatch(/^\d+$/);
+    expect(hashPair("", "a")).toMatch(/^\d+$/);
+    expect(hashPair("a", "")).toMatch(/^\d+$/);
+    expect(hashPair("", "a")).not.toBe(hashPair("a", ""));
   });
 });

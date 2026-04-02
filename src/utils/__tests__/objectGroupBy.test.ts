@@ -38,4 +38,18 @@ describe("objectGroupBy", () => {
     expect(result.admin).toHaveLength(2);
     expect(result.user).toHaveLength(1);
   });
+
+  test("handles key function returning undefined", () => {
+    const result = objectGroupBy([1, 2, 3], () => undefined as any);
+    expect(result["undefined"]).toEqual([1, 2, 3]);
+  });
+
+  test("handles keys with special characters", () => {
+    const result = objectGroupBy(
+      [{ key: "a/b" }, { key: "a.b" }, { key: "a/b" }],
+      (item) => item.key
+    );
+    expect(result["a/b"]).toHaveLength(2);
+    expect(result["a.b"]).toHaveLength(1);
+  });
 });

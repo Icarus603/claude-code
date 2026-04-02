@@ -13,6 +13,14 @@ describe("gt", () => {
   test("returns false when equal", () => {
     expect(gt("1.0.0", "1.0.0")).toBe(false);
   });
+
+  test("returns false for 0.0.0 vs 0.0.0", () => {
+    expect(gt("0.0.0", "0.0.0")).toBe(false);
+  });
+
+  test("release is greater than pre-release", () => {
+    expect(gt("1.0.0", "1.0.0-alpha")).toBe(true);
+  });
 });
 
 describe("gte", () => {
@@ -76,6 +84,14 @@ describe("satisfies", () => {
 
   test("does not match major bump in caret", () => {
     expect(satisfies("2.0.0", "^1.0.0")).toBe(false);
+  });
+
+  test("matches tilde range", () => {
+    expect(satisfies("1.2.5", "~1.2.3")).toBe(true);
+  });
+
+  test("matches wildcard range", () => {
+    expect(satisfies("2.0.0", "*")).toBe(true);
   });
 });
 

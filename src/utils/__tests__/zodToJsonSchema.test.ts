@@ -23,8 +23,8 @@ describe("zodToJsonSchema", () => {
     const result = zodToJsonSchema(schema);
     expect(result.type).toBe("object");
     expect(result.properties).toBeDefined();
-    expect((result.properties as any).name).toBeDefined();
-    expect((result.properties as any).age).toBeDefined();
+    expect((result.properties as any).name).toEqual({ type: "string" });
+    expect((result.properties as any).age).toEqual({ type: "number" });
   });
 
   test("converts enum schema", () => {
@@ -39,7 +39,8 @@ describe("zodToJsonSchema", () => {
       optional: z.string().optional(),
     });
     const result = zodToJsonSchema(schema);
-    expect(result.required).toContain("required");
+    expect(result.required).toEqual(["required"]);
+    expect(result.required).not.toContain("optional");
   });
 
   test("caches results for same schema reference", () => {

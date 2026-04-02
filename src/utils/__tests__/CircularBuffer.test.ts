@@ -83,4 +83,20 @@ describe("CircularBuffer", () => {
     buf.add("c");
     expect(buf.toArray()).toEqual(["b", "c"]);
   });
+
+  test("capacity=1 keeps only the most recent item", () => {
+    const buf = new CircularBuffer<number>(1);
+    buf.add(10);
+    expect(buf.toArray()).toEqual([10]);
+    buf.add(20);
+    expect(buf.toArray()).toEqual([20]);
+    buf.add(30);
+    expect(buf.toArray()).toEqual([30]);
+    expect(buf.getRecent(1)).toEqual([30]);
+  });
+
+  test("getRecent on empty buffer returns empty array", () => {
+    const buf = new CircularBuffer<number>(5);
+    expect(buf.getRecent(3)).toEqual([]);
+  });
 });

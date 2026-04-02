@@ -88,6 +88,14 @@ describe("stripTrailingWhitespace", () => {
   test("handles no trailing whitespace", () => {
     expect(stripTrailingWhitespace("hello\nworld")).toBe("hello\nworld");
   });
+
+  test("handles CR-only line endings", () => {
+    expect(stripTrailingWhitespace("hello   \rworld  ")).toBe("hello\rworld");
+  });
+
+  test("handles content with no trailing newline", () => {
+    expect(stripTrailingWhitespace("hello   ")).toBe("hello");
+  });
 });
 
 // ─── findActualString ───────────────────────────────────────────────────
@@ -129,6 +137,26 @@ describe("preserveQuoteStyle", () => {
     expect(result).toContain(LEFT_DOUBLE_CURLY_QUOTE);
     expect(result).toContain(RIGHT_DOUBLE_CURLY_QUOTE);
   });
+
+  test("converts straight single quotes to curly in replacement", () => {
+    const oldString = "'hello'";
+    const actualOldString = `${LEFT_SINGLE_CURLY_QUOTE}hello${RIGHT_SINGLE_CURLY_QUOTE}`;
+    const newString = "'world'";
+    const result = preserveQuoteStyle(oldString, actualOldString, newString);
+    expect(result).toContain(LEFT_SINGLE_CURLY_QUOTE);
+    expect(result).toContain(RIGHT_SINGLE_CURLY_QUOTE);
+  });
+
+  test("treats apostrophe in contraction as right curly quote", () => {
+    const oldString = "'it's a test'";
+    const actualOldString = `${LEFT_SINGLE_CURLY_QUOTE}it${RIGHT_SINGLE_CURLY_QUOTE}s a test${RIGHT_SINGLE_CURLY_QUOTE}`;
+    const newString = "'don't worry'";
+    const result = preserveQuoteStyle(oldString, actualOldString, newString);
+    // The leading ' at position 0 should be LEFT_SINGLE_CURLY_QUOTE
+    expect(result[0]).toBe(LEFT_SINGLE_CURLY_QUOTE);
+    // The apostrophe in "don't" (between n and t) should be RIGHT_SINGLE_CURLY_QUOTE
+    expect(result).toContain(RIGHT_SINGLE_CURLY_QUOTE);
+  });
 });
 
 // ─── applyEditToFile ────────────────────────────────────────────────────
@@ -160,5 +188,21 @@ describe("applyEditToFile", () => {
 
   test("handles empty original content with insertion", () => {
     expect(applyEditToFile("", "", "new content")).toBe("new content");
+  });
+
+  test("handles multiline oldString and newString", () => {
+    const content = "line1\nline2\nline3\n";
+    const result = applyEditToFile(content, "line2\nline3", "replaced");
+    expect(result).toBe("line1\nreplaced\n");
+  });
+
+  test("handles multiline replacement across multiple lines", () => {
+    const content = "header\nold line A\nold line B\nfooter\n";
+    const result = applyEditToFile(
+      content,
+      "old line A\nold line B",
+      "new line X\nnew line Y"
+    );
+    expect(result).toBe("header\nnew line X\nnew line Y\nfooter\n");
   });
 });

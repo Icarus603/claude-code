@@ -1,4 +1,4 @@
-import { mock, describe, expect, test } from "bun:test";
+import { mock, describe, expect, test, beforeEach, afterEach } from "bun:test";
 
 // Mock slowOperations to cut bootstrap/state dependency chain
 // (figures.js → env.js → fsOperations.js → slowOperations.js → bootstrap/state.js)
@@ -57,11 +57,25 @@ describe("permissionModeFromString", () => {
     expect(permissionModeFromString("plan")).toBe("plan");
     expect(permissionModeFromString("default")).toBe("default");
     expect(permissionModeFromString("dontAsk")).toBe("dontAsk");
+    expect(permissionModeFromString("acceptEdits")).toBe("acceptEdits");
+    expect(permissionModeFromString("bypassPermissions")).toBe("bypassPermissions");
   });
 
   test("returns 'default' for unknown string", () => {
     expect(permissionModeFromString("unknown")).toBe("default");
     expect(permissionModeFromString("")).toBe("default");
+  });
+
+  test("is case sensitive — uppercase returns default", () => {
+    expect(permissionModeFromString("PLAN")).toBe("default");
+    expect(permissionModeFromString("Default")).toBe("default");
+    expect(permissionModeFromString("PLAN")).toBe("default");
+  });
+
+  test("returns mode for all known external modes", () => {
+    for (const mode of EXTERNAL_PERMISSION_MODES) {
+      expect(permissionModeFromString(mode)).toBe(mode);
+    }
   });
 });
 
@@ -72,6 +86,8 @@ describe("permissionModeTitle", () => {
     expect(permissionModeTitle("default")).toBe("Default");
     expect(permissionModeTitle("plan")).toBe("Plan Mode");
     expect(permissionModeTitle("acceptEdits")).toBe("Accept edits");
+    expect(permissionModeTitle("bypassPermissions")).toBe("Bypass Permissions");
+    expect(permissionModeTitle("dontAsk")).toBe("Don't Ask");
   });
 
   test("falls back to Default for unknown mode", () => {
@@ -86,6 +102,8 @@ describe("permissionModeShortTitle", () => {
     expect(permissionModeShortTitle("default")).toBe("Default");
     expect(permissionModeShortTitle("plan")).toBe("Plan");
     expect(permissionModeShortTitle("bypassPermissions")).toBe("Bypass");
+    expect(permissionModeShortTitle("dontAsk")).toBe("DontAsk");
+    expect(permissionModeShortTitle("acceptEdits")).toBe("Accept");
   });
 });
 
@@ -115,6 +133,14 @@ describe("getModeColor", () => {
 
   test("returns 'error' for bypassPermissions", () => {
     expect(getModeColor("bypassPermissions")).toBe("error");
+  });
+
+  test("returns 'error' for dontAsk", () => {
+    expect(getModeColor("dontAsk")).toBe("error");
+  });
+
+  test("returns 'autoAccept' for acceptEdits", () => {
+    expect(getModeColor("acceptEdits")).toBe("autoAccept");
   });
 });
 
@@ -149,6 +175,14 @@ describe("toExternalPermissionMode", () => {
   test("maps dontAsk to dontAsk", () => {
     expect(toExternalPermissionMode("dontAsk")).toBe("dontAsk");
   });
+
+  test("maps acceptEdits to acceptEdits", () => {
+    expect(toExternalPermissionMode("acceptEdits")).toBe("acceptEdits");
+  });
+
+  test("maps bypassPermissions to bypassPermissions", () => {
+    expect(toExternalPermissionMode("bypassPermissions")).toBe("bypassPermissions");
+  });
 });
 
 // ─── isExternalPermissionMode ──────────────────────────────────────────
@@ -158,5 +192,40 @@ describe("isExternalPermissionMode", () => {
     // USER_TYPE is not 'ant' in tests, so always true
     expect(isExternalPermissionMode("default")).toBe(true);
     expect(isExternalPermissionMode("plan")).toBe(true);
+  });
+
+  describe("when USER_TYPE is 'ant'", () => {
+    const savedUserType = process.env.USER_TYPE;
+
+    beforeEach(() => {
+      process.env.USER_TYPE = "ant";
+    });
+
+    afterEach(() => {
+      if (savedUserType !== undefined) {
+        process.env.USER_TYPE = savedUserType;
+      } else {
+        delete process.env.USER_TYPE;
+      }
+    });
+
+    test("returns false for 'auto' (ant-only mode)", () => {
+      expect(isExternalPermissionMode("auto")).toBe(false);
+    });
+
+    test("returns false for 'bubble' (ant-only mode)", () => {
+      expect(isExternalPermissionMode("bubble")).toBe(false);
+    });
+
+    test("returns true for standard external modes", () => {
+      expect(isExternalPermissionMode("default")).toBe(true);
+      expect(isExternalPermissionMode("plan")).toBe(true);
+      expect(isExternalPermissionMode("dontAsk")).toBe(true);
+    });
+
+    test("returns true for acceptEdits and bypassPermissions", () => {
+      expect(isExternalPermissionMode("acceptEdits")).toBe(true);
+      expect(isExternalPermissionMode("bypassPermissions")).toBe(true);
+    });
   });
 });

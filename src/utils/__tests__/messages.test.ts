@@ -375,6 +375,16 @@ describe("isNotEmptyMessage", () => {
     };
     expect(isNotEmptyMessage(msg)).toBe(true);
   });
+
+  test("returns false for whitespace-only text block in content array", () => {
+    const msg: any = {
+      type: "user",
+      message: {
+        content: [{ type: "text", text: "  " }],
+      },
+    };
+    expect(isNotEmptyMessage(msg)).toBe(false);
+  });
 });
 
 // ─── deriveUUID ─────────────────────────────────────────────────────────
@@ -458,6 +468,11 @@ describe("normalizeMessages", () => {
     ]);
     const normalized = normalizeMessages([msg]);
     expect(normalized.length).toBe(2);
+    // Verify each split message contains only one content block
+    expect(normalized[0].message.content).toHaveLength(1);
+    expect((normalized[0].message.content as any[])[0].text).toBe("first");
+    expect(normalized[1].message.content).toHaveLength(1);
+    expect((normalized[1].message.content as any[])[0].text).toBe("second");
   });
 
   test("handles empty array", () => {
