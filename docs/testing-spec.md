@@ -371,7 +371,62 @@ bun test --watch
 
 **关键约束**：`mock.module()` 必须在每个测试文件中内联调用，不能从共享 helper 导入（Bun 在 mock 生效前就解析了 helper 的导入）。
 
-## 12. 参考
+## 12. 后续测试覆盖计划
+
+> 目标：再增加 ~200 tests，从 647 → ~860 tests / 52 files
+
+### Phase 1：纯函数（零依赖，~98 tests，8 files）
+
+| 测试文件 | 源文件 | 关键函数 | 预估 |
+|----------|--------|----------|------|
+| `errors.test.ts` | `src/utils/errors.ts` | `isAbortError`, `toError`, `errorMessage`, `getErrnoCode`, `isENOENT`, `isFsInaccessible`, `classifyAxiosError` + Error classes | 20 |
+| `shellRuleMatching.test.ts` | `src/utils/permissions/shellRuleMatching.ts` | `permissionRuleExtractPrefix`, `hasWildcards`, `matchWildcardPattern`, `parsePermissionRule`, `suggestionForExactCommand` | 20 |
+| `argumentSubstitution.test.ts` | `src/utils/argumentSubstitution.ts` | `parseArguments`, `parseArgumentNames`, `generateProgressiveArgumentHint`, `substituteArguments` | 15 |
+| `CircularBuffer.test.ts` | `src/utils/CircularBuffer.ts` | `CircularBuffer` class 全部方法 | 12 |
+| `sanitization.test.ts` | `src/utils/sanitization.ts` | `partiallySanitizeUnicode`, `recursivelySanitizeUnicode` | 10 |
+| `slashCommandParsing.test.ts` | `src/utils/slashCommandParsing.ts` | `parseSlashCommand` | 8 |
+| `contentArray.test.ts` | `src/utils/contentArray.ts` | `insertBlockAfterToolResults` | 8 |
+| `objectGroupBy.test.ts` | `src/utils/objectGroupBy.ts` | `objectGroupBy` | 5 |
+
+### Phase 2：轻 Mock（mock log.ts / env，~63 tests，6 files）
+
+| 测试文件 | 源文件 | Mock 策略 | 预估 |
+|----------|--------|-----------|------|
+| `envUtils.test.ts` | `src/utils/envUtils.ts` | 临时修改 `process.env` | 15 |
+| `sleep.test.ts` | `src/utils/sleep.ts` + `sequential.ts` | AbortController | 14 |
+| `memoize.test.ts` | `src/utils/memoize.ts` | mock `log.ts` + `slowOperations.ts` | 12 |
+| `groupToolUses.test.ts` | `src/utils/groupToolUses.ts` | 构造 mock message/tool 对象 | 12 |
+| `dangerousPatterns.test.ts` | `src/utils/permissions/dangerousPatterns.ts` | 无（常量导出） | 5 |
+| `outputLimits.test.ts` | `src/utils/shell/outputLimits.ts` | 临时修改 `process.env` | 5 |
+
+### Phase 3：补全现有计划缺口（~20 tests，3 files）
+
+| 测试文件 | 源文件 | Mock 策略 | 预估 |
+|----------|--------|-----------|------|
+| `context.test.ts` | `src/context.ts` | mock `execFileNoThrow`, `log.ts` | 10 |
+| `zodToJsonSchema.test.ts` | `src/utils/zodToJsonSchema.ts` | 无（仅依赖 zod） | 5 |
+| `PermissionMode.test.ts` | `src/utils/permissions/PermissionMode.ts` | 视导出情况 | 5 |
+
+### Phase 4：工具模块扩展（~30 tests，3 files）
+
+| 测试文件 | 源文件 | 预估 |
+|----------|--------|------|
+| `bashPermissions.test.ts` | `src/tools/BashTool/` | 10 |
+| `GlobTool.test.ts` | `src/tools/GlobTool/` | 10 |
+| `mcpStringUtils.test.ts` | `src/services/mcp/mcpStringUtils.ts` | 10 |
+
+### 不纳入计划的模块
+
+| 模块 | 原因 |
+|------|------|
+| `query.ts` / `QueryEngine.ts` | 核心循环，需集成测试环境 |
+| `services/api/claude.ts` | 需 mock SDK 流式响应 |
+| `spawnMultiAgent.ts` | 50+ 依赖，mock 不可行 |
+| `modelCost.ts` | 依赖 bootstrap/state + analytics |
+| `mcp/dateTimeParser.ts` | 调用 Haiku API |
+| `screens/` / `components/` | UI 组件，需 Ink 渲染测试 |
+
+## 13. 参考
 
 - [Bun Test 文档](https://bun.sh/docs/cli/test)
 - 现有测试示例：`src/utils/__tests__/set.test.ts`, `src/utils/__tests__/array.test.ts`
