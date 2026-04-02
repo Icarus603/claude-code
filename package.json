@@ -1,5 +1,5 @@
 {
-  "name": "claude-js",
+  "name": "claude-code-best",
   "version": "1.0.3",
   "description": "Reverse-engineered Anthropic Claude Code CLI — interactive AI coding assistant in the terminal",
   "type": "module",
@@ -25,7 +25,7 @@
     "bun": ">=1.2.0"
   },
   "bin": {
-    "claude-js": "dist/cli.js"
+    "ccb": "dist/cli.js"
   },
   "workspaces": [
     "packages/*",

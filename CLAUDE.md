@@ -47,10 +47,10 @@ bun run format            # format all src/
 
 ### Entry & Bootstrap
 
-1. **`src/entrypoints/cli.tsx`** — True entrypoint. Injects runtime polyfills at the top:
-   - `feature()` always returns `false` (all feature flags disabled, skipping unimplemented branches).
-   - `globalThis.MACRO` — simulates build-time macro injection (VERSION, BUILD_TIME, etc.).
-   - `BUILD_TARGET`, `BUILD_ENV`, `INTERFACE_TYPE` globals.
+1. **`src/entrypoints/cli.tsx`** — True entrypoint. Sets up runtime globals:
+   - `globalThis.MACRO` — build-time macro values (VERSION, BUILD_TIME, etc.)，通过 `scripts/dev.ts` 的 `-d` flags 注入。
+   - `BUILD_TARGET`, `BUILD_ENV`, `INTERFACE_TYPE` globals。
+   - `feature()` 由 `bun:bundle` 内置模块提供，不需要在此 polyfill。
 2. **`src/main.tsx`** — Commander.js CLI definition. Parses args, initializes services (auth, analytics, policy), then launches the REPL or runs in pipe mode.
 3. **`src/entrypoints/init.ts`** — One-time initialization (telemetry, config, trust dialog).
 
@@ -97,7 +97,17 @@ bun run format            # format all src/
 
 ### Feature Flag System
 
-All `feature('FLAG_NAME')` calls come from `bun:bundle` (a build-time API). In this decompiled version, `feature()` is polyfilled to always return `false` in `cli.tsx`. This means all Anthropic-internal features (COORDINATOR_MODE, KAIROS, PROACTIVE, etc.) are disabled.
+Feature flags control which functionality is enabled at runtime. The system works as follows:
+
+- **在代码中使用**: 统一通过 `import { feature } from 'bun:bundle'` 导入，调用 `feature('FLAG_NAME')` 返回 `boolean`。**不要**在 `cli.tsx` 或其他文件里自己定义 `feature` 函数或覆盖这个 import。
+- **启用方式**: 通过环境变量 `FEATURE_<FLAG_NAME>=1`。例如 `FEATURE_BUDDY=1 bun run dev` 启用 BUDDY 功能。
+- **Dev 模式**: `scripts/dev.ts` 自动扫描所有 `FEATURE_*` 环境变量，转换为 Bun 的 `--feature` 参数传递给运行时。
+- **Build 模式**: `build.ts` 同样读取 `FEATURE_*` 环境变量，传入 `Bun.build({ features })` 数组。
+- **默认行为**: 不设置任何 `FEATURE_*` 环境变量时，所有 `feature()` 调用返回 `false`，即所有 feature-gated 代码不执行。
+- **常见 flag 名称**: `BUDDY`、`FORK_SUBAGENT`、`PROACTIVE`、`KAIROS`、`VOICE_MODE`、`DAEMON` 等（见 `src/commands.ts` 中的使用）。
+- **类型声明**: `src/types/internal-modules.d.ts` 中声明了 `bun:bundle` 模块的 `feature` 函数签名。
+
+**新增功能的正确做法**: 如果要让某个 feature-gated 模块（如 buddy）永久启用，应保留代码中 `import { feature } from 'bun:bundle'` + `feature('FLAG_NAME')` 的标准模式，在运行时通过环境变量或配置控制，而不是绕过 feature flag 直接 import。
 
 ### Stubbed/Deleted Modules
 
@@ -129,9 +139,9 @@ All `feature('FLAG_NAME')` calls come from `bun:bundle` (a build-time API). In t
 ## Working with This Codebase
 
 - **Don't try to fix all tsc errors** — they're from decompilation and don't affect runtime.
-- **`feature()` is always `false`** — any code behind a feature flag is dead code in this build.
+- **Feature flags** — 默认全部关闭（`feature()` 返回 `false`）。启用方式见上方 Feature Flag System 章节。不要在 `cli.tsx` 中重定义 `feature` 函数。
 - **React Compiler output** — Components have decompiled memoization boilerplate (`const $ = _c(N)`). This is normal.
-- **`bun:bundle` import** — In `src/main.tsx` and other files, `import { feature } from 'bun:bundle'` works at build time. At dev-time, the polyfill in `cli.tsx` provides it.
+- **`bun:bundle` import** — `import { feature } from 'bun:bundle'` 是 Bun 内置模块，由运行时/构建器解析。不要用自定义函数替代它。
 - **`src/` path alias** — tsconfig maps `src/*` to `./src/*`. Imports like `import { ... } from 'src/utils/...'` are valid.
 - **MACRO defines** — 集中管理在 `scripts/defines.ts`。Dev mode 通过 `bun -d` 注入，build 通过 `Bun.build({ define })` 注入。修改版本号等常量只改这个文件。
 - **构建产物兼容 Node.js** — `build.ts` 会自动后处理 `import.meta.require`，产物可直接用 `node dist/cli.js` 运行。
