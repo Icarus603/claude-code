@@ -300,15 +300,16 @@ bun test --watch
 
 ## 11. 当前测试覆盖状态
 
-> 更新日期：2026-04-01 | 总计：**517 tests, 25 files, 0 failures**
+> 更新日期：2026-04-02 | 总计：**647 tests, 32 files, 0 failures**
 
 ### P0 — 核心模块
 
 | 测试计划 | 测试文件 | 测试数 | 覆盖范围 |
 |----------|----------|--------|----------|
 | 01 - Tool 系统 | `src/__tests__/Tool.test.ts` | 25 | buildTool, toolMatchesName, findToolByName, getEmptyToolPermissionContext, filterToolProgressMessages |
-| | `src/__tests__/tools.test.ts` | 5 | parseToolPreset |
+| | `src/__tests__/tools.test.ts` | 10 | parseToolPreset, filterToolsByDenyRules |
 | | `src/tools/shared/__tests__/gitOperationTracking.test.ts` | 16 | parseGitCommitId, detectGitOperation |
+| | `src/tools/FileEditTool/__tests__/utils.test.ts` | 24 | normalizeQuotes, stripTrailingWhitespace, findActualString, preserveQuoteStyle, applyEditToFile |
 | 02 - Utils 纯函数 | `src/utils/__tests__/array.test.ts` | 12 | intersperse, count, uniq |
 | | `src/utils/__tests__/set.test.ts` | 12 | difference, intersects, every, union |
 | | `src/utils/__tests__/xml.test.ts` | 9 | escapeXml, escapeXmlAttr |
@@ -321,6 +322,10 @@ bun test --watch
 | | `src/utils/__tests__/file.test.ts` | 17 | convertLeadingTabsToSpaces, addLineNumbers, stripLineNumberPrefix, normalizePathForComparison, pathsEqual |
 | | `src/utils/__tests__/glob.test.ts` | 6 | extractGlobBaseDirectory |
 | | `src/utils/__tests__/diff.test.ts` | 8 | adjustHunkLineNumbers, getPatchFromContents |
+| | `src/utils/__tests__/json.test.ts` | 27 | safeParseJSON, safeParseJSONC, parseJSONL, addItemToJSONCArray (mock log.ts) |
+| | `src/utils/__tests__/truncate.test.ts` | 24 | truncateToWidth, truncateStartToWidth, truncateToWidthNoEllipsis, truncatePathMiddle, truncate, wrapText |
+| | `src/utils/__tests__/path.test.ts` | 15 | containsPathTraversal, normalizePathForConfigKey |
+| | `src/utils/__tests__/tokens.test.ts` | 22 | getTokenCountFromUsage, getTokenUsage, tokenCountFromLastAPIResponse, messageTokenCountFromLastAPIResponse, getCurrentUsage, doesMostRecentAssistantMessageExceed200k, getAssistantMessageContentLength (mock log.ts, tokenEstimation, slowOperations) |
 | 03 - Context 构建 | `src/utils/__tests__/claudemd.test.ts` | 16 | stripHtmlComments, isMemoryFilePath, getLargeMemoryFiles |
 | | `src/utils/__tests__/systemPrompt.test.ts` | 9 | buildEffectiveSystemPrompt |
 
@@ -329,6 +334,7 @@ bun test --watch
 | 测试计划 | 测试文件 | 测试数 | 覆盖范围 |
 |----------|----------|--------|----------|
 | 04 - 权限系统 | `src/utils/permissions/__tests__/permissionRuleParser.test.ts` | 25 | escapeRuleContent, unescapeRuleContent, permissionRuleValueFromString, permissionRuleValueToString, normalizeLegacyToolName |
+| | `src/utils/permissions/__tests__/permissions.test.ts` | 13 | getDenyRuleForTool, getAskRuleForTool, getDenyRuleForAgent, filterDeniedAgents (mock log.ts, slowOperations) |
 | 05 - 模型路由 | `src/utils/model/__tests__/aliases.test.ts` | 16 | isModelAlias, isModelFamilyAlias |
 | | `src/utils/model/__tests__/model.test.ts` | 14 | firstPartyNameToCanonical |
 | | `src/utils/model/__tests__/providers.test.ts` | 10 | getAPIProvider, isFirstPartyAnthropicBaseUrl |
@@ -344,16 +350,26 @@ bun test --watch
 
 ### 已知限制
 
-以下模块因 ESM 重依赖链导致测试挂起，尚未编写测试：
+以下模块因 Bun 运行时限制或极重依赖链，暂时无法或不适合测试：
 
-| 模块 | 问题 | 依赖链 |
-|------|------|--------|
-| `src/utils/json.ts` | 导入时挂起 | `json.ts` → `log.ts` → `logError` → analytics/bootstrap |
-| `src/utils/config.ts` | 导入时挂起 | `config.ts` → `log.ts` → analytics/bootstrap |
-| `src/utils/messages.ts` 部分函数 | 需 mock 重依赖 | `withMemoryCorrectionHint` → `getFeatureValue_CACHED_MAY_BE_STALE` |
-| `src/tools.ts` 部分函数 | 需 mock 重依赖 | `getAllBaseTools`、`getTools` → 全量 tool 注册 |
+| 模块 | 问题 | 说明 |
+|------|------|------|
+| `Bun.JSONL.parseChunk` | 处理畸形行时无限挂起 | Bun 1.3.10 bug，错误恢复循环卡死；已跳过 parseJSONL 畸形行测试 |
+| `src/tools.ts` 部分函数 | `getAllBaseTools`/`getTools` 加载全量 tool | 导入链过重，mock 难度大 |
+| `src/tools/shared/spawnMultiAgent.ts` | 依赖 bootstrap/state + AppState + 50+ 模块 | mock 成本极高，投入产出比低 |
+| `src/utils/messages.ts` 部分函数 | `withMemoryCorrectionHint` 等 | 依赖 `getFeatureValue_CACHED_MAY_BE_STALE` |
 
-**解决方向**：使用 `mock.module()` 在导入前 mock 掉 `log.ts`、`bootstrap/state.ts` 等重依赖模块。
+### Mock 策略总结
+
+通过 `mock.module()` + `await import()` 模式成功解锁了以下重依赖模块的测试：
+
+| 被 Mock 模块 | 解锁的测试 |
+|-------------|-----------|
+| `src/utils/log.ts` | json.ts, tokens.ts, FileEditTool/utils.ts, permissions.ts |
+| `src/services/tokenEstimation.ts` | tokens.ts |
+| `src/utils/slowOperations.ts` | tokens.ts, permissions.ts |
+
+**关键约束**：`mock.module()` 必须在每个测试文件中内联调用，不能从共享 helper 导入（Bun 在 mock 生效前就解析了 helper 的导入）。
 
 ## 12. 参考
 
