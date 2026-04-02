@@ -14,14 +14,17 @@ const defineArgs = Object.entries(defines).flatMap(([k, v]) => [
 ]);
 
 // Bun --feature flags: enable feature() gates at runtime.
-// Any env var matching FEATURE_<NAME>=1 will enable that feature.
-// e.g. FEATURE_TRANSCRIPT_CLASSIFIER=1 bun run dev
-const featureArgs: string[] = Object.entries(process.env)
+// Default features enabled in dev mode.
+const DEFAULT_FEATURES = ["BUDDY", "TRANSCRIPT_CLASSIFIER"];
+
+// Any env var matching FEATURE_<NAME>=1 will also enable that feature.
+// e.g. FEATURE_PROACTIVE=1 bun run dev
+const envFeatures = Object.entries(process.env)
     .filter(([k]) => k.startsWith("FEATURE_"))
-    .flatMap(([k]) => {
-        const name = k.replace("FEATURE_", "");
-        return ["--feature", name];
-    });
+    .map(([k]) => k.replace("FEATURE_", ""));
+
+const allFeatures = [...new Set([...DEFAULT_FEATURES, ...envFeatures])];
+const featureArgs = allFeatures.flatMap((name) => ["--feature", name]);
 
 const result = Bun.spawnSync(
     ["bun", "run", ...defineArgs, ...featureArgs, "src/entrypoints/cli.tsx", ...process.argv.slice(2)],
