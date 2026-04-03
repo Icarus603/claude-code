@@ -66,15 +66,6 @@
       ]
     },
     {
-      "group": "安全与权限",
-      "pages": [
-        "docs/safety/why-safety-matters",
-        "docs/safety/permission-model",
-        "docs/safety/sandbox",
-        "docs/safety/plan-mode"
-      ]
-    },
-    {
       "group": "上下文工程",
       "pages": [
         "docs/context/system-prompt",
@@ -101,6 +92,16 @@
       ]
     },
     {
+      "group": "安全与权限",
+      "pages": [
+        "docs/safety/why-safety-matters",
+        "docs/safety/permission-model",
+        "docs/safety/sandbox",
+        "docs/safety/plan-mode",
+        "docs/safety/auto-mode"
+      ]
+    },
+    {
       "group": "揭秘：隐藏功能与内部机制",
       "pages": [
         "docs/internals/three-tier-gating",
@@ -113,12 +114,66 @@
         "docs/features/debug-mode",
         "docs/features/buddy"
       ]
+    },
+    {
+      "group": "隐藏功能详解",
+      "pages": [
+        {
+          "group": "Agent 与协作",
+          "pages": [
+            "docs/features/coordinator-mode",
+            "docs/features/fork-subagent",
+            "docs/features/daemon",
+            "docs/features/teammem"
+          ]
+        },
+        {
+          "group": "运行模式",
+          "pages": [
+            "docs/features/kairos",
+            "docs/features/voice-mode",
+            "docs/features/bridge-mode",
+            "docs/features/proactive",
+            "docs/features/ultraplan"
+          ]
+        },
+        {
+          "group": "工具增强",
+          "pages": [
+            "docs/features/mcp-skills",
+            "docs/features/tree-sitter-bash",
+            "docs/features/bash-classifier",
+            "docs/features/web-browser-tool",
+            "docs/features/experimental-skill-search"
+          ]
+        },
+        {
+          "group": "上下文与自动化",
+          "pages": [
+            "docs/features/token-budget",
+            "docs/features/context-collapse",
+            "docs/features/workflow-scripts"
+          ]
+        },
+        "docs/features/tier3-stubs"
+      ]
+    },
+    {
+      "group": "基础设施与依赖",
+      "pages": [
+        "docs/auto-updater",
+        "docs/lsp-integration",
+        "docs/external-dependencies",
+        "docs/telemetry-remote-config-audit"
+      ]
     }
   ],
   "excludes": [
     "docs/test-plans/**",
     "docs/testing-spec.md",
-    "docs/REVISION-PLAN.md"
+    "docs/REVISION-PLAN.md",
+    "docs/feature-exploration-plan.md",
+    "docs/ultraplan-implementation.md"
   ],
   "footerSocials": {
     "github": "https://github.com/anthropics/claude-code"
