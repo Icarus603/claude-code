@@ -1,5 +1,48 @@
 # DEV-LOG
 
+## Enable Computer Use — macOS + Windows + Linux (2026-04-03)
+
+恢复 Computer Use 屏幕操控功能。参考项目仅 macOS，本次扩展为三平台支持。
+
+**Phase 1 — MCP server stub 替换：**
+从参考项目复制 `@ant/computer-use-mcp` 完整实现（12 文件，6517 行）。
+
+**Phase 2 — 移除 src/ 中 8 处 macOS 硬编码：**
+
+| 文件 | 改动 |
+|------|------|
+| `src/main.tsx:1605` | 去掉 `getPlatform() === 'macos'` |
+| `src/utils/computerUse/swiftLoader.ts` | 移除 darwin-only throw |
+| `src/utils/computerUse/executor.ts` | 平台守卫扩展为 darwin+win32+linux；剪贴板按平台分发（pbcopy→PowerShell→xclip）；paste 快捷键 command→ctrl |
+| `src/utils/computerUse/drainRunLoop.ts` | 非 darwin 直接执行 fn() |
+| `src/utils/computerUse/escHotkey.ts` | 非 darwin 返回 false（Ctrl+C fallback） |
+| `src/utils/computerUse/hostAdapter.ts` | 非 darwin 权限检查返回 granted |
+| `src/utils/computerUse/common.ts` | platform + screenshotFiltering 动态化 |
+| `src/utils/computerUse/gates.ts` | enabled:true + hasRequiredSubscription→true |
+
+**Phase 3 — input/swift 包 dispatcher + backends 三平台架构：**
+
+```
+packages/@ant/computer-use-{input,swift}/src/
+├── index.ts          ← dispatcher
+├── types.ts          ← 共享接口
+└── backends/
+    ├── darwin.ts      ← macOS AppleScript（原样拆出，不改逻辑）
+    ├── win32.ts       ← Windows PowerShell
+    └── linux.ts       ← Linux xdotool/scrot/xrandr/wmctrl
+```
+
+**编译开关：** `CHICAGO_MCP` 加入 DEFAULT_FEATURES + DEFAULT_BUILD_FEATURES
+
+**验证结果（Windows x64）：**
+- `isSupported: true` ✅
+- 鼠标定位 + 前台窗口信息 ✅
+- 双显示器检测 2560x1440 × 2 ✅
+- 全屏截图 3MB base64 ✅
+- `bun run build` 463 files ✅
+
+---
+
 ## Enable Remote Control / BRIDGE_MODE (2026-04-03)
 
 **PR**: [claude-code-best/claude-code#60](https://github.com/claude-code-best/claude-code/pull/60)

@@ -10,7 +10,7 @@ rmSync(outdir, { recursive: true, force: true });
 
 // Default features that match the official CLI build.
 // Additional features can be enabled via FEATURE_<NAME>=1 env vars.
-const DEFAULT_BUILD_FEATURES = ["AGENT_TRIGGERS_REMOTE"];
+const DEFAULT_BUILD_FEATURES = ["AGENT_TRIGGERS_REMOTE", "CHICAGO_MCP"];
 
 // Collect FEATURE_* env vars → Bun.build features
 const envFeatures = Object.keys(process.env)
