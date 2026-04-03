@@ -1,5 +1,33 @@
 # DEV-LOG
 
+## Enable Claude in Chrome MCP (2026-04-03)
+
+恢复 Chrome 浏览器控制功能。`src/` 下所有 claudeInChrome 相关源码已与官方一致（0 行差异），问题出在 `@ant/claude-for-chrome-mcp` 包是 6 行 stub（返回空工具列表和 null server）。
+
+**替换文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `packages/@ant/claude-for-chrome-mcp/src/index.ts` | 6 行 stub → 15 行完整导出 |
+
+**新增文件：**
+
+| 文件 | 行数 | 说明 |
+|------|------|------|
+| `packages/@ant/claude-for-chrome-mcp/src/types.ts` | 134 | 类型定义 |
+| `packages/@ant/claude-for-chrome-mcp/src/browserTools.ts` | 546 | 17 个浏览器工具定义 |
+| `packages/@ant/claude-for-chrome-mcp/src/mcpServer.ts` | 96 | MCP Server |
+| `packages/@ant/claude-for-chrome-mcp/src/mcpSocketClient.ts` | 493 | Unix Socket 客户端 |
+| `packages/@ant/claude-for-chrome-mcp/src/mcpSocketPool.ts` | 327 | 多 Profile 连接池 |
+| `packages/@ant/claude-for-chrome-mcp/src/bridgeClient.ts` | 1126 | Bridge WebSocket 客户端 |
+| `packages/@ant/claude-for-chrome-mcp/src/toolCalls.ts` | 301 | 工具调用路由 |
+
+**不需要 feature flag，不需要改 dev.ts/build.ts，不改 src/ 下任何文件。**
+
+**运行时依赖：** Chrome 浏览器 + Claude in Chrome 扩展（https://claude.ai/chrome）
+
+---
+
 ## OpenAI 接口兼容 (2026-04-03)
 
 **分支**: `feature/openai`
