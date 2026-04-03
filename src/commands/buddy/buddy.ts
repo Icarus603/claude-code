@@ -102,7 +102,7 @@ export async function call(
     setState?.(prev => ({ ...prev, companionPetAt: Date.now() }))
 
     // Trigger a post-pet reaction
-    triggerCompanionReaction((context as any).messages ?? [], reaction =>
+    triggerCompanionReaction(context.messages ?? [], reaction =>
       setState?.(prev =>
         prev.companionReaction === reaction
           ? prev

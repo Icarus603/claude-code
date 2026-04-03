@@ -151,6 +151,10 @@ async function callBuddyReactAPI(
 
   if (!resp.ok) return null
 
-  const data = (await resp.json()) as { reaction?: string }
-  return data.reaction?.trim() || null
+  try {
+    const data = (await resp.json()) as { reaction?: string }
+    return data.reaction?.trim() || null
+  } catch {
+    return null
+  }
 }
