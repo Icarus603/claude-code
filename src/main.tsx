@@ -1525,7 +1525,7 @@ async function run(): Promise<CommanderCommand> {
     };
     // Store the explicit CLI flag so teammates can inherit it
     setChromeFlagOverride(chromeOpts.chrome);
-    const enableClaudeInChrome = shouldEnableClaudeInChrome(chromeOpts.chrome) && ((process.env.USER_TYPE) === 'ant' || isClaudeAISubscriber());
+    const enableClaudeInChrome = shouldEnableClaudeInChrome(chromeOpts.chrome);
     const autoEnableClaudeInChrome = !enableClaudeInChrome && shouldAutoEnableClaudeInChrome();
     if (enableClaudeInChrome) {
       const platform = getPlatform();
@@ -1602,7 +1602,7 @@ async function run(): Promise<CommanderCommand> {
     // `type: 'stdio'`. An enterprise-config ant with the GB gate on would
     // otherwise process.exit(1). Chrome has the same latent issue but has
     // shipped without incident; chicago places itself correctly.
-    if (feature('CHICAGO_MCP') && getPlatform() === 'macos' && !getIsNonInteractiveSession()) {
+    if (feature('CHICAGO_MCP') && !getIsNonInteractiveSession()) {
       try {
         const {
           getChicagoEnabled

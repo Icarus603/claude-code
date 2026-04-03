@@ -15,7 +15,7 @@ const defineArgs = Object.entries(defines).flatMap(([k, v]) => [
 
 // Bun --feature flags: enable feature() gates at runtime.
 // Default features enabled in dev mode.
-const DEFAULT_FEATURES = ["BUDDY", "TRANSCRIPT_CLASSIFIER", "BRIDGE_MODE", "AGENT_TRIGGERS_REMOTE"];
+const DEFAULT_FEATURES = ["BUDDY", "TRANSCRIPT_CLASSIFIER", "BRIDGE_MODE", "AGENT_TRIGGERS_REMOTE", "CHICAGO_MCP", "VOICE_MODE"];
 
 // Any env var matching FEATURE_<NAME>=1 will also enable that feature.
 // e.g. FEATURE_PROACTIVE=1 bun run dev
