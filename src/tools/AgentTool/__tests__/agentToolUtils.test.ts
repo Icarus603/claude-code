@@ -1,45 +1,13 @@
 import { mock, describe, expect, test } from "bun:test";
 
-// ─── Comprehensive mocks for agentToolUtils.ts dependencies ───
-// These must cover ALL named exports used by the module's transitive imports.
+// ─── Mocks for agentToolUtils.ts dependencies ───
+// Only mock modules that are truly unavailable or cause side effects.
+// Do NOT mock common/shared modules (zod/v4, bootstrap/state, etc.) to avoid
+// corrupting the module cache for other test files in the same Bun process.
 
 const noop = () => {};
-const emptySet = () => new Set<string>();
-
-// Utility: create a mock module factory that returns an object with arbitrary named exports
-function stubModule(exportNames: string[]) {
-  const obj: Record<string, any> = {};
-  for (const name of exportNames) {
-    obj[name] = noop;
-  }
-  return () => obj;
-}
 
 mock.module("bun:bundle", () => ({ feature: () => false }));
-
-mock.module("zod/v4", () => ({
-  z: {
-    object: () => ({ extend: () => ({ parse: noop }) }),
-    strictObject: () => ({ extend: noop }),
-    string: () => ({ optional: () => ({ describe: noop }) }),
-    number: () => ({ optional: noop }),
-    boolean: () => ({ describe: noop }),
-    enum: () => ({ optional: noop }),
-    array: noop,
-    union: noop,
-    optional: noop,
-    preprocess: noop,
-    nullable: noop,
-    record: noop,
-    any: noop,
-    unknown: noop,
-    default: noop,
-  },
-}));
-
-mock.module("src/bootstrap/state.js", () => ({
-  clearInvokedSkillsForAgent: noop,
-}));
 
 mock.module("src/constants/tools.js", () => ({
   ALL_AGENT_DISALLOWED_TOOLS: new Set(),
@@ -54,6 +22,10 @@ mock.module("src/services/AgentSummary/agentSummary.js", () => ({
 
 mock.module("src/services/analytics/index.js", () => ({
   logEvent: noop,
+  logEventAsync: async () => {},
+  stripProtoFields: (v: any) => v,
+  attachAnalyticsSink: noop,
+  _resetForTesting: noop,
   AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS: undefined,
 }));
 
@@ -64,7 +36,6 @@ mock.module("src/services/api/dumpPrompts.js", () => ({
 mock.module("src/Tool.js", () => ({
   toolMatchesName: () => false,
   findToolByName: noop,
-  toolMatchesName: () => false,
 }));
 
 // messages.ts is complex - provide stubs for all named exports
@@ -116,70 +87,42 @@ mock.module("src/tasks/LocalAgentTask/LocalAgentTask.js", () => ({
   updateProgressFromMessage: noop,
 }));
 
-mock.module("src/utils/agentSwarmsEnabled.js", () => ({
-  isAgentSwarmsEnabled: () => false,
-}));
-
 mock.module("src/utils/debug.js", () => ({
+  getMinDebugLogLevel: () => "warn",
+  isDebugMode: () => false,
+  enableDebugLogging: () => false,
+  getDebugFilter: () => null,
+  isDebugToStdErr: () => false,
+  getDebugFilePath: () => null,
+  setHasFormattedOutput: noop,
+  getHasFormattedOutput: () => false,
+  flushDebugLogs: async () => {},
   logForDebugging: noop,
-}));
-
-mock.module("src/utils/envUtils.js", () => ({
-  isInProtectedNamespace: () => false,
+  getDebugLogPath: () => "",
+  logAntError: noop,
 }));
 
 mock.module("src/utils/errors.js", () => ({
+  ClaudeError: class extends Error {},
+  MalformedCommandError: class extends Error {},
   AbortError: class extends Error {},
+  ConfigParseError: class extends Error {},
+  ShellError: class extends Error {},
+  TeleportOperationError: class extends Error {},
+  TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS: class extends Error {},
+  isAbortError: () => false,
+  hasExactErrorMessage: () => false,
+  toError: (e: any) => e instanceof Error ? e : new Error(String(e)),
   errorMessage: (e: any) => String(e),
+  getErrnoCode: () => undefined,
+  isENOENT: () => false,
+  getErrnoPath: () => undefined,
+  shortErrorStack: () => "",
+  isFsInaccessible: () => false,
+  classifyAxiosError: () => ({ category: "unknown" }),
 }));
 
 mock.module("src/utils/forkedAgent.js", () => ({}));
-
-mock.module("src/utils/lazySchema.js", () => ({
-  lazySchema: (fn: () => any) => fn,
-}));
-
-mock.module("src/utils/permissions/PermissionMode.js", () => ({}));
-
-// Provide working permissionRuleValueFromString to avoid polluting other test files
-const LEGACY_ALIASES: Record<string, string> = {
-  Task: "Agent",
-  KillShell: "TaskStop",
-  AgentOutputTool: "TaskOutput",
-  BashOutputTool: "TaskOutput",
-};
-
-function normalizeLegacyToolName(name: string): string {
-  return LEGACY_ALIASES[name] ?? name;
-}
-
-function escapeRuleContent(content: string): string {
-  return content.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-}
-
-function unescapeRuleContent(content: string): string {
-  return content.replace(/\\\(/g, "(").replace(/\\\)/g, ")").replace(/\\\\/g, "\\");
-}
-
-mock.module("src/utils/permissions/permissionRuleParser.js", () => ({
-  permissionRuleValueFromString: (ruleString: string) => {
-    const openIdx = ruleString.indexOf("(");
-    if (openIdx === -1) return { toolName: normalizeLegacyToolName(ruleString) };
-    const closeIdx = ruleString.lastIndexOf(")");
-    if (closeIdx === -1 || closeIdx <= openIdx) return { toolName: normalizeLegacyToolName(ruleString) };
-    if (closeIdx !== ruleString.length - 1) return { toolName: normalizeLegacyToolName(ruleString) };
-    const toolName = ruleString.substring(0, openIdx);
-    const rawContent = ruleString.substring(openIdx + 1, closeIdx);
-    if (!toolName) return { toolName: normalizeLegacyToolName(ruleString) };
-    if (rawContent === "" || rawContent === "*") return { toolName: normalizeLegacyToolName(toolName) };
-    return { toolName: normalizeLegacyToolName(toolName), ruleContent: unescapeRuleContent(rawContent) };
-  },
-  permissionRuleValueToString: (v: any) => {
-    if (!v.ruleContent) return v.toolName;
-    return `${v.toolName}(${escapeRuleContent(v.ruleContent)})`;
-  },
-  normalizeLegacyToolName,
-}));
 
 mock.module("src/utils/permissions/yoloClassifier.js", () => ({
   buildTranscriptForClassifier: () => "",
@@ -188,10 +131,6 @@ mock.module("src/utils/permissions/yoloClassifier.js", () => ({
 
 mock.module("src/utils/task/sdkProgress.js", () => ({
   emitTaskProgress: noop,
-}));
-
-mock.module("src/utils/teammateContext.js", () => ({
-  isInProcessTeammate: () => false,
 }));
 
 mock.module("src/utils/tokens.js", () => ({
