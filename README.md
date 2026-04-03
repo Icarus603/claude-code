@@ -37,7 +37,9 @@
   - [x] 自定义 login 模式, 大家可以用这个配置 Claude 的模型!
   - [x] 修复搜索工具的 rg 缺失问题(需要重新 bun i)
   - [x] OpenAI 接口兼容! /login 然后配置 OpenAI 平台即可!
-  - [x] Chrome use 支持(暂时浏览器插件要订阅权限,万恶的牢 A)
+  - [x] Chrome use 支持(暂时浏览器插件要订阅权限,万恶的牢 A) 感谢 @amDosion
+  - [x] Computer use 支持 感谢 @amDosion
+  - [x] /voice 支持 @amDosion
 - [ ] V6 大规模重构石山代码, 全面模块分包
   - [ ] V6 将会为全新分支, 届时 main 分支将会封存为历史版本
 
