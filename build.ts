@@ -53,3 +53,19 @@ for (const file of files) {
 console.log(
     `Bundled ${result.outputs.length} files to ${outdir}/ (patched ${patched} for Node.js compat)`,
 );
+
+// Step 4: Bundle download-ripgrep script as standalone JS for postinstall
+const rgScript = await Bun.build({
+    entrypoints: ["scripts/download-ripgrep.ts"],
+    outdir,
+    target: "node",
+});
+if (!rgScript.success) {
+    console.error("Failed to bundle download-ripgrep script:");
+    for (const log of rgScript.logs) {
+        console.error(log);
+    }
+    // Non-fatal — postinstall fallback to bun run scripts/download-ripgrep.ts
+} else {
+    console.log(`Bundled download-ripgrep script to ${outdir}/`);
+}

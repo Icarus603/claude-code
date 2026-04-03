@@ -8,3 +8,4 @@ coverage
 .vscode
 *.suo
 *.lock
+src/utils/vendor/
