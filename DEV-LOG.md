@@ -1,5 +1,22 @@
 # DEV-LOG
 
+## Datadog 日志端点可配置化 (2026-04-03)
+
+将 Datadog 硬编码的 Anthropic 内部端点改为环境变量驱动，默认禁用。
+
+**修改文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `src/services/analytics/datadog.ts` | `DATADOG_LOGS_ENDPOINT` 和 `DATADOG_CLIENT_TOKEN` 从硬编码常量改为读取 `process.env.DATADOG_LOGS_ENDPOINT` / `process.env.DATADOG_API_KEY`，默认空字符串；`initializeDatadog()` 增加守卫：端点或 Token 未配置时直接返回 `false` |
+| `docs/telemetry-remote-config-audit.md` | 更新第 1 节，反映新的环境变量配置方式 |
+
+**效果：** 默认不向任何外部发送数据；设置两个环境变量即可接入自己的 Datadog 实例。原有 `DISABLE_TELEMETRY`、privacy level、sink killswitch 等防线保留。
+
+**用法：** `DATADOG_LOGS_ENDPOINT=https://http-intake.logs.datadoghq.com/api/v2/logs DATADOG_API_KEY=xxx bun run dev`
+
+---
+
 ## Sentry 错误上报集成 (2026-04-03)
 
 恢复反编译过程中被移除的 Sentry 集成。通过 `SENTRY_DSN` 环境变量控制，未设置时所有函数为 no-op，不影响正常运行。

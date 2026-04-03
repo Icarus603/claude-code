@@ -4,12 +4,13 @@
 
 **文件**: `src/services/analytics/datadog.ts`
 
-- **端点**: `https://http-intake.logs.us5.datadoghq.com/api/v2/logs`
-- **客户端 token**: `pubbbf48e6d78dae54bceaa4acf463299bf`
+- **端点**: 通过环境变量 `DATADOG_LOGS_ENDPOINT` 配置（默认为空，即禁用）
+- **客户端 token**: 通过环境变量 `DATADOG_API_KEY` 配置（默认为空，即禁用）
 - **行为**: 批量发送日志（15s flush 间隔，100 条上限），仅限 1P（直连 Anthropic API）用户
 - **事件白名单**: `tengu_*` 系列事件（启动、错误、OAuth、工具调用等 ~35 种）
 - **基线数据**: 收集 model、platform、arch、version、userBucket（用户 hash 到 30 个桶）等
 - **仅限**: `NODE_ENV === 'production'`
+- **配置示例**: `DATADOG_LOGS_ENDPOINT=https://http-intake.logs.datadoghq.com/api/v2/logs DATADOG_API_KEY=xxx bun run dev`
 
 ## 2. 1P 事件日志（BigQuery）
 
