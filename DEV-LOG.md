@@ -1,5 +1,42 @@
 # DEV-LOG
 
+## Sentry 错误上报集成 (2026-04-03)
+
+恢复反编译过程中被移除的 Sentry 集成。通过 `SENTRY_DSN` 环境变量控制，未设置时所有函数为 no-op，不影响正常运行。
+
+**新增文件：**
+
+| 文件 | 说明 |
+|------|------|
+| `src/utils/sentry.ts` | 核心模块：`initSentry()`、`captureException()`、`setTag()`、`setUser()`、`closeSentry()`；`beforeSend` 过滤 auth headers 等敏感信息；忽略 ECONNREFUSED/AbortError 等非 actionable 错误 |
+
+**修改文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `src/utils/errorLogSink.ts` | `logErrorImpl` 末尾调用 `captureException()`，所有经 `logError()` 的错误自动上报 |
+| `src/components/SentryErrorBoundary.ts` | 添加 `componentDidCatch`，React 组件渲染错误上报到 Sentry（含 componentStack） |
+| `src/entrypoints/init.ts` | 网络配置后调用 `initSentry()` |
+| `src/utils/gracefulShutdown.ts` | 优雅关闭时 flush Sentry 事件 |
+| `src/screens/REPL.tsx:2809` | `fireCompanionObserver` 调用增加 `typeof` 防护，BUDDY feature 启用时不报错（TODO: 待实现） |
+| `package.json` | devDependencies 新增 `@sentry/node` |
+
+**用法：** `SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx bun run dev`
+
+---
+
+## 默认关闭自动更新 (2026-04-03)
+
+修改 `src/utils/config.ts` — `getAutoUpdaterDisabledReason()`，在原有检查逻辑前插入默认关闭逻辑。未设置 `ENABLE_AUTOUPDATER=1` 时，自动更新始终返回 `{ type: 'config' }` 被禁用。
+
+**启用方式：** `ENABLE_AUTOUPDATER=1 bun run dev`
+
+**原因：** 本项目为逆向工程/反编译版本，自动更新会覆盖本地修改的代码。
+
+**同时新增文档：** `docs/auto-updater.md` — 自动更新机制完整审计，涵盖三种安装类型的更新策略、后台轮询、版本门控、原生安装器架构、文件锁、配置项等。
+
+---
+
 ## WebSearch Bing 适配器补全 (2026-04-03)
 
 原始 `WebSearchTool` 仅支持 Anthropic API 服务端搜索（`web_search_20250305` server tool），在非官方 API 端点（第三方代理）下搜索功能不可用。本次改动引入适配器架构，新增 Bing 搜索页面解析作为 fallback。
