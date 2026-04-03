@@ -1,5 +1,14 @@
 # Claude Code Best V3 (CCB)
 
+[![GitHub Stars](https://img.shields.io/github/stars/claude-code-best/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/claude-code-best/claude-code/stargazers)
+[![GitHub Contributors](https://img.shields.io/github/contributors/claude-code-best/claude-code?style=flat-square&color=green)](https://github.com/claude-code-best/claude-code/graphs/contributors)
+[![GitHub Issues](https://img.shields.io/github/issues/claude-code-best/claude-code?style=flat-square&color=orange)](https://github.com/claude-code-best/claude-code/issues)
+[![GitHub License](https://img.shields.io/github/license/claude-code-best/claude-code?style=flat-square)](https://github.com/claude-code-best/claude-code/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/claude-code-best/claude-code?style=flat-square&color=blue)](https://github.com/claude-code-best/claude-code/commits/main)
+[![Bun](https://img.shields.io/badge/runtime-Bun-black?style=flat-square&logo=bun)](https://bun.sh/)
+
+> Which Claude do you like? The open source one is the best.
+
 牢 A (Anthropic) 官方 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 工具的源码反编译/逆向还原项目。目标是将 Claude Code 大部分功能及工程化能力复现 (问就是老佛爷已经付过钱了)。虽然很难绷, 但是它叫做 CCB(踩踩背)...
 
 [文档在这里, 支持投稿 PR](https://ccb.agent-aura.top/)
@@ -95,6 +104,12 @@ TUI (REPL) 模式需要真实终端，无法直接通过 VS Code launch 启动�
 
 - **在线文档（Mintlify）**: [ccb.agent-aura.top](https://ccb.agent-aura.top/) — 文档源码位于 [`docs/`](docs/) 目录，欢迎投稿 PR
 - **DeepWiki**: <https://deepwiki.com/claude-code-best/claude-code>
+
+## Contributors
+
+<a href="https://github.com/claude-code-best/claude-code/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=claude-code-best/claude-code" />
+</a>
 
 ## Star History
 
