@@ -12,7 +12,8 @@ const CARD_WIDTH = 40;
 const CARD_PADDING_X = 2;
 
 function StatBar({ name, value }: { name: string; value: number }) {
-  const filled = Math.round(value / 10);
+  const clamped = Math.max(0, Math.min(100, value));
+  const filled = Math.round(clamped / 10);
   const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled);
   return (
     <Text>

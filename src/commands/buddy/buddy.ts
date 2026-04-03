@@ -71,7 +71,7 @@ export async function call(
   onDone: LocalJSXCommandOnDone,
   context: ToolUseContext & LocalJSXCommandContext,
   args: string,
-): Promise<null> {
+): Promise<React.ReactNode> {
   const sub = args?.trim().toLowerCase() ?? ''
   const setState = context.setAppState
 
