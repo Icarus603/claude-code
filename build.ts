@@ -8,10 +8,15 @@ const outdir = "dist";
 const { rmSync } = await import("fs");
 rmSync(outdir, { recursive: true, force: true });
 
+// Default features that match the official CLI build.
+// Additional features can be enabled via FEATURE_<NAME>=1 env vars.
+const DEFAULT_BUILD_FEATURES = ["AGENT_TRIGGERS_REMOTE"];
+
 // Collect FEATURE_* env vars → Bun.build features
-const features = Object.keys(process.env)
+const envFeatures = Object.keys(process.env)
     .filter(k => k.startsWith("FEATURE_"))
     .map(k => k.replace("FEATURE_", ""));
+const features = [...new Set([...DEFAULT_BUILD_FEATURES, ...envFeatures])];
 
 // Step 2: Bundle with splitting
 const result = await Bun.build({
