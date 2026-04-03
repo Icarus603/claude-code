@@ -1,5 +1,35 @@
 # DEV-LOG
 
+## Enable Voice Mode / VOICE_MODE (2026-04-03)
+
+恢复 `/voice` 语音输入功能。`src/` 下所有 voice 相关源码已与官方一致（0 行差异），问题出在：① `VOICE_MODE` 编译开关未开，命令不显示；② `audio-capture-napi` 是 SoX 子进程 stub（Windows 不支持），缺少官方原生 `.node` 二进制。
+
+**新增文件：**
+
+| 文件 | 说明 |
+|------|------|
+| `vendor/audio-capture/{platform}/audio-capture.node` | 6 个平台的原生音频二进制（cpal，来自参考项目） |
+| `vendor/audio-capture-src/index.ts` | 原生模块加载器（按 `${arch}-${platform}` 动态 require `.node`） |
+
+**修改文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `packages/audio-capture-napi/src/index.ts` | SoX 子进程 stub → 原生 `.node` 加载器（含 `process.cwd()` workspace 路径 fallback） |
+| `scripts/dev.ts` | `DEFAULT_FEATURES` 加 `"VOICE_MODE"` |
+| `build.ts` | `DEFAULT_BUILD_FEATURES` 加 `"VOICE_MODE"` |
+| `docs/features/voice-mode.md` | 追加恢复计划章节（第八节） |
+
+**验证结果：**
+
+- `isNativeAudioAvailable()` → `true`（Windows x64 原生 `.node` 加载成功）
+- `feature('VOICE_MODE')` → `ENABLED`
+- `bun run build` → voice 代码编入产物
+
+**运行时前置条件：** claude.ai OAuth 登录 + 麦克风权限
+
+---
+
 ## Enable Claude in Chrome MCP (2026-04-03)
 
 恢复 Chrome 浏览器控制功能。`src/` 下所有 claudeInChrome 相关源码已与官方一致（0 行差异），问题出在 `@ant/claude-for-chrome-mcp` 包是 6 行 stub（返回空工具列表和 null server）。
