@@ -11,6 +11,9 @@ import type {
   SwiftBackend, WindowDisplayInfo,
 } from '../types.js'
 
+import { listWindows } from 'src/utils/computerUse/win32/windowEnum.js'
+import { captureWindow, captureWindowByHwnd } from 'src/utils/computerUse/win32/windowCapture.js'
+
 // ---------------------------------------------------------------------------
 // PowerShell helper
 // ---------------------------------------------------------------------------
@@ -155,11 +158,11 @@ $apps | Select-Object -Unique | Select-Object -First 200
 
   listRunning() {
     try {
-      const raw = ps(`Get-Process | Where-Object { $_.MainWindowTitle -ne '' } | Select-Object -First 50 | ForEach-Object { "$($_.MainModule.FileName)|$($_.ProcessName)" }`)
-      return raw.split('\n').filter(Boolean).map(line => {
-        const [exePath, name] = line.split('|', 2)
-        return { bundleId: exePath ?? '', displayName: name ?? '' }
-      })
+      const windows = listWindows()
+      return windows.map(w => ({
+        bundleId: String(w.hwnd),
+        displayName: w.title,
+      }))
     } catch {
       return []
     }
@@ -245,5 +248,16 @@ $ms.Dispose()
     const secondComma = raw.indexOf(',', firstComma + 1)
     const base64 = raw.slice(secondComma + 1)
     return { base64, width: w, height: h }
+  },
+
+  /**
+   * Capture a specific window by title or HWND using PrintWindow.
+   * Works even for occluded or background windows.
+   */
+  captureWindowTarget(titleOrHwnd: string | number): ScreenshotResult | null {
+    if (typeof titleOrHwnd === 'number') {
+      return captureWindowByHwnd(titleOrHwnd)
+    }
+    return captureWindow(titleOrHwnd)
   },
 }

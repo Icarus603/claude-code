@@ -1,5 +1,32 @@
 # DEV-LOG
 
+## Computer Use Windows 增强：窗口绑定截图 + UI Automation + OCR (2026-04-03)
+
+在三平台基础实现之上，利用 Windows 原生 API 增强 Computer Use 的 Windows 专属能力。
+
+**新增文件：**
+
+| 文件 | 行数 | 说明 |
+|------|------|------|
+| `src/utils/computerUse/win32/windowCapture.ts` | — | `PrintWindow` 窗口绑定截图，支持被遮挡/后台窗口 |
+| `src/utils/computerUse/win32/windowEnum.ts` | — | `EnumWindows` 精确窗口枚举（HWND + PID + 标题） |
+| `src/utils/computerUse/win32/uiAutomation.ts` | — | `IUIAutomation` UI 元素树读取、按钮点击、文本写入、坐标识别 |
+| `src/utils/computerUse/win32/ocr.ts` | — | `Windows.Media.Ocr` 截图+文字识别（英语+中文） |
+
+**修改文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `packages/@ant/computer-use-swift/src/backends/win32.ts` | `listRunning` 改用 EnumWindows；新增 `captureWindowTarget` 窗口级截图 |
+
+**验证结果（Windows x64）：**
+- 窗口枚举：38 个可见窗口 ✅
+- 窗口截图：VS Code 2575x1415, 444KB ✅（PrintWindow, 即使被遮挡）
+- UI Automation：坐标元素识别 ✅
+- OCR：识别 VS Code 界面文字，34 行 ✅
+
+---
+
 ## Enable Computer Use — macOS + Windows + Linux (2026-04-03)
 
 恢复 Computer Use 屏幕操控功能。参考项目仅 macOS，本次扩展为三平台支持。
