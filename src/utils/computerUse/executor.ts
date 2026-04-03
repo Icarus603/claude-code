@@ -414,7 +414,7 @@ export function createCliExecutor(opts: {
         d.height,
         d.scaleFactor,
       )
-      return drainRunLoop(() =>
+      const raw = await drainRunLoop(() =>
         cu.resolvePrepareCapture(
           withoutTerminal(opts.allowedBundleIds),
           surrogateHost,
@@ -426,6 +426,14 @@ export function createCliExecutor(opts: {
           opts.doHide,
         ),
       )
+      // Ensure the result has fields expected by toolCalls.ts (hidden, displayId).
+      // macOS native returns these from Swift; our cross-platform ComputerUseAPI
+      // returns {base64, width, height} — fill in the missing fields.
+      return {
+        ...raw,
+        hidden: (raw as any).hidden ?? [],
+        displayId: (raw as any).displayId ?? opts.preferredDisplayId ?? d.displayId,
+      }
     },
 
     /**
