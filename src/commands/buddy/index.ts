@@ -1,10 +1,15 @@
 import type { Command } from '../../commands.js'
+import { isBuddyLive } from '../../buddy/useBuddyNotification.js'
 
 const buddy = {
-  type: 'local',
+  type: 'local-jsx',
   name: 'buddy',
-  description: 'View and manage your companion buddy',
-  supportsNonInteractive: false,
+  description: 'Hatch a coding companion · pet, off',
+  argumentHint: '[pet|off]',
+  immediate: true,
+  get isHidden() {
+    return !isBuddyLive()
+  },
   load: () => import('./buddy.js'),
 } satisfies Command
 

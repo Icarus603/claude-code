@@ -275,6 +275,7 @@ const WebBrowserPanelModule = feature('WEB_BROWSER_TOOL') ? require('../tools/We
 import { IssueFlagBanner } from '../components/PromptInput/IssueFlagBanner.js';
 import { useIssueFlagBanner } from '../hooks/useIssueFlagBanner.js';
 import { CompanionSprite, CompanionFloatingBubble, MIN_COLS_FOR_FULL_SPRITE } from '../buddy/CompanionSprite.js';
+import { triggerCompanionReaction } from '../buddy/companionReact.js';
 import { DevBar } from '../components/DevBar.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '../remote/RemoteSessionManager.js';
@@ -2805,12 +2806,13 @@ export function REPL({
     })) {
       onQueryEvent(event);
     }
-    // TODO: implement fireCompanionObserver — companion model reaction after each query turn
-    if (feature('BUDDY') && typeof fireCompanionObserver === 'function') {
-      void fireCompanionObserver(messagesRef.current, reaction => setAppState(prev => prev.companionReaction === reaction ? prev : {
-        ...prev,
-        companionReaction: reaction as string | undefined
-      }));
+    if (feature('BUDDY')) {
+      triggerCompanionReaction(messagesRef.current, reaction =>
+        setAppState(prev => prev.companionReaction === reaction ? prev : {
+          ...prev,
+          companionReaction: reaction as string | undefined,
+        })
+      );
     }
     queryCheckpoint('query_end');
 
