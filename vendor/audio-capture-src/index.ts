@@ -50,15 +50,14 @@ function loadModule(): AudioCaptureNapi | null {
     }
   }
 
-  // Candidates 2-4: npm-install, dev/source, and workspace layouts.
-  // In bundled output, require() resolves relative to cli.js at the package root.
-  // In dev, it resolves relative to this file. When loaded from a workspace
-  // package (packages/audio-capture-napi/src/), we need an absolute path fallback.
+  // Candidates 2/3: npm-install and dev/source layouts. Dynamic require is
+  // fine here — in bundled output (node --target build) require() resolves at
+  // runtime relative to cli.js at the package root; in dev it resolves
+  // relative to this file (vendor/audio-capture-src/index.ts).
   const platformDir = `${process.arch}-${platform}`
   const fallbacks = [
     `./vendor/audio-capture/${platformDir}/audio-capture.node`,
     `../audio-capture/${platformDir}/audio-capture.node`,
-    `${process.cwd()}/vendor/audio-capture/${platformDir}/audio-capture.node`,
   ]
   for (const p of fallbacks) {
     try {
