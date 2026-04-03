@@ -14,6 +14,8 @@
 
 [文档在这里, 支持投稿 PR](https://ccb.agent-aura.top/)
 
+[Discord 群组](https://discord.gg/qZU6zS7Q)
+
 赞助商占位符
 
 - [x] v1 会完成跑通及基本的类型检查通过;
