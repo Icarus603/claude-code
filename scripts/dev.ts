@@ -26,8 +26,13 @@ const envFeatures = Object.entries(process.env)
 const allFeatures = [...new Set([...DEFAULT_FEATURES, ...envFeatures])];
 const featureArgs = allFeatures.flatMap((name) => ["--feature", name]);
 
+// If BUN_INSPECT is set, pass --inspect-wait to the child process
+const inspectArgs = process.env.BUN_INSPECT
+    ? ["--inspect-wait=" + process.env.BUN_INSPECT]
+    : [];
+
 const result = Bun.spawnSync(
-    ["bun", "run", ...defineArgs, ...featureArgs, "src/entrypoints/cli.tsx", ...process.argv.slice(2)],
+    ["bun", ...inspectArgs, "run", ...defineArgs, ...featureArgs, "src/entrypoints/cli.tsx", ...process.argv.slice(2)],
     { stdio: ["inherit", "inherit", "inherit"] },
 );
 
