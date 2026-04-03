@@ -31,6 +31,7 @@
   - [x] 关闭自动更新;
   - [x] 添加自定义 sentry 错误上报支持 [文档](https://ccb.agent-aura.top/docs/internals/sentry-setup)
   - [x] 添加自定义 GrowthBook 支持 (GB 也是开源的, 现在你可以配置一个自定义的遥控平台) [文档](https://ccb.agent-aura.top/docs/internals/growthbook-adapter)
+  - [x] 自定义 login 模式, 大家可以用这个配置 Claude 的模型!
 - [ ] V6 大规模重构石山代码, 全面模块分包
   - [ ] V6 将会为全新分支, 届时 main 分支将会封存为历史版本
 
@@ -71,6 +72,40 @@ bun run build
 构建出的版本 bun 和 node 都可以启动, 你 publish 到私有源可以直接启动
 
 如果遇到 bug 请直接提一个 issues, 我们优先解决
+
+### 新人配置 /login
+
+首次运行后，在 REPL 中输入 `/login` 命令进入登录配置界面，选择 **Custom Platform** 即可对接第三方 API 兼容服务（无需 Anthropic 官方账号）。
+
+需要填写的字段：
+
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| Base URL | API 服务地址 | `https://api.example.com/v1` |
+| API Key | 认证密钥 | `sk-xxx` |
+| Haiku Model | 快速模型 ID | `claude-haiku-4-5-20251001` |
+| Sonnet Model | 均衡模型 ID | `claude-sonnet-4-6` |
+| Opus Model | 高性能模型 ID | `claude-opus-4-6` |
+
+- **Tab / Shift+Tab** 切换字段，**Enter** 确认并跳到下一个，最后一个字段按 Enter 保存
+- 模型字段会自动读取当前环境变量预填
+- 配置保存到 `~/.claude/settings.json` 的 `env` 字段，保存后立即生效
+
+也可以直接编辑 `~/.claude/settings.json`：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.example.com/v1",
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxx",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5-20251001",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6"
+  }
+}
+```
+
+> 支持所有 Anthropic API 兼容服务（如 OpenRouter、AWS Bedrock 代理等），只要接口兼容 Messages API 即可。
 
 ## Feature Flags
 

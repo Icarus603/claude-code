@@ -168,3 +168,37 @@ GrowthBook 功能开关系统原为 Anthropic 内部构建设计，硬编码 SDK
 注意：
 - `USER_TYPE=ant` 启用 alt-screen 全屏模式，中心区域满屏是预期行为
 - `global.d.ts` 中剩余未 stub 的全局函数（`getAntModels` 等）遇到 `X is not defined` 时按同样模式处理
+
+---
+
+## /login 添加 Custom Platform 选项 (2026-04-03)
+
+在 `/login` 命令的登录方式选择列表中新增 "Custom Platform" 选项（位于第一位），允许用户直接在终端配置第三方 API 兼容服务的 Base URL、API Key 和三种模型映射，保存到 `~/.claude/settings.json`。
+
+**修改文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `src/components/ConsoleOAuthFlow.tsx` | `OAuthStatus` 类型新增 `custom_platform` state（含 `baseUrl`、`apiKey`、`haikuModel`、`sonnetModel`、`opusModel`、`activeField`）；`idle` case Select 选项新增 Custom Platform 并排第一位；新增 `custom_platform` case 渲染 5 字段表单（Tab/Shift+Tab 切换、focus 高亮、Enter 跳转/保存）；Select onChange 处理 `custom_platform` 初始状态（从 `process.env` 预填当前值）；`OAuthStatusMessageProps` 类型及调用处新增 `onDone` prop |
+| `src/components/ConsoleOAuthFlow.tsx` | 新增 `updateSettingsForSource` import |
+
+**UI 交互：**
+- 5 个字段同屏：Base URL、API Key、Haiku Model、Sonnet Model、Opus Model
+- 当前活动字段的标签用 `suggestion` 背景色 + `inverseText` 反色高亮
+- Tab / Shift+Tab 在字段间切换，各自保留输入值
+- 每个字段按 Enter 跳到下一个，最后一个字段 (Opus) 按 Enter 保存
+- 模型字段自动从 `process.env` 读取当前配置作为预填值，无值则空
+- 保存时调用 `updateSettingsForSource('userSettings', { env })` 写入 settings.json，同时更新 `process.env`
+
+**保存的 settings.json env 字段：**
+```json
+{
+  "ANTHROPIC_BASE_URL": "...",
+  "ANTHROPIC_AUTH_TOKEN": "...",
+  "ANTHROPIC_DEFAULT_HAIKU_MODEL": "...",
+  "ANTHROPIC_DEFAULT_SONNET_MODEL": "...",
+  "ANTHROPIC_DEFAULT_OPUS_MODEL": "..."
+}
+```
+
+非空字段才写入，保存后立即生效（`onDone()` 触发 `onChangeAPIKey()` 刷新 API 客户端）。
