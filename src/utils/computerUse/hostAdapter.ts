@@ -46,9 +46,11 @@ export function getComputerUseHostAdapter(): ComputerUseHostAdapter {
     }),
     ensureOsPermissions: async () => {
       if (process.platform !== 'darwin') return { granted: true }
-      const cu = requireComputerUseSwift()
-      const accessibility = (cu as any).tcc.checkAccessibility()
-      const screenRecording = (cu as any).tcc.checkScreenRecording()
+      const cu = requireComputerUseSwift() as any
+      // Native .node module exposes tcc; cross-platform JS backend does not.
+      if (!cu.tcc) return { granted: true }
+      const accessibility = cu.tcc.checkAccessibility()
+      const screenRecording = cu.tcc.checkScreenRecording()
       return accessibility && screenRecording
         ? { granted: true }
         : { granted: false, accessibility, screenRecording }

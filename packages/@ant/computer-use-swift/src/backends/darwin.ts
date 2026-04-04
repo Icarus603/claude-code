@@ -159,23 +159,28 @@ export const apps: AppsAPI = {
 
   async listInstalled() {
     try {
-      const result = await osascript(`
-        tell application "System Events"
-          set appList to ""
-          repeat with appFile in (every file of folder "Applications" of startup disk whose name ends with ".app")
-            set appPath to POSIX path of (appFile as alias)
-            set appName to name of appFile
-            set appList to appList & appPath & "|" & appName & "\\n"
-          end repeat
-          return appList
-        end tell
-      `)
-      return result.split('\n').filter(Boolean).map(line => {
-        const [path, name] = line.split('|', 2)
-        const displayName = (name ?? '').replace(/\.app$/, '')
+      // Use Spotlight (mdfind) to enumerate .app bundles and mdls to get real bundle IDs.
+      // Searches /Applications, /System/Applications, and /System/Applications/Utilities
+      // so that system apps (Terminal, Chess, etc.) and core services (Finder) are found.
+      const proc = Bun.spawn([
+        'bash', '-c',
+        `for dir in /Applications /System/Applications /System/Applications/Utilities /System/Library/CoreServices; do
+mdfind 'kMDItemContentType == "com.apple.application-bundle"' -onlyin "$dir" 2>/dev/null
+done | sort -u | while read -r appPath; do
+bundleId=$(mdls -raw -name kMDItemCFBundleIdentifier "$appPath" 2>/dev/null)
+if [ -n "$bundleId" ] && [ "$bundleId" != "(null)" ]; then
+  displayName=$(basename "$appPath" .app)
+  echo "$bundleId|$displayName|$appPath"
+fi
+done`,
+      ], { stdout: 'pipe', stderr: 'pipe' })
+      const text = await new Response(proc.stdout).text()
+      await proc.exited
+      return text.split('\n').filter(Boolean).map(line => {
+        const [bundleId, displayName, path] = line.split('|', 3)
         return {
-          bundleId: `com.app.${displayName.toLowerCase().replace(/\s+/g, '-')}`,
-          displayName,
+          bundleId: bundleId ?? '',
+          displayName: displayName ?? '',
           path: path ?? '',
         }
       })
