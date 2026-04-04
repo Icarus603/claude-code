@@ -85,14 +85,12 @@ const call: LocalCommandCall = async (args, context) => {
     applyConfigEnvironmentVariables()
     return { type: 'text', value: `API provider set to ${arg}.` }
   } else {
-    // Cloud providers: set env vars only, clear settings.modelType
+    // Cloud providers: set env vars only, do NOT touch settings.modelType
     delete process.env.CLAUDE_CODE_USE_OPENAI
     delete process.env.OPENAI_API_KEY
     delete process.env.OPENAI_BASE_URL
     process.env[getEnvVarForProvider(arg)] = '1'
-    // Clear settings.json to 'anthropic' to avoid validation errors
-    updateSettingsForSource('userSettings', { modelType: 'anthropic' })
-    // Ensure settings.env gets applied to process.env (in case it contains provider-specific creds)
+    // Do not modify settings.json - cloud providers controlled solely by env vars
     applyConfigEnvironmentVariables()
     return { type: 'text', value: `API provider set to ${arg} (via environment variable).` }
   }
