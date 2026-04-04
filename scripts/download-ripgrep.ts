@@ -248,6 +248,7 @@ async function downloadAndExtract(): Promise<void> {
         rmSync(tmpDir, { recursive: true, force: true })
       }
     } else {
+      let fflateError: unknown
       try {
         const { unzipSync } = await import('fflate')
         const unzipped = unzipSync(new Uint8Array(buffer))
@@ -256,20 +257,50 @@ async function downloadAndExtract(): Promise<void> {
           throw new Error(`Binary ${extractedBinary} not found in zip`)
         }
         writeFileSync(binaryPath, Buffer.from(unzipped[key]))
-      } catch {
-        // No fflate or bad archive — try `unzip` CLI (common on Unix / Git for Windows)
+        fflateError = undefined
+      } catch (e) {
+        fflateError = e
+      }
+
+      if (fflateError) {
+        // fflate failed — try PowerShell Expand-Archive on Windows, then unzip CLI
         const tmpDir = path.join(binaryDir, '.tmp-download')
         rmSync(tmpDir, { recursive: true, force: true })
         mkdirSync(tmpDir, { recursive: true })
         try {
           const archivePath = path.join(tmpDir, assetName)
           writeFileSync(archivePath, buffer)
-          const result = spawnSync('unzip', ['-o', archivePath, '-d', tmpDir], {
-            stdio: 'pipe',
-          })
-          if (result.status !== 0) {
-            throw new Error(`unzip failed: ${result.stderr?.toString()}`)
+
+          let extracted = false
+
+          // On Windows, prefer PowerShell Expand-Archive
+          if (process.platform === 'win32') {
+            const psCmd = `Expand-Archive -Path '${archivePath.replace(/'/g, "''")}' -DestinationPath '${tmpDir.replace(/'/g, "''")}' -Force`
+            const psResult = spawnSync(
+              'powershell.exe',
+              ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', psCmd],
+              { stdio: 'pipe', windowsHide: true },
+            )
+            if (psResult.status === 0) {
+              extracted = true
+            } else {
+              const psErr = psResult.stderr?.toString().trim() || 'unknown error'
+              console.log(`[ripgrep] PowerShell Expand-Archive failed: ${psErr}`)
+            }
           }
+
+          // Fallback: unzip CLI (Git for Windows, MSYS2, or Unix)
+          if (!extracted) {
+            const result = spawnSync('unzip', ['-o', archivePath, '-d', tmpDir], {
+              stdio: 'pipe',
+            })
+            if (result.status !== 0) {
+              const unzipErr = result.stderr?.toString().trim() || 'command not found'
+              const fflateMsg = fflateError instanceof Error ? fflateError.message : String(fflateError)
+              throw new Error(`zip extraction failed (fflate: ${fflateMsg}; unzip: ${unzipErr})`)
+            }
+          }
+
           const srcBinary = path.join(tmpDir, extractedBinary)
           if (!existsSync(srcBinary)) {
             throw new Error(`Binary not found at expected path: ${srcBinary}`)
