@@ -1,7 +1,7 @@
 # Computer Use — macOS / Windows / Linux 跨平台实施计划
 
-更新时间：2026-04-03
-参考项目：`E:\源码\claude-code-source-main\claude-code-source-main`
+更新时间：2026-04-04
+参考项目：https://github.com/JrCx7scC/claude-code-source
 
 ## 1. 现状
 
@@ -11,44 +11,90 @@
 - ✅ `@ant/computer-use-input` 拆为 dispatcher + backends（darwin + win32）
 - ✅ `@ant/computer-use-swift` 拆为 dispatcher + backends（darwin + win32）
 - ✅ `CHICAGO_MCP` 编译开关已开
-- ❌ `src/` 层有 6 处 macOS 硬编码阻塞
+- ✅ `src/` 层 macOS 硬编码全部移除，已支持 darwin / win32 / linux 三平台
 
-## 2. 阻塞点全景
+## 2. 用户使用方式
 
-### 2.1 入口层
+Computer Use 由 `CHICAGO_MCP` feature flag 控制，无需额外 CLI 参数。
 
-| # | 文件:行号 | 阻塞代码 | 影响 |
-|---|----------|---------|------|
-| 1 | `src/main.tsx:1605` | `getPlatform() === 'macos'` | 整个 CU 初始化被跳过 |
+> **订阅要求**：需要 Claude Pro、Max 或 Team 订阅，Computer Use 功能不向免费用户开放。
 
-### 2.2 加载层
+### Dev 模式（默认已开启）
 
-| # | 文件:行号 | 阻塞代码 | 影响 |
-|---|----------|---------|------|
-| 2 | `src/utils/computerUse/swiftLoader.ts:16` | `process.platform !== 'darwin'` → throw | 截图、应用管理全部不可用 |
-| 3 | `src/utils/computerUse/executor.ts:263` | `process.platform !== 'darwin'` → throw | 整个 executor 工厂函数不可用 |
+```bash
+bun run dev
+```
 
-### 2.3 macOS 特有依赖
+`scripts/dev.ts` 的默认 feature 列表已包含 `CHICAGO_MCP`，启动后自动注册 Computer Use MCP 工具。
 
-| # | 文件:行号 | 依赖 | macOS 实现 | 需要替代方案 |
-|---|----------|------|-----------|------------|
-| 4 | `executor.ts:70-88` | 剪贴板 | `pbcopy`/`pbpaste` | Win: PowerShell `Get/Set-Clipboard`；Linux: `xclip`/`wl-copy` |
-| 5 | `drainRunLoop.ts:21` | CFRunLoop pump | `cu._drainMainRunLoop()` | 非 darwin：直接执行 fn()，不需要 pump |
-| 6 | `escHotkey.ts:28` | ESC 热键 | CGEventTap | 非 darwin：返回 false（已有 Ctrl+C fallback） |
-| 7 | `hostAdapter.ts:48-54` | 系统权限 | TCC accessibility + screenRecording | Win：直接 granted；Linux：检查 xdotool |
-| 8 | `common.ts:56` | 平台标识 | `platform: 'darwin'` 硬编码 | 动态获取 |
-| 9 | `executor.ts:180` | 粘贴快捷键 | `command+v` | Win/Linux：`ctrl+v` |
+### 构建产物
 
-### 2.4 缺失的 Linux 后端
+```bash
+FEATURE_CHICAGO_MCP=1 node dist/cli.js
+```
 
-| 包 | macOS | Windows | Linux |
-|---|-------|---------|-------|
-| `computer-use-input/backends/` | ✅ darwin.ts | ✅ win32.ts | ❌ 需新建 linux.ts |
-| `computer-use-swift/backends/` | ✅ darwin.ts | ✅ win32.ts | ❌ 需新建 linux.ts |
+### 使用流程
 
-## 3. 每个平台的能力依赖
+1. **启动 CLI** — `bun run dev`（或构建产物 + 环境变量）
+2. **正常对话** — 在 REPL 中与 Claude 对话，当你让 Claude 操作电脑时（如"帮我打开浏览器并访问 xxx"），Claude 会调用 Computer Use 工具
+3. **首次审批** — Claude 首次尝试操控某个 App 时，会弹出权限对话框，你需要确认允许哪些 App 被操控（可勾选"本次会话不再询问"）
+4. **操作中** — 系统会发送通知"Claude is using your computer"，macOS 按 Esc、其他平台按 Ctrl+C 可中止
+5. **操作结束** — Claude 完成操作后自动释放，被隐藏的窗口会自动恢复
 
-### 3.1 computer-use-input（键鼠）
+### 可用的操作
+
+- 截图（全屏 / 区域缩放）
+- 鼠标移动、点击、拖拽、滚轮
+- 键盘输入、组合键、长按
+- 通过剪贴板粘贴多行文本
+- 应用管理（列出、打开、隐藏/恢复）
+- 多显示器支持（自动选择或手动指定）
+
+### Linux 依赖工具
+
+| 工具 | 用途 | 安装命令（Ubuntu） |
+|------|------|-------------------|
+| `xdotool` | 键鼠模拟 + 窗口管理 | `sudo apt install xdotool` |
+| `scrot` 或 `gnome-screenshot` | 截图 | `sudo apt install scrot` |
+| `xrandr` | 显示器信息 | 通常已预装 |
+| `xclip` | 剪贴板 | `sudo apt install xclip` |
+| `wmctrl` | 窗口列表/切换 | `sudo apt install wmctrl` |
+
+Wayland 环境需要替代工具：`ydotool`（替代 xdotool）、`grim`（替代 scrot）、`wl-clipboard`（替代 xclip）。初期只支持 X11，Wayland 标记为 todo。
+
+### macOS 权限
+
+macOS 首次使用需要授予「辅助功能」和「屏幕录制」权限（系统会提示）。
+
+### Windows
+
+无需额外权限，开箱即用。
+
+## 3. 实施细节
+
+### 3.1 功能开关（gates.ts）
+
+- `enabled` 默认为 `true`，无需订阅检查
+- `hasRequiredSubscription()` 直接返回 `true`
+- 子开关（鼠标动画、隐藏窗口、剪贴板守卫等）均通过 GrowthBook 远程配置或使用默认值
+
+### 3.2 平台分发
+
+所有平台相关逻辑已通过 `process.platform` 判断分发：
+
+| 文件 | 处理方式 |
+|------|---------|
+| `executor.ts` | 剪贴板：darwin→pbcopy/pbpaste，win32→PowerShell，linux→xclip；粘贴键：darwin→command+v，其他→ctrl+v |
+| `drainRunLoop.ts` | 非 darwin 直接执行 fn()，不需要 CFRunLoop pump |
+| `escHotkey.ts` | 非 darwin 返回 false（已有 Ctrl+C fallback） |
+| `hostAdapter.ts` | 非 darwin 直接返回 `{ granted: true }`，macOS 检查 TCC 权限 |
+| `common.ts` | 动态获取 platform 标识，截图过滤按平台选择 |
+| `swiftLoader.ts` | 自动检测包导出类型，跨平台实例化 `ComputerUseAPI` |
+| `main.tsx` | 仅检查 `feature('CHICAGO_MCP')` + 交互模式，无平台限制 |
+
+### 3.3 每个平台的能力依赖
+
+#### computer-use-input（键鼠）
 
 | 功能 | macOS | Windows | Linux |
 |------|-------|---------|-------|
@@ -61,7 +107,7 @@
 | 前台应用 | System Events osascript | GetForegroundWindow P/Invoke | xdotool getactivewindow + /proc |
 | 工具依赖 | osascript（内置） | powershell（内置） | xdotool（需安装） |
 
-### 3.2 computer-use-swift（截图 + 应用管理）
+#### computer-use-swift（截图 + 应用管理）
 
 | 功能 | macOS | Windows | Linux |
 |------|-------|---------|-------|
@@ -73,7 +119,7 @@
 | 隐藏/显示 | System Events visibility | ShowWindow/SetForegroundWindow | wmctrl -c / xdotool |
 | 工具依赖 | screencapture + osascript | powershell | xdotool + scrot/grim + wmctrl |
 
-### 3.3 executor 层
+#### executor 层
 
 | 功能 | macOS | Windows | Linux |
 |------|-------|---------|-------|
@@ -85,113 +131,12 @@
 | 终端检测 | __CFBundleIdentifier | WT_SESSION / TERM_PROGRAM | TERM_PROGRAM |
 | 系统权限 | TCC check | 直接 granted | 检查 xdotool 安装 |
 
-## 4. 执行步骤
+## 4. 完成状态
 
-### Phase 1：已完成 ✅
+| Phase | 内容 | 状态 |
+|-------|------|------|
+| Phase 1 | MCP 实现 + Windows 后端 | ✅ 已完成 |
+| Phase 2 | 移除 macOS 硬编码 | ✅ 已完成 |
+| Phase 3 | Linux 后端（待新建 linux.ts） | ❌ 未完成 |
 
-- [x] `@ant/computer-use-mcp` stub → 完整实现
-- [x] `@ant/computer-use-input` dispatcher + darwin/win32 backends
-- [x] `@ant/computer-use-swift` dispatcher + darwin/win32 backends
-- [x] `CHICAGO_MCP` 编译开关
-
-### Phase 2：移除 6 处 macOS 硬编码（解锁 macOS + Windows）
-
-**改动原则：macOS 代码路径不变，只在每处 darwin 守卫后加 win32/linux 分支。**
-
-| 步骤 | 文件 | 改动 |
-|------|------|------|
-| 2.1 | `src/main.tsx:1605` | `getPlatform() === 'macos'` → 去掉平台限制，或改为 `!== 'unknown'` |
-| 2.2 | `src/utils/computerUse/swiftLoader.ts:16-18` | 移除 `process.platform !== 'darwin'` throw。`@ant/computer-use-swift/index.ts` 已有跨平台 dispatch |
-| 2.3 | `src/utils/computerUse/executor.ts:263-267` | 移除 `process.platform !== 'darwin'` throw。改为检查 input/swift isSupported |
-| 2.4 | `src/utils/computerUse/executor.ts:70-88` | 剪贴板函数按平台分发：darwin→pbcopy/pbpaste，win32→PowerShell Get/Set-Clipboard，linux→xclip |
-| 2.5 | `src/utils/computerUse/executor.ts:180` | `typeViaClipboard` 中 `command+v` → 非 darwin 时用 `ctrl+v` |
-| 2.6 | `src/utils/computerUse/executor.ts:273` | `const cu = requireComputerUseSwift()` → 改为 `new ComputerUseAPI()`（从 package 直接实例化，不走 swiftLoader throw） |
-| 2.7 | `src/utils/computerUse/drainRunLoop.ts` | 开头加 `if (process.platform !== 'darwin') return fn()` |
-| 2.8 | `src/utils/computerUse/escHotkey.ts` | `registerEscHotkey` 非 darwin 返回 false（已有 Ctrl+C fallback） |
-| 2.9 | `src/utils/computerUse/hostAdapter.ts:48-54` | `ensureOsPermissions` 非 darwin 返回 `{ granted: true }` |
-| 2.10 | `src/utils/computerUse/common.ts:56` | `platform: 'darwin'` → `platform: process.platform === 'win32' ? 'windows' : process.platform === 'linux' ? 'linux' : 'darwin'` |
-| 2.11 | `src/utils/computerUse/common.ts:55` | `screenshotFiltering: 'native'` → 非 darwin 时 `'none'`（Windows/Linux 截图不支持 per-app 过滤） |
-| 2.12 | `src/utils/computerUse/gates.ts:13` | `enabled: false` → `enabled: true`（无 GrowthBook 时默认可用） |
-| 2.13 | `src/utils/computerUse/gates.ts:39-43` | `hasRequiredSubscription()` → 直接返回 `true` |
-
-### Phase 3：新增 Linux 后端
-
-| 步骤 | 文件 | 内容 |
-|------|------|------|
-| 3.1 | `packages/@ant/computer-use-input/src/backends/linux.ts` | xdotool 键鼠（mousemove/click/key/type/getactivewindow） |
-| 3.2 | `packages/@ant/computer-use-swift/src/backends/linux.ts` | scrot/grim 截图 + xrandr 显示器 + wmctrl 窗口管理 |
-| 3.3 | `packages/@ant/computer-use-input/src/index.ts` | dispatcher 加 `case 'linux'` |
-| 3.4 | `packages/@ant/computer-use-swift/src/index.ts` | dispatcher 加 `case 'linux'` |
-
-### Phase 4：验证
-
-| 测试项 | macOS | Windows | Linux |
-|--------|-------|---------|-------|
-| build 成功 | ✅ | 验证 | 验证 |
-| MCP 工具列表非空 | 验证 | 验证 | 验证 |
-| 鼠标移动 | 验证 | ✅ 已通过 | 验证 |
-| 截图 | 验证 | ✅ 已通过 | 验证 |
-| 键盘输入 | 验证 | 验证 | 验证 |
-| 前台窗口 | 验证 | ✅ 已通过 | 验证 |
-| 剪贴板 | 验证 | 验证 | 验证 |
-
-## 5. 文件改动总览
-
-### 不动的文件（14 个）
-
-`cleanup.ts`、`computerUseLock.ts`、`wrapper.tsx`、`toolRendering.tsx`、`mcpServer.ts`、`setup.ts`、`appNames.ts`、`inputLoader.ts`、`src/services/mcp/client.ts`、`@ant/computer-use-mcp/src/*`（Phase 1 已完成）、`backends/darwin.ts`（两个包都不动）
-
-### 改 src/ 的文件（8 个）
-
-| 文件 | 改动量 | 风险 |
-|------|--------|------|
-| `main.tsx` | 1 行 | 低 |
-| `swiftLoader.ts` | 2 行 | 低 |
-| `executor.ts` | ~40 行（剪贴板分发 + 平台守卫 + paste 快捷键） | **中** |
-| `drainRunLoop.ts` | 1 行 | 低 |
-| `escHotkey.ts` | 3 行 | 低 |
-| `hostAdapter.ts` | 5 行 | 低 |
-| `common.ts` | 3 行 | 低 |
-| `gates.ts` | 3 行 | 低 |
-
-### 新增文件（2 个）
-
-| 文件 | 行数估算 |
-|------|---------|
-| `packages/@ant/computer-use-input/src/backends/linux.ts` | ~150 行 |
-| `packages/@ant/computer-use-swift/src/backends/linux.ts` | ~200 行 |
-
-## 6. Linux 依赖工具
-
-| 工具 | 用途 | 安装命令（Ubuntu） |
-|------|------|-------------------|
-| `xdotool` | 键鼠模拟 + 窗口管理 | `sudo apt install xdotool` |
-| `scrot` 或 `gnome-screenshot` | 截图 | `sudo apt install scrot` |
-| `xrandr` | 显示器信息 | 通常已预装 |
-| `xclip` | 剪贴板 | `sudo apt install xclip` |
-| `wmctrl` | 窗口列表/切换 | `sudo apt install wmctrl` |
-
-Wayland 环境需要替代工具：`ydotool`（替代 xdotool）、`grim`（替代 scrot）、`wl-clipboard`（替代 xclip）。初期可先只支持 X11，Wayland 标记为 todo。
-
-## 7. 执行顺序建议
-
-```
-Phase 2（解锁 macOS + Windows）
-  ├── 2.1-2.3  移除 3 处硬编码 throw/skip
-  ├── 2.4-2.5  剪贴板 + 粘贴快捷键平台分发
-  ├── 2.6      swiftLoader → 直接实例化
-  ├── 2.7-2.9  drainRunLoop / escHotkey / permissions 平台分支
-  ├── 2.10-2.11 common.ts 平台标识动态化
-  ├── 2.12-2.13 gates.ts 默认值
-  └── 验证 Windows
-
-Phase 3（Linux 后端）
-  ├── 3.1  input/backends/linux.ts
-  ├── 3.2  swift/backends/linux.ts
-  ├── 3.3-3.4  dispatcher 加 linux case
-  └── 验证 Linux
-
-Phase 4（集成验证 + PR）
-```
-
-每个 Phase 可独立验证、独立提交。Phase 2 完成后 macOS + Windows 可用，Phase 3 完成后三平台全部可用。
+Phase 1-2 完成后 macOS + Windows 可用。Phase 3（Linux 后端）需要新建 `packages/@ant/computer-use-input/src/backends/linux.ts`（~150 行）和 `packages/@ant/computer-use-swift/src/backends/linux.ts`（~200 行），并在对应 dispatcher 中加 `case 'linux'`。
