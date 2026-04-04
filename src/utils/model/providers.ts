@@ -8,6 +8,9 @@ export function getAPIProvider(): APIProvider {
   // 1. Check settings.json modelType field (highest priority)
   const modelType = getInitialSettings().modelType
   if (modelType === 'openai') return 'openai'
+  if (modelType === 'bedrock') return 'bedrock'
+  if (modelType === 'vertex') return 'vertex'
+  if (modelType === 'foundry') return 'foundry'
 
   // 2. Check environment variables (backward compatibility)
   return isEnvTruthy(process.env.CLAUDE_CODE_USE_OPENAI)
