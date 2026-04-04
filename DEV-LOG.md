@@ -1,5 +1,30 @@
 # DEV-LOG
 
+## /dream 手动触发 + DreamTask 类型补全 (2026-04-04)
+
+将 `/dream` 命令从 KAIROS feature gate 中解耦，作为 bundled skill 无条件注册；补全 DreamTask 类型存根。
+
+**新增文件：**
+
+| 文件 | 说明 |
+|------|------|
+| `src/skills/bundled/dream.ts` | `/dream` skill 注册，调用 `buildConsolidationPrompt()` 生成整理提示词 |
+
+**修改文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `src/skills/bundled/index.ts` | 导入并注册 `registerDreamSkill()` |
+| `src/components/tasks/src/tasks/DreamTask/DreamTask.ts` | `any` 存根 → 从 `src/tasks/DreamTask/DreamTask.js` 重新导出完整类型 |
+
+**新增文档：**
+
+| 文件 | 说明 |
+|------|------|
+| `docs/features/auto-dream.md` | Auto Dream 原理、触发机制、使用场景完整说明 |
+
+---
+
 ## Computer Use Windows 增强：窗口绑定截图 + UI Automation + OCR (2026-04-03)
 
 在三平台基础实现之上，利用 Windows 原生 API 增强 Computer Use 的 Windows 专属能力。
@@ -413,3 +438,4 @@ GrowthBook 功能开关系统原为 Anthropic 内部构建设计，硬编码 SDK
 ```
 
 非空字段才写入，保存后立即生效（`onDone()` 触发 `onChangeAPIKey()` 刷新 API 客户端）。
+

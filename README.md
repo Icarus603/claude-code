@@ -45,6 +45,7 @@
     - [x] Mac 上可以用这个项目 [computer-use-mcp](https://github.com/domdomegg/computer-use-mcp)
         - 注意这个库的命名方式与官方冲突了, 需要改为 `claude mcp add --scope user --transport stdio computer-use-mcp -- npx -y computer-use-mcp`
   - [x] /voice 支持 @amDosion
+  - [x] /dream 记忆整理命令（手动 + 自动后台触发） [文档](https://ccb.agent-aura.top/docs/features/auto-dream)
 - [ ] V6 大规模重构石山代码, 全面模块分包
   - [ ] V6 将会为全新分支, 届时 main 分支将会封存为历史版本
 
