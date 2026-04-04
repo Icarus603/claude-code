@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Claude Code TUI",
+			"type": "shell",
+			"command": "bun run dev:inspect",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "always",
+				"focus": true,
+				"panel": "dedicated",
+				"clear": true
+			},
+			"problemMatcher": {
+				"pattern": {
+					"regexp": "^$"
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": ".*Bun Inspector.*",
+					"endsPattern": ".*Listening:.*"
+				}
+			}
+		}
+	]
+}
