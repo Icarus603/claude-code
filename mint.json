@@ -152,7 +152,8 @@
           "pages": [
             "docs/features/token-budget",
             "docs/features/context-collapse",
-            "docs/features/workflow-scripts"
+            "docs/features/workflow-scripts",
+            "docs/features/auto-dream"
           ]
         },
         "docs/features/tier3-stubs"
