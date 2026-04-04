@@ -16,28 +16,48 @@
 
 [Discord 群组](https://discord.gg/qZU6zS7Q)
 
-- [x] V4 — 测试补全、[Buddy](https://ccb.agent-aura.top/docs/features/buddy)、[Auto Mode](https://ccb.agent-aura.top/docs/safety/auto-mode)、环境变量 Feature 开关
-- [x] V5 — [Sentry](https://ccb.agent-aura.top/docs/internals/sentry-setup) / [GrowthBook](https://ccb.agent-aura.top/docs/internals/growthbook-adapter) 企业监控、[自定义 Login](https://ccb.agent-aura.top/docs/features/custom-platform-login)、[OpenAI 兼容](https://ccb.agent-aura.top/docs/plans/openai-compatibility)、[Web Search](https://ccb.agent-aura.top/docs/features/web-browser-tool)、[Computer Use](https://ccb.agent-aura.top/docs/features/computer-use) / [Chrome Use](https://ccb.agent-aura.top/docs/features/claude-in-chrome-mcp)、[Voice Mode](https://ccb.agent-aura.top/docs/features/voice-mode)、[Bridge Mode](https://ccb.agent-aura.top/docs/features/bridge-mode)、[/dream 记忆整理](https://ccb.agent-aura.top/docs/features/auto-dream)
-- [ ] V6 — 大规模重构石山代码，全面模块分包（全新分支，main 封存为历史版本）
+赞助商占位符
 
+- [x] v1 会完成跑通及基本的类型检查通过;
+- [x] V2 会完整实现工程化配套设施;
+  - [ ] Biome 格式化可能不会先实施, 避免代码冲突
+  - [x] 构建流水线完成, 产物 Node/Bun 都可以运行
+- [x] V3 会写大量文档, 完善文档站点
+- [x] V4 会完成大量的测试文件, 以提高稳定性
+  - [x] Buddy 小宠物回来啦 [文档](https://ccb.agent-aura.top/docs/features/buddy)
+  - [x] Auto Mode 回归 [文档](https://ccb.agent-aura.top/docs/safety/auto-mode)
+  - [x] 所有 Feature 现在可以通过环境变量配置, 而不是垃圾的 bun --feature
+- [x] V5 支持企业级的监控上报功能, 补全缺失的工具, 解除限制
+  - [x] 移除牢 A 的反蒸馏代码!!!
+  - [x] 补全 web search 能力(用的 Bing 搜索)!!! [文档](https://ccb.agent-aura.top/docs/features/web-browser-tool)
+  - [x] 支持 Debug [文档](https://ccb.agent-aura.top/docs/features/debug-mode)
+  - [x] 关闭自动更新;
+  - [x] 添加自定义 sentry 错误上报支持 [文档](https://ccb.agent-aura.top/docs/internals/sentry-setup)
+  - [x] 添加自定义 GrowthBook 支持 (GB 也是开源的, 现在你可以配置一个自定义的遥控平台) [文档](https://ccb.agent-aura.top/docs/internals/growthbook-adapter)
+  - [x] 自定义 login 模式, 大家可以用这个配置 Claude 的模型! [文档](https://ccb.agent-aura.top/docs/features/custom-platform-login)
+  - [x] Remote Control / Bridge Mode 支持 [文档](https://ccb.agent-aura.top/docs/features/bridge-mode)
+  - [x] 修复搜索工具的 rg 缺失问题(需要重新 bun i)
+  - [x] OpenAI 接口兼容! /login 然后配置 OpenAI 平台即可! [文档](https://ccb.agent-aura.top/docs/plans/openai-compatibility)
+  - [x] Any Use
+    - [x] 由于 Chrome Use 和 Computer Use 原本都是未完全验证的能力, 还是比较建议大家用社区里面的 MCP 支持
+    - [x] Chrome use 支持 (浏览器插件要订阅权限 ) 感谢 @amDosion [文档](https://ccb.agent-aura.top/docs/features/claude-in-chrome-mcp)
+    - [x] 普通用户可以使用 [chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp/) 替代, 比较不那么折腾
+    - [x] Computer use 支持 感谢 @amDosion [文档](https://ccb.agent-aura.top/docs/features/computer-use)
+    - [x] Mac 上可以用这个项目 [computer-use-mcp](https://github.com/domdomegg/computer-use-mcp)
+        - 注意这个库的命名方式与官方冲突了, 需要改为 `claude mcp add --scope user --transport stdio computer-use-mcp -- npx -y computer-use-mcp`
+  - [x] /voice 支持 @amDosion [文档](https://ccb.agent-aura.top/docs/features/voice-mode)
+  - [x] /dream 记忆整理命令（手动 + 自动后台触发） [文档](https://ccb.agent-aura.top/docs/features/auto-dream)
+- [ ] V6 大规模重构石山代码, 全面模块分包
+  - [ ] V6 将会为全新分支, 届时 main 分支将会封存为历史版本
 
-## 快速开始(安装版)
+> 我不知道这个项目还会存在多久, Star + Fork + git clone + .zip 包最稳健; 说白了就是扛旗项目, 看看能走多远
+>
+> 这个项目更新很快, 后台有 Opus 持续优化, 几乎几个小时就有新变化;
+>
+> Claude 已经烧了 1000$ 以上, 没钱了, 换成 GLM 继续玩; @zai-org GLM 5.1 非常可以;
+>
 
-不用克隆仓库, 从 NPM 下载后, 直接使用
-
-```sh
-bun  i -g claude-code-best
-bun pm -g trust claude-code-best
-ccb # 直接打开 claude code
-```
-
-国内对 github 网络较差的, 需要先设置这个环境变量
-
-```bash
-DEFAULT_RELEASE_BASE=https://ghproxy.net/https://github.com/microsoft/ripgrep-prebuilt/releases/download/v15.0.1
-```
-
-## 快速开始(源码版)
+## 快速开始
 
 ### 环境要求
 
@@ -76,7 +96,7 @@ bun run build
 
 ### 新人配置 /login
 
-首次运行后，在 REPL 中输入 `/login` 命令进入登录配置界面，选择 **Custom Platform** 即可对接第三方 API 兼容服务（无需 Anthropic 官方账号）。
+首次运行后，在 REPL 中输入 `/login` 命令进入登录配置界面，选择 **Anthropic Compatible** 即可对接第三方 API 兼容服务（无需 Anthropic 官方账号）。
 
 需要填写的字段：
 
@@ -89,7 +109,22 @@ bun run build
 | Opus Model | 高性能模型 ID | `claude-opus-4-6` |
 
 - **Tab / Shift+Tab** 切换字段，**Enter** 确认并跳到下一个，最后一个字段按 Enter 保存
+- 模型字段会自动读取当前环境变量预填
+- 配置保存到 `~/.claude/settings.json` 的 `env` 字段，保存后立即生效
 
+也可以直接编辑 `~/.claude/settings.json`：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.example.com/v1",
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxx",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5-20251001",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6"
+  }
+}
+```
 
 > 支持所有 Anthropic API 兼容服务（如 OpenRouter、AWS Bedrock 代理等），只要接口兼容 Messages API 即可。
 
