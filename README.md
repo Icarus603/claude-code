@@ -37,8 +37,13 @@
   - [x] 自定义 login 模式, 大家可以用这个配置 Claude 的模型!
   - [x] 修复搜索工具的 rg 缺失问题(需要重新 bun i)
   - [x] OpenAI 接口兼容! /login 然后配置 OpenAI 平台即可!
-  - [x] Chrome use 支持(暂时浏览器插件要订阅权限,万恶的牢 A) 感谢 @amDosion
-  - [x] Computer use 支持 感谢 @amDosion
+  - [x] Any Use
+    - [x] 由于 Chrome Use 和 Computer Use 原本都是未完全验证的能力, 还是比较建议大家用社区里面的 MCP 支持
+    - [x] Chrome use 支持 (浏览器插件要订阅权限 ) 感谢 @amDosion
+    - [x] 普通用户可以使用 [chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp/) 替代, 比较不那么折腾
+    - [x] Computer use 支持 感谢 @amDosion
+    - [x] Mac 上可以用这个项目 [computer-use-mcp](https://github.com/domdomegg/computer-use-mcp)
+        - 注意这个库的命名方式与官方冲突了, 需要改为 `claude mcp add --scope user --transport stdio computer-use-mcp -- npx -y computer-use-mcp`
   - [x] /voice 支持 @amDosion
 - [ ] V6 大规模重构石山代码, 全面模块分包
   - [ ] V6 将会为全新分支, 届时 main 分支将会封存为历史版本
