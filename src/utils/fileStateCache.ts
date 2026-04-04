@@ -34,7 +34,18 @@ export class FileStateCache {
     this.cache = new LRUCache<string, FileState>({
       max: maxEntries,
       maxSize: maxSizeBytes,
-      sizeCalculation: value => Math.max(1, Buffer.byteLength(value.content)),
+      sizeCalculation: value => {
+        const c = value.content
+        const s =
+          typeof c === 'string'
+            ? c
+            : c === null || c === undefined
+              ? ''
+              : typeof c === 'object'
+                ? JSON.stringify(c)
+                : String(c)
+        return Math.max(1, Buffer.byteLength(s, 'utf8'))
+      },
     })
   }
 

@@ -45,6 +45,14 @@ export type PermissionPromptTool = Tool<
 // during permission prompts or limited tool operations
 const ASK_READ_FILE_STATE_CACHE_SIZE = 10
 
+/** Transcript JSON may deserialize Write tool `content` as a nested object — LRU needs strings. */
+function coerceToolContentToString(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'object') return JSON.stringify(value)
+  return String(value)
+}
+
 /**
  * Checks if the result should be considered successful based on the last message.
  * Returns true if:
@@ -402,14 +410,18 @@ export function extractReadFilesFromMessages(
         ) {
           // Extract file_path and content from the Write tool use input
           const input = content.input as
-            | { file_path?: string; content?: string }
+            | { file_path?: string; content?: unknown }
             | undefined
-          if (input?.file_path && input?.content) {
+          if (
+            input?.file_path &&
+            input.content !== undefined &&
+            input.content !== null
+          ) {
             // Normalize to absolute path for consistent cache lookups
             const absolutePath = expandPath(input.file_path, cwd)
             fileWriteToolUseIds.set(content.id, {
               filePath: absolutePath,
-              content: input.content,
+              content: coerceToolContentToString(input.content),
             })
           }
         } else if (
