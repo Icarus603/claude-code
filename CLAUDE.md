@@ -51,8 +51,8 @@ bun run docs:dev
 ### Runtime & Build
 
 - **Runtime**: Bun (not Node.js). All imports, builds, and execution use Bun APIs.
-- **Build**: `build.ts` 执行 `Bun.build()` with `splitting: true`，入口 `src/entrypoints/cli.tsx`，输出 `dist/cli.js` + chunk files。默认启用 `AGENT_TRIGGERS_REMOTE` feature。构建后自动替换 `import.meta.require` 为 Node.js 兼容版本（产物 bun/node 都可运行）。
-- **Dev mode**: `scripts/dev.ts` 通过 Bun `-d` flag 注入 `MACRO.*` defines，运行 `src/entrypoints/cli.tsx`。默认启用 `BUDDY`、`TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE` 四个 feature。
+- **Build**: `build.ts` 执行 `Bun.build()` with `splitting: true`，入口 `src/entrypoints/cli.tsx`，输出 `dist/cli.js` + chunk files。默认启用 `AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE` feature。构建后自动替换 `import.meta.require` 为 Node.js 兼容版本（产物 bun/node 都可运行）。
+- **Dev mode**: `scripts/dev.ts` 通过 Bun `-d` flag 注入 `MACRO.*` defines，运行 `src/entrypoints/cli.tsx`。默认启用 `BUDDY`、`TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE` 六个 feature。
 - **Module system**: ESM (`"type": "module"`), TSX with `react-jsx` transform.
 - **Monorepo**: Bun workspaces — internal packages live in `packages/` resolved via `workspace:*`.
 - **Lint/Format**: Biome (`biome.json`)。`bun run lint` / `bun run lint:fix` / `bun run format`。
@@ -132,8 +132,8 @@ Feature flags control which functionality is enabled at runtime:
 
 - **在代码中使用**: 统一通过 `import { feature } from 'bun:bundle'` 导入，调用 `feature('FLAG_NAME')` 返回 `boolean`。**不要**在 `cli.tsx` 或其他文件里自己定义 `feature` 函数或覆盖这个 import。
 - **启用方式**: 通过环境变量 `FEATURE_<FLAG_NAME>=1`。例如 `FEATURE_BUDDY=1 bun run dev` 启用 BUDDY 功能。
-- **Dev 默认 features**: `BUDDY`、`TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`（见 `scripts/dev.ts`）。
-- **Build 默认 features**: `AGENT_TRIGGERS_REMOTE`（见 `build.ts`）。
+- **Dev 默认 features**: `BUDDY`、`TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE`（见 `scripts/dev.ts`）。
+- **Build 默认 features**: `AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE`（见 `build.ts`）。
 - **常见 flag**: `BUDDY`, `DAEMON`, `BRIDGE_MODE`, `BG_SESSIONS`, `PROACTIVE`, `KAIROS`, `VOICE_MODE`, `FORK_SUBAGENT`, `SSH_REMOTE`, `DIRECT_CONNECT`, `TEMPLATES`, `CHICAGO_MCP`, `BYOC_ENVIRONMENT_RUNNER`, `SELF_HOSTED_RUNNER`, `COORDINATOR_MODE`, `UDS_INBOX`, `LODESTONE`, `ABLATION_BASELINE` 等。
 - **类型声明**: `src/types/internal-modules.d.ts` 中声明了 `bun:bundle` 模块的 `feature` 函数签名。
 
@@ -143,12 +143,44 @@ Feature flags control which functionality is enabled at runtime:
 
 | Module | Status |
 |--------|--------|
-| Computer Use (`@ant/*`) | Stub packages in `packages/@ant/` |
-| `*-napi` packages (audio, image, url, modifiers) | Stubs in `packages/` (except `color-diff-napi` which is fully implemented) |
+| Computer Use (`@ant/*`) | Restored — `computer-use-swift`, `computer-use-input`, `computer-use-mcp`, `claude-for-chrome-mcp` 均有完整实现，macOS + Windows 可用，Linux 后端待完成 |
+| `*-napi` packages | `audio-capture-napi`、`image-processor-napi` 已恢复实现；`color-diff-napi` 完整实现；`url-handler-napi`、`modifiers-napi` 仍为 stub |
+| Voice Mode | Restored — `src/voice/`、`src/hooks/useVoiceIntegration.tsx`、`src/services/voiceStreamSTT.ts` 等，Push-to-Talk 语音输入（需 Anthropic OAuth） |
+| OpenAI 兼容层 | Restored — `src/services/api/openai/`，支持 Ollama/DeepSeek/vLLM 等任意 OpenAI 协议端点，通过 `CLAUDE_CODE_USE_OPENAI=1` 启用 |
 | Analytics / GrowthBook / Sentry | Empty implementations |
-| Magic Docs / Voice Mode / LSP Server | Removed |
+| Magic Docs / LSP Server | Removed |
 | Plugins / Marketplace | Removed |
 | MCP OAuth | Simplified |
+
+### Computer Use
+
+Feature flag `CHICAGO_MCP`，dev/build 默认启用。实现跨平台屏幕操控（macOS + Windows 可用，Linux 待完成）。
+
+- **`packages/@ant/computer-use-mcp/`** — MCP server，注册截图/键鼠/剪贴板/应用管理工具
+- **`packages/@ant/computer-use-input/`** — 键鼠模拟，dispatcher + per-platform backend（`backends/darwin.ts`、`win32.ts`、`linux.ts`）
+- **`packages/@ant/computer-use-swift/`** — 截图 + 应用管理，同样 dispatcher + per-platform backend
+- **`packages/@ant/claude-for-chrome-mcp/`** — Chrome 浏览器控制（独立于 Computer Use，通过 `--chrome` CLI 参数启用）
+
+详见 `docs/features/computer-use.md`。
+
+### Voice Mode
+
+Feature flag `VOICE_MODE`，dev/build 默认启用。Push-to-Talk 语音输入，音频通过 WebSocket 流式传输到 Anthropic STT（Nova 3）。需要 Anthropic OAuth（非 API key）。
+
+- **`src/voice/voiceModeEnabled.ts`** — 三层门控（feature flag + GrowthBook + OAuth auth）
+- **`src/hooks/useVoice.ts`** — React hook 管理录音状态和 WebSocket 连接
+- **`src/services/voiceStreamSTT.ts`** — STT WebSocket 流式传输
+
+详见 `docs/features/voice-mode.md`。
+
+### OpenAI 兼容层
+
+通过 `CLAUDE_CODE_USE_OPENAI=1` 环境变量启用，支持任意 OpenAI Chat Completions 协议端点（Ollama、DeepSeek、vLLM 等）。流适配器模式：在 `queryModel()` 中将 Anthropic 格式请求转为 OpenAI 格式，再将 SSE 流转换回 `BetaRawMessageStreamEvent`，下游代码完全不改。
+
+- **`src/services/api/openai/`** — client、消息/工具转换、流适配、模型映射
+- **`src/utils/model/providers.ts`** — 添加 `'openai'` provider 类型（最高优先级）
+
+关键环境变量：`CLAUDE_CODE_USE_OPENAI`、`OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`、`OPENAI_MODEL_MAP`。详见 `docs/plans/openai-compatibility.md`。
 
 ### Key Type Files
 

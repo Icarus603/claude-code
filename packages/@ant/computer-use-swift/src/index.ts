@@ -80,6 +80,12 @@ export class ComputerUseAPI {
     async captureRegion() { throw new Error('computer-use-swift: no backend for this platform') },
   }
 
+  hotkey = (backend as any)?.hotkey ?? {
+    registerEscape(_cb: () => void): boolean { return false },
+    unregister() {},
+    notifyExpectedEscape() {},
+  }
+
   async resolvePrepareCapture(
     allowedBundleIds: string[],
     _surrogateHost: string,

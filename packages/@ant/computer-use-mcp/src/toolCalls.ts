@@ -796,6 +796,17 @@ function resolveRequestedApps(
     if (!resolved) {
       resolved = byLowerDisplayName.get(requested.toLowerCase());
     }
+    // Fuzzy fallback: match requested name as substring of display name
+    // e.g. "Chrome" matches "Google Chrome", "Code" matches "Visual Studio Code"
+    if (!resolved) {
+      const lower = requested.toLowerCase();
+      for (const app of installed) {
+        if (app.displayName.toLowerCase().includes(lower)) {
+          resolved = app;
+          break;
+        }
+      }
+    }
     const bundleId = resolved?.bundleId;
     // When unresolved AND the requested string looks like a bundle ID, use it
     // directly for tier lookup (e.g. "company.thebrowser.Browser" with Arc not
