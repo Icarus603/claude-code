@@ -72,6 +72,12 @@
 bun install
 ```
 
+国内对 github 网络较差的,可以使用这个环境变量
+
+```bash
+DEFAULT_RELEASE_BASE=https://ghproxy.net/https://github.com/microsoft/ripgrep-prebuilt/releases/download/v15.0.1
+```
+
 ### 运行
 
 ```bash
