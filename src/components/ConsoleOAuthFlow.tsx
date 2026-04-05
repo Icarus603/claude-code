@@ -119,7 +119,7 @@ export function ConsoleOAuthFlow({
       const timer = setTimeout(setOAuthStatus, 1000, oauthStatus.nextState)
       return () => clearTimeout(timer)
     }
-  }, [oauthStatus.state, oauthStatus.nextState])
+  }, [oauthStatus])
 
   // Handle Enter to continue on success state
   useKeybinding(
@@ -178,7 +178,7 @@ export function ConsoleOAuthFlow({
       })
       setPastedCode('')
     }
-  }, [pastedCode, oauthStatus.state, oauthStatus.url, showPastePrompt, urlCopied])
+  }, [pastedCode, oauthStatus, showPastePrompt, urlCopied])
 
   async function handleSubmitCode(value: string, url: string) {
     try {
@@ -648,7 +648,7 @@ function OAuthStatusMessage({
             for (const [k, v] of Object.entries(env)) process.env[k] = v
             setOAuthStatus({ state: 'success' })
             // Schedule onDone after state update to avoid potential state update on unmounted component
-            setTimeout(onDone, 0)
+            void onDone()
           }
         }, [activeField, inputValue, displayValues, setOAuthStatus, onDone])
 
@@ -845,7 +845,7 @@ function OAuthStatusMessage({
             for (const [k, v] of Object.entries(env)) process.env[k] = v
             setOAuthStatus({ state: 'success' })
             // Schedule onDone after state update to avoid potential state update on unmounted component
-            setTimeout(onDone, 0)
+            void onDone()
           }
         }, [activeField, openaiInputValue, openaiDisplayValues, setOAuthStatus, onDone])
 
