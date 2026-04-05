@@ -621,7 +621,30 @@ function OAuthStatusMessage({
         const doSave = useCallback(() => {
           const finalVals = { ...displayValues, [activeField]: inputValue }
           const env: Record<string, string> = {}
-          if (finalVals.base_url) env.ANTHROPIC_BASE_URL = finalVals.base_url
+
+          // Validate base_url if provided
+          if (finalVals.base_url) {
+            try {
+              new URL(finalVals.base_url)
+            } catch {
+              setOAuthStatus({
+                state: 'error',
+                message: 'Invalid base URL: please enter a full URL including protocol (e.g., https://api.example.com)',
+                toRetry: {
+                  state: 'custom_platform',
+                  baseUrl: '',
+                  apiKey: '',
+                  haikuModel: '',
+                  sonnetModel: '',
+                  opusModel: '',
+                  activeField: 'base_url',
+                },
+              })
+              return
+            }
+            env.ANTHROPIC_BASE_URL = finalVals.base_url
+          }
+
           if (finalVals.api_key) env.ANTHROPIC_AUTH_TOKEN = finalVals.api_key
           if (finalVals.haiku_model) env.ANTHROPIC_DEFAULT_HAIKU_MODEL = finalVals.haiku_model
           if (finalVals.sonnet_model) env.ANTHROPIC_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
@@ -817,7 +840,30 @@ function OAuthStatusMessage({
         const doOpenAISave = useCallback(() => {
           const finalVals = { ...openaiDisplayValues, [activeField]: openaiInputValue }
           const env: Record<string, string> = {}
-          if (finalVals.base_url) env.OPENAI_BASE_URL = finalVals.base_url
+
+          // Validate base_url if provided
+          if (finalVals.base_url) {
+            try {
+              new URL(finalVals.base_url)
+            } catch {
+              setOAuthStatus({
+                state: 'error',
+                message: 'Invalid base URL: please enter a full URL including protocol (e.g., https://api.example.com)',
+                toRetry: {
+                  state: 'openai_chat_api',
+                  baseUrl: '',
+                  apiKey: '',
+                  haikuModel: '',
+                  sonnetModel: '',
+                  opusModel: '',
+                  activeField: 'base_url',
+                },
+              })
+              return
+            }
+            env.OPENAI_BASE_URL = finalVals.base_url
+          }
+
           if (finalVals.api_key) env.OPENAI_API_KEY = finalVals.api_key
           if (finalVals.haiku_model) env.OPENAI_DEFAULT_HAIKU_MODEL = finalVals.haiku_model
           if (finalVals.sonnet_model) env.OPENAI_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
