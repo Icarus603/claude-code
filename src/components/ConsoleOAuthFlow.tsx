@@ -647,7 +647,6 @@ function OAuthStatusMessage({
           } else {
             for (const [k, v] of Object.entries(env)) process.env[k] = v
             setOAuthStatus({ state: 'success' })
-            // Schedule onDone after state update to avoid potential state update on unmounted component
             void onDone()
           }
         }, [activeField, inputValue, displayValues, setOAuthStatus, onDone])
@@ -844,7 +843,6 @@ function OAuthStatusMessage({
           } else {
             for (const [k, v] of Object.entries(env)) process.env[k] = v
             setOAuthStatus({ state: 'success' })
-            // Schedule onDone after state update to avoid potential state update on unmounted component
             void onDone()
           }
         }, [activeField, openaiInputValue, openaiDisplayValues, setOAuthStatus, onDone])
