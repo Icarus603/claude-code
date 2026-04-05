@@ -1,5 +1,56 @@
 # DEV-LOG
 
+## Enable SHOT_STATS, TOKEN_BUDGET, PROMPT_CACHE_BREAK_DETECTION (2026-04-05)
+
+**PR**: [claude-code-best/claude-code#140](https://github.com/claude-code-best/claude-code/pull/140)
+**分支**: `feat/enable-safe-feature-flags`
+
+对 22 个被标记为 "COMPLETE" 的编译时 feature flag 进行实际源码验证（6 个并行子代理 + Codex CLI 独立复核），发现审计报告存在大量误判。最终确认仅 3 个 flag 为真正 compile-only，安全启用。
+
+**验证流程：**
+
+1. 6 个并行子代理分别检查每个 flag 的 `feature('FLAG_NAME')` 引用点、依赖模块完整性、外部服务依赖
+2. Codex CLI (v0.118.0, 240K tokens) 独立复核，将原 7 个 "compile-only" 进一步缩减为 3 个
+3. 3 个专项代理逐一验证代码路径完整性和运行时安全性
+
+**新启用的 3 个 flag：**
+
+| Flag | 功能 | 用户可感知效果 |
+|------|------|---------------|
+| `SHOT_STATS` | shot 分布统计 | `/stats` 面板显示 shot 分布和 one-shot rate |
+| `TOKEN_BUDGET` | token 预算目标 | 支持 `+500k` / `spend 2M tokens` 语法，自动续写直到达标，带进度条 |
+| `PROMPT_CACHE_BREAK_DETECTION` | cache key 变化检测 | 内部诊断，`--debug` 模式可见，写 diff 到临时目录 |
+
+**修改文件：**
+
+| 文件 | 变更 |
+|------|------|
+| `build.ts` | `DEFAULT_BUILD_FEATURES` 新增 3 个 flag |
+| `scripts/dev.ts` | `DEFAULT_FEATURES` 新增 3 个 flag |
+| `package.json` / `bun.lock` | 新增 `openai` 依赖（OpenAI 兼容层需要） |
+
+**新增文档：**
+
+| 文件 | 说明 |
+|------|------|
+| `docs/features/feature-flags-codex-review.md` | Codex 独立复核报告：修正后的 5 类分类、恢复优先级、三轴分类标准建议 |
+| `docs/features/feature-flags-audit-complete.md` | 标记所有已启用 flag 的状态（`[build: ON]` / `[dev: ON]`） |
+
+**Codex 复核关键发现：**
+
+- 原 22 个 "COMPLETE" flag 中，8 个核心模块是 stub，3 个依赖远程服务
+- `TEAMMEM`、`AGENT_TRIGGERS`、`EXTRACT_MEMORIES`、`KAIROS_BRIEF` 被降级为"有条件可用"（受 GrowthBook 门控）
+- 建议审计分类标准改为三轴：实现完整度 × 激活条件 × 运行风险
+- 恢复优先级：REACTIVE_COMPACT > BG_SESSIONS > PROACTIVE > CONTEXT_COLLAPSE
+
+**验证结果：**
+
+- `bun run build` → 475 files ✅
+- `bun test` → 零新增失败 ✅
+- 3 个 flag 代码路径全部完整，无缺失依赖，无 crash 风险 ✅
+
+---
+
 ## /dream 手动触发 + DreamTask 类型补全 (2026-04-04)
 
 将 `/dream` 命令从 KAIROS feature gate 中解耦，作为 bundled skill 无条件注册；补全 DreamTask 类型存根。
@@ -38,6 +89,7 @@
 ---
 
 ## Computer Use Windows 增强：窗口绑定截图 + UI Automation + OCR (2026-04-03)
+
 
 在三平台基础实现之上，利用 Windows 原生 API 增强 Computer Use 的 Windows 专属能力。
 
@@ -117,23 +169,6 @@ packages/@ant/computer-use-{input,swift}/src/
 |------|------|
 | `vendor/audio-capture/{platform}/audio-capture.node` | 6 个平台的原生音频二进制（cpal，来自参考项目） |
 | `vendor/audio-capture-src/index.ts` | 原生模块加载器（按 `${arch}-${platform}` 动态 require `.node`） |
-
-**修改文件：**
-
-| 文件 | 变更 |
-|------|------|
-| `packages/audio-capture-napi/src/index.ts` | SoX 子进程 stub → 原生 `.node` 加载器（含 `process.cwd()` workspace 路径 fallback） |
-| `scripts/dev.ts` | `DEFAULT_FEATURES` 加 `"VOICE_MODE"` |
-| `build.ts` | `DEFAULT_BUILD_FEATURES` 加 `"VOICE_MODE"` |
-| `docs/features/voice-mode.md` | 追加恢复计划章节（第八节） |
-
-**验证结果：**
-
-- `isNativeAudioAvailable()` → `true`（Windows x64 原生 `.node` 加载成功）
-- `feature('VOICE_MODE')` → `ENABLED`
-- `bun run build` → voice 代码编入产物
-
-**运行时前置条件：** claude.ai OAuth 登录 + 麦克风权限
 
 ---
 

@@ -5,6 +5,8 @@
  * value setting, and hit-testing via PowerShell + System.Windows.Automation.
  */
 
+import { ps } from './shared.js'
+
 export interface UIElement {
   name: string
   controlType: string // Button, Edit, Text, List, Window, etc.
@@ -15,6 +17,48 @@ export interface UIElement {
   children?: UIElement[]
 }
 
+const VALID_CONTROL_TYPES = new Set([
+  'Button',
+  'Calendar',
+  'CheckBox',
+  'ComboBox',
+  'Custom',
+  'DataGrid',
+  'DataItem',
+  'Document',
+  'Edit',
+  'Group',
+  'Header',
+  'HeaderItem',
+  'Hyperlink',
+  'Image',
+  'List',
+  'ListItem',
+  'Menu',
+  'MenuBar',
+  'MenuItem',
+  'Pane',
+  'ProgressBar',
+  'RadioButton',
+  'ScrollBar',
+  'Separator',
+  'Slider',
+  'Spinner',
+  'SplitButton',
+  'StatusBar',
+  'Tab',
+  'TabItem',
+  'Table',
+  'Text',
+  'Thumb',
+  'TitleBar',
+  'ToolBar',
+  'ToolTip',
+  'Tree',
+  'TreeItem',
+  'Window',
+])
+
 // ---------------------------------------------------------------------------
 // Helper
 // ---------------------------------------------------------------------------
@@ -24,15 +68,6 @@ Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
 Add-Type -AssemblyName WindowsBase
 `
-
-function ps(script: string): string {
-  const result = Bun.spawnSync({
-    cmd: ['powershell', '-NoProfile', '-NonInteractive', '-Command', script],
-    stdout: 'pipe',
-    stderr: 'pipe',
-  })
-  return new TextDecoder().decode(result.stdout).trim()
-}
 
 function parseJsonSafe<T>(raw: string, fallback: T): T {
   try {
@@ -143,6 +178,9 @@ export function findElement(
     )
   }
   if (query.controlType) {
+    if (!VALID_CONTROL_TYPES.has(query.controlType)) {
+      return null // Invalid control type
+    }
     const v = query.controlType.replace(/'/g, "''")
     conditions.push(
       `[System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::${v})`,
@@ -204,7 +242,10 @@ $obj | ConvertTo-Json -Compress
 /**
  * Click an element by its automationId using InvokePattern.
  */
-export function clickElement(windowTitle: string, automationId: string): boolean {
+export function clickElement(
+  windowTitle: string,
+  automationId: string,
+): boolean {
   const escapedTitle = windowTitle.replace(/'/g, "''")
   const escapedId = automationId.replace(/'/g, "''")
 
@@ -237,7 +278,11 @@ try {
 /**
  * Set the value of an element by its automationId using ValuePattern.
  */
-export function setValue(windowTitle: string, automationId: string, value: string): boolean {
+export function setValue(
+  windowTitle: string,
+  automationId: string,
+  value: string,
+): boolean {
   const escapedTitle = windowTitle.replace(/'/g, "''")
   const escapedId = automationId.replace(/'/g, "''")
   const escapedValue = value.replace(/'/g, "''")
