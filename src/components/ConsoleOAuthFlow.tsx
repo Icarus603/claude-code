@@ -19,6 +19,7 @@ import { Select } from './CustomSelect/select.js'
 import { KeyboardShortcutHint } from './design-system/KeyboardShortcutHint.js'
 import { Spinner } from './Spinner.js'
 import TextInput from './TextInput.js'
+import { fi } from 'zod/v4/locales'
 
 type Props = {
   onDone(): void
@@ -659,11 +660,11 @@ function OAuthStatusMessage({
               message: 'Failed to save settings. Please try again.',
               toRetry: {
                 state: 'custom_platform',
-                baseUrl: '',
-                apiKey: '',
-                haikuModel: '',
-                sonnetModel: '',
-                opusModel: '',
+                baseUrl: finalVals.base_url ?? '',
+                apiKey: finalVals.api_key ?? '',
+                haikuModel: finalVals.haiku_model ?? '',
+                sonnetModel: finalVals.sonnet_model ?? '',
+                opusModel: finalVals.opus_model ?? '',
                 activeField: 'base_url',
               },
             })
@@ -878,11 +879,11 @@ function OAuthStatusMessage({
               message: 'Failed to save settings. Please try again.',
               toRetry: {
                 state: 'openai_chat_api',
-                baseUrl: '',
-                apiKey: '',
-                haikuModel: '',
-                sonnetModel: '',
-                opusModel: '',
+                baseUrl: finalVals.base_url ?? '',
+                apiKey: finalVals.api_key ?? '',
+                haikuModel: finalVals.haiku_model ?? '',
+                sonnetModel: finalVals.sonnet_model ?? '',
+                opusModel: finalVals.opus_model ?? '',
                 activeField: 'base_url',
               },
             })
