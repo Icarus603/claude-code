@@ -1,6 +1,6 @@
-import { readdir, readFile, writeFile, cp } from "fs/promises";
-import { join } from "path";
-import { getMacroDefines } from "./scripts/defines.ts";
+import { readdir, readFile, writeFile, cp } from 'fs/promises'
+import { join } from 'path'
+import { getMacroDefines } from './scripts/defines.ts'
 
 const outdir = 'dist'
 
@@ -10,7 +10,14 @@ rmSync(outdir, { recursive: true, force: true })
 
 // Default features that match the official CLI build.
 // Additional features can be enabled via FEATURE_<NAME>=1 env vars.
-const DEFAULT_BUILD_FEATURES = ["AGENT_TRIGGERS_REMOTE", "CHICAGO_MCP", "VOICE_MODE"];
+const DEFAULT_BUILD_FEATURES = [
+  'AGENT_TRIGGERS_REMOTE',
+  'CHICAGO_MCP',
+  'VOICE_MODE',
+  'SHOT_STATS',
+  'PROMPT_CACHE_BREAK_DETECTION',
+  'TOKEN_BUDGET',
+]
 
 // Collect FEATURE_* env vars → Bun.build features
 const envFeatures = Object.keys(process.env)
@@ -60,9 +67,9 @@ console.log(
 )
 
 // Step 4: Copy native .node addon files (audio-capture)
-const vendorDir = join(outdir, "vendor", "audio-capture");
-await cp("vendor/audio-capture", vendorDir, { recursive: true });
-console.log(`Copied vendor/audio-capture/ → ${vendorDir}/`);
+const vendorDir = join(outdir, 'vendor', 'audio-capture')
+await cp('vendor/audio-capture', vendorDir, { recursive: true })
+console.log(`Copied vendor/audio-capture/ → ${vendorDir}/`)
 
 // Step 5: Bundle download-ripgrep script as standalone JS for postinstall
 const rgScript = await Bun.build({
