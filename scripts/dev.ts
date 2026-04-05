@@ -4,7 +4,15 @@
  * via Bun's -d flag (bunfig.toml [define] doesn't propagate to
  * dynamically imported modules at runtime).
  */
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { getMacroDefines } from "./defines.ts";
+
+// Resolve project root from this script's location
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const projectRoot = join(__dirname, "..");
+const cliPath = join(projectRoot, "src/entrypoints/cli.tsx");
 
 const defines = getMacroDefines();
 
@@ -32,8 +40,8 @@ const inspectArgs = process.env.BUN_INSPECT
     : [];
 
 const result = Bun.spawnSync(
-    ["bun", ...inspectArgs, "run", ...defineArgs, ...featureArgs, "src/entrypoints/cli.tsx", ...process.argv.slice(2)],
-    { stdio: ["inherit", "inherit", "inherit"] },
+    ["bun", ...inspectArgs, "run", ...defineArgs, ...featureArgs, cliPath, ...process.argv.slice(2)],
+    { stdio: ["inherit", "inherit", "inherit"], cwd: projectRoot },
 );
 
 process.exit(result.exitCode ?? 0);
