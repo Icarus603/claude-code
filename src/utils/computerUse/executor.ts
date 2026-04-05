@@ -297,16 +297,17 @@ export function createCliExecutor(opts: {
   getMouseAnimationEnabled: () => boolean
   getHideBeforeActionEnabled: () => boolean
 }): ComputerExecutor {
-  if (process.platform !== 'darwin' && process.platform !== 'win32' && process.platform !== 'linux') {
-    throw new Error(
-      `createCliExecutor called on ${process.platform}. Computer control requires macOS, Windows, or Linux.`,
-    )
+  // Non-macOS: delegate entirely to the cross-platform executor.
+  // No macOS code paths, no drainRunLoop, no @ant packages.
+  if (process.platform !== 'darwin') {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { createCrossPlatformExecutor } = require('./executorCrossPlatform.js') as typeof import('./executorCrossPlatform.js')
+    return createCrossPlatformExecutor(opts)
   }
 
-  // Swift loaded once at factory time — every executor method needs it.
-  // Input loaded lazily via requireComputerUseInput() on first mouse/keyboard
-  // call — it caches internally, so screenshot-only flows never pull the
-  // enigo .node.
+  // ── macOS: native @ant packages ─────────────────────────────────────
+  // Everything below is macOS-only. No platform checks needed.
+
   const cu = requireComputerUseSwift()
 
   const { getMouseAnimationEnabled, getHideBeforeActionEnabled } = opts
@@ -500,18 +501,12 @@ export function createCliExecutor(opts: {
     async key(keySequence: string, repeat?: number): Promise<void> {
       const input = requireComputerUseInput()
       const parts = keySequence.split('+').filter(p => p.length > 0)
-      // Bare-only: the CGEventTap checks event.flags.isEmpty so ctrl+escape
-      // etc. pass through without aborting.
       const isEsc = isBareEscape(parts)
       const n = repeat ?? 1
       await drainRunLoop(async () => {
         for (let i = 0; i < n; i++) {
-          if (i > 0) {
-            await sleep(8)
-          }
-          if (isEsc) {
-            notifyExpectedEscape()
-          }
+          if (i > 0) await sleep(8)
+          if (isEsc) notifyExpectedEscape()
           await input.keys(parts)
         }
       })
@@ -554,12 +549,9 @@ export function createCliExecutor(opts: {
     async type(text: string, opts: { viaClipboard: boolean }): Promise<void> {
       const input = requireComputerUseInput()
       if (opts.viaClipboard) {
-        // keys(['command','v']) inside needs the pump.
         await drainRunLoop(() => typeViaClipboard(input, text))
         return
       }
-      // `toolCalls.ts` handles the grapheme loop + 8ms sleeps and calls this
-      // once per grapheme. typeText doesn't dispatch to the main queue.
       await input.typeText(text)
     },
 
@@ -656,6 +648,10 @@ export function createCliExecutor(opts: {
     // ── App management ───────────────────────────────────────────────────
 
     async getFrontmostApp(): Promise<FrontmostApp | null> {
+      // When HWND is bound on Windows, operations go through SendMessage
+      // and don't touch the real foreground. Return the first allowed app
+      // so the frontmost gate in toolCalls.ts passes — the real foreground
+      // is irrelevant since we never touch it.
       const info = requireComputerUseInput().getFrontmostAppInfo()
       if (!info || !info.bundleId) return null
       return { bundleId: info.bundleId, displayName: info.appName }
@@ -698,6 +694,7 @@ export async function unhideComputerUseApps(
   bundleIds: readonly string[],
 ): Promise<void> {
   if (bundleIds.length === 0) return
+  if (process.platform !== 'darwin') return // non-macOS: no-op
   const cu = requireComputerUseSwift()
   await cu.apps.unhide([...bundleIds])
 }

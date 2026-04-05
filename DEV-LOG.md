@@ -39,6 +39,7 @@
 
 ## Computer Use Windows 增强：窗口绑定截图 + UI Automation + OCR (2026-04-03)
 
+
 在三平台基础实现之上，利用 Windows 原生 API 增强 Computer Use 的 Windows 专属能力。
 
 **新增文件：**
@@ -117,23 +118,6 @@ packages/@ant/computer-use-{input,swift}/src/
 |------|------|
 | `vendor/audio-capture/{platform}/audio-capture.node` | 6 个平台的原生音频二进制（cpal，来自参考项目） |
 | `vendor/audio-capture-src/index.ts` | 原生模块加载器（按 `${arch}-${platform}` 动态 require `.node`） |
-
-**修改文件：**
-
-| 文件 | 变更 |
-|------|------|
-| `packages/audio-capture-napi/src/index.ts` | SoX 子进程 stub → 原生 `.node` 加载器（含 `process.cwd()` workspace 路径 fallback） |
-| `scripts/dev.ts` | `DEFAULT_FEATURES` 加 `"VOICE_MODE"` |
-| `build.ts` | `DEFAULT_BUILD_FEATURES` 加 `"VOICE_MODE"` |
-| `docs/features/voice-mode.md` | 追加恢复计划章节（第八节） |
-
-**验证结果：**
-
-- `isNativeAudioAvailable()` → `true`（Windows x64 原生 `.node` 加载成功）
-- `feature('VOICE_MODE')` → `ENABLED`
-- `bun run build` → voice 代码编入产物
-
-**运行时前置条件：** claude.ai OAuth 登录 + 麦克风权限
 
 ---
 
