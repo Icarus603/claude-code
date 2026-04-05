@@ -14,3 +14,15 @@ src/utils/vendor/
 .agents/
 .codex/
 .omx/
+
+# Binary / screenshot files (root only)
+/*.png
+*.bmp
+
+# Agent / tool state dirs
+.swarm/
+.agents/__pycache__/
+
+# Python bytecode
+__pycache__/
+*.pyc

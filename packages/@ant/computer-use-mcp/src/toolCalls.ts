@@ -434,6 +434,15 @@ async function runInputActionGates(
     }
   }
 
+  // Windows/Linux: operations go through SendMessage (HWND-bound) or platform
+  // abstraction, not global input to the foreground. The frontmost gate is a
+  // macOS safety net for global CGEvent input — on other platforms, skip it
+  // when the platform's screenshotFiltering is 'none' (no per-app filtering,
+  // meaning no hide/defocus, meaning frontmost is meaningless).
+  if (adapter.executor.capabilities.screenshotFiltering === 'none') {
+    return null; // pass — non-macOS platform, frontmost irrelevant
+  }
+
   // Frontmost gate. Check FRESH on every call.
   const frontmost = await adapter.executor.getFrontmostApp();
 
@@ -561,6 +570,13 @@ async function runHitTestGate(
   y: number,
   actionKind: CuActionKind,
 ): Promise<CuCallToolResult | null> {
+  // Non-macOS: HWND-bound mode — clicks go to the bound window via
+  // SendMessage with window-relative coordinates. Hit-test against the
+  // real screen is meaningless.
+  if (adapter.executor.capabilities.screenshotFiltering === 'none') {
+    return null;
+  }
+
   const target = await adapter.executor.appUnderPoint(x, y);
   if (!target) return null; // desktop / nothing under point / platform no-op
 
@@ -796,12 +812,12 @@ function resolveRequestedApps(
     if (!resolved) {
       resolved = byLowerDisplayName.get(requested.toLowerCase());
     }
-    // Fuzzy fallback: match requested name as substring of display name
-    // e.g. "Chrome" matches "Google Chrome", "Code" matches "Visual Studio Code"
+    // Windows fuzzy matching: strip .exe suffix, try substring match
     if (!resolved) {
-      const lower = requested.toLowerCase();
-      for (const app of installed) {
-        if (app.displayName.toLowerCase().includes(lower)) {
+      const clean = requested.toLowerCase().replace(/\.exe$/, '').trim();
+      // Try: "chrome" matches "Google Chrome", "notepad" matches "Notepad"
+      for (const [name, app] of byLowerDisplayName) {
+        if (name.includes(clean) || clean.includes(name)) {
           resolved = app;
           break;
         }
@@ -2137,6 +2153,8 @@ async function handleScreenshot(
       content: [
         ...(monitorNote ? [{ type: "text" as const, text: monitorNote }] : []),
         ...(hiddenNote ? [{ type: "text" as const, text: hiddenNote }] : []),
+        // Accessibility snapshot: structured GUI element tree (Windows bound-window mode)
+        ...(shot.accessibilityText ? [{ type: "text" as const, text: `GUI elements in this window:\n${shot.accessibilityText}` }] : []),
         {
           type: "image",
           data: shot.base64,
@@ -2204,6 +2222,8 @@ async function handleScreenshot(
     content: [
       ...(monitorNote ? [{ type: "text" as const, text: monitorNote }] : []),
       ...(hiddenNote ? [{ type: "text" as const, text: hiddenNote }] : []),
+      // Accessibility snapshot: structured GUI element tree (Windows bound-window mode)
+      ...(shot.accessibilityText ? [{ type: "text" as const, text: `GUI elements in this window:\n${shot.accessibilityText}` }] : []),
       {
         type: "image",
         data: shot.base64,
@@ -2812,6 +2832,443 @@ async function handleOpenApplication(
   return okText(`Opened "${app}".`);
 }
 
+async function handleVirtualMouse(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.virtualMouse) {
+    return errorResult("virtual_mouse is only available on Windows with a bound window.", "feature_unavailable");
+  }
+  const action = requireString(args, "action");
+  if (action instanceof Error) return errorResult(action.message, "bad_args");
+  const coord = args.coordinate;
+  if (!Array.isArray(coord) || coord.length < 2) {
+    return errorResult("coordinate [x, y] is required.", "bad_args");
+  }
+  const validActions = new Set(["click", "double_click", "right_click", "move", "drag", "down", "up"]);
+  if (!validActions.has(action)) {
+    return errorResult(`Invalid action "${action}". Valid: ${[...validActions].join(", ")}`, "bad_args");
+  }
+  const startCoord = Array.isArray(args.start_coordinate) ? args.start_coordinate : undefined;
+  const ok = await adapter.executor.virtualMouse({
+    action: action as any,
+    x: coord[0], y: coord[1],
+    startX: startCoord?.[0], startY: startCoord?.[1],
+  });
+  if (!ok) {
+    return errorResult("No window is currently bound.", "bad_args");
+  }
+  const desc: Record<string, string> = {
+    click: `Click at (${coord[0]},${coord[1]})`,
+    double_click: `Double-click at (${coord[0]},${coord[1]})`,
+    right_click: `Right-click at (${coord[0]},${coord[1]})`,
+    move: `Moved to (${coord[0]},${coord[1]})`,
+    drag: `Dragged ${startCoord ? `(${startCoord[0]},${startCoord[1]})` : "current"} → (${coord[0]},${coord[1]})`,
+    down: `Button down at (${coord[0]},${coord[1]})`,
+    up: `Button up at (${coord[0]},${coord[1]})`,
+  };
+  return okText(desc[action] ?? action);
+}
+
+async function handleVirtualKeyboard(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.virtualKeyboard) {
+    return errorResult("virtual_keyboard is only available on Windows with a bound window.", "feature_unavailable");
+  }
+  const action = requireString(args, "action");
+  if (action instanceof Error) return errorResult(action.message, "bad_args");
+  const text = requireString(args, "text");
+  if (text instanceof Error) return errorResult(text.message, "bad_args");
+
+  const validActions = new Set(["type", "combo", "press", "release", "hold"]);
+  if (!validActions.has(action)) {
+    return errorResult(`Invalid action "${action}". Valid: ${[...validActions].join(", ")}`, "bad_args");
+  }
+
+  const duration = typeof args.duration === "number" ? args.duration : undefined;
+  const repeat = typeof args.repeat === "number" ? args.repeat : undefined;
+
+  const ok = await adapter.executor.virtualKeyboard({
+    action: action as any,
+    text,
+    duration,
+    repeat,
+  });
+
+  if (!ok) {
+    return errorResult("No window is currently bound. Use open_application or bind_window first.", "bad_args");
+  }
+
+  const desc: Record<string, string> = {
+    type: `Typed "${text.length > 40 ? text.slice(0, 40) + "..." : text}"`,
+    combo: `Sent ${text}`,
+    press: `Pressed ${text} (holding)`,
+    release: `Released ${text}`,
+    hold: `Held ${text} for ${duration ?? 1}s`,
+  };
+
+  return okText(`${desc[action]}${repeat && repeat > 1 ? ` ×${repeat}` : ""}`);
+}
+
+async function handleStatusIndicator(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.statusIndicator) {
+    return errorResult("status_indicator is only available on Windows.", "feature_unavailable");
+  }
+  const action = requireString(args, "action");
+  if (action instanceof Error) return errorResult(action.message, "bad_args");
+  if (!["show", "hide", "status"].includes(action)) {
+    return errorResult(`Invalid action "${action}". Valid: show, hide, status.`, "bad_args");
+  }
+  const message = typeof args.message === "string" ? args.message : undefined;
+  if (action === "show" && !message) {
+    return errorResult("'show' requires a message parameter.", "bad_args");
+  }
+  const result = await adapter.executor.statusIndicator(action as any, message);
+  if (action === "status") {
+    return okText(result.active ? "Indicator is active on the bound window." : "Indicator is not active (no window bound).");
+  }
+  if (action === "show") {
+    return okText(`Indicator showing: "${message}"`);
+  }
+  return okText("Indicator hidden.");
+}
+
+async function handleMouseWheel(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.mouseWheel) {
+    return errorResult("mouse_wheel is only available on Windows with a bound window.", "feature_unavailable");
+  }
+  const coord = args.coordinate;
+  if (!Array.isArray(coord) || coord.length < 2) {
+    return errorResult("coordinate must be [x, y] array.", "bad_args");
+  }
+  const delta = typeof args.delta === "number" ? args.delta : undefined;
+  if (delta === undefined) {
+    return errorResult("delta is required (positive=up, negative=down).", "bad_args");
+  }
+  const horizontal = args.direction === "horizontal";
+  const ok = await adapter.executor.mouseWheel(coord[0], coord[1], delta, horizontal);
+  if (!ok) {
+    return errorResult("No window is currently bound. Use open_application or bind_window first.", "bad_args");
+  }
+  return okText(
+    `Mouse wheel: ${horizontal ? "horizontal" : "vertical"} scroll ${delta > 0 ? "up" : "down"} ${Math.abs(delta)} click(s) at (${coord[0]},${coord[1]}).`,
+  );
+}
+
+async function handleActivateWindow(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.activateWindow) {
+    return errorResult("activate_window is only available on Windows with a bound window.", "feature_unavailable");
+  }
+  const clickX = typeof args.click_x === "number" ? args.click_x : undefined;
+  const clickY = typeof args.click_y === "number" ? args.click_y : undefined;
+  const ok = await adapter.executor.activateWindow(clickX, clickY);
+  if (!ok) {
+    return errorResult("No window is currently bound. Use open_application or bind_window first.", "bad_args");
+  }
+  return okText("Window activated and focused. Ready for input.");
+}
+
+async function handlePromptRespond(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.respondToPrompt) {
+    return errorResult("prompt_respond is only available on Windows with a bound window.", "feature_unavailable");
+  }
+  const responseType = requireString(args, "response_type");
+  if (responseType instanceof Error) return errorResult(responseType.message, "bad_args");
+
+  const validTypes = new Set(["yes", "no", "enter", "escape", "select", "type"]);
+  if (!validTypes.has(responseType)) {
+    return errorResult(`Invalid response_type "${responseType}". Valid: ${[...validTypes].join(", ")}`, "bad_args");
+  }
+
+  if (responseType === "select" && typeof args.arrow_count !== "number") {
+    return errorResult("'select' requires arrow_count parameter.", "bad_args");
+  }
+  if (responseType === "type" && typeof args.text !== "string") {
+    return errorResult("'type' requires text parameter.", "bad_args");
+  }
+
+  const ok = await adapter.executor.respondToPrompt({
+    responseType: responseType as any,
+    arrowDirection: typeof args.arrow_direction === "string" ? args.arrow_direction as any : undefined,
+    arrowCount: typeof args.arrow_count === "number" ? args.arrow_count : undefined,
+    text: typeof args.text === "string" ? args.text : undefined,
+  });
+
+  if (!ok) {
+    return errorResult("No window is currently bound. Use open_application or bind_window first.", "bad_args");
+  }
+
+  const descriptions: Record<string, string> = {
+    yes: "Sent 'y' + Enter.",
+    no: "Sent 'n' + Enter.",
+    enter: "Sent Enter.",
+    escape: "Sent Escape.",
+    select: `Navigated ${args.arrow_direction ?? "down"} ${args.arrow_count ?? 1} time(s) + Enter.`,
+    type: `Typed "${args.text}" + Enter.`,
+  };
+
+  return okText(`Prompt responded: ${descriptions[responseType] ?? responseType}. Take a screenshot to verify.`);
+}
+
+async function handleOpenTerminal(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.openTerminal) {
+    return errorResult("open_terminal is only available on Windows.", "feature_unavailable");
+  }
+  const agent = requireString(args, "agent");
+  if (agent instanceof Error) return errorResult(agent.message, "bad_args");
+
+  const validAgents = new Set(["claude", "codex", "gemini", "custom"]);
+  if (!validAgents.has(agent)) {
+    return errorResult(`Invalid agent "${agent}". Valid: claude, codex, gemini, custom.`, "bad_args");
+  }
+  if (agent === "custom" && typeof args.command !== "string") {
+    return errorResult("agent='custom' requires 'command' parameter.", "bad_args");
+  }
+
+  const result = await adapter.executor.openTerminal({
+    agent: agent as any,
+    command: typeof args.command === "string" ? args.command : undefined,
+    terminal: typeof args.terminal === "string" ? args.terminal as any : undefined,
+    workingDirectory: typeof args.working_directory === "string" ? args.working_directory : undefined,
+  });
+
+  if (!result) {
+    return errorResult(
+      "Failed to open terminal. Windows Terminal (wt.exe) may not be installed.",
+      "launch_failed",
+    );
+  }
+
+  if (!result.launched) {
+    return okText(
+      `Terminal opened (hwnd=${result.hwnd}, "${result.title}") but no command was sent. Window is now bound.`,
+    );
+  }
+
+  const agentNames: Record<string, string> = {
+    claude: "Claude Code", codex: "Codex", gemini: "Gemini",
+    custom: args.command as string,
+  };
+
+  return okText(
+    `Terminal opened and ${agentNames[agent] ?? agent} launched.\n` +
+    `Window: hwnd=${result.hwnd} "${result.title}"\n` +
+    `Command: '${agent === "custom" ? args.command : agent}' + Enter\n` +
+    `Status: bound to this terminal. Take a screenshot to verify the agent started.`,
+  );
+}
+
+async function handleBindWindow(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  const action = requireString(args, "action");
+  if (action instanceof Error) return errorResult(action.message, "bad_args");
+
+  switch (action) {
+    case "list": {
+      if (!adapter.executor.listVisibleWindows) {
+        return errorResult("bind_window is only available on Windows.", "feature_unavailable");
+      }
+      const windows = await adapter.executor.listVisibleWindows();
+      if (windows.length === 0) return okText("No visible windows found.");
+      const lines = windows.map(
+        (w) => `hwnd=${w.hwnd} pid=${w.pid} "${w.title}"`,
+      );
+      return okText(`Visible windows (${windows.length}):\n${lines.join("\n")}`);
+    }
+    case "status": {
+      if (!adapter.executor.getBindingStatus) {
+        return errorResult("bind_window is only available on Windows.", "feature_unavailable");
+      }
+      const status = await adapter.executor.getBindingStatus();
+      if (!status || !status.bound) {
+        return okText("No window is currently bound. Use bind_window(action='list') to see available windows, then bind_window(action='bind', title='...') to bind.");
+      }
+      let text = `Bound to: hwnd=${status.hwnd}`;
+      if (status.title) text += ` "${status.title}"`;
+      if (status.pid) text += ` pid=${status.pid}`;
+      if (status.rect) text += ` rect=(${status.rect.x},${status.rect.y} ${status.rect.width}x${status.rect.height})`;
+      return okText(text);
+    }
+    case "bind": {
+      if (!adapter.executor.bindToWindow) {
+        return errorResult("bind_window is only available on Windows.", "feature_unavailable");
+      }
+      const title = typeof args.title === "string" ? args.title : undefined;
+      const hwnd = typeof args.hwnd === "string" ? args.hwnd : undefined;
+      const pid = typeof args.pid === "number" ? args.pid : undefined;
+      if (!title && !hwnd && !pid) {
+        return errorResult("Specify at least one of: title, hwnd, or pid.", "bad_args");
+      }
+      const result = await adapter.executor.bindToWindow({ hwnd, title, pid });
+      if (!result) {
+        return errorResult(
+          `No window found matching: ${[title && `title="${title}"`, hwnd && `hwnd=${hwnd}`, pid && `pid=${pid}`].filter(Boolean).join(", ")}. Use bind_window(action='list') to see available windows.`,
+          "element_not_found",
+        );
+      }
+      return okText(`Bound to window: hwnd=${result.hwnd} pid=${result.pid} "${result.title}". All subsequent screenshot/click/type operations target this window.`);
+    }
+    case "unbind": {
+      if (!adapter.executor.unbindFromWindow) {
+        return errorResult("bind_window is only available on Windows.", "feature_unavailable");
+      }
+      await adapter.executor.unbindFromWindow();
+      return okText("Window binding released. Operations now target the full screen.");
+    }
+    default:
+      return errorResult(`Unknown bind_window action "${action}". Valid: list, bind, unbind, status.`, "bad_args");
+  }
+}
+
+async function handleClickElement(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.clickElement) {
+    return errorResult(
+      "click_element is only available on Windows with a bound window.",
+      "feature_unavailable",
+    );
+  }
+  const name = typeof args.name === "string" ? args.name : undefined;
+  const role = typeof args.role === "string" ? args.role : undefined;
+  const automationId = typeof args.automationId === "string" ? args.automationId : undefined;
+  if (!name && !role && !automationId) {
+    return errorResult("At least one of name, role, or automationId is required.", "bad_args");
+  }
+  const ok = await adapter.executor.clickElement({ name, role, automationId });
+  if (!ok) {
+    return errorResult(
+      `Element not found: ${[name && `name="${name}"`, role && `role=${role}`, automationId && `id=${automationId}`].filter(Boolean).join(", ")}. Take a screenshot to see current GUI elements.`,
+      "element_not_found",
+    );
+  }
+  return okText(`Clicked element: ${[name && `"${name}"`, role, automationId].filter(Boolean).join(" ")}`);
+}
+
+async function handleTypeIntoElement(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  if (!adapter.executor.typeIntoElement) {
+    return errorResult(
+      "type_into_element is only available on Windows with a bound window.",
+      "feature_unavailable",
+    );
+  }
+  const text = requireString(args, "text");
+  if (text instanceof Error) return errorResult(text.message, "bad_args");
+  const name = typeof args.name === "string" ? args.name : undefined;
+  const role = typeof args.role === "string" ? args.role : undefined;
+  const automationId = typeof args.automationId === "string" ? args.automationId : undefined;
+  const ok = await adapter.executor.typeIntoElement({ name, role, automationId }, text);
+  if (!ok) {
+    return errorResult(
+      `Could not type into element: ${[name && `name="${name}"`, role && `role=${role}`, automationId && `id=${automationId}`].filter(Boolean).join(", ")}. The element was not found or doesn't support text input.`,
+      "element_not_found",
+    );
+  }
+  return okText(`Typed ${text.length} chars into: ${[name && `"${name}"`, role, automationId].filter(Boolean).join(" ")}`);
+}
+
+async function handleWindowManagement(
+  adapter: ComputerUseHostAdapter,
+  args: Record<string, unknown>,
+): Promise<CuCallToolResult> {
+  const action = requireString(args, "action");
+  if (action instanceof Error) return errorResult(action.message, "bad_args");
+
+  const VALID_ACTIONS = new Set([
+    "minimize", "maximize", "restore", "close", "focus", "move_offscreen", "move_resize", "get_rect",
+  ]);
+  if (!VALID_ACTIONS.has(action)) {
+    return errorResult(
+      `Unknown window_management action "${action}". Valid: ${[...VALID_ACTIONS].join(", ")}`,
+      "bad_args",
+    );
+  }
+
+  if (!adapter.executor.manageWindow) {
+    return errorResult(
+      "window_management is only available on Windows with a bound window.",
+      "feature_unavailable",
+    );
+  }
+
+  // get_rect: just return the current window position and size
+  if (action === "get_rect") {
+    if (!adapter.executor.getWindowRect) {
+      return errorResult("getWindowRect not available.", "feature_unavailable");
+    }
+    const rect = await adapter.executor.getWindowRect();
+    if (!rect) {
+      return errorResult("No window is currently bound. Call open_application first.", "bad_args");
+    }
+    return okText(
+      `Window rect: x=${rect.x}, y=${rect.y}, width=${rect.width}, height=${rect.height}`,
+    );
+  }
+
+  // move_resize: requires x, y (width/height optional)
+  if (action === "move_resize") {
+    const x = typeof args.x === "number" ? args.x : undefined;
+    const y = typeof args.y === "number" ? args.y : undefined;
+    if (x === undefined || y === undefined) {
+      return errorResult("move_resize requires x and y parameters.", "bad_args");
+    }
+    const width = typeof args.width === "number" ? args.width : undefined;
+    const height = typeof args.height === "number" ? args.height : undefined;
+    const ok = await adapter.executor.manageWindow(action, { x, y, width, height });
+    if (!ok) {
+      return errorResult("No window is currently bound. Call open_application first.", "bad_args");
+    }
+    return okText(
+      width && height
+        ? `Moved window to (${x}, ${y}) and resized to ${width}×${height}.`
+        : `Moved window to (${x}, ${y}).`,
+    );
+  }
+
+  // All other actions: minimize, maximize, restore, close, focus, move_offscreen
+  const ok = await adapter.executor.manageWindow(action);
+  if (!ok) {
+    return errorResult(
+      "No window is currently bound. Call open_application first.",
+      "bad_args",
+    );
+  }
+
+  const descriptions: Record<string, string> = {
+    minimize: "Window minimized (ShowWindow SW_MINIMIZE).",
+    maximize: "Window maximized (ShowWindow SW_MAXIMIZE).",
+    restore: "Window restored (ShowWindow SW_RESTORE).",
+    close: "Window closed (SendMessage WM_CLOSE). The window binding has been released.",
+    focus: "Window brought to front (SetForegroundWindow).",
+    move_offscreen: "Window moved offscreen (-32000,-32000). Still usable via SendMessage/PrintWindow.",
+  };
+
+  return okText(descriptions[action] ?? `Action "${action}" completed.`);
+}
+
 async function handleSwitchDisplay(
   adapter: ComputerUseHostAdapter,
   args: Record<string, unknown>,
@@ -3383,6 +3840,64 @@ async function dispatchAction(
   overrides: ComputerUseOverrides,
   subGates: CuSubGates,
 ): Promise<CuCallToolResult> {
+  // ── Bound-window auto-routing ──────────────────────────────────────
+  // When a window is bound (Win32), route generic input tools to
+  // virtual_mouse / virtual_keyboard automatically. The model doesn't
+  // need to know which tools to use — binding handles it.
+  const hasBoundWindow =
+    (await adapter.executor.hasBoundWindow?.()) === true &&
+    adapter.executor.virtualMouse &&
+    adapter.executor.virtualKeyboard;
+  if (hasBoundWindow) {
+    const coord = Array.isArray(a.coordinate) ? a.coordinate as number[] : undefined;
+    switch (name) {
+      case "left_click":
+        if (coord) return handleVirtualMouse(adapter, { action: "click", coordinate: coord });
+        break;
+      case "double_click":
+        if (coord) return handleVirtualMouse(adapter, { action: "double_click", coordinate: coord });
+        break;
+      case "right_click":
+        if (coord) return handleVirtualMouse(adapter, { action: "right_click", coordinate: coord });
+        break;
+      case "mouse_move":
+        if (coord) return handleVirtualMouse(adapter, { action: "move", coordinate: coord });
+        break;
+      case "left_click_drag":
+        if (coord) return handleVirtualMouse(adapter, {
+          action: "drag", coordinate: coord,
+          start_coordinate: Array.isArray(a.start_coordinate) ? a.start_coordinate : undefined,
+        });
+        break;
+      case "left_mouse_down":
+        if (coord) return handleVirtualMouse(adapter, { action: "down", coordinate: coord });
+        break;
+      case "left_mouse_up":
+        if (coord) return handleVirtualMouse(adapter, { action: "up", coordinate: coord });
+        break;
+      case "type":
+        if (typeof a.text === "string") return handleVirtualKeyboard(adapter, { action: "type", text: a.text });
+        break;
+      case "key":
+        if (typeof a.text === "string") return handleVirtualKeyboard(adapter, { action: "combo", text: a.text, repeat: a.repeat });
+        break;
+      case "hold_key":
+        if (typeof a.text === "string") return handleVirtualKeyboard(adapter, {
+          action: "hold", text: a.text,
+          duration: typeof a.duration === "number" ? a.duration : 1,
+        });
+        break;
+      case "scroll":
+        if (coord) return handleMouseWheel(adapter, {
+          coordinate: coord,
+          delta: a.scroll_direction === "up" ? (a.scroll_amount ?? 3) : -(a.scroll_amount ?? 3),
+          direction: (a.scroll_direction === "left" || a.scroll_direction === "right") ? "horizontal" : "vertical",
+        });
+        break;
+      // screenshot, zoom, wait, cursor_position — not rerouted, pass through
+    }
+  }
+  // ── Standard dispatch (unbound or tools not rerouted above) ────────
   switch (name) {
     case "screenshot":
       return handleScreenshot(adapter, overrides, subGates);
@@ -3433,6 +3948,39 @@ async function dispatchAction(
 
     case "open_application":
       return handleOpenApplication(adapter, a, overrides);
+
+    case "window_management":
+      return handleWindowManagement(adapter, a);
+
+    case "click_element":
+      return handleClickElement(adapter, a);
+
+    case "type_into_element":
+      return handleTypeIntoElement(adapter, a);
+
+    case "open_terminal":
+      return handleOpenTerminal(adapter, a);
+
+    case "bind_window":
+      return handleBindWindow(adapter, a);
+
+    case "virtual_mouse":
+      return handleVirtualMouse(adapter, a);
+
+    case "virtual_keyboard":
+      return handleVirtualKeyboard(adapter, a);
+
+    case "status_indicator":
+      return handleStatusIndicator(adapter, a);
+
+    case "mouse_wheel":
+      return handleMouseWheel(adapter, a);
+
+    case "activate_window":
+      return handleActivateWindow(adapter, a);
+
+    case "prompt_respond":
+      return handlePromptRespond(adapter, a);
 
     case "switch_display":
       return handleSwitchDisplay(adapter, a, overrides);

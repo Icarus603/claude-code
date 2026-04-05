@@ -4,7 +4,7 @@
  */
 
 export interface WindowInfo {
-  hwnd: number
+  hwnd: string
   pid: number
   title: string
 }
@@ -59,7 +59,13 @@ public class WinEnum {
  */
 export function listWindows(): WindowInfo[] {
   const result = Bun.spawnSync({
-    cmd: ['powershell', '-NoProfile', '-NonInteractive', '-Command', ENUM_WINDOWS_PS],
+    cmd: [
+      'powershell',
+      '-NoProfile',
+      '-NonInteractive',
+      '-Command',
+      ENUM_WINDOWS_PS,
+    ],
     stdout: 'pipe',
     stderr: 'pipe',
   })
@@ -75,11 +81,11 @@ export function listWindows(): WindowInfo[] {
       const secondPipe = trimmed.indexOf('|', firstPipe + 1)
       if (firstPipe === -1 || secondPipe === -1) return null
 
-      const hwnd = Number(trimmed.slice(0, firstPipe))
+      const hwnd = trimmed.slice(0, firstPipe)
       const pid = Number(trimmed.slice(firstPipe + 1, secondPipe))
       const title = trimmed.slice(secondPipe + 1)
 
-      if (isNaN(hwnd) || isNaN(pid) || !title) return null
+      if (!hwnd || isNaN(pid) || !title) return null
       return { hwnd, pid, title }
     })
     .filter((item): item is WindowInfo => item !== null)

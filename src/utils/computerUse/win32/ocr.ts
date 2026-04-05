@@ -3,6 +3,8 @@
  * Captures a screen region or window, then runs WinRT OCR to extract text.
  */
 
+import { ps as runPs } from './shared.js'
+
 export interface OcrLine {
   text: string
   bounds: { x: number; y: number; w: number; h: number }
@@ -16,15 +18,6 @@ export interface OcrResult {
 
 function emptyResult(language: string): OcrResult {
   return { text: '', lines: [], language }
-}
-
-function runPs(script: string): string {
-  const result = Bun.spawnSync({
-    cmd: ['powershell', '-NoProfile', '-NonInteractive', '-Command', script],
-    stdout: 'pipe',
-    stderr: 'pipe',
-  })
-  return new TextDecoder().decode(result.stdout).trim()
 }
 
 /**

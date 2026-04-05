@@ -1,14 +1,10 @@
 /**
- * @ant/computer-use-swift — cross-platform display, apps, and screenshot API
+ * @ant/computer-use-swift — macOS display, apps, and screenshot (Swift native)
  *
- * Platform backends:
- *   - darwin: AppleScript/JXA + screencapture
- *   - win32:  PowerShell + System.Drawing + Win32 P/Invoke
- *
- * Add new platforms by creating backends/<platform>.ts implementing SwiftBackend.
+ * This package wraps the macOS-only Swift .node native module.
+ * For Windows/Linux, use src/utils/computerUse/platforms/ instead.
  */
 
-// Re-export all types
 export type {
   DisplayGeometry,
   PrepareDisplayResult,
@@ -18,72 +14,42 @@ export type {
   ScreenshotResult,
   ResolvePrepareCaptureResult,
   WindowDisplayInfo,
-  DisplayAPI,
-  AppsAPI,
-  ScreenshotAPI,
-  SwiftBackend,
-} from './types.js'
+} from './backends/darwin.js'
 
-import type { ResolvePrepareCaptureResult, SwiftBackend } from './types.js'
+import type { ResolvePrepareCaptureResult } from './backends/darwin.js'
 
-// ---------------------------------------------------------------------------
-// Platform dispatch
-// ---------------------------------------------------------------------------
-
-function loadBackend(): SwiftBackend | null {
+function loadDarwin() {
+  if (process.platform !== 'darwin') return null
   try {
-    switch (process.platform) {
-      case 'darwin':
-        return require('./backends/darwin.js') as SwiftBackend
-      case 'win32':
-        return require('./backends/win32.js') as SwiftBackend
-      case 'linux':
-        return require('./backends/linux.js') as SwiftBackend
-      default:
-        return null
-    }
+    return require('./backends/darwin.js')
   } catch {
     return null
   }
 }
 
-const backend = loadBackend()
-
-// ---------------------------------------------------------------------------
-// ComputerUseAPI — Main export (preserves original class interface)
-// ---------------------------------------------------------------------------
+const darwin = loadDarwin()
 
 export class ComputerUseAPI {
-  // When no backend is loaded (unsupported platform), all APIs are no-op stubs.
-  // These stubs should never be reached in practice — callers check isSupported
-  // or the feature gate before invoking.
-
-  apps = backend?.apps ?? {
+  apps = darwin?.apps ?? {
     async prepareDisplay() { return { activated: '', hidden: [] } },
     async previewHideSet() { return [] },
-    async findWindowDisplays(ids: string[]) { return ids.map(b => ({ bundleId: b, displayIds: [] as number[] })) },
+    async findWindowDisplays(ids: string[]) { return ids.map((b: string) => ({ bundleId: b, displayIds: [] as number[] })) },
     async appUnderPoint() { return null },
     async listInstalled() { return [] },
     iconDataUrl() { return null },
     listRunning() { return [] },
-    async open() { throw new Error('computer-use-swift: no backend for this platform') },
+    async open() { throw new Error('@ant/computer-use-swift: macOS only') },
     async unhide() {},
   }
 
-  display = backend?.display ?? {
-    getSize() { throw new Error('computer-use-swift: no backend for this platform') },
-    listAll() { throw new Error('computer-use-swift: no backend for this platform') },
+  display = darwin?.display ?? {
+    getSize() { throw new Error('@ant/computer-use-swift: macOS only') },
+    listAll() { throw new Error('@ant/computer-use-swift: macOS only') },
   }
 
-  screenshot = backend?.screenshot ?? {
-    async captureExcluding() { throw new Error('computer-use-swift: no backend for this platform') },
-    async captureRegion() { throw new Error('computer-use-swift: no backend for this platform') },
-  }
-
-  hotkey = (backend as any)?.hotkey ?? {
-    registerEscape(_cb: () => void): boolean { return false },
-    unregister() {},
-    notifyExpectedEscape() {},
+  screenshot = darwin?.screenshot ?? {
+    async captureExcluding() { throw new Error('@ant/computer-use-swift: macOS only') },
+    async captureRegion() { throw new Error('@ant/computer-use-swift: macOS only') },
   }
 
   async resolvePrepareCapture(
@@ -93,8 +59,6 @@ export class ComputerUseAPI {
     targetW: number,
     targetH: number,
     displayId?: number,
-    _autoResolve?: boolean,
-    _doHide?: boolean,
   ): Promise<ResolvePrepareCaptureResult> {
     return this.screenshot.captureExcluding(allowedBundleIds, quality, targetW, targetH, displayId)
   }

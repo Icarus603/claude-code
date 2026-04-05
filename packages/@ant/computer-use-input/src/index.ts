@@ -1,33 +1,30 @@
 /**
- * @ant/computer-use-input — cross-platform keyboard & mouse simulation
+ * @ant/computer-use-input — macOS keyboard & mouse simulation (enigo)
  *
- * Platform backends:
- *   - darwin: AppleScript/JXA via CoreGraphics events
- *   - win32:  PowerShell via Win32 P/Invoke (SetCursorPos, SendInput, keybd_event)
- *
- * Add new platforms by creating backends/<platform>.ts implementing InputBackend.
+ * This package wraps the macOS-only native enigo .node module.
+ * For Windows/Linux, use src/utils/computerUse/platforms/ instead.
  */
 
-import type { FrontmostAppInfo, InputBackend } from './types.js'
+export interface FrontmostAppInfo {
+  bundleId: string
+  appName: string
+}
 
-export type { FrontmostAppInfo, InputBackend } from './types.js'
-
-// ---------------------------------------------------------------------------
-// Platform dispatch
-// ---------------------------------------------------------------------------
+export interface InputBackend {
+  moveMouse(x: number, y: number, animated: boolean): Promise<void>
+  key(key: string, action: 'press' | 'release'): Promise<void>
+  keys(parts: string[]): Promise<void>
+  mouseLocation(): Promise<{ x: number; y: number }>
+  mouseButton(button: 'left' | 'right' | 'middle', action: 'click' | 'press' | 'release', count?: number): Promise<void>
+  mouseScroll(amount: number, direction: 'vertical' | 'horizontal'): Promise<void>
+  typeText(text: string): Promise<void>
+  getFrontmostAppInfo(): FrontmostAppInfo | null
+}
 
 function loadBackend(): InputBackend | null {
+  if (process.platform !== 'darwin') return null
   try {
-    switch (process.platform) {
-      case 'darwin':
-        return require('./backends/darwin.js') as InputBackend
-      case 'win32':
-        return require('./backends/win32.js') as InputBackend
-      case 'linux':
-        return require('./backends/linux.js') as InputBackend
-      default:
-        return null
-    }
+    return require('./backends/darwin.js') as InputBackend
   } catch {
     return null
   }
@@ -35,30 +32,16 @@ function loadBackend(): InputBackend | null {
 
 const backend = loadBackend()
 
-// ---------------------------------------------------------------------------
-// Unsupported stub (throws on call — guards via isSupported check)
-// ---------------------------------------------------------------------------
-
-function unsupported(): never {
-  throw new Error(`computer-use-input is not supported on ${process.platform}`)
-}
-
-// ---------------------------------------------------------------------------
-// Public API — matches the original export surface
-// ---------------------------------------------------------------------------
-
 export const isSupported = backend !== null
-
-export const moveMouse = backend?.moveMouse ?? unsupported
-export const key = backend?.key ?? unsupported
-export const keys = backend?.keys ?? unsupported
-export const mouseLocation = backend?.mouseLocation ?? unsupported
-export const mouseButton = backend?.mouseButton ?? unsupported
-export const mouseScroll = backend?.mouseScroll ?? unsupported
-export const typeText = backend?.typeText ?? unsupported
+export const moveMouse = backend?.moveMouse
+export const key = backend?.key
+export const keys = backend?.keys
+export const mouseLocation = backend?.mouseLocation
+export const mouseButton = backend?.mouseButton
+export const mouseScroll = backend?.mouseScroll
+export const typeText = backend?.typeText
 export const getFrontmostAppInfo = backend?.getFrontmostAppInfo ?? (() => null)
 
-// Legacy class type — used by inputLoader.ts for type narrowing
 export class ComputerUseInputAPI {
   declare moveMouse: InputBackend['moveMouse']
   declare key: InputBackend['key']
@@ -71,8 +54,5 @@ export class ComputerUseInputAPI {
   declare isSupported: true
 }
 
-interface ComputerUseInputUnsupported {
-  isSupported: false
-}
-
+interface ComputerUseInputUnsupported { isSupported: false }
 export type ComputerUseInput = ComputerUseInputAPI | ComputerUseInputUnsupported
