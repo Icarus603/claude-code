@@ -709,7 +709,7 @@ function OAuthStatusMessage({
               setInputCursorOffset((displayValues[FIELDS[idx + 1]!] ?? '').length)
             }
           },
-          { context: 'Tabs' },
+          { context: 'FormField' },
         )
         useKeybinding(
           'tabs:previous',
@@ -721,7 +721,7 @@ function OAuthStatusMessage({
               setInputCursorOffset((displayValues[FIELDS[idx - 1]!] ?? '').length)
             }
           },
-          { context: 'Tabs' },
+          { context: 'FormField' },
         )
         useKeybinding(
           'confirm:no',
@@ -782,7 +782,7 @@ function OAuthStatusMessage({
               {renderRow('opus_model', 'Opus     ')}
             </Box>
             <Text dimColor>
-              Tab to switch · Enter on last field to save · Esc to go back
+              ↑↓/Tab to switch · Enter on last field to save · Esc to go back
             </Text>
           </Box>
         )
@@ -916,7 +916,7 @@ function OAuthStatusMessage({
               )
             }
           },
-          { context: 'Tabs' },
+          { context: 'FormField' },
         )
         useKeybinding(
           'tabs:previous',
@@ -932,7 +932,7 @@ function OAuthStatusMessage({
               )
             }
           },
-          { context: 'Tabs' },
+          { context: 'FormField' },
         )
         useKeybinding(
           'confirm:no',
@@ -997,7 +997,7 @@ function OAuthStatusMessage({
               {renderOpenAIRow('opus_model', 'Opus     ')}
             </Box>
             <Text dimColor>
-              Tab to switch · Enter on last field to save · Esc to go back
+              ↑↓/Tab to switch · Enter on last field to save · Esc to go back
             </Text>
           </Box>
         )
@@ -1148,7 +1148,7 @@ function OAuthStatusMessage({
               )
             }
           },
-          { context: 'Tabs' },
+          { context: 'FormField' },
         )
         useKeybinding(
           'tabs:previous',
@@ -1164,7 +1164,7 @@ function OAuthStatusMessage({
               )
             }
           },
-          { context: 'Tabs' },
+          { context: 'FormField' },
         )
         useKeybinding(
           'confirm:no',
@@ -1229,7 +1229,7 @@ function OAuthStatusMessage({
               {renderGeminiRow('opus_model', 'Opus     ')}
             </Box>
             <Text dimColor>
-              Tab to switch · Enter on last field to save · Esc to go back
+              ↑↓/Tab to switch · Enter on last field to save · Esc to go back
             </Text>
           </Box>
         )
