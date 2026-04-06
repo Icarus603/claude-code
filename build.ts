@@ -17,6 +17,16 @@ const DEFAULT_BUILD_FEATURES = [
   'SHOT_STATS',
   'PROMPT_CACHE_BREAK_DETECTION',
   'TOKEN_BUDGET',
+  // P0: local features
+  'AGENT_TRIGGERS',
+  'ULTRATHINK',
+  'BUILTIN_EXPLORE_PLAN_AGENTS',
+  'LODESTONE',
+  // P1: API-dependent features
+  'EXTRACT_MEMORIES',
+  'VERIFICATION_AGENT',
+  'KAIROS_BRIEF',
+  'AWAY_SUMMARY',
 ]
 
 // Collect FEATURE_* env vars → Bun.build features
