@@ -2,7 +2,13 @@ import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 
 import { getInitialSettings } from '../settings/settings.js'
 import { isEnvTruthy } from '../envUtils.js'
 
-export type APIProvider = 'firstParty' | 'bedrock' | 'vertex' | 'foundry' | 'openai'
+export type APIProvider =
+  | 'firstParty'
+  | 'bedrock'
+  | 'vertex'
+  | 'foundry'
+  | 'openai'
+  | 'gemini'
 
 export function getAPIProvider(): APIProvider {
   // Cloud provider env vars have highest priority (they are explicit switches)
@@ -13,12 +19,20 @@ export function getAPIProvider(): APIProvider {
   // Check settings.json modelType field
   const modelType = getInitialSettings().modelType
   if (modelType === 'openai') return 'openai'
+  if (modelType === 'gemini') return 'gemini'
 
-  // Backward compatibility: check legacy OpenAI env var
-  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_OPENAI)) return 'openai'
-
-  // Default: Anthropic first-party API
-  return 'firstParty'
+  // 2. Check environment variables (backward compatibility)
+  return isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)
+    ? 'bedrock'
+    : isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)
+      ? 'vertex'
+      : isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
+        ? 'foundry'
+        : isEnvTruthy(process.env.CLAUDE_CODE_USE_OPENAI)
+          ? 'openai'
+          : isEnvTruthy(process.env.CLAUDE_CODE_USE_GEMINI)
+            ? 'gemini'
+            : 'firstParty'
 }
 
 export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS {
