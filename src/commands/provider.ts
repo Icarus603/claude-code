@@ -13,6 +13,8 @@ function getEnvVarForProvider(provider: string): string {
       return 'CLAUDE_CODE_USE_VERTEX'
     case 'foundry':
       return 'CLAUDE_CODE_USE_FOUNDRY'
+    case 'gemini':
+      return 'CLAUDE_CODE_USE_GEMINI'
     default:
       throw new Error(`Unknown provider: ${provider}`)
   }
@@ -45,13 +47,27 @@ const call: LocalCommandCall = async (args, context) => {
     delete process.env.CLAUDE_CODE_USE_VERTEX
     delete process.env.CLAUDE_CODE_USE_FOUNDRY
     delete process.env.CLAUDE_CODE_USE_OPENAI
-    return { type: 'text', value: 'API provider cleared (will use environment variables).' }
+    delete process.env.CLAUDE_CODE_USE_GEMINI
+    return {
+      type: 'text',
+      value: 'API provider cleared (will use environment variables).',
+    }
   }
 
   // Validate provider
-  const validProviders = ['anthropic', 'openai', 'bedrock', 'vertex', 'foundry']
+  const validProviders = [
+    'anthropic',
+    'openai',
+    'gemini',
+    'bedrock',
+    'vertex',
+    'foundry',
+  ]
   if (!validProviders.includes(arg)) {
-    return { type: 'text', value: `Invalid provider: ${arg}\nValid: ${validProviders.join(', ')}` }
+    return {
+      type: 'text',
+      value: `Invalid provider: ${arg}\nValid: ${validProviders.join(', ')}`,
+    }
   }
 
   // Check env vars when switching to openai (including settings.env)
@@ -71,37 +87,58 @@ const call: LocalCommandCall = async (args, context) => {
     }
   }
 
+  // Check env vars when switching to gemini (including settings.env)
+  if (arg === 'gemini') {
+    const mergedEnv = getMergedEnv()
+    const hasKey = !!mergedEnv.GEMINI_API_KEY
+    // GEMINI_BASE_URL is optional (has default)
+    if (!hasKey) {
+      updateSettingsForSource('userSettings', { modelType: 'gemini' })
+      return {
+        type: 'text',
+        value: `Switched to Gemini provider.\nWarning: Missing env var: GEMINI_API_KEY\nConfigure it via /login or set manually.`,
+      }
+    }
+  }
+
   // Handle different provider types
-  // - 'anthropic' and 'openai' are stored in settings.json (persistent)
+  // - 'anthropic', 'openai', 'gemini' are stored in settings.json (persistent)
   // - 'bedrock', 'vertex', 'foundry' are env-only (do NOT touch settings.json)
-  if (arg === 'anthropic' || arg === 'openai') {
+  if (arg === 'anthropic' || arg === 'openai' || arg === 'gemini') {
     // Clear any cloud provider env vars to avoid conflicts
     delete process.env.CLAUDE_CODE_USE_BEDROCK
     delete process.env.CLAUDE_CODE_USE_VERTEX
     delete process.env.CLAUDE_CODE_USE_FOUNDRY
+    delete process.env.CLAUDE_CODE_USE_OPENAI
+    delete process.env.CLAUDE_CODE_USE_GEMINI
     // Update settings.json
     updateSettingsForSource('userSettings', { modelType: arg })
     // Ensure settings.env gets applied to process.env
     applyConfigEnvironmentVariables()
     return { type: 'text', value: `API provider set to ${arg}.` }
   } else {
-    // Cloud providers: set env vars only, do NOT touch settings.modelType
+    // Cloud providers: set env vars only, do NOT touch settings.json
     delete process.env.CLAUDE_CODE_USE_OPENAI
     delete process.env.OPENAI_API_KEY
     delete process.env.OPENAI_BASE_URL
+    delete process.env.CLAUDE_CODE_USE_GEMINI
     process.env[getEnvVarForProvider(arg)] = '1'
     // Do not modify settings.json - cloud providers controlled solely by env vars
     applyConfigEnvironmentVariables()
-    return { type: 'text', value: `API provider set to ${arg} (via environment variable).` }
+    return {
+      type: 'text',
+      value: `API provider set to ${arg} (via environment variable).`,
+    }
   }
 }
 
 const provider = {
   type: 'local',
   name: 'provider',
-  description: 'Switch API provider (anthropic/openai/bedrock/vertex/foundry)',
+  description:
+    'Switch API provider (anthropic/openai/gemini/bedrock/vertex/foundry)',
   aliases: ['api'],
-  argumentHint: '[anthropic|openai|bedrock|vertex|foundry|unset]',
+  argumentHint: '[anthropic|openai|gemini|bedrock|vertex|foundry|unset]',
   supportsNonInteractive: true,
   load: () => Promise.resolve({ call }),
 } satisfies Command

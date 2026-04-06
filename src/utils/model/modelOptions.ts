@@ -76,22 +76,29 @@ export function getDefaultOptionForUser(fastMode = false): ModelOption {
 
 function getCustomSonnetOption(): ModelOption | undefined {
   const is3P = getAPIProvider() !== 'firstParty'
-  // For OpenAI provider, use OPENAI_DEFAULT_SONNET_MODEL; for other 3P, use ANTHROPIC_DEFAULT_SONNET_MODEL
+  const provider = getAPIProvider()
+  // Use provider-specific DEFAULT_SONNET_MODEL
   const customSonnetModel =
-    getAPIProvider() === 'openai'
+    provider === 'openai'
       ? process.env.OPENAI_DEFAULT_SONNET_MODEL
+      : provider === 'gemini'
+      ? process.env.GEMINI_DEFAULT_SONNET_MODEL
       : process.env.ANTHROPIC_DEFAULT_SONNET_MODEL
   // When a 3P user has a custom sonnet model string, show it directly
   if (is3P && customSonnetModel) {
     const is1m = has1mContext(customSonnetModel)
     // Use appropriate NAME/DESCRIPTION env vars based on provider
     const nameEnv =
-      getAPIProvider() === 'openai'
+      provider === 'openai'
         ? process.env.OPENAI_DEFAULT_SONNET_MODEL_NAME
+        : provider === 'gemini'
+        ? process.env.GEMINI_DEFAULT_SONNET_MODEL_NAME
         : process.env.ANTHROPIC_DEFAULT_SONNET_MODEL_NAME
     const descEnv =
-      getAPIProvider() === 'openai'
+      provider === 'openai'
         ? process.env.OPENAI_DEFAULT_SONNET_MODEL_DESCRIPTION
+        : provider === 'gemini'
+        ? process.env.GEMINI_DEFAULT_SONNET_MODEL_DESCRIPTION
         : process.env.ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION
     return {
       value: 'sonnet',
@@ -118,22 +125,29 @@ function getSonnet46Option(): ModelOption {
 
 function getCustomOpusOption(): ModelOption | undefined {
   const is3P = getAPIProvider() !== 'firstParty'
-  // For OpenAI provider, use OPENAI_DEFAULT_OPUS_MODEL; for other 3P, use ANTHROPIC_DEFAULT_OPUS_MODEL
+  const provider = getAPIProvider()
+  // Use provider-specific DEFAULT_OPUS_MODEL
   const customOpusModel =
-    getAPIProvider() === 'openai'
+    provider === 'openai'
       ? process.env.OPENAI_DEFAULT_OPUS_MODEL
+      : provider === 'gemini'
+      ? process.env.GEMINI_DEFAULT_OPUS_MODEL
       : process.env.ANTHROPIC_DEFAULT_OPUS_MODEL
   // When a 3P user has a custom opus model string, show it directly
   if (is3P && customOpusModel) {
     const is1m = has1mContext(customOpusModel)
     // Use appropriate NAME/DESCRIPTION env vars based on provider
     const nameEnv =
-      getAPIProvider() === 'openai'
+      provider === 'openai'
         ? process.env.OPENAI_DEFAULT_OPUS_MODEL_NAME
+        : provider === 'gemini'
+        ? process.env.GEMINI_DEFAULT_OPUS_MODEL_NAME
         : process.env.ANTHROPIC_DEFAULT_OPUS_MODEL_NAME
     const descEnv =
-      getAPIProvider() === 'openai'
+      provider === 'openai'
         ? process.env.OPENAI_DEFAULT_OPUS_MODEL_DESCRIPTION
+        : provider === 'gemini'
+        ? process.env.GEMINI_DEFAULT_OPUS_MODEL_DESCRIPTION
         : process.env.ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION
     return {
       value: 'opus',
@@ -187,21 +201,28 @@ export function getOpus46_1MOption(fastMode = false): ModelOption {
 
 function getCustomHaikuOption(): ModelOption | undefined {
   const is3P = getAPIProvider() !== 'firstParty'
-  // For OpenAI provider, use OPENAI_DEFAULT_HAIKU_MODEL; for other 3P, use ANTHROPIC_DEFAULT_HAIKU_MODEL
+  const provider = getAPIProvider()
+  // Use provider-specific DEFAULT_HAIKU_MODEL
   const customHaikuModel =
-    getAPIProvider() === 'openai'
+    provider === 'openai'
       ? process.env.OPENAI_DEFAULT_HAIKU_MODEL
+      : provider === 'gemini'
+      ? process.env.GEMINI_DEFAULT_HAIKU_MODEL
       : process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL
   // When a 3P user has a custom haiku model string, show it directly
   if (is3P && customHaikuModel) {
     // Use appropriate NAME/DESCRIPTION env vars based on provider
     const nameEnv =
-      getAPIProvider() === 'openai'
+      provider === 'openai'
         ? process.env.OPENAI_DEFAULT_HAIKU_MODEL_NAME
+        : provider === 'gemini'
+        ? process.env.GEMINI_DEFAULT_HAIKU_MODEL_NAME
         : process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME
     const descEnv =
-      getAPIProvider() === 'openai'
+      provider === 'openai'
         ? process.env.OPENAI_DEFAULT_HAIKU_MODEL_DESCRIPTION
+        : provider === 'gemini'
+        ? process.env.GEMINI_DEFAULT_HAIKU_MODEL_DESCRIPTION
         : process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL_DESCRIPTION
     return {
       value: 'haiku',

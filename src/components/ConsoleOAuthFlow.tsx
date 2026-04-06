@@ -561,9 +561,9 @@ function OAuthStatusMessage({
                     state: 'gemini_api',
                     baseUrl: process.env.GEMINI_BASE_URL ?? '',
                     apiKey: process.env.GEMINI_API_KEY ?? '',
-                    haikuModel: process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL ?? '',
-                    sonnetModel: process.env.ANTHROPIC_DEFAULT_SONNET_MODEL ?? '',
-                    opusModel: process.env.ANTHROPIC_DEFAULT_OPUS_MODEL ?? '',
+                    haikuModel: process.env.GEMINI_DEFAULT_HAIKU_MODEL ?? '',
+                    sonnetModel: process.env.GEMINI_DEFAULT_SONNET_MODEL ?? '',
+                    opusModel: process.env.GEMINI_DEFAULT_OPUS_MODEL ?? '',
                     activeField: 'base_url',
                   })
                 } else if (value === 'platform') {
@@ -1127,9 +1127,9 @@ function OAuthStatusMessage({
           const env: Record<string, string> = {}
           if (finalVals.base_url) env.GEMINI_BASE_URL = finalVals.base_url
           if (finalVals.api_key) env.GEMINI_API_KEY = finalVals.api_key
-          if (finalVals.haiku_model) env.ANTHROPIC_DEFAULT_HAIKU_MODEL = finalVals.haiku_model
-          if (finalVals.sonnet_model) env.ANTHROPIC_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
-          if (finalVals.opus_model) env.ANTHROPIC_DEFAULT_OPUS_MODEL = finalVals.opus_model
+          if (finalVals.haiku_model) env.GEMINI_DEFAULT_HAIKU_MODEL = finalVals.haiku_model
+          if (finalVals.sonnet_model) env.GEMINI_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
+          if (finalVals.opus_model) env.GEMINI_DEFAULT_OPUS_MODEL = finalVals.opus_model
           const { error } = updateSettingsForSource('userSettings', {
             modelType: 'gemini' as any,
             env,
