@@ -1,16 +1,4 @@
-import { describe, expect, test, beforeEach, afterEach, beforeAll, afterAll } from "bun:test";
-// import { getAPIProvider, isFirstPartyAnthropicBaseUrl } from "../providers";
-import { readFileSync, writeFileSync } from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { homedir } from "os";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-function getSettingsPath(): string {
-  return path.join(homedir(), ".claude", "settings.json");
-}
+import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import { mock } from "bun:test";
 
 let mockedModelType: "gemini" | undefined;
@@ -32,27 +20,7 @@ describe("getAPIProvider", () => {
     "CLAUDE_CODE_USE_OPENAI",
   ] as const;
   const savedEnv: Record<string, string | undefined> = {};
-  let originalSettings: string = "";
 
-  beforeAll(() => {
-    // Backup and clear settings.json modelType
-    const settingsPath = getSettingsPath();
-    try {
-      originalSettings = readFileSync(settingsPath, "utf-8");
-      const parsed = JSON.parse(originalSettings);
-      delete parsed.modelType;
-      writeFileSync(settingsPath, JSON.stringify(parsed, null, 2) + "\n");
-    } catch (e) {
-      // If file doesn't exist or can't parse, ignore
-    }
-  });
-
-  afterAll(() => {
-    // Restore original settings.json
-    if (originalSettings) {
-      writeFileSync(getSettingsPath(), originalSettings);
-    }
-  });
 
   beforeEach(() => {
     // Save and clear environment variables
