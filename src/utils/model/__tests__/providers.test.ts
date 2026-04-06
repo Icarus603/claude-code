@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
+import { describe, expect, test, beforeEach, afterEach } from "bun:test";
+import { mock } from "bun:test";
 
 let mockedModelType: "gemini" | undefined;
 
@@ -16,10 +17,13 @@ describe("getAPIProvider", () => {
     "CLAUDE_CODE_USE_BEDROCK",
     "CLAUDE_CODE_USE_VERTEX",
     "CLAUDE_CODE_USE_FOUNDRY",
+    "CLAUDE_CODE_USE_OPENAI",
   ] as const;
   const savedEnv: Record<string, string | undefined> = {};
 
+
   beforeEach(() => {
+    // Save and clear environment variables
     mockedModelType = undefined;
     for (const key of envKeys) {
       savedEnv[key] = process.env[key];
@@ -28,6 +32,7 @@ describe("getAPIProvider", () => {
   });
 
   afterEach(() => {
+    // Restore environment variables
     mockedModelType = undefined;
     for (const key of envKeys) {
       if (savedEnv[key] !== undefined) {
