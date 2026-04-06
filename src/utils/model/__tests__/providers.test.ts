@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, afterEach, beforeAll, afterAll } from "bun:test";
-import { getAPIProvider, isFirstPartyAnthropicBaseUrl } from "../providers";
+// import { getAPIProvider, isFirstPartyAnthropicBaseUrl } from "../providers";
 import { readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 function getSettingsPath(): string {
   return path.join(homedir(), ".claude", "settings.json");
 }
-import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
+import { mock } from "bun:test";
 
 let mockedModelType: "gemini" | undefined;
 
