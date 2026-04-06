@@ -199,4 +199,69 @@ describe('anthropicMessagesToGemini', () => {
       },
     ])
   })
+
+  test('converts base64 image to inlineData', () => {
+    const result = anthropicMessagesToGemini(
+      [makeUserMsg([
+        { type: 'text', text: 'describe this' },
+        {
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: 'image/png',
+            data: 'iVBORw0KGgo=',
+          },
+        },
+      ])],
+      [] as any,
+    )
+    expect(result.contents).toEqual([
+      {
+        role: 'user',
+        parts: [
+          { text: 'describe this' },
+          { inlineData: { mimeType: 'image/png', data: 'iVBORw0KGgo=' } },
+        ],
+      },
+    ])
+  })
+
+  test('converts url image to text fallback', () => {
+    const result = anthropicMessagesToGemini(
+      [makeUserMsg([
+        {
+          type: 'image',
+          source: {
+            type: 'url',
+            url: 'https://example.com/img.png',
+          },
+        },
+      ])],
+      [] as any,
+    )
+    expect(result.contents).toEqual([
+      {
+        role: 'user',
+        parts: [{ text: '[image: https://example.com/img.png]' }],
+      },
+    ])
+  })
+
+  test('defaults to image/png when media_type is missing', () => {
+    const result = anthropicMessagesToGemini(
+      [makeUserMsg([
+        {
+          type: 'image',
+          source: {
+            type: 'base64',
+            data: 'ABC123',
+          },
+        },
+      ])],
+      [] as any,
+    )
+    expect(result.contents[0].parts[0]).toEqual({
+      inlineData: { mimeType: 'image/png', data: 'ABC123' },
+    })
+  })
 })

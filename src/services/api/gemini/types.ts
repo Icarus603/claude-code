@@ -10,12 +10,18 @@ export type GeminiFunctionResponse = {
   response?: Record<string, unknown>
 }
 
+export type GeminiInlineData = {
+  mimeType: string
+  data: string
+}
+
 export type GeminiPart = {
   text?: string
   thought?: boolean
   thoughtSignature?: string
   functionCall?: GeminiFunctionCall
   functionResponse?: GeminiFunctionResponse
+  inlineData?: GeminiInlineData
 }
 
 export type GeminiContent = {

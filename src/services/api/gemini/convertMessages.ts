@@ -113,6 +113,26 @@ function convertUserContentBlockToGeminiParts(
     ]
   }
 
+  // 将 Anthropic image 块转换为 Gemini inlineData
+  if (block.type === 'image') {
+    const source = block.source as Record<string, unknown> | undefined
+    if (source?.type === 'base64' && typeof source.data === 'string') {
+      const mediaType = (source.media_type as string) || 'image/png'
+      return [
+        {
+          inlineData: {
+            mimeType: mediaType,
+            data: source.data,
+          },
+        },
+      ]
+    }
+    // url 类型的图片，Gemini 不直接支持，转为文本描述
+    if (source?.type === 'url' && typeof source.url === 'string') {
+      return createTextGeminiParts(`[image: ${source.url}]`)
+    }
+  }
+
   return []
 }
 
