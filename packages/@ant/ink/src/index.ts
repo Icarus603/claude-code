@@ -16,6 +16,48 @@ export type { RenderOptions, Instance, Root } from './core/root.js'
 // InkCore class
 export { default as Ink } from './core/ink.js'
 
+
+// ============================================================
+// Keybindings
+// ============================================================
+export { useKeybinding, useKeybindings } from './keybindings/useKeybinding.js'
+export {
+  KeybindingProvider,
+  useKeybindingContext,
+  useOptionalKeybindingContext,
+  useRegisterKeybindingContext,
+} from './keybindings/KeybindingContext.js'
+export {
+  resolveKey,
+  resolveKeyWithChordState,
+  getBindingDisplayText,
+  keystrokesEqual,
+  type ResolveResult,
+  type ChordResolveResult,
+} from './keybindings/resolver.js'
+export {
+  parseKeystroke,
+  parseChord,
+  keystrokeToString,
+  chordToString,
+  keystrokeToDisplayString,
+  chordToDisplayString,
+  parseBindings,
+} from './keybindings/parser.js'
+export {
+  getKeyName,
+  matchesKeystroke,
+  matchesBinding,
+} from './keybindings/match.js'
+export type {
+  ParsedBinding,
+  ParsedKeystroke,
+  KeybindingContextName,
+  KeybindingBlock,
+  Chord,
+  KeybindingAction,
+} from './keybindings/types.js'
+
 // ============================================================
 // Core types
 // ============================================================

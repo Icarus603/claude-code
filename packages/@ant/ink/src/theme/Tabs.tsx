@@ -14,7 +14,7 @@ import ScrollBox from '../components/ScrollBox.js'
 import type { KeyboardEvent } from '../core/events/keyboard-event.js'
 import { stringWidth } from '../core/stringWidth.js'
 import { Box, Text } from '../index.js'
-import { useKeybindings } from './keybindings.js'
+import { useKeybindings } from '../keybindings/useKeybinding.js'
 import type { Theme } from './theme-types.js'
 
 type TabsProps = {

@@ -4,7 +4,7 @@ import {
   useExitOnCtrlCDWithKeybindings,
 } from '../hooks/useExitOnCtrlCD.js'
 import { Box, Text } from '../index.js'
-import { useKeybinding } from './keybindings.js'
+import { useKeybinding } from '../keybindings/useKeybinding.js'
 import type { Theme } from './theme-types.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Byline } from './Byline.js'
