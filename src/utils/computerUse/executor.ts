@@ -428,12 +428,19 @@ export function createCliExecutor(opts: {
         ),
       )
       // Ensure the result has fields expected by toolCalls.ts (hidden, displayId).
-      // macOS native returns these from Swift; our cross-platform ComputerUseAPI
+      // macOS native returns these from Swift; our AppleScript/screencapture backend
       // returns {base64, width, height} — fill in the missing fields.
+      // displayWidth/displayHeight are the LOGICAL display dimensions (not image px).
+      // scaleCoord() uses displayWidth/screenshotWidth as the px→pt ratio, so
+      // these must be correct or every click lands at (0,0) (Apple menu).
       return {
         ...raw,
         hidden: (raw as any).hidden ?? [],
         displayId: (raw as any).displayId ?? opts.preferredDisplayId ?? d.displayId,
+        displayWidth: (raw as any).displayWidth ?? d.width,
+        displayHeight: (raw as any).displayHeight ?? d.height,
+        originX: (raw as any).originX ?? (d as any).originX ?? 0,
+        originY: (raw as any).originY ?? (d as any).originY ?? 0,
       }
     },
 
@@ -452,7 +459,7 @@ export function createCliExecutor(opts: {
         d.height,
         d.scaleFactor,
       )
-      return drainRunLoop(() =>
+      const raw = await drainRunLoop(() =>
         cu.screenshot.captureExcluding(
           withoutTerminal(opts.allowedBundleIds),
           SCREENSHOT_JPEG_QUALITY,
@@ -461,6 +468,18 @@ export function createCliExecutor(opts: {
           opts.displayId,
         ),
       )
+      // Fill in displayWidth/displayHeight/originX/Y so scaleCoord() can
+      // convert image-pixel coordinates to logical display points. Without
+      // these, scaleCoord() computes NaN → 0, and every click lands at
+      // (0,0) which is the Apple menu (top-left corner of the screen).
+      return {
+        ...raw,
+        displayWidth: (raw as any).displayWidth ?? d.width,
+        displayHeight: (raw as any).displayHeight ?? d.height,
+        originX: (raw as any).originX ?? (d as any).originX ?? 0,
+        originY: (raw as any).originY ?? (d as any).originY ?? 0,
+        displayId: opts.displayId ?? d.displayId,
+      }
     },
 
     async zoom(
@@ -548,7 +567,20 @@ export function createCliExecutor(opts: {
 
     async type(text: string, opts: { viaClipboard: boolean }): Promise<void> {
       const input = requireComputerUseInput()
-      if (opts.viaClipboard) {
+      // On macOS, System Events `keystroke` has two failure modes:
+      //   1. Non-ASCII (CJK, emoji): no keyboard mapping → falls back to
+      //      keyCode 0 ('a'), so "你好" types as "aa".
+      //   2. ASCII with an active CJK IME: letters enter IME composition mode,
+      //      and a subsequent space is consumed as "select candidate" instead
+      //      of inserting a space (e.g. "我是 Claude Code" → "我是 ClaudeCode").
+      // Clipboard paste bypasses the IME pipeline entirely for both cases.
+      // On other platforms there is no IME-vs-keystroke conflict, so only
+      // non-ASCII needs the clipboard path there.
+      const needsClipboard =
+        opts.viaClipboard ||
+        process.platform === 'darwin' ||
+        /[^\x00-\x7F]/.test(text)
+      if (needsClipboard) {
         await drainRunLoop(() => typeViaClipboard(input, text))
         return
       }

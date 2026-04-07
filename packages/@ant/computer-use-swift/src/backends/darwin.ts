@@ -85,13 +85,17 @@ export const display: DisplayAPI = {
           var mode = $.CGDisplayCopyDisplayMode(did);
           var pw = $.CGDisplayModeGetPixelWidth(mode);
           var sf = pw > 0 && w > 0 ? pw / w : 2;
-          result.push({width: w, height: h, scaleFactor: sf, displayId: did});
+          var bounds = $.CGDisplayBounds(did);
+          result.push({width: w, height: h, scaleFactor: sf, displayId: did,
+            originX: bounds.origin.x, originY: bounds.origin.y});
         }
         JSON.stringify(result);
       `)
       return (JSON.parse(raw) as DisplayGeometry[]).map(d => ({
         width: Number(d.width), height: Number(d.height),
         scaleFactor: Number(d.scaleFactor), displayId: Number(d.displayId),
+        originX: Number((d as any).originX ?? 0),
+        originY: Number((d as any).originY ?? 0),
       }))
     } catch {
       try {
@@ -109,7 +113,9 @@ export const display: DisplayAPI = {
               width: Math.round(frame.size.width),
               height: Math.round(frame.size.height),
               scaleFactor: backingFactor,
-              displayId: screenNumber
+              displayId: screenNumber,
+              originX: Math.round(frame.origin.x),
+              originY: Math.round(frame.origin.y),
             });
           }
           JSON.stringify(result);
@@ -117,6 +123,8 @@ export const display: DisplayAPI = {
         return (JSON.parse(raw) as DisplayGeometry[]).map(d => ({
           width: Number(d.width), height: Number(d.height),
           scaleFactor: Number(d.scaleFactor), displayId: Number(d.displayId),
+          originX: Number((d as any).originX ?? 0),
+          originY: Number((d as any).originY ?? 0),
         }))
       } catch {
         return [{ width: 1920, height: 1080, scaleFactor: 2, displayId: 1 }]
@@ -130,12 +138,94 @@ export const display: DisplayAPI = {
 // ---------------------------------------------------------------------------
 
 export const apps: AppsAPI = {
-  async prepareDisplay(_allowlistBundleIds, _surrogateHost, _displayId) {
-    return { activated: '', hidden: [] }
+  async prepareDisplay(allowlistBundleIds, surrogateHost, _displayId) {
+    const FINDER_BUNDLE_ID = 'com.apple.finder'
+    const hidden: string[] = []
+    let activated = ''
+
+    // Step 1: Get all visible foreground apps.
+    let runningVisible: Array<{ bundleId: string; displayName: string }> = []
+    try {
+      const raw = jxaSync(`
+        var procs = Application("System Events").applicationProcesses.whose({backgroundOnly: false});
+        var result = [];
+        for (var i = 0; i < procs.length; i++) {
+          try {
+            var p = procs[i];
+            if (p.visible()) {
+              result.push({ bundleId: p.bundleIdentifier(), displayName: p.name() });
+            }
+          } catch(e) {}
+        }
+        JSON.stringify(result);
+      `)
+      runningVisible = JSON.parse(raw)
+    } catch {
+      // If we can't enumerate, proceed with best-effort activation only.
+    }
+
+    const allowSet = new Set(allowlistBundleIds)
+
+    // Step 2: Hide visible apps that are not in the allowlist and not Finder.
+    // The surrogate host (terminal) is included here — it must step back so
+    // the target app can receive events.
+    for (const app of runningVisible) {
+      if (allowSet.has(app.bundleId)) continue
+      if (app.bundleId === FINDER_BUNDLE_ID) continue
+      try {
+        await osascript(`
+          tell application "System Events"
+            set visible of (first application process whose bundle identifier is "${app.bundleId}") to false
+          end tell
+        `)
+        hidden.push(app.bundleId)
+      } catch {
+        // Non-fatal: if we can't hide it, keep going.
+      }
+    }
+
+    // Step 3: Activate the first running allowlisted app to bring it forward.
+    const runningBundleIds = new Set(runningVisible.map(a => a.bundleId))
+    for (const bundleId of allowlistBundleIds) {
+      if (!runningBundleIds.has(bundleId)) continue
+      try {
+        await osascript(`tell application id "${bundleId}" to activate`)
+        // Brief settle time so macOS processes the window-manager event.
+        await Bun.sleep(150)
+        activated = bundleId
+      } catch {
+        // Non-fatal.
+      }
+      break
+    }
+
+    return { activated, hidden }
   },
 
-  async previewHideSet(_bundleIds, _displayId) {
-    return []
+  async previewHideSet(bundleIds, _displayId) {
+    // Return the apps that WOULD be hidden (i.e. running foreground apps
+    // not in the allowlist and not Finder) so the approval dialog can show them.
+    const FINDER_BUNDLE_ID = 'com.apple.finder'
+    try {
+      const raw = jxaSync(`
+        var procs = Application("System Events").applicationProcesses.whose({backgroundOnly: false});
+        var result = [];
+        for (var i = 0; i < procs.length; i++) {
+          try {
+            var p = procs[i];
+            if (p.visible()) {
+              result.push({ bundleId: p.bundleIdentifier(), displayName: p.name() });
+            }
+          } catch(e) {}
+        }
+        JSON.stringify(result);
+      `)
+      const running: Array<{ bundleId: string; displayName: string }> = JSON.parse(raw)
+      const allowSet = new Set(bundleIds)
+      return running.filter(a => !allowSet.has(a.bundleId) && a.bundleId !== FINDER_BUNDLE_ID)
+    } catch {
+      return []
+    }
   },
 
   async findWindowDisplays(bundleIds) {
@@ -217,15 +307,41 @@ export const apps: AppsAPI = {
 
   async open(bundleId) {
     await osascript(`tell application id "${bundleId}" to activate`)
+    // Give macOS time to process the window-manager event before the
+    // next tool call arrives (which will call prepareForAction to keep focus).
+    await Bun.sleep(300)
   },
 
   async unhide(bundleIds) {
-    for (const bundleId of bundleIds) {
-      await osascript(`
-        tell application "System Events"
-          set visible of application process (name of application process whose bundle identifier is "${bundleId}") to true
-        end tell
+    // Use JXA so we can match by bundle ID directly and batch in one call.
+    if (bundleIds.length === 0) return
+    try {
+      await jxa(`
+        var ids = ${JSON.stringify(bundleIds)};
+        var procs = Application("System Events").applicationProcesses();
+        for (var i = 0; i < procs.length; i++) {
+          try {
+            var p = procs[i];
+            if (ids.indexOf(p.bundleIdentifier()) !== -1) {
+              p.visible = true;
+            }
+          } catch(e) {}
+        }
+        "ok"
       `)
+    } catch {
+      // Fallback: unhide one-by-one via AppleScript name lookup.
+      for (const bundleId of bundleIds) {
+        try {
+          await osascript(`
+            tell application "System Events"
+              set visible of (first application process whose bundle identifier is "${bundleId}") to true
+            end tell
+          `)
+        } catch {
+          // Non-fatal.
+        }
+      }
     }
   },
 }
