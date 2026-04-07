@@ -101,18 +101,59 @@ function processChunk(str: string): void {
       continue
     }
 
-    // Skip escape sequences (arrow keys, function keys, focus events, etc.)
-    // All escape sequences start with ESC (0x1B) and end with a byte in 0x40-0x7E
+    // Skip escape sequences (arrow keys, function keys, terminal responses, etc.)
     if (code === 27) {
       i++ // Skip the ESC character
-      // Skip until the terminating byte (@ to ~) or end of string
-      while (
-        i < str.length &&
-        !(str.charCodeAt(i) >= 64 && str.charCodeAt(i) <= 126)
+      if (i >= str.length) continue
+
+      const introducer = str.charCodeAt(i)
+
+      // DCS (P), OSC (]), APC (_), PM (^), SOS (X) — string sequences
+      // terminated by BEL (0x07) or ST (ESC \). XTVERSION and DA1 responses
+      // arrive as DCS/CSI strings; without proper handling they leak through
+      // as printable text (e.g. ">|iTerm2 3.6.9?64;...c" in the input box).
+      if (
+        introducer === 0x50 || // P - DCS
+        introducer === 0x5d || // ] - OSC
+        introducer === 0x5f || // _ - APC
+        introducer === 0x5e || // ^ - PM
+        introducer === 0x58    // X - SOS
       ) {
-        i++
+        i++ // Skip introducer
+        while (i < str.length) {
+          if (str.charCodeAt(i) === 0x07) { // BEL terminator
+            i++
+            break
+          }
+          if (
+            str.charCodeAt(i) === 0x1b &&
+            i + 1 < str.length &&
+            str.charCodeAt(i + 1) === 0x5c // ST = ESC \
+          ) {
+            i += 2
+            break
+          }
+          i++
+        }
+      } else if (introducer === 0x5b) { // [ - CSI: skip params + final byte
+        i++ // Skip [
+        while (
+          i < str.length &&
+          !(str.charCodeAt(i) >= 0x40 && str.charCodeAt(i) <= 0x7e)
+        ) {
+          i++
+        }
+        if (i < str.length) i++ // Skip CSI final byte
+      } else {
+        // Simple two-char escape (e.g. ESC A, ESC O x for SS3)
+        while (
+          i < str.length &&
+          !(str.charCodeAt(i) >= 64 && str.charCodeAt(i) <= 126)
+        ) {
+          i++
+        }
+        if (i < str.length) i++ // Skip the terminating byte
       }
-      if (i < str.length) i++ // Skip the terminating byte
       continue
     }
 

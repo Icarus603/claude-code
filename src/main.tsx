@@ -173,7 +173,7 @@ import {
   launchTeleportRepoMismatchDialog,
   launchTeleportResumeWrapper,
 } from './dialogLaunchers.js'
-import { SHOW_CURSOR } from '@anthropic/ink'
+import { SHOW_CURSOR, setAppCallbacks } from '@anthropic/ink'
 import {
   exitWithError,
   exitWithMessage,
@@ -3234,6 +3234,15 @@ async function run(): Promise<CommanderCommand> {
         }
 
         const { createRoot } = await import('@anthropic/ink')
+        // Wire early-input capture teardown into Ink's raw-mode lifecycle.
+        // App.tsx calls stopCapturingEarlyInput() when it first enables raw mode
+        // so both handlers never coexist on stdin (which would let terminal query
+        // responses like XTVERSION leak into the early-input buffer as text).
+        setAppCallbacks({
+          stopCapturingEarlyInput,
+          logForDebugging: (msg, opts) => logForDebugging(msg, opts),
+          logError: (err) => logError(err),
+        })
         root = await createRoot(ctx.renderOptions)
 
         // Log startup time now, before any blocking dialog renders. Logging
