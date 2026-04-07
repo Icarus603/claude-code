@@ -38,6 +38,8 @@ const DEFAULT_FEATURES = [
   // P1: API-dependent features (upstream)
   "EXTRACT_MEMORIES", "VERIFICATION_AGENT",
   "KAIROS_BRIEF", "AWAY_SUMMARY", "ULTRAPLAN",
+  // P2: daemon + remote control server
+  "DAEMON",
 ];
 
 // Any env var matching FEATURE_<NAME>=1 will also enable that feature.
