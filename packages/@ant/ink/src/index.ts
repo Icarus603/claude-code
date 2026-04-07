@@ -77,6 +77,7 @@ export { AlternateScreen } from './components/AlternateScreen.js'
 // App types
 export type { Props as AppProps } from './components/AppContext.js'
 export type { Props as StdinProps } from './components/StdinContext.js'
+export { setAppCallbacks } from './components/App.js'
 export { TerminalSizeContext, type TerminalSize } from './components/TerminalSizeContext.js'
 
 // ============================================================
