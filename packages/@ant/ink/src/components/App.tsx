@@ -315,9 +315,21 @@ export default class App extends PureComponent<Props, State> {
       if (this.rawModeEnabledCount === 0) {
         // Stop early input capture right before we add our own readable handler.
         // Both use the same stdin 'readable' + read() pattern, so they can't
-        // coexist -- our handler would drain stdin before Ink's can see it.
-        // The buffered text is preserved for REPL.tsx via consumeEarlyInput().
+        // coexist -- the early capture handler would drain stdin before ours
+        // can see it. The buffered text is preserved for REPL.tsx via consumeEarlyInput().
         defaultCallbacks.stopCapturingEarlyInput()
+
+        // Safety net: remove any pre-existing readable listeners that aren't
+        // ours. In builds where setAppCallbacks() was never called, the early
+        // input capture's readableHandler remains attached and would consume
+        // all stdin data before our handleReadable sees it.
+        const existingListeners = stdin.listeners('readable')
+        for (const listener of existingListeners) {
+          if (listener !== this.handleReadable) {
+            stdin.removeListener('readable', listener as any)
+          }
+        }
+
         stdin.ref()
         stdin.setRawMode(true)
         stdin.addListener('readable', this.handleReadable)
@@ -363,6 +375,17 @@ export default class App extends PureComponent<Props, State> {
 
     // Disable raw mode only when no components left that are using it
     if (--this.rawModeEnabledCount === 0) {
+      // Guard: React 19 runs new useLayoutEffect setup before old cleanup when
+      // replacing the tree (e.g., showSetupDialog → launchResumeChooser).
+      // If the old tree had more useInput hooks than the new tree, the old
+      // cleanup over-decrements the count to 0 even though the new tree has
+      // active listeners. Detect this and fix the count instead of disabling.
+      const activeListeners = this.internal_eventEmitter.listenerCount('input')
+      if (activeListeners > 0) {
+        this.rawModeEnabledCount = activeListeners
+        return
+      }
+
       this.props.stdout.write(DISABLE_MODIFY_OTHER_KEYS)
       this.props.stdout.write(DISABLE_KITTY_KEYBOARD)
       // Disable terminal focus reporting (DECSET 1004)
