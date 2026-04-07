@@ -27,6 +27,38 @@ class DebugLogger implements Logger {
   }
 }
 
+// ---------------------------------------------------------------------------
+// JXA-based TCC permission probes (fallback when native .node module absent)
+// ---------------------------------------------------------------------------
+
+/** Probe accessibility by asking System Events for a process list. */
+function checkAccessibilityJXA(): boolean {
+  try {
+    const result = Bun.spawnSync({
+      cmd: ['osascript', '-e', 'tell application "System Events" to get name of every process whose background only is false'],
+      stdout: 'pipe',
+      stderr: 'pipe',
+    })
+    return result.exitCode === 0
+  } catch {
+    return false
+  }
+}
+
+/** Probe screen recording by attempting a 1x1 screencapture. */
+function checkScreenRecordingJXA(): boolean {
+  try {
+    const result = Bun.spawnSync({
+      cmd: ['screencapture', '-x', '-R', '0,0,1,1', '/dev/null'],
+      stdout: 'pipe',
+      stderr: 'pipe',
+    })
+    return result.exitCode === 0
+  } catch {
+    return false
+  }
+}
+
 let cached: ComputerUseHostAdapter | undefined
 
 /**
@@ -47,8 +79,19 @@ export function getComputerUseHostAdapter(): ComputerUseHostAdapter {
     ensureOsPermissions: async () => {
       if (process.platform !== 'darwin') return { granted: true }
       const cu = requireComputerUseSwift()
-      const accessibility = (cu as any).tcc.checkAccessibility()
-      const screenRecording = (cu as any).tcc.checkScreenRecording()
+      const tcc = (cu as any).tcc
+      // Native Swift .node module provides tcc.checkAccessibility/checkScreenRecording.
+      // When absent (decompiled/reverse-engineered build), fall back to JXA probes.
+      if (tcc) {
+        const accessibility = tcc.checkAccessibility()
+        const screenRecording = tcc.checkScreenRecording()
+        return accessibility && screenRecording
+          ? { granted: true }
+          : { granted: false, accessibility, screenRecording }
+      }
+      // JXA fallback: try to query System Events (accessibility) and screencapture (screen recording).
+      const accessibility = checkAccessibilityJXA()
+      const screenRecording = checkScreenRecordingJXA()
       return accessibility && screenRecording
         ? { granted: true }
         : { granted: false, accessibility, screenRecording }

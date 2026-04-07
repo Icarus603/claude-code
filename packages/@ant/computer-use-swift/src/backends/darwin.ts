@@ -159,25 +159,33 @@ export const apps: AppsAPI = {
 
   async listInstalled() {
     try {
-      const result = await osascript(`
-        tell application "System Events"
-          set appList to ""
-          repeat with appFile in (every file of folder "Applications" of startup disk whose name ends with ".app")
-            set appPath to POSIX path of (appFile as alias)
-            set appName to name of appFile
-            set appList to appList & appPath & "|" & appName & "\\n"
-          end repeat
-          return appList
-        end tell
-      `)
-      return result.split('\n').filter(Boolean).map(line => {
-        const [path, name] = line.split('|', 2)
-        const displayName = (name ?? '').replace(/\.app$/, '')
-        return {
-          bundleId: `com.app.${displayName.toLowerCase().replace(/\s+/g, '-')}`,
-          displayName,
-          path: path ?? '',
+      // Use mdls to enumerate apps and get real bundle identifiers.
+      // The previous AppleScript approach generated fake bundle IDs
+      // (com.app.display-name) which prevented request_access from matching
+      // apps by their real bundle ID (e.g. com.google.Chrome).
+      const dirs = ['/Applications', '~/Applications', '/System/Applications']
+      const allApps: InstalledApp[] = []
+      for (const dir of dirs) {
+        const expanded = dir.startsWith('~') ? join(process.env.HOME ?? '~', dir.slice(1)) : dir
+        const proc = Bun.spawn(
+          ['bash', '-c', `for f in "${expanded}"/*.app; do [ -d "$f" ] || continue; bid=$(mdls -name kMDItemCFBundleIdentifier "$f" 2>/dev/null | sed 's/.*= "//;s/"//'); name=$(basename "$f" .app); echo "$f|$name|$bid"; done`],
+          { stdout: 'pipe', stderr: 'pipe' },
+        )
+        const text = await new Response(proc.stdout).text()
+        await proc.exited
+        for (const line of text.split('\n').filter(Boolean)) {
+          const [path, displayName, bundleId] = line.split('|', 3)
+          if (path && displayName && bundleId && bundleId !== '(null)') {
+            allApps.push({ bundleId, displayName, path })
+          }
         }
+      }
+      // Deduplicate by bundleId (prefer /Applications over ~/Applications)
+      const seen = new Set<string>()
+      return allApps.filter(app => {
+        if (seen.has(app.bundleId)) return false
+        seen.add(app.bundleId)
+        return true
       })
     } catch {
       return []
