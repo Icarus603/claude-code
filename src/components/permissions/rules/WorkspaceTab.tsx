@@ -6,7 +6,6 @@ import type { CommandResultDisplay } from '../../../commands.js'
 import { Select } from '../../../components/CustomSelect/select.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolPermissionContext } from '../../../Tool.js'
-import { useTabHeaderFocus } from '../../design-system/Tabs.js'
 
 type Props = {
   onExit: (

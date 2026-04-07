@@ -8,7 +8,6 @@ import {
 } from '../../../utils/autoModeDenials.js'
 import { Select } from '../../CustomSelect/select.js'
 import { StatusIcon } from '@anthropic/ink'
-import { useTabHeaderFocus } from '../../design-system/Tabs.js'
 
 type Props = {
   onHeaderFocusChange?: (focused: boolean) => void

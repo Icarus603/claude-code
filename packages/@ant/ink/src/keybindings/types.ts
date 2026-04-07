@@ -21,3 +21,34 @@ export type KeybindingBlock = {
 }
 export type Chord = ParsedKeystroke[]
 export type KeybindingAction = string
+
+/**
+ * Types of validation issues that can occur with keybindings.
+ */
+export type KeybindingWarningType =
+  | 'parse_error'
+  | 'duplicate'
+  | 'reserved'
+  | 'invalid_context'
+  | 'invalid_action'
+
+/**
+ * A warning or error about a keybinding configuration issue.
+ */
+export type KeybindingWarning = {
+  type: KeybindingWarningType
+  severity: 'error' | 'warning'
+  message: string
+  key?: string
+  context?: string
+  action?: string
+  suggestion?: string
+}
+
+/**
+ * Result of loading keybindings, including any validation warnings.
+ */
+export type KeybindingsLoadResult = {
+  bindings: ParsedBinding[]
+  warnings: KeybindingWarning[]
+}

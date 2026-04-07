@@ -203,7 +203,6 @@ import {
 } from "./tools/AgentTool/loadAgentsDir.js";
 import type { LogOption } from "./types/logs.js";
 import type { Message as MessageType } from "./types/message.js";
-import { assertMinVersion } from "./utils/autoUpdater.js";
 import {
 	CLAUDE_IN_CHROME_SKILL_HINT,
 	CLAUDE_IN_CHROME_SKILL_HINT_WITH_WEBBROWSER,
@@ -390,7 +389,6 @@ const autoModeStateModule = feature("TRANSCRIPT_CLASSIFIER")
 	: null;
 
 // TeleportRepoMismatchDialog, TeleportResumeWrapper dynamically imported at call sites
-import { migrateAutoUpdatesToSettings } from "./migrations/migrateAutoUpdatesToSettings.js";
 import { migrateBypassPermissionsAcceptedToSettings } from "./migrations/migrateBypassPermissionsAcceptedToSettings.js";
 import { migrateEnableAllProjectMcpServersToSettings } from "./migrations/migrateEnableAllProjectMcpServersToSettings.js";
 import { migrateFennecToOpus } from "./migrations/migrateFennecToOpus.js";
@@ -587,7 +585,6 @@ async function logStartupTelemetry(): Promise<void> {
 const CURRENT_MIGRATION_VERSION = 11;
 function runMigrations(): void {
 	if (getGlobalConfig().migrationVersion !== CURRENT_MIGRATION_VERSION) {
-		migrateAutoUpdatesToSettings();
 		migrateBypassPermissionsAcceptedToSettings();
 		migrateEnableAllProjectMcpServersToSettings();
 		resetProToOpusDefault();
@@ -2731,7 +2728,6 @@ async function run(): Promise<CommanderCommand> {
 				console.error(warning);
 			});
 
-			void assertMinVersion();
 
 			// claude.ai config fetch: -p mode only (interactive uses useManageMCPConnections
 			// two-phase loading). Kicked off here to overlap with setup(); awaited
@@ -6497,20 +6493,6 @@ async function run(): Promise<CommanderCommand> {
       await doctorHandler(root)
     })
 
-	// claude update
-	//
-	// For SemVer-compliant versioning with build metadata (X.X.X+SHA):
-	// - We perform exact string comparison (including SHA) to detect any change
-	// - This ensures users always get the latest build, even when only the SHA changes
-	// - UI shows both versions including build metadata for clarity
-	program
-		.command("update")
-		.alias("upgrade")
-		.description("Check for updates and install if available")
-		.action(async () => {
-			const { update } = await import("src/cli/update.js");
-			await update();
-		});
 
 	// claude up — run the project's CLAUDE.md "# claude up" setup instructions.
 	if (process.env.USER_TYPE === "ant") {

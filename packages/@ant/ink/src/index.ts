@@ -49,6 +49,10 @@ export {
   matchesKeystroke,
   matchesBinding,
 } from './keybindings/match.js'
+export {
+  KeybindingSetup,
+  type KeybindingSetupProps,
+} from './keybindings/KeybindingSetup.js'
 export type {
   ParsedBinding,
   ParsedKeystroke,
@@ -56,6 +60,9 @@ export type {
   KeybindingBlock,
   Chord,
   KeybindingAction,
+  KeybindingWarningType,
+  KeybindingWarning,
+  KeybindingsLoadResult,
 } from './keybindings/types.js'
 
 // ============================================================
@@ -130,6 +137,10 @@ export { useAnimationFrame } from './hooks/use-animation-frame.js'
 export { useAnimationTimer, useInterval } from './hooks/use-interval.js'
 export { useSelection, useHasSelection } from './hooks/use-selection.js'
 export { default as useStdin } from './hooks/use-stdin.js'
+export { useTerminalSize } from './hooks/useTerminalSize.js'
+export { useTimeout } from './hooks/useTimeout.js'
+export { useMinDisplayTime } from './hooks/useMinDisplayTime.js'
+export { useDoublePress, DOUBLE_PRESS_TIMEOUT_MS } from './hooks/useDoublePress.js'
 export { useTabStatus, type TabStatusKind } from './hooks/use-tab-status.js'
 export { useTerminalFocus } from './hooks/use-terminal-focus.js'
 export { useTerminalTitle } from './hooks/use-terminal-title.js'
@@ -149,11 +160,12 @@ export {
 } from './theme/ThemeProvider.js'
 export { default as Box } from './theme/ThemedBox.js'
 export type { Props as BoxProps } from './theme/ThemedBox.js'
-export { default as Text } from './theme/ThemedText.js'
+export { default as Text, TextHoverColorContext } from './theme/ThemedText.js'
 export type { Props as TextProps } from './theme/ThemedText.js'
 export { color } from './theme/color.js'
 
 // Theme sub-components
+export { SearchBox } from './theme/SearchBox.js'
 export { Dialog } from './theme/Dialog.js'
 export { Divider } from './theme/Divider.js'
 export { FuzzyPicker } from './theme/FuzzyPicker.js'
@@ -163,6 +175,6 @@ export { Pane } from './theme/Pane.js'
 export { ProgressBar } from './theme/ProgressBar.js'
 export { Ratchet } from './theme/Ratchet.js'
 export { StatusIcon } from './theme/StatusIcon.js'
-export { Tabs } from './theme/Tabs.js'
+export { Tabs, Tab, useTabsWidth, useTabHeaderFocus } from './theme/Tabs.js'
 export { Byline } from './theme/Byline.js'
 export { KeyboardShortcutHint } from './theme/KeyboardShortcutHint.js'

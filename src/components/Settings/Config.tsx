@@ -69,8 +69,7 @@ import {
   getMemoryFiles,
   hasExternalClaudeMdIncludes,
 } from 'src/utils/claudemd.js'
-import { Byline, KeyboardShortcutHint } from '@anthropic/ink'
-import { useTabHeaderFocus } from '../design-system/Tabs.js'
+import { Byline, KeyboardShortcutHint, useTabHeaderFocus } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { useIsInsideModal } from '../../context/modalContext.js'
 import { SearchBox } from '../SearchBox.js'
