@@ -68,8 +68,8 @@ export function AutoUpdater({
     }
 
     if (
-      "production" === 'test' ||
-      "production" === 'development'
+      process.env.NODE_ENV === 'test' ||
+      process.env.NODE_ENV === 'development'
     ) {
       logForDebugging(
         'AutoUpdater: Skipping update check in test/dev environment',
