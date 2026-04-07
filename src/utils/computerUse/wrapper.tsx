@@ -29,6 +29,7 @@ import * as React from 'react'
 import { getSessionId } from '../../bootstrap/state.js'
 import { ComputerUseApproval } from '../../components/permissions/ComputerUseApproval/ComputerUseApproval.js'
 import type { Tool, ToolUseContext } from '../../Tool.js'
+import { getGlobalConfig, saveGlobalConfig } from '../config.js'
 import { logForDebugging } from '../debug.js'
 import {
   checkComputerUseLock,
@@ -106,10 +107,49 @@ export function buildSessionContext(): ComputerUseSessionContext {
     // dismissal) is irrelevant here: `setToolJSX` blocks the tool call, so
     // the dialog can't outlive it. Ctrl+C is what matters, and
     // `runPermissionDialog` wires that from the per-call ref's abortController.
-    onPermissionRequest: (req, _dialogSignal) => runPermissionDialog(req),
+    //
+    // In bypassPermissions mode, auto-grant all resolved apps + requested flags
+    // without showing the dialog, then merge in any previously-persisted apps.
+    onPermissionRequest: (req, _dialogSignal) => {
+      if (tuc().getAppState().toolPermissionContext.mode === 'bypassPermissions') {
+        const now = Date.now()
+        // Auto-grant every resolved app the model requested.
+        const granted = req.apps.flatMap(a =>
+          a.resolved
+            ? [{ bundleId: a.resolved.bundleId, displayName: a.resolved.displayName, grantedAt: now }]
+            : [],
+        )
+        // Also merge any previously-persisted approved apps not already in granted.
+        const persistedApps = getGlobalConfig().computerUseApprovedApps ?? []
+        const grantedIds = new Set(granted.map(a => a.bundleId))
+        for (const app of persistedApps) {
+          if (!grantedIds.has(app.bundleId)) {
+            granted.push({ ...app, grantedAt: now })
+          }
+        }
+        const flags = {
+          ...DEFAULT_GRANT_FLAGS,
+          ...Object.fromEntries(
+            Object.entries(req.requestedFlags).filter(([, v]) => v),
+          ),
+        }
+        logForDebugging(`[cu] bypassPermissions: auto-granting ${granted.length} apps`)
+        return Promise.resolve({ granted, denied: [], flags })
+      }
+      return runPermissionDialog(req)
+    },
 
     // Package does the merge (dedupe + truthy-only flags). We just persist.
-    onAllowedAppsChanged: (apps, flags) =>
+    onAllowedAppsChanged: (apps, flags) => {
+      // Persist approved apps to disk so they survive across sessions.
+      saveGlobalConfig(cfg => ({
+        ...cfg,
+        computerUseApprovedApps: apps.map(a => ({
+          bundleId: a.bundleId,
+          displayName: a.displayName,
+          grantedAt: a.grantedAt,
+        })),
+      }))
       tuc().setAppState(prev => {
         const cu = prev.computerUseMcpState
         const prevApps = cu?.allowedApps
@@ -131,7 +171,8 @@ export function buildSessionContext(): ComputerUseSessionContext {
                 grantFlags: flags,
               },
             }
-      }),
+      })
+    },
 
     onAppsHidden: ids => {
       if (ids.length === 0) return

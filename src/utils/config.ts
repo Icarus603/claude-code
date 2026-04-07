@@ -575,6 +575,14 @@ export type GlobalConfig = {
   // CURRENT_MIGRATION_VERSION, runMigrations() skips all sync migrations
   // (avoiding 11× saveGlobalConfig lock+re-read on every startup).
   migrationVersion?: number
+
+  // Computer Use: approved apps persisted across sessions.
+  // Each entry was approved by the user at least once; auto-granted on next session.
+  computerUseApprovedApps?: Array<{
+    bundleId: string
+    displayName: string
+    grantedAt: number
+  }>
 }
 
 /**
