@@ -26,23 +26,23 @@ startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
 import {
-	Command as CommanderCommand,
-	InvalidArgumentError,
-	Option,
-} from "@commander-js/extra-typings";
-import chalk from "chalk";
-import { readFileSync } from "fs";
-import mapValues from "lodash-es/mapValues.js";
-import pickBy from "lodash-es/pickBy.js";
-import uniqBy from "lodash-es/uniqBy.js";
-import React from "react";
-import { getOauthConfig } from "./constants/oauth.js";
-import { getRemoteSessionUrl } from "./constants/product.js";
-import { getSystemContext, getUserContext } from "./context.js";
-import { init, initializeTelemetryAfterTrust } from "./entrypoints/init.js";
-import { addToHistory } from "./history.js";
-import type { Root } from "./ink.js";
-import { launchRepl } from "./replLauncher.js";
+  Command as CommanderCommand,
+  InvalidArgumentError,
+  Option,
+} from '@commander-js/extra-typings'
+import chalk from 'chalk'
+import { readFileSync } from 'fs'
+import mapValues from 'lodash-es/mapValues.js'
+import pickBy from 'lodash-es/pickBy.js'
+import uniqBy from 'lodash-es/uniqBy.js'
+import React from 'react'
+import { getOauthConfig } from './constants/oauth.js'
+import { getRemoteSessionUrl } from './constants/product.js'
+import { getSystemContext, getUserContext } from './context.js'
+import { init, initializeTelemetryAfterTrust } from './entrypoints/init.js'
+import { addToHistory } from './history.js'
+import type { Root } from './ink.js'
+import { launchRepl } from './replLauncher.js'
 import {
 	hasGrowthBookEnvOverride,
 	initializeGrowthBook,
@@ -150,10 +150,10 @@ import { relative, resolve } from "path";
 import { isAnalyticsDisabled } from "src/services/analytics/config.js";
 import { getFeatureValue_CACHED_MAY_BE_STALE } from "src/services/analytics/growthbook.js";
 import {
-	type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-	logEvent,
-} from "src/services/analytics/index.js";
-import { initializeAnalyticsGates } from "src/services/analytics/sink.js";
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  logEvent,
+} from 'src/services/analytics/index.js'
+import { initializeAnalyticsGates } from 'src/services/analytics/sink.js'
 import {
 	getOriginalCwd,
 	setAdditionalDirectoriesForClaudeMd,
@@ -165,15 +165,15 @@ import {
 import { filterCommandsForRemoteMode, getCommands } from "./commands.js";
 import type { StatsStore } from "./context/stats.js";
 import {
-	launchAssistantInstallWizard,
-	launchAssistantSessionChooser,
-	launchInvalidSettingsDialog,
-	launchResumeChooser,
-	launchSnapshotUpdateDialog,
-	launchTeleportRepoMismatchDialog,
-	launchTeleportResumeWrapper,
-} from "./dialogLaunchers.js";
-import { SHOW_CURSOR } from "./ink/termio/dec.js";
+  launchAssistantInstallWizard,
+  launchAssistantSessionChooser,
+  launchInvalidSettingsDialog,
+  launchResumeChooser,
+  launchSnapshotUpdateDialog,
+  launchTeleportRepoMismatchDialog,
+  launchTeleportResumeWrapper,
+} from './dialogLaunchers.js'
+import { SHOW_CURSOR } from './ink/termio/dec.js'
 import {
 	exitWithError,
 	exitWithMessage,
@@ -440,10 +440,10 @@ import {
 	validateSessionRepository,
 } from "./utils/teleport.js";
 import {
-	shouldEnableThinkingByDefault,
-	type ThinkingConfig,
-} from "./utils/thinking.js";
-import { initUser, resetUserCache } from "./utils/user.js";
+  shouldEnableThinkingByDefault,
+  type ThinkingConfig,
+} from './utils/thinking.js'
+import { initUser, resetUserCache } from './utils/user.js'
 import {
 	getTmuxInstallInstructions,
 	isTmuxAvailable,
@@ -3370,8 +3370,8 @@ async function run(): Promise<CommanderCommand> {
 					installAsciicastRecorder();
 				}
 
-				const { createRoot } = await import("./ink.js");
-				root = await createRoot(ctx.renderOptions);
+        const { createRoot } = await import('./ink.js')
+        root = await createRoot(ctx.renderOptions)
 
 				// Log startup time now, before any blocking dialog renders. Logging
 				// from REPL's first render (the old location) included however long
@@ -6365,20 +6365,20 @@ async function run(): Promise<CommanderCommand> {
 		);
 	// END ANT-ONLY
 
-	// Setup token command
-	program
-		.command("setup-token")
-		.description(
-			"Set up a long-lived authentication token (requires Claude subscription)",
-		)
-		.action(async () => {
-			const [{ setupTokenHandler }, { createRoot }] = await Promise.all([
-				import("./cli/handlers/util.js"),
-				import("./ink.js"),
-			]);
-			const root = await createRoot(getBaseRenderOptions(false));
-			await setupTokenHandler(root);
-		});
+  // Setup token command
+  program
+    .command('setup-token')
+    .description(
+      'Set up a long-lived authentication token (requires Claude subscription)',
+    )
+    .action(async () => {
+      const [{ setupTokenHandler }, { createRoot }] = await Promise.all([
+        import('./cli/handlers/util.js'),
+        import('./ink.js'),
+      ])
+      const root = await createRoot(getBaseRenderOptions(false))
+      await setupTokenHandler(root)
+    })
 
 	// Agents command - list configured agents
 	program
@@ -6482,20 +6482,20 @@ async function run(): Promise<CommanderCommand> {
 			});
 	}
 
-	// Doctor command - check installation health
-	program
-		.command("doctor")
-		.description(
-			"Check the health of your Claude Code auto-updater. Note: The workspace trust dialog is skipped and stdio servers from .mcp.json are spawned for health checks. Only use this command in directories you trust.",
-		)
-		.action(async () => {
-			const [{ doctorHandler }, { createRoot }] = await Promise.all([
-				import("./cli/handlers/util.js"),
-				import("./ink.js"),
-			]);
-			const root = await createRoot(getBaseRenderOptions(false));
-			await doctorHandler(root);
-		});
+  // Doctor command - check installation health
+  program
+    .command('doctor')
+    .description(
+      'Check the health of your Claude Code auto-updater. Note: The workspace trust dialog is skipped and stdio servers from .mcp.json are spawned for health checks. Only use this command in directories you trust.',
+    )
+    .action(async () => {
+      const [{ doctorHandler }, { createRoot }] = await Promise.all([
+        import('./cli/handlers/util.js'),
+        import('./ink.js'),
+      ])
+      const root = await createRoot(getBaseRenderOptions(false))
+      await doctorHandler(root)
+    })
 
 	// claude update
 	//
