@@ -33,6 +33,7 @@ import type { SessionHooksState } from '../utils/hooks/sessionHooks.js'
 import type { ModelSetting } from '../utils/model/model.js'
 import type { DenialTrackingState } from '../utils/permissions/denialTracking.js'
 import type { PermissionMode } from '../utils/permissions/PermissionMode.js'
+import { getGlobalConfig } from '../utils/config.js'
 import { getInitialSettings } from '../utils/settings/settings.js'
 import type { SettingsJson } from '../utils/settings/types.js'
 import { shouldEnableThinkingByDefault } from '../utils/thinking.js'
@@ -565,5 +566,12 @@ export function getDefaultAppState(): AppState {
     effortValue: undefined,
     activeOverlays: new Set<string>(),
     fastMode: false,
+    // Pre-populate allowed apps from persisted config so the MCP package
+    // treats them as alreadyGranted and skips the per-session dialog.
+    computerUseMcpState: (() => {
+      const persisted = getGlobalConfig().computerUseApprovedApps
+      if (!persisted || persisted.length === 0) return undefined
+      return { allowedApps: persisted }
+    })(),
   }
 }
