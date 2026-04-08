@@ -83,12 +83,6 @@ The TUI REPL needs a real terminal, so use attach mode:
 - Traditional Chinese README: [`README.zh-TW.md`](./README.zh-TW.md)
 - Simplified Chinese README: [`README.zh-CN.md`](./README.zh-CN.md)
 
-## Contributors
-
-<a href="https://github.com/Icarus603/claude-code/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Icarus603/claude-code" alt="Contributors" />
-</a>
-
 ## License and Lineage
 
 This repository keeps the necessary lineage context and attribution. It is now maintained as an independent line by **Icarus603**, rather than as an upstream-tracking workflow.

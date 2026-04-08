@@ -91,12 +91,6 @@ TUI（REPL）模式需要真實終端，因此無法直接用一般 launch confi
 - 逐步把對外文案與中文文件整理成清楚的多語版本
 - 為 V6 的分包式重構預先整理邊界與治理方式
 
-## Contributors
-
-<a href="https://github.com/Icarus603/claude-code/graphs/contributors">
-  <img src="contributors.svg" alt="Contributors" />
-</a>
-
 ## 授權與來源
 
 本專案保留必要的來源脈絡與 attribution。它已演化為 **Icarus603** 維護的獨立主線，但並非從零開始的新作。
