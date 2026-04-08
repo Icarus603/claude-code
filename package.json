@@ -50,6 +50,7 @@
     "test": "bun test",
     "check:unused": "knip-bun",
     "health": "bun run scripts/health-check.ts",
+    "check:transition-stubs": "bun run scripts/check-transition-stubs.ts",
     "postinstall": "node scripts/postinstall.cjs",
     "docs:dev": "npx mintlify dev"
   },
