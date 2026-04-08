@@ -89,16 +89,6 @@ The TUI REPL needs a real terminal, so use attach mode:
   <img src="https://contrib.rocks/image?repo=Icarus603/claude-code" alt="Contributors" />
 </a>
 
-## Star History
-
-<a href="https://www.star-history.com/?repos=Icarus603%2Fclaude-code&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=Icarus603%2Fclaude-code&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=Icarus603%2Fclaude-code&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=Icarus603%2Fclaude-code&type=date&legend=top-left" />
- </picture>
-</a>
-
 ## License and Lineage
 
 This repository keeps the necessary lineage context and attribution. It is now maintained as an independent line by **Icarus603**, rather than as an upstream-tracking workflow.

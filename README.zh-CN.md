@@ -97,16 +97,6 @@ TUI（REPL）模式需要真实终端，因此无法直接用普通 launch confi
   <img src="contributors.svg" alt="Contributors" />
 </a>
 
-## Star History
-
-<a href="https://www.star-history.com/?repos=Icarus603%2Fclaude-code&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=Icarus603/claude-code&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=Icarus603/claude-code&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=Icarus603/claude-code&type=date&legend=top-left" />
- </picture>
-</a>
-
 ## 授权与来源
 
 本项目保留必要的来源脉络与 attribution。它已经演化为 **Icarus603** 维护的独立主线，但并非从零开始的新作。
