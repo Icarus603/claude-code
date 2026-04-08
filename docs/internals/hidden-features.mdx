@@ -1,133 +1,133 @@
 ---
-title: "未公开功能巡礼 - 8 个隐藏功能深度解析"
-description: "深度解析 Claude Code 中 8 个最令人兴奋的隐藏功能：从永不下线的 AI 助手到 AI 吉祥物，揭示 88+ flags 中最具代表性的未公开特性。"
-keywords: ["隐藏功能", "未公开功能", "秘密功能", "Claude Code 彩蛋", "AI 助手"]
+title: "未公開功能巡禮 - 8 個隱藏功能深度解析"
+description: "深度解析 Claude Code 中 8 個最令人興奮的隱藏功能：從永不下線的 AI 助手到 AI 吉祥物，揭示 88+ flags 中最具代表性的未公開特性。"
+keywords: ["隱藏功能", "未公開功能", "祕密功能", "Claude Code 彩蛋", "AI 助手"]
 ---
 
-{/* 本章目标：逐一展示 8 个最重要的隐藏功能，分析它们背后的产品方向 */}
+{/* 本章目標：逐一展示 8 個最重要的隱藏功能，分析它們背後的產品方向 */}
 
 ## 全景
 
-从 88+ 个构建时 flags 和 500+ 个运行时 flags 中，我们挑选了 8 个最具代表性的未公开功能。它们不仅展示了 Claude Code 当前的技术深度，更勾勒出 Anthropic 对"AI 编程助手"的未来愿景。
+從 88+ 個構建時 flags 和 500+ 個執行時 flags 中，我們挑選了 8 個最具代表性的未公開功能。它們不僅展示了 Claude Code 當前的技術深度，更勾勒出 Anthropic 對"AI 編程助手"的未來願景。
 
 <AccordionGroup>
-  <Accordion title="KAIROS：永不下线的 AI 助手">
-    **门控**: `feature('KAIROS')` + `tengu_kairos`
+  <Accordion title="KAIROS：永不下線的 AI 助手">
+    **門控**: `feature('KAIROS')` + `tengu_kairos`
 
-    KAIROS 是 Claude Code 最庞大的隐藏功能群——6 个独立 flag 控制着一个完整的"持久化 AI 助手"系统：
+    KAIROS 是 Claude Code 最龐大的隱藏功能羣——6 個獨立 flag 控制着一個完整的"持久化 AI 助手"系統：
 
     | Flag | 能力 |
     |------|------|
-    | `KAIROS` | 核心助手模式——AI 不再随对话结束而"消失" |
-    | `KAIROS_BRIEF` | 精简输出模式 |
-    | `KAIROS_CHANNELS` | 基于频道的消息系统 |
-    | `KAIROS_DREAM` | 后台"做梦"——自主整理记忆 |
-    | `KAIROS_GITHUB_WEBHOOKS` | 订阅 GitHub PR 事件，自动响应 |
-    | `KAIROS_PUSH_NOTIFICATION` | 向移动端推送通知 |
+    | `KAIROS` | 核心助手模式——AI 不再隨對話結束而"消失" |
+    | `KAIROS_BRIEF` | 精簡輸出模式 |
+    | `KAIROS_CHANNELS` | 基於頻道的訊息系統 |
+    | `KAIROS_DREAM` | 後臺"做夢"——自主整理記憶 |
+    | `KAIROS_GITHUB_WEBHOOKS` | 訂閱 GitHub PR 事件，自動響應 |
+    | `KAIROS_PUSH_NOTIFICATION` | 向移動端推送通知 |
 
-    KAIROS 的工具集包括 `SleepTool`（让 AI 主动"休眠"等待事件）、`SendUserFileTool`（向用户发送文件）、`PushNotificationTool`（推送通知）和 `SubscribePRTool`（监听 PR）。
+    KAIROS 的工具集包括 `SleepTool`（讓 AI 主動"休眠"等待事件）、`SendUserFileTool`（向用戶發送文件）、`PushNotificationTool`（推送通知）和 `SubscribePRTool`（監聽 PR）。
 
-    **推测方向**: 一个 7x24 在线的 AI 团队成员，能自主监控代码库、响应事件、管理任务。
+    **推測方向**: 一個 7x24 在線的 AI 團隊成員，能自主監控程式碼庫、響應事件、管理任務。
   </Accordion>
 
-  <Accordion title="PROACTIVE：自主行动模式">
-    **门控**: `feature('PROACTIVE')`
+  <Accordion title="PROACTIVE：自主行動模式">
+    **門控**: `feature('PROACTIVE')`
 
-    在标准模式中，Claude Code 是被动的——等待你输入，然后响应。PROACTIVE 模式颠覆了这一范式：
+    在標準模式中，Claude Code 是被動的——等待你輸入，然後響應。PROACTIVE 模式顛覆了這一範式：
 
-    - AI 拥有 `SleepTool`，可以主动"打盹"一段时间
-    - 系统定期发送 `<tick>` 提示，触发 AI 检查是否有需要主动做的事
-    - AI 可以在没有用户输入的情况下自行决策和执行
+    - AI 擁有 `SleepTool`，可以主動"打盹"一段時間
+    - 系統定期發送 `<tick>` 提示，觸發 AI 檢查是否有需要主動做的事
+    - AI 可以在沒有用戶輸入的情況下自行決策和執行
 
-    **推测方向**: 从"问答式助手"进化为"自主式同事"——AI 在后台持续工作，偶尔需要你确认方向。
+    **推測方向**: 從"問答式助手"進化爲"自主式同事"——AI 在後臺持續工作，偶爾需要你確認方向。
   </Accordion>
 
-  <Accordion title="COORDINATOR_MODE：多 Agent 指挥官">
-    **门控**: `feature('COORDINATOR_MODE')`
+  <Accordion title="COORDINATOR_MODE：多 Agent 指揮官">
+    **門控**: `feature('COORDINATOR_MODE')`
 
-    当前的 Claude Code 已经支持子 Agent（`AgentTool`），但 Coordinator Mode 将其提升到新的层次：
+    當前的 Claude Code 已經支援子 Agent（`AgentTool`），但 Coordinator Mode 將其提升到新的層次：
 
-    - 一个"指挥官" Agent 分析任务并分解为子任务
-    - 多个"工人" Agent 并行执行子任务
-    - 指挥官协调结果、处理冲突、合并输出
+    - 一個"指揮官" Agent 分析任務並分解爲子任務
+    - 多個"工人" Agent 並行執行子任務
+    - 指揮官協調結果、處理衝突、合併輸出
 
-    完整实现位于 `src/coordinator/coordinatorMode.ts`。
+    完整實現位於 `src/coordinator/coordinatorMode.ts`。
 
-    **推测方向**: 大型编程任务的全自动并行处理——比如"重构整个认证系统"可以同时由多个 Agent 处理不同模块。
+    **推測方向**: 大型編程任務的全自動並行處理——比如"重構整個認證系統"可以同時由多個 Agent 處理不同模組。
   </Accordion>
 
-  <Accordion title="BRIDGE_MODE：远程遥控">
-    **门控**: `feature('BRIDGE_MODE')`
+  <Accordion title="BRIDGE_MODE：遠程遙控">
+    **門控**: `feature('BRIDGE_MODE')`
 
-    Bridge Mode 让 Claude Code 可以通过 WebSocket 被远程控制：
+    Bridge Mode 讓 Claude Code 可以通過 WebSocket 被遠程控制：
 
-    - `src/bridge/` 目录包含完整的 WebSocket 桥接实现
-    - 支持 IDE 扩展作为远程前端
-    - 包含 ant-only 的故障注入测试（`bridgeDebug.ts`）
-    - 配合 `DIRECT_CONNECT` flag 可通过 `cc://` URL 直连
+    - `src/bridge/` 目錄包含完整的 WebSocket 橋接實現
+    - 支援 IDE 擴展作爲遠程前端
+    - 包含 ant-only 的故障注入測試（`bridgeDebug.ts`）
+    - 配合 `DIRECT_CONNECT` flag 可通過 `cc://` URL 直連
 
-    **推测方向**: Claude Code 的 UI 前端与后端执行分离——你可以在 VS Code 中操作，但 AI 在远程服务器上执行。
+    **推測方向**: Claude Code 的 UI 前端與後端執行分離——你可以在 VS Code 中操作，但 AI 在遠程服務器上執行。
   </Accordion>
 
-  <Accordion title="WEB_BROWSER_TOOL：内置浏览器">
-    **门控**: `feature('WEB_BROWSER_TOOL')`
+  <Accordion title="WEB_BROWSER_TOOL：內置瀏覽器">
+    **門控**: `feature('WEB_BROWSER_TOOL')`
 
-    当前的 Claude Code 只有简化的 `WebFetchTool`（获取网页内容），但代码中存在更强大的浏览器工具：
+    當前的 Claude Code 只有簡化的 `WebFetchTool`（取得網頁內容），但程式碼中存在更強大的瀏覽器工具：
 
-    - 基于 Bun 的 WebView 实现
-    - 可以渲染和交互网页，而不仅仅是抓取文本
-    - 与 Computer Use 的 `@ant/` 包配合使用
+    - 基於 Bun 的 WebView 實現
+    - 可以渲染和交互網頁，而不僅僅是抓取文本
+    - 與 Computer Use 的 `@ant/` 包配合使用
 
-    **推测方向**: AI 能像人一样浏览网页——点击、填表、截图，用于测试 Web 应用或收集信息。
+    **推測方向**: AI 能像人一樣瀏覽網頁——點擊、填表、截圖，用於測試 Web 應用或收集信息。
   </Accordion>
 
-  <Accordion title="VOICE_MODE：语音交互">
-    **门控**: `feature('VOICE_MODE')`
+  <Accordion title="VOICE_MODE：語音交互">
+    **門控**: `feature('VOICE_MODE')`
 
-    代码中存在语音输入模式的注册点，但核心实现依赖于 `audio-napi` 包（在反编译版本中已 stub）：
+    程式碼中存在語音輸入模式的註冊點，但核心實現依賴於 `audio-napi` 包（在反編譯版本中已 stub）：
 
-    - 通过 `/voice` 命令激活
-    - "按住说话"（hold-to-talk）交互模式
-    - 需要系统级音频 API 支持
+    - 通過 `/voice` 命令激活
+    - "按住說話"（hold-to-talk）交互模式
+    - 需要系統級音頻 API 支援
 
-    **推测方向**: 不用打字，直接和 AI 对话编程。
+    **推測方向**: 不用打字，直接和 AI 對話編程。
   </Accordion>
 
   <Accordion title="BUDDY：AI 吉祥物">
-    **门控**: `feature('BUDDY')`
+    **門控**: `feature('BUDDY')`
 
-    `src/buddy/` 目录包含一个完整的"伙伴精灵"系统：
+    `src/buddy/` 目錄包含一個完整的"夥伴精靈"系統：
 
-    - 终端中的小型动画角色
-    - 可能根据 AI 的状态（思考中、执行中、完成）展示不同动画
-    - 纯 UI/趣味性功能
+    - 終端中的小型動畫角色
+    - 可能根據 AI 的狀態（思考中、執行中、完成）展示不同動畫
+    - 純 UI/趣味性功能
 
-    **推测方向**: 给冷冰冰的终端增加一点温度——让等待 AI 思考的过程不那么无聊。
+    **推測方向**: 給冷冰冰的終端增加一點溫度——讓等待 AI 思考的過程不那麼無聊。
   </Accordion>
 
-  <Accordion title="Undercover Mode：隐身贡献">
-    **门控**: `USER_TYPE === 'ant'`（自动激活）
+  <Accordion title="Undercover Mode：隱身貢獻">
+    **門控**: `USER_TYPE === 'ant'`（自動激活）
 
-    这不是一个功能，而是一个**安全机制**——当 Anthropic 员工向公开仓库贡献代码时自动激活：
+    這不是一個功能，而是一個**安全機制**——當 Anthropic 員工向公開倉庫貢獻程式碼時自動激活：
 
-    - 剥除所有 AI 归属标记（`Co-Authored-By` 行）
-    - 禁止在 commit 消息中提及模型代号（Capybara、Tengu 等）
-    - 禁止暴露内部仓库名、Slack 频道、短链接
-    - 通过 `CLAUDE_CODE_UNDERCOVER=1` 强制开启，无法强制关闭
-    - 仅在仓库匹配内部白名单（~25 个私有仓库）时自动关闭
+    - 剝除所有 AI 歸屬標記（`Co-Authored-By` 行）
+    - 禁止在 commit 訊息中提及模型代號（Capybara、Tengu 等）
+    - 禁止暴露內部倉庫名、Slack 頻道、短連結
+    - 通過 `CLAUDE_CODE_UNDERCOVER=1` 強制開啓，無法強制關閉
+    - 僅在倉庫匹配內部白名單（~25 個私有倉庫）時自動關閉
 
-    **意义**: 证实 Anthropic 员工确实在使用 Claude Code 进行日常开发，并且会向公开项目贡献代码。
+    **意義**: 證實 Anthropic 員工確實在使用 Claude Code 進行日常開發，並且會向公開專案貢獻程式碼。
   </Accordion>
 </AccordionGroup>
 
-## 这些功能告诉我们什么
+## 這些功能告訴我們什麼
 
-纵观这 8 个隐藏功能，一个清晰的产品愿景浮现：
+縱觀這 8 個隱藏功能，一個清晰的產品願景浮現：
 
-1. **从被动到主动** — PROACTIVE、KAIROS 让 AI 不再只是等待指令
-2. **从短暂到持久** — KAIROS 的持久化模式让 AI 成为"常驻团队成员"
-3. **从单一到多感官** — VOICE_MODE、WEB_BROWSER_TOOL 拓展交互维度
-4. **从单兵到协同** — COORDINATOR_MODE 让多个 AI 并行协作
-5. **从本地到分布式** — BRIDGE_MODE、SSH_REMOTE 解耦前后端
+1. **從被動到主動** — PROACTIVE、KAIROS 讓 AI 不再只是等待指令
+2. **從短暫到持久** — KAIROS 的持久化模式讓 AI 成爲"常駐團隊成員"
+3. **從單一到多感官** — VOICE_MODE、WEB_BROWSER_TOOL 拓展交互維度
+4. **從單兵到協同** — COORDINATOR_MODE 讓多個 AI 並行協作
+5. **從本地到分佈式** — BRIDGE_MODE、SSH_REMOTE 解耦前後端
 
-Claude Code 正在从一个"终端里的聊天机器人"进化为一个**自主、持久、多模态的 AI 编程同事**。
+Claude Code 正在從一個"終端裏的聊天機器人"進化爲一個**自主、持久、多模態的 AI 編程同事**。

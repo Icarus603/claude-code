@@ -13,5 +13,4 @@ Instructions:
 
 Style:
 - Be concise and friendly.
-- Respond in 简体中文.
 - Keep responses short — no more than a few sentences.

@@ -1,277 +1,277 @@
-# Computer Use MCP 工具测试报告
+# Computer Use MCP 工具測試報告
 
-> 测试日期: 2026-04-04
-> 测试环境: macOS Darwin 25.4.0, Cursor (IDE tier: click)
+> 測試日期: 2026-04-04
+> 測試環境: macOS Darwin 25.4.0, Cursor (IDE tier: click)
 > MCP Server: `@ant/computer-use-mcp`
 
-## 工具总览
+## 工具總覽
 
-共 17 个工具（含 batch 复合操作），分为 5 大类：
+共 17 個工具（含 batch 複合操作），分爲 5 大類：
 
-| 类别 | 工具 | 数量 |
+| 類別 | 工具 | 數量 |
 |------|------|------|
-| 截图/显示 | `screenshot`, `switch_display`, `zoom` | 3 |
-| 鼠标操作 | `left_click`, `right_click`, `double_click`, `triple_click`, `middle_click`, `left_click_drag`, `mouse_move` | 7 |
-| 键盘操作 | `key`, `type`, `hold_key` | 3 |
-| 状态查询 | `cursor_position`, `request_access` | 2 |
-| 复合/辅助 | `computer_batch`, `wait` | 2 |
+| 截圖/顯示 | `screenshot`, `switch_display`, `zoom` | 3 |
+| 鼠標操作 | `left_click`, `right_click`, `double_click`, `triple_click`, `middle_click`, `left_click_drag`, `mouse_move` | 7 |
+| 鍵盤操作 | `key`, `type`, `hold_key` | 3 |
+| 狀態查詢 | `cursor_position`, `request_access` | 2 |
+| 複合/輔助 | `computer_batch`, `wait` | 2 |
 
 ---
 
-## 测试结果
+## 測試結果
 
-### 1. 权限管理
+### 1. 權限管理
 
-#### `request_access` — 请求应用访问权限
+#### `request_access` — 請求應用訪問權限
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 行为 | 弹出系统对话框请求用户授权，支持批量申请多个应用 |
+| 狀態 | ✅ 通過 |
+| 行爲 | 彈出系統對話框請求用戶授權，支援批量申請多個應用 |
 | 返回 | `{ granted: [...], denied: [...], tierGuidance: "..." }` |
-| 权限分级 | `click`（仅点击）, `full`（完整控制） |
-| 说明 | IDE 类应用（Cursor、VSCode、Terminal）默认授予 `click` tier，限制键盘输入和右键操作；系统应用（System Settings）授予 `full` tier |
+| 權限分級 | `click`（僅點擊）, `full`（完整控制） |
+| 說明 | IDE 類應用（Cursor、VSCode、Terminal）預設授予 `click` tier，限制鍵盤輸入和右鍵操作；系統應用（System Settings）授予 `full` tier |
 
-#### 已授权应用
+#### 已授權應用
 
-| 应用 | Tier | 能力 |
+| 應用 | Tier | 能力 |
 |------|------|------|
-| Cursor | click | 可见 + 纯左键点击（无键盘输入、右键、修饰键点击、拖拽） |
+| Cursor | click | 可見 + 純左鍵點擊（無鍵盤輸入、右鍵、修飾鍵點擊、拖拽） |
 | Terminal | click | 同上 |
-| System Settings | full | 完整控制（键鼠、拖拽等） |
-| Finder | — | 已授权 |
+| System Settings | full | 完整控制（鍵鼠、拖拽等） |
+| Finder | — | 已授權 |
 
 ---
 
-### 2. 截图与显示
+### 2. 截圖與顯示
 
-#### `screenshot` — 截取屏幕截图
+#### `screenshot` — 截取屏幕截圖
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⚠️ 部分通过 |
-| 执行 | 工具成功执行，返回 `ok: true` |
-| 图片 | **未返回可视图片内容**（output 为空字符串） |
-| `save_to_disk` | 设置后仍无输出 |
-| 分析 | 可能原因：(1) macOS 屏幕录制权限未授予；(2) 当前前台应用未被过滤导致截图为空；(3) MCP 传输层未正确编码图片数据 |
-| 建议 | 检查 **系统设置 → 隐私与安全性 → 屏幕录制** 是否授权给运行 Claude Code 的应用 |
+| 狀態 | ⚠️ 部分通過 |
+| 執行 | 工具成功執行，返回 `ok: true` |
+| 圖片 | **未返回可視圖片內容**（output 爲空字符串） |
+| `save_to_disk` | 設置後仍無輸出 |
+| 分析 | 可能原因：(1) macOS 屏幕錄製權限未授予；(2) 當前前臺應用未被過濾導致截圖爲空；(3) MCP 傳輸層未正確編碼圖片資料 |
+| 建議 | 檢查 **系統設置 → 隱私與安全性 → 屏幕錄製** 是否授權給執行 Claude Code 的應用 |
 
-#### `switch_display` — 切换显示器
+#### `switch_display` — 切換顯示器
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 行为 | 接受显示器名称或 `"auto"`（自动选择） |
-| 返回 | 确认消息 |
+| 狀態 | ✅ 通過 |
+| 行爲 | 接受顯示器名稱或 `"auto"`（自動選擇） |
+| 返回 | 確認訊息 |
 
-#### `zoom` — 区域放大截图
+#### `zoom` — 區域放大截圖
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⏭️ 跳过 |
-| 原因 | 依赖 `screenshot` 返回的图片坐标，截图未返回图片无法测试 |
+| 狀態 | ⏭️ 跳過 |
+| 原因 | 依賴 `screenshot` 返回的圖片座標，截圖未返回圖片無法測試 |
 
 ---
 
-### 3. 鼠标操作
+### 3. 鼠標操作
 
-> 以下测试在 Cursor 窗口上执行（tier: click）
+> 以下測試在 Cursor 窗口上執行（tier: click）
 
-#### `mouse_move` — 移动鼠标
+#### `mouse_move` — 移動鼠標
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 输入 | `coordinate: [500, 500]` |
+| 狀態 | ✅ 通過 |
+| 輸入 | `coordinate: [500, 500]` |
 | 返回 | `"Moved."` |
 
-#### `left_click` — 左键单击
+#### `left_click` — 左鍵單擊
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 输入 | `coordinate: [500, 500]` |
+| 狀態 | ✅ 通過 |
+| 輸入 | `coordinate: [500, 500]` |
 | 返回 | `"Clicked."` |
 
-#### `double_click` — 双击
+#### `double_click` — 雙擊
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 输入 | `coordinate: [500, 500]` |
+| 狀態 | ✅ 通過 |
+| 輸入 | `coordinate: [500, 500]` |
 | 返回 | `"Clicked."` |
 
-#### `triple_click` — 三击
+#### `triple_click` — 三擊
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 输入 | `coordinate: [500, 500]` |
+| 狀態 | ✅ 通過 |
+| 輸入 | `coordinate: [500, 500]` |
 | 返回 | `"Clicked."` |
 
-#### `right_click` — 右键点击
+#### `right_click` — 右鍵點擊
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⚠️ 受 tier 限制 |
-| Cursor (click tier) | ❌ 被拒绝 — `"Code" is granted at tier "click" — right-click, middle-click, and clicks with modifier keys require tier "full"` |
-| Finder (full tier) | ✅ 通过 — 返回 `"Clicked."` |
-| 结论 | 功能正常，IDE 安全限制符合预期 |
+| 狀態 | ⚠️ 受 tier 限制 |
+| Cursor (click tier) | ❌ 被拒絕 — `"Code" is granted at tier "click" — right-click, middle-click, and clicks with modifier keys require tier "full"` |
+| Finder (full tier) | ✅ 通過 — 返回 `"Clicked."` |
+| 結論 | 功能正常，IDE 安全限制符合預期 |
 
-#### `middle_click` — 中键点击
+#### `middle_click` — 中鍵點擊
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⚠️ 受 tier 限制 |
-| Cursor (click tier) | ❌ 被拒绝 — 同 `right_click`，需要 full tier |
-| Finder (full tier) | ✅ 通过 — 返回 `"Clicked."` |
-| 结论 | 功能正常，IDE 安全限制符合预期 |
+| 狀態 | ⚠️ 受 tier 限制 |
+| Cursor (click tier) | ❌ 被拒絕 — 同 `right_click`，需要 full tier |
+| Finder (full tier) | ✅ 通過 — 返回 `"Clicked."` |
+| 結論 | 功能正常，IDE 安全限制符合預期 |
 
 #### `left_click_drag` — 拖拽
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⚠️ 受 tier 限制 |
-| Cursor (click tier) | ❌ 被拒绝 — 拖拽被视为修饰键点击，需要 full tier |
-| Finder (full tier) | ✅ 通过 — 返回 `"Dragged."` |
-| 结论 | 功能正常，IDE 安全限制符合预期 |
+| 狀態 | ⚠️ 受 tier 限制 |
+| Cursor (click tier) | ❌ 被拒絕 — 拖拽被視爲修飾鍵點擊，需要 full tier |
+| Finder (full tier) | ✅ 通過 — 返回 `"Dragged."` |
+| 結論 | 功能正常，IDE 安全限制符合預期 |
 
-#### `scroll` — 滚轮滚动
+#### `scroll` — 滾輪滾動
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 输入 | `coordinate: [500, 500]`, `scroll_direction: "down"`, `scroll_amount: 3` |
+| 狀態 | ✅ 通過 |
+| 輸入 | `coordinate: [500, 500]`, `scroll_direction: "down"`, `scroll_amount: 3` |
 | 返回 | `"Scrolled."` |
-| 反向 | ✅ `scroll_direction: "up"` 也通过 |
+| 反向 | ✅ `scroll_direction: "up"` 也通過 |
 
 ---
 
-### 4. 键盘操作
+### 4. 鍵盤操作
 
-> 以下测试在 Cursor 窗口上执行（tier: click）— 所有键盘操作均被拒绝
+> 以下測試在 Cursor 窗口上執行（tier: click）— 所有鍵盤操作均被拒絕
 
-#### `key` — 按键/快捷键
+#### `key` — 按鍵/快捷鍵
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⚠️ 受 tier 限制 |
-| Cursor (click tier) | ❌ 被拒绝 — IDE tier 限制键盘输入 |
-| Finder (full tier) | ✅ 通过 — `escape` 按键成功，返回 `"Key pressed."` |
-| 结论 | 功能正常，IDE 安全限制符合预期 |
+| 狀態 | ⚠️ 受 tier 限制 |
+| Cursor (click tier) | ❌ 被拒絕 — IDE tier 限制鍵盤輸入 |
+| Finder (full tier) | ✅ 通過 — `escape` 按鍵成功，返回 `"Key pressed."` |
+| 結論 | 功能正常，IDE 安全限制符合預期 |
 
-#### `type` — 输入文本
+#### `type` — 輸入文本
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⚠️ 受 tier 限制 |
-| Cursor (click tier) | ❌ 被拒绝 — IDE tier 限制文本输入 |
-| Finder (full tier) | ✅ 通过 — 输入 `"hello"` 成功，返回 `"Typed 5 grapheme(s)."` |
-| 结论 | 功能正常，IDE 安全限制符合预期 |
+| 狀態 | ⚠️ 受 tier 限制 |
+| Cursor (click tier) | ❌ 被拒絕 — IDE tier 限制文本輸入 |
+| Finder (full tier) | ✅ 通過 — 輸入 `"hello"` 成功，返回 `"Typed 5 grapheme(s)."` |
+| 結論 | 功能正常，IDE 安全限制符合預期 |
 
-#### `hold_key` — 按住按键
+#### `hold_key` — 按住按鍵
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ⚠️ 受 tier 限制 |
-| Cursor (click tier) | ❌ 被拒绝 — IDE tier 限制键盘输入 |
-| Finder (full tier) | ✅ 通过 — 按住 `shift` 1 秒成功，返回 `"Key held."` |
-| 结论 | 功能正常，IDE 安全限制符合预期 |
+| 狀態 | ⚠️ 受 tier 限制 |
+| Cursor (click tier) | ❌ 被拒絕 — IDE tier 限制鍵盤輸入 |
+| Finder (full tier) | ✅ 通過 — 按住 `shift` 1 秒成功，返回 `"Key held."` |
+| 結論 | 功能正常，IDE 安全限制符合預期 |
 
 ---
 
-### 5. 状态查询
+### 5. 狀態查詢
 
-#### `cursor_position` — 获取鼠标位置
+#### `cursor_position` — 取得鼠標位置
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
+| 狀態 | ✅ 通過 |
 | 返回 | `{"x": null, "y": null, "coordinateSpace": "image_pixels"}` |
-| 说明 | 坐标为 null 是因为没有成功截图，无参考坐标系 |
+| 說明 | 座標爲 null 是因爲沒有成功截圖，無參考座標系 |
 
 ---
 
-### 6. 复合/辅助操作
+### 6. 複合/輔助操作
 
-#### `computer_batch` — 批量执行操作
+#### `computer_batch` — 批量執行操作
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 行为 | 按顺序执行操作列表，遇到失败则停止后续操作 |
+| 狀態 | ✅ 通過 |
+| 行爲 | 按順序執行操作列表，遇到失敗則停止後續操作 |
 | 返回 | `{ completed: [...], failed: {...}, remaining: N }` |
-| 特点 | 单次 API 调用执行多个操作，减少往返延迟 |
-| 错误处理 | 失败的操作会中断后续操作，返回已完成和剩余数量 |
+| 特點 | 單次 API 呼叫執行多個操作，減少往返延遲 |
+| 錯誤處理 | 失敗的操作會中斷後續操作，返回已完成和剩餘數量 |
 
 #### `wait` — 等待
 
-| 项目 | 结果 |
+| 專案 | 結果 |
 |------|------|
-| 状态 | ✅ 通过 |
-| 输入 | `duration: 1` (秒) |
+| 狀態 | ✅ 通過 |
+| 輸入 | `duration: 1` (秒) |
 | 返回 | `"Waited 1s."` |
 | 最大值 | 100 秒 |
 
 ---
 
-## 汇总统计
+## 彙總統計
 
-| 状态 | 数量 | 工具 |
+| 狀態 | 數量 | 工具 |
 |------|------|------|
-| ✅ 通过 | 10 | `request_access`, `switch_display`, `mouse_move`, `left_click`, `double_click`, `triple_click`, `scroll`, `cursor_position`, `computer_batch`, `wait` |
-| ⚠️ 部分通过 | 7 | `screenshot`（执行成功但无图片返回）, `right_click`, `middle_click`, `left_click_drag`, `key`, `type`, `hold_key`（均在 full tier 应用上通过，IDE click tier 限制是预期行为） |
-| ❌ 被拒绝 | 0 | — |
-| ⏭️ 跳过 | 1 | `zoom`（依赖截图） |
+| ✅ 通過 | 10 | `request_access`, `switch_display`, `mouse_move`, `left_click`, `double_click`, `triple_click`, `scroll`, `cursor_position`, `computer_batch`, `wait` |
+| ⚠️ 部分通過 | 7 | `screenshot`（執行成功但無圖片返回）, `right_click`, `middle_click`, `left_click_drag`, `key`, `type`, `hold_key`（均在 full tier 應用上通過，IDE click tier 限制是預期行爲） |
+| ❌ 被拒絕 | 0 | — |
+| ⏭️ 跳過 | 1 | `zoom`（依賴截圖） |
 
 ---
 
-## 已知问题
+## 已知問題
 
-### P0: 截图无图片返回
+### P0: 截圖無圖片返回
 
-`screenshot` 工具执行成功但未返回图片内容，导致：
-- 无法获取屏幕坐标参考
-- `cursor_position` 返回 null 坐标
-- `zoom` 无法使用
-- 所有点击操作只能盲点（无截图验证）
+`screenshot` 工具執行成功但未返回圖片內容，導致：
+- 無法取得屏幕座標參考
+- `cursor_position` 返回 null 座標
+- `zoom` 無法使用
+- 所有點擊操作只能盲點（無截圖驗證）
 
 **可能原因**:
-1. macOS 屏幕录制权限未授予
-2. MCP 图片传输/编码问题
-3. 截图内容被安全过滤机制过滤
+1. macOS 屏幕錄製權限未授予
+2. MCP 圖片傳輸/編碼問題
+3. 截圖內容被安全過濾機制過濾
 
-**建议排查**: 检查 `系统设置 → 隐私与安全性 → 屏幕录制` 权限。
+**建議排查**: 檢查 `系統設置 → 隱私與安全性 → 屏幕錄製` 權限。
 
-### P1: IDE 应用键盘操作受限 — ✅ 已确认功能正常
+### P1: IDE 應用鍵盤操作受限 — ✅ 已確認功能正常
 
-IDE 类应用（Cursor、VSCode、Terminal）被限制在 `click` tier，无法执行：
-- 键盘输入（`key`, `type`, `hold_key`）
-- 右键/中键点击（`right_click`, `middle_click`）
+IDE 類應用（Cursor、VSCode、Terminal）被限制在 `click` tier，無法執行：
+- 鍵盤輸入（`key`, `type`, `hold_key`）
+- 右鍵/中鍵點擊（`right_click`, `middle_click`）
 - 拖拽操作（`left_click_drag`）
 
-这是安全设计，防止 AI 操控 IDE 终端。**在 full tier 应用（Finder、System Settings）上，以上 6 个操作均测试通过，功能完全正常。**
+這是安全設計，防止 AI 操控 IDE 終端。**在 full tier 應用（Finder、System Settings）上，以上 6 個操作均測試通過，功能完全正常。**
 
 ---
 
-## 权限模型说明
+## 權限模型說明
 
-Computer Use MCP 采用分级权限模型：
+Computer Use MCP 採用分級權限模型：
 
 ```
 ┌─────────────────────────────────────────┐
 │  Tier: full                             │
-│  - 所有鼠标操作（左键、右键、中键、拖拽）  │
-│  - 键盘输入（type, key, hold_key）       │
-│  - 适用于: 系统应用、Finder 等           │
+│  - 所有鼠標操作（左鍵、右鍵、中鍵、拖拽）  │
+│  - 鍵盤輸入（type, key, hold_key）       │
+│  - 適用於: 系統應用、Finder 等           │
 ├─────────────────────────────────────────┤
 │  Tier: click                            │
-│  - 仅纯左键点击                          │
-│  - 滚轮滚动                             │
-│  - 适用于: IDE、Terminal 等              │
+│  - 僅純左鍵點擊                          │
+│  - 滾輪滾動                             │
+│  - 適用於: IDE、Terminal 等              │
 ├─────────────────────────────────────────┤
-│  未授权                                  │
-│  - 所有操作被拒绝                        │
-│  - 需通过 request_access 申请            │
+│  未授權                                  │
+│  - 所有操作被拒絕                        │
+│  - 需通過 request_access 申請            │
 └─────────────────────────────────────────┘
 ```

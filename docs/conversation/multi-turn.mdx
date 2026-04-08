@@ -1,48 +1,48 @@
 ---
-title: "多轮对话管理 - QueryEngine 会话编排与持久化"
-description: "从源码角度解析 Claude Code 多轮对话管理：QueryEngine 的会话状态机、JSONL transcript 持久化、成本追踪模型和模型热切换机制。"
-keywords: ["多轮对话", "会话管理", "QueryEngine", "transcript", "成本追踪"]
+title: "多輪對話管理 - QueryEngine 會話編排與持久化"
+description: "從源碼角度解析 Claude Code 多輪對話管理：QueryEngine 的會話狀態機、JSONL transcript 持久化、成本追蹤模型和模型熱切換機制。"
+keywords: ["多輪對話", "會話管理", "QueryEngine", "transcript", "成本追蹤"]
 ---
 
-{/* 本章目标：从源码角度揭示会话编排、持久化存储、成本追踪和模型切换的完整链路 */}
+{/* 本章目標：從源碼角度揭示會話編排、持久化存儲、成本追蹤和模型切換的完整鏈路 */}
 
-## 单轮 vs 多轮：架构层面的差异
+## 單輪 vs 多輪：架構層面的差異
 
-- **单轮**（一次 Agentic Loop）：`query()` 函数的一次完整执行——组装上下文 → 调 API → 处理工具调用 → 循环直到结束
-- **多轮**（一个 Session）：`QueryEngine` 类管理的一次会话——跨越数十轮 `submitMessage()` 调用，持续数小时
+- **單輪**（一次 Agentic Loop）：`query()` 函數的一次完整執行——組裝上下文 → 調 API → 處理工具呼叫 → 循環直到結束
+- **多輪**（一個 Session）：`QueryEngine` 類管理的一次會話——跨越數十輪 `submitMessage()` 呼叫，持續數小時
 
-`QueryEngine`（`src/QueryEngine.ts:186`）是单轮 Agentic Loop 之上的**会话编排器**，它管理的状态远不止消息列表：
+`QueryEngine`（`src/QueryEngine.ts:186`）是單輪 Agentic Loop 之上的**會話編排器**，它管理的狀態遠不止訊息列表：
 
 ```
-QueryEngine 内部状态
-├── mutableMessages: Message[]         ← 完整对话历史，跨 turn 累积
-├── readFileState: FileStateCache      ← 已读文件内容缓存，避免重复读取
-├── totalUsage: NonNullableUsage       ← 累计 token 消耗（input/output/cache）
-├── permissionDenials: SDKPermissionDenial[]  ← 权限拒绝记录
-├── discoveredSkillNames: Set<string>  ← 当前 turn 已发现的 skill
-└── abortController: AbortController   ← 会话级中断控制
+QueryEngine 內部狀態
+├── mutableMessages: Message[]         ← 完整對話歷史，跨 turn 累積
+├── readFileState: FileStateCache      ← 已讀檔案內容快取，避免重複讀取
+├── totalUsage: NonNullableUsage       ← 累計 token 消耗（input/output/cache）
+├── permissionDenials: SDKPermissionDenial[]  ← 權限拒絕記錄
+├── discoveredSkillNames: Set<string>  ← 當前 turn 已發現的 skill
+└── abortController: AbortController   ← 會話級中斷控制
 ```
 
 ## QueryEngine 的核心方法：submitMessage()
 
-每次用户输入一条消息，REPL 或 SDK 调用 `submitMessage()`，它会执行完整的 turn 初始化链路：
+每次用戶輸入一條訊息，REPL 或 SDK 呼叫 `submitMessage()`，它會執行完整的 turn 初始化鏈路：
 
 ```typescript
-// src/QueryEngine.ts:211 — 简化的 submitMessage 流程
+// src/QueryEngine.ts:211 — 簡化的 submitMessage 流程
 async *submitMessage(prompt, options?): AsyncGenerator<SDKMessage> {
-  // 1. 清除 turn 级追踪状态
+  // 1. 清除 turn 級追蹤狀態
   this.discoveredSkillNames.clear()
   
-  // 2. 解析模型（用户可能中途切换了模型）
+  // 2. 解析模型（用戶可能中途切換了模型）
   const mainLoopModel = userSpecifiedModel
     ? parseUserSpecifiedModel(userSpecifiedModel)
     : getMainLoopModel()
   
-  // 3. 动态组装 System Prompt（每次 turn 都重新构建）
+  // 3. 動態組裝 System Prompt（每次 turn 都重新構建）
   const { defaultSystemPrompt, userContext, systemContext } =
     await fetchSystemPromptParts({ tools, mainLoopModel, mcpClients })
   
-  // 4. 包装权限检查（追踪每次拒绝）
+  // 4. 包裝權限檢查（追蹤每次拒絕）
   const wrappedCanUseTool = async (tool, input, ...) => {
     const result = await canUseTool(tool, input, ...)
     if (result.behavior !== 'allow') {
@@ -51,7 +51,7 @@ async *submitMessage(prompt, options?): AsyncGenerator<SDKMessage> {
     return result
   }
   
-  // 5. 调用核心 query() 函数执行 agentic loop
+  // 5. 呼叫核心 query() 函數執行 agentic loop
   yield* query({
     systemPrompt, messages: this.mutableMessages,
     tools, model: mainLoopModel, ...
@@ -59,126 +59,126 @@ async *submitMessage(prompt, options?): AsyncGenerator<SDKMessage> {
 }
 ```
 
-关键设计：`submitMessage()` 是 `async *Generator`——它逐步 yield `SDKMessage`，让调用方（REPL/SDK）能实时展示进度，而不是等整个 turn 结束。
+關鍵設計：`submitMessage()` 是 `async *Generator`——它逐步 yield `SDKMessage`，讓呼叫方（REPL/SDK）能實時展示進度，而不是等整個 turn 結束。
 
-## 会话持久化：JSONL Transcript
+## 會話持久化：JSONL Transcript
 
-每次对话事件都被追加写入 transcript 文件（`src/utils/sessionStorage.ts`）：
+每次對話事件都被追加寫入 transcript 文件（`src/utils/sessionStorage.ts`）：
 
-### 存储路径
+### 存儲路徑
 
 ```
 ~/.claude/projects/<project-hash>/<session-id>.jsonl
 ```
 
-- `project-hash` 由 `getProjectDir(originalCwd)` 生成，同一项目目录的会话归入同一子目录
-- 每条记录是一行 JSON（JSONL 格式），支持追加写入而不需要读取-修改-写入整个文件
-- 读取上限为 50MB（`MAX_TRANSCRIPT_READ_BYTES`），防止超大会话导致 OOM
+- `project-hash` 由 `getProjectDir(originalCwd)` 生成，同一專案目錄的會話歸入同一子目錄
+- 每條記錄是一行 JSON（JSONL 格式），支援追加寫入而不需要讀取-修改-寫入整個文件
+- 讀取上限爲 50MB（`MAX_TRANSCRIPT_READ_BYTES`），防止超大會話導致 OOM
 
-### Transcript 写入器
+### Transcript 寫入器
 
-`TranscriptWriter`（`src/utils/sessionStorage.ts:1200+`）是一个写队列，确保并发的消息追加不会互相覆盖：
+`TranscriptWriter`（`src/utils/sessionStorage.ts:1200+`）是一個寫隊列，確保併發的訊息追加不會互相覆蓋：
 
 ```
-写入流程：
+寫入流程：
   appendEntryToFile(sessionId, entry)
     ↓
-  ensureCurrentSessionFile()   ← 懒初始化：首次写入时才创建文件
+  ensureCurrentSessionFile()   ← 懶初始化：首次寫入時才建立文件
     ↓
-  序列化为 JSON + 换行符
+  序列化爲 JSON + 換行符
     ↓
   appendFile(path, line)       ← 原子追加
     ↓
-  如果配置了远程持久化：
+  如果設定了遠程持久化：
     persistToRemote(sessionId, entry)
       ├── CCR v2: internalEventWriter('transcript', entry)
       └── v1 Ingress: sessionIngress.appendSessionLog(...)
 ```
 
-### 会话恢复链路
+### 會話恢復鏈路
 
-`--resume` 参数触发的恢复流程（`src/main.tsx:3620+`）：
+`--resume` 參數觸發的恢復流程（`src/main.tsx:3620+`）：
 
 ```
-1. 解析 resume 参数：
+1. 解析 resume 參數：
    ├── UUID 格式 → getTranscriptPathForSession(uuid)
-   ├── .jsonl 文件路径 → 直接使用
-   └── boolean → 最近一次会话的 picker
+   ├── .jsonl 檔案路徑 → 直接使用
+   └── boolean → 最近一次會話的 picker
    
 2. loadTranscriptFromFile(path)
    ├── 按 JSONL 行解析
-   ├── 过滤出消息类型记录
-   └── 重建 Message[] 数组
+   ├── 過濾出訊息類型記錄
+   └── 重建 Message[] 數組
 
-3. 恢复上下文状态：
-   ├── restoreCostStateForSession(sessionId)  ← 恢复累计费用
-   ├── 恢复 agentSetting（用户选择的 Agent 类型）
-   └── 如果有 --rewind-files，恢复文件到指定消息时的快照
+3. 恢復上下文狀態：
+   ├── restoreCostStateForSession(sessionId)  ← 恢復累計費用
+   ├── 恢復 agentSetting（用戶選擇的 Agent 類型）
+   └── 如果有 --rewind-files，恢復文件到指定訊息時的快照
 
-4. 创建 QueryEngine({ initialMessages: restoredMessages })
-   └── 从恢复的消息继续对话
+4. 建立 QueryEngine({ initialMessages: restoredMessages })
+   └── 從恢復的訊息繼續對話
 ```
 
-## 成本追踪：从 API Usage 到美元
+## 成本追蹤：從 API Usage 到美元
 
-成本追踪贯穿三个模块，形成完整的记录→累计→展示链路：
+成本追蹤貫穿三個模組，形成完整的記錄→累計→展示鏈路：
 
-### 记录层：API 响应中的 Usage
+### 記錄層：API 響應中的 Usage
 
-每个 `message_delta` 事件携带 `usage` 字段（`input_tokens`、`output_tokens`、`cache_creation_input_tokens`、`cache_read_input_tokens`）。`accumulateUsage()` 将增量 usage 累加到会话总量。
+每個 `message_delta` 事件攜帶 `usage` 字段（`input_tokens`、`output_tokens`、`cache_creation_input_tokens`、`cache_read_input_tokens`）。`accumulateUsage()` 將增量 usage 累加到會話總量。
 
-### 累计层：cost-tracker.ts
+### 累計層：cost-tracker.ts
 
 ```typescript
-// src/cost-tracker.ts — StoredCostState 数据模型
+// src/cost-tracker.ts — StoredCostState 資料模型
 type StoredCostState = {
-  totalCostUSD: number                       // 累计美元花费
-  totalAPIDuration: number                   // API 调用总时长（含重试）
-  totalAPIDurationWithoutRetries: number     // 不含重试的纯推理时间
-  totalToolDuration: number                  // 工具执行总时长
-  totalLinesAdded: number                    // 代码增加行数
-  totalLinesRemoved: number                  // 代码删除行数
+  totalCostUSD: number                       // 累計美元花費
+  totalAPIDuration: number                   // API 呼叫總時長（含重試）
+  totalAPIDurationWithoutRetries: number     // 不含重試的純推理時間
+  totalToolDuration: number                  // 工具執行總時長
+  totalLinesAdded: number                    // 程式碼增加行數
+  totalLinesRemoved: number                  // 程式碼刪除行數
   modelUsage: { [modelName: string]: ModelUsage }  // 按模型分拆的用量
 }
 ```
 
-`addToTotalSessionCost()` 根据模型定价计算每次 API 调用的费用，累计到 `totalCostUSD`。按模型的 `ModelUsage` 支持在同一会话中切换模型后分别统计。
+`addToTotalSessionCost()` 根據模型定價計算每次 API 呼叫的費用，累計到 `totalCostUSD`。按模型的 `ModelUsage` 支援在同一會話中切換模型後分別統計。
 
-### 持久化：跨重启保留
+### 持久化：跨重啓保留
 
 ```typescript
-// 每次会话结束时保存到项目配置
+// 每次會話結束時保存到專案設定
 saveCurrentSessionCosts(sessionId)
   → projectConfig.lastCost = totalCostUSD
   → projectConfig.lastSessionId = sessionId
   → projectConfig.lastModelUsage = modelUsage
 ```
 
-### 预算熔断
+### 預算熔斷
 
-`QueryEngineConfig.maxBudgetUsd` 提供了会话级的硬性预算上限。在 REPL 中，当累计费用超过 $5 时（`src/screens/REPL.tsx:2208`），弹出费用提醒对话框——这不是硬性阻断，而是"软提醒"。
+`QueryEngineConfig.maxBudgetUsd` 提供了會話級的硬性預算上限。在 REPL 中，當累計費用超過 $5 時（`src/screens/REPL.tsx:2208`），彈出費用提醒對話框——這不是硬性阻斷，而是"軟提醒"。
 
-## 模型热切换
+## 模型熱切換
 
-在一个会话中切换模型不会丢失对话历史——因为 `mutableMessages` 与模型选择是解耦的：
+在一個會話中切換模型不會丟失對話歷史——因爲 `mutableMessages` 與模型選擇是解耦的：
 
 ```
 /model sonnet → setMainLoopModelOverride('claude-sonnet-4-20250514')
   ↓
-下一次 submitMessage() 开始时：
+下一次 submitMessage() 開始時：
   ↓
 parseUserSpecifiedModel(userSpecifiedModel)
-  → 返回新的模型配置
+  → 返回新的模型設定
   ↓
 fetchSystemPromptParts({ mainLoopModel: newModel })
-  → System Prompt 根据新模型能力重新组装
+  → System Prompt 根據新模型能力重新組裝
   ↓
 query({ model: newModel, messages: this.mutableMessages })
-  → 使用完整历史 + 新模型继续对话
+  → 使用完整歷史 + 新模型繼續對話
 ```
 
-切换模型时，`contextWindowTokens` 和 `maxOutputTokens` 也会根据新模型的规格重新计算——例如从 Sonnet 切换到 Opus 时，上下文窗口可能从 200K 变为 1M。
+切換模型時，`contextWindowTokens` 和 `maxOutputTokens` 也會根據新模型的規格重新計算——例如從 Sonnet 切換到 Opus 時，上下文窗口可能從 200K 變爲 1M。
 
-## 文件快照与回滚
+## 檔案快照與回滾
 
-`fileHistoryMakeSnapshot()`（`src/utils/fileHistory.ts`）在 AI 每次修改文件前自动保存当前内容。快照绑定到具体的 `message.id`，使得 `--rewind-files <user-message-id>` 可以精确恢复到对话中任意时间点的文件状态——这比 git 更细粒度（git 只追踪已提交的内容）。
+`fileHistoryMakeSnapshot()`（`src/utils/fileHistory.ts`）在 AI 每次修改文件前自動保存當前內容。快照綁定到具體的 `message.id`，使得 `--rewind-files <user-message-id>` 可以精確恢復到對話中任意時間點的文件狀態——這比 git 更細粒度（git 只追蹤已提交的內容）。

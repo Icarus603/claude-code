@@ -1,152 +1,152 @@
-# Claude Code 源码学习路线
+# Claude Code 源碼學習路線
 
-> 基于反编译版 Claude Code CLI (v2.1.888) 的源码学习跟踪
+> 基於反編譯版 Claude Code CLI (v2.1.888) 的源碼學習跟蹤
 >
-> 各阶段详细笔记见同目录下的 `phase-*.md` 文件
+> 各階段詳細筆記見同目錄下的 `phase-*.md` 文件
 
-## 第一阶段：启动流程（入口链路） ✅
+## 第一階段：啓動流程（入口鏈路） ✅
 
-详细笔记：[phase-1-startup-flow.md](phase-1-startup-flow.md)
+詳細筆記：[phase-1-startup-flow.md](phase-1-startup-flow.md)
 
-理解程序从命令行启动到用户看到交互界面的完整路径。
+理解程式從命令列啓動到用戶看到互動介面的完整路徑。
 
-- [x] `src/entrypoints/cli.tsx` — 真正入口，polyfill 注入 + 快速路径分发
-  - [x] 全局 polyfill：`feature()` 永远返回 false、`MACRO` 全局对象、`BUILD_*` 常量
-  - [x] 快速路径设计：按开销从低到高检查，能早返回就早返回
-  - [x] 动态 import 模式：`await import()` 延迟加载，减少启动时间
-  - [x] 最终出口：`import("../main.jsx")` → `cliMain()`
-- [x] `src/main.tsx` — Commander.js CLI 定义，重型初始化（4683 行）
-  - [x] 三段式结构：辅助函数(1-584) → main()(585-856) → run()(884-4683)
-  - [x] side-effect import：profileCheckpoint、startMdmRawRead、startKeychainPrefetch 并行预加载
-  - [x] preAction 钩子：MDM 等待、init()、迁移、远程设置
-  - [x] Commander 参数定义：40+ CLI 选项
-  - [x] action handler（2800 行）：参数解析 → 服务初始化 → showSetupScreens → launchRepl()
-  - [x] --print 分支走 print.ts；交互分支走 launchRepl()（7 个场景分支）
-  - [x] 子命令注册：mcp/auth/plugin/doctor/update/install 等
-- [x] `src/replLauncher.tsx` — 桥梁（22 行），组合 `<App>` + `<REPL>` 渲染到终端
+- [x] `src/entrypoints/cli.tsx` — 真正入口，polyfill 注入 + 快速路徑分發
+  - [x] 全局 polyfill：`feature()` 永遠返回 false、`MACRO` 全局對象、`BUILD_*` 常量
+  - [x] 快速路徑設計：按開銷從低到高檢查，能早返回就早返回
+  - [x] 動態 import 模式：`await import()` 延遲加載，減少啓動時間
+  - [x] 最終出口：`import("../main.jsx")` → `cliMain()`
+- [x] `src/main.tsx` — Commander.js CLI 定義，重型初始化（4683 行）
+  - [x] 三段式結構：輔助函數(1-584) → main()(585-856) → run()(884-4683)
+  - [x] side-effect import：profileCheckpoint、startMdmRawRead、startKeychainPrefetch 並行預加載
+  - [x] preAction 鉤子：MDM 等待、init()、遷移、遠程設置
+  - [x] Commander 參數定義：40+ CLI 選項
+  - [x] action handler（2800 行）：參數解析 → 服務初始化 → showSetupScreens → launchRepl()
+  - [x] --print 分支走 print.ts；交互分支走 launchRepl()（7 個場景分支）
+  - [x] 子命令註冊：mcp/auth/plugin/doctor/update/install 等
+- [x] `src/replLauncher.tsx` — 橋樑（22 行），組合 `<App>` + `<REPL>` 渲染到終端
 - [x] `src/screens/REPL.tsx` — 交互式 REPL 界面（5009 行）
   - [x] Props：commands、tools、messages、systemPrompt、thinkingConfig 等
-  - [x] 50+ 状态：messages、inputValue、screen、streamingText、queryGuard 等
-  - [x] 核心数据流：onSubmit → handlePromptSubmit → onQuery → onQueryImpl → query() → onQueryEvent
-  - [x] QueryGuard 并发控制：idle → running → idle，防止重复查询
-  - [x] 渲染：Transcript 模式（只读历史）/ Prompt 模式（Messages + PermissionRequest + PromptInput）
+  - [x] 50+ 狀態：messages、inputValue、screen、streamingText、queryGuard 等
+  - [x] 核心資料流：onSubmit → handlePromptSubmit → onQuery → onQueryImpl → query() → onQueryEvent
+  - [x] QueryGuard 併發控制：idle → running → idle，防止重複查詢
+  - [x] 渲染：Transcript 模式（只讀歷史）/ Prompt 模式（Messages + PermissionRequest + PromptInput）
 
-**数据流**：`bun run dev` → `package.json scripts.dev` → `bun run src/entrypoints/cli.tsx` → 快速路径检查 → `main.tsx:main()` → `launchRepl()` → `<App><REPL /></App>`
+**資料流**：`bun run dev` → `package.json scripts.dev` → `bun run src/entrypoints/cli.tsx` → 快速路徑檢查 → `main.tsx:main()` → `launchRepl()` → `<App><REPL /></App>`
 
 ---
 
-## 第二阶段：核心对话循环 ✅
+## 第二階段：核心對話循環 ✅
 
-详细笔记：[phase-2-conversation-loop.md](phase-2-conversation-loop.md)
+詳細筆記：[phase-2-conversation-loop.md](phase-2-conversation-loop.md)
 
-理解用户发一句话后，如何变成 API 请求、如何处理流式响应和工具调用。
+理解用戶發一句話後，如何變成 API 請求、如何處理流式響應和工具呼叫。
 
-- [x] `src/query.ts` — 核心查询循环（1732 行）
-  - [x] `query()` AsyncGenerator 入口，委托给 `queryLoop()`
-  - [x] `queryLoop()` — while(true) 主循环，State 对象管理迭代状态
-  - [x] 消息预处理（autocompact、compact boundary）
-  - [x] `deps.callModel()` → 流式 API 调用
-  - [x] StreamingToolExecutor — API 流式返回时并行执行工具
-  - [x] 工具调用循环（tool use → 执行 → result → continue）
-  - [x] 错误恢复（prompt-too-long、max_output_tokens 升级+多轮恢复）
-  - [x] 模型降级（FallbackTriggeredError → 切换 fallbackModel）
-  - [x] Withheld 消息模式（暂扣可恢复错误）
-- [x] `src/QueryEngine.ts` — 高层编排器（1320 行）
-  - [x] QueryEngine 类 — 一个 conversation 一个实例
-  - [x] `submitMessage()` — 处理用户输入 → 调用 `query()` → 消费事件流
-  - [x] SDK/print 模式专用（REPL 直接调用 query()）
-  - [x] 会话持久化（recordTranscript）
-  - [x] Usage 跟踪、权限拒绝记录
-  - [x] `ask()` 便捷包装函数
-- [x] `src/services/api/claude.ts` — API 客户端（3420 行）
-  - [x] `queryModelWithStreaming` / `queryModelWithoutStreaming` — 两个公开入口
-  - [x] `queryModel()` — 核心私有函数（2400 行）
-  - [x] 请求参数组装（system prompt、betas、tools、cache control）
-  - [x] Anthropic SDK 流式调用（`anthropic.beta.messages.stream()`）
-  - [x] `BetaRawMessageStreamEvent` 事件处理（message_start/content_block_*/message_delta/stop）
-  - [x] withRetry 重试策略（429/500/529 + 模型降级）
+- [x] `src/query.ts` — 核心查詢循環（1732 行）
+  - [x] `query()` AsyncGenerator 入口，委託給 `queryLoop()`
+  - [x] `queryLoop()` — while(true) 主循環，State 對象管理迭代狀態
+  - [x] 訊息預處理（autocompact、compact boundary）
+  - [x] `deps.callModel()` → 流式 API 呼叫
+  - [x] StreamingToolExecutor — API 流式返回時並行執行工具
+  - [x] 工具呼叫循環（tool use → 執行 → result → continue）
+  - [x] 錯誤恢復（prompt-too-long、max_output_tokens 升級+多輪恢復）
+  - [x] 模型降級（FallbackTriggeredError → 切換 fallbackModel）
+  - [x] Withheld 訊息模式（暫扣可恢復錯誤）
+- [x] `src/QueryEngine.ts` — 高層編排器（1320 行）
+  - [x] QueryEngine 類 — 一個 conversation 一個實例
+  - [x] `submitMessage()` — 處理用戶輸入 → 呼叫 `query()` → 消費事件流
+  - [x] SDK/print 模式專用（REPL 直接呼叫 query()）
+  - [x] 會話持久化（recordTranscript）
+  - [x] Usage 跟蹤、權限拒絕記錄
+  - [x] `ask()` 便捷包裝函數
+- [x] `src/services/api/claude.ts` — API 客戶端（3420 行）
+  - [x] `queryModelWithStreaming` / `queryModelWithoutStreaming` — 兩個公開入口
+  - [x] `queryModel()` — 核心私有函數（2400 行）
+  - [x] 請求參數組裝（system prompt、betas、tools、cache control）
+  - [x] Anthropic SDK 流式呼叫（`anthropic.beta.messages.stream()`）
+  - [x] `BetaRawMessageStreamEvent` 事件處理（message_start/content_block_*/message_delta/stop）
+  - [x] withRetry 重試策略（429/500/529 + 模型降級）
   - [x] Prompt Caching 策略（ephemeral/1h TTL/global scope）
-  - [x] 多 provider 支持（Anthropic / Bedrock / Vertex / Azure）
+  - [x] 多 provider 支援（Anthropic / Bedrock / Vertex / Azure）
 
-**数据流**：REPL.onSubmit → handlePromptSubmit → onQuery → onQueryImpl → `query()` AsyncGenerator → `queryLoop()` while(true) → `deps.callModel()` → `claude.ts queryModel()` → `anthropic.beta.messages.stream()` → 流式事件 → 收集 tool_use → 执行工具 → 结果追加到 messages → continue → 无工具调用时 return
-
----
-
-## 第三阶段：工具系统
-
-理解 Claude 如何定义、注册、调用工具。先读框架，再挑具体工具。
-
-- [ ] `src/Tool.ts` — Tool 接口定义
-  - [ ] `Tool` 类型结构（name、description、inputSchema、call）
-  - [ ] `findToolByName`、`toolMatchesName` 工具函数
-- [ ] `src/tools.ts` — 工具注册表
-  - [ ] 工具列表组装逻辑
-  - [ ] 条件加载（feature flag、USER_TYPE）
-- [ ] 具体工具实现（挑选 2-3 个深入阅读）：
-  - [ ] `src/tools/BashTool/` — 执行 shell 命令，最常用的工具
-  - [ ] `src/tools/FileReadTool/` — 读取文件，简单直观，适合理解工具模式
-  - [ ] `src/tools/FileEditTool/` — 编辑文件，理解 diff/patch 机制
-  - [ ] `src/tools/AgentTool/` — 子 Agent 机制，较复杂但核心
+**資料流**：REPL.onSubmit → handlePromptSubmit → onQuery → onQueryImpl → `query()` AsyncGenerator → `queryLoop()` while(true) → `deps.callModel()` → `claude.ts queryModel()` → `anthropic.beta.messages.stream()` → 流式事件 → 收集 tool_use → 執行工具 → 結果追加到 messages → continue → 無工具呼叫時 return
 
 ---
 
-## 第四阶段：上下文与系统提示
+## 第三階段：工具系統
 
-理解 Claude 如何"知道"项目信息、用户偏好等上下文。
+理解 Claude 如何定義、註冊、呼叫工具。先讀框架，再挑具體工具。
 
-- [ ] `src/context.ts` — 系统/用户上下文构建
-  - [ ] git 状态注入
-  - [ ] CLAUDE.md 内容加载
-  - [ ] 内存文件（memory）注入
-  - [ ] 日期、平台等环境信息
-- [ ] `src/utils/claudemd.ts` — CLAUDE.md 发现与加载
-  - [ ] 项目层级搜索逻辑
-  - [ ] 多级 CLAUDE.md 合并
-
----
-
-## 第五阶段：UI 层（按兴趣选读）
-
-理解终端 UI 的渲染机制（React/Ink）。
-
-- [ ] `src/components/App.tsx` — 根组件，Provider 注入
-- [ ] `src/state/AppState.tsx` — 全局状态类型与 Context
-- [ ] `src/components/permissions/` — 工具权限审批 UI
-- [ ] `src/components/messages/` — 消息渲染组件
+- [ ] `src/Tool.ts` — Tool 介面定義
+  - [ ] `Tool` 類型結構（name、description、inputSchema、call）
+  - [ ] `findToolByName`、`toolMatchesName` 工具函數
+- [ ] `src/tools.ts` — 工具註冊表
+  - [ ] 工具列表組裝邏輯
+  - [ ] 條件加載（feature flag、USER_TYPE）
+- [ ] 具體工具實現（挑選 2-3 個深入閱讀）：
+  - [ ] `src/tools/BashTool/` — 執行 shell 命令，最常用的工具
+  - [ ] `src/tools/FileReadTool/` — 讀取文件，簡單直觀，適合理解工具模式
+  - [ ] `src/tools/FileEditTool/` — 編輯文件，理解 diff/patch 機制
+  - [ ] `src/tools/AgentTool/` — 子 Agent 機制，較複雜但核心
 
 ---
 
-## 第六阶段：外围系统（按需探索）
+## 第四階段：上下文與系統提示
 
-- [ ] `src/services/mcp/` — MCP 协议（Model Context Protocol）
-- [ ] `src/skills/` — 技能系统（/commit 等斜杠命令）
+理解 Claude 如何"知道"專案信息、用戶偏好等上下文。
+
+- [ ] `src/context.ts` — 系統/用戶上下文構建
+  - [ ] git 狀態注入
+  - [ ] CLAUDE.md 內容加載
+  - [ ] 內存文件（memory）注入
+  - [ ] 日期、平臺等環境信息
+- [ ] `src/utils/claudemd.ts` — CLAUDE.md 發現與加載
+  - [ ] 專案層級搜索邏輯
+  - [ ] 多級 CLAUDE.md 合併
+
+---
+
+## 第五階段：UI 層（按興趣選讀）
+
+理解終端 UI 的渲染機制（React/Ink）。
+
+- [ ] `src/components/App.tsx` — 根組件，Provider 注入
+- [ ] `src/state/AppState.tsx` — 全局狀態類型與 Context
+- [ ] `src/components/permissions/` — 工具權限審批 UI
+- [ ] `src/components/messages/` — 訊息渲染組件
+
+---
+
+## 第六階段：外圍系統（按需探索）
+
+- [ ] `src/services/mcp/` — MCP 協議（Model Context Protocol）
+- [ ] `src/skills/` — 技能系統（/commit 等斜槓命令）
 - [ ] `src/commands/` — CLI 子命令
-- [ ] `src/tasks/` — 后台任务系统
-- [ ] `src/utils/model/providers.ts` — 多 provider 选择逻辑
+- [ ] `src/tasks/` — 後臺任務系統
+- [ ] `src/utils/model/providers.ts` — 多 provider 選擇邏輯
 
 ---
 
-## 学习笔记
+## 學習筆記
 
-### 关键设计模式
+### 關鍵設計模式
 
-| 模式 | 位置 | 说明 |
+| 模式 | 位置 | 說明 |
 |------|------|------|
-| 快速路径 | cli.tsx | 按开销从低到高逐级检查，减少不必要的模块加载 |
-| 动态 import | cli.tsx / main.tsx | `await import()` 延迟加载，优化启动时间 |
-| feature flag | 全局 | `feature()` 永远返回 false，所有内部功能禁用 |
-| React/Ink | UI 层 | 用 React 组件模型渲染终端 UI |
-| 工具循环 | query.ts | AI 返回工具调用 → 执行 → 结果回传 → 继续，直到无工具调用 |
-| AsyncGenerator 链 | query.ts → claude.ts | `yield*` 透传事件流，形成管道 |
-| State 对象 | query.ts queryLoop | 循环间通过不可变 State + transition 字段传递状态 |
-| StreamingToolExecutor | query.ts | API 流式返回时并行执行工具 |
-| Withheld 消息 | query.ts | 暂扣可恢复错误，恢复成功则吞掉 |
-| withRetry | claude.ts | 429/500/529 自动重试 + 模型降级 |
-| Prompt Caching | claude.ts | 缓存系统提示和历史消息，减少 token 消耗 |
+| 快速路徑 | cli.tsx | 按開銷從低到高逐級檢查，減少不必要的模組加載 |
+| 動態 import | cli.tsx / main.tsx | `await import()` 延遲加載，優化啓動時間 |
+| feature flag | 全局 | `feature()` 永遠返回 false，所有內部功能禁用 |
+| React/Ink | UI 層 | 用 React 組件模型渲染終端 UI |
+| 工具循環 | query.ts | AI 返回工具呼叫 → 執行 → 結果回傳 → 繼續，直到無工具呼叫 |
+| AsyncGenerator 鏈 | query.ts → claude.ts | `yield*` 透傳事件流，形成管道 |
+| State 對象 | query.ts queryLoop | 循環間通過不可變 State + transition 字段傳遞狀態 |
+| StreamingToolExecutor | query.ts | API 流式返回時並行執行工具 |
+| Withheld 訊息 | query.ts | 暫扣可恢復錯誤，恢復成功則吞掉 |
+| withRetry | claude.ts | 429/500/529 自動重試 + 模型降級 |
+| Prompt Caching | claude.ts | 快取系統提示和歷史訊息，減少 token 消耗 |
 
-### 需要忽略的内容
+### 需要忽略的內容
 
-- `_c()` 调用 — React Compiler 反编译产物
-- `feature('...')` 后面的代码块 — 全部是死代码
-- tsc 类型错误 — 反编译导致，不影响 Bun 运行
-- `packages/@ant/` — stub 包，无实际实现
+- `_c()` 呼叫 — React Compiler 反編譯產物
+- `feature('...')` 後面的程式碼塊 — 全部是死程式碼
+- tsc 類型錯誤 — 反編譯導致，不影響 Bun 執行
+- `packages/@ant/` — stub 包，無實際實現

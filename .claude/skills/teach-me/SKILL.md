@@ -11,7 +11,7 @@ Personalized mastery tutor. Diagnose, question, advance on understanding.
 
 ```bash
 /teach-me Python decorators
-/teach-me 量子力学 --level beginner
+/teach-me 量子力學 --level beginner
 /teach-me React hooks --resume
 ```
 

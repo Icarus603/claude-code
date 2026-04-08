@@ -1744,7 +1744,7 @@ export function getAutoUpdaterDisabledReason(): AutoUpdaterDisabledReason | null
   if (process.env.NODE_ENV === 'development') {
     return { type: 'development' }
   }
-  // 本项目默认关闭自动更新；通过 ENABLE_AUTOUPDATER=1 显式开启
+  // Auto-update is disabled by default in this fork; enable it explicitly with ENABLE_AUTOUPDATER=1
   if (!isEnvTruthy(process.env.ENABLE_AUTOUPDATER)) {
     return { type: 'config' }
   }

@@ -1,15 +1,15 @@
-# Phase 19 - Batch 4: Services 纯逻辑
+# Phase 19 - Batch 4: Services 純邏輯
 
-> 预计 ~84 tests / 5 文件 | 部分需轻量 mock
+> 預計 ~84 tests / 5 文件 | 部分需輕量 mock
 
 ---
 
 ## 1. `src/services/compact/__tests__/grouping.test.ts` (~15 tests)
 
 **源文件**: `src/services/compact/grouping.ts` (64 行)
-**目标函数**: `groupMessagesByApiRound`
+**目標函數**: `groupMessagesByApiRound`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("groupMessagesByApiRound", () => {
@@ -32,44 +32,44 @@ describe("groupMessagesByApiRound", () => {
 ```
 
 ### Mock 需求
-需构造 `Message` mock 对象（type: 'user'/'assistant', message: { id, content }）
+需構造 `Message` mock 對象（type: 'user'/'assistant', message: { id, content }）
 
 ---
 
 ## 2. `src/services/compact/__tests__/stripMessages.test.ts` (~20 tests)
 
 **源文件**: `src/services/compact/compact.ts` (1709 行)
-**目标函数**: `stripImagesFromMessages`, `collectReadToolFilePaths` (私有)
+**目標函數**: `stripImagesFromMessages`, `collectReadToolFilePaths` (私有)
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("stripImagesFromMessages", () => {
-  // user 消息处理
+  // user 訊息處理
   test("replaces image block with [image] text")
   test("replaces document block with [document] text")
   test("preserves text blocks unchanged")
   test("handles multiple image/document blocks in single message")
   test("returns original message when no media blocks")
 
-  // tool_result 内嵌套
+  // tool_result 內嵌套
   test("replaces image inside tool_result content")
   test("replaces document inside tool_result content")
   test("preserves non-media tool_result content")
 
-  // 非用户消息
+  // 非用戶訊息
   test("passes through assistant messages unchanged")
   test("passes through system messages unchanged")
 
-  // 边界
+  // 邊界
   test("handles empty message array")
   test("handles string content (non-array) in user message")
   test("does not mutate original messages")
 })
 
 describe("collectReadToolFilePaths", () => {
-  // 注意：这是私有函数，可能需要通过 stripImagesFromMessages 或其他导出间接测试
-  // 如果不可直接测试，则跳过或通过集成测试覆盖
+  // 注意：這是私有函數，可能需要通過 stripImagesFromMessages 或其他導出間接測試
+  // 如果不可直接測試，則跳過或通過集成測試覆蓋
   test("collects file_path from Read tool_use blocks")
   test("skips tool_use with FILE_UNCHANGED_STUB result")
   test("returns empty set for messages without Read tool_use")
@@ -79,18 +79,18 @@ describe("collectReadToolFilePaths", () => {
 ```
 
 ### Mock 需求
-需 mock `expandPath`（如果 collectReadToolFilePaths 要测）
-需 mock `log`, `slowOperations` 等重依赖
-构造 `Message` mock 对象
+需 mock `expandPath`（如果 collectReadToolFilePaths 要測）
+需 mock `log`, `slowOperations` 等重依賴
+構造 `Message` mock 對象
 
 ---
 
 ## 3. `src/services/compact/__tests__/prompt.test.ts` (~12 tests)
 
 **源文件**: `src/services/compact/prompt.ts` (375 行)
-**目标函数**: `formatCompactSummary`
+**目標函數**: `formatCompactSummary`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("formatCompactSummary", () => {
@@ -110,17 +110,17 @@ describe("formatCompactSummary", () => {
 ```
 
 ### Mock 需求
-需 mock 重依赖链（`log`, feature flags 等）
-`formatCompactSummary` 是纯字符串处理，如果 import 链不太重则无需复杂 mock
+需 mock 重依賴鏈（`log`, feature flags 等）
+`formatCompactSummary` 是純字符串處理，如果 import 鏈不太重則無需複雜 mock
 
 ---
 
 ## 4. `src/services/mcp/__tests__/channelPermissions.test.ts` (~25 tests)
 
 **源文件**: `src/services/mcp/channelPermissions.ts` (241 行)
-**目标函数**: `hashToId`, `shortRequestId`, `truncateForPreview`, `filterPermissionRelayClients`
+**目標函數**: `hashToId`, `shortRequestId`, `truncateForPreview`, `filterPermissionRelayClients`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("hashToId", () => {
@@ -167,22 +167,22 @@ describe("PERMISSION_REPLY_RE", () => {
 ```
 
 ### Mock 需求
-`hashToId` 可能需要确认导出状态
-`filterPermissionRelayClients` 需要 mock 客户端类型
-`truncateForPreview` 可能依赖 `jsonStringify`（需 mock `slowOperations`）
+`hashToId` 可能需要確認導出狀態
+`filterPermissionRelayClients` 需要 mock 客戶端類型
+`truncateForPreview` 可能依賴 `jsonStringify`（需 mock `slowOperations`）
 
 ---
 
 ## 5. `src/services/mcp/__tests__/officialRegistry.test.ts` (~12 tests)
 
 **源文件**: `src/services/mcp/officialRegistry.ts` (73 行)
-**目标函数**: `normalizeUrl` (私有), `isOfficialMcpUrl`, `resetOfficialMcpUrlsForTesting`
+**目標函數**: `normalizeUrl` (私有), `isOfficialMcpUrl`, `resetOfficialMcpUrlsForTesting`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("normalizeUrl", () => {
-  // 注意：如果是私有的，通过 isOfficialMcpUrl 间接测试
+  // 注意：如果是私有的，通過 isOfficialMcpUrl 間接測試
   test("removes trailing slash")
   test("removes query parameters")
   test("preserves path")
@@ -211,5 +211,5 @@ describe("URL normalization + lookup integration", () => {
 ```
 
 ### Mock 需求
-需 mock `axios`（避免网络请求）
-使用 `resetOfficialMcpUrlsForTesting` 做测试隔离
+需 mock `axios`（避免網絡請求）
+使用 `resetOfficialMcpUrlsForTesting` 做測試隔離

@@ -1,92 +1,92 @@
 ---
-title: "沙箱机制 - 权限之外的第二道防线"
-description: "深入 Claude Code 沙箱机制：文件系统隔离、网络限制和资源约束，即使命令通过权限审批，沙箱仍可限制其行为范围。"
-keywords: ["沙箱", "sandbox", "文件隔离", "安全沙箱", "命令隔离"]
+title: "沙箱機制 - 權限之外的第二道防線"
+description: "深入 Claude Code 沙箱機制：檔案系統隔離、網絡限制和資源約束，即使命令通過權限審批，沙箱仍可限制其行爲範圍。"
+keywords: ["沙箱", "sandbox", "文件隔離", "安全沙箱", "命令隔離"]
 ---
 
-## 权限之外的第二道防线
+## 權限之外的第二道防線
 
-权限系统决定"这条命令能不能执行"，沙箱决定"执行时能做到什么程度"。
+權限系統決定"這條命令能不能執行"，沙箱決定"執行時能做到什麼程度"。
 
-即使一条命令通过了权限审批，沙箱仍然可以限制它的行为。两者构成纵深防御的两层：
-- **权限层**（应用级）：在工具调用前检查，决定是否弹窗审批
-- **沙箱层**（OS 级）：在进程级别强制约束，即使 AI 生成了恶意命令也无法突破
+即使一條命令通過了權限審批，沙箱仍然可以限制它的行爲。兩者構成縱深防禦的兩層：
+- **權限層**（應用級）：在工具呼叫前檢查，決定是否彈窗審批
+- **沙箱層**（OS 級）：在進程級別強制約束，即使 AI 生成了惡意命令也無法突破
 
-## 执行链路：从用户输入到沙箱包裹
+## 執行鏈路：從用戶輸入到沙箱包裹
 
-一条 Bash 命令的完整执行路径如下：
+一條 Bash 命令的完整執行路徑如下：
 
 ```
-用户输入 → BashTool.call()
+用戶輸入 → BashTool.call()
          → shouldUseSandbox(input) ─── 是否需要沙箱？
          → Shell.exec(command, { shouldUseSandbox })
          → SandboxManager.wrapWithSandbox(command)
-         → spawn(wrapped_command)  ─── 实际进程创建
+         → spawn(wrapped_command)  ─── 實際進程建立
 ```
 
-关键判定发生在 `shouldUseSandbox()`（`src/tools/BashTool/shouldUseSandbox.ts`），它执行以下检查：
+關鍵判定發生在 `shouldUseSandbox()`（`src/tools/BashTool/shouldUseSandbox.ts`），它執行以下檢查：
 
-1. **全局开关**：`SandboxManager.isSandboxingEnabled()` — 检查平台支持 + 依赖完整性 + 用户设置
-2. **显式跳过**：如果 `dangerouslyDisableSandbox: true` 且策略允许（`allowUnsandboxedCommands`），则不走沙箱
-3. **排除列表**：用户可在 `settings.json` 中配置 `sandbox.excludedCommands`，匹配的命令跳过沙箱
-4. **默认行为**：以上条件都不满足时，**进入沙箱**
+1. **全局開關**：`SandboxManager.isSandboxingEnabled()` — 檢查平臺支援 + 依賴完整性 + 用戶設置
+2. **顯式跳過**：如果 `dangerouslyDisableSandbox: true` 且策略允許（`allowUnsandboxedCommands`），則不走沙箱
+3. **排除列表**：用戶可在 `settings.json` 中設定 `sandbox.excludedCommands`，匹配的命令跳過沙箱
+4. **預設行爲**：以上條件都不滿足時，**進入沙箱**
 
-## `shouldUseSandbox()` 判定逻辑详解
+## `shouldUseSandbox()` 判定邏輯詳解
 
 ```typescript
 // src/tools/BashTool/shouldUseSandbox.ts
 function shouldUseSandbox(input: Partial<SandboxInput>): boolean {
-  // 1. 全局未启用 → 直接跳过
+  // 1. 全局未啓用 → 直接跳過
   if (!SandboxManager.isSandboxingEnabled()) return false
 
-  // 2. 显式禁用 + 策略允许 → 跳过
+  // 2. 顯式禁用 + 策略允許 → 跳過
   if (input.dangerouslyDisableSandbox && 
       SandboxManager.areUnsandboxedCommandsAllowed()) return false
 
-  // 3. 无命令 → 跳过
+  // 3. 無命令 → 跳過
   if (!input.command) return false
 
-  // 4. 匹配排除列表 → 跳过
+  // 4. 匹配排除列表 → 跳過
   if (containsExcludedCommand(input.command)) return false
 
-  // 5. 其他情况 → 必须沙箱化
+  // 5. 其他情況 → 必須沙箱化
   return true
 }
 ```
 
-`containsExcludedCommand()` 的匹配机制值得注意——它不只是简单的前缀匹配，而是支持三种模式：
+`containsExcludedCommand()` 的匹配機制值得注意——它不只是簡單的前綴匹配，而是支援三種模式：
 
-| 模式 | 示例 | 匹配行为 |
+| 模式 | 示例 | 匹配行爲 |
 |------|------|----------|
-| **精确匹配** | `npm run lint` | 完全相等 |
-| **前缀匹配** | `npm run test:*` | 前缀 + 空格或完全相等 |
+| **精確匹配** | `npm run lint` | 完全相等 |
+| **前綴匹配** | `npm run test:*` | 前綴 + 空格或完全相等 |
 | **通配符** | `docker*` | 使用 `matchWildcardPattern` |
 
-对于复合命令（如 `docker ps && curl evil.com`），系统会先拆分为子命令，逐一检查。还会迭代剥离环境变量前缀（`FOO=bar bazel ...`）和包装命令（`timeout 30 bazel ...`），直到不动点——防止通过嵌套包装绕过。
+對於複合命令（如 `docker ps && curl evil.com`），系統會先拆分爲子命令，逐一檢查。還會迭代剝離環境變量前綴（`FOO=bar bazel ...`）和包裝命令（`timeout 30 bazel ...`），直到不動點——防止通過嵌套包裝繞過。
 
-## 沙箱的配置模型
+## 沙箱的設定模型
 
-沙箱配置来自 `settings.json` 中的 `sandbox` 字段（`src/entrypoints/sandboxTypes.ts`）：
+沙箱設定來自 `settings.json` 中的 `sandbox` 字段（`src/entrypoints/sandboxTypes.ts`）：
 
 ```jsonc
 {
   "sandbox": {
-    "enabled": true,                     // 主开关
-    "autoAllowBashIfSandboxed": true,     // 沙箱中的命令自动允许（跳过审批）
-    "allowUnsandboxedCommands": true,     // 是否允许 dangerouslyDisableSandbox
-    "failIfUnavailable": false,           // 沙箱依赖缺失时是否报错退出
+    "enabled": true,                     // 主開關
+    "autoAllowBashIfSandboxed": true,     // 沙箱中的命令自動允許（跳過審批）
+    "allowUnsandboxedCommands": true,     // 是否允許 dangerouslyDisableSandbox
+    "failIfUnavailable": false,           // 沙箱依賴缺失時是否報錯退出
     
     "network": {
-      "allowedDomains": ["github.com"],   // 网络白名单
-      "deniedDomains": [],                // 网络黑名单
-      "allowLocalBinding": true,          // 允许 localhost 绑定
+      "allowedDomains": ["github.com"],   // 網絡白名單
+      "deniedDomains": [],                // 網絡黑名單
+      "allowLocalBinding": true,          // 允許 localhost 綁定
       "httpProxyPort": 8888               // HTTP 代理端口（MITM）
     },
     
     "filesystem": {
-      "allowWrite": ["~/projects"],       // 额外可写路径
-      "denyWrite": ["~/.ssh"],            // 禁止写入路径
-      "denyRead": [],                     // 禁止读取路径
+      "allowWrite": ["~/projects"],       // 額外可寫路徑
+      "denyWrite": ["~/.ssh"],            // 禁止寫入路徑
+      "denyRead": [],                     // 禁止讀取路徑
       "allowRead": []                     // 在 denyRead 中重新放行
     },
     
@@ -95,121 +95,121 @@ function shouldUseSandbox(input: Partial<SandboxInput>): boolean {
 }
 ```
 
-`SandboxSettingsSchema` 定义了完整的 Zod 验证规则，包含一些未公开的设置如 `enabledPlatforms`（限制沙箱只在特定平台生效）。
+`SandboxSettingsSchema` 定義了完整的 Zod 驗證規則，包含一些未公開的設置如 `enabledPlatforms`（限制沙箱只在特定平臺生效）。
 
-## 平台实现差异
+## 平臺實現差異
 
 ### macOS：sandbox-exec（Seatbelt）
 
-macOS 使用 Apple 的 Seatbelt 沙箱（`sandbox-exec` 命令），这是 macOS 原生的进程隔离机制。
+macOS 使用 Apple 的 Seatbelt 沙箱（`sandbox-exec` 命令），這是 macOS 原生的進程隔離機制。
 
-执行流程：
-1. `SandboxManager.wrapWithSandbox()` 调用 `@anthropic-ai/sandbox-runtime` 的 `BaseSandboxManager`
-2. 运行时生成 Seatbelt profile（基于配置中的网络/文件系统规则）
-3. 通过 `sandbox-exec -p <profile> -- <command>` 包裹原始命令
-4. Seatbelt 在内核级别强制执行约束
+執行流程：
+1. `SandboxManager.wrapWithSandbox()` 呼叫 `@anthropic-ai/sandbox-runtime` 的 `BaseSandboxManager`
+2. 執行時生成 Seatbelt profile（基於設定中的網絡/檔案系統規則）
+3. 通過 `sandbox-exec -p <profile> -- <command>` 包裹原始命令
+4. Seatbelt 在內核級別強制執行約束
 
-网络隔离的实现方式：
-- 通过代理端口拦截 HTTP/HTTPS 请求
-- 域名白名单/黑名单在代理层过滤
-- Unix socket 可单独配置允许路径
+網絡隔離的實現方式：
+- 通過代理端口攔截 HTTP/HTTPS 請求
+- 域名白名單/黑名單在代理層過濾
+- Unix socket 可單獨設定允許路徑
 
 ### Linux：bubblewrap（bwrap）+ seccomp
 
-Linux 使用 `bubblewrap`（bwrap）创建命名空间隔离，配合 seccomp 过滤系统调用：
+Linux 使用 `bubblewrap`（bwrap）建立命名空間隔離，配合 seccomp 過濾系統呼叫：
 
-依赖项（`apt install`）：
+依賴項（`apt install`）：
 | 包 | 作用 |
 |----|------|
-| `bubblewrap` | 创建 mount/PID/network 命名空间 |
-| `socat` | 网络代理（HTTP/SOCKS） |
-| `libseccomp` / seccomp filter | 过滤 Unix socket 系统调用 |
+| `bubblewrap` | 建立 mount/PID/network 命名空間 |
+| `socat` | 網絡代理（HTTP/SOCKS） |
+| `libseccomp` / seccomp filter | 過濾 Unix socket 系統呼叫 |
 
-bwrap 的实现差异：
-- **不支持 glob 路径模式**（macOS 的 Seatbelt 支持）— Linux 上带 glob 的权限规则会触发警告
-- 执行后会在当前目录留下 0 字节的 mount-point 文件（如 `.bashrc`），需要 `cleanupAfterCommand()` 清理
-- seccomp 无法按路径过滤 Unix socket（只能全允许或全拒绝），与 macOS 的按路径放行形成差异
+bwrap 的實現差異：
+- **不支援 glob 路徑模式**（macOS 的 Seatbelt 支援）— Linux 上帶 glob 的權限規則會觸發警告
+- 執行後會在當前目錄留下 0 字節的 mount-point 文件（如 `.bashrc`），需要 `cleanupAfterCommand()` 清理
+- seccomp 無法按路徑過濾 Unix socket（只能全允許或全拒絕），與 macOS 的按路徑放行形成差異
 
-### 平台支持矩阵
+### 平臺支援矩陣
 
 | 特性 | macOS | Linux | WSL |
 |------|-------|-------|-----|
-| 沙箱引擎 | sandbox-exec (Seatbelt) | bubblewrap + seccomp | 仅 WSL2 |
-| 文件 glob | ✅ 完整支持 | ⚠️ 仅 `/**` 后缀 | 同 Linux |
-| 网络 Unix socket 按路径 | ✅ | ❌ | ❌ |
-| 依赖检查 | ripgrep | bwrap + socat + ripgrep + seccomp | 同 Linux |
+| 沙箱引擎 | sandbox-exec (Seatbelt) | bubblewrap + seccomp | 僅 WSL2 |
+| 文件 glob | ✅ 完整支援 | ⚠️ 僅 `/**` 後綴 | 同 Linux |
+| 網絡 Unix socket 按路徑 | ✅ | ❌ | ❌ |
+| 依賴檢查 | ripgrep | bwrap + socat + ripgrep + seccomp | 同 Linux |
 
 ## 沙箱初始化流程
 
 ```
-REPL/SDK 启动
+REPL/SDK 啓動
   → main.tsx → init.ts
   → SandboxManager.initialize(sandboxAskCallback)
-    → detectWorktreeMainRepoPath()     // 检测 git worktree，放行主仓库 .git
-    → convertToSandboxRuntimeConfig()  // 构建 SandboxRuntimeConfig
-    → BaseSandboxManager.initialize()  // 启动底层运行时
-    → settingsChangeDetector.subscribe() // 订阅设置变更，动态更新配置
+    → detectWorktreeMainRepoPath()     // 檢測 git worktree，放行主倉庫 .git
+    → convertToSandboxRuntimeConfig()  // 構建 SandboxRuntimeConfig
+    → BaseSandboxManager.initialize()  // 啓動底層執行時
+    → settingsChangeDetector.subscribe() // 訂閱設置變更，動態更新設定
 ```
 
-`convertToSandboxRuntimeConfig()`（`src/utils/sandbox/sandbox-adapter.ts`）完成从用户设置到运行时配置的转换：
+`convertToSandboxRuntimeConfig()`（`src/utils/sandbox/sandbox-adapter.ts`）完成從用戶設置到執行時設定的轉換：
 
-1. **网络规则**：从 `WebFetch(domain:...)` 权限规则提取域名 → `allowedDomains`
-2. **文件系统规则**：从 `Edit(...)` / `Read(...)` 权限规则提取路径 → `allowWrite` / `denyWrite` / `denyRead`
+1. **網絡規則**：從 `WebFetch(domain:...)` 權限規則提取域名 → `allowedDomains`
+2. **檔案系統規則**：從 `Edit(...)` / `Read(...)` 權限規則提取路徑 → `allowWrite` / `denyWrite` / `denyRead`
 3. **安全加固**：
-   - 自动将项目目录加入 `allowWrite`
-   - 自动将 `settings.json` 路径加入 `denyWrite`（防止沙箱逃逸）
-   - 自动将 `.claude/skills` 加入 `denyWrite`（防止技能注入）
-   - 检测 bare git repo 攻击向量，对 `HEAD`/`objects`/`refs` 做保护
+   - 自動將專案目錄加入 `allowWrite`
+   - 自動將 `settings.json` 路徑加入 `denyWrite`（防止沙箱逃逸）
+   - 自動將 `.claude/skills` 加入 `denyWrite`（防止技能注入）
+   - 檢測 bare git repo 攻擊向量，對 `HEAD`/`objects`/`refs` 做保護
 
-## `dangerouslyDisableSandbox` 的设计权衡
+## `dangerouslyDisableSandbox` 的設計權衡
 
-这个参数的命名本身就传达了设计意图——它不是"关闭沙箱"，而是"**危险地禁用沙箱**"。
+這個參數的命名本身就傳達了設計意圖——它不是"關閉沙箱"，而是"**危險地禁用沙箱**"。
 
-双重保险机制：
-1. **调用侧**：模型在 BashTool 的 `inputSchema` 中可以设置 `dangerouslyDisableSandbox: true`
-2. **策略侧**：管理员可通过 `allowUnsandboxedCommands: false` 完全禁止此参数（企业部署场景）
+雙重保險機制：
+1. **呼叫側**：模型在 BashTool 的 `inputSchema` 中可以設置 `dangerouslyDisableSandbox: true`
+2. **策略側**：管理員可通過 `allowUnsandboxedCommands: false` 完全禁止此參數（企業部署場景）
 
 ```typescript
-// 即使 AI 请求了 dangerouslyDisableSandbox，策略层仍可覆盖
+// 即使 AI 請求了 dangerouslyDisableSandbox，策略層仍可覆蓋
 if (input.dangerouslyDisableSandbox && 
     SandboxManager.areUnsandboxedCommandsAllowed()) {
-  return false  // 只有策略允许时才真正跳过沙箱
+  return false  // 只有策略允許時才真正跳過沙箱
 }
 ```
 
-`autoAllowBashIfSandboxed` 进一步补充了这个模型：当启用时，**在沙箱中的命令自动获得执行许可**，无需逐条审批。这基于一个信任假设——如果 OS 级沙箱已经限制了命令的能力，那么应用层的逐条审批就变得多余。
+`autoAllowBashIfSandboxed` 進一步補充了這個模型：當啓用時，**在沙箱中的命令自動獲得執行許可**，無需逐條審批。這基於一個信任假設——如果 OS 級沙箱已經限制了命令的能力，那麼應用層的逐條審批就變得多餘。
 
-## 沙箱违规处理
+## 沙箱違規處理
 
-当命令尝试违反沙箱约束时：
+當命令嘗試違反沙箱約束時：
 
-1. 运行时捕获违规事件（文件/网络访问被拒绝）
-2. `SandboxManager.annotateStderrWithSandboxFailures()` 在输出中注入 `<sandbox_violations>` 标签
-3. UI 层通过 `removeSandboxViolationTags()` 清理显示
-4. 违规事件通过 `SandboxViolationStore` 持久化，可用于审计
+1. 執行時捕獲違規事件（文件/網絡訪問被拒絕）
+2. `SandboxManager.annotateStderrWithSandboxFailures()` 在輸出中注入 `<sandbox_violations>` 標籤
+3. UI 層通過 `removeSandboxViolationTags()` 清理顯示
+4. 違規事件通過 `SandboxViolationStore` 持久化，可用於審計
 
-## 完整执行链路示例
+## 完整執行鏈路示例
 
-以 `npm install` 为例：
+以 `npm install` 爲例：
 
 ```
-1. 用户在 REPL 中输入 → Claude 决定调用 BashTool
-2. BashTool.validateInput() → 通过
-3. BashTool.checkPermissions() → 检查权限规则
-   ├── autoAllowBashIfSandboxed = true 且沙箱可用 → 自动允许
-   └── 否则 → 弹窗请用户确认
+1. 用戶在 REPL 中輸入 → Claude 決定呼叫 BashTool
+2. BashTool.validateInput() → 通過
+3. BashTool.checkPermissions() → 檢查權限規則
+   ├── autoAllowBashIfSandboxed = true 且沙箱可用 → 自動允許
+   └── 否則 → 彈窗請用戶確認
 4. BashTool.call() → runShellCommand()
 5. shouldUseSandbox({ command: "npm install" })
    ├── SandboxManager.isSandboxingEnabled() → true
    ├── dangerouslyDisableSandbox → undefined
-   └── containsExcludedCommand() → false（除非用户配置了排除 npm）
-   → 结果: true，需要沙箱
+   └── containsExcludedCommand() → false（除非用戶設定了排除 npm）
+   → 結果: true，需要沙箱
 6. Shell.exec() → SandboxManager.wrapWithSandbox("npm install")
    ├── macOS: sandbox-exec -p <generated-profile> -- bash -c 'npm install'
    └── Linux: bwrap ... bash -c 'npm install'
-7. spawn(wrapped_command) → 子进程在沙箱内执行
-8. 执行完成 → SandboxManager.cleanupAfterCommand()
-   ├── 清理 bwrap 残留文件（Linux）
+7. spawn(wrapped_command) → 子進程在沙箱內執行
+8. 執行完成 → SandboxManager.cleanupAfterCommand()
+   ├── 清理 bwrap 殘留文件（Linux）
    └── scrubBareGitRepoFiles()（安全清理）
-9. 结果返回给 Claude → 展示给用户
+9. 結果返回給 Claude → 展示給用戶
 ```

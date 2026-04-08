@@ -1,50 +1,50 @@
-# 第一阶段：启动流程详解
+# 第一階段：啓動流程詳解
 
-> 从 `bun run dev` 到用户看到交互界面的完整路径
+> 從 `bun run dev` 到用戶看到交互界面的完整路徑
 
-## 启动链路总览
+## 啓動鏈路總覽
 
 ```
 bun run dev
   → package.json scripts.dev: "bun run src/entrypoints/cli.tsx"
-    → cli.tsx: polyfill 注入 + 快速路径检查
+    → cli.tsx: polyfill 注入 + 快速路徑檢查
       → import("../main.jsx") → cliMain()
         → main.tsx: main() → run()
-          → Commander 参数解析 → preAction 钩子
-            → action handler: 服务初始化 → showSetupScreens
+          → Commander 參數解析 → preAction 鉤子
+            → action handler: 服務初始化 → showSetupScreens
               → launchRepl()
                 → replLauncher.tsx: <App><REPL /></App>
-                  → REPL.tsx: 渲染交互界面，等待用户输入
+                  → REPL.tsx: 渲染交互界面，等待用戶輸入
 ```
 
 ---
 
-## 1. cli.tsx（321 行）— 入口与快速路径分发
+## 1. cli.tsx（321 行）— 入口與快速路徑分發
 
-**文件路径**: `src/entrypoints/cli.tsx`
+**檔案路徑**: `src/entrypoints/cli.tsx`
 
 ### 1.1 全局 Polyfill（第 1-53 行）
 
-模块加载时立即执行的 side-effect，在 `main()` 之前运行。
+模組加載時立即執行的 side-effect，在 `main()` 之前執行。
 
-#### feature() 桩函数（第 3 行）
+#### feature() 樁函數（第 3 行）
 
 ```ts
 const feature = (_name: string) => false;
 ```
 
-原版 Claude Code 构建时，Bun bundler 通过 `bun:bundle` 提供 `feature()` 函数，用于**编译时 feature flag**（类似 C 的 `#ifdef`）。反编译版没有构建流程，所以直接定义为永远返回 `false`。
+原版 Claude Code 構建時，Bun bundler 通過 `bun:bundle` 提供 `feature()` 函數，用於**編譯時 feature flag**（類似 C 的 `#ifdef`）。反編譯版沒有構建流程，所以直接定義爲永遠返回 `false`。
 
-**效果**：所有 Anthropic 内部功能分支全部禁用，包括：
-- `COORDINATOR_MODE` — 协调器模式
+**效果**：所有 Anthropic 內部功能分支全部禁用，包括：
+- `COORDINATOR_MODE` — 協調器模式
 - `KAIROS` — 助手模式
-- `DAEMON` — 后台守护进程
-- `BRIDGE_MODE` — 远程控制
-- `SSH_REMOTE` — SSH 远程
-- `BG_SESSIONS` — 后台会话
-- ... 等 20+ 个 flag
+- `DAEMON` — 後臺守護進程
+- `BRIDGE_MODE` — 遠程控制
+- `SSH_REMOTE` — SSH 遠程
+- `BG_SESSIONS` — 後臺會話
+- ... 等 20+ 個 flag
 
-#### MACRO 全局对象（第 4-14 行）
+#### MACRO 全局對象（第 4-14 行）
 
 ```ts
 globalThis.MACRO = {
@@ -58,22 +58,22 @@ globalThis.MACRO = {
 };
 ```
 
-原版构建时 Bun 会把这些值内联到代码里。这里模拟注入，让后续代码读 `MACRO.VERSION` 时能拿到值。
+原版構建時 Bun 會把這些值內聯到程式碼裏。這裏模擬注入，讓後續程式碼讀 `MACRO.VERSION` 時能拿到值。
 
-#### 构建常量（第 16-18 行）
+#### 構建常量（第 16-18 行）
 
 ```ts
-BUILD_TARGET = "external";   // 标记为"外部"构建（非 Anthropic 内部）
-BUILD_ENV = "production";    // 生产环境
-INTERFACE_TYPE = "stdio";    // 标准输入输出模式
+BUILD_TARGET = "external";   // 標記爲"外部"構建（非 Anthropic 內部）
+BUILD_ENV = "production";    // 生產環境
+INTERFACE_TYPE = "stdio";    // 標準輸入輸出模式
 ```
 
-这三个全局变量在代码各处被读取，用来区分运行环境。`"external"` 意味着很多 `("external" as string) === 'ant'` 的检查会返回 false。
+這三個全局變量在程式碼各處被讀取，用來區分執行環境。`"external"` 意味着很多 `("external" as string) === 'ant'` 的檢查會返回 false。
 
-#### 环境修补（第 22-33 行）
+#### 環境修補（第 22-33 行）
 
-- 禁用 corepack 自动 pin（防止污染 package.json）
-- 远程模式下设置 Node.js 堆内存上限 8GB
+- 禁用 corepack 自動 pin（防止污染 package.json）
+- 遠程模式下設置 Node.js 堆內存上限 8GB
 
 #### ABLATION_BASELINE（第 40-53 行）
 
@@ -81,125 +81,125 @@ INTERFACE_TYPE = "stdio";    // 标准输入输出模式
 if (feature("ABLATION_BASELINE") && ...) { ... }
 ```
 
-`feature()` 返回 false，**永远不执行**。Anthropic 内部 A/B 测试代码。
+`feature()` 返回 false，**永遠不執行**。Anthropic 內部 A/B 測試程式碼。
 
-### 1.2 main() 函数（第 60-317 行）
+### 1.2 main() 函數（第 60-317 行）
 
-设计模式：**分层快速路径（fast path cascading）**——按开销从低到高逐级检查，命中即返回。
+設計模式：**分層快速路徑（fast path cascading）**——按開銷從低到高逐級檢查，命中即返回。
 
-#### 快速路径列表
+#### 快速路徑列表
 
-| 优先级 | 行号 | 检查条件 | 功能 | 开销 | 可执行 |
+| 優先級 | 行號 | 檢查條件 | 功能 | 開銷 | 可執行 |
 |--------|------|---------|------|------|--------|
-| 1 | 64-72 | `--version` / `-v` | 打印版本号退出 | **零 import** | 是 |
-| 2 | 81-94 | `feature("DUMP_SYSTEM_PROMPT")` | 导出系统提示 | - | 否（flag） |
-| 3 | 95-99 | `--claude-in-chrome-mcp` | Chrome MCP 服务 | 动态 import | 是 |
-| 4 | 101-105 | `--chrome-native-host` | Chrome Native Host | 动态 import | 是 |
+| 1 | 64-72 | `--version` / `-v` | 打印版本號退出 | **零 import** | 是 |
+| 2 | 81-94 | `feature("DUMP_SYSTEM_PROMPT")` | 導出系統提示 | - | 否（flag） |
+| 3 | 95-99 | `--claude-in-chrome-mcp` | Chrome MCP 服務 | 動態 import | 是 |
+| 4 | 101-105 | `--chrome-native-host` | Chrome Native Host | 動態 import | 是 |
 | 5 | 108-116 | `feature("CHICAGO_MCP")` | Computer Use MCP | - | 否（flag） |
 | 6 | 123-127 | `feature("DAEMON")` | Daemon Worker | - | 否（flag） |
-| 7 | 133-178 | `feature("BRIDGE_MODE")` | 远程控制 | - | 否（flag） |
-| 8 | 181-190 | `feature("DAEMON")` | Daemon 主进程 | - | 否（flag） |
+| 7 | 133-178 | `feature("BRIDGE_MODE")` | 遠程控制 | - | 否（flag） |
+| 8 | 181-190 | `feature("DAEMON")` | Daemon 主進程 | - | 否（flag） |
 | 9 | 195-225 | `feature("BG_SESSIONS")` | ps/logs/attach/kill | - | 否（flag） |
-| 10 | 228-240 | `feature("TEMPLATES")` | 模板任务 | - | 否（flag） |
-| 11 | 244-253 | `feature("BYOC_ENVIRONMENT_RUNNER")` | BYOC 运行器 | - | 否（flag） |
-| 12 | 258-264 | `feature("SELF_HOSTED_RUNNER")` | 自托管运行器 | - | 否（flag） |
-| 13 | 267-293 | `--tmux` + `--worktree` | tmux worktree | 动态 import | 是 |
+| 10 | 228-240 | `feature("TEMPLATES")` | 模板任務 | - | 否（flag） |
+| 11 | 244-253 | `feature("BYOC_ENVIRONMENT_RUNNER")` | BYOC 執行器 | - | 否（flag） |
+| 12 | 258-264 | `feature("SELF_HOSTED_RUNNER")` | 自託管執行器 | - | 否（flag） |
+| 13 | 267-293 | `--tmux` + `--worktree` | tmux worktree | 動態 import | 是 |
 
-#### 参数修正（第 296-307 行）
+#### 參數修正（第 296-307 行）
 
 ```ts
-// --update/--upgrade → 重写为 update 子命令
+// --update/--upgrade → 重寫爲 update 子命令
 if (args[0] === "--update") process.argv = [..., "update"];
-// --bare → 设置简单模式环境变量
+// --bare → 設置簡單模式環境變量
 if (args.includes("--bare")) process.env.CLAUDE_CODE_SIMPLE = "1";
 ```
 
-#### 最终出口（第 310-316 行）
+#### 最終出口（第 310-316 行）
 
 ```ts
 const { startCapturingEarlyInput } = await import("../utils/earlyInput.js");
-startCapturingEarlyInput();           // 捕获用户提前输入的内容
+startCapturingEarlyInput();           // 捕獲用戶提前輸入的內容
 const { main: cliMain } = await import("../main.jsx");
-await cliMain();                      // 进入 main.tsx 重型初始化
+await cliMain();                      // 進入 main.tsx 重型初始化
 ```
 
-所有快速路径都没命中时（99% 的情况），才走到这里。
+所有快速路徑都沒命中時（99% 的情況），才走到這裏。
 
-### 1.3 启动（第 320 行）
+### 1.3 啓動（第 320 行）
 
 ```ts
 void main();
 ```
 
-`void` 表示不关心 Promise 返回值。
+`void` 表示不關心 Promise 返回值。
 
-### 1.4 关键设计思想
+### 1.4 關鍵設計思想
 
-- **快速路径**：`--version` 零开销返回，不加载任何模块
-- **动态 import**：`await import()` 替代静态 import，每条路径只加载自己需要的模块
-- **feature flag 过滤**：`feature()` 返回 false 使大量内部功能成为死代码
+- **快速路徑**：`--version` 零開銷返回，不加載任何模組
+- **動態 import**：`await import()` 替代靜態 import，每條路徑只加載自己需要的模組
+- **feature flag 過濾**：`feature()` 返回 false 使大量內部功能成爲死程式碼
 
 ---
 
-## 2. main.tsx（4683 行）— 重型初始化与 Commander CLI
+## 2. main.tsx（4683 行）— 重型初始化與 Commander CLI
 
-**文件路径**: `src/main.tsx`
+**檔案路徑**: `src/main.tsx`
 
-整个项目最大的单文件，但结构清晰：**辅助函数 → main() → run()**。
+整個專案最大的單檔，但結構清晰：**輔助函數 → main() → run()**。
 
-### 2.1 Import 区（第 1-215 行）
+### 2.1 Import 區（第 1-215 行）
 
-200+ 行 import，加载几乎所有子系统。关键的是前三个 **side-effect import**（import 即执行）：
+200+ 行 import，加載幾乎所有子系統。關鍵的是前三個 **side-effect import**（import 即執行）：
 
 ```ts
-// 第 9 行：记录时间戳
+// 第 9 行：記錄時間戳
 profileCheckpoint('main_tsx_entry');
 
-// 第 16 行：启动 MDM 子进程读取（macOS plutil）
+// 第 16 行：啓動 MDM 子進程讀取（macOS plutil）
 startMdmRawRead();
 
-// 第 20 行：启动 keychain 预读取（OAuth token、API key）
+// 第 20 行：啓動 keychain 預讀取（OAuth token、API key）
 startKeychainPrefetch();
 ```
 
-这三个在 import 阶段就**并行启动子进程**，和后续 ~135ms 的模块加载同时进行——**用并行隐藏延迟**。
+這三個在 import 階段就**並行啓動子進程**，和後續 ~135ms 的模組加載同時進行——**用並行隱藏延遲**。
 
-### 2.2 辅助函数（第 216-584 行）
+### 2.2 輔助函數（第 216-584 行）
 
-| 函数 | 行号 | 作用 |
+| 函數 | 行號 | 作用 |
 |------|------|------|
-| `logManagedSettings()` | 216 | 记录企业托管设置到分析日志 |
-| `isBeingDebugged()` | 232 | 检测调试模式，**外部构建下直接 exit(1)**（第 266 行） |
-| `logSessionTelemetry()` | 279 | Session 遥测（技能、插件） |
-| `getCertEnvVarTelemetry()` | 291 | SSL 证书环境变量收集 |
-| `runMigrations()` | 326 | 数据迁移（模型重命名、设置格式升级等） |
-| `prefetchSystemContextIfSafe()` | 360 | 信任关系建立后安全预取系统上下文 |
-| `startDeferredPrefetches()` | 388 | REPL 首次渲染后的延迟预取 |
-| `eagerLoadSettings()` | 502 | 在 init() 之前提前加载 `--settings` 参数 |
-| `initializeEntrypoint()` | 517 | 根据运行模式设置 `CLAUDE_CODE_ENTRYPOINT` |
+| `logManagedSettings()` | 216 | 記錄企業託管設置到分析日誌 |
+| `isBeingDebugged()` | 232 | 檢測調試模式，**外部構建下直接 exit(1)**（第 266 行） |
+| `logSessionTelemetry()` | 279 | Session 遙測（技能、插件） |
+| `getCertEnvVarTelemetry()` | 291 | SSL 證書環境變量收集 |
+| `runMigrations()` | 326 | 資料遷移（模型重命名、設置格式升級等） |
+| `prefetchSystemContextIfSafe()` | 360 | 信任關係建立後安全預取系統上下文 |
+| `startDeferredPrefetches()` | 388 | REPL 首次渲染後的延遲預取 |
+| `eagerLoadSettings()` | 502 | 在 init() 之前提前加載 `--settings` 參數 |
+| `initializeEntrypoint()` | 517 | 根據執行模式設置 `CLAUDE_CODE_ENTRYPOINT` |
 
-还有 `_pendingConnect`、`_pendingSSH`、`_pendingAssistantChat` 三个状态变量（第 542-583 行），用于暂存子命令参数。
+還有 `_pendingConnect`、`_pendingSSH`、`_pendingAssistantChat` 三個狀態變量（第 542-583 行），用於暫存子命令參數。
 
-### 2.3 main() 函数（第 585-856 行）
+### 2.3 main() 函數（第 585-856 行）
 
-`main()` 本身不长，做完环境检测后调用 `run()`：
+`main()` 本身不長，做完環境檢測後呼叫 `run()`：
 
 ```
 main()
-├── 安全设置（NoDefaultCurrentDirectoryInExePath）
-├── 信号处理（SIGINT → exit, exit → 恢复光标）
-├── feature flag 保护的特殊路径（全部跳过）
-├── 检测 -p/--print / --init-only → 判断是否交互模式
-├── clientType 判断（cli / sdk-typescript / remote / github-action 等）
+├── 安全設置（NoDefaultCurrentDirectoryInExePath）
+├── 信號處理（SIGINT → exit, exit → 恢復光標）
+├── feature flag 保護的特殊路徑（全部跳過）
+├── 檢測 -p/--print / --init-only → 判斷是否交互模式
+├── clientType 判斷（cli / sdk-typescript / remote / github-action 等）
 ├── eagerLoadSettings()
-└── await run()  ← 进入真正的逻辑
+└── await run()  ← 進入真正的邏輯
 ```
 
-### 2.4 run() 函数（第 884-4683 行）
+### 2.4 run() 函數（第 884-4683 行）
 
-占 3800 行，是整个文件的核心。
+佔 3800 行，是整個文件的核心。
 
-#### Commander 初始化 + preAction 钩子（第 884-967 行）
+#### Commander 初始化 + preAction 鉤子（第 884-967 行）
 
 ```ts
 const program = new CommanderCommand()
@@ -207,118 +207,118 @@ const program = new CommanderCommand()
     .enablePositionalOptions();
 ```
 
-**preAction 钩子**（所有命令执行前都会运行）：
+**preAction 鉤子**（所有命令執行前都會執行）：
 
 ```
 preAction
-├── await ensureMdmSettingsLoaded()         ← 等 MDM 子进程完成
-├── await ensureKeychainPrefetchCompleted() ← 等 keychain 预读完成
+├── await ensureMdmSettingsLoaded()         ← 等 MDM 子進程完成
+├── await ensureKeychainPrefetchCompleted() ← 等 keychain 預讀完成
 ├── await init()                             ← 一次性初始化
-├── initSinks()                              ← 分析日志接收器
-├── runMigrations()                          ← 数据迁移
-├── loadRemoteManagedSettings()              ← 企业远程设置（非阻塞）
+├── initSinks()                              ← 分析日誌接收器
+├── runMigrations()                          ← 資料遷移
+├── loadRemoteManagedSettings()              ← 企業遠程設置（非阻塞）
 └── loadPolicyLimits()                       ← 策略限制（非阻塞）
 ```
 
-#### 主命令 Option 定义（第 968-1006 行）
+#### 主命令 Option 定義（第 968-1006 行）
 
-定义了 40+ CLI 参数，关键的包括：
+定義了 40+ CLI 參數，關鍵的包括：
 
-| 参数 | 作用 |
+| 參數 | 作用 |
 |------|------|
-| `-p, --print` | 非交互模式，输出后退出 |
+| `-p, --print` | 非交互模式，輸出後退出 |
 | `--model <model>` | 指定模型（如 sonnet、opus） |
-| `--permission-mode <mode>` | 权限模式 |
-| `-c, --continue` | 继续最近对话 |
-| `-r, --resume` | 恢复指定对话 |
-| `--mcp-config` | MCP 服务器配置文件 |
-| `--allowedTools` | 允许的工具列表 |
-| `--system-prompt` | 自定义系统提示 |
-| `--dangerously-skip-permissions` | 跳过所有权限检查 |
-| `--output-format` | 输出格式（text/json/stream-json） |
-| `--effort <level>` | 推理努力级别（low/medium/high/max） |
+| `--permission-mode <mode>` | 權限模式 |
+| `-c, --continue` | 繼續最近對話 |
+| `-r, --resume` | 恢復指定對話 |
+| `--mcp-config` | MCP 服務器設定文件 |
+| `--allowedTools` | 允許的工具列表 |
+| `--system-prompt` | 自定義系統提示 |
+| `--dangerously-skip-permissions` | 跳過所有權限檢查 |
+| `--output-format` | 輸出格式（text/json/stream-json） |
+| `--effort <level>` | 推理努力級別（low/medium/high/max） |
 | `--bare` | 最小模式 |
 
-#### action 处理器（第 1006-3808 行）
+#### action 處理器（第 1006-3808 行）
 
-主命令的执行逻辑，内部按阶段和场景分支：
+主命令的執行邏輯，內部按階段和場景分支：
 
 ```
 action(async (prompt, options) => {
     │
-    ├── [1007-1600] 参数解析与预处理
+    ├── [1007-1600] 參數解析與預處理
     │   ├── --bare 模式
     │   ├── 解析 model / permission-mode / thinking / effort
-    │   ├── 解析 MCP 配置、工具列表、系统提示
-    │   └── 初始化工具权限上下文
+    │   ├── 解析 MCP 設定、工具列表、系統提示
+    │   └── 初始化工具權限上下文
     │
-    ├── [1600-2220] 服务初始化
-    │   ├── MCP 客户端连接
-    │   ├── 插件加载 + 技能初始化
-    │   ├── 工具列表组装
-    │   └── 初始 AppState 构建
+    ├── [1600-2220] 服務初始化
+    │   ├── MCP 客戶端連接
+    │   ├── 擴充功能加載 + 技能初始化
+    │   ├── 工具列表組裝
+    │   └── 初始 AppState 構建
     │
     ├── [2220-2315] UI 初始化（交互模式）
-    │   ├── createRoot() — 创建 Ink 渲染根节点
-    │   ├── showSetupScreens() — 信任对话框、OAuth 登录、引导
-    │   └── 登录后刷新各种服务
+    │   ├── createRoot() — 建立 Ink 渲染根節點
+    │   ├── showSetupScreens() — 信任對話框、OAuth 登錄、引導
+    │   └── 登錄後刷新各種服務
     │
-    ├── [2315-2582] 后续初始化
-    │   ├── LSP 管理器、插件版本管理
-    │   ├── session 注册、遥测日志
-    │   └── 遥测上报
+    ├── [2315-2582] 後續初始化
+    │   ├── LSP 管理器、擴充功能版本管理
+    │   ├── session 註冊、遙測日誌
+    │   └── 遙測上報
     │
     ├── [2584-3050] --print 非交互模式分支
-    │   ├── 构建 headless AppState + store
-    │   └── 交给 print.ts 执行
+    │   ├── 構建 headless AppState + store
+    │   └── 交給 print.ts 執行
     │
-    └── [3050-3808] 交互模式：启动 REPL（7 个分支）
-        ├── --continue      → 加载最近对话 → launchRepl()
-        ├── DIRECT_CONNECT  → ❌ flag 关闭
-        ├── SSH_REMOTE      → ❌ flag 关闭
-        ├── KAIROS assistant → ❌ flag 关闭
-        ├── --resume <id>   → 恢复指定对话 → launchRepl()
-        ├── --resume 无 ID  → 显示对话选择器
-        └── 默认（无参数）  → launchRepl()  ★最常走的路径
+    └── [3050-3808] 交互模式：啓動 REPL（7 個分支）
+        ├── --continue      → 加載最近對話 → launchRepl()
+        ├── DIRECT_CONNECT  → ❌ flag 關閉
+        ├── SSH_REMOTE      → ❌ flag 關閉
+        ├── KAIROS assistant → ❌ flag 關閉
+        ├── --resume <id>   → 恢復指定對話 → launchRepl()
+        ├── --resume 無 ID  → 顯示對話選擇器
+        └── 預設（無參數）  → launchRepl()  ★最常走的路徑
 })
 ```
 
-#### 子命令注册（第 3808-4683 行）
+#### 子命令註冊（第 3808-4683 行）
 
-| 子命令 | 行号 | 作用 |
+| 子命令 | 行號 | 作用 |
 |--------|------|------|
-| `claude mcp` | 3892 | MCP 服务器管理（serve/add/remove/list/get） |
-| `claude server` | 3960 | Session 服务器（❌ flag 关闭） |
-| `claude auth` | 4098 | 认证管理（login/logout/status/token） |
-| `claude plugin` | 4148 | 插件管理（install/uninstall/list/update） |
-| `claude setup-token` | 4267 | 设置长期认证 token |
-| `claude agents` | 4278 | 列出已配置的 agents |
-| `claude doctor` | 4346 | 健康检查 |
-| `claude update` | 4362 | 检查更新 |
-| `claude install` | 4394 | 安装原生构建 |
-| `claude log` | 4411 | 查看对话日志（内部） |
-| `claude completion` | 4491 | Shell 自动补全 |
+| `claude mcp` | 3892 | MCP 服務器管理（serve/add/remove/list/get） |
+| `claude server` | 3960 | Session 服務器（❌ flag 關閉） |
+| `claude auth` | 4098 | 認證管理（login/logout/status/token） |
+| `claude plugin` | 4148 | 擴充功能管理（install/uninstall/list/update） |
+| `claude setup-token` | 4267 | 設置長期認證 token |
+| `claude agents` | 4278 | 列出已設定的 agents |
+| `claude doctor` | 4346 | 健康檢查 |
+| `claude update` | 4362 | 檢查更新 |
+| `claude install` | 4394 | 安裝原生構建 |
+| `claude log` | 4411 | 查看對話日誌（內部） |
+| `claude completion` | 4491 | Shell 自動補全 |
 
-最后执行解析：
+最後執行解析：
 
 ```ts
 await program.parseAsync(process.argv);
 ```
 
-### 2.5 main.tsx 学习建议
+### 2.5 main.tsx 學習建議
 
-- **不要通读**。记住三段结构：辅助函数 → main() → run()
-- `feature()` 返回 false 的分支全部跳过，可忽略 50%+ 代码
-- `("external" as string) === 'ant'` 的分支也跳过（内部构建专用）
-- 需要深入某功能时，通过搜索定位对应代码段
+- **不要通讀**。記住三段結構：輔助函數 → main() → run()
+- `feature()` 返回 false 的分支全部跳過，可忽略 50%+ 程式碼
+- `("external" as string) === 'ant'` 的分支也跳過（內部構建專用）
+- 需要深入某功能時，通過搜索定位對應程式碼段
 
 ---
 
-## 3. replLauncher.tsx（22 行）— 胶水层
+## 3. replLauncher.tsx（22 行）— 膠水層
 
-**文件路径**: `src/replLauncher.tsx`
+**檔案路徑**: `src/replLauncher.tsx`
 
-极其简单，就做一件事：
+極其簡單，就做一件事：
 
 ```tsx
 export async function launchRepl(root, appProps, replProps, renderAndRun) {
@@ -329,66 +329,66 @@ export async function launchRepl(root, appProps, replProps, renderAndRun) {
 ```
 
 - `App` — 全局 Provider（AppState、Stats、FpsMetrics）
-- `REPL` — 交互界面组件
-- `renderAndRun` — 把 React 元素渲染到 Ink 终端
+- `REPL` — 交互界面組件
+- `renderAndRun` — 把 React 元素渲染到 Ink 終端
 
-动态 import 保持了按需加载的策略。
+動態 import 保持了按需加載的策略。
 
 ---
 
 ## 4. REPL.tsx（5009 行）— 交互界面
 
-**文件路径**: `src/screens/REPL.tsx`
+**檔案路徑**: `src/screens/REPL.tsx`
 
-项目第二大文件，是用户直接交互的界面。一个巨型 React 函数组件。
+專案第二大文件，是用戶直接交互的界面。一個巨型 React 函數組件。
 
-### 4.1 文件结构
+### 4.1 文件結構
 
 ```
 REPL.tsx (5009 行)
-├── [1-310]     Import 区（150+ import）
-├── [312-525]   辅助组件
-│   ├── median()               — 数学工具函数
-│   ├── TranscriptModeFooter   — 转录模式底栏
-│   ├── TranscriptSearchBar    — 转录搜索栏
-│   └── AnimatedTerminalTitle  — 终端标题动画
-├── [527-571]   Props 类型定义
-└── [573-5009]  REPL() 组件主体
-    ├── [600-900]   状态声明（50+ 个 useState/useRef/useAppState）
-    ├── [900-2750]  副作用与回调（useEffect/useCallback）
-    ├── [2750-2860] onQueryImpl — 核心：执行 API 查询
-    ├── [2860-3030] onQuery — 查询守卫与并发控制
-    ├── [3030-3145] 查询相关辅助回调
-    ├── [3146-3550] onSubmit — 用户提交处理
-    ├── [3550-4395] 更多副作用与状态管理
+├── [1-310]     Import 區（150+ import）
+├── [312-525]   輔助組件
+│   ├── median()               — 數學工具函數
+│   ├── TranscriptModeFooter   — 轉錄模式底欄
+│   ├── TranscriptSearchBar    — 轉錄搜索欄
+│   └── AnimatedTerminalTitle  — 終端標題動畫
+├── [527-571]   Props 類型定義
+└── [573-5009]  REPL() 組件主體
+    ├── [600-900]   狀態聲明（50+ 個 useState/useRef/useAppState）
+    ├── [900-2750]  副作用與回調（useEffect/useCallback）
+    ├── [2750-2860] onQueryImpl — 核心：執行 API 查詢
+    ├── [2860-3030] onQuery — 查詢守衛與併發控制
+    ├── [3030-3145] 查詢相關輔助回調
+    ├── [3146-3550] onSubmit — 用戶提交處理
+    ├── [3550-4395] 更多副作用與狀態管理
     └── [4396-5009] JSX 渲染
 ```
 
 ### 4.2 Props
 
-从 main.tsx 通过 launchRepl() 传入：
+從 main.tsx 通過 launchRepl() 傳入：
 
-| Prop | 类型 | 含义 |
+| Prop | 類型 | 含義 |
 |------|------|------|
-| `commands` | `Command[]` | 可用的斜杠命令 |
-| `debug` | `boolean` | 调试模式 |
+| `commands` | `Command[]` | 可用的斜槓命令 |
+| `debug` | `boolean` | 調試模式 |
 | `initialTools` | `Tool[]` | 初始工具集 |
-| `initialMessages` | `MessageType[]` | 初始消息（恢复对话时有值） |
-| `pendingHookMessages` | `Promise<...>` | 延迟加载的 hook 消息 |
-| `mcpClients` | `MCPServerConnection[]` | MCP 服务器连接 |
-| `systemPrompt` | `string` | 自定义系统提示 |
-| `appendSystemPrompt` | `string` | 追加系统提示 |
-| `onBeforeQuery` | `fn` | 查询前回调，返回 false 可阻止查询 |
-| `onTurnComplete` | `fn` | 轮次完成回调 |
-| `mainThreadAgentDefinition` | `AgentDefinition` | 主线程 Agent 定义 |
-| `thinkingConfig` | `ThinkingConfig` | 思考模式配置 |
-| `disabled` | `boolean` | 禁用输入 |
+| `initialMessages` | `MessageType[]` | 初始訊息（恢復對話時有值） |
+| `pendingHookMessages` | `Promise<...>` | 延遲加載的 hook 訊息 |
+| `mcpClients` | `MCPServerConnection[]` | MCP 服務器連接 |
+| `systemPrompt` | `string` | 自定義系統提示 |
+| `appendSystemPrompt` | `string` | 追加系統提示 |
+| `onBeforeQuery` | `fn` | 查詢前回調，返回 false 可阻止查詢 |
+| `onTurnComplete` | `fn` | 輪次完成回調 |
+| `mainThreadAgentDefinition` | `AgentDefinition` | 主執行緒 Agent 定義 |
+| `thinkingConfig` | `ThinkingConfig` | 思考模式設定 |
+| `disabled` | `boolean` | 禁用輸入 |
 
-### 4.3 状态管理
+### 4.3 狀態管理
 
-分三层：
+分三層：
 
-**全局 AppState（通过 useAppState 选择器读取）：**
+**全局 AppState（通過 useAppState 選擇器讀取）：**
 
 ```ts
 const toolPermissionContext = useAppState(s => s.toolPermissionContext);
@@ -398,7 +398,7 @@ const plugins = useAppState(s => s.plugins);
 const agentDefinitions = useAppState(s => s.agentDefinitions);
 ```
 
-**本地状态（useState）：**
+**本地狀態（useState）：**
 
 ```ts
 const [messages, setMessages] = useState(initialMessages ?? []);
@@ -406,66 +406,66 @@ const [inputValue, setInputValue] = useState('');
 const [screen, setScreen] = useState<Screen>('prompt');
 const [streamingText, setStreamingText] = useState(null);
 const [streamingToolUses, setStreamingToolUses] = useState([]);
-// ... 50+ 个状态
+// ... 50+ 個狀態
 ```
 
-**关键 Ref：**
+**關鍵 Ref：**
 
 ```ts
-const queryGuard = useRef(new QueryGuard()).current;  // 查询并发控制
-const messagesRef = useRef(messages);                  // 消息的同步引用（避免闭包问题）
-const abortController = ...;                           // 取消请求控制器
-const responseLengthRef = useRef(0);                   // 响应长度追踪
+const queryGuard = useRef(new QueryGuard()).current;  // 查詢併發控制
+const messagesRef = useRef(messages);                  // 訊息的同步引用（避免閉包問題）
+const abortController = ...;                           // 取消請求控制器
+const responseLengthRef = useRef(0);                   // 響應長度追蹤
 ```
 
-### 4.4 核心数据流：用户输入 → API 调用
+### 4.4 核心資料流：用戶輸入 → API 呼叫
 
 ```
-用户按回车
+用戶按回車
     │
     ▼
 onSubmit (第 3146 行)
-    ├── 斜杠命令？→ immediate command 直接执行 或 handlePromptSubmit 路由
-    ├── 空输入？→ 忽略
-    ├── 空闲检测 → 可能弹出"是否开始新对话"对话框
-    ├── 加入历史记录
+    ├── 斜槓命令？→ immediate command 直接執行 或 handlePromptSubmit 路由
+    ├── 空輸入？→ 忽略
+    ├── 空閒檢測 → 可能彈出"是否開始新對話"對話框
+    ├── 加入歷史記錄
     │
     ▼
-handlePromptSubmit (外部函数，src/utils/handlePromptSubmit.ts)
-    ├── 斜杠命令 → 路由到对应 Command handler
-    ├── 普通文本 → 构建 UserMessage，调用 onQuery()
+handlePromptSubmit (外部函數，src/utils/handlePromptSubmit.ts)
+    ├── 斜槓命令 → 路由到對應 Command handler
+    ├── 普通文本 → 構建 UserMessage，呼叫 onQuery()
     │
     ▼
-onQuery (第 2860 行) — 并发守卫层
-    ├── queryGuard.tryStart() → 已有查询？排队等待
-    ├── setMessages([...old, ...newMessages]) — 追加用户消息
+onQuery (第 2860 行) — 併發守衛層
+    ├── queryGuard.tryStart() → 已有查詢？排隊等待
+    ├── setMessages([...old, ...newMessages]) — 追加用戶訊息
     ├── onQueryImpl()
     │
     ▼
-onQueryImpl (第 2750 行) — 真正执行 API 调用
+onQueryImpl (第 2750 行) — 真正執行 API 呼叫
     │
-    ├── 1. 并行加载上下文:
+    ├── 1. 並行加載上下文:
     │   await Promise.all([
-    │       getSystemPrompt(),      // 构建系统提示
-    │       getUserContext(),        // 用户上下文
-    │       getSystemContext(),      // 系统上下文（git、平台等）
+    │       getSystemPrompt(),      // 構建系統提示
+    │       getUserContext(),        // 用戶上下文
+    │       getSystemContext(),      // 系統上下文（git、平臺等）
     │   ])
     │
-    ├── 2. buildEffectiveSystemPrompt() — 合成最终系统提示
+    ├── 2. buildEffectiveSystemPrompt() — 合成最終系統提示
     │
     ├── 3. for await (const event of query({...}))  ★核心★
-    │   │   调用 src/query.ts 的 query() AsyncGenerator
-    │   │   流式产出事件
+    │   │   呼叫 src/query.ts 的 query() AsyncGenerator
+    │   │   流式產出事件
     │   │
-    │   └── onQueryEvent(event) — 处理每个流式事件
-    │       ├── 更新 streamingText（打字机效果）
-    │       ├── 更新 messages（工具调用结果）
+    │   └── onQueryEvent(event) — 處理每個流式事件
+    │       ├── 更新 streamingText（打字機效果）
+    │       ├── 更新 messages（工具呼叫結果）
     │       └── 更新 inProgressToolUseIDs
     │
     └── 4. 收尾：resetLoadingState()、onTurnComplete()
 ```
 
-**核心代码（第 2797-2807 行）**：
+**核心程式碼（第 2797-2807 行）**：
 
 ```ts
 for await (const event of query({
@@ -481,30 +481,30 @@ for await (const event of query({
 }
 ```
 
-`query()` 来自 `src/query.ts`，是第二阶段要学的核心函数。
+`query()` 來自 `src/query.ts`，是第二階段要學的核心函數。
 
-### 4.5 QueryGuard 并发控制
+### 4.5 QueryGuard 併發控制
 
-防止同时发起多个 API 请求的状态机：
+防止同時發起多個 API 請求的狀態機：
 
 ```
 idle ──tryStart()──▶ running ──end()──▶ idle
                         │
-                        └── tryStart() 返回 null（已在运行）
-                            → 新消息排入队列
+                        └── tryStart() 返回 null（已在執行）
+                            → 新訊息排入隊列
 ```
 
-- `tryStart()` — 原子操作，检查并转换 idle→running，返回 generation 号
-- `end(generation)` — 检查 generation 匹配后转换 running→idle
-- 防止 cancel+resubmit 竞态条件
+- `tryStart()` — 原子操作，檢查並轉換 idle→running，返回 generation 號
+- `end(generation)` — 檢查 generation 匹配後轉換 running→idle
+- 防止 cancel+resubmit 競態條件
 
 ### 4.6 JSX 渲染
 
-两个互斥的渲染分支：
+兩個互斥的渲染分支：
 
 #### Transcript 模式（第 4396-4493 行）
 
-按 `v` 键切换，只读浏览对话历史，支持搜索：
+按 `v` 鍵切換，只讀瀏覽對話歷史，支援搜索：
 
 ```tsx
 <KeybindingSetup>
@@ -521,36 +521,36 @@ idle ──tryStart()──▶ running ──end()──▶ idle
 
 #### Prompt 模式（第 4552-5009 行）
 
-主交互界面，从上到下：
+主交互界面，從上到下：
 
 ```tsx
 <KeybindingSetup>
-  <AnimatedTerminalTitle />           // 终端 tab 标题
-  <GlobalKeybindingHandlers />        // 全局快捷键
-  <CommandKeybindingHandlers />       // 命令快捷键
-  <ScrollKeybindingHandler />         // 滚动快捷键
+  <AnimatedTerminalTitle />           // 終端 tab 標題
+  <GlobalKeybindingHandlers />        // 全局快捷鍵
+  <CommandKeybindingHandlers />       // 命令快捷鍵
+  <ScrollKeybindingHandler />         // 滾動快捷鍵
   <CancelRequestHandler />           // Ctrl+C 取消
-  <MCPConnectionManager>             // MCP 连接管理
+  <MCPConnectionManager>             // MCP 連接管理
     <FullscreenLayout
-      overlay={<PermissionRequest />}  // 权限审批覆盖层
-      scrollable={                     // 可滚动区域
+      overlay={<PermissionRequest />}  // 權限審批覆蓋層
+      scrollable={                     // 可滾動區域
         <>
-          <Messages />                 // ★ 对话消息渲染
-          <UserTextMessage />          // 用户输入占位
+          <Messages />                 // ★ 對話訊息渲染
+          <UserTextMessage />          // 用戶輸入佔位
           {toolJSX}                    // 工具 UI
-          <SpinnerWithVerb />          // 加载动画
+          <SpinnerWithVerb />          // 加載動畫
         </>
       }
       bottom={                         // 固定底部
         <>
-          {/* 各种对话框 */}
+          {/* 各種對話框 */}
           <SandboxPermissionRequest />
           <PromptDialog />
           <ElicitationDialog />
           <CostThresholdDialog />
           <FeedbackSurvey />
 
-          {/* ★ 用户输入框 */}
+          {/* ★ 用戶輸入框 */}
           <PromptInput
             onSubmit={onSubmit}
             commands={commands}
@@ -565,33 +565,33 @@ idle ──tryStart()──▶ running ──end()──▶ idle
 </KeybindingSetup>
 ```
 
-### 4.7 REPL.tsx 学习建议
+### 4.7 REPL.tsx 學習建議
 
-- 核心只有一条线：`onSubmit → onQuery → query() → onQueryEvent → 更新消息`
-- 其余 4000+ 行是 UI 细节：快捷键、对话框、动画、边界情况处理
-- `feature('...')` 保护的 JSX 全部跳过
-- `("external" as string) === 'ant'` 的分支也跳过
+- 核心只有一條線：`onSubmit → onQuery → query() → onQueryEvent → 更新訊息`
+- 其餘 4000+ 行是 UI 細節：快捷鍵、對話框、動畫、邊界情況處理
+- `feature('...')` 保護的 JSX 全部跳過
+- `("external" as string) === 'ant'` 的分支也跳過
 
 ---
 
-## 关键设计模式总结
+## 關鍵設計模式總結
 
-| 模式 | 位置 | 说明 |
+| 模式 | 位置 | 說明 |
 |------|------|------|
-| 快速路径 | cli.tsx | 按开销从低到高逐级检查，零开销处理简单请求 |
-| 动态 import | cli.tsx / main.tsx | `await import()` 延迟加载，每条路径只加载需要的模块 |
-| Side-effect import | main.tsx 顶部 | import 阶段就并行启动子进程，用并行隐藏延迟 |
-| feature flag | 全局 | `feature()` 永远返回 false，编译时消除死代码 |
-| preAction 钩子 | main.tsx run() | Commander.js 命令执行前统一初始化 |
-| QueryGuard | REPL.tsx | 状态机防止并发 API 请求，带 generation 计数防竞态 |
-| React/Ink | UI 层 | 用 React 组件模型渲染终端 UI，支持全屏和虚拟滚动 |
+| 快速路徑 | cli.tsx | 按開銷從低到高逐級檢查，零開銷處理簡單請求 |
+| 動態 import | cli.tsx / main.tsx | `await import()` 延遲加載，每條路徑只加載需要的模組 |
+| Side-effect import | main.tsx 頂部 | import 階段就並行啓動子進程，用並行隱藏延遲 |
+| feature flag | 全局 | `feature()` 永遠返回 false，編譯時消除死程式碼 |
+| preAction 鉤子 | main.tsx run() | Commander.js 命令執行前統一初始化 |
+| QueryGuard | REPL.tsx | 狀態機防止併發 API 請求，帶 generation 計數防競態 |
+| React/Ink | UI 層 | 用 React 組件模型渲染終端 UI，支援全屏和虛擬滾動 |
 
-## 需要忽略的代码模式
+## 需要忽略的程式碼模式
 
-| 模式 | 来源 | 说明 |
+| 模式 | 來源 | 說明 |
 |------|------|------|
-| `_c(N)` 调用 | React Compiler | 反编译产生的 memoization 样板代码 |
-| `feature('FLAG')` 后面的代码 | Bun bundler | 全部是死代码，在当前版本不会执行 |
-| `("external" as string) === 'ant'` | 构建目标检查 | 永远为 false（external !== ant） |
-| tsc 类型错误 | 反编译 | `unknown`/`never`/`{}` 类型，不影响 Bun 运行 |
-| `packages/@ant/` | stub 包 | 空实现，仅满足 import 依赖 |
+| `_c(N)` 呼叫 | React Compiler | 反編譯產生的 memoization 樣板程式碼 |
+| `feature('FLAG')` 後面的程式碼 | Bun bundler | 全部是死程式碼，在當前版本不會執行 |
+| `("external" as string) === 'ant'` | 構建目標檢查 | 永遠爲 false（external !== ant） |
+| tsc 類型錯誤 | 反編譯 | `unknown`/`never`/`{}` 類型，不影響 Bun 執行 |
+| `packages/@ant/` | stub 包 | 空實現，僅滿足 import 依賴 |

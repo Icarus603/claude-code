@@ -113,7 +113,7 @@ function convertUserContentBlockToGeminiParts(
     ]
   }
 
-  // 将 Anthropic image 块转换为 Gemini inlineData
+  // Convert an Anthropic image block into Gemini inlineData
   if (block.type === 'image') {
     const source = block.source as Record<string, unknown> | undefined
     if (source?.type === 'base64' && typeof source.data === 'string') {
@@ -127,7 +127,7 @@ function convertUserContentBlockToGeminiParts(
         },
       ]
     }
-    // url 类型的图片，Gemini 不直接支持，转为文本描述
+    // Gemini does not support URL-based images directly, so fall back to text
     if (source?.type === 'url' && typeof source.url === 'string') {
       return createTextGeminiParts(`[image: ${source.url}]`)
     }

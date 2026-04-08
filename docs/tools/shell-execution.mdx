@@ -1,24 +1,24 @@
 ---
-title: "命令执行工具 - BashTool 安全设计与实现"
-description: "从源码角度解析 Claude Code BashTool：只读命令判定、AST 安全解析、自动后台化、输出截断和专用工具 vs shell 命令的设计权衡。"
-keywords: ["Bash 工具", "命令执行", "Shell 执行", "安全命令", "AI 执行命令"]
+title: "命令執行工具 - BashTool 安全設計與實現"
+description: "從源碼角度解析 Claude Code BashTool：只讀命令判定、AST 安全解析、自動後臺化、輸出截斷和專用工具 vs shell 命令的設計權衡。"
+keywords: ["Bash 工具", "命令執行", "Shell 執行", "安全命令", "AI 執行命令"]
 ---
 
-{/* 本章目标：从源码角度揭示 BashTool 的安全设计、执行链路和关键工程决策 */}
+{/* 本章目標：從源碼角度揭示 BashTool 的安全設計、執行鏈路和關鍵工程決策 */}
 
-## 执行链路总览
+## 執行鏈路總覽
 
-一条 Bash 命令从 AI 决策到实际执行的完整路径：
+一條 Bash 命令從 AI 決策到實際執行的完整路徑：
 
 ```
 AI 生成 tool_use: { command: "npm test" }
   ↓
-BashTool.validateInput()         ← 基础输入校验
+BashTool.validateInput()         ← 基礎輸入校驗
   ↓
-BashTool.checkPermissions()      ← 权限检查（详见安全体系章节）
-  ├── isReadOnly()? → 自动 allow（只读命令免审批）
-  ├── bashToolHasPermission()    ← AST 解析 + 语义检查 + 规则匹配
-  └── 未匹配 → 弹窗确认
+BashTool.checkPermissions()      ← 權限檢查（詳見安全體系章節）
+  ├── isReadOnly()? → 自動 allow（只讀命令免審批）
+  ├── bashToolHasPermission()    ← AST 解析 + 語義檢查 + 規則匹配
+  └── 未匹配 → 彈窗確認
   ↓
 BashTool.call() → runShellCommand()
   ↓
@@ -26,12 +26,12 @@ shouldUseSandbox(input)          ← 是否需要沙箱包裹
   ↓
 Shell.exec(command, { shouldUseSandbox, shouldAutoBackground })
   ↓
-spawn(wrapped_command)           ← 实际进程创建
+spawn(wrapped_command)           ← 實際進程建立
 ```
 
-## 只读命令的判定：为什么 Read 免审批而 Bash 不一定
+## 只讀命令的判定：爲什麼 Read 免審批而 Bash 不一定
 
-BashTool 的 `isReadOnly()` 方法（`BashTool.tsx:437`）决定一条命令是否被视为"只读"：
+BashTool 的 `isReadOnly()` 方法（`BashTool.tsx:437`）決定一條命令是否被視爲"只讀"：
 
 ```typescript
 isReadOnly(input) {
@@ -41,38 +41,38 @@ isReadOnly(input) {
 }
 ```
 
-判定逻辑基于 4 个命令集合（`BashTool.tsx:60-78`）：
+判定邏輯基於 4 個命令集合（`BashTool.tsx:60-78`）：
 
-| 集合 | 命令 | 性质 |
+| 集合 | 命令 | 性質 |
 |------|------|------|
-| `BASH_SEARCH_COMMANDS` | find, grep, rg, ag, ack, locate, which, whereis | 搜索类 |
-| `BASH_READ_COMMANDS` | cat, head, tail, wc, stat, file, jq, awk, sort, uniq... | 读取/分析类 |
-| `BASH_LIST_COMMANDS` | ls, tree, du | 列表类 |
-| `BASH_SEMANTIC_NEUTRAL_COMMANDS` | echo, printf, true, false, : | 语义中性（不影响判定） |
+| `BASH_SEARCH_COMMANDS` | find, grep, rg, ag, ack, locate, which, whereis | 搜索類 |
+| `BASH_READ_COMMANDS` | cat, head, tail, wc, stat, file, jq, awk, sort, uniq... | 讀取/分析類 |
+| `BASH_LIST_COMMANDS` | ls, tree, du | 列表類 |
+| `BASH_SEMANTIC_NEUTRAL_COMMANDS` | echo, printf, true, false, : | 語義中性（不影響判定） |
 
-对于复合命令（`ls dir && echo "---" && ls dir2`），系统拆分后逐段检查——**所有非中性段都必须属于上述集合**，整条命令才被视为只读。
+對於複合命令（`ls dir && echo "---" && ls dir2`），系統拆分後逐段檢查——**所有非中性段都必須屬於上述集合**，整條命令才被視爲只讀。
 
 ```typescript
-// BashTool.tsx:95 — 简化的判定逻辑
+// BashTool.tsx:95 — 簡化的判定邏輯
 for (const part of partsWithOperators) {
-  if (BASH_SEMANTIC_NEUTRAL_COMMANDS.has(baseCommand)) continue  // 跳过中性段
+  if (BASH_SEMANTIC_NEUTRAL_COMMANDS.has(baseCommand)) continue  // 跳過中性段
   if (!isPartSearch && !isPartRead && !isPartList) {
-    return { isSearch: false, isRead: false, isList: false }  // 有任何一段不通过 → 非只读
+    return { isSearch: false, isRead: false, isList: false }  // 有任何一段不通過 → 非只讀
   }
 }
 ```
 
 ## AST 安全解析：tree-sitter bash 解析
 
-`preparePermissionMatcher()`（`BashTool.tsx:445`）在权限检查前用 `parseForSecurity()` 解析命令结构：
+`preparePermissionMatcher()`（`BashTool.tsx:445`）在權限檢查前用 `parseForSecurity()` 解析命令結構：
 
 ```typescript
 async preparePermissionMatcher({ command }) {
   const parsed = await parseForSecurity(command)
   if (parsed.kind !== 'simple') {
-    return () => true  // 解析失败 → fail-safe，触发所有 hook
+    return () => true  // 解析失敗 → fail-safe，觸發所有 hook
   }
-  // 提取子命令列表，剥离 VAR=val 前缀
+  // 提取子命令列表，剝離 VAR=val 前綴
   const subcommands = parsed.commands.map(c => c.argv.join(' '))
   return pattern => {
     return subcommands.some(cmd => matchWildcardPattern(pattern, cmd))
@@ -80,23 +80,23 @@ async preparePermissionMatcher({ command }) {
 }
 ```
 
-关键安全点：对于复合命令 `ls && git push`，解析后拆分为 `["ls", "git push"]`，确保 `git push` 不会因为前半段是只读命令而绕过权限检查。解析失败时采用 fail-safe 策略——假设不安全，触发所有安全 hook。
+關鍵安全點：對於複合命令 `ls && git push`，解析後拆分爲 `["ls", "git push"]`，確保 `git push` 不會因爲前半段是隻讀命令而繞過權限檢查。解析失敗時採用 fail-safe 策略——假設不安全，觸發所有安全 hook。
 
-## 超时控制：分级策略
+## 超時控制：分級策略
 
 ```
-用户指定 timeout → 直接使用
+用戶指定 timeout → 直接使用
   ↓ 未指定
 getDefaultTimeoutMs()
-  ├── 默认上限：120,000ms（2 分钟）
-  └── 最大上限：600,000ms（10 分钟，用户显式设置时）
+  ├── 預設上限：120,000ms（2 分鐘）
+  └── 最大上限：600,000ms（10 分鐘，用戶顯式設置時）
 ```
 
-超时后系统不会直接杀进程——`ShellCommand`（`src/utils/ShellCommand.ts:129`）通过 `onTimeout` 回调通知调用方，由调用方决定是终止还是后台化。
+超時後系統不會直接殺進程——`ShellCommand`（`src/utils/ShellCommand.ts:129`）通過 `onTimeout` 回調通知呼叫方，由呼叫方決定是終止還是後臺化。
 
-## 自动后台化
+## 自動後臺化
 
-长时间运行的命令可以自动转为后台任务，不阻塞 AI 的 agentic loop：
+長時間執行的命令可以自動轉爲後臺任務，不阻塞 AI 的 agentic loop：
 
 ```typescript
 // BashTool.tsx:880
@@ -104,65 +104,65 @@ const shouldAutoBackground = !isBackgroundTasksDisabled
   && isAutobackgroundingAllowed(command)
 ```
 
-自动后台化的完整链路：
+自動後臺化的完整鏈路：
 
 ```
-命令开始执行
-  ↓ 进度轮询
-15 秒内未完成（ASSISTANT_BLOCKING_BUDGET_MS）
+命令開始執行
+  ↓ 進度輪詢
+15 秒內未完成（ASSISTANT_BLOCKING_BUDGET_MS）
   ↓
-检查 isAutobackgroundingAllowed(command)
-  ↓ 允许
-将前台任务转为后台任务（backgroundExistingForegroundTask）
+檢查 isAutobackgroundingAllowed(command)
+  ↓ 允許
+將前臺任務轉爲後臺任務（backgroundExistingForegroundTask）
   ↓
 shellCommand.onTimeout → spawnBackgroundTask()
   ↓
-返回 taskId 给 AI，AI 可以继续做其他事
+返回 taskId 給 AI，AI 可以繼續做其他事
   ↓
-后台任务完成后通过通知机制汇报结果
+後臺任務完成後通過通知機制彙報結果
 ```
 
-主线程 Agent 有 15 秒的阻塞预算——超过这个时间，系统自动将命令后台化。这防止了一个 `npm install` 阻塞整个 agentic loop 数分钟。
+主執行緒 Agent 有 15 秒的阻塞預算——超過這個時間，系統自動將命令後臺化。這防止了一個 `npm install` 阻塞整個 agentic loop 數分鐘。
 
-## 输出截断策略
+## 輸出截斷策略
 
-命令输出过长时会触发截断，防止把海量日志塞进 AI 的上下文窗口：
+命令輸出過長時會觸發截斷，防止把海量日誌塞進 AI 的上下文窗口：
 
-| 截断点 | 位置 | 行为 |
+| 截斷點 | 位置 | 行爲 |
 |--------|------|------|
-| `maxResultSizeChars` | 工具级（通常 100K 字符） | 超长输出在写入消息前截断 |
-| 进度轮询截断 | `onProgress` 回调 | 只传递最后几行作为进度显示 |
-| `totalBytes` 标记 | `isIncomplete` 参数 | 告知 AI 输出被截断 |
+| `maxResultSizeChars` | 工具級（通常 100K 字符） | 超長輸出在寫入訊息前截斷 |
+| 進度輪詢截斷 | `onProgress` 回調 | 只傳遞最後幾行作爲進度顯示 |
+| `totalBytes` 標記 | `isIncomplete` 參數 | 告知 AI 輸出被截斷 |
 
-截断不是简单砍尾——`isIncomplete` 标记确保 AI 知道输出不完整，可以决定是否需要用更精确的命令重新获取。
+截斷不是簡單砍尾——`isIncomplete` 標記確保 AI 知道輸出不完整，可以決定是否需要用更精確的命令重新取得。
 
-## 为什么用专用工具而不是直接调 shell
+## 爲什麼用專用工具而不是直接調 shell
 
-Claude Code 为文件读写、代码搜索等操作提供了专用工具（Read、Grep、Glob），而不是让 AI 用 `cat`、`grep` 等 shell 命令。这不仅是用户体验的选择，更是架构层面的设计决策：
+Claude Code 爲文件讀寫、程式碼搜索等操作提供了專用工具（Read、Grep、Glob），而不是讓 AI 用 `cat`、`grep` 等 shell 命令。這不僅是用戶體驗的選擇，更是架構層面的設計決策：
 
-| 维度 | 专用工具 | Bash 命令 |
+| 維度 | 專用工具 | Bash 命令 |
 |------|---------|----------|
-| **权限粒度** | `Read` 是只读操作 → 自动放行 | `Bash: cat file` 需要审批整条命令（cat 在只读集合中但走不同路径） |
-| **输出结构化** | 返回结构化数据，UI 可渲染 diff、高亮 | 纯文本输出，无渲染优化 |
-| **性能优化** | 文件缓存、分页、token 预算控制 | 每次都是新进程，无缓存 |
-| **并发安全** | `isConcurrencySafe()` 返回 `true` → 可并行执行 | Bash 命令可能有副作用，串行执行 |
-| **安全审计** | 工具名精确匹配权限规则 | 需 AST 解析命令结构后匹配 |
+| **權限粒度** | `Read` 是隻讀操作 → 自動放行 | `Bash: cat file` 需要審批整條命令（cat 在只讀集合中但走不同路徑） |
+| **輸出結構化** | 返回結構化資料，UI 可渲染 diff、高亮 | 純文本輸出，無渲染優化 |
+| **性能優化** | 文件快取、分頁、token 預算控制 | 每次都是新進程，無快取 |
+| **併發安全** | `isConcurrencySafe()` 返回 `true` → 可並行執行 | Bash 命令可能有副作用，串行執行 |
+| **安全審計** | 工具名精確匹配權限規則 | 需 AST 解析命令結構後匹配 |
 
-`isConcurrencySafe()`（`BashTool.tsx:434`）是一个常被忽视但重要的设计——只有只读命令可以在 agentic loop 中并行执行，有副作用的命令必须串行，防止竞态条件。
+`isConcurrencySafe()`（`BashTool.tsx:434`）是一個常被忽視但重要的設計——只有只讀命令可以在 agentic loop 中並行執行，有副作用的命令必須串行，防止競態條件。
 
-## 进度反馈的流式设计
+## 進度反饋的流式設計
 
-BashTool 的命令执行是流式的，通过 `onProgress` 回调逐行推送输出：
+BashTool 的命令執行是流式的，通過 `onProgress` 回調逐行推送輸出：
 
 ```
 runShellCommand()
-  ├── Shell.exec() 启动子进程
-  ├── 每秒轮询输出文件
+  ├── Shell.exec() 啓動子進程
+  ├── 每秒輪詢輸出文件
   ├── onProgress(lastLines, allLines, totalLines, totalBytes, isIncomplete)
   │   ├── 更新 lastProgressOutput / fullOutput
-  │   └── resolveProgress() → 唤醒 generator yield
+  │   └── resolveProgress() → 喚醒 generator yield
   ├── yield { type: 'progress', output, fullOutput, elapsedTimeSeconds }
   └── return { code, stdout, interrupted, ... }
 ```
 
-UI 层通过 `useToolCallProgress` hook 实时展示命令输出。`resolveProgress()` 信号机制让 generator 在有新数据时才 yield，避免了忙等待。
+UI 層通過 `useToolCallProgress` hook 實時展示命令輸出。`resolveProgress()` 信號機制讓 generator 在有新資料時才 yield，避免了忙等待。

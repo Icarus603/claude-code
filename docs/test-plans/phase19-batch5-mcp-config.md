@@ -1,18 +1,18 @@
-# Phase 19 - Batch 5: MCP 配置 + modelCost
+# Phase 19 - Batch 5: MCP 設定 + modelCost
 
-> 预计 ~80 tests / 4 文件 | 需中等 mock
+> 預計 ~80 tests / 4 文件 | 需中等 mock
 
 ---
 
 ## 1. `src/services/mcp/__tests__/configUtils.test.ts` (~30 tests)
 
 **源文件**: `src/services/mcp/config.ts` (1580 行)
-**目标函数**: `unwrapCcrProxyUrl`, `urlPatternToRegex` (私有), `commandArraysMatch` (私有), `toggleMembership` (私有), `addScopeToServers` (私有), `dedupPluginMcpServers`, `getMcpServerSignature` (如导出)
+**目標函數**: `unwrapCcrProxyUrl`, `urlPatternToRegex` (私有), `commandArraysMatch` (私有), `toggleMembership` (私有), `addScopeToServers` (私有), `dedupPluginMcpServers`, `getMcpServerSignature` (如導出)
 
-### 测试策略
-私有函数如不可直接测试，通过公开的 `dedupPluginMcpServers` 间接覆盖。导出函数直接测。
+### 測試策略
+私有函數如不可直接測試，通過公開的 `dedupPluginMcpServers` 間接覆蓋。導出函數直接測。
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("unwrapCcrProxyUrl", () => {
@@ -66,16 +66,16 @@ describe("commandArraysMatch (via integration)", () => {
 
 ### Mock 需求
 需 mock `feature()` (bun:bundle), `jsonStringify`, `safeParseJSON`, `log` 等
-通过 `mock.module()` + `await import()` 解锁
+通過 `mock.module()` + `await import()` 解鎖
 
 ---
 
 ## 2. `src/services/mcp/__tests__/filterUtils.test.ts` (~20 tests)
 
 **源文件**: `src/services/mcp/utils.ts` (576 行)
-**目标函数**: `filterToolsByServer`, `hashMcpConfig`, `isToolFromMcpServer`, `isMcpTool`, `parseHeaders`
+**目標函數**: `filterToolsByServer`, `hashMcpConfig`, `isToolFromMcpServer`, `isMcpTool`, `parseHeaders`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("filterToolsByServer", () => {
@@ -121,16 +121,16 @@ describe("parseHeaders", () => {
 
 ### Mock 需求
 需 mock `normalizeNameForMCP`, `mcpInfoFromString`, `jsonStringify`, `createHash` 等
-`parseHeaders` 是最独立的，可能不需要太多 mock
+`parseHeaders` 是最獨立的，可能不需要太多 mock
 
 ---
 
 ## 3. `src/services/mcp/__tests__/channelNotification.test.ts` (~15 tests)
 
 **源文件**: `src/services/mcp/channelNotification.ts` (317 行)
-**目标函数**: `wrapChannelMessage`, `findChannelEntry`
+**目標函數**: `wrapChannelMessage`, `findChannelEntry`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("wrapChannelMessage", () => {
@@ -156,17 +156,17 @@ describe("findChannelEntry", () => {
 ```
 
 ### Mock 需求
-需 mock `escapeXmlAttr`（来自 xml.ts，已有测试）或直接使用
-`CHANNEL_TAG` 常量需确认导出
+需 mock `escapeXmlAttr`（來自 xml.ts，已有測試）或直接使用
+`CHANNEL_TAG` 常量需確認導出
 
 ---
 
 ## 4. `src/utils/__tests__/modelCost.test.ts` (~15 tests)
 
 **源文件**: `src/utils/modelCost.ts` (232 行)
-**目标函数**: `formatModelPricing`, `COST_TIER_*` 常量
+**目標函數**: `formatModelPricing`, `COST_TIER_*` 常量
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("COST_TIER constants", () => {
@@ -196,5 +196,5 @@ describe("MODEL_COSTS", () => {
 ```
 
 ### Mock 需求
-需 mock `log`, `slowOperations` 等重依赖（modelCost.ts 通常 import 链较重）
-`formatModelPricing` 和 `COST_TIER_*` 是纯数据/纯函数，mock 成功后直接测
+需 mock `log`, `slowOperations` 等重依賴（modelCost.ts 通常 import 鏈較重）
+`formatModelPricing` 和 `COST_TIER_*` 是純資料/純函數，mock 成功後直接測

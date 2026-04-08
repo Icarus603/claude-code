@@ -1,17 +1,17 @@
 ---
-title: "88 个 Feature Flags - 构建时特性门控全解"
-description: "深入剖析 Claude Code 的 88+ 个构建时 feature flags：bun:bundle 编译时门控机制，揭示被编译器删除的隐藏功能模块。"
-keywords: ["feature flags", "特性标志", "构建时门控", "bun:bundle", "条件编译"]
+title: "88 個 Feature Flags - 構建時特性門控全解"
+description: "深入剖析 Claude Code 的 88+ 個構建時 feature flags：bun:bundle 編譯時門控機制，揭示被編譯器刪除的隱藏功能模組。"
+keywords: ["feature flags", "特性標誌", "構建時門控", "bun:bundle", "條件編譯"]
 ---
 
-{/* 本章目标：完整梳理构建时 feature flag 系统的机制和所有 flag 的分类 */}
+{/* 本章目標：完整梳理構建時 feature flag 系統的機制和所有 flag 的分類 */}
 
-## feature() 是什么
+## feature() 是什麼
 
-Claude Code 使用 Bun 打包器的 `bun:bundle` 模块提供编译时特性门控：
+Claude Code 使用 Bun 打包器的 `bun:bundle` 模組提供編譯時特性門控：
 
 ```typescript
-// 源码中的用法（src/tools.ts 等）
+// 源碼中的用法（src/tools.ts 等）
 import { feature } from 'bun:bundle'
 
 const SleepTool = feature('PROACTIVE') || feature('KAIROS')
@@ -19,97 +19,97 @@ const SleepTool = feature('PROACTIVE') || feature('KAIROS')
   : null
 ```
 
-在 Anthropic 的内部构建中，`feature()` 在打包时被求值——返回 `true` 的代码会被保留，返回 `false` 的代码会被 **Dead Code Elimination (DCE)** 彻底移除。
+在 Anthropic 的內部構建中，`feature()` 在打包時被求值——返回 `true` 的程式碼會被保留，返回 `false` 的程式碼會被 **Dead Code Elimination (DCE)** 徹底移除。
 
-在我们的反编译版本中，这个函数被兜底为：
+在我們的反編譯版本中，這個函數被兜底爲：
 
 ```typescript
 // src/entrypoints/cli.tsx 第 3 行
 const feature = (_name: string) => false;
 ```
 
-这意味着所有 88+ 个 feature flag 后的代码**在运行时永远不会执行**，但代码本身完整保留，可以阅读和分析。
+這意味着所有 88+ 個 feature flag 後的程式碼**在執行時永遠不會執行**，但程式碼本身完整保留，可以閱讀和分析。
 
-## Flags 分类全景
+## Flags 分類全景
 
 <CardGroup cols={2}>
-  <Card title="Agent / 自动化" icon="robot">
-    **15 个 flags** — 控制 AI 的自主能力边界
+  <Card title="Agent / 自動化" icon="robot">
+    **15 個 flags** — 控制 AI 的自主能力邊界
 
     `KAIROS` · `KAIROS_BRIEF` · `KAIROS_CHANNELS` · `KAIROS_DREAM` · `KAIROS_GITHUB_WEBHOOKS` · `KAIROS_PUSH_NOTIFICATION` · `PROACTIVE` · `COORDINATOR_MODE` · `FORK_SUBAGENT` · `AGENT_MEMORY_SNAPSHOT` · `AGENT_TRIGGERS` · `AGENT_TRIGGERS_REMOTE` · `VERIFICATION_AGENT` · `BUILTIN_EXPLORE_PLAN_AGENTS` · `MONITOR_TOOL`
   </Card>
 
-  <Card title="基础设施" icon="server">
-    **10 个 flags** — 控制运行环境和连接方式
+  <Card title="基礎設施" icon="server">
+    **10 個 flags** — 控制執行環境和連接方式
 
     `DAEMON` · `BG_SESSIONS` · `BRIDGE_MODE` · `CCR_AUTO_CONNECT` · `CCR_MIRROR` · `CCR_REMOTE_SETUP` · `DIRECT_CONNECT` · `SSH_REMOTE` · `SELF_HOSTED_RUNNER` · `BYOC_ENVIRONMENT_RUNNER`
   </Card>
 
-  <Card title="安全 / 分类" icon="shield-halved">
-    **6 个 flags** — 增强权限判断的智能性
+  <Card title="安全 / 分類" icon="shield-halved">
+    **6 個 flags** — 增強權限判斷的智能性
 
     `TRANSCRIPT_CLASSIFIER` · `BASH_CLASSIFIER` · `TREE_SITTER_BASH` · `TREE_SITTER_BASH_SHADOW` · `NATIVE_CLIENT_ATTESTATION` · `ABLATION_BASELINE`
   </Card>
 
   <Card title="工具 / 能力" icon="toolbox">
-    **10 个 flags** — 新增的 AI 能力
+    **10 個 flags** — 新增的 AI 能力
 
     `WEB_BROWSER_TOOL` · `TERMINAL_PANEL` · `CONTEXT_COLLAPSE` · `HISTORY_SNIP` · `OVERFLOW_TEST_TOOL` · `WORKFLOW_SCRIPTS` · `VOICE_MODE` · `MCP_RICH_OUTPUT` · `MCP_SKILLS` · `UDS_INBOX`
   </Card>
 
-  <Card title="UI / 体验" icon="palette">
-    **8 个 flags** — 界面和交互改进
+  <Card title="UI / 體驗" icon="palette">
+    **8 個 flags** — 界面和交互改進
 
     `MESSAGE_ACTIONS` · `QUICK_SEARCH` · `HISTORY_PICKER` · `AUTO_THEME` · `STREAMLINED_OUTPUT` · `COMPACTION_REMINDERS` · `TEMPLATES` · `BUDDY`
   </Card>
 
-  <Card title="平台 / 实验" icon="flask-vial">
-    **10+ 个 flags** — 实验性和平台级功能
+  <Card title="平臺 / 實驗" icon="flask-vial">
+    **10+ 個 flags** — 實驗性和平臺級功能
 
     `DUMP_SYSTEM_PROMPT` · `UPLOAD_USER_SETTINGS` · `DOWNLOAD_USER_SETTINGS` · `EXPERIMENTAL_SKILL_SEARCH` · `ULTRAPLAN` · `ULTRATHINK` · `TORCH` · `LODESTONE` · `PERFETTO_TRACING` · `SLOW_OPERATION_LOGGING` · `HARD_FAIL` · `ALLOW_TEST_VERSIONS`
   </Card>
 </CardGroup>
 
-## 代码中的典型模式
+## 程式碼中的典型模式
 
-Feature flags 在代码中主要有三种使用模式：
+Feature flags 在程式碼中主要有三種使用模式：
 
-### 模式一：条件加载工具
+### 模式一：條件加載工具
 
 ```typescript
-// src/tools.ts — 最常见的模式
+// src/tools.ts — 最常見的模式
 const MonitorTool = feature('MONITOR_TOOL')
   ? require('./tools/MonitorTool/MonitorTool.js').MonitorTool
   : null
 ```
 
-当 flag 为 `false` 时，`require()` 调用被 DCE 移除，工具不会出现在可用工具列表中。
+當 flag 爲 `false` 時，`require()` 呼叫被 DCE 移除，工具不會出現在可用工具列表中。
 
-### 模式二：条件注册命令
+### 模式二：條件註冊命令
 
 ```typescript
-// src/commands.ts — 注册斜杠命令
+// src/commands.ts — 註冊斜槓命令
 if (feature('VOICE_MODE')) {
   commands.push({ name: 'voice', description: '...' })
 }
 ```
 
-### 模式三：条件启用 API 特性
+### 模式三：條件啓用 API 特性
 
 ```typescript
-// src/constants/betas.ts — 控制发送给 API 的 beta header
+// src/constants/betas.ts — 控制發送給 API 的 beta header
 export const AFK_MODE_BETA_HEADER = feature('TRANSCRIPT_CLASSIFIER')
   ? 'afk-mode-2026-01-31'
   : ''
 ```
 
 <Note>
-由于 `feature()` 在构建时求值，被 DCE 移除的代码不会增加最终打包体积。但在反编译版本中，这些代码全部保留——这正是我们能够进行完整分析的原因。
+由於 `feature()` 在構建時求值，被 DCE 移除的程式碼不會增加最終打包體積。但在反編譯版本中，這些程式碼全部保留——這正是我們能夠進行完整分析的原因。
 </Note>
 
-## 有趣的发现
+## 有趣的發現
 
-- **KAIROS 家族**最庞大——6 个相关 flag 控制从核心功能到推送通知的方方面面
-- **ABLATION_BASELINE** 是用于"科学对照实验"的——它会关闭 thinking、compaction、auto-memory 等高级功能，测量裸 API 调用的基线性能
-- **BUDDY** 是一个 AI 吉祥物/精灵系统——在 `src/buddy/` 目录下有完整实现
-- **ULTRAPLAN** 和 **ULTRATHINK** 暗示着比当前 extended thinking 更高级的推理模式
+- **KAIROS 家族**最龐大——6 個相關 flag 控制從核心功能到推送通知的方方面面
+- **ABLATION_BASELINE** 是用於"科學對照實驗"的——它會關閉 thinking、compaction、auto-memory 等高級功能，測量裸 API 呼叫的基線性能
+- **BUDDY** 是一個 AI 吉祥物/精靈系統——在 `src/buddy/` 目錄下有完整實現
+- **ULTRAPLAN** 和 **ULTRATHINK** 暗示着比當前 extended thinking 更高級的推理模式

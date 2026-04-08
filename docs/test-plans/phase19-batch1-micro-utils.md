@@ -1,45 +1,45 @@
-# Phase 19 - Batch 1: 零依赖微型 utils
+# Phase 19 - Batch 1: 零依賴微型 utils
 
-> 预计 ~154 tests / 13 文件 | 全部纯函数，无需 mock
+> 預計 ~154 tests / 13 文件 | 全部純函數，無需 mock
 
 ---
 
 ## 1. `src/utils/__tests__/semanticBoolean.test.ts` (~8 tests)
 
 **源文件**: `src/utils/semanticBoolean.ts` (30 行)
-**依赖**: `zod/v4`
+**依賴**: `zod/v4`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("semanticBoolean", () => {
-  // 基本 Zod 行为
+  // 基本 Zod 行爲
   test("parses boolean true to true")
   test("parses boolean false to false")
   test("parses string 'true' to true")
   test("parses string 'false' to false")
-  // 边界
+  // 邊界
   test("rejects string 'TRUE' (case-sensitive)")
   test("rejects string 'FALSE' (case-sensitive)")
   test("rejects number 1")
   test("rejects null")
   test("rejects undefined")
-  // 自定义 inner schema
+  // 自定義 inner schema
   test("works with custom inner schema (z.boolean().optional())")
 })
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 2. `src/utils/__tests__/semanticNumber.test.ts` (~10 tests)
 
 **源文件**: `src/utils/semanticNumber.ts` (37 行)
-**依赖**: `zod/v4`
+**依賴**: `zod/v4`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("semanticNumber", () => {
@@ -58,16 +58,16 @@ describe("semanticNumber", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 3. `src/utils/__tests__/lazySchema.test.ts` (~6 tests)
 
 **源文件**: `src/utils/lazySchema.ts` (9 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("lazySchema", () => {
@@ -81,16 +81,16 @@ describe("lazySchema", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 4. `src/utils/__tests__/withResolvers.test.ts` (~8 tests)
 
 **源文件**: `src/utils/withResolvers.ts` (14 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("withResolvers", () => {
@@ -106,16 +106,16 @@ describe("withResolvers", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 5. `src/utils/__tests__/userPromptKeywords.test.ts` (~12 tests)
 
 **源文件**: `src/utils/userPromptKeywords.ts` (28 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("matchesNegativeKeyword", () => {
@@ -138,16 +138,16 @@ describe("matchesKeepGoingKeyword", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 6. `src/utils/__tests__/xdg.test.ts` (~15 tests)
 
 **源文件**: `src/utils/xdg.ts` (66 行)
-**依赖**: 无（通过 options 参数注入）
+**依賴**: 無（通過 options 參數注入）
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("getXDGStateHome", () => {
@@ -184,20 +184,20 @@ describe("path construction", () => {
 ```
 
 ### Mock 需求
-无（通过 options.env 和 options.homedir 注入）
+無（通過 options.env 和 options.homedir 注入）
 
 ---
 
 ## 7. `src/utils/__tests__/horizontalScroll.test.ts` (~20 tests)
 
 **源文件**: `src/utils/horizontalScroll.ts` (138 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("calculateHorizontalScrollWindow", () => {
-  // 基本场景
+  // 基本場景
   test("all items fit within available width")
   test("single item selected within view")
   test("selected item at beginning")
@@ -205,13 +205,13 @@ describe("calculateHorizontalScrollWindow", () => {
   test("selected item beyond visible range scrolls right")
   test("selected item before visible range scrolls left")
 
-  // 箭头指示器
+  // 箭頭指示器
   test("showLeftArrow when items hidden on left")
   test("showRightArrow when items hidden on right")
   test("no arrows when all items visible")
   test("both arrows when items hidden on both sides")
 
-  // 边界条件
+  // 邊界條件
   test("empty itemWidths array")
   test("single item")
   test("available width is 0")
@@ -226,16 +226,16 @@ describe("calculateHorizontalScrollWindow", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 8. `src/utils/__tests__/generators.test.ts` (~18 tests)
 
 **源文件**: `src/utils/generators.ts` (89 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("lastX", () => {
@@ -271,16 +271,16 @@ describe("all", () => {
 ```
 
 ### Mock 需求
-无（用 fromArray 构造测试数据）
+無（用 fromArray 構造測試資料）
 
 ---
 
 ## 9. `src/utils/__tests__/sequential.test.ts` (~12 tests)
 
 **源文件**: `src/utils/sequential.ts` (57 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("sequential", () => {
@@ -300,16 +300,16 @@ describe("sequential", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 10. `src/utils/__tests__/fingerprint.test.ts` (~15 tests)
 
 **源文件**: `src/utils/fingerprint.ts` (77 行)
-**依赖**: `crypto` (内置)
+**依賴**: `crypto` (內置)
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("FINGERPRINT_SALT", () => {
@@ -340,16 +340,16 @@ describe("computeFingerprintFromMessages", () => {
 ```
 
 ### Mock 需求
-需要 `mock.module` 处理 `UserMessage`/`AssistantMessage` 类型依赖（查看实际 import 情况）
+需要 `mock.module` 處理 `UserMessage`/`AssistantMessage` 類型依賴（查看實際 import 情況）
 
 ---
 
 ## 11. `src/utils/__tests__/configConstants.test.ts` (~8 tests)
 
 **源文件**: `src/utils/configConstants.ts` (22 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("NOTIFICATION_CHANNELS", () => {
@@ -370,16 +370,16 @@ describe("TEAMMATE_MODES", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 12. `src/utils/__tests__/directMemberMessage.test.ts` (~12 tests)
 
 **源文件**: `src/utils/directMemberMessage.ts` (70 行)
-**依赖**: 仅类型（可 mock）
+**依賴**: 僅類型（可 mock）
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("parseDirectMemberMessage", () => {
@@ -410,9 +410,9 @@ describe("sendDirectMemberMessage", () => {
 ## 13. `src/utils/__tests__/collapseHookSummaries.test.ts` (~12 tests)
 
 **源文件**: `src/utils/collapseHookSummaries.ts` (60 行)
-**依赖**: 仅类型
+**依賴**: 僅類型
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("collapseHookSummaries", () => {
@@ -432,4 +432,4 @@ describe("collapseHookSummaries", () => {
 ```
 
 ### Mock 需求
-需要构造 `RenderableMessage` mock 对象
+需要構造 `RenderableMessage` mock 對象

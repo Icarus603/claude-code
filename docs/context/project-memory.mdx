@@ -1,42 +1,42 @@
 ---
-title: "项目记忆系统 - 文件级跨对话记忆架构"
-description: "深度解析 Claude Code 记忆系统：基于文件的持久化存储、MEMORY.md 索引结构、四类型分类法、Sonnet 智能召回、Session Memory 压缩集成。"
-keywords: ["项目记忆", "MEMORY.md", "AI 记忆", "跨对话", "自动记忆", "memdir"]
+title: "專案記憶系統 - 文件級跨對話記憶架構"
+description: "深度解析 Claude Code 記憶系統：基於文件的持久化存儲、MEMORY.md 索引結構、四類型分類法、Sonnet 智能召回、Session Memory 壓縮集成。"
+keywords: ["專案記憶", "MEMORY.md", "AI 記憶", "跨對話", "自動記憶", "memdir"]
 ---
 
-{/* 本章目标：从源码层面剖析记忆系统的存储架构、召回机制和注入链路 */}
+{/* 本章目標：從源碼層面剖析記憶系統的存儲架構、召回機制和注入鏈路 */}
 
-## 记忆系统的存储架构
+## 記憶系統的存儲架構
 
-源码路径：`src/memdir/paths.ts`、`src/memdir/memdir.ts`
+源碼路徑：`src/memdir/paths.ts`、`src/memdir/memdir.ts`
 
-Claude Code 的记忆系统是**纯文件**的——没有数据库、没有向量存储，只有 Markdown 文件和目录结构。
+Claude Code 的記憶系統是**純文件**的——沒有資料庫、沒有向量存儲，只有 Markdown 文件和目錄結構。
 
-### 目录布局
+### 目錄佈局
 
 ```
 ~/.claude/projects/<sanitized-git-root>/memory/
-├── MEMORY.md                    ← 入口索引（每次对话加载）
-├── user_role.md                 ← 用户记忆
-├── feedback_testing.md          ← 反馈记忆
-├── project_mobile_release.md    ← 项目记忆
-├── reference_linear_ingest.md   ← 参考记忆
-└── logs/                        ← KAIROS 模式：每日日志
+├── MEMORY.md                    ← 入口索引（每次對話加載）
+├── user_role.md                 ← 用戶記憶
+├── feedback_testing.md          ← 反饋記憶
+├── project_mobile_release.md    ← 專案記憶
+├── reference_linear_ingest.md   ← 參考記憶
+└── logs/                        ← KAIROS 模式：每日日誌
     └── 2026/
         └── 04/
             └── 2026-04-01.md
 ```
 
-路径解析链路（`getAutoMemPath()`）：
-1. `CLAUDE_COWORK_MEMORY_PATH_OVERRIDE` 环境变量（Cowork SDK 全路径覆盖）
-2. `autoMemoryDirectory` 设置（仅限 `policySettings`/`localSettings`/`userSettings`——**故意排除** `projectSettings`，防止恶意仓库将记忆路径指向 `~/.ssh`）
-3. 默认：`<memoryBase>/projects/<sanitized-git-root>/memory/`
+路徑解析鏈路（`getAutoMemPath()`）：
+1. `CLAUDE_COWORK_MEMORY_PATH_OVERRIDE` 環境變量（Cowork SDK 全路徑覆蓋）
+2. `autoMemoryDirectory` 設置（僅限 `policySettings`/`localSettings`/`userSettings`——**故意排除** `projectSettings`，防止惡意倉庫將記憶路徑指向 `~/.ssh`）
+3. 預設：`<memoryBase>/projects/<sanitized-git-root>/memory/`
 
-同一个 Git 仓库的所有 worktree 共享一个记忆目录（通过 `findCanonicalGitRoot()` 找到真正的 `.git` 根）。
+同一個 Git 倉庫的所有 worktree 共享一個記憶目錄（通過 `findCanonicalGitRoot()` 找到真正的 `.git` 根）。
 
 ### MEMORY.md 索引
 
-`MEMORY.md` 是记忆的入口索引，每次对话都完整加载到上下文中：
+`MEMORY.md` 是記憶的入口索引，每次對話都完整加載到上下文中：
 
 ```typescript
 // memdir.ts:35-38
@@ -45,73 +45,73 @@ export const MAX_ENTRYPOINT_LINES = 200
 export const MAX_ENTRYPOINT_BYTES = 25_000
 ```
 
-索引有**双重上限**：200 行 AND 25KB。超过任何一条都会被 `truncateEntrypointContent()` 截断并追加警告。设计原因：p97 的索引文件用 200 行就能覆盖，但有些索引条目特别长（p100 观测到 197KB/200 行），字节上限捕捉这种长行异常。
+索引有**雙重上限**：200 行 AND 25KB。超過任何一條都會被 `truncateEntrypointContent()` 截斷並追加警告。設計原因：p97 的索引文件用 200 行就能覆蓋，但有些索引條目特別長（p100 觀測到 197KB/200 行），字節上限捕捉這種長行異常。
 
-索引条目格式：
+索引條目格式：
 ```markdown
 - [Title](file.md) — one-line hook
 ```
 
-每条一行，~150 字符以内。`MEMORY.md` 本身没有 frontmatter——它只是一个链接列表，不是记忆内容。
+每條一行，~150 字符以內。`MEMORY.md` 本身沒有 frontmatter——它只是一個連結列表，不是記憶內容。
 
-## 四类型分类法
+## 四類型分類法
 
-源码路径：`src/memdir/memoryTypes.ts`
+源碼路徑：`src/memdir/memoryTypes.ts`
 
-记忆被约束为一个**封闭的四类型系统**，每种类型有明确的 `<when_to_save>`、`<how_to_use>` 和 `<body_structure>` 规范：
+記憶被約束爲一個**封閉的四類型系統**，每種類型有明確的 `<when_to_save>`、`<how_to_use>` 和 `<body_structure>` 規範：
 
-| 类型 | 存储内容 | 典型触发 |
+| 類型 | 存儲內容 | 典型觸發 |
 |------|---------|---------|
-| **user** | 用户角色、偏好、技术背景 | "我是数据科学家"、"我写了十年 Go" |
-| **feedback** | 用户对 AI 行为的纠正和确认 | "别 mock 数据库"、"单 PR 更好" |
-| **project** | 非代码可推导的项目上下文 | "合并冻结从周四开始"、"auth 重写是合规要求" |
-| **reference** | 外部系统指针 | "pipeline bugs 在 Linear INGEST 项目" |
+| **user** | 用戶角色、偏好、技術背景 | "我是資料科學家"、"我寫了十年 Go" |
+| **feedback** | 用戶對 AI 行爲的糾正和確認 | "別 mock 資料庫"、"單 PR 更好" |
+| **project** | 非程式碼可推導的專案上下文 | "合併凍結從週四開始"、"auth 重寫是合規要求" |
+| **reference** | 外部系統指針 | "pipeline bugs 在 Linear INGEST 專案" |
 
-关键设计约束：**只存储无法从当前项目状态推导的信息**。代码架构、文件路径、git 历史都可以实时获取，不需要记忆。
+關鍵設計約束：**只存儲無法從當前專案狀態推導的信息**。程式碼架構、檔案路徑、git 歷史都可以實時取得，不需要記憶。
 
-### 反馈类型的双通道捕获
+### 反饋類型的雙通道捕獲
 
-`feedback` 类型的 `when_to_save` 指令特别强调：
+`feedback` 類型的 `when_to_save` 指令特別強調：
 
 > Record from failure AND success: if you only save corrections, you will avoid past mistakes but drift away from approaches the user has already validated, and may grow overly cautious.
 
-这意味着 AI 不仅在用户说"不要这样做"时保存，也在用户说"对，就是这样"时保存。后一种更难捕捉，但同等重要——它防止 AI 的行为随时间漂移。
+這意味着 AI 不僅在用戶說"不要這樣做"時保存，也在用戶說"對，就是這樣"時保存。後一種更難捕捉，但同等重要——它防止 AI 的行爲隨時間漂移。
 
-### 每条记忆的 Frontmatter 格式
+### 每條記憶的 Frontmatter 格式
 
 ```markdown
 ---
 name: {{memory name}}
-description: {{one-line description — 用于未来判断相关性}}
+description: {{one-line description — 用於未來判斷相關性}}
 type: {{user, feedback, project, reference}}
 ---
 
-{{memory content — feedback/project 类型建议包含 **Why:** 和 **How to apply:** 行}}
+{{memory content — feedback/project 類型建議包含 **Why:** 和 **How to apply:** 行}}
 ```
 
-`description` 字段是关键：它不是给人读的摘要，而是给 AI 召回系统做相关性判断的搜索关键词。
+`description` 字段是關鍵：它不是給人讀的摘要，而是給 AI 召回系統做相關性判斷的搜索關鍵詞。
 
-## 智能召回机制
+## 智能召回機制
 
-源码路径：`src/memdir/findRelevantMemories.ts`、`src/memdir/memoryScan.ts`
+源碼路徑：`src/memdir/findRelevantMemories.ts`、`src/memdir/memoryScan.ts`
 
-不是所有记忆都适合每次对话。系统使用一个**轻量级 Sonnet 侧查询**来筛选最相关的记忆。
+不是所有記憶都適合每次對話。系統使用一個**輕量級 Sonnet 側查詢**來篩選最相關的記憶。
 
 ### 召回流程
 
 ```
-用户消息 → findRelevantMemories(query, memoryDir)
-  ├── scanMemoryFiles() — 扫描所有记忆文件的 frontmatter
-  ├── selectRelevantMemories() — Sonnet 侧查询，从清单中选出 ≤5 条
+用戶訊息 → findRelevantMemories(query, memoryDir)
+  ├── scanMemoryFiles() — 掃描所有記憶文件的 frontmatter
+  ├── selectRelevantMemories() — Sonnet 側查詢，從清單中選出 ≤5 條
   └── 返回 [{path, mtimeMs}, ...]
 ```
 
-核心是 `selectRelevantMemories()` 函数，它调用 `sideQuery()`（一个独立的轻量 API 调用）：
+核心是 `selectRelevantMemories()` 函數，它呼叫 `sideQuery()`（一個獨立的輕量 API 呼叫）：
 
 ```typescript
 // findRelevantMemories.ts:98-121
 const result = await sideQuery({
-  model: getDefaultSonnetModel(),  // 用 Sonnet 做筛选（非主模型）
+  model: getDefaultSonnetModel(),  // 用 Sonnet 做篩選（非主模型）
   system: SELECT_MEMORIES_SYSTEM_PROMPT,
   messages: [{
     role: 'user',
@@ -124,7 +124,7 @@ const result = await sideQuery({
 
 ### 近期工具去噪
 
-当 AI 正在使用某个工具时，召回该工具的使用文档是噪音（对话中已有工作上下文）。`recentTools` 参数让召回系统跳过这些记忆：
+當 AI 正在使用某個工具時，召回該工具的使用文件是噪音（對話中已有工作上下文）。`recentTools` 參數讓召回系統跳過這些記憶：
 
 ```typescript
 // findRelevantMemories.ts:92-95
@@ -133,22 +133,22 @@ const toolsSection = recentTools.length > 0
   : ''
 ```
 
-System Prompt 明确指示："如果已提供最近使用的工具列表，不要选择该工具的使用参考或 API 文档。**仍然要选择**关于这些工具的警告、陷阱或已知问题——这正是使用时最关键的信息。"
+System Prompt 明確指示："如果已提供最近使用的工具列表，不要選擇該工具的使用參考或 API 文件。**仍然要選擇**關於這些工具的警告、陷阱或已知問題——這正是使用時最關鍵的信息。"
 
 ### 已展示去重
 
-`alreadySurfaced` 参数过滤之前轮次已展示过的文件路径，让 Sonnet 的 5 槽预算花在新的候选上，而不是重复召回同一文件。
+`alreadySurfaced` 參數過濾之前輪次已展示過的檔案路徑，讓 Sonnet 的 5 槽預算花在新的候選上，而不是重複召回同一文件。
 
-## 记忆注入 System Prompt 的链路
+## 記憶注入 System Prompt 的鏈路
 
-源码路径：`src/memdir/memdir.ts` → `src/context.ts`
+源碼路徑：`src/memdir/memdir.ts` → `src/context.ts`
 
-`loadMemoryPrompt()` 是记忆注入的入口，每会话调用一次（通过 `systemPromptSection('memory', ...)` 缓存）：
+`loadMemoryPrompt()` 是記憶注入的入口，每會話呼叫一次（通過 `systemPromptSection('memory', ...)` 快取）：
 
 ```typescript
 // memdir.ts:419-507
 export async function loadMemoryPrompt(): Promise<string | null> {
-  // 优先级：KAIROS 日志模式 → TEAMMEM 组合模式 → 纯自动记忆
+  // 優先級：KAIROS 日誌模式 → TEAMMEM 組合模式 → 純自動記憶
   if (feature('KAIROS') && autoEnabled && getKairosActive()) {
     return buildAssistantDailyLogPrompt(skipIndex)
   }
@@ -162,29 +162,29 @@ export async function loadMemoryPrompt(): Promise<string | null> {
 }
 ```
 
-注入时机：`context.ts` 中 `getSystemContext()` 调用时，记忆 Prompt 作为 system prompt 的一个 section 被组装。`MEMORY.md` 的内容作为 **user context message** 注入（而非 system prompt），这样可以利用 Prompt Cache 的 prefix 共享。
+注入時機：`context.ts` 中 `getSystemContext()` 呼叫時，記憶 Prompt 作爲 system prompt 的一個 section 被組裝。`MEMORY.md` 的內容作爲 **user context message** 注入（而非 system prompt），這樣可以利用 Prompt Cache 的 prefix 共享。
 
-## KAIROS 模式：每日日志
+## KAIROS 模式：每日日誌
 
-源码路径：`src/memdir/memdir.ts`（`buildAssistantDailyLogPrompt`）
+源碼路徑：`src/memdir/memdir.ts`（`buildAssistantDailyLogPrompt`）
 
-长期运行的 assistant 会话使用不同的记忆策略：
+長期執行的 assistant 會話使用不同的記憶策略：
 
-- **标准模式**：AI 维护 `MEMORY.md` 作为实时索引 + 独立记忆文件
-- **KAIROS 模式**：AI 只往日期文件追加日志（`logs/YYYY/MM/YYYY-MM-DD.md`），不做重组
+- **標準模式**：AI 維護 `MEMORY.md` 作爲實時索引 + 獨立記憶文件
+- **KAIROS 模式**：AI 只往日期文件追加日誌（`logs/YYYY/MM/YYYY-MM-DD.md`），不做重組
 
 ```typescript
-// 日志路径模式（非字面路径——因为 Prompt 被缓存）
+// 日誌路徑模式（非字面路徑——因爲 Prompt 被快取）
 const logPathPattern = join(memoryDir, 'logs', 'YYYY', 'MM', 'YYYY-MM-DD.md')
 ```
 
-一个独立的夜间 `/dream` 技能负责将日志蒸馏为主题文件 + `MEMORY.md` 索引。
+一個獨立的夜間 `/dream` 技能負責將日誌蒸餾爲主題文件 + `MEMORY.md` 索引。
 
-## 记忆漂移防御
+## 記憶漂移防禦
 
-源码路径：`src/memdir/memoryTypes.ts`（`TRUSTING_RECALL_SECTION`）
+源碼路徑：`src/memdir/memoryTypes.ts`（`TRUSTING_RECALL_SECTION`）
 
-记忆可能过期。系统在 Prompt 中设置了一个专门的 section "Before recommending from memory"：
+記憶可能過期。系統在 Prompt 中設置了一個專門的 section "Before recommending from memory"：
 
 ```
 A memory that names a specific function, file, or flag is a claim
@@ -195,9 +195,9 @@ renamed, removed, or never merged. Before recommending it:
 - If the memory names a function or flag: grep for it.
 ```
 
-这个 section 的标题经过 A/B 测试验证："Before recommending from memory"（行动导向）比 "Trusting what you recall"（抽象描述）效果好（3/3 vs 0/3）。
+這個 section 的標題經過 A/B 測試驗證："Before recommending from memory"（行動導向）比 "Trusting what you recall"（抽象描述）效果好（3/3 vs 0/3）。
 
-### 忽略记忆的严格语义
+### 忽略記憶的嚴格語義
 
 ```
 If the user says to *ignore* or *not use* memory:
@@ -206,21 +206,21 @@ Do not apply remembered facts, cite, compare against,
 or mention memory content.
 ```
 
-这解决了 AI 的一个常见反模式：用户说"忽略关于 X 的记忆"，AI 虽然正确识别了代码但仍然加上"不像记忆中说的 Y"——这不是"忽略"，而是"承认然后覆盖"。
+這解決了 AI 的一個常見反模式：用戶說"忽略關於 X 的記憶"，AI 雖然正確識別了程式碼但仍然加上"不像記憶中說的 Y"——這不是"忽略"，而是"承認然後覆蓋"。
 
-## Session Memory 与压缩的联动
+## Session Memory 與壓縮的聯動
 
-源码路径：`src/services/compact/sessionMemoryCompact.ts`
+源碼路徑：`src/services/compact/sessionMemoryCompact.ts`
 
-记忆系统与上下文压缩有深度集成。当 `tengu_session_memory` 和 `tengu_sm_compact` 两个 feature flag 同时开启时，压缩优先使用 Session Memory 而非传统摘要：
+記憶系統與上下文壓縮有深度集成。當 `tengu_session_memory` 和 `tengu_sm_compact` 兩個 feature flag 同時開啓時，壓縮優先使用 Session Memory 而非傳統摘要：
 
 ```typescript
 // sessionMemoryCompact.ts:57-61
 const DEFAULT_SM_COMPACT_CONFIG = {
-  minTokens: 10_000,           // 压缩后至少保留 10K token
-  minTextBlockMessages: 5,     // 至少保留 5 条文本消息
+  minTokens: 10_000,           // 壓縮後至少保留 10K token
+  minTextBlockMessages: 5,     // 至少保留 5 條文本訊息
   maxTokens: 40_000,           // 最多保留 40K token
 }
 ```
 
-SM-compact 不调用压缩 API（没有摘要模型），而是直接使用已有的 Session Memory 作为摘要——更快、更便宜、且不会丢失信息。
+SM-compact 不呼叫壓縮 API（沒有摘要模型），而是直接使用已有的 Session Memory 作爲摘要——更快、更便宜、且不會丟失信息。

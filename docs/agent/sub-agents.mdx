@@ -1,72 +1,72 @@
 ---
-title: "子 Agent 机制 - AgentTool 的执行链路与隔离架构"
-description: "从源码角度解析 Claude Code 子 Agent：AgentTool.call() 的完整执行链路、Fork 子进程的 Prompt Cache 共享、Worktree 隔离、工具池独立组装、以及结果回传的数据格式。"
-keywords: ["子 Agent", "AgentTool", "任务委派", "forkSubagent", "子进程隔离"]
+title: "子 Agent 機制 - AgentTool 的執行鏈路與隔離架構"
+description: "從源碼角度解析 Claude Code 子 Agent：AgentTool.call() 的完整執行鏈路、Fork 子進程的 Prompt Cache 共享、Worktree 隔離、工具池獨立組裝、以及結果回傳的資料格式。"
+keywords: ["子 Agent", "AgentTool", "任務委派", "forkSubagent", "子進程隔離"]
 ---
 
-{/* 本章目标：从源码角度揭示子 Agent 的完整执行链路、工具隔离、通信协议和生命周期管理 */}
+{/* 本章目標：從源碼角度揭示子 Agent 的完整執行鏈路、工具隔離、通信協議和生命週期管理 */}
 
-## 执行链路总览
+## 執行鏈路總覽
 
-一条 `Agent(prompt="修复 bug")` 调用的完整路径：
+一條 `Agent(prompt="修復 bug")` 呼叫的完整路徑：
 
 ```
-AI 生成 tool_use: { prompt: "修复 bug", subagent_type: "Explore" }
+AI 生成 tool_use: { prompt: "修復 bug", subagent_type: "Explore" }
   ↓
 AgentTool.call()                              ← 入口（AgentTool.tsx:239）
   ├── 解析 effectiveType（fork vs 命名 agent）
-  ├── filterDeniedAgents()                    ← 权限过滤
-  ├── 检查 requiredMcpServers                 ← MCP 依赖验证（最长等 30s）
-  ├── assembleToolPool(workerPermissionContext) ← 独立组装工具池
-  ├── createAgentWorktree()                   ← 可选 worktree 隔离
+  ├── filterDeniedAgents()                    ← 權限過濾
+  ├── 檢查 requiredMcpServers                 ← MCP 依賴驗證（最長等 30s）
+  ├── assembleToolPool(workerPermissionContext) ← 獨立組裝工具池
+  ├── createAgentWorktree()                   ← 可選 worktree 隔離
   ↓
-runAgent()                                    ← 核心执行（runAgent.ts:248）
-  ├── getAgentSystemPrompt()                  ← 构建 agent 专属 system prompt
-  ├── initializeAgentMcpServers()             ← agent 级 MCP 服务器
+runAgent()                                    ← 核心執行（runAgent.ts:248）
+  ├── getAgentSystemPrompt()                  ← 構建 agent 專屬 system prompt
+  ├── initializeAgentMcpServers()             ← agent 級 MCP 服務器
   ├── executeSubagentStartHooks()             ← Hook 注入
-  ├── query()                                 ← 进入标准 agentic loop
-  │   ├── 消息流逐条 yield
+  ├── query()                                 ← 進入標準 agentic loop
+  │   ├── 訊息流逐條 yield
   │   └── recordSidechainTranscript()         ← JSONL 持久化
   ↓
-finalizeAgentTool()                           ← 结果汇总
-  ├── 提取文本内容 + usage 统计
-  └── mapToolResultToToolResultBlockParam()   ← 格式化为 tool_result
+finalizeAgentTool()                           ← 結果彙總
+  ├── 提取文本內容 + usage 統計
+  └── mapToolResultToToolResultBlockParam()   ← 格式化爲 tool_result
 ```
 
-## 两种子 Agent 路径：命名 Agent vs Fork
+## 兩種子 Agent 路徑：命名 Agent vs Fork
 
-`AgentTool.call()` 根据是否提供 `subagent_type` 走两条完全不同的路径（`AgentTool.tsx:322-356`）：
+`AgentTool.call()` 根據是否提供 `subagent_type` 走兩條完全不同的路徑（`AgentTool.tsx:322-356`）：
 
-| 维度 | 命名 Agent（`subagent_type` 指定） | Fork 子进程（`subagent_type` 省略） |
+| 維度 | 命名 Agent（`subagent_type` 指定） | Fork 子進程（`subagent_type` 省略） |
 |------|-------------------------------------|--------------------------------------|
-| **触发条件** | `subagent_type` 有值 | `isForkSubagentEnabled()` && 未指定类型 |
-| **System Prompt** | Agent 自身的 `getSystemPrompt()` | 继承父 Agent 的完整 System Prompt |
-| **工具池** | `assembleToolPool()` 独立组装 | 父 Agent 的原始工具池（`useExactTools: true`） |
-| **上下文** | 仅任务描述 | 父 Agent 的完整对话历史（`forkContextMessages`） |
-| **模型** | 可独立指定 | 继承父模型（`model: 'inherit'`） |
-| **权限模式** | Agent 定义的 `permissionMode` | `'bubble'`（上浮到父终端） |
-| **目的** | 专业任务委派 | Prompt Cache 命中率优化 |
+| **觸發條件** | `subagent_type` 有值 | `isForkSubagentEnabled()` && 未指定類型 |
+| **System Prompt** | Agent 自身的 `getSystemPrompt()` | 繼承父 Agent 的完整 System Prompt |
+| **工具池** | `assembleToolPool()` 獨立組裝 | 父 Agent 的原始工具池（`useExactTools: true`） |
+| **上下文** | 僅任務描述 | 父 Agent 的完整對話歷史（`forkContextMessages`） |
+| **模型** | 可獨立指定 | 繼承父模型（`model: 'inherit'`） |
+| **權限模式** | Agent 定義的 `permissionMode` | `'bubble'`（上浮到父終端） |
+| **目的** | 專業任務委派 | Prompt Cache 命中率優化 |
 
-Fork 路径的设计核心是 **Prompt Cache 共享**：所有 fork 子进程共享父 Agent 的完整 `assistant` 消息（所有 `tool_use` 块），用相同的占位符 `tool_result` 填充，只有最后一个 `text` 块包含各自的指令。这使得 API 请求前缀字节完全一致，最大化缓存命中。
+Fork 路徑的設計核心是 **Prompt Cache 共享**：所有 fork 子進程共享父 Agent 的完整 `assistant` 訊息（所有 `tool_use` 塊），用相同的佔位符 `tool_result` 填充，只有最後一個 `text` 塊包含各自的指令。這使得 API 請求前綴字節完全一致，最大化快取命中。
 
 ```typescript
-// forkSubagent.ts:142 — 所有 fork 子进程的占位结果
+// forkSubagent.ts:142 — 所有 fork 子進程的佔位結果
 const FORK_PLACEHOLDER_RESULT = 'Fork started — processing in background'
 
-// buildForkedMessages() 构建：
-// [assistant(全量 tool_use), user(placeholder_results..., 子进程指令)]
+// buildForkedMessages() 構建：
+// [assistant(全量 tool_use), user(placeholder_results..., 子進程指令)]
 ```
 
-### Fork 递归防护
+### Fork 遞歸防護
 
-Fork 子进程保留 Agent 工具（为了 cache-identical tool defs），但通过两道防线防止递归 fork（`AgentTool.tsx:332`）：
+Fork 子進程保留 Agent 工具（爲了 cache-identical tool defs），但通過兩道防線防止遞歸 fork（`AgentTool.tsx:332`）：
 
-1. **`querySource` 检查**（压缩安全）：`context.options.querySource === 'agent:builtin:fork'`
-2. **消息扫描**（降级兜底）：检测 `<fork-boilerplate>` 标签
+1. **`querySource` 檢查**（壓縮安全）：`context.options.querySource === 'agent:builtin:fork'`
+2. **訊息掃描**（降級兜底）：檢測 `<fork-boilerplate>` 標籤
 
-## 工具池的独立组装
+## 工具池的獨立組裝
 
-子 Agent 不继承父 Agent 的工具限制——它的工具池完全独立组装（`AgentTool.tsx:573-577`）：
+子 Agent 不繼承父 Agent 的工具限制——它的工具池完全獨立組裝（`AgentTool.tsx:573-577`）：
 
 ```typescript
 const workerPermissionContext = {
@@ -76,14 +76,14 @@ const workerPermissionContext = {
 const workerTools = assembleToolPool(workerPermissionContext, appState.mcp.tools)
 ```
 
-关键设计决策：
-- **权限模式独立**：子 Agent 使用 `selectedAgent.permissionMode`（默认 `acceptEdits`），不受父 Agent 当前模式的限制
-- **MCP 工具继承**：`appState.mcp.tools` 包含所有已连接的 MCP 工具，子 Agent 自动获得
-- **Agent 级 MCP 服务器**：`runAgent()` 中的 `initializeAgentMcpServers()` 可以为特定 Agent 额外连接专属 MCP 服务器
+關鍵設計決策：
+- **權限模式獨立**：子 Agent 使用 `selectedAgent.permissionMode`（預設 `acceptEdits`），不受父 Agent 當前模式的限制
+- **MCP 工具繼承**：`appState.mcp.tools` 包含所有已連接的 MCP 工具，子 Agent 自動獲得
+- **Agent 級 MCP 服務器**：`runAgent()` 中的 `initializeAgentMcpServers()` 可以爲特定 Agent 額外連接專屬 MCP 服務器
 
-### 工具过滤的 resolveAgentTools
+### 工具過濾的 resolveAgentTools
 
-`runAgent.ts:500-502` 在工具组装后进一步过滤：
+`runAgent.ts:500-502` 在工具組裝後進一步過濾：
 
 ```typescript
 const resolvedTools = useExactTools
@@ -91,104 +91,104 @@ const resolvedTools = useExactTools
   : resolveAgentTools(agentDefinition, availableTools, isAsync).resolvedTools
 ```
 
-`resolveAgentTools()` 会根据 Agent 定义中的 `tools` 字段过滤可用工具，将 `['*']` 映射为全量工具。
+`resolveAgentTools()` 會根據 Agent 定義中的 `tools` 字段過濾可用工具，將 `['*']` 映射爲全量工具。
 
-## Worktree 隔离机制
+## Worktree 隔離機制
 
-`isolation: "worktree"` 参数让子 Agent 在独立的 git worktree 中工作（`AgentTool.tsx:590-593`）：
+`isolation: "worktree"` 參數讓子 Agent 在獨立的 git worktree 中工作（`AgentTool.tsx:590-593`）：
 
 ```typescript
 const slug = `agent-${earlyAgentId.slice(0, 8)}`
 worktreeInfo = await createAgentWorktree(slug)
 ```
 
-Worktree 生命周期：
-1. **创建**：在 `.git/worktrees/` 下创建独立工作副本
-2. **CWD 覆盖**：`runWithCwdOverride(worktreePath, fn)` 让所有文件操作在 worktree 中执行
-3. **路径翻译**：Fork + worktree 时注入路径翻译通知（`buildWorktreeNotice`）
+Worktree 生命週期：
+1. **建立**：在 `.git/worktrees/` 下建立獨立工作副本
+2. **CWD 覆蓋**：`runWithCwdOverride(worktreePath, fn)` 讓所有檔案操作在 worktree 中執行
+3. **路徑翻譯**：Fork + worktree 時注入路徑翻譯通知（`buildWorktreeNotice`）
 4. **清理**（`cleanupWorktreeIfNeeded`）：
-   - Hook-based worktree → 始终保留
-   - 有变更 → 保留，返回 `worktreePath`
-   - 无变更 → 自动删除
+   - Hook-based worktree → 始終保留
+   - 有變更 → 保留，返回 `worktreePath`
+   - 無變更 → 自動刪除
 
-## 生命周期管理：同步 vs 异步
+## 生命週期管理：同步 vs 異步
 
-### 异步 Agent（后台运行）
+### 異步 Agent（後臺執行）
 
-当 `run_in_background=true` 或 `selectedAgent.background=true` 时，Agent 立即返回 `async_launched` 状态（`AgentTool.tsx:686-764`）：
+當 `run_in_background=true` 或 `selectedAgent.background=true` 時，Agent 立即返回 `async_launched` 狀態（`AgentTool.tsx:686-764`）：
 
 ```
-registerAsyncAgent(agentId, ...)      ← 注册到 AppState.tasks
-  ↓ (void — 火后不管)
-runAsyncAgentLifecycle()              ← 后台执行
-  ├── runAgent().onCacheSafeParams    ← 进度摘要初始化
-  ├── 消息流迭代
-  ├── completeAsyncAgent()            ← 标记完成
-  ├── classifyHandoffIfNeeded()       ← 安全检查
+registerAsyncAgent(agentId, ...)      ← 註冊到 AppState.tasks
+  ↓ (void — 火後不管)
+runAsyncAgentLifecycle()              ← 後臺執行
+  ├── runAgent().onCacheSafeParams    ← 進度摘要初始化
+  ├── 訊息流迭代
+  ├── completeAsyncAgent()            ← 標記完成
+  ├── classifyHandoffIfNeeded()       ← 安全檢查
   └── enqueueAgentNotification()      ← 通知主 Agent
 ```
 
-异步 Agent 获得独立的 `AbortController`，不与父 Agent 共享——用户按 ESC 取消主线程不会杀掉后台 Agent。
+異步 Agent 獲得獨立的 `AbortController`，不與父 Agent 共享——用戶按 ESC 取消主執行緒不會殺掉後臺 Agent。
 
-### 同步 Agent（前台运行）
+### 同步 Agent（前臺執行）
 
-同步 Agent 的关键特性是 **可后台化**（`AgentTool.tsx:818-833`）：
+同步 Agent 的關鍵特性是 **可後臺化**（`AgentTool.tsx:818-833`）：
 
 ```typescript
 const registration = registerAgentForeground({
-  autoBackgroundMs: getAutoBackgroundMs() || undefined  // 默认 120s
+  autoBackgroundMs: getAutoBackgroundMs() || undefined  // 預設 120s
 })
 backgroundPromise = registration.backgroundSignal.then(...)
 ```
 
-在 agentic loop 的每次迭代中，系统用 `Promise.race` 竞争下一条消息和后台化信号：
+在 agentic loop 的每次迭代中，系統用 `Promise.race` 競爭下一條訊息和後臺化信號：
 
 ```typescript
 const raceResult = await Promise.race([
   nextMessagePromise.then(r => ({ type: 'message', result: r })),
-  backgroundPromise  // 超过 autoBackgroundMs 触发
+  backgroundPromise  // 超過 autoBackgroundMs 觸發
 ])
 ```
 
-后台化后，前台迭代器被终止（`agentIterator.return()`），新的 `runAgent()` 以 `isAsync: true` 重新启动，当前台的输出文件继续写入。
+後臺化後，前臺迭代器被終止（`agentIterator.return()`），新的 `runAgent()` 以 `isAsync: true` 重新啓動，當前臺的輸出文件繼續寫入。
 
-## 结果回传格式
+## 結果回傳格式
 
-`mapToolResultToToolResultBlockParam()` 根据状态返回不同格式（`AgentTool.tsx:1298-1375`）：
+`mapToolResultToToolResultBlockParam()` 根據狀態返回不同格式（`AgentTool.tsx:1298-1375`）：
 
-| 状态 | 返回内容 |
+| 狀態 | 返回內容 |
 |------|---------|
-| `completed` | 内容 + `<usage>` 块（token/tool_calls/duration） |
-| `async_launched` | agentId + outputFile 路径 + 操作指引 |
+| `completed` | 內容 + `<usage>` 塊（token/tool_calls/duration） |
+| `async_launched` | agentId + outputFile 路徑 + 操作指引 |
 | `teammate_spawned` | agent_id + name + team_name |
 | `remote_launched` | taskId + sessionUrl + outputFile |
 
-对于一次性内置 Agent（Explore、Plan），`<usage>` 块被省略——每周节省约 1-2 Gtok 的上下文窗口。
+對於一次性內置 Agent（Explore、Plan），`<usage>` 塊被省略——每週節省約 1-2 Gtok 的上下文窗口。
 
-## MCP 依赖的等待机制
+## MCP 依賴的等待機制
 
-如果 Agent 声明了 `requiredMcpServers`，`call()` 会等待这些服务器连接完成（`AgentTool.tsx:371-410`）：
+如果 Agent 聲明瞭 `requiredMcpServers`，`call()` 會等待這些服務器連接完成（`AgentTool.tsx:371-410`）：
 
 ```typescript
-const MAX_WAIT_MS = 30_000     // 最长等 30 秒
-const POLL_INTERVAL_MS = 500   // 每 500ms 轮询
+const MAX_WAIT_MS = 30_000     // 最長等 30 秒
+const POLL_INTERVAL_MS = 500   // 每 500ms 輪詢
 ```
 
-早期退出条件：任何必需服务器进入 `failed` 状态时立即停止等待。工具可用性通过 `mcp__` 前缀工具名解析（`mcp__serverName__toolName`）判断。
+早期退出條件：任何必需服務器進入 `failed` 狀態時立即停止等待。工具可用性通過 `mcp__` 前綴工具名解析（`mcp__serverName__toolName`）判斷。
 
-## 适用场景
+## 適用場景
 
 <CardGroup cols={2}>
-  <Card title="并行研究" icon="magnifying-glass">
-    多个 fork 子进程并行搜索不同方向，共享 Prompt Cache 前缀，只有指令不同
+  <Card title="並行研究" icon="magnifying-glass">
+    多個 fork 子進程並行搜索不同方向，共享 Prompt Cache 前綴，只有指令不同
   </Card>
-  <Card title="专业委派" icon="code-branch">
-    使用命名 Agent（Explore/Plan/verification）执行专业任务，受限工具集 + 独立权限
+  <Card title="專業委派" icon="code-branch">
+    使用命名 Agent（Explore/Plan/verification）執行專業任務，受限工具集 + 獨立權限
   </Card>
-  <Card title="隔离实验" icon="flask">
-    `isolation: "worktree"` 在独立工作副本中尝试方案，不影响主分支
+  <Card title="隔離實驗" icon="flask">
+    `isolation: "worktree"` 在獨立工作副本中嘗試方案，不影響主分支
   </Card>
-  <Card title="后台构建" icon="layer-group">
-    `run_in_background: true` 启动长时间构建/测试任务，主 Agent 继续工作
+  <Card title="後臺構建" icon="layer-group">
+    `run_in_background: true` 啓動長時間構建/測試任務，主 Agent 繼續工作
   </Card>
 </CardGroup>

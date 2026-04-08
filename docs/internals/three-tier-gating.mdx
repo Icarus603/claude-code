@@ -1,87 +1,87 @@
 ---
-title: "三层门禁系统 - 功能可见性控制架构"
-description: "详解 Claude Code 三层门禁系统：构建时 feature()、运行时 GrowthBook 和身份层 USER_TYPE，如何控制功能的可见性和灰度发布。"
-keywords: ["门禁系统", "功能门控", "feature flag", "灰度发布", "可见性控制"]
+title: "三層門禁系統 - 功能可見性控制架構"
+description: "詳解 Claude Code 三層門禁系統：構建時 feature()、執行時 GrowthBook 和身份層 USER_TYPE，如何控制功能的可見性和灰度發佈。"
+keywords: ["門禁系統", "功能門控", "feature flag", "灰度發佈", "可見性控制"]
 ---
 
-{/* 本章目标：建立对三层门禁系统的全局认知，为后续四篇深入文章奠定坐标系 */}
+{/* 本章目標：建立對三層門禁系統的全局認知，爲後續四篇深入文章奠定座標系 */}
 
 ## 冰山一角
 
-你日常使用的 Claude Code，只是完整代码库的冰山一角。
+你日常使用的 Claude Code，只是完整程式碼庫的冰山一角。
 
-逆向工程揭示了一个事实：大量功能被精心"藏"在三层独立的门禁系统之后。有些是正在 A/B 测试的实验性功能，有些是仅限 Anthropic 员工使用的内部工具，还有些是尚未对外发布的下一代能力。
+逆向工程揭示了一個事實：大量功能被精心"藏"在三層獨立的門禁系統之後。有些是正在 A/B 測試的實驗性功能，有些是僅限 Anthropic 員工使用的內部工具，還有些是尚未對外發布的下一代能力。
 
-> 我们在 `src/` 中发现了 88+ 个构建时 feature flags、500+ 个运行时 A/B 测试标记，以及一整套身份门控机制。
+> 我們在 `src/` 中發現了 88+ 個構建時 feature flags、500+ 個執行時 A/B 測試標記，以及一整套身份門控機制。
 
-## 三层门禁全景
+## 三層門禁全景
 
-| 维度 | 第一层：构建时 `feature()` | 第二层：运行时 GrowthBook | 第三层：身份 `USER_TYPE` |
+| 維度 | 第一層：構建時 `feature()` | 第二層：執行時 GrowthBook | 第三層：身份 `USER_TYPE` |
 |------|---------------------------|--------------------------|-------------------------|
-| **控制方式** | `bun:bundle` 编译时宏 | GrowthBook SDK 远程求值 | 构建时 `--define` 常量 |
-| **决策时机** | 打包时（代码直接被删除） | 启动时 + 定期刷新 | 打包时（常量折叠） |
-| **粒度** | 全有或全无 | 按用户/设备/组织定向 | 按构建版本（ant / external） |
-| **标记数量** | 88+ | 500+ (`tengu_*` 前缀) | 1（`ant` vs `external`） |
-| **逆向可见性** | 代码残留，但永远走 `false` 分支 | 完整 SDK 代码可读 | 条件分支清晰可见 |
+| **控制方式** | `bun:bundle` 編譯時宏 | GrowthBook SDK 遠程求值 | 構建時 `--define` 常量 |
+| **決策時機** | 打包時（程式碼直接被刪除） | 啓動時 + 定期刷新 | 打包時（常量摺疊） |
+| **粒度** | 全有或全無 | 按用戶/設備/組織定向 | 按構建版本（ant / external） |
+| **標記數量** | 88+ | 500+ (`tengu_*` 前綴) | 1（`ant` vs `external`） |
+| **逆向可見性** | 程式碼殘留，但永遠走 `false` 分支 | 完整 SDK 程式碼可讀 | 條件分支清晰可見 |
 
-## 决策流程
+## 決策流程
 
-当一个功能请求进入 Claude Code，它会依次经过三层门禁的检查：
+當一個功能請求進入 Claude Code，它會依次經過三層門禁的檢查：
 
 ```
-功能请求
+功能請求
   │
   ▼
 ┌─────────────────────────┐
-│  第一层：feature('X')    │ ──── 编译时已决定 ──→ false → 代码被 DCE 移除
-│  (构建时 Feature Flag)   │
+│  第一層：feature('X')    │ ──── 編譯時已決定 ──→ false → 程式碼被 DCE 移除
+│  (構建時 Feature Flag)   │
 └─────────┬───────────────┘
-          │ true (仅内部构建)
+          │ true (僅內部構建)
           ▼
 ┌─────────────────────────┐
-│  第二层：tengu_xxx       │ ──── 运行时按用户属性 ──→ 不在实验组 → 功能关闭
-│  (GrowthBook A/B 测试)   │
+│  第二層：tengu_xxx       │ ──── 執行時按用戶屬性 ──→ 不在實驗組 → 功能關閉
+│  (GrowthBook A/B 測試)   │
 └─────────┬───────────────┘
-          │ 在实验组
+          │ 在實驗組
           ▼
 ┌─────────────────────────┐
-│  第三层：USER_TYPE       │ ──── ant? external? ──→ external → 功能不可用
-│  (身份门控)              │
+│  第三層：USER_TYPE       │ ──── ant? external? ──→ external → 功能不可用
+│  (身份門控)              │
 └─────────┬───────────────┘
           │ ant
           ▼
       功能可用 ✓
 ```
 
-三层门禁**相互独立**，一个功能可能同时受多层控制。例如，KAIROS 助手模式同时需要 `feature('KAIROS')` 构建时开启 **和** `tengu_kairos` 运行时实验命中。
+三層門禁**相互獨立**，一個功能可能同時受多層控制。例如，KAIROS 助手模式同時需要 `feature('KAIROS')` 構建時開啓 **和** `tengu_kairos` 執行時實驗命中。
 
-## 逆向工程揭示了什么
+## 逆向工程揭示了什麼
 
-在这个反编译版本中：
+在這個反編譯版本中：
 
-- **第一层**完全透明——`feature()` 被兜底为 `() => false`，所有 88+ 个 flag 的代码路径都可以阅读，只是永远不会执行
-- **第二层**完整保留——GrowthBook SDK 的 1156 行代码完整可读，包括用户定向属性、缓存策略、覆盖机制
-- **第三层**清晰可见——`process.env.USER_TYPE === 'ant'` 出现在 60+ 个位置，每一处都标记着"仅限内部"的功能边界
+- **第一層**完全透明——`feature()` 被兜底爲 `() => false`，所有 88+ 個 flag 的程式碼路徑都可以閱讀，只是永遠不會執行
+- **第二層**完整保留——GrowthBook SDK 的 1156 行程式碼完整可讀，包括用戶定向屬性、快取策略、覆蓋機制
+- **第三層**清晰可見——`process.env.USER_TYPE === 'ant'` 出現在 60+ 個位置，每一處都標記着"僅限內部"的功能邊界
 
 <Note>
-这三层门禁不是安全机制——它们是产品发布策略。目的是让 Anthropic 能够在不同用户群体中渐进式地测试和发布功能，而不是阻止逆向工程。
+這三層門禁不是安全機制——它們是產品發佈策略。目的是讓 Anthropic 能夠在不同用戶羣體中漸進式地測試和發佈功能，而不是阻止逆向工程。
 </Note>
 
-## 接下来
+## 接下來
 
-后续四篇文章将分别深入每一层门禁的细节：
+後續四篇文章將分別深入每一層門禁的細節：
 
 <CardGroup cols={2}>
-  <Card title="88 面旗帜" icon="flag" href="/docs/internals/feature-flags">
-    构建时 Feature Flags 的完整分类与解读
+  <Card title="88 面旗幟" icon="flag" href="/docs/internals/feature-flags">
+    構建時 Feature Flags 的完整分類與解讀
   </Card>
   <Card title="千面千人" icon="flask" href="/docs/internals/growthbook-ab-testing">
-    GrowthBook A/B 测试体系的运作机制
+    GrowthBook A/B 測試體系的運作機制
   </Card>
-  <Card title="未公开功能巡礼" icon="eye" href="/docs/internals/hidden-features">
-    KAIROS、PROACTIVE 等 8 大隐藏功能深度解析
+  <Card title="未公開功能巡禮" icon="eye" href="/docs/internals/hidden-features">
+    KAIROS、PROACTIVE 等 8 大隱藏功能深度解析
   </Card>
-  <Card title="Ant 的特权世界" icon="shield" href="/docs/internals/ant-only-world">
-    Anthropic 员工专属的工具、命令与 API
+  <Card title="Ant 的特權世界" icon="shield" href="/docs/internals/ant-only-world">
+    Anthropic 員工專屬的工具、命令與 API
   </Card>
 </CardGroup>
