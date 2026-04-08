@@ -1,4 +1,6 @@
 import { feature } from 'bun:bundle'
+import { AgentCore } from '@claude-code/agent'
+import './utils/macroFallback.js'
 import { getGlobalConfig } from '@claude-code/config'
 import {
   hasAutoMemPathOverride,
@@ -37,7 +39,12 @@ import {
   getTotalCost,
 } from './cost-tracker.js'
 import type { CanUseToolFn } from './hooks/useCanUseTool.js'
-import { query } from './query.js'
+import {
+  createProductionDeps,
+  fromAgentEvent,
+  fromCoreMessages,
+  toCoreMessages,
+} from './agent/createDeps.js'
 import { categorizeRetryableAPIError } from './services/api/errors.js'
 import type { MCPServerConnection } from './services/mcp/types.js'
 import type { AppState } from './state/AppState.js'
@@ -97,6 +104,7 @@ import {
   localCommandOutputToSDKAssistantMessage,
   toSDKCompactMetadata,
 } from './utils/messages/mappers.js'
+import { createCompactBoundaryMessage } from './utils/messages.js'
 import {
   buildSystemInitMessage,
   sdkCompatToolName,
@@ -354,6 +362,7 @@ export class QueryEngine {
         tools,
         verbose,
         mainLoopModel: initialMainLoopModel,
+        fallbackModel,
         thinkingConfig: initialThinkingConfig,
         mcpClients,
         mcpResources: {},
@@ -364,7 +373,9 @@ export class QueryEngine {
         agentDefinitions: { activeAgents: agents, allAgents: [] },
         theme: resolveThemeSetting(getGlobalConfig().theme),
         maxBudgetUsd,
+        taskBudget,
       },
+      renderedSystemPrompt: systemPrompt,
       getAppState,
       setAppState,
       abortController: this.abortController,
@@ -502,6 +513,7 @@ export class QueryEngine {
         tools,
         verbose,
         mainLoopModel,
+        fallbackModel,
         thinkingConfig: initialThinkingConfig,
         mcpClients,
         mcpResources: {},
@@ -512,7 +524,9 @@ export class QueryEngine {
         theme: resolveThemeSetting(getGlobalConfig().theme),
         agentDefinitions: { activeAgents: agents, allAgents: [] },
         maxBudgetUsd,
+        taskBudget,
       },
+      renderedSystemPrompt: systemPrompt,
       getAppState,
       setAppState,
       abortController: this.abortController,
@@ -675,18 +689,134 @@ export class QueryEngine {
       ? countToolCalls(this.mutableMessages, SYNTHETIC_OUTPUT_TOOL_NAME)
       : 0
 
-    for await (const message of query({
-      messages,
-      systemPrompt,
-      userContext,
-      systemContext,
-      canUseTool: wrappedCanUseTool,
-      toolUseContext: processUserInputContext,
-      fallbackModel,
-      querySource: 'sdk',
+    const agent = new AgentCore(
+      createProductionDeps({
+        tools,
+        toolUseContext: processUserInputContext,
+        canUseTool: wrappedCanUseTool,
+        querySource: 'sdk',
+        contextOverrides: {
+          systemPrompt,
+          userContext,
+          systemContext,
+        },
+      }),
+      {
+        messages: toCoreMessages(messages),
+        model: mainLoopModel,
+        sessionId: getSessionId(),
+        totalUsage: this.totalUsage,
+      },
+    )
+
+    for await (const event of agent.run({
+      messages: toCoreMessages(messages),
       maxTurns,
-      taskBudget,
+      abortSignal: this.abortController.signal,
     })) {
+      if (event.type === 'done') {
+        if (event.reason === 'max_turns') {
+          if (
+            persistSession &&
+            (isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
+              isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK))
+          ) {
+            await flushSessionStorage()
+          }
+          yield {
+            type: 'result',
+            subtype: 'error_max_turns',
+            duration_ms: Date.now() - startTime,
+            duration_api_ms: getTotalAPIDuration(),
+            is_error: true,
+            num_turns: turnCount,
+            stop_reason: lastStopReason,
+            session_id: getSessionId(),
+            total_cost_usd: getTotalCost(),
+            usage: this.totalUsage,
+            modelUsage: getModelUsage(),
+            permission_denials: this.permissionDenials,
+            fast_mode_state: getFastModeState(
+              mainLoopModel,
+              initialAppState.fastMode,
+            ),
+            uuid: randomUUID(),
+            errors: [
+              `Reached maximum number of turns (${maxTurns ?? 'unknown'})`,
+            ],
+          }
+          return
+        }
+
+        if (event.reason === 'error') {
+          if (
+            persistSession &&
+            (isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
+              isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK))
+          ) {
+            await flushSessionStorage()
+          }
+          yield {
+            type: 'result',
+            subtype: 'error_during_execution',
+            duration_ms: Date.now() - startTime,
+            duration_api_ms: getTotalAPIDuration(),
+            is_error: true,
+            num_turns: turnCount,
+            stop_reason: lastStopReason,
+            session_id: getSessionId(),
+            total_cost_usd: getTotalCost(),
+            usage: this.totalUsage,
+            modelUsage: getModelUsage(),
+            permission_denials: this.permissionDenials,
+            fast_mode_state: getFastModeState(
+              mainLoopModel,
+              initialAppState.fastMode,
+            ),
+            uuid: randomUUID(),
+            errors: [
+              event.error instanceof Error
+                ? event.error.message
+                : String(event.error ?? 'Agent core execution failed'),
+            ],
+          }
+          return
+        }
+
+        continue
+      }
+
+      if (event.type === 'compaction') {
+        this.mutableMessages = fromCoreMessages(event.after)
+        messages.splice(0, messages.length, ...this.mutableMessages)
+
+        const compactBoundary = createCompactBoundaryMessage(
+          'auto',
+          0,
+          this.mutableMessages.at(-1)?.uuid,
+        )
+        this.mutableMessages.push(compactBoundary)
+        messages.push(compactBoundary)
+
+        if (persistSession) {
+          await recordTranscript(messages)
+        }
+
+        yield {
+          type: 'system',
+          subtype: 'compact_boundary' as const,
+          session_id: getSessionId(),
+          uuid: compactBoundary.uuid,
+          compact_metadata: toSDKCompactMetadata(compactBoundary.compactMetadata),
+        }
+        continue
+      }
+
+      const message = fromAgentEvent(event)
+      if (!message) {
+        continue
+      }
+
       // Record assistant, user, and compact boundary messages
       if (
         message.type === 'assistant' ||

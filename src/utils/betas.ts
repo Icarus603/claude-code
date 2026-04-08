@@ -376,7 +376,7 @@ export function getMergedBetas(
   model: string,
   options?: { isAgenticQuery?: boolean },
 ): string[] {
-  const baseBetas = [...getModelBetas(model)]
+  const baseBetas = sanitizeBetaHeaders(getModelBetas(model))
 
   // Agentic queries always need claude-code and cli-internal beta headers.
   // For non-Haiku models these are already in baseBetas; for Haiku they're
@@ -402,11 +402,18 @@ export function getMergedBetas(
   }
 
   // Merge SDK betas without duplicates (already filtered by filterAllowedSdkBetas)
-  return [...baseBetas, ...sdkBetas.filter(b => !baseBetas.includes(b))]
+  return sanitizeBetaHeaders([
+    ...baseBetas,
+    ...sdkBetas.filter(b => !baseBetas.includes(b)),
+  ])
 }
 
 export function clearBetasCaches(): void {
   getAllModelBetas.cache?.clear?.()
   getModelBetas.cache?.clear?.()
   getBedrockExtraBodyParamsBetas.cache?.clear?.()
+}
+
+export function sanitizeBetaHeaders(betas: readonly string[]): string[] {
+  return [...new Set(betas.map(beta => beta.trim()).filter(beta => beta.length > 0))]
 }

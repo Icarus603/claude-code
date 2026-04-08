@@ -76,6 +76,7 @@
     "@aws-sdk/credential-providers": "^3.1020.0",
     "@azure/identity": "^4.13.1",
     "@biomejs/biome": "^2.4.10",
+    "@claude-code/agent": "workspace:*",
     "@claude-code/config": "workspace:*",
     "@claude-code/memory": "workspace:*",
     "@claude-code/permission": "workspace:*",

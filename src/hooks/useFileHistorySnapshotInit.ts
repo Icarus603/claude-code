@@ -4,7 +4,7 @@ import {
   type FileHistoryState,
   fileHistoryEnabled,
   fileHistoryRestoreStateFromLog,
-} from '../utils/fileHistory.js'
+} from '@claude-code/agent/file-history'
 
 export function useFileHistorySnapshotInit(
   initialFileHistorySnapshots: FileHistorySnapshot[] | undefined,

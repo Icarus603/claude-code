@@ -61,6 +61,7 @@ import {
   getBedrockExtraBodyParamsBetas,
   getMergedBetas,
   getModelBetas,
+  sanitizeBetaHeaders,
 } from '../../utils/betas.js'
 import { getOrCreateUserID } from '../../utils/config.js'
 import {
@@ -1082,7 +1083,9 @@ async function* queryModel(
     options.querySource === 'sdk' ||
     options.querySource === 'hook_agent' ||
     options.querySource === 'verification_agent'
-  const betas = getMergedBetas(options.model, { isAgenticQuery })
+  const betas = sanitizeBetaHeaders(
+    getMergedBetas(options.model, { isAgenticQuery }),
+  )
 
   // Always send the advisor beta header when advisor is enabled, so
   // non-agentic queries (compact, side_question, extract_memories, etc.)
@@ -1208,13 +1211,14 @@ async function* queryModel(
       getCachedMCConfig,
     } = await import('../compact/cachedMicrocompact.js')
     const betas = await import('src/constants/betas.js')
-    cacheEditingBetaHeader = betas.CACHE_EDITING_BETA_HEADER
+    cacheEditingBetaHeader = betas.CACHE_EDITING_BETA_HEADER.trim()
     const featureEnabled = isCachedMicrocompactEnabled()
     const modelSupported = isModelSupportedForCacheEditing(options.model)
-    cachedMCEnabled = featureEnabled && modelSupported
+    cachedMCEnabled =
+      featureEnabled && modelSupported && cacheEditingBetaHeader.length > 0
     const config = getCachedMCConfig()
     logForDebugging(
-      `Cached MC gate: enabled=${featureEnabled} modelSupported=${modelSupported} model=${options.model} supportedModels=${jsonStringify((config as any).supportedModels)}`,
+      `Cached MC gate: enabled=${featureEnabled} modelSupported=${modelSupported} header=${cacheEditingBetaHeader || '<empty>'} model=${options.model} supportedModels=${jsonStringify((config as any).supportedModels)}`,
     )
   }
 
@@ -1419,8 +1423,6 @@ async function* queryModel(
     skipGlobalCacheForSystemPrompt: needsToolBasedCacheMarker,
     querySource: options.querySource,
   })
-  const useBetas = betas.length > 0
-
   // Build minimal context for detailed tracing (when beta tracing is enabled)
   // Note: The actual new_context message extraction is done in sessionTracing.ts using
   // hash-based tracking per querySource (agent) from the messagesForAPI array
@@ -1578,7 +1580,7 @@ async function* queryModel(
   let lastRequestBetas: string[] | undefined
 
   const paramsFromContext = (retryContext: RetryContext) => {
-    const betasParams = [...betas]
+    const betasParams = sanitizeBetaHeaders(betas)
 
     // Append 1M beta dynamically for the Sonnet 1M experiment.
     if (
@@ -1736,7 +1738,7 @@ async function* queryModel(
       ? (options.temperatureOverride ?? 1)
       : undefined
 
-    lastRequestBetas = betasParams
+    lastRequestBetas = sanitizeBetaHeaders(betasParams)
 
     return {
       model: normalizeModelStringForAPI(options.model),
@@ -1752,13 +1754,13 @@ async function* queryModel(
       system,
       tools: allTools,
       tool_choice: options.toolChoice,
-      ...(useBetas && { betas: betasParams }),
+      ...(betasParams.length > 0 && { betas: sanitizeBetaHeaders(betasParams) }),
       metadata: getAPIMetadata(),
       max_tokens: maxOutputTokens,
       thinking,
       ...(temperature !== undefined && { temperature }),
       ...(contextManagement &&
-        useBetas &&
+        betasParams.length > 0 &&
         betasParams.includes(CONTEXT_MANAGEMENT_BETA_HEADER) && {
           context_management: contextManagement,
         }),
@@ -1780,7 +1782,7 @@ async function* queryModel(
       thinkingConfig,
     })
     const logMessagesLength = queryParams.messages.length
-    const logBetas = useBetas ? (queryParams.betas ?? []) : []
+    const logBetas = queryParams.betas ?? []
     const logThinkingType = queryParams.thinking?.type ?? 'disabled'
     const logEffortValue = queryParams.output_config?.effort
     void options.getToolPermissionContext().then(permissionContext => {
