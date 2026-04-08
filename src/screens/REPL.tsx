@@ -309,7 +309,7 @@ import {
   copyFileHistoryForResume,
   fileHistoryEnabled,
   fileHistoryHasAnyChanges,
-} from '../utils/fileHistory.js';
+} from '@claude-code/agent/file-history';
 import { type AttributionState, incrementPromptCount } from '../utils/commitAttribution.js';
 import { recordAttributionSnapshot } from '../utils/sessionStorage.js';
 import {

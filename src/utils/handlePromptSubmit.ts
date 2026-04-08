@@ -21,8 +21,11 @@ import { createAbortController } from './abortController.js'
 import type { PastedContent } from './config.js'
 import { logForDebugging } from './debug.js'
 import type { EffortValue } from './effort.js'
-import type { FileHistoryState } from './fileHistory.js'
-import { fileHistoryEnabled, fileHistoryMakeSnapshot } from './fileHistory.js'
+import {
+  type FileHistoryState,
+  fileHistoryEnabled,
+  fileHistoryMakeSnapshot,
+} from '@claude-code/agent/file-history'
 import { gracefulShutdownSync } from './gracefulShutdown.js'
 import { enqueue } from './messageQueueManager.js'
 import { resolveSkillModelOverride } from './model/model.js'

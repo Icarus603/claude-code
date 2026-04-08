@@ -25,6 +25,7 @@
         "@aws-sdk/credential-providers": "^3.1020.0",
         "@azure/identity": "^4.13.1",
         "@biomejs/biome": "^2.4.10",
+        "@claude-code/agent": "workspace:*",
         "@claude-code/config": "workspace:*",
         "@claude-code/memory": "workspace:*",
         "@claude-code/permission": "workspace:*",
@@ -164,6 +165,13 @@
         "type-fest": "^5.5.0",
         "usehooks-ts": "^3.1.1",
         "wrap-ansi": "^10.0.0",
+      },
+    },
+    "packages/agent": {
+      "name": "@claude-code/agent",
+      "version": "0.1.0",
+      "dependencies": {
+        "zod": "^4.3.6",
       },
     },
     "packages/audio-capture-napi": {
@@ -355,6 +363,8 @@
     "@biomejs/cli-win32-arm64": ["@biomejs/cli-win32-arm64@2.4.10", "https://registry.npmmirror.com/@biomejs/cli-win32-arm64/-/cli-win32-arm64-2.4.10.tgz", { "os": "win32", "cpu": "arm64" }, "sha512-umwQU6qPzH+ISTf/eHyJ/QoQnJs3V9Vpjz2OjZXe9MVBZ7prgGafMy7yYeRGnlmDAn87AKTF3Q6weLoMGpeqdQ=="],
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.4.10", "https://registry.npmmirror.com/@biomejs/cli-win32-x64/-/cli-win32-x64-2.4.10.tgz", { "os": "win32", "cpu": "x64" }, "sha512-aW/JU5GuyH4uxMrNYpoC2kjaHlyJGLgIa3XkhPEZI0uKhZhJZU8BuEyJmvgzSPQNGozBwWjC972RaNdcJ9KyJg=="],
+
+    "@claude-code/agent": ["@claude-code/agent@workspace:packages/agent"],
 
     "@claude-code/config": ["@claude-code/config@workspace:packages/config"],
 

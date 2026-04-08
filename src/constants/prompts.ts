@@ -62,6 +62,11 @@ import { isUndercover } from '../utils/undercover.js'
 import { getAntModelOverrideConfig } from '../utils/model/antModels.js'
 import { isMcpInstructionsDeltaEnabled } from '../utils/mcpInstructionsDelta.js'
 
+const ISSUES_EXPLAINER =
+  typeof globalThis.MACRO !== 'undefined'
+    ? globalThis.MACRO.ISSUES_EXPLAINER
+    : ''
+
 // Dead code elimination: conditional imports for feature-gated modules
 /* eslint-disable @typescript-eslint/no-require-imports */
 const getCachedMCConfigForFRC = feature('CACHED_MICROCOMPACT')
@@ -216,7 +221,7 @@ function getSimpleDoingTasksSection(): string {
 
   const userHelpSubitems = [
     `/help: Get help with using Claude Code`,
-    `To give feedback, users should ${MACRO.ISSUES_EXPLAINER}`,
+    `To give feedback, users should ${ISSUES_EXPLAINER}`,
   ]
 
   const items = [

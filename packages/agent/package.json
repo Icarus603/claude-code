@@ -1,0 +1,17 @@
+{
+  "name": "@claude-code/agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./file-history": "./fileHistory.ts",
+    "./scheduler": "./scheduler.ts",
+    "./hooks": "./hooks/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}

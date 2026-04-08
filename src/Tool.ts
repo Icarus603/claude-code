@@ -160,6 +160,7 @@ export type ToolUseContext = {
     commands: Command[]
     debug: boolean
     mainLoopModel: string
+    fallbackModel?: string
     tools: Tools
     verbose: boolean
     thinkingConfig: ThinkingConfig
@@ -168,6 +169,7 @@ export type ToolUseContext = {
     isNonInteractiveSession: boolean
     agentDefinitions: AgentDefinitionsResult
     maxBudgetUsd?: number
+    taskBudget?: { total: number; remaining?: number }
     /** Custom system prompt that replaces the default system prompt */
     customSystemPrompt?: string
     /** Additional system prompt appended after the main system prompt */
