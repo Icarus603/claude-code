@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useApp } from '@anthropic/ink'
-import type { KeybindingContextName } from '../keybindings/types.js'
+import type { KeybindingContextName } from '@anthropic/ink/keybindings'
 import { useDoublePress } from './useDoublePress.js'
 
 export type ExitState = {

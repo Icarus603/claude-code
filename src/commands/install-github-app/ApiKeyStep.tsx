@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import TextInput from '../../components/TextInput.js'
 import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 import { Box, color, Text, useTheme } from '@anthropic/ink'
-import { useKeybindings } from '../../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 
 interface ApiKeyStepProps {
   existingApiKey: string | null

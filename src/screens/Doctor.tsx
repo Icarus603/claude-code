@@ -22,7 +22,7 @@ import { ValidationErrorsList } from '../components/ValidationErrorsList.js'
 import { useSettingsErrors } from '../hooks/notifs/useSettingsErrors.js'
 import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybindings } from '../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useAppState } from '../state/AppState.js'
 import { getPluginErrorMessage } from '../types/plugin.js'
 import {

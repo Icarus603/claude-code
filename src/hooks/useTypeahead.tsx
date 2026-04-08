@@ -22,8 +22,8 @@ import { KeyboardEvent, useInput } from '@anthropic/ink'
 import {
   useOptionalKeybindingContext,
   useRegisterKeybindingContext,
-} from '../keybindings/KeybindingContext.js'
-import { useKeybindings } from '../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import { useAppState, useAppStateStore } from '../state/AppState.js'
 import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js'

@@ -6,7 +6,7 @@ import { useInterval } from 'usehooks-ts'
 import { useRegisterOverlay } from '../../context/overlayContext.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow dialog navigation
 import { Box, Text, useInput, stringWidth } from '@anthropic/ink'
-import { useKeybindings } from '../../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
 import {
   type AppState,

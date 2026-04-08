@@ -8,7 +8,7 @@ import {
 } from '../../../commands/add-dir/validation.js'
 import TextInput from '../../../components/TextInput.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { ToolPermissionContext } from '../../../Tool.js'
 import { getDirectoryCompletions } from '../../../utils/suggestions/directoryCompletion.js'
 import { ConfigurableShortcutHint } from '../../ConfigurableShortcutHint.js'

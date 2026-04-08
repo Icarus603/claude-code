@@ -20,7 +20,7 @@ import {
 import { logError } from 'src/utils/log.js'
 import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text, Divider } from '@anthropic/ink'
-import { useKeybinding, useKeybindings } from '../keybindings/useKeybinding.js'
+import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'
 import type {
   Message,
   PartialCompactDirection,

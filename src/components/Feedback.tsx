@@ -15,7 +15,7 @@ import {
 import type { CommandResultDisplay } from '../commands.js'
 import { useTerminalSize } from '../hooks/useTerminalSize.js'
 import { Box, Text, useInput } from '@anthropic/ink'
-import { useKeybinding } from '../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { queryHaiku } from '../services/api/claude.js'
 import { startsWithApiErrorPrefix } from '../services/api/errors.js'
 import type { Message } from '../types/message.js'

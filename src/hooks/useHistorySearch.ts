@@ -7,7 +7,7 @@ import {
 import { makeHistoryReader } from '../history.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until consumers wire handleKeyDown to <Box onKeyDown>
-import { useKeybinding, useKeybindings } from '../keybindings/useKeybinding.js'
+import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'
 import type { PromptInputMode } from '../types/textInputTypes.js'
 import type { HistoryEntry } from '../utils/config.js'
 

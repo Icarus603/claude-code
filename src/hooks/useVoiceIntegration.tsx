@@ -10,9 +10,9 @@ import {
 } from '../context/voice.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until REPL wires handleKeyDown to <Box onKeyDown>
-import { useOptionalKeybindingContext } from '../keybindings/KeybindingContext.js'
-import { keystrokesEqual } from '../keybindings/resolver.js'
-import type { ParsedKeystroke } from '../keybindings/types.js'
+import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
+import { keystrokesEqual } from '@anthropic/ink/keybindings'
+import type { ParsedKeystroke } from '@anthropic/ink/keybindings'
 import { normalizeFullWidthSpace } from '../utils/stringUtils.js'
 import { useVoiceEnabled } from './useVoiceEnabled.js'
 

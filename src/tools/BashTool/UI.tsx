@@ -5,7 +5,7 @@ import { FallbackToolUseErrorMessage } from '../../components/FallbackToolUseErr
 import { MessageResponse } from '../../components/MessageResponse.js'
 import { ShellProgressMessage } from '../../components/shell/ShellProgressMessage.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
 import { useAppStateStore, useSetAppState } from '../../state/AppState.js'
 import type { Tool } from '../../Tool.js'

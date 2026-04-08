@@ -2,7 +2,7 @@ import figures from 'figures'
 import React from 'react'
 import { GITHUB_ACTION_SETUP_DOCS_URL } from '../../constants/github-app.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 
 interface InstallAppStepProps {
   repoUrl: string

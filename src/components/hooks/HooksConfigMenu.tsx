@@ -17,7 +17,7 @@ import { useAppState, useAppStateStore } from 'src/state/AppState.js'
 import type { CommandResultDisplay } from '../../commands.js'
 import { useSettingsChange } from '../../hooks/useSettingsChange.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
   getHookEventMetadata,
   getHooksForMatcher,

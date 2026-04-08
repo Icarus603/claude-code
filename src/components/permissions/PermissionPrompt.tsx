@@ -1,7 +1,7 @@
 import React, { type ReactNode, useCallback, useMemo, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import type { KeybindingAction } from '../../keybindings/types.js'
-import { useKeybindings } from '../../keybindings/useKeybinding.js'
+import type { KeybindingAction } from '@anthropic/ink/keybindings'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

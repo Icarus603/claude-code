@@ -2,7 +2,7 @@ import figures from 'figures'
 import type { RefObject } from 'react'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybindings } from '../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import { logEvent } from '../services/analytics/index.js'
 import type {
   NormalizedUserMessage,

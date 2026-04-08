@@ -11,7 +11,7 @@ import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 import { setClipboard } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow menu navigation
 import { Box, color, Link, Text, useInput, useTheme } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
   AuthenticationCancelledError,
   performMCPOAuthFlow,

@@ -6,7 +6,7 @@ import { useState, useCallback } from 'react'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import figures from 'figures'
 import {
   type GlobalConfig,
@@ -96,7 +96,7 @@ import {
   clearCliTeammateModeOverride,
 } from '../../utils/swarm/backends/teammateModeSnapshot.js'
 import { getHardcodedTeammateModelFallback } from '../../utils/swarm/teammateModel.js'
-import { useSearchInput } from '../../hooks/useSearchInput.js'
+import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 import {
   clearFastModeCooldown,

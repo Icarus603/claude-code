@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { Pane } from '@anthropic/ink'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 
 type Platform = 'ios' | 'android'

@@ -17,14 +17,14 @@ import type {
   StdioServerInfo,
 } from '../../components/mcp/types.js'
 import { SearchBox } from '../../components/SearchBox.js'
-import { useSearchInput } from '../../hooks/useSearchInput.js'
+import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- useInput needed for raw search mode text input
 import { Box, Text, useInput, useTerminalFocus } from '@anthropic/ink'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import { getBuiltinPluginDefinition } from '../../plugins/builtinPlugins.js'
 import { useMcpToggleEnabled } from '../../services/mcp/MCPConnectionManager.js'
 import type {

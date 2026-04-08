@@ -5,7 +5,7 @@ import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import { useAppState } from '../../../state/AppState.js'
 import type { Question } from '../../../tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import { getExternalEditor } from '../../../utils/editor.js'

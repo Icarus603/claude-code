@@ -1,8 +1,5 @@
 import React, { useCallback, useState } from 'react'
 import type { Key } from '@anthropic/ink'
-import type { VimInputState, VimMode } from '../types/textInputTypes.js'
-import { Cursor } from '../utils/Cursor.js'
-import { lastGrapheme } from '../utils/intl.js'
 import {
   executeIndent,
   executeJoin,
@@ -13,16 +10,18 @@ import {
   executeReplace,
   executeToggleCase,
   executeX,
+  transition,
   type OperatorContext,
-} from '../vim/operators.js'
-import { type TransitionContext, transition } from '../vim/transitions.js'
-import {
+  type TransitionContext,
   createInitialPersistentState,
   createInitialVimState,
   type PersistentState,
   type RecordedChange,
   type VimState,
-} from '../vim/types.js'
+} from '@anthropic/ink/vim'
+import type { VimInputState, VimMode } from '../types/textInputTypes.js'
+import { Cursor } from '../utils/Cursor.js'
+import { lastGrapheme } from '../utils/intl.js'
 import { type UseTextInputProps, useTextInput } from './useTextInput.js'
 
 type UseVimInputProps = Omit<UseTextInputProps, 'inputFilter'> & {

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
 import { useSetAppState } from 'src/state/AppState.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { Tools } from '../../Tool.js'
 import {
   type AgentColorName,
