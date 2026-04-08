@@ -9,7 +9,7 @@ import {
 } from '../commands/terminalSetup/terminalSetup.js'
 import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Newline, Text, useTheme } from '@anthropic/ink'
-import { useKeybindings } from '../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import { isAnthropicAuthEnabled } from '../utils/auth.js'
 import { normalizeApiKeyForConfig } from '../utils/authPortable.js'
 import { getCustomApiKeyStatus } from '../utils/config.js'

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, color, Link, Text, useTheme, Pane, Tab, Tabs, useTabHeaderFocus } from '@anthropic/ink'
-import { useKeybindings } from '../../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import type { CommandResultDisplay } from '../../types/command.js'
 import type { SandboxDependencyCheck } from '../../utils/sandbox/sandbox-adapter.js'
 import { SandboxManager } from '../../utils/sandbox/sandbox-adapter.js'

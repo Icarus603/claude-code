@@ -11,9 +11,9 @@ import type { PermissionUpdateDestination } from 'src/utils/permissions/Permissi
 import type { CommandResultDisplay } from '../../../commands.js'
 import { Select } from '../../../components/CustomSelect/select.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../../hooks/useExitOnCtrlCDWithKeybindings.js'
-import { useSearchInput } from '../../../hooks/useSearchInput.js'
+import { useSearchInput } from '@anthropic/ink/search'
 import { type KeyboardEvent, Box, Text, useTerminalFocus } from '@anthropic/ink'
-import { useKeybinding } from '../../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
   type AutoModeDenial,
   getAutoModeDenials,

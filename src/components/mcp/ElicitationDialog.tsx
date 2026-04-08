@@ -11,7 +11,7 @@ import { useNotifyAfterTimeout } from '../../hooks/useNotifyAfterTimeout.js'
 import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw text input for elicitation form
 import { Box, Text, useInput } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { ElicitationRequestEvent } from '../../services/mcp/elicitationHandler.js'
 import { openBrowser } from '../../utils/browser.js'
 import {

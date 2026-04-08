@@ -6,7 +6,7 @@ import { Box, Text, useInput, stringWidth } from '@anthropic/ink'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import { isEnvTruthy } from '../../utils/envUtils.js'
 import type {
   PluginOptionSchema,

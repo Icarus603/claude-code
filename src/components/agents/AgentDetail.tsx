@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { Tools } from '../../Tool.js'
 import { getAgentColor } from '../../tools/AgentTool/agentColorManager.js'
 import { getMemoryScopeDisplay } from '../../tools/AgentTool/agentMemory.js'

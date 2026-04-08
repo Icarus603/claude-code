@@ -16,7 +16,7 @@ import {
 import { useRegisterOverlay } from '../context/overlayContext.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw 'd' key for disconnect, not a configurable keybinding action
 import { Box, Text, useInput } from '@anthropic/ink'
-import { useKeybindings } from '../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useAppState, useSetAppState } from '../state/AppState.js'
 import { saveGlobalConfig } from '../utils/config.js'
 import { getBranch } from '../utils/git.js'

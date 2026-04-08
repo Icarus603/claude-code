@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useRegisterOverlay } from '../../context/overlayContext.js'
 import { type InputEvent, useInput } from '@anthropic/ink'
-import { useKeybindings } from '../../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   normalizeFullWidthDigits,
   normalizeFullWidthSpace,

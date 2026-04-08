@@ -8,7 +8,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import { useAppState, useSetAppState } from '../../state/AppState.js'
 import type { PluginError } from '../../types/plugin.js'
 import { errorMessage } from '../../utils/errors.js'

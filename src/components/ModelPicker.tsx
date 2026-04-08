@@ -13,7 +13,7 @@ import {
   isFastModeEnabled,
 } from 'src/utils/fastMode.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybindings } from '../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useAppState, useSetAppState } from '../state/AppState.js'
 import {
   convertEffortValueToLevel,

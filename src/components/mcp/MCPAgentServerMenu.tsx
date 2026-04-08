@@ -2,7 +2,7 @@ import figures from 'figures'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CommandResultDisplay } from '../../commands.js'
 import { Box, color, Link, Text, useTheme } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
   AuthenticationCancelledError,
   performMCPOAuthFlow,

@@ -4,7 +4,7 @@ import { Box, Text, useInput } from '@anthropic/ink'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import type { PastedContent } from '../../utils/config.js'
 import { getImageFromClipboard } from '../../utils/imagePaste.js'
 import type { ImageDimensions } from '../../utils/imageResizer.js'

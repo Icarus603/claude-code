@@ -10,7 +10,7 @@ import {
 import { useIsInsideModal } from '../../context/modalContext.js'
 import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 import { Box, Link, Text, Tab, Tabs, Pane } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { Commands } from './Commands.js'
 import { General } from './General.js'
 

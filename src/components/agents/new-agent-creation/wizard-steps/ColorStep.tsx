@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react'
 import { Box, Byline, KeyboardShortcutHint } from '@anthropic/ink'
-import { useKeybinding } from '../../../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { AgentColorName } from '../../../../tools/AgentTool/agentColorManager.js'
 import { ConfigurableShortcutHint } from '../../../ConfigurableShortcutHint.js'
 import { useWizard } from '../../../wizard/index.js'

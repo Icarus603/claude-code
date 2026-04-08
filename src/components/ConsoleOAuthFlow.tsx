@@ -6,7 +6,7 @@ import {
 import { installOAuthTokens } from '../cli/handlers/auth.js'
 import { useTerminalSize } from '../hooks/useTerminalSize.js'
 import { setClipboard, useTerminalNotification, Box, Link, Text, KeyboardShortcutHint } from '@anthropic/ink'
-import { useKeybinding } from '../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getSSLErrorHint } from '../services/api/errorUtils.js'
 import { sendNotification } from '../services/notifier.js'
 import { OAuthService } from '../services/oauth/index.js'

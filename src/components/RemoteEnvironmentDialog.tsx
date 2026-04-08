@@ -3,7 +3,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { Text } from '@anthropic/ink'
-import { useKeybinding } from '../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { toError } from '../utils/errors.js'
 import { logError } from '../utils/log.js'
 import {

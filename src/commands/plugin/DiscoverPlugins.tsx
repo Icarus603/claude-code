@@ -4,14 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
 import { SearchBox } from '../../components/SearchBox.js'
 import { Byline } from '@anthropic/ink'
-import { useSearchInput } from '../../hooks/useSearchInput.js'
+import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- useInput needed for raw search mode text input
 import { Box, Text, useInput, useTerminalFocus } from '@anthropic/ink'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import type { LoadedPlugin } from '../../types/plugin.js'
 import { count } from '../../utils/array.js'
 import { openBrowser } from '../../utils/browser.js'

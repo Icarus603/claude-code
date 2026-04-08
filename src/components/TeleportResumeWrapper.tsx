@@ -10,7 +10,7 @@ import {
   useTeleportResume,
 } from '../hooks/useTeleportResume.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { ResumeTask } from './ResumeTask.js'
 import { Spinner } from './Spinner.js'
 

@@ -6,7 +6,7 @@ import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithK
 import { setClipboard } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- enter to copy link
 import { Box, Link, Text, useInput } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { logEvent } from '../../services/analytics/index.js'
 import {
   fetchReferralRedemptions,

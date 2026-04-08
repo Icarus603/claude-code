@@ -17,7 +17,7 @@ import { Dialog, ListItem } from '@anthropic/ink'
 import { shouldShowRemoteCallout } from '../../components/RemoteCallout.js'
 import { useRegisterOverlay } from '../../context/overlayContext.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybindings } from '../../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

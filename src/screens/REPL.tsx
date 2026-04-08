@@ -15,7 +15,7 @@ import { tmpdir } from 'os';
 import figures from 'figures';
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- / n N Esc [ v are bare letters in transcript modal context, same class as g/G/j/k in ScrollKeybindingHandler
 import { useInput } from '@anthropic/ink'
-import { useSearchInput } from '../hooks/useSearchInput.js'
+import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '../hooks/useTerminalSize.js'
 import { useSearchHighlight } from '@anthropic/ink'
 import type { JumpHandle } from '../components/VirtualMessageList.js'

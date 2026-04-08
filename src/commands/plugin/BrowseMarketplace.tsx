@@ -6,7 +6,7 @@ import { Box, Byline, Text } from '@anthropic/ink'
 import {
   useKeybinding,
   useKeybindings,
-} from '../../keybindings/useKeybinding.js'
+} from '@anthropic/ink/keybindings'
 import type { LoadedPlugin } from '../../types/plugin.js'
 import { count } from '../../utils/array.js'
 import { openBrowser } from '../../utils/browser.js'

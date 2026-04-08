@@ -2,7 +2,7 @@ import * as React from 'react'
 import type {
   KeybindingAction,
   KeybindingContextName,
-} from '../keybindings/types.js'
+} from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import { KeyboardShortcutHint } from '@anthropic/ink'
 

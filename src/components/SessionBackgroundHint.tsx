@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { useDoublePress } from '../hooks/useDoublePress.js'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import {
   useAppState,

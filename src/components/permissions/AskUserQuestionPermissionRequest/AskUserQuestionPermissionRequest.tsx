@@ -13,7 +13,7 @@ import React, {
 import { useSettings } from '../../../hooks/useSettings.js'
 import { useTerminalSize } from '../../../hooks/useTerminalSize.js'
 import { stringWidth, useTheme } from '@anthropic/ink'
-import { useKeybindings } from '../../../keybindings/useKeybinding.js'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

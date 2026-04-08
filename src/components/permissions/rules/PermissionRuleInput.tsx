@@ -5,7 +5,7 @@ import TextInput from '../../../components/TextInput.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useTerminalSize } from '../../../hooks/useTerminalSize.js'
 import { Box, Newline, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { BashTool } from '../../../tools/BashTool/BashTool.js'
 import { WebFetchTool } from '../../../tools/WebFetchTool/WebFetchTool.js'
 import type {

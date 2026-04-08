@@ -1,7 +1,7 @@
 import figures from 'figures'
 import React, { useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { useKeybinding } from '../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import TextInput from './TextInput.js'
 
 type Props = {

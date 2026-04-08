@@ -5,7 +5,7 @@ import { setSessionTrustAccepted } from '../../bootstrap/state.js'
 import type { Command } from '../../commands.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Text } from '@anthropic/ink'
-import { useKeybinding } from '../../keybindings/useKeybinding.js'
+import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getMcpConfigsByScope } from '../../services/mcp/config.js'
 import { BASH_TOOL_NAME } from '../../tools/BashTool/toolName.js'
 import {
