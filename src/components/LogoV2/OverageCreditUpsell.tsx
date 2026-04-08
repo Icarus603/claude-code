@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { Text } from '@anthropic/ink'
-import { logEvent } from '../../services/analytics/index.js'
+import { logEvent } from '../../services/eventLogger.js'
 import {
   formatGrantAmount,
   getCachedOverageCreditGrant,

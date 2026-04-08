@@ -2,22 +2,14 @@ import { feature } from 'bun:bundle'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { QuerySource } from '../../constants/querySource.js'
 import type { ToolUseContext } from '../../Tool.js'
-import { FILE_EDIT_TOOL_NAME } from '../../tools/FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from '../../tools/FileReadTool/prompt.js'
-import { FILE_WRITE_TOOL_NAME } from '../../tools/FileWriteTool/prompt.js'
-import { GLOB_TOOL_NAME } from '../../tools/GlobTool/prompt.js'
-import { GREP_TOOL_NAME } from '../../tools/GrepTool/prompt.js'
-import { WEB_FETCH_TOOL_NAME } from '../../tools/WebFetchTool/prompt.js'
-import { WEB_SEARCH_TOOL_NAME } from '../../tools/WebSearchTool/prompt.js'
 import type { Message } from '../../types/message.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { getMainLoopModel } from '../../utils/model/model.js'
-import { SHELL_TOOL_NAMES } from '../../utils/shell/shellToolUtils.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../analytics/index.js'
+} from '../eventLogger.js'
 import { notifyCacheDeletion } from '../api/promptCacheBreakDetection.js'
 import { roughTokenCountEstimation } from '../tokenEstimation.js'
 import {
@@ -38,15 +30,19 @@ export const TIME_BASED_MC_CLEARED_MESSAGE = '[Old tool result content cleared]'
 const IMAGE_MAX_TOKEN_SIZE = 2000
 
 // Only compact these tools
+// Keep these as local literals so importing microCompact cannot trip tool-name
+// initialization cycles during unrelated startup paths (for example memory-only
+// package imports used in Phase 2 validation). Canonical names remain stable.
 const COMPACTABLE_TOOLS = new Set<string>([
-  FILE_READ_TOOL_NAME,
-  ...SHELL_TOOL_NAMES,
-  GREP_TOOL_NAME,
-  GLOB_TOOL_NAME,
-  WEB_SEARCH_TOOL_NAME,
-  WEB_FETCH_TOOL_NAME,
-  FILE_EDIT_TOOL_NAME,
-  FILE_WRITE_TOOL_NAME,
+  'Read',
+  'Bash',
+  'PowerShell',
+  'Grep',
+  'Glob',
+  'WebSearch',
+  'WebFetch',
+  'Edit',
+  'Write',
 ])
 
 // --- Cached microcompact state (ant-only, gated by feature('CACHED_MICROCOMPACT')) ---

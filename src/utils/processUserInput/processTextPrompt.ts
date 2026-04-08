@@ -6,7 +6,7 @@ import type {
   SystemMessage,
   UserMessage,
 } from 'src/types/message.js'
-import { logEvent } from '../../services/analytics/index.js'
+import { logEvent } from '../../services/eventLogger.js'
 import type { PermissionMode } from '../../types/permissions.js'
 import { createUserMessage } from '../messages.js'
 import { logOTelEvent, redactIfDisabled } from '../telemetry/events.js'

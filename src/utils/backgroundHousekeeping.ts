@@ -1,12 +1,9 @@
 import { feature } from 'bun:bundle'
-import { initAutoDream } from '../services/autoDream/autoDream.js'
+import { initAutoDream, initExtractMemories } from '@claude-code/memory'
 import { initMagicDocs } from '../services/MagicDocs/magicDocs.js'
 import { initSkillImprovement } from './hooks/skillImprovement.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-const extractMemoriesModule = feature('EXTRACT_MEMORIES')
-  ? (require('../services/extractMemories/extractMemories.js') as typeof import('../services/extractMemories/extractMemories.js'))
-  : null
 const registerProtocolModule = feature('LODESTONE')
   ? (require('./deepLink/registerProtocol.js') as typeof import('./deepLink/registerProtocol.js'))
   : null
@@ -32,7 +29,7 @@ export function startBackgroundHousekeeping(): void {
   void initMagicDocs()
   void initSkillImprovement()
   if (feature('EXTRACT_MEMORIES')) {
-    extractMemoriesModule!.initExtractMemories()
+    initExtractMemories()
   }
   initAutoDream()
   void autoUpdateMarketplacesAndPluginsInBackground()

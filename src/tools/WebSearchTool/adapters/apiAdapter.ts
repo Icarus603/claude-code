@@ -7,7 +7,7 @@ import type {
   BetaContentBlock,
   BetaWebSearchTool20250305,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../../services/analytics/growthbook.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../../services/featureFlags.js'
 import { queryModelWithStreaming } from '../../../services/api/claude.js'
 import { createUserMessage } from '../../../utils/messages.js'
 import { getMainLoopModel, getSmallFastModel } from '../../../utils/model/model.js'

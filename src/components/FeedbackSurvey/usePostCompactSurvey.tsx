@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { isFeedbackSurveyDisabled } from 'src/services/analytics/config.js'
-import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js'
+import { isFeedbackSurveyDisabled } from 'src/services/privacyConfig.js'
+import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from 'src/services/featureFlags.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import { shouldUseSessionMemoryCompaction } from '../../services/compact/sessionMemoryCompact.js'
 import type { Message } from '../../types/message.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'

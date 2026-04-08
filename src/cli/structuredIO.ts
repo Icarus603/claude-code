@@ -30,12 +30,12 @@ import {
   type Output as PermissionToolOutput,
   permissionPromptToolResultToPermissionDecision,
   outputSchema as permissionToolOutputSchema,
-} from 'src/utils/permissions/PermissionPromptToolResultSchema.js'
+} from '@claude-code/permission/PermissionPromptToolResultSchema'
 import type {
   PermissionDecision,
   PermissionDecisionReason,
-} from 'src/utils/permissions/PermissionResult.js'
-import { hasPermissionsToUseTool } from 'src/utils/permissions/permissions.js'
+} from '@claude-code/permission/PermissionResult'
+import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'
 import { writeToStdout } from 'src/utils/process.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { z } from 'zod/v4'
@@ -45,7 +45,7 @@ import { executePermissionRequestHooks } from '../utils/hooks.js'
 import {
   applyPermissionUpdates,
   persistPermissionUpdates,
-} from '../utils/permissions/PermissionUpdate.js'
+} from '@claude-code/permission/PermissionUpdate'
 import {
   notifySessionStateChanged,
   type RequiresActionDetails,

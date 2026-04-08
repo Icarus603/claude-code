@@ -1,4 +1,5 @@
 import { feature } from 'bun:bundle'
+import { getAllBaseTools } from '@claude-code/tool-registry'
 import type {
   ContentBlockParam,
   ToolResultBlockParam,
@@ -7,7 +8,7 @@ import type {
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import {
   extractMcpToolDetails,
   extractSkillName,
@@ -17,7 +18,7 @@ import {
   isToolDetailsLoggingEnabled,
   mcpToolDetailsForAnalytics,
   sanitizeToolNameForAnalytics,
-} from 'src/services/analytics/metadata.js'
+} from 'src/services/eventMetadata.js'
 import {
   addToToolDuration,
   getCodeEditToolDecisionCounter,
@@ -48,7 +49,6 @@ import {
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
 } from '../../tools/ToolSearchTool/prompt.js'
-import { getAllBaseTools } from '../../tools.js'
 import type { HookProgress } from '../../types/hooks.js'
 import type {
   AssistantMessage,
@@ -80,7 +80,7 @@ import {
 import type {
   PermissionDecisionReason,
   PermissionResult,
-} from '../../utils/permissions/PermissionResult.js'
+} from '@claude-code/permission/PermissionResult'
 import {
   startSessionActivity,
   stopSessionActivity,

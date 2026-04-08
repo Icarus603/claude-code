@@ -5,8 +5,8 @@ import { feature } from 'bun:bundle'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
-import { sanitizeToolNameForAnalytics } from 'src/services/analytics/metadata.js'
+} from 'src/services/eventLogger.js'
+import { sanitizeToolNameForAnalytics } from 'src/services/eventMetadata.js'
 import { getCodeEditToolDecisionCounter } from '../../bootstrap/state.js'
 import type { Tool as ToolType, ToolUseContext } from '../../Tool.js'
 import { getLanguageName } from '../../utils/cliHighlight.js'

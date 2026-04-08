@@ -3,7 +3,7 @@ import { mock, describe, expect, test } from "bun:test";
 mock.module("src/utils/slowOperations.js", () => ({
   jsonStringify: (v: unknown) => JSON.stringify(v),
 }));
-mock.module("src/services/analytics/growthbook.js", () => ({
+mock.module("src/services/featureFlags.js", () => ({
   getFeatureValue_CACHED_MAY_BE_STALE: () => false,
 }));
 

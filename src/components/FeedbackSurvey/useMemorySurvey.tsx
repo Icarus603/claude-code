@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { isFeedbackSurveyDisabled } from 'src/services/analytics/config.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js'
+import { isFeedbackSurveyDisabled } from 'src/services/privacyConfig.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/featureFlags.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import { isAutoMemoryEnabled } from '../../memdir/paths.js'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
 import { FILE_READ_TOOL_NAME } from '../../tools/FileReadTool/prompt.js'

@@ -5,7 +5,7 @@ import { useExitOnCtrlCDWithKeybindings } from 'src/hooks/useExitOnCtrlCDWithKey
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import {
   FAST_MODE_MODEL_DISPLAY,
   isFastModeAvailable,

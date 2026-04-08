@@ -1,6 +1,6 @@
 import memoize from 'lodash-es/memoize.js'
 import { basename } from 'path'
-import { isAutoMemoryEnabled } from '../../memdir/paths.js'
+import { isAutoMemoryEnabled } from '@claude-code/memory'
 import type { AgentColorName } from '../../tools/AgentTool/agentColorManager.js'
 import {
   type AgentMemoryScope,

@@ -1,6 +1,6 @@
 import partition from 'lodash-es/partition.js'
 import React, { useCallback } from 'react'
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   getSettings_DEPRECATED,

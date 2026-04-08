@@ -212,8 +212,8 @@ import { hasConsoleBillingAccess } from '../utils/billing.js';
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/services/analytics/index.js';
-import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js';
+} from 'src/services/eventLogger.js';
+import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/featureFlags.js';
 import {
   textForResubmit,
   handleMessageFromStream,

@@ -98,7 +98,7 @@ import {
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../analytics/index.js'
+} from '../eventLogger.js'
 import {
   type ElicitationWaitingState,
   runElicitationHooks,

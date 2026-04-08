@@ -20,7 +20,7 @@ mock.module("src/services/AgentSummary/agentSummary.js", () => ({
   startAgentSummarization: noop,
 }));
 
-mock.module("src/services/analytics/index.js", () => ({
+mock.module("src/services/eventLogger.js", () => ({
   logEvent: noop,
   logEventAsync: async () => {},
   stripProtoFields: (v: any) => v,

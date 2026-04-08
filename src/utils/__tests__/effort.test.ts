@@ -12,7 +12,7 @@ mock.module("src/utils/auth.js", () => ({
   isMaxSubscriber: () => false,
   isTeamSubscriber: () => false,
 }));
-mock.module("src/services/analytics/growthbook.js", () => ({
+mock.module("src/services/featureFlags.js", () => ({
   getFeatureValue_CACHED_MAY_BE_STALE: () => null,
 }));
 mock.module("src/utils/model/modelSupportOverrides.js", () => ({

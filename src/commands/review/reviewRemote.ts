@@ -10,11 +10,11 @@
  */
 
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/analytics/index.js'
+} from '../../services/eventLogger.js'
 import { fetchUltrareviewQuota } from '../../services/api/ultrareviewQuota.js'
 import { fetchUtilization } from '../../services/api/usage.js'
 import type { ToolUseContext } from '../../Tool.js'

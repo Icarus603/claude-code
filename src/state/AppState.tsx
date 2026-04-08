@@ -6,15 +6,15 @@ import React, {
   useState,
   useSyncExternalStore,
 } from 'react'
-import { MailboxProvider } from '../context/mailbox.js'
-import { useSettingsChange } from '../hooks/useSettingsChange.js'
-import { logForDebugging } from '../utils/debug.js'
+import { applySettingsChange } from '@claude-code/config/applySettingsChange'
+import type { SettingSource } from '@claude-code/config/constants'
 import {
   createDisabledBypassPermissionsContext,
   isBypassPermissionsModeDisabled,
-} from '../utils/permissions/permissionSetup.js'
-import { applySettingsChange } from '../utils/settings/applySettingsChange.js'
-import type { SettingSource } from '../utils/settings/constants.js'
+} from '@claude-code/permission/permissionSetup'
+import { MailboxProvider } from '../context/mailbox.js'
+import { useSettingsChange } from '../hooks/useSettingsChange.js'
+import { logForDebugging } from '../utils/debug.js'
 import { createStore } from './store.js'
 
 // DCE: voice context is ant-only. External builds get a passthrough.

@@ -8,12 +8,16 @@ import { getOriginalCwd } from '../../bootstrap/state.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text, ListItem } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { getAutoMemPath, isAutoMemoryEnabled } from '../../memdir/paths.js'
-import { logEvent } from '../../services/analytics/index.js'
-import { isAutoDreamEnabled } from '../../services/autoDream/config.js'
-import { readLastConsolidatedAt } from '../../services/autoDream/consolidationLock.js'
+import {
+  getAutoMemPath,
+  getAgentMemoryDir,
+  isAutoDreamEnabled,
+  isAutoMemoryEnabled,
+  readLastConsolidatedAt,
+} from '@claude-code/memory'
+import * as teamMemPaths from '@claude-code/memory/teamMemPaths'
+import { logEvent } from '../../services/eventLogger.js'
 import { useAppState } from '../../state/AppState.js'
-import { getAgentMemoryDir } from '../../tools/AgentTool/agentMemory.js'
 import { openPath } from '../../utils/browser.js'
 import { getMemoryFiles, type MemoryFileInfo } from '../../utils/claudemd.js'
 import { getClaudeConfigHomeDir } from '../../utils/envUtils.js'
@@ -22,12 +26,6 @@ import { formatRelativeTimeAgo } from '../../utils/format.js'
 import { projectIsInGitRepo } from '../../utils/memory/versions.js'
 import { updateSettingsForSource } from '../../utils/settings/settings.js'
 import { Select } from '../CustomSelect/index.js'
-
-/* eslint-disable @typescript-eslint/no-require-imports */
-const teamMemPaths = feature('TEAMMEM')
-  ? (require('../../memdir/teamMemPaths.js') as typeof import('../../memdir/teamMemPaths.js'))
-  : null
-/* eslint-enable @typescript-eslint/no-require-imports */
 
 interface ExtendedMemoryFileInfo extends MemoryFileInfo {
   isNested?: boolean
@@ -171,10 +169,10 @@ export function MemoryFileSelector({
     })
 
     // Team memory directly below auto-memory (team dir is a subdir of auto dir)
-    if (feature('TEAMMEM') && teamMemPaths!.isTeamMemoryEnabled()) {
+    if (feature('TEAMMEM') && teamMemPaths.isTeamMemoryEnabled()) {
       folderOptions.push({
         label: 'Open team memory folder',
-        value: `${OPEN_FOLDER_PREFIX}${teamMemPaths!.getTeamMemPath()}`,
+        value: `${OPEN_FOLDER_PREFIX}${teamMemPaths.getTeamMemPath()}`,
         description: '',
       })
     }

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import { Box, Dialog, Link, Text } from '@anthropic/ink'
 import type { ExternalClaudeMdInclude } from '../utils/claudemd.js'
 import { saveCurrentProjectConfig } from '../utils/config.js'

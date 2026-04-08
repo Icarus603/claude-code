@@ -15,7 +15,7 @@ import { TOOL_SUMMARY_MAX_LENGTH } from '../../constants/toolLimits.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/analytics/index.js'
+} from '../../services/eventLogger.js'
 import type {
   SetToolJSXFn,
   Tool,

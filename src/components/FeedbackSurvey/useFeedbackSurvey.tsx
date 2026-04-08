@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDynamicConfig } from 'src/hooks/useDynamicConfig.js'
-import { isFeedbackSurveyDisabled } from 'src/services/analytics/config.js'
+import { isFeedbackSurveyDisabled } from 'src/services/privacyConfig.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
 import type { Message } from '../../types/message.js'
 import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'

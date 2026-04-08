@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logError } from 'src/utils/log.js'
 import { useInterval } from 'usehooks-ts'

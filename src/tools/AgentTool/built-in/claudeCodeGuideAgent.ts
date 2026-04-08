@@ -100,19 +100,21 @@ export const CLAUDE_CODE_GUIDE_AGENT: BuiltInAgentDefinition = {
   whenToUse: `Use this agent when the user asks questions ("Can Claude...", "Does Claude...", "How do I...") about: (1) Claude Code (the CLI tool) - features, hooks, slash commands, MCP servers, settings, IDE integrations, keyboard shortcuts; (2) Claude Agent SDK - building custom agents; (3) Claude API (formerly Anthropic API) - API usage, tool use, Anthropic SDK usage. **IMPORTANT:** Before spawning a new agent, check if there is already a running or recently completed claude-code-guide agent that you can continue via ${SEND_MESSAGE_TOOL_NAME}.`,
   // Ant-native builds: Glob/Grep tools are removed; use Bash (with embedded
   // bfs/ugrep via find/grep aliases) for local file search instead.
+  // Keep the array literal local to avoid circular module initialization on
+  // early settings/memory imports that load built-in agents transitively.
   tools: hasEmbeddedSearchTools()
     ? [
-        BASH_TOOL_NAME,
-        FILE_READ_TOOL_NAME,
-        WEB_FETCH_TOOL_NAME,
-        WEB_SEARCH_TOOL_NAME,
+        'Bash',
+        'Read',
+        'WebFetch',
+        'WebSearch',
       ]
     : [
-        GLOB_TOOL_NAME,
-        GREP_TOOL_NAME,
-        FILE_READ_TOOL_NAME,
-        WEB_FETCH_TOOL_NAME,
-        WEB_SEARCH_TOOL_NAME,
+        'Glob',
+        'Grep',
+        'Read',
+        'WebFetch',
+        'WebSearch',
       ],
   source: 'built-in',
   baseDir: 'built-in',

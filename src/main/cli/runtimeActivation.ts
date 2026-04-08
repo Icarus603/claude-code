@@ -4,7 +4,7 @@ import { setUserMsgOptIn } from "../../bootstrap/state.js";
 import {
 	logEvent,
 	type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from "../../services/analytics/index.js";
+} from "../../services/eventLogger.js";
 
 export function maybeActivateProactive(options: unknown): void {
 	if (

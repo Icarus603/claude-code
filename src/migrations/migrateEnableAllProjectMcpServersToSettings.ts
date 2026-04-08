@@ -1,4 +1,4 @@
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import {
   getCurrentProjectConfig,
   saveCurrentProjectConfig,

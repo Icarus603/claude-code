@@ -1,12 +1,6 @@
 import { FILE_EDIT_TOOL_NAME } from 'src/tools/FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from 'src/tools/FileReadTool/prompt.js'
 import { FILE_WRITE_TOOL_NAME } from 'src/tools/FileWriteTool/prompt.js'
-import { GLOB_TOOL_NAME } from 'src/tools/GlobTool/prompt.js'
-import { GREP_TOOL_NAME } from 'src/tools/GrepTool/prompt.js'
 import { NOTEBOOK_EDIT_TOOL_NAME } from 'src/tools/NotebookEditTool/constants.js'
-import { WEB_FETCH_TOOL_NAME } from 'src/tools/WebFetchTool/prompt.js'
-import { WEB_SEARCH_TOOL_NAME } from 'src/tools/WebSearchTool/prompt.js'
-import { SHELL_TOOL_NAMES } from 'src/utils/shell/shellToolUtils.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'
 
 // docs: https://docs.google.com/document/d/1oCT4evvWTh3P6z-kcfNQwWTCxAhkoFndSaNS9Gm40uw/edit?tab=t.0
@@ -17,12 +11,13 @@ const DEFAULT_MAX_INPUT_TOKENS = 180_000 // Typical warning threshold
 const DEFAULT_TARGET_INPUT_TOKENS = 40_000 // Keep last 40k tokens like client-side
 
 const TOOLS_CLEARABLE_RESULTS = [
-  ...SHELL_TOOL_NAMES,
-  GLOB_TOOL_NAME,
-  GREP_TOOL_NAME,
-  FILE_READ_TOOL_NAME,
-  WEB_FETCH_TOOL_NAME,
-  WEB_SEARCH_TOOL_NAME,
+  'Bash',
+  'PowerShell',
+  'Glob',
+  'Grep',
+  'Read',
+  'WebFetch',
+  'WebSearch',
 ]
 
 const TOOLS_CLEARABLE_USES = [

@@ -11,7 +11,7 @@ import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/analytics/index.js'
+} from '../../services/eventLogger.js'
 import {
   type AppState,
   useAppState,

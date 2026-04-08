@@ -17,11 +17,11 @@ import { getIsGit, getWorktreeCount } from "../../utils/git.js";
 import { getInitialSettings } from "../../utils/settings/settings.js";
 import { getGhAuthStatus } from "../../utils/github/ghAuthStatus.js";
 import { isAutoUpdaterDisabled } from "../../utils/config.js";
-import { isAnalyticsDisabled } from "../../services/analytics/config.js";
+import { isAnalyticsDisabled } from "../../services/privacyConfig.js";
 import {
 	logEvent,
 	type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from "../../services/analytics/index.js";
+} from "../../services/eventLogger.js";
 
 export function logSessionTelemetry(): void {
 	const model = parseUserSpecifiedModel(

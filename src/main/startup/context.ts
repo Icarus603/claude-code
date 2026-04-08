@@ -11,7 +11,6 @@ import {
 } from "../../utils/auth.js";
 import { countFilesRoundedRg } from "../../utils/ripgrep.js";
 import { getCwd } from "../../utils/cwd.js";
-import { initializeAnalyticsGates } from "../../services/analytics/sink.js";
 import { prefetchOfficialMcpUrls } from "../../services/mcp/officialRegistry.js";
 import { refreshModelCapabilities } from "../../utils/model/modelCapabilities.js";
 import { settingsChangeDetector } from "../../utils/settings/changeDetector.js";
@@ -61,7 +60,6 @@ export function startDeferredPrefetches(): void {
 		void prefetchGcpCredentialsIfSafe();
 	}
 	void countFilesRoundedRg(getCwd(), AbortSignal.timeout(3000), []);
-	void initializeAnalyticsGates();
 	void prefetchOfficialMcpUrls();
 	void refreshModelCapabilities();
 	void settingsChangeDetector.initialize();

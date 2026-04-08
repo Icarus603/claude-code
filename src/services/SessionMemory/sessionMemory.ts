@@ -39,7 +39,7 @@ import {
 import { sequential } from '../../utils/sequential.js'
 import { asSystemPrompt } from '../../utils/systemPromptType.js'
 import { getTokenUsage, tokenCountWithEstimation } from '../../utils/tokens.js'
-import { logEvent } from '../analytics/index.js'
+import { logEvent } from '../eventLogger.js'
 import { isAutoCompactEnabled } from '../compact/autoCompact.js'
 import {
   buildSessionMemoryUpdatePrompt,
@@ -71,7 +71,7 @@ import { errorMessage, getErrnoCode } from '../../utils/errors.js'
 import {
   getDynamicConfig_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
-} from '../analytics/growthbook.js'
+} from '../featureFlags.js'
 
 /**
  * Check if session memory feature is enabled.

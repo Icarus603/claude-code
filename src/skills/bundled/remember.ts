@@ -1,4 +1,4 @@
-import { isAutoMemoryEnabled } from '../../memdir/paths.js'
+import { isAutoMemoryEnabled } from '@claude-code/memory'
 import { registerBundledSkill } from '../bundledSkills.js'
 
 export function registerRememberSkill(): void {

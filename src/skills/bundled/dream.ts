@@ -2,9 +2,12 @@
 // Extracted from the KAIROS feature gate so it's available unconditionally
 // whenever auto-memory is enabled.
 
-import { getAutoMemPath, isAutoMemoryEnabled } from '../../memdir/paths.js'
-import { buildConsolidationPrompt } from '../../services/autoDream/consolidationPrompt.js'
-import { recordConsolidation } from '../../services/autoDream/consolidationLock.js'
+import {
+  buildConsolidationPrompt,
+  getAutoMemPath,
+  isAutoMemoryEnabled,
+  recordConsolidation,
+} from '@claude-code/memory'
 import { getOriginalCwd } from '../../bootstrap/state.js'
 import { getProjectDir } from '../../utils/sessionStorage.js'
 import { registerBundledSkill } from '../bundledSkills.js'

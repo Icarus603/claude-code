@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import type { CommandResultDisplay } from 'src/commands.js'
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
 import { execFileNoThrow } from '../utils/execFileNoThrow.js'

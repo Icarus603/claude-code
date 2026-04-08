@@ -26,6 +26,15 @@ startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
 import {
+  checkHasTrustDialogAccepted,
+  getGlobalConfig,
+  getRemoteControlAtStartup,
+  isAutoUpdaterDisabled,
+  saveGlobalConfig,
+} from '@claude-code/config'
+import { settingsChangeDetector } from '@claude-code/config/changeDetector'
+import { getTools } from '@claude-code/tool-registry'
+import {
   Command as CommanderCommand,
   InvalidArgumentError,
   Option,
@@ -48,7 +57,7 @@ import {
 	hasGrowthBookEnvOverride,
 	initializeGrowthBook,
 	refreshGrowthBookAfterAuthChange,
-} from "./services/analytics/growthbook.js";
+} from "./services/featureFlags.js";
 import { fetchBootstrapData } from "./services/api/bootstrap.js";
 import {
 	type DownloadResult,
@@ -78,7 +87,6 @@ import {
 	createSyntheticOutputTool,
 	isSyntheticOutputToolEnabled,
 } from "./tools/SyntheticOutputTool/SyntheticOutputTool.js";
-import { getTools } from "./tools.js";
 import {
 	canUserConfigureAdvisor,
 	getInitialAdvisorSetting,
@@ -96,13 +104,6 @@ import {
 	prefetchGcpCredentialsIfSafe,
 	validateForceLoginOrg,
 } from "./utils/auth.js";
-import {
-	checkHasTrustDialogAccepted,
-	getGlobalConfig,
-	getRemoteControlAtStartup,
-	isAutoUpdaterDisabled,
-	saveGlobalConfig,
-} from "./utils/config.js";
 import { seedEarlyInput, stopCapturingEarlyInput } from "./utils/earlyInput.js";
 import { getInitialEffortSetting, parseEffortValue } from "./utils/effort.js";
 import {
@@ -129,7 +130,6 @@ export { startDeferredPrefetches };
 import { getPlatform } from "./utils/platform.js";
 import { getBaseRenderOptions } from "./utils/renderOptions.js";
 import { getSessionIngressAuthToken } from "./utils/sessionIngressAuth.js";
-import { settingsChangeDetector } from "./utils/settings/changeDetector.js";
 import { skillChangeDetector } from "./utils/skills/skillChangeDetector.js";
 import { jsonParse, writeFileSync_DEPRECATED } from "./utils/slowOperations.js";
 import { computeInitialTeamContext } from "./utils/swarm/reconnection.js";
@@ -161,13 +161,12 @@ const kairosGate = feature("KAIROS")
 	: null;
 
 import { relative, resolve } from "path";
-import { isAnalyticsDisabled } from "src/services/analytics/config.js";
-import { getFeatureValue_CACHED_MAY_BE_STALE } from "src/services/analytics/growthbook.js";
+import { isAnalyticsDisabled } from "src/services/privacyConfig.js";
+import { getFeatureValue_CACHED_MAY_BE_STALE } from "src/services/featureFlags.js";
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
-import { initializeAnalyticsGates } from 'src/services/analytics/sink.js'
+} from 'src/services/eventLogger.js'
 import {
 	getOriginalCwd,
 	setAdditionalDirectoriesForClaudeMd,
@@ -255,7 +254,7 @@ import {
 	parseUserSpecifiedModel,
 } from "./utils/model/model.js";
 import { ensureModelStringsInitialized } from "./utils/model/modelStrings.js";
-import { PERMISSION_MODES } from "./utils/permissions/PermissionMode.js";
+import { PERMISSION_MODES } from "@claude-code/permission/PermissionMode";
 import {
 	checkAndDisableBypassPermissions,
 	getAutoModeEnabledStateIfCached,
@@ -266,7 +265,7 @@ import {
 	removeDangerousPermissions,
 	stripDangerousPermissionsForAutoMode,
 	verifyAutoModeGateAccess,
-} from "./utils/permissions/permissionSetup.js";
+} from "@claude-code/permission/permissionSetup";
 import { cleanupOrphanedPluginVersionsInBackground } from "./utils/plugins/cacheUtils.js";
 import { initializeVersionedPlugins } from "./utils/plugins/installedPluginsManager.js";
 import { getManagedPluginNames } from "./utils/plugins/managedPlugins.js";
@@ -468,8 +467,23 @@ profileCheckpoint("main_tsx_imports_loaded");
 // Wire up theme config persistence into @anthropic/ink's ThemeProvider.
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 setThemeConfigCallbacks({
-  loadTheme: () => getGlobalConfig().theme,
-  saveTheme: (setting) => saveGlobalConfig(c => ({ ...c, theme: setting })),
+  loadTheme: () => {
+    try {
+      return getGlobalConfig().theme
+    } catch {
+      // ThemeProvider mounts before enableConfigs() in interactive startup.
+      // Fall back to a safe default for first render, then later reads use config.
+      return 'dark'
+    }
+  },
+  saveTheme: setting => {
+    try {
+      saveGlobalConfig(c => ({ ...c, theme: setting }))
+    } catch {
+      // Ignore pre-config startup writes; interactive settings saves happen
+      // after enableConfigs() and will persist normally.
+    }
+  },
 })
 
 /**

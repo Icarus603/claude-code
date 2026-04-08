@@ -7,7 +7,7 @@ import {
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/analytics/index.js'
+} from '../../services/eventLogger.js'
 import { Select } from '../CustomSelect/select.js'
 import { PermissionDialog } from './PermissionDialog.js'
 

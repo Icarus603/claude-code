@@ -32,7 +32,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
-} from '../../services/analytics/index.js'
+} from '../../services/eventLogger.js'
 import { getDumpPromptsPath } from '../../services/api/dumpPrompts.js'
 import { buildPostCompactMessages } from '../../services/compact/compact.js'
 import { resetMicrocompactState } from '../../services/compact/microCompact.js'

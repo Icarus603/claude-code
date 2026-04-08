@@ -57,7 +57,7 @@ import type {
   WebSearchProgress,
 } from './types/tools.js'
 import type { FileStateCache } from './utils/fileStateCache.js'
-import type { DenialTrackingState } from './utils/permissions/denialTracking.js'
+import type { DenialTrackingState } from '@claude-code/permission/denialTracking'
 import type { SystemPrompt } from './utils/systemPromptType.js'
 import type { ContentReplacementState } from './utils/toolResultStorage.js'
 
