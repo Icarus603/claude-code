@@ -110,6 +110,11 @@ import {
 } from './bootstrap/state.js'
 import { createBudgetTracker, checkTokenBudget } from './query/tokenBudget.js'
 import { count } from './utils/array.js'
+import { createInitialQueryState, type QueryLoopState } from './query/state.js'
+import {
+  isWithheldMaxOutputTokens,
+  yieldMissingToolResultBlocks,
+} from './query/streaming.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const snipModule = feature('HISTORY_SNIP')
@@ -119,34 +124,6 @@ const taskSummaryModule = feature('BG_SESSIONS')
   ? (require('./utils/taskSummary.js') as typeof import('./utils/taskSummary.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
-
-function* yieldMissingToolResultBlocks(
-  assistantMessages: AssistantMessage[],
-  errorMessage: string,
-) {
-  for (const assistantMessage of assistantMessages) {
-    // Extract all tool use blocks from this assistant message
-    const toolUseBlocks = (Array.isArray(assistantMessage.message?.content) ? assistantMessage.message.content : []).filter(
-      (content: { type: string }) => content.type === 'tool_use',
-    ) as ToolUseBlock[]
-
-    // Emit an interruption message for each tool use
-    for (const toolUse of toolUseBlocks) {
-      yield createUserMessage({
-        content: [
-          {
-            type: 'tool_result',
-            content: errorMessage,
-            is_error: true,
-            tool_use_id: toolUse.id,
-          },
-        ],
-        toolUseResult: errorMessage,
-        sourceToolAssistantUUID: assistantMessage.uuid,
-      })
-    }
-  }
-}
 
 /**
  * The rules of thinking are lengthy and fortuitous. They require plenty of thinking
@@ -172,12 +149,6 @@ const MAX_OUTPUT_TOKENS_RECOVERY_LIMIT = 3
  *
  * Mirrors reactiveCompact.isWithheldPromptTooLong.
  */
-function isWithheldMaxOutputTokens(
-  msg: Message | StreamEvent | undefined,
-): msg is AssistantMessage {
-  return msg?.type === 'assistant' && msg.apiError === 'max_output_tokens'
-}
-
 export type QueryParams = {
   messages: Message[]
   systemPrompt: SystemPrompt
@@ -201,21 +172,6 @@ export type QueryParams = {
 // -- query loop state
 
 // Mutable state carried between loop iterations
-type State = {
-  messages: Message[]
-  toolUseContext: ToolUseContext
-  autoCompactTracking: AutoCompactTrackingState | undefined
-  maxOutputTokensRecoveryCount: number
-  hasAttemptedReactiveCompact: boolean
-  maxOutputTokensOverride: number | undefined
-  pendingToolUseSummary: Promise<ToolUseSummaryMessage | null> | undefined
-  stopHookActive: boolean | undefined
-  turnCount: number
-  // Why the previous iteration continued. Undefined on first iteration.
-  // Lets tests assert recovery paths fired without inspecting message contents.
-  transition: Continue | undefined
-}
-
 export async function* query(
   params: QueryParams,
 ): AsyncGenerator<
@@ -265,18 +221,11 @@ async function* queryLoop(
   // Mutable cross-iteration state. The loop body destructures this at the top
   // of each iteration so reads stay bare-name (`messages`, `toolUseContext`).
   // Continue sites write `state = { ... }` instead of 9 separate assignments.
-  let state: State = {
+  let state: QueryLoopState = createInitialQueryState({
     messages: params.messages,
     toolUseContext: params.toolUseContext,
     maxOutputTokensOverride: params.maxOutputTokensOverride,
-    autoCompactTracking: undefined,
-    stopHookActive: undefined,
-    maxOutputTokensRecoveryCount: 0,
-    hasAttemptedReactiveCompact: false,
-    turnCount: 1,
-    pendingToolUseSummary: undefined,
-    transition: undefined,
-  }
+  })
   const budgetTracker = feature('TOKEN_BUDGET') ? createBudgetTracker() : null
 
   // task_budget.remaining tracking across compaction boundaries. Undefined

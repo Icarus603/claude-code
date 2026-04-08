@@ -125,6 +125,18 @@ async function checkBuild() {
 }
 
 // ---------------------------------------------------------------------------
+// 6. Transition stub guard
+// ---------------------------------------------------------------------------
+async function checkTransitionStubGuard() {
+	try {
+		const result = await $`bun run scripts/check-transition-stubs.ts 2>&1`.quiet().nothrow();
+		add("Transition stub guard", result.exitCode === 0 ? "pass" : "failed", result.exitCode === 0 ? "ok" : "error");
+	} catch {
+		add("Transition stub guard", "failed", "error");
+	}
+}
+
+// ---------------------------------------------------------------------------
 // Run
 // ---------------------------------------------------------------------------
 console.log("");
@@ -138,6 +150,7 @@ await checkLint();
 await checkTests();
 await checkUnused();
 await checkBuild();
+await checkTransitionStubGuard();
 
 console.log("");
 for (const m of metrics) {

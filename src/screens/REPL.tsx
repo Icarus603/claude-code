@@ -271,7 +271,8 @@ import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js';
 import { resolveAgentTools } from '../tools/AgentTool/agentToolUtils.js';
 import { resumeAgentBackground } from '../tools/AgentTool/resumeAgent.js';
 import { useMainLoopModel } from '../hooks/useMainLoopModel.js';
-import { useAppState, useSetAppState, useAppStateStore } from '../state/AppState.js';
+import { useAppState } from '../state/AppState.js';
+import { useReplAppState } from './repl/useReplAppState.js';
 import type { ContentBlockParam, ImageBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs';
 import type { ProcessUserInputContext } from '../utils/processUserInput/processUserInput.js';
 import type { PastedContent } from '../utils/config.js';
@@ -322,6 +323,9 @@ import { isBgSession, updateSessionName, updateSessionActivity } from '../utils/
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '../tasks/InProcessTeammateTask/types.js';
 import { restoreRemoteAgentTasks } from '../tasks/RemoteAgentTask/RemoteAgentTask.js';
 import { useInboxPoller } from '../hooks/useInboxPoller.js';
+import { getViewedLocalAgentTask } from './repl/backgrounding.js';
+import { getInteractiveMcpClients } from './repl/integrations.js';
+import { parseImmediateCommandInput } from './repl/submission.js';
 // Dead code elimination: conditional import for loop mode
 /* eslint-disable @typescript-eslint/no-require-imports */
 const proactiveModule = feature('PROACTIVE') || feature('KAIROS') ? require('../proactive/index.js') : null;
@@ -446,6 +450,7 @@ import { DevBar } from '../components/DevBar.js';
 import { UltraplanChoiceDialog } from '../components/ultraplan/UltraplanChoiceDialog.js';
 import { UltraplanLaunchDialog } from '../components/ultraplan/UltraplanLaunchDialog.js';
 import { launchUltraplan } from '../commands/ultraplan.js';
+import { getFocusedInputDialog } from './repl/dialogs.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '../remote/RemoteSessionManager.js'
 import { REMOTE_SAFE_COMMANDS } from '../commands.js'
@@ -476,11 +481,6 @@ import {
   createAttachmentMessage,
   getQueuedCommandAttachments,
 } from '../utils/attachments.js'
-
-// Stable empty array for hooks that accept MCPServerConnection[] — avoids
-// creating a new [] literal on every render in remote mode, which would
-// cause useEffect dependency changes and infinite re-render loops.
-const EMPTY_MCP_CLIENTS: MCPServerConnection[] = [];
 
 // Stable stub for useAssistantHistory's non-KAIROS branch — avoids a new
 // function identity each render, which would break composedOnScroll's memo.
@@ -835,35 +835,40 @@ export function REPL({
   // Agent definition is state so /resume can update it mid-session
   const [mainThreadAgentDefinition, setMainThreadAgentDefinition] = useState(initialMainThreadAgentDefinition);
 
-  const toolPermissionContext = useAppState(s => s.toolPermissionContext);
-  const verbose = useAppState(s => s.verbose);
-  const mcp = useAppState(s => s.mcp);
-  const plugins = useAppState(s => s.plugins);
-  const agentDefinitions = useAppState(s => s.agentDefinitions);
-  const fileHistory = useAppState(s => s.fileHistory);
-  const initialMessage = useAppState(s => s.initialMessage);
+  const {
+    toolPermissionContext,
+    verbose,
+    mcp,
+    plugins,
+    agentDefinitions,
+    fileHistory,
+    initialMessage,
+    spinnerTip,
+    showExpandedTodos,
+    pendingWorkerRequest,
+    pendingSandboxRequest,
+    teamContext,
+    tasks,
+    workerSandboxPermissions,
+    elicitation,
+    ultraplanPendingChoice,
+    ultraplanLaunchPending,
+    viewingAgentTaskId,
+    setAppState,
+    store,
+    isBriefOnly,
+    showRemoteCallout,
+  } = useReplAppState();
   const queuedCommands = useCommandQueue();
   // feature() is a build-time constant — dead code elimination removes the hook
   // call entirely in external builds, so this is safe despite looking conditional.
   // These fields contain excluded strings that must not appear in external builds.
-  const spinnerTip = useAppState(s => s.spinnerTip);
-  const showExpandedTodos = useAppState(s => s.expandedView) === 'tasks';
-  const pendingWorkerRequest = useAppState(s => s.pendingWorkerRequest);
-  const pendingSandboxRequest = useAppState(s => s.pendingSandboxRequest);
-  const teamContext = useAppState(s => s.teamContext);
-  const tasks = useAppState(s => s.tasks);
-  const workerSandboxPermissions = useAppState(s => s.workerSandboxPermissions);
-  const elicitation = useAppState(s => s.elicitation);
-  const ultraplanPendingChoice = useAppState(s => s.ultraplanPendingChoice);
-  const ultraplanLaunchPending = useAppState(s => s.ultraplanLaunchPending);
-  const viewingAgentTaskId = useAppState(s => s.viewingAgentTaskId);
-  const setAppState = useSetAppState();
 
   // Bootstrap: retained local_agent that hasn't loaded disk yet → read
   // sidechain JSONL and UUID-merge with whatever stream has appended so far.
   // Stream appends immediately on retain (no defer); bootstrap fills the
   // prefix. Disk-write-before-yield means live is always a suffix of disk.
-  const viewedLocalAgent = viewingAgentTaskId ? tasks[viewingAgentTaskId] : undefined;
+  const viewedLocalAgent = getViewedLocalAgentTask(tasks, viewingAgentTaskId);
   const needsBootstrap = isLocalAgentTask(viewedLocalAgent) && viewedLocalAgent.retain && !viewedLocalAgent.diskLoaded;
   useEffect(() => {
     if (!viewingAgentTaskId || !needsBootstrap) return;
@@ -890,7 +895,6 @@ export function REPL({
     });
   }, [viewingAgentTaskId, needsBootstrap, setAppState]);
 
-  const store = useAppStateStore();
   const terminal = useTerminalNotification();
   const mainLoopModel = useMainLoopModel();
 
@@ -916,7 +920,6 @@ export function REPL({
   // the AppState mirror that triggers the re-render. Without this, toggling
   // /brief mid-session leaves the stale tool list (no SendUserMessage) and
   // the model emits plain text the brief filter hides.
-  const isBriefOnly = useAppState(s => s.isBriefOnly);
 
   const localTools = useMemo(
     () => getTools(toolPermissionContext),
@@ -974,7 +977,6 @@ export function REPL({
     return false;
   });
   const [showEffortCallout, setShowEffortCallout] = useState(() => shouldShowEffortCallout(mainLoopModel));
-  const showRemoteCallout = useAppState(s => s.showRemoteCallout);
   const [showDesktopUpsellStartup, setShowDesktopUpsellStartup] = useState(() => shouldShowDesktopUpsellStartup());
   // notifications
   useModelMigrationNotifications();
@@ -1007,6 +1009,7 @@ export function REPL({
   useManagePlugins({ enabled: !isRemoteSession });
 
   const tasksV2 = useTasksV2WithCollapseEffect();
+  const interactiveMcpClients = getInteractiveMcpClients(isRemoteSession, mcpClients);
 
   // Start background plugin installations
 
@@ -1023,7 +1026,7 @@ export function REPL({
 
   // Allow Claude in Chrome MCP to send prompts through MCP notifications
   // and sync permission mode changes to the Chrome extension
-  usePromptsFromClaudeInChrome(isRemoteSession ? EMPTY_MCP_CLIENTS : mcpClients, toolPermissionContext.mode);
+  usePromptsFromClaudeInChrome(interactiveMcpClients, toolPermissionContext.mode);
 
   // Initialize swarm features: teammate hooks and context
   // Handles both fresh spawns and resumed teammate sessions
@@ -1054,8 +1057,8 @@ export function REPL({
   // Filter out all commands if disableSlashCommands is true
   const commands = useMemo(() => (disableSlashCommands ? [] : mergedCommands), [disableSlashCommands, mergedCommands]);
 
-  useIdeLogging(isRemoteSession ? EMPTY_MCP_CLIENTS : mcp.clients);
-  useIdeSelection(isRemoteSession ? EMPTY_MCP_CLIENTS : mcp.clients, setIDESelection);
+  useIdeLogging(interactiveMcpClients);
+  useIdeSelection(getInteractiveMcpClients(isRemoteSession, mcp.clients), setIDESelection);
 
   const [streamMode, setStreamMode] = useState<SpinnerMode>('responding');
   // Ref mirror so onSubmit can read the latest value without adding
@@ -2324,84 +2327,32 @@ export function REPL({
   // Permission and interactive dialogs can show even when toolJSX is set,
   // as long as shouldContinueAnimation is true. This prevents deadlocks when
   // agents set background hints while waiting for user interaction.
-  function getFocusedInputDialog():
-    | 'message-selector'
-    | 'sandbox-permission'
-    | 'tool-permission'
-    | 'prompt'
-    | 'worker-sandbox-permission'
-    | 'elicitation'
-    | 'cost'
-    | 'idle-return'
-    | 'init-onboarding'
-    | 'ide-onboarding'
-    | 'model-switch'
-    | 'undercover-callout'
-    | 'effort-callout'
-    | 'remote-callout'
-    | 'lsp-recommendation'
-    | 'plugin-hint'
-    | 'desktop-upsell'
-    | 'ultraplan-choice'
-    | 'ultraplan-launch'
-    | undefined {
-    // Exit states always take precedence
-    if (isExiting || exitFlow) return undefined;
-
-    // High priority dialogs (always show regardless of typing)
-    if (isMessageSelectorVisible) return 'message-selector';
-
-    // Suppress interrupt dialogs while user is actively typing
-    if (isPromptInputActive) return undefined;
-
-    if (sandboxPermissionRequestQueue[0]) return 'sandbox-permission';
-
-    // Permission/interactive dialogs (show unless blocked by toolJSX)
-    const allowDialogsWithAnimation = !toolJSX || toolJSX.shouldContinueAnimation;
-
-    if (allowDialogsWithAnimation && toolUseConfirmQueue[0]) return 'tool-permission';
-    if (allowDialogsWithAnimation && promptQueue[0]) return 'prompt';
-    // Worker sandbox permission prompts (network access) from swarm workers
-    if (allowDialogsWithAnimation && workerSandboxPermissions.queue[0]) return 'worker-sandbox-permission';
-    if (allowDialogsWithAnimation && elicitation.queue[0]) return 'elicitation';
-    if (allowDialogsWithAnimation && showingCostDialog) return 'cost';
-    if (allowDialogsWithAnimation && idleReturnPending) return 'idle-return';
-
-    if (feature('ULTRAPLAN') && allowDialogsWithAnimation && !isLoading && ultraplanPendingChoice)
-      return 'ultraplan-choice';
-
-    if (feature('ULTRAPLAN') && allowDialogsWithAnimation && !isLoading && ultraplanLaunchPending)
-      return 'ultraplan-launch';
-
-    // Onboarding dialogs (special conditions)
-    if (allowDialogsWithAnimation && showIdeOnboarding) return 'ide-onboarding';
-
-    // Model switch callout (ant-only, eliminated from external builds)
-    if (process.env.USER_TYPE === 'ant' && allowDialogsWithAnimation && showModelSwitchCallout) return 'model-switch';
-
-    // Undercover auto-enable explainer (ant-only, eliminated from external builds)
-    if (process.env.USER_TYPE === 'ant' && allowDialogsWithAnimation && showUndercoverCallout)
-      return 'undercover-callout';
-
-    // Effort callout (shown once for Opus 4.6 users when effort is enabled)
-    if (allowDialogsWithAnimation && showEffortCallout) return 'effort-callout';
-
-    // Remote callout (shown once before first bridge enable)
-    if (allowDialogsWithAnimation && showRemoteCallout) return 'remote-callout';
-
-    // LSP plugin recommendation (lowest priority - non-blocking suggestion)
-    if (allowDialogsWithAnimation && lspRecommendation) return 'lsp-recommendation';
-
-    // Plugin hint from CLI/SDK stderr (same priority band as LSP rec)
-    if (allowDialogsWithAnimation && hintRecommendation) return 'plugin-hint';
-
-    // Desktop app upsell (max 3 launches, lowest priority)
-    if (allowDialogsWithAnimation && showDesktopUpsellStartup) return 'desktop-upsell';
-
-    return undefined;
-  }
-
-  const focusedInputDialog = getFocusedInputDialog();
+  const allowDialogsWithAnimation = !toolJSX || toolJSX.shouldContinueAnimation;
+  const focusedInputDialog = getFocusedInputDialog({
+    isExiting,
+    exitFlow,
+    isMessageSelectorVisible,
+    isPromptInputActive,
+    hasSandboxPermissionRequest: Boolean(sandboxPermissionRequestQueue[0]),
+    allowDialogsWithAnimation,
+    hasToolUseConfirm: Boolean(toolUseConfirmQueue[0]),
+    hasPromptQueue: Boolean(promptQueue[0]),
+    hasWorkerSandboxPermission: Boolean(workerSandboxPermissions.queue[0]),
+    hasElicitation: Boolean(elicitation.queue[0]),
+    showingCostDialog,
+    idleReturnPending,
+    isLoading,
+    ultraplanPendingChoice,
+    ultraplanLaunchPending,
+    showIdeOnboarding,
+    showModelSwitchCallout,
+    showUndercoverCallout,
+    showEffortCallout,
+    showRemoteCallout,
+    lspRecommendation,
+    hintRecommendation,
+    showDesktopUpsellStartup,
+  });
 
   // True when permission prompts exist but are hidden because the user is typing
   const hasSuppressedDialogs =
@@ -3747,10 +3698,7 @@ export function REPL({
         // Expand [Pasted text #N] refs so immediate commands (e.g. /btw) receive
         // the pasted content, not the placeholder. The non-immediate path gets
         // this expansion later in handlePromptSubmit.
-        const trimmedInput = expandPastedTextRefs(input, pastedContents).trim();
-        const spaceIndex = trimmedInput.indexOf(' ');
-        const commandName = spaceIndex === -1 ? trimmedInput.slice(1) : trimmedInput.slice(1, spaceIndex);
-        const commandArgs = spaceIndex === -1 ? '' : trimmedInput.slice(spaceIndex + 1).trim();
+        const { commandName, commandArgs } = parseImmediateCommandInput(input, pastedContents);
 
         // Find matching command - treat as immediate if:
         // 1. Command has `immediate: true`, OR
