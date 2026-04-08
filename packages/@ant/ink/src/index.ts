@@ -157,12 +157,22 @@ export {
   usePreviewTheme,
   useTheme,
   useThemeSetting,
+  setThemeConfigCallbacks,
 } from './theme/ThemeProvider.js'
 export { default as Box } from './theme/ThemedBox.js'
 export type { Props as BoxProps } from './theme/ThemedBox.js'
 export { default as Text, TextHoverColorContext } from './theme/ThemedText.js'
 export type { Props as TextProps } from './theme/ThemedText.js'
 export { color } from './theme/color.js'
+export {
+  THEME_NAMES,
+  THEME_SETTINGS,
+  type Theme,
+  type ThemeName,
+  type ThemeSetting,
+  getTheme,
+  themeColorToAnsi,
+} from './theme/theme-types.js'
 
 // Theme sub-components
 export { SearchBox } from './theme/SearchBox.js'
