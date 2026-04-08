@@ -88,22 +88,7 @@ export const init = memoize(async (): Promise<void> => {
     setupGracefulShutdown()
     profileCheckpoint('init_after_graceful_shutdown')
 
-    // Initialize 1P event logging (no security concerns, but deferred to avoid
-    // loading OpenTelemetry sdk-logs at startup). growthbook.js is already in
-    // the module cache by this point (firstPartyEventLogger imports it), so the
-    // second dynamic import adds no load cost.
-    void Promise.all([
-      import('../services/analytics/firstPartyEventLogger.js'),
-      import('../services/analytics/growthbook.js'),
-    ]).then(([fp, gb]) => {
-      fp.initialize1PEventLogging()
-      // Rebuild the logger provider if tengu_1p_event_batch_config changes
-      // mid-session. Change detection (isEqual) is inside the handler so
-      // unchanged refreshes are no-ops.
-      gb.onGrowthBookRefresh(() => {
-        void fp.reinitialize1PEventLoggingIfConfigChanged()
-      })
-    })
+    void import('../services/featureFlags.js')
     profileCheckpoint('init_after_1p_event_logging')
 
     // Populate OAuth account info if it is not already cached in config. This is needed since the
@@ -249,44 +234,7 @@ export const init = memoize(async (): Promise<void> => {
  * This should only be called once, after the trust dialog has been accepted.
  */
 export function initializeTelemetryAfterTrust(): void {
-  if (isEligibleForRemoteManagedSettings()) {
-    // For SDK/headless mode with beta tracing, initialize eagerly first
-    // to ensure the tracer is ready before the first query runs.
-    // The async path below will still run but doInitializeTelemetry() guards against double init.
-    if (getIsNonInteractiveSession() && isBetaTracingEnabled()) {
-      void doInitializeTelemetry().catch(error => {
-        logForDebugging(
-          `[3P telemetry] Eager telemetry init failed (beta tracing): ${errorMessage(error)}`,
-          { level: 'error' },
-        )
-      })
-    }
-    logForDebugging(
-      '[3P telemetry] Waiting for remote managed settings before telemetry init',
-    )
-    void waitForRemoteManagedSettingsToLoad()
-      .then(async () => {
-        logForDebugging(
-          '[3P telemetry] Remote managed settings loaded, initializing telemetry',
-        )
-        // Re-apply env vars to pick up remote settings before initializing telemetry.
-        applyConfigEnvironmentVariables()
-        await doInitializeTelemetry()
-      })
-      .catch(error => {
-        logForDebugging(
-          `[3P telemetry] Telemetry init failed (remote settings path): ${errorMessage(error)}`,
-          { level: 'error' },
-        )
-      })
-  } else {
-    void doInitializeTelemetry().catch(error => {
-      logForDebugging(
-        `[3P telemetry] Telemetry init failed: ${errorMessage(error)}`,
-        { level: 'error' },
-      )
-    })
-  }
+  return
 }
 
 async function doInitializeTelemetry(): Promise<void> {

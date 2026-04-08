@@ -10,7 +10,7 @@ import type { MCPServerConnection, ScopedMcpServerConfig } from "../types.js";
 import {
 	logEvent,
 	type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from "../../analytics/index.js";
+} from "../../eventLogger.js";
 import { setMcpAuthCacheEntry } from "./authCache.js";
 
 export function mcpBaseUrlAnalytics(serverRef: ScopedMcpServerConfig): {

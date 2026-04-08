@@ -1,0 +1,22 @@
+{
+  "name": "@claude-code/permission",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./permissions": "./src/permissions.ts",
+    "./permissionSetup": "./src/permissionSetup.ts",
+    "./PermissionMode": "./src/PermissionMode.ts",
+    "./PermissionResult": "./src/PermissionResult.ts",
+    "./PermissionRule": "./src/PermissionRule.ts",
+    "./PermissionUpdate": "./src/PermissionUpdate.ts",
+    "./PermissionUpdateSchema": "./src/PermissionUpdateSchema.ts",
+    "./PermissionPromptToolResultSchema": "./src/PermissionPromptToolResultSchema.ts",
+    "./permissionRuleParser": "./src/permissionRuleParser.ts",
+    "./filesystem": "./src/filesystem.ts",
+    "./denialTracking": "./src/denialTracking.ts"
+  }
+}

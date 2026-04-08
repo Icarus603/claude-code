@@ -13,7 +13,7 @@ import { KeybindingSetup } from '../../keybindings/KeybindingProviderSetup.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/analytics/index.js'
+} from '../../services/eventLogger.js'
 import {
   clearMcpClientConfig,
   clearServerTokensFromLocalStorage,

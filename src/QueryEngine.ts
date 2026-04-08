@@ -1,4 +1,10 @@
 import { feature } from 'bun:bundle'
+import { getGlobalConfig } from '@claude-code/config'
+import {
+  hasAutoMemPathOverride,
+  loadMemoryPrompt,
+} from '@claude-code/memory'
+import { getScratchpadDir, isScratchpadEnabled } from '@claude-code/permission/filesystem'
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs'
 import { randomUUID } from 'crypto'
 import last from 'lodash-es/last.js'
@@ -31,8 +37,6 @@ import {
   getTotalCost,
 } from './cost-tracker.js'
 import type { CanUseToolFn } from './hooks/useCanUseTool.js'
-import { loadMemoryPrompt } from './memdir/memdir.js'
-import { hasAutoMemPathOverride } from './memdir/paths.js'
 import { query } from './query.js'
 import { categorizeRetryableAPIError } from './services/api/errors.js'
 import type { MCPServerConnection } from './services/mcp/types.js'
@@ -45,7 +49,6 @@ import type { CompactMetadata, Message, SystemCompactBoundaryMessage } from './t
 import type { OrphanedPermission } from './types/textInputTypes.js'
 import { createAbortController } from './utils/abortController.js'
 import type { AttributionState } from './utils/commitAttribution.js'
-import { getGlobalConfig } from './utils/config.js'
 import { getCwd } from './utils/cwd.js'
 import { isBareMode, isEnvTruthy } from './utils/envUtils.js'
 import { getFastModeState } from './utils/fastMode.js'
@@ -98,10 +101,6 @@ import {
   buildSystemInitMessage,
   sdkCompatToolName,
 } from './utils/messages/systemInit.js'
-import {
-  getScratchpadDir,
-  isScratchpadEnabled,
-} from './utils/permissions/filesystem.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import {
   handleOrphanedPermission,

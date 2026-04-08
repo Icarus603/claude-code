@@ -1,0 +1,20 @@
+{
+  "name": "@claude-code/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./feature-flags": "./feature-flags.ts",
+    "./settings": "./settings/settings.ts",
+    "./changeDetector": "./settings/changeDetector.ts",
+    "./applySettingsChange": "./settings/applySettingsChange.ts",
+    "./constants": "./settings/constants.ts",
+    "./types": "./settings/types.ts",
+    "./managedPath": "./settings/managedPath.ts",
+    "./pluginOnlyPolicy": "./settings/pluginOnlyPolicy.ts",
+    "./validation": "./settings/validation.ts"
+  }
+}

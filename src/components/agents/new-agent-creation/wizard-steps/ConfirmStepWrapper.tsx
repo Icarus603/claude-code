@@ -3,7 +3,7 @@ import React, { type ReactNode, useCallback, useState } from 'react'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import { useSetAppState } from 'src/state/AppState.js'
 import type { Tools } from '../../../../Tool.js'
 import type { AgentDefinition } from '../../../../tools/AgentTool/loadAgentsDir.js'

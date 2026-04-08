@@ -3,14 +3,13 @@ import { randomUUID } from 'crypto'
 import { hostname, tmpdir } from 'os'
 import { basename, join, resolve } from 'path'
 import { getRemoteSessionUrl } from '../constants/product.js'
-import { shutdownDatadog } from '../services/analytics/datadog.js'
-import { shutdown1PEventLogging } from '../services/analytics/firstPartyEventLogger.js'
-import { checkGate_CACHED_OR_BLOCKING } from '../services/analytics/growthbook.js'
+import { checkGate_CACHED_OR_BLOCKING } from '../services/featureFlags.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
   logEventAsync,
-} from '../services/analytics/index.js'
+  shutdownEventLoggers,
+} from '../services/eventLogger.js'
 import { isInBundledMode } from '../utils/bundledMode.js'
 import { logForDebugging } from '../utils/debug.js'
 import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
@@ -2064,7 +2063,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
     // (sleep() doesn't unref its timer, but process.exit() follows immediately
     // so the ref'd timer can't delay shutdown.)
     await Promise.race([
-      Promise.all([shutdown1PEventLogging(), shutdownDatadog()]),
+      shutdownEventLoggers(),
       sleep(500, undefined, { unref: true }),
     ]).catch(() => {})
     // biome-ignore lint/suspicious/noConsole: intentional error output

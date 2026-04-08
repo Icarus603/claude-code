@@ -41,7 +41,7 @@ import { logError } from '../../utils/log.js'
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import { isBridgeEnabled } from '../../bridge/bridgeEnabled.js'
 import { ThemePicker } from '../ThemePicker.js'
 import {
@@ -89,7 +89,7 @@ import type {
   LocalJSXCommandContext,
   CommandResultDisplay,
 } from '../../commands.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
 import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
 import {
   getCliTeammateModeOverride,

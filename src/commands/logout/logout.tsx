@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { clearTrustedDeviceTokenCache } from '../../bridge/trustedDevice.js'
 import { Text } from '@anthropic/ink'
-import { refreshGrowthBookAfterAuthChange } from '../../services/analytics/growthbook.js'
+import { refreshGrowthBookAfterAuthChange } from '../../services/featureFlags.js'
 import {
   getGroveNoticeConfig,
   getGroveSettings,

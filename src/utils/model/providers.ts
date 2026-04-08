@@ -1,4 +1,4 @@
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/analytics/index.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/eventLogger.js'
 import { getInitialSettings } from '../settings/settings.js'
 import { isEnvTruthy } from '../envUtils.js'
 

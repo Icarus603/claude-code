@@ -3,11 +3,11 @@ import chalk from 'chalk'
 import { randomUUID } from 'crypto'
 import React from 'react'
 import { getOriginalCwd, getSessionId } from 'src/bootstrap/state.js'
-import { checkGate_CACHED_OR_BLOCKING } from 'src/services/analytics/growthbook.js'
+import { checkGate_CACHED_OR_BLOCKING } from 'src/services/featureFlags.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import { isPolicyAllowed } from 'src/services/policyLimits/index.js'
 import { z } from 'zod/v4'
 import {

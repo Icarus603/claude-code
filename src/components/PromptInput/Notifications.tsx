@@ -5,7 +5,7 @@ import {
   type Notification,
   useNotifications,
 } from 'src/context/notifications.js'
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import { useAppState } from 'src/state/AppState.js'
 import { useVoiceState } from '../../context/voice.js'
 import type { VerificationStatus } from '../../hooks/useApiKeyVerification.js'

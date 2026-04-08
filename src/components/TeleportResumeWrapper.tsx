@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import type { TeleportRemoteResponse } from 'src/utils/conversationRecovery.js'
 import type { CodeSession } from 'src/utils/teleport/api.js'
 import {

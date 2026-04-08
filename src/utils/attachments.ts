@@ -2,7 +2,7 @@
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/services/analytics/index.js'
+} from 'src/services/eventLogger.js'
 import {
   toolMatchesName,
   type Tools,
@@ -216,7 +216,15 @@ import {
   getEffectiveContextWindowSize,
   isAutoCompactEnabled,
 } from '../services/compact/autoCompact.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/analytics/growthbook.js'
+import {
+  findRelevantMemories,
+  getAutoMemPath,
+  isAutoMemoryEnabled,
+  memoryAge,
+  memoryFreshnessText,
+} from '@claude-code/memory'
+import { getAgentMemoryDir } from '@claude-code/memory/agentMemory'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
 import {
   hasInstructionsLoadedHook,
   executeInstructionsLoadedHooks,
@@ -229,10 +237,6 @@ import { getLocalISODate } from '../constants/common.js'
 import { getPDFPageCount } from './pdf.js'
 import { PDF_AT_MENTION_INLINE_THRESHOLD } from '../constants/apiLimits.js'
 import { isAgentSwarmsEnabled } from './agentSwarmsEnabled.js'
-import { findRelevantMemories } from '../memdir/findRelevantMemories.js'
-import { memoryAge, memoryFreshnessText } from '../memdir/memoryAge.js'
-import { getAutoMemPath, isAutoMemoryEnabled } from '../memdir/paths.js'
-import { getAgentMemoryDir } from '../tools/AgentTool/agentMemory.js'
 import {
   readUnreadMessages,
   markMessagesAsReadByPredicate,

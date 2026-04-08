@@ -10,12 +10,12 @@ import {
 } from '../../constants/apiLimits.js'
 import { hasBinaryExtension } from '../../constants/files.js'
 import { memoryFreshnessNote } from '../../memdir/memoryAge.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
-import { logEvent } from '../../services/analytics/index.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { logEvent } from '../../services/eventLogger.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   getFileExtensionForAnalytics,
-} from '../../services/analytics/metadata.js'
+} from '../../services/eventMetadata.js'
 import {
   countTokensWithAPI,
   roughTokenCountEstimationForFileType,
@@ -335,7 +335,9 @@ type OutputSchema = ReturnType<typeof outputSchema>
 export type Output = z.infer<OutputSchema>
 
 export const FileReadTool = buildTool({
-  name: FILE_READ_TOOL_NAME,
+  // Keep the canonical name inline so this module can initialize cleanly even
+  // when prompt.ts is part of a larger import cycle.
+  name: 'Read',
   searchHint: 'read files, images, PDFs, notebooks',
   // Output is bounded by maxTokens (validateContentTokens). Persisting to a
   // file the model reads back with Read is circular — never persist.

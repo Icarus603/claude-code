@@ -9,11 +9,11 @@ import { useCallback } from 'react'
 import { instances } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { Screen } from '../screens/REPL.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/analytics/growthbook.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../services/analytics/index.js'
+} from '../services/eventLogger.js'
 import { useAppState, useSetAppState } from '../state/AppState.js'
 import { count } from '../utils/array.js'
 import { getTerminalPanel } from '../utils/terminalPanel.js'

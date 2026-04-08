@@ -1,0 +1,25 @@
+{
+  "name": "@claude-code/memory",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./memdir": "./src/memdir.ts",
+    "./agentMemory": "./src/agentMemory.ts",
+    "./memoryAge": "./src/memoryAge.ts",
+    "./findRelevantMemories": "./src/findRelevantMemories.ts",
+    "./paths": "./src/paths.ts",
+    "./teamMemPaths": "./src/teamMemPaths.ts",
+    "./teamMemPrompts": "./src/teamMemPrompts.ts",
+    "./memoryTypes": "./src/memoryTypes.ts",
+    "./extractMemories": "./src/extractMemories.ts",
+    "./autoDream": "./src/autoDream.ts",
+    "./autoDreamConfig": "./src/autoDreamConfig.ts",
+    "./consolidationLock": "./src/consolidationLock.ts",
+    "./consolidationPrompt": "./src/consolidationPrompt.ts",
+    "./teamMemorySync": "./src/teamMemorySync.ts"
+  }
+}

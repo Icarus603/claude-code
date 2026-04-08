@@ -8,8 +8,8 @@ import {
   Select,
 } from '../../components/CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
-import { logEvent } from '../../services/analytics/index.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { logEvent } from '../../services/eventLogger.js'
 import { useClaudeAiLimits } from '../../services/claudeAiLimitsHook.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'

@@ -20,7 +20,7 @@ import type {
 } from '../entrypoints/agentSdkTypes.js'
 import type { SDKControlResponse } from '../entrypoints/sdk/controlTypes.js'
 import { Text } from '@anthropic/ink'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/analytics/growthbook.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
 import {
   useAppState,
   useAppStateStore,

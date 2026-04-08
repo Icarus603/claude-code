@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { appendFileSync } from 'fs'
 import React from 'react'
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import {
   gracefulShutdown,
   gracefulShutdownSync,
@@ -26,7 +26,7 @@ import {
   checkGate_CACHED_OR_BLOCKING,
   initializeGrowthBook,
   resetGrowthBook,
-} from './services/analytics/growthbook.js'
+} from './services/featureFlags.js'
 import { isQualifiedForGrove } from './services/api/grove.js'
 import { handleMcpjsonServerApprovals } from './services/mcpServerApproval.js'
 import { AppStateProvider } from './state/AppState.js'

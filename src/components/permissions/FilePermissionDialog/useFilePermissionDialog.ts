@@ -4,8 +4,8 @@ import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../../services/analytics/index.js'
-import { sanitizeToolNameForAnalytics } from '../../../services/analytics/metadata.js'
+} from '../../../services/eventLogger.js'
+import { sanitizeToolNameForAnalytics } from '../../../services/eventMetadata.js'
 import type { PermissionUpdate } from '../../../utils/permissions/PermissionUpdateSchema.js'
 import type { CompletionType } from '../../../utils/unaryLogging.js'
 import type { ToolUseConfirm } from '../PermissionRequest.js'

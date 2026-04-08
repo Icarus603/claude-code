@@ -1,5 +1,27 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { feature } from 'bun:bundle'
+import { applySettingsChange } from '@claude-code/config/applySettingsChange'
+import { settingsChangeDetector } from '@claude-code/config/changeDetector'
+import {
+  getSettings_DEPRECATED,
+  getSettingsWithSources,
+} from '@claude-code/config/settings'
+import {
+  getAutoModeUnavailableNotification,
+  getAutoModeUnavailableReason,
+  hasPermissionsToUseTool,
+  isAutoModeGateEnabled,
+  isBypassPermissionsModeDisabled,
+  transitionPermissionMode,
+} from '@claude-code/permission'
+import {
+  outputSchema as permissionToolOutputSchema,
+  permissionPromptToolResultToPermissionDecision,
+} from '@claude-code/permission/PermissionPromptToolResultSchema'
+import {
+  assembleToolPool,
+  filterToolsByDenyRules,
+} from '@claude-code/tool-registry'
 import { readFile, stat } from 'fs/promises'
 import { dirname } from 'path'
 import {
@@ -18,15 +40,14 @@ import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
 import type { ToolPermissionContext } from 'src/Tool.js'
 import type { ThinkingConfig } from 'src/utils/thinking.js'
-import { assembleToolPool, filterToolsByDenyRules } from 'src/tools.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { uniq } from 'src/utils/array.js'
 import { mergeAndFilterTools } from 'src/utils/toolPool.js'
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/services/analytics/index.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js'
+} from 'src/services/eventLogger.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/featureFlags.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {
   logForDiagnosticsNoPII,
@@ -140,12 +161,7 @@ import { buildBridgeConnectUrl } from 'src/bridge/bridgeStatusUtil.js'
 import { extractInboundMessageFields } from 'src/bridge/inboundMessages.js'
 import { resolveAndPrepend } from 'src/bridge/inboundAttachments.js'
 import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
-import { hasPermissionsToUseTool } from 'src/utils/permissions/permissions.js'
 import { safeParseJSON } from 'src/utils/json.js'
-import {
-  outputSchema as permissionToolOutputSchema,
-  permissionPromptToolResultToPermissionDecision,
-} from 'src/utils/permissions/PermissionPromptToolResultSchema.js'
 import { createAbortController } from 'src/utils/abortController.js'
 import { createCombinedAbortSignal } from 'src/utils/combinedAbortSignal.js'
 import { generateSessionTitle } from 'src/utils/sessionTitle.js'
@@ -162,24 +178,11 @@ import {
 } from 'src/constants/outputStyles.js'
 import { TEAMMATE_MESSAGE_TAG, TICK_TAG } from 'src/constants/xml.js'
 import {
-  getSettings_DEPRECATED,
-  getSettingsWithSources,
-} from 'src/utils/settings/settings.js'
-import { settingsChangeDetector } from 'src/utils/settings/changeDetector.js'
-import { applySettingsChange } from 'src/utils/settings/applySettingsChange.js'
-import {
   isFastModeAvailable,
   isFastModeEnabled,
   isFastModeSupportedByModel,
   getFastModeState,
 } from 'src/utils/fastMode.js'
-import {
-  isAutoModeGateEnabled,
-  getAutoModeUnavailableNotification,
-  getAutoModeUnavailableReason,
-  isBypassPermissionsModeDisabled,
-  transitionPermissionMode,
-} from 'src/utils/permissions/permissionSetup.js'
 import {
   tryGenerateSuggestion,
   logSuggestionOutcome,
@@ -348,7 +351,7 @@ import { getRunningTasks } from '../utils/task/framework.js'
 import { isBackgroundTask } from '../tasks/types.js'
 import { stopTask } from '../tasks/stopTask.js'
 import { drainSdkEvents } from '../utils/sdkEventQueue.js'
-import { initializeGrowthBook } from '../services/analytics/growthbook.js'
+import { initializeGrowthBook } from '../services/featureFlags.js'
 import { errorMessage, toError } from '../utils/errors.js'
 import { sleep } from '../utils/sleep.js'
 import { isExtractModeActive } from '../memdir/paths.js'

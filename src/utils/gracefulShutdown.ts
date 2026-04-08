@@ -11,12 +11,11 @@ import {
   isSessionPersistenceDisabled,
 } from '../bootstrap/state.js'
 import { DISABLE_KITTY_KEYBOARD, DISABLE_MODIFY_OTHER_KEYS, DBP, DFE, DISABLE_MOUSE_TRACKING, EXIT_ALT_SCREEN, SHOW_CURSOR, CLEAR_ITERM2_PROGRESS, CLEAR_TAB_STATUS, CLEAR_TERMINAL_TITLE, instances, supportsTabStatus, wrapForMultiplexer } from '@anthropic/ink'
-import { shutdownDatadog } from '../services/analytics/datadog.js'
-import { shutdown1PEventLogging } from '../services/analytics/firstPartyEventLogger.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../services/analytics/index.js'
+  shutdownEventLoggers,
+} from '../services/eventLogger.js'
 import type { AppState } from '../state/AppState.js'
 import { runCleanupFunctions } from './cleanupRegistry.js'
 import { logForDebugging } from './debug.js'
@@ -481,16 +480,14 @@ export async function gracefulShutdown(
     })
   }
 
-  // Flush analytics — capped at 500ms. Previously unbounded: the 1P exporter
-  // awaits all pending axios POSTs (10s each), eating the full failsafe budget.
-  // Lost analytics on slow networks are acceptable; a hanging exit is not.
+  // Flush remaining local sinks — capped at 500ms.
   try {
     await Promise.race([
-      Promise.all([shutdown1PEventLogging(), shutdownDatadog(), closeSentry(2000)]),
+      Promise.all([shutdownEventLoggers(), closeSentry(2000)]),
       sleep(500),
     ])
   } catch {
-    // Ignore analytics shutdown errors
+    // Ignore shutdown errors
   }
 
   if (options?.finalMessage) {

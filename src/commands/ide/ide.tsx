@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import * as path from 'path'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { logEvent } from 'src/services/analytics/index.js'
+import { logEvent } from 'src/services/eventLogger.js'
 import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
