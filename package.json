@@ -1,16 +1,17 @@
 {
-  "name": "claude-code-best",
+  "name": "icarus603-claude-code",
   "version": "1.1.0",
-  "description": "Reverse-engineered Anthropic Claude Code CLI — interactive AI coding assistant in the terminal",
+  "description": "Icarus603-maintained Claude Code derivative CLI for terminal-based AI coding workflows",
   "type": "module",
-  "author": "claude-code-best <claude-code-best@proton.me>",
+  "author": "Icarus603",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/claude-code-best/claude-code.git"
+    "url": "git+https://github.com/Icarus603/claude-code.git"
   },
-  "homepage": "https://github.com/claude-code-best/claude-code#readme",
+  "homepage": "https://github.com/Icarus603/claude-code#readme",
   "bugs": {
-    "url": "https://github.com/claude-code-best/claude-code/issues"
+    "url": "https://github.com/Icarus603/claude-code/issues"
   },
   "keywords": [
     "claude",
@@ -26,7 +27,7 @@
   },
   "bin": {
     "ccb": "dist/cli.js",
-    "claude-code-best": "dist/cli.js"
+    "icarus-claude": "dist/cli.js"
   },
   "workspaces": [
     "packages/*",
