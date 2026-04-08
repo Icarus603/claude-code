@@ -1,95 +1,95 @@
-# ULTRAPLAN（增强规划）实现分析
+# ULTRAPLAN（增強規劃）實現分析
 
 > 生成日期：2026-04-02
 > Feature Flag：`FEATURE_ULTRAPLAN=1`
-> 引用数：10（跨 8 个文件）
+> 引用數：10（跨 8 個文件）
 
 ---
 
 ## 一、功能概述
 
-ULTRAPLAN 是一个**远程增强规划**功能，将用户的规划请求发送到 Claude Code on the Web（CCR，云端容器）执行。使用 Opus 模型在云端生成高级计划，用户可以在浏览器中编辑和审批，然后选择在云端继续执行或将计划"传送"回本地终端执行。
+ULTRAPLAN 是一個**遠程增強規劃**功能，將用戶的規劃請求發送到 Claude Code on the Web（CCR，雲端容器）執行。使用 Opus 模型在雲端生成高級計劃，用戶可以在瀏覽器中編輯和審批，然後選擇在雲端繼續執行或將計劃"傳送"回本地終端執行。
 
-**核心卖点**：
-- 终端不被阻塞 — 远程在云端规划，本地可继续工作
-- 使用最强大的模型（Opus）
-- 用户可在浏览器中实时查看和编辑计划
-- 支持多轮迭代（云端可追问，用户在浏览器回复）
+**核心賣點**：
+- 終端不被阻塞 — 遠程在雲端規劃，本地可繼續工作
+- 使用最強大的模型（Opus）
+- 用戶可在瀏覽器中實時查看和編輯計劃
+- 支援多輪迭代（雲端可追問，用戶在瀏覽器回覆）
 
 ---
 
-## 二、架构总览
+## 二、架構總覽
 
 ```
-用户输入 "ultraplan xxx"
+用戶輸入 "ultraplan xxx"
         │
         ▼
 ┌─────────────────────────────────┐
-│  关键字检测层 (keyword.ts)       │  识别 "ultraplan" 关键字
-│  + 输入处理层 (processUserInput) │  重写为 /ultraplan 命令
+│  關鍵字檢測層 (keyword.ts)       │  識別 "ultraplan" 關鍵字
+│  + 輸入處理層 (processUserInput) │  重寫爲 /ultraplan 命令
 └───────────┬─────────────────────┘
             │
             ▼
 ┌─────────────────────────────────┐
-│  命令处理层 (ultraplan.tsx)      │  launchUltraplan()
-│  - 前置校验（资格、防重入）      │  → launchDetached()
-│  - 构建提示词                    │  buildUltraplanPrompt()
+│  命令處理層 (ultraplan.tsx)      │  launchUltraplan()
+│  - 前置校驗（資格、防重入）      │  → launchDetached()
+│  - 構建提示詞                    │  buildUltraplanPrompt()
 └───────────┬─────────────────────┘
             │
             ▼
 ┌─────────────────────────────────┐
-│  远程会话层                      │  teleportToRemote()
-│  - 创建 CCR 云端会话             │  permissionMode: 'plan'
-│  - 设置 plan 权限模式            │  model: Opus
+│  遠程會話層                      │  teleportToRemote()
+│  - 建立 CCR 雲端會話             │  permissionMode: 'plan'
+│  - 設置 plan 權限模式            │  model: Opus
 └───────────┬─────────────────────┘
             │
             ▼
 ┌─────────────────────────────────┐
-│  轮询层 (ccrSession.ts)         │  pollForApprovedExitPlanMode()
-│  - ExitPlanModeScanner          │  每 3 秒轮询事件流
-│  - 状态机: running → needs_input │  超时: 30 分钟
+│  輪詢層 (ccrSession.ts)         │  pollForApprovedExitPlanMode()
+│  - ExitPlanModeScanner          │  每 3 秒輪詢事件流
+│  - 狀態機: running → needs_input │  超時: 30 分鐘
 │                → plan_ready      │
 └───────────┬─────────────────────┘
             │
       ┌─────┴─────┐
       ▼           ▼
    approved    teleport
-  (云端执行)   (传送回本地)
+  (雲端執行)   (傳送回本地)
       │           │
       │           ▼
       │    UltraplanChoiceDialog
-      │    用户选择执行方式
+      │    用戶選擇執行方式
       ▼           ▼
-   完成通知    本地执行计划
+   完成通知    本地執行計劃
 ```
 
 ---
 
-## 三、模块详解
+## 三、模組詳解
 
-### 3.1 关键字检测 — `src/utils/ultraplan/keyword.ts`
+### 3.1 關鍵字檢測 — `src/utils/ultraplan/keyword.ts`
 
-负责检测用户输入中的 "ultraplan" 关键字。检测逻辑相当精细，避免误触发：
+負責檢測用戶輸入中的 "ultraplan" 關鍵字。檢測邏輯相當精細，避免誤觸發：
 
-**触发条件**：输入中包含独立的 `ultraplan` 单词（大小写不敏感）。
+**觸發條件**：輸入中包含獨立的 `ultraplan` 單詞（大小寫不敏感）。
 
-**不触发的场景**：
-- 在引号/括号内：`` `ultraplan` ``、`"ultraplan"`、`[ultraplan]`、`{ultraplan}`
-- 路径/标识符上下文：`src/ultraplan/foo.ts`、`ultraplan.tsx`、`--ultraplan-mode`
-- 问句：`ultraplan?`
-- 斜杠命令内：`/rename ultraplan foo`
-- 已有 ultraplan 会话运行中或正在启动时
+**不觸發的場景**：
+- 在引號/括號內：`` `ultraplan` ``、`"ultraplan"`、`[ultraplan]`、`{ultraplan}`
+- 路徑/標識符上下文：`src/ultraplan/foo.ts`、`ultraplan.tsx`、`--ultraplan-mode`
+- 問句：`ultraplan?`
+- 斜槓命令內：`/rename ultraplan foo`
+- 已有 ultraplan 會話執行中或正在啓動時
 
-**关键字替换**：触发后将 `ultraplan` 替换为 `plan`，保持语法通顺（如 "please ultraplan this" → "please plan this"）。
+**關鍵字替換**：觸發後將 `ultraplan` 替換爲 `plan`，保持語法通順（如 "please ultraplan this" → "please plan this"）。
 
 ```typescript
-// 核心导出函数
-findUltraplanTriggerPositions(text)  // 返回触发位置数组
-hasUltraplanKeyword(text)            // 布尔判断
-replaceUltraplanKeyword(text)        // 替换第一个触发词为 "plan"
+// 核心導出函數
+findUltraplanTriggerPositions(text)  // 返回觸發位置數組
+hasUltraplanKeyword(text)            // 布爾判斷
+replaceUltraplanKeyword(text)        // 替換第一個觸發詞爲 "plan"
 ```
 
-### 3.2 命令注册 — `src/commands.ts`
+### 3.2 命令註冊 — `src/commands.ts`
 
 ```typescript
 const ultraplan = feature('ULTRAPLAN')
@@ -97,7 +97,7 @@ const ultraplan = feature('ULTRAPLAN')
   : null
 ```
 
-命令仅在 `FEATURE_ULTRAPLAN=1` 时加载。命令定义：
+命令僅在 `FEATURE_ULTRAPLAN=1` 時加載。命令定義：
 
 ```typescript
 {
@@ -105,221 +105,221 @@ const ultraplan = feature('ULTRAPLAN')
   name: 'ultraplan',
   description: '~10–30 min · Claude Code on the web drafts an advanced plan...',
   argumentHint: '<prompt>',
-  isEnabled: () => process.env.USER_TYPE === 'ant',  // 仅 ant 用户可用
+  isEnabled: () => process.env.USER_TYPE === 'ant',  // 僅 ant 用戶可用
 }
 ```
 
-> 注意：`isEnabled` 检查 `USER_TYPE === 'ant'`（Anthropic 内部用户），这是命令级限制。关键字触发路径没有此限制，只要 feature flag 开启即可。
+> 注意：`isEnabled` 檢查 `USER_TYPE === 'ant'`（Anthropic 內部用戶），這是命令級限制。關鍵字觸發路徑沒有此限制，只要 feature flag 開啓即可。
 
-### 3.3 核心命令实现 — `src/commands/ultraplan.tsx`
+### 3.3 核心命令實現 — `src/commands/ultraplan.tsx`
 
-#### 3.3.1 入口函数 `call()`
+#### 3.3.1 入口函數 `call()`
 
-处理 `/ultraplan <prompt>` 斜杠命令：
+處理 `/ultraplan <prompt>` 斜槓命令：
 
-1. **无参数调用**：显示使用帮助文本
-2. **已有活跃会话**：返回 "already polling" 提示
-3. **正常调用**：设置 `ultraplanLaunchPending` 状态，触发 `UltraplanLaunchDialog` 对话框
+1. **無參數呼叫**：顯示使用幫助文本
+2. **已有活躍會話**：返回 "already polling" 提示
+3. **正常呼叫**：設置 `ultraplanLaunchPending` 狀態，觸發 `UltraplanLaunchDialog` 對話框
 
 #### 3.3.2 `launchUltraplan()`
 
-公共启动入口，被三个路径共享：
-- 斜杠命令 (`/ultraplan`)
-- 关键字触发 (`processUserInput.ts`)
-- Plan 审批对话框的 "Ultraplan" 按钮 (`ExitPlanModePermissionRequest`)
+公共啓動入口，被三個路徑共享：
+- 斜槓命令 (`/ultraplan`)
+- 關鍵字觸發 (`processUserInput.ts`)
+- Plan 審批對話框的 "Ultraplan" 按鈕 (`ExitPlanModePermissionRequest`)
 
-关键逻辑：
-1. 防重入检查（`ultraplanSessionUrl` / `ultraplanLaunching`）
-2. 同步设置 `ultraplanLaunching = true` 防止竞态
-3. 异步调用 `launchDetached()`
-4. 立即返回启动消息（不等远程会话创建）
+關鍵邏輯：
+1. 防重入檢查（`ultraplanSessionUrl` / `ultraplanLaunching`）
+2. 同步設置 `ultraplanLaunching = true` 防止競態
+3. 異步呼叫 `launchDetached()`
+4. 立即返回啓動訊息（不等遠程會話建立）
 
 #### 3.3.3 `launchDetached()`
 
-异步后台流程：
+異步後臺流程：
 
-1. **获取模型**：从 GrowthBook 读取 `tengu_ultraplan_model`，默认 `opus46` 的 firstParty ID
-2. **资格检查**：`checkRemoteAgentEligibility()` — 验证用户是否有权限使用远程 agent
-3. **构建提示词**：`buildUltraplanPrompt(blurb, seedPlan)`
-   - 如有 `seedPlan`（来自 plan 审批对话框），作为草稿前缀
-   - 加载 `prompt.txt` 中的指令模板
-   - 附加用户 blurb
-4. **创建远程会话**：`teleportToRemote()`
-   - `permissionMode: 'plan'` — 远程以 plan 模式运行
-   - `ultraplan: true` — 标记为 ultraplan 会话
-   - `useDefaultEnvironment: true` — 使用默认云端环境
-5. **注册任务**：`registerRemoteAgentTask()` 创建 `RemoteAgentTask` 追踪条目
-6. **启动轮询**：`startDetachedPoll()` 后台轮询审批状态
+1. **取得模型**：從 GrowthBook 讀取 `tengu_ultraplan_model`，預設 `opus46` 的 firstParty ID
+2. **資格檢查**：`checkRemoteAgentEligibility()` — 驗證用戶是否有權限使用遠程 agent
+3. **構建提示詞**：`buildUltraplanPrompt(blurb, seedPlan)`
+   - 如有 `seedPlan`（來自 plan 審批對話框），作爲草稿前綴
+   - 加載 `prompt.txt` 中的指令模板
+   - 附加用戶 blurb
+4. **建立遠程會話**：`teleportToRemote()`
+   - `permissionMode: 'plan'` — 遠程以 plan 模式執行
+   - `ultraplan: true` — 標記爲 ultraplan 會話
+   - `useDefaultEnvironment: true` — 使用預設雲端環境
+5. **註冊任務**：`registerRemoteAgentTask()` 建立 `RemoteAgentTask` 追蹤條目
+6. **啓動輪詢**：`startDetachedPoll()` 後臺輪詢審批狀態
 
-#### 3.3.4 提示词构建
+#### 3.3.4 提示詞構建
 
 ```
 buildUltraplanPrompt(blurb, seedPlan?)
 ```
 
-- `prompt.txt`：当前为空文件（反编译丢失），原始内容应包含指导远程 agent 生成计划的系统指令
-- 开发者可通过 `ULTRAPLAN_PROMPT_FILE` 环境变量覆盖提示词文件（仅 `USER_TYPE=ant` 时生效）
+- `prompt.txt`：當前爲空文件（反編譯丟失），原始內容應包含指導遠程 agent 生成計劃的系統指令
+- 開發者可通過 `ULTRAPLAN_PROMPT_FILE` 環境變量覆蓋提示詞文件（僅 `USER_TYPE=ant` 時生效）
 
 #### 3.3.5 `startDetachedPoll()`
 
-后台轮询管理：
+後臺輪詢管理：
 
-1. 调用 `pollForApprovedExitPlanMode()` 等待计划审批
-2. 阶段变化时更新 `RemoteAgentTask.ultraplanPhase`（UI 展示）
-3. 审批完成后的两种路径：
-   - **`executionTarget: 'remote'`**：用户选择在云端执行
-     - 标记任务完成
+1. 呼叫 `pollForApprovedExitPlanMode()` 等待計劃審批
+2. 階段變化時更新 `RemoteAgentTask.ultraplanPhase`（UI 展示）
+3. 審批完成後的兩種路徑：
+   - **`executionTarget: 'remote'`**：用戶選擇在雲端執行
+     - 標記任務完成
      - 清除 `ultraplanSessionUrl`
-     - 发送通知：结果将以 PR 形式提交
-   - **`executionTarget: 'local'`**：用户选择传送回本地（teleport）
-     - 设置 `ultraplanPendingChoice`
-     - 触发 `UltraplanChoiceDialog` 对话框
-4. 失败时：归档远程会话、清除状态、发送错误通知
+     - 發送通知：結果將以 PR 形式提交
+   - **`executionTarget: 'local'`**：用戶選擇傳送回本地（teleport）
+     - 設置 `ultraplanPendingChoice`
+     - 觸發 `UltraplanChoiceDialog` 對話框
+4. 失敗時：歸檔遠程會話、清除狀態、發送錯誤通知
 
 #### 3.3.6 `stopUltraplan()`
 
-用户主动停止：
+用戶主動停止：
 
-1. `RemoteAgentTask.kill()` 归档远程会话
-2. 清除所有 ultraplan 状态（`ultraplanSessionUrl`、`ultraplanPendingChoice`、`ultraplanLaunching`）
-3. 发送停止通知
+1. `RemoteAgentTask.kill()` 歸檔遠程會話
+2. 清除所有 ultraplan 狀態（`ultraplanSessionUrl`、`ultraplanPendingChoice`、`ultraplanLaunching`）
+3. 發送停止通知
 
-### 3.4 CCR 会话轮询 — `src/utils/ultraplan/ccrSession.ts`
+### 3.4 CCR 會話輪詢 — `src/utils/ultraplan/ccrSession.ts`
 
 #### 3.4.1 `ExitPlanModeScanner`
 
-纯状态机，无 I/O。摄入 `SDKMessage[]` 事件批次，分类 `ExitPlanMode` 工具调用的结果。
+純狀態機，無 I/O。攝入 `SDKMessage[]` 事件批次，分類 `ExitPlanMode` 工具呼叫的結果。
 
-**状态类型**：
+**狀態類型**：
 
 ```typescript
 type ScanResult =
-  | { kind: 'approved' }   // 用户批准了计划
-  | { kind: 'teleport' }   // 用户点击"传送回本地"
-  | { kind: 'rejected' }   // 用户拒绝（可继续迭代）
-  | { kind: 'pending' }    // 等待用户审批中
-  | { kind: 'terminated' } // 远程会话意外终止
-  | { kind: 'unchanged' }  // 无新事件，状态不变
+  | { kind: 'approved' }   // 用戶批准了計劃
+  | { kind: 'teleport' }   // 用戶點擊"傳送回本地"
+  | { kind: 'rejected' }   // 用戶拒絕（可繼續迭代）
+  | { kind: 'pending' }    // 等待用戶審批中
+  | { kind: 'terminated' } // 遠程會話意外終止
+  | { kind: 'unchanged' }  // 無新事件，狀態不變
 ```
 
-**优先级**：approved > terminated > rejected > pending > unchanged
+**優先級**：approved > terminated > rejected > pending > unchanged
 
-**关键设计**：
-- 同一批事件可能包含审批和后续崩溃 — 不丢弃已审批的计划
-- 拒绝后重新扫描（`rescanAfterRejection`），因为新事件可能包含修改后的计划
-- 使用 `is_error: true` 判断拒绝，`content` 中查找标记提取计划文本
+**關鍵設計**：
+- 同一批事件可能包含審批和後續崩潰 — 不丟棄已審批的計劃
+- 拒絕後重新掃描（`rescanAfterRejection`），因爲新事件可能包含修改後的計劃
+- 使用 `is_error: true` 判斷拒絕，`content` 中查找標記提取計劃文本
 
 #### 3.4.2 `pollForApprovedExitPlanMode()`
 
-轮询主循环：
+輪詢主循環：
 
-- **轮询间隔**：3 秒
-- **超时**：30 分钟
-- **容错**：连续 5 次网络错误才放弃
-- **阶段推断**：
-  - `hasPendingPlan`（有 ExitPlanMode 无结果）→ `plan_ready`
-  - `quietIdle`（空闲且无新事件）→ `needs_input`（远程在等用户输入）
+- **輪詢間隔**：3 秒
+- **超時**：30 分鐘
+- **容錯**：連續 5 次網絡錯誤才放棄
+- **階段推斷**：
+  - `hasPendingPlan`（有 ExitPlanMode 無結果）→ `plan_ready`
+  - `quietIdle`（空閒且無新事件）→ `needs_input`（遠程在等用戶輸入）
   - 其他 → `running`
 
-#### 3.4.3 计划文本提取
+#### 3.4.3 計劃文本提取
 
-两种提取路径：
+兩種提取路徑：
 
-1. **Approved**：从 `tool_result` 中查找 `## Approved Plan:\n` 或 `## Approved Plan (edited by user):\n` 标记
-2. **Teleport**：从 `tool_result` 中查找 `__ULTRAPLAN_TELEPORT_SENTINEL__` 标记（浏览器端嵌入）
+1. **Approved**：從 `tool_result` 中查找 `## Approved Plan:\n` 或 `## Approved Plan (edited by user):\n` 標記
+2. **Teleport**：從 `tool_result` 中查找 `__ULTRAPLAN_TELEPORT_SENTINEL__` 標記（瀏覽器端嵌入）
 
-### 3.5 输入处理集成 — `src/utils/processUserInput/processUserInput.ts`
+### 3.5 輸入處理集成 — `src/utils/processUserInput/processUserInput.ts`
 
-关键字触发路径（在斜杠命令处理之前）：
+關鍵字觸發路徑（在斜槓命令處理之前）：
 
 ```typescript
 if (feature('ULTRAPLAN') &&
     mode === 'prompt' &&               // 非非交互模式
-    !isNonInteractiveSession &&         // 非后台会话
+    !isNonInteractiveSession &&         // 非後臺會話
     inputString !== null &&
-    !inputString.startsWith('/') &&     // 非斜杠命令
-    !ultraplanSessionUrl &&             // 无活跃会话
-    !ultraplanLaunching &&              // 非正在启动
+    !inputString.startsWith('/') &&     // 非斜槓命令
+    !ultraplanSessionUrl &&             // 無活躍會話
+    !ultraplanLaunching &&              // 非正在啓動
     hasUltraplanKeyword(inputString)) {
-  // 重写为 /ultraplan 命令
+  // 重寫爲 /ultraplan 命令
   const rewritten = replaceUltraplanKeyword(inputString).trim()
   await processSlashCommand(`/ultraplan ${rewritten}`, ...)
 }
 ```
 
-### 3.6 UI 层
+### 3.6 UI 層
 
 #### 3.6.1 彩虹高亮 — `src/components/PromptInput/PromptInput.tsx`
 
-当输入中检测到 `ultraplan` 关键字时：
-- 对每个字符施加**彩虹渐变色**高亮（`getRainbowColor()`）
-- 显示通知："This prompt will launch an ultraplan session in Claude Code on the web"
+當輸入中檢測到 `ultraplan` 關鍵字時：
+- 對每個字符施加**彩虹漸變色**高亮（`getRainbowColor()`）
+- 顯示通知："This prompt will launch an ultraplan session in Claude Code on the web"
 
-#### 3.6.2 预启动对话框 — `UltraplanLaunchDialog`
+#### 3.6.2 預啓動對話框 — `UltraplanLaunchDialog`
 
-在 REPL 的 `focusedInputDialog === 'ultraplan-launch'` 时渲染。
+在 REPL 的 `focusedInputDialog === 'ultraplan-launch'` 時渲染。
 
-用户选择：
-- **确认**：调用 `launchUltraplan()`，先添加命令回显，异步启动远程会话
-- **取消**：清除 `ultraplanLaunchPending` 状态
+用戶選擇：
+- **確認**：呼叫 `launchUltraplan()`，先添加命令回顯，異步啓動遠程會話
+- **取消**：清除 `ultraplanLaunchPending` 狀態
 
-#### 3.6.3 计划选择对话框 — `UltraplanChoiceDialog`
+#### 3.6.3 計劃選擇對話框 — `UltraplanChoiceDialog`
 
-在 `focusedInputDialog === 'ultraplan-choice'` 时渲染。
+在 `focusedInputDialog === 'ultraplan-choice'` 時渲染。
 
-当 teleport 路径返回已审批计划时，用户可选择执行方式。
+當 teleport 路徑返回已審批計劃時，用戶可選擇執行方式。
 
-#### 3.6.4 Plan 审批按钮 — `ExitPlanModePermissionRequest`
+#### 3.6.4 Plan 審批按鈕 — `ExitPlanModePermissionRequest`
 
-本地 Plan Mode 的审批对话框中，如果 `feature('ULTRAPLAN')` 开启，会显示额外的 "Ultraplan" 按钮：
-- 将当前本地计划作为 `seedPlan` 发送给远程
-- 按钮仅在无活跃 ultraplan 会话时显示
+本地 Plan Mode 的審批對話框中，如果 `feature('ULTRAPLAN')` 開啓，會顯示額外的 "Ultraplan" 按鈕：
+- 將當前本地計劃作爲 `seedPlan` 發送給遠程
+- 按鈕僅在無活躍 ultraplan 會話時顯示
 
-### 3.7 应用状态 — `src/state/AppStateStore.ts`
+### 3.7 應用狀態 — `src/state/AppStateStore.ts`
 
 ```typescript
 interface AppState {
-  ultraplanLaunching?: boolean    // 防重入锁（5 秒窗口）
-  ultraplanSessionUrl?: string    // 活跃远程会话 URL
-  ultraplanPendingChoice?: {      // 已审批计划等待选择
+  ultraplanLaunching?: boolean    // 防重入鎖（5 秒窗口）
+  ultraplanSessionUrl?: string    // 活躍遠程會話 URL
+  ultraplanPendingChoice?: {      // 已審批計劃等待選擇
     plan: string
     sessionId: string
     taskId: string
   }
-  ultraplanLaunchPending?: {      // 预启动对话框
+  ultraplanLaunchPending?: {      // 預啓動對話框
     blurb: string
   }
-  isUltraplanMode?: boolean       // 远程端：CCR 侧的 ultraplan 标记
+  isUltraplanMode?: boolean       // 遠程端：CCR 側的 ultraplan 標記
 }
 ```
 
-### 3.8 远程任务追踪 — `src/tasks/RemoteAgentTask/RemoteAgentTask.tsx`
+### 3.8 遠程任務追蹤 — `src/tasks/RemoteAgentTask/RemoteAgentTask.tsx`
 
-Ultraplan 使用 `RemoteAgentTask` 基础设施追踪远程会话：
+Ultraplan 使用 `RemoteAgentTask` 基礎設施追蹤遠程會話：
 
 ```typescript
 registerRemoteAgentTask({
   remoteTaskType: 'ultraplan',
   session: { id, title },
   command: blurb,
-  isUltraplan: true  // 特殊标记，跳过通用轮询逻辑
+  isUltraplan: true  // 特殊標記，跳過通用輪詢邏輯
 })
 ```
 
-`extractPlanFromLog()` 从 `<ultraplan>...</ultraplan>` XML 标签中提取计划内容。
+`extractPlanFromLog()` 從 `<ultraplan>...</ultraplan>` XML 標籤中提取計劃內容。
 
 ---
 
-## 四、数据流时序
+## 四、資料流時序
 
 ```
-时间线 →
+時間線 →
 
-用户                    本地 CLI                     CCR 云端
+用戶                    本地 CLI                     CCR 雲端
  │                       │                             │
  │ "ultraplan xxx"       │                             │
  │──────────────────────>│                             │
- │                       │ keyword 检测 + 重写          │
+ │                       │ keyword 檢測 + 重寫          │
  │                       │ /ultraplan "plan xxx"        │
  │                       │                             │
  │  [UltraplanLaunch     │                             │
@@ -333,112 +333,112 @@ registerRemoteAgentTask({
  │  "Starting..."        │                             │
  │<──────────────────────│                             │
  │                       │                             │
- │  (终端空闲，可继续)    │  startDetachedPoll()        │
- │                       │  ═══ 3s 轮询循环 ═══         │
+ │  (終端空閒，可繼續)    │  startDetachedPoll()        │
+ │                       │  ═══ 3s 輪詢循環 ═══         │
  │                       │                             │
- │                       │                   [浏览器打开]│
- │                       │                   [云端生成计划]
+ │                       │                   [瀏覽器打開]│
+ │                       │                   [雲端生成計劃]
  │                       │                             │
  │                       │  ← needs_input ─────────────│
- │                       │    (云端追问用户)             │
+ │                       │    (雲端追問用戶)             │
  │                       │                             │
- │                       │                   [用户在浏览器回复]
+ │                       │                   [用戶在瀏覽器回覆]
  │                       │                             │
  │                       │  ← plan_ready ──────────────│
- │                       │    (ExitPlanMode 等待审批)    │
+ │                       │    (ExitPlanMode 等待審批)    │
  │                       │                             │
- │                       │                   [用户审批/编辑]
+ │                       │                   [用戶審批/編輯]
  │                       │                             │
  │               ┌───────┤  ← approved ────────────────│
  │               │       │                             │
- │    [远程执行]  │       │                             │
+ │    [遠程執行]  │       │                             │
  │    通知完成    │       │                             │
  │               │       │                             │
  │               └── OR ─┤  ← teleport ───────────────│
  │                       │                             │
  │  [UltraplanChoice     │                             │
  │   Dialog]             │                             │
- │── 选择执行方式 ───────>│                             │
- │                       │ 本地执行计划                  │
+ │── 選擇執行方式 ───────>│                             │
+ │                       │ 本地執行計劃                  │
 ```
 
 ---
 
-## 五、关键文件清单
+## 五、關鍵文件清單
 
-| 文件 | 职责 |
+| 文件 | 職責 |
 |------|------|
-| `src/utils/ultraplan/keyword.ts` | 关键字检测、高亮位置计算、关键字替换 |
-| `src/utils/ultraplan/ccrSession.ts` | CCR 会话轮询、ExitPlanMode 状态机、计划文本提取 |
-| `src/utils/ultraplan/prompt.txt` | 远程指令模板（当前为空，需重建） |
-| `src/commands/ultraplan.tsx` | `/ultraplan` 命令、启动/停止逻辑、提示词构建 |
-| `src/utils/processUserInput/processUserInput.ts` | 关键字触发 → `/ultraplan` 命令路由 |
+| `src/utils/ultraplan/keyword.ts` | 關鍵字檢測、高亮位置計算、關鍵字替換 |
+| `src/utils/ultraplan/ccrSession.ts` | CCR 會話輪詢、ExitPlanMode 狀態機、計劃文本提取 |
+| `src/utils/ultraplan/prompt.txt` | 遠程指令模板（當前爲空，需重建） |
+| `src/commands/ultraplan.tsx` | `/ultraplan` 命令、啓動/停止邏輯、提示詞構建 |
+| `src/utils/processUserInput/processUserInput.ts` | 關鍵字觸發 → `/ultraplan` 命令路由 |
 | `src/components/PromptInput/PromptInput.tsx` | 彩虹高亮 + 通知提示 |
-| `src/screens/REPL.tsx` | 对话框渲染（UltraplanLaunchDialog / UltraplanChoiceDialog） |
-| `src/components/permissions/ExitPlanModePermissionRequest/` | Plan 审批中的 "Ultraplan" 按钮 |
-| `src/state/AppStateStore.ts` | ultraplan 相关状态字段定义 |
-| `src/tasks/RemoteAgentTask/RemoteAgentTask.tsx` | 远程任务追踪 + `<ultraplan>` 标签提取 |
+| `src/screens/REPL.tsx` | 對話框渲染（UltraplanLaunchDialog / UltraplanChoiceDialog） |
+| `src/components/permissions/ExitPlanModePermissionRequest/` | Plan 審批中的 "Ultraplan" 按鈕 |
+| `src/state/AppStateStore.ts` | ultraplan 相關狀態字段定義 |
+| `src/tasks/RemoteAgentTask/RemoteAgentTask.tsx` | 遠程任務追蹤 + `<ultraplan>` 標籤提取 |
 | `src/constants/xml.ts` | `ULTRAPLAN_TAG = 'ultraplan'` |
 
 ---
 
-## 六、依赖关系
+## 六、依賴關係
 
-### 外部依赖
+### 外部依賴
 
-| 依赖 | 用途 | 必要性 |
+| 依賴 | 用途 | 必要性 |
 |------|------|--------|
-| `teleportToRemote()` | 创建 CCR 云端会话 | 必须 — 核心功能 |
-| `checkRemoteAgentEligibility()` | 验证用户远程 agent 使用资格 | 必须 — 前置检查 |
-| `archiveRemoteSession()` | 归档/终止远程会话 | 必须 — 清理 |
-| GrowthBook `tengu_ultraplan_model` | 获取使用的模型 ID | 可选 — 默认 opus46 |
-| `@anthropic-ai/sdk` | SDKMessage 类型 | 必须 — 类型定义 |
-| `pollRemoteSessionEvents()` | 事件流分页轮询 | 必须 — 轮询基础设施 |
+| `teleportToRemote()` | 建立 CCR 雲端會話 | 必須 — 核心功能 |
+| `checkRemoteAgentEligibility()` | 驗證用戶遠程 agent 使用資格 | 必須 — 前置檢查 |
+| `archiveRemoteSession()` | 歸檔/終止遠程會話 | 必須 — 清理 |
+| GrowthBook `tengu_ultraplan_model` | 取得使用的模型 ID | 可選 — 預設 opus46 |
+| `@anthropic-ai/sdk` | SDKMessage 類型 | 必須 — 類型定義 |
+| `pollRemoteSessionEvents()` | 事件流分頁輪詢 | 必須 — 輪詢基礎設施 |
 
-### 内部依赖
+### 內部依賴
 
-- **ExitPlanModeV2Tool**：远程端调用的工具，触发 plan 审批流程
-- **RemoteAgentTask**：任务追踪和状态管理基础设施
-- **AppState Store**：ultraplan 状态管理
+- **ExitPlanModeV2Tool**：遠程端呼叫的工具，觸發 plan 審批流程
+- **RemoteAgentTask**：任務追蹤和狀態管理基礎設施
+- **AppState Store**：ultraplan 狀態管理
 
 ---
 
-## 七、当前状态与补全要点
+## 七、當前狀態與補全要點
 
-| 组件 | 状态 | 说明 |
+| 組件 | 狀態 | 說明 |
 |------|------|------|
-| 关键字检测 | ✅ 完整 | `keyword.ts` 逻辑完善 |
-| 命令框架 | ✅ 完整 | 注册、路由、防重入完整 |
-| 启动流程 | ✅ 完整 | `launchUltraplan` / `launchDetached` 完整 |
-| CCR 轮询 | ✅ 完整 | `ccrSession.ts` 状态机完整 |
+| 關鍵字檢測 | ✅ 完整 | `keyword.ts` 邏輯完善 |
+| 命令框架 | ✅ 完整 | 註冊、路由、防重入完整 |
+| 啓動流程 | ✅ 完整 | `launchUltraplan` / `launchDetached` 完整 |
+| CCR 輪詢 | ✅ 完整 | `ccrSession.ts` 狀態機完整 |
 | UI 高亮/通知 | ✅ 完整 | 彩虹高亮 + 提示通知完整 |
-| 状态管理 | ✅ 完整 | AppState 字段完整 |
-| `prompt.txt` | ❌ 空文件 | 需要重建远程指令模板 |
-| `UltraplanLaunchDialog` | ⚠️ 全局声明 | 组件实现未找到（可能在内置包中） |
-| `UltraplanChoiceDialog` | ⚠️ 全局声明 | 组件实现未找到（可能在内置包中） |
-| `isEnabled` 限制 | ⚠️ `USER_TYPE === 'ant'` | 命令级限制，仅 Anthropic 内部用户 |
+| 狀態管理 | ✅ 完整 | AppState 字段完整 |
+| `prompt.txt` | ❌ 空文件 | 需要重建遠程指令模板 |
+| `UltraplanLaunchDialog` | ⚠️ 全局聲明 | 組件實現未找到（可能在內置包中） |
+| `UltraplanChoiceDialog` | ⚠️ 全局聲明 | 組件實現未找到（可能在內置包中） |
+| `isEnabled` 限制 | ⚠️ `USER_TYPE === 'ant'` | 命令級限制，僅 Anthropic 內部用戶 |
 
-### 补全建议
+### 補全建議
 
-1. **重建 `prompt.txt`**：这是远程 agent 的核心指令，定义如何进行多 agent 探索式规划。需要设计：
-   - 规划方法论（多角度分析、风险评估、分阶段执行）
-   - ExitPlanMode 工具的使用引导
-   - 输出格式要求
+1. **重建 `prompt.txt`**：這是遠程 agent 的核心指令，定義如何進行多 agent 探索式規劃。需要設計：
+   - 規劃方法論（多角度分析、風險評估、分階段執行）
+   - ExitPlanMode 工具的使用引導
+   - 輸出格式要求
 
-2. **对话框组件**：`UltraplanLaunchDialog` 和 `UltraplanChoiceDialog` 在 `global.d.ts` 中声明但实现缺失，需要新建：
-   - Launch Dialog：确认对话框（含 CCR 使用条款链接）
-   - Choice Dialog：展示已审批计划 + 执行方式选择
+2. **對話框組件**：`UltraplanLaunchDialog` 和 `UltraplanChoiceDialog` 在 `global.d.ts` 中聲明但實現缺失，需要新建：
+   - Launch Dialog：確認對話框（含 CCR 使用條款連結）
+   - Choice Dialog：展示已審批計劃 + 執行方式選擇
 
-3. **放宽 `isEnabled`**：如果要让非 ant 用户使用斜杠命令，需移除 `USER_TYPE === 'ant'` 检查
+3. **放寬 `isEnabled`**：如果要讓非 ant 用戶使用斜槓命令，需移除 `USER_TYPE === 'ant'` 檢查
 
 ---
 
-## 八、与相关 Feature 的关系
+## 八、與相關 Feature 的關係
 
-| Feature | 关系 |
+| Feature | 關係 |
 |---------|------|
-| `ULTRATHINK` | 类似的高能力模式，但 `ULTRATHINK` 只调高 effort，不启动远程会话 |
-| `FORK_SUBAGENT` | Ultraplan 不使用 fork subagent，使用的是 CCR 远程 agent |
-| `COORDINATOR_MODE` | 不同范式的多 agent，Coordinator 在本地编排，Ultraplan 在云端 |
-| `BRIDGE_MODE` | 底层依赖相同的 `teleportToRemote()` 基础设施 |
-| `ExitPlanModeTool` | 远程端的审批机制，Ultraplan 的核心交互模型 |
+| `ULTRATHINK` | 類似的高能力模式，但 `ULTRATHINK` 只調高 effort，不啓動遠程會話 |
+| `FORK_SUBAGENT` | Ultraplan 不使用 fork subagent，使用的是 CCR 遠程 agent |
+| `COORDINATOR_MODE` | 不同範式的多 agent，Coordinator 在本地編排，Ultraplan 在雲端 |
+| `BRIDGE_MODE` | 底層依賴相同的 `teleportToRemote()` 基礎設施 |
+| `ExitPlanModeTool` | 遠程端的審批機制，Ultraplan 的核心交互模型 |

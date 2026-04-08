@@ -1,53 +1,53 @@
 ---
-title: "自定义 Agent - 从 Markdown 到运行时的完整链路"
-description: "揭秘 Claude Code 自定义 Agent 完整链路：Agent 定义的 Markdown 数据模型、三种加载来源、工具过滤策略和与 AgentTool 的联动机制。"
-keywords: ["自定义 Agent", "Agent 定义", "Markdown Agent", "Agent 配置", "角色定制"]
+title: "自定義 Agent - 從 Markdown 到執行時的完整鏈路"
+description: "揭祕 Claude Code 自定義 Agent 完整鏈路：Agent 定義的 Markdown 資料模型、三種加載來源、工具過濾策略和與 AgentTool 的聯動機制。"
+keywords: ["自定義 Agent", "Agent 定義", "Markdown Agent", "Agent 設定", "角色定製"]
 ---
 
-{/* 本章目标：揭示 Agent 定义的完整数据模型、加载发现机制、工具过滤和与 AgentTool 的联动 */}
+{/* 本章目標：揭示 Agent 定義的完整資料模型、加載發現機制、工具過濾和與 AgentTool 的聯動 */}
 
-## Agent 定义的三种来源
+## Agent 定義的三種來源
 
-Claude Code 的 Agent 不仅仅来自用户自定义——系统有三类来源，按优先级合并：
+Claude Code 的 Agent 不僅僅來自用戶自定義——系統有三類來源，按優先級合併：
 
-| 来源 | 位置 | 优先级 |
+| 來源 | 位置 | 優先級 |
 |------|------|--------|
-| **Built-in** | `src/tools/AgentTool/built-in/` 硬编码 | 最低（可被覆盖） |
-| **Plugin** | 通过插件系统注册 | 中 |
+| **Built-in** | `src/tools/AgentTool/built-in/` 硬編碼 | 最低（可被覆蓋） |
+| **Plugin** | 通過插件系統註冊 | 中 |
 | **User/Project/Policy** | `.claude/agents/*.md` 或 settings.json | 最高 |
 
-合并逻辑在 `getActiveAgentsFromList()` 中：按 `agentType` 去重，后者覆盖前者。这意味着你可以在 `.claude/agents/` 中放一个 `Explore.md` 来完全替换内置的 Explore Agent。
+合併邏輯在 `getActiveAgentsFromList()` 中：按 `agentType` 去重，後者覆蓋前者。這意味着你可以在 `.claude/agents/` 中放一個 `Explore.md` 來完全替換內置的 Explore Agent。
 
 ## Markdown Agent 文件的完整格式
 
 ```markdown
 ---
 # === 必需字段 ===
-name: "reviewer"                    # Agent 标识（agentType）
+name: "reviewer"                    # Agent 標識（agentType）
 description: "Code review specialist, read-only analysis"
 
 # === 工具控制 ===
-tools: "Read,Glob,Grep,Bash"        # 允许的工具列表（逗号分隔）
-disallowedTools: "Write,Edit"       # 显式禁止的工具
+tools: "Read,Glob,Grep,Bash"        # 允許的工具列表（逗號分隔）
+disallowedTools: "Write,Edit"       # 顯式禁止的工具
 
-# === 模型配置 ===
-model: "haiku"                      # 指定模型（或 "inherit" 继承主线程）
-effort: "high"                      # 推理努力程度：low/medium/high 或整数
+# === 模型設定 ===
+model: "haiku"                      # 指定模型（或 "inherit" 繼承主執行緒）
+effort: "high"                      # 推理努力程度：low/medium/high 或整數
 
-# === 行为控制 ===
-maxTurns: 10                        # 最大 agentic 轮次
-permissionMode: "plan"              # 权限模式：plan/bypassPermissions 等
-background: true                    # 始终作为后台任务运行
-initialPrompt: "/search TODO"       # 首轮用户消息前缀（支持斜杠命令）
+# === 行爲控制 ===
+maxTurns: 10                        # 最大 agentic 輪次
+permissionMode: "plan"              # 權限模式：plan/bypassPermissions 等
+background: true                    # 始終作爲後臺任務執行
+initialPrompt: "/search TODO"       # 首輪用戶訊息前綴（支援斜槓命令）
 
-# === 隔离与持久化 ===
-isolation: "worktree"               # 在独立 git worktree 中运行
-memory: "project"                   # 持久记忆范围：user/project/local
+# === 隔離與持久化 ===
+isolation: "worktree"               # 在獨立 git worktree 中執行
+memory: "project"                   # 持久記憶範圍：user/project/local
 
-# === MCP 服务器 ===
+# === MCP 服務器 ===
 mcpServers:
-  - "slack"                         # 引用已配置的 MCP 服务器
-  - database:                       # 内联定义
+  - "slack"                         # 引用已設定的 MCP 服務器
+  - database:                       # 內聯定義
       command: "npx"
       args: ["mcp-db"]
 
@@ -58,88 +58,88 @@ hooks:
       timeout: 5000
 
 # === Skills ===
-skills: "code-review,security-review"  # 预加载的 skills（逗号分隔）
+skills: "code-review,security-review"  # 預加載的 skills（逗號分隔）
 
-# === 显示 ===
-color: "blue"                       # 终端中的 Agent 颜色标识
+# === 顯示 ===
+color: "blue"                       # 終端中的 Agent 顏色標識
 ---
 
-你是代码审查专家。你的职责是...
+你是程式碼審查專家。你的職責是...
 
-（正文内容 = system prompt）
+（正文內容 = system prompt）
 ```
 
-### 字段解析细节
+### 字段解析細節
 
-- **`tools`**：通过 `parseAgentToolsFromFrontmatter()` 解析，支持逗号分隔字符串或数组
-- **`model: "inherit"`**：使用主线程的模型（区分大小写，只有小写 "inherit" 有效）
-- **`memory`**：启用后自动注入 `Write`/`Edit`/`Read` 工具（即使 `tools` 未包含），并在 system prompt 末尾追加 memory 指令
-- **`isolation: "remote"`**：仅在 Anthropic 内部可用（`USER_TYPE === 'ant'`），外部构建只支持 `worktree`
-- **`background`**：`true` 使 Agent 始终在后台运行，主线程不等待结果
+- **`tools`**：通過 `parseAgentToolsFromFrontmatter()` 解析，支援逗號分隔字符串或數組
+- **`model: "inherit"`**：使用主執行緒的模型（區分大小寫，只有小寫 "inherit" 有效）
+- **`memory`**：啓用後自動注入 `Write`/`Edit`/`Read` 工具（即使 `tools` 未包含），並在 system prompt 末尾追加 memory 指令
+- **`isolation: "remote"`**：僅在 Anthropic 內部可用（`USER_TYPE === 'ant'`），外部構建只支援 `worktree`
+- **`background`**：`true` 使 Agent 始終在後臺執行，主執行緒不等待結果
 
-## 加载与发现机制
+## 加載與發現機制
 
-`getAgentDefinitionsWithOverrides()`（被 `memoize` 缓存）执行完整的发现流程：
+`getAgentDefinitionsWithOverrides()`（被 `memoize` 快取）執行完整的發現流程：
 
 ```
-1. 加载 Markdown 文件
+1. 加載 Markdown 文件
    ├── loadMarkdownFilesForSubdir('agents', cwd)
-   │   ├── ~/.claude/agents/*.md  （用户级，source = 'userSettings'）
-   │   ├── .claude/agents/*.md    （项目级，source = 'projectSettings'）
-   │   └── managed/policy sources （策略级，source = 'policySettings'）
+   │   ├── ~/.claude/agents/*.md  （用戶級，source = 'userSettings'）
+   │   ├── .claude/agents/*.md    （專案級，source = 'projectSettings'）
+   │   └── managed/policy sources （策略級，source = 'policySettings'）
    │
-   └── 每个 .md 文件：
+   └── 每個 .md 文件：
        ├── 解析 YAML frontmatter
-       ├── 正文作为 system prompt
-       ├── 校验必需字段（name, description）
-       ├── 静默跳过无 frontmatter 的 .md 文件（可能是参考文档）
-       └── 解析失败 → 记录到 failedFiles，不阻塞其他 Agent
+       ├── 正文作爲 system prompt
+       ├── 校驗必需字段（name, description）
+       ├── 靜默跳過無 frontmatter 的 .md 文件（可能是參考文件）
+       └── 解析失敗 → 記錄到 failedFiles，不阻塞其他 Agent
 
-2. 并行加载 Plugin Agents
+2. 並行加載 Plugin Agents
    └── loadPluginAgents() → memoized
 
-3. 初始化 Memory Snapshots（如果 AGENT_MEMORY_SNAPSHOT 启用）
+3. 初始化 Memory Snapshots（如果 AGENT_MEMORY_SNAPSHOT 啓用）
    └── initializeAgentMemorySnapshots()
 
-4. 合并 Built-in + Plugin + Custom
-   └── getActiveAgentsFromList() → 按 agentType 去重，后者覆盖前者
+4. 合併 Built-in + Plugin + Custom
+   └── getActiveAgentsFromList() → 按 agentType 去重，後者覆蓋前者
 
-5. 分配颜色
-   └── setAgentColor(agentType, color) → 终端 UI 中区分不同 Agent
+5. 分配顏色
+   └── setAgentColor(agentType, color) → 終端 UI 中區分不同 Agent
 ```
 
-## 工具过滤的实现
+## 工具過濾的實現
 
-当 Agent 被派生时，`AgentTool` 根据定义中的 `tools` / `disallowedTools` 过滤可用工具列表：
+當 Agent 被派生時，`AgentTool` 根據定義中的 `tools` / `disallowedTools` 過濾可用工具列表：
 
 ```
 全部工具
   ↓ disallowedTools 移除
-  ↓ tools 白名单过滤（如果指定）
+  ↓ tools 白名單過濾（如果指定）
 可用工具
 ```
 
-- **`tools` 未指定**：Agent 可以使用所有工具（默认全能）
+- **`tools` 未指定**：Agent 可以使用所有工具（預設全能）
 - **`tools` 指定**：只能使用列出的工具
-- **`disallowedTools`**：即使 `tools` 未指定，这些工具也被禁止
-- **自动注入**：`memory` 启用时自动添加 `Write`/`Edit`/`Read`
+- **`disallowedTools`**：即使 `tools` 未指定，這些工具也被禁止
+- **自動注入**：`memory` 啓用時自動添加 `Write`/`Edit`/`Read`
 
-以内置 Explore Agent 为例：
+以內置 Explore Agent 爲例：
 
 ```typescript
 // src/tools/AgentTool/built-in/exploreAgent.ts
 disallowedTools: [
-  'Agent',           // 不能嵌套调用 Agent
+  'Agent',           // 不能嵌套呼叫 Agent
   'ExitPlanMode',    // 不需要 plan mode
-  'FileEdit',        // 只读
-  'FileWrite',       // 只读
-  'NotebookEdit',    // 只读
+  'FileEdit',        // 只讀
+  'FileWrite',       // 只讀
+  'NotebookEdit',    // 只讀
 ]
 ```
 
 ## System Prompt 的注入方式
 
-Agent 的 system prompt 通过 `getSystemPrompt()` 闭包延迟生成：
+Agent 的 system prompt 通過 `getSystemPrompt()` 閉包延遲生成：
 
 ```typescript
 // Markdown Agent
@@ -151,61 +151,61 @@ getSystemPrompt: () => {
 }
 ```
 
-这意味着：
-1. **Markdown 正文 = 完整的 system prompt**——不是追加，而是替换默认 prompt
-2. **Memory 指令**在 memory 启用时自动追加到末尾
-3. **闭包延迟计算**——memory 状态可能在文件加载后才变化
+這意味着：
+1. **Markdown 正文 = 完整的 system prompt**——不是追加，而是替換預設 prompt
+2. **Memory 指令**在 memory 啓用時自動追加到末尾
+3. **閉包延遲計算**——memory 狀態可能在文件加載後才變化
 
-对于 Built-in Agent，`getSystemPrompt` 接受 `toolUseContext` 参数，可以根据运行时状态（如是否使用嵌入式搜索工具）动态调整 prompt 内容。
+對於 Built-in Agent，`getSystemPrompt` 接受 `toolUseContext` 參數，可以根據執行時狀態（如是否使用嵌入式搜索工具）動態調整 prompt 內容。
 
-## 与 AgentTool 的联动
+## 與 AgentTool 的聯動
 
-当主 Agent 需要派生子 Agent 时：
+當主 Agent 需要派生子 Agent 時：
 
 ```
 AgentTool.call({ subagent_type: "reviewer", ... })
   ↓
-1. 从 agentDefinitions.activeAgents 查找 agentType === "reviewer"
+1. 從 agentDefinitions.activeAgents 查找 agentType === "reviewer"
   ↓
-2. 检查 requiredMcpServers（如果 Agent 要求特定 MCP 服务器）
+2. 檢查 requiredMcpServers（如果 Agent 要求特定 MCP 服務器）
   ↓
-3. 过滤工具列表（tools / disallowedTools）
+3. 過濾工具列表（tools / disallowedTools）
   ↓
 4. 解析模型：
-   - "inherit" → 使用主线程模型
-   - 具体模型名 → 直接使用
-   - 未指定 → 主线程模型
+   - "inherit" → 使用主執行緒模型
+   - 具體模型名 → 直接使用
+   - 未指定 → 主執行緒模型
   ↓
-5. 解析权限模式（permissionMode）
+5. 解析權限模式（permissionMode）
   ↓
-6. 构建隔离环境（如果 isolation === "worktree"）
+6. 構建隔離環境（如果 isolation === "worktree"）
   ↓
 7. 注入 system prompt（getSystemPrompt()）
   ↓
-8. 注入 initialPrompt（如果定义了）
+8. 注入 initialPrompt（如果定義了）
   ↓
-9. 启动子 Agent 循环（forkSubagent / runAgent）
+9. 啓動子 Agent 循環（forkSubagent / runAgent）
 ```
 
-## 内置 Agent 参考
+## 內置 Agent 參考
 
 | Agent | agentType | 角色 | 工具限制 | 模型 |
 |-------|-----------|------|---------|------|
-| **General Purpose** | `general-purpose` | 默认子 Agent | 全部工具 | 主线程模型 |
-| **Explore** | `Explore` | 代码搜索专家 | 只读（无 Write/Edit） | haiku（外部） |
-| **Plan** | `Plan` | 规划专家 | 只读 + ExitPlanMode | inherit |
-| **Verification** | `verification` | 结果验证 | 由 feature flag 控制 | — |
-| **Code Guide** | `claude-code-guide` | Claude Code 使用指南 | 只读 | — |
-| **Statusline Setup** | `statusline-setup` | 终端状态栏配置 | 有限 | — |
+| **General Purpose** | `general-purpose` | 預設子 Agent | 全部工具 | 主執行緒模型 |
+| **Explore** | `Explore` | 程式碼搜索專家 | 只讀（無 Write/Edit） | haiku（外部） |
+| **Plan** | `Plan` | 規劃專家 | 只讀 + ExitPlanMode | inherit |
+| **Verification** | `verification` | 結果驗證 | 由 feature flag 控制 | — |
+| **Code Guide** | `claude-code-guide` | Claude Code 使用指南 | 只讀 | — |
+| **Statusline Setup** | `statusline-setup` | 終端狀態欄設定 | 有限 | — |
 
-SDK 入口（`sdk-ts`/`sdk-py`/`sdk-cli`）不加载 Code Guide Agent。环境变量 `CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS` 可以完全禁用内置 Agent，给 SDK 用户提供空白画布。
+SDK 入口（`sdk-ts`/`sdk-py`/`sdk-cli`）不加載 Code Guide Agent。環境變量 `CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS` 可以完全禁用內置 Agent，給 SDK 用戶提供空白畫布。
 
-## Agent Memory：持久化的 Agent 状态
+## Agent Memory：持久化的 Agent 狀態
 
-当 `memory` 字段启用时，Agent 获得跨会话的持久记忆：
+當 `memory` 字段啓用時，Agent 獲得跨會話的持久記憶：
 
-- **`local`**：当前项目、当前用户有效
-- **`project`**：当前项目所有用户共享
-- **`user`**：所有项目共享
+- **`local`**：當前專案、當前用戶有效
+- **`project`**：當前專案所有用戶共享
+- **`user`**：所有專案共享
 
-Memory 通过 `loadAgentMemoryPrompt()` 注入到 system prompt 末尾，包含读写记忆的指令。Agent Memory Snapshot 机制在项目间同步 `user` 级记忆。
+Memory 通過 `loadAgentMemoryPrompt()` 注入到 system prompt 末尾，包含讀寫記憶的指令。Agent Memory Snapshot 機制在專案間同步 `user` 級記憶。

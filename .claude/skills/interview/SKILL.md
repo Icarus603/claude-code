@@ -8,5 +8,5 @@ Be very in-depth and continue interviewing me continually until it's complete, t
 
 Rules:
 
-- Every question MUST have a recommended option: place it first in options, append "(推荐)" to its label, and start its description with the recommendation reason.
+- Every question MUST have a recommended option: place it first in options, append "(推薦)" to its label, and start its description with the recommendation reason.
 - All user-facing text (question, header, label, description) MUST be in Chinese.

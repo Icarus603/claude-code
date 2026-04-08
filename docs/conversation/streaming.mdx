@@ -1,83 +1,83 @@
 ---
-title: "流式响应机制 - Claude Code 打字机效果原理"
-description: "解析 Claude Code 流式响应实现：如何通过 SSE 逐 token 接收 AI 输出，实现实时打字机效果，提升用户等待体验。"
-keywords: ["流式响应", "SSE", "streaming", "实时输出", "API streaming"]
+title: "流式響應機制 - Claude Code 打字機效果原理"
+description: "解析 Claude Code 流式響應實現：如何通過 SSE 逐 token 接收 AI 輸出，實現實時打字機效果，提升用戶等待體驗。"
+keywords: ["流式響應", "SSE", "streaming", "實時輸出", "API streaming"]
 ---
 
-## 为什么需要流式
+## 爲什麼需要流式
 
-想象 AI 需要 30 秒才能生成完整回答——如果等 30 秒后才一次性显示，用户体验是灾难性的。
+想象 AI 需要 30 秒才能生成完整回答——如果等 30 秒後才一次性顯示，用戶體驗是災難性的。
 
-流式响应让用户**实时看到 AI 的思考过程**：
-- 文字逐字出现，用户能提前判断方向是否正确
-- 工具调用的参数在生成过程中就能预览
-- 长时间任务不会让用户觉得"卡死了"
+流式響應讓用戶**實時看到 AI 的思考過程**：
+- 文字逐字出現，用戶能提前判斷方向是否正確
+- 工具呼叫的參數在生成過程中就能預覽
+- 長時間任務不會讓用戶覺得"卡死了"
 
-## `BetaRawMessageStreamEvent` 核心事件类型
+## `BetaRawMessageStreamEvent` 核心事件類型
 
-流式 API 返回的是一系列 `BetaRawMessageStreamEvent`，每种事件类型对应流式响应的不同阶段（`src/services/api/claude.ts`）：
+流式 API 返回的是一系列 `BetaRawMessageStreamEvent`，每種事件類型對應流式響應的不同階段（`src/services/api/claude.ts`）：
 
 ```
-message_start           ← 消息开始，包含 model、usage 初始值
-  ├── content_block_start   ← 内容块开始（text / tool_use / thinking）
-  │   ├── content_block_delta  ← 增量数据（text_delta / input_json_delta / thinking_delta）
-  │   ├── content_block_delta  ← ... 持续到达
-  │   └── content_block_stop   ← 内容块结束，yield AssistantMessage
-  ├── content_block_start   ← 下一个内容块...
+message_start           ← 訊息開始，包含 model、usage 初始值
+  ├── content_block_start   ← 內容塊開始（text / tool_use / thinking）
+  │   ├── content_block_delta  ← 增量資料（text_delta / input_json_delta / thinking_delta）
+  │   ├── content_block_delta  ← ... 持續到達
+  │   └── content_block_stop   ← 內容塊結束，yield AssistantMessage
+  ├── content_block_start   ← 下一個內容塊...
   │   └── ...
-  └── message_delta       ← stop_reason + 最终 usage
-message_stop            ← 消息结束
+  └── message_delta       ← stop_reason + 最終 usage
+message_stop            ← 訊息結束
 ```
 
-### 事件处理状态机
+### 事件處理狀態機
 
-`src/services/api/claude.ts:1980-2298` 实现了一个基于 `switch(part.type)` 的状态机：
+`src/services/api/claude.ts:1980-2298` 實現了一個基於 `switch(part.type)` 的狀態機：
 
-| 事件类型 | 处理逻辑 | 状态变更 |
+| 事件類型 | 處理邏輯 | 狀態變更 |
 |----------|----------|----------|
-| `message_start` | 初始化 `partialMessage`，记录 TTFT（首字节延迟） | `usage` 初始化 |
-| `content_block_start` | 按 `part.index` 创建对应类型的内容块 | `contentBlocks[index]` 初始化 |
-| `content_block_delta` | 按子类型增量追加数据 | text / thinking / input 累加 |
-| `content_block_stop` | 构建完整 `AssistantMessage` 并 yield | 消息推入 `newMessages` |
-| `message_delta` | 更新 stop_reason 和最终 usage | 写回最后一条消息 |
-| `message_stop` | 无操作（流结束标记） | — |
+| `message_start` | 初始化 `partialMessage`，記錄 TTFT（首字節延遲） | `usage` 初始化 |
+| `content_block_start` | 按 `part.index` 建立對應類型的內容塊 | `contentBlocks[index]` 初始化 |
+| `content_block_delta` | 按子類型增量追加資料 | text / thinking / input 累加 |
+| `content_block_stop` | 構建完整 `AssistantMessage` 並 yield | 訊息推入 `newMessages` |
+| `message_delta` | 更新 stop_reason 和最終 usage | 寫回最後一條訊息 |
+| `message_stop` | 無操作（流結束標記） | — |
 
-### 内容块类型及其增量数据
+### 內容塊類型及其增量資料
 
-`content_block_start` 中的 `content_block.type` 决定了如何处理后续 delta：
+`content_block_start` 中的 `content_block.type` 決定了如何處理後續 delta：
 
-| 内容块类型 | Delta 类型 | 累加逻辑 |
+| 內容塊類型 | Delta 類型 | 累加邏輯 |
 |-----------|-----------|----------|
 | `text` | `text_delta` | `text += delta.text` |
 | `thinking` | `thinking_delta` + `signature_delta` | `thinking += delta.thinking`，`signature = delta.signature` |
 | `tool_use` | `input_json_delta` | `input += delta.partial_json`（JSON 字符串增量拼接） |
 | `server_tool_use` | `input_json_delta` | 同 tool_use |
-| `connector_text` | `connector_text_delta` | 特殊连接器文本（feature flag 控制） |
+| `connector_text` | `connector_text_delta` | 特殊連接器文本（feature flag 控制） |
 
-关键设计：`content_block_start` 时所有文本字段初始化为空字符串，只通过 `content_block_delta` 累加。这是因为 SDK 有时在 start 和 delta 中重复发送相同文本。
+關鍵設計：`content_block_start` 時所有文本字段初始化爲空字符串，只通過 `content_block_delta` 累加。這是因爲 SDK 有時在 start 和 delta 中重複發送相同文本。
 
-## 文本 chunk 和 tool_use block 的交织
+## 文本 chunk 和 tool_use block 的交織
 
-一次 AI 响应可能包含多个内容块，交替出现：
+一次 AI 響應可能包含多個內容塊，交替出現：
 
 ```
-content_block_start (text, index=0)     "我来帮你修复这个 bug。"
+content_block_start (text, index=0)     "我來幫你修復這個 bug。"
 content_block_delta  (text_delta)       "首先..."
 content_block_stop  (index=0)
 content_block_start (tool_use, index=1) { name: "Read", input: "..." }
 content_block_delta  (input_json_delta) '{"file_p' → 'ath":' → '"src/foo.ts"}'
 content_block_stop  (index=1)
-content_block_start (text, index=2)     "我已经看到了问题所在..."
+content_block_start (text, index=2)     "我已經看到了問題所在..."
 content_block_stop  (index=2)
 ```
 
-每个 `content_block_stop` 触发一次 `yield`，将完整的 AssistantMessage 推送给消费者。这意味着一个 AI 响应会产生**多条** `AssistantMessage`——文本消息和工具调用消息交替产出。
+每個 `content_block_stop` 觸發一次 `yield`，將完整的 AssistantMessage 推送給消費者。這意味着一個 AI 響應會產生**多條** `AssistantMessage`——文本訊息和工具呼叫訊息交替產出。
 
-`stop_reason` 要等到 `message_delta` 才确定（可能是 `end_turn`、`tool_use`、`max_tokens` 等），所以最后一条消息的 `stop_reason` 是**回写**的：
+`stop_reason` 要等到 `message_delta` 才確定（可能是 `end_turn`、`tool_use`、`max_tokens` 等），所以最後一條訊息的 `stop_reason` 是**回寫**的：
 
 ```typescript
-// claude.ts:2246 — 直接属性修改，不用对象替换
-// 因为 transcript 写队列持有 message.message 的引用
+// claude.ts:2246 — 直接屬性修改，不用對象替換
+// 因爲 transcript 寫隊列持有 message.message 的引用
 const lastMsg = newMessages.at(-1)
 if (lastMsg) {
   lastMsg.message.usage = usage
@@ -85,37 +85,37 @@ if (lastMsg) {
 }
 ```
 
-## 流式中的错误处理
+## 流式中的錯誤處理
 
-### 网络断开
+### 網絡斷開
 
-流式连接依赖 SSE（Server-Sent Events）。当连接中断时：
+流式連接依賴 SSE（Server-Sent Events）。當連接中斷時：
 
-1. **Stream idle watchdog**：定时检测事件间隔，超过阈值（stall）触发告警和重试
-2. **Stream abort**：如果 watchdog 检测到长时间无事件，抛出错误进入重试流程
-3. **非流式降级**：作为最后手段，回退到非流式请求（一次性获取完整响应）
+1. **Stream idle watchdog**：定時檢測事件間隔，超過閾值（stall）觸發告警和重試
+2. **Stream abort**：如果 watchdog 檢測到長時間無事件，拋出錯誤進入重試流程
+3. **非流式降級**：作爲最後手段，回退到非流式請求（一次性取得完整響應）
 
 ```typescript
-// claude.ts:2338-2355 — 检测空流
-// 1. 完全没有事件 → 代理返回了非 SSE 响应
-// 2. 有 message_start 但没有 content_block_stop → 流被截断
+// claude.ts:2338-2355 — 檢測空流
+// 1. 完全沒有事件 → 代理返回了非 SSE 響應
+// 2. 有 message_start 但沒有 content_block_stop → 流被截斷
 ```
 
 ### API 限流
 
-当 API 返回限流错误时，系统使用 `withRetry` 包装器进行指数退避重试。重试逻辑考虑了：
-- 错误类型（429 限流 vs 500 服务器错误）
-- 重试次数上限
-- 退避间隔
+當 API 返回限流錯誤時，系統使用 `withRetry` 包裝器進行指數退避重試。重試邏輯考慮了：
+- 錯誤類型（429 限流 vs 500 服務器錯誤）
+- 重試次數上限
+- 退避間隔
 
 ### Token 超限
 
-两种 token 超限场景有不同的处理：
+兩種 token 超限場景有不同的處理：
 
-| 场景 | stop_reason | 处理方式 |
+| 場景 | stop_reason | 處理方式 |
 |------|------------|----------|
-| **输出超限** | `max_tokens` | 生成错误消息，建议设置 `CLAUDE_CODE_MAX_OUTPUT_TOKENS` |
-| **上下文窗口超限** | `model_context_window_exceeded` | 触发 compaction 压缩对话历史后重试 |
+| **輸出超限** | `max_tokens` | 生成錯誤訊息，建議設置 `CLAUDE_CODE_MAX_OUTPUT_TOKENS` |
+| **上下文窗口超限** | `model_context_window_exceeded` | 觸發 compaction 壓縮對話歷史後重試 |
 
 ```typescript
 // claude.ts:2267-2293
@@ -123,18 +123,18 @@ if (stopReason === 'max_tokens') {
   yield createAssistantAPIErrorMessage({ error: 'max_output_tokens', ... })
 }
 if (stopReason === 'model_context_window_exceeded') {
-  // 复用 max_output_tokens 的恢复路径
+  // 複用 max_output_tokens 的恢復路徑
   yield createAssistantAPIErrorMessage({ error: 'max_output_tokens', ... })
 }
 ```
 
-### 流式停滞检测
+### 流式停滯檢測
 
-系统持续监控事件到达间隔，检测"停滞"（stall）：
+系統持續監控事件到達間隔，檢測"停滯"（stall）：
 
 ```typescript
 // claude.ts:1940-1966
-const STALL_THRESHOLD_MS = 10_000  // 10 秒无事件视为停滞
+const STALL_THRESHOLD_MS = 10_000  // 10 秒無事件視爲停滯
 if (timeSinceLastEvent > STALL_THRESHOLD_MS) {
   stallCount++
   totalStallTime += timeSinceLastEvent
@@ -142,42 +142,42 @@ if (timeSinceLastEvent > STALL_THRESHOLD_MS) {
 }
 ```
 
-多个 stall 累积后，watchdog 可能决定中断流并触发重试。
+多個 stall 累積後，watchdog 可能決定中斷流並觸發重試。
 
-## 工具执行的流式反馈
+## 工具執行的流式反饋
 
-BashTool 的命令执行也是流式的——通过 `onProgress` 回调逐行推送输出：
+BashTool 的命令執行也是流式的——通過 `onProgress` 回調逐行推送輸出：
 
 ```
 BashTool.call() → runShellCommand() → AsyncGenerator
-  ├── 每秒轮询输出文件 → onProgress(lastLines, allLines, ...)
+  ├── 每秒輪詢輸出文件 → onProgress(lastLines, allLines, ...)
   ├── yield { type: 'progress', output, fullOutput, elapsedTimeSeconds }
   └── return { code, stdout, interrupted, ... }
 ```
 
-UI 层通过 `useToolCallProgress` hook 实时展示命令输出，而不是等命令完全结束。长时间运行的命令还支持自动后台化（`shouldAutoBackground`）。
+UI 層通過 `useToolCallProgress` hook 實時展示命令輸出，而不是等命令完全結束。長時間執行的命令還支援自動後臺化（`shouldAutoBackground`）。
 
-## 多 Provider 适配
+## 多 Provider 適配
 
-| Provider | 流式协议 | 特殊处理 |
+| Provider | 流式協議 | 特殊處理 |
 |----------|----------|----------|
-| **Anthropic Direct** | 原生 SSE | 延迟最低，TTFT 最快 |
-| **AWS Bedrock** | AWS SDK 流式接口 | 需要额外的 beta header 和认证 |
-| **Google Vertex** | gRPC → 事件流 | 通过 `getMergedBetas()` 适配 |
-| **Azure** | Anthropic 兼容 API | 自定义 base URL |
+| **Anthropic Direct** | 原生 SSE | 延遲最低，TTFT 最快 |
+| **AWS Bedrock** | AWS SDK 流式介面 | 需要額外的 beta header 和認證 |
+| **Google Vertex** | gRPC → 事件流 | 通過 `getMergedBetas()` 適配 |
+| **Azure** | Anthropic 相容 API | 自定義 base URL |
 
-所有 Provider 通过统一的 `Stream<BetaRawMessageStreamEvent>` 抽象层屏蔽差异。上层代码（QueryEngine、REPL）不需要关心底层用的是哪个 Provider。
+所有 Provider 通過統一的 `Stream<BetaRawMessageStreamEvent>` 抽象層屏蔽差異。上層程式碼（QueryEngine、REPL）不需要關心底層用的是哪個 Provider。
 
-### Provider 选择
+### Provider 選擇
 
-`src/utils/model/providers.ts` 中的 `getAPIProvider()` 根据配置决定使用哪个 Provider：
+`src/utils/model/providers.ts` 中的 `getAPIProvider()` 根據設定決定使用哪個 Provider：
 
 ```typescript
-// 根据 api_provider 配置选择：
-// "anthropic" → 直连
+// 根據 api_provider 設定選擇：
+// "anthropic" → 直連
 // "bedrock"   → AWS SDK
 // "vertex"    → Google SDK
-// 第三方 base URL → 自动检测
+// 第三方 base URL → 自動檢測
 ```
 
-每个 Provider 需要适配的细节包括：认证方式、beta header、请求参数格式、错误码映射——但这些差异在 `claude.ts` 的 `queryStream()` 函数中被统一处理。
+每個 Provider 需要適配的細節包括：認證方式、beta header、請求參數格式、錯誤碼映射——但這些差異在 `claude.ts` 的 `queryStream()` 函數中被統一處理。

@@ -1,109 +1,109 @@
-# PROACTIVE — 主动模式
+# PROACTIVE — 主動模式
 
-> Feature Flag: `FEATURE_PROACTIVE=1`（与 `FEATURE_KAIROS=1` 共享功能）
-> 实现状态：核心模块全部 Stub，布线完整
-> 引用数：37
+> Feature Flag: `FEATURE_PROACTIVE=1`（與 `FEATURE_KAIROS=1` 共享功能）
+> 實現狀態：核心模組全部 Stub，佈線完整
+> 引用數：37
 
 ## 一、功能概述
 
-PROACTIVE 实现 Tick 驱动的自主代理。CLI 在用户不输入时也能持续工作：定时唤醒执行任务，配合 SleepTool 控制节奏。适用于长时间运行的后台任务（等待 CI、监控文件变化、定时检查等）。
+PROACTIVE 實現 Tick 驅動的自主代理。CLI 在用戶不輸入時也能持續工作：定時喚醒執行任務，配合 SleepTool 控制節奏。適用於長時間執行的後臺任務（等待 CI、監控文件變化、定時檢查等）。
 
-### 与 KAIROS 的关系
+### 與 KAIROS 的關係
 
-所有代码检查都是 `feature('PROACTIVE') || feature('KAIROS')`，即：
-- 单独开 `FEATURE_PROACTIVE=1` → 获得 proactive 能力
-- 单独开 `FEATURE_KAIROS=1` → 自动获得 proactive 能力
-- 两者都开 → 相同效果（不重复）
+所有程式碼檢查都是 `feature('PROACTIVE') || feature('KAIROS')`，即：
+- 單獨開 `FEATURE_PROACTIVE=1` → 獲得 proactive 能力
+- 單獨開 `FEATURE_KAIROS=1` → 自動獲得 proactive 能力
+- 兩者都開 → 相同效果（不重複）
 
-## 二、实现架构
+## 二、實現架構
 
-### 2.1 模块状态
+### 2.1 模組狀態
 
-| 模块 | 文件 | 状态 | 说明 |
+| 模組 | 文件 | 狀態 | 說明 |
 |------|------|------|------|
-| 核心逻辑 | `src/proactive/index.ts` | **Stub** | `activateProactive()`、`deactivateProactive()`、`isProactiveActive() => false` |
-| SleepTool 提示 | `src/tools/SleepTool/prompt.ts` | **完整** | 工具提示定义（工具名：`Sleep`） |
-| 命令注册 | `src/commands.ts:62-65` | **布线** | 动态加载 `./commands/proactive.js` |
-| 工具注册 | `src/tools.ts:26-28` | **布线** | SleepTool 动态加载 |
-| REPL 集成 | `src/screens/REPL.tsx` | **布线** | tick 驱动逻辑、占位符、页脚 UI |
-| 系统提示 | `src/constants/prompts.ts:860-914` | **完整** | 自主工作行为指令（~55 行详细 prompt） |
-| 会话存储 | `src/utils/sessionStorage.ts:4892-4912` | **布线** | tick 消息注入对话流 |
+| 核心邏輯 | `src/proactive/index.ts` | **Stub** | `activateProactive()`、`deactivateProactive()`、`isProactiveActive() => false` |
+| SleepTool 提示 | `src/tools/SleepTool/prompt.ts` | **完整** | 工具提示定義（工具名：`Sleep`） |
+| 命令註冊 | `src/commands.ts:62-65` | **佈線** | 動態加載 `./commands/proactive.js` |
+| 工具註冊 | `src/tools.ts:26-28` | **佈線** | SleepTool 動態加載 |
+| REPL 集成 | `src/screens/REPL.tsx` | **佈線** | tick 驅動邏輯、佔位符、頁腳 UI |
+| 系統提示 | `src/constants/prompts.ts:860-914` | **完整** | 自主工作行爲指令（~55 行詳細 prompt） |
+| 會話存儲 | `src/utils/sessionStorage.ts:4892-4912` | **佈線** | tick 訊息注入對話流 |
 
-### 2.2 系统提示内容
+### 2.2 系統提示內容
 
 `getProactiveSection()` 注入的自主工作指令包含：
 
-| 章节 | 内容 |
+| 章節 | 內容 |
 |------|------|
-| Tick 驱动 | `<tick_tag>` prompt 保持存活，包含用户本地时间 |
-| 节奏控制 | SleepTool 控制等待间隔，prompt cache 5 分钟过期 |
-| 空操作规则 | 无事可做时**必须**调用 Sleep，禁止输出 "still waiting" |
-| 首次唤醒 | 简短问候，等待方向（不主动探索） |
-| 后续唤醒 | 寻找有用工作：调查、验证、检查（不 spam 用户） |
-| 偏向行动 | 读文件、搜索代码、commit — 不需询问 |
-| 终端焦点 | `terminalFocus` 字段调节自主程度 |
+| Tick 驅動 | `<tick_tag>` prompt 保持存活，包含用戶本地時間 |
+| 節奏控制 | SleepTool 控制等待間隔，prompt cache 5 分鐘過期 |
+| 空操作規則 | 無事可做時**必須**呼叫 Sleep，禁止輸出 "still waiting" |
+| 首次喚醒 | 簡短問候，等待方向（不主動探索） |
+| 後續喚醒 | 尋找有用工作：調查、驗證、檢查（不 spam 用戶） |
+| 偏向行動 | 讀文件、搜索程式碼、commit — 不需詢問 |
+| 終端焦點 | `terminalFocus` 字段調節自主程度 |
 
-### 2.3 数据流
+### 2.3 資料流
 
 ```
-activateProactive() [需要实现]
+activateProactive() [需要實現]
       │
       ▼
-Tick 调度器启动
+Tick 調度器啓動
       │
-      ├── 定时生成 <tick_tag> 消息
-      │   ├── 包含用户当前本地时间
-      │   └── 注入到对话流（sessionStorage）
-      │
-      ▼
-模型处理 tick
-      │
-      ├── 有事可做 → 使用工具执行 → 可能再次 Sleep
-      └── 无事可做 → 必须调用 SleepTool
+      ├── 定時生成 <tick_tag> 訊息
+      │   ├── 包含用戶當前本地時間
+      │   └── 注入到對話流（sessionStorage）
       │
       ▼
-SleepTool 等待 [需要实现]
+模型處理 tick
+      │
+      ├── 有事可做 → 使用工具執行 → 可能再次 Sleep
+      └── 無事可做 → 必須呼叫 SleepTool
       │
       ▼
-下一个 tick 到达
+SleepTool 等待 [需要實現]
+      │
+      ▼
+下一個 tick 到達
 ```
 
-## 三、需要补全的内容
+## 三、需要補全的內容
 
-| 优先级 | 模块 | 工作量 | 说明 |
+| 優先級 | 模組 | 工作量 | 說明 |
 |--------|------|--------|------|
-| 1 | `src/proactive/index.ts` | 中 | Tick 调度器、activate/deactivate 状态机、pause/resume |
-| 2 | `src/tools/SleepTool/SleepTool.ts` | 小 | 工具执行（等待指定时间后触发 tick） |
-| 3 | `src/commands/proactive.js` | 小 | `/proactive` 斜杠命令处理器 |
+| 1 | `src/proactive/index.ts` | 中 | Tick 調度器、activate/deactivate 狀態機、pause/resume |
+| 2 | `src/tools/SleepTool/SleepTool.ts` | 小 | 工具執行（等待指定時間後觸發 tick） |
+| 3 | `src/commands/proactive.js` | 小 | `/proactive` 斜槓命令處理器 |
 | 4 | `src/hooks/useProactive.ts` | 中 | React hook（REPL 引用但不存在） |
 
-## 四、关键设计决策
+## 四、關鍵設計決策
 
-1. **Tick 驱动**：模型通过 SleepTool 自行控制唤醒频率，不是外部事件推送
-2. **空操作必须 Sleep**：防止 "still waiting" 类空消息浪费 turn 和 token
-3. **Prompt cache 考量**：SleepTool 提示中提到 cache 5 分钟过期，建议平衡等待时间
-4. **Terminal Focus 感知**：模型根据用户是否在看终端调整自主程度
+1. **Tick 驅動**：模型通過 SleepTool 自行控制喚醒頻率，不是外部事件推送
+2. **空操作必須 Sleep**：防止 "still waiting" 類空訊息浪費 turn 和 token
+3. **Prompt cache 考量**：SleepTool 提示中提到 cache 5 分鐘過期，建議平衡等待時間
+4. **Terminal Focus 感知**：模型根據用戶是否在看終端調整自主程度
 
 ## 五、使用方式
 
 ```bash
-# 单独启用 proactive
+# 單獨啓用 proactive
 FEATURE_PROACTIVE=1 bun run dev
 
-# 通过 KAIROS 间接启用
+# 通過 KAIROS 間接啓用
 FEATURE_KAIROS=1 bun run dev
 
-# 组合使用
+# 組合使用
 FEATURE_PROACTIVE=1 FEATURE_KAIROS=1 FEATURE_KAIROS_BRIEF=1 bun run dev
 ```
 
-## 六、文件索引
+## 六、檔案索引
 
-| 文件 | 职责 |
+| 文件 | 職責 |
 |------|------|
-| `src/proactive/index.ts` | 核心逻辑（stub） |
+| `src/proactive/index.ts` | 核心邏輯（stub） |
 | `src/tools/SleepTool/prompt.ts` | SleepTool 工具提示 |
-| `src/constants/prompts.ts:860-914` | 自主工作系统提示 |
+| `src/constants/prompts.ts:860-914` | 自主工作系統提示 |
 | `src/screens/REPL.tsx` | REPL tick 集成 |
-| `src/utils/sessionStorage.ts:4892-4912` | Tick 消息注入 |
-| `src/components/PromptInput/PromptInputFooterLeftSide.tsx` | 页脚 UI 状态 |
+| `src/utils/sessionStorage.ts:4892-4912` | Tick 訊息注入 |
+| `src/components/PromptInput/PromptInputFooterLeftSide.tsx` | 頁腳 UI 狀態 |

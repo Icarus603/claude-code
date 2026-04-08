@@ -1,49 +1,49 @@
-# TEAMMEM — 团队共享记忆
+# TEAMMEM — 團隊共享記憶
 
 > Feature Flag: `FEATURE_TEAMMEM=1`
-> 实现状态：完整可用（需要 Anthropic OAuth + GitHub remote）
-> 引用数：51
+> 實現狀態：完整可用（需要 Anthropic OAuth + GitHub remote）
+> 引用數：51
 
 ## 一、功能概述
 
-TEAMMEM 实现基于 GitHub 仓库的团队共享记忆系统。`memory/team/` 目录中的文件双向同步到 Anthropic 服务器，团队所有认证成员可共享项目知识。
+TEAMMEM 實現基於 GitHub 倉庫的團隊共享記憶系統。`memory/team/` 目錄中的文件雙向同步到 Anthropic 服務器，團隊所有認證成員可共享專案知識。
 
 ### 核心特性
 
-- **增量同步**：只上传内容哈希变化的文件（delta upload）
-- **冲突解决**：基于 ETag 的乐观锁 + 412 冲突重试
-- **密钥扫描**：上传前检测并跳过包含密钥的文件（PSR M22174）
-- **路径穿越防护**：所有写入路径验证在 `memory/team/` 边界内
-- **分批上传**：自动拆分超过 200KB 的 PUT 请求避免网关拒绝
+- **增量同步**：只上傳內容哈希變化的文件（delta upload）
+- **衝突解決**：基於 ETag 的樂觀鎖 + 412 衝突重試
+- **密鑰掃描**：上傳前檢測並跳過包含密鑰的文件（PSR M22174）
+- **路徑穿越防護**：所有寫入路徑驗證在 `memory/team/` 邊界內
+- **分批上傳**：自動拆分超過 200KB 的 PUT 請求避免網關拒絕
 
-## 二、用户交互
+## 二、用戶交互
 
-### 同步行为
+### 同步行爲
 
-| 事件 | 行为 |
+| 事件 | 行爲 |
 |------|------|
-| 项目启动 | 自动 pull 团队记忆到 `memory/team/` |
-| 本地文件编辑 | watcher 检测变更，自动 push |
-| 服务端更新 | 下次 pull 时覆盖本地（server-wins） |
-| 密钥检测 | 跳过该文件，记录警告，不阻止其他文件同步 |
+| 專案啓動 | 自動 pull 團隊記憶到 `memory/team/` |
+| 本地檔案編輯 | watcher 檢測變更，自動 push |
+| 服務端更新 | 下次 pull 時覆蓋本地（server-wins） |
+| 密鑰檢測 | 跳過該文件，記錄警告，不阻止其他文件同步 |
 
-### API 端点
+### API 端點
 
 ```
-GET  /api/claude_code/team_memory?repo={owner/repo}             → 完整数据 + entryChecksums
-GET  /api/claude_code/team_memory?repo={owner/repo}&view=hashes → 仅 checksums（冲突解决用）
-PUT  /api/claude_code/team_memory?repo={owner/repo}             → 上传 entries（upsert 语义）
+GET  /api/claude_code/team_memory?repo={owner/repo}             → 完整資料 + entryChecksums
+GET  /api/claude_code/team_memory?repo={owner/repo}&view=hashes → 僅 checksums（衝突解決用）
+PUT  /api/claude_code/team_memory?repo={owner/repo}             → 上傳 entries（upsert 語義）
 ```
 
-## 三、实现架构
+## 三、實現架構
 
-### 3.1 同步状态
+### 3.1 同步狀態
 
 ```ts
 type SyncState = {
-  lastKnownChecksum: string | null    // ETag 条件请求
+  lastKnownChecksum: string | null    // ETag 條件請求
   serverChecksums: Map<string, string> // sha256:<hex> 逐文件哈希
-  serverMaxEntries: number | null      // 从 413 学习的服务端容量
+  serverMaxEntries: number | null      // 從 413 學習的服務端容量
 }
 ```
 
@@ -55,12 +55,12 @@ type SyncState = {
 pullTeamMemory(state)
       │
       ▼
-检查 OAuth + GitHub remote
+檢查 OAuth + GitHub remote
       │
       ▼
 fetchTeamMemory(state, repo, etag)
-  ├── 304 Not Modified → 返回（无变化）
-  ├── 404 → 返回（服务端无数据）
+  ├── 304 Not Modified → 返回（無變化）
+  ├── 404 → 返回（服務端無資料）
   └── 200 → 解析 TeamMemoryData
       │
       ▼
@@ -68,10 +68,10 @@ fetchTeamMemory(state, repo, etag)
       │
       ▼
 writeRemoteEntriesToLocal(entries)
-  ├── 路径穿越验证（validateTeamMemKey）
-  ├── 文件大小检查（> 250KB 跳过）
-  ├── 内容比较（相同则跳过写入）
-  └── 并行写入（Promise.all）
+  ├── 路徑穿越驗證（validateTeamMemKey）
+  ├── 檔案大小檢查（> 250KB 跳過）
+  ├── 內容比較（相同則跳過寫入）
+  └── 並行寫入（Promise.all）
 ```
 
 ### 3.3 Push 流程（Local → Server）
@@ -83,85 +83,85 @@ pushTeamMemory(state)
       │
       ▼
 readLocalTeamMemory(maxEntries)
-  ├── 递归扫描 memory/team/ 目录
-  ├── 跳过超大文件（> 250KB）
-  ├── 密钥扫描（scanForSecrets，gitleaks 规则）
-  └── 按 serverMaxEntries 截断（如果已知）
+  ├── 遞歸掃描 memory/team/ 目錄
+  ├── 跳過超大文件（> 250KB）
+  ├── 密鑰掃描（scanForSecrets，gitleaks 規則）
+  └── 按 serverMaxEntries 截斷（如果已知）
       │
       ▼
-计算 delta = 本地文件 - serverChecksums
+計算 delta = 本地文件 - serverChecksums
   （只包含哈希不同的文件）
       │
       ▼
 batchDeltaByBytes(delta)
-  （拆分为 ≤200KB 的批次）
+  （拆分爲 ≤200KB 的批次）
       │
       ▼
 逐批 uploadTeamMemory(state, repo, batch, etag)
   ├── 200 成功 → 更新 serverChecksums
-  ├── 412 冲突 → fetchTeamMemoryHashes() 刷新 checksums
-  │              → 重试 delta 计算（最多 2 次）
-  └── 413 超容量 → 学习 serverMaxEntries
+  ├── 412 衝突 → fetchTeamMemoryHashes() 刷新 checksums
+  │              → 重試 delta 計算（最多 2 次）
+  └── 413 超容量 → 學習 serverMaxEntries
 ```
 
-### 3.4 密钥扫描
+### 3.4 密鑰掃描
 
 文件：`src/services/teamMemorySync/secretScanner.ts`
 
-使用 gitleaks 规则模式扫描文件内容。检测到密钥时：
-- 跳过该文件（不上传）
-- 记录 `tengu_team_mem_secret_skipped` 事件（仅记录规则 ID，不记录值）
+使用 gitleaks 規則模式掃描檔案內容。檢測到密鑰時：
+- 跳過該文件（不上傳）
+- 記錄 `tengu_team_mem_secret_skipped` 事件（僅記錄規則 ID，不記錄值）
 - 不阻止其他文件同步
 
-### 3.5 文件监视
+### 3.5 文件監視
 
 文件：`src/services/teamMemorySync/watcher.ts`
 
-监视 `memory/team/` 目录变更，触发自动 push。抑制由 pull 写入引起的假变更。
+監視 `memory/team/` 目錄變更，觸發自動 push。抑制由 pull 寫入引起的假變更。
 
-### 3.6 路径安全
+### 3.6 路徑安全
 
 文件：`src/memdir/teamMemPaths.ts`
 
-- `validateTeamMemKey(relPath)` — 验证相对路径不超出 `memory/team/` 边界
-- `getTeamMemPath()` — 返回 team memory 根目录路径
+- `validateTeamMemKey(relPath)` — 驗證相對路徑不超出 `memory/team/` 邊界
+- `getTeamMemPath()` — 返回 team memory 根目錄路徑
 
-## 四、关键设计决策
+## 四、關鍵設計決策
 
-1. **Server-wins on pull, Local-wins on push**：pull 时服务端内容覆盖本地；push 时本地编辑覆盖服务端。本地用户正在编辑，不应被静默丢弃
-2. **Delta upload**：只上传哈希变化的条目，节省带宽。首次 push 为全量，后续增量
-3. **分批 PUT**：单次 PUT ≤200KB，避免 API 网关（~256-512KB）拒绝。每批独立 upsert，部分失败不影响已提交批次
-4. **密钥扫描在上传前**：PSR M22174 要求密钥永不离开本机。扫描在 `readLocalTeamMemory` 中执行，密钥文件不进入上传集
-5. **ETag 乐观锁**：push 使用 `If-Match` header。412 时 probe `?view=hashes`（只获取 checksums，不下载内容），刷新后重试
-6. **服务端容量动态学习**：不假设客户端容量上限，从 413 的 `extra_details.max_entries` 学习
+1. **Server-wins on pull, Local-wins on push**：pull 時服務端內容覆蓋本地；push 時本地編輯覆蓋服務端。本地用戶正在編輯，不應被靜默丟棄
+2. **Delta upload**：只上傳哈希變化的條目，節省帶寬。首次 push 爲全量，後續增量
+3. **分批 PUT**：單次 PUT ≤200KB，避免 API 網關（~256-512KB）拒絕。每批獨立 upsert，部分失敗不影響已提交批次
+4. **密鑰掃描在上傳前**：PSR M22174 要求密鑰永不離開本機。掃描在 `readLocalTeamMemory` 中執行，密鑰文件不進入上傳集
+5. **ETag 樂觀鎖**：push 使用 `If-Match` header。412 時 probe `?view=hashes`（只取得 checksums，不下載內容），刷新後重試
+6. **服務端容量動態學習**：不假設客戶端容量上限，從 413 的 `extra_details.max_entries` 學習
 
 ## 五、使用方式
 
 ```bash
-# 启用 feature
+# 啓用 feature
 FEATURE_TEAMMEM=1 bun run dev
 
-# 前提条件：
-# 1. 已通过 Anthropic OAuth 登录
-# 2. 项目有 GitHub remote（git remote -v 显示 origin）
-# 3. memory/team/ 目录自动创建
+# 前提條件：
+# 1. 已通過 Anthropic OAuth 登錄
+# 2. 專案有 GitHub remote（git remote -v 顯示 origin）
+# 3. memory/team/ 目錄自動建立
 ```
 
-## 六、外部依赖
+## 六、外部依賴
 
-| 依赖 | 说明 |
+| 依賴 | 說明 |
 |------|------|
-| Anthropic OAuth | first-party 认证 |
-| GitHub Remote | `getGithubRepo()` 获取 `owner/repo` 作为同步 scope |
-| Team Memory API | `/api/claude_code/team_memory` 端点 |
+| Anthropic OAuth | first-party 認證 |
+| GitHub Remote | `getGithubRepo()` 取得 `owner/repo` 作爲同步 scope |
+| Team Memory API | `/api/claude_code/team_memory` 端點 |
 
-## 七、文件索引
+## 七、檔案索引
 
-| 文件 | 行数 | 职责 |
+| 文件 | 行數 | 職責 |
 |------|------|------|
-| `src/services/teamMemorySync/index.ts` | 1257 | 核心同步逻辑（pull/push/sync） |
-| `src/services/teamMemorySync/watcher.ts` | — | 文件监视 + 自动同步触发 |
-| `src/services/teamMemorySync/secretScanner.ts` | — | gitleaks 密钥扫描 |
-| `src/services/teamMemorySync/types.ts` | — | Zod schema + 类型定义 |
-| `src/services/teamMemorySync/teamMemSecretGuard.ts` | — | 密钥防护辅助 |
-| `src/memdir/teamMemPaths.ts` | — | 路径验证 + 目录管理 |
+| `src/services/teamMemorySync/index.ts` | 1257 | 核心同步邏輯（pull/push/sync） |
+| `src/services/teamMemorySync/watcher.ts` | — | 文件監視 + 自動同步觸發 |
+| `src/services/teamMemorySync/secretScanner.ts` | — | gitleaks 密鑰掃描 |
+| `src/services/teamMemorySync/types.ts` | — | Zod schema + 類型定義 |
+| `src/services/teamMemorySync/teamMemSecretGuard.ts` | — | 密鑰防護輔助 |
+| `src/memdir/teamMemPaths.ts` | — | 路徑驗證 + 目錄管理 |

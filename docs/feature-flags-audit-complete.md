@@ -1,36 +1,36 @@
-# Claude Code 编译时特性标志（Feature Flags）完整审计报告
+# Claude Code 編譯時特性標誌（Feature Flags）完整審計報告
 
-> 审计日期: 2026-04-05
-> 代码库: Claude Code CLI
-> 总计特性标志数: 92 个
-> 编译时门控机制: `feature('FLAG_NAME')` — 来自 `bun:bundle` 的编译时常量
-> 运行时门控机制: `USER_TYPE` 环境变量 + GrowthBook 远程开关（`tengu_*` 前缀）
-
----
-
-## 门控机制概述
-
-Claude Code 使用三层门控系统:
-
-1. **编译时标志** (`feature('...')` from `bun:bundle`): 在构建时决定代码是否包含在最终产物中。当 `feature('X')` 为 `false` 时，Bun 的死代码消除（DCE）会移除整个 `if` 分支，最终产物中完全不包含该功能的代码。
-2. **运行时用户类型** (`USER_TYPE`): 通过环境变量区分用户类型（如 `internal`, `external`, `enterprise`），在运行时决定功能是否可用。
-3. **远程开关** (GrowthBook SDK, `tengu_*` 前缀): 通过 Anthropic 的 GrowthBook 实例进行远程 A/B 测试和功能开关控制，可在不重新部署的情况下开启/关闭功能。
-
-本文档审计的是第一层——编译时标志。所有 92 个标志均以 `feature('FLAG_NAME')` 的形式出现在源代码中。
+> 審計日期: 2026-04-05
+> 程式碼庫: Claude Code CLI
+> 總計特性標誌數: 92 個
+> 編譯時門控機制: `feature('FLAG_NAME')` — 來自 `bun:bundle` 的編譯時常量
+> 執行時門控機制: `USER_TYPE` 環境變量 + GrowthBook 遠程開關（`tengu_*` 前綴）
 
 ---
 
-## 分类标准
+## 門控機制概述
 
-- **COMPLETE（完整实现）**: 核心功能代码完整，所有引用文件存在且有实质性内容。只需在构建配置中将该标志设为 `true` 即可启用。
-- **PARTIAL（部分实现）**: 有实质性的功能代码，但存在缺失的文件（命令入口、组件等）或关键模块仅有空壳。启用后可能报错或功能不完整。
-- **STUB（纯桩/最小实现）**: 仅有 1-2 处引用，没有或几乎没有实际功能代码。代码只是为该标志预留了位置。
+Claude Code 使用三層門控系統:
+
+1. **編譯時標誌** (`feature('...')` from `bun:bundle`): 在構建時決定程式碼是否包含在最終產物中。當 `feature('X')` 爲 `false` 時，Bun 的死程式碼消除（DCE）會移除整個 `if` 分支，最終產物中完全不包含該功能的程式碼。
+2. **執行時用戶類型** (`USER_TYPE`): 通過環境變量區分用戶類型（如 `internal`, `external`, `enterprise`），在執行時決定功能是否可用。
+3. **遠程開關** (GrowthBook SDK, `tengu_*` 前綴): 通過 Anthropic 的 GrowthBook 實例進行遠程 A/B 測試和功能開關控制，可在不重新部署的情況下開啓/關閉功能。
+
+本文件審計的是第一層——編譯時標誌。所有 92 個標誌均以 `feature('FLAG_NAME')` 的形式出現在源程式碼中。
 
 ---
 
-## 统计摘要
+## 分類標準
 
-| 分类 | 数量 | 标志名称 |
+- **COMPLETE（完整實現）**: 核心功能程式碼完整，所有引用文件存在且有實質性內容。只需在構建設定中將該標誌設爲 `true` 即可啓用。
+- **PARTIAL（部分實現）**: 有實質性的功能程式碼，但存在缺失的文件（命令入口、組件等）或關鍵模組僅有空殼。啓用後可能報錯或功能不完整。
+- **STUB（純樁/最小實現）**: 僅有 1-2 處引用，沒有或幾乎沒有實際功能程式碼。程式碼只是爲該標誌預留了位置。
+
+---
+
+## 統計摘要
+
+| 分類 | 數量 | 標誌名稱 |
 |------|------|----------|
 | COMPLETE | 22 | BRIDGE_MODE, COORDINATOR_MODE, CONTEXT_COLLAPSE, VOICE_MODE, TEAMMEM, COMMIT_ATTRIBUTION, ULTRAPLAN, BASH_CLASSIFIER, TRANSCRIPT_CLASSIFIER, EXTRACT_MEMORIES, CACHED_MICROCOMPACT, TOKEN_BUDGET, AGENT_TRIGGERS, REACTIVE_COMPACT, KAIROS_BRIEF, CCR_REMOTE_SETUP, SHOT_STATS, BG_SESSIONS, PROACTIVE, CHICAGO_MCP, VERIFICATION_AGENT, PROMPT_CACHE_BREAK_DETECTION |
 | PARTIAL | 19 | KAIROS, BUDDY, MONITOR_TOOL, HISTORY_SNIP, WORKFLOW_SCRIPTS, UDS_INBOX, KAIROS_CHANNELS, FORK_SUBAGENT, EXPERIMENTAL_SKILL_SEARCH, WEB_BROWSER_TOOL, MCP_SKILLS, REVIEW_ARTIFACT, KAIROS_GITHUB_WEBHOOKS, CONNECTOR_TEXT, TEMPLATES, LODESTONE, HISTORY_PICKER, MESSAGE_ACTIONS, TERMINAL_PANEL |
@@ -38,778 +38,778 @@ Claude Code 使用三层门控系统:
 
 ---
 
-## 当前启用状态 (2026-04-05)
+## 當前啓用狀態 (2026-04-05)
 
-> 经 Codex CLI 独立复核验证，详见 `feature-flags-codex-review.md`
+> 經 Codex CLI 獨立複覈驗證，詳見 `feature-flags-codex-review.md`
 
-| 标志 | build.ts | dev.ts | 实际验证状态 | 备注 |
+| 標誌 | build.ts | dev.ts | 實際驗證狀態 | 備註 |
 |------|:--------:|:------:|:----------:|------|
-| AGENT_TRIGGERS_REMOTE | **ON** | **ON** | compile-only | 环境标记，原始即启用 |
-| CHICAGO_MCP | **ON** | **ON** | compile-only | Computer Use，原始即启用 |
-| VOICE_MODE | **ON** | **ON** | compile-only | 语音模式，原始即启用 |
-| SHOT_STATS | **ON** | **ON** | compile-only, 已验证 | 本轮新增，纯本地统计 |
-| PROMPT_CACHE_BREAK_DETECTION | **ON** | **ON** | compile-only, 已验证 | 本轮新增，内部诊断 |
-| TOKEN_BUDGET | **ON** | **ON** | compile-only, 已验证 | 本轮新增，支持 `+500k` 语法 |
-| BUDDY | off | **ON** | compile+GrowthBook | 仅 dev 模式 |
-| TRANSCRIPT_CLASSIFIER | off | **ON** | compile+GrowthBook | 仅 dev 模式 |
-| BRIDGE_MODE | off | **ON** | compile+remote | 仅 dev 模式，需 claude.ai 订阅 |
+| AGENT_TRIGGERS_REMOTE | **ON** | **ON** | compile-only | 環境標記，原始即啓用 |
+| CHICAGO_MCP | **ON** | **ON** | compile-only | Computer Use，原始即啓用 |
+| VOICE_MODE | **ON** | **ON** | compile-only | 語音模式，原始即啓用 |
+| SHOT_STATS | **ON** | **ON** | compile-only, 已驗證 | 本輪新增，純本地統計 |
+| PROMPT_CACHE_BREAK_DETECTION | **ON** | **ON** | compile-only, 已驗證 | 本輪新增，內部診斷 |
+| TOKEN_BUDGET | **ON** | **ON** | compile-only, 已驗證 | 本輪新增，支援 `+500k` 語法 |
+| BUDDY | off | **ON** | compile+GrowthBook | 僅 dev 模式 |
+| TRANSCRIPT_CLASSIFIER | off | **ON** | compile+GrowthBook | 僅 dev 模式 |
+| BRIDGE_MODE | off | **ON** | compile+remote | 僅 dev 模式，需 claude.ai 訂閱 |
 
 ---
 
-# 一、COMPLETE（完整实现）— 共 22 个
+# 一、COMPLETE（完整實現）— 共 22 個
 
-以下标志的功能代码完整，所有引用的文件均存在且有实质性内容。只需在构建配置中将对应标志设为 `true` 即可启用该功能。
+以下標誌的功能程式碼完整，所有引用的文件均存在且有實質性內容。只需在構建設定中將對應標誌設爲 `true` 即可啓用該功能。
 
 ---
 
 ## 1. BRIDGE_MODE `[dev: ON]`
 
-**编译时引用次数**: 29（单引号 28 + 双引号 1）
-**功能描述**: 远程桥接模式。允许 Claude Code CLI 通过 WebSocket 连接到远程服务端（如 claude.ai Web 端），实现远程控制、会话转发、权限代理、附件传输等功能。这是 Claude Code 最大的子系统之一。
-**分类**: COMPLETE
-**启用条件**: 将 `BRIDGE_MODE` 编译标志设为 `true`
+**編譯時引用次數**: 29（單引號 28 + 雙引號 1）
+**功能描述**: 遠程橋接模式。允許 Claude Code CLI 通過 WebSocket 連接到遠程服務端（如 claude.ai Web 端），實現遠程控制、會話轉發、權限代理、附件傳輸等功能。這是 Claude Code 最大的子系統之一。
+**分類**: COMPLETE
+**啓用條件**: 將 `BRIDGE_MODE` 編譯標誌設爲 `true`
 
-**核心实现文件（src/bridge/ 目录，共 32 个文件，12,619 行）**:
+**核心實現文件（src/bridge/ 目錄，共 32 個文件，12,619 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/bridge/bridgeMain.ts | 2,999 行 | 桥接主入口，管理整个远程桥接生命周期 |
-| src/bridge/replBridge.ts | 2,406 行 | REPL 桥接核心，处理消息路由和会话管理 |
-| src/bridge/remoteBridgeCore.ts | 1,008 行 | 远程桥接核心连接逻辑 |
-| src/bridge/initReplBridge.ts | 569 行 | REPL 桥接初始化 |
-| src/bridge/sessionRunner.ts | 550 行 | 会话运行器，管理远程会话执行 |
-| src/bridge/bridgeApi.ts | 539 行 | 桥接 API 封装 |
-| src/bridge/bridgeUI.ts | 530 行 | 桥接模式 UI 组件 |
-| src/bridge/bridgeMessaging.ts | 461 行 | 桥接消息协议 |
-| src/bridge/createSession.ts | 384 行 | 远程会话创建逻辑 |
-| src/bridge/replBridgeTransport.ts | 370 行 | REPL 桥接传输层 |
-| src/bridge/types.ts | 262 行 | 桥接相关类型定义 |
+| src/bridge/bridgeMain.ts | 2,999 行 | 橋接主入口，管理整個遠程橋接生命週期 |
+| src/bridge/replBridge.ts | 2,406 行 | REPL 橋接核心，處理訊息路由和會話管理 |
+| src/bridge/remoteBridgeCore.ts | 1,008 行 | 遠程橋接核心連接邏輯 |
+| src/bridge/initReplBridge.ts | 569 行 | REPL 橋接初始化 |
+| src/bridge/sessionRunner.ts | 550 行 | 會話執行器，管理遠程會話執行 |
+| src/bridge/bridgeApi.ts | 539 行 | 橋接 API 封裝 |
+| src/bridge/bridgeUI.ts | 530 行 | 橋接模式 UI 組件 |
+| src/bridge/bridgeMessaging.ts | 461 行 | 橋接訊息協議 |
+| src/bridge/createSession.ts | 384 行 | 遠程會話建立邏輯 |
+| src/bridge/replBridgeTransport.ts | 370 行 | REPL 橋接傳輸層 |
+| src/bridge/types.ts | 262 行 | 橋接相關類型定義 |
 | src/bridge/jwtUtils.ts | 256 行 | JWT 令牌工具 |
-| src/bridge/trustedDevice.ts | 210 行 | 可信设备管理 |
-| src/bridge/bridgePointer.ts | 210 行 | 桥接指针管理 |
-| src/bridge/bridgeEnabled.ts | 202 行 | 桥接模式启用检测 |
-| src/bridge/inboundAttachments.ts | 175 行 | 入站附件处理 |
-| src/bridge/envLessBridgeConfig.ts | 165 行 | 无环境变量桥接配置 |
-| src/bridge/bridgeStatusUtil.ts | 163 行 | 桥接状态工具 |
-| src/bridge/debugUtils.ts | 141 行 | 桥接调试工具 |
-| src/bridge/bridgeDebug.ts | 135 行 | 桥接调试模块 |
-| src/bridge/workSecret.ts | 127 行 | 工作密钥管理 |
-| src/bridge/pollConfig.ts | 110 行 | 轮询配置 |
-| src/bridge/pollConfigDefaults.ts | 82 行 | 轮询配置默认值 |
-| src/bridge/inboundMessages.ts | 80 行 | 入站消息处理 |
-| src/bridge/capacityWake.ts | 56 行 | 容量唤醒 |
-| src/bridge/sessionIdCompat.ts | 57 行 | 会话 ID 兼容层 |
-| src/bridge/codeSessionApi.ts | 168 行 | 代码会话 API |
-| src/bridge/bridgeConfig.ts | 48 行 | 桥接配置 |
-| src/bridge/bridgePermissionCallbacks.ts | 43 行 | 桥接权限回调 |
-| src/bridge/replBridgeHandle.ts | 36 行 | REPL 桥接句柄 |
-| src/bridge/flushGate.ts | 71 行 | 刷新门控 |
+| src/bridge/trustedDevice.ts | 210 行 | 可信設備管理 |
+| src/bridge/bridgePointer.ts | 210 行 | 橋接指針管理 |
+| src/bridge/bridgeEnabled.ts | 202 行 | 橋接模式啓用檢測 |
+| src/bridge/inboundAttachments.ts | 175 行 | 入站附件處理 |
+| src/bridge/envLessBridgeConfig.ts | 165 行 | 無環境變量橋接設定 |
+| src/bridge/bridgeStatusUtil.ts | 163 行 | 橋接狀態工具 |
+| src/bridge/debugUtils.ts | 141 行 | 橋接調試工具 |
+| src/bridge/bridgeDebug.ts | 135 行 | 橋接調試模組 |
+| src/bridge/workSecret.ts | 127 行 | 工作密鑰管理 |
+| src/bridge/pollConfig.ts | 110 行 | 輪詢設定 |
+| src/bridge/pollConfigDefaults.ts | 82 行 | 輪詢設定預設值 |
+| src/bridge/inboundMessages.ts | 80 行 | 入站訊息處理 |
+| src/bridge/capacityWake.ts | 56 行 | 容量喚醒 |
+| src/bridge/sessionIdCompat.ts | 57 行 | 會話 ID 相容層 |
+| src/bridge/codeSessionApi.ts | 168 行 | 程式碼會話 API |
+| src/bridge/bridgeConfig.ts | 48 行 | 橋接設定 |
+| src/bridge/bridgePermissionCallbacks.ts | 43 行 | 橋接權限回調 |
+| src/bridge/replBridgeHandle.ts | 36 行 | REPL 橋接句柄 |
+| src/bridge/flushGate.ts | 71 行 | 刷新門控 |
 | src/bridge/webhookSanitizer.ts | 3 行 | Webhook 清理 |
-| src/bridge/peerSessions.ts | 3 行 | 对等会话（桩） |
+| src/bridge/peerSessions.ts | 3 行 | 對等會話（樁） |
 
-**引用该标志的文件（13 个）**:
-1. src/bridge/bridgeEnabled.ts — 检测桥接模式是否编译启用
-2. src/commands.ts — 条件注册 `/bridge` 命令和 `/remoteControlServer` 命令
-3. src/commands/bridge/index.ts — 桥接命令入口（604 行）
-4. src/components/PromptInput/PromptInputFooter.tsx — 桥接模式下的页脚 UI
-5. src/components/Settings/Config.tsx — 设置面板中的桥接选项
-6. src/entrypoints/cli.tsx — CLI 入口中的桥接模式初始化
-7. src/hooks/useCanUseTool.tsx — 桥接模式下的工具权限
-8. src/hooks/useReplBridge.tsx — REPL 桥接 Hook
-9. src/main.tsx — 主入口中的桥接模式启动
-10. src/screens/REPL.tsx — REPL 屏幕中的桥接集成
-11. src/tools/BriefTool/attachments.ts — Brief 工具附件处理
-12. src/tools/BriefTool/upload.ts — Brief 工具上传
-13. src/tools/ConfigTool/supportedSettings.ts — 配置工具中的桥接设置
+**引用該標誌的文件（13 個）**:
+1. src/bridge/bridgeEnabled.ts — 檢測橋接模式是否編譯啓用
+2. src/commands.ts — 條件註冊 `/bridge` 命令和 `/remoteControlServer` 命令
+3. src/commands/bridge/index.ts — 橋接命令入口（604 行）
+4. src/components/PromptInput/PromptInputFooter.tsx — 橋接模式下的頁腳 UI
+5. src/components/Settings/Config.tsx — 設置面板中的橋接選項
+6. src/entrypoints/cli.tsx — CLI 入口中的橋接模式初始化
+7. src/hooks/useCanUseTool.tsx — 橋接模式下的工具權限
+8. src/hooks/useReplBridge.tsx — REPL 橋接 Hook
+9. src/main.tsx — 主入口中的橋接模式啓動
+10. src/screens/REPL.tsx — REPL 屏幕中的橋接集成
+11. src/tools/BriefTool/attachments.ts — Brief 工具附件處理
+12. src/tools/BriefTool/upload.ts — Brief 工具上傳
+13. src/tools/ConfigTool/supportedSettings.ts — 設定工具中的橋接設置
 
-**启用所需操作**: 仅需将编译标志 `BRIDGE_MODE` 设为 `true`。所有代码完整，命令入口 `src/commands/bridge/index.ts`（604 行）和 `src/commands/bridge/bridge.tsx`（46,907 行）均存在。
+**啓用所需操作**: 僅需將編譯標誌 `BRIDGE_MODE` 設爲 `true`。所有程式碼完整，命令入口 `src/commands/bridge/index.ts`（604 行）和 `src/commands/bridge/bridge.tsx`（46,907 行）均存在。
 
 ---
 
 ## 2. COORDINATOR_MODE
 
-**编译时引用次数**: 32
-**功能描述**: 协调器模式。允许 Claude Code 作为"领导者"协调多个"工作者"代理并行执行任务。工作者可以在同一进程内运行（in-process），也可以通过 tmux/iTerm2 面板运行。支持权限同步、重连、团队管理等。
-**分类**: COMPLETE
-**启用条件**: 将 `COORDINATOR_MODE` 编译标志设为 `true`
+**編譯時引用次數**: 32
+**功能描述**: 協調器模式。允許 Claude Code 作爲"領導者"協調多個"工作者"代理並行執行任務。工作者可以在同一進程內執行（in-process），也可以通過 tmux/iTerm2 面板執行。支援權限同步、重連、團隊管理等。
+**分類**: COMPLETE
+**啓用條件**: 將 `COORDINATOR_MODE` 編譯標誌設爲 `true`
 
-**核心实现文件（src/coordinator/ 目录，370 行 + src/utils/swarm/ 目录，7,620 行 = 共 7,990 行）**:
+**核心實現文件（src/coordinator/ 目錄，370 行 + src/utils/swarm/ 目錄，7,620 行 = 共 7,990 行）**:
 
-src/coordinator/ 目录（2 个文件）:
+src/coordinator/ 目錄（2 個文件）:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/coordinator/coordinatorMode.ts | 369 行 | 协调器模式核心逻辑，管理领导者/工作者角色 |
-| src/coordinator/workerAgent.ts | 1 行 | 工作者代理（桩文件，实际逻辑在 swarm 中） |
+| src/coordinator/coordinatorMode.ts | 369 行 | 協調器模式核心邏輯，管理領導者/工作者角色 |
+| src/coordinator/workerAgent.ts | 1 行 | 工作者代理（樁文件，實際邏輯在 swarm 中） |
 
-src/utils/swarm/ 目录（22 个文件）:
+src/utils/swarm/ 目錄（22 個文件）:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/utils/swarm/inProcessRunner.ts | 1,552 行 | 进程内工作者运行器 |
-| src/utils/swarm/permissionSync.ts | 928 行 | 权限同步机制 |
-| src/utils/swarm/backends/TmuxBackend.ts | 764 行 | Tmux 后端执行器 |
-| src/utils/swarm/teamHelpers.ts | 683 行 | 团队辅助函数 |
-| src/utils/swarm/It2SetupPrompt.tsx | 379 行 | iTerm2 设置提示 UI |
-| src/utils/swarm/backends/ITermBackend.ts | 370 行 | iTerm2 后端执行器 |
-| src/utils/swarm/backends/PaneBackendExecutor.ts | 354 行 | 面板后端执行器 |
-| src/utils/swarm/backends/InProcessBackend.ts | 339 行 | 进程内后端 |
-| src/utils/swarm/spawnInProcess.ts | 328 行 | 进程内 spawn 逻辑 |
-| src/utils/swarm/backends/types.ts | 311 行 | 后端类型定义 |
-| src/utils/swarm/backends/registry.ts | 464 行 | 后端注册表 |
-| src/utils/swarm/backends/it2Setup.ts | 245 行 | iTerm2 设置逻辑 |
-| src/utils/swarm/spawnUtils.ts | 146 行 | Spawn 工具函数 |
-| src/utils/swarm/teammateInit.ts | 129 行 | 队友初始化 |
-| src/utils/swarm/reconnection.ts | 119 行 | 重连逻辑 |
-| src/utils/swarm/teammateLayoutManager.ts | 107 行 | 队友布局管理 |
-| src/utils/swarm/backends/teammateModeSnapshot.ts | 87 行 | 队友模式快照 |
-| src/utils/swarm/backends/detection.ts | 128 行 | 后端检测 |
-| src/utils/swarm/leaderPermissionBridge.ts | 54 行 | 领导者权限桥接 |
-| src/utils/swarm/constants.ts | 33 行 | 常量定义 |
-| src/utils/swarm/teammatePromptAddendum.ts | 18 行 | 队友提示附加内容 |
-| src/utils/swarm/teammateModel.ts | 10 行 | 队友模型配置 |
+| src/utils/swarm/inProcessRunner.ts | 1,552 行 | 進程內工作者執行器 |
+| src/utils/swarm/permissionSync.ts | 928 行 | 權限同步機制 |
+| src/utils/swarm/backends/TmuxBackend.ts | 764 行 | Tmux 後端執行器 |
+| src/utils/swarm/teamHelpers.ts | 683 行 | 團隊輔助函數 |
+| src/utils/swarm/It2SetupPrompt.tsx | 379 行 | iTerm2 設置提示 UI |
+| src/utils/swarm/backends/ITermBackend.ts | 370 行 | iTerm2 後端執行器 |
+| src/utils/swarm/backends/PaneBackendExecutor.ts | 354 行 | 面板後端執行器 |
+| src/utils/swarm/backends/InProcessBackend.ts | 339 行 | 進程內後端 |
+| src/utils/swarm/spawnInProcess.ts | 328 行 | 進程內 spawn 邏輯 |
+| src/utils/swarm/backends/types.ts | 311 行 | 後端類型定義 |
+| src/utils/swarm/backends/registry.ts | 464 行 | 後端註冊表 |
+| src/utils/swarm/backends/it2Setup.ts | 245 行 | iTerm2 設置邏輯 |
+| src/utils/swarm/spawnUtils.ts | 146 行 | Spawn 工具函數 |
+| src/utils/swarm/teammateInit.ts | 129 行 | 隊友初始化 |
+| src/utils/swarm/reconnection.ts | 119 行 | 重連邏輯 |
+| src/utils/swarm/teammateLayoutManager.ts | 107 行 | 隊友佈局管理 |
+| src/utils/swarm/backends/teammateModeSnapshot.ts | 87 行 | 隊友模式快照 |
+| src/utils/swarm/backends/detection.ts | 128 行 | 後端檢測 |
+| src/utils/swarm/leaderPermissionBridge.ts | 54 行 | 領導者權限橋接 |
+| src/utils/swarm/constants.ts | 33 行 | 常量定義 |
+| src/utils/swarm/teammatePromptAddendum.ts | 18 行 | 隊友提示附加內容 |
+| src/utils/swarm/teammateModel.ts | 10 行 | 隊友模型設定 |
 
-**引用该标志的文件（15 个）**:
-1. src/QueryEngine.ts — 查询引擎中的协调器模式分支
-2. src/cli/print.ts — CLI 输出中的协调器模式处理
-3. src/commands/clear/conversation.ts — 清除对话时的协调器状态处理
-4. src/components/PromptInput/PromptInputFooterLeftSide.tsx — 协调器模式下的页脚左侧 UI
-5. src/coordinator/coordinatorMode.ts — 协调器模式核心逻辑
-6. src/main.tsx — 主入口中的协调器模式启动
-7. src/screens/REPL.tsx — REPL 屏幕中的协调器集成
-8. src/screens/ResumeConversation.tsx — 恢复对话时的协调器处理
-9. src/tools.ts — 工具注册中的协调器工具
-10. src/tools/AgentTool/AgentTool.tsx — Agent 工具中的协调器模式分支
-11. src/tools/AgentTool/builtInAgents.ts — 内置代理定义
-12. src/utils/processUserInput/processSlashCommand.tsx — 斜杠命令处理中的协调器
-13. src/utils/sessionRestore.ts — 会话恢复中的协调器状态
-14. src/utils/systemPrompt.ts — 系统提示中的协调器指令
-15. src/utils/toolPool.ts — 工具池中的协调器工具
+**引用該標誌的文件（15 個）**:
+1. src/QueryEngine.ts — 查詢引擎中的協調器模式分支
+2. src/cli/print.ts — CLI 輸出中的協調器模式處理
+3. src/commands/clear/conversation.ts — 清除對話時的協調器狀態處理
+4. src/components/PromptInput/PromptInputFooterLeftSide.tsx — 協調器模式下的頁腳左側 UI
+5. src/coordinator/coordinatorMode.ts — 協調器模式核心邏輯
+6. src/main.tsx — 主入口中的協調器模式啓動
+7. src/screens/REPL.tsx — REPL 屏幕中的協調器集成
+8. src/screens/ResumeConversation.tsx — 恢復對話時的協調器處理
+9. src/tools.ts — 工具註冊中的協調器工具
+10. src/tools/AgentTool/AgentTool.tsx — Agent 工具中的協調器模式分支
+11. src/tools/AgentTool/builtInAgents.ts — 內置代理定義
+12. src/utils/processUserInput/processSlashCommand.tsx — 斜槓命令處理中的協調器
+13. src/utils/sessionRestore.ts — 會話恢復中的協調器狀態
+14. src/utils/systemPrompt.ts — 系統提示中的協調器指令
+15. src/utils/toolPool.ts — 工具池中的協調器工具
 
-**启用所需操作**: 仅需将编译标志 `COORDINATOR_MODE` 设为 `true`。所有 7,990 行代码完整。
+**啓用所需操作**: 僅需將編譯標誌 `COORDINATOR_MODE` 設爲 `true`。所有 7,990 行程式碼完整。
 
 ---
 
 ## 3. CONTEXT_COLLAPSE
 
-**编译时引用次数**: 23（单引号 20 + 双引号 3）
-**功能描述**: 上下文折叠/分析功能。提供对话上下文的可视化分析，包括 token 使用量统计、上下文窗口利用率、自动压缩触发等。
-**分类**: COMPLETE
-**启用条件**: 将 `CONTEXT_COLLAPSE` 编译标志设为 `true`
+**編譯時引用次數**: 23（單引號 20 + 雙引號 3）
+**功能描述**: 上下文摺疊/分析功能。提供對話上下文的可視化分析，包括 token 使用量統計、上下文窗口利用率、自動壓縮觸發等。
+**分類**: COMPLETE
+**啓用條件**: 將 `CONTEXT_COLLAPSE` 編譯標誌設爲 `true`
 
-**核心实现文件（共 2,258 行）**:
+**核心實現文件（共 2,258 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/utils/analyzeContext.ts | 1,382 行 | 上下文分析核心逻辑 |
-| src/components/ContextVisualization.tsx | 488 行 | 上下文可视化 UI 组件 |
+| src/utils/analyzeContext.ts | 1,382 行 | 上下文分析核心邏輯 |
+| src/components/ContextVisualization.tsx | 488 行 | 上下文可視化 UI 組件 |
 | src/commands/context/context-noninteractive.ts | 325 行 | 非交互式上下文命令 |
 | src/commands/context/context.tsx | 63 行 | 交互式上下文命令入口 |
 
-**引用该标志的文件（13 个）**:
+**引用該標誌的文件（13 個）**:
 1. src/commands/context/context-noninteractive.ts — 非交互式上下文分析命令
 2. src/commands/context/context.tsx — 上下文命令入口
-3. src/components/ContextVisualization.tsx — 上下文可视化组件
-4. src/components/TokenWarning.tsx — Token 警告组件中的上下文折叠检测
-5. src/query.ts — 查询中的上下文折叠处理
-6. src/screens/REPL.tsx — REPL 中的上下文折叠集成
-7. src/screens/ResumeConversation.tsx — 恢复对话中的上下文折叠
-8. src/services/compact/autoCompact.ts — 自动压缩中的上下文折叠触发
-9. src/services/compact/postCompactCleanup.ts — 压缩后清理
-10. src/setup.ts — 初始化设置中的上下文折叠
-11. src/tools.ts — 工具注册
+3. src/components/ContextVisualization.tsx — 上下文可視化組件
+4. src/components/TokenWarning.tsx — Token 警告組件中的上下文摺疊檢測
+5. src/query.ts — 查詢中的上下文摺疊處理
+6. src/screens/REPL.tsx — REPL 中的上下文摺疊集成
+7. src/screens/ResumeConversation.tsx — 恢復對話中的上下文摺疊
+8. src/services/compact/autoCompact.ts — 自動壓縮中的上下文摺疊觸發
+9. src/services/compact/postCompactCleanup.ts — 壓縮後清理
+10. src/setup.ts — 初始化設置中的上下文摺疊
+11. src/tools.ts — 工具註冊
 12. src/utils/analyzeContext.ts — 上下文分析核心
-13. src/utils/sessionRestore.ts — 会话恢复
+13. src/utils/sessionRestore.ts — 會話恢復
 
-**启用所需操作**: 仅需将编译标志 `CONTEXT_COLLAPSE` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `CONTEXT_COLLAPSE` 設爲 `true`。
 
 ---
 
 ## 4. VOICE_MODE `[build: ON] [dev: ON]`
 
-**编译时引用次数**: 49（单引号 46 + 双引号 3）
-**功能描述**: 语音模式。集成语音转文字（STT）功能，用户可以通过麦克风输入语音，实时转换为文本发送给 AI。包括语音指示器 UI、语音流处理、键绑定等。
-**分类**: COMPLETE
-**启用条件**: 将 `VOICE_MODE` 编译标志设为 `true`
+**編譯時引用次數**: 49（單引號 46 + 雙引號 3）
+**功能描述**: 語音模式。集成語音轉文字（STT）功能，用戶可以通過麥克風輸入語音，實時轉換爲文本發送給 AI。包括語音指示器 UI、語音流處理、鍵綁定等。
+**分類**: COMPLETE
+**啓用條件**: 將 `VOICE_MODE` 編譯標誌設爲 `true`
 
-**核心实现文件（共 1,410 行）**:
+**核心實現文件（共 1,410 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/hooks/useVoiceIntegration.tsx | 676 行 | 语音集成 React Hook |
-| src/services/voiceStreamSTT.ts | 544 行 | 语音流式 STT（语音转文字）服务 |
-| src/components/PromptInput/VoiceIndicator.tsx | 136 行 | 语音指示器 UI 组件 |
-| src/voice/voiceModeEnabled.ts | 54 行 | 语音模式启用检测 |
+| src/hooks/useVoiceIntegration.tsx | 676 行 | 語音集成 React Hook |
+| src/services/voiceStreamSTT.ts | 544 行 | 語音流式 STT（語音轉文字）服務 |
+| src/components/PromptInput/VoiceIndicator.tsx | 136 行 | 語音指示器 UI 組件 |
+| src/voice/voiceModeEnabled.ts | 54 行 | 語音模式啓用檢測 |
 
-**引用该标志的文件（16 个）**:
-1. src/commands.ts — 条件注册语音相关命令
-2. src/components/LogoV2/VoiceModeNotice.tsx — 语音模式通知 UI
-3. src/components/PromptInput/Notifications.tsx — 提示输入通知中的语音状态
-4. src/components/PromptInput/PromptInputFooterLeftSide.tsx — 页脚左侧语音按钮
-5. src/components/PromptInput/VoiceIndicator.tsx — 语音指示器组件
-6. src/components/TextInput.tsx — 文本输入中的语音模式处理
-7. src/hooks/useVoiceIntegration.tsx — 语音集成 Hook
-8. src/keybindings/defaultBindings.ts — 语音模式键绑定
-9. src/screens/REPL.tsx — REPL 中的语音模式集成
-10. src/services/voiceStreamSTT.ts — STT 服务
-11. src/state/AppState.tsx — 应用状态中的语音状态
-12. src/tools/ConfigTool/ConfigTool.ts — 配置工具中的语音设置
-13. src/tools/ConfigTool/prompt.ts — 配置工具提示
-14. src/tools/ConfigTool/supportedSettings.ts — 支持的设置项
-15. src/utils/settings/types.ts — 设置类型定义
-16. src/voice/voiceModeEnabled.ts — 语音模式启用逻辑
+**引用該標誌的文件（16 個）**:
+1. src/commands.ts — 條件註冊語音相關命令
+2. src/components/LogoV2/VoiceModeNotice.tsx — 語音模式通知 UI
+3. src/components/PromptInput/Notifications.tsx — 提示輸入通知中的語音狀態
+4. src/components/PromptInput/PromptInputFooterLeftSide.tsx — 頁腳左側語音按鈕
+5. src/components/PromptInput/VoiceIndicator.tsx — 語音指示器組件
+6. src/components/TextInput.tsx — 文本輸入中的語音模式處理
+7. src/hooks/useVoiceIntegration.tsx — 語音集成 Hook
+8. src/keybindings/defaultBindings.ts — 語音模式鍵綁定
+9. src/screens/REPL.tsx — REPL 中的語音模式集成
+10. src/services/voiceStreamSTT.ts — STT 服務
+11. src/state/AppState.tsx — 應用狀態中的語音狀態
+12. src/tools/ConfigTool/ConfigTool.ts — 設定工具中的語音設置
+13. src/tools/ConfigTool/prompt.ts — 設定工具提示
+14. src/tools/ConfigTool/supportedSettings.ts — 支援的設置項
+15. src/utils/settings/types.ts — 設置類型定義
+16. src/voice/voiceModeEnabled.ts — 語音模式啓用邏輯
 
-**启用所需操作**: 仅需将编译标志 `VOICE_MODE` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `VOICE_MODE` 設爲 `true`。
 
 ---
 
 ## 5. TEAMMEM
 
-**编译时引用次数**: 53（单引号 51 + 双引号 2）
-**功能描述**: 团队记忆功能。允许团队成员之间共享和同步记忆文件（CLAUDE.md），包括记忆提取、秘密过滤、文件选择器、折叠显示等。
-**分类**: COMPLETE
-**启用条件**: 将 `TEAMMEM` 编译标志设为 `true`
+**編譯時引用次數**: 53（單引號 51 + 雙引號 2）
+**功能描述**: 團隊記憶功能。允許團隊成員之間共享和同步記憶文件（CLAUDE.md），包括記憶提取、祕密過濾、文件選擇器、摺疊顯示等。
+**分類**: COMPLETE
+**啓用條件**: 將 `TEAMMEM` 編譯標誌設爲 `true`
 
-**核心实现文件（共 1,026 行）**:
+**核心實現文件（共 1,026 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/components/memory/MemoryFileSelector.tsx | 437 行 | 记忆文件选择器 UI |
-| src/services/teamMemorySync/watcher.ts | 387 行 | 团队记忆文件监视器 |
-| src/components/messages/teamMemCollapsed.tsx | 139 行 | 团队记忆折叠显示组件 |
-| src/services/teamMemorySync/teamMemSecretGuard.ts | 44 行 | 团队记忆秘密过滤器 |
-| src/components/messages/teamMemSaved.ts | 19 行 | 团队记忆保存状态 |
+| src/components/memory/MemoryFileSelector.tsx | 437 行 | 記憶文件選擇器 UI |
+| src/services/teamMemorySync/watcher.ts | 387 行 | 團隊記憶文件監視器 |
+| src/components/messages/teamMemCollapsed.tsx | 139 行 | 團隊記憶摺疊顯示組件 |
+| src/services/teamMemorySync/teamMemSecretGuard.ts | 44 行 | 團隊記憶祕密過濾器 |
+| src/components/messages/teamMemSaved.ts | 19 行 | 團隊記憶保存狀態 |
 
-**引用该标志的文件（17 个）**:
-1. src/components/memory/MemoryFileSelector.tsx — 记忆文件选择器
-2. src/components/messages/CollapsedReadSearchContent.tsx — 折叠的读取/搜索内容
-3. src/components/messages/SystemTextMessage.tsx — 系统消息中的团队记忆显示
-4. src/components/messages/teamMemCollapsed.tsx — 团队记忆折叠组件
-5. src/components/messages/teamMemSaved.ts — 保存状态
-6. src/memdir/memdir.ts — 记忆目录操作
-7. src/services/extractMemories/extractMemories.ts — 记忆提取中的团队记忆
-8. src/services/extractMemories/prompts.ts — 记忆提取提示
-9. src/services/teamMemorySync/teamMemSecretGuard.ts — 秘密过滤
-10. src/services/teamMemorySync/watcher.ts — 文件监视
-11. src/setup.ts — 初始化中的团队记忆设置
-12. src/utils/claudemd.ts — CLAUDE.md 处理
-13. src/utils/collapseReadSearch.ts — 折叠读取/搜索
-14. src/utils/config.ts — 配置中的团队记忆
-15. src/utils/memory/types.ts — 记忆类型定义
-16. src/utils/memoryFileDetection.ts — 记忆文件检测
-17. src/utils/sessionFileAccessHooks.ts — 会话文件访问钩子
+**引用該標誌的文件（17 個）**:
+1. src/components/memory/MemoryFileSelector.tsx — 記憶文件選擇器
+2. src/components/messages/CollapsedReadSearchContent.tsx — 摺疊的讀取/搜索內容
+3. src/components/messages/SystemTextMessage.tsx — 系統訊息中的團隊記憶顯示
+4. src/components/messages/teamMemCollapsed.tsx — 團隊記憶摺疊組件
+5. src/components/messages/teamMemSaved.ts — 保存狀態
+6. src/memdir/memdir.ts — 記憶目錄操作
+7. src/services/extractMemories/extractMemories.ts — 記憶提取中的團隊記憶
+8. src/services/extractMemories/prompts.ts — 記憶提取提示
+9. src/services/teamMemorySync/teamMemSecretGuard.ts — 祕密過濾
+10. src/services/teamMemorySync/watcher.ts — 文件監視
+11. src/setup.ts — 初始化中的團隊記憶設置
+12. src/utils/claudemd.ts — CLAUDE.md 處理
+13. src/utils/collapseReadSearch.ts — 摺疊讀取/搜索
+14. src/utils/config.ts — 設定中的團隊記憶
+15. src/utils/memory/types.ts — 記憶類型定義
+16. src/utils/memoryFileDetection.ts — 記憶文件檢測
+17. src/utils/sessionFileAccessHooks.ts — 會話文件訪問鉤子
 
-**启用所需操作**: 仅需将编译标志 `TEAMMEM` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `TEAMMEM` 設爲 `true`。
 
 ---
 
 ## 6. COMMIT_ATTRIBUTION
 
-**编译时引用次数**: 12
-**功能描述**: 提交归属功能。在 git 提交中标记哪些代码是由 AI 生成的，包括 git trailer、统计信息、提交后处理等。
-**分类**: COMPLETE
-**启用条件**: 将 `COMMIT_ATTRIBUTION` 编译标志设为 `true`
+**編譯時引用次數**: 12
+**功能描述**: 提交歸屬功能。在 git 提交中標記哪些程式碼是由 AI 生成的，包括 git trailer、統計信息、提交後處理等。
+**分類**: COMPLETE
+**啓用條件**: 將 `COMMIT_ATTRIBUTION` 編譯標誌設爲 `true`
 
-**核心实现文件（共 1,354 行）**:
+**核心實現文件（共 1,354 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/utils/commitAttribution.ts | 961 行 | 提交归属核心逻辑 |
-| src/utils/attribution.ts | 393 行 | 归属计算与标记 |
+| src/utils/commitAttribution.ts | 961 行 | 提交歸屬核心邏輯 |
+| src/utils/attribution.ts | 393 行 | 歸屬計算與標記 |
 
-**引用该标志的文件（9 个）**:
-1. src/cli/print.ts — CLI 输出中的归属信息
-2. src/commands/clear/caches.ts — 清除缓存中的归属数据
-3. src/screens/REPL.tsx — REPL 中的归属集成
-4. src/services/compact/postCompactCleanup.ts — 压缩后的归属清理
-5. src/setup.ts — 初始化中的归属设置
-6. src/utils/attribution.ts — 归属核心
-7. src/utils/sessionRestore.ts — 会话恢复中的归属
-8. src/utils/shell/bashProvider.ts — Bash 提供者中的归属钩子（255 行）
-9. src/utils/worktree.ts — 工作树中的归属处理（1,519 行）
+**引用該標誌的文件（9 個）**:
+1. src/cli/print.ts — CLI 輸出中的歸屬信息
+2. src/commands/clear/caches.ts — 清除快取中的歸屬資料
+3. src/screens/REPL.tsx — REPL 中的歸屬集成
+4. src/services/compact/postCompactCleanup.ts — 壓縮後的歸屬清理
+5. src/setup.ts — 初始化中的歸屬設置
+6. src/utils/attribution.ts — 歸屬核心
+7. src/utils/sessionRestore.ts — 會話恢復中的歸屬
+8. src/utils/shell/bashProvider.ts — Bash 提供者中的歸屬鉤子（255 行）
+9. src/utils/worktree.ts — 工作樹中的歸屬處理（1,519 行）
 
-**启用所需操作**: 仅需将编译标志 `COMMIT_ATTRIBUTION` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `COMMIT_ATTRIBUTION` 設爲 `true`。
 
 ---
 
 ## 7. ULTRAPLAN
 
-**编译时引用次数**: 10
-**功能描述**: 超级计划模式。提供增强版的计划功能，允许用户创建更详细、更结构化的执行计划。
-**分类**: COMPLETE
-**启用条件**: 将 `ULTRAPLAN` 编译标志设为 `true`
+**編譯時引用次數**: 10
+**功能描述**: 超級計劃模式。提供增強版的計劃功能，允許用戶建立更詳細、更結構化的執行計劃。
+**分類**: COMPLETE
+**啓用條件**: 將 `ULTRAPLAN` 編譯標誌設爲 `true`
 
-**核心实现文件**:
+**核心實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/commands/ultraplan.tsx | 470 行 | 超级计划命令完整实现 |
+| src/commands/ultraplan.tsx | 470 行 | 超級計劃命令完整實現 |
 
-**引用该标志的文件（5 个）**:
-1. src/commands.ts — 条件注册 `/ultraplan` 命令
-2. src/components/PromptInput/PromptInput.tsx — 提示输入中的超级计划处理
-3. src/components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.tsx — 退出计划模式权限
-4. src/screens/REPL.tsx — REPL 中的超级计划集成
-5. src/utils/processUserInput/processUserInput.ts — 用户输入处理
+**引用該標誌的文件（5 個）**:
+1. src/commands.ts — 條件註冊 `/ultraplan` 命令
+2. src/components/PromptInput/PromptInput.tsx — 提示輸入中的超級計劃處理
+3. src/components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.tsx — 退出計劃模式權限
+4. src/screens/REPL.tsx — REPL 中的超級計劃集成
+5. src/utils/processUserInput/processUserInput.ts — 用戶輸入處理
 
-**启用所需操作**: 仅需将编译标志 `ULTRAPLAN` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `ULTRAPLAN` 設爲 `true`。
 
 ---
 
 ## 8. BASH_CLASSIFIER
 
-**编译时引用次数**: 49（单引号 45 + 双引号 4）
-**功能描述**: Bash 命令分类器。对用户请求执行的 Bash 命令进行安全分类，决定是否需要用户确认。支持自动模式（YOLO mode）下的智能权限判断。
-**分类**: COMPLETE
-**启用条件**: 将 `BASH_CLASSIFIER` 编译标志设为 `true`
+**編譯時引用次數**: 49（單引號 45 + 雙引號 4）
+**功能描述**: Bash 命令分類器。對用戶請求執行的 Bash 命令進行安全分類，決定是否需要用戶確認。支援自動模式（YOLO mode）下的智能權限判斷。
+**分類**: COMPLETE
+**啓用條件**: 將 `BASH_CLASSIFIER` 編譯標誌設爲 `true`
 
-**实现分布**: 该功能的代码分布在权限系统、工具系统和 UI 组件的 19 个文件中，与现有权限架构深度集成。
+**實現分佈**: 該功能的程式碼分佈在權限系統、工具系統和 UI 組件的 19 個檔案中，與現有權限架構深度集成。
 
-**引用该标志的文件（20 个）**:
-1. src/cli/structuredIO.ts — 结构化 IO 中的分类器输出
-2. src/components/messages/UserToolResultMessage/UserToolSuccessMessage.tsx — 工具成功消息中的分类器信息
-3. src/components/permissions/BashPermissionRequest/BashPermissionRequest.tsx — Bash 权限请求 UI
-4. src/components/permissions/PermissionDecisionDebugInfo.tsx — 权限决策调试信息
-5. src/components/permissions/PermissionRuleExplanation.tsx — 权限规则解释
-6. src/components/permissions/hooks.ts — 权限 Hooks
-7. src/hooks/toolPermission/PermissionContext.ts — 权限上下文
-8. src/hooks/toolPermission/handlers/coordinatorHandler.ts — 协调器权限处理
-9. src/hooks/toolPermission/handlers/interactiveHandler.ts — 交互式权限处理
-10. src/hooks/toolPermission/handlers/swarmWorkerHandler.ts — Swarm 工作者权限处理
-11. src/hooks/toolPermission/permissionLogging.ts — 权限日志
-12. src/hooks/useCanUseTool.tsx — 工具可用性检查
-13. src/services/api/withRetry.ts — API 重试中的分类器
-14. src/tools/BashTool/bashPermissions.ts — Bash 权限逻辑
-15. src/tools/BashTool/pathValidation.ts — 路径验证
-16. src/utils/classifierApprovals.ts — 分类器审批记录
-17. src/utils/messages.ts — 消息处理
-18. src/utils/permissions/permissions.ts — 权限核心
-19. src/utils/permissions/yoloClassifier.ts — YOLO 模式分类器
-20. src/utils/swarm/inProcessRunner.ts — 进程内运行器中的分类器
+**引用該標誌的文件（20 個）**:
+1. src/cli/structuredIO.ts — 結構化 IO 中的分類器輸出
+2. src/components/messages/UserToolResultMessage/UserToolSuccessMessage.tsx — 工具成功訊息中的分類器信息
+3. src/components/permissions/BashPermissionRequest/BashPermissionRequest.tsx — Bash 權限請求 UI
+4. src/components/permissions/PermissionDecisionDebugInfo.tsx — 權限決策調試信息
+5. src/components/permissions/PermissionRuleExplanation.tsx — 權限規則解釋
+6. src/components/permissions/hooks.ts — 權限 Hooks
+7. src/hooks/toolPermission/PermissionContext.ts — 權限上下文
+8. src/hooks/toolPermission/handlers/coordinatorHandler.ts — 協調器權限處理
+9. src/hooks/toolPermission/handlers/interactiveHandler.ts — 交互式權限處理
+10. src/hooks/toolPermission/handlers/swarmWorkerHandler.ts — Swarm 工作者權限處理
+11. src/hooks/toolPermission/permissionLogging.ts — 權限日誌
+12. src/hooks/useCanUseTool.tsx — 工具可用性檢查
+13. src/services/api/withRetry.ts — API 重試中的分類器
+14. src/tools/BashTool/bashPermissions.ts — Bash 權限邏輯
+15. src/tools/BashTool/pathValidation.ts — 路徑驗證
+16. src/utils/classifierApprovals.ts — 分類器審批記錄
+17. src/utils/messages.ts — 訊息處理
+18. src/utils/permissions/permissions.ts — 權限核心
+19. src/utils/permissions/yoloClassifier.ts — YOLO 模式分類器
+20. src/utils/swarm/inProcessRunner.ts — 進程內執行器中的分類器
 
-**启用所需操作**: 仅需将编译标志 `BASH_CLASSIFIER` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `BASH_CLASSIFIER` 設爲 `true`。
 
 ---
 
 ## 9. TRANSCRIPT_CLASSIFIER `[dev: ON]`
 
-**编译时引用次数**: 110（单引号 107 + 双引号 3）
-**功能描述**: 转录分类器。这是引用次数第二多的标志，与自动模式（Auto Mode）权限系统深度集成。对整个对话转录进行分析，判断 AI 请求的工具调用是否安全。
-**分类**: COMPLETE
-**启用条件**: 将 `TRANSCRIPT_CLASSIFIER` 编译标志设为 `true`
+**編譯時引用次數**: 110（單引號 107 + 雙引號 3）
+**功能描述**: 轉錄分類器。這是引用次數第二多的標誌，與自動模式（Auto Mode）權限系統深度集成。對整個對話轉錄進行分析，判斷 AI 請求的工具呼叫是否安全。
+**分類**: COMPLETE
+**啓用條件**: 將 `TRANSCRIPT_CLASSIFIER` 編譯標誌設爲 `true`
 
-**实现分布**: 该功能的代码分布在 44 个文件中，是除 KAIROS 外集成最广泛的功能。
+**實現分佈**: 該功能的程式碼分佈在 44 個檔案中，是除 KAIROS 外集成最廣泛的功能。
 
-**引用该标志的文件（44 个）**:
-1. src/cli/print.ts — CLI 输出
-2. src/cli/structuredIO.ts — 结构化 IO
-3. src/commands/login/login.tsx — 登录命令
-4. src/components/PromptInput/PromptInput.tsx — 提示输入
-5. src/components/Settings/Config.tsx — 设置配置
-6. src/components/messages/UserToolResultMessage/UserToolErrorMessage.tsx — 工具错误消息
-7. src/components/messages/UserToolResultMessage/UserToolSuccessMessage.tsx — 工具成功消息
-8. src/components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.tsx — 退出计划模式权限
-9. src/components/permissions/PermissionDecisionDebugInfo.tsx — 权限决策调试
-10. src/components/permissions/PermissionRuleExplanation.tsx — 权限规则解释
-11. src/components/permissions/hooks.ts — 权限 Hooks
+**引用該標誌的文件（44 個）**:
+1. src/cli/print.ts — CLI 輸出
+2. src/cli/structuredIO.ts — 結構化 IO
+3. src/commands/login/login.tsx — 登錄命令
+4. src/components/PromptInput/PromptInput.tsx — 提示輸入
+5. src/components/Settings/Config.tsx — 設置設定
+6. src/components/messages/UserToolResultMessage/UserToolErrorMessage.tsx — 工具錯誤訊息
+7. src/components/messages/UserToolResultMessage/UserToolSuccessMessage.tsx — 工具成功訊息
+8. src/components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.tsx — 退出計劃模式權限
+9. src/components/permissions/PermissionDecisionDebugInfo.tsx — 權限決策調試
+10. src/components/permissions/PermissionRuleExplanation.tsx — 權限規則解釋
+11. src/components/permissions/hooks.ts — 權限 Hooks
 12. src/constants/betas.ts — Beta 常量
-13. src/hooks/notifs/useAutoModeUnavailableNotification.ts — 自动模式不可用通知
-14. src/hooks/toolPermission/PermissionContext.ts — 权限上下文
-15. src/hooks/toolPermission/handlers/interactiveHandler.ts — 交互式处理
-16. src/hooks/toolPermission/permissionLogging.ts — 权限日志
+13. src/hooks/notifs/useAutoModeUnavailableNotification.ts — 自動模式不可用通知
+14. src/hooks/toolPermission/PermissionContext.ts — 權限上下文
+15. src/hooks/toolPermission/handlers/interactiveHandler.ts — 交互式處理
+16. src/hooks/toolPermission/permissionLogging.ts — 權限日誌
 17. src/hooks/useCanUseTool.tsx — 工具可用性
-18. src/hooks/useReplBridge.tsx — REPL 桥接
-19. src/interactiveHelpers.tsx — 交互帮助函数
+18. src/hooks/useReplBridge.tsx — REPL 橋接
+19. src/interactiveHelpers.tsx — 交互幫助函數
 20. src/main.tsx — 主入口
-21. src/migrations/resetAutoModeOptInForDefaultOffer.ts — 迁移脚本
+21. src/migrations/resetAutoModeOptInForDefaultOffer.ts — 遷移腳本
 22. src/screens/REPL.tsx — REPL 屏幕
-23. src/services/api/claude.ts — Claude API 服务
-24. src/services/tools/toolExecution.ts — 工具执行
+23. src/services/api/claude.ts — Claude API 服務
+24. src/services/tools/toolExecution.ts — 工具執行
 25. src/tools/AgentTool/AgentTool.tsx — Agent 工具
-26. src/tools/AgentTool/agentToolUtils.ts — Agent 工具工具函数
-27. src/tools/AgentTool/runAgent.ts — 运行 Agent
-28. src/tools/BashTool/bashPermissions.ts — Bash 权限
-29. src/tools/ConfigTool/supportedSettings.ts — 支持的设置
-30. src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts — 退出计划模式工具
-31. src/tools/NotebookEditTool/NotebookEditTool.ts — Notebook 编辑工具
-32. src/types/permissions.ts — 权限类型
-33. src/utils/attachments.ts — 附件处理
-34. src/utils/autoModeDenials.ts — 自动模式拒绝
+26. src/tools/AgentTool/agentToolUtils.ts — Agent 工具工具函數
+27. src/tools/AgentTool/runAgent.ts — 執行 Agent
+28. src/tools/BashTool/bashPermissions.ts — Bash 權限
+29. src/tools/ConfigTool/supportedSettings.ts — 支援的設置
+30. src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts — 退出計劃模式工具
+31. src/tools/NotebookEditTool/NotebookEditTool.ts — Notebook 編輯工具
+32. src/types/permissions.ts — 權限類型
+33. src/utils/attachments.ts — 附件處理
+34. src/utils/autoModeDenials.ts — 自動模式拒絕
 35. src/utils/betas.ts — Beta 工具
-36. src/utils/classifierApprovals.ts — 分类器审批
-37. src/utils/permissions/PermissionMode.ts — 权限模式
-38. src/utils/permissions/autoModeState.ts — 自动模式状态
-39. src/utils/permissions/bypassPermissionsKillswitch.ts — 绕过权限 Kill Switch
-40. src/utils/permissions/getNextPermissionMode.ts — 获取下一个权限模式
-41. src/utils/permissions/permissionSetup.ts — 权限设置
-42. src/utils/permissions/permissions.ts — 权限核心
-43. src/utils/permissions/yoloClassifier.ts — YOLO 分类器
-44. src/utils/settings/settings.ts — 设置
-45. src/utils/settings/types.ts — 设置类型
-46. src/utils/toolResultStorage.ts — 工具结果存储
+36. src/utils/classifierApprovals.ts — 分類器審批
+37. src/utils/permissions/PermissionMode.ts — 權限模式
+38. src/utils/permissions/autoModeState.ts — 自動模式狀態
+39. src/utils/permissions/bypassPermissionsKillswitch.ts — 繞過權限 Kill Switch
+40. src/utils/permissions/getNextPermissionMode.ts — 取得下一個權限模式
+41. src/utils/permissions/permissionSetup.ts — 權限設置
+42. src/utils/permissions/permissions.ts — 權限核心
+43. src/utils/permissions/yoloClassifier.ts — YOLO 分類器
+44. src/utils/settings/settings.ts — 設置
+45. src/utils/settings/types.ts — 設置類型
+46. src/utils/toolResultStorage.ts — 工具結果存儲
 
-**启用所需操作**: 仅需将编译标志 `TRANSCRIPT_CLASSIFIER` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `TRANSCRIPT_CLASSIFIER` 設爲 `true`。
 
 ---
 
 ## 10. EXTRACT_MEMORIES
 
-**编译时引用次数**: 7
-**功能描述**: 记忆提取功能。从对话中自动提取有用的记忆信息并保存到记忆文件中。
-**分类**: COMPLETE
-**启用条件**: 将 `EXTRACT_MEMORIES` 编译标志设为 `true`
+**編譯時引用次數**: 7
+**功能描述**: 記憶提取功能。從對話中自動提取有用的記憶信息並保存到記憶檔案中。
+**分類**: COMPLETE
+**啓用條件**: 將 `EXTRACT_MEMORIES` 編譯標誌設爲 `true`
 
-**核心实现文件（共 769 行）**:
+**核心實現文件（共 769 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/services/extractMemories/extractMemories.ts | 615 行 | 记忆提取核心算法 |
-| src/services/extractMemories/prompts.ts | 154 行 | 记忆提取的 AI 提示词 |
+| src/services/extractMemories/extractMemories.ts | 615 行 | 記憶提取核心算法 |
+| src/services/extractMemories/prompts.ts | 154 行 | 記憶提取的 AI 提示詞 |
 
-**引用该标志的文件（4 个）**:
-1. src/cli/print.ts — CLI 输出中的记忆提取信息
-2. src/memdir/paths.ts — 记忆目录路径
-3. src/query/stopHooks.ts — 查询停止钩子中触发记忆提取
-4. src/utils/backgroundHousekeeping.ts — 后台维护中的记忆提取
+**引用該標誌的文件（4 個）**:
+1. src/cli/print.ts — CLI 輸出中的記憶提取信息
+2. src/memdir/paths.ts — 記憶目錄路徑
+3. src/query/stopHooks.ts — 查詢停止鉤子中觸發記憶提取
+4. src/utils/backgroundHousekeeping.ts — 後臺維護中的記憶提取
 
-**启用所需操作**: 仅需将编译标志 `EXTRACT_MEMORIES` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `EXTRACT_MEMORIES` 設爲 `true`。
 
 ---
 
 ## 11. CACHED_MICROCOMPACT
 
-**编译时引用次数**: 12
-**功能描述**: 缓存微压缩功能。在对话压缩时使用缓存策略优化性能。
-**分类**: COMPLETE
-**启用条件**: 将 `CACHED_MICROCOMPACT` 编译标志设为 `true`
+**編譯時引用次數**: 12
+**功能描述**: 快取微壓縮功能。在對話壓縮時使用快取策略優化性能。
+**分類**: COMPLETE
+**啓用條件**: 將 `CACHED_MICROCOMPACT` 編譯標誌設爲 `true`
 
-**实现文件**:
+**實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/services/compact/microCompact.ts | 530 行 | 微压缩核心实现 |
+| src/services/compact/microCompact.ts | 530 行 | 微壓縮核心實現 |
 
-**引用该标志的文件（5 个）**:
-1. src/constants/prompts.ts — 提示词常量
-2. src/query.ts — 查询引擎
-3. src/services/api/claude.ts — Claude API 服务
-4. src/services/api/logging.ts — API 日志
-5. src/services/compact/microCompact.ts — 微压缩核心
+**引用該標誌的文件（5 個）**:
+1. src/constants/prompts.ts — 提示詞常量
+2. src/query.ts — 查詢引擎
+3. src/services/api/claude.ts — Claude API 服務
+4. src/services/api/logging.ts — API 日誌
+5. src/services/compact/microCompact.ts — 微壓縮核心
 
-**启用所需操作**: 仅需将编译标志 `CACHED_MICROCOMPACT` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `CACHED_MICROCOMPACT` 設爲 `true`。
 
 ---
 
 ## 12. TOKEN_BUDGET `[build: ON] [dev: ON]` *NEW*
 
-**编译时引用次数**: 9
-**功能描述**: Token 预算管理。允许设置和跟踪 token 使用预算，在接近限制时提供警告。
-**分类**: COMPLETE
-**启用条件**: 将 `TOKEN_BUDGET` 编译标志设为 `true`
+**編譯時引用次數**: 9
+**功能描述**: Token 預算管理。允許設置和跟蹤 token 使用預算，在接近限制時提供警告。
+**分類**: COMPLETE
+**啓用條件**: 將 `TOKEN_BUDGET` 編譯標誌設爲 `true`
 
-**核心实现文件（共 166 行）**:
+**核心實現文件（共 166 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/utils/tokenBudget.ts | 73 行 | Token 预算核心逻辑 |
-| src/query/tokenBudget.ts | 93 行 | 查询层的 Token 预算管理 |
+| src/utils/tokenBudget.ts | 73 行 | Token 預算核心邏輯 |
+| src/query/tokenBudget.ts | 93 行 | 查詢層的 Token 預算管理 |
 
-**引用该标志的文件（6 个）**:
-1. src/components/PromptInput/PromptInput.tsx — 提示输入中的预算显示
-2. src/components/Spinner.tsx — 加载指示器中的预算信息
-3. src/constants/prompts.ts — 提示词中的预算指令
-4. src/query.ts — 查询引擎中的预算检查
-5. src/screens/REPL.tsx — REPL 中的预算集成
-6. src/utils/attachments.ts — 附件处理中的预算计算
+**引用該標誌的文件（6 個）**:
+1. src/components/PromptInput/PromptInput.tsx — 提示輸入中的預算顯示
+2. src/components/Spinner.tsx — 加載指示器中的預算信息
+3. src/constants/prompts.ts — 提示詞中的預算指令
+4. src/query.ts — 查詢引擎中的預算檢查
+5. src/screens/REPL.tsx — REPL 中的預算集成
+6. src/utils/attachments.ts — 附件處理中的預算計算
 
-**启用所需操作**: 仅需将编译标志 `TOKEN_BUDGET` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `TOKEN_BUDGET` 設爲 `true`。
 
 ---
 
 ## 13. AGENT_TRIGGERS
 
-**编译时引用次数**: 11
-**功能描述**: 代理触发器/定时任务。允许 AI 创建、管理和执行 cron 定时任务。
-**分类**: COMPLETE
-**启用条件**: 将 `AGENT_TRIGGERS` 编译标志设为 `true`
+**編譯時引用次數**: 11
+**功能描述**: 代理觸發器/定時任務。允許 AI 建立、管理和執行 cron 定時任務。
+**分類**: COMPLETE
+**啓用條件**: 將 `AGENT_TRIGGERS` 編譯標誌設爲 `true`
 
-**核心实现文件（共 543 行）**:
+**核心實現文件（共 543 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/tools/ScheduleCronTool/CronCreateTool.ts | 157 行 | Cron 创建工具 |
-| src/tools/ScheduleCronTool/prompt.ts | 135 行 | Cron 工具提示词 |
+| src/tools/ScheduleCronTool/CronCreateTool.ts | 157 行 | Cron 建立工具 |
+| src/tools/ScheduleCronTool/prompt.ts | 135 行 | Cron 工具提示詞 |
 | src/tools/ScheduleCronTool/CronListTool.ts | 97 行 | Cron 列表工具 |
-| src/tools/ScheduleCronTool/CronDeleteTool.ts | 95 行 | Cron 删除工具 |
-| src/tools/ScheduleCronTool/UI.tsx | 59 行 | Cron UI 组件 |
+| src/tools/ScheduleCronTool/CronDeleteTool.ts | 95 行 | Cron 刪除工具 |
+| src/tools/ScheduleCronTool/UI.tsx | 59 行 | Cron UI 組件 |
 
-**引用该标志的文件（6 个）**:
-1. src/cli/print.ts — CLI 输出
+**引用該標誌的文件（6 個）**:
+1. src/cli/print.ts — CLI 輸出
 2. src/constants/tools.ts — 工具常量
 3. src/screens/REPL.tsx — REPL 集成
-4. src/skills/bundled/index.ts — 内置技能
-5. src/tools.ts — 工具注册
-6. src/tools/ScheduleCronTool/prompt.ts — Cron 提示词
+4. src/skills/bundled/index.ts — 內置技能
+5. src/tools.ts — 工具註冊
+6. src/tools/ScheduleCronTool/prompt.ts — Cron 提示詞
 
-**启用所需操作**: 仅需将编译标志 `AGENT_TRIGGERS` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `AGENT_TRIGGERS` 設爲 `true`。
 
 ---
 
 ## 14. REACTIVE_COMPACT
 
-**编译时引用次数**: 5（单引号 4 + 双引号 1）
-**功能描述**: 响应式压缩。根据上下文使用情况动态触发对话压缩。
-**分类**: COMPLETE
-**启用条件**: 将 `REACTIVE_COMPACT` 编译标志设为 `true`
+**編譯時引用次數**: 5（單引號 4 + 雙引號 1）
+**功能描述**: 響應式壓縮。根據上下文使用情況動態觸發對話壓縮。
+**分類**: COMPLETE
+**啓用條件**: 將 `REACTIVE_COMPACT` 編譯標誌設爲 `true`
 
-**实现文件（压缩服务已完整，共 2,586 行）**:
+**實現文件（壓縮服務已完整，共 2,586 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/services/compact/compact.ts | 1,705 行 | 压缩核心逻辑 |
-| src/services/compact/microCompact.ts | 530 行 | 微压缩 |
-| src/services/compact/autoCompact.ts | 351 行 | 自动压缩触发 |
+| src/services/compact/compact.ts | 1,705 行 | 壓縮核心邏輯 |
+| src/services/compact/microCompact.ts | 530 行 | 微壓縮 |
+| src/services/compact/autoCompact.ts | 351 行 | 自動壓縮觸發 |
 
-**引用该标志的文件（5 个）**:
-1. src/commands/compact/compact.ts — 压缩命令
+**引用該標誌的文件（5 個）**:
+1. src/commands/compact/compact.ts — 壓縮命令
 2. src/components/TokenWarning.tsx — Token 警告
-3. src/query.ts — 查询引擎
-4. src/services/compact/autoCompact.ts — 自动压缩
+3. src/query.ts — 查詢引擎
+4. src/services/compact/autoCompact.ts — 自動壓縮
 5. src/utils/analyzeContext.ts — 上下文分析
 
-**启用所需操作**: 仅需将编译标志 `REACTIVE_COMPACT` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `REACTIVE_COMPACT` 設爲 `true`。
 
 ---
 
 ## 15. KAIROS_BRIEF
 
-**编译时引用次数**: 39
-**功能描述**: Kairos Brief 功能。提供简报工具，允许 AI 生成和管理项目简报。
-**分类**: COMPLETE
-**启用条件**: 将 `KAIROS_BRIEF` 编译标志设为 `true`
+**編譯時引用次數**: 39
+**功能描述**: Kairos Brief 功能。提供簡報工具，允許 AI 生成和管理專案簡報。
+**分類**: COMPLETE
+**啓用條件**: 將 `KAIROS_BRIEF` 編譯標誌設爲 `true`
 
-**核心实现文件（共 334 行）**:
+**核心實現文件（共 334 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
 | src/tools/BriefTool/BriefTool.ts | 204 行 | Brief 工具核心 |
-| src/commands/brief.ts | 130 行 | Brief 命令实现 |
+| src/commands/brief.ts | 130 行 | Brief 命令實現 |
 
-**引用该标志的文件（20 个）**:
-1. src/commands.ts — 命令注册
+**引用該標誌的文件（20 個）**:
+1. src/commands.ts — 命令註冊
 2. src/commands/brief.ts — Brief 命令
-3. src/components/Messages.tsx — 消息组件
+3. src/components/Messages.tsx — 訊息組件
 4. src/components/PromptInput/Notifications.tsx — 通知
-5. src/components/PromptInput/PromptInput.tsx — 提示输入
-6. src/components/PromptInput/PromptInputQueuedCommands.tsx — 排队命令
-7. src/components/Settings/Config.tsx — 设置
-8. src/components/Spinner.tsx — 加载指示器
-9. src/components/messages/UserPromptMessage.tsx — 用户提示消息
-10. src/components/messages/UserToolResultMessage/UserToolSuccessMessage.tsx — 工具成功消息
-11. src/constants/prompts.ts — 提示词
-12. src/hooks/useGlobalKeybindings.tsx — 全局键绑定
-13. src/keybindings/defaultBindings.ts — 默认键绑定
+5. src/components/PromptInput/PromptInput.tsx — 提示輸入
+6. src/components/PromptInput/PromptInputQueuedCommands.tsx — 排隊命令
+7. src/components/Settings/Config.tsx — 設置
+8. src/components/Spinner.tsx — 加載指示器
+9. src/components/messages/UserPromptMessage.tsx — 用戶提示訊息
+10. src/components/messages/UserToolResultMessage/UserToolSuccessMessage.tsx — 工具成功訊息
+11. src/constants/prompts.ts — 提示詞
+12. src/hooks/useGlobalKeybindings.tsx — 全局鍵綁定
+13. src/keybindings/defaultBindings.ts — 預設鍵綁定
 14. src/main.tsx — 主入口
 15. src/tools/BriefTool/BriefTool.ts — Brief 工具
 16. src/tools/ToolSearchTool/prompt.ts — 工具搜索提示
 17. src/utils/attachments.ts — 附件
-18. src/utils/conversationRecovery.ts — 对话恢复
-19. src/utils/permissions/permissionRuleParser.ts — 权限规则解析
-20. src/utils/settings/types.ts — 设置类型
+18. src/utils/conversationRecovery.ts — 對話恢復
+19. src/utils/permissions/permissionRuleParser.ts — 權限規則解析
+20. src/utils/settings/types.ts — 設置類型
 
-**启用所需操作**: 仅需将编译标志 `KAIROS_BRIEF` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `KAIROS_BRIEF` 設爲 `true`。
 
 ---
 
 ## 16. CCR_REMOTE_SETUP
 
-**编译时引用次数**: 1
-**功能描述**: CCR（Claude Code Remote）远程设置命令。
-**分类**: COMPLETE
-**启用条件**: 将 `CCR_REMOTE_SETUP` 编译标志设为 `true`
+**編譯時引用次數**: 1
+**功能描述**: CCR（Claude Code Remote）遠程設置命令。
+**分類**: COMPLETE
+**啓用條件**: 將 `CCR_REMOTE_SETUP` 編譯標誌設爲 `true`
 
-**引用该标志的文件（1 个）**:
-1. src/commands.ts — 条件注册远程设置命令
+**引用該標誌的文件（1 個）**:
+1. src/commands.ts — 條件註冊遠程設置命令
 
-**启用所需操作**: 仅需将编译标志 `CCR_REMOTE_SETUP` 设为 `true`。命令文件通过条件 require 加载。
+**啓用所需操作**: 僅需將編譯標誌 `CCR_REMOTE_SETUP` 設爲 `true`。命令文件通過條件 require 加載。
 
 ---
 
 ## 17. SHOT_STATS `[build: ON] [dev: ON]` *NEW*
 
-**编译时引用次数**: 10
-**功能描述**: 统计功能。提供详细的会话统计信息，包括 token 使用、工具调用、时间统计等，带有完整的 UI 面板。
-**分类**: COMPLETE
-**启用条件**: 将 `SHOT_STATS` 编译标志设为 `true`
+**編譯時引用次數**: 10
+**功能描述**: 統計功能。提供詳細的會話統計信息，包括 token 使用、工具呼叫、時間統計等，帶有完整的 UI 面板。
+**分類**: COMPLETE
+**啓用條件**: 將 `SHOT_STATS` 編譯標誌設爲 `true`
 
-**核心实现文件（共 2,722 行）**:
+**核心實現文件（共 2,722 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/components/Stats.tsx | 1,227 行 | 统计 UI 组件 |
-| src/utils/stats.ts | 1,061 行 | 统计核心逻辑 |
-| src/utils/statsCache.ts | 434 行 | 统计缓存 |
+| src/components/Stats.tsx | 1,227 行 | 統計 UI 組件 |
+| src/utils/stats.ts | 1,061 行 | 統計核心邏輯 |
+| src/utils/statsCache.ts | 434 行 | 統計快取 |
 
-**引用该标志的文件（3 个）**:
-1. src/components/Stats.tsx — 统计 UI
-2. src/utils/stats.ts — 统计核心
-3. src/utils/statsCache.ts — 统计缓存
+**引用該標誌的文件（3 個）**:
+1. src/components/Stats.tsx — 統計 UI
+2. src/utils/stats.ts — 統計核心
+3. src/utils/statsCache.ts — 統計快取
 
-**启用所需操作**: 仅需将编译标志 `SHOT_STATS` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `SHOT_STATS` 設爲 `true`。
 
 ---
 
 ## 18. BG_SESSIONS
 
-**编译时引用次数**: 11
-**功能描述**: 后台会话功能。支持对话恢复和并发会话管理，允许会话在后台继续运行。
-**分类**: COMPLETE
-**启用条件**: 将 `BG_SESSIONS` 编译标志设为 `true`
+**編譯時引用次數**: 11
+**功能描述**: 後臺會話功能。支援對話恢復和併發會話管理，允許會話在後臺繼續執行。
+**分類**: COMPLETE
+**啓用條件**: 將 `BG_SESSIONS` 編譯標誌設爲 `true`
 
-**核心实现文件（共 801 行）**:
+**核心實現文件（共 801 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/utils/conversationRecovery.ts | 597 行 | 对话恢复逻辑 |
-| src/utils/concurrentSessions.ts | 204 行 | 并发会话管理 |
+| src/utils/conversationRecovery.ts | 597 行 | 對話恢復邏輯 |
+| src/utils/concurrentSessions.ts | 204 行 | 併發會話管理 |
 
-**引用该标志的文件（7 个）**:
-1. src/commands/exit/exit.tsx — 退出命令中的后台会话处理
-2. src/entrypoints/cli.tsx — CLI 入口中的后台会话
+**引用該標誌的文件（7 個）**:
+1. src/commands/exit/exit.tsx — 退出命令中的後臺會話處理
+2. src/entrypoints/cli.tsx — CLI 入口中的後臺會話
 3. src/main.tsx — 主入口
-4. src/query.ts — 查询引擎
+4. src/query.ts — 查詢引擎
 5. src/screens/REPL.tsx — REPL 集成
-6. src/utils/concurrentSessions.ts — 并发会话
-7. src/utils/conversationRecovery.ts — 对话恢复
+6. src/utils/concurrentSessions.ts — 併發會話
+7. src/utils/conversationRecovery.ts — 對話恢復
 
-**启用所需操作**: 仅需将编译标志 `BG_SESSIONS` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `BG_SESSIONS` 設爲 `true`。
 
 ---
 
 ## 19. PROACTIVE
 
-**编译时引用次数**: 37
-**功能描述**: 主动模式。AI 可以在没有用户输入的情况下主动发起操作或建议。
-**分类**: COMPLETE
-**启用条件**: 将 `PROACTIVE` 编译标志设为 `true`
+**編譯時引用次數**: 37
+**功能描述**: 主動模式。AI 可以在沒有用戶輸入的情況下主動發起操作或建議。
+**分類**: COMPLETE
+**啓用條件**: 將 `PROACTIVE` 編譯標誌設爲 `true`
 
-**核心实现文件（共 63 行，注意：大部分逻辑与 KAIROS 共享，通过 `feature('PROACTIVE') || feature('KAIROS')` 模式门控）**:
+**核心實現文件（共 63 行，注意：大部分邏輯與 KAIROS 共享，通過 `feature('PROACTIVE') || feature('KAIROS')` 模式門控）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/proactive/index.ts | 57 行 | 主动模式入口 |
-| src/proactive/useProactive.ts | 6 行 | 主动模式 Hook |
+| src/proactive/index.ts | 57 行 | 主動模式入口 |
+| src/proactive/useProactive.ts | 6 行 | 主動模式 Hook |
 
-**引用该标志的文件（15 个）**:
-1. src/cli/print.ts — CLI 输出
-2. src/commands.ts — 命令注册（`feature('PROACTIVE') || feature('KAIROS')`）
-3. src/commands/clear/conversation.ts — 清除对话
-4. src/components/Messages.tsx — 消息组件
-5. src/components/PromptInput/PromptInputFooterLeftSide.tsx — 页脚
-6. src/components/PromptInput/usePromptInputPlaceholder.ts — 输入占位符
-7. src/constants/prompts.ts — 提示词
+**引用該標誌的文件（15 個）**:
+1. src/cli/print.ts — CLI 輸出
+2. src/commands.ts — 命令註冊（`feature('PROACTIVE') || feature('KAIROS')`）
+3. src/commands/clear/conversation.ts — 清除對話
+4. src/components/Messages.tsx — 訊息組件
+5. src/components/PromptInput/PromptInputFooterLeftSide.tsx — 頁腳
+6. src/components/PromptInput/usePromptInputPlaceholder.ts — 輸入佔位符
+7. src/constants/prompts.ts — 提示詞
 8. src/main.tsx — 主入口
-9. src/screens/REPL.tsx — REPL（多处引用，通过 require 加载 proactive 模块）
-10. src/services/compact/prompt.ts — 压缩提示
-11. src/tools.ts — 工具注册
+9. src/screens/REPL.tsx — REPL（多處引用，通過 require 加載 proactive 模組）
+10. src/services/compact/prompt.ts — 壓縮提示
+11. src/tools.ts — 工具註冊
 12. src/tools/AgentTool/AgentTool.tsx — Agent 工具
-13. src/utils/sessionStorage.ts — 会话存储
-14. src/utils/settings/types.ts — 设置类型
-15. src/utils/systemPrompt.ts — 系统提示
+13. src/utils/sessionStorage.ts — 會話存儲
+14. src/utils/settings/types.ts — 設置類型
+15. src/utils/systemPrompt.ts — 系統提示
 
-**特殊说明**: PROACTIVE 在代码中几乎总是与 KAIROS 一起使用（`feature('PROACTIVE') || feature('KAIROS')`），意味着启用 KAIROS 也会启用主动功能。PROACTIVE 模块文件（src/proactive/）存在且有内容。
+**特殊說明**: PROACTIVE 在程式碼中幾乎總是與 KAIROS 一起使用（`feature('PROACTIVE') || feature('KAIROS')`），意味着啓用 KAIROS 也會啓用主動功能。PROACTIVE 模組文件（src/proactive/）存在且有內容。
 
-**启用所需操作**: 仅需将编译标志 `PROACTIVE` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `PROACTIVE` 設爲 `true`。
 
 ---
 
 ## 20. CHICAGO_MCP `[build: ON] [dev: ON]`
 
-**编译时引用次数**: 16
-**功能描述**: Chicago MCP（Computer Use 计算机使用）。集成计算机使用功能，允许 AI 控制桌面应用程序。
-**分类**: COMPLETE
-**启用条件**: 将 `CHICAGO_MCP` 编译标志设为 `true`
+**編譯時引用次數**: 16
+**功能描述**: Chicago MCP（Computer Use 計算機使用）。集成計算機使用功能，允許 AI 控制桌面應用程式。
+**分類**: COMPLETE
+**啓用條件**: 將 `CHICAGO_MCP` 編譯標誌設爲 `true`
 
-**核心实现文件（共 421 行）**:
+**核心實現文件（共 421 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/utils/computerUse/wrapper.tsx | 335 行 | 计算机使用包装器 |
-| src/utils/computerUse/cleanup.ts | 86 行 | 计算机使用清理 |
+| src/utils/computerUse/wrapper.tsx | 335 行 | 計算機使用包裝器 |
+| src/utils/computerUse/cleanup.ts | 86 行 | 計算機使用清理 |
 
-**引用该标志的文件（10 个）**:
+**引用該標誌的文件（10 個）**:
 1. src/entrypoints/cli.tsx — CLI 入口
 2. src/main.tsx — 主入口
-3. src/query.ts — 查询引擎
-4. src/query/stopHooks.ts — 停止钩子
-5. src/services/analytics/metadata.ts — 分析元数据
-6. src/services/mcp/client.ts — MCP 客户端
-7. src/services/mcp/config.ts — MCP 配置
-8. src/state/AppStateStore.ts — 应用状态
+3. src/query.ts — 查詢引擎
+4. src/query/stopHooks.ts — 停止鉤子
+5. src/services/analytics/metadata.ts — 分析元資料
+6. src/services/mcp/client.ts — MCP 客戶端
+7. src/services/mcp/config.ts — MCP 設定
+8. src/state/AppStateStore.ts — 應用狀態
 9. src/utils/computerUse/cleanup.ts — 清理
-10. src/utils/computerUse/wrapper.tsx — 包装器
+10. src/utils/computerUse/wrapper.tsx — 包裝器
 
-**启用所需操作**: 仅需将编译标志 `CHICAGO_MCP` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `CHICAGO_MCP` 設爲 `true`。
 
 ---
 
 ## 21. VERIFICATION_AGENT
 
-**编译时引用次数**: 4
-**功能描述**: 验证代理。内置代理类型，用于验证任务执行结果的正确性。
-**分类**: COMPLETE
-**启用条件**: 将 `VERIFICATION_AGENT` 编译标志设为 `true`
+**編譯時引用次數**: 4
+**功能描述**: 驗證代理。內置代理類型，用於驗證任務執行結果的正確性。
+**分類**: COMPLETE
+**啓用條件**: 將 `VERIFICATION_AGENT` 編譯標誌設爲 `true`
 
-**核心实现文件（共 478 行）**:
+**核心實現文件（共 478 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/tools/TaskUpdateTool/TaskUpdateTool.ts | 406 行 | 任务更新工具 |
-| src/tools/AgentTool/builtInAgents.ts | 72 行 | 内置代理定义 |
+| src/tools/TaskUpdateTool/TaskUpdateTool.ts | 406 行 | 任務更新工具 |
+| src/tools/AgentTool/builtInAgents.ts | 72 行 | 內置代理定義 |
 
-**引用该标志的文件（4 个）**:
-1. src/constants/prompts.ts — 提示词
-2. src/tools/AgentTool/builtInAgents.ts — 内置代理
-3. src/tools/TaskUpdateTool/TaskUpdateTool.ts — 任务更新工具
+**引用該標誌的文件（4 個）**:
+1. src/constants/prompts.ts — 提示詞
+2. src/tools/AgentTool/builtInAgents.ts — 內置代理
+3. src/tools/TaskUpdateTool/TaskUpdateTool.ts — 任務更新工具
 4. src/tools/TodoWriteTool/TodoWriteTool.ts — TodoWrite 工具
 
-**启用所需操作**: 仅需将编译标志 `VERIFICATION_AGENT` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `VERIFICATION_AGENT` 設爲 `true`。
 
 ---
 
 ## 22. PROMPT_CACHE_BREAK_DETECTION `[build: ON] [dev: ON]` *NEW*
 
-**编译时引用次数**: 9
-**功能描述**: 提示缓存中断检测。检测提示缓存是否被意外破坏，并在压缩时考虑缓存状态。
-**分类**: COMPLETE
-**启用条件**: 将 `PROMPT_CACHE_BREAK_DETECTION` 编译标志设为 `true`
+**編譯時引用次數**: 9
+**功能描述**: 提示快取中斷檢測。檢測提示快取是否被意外破壞，並在壓縮時考慮快取狀態。
+**分類**: COMPLETE
+**啓用條件**: 將 `PROMPT_CACHE_BREAK_DETECTION` 編譯標誌設爲 `true`
 
-**引用该标志的文件（6 个）**:
-1. src/commands/compact/compact.ts — 压缩命令
-2. src/services/api/claude.ts — Claude API 服务
-3. src/services/compact/autoCompact.ts — 自动压缩
-4. src/services/compact/compact.ts — 压缩核心
-5. src/services/compact/microCompact.ts — 微压缩
-6. src/tools/AgentTool/runAgent.ts — 运行 Agent
+**引用該標誌的文件（6 個）**:
+1. src/commands/compact/compact.ts — 壓縮命令
+2. src/services/api/claude.ts — Claude API 服務
+3. src/services/compact/autoCompact.ts — 自動壓縮
+4. src/services/compact/compact.ts — 壓縮核心
+5. src/services/compact/microCompact.ts — 微壓縮
+6. src/tools/AgentTool/runAgent.ts — 執行 Agent
 
-**启用所需操作**: 仅需将编译标志 `PROMPT_CACHE_BREAK_DETECTION` 设为 `true`。
+**啓用所需操作**: 僅需將編譯標誌 `PROMPT_CACHE_BREAK_DETECTION` 設爲 `true`。
 
 ---
 
-# 二、PARTIAL（部分实现）— 共 19 个
+# 二、PARTIAL（部分實現）— 共 19 個
 
-以下标志有实质性的功能代码，但存在缺失的文件（命令入口、组件等）或关键模块仅有空壳。启用后可能报错或功能不完整。
+以下標誌有實質性的功能程式碼，但存在缺失的文件（命令入口、組件等）或關鍵模組僅有空殼。啓用後可能報錯或功能不完整。
 
 ---
 
 ## 23. KAIROS
 
-**编译时引用次数**: 156（单引号 154 + 双引号 2）
-**功能描述**: Kairos 是 Claude Code 最大的功能集合。它是一个综合性平台功能，涵盖频道通知、主动模式、简报、GitHub Webhook、推送通知等多个子系统。几乎贯穿整个代码库。
-**分类**: PARTIAL
-**缺失原因**: `src/commands/assistant/` 目录完全缺失（包括 `index.ts` 和 `gate.ts`），但 `src/commands.ts` 中通过条件 require 引用了 `commands/assistant/index.js`
+**編譯時引用次數**: 156（單引號 154 + 雙引號 2）
+**功能描述**: Kairos 是 Claude Code 最大的功能集合。它是一個綜合性平臺功能，涵蓋頻道通知、主動模式、簡報、GitHub Webhook、推送通知等多個子系統。幾乎貫穿整個程式碼庫。
+**分類**: PARTIAL
+**缺失原因**: `src/commands/assistant/` 目錄完全缺失（包括 `index.ts` 和 `gate.ts`），但 `src/commands.ts` 中通過條件 require 引用了 `commands/assistant/index.js`
 
-**引用该标志的文件（59 个）**:
+**引用該標誌的文件（59 個）**:
 1. src/bridge/bridgeMain.ts
 2. src/bridge/initReplBridge.ts
 3. src/cli/print.ts
@@ -874,187 +874,187 @@ src/utils/swarm/ 目录（22 个文件）:
 - src/commands/assistant/index.ts — 完全缺失（src/commands.ts 第 69 行引用了 `commands/assistant/index.js`）
 - src/commands/assistant/gate.ts — 完全缺失
 
-**启用所需修复**: 需要创建 `src/commands/assistant/` 目录及其 `index.ts` 和 `gate.ts` 文件。
+**啓用所需修復**: 需要建立 `src/commands/assistant/` 目錄及其 `index.ts` 和 `gate.ts` 文件。
 
 ---
 
 ## 24. BUDDY `[dev: ON]`
 
-**编译时引用次数**: 18（单引号 16 + 双引号 2）
-**功能描述**: 伙伴精灵功能。在 CLI 中显示一个可爱的像素精灵角色作为 AI 助手的化身，有动画、表情、通知等。
-**分类**: PARTIAL
-**缺失原因**: `src/commands/buddy/index.ts` 命令入口文件缺失，但 `src/buddy/` 目录下有完整的 1,298 行实现代码
+**編譯時引用次數**: 18（單引號 16 + 雙引號 2）
+**功能描述**: 夥伴精靈功能。在 CLI 中顯示一個可愛的像素精靈角色作爲 AI 助手的化身，有動畫、表情、通知等。
+**分類**: PARTIAL
+**缺失原因**: `src/commands/buddy/index.ts` 命令入口文件缺失，但 `src/buddy/` 目錄下有完整的 1,298 行實現程式碼
 
-**核心实现文件（src/buddy/ 目录，共 1,298 行）**:
+**核心實現文件（src/buddy/ 目錄，共 1,298 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/buddy/sprites.ts | 514 行 | 精灵图形定义 |
-| src/buddy/CompanionSprite.tsx | 370 行 | 精灵 React 组件 |
-| src/buddy/types.ts | 148 行 | 类型定义 |
-| src/buddy/companion.ts | 133 行 | 伙伴核心逻辑 |
-| src/buddy/useBuddyNotification.tsx | 97 行 | 伙伴通知 Hook |
-| src/buddy/prompt.ts | 36 行 | 伙伴提示词 |
+| src/buddy/sprites.ts | 514 行 | 精靈圖形定義 |
+| src/buddy/CompanionSprite.tsx | 370 行 | 精靈 React 組件 |
+| src/buddy/types.ts | 148 行 | 類型定義 |
+| src/buddy/companion.ts | 133 行 | 夥伴核心邏輯 |
+| src/buddy/useBuddyNotification.tsx | 97 行 | 夥伴通知 Hook |
+| src/buddy/prompt.ts | 36 行 | 夥伴提示詞 |
 
-**引用该标志的文件（8 个）**:
-1. src/buddy/CompanionSprite.tsx — 精灵组件
-2. src/buddy/prompt.ts — 提示词
+**引用該標誌的文件（8 個）**:
+1. src/buddy/CompanionSprite.tsx — 精靈組件
+2. src/buddy/prompt.ts — 提示詞
 3. src/buddy/useBuddyNotification.tsx — 通知
-4. src/commands.ts — 条件注册 `/buddy` 命令（引用 `commands/buddy/index.js`）
-5. src/components/PromptInput/PromptInput.tsx — 提示输入
+4. src/commands.ts — 條件註冊 `/buddy` 命令（引用 `commands/buddy/index.js`）
+5. src/components/PromptInput/PromptInput.tsx — 提示輸入
 6. src/screens/REPL.tsx — REPL 集成
 7. src/utils/attachments.ts — 附件
 
 **缺失文件**:
 - src/commands/buddy/index.ts — 命令入口缺失
 
-**启用所需修复**: 需要创建 `src/commands/buddy/index.ts` 命令入口文件。
+**啓用所需修復**: 需要建立 `src/commands/buddy/index.ts` 命令入口文件。
 
 ---
 
 ## 25. MONITOR_TOOL
 
-**编译时引用次数**: 13
-**功能描述**: 监控工具。允许 AI 在后台启动长时间运行的 shell 任务并监控其输出。
-**分类**: PARTIAL
-**缺失原因**: MonitorMcpDetailDialog 和 MonitorPermissionRequest 文件虽然存在但仅有 3 行空壳
+**編譯時引用次數**: 13
+**功能描述**: 監控工具。允許 AI 在後臺啓動長時間執行的 shell 任務並監控其輸出。
+**分類**: PARTIAL
+**缺失原因**: MonitorMcpDetailDialog 和 MonitorPermissionRequest 文件雖然存在但僅有 3 行空殼
 
-**核心实现文件**:
+**核心實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/tasks/LocalShellTask/LocalShellTask.tsx | 522 行 | 本地 Shell 任务完整实现 |
-| src/tools/MonitorTool/MonitorTool.ts | 1 行 | 监控工具（桩） |
-| src/tasks/MonitorMcpTask/MonitorMcpTask.ts | 5 行 | MCP 监控任务（桩） |
-| src/components/tasks/MonitorMcpDetailDialog.tsx | 3 行 | MCP 详情对话框（桩） |
-| src/components/permissions/MonitorPermissionRequest/MonitorPermissionRequest.tsx | 3 行 | 监控权限请求（桩） |
+| src/tasks/LocalShellTask/LocalShellTask.tsx | 522 行 | 本地 Shell 任務完整實現 |
+| src/tools/MonitorTool/MonitorTool.ts | 1 行 | 監控工具（樁） |
+| src/tasks/MonitorMcpTask/MonitorMcpTask.ts | 5 行 | MCP 監控任務（樁） |
+| src/components/tasks/MonitorMcpDetailDialog.tsx | 3 行 | MCP 詳情對話框（樁） |
+| src/components/permissions/MonitorPermissionRequest/MonitorPermissionRequest.tsx | 3 行 | 監控權限請求（樁） |
 
-**引用该标志的文件（9 个）**:
-1. src/components/permissions/PermissionRequest.tsx — 权限请求
-2. src/components/tasks/BackgroundTasksDialog.tsx — 后台任务对话框
-3. src/tasks.ts — 任务注册
-4. src/tasks/LocalShellTask/LocalShellTask.tsx — Shell 任务
-5. src/tools.ts — 工具注册
-6. src/tools/AgentTool/runAgent.ts — Agent 运行
+**引用該標誌的文件（9 個）**:
+1. src/components/permissions/PermissionRequest.tsx — 權限請求
+2. src/components/tasks/BackgroundTasksDialog.tsx — 後臺任務對話框
+3. src/tasks.ts — 任務註冊
+4. src/tasks/LocalShellTask/LocalShellTask.tsx — Shell 任務
+5. src/tools.ts — 工具註冊
+6. src/tools/AgentTool/runAgent.ts — Agent 執行
 7. src/tools/BashTool/BashTool.tsx — Bash 工具
 8. src/tools/BashTool/prompt.ts — Bash 提示
 9. src/tools/PowerShellTool/PowerShellTool.tsx — PowerShell 工具
 
-**启用所需修复**: 需要实现 `src/tools/MonitorTool/MonitorTool.ts`、`src/tasks/MonitorMcpTask/MonitorMcpTask.ts`、`src/components/tasks/MonitorMcpDetailDialog.tsx` 和 `src/components/permissions/MonitorPermissionRequest/MonitorPermissionRequest.tsx`。
+**啓用所需修復**: 需要實現 `src/tools/MonitorTool/MonitorTool.ts`、`src/tasks/MonitorMcpTask/MonitorMcpTask.ts`、`src/components/tasks/MonitorMcpDetailDialog.tsx` 和 `src/components/permissions/MonitorPermissionRequest/MonitorPermissionRequest.tsx`。
 
 ---
 
 ## 26. HISTORY_SNIP
 
-**编译时引用次数**: 16（单引号 15 + 双引号 1）
-**功能描述**: 历史剪辑。允许从对话历史中剪切特定片段。
-**分类**: PARTIAL
+**編譯時引用次數**: 16（單引號 15 + 雙引號 1）
+**功能描述**: 歷史剪輯。允許從對話歷史中剪切特定片段。
+**分類**: PARTIAL
 **缺失原因**: `src/commands/force-snip.ts` 命令文件缺失
 
-**引用该标志的文件（8 个）**:
-1. src/QueryEngine.ts — 查询引擎
-2. src/commands.ts — 命令注册（引用 `commands/force-snip.js`）
-3. src/components/Message.tsx — 消息组件
-4. src/query.ts — 查询
-5. src/tools.ts — 工具注册
+**引用該標誌的文件（8 個）**:
+1. src/QueryEngine.ts — 查詢引擎
+2. src/commands.ts — 命令註冊（引用 `commands/force-snip.js`）
+3. src/components/Message.tsx — 訊息組件
+4. src/query.ts — 查詢
+5. src/tools.ts — 工具註冊
 6. src/utils/attachments.ts — 附件
-7. src/utils/collapseReadSearch.ts — 折叠读取搜索
-8. src/utils/messages.ts — 消息处理
+7. src/utils/collapseReadSearch.ts — 摺疊讀取搜索
+8. src/utils/messages.ts — 訊息處理
 
 **缺失文件**:
 - src/commands/force-snip.ts — 命令文件缺失
 
-**启用所需修复**: 需要创建 `src/commands/force-snip.ts`。
+**啓用所需修復**: 需要建立 `src/commands/force-snip.ts`。
 
 ---
 
 ## 27. WORKFLOW_SCRIPTS
 
-**编译时引用次数**: 10
-**功能描述**: 工作流脚本。允许定义和执行自定义工作流。
-**分类**: PARTIAL
-**缺失原因**: 多个核心文件仅有 1-5 行空壳，命令入口目录缺失
+**編譯時引用次數**: 10
+**功能描述**: 工作流腳本。允許定義和執行自定義工作流。
+**分類**: PARTIAL
+**缺失原因**: 多個核心文件僅有 1-5 行空殼，命令入口目錄缺失
 
-**实现文件（大部分为空壳）**:
+**實現文件（大部分爲空殼）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/components/WorkflowMultiselectDialog.tsx | 127 行 | 工作流多选对话框（有内容） |
-| src/tasks/LocalWorkflowTask/LocalWorkflowTask.ts | 5 行 | 本地工作流任务（桩） |
-| src/components/tasks/WorkflowDetailDialog.tsx | 3 行 | 工作流详情对话框（桩） |
-| src/tools/WorkflowTool/WorkflowPermissionRequest.tsx | 3 行 | 工作流权限请求（桩） |
-| src/tools/WorkflowTool/createWorkflowCommand.ts | 3 行 | 创建工作流命令（桩） |
-| src/tools/WorkflowTool/WorkflowTool.ts | 1 行 | 工作流工具（桩） |
-| src/tools/WorkflowTool/constants.ts | 1 行 | 常量（桩） |
+| src/components/WorkflowMultiselectDialog.tsx | 127 行 | 工作流多選對話框（有內容） |
+| src/tasks/LocalWorkflowTask/LocalWorkflowTask.ts | 5 行 | 本地工作流任務（樁） |
+| src/components/tasks/WorkflowDetailDialog.tsx | 3 行 | 工作流詳情對話框（樁） |
+| src/tools/WorkflowTool/WorkflowPermissionRequest.tsx | 3 行 | 工作流權限請求（樁） |
+| src/tools/WorkflowTool/createWorkflowCommand.ts | 3 行 | 建立工作流命令（樁） |
+| src/tools/WorkflowTool/WorkflowTool.ts | 1 行 | 工作流工具（樁） |
+| src/tools/WorkflowTool/constants.ts | 1 行 | 常量（樁） |
 
-**引用该标志的文件（7 个）**:
-1. src/commands.ts — 命令注册（引用 `commands/workflows/index.js`）
-2. src/components/permissions/PermissionRequest.tsx — 权限请求
-3. src/components/tasks/BackgroundTasksDialog.tsx — 后台任务
+**引用該標誌的文件（7 個）**:
+1. src/commands.ts — 命令註冊（引用 `commands/workflows/index.js`）
+2. src/components/permissions/PermissionRequest.tsx — 權限請求
+3. src/components/tasks/BackgroundTasksDialog.tsx — 後臺任務
 4. src/constants/tools.ts — 工具常量
-5. src/tasks.ts — 任务注册
-6. src/tools.ts — 工具注册
-7. src/utils/permissions/classifierDecision.ts — 分类器决策
+5. src/tasks.ts — 任務註冊
+6. src/tools.ts — 工具註冊
+7. src/utils/permissions/classifierDecision.ts — 分類器決策
 
 **缺失文件**:
-- src/commands/workflows/index.ts — 命令入口目录缺失
+- src/commands/workflows/index.ts — 命令入口目錄缺失
 
-**启用所需修复**: 需要实现所有空壳文件并创建命令入口。
+**啓用所需修復**: 需要實現所有空殼文件並建立命令入口。
 
 ---
 
 ## 28. UDS_INBOX
 
-**编译时引用次数**: 18（单引号 17 + 双引号 1）
-**功能描述**: UDS（Unix Domain Socket）收件箱。允许 Claude Code 实例之间通过 Unix 套接字发送消息。
-**分类**: PARTIAL
-**缺失原因**: `src/utils/udsMessaging.ts` 仅 1 行，`src/utils/udsClient.ts` 仅 3 行（空壳），命令入口缺失
+**編譯時引用次數**: 18（單引號 17 + 雙引號 1）
+**功能描述**: UDS（Unix Domain Socket）收件箱。允許 Claude Code 實例之間通過 Unix 套接字發送訊息。
+**分類**: PARTIAL
+**缺失原因**: `src/utils/udsMessaging.ts` 僅 1 行，`src/utils/udsClient.ts` 僅 3 行（空殼），命令入口缺失
 
-**核心实现文件**:
+**核心實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/tools/SendMessageTool/SendMessageTool.ts | 917 行 | 发送消息工具（完整实现） |
-| src/tools/SendMessageTool/prompt.ts | 49 行 | 消息工具提示词 |
-| src/utils/udsClient.ts | 3 行 | UDS 客户端（桩） |
-| src/utils/udsMessaging.ts | 1 行 | UDS 消息（桩） |
+| src/tools/SendMessageTool/SendMessageTool.ts | 917 行 | 發送訊息工具（完整實現） |
+| src/tools/SendMessageTool/prompt.ts | 49 行 | 訊息工具提示詞 |
+| src/utils/udsClient.ts | 3 行 | UDS 客戶端（樁） |
+| src/utils/udsMessaging.ts | 1 行 | UDS 訊息（樁） |
 
-**引用该标志的文件（10 个）**:
-1. src/cli/print.ts — CLI 输出
-2. src/commands.ts — 命令注册（引用 `commands/peers/index.js`）
-3. src/components/messages/UserTextMessage.tsx — 用户消息
+**引用該標誌的文件（10 個）**:
+1. src/cli/print.ts — CLI 輸出
+2. src/commands.ts — 命令註冊（引用 `commands/peers/index.js`）
+3. src/components/messages/UserTextMessage.tsx — 用戶訊息
 4. src/main.tsx — 主入口
 5. src/setup.ts — 初始化
-6. src/tools.ts — 工具注册
-7. src/tools/SendMessageTool/SendMessageTool.ts — 发送消息工具
-8. src/tools/SendMessageTool/prompt.ts — 提示词
-9. src/utils/concurrentSessions.ts — 并发会话
-10. src/utils/messages/systemInit.ts — 系统初始化消息
+6. src/tools.ts — 工具註冊
+7. src/tools/SendMessageTool/SendMessageTool.ts — 發送訊息工具
+8. src/tools/SendMessageTool/prompt.ts — 提示詞
+9. src/utils/concurrentSessions.ts — 併發會話
+10. src/utils/messages/systemInit.ts — 系統初始化訊息
 
 **缺失文件**:
 - src/commands/peers/index.ts — 命令入口缺失
-- src/utils/udsMessaging.ts — 仅 1 行空壳
-- src/utils/udsClient.ts — 仅 3 行空壳
+- src/utils/udsMessaging.ts — 僅 1 行空殼
+- src/utils/udsClient.ts — 僅 3 行空殼
 
-**启用所需修复**: 需要实现 UDS 客户端和消息模块，并创建命令入口。
+**啓用所需修復**: 需要實現 UDS 客戶端和訊息模組，並建立命令入口。
 
 ---
 
 ## 29. KAIROS_CHANNELS
 
-**编译时引用次数**: 21（单引号 19 + 双引号 2）
-**功能描述**: Kairos 频道功能。MCP 频道通知系统。
-**分类**: PARTIAL
-**缺失原因**: 依赖 KAIROS 的 assistant/gate.ts 模块
+**編譯時引用次數**: 21（單引號 19 + 雙引號 2）
+**功能描述**: Kairos 頻道功能。MCP 頻道通知系統。
+**分類**: PARTIAL
+**缺失原因**: 依賴 KAIROS 的 assistant/gate.ts 模組
 
-**核心实现文件（共 581 行）**:
+**核心實現文件（共 581 行）**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/services/mcp/channelNotification.ts | 316 行 | 频道通知服务 |
-| src/components/LogoV2/ChannelsNotice.tsx | 265 行 | 频道通知 UI |
+| src/services/mcp/channelNotification.ts | 316 行 | 頻道通知服務 |
+| src/components/LogoV2/ChannelsNotice.tsx | 265 行 | 頻道通知 UI |
 
-**引用该标志的文件（15 个）**:
+**引用該標誌的文件（15 個）**:
 1. src/cli/print.ts
 2. src/components/LogoV2/ChannelsNotice.tsx
 3. src/components/LogoV2/LogoV2.tsx
@@ -1071,131 +1071,131 @@ src/utils/swarm/ 目录（22 个文件）:
 14. src/utils/messageQueueManager.ts
 15. src/utils/messages.ts
 
-**启用所需修复**: 需先修复 KAIROS 的缺失文件。
+**啓用所需修復**: 需先修復 KAIROS 的缺失文件。
 
 ---
 
 ## 30. FORK_SUBAGENT
 
-**编译时引用次数**: 5（单引号 4 + 双引号 1）
-**功能描述**: 分叉子代理。允许从当前会话分叉出独立的子代理进程。
-**分类**: PARTIAL
-**缺失原因**: `src/commands/fork/index.ts` 命令入口缺失（注意：代码中引用的是 `commands/branch/index.js`，而 `src/commands/branch/index.ts` 存在）
+**編譯時引用次數**: 5（單引號 4 + 雙引號 1）
+**功能描述**: 分叉子代理。允許從當前會話分叉出獨立的子代理進程。
+**分類**: PARTIAL
+**缺失原因**: `src/commands/fork/index.ts` 命令入口缺失（注意：程式碼中引用的是 `commands/branch/index.js`，而 `src/commands/branch/index.ts` 存在）
 
-**核心实现文件**:
+**核心實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/tools/AgentTool/forkSubagent.ts | 210 行 | 分叉子代理核心逻辑 |
+| src/tools/AgentTool/forkSubagent.ts | 210 行 | 分叉子代理核心邏輯 |
 
-**引用该标志的文件（5 个）**:
-1. src/commands.ts — 命令注册
+**引用該標誌的文件（5 個）**:
+1. src/commands.ts — 命令註冊
 2. src/commands/branch/index.ts — 分支命令入口
-3. src/components/messages/UserTextMessage.tsx — 用户消息
-4. src/tools/AgentTool/forkSubagent.ts — 分叉逻辑
+3. src/components/messages/UserTextMessage.tsx — 用戶訊息
+4. src/tools/AgentTool/forkSubagent.ts — 分叉邏輯
 5. src/tools/ToolSearchTool/prompt.ts — 工具搜索提示
 
 **缺失文件**:
 - src/commands/fork/index.ts — 命令入口缺失（但 branch/index.ts 存在，可能是重命名）
 
-**启用所需修复**: 需确认命令入口路径是否正确。
+**啓用所需修復**: 需確認命令入口路徑是否正確。
 
 ---
 
 ## 31. EXPERIMENTAL_SKILL_SEARCH
 
-**编译时引用次数**: 21
-**功能描述**: 实验性技能搜索。本地技能搜索功能。
-**分类**: PARTIAL
-**缺失原因**: 核心搜索逻辑可能不完整（SkillTool.ts 有 1,108 行但 localSearch 功能可能缺失）
+**編譯時引用次數**: 21
+**功能描述**: 實驗性技能搜索。本地技能搜索功能。
+**分類**: PARTIAL
+**缺失原因**: 核心搜索邏輯可能不完整（SkillTool.ts 有 1,108 行但 localSearch 功能可能缺失）
 
-**引用该标志的文件（9 个）**:
-1. src/commands.ts — 命令注册
-2. src/components/messages/AttachmentMessage.tsx — 附件消息
-3. src/constants/prompts.ts — 提示词
-4. src/query.ts — 查询
-5. src/services/compact/compact.ts — 压缩
-6. src/services/mcp/useManageMCPConnections.ts — MCP 连接管理
+**引用該標誌的文件（9 個）**:
+1. src/commands.ts — 命令註冊
+2. src/components/messages/AttachmentMessage.tsx — 附件訊息
+3. src/constants/prompts.ts — 提示詞
+4. src/query.ts — 查詢
+5. src/services/compact/compact.ts — 壓縮
+6. src/services/mcp/useManageMCPConnections.ts — MCP 連接管理
 7. src/tools/SkillTool/SkillTool.ts — 技能工具（1,108 行）
 8. src/utils/attachments.ts — 附件
-9. src/utils/messages.ts — 消息
+9. src/utils/messages.ts — 訊息
 
 ---
 
 ## 32. WEB_BROWSER_TOOL
 
-**编译时引用次数**: 4
-**功能描述**: Web 浏览器工具。允许 AI 在面板中打开和操作网页。
-**分类**: PARTIAL
-**缺失原因**: `src/tools/WebBrowserTool/WebBrowserPanel.tsx` 仅 3 行，返回 `null`
+**編譯時引用次數**: 4
+**功能描述**: Web 瀏覽器工具。允許 AI 在面板中打開和操作網頁。
+**分類**: PARTIAL
+**缺失原因**: `src/tools/WebBrowserTool/WebBrowserPanel.tsx` 僅 3 行，返回 `null`
 
-**实现文件**:
+**實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
 | src/tools/WebBrowserTool/WebBrowserPanel.tsx | 3 行 | `export function WebBrowserPanel() { return null }` |
 
-**引用该标志的文件（3 个）**:
+**引用該標誌的文件（3 個）**:
 1. src/main.tsx — 主入口
 2. src/screens/REPL.tsx — REPL
-3. src/tools.ts — 工具注册
+3. src/tools.ts — 工具註冊
 
-**启用所需修复**: 需要实现 `WebBrowserPanel.tsx`。
+**啓用所需修復**: 需要實現 `WebBrowserPanel.tsx`。
 
 ---
 
 ## 33. MCP_SKILLS
 
-**编译时引用次数**: 9
-**功能描述**: MCP 技能系统。通过 MCP 协议加载和运行技能。
-**分类**: PARTIAL
+**編譯時引用次數**: 9
+**功能描述**: MCP 技能系統。通過 MCP 協議加載和執行技能。
+**分類**: PARTIAL
 
-**实现文件**:
+**實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/skills/mcpSkillBuilders.ts | 44 行 | MCP 技能构建器 |
-| src/skills/mcpSkills.ts | 3 行 | MCP 技能（桩） |
+| src/skills/mcpSkillBuilders.ts | 44 行 | MCP 技能構建器 |
+| src/skills/mcpSkills.ts | 3 行 | MCP 技能（樁） |
 
-**引用该标志的文件（3 个）**:
-1. src/commands.ts — 命令注册
-2. src/services/mcp/client.ts — MCP 客户端
-3. src/services/mcp/useManageMCPConnections.ts — MCP 连接管理
+**引用該標誌的文件（3 個）**:
+1. src/commands.ts — 命令註冊
+2. src/services/mcp/client.ts — MCP 客戶端
+3. src/services/mcp/useManageMCPConnections.ts — MCP 連接管理
 
 ---
 
 ## 34. REVIEW_ARTIFACT
 
-**编译时引用次数**: 4
-**功能描述**: 审查工件。允许 AI 审查和标注工件（代码片段、文档等）。
-**分类**: PARTIAL
-**缺失原因**: ReviewArtifactTool.ts 仅 1 行，ReviewArtifactPermissionRequest.tsx 仅 3 行
+**編譯時引用次數**: 4
+**功能描述**: 審查工件。允許 AI 審查和標註工件（程式碼片段、文件等）。
+**分類**: PARTIAL
+**缺失原因**: ReviewArtifactTool.ts 僅 1 行，ReviewArtifactPermissionRequest.tsx 僅 3 行
 
-**实现文件**:
+**實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/tools/ReviewArtifactTool/ReviewArtifactTool.ts | 1 行 | 审查工件工具（桩） |
-| src/components/permissions/ReviewArtifactPermissionRequest/ReviewArtifactPermissionRequest.tsx | 3 行 | 权限请求（桩） |
+| src/tools/ReviewArtifactTool/ReviewArtifactTool.ts | 1 行 | 審查工件工具（樁） |
+| src/components/permissions/ReviewArtifactPermissionRequest/ReviewArtifactPermissionRequest.tsx | 3 行 | 權限請求（樁） |
 
-**引用该标志的文件（2 个）**:
-1. src/components/permissions/PermissionRequest.tsx — 权限请求
-2. src/skills/bundled/index.ts — 内置技能
+**引用該標誌的文件（2 個）**:
+1. src/components/permissions/PermissionRequest.tsx — 權限請求
+2. src/skills/bundled/index.ts — 內置技能
 
 ---
 
 ## 35. KAIROS_GITHUB_WEBHOOKS
 
-**编译时引用次数**: 4（单引号 3 + 双引号 1）
-**功能描述**: Kairos GitHub Webhooks。订阅 GitHub PR 活动的 Webhook。
-**分类**: PARTIAL
+**編譯時引用次數**: 4（單引號 3 + 雙引號 1）
+**功能描述**: Kairos GitHub Webhooks。訂閱 GitHub PR 活動的 Webhook。
+**分類**: PARTIAL
 **缺失原因**: `src/commands/subscribe-pr.ts` 命令文件缺失
 
-**引用该标志的文件（4 个）**:
-1. src/commands.ts — 命令注册（引用 `commands/subscribe-pr.js`）
-2. src/components/messages/UserTextMessage.tsx — 用户消息
-3. src/hooks/useReplBridge.tsx — REPL 桥接
-4. src/tools.ts — 工具注册
+**引用該標誌的文件（4 個）**:
+1. src/commands.ts — 命令註冊（引用 `commands/subscribe-pr.js`）
+2. src/components/messages/UserTextMessage.tsx — 用戶訊息
+3. src/hooks/useReplBridge.tsx — REPL 橋接
+4. src/tools.ts — 工具註冊
 
 **缺失文件**:
 - src/commands/subscribe-pr.ts — 命令文件缺失
@@ -1204,664 +1204,664 @@ src/utils/swarm/ 目录（22 个文件）:
 
 ## 36. CONNECTOR_TEXT
 
-**编译时引用次数**: 8（单引号 7 + 双引号 1）
-**功能描述**: 连接器文本。控制消息中的连接器文本显示方式。
-**分类**: PARTIAL
+**編譯時引用次數**: 8（單引號 7 + 雙引號 1）
+**功能描述**: 連接器文本。控制訊息中的連接器文本顯示方式。
+**分類**: PARTIAL
 
-**引用该标志的文件（5 个）**:
-1. src/components/Message.tsx — 消息组件
+**引用該標誌的文件（5 個）**:
+1. src/components/Message.tsx — 訊息組件
 2. src/constants/betas.ts — Beta 常量
 3. src/services/api/claude.ts — Claude API
-4. src/services/api/logging.ts — API 日志
-5. src/utils/messages.ts — 消息处理
+4. src/services/api/logging.ts — API 日誌
+5. src/utils/messages.ts — 訊息處理
 
 ---
 
 ## 37. TEMPLATES
 
-**编译时引用次数**: 6
-**功能描述**: 模板系统。支持从 Markdown 配置文件加载模板。
-**分类**: PARTIAL
+**編譯時引用次數**: 6
+**功能描述**: 模板系統。支援從 Markdown 設定文件加載模板。
+**分類**: PARTIAL
 
-**实现文件**:
+**實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/utils/markdownConfigLoader.ts | 600 行 | Markdown 配置加载器 |
-| src/keybindings/template.ts | 52 行 | 模板键绑定 |
+| src/utils/markdownConfigLoader.ts | 600 行 | Markdown 設定加載器 |
+| src/keybindings/template.ts | 52 行 | 模板鍵綁定 |
 
-**引用该标志的文件（5 个）**:
+**引用該標誌的文件（5 個）**:
 1. src/entrypoints/cli.tsx — CLI 入口
-2. src/query.ts — 查询
-3. src/query/stopHooks.ts — 停止钩子
-4. src/utils/markdownConfigLoader.ts — 配置加载器
-5. src/utils/permissions/filesystem.ts — 文件系统权限
+2. src/query.ts — 查詢
+3. src/query/stopHooks.ts — 停止鉤子
+4. src/utils/markdownConfigLoader.ts — 設定加載器
+5. src/utils/permissions/filesystem.ts — 檔案系統權限
 
 ---
 
 ## 38. LODESTONE
 
-**编译时引用次数**: 6
-**功能描述**: Lodestone 功能。具体功能不明确，可能与导航或指引相关。
-**分类**: PARTIAL
+**編譯時引用次數**: 6
+**功能描述**: Lodestone 功能。具體功能不明確，可能與導航或指引相關。
+**分類**: PARTIAL
 
-**引用该标志的文件（4 个）**:
-1. src/interactiveHelpers.tsx — 交互帮助
+**引用該標誌的文件（4 個）**:
+1. src/interactiveHelpers.tsx — 交互幫助
 2. src/main.tsx — 主入口
-3. src/utils/backgroundHousekeeping.ts — 后台维护
-4. src/utils/settings/types.ts — 设置类型
+3. src/utils/backgroundHousekeeping.ts — 後臺維護
+4. src/utils/settings/types.ts — 設置類型
 
-**说明**: 没有专属实现文件，代码散布在 4 个文件中。
+**說明**: 沒有專屬實現文件，程式碼散佈在 4 個檔案中。
 
 ---
 
 ## 39. HISTORY_PICKER
 
-**编译时引用次数**: 4
-**功能描述**: 历史选择器。交互式历史搜索和选择。
-**分类**: PARTIAL
+**編譯時引用次數**: 4
+**功能描述**: 歷史選擇器。交互式歷史搜索和選擇。
+**分類**: PARTIAL
 
-**实现文件**:
+**實現文件**:
 
-| 文件路径 | 行数 | 功能说明 |
+| 檔案路徑 | 行數 | 功能說明 |
 |----------|------|----------|
-| src/hooks/useHistorySearch.ts | 303 行 | 历史搜索 Hook |
+| src/hooks/useHistorySearch.ts | 303 行 | 歷史搜索 Hook |
 
-**引用该标志的文件（2 个）**:
-1. src/components/PromptInput/PromptInput.tsx — 提示输入
-2. src/hooks/useHistorySearch.ts — 历史搜索
+**引用該標誌的文件（2 個）**:
+1. src/components/PromptInput/PromptInput.tsx — 提示輸入
+2. src/hooks/useHistorySearch.ts — 歷史搜索
 
 ---
 
 ## 40. MESSAGE_ACTIONS
 
-**编译时引用次数**: 5
-**功能描述**: 消息操作。对消息执行操作（如复制、编辑、重试等）。
-**分类**: PARTIAL
+**編譯時引用次數**: 5
+**功能描述**: 訊息操作。對訊息執行操作（如複製、編輯、重試等）。
+**分類**: PARTIAL
 
-**引用该标志的文件（2 个）**:
-1. src/keybindings/defaultBindings.ts — 默认键绑定
+**引用該標誌的文件（2 個）**:
+1. src/keybindings/defaultBindings.ts — 預設鍵綁定
 2. src/screens/REPL.tsx — REPL
 
 ---
 
 ## 41. TERMINAL_PANEL
 
-**编译时引用次数**: 5（单引号 4 + 双引号 1）
-**功能描述**: 终端面板。在 UI 中显示内嵌终端面板。
-**分类**: PARTIAL
+**編譯時引用次數**: 5（單引號 4 + 雙引號 1）
+**功能描述**: 終端面板。在 UI 中顯示內嵌終端面板。
+**分類**: PARTIAL
 
-**引用该标志的文件（5 个）**:
-1. src/components/PromptInput/PromptInputHelpMenu.tsx — 帮助菜单
-2. src/hooks/useGlobalKeybindings.tsx — 全局键绑定
-3. src/keybindings/defaultBindings.ts — 默认键绑定
-4. src/tools.ts — 工具注册
-5. src/utils/permissions/classifierDecision.ts — 分类器决策
+**引用該標誌的文件（5 個）**:
+1. src/components/PromptInput/PromptInputHelpMenu.tsx — 幫助菜單
+2. src/hooks/useGlobalKeybindings.tsx — 全局鍵綁定
+3. src/keybindings/defaultBindings.ts — 預設鍵綁定
+4. src/tools.ts — 工具註冊
+5. src/utils/permissions/classifierDecision.ts — 分類器決策
 
 ---
 
-# 三、STUB（纯桩/最小实现）— 共 51 个
+# 三、STUB（純樁/最小實現）— 共 51 個
 
-以下标志仅有极少的引用（通常 1-3 处），没有或几乎没有实际功能代码。代码只是为该标志预留了位置。
+以下標誌僅有極少的引用（通常 1-3 處），沒有或幾乎沒有實際功能程式碼。程式碼只是爲該標誌預留了位置。
 
 ---
 
 ## 42. TORCH
 
-**编译时引用次数**: 1
-**功能描述**: Torch 功能（具体不明）。
-**分类**: STUB
-**引用文件**: src/commands.ts — 条件注册 `/torch` 命令（引用 `commands/torch.js`）
+**編譯時引用次數**: 1
+**功能描述**: Torch 功能（具體不明）。
+**分類**: STUB
+**引用文件**: src/commands.ts — 條件註冊 `/torch` 命令（引用 `commands/torch.js`）
 **缺失文件**: src/commands/torch.ts — 命令文件完全不存在
-**代码量**: 0 行专属代码
-**说明**: 纯占位符，没有任何实现。
+**程式碼量**: 0 行專屬程式碼
+**說明**: 純佔位符，沒有任何實現。
 
 ---
 
 ## 43. KAIROS_DREAM
 
-**编译时引用次数**: 1
-**功能描述**: Kairos Dream（具体不明）。
-**分类**: STUB
-**引用文件**: src/skills/bundled/index.ts — 内置技能注册
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: Kairos Dream（具體不明）。
+**分類**: STUB
+**引用文件**: src/skills/bundled/index.ts — 內置技能註冊
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 44. KAIROS_PUSH_NOTIFICATION
 
-**编译时引用次数**: 4
+**編譯時引用次數**: 4
 **功能描述**: Kairos 推送通知。
-**分类**: STUB
+**分類**: STUB
 **引用文件**:
-1. src/components/Settings/Config.tsx — 设置
-2. src/tools.ts — 工具注册
-3. src/tools/ConfigTool/supportedSettings.ts — 支持的设置
-**代码量**: 0 行专属代码，仅在设置中预留了开关位
+1. src/components/Settings/Config.tsx — 設置
+2. src/tools.ts — 工具註冊
+3. src/tools/ConfigTool/supportedSettings.ts — 支援的設置
+**程式碼量**: 0 行專屬程式碼，僅在設置中預留了開關位
 
 ---
 
 ## 45. DAEMON
 
-**编译时引用次数**: 3
-**功能描述**: 守护进程模式。
-**分类**: STUB
+**編譯時引用次數**: 3
+**功能描述**: 守護進程模式。
+**分類**: STUB
 **引用文件**:
-1. src/commands.ts — 条件注册命令（与 BRIDGE_MODE 组合）
+1. src/commands.ts — 條件註冊命令（與 BRIDGE_MODE 組合）
 2. src/entrypoints/cli.tsx — CLI 入口
-**代码量**: 0 行专属代码
-**说明**: 在 commands.ts 中，`DAEMON` 与 `BRIDGE_MODE` 一起用于条件加载 `commands/remoteControlServer/index.js`，该文件不存在。
+**程式碼量**: 0 行專屬程式碼
+**說明**: 在 commands.ts 中，`DAEMON` 與 `BRIDGE_MODE` 一起用於條件加載 `commands/remoteControlServer/index.js`，該文件不存在。
 
 ---
 
 ## 46. DIRECT_CONNECT
 
-**编译时引用次数**: 5
-**功能描述**: 直连模式。
-**分类**: STUB
+**編譯時引用次數**: 5
+**功能描述**: 直連模式。
+**分類**: STUB
 **引用文件**: src/main.tsx — 主入口
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 47. SSH_REMOTE
 
-**编译时引用次数**: 4
-**功能描述**: SSH 远程连接。
-**分类**: STUB
+**編譯時引用次數**: 4
+**功能描述**: SSH 遠程連接。
+**分類**: STUB
 **引用文件**: src/main.tsx — 主入口
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 48. STREAMLINED_OUTPUT
 
-**编译时引用次数**: 1
-**功能描述**: 精简输出模式。
-**分类**: STUB
-**引用文件**: src/cli/print.ts — CLI 输出
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 精簡輸出模式。
+**分類**: STUB
+**引用文件**: src/cli/print.ts — CLI 輸出
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 49. ANTI_DISTILLATION_CC
 
-**编译时引用次数**: 1
-**功能描述**: 反蒸馏（防止模型蒸馏攻击）。
-**分类**: STUB
-**引用文件**: src/services/api/claude.ts — Claude API 服务
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 反蒸餾（防止模型蒸餾攻擊）。
+**分類**: STUB
+**引用文件**: src/services/api/claude.ts — Claude API 服務
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 50. NATIVE_CLIENT_ATTESTATION
 
-**编译时引用次数**: 1
-**功能描述**: 原生客户端认证。
-**分类**: STUB
-**引用文件**: src/constants/system.ts — 系统常量
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 原生客戶端認證。
+**分類**: STUB
+**引用文件**: src/constants/system.ts — 系統常量
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 51. ABLATION_BASELINE
 
-**编译时引用次数**: 1
-**功能描述**: 消融基线测试。
-**分类**: STUB
+**編譯時引用次數**: 1
+**功能描述**: 消融基線測試。
+**分類**: STUB
 **引用文件**: src/entrypoints/cli.tsx — CLI 入口
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 52. AGENT_MEMORY_SNAPSHOT
 
-**编译时引用次数**: 2
-**功能描述**: 代理记忆快照。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: 代理記憶快照。
+**分類**: STUB
 **引用文件**:
 1. src/main.tsx — 主入口
-2. src/tools/AgentTool/loadAgentsDir.ts — 加载代理目录
-**代码量**: 0 行专属代码
+2. src/tools/AgentTool/loadAgentsDir.ts — 加載代理目錄
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 53. AGENT_TRIGGERS_REMOTE `[build: ON] [dev: ON]`
 
-**编译时引用次数**: 2
-**功能描述**: 远程代理触发器。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: 遠程代理觸發器。
+**分類**: STUB
 **引用文件**:
-1. src/skills/bundled/index.ts — 内置技能
-2. src/tools.ts — 工具注册
-**代码量**: 0 行专属代码
+1. src/skills/bundled/index.ts — 內置技能
+2. src/tools.ts — 工具註冊
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 54. ALLOW_TEST_VERSIONS
 
-**编译时引用次数**: 2
-**功能描述**: 允许测试版本。
-**分类**: STUB
-**引用文件**: src/utils/nativeInstaller/download.ts — 原生安装器下载（523 行，但标志仅用于一处条件判断）
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 2
+**功能描述**: 允許測試版本。
+**分類**: STUB
+**引用文件**: src/utils/nativeInstaller/download.ts — 原生安裝器下載（523 行，但標誌僅用於一處條件判斷）
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 55. AUTO_THEME
 
-**编译时引用次数**: 3（单引号 2 + 双引号 1）
-**功能描述**: 自动主题切换。
-**分类**: STUB
+**編譯時引用次數**: 3（單引號 2 + 雙引號 1）
+**功能描述**: 自動主題切換。
+**分類**: STUB
 **引用文件**:
-1. src/components/ThemePicker.tsx — 主题选择器
-2. src/components/design-system/ThemeProvider.tsx — 主题提供者
-3. src/tools/ConfigTool/supportedSettings.ts — 支持的设置
-**代码量**: 0 行专属代码
+1. src/components/ThemePicker.tsx — 主題選擇器
+2. src/components/design-system/ThemeProvider.tsx — 主題提供者
+3. src/tools/ConfigTool/supportedSettings.ts — 支援的設置
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 56. AWAY_SUMMARY
 
-**编译时引用次数**: 2
-**功能描述**: 离开摘要。用户离开时生成会话摘要。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: 離開摘要。用戶離開時生成會話摘要。
+**分類**: STUB
 **引用文件**:
-1. src/hooks/useAwaySummary.ts — 离开摘要 Hook（125 行，但功能可能不完整）
+1. src/hooks/useAwaySummary.ts — 離開摘要 Hook（125 行，但功能可能不完整）
 2. src/screens/REPL.tsx — REPL
-**代码量**: 约 125 行（useAwaySummary.ts）
+**程式碼量**: 約 125 行（useAwaySummary.ts）
 
 ---
 
 ## 57. BREAK_CACHE_COMMAND
 
-**编译时引用次数**: 2
-**功能描述**: 缓存中断命令。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: 快取中斷命令。
+**分類**: STUB
 **引用文件**: src/context.ts — 上下文
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 58. BUILDING_CLAUDE_APPS
 
-**编译时引用次数**: 1
-**功能描述**: 构建 Claude 应用程序。
-**分类**: STUB
-**引用文件**: src/skills/bundled/index.ts — 内置技能
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 構建 Claude 應用程式。
+**分類**: STUB
+**引用文件**: src/skills/bundled/index.ts — 內置技能
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 59. BUILTIN_EXPLORE_PLAN_AGENTS
 
-**编译时引用次数**: 1
-**功能描述**: 内置探索和计划代理。
-**分类**: STUB
-**引用文件**: src/tools/AgentTool/builtInAgents.ts — 内置代理定义
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 內置探索和計劃代理。
+**分類**: STUB
+**引用文件**: src/tools/AgentTool/builtInAgents.ts — 內置代理定義
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 60. BYOC_ENVIRONMENT_RUNNER
 
-**编译时引用次数**: 1
-**功能描述**: BYOC（Bring Your Own Cloud）环境运行器。
-**分类**: STUB
+**編譯時引用次數**: 1
+**功能描述**: BYOC（Bring Your Own Cloud）環境執行器。
+**分類**: STUB
 **引用文件**: src/entrypoints/cli.tsx — CLI 入口
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 61. CCR_AUTO_CONNECT
 
-**编译时引用次数**: 3
-**功能描述**: CCR 自动连接。
-**分类**: STUB
+**編譯時引用次數**: 3
+**功能描述**: CCR 自動連接。
+**分類**: STUB
 **引用文件**:
-1. src/bridge/bridgeEnabled.ts — 桥接启用检测
-2. src/utils/config.ts — 配置
-**代码量**: 0 行专属代码
+1. src/bridge/bridgeEnabled.ts — 橋接啓用檢測
+2. src/utils/config.ts — 設定
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 62. CCR_MIRROR
 
-**编译时引用次数**: 4
-**功能描述**: CCR 镜像模式。
-**分类**: STUB
+**編譯時引用次數**: 4
+**功能描述**: CCR 鏡像模式。
+**分類**: STUB
 **引用文件**:
-1. src/bridge/bridgeEnabled.ts — 桥接启用检测
-2. src/bridge/remoteBridgeCore.ts — 远程桥接核心
+1. src/bridge/bridgeEnabled.ts — 橋接啓用檢測
+2. src/bridge/remoteBridgeCore.ts — 遠程橋接核心
 3. src/main.tsx — 主入口
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 63. COMPACTION_REMINDERS
 
-**编译时引用次数**: 1
-**功能描述**: 压缩提醒。
-**分类**: STUB
-**引用文件**: src/utils/attachments.ts — 附件处理
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 壓縮提醒。
+**分類**: STUB
+**引用文件**: src/utils/attachments.ts — 附件處理
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 64. COWORKER_TYPE_TELEMETRY
 
-**编译时引用次数**: 2
-**功能描述**: 共同工作者类型遥测。
-**分类**: STUB
-**引用文件**: src/services/analytics/metadata.ts — 分析元数据
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 2
+**功能描述**: 共同工作者類型遙測。
+**分類**: STUB
+**引用文件**: src/services/analytics/metadata.ts — 分析元資料
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 65. DOWNLOAD_USER_SETTINGS
 
-**编译时引用次数**: 5
-**功能描述**: 下载用户设置（从远程同步）。
-**分类**: STUB
+**編譯時引用次數**: 5
+**功能描述**: 下載用戶設置（從遠程同步）。
+**分類**: STUB
 **引用文件**:
-1. src/cli/print.ts — CLI 输出
-2. src/commands/reload-plugins/reload-plugins.ts — 重载插件
-3. src/services/settingsSync/index.ts — 设置同步
-**代码量**: 0 行专属代码
+1. src/cli/print.ts — CLI 輸出
+2. src/commands/reload-plugins/reload-plugins.ts — 重載插件
+3. src/services/settingsSync/index.ts — 設置同步
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 66. DUMP_SYSTEM_PROMPT
 
-**编译时引用次数**: 1
-**功能描述**: 转储系统提示（调试用）。
-**分类**: STUB
+**編譯時引用次數**: 1
+**功能描述**: 轉儲系統提示（調試用）。
+**分類**: STUB
 **引用文件**: src/entrypoints/cli.tsx — CLI 入口
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 67. ENHANCED_TELEMETRY_BETA
 
-**编译时引用次数**: 2
-**功能描述**: 增强遥测 Beta。
-**分类**: STUB
-**引用文件**: src/utils/telemetry/sessionTracing.ts — 会话追踪（927 行，但标志仅用于一处条件）
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 2
+**功能描述**: 增強遙測 Beta。
+**分類**: STUB
+**引用文件**: src/utils/telemetry/sessionTracing.ts — 會話追蹤（927 行，但標誌僅用於一處條件）
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 68. FILE_PERSISTENCE
 
-**编译时引用次数**: 3
+**編譯時引用次數**: 3
 **功能描述**: 文件持久化。
-**分类**: STUB
+**分類**: STUB
 **引用文件**:
-1. src/cli/print.ts — CLI 输出
+1. src/cli/print.ts — CLI 輸出
 2. src/utils/filePersistence/filePersistence.ts — 文件持久化（287 行）
-**代码量**: 约 287 行（filePersistence.ts），但仅 3 处引用
+**程式碼量**: 約 287 行（filePersistence.ts），但僅 3 處引用
 
 ---
 
 ## 69. HARD_FAIL
 
-**编译时引用次数**: 2
-**功能描述**: 硬失败模式（遇到错误时立即退出而非优雅降级）。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: 硬失敗模式（遇到錯誤時立即退出而非優雅降級）。
+**分類**: STUB
 **引用文件**:
 1. src/main.tsx — 主入口
-2. src/utils/log.ts — 日志工具
-**代码量**: 0 行专属代码
+2. src/utils/log.ts — 日誌工具
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 70. HOOK_PROMPTS
 
-**编译时引用次数**: 1
-**功能描述**: 钩子提示。
-**分类**: STUB
+**編譯時引用次數**: 1
+**功能描述**: 鉤子提示。
+**分類**: STUB
 **引用文件**: src/screens/REPL.tsx — REPL
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 71. IS_LIBC_GLIBC
 
-**编译时引用次数**: 1
-**功能描述**: 检测 libc 是否为 glibc。
-**分类**: STUB
-**引用文件**: src/utils/envDynamic.ts — 动态环境检测（151 行）
-**代码量**: 0 行专属代码（标志用于条件编译）
+**編譯時引用次數**: 1
+**功能描述**: 檢測 libc 是否爲 glibc。
+**分類**: STUB
+**引用文件**: src/utils/envDynamic.ts — 動態環境檢測（151 行）
+**程式碼量**: 0 行專屬程式碼（標誌用於條件編譯）
 
 ---
 
 ## 72. IS_LIBC_MUSL
 
-**编译时引用次数**: 1
-**功能描述**: 检测 libc 是否为 musl。
-**分类**: STUB
-**引用文件**: src/utils/envDynamic.ts — 动态环境检测（151 行）
-**代码量**: 0 行专属代码（标志用于条件编译）
+**編譯時引用次數**: 1
+**功能描述**: 檢測 libc 是否爲 musl。
+**分類**: STUB
+**引用文件**: src/utils/envDynamic.ts — 動態環境檢測（151 行）
+**程式碼量**: 0 行專屬程式碼（標誌用於條件編譯）
 
 ---
 
 ## 73. MCP_RICH_OUTPUT
 
-**编译时引用次数**: 3
-**功能描述**: MCP 富文本输出。
-**分类**: STUB
+**編譯時引用次數**: 3
+**功能描述**: MCP 富文本輸出。
+**分類**: STUB
 **引用文件**: src/tools/MCPTool/UI.tsx — MCP 工具 UI
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 74. MEMORY_SHAPE_TELEMETRY
 
-**编译时引用次数**: 3
-**功能描述**: 记忆形状遥测。
-**分类**: STUB
+**編譯時引用次數**: 3
+**功能描述**: 記憶形狀遙測。
+**分類**: STUB
 **引用文件**:
-1. src/memdir/findRelevantMemories.ts — 查找相关记忆
-2. src/utils/sessionFileAccessHooks.ts — 会话文件访问钩子
-**代码量**: 0 行专属代码
+1. src/memdir/findRelevantMemories.ts — 查找相關記憶
+2. src/utils/sessionFileAccessHooks.ts — 會話文件訪問鉤子
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 75. NATIVE_CLIPBOARD_IMAGE
 
-**编译时引用次数**: 2
-**功能描述**: 原生剪贴板图片支持。
-**分类**: STUB
-**引用文件**: src/utils/imagePaste.ts — 图片粘贴（416 行，但标志仅用于一处条件）
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 2
+**功能描述**: 原生剪貼板圖片支援。
+**分類**: STUB
+**引用文件**: src/utils/imagePaste.ts — 圖片粘貼（416 行，但標誌僅用於一處條件）
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 76. NEW_INIT
 
-**编译时引用次数**: 2
+**編譯時引用次數**: 2
 **功能描述**: 新的初始化流程。
-**分类**: STUB
+**分類**: STUB
 **引用文件**: src/commands/init.ts — 初始化命令
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 77. OVERFLOW_TEST_TOOL
 
-**编译时引用次数**: 2
-**功能描述**: 溢出测试工具（内部测试用）。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: 溢出測試工具（內部測試用）。
+**分類**: STUB
 **引用文件**:
-1. src/tools.ts — 工具注册
-2. src/utils/permissions/classifierDecision.ts — 分类器决策
-**代码量**: 0 行专属代码
+1. src/tools.ts — 工具註冊
+2. src/utils/permissions/classifierDecision.ts — 分類器決策
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 78. PERFETTO_TRACING
 
-**编译时引用次数**: 1
-**功能描述**: Perfetto 追踪（性能追踪工具）。
-**分类**: STUB
-**引用文件**: src/utils/telemetry/perfettoTracing.ts — Perfetto 追踪（1,120 行，但标志仅用于一处）
-**代码量**: 约 1,120 行（perfettoTracing.ts）存在，但仅 1 处引用
+**編譯時引用次數**: 1
+**功能描述**: Perfetto 追蹤（性能追蹤工具）。
+**分類**: STUB
+**引用文件**: src/utils/telemetry/perfettoTracing.ts — Perfetto 追蹤（1,120 行，但標誌僅用於一處）
+**程式碼量**: 約 1,120 行（perfettoTracing.ts）存在，但僅 1 處引用
 
 ---
 
 ## 79. POWERSHELL_AUTO_MODE
 
-**编译时引用次数**: 2
-**功能描述**: PowerShell 自动模式。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: PowerShell 自動模式。
+**分類**: STUB
 **引用文件**:
-1. src/utils/permissions/permissions.ts — 权限
-2. src/utils/permissions/yoloClassifier.ts — YOLO 分类器
-**代码量**: 0 行专属代码
+1. src/utils/permissions/permissions.ts — 權限
+2. src/utils/permissions/yoloClassifier.ts — YOLO 分類器
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 80. QUICK_SEARCH
 
-**编译时引用次数**: 5
+**編譯時引用次數**: 5
 **功能描述**: 快速搜索。
-**分类**: STUB
+**分類**: STUB
 **引用文件**:
-1. src/components/PromptInput/PromptInput.tsx — 提示输入
-2. src/keybindings/defaultBindings.ts — 默认键绑定
-**代码量**: 0 行专属代码
+1. src/components/PromptInput/PromptInput.tsx — 提示輸入
+2. src/keybindings/defaultBindings.ts — 預設鍵綁定
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 81. RUN_SKILL_GENERATOR
 
-**编译时引用次数**: 1
-**功能描述**: 运行技能生成器。
-**分类**: STUB
-**引用文件**: src/skills/bundled/index.ts — 内置技能
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 執行技能生成器。
+**分類**: STUB
+**引用文件**: src/skills/bundled/index.ts — 內置技能
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 82. SELF_HOSTED_RUNNER
 
-**编译时引用次数**: 1
-**功能描述**: 自托管运行器。
-**分类**: STUB
+**編譯時引用次數**: 1
+**功能描述**: 自託管執行器。
+**分類**: STUB
 **引用文件**: src/entrypoints/cli.tsx — CLI 入口
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 83. SKILL_IMPROVEMENT
 
-**编译时引用次数**: 1
-**功能描述**: 技能改进。
-**分类**: STUB
-**引用文件**: src/utils/hooks/skillImprovement.ts — 技能改进（267 行，但标志仅 1 处引用）
-**代码量**: 约 267 行（skillImprovement.ts）
+**編譯時引用次數**: 1
+**功能描述**: 技能改進。
+**分類**: STUB
+**引用文件**: src/utils/hooks/skillImprovement.ts — 技能改進（267 行，但標誌僅 1 處引用）
+**程式碼量**: 約 267 行（skillImprovement.ts）
 
 ---
 
 ## 84. SLOW_OPERATION_LOGGING
 
-**编译时引用次数**: 1
-**功能描述**: 慢操作日志记录。
-**分类**: STUB
-**引用文件**: src/utils/slowOperations.ts — 慢操作（286 行，但标志仅 1 处引用）
-**代码量**: 约 286 行（slowOperations.ts）
+**編譯時引用次數**: 1
+**功能描述**: 慢操作日誌記錄。
+**分類**: STUB
+**引用文件**: src/utils/slowOperations.ts — 慢操作（286 行，但標誌僅 1 處引用）
+**程式碼量**: 約 286 行（slowOperations.ts）
 
 ---
 
 ## 85. TREE_SITTER_BASH
 
-**编译时引用次数**: 3
+**編譯時引用次數**: 3
 **功能描述**: Tree-sitter Bash 解析器。
-**分类**: STUB
+**分類**: STUB
 **引用文件**: src/utils/bash/parser.ts — Bash 解析器
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 86. TREE_SITTER_BASH_SHADOW
 
-**编译时引用次数**: 5
-**功能描述**: Tree-sitter Bash 影子模式（并行运行 tree-sitter 和传统解析器进行对比）。
-**分类**: STUB
+**編譯時引用次數**: 5
+**功能描述**: Tree-sitter Bash 影子模式（並行執行 tree-sitter 和傳統解析器進行對比）。
+**分類**: STUB
 **引用文件**:
-1. src/tools/BashTool/bashPermissions.ts — Bash 权限
+1. src/tools/BashTool/bashPermissions.ts — Bash 權限
 2. src/utils/bash/parser.ts — Bash 解析器
-**代码量**: 0 行专属代码
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 87. ULTRATHINK
 
-**编译时引用次数**: 1
-**功能描述**: 超级思考模式。
-**分类**: STUB
-**引用文件**: src/utils/thinking.ts — 思考工具（162 行，但标志仅 1 处引用）
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 超級思考模式。
+**分類**: STUB
+**引用文件**: src/utils/thinking.ts — 思考工具（162 行，但標誌僅 1 處引用）
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 88. UNATTENDED_RETRY
 
-**编译时引用次数**: 1
-**功能描述**: 无人值守重试。
-**分类**: STUB
-**引用文件**: src/services/api/withRetry.ts — API 重试
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1
+**功能描述**: 無人值守重試。
+**分類**: STUB
+**引用文件**: src/services/api/withRetry.ts — API 重試
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 89. UPLOAD_USER_SETTINGS
 
-**编译时引用次数**: 2
-**功能描述**: 上传用户设置（同步到远程）。
-**分类**: STUB
+**編譯時引用次數**: 2
+**功能描述**: 上傳用戶設置（同步到遠程）。
+**分類**: STUB
 **引用文件**:
 1. src/main.tsx — 主入口
-2. src/services/settingsSync/index.ts — 设置同步
-**代码量**: 0 行专属代码
+2. src/services/settingsSync/index.ts — 設置同步
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 90. SKIP_DETECTION_WHEN_AUTOUPDATES_DISABLED
 
-**编译时引用次数**: 1（仅双引号形式）
-**功能描述**: 当自动更新禁用时跳过检测。
-**分类**: STUB
-**引用文件**: src/components/AutoUpdaterWrapper.tsx — 自动更新包装器
-**代码量**: 0 行专属代码
+**編譯時引用次數**: 1（僅雙引號形式）
+**功能描述**: 當自動更新禁用時跳過檢測。
+**分類**: STUB
+**引用文件**: src/components/AutoUpdaterWrapper.tsx — 自動更新包裝器
+**程式碼量**: 0 行專屬程式碼
 
 ---
 
 ## 91. QUICK_SEARCH（已在 #80 列出）
 
-注：QUICK_SEARCH 已在 #80 列出。总计为 92 个独立标志（含 SKIP_DETECTION_WHEN_AUTOUPDATES_DISABLED）。
+注：QUICK_SEARCH 已在 #80 列出。總計爲 92 個獨立標誌（含 SKIP_DETECTION_WHEN_AUTOUPDATES_DISABLED）。
 
 ---
 
-# 四、缺失文件汇总
+# 四、缺失文件彙總
 
-以下是 `src/commands.ts` 中通过 `feature()` 条件 require 引用的文件，但在源代码中不存在：
+以下是 `src/commands.ts` 中通過 `feature()` 條件 require 引用的文件，但在源程式碼中不存在：
 
-| 标志 | 引用路径 | 状态 |
+| 標誌 | 引用路徑 | 狀態 |
 |------|----------|------|
-| TORCH | commands/torch.js | 文件完全不存在，无 .ts 版本 |
-| PROACTIVE（与 KAIROS 共用） | commands/assistant/index.js | 整个 commands/assistant/ 目录不存在 |
+| TORCH | commands/torch.js | 文件完全不存在，無 .ts 版本 |
+| PROACTIVE（與 KAIROS 共用） | commands/assistant/index.js | 整個 commands/assistant/ 目錄不存在 |
 | KAIROS | commands/assistant/index.js | 同上 |
 | DAEMON + BRIDGE_MODE | commands/remoteControlServer/index.js | 文件不存在 |
-| HISTORY_SNIP | commands/force-snip.js | 文件完全不存在，无 .ts 版本 |
-| WORKFLOW_SCRIPTS | commands/workflows/index.js | 整个 commands/workflows/ 目录不存在 |
-| KAIROS_GITHUB_WEBHOOKS | commands/subscribe-pr.js | 文件完全不存在，无 .ts 版本 |
-| UDS_INBOX | commands/peers/index.js | 整个 commands/peers/ 目录不存在 |
-| BUDDY | commands/buddy/index.js | 整个 commands/buddy/ 目录不存在（但 src/buddy/ 有 1,298 行实现） |
+| HISTORY_SNIP | commands/force-snip.js | 文件完全不存在，無 .ts 版本 |
+| WORKFLOW_SCRIPTS | commands/workflows/index.js | 整個 commands/workflows/ 目錄不存在 |
+| KAIROS_GITHUB_WEBHOOKS | commands/subscribe-pr.js | 文件完全不存在，無 .ts 版本 |
+| UDS_INBOX | commands/peers/index.js | 整個 commands/peers/ 目錄不存在 |
+| BUDDY | commands/buddy/index.js | 整個 commands/buddy/ 目錄不存在（但 src/buddy/ 有 1,298 行實現） |
 
-以下是源代码中通过条件 require 引用但内容为空壳（1-5 行）的文件：
+以下是源程式碼中通過條件 require 引用但內容爲空殼（1-5 行）的文件：
 
-| 文件路径 | 行数 | 所属标志 |
+| 檔案路徑 | 行數 | 所屬標誌 |
 |----------|------|----------|
 | src/tools/MonitorTool/MonitorTool.ts | 1 行 | MONITOR_TOOL |
 | src/tools/WorkflowTool/WorkflowTool.ts | 1 行 | WORKFLOW_SCRIPTS |
@@ -1885,9 +1885,9 @@ src/utils/swarm/ 目录（22 个文件）:
 
 ---
 
-# 五、按引用次数排序的完整列表
+# 五、按引用次數排序的完整列表
 
-| 排名 | 标志名称 | 引用次数 | 分类 |
+| 排名 | 標誌名稱 | 引用次數 | 分類 |
 |------|----------|----------|------|
 | 1 | KAIROS | 156 | PARTIAL |
 | 2 | TRANSCRIPT_CLASSIFIER | 110 | COMPLETE |
@@ -1982,27 +1982,27 @@ src/utils/swarm/ 目录（22 个文件）:
 
 ---
 
-# 六、代码量统计
+# 六、程式碼量統計
 
-| 分类 | 标志数 | 总引用次数 | 专属代码行数（估算） |
+| 分類 | 標誌數 | 總引用次數 | 專屬程式碼行數（估算） |
 |------|--------|------------|---------------------|
-| COMPLETE | 22 | 约 640 | 约 35,000 行 |
-| PARTIAL | 19 | 约 330 | 约 5,500 行 |
-| STUB | 51 | 约 95 | 约 2,000 行（主要是附带的工具文件） |
-| **总计** | **92** | **约 1,065** | **约 42,500 行** |
+| COMPLETE | 22 | 約 640 | 約 35,000 行 |
+| PARTIAL | 19 | 約 330 | 約 5,500 行 |
+| STUB | 51 | 約 95 | 約 2,000 行（主要是附帶的工具文件） |
+| **總計** | **92** | **約 1,065** | **約 42,500 行** |
 
-**最大功能模块（按代码行数排序）**:
-1. BRIDGE_MODE: 12,619 行（src/bridge/ 目录）
+**最大功能模組（按程式碼行數排序）**:
+1. BRIDGE_MODE: 12,619 行（src/bridge/ 目錄）
 2. COORDINATOR_MODE: 7,990 行（src/coordinator/ + src/utils/swarm/）
-3. SHOT_STATS: 2,722 行（统计系统）
+3. SHOT_STATS: 2,722 行（統計系統）
 4. CONTEXT_COLLAPSE: 2,258 行（上下文分析）
-5. COMMIT_ATTRIBUTION: 1,354 行（提交归属）
-6. BUDDY: 1,298 行（伙伴精灵）
-7. VOICE_MODE: 1,410 行（语音模式）
-8. TEAMMEM: 1,026 行（团队记忆）
-9. UDS_INBOX: 966 行（Unix 套接字消息，但大部分是桩）
-10. BG_SESSIONS: 801 行（后台会话）
+5. COMMIT_ATTRIBUTION: 1,354 行（提交歸屬）
+6. BUDDY: 1,298 行（夥伴精靈）
+7. VOICE_MODE: 1,410 行（語音模式）
+8. TEAMMEM: 1,026 行（團隊記憶）
+9. UDS_INBOX: 966 行（Unix 套接字訊息，但大部分是樁）
+10. BG_SESSIONS: 801 行（後臺會話）
 
 ---
 
-*本文档由自动审计生成，基于对 Claude Code 源代码中所有 `feature('...')` 引用的穷举搜索。每个标志的引用次数包含单引号和双引号两种形式。*
+*本文件由自動審計生成，基於對 Claude Code 源程式碼中所有 `feature('...')` 引用的窮舉搜索。每個標誌的引用次數包含單引號和雙引號兩種形式。*

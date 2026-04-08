@@ -1,227 +1,227 @@
 ---
-title: "Auto Mode - AI 分类器驱动的自主执行模式"
-description: "详解 Claude Code 的 auto mode：基于 transcript classifier 的自动权限决策、两阶段分类流水线、危险权限剥离机制、模式切换状态管理、以及与 plan mode 的协作方式。"
-keywords: ["auto mode", "yoloClassifier", "transcript classifier", "权限分类", "自动执行", "两阶段分类"]
+title: "Auto Mode - AI 分類器驅動的自主執行模式"
+description: "詳解 Claude Code 的 auto mode：基於 transcript classifier 的自動權限決策、兩階段分類流水線、危險權限剝離機制、模式切換狀態管理、以及與 plan mode 的協作方式。"
+keywords: ["auto mode", "yoloClassifier", "transcript classifier", "權限分類", "自動執行", "兩階段分類"]
 ---
 
 ## 概述
 
-Auto mode 是 Claude Code 的一种权限模式，让 AI 进入**连续自主执行**状态。与传统模式（每个敏感操作都弹出权限对话框等待用户审批）不同，auto mode 使用 AI 分类器（transcript classifier）自动判断每个工具调用是否安全，从而实现无中断的执行体验。
+Auto mode 是 Claude Code 的一種權限模式，讓 AI 進入**連續自主執行**狀態。與傳統模式（每個敏感操作都彈出權限對話框等待用戶審批）不同，auto mode 使用 AI 分類器（transcript classifier）自動判斷每個工具呼叫是否安全，從而實現無中斷的執行體驗。
 
 ```
-权限模式层级：
+權限模式層級：
 
 default  →  auto  →  bypassPermissions
-（逐项确认） （AI 分类器审批） （全部放行）
+（逐項確認） （AI 分類器審批） （全部放行）
 ```
 
-## 核心架构
+## 核心架構
 
-### 1. AI 分类器（yoloClassifier）
+### 1. AI 分類器（yoloClassifier）
 
-分类器是 auto mode 的核心，位于 `src/utils/permissions/yoloClassifier.ts`。
+分類器是 auto mode 的核心，位於 `src/utils/permissions/yoloClassifier.ts`。
 
-每个工具调用经过分类器评估，返回三种裁决之一：
+每個工具呼叫經過分類器評估，返回三種裁決之一：
 
-| 裁决 | 含义 | 处理方式 |
+| 裁決 | 含義 | 處理方式 |
 |------|------|---------|
-| **allow** | 操作安全 | 直接执行，用户无感知 |
-| **deny** | 操作危险 | 拒绝执行，向 AI 返回拒绝消息 |
-| **ask** | 无法确定 | 回退到传统权限对话框 |
+| **allow** | 操作安全 | 直接執行，用戶無感知 |
+| **deny** | 操作危險 | 拒絕執行，向 AI 返回拒絕訊息 |
+| **ask** | 無法確定 | 回退到傳統權限對話框 |
 
-分类器的判断基于完整的对话上下文（transcript），而不仅仅看单条命令——它能理解操作的意图和上下文。
+分類器的判斷基於完整的對話上下文（transcript），而不僅僅看單條命令——它能理解操作的意圖和上下文。
 
-### 2. 两阶段分类流水线
+### 2. 兩階段分類流水線
 
-分类器支持两阶段 XML 分类（`classifyYoloActionXml`）：
+分類器支援兩階段 XML 分類（`classifyYoloActionXml`）：
 
 ```
-Stage 1 — "fast"（快速判断）
-├── max_tokens=64，stop_sequences 触发即时 yes/no
-├── 如果 allow → 直接放行（最快路径）
-└── 如果 block → 进入 Stage 2
+Stage 1 — "fast"（快速判斷）
+├── max_tokens=64，stop_sequences 觸發即時 yes/no
+├── 如果 allow → 直接放行（最快路徑）
+└── 如果 block → 進入 Stage 2
 
 Stage 2 — "thinking"（深度思考）
 ├── chain-of-thought 推理
-├── 减少误报（false positives）
-└── 最终决定 allow / deny / ask
+├── 減少誤報（false positives）
+└── 最終決定 allow / deny / ask
 ```
 
-两个阶段共享相同的 system prompt 和 user content，利用 API 的 prompt caching（1 小时 TTL）优化性能。
+兩個階段共享相同的 system prompt 和 user content，利用 API 的 prompt caching（1 小時 TTL）優化性能。
 
-可通过配置选择模式：
-- `'both'`（默认）— 两阶段都跑
+可通過設定選擇模式：
+- `'both'`（預設）— 兩階段都跑
 - `'fast'` — 只跑 Stage 1
 - `'thinking'` — 只跑 Stage 2
 
-### 3. 分类器结果类型
+### 3. 分類器結果類型
 
 ```typescript
 // src/types/permissions.ts
 type YoloClassifierResult = {
-  thinking?: string          // 分类器的推理过程
+  thinking?: string          // 分類器的推理過程
   shouldBlock: boolean       // 是否阻止
-  reason: string             // 决策原因
-  unavailable?: boolean      // 分类器是否不可用
-  transcriptTooLong?: boolean // 对话是否超出上下文窗口
-  model: string              // 使用的分类器模型
-  stage?: 'fast' | 'thinking' // 哪个阶段做出的决定
-  // ... token 使用量、耗时等监控字段
+  reason: string             // 決策原因
+  unavailable?: boolean      // 分類器是否不可用
+  transcriptTooLong?: boolean // 對話是否超出上下文窗口
+  model: string              // 使用的分類器模型
+  stage?: 'fast' | 'thinking' // 哪個階段做出的決定
+  // ... token 使用量、耗時等監控字段
 }
 ```
 
-## 安全机制
+## 安全機制
 
-### 危险权限剥离
+### 危險權限剝離
 
-进入 auto mode 时，系统调用 `stripDangerousPermissionsForAutoMode()`（`permissionSetup.ts:510`），移除所有可能绕过分类器的 allow 规则。
+進入 auto mode 時，系統呼叫 `stripDangerousPermissionsForAutoMode()`（`permissionSetup.ts:510`），移除所有可能繞過分類器的 allow 規則。
 
-被剥离的规则类型（`dangerousPatterns.ts`）：
+被剝離的規則類型（`dangerousPatterns.ts`）：
 
-| 规则类型 | 示例 | 剥离原因 |
+| 規則類型 | 示例 | 剝離原因 |
 |---------|------|---------|
-| **Bash 代码执行** | `Bash(python:*)`, `Bash(node:*)` | 解释器可执行任意代码，绕过分类器审查 |
-| **Shell 入口** | `Bash(bash:*)`, `Bash(sh:*)` | 直接 shell 访问等同无限制 |
-| **Agent 规则** | `Agent(*)` | 任何 Agent allow 规则会绕过分类器审批子代理 |
-| **PowerShell 代码执行** | `PowerShell(node:*)` | 同 Bash 逻辑 |
-| **权限提升** | `Bash(sudo:*)`, `Bash(eval:*)` | 可执行任意命令 |
+| **Bash 程式碼執行** | `Bash(python:*)`, `Bash(node:*)` | 解釋器可執行任意程式碼，繞過分類器審查 |
+| **Shell 入口** | `Bash(bash:*)`, `Bash(sh:*)` | 直接 shell 訪問等同無限制 |
+| **Agent 規則** | `Agent(*)` | 任何 Agent allow 規則會繞過分類器審批子代理 |
+| **PowerShell 程式碼執行** | `PowerShell(node:*)` | 同 Bash 邏輯 |
+| **權限提升** | `Bash(sudo:*)`, `Bash(eval:*)` | 可執行任意命令 |
 
-剥离的规则被暂存在 `strippedDangerousRules` 中，退出 auto mode 时通过 `restoreDangerousPermissions()` 恢复。
+剝離的規則被暫存在 `strippedDangerousRules` 中，退出 auto mode 時通過 `restoreDangerousPermissions()` 恢復。
 
-### 模型支持检测
+### 模型支援檢測
 
-不是所有模型都支持 auto mode。`modelSupportsAutoMode()`（`src/utils/betas.ts`）检查当前模型是否具备安全分类能力。不支持的模型无法进入 auto mode。
+不是所有模型都支援 auto mode。`modelSupportsAutoMode()`（`src/utils/betas.ts`）檢查當前模型是否具備安全分類能力。不支援的模型無法進入 auto mode。
 
-### Circuit Breaker 机制
+### Circuit Breaker 機制
 
-`autoModeState.ts` 维护一个 circuit breaker 标志：
+`autoModeState.ts` 維護一個 circuit breaker 標誌：
 
 ```typescript
-let autoModeCircuitBroken = false  // 由远程配置控制
+let autoModeCircuitBroken = false  // 由遠程設定控制
 ```
 
-当远程配置（GrowthBook `tengu_auto_mode_config.enabled`）设为 `'disabled'` 时，circuit breaker 触发，阻止 auto mode 的进入和继续使用。这为 Anthropic 提供了远程紧急关停能力。
+當遠程設定（GrowthBook `tengu_auto_mode_config.enabled`）設爲 `'disabled'` 時，circuit breaker 觸發，阻止 auto mode 的進入和繼續使用。這爲 Anthropic 提供了遠程緊急關停能力。
 
-## 模式切换状态管理
+## 模式切換狀態管理
 
-### 进入 Auto Mode
+### 進入 Auto Mode
 
-`transitionPermissionMode()`（`permissionSetup.ts:597`）处理所有模式切换：
+`transitionPermissionMode()`（`permissionSetup.ts:597`）處理所有模式切換：
 
 ```
-1. 检查 auto mode gate 是否开启（isAutoModeGateEnabled）
-2. 设置 autoModeActive = true
-3. 调用 stripDangerousPermissionsForAutoMode() 剥离危险规则
-4. 向对话注入 Auto Mode 系统提示
+1. 檢查 auto mode gate 是否開啓（isAutoModeGateEnabled）
+2. 設置 autoModeActive = true
+3. 呼叫 stripDangerousPermissionsForAutoMode() 剝離危險規則
+4. 向對話注入 Auto Mode 系統提示
 ```
 
 ### 退出 Auto Mode
 
 ```
-1. 设置 autoModeActive = false
-2. 设置 needsAutoModeExitAttachment = true（触发退出通知）
-3. 调用 restoreDangerousPermissions() 恢复被剥离的规则
-4. 向对话注入 "Exited Auto Mode" 提示
+1. 設置 autoModeActive = false
+2. 設置 needsAutoModeExitAttachment = true（觸發退出通知）
+3. 呼叫 restoreDangerousPermissions() 恢復被剝離的規則
+4. 向對話注入 "Exited Auto Mode" 提示
 ```
 
-### 触发路径
+### 觸發路徑
 
-Auto mode 可通过以下方式激活：
-- CLI 参数 `--enable-auto-mode`
-- settings.json 中的 `autoMode` 配置
-- Plan mode 默认使用 auto mode 语义（`useAutoModeDuringPlan`，默认 true）
-- SDK 控制消息
-- REPL 中 Shift+Tab 切换
+Auto mode 可通過以下方式激活：
+- CLI 參數 `--enable-auto-mode`
+- settings.json 中的 `autoMode` 設定
+- Plan mode 預設使用 auto mode 語義（`useAutoModeDuringPlan`，預設 true）
+- SDK 控制訊息
+- REPL 中 Shift+Tab 切換
 
-## 系统提示词
+## 系統提示詞
 
-### 进入时（Full Instructions）
+### 進入時（Full Instructions）
 
-注入到对话中的指令（`messages.ts:3464`）：
+注入到對話中的指令（`messages.ts:3464`）：
 
 > Auto mode is active. The user chose continuous, autonomous execution. You should:
 >
-> 1. **Execute immediately** — 直接实现，做合理假设
-> 2. **Minimize interruptions** — 常规决策自行判断，减少提问
-> 3. **Prefer action over planning** — 默认直接编码，不进 plan mode
-> 4. **Expect course corrections** — 用户可随时纠正
-> 5. **Do not take overly destructive actions** — 删除数据/修改生产系统仍需确认
-> 6. **Avoid data exfiltration** — 不主动分享密钥/内部文档
+> 1. **Execute immediately** — 直接實現，做合理假設
+> 2. **Minimize interruptions** — 常規決策自行判斷，減少提問
+> 3. **Prefer action over planning** — 預設直接編碼，不進 plan mode
+> 4. **Expect course corrections** — 用戶可隨時糾正
+> 5. **Do not take overly destructive actions** — 刪除資料/修改生產系統仍需確認
+> 6. **Avoid data exfiltration** — 不主動分享密鑰/內部文件
 
-### 持续运行时（Sparse Instructions）
+### 持續執行時（Sparse Instructions）
 
-后续轮次注入简短提醒：
+後續輪次注入簡短提醒：
 
 > Auto mode still active. Execute autonomously, minimize interruptions, prefer action over planning.
 
-### 退出时（Exit Instructions）
+### 退出時（Exit Instructions）
 
 > You have exited auto mode. Ask clarifying questions when the approach is ambiguous rather than making assumptions.
 
-## 与 Plan Mode 的协作
+## 與 Plan Mode 的協作
 
-Plan mode 默认使用 auto mode 语义（`getUseAutoModeDuringPlan()`，默认 true）。这意味着：
+Plan mode 預設使用 auto mode 語義（`getUseAutoModeDuringPlan()`，預設 true）。這意味着：
 
-- Plan mode 进入时，如果 auto mode 可用，也会激活分类器
-- `isAutoModeActive()` 是权威信号（`prePlanMode`/`strippedDangerousRules` 不可靠）
-- 退出 plan mode 时会同时退出 auto mode
+- Plan mode 進入時，如果 auto mode 可用，也會激活分類器
+- `isAutoModeActive()` 是權威信號（`prePlanMode`/`strippedDangerousRules` 不可靠）
+- 退出 plan mode 時會同時退出 auto mode
 
-## 分类器不可用的降级策略
+## 分類器不可用的降級策略
 
-当分类器 API 不可用时（`unavailable: true` 或 `transcriptTooLong: true`）：
+當分類器 API 不可用時（`unavailable: true` 或 `transcriptTooLong: true`）：
 
-- 不会直接 allow — 回退到传统的权限对话框（ask）
-- 向 AI 发送消息："{model} is temporarily unavailable, so auto mode cannot determine the safety of {toolName} right now."
-- 确定性错误（如对话过长）不重试，直接降级
+- 不會直接 allow — 回退到傳統的權限對話框（ask）
+- 向 AI 發送訊息："{model} is temporarily unavailable, so auto mode cannot determine the safety of {toolName} right now."
+- 確定性錯誤（如對話過長）不重試，直接降級
 
-## 分类器 Prompt 模板
+## 分類器 Prompt 模板
 
-分类器的行为由三个 prompt 文件控制，位于 `src/utils/permissions/yolo-classifier-prompts/`。这些文件在构建时通过 `require()` 内联为字符串常量，运行时不可修改。
+分類器的行爲由三個 prompt 文件控制，位於 `src/utils/permissions/yolo-classifier-prompts/`。這些文件在構建時通過 `require()` 內聯爲字符串常量，執行時不可修改。
 
 ### auto_mode_system_prompt.txt
 
-主系统提示词，定义分类器的角色、分类流程和决策类别。包含：
+主系統提示詞，定義分類器的角色、分類流程和決策類別。包含：
 
-- **分类流程**：理解操作 → 检查用户意图 → 评估风险
-- **BLOCK 始终阻止**：外部代码执行、不可逆删除、未授权持久化、安全削弱、提权、网络服务
-- **BLOCK 除非明确意图**：CWD 外写入、系统包管理、git push、大规模变更
-- **ALLOW 安全操作**：读文件、搜索、git 只读命令、测试/lint/构建、CWD 内编辑
-- `<permissions_template>` 占位符 — 运行时替换为具体权限模板（external 或 anthropic）
-- 末尾 `Use the classify_result tool to report your classification.` — XML 模式下被替换为 `<block>` 标签格式说明
+- **分類流程**：理解操作 → 檢查用戶意圖 → 評估風險
+- **BLOCK 始終阻止**：外部程式碼執行、不可逆刪除、未授權持久化、安全削弱、提權、網絡服務
+- **BLOCK 除非明確意圖**：CWD 外寫入、系統包管理、git push、大規模變更
+- **ALLOW 安全操作**：讀文件、搜索、git 只讀命令、測試/lint/構建、CWD 內編輯
+- `<permissions_template>` 佔位符 — 執行時替換爲具體權限模板（external 或 anthropic）
+- 末尾 `Use the classify_result tool to report your classification.` — XML 模式下被替換爲 `<block>` 標籤格式說明
 
 ### permissions_external.txt
 
-外部用户版本的权限模板。三个 `<user_*_to_replace>` 标签内包裹默认规则（bullet 格式），用户自定义规则**整体替换**默认值：
+外部用戶版本的權限模板。三個 `<user_*_to_replace>` 標籤內包裹預設規則（bullet 格式），用戶自定義規則**整體替換**預設值：
 
 ```
 <user_allow_rules_to_replace>
-- 默认 allow 规则 1
-- 默认 allow 规则 2
+- 預設 allow 規則 1
+- 預設 allow 規則 2
 </user_allow_rules_to_replace>
 ```
 
-- **allow**：9 条默认规则（只读命令、版本检查、git 只读、测试/lint/构建、包安装、CWD 内文件操作等）
-- **soft_deny**：10 条默认规则（外部代码执行、递归删除、shell 配置修改、提权、网络服务等）
-- **environment**：4 条环境描述（终端环境、auto mode 上下文、开发工具可用、语言/框架不限）
+- **allow**：9 條預設規則（只讀命令、版本檢查、git 只讀、測試/lint/構建、包安裝、CWD 內檔案操作等）
+- **soft_deny**：10 條預設規則（外部程式碼執行、遞歸刪除、shell 設定修改、提權、網絡服務等）
+- **environment**：4 條環境描述（終端環境、auto mode 上下文、開發工具可用、語言/框架不限）
 
-`getDefaultExternalAutoModeRules()` 从此文件提取 bullet 项，供 `claude auto-mode defaults` 命令输出。
+`getDefaultExternalAutoModeRules()` 從此文件提取 bullet 項，供 `claude auto-mode defaults` 命令輸出。
 
 ### permissions_anthropic.txt
 
-Anthropic 内部版本的权限模板。默认规则在标签**外部**，标签内为空，用户自定义规则以**追加**方式叠加：
+Anthropic 內部版本的權限模板。預設規則在標籤**外部**，標籤內爲空，用戶自定義規則以**追加**方式疊加：
 
 ```
-- 默认规则（在标签外，始终生效）
+- 預設規則（在標籤外，始終生效）
 <user_allow_rules_to_replace>
 </user_allow_rules_to_replace>
 ```
 
-相比 external 版本，额外包含：
-- 云 CLI 只读命令（aws describe, gcloud describe, kubectl get 等）
-- 基础设施即代码 plan 命令（terraform plan, pulumi preview 等）
-- 对应的 deny 规则（云资源创建/修改/删除、IaC apply、生产环境访问等）
+相比 external 版本，額外包含：
+- 雲 CLI 只讀命令（aws describe, gcloud describe, kubectl get 等）
+- 基礎設施即程式碼 plan 命令（terraform plan, pulumi preview 等）
+- 對應的 deny 規則（雲資源建立/修改/刪除、IaC apply、生產環境訪問等）
 
-### 模板替换流程
+### 模板替換流程
 
 ```
 buildYoloSystemPrompt()
@@ -231,33 +231,33 @@ buildYoloSystemPrompt()
   └── .replace(<user_environment_to_replace>, userEnvironment ?? defaults)
 ```
 
-- 外部模板：用户设置非空时**替换**对应标签内容，否则保留默认值
-- 内部模板：用户设置**追加**到默认值之后（标签在末尾为空）
+- 外部模板：用戶設置非空時**替換**對應標籤內容，否則保留預設值
+- 內部模板：用戶設置**追加**到預設值之後（標籤在末尾爲空）
 
-## 当前状态说明
+## 當前狀態說明
 
-> **注意**：auto mode 的完整代码逻辑已存在于代码库中，但依赖 `feature('TRANSCRIPT_CLASSIFIER')` feature flag。
-> 在当前反编译版本中，`feature()` 始终返回 `false`，因此 auto mode 不可用。
-> 要启用需将 `feature('TRANSCRIPT_CLASSIFIER')` 改为 `true`，并确保 GrowthBook 配置源有合理的 fallback 默认值。
+> **注意**：auto mode 的完整程式碼邏輯已存在於程式碼庫中，但依賴 `feature('TRANSCRIPT_CLASSIFIER')` feature flag。
+> 在當前反編譯版本中，`feature()` 始終返回 `false`，因此 auto mode 不可用。
+> 要啓用需將 `feature('TRANSCRIPT_CLASSIFIER')` 改爲 `true`，並確保 GrowthBook 設定源有合理的 fallback 預設值。
 
-Prompt 模板文件为**重建产物**——原始文件在反编译过程中丢失，已根据代码逻辑和 `yoloClassifier.ts` 中的替换模式重新编写。
+Prompt 模板文件爲**重建產物**——原始文件在反編譯過程中丟失，已根據程式碼邏輯和 `yoloClassifier.ts` 中的替換模式重新編寫。
 
-## 相关源码索引
+## 相關源碼索引
 
-| 文件 | 职责 |
+| 文件 | 職責 |
 |------|------|
-| `src/utils/permissions/yoloClassifier.ts` | 分类器核心实现 |
-| `src/utils/permissions/autoModeState.ts` | Auto mode 状态管理 |
-| `src/utils/permissions/permissionSetup.ts` | 模式切换、危险权限剥离 |
-| `src/utils/permissions/dangerousPatterns.ts` | 危险命令模式列表 |
-| `src/utils/permissions/classifierDecision.ts` | 分类器决策处理 |
-| `src/utils/permissions/classifierShared.ts` | 分类器共享逻辑 |
-| `src/utils/permissions/bashClassifier.ts` | Bash 命令分类规则 |
-| `src/utils/permissions/bypassPermissionsKillswitch.ts` | bypass 权限熔断器 |
-| `src/utils/permissions/yolo-classifier-prompts/auto_mode_system_prompt.txt` | 分类器主系统提示词 |
-| `src/utils/permissions/yolo-classifier-prompts/permissions_external.txt` | 外部权限模板 |
-| `src/utils/permissions/yolo-classifier-prompts/permissions_anthropic.txt` | 内部权限模板 |
-| `src/cli/handlers/autoMode.ts` | CLI `auto-mode` 子命令处理 |
-| `src/utils/messages.ts` | Auto mode 系统提示词注入 |
-| `src/types/permissions.ts` | 权限类型定义 |
-| `src/utils/betas.ts` | 模型 auto mode 支持检测 |
+| `src/utils/permissions/yoloClassifier.ts` | 分類器核心實現 |
+| `src/utils/permissions/autoModeState.ts` | Auto mode 狀態管理 |
+| `src/utils/permissions/permissionSetup.ts` | 模式切換、危險權限剝離 |
+| `src/utils/permissions/dangerousPatterns.ts` | 危險命令模式列表 |
+| `src/utils/permissions/classifierDecision.ts` | 分類器決策處理 |
+| `src/utils/permissions/classifierShared.ts` | 分類器共享邏輯 |
+| `src/utils/permissions/bashClassifier.ts` | Bash 命令分類規則 |
+| `src/utils/permissions/bypassPermissionsKillswitch.ts` | bypass 權限熔斷器 |
+| `src/utils/permissions/yolo-classifier-prompts/auto_mode_system_prompt.txt` | 分類器主系統提示詞 |
+| `src/utils/permissions/yolo-classifier-prompts/permissions_external.txt` | 外部權限模板 |
+| `src/utils/permissions/yolo-classifier-prompts/permissions_anthropic.txt` | 內部權限模板 |
+| `src/cli/handlers/autoMode.ts` | CLI `auto-mode` 子命令處理 |
+| `src/utils/messages.ts` | Auto mode 系統提示詞注入 |
+| `src/types/permissions.ts` | 權限類型定義 |
+| `src/utils/betas.ts` | 模型 auto mode 支援檢測 |

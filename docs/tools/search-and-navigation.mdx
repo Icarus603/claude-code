@@ -1,37 +1,37 @@
 ---
-title: "搜索与导航工具 - 代码库精准定位"
-description: "解析 Claude Code 的搜索导航工具：Glob 文件匹配、Grep 内容搜索，基于 ripgrep 的高性能代码检索，帮助 AI 在百万行代码中精准定位。"
-keywords: ["代码搜索", "Glob", "Grep", "ripgrep", "文件搜索"]
+title: "搜索與導航工具 - 程式碼庫精準定位"
+description: "解析 Claude Code 的搜索導航工具：Glob 文件匹配、Grep 內容搜索，基於 ripgrep 的高性能程式碼檢索，幫助 AI 在百萬行程式碼中精準定位。"
+keywords: ["程式碼搜索", "Glob", "Grep", "ripgrep", "文件搜索"]
 ---
 
-## 两种搜索维度
+## 兩種搜索維度
 
-| 维度 | 工具 | 底层实现 | 适用场景 |
+| 維度 | 工具 | 底層實現 | 適用場景 |
 |------|------|----------|---------|
-| **按名称找文件** | Glob | ripgrep `--files` + glob 过滤 | "找到所有测试文件"、"找 config 开头的文件" |
-| **按内容找代码** | Grep | ripgrep 正则搜索 | "哪里定义了这个函数"、"谁在调用这个 API" |
+| **按名稱找文件** | Glob | ripgrep `--files` + glob 過濾 | "找到所有測試文件"、"找 config 開頭的文件" |
+| **按內容找程式碼** | Grep | ripgrep 正則搜索 | "哪裏定義了這個函數"、"誰在呼叫這個 API" |
 
-两者共享同一个 ripgrep 引擎，通过不同的参数组合实现不同搜索模式。
+兩者共享同一個 ripgrep 引擎，通過不同的參數組合實現不同搜索模式。
 
-## ripgrep 的内嵌方式
+## ripgrep 的內嵌方式
 
-Claude Code 不依赖系统安装的 ripgrep——它在 `src/utils/ripgrep.ts` 中实现了三级降级策略：
+Claude Code 不依賴系統安裝的 ripgrep——它在 `src/utils/ripgrep.ts` 中實現了三級降級策略：
 
 ```
-优先级 1: 系统 ripgrep (USE_BUILTIN_RIPGREP=false)
-  → 使用 PATH 中的 rg 二进制
-  → 安全考虑：只用命令名 'rg'，不用完整路径，防止 PATH 劫持
+優先級 1: 系統 ripgrep (USE_BUILTIN_RIPGREP=false)
+  → 使用 PATH 中的 rg 二進制
+  → 安全考慮：只用命令名 'rg'，不用完整路徑，防止 PATH 劫持
 
-优先级 2: 内嵌模式 (bundled/native build)
+優先級 2: 內嵌模式 (bundled/native build)
   → process.execPath 自身，argv0='rg'
-  → Bun 将 rg 静态编译进二进制，通过 argv0 分发
+  → Bun 將 rg 靜態編譯進二進制，通過 argv0 分發
 
-优先级 3: vendor 目录 (npm build)
+優先級 3: vendor 目錄 (npm build)
   → vendor/ripgrep/{arch}-{platform}/rg
-  → macOS 需要 codesign 签名 + 移除 quarantine xattr
+  → macOS 需要 codesign 簽名 + 移除 quarantine xattr
 ```
 
-平台适配示例：
+平臺適配示例：
 ```
 vendor/ripgrep/
   ├── x86_64-darwin/rg      # macOS Intel
@@ -41,241 +41,241 @@ vendor/ripgrep/
   └── x86_64-win32/rg.exe    # Windows
 ```
 
-### macOS 代码签名
+### macOS 程式碼簽名
 
-vendor 模式下的 rg 二进制需要 ad-hoc 签名才能通过 Gatekeeper（`codesignRipgrepIfNecessary()`）：
+vendor 模式下的 rg 二進制需要 ad-hoc 簽名才能通過 Gatekeeper（`codesignRipgrepIfNecessary()`）：
 
 ```typescript
-// 首次使用时执行：
-// 1. 检查是否已是有效签名
+// 首次使用時執行：
+// 1. 檢查是否已是有效簽名
 codesign -vv -d <rg-path>
-// 2. 如果只是 linker-signed，重新签名
+// 2. 如果只是 linker-signed，重新簽名
 codesign --sign - --force --preserve-metadata=entitlements,requirements,flags,runtime <rg-path>
-// 3. 移除隔离属性
+// 3. 移除隔離屬性
 xattr -d com.apple.quarantine <rg-path>
 ```
 
-## 搜索结果的设计考量
+## 搜索結果的設計考量
 
-### head_limit 与 Token 预算
+### head_limit 與 Token 預算
 
-大型项目的搜索结果可能有数十万条。默认最多返回 250 条匹配——这不是随意选择，而是**token 预算**的约束：
+大型專案的搜索結果可能有數十萬條。預設最多返回 250 條匹配——這不是隨意選擇，而是**token 預算**的約束：
 
-- 每条匹配行约 50-100 token
-- 250 条 ≈ 12,500-25,000 token
-- 这大约占 200k 上下文窗口的 6-12%
-- 超过这个比例，AI 的推理质量会下降
+- 每條匹配行約 50-100 token
+- 250 條 ≈ 12,500-25,000 token
+- 這大約佔 200k 上下文窗口的 6-12%
+- 超過這個比例，AI 的推理質量會下降
 
-Grep 工具的 `head_limit` 参数让 AI 可以按需调整——搜索小项目时可以用更大的值。
+Grep 工具的 `head_limit` 參數讓 AI 可以按需調整——搜索小專案時可以用更大的值。
 
-### 按修改时间排序
+### 按修改時間排序
 
-Glob 默认把**最近修改的文件排在前面**。这不是默认的文件系统排序，而是刻意的设计决策：
+Glob 預設把**最近修改的文件排在前面**。這不是預設的檔案系統排序，而是刻意的設計決策：
 
 ```
-设计假设：最近修改的文件最可能与当前任务相关
-实际效果：AI 优先看到"活"的代码，而不是沉寂的历史文件
+設計假設：最近修改的文件最可能與當前任務相關
+實際效果：AI 優先看到"活"的程式碼，而不是沉寂的歷史文件
 ```
 
-在 `src/tools/GlobTool/` 中，ripgrep 的输出在返回给 AI 前按 mtime 排序。
+在 `src/tools/GlobTool/` 中，ripgrep 的輸出在返回給 AI 前按 mtime 排序。
 
-### ripgrep 的错误处理
+### ripgrep 的錯誤處理
 
-ripgrep 执行有专门的错误恢复链（`src/utils/ripgrep.ts`）：
+ripgrep 執行有專門的錯誤恢復鏈（`src/utils/ripgrep.ts`）：
 
-| 错误 | 处理 |
+| 錯誤 | 處理 |
 |------|------|
-| **EAGAIN**（资源不足） | 自动以单线程模式 `-j 1` 重试 |
-| **超时**（默认 20s，WSL 60s） | 返回已有部分结果，丢弃可能不完整的最后一行 |
-| **缓冲区溢出** | 截断到 20MB，返回已收集的结果 |
-| **SIGTERM 失效** | 5 秒后升级为 SIGKILL |
+| **EAGAIN**（資源不足） | 自動以單執行緒模式 `-j 1` 重試 |
+| **超時**（預設 20s，WSL 60s） | 返回已有部分結果，丟棄可能不完整的最後一行 |
+| **緩衝區溢出** | 截斷到 20MB，返回已收集的結果 |
+| **SIGTERM 失效** | 5 秒後升級爲 SIGKILL |
 
-## ToolSearch：在 50+ 工具中发现目标
+## ToolSearch：在 50+ 工具中發現目標
 
-当可用工具超过 50 个时（含 MCP 提供的外部工具），AI 可能不知道该用哪个。**ToolSearch**（`src/tools/ToolSearchTool/`）提供了工具发现机制。
+當可用工具超過 50 個時（含 MCP 提供的外部工具），AI 可能不知道該用哪個。**ToolSearch**（`src/tools/ToolSearchTool/`）提供了工具發現機制。
 
 ### 搜索算法
 
-ToolSearch 实现了基于关键词的加权搜索（`searchToolsWithKeywords()`）：
+ToolSearch 實現了基於關鍵詞的加權搜索（`searchToolsWithKeywords()`）：
 
 ```
-输入: query = "database connection"
+輸入: query = "database connection"
      ↓
-1. 精确匹配: 检查是否有工具名完全匹配（快速路径）
-2. MCP 前缀匹配: "mcp__postgres" → 匹配所有 postgres 相关工具
-3. 关键词拆分: ["database", "connection"]
+1. 精確匹配: 檢查是否有工具名完全匹配（快速路徑）
+2. MCP 前綴匹配: "mcp__postgres" → 匹配所有 postgres 相關工具
+3. 關鍵詞拆分: ["database", "connection"]
 4. 工具名解析:
    - MCP 工具: "mcp__server__action" → ["server", "action"]
    - 普通工具: "FileEditTool" → ["file", "edit", "tool"]
-5. 加权评分:
-   - 工具名精确匹配: 10 分（MCP: 12 分）
+5. 加權評分:
+   - 工具名精確匹配: 10 分（MCP: 12 分）
    - 工具名部分匹配: 5 分（MCP: 6 分）
    - searchHint 匹配: 4 分
    - 描述匹配: 2 分
-6. 必选词过滤: "+database" 前缀表示必须包含
-7. 按分数排序，返回 top-N
+6. 必選詞過濾: "+database" 前綴表示必須包含
+7. 按分數排序，返回 top-N
 ```
 
-### `select:` 直接选择
+### `select:` 直接選擇
 
-AI 也可以用 `select:ToolName` 精确选择已知工具。这比搜索更快，且支持逗号分隔的批量选择（`select:A,B,C`）。
+AI 也可以用 `select:ToolName` 精確選擇已知工具。這比搜索更快，且支援逗號分隔的批量選擇（`select:A,B,C`）。
 
-### 延迟加载（Deferred Tools）
+### 延遲加載（Deferred Tools）
 
-不是所有工具都常驻内存。MCP 工具和低频工具被标记为 `isDeferredTool`，只有在 ToolSearch 选中后才真正加载。这减少了每次 API 调用的 token 开销（工具描述占用大量 token）。
+不是所有工具都常駐內存。MCP 工具和低頻工具被標記爲 `isDeferredTool`，只有在 ToolSearch 選中後才真正加載。這減少了每次 API 呼叫的 token 開銷（工具描述佔用大量 token）。
 
-### 缓存策略
+### 快取策略
 
-工具描述的获取是 memoized 的——只在延迟工具集合变化时清除缓存：
+工具描述的取得是 memoized 的——只在延遲工具集合變化時清除快取：
 
 ```typescript
-// 工具名排序后拼接作为缓存 key
+// 工具名排序後拼接作爲快取 key
 function getDeferredToolsCacheKey(deferredTools: Tools): string {
   return deferredTools.map(t => t.name).sort().join(',')
 }
 ```
 
-## Web 搜索与抓取
+## Web 搜索與抓取
 
-AI 的信息获取不局限于本地代码：
+AI 的信息取得不侷限於本地程式碼：
 
-- **WebSearch**（`src/tools/WebSearchTool/`）：调用 Anthropic API 的 `web_search_20250305` server tool 搜索互联网
-- **WebFetch**（`src/tools/WebFetchTool/`）：抓取特定 URL 内容，转换为 Markdown 供 AI 阅读
+- **WebSearch**（`src/tools/WebSearchTool/`）：呼叫 Anthropic API 的 `web_search_20250305` server tool 搜索互聯網
+- **WebFetch**（`src/tools/WebFetchTool/`）：抓取特定 URL 內容，轉換爲 Markdown 供 AI 閱讀
 
-这让 AI 可以查阅文档、搜索 Stack Overflow、阅读 GitHub issue——和人类开发者的工作方式一致。
+這讓 AI 可以查閱文件、搜索 Stack Overflow、閱讀 GitHub issue——和人類開發者的工作方式一致。
 
-### WebSearch 实现机制
+### WebSearch 實現機制
 
-WebSearch 通过适配器模式支持两种搜索后端，由 `src/tools/WebSearchTool/adapters/` 中的工厂函数 `createAdapter()` 选择：
+WebSearch 通過適配器模式支援兩種搜索後端，由 `src/tools/WebSearchTool/adapters/` 中的工廠函數 `createAdapter()` 選擇：
 
 ```
-适配器架构:
+適配器架構:
   WebSearchTool.call()
-    → createAdapter() 选择后端
-      ├─ ApiSearchAdapter — Anthropic API 服务端搜索（需官方 API 密钥）
-      └─ BingSearchAdapter — 直接抓取 Bing 搜索页面解析（无需 API 密钥）
+    → createAdapter() 選擇後端
+      ├─ ApiSearchAdapter — Anthropic API 服務端搜索（需官方 API 密鑰）
+      └─ BingSearchAdapter — 直接抓取 Bing 搜索頁面解析（無需 API 密鑰）
     → adapter.search(query, options)
-    → 转换为统一 SearchResult[] 格式返回
+    → 轉換爲統一 SearchResult[] 格式返回
 ```
 
-#### 适配器选择逻辑
+#### 適配器選擇邏輯
 
-`adapters/index.ts` 中的工厂函数按以下优先级选择后端：
+`adapters/index.ts` 中的工廠函數按以下優先級選擇後端：
 
-| 优先级 | 条件 | 适配器 |
+| 優先級 | 條件 | 適配器 |
 |--------|------|--------|
-| 1 | 环境变量 `WEB_SEARCH_ADAPTER=api` | `ApiSearchAdapter` |
-| 2 | 环境变量 `WEB_SEARCH_ADAPTER=bing` | `BingSearchAdapter` |
+| 1 | 環境變量 `WEB_SEARCH_ADAPTER=api` | `ApiSearchAdapter` |
+| 2 | 環境變量 `WEB_SEARCH_ADAPTER=bing` | `BingSearchAdapter` |
 | 3 | API Base URL 指向 Anthropic 官方 | `ApiSearchAdapter` |
-| 4 | 第三方代理 / 非官方端点 | `BingSearchAdapter` |
+| 4 | 第三方代理 / 非官方端點 | `BingSearchAdapter` |
 
-适配器是无状态的，同一会话内缓存复用。
+適配器是無狀態的，同一會話內快取複用。
 
-#### ApiSearchAdapter — API 服务端搜索
+#### ApiSearchAdapter — API 服務端搜索
 
-将搜索请求委托给 Anthropic API 的 `web_search_20250305` server tool：
+將搜索請求委託給 Anthropic API 的 `web_search_20250305` server tool：
 
 ```
-调用链:
+呼叫鏈:
   ApiSearchAdapter.search(query, options)
-    → queryModelWithStreaming() 发起独立的 API 调用
-      → 携带 extraToolSchemas: [BetaWebSearchTool20250305]
-      → API 服务端执行搜索，返回流式事件
+    → queryModelWithStreaming() 發起獨立的 API 呼叫
+      → 攜帶 extraToolSchemas: [BetaWebSearchTool20250305]
+      → API 服務端執行搜索，返回流式事件
         → server_tool_use / web_search_tool_result / text 交替返回
-    → extractSearchResults() 从 content blocks 提取 SearchResult[]
+    → extractSearchResults() 從 content blocks 提取 SearchResult[]
 ```
 
-| 特性 | 实现 |
+| 特性 | 實現 |
 |------|------|
-| **模型选择** | Feature flag `tengu_plum_vx3` 控制用 Haiku（强制 tool_choice）还是主模型 |
-| **搜索上限** | 每次调用最多 8 次搜索（`max_uses: 8`） |
-| **域过滤** | 支持 `allowedDomains` / `blockedDomains` |
-| **进度追踪** | 流式解析 `input_json_delta` 提取 query，实时回调 `onProgress` |
+| **模型選擇** | Feature flag `tengu_plum_vx3` 控制用 Haiku（強制 tool_choice）還是主模型 |
+| **搜索上限** | 每次呼叫最多 8 次搜索（`max_uses: 8`） |
+| **域過濾** | 支援 `allowedDomains` / `blockedDomains` |
+| **進度追蹤** | 流式解析 `input_json_delta` 提取 query，實時回調 `onProgress` |
 
-#### BingSearchAdapter — Bing 搜索页面解析
+#### BingSearchAdapter — Bing 搜索頁面解析
 
-直接抓取 Bing 搜索 HTML 并用正则提取结果，无需 API 密钥：
+直接抓取 Bing 搜索 HTML 並用正則提取結果，無需 API 密鑰：
 
 ```
-调用链:
+呼叫鏈:
   BingSearchAdapter.search(query, options)
-    → axios.get(bing.com/search?q=...)  — 使用浏览器级别 headers 绕过反爬
+    → axios.get(bing.com/search?q=...)  — 使用瀏覽器級別 headers 繞過反爬
     → extractBingResults(html)
-      → 正则匹配 <li class="b_algo"> 块
-      → 提取 <h2><a> 标题和 URL
-      → resolveBingUrl() 解码 Bing 重定向链接
-      → extractSnippet() 三级降级提取摘要
-    → 客户端域过滤 (allowedDomains / blockedDomains)
+      → 正則匹配 <li class="b_algo"> 塊
+      → 提取 <h2><a> 標題和 URL
+      → resolveBingUrl() 解碼 Bing 重定向連結
+      → extractSnippet() 三級降級提取摘要
+    → 客戶端域過濾 (allowedDomains / blockedDomains)
     → 返回 SearchResult[]
 ```
 
-**反爬策略**：Bing 对非浏览器 UA 返回需要 JS 渲染的空页面。适配器使用完整的 Edge 浏览器请求头（包含 `Sec-Ch-Ua`、`Sec-Fetch-*` 等现代浏览器标头）确保获得完整 HTML。同时使用 `setmkt=en-US` 参数统一市场定位，避免 Bing 基于用户 IP 做区域化定向（如跳转到德语/新加坡市场导致结果不相关）。
+**反爬策略**：Bing 對非瀏覽器 UA 返回需要 JS 渲染的空頁面。適配器使用完整的 Edge 瀏覽器請求頭（包含 `Sec-Ch-Ua`、`Sec-Fetch-*` 等現代瀏覽器標頭）確保獲得完整 HTML。同時使用 `setmkt=en-US` 參數統一市場定位，避免 Bing 基於用戶 IP 做區域化定向（如跳轉到德語/新加坡市場導致結果不相關）。
 
-**URL 解码**：Bing 搜索结果中的 URL 为重定向格式（`bing.com/ck/a?...&u=a1aHR0cHM6Ly9...`），`resolveBingUrl()` 从 `u` 参数中 base64 解码出真实目标 URL（`a1` 前缀 = https，`a0` = http）。
+**URL 解碼**：Bing 搜索結果中的 URL 爲重定向格式（`bing.com/ck/a?...&u=a1aHR0cHM6Ly9...`），`resolveBingUrl()` 從 `u` 參數中 base64 解碼出真實目標 URL（`a1` 前綴 = https，`a0` = http）。
 
-**摘要提取**（`extractSnippet()`）按优先级尝试三个来源：
-1. `<p class="b_lineclamp...">` — 带行截断的摘要段落
-2. `<div class="b_caption">` 内的 `<p>` — 普通摘要段落
-3. `<div class="b_caption">` 的直接文本内容 — 兜底方案
+**摘要提取**（`extractSnippet()`）按優先級嘗試三個來源：
+1. `<p class="b_lineclamp...">` — 帶行截斷的摘要段落
+2. `<div class="b_caption">` 內的 `<p>` — 普通摘要段落
+3. `<div class="b_caption">` 的直接文本內容 — 兜底方案
 
-| 特性 | 实现 |
+| 特性 | 實現 |
 |------|------|
-| **超时** | 30 秒（`FETCH_TIMEOUT_MS`） |
-| **域过滤** | 支持 `allowedDomains` / `blockedDomains`，含子域名匹配 |
-| **进度追踪** | 发送 query_update 和 search_results_received 回调 |
-| **中止支持** | 外部 AbortSignal 传播到 axios 请求 |
+| **超時** | 30 秒（`FETCH_TIMEOUT_MS`） |
+| **域過濾** | 支援 `allowedDomains` / `blockedDomains`，含子域名匹配 |
+| **進度追蹤** | 發送 query_update 和 search_results_received 回調 |
+| **中止支援** | 外部 AbortSignal 傳播到 axios 請求 |
 
-### WebSearchTool 统一接口
+### WebSearchTool 統一介面
 
-`WebSearchTool`（`src/tools/WebSearchTool/WebSearchTool.ts`）是面向主循环的工具定义，所有 provider 均可使用（`isEnabled()` 始终返回 true）。它将适配器返回的 `SearchResult[]` 转换为内部 `Output` 格式，`mapToolResultToToolResultBlockParam` 将搜索结果格式化为带 markdown 超链接的文本，并附加 "REMINDER" 要求主模型在回复中包含 Sources。
+`WebSearchTool`（`src/tools/WebSearchTool/WebSearchTool.ts`）是面向主循環的工具定義，所有 provider 均可使用（`isEnabled()` 始終返回 true）。它將適配器返回的 `SearchResult[]` 轉換爲內部 `Output` 格式，`mapToolResultToToolResultBlockParam` 將搜索結果格式化爲帶 markdown 超連結的文本，並附加 "REMINDER" 要求主模型在回覆中包含 Sources。
 
-### WebFetch 实现机制
+### WebFetch 實現機制
 
-WebFetch 是一个完整的 HTTP 客户端 + 内容处理管线：
+WebFetch 是一個完整的 HTTP 客戶端 + 內容處理管線：
 
 ```
-调用链:
+呼叫鏈:
   WebFetchTool.call({ url, prompt })
     → getURLMarkdownContent(url)
-      → validateURL() — 长度≤2000、无用户名密码、公网域名
-      → URL_CACHE 命中检查（15 分钟 TTL LRU，50MB 上限）
-      → checkDomainBlocklist() — 调用 api.anthropic.com/api/web/domain_info 预检
-      → getWithPermittedRedirects() — axios 请求，自定义重定向处理
-        → HTML → Turndown 转 Markdown（懒加载单例，~1.4MB）
+      → validateURL() — 長度≤2000、無用戶名密碼、公網域名
+      → URL_CACHE 命中檢查（15 分鐘 TTL LRU，50MB 上限）
+      → checkDomainBlocklist() — 呼叫 api.anthropic.com/api/web/domain_info 預檢
+      → getWithPermittedRedirects() — axios 請求，自定義重定向處理
+        → HTML → Turndown 轉 Markdown（懶加載單例，~1.4MB）
         → 非 HTML → 原始文本
-        → 二进制（PDF 等）→ persistBinaryContent() 保存到磁盘
+        → 二進制（PDF 等）→ persistBinaryContent() 保存到磁盤
     → applyPromptToMarkdown()
-      → 截断到 100K 字符
+      → 截斷到 100K 字符
       → queryHaiku() 用小模型按 prompt 提取信息
-    → 返回处理后的结果
+    → 返回處理後的結果
 ```
 
-安全防护多层设计：
+安全防護多層設計：
 
-| 层级 | 机制 | 说明 |
+| 層級 | 機制 | 說明 |
 |------|------|------|
-| **域名预检** | `checkDomainBlocklist()` | 调用 `api.anthropic.com/api/web/domain_info?domain=…`，5 分钟缓存 |
-| **重定向控制** | `isPermittedRedirect()` | 仅允许同 host（±www）重定向，跨域重定向返回提示让 AI 重新调用 |
-| **重定向深度** | `MAX_REDIRECTS = 10` | 防止重定向循环无限挂起 |
-| **内容大小** | `MAX_HTTP_CONTENT_LENGTH = 10MB` | 单次响应上限 |
-| **请求超时** | `FETCH_TIMEOUT_MS = 60s` | 主请求超时；域名预检 10s |
-| **URL 验证** | `validateURL()` | 长度、协议、用户名密码、公网域名检查 |
-| **egress 检测** | `X-Proxy-Error: blocked-by-allowlist` | 检测企业代理拦截 |
+| **域名預檢** | `checkDomainBlocklist()` | 呼叫 `api.anthropic.com/api/web/domain_info?domain=…`，5 分鐘快取 |
+| **重定向控制** | `isPermittedRedirect()` | 僅允許同 host（±www）重定向，跨域重定向返回提示讓 AI 重新呼叫 |
+| **重定向深度** | `MAX_REDIRECTS = 10` | 防止重定向循環無限掛起 |
+| **內容大小** | `MAX_HTTP_CONTENT_LENGTH = 10MB` | 單次響應上限 |
+| **請求超時** | `FETCH_TIMEOUT_MS = 60s` | 主請求超時；域名預檢 10s |
+| **URL 驗證** | `validateURL()` | 長度、協議、用戶名密碼、公網域名檢查 |
+| **egress 檢測** | `X-Proxy-Error: blocked-by-allowlist` | 檢測企業代理攔截 |
 
-预批准域名（`src/tools/WebFetchTool/preapproved.ts`）：
+預批准域名（`src/tools/WebFetchTool/preapproved.ts`）：
 
-用户无需手动授权即可抓取的域名列表，包含 ~90 个主流技术文档站点（MDN、Python docs、React docs、AWS docs 等）。列表分为 hostname-only 和 path-prefix 两类，查找复杂度 O(1)。
+用戶無需手動授權即可抓取的域名列表，包含 ~90 個主流技術文件站點（MDN、Python docs、React docs、AWS docs 等）。列表分爲 hostname-only 和 path-prefix 兩類，查找複雜度 O(1)。
 
-对预批准域名，WebFetch 跳过 Haiku 摘要步骤（如果内容是 Markdown 且 < 100K 字符），直接返回原文——因为技术文档本身的结构化程度已经足够好。
+對預批准域名，WebFetch 跳過 Haiku 摘要步驟（如果內容是 Markdown 且 < 100K 字符），直接返回原文——因爲技術文件本身的結構化程度已經足夠好。
 
-权限模型方面，WebFetch 按 hostname 生成 `domain:xxx` 规则匹配用户的 allow/deny/ask 规则，支持用户对特定域名配置永久允许或拒绝。
+權限模型方面，WebFetch 按 hostname 生成 `domain:xxx` 規則匹配用戶的 allow/deny/ask 規則，支援用戶對特定域名設定永久允許或拒絕。
 
-### ripgrep 的流式输出
+### ripgrep 的流式輸出
 
-对于交互式场景（如 QuickOpen），ripgrep 支持**流式输出**（`ripGrepStream()`）：
+對於交互式場景（如 QuickOpen），ripgrep 支援**流式輸出**（`ripGrepStream()`）：
 
 ```
-rg --files → 逐 chunk 到达 → 按行分割 → onLines(lines) 回调
+rg --files → 逐 chunk 到達 → 按行分割 → onLines(lines) 回調
 ```
 
-不需要等 ripgrep 完成整个搜索——第一批结果在 rg 仍在遍历目录树时就已展示。调用者可以通过 AbortSignal 提前终止搜索（例如找到足够多的结果后）。
+不需要等 ripgrep 完成整個搜索——第一批結果在 rg 仍在遍歷目錄樹時就已展示。呼叫者可以通過 AbortSignal 提前終止搜索（例如找到足夠多的結果後）。

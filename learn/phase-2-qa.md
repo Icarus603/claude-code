@@ -1,33 +1,33 @@
-# 第二阶段 Q&A
+# 第二階段 Q&A
 
-## Q1：query.ts 的流式消息处理具体是怎样的？
+## Q1：query.ts 的流式訊息處理具體是怎樣的？
 
-**核心问题**：`deps.callModel()` yield 出的每一条消息，在 `queryLoop()` 的 `for await` 循环体（L659-866）中具体经历了什么处理？
+**核心問題**：`deps.callModel()` yield 出的每一條訊息，在 `queryLoop()` 的 `for await` 循環體（L659-866）中具體經歷了什麼處理？
 
-### 场景
+### 場景
 
-用户说：**"帮我看看 package.json 的内容"**
+用戶說：**"幫我看看 package.json 的內容"**
 
-模型回复：一段文字 "我来读取文件。" + 一个 Read 工具调用。
+模型回覆：一段文字 "我來讀取文件。" + 一個 Read 工具呼叫。
 
-### callModel yield 的完整消息序列
+### callModel yield 的完整訊息序列
 
-claude.ts 的 `queryModel()` 会 yield 两种类型的消息：
+claude.ts 的 `queryModel()` 會 yield 兩種類型的訊息：
 
-| 类型标记 | 含义 | 产出时机 |
+| 類型標記 | 含義 | 產出時機 |
 |---------|------|---------|
-| `stream_event` | 原始 SSE 事件包装 | 每个 SSE 事件都产出一条 |
-| `assistant` | 完整的 AssistantMessage | 仅在 `content_block_stop` 时产出 |
+| `stream_event` | 原始 SSE 事件包裝 | 每個 SSE 事件都產出一條 |
+| `assistant` | 完整的 AssistantMessage | 僅在 `content_block_stop` 時產出 |
 
-本例中 callModel 依次 yield **共 13 条消息**：
+本例中 callModel 依次 yield **共 13 條訊息**：
 
 ```
 #1  { type: 'stream_event', event: { type: 'message_start', ... }, ttftMs: 342 }
 #2  { type: 'stream_event', event: { type: 'content_block_start', index: 0, content_block: { type: 'text' } } }
-#3  { type: 'stream_event', event: { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '我来' } } }
-#4  { type: 'stream_event', event: { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '读取文件。' } } }
+#3  { type: 'stream_event', event: { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '我來' } } }
+#4  { type: 'stream_event', event: { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '讀取文件。' } } }
 #5  { type: 'stream_event', event: { type: 'content_block_stop', index: 0 } }
-#6  { type: 'assistant', uuid: 'uuid-1', message: { content: [{ type: 'text', text: '我来读取文件。' }], stop_reason: null } }
+#6  { type: 'assistant', uuid: 'uuid-1', message: { content: [{ type: 'text', text: '我來讀取文件。' }], stop_reason: null } }
 #7  { type: 'stream_event', event: { type: 'content_block_start', index: 1, content_block: { type: 'tool_use', id: 'toolu_001', name: 'Read' } } }
 #8  { type: 'stream_event', event: { type: 'content_block_delta', index: 1, delta: { type: 'input_json_delta', partial_json: '{"file_path":' } } }
 #9  { type: 'stream_event', event: { type: 'content_block_delta', index: 1, delta: { type: 'input_json_delta', partial_json: '"/path/package.json"}' } } }
@@ -37,45 +37,45 @@ claude.ts 的 `queryModel()` 会 yield 两种类型的消息：
 #13 { type: 'stream_event', event: { type: 'message_stop' } }
 ```
 
-注意 `#6` 和 `#11` 是 **assistant 类型**（content_block_stop 时由 claude.ts 组装），其余全是 **stream_event 类型**。
+注意 `#6` 和 `#11` 是 **assistant 類型**（content_block_stop 時由 claude.ts 組裝），其餘全是 **stream_event 類型**。
 
-### 循环体结构
+### 循環體結構
 
-循环体在 L708-866，结构如下：
+循環體在 L708-866，結構如下：
 
 ```
 for await (const message of deps.callModel({...})) {   // L659
-    // A. 降级检查 (L712)
+    // A. 降級檢查 (L712)
     // B. backfill (L747-789)
-    // C. withheld 检查 (L801-824)
+    // C. withheld 檢查 (L801-824)
     // D. yield (L825-827)
     // E. assistant 收集 + addTool (L828-848)
     // F. getCompletedResults (L850-865)
 }
 ```
 
-### 逐条走循环体
+### 逐條走循環體
 
 #### #1 stream_event (message_start)
 
 ```
-A. L712: streamingFallbackOccured = false → 跳过
+A. L712: streamingFallbackOccured = false → 跳過
 
 B. L748: message.type === 'assistant'?
-   → 'stream_event' !== 'assistant' → 跳过整个 backfill 块
+   → 'stream_event' !== 'assistant' → 跳過整個 backfill 塊
 
-C. L801-824: withheld 检查
-   → 不是 assistant 类型，各项检查均为 false → withheld = false
+C. L801-824: withheld 檢查
+   → 不是 assistant 類型，各項檢查均爲 false → withheld = false
 
-D. L825: yield message  ✅ → 透传给 REPL（REPL 记录 ttftMs）
+D. L825: yield message  ✅ → 透傳給 REPL（REPL 記錄 ttftMs）
 
-E. L828: message.type === 'assistant'? → 否 → 跳过
+E. L828: message.type === 'assistant'? → 否 → 跳過
 
 F. L850-854: streamingToolExecutor.getCompletedResults()
-   → tools 数组为空 → 无结果
+   → tools 數組爲空 → 無結果
 ```
 
-**净效果**：`yield` 透传。
+**淨效果**：`yield` 透傳。
 
 ---
 
@@ -83,34 +83,34 @@ F. L850-854: streamingToolExecutor.getCompletedResults()
 
 ```
 A-C. 同 #1
-D.   yield message  ✅ → REPL 设置 spinner 为 "Responding..."
+D.   yield message  ✅ → REPL 設置 spinner 爲 "Responding..."
 E-F. 同 #1
 ```
 
-**净效果**：`yield` 透传。
+**淨效果**：`yield` 透傳。
 
 ---
 
-#### #3 stream_event (text_delta: "我来")
+#### #3 stream_event (text_delta: "我來")
 
 ```
 A-C. 同 #1
-D.   yield message  ✅ → REPL 追加 streamingText += "我来"（打字机效果）
+D.   yield message  ✅ → REPL 追加 streamingText += "我來"（打字機效果）
 E-F. 同 #1
 ```
 
-**净效果**：`yield` 透传。
+**淨效果**：`yield` 透傳。
 
 ---
 
-#### #4 stream_event (text_delta: "读取文件。")
+#### #4 stream_event (text_delta: "讀取文件。")
 
 ```
 同 #3
-D. yield message  ✅ → REPL streamingText += "读取文件。"
+D. yield message  ✅ → REPL streamingText += "讀取文件。"
 ```
 
-**净效果**：`yield` 透传。
+**淨效果**：`yield` 透傳。
 
 ---
 
@@ -118,58 +118,58 @@ D. yield message  ✅ → REPL streamingText += "读取文件。"
 
 ```
 同 #2
-D. yield message  ✅ → REPL 无特殊操作（真正的 AssistantMessage 在下一条 #6）
+D. yield message  ✅ → REPL 無特殊操作（真正的 AssistantMessage 在下一條 #6）
 ```
 
-**净效果**：`yield` 透传。
+**淨效果**：`yield` 透傳。
 
 ---
 
-#### #6 assistant (text block 完整消息) ★
+#### #6 assistant (text block 完整訊息) ★
 
-第一条 `type: 'assistant'` 的消息，走**完全不同的路径**：
+第一條 `type: 'assistant'` 的訊息，走**完全不同的路徑**：
 
 ```
-A. L712: streamingFallbackOccured = false → 跳过
+A. L712: streamingFallbackOccured = false → 跳過
 
-B. L748: message.type === 'assistant'? → ✅ 进入 backfill
-   L750: contentArr = [{ type: 'text', text: '我来读取文件。' }]
+B. L748: message.type === 'assistant'? → ✅ 進入 backfill
+   L750: contentArr = [{ type: 'text', text: '我來讀取文件。' }]
    L752: for i=0: block.type === 'text'
-   L754: block.type === 'tool_use'? → 否 → 跳过
-   L783: clonedContent 为 undefined → yieldMessage = message（原样不变）
+   L754: block.type === 'tool_use'? → 否 → 跳過
+   L783: clonedContent 爲 undefined → yieldMessage = message（原樣不變）
 
 C. L801: let withheld = false
-   L802: feature('CONTEXT_COLLAPSE') → false → 跳过
+   L802: feature('CONTEXT_COLLAPSE') → false → 跳過
    L813: reactiveCompact?.isWithheldPromptTooLong(message) → 否 → false
    L822: isWithheldMaxOutputTokens(message)
          → message.message.stop_reason === null → false
    → withheld = false
 
-D. L825: yield message  ✅ → REPL 清除 streamingText，添加完整 text 消息到列表
+D. L825: yield message  ✅ → REPL 清除 streamingText，添加完整 text 訊息到列表
 
 E. L828: message.type === 'assistant'? → ✅
    L830: assistantMessages.push(message)
          → assistantMessages = [uuid-1(text)]
 
    L832-834: msgToolUseBlocks = content.filter(type === 'tool_use')
-             → []（这是 text block，没有 tool_use）
+             → []（這是 text block，沒有 tool_use）
 
-   L835: length > 0? → 否 → 不设 needsFollowUp
-   L844: msgToolUseBlocks 为空 → 不调用 addTool
+   L835: length > 0? → 否 → 不設 needsFollowUp
+   L844: msgToolUseBlocks 爲空 → 不呼叫 addTool
 
 F. L854: getCompletedResults() → 空
 ```
 
-**净效果**：`yield` 消息 + `assistantMessages` 增加一条。`needsFollowUp` 仍为 `false`。
+**淨效果**：`yield` 訊息 + `assistantMessages` 增加一條。`needsFollowUp` 仍爲 `false`。
 
 ---
 
 #### #7 stream_event (content_block_start, tool_use: Read)
 
 ```
-A-C. 同 stream_event 通用路径
-D.   yield message  ✅ → REPL 设置 spinner 为 "tool-input"，添加 streamingToolUse
-E.   不是 assistant → 跳过
+A-C. 同 stream_event 通用路徑
+D.   yield message  ✅ → REPL 設置 spinner 爲 "tool-input"，添加 streamingToolUse
+E.   不是 assistant → 跳過
 F.   getCompletedResults() → 空
 ```
 
@@ -178,7 +178,7 @@ F.   getCompletedResults() → 空
 #### #8 stream_event (input_json_delta: '{"file_path":')
 
 ```
-D. yield message  ✅ → REPL 追加工具输入 JSON 碎片
+D. yield message  ✅ → REPL 追加工具輸入 JSON 碎片
 F. getCompletedResults() → 空
 ```
 
@@ -202,41 +202,41 @@ F. getCompletedResults() → 空
 
 ---
 
-#### #11 assistant (tool_use block 完整消息) ★★
+#### #11 assistant (tool_use block 完整訊息) ★★
 
-这条是**最关键的**——触发工具执行：
+這條是**最關鍵的**——觸發工具執行：
 
 ```
-A. L712: streamingFallbackOccured = false → 跳过
+A. L712: streamingFallbackOccured = false → 跳過
 
-B. L748: message.type === 'assistant'? → ✅ 进入 backfill
+B. L748: message.type === 'assistant'? → ✅ 進入 backfill
    L750: contentArr = [{ type: 'tool_use', id: 'toolu_001', name: 'Read',
                           input: { file_path: '/path/package.json' } }]
    L752: for i=0:
    L754: block.type === 'tool_use'? → ✅
    L756: typeof block.input === 'object' && !== null? → ✅
-   L759: tool = findToolByName(tools, 'Read') → Read 工具定义
-   L763: tool.backfillObservableInput 存在? → 假设存在
+   L759: tool = findToolByName(tools, 'Read') → Read 工具定義
+   L763: tool.backfillObservableInput 存在? → 假設存在
    L764-766: inputCopy = { file_path: '/path/package.json' }
              tool.backfillObservableInput(inputCopy)
              → 可能添加 absolutePath 字段
-   L773-776: addedFields? → 假设有新增字段
+   L773-776: addedFields? → 假設有新增字段
              clonedContent = [...contentArr]
              clonedContent[0] = { ...block, input: inputCopy }
    L783-788: yieldMessage = {
-               ...message,                 // uuid, type, timestamp 不变
+               ...message,                 // uuid, type, timestamp 不變
                message: {
-                 ...message.message,        // stop_reason, usage 不变
-                 content: clonedContent      // ★ 替换为带 absolutePath 的副本
+                 ...message.message,        // stop_reason, usage 不變
+                 content: clonedContent      // ★ 替換爲帶 absolutePath 的副本
                }
              }
-             // ★ 原始 message 保持不变（回传 API 保证缓存一致）
+             // ★ 原始 message 保持不變（回傳 API 保證快取一致）
 
-C. L801-824: withheld 检查 → 全部 false → withheld = false
+C. L801-824: withheld 檢查 → 全部 false → withheld = false
 
 D. L825: yield yieldMessage  ✅
-         → yield 的是克隆版（带 backfill 字段），给 REPL 和 SDK 用
-         → 原始 message 下面存进 assistantMessages，回传 API 保证缓存一致
+         → yield 的是克隆版（帶 backfill 字段），給 REPL 和 SDK 用
+         → 原始 message 下面存進 assistantMessages，回傳 API 保證快取一致
 
 E. L828: message.type === 'assistant'? → ✅
    L830: assistantMessages.push(message)   // ★ push 原始 message，不是 yieldMessage
@@ -248,50 +248,50 @@ E. L828: message.type === 'assistant'? → ✅
    L835: length > 0? → ✅
    L836: toolUseBlocks.push(...msgToolUseBlocks)
          → toolUseBlocks = [Read_block]
-   L837: needsFollowUp = true          // ★★★ 决定 while(true) 不会终止
+   L837: needsFollowUp = true          // ★★★ 決定 while(true) 不會終止
 
    L840-842: streamingToolExecutor 存在 ✓ && !aborted ✓
    L844-846: for (const toolBlock of msgToolUseBlocks):
-             streamingToolExecutor.addTool(Read_block, uuid-2消息)
-             // ★★★ 工具开始执行！
-             // → StreamingToolExecutor 内部：
+             streamingToolExecutor.addTool(Read_block, uuid-2訊息)
+             // ★★★ 工具開始執行！
+             // → StreamingToolExecutor 內部：
              //   isConcurrencySafe = true（Read 是安全的）
              //   queued → processQueue() → canExecuteTool() → true
-             //   → executeTool() → runToolUse() → 后台异步读文件
+             //   → executeTool() → runToolUse() → 後臺異步讀文件
 
 F. L850-854: getCompletedResults()
-   → Read 刚开始执行，status = 'executing' → 无完成结果
+   → Read 剛開始執行，status = 'executing' → 無完成結果
 ```
 
-**净效果**：
-- `yield` 克隆消息（带 backfill 字段）
-- `assistantMessages` push 原始消息
+**淨效果**：
+- `yield` 克隆訊息（帶 backfill 字段）
+- `assistantMessages` push 原始訊息
 - `needsFollowUp = true`
-- **Read 工具在后台异步开始执行**
+- **Read 工具在後臺異步開始執行**
 
 ---
 
 #### #12 stream_event (message_delta, stop_reason: 'tool_use')
 
 ```
-A-C. 同 stream_event 通用路径
+A-C. 同 stream_event 通用路徑
 D.   yield message  ✅
 
-E.   不是 assistant → 跳过
+E.   不是 assistant → 跳過
 
 F. L854: getCompletedResults()
-   → ★ 此时 Read 可能已经完成了!（读文件通常 <1ms）
+   → ★ 此時 Read 可能已經完成了!（讀文件通常 <1ms）
    → 如果完成: status = 'completed', results 有值
      L428(StreamingToolExecutor): tool.status = 'yielded'
      L431-432: yield { message: UserMsg(tool_result) }
    → 回到 query.ts:
      L855: result.message 存在
-     L856: yield result.message  ✅ → REPL 显示工具结果
+     L856: yield result.message  ✅ → REPL 顯示工具結果
      L857-862: toolResults.push(normalizeMessagesForAPI([result.message])...)
                → toolResults = [Read 的 tool_result]
 ```
 
-**净效果**：`yield` stream_event + **可能 yield 工具结果**（如果工具已完成）。
+**淨效果**：`yield` stream_event + **可能 yield 工具結果**（如果工具已完成）。
 
 ---
 
@@ -301,60 +301,60 @@ F. L854: getCompletedResults()
 D. yield message  ✅
 F. getCompletedResults()
    → 如果 Read 在 #12 已被收割 → 空
-   → 如果 Read 此时才完成 → yield 工具结果（同 #12 的 F 逻辑）
+   → 如果 Read 此時才完成 → yield 工具結果（同 #12 的 F 邏輯）
 ```
 
 ---
 
-### for await 循环退出后
+### for await 循環退出後
 
 ```
-L1018: aborted? → false → 跳过
+L1018: aborted? → false → 跳過
 
 L1065: if (!needsFollowUp)
-       → needsFollowUp = true → 不进入 → 跳过终止逻辑
+       → needsFollowUp = true → 不進入 → 跳過終止邏輯
 
 L1383: toolUpdates = streamingToolExecutor.getRemainingResults()
        → 如果 Read 已在 #12/#13 被收割 → 立即返回空
-       → 如果 Read 还没完成 → 阻塞等待 → 完成后 yield 结果
+       → 如果 Read 還沒完成 → 阻塞等待 → 完成後 yield 結果
 
 L1387-1404: for await (const update of toolUpdates) {
-              yield update.message        → REPL 显示
+              yield update.message        → REPL 顯示
               toolResults.push(...)        → 收集
             }
 
-L1718-1730: 构建 next State:
+L1718-1730: 構建 next State:
   state = {
     messages: [
-      ...messagesForQuery,     // [UserMessage("帮我看看...")]
+      ...messagesForQuery,     // [UserMessage("幫我看看...")]
       ...assistantMessages,    // [AssistantMsg(text), AssistantMsg(tool_use)]
       ...toolResults,          // [UserMsg(tool_result)]
     ],
     turnCount: 1,
     transition: { reason: 'next_turn' },
   }
-  → continue → while(true) 第 2 次迭代 → 带着工具结果再次调 API
+  → continue → while(true) 第 2 次迭代 → 帶着工具結果再次調 API
 ```
 
-### 循环体判定树总结
+### 循環體判定樹總結
 
 ```
 for await (const message of deps.callModel(...)) {
     │
     ├─ message.type === 'stream_event'?
     │   │
-    │   └─ YES → 几乎零操作
-    │        ├─ yield message（透传给 REPL 做实时 UI）
-    │        └─ getCompletedResults()（顺便检查有没有完成的工具）
+    │   └─ YES → 幾乎零操作
+    │        ├─ yield message（透傳給 REPL 做實時 UI）
+    │        └─ getCompletedResults()（順便檢查有沒有完成的工具）
     │
     └─ message.type === 'assistant'?
         │
         ├─ B. backfill: 有 tool_use + backfillObservableInput?
-        │   ├─ YES → 克隆消息，yield 克隆版（原始消息保留给 API）
-        │   └─ NO  → yield 原始消息
+        │   ├─ YES → 克隆訊息，yield 克隆版（原始訊息保留給 API）
+        │   └─ NO  → yield 原始訊息
         │
         ├─ C. withheld: prompt_too_long / max_output_tokens?
-        │   ├─ YES → 不 yield（暂扣，等后面恢复逻辑处理）
+        │   ├─ YES → 不 yield（暫扣，等後面恢復邏輯處理）
         │   └─ NO  → yield
         │
         ├─ E. assistantMessages.push(原始 message)
@@ -362,11 +362,11 @@ for await (const message of deps.callModel(...)) {
         ├─ E. 有 tool_use block?
         │   ├─ YES → toolUseBlocks.push()
         │   │         + needsFollowUp = true
-        │   │         + streamingToolExecutor.addTool() → ★ 立即开始执行工具
-        │   └─ NO  → 什么都不做
+        │   │         + streamingToolExecutor.addTool() → ★ 立即開始執行工具
+        │   └─ NO  → 什麼都不做
         │
-        └─ F. getCompletedResults() → 收割已完成的工具结果
+        └─ F. getCompletedResults() → 收割已完成的工具結果
 }
 ```
 
-**一句话总结**：stream_event 透传不处理；assistant 消息才是"真正的货"——收集起来、判断要不要暂扣、有工具就立即开始执行、顺便收割已完成的工具结果。
+**一句話總結**：stream_event 透傳不處理；assistant 訊息纔是"真正的貨"——收集起來、判斷要不要暫扣、有工具就立即開始執行、順便收割已完成的工具結果。

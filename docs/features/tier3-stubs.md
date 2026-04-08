@@ -1,76 +1,76 @@
-# Tier 3 — 纯 Stub / N/A 低优先级 Feature 概览
+# Tier 3 — 純 Stub / N/A 低優先級 Feature 概覽
 
-> 本文档汇总所有 Tier 3 feature。这些功能要么是纯 Stub（所有函数返回空值），
-> 要么是 Anthropic 内部基础设施（N/A），要么是引用量极低的辅助功能。
+> 本文件彙總所有 Tier 3 feature。這些功能要麼是純 Stub（所有函數返回空值），
+> 要麼是 Anthropic 內部基礎設施（N/A），要麼是引用量極低的輔助功能。
 
-## 概览
+## 概覽
 
-| Feature | 引用 | 状态 | 类别 | 简要说明 |
+| Feature | 引用 | 狀態 | 類別 | 簡要說明 |
 |---------|------|------|------|---------|
-| CHICAGO_MCP | 16 | N/A | 内部基础设施 | Anthropic 内部 MCP 基础设施，非外部可用 |
-| UDS_INBOX | 17 | Stub | 消息通信 | Unix 域套接字对等消息，进程间消息传递 |
-| MONITOR_TOOL | 13 | Stub | 工具 | 文件/进程监控工具，检测变更并通知 |
-| BG_SESSIONS | 11 | Stub | 会话管理 | 后台会话管理，支持多会话并行 |
-| SHOT_STATS | 10 | 无实现 | 统计 | 逐 prompt 统计信息收集 |
-| EXTRACT_MEMORIES | 7 | 无实现 | 记忆 | 自动从对话中提取重要信息作为记忆 |
-| TEMPLATES | 6 | Stub | 项目管理 | 项目/提示模板系统 |
-| LODESTONE | 6 | N/A | 内部基础设施 | 内部基础设施模块 |
-| STREAMLINED_OUTPUT | 1 | — | 输出 | 精简输出模式，减少终端输出量 |
-| HOOK_PROMPTS | 1 | — | 钩子 | Hook 提示词，自定义钩子的提示注入 |
-| CCR_AUTO_CONNECT | 3 | — | 远程控制 | CCR 自动连接，自动建立远程控制会话 |
-| CCR_MIRROR | 4 | — | 远程控制 | CCR 镜像模式，会话状态同步 |
-| CCR_REMOTE_SETUP | 1 | — | 远程控制 | CCR 远程设置，初始化远程控制配置 |
-| NATIVE_CLIPBOARD_IMAGE | 2 | — | 系统集成 | 原生剪贴板图片，从剪贴板读取图片 |
-| CONNECTOR_TEXT | 7 | — | 连接器 | 连接器文本，外部系统文本适配 |
-| COMMIT_ATTRIBUTION | 12 | — | Git | Commit 归因，标记 commit 来源 |
-| CACHED_MICROCOMPACT | 12 | — | 压缩 | 缓存微压缩，优化 compaction 性能 |
-| PROMPT_CACHE_BREAK_DETECTION | 9 | — | 性能 | Prompt cache 中断检测，监控 cache miss |
-| MEMORY_SHAPE_TELEMETRY | 3 | — | 遥测 | 记忆形态遥测，记忆使用模式追踪 |
-| MCP_RICH_OUTPUT | 3 | — | MCP | MCP 富输出，增强 MCP 工具输出格式 |
-| FILE_PERSISTENCE | 3 | — | 持久化 | 文件持久化，跨会话保持状态 |
-| TREE_SITTER_BASH_SHADOW | 5 | Shadow | 安全 | Bash AST Shadow 模式（见 tree-sitter-bash.md） |
-| QUICK_SEARCH | 5 | — | 搜索 | 快速搜索，优化的文件/内容搜索 |
-| MESSAGE_ACTIONS | 5 | — | UI | 消息操作，对消息执行后处理动作 |
-| DOWNLOAD_USER_SETTINGS | 5 | — | 配置 | 下载用户设置，从服务端同步配置 |
-| DIRECT_CONNECT | 5 | — | 网络 | 直连模式，绕过代理直接连接 API |
-| VERIFICATION_AGENT | 4 | — | Agent | 验证 Agent，专门用于验证代码变更 |
-| TERMINAL_PANEL | 4 | — | UI | 终端面板，嵌入式终端输出显示 |
-| SSH_REMOTE | 4 | — | 远程 | SSH 远程，通过 SSH 连接远程 Claude |
-| REVIEW_ARTIFACT | 4 | — | 审查 | Review Artifact，代码审查产出物 |
-| REACTIVE_COMPACT | 4 | — | 压缩 | 响应式压缩，基于上下文变化触发 compaction |
-| HISTORY_PICKER | 4 | — | UI | 历史选择器，浏览和选择历史对话 |
-| UPLOAD_USER_SETTINGS | 2 | — | 配置 | 上传用户设置，同步配置到服务端 |
-| POWERSHELL_AUTO_MODE | 2 | — | 平台 | PowerShell 自动模式，Windows 权限自动化 |
-| OVERFLOW_TEST_TOOL | 2 | — | 测试 | 溢出测试工具，测试上下文溢出处理 |
+| CHICAGO_MCP | 16 | N/A | 內部基礎設施 | Anthropic 內部 MCP 基礎設施，非外部可用 |
+| UDS_INBOX | 17 | Stub | 訊息通信 | Unix 域套接字對等訊息，進程間訊息傳遞 |
+| MONITOR_TOOL | 13 | Stub | 工具 | 文件/進程監控工具，檢測變更並通知 |
+| BG_SESSIONS | 11 | Stub | 會話管理 | 後臺會話管理，支援多會話並行 |
+| SHOT_STATS | 10 | 無實現 | 統計 | 逐 prompt 統計信息收集 |
+| EXTRACT_MEMORIES | 7 | 無實現 | 記憶 | 自動從對話中提取重要信息作爲記憶 |
+| TEMPLATES | 6 | Stub | 專案管理 | 專案/提示模板系統 |
+| LODESTONE | 6 | N/A | 內部基礎設施 | 內部基礎設施模組 |
+| STREAMLINED_OUTPUT | 1 | — | 輸出 | 精簡輸出模式，減少終端輸出量 |
+| HOOK_PROMPTS | 1 | — | 鉤子 | Hook 提示詞，自定義鉤子的提示注入 |
+| CCR_AUTO_CONNECT | 3 | — | 遠程控制 | CCR 自動連接，自動建立遠程控制會話 |
+| CCR_MIRROR | 4 | — | 遠程控制 | CCR 鏡像模式，會話狀態同步 |
+| CCR_REMOTE_SETUP | 1 | — | 遠程控制 | CCR 遠程設置，初始化遠程控制設定 |
+| NATIVE_CLIPBOARD_IMAGE | 2 | — | 系統集成 | 原生剪貼板圖片，從剪貼板讀取圖片 |
+| CONNECTOR_TEXT | 7 | — | 連接器 | 連接器文本，外部系統文本適配 |
+| COMMIT_ATTRIBUTION | 12 | — | Git | Commit 歸因，標記 commit 來源 |
+| CACHED_MICROCOMPACT | 12 | — | 壓縮 | 快取微壓縮，優化 compaction 性能 |
+| PROMPT_CACHE_BREAK_DETECTION | 9 | — | 性能 | Prompt cache 中斷檢測，監控 cache miss |
+| MEMORY_SHAPE_TELEMETRY | 3 | — | 遙測 | 記憶形態遙測，記憶使用模式追蹤 |
+| MCP_RICH_OUTPUT | 3 | — | MCP | MCP 富輸出，增強 MCP 工具輸出格式 |
+| FILE_PERSISTENCE | 3 | — | 持久化 | 文件持久化，跨會話保持狀態 |
+| TREE_SITTER_BASH_SHADOW | 5 | Shadow | 安全 | Bash AST Shadow 模式（見 tree-sitter-bash.md） |
+| QUICK_SEARCH | 5 | — | 搜索 | 快速搜索，優化的文件/內容搜索 |
+| MESSAGE_ACTIONS | 5 | — | UI | 訊息操作，對訊息執行後處理動作 |
+| DOWNLOAD_USER_SETTINGS | 5 | — | 設定 | 下載用戶設置，從服務端同步設定 |
+| DIRECT_CONNECT | 5 | — | 網絡 | 直連模式，繞過代理直接連接 API |
+| VERIFICATION_AGENT | 4 | — | Agent | 驗證 Agent，專門用於驗證程式碼變更 |
+| TERMINAL_PANEL | 4 | — | UI | 終端面板，嵌入式終端輸出顯示 |
+| SSH_REMOTE | 4 | — | 遠程 | SSH 遠程，通過 SSH 連接遠程 Claude |
+| REVIEW_ARTIFACT | 4 | — | 審查 | Review Artifact，程式碼審查產出物 |
+| REACTIVE_COMPACT | 4 | — | 壓縮 | 響應式壓縮，基於上下文變化觸發 compaction |
+| HISTORY_PICKER | 4 | — | UI | 歷史選擇器，瀏覽和選擇歷史對話 |
+| UPLOAD_USER_SETTINGS | 2 | — | 設定 | 上傳用戶設置，同步設定到服務端 |
+| POWERSHELL_AUTO_MODE | 2 | — | 平臺 | PowerShell 自動模式，Windows 權限自動化 |
+| OVERFLOW_TEST_TOOL | 2 | — | 測試 | 溢出測試工具，測試上下文溢出處理 |
 | NEW_INIT | 2 | — | 初始化 | 新版初始化流程 |
-| HARD_FAIL | 2 | — | 错误处理 | 硬失败模式，不可恢复错误直接终止 |
-| ENHANCED_TELEMETRY_BETA | 2 | — | 遥测 | 增强遥测 Beta，详细的性能指标收集 |
-| COWORKER_TYPE_TELEMETRY | 2 | — | 遥测 | 协作者类型遥测，追踪协作模式 |
-| BREAK_CACHE_COMMAND | 2 | — | 缓存 | 中断缓存命令，强制刷新 prompt cache |
-| AWAY_SUMMARY | 2 | — | 摘要 | 离开摘要，用户返回时总结期间工作 |
-| AUTO_THEME | 2 | — | UI | 自动主题，根据终端设置切换主题 |
-| ALLOW_TEST_VERSIONS | 2 | — | 版本 | 允许测试版本，跳过版本检查 |
-| AGENT_TRIGGERS_REMOTE | 2 | — | Agent | Agent 远程触发，从远程触发 Agent 任务 |
-| AGENT_MEMORY_SNAPSHOT | 2 | — | Agent | Agent 记忆快照，保存/恢复 Agent 状态 |
+| HARD_FAIL | 2 | — | 錯誤處理 | 硬失敗模式，不可恢復錯誤直接終止 |
+| ENHANCED_TELEMETRY_BETA | 2 | — | 遙測 | 增強遙測 Beta，詳細的性能指標收集 |
+| COWORKER_TYPE_TELEMETRY | 2 | — | 遙測 | 協作者類型遙測，追蹤協作模式 |
+| BREAK_CACHE_COMMAND | 2 | — | 快取 | 中斷快取命令，強制刷新 prompt cache |
+| AWAY_SUMMARY | 2 | — | 摘要 | 離開摘要，用戶返回時總結期間工作 |
+| AUTO_THEME | 2 | — | UI | 自動主題，根據終端設置切換主題 |
+| ALLOW_TEST_VERSIONS | 2 | — | 版本 | 允許測試版本，跳過版本檢查 |
+| AGENT_TRIGGERS_REMOTE | 2 | — | Agent | Agent 遠程觸發，從遠程觸發 Agent 任務 |
+| AGENT_MEMORY_SNAPSHOT | 2 | — | Agent | Agent 記憶快照，保存/恢復 Agent 狀態 |
 
-## 单引用 Feature（40+ 个）
+## 單引用 Feature（40+ 個）
 
-以下 feature 各只有 1 处引用，多为内部标记或实验性功能：
+以下 feature 各只有 1 處引用，多爲內部標記或實驗性功能：
 
 UNATTENDED_RETRY, ULTRATHINK, TORCH, SLOW_OPERATION_LOGGING, SKILL_IMPROVEMENT,
 SELF_HOSTED_RUNNER, RUN_SKILL_GENERATOR, PERFETTO_TRACING, NATIVE_CLIENT_ATTESTATION,
-KAIROS_DREAM（见 kairos.md）, IS_LIBC_MUSL, IS_LIBC_GLIBC, DUMP_SYSTEM_PROMPT,
+KAIROS_DREAM（見 kairos.md）, IS_LIBC_MUSL, IS_LIBC_GLIBC, DUMP_SYSTEM_PROMPT,
 COMPACTION_REMINDERS, CCR_REMOTE_SETUP, BYOC_ENVIRONMENT_RUNNER, BUILTIN_EXPLORE_PLAN_AGENTS,
 BUILDING_CLAUDE_APPS, ANTI_DISTILLATION_CC, AGENT_TRIGGERS, ABLATION_BASELINE
 
-## 优先级说明
+## 優先級說明
 
-这些 feature 被列为 Tier 3 的原因：
+這些 feature 被列爲 Tier 3 的原因：
 
-1. **内部基础设施**（CHICAGO_MCP, LODESTONE）：Anthropic 内部使用，外部无法运行
-2. **纯 Stub 且引用低**（UDS_INBOX, MONITOR_TOOL, BG_SESSIONS）：需要大量工作才能实现
-3. **实验性功能**（SHOT_STATS, EXTRACT_MEMORIES）：尚在概念阶段
-4. **辅助功能**（STREAMLINED_OUTPUT, HOOK_PROMPTS）：影响范围小
-5. **CCR 系列**：依赖远程控制基础设施，需要 BRIDGE_MODE 先完善
+1. **內部基礎設施**（CHICAGO_MCP, LODESTONE）：Anthropic 內部使用，外部無法執行
+2. **純 Stub 且引用低**（UDS_INBOX, MONITOR_TOOL, BG_SESSIONS）：需要大量工作才能實現
+3. **實驗性功能**（SHOT_STATS, EXTRACT_MEMORIES）：尚在概念階段
+4. **輔助功能**（STREAMLINED_OUTPUT, HOOK_PROMPTS）：影響範圍小
+5. **CCR 系列**：依賴遠程控制基礎設施，需要 BRIDGE_MODE 先完善
 
-如需深入了解某个 Tier 3 feature，可以在代码库中搜索 `feature('FEATURE_NAME')` 查看具体使用场景。
+如需深入瞭解某個 Tier 3 feature，可以在程式碼庫中搜索 `feature('FEATURE_NAME')` 查看具體使用場景。

@@ -1,45 +1,45 @@
 ---
-title: "计划模式 - Plan Mode 先看后做的安全机制"
-description: "基于源码解析 Claude Code Plan Mode 的完整实现：EnterPlanModeTool/ExitPlanModeV2Tool 的工具设计、权限上下文切换机制、Prompt-based 权限请求、计划文件持久化、Teammate 审批流程。"
-keywords: ["Plan Mode", "计划模式", "EnterPlanMode", "ExitPlanMode", "prepareContextForPlanMode", "allowedPrompts"]
+title: "計劃模式 - Plan Mode 先看後做的安全機制"
+description: "基於源碼解析 Claude Code Plan Mode 的完整實現：EnterPlanModeTool/ExitPlanModeV2Tool 的工具設計、權限上下文切換機制、Prompt-based 權限請求、計劃文件持久化、Teammate 審批流程。"
+keywords: ["Plan Mode", "計劃模式", "EnterPlanMode", "ExitPlanMode", "prepareContextForPlanMode", "allowedPrompts"]
 ---
 
-{/* 本章目标：基于源码揭示 Plan Mode 的完整实现 */}
+{/* 本章目標：基於源碼揭示 Plan Mode 的完整實現 */}
 
-## 问题场景
+## 問題場景
 
-你说"重构这个模块"，AI 立刻开始改代码——但你还没搞清楚它打算怎么改。等改了一半发现方向不对，已经来不及了。
+你說"重構這個模組"，AI 立刻開始改程式碼——但你還沒搞清楚它打算怎麼改。等改了一半發現方向不對，已經來不及了。
 
-## Plan Mode 的解决方案
+## Plan Mode 的解決方案
 
-计划模式给对话加了一个"只读阶段"，通过两个工具实现闭环：
+計劃模式給對話加了一個"只讀階段"，通過兩個工具實現閉環：
 
 <Steps>
-  <Step title="EnterPlanMode — 进入计划模式">
-    AI 自主判断（或用户触发）任务需要规划，调用 `EnterPlanModeTool`（`src/tools/EnterPlanModeTool/EnterPlanModeTool.ts:36`）。该工具需要**用户审批**（`checkPermissions` 返回 `ask`）。
+  <Step title="EnterPlanMode — 進入計劃模式">
+    AI 自主判斷（或用戶觸發）任務需要規劃，呼叫 `EnterPlanModeTool`（`src/tools/EnterPlanModeTool/EnterPlanModeTool.ts:36`）。該工具需要**用戶審批**（`checkPermissions` 返回 `ask`）。
   </Step>
-  <Step title="探索阶段 — 只读工具集">
-    权限模式切换为 `'plan'`，AI 只能使用 `isReadOnly()` 为 true 的工具（Read、Grep、Glob、Agent 等）。写操作被自动拒绝。
+  <Step title="探索階段 — 只讀工具集">
+    權限模式切換爲 `'plan'`，AI 只能使用 `isReadOnly()` 爲 true 的工具（Read、Grep、Glob、Agent 等）。寫操作被自動拒絕。
   </Step>
-  <Step title="ExitPlanMode — 提交方案审批">
-    AI 完成探索后，调用 `ExitPlanModeV2Tool`（`src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:147`），将计划文件提交给用户审阅。这是第二个**需要用户审批**的节点。
+  <Step title="ExitPlanMode — 提交方案審批">
+    AI 完成探索後，呼叫 `ExitPlanModeV2Tool`（`src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:147`），將計劃文件提交給用戶審閱。這是第二個**需要用戶審批**的節點。
   </Step>
-  <Step title="恢复执行 — 全部工具权限">
-    用户批准后，权限模式恢复为进入前的状态，AI 按计划执行。
+  <Step title="恢復執行 — 全部工具權限">
+    用戶批准後，權限模式恢復爲進入前的狀態，AI 按計劃執行。
   </Step>
 </Steps>
 
-## 权限的自动收窄与恢复
+## 權限的自動收窄與恢復
 
-### 进入：`prepareContextForPlanMode()`
+### 進入：`prepareContextForPlanMode()`
 
-`EnterPlanModeTool.call()`（第 77 行）的核心逻辑：
+`EnterPlanModeTool.call()`（第 77 行）的核心邏輯：
 
 ```typescript
-// 1. 记录转换状态（保存之前的模式）
+// 1. 記錄轉換狀態（保存之前的模式）
 handlePlanModeTransition(currentMode, 'plan')
 
-// 2. 切换权限上下文为 plan 模式
+// 2. 切換權限上下文爲 plan 模式
 context.setAppState(prev => ({
   ...prev,
   toolPermissionContext: applyPermissionUpdate(
@@ -49,22 +49,22 @@ context.setAppState(prev => ({
 }))
 ```
 
-`prepareContextForPlanMode()`（`src/utils/permissions/permissionSetup.ts`）做了什么：
-- 创建新的 `ToolPermissionContext`，`mode` 设为 `'plan'`
-- 在 plan 模式下，工具的 `isReadOnly()` 检查成为唯一准入条件
-- 如果用户的默认模式是 `'auto'`，还会激活 classifier 的副作用
+`prepareContextForPlanMode()`（`src/utils/permissions/permissionSetup.ts`）做了什麼：
+- 建立新的 `ToolPermissionContext`，`mode` 設爲 `'plan'`
+- 在 plan 模式下，工具的 `isReadOnly()` 檢查成爲唯一準入條件
+- 如果用戶的預設模式是 `'auto'`，還會激活 classifier 的副作用
 
-### 退出：权限恢复 + Prompt-based 权限
+### 退出：權限恢復 + Prompt-based 權限
 
-`ExitPlanModeV2Tool` 的退出逻辑做了两件关键的事：
+`ExitPlanModeV2Tool` 的退出邏輯做了兩件關鍵的事：
 
-**1. 恢复权限模式**
+**1. 恢復權限模式**
 
-通过 `handlePlanModeTransition()` 和 `applyPermissionUpdate()` 恢复到进入前的模式。
+通過 `handlePlanModeTransition()` 和 `applyPermissionUpdate()` 恢復到進入前的模式。
 
-**2. 注入 Prompt-based 权限**
+**2. 注入 Prompt-based 權限**
 
-这是 Plan Mode 最精妙的设计——AI 可以在计划中声明它需要执行的命令类别：
+這是 Plan Mode 最精妙的設計——AI 可以在計劃中聲明它需要執行的命令類別：
 
 ```typescript
 // ExitPlanModeV2Tool 的 inputSchema
@@ -74,78 +74,78 @@ allowedPrompts: z.array(z.object({
 })).optional()
 ```
 
-当 AI 提交计划时，如果声明了 `allowedPrompts: [{ tool: 'Bash', prompt: 'run tests' }]`，用户批准后，"run tests" 这类 Bash 命令会被自动放行——不再需要逐个确认。
+當 AI 提交計劃時，如果聲明瞭 `allowedPrompts: [{ tool: 'Bash', prompt: 'run tests' }]`，用戶批准後，"run tests" 這類 Bash 命令會被自動放行——不再需要逐個確認。
 
-## 计划文件的持久化
+## 計劃文件的持久化
 
-计划内容被写入磁盘文件（由 `getPlanFilePath()` 确定路径），这与简单的"AI 说一段话然后开始执行"有本质区别：
+計劃內容被寫入磁盤文件（由 `getPlanFilePath()` 確定路徑），這與簡單的"AI 說一段話然後開始執行"有本質區別：
 
-1. `ExitPlanModeV2Tool` 的 `normalizeToolInput` 从磁盘读取计划内容，注入到 `input.plan` 和 `input.planFilePath`
-2. 计划文件是用户**可编辑**的——用户可以在审批前修改 AI 的方案
-3. `planWasEdited` 字段标记用户是否修改了计划，影响后续的 tool_result 回显
-4. `persistFileSnapshotIfRemote()` 在远程场景下保存文件快照
+1. `ExitPlanModeV2Tool` 的 `normalizeToolInput` 從磁盤讀取計劃內容，注入到 `input.plan` 和 `input.planFilePath`
+2. 計劃文件是用戶**可編輯**的——用戶可以在審批前修改 AI 的方案
+3. `planWasEdited` 字段標記用戶是否修改了計劃，影響後續的 tool_result 回顯
+4. `persistFileSnapshotIfRemote()` 在遠程場景下保存檔案快照
 
-## Teammate 场景下的计划审批
+## Teammate 場景下的計劃審批
 
-在 Agent Swarms（`isAgentSwarmsEnabled()`）模式下，计划审批有额外的协作流程：
+在 Agent Swarms（`isAgentSwarmsEnabled()`）模式下，計劃審批有額外的協作流程：
 
 ```typescript
 // 如果是 Teammate 角色
 if (isTeammate()) {
-  // 发送计划到 Team Leader 的 mailbox 等待审批
+  // 發送計劃到 Team Leader 的 mailbox 等待審批
   const requestId = generateRequestId()
   writeToMailbox(getTeamName(), {
     type: 'plan_approval_request',
     plan, requestId, ...
   })
   // 返回 awaitingLeaderApproval: true
-  // Team Leader 审批后通过 mailbox 通知 Teammate
+  // Team Leader 審批後通過 mailbox 通知 Teammate
 }
 ```
 
-这意味着在蜂群模式下，计划可能不是由直接用户审批，而是由 Team Leader 审批。
+這意味着在蜂羣模式下，計劃可能不是由直接用戶審批，而是由 Team Leader 審批。
 
-## 什么时候该用计划模式
+## 什麼時候該用計劃模式
 
-`EnterPlanModeTool` 的 Prompt（`src/tools/EnterPlanModeTool/prompt.ts`）定义了两套触发标准——外部版本更积极（鼓励规划），内部版本更克制（仅在真正模糊时使用）：
+`EnterPlanModeTool` 的 Prompt（`src/tools/EnterPlanModeTool/prompt.ts`）定義了兩套觸發標準——外部版本更積極（鼓勵規劃），內部版本更剋制（僅在真正模糊時使用）：
 
-| 场景 | 外部版本 | 内部版本 |
+| 場景 | 外部版本 | 內部版本 |
 |------|---------|---------|
-| 修复 typo | 跳过 | 跳过 |
-| 添加删除按钮 | **进入**（涉及多个文件） | **跳过**（路径明确） |
-| 重构认证系统 | **进入** | **进入**（高影响重构） |
-| "开始做 X" | — | **跳过**（直接开始） |
-| 架构决策（Redis vs 内存缓存） | **进入** | **进入**（真正模糊） |
+| 修復 typo | 跳過 | 跳過 |
+| 添加刪除按鈕 | **進入**（涉及多個文件） | **跳過**（路徑明確） |
+| 重構認證系統 | **進入** | **進入**（高影響重構） |
+| "開始做 X" | — | **跳過**（直接開始） |
+| 架構決策（Redis vs 內存快取） | **進入** | **進入**（真正模糊） |
 
-## 计划模式 + 任务系统
+## 計劃模式 + 任務系統
 
-计划模式通常与任务系统配合使用：
+計劃模式通常與任務系統配合使用：
 
-1. 在计划模式中，AI 把实施步骤创建为任务列表（`TodoWrite`）
-2. 用户审批计划（包含任务列表）
-3. 退出计划模式后，AI 按任务列表逐项执行
-4. 用户可以通过任务列表追踪进度
+1. 在計劃模式中，AI 把實施步驟建立爲任務列表（`TodoWrite`）
+2. 用戶審批計劃（包含任務列表）
+3. 退出計劃模式後，AI 按任務列表逐項執行
+4. 用戶可以通過任務列表追蹤進度
 
-## 完整生命周期
+## 完整生命週期
 
 ```
-用户: "重构这个模块"
+用戶: "重構這個模組"
   ↓
-AI 判断需要规划 → 调用 EnterPlanModeTool
-  ↓ 用户审批（Ask 对话框）
+AI 判斷需要規劃 → 呼叫 EnterPlanModeTool
+  ↓ 用戶審批（Ask 對話框）
 handlePlanModeTransition(default, 'plan')  // 保存 default
-prepareContextForPlanMode()                // 创建只读上下文
+prepareContextForPlanMode()                // 建立只讀上下文
   ↓
-AI 使用 Read/Grep/Glob/Agent 探索代码库
-  ↓ （可能 10+ 轮只读工具调用）
-AI 形成方案 → 调用 ExitPlanModeV2Tool({
+AI 使用 Read/Grep/Glob/Agent 探索程式碼庫
+  ↓ （可能 10+ 輪只讀工具呼叫）
+AI 形成方案 → 呼叫 ExitPlanModeV2Tool({
   allowedPrompts: [
     { tool: 'Bash', prompt: 'run tests' },
     { tool: 'Bash', prompt: 'install dependencies' }
   ]
 })
-  ↓ 用户审批计划（可编辑计划文件）
-恢复权限模式 → 注入 prompt-based 权限
+  ↓ 用戶審批計劃（可編輯計劃文件）
+恢復權限模式 → 注入 prompt-based 權限
   ↓
-AI 使用全部工具执行计划，"run tests" 等命令自动放行
+AI 使用全部工具執行計劃，"run tests" 等命令自動放行
 ```

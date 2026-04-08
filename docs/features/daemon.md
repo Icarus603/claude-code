@@ -1,102 +1,102 @@
-# DAEMON — 后台守护进程
+# DAEMON — 後臺守護進程
 
 > Feature Flag: `FEATURE_DAEMON=1`
-> 实现状态：主进程和 worker 注册为 Stub，CLI 路由完整
-> 引用数：3
+> 實現狀態：主進程和 worker 註冊爲 Stub，CLI 路由完整
+> 引用數：3
 
 ## 一、功能概述
 
-DAEMON 将 Claude Code 变为后台守护进程。主进程（supervisor）管理多个 worker 进程的生命周期，通过 Unix 域套接字进行 IPC。适用于持续运行的后台服务场景（如配合 BRIDGE_MODE 提供远程控制服务）。
+DAEMON 將 Claude Code 變爲後臺守護進程。主進程（supervisor）管理多個 worker 進程的生命週期，通過 Unix 域套接字進行 IPC。適用於持續執行的後臺服務場景（如配合 BRIDGE_MODE 提供遠程控制服務）。
 
-## 二、实现架构
+## 二、實現架構
 
-### 2.1 模块状态
+### 2.1 模組狀態
 
-| 模块 | 文件 | 状态 |
+| 模組 | 文件 | 狀態 |
 |------|------|------|
-| 守护主进程 | `src/daemon/main.ts` | **Stub** — `daemonMain: () => Promise.resolve()` |
-| Worker 注册 | `src/daemon/workerRegistry.ts` | **Stub** — `runDaemonWorker: () => Promise.resolve()` |
-| CLI 路由 | `src/entrypoints/cli.tsx` | **布线** — `--daemon-worker` 和 `daemon` 子命令 |
-| 命令注册 | `src/commands.ts` | **布线** — DAEMON + BRIDGE_MODE 门控 |
+| 守護主進程 | `src/daemon/main.ts` | **Stub** — `daemonMain: () => Promise.resolve()` |
+| Worker 註冊 | `src/daemon/workerRegistry.ts` | **Stub** — `runDaemonWorker: () => Promise.resolve()` |
+| CLI 路由 | `src/entrypoints/cli.tsx` | **佈線** — `--daemon-worker` 和 `daemon` 子命令 |
+| 命令註冊 | `src/commands.ts` | **佈線** — DAEMON + BRIDGE_MODE 門控 |
 
 ### 2.2 CLI 入口
 
 ```
-# 启动守护进程
+# 啓動守護進程
 claude daemon
 
-# 以 worker 身份启动
+# 以 worker 身份啓動
 claude --daemon-worker=<kind>
 ```
 
-### 2.3 预期架构
+### 2.3 預期架構
 
 ```
 Supervisor (daemonMain)
       │
       ├── Worker 1: assistant-mode
-      │   └── 接收和处理 assistant 会话
+      │   └── 接收和處理 assistant 會話
       │
       ├── Worker 2: bridge-sync
-      │   └── bridge 消息同步
+      │   └── bridge 訊息同步
       │
       └── Worker 3: proactive
-          └── 主动任务执行
+          └── 主動任務執行
       │
       ▼
 IPC via Unix Domain Sockets
-  - 生命周期管理（启动、停止、重启）
-  - 工作分发
-  - 状态报告
+  - 生命週期管理（啓動、停止、重啓）
+  - 工作分發
+  - 狀態報告
 ```
 
-### 2.4 与 BRIDGE_MODE 的关系
+### 2.4 與 BRIDGE_MODE 的關係
 
-DAEMON 和 BRIDGE_MODE 常组合使用：
+DAEMON 和 BRIDGE_MODE 常組合使用：
 
 ```ts
 // src/commands.ts
 if (feature('DAEMON') && feature('BRIDGE_MODE')) {
-  // 加载 remoteControlServer 命令
+  // 加載 remoteControlServer 命令
 }
 ```
 
-双重门控：两个 feature 都需要开启才能使用远程控制服务器。
+雙重門控：兩個 feature 都需要開啓才能使用遠程控制服務器。
 
-## 三、需要补全的内容
+## 三、需要補全的內容
 
-| 模块 | 工作量 | 说明 |
+| 模組 | 工作量 | 說明 |
 |------|--------|------|
-| `daemon/main.ts` | 大 | Supervisor 主进程：启动 worker、生命周期管理、IPC |
-| `daemon/workerRegistry.ts` | 中 | Worker 类型分发（assistant/bridge-sync/proactive） |
-| Worker 实现 | 大 | 各类型 worker 的具体实现 |
-| IPC 协议 | 中 | Supervisor-Worker 通信层 |
+| `daemon/main.ts` | 大 | Supervisor 主進程：啓動 worker、生命週期管理、IPC |
+| `daemon/workerRegistry.ts` | 中 | Worker 類型分發（assistant/bridge-sync/proactive） |
+| Worker 實現 | 大 | 各類型 worker 的具體實現 |
+| IPC 協議 | 中 | Supervisor-Worker 通信層 |
 
-## 四、关键设计决策
+## 四、關鍵設計決策
 
-1. **多进程架构**：一个 supervisor + 多个 worker，进程隔离
-2. **Unix 域套接字 IPC**：本地进程间通信，低延迟
-3. **与 BRIDGE_MODE 强绑定**：守护进程最常见的用途是提供远程控制服务
-4. **CLI 子命令路由**：`daemon` 子命令和 `--daemon-worker` 参数在 `cli.tsx` 中路由
+1. **多進程架構**：一個 supervisor + 多個 worker，進程隔離
+2. **Unix 域套接字 IPC**：本地進程間通信，低延遲
+3. **與 BRIDGE_MODE 強綁定**：守護進程最常見的用途是提供遠程控制服務
+4. **CLI 子命令路由**：`daemon` 子命令和 `--daemon-worker` 參數在 `cli.tsx` 中路由
 
 ## 五、使用方式
 
 ```bash
-# 启用守护进程模式
+# 啓用守護進程模式
 FEATURE_DAEMON=1 FEATURE_BRIDGE_MODE=1 bun run dev
 
-# 启动守护进程
+# 啓動守護進程
 claude daemon
 
-# 以特定 worker 启动
+# 以特定 worker 啓動
 claude --daemon-worker=assistant
 ```
 
-## 六、文件索引
+## 六、檔案索引
 
-| 文件 | 职责 |
+| 文件 | 職責 |
 |------|------|
-| `src/daemon/main.ts` | Supervisor 主进程（stub） |
-| `src/daemon/workerRegistry.ts` | Worker 注册（stub） |
+| `src/daemon/main.ts` | Supervisor 主進程（stub） |
+| `src/daemon/workerRegistry.ts` | Worker 註冊（stub） |
 | `src/entrypoints/cli.tsx:95,149` | CLI 路由 |
-| `src/commands.ts:77` | 命令注册（双重门控） |
+| `src/commands.ts:77` | 命令註冊（雙重門控） |

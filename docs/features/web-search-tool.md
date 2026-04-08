@@ -1,55 +1,55 @@
-# WEB_SEARCH_TOOL — 网页搜索工具
+# WEB_SEARCH_TOOL — 網頁搜索工具
 
-> 实现状态：适配器架构完成，Bing 适配器为当前默认后端
-> 引用数：核心工具，无 feature flag 门控（始终启用）
+> 實現狀態：適配器架構完成，Bing 適配器爲當前預設後端
+> 引用數：核心工具，無 feature flag 門控（始終啓用）
 
 ## 一、功能概述
 
-WebSearchTool 让模型可以搜索互联网获取最新信息。原始实现仅支持 Anthropic API 服务端搜索（`web_search_20250305` server tool），在第三方代理端点下不可用。现已重构为适配器架构，新增 Bing 搜索页面解析作为 fallback，确保任何 API 端点都能使用搜索功能。
+WebSearchTool 讓模型可以搜索互聯網取得最新信息。原始實現僅支援 Anthropic API 服務端搜索（`web_search_20250305` server tool），在第三方代理端點下不可用。現已重構爲適配器架構，新增 Bing 搜索頁面解析作爲 fallback，確保任何 API 端點都能使用搜索功能。
 
-## 二、实现架构
+## 二、實現架構
 
-### 2.1 适配器模式
+### 2.1 適配器模式
 
 ```
 WebSearchTool.call()
        │
        ▼
-  createAdapter()  ← 适配器工厂
+  createAdapter()  ← 適配器工廠
        │
-       ├── ApiSearchAdapter  — Anthropic 官方 API 服务端搜索
+       ├── ApiSearchAdapter  — Anthropic 官方 API 服務端搜索
        │     └── 使用 web_search_20250305 server tool
-       │         通过 queryModelWithStreaming 二次调用 API
+       │         通過 queryModelWithStreaming 二次呼叫 API
        │
-       └── BingSearchAdapter — Bing HTML 抓取 + 正则提取（当前默认）
-             └── 直接抓取 Bing 搜索页 HTML
-                 正则提取 b_algo 块中的标题/URL/摘要
+       └── BingSearchAdapter — Bing HTML 抓取 + 正則提取（當前預設）
+             └── 直接抓取 Bing 搜索頁 HTML
+                 正則提取 b_algo 塊中的標題/URL/摘要
 ```
 
-### 2.2 模块结构
+### 2.2 模組結構
 
-| 模块 | 文件 | 说明 |
+| 模組 | 文件 | 說明 |
 |------|------|------|
-| 工具入口 | `src/tools/WebSearchTool/WebSearchTool.ts` | `buildTool()` 定义：schema、权限、执行、输出格式化 |
-| 工具 prompt | `src/tools/WebSearchTool/prompt.ts` | 搜索工具的系统提示词 |
-| UI 渲染 | `src/tools/WebSearchTool/UI.tsx` | 搜索结果的终端渲染组件 |
-| 适配器接口 | `src/tools/WebSearchTool/adapters/types.ts` | `WebSearchAdapter` 接口、`SearchResult`/`SearchOptions`/`SearchProgress` 类型 |
-| 适配器工厂 | `src/tools/WebSearchTool/adapters/index.ts` | `createAdapter()` 工厂函数，选择后端 |
-| API 适配器 | `src/tools/WebSearchTool/adapters/apiAdapter.ts` | 封装原有 `queryModelWithStreaming` 逻辑，使用 server tool |
-| Bing 适配器 | `src/tools/WebSearchTool/adapters/bingAdapter.ts` | Bing HTML 抓取 + 正则解析 |
-| 单元测试 | `src/tools/WebSearchTool/__tests__/bingAdapter.test.ts` | 32 个测试用例 |
-| 集成测试 | `src/tools/WebSearchTool/__tests__/bingAdapter.integration.ts` | 真实网络请求验证 |
+| 工具入口 | `src/tools/WebSearchTool/WebSearchTool.ts` | `buildTool()` 定義：schema、權限、執行、輸出格式化 |
+| 工具 prompt | `src/tools/WebSearchTool/prompt.ts` | 搜索工具的系統提示詞 |
+| UI 渲染 | `src/tools/WebSearchTool/UI.tsx` | 搜索結果的終端渲染組件 |
+| 適配器介面 | `src/tools/WebSearchTool/adapters/types.ts` | `WebSearchAdapter` 介面、`SearchResult`/`SearchOptions`/`SearchProgress` 類型 |
+| 適配器工廠 | `src/tools/WebSearchTool/adapters/index.ts` | `createAdapter()` 工廠函數，選擇後端 |
+| API 適配器 | `src/tools/WebSearchTool/adapters/apiAdapter.ts` | 封裝原有 `queryModelWithStreaming` 邏輯，使用 server tool |
+| Bing 適配器 | `src/tools/WebSearchTool/adapters/bingAdapter.ts` | Bing HTML 抓取 + 正則解析 |
+| 單元測試 | `src/tools/WebSearchTool/__tests__/bingAdapter.test.ts` | 32 個測試用例 |
+| 集成測試 | `src/tools/WebSearchTool/__tests__/bingAdapter.integration.ts` | 真實網絡請求驗證 |
 
-### 2.3 数据流
+### 2.3 資料流
 
 ```
-模型调用 WebSearchTool(query, allowed_domains, blocked_domains)
+模型呼叫 WebSearchTool(query, allowed_domains, blocked_domains)
        │
        ▼
-  validateInput() — 校验 query 非空、allowed/block 不共存
+  validateInput() — 校驗 query 非空、allowed/block 不共存
        │
        ▼
-  createAdapter() → BingSearchAdapter（当前硬编码）
+  createAdapter() → BingSearchAdapter（當前硬編碼）
        │
        ▼
   adapter.search(query, { allowedDomains, blockedDomains, signal, onProgress })
@@ -57,26 +57,26 @@ WebSearchTool.call()
        ├── onProgress({ type: 'query_update', query })
        │
        ├── axios.get(bing.com/search?q=...&setmkt=en-US)
-       │     └── 13 个 Edge 浏览器请求头
+       │     └── 13 個 Edge 瀏覽器請求頭
        │
-       ├── extractBingResults(html) — 正则提取 <li class="b_algo"> 块
-       │     ├── resolveBingUrl() — 解码 base64 重定向 URL
-       │     ├── extractSnippet() — 三级降级摘要提取
+       ├── extractBingResults(html) — 正則提取 <li class="b_algo"> 塊
+       │     ├── resolveBingUrl() — 解碼 base64 重定向 URL
+       │     ├── extractSnippet() — 三級降級摘要提取
        │     └── decodeHtmlEntities() — he.decode
        │
-       ├── 客户端域名过滤 (allowedDomains / blockedDomains)
+       ├── 客戶端域名過濾 (allowedDomains / blockedDomains)
        │
        ├── onProgress({ type: 'search_results_received', resultCount })
        │
        ▼
-  格式化为 markdown 链接列表返回给模型
+  格式化爲 markdown 連結列表返回給模型
 ```
 
-## 三、Bing 适配器技术细节
+## 三、Bing 適配器技術細節
 
-### 3.1 反爬绕过
+### 3.1 反爬繞過
 
-使用 13 个 Edge 浏览器请求头（含 `Sec-Ch-Ua`、`Sec-Fetch-*` 等），避免 Bing 返回 JS 渲染的空页面：
+使用 13 個 Edge 瀏覽器請求頭（含 `Sec-Ch-Ua`、`Sec-Fetch-*` 等），避免 Bing 返回 JS 渲染的空頁面：
 
 ```typescript
 const BROWSER_HEADERS = {
@@ -86,52 +86,52 @@ const BROWSER_HEADERS = {
   'Sec-Fetch-Mode': 'navigate',
   'Sec-Fetch-Site': 'none',
   'Sec-Fetch-User': '?1',
-  // ... 共 13 个标头
+  // ... 共 13 個標頭
 }
 ```
 
-`setmkt=en-US` 参数强制美式英语市场，避免 IP 地理定位导致区域化结果。
+`setmkt=en-US` 參數強制美式英語市場，避免 IP 地理定位導致區域化結果。
 
-### 3.2 URL 解码（`resolveBingUrl()`）
+### 3.2 URL 解碼（`resolveBingUrl()`）
 
 Bing 返回的重定向 URL 格式：`bing.com/ck/a?...&u=a1aHR0cHM6Ly9...`
 
-- `u` 参数前 2 字符为协议前缀：`a1` = https，`a0` = http
-- 剩余部分为 base64url 编码的真实 URL
-- Bing 内部链接和相对路径被过滤返回 `undefined`
+- `u` 參數前 2 字符爲協議前綴：`a1` = https，`a0` = http
+- 剩餘部分爲 base64url 編碼的真實 URL
+- Bing 內部連結和相對路徑被過濾返回 `undefined`
 
 ### 3.3 摘要提取（`extractSnippet()`）
 
-三级降级策略：
+三級降級策略：
 
 1. `<p class="b_lineclamp...">` — Bing 的搜索摘要段落
-2. `<div class="b_caption">` 内的 `<p>` — 备选摘要位置
-3. `<div class="b_caption">` 直接文本 — 最终 fallback
+2. `<div class="b_caption">` 內的 `<p>` — 備選摘要位置
+3. `<div class="b_caption">` 直接文本 — 最終 fallback
 
-### 3.4 域名过滤
+### 3.4 域名過濾
 
-客户端侧实现，支持子域名匹配：
-- `allowedDomains`：白名单，结果域名必须匹配列表中的某项（含子域名）
-- `blockedDomains`：黑名单，匹配的结果被过滤
-- 两者不可同时使用（`validateInput` 校验）
+客戶端側實現，支援子域名匹配：
+- `allowedDomains`：白名單，結果域名必須匹配列表中的某項（含子域名）
+- `blockedDomains`：黑名單，匹配的結果被過濾
+- 兩者不可同時使用（`validateInput` 校驗）
 
-## 四、适配器选择逻辑
+## 四、適配器選擇邏輯
 
-当前 `createAdapter()` 硬编码返回 `BingSearchAdapter`，原逻辑已注释保留：
+當前 `createAdapter()` 硬編碼返回 `BingSearchAdapter`，原邏輯已註釋保留：
 
 ```typescript
 export function createAdapter(): WebSearchAdapter {
   return new BingSearchAdapter()
-  // 注释保留的选择逻辑：
-  // 1. WEB_SEARCH_ADAPTER 环境变量强制指定 api|bing
-  // 2. isFirstPartyAnthropicBaseUrl() → API 适配器
-  // 3. 第三方端点 → Bing 适配器
+  // 註釋保留的選擇邏輯：
+  // 1. WEB_SEARCH_ADAPTER 環境變量強制指定 api|bing
+  // 2. isFirstPartyAnthropicBaseUrl() → API 適配器
+  // 3. 第三方端點 → Bing 適配器
 }
 ```
 
-恢复自动选择：取消 `index.ts` 中的注释即可。
+恢復自動選擇：取消 `index.ts` 中的註釋即可。
 
-## 五、接口定义
+## 五、介面定義
 
 ### WebSearchAdapter
 
@@ -164,23 +164,23 @@ interface SearchProgress {
 
 ```typescript
 {
-  query: string              // 搜索关键词，最少 2 字符
-  allowed_domains?: string[] // 域名白名单
-  blocked_domains?: string[] // 域名黑名单
+  query: string              // 搜索關鍵詞，最少 2 字符
+  allowed_domains?: string[] // 域名白名單
+  blocked_domains?: string[] // 域名黑名單
 }
 ```
 
-## 六、文件索引
+## 六、檔案索引
 
-| 文件 | 职责 |
+| 文件 | 職責 |
 |------|------|
-| `src/tools/WebSearchTool/WebSearchTool.ts` | 工具定义入口 |
+| `src/tools/WebSearchTool/WebSearchTool.ts` | 工具定義入口 |
 | `src/tools/WebSearchTool/prompt.ts` | 搜索工具 prompt |
-| `src/tools/WebSearchTool/UI.tsx` | 终端 UI 渲染 |
-| `src/tools/WebSearchTool/adapters/types.ts` | 适配器接口 |
-| `src/tools/WebSearchTool/adapters/index.ts` | 适配器工厂 |
-| `src/tools/WebSearchTool/adapters/apiAdapter.ts` | API 服务端搜索适配器 |
-| `src/tools/WebSearchTool/adapters/bingAdapter.ts` | Bing HTML 解析适配器 |
-| `src/tools/WebSearchTool/__tests__/bingAdapter.test.ts` | 单元测试 (32 cases) |
-| `src/tools/WebSearchTool/__tests__/bingAdapter.integration.ts` | 集成测试 |
-| `src/tools.ts` | 工具注册 |
+| `src/tools/WebSearchTool/UI.tsx` | 終端 UI 渲染 |
+| `src/tools/WebSearchTool/adapters/types.ts` | 適配器介面 |
+| `src/tools/WebSearchTool/adapters/index.ts` | 適配器工廠 |
+| `src/tools/WebSearchTool/adapters/apiAdapter.ts` | API 服務端搜索適配器 |
+| `src/tools/WebSearchTool/adapters/bingAdapter.ts` | Bing HTML 解析適配器 |
+| `src/tools/WebSearchTool/__tests__/bingAdapter.test.ts` | 單元測試 (32 cases) |
+| `src/tools/WebSearchTool/__tests__/bingAdapter.integration.ts` | 集成測試 |
+| `src/tools.ts` | 工具註冊 |

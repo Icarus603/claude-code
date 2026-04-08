@@ -1,107 +1,107 @@
-# ULTRAPLAN — 增强规划
+# ULTRAPLAN — 增強規劃
 
 > Feature Flag: `FEATURE_ULTRAPLAN=1`
-> 实现状态：关键字检测完整，命令处理完整，CCR 远程会话完整
-> 引用数：10
+> 實現狀態：關鍵字檢測完整，命令處理完整，CCR 遠程會話完整
+> 引用數：10
 
 ## 一、功能概述
 
-ULTRAPLAN 在用户输入中检测 "ultraplan" 关键字时，自动进入增强计划模式。相比普通 plan mode，ultraplan 提供更深入的规划能力，支持本地和远程（CCR）执行。
+ULTRAPLAN 在用戶輸入中檢測 "ultraplan" 關鍵字時，自動進入增強計劃模式。相比普通 plan mode，ultraplan 提供更深入的規劃能力，支援本地和遠程（CCR）執行。
 
-### 触发方式
+### 觸發方式
 
-| 方式 | 行为 |
+| 方式 | 行爲 |
 |------|------|
-| 输入含 "ultraplan" 的文本 | 自动重定向到 `/ultraplan` 命令 |
-| `/ultraplan` 斜杠命令 | 直接执行 |
-| 彩虹高亮 | 输入框中 "ultraplan" 关键字彩虹动画 |
+| 輸入含 "ultraplan" 的文本 | 自動重定向到 `/ultraplan` 命令 |
+| `/ultraplan` 斜槓命令 | 直接執行 |
+| 彩虹高亮 | 輸入框中 "ultraplan" 關鍵字彩虹動畫 |
 
-## 二、实现架构
+## 二、實現架構
 
-### 2.1 模块状态
+### 2.1 模組狀態
 
-| 模块 | 文件 | 行数 | 状态 |
+| 模組 | 文件 | 行數 | 狀態 |
 |------|------|------|------|
-| 命令处理器 | `src/commands/ultraplan.tsx` | 472 | **完整** |
-| CCR 会话 | `src/utils/ultraplan/ccrSession.ts` | 350 | **完整** |
-| 关键字检测 | `src/utils/ultraplan/keyword.ts` | 128 | **完整** |
+| 命令處理器 | `src/commands/ultraplan.tsx` | 472 | **完整** |
+| CCR 會話 | `src/utils/ultraplan/ccrSession.ts` | 350 | **完整** |
+| 關鍵字檢測 | `src/utils/ultraplan/keyword.ts` | 128 | **完整** |
 | 嵌入式提示 | `src/utils/ultraplan/prompt.txt` | 1 | **完整** |
-| REPL 对话框 | `src/screens/REPL.tsx` | — | **布线** |
-| 关键字高亮 | `src/components/PromptInput/PromptInput.tsx` | — | **布线** |
+| REPL 對話框 | `src/screens/REPL.tsx` | — | **佈線** |
+| 關鍵字高亮 | `src/components/PromptInput/PromptInput.tsx` | — | **佈線** |
 
-### 2.2 关键字检测
+### 2.2 關鍵字檢測
 
 文件：`src/utils/ultraplan/keyword.ts`（128 行）
 
-`findUltraplanTriggerPositions(text)` 智能过滤：
-- 排除引号内的 "ultraplan"
-- 排除路径中的 "ultraplan"（如 `/path/to/ultraplan/`）
-- 排除斜杠命令以外的上下文
-- `replaceUltraplanKeyword(text)` 清理关键字
+`findUltraplanTriggerPositions(text)` 智能過濾：
+- 排除引號內的 "ultraplan"
+- 排除路徑中的 "ultraplan"（如 `/path/to/ultraplan/`）
+- 排除斜槓命令以外的上下文
+- `replaceUltraplanKeyword(text)` 清理關鍵字
 
-### 2.3 CCR 远程会话
+### 2.3 CCR 遠程會話
 
 文件：`src/utils/ultraplan/ccrSession.ts`（350 行）
 
-`ExitPlanModeScanner` 类实现完整的事件状态机：
-- `pollForApprovedExitPlanMode()` — 3 秒轮询间隔
-- 超时处理和重试
-- 支持远程（teleport）和本地执行
+`ExitPlanModeScanner` 類實現完整的事件狀態機：
+- `pollForApprovedExitPlanMode()` — 3 秒輪詢間隔
+- 超時處理和重試
+- 支援遠程（teleport）和本地執行
 
-### 2.4 数据流
+### 2.4 資料流
 
 ```
-用户输入 "帮我 ultraplan 重构这个模块"
+用戶輸入 "幫我 ultraplan 重構這個模組"
          │
          ▼
-processUserInput 检测 "ultraplan"
+processUserInput 檢測 "ultraplan"
          │
          ▼
 重定向到 /ultraplan 命令
          │
-         ├── 本地执行 → EnterPlanMode
+         ├── 本地執行 → EnterPlanMode
          │
-         └── 远程执行 → teleportToRemote → CCR 会话
+         └── 遠程執行 → teleportToRemote → CCR 會話
                 │
                 ▼
-         ExitPlanModeScanner 轮询
+         ExitPlanModeScanner 輪詢
                 │
                 ▼
-         用户在远程审批 → 本地收到结果
+         用戶在遠程審批 → 本地收到結果
 ```
 
-## 三、需要补全的内容
+## 三、需要補全的內容
 
-| 模块 | 说明 |
+| 模組 | 說明 |
 |------|------|
-| `src/screens/REPL.tsx` 中的 UltraplanChoiceDialog / UltraplanLaunchDialog | 用户选择本地/远程执行的对话框组件 |
-| `src/commands/ultraplan/` | 空目录，可能是未合并的子命令结构 |
+| `src/screens/REPL.tsx` 中的 UltraplanChoiceDialog / UltraplanLaunchDialog | 用戶選擇本地/遠程執行的對話框組件 |
+| `src/commands/ultraplan/` | 空目錄，可能是未合併的子命令結構 |
 
-## 四、关键设计决策
+## 四、關鍵設計決策
 
-1. **智能关键字过滤**：排除引号和路径中的 "ultraplan"，避免误触发
-2. **本地/远程双模式**：支持本地 plan mode 和 CCR 远程会话
-3. **彩虹高亮反馈**：输入框中 "ultraplan" 关键字使用彩虹动画，暗示这是特殊功能
-4. **processUserInput 集成**：在用户输入处理管道中拦截，无缝重定向
+1. **智能關鍵字過濾**：排除引號和路徑中的 "ultraplan"，避免誤觸發
+2. **本地/遠程雙模式**：支援本地 plan mode 和 CCR 遠程會話
+3. **彩虹高亮反饋**：輸入框中 "ultraplan" 關鍵字使用彩虹動畫，暗示這是特殊功能
+4. **processUserInput 集成**：在用戶輸入處理管道中攔截，無縫重定向
 
 ## 五、使用方式
 
 ```bash
-# 启用 feature
+# 啓用 feature
 FEATURE_ULTRAPLAN=1 bun run dev
 
 # 在 REPL 中使用
-# > ultraplan 重构认证模块
+# > ultraplan 重構認證模組
 # > /ultraplan
 ```
 
-## 六、文件索引
+## 六、檔案索引
 
-| 文件 | 行数 | 职责 |
+| 文件 | 行數 | 職責 |
 |------|------|------|
-| `src/commands/ultraplan.tsx` | 472 | 斜杠命令处理器 |
-| `src/utils/ultraplan/ccrSession.ts` | 350 | CCR 远程会话管理 |
-| `src/utils/ultraplan/keyword.ts` | 128 | 关键字检测和替换 |
+| `src/commands/ultraplan.tsx` | 472 | 斜槓命令處理器 |
+| `src/utils/ultraplan/ccrSession.ts` | 350 | CCR 遠程會話管理 |
+| `src/utils/ultraplan/keyword.ts` | 128 | 關鍵字檢測和替換 |
 | `src/utils/ultraplan/prompt.txt` | 1 | 嵌入式提示 |
-| `src/utils/processUserInput/processUserInput.ts:468` | — | 关键字重定向 |
+| `src/utils/processUserInput/processUserInput.ts:468` | — | 關鍵字重定向 |
 | `src/components/PromptInput/PromptInput.tsx` | — | 彩虹高亮 |

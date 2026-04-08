@@ -1,15 +1,15 @@
 # Phase 19 - Batch 2: 更多 utils + state + commands
 
-> 预计 ~120 tests / 8 文件 | 部分需轻量 mock
+> 預計 ~120 tests / 8 文件 | 部分需輕量 mock
 
 ---
 
 ## 1. `src/utils/__tests__/collapseTeammateShutdowns.test.ts` (~10 tests)
 
 **源文件**: `src/utils/collapseTeammateShutdowns.ts` (56 行)
-**依赖**: 仅类型
+**依賴**: 僅類型
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("collapseTeammateShutdowns", () => {
@@ -27,16 +27,16 @@ describe("collapseTeammateShutdowns", () => {
 ```
 
 ### Mock 需求
-构造 `RenderableMessage` mock 对象（带 `task_status` attachment，`status=completed`，`taskType=in_process_teammate`）
+構造 `RenderableMessage` mock 對象（帶 `task_status` attachment，`status=completed`，`taskType=in_process_teammate`）
 
 ---
 
 ## 2. `src/utils/__tests__/privacyLevel.test.ts` (~12 tests)
 
 **源文件**: `src/utils/privacyLevel.ts` (56 行)
-**依赖**: `process.env`
+**依賴**: `process.env`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("getPrivacyLevel", () => {
@@ -65,16 +65,16 @@ describe("getEssentialTrafficOnlyReason", () => {
 ```
 
 ### Mock 需求
-`process.env` 保存/恢复模式（参考现有 `envUtils.test.ts`）
+`process.env` 保存/恢復模式（參考現有 `envUtils.test.ts`）
 
 ---
 
 ## 3. `src/utils/__tests__/textHighlighting.test.ts` (~18 tests)
 
 **源文件**: `src/utils/textHighlighting.ts` (167 行)
-**依赖**: `@alcalzone/ansi-tokenize`
+**依賴**: `@alcalzone/ansi-tokenize`
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("segmentTextByHighlights", () => {
@@ -89,18 +89,18 @@ describe("segmentTextByHighlights", () => {
   test("handles overlapping highlights (priority-based)")
   test("handles adjacent highlights")
 
-  // 边界
+  // 邊界
   test("highlight starting at 0")
   test("highlight ending at text length")
   test("highlight covering entire text")
   test("empty text with highlights")
   test("empty highlights array returns single segment")
 
-  // ANSI 处理
+  // ANSI 處理
   test("correctly segments text with ANSI escape codes")
   test("handles text with mixed ANSI and highlights")
 
-  // 属性
+  // 屬性
   test("preserves highlight color property")
   test("preserves highlight priority property")
   test("preserves dimColor and inverse flags")
@@ -109,21 +109,21 @@ describe("segmentTextByHighlights", () => {
 ```
 
 ### Mock 需求
-可能需要 mock `@alcalzone/ansi-tokenize`，或直接使用（如果有安装）
+可能需要 mock `@alcalzone/ansi-tokenize`，或直接使用（如果有安裝）
 
 ---
 
 ## 4. `src/utils/__tests__/detectRepository.test.ts` (~15 tests)
 
 **源文件**: `src/utils/detectRepository.ts` (179 行)
-**依赖**: git 命令（`getRemoteUrl`）
+**依賴**: git 命令（`getRemoteUrl`）
 
-### 重点测试函数
+### 重點測試函數
 
-**`parseGitRemote(input: string): ParsedRepository | null`** — 纯正则解析
-**`parseGitHubRepository(input: string): string | null`** — 纯函数
+**`parseGitRemote(input: string): ParsedRepository | null`** — 純正則解析
+**`parseGitHubRepository(input: string): string | null`** — 純函數
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("parseGitRemote", () => {
@@ -142,7 +142,7 @@ describe("parseGitRemote", () => {
   // git://
   test("parses git:// URL")
 
-  // 边界
+  // 邊界
   test("returns null for invalid URL")
   test("returns null for empty string")
   test("handles GHE hostname")
@@ -159,20 +159,20 @@ describe("parseGitHubRepository", () => {
 ```
 
 ### Mock 需求
-仅测试 `parseGitRemote` 和 `parseGitHubRepository`（纯函数），不需要 mock git
+僅測試 `parseGitRemote` 和 `parseGitHubRepository`（純函數），不需要 mock git
 
 ---
 
 ## 5. `src/utils/__tests__/markdown.test.ts` (~20 tests)
 
 **源文件**: `src/utils/markdown.ts` (382 行)
-**依赖**: `marked`, `cli-highlight`, theme types
+**依賴**: `marked`, `cli-highlight`, theme types
 
-### 重点测试函数
+### 重點測試函數
 
-**`padAligned(content, displayWidth, targetWidth, align)`** — 纯函数
+**`padAligned(content, displayWidth, targetWidth, align)`** — 純函數
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("padAligned", () => {
@@ -189,7 +189,7 @@ describe("padAligned", () => {
 })
 ```
 
-注意：`numberToLetter`/`numberToRoman`/`getListNumber` 是私有函数，除非从模块导出否则无法直接测试。如果确实私有，则通过 `applyMarkdown` 间接测试列表渲染：
+注意：`numberToLetter`/`numberToRoman`/`getListNumber` 是私有函數，除非從模組導出否則無法直接測試。如果確實私有，則通過 `applyMarkdown` 間接測試列表渲染：
 
 ```typescript
 describe("list numbering (via applyMarkdown)", () => {
@@ -201,16 +201,16 @@ describe("list numbering (via applyMarkdown)", () => {
 ```
 
 ### Mock 需求
-`padAligned` 无需 mock。`applyMarkdown` 可能需要 mock theme 依赖。
+`padAligned` 無需 mock。`applyMarkdown` 可能需要 mock theme 依賴。
 
 ---
 
 ## 6. `src/state/__tests__/store.test.ts` (~15 tests)
 
 **源文件**: `src/state/store.ts` (35 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("createStore", () => {
@@ -233,20 +233,20 @@ describe("createStore", () => {
 ```
 
 ### Mock 需求
-无
+無
 
 ---
 
 ## 7. `src/commands/plugin/__tests__/parseArgs.test.ts` (~18 tests)
 
 **源文件**: `src/commands/plugin/parseArgs.ts` (104 行)
-**依赖**: 无
+**依賴**: 無
 
-### 测试用例
+### 測試用例
 
 ```typescript
 describe("parsePluginArgs", () => {
-  // 无参数
+  // 無參數
   test("returns { type: 'menu' } for undefined")
   test("returns { type: 'menu' } for empty string")
   test("returns { type: 'menu' } for whitespace only")
@@ -277,11 +277,11 @@ describe("parsePluginArgs", () => {
   test("parses 'marketplace remove ...'")
   test("parses 'marketplace list'")
 
-  // 边界
+  // 邊界
   test("handles extra whitespace")
   test("handles unknown subcommand gracefully")
 })
 ```
 
 ### Mock 需求
-无
+無

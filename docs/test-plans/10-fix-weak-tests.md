@@ -1,32 +1,32 @@
-# Plan 10 — 修复 WEAK 评分测试文件
+# Plan 10 — 修復 WEAK 評分測試文件
 
-> 优先级：高 | 8 个文件 | 预估新增/修改 ~60 个测试用例
+> 優先級：高 | 8 個文件 | 預估新增/修改 ~60 個測試用例
 
-本计划修复 testing-spec.md 中评定为 WEAK 的 8 个测试文件的断言缺陷和覆盖缺口。
+本計劃修復 testing-spec.md 中評定爲 WEAK 的 8 個測試文件的斷言缺陷和覆蓋缺口。
 
 ---
 
 ## 10.1 `src/utils/__tests__/format.test.ts`
 
-**问题**：`formatNumber`、`formatTokens`、`formatRelativeTime` 使用 `toContain` 代替精确匹配，无法检测格式回归。
+**問題**：`formatNumber`、`formatTokens`、`formatRelativeTime` 使用 `toContain` 代替精確匹配，無法檢測格式迴歸。
 
-### 修改清单
+### 修改清單
 
 #### formatNumber — toContain → toBe
 
 ```typescript
-// 当前（弱）
+// 當前（弱）
 expect(formatNumber(1321)).toContain("k");
 expect(formatNumber(1500000)).toContain("m");
 
-// 修复为
+// 修復爲
 expect(formatNumber(1321)).toBe("1.3k");
 expect(formatNumber(1500000)).toBe("1.5m");
 ```
 
-> 注意：`Intl.NumberFormat` 输出可能因 locale 不同。若 CI locale 不一致，改用 `toMatch(/^\d+(\.\d)?[km]$/)` 正则匹配。
+> 注意：`Intl.NumberFormat` 輸出可能因 locale 不同。若 CI locale 不一致，改用 `toMatch(/^\d+(\.\d)?[km]$/)` 正則匹配。
 
-#### formatTokens — 补精确断言
+#### formatTokens — 補精確斷言
 
 ```typescript
 expect(formatTokens(1000)).toBe("1k");
@@ -36,42 +36,42 @@ expect(formatTokens(1500)).toBe("1.5k");
 #### formatRelativeTime — toContain → toBe
 
 ```typescript
-// 当前（弱）
+// 當前（弱）
 expect(formatRelativeTime(diff, now)).toContain("30");
 expect(formatRelativeTime(diff, now)).toContain("ago");
 
-// 修复为
+// 修復爲
 expect(formatRelativeTime(diff, now)).toBe("30s ago");
 ```
 
-#### 新增：formatDuration 进位边界
+#### 新增：formatDuration 進位邊界
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
-| 59.5s 进位 | 59500ms | 至少含 `1m` |
-| 59m59s 进位 | 3599000ms | 至少含 `1h` |
+| 59.5s 進位 | 59500ms | 至少含 `1m` |
+| 59m59s 進位 | 3599000ms | 至少含 `1h` |
 | sub-millisecond | 0.5ms | `"<1ms"` 或 `"0ms"` |
 
-#### 新增：未测试函数
+#### 新增：未測試函數
 
-| 函数 | 最少用例 |
+| 函數 | 最少用例 |
 |------|---------|
-| `formatRelativeTimeAgo` | 2（过去 / 未来） |
-| `formatLogMetadata` | 1（基本调用不抛错） |
+| `formatRelativeTimeAgo` | 2（過去 / 未來） |
+| `formatLogMetadata` | 1（基本呼叫不拋錯） |
 | `formatResetTime` | 2（有值 / null） |
-| `formatResetText` | 1（基本调用） |
+| `formatResetText` | 1（基本呼叫） |
 
 ---
 
 ## 10.2 `src/tools/shared/__tests__/gitOperationTracking.test.ts`
 
-**问题**：`detectGitOperation` 内部调用 `getCommitCounter()`、`getPrCounter()`、`logEvent()`，测试产生分析副作用。
+**問題**：`detectGitOperation` 內部呼叫 `getCommitCounter()`、`getPrCounter()`、`logEvent()`，測試產生分析副作用。
 
-### 修改清单
+### 修改清單
 
 #### 添加 analytics mock
 
-在文件顶部添加 `mock.module`：
+在文件頂部添加 `mock.module`：
 
 ```typescript
 import { mock, afterAll, afterEach, beforeEach } from "bun:test";
@@ -86,35 +86,35 @@ mock.module("src/bootstrap/state.ts", () => ({
 }));
 ```
 
-> 需验证 `detectGitOperation` 的实际导入路径，按需调整 mock 目标。
+> 需驗證 `detectGitOperation` 的實際導入路徑，按需調整 mock 目標。
 
 #### 新增：缺失的 GH PR actions
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
 | gh pr edit | `'gh pr edit 123 --title "fix"'` | `result.pr.number === 123` |
 | gh pr close | `'gh pr close 456'` | `result.pr.number === 456` |
 | gh pr ready | `'gh pr ready 789'` | `result.pr.number === 789` |
 | gh pr comment | `'gh pr comment 123 --body "done"'` | `result.pr.number === 123` |
 
-#### 新增：parseGitCommitId 边界
+#### 新增：parseGitCommitId 邊界
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
 | 完整 40 字符 SHA | `'[abcdef0123456789abcdef0123456789abcdef01] ...'` | 返回完整 40 字符 |
-| 畸形括号输出 | `'create mode 100644 file.txt'` | 返回 `null` |
+| 畸形括號輸出 | `'create mode 100644 file.txt'` | 返回 `null` |
 
 ---
 
 ## 10.3 `src/utils/permissions/__tests__/PermissionMode.test.ts`
 
-**问题**：`isExternalPermissionMode` 在非 ant 环境永远返回 true，false 路径从未执行；mode 覆盖不完整。
+**問題**：`isExternalPermissionMode` 在非 ant 環境永遠返回 true，false 路徑從未執行；mode 覆蓋不完整。
 
-### 修改清单
+### 修改清單
 
-#### 补全 mode 覆盖
+#### 補全 mode 覆蓋
 
-| 函数 | 缺失的 mode |
+| 函數 | 缺失的 mode |
 |------|-------------|
 | `permissionModeTitle` | `bypassPermissions`, `dontAsk` |
 | `permissionModeShortTitle` | `dontAsk`, `acceptEdits` |
@@ -122,11 +122,11 @@ mock.module("src/bootstrap/state.ts", () => ({
 | `permissionModeFromString` | `acceptEdits`, `bypassPermissions` |
 | `toExternalPermissionMode` | `acceptEdits`, `bypassPermissions` |
 
-#### 修复 isExternalPermissionMode
+#### 修復 isExternalPermissionMode
 
 ```typescript
-// 当前：只测了非 ant 环境（永远 true）
-// 需要新增 ant 环境测试
+// 當前：只測了非 ant 環境（永遠 true）
+// 需要新增 ant 環境測試
 describe("when USER_TYPE is 'ant'", () => {
   beforeEach(() => {
     process.env.USER_TYPE = "ant";
@@ -151,20 +151,20 @@ describe("when USER_TYPE is 'ant'", () => {
 
 #### 新增：permissionModeSchema
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
 | 有效 mode | `'plan'` | `success: true` |
-| 无效 mode | `'invalid'` | `success: false` |
+| 無效 mode | `'invalid'` | `success: false` |
 
 ---
 
 ## 10.4 `src/utils/permissions/__tests__/dangerousPatterns.test.ts`
 
-**问题**：纯数据 smoke test，无行为验证。
+**問題**：純資料 smoke test，無行爲驗證。
 
-### 修改清单
+### 修改清單
 
-#### 新增：重复值检查
+#### 新增：重複值檢查
 
 ```typescript
 test("CROSS_PLATFORM_CODE_EXEC has no duplicates", () => {
@@ -178,7 +178,7 @@ test("DANGEROUS_BASH_PATTERNS has no duplicates", () => {
 });
 ```
 
-#### 新增：全量成员断言（用 Set 确保精确）
+#### 新增：全量成員斷言（用 Set 確保精確）
 
 ```typescript
 test("CROSS_PLATFORM_CODE_EXEC contains expected interpreters", () => {
@@ -205,23 +205,23 @@ test("empty string does not match any pattern", () => {
 
 ## 10.5 `src/utils/__tests__/zodToJsonSchema.test.ts`
 
-**问题**：object 属性仅 `toBeDefined` 未验证类型结构；optional 字段未验证 absence。
+**問題**：object 屬性僅 `toBeDefined` 未驗證類型結構；optional 字段未驗證 absence。
 
-### 修改清单
+### 修改清單
 
-#### 修复 object schema 测试
+#### 修復 object schema 測試
 
 ```typescript
-// 当前（弱）
+// 當前（弱）
 expect(schema.properties!.name).toBeDefined();
 expect(schema.properties!.age).toBeDefined();
 
-// 修复为
+// 修復爲
 expect(schema.properties!.name).toEqual({ type: "string" });
 expect(schema.properties!.age).toEqual({ type: "number" });
 ```
 
-#### 修复 optional 字段测试
+#### 修復 optional 字段測試
 
 ```typescript
 test("optional field is not in required array", () => {
@@ -234,128 +234,128 @@ test("optional field is not in required array", () => {
 });
 ```
 
-#### 新增：缺失的 schema 类型
+#### 新增：缺失的 schema 類型
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
 | `z.literal("foo")` | `z.literal("foo")` | `{ const: "foo" }` |
 | `z.null()` | `z.null()` | `{ type: "null" }` |
 | `z.union()` | `z.union([z.string(), z.number()])` | `{ anyOf: [...] }` |
 | `z.record()` | `z.record(z.string(), z.number())` | `{ type: "object", additionalProperties: { type: "number" } }` |
 | `z.tuple()` | `z.tuple([z.string(), z.number()])` | `{ type: "array", items: [...], additionalItems: false }` |
-| 嵌套 object | `z.object({ a: z.object({ b: z.string() }) })` | 验证嵌套属性结构 |
+| 嵌套 object | `z.object({ a: z.object({ b: z.string() }) })` | 驗證嵌套屬性結構 |
 
 ---
 
 ## 10.6 `src/utils/__tests__/envValidation.test.ts`
 
-**问题**：`validateBoundedIntEnvVar` lower bound=100 时 value=1 返回 `status: "valid"`，疑似源码 bug。
+**問題**：`validateBoundedIntEnvVar` lower bound=100 時 value=1 返回 `status: "valid"`，疑似源碼 bug。
 
-### 修改清单
+### 修改清單
 
-#### 验证 lower bound 行为
+#### 驗證 lower bound 行爲
 
 ```typescript
-// 当前测试
+// 當前測試
 test("value of 1 with lower bound 100", () => {
   const result = validateBoundedIntEnvVar("1", { defaultValue: 100, upperLimit: 1000, lowerLimit: 100 });
-  // 如果源码有 bug，这里应该暴露
+  // 如果源碼有 bug，這裏應該暴露
   expect(result.effective).toBeGreaterThanOrEqual(100);
   expect(result.status).toBe(result.effective !== 100 ? "capped" : "valid");
 });
 ```
 
-#### 新增边界用例
+#### 新增邊界用例
 
 | 用例 | value | lowerLimit | 期望 |
 |------|-------|------------|------|
-| 低于 lower bound | `"50"` | 100 | `effective: 100, status: "capped"` |
-| 等于 lower bound | `"100"` | 100 | `effective: 100, status: "valid"` |
-| 浮点截断 | `"50.7"` | 100 | `effective: 100`（parseInt 截断后 cap） |
+| 低於 lower bound | `"50"` | 100 | `effective: 100, status: "capped"` |
+| 等於 lower bound | `"100"` | 100 | `effective: 100, status: "valid"` |
+| 浮點截斷 | `"50.7"` | 100 | `effective: 100`（parseInt 截斷後 cap） |
 | 空白字符 | `" 500 "` | 1 | `effective: 500, status: "valid"` |
-| defaultValue 为 0 | `"0"` | 0 | 需确认 `parsed <= 0` 逻辑 |
+| defaultValue 爲 0 | `"0"` | 0 | 需確認 `parsed <= 0` 邏輯 |
 
-> **行动**：先确认 `validateBoundedIntEnvVar` 源码中 lower bound 的实际执行路径。如果确实不生效，需先修源码再补测试。
+> **行動**：先確認 `validateBoundedIntEnvVar` 源碼中 lower bound 的實際執行路徑。如果確實不生效，需先修源碼再補測試。
 
 ---
 
 ## 10.7 `src/utils/__tests__/file.test.ts`
 
-**问题**：`addLineNumbers` 仅 `toContain`，未验证完整格式。
+**問題**：`addLineNumbers` 僅 `toContain`，未驗證完整格式。
 
-### 修改清单
+### 修改清單
 
-#### 修复 addLineNumbers 断言
+#### 修復 addLineNumbers 斷言
 
 ```typescript
-// 当前（弱）
+// 當前（弱）
 expect(result).toContain("1");
 expect(result).toContain("hello");
 
-// 修复为（需确定 isCompactLinePrefixEnabled 行为）
-// 假设 compact=false，格式为 "     1→hello"
+// 修復爲（需確定 isCompactLinePrefixEnabled 行爲）
+// 假設 compact=false，格式爲 "     1→hello"
 test("formats single line with tab prefix", () => {
-  // 先确认环境，如果 compact 模式不确定，用正则
+  // 先確認環境，如果 compact 模式不確定，用正則
   expect(result).toMatch(/^\s*\d+[→\t]hello$/m);
 });
 ```
 
-#### 新增：stripLineNumberPrefix 边界
+#### 新增：stripLineNumberPrefix 邊界
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
-| 纯数字行 | `"123"` | `""` |
-| 无内容前缀 | `"→"` | `""` |
+| 純數字行 | `"123"` | `""` |
+| 無內容前綴 | `"→"` | `""` |
 | compact 格式 `"1\thello"` | `"1\thello"` | `"hello"` |
 
-#### 新增：pathsEqual 边界
+#### 新增：pathsEqual 邊界
 
 | 用例 | a | b | 期望 |
 |------|---|---|------|
-| 尾部斜杠差异 | `"/a/b"` | `"/a/b/"` | `false` |
-| `..` 段 | `"/a/../b"` | `"/b"` | 视实现而定 |
+| 尾部斜槓差異 | `"/a/b"` | `"/a/b/"` | `false` |
+| `..` 段 | `"/a/../b"` | `"/b"` | 視實現而定 |
 
 ---
 
 ## 10.8 `src/utils/__tests__/notebook.test.ts`
 
-**问题**：`mapNotebookCellsToToolResult` 内容检查用 `toContain`，未验证 XML 格式。
+**問題**：`mapNotebookCellsToToolResult` 內容檢查用 `toContain`，未驗證 XML 格式。
 
-### 修改清单
+### 修改清單
 
-#### 修复 content 断言
+#### 修復 content 斷言
 
 ```typescript
-// 当前（弱）
+// 當前（弱）
 expect(result).toContain("cell-0");
 expect(result).toContain("print('hello')");
 
-// 修复为
+// 修復爲
 expect(result).toContain('<cell id="cell-0">');
 expect(result).toContain("</cell>");
 ```
 
-#### 新增：parseCellId 边界
+#### 新增：parseCellId 邊界
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
-| 负数 | `"cell--1"` | `null` |
-| 前导零 | `"cell-007"` | `7` |
-| 极大数 | `"cell-999999999"` | `999999999` |
+| 負數 | `"cell--1"` | `null` |
+| 前導零 | `"cell-007"` | `7` |
+| 極大數 | `"cell-999999999"` | `999999999` |
 
-#### 新增：mapNotebookCellsToToolResult 边界
+#### 新增：mapNotebookCellsToToolResult 邊界
 
-| 用例 | 输入 | 期望 |
+| 用例 | 輸入 | 期望 |
 |------|------|------|
-| 空 data 数组 | `{ cells: [] }` | 空字符串或空结果 |
-| 无 cell_id | `{ cell_type: "code", source: "x" }` | fallback 到 `cell-${index}` |
+| 空 data 數組 | `{ cells: [] }` | 空字符串或空結果 |
+| 無 cell_id | `{ cell_type: "code", source: "x" }` | fallback 到 `cell-${index}` |
 | error output | `{ output_type: "error", ename: "Error", evalue: "msg" }` | 包含 error 信息 |
 
 ---
 
-## 验收标准
+## 驗收標準
 
-- [ ] `bun test` 全部通过
-- [ ] 8 个文件评分从 WEAK 提升至 ACCEPTABLE 或 GOOD
-- [ ] `toContain` 仅用于警告文本等确实不确定精确值的场景
-- [ ] envValidation bug 确认并修复（或确认非 bug 并更新测试）
+- [ ] `bun test` 全部通過
+- [ ] 8 個文件評分從 WEAK 提升至 ACCEPTABLE 或 GOOD
+- [ ] `toContain` 僅用於警告文本等確實不確定精確值的場景
+- [ ] envValidation bug 確認並修復（或確認非 bug 並更新測試）
