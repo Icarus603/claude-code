@@ -42,6 +42,7 @@ import { getSystemContext, getUserContext } from './context.js'
 import { init, initializeTelemetryAfterTrust } from './entrypoints/init.js'
 import { addToHistory } from './history.js'
 import type { Root } from '@anthropic/ink'
+import { setThemeConfigCallbacks } from '@anthropic/ink'
 import { launchRepl } from './replLauncher.js'
 import {
 	hasGrowthBookEnvOverride,
@@ -450,6 +451,13 @@ import {
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 profileCheckpoint("main_tsx_imports_loaded");
+
+// Wire up theme config persistence into @anthropic/ink's ThemeProvider.
+// eslint-disable-next-line custom-rules/no-top-level-side-effects
+setThemeConfigCallbacks({
+  loadTheme: () => getGlobalConfig().theme,
+  saveTheme: (setting) => saveGlobalConfig(c => ({ ...c, theme: setting })),
+})
 
 /**
  * Log managed settings keys to Statsig for analytics.

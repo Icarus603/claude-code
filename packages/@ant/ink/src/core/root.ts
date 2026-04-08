@@ -1,8 +1,13 @@
-import type { ReactNode } from 'react'
+import { createElement, type ReactNode } from 'react'
 import { Stream } from 'stream'
 import type { FrameEvent } from './frame.js'
 import Ink, { type Options as InkOptions } from './ink.js'
 import instances from './instances.js'
+import { ThemeProvider } from '../theme/ThemeProvider.js'
+
+function withTheme(node: ReactNode): ReactNode {
+  return createElement(ThemeProvider, null, node)
+}
 
 export type RenderOptions = {
   /**
@@ -112,7 +117,7 @@ const wrappedRender = async (
   // (e.g. useReplBridge notification state) settles, and the subsequent Static
   // write overwrites scrollback instead of appending below the logo.
   await Promise.resolve()
-  const instance = renderSync(node, options)
+  const instance = renderSync(withTheme(node), options)
   if (process.env.CLAUDE_CODE_DEBUG_REPAINTS === '1') {
     // biome-ignore lint/suspicious/noConsole: debug instrumentation
     console.warn(
@@ -152,7 +157,7 @@ export async function createRoot({
   instances.set(stdout, instance)
 
   return {
-    render: node => instance.render(node),
+    render: node => instance.render(withTheme(node)),
     unmount: () => instance.unmount(),
     waitUntilExit: () => instance.waitUntilExit(),
   }
