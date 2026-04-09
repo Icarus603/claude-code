@@ -5,7 +5,7 @@ import {
   useNotifications,
 } from '../../context/notifications.js'
 import { useAppState } from '../../state/AppState.js'
-import { isInProcessTeammateTask } from '../../tasks/InProcessTeammateTask/types.js'
+import { isInProcessTeammateTask } from '@claude-code/swarm'
 
 function parseCount(notif: Notification): number {
   if (!('text' in notif)) {

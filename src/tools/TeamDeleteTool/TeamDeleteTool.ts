@@ -6,13 +6,13 @@ import { buildTool, type ToolDef } from '../../Tool.js'
 import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
-import { TEAM_LEAD_NAME } from '../../utils/swarm/constants.js'
+import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import {
   cleanupTeamDirectories,
   readTeamFile,
   unregisterTeamForSessionCleanup,
-} from '../../utils/swarm/teamHelpers.js'
-import { clearTeammateColors } from '../../utils/swarm/teammateLayoutManager.js'
+} from '@claude-code/swarm'
+import { clearTeammateColors } from '@claude-code/swarm'
 import { clearLeaderTeamName } from '../../utils/tasks.js'
 import { TEAM_DELETE_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'

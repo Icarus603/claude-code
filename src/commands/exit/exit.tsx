@@ -6,7 +6,7 @@ import { ExitFlow } from '../../components/ExitFlow.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import { isBgSession } from '../../utils/concurrentSessions.js'
 import { gracefulShutdown } from '../../utils/gracefulShutdown.js'
-import { getCurrentWorktreeSession } from '../../utils/worktree.js'
+import { getCurrentWorktreeSession } from '@claude-code/swarm'
 
 const GOODBYE_MESSAGES = ['Goodbye!', 'See ya!', 'Bye!', 'Catch you later!']
 

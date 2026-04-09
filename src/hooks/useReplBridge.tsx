@@ -43,7 +43,7 @@ import {
   isBypassPermissionsModeDisabled,
   transitionPermissionMode,
 } from '../utils/permissions/permissionSetup.js'
-import { getLeaderToolUseConfirmQueue } from '../utils/swarm/leaderPermissionBridge.js'
+import { getLeaderToolUseConfirmQueue } from '@claude-code/swarm'
 
 /** How long after a failure before replBridgeEnabled is auto-cleared (stops retries). */
 export const BRIDGE_FAILURE_DISMISS_MS = 10_000

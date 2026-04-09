@@ -53,7 +53,7 @@ import {
   doesMostRecentAssistantMessageExceed200k,
   getCurrentUsage,
 } from '../utils/tokens.js'
-import { getCurrentWorktreeSession } from '../utils/worktree.js'
+import { getCurrentWorktreeSession } from '@claude-code/swarm'
 import { isVimModeEnabled } from './PromptInput/utils.js'
 
 export function statusLineShouldDisplay(settings: ReadonlySettings): boolean {

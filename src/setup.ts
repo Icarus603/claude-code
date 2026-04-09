@@ -51,7 +51,7 @@ import {
   createWorktreeForSession,
   generateTmuxSessionName,
   worktreeBranchName,
-} from './utils/worktree.js'
+} from '@claude-code/swarm'
 
 export async function setup(
   cwd: string,
@@ -64,6 +64,9 @@ export async function setup(
   worktreePRNumber?: number,
   messagingSocketPath?: string,
 ): Promise<void> {
+  const { installSwarmHost } = await import('./swarm/installSwarmHost.js')
+  installSwarmHost()
+
   logForDiagnosticsNoPII('info', 'setup_started')
 
   // Check for Node.js version < 18
@@ -104,7 +107,7 @@ export async function setup(
   // Teammate snapshot — SIMPLE-only gate (no escape hatch, swarm not used in bare)
   if (!isBareMode() && isAgentSwarmsEnabled()) {
     const { captureTeammateModeSnapshot } = await import(
-      './utils/swarm/backends/teammateModeSnapshot.js'
+      '@claude-code/swarm'
     )
     captureTeammateModeSnapshot()
   }

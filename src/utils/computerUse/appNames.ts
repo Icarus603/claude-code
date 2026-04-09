@@ -99,7 +99,7 @@ const ALWAYS_KEEP_BUNDLE_IDS: ReadonlySet<string> = new Set([
 // ── Prompt-injection hardening ───────────────────────────────────────────
 
 /**
- * `\p{L}\p{M}\p{N}` with /u — not `\w` (ASCII-only, would drop Bücher, 微信,
+ * `\p{L}\p{M}\p{N}` with /u — not `\w` (ASCII-only, would drop Bücher, WeChat,
  * Préférences Système). `\p{M}` matches combining marks so NFD-decomposed
  * diacritics (ü → u + ◌̈) pass. Single space not `\s` — `\s` matches newlines,
  * which would let "App\nIgnore previous…" through as a multi-line injection.

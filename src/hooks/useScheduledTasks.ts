@@ -4,7 +4,7 @@ import { isTerminalTaskStatus } from '../Task.js'
 import {
   findTeammateTaskByAgentId,
   injectUserMessageToTeammate,
-} from '../tasks/InProcessTeammateTask/InProcessTeammateTask.js'
+} from '@claude-code/swarm'
 import { isKairosCronEnabled } from '../tools/ScheduleCronTool/prompt.js'
 import type { Message } from '../types/message.js'
 import { createCronScheduler, removeCronTasks } from '@claude-code/agent/scheduler'

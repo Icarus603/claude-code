@@ -89,8 +89,8 @@ import {
   stopOrDismissAgent,
 } from '../../state/teammateViewHelpers.js'
 import type { ToolPermissionContext } from '../../Tool.js'
-import { getRunningTeammatesSorted } from '../../tasks/InProcessTeammateTask/InProcessTeammateTask.js'
-import type { InProcessTeammateTaskState } from '../../tasks/InProcessTeammateTask/types.js'
+import { getRunningTeammatesSorted } from '@claude-code/swarm'
+import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import {
   isPanelAgentTask,
   type LocalAgentTaskState,
@@ -169,12 +169,12 @@ import {
   hasSlackMcpServer,
   subscribeKnownChannels,
 } from '../../utils/suggestions/slackChannelSuggestions.js'
-import { isInProcessEnabled } from '../../utils/swarm/backends/registry.js'
-import { syncTeammateMode } from '../../utils/swarm/teamHelpers.js'
+import { isInProcessEnabled } from '@claude-code/swarm'
+import { syncTeammateMode } from '@claude-code/swarm'
 import type { TeamSummary } from '../../utils/teamDiscovery.js'
 import { getTeammateColor } from '../../utils/teammate.js'
 import { isInProcessTeammate } from '../../utils/teammateContext.js'
-import { writeToMailbox } from '../../utils/teammateMailbox.js'
+import { writeToMailbox } from '@claude-code/swarm'
 import type { TextHighlight } from '../../utils/textHighlighting.js'
 import type { Theme } from '../../utils/theme.js'
 import {

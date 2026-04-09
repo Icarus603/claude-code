@@ -4,7 +4,7 @@ import { useElapsedTime } from '../../hooks/useElapsedTime.js'
 import { type KeyboardEvent, Box, Text, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { getEmptyToolPermissionContext } from '../../Tool.js'
-import type { InProcessTeammateTaskState } from '../../tasks/InProcessTeammateTask/types.js'
+import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import { getTools } from '../../tools.js'
 import { formatNumber, truncateToWidth } from '../../utils/format.js'
 

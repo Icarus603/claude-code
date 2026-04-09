@@ -12,7 +12,7 @@ import {
   useSetAppState,
 } from '../state/AppState.js'
 import { findToolByName } from '../Tool.js'
-import { isInProcessTeammateTask } from '../tasks/InProcessTeammateTask/types.js'
+import { isInProcessTeammateTask } from '@claude-code/swarm'
 import { getAllBaseTools } from '../tools.js'
 import type { PermissionUpdate } from '../types/permissions.js'
 import { logForDebugging } from '../utils/debug.js'
@@ -27,19 +27,19 @@ import {
 } from '../utils/permissions/PermissionMode.js'
 import { applyPermissionUpdate } from '../utils/permissions/PermissionUpdate.js'
 import { jsonStringify } from '../utils/slowOperations.js'
-import { isInsideTmux } from '../utils/swarm/backends/detection.js'
+import { isInsideTmux } from '@claude-code/swarm'
 import {
   ensureBackendsRegistered,
   getBackendByType,
-} from '../utils/swarm/backends/registry.js'
-import type { PaneBackendType } from '../utils/swarm/backends/types.js'
-import { TEAM_LEAD_NAME } from '../utils/swarm/constants.js'
-import { getLeaderToolUseConfirmQueue } from '../utils/swarm/leaderPermissionBridge.js'
-import { sendPermissionResponseViaMailbox } from '../utils/swarm/permissionSync.js'
+} from '@claude-code/swarm'
+import type { PaneBackendType } from '@claude-code/swarm'
+import { TEAM_LEAD_NAME } from '@claude-code/swarm'
+import { getLeaderToolUseConfirmQueue } from '@claude-code/swarm'
+import { sendPermissionResponseViaMailbox } from '@claude-code/swarm'
 import {
   removeTeammateFromTeamFile,
   setMemberMode,
-} from '../utils/swarm/teamHelpers.js'
+} from '@claude-code/swarm'
 import { unassignTeammateTasks } from '../utils/tasks.js'
 import {
   getAgentName,
@@ -63,7 +63,7 @@ import {
   readUnreadMessages,
   type TeammateMessage,
   writeToMailbox,
-} from '../utils/teammateMailbox.js'
+} from '@claude-code/swarm'
 import {
   hasPermissionCallback,
   hasSandboxPermissionCallback,

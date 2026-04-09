@@ -13,13 +13,11 @@ import type { AppState } from '../state/AppState.js'
 import {
   type InProcessTeammateTaskState,
   isInProcessTeammateTask,
-} from '../tasks/InProcessTeammateTask/types.js'
-import { updateTaskState } from './task/framework.js'
-import {
   isPermissionResponse,
   isSandboxPermissionResponse,
   type PlanApprovalResponseMessage,
-} from './teammateMailbox.js'
+} from '@claude-code/swarm'
+import { updateTaskState } from './task/framework.js'
 
 type SetAppState = (updater: (prev: AppState) => AppState) => void
 

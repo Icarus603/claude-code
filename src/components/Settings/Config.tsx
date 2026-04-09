@@ -94,8 +94,8 @@ import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
 import {
   getCliTeammateModeOverride,
   clearCliTeammateModeOverride,
-} from '../../utils/swarm/backends/teammateModeSnapshot.js'
-import { getHardcodedTeammateModelFallback } from '../../utils/swarm/teammateModel.js'
+} from '@claude-code/swarm'
+import { getHardcodedTeammateModelFallback } from '@claude-code/swarm'
 import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '../../hooks/useTerminalSize.js'
 import {

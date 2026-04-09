@@ -9,7 +9,7 @@ import {
   isPlanApprovalResponse,
   type PlanApprovalRequestMessage,
   type PlanApprovalResponseMessage,
-} from '../../utils/teammateMailbox.js'
+} from '@claude-code/swarm'
 import { getShutdownMessageSummary } from './ShutdownMessage.js'
 import { getTaskAssignmentSummary } from './TaskAssignmentMessage.js'
 

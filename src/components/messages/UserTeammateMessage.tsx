@@ -6,7 +6,7 @@ import { Ansi, Box, Text, type TextProps } from '@anthropic/ink'
 import { toInkColor } from '../../utils/ink.js'
 
 import { jsonParse } from '../../utils/slowOperations.js'
-import { isShutdownApproved } from '../../utils/teammateMailbox.js'
+import { isShutdownApproved } from '@claude-code/swarm'
 import { MessageResponse } from '../MessageResponse.js'
 import { tryRenderPlanApprovalMessage } from './PlanApprovalMessage.js'
 import { tryRenderShutdownMessage } from './ShutdownMessage.js'

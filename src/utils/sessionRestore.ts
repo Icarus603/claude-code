@@ -59,7 +59,7 @@ import type { ContentReplacementRecord } from './toolResultStorage.js'
 import {
   getCurrentWorktreeSession,
   restoreWorktreeSession,
-} from './worktree.js'
+} from '@claude-code/swarm'
 
 type ResumeResult = {
   messages?: Message[]

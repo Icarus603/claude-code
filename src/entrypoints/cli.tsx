@@ -281,7 +281,7 @@ async function main(): Promise<void> {
       '../utils/worktreeModeEnabled.js'
     )
     if (isWorktreeModeEnabled()) {
-      const { execIntoTmuxWorktree } = await import('../utils/worktree.js')
+      const { execIntoTmuxWorktree } = await import('@claude-code/swarm')
       const result = await execIntoTmuxWorktree(args)
       if (result.handled) {
         return

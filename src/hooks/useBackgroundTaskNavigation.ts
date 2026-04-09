@@ -13,11 +13,11 @@ import {
 import {
   getRunningTeammatesSorted,
   InProcessTeammateTask,
-} from '../tasks/InProcessTeammateTask/InProcessTeammateTask.js'
+} from '@claude-code/swarm'
 import {
   type InProcessTeammateTaskState,
   isInProcessTeammateTask,
-} from '../tasks/InProcessTeammateTask/types.js'
+} from '@claude-code/swarm'
 import { isBackgroundTask } from '../tasks/types.js'
 
 // Step teammate selection by delta, wrapping across leader(-1)..teammates(0..n-1)..hide(n).

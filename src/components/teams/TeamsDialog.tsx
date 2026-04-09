@@ -29,24 +29,24 @@ import { jsonStringify } from '../../utils/slowOperations.js'
 import {
   IT2_COMMAND,
   isInsideTmuxSync,
-} from '../../utils/swarm/backends/detection.js'
+} from '@claude-code/swarm'
 import {
   ensureBackendsRegistered,
   getBackendByType,
   getCachedBackend,
-} from '../../utils/swarm/backends/registry.js'
-import type { PaneBackendType } from '../../utils/swarm/backends/types.js'
+} from '@claude-code/swarm'
+import type { PaneBackendType } from '@claude-code/swarm'
 import {
   getSwarmSocketName,
   TMUX_COMMAND,
-} from '../../utils/swarm/constants.js'
+} from '@claude-code/swarm'
 import {
   addHiddenPaneId,
   removeHiddenPaneId,
   removeMemberFromTeam,
   setMemberMode,
   setMultipleMemberModes,
-} from '../../utils/swarm/teamHelpers.js'
+} from '@claude-code/swarm'
 import {
   listTasks,
   type Task,
@@ -61,7 +61,7 @@ import {
   createModeSetRequestMessage,
   sendShutdownRequestToMailbox,
   writeToMailbox,
-} from '../../utils/teammateMailbox.js'
+} from '@claude-code/swarm'
 import { Dialog } from '@anthropic/ink'
 import ThemedText from '../design-system/ThemedText.js'
 

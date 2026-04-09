@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useMemo, useRef } from 'react'
 import { Box, Text, useAnimationFrame, stringWidth, Byline } from '@anthropic/ink'
 import { toInkColor } from '../../utils/ink.js'
-import type { InProcessTeammateTaskState } from '../../tasks/InProcessTeammateTask/types.js'
+import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import { formatDuration, formatNumber } from '../../utils/format.js'
 
 import type { Theme } from '../../utils/theme.js'

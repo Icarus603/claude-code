@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useTerminalSize } from '../hooks/useTerminalSize.js'
 import { Box, Text, stringWidth } from '@anthropic/ink'
 import { useAppState } from '../state/AppState.js'
-import { isInProcessTeammateTask } from '../tasks/InProcessTeammateTask/types.js'
+import { isInProcessTeammateTask } from '@claude-code/swarm'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
   type AgentColorName,

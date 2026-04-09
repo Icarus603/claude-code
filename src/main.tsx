@@ -137,7 +137,7 @@ import { getBaseRenderOptions } from "./utils/renderOptions.js";
 import { getSessionIngressAuthToken } from "./utils/sessionIngressAuth.js";
 import { skillChangeDetector } from "./utils/skills/skillChangeDetector.js";
 import { jsonParse, writeFileSync_DEPRECATED } from "./utils/slowOperations.js";
-import { computeInitialTeamContext } from "./utils/swarm/reconnection.js";
+import { computeInitialTeamContext } from "@claude-code/swarm";
 import { initializeWarningHandler } from "./utils/warningHandler.js";
 import { isWorktreeModeEnabled } from "./utils/worktreeModeEnabled.js";
 
@@ -146,9 +146,9 @@ import { isWorktreeModeEnabled } from "./utils/worktreeModeEnabled.js";
 const getTeammateUtils = () =>
 	require("./utils/teammate.js") as typeof import("./utils/teammate.js");
 const getTeammatePromptAddendum = () =>
-	require("./utils/swarm/teammatePromptAddendum.js") as typeof import("./utils/swarm/teammatePromptAddendum.js");
+	require("@claude-code/swarm") as typeof import("@claude-code/swarm");
 const getTeammateModeSnapshot = () =>
-	require("./utils/swarm/backends/teammateModeSnapshot.js") as typeof import("./utils/swarm/backends/teammateModeSnapshot.js");
+	require("@claude-code/swarm") as typeof import("@claude-code/swarm");
 /* eslint-enable @typescript-eslint/no-require-imports */
 // Dead code elimination: conditional import for COORDINATOR_MODE
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -460,7 +460,7 @@ import {
 	getTmuxInstallInstructions,
 	isTmuxAvailable,
 	parsePRReference,
-} from "./utils/worktree.js";
+} from "@claude-code/swarm";
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 profileCheckpoint("main_tsx_imports_loaded");

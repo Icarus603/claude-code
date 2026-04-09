@@ -183,7 +183,7 @@ export const init = memoize(async (): Promise<void> => {
     // behind feature gate and most sessions never create teams.
     registerCleanup(async () => {
       const { cleanupSessionTeams } = await import(
-        '../utils/swarm/teamHelpers.js'
+        '@claude-code/swarm'
       )
       await cleanupSessionTeams()
     })
