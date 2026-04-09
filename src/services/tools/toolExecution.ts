@@ -1,4 +1,5 @@
 import { feature } from 'bun:bundle'
+import 'src/tools.js'
 import { getAllBaseTools } from '@claude-code/tool-registry'
 import type {
   ContentBlockParam,

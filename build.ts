@@ -100,6 +100,18 @@ const vendorDir = join(outdir, 'vendor', 'audio-capture')
 await cp('vendor/audio-capture', vendorDir, { recursive: true })
 console.log(`Copied vendor/audio-capture/ → ${vendorDir}/`)
 
+// Step 4.1: Copy pre-downloaded ripgrep binary into dist when available.
+// This keeps Glob/Grep working in local dist runs without requiring a separate
+// post-build download step.
+const ripgrepSourceDir = 'src/utils/vendor/ripgrep'
+const ripgrepTargetDir = join(outdir, 'vendor', 'ripgrep')
+try {
+  await cp(ripgrepSourceDir, ripgrepTargetDir, { recursive: true })
+  console.log(`Copied ${ripgrepSourceDir}/ → ${ripgrepTargetDir}/`)
+} catch {
+  // Optional artifact; postinstall/download-ripgrep handles missing binaries.
+}
+
 // Step 5: Bundle download-ripgrep script as standalone JS for postinstall
 const rgScript = await Bun.build({
   entrypoints: ['scripts/download-ripgrep.ts'],

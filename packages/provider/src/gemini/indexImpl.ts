@@ -11,6 +11,12 @@ import type {
 } from '../contracts.js'
 import { getProviderHostBindings } from '../host.js'
 import type { ProviderRequestOptions } from '../requestOptions.js'
+import {
+  createAssistantAPIErrorMessage,
+  normalizeContentFromAPI,
+  normalizeMessagesForAPI,
+  toolToAPISchema,
+} from '../runtimeHelpers.js'
 import { streamGeminiGenerateContent } from './client.js'
 import { anthropicMessagesToGemini } from './convertMessages.js'
 import {
@@ -35,13 +41,16 @@ export async function* queryModelGemini(
   void
 > {
   try {
-    const { runtime } = getProviderHostBindings()
+    const hostBindings = getProviderHostBindings()
+    const logForDebugging =
+      hostBindings.session.logForDebugging ??
+      hostBindings.anthropic.logForDebugging
     const geminiModel = resolveGeminiModel(options.model)
-    const messagesForAPI = runtime.normalizeMessagesForAPI(messages, tools)
+    const messagesForAPI = normalizeMessagesForAPI(messages, tools)
 
     const toolSchemas = await Promise.all(
       tools.map(tool =>
-        runtime.toolToAPISchema(tool, {
+        toolToAPISchema(tool, {
           getToolPermissionContext: options.getToolPermissionContext,
           tools,
           agents: options.agents,
@@ -97,7 +106,7 @@ export async function* queryModelGemini(
       },
     })
 
-    runtime.logForDebugging(
+    logForDebugging(
       `[Gemini] Calling model=${geminiModel}, messages=${contents.length}, tools=${geminiTools.length}`,
     )
 
@@ -160,7 +169,7 @@ export async function* queryModelGemini(
           const message: ProviderAssistantMessage = {
             message: {
               ...partialMessage,
-              content: runtime.normalizeContentFromAPI(
+              content: normalizeContentFromAPI(
                 [block],
                 tools,
                 options.agentId,
@@ -186,12 +195,15 @@ export async function* queryModelGemini(
       } as ProviderStreamEvent
     }
   } catch (error) {
-    const { runtime } = getProviderHostBindings()
+    const hostBindings = getProviderHostBindings()
+    const logForDebugging =
+      hostBindings.session.logForDebugging ??
+      hostBindings.anthropic.logForDebugging
     const errorMessage = error instanceof Error ? error.message : String(error)
-    runtime.logForDebugging(`[Gemini] Error: ${errorMessage}`, {
+    logForDebugging(`[Gemini] Error: ${errorMessage}`, {
       level: 'error',
     })
-    yield runtime.createAssistantAPIErrorMessage({
+    yield createAssistantAPIErrorMessage({
       content: `API Error: ${errorMessage}`,
       apiError: 'api_error',
       error: (error instanceof Error ? error : new Error(String(error))) as any,

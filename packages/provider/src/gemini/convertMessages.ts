@@ -2,13 +2,13 @@ import type {
   BetaToolResultBlockParam,
   BetaToolUseBlock,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
-import { getProviderHostBindings } from '../host.js'
 import type {
   ProviderAssistantMessage,
   ProviderMessage,
   ProviderSystemPrompt,
   ProviderUserMessage,
 } from '../contracts.js'
+import { safeParseJSON } from '../runtimeHelpers.js'
 import {
   GEMINI_THOUGHT_SIGNATURE_FIELD,
   type GeminiContent,
@@ -243,7 +243,7 @@ function createThinkingGeminiPart(
 
 function normalizeToolUseInput(input: unknown): Record<string, unknown> {
   if (typeof input === 'string') {
-    const parsed = getProviderHostBindings().runtime.safeParseJSON(input)
+    const parsed = safeParseJSON(input)
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       return parsed as Record<string, unknown>
     }
@@ -280,7 +280,7 @@ function toolResultToResponseObject(
 
 function normalizeToolResultContent(content: unknown): unknown {
   if (typeof content === 'string') {
-    const parsed = getProviderHostBindings().runtime.safeParseJSON(content)
+    const parsed = safeParseJSON(content)
     return parsed ?? content
   }
 
@@ -301,7 +301,7 @@ function normalizeToolResultContent(content: unknown): unknown {
       .filter(Boolean)
       .join('\n')
 
-    const parsed = getProviderHostBindings().runtime.safeParseJSON(text)
+    const parsed = safeParseJSON(text)
     return parsed ?? text
   }
 

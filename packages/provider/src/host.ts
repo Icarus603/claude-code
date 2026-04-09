@@ -1,23 +1,13 @@
 import type {
   ProviderAPIProvider,
-  ProviderAgentDefinition,
-  ProviderAssistantMessage,
   ProviderAwsCredentials,
   ProviderCachedAsyncFn,
-  ProviderMessage,
   ProviderModelOption,
   ProviderOauthConfig,
   ProviderOAuthTokens,
-  ProviderQuerySource,
-  ProviderSafeParseJSONFn,
-  ProviderSystemAPIErrorMessage,
-  ProviderTool,
-  ProviderToolPermissionContext,
-  ProviderTools,
-  ProviderToolSchema,
-  ProviderToolSchemaOptions,
 } from './contracts.js'
 import type { ContextPipeline, NetworkLayer } from './types.js'
+import type { ProviderQueryFn, ProviderQueryStreamFn } from './types.js'
 
 export type ProviderHostBindings = {
   contextPipeline: ContextPipeline
@@ -50,51 +40,16 @@ export type ProviderHostBindings = {
     getAWSRegion: () => string
     getVertexRegionForModel: (model: string) => string
     isEnvTruthy: (value: unknown) => boolean
+    query?: ProviderQueryFn
+    queryStream?: ProviderQueryStreamFn
   }
-  runtime: {
-    toolToAPISchema: (
-      tool: ProviderTool,
-      options: ProviderToolSchemaOptions,
-    ) => Promise<ProviderToolSchema>
-    addToTotalSessionCost: (
+  session: {
+    addToTotalSessionCost?: (
       costUSD: number,
       usage: unknown,
       model: string,
     ) => void
-    logForDebugging: (message: string, options?: unknown) => void
-    createAssistantAPIErrorMessage: (args: {
-      content: string
-      apiError?: unknown
-      error?: unknown
-      errorDetails?: string
-    }) => ProviderAssistantMessage | ProviderSystemAPIErrorMessage
-    normalizeContentFromAPI: (
-      blocks: unknown,
-      tools: ProviderTools,
-      agentId?: string,
-    ) => ProviderMessage['message']['content']
-    normalizeMessagesForAPI: (
-      messages: readonly ProviderMessage[],
-      tools: ProviderTools,
-    ) => ProviderMessage[]
-    calculateUSDCost: (
-      model: string,
-      usage: unknown,
-    ) => number
-    isToolSearchEnabled: (
-      model: string,
-      tools: ProviderTools,
-      getToolPermissionContext: () => Promise<ProviderToolPermissionContext>,
-      agents: readonly ProviderAgentDefinition[],
-      querySource?: ProviderQuerySource,
-    ) => Promise<boolean>
-    extractDiscoveredToolNames: (
-      messages: readonly ProviderMessage[],
-    ) => Set<string>
-    isDeferredTool: (tool: ProviderTool) => boolean
-    TOOL_SEARCH_TOOL_NAME: string
-    safeParseJSON: ProviderSafeParseJSONFn
-    errorMessage: (error: unknown) => string
+    logForDebugging?: (message: string, options?: unknown) => void
   }
 }
 

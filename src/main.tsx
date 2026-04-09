@@ -25,6 +25,7 @@ import {
 startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
+import './tools.js'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,

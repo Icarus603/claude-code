@@ -1,7 +1,8 @@
-
 import type { ProviderDep, ProviderStreamParams, ProviderEvent } from '@claude-code/agent'
+import { getProviderAdapter } from '@claude-code/provider'
 import type { ToolUseContext, Tools } from '../Tool.js'
 import type { Message } from '../types/message.js'
+import '../services/api/providerHostSetup.js'
 
 export class ProviderDepImpl implements ProviderDep {
   private toolUseContext: ToolUseContext
@@ -13,8 +14,8 @@ export class ProviderDepImpl implements ProviderDep {
   }
 
   async *stream(params: ProviderStreamParams): AsyncGenerator<ProviderEvent> {
-    const { queryModelWithStreaming } = await import('../services/api/claude.js')
     const ctx = this.toolUseContext
+    const adapter = getProviderAdapter()
 
     const systemPrompt = ctx.renderedSystemPrompt ?? params.systemPrompt
     const tools = (ctx.options.tools ?? []) as unknown as Tools
@@ -46,12 +47,12 @@ export class ProviderDepImpl implements ProviderDep {
       }
     }
 
-    const stream = queryModelWithStreaming({
+    const stream = adapter.queryStream({
       messages: params.messages as Message[],
       systemPrompt: systemPrompt as any,
-      thinkingConfig: ctx.options.thinkingConfig,
-      tools,
-      signal: params.abortSignal ?? ctx.abortController.signal,
+      thinkingConfig: ctx.options.thinkingConfig as any,
+      tools: tools as any,
+      signal: (params.abortSignal ?? ctx.abortController.signal) as AbortSignal,
       options: options as any,
     })
 

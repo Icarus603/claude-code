@@ -10,6 +10,13 @@ import type {
 } from '../contracts.js'
 import { getProviderHostBindings } from '../host.js'
 import type { ProviderRequestOptions } from '../requestOptions.js'
+import {
+  calculateUSDCost,
+  createAssistantAPIErrorMessage,
+  normalizeContentFromAPI,
+  normalizeMessagesForAPI,
+  toolToAPISchema,
+} from '../runtimeHelpers.js'
 import { getGrokClient } from './client.js'
 import { resolveGrokModel } from './modelMapping.js'
 import {
@@ -34,13 +41,16 @@ export async function* queryModelGrok(
   void
 > {
   try {
-    const { runtime } = getProviderHostBindings()
+    const hostBindings = getProviderHostBindings()
+    const logForDebugging =
+      hostBindings.session.logForDebugging ??
+      hostBindings.anthropic.logForDebugging
     const grokModel = resolveGrokModel(options.model)
-    const messagesForAPI = runtime.normalizeMessagesForAPI(messages, tools)
+    const messagesForAPI = normalizeMessagesForAPI(messages, tools)
 
     const toolSchemas = await Promise.all(
       tools.map(tool =>
-        runtime.toolToAPISchema(tool, {
+        toolToAPISchema(tool, {
           getToolPermissionContext: options.getToolPermissionContext,
           tools,
           agents: options.agents,
@@ -72,7 +82,7 @@ export async function* queryModelGrok(
       source: options.querySource,
     })
 
-    runtime.logForDebugging(
+    logForDebugging(
       `[Grok] Calling model=${grokModel}, messages=${openaiMessages.length}, tools=${openaiTools.length}`,
     )
 
@@ -157,7 +167,7 @@ export async function* queryModelGrok(
           const message: ProviderAssistantMessage = {
             message: {
               ...partialMessage,
-              content: runtime.normalizeContentFromAPI(
+              content: normalizeContentFromAPI(
                 [block],
                 tools,
                 options.agentId,
@@ -186,8 +196,12 @@ export async function* queryModelGrok(
         event.type === 'message_stop' &&
         usage.input_tokens + usage.output_tokens > 0
       ) {
-        const costUSD = runtime.calculateUSDCost(grokModel, usage as any)
-        runtime.addToTotalSessionCost(costUSD, usage as any, options.model)
+        const costUSD = calculateUSDCost(grokModel, usage as any)
+        hostBindings.session.addToTotalSessionCost?.(
+          costUSD,
+          usage as any,
+          options.model,
+        )
       }
 
       yield {
@@ -197,10 +211,13 @@ export async function* queryModelGrok(
       } as ProviderStreamEvent
     }
   } catch (error) {
-    const { runtime } = getProviderHostBindings()
+    const hostBindings = getProviderHostBindings()
+    const logForDebugging =
+      hostBindings.session.logForDebugging ??
+      hostBindings.anthropic.logForDebugging
     const errorMessage = error instanceof Error ? error.message : String(error)
-    runtime.logForDebugging(`[Grok] Error: ${errorMessage}`, { level: 'error' })
-    yield runtime.createAssistantAPIErrorMessage({
+    logForDebugging(`[Grok] Error: ${errorMessage}`, { level: 'error' })
+    yield createAssistantAPIErrorMessage({
       content: `API Error: ${errorMessage}`,
       apiError: 'api_error',
       error: (error instanceof Error ? error : new Error(String(error))) as any,
