@@ -19,6 +19,7 @@ import type {
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { Stream } from '@anthropic-ai/sdk/streaming.mjs'
+import { getProviderAdapter } from '@claude-code/provider'
 import { randomUUID } from 'crypto'
 import {
   getAPIProvider,
@@ -1335,28 +1336,21 @@ async function* queryModel(
   // OpenAI-compatible provider: delegate to the OpenAI adapter layer
   // after shared preprocessing (message normalization, tool filtering,
   // media stripping) but before Anthropic-specific logic (betas, thinking, caching).
-  if (getAPIProvider() === 'openai') {
-    const { queryModelOpenAI } = await import('./openai/index.js')
-    yield* queryModelOpenAI(messagesForAPI, systemPrompt, filteredTools, signal, options)
-    return
-  }
-
-  if (getAPIProvider() === 'gemini') {
-    const { queryModelGemini } = await import('./gemini/index.js')
-    yield* queryModelGemini(
-      messagesForAPI,
+  const selectedProvider = getAPIProvider()
+  if (
+    selectedProvider === 'openai' ||
+    selectedProvider === 'gemini' ||
+    selectedProvider === 'grok'
+  ) {
+    const adapter = getProviderAdapter(selectedProvider)
+    yield* adapter.queryStream({
+      messages: messagesForAPI,
       systemPrompt,
-      filteredTools,
+      tools: filteredTools,
       signal,
       options,
       thinkingConfig,
-    )
-    return
-  }
-
-  if (getAPIProvider() === 'grok') {
-    const { queryModelGrok } = await import('./grok/index.js')
-    yield* queryModelGrok(messagesForAPI, systemPrompt, filteredTools, signal, options)
+    })
     return
   }
 

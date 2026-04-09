@@ -1,6 +1,5 @@
+import { getProviderNetworkLayer } from '@claude-code/provider'
 import OpenAI from 'openai'
-import { getProxyFetchOptions } from 'src/utils/proxy.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
 
 /**
  * Environment variables:
@@ -19,6 +18,7 @@ export function getOpenAIClient(options?: {
   source?: string
 }): OpenAI {
   if (cachedClient) return cachedClient
+  const networkLayer = getProviderNetworkLayer()
 
   const apiKey = process.env.OPENAI_API_KEY || ''
   const baseURL = process.env.OPENAI_BASE_URL
@@ -31,7 +31,9 @@ export function getOpenAIClient(options?: {
     dangerouslyAllowBrowser: true,
     ...(process.env.OPENAI_ORG_ID && { organization: process.env.OPENAI_ORG_ID }),
     ...(process.env.OPENAI_PROJECT_ID && { project: process.env.OPENAI_PROJECT_ID }),
-    fetchOptions: getProxyFetchOptions({ forAnthropicAPI: false }) as RequestInit,
+    fetchOptions: networkLayer.getProxyFetchOptions({
+      forAnthropicAPI: false,
+    }) as RequestInit,
     ...(options?.fetchOverride && { fetch: options.fetchOverride }),
   })
 

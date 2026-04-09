@@ -26,9 +26,13 @@
         "@azure/identity": "^4.13.1",
         "@biomejs/biome": "^2.4.10",
         "@claude-code/agent": "workspace:*",
+        "@claude-code/cli": "workspace:*",
         "@claude-code/config": "workspace:*",
         "@claude-code/memory": "workspace:*",
         "@claude-code/permission": "workspace:*",
+        "@claude-code/provider": "workspace:*",
+        "@claude-code/shell": "workspace:*",
+        "@claude-code/swarm": "workspace:*",
         "@claude-code/tool-registry": "workspace:*",
         "@commander-js/extra-typings": "^14.0.0",
         "@growthbook/growthbook": "^1.6.5",
@@ -178,6 +182,10 @@
       "name": "audio-capture-napi",
       "version": "1.0.0",
     },
+    "packages/cli": {
+      "name": "@claude-code/cli",
+      "version": "0.1.0",
+    },
     "packages/color-diff-napi": {
       "name": "color-diff-napi",
       "version": "1.0.0",
@@ -207,6 +215,27 @@
     "packages/permission": {
       "name": "@claude-code/permission",
       "version": "1.0.0",
+    },
+    "packages/provider": {
+      "name": "@claude-code/provider",
+      "version": "0.1.0",
+    },
+    "packages/shell": {
+      "name": "@claude-code/shell",
+      "version": "0.1.0",
+      "dependencies": {
+        "execa": "^9.6.1",
+        "lodash-es": "^4.17.23",
+        "tree-kill": "^1.2.2",
+      },
+    },
+    "packages/swarm": {
+      "name": "@claude-code/swarm",
+      "version": "0.1.0",
+      "dependencies": {
+        "@claude-code/agent": "workspace:*",
+        "zod": "^4.3.6",
+      },
     },
     "packages/tool-registry": {
       "name": "@claude-code/tool-registry",
@@ -366,11 +395,19 @@
 
     "@claude-code/agent": ["@claude-code/agent@workspace:packages/agent"],
 
+    "@claude-code/cli": ["@claude-code/cli@workspace:packages/cli"],
+
     "@claude-code/config": ["@claude-code/config@workspace:packages/config"],
 
     "@claude-code/memory": ["@claude-code/memory@workspace:packages/memory"],
 
     "@claude-code/permission": ["@claude-code/permission@workspace:packages/permission"],
+
+    "@claude-code/provider": ["@claude-code/provider@workspace:packages/provider"],
+
+    "@claude-code/shell": ["@claude-code/shell@workspace:packages/shell"],
+
+    "@claude-code/swarm": ["@claude-code/swarm@workspace:packages/swarm"],
 
     "@claude-code/tool-registry": ["@claude-code/tool-registry@workspace:packages/tool-registry"],
 

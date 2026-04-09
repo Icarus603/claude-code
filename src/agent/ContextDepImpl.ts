@@ -1,7 +1,7 @@
 
 import type { ContextDep, SystemPrompt } from '@claude-code/agent'
+import { getProviderContextPipeline } from '@claude-code/provider'
 import type { ToolUseContext } from '../Tool.js'
-import { getSystemContext, getUserContext } from '../context.js'
 
 type ContextOverrides = {
   systemPrompt?: SystemPrompt[]
@@ -12,6 +12,7 @@ type ContextOverrides = {
 export class ContextDepImpl implements ContextDep {
   private toolUseContext: ToolUseContext
   private overrides?: ContextOverrides
+  private readonly contextPipeline = getProviderContextPipeline()
 
   constructor(toolUseContext: ToolUseContext, overrides?: ContextOverrides) {
     this.toolUseContext = toolUseContext
@@ -33,7 +34,7 @@ export class ContextDepImpl implements ContextDep {
       return this.overrides.userContext
     }
     try {
-      return await getUserContext()
+      return await this.contextPipeline.getUserContext()
     } catch {
       return {}
     }
@@ -44,7 +45,7 @@ export class ContextDepImpl implements ContextDep {
       return this.overrides.systemContext
     }
     try {
-      return await getSystemContext()
+      return await this.contextPipeline.getSystemContext()
     } catch {
       return {}
     }

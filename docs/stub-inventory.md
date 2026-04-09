@@ -73,6 +73,8 @@ Typical reasons to defer:
 - `scripts/check-transition-stubs.ts` blocks any newly introduced `src/*/src` directories.
 - `bun run health` includes the transition stub guard result.
 - Existing `export type ... = any` stubs are inventory, not proof of a completed boundary.
+- As of 2026-04-09, the guard reports 79 existing `src/*/src` directories and 661
+  type-any transition stubs, with no newly introduced stub directories.
 
 ## Phase 0 Outcome
 

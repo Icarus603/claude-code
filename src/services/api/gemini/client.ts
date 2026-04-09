@@ -1,6 +1,10 @@
-import { parseSSEFrames } from 'src/cli/transports/SSETransport.js'
-import { errorMessage } from 'src/utils/errors.js'
-import { getProxyFetchOptions } from 'src/utils/proxy.js'
+import { parseSSEFrames } from '@claude-code/cli'
+import {
+  getProviderNetworkLayer,
+} from '@claude-code/provider'
+import {
+  errorMessage,
+} from 'src/utils/errors.js'
 import type {
   GeminiGenerateContentRequest,
   GeminiStreamChunk,
@@ -29,6 +33,7 @@ export async function* streamGeminiGenerateContent(params: {
   signal: AbortSignal
   fetchOverride?: typeof fetch
 }): AsyncGenerator<GeminiStreamChunk, void> {
+  const networkLayer = getProviderNetworkLayer()
   const fetchImpl = params.fetchOverride ?? fetch
   const url = `${getGeminiBaseUrl()}/${getGeminiModelPath(params.model)}:streamGenerateContent?alt=sse`
 
@@ -40,7 +45,7 @@ export async function* streamGeminiGenerateContent(params: {
     },
     body: JSON.stringify(params.body),
     signal: params.signal,
-    ...getProxyFetchOptions({ forAnthropicAPI: false }),
+    ...networkLayer.getProxyFetchOptions({ forAnthropicAPI: false }),
   })
 
   if (!response.ok) {
