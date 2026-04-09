@@ -1,33 +1,33 @@
 import { feature } from 'bun:bundle'
-import { runHeadless as runHeadlessImpl } from '@cc-app/cli/print.js'
-import type { Command } from '@cc-app/commands.js'
-import type { SDKStatus } from '@cc-app/entrypoints/agentSdkTypes.js'
+import { runHeadless as runHeadlessImpl } from '@claude-code/app-compat/cli/print.js'
+import type { Command } from '@claude-code/app-compat/commands.js'
+import type { SDKStatus } from '@claude-code/app-compat/entrypoints/agentSdkTypes.js'
 import type {
   MCPServerConnection,
   McpCommand,
   McpSdkServerConfig,
-} from '@cc-app/services/mcp/types.js'
-import type { AppState } from '@cc-app/state/AppStateStore.js'
-import { getDefaultAppState } from '@cc-app/state/AppStateStore.js'
-import { onChangeAppState } from '@cc-app/state/onChangeAppState.js'
-import { createStore } from '@cc-app/state/store.js'
-import type { AgentDefinition } from '@cc-app/tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/app-compat/services/mcp/types.js'
+import type { AppState } from '@claude-code/app-compat/state/AppStateStore.js'
+import { getDefaultAppState } from '@claude-code/app-compat/state/AppStateStore.js'
+import { onChangeAppState } from '@claude-code/app-compat/state/onChangeAppState.js'
+import { createStore } from '@claude-code/app-compat/state/store.js'
+import type { AgentDefinition } from '@claude-code/app-compat/tools/AgentTool/loadAgentsDir.js'
 import type {
   Tool,
   ToolPermissionContext,
   Tools,
-} from '@cc-app/Tool.js'
+} from '@claude-code/app-compat/Tool.js'
 import {
   parseEffortValue,
   toPersistableEffort,
-} from '@cc-app/utils/effort.js'
+} from '@claude-code/app-compat/utils/effort.js'
 import {
   getFastModeUnavailableReason,
   isFastModeEnabled,
   isFastModeSupportedByModel,
-} from '@cc-app/utils/fastMode.js'
-import { getInitialSettings } from '@cc-app/utils/settings/settings.js'
-import type { ThinkingConfig } from '@cc-app/utils/thinking.js'
+} from '@claude-code/app-compat/utils/fastMode.js'
+import { getInitialSettings } from '@claude-code/app-compat/utils/settings/settings.js'
+import type { ThinkingConfig } from '@claude-code/app-compat/utils/thinking.js'
 
 export type HeadlessStoreParams = {
   mcpClients: MCPServerConnection[]
@@ -68,7 +68,7 @@ export type HeadlessRunOptions = {
   workload: string | undefined
   setupTrigger?: 'init' | 'maintenance' | undefined
   sessionStartHooksPromise?: ReturnType<
-    typeof import('@cc-app/utils/sessionStart.js').processSessionStartHooks
+    typeof import('@claude-code/app-compat/utils/sessionStart.js').processSessionStartHooks
   >
   setSDKStatus?: (status: SDKStatus) => void
 }

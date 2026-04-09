@@ -1,7 +1,7 @@
-import type { Tool, ToolUseContext } from '@cc-app/Tool.js'
+import type { Tool, ToolUseContext } from '@claude-code/app-compat/Tool.js'
 import z from 'zod/v4'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { lazySchema } from '@cc-app/utils/lazySchema.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
 import type {
   PermissionDecision,
   PermissionDecisionReason,

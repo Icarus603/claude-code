@@ -1,5 +1,12 @@
+import {
+  endSpan as endObsSpan,
+  startSpan as startObsSpan,
+  type Span as ObsSpan,
+} from '@claude-code/local-observability'
+
 export type Span = {
   spanContext?: () => { spanId?: string }
+  _obsSpan?: ObsSpan
 }
 
 export type LLMRequestNewContext = {
@@ -18,7 +25,8 @@ export function isEnhancedTelemetryEnabled(): boolean {
 }
 
 export function startInteractionSpan(_userPrompt: string): Span {
-  return {}
+  const span = startObsSpan('interaction')
+  return { _obsSpan: span }
 }
 
 export function endInteractionSpan(): void {}
@@ -29,49 +37,64 @@ export function startLLMRequestSpan(
   _systemPrompt: string,
   _toolNames?: string[],
 ): Span {
-  return {}
+  const span = startObsSpan('llm_request')
+  return { _obsSpan: span }
 }
 
 export function endLLMRequestSpan(
-  _span: Span | undefined,
+  span: Span | undefined,
   _response?: unknown,
-): void {}
+): void {
+  endObsSpan(span?._obsSpan)
+}
 
 export function startToolSpan(
   _toolName: string,
   _input?: unknown,
 ): Span {
-  return {}
+  const span = startObsSpan('tool')
+  return { _obsSpan: span }
 }
 
 export function endToolSpan(
-  _span: Span | undefined,
+  span: Span | undefined,
   _output?: unknown,
-): void {}
+): void {
+  endObsSpan(span?._obsSpan)
+}
 
 export function startToolExecutionSpan(
   _toolName: string,
   _input?: unknown,
 ): Span {
-  return {}
+  const span = startObsSpan('tool_execution')
+  return { _obsSpan: span }
 }
 
 export function startToolBlockedOnUserSpan(_toolName: string): Span {
-  return {}
+  const span = startObsSpan('tool_blocked_on_user')
+  return { _obsSpan: span }
 }
 
 export function endToolExecutionSpan(
-  _span: Span | undefined,
+  span: Span | undefined,
   _output?: unknown,
-): void {}
-
-export function endToolBlockedOnUserSpan(_span: Span | undefined): void {}
-
-export function startHookSpan(_hookName: string, _eventName: string): Span {
-  return {}
+): void {
+  endObsSpan(span?._obsSpan)
 }
 
-export function endHookSpan(_span: Span | undefined): void {}
+export function endToolBlockedOnUserSpan(span: Span | undefined): void {
+  endObsSpan(span?._obsSpan)
+}
+
+export function startHookSpan(_hookName: string, _eventName: string): Span {
+  const span = startObsSpan('hook')
+  return { _obsSpan: span }
+}
+
+export function endHookSpan(span: Span | undefined): void {
+  endObsSpan(span?._obsSpan)
+}
 
 export function addToolContentEvent(
   _span: Span | undefined,

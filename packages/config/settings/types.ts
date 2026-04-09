@@ -1,13 +1,13 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
-import { SandboxSettingsSchema } from '@cc-app/entrypoints/sandboxTypes.js'
-import { isEnvTruthy } from '@cc-app/utils/envUtils.js'
-import { lazySchema } from '@cc-app/utils/lazySchema.js'
+import { SandboxSettingsSchema } from '@claude-code/app-compat/entrypoints/sandboxTypes.js'
+import { isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
+import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
 import {
   EXTERNAL_PERMISSION_MODES,
   PERMISSION_MODES,
 } from '@claude-code/permission/PermissionMode'
-import { MarketplaceSourceSchema } from '@cc-app/utils/plugins/schemas.js'
+import { MarketplaceSourceSchema } from '@claude-code/app-compat/utils/plugins/schemas.js'
 import { CLAUDE_CODE_SETTINGS_SCHEMA_URL } from './constants.js'
 import { PermissionRuleSchema } from './permissionValidation.js'
 
@@ -23,11 +23,11 @@ export {
   type HooksSettings,
   type HttpHook,
   type PromptHook,
-} from '@cc-app/schemas/hooks.js'
+} from '@claude-code/app-compat/schemas/hooks.js'
 
 // Also import for use within this file
-import { type HookCommand, HooksSchema } from '@cc-app/schemas/hooks.js'
-import { count } from '@cc-app/utils/array.js'
+import { type HookCommand, HooksSchema } from '@claude-code/app-compat/schemas/hooks.js'
+import { count } from '@claude-code/app-compat/utils/array.js'
 
 /**
  * Schema for environment variables

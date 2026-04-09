@@ -49,7 +49,7 @@ const coordinatorModeModule = feature('COORDINATOR_MODE')
 
 let registryHostBindingsInstalled = false
 
-function ensureToolRegistryBindingsInstalled(): void {
+export function installToolRegistryRuntimeBindings(): void {
   if (registryHostBindingsInstalled) return
 
   installToolRegistryHostBindings({
@@ -116,7 +116,7 @@ function ensureToolRegistryBindingsInstalled(): void {
 
 // Install host bindings on module load so any direct
 // @claude-code/tool-registry caller can rely on an initialized runtime.
-ensureToolRegistryBindingsInstalled()
+installToolRegistryRuntimeBindings()
 
 export {
   ALL_AGENT_DISALLOWED_TOOLS,
@@ -130,22 +130,22 @@ export const TOOL_PRESETS = PACKAGE_TOOL_PRESETS
 export type ToolPreset = (typeof TOOL_PRESETS)[number]
 
 export function parseToolPreset(preset: string): ToolPreset | null {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return parseToolPresetFromPackage(preset) as ToolPreset | null
 }
 
 export function getToolsForDefaultPreset(): string[] {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return getToolsForDefaultPresetFromPackage()
 }
 
 export function getToolRegistry() {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return getToolRegistryFromPackage()
 }
 
 export function getAllBaseTools(): Tools {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return getAllBaseToolsFromPackage() as unknown as Tools
 }
 
@@ -155,7 +155,7 @@ export function filterToolsByDenyRules<
     mcpInfo?: { serverName: string; toolName: string }
   },
 >(tools: readonly T[], permissionContext: ToolPermissionContext): T[] {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return filterToolsByDenyRulesFromPackage(
     tools,
     permissionContext as any,
@@ -163,7 +163,7 @@ export function filterToolsByDenyRules<
 }
 
 export function getTools(permissionContext: ToolPermissionContext): Tools {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return getToolsFromPackage(permissionContext as any) as unknown as Tools
 }
 
@@ -171,7 +171,7 @@ export function assembleToolPool(
   permissionContext: ToolPermissionContext,
   mcpTools: Tools,
 ): Tools {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return assembleToolPoolFromPackage(
     permissionContext as any,
     mcpTools as any,
@@ -182,7 +182,7 @@ export function getMergedTools(
   permissionContext: ToolPermissionContext,
   mcpTools: Tools,
 ): Tools {
-  ensureToolRegistryBindingsInstalled()
+  installToolRegistryRuntimeBindings()
   return getMergedToolsFromPackage(
     permissionContext as any,
     mcpTools as any,

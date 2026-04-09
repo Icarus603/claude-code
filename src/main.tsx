@@ -25,8 +25,8 @@ import {
 startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
-import './tools.js'
-import './services/packageHostSetup.js'
+import './runtime/bootstrap.js'
+import '@claude-code/app-host'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,

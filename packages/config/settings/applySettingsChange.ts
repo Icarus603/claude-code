@@ -1,6 +1,6 @@
-import type { AppState } from '@cc-app/state/AppState.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { updateHooksConfigSnapshot } from '@cc-app/utils/hooks/hooksConfigSnapshot.js'
+import type { AppState } from '@claude-code/app-compat/state/AppState.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { updateHooksConfigSnapshot } from '@claude-code/app-compat/utils/hooks/hooksConfigSnapshot.js'
 import {
   createDisabledBypassPermissionsContext,
   findOverlyBroadBashPermissions,
@@ -9,7 +9,7 @@ import {
   transitionPlanAutoMode,
 } from '@claude-code/permission/permissionSetup'
 import { syncPermissionRulesFromDisk } from '@claude-code/permission/permissions'
-import { loadAllPermissionRulesFromDisk } from '@cc-app/utils/permissions/permissionsLoader.js'
+import { loadAllPermissionRulesFromDisk } from '@claude-code/app-compat/utils/permissions/permissionsLoader.js'
 import type { SettingSource } from './constants.js'
 import { getInitialSettings } from './settings.js'
 

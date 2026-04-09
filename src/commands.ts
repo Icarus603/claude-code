@@ -758,7 +758,7 @@ export function formatDescriptionWithSource(cmd: Command): string {
 
 let commandRegistryHostBindingsInstalled = false
 
-function ensureCommandRegistryHostBindingsInstalled(): void {
+export function installCommandRuntimeBindings(): void {
   if (commandRegistryHostBindingsInstalled) {
     return
   }
@@ -780,4 +780,4 @@ function ensureCommandRegistryHostBindingsInstalled(): void {
   commandRegistryHostBindingsInstalled = true
 }
 
-ensureCommandRegistryHostBindingsInstalled()
+installCommandRuntimeBindings()

@@ -133,4 +133,14 @@ const bindings: ProviderHostBindings = {
   },
 }
 
-installProviderHostBindings(bindings)
+let providerHostBindingsInstalled = false
+
+export function installProviderRuntimeBindings(): void {
+  if (providerHostBindingsInstalled) {
+    return
+  }
+  installProviderHostBindings(bindings)
+  providerHostBindingsInstalled = true
+}
+
+installProviderRuntimeBindings()

@@ -1,0 +1,4 @@
+export type { OutputEvent, OutputTarget } from './contracts.js'
+export { JsonOutputTarget } from './targets/json.js'
+export { SilentOutputTarget } from './targets/silent.js'
+export { TerminalOutputTarget } from './targets/terminal.js'

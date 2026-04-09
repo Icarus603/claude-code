@@ -1,17 +1,17 @@
 import { posix } from 'path'
-import type { ToolPermissionContext } from '@cc-app/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/app-compat/Tool.js'
 import type {
   AdditionalWorkingDirectory,
   WorkingDirectorySource,
-} from '@cc-app/types/permissions.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import type { EditableSettingSource } from '@cc-app/utils/settings/constants.js'
+} from '@claude-code/app-compat/types/permissions.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import type { EditableSettingSource } from '@claude-code/app-compat/utils/settings/constants.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@cc-app/utils/settings/settings.js'
-import { jsonStringify } from '@cc-app/utils/slowOperations.js'
-import { addPermissionRulesToSettings } from '@cc-app/utils/permissions/permissionsLoader.js'
+} from '@claude-code/app-compat/utils/settings/settings.js'
+import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+import { addPermissionRulesToSettings } from '@claude-code/app-compat/utils/permissions/permissionsLoader.js'
 import { toPosixPath } from './filesystem.js'
 import type { PermissionRuleValue } from './PermissionRule.js'
 import type {
