@@ -3,8 +3,8 @@
  * Keep selectors pure and simple - just data extraction, no side effects.
  */
 
-import type { InProcessTeammateTaskState } from '../tasks/InProcessTeammateTask/types.js'
-import { isInProcessTeammateTask } from '../tasks/InProcessTeammateTask/types.js'
+import type { InProcessTeammateTaskState } from '@claude-code/swarm'
+import { isInProcessTeammateTask } from '@claude-code/swarm'
 import type { LocalAgentTaskState } from '../tasks/LocalAgentTask/LocalAgentTask.js'
 import type { AppState } from './AppStateStore.js'
 

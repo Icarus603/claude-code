@@ -10,7 +10,7 @@ import {
   createPermissionRequest,
   isSwarmWorker,
   sendPermissionRequestViaMailbox,
-} from '../../../utils/swarm/permissionSync.js'
+} from '@claude-code/swarm'
 import { registerPermissionCallback } from '../../useSwarmPermissionPoller.js'
 import type { PermissionContext } from '../PermissionContext.js'
 import { createResolveOnce } from '../PermissionContext.js'

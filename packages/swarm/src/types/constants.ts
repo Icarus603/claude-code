@@ -1,0 +1,25 @@
+
+export const TEAM_LEAD_NAME = 'team-lead'
+
+export const MAILBOX_POLL_INTERVAL_MS = 500
+
+export const PERMISSION_POLL_INTERVAL_MS = 500
+
+export const TEAMMATE_MESSAGES_UI_CAP = 50
+
+export const LOCK_OPTIONS = {
+  retries: {
+    retries: 10,
+    minTimeout: 5,
+    maxTimeout: 100,
+  },
+}
+
+export const ENV = {
+  TEAM_NAME: 'CLAUDE_CODE_TEAM_NAME',
+  TEAMMATE_NAME: 'CLAUDE_CODE_TEAMMATE_NAME',
+  TEAMMATE_COLOR: 'CLAUDE_CODE_TEAMMATE_COLOR',
+  SESSION_ID: 'CLAUDE_CODE_SESSION_ID',
+  PERMISSION_MODE: 'CLAUDE_CODE_PERMISSION_MODE',
+  TEAM_ALLOWED_PATHS: 'CLAUDE_CODE_TEAM_ALLOWED_PATHS',
+} as const

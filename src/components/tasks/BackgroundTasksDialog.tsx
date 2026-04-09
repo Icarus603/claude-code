@@ -1,5 +1,10 @@
 import { feature } from 'bun:bundle'
 import figures from 'figures'
+import {
+  InProcessTeammateTask,
+  type InProcessTeammateTaskState,
+  TEAM_LEAD_NAME,
+} from '@claude-code/swarm'
 import React, {
   type ReactNode,
   useEffect,
@@ -20,8 +25,6 @@ import {
   DreamTask,
   type DreamTaskState,
 } from 'src/tasks/DreamTask/DreamTask.js'
-import { InProcessTeammateTask } from 'src/tasks/InProcessTeammateTask/InProcessTeammateTask.js'
-import type { InProcessTeammateTaskState } from 'src/tasks/InProcessTeammateTask/types.js'
 import type { LocalAgentTaskState } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { LocalAgentTask } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
@@ -40,7 +43,6 @@ import {
 } from 'src/tasks/types.js'
 import type { DeepImmutable } from 'src/types/utils.js'
 import { intersperse } from 'src/utils/array.js'
-import { TEAM_LEAD_NAME } from 'src/utils/swarm/constants.js'
 import { stopUltraplan } from '../../commands/ultraplan.js'
 import type { CommandResultDisplay } from '../../commands.js'
 import { useRegisterOverlay } from '../../context/overlayContext.js'

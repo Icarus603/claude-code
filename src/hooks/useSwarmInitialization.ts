@@ -12,9 +12,9 @@ import { getSessionId } from '../bootstrap/state.js'
 import type { AppState } from '../state/AppState.js'
 import type { Message } from '../types/message.js'
 import { isAgentSwarmsEnabled } from '../utils/agentSwarmsEnabled.js'
-import { initializeTeammateContextFromSession } from '../utils/swarm/reconnection.js'
-import { readTeamFile } from '../utils/swarm/teamHelpers.js'
-import { initializeTeammateHooks } from '../utils/swarm/teammateInit.js'
+import { initializeTeammateContextFromSession } from '@claude-code/swarm'
+import { readTeamFile } from '@claude-code/swarm'
+import { initializeTeammateHooks } from '@claude-code/swarm'
 import { getDynamicTeamContext } from '../utils/teammate.js'
 
 type SetAppState = (f: (prevState: AppState) => AppState) => void

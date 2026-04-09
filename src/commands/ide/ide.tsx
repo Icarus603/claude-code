@@ -30,7 +30,7 @@ import {
   isSupportedTerminal,
   toIDEDisplayName,
 } from '../../utils/ide.js'
-import { getCurrentWorktreeSession } from '../../utils/worktree.js'
+import { getCurrentWorktreeSession } from '@claude-code/swarm'
 
 type IDEScreenProps = {
   availableIDEs: DetectedIDEInfo[]

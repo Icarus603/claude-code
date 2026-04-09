@@ -18,7 +18,7 @@ import { errorMessage } from '../utils/errors.js'
 import { truncateToWidth } from '../utils/format.js'
 import { logError } from '../utils/log.js'
 import { sleep } from '../utils/sleep.js'
-import { createAgentWorktree, removeAgentWorktree } from '../utils/worktree.js'
+import { createAgentWorktree, removeAgentWorktree } from '@claude-code/swarm'
 import {
   BridgeFatalError,
   createBridgeApiClient,
@@ -149,6 +149,9 @@ export async function runBridgeLoop(
   initialSessionId?: string,
   getAccessToken?: () => string | undefined | Promise<string | undefined>,
 ): Promise<void> {
+  const { installSwarmHost } = await import('../swarm/installSwarmHost.js')
+  installSwarmHost()
+
   // Local abort controller so that onSessionDone can stop the poll loop.
   // Linked to the incoming signal so external aborts also work.
   const controller = new AbortController()
@@ -1977,6 +1980,9 @@ async function fetchSessionTitle(
 }
 
 export async function bridgeMain(args: string[]): Promise<void> {
+  const { installSwarmHost } = await import('../swarm/installSwarmHost.js')
+  installSwarmHost()
+
   const parsed = parseArgs(args)
 
   if (parsed.help) {
@@ -2810,6 +2816,9 @@ export async function runBridgeHeadless(
   opts: HeadlessBridgeOpts,
   signal: AbortSignal,
 ): Promise<void> {
+  const { installSwarmHost } = await import('../swarm/installSwarmHost.js')
+  installSwarmHost()
+
   const { dir, log } = opts
 
   // Worker inherits the supervisor's CWD. chdir first so git utilities

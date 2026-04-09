@@ -15,7 +15,7 @@ import {
   logEvent,
 } from '../../services/eventLogger.js'
 import type { AppState } from '../../state/AppState.js'
-import { isInProcessTeammateTask } from '../../tasks/InProcessTeammateTask/types.js'
+import { isInProcessTeammateTask } from '@claude-code/swarm'
 import {
   isLocalAgentTask,
   type LocalAgentTaskState,
@@ -43,7 +43,7 @@ import {
   evictTaskOutput,
   initTaskOutputAsSymlink,
 } from '../../utils/task/diskOutput.js'
-import { getCurrentWorktreeSession } from '../../utils/worktree.js'
+import { getCurrentWorktreeSession } from '@claude-code/swarm'
 import { clearSessionCaches } from './caches.js'
 
 export async function clearConversation({

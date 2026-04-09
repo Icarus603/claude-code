@@ -11,7 +11,7 @@ import {
   getCurrentWorktreeSession,
   keepWorktree,
   killTmuxSession,
-} from '../utils/worktree.js'
+} from '@claude-code/swarm'
 import { Select } from './CustomSelect/select.js'
 import { Spinner } from './Spinner.js'
 

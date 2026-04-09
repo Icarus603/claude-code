@@ -3,7 +3,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   isTaskAssignment,
   type TaskAssignmentMessage,
-} from '../../utils/teammateMailbox.js'
+} from '@claude-code/swarm'
 
 type Props = {
   assignment: TaskAssignmentMessage

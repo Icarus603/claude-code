@@ -11,12 +11,12 @@ import {
   getAgentColor,
 } from '../../tools/AgentTool/agentColorManager.js'
 import { getStandaloneAgentName } from '../../utils/standaloneAgent.js'
-import { isInsideTmux } from '../../utils/swarm/backends/detection.js'
+import { isInsideTmux } from '@claude-code/swarm'
 import {
   getCachedDetectionResult,
   isInProcessEnabled,
-} from '../../utils/swarm/backends/registry.js'
-import { getSwarmSocketName } from '../../utils/swarm/constants.js'
+} from '@claude-code/swarm'
+import { getSwarmSocketName } from '@claude-code/swarm'
 import {
   getAgentName,
   getTeammateColor,

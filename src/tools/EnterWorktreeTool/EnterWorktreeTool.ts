@@ -15,7 +15,7 @@ import {
   createWorktreeForSession,
   getCurrentWorktreeSession,
   validateWorktreeSlug,
-} from '../../utils/worktree.js'
+} from '@claude-code/swarm'
 import { ENTER_WORKTREE_TOOL_NAME } from './constants.js'
 import { getEnterWorktreeToolPrompt } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'

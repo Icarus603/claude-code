@@ -163,10 +163,10 @@ import {
 import { escapeRegExp } from './stringUtils.js'
 import { isTodoV2Enabled } from './tasks.js'
 
-// Lazy import to avoid circular dependency (teammateMailbox -> teammate -> ... -> messages)
-function getTeammateMailbox(): typeof import('./teammateMailbox.js') {
+// Lazy import to avoid circular dependency while keeping swarm ownership in the package.
+function getTeammateMailbox(): typeof import('@claude-code/swarm') {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require('./teammateMailbox.js')
+  return require('@claude-code/swarm')
 }
 
 import {

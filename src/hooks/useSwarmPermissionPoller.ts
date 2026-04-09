@@ -22,7 +22,7 @@ import {
   type PermissionResponse,
   pollForResponse,
   removeWorkerResponse,
-} from '../utils/swarm/permissionSync.js'
+} from '@claude-code/swarm'
 import { getAgentName, getTeamName } from '../utils/teammate.js'
 
 const POLL_INTERVAL_MS = 500

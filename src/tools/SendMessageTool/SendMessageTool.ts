@@ -4,7 +4,7 @@ import { isReplBridgeActive } from '../../bootstrap/state.js'
 import { getReplBridgeHandle } from '../../bridge/replBridgeHandle.js'
 import type { Tool, ToolUseContext } from '../../Tool.js'
 import { buildTool, type ToolDef } from '../../Tool.js'
-import { findTeammateTaskByAgentId } from '../../tasks/InProcessTeammateTask/InProcessTeammateTask.js'
+import { findTeammateTaskByAgentId } from '@claude-code/swarm'
 import {
   isLocalAgentTask,
   queuePendingMessage,
@@ -21,9 +21,9 @@ import { lazySchema } from '../../utils/lazySchema.js'
 import { parseAddress } from '../../utils/peerAddress.js'
 import { semanticBoolean } from '../../utils/semanticBoolean.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
-import type { BackendType } from '../../utils/swarm/backends/types.js'
-import { TEAM_LEAD_NAME } from '../../utils/swarm/constants.js'
-import { readTeamFileAsync } from '../../utils/swarm/teamHelpers.js'
+import type { BackendType } from '@claude-code/swarm'
+import { TEAM_LEAD_NAME } from '@claude-code/swarm'
+import { readTeamFileAsync } from '@claude-code/swarm'
 import {
   getAgentId,
   getAgentName,
@@ -37,7 +37,7 @@ import {
   createShutdownRejectedMessage,
   createShutdownRequestMessage,
   writeToMailbox,
-} from '../../utils/teammateMailbox.js'
+} from '@claude-code/swarm'
 import { resumeAgentBackground } from '../AgentTool/resumeAgent.js'
 import { SEND_MESSAGE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, getPrompt } from './prompt.js'

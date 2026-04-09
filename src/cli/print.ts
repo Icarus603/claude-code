@@ -344,8 +344,8 @@ import {
   readUnreadMessages,
   markMessagesAsRead,
   isShutdownApproved,
-} from '../utils/teammateMailbox.js'
-import { removeTeammateFromTeamFile } from '../utils/swarm/teamHelpers.js'
+} from '@claude-code/swarm'
+import { removeTeammateFromTeamFile } from '@claude-code/swarm'
 import { unassignTeammateTasks } from '../utils/tasks.js'
 import { getRunningTasks } from '../utils/task/framework.js'
 import { isBackgroundTask } from '../tasks/types.js'

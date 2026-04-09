@@ -5,8 +5,7 @@
  * Used by the Teams UI in the footer to show team status.
  */
 
-import { isPaneBackend, type PaneBackendType } from './swarm/backends/types.js'
-import { readTeamFile } from './swarm/teamHelpers.js'
+import { isPaneBackend, readTeamFile, type PaneBackendType } from '@claude-code/swarm'
 
 export type TeamSummary = {
   name: string

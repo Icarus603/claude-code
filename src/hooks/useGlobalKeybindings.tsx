@@ -59,7 +59,7 @@ export function GlobalKeybindingHandlers({
     setAppState(prev => {
       const { getAllInProcessTeammateTasks } =
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require('../tasks/InProcessTeammateTask/InProcessTeammateTask.js') as typeof import('../tasks/InProcessTeammateTask/InProcessTeammateTask.js')
+        require('@claude-code/swarm') as typeof import('@claude-code/swarm')
       const hasTeammates =
         count(
           getAllInProcessTeammateTasks(prev.tasks),

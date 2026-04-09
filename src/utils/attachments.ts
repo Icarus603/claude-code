@@ -243,7 +243,8 @@ import {
   isShutdownApproved,
   isStructuredProtocolMessage,
   isIdleNotification,
-} from './teammateMailbox.js'
+  removeTeammateFromTeamFile,
+} from '@claude-code/swarm'
 import {
   getAgentName,
   getAgentId,
@@ -251,7 +252,6 @@ import {
   isTeamLead,
 } from './teammate.js'
 import { isInProcessTeammate } from './teammateContext.js'
-import { removeTeammateFromTeamFile } from './swarm/teamHelpers.js'
 import { unassignTeammateTasks } from './tasks.js'
 import { getCompanionIntroAttachment } from '../buddy/prompt.js'
 

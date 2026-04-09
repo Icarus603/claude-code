@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useAppState, useSetAppState } from '../state/AppState.js'
 import { exitTeammateView } from '../state/teammateViewHelpers.js'
-import { isInProcessTeammateTask } from '../tasks/InProcessTeammateTask/types.js'
+import { isInProcessTeammateTask } from '@claude-code/swarm'
 
 /**
  * Auto-exits teammate viewing mode when the viewed teammate

@@ -13,17 +13,17 @@ import {
   parseUserSpecifiedModel,
 } from '../../utils/model/model.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
-import { getResolvedTeammateMode } from '../../utils/swarm/backends/registry.js'
-import { TEAM_LEAD_NAME } from '../../utils/swarm/constants.js'
-import type { TeamFile } from '../../utils/swarm/teamHelpers.js'
+import { getResolvedTeammateMode } from '@claude-code/swarm'
+import { TEAM_LEAD_NAME } from '@claude-code/swarm'
+import type { TeamFile } from '@claude-code/swarm'
 import {
   getTeamFilePath,
   readTeamFile,
   registerTeamForSessionCleanup,
   sanitizeName,
   writeTeamFileAsync,
-} from '../../utils/swarm/teamHelpers.js'
-import { assignTeammateColor } from '../../utils/swarm/teammateLayoutManager.js'
+} from '@claude-code/swarm'
+import { assignTeammateColor } from '@claude-code/swarm'
 import {
   ensureTasksDir,
   resetTaskList,

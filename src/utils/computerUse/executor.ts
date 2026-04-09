@@ -569,10 +569,11 @@ export function createCliExecutor(opts: {
       const input = requireComputerUseInput()
       // On macOS, System Events `keystroke` has two failure modes:
       //   1. Non-ASCII (CJK, emoji): no keyboard mapping → falls back to
-      //      keyCode 0 ('a'), so "你好" types as "aa".
+      //      keyCode 0 ('a'), so a CJK greeting can end up typed as "aa".
       //   2. ASCII with an active CJK IME: letters enter IME composition mode,
       //      and a subsequent space is consumed as "select candidate" instead
-      //      of inserting a space (e.g. "我是 Claude Code" → "我是 ClaudeCode").
+      //      of inserting a space (for example, a CJK sentence plus "Claude Code"
+      //      can lose the expected space before "Code").
       // Clipboard paste bypasses the IME pipeline entirely for both cases.
       // On other platforms there is no IME-vs-keystroke conflict, so only
       // non-ASCII needs the clipboard path there.

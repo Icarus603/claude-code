@@ -73,20 +73,20 @@ import { isEnvTruthy } from '../utils/envUtils.js';
 import { formatTokens, truncateToWidth } from '../utils/format.js';
 import { consumeEarlyInput } from '../utils/earlyInput.js';
 
-import { setMemberActive } from '../utils/swarm/teamHelpers.js';
+import { setMemberActive } from '@claude-code/swarm';
 import {
   isSwarmWorker,
   generateSandboxRequestId,
   sendSandboxPermissionRequestViaMailbox,
   sendSandboxPermissionResponseViaMailbox,
-} from '../utils/swarm/permissionSync.js';
+} from '@claude-code/swarm';
 import { registerSandboxPermissionCallback } from '../hooks/useSwarmPermissionPoller.js';
 import { getTeamName, getAgentName } from '../utils/teammate.js';
 import { WorkerPendingPermission } from '../components/permissions/WorkerPendingPermission.js';
 import {
   injectUserMessageToTeammate,
   getAllInProcessTeammateTasks,
-} from '../tasks/InProcessTeammateTask/InProcessTeammateTask.js';
+} from '@claude-code/swarm';
 import {
   isLocalAgentTask,
   queuePendingMessage,
@@ -98,7 +98,7 @@ import {
   unregisterLeaderToolUseConfirmQueue,
   registerLeaderSetToolPermissionContext,
   unregisterLeaderSetToolPermissionContext,
-} from '../utils/swarm/leaderPermissionBridge.js';
+} from '@claude-code/swarm';
 import { endInteractionSpan } from '../utils/telemetry/sessionTracing.js';
 import { useLogMessages } from '../hooks/useLogMessages.js';
 import { useReplBridge } from '../hooks/useReplBridge.js';
@@ -320,7 +320,7 @@ import {
   exitRestoredWorktree,
 } from '../utils/sessionRestore.js';
 import { isBgSession, updateSessionName, updateSessionActivity } from '../utils/concurrentSessions.js';
-import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '../tasks/InProcessTeammateTask/types.js';
+import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
 import { restoreRemoteAgentTasks } from '../tasks/RemoteAgentTask/RemoteAgentTask.js';
 import { useInboxPoller } from '../hooks/useInboxPoller.js';
 import { getViewedLocalAgentTask } from './repl/backgrounding.js';
@@ -349,7 +349,7 @@ import {
 import { useIDEIntegration } from '../hooks/useIDEIntegration.js';
 import exit from '../commands/exit/index.js';
 import { ExitFlow } from '../components/ExitFlow.js';
-import { getCurrentWorktreeSession } from '../utils/worktree.js';
+import { getCurrentWorktreeSession } from '@claude-code/swarm';
 import {
   popAllEditable,
   enqueue,

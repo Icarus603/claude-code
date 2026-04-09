@@ -3,8 +3,8 @@
  */
 
 import figures from 'figures'
+import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import type { TaskStatus } from 'src/Task.js'
-import type { InProcessTeammateTaskState } from 'src/tasks/InProcessTeammateTask/types.js'
 import { isPanelAgentTask } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { isBackgroundTask, type TaskState } from 'src/tasks/types.js'
 import type { DeepImmutable } from 'src/types/utils.js'
