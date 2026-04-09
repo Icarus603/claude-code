@@ -13,7 +13,8 @@
         "types": ["bun"],
         "paths": {
             "src/*": ["./src/*"],
-            "@cc-app/*": ["./src/*"]
+            "@cc-app/*": ["./src/*"],
+            "@claude-code/app-compat/*": ["./src/*"]
         }
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],

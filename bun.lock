@@ -26,14 +26,18 @@
         "@azure/identity": "^4.13.1",
         "@biomejs/biome": "^2.4.10",
         "@claude-code/agent": "workspace:*",
+        "@claude-code/app-host": "workspace:*",
         "@claude-code/cli": "workspace:*",
         "@claude-code/command-registry": "workspace:*",
         "@claude-code/config": "workspace:*",
+        "@claude-code/local-observability": "workspace:*",
         "@claude-code/mcp-runtime": "workspace:*",
         "@claude-code/memory": "workspace:*",
+        "@claude-code/output": "workspace:*",
         "@claude-code/permission": "workspace:*",
         "@claude-code/provider": "workspace:*",
         "@claude-code/shell": "workspace:*",
+        "@claude-code/storage": "workspace:*",
         "@claude-code/swarm": "workspace:*",
         "@claude-code/tool-registry": "workspace:*",
         "@commander-js/extra-typings": "^14.0.0",
@@ -180,6 +184,10 @@
         "zod": "^4.3.6",
       },
     },
+    "packages/app-host": {
+      "name": "@claude-code/app-host",
+      "version": "0.1.0",
+    },
     "packages/audio-capture-napi": {
       "name": "audio-capture-napi",
       "version": "1.0.0",
@@ -210,6 +218,10 @@
         "sharp": "^0.33.5",
       },
     },
+    "packages/local-observability": {
+      "name": "@claude-code/local-observability",
+      "version": "0.1.0",
+    },
     "packages/mcp-runtime": {
       "name": "@claude-code/mcp-runtime",
       "version": "0.1.0",
@@ -221,6 +233,10 @@
     "packages/modifiers-napi": {
       "name": "modifiers-napi",
       "version": "1.0.0",
+    },
+    "packages/output": {
+      "name": "@claude-code/output",
+      "version": "0.1.0",
     },
     "packages/permission": {
       "name": "@claude-code/permission",
@@ -238,6 +254,10 @@
         "lodash-es": "^4.17.23",
         "tree-kill": "^1.2.2",
       },
+    },
+    "packages/storage": {
+      "name": "@claude-code/storage",
+      "version": "0.1.0",
     },
     "packages/swarm": {
       "name": "@claude-code/swarm",
@@ -405,21 +425,29 @@
 
     "@claude-code/agent": ["@claude-code/agent@workspace:packages/agent"],
 
+    "@claude-code/app-host": ["@claude-code/app-host@workspace:packages/app-host"],
+
     "@claude-code/cli": ["@claude-code/cli@workspace:packages/cli"],
 
     "@claude-code/command-registry": ["@claude-code/command-registry@workspace:packages/command-registry"],
 
     "@claude-code/config": ["@claude-code/config@workspace:packages/config"],
 
+    "@claude-code/local-observability": ["@claude-code/local-observability@workspace:packages/local-observability"],
+
     "@claude-code/mcp-runtime": ["@claude-code/mcp-runtime@workspace:packages/mcp-runtime"],
 
     "@claude-code/memory": ["@claude-code/memory@workspace:packages/memory"],
+
+    "@claude-code/output": ["@claude-code/output@workspace:packages/output"],
 
     "@claude-code/permission": ["@claude-code/permission@workspace:packages/permission"],
 
     "@claude-code/provider": ["@claude-code/provider@workspace:packages/provider"],
 
     "@claude-code/shell": ["@claude-code/shell@workspace:packages/shell"],
+
+    "@claude-code/storage": ["@claude-code/storage@workspace:packages/storage"],
 
     "@claude-code/swarm": ["@claude-code/swarm@workspace:packages/swarm"],
 

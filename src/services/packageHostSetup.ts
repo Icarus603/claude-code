@@ -1,3 +1,4 @@
+import { installHostBindings } from '@claude-code/app-host'
 import { installAgentHostBindings } from '@claude-code/agent'
 import { installCliHostBindings } from '@claude-code/cli'
 import { installConfigHostBindings } from '@claude-code/config'
@@ -10,7 +11,14 @@ import { getCwd } from '../utils/cwd.js'
 
 let packageHostBindingsInstalled = false
 
-export function installPackageHostBindings(): void {
+export type PackageHostBindingInstallers = {
+  installProviderBindings?: () => void
+  installToolRegistryBindings?: () => void
+  installCommandRuntimeBindings?: () => void
+  installMcpRuntimeBindings?: () => void
+}
+
+export function installCorePackageHostBindings(): void {
   if (packageHostBindingsInstalled) {
     return
   }
@@ -43,5 +51,15 @@ export function installPackageHostBindings(): void {
   packageHostBindingsInstalled = true
 }
 
-installPackageHostBindings()
-
+export function installPackageHostBindings(
+  installers: PackageHostBindingInstallers = {},
+): void {
+  installHostBindings({
+    installCorePackageBindings: () => installCorePackageHostBindings(),
+    installProviderBindings: installers.installProviderBindings,
+    installToolRegistryBindings: installers.installToolRegistryBindings,
+    installCommandRuntimeBindings: installers.installCommandRuntimeBindings,
+    installMcpRuntimeBindings: installers.installMcpRuntimeBindings,
+    installCliBindings: () => installCorePackageHostBindings(),
+  })
+}

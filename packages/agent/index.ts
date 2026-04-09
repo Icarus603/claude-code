@@ -3,6 +3,8 @@ export type { AgentHostBindings } from './contracts.js'
 export { getAgentHostBindings, installAgentHostBindings } from './host.js'
 
 export { AgentCore } from './core/AgentCore.js'
+export * from './query.js'
+export * from './QueryEngine.js'
 export {
   fileHistoryEnabled,
   fileHistoryTrackEdit,

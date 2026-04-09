@@ -1,17 +1,17 @@
 import chokidar, { type FSWatcher } from 'chokidar'
 import { stat } from 'fs/promises'
 import * as platformPath from 'path'
-import { getIsRemoteMode } from '@cc-app/bootstrap/state.js'
-import { registerCleanup } from '@cc-app/utils/cleanupRegistry.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { errorMessage } from '@cc-app/utils/errors.js'
+import { getIsRemoteMode } from '@claude-code/app-compat/bootstrap/state.js'
+import { registerCleanup } from '@claude-code/app-compat/utils/cleanupRegistry.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { errorMessage } from '@claude-code/app-compat/utils/errors.js'
 import {
   type ConfigChangeSource,
   executeConfigChangeHooks,
   hasBlockingResult,
-} from '@cc-app/utils/hooks.js'
-import { createSignal } from '@cc-app/utils/signal.js'
-import { jsonStringify } from '@cc-app/utils/slowOperations.js'
+} from '@claude-code/app-compat/utils/hooks.js'
+import { createSignal } from '@claude-code/app-compat/utils/signal.js'
+import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
 import { SETTING_SOURCES, type SettingSource } from './constants.js'
 import { clearInternalWrites, consumeInternalWrite } from './internalWrites.js'
 import { getManagedSettingsDropInDir } from './managedPath.js'

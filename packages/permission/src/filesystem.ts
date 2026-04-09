@@ -10,35 +10,35 @@ import {
   CLAUDE_FOLDER_PERMISSION_PATTERN,
   FILE_EDIT_TOOL_NAME,
   GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN,
-} from '@cc-app/tools/FileEditTool/constants.js'
+} from '@claude-code/app-compat/tools/FileEditTool/constants.js'
 import type { z } from 'zod/v4'
-import { getOriginalCwd, getSessionId } from '@cc-app/bootstrap/state.js'
+import { getOriginalCwd, getSessionId } from '@claude-code/app-compat/bootstrap/state.js'
 import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { AnyObject, Tool, ToolPermissionContext } from '@cc-app/Tool.js'
-import { FILE_READ_TOOL_NAME } from '@cc-app/tools/FileReadTool/prompt.js'
-import { getCwd } from '@cc-app/utils/cwd.js'
-import { getClaudeConfigHomeDir } from '@cc-app/utils/envUtils.js'
+import type { AnyObject, Tool, ToolPermissionContext } from '@claude-code/app-compat/Tool.js'
+import { FILE_READ_TOOL_NAME } from '@claude-code/app-compat/tools/FileReadTool/prompt.js'
+import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
+import { getClaudeConfigHomeDir } from '@claude-code/app-compat/utils/envUtils.js'
 import {
   getFsImplementation,
   getPathsForPermissionCheck,
-} from '@cc-app/utils/fsOperations.js'
+} from '@claude-code/app-compat/utils/fsOperations.js'
 import {
   containsPathTraversal,
   expandPath,
   getDirectoryForPath,
   sanitizePath,
-} from '@cc-app/utils/path.js'
-import { getPlanSlug, getPlansDirectory } from '@cc-app/utils/plans.js'
-import { getPlatform } from '@cc-app/utils/platform.js'
-import { getProjectDir } from '@cc-app/utils/sessionStorage.js'
-import { SETTING_SOURCES } from '@cc-app/utils/settings/constants.js'
+} from '@claude-code/app-compat/utils/path.js'
+import { getPlanSlug, getPlansDirectory } from '@claude-code/app-compat/utils/plans.js'
+import { getPlatform } from '@claude-code/app-compat/utils/platform.js'
+import { getProjectDir } from '@claude-code/app-compat/utils/sessionStorage.js'
+import { SETTING_SOURCES } from '@claude-code/app-compat/utils/settings/constants.js'
 import {
   getSettingsFilePathForSource,
   getSettingsRootPathForSource,
-} from '@cc-app/utils/settings/settings.js'
-import { containsVulnerableUncPath } from '@cc-app/utils/shell/readOnlyCommandValidation.js'
-import { getToolResultsDir } from '@cc-app/utils/toolResultStorage.js'
-import { windowsPathToPosixPath } from '@cc-app/utils/windowsPaths.js'
+} from '@claude-code/app-compat/utils/settings/settings.js'
+import { containsVulnerableUncPath } from '@claude-code/app-compat/utils/shell/readOnlyCommandValidation.js'
+import { getToolResultsDir } from '@claude-code/app-compat/utils/toolResultStorage.js'
+import { windowsPathToPosixPath } from '@claude-code/app-compat/utils/windowsPaths.js'
 import type {
   PermissionDecision,
   PermissionResult,

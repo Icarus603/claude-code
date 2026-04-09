@@ -4,46 +4,46 @@ import { unwatchFile, watchFile } from 'fs'
 import memoize from 'lodash-es/memoize.js'
 import pickBy from 'lodash-es/pickBy.js'
 import { basename, dirname, join, resolve } from 'path'
-import { getOriginalCwd, getSessionTrustAccepted } from '@cc-app/bootstrap/state.js'
+import { getOriginalCwd, getSessionTrustAccepted } from '@claude-code/app-compat/bootstrap/state.js'
 import { getAutoMemEntrypoint } from '@claude-code/memory/paths'
-import { logEvent } from '@cc-app/services/eventLogger.js'
-import type { McpServerConfig } from '@cc-app/services/mcp/types.js'
+import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
+import type { McpServerConfig } from '@claude-code/app-compat/services/mcp/types.js'
 import type {
   BillingType,
   ReferralEligibilityResponse,
-} from '@cc-app/services/oauth/types.js'
-import { getCwd } from '@cc-app/utils/cwd.js'
-import { registerCleanup } from '@cc-app/utils/cleanupRegistry.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { logForDiagnosticsNoPII } from '@cc-app/utils/diagLogs.js'
-import { getGlobalClaudeFile } from '@cc-app/utils/env.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '@cc-app/utils/envUtils.js'
-import { ConfigParseError, getErrnoCode } from '@cc-app/utils/errors.js'
-import { writeFileSyncAndFlush_DEPRECATED } from '@cc-app/utils/file.js'
-import { getFsImplementation } from '@cc-app/utils/fsOperations.js'
-import { findCanonicalGitRoot } from '@cc-app/utils/git.js'
-import { safeParseJSON } from '@cc-app/utils/json.js'
-import { stripBOM } from '@cc-app/utils/jsonRead.js'
-import * as lockfile from '@cc-app/utils/lockfile.js'
-import { logError } from '@cc-app/utils/log.js'
-import type { MemoryType } from '@cc-app/utils/memory/types.js'
-import { normalizePathForConfigKey } from '@cc-app/utils/path.js'
-import { getEssentialTrafficOnlyReason } from '@cc-app/utils/privacyLevel.js'
+} from '@claude-code/app-compat/services/oauth/types.js'
+import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
+import { registerCleanup } from '@claude-code/app-compat/utils/cleanupRegistry.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
+import { getGlobalClaudeFile } from '@claude-code/app-compat/utils/env.js'
+import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
+import { ConfigParseError, getErrnoCode } from '@claude-code/app-compat/utils/errors.js'
+import { writeFileSyncAndFlush_DEPRECATED } from '@claude-code/app-compat/utils/file.js'
+import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
+import { findCanonicalGitRoot } from '@claude-code/app-compat/utils/git.js'
+import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
+import { stripBOM } from '@claude-code/app-compat/utils/jsonRead.js'
+import * as lockfile from '@claude-code/app-compat/utils/lockfile.js'
+import { logError } from '@claude-code/app-compat/utils/log.js'
+import type { MemoryType } from '@claude-code/app-compat/utils/memory/types.js'
+import { normalizePathForConfigKey } from '@claude-code/app-compat/utils/path.js'
+import { getEssentialTrafficOnlyReason } from '@claude-code/app-compat/utils/privacyLevel.js'
 import { getManagedFilePath } from '../settings/managedPath.js'
-import type { ThemeSetting } from '@cc-app/utils/theme.js'
+import type { ThemeSetting } from '@claude-code/app-compat/utils/theme.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const teamMemPaths = feature('TEAMMEM')
   ? (require('@claude-code/memory/teamMemPaths') as typeof import('@claude-code/memory/teamMemPaths'))
   : null
 const ccrAutoConnect = feature('CCR_AUTO_CONNECT')
-  ? (require('@cc-app/bridge/bridgeEnabled.js') as typeof import('@cc-app/bridge/bridgeEnabled.js'))
+  ? (require('@claude-code/app-compat/bridge/bridgeEnabled.js') as typeof import('@claude-code/app-compat/bridge/bridgeEnabled.js'))
   : null
 
 /* eslint-enable @typescript-eslint/no-require-imports */
-import type { ImageDimensions } from '@cc-app/utils/imageResizer.js'
-import type { ModelOption } from '@cc-app/utils/model/modelOptions.js'
-import { jsonParse, jsonStringify } from '@cc-app/utils/slowOperations.js'
+import type { ImageDimensions } from '@claude-code/app-compat/utils/imageResizer.js'
+import type { ModelOption } from '@claude-code/app-compat/utils/model/modelOptions.js'
+import { jsonParse, jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
 
 // Re-entrancy guard: prevents getConfig → logEvent → getGlobalConfig → getConfig
 // infinite recursion when the config file is corrupted. logEvent's sampling check
@@ -267,7 +267,7 @@ export type GlobalConfig = {
   }
 
   // /buddy companion soul — bones regenerated from userId on read. See src/buddy/.
-  companion?: import('@cc-app/buddy/types.js').StoredCompanion
+  companion?: import('@claude-code/app-compat/buddy/types.js').StoredCompanion
   companionMuted?: boolean
 
   // Feedback survey tracking

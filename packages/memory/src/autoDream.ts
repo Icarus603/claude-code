@@ -11,29 +11,29 @@
 // (tests call initAutoDream() in beforeEach for a fresh closure).
 
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
-import type { REPLHookContext } from '@cc-app/utils/hooks/postSamplingHooks.js'
+import type { REPLHookContext } from '@claude-code/app-compat/utils/hooks/postSamplingHooks.js'
 import {
   createCacheSafeParams,
   runForkedAgent,
-} from '@cc-app/utils/forkedAgent.js'
+} from '@claude-code/app-compat/utils/forkedAgent.js'
 import {
   createUserMessage,
   createMemorySavedMessage,
-} from '@cc-app/utils/messages.js'
-import type { Message } from '@cc-app/types/message.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import type { ToolUseContext } from '@cc-app/Tool.js'
-import { logEvent } from '@cc-app/services/eventLogger.js'
+} from '@claude-code/app-compat/utils/messages.js'
+import type { Message } from '@claude-code/app-compat/types/message.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import type { ToolUseContext } from '@claude-code/app-compat/Tool.js'
+import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isAutoMemoryEnabled, getAutoMemPath } from './paths.js'
 import { isAutoDreamEnabled } from './autoDreamConfig.js'
-import { getProjectDir } from '@cc-app/utils/sessionStorage.js'
+import { getProjectDir } from '@claude-code/app-compat/utils/sessionStorage.js'
 import {
   getOriginalCwd,
   getKairosActive,
   getIsRemoteMode,
   getSessionId,
-} from '@cc-app/bootstrap/state.js'
+} from '@claude-code/app-compat/bootstrap/state.js'
 import { createAutoMemCanUseTool } from './extractMemories.js'
 import { buildConsolidationPrompt } from './consolidationPrompt.js'
 import {
@@ -48,9 +48,9 @@ import {
   completeDreamTask,
   failDreamTask,
   isDreamTask,
-} from '@cc-app/tasks/DreamTask/DreamTask.js'
-import { FILE_EDIT_TOOL_NAME } from '@cc-app/tools/FileEditTool/constants.js'
-import { FILE_WRITE_TOOL_NAME } from '@cc-app/tools/FileWriteTool/prompt.js'
+} from '@claude-code/app-compat/tasks/DreamTask/DreamTask.js'
+import { FILE_EDIT_TOOL_NAME } from '@claude-code/app-compat/tools/FileEditTool/constants.js'
+import { FILE_WRITE_TOOL_NAME } from '@claude-code/app-compat/tools/FileWriteTool/prompt.js'
 
 // Scan throttle: when time-gate passes but session-gate doesn't, the lock
 // mtime doesn't advance, so the time-gate keeps passing every turn.

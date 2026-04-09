@@ -12,4 +12,4 @@ export {
   getTaskCompletedHookMessage,
   getTeammateIdleHookMessage,
   getPreToolHookBlockingMessage,
-} from '@cc-app/utils/hooks.js'
+} from '@claude-code/app-compat/utils/hooks.js'

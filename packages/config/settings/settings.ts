@@ -7,22 +7,22 @@ import {
   getFlagSettingsPath,
   getOriginalCwd,
   getUseCoworkPlugins,
-} from '@cc-app/bootstrap/state.js'
+} from '@claude-code/app-compat/bootstrap/state.js'
 import { getRemoteManagedSettingsSyncFromCache } from '../remote/syncCacheState.js'
-import { uniq } from '@cc-app/utils/array.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { logForDiagnosticsNoPII } from '@cc-app/utils/diagLogs.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '@cc-app/utils/envUtils.js'
-import { getErrnoCode, isENOENT } from '@cc-app/utils/errors.js'
-import { writeFileSyncAndFlush_DEPRECATED } from '@cc-app/utils/file.js'
-import { readFileSync } from '@cc-app/utils/fileRead.js'
-import { getFsImplementation, safeResolvePath } from '@cc-app/utils/fsOperations.js'
-import { addFileGlobRuleToGitignore } from '@cc-app/utils/git/gitignore.js'
-import { safeParseJSON } from '@cc-app/utils/json.js'
-import { logError } from '@cc-app/utils/log.js'
-import { getPlatform } from '@cc-app/utils/platform.js'
-import { clone, jsonStringify } from '@cc-app/utils/slowOperations.js'
-import { profileCheckpoint } from '@cc-app/utils/startupProfiler.js'
+import { uniq } from '@claude-code/app-compat/utils/array.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
+import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
+import { getErrnoCode, isENOENT } from '@claude-code/app-compat/utils/errors.js'
+import { writeFileSyncAndFlush_DEPRECATED } from '@claude-code/app-compat/utils/file.js'
+import { readFileSync } from '@claude-code/app-compat/utils/fileRead.js'
+import { getFsImplementation, safeResolvePath } from '@claude-code/app-compat/utils/fsOperations.js'
+import { addFileGlobRuleToGitignore } from '@claude-code/app-compat/utils/git/gitignore.js'
+import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
+import { logError } from '@claude-code/app-compat/utils/log.js'
+import { getPlatform } from '@claude-code/app-compat/utils/platform.js'
+import { clone, jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+import { profileCheckpoint } from '@claude-code/app-compat/utils/startupProfiler.js'
 import {
   type EditableSettingSource,
   getEnabledSettingSources,

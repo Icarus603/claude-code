@@ -3072,7 +3072,7 @@ export async function setupSdkMcpClients(
 
 let mcpRuntimeHostBindingsInstalled = false
 
-function ensureMcpRuntimeHostBindingsInstalled(): void {
+export function installMcpRuntimeBindings(): void {
   if (mcpRuntimeHostBindingsInstalled) {
     return
   }
@@ -3085,4 +3085,4 @@ function ensureMcpRuntimeHostBindingsInstalled(): void {
   mcpRuntimeHostBindingsInstalled = true
 }
 
-ensureMcpRuntimeHostBindingsInstalled()
+installMcpRuntimeBindings()

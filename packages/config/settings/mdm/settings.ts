@@ -19,12 +19,12 @@
  */
 
 import { join } from 'path'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { logForDiagnosticsNoPII } from '@cc-app/utils/diagLogs.js'
-import { readFileSync } from '@cc-app/utils/fileRead.js'
-import { getFsImplementation } from '@cc-app/utils/fsOperations.js'
-import { safeParseJSON } from '@cc-app/utils/json.js'
-import { profileCheckpoint } from '@cc-app/utils/startupProfiler.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
+import { readFileSync } from '@claude-code/app-compat/utils/fileRead.js'
+import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
+import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
+import { profileCheckpoint } from '@claude-code/app-compat/utils/startupProfiler.js'
 import {
   getManagedFilePath,
   getManagedSettingsDropInDir,

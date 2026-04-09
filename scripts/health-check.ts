@@ -137,6 +137,31 @@ async function checkTransitionStubGuard() {
 }
 
 // ---------------------------------------------------------------------------
+// 7. Runtime skeleton guard
+// ---------------------------------------------------------------------------
+async function checkRuntimeSkeletonGuards() {
+  const checks = [
+    'scripts/verify-runtime-boundaries.ts',
+    'scripts/verify-app-host-composition.ts',
+    'scripts/verify-output-targets.ts',
+    'scripts/verify-storage-contracts.ts',
+  ]
+
+  for (const script of checks) {
+    try {
+      const result = await $`bun run ${script} 2>&1`.quiet().nothrow()
+      add(
+        script.replace('scripts/', ''),
+        result.exitCode === 0 ? 'pass' : 'failed',
+        result.exitCode === 0 ? 'ok' : 'error',
+      )
+    } catch {
+      add(script.replace('scripts/', ''), 'failed', 'error')
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Run
 // ---------------------------------------------------------------------------
 console.log("");
@@ -151,6 +176,7 @@ await checkTests();
 await checkUnused();
 await checkBuild();
 await checkTransitionStubGuard();
+await checkRuntimeSkeletonGuards();
 
 console.log("");
 for (const m of metrics) {

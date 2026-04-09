@@ -22,12 +22,12 @@
  */
 
 import { join } from 'path'
-import { getClaudeConfigHomeDir } from '@cc-app/utils/envUtils.js'
-import { readFileSync } from '@cc-app/utils/fileRead.js'
-import { stripBOM } from '@cc-app/utils/jsonRead.js'
+import { getClaudeConfigHomeDir } from '@claude-code/app-compat/utils/envUtils.js'
+import { readFileSync } from '@claude-code/app-compat/utils/fileRead.js'
+import { stripBOM } from '@claude-code/app-compat/utils/jsonRead.js'
 import { resetSettingsCache } from '../settings/settingsCache.js'
 import type { SettingsJson } from '../settings/types.js'
-import { jsonParse } from '@cc-app/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/app-compat/utils/slowOperations.js'
 
 const SETTINGS_FILENAME = 'remote-settings.json'
 

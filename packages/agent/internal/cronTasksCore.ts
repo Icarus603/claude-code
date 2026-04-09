@@ -18,17 +18,17 @@ import {
   getProjectRoot,
   getSessionCronTasks,
   removeSessionCronTasks,
-} from '@cc-app/bootstrap/state.js'
+} from '@claude-code/app-compat/bootstrap/state.js'
 import {
   computeNextCronRun,
   parseCronExpression,
 } from './cronCore.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { isFsInaccessible } from '@cc-app/utils/errors.js'
-import { getFsImplementation } from '@cc-app/utils/fsOperations.js'
-import { safeParseJSON } from '@cc-app/utils/json.js'
-import { logError } from '@cc-app/utils/log.js'
-import { jsonStringify } from '@cc-app/utils/slowOperations.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { isFsInaccessible } from '@claude-code/app-compat/utils/errors.js'
+import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
+import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
+import { logError } from '@claude-code/app-compat/utils/log.js'
+import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
 
 export type CronTask = {
   id: string

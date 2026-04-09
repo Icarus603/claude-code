@@ -15,51 +15,51 @@
 
 import { feature } from 'bun:bundle'
 import { basename } from 'path'
-import { getIsRemoteMode } from '@cc-app/bootstrap/state.js'
-import type { CanUseToolFn } from '@cc-app/hooks/useCanUseTool.js'
+import { getIsRemoteMode } from '@claude-code/app-compat/bootstrap/state.js'
+import type { CanUseToolFn } from '@claude-code/app-compat/hooks/useCanUseTool.js'
 import { ENTRYPOINT_NAME } from './memdir.js'
 import {
   formatMemoryManifest,
   scanMemoryFiles,
-} from '@cc-app/memdir/memoryScan.js'
+} from '@claude-code/app-compat/memdir/memoryScan.js'
 import {
   getAutoMemPath,
   isAutoMemoryEnabled,
   isAutoMemPath,
 } from './paths.js'
-import type { Tool } from '@cc-app/Tool.js'
-import { BASH_TOOL_NAME } from '@cc-app/tools/BashTool/toolName.js'
-import { FILE_EDIT_TOOL_NAME } from '@cc-app/tools/FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from '@cc-app/tools/FileReadTool/prompt.js'
-import { FILE_WRITE_TOOL_NAME } from '@cc-app/tools/FileWriteTool/prompt.js'
-import { GLOB_TOOL_NAME } from '@cc-app/tools/GlobTool/prompt.js'
-import { GREP_TOOL_NAME } from '@cc-app/tools/GrepTool/prompt.js'
-import { REPL_TOOL_NAME } from '@cc-app/tools/REPLTool/constants.js'
+import type { Tool } from '@claude-code/app-compat/Tool.js'
+import { BASH_TOOL_NAME } from '@claude-code/app-compat/tools/BashTool/toolName.js'
+import { FILE_EDIT_TOOL_NAME } from '@claude-code/app-compat/tools/FileEditTool/constants.js'
+import { FILE_READ_TOOL_NAME } from '@claude-code/app-compat/tools/FileReadTool/prompt.js'
+import { FILE_WRITE_TOOL_NAME } from '@claude-code/app-compat/tools/FileWriteTool/prompt.js'
+import { GLOB_TOOL_NAME } from '@claude-code/app-compat/tools/GlobTool/prompt.js'
+import { GREP_TOOL_NAME } from '@claude-code/app-compat/tools/GrepTool/prompt.js'
+import { REPL_TOOL_NAME } from '@claude-code/app-compat/tools/REPLTool/constants.js'
 import type {
   AssistantMessage,
   Message,
   SystemLocalCommandMessage,
   SystemMessage,
-} from '@cc-app/types/message.js'
-import { createAbortController } from '@cc-app/utils/abortController.js'
-import { count, uniq } from '@cc-app/utils/array.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
+} from '@claude-code/app-compat/types/message.js'
+import { createAbortController } from '@claude-code/app-compat/utils/abortController.js'
+import { count, uniq } from '@claude-code/app-compat/utils/array.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
 import {
   createCacheSafeParams,
   runForkedAgent,
-} from '@cc-app/utils/forkedAgent.js'
-import type { REPLHookContext } from '@cc-app/utils/hooks/postSamplingHooks.js'
+} from '@claude-code/app-compat/utils/forkedAgent.js'
+import type { REPLHookContext } from '@claude-code/app-compat/utils/hooks/postSamplingHooks.js'
 import {
   createMemorySavedMessage,
   createUserMessage,
-} from '@cc-app/utils/messages.js'
+} from '@claude-code/app-compat/utils/messages.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logEvent } from '@cc-app/services/eventLogger.js'
-import { sanitizeToolNameForAnalytics } from '@cc-app/services/eventMetadata.js'
+import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
+import { sanitizeToolNameForAnalytics } from '@claude-code/app-compat/services/eventMetadata.js'
 import {
   buildExtractAutoOnlyPrompt,
   buildExtractCombinedPrompt,
-} from '@cc-app/services/extractMemories/prompts.js'
+} from '@claude-code/app-compat/services/extractMemories/prompts.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const teamMemPaths = feature('TEAMMEM')

@@ -15,24 +15,24 @@
 import axios from 'axios'
 import { createHash } from 'crypto'
 import { open, unlink } from 'fs/promises'
-import { getOauthConfig, OAUTH_BETA_HEADER } from '@cc-app/constants/oauth.js'
+import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/app-compat/constants/oauth.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getAnthropicApiKeyWithSource,
   getClaudeAIOAuthTokens,
-} from '@cc-app/utils/auth.js'
-import { registerCleanup } from '@cc-app/utils/cleanupRegistry.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { classifyAxiosError, getErrnoCode } from '@cc-app/utils/errors.js'
+} from '@claude-code/app-compat/utils/auth.js'
+import { registerCleanup } from '@claude-code/app-compat/utils/cleanupRegistry.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { classifyAxiosError, getErrnoCode } from '@claude-code/app-compat/utils/errors.js'
 import { settingsChangeDetector } from '../settings/changeDetector.js'
 import {
   type SettingsJson,
   SettingsSchema,
 } from '../settings/types.js'
-import { sleep } from '@cc-app/utils/sleep.js'
-import { jsonStringify } from '@cc-app/utils/slowOperations.js'
-import { getClaudeCodeUserAgent } from '@cc-app/utils/userAgent.js'
-import { getRetryDelay } from '@cc-app/services/api/withRetry.js'
+import { sleep } from '@claude-code/app-compat/utils/sleep.js'
+import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+import { getClaudeCodeUserAgent } from '@claude-code/app-compat/utils/userAgent.js'
+import { getRetryDelay } from '@claude-code/app-compat/services/api/withRetry.js'
 import {
   checkManagedSettingsSecurity,
   handleSecurityCheckResult,

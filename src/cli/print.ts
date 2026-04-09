@@ -1,7 +1,6 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { feature } from 'bun:bundle'
-import 'src/tools.js'
-import 'src/services/packageHostSetup.js'
+import 'src/runtime/bootstrap.js'
 import { applySettingsChange } from '@claude-code/config/applySettingsChange'
 import { settingsChangeDetector } from '@claude-code/config/changeDetector'
 import {
@@ -111,7 +110,7 @@ import {
 import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
 import { validateUuid } from 'src/utils/uuid.js'
 import { fromArray } from 'src/utils/generators.js'
-import { ask } from 'src/QueryEngine.js'
+import { ask } from '@claude-code/agent/query-engine'
 import type { PermissionPromptTool } from 'src/utils/queryHelpers.js'
 import {
   createFileStateCacheWithSizeLimit,

@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { join } from 'path'
-import { getFsImplementation } from '@cc-app/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
 import { getAutoMemPath, isAutoMemoryEnabled } from './paths.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -8,21 +8,21 @@ const teamMemPaths = feature('TEAMMEM')
   ? (require('./teamMemPaths.js') as typeof import('./teamMemPaths.js'))
   : null
 
-import { getKairosActive, getOriginalCwd } from '@cc-app/bootstrap/state.js'
+import { getKairosActive, getOriginalCwd } from '@claude-code/app-compat/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '@cc-app/services/eventLogger.js'
-import { GREP_TOOL_NAME } from '@cc-app/tools/GrepTool/prompt.js'
-import { isReplModeEnabled } from '@cc-app/tools/REPLTool/constants.js'
-import { logForDebugging } from '@cc-app/utils/debug.js'
-import { hasEmbeddedSearchTools } from '@cc-app/utils/embeddedTools.js'
-import { isEnvTruthy } from '@cc-app/utils/envUtils.js'
-import { formatFileSize } from '@cc-app/utils/format.js'
-import { getProjectDir } from '@cc-app/utils/sessionStorage.js'
-import { getInitialSettings } from '@cc-app/utils/settings/settings.js'
+} from '@claude-code/app-compat/services/eventLogger.js'
+import { GREP_TOOL_NAME } from '@claude-code/app-compat/tools/GrepTool/prompt.js'
+import { isReplModeEnabled } from '@claude-code/app-compat/tools/REPLTool/constants.js'
+import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
+import { hasEmbeddedSearchTools } from '@claude-code/app-compat/utils/embeddedTools.js'
+import { isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
+import { formatFileSize } from '@claude-code/app-compat/utils/format.js'
+import { getProjectDir } from '@claude-code/app-compat/utils/sessionStorage.js'
+import { getInitialSettings } from '@claude-code/app-compat/utils/settings/settings.js'
 import {
   MEMORY_FRONTMATTER_EXAMPLE,
   TRUSTING_RECALL_SECTION,

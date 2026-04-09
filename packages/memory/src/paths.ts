@@ -4,19 +4,19 @@ import { isAbsolute, join, normalize, sep } from 'path'
 import {
   getIsNonInteractiveSession,
   getProjectRoot,
-} from '@cc-app/bootstrap/state.js'
+} from '@claude-code/app-compat/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   getClaudeConfigHomeDir,
   isEnvDefinedFalsy,
   isEnvTruthy,
-} from '@cc-app/utils/envUtils.js'
-import { findCanonicalGitRoot } from '@cc-app/utils/git.js'
-import { sanitizePath } from '@cc-app/utils/path.js'
+} from '@claude-code/app-compat/utils/envUtils.js'
+import { findCanonicalGitRoot } from '@claude-code/app-compat/utils/git.js'
+import { sanitizePath } from '@claude-code/app-compat/utils/path.js'
 import {
   getInitialSettings,
   getSettingsForSource,
-} from '@cc-app/utils/settings/settings.js'
+} from '@claude-code/app-compat/utils/settings/settings.js'
 
 export function isAutoMemoryEnabled(): boolean {
   const envVal = process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY

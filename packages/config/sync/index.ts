@@ -14,33 +14,33 @@ import axios from 'axios'
 import { mkdir, readFile, stat, writeFile } from 'fs/promises'
 import pickBy from 'lodash-es/pickBy.js'
 import { dirname } from 'path'
-import { getIsInteractive } from '@cc-app/bootstrap/state.js'
+import { getIsInteractive } from '@claude-code/app-compat/bootstrap/state.js'
 import {
   CLAUDE_AI_INFERENCE_SCOPE,
   getOauthConfig,
   OAUTH_BETA_HEADER,
-} from '@cc-app/constants/oauth.js'
+} from '@claude-code/app-compat/constants/oauth.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
-} from '@cc-app/utils/auth.js'
-import { clearMemoryFileCaches } from '@cc-app/utils/claudemd.js'
+} from '@claude-code/app-compat/utils/auth.js'
+import { clearMemoryFileCaches } from '@claude-code/app-compat/utils/claudemd.js'
 import { getMemoryPath } from '../global/config.js'
-import { logForDiagnosticsNoPII } from '@cc-app/utils/diagLogs.js'
-import { classifyAxiosError } from '@cc-app/utils/errors.js'
-import { getRepoRemoteHash } from '@cc-app/utils/git.js'
+import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
+import { classifyAxiosError } from '@claude-code/app-compat/utils/errors.js'
+import { getRepoRemoteHash } from '@claude-code/app-compat/utils/git.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from '@cc-app/utils/model/providers.js'
+} from '@claude-code/app-compat/utils/model/providers.js'
 import { markInternalWrite } from '../settings/internalWrites.js'
 import { getSettingsFilePathForSource } from '../settings/settings.js'
 import { resetSettingsCache } from '../settings/settingsCache.js'
-import { sleep } from '@cc-app/utils/sleep.js'
-import { getClaudeCodeUserAgent } from '@cc-app/utils/userAgent.js'
+import { sleep } from '@claude-code/app-compat/utils/sleep.js'
+import { getClaudeCodeUserAgent } from '@claude-code/app-compat/utils/userAgent.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logEvent } from '@cc-app/services/eventLogger.js'
-import { getRetryDelay } from '@cc-app/services/api/withRetry.js'
+import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
+import { getRetryDelay } from '@claude-code/app-compat/services/api/withRetry.js'
 import {
   type SettingsSyncFetchResult,
   type SettingsSyncUploadResult,

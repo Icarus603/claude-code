@@ -1,6 +1,7 @@
 import { readFile } from 'fs/promises'
 import { getCommandRegistryHostBindings } from '@claude-code/command-registry'
 import { getMcpRuntimeHostBindings } from '@claude-code/mcp-runtime'
+import '../src/runtime/bootstrap.js'
 import '../src/commands.js'
 import '../src/services/mcp/client.js'
 
@@ -8,6 +9,8 @@ async function main(): Promise<void> {
   const mainContent = await readFile('./src/main.tsx', 'utf8')
 
   const requiredEntrySeams = [
+    './runtime/bootstrap.js',
+    '@claude-code/app-host',
     '@claude-code/config',
     '@claude-code/cli',
     '@claude-code/tool-registry',
@@ -34,4 +37,3 @@ async function main(): Promise<void> {
 }
 
 await main()
-
