@@ -7,6 +7,7 @@ import {
   type ListToolsResult,
   type Tool,
 } from '@modelcontextprotocol/sdk/types.js'
+import 'src/tools.js'
 import { getDefaultAppState } from 'src/state/AppStateStore.js'
 import review from '../commands/review.js'
 import type { Command } from '../commands.js'
@@ -15,7 +16,7 @@ import {
   getEmptyToolPermissionContext,
   type ToolUseContext,
 } from '../Tool.js'
-import { getTools } from '../tools.js'
+import { getTools } from '@claude-code/tool-registry'
 import { createAbortController } from '../utils/abortController.js'
 import { createFileStateCacheWithSizeLimit } from '../utils/fileStateCache.js'
 import { logError } from '../utils/log.js'

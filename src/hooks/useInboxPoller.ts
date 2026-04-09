@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto'
 import { useCallback, useEffect, useRef } from 'react'
 import { useInterval } from 'usehooks-ts'
+import 'src/tools.js'
 import type { ToolUseConfirm } from '../components/permissions/PermissionRequest.js'
 import { TEAMMATE_MESSAGE_TAG } from '../constants/xml.js'
 import { useTerminalNotification } from '@anthropic/ink'
@@ -13,7 +14,7 @@ import {
 } from '../state/AppState.js'
 import { findToolByName } from '../Tool.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
-import { getAllBaseTools } from '../tools.js'
+import { getAllBaseTools } from '@claude-code/tool-registry'
 import type { PermissionUpdate } from '../types/permissions.js'
 import { logForDebugging } from '../utils/debug.js'
 import {

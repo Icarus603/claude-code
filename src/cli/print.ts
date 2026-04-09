@@ -1,5 +1,6 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { feature } from 'bun:bundle'
+import 'src/tools.js'
 import { applySettingsChange } from '@claude-code/config/applySettingsChange'
 import { settingsChangeDetector } from '@claude-code/config/changeDetector'
 import {

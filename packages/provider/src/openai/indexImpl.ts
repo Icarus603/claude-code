@@ -12,6 +12,17 @@ import {
 } from '../contracts.js'
 import { getProviderHostBindings } from '../host.js'
 import type { ProviderRequestOptions } from '../requestOptions.js'
+import {
+  TOOL_SEARCH_TOOL_NAME,
+  calculateUSDCost,
+  createAssistantAPIErrorMessage,
+  extractDiscoveredToolNames,
+  isDeferredTool,
+  isToolSearchEnabled,
+  normalizeContentFromAPI,
+  normalizeMessagesForAPI,
+  toolToAPISchema,
+} from '../runtimeHelpers.js'
 import { getOpenAIClient } from './client.js'
 import { anthropicMessagesToOpenAI } from './convertMessages.js'
 import {
@@ -34,11 +45,14 @@ export async function* queryModelOpenAI(
   void
 > {
   try {
-    const { runtime } = getProviderHostBindings()
+    const hostBindings = getProviderHostBindings()
+    const logForDebugging =
+      hostBindings.session.logForDebugging ??
+      hostBindings.anthropic.logForDebugging
     const openaiModel = resolveOpenAIModel(options.model)
-    const messagesForAPI = runtime.normalizeMessagesForAPI(messages, tools)
+    const messagesForAPI = normalizeMessagesForAPI(messages, tools)
 
-    const useToolSearch = await runtime.isToolSearchEnabled(
+    const useToolSearch = await isToolSearchEnabled(
       options.model,
       tools,
       options.getToolPermissionContext ||
@@ -50,7 +64,7 @@ export async function* queryModelOpenAI(
     const deferredToolNames = new Set<string>()
     if (useToolSearch) {
       for (const tool of tools) {
-        if (runtime.isDeferredTool(tool)) {
+        if (isDeferredTool(tool)) {
           deferredToolNames.add(tool.name)
         }
       }
@@ -58,17 +72,17 @@ export async function* queryModelOpenAI(
 
     let filteredTools = tools
     if (useToolSearch && deferredToolNames.size > 0) {
-      const discoveredToolNames = runtime.extractDiscoveredToolNames(messages)
+      const discoveredToolNames = extractDiscoveredToolNames(messages)
       filteredTools = tools.filter(tool => {
         if (!deferredToolNames.has(tool.name)) return true
-        if (providerToolMatchesName(tool, runtime.TOOL_SEARCH_TOOL_NAME)) return true
+        if (providerToolMatchesName(tool, TOOL_SEARCH_TOOL_NAME)) return true
         return discoveredToolNames.has(tool.name)
       })
     }
 
     const toolSchemas = await Promise.all(
       filteredTools.map(tool =>
-        runtime.toolToAPISchema(tool, {
+        toolToAPISchema(tool, {
           getToolPermissionContext: options.getToolPermissionContext,
           tools,
           agents: options.agents,
@@ -100,11 +114,11 @@ export async function* queryModelOpenAI(
       const includedDeferredTools = filteredTools.filter(tool =>
         deferredToolNames.has(tool.name),
       ).length
-      runtime.logForDebugging(
+      logForDebugging(
         `[OpenAI] Tool search enabled: ${includedDeferredTools}/${deferredToolNames.size} deferred tools included, total tools=${openaiTools.length}`,
       )
     } else {
-      runtime.logForDebugging(
+      logForDebugging(
         `[OpenAI] Tool search disabled, total tools=${openaiTools.length}`,
       )
     }
@@ -115,7 +129,7 @@ export async function* queryModelOpenAI(
       source: options.querySource,
     })
 
-    runtime.logForDebugging(
+    logForDebugging(
       `[OpenAI] Calling model=${openaiModel}, messages=${openaiMessages.length}, tools=${openaiTools.length}`,
     )
 
@@ -203,7 +217,7 @@ export async function* queryModelOpenAI(
           const message: ProviderAssistantMessage = {
             message: {
               ...partialMessage,
-              content: runtime.normalizeContentFromAPI(
+              content: normalizeContentFromAPI(
                 [block],
                 tools,
                 options.agentId,
@@ -232,8 +246,12 @@ export async function* queryModelOpenAI(
         event.type === 'message_stop' &&
         usage.input_tokens + usage.output_tokens > 0
       ) {
-        const costUSD = runtime.calculateUSDCost(openaiModel, usage as any)
-        runtime.addToTotalSessionCost(costUSD, usage as any, options.model)
+        const costUSD = calculateUSDCost(openaiModel, usage as any)
+        hostBindings.session.addToTotalSessionCost?.(
+          costUSD,
+          usage as any,
+          options.model,
+        )
       }
 
       yield {
@@ -243,12 +261,15 @@ export async function* queryModelOpenAI(
       } as ProviderStreamEvent
     }
   } catch (error) {
-    const { runtime } = getProviderHostBindings()
+    const hostBindings = getProviderHostBindings()
+    const logForDebugging =
+      hostBindings.session.logForDebugging ??
+      hostBindings.anthropic.logForDebugging
     const errorMessage = error instanceof Error ? error.message : String(error)
-    runtime.logForDebugging(`[OpenAI] Error: ${errorMessage}`, {
+    logForDebugging(`[OpenAI] Error: ${errorMessage}`, {
       level: 'error',
     })
-    yield runtime.createAssistantAPIErrorMessage({
+    yield createAssistantAPIErrorMessage({
       content: `API Error: ${errorMessage}`,
       apiError: 'api_error',
       error: (error instanceof Error ? error : new Error(String(error))) as any,

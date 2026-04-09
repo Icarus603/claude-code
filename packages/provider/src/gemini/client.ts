@@ -1,6 +1,6 @@
 import { parseSSEFrames } from '@claude-code/cli'
-import { getProviderHostBindings } from '../host.js'
 import { getProviderNetworkLayer } from '../network.js'
+import { errorMessage } from '../runtimeHelpers.js'
 import type {
   GeminiGenerateContentRequest,
   GeminiStreamChunk,
@@ -74,7 +74,7 @@ export async function* streamGeminiGenerateContent(params: {
           yield JSON.parse(frame.data) as GeminiStreamChunk
         } catch (error) {
           throw new Error(
-            `Failed to parse Gemini SSE payload: ${getProviderHostBindings().runtime.errorMessage(error)}`,
+            `Failed to parse Gemini SSE payload: ${errorMessage(error)}`,
           )
         }
       }
@@ -88,7 +88,7 @@ export async function* streamGeminiGenerateContent(params: {
         yield JSON.parse(frame.data) as GeminiStreamChunk
       } catch (error) {
         throw new Error(
-          `Failed to parse trailing Gemini SSE payload: ${getProviderHostBindings().runtime.errorMessage(error)}`,
+          `Failed to parse trailing Gemini SSE payload: ${errorMessage(error)}`,
         )
       }
     }

@@ -59,6 +59,7 @@ export function getProviderAdapter(
   provider: APIProvider = getProviderHostBindings().getAPIProvider(),
   overrides: ProviderAdapterOverrides = {},
 ): ProviderAdapter {
+  const hostBindings = getProviderHostBindings()
   switch (provider) {
     case 'openai':
       return createAdapter('openai', {
@@ -102,15 +103,17 @@ export function getProviderAdapter(
     case 'foundry':
     case 'firstParty':
     default:
-      if (!overrides.anthropicQueryStream) {
+      if (!overrides.anthropicQueryStream && !hostBindings.anthropic.queryStream) {
         throw new Error(
-          `Provider ${provider} requires an Anthropic query adapter override.`,
+          `Provider ${provider} requires an Anthropic query stream implementation.`,
         )
       }
       return createAdapter(provider, {
         authProvider: anthropicAuthProvider,
-        query: overrides.anthropicQuery,
-        queryStream: overrides.anthropicQueryStream,
+        query: overrides.anthropicQuery ?? hostBindings.anthropic.query,
+        queryStream:
+          overrides.anthropicQueryStream ??
+          (hostBindings.anthropic.queryStream as ProviderAdapter['queryStream']),
       })
   }
 }

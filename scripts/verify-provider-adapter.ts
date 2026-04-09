@@ -1,4 +1,5 @@
 import { getProviderAdapter } from '@claude-code/provider'
+import '../src/services/api/providerHostSetup.js'
 import { getEmptyToolPermissionContext } from '../src/Tool.js'
 import { createUserMessage } from '../src/utils/messages.js'
 import { enableConfigs } from '../src/utils/config.js'
@@ -37,6 +38,53 @@ function createGeminiMockFetch(): typeof fetch {
     ])) as typeof fetch
 }
 
+async function collectAnthropicText(): Promise<string> {
+  const adapter = getProviderAdapter('firstParty', {
+    anthropicQueryStream: async function* () {
+      yield {
+        type: 'assistant',
+        message: {
+          role: 'assistant',
+          content: [{ type: 'text', text: 'provider-anthropic-ok' }],
+        },
+        uuid: 'anthropic-test',
+        timestamp: new Date().toISOString(),
+      } as any
+    },
+  })
+
+  let text = ''
+  for await (const event of adapter.queryStream({
+    messages: [
+      createUserMessage({
+        content: 'verify anthropic',
+      }),
+    ],
+    systemPrompt: asSystemPrompt(['Respond with the verification token only.']),
+    tools: [],
+    signal: AbortSignal.timeout(5_000),
+    thinkingConfig: { type: 'disabled' },
+    options: {
+      getToolPermissionContext: async () => getEmptyToolPermissionContext(),
+      model: 'claude-sonnet-4-6',
+      isNonInteractiveSession: true,
+      querySource: 'repl_main_thread',
+      agents: [],
+      hasAppendSystemPrompt: false,
+      mcpTools: [],
+    },
+  })) {
+    if (event.type === 'assistant') {
+      for (const block of event.message.content) {
+        if (block.type === 'text') {
+          text += block.text
+        }
+      }
+    }
+  }
+  return text
+}
+
 async function collectAssistantText(
   provider: 'openai' | 'gemini',
   fetchOverride: typeof fetch,
@@ -70,6 +118,7 @@ async function collectAssistantText(
       querySource: 'repl_main_thread',
       agents: [],
       hasAppendSystemPrompt: false,
+      mcpTools: [],
       fetchOverride,
     },
   })) {
@@ -92,6 +141,13 @@ async function main(): Promise<void> {
   process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'provider-test'
   process.env.GEMINI_MODEL =
     process.env.GEMINI_MODEL || 'models/gemini-2.5-pro'
+
+  const anthropicText = await collectAnthropicText()
+  if (!anthropicText.includes('provider-anthropic-ok')) {
+    throw new Error(
+      `Anthropic adapter returned unexpected text: ${anthropicText}`,
+    )
+  }
 
   const openaiText = await collectAssistantText(
     'openai',
@@ -120,3 +176,4 @@ async function main(): Promise<void> {
 }
 
 await main()
+process.exit(0)
