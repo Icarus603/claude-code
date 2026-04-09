@@ -1,5 +1,5 @@
 import { expandPastedTextRefs } from '../../history.js';
-import type { PastedContent } from '../../utils/config.js';
+import type { PastedContent } from '@claude-code/config';
 
 export function parseImmediateCommandInput(input: string, pastedContents: Record<number, PastedContent>) {
   const trimmedInput = expandPastedTextRefs(input, pastedContents).trim();

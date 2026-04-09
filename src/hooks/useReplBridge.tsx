@@ -20,7 +20,7 @@ import type {
 } from '../entrypoints/agentSdkTypes.js'
 import type { SDKControlResponse } from '../entrypoints/sdk/controlTypes.js'
 import { Text } from '@anthropic/ink'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   useAppState,
   useAppStateStore,
@@ -42,7 +42,7 @@ import {
   isAutoModeGateEnabled,
   isBypassPermissionsModeDisabled,
   transitionPermissionMode,
-} from '../utils/permissions/permissionSetup.js'
+} from '@claude-code/permission/permissionSetup'
 import { getLeaderToolUseConfirmQueue } from '@claude-code/swarm'
 
 /** How long after a failure before replBridgeEnabled is auto-cleared (stops retries). */

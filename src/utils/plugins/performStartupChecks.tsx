@@ -1,6 +1,6 @@
 import { performBackgroundPluginInstallations } from '../../services/plugins/PluginInstallationManager.js'
 import type { AppState } from '../../state/AppState.js'
-import { checkHasTrustDialogAccepted } from '../config.js'
+import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'
 import {
   clearMarketplacesCache,

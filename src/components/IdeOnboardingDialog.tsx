@@ -2,7 +2,7 @@ import React from 'react'
 import { envDynamic } from 'src/utils/envDynamic.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from '../utils/env.js'
 import {
   getTerminalIdeType,

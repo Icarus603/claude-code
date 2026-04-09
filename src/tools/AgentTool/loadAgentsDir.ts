@@ -31,7 +31,7 @@ import {
 import {
   PERMISSION_MODES,
   type PermissionMode,
-} from '../../utils/permissions/PermissionMode.js'
+} from '@claude-code/permission/PermissionMode'
 import {
   clearPluginAgentCache,
   loadPluginAgents,
@@ -46,7 +46,7 @@ import {
   type AgentColorName,
   setAgentColor,
 } from './agentColorManager.js'
-import { type AgentMemoryScope, loadAgentMemoryPrompt } from './agentMemory.js'
+import { type AgentMemoryScope, loadAgentMemoryPrompt } from '@claude-code/memory/agentMemory'
 import {
   checkAgentMemorySnapshot,
   initializeFromSnapshot,

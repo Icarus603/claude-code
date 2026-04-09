@@ -9,7 +9,7 @@ import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until consumers wire handleKeyDown to <Box onKeyDown>
 import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'
 import type { PromptInputMode } from '../types/textInputTypes.js'
-import type { HistoryEntry } from '../utils/config.js'
+import type { HistoryEntry } from '@claude-code/config'
 
 export function useHistorySearch(
   onAcceptHistory: (entry: HistoryEntry) => void,

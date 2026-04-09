@@ -1,14 +1,14 @@
 import { feature } from 'bun:bundle'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { errorMessage } from '../../../src/utils/errors.js'
-import { getDefaultSonnetModel } from '../../../src/utils/model/model.js'
-import { sideQuery } from '../../../src/utils/sideQuery.js'
-import { jsonParse } from '../../../src/utils/slowOperations.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { errorMessage } from '@cc-app/utils/errors.js'
+import { getDefaultSonnetModel } from '@cc-app/utils/model/model.js'
+import { sideQuery } from '@cc-app/utils/sideQuery.js'
+import { jsonParse } from '@cc-app/utils/slowOperations.js'
 import {
   formatMemoryManifest,
   type MemoryHeader,
   scanMemoryFiles,
-} from '../../../src/memdir/memoryScan.js'
+} from '@cc-app/memdir/memoryScan.js'
 
 export type RelevantMemory = {
   path: string
@@ -66,7 +66,7 @@ export async function findRelevantMemories(
   if (feature('MEMORY_SHAPE_TELEMETRY')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { logMemoryRecallShape } =
-      require('../../../src/memdir/memoryShapeTelemetry.js') as typeof import('./memoryShapeTelemetry.js')
+      require('@cc-app/memdir/memoryShapeTelemetry.js') as typeof import('./memoryShapeTelemetry.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     logMemoryRecallShape(memories, selected)
   }

@@ -4,8 +4,8 @@ import type {
   PermissionRule,
   PermissionRuleSource,
   PermissionRuleValue,
-} from '../../../src/types/permissions.js'
-import { lazySchema } from '../../../src/utils/lazySchema.js'
+} from '@cc-app/types/permissions.js'
+import { lazySchema } from '@cc-app/utils/lazySchema.js'
 
 export type {
   PermissionBehavior,

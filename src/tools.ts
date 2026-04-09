@@ -35,7 +35,7 @@ import { SYNTHETIC_OUTPUT_TOOL_NAME } from './tools/SyntheticOutputTool/Syntheti
 import { TaskStopTool } from './tools/TaskStopTool/TaskStopTool.js'
 import { ListMcpResourcesTool } from './tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
 import { isEnvTruthy } from './utils/envUtils.js'
-import { getDenyRuleForTool } from './utils/permissions/permissions.js'
+import { getDenyRuleForTool } from '@claude-code/permission/permissions'
 
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const REPLTool =

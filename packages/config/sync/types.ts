@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod/v4'
-import { lazySchema } from '../../../src/utils/lazySchema.js'
+import { lazySchema } from '@cc-app/utils/lazySchema.js'
 
 /**
  * Content portion of user sync data - flat key-value storage.

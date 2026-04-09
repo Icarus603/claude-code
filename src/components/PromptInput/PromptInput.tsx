@@ -55,13 +55,13 @@ import {
   type HistoryMode,
   useArrowKeyHistory,
 } from '../../hooks/useArrowKeyHistory.js'
-import { useDoublePress } from '../../hooks/useDoublePress.js'
+import { useDoublePress } from '@anthropic/ink'
 import { useHistorySearch } from '../../hooks/useHistorySearch.js'
 import type { IDESelection } from '../../hooks/useIdeSelection.js'
 import { useInputBuffer } from '../../hooks/useInputBuffer.js'
 import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { usePromptSuggestion } from '../../hooks/usePromptSuggestion.js'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { useTypeahead } from '../../hooks/useTypeahead.js'
 import { Box, type BorderTextOptions, type ClickEvent, type Key, stringWidth, Text, useInput } from '@anthropic/ink'
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
@@ -117,7 +117,7 @@ import {
   getGlobalConfig,
   type PastedContent,
   saveGlobalConfig,
-} from '../../utils/config.js'
+} from '@claude-code/config'
 import { logForDebugging } from '../../utils/debug.js'
 import {
   parseDirectMemberMessage,
@@ -156,7 +156,7 @@ import {
   cyclePermissionMode,
   getNextPermissionMode,
 } from '../../utils/permissions/getNextPermissionMode.js'
-import { transitionPermissionMode } from '../../utils/permissions/permissionSetup.js'
+import { transitionPermissionMode } from '@claude-code/permission/permissionSetup'
 import { getPlatform } from '../../utils/platform.js'
 import type { ProcessUserInputContext } from '../../utils/processUserInput/processUserInput.js'
 import { editPromptInEditor } from '../../utils/promptEditor.js'

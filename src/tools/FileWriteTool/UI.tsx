@@ -11,7 +11,7 @@ import { FileEditToolUpdatedMessage } from '../../components/FileEditToolUpdated
 import { FileEditToolUseRejectedMessage } from '../../components/FileEditToolUseRejectedMessage.js'
 
 import { HighlightedCode } from '../../components/HighlightedCode.js'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { FilePathLink } from '../../components/FilePathLink.js'
 import type { ToolProgressData } from '../../Tool.js'

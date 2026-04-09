@@ -16,7 +16,7 @@ import { hasNodeOption } from "../../utils/envUtils.js";
 import { getIsGit, getWorktreeCount } from "../../utils/git.js";
 import { getInitialSettings } from "../../utils/settings/settings.js";
 import { getGhAuthStatus } from "../../utils/github/ghAuthStatus.js";
-import { isAutoUpdaterDisabled } from "../../utils/config.js";
+import { isAutoUpdaterDisabled } from "@claude-code/config";
 import { isAnalyticsDisabled } from "../../services/privacyConfig.js";
 import {
 	logEvent,

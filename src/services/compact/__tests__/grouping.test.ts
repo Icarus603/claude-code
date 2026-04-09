@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { groupMessagesByApiRound } from "../grouping";
+import { groupMessagesByApiRound } from "@claude-code/agent/compaction";
 
 function makeMsg(type: "user" | "assistant" | "system", id: string): any {
   return {

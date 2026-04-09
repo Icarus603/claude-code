@@ -1,7 +1,7 @@
 import { describe, test, expect, mock } from 'bun:test'
 import { AgentCore } from '../core/AgentCore.js'
-import { createProductionDeps } from '../../../src/agent/createDeps.js'
-import { getEmptyToolPermissionContext, type ToolUseContext, type Tools } from '../../../src/Tool.js'
+import { createProductionDeps } from '@cc-app/agent/createDeps.js'
+import { getEmptyToolPermissionContext, type ToolUseContext, type Tools } from '@cc-app/Tool.js'
 
 describe('AgentCore production wiring', () => {
   test('runs through src/agent production adapters for tools and permissions', async () => {

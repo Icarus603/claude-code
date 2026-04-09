@@ -2,7 +2,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '../services/eventLogger.js'
-import { saveGlobalConfig } from '../utils/config.js'
+import { saveGlobalConfig } from '@claude-code/config'
 import { isLegacyModelRemapEnabled } from '../utils/model/model.js'
 import { getAPIProvider } from '../utils/model/providers.js'
 import {

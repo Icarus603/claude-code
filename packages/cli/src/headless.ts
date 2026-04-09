@@ -1,33 +1,33 @@
 import { feature } from 'bun:bundle'
-import { runHeadless as runHeadlessImpl } from '../../../src/cli/print.js'
-import type { Command } from '../../../src/commands.js'
-import type { SDKStatus } from '../../../src/entrypoints/agentSdkTypes.js'
+import { runHeadless as runHeadlessImpl } from '@cc-app/cli/print.js'
+import type { Command } from '@cc-app/commands.js'
+import type { SDKStatus } from '@cc-app/entrypoints/agentSdkTypes.js'
 import type {
   MCPServerConnection,
   McpCommand,
   McpSdkServerConfig,
-} from '../../../src/services/mcp/types.js'
-import type { AppState } from '../../../src/state/AppStateStore.js'
-import { getDefaultAppState } from '../../../src/state/AppStateStore.js'
-import { onChangeAppState } from '../../../src/state/onChangeAppState.js'
-import { createStore } from '../../../src/state/store.js'
-import type { AgentDefinition } from '../../../src/tools/AgentTool/loadAgentsDir.js'
+} from '@cc-app/services/mcp/types.js'
+import type { AppState } from '@cc-app/state/AppStateStore.js'
+import { getDefaultAppState } from '@cc-app/state/AppStateStore.js'
+import { onChangeAppState } from '@cc-app/state/onChangeAppState.js'
+import { createStore } from '@cc-app/state/store.js'
+import type { AgentDefinition } from '@cc-app/tools/AgentTool/loadAgentsDir.js'
 import type {
   Tool,
   ToolPermissionContext,
   Tools,
-} from '../../../src/Tool.js'
+} from '@cc-app/Tool.js'
 import {
   parseEffortValue,
   toPersistableEffort,
-} from '../../../src/utils/effort.js'
+} from '@cc-app/utils/effort.js'
 import {
   getFastModeUnavailableReason,
   isFastModeEnabled,
   isFastModeSupportedByModel,
-} from '../../../src/utils/fastMode.js'
-import { getInitialSettings } from '../../../src/utils/settings/settings.js'
-import type { ThinkingConfig } from '../../../src/utils/thinking.js'
+} from '@cc-app/utils/fastMode.js'
+import { getInitialSettings } from '@cc-app/utils/settings/settings.js'
+import type { ThinkingConfig } from '@cc-app/utils/thinking.js'
 
 export type HeadlessStoreParams = {
   mcpClients: MCPServerConnection[]
@@ -68,7 +68,7 @@ export type HeadlessRunOptions = {
   workload: string | undefined
   setupTrigger?: 'init' | 'maintenance' | undefined
   sessionStartHooksPromise?: ReturnType<
-    typeof import('../../../src/utils/sessionStart.js').processSessionStartHooks
+    typeof import('@cc-app/utils/sessionStart.js').processSessionStartHooks
   >
   setSDKStatus?: (status: SDKStatus) => void
 }

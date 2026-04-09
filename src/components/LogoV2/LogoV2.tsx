@@ -1,7 +1,7 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import * as React from 'react'
 import { Box, Text, color, stringWidth } from '@anthropic/ink'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import {
   getLayoutMode,
   calculateLayoutDimensions,
@@ -22,7 +22,7 @@ import {
   createProjectOnboardingFeed,
   createGuestPassesFeed,
 } from './feedConfigs.js'
-import { getGlobalConfig, saveGlobalConfig } from 'src/utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { resolveThemeSetting } from 'src/utils/systemTheme.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
 import {

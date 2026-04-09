@@ -1,6 +1,6 @@
 import { isRemoteManagedSettingsEligible } from '../services/remoteManagedSettings/syncCache.js'
 import { clearCACertsCache } from './caCerts.js'
-import { getGlobalConfig } from './config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from './envUtils.js'
 import {
   isProviderManagedEnvVar,

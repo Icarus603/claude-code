@@ -46,7 +46,7 @@ import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
   saveGlobalConfig,
-} from './config.js'
+} from '@claude-code/config'
 import { logAntError, logForDebugging } from './debug.js'
 import {
   getClaudeConfigHomeDir,

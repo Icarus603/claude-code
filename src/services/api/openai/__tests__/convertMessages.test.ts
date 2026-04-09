@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { anthropicMessagesToOpenAI } from '../convertMessages.js'
+import { anthropicMessagesToOpenAI } from '@claude-code/provider'
 import type { UserMessage, AssistantMessage } from '../../../../types/message.js'
 
 // Helpers to create internal-format messages

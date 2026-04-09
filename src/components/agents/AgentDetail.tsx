@@ -4,7 +4,7 @@ import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { Tools } from '../../Tool.js'
 import { getAgentColor } from '../../tools/AgentTool/agentColorManager.js'
-import { getMemoryScopeDisplay } from '../../tools/AgentTool/agentMemory.js'
+import { getMemoryScopeDisplay } from '@claude-code/memory/agentMemory'
 import { resolveAgentTools } from '../../tools/AgentTool/agentToolUtils.js'
 import {
   type AgentDefinition,

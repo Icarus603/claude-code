@@ -9,7 +9,7 @@ import { expandPath, getDirectoryForPath } from '../../../utils/path.js'
 import {
   normalizeCaseForComparison,
   pathInAllowedWorkingPath,
-} from '../../../utils/permissions/filesystem.js'
+} from '@claude-code/permission/filesystem'
 import type { OptionWithDescription } from '../../CustomSelect/select.js'
 /**
  * Check if a path is within the project's .claude/ folder.

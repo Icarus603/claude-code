@@ -18,7 +18,7 @@ import { useRegisterOverlay } from '../context/overlayContext.js'
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useAppState, useSetAppState } from '../state/AppState.js'
-import { saveGlobalConfig } from '../utils/config.js'
+import { saveGlobalConfig } from '@claude-code/config'
 import { getBranch } from '../utils/git.js'
 import { Dialog } from '@anthropic/ink'
 

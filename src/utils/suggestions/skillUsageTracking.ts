@@ -1,4 +1,4 @@
-import { getGlobalConfig, saveGlobalConfig } from '../config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 
 const SKILL_USAGE_DEBOUNCE_MS = 60_000
 

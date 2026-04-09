@@ -5,7 +5,7 @@ import {
 } from '../../buddy/companion.js'
 import { type StoredCompanion, RARITY_STARS } from '../../buddy/types.js'
 import { renderSprite } from '../../buddy/sprites.js'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { triggerCompanionReaction } from '../../buddy/companionReact.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type {

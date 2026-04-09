@@ -1,6 +1,6 @@
 import { logEvent } from 'src/services/eventLogger.js'
 import { isProSubscriber } from '../utils/auth.js'
-import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getAPIProvider } from '../utils/model/providers.js'
 import { getSettings_DEPRECATED } from '../utils/settings/settings.js'
 

@@ -26,7 +26,7 @@ import {
   checkGate_CACHED_OR_BLOCKING,
   initializeGrowthBook,
   resetGrowthBook,
-} from './services/featureFlags.js'
+} from '@claude-code/config/feature-flags'
 import { isQualifiedForGrove } from './services/api/grove.js'
 import { handleMcpjsonServerApprovals } from './services/mcpServerApproval.js'
 import { AppStateProvider } from './state/AppState.js'
@@ -42,13 +42,13 @@ import {
   getCustomApiKeyStatus,
   getGlobalConfig,
   saveGlobalConfig,
-} from './utils/config.js'
+} from '@claude-code/config'
 import { updateDeepLinkTerminalPreference } from './utils/deepLink/terminalPreference.js'
 import { isEnvTruthy, isRunningOnHomespace } from './utils/envUtils.js'
 import { type FpsMetrics, FpsTracker } from './utils/fpsTracker.js'
 import { updateGithubRepoPathMapping } from './utils/githubRepoPathMapping.js'
 import { applyConfigEnvironmentVariables } from './utils/managedEnv.js'
-import type { PermissionMode } from './utils/permissions/PermissionMode.js'
+import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { getBaseRenderOptions } from './utils/renderOptions.js'
 import { getSettingsWithAllErrors } from './utils/settings/allErrors.js'
 import {

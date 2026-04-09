@@ -17,7 +17,7 @@ import {
 } from '../../constants/prompts.js'
 import { isCoordinatorMode } from '../../coordinator/coordinatorMode.js'
 import { startAgentSummarization } from '../../services/AgentSummary/agentSummary.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -62,12 +62,12 @@ import {
   normalizeMessages,
 } from '../../utils/messages.js'
 import { getAgentModel } from '../../utils/model/agent.js'
-import { permissionModeSchema } from '../../utils/permissions/PermissionMode.js'
-import type { PermissionResult } from '../../utils/permissions/PermissionResult.js'
+import { permissionModeSchema } from '@claude-code/permission/PermissionMode'
+import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import {
   filterDeniedAgents,
   getDenyRuleForAgent,
-} from '../../utils/permissions/permissions.js'
+} from '@claude-code/permission/permissions'
 import { enqueueSdkEvent } from '../../utils/sdkEventQueue.js'
 import { writeAgentMetadata } from '../../utils/sessionStorage.js'
 import { sleep } from '../../utils/sleep.js'

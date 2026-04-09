@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Suspense, useState } from 'react'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import {
   useIsInsideModal,
   useModalOrTerminalSize,

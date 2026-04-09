@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { ScopedMcpServerConfig } from '../services/mcp/types.js'
-import { getGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { isEnvDefinedFalsy, isEnvTruthy } from '../utils/envUtils.js'
 import type { DetectedIDEInfo } from '../utils/ide.js'
 import {

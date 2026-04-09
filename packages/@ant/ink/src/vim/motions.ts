@@ -1,4 +1,4 @@
-import type { Cursor } from '../../../../../src/utils/Cursor.js'
+import type { Cursor } from '@cc-app/utils/Cursor.js'
 
 export function resolveMotion(
   key: string,

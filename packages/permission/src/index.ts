@@ -1,3 +1,9 @@
+export type { PermissionHostBindings } from './contracts.js'
+export {
+  getPermissionHostBindings,
+  installPermissionHostBindings,
+} from './host.js'
+
 export * from './permissions.js'
 export * from './permissionSetup.js'
 export * from './PermissionMode.js'

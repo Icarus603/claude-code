@@ -12,7 +12,7 @@ import {
   MAX_TOOL_RESULT_BYTES,
   MAX_TOOL_RESULTS_PER_MESSAGE_CHARS,
 } from '../constants/toolLimits.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '../services/eventLogger.js'
 import { sanitizeToolNameForAnalytics } from '../services/eventMetadata.js'
 import type { Message } from '../types/message.js'

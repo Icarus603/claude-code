@@ -7,7 +7,7 @@ import {
 } from 'src/services/eventLogger.js'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
 import type { Message } from '../../types/message.js'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '../../utils/envUtils.js'
 import { getLastAssistantMessage } from '../../utils/messages.js'
 import { getMainLoopModel } from '../../utils/model/model.js'

@@ -3,7 +3,7 @@ import { mock, describe, expect, test } from "bun:test";
 mock.module("src/utils/slowOperations.js", () => ({
   jsonStringify: (v: unknown) => JSON.stringify(v),
 }));
-mock.module("src/services/featureFlags.js", () => ({
+mock.module("@claude-code/config/feature-flags", () => ({
   getFeatureValue_CACHED_MAY_BE_STALE: () => false,
 }));
 

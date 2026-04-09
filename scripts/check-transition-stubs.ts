@@ -5,97 +5,7 @@ import { join, relative, sep } from "path";
 
 const ROOT = new URL("../", import.meta.url).pathname;
 const SRC_ROOT = join(ROOT, "src");
-
-const ALLOWED_SRC_STUB_DIRS = new Set([
-	"src",
-	"src/bootstrap/src",
-	"src/bridge/src",
-	"src/cli/src",
-	"src/cli/transports/src",
-	"src/commands/compact/src",
-	"src/commands/ide/src",
-	"src/commands/install-github-app/src",
-	"src/commands/plugin/src",
-	"src/commands/src",
-	"src/commands/terminalSetup/src",
-	"src/components/FeedbackSurvey/src",
-	"src/components/HelpV2/src",
-	"src/components/LogoV2/src",
-	"src/components/PromptInput/src",
-	"src/components/Settings/src",
-	"src/components/StructuredDiff/src",
-	"src/components/TrustDialog/src",
-	"src/components/agents/new-agent-creation/wizard-steps/src",
-	"src/components/agents/src",
-	"src/components/grove/src",
-	"src/components/hooks/src",
-	"src/components/mcp/src",
-	"src/components/messages/UserToolResultMessage/src",
-	"src/components/messages/src",
-	"src/components/permissions/ExitPlanModePermissionRequest/src",
-	"src/components/permissions/FileEditPermissionRequest/src",
-	"src/components/permissions/FilePermissionDialog/src",
-	"src/components/permissions/SedEditPermissionRequest/src",
-	"src/components/permissions/SkillPermissionRequest/src",
-	"src/components/permissions/rules/src",
-	"src/components/permissions/src",
-	"src/components/src",
-	"src/components/tasks/src",
-	"src/constants/src",
-	"src/context/src",
-	"src/entrypoints/src",
-	"src/hooks/notifs/src",
-	"src/hooks/src",
-	"src/hooks/toolPermission/handlers/src",
-	"src/hooks/toolPermission/src",
-	"src/keybindings/src",
-	"src/migrations/src",
-	"src/schemas/src",
-	"src/screens/src",
-	"src/services/analytics/src",
-	"src/services/api/src",
-	"src/services/compact/src",
-	"src/services/mcp/src",
-	"src/services/oauth/src",
-	"src/services/src",
-	"src/services/tips/src",
-	"src/services/tools/src",
-	"src/skills/bundled/src",
-	"src/state/src",
-	"src/tools/AgentTool/built-in/src",
-	"src/tools/AgentTool/src",
-	"src/tools/AskUserQuestionTool/src",
-	"src/tools/BashTool/src",
-	"src/tools/EnterPlanModeTool/src",
-	"src/tools/ExitPlanModeTool/src",
-	"src/tools/FileEditTool/src",
-	"src/tools/FileReadTool/src",
-	"src/tools/FileWriteTool/src",
-	"src/tools/GlobTool/src",
-	"src/tools/NotebookEditTool/src",
-	"src/tools/PowerShellTool/src",
-	"src/tools/SkillTool/src",
-	"src/tools/WebSearchTool/src",
-	"src/tools/src",
-	"src/types/src",
-	"src/utils/background/remote/src",
-	"src/utils/bash/src",
-	"src/utils/deepLink/src",
-	"src/utils/hooks/src",
-	"src/utils/messages/src",
-	"src/utils/model/src",
-	"src/utils/nativeInstaller/src",
-	"src/utils/permissions/src",
-	"src/utils/plugins/src",
-	"src/utils/processUserInput/src",
-	"src/utils/sandbox/src",
-	"src/utils/secureStorage/src",
-	"src/utils/settings/src",
-	"src/utils/src",
-	"src/utils/suggestions/src",
-	"src/utils/telemetry/src",
-	"src/utils/teleport/src",
-]);
+const TYPE_ANY_PATTERN = /export type [A-Za-z0-9_$]+ = any;?/m;
 
 function walkDirectories(root: string, results: string[]) {
 	for (const entry of readdirSync(root, { withFileTypes: true })) {
@@ -107,7 +17,7 @@ function walkDirectories(root: string, results: string[]) {
 	}
 }
 
-function collectSrcStubDirs(): string[] {
+function collectNestedSrcStubDirs(): string[] {
 	const directories: string[] = [];
 	walkDirectories(SRC_ROOT, directories);
 	return directories
@@ -116,9 +26,9 @@ function collectSrcStubDirs(): string[] {
 		.sort();
 }
 
-function collectTypeAnyStubFiles(): string[] {
+function collectTypeAnyStubFiles(scanRoot: string): string[] {
 	const directories: string[] = [];
-	walkDirectories(SRC_ROOT, directories);
+	walkDirectories(scanRoot, directories);
 	const suspectFiles: string[] = [];
 
 	for (const directory of directories) {
@@ -127,7 +37,7 @@ function collectTypeAnyStubFiles(): string[] {
 			if (!entry.name.endsWith(".ts") && !entry.name.endsWith(".tsx")) continue;
 			const fullPath = join(directory, entry.name);
 			const content = readFileSync(fullPath, "utf8");
-			if (/export type [A-Za-z0-9_$]+ = any;?/m.test(content)) {
+			if (TYPE_ANY_PATTERN.test(content)) {
 				suspectFiles.push(relative(ROOT, fullPath).replaceAll(sep, "/"));
 			}
 		}
@@ -136,20 +46,26 @@ function collectTypeAnyStubFiles(): string[] {
 	return suspectFiles.sort();
 }
 
-const discoveredStubDirs = collectSrcStubDirs();
-const newStubDirs = discoveredStubDirs.filter((dir) => !ALLOWED_SRC_STUB_DIRS.has(dir));
-const typeAnyStubFiles = collectTypeAnyStubFiles();
+const discoveredStubDirs = collectNestedSrcStubDirs();
+const typeAnyStubFiles = collectTypeAnyStubFiles(ROOT);
 
 console.log("Transition stub directories:", discoveredStubDirs.length);
 console.log("Type-any transition stubs:", typeAnyStubFiles.length);
 
-if (newStubDirs.length > 0) {
-	console.error("\nUnexpected src/*/src directories detected:");
-	for (const dir of newStubDirs) {
-		console.error(`  - ${dir}`);
+if (discoveredStubDirs.length > 0 || typeAnyStubFiles.length > 0) {
+	if (discoveredStubDirs.length > 0) {
+		console.error("\nRemaining transition src/*/src directories:");
+		for (const dir of discoveredStubDirs) {
+			console.error(`  - ${dir}`);
+		}
+	}
+	if (typeAnyStubFiles.length > 0) {
+		console.error("\nRemaining type-any transition stubs:");
+		for (const file of typeAnyStubFiles) {
+			console.error(`  - ${file}`);
+		}
 	}
 	process.exit(1);
 }
 
-console.log("No new src/*/src directories detected.");
-console.log("Current type-any transition stubs are inventory only; avoid adding more in Phase 0.");
+console.log("Transition stub check passed: 0 directories, 0 type-any stubs.");

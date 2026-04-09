@@ -15,18 +15,18 @@ import {
   getIsNonInteractiveSession,
   getOriginalCwd,
   getSessionId,
-} from 'src/bootstrap/state.js'
-import { logEvent } from 'src/services/eventLogger.js'
-import { notifyVscodeFileUpdated } from 'src/services/mcp/vscodeSdkMcp.js'
-import type { LogOption } from 'src/types/logs.js'
+} from '@cc-app/bootstrap/state.js'
+import { logEvent } from '@cc-app/services/eventLogger.js'
+import { notifyVscodeFileUpdated } from '@cc-app/services/mcp/vscodeSdkMcp.js'
+import type { LogOption } from '@cc-app/types/logs.js'
 import { inspect } from 'util'
-import { getGlobalConfig } from '../../../src/utils/config.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '../../../src/utils/envUtils.js'
-import { getErrnoCode, isENOENT } from '../../../src/utils/errors.js'
-import { pathExists } from '../../../src/utils/file.js'
-import { logError } from '../../../src/utils/log.js'
-import { recordFileHistorySnapshot } from '../../../src/utils/sessionStorage.js'
+import { getGlobalConfig } from '@claude-code/config'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { getClaudeConfigHomeDir, isEnvTruthy } from '@cc-app/utils/envUtils.js'
+import { getErrnoCode, isENOENT } from '@cc-app/utils/errors.js'
+import { pathExists } from '@cc-app/utils/file.js'
+import { logError } from '@cc-app/utils/log.js'
+import { recordFileHistorySnapshot } from '@cc-app/utils/sessionStorage.js'
 
 type BackupFileName = string | null // The null value means the file does not exist in this version
 

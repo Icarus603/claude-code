@@ -4,13 +4,13 @@ import {
   executeExtractMemories,
   isExtractModeActive,
 } from '@claude-code/memory'
-import { getShortcutDisplay } from '../../../src/keybindings/shortcutFormat.js'
+import { getShortcutDisplay } from '@cc-app/keybindings/shortcutFormat.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../../src/services/eventLogger.js'
-import type { ToolUseContext } from '../../../src/Tool.js'
-import type { HookProgress } from '../../../src/types/hooks.js'
+} from '@cc-app/services/eventLogger.js'
+import type { ToolUseContext } from '@cc-app/Tool.js'
+import type { HookProgress } from '@cc-app/types/hooks.js'
 import type {
   AssistantMessage,
   Message,
@@ -19,11 +19,11 @@ import type {
   StreamEvent,
   TombstoneMessage,
   ToolUseSummaryMessage,
-} from '../../../src/types/message.js'
-import { createAttachmentMessage } from '../../../src/utils/attachments.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { errorMessage } from '../../../src/utils/errors.js'
-import type { REPLHookContext } from '../../../src/utils/hooks/postSamplingHooks.js'
+} from '@cc-app/types/message.js'
+import { createAttachmentMessage } from '@cc-app/utils/attachments.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { errorMessage } from '@cc-app/utils/errors.js'
+import type { REPLHookContext } from '@cc-app/utils/hooks/postSamplingHooks.js'
 import {
   executeStopHooks,
   executeTaskCompletedHooks,
@@ -31,31 +31,31 @@ import {
   getStopHookMessage,
   getTaskCompletedHookMessage,
   getTeammateIdleHookMessage,
-} from '../../../src/utils/hooks.js'
+} from '@cc-app/utils/hooks.js'
 import {
   createStopHookSummaryMessage,
   createSystemMessage,
   createUserInterruptionMessage,
   createUserMessage,
-} from '../../../src/utils/messages.js'
-import type { SystemPrompt } from '../../../src/utils/systemPromptType.js'
-import { getTaskListId, listTasks } from '../../../src/utils/tasks.js'
-import { getAgentName, getTeamName, isTeammate } from '../../../src/utils/teammate.js'
+} from '@cc-app/utils/messages.js'
+import type { SystemPrompt } from '@cc-app/utils/systemPromptType.js'
+import { getTaskListId, listTasks } from '@cc-app/utils/tasks.js'
+import { getAgentName, getTeamName, isTeammate } from '@cc-app/utils/teammate.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const jobClassifierModule = feature('TEMPLATES')
-  ? (require('../../../src/jobs/classifier.js') as typeof import('../../../src/jobs/classifier.js'))
+  ? (require('@cc-app/jobs/classifier.js') as typeof import('@cc-app/jobs/classifier.js'))
   : null
 
 /* eslint-enable @typescript-eslint/no-require-imports */
 
-import type { QuerySource } from '../../../src/constants/querySource.js'
-import { executePromptSuggestion } from '../../../src/services/PromptSuggestion/promptSuggestion.js'
-import { isBareMode, isEnvDefinedFalsy } from '../../../src/utils/envUtils.js'
+import type { QuerySource } from '@cc-app/constants/querySource.js'
+import { executePromptSuggestion } from '@cc-app/services/PromptSuggestion/promptSuggestion.js'
+import { isBareMode, isEnvDefinedFalsy } from '@cc-app/utils/envUtils.js'
 import {
   createCacheSafeParams,
   saveCacheSafeParams,
-} from '../../../src/utils/forkedAgent.js'
+} from '@cc-app/utils/forkedAgent.js'
 
 type StopHookResult = {
   blockingErrors: Message[]
@@ -164,7 +164,7 @@ export async function* handleStopHooks(
   if (feature('CHICAGO_MCP') && !toolUseContext.agentId) {
     try {
       const { cleanupComputerUseAfterTurn } = await import(
-        '../../../src/utils/computerUse/cleanup.js'
+        '@cc-app/utils/computerUse/cleanup.js'
       )
       await cleanupComputerUseAfterTurn(toolUseContext)
     } catch {

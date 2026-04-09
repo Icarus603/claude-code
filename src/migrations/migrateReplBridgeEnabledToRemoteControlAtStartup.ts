@@ -1,4 +1,4 @@
-import { saveGlobalConfig } from '../utils/config.js'
+import { saveGlobalConfig } from '@claude-code/config'
 
 /**
  * Migrate the `replBridgeEnabled` config key to `remoteControlAtStartup`.

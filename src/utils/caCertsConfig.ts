@@ -13,7 +13,7 @@
  * env var at CLI startup. Only `init.ts` imports this file.
  */
 
-import { getGlobalConfig } from './config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from './debug.js'
 import { getSettingsForSource } from './settings/settings.js'
 

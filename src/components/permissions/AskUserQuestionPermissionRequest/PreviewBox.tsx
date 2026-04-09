@@ -1,6 +1,6 @@
 import React, { Suspense, use, useMemo } from 'react'
 import { useSettings } from '../../../hooks/useSettings.js'
-import { useTerminalSize } from '../../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, Box, Text, stringWidth, useTheme } from '@anthropic/ink'
 import {
   type CliHighlight,

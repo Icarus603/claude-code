@@ -1,6 +1,6 @@
 import type { CoordinateMode, CuSubGates } from '@ant/computer-use-mcp/types'
 
-import { getDynamicConfig_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { getDynamicConfig_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getSubscriptionType } from '../auth.js'
 import { isEnvTruthy } from '../envUtils.js'
 

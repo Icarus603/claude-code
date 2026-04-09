@@ -4,7 +4,7 @@ import {
   logEvent,
 } from 'src/services/eventLogger.js'
 import { installOAuthTokens } from '../cli/handlers/auth.js'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { setClipboard, useTerminalNotification, Box, Link, Text, KeyboardShortcutHint } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getSSLErrorHint } from '../services/api/errorUtils.js'

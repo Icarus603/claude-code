@@ -18,7 +18,7 @@ import {
 } from '../bootstrap/state.js'
 import { useNotifications } from '../context/notifications.js'
 import { useAppState } from '../state/AppState.js'
-import { saveGlobalConfig } from '../utils/config.js'
+import { saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../utils/debug.js'
 import { logError } from '../utils/log.js'
 import {

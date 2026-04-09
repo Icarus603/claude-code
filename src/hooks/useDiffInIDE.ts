@@ -16,7 +16,7 @@ import {
   getEditsForPatch,
   getPatchForEdits,
 } from '../tools/FileEditTool/utils.js'
-import { getGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { getPatchFromContents } from '../utils/diff.js'
 import { isENOENT } from '../utils/errors.js'
 import {

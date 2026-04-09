@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { getFeatureValue_CACHED_WITH_REFRESH } from '../services/featureFlags.js'
+import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature-flags'
 import { lazySchema } from '../utils/lazySchema.js'
 import {
   DEFAULT_POLL_CONFIG,

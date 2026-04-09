@@ -27,8 +27,8 @@ export type OptionWithDescription<T = string> = {
   description?: string
 }
 
-export type ToolUseConfirm = any
-export type ToolPermissionContext = any
+export type ToolUseConfirm = unknown;
+export type ToolPermissionContext = unknown;
 
 export let Select = missingBinding('Select') as React.ComponentType<any>
 export let Spinner = missingBinding('Spinner') as React.ComponentType<any>

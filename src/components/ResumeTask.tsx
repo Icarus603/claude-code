@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { useTerminalSize } from 'src/hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import {
   type CodeSession,
   fetchCodeSessionsFromSessionsAPI,

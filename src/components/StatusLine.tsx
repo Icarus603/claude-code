@@ -3,7 +3,7 @@ import * as React from 'react'
 import { memo, useCallback, useEffect, useRef } from 'react'
 import { logEvent } from 'src/services/eventLogger.js'
 import { useAppState, useSetAppState } from 'src/state/AppState.js'
-import type { PermissionMode } from 'src/utils/permissions/PermissionMode.js'
+import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import {
   getIsRemoteMode,
   getKairosActive,
@@ -30,7 +30,7 @@ import { getRawUtilization } from '../services/claudeAiLimits.js'
 import type { Message } from '../types/message.js'
 import type { StatusLineCommandInput } from '../types/statusLine.js'
 import type { VimMode } from '../types/textInputTypes.js'
-import { checkHasTrustDialogAccepted } from '../utils/config.js'
+import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import {
   calculateContextPercentages,
   getContextWindowForModel,

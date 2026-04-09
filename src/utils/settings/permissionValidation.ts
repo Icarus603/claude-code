@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 import { mcpInfoFromString } from '../../services/mcp/mcpStringUtils.js'
 import { lazySchema } from '../lazySchema.js'
-import { permissionRuleValueFromString } from '../permissions/permissionRuleParser.js'
+import { permissionRuleValueFromString } from '@claude-code/permission/permissionRuleParser'
 import { capitalize } from '../stringUtils.js'
 import {
   getCustomValidation,

@@ -42,7 +42,7 @@ function isTextBlock(block: ContentBlockParam): block is TextBlockParam {
 }
 
 import * as path from 'path'
-import { useTerminalSize } from 'src/hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import type { FileEditOutput } from 'src/tools/FileEditTool/types.js'
 import type { Output as FileWriteToolOutput } from 'src/tools/FileWriteTool/FileWriteTool.js'
 import {

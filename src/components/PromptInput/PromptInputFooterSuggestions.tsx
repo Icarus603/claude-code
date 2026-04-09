@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { memo, type ReactNode } from 'react'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
 import { truncatePathMiddle, truncateToWidth } from '../../utils/format.js'
 import type { Theme } from '../../utils/theme.js'

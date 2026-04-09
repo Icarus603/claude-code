@@ -11,8 +11,8 @@ import type {
   SwiftBackend, WindowDisplayInfo,
 } from '../types.js'
 
-import { listWindows } from 'src/utils/computerUse/win32/windowEnum.js'
-import { captureWindow, captureWindowByHwnd } from 'src/utils/computerUse/win32/windowCapture.js'
+import { listWindows } from '@cc-app/utils/computerUse/win32/windowEnum.js'
+import { captureWindow, captureWindowByHwnd } from '@cc-app/utils/computerUse/win32/windowCapture.js'
 
 // ---------------------------------------------------------------------------
 // PowerShell helper

@@ -12,11 +12,11 @@ import React, {
 } from 'react'
 import stripAnsi from 'strip-ansi'
 import type { CommandResultDisplay } from '../commands.js'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow stats navigation
 import { Ansi, applyColor, Box, Text, useInput, stringWidth as getStringWidth, type Color, Pane, Tab, Tabs, useTabHeaderFocus } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { getGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { formatDuration, formatNumber } from '../utils/format.js'
 import { generateHeatmap } from '../utils/heatmap.js'
 import { renderModelName } from '../utils/model/model.js'

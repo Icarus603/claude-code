@@ -1,13 +1,13 @@
 import { feature } from 'bun:bundle'
 import z from 'zod/v4'
-import { PAUSE_ICON } from '../../../src/constants/figures.js'
+import { PAUSE_ICON } from '@cc-app/constants/figures.js'
 import {
   EXTERNAL_PERMISSION_MODES,
   type ExternalPermissionMode,
   PERMISSION_MODES,
   type PermissionMode,
-} from '../../../src/types/permissions.js'
-import { lazySchema } from '../../../src/utils/lazySchema.js'
+} from '@cc-app/types/permissions.js'
+import { lazySchema } from '@cc-app/utils/lazySchema.js'
 
 export {
   EXTERNAL_PERMISSION_MODES,

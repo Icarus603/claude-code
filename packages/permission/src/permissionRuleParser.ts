@@ -1,13 +1,13 @@
 import { feature } from 'bun:bundle'
-import { AGENT_TOOL_NAME } from '../../../src/tools/AgentTool/constants.js'
-import { TASK_OUTPUT_TOOL_NAME } from '../../../src/tools/TaskOutputTool/constants.js'
-import { TASK_STOP_TOOL_NAME } from '../../../src/tools/TaskStopTool/prompt.js'
+import { AGENT_TOOL_NAME } from '@cc-app/tools/AgentTool/constants.js'
+import { TASK_OUTPUT_TOOL_NAME } from '@cc-app/tools/TaskOutputTool/constants.js'
+import { TASK_STOP_TOOL_NAME } from '@cc-app/tools/TaskStopTool/prompt.js'
 import type { PermissionRuleValue } from './PermissionRule.js'
 
 const BRIEF_TOOL_NAME: string | null =
   feature('KAIROS') || feature('KAIROS_BRIEF')
     ? (
-        require('../../../src/tools/BriefTool/prompt.js') as typeof import('../../../src/tools/BriefTool/prompt.js')
+        require('@cc-app/tools/BriefTool/prompt.js') as typeof import('@cc-app/tools/BriefTool/prompt.js')
       ).BRIEF_TOOL_NAME
     : null
 

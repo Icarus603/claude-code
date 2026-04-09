@@ -13,8 +13,8 @@ import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import {
   applyPermissionUpdate,
   persistPermissionUpdate,
-} from '../../utils/permissions/PermissionUpdate.js'
-import type { PermissionUpdateDestination } from '../../utils/permissions/PermissionUpdateSchema.js'
+} from '@claude-code/permission/PermissionUpdate'
+import type { PermissionUpdateDestination } from '@claude-code/permission/PermissionUpdateSchema'
 import { SandboxManager } from '../../utils/sandbox/sandbox-adapter.js'
 import {
   addDirHelpMessage,

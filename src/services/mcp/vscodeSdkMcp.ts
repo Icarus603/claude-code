@@ -4,7 +4,7 @@ import { lazySchema } from '../../utils/lazySchema.js'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
-} from '../featureFlags.js'
+} from '@claude-code/config/feature-flags'
 import { logEvent } from '../eventLogger.js'
 import type { ConnectedMCPServer, MCPServerConnection } from './types.js'
 

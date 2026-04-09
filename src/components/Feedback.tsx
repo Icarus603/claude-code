@@ -13,7 +13,7 @@ import {
   normalizeMessagesForAPI,
 } from 'src/utils/messages.js'
 import type { CommandResultDisplay } from '../commands.js'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { queryHaiku } from '../services/api/claude.js'

@@ -11,12 +11,12 @@ import type {
 } from '../../types/permissions.js'
 import { getCwd } from '../../utils/cwd.js'
 import { isCurrentDirectoryBareGitRepo } from '../../utils/git.js'
-import type { PermissionRule } from '../../utils/permissions/PermissionRule.js'
-import type { PermissionUpdate } from '../../utils/permissions/PermissionUpdateSchema.js'
+import type { PermissionRule } from '@claude-code/permission/PermissionRule'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {
   createPermissionRequestMessage,
   getRuleByContentsForToolName,
-} from '../../utils/permissions/permissions.js'
+} from '@claude-code/permission/permissions'
 import {
   matchWildcardPattern,
   parsePermissionRule,

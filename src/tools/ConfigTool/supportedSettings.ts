@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import { getRemoteControlAtStartup } from '../../utils/config.js'
+import { getRemoteControlAtStartup } from '@claude-code/config'
 import {
   EDITOR_MODES,
   NOTIFICATION_CHANNELS,

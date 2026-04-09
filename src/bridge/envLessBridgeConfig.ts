@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { getFeatureValue_DEPRECATED } from '../services/featureFlags.js'
+import { getFeatureValue_DEPRECATED } from '@claude-code/config/feature-flags'
 import { lazySchema } from '../utils/lazySchema.js'
 import { lt } from '../utils/semver.js'
 import { isEnvLessBridgeEnabled } from './bridgeEnabled.js'

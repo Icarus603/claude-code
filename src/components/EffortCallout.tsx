@@ -5,7 +5,7 @@ import {
   isProSubscriber,
   isTeamSubscriber,
 } from '../utils/auth.js'
-import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import type { EffortLevel } from '../utils/effort.js'
 import {
   convertEffortValueToLevel,

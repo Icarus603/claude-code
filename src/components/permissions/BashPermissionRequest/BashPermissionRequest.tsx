@@ -3,7 +3,7 @@ import figures from 'figures'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Text, useTheme } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -25,8 +25,8 @@ import {
   getBashPromptAllowDescriptions,
   isClassifierPermissionsEnabled,
 } from '../../../utils/permissions/bashClassifier.js'
-import { extractRules } from '../../../utils/permissions/PermissionUpdate.js'
-import type { PermissionUpdate } from '../../../utils/permissions/PermissionUpdateSchema.js'
+import { extractRules } from '@claude-code/permission/PermissionUpdate'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { SandboxManager } from '../../../utils/sandbox/sandbox-adapter.js'
 import { Select } from '../../CustomSelect/select.js'
 import { ShimmerChar } from '../../Spinner/ShimmerChar.js'

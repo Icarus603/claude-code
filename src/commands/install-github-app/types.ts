@@ -1,4 +1,4 @@
 // Auto-generated stub — replace with real implementation
-export type Workflow = any;
-export type State = any;
-export type Warning = any;
+export type Workflow = unknown;
+export type State = unknown;
+export type Warning = unknown;

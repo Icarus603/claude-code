@@ -7,7 +7,7 @@ import { expandPath } from '../../utils/path.js'
 import {
   allWorkingDirectories,
   pathInWorkingPath,
-} from '../../utils/permissions/filesystem.js'
+} from '@claude-code/permission/filesystem'
 
 export type AddDirectoryResult =
   | {

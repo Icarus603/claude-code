@@ -13,7 +13,7 @@ import type {
   QueuedCommand,
   QueuePriority,
 } from '../types/textInputTypes.js'
-import type { PastedContent } from './config.js'
+import type { PastedContent } from '@claude-code/config'
 import { extractTextContent } from './messages.js'
 import { objectGroupBy } from './objectGroupBy.js'
 import { recordQueueOperation } from './sessionStorage.js'

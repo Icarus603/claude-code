@@ -11,14 +11,14 @@
 import { mkdir, readFile, unlink, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import { z } from 'zod/v4'
-import { getProjectRoot, getSessionId } from '../../../src/bootstrap/state.js'
-import { registerCleanup } from '../../../src/utils/cleanupRegistry.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { getErrnoCode } from '../../../src/utils/errors.js'
-import { isProcessRunning } from '../../../src/utils/genericProcessUtils.js'
-import { safeParseJSON } from '../../../src/utils/json.js'
-import { lazySchema } from '../../../src/utils/lazySchema.js'
-import { jsonStringify } from '../../../src/utils/slowOperations.js'
+import { getProjectRoot, getSessionId } from '@cc-app/bootstrap/state.js'
+import { registerCleanup } from '@cc-app/utils/cleanupRegistry.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { getErrnoCode } from '@cc-app/utils/errors.js'
+import { isProcessRunning } from '@cc-app/utils/genericProcessUtils.js'
+import { safeParseJSON } from '@cc-app/utils/json.js'
+import { lazySchema } from '@cc-app/utils/lazySchema.js'
+import { jsonStringify } from '@cc-app/utils/slowOperations.js'
 
 const LOCK_FILE_REL = join('.claude', 'scheduled_tasks.lock')
 

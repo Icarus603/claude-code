@@ -3,7 +3,7 @@ import type {
   AssistantMessage,
   UserMessage,
 } from '../../../../types/message.js'
-import { anthropicMessagesToGemini } from '../convertMessages.js'
+import { anthropicMessagesToGemini } from '@claude-code/provider'
 
 function makeUserMsg(content: string | any[]): UserMessage {
   return {

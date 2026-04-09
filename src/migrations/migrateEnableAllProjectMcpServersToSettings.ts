@@ -2,7 +2,7 @@ import { logEvent } from 'src/services/eventLogger.js'
 import {
   getCurrentProjectConfig,
   saveCurrentProjectConfig,
-} from '../utils/config.js'
+} from '@claude-code/config'
 import { logError } from '../utils/log.js'
 import {
   getSettingsForSource,

@@ -1,5 +1,5 @@
 import { logEvent } from 'src/services/eventLogger.js'
-import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logError } from '../utils/log.js'
 import {
   hasSkipDangerousModePermissionPrompt,

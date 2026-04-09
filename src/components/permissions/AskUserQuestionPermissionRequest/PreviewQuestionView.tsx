@@ -1,6 +1,6 @@
 import figures from 'figures'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
-import { useTerminalSize } from '../../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import {
   useKeybinding,

@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, afterEach } from 'bun:test'
-import { resolveOpenAIModel } from '../modelMapping.js'
+import { resolveOpenAIModel } from '@claude-code/provider'
 
 describe('resolveOpenAIModel', () => {
   const originalEnv = {

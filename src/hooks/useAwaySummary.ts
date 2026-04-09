@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { useEffect, useRef } from 'react'
 import { getTerminalFocusState, subscribeTerminalFocus } from '@anthropic/ink'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { generateAwaySummary } from '../services/awaySummary.js'
 import type { Message } from '../types/message.js'
 import { createAwaySummaryMessage } from '../utils/messages.js'

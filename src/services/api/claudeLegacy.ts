@@ -65,7 +65,7 @@ import {
   getModelBetas,
   sanitizeBetaHeaders,
 } from '../../utils/betas.js'
-import { getOrCreateUserID } from '../../utils/config.js'
+import { getOrCreateUserID } from '@claude-code/config'
 import {
   CAPPED_DEFAULT_MAX_TOKENS,
   getModelMaxOutputTokens,
@@ -97,7 +97,7 @@ import {
   type SystemPrompt,
 } from '../../utils/systemPromptType.js'
 import { tokenCountFromLastAPIResponse } from '../../utils/tokens.js'
-import { getDynamicConfig_BLOCKS_ON_INIT } from '../featureFlags.js'
+import { getDynamicConfig_BLOCKS_ON_INIT } from '@claude-code/config/feature-flags'
 import {
   currentLimits,
   extractQuotaStatusFromError,
@@ -148,7 +148,7 @@ import {
 import type { QuerySource } from 'src/constants/querySource.js'
 import type { Notification } from 'src/context/notifications.js'
 import { addToTotalSessionCost } from 'src/cost-tracker.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { AgentId } from 'src/types/ids.js'
 import {
   ADVISOR_TOOL_INSTRUCTIONS,

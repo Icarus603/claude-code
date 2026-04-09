@@ -23,10 +23,10 @@ import {
   checkReadableInternalPath,
   matchingRuleForInput,
   pathInAllowedWorkingPath,
-} from '../../utils/permissions/filesystem.js'
-import type { PermissionResult } from '../../utils/permissions/PermissionResult.js'
-import { createReadRuleSuggestion } from '../../utils/permissions/PermissionUpdate.js'
-import type { PermissionUpdate } from '../../utils/permissions/PermissionUpdateSchema.js'
+} from '@claude-code/permission/filesystem'
+import type { PermissionResult } from '@claude-code/permission/PermissionResult'
+import { createReadRuleSuggestion } from '@claude-code/permission/PermissionUpdate'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {
   isDangerousRemovalPath,
   isPathInSandboxWriteAllowlist,
@@ -53,7 +53,7 @@ type FileOperationType = 'read' | 'write' | 'create'
 
 type PathCheckResult = {
   allowed: boolean
-  decisionReason?: import('../../utils/permissions/PermissionResult.js').PermissionDecisionReason
+  decisionReason?: import('@claude-code/permission/PermissionResult').PermissionDecisionReason
 }
 
 type ResolvedPathCheckResult = PathCheckResult & {

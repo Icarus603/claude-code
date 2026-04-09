@@ -25,7 +25,7 @@ import {
   permissionModeSymbol,
   permissionModeTitle,
   getModeColor,
-} from '../../utils/permissions/PermissionMode.js'
+} from '@claude-code/permission/PermissionMode'
 import { BackgroundTaskStatus } from '../tasks/BackgroundTaskStatus.js'
 import { isBackgroundTask } from '../../tasks/types.js'
 import { isPanelAgentTask } from '../../tasks/LocalAgentTask/LocalAgentTask.js'
@@ -40,7 +40,7 @@ import { getIsRemoteMode } from '../../bootstrap/state.js'
 import HistorySearchInput from './HistorySearchInput.js'
 import { usePrStatus } from '../../hooks/usePrStatus.js'
 import { Byline, KeyboardShortcutHint } from '@anthropic/ink'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { useTasksV2 } from '../../hooks/useTasksV2.js'
 import { formatDuration } from '../../utils/format.js'
 import { VoiceWarmupHint } from './VoiceIndicator.js'
@@ -48,7 +48,7 @@ import { useVoiceEnabled } from '../../hooks/useVoiceEnabled.js'
 import { useVoiceState } from '../../context/voice.js'
 import { isFullscreenEnvEnabled } from '../../utils/fullscreen.js'
 import { isXtermJs, useHasSelection, useSelection } from '@anthropic/ink'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getPlatform } from '../../utils/platform.js'
 import { PrBadge } from '../PrBadge.js'
 

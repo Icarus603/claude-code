@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useMemo,
 } from 'react'
-import { saveCurrentProjectConfig } from '../utils/config.js'
+import { saveCurrentProjectConfig } from '@claude-code/config'
 
 export type StatsStore = {
   increment(name: string, value?: number): void

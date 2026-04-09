@@ -1,7 +1,7 @@
 import { lstat, realpath } from 'fs/promises'
 import { dirname, join, resolve, sep } from 'path'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../../src/services/featureFlags.js'
-import { getErrnoCode } from '../../../src/utils/errors.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { getErrnoCode } from '@cc-app/utils/errors.js'
 import { getAutoMemPath, isAutoMemoryEnabled } from './paths.js'
 
 export class PathTraversalError extends Error {

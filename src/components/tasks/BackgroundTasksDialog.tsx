@@ -14,7 +14,7 @@ import React, {
   useState,
 } from 'react'
 import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
-import { useTerminalSize } from 'src/hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { useAppState, useSetAppState } from 'src/state/AppState.js'
 import {
   enterTeammateView,

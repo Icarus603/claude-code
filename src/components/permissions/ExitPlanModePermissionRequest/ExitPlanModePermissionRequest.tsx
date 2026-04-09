@@ -58,13 +58,13 @@ import {
 import {
   type PermissionMode,
   toExternalPermissionMode,
-} from '../../../utils/permissions/PermissionMode.js'
-import type { PermissionUpdate } from '../../../utils/permissions/PermissionUpdateSchema.js'
+} from '@claude-code/permission/PermissionMode'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {
   isAutoModeGateEnabled,
   restoreDangerousPermissions,
   stripDangerousPermissionsForAutoMode,
-} from '../../../utils/permissions/permissionSetup.js'
+} from '@claude-code/permission/permissionSetup'
 import {
   getPewterLedgerVariant,
   isPlanModeInterviewPhaseEnabled,
@@ -97,7 +97,7 @@ import type {
   ImageBlockParam,
 } from '@anthropic-ai/sdk/resources/messages.mjs'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import type { PastedContent } from '../../../utils/config.js'
+import type { PastedContent } from '@claude-code/config'
 import type { ImageDimensions } from '../../../utils/imageResizer.js'
 import { maybeResizeAndDownsampleImageBlock } from '../../../utils/imageResizer.js'
 import { cacheImagePath, storeImage } from '../../../utils/imageStore.js'

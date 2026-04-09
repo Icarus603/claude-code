@@ -12,7 +12,7 @@ import {
   createDisabledBypassPermissionsContext,
   shouldDisableBypassPermissions,
   verifyAutoModeGateAccess,
-} from './permissionSetup.js'
+} from '@claude-code/permission/permissionSetup'
 
 let bypassPermissionsCheckRan = false
 

@@ -6,8 +6,8 @@ import { useAppState, useSetAppState } from 'src/state/AppState.js'
 import {
   applyPermissionUpdate,
   persistPermissionUpdate,
-} from 'src/utils/permissions/PermissionUpdate.js'
-import type { PermissionUpdateDestination } from 'src/utils/permissions/PermissionUpdateSchema.js'
+} from '@claude-code/permission/PermissionUpdate'
+import type { PermissionUpdateDestination } from '@claude-code/permission/PermissionUpdateSchema'
 import type { CommandResultDisplay } from '../../../commands.js'
 import { Select } from '../../../components/CustomSelect/select.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../../hooks/useExitOnCtrlCDWithKeybindings.js'
@@ -22,19 +22,19 @@ import type {
   PermissionBehavior,
   PermissionRule,
   PermissionRuleValue,
-} from '../../../utils/permissions/PermissionRule.js'
-import { permissionRuleValueToString } from '../../../utils/permissions/permissionRuleParser.js'
+} from '@claude-code/permission/PermissionRule'
+import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
 import {
   deletePermissionRule,
   getAllowRules,
   getAskRules,
   getDenyRules,
   permissionRuleSourceDisplayString,
-} from '../../../utils/permissions/permissions.js'
+} from '@claude-code/permission/permissions'
 import type { UnreachableRule } from '../../../utils/permissions/shadowedRuleDetection.js'
 import { jsonStringify } from '../../../utils/slowOperations.js'
 import { Pane, Tab, Tabs, useTabHeaderFocus, useTabsWidth } from '@anthropic/ink'
-import { SearchBox } from '../../SearchBox.js'
+import { SearchBox } from '@anthropic/ink'
 import type { Option } from '../../ui/option.js'
 import { AddPermissionRules } from './AddPermissionRules.js'
 import { AddWorkspaceDirectory } from './AddWorkspaceDirectory.js'

@@ -1,18 +1,18 @@
 import React from 'react'
-import { getIsInteractive } from '../../../src/bootstrap/state.js'
-import { ManagedSettingsSecurityDialog } from '../../../src/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js'
+import { getIsInteractive } from '@cc-app/bootstrap/state.js'
+import { ManagedSettingsSecurityDialog } from '@cc-app/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js'
 import {
   extractDangerousSettings,
   hasDangerousSettings,
   hasDangerousSettingsChanged,
-} from '../../../src/components/ManagedSettingsSecurityDialog/utils.js'
-import { render } from '../../../src/ink.js'
-import { KeybindingSetup } from '../../../src/keybindings/KeybindingProviderSetup.js'
-import { AppStateProvider } from '../../../src/state/AppState.js'
-import { gracefulShutdownSync } from '../../../src/utils/gracefulShutdown.js'
-import { getBaseRenderOptions } from '../../../src/utils/renderOptions.js'
+} from '@cc-app/components/ManagedSettingsSecurityDialog/utils.js'
+import { render } from '@cc-app/ink.js'
+import { KeybindingSetup } from '@cc-app/keybindings/KeybindingProviderSetup.js'
+import { AppStateProvider } from '@cc-app/state/AppState.js'
+import { gracefulShutdownSync } from '@cc-app/utils/gracefulShutdown.js'
+import { getBaseRenderOptions } from '@cc-app/utils/renderOptions.js'
 import type { SettingsJson } from '../settings/types.js'
-import { logEvent } from '../../../src/services/eventLogger.js'
+import { logEvent } from '@cc-app/services/eventLogger.js'
 
 export type SecurityCheckResult = 'approved' | 'rejected' | 'no_check_needed'
 

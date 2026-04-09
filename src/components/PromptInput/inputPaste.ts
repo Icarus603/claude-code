@@ -1,5 +1,5 @@
 import { getPastedTextRefNumLines } from 'src/history.js'
-import type { PastedContent } from 'src/utils/config.js'
+import type { PastedContent } from '@claude-code/config'
 
 const TRUNCATION_THRESHOLD = 10000 // Characters before we truncate
 const PREVIEW_LENGTH = 1000 // Characters to show at start and end

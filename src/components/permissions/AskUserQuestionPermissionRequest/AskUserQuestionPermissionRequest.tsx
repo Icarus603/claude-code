@@ -11,7 +11,7 @@ import React, {
   useState,
 } from 'react'
 import { useSettings } from '../../../hooks/useSettings.js'
-import { useTerminalSize } from '../../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { stringWidth, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
@@ -25,7 +25,7 @@ import {
   type CliHighlight,
   getCliHighlightPromise,
 } from '../../../utils/cliHighlight.js'
-import type { PastedContent } from '../../../utils/config.js'
+import type { PastedContent } from '@claude-code/config'
 import type { ImageDimensions } from '../../../utils/imageResizer.js'
 import { maybeResizeAndDownsampleImageBlock } from '../../../utils/imageResizer.js'
 import { cacheImagePath, storeImage } from '../../../utils/imageStore.js'

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import type { PastedContent } from '../utils/config.js'
+import type { PastedContent } from '@claude-code/config'
 
 export type BufferEntry = {
   text: string

@@ -6,7 +6,7 @@ import type {
   Question,
   QuestionOption,
 } from '../../../tools/AskUserQuestionTool/AskUserQuestionTool.js'
-import type { PastedContent } from '../../../utils/config.js'
+import type { PastedContent } from '@claude-code/config'
 import { getExternalEditor } from '../../../utils/editor.js'
 import { toIDEDisplayName } from '../../../utils/ide.js'
 import type { ImageDimensions } from '../../../utils/imageResizer.js'

@@ -3,7 +3,7 @@ import { logEvent } from 'src/services/eventLogger.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- enter to continue
 import { Box, Dialog, Link, Newline, Text, useInput } from '@anthropic/ink'
 import { isChromeExtensionInstalled } from '../utils/claudeInChrome/setup.js'
-import { saveGlobalConfig } from '../utils/config.js'
+import { saveGlobalConfig } from '@claude-code/config'
 
 const CHROME_EXTENSION_URL = 'https://claude.ai/chrome'
 const CHROME_PERMISSIONS_URL = 'https://clau.de/chrome/permissions'

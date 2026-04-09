@@ -10,35 +10,35 @@ import {
   CLAUDE_FOLDER_PERMISSION_PATTERN,
   FILE_EDIT_TOOL_NAME,
   GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN,
-} from '../../../src/utils/../../src/tools/FileEditTool/constants.js'
+} from '@cc-app/tools/FileEditTool/constants.js'
 import type { z } from 'zod/v4'
-import { getOriginalCwd, getSessionId } from '../../../src/utils/../../src/bootstrap/state.js'
-import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '../../../src/utils/../../src/services/featureFlags.js'
-import type { AnyObject, Tool, ToolPermissionContext } from '../../../src/utils/../../src/Tool.js'
-import { FILE_READ_TOOL_NAME } from '../../../src/utils/../../src/tools/FileReadTool/prompt.js'
-import { getCwd } from '../../../src/utils/cwd.js'
-import { getClaudeConfigHomeDir } from '../../../src/utils/envUtils.js'
+import { getOriginalCwd, getSessionId } from '@cc-app/bootstrap/state.js'
+import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import type { AnyObject, Tool, ToolPermissionContext } from '@cc-app/Tool.js'
+import { FILE_READ_TOOL_NAME } from '@cc-app/tools/FileReadTool/prompt.js'
+import { getCwd } from '@cc-app/utils/cwd.js'
+import { getClaudeConfigHomeDir } from '@cc-app/utils/envUtils.js'
 import {
   getFsImplementation,
   getPathsForPermissionCheck,
-} from '../../../src/utils/fsOperations.js'
+} from '@cc-app/utils/fsOperations.js'
 import {
   containsPathTraversal,
   expandPath,
   getDirectoryForPath,
   sanitizePath,
-} from '../../../src/utils/path.js'
-import { getPlanSlug, getPlansDirectory } from '../../../src/utils/plans.js'
-import { getPlatform } from '../../../src/utils/platform.js'
-import { getProjectDir } from '../../../src/utils/sessionStorage.js'
-import { SETTING_SOURCES } from '../../../src/utils/settings/constants.js'
+} from '@cc-app/utils/path.js'
+import { getPlanSlug, getPlansDirectory } from '@cc-app/utils/plans.js'
+import { getPlatform } from '@cc-app/utils/platform.js'
+import { getProjectDir } from '@cc-app/utils/sessionStorage.js'
+import { SETTING_SOURCES } from '@cc-app/utils/settings/constants.js'
 import {
   getSettingsFilePathForSource,
   getSettingsRootPathForSource,
-} from '../../../src/utils/settings/settings.js'
-import { containsVulnerableUncPath } from '../../../src/utils/shell/readOnlyCommandValidation.js'
-import { getToolResultsDir } from '../../../src/utils/toolResultStorage.js'
-import { windowsPathToPosixPath } from '../../../src/utils/windowsPaths.js'
+} from '@cc-app/utils/settings/settings.js'
+import { containsVulnerableUncPath } from '@cc-app/utils/shell/readOnlyCommandValidation.js'
+import { getToolResultsDir } from '@cc-app/utils/toolResultStorage.js'
+import { windowsPathToPosixPath } from '@cc-app/utils/windowsPaths.js'
 import type {
   PermissionDecision,
   PermissionResult,

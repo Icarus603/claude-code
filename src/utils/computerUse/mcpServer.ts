@@ -6,7 +6,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import { homedir } from 'os'
 
-import { enableConfigs } from '../config.js'
+import { enableConfigs } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'
 import { shutdownEventLoggers } from '../../services/eventLogger.js'
 import { filterAppsForDescription } from './appNames.js'

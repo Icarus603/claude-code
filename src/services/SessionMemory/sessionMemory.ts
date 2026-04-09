@@ -35,7 +35,7 @@ import {
 import {
   getSessionMemoryDir,
   getSessionMemoryPath,
-} from '../../utils/permissions/filesystem.js'
+} from '@claude-code/permission/filesystem'
 import { sequential } from '../../utils/sequential.js'
 import { asSystemPrompt } from '../../utils/systemPromptType.js'
 import { getTokenUsage, tokenCountWithEstimation } from '../../utils/tokens.js'
@@ -71,7 +71,7 @@ import { errorMessage, getErrnoCode } from '../../utils/errors.js'
 import {
   getDynamicConfig_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
-} from '../featureFlags.js'
+} from '@claude-code/config/feature-flags'
 
 /**
  * Check if session memory feature is enabled.

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { adaptGeminiStreamToAnthropic } from '../streamAdapter.js'
+import { adaptGeminiStreamToAnthropic } from '@claude-code/provider'
 import type { GeminiStreamChunk } from '../types.js'
 
 function mockStream(

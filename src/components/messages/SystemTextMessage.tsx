@@ -21,7 +21,7 @@ const teamMemSaved = feature('TEAMMEM')
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { TURN_COMPLETION_VERBS } from '../../constants/turnCompletionVerbs.js'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import type {
   SystemMessage,
   SystemStopHookSummaryMessage,
@@ -36,8 +36,8 @@ import {
   formatNumber,
   formatSecondsShort,
 } from '../../utils/format.js'
-import { getGlobalConfig } from '../../utils/config.js'
-import ThemedText from '../design-system/ThemedText.js'
+import { getGlobalConfig } from '@claude-code/config'
+import { Text as ThemedText } from '@anthropic/ink'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'
 import { useAppStateStore } from '../../state/AppState.js'
 import { isBackgroundTask, type TaskState } from '../../tasks/types.js'
