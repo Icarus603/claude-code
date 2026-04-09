@@ -1,5 +1,5 @@
+import { getProviderNetworkLayer } from '@claude-code/provider'
 import OpenAI from 'openai'
-import { getProxyFetchOptions } from 'src/utils/proxy.js'
 
 /**
  * Environment variables:
@@ -18,6 +18,7 @@ export function getGrokClient(options?: {
   source?: string
 }): OpenAI {
   if (cachedClient) return cachedClient
+  const networkLayer = getProviderNetworkLayer()
 
   const apiKey = process.env.GROK_API_KEY || process.env.XAI_API_KEY || ''
   const baseURL = process.env.GROK_BASE_URL || DEFAULT_BASE_URL
@@ -28,7 +29,9 @@ export function getGrokClient(options?: {
     maxRetries: options?.maxRetries ?? 0,
     timeout: parseInt(process.env.API_TIMEOUT_MS || String(600 * 1000), 10),
     dangerouslyAllowBrowser: true,
-    fetchOptions: getProxyFetchOptions({ forAnthropicAPI: false }) as RequestInit,
+    fetchOptions: networkLayer.getProxyFetchOptions({
+      forAnthropicAPI: false,
+    }) as RequestInit,
     ...(options?.fetchOverride && { fetch: options.fetchOverride }),
   })
 

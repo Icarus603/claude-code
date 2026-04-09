@@ -52,6 +52,7 @@ import { init, initializeTelemetryAfterTrust } from './entrypoints/init.js'
 import { addToHistory } from './history.js'
 import type { Root } from '@anthropic/ink'
 import { setThemeConfigCallbacks } from '@anthropic/ink'
+import { createHeadlessSession } from '@claude-code/cli'
 import { launchRepl } from './replLauncher.js'
 import {
 	hasGrowthBookEnvOverride,
@@ -105,9 +106,13 @@ import {
 	validateForceLoginOrg,
 } from "./utils/auth.js";
 import { seedEarlyInput, stopCapturingEarlyInput } from "./utils/earlyInput.js";
-import { getInitialEffortSetting, parseEffortValue } from "./utils/effort.js";
 import {
-	getInitialFastModeSetting,
+	parseEffortValue,
+	toPersistableEffort,
+} from "./utils/effort.js";
+import {
+	getFastModeUnavailableReason,
+	isFastModeSupportedByModel,
 	isFastModeEnabled,
 	prefetchFastModeStatus,
 	resolveFastModeStatusFromCache,
@@ -422,12 +427,8 @@ import {
 import { initializeLspServerManager } from "./services/lsp/manager.js";
 import { shouldEnablePromptSuggestion } from "./services/PromptSuggestion/promptSuggestion.js";
 import {
-	type AppState,
-	getDefaultAppState,
 	IDLE_SPECULATION_STATE,
 } from "./state/AppStateStore.js";
-import { onChangeAppState } from "./state/onChangeAppState.js";
-import { createStore } from "./state/store.js";
 import { asSessionId } from "./types/ids.js";
 import { filterAllowedSdkBetas } from "./utils/betas.js";
 import { isInBundledMode, isRunningWithBun } from "./utils/bundledMode.js";
@@ -3565,50 +3566,57 @@ async function run(): Promise<CommanderCommand> {
 
 				// Headless mode supports all prompt commands and some local commands
 				// If disableSlashCommands is true, return empty array
-				const commandsHeadless = disableSlashCommands
-					? []
-					: commands.filter(
-							(command) =>
-								(command.type === "prompt" &&
-									!command.disableNonInteractive) ||
-								(command.type === "local" &&
-									command.supportsNonInteractive),
-						);
-
-				const defaultState = getDefaultAppState();
-				const headlessInitialState: AppState = {
-					...defaultState,
-					mcp: {
-						...defaultState.mcp,
-						clients: mcpClients,
-						commands: mcpCommands,
-						tools: mcpTools,
+				const headlessSession = createHeadlessSession({
+					commands,
+					disableSlashCommands,
+					store: {
+						mcpClients,
+						mcpCommands,
+						mcpTools,
+						toolPermissionContext,
+						effort: options.effort,
+						effectiveModel: effectiveModel ?? null,
+						...(isAdvisorEnabled() && advisorModel
+							? { advisorModel }
+							: {}),
+						kairosEnabled,
 					},
-					toolPermissionContext,
-					effortValue:
-						parseEffortValue(options.effort) ??
-						getInitialEffortSetting(),
-					...(isFastModeEnabled() && {
-						fastMode: getInitialFastModeSetting(
-							effectiveModel ?? null,
-						),
-					}),
-					...(isAdvisorEnabled() && advisorModel && { advisorModel }),
-					// kairosEnabled gates the async fire-and-forget path in
-					// executeForkedSlashCommand (processSlashCommand.tsx:132) and
-					// AgentTool's shouldRunAsync. The REPL initialState sets this at
-					// ~3459; headless was defaulting to false, so the daemon child's
-					// scheduled tasks and Agent-tool calls ran synchronously — N
-					// overdue cron tasks on spawn = N serial subagent turns blocking
-					// user input. Computed at :1620, well before this branch.
-					...(feature("KAIROS") ? { kairosEnabled } : {}),
-				};
-
-				// Init app state
-				const headlessStore = createStore(
-					headlessInitialState,
-					onChangeAppState,
-				);
+					tools,
+					sdkMcpConfigs,
+					agents: agentDefinitions.activeAgents,
+					options: {
+						continue: options.continue,
+						resume: options.resume,
+						verbose: verbose,
+						outputFormat: outputFormat,
+						jsonSchema,
+						permissionPromptToolName: options.permissionPromptTool,
+						allowedTools,
+						thinkingConfig,
+						maxTurns: options.maxTurns,
+						maxBudgetUsd: options.maxBudgetUsd,
+						taskBudget: options.taskBudget
+							? { total: options.taskBudget }
+							: undefined,
+						systemPrompt,
+						appendSystemPrompt,
+						userSpecifiedModel: effectiveModel,
+						fallbackModel: userSpecifiedFallbackModel,
+						teleport,
+						sdkUrl,
+						replayUserMessages: effectiveReplayUserMessages,
+						includePartialMessages: effectiveIncludePartialMessages,
+						forkSession: options.forkSession || false,
+						resumeSessionAt: options.resumeSessionAt || undefined,
+						rewindFiles: options.rewindFiles,
+						enableAuthStatus: options.enableAuthStatus,
+						agent: agentCli,
+						workload: options.workload,
+						setupTrigger: setupTrigger ?? undefined,
+						sessionStartHooksPromise,
+					},
+				});
+				const { store: headlessStore } = headlessSession;
 
 				// Check if bypassPermissions should be disabled based on Statsig gate
 				// This runs in parallel to the code below, to avoid blocking the main loop.
@@ -3859,54 +3867,12 @@ async function run(): Promise<CommanderCommand> {
 				}
 
 				logSessionTelemetry();
-				profileCheckpoint("before_print_import");
-				const { runHeadless } = await import("src/cli/print.js");
-				profileCheckpoint("after_print_import");
-				void runHeadless(
-					inputPrompt,
-					() => headlessStore.getState(),
-					headlessStore.setState,
-					commandsHeadless,
-					tools,
-					sdkMcpConfigs,
-					agentDefinitions.activeAgents,
-					{
-						continue: options.continue,
-						resume: options.resume,
-						verbose: verbose,
-						outputFormat: outputFormat,
-						jsonSchema,
-						permissionPromptToolName: options.permissionPromptTool,
-						allowedTools,
-						thinkingConfig,
-						maxTurns: options.maxTurns,
-						maxBudgetUsd: options.maxBudgetUsd,
-						taskBudget: options.taskBudget
-							? { total: options.taskBudget }
-							: undefined,
-						systemPrompt,
-						appendSystemPrompt,
-						userSpecifiedModel: effectiveModel,
-						fallbackModel: userSpecifiedFallbackModel,
-						teleport,
-						sdkUrl,
-						replayUserMessages: effectiveReplayUserMessages,
-						includePartialMessages: effectiveIncludePartialMessages,
-						forkSession: options.forkSession || false,
-						resumeSessionAt: options.resumeSessionAt || undefined,
-						rewindFiles: options.rewindFiles,
-						enableAuthStatus: options.enableAuthStatus,
-						agent: agentCli,
-						workload: options.workload,
-						setupTrigger: setupTrigger ?? undefined,
-						sessionStartHooksPromise,
-					},
-				);
+				void headlessSession.run(inputPrompt);
 				return;
-			}
+				}
 
-			// Log model config at startup
-			logEvent("tengu_startup_manual_model_config", {
+				// Log model config at startup
+				logEvent("tengu_startup_manual_model_config", {
 				cli_flag:
 					options.model as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 				env_var: process.env
@@ -3986,19 +3952,37 @@ async function run(): Promise<CommanderCommand> {
 				ccrMirrorEnabled = isCcrMirrorEnabled();
 			}
 
-			const initialState: AppState = {
-				settings: getInitialSettings(),
-				tasks: {},
-				agentNameRegistry: new Map(),
-				verbose: verbose ?? getGlobalConfig().verbose ?? false,
-				mainLoopModel: initialMainLoopModel,
-				mainLoopModelForSession: null,
-				isBriefOnly: initialIsBriefOnly,
-				expandedView: getGlobalConfig().showSpinnerTree
+				const initialSettings = getInitialSettings();
+				const globalConfig = getGlobalConfig();
+				const initialExpandedView = globalConfig.showSpinnerTree
 					? "teammates"
-					: getGlobalConfig().showExpandedTodos
+					: globalConfig.showExpandedTodos
 						? "tasks"
-						: "none",
+						: "none";
+				const initialAttributionState = createEmptyAttributionState();
+				const initialPromptSuggestionEnabled =
+					shouldEnablePromptSuggestion();
+				const initialEffortValue =
+					parseEffortValue(options.effort) ??
+					toPersistableEffort(initialSettings.effortLevel);
+				const initialFastMode =
+					isFastModeEnabled() &&
+					getFastModeUnavailableReason() === null &&
+					isFastModeSupportedByModel(resolvedInitialModel) &&
+					!initialSettings.fastModePerSessionOptIn &&
+					initialSettings.fastMode === true;
+				const initialTeamContext = feature("KAIROS")
+					? (assistantTeamContext ?? computeInitialTeamContext?.())
+					: computeInitialTeamContext?.();
+				const initialState: AppState = {
+					settings: initialSettings,
+					tasks: {},
+					agentNameRegistry: new Map(),
+					verbose: verbose ?? globalConfig.verbose ?? false,
+					mainLoopModel: initialMainLoopModel,
+					mainLoopModelForSession: null,
+					isBriefOnly: initialIsBriefOnly,
+					expandedView: initialExpandedView,
 				showTeammateMessagePreview: isAgentSwarmsEnabled()
 					? false
 					: undefined,
@@ -4059,9 +4043,10 @@ async function run(): Promise<CommanderCommand> {
 					trackedFiles: new Set(),
 					snapshotSequence: 0,
 				},
-				attribution: createEmptyAttributionState(),
-				thinkingEnabled,
-				promptSuggestionEnabled: shouldEnablePromptSuggestion(),
+					attribution: initialAttributionState,
+					thinkingEnabled,
+					promptSuggestionEnabled:
+						initialPromptSuggestionEnabled,
 				sessionHooks: new Map(),
 				inbox: {
 					messages: [],
@@ -4092,25 +4077,21 @@ async function run(): Promise<CommanderCommand> {
 							}),
 						}
 					: null,
-				effortValue:
-					parseEffortValue(options.effort) ??
-					getInitialEffortSetting(),
-				activeOverlays: new Set<string>(),
-				fastMode: getInitialFastModeSetting(resolvedInitialModel),
-				...(isAdvisorEnabled() && advisorModel && { advisorModel }),
+					effortValue: initialEffortValue,
+					activeOverlays: new Set<string>(),
+					fastMode: initialFastMode,
+					...(isAdvisorEnabled() && advisorModel && { advisorModel }),
 				// Compute teamContext synchronously to avoid useEffect setState during render.
 				// KAIROS: assistantTeamContext takes precedence — set earlier in the
 				// KAIROS block so Agent(name: "foo") can spawn in-process teammates
 				// without TeamCreate. computeInitialTeamContext() is for tmux-spawned
 				// teammates reading their own identity, not the assistant-mode leader.
-				teamContext: feature("KAIROS")
-					? (assistantTeamContext ?? computeInitialTeamContext?.())
-					: computeInitialTeamContext?.(),
-			};
+					teamContext: initialTeamContext,
+				};
 
-			// Add CLI initial prompt to history
-			if (inputPrompt) {
-				addToHistory(String(inputPrompt));
+				// Add CLI initial prompt to history
+				if (inputPrompt) {
+					addToHistory(String(inputPrompt));
 			}
 
 			const initialTools = mcpTools;
@@ -4150,7 +4131,7 @@ async function run(): Promise<CommanderCommand> {
 						.catch(() => null)
 				: null;
 
-			const sessionConfig = {
+				const sessionConfig = {
 				debug: debug || debugToStderr,
 				commands: [...commands, ...mcpCommands],
 				initialTools,
@@ -4170,8 +4151,8 @@ async function run(): Promise<CommanderCommand> {
 							uploader?.(messages),
 						);
 					},
-				}),
-			};
+					}),
+				};
 
 			// Shared context for processResumedConversation calls
 			const resumeContext = {
@@ -5072,11 +5053,11 @@ async function run(): Promise<CommanderCommand> {
 					}
 				}
 
-				// Await file downloads before rendering REPL (files must be available)
-				if (fileDownloadPromise) {
-					try {
-						const results = await fileDownloadPromise;
-						const failedCount = count(results, (r) => !r.success);
+					// Await file downloads before rendering REPL (files must be available)
+					if (fileDownloadPromise) {
+						try {
+							const results = await fileDownloadPromise;
+							const failedCount = count(results, (r) => !r.success);
 						if (failedCount > 0) {
 							process.stderr.write(
 								chalk.yellow(
@@ -5092,8 +5073,8 @@ async function run(): Promise<CommanderCommand> {
 					}
 				}
 
-				// If we have a processed resume or teleport messages, render the REPL
-				const resumeData =
+					// If we have a processed resume or teleport messages, render the REPL
+					const resumeData =
 					processedResume ??
 					(Array.isArray(messages)
 						? {
@@ -5149,8 +5130,8 @@ async function run(): Promise<CommanderCommand> {
 						},
 					);
 				}
-			} else {
-				// Pass unresolved hooks promise to REPL so it can render immediately
+					} else {
+						// Pass unresolved hooks promise to REPL so it can render immediately
 				// instead of blocking ~500ms waiting for SessionStart hooks to finish.
 				// REPL will inject hook messages when they resolve and await them before
 				// the first API call so the model always sees hook context.

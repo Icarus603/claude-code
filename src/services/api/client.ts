@@ -1,12 +1,11 @@
 import Anthropic, { type ClientOptions } from '@anthropic-ai/sdk'
+import {
+  getAnthropicAuthProvider,
+  getProviderNetworkLayer,
+} from '@claude-code/provider'
 import { randomUUID } from 'crypto'
 import type { GoogleAuth } from 'google-auth-library'
 import {
-  checkAndRefreshOAuthTokenIfNeeded,
-  getAnthropicApiKey,
-  getApiKeyFromApiKeyHelper,
-  getClaudeAIOAuthTokens,
-  isClaudeAISubscriber,
   refreshAndGetAwsCredentials,
   refreshGcpCredentialsIfNeeded,
 } from 'src/utils/auth.js'
@@ -16,12 +15,10 @@ import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
 } from 'src/utils/model/providers.js'
-import { getProxyFetchOptions } from 'src/utils/proxy.js'
 import {
   getIsNonInteractiveSession,
   getSessionId,
 } from '../../bootstrap/state.js'
-import { getOauthConfig } from '../../constants/oauth.js'
 import { isDebugToStdErr, logForDebugging } from '../../utils/debug.js'
 import {
   getAWSRegion,
@@ -98,6 +95,8 @@ export async function getAnthropicClient({
   fetchOverride?: ClientOptions['fetch']
   source?: string
 }): Promise<Anthropic> {
+  const authProvider = getAnthropicAuthProvider()
+  const networkLayer = getProviderNetworkLayer()
   const containerId = process.env.CLAUDE_CODE_CONTAINER_ID
   const remoteSessionId = process.env.CLAUDE_CODE_REMOTE_SESSION_ID
   const clientApp = process.env.CLAUDE_AGENT_SDK_CLIENT_APP
@@ -129,11 +128,16 @@ export async function getAnthropicClient({
   }
 
   logForDebugging('[API:auth] OAuth token check starting')
-  await checkAndRefreshOAuthTokenIfNeeded()
+  await authProvider.refresh()
   logForDebugging('[API:auth] OAuth token check complete')
 
-  if (!isClaudeAISubscriber()) {
-    await configureApiKeyHeaders(defaultHeaders, getIsNonInteractiveSession())
+  const authCredentials = await authProvider.getCredentials({
+    apiKeyOverride: apiKey,
+    isNonInteractiveSession: getIsNonInteractiveSession(),
+  })
+
+  if (!authCredentials.subscriber && authCredentials.authorizationHeader) {
+    defaultHeaders['Authorization'] = authCredentials.authorizationHeader
   }
 
   const resolvedFetch = buildFetch(fetchOverride, source)
@@ -143,7 +147,7 @@ export async function getAnthropicClient({
     maxRetries,
     timeout: parseInt(process.env.API_TIMEOUT_MS || String(600 * 1000), 10),
     dangerouslyAllowBrowser: true,
-    fetchOptions: getProxyFetchOptions({
+    fetchOptions: networkLayer.getProxyFetchOptions({
       forAnthropicAPI: true,
     }) as ClientOptions['fetchOptions'],
     ...(resolvedFetch && {
@@ -299,32 +303,14 @@ export async function getAnthropicClient({
 
   // Determine authentication method based on available tokens
   const clientConfig: ConstructorParameters<typeof Anthropic>[0] = {
-    apiKey: isClaudeAISubscriber() ? null : apiKey || getAnthropicApiKey(),
-    authToken: isClaudeAISubscriber()
-      ? getClaudeAIOAuthTokens()?.accessToken
-      : undefined,
-    // Set baseURL from OAuth config when using staging OAuth
-    ...(process.env.USER_TYPE === 'ant' &&
-    isEnvTruthy(process.env.USE_STAGING_OAUTH)
-      ? { baseURL: getOauthConfig().BASE_API_URL }
-      : {}),
+    apiKey: authCredentials.apiKey,
+    authToken: authCredentials.authToken ?? undefined,
+    ...(authCredentials.baseURL ? { baseURL: authCredentials.baseURL } : {}),
     ...ARGS,
     ...(isDebugToStdErr() && { logger: createStderrLogger() }),
   }
 
   return new Anthropic(clientConfig)
-}
-
-async function configureApiKeyHeaders(
-  headers: Record<string, string>,
-  isNonInteractiveSession: boolean,
-): Promise<void> {
-  const token =
-    process.env.ANTHROPIC_AUTH_TOKEN ||
-    (await getApiKeyFromApiKeyHelper(isNonInteractiveSession))
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
 }
 
 function getCustomHeaders(): Record<string, string> {

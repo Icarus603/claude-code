@@ -9,9 +9,9 @@
  * import from here (QueryEngine.ts, cli/print.ts).
  */
 
+import { getProviderContextPipeline } from '@claude-code/provider'
 import type { Command } from '../commands.js'
 import { getSystemPrompt } from '../constants/prompts.js'
-import { getSystemContext, getUserContext } from '../context.js'
 import type { MCPServerConnection } from '../services/mcp/types.js'
 import type { AppState } from '../state/AppStateStore.js'
 import type { Tools, ToolUseContext } from '../Tool.js'
@@ -58,6 +58,7 @@ export async function fetchSystemPromptParts({
   userContext: { [k: string]: string }
   systemContext: { [k: string]: string }
 }> {
+  const contextPipeline = getProviderContextPipeline()
   const [defaultSystemPrompt, userContext, systemContext] = await Promise.all([
     customSystemPrompt !== undefined
       ? Promise.resolve([])
@@ -67,8 +68,10 @@ export async function fetchSystemPromptParts({
           additionalWorkingDirectories,
           mcpClients,
         ),
-    getUserContext(),
-    customSystemPrompt !== undefined ? Promise.resolve({}) : getSystemContext(),
+    contextPipeline.getUserContext(),
+    customSystemPrompt !== undefined
+      ? Promise.resolve({})
+      : contextPipeline.getSystemContext(),
   ])
   return { defaultSystemPrompt, userContext, systemContext }
 }
