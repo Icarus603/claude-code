@@ -1,44 +1,40 @@
-import {
-  checkAndRefreshOAuthTokenIfNeeded,
-  getAnthropicApiKey,
-  getApiKeyFromApiKeyHelper,
-  getClaudeAIOAuthTokens,
-  isClaudeAISubscriber,
-} from '../../../src/utils/auth.js'
-import { isEnvTruthy } from '../../../src/utils/envUtils.js'
-import { getOauthConfig } from '../../../src/constants/oauth.js'
 import type {
   AnthropicCredentials,
   AuthProvider,
   ProviderAuthContext,
   ProviderAvailability,
 } from './types.js'
+import { getProviderHostBindings } from './host.js'
 
 async function getAnthropicAuthorizationHeader(
   context?: ProviderAuthContext,
 ): Promise<string | null> {
+  const { auth } = getProviderHostBindings()
   const token =
     process.env.ANTHROPIC_AUTH_TOKEN ||
-    (await getApiKeyFromApiKeyHelper(context?.isNonInteractiveSession ?? false))
+    (await auth.getApiKeyFromApiKeyHelper(
+      context?.isNonInteractiveSession ?? false,
+    ))
   return token ? `Bearer ${token}` : null
 }
 
 export const anthropicAuthProvider: AuthProvider<AnthropicCredentials> = {
   id: 'anthropic',
   async refresh(): Promise<void> {
-    await checkAndRefreshOAuthTokenIfNeeded()
+    await getProviderHostBindings().auth.checkAndRefreshOAuthTokenIfNeeded()
   },
   async getCredentials(
     context?: ProviderAuthContext,
   ): Promise<AnthropicCredentials> {
-    await checkAndRefreshOAuthTokenIfNeeded()
+    const { auth } = getProviderHostBindings()
+    await auth.checkAndRefreshOAuthTokenIfNeeded()
 
-    const subscriber = isClaudeAISubscriber()
+    const subscriber = auth.isClaudeAISubscriber()
     const apiKey = subscriber
       ? null
-      : context?.apiKeyOverride || getAnthropicApiKey()
+      : context?.apiKeyOverride || auth.getAnthropicApiKey()
     const authToken = subscriber
-      ? getClaudeAIOAuthTokens()?.accessToken ?? null
+      ? auth.getClaudeAIOAuthTokens()?.accessToken ?? null
       : null
 
     return {
@@ -49,8 +45,8 @@ export const anthropicAuthProvider: AuthProvider<AnthropicCredentials> = {
         ? null
         : await getAnthropicAuthorizationHeader(context),
       ...(process.env.USER_TYPE === 'ant' &&
-      isEnvTruthy(process.env.USE_STAGING_OAUTH)
-        ? { baseURL: getOauthConfig().BASE_API_URL }
+      auth.isEnvTruthy(process.env.USE_STAGING_OAUTH)
+        ? { baseURL: auth.getOauthConfig().BASE_API_URL }
         : {}),
     }
   },

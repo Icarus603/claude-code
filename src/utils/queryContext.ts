@@ -10,6 +10,7 @@
  */
 
 import { getProviderContextPipeline } from '@claude-code/provider'
+import '../services/api/providerHostSetup.js'
 import type { Command } from '../commands.js'
 import { getSystemPrompt } from '../constants/prompts.js'
 import type { MCPServerConnection } from '../services/mcp/types.js'

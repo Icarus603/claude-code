@@ -1,9 +1,5 @@
-import {
-  getAPIProvider,
-  type APIProvider,
-} from '../../../src/utils/model/providers.js'
-import { getModelOptions } from '../../../src/utils/model/modelOptions.js'
 import type {
+  APIProvider,
   ProviderAdapter,
   ProviderAdapterOverrides,
   ProviderAvailability,
@@ -17,46 +13,10 @@ import {
   grokAuthProvider,
   openAIAuthProvider,
 } from './auth.js'
-
-async function* queryOpenAI(args: ProviderQueryArgs) {
-  const { queryModelOpenAI } = await import(
-    '../../../src/services/api/openai/index.js'
-  )
-  yield* queryModelOpenAI(
-    args.messages,
-    args.systemPrompt,
-    args.tools,
-    args.signal,
-    args.options,
-  )
-}
-
-async function* queryGemini(args: ProviderQueryArgs) {
-  const { queryModelGemini } = await import(
-    '../../../src/services/api/gemini/index.js'
-  )
-  yield* queryModelGemini(
-    args.messages,
-    args.systemPrompt,
-    args.tools,
-    args.signal,
-    args.options,
-    args.thinkingConfig,
-  )
-}
-
-async function* queryGrok(args: ProviderQueryArgs) {
-  const { queryModelGrok } = await import(
-    '../../../src/services/api/grok/index.js'
-  )
-  yield* queryModelGrok(
-    args.messages,
-    args.systemPrompt,
-    args.tools,
-    args.signal,
-    args.options,
-  )
-}
+import { getProviderHostBindings } from './host.js'
+import { queryModelOpenAI } from './openai/indexImpl.js'
+import { queryModelGemini } from './gemini/indexImpl.js'
+import { queryModelGrok } from './grok/indexImpl.js'
 
 function createAdapter(
   id: APIProvider,
@@ -87,7 +47,7 @@ function createAdapter(
       }),
     queryStream: options.queryStream,
     listModels(fastMode?: boolean) {
-      return getModelOptions(fastMode)
+      return getProviderHostBindings().getModelOptions(fastMode)
     },
     async isAvailable() {
       return options.authProvider.isAvailable()
@@ -96,24 +56,46 @@ function createAdapter(
 }
 
 export function getProviderAdapter(
-  provider: APIProvider = getAPIProvider(),
+  provider: APIProvider = getProviderHostBindings().getAPIProvider(),
   overrides: ProviderAdapterOverrides = {},
 ): ProviderAdapter {
   switch (provider) {
     case 'openai':
       return createAdapter('openai', {
         authProvider: openAIAuthProvider,
-        queryStream: args => queryOpenAI(args),
+        queryStream: args =>
+          queryModelOpenAI(
+            args.messages,
+            args.systemPrompt,
+            args.tools,
+            args.signal,
+            args.options,
+          ),
       })
     case 'gemini':
       return createAdapter('gemini', {
         authProvider: geminiAuthProvider,
-        queryStream: args => queryGemini(args),
+        queryStream: args =>
+          queryModelGemini(
+            args.messages,
+            args.systemPrompt,
+            args.tools,
+            args.signal,
+            args.options,
+            args.thinkingConfig,
+          ),
       })
     case 'grok':
       return createAdapter('grok', {
         authProvider: grokAuthProvider,
-        queryStream: args => queryGrok(args),
+        queryStream: args =>
+          queryModelGrok(
+            args.messages,
+            args.systemPrompt,
+            args.tools,
+            args.signal,
+            args.options,
+          ),
       })
     case 'bedrock':
     case 'vertex':

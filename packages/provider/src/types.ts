@@ -1,36 +1,36 @@
 import type { ClientOptions } from '@anthropic-ai/sdk'
-import type { AssistantMessage } from '../../../src/types/message.js'
 import type {
-  Message,
-  StreamEvent,
-  SystemAPIErrorMessage,
-} from '../../../src/types/message.js'
-import type { Tools } from '../../../src/Tool.js'
-import type { SystemPrompt } from '../../../src/utils/systemPromptType.js'
-import type { ThinkingConfig } from '../../../src/utils/thinking.js'
-import type { ModelOption } from '../../../src/utils/model/modelOptions.js'
-import type {
-  APIProvider,
-} from '../../../src/utils/model/providers.js'
-import type { Options as ClaudeQueryOptions } from '../../../src/services/api/claude.js'
+  ProviderAPIProvider,
+  ProviderAssistantMessage,
+  ProviderMessage,
+  ProviderModelOption,
+  ProviderStreamEvent,
+  ProviderSystemAPIErrorMessage,
+  ProviderSystemPrompt,
+  ProviderThinkingConfig,
+  ProviderTools,
+} from './contracts.js'
+import type { ProviderRequestOptions } from './requestOptions.js'
 
 export type ProviderQueryArgs = {
-  messages: Message[]
-  systemPrompt: SystemPrompt
-  tools: Tools
+  messages: readonly ProviderMessage[]
+  systemPrompt: ProviderSystemPrompt
+  tools: ProviderTools
   signal: AbortSignal
-  options: ClaudeQueryOptions
-  thinkingConfig: ThinkingConfig
+  options: ProviderRequestOptions
+  thinkingConfig: ProviderThinkingConfig
 }
 
 export type ProviderQueryStream = AsyncGenerator<
-  StreamEvent | AssistantMessage | SystemAPIErrorMessage,
+  | ProviderStreamEvent
+  | ProviderAssistantMessage
+  | ProviderSystemAPIErrorMessage,
   void
 >
 
 export type ProviderQueryFn = (
   args: ProviderQueryArgs,
-) => Promise<AssistantMessage>
+) => Promise<ProviderAssistantMessage>
 
 export type ProviderQueryStreamFn = (
   args: ProviderQueryArgs,
@@ -43,22 +43,11 @@ export type ProviderAvailability = {
 
 export type NetworkLayer = {
   getProxyFetchOptions(
-    opts?: Parameters<
-      typeof import('../../../src/utils/proxy.js').getProxyFetchOptions
-    >[0],
-  ): ReturnType<typeof import('../../../src/utils/proxy.js').getProxyFetchOptions>
-  createAxiosInstance(
-    extra?: Parameters<
-      typeof import('../../../src/utils/proxy.js').createAxiosInstance
-    >[0],
-  ): ReturnType<typeof import('../../../src/utils/proxy.js').createAxiosInstance>
-  getProxyUrl(
-    env?: Parameters<typeof import('../../../src/utils/proxy.js').getProxyUrl>[0],
-  ): ReturnType<typeof import('../../../src/utils/proxy.js').getProxyUrl>
-  shouldBypassProxy(
-    url: string,
-    noProxy?: string,
-  ): ReturnType<typeof import('../../../src/utils/proxy.js').shouldBypassProxy>
+    opts?: Record<string, unknown>,
+  ): Record<string, unknown> | undefined
+  createAxiosInstance(extra?: Record<string, unknown>): unknown
+  getProxyUrl(env?: NodeJS.ProcessEnv): string | undefined
+  shouldBypassProxy(url: string, noProxy?: string): boolean
 }
 
 export type ContextPipeline = {
@@ -88,13 +77,13 @@ export type AuthProvider<TCredentials = unknown> = {
 }
 
 export type ProviderAdapter = {
-  id: APIProvider
+  id: ProviderAPIProvider
   authProvider: AuthProvider
   contextPipeline: ContextPipeline
   networkLayer: NetworkLayer
   query: ProviderQueryFn
   queryStream: ProviderQueryStreamFn
-  listModels(fastMode?: boolean): ModelOption[]
+  listModels(fastMode?: boolean): ProviderModelOption[]
   isAvailable(context?: ProviderAuthContext): Promise<ProviderAvailability>
 }
 
@@ -104,3 +93,4 @@ export type ProviderAdapterOverrides = {
 }
 
 export type ProviderClientFetch = ClientOptions['fetch']
+export type APIProvider = ProviderAPIProvider

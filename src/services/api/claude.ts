@@ -20,6 +20,7 @@ import type {
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { Stream } from '@anthropic-ai/sdk/streaming.mjs'
 import { getProviderAdapter } from '@claude-code/provider'
+import './providerHostSetup.js'
 import { randomUUID } from 'crypto'
 import {
   getAPIProvider,
@@ -231,7 +232,10 @@ import {
 import { getInitializationStatus } from '../lsp/manager.js'
 import { isToolFromMcpServer } from '../mcp/utils.js'
 import { withStreamingVCR, withVCR } from '../vcr.js'
-import { CLIENT_REQUEST_ID_HEADER, getAnthropicClient } from './client.js'
+import {
+  CLIENT_REQUEST_ID_HEADER,
+  getAnthropicClient,
+} from '@claude-code/provider'
 import {
   API_ERROR_MESSAGE_PREFIX,
   CUSTOM_OFF_SWITCH_MESSAGE,
@@ -666,27 +670,28 @@ export function assistantMessageToMessageParam(
     content:
       typeof message.message.content === 'string'
         ? message.message.content
-        : message.message.content.map(stripGeminiProviderMetadata),
+        : (message.message.content.map(block =>
+            typeof block === 'string'
+              ? block
+              : stripGeminiProviderMetadata(block),
+          ) as BetaContentBlockParam[]),
   }
 }
 
-function stripGeminiProviderMetadata<T extends BetaContentBlockParam | string>(
-  contentBlock: T,
-): T {
-  if (
-    typeof contentBlock === 'string' ||
-    !('_geminiThoughtSignature' in contentBlock)
-  ) {
+function stripGeminiProviderMetadata(
+  contentBlock: BetaContentBlockParam,
+): BetaContentBlockParam {
+  if (!('_geminiThoughtSignature' in contentBlock)) {
     return contentBlock
   }
 
   const {
     _geminiThoughtSignature: _unusedGeminiThoughtSignature,
     ...rest
-  } = contentBlock as T & {
+  } = contentBlock as BetaContentBlockParam & {
     _geminiThoughtSignature?: string
   }
-  return rest as T
+  return rest as BetaContentBlockParam
 }
 
 export type Options = {
@@ -1523,21 +1528,15 @@ async function* queryModel(
     })
   }
 
-  const newContext: LLMRequestNewContext | undefined = isBetaTracingEnabled()
-    ? {
-        systemPrompt: systemPrompt.join('\n\n'),
-        querySource: options.querySource,
-        tools: jsonStringify(allTools),
-      }
-    : undefined
-
   // Capture the span so we can pass it to endLLMRequestSpan later
   // This ensures responses are matched to the correct request when multiple requests run in parallel
   const llmSpan = startLLMRequestSpan(
     options.model,
-    newContext,
     messagesForAPI,
-    isFastMode,
+    systemPrompt.join('\n\n'),
+    allTools
+      .map(tool => (tool as { name?: string }).name)
+      .filter((name): name is string => Boolean(name)),
   )
 
   const startIncludingRetries = Date.now()

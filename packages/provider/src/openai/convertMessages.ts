@@ -1,0 +1,248 @@
+import type {
+  BetaContentBlockParam,
+  BetaToolResultBlockParam,
+  BetaToolUseBlock,
+} from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
+import type {
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionMessageParam,
+  ChatCompletionSystemMessageParam,
+  ChatCompletionToolMessageParam,
+  ChatCompletionUserMessageParam,
+} from 'openai/resources/chat/completions/completions.mjs'
+import type {
+  ProviderAssistantMessage,
+  ProviderMessage,
+  ProviderSystemPrompt,
+  ProviderUserMessage,
+} from '../contracts.js'
+
+/**
+ * Convert internal (UserMessage | AssistantMessage)[] to OpenAI-format messages.
+ *
+ * Key conversions:
+ * - system prompt → role: "system" message prepended
+ * - tool_use blocks → tool_calls[] on assistant message
+ * - tool_result blocks → role: "tool" messages
+ * - thinking blocks → silently dropped
+ * - cache_control → stripped
+ */
+export function anthropicMessagesToOpenAI(
+  messages: readonly ProviderMessage[],
+  systemPrompt: ProviderSystemPrompt,
+): ChatCompletionMessageParam[] {
+  const result: ChatCompletionMessageParam[] = []
+
+  // Prepend system prompt as system message
+  const systemText = systemPromptToText(systemPrompt)
+  if (systemText) {
+    result.push({
+      role: 'system',
+      content: systemText,
+    } satisfies ChatCompletionSystemMessageParam)
+  }
+
+  for (const msg of messages) {
+    switch (msg.type) {
+      case 'user':
+        result.push(...convertInternalUserMessage(msg as ProviderUserMessage))
+        break
+      case 'assistant':
+        result.push(
+          ...convertInternalAssistantMessage(msg as ProviderAssistantMessage),
+        )
+        break
+      default:
+        break
+    }
+  }
+
+  return result
+}
+
+function systemPromptToText(systemPrompt: ProviderSystemPrompt): string {
+  if (!systemPrompt || systemPrompt.length === 0) return ''
+  return systemPrompt
+    .filter(Boolean)
+    .join('\n\n')
+}
+
+function convertInternalUserMessage(
+  msg: ProviderUserMessage,
+): ChatCompletionMessageParam[] {
+  const result: ChatCompletionMessageParam[] = []
+  const content = msg.message.content
+
+  if (typeof content === 'string') {
+    result.push({
+      role: 'user',
+      content,
+    } satisfies ChatCompletionUserMessageParam)
+  } else if (Array.isArray(content)) {
+    const textParts: string[] = []
+    const toolResults: BetaToolResultBlockParam[] = []
+    const imageParts: Array<{ type: 'image_url'; image_url: { url: string } }> = []
+
+    for (const block of content) {
+      if (typeof block === 'string') {
+        textParts.push(block)
+      } else if (block.type === 'text') {
+        textParts.push(block.text)
+      } else if (block.type === 'tool_result') {
+        toolResults.push(block as BetaToolResultBlockParam)
+      } else if (block.type === 'image') {
+        const imagePart = convertImageBlockToOpenAI(
+          block as unknown as Record<string, unknown>,
+        )
+        if (imagePart) {
+          imageParts.push(imagePart)
+        }
+      }
+    }
+
+    // CRITICAL: tool messages must come BEFORE any user message in the result.
+    // OpenAI API requires that a tool message immediately follows the assistant
+    // message with tool_calls. If we emit a user message first, the API will
+    // reject the request with "insufficient tool messages following tool_calls".
+    // See: https://github.com/anthropics/claude-code/issues/xxx
+    for (const tr of toolResults) {
+      result.push(convertToolResult(tr))
+    }
+
+    // If images are present, build a multimodal content array
+    if (imageParts.length > 0) {
+      const multiContent: Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }> = []
+      if (textParts.length > 0) {
+        multiContent.push({ type: 'text', text: textParts.join('\n') })
+      }
+      multiContent.push(...imageParts)
+      result.push({
+        role: 'user',
+        content: multiContent,
+      } satisfies ChatCompletionUserMessageParam)
+    } else if (textParts.length > 0) {
+      result.push({
+        role: 'user',
+        content: textParts.join('\n'),
+      } satisfies ChatCompletionUserMessageParam)
+    }
+  }
+
+  return result
+}
+
+function convertToolResult(
+  block: BetaToolResultBlockParam,
+): ChatCompletionToolMessageParam {
+  let content: string
+  if (typeof block.content === 'string') {
+    content = block.content
+  } else if (Array.isArray(block.content)) {
+    content = block.content
+      .map(c => {
+        if (typeof c === 'string') return c
+        if ('text' in c) return c.text
+        return ''
+      })
+      .filter(Boolean)
+      .join('\n')
+  } else {
+    content = ''
+  }
+
+  return {
+    role: 'tool',
+    tool_call_id: block.tool_use_id,
+    content,
+  } satisfies ChatCompletionToolMessageParam
+}
+
+function convertInternalAssistantMessage(
+  msg: ProviderAssistantMessage,
+): ChatCompletionMessageParam[] {
+  const content = msg.message.content
+
+  if (typeof content === 'string') {
+    return [
+      {
+        role: 'assistant',
+        content,
+      } satisfies ChatCompletionAssistantMessageParam,
+    ]
+  }
+
+  if (!Array.isArray(content)) {
+    return [
+      {
+        role: 'assistant',
+        content: '',
+      } satisfies ChatCompletionAssistantMessageParam,
+    ]
+  }
+
+  const textParts: string[] = []
+  const toolCalls: NonNullable<ChatCompletionAssistantMessageParam['tool_calls']> = []
+
+  for (const block of content) {
+    if (typeof block === 'string') {
+      textParts.push(block)
+    } else if (block.type === 'text') {
+      textParts.push(block.text)
+    } else if (block.type === 'tool_use') {
+      const tu = block as BetaToolUseBlock
+      toolCalls.push({
+        id: tu.id,
+        type: 'function',
+        function: {
+          name: tu.name,
+          arguments:
+            typeof tu.input === 'string' ? tu.input : JSON.stringify(tu.input),
+        },
+      })
+    }
+    // Skip thinking, redacted_thinking, server_tool_use, etc.
+  }
+
+  const result: ChatCompletionAssistantMessageParam = {
+    role: 'assistant',
+    content: textParts.length > 0 ? textParts.join('\n') : null,
+    ...(toolCalls.length > 0 && { tool_calls: toolCalls }),
+  }
+
+  return [result]
+}
+
+/**
+ * Convert an Anthropic image block into the OpenAI image_url format.
+ *
+ * Anthropic format: { type: "image", source: { type: "base64", media_type: "image/png", data: "..." } }
+ * OpenAI format: { type: "image_url", image_url: { url: "data:image/png;base64,..." } }
+ */
+function convertImageBlockToOpenAI(
+  block: Record<string, unknown>,
+): { type: 'image_url'; image_url: { url: string } } | null {
+  const source = block.source as Record<string, unknown> | undefined
+  if (!source) return null
+
+  if (source.type === 'base64' && typeof source.data === 'string') {
+    const mediaType = (source.media_type as string) || 'image/png'
+    return {
+      type: 'image_url',
+      image_url: {
+        url: `data:${mediaType};base64,${source.data}`,
+      },
+    }
+  }
+
+  // Pass through URL-based images directly
+  if (source.type === 'url' && typeof source.url === 'string') {
+    return {
+      type: 'image_url',
+      image_url: {
+        url: source.url,
+      },
+    }
+  }
+
+  return null
+}

@@ -1,7 +1,8 @@
 
 import type { AgentDeps, CoreMessage } from '@claude-code/agent'
-import type { ToolUseContext, Message, Tools } from '../Tool.js'
+import type { ToolUseContext, Tools } from '../Tool.js'
 import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
+import type { Message } from '../types/message.js'
 import { ProviderDepImpl } from './ProviderDepImpl.js'
 import { ToolDepImpl } from './ToolDepImpl.js'
 import { PermissionDepImpl } from './PermissionDepImpl.js'
@@ -42,7 +43,10 @@ export function createProductionDeps(params: CreateDepsParams): AgentDeps {
     output: new OutputDepImpl(toolUseContext, emitFn),
     hooks: new HookDepImpl(toolUseContext),
     compaction: new CompactionDepImpl(toolUseContext),
-    context: new ContextDepImpl(toolUseContext, contextOverrides),
+    context: new ContextDepImpl(
+      toolUseContext,
+      contextOverrides,
+    ) as unknown as AgentDeps['context'],
     session: new SessionDepImpl(),
   }
 }

@@ -13,6 +13,12 @@ export type {
   ProviderQueryStream,
   ProviderQueryStreamFn,
 } from './types.js'
+export type { ProviderRequestOptions } from './requestOptions.js'
+export {
+  getProviderHostBindings,
+  installProviderHostBindings,
+} from './host.js'
+export type { ProviderHostBindings } from './host.js'
 
 export {
   anthropicAuthProvider,
@@ -25,3 +31,10 @@ export {
 export { getProviderContextPipeline } from './contextPipeline.js'
 export { getProviderNetworkLayer } from './network.js'
 export { getProviderAdapter } from './adapters.js'
+export {
+  getAnthropicClient,
+  CLIENT_REQUEST_ID_HEADER,
+} from './anthropic/client.js'
+export * from './openai/index.js'
+export * from './gemini/index.js'
+export * from './grok/index.js'

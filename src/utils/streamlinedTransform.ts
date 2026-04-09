@@ -35,25 +35,31 @@ type ToolCounts = {
 /**
  * Tool categories for summarization.
  */
-const SEARCH_TOOLS = [
-  GREP_TOOL_NAME,
-  GLOB_TOOL_NAME,
-  WEB_SEARCH_TOOL_NAME,
-  LSP_TOOL_NAME,
-]
-const READ_TOOLS = [FILE_READ_TOOL_NAME, LIST_MCP_RESOURCES_TOOL_NAME]
-const WRITE_TOOLS = [
-  FILE_WRITE_TOOL_NAME,
-  FILE_EDIT_TOOL_NAME,
-  NOTEBOOK_EDIT_TOOL_NAME,
-]
-const COMMAND_TOOLS = [...SHELL_TOOL_NAMES, 'Tmux', TASK_STOP_TOOL_NAME]
+function getSearchTools(): string[] {
+  return [GREP_TOOL_NAME, GLOB_TOOL_NAME, WEB_SEARCH_TOOL_NAME, LSP_TOOL_NAME]
+}
+
+function getReadTools(): string[] {
+  return [FILE_READ_TOOL_NAME, LIST_MCP_RESOURCES_TOOL_NAME]
+}
+
+function getWriteTools(): string[] {
+  return [
+    FILE_WRITE_TOOL_NAME,
+    FILE_EDIT_TOOL_NAME,
+    NOTEBOOK_EDIT_TOOL_NAME,
+  ]
+}
+
+function getCommandTools(): string[] {
+  return [...SHELL_TOOL_NAMES, 'Tmux', TASK_STOP_TOOL_NAME]
+}
 
 function categorizeToolName(toolName: string): keyof ToolCounts {
-  if (SEARCH_TOOLS.some(t => toolName.startsWith(t))) return 'searches'
-  if (READ_TOOLS.some(t => toolName.startsWith(t))) return 'reads'
-  if (WRITE_TOOLS.some(t => toolName.startsWith(t))) return 'writes'
-  if (COMMAND_TOOLS.some(t => toolName.startsWith(t))) return 'commands'
+  if (getSearchTools().some(t => toolName.startsWith(t))) return 'searches'
+  if (getReadTools().some(t => toolName.startsWith(t))) return 'reads'
+  if (getWriteTools().some(t => toolName.startsWith(t))) return 'writes'
+  if (getCommandTools().some(t => toolName.startsWith(t))) return 'commands'
   return 'other'
 }
 

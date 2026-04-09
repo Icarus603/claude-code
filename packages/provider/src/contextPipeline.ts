@@ -1,14 +1,6 @@
-import {
-  getSystemContext,
-  getUserContext,
-} from '../../../src/context.js'
 import type { ContextPipeline } from './types.js'
-
-const contextPipeline: ContextPipeline = {
-  getUserContext,
-  getSystemContext,
-}
+import { getProviderHostBindings } from './host.js'
 
 export function getProviderContextPipeline(): ContextPipeline {
-  return contextPipeline
+  return getProviderHostBindings().contextPipeline
 }
