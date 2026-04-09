@@ -106,12 +106,9 @@ import {
 
 const CLASSIFIER_FAIL_CLOSED_REFRESH_MS = 30 * 60 * 1000 // 30 minutes
 
-const PERMISSION_RULE_SOURCES = [
-  ...SETTING_SOURCES,
-  'cliArg',
-  'command',
-  'session',
-] as const satisfies readonly PermissionRuleSource[]
+function getPermissionRuleSources(): readonly PermissionRuleSource[] {
+  return [...SETTING_SOURCES, 'cliArg', 'command', 'session'] as const
+}
 
 export function permissionRuleSourceDisplayString(
   source: PermissionRuleSource,
@@ -122,7 +119,7 @@ export function permissionRuleSourceDisplayString(
 export function getAllowRules(
   context: ToolPermissionContext,
 ): PermissionRule[] {
-  return PERMISSION_RULE_SOURCES.flatMap(source =>
+  return getPermissionRuleSources().flatMap(source =>
     (context.alwaysAllowRules[source] || []).map(ruleString => ({
       source,
       ruleBehavior: 'allow',
@@ -211,7 +208,7 @@ export function createPermissionRequestMessage(
 }
 
 export function getDenyRules(context: ToolPermissionContext): PermissionRule[] {
-  return PERMISSION_RULE_SOURCES.flatMap(source =>
+  return getPermissionRuleSources().flatMap(source =>
     (context.alwaysDenyRules[source] || []).map(ruleString => ({
       source,
       ruleBehavior: 'deny',
@@ -221,7 +218,7 @@ export function getDenyRules(context: ToolPermissionContext): PermissionRule[] {
 }
 
 export function getAskRules(context: ToolPermissionContext): PermissionRule[] {
-  return PERMISSION_RULE_SOURCES.flatMap(source =>
+  return getPermissionRuleSources().flatMap(source =>
     (context.alwaysAskRules[source] || []).map(ruleString => ({
       source,
       ruleBehavior: 'ask',

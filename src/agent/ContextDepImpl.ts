@@ -1,6 +1,7 @@
 
-import type { ContextDep, SystemPrompt } from '@claude-code/agent'
+import type { SystemPrompt } from '@claude-code/agent'
 import { getProviderContextPipeline } from '@claude-code/provider'
+import '../services/api/providerHostSetup.js'
 import type { ToolUseContext } from '../Tool.js'
 
 type ContextOverrides = {
@@ -9,7 +10,7 @@ type ContextOverrides = {
   systemContext?: Record<string, string>
 }
 
-export class ContextDepImpl implements ContextDep {
+export class ContextDepImpl {
   private toolUseContext: ToolUseContext
   private overrides?: ContextOverrides
   private readonly contextPipeline = getProviderContextPipeline()
