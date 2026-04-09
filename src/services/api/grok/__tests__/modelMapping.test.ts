@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, afterEach } from 'bun:test'
-import { resolveGrokModel } from '../modelMapping.js'
+import { resolveGrokModel } from '@claude-code/provider'
 
 describe('resolveGrokModel', () => {
   const originalEnv = { ...process.env }

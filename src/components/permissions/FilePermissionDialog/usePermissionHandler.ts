@@ -10,8 +10,8 @@ import {
   GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN,
 } from '../../../tools/FileEditTool/constants.js'
 import { env } from '../../../utils/env.js'
-import { generateSuggestions } from '../../../utils/permissions/filesystem.js'
-import type { PermissionUpdate } from '../../../utils/permissions/PermissionUpdateSchema.js'
+import { generateSuggestions } from '@claude-code/permission/filesystem'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {
   type CompletionType,
   logUnaryEvent,

@@ -1,5 +1,5 @@
 import type { Command } from '../../commands.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
 
 const web = {

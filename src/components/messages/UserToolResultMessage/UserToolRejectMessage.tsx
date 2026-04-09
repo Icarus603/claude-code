@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTerminalSize } from '../../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { useTheme } from '@anthropic/ink'
 import {
   filterToolProgressMessages,

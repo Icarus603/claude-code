@@ -35,7 +35,7 @@ import {
   createAttachmentMessage,
   getAttachmentMessages,
 } from '../attachments.js'
-import type { PastedContent } from '../config.js'
+import type { PastedContent } from '@claude-code/config'
 import type { EffortValue } from '../effort.js'
 import { toArray } from '../generators.js'
 import {

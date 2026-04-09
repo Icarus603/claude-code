@@ -13,7 +13,7 @@
 
 import { spawn } from 'child_process'
 import { basename } from 'path'
-import { getGlobalConfig } from '../config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'
 import { execFileNoThrow } from '../execFileNoThrow.js'
 import { which } from '../which.js'

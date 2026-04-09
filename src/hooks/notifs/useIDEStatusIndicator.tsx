@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useNotifications } from 'src/context/notifications.js'
 import { Text } from '@anthropic/ink'
 import type { MCPServerConnection } from 'src/services/mcp/types.js'
-import { getGlobalConfig, saveGlobalConfig } from 'src/utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import {
   detectIDEs,
   type IDEExtensionInstallationStatus,

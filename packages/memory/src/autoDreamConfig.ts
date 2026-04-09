@@ -1,5 +1,5 @@
-import { getInitialSettings } from '../../../src/utils/settings/settings.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../../src/services/featureFlags.js'
+import { getInitialSettings } from '@cc-app/utils/settings/settings.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 
 export function isAutoDreamEnabled(): boolean {
   const setting = getInitialSettings().autoDreamEnabled

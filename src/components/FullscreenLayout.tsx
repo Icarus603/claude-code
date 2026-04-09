@@ -18,7 +18,7 @@ import {
   usePromptOverlay,
   usePromptOverlayDialog,
 } from '../context/promptOverlayContext.js'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, ScrollBox, type ScrollBoxHandle, Text, instances } from '@anthropic/ink'
 import type { Message } from '../types/message.js'
 import { openBrowser, openPath } from '../utils/browser.js'

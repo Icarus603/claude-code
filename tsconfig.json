@@ -12,7 +12,8 @@
         "resolveJsonModule": true,
         "types": ["bun"],
         "paths": {
-            "src/*": ["./src/*"]
+            "src/*": ["./src/*"],
+            "@cc-app/*": ["./src/*"]
         }
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],

@@ -36,7 +36,7 @@ import {
   getOriginalCwd,
   getMainThreadAgentType,
 } from '../bootstrap/state.js'
-import { checkHasTrustDialogAccepted } from './config.js'
+import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import {
   getHooksConfigFromSnapshot,
   shouldAllowManagedHooksOnly,
@@ -126,11 +126,11 @@ import {
   normalizeLegacyToolName,
   getLegacyToolNames,
   permissionRuleValueFromString,
-} from './permissions/permissionRuleParser.js'
+} from '@claude-code/permission/permissionRuleParser'
 import { logError } from './log.js'
 import { SandboxManager } from './sandbox/sandbox-adapter.js'
 import { createCombinedAbortSignal } from './combinedAbortSignal.js'
-import type { PermissionResult } from './permissions/PermissionResult.js'
+import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { registerPendingAsyncHook } from './hooks/AsyncHookRegistry.js'
 import { enqueuePendingNotification } from './messageQueueManager.js'
 import {

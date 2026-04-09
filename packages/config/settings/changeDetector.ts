@@ -1,17 +1,17 @@
 import chokidar, { type FSWatcher } from 'chokidar'
 import { stat } from 'fs/promises'
 import * as platformPath from 'path'
-import { getIsRemoteMode } from '../../../src/bootstrap/state.js'
-import { registerCleanup } from '../../../src/utils/cleanupRegistry.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { errorMessage } from '../../../src/utils/errors.js'
+import { getIsRemoteMode } from '@cc-app/bootstrap/state.js'
+import { registerCleanup } from '@cc-app/utils/cleanupRegistry.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { errorMessage } from '@cc-app/utils/errors.js'
 import {
   type ConfigChangeSource,
   executeConfigChangeHooks,
   hasBlockingResult,
-} from '../../../src/utils/hooks.js'
-import { createSignal } from '../../../src/utils/signal.js'
-import { jsonStringify } from '../../../src/utils/slowOperations.js'
+} from '@cc-app/utils/hooks.js'
+import { createSignal } from '@cc-app/utils/signal.js'
+import { jsonStringify } from '@cc-app/utils/slowOperations.js'
 import { SETTING_SOURCES, type SettingSource } from './constants.js'
 import { clearInternalWrites, consumeInternalWrite } from './internalWrites.js'
 import { getManagedSettingsDropInDir } from './managedPath.js'

@@ -1,5 +1,5 @@
 import type { Command } from '../../commands.js'
-import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 
 const thinkback = {
   type: 'local-jsx',

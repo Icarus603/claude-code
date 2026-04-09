@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { logEvent } from 'src/services/eventLogger.js'
 import { Box, Dialog, Link, Text } from '@anthropic/ink'
 import type { ExternalClaudeMdInclude } from '../utils/claudemd.js'
-import { saveCurrentProjectConfig } from '../utils/config.js'
+import { saveCurrentProjectConfig } from '@claude-code/config'
 import { Select } from './CustomSelect/index.js'
 
 type Props = {

@@ -11,7 +11,7 @@ import { BASH_TOOL_NAME } from '../../tools/BashTool/toolName.js'
 import {
   checkHasTrustDialogAccepted,
   saveCurrentProjectConfig,
-} from '../../utils/config.js'
+} from '@claude-code/config'
 import { getCwd } from '../../utils/cwd.js'
 import { getFsImplementation } from '../../utils/fsOperations.js'
 import { gracefulShutdownSync } from '../../utils/gracefulShutdown.js'

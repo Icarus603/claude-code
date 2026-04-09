@@ -6,7 +6,7 @@ import {
 } from 'src/bootstrap/state.js'
 import { MessageResponse } from 'src/components/MessageResponse.js'
 import { BLACK_CIRCLE } from 'src/constants/figures.js'
-import { getModeColor } from 'src/utils/permissions/PermissionMode.js'
+import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { z } from 'zod/v4'
 import { Box, Text } from '@anthropic/ink'
 import type { Tool } from '../../Tool.js'

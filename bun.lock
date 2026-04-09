@@ -27,7 +27,9 @@
         "@biomejs/biome": "^2.4.10",
         "@claude-code/agent": "workspace:*",
         "@claude-code/cli": "workspace:*",
+        "@claude-code/command-registry": "workspace:*",
         "@claude-code/config": "workspace:*",
+        "@claude-code/mcp-runtime": "workspace:*",
         "@claude-code/memory": "workspace:*",
         "@claude-code/permission": "workspace:*",
         "@claude-code/provider": "workspace:*",
@@ -193,6 +195,10 @@
         "highlight.js": "latest",
       },
     },
+    "packages/command-registry": {
+      "name": "@claude-code/command-registry",
+      "version": "0.1.0",
+    },
     "packages/config": {
       "name": "@claude-code/config",
       "version": "0.1.0",
@@ -203,6 +209,10 @@
       "dependencies": {
         "sharp": "^0.33.5",
       },
+    },
+    "packages/mcp-runtime": {
+      "name": "@claude-code/mcp-runtime",
+      "version": "0.1.0",
     },
     "packages/memory": {
       "name": "@claude-code/memory",
@@ -397,7 +407,11 @@
 
     "@claude-code/cli": ["@claude-code/cli@workspace:packages/cli"],
 
+    "@claude-code/command-registry": ["@claude-code/command-registry@workspace:packages/command-registry"],
+
     "@claude-code/config": ["@claude-code/config@workspace:packages/config"],
+
+    "@claude-code/mcp-runtime": ["@claude-code/mcp-runtime@workspace:packages/mcp-runtime"],
 
     "@claude-code/memory": ["@claude-code/memory@workspace:packages/memory"],
 

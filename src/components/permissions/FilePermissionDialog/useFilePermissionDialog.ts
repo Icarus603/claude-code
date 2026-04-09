@@ -6,7 +6,7 @@ import {
   logEvent,
 } from '../../../services/eventLogger.js'
 import { sanitizeToolNameForAnalytics } from '../../../services/eventMetadata.js'
-import type { PermissionUpdate } from '../../../utils/permissions/PermissionUpdateSchema.js'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import type { CompletionType } from '../../../utils/unaryLogging.js'
 import type { ToolUseConfirm } from '../PermissionRequest.js'
 import {

@@ -47,7 +47,7 @@ import {
 } from './debugUtils.js'
 import type { Message } from '../types/message.js'
 import type { SDKMessage } from '../entrypoints/agentSdkTypes.js'
-import type { PermissionMode } from '../utils/permissions/PermissionMode.js'
+import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import type {
   SDKControlRequest,
   SDKControlResponse,

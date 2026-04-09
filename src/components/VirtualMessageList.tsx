@@ -11,7 +11,7 @@ import {
 } from 'react'
 import { useVirtualScroll } from '../hooks/useVirtualScroll.js'
 import { Box, type DOMElement, type ScrollBoxHandle, type MatchPosition } from '@anthropic/ink'
-import { TextHoverColorContext } from './design-system/ThemedText.js'
+import { TextHoverColorContext } from '@anthropic/ink'
 import { ScrollChromeContext } from './FullscreenLayout.js'
 
 // Rows of breathing room above the target when we scrollTo.

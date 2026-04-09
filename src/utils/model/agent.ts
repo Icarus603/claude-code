@@ -1,4 +1,4 @@
-import type { PermissionMode } from '../permissions/PermissionMode.js'
+import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { capitalize } from '../stringUtils.js'
 import { MODEL_ALIASES, type ModelAlias } from './aliases.js'
 import { applyBedrockRegionPrefix, getBedrockRegionPrefix } from './bedrock.js'

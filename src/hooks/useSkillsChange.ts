@@ -5,7 +5,7 @@ import {
   clearCommandsCache,
   getCommands,
 } from '../commands.js'
-import { onGrowthBookRefresh } from '../services/featureFlags.js'
+import { onGrowthBookRefresh } from '@claude-code/config/feature-flags'
 import { logError } from '../utils/log.js'
 import { skillChangeDetector } from '../utils/skills/skillChangeDetector.js'
 

@@ -71,8 +71,8 @@ import type {
   Base64ImageSource,
 } from '@anthropic-ai/sdk/resources/messages.mjs'
 import { maybeResizeAndDownsampleImageBlock } from './imageResizer.js'
-import type { PastedContent } from './config.js'
-import { getGlobalConfig } from './config.js'
+import type { PastedContent } from '@claude-code/config'
+import { getGlobalConfig } from '@claude-code/config'
 import {
   getDefaultSonnetModel,
   getDefaultHaikuModel,
@@ -126,13 +126,13 @@ import {
   formatAgentLine,
   shouldInjectAgentListInMessages,
 } from '../tools/AgentTool/prompt.js'
-import { filterDeniedAgents } from './permissions/permissions.js'
+import { filterDeniedAgents } from '@claude-code/permission/permissions'
 import { getSubscriptionType } from './auth.js'
 import { mcpInfoFromString } from '../services/mcp/mcpStringUtils.js'
 import {
   matchingRuleForInput,
   pathInAllowedWorkingPath,
-} from './permissions/filesystem.js'
+} from '@claude-code/permission/filesystem'
 import {
   generateTaskAttachments,
   applyTaskOffsetsAndEvictions,
@@ -224,7 +224,7 @@ import {
   memoryFreshnessText,
 } from '@claude-code/memory'
 import { getAgentMemoryDir } from '@claude-code/memory/agentMemory'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   hasInstructionsLoadedHook,
   executeInstructionsLoadedHooks,

@@ -6,7 +6,7 @@ import {
   getRateLimitTier,
   getSubscriptionType,
 } from './auth.js'
-import { getGlobalConfig, getOrCreateUserID } from './config.js'
+import { getGlobalConfig, getOrCreateUserID } from '@claude-code/config'
 import { getCwd } from './cwd.js'
 import { type env, getHostPlatformForAnalytics } from './env.js'
 import { isEnvTruthy } from './envUtils.js'

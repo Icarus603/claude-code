@@ -6,31 +6,31 @@ import {
   handlePlanModeTransition,
   setHasExitedPlanMode,
   setNeedsAutoModeExitAttachment,
-} from '../../../src/utils/../../src/bootstrap/state.js'
+} from '@cc-app/bootstrap/state.js'
 import type {
   ToolPermissionContext,
   ToolPermissionRulesBySource,
-} from '../../../src/utils/../../src/Tool.js'
-import { getCwd } from '../../../src/utils/cwd.js'
-import { isEnvTruthy } from '../../../src/utils/envUtils.js'
-import type { SettingSource } from '../../../src/utils/settings/constants.js'
-import { SETTING_SOURCES } from '../../../src/utils/settings/constants.js'
+} from '@cc-app/Tool.js'
+import { getCwd } from '@cc-app/utils/cwd.js'
+import { isEnvTruthy } from '@cc-app/utils/envUtils.js'
+import type { SettingSource } from '@cc-app/utils/settings/constants.js'
+import { SETTING_SOURCES } from '@cc-app/utils/settings/constants.js'
 import {
   getSettings_DEPRECATED,
   getSettingsFilePathForSource,
   getUseAutoModeDuringPlan,
   hasAutoModeOptIn,
-} from '../../../src/utils/settings/settings.js'
+} from '@cc-app/utils/settings/settings.js'
 import {
   type PermissionMode,
   permissionModeFromString,
 } from './PermissionMode.js'
 import { applyPermissionRulesToPermissionContext } from './permissions.js'
-import { loadAllPermissionRulesFromDisk } from '../../../src/utils/permissions/permissionsLoader.js'
+import { loadAllPermissionRulesFromDisk } from '@cc-app/utils/permissions/permissionsLoader.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('../../../src/utils/permissions/autoModeState.js') as typeof import('./autoModeState.js'))
+  ? (require('@cc-app/utils/permissions/autoModeState.js') as typeof import('./autoModeState.js'))
   : null
 
 import { resolve } from 'path'
@@ -39,32 +39,32 @@ import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getDynamicConfig_BLOCKS_ON_INIT,
   getFeatureValue_CACHED_MAY_BE_STALE,
-} from '../../../src/services/featureFlags.js'
+} from '@claude-code/config/feature-flags'
 import {
   addDirHelpMessage,
   validateDirectoryForWorkspace,
-} from '../../../src/utils/../commands/add-dir/validation.js'
+} from '@cc-app/commands/add-dir/validation.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../../src/utils/../services/eventLogger.js'
-import { AGENT_TOOL_NAME } from '../../../src/utils/../tools/AgentTool/constants.js'
-import { BASH_TOOL_NAME } from '../../../src/utils/../tools/BashTool/toolName.js'
+} from '@cc-app/services/eventLogger.js'
+import { AGENT_TOOL_NAME } from '@cc-app/tools/AgentTool/constants.js'
+import { BASH_TOOL_NAME } from '@cc-app/tools/BashTool/toolName.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { POWERSHELL_TOOL_NAME } from '../../../src/utils/../tools/PowerShellTool/toolName.js'
-import { getToolsForDefaultPreset, parseToolPreset } from '../../../src/utils/../tools.js'
+import { POWERSHELL_TOOL_NAME } from '@cc-app/tools/PowerShellTool/toolName.js'
+import { getToolsForDefaultPreset, parseToolPreset } from '@cc-app/tools.js'
 import {
   getFsImplementation,
   safeResolvePath,
-} from '../../../src/utils/../utils/fsOperations.js'
-import { modelSupportsAutoMode } from '../../../src/utils/betas.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { gracefulShutdown } from '../../../src/utils/gracefulShutdown.js'
-import { getMainLoopModel } from '../../../src/utils/model/model.js'
+} from '@cc-app/utils/fsOperations.js'
+import { modelSupportsAutoMode } from '@cc-app/utils/betas.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { gracefulShutdown } from '@cc-app/utils/gracefulShutdown.js'
+import { getMainLoopModel } from '@cc-app/utils/model/model.js'
 import {
   CROSS_PLATFORM_CODE_EXEC,
   DANGEROUS_BASH_PATTERNS,
-} from '../../../src/utils/permissions/dangerousPatterns.js'
+} from '@cc-app/utils/permissions/dangerousPatterns.js'
 import type {
   PermissionRule,
   PermissionRuleSource,

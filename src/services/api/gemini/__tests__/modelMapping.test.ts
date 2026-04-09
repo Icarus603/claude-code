@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import { resolveGeminiModel } from '../modelMapping.js'
+import { resolveGeminiModel } from '@claude-code/provider'
 
 describe('resolveGeminiModel', () => {
   const originalEnv = {

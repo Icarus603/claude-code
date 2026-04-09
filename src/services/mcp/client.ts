@@ -1,4 +1,5 @@
 import { feature } from 'bun:bundle'
+import { installMcpRuntimeHostBindings } from '@claude-code/mcp-runtime'
 import type {
   Base64ImageSource,
   ContentBlockParam,
@@ -3068,3 +3069,20 @@ export async function setupSdkMcpClients(
 
   return { clients, tools }
 }
+
+let mcpRuntimeHostBindingsInstalled = false
+
+function ensureMcpRuntimeHostBindingsInstalled(): void {
+  if (mcpRuntimeHostBindingsInstalled) {
+    return
+  }
+
+  installMcpRuntimeHostBindings({
+    getMcpToolsCommandsAndResources,
+    prefetchAllMcpResources,
+  })
+
+  mcpRuntimeHostBindingsInstalled = true
+}
+
+ensureMcpRuntimeHostBindingsInstalled()

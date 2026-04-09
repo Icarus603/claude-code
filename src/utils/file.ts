@@ -13,7 +13,7 @@ import {
   sep,
 } from 'path'
 import { logEvent } from 'src/services/eventLogger.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getCwd } from '../utils/cwd.js'
 import { logForDebugging } from './debug.js'
 import { isENOENT, isFsInaccessible } from './errors.js'

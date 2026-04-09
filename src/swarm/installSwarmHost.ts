@@ -68,8 +68,8 @@ import {
   applyPermissionUpdate,
   applyPermissionUpdates,
   persistPermissionUpdates,
-} from '../utils/permissions/PermissionUpdate.js'
-import { hasPermissionsToUseTool } from '../utils/permissions/permissions.js'
+} from '@claude-code/permission/PermissionUpdate'
+import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'
 import { emitTaskTerminatedSdk } from '../utils/sdkEventQueue.js'
 import { sleep } from '../utils/sleep.js'
 import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
@@ -124,7 +124,7 @@ import {
   getGlobalConfig,
   saveCurrentProjectConfig,
   saveGlobalConfig,
-} from '../utils/config.js'
+} from '@claude-code/config'
 import { env } from '../utils/env.js'
 import {
   execFileNoThrow,

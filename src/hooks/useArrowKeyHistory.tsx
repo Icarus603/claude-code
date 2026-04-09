@@ -6,7 +6,7 @@ import { FOOTER_TEMPORARY_STATUS_TIMEOUT } from '../components/PromptInput/Notif
 import { getHistory } from '../history.js'
 import { Text } from '@anthropic/ink'
 import type { PromptInputMode } from '../types/textInputTypes.js'
-import type { HistoryEntry, PastedContent } from '../utils/config.js'
+import type { HistoryEntry, PastedContent } from '@claude-code/config'
 
 export type HistoryMode = PromptInputMode
 

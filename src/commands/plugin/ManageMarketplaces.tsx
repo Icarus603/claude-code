@@ -15,7 +15,7 @@ import {
 } from '@anthropic/ink/keybindings'
 import type { LoadedPlugin } from '../../types/plugin.js'
 import { count } from '../../utils/array.js'
-import { shouldSkipPluginAutoupdate } from '../../utils/config.js'
+import { shouldSkipPluginAutoupdate } from '@claude-code/config'
 import { errorMessage } from '../../utils/errors.js'
 import { clearAllCaches } from '../../utils/plugins/cacheUtils.js'
 import {

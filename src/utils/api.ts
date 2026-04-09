@@ -10,7 +10,7 @@ import { isAnalyticsDisabled } from 'src/services/privacyConfig.js'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
-} from 'src/services/featureFlags.js'
+} from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -51,7 +51,7 @@ import {
 import {
   getFileReadIgnorePatterns,
   normalizePatternsToPath,
-} from './permissions/filesystem.js'
+} from '@claude-code/permission/filesystem'
 import {
   getPlan,
   getPlanFilePath,

@@ -1,3 +1,6 @@
+export type { MemoryHostBindings } from './contracts.js'
+export { getMemoryHostBindings, installMemoryHostBindings } from './host.js'
+
 export * from './memdir.js'
 export * from './memoryAge.js'
 export * from './findRelevantMemories.js'

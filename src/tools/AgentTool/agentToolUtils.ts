@@ -47,8 +47,8 @@ import {
   extractTextContent,
   getLastAssistantMessage,
 } from '../../utils/messages.js'
-import type { PermissionMode } from '../../utils/permissions/PermissionMode.js'
-import { permissionRuleValueFromString } from '../../utils/permissions/permissionRuleParser.js'
+import type { PermissionMode } from '@claude-code/permission/PermissionMode'
+import { permissionRuleValueFromString } from '@claude-code/permission/permissionRuleParser'
 import {
   buildTranscriptForClassifier,
   classifyYoloAction,

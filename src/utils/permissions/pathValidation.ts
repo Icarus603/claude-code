@@ -18,8 +18,8 @@ import {
   matchingRuleForInput,
   pathInAllowedWorkingPath,
   pathInWorkingPath,
-} from './filesystem.js'
-import type { PermissionDecisionReason } from './PermissionResult.js'
+} from '@claude-code/permission/filesystem'
+import type { PermissionDecisionReason } from '@claude-code/permission/PermissionResult'
 
 const MAX_DIRS_TO_LIST = 5
 const GLOB_PATTERN_REGEX = /[*?[\]{}]/

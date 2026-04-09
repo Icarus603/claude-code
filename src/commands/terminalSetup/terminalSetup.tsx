@@ -20,7 +20,7 @@ import {
   markTerminalSetupComplete,
 } from '../../utils/appleTerminalBackup.js'
 import { setupShellCompletion } from '../../utils/completionCache.js'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from '../../utils/env.js'
 import { isFsInaccessible } from '../../utils/errors.js'
 import { execFileNoThrow } from '../../utils/execFileNoThrow.js'

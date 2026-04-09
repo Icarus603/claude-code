@@ -26,6 +26,7 @@ startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
 import './tools.js'
+import './services/packageHostSetup.js'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
@@ -59,7 +60,7 @@ import {
 	hasGrowthBookEnvOverride,
 	initializeGrowthBook,
 	refreshGrowthBookAfterAuthChange,
-} from "./services/featureFlags.js";
+} from "@claude-code/config/feature-flags";
 import { fetchBootstrapData } from "./services/api/bootstrap.js";
 import {
 	type DownloadResult,
@@ -168,7 +169,7 @@ const kairosGate = feature("KAIROS")
 
 import { relative, resolve } from "path";
 import { isAnalyticsDisabled } from "src/services/privacyConfig.js";
-import { getFeatureValue_CACHED_MAY_BE_STALE } from "src/services/featureFlags.js";
+import { getFeatureValue_CACHED_MAY_BE_STALE } from "@claude-code/config/feature-flags";
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -679,7 +680,7 @@ export async function main() {
 	if (feature("LODESTONE")) {
 		const handleUriIdx = process.argv.indexOf("--handle-uri");
 		if (handleUriIdx !== -1 && process.argv[handleUriIdx + 1]) {
-			const { enableConfigs } = await import("./utils/config.js");
+			const { enableConfigs } = await import("@claude-code/config");
 			enableConfigs();
 			const uri = process.argv[handleUriIdx + 1]!;
 			const { handleDeepLinkUri } =
@@ -697,7 +698,7 @@ export async function main() {
 			process.env.__CFBundleIdentifier ===
 				"com.anthropic.claude-code-url-handler"
 		) {
-			const { enableConfigs } = await import("./utils/config.js");
+			const { enableConfigs } = await import("@claude-code/config");
 			enableConfigs();
 			const { handleUrlSchemeLaunch } =
 				await import("./utils/deepLink/protocolHandler.js");

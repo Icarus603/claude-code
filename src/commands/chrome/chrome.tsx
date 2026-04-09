@@ -13,7 +13,7 @@ import {
   openInChrome,
 } from '../../utils/claudeInChrome/common.js'
 import { isChromeExtensionInstalled } from '../../utils/claudeInChrome/setup.js'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from '../../utils/env.js'
 import { isRunningOnHomespace } from '../../utils/envUtils.js'
 

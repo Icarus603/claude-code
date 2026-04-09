@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import TextInput from '../../../components/TextInput.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../../hooks/useExitOnCtrlCDWithKeybindings.js'
-import { useTerminalSize } from '../../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Newline, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { BashTool } from '../../../tools/BashTool/BashTool.js'
@@ -11,11 +11,11 @@ import { WebFetchTool } from '../../../tools/WebFetchTool/WebFetchTool.js'
 import type {
   PermissionBehavior,
   PermissionRuleValue,
-} from '../../../utils/permissions/PermissionRule.js'
+} from '@claude-code/permission/PermissionRule'
 import {
   permissionRuleValueFromString,
   permissionRuleValueToString,
-} from '../../../utils/permissions/permissionRuleParser.js'
+} from '@claude-code/permission/permissionRuleParser'
 
 export type PermissionRuleInputProps = {
   onCancel: () => void

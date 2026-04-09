@@ -1,6 +1,6 @@
-import { Cursor } from '../../../../../src/utils/Cursor.js'
-import { firstGrapheme, lastGrapheme } from '../../../../../src/utils/intl.js'
-import { countCharInString } from '../../../../../src/utils/stringUtils.js'
+import { Cursor } from '@cc-app/utils/Cursor.js'
+import { firstGrapheme, lastGrapheme } from '@cc-app/utils/intl.js'
+import { countCharInString } from '@cc-app/utils/stringUtils.js'
 import {
   isInclusiveMotion,
   isLinewiseMotion,

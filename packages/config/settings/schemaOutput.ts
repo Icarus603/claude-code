@@ -1,5 +1,5 @@
 import { toJSONSchema } from 'zod/v4'
-import { jsonStringify } from '../../../src/utils/slowOperations.js'
+import { jsonStringify } from '@cc-app/utils/slowOperations.js'
 import { SettingsSchema } from './types.js'
 
 export function generateSettingsJSONSchema(): string {

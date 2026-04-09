@@ -12,7 +12,7 @@ mock.module("src/utils/auth.js", () => ({
   isMaxSubscriber: () => false,
   isTeamSubscriber: () => false,
 }));
-mock.module("src/services/featureFlags.js", () => ({
+mock.module("@claude-code/config/feature-flags", () => ({
   getFeatureValue_CACHED_MAY_BE_STALE: () => null,
 }));
 mock.module("src/utils/model/modelSupportOverrides.js", () => ({

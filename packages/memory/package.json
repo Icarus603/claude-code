@@ -7,6 +7,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./contracts": "./src/contracts.ts",
     "./memdir": "./src/memdir.ts",
     "./agentMemory": "./src/agentMemory.ts",
     "./memoryAge": "./src/memoryAge.ts",

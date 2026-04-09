@@ -7,12 +7,12 @@ import type {
   PermissionBehavior,
   PermissionRule,
   PermissionRuleValue,
-} from '../../../utils/permissions/PermissionRule.js'
+} from '@claude-code/permission/PermissionRule'
 import {
   applyPermissionUpdate,
   persistPermissionUpdate,
-} from '../../../utils/permissions/PermissionUpdate.js'
-import { permissionRuleValueToString } from '../../../utils/permissions/permissionRuleParser.js'
+} from '@claude-code/permission/PermissionUpdate'
+import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
 import {
   detectUnreachableRules,
   type UnreachableRule,

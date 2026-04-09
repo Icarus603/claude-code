@@ -13,14 +13,14 @@ import {
   saveGlobalConfig,
   getCurrentProjectConfig,
   type OutputStyle,
-} from '../../utils/config.js'
+} from '@claude-code/config'
 import { normalizeApiKeyForConfig } from '../../utils/authPortable.js'
 import {
   getGlobalConfig,
   getAutoUpdaterDisabledReason,
   formatAutoUpdaterDisabledReason,
   getRemoteControlAtStartup,
-} from '../../utils/config.js'
+} from '@claude-code/config'
 import chalk from 'chalk'
 import {
   permissionModeTitle,
@@ -31,12 +31,12 @@ import {
   PERMISSION_MODES,
   type ExternalPermissionMode,
   type PermissionMode,
-} from '../../utils/permissions/PermissionMode.js'
+} from '@claude-code/permission/PermissionMode'
 import {
   getAutoModeEnabledState,
   hasAutoModeOptInAnySource,
   transitionPlanAutoMode,
-} from '../../utils/permissions/permissionSetup.js'
+} from '@claude-code/permission/permissionSetup'
 import { logError } from '../../utils/log.js'
 import {
   logEvent,
@@ -72,7 +72,7 @@ import {
 import { Byline, KeyboardShortcutHint, useTabHeaderFocus } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { useIsInsideModal } from '../../context/modalContext.js'
-import { SearchBox } from '../SearchBox.js'
+import { SearchBox } from '@anthropic/ink'
 import {
   isSupportedTerminal,
   hasAccessToIDEExtensionDiffFeature,
@@ -89,7 +89,7 @@ import type {
   LocalJSXCommandContext,
   CommandResultDisplay,
 } from '../../commands.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
 import {
   getCliTeammateModeOverride,
@@ -97,7 +97,7 @@ import {
 } from '@claude-code/swarm'
 import { getHardcodedTeammateModelFallback } from '@claude-code/swarm'
 import { useSearchInput } from '@anthropic/ink/search'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import {
   clearFastModeCooldown,
   FAST_MODE_MODEL_DISPLAY,

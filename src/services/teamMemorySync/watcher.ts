@@ -14,7 +14,7 @@ import { join } from 'path'
 import {
   getTeamMemPath,
   isTeamMemoryEnabled,
-} from '../../memdir/teamMemPaths.js'
+} from '@claude-code/memory/teamMemPaths'
 import { registerCleanup } from '../../utils/cleanupRegistry.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { errorMessage } from '../../utils/errors.js'
@@ -29,7 +29,7 @@ import {
   pullTeamMemory,
   pushTeamMemory,
   type SyncState,
-} from './index.js'
+} from '@claude-code/memory/teamMemorySync'
 import type { TeamMemorySyncPushResult } from './types.js'
 
 const DEBOUNCE_MS = 2000 // Wait 2s after last change before pushing

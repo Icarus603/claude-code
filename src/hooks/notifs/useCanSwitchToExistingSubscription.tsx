@@ -3,7 +3,7 @@ import { getOauthProfileFromApiKey } from 'src/services/oauth/getOauthProfile.js
 import { isClaudeAISubscriber } from 'src/utils/auth.js'
 import { Text } from '@anthropic/ink'
 import { logEvent } from '../../services/eventLogger.js'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { useStartupNotification } from './useStartupNotification.js'
 
 const MAX_SHOW_COUNT = 3

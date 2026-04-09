@@ -7,22 +7,22 @@ import {
   getFlagSettingsPath,
   getOriginalCwd,
   getUseCoworkPlugins,
-} from '../../../src/bootstrap/state.js'
+} from '@cc-app/bootstrap/state.js'
 import { getRemoteManagedSettingsSyncFromCache } from '../remote/syncCacheState.js'
-import { uniq } from '../../../src/utils/array.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { logForDiagnosticsNoPII } from '../../../src/utils/diagLogs.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '../../../src/utils/envUtils.js'
-import { getErrnoCode, isENOENT } from '../../../src/utils/errors.js'
-import { writeFileSyncAndFlush_DEPRECATED } from '../../../src/utils/file.js'
-import { readFileSync } from '../../../src/utils/fileRead.js'
-import { getFsImplementation, safeResolvePath } from '../../../src/utils/fsOperations.js'
-import { addFileGlobRuleToGitignore } from '../../../src/utils/git/gitignore.js'
-import { safeParseJSON } from '../../../src/utils/json.js'
-import { logError } from '../../../src/utils/log.js'
-import { getPlatform } from '../../../src/utils/platform.js'
-import { clone, jsonStringify } from '../../../src/utils/slowOperations.js'
-import { profileCheckpoint } from '../../../src/utils/startupProfiler.js'
+import { uniq } from '@cc-app/utils/array.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { logForDiagnosticsNoPII } from '@cc-app/utils/diagLogs.js'
+import { getClaudeConfigHomeDir, isEnvTruthy } from '@cc-app/utils/envUtils.js'
+import { getErrnoCode, isENOENT } from '@cc-app/utils/errors.js'
+import { writeFileSyncAndFlush_DEPRECATED } from '@cc-app/utils/file.js'
+import { readFileSync } from '@cc-app/utils/fileRead.js'
+import { getFsImplementation, safeResolvePath } from '@cc-app/utils/fsOperations.js'
+import { addFileGlobRuleToGitignore } from '@cc-app/utils/git/gitignore.js'
+import { safeParseJSON } from '@cc-app/utils/json.js'
+import { logError } from '@cc-app/utils/log.js'
+import { getPlatform } from '@cc-app/utils/platform.js'
+import { clone, jsonStringify } from '@cc-app/utils/slowOperations.js'
+import { profileCheckpoint } from '@cc-app/utils/startupProfiler.js'
 import {
   type EditableSettingSource,
   getEnabledSettingSources,

@@ -7,7 +7,7 @@ import {
   isProSubscriber,
   isTeamPremiumSubscriber,
 } from '../utils/auth.js'
-import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getAPIProvider } from '../utils/model/providers.js'
 import {
   getSettingsForSource,

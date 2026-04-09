@@ -8,7 +8,7 @@ import {
   SSETransport,
   WebSocketTransport,
 } from '@claude-code/cli'
-import { enableConfigs } from '../src/utils/config.js'
+import { enableConfigs } from '@claude-code/config'
 import { getDefaultAppState } from '../src/state/AppStateStore.js'
 import type { Command } from '../src/commands.js'
 

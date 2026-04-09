@@ -31,21 +31,21 @@ function bindValue<T>(name: string): T {
 
 export type CanUseToolFn = (...args: any[]) => Promise<any>
 export type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS = string
-export type AppState = any
-export type Tool = any
-export type ToolUseContext = any
-export type AgentProgress = any
-export type CustomAgentDefinition = any
-export type AgentDefinition = any
-export type AgentToolResult = any
-export type Message = any
-export type PermissionDecision = any
-export type AgentContext = any
+export type AppState = unknown;
+export type Tool = unknown;
+export type ToolUseContext = unknown;
+export type AgentProgress = unknown;
+export type CustomAgentDefinition = unknown;
+export type AgentDefinition = unknown;
+export type AgentToolResult = unknown;
+export type Message = unknown;
+export type PermissionDecision = unknown;
+export type AgentContext = unknown;
 export type ModelAlias = string
-export type PermissionUpdate = any
+export type PermissionUpdate = unknown;
 export type PermissionMode = string
-export type Task = any
-export type TeammateContext = any
+export type Task = unknown;
+export type TeammateContext = unknown;
 export type AgentColorName = string
 
 export let TEAMMATE_MESSAGE_TAG = 'teammate-message'

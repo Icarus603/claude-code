@@ -28,7 +28,7 @@ import { isAutoMemoryEnabled } from '@claude-code/memory'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
-} from '../services/featureFlags.js'
+} from '@claude-code/config/feature-flags'
 import {
   getImageTooLargeErrorMessage,
   getPdfInvalidErrorMessage,
@@ -146,7 +146,7 @@ import { TASK_OUTPUT_TOOL_NAME } from '../tools/TaskOutputTool/constants.js'
 import { TASK_UPDATE_TOOL_NAME } from '../tools/TaskUpdateTool/constants.js'
 import type { PermissionMode } from '../types/permissions.js'
 import { normalizeToolInput, normalizeToolInputForAPI } from './api.js'
-import { getCurrentProjectConfig } from './config.js'
+import { getCurrentProjectConfig } from '@claude-code/config'
 import { logAntError, logForDebugging } from './debug.js'
 import { stripIdeContextTags } from './displayTags.js'
 import { hasEmbeddedSearchTools } from './embeddedTools.js'
@@ -154,7 +154,7 @@ import { formatFileSize } from './format.js'
 import { validateImagesForAPI } from './imageValidation.js'
 import { safeParseJSON } from './json.js'
 import { logError, logMCPDebug } from './log.js'
-import { normalizeLegacyToolName } from './permissions/permissionRuleParser.js'
+import { normalizeLegacyToolName } from '@claude-code/permission/permissionRuleParser'
 import {
   getPlanModeV2AgentCount,
   getPlanModeV2ExploreAgentCount,

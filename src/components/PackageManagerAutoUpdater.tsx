@@ -8,7 +8,7 @@ import {
   getMaxVersion,
   shouldSkipVersion,
 } from '../utils/autoUpdater.js'
-import { isAutoUpdaterDisabled } from '../utils/config.js'
+import { isAutoUpdaterDisabled } from '@claude-code/config'
 import { logForDebugging } from '../utils/debug.js'
 import {
   getPackageManager,

@@ -4,8 +4,8 @@ import type { PendingClassifierCheck } from '../../../types/permissions.js'
 import { isAgentSwarmsEnabled } from '../../../utils/agentSwarmsEnabled.js'
 import { toError } from '../../../utils/errors.js'
 import { logError } from '../../../utils/log.js'
-import type { PermissionDecision } from '../../../utils/permissions/PermissionResult.js'
-import type { PermissionUpdate } from '../../../utils/permissions/PermissionUpdateSchema.js'
+import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {
   createPermissionRequest,
   isSwarmWorker,

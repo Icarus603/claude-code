@@ -1,5 +1,5 @@
 import React from 'react'
-import { getDynamicConfig_BLOCKS_ON_INIT } from '../services/featureFlags.js'
+import { getDynamicConfig_BLOCKS_ON_INIT } from '@claude-code/config/feature-flags'
 
 /**
  * React hook for dynamic config values.

@@ -1,7 +1,7 @@
 import type { Token, Tokens } from 'marked'
 import React from 'react'
 import stripAnsi from 'strip-ansi'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, stringWidth, useTheme, wrapAnsi } from '@anthropic/ink'
 import type { CliHighlight } from '../utils/cliHighlight.js'
 import { formatToken, padAligned } from '../utils/markdown.js'

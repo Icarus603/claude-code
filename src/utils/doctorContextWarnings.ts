@@ -8,7 +8,7 @@ import {
   MAX_MEMORY_CHARACTER_COUNT,
 } from './claudemd.js'
 import { getMainLoopModel } from './model/model.js'
-import { permissionRuleValueToString } from './permissions/permissionRuleParser.js'
+import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
 import { detectUnreachableRules } from './permissions/shadowedRuleDetection.js'
 import { SandboxManager } from './sandbox/sandbox-adapter.js'
 import {

@@ -1,3 +1,6 @@
+export type { CliHostBindings } from './contracts.js'
+export { getCliHostBindings, installCliHostBindings } from './host.js'
+
 export {
   createHeadlessSession,
   createHeadlessStore,
@@ -13,29 +16,29 @@ export type {
 
 import type React from 'react'
 import type { Root } from '@anthropic/ink'
-import type { Props as REPLProps } from '../../../src/screens/REPL.js'
-import type { AppState } from '../../../src/state/AppStateStore.js'
-import type { FpsMetrics } from '../../../src/utils/fpsTracker.js'
+import type { Props as REPLProps } from '@cc-app/screens/REPL.js'
+import type { AppState } from '@cc-app/state/AppStateStore.js'
+import type { FpsMetrics } from '@cc-app/utils/fpsTracker.js'
 
-export type { Transport } from '../../../src/cli/transports/Transport.js'
-export { HybridTransport } from '../../../src/cli/transports/HybridTransport.js'
+export type { Transport } from '@cc-app/cli/transports/Transport.js'
+export { HybridTransport } from '@cc-app/cli/transports/HybridTransport.js'
 export {
   SSETransport,
   parseSSEFrames,
-} from '../../../src/cli/transports/SSETransport.js'
+} from '@cc-app/cli/transports/SSETransport.js'
 export {
   WebSocketTransport,
-} from '../../../src/cli/transports/WebSocketTransport.js'
+} from '@cc-app/cli/transports/WebSocketTransport.js'
 export {
   SerialBatchEventUploader,
-} from '../../../src/cli/transports/SerialBatchEventUploader.js'
+} from '@cc-app/cli/transports/SerialBatchEventUploader.js'
 export {
   WorkerStateUploader,
-} from '../../../src/cli/transports/WorkerStateUploader.js'
+} from '@cc-app/cli/transports/WorkerStateUploader.js'
 
 type AppWrapperProps = {
   getFpsMetrics: () => FpsMetrics | undefined
-  stats?: import('../../../src/context/stats.js').StatsStore
+  stats?: import('@cc-app/context/stats.js').StatsStore
   initialState: AppState
 }
 
@@ -46,7 +49,7 @@ export async function launchRepl(
   renderAndRun: (root: Root, element: React.ReactNode) => Promise<void>,
 ): Promise<void> {
   const { launchRepl: launchReplImpl } = await import(
-    '../../../src/replLauncher.js'
+    '@cc-app/replLauncher.js'
   )
   return launchReplImpl(root, appProps, replProps, renderAndRun)
 }

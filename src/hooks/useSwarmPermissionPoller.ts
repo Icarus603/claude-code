@@ -16,7 +16,7 @@ import { errorMessage } from '../utils/errors.js'
 import {
   type PermissionUpdate,
   permissionUpdateSchema,
-} from '../utils/permissions/PermissionUpdateSchema.js'
+} from '@claude-code/permission/PermissionUpdateSchema'
 import {
   isSwarmWorker,
   type PermissionResponse,

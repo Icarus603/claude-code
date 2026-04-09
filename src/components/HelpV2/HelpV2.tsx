@@ -8,7 +8,7 @@ import {
   INTERNAL_ONLY_COMMANDS,
 } from '../../commands.js'
 import { useIsInsideModal } from '../../context/modalContext.js'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Link, Text, Tab, Tabs, Pane } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { Commands } from './Commands.js'

@@ -73,8 +73,8 @@ import {
   prepareUserContent,
 } from '../messages.js'
 import type { ModelAlias } from '../model/aliases.js'
-import { parseToolListFromCLI } from '../permissions/permissionSetup.js'
-import { hasPermissionsToUseTool } from '../permissions/permissions.js'
+import { parseToolListFromCLI } from '@claude-code/permission/permissionSetup'
+import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'
 import {
   isOfficialMarketplaceName,
   parsePluginIdentifier,

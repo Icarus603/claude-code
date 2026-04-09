@@ -1,5 +1,5 @@
 import type { TerminalNotification } from '@anthropic/ink'
-import { getGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { env } from '../utils/env.js'
 import { execFileNoThrow } from '../utils/execFileNoThrow.js'
 import { executeNotificationHooks } from '../utils/hooks.js'

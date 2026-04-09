@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { useSyncExternalStore } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   calculateTokenWarningState,
   getEffectiveContextWindowSize,

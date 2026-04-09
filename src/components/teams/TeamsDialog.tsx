@@ -24,7 +24,7 @@ import {
   type PermissionMode,
   permissionModeFromString,
   permissionModeSymbol,
-} from '../../utils/permissions/PermissionMode.js'
+} from '@claude-code/permission/PermissionMode'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import {
   IT2_COMMAND,
@@ -63,7 +63,7 @@ import {
   writeToMailbox,
 } from '@claude-code/swarm'
 import { Dialog } from '@anthropic/ink'
-import ThemedText from '../design-system/ThemedText.js'
+import { Text as ThemedText } from '@anthropic/ink'
 
 type Props = {
   initialTeams?: TeamSummary[]

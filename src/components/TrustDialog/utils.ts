@@ -1,4 +1,4 @@
-import type { PermissionRule } from 'src/utils/permissions/PermissionRule.js'
+import type { PermissionRule } from '@claude-code/permission/PermissionRule'
 import { getSettingsForSource } from 'src/utils/settings/settings.js'
 import type { SettingsJson } from 'src/utils/settings/types.js'
 import { BASH_TOOL_NAME } from '../../tools/BashTool/toolName.js'

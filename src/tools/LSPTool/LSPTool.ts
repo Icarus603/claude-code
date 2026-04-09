@@ -29,8 +29,8 @@ import { getFsImplementation } from '../../utils/fsOperations.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '../../utils/log.js'
 import { expandPath } from '../../utils/path.js'
-import { checkReadPermissionForTool } from '../../utils/permissions/filesystem.js'
-import type { PermissionDecision } from '../../utils/permissions/PermissionResult.js'
+import { checkReadPermissionForTool } from '@claude-code/permission/filesystem'
+import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import {
   formatDocumentSymbolResult,
   formatFindReferencesResult,

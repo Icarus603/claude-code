@@ -1,3 +1,6 @@
+export type { ConfigHostBindings } from './contracts.js'
+export { installConfigHostBindings, getConfigHostBindings } from './host.js'
+
 // @anthropic/config — Configuration Management Package
 // Phase 1: Re-export from existing src/ locations
 // Phase 2: Unified interfaces (SettingsManager, FeatureFlagProvider)

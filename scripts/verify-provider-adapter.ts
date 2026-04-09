@@ -2,7 +2,7 @@ import { getProviderAdapter } from '@claude-code/provider'
 import '../src/services/api/providerHostSetup.js'
 import { getEmptyToolPermissionContext } from '../src/Tool.js'
 import { createUserMessage } from '../src/utils/messages.js'
-import { enableConfigs } from '../src/utils/config.js'
+import { enableConfigs } from '@claude-code/config'
 import { asSystemPrompt } from '../src/utils/systemPromptType.js'
 
 function makeSseResponse(frames: string[]): Response {

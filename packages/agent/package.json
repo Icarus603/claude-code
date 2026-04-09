@@ -7,6 +7,8 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./compaction": "./compaction/index.ts",
+    "./contracts": "./contracts.ts",
     "./file-history": "./fileHistory.ts",
     "./scheduler": "./scheduler.ts",
     "./hooks": "./hooks/index.ts"

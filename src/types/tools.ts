@@ -1,12 +1,12 @@
 // Auto-generated stub — replace with real implementation
-export type AgentToolProgress = any;
-export type BashProgress = any;
-export type MCPProgress = any;
-export type REPLToolProgress = any;
-export type SkillToolProgress = any;
-export type TaskOutputProgress = any;
-export type ToolProgressData = any;
-export type WebSearchProgress = any;
-export type ShellProgress = any;
-export type PowerShellProgress = any;
-export type SdkWorkflowProgress = any;
+export type AgentToolProgress = unknown;
+export type BashProgress = unknown;
+export type MCPProgress = unknown;
+export type REPLToolProgress = unknown;
+export type SkillToolProgress = unknown;
+export type TaskOutputProgress = unknown;
+export type ToolProgressData = unknown;
+export type WebSearchProgress = unknown;
+export type ShellProgress = unknown;
+export type PowerShellProgress = unknown;
+export type SdkWorkflowProgress = unknown;

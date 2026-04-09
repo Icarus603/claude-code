@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { adaptOpenAIStreamToAnthropic } from '../streamAdapter.js'
+import { adaptOpenAIStreamToAnthropic } from '@claude-code/provider'
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions/completions.mjs'
 
 /** Helper to create a mock async iterable from chunk array */

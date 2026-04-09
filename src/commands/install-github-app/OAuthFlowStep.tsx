@@ -6,7 +6,7 @@ import {
 import { KeyboardShortcutHint } from '@anthropic/ink'
 import { Spinner } from '../../components/Spinner.js'
 import TextInput from '../../components/TextInput.js'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { type KeyboardEvent, setClipboard, Box, Link, Text } from '@anthropic/ink'
 import { OAuthService } from '../../services/oauth/index.js'
 import { saveOAuthTokensIfNeeded } from '../../utils/auth.js'

@@ -6,7 +6,7 @@
  * generate a reaction shown in the CompanionSprite speech bubble.
  */
 import { getCompanion } from './companion.js'
-import { getGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { getClaudeAIOAuthTokens } from '../utils/auth.js'
 import { getOauthConfig } from '../constants/oauth.js'
 import { getUserAgent } from '../utils/http.js'

@@ -3,7 +3,7 @@ import { use } from 'react'
 import { Box } from '@anthropic/ink'
 import type { AgentDefinitionsResult } from '../tools/AgentTool/loadAgentsDir.js'
 import { getMemoryFiles } from '../utils/claudemd.js'
-import { getGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import {
   getActiveNotices,
   type StatusNoticeContext,

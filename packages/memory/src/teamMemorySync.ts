@@ -33,31 +33,31 @@ import {
   CLAUDE_AI_PROFILE_SCOPE,
   getOauthConfig,
   OAUTH_BETA_HEADER,
-} from '../../../src/constants/oauth.js'
+} from '@cc-app/constants/oauth.js'
 import {
   getTeamMemPath,
   PathTraversalError,
   validateTeamMemKey,
 } from './teamMemPaths.js'
-import { count } from '../../../src/utils/array.js'
+import { count } from '@cc-app/utils/array.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
-} from '../../../src/utils/auth.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
-import { classifyAxiosError } from '../../../src/utils/errors.js'
-import { getGithubRepo } from '../../../src/utils/git.js'
+} from '@cc-app/utils/auth.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
+import { classifyAxiosError } from '@cc-app/utils/errors.js'
+import { getGithubRepo } from '@cc-app/utils/git.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from '../../../src/utils/model/providers.js'
-import { sleep } from '../../../src/utils/sleep.js'
-import { jsonStringify } from '../../../src/utils/slowOperations.js'
-import { getClaudeCodeUserAgent } from '../../../src/utils/userAgent.js'
-import { logEvent } from '../../../src/services/eventLogger.js'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../../src/services/eventMetadata.js'
-import { getRetryDelay } from '../../../src/services/api/withRetry.js'
-import { scanForSecrets } from '../../../src/services/teamMemorySync/secretScanner.js'
+} from '@cc-app/utils/model/providers.js'
+import { sleep } from '@cc-app/utils/sleep.js'
+import { jsonStringify } from '@cc-app/utils/slowOperations.js'
+import { getClaudeCodeUserAgent } from '@cc-app/utils/userAgent.js'
+import { logEvent } from '@cc-app/services/eventLogger.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@cc-app/services/eventMetadata.js'
+import { getRetryDelay } from '@cc-app/services/api/withRetry.js'
+import { scanForSecrets } from '@cc-app/services/teamMemorySync/secretScanner.js'
 import {
   type SkippedSecretFile,
   TeamMemoryDataSchema,
@@ -66,7 +66,7 @@ import {
   type TeamMemorySyncPushResult,
   type TeamMemorySyncUploadResult,
   TeamMemoryTooManyEntriesSchema,
-} from '../../../src/services/teamMemorySync/types.js'
+} from '@cc-app/services/teamMemorySync/types.js'
 
 const TEAM_MEMORY_SYNC_TIMEOUT_MS = 30_000
 // Per-entry size cap — server default from anthropic/anthropic#293258.
@@ -851,7 +851,7 @@ export async function pullTeamMemory(
   const filesWritten = await writeRemoteEntriesToLocal(entries)
   if (filesWritten > 0) {
     const { clearMemoryFileCaches } = await import(
-      '../../../src/utils/claudemd.js'
+      '@cc-app/utils/claudemd.js'
     )
     clearMemoryFileCaches()
   }

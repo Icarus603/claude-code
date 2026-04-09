@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { formatCost } from '../cost-tracker.js';
 import { Box, Text, ProgressBar } from '@anthropic/ink';
 import { formatTokens } from '../utils/format.js';
-import { useTerminalSize } from '../hooks/useTerminalSize.js';
+import { useTerminalSize } from '@anthropic/ink';
 
 type RateLimitBucket = {
   utilization: number;

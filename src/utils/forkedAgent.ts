@@ -33,8 +33,8 @@ import {
   extractTextContent,
   getLastAssistantMessage,
 } from './messages.js'
-import { createDenialTrackingState } from './permissions/denialTracking.js'
-import { parseToolListFromCLI } from './permissions/permissionSetup.js'
+import { createDenialTrackingState } from '@claude-code/permission/denialTracking'
+import { parseToolListFromCLI } from '@claude-code/permission/permissionSetup'
 import { recordSidechainTranscript } from './sessionStorage.js'
 import type { SystemPrompt } from './systemPromptType.js'
 import {

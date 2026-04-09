@@ -1,7 +1,7 @@
 import { join } from 'path'
 import React, { useCallback, useState } from 'react'
 import type { ExitState } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { setClipboard, Box, Text, Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getCwd } from '../utils/cwd.js'

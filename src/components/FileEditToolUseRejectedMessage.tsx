@@ -1,7 +1,7 @@
 import type { StructuredPatchHunk } from 'diff'
 import { relative } from 'path'
 import * as React from 'react'
-import { useTerminalSize } from 'src/hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { getCwd } from 'src/utils/cwd.js'
 import { Box, Text } from '@anthropic/ink'
 import { HighlightedCode } from './HighlightedCode.js'

@@ -12,11 +12,11 @@ import {
   getSessionCronTasks,
   removeSessionCronTasks,
   setScheduledTasksEnabled,
-} from '../../../src/bootstrap/state.js'
+} from '@cc-app/bootstrap/state.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../../src/services/eventLogger.js'
+} from '@cc-app/services/eventLogger.js'
 import { cronToHuman } from './cronCore.js'
 import {
   type CronJitterConfig,
@@ -35,7 +35,7 @@ import {
   releaseSchedulerLock,
   tryAcquireSchedulerLock,
 } from './cronTasksLockCore.js'
-import { logForDebugging } from '../../../src/utils/debug.js'
+import { logForDebugging } from '@cc-app/utils/debug.js'
 
 const CHECK_INTERVAL_MS = 1000
 const FILE_STABILITY_MS = 300

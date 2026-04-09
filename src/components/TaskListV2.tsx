@@ -1,6 +1,6 @@
 import figures from 'figures'
 import * as React from 'react'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
 import { useAppState } from '../state/AppState.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
@@ -14,7 +14,7 @@ import { summarizeRecentActivities } from '../utils/collapseReadSearch.js'
 import { truncateToWidth } from '../utils/format.js'
 import { isTodoV2Enabled, type Task } from '../utils/tasks.js'
 import type { Theme } from '../utils/theme.js'
-import ThemedText from './design-system/ThemedText.js'
+import { Text as ThemedText } from '@anthropic/ink'
 
 type Props = {
   tasks: Task[]

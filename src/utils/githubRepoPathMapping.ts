@@ -1,6 +1,6 @@
 import { realpath } from 'fs/promises'
 import { getOriginalCwd } from '../bootstrap/state.js'
-import { getGlobalConfig, saveGlobalConfig } from './config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from './debug.js'
 import {
   detectCurrentRepository,

@@ -10,7 +10,7 @@ import figures from 'figures'
 import { getCwd } from './cwd.js'
 import { relative } from 'path'
 import { formatNumber } from './format.js'
-import type { getGlobalConfig } from './config.js'
+import type { getGlobalConfig } from '@claude-code/config'
 import {
   getAnthropicApiKeyWithSource,
   getApiKeyFromConfigOrMacOSKeychain,

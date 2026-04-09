@@ -1,7 +1,7 @@
 import { mkdir, open } from 'fs/promises'
 import { join } from 'path'
 import { getSessionId } from '../bootstrap/state.js'
-import type { PastedContent } from './config.js'
+import type { PastedContent } from '@claude-code/config'
 import { logForDebugging } from './debug.js'
 import { getClaudeConfigHomeDir } from './envUtils.js'
 import { getFsImplementation } from './fsOperations.js'

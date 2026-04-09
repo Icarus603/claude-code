@@ -1,6 +1,6 @@
 import type { OverageDisabledReason } from 'src/services/claudeAiLimits.js'
 import { isClaudeAISubscriber } from '../auth.js'
-import { getGlobalConfig } from '../config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { is1mContextDisabled } from '../context.js'
 
 /**

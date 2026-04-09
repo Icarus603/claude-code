@@ -1,8 +1,8 @@
 import { feature } from 'bun:bundle'
 import { logEvent } from 'src/services/eventLogger.js'
-import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logError } from '../utils/log.js'
-import { getAutoModeEnabledState } from '../utils/permissions/permissionSetup.js'
+import { getAutoModeEnabledState } from '@claude-code/permission/permissionSetup'
 import {
   getSettingsForSource,
   updateSettingsForSource,

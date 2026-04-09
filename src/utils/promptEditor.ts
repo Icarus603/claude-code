@@ -4,7 +4,7 @@ import {
   getPastedTextRefNumLines,
 } from '../history.js'
 import { instances } from '@anthropic/ink'
-import type { PastedContent } from './config.js'
+import type { PastedContent } from '@claude-code/config'
 import { classifyGuiEditor, getExternalEditor } from './editor.js'
 import { execSync_DEPRECATED } from './execSyncWrapper.js'
 import { getFsImplementation } from './fsOperations.js'

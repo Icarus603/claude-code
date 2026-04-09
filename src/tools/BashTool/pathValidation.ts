@@ -9,10 +9,10 @@ import {
 } from '../../utils/bash/commands.js'
 import { tryParseShellCommand } from '../../utils/bash/shellQuote.js'
 import { getDirectoryForPath } from '../../utils/path.js'
-import { allWorkingDirectories } from '../../utils/permissions/filesystem.js'
-import type { PermissionResult } from '../../utils/permissions/PermissionResult.js'
-import { createReadRuleSuggestion } from '../../utils/permissions/PermissionUpdate.js'
-import type { PermissionUpdate } from '../../utils/permissions/PermissionUpdateSchema.js'
+import { allWorkingDirectories } from '@claude-code/permission/filesystem'
+import type { PermissionResult } from '@claude-code/permission/PermissionResult'
+import { createReadRuleSuggestion } from '@claude-code/permission/PermissionUpdate'
+import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {
   expandTilde,
   type FileOperationType,

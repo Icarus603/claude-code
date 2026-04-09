@@ -13,7 +13,7 @@ import type {
   ConnectedMCPServer,
   MCPServerConnection,
 } from '../services/mcp/types.js'
-import { getGlobalConfig, saveGlobalConfig } from './config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from './env.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from './envUtils.js'
 import {

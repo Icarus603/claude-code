@@ -32,7 +32,7 @@ import {
   type ModelSetting,
 } from './model.js'
 import { has1mContext } from '../context.js'
-import { getGlobalConfig } from '../config.js'
+import { getGlobalConfig } from '@claude-code/config'
 
 // @[MODEL LAUNCH]: Update all the available and default model option strings below.
 

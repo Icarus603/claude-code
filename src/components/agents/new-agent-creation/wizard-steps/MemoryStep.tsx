@@ -1,11 +1,11 @@
 import React, { type ReactNode } from 'react'
 import { Box, Byline, KeyboardShortcutHint } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { isAutoMemoryEnabled } from '../../../../memdir/paths.js'
+import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
 import {
   type AgentMemoryScope,
   loadAgentMemoryPrompt,
-} from '../../../../tools/AgentTool/agentMemory.js'
+} from '@claude-code/memory/agentMemory'
 import { ConfigurableShortcutHint } from '../../../ConfigurableShortcutHint.js'
 import { Select } from '../../../CustomSelect/select.js'
 import { useWizard } from '../../../wizard/index.js'

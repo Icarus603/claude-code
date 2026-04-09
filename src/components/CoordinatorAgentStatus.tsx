@@ -9,7 +9,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { BLACK_CIRCLE, PAUSE_ICON, PLAY_ICON } from '../constants/figures.js'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth, wrapText } from '@anthropic/ink'
 import {
   type AppState,

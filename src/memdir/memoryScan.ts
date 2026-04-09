@@ -8,7 +8,7 @@ import { readdir } from 'fs/promises'
 import { basename, join } from 'path'
 import { parseFrontmatter } from '../utils/frontmatterParser.js'
 import { readFileInRange } from '../utils/readFileInRange.js'
-import { type MemoryType, parseMemoryType } from './memoryTypes.js'
+import { type MemoryType, parseMemoryType } from '@claude-code/memory/memoryTypes'
 
 export type MemoryHeader = {
   filename: string

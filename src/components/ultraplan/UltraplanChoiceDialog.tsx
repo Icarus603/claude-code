@@ -3,7 +3,7 @@ import { join } from 'path';
 import { writeFile } from 'fs/promises';
 import figures from 'figures';
 import { Box, Text, useInput, wrapText } from '@anthropic/ink';
-import { useTerminalSize } from '../../hooks/useTerminalSize.js';
+import { useTerminalSize } from '@anthropic/ink';
 import { Select } from '../CustomSelect/select.js';
 import { PermissionDialog } from '../permissions/PermissionDialog.js';
 import { useSetAppState } from '../../state/AppState.js';

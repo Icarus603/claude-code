@@ -5,7 +5,7 @@
 
 import { isFsInaccessible } from '../../utils/errors.js'
 import { getFsImplementation } from '../../utils/fsOperations.js'
-import { getSessionMemoryPath } from '../../utils/permissions/filesystem.js'
+import { getSessionMemoryPath } from '@claude-code/permission/filesystem'
 import { sleep } from '../../utils/sleep.js'
 import { logEvent } from '../eventLogger.js'
 

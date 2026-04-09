@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useMemo } from 'react'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, Text } from '@anthropic/ink'
 import { createHyperlink } from '../../utils/hyperlink.js'
 

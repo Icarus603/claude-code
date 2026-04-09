@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import { randomUUID } from 'crypto'
 import React from 'react'
 import { getOriginalCwd, getSessionId } from 'src/bootstrap/state.js'
-import { checkGate_CACHED_OR_BLOCKING } from 'src/services/featureFlags.js'
+import { checkGate_CACHED_OR_BLOCKING } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

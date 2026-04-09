@@ -1,6 +1,6 @@
 import type { StructuredPatchHunk } from 'diff'
 import * as React from 'react'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { count } from '../utils/array.js'
 import { MessageResponse } from './MessageResponse.js'

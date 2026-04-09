@@ -5,7 +5,7 @@ import {
   permissionRuleValueFromString,
   permissionRuleValueToString,
   normalizeLegacyToolName,
-} from "../permissionRuleParser";
+} from "@claude-code/permission/permissionRuleParser";
 
 describe("escapeRuleContent", () => {
   test("escapes backslashes first", () => {

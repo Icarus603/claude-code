@@ -12,4 +12,4 @@ export {
   getTaskCompletedHookMessage,
   getTeammateIdleHookMessage,
   getPreToolHookBlockingMessage,
-} from '../../../src/utils/hooks.js'
+} from '@cc-app/utils/hooks.js'

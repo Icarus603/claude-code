@@ -1,6 +1,6 @@
 import { feature } from "bun:bundle";
 import { getSystemContext, getUserContext } from "../../context.js";
-import { checkHasTrustDialogAccepted } from "../../utils/config.js";
+import { checkHasTrustDialogAccepted } from "@claude-code/config";
 import { getIsNonInteractiveSession } from "../../bootstrap/state.js";
 import { logForDiagnosticsNoPII } from "../../utils/diagLogs.js";
 import { initUser } from "../../utils/user.js";

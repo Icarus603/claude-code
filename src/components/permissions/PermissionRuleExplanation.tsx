@@ -2,13 +2,13 @@ import { feature } from 'bun:bundle'
 import chalk from 'chalk'
 import React from 'react'
 import { Ansi, Box, Text } from '@anthropic/ink'
-import ThemedText from '../design-system/ThemedText.js'
+import { Text as ThemedText } from '@anthropic/ink'
 import { useAppState } from '../../state/AppState.js'
 import type {
   PermissionDecision,
   PermissionDecisionReason,
-} from '../../utils/permissions/PermissionResult.js'
-import { permissionRuleValueToString } from '../../utils/permissions/permissionRuleParser.js'
+} from '@claude-code/permission/PermissionResult'
+import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
 import type { Theme } from '../../utils/theme.js'
 
 export type PermissionRuleExplanationProps = {

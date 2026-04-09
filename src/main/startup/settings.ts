@@ -26,7 +26,7 @@ import { migrateReplBridgeEnabledToRemoteControlAtStartup } from "../../migratio
 import { resetAutoModeOptInForDefaultOffer } from "../../migrations/resetAutoModeOptInForDefaultOffer.js";
 import { migrateFennecToOpus } from "../../migrations/migrateFennecToOpus.js";
 import { migrateChangelogFromConfig } from "../../utils/releaseNotes.js";
-import { getGlobalConfig, saveGlobalConfig } from "../../utils/config.js";
+import { getGlobalConfig, saveGlobalConfig } from "@claude-code/config";
 import { profileCheckpoint } from "../../utils/startupProfiler.js";
 import { isEnvTruthy } from "../../utils/envUtils.js";
 

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { isFeedbackSurveyDisabled } from 'src/services/privacyConfig.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from 'src/services/eventLogger.js'
-import { isAutoMemoryEnabled } from '../../memdir/paths.js'
+import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
 import { FILE_READ_TOOL_NAME } from '../../tools/FileReadTool/prompt.js'
 import type { Message } from '../../types/message.js'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '../../utils/envUtils.js'
 import { isAutoManagedMemoryFile } from '../../utils/memoryFileDetection.js'
 import {

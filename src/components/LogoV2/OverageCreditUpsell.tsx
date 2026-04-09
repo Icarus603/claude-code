@@ -7,7 +7,7 @@ import {
   getCachedOverageCreditGrant,
   refreshOverageCreditGrantCache,
 } from '../../services/api/overageCreditGrant.js'
-import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { truncate } from '../../utils/format.js'
 import type { FeedConfig } from './Feed.js'
 

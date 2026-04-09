@@ -4,7 +4,7 @@ import { Box, Text } from '@anthropic/ink'
 import { getPlatform } from 'src/utils/platform.js'
 import { isKeybindingCustomizationEnabled } from '../../keybindings/loadUserBindings.js'
 import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/featureFlags.js'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isFastModeAvailable, isFastModeEnabled } from '../../utils/fastMode.js'
 import { getNewlineInstructions } from './utils.js'
 

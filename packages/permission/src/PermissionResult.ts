@@ -6,7 +6,7 @@ import type {
   PermissionDenyDecision,
   PermissionMetadata,
   PermissionResult,
-} from '../../../src/types/permissions.js'
+} from '@cc-app/types/permissions.js'
 
 export type {
   PermissionAllowDecision,

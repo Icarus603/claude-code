@@ -6,7 +6,7 @@ import {
   type OutputStyleConfig,
 } from '../constants/outputStyles.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
-import type { OutputStyle } from '../utils/config.js'
+import type { OutputStyle } from '@claude-code/config'
 import { getCwd } from '../utils/cwd.js'
 import type { OptionWithDescription } from './CustomSelect/select.js'
 import { Select } from './CustomSelect/select.js'

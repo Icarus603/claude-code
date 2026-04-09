@@ -16,7 +16,7 @@ import figures from 'figures';
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- / n N Esc [ v are bare letters in transcript modal context, same class as g/G/j/k in ScrollKeybindingHandler
 import { useInput } from '@anthropic/ink'
 import { useSearchInput } from '@anthropic/ink/search'
-import { useTerminalSize } from '../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 import { useSearchHighlight } from '@anthropic/ink'
 import type { JumpHandle } from '../components/VirtualMessageList.js'
 import { renderMessagesToPlainText } from '../utils/exportRenderer.js'
@@ -199,21 +199,21 @@ import {
   applyPermissionUpdate,
   applyPermissionUpdates,
   persistPermissionUpdate,
-} from '../utils/permissions/PermissionUpdate.js';
+} from '@claude-code/permission/PermissionUpdate';
 import { buildPermissionUpdates } from '../components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.js';
-import { stripDangerousPermissionsForAutoMode } from '../utils/permissions/permissionSetup.js';
-import { getScratchpadDir, isScratchpadEnabled } from '../utils/permissions/filesystem.js';
+import { stripDangerousPermissionsForAutoMode } from '@claude-code/permission/permissionSetup';
+import { getScratchpadDir, isScratchpadEnabled } from '@claude-code/permission/filesystem';
 import { WEB_FETCH_TOOL_NAME } from '../tools/WebFetchTool/prompt.js';
 import { SLEEP_TOOL_NAME } from '../tools/SleepTool/prompt.js';
 import { clearSpeculativeChecks } from '../tools/BashTool/bashPermissions.js';
 import type { AutoUpdaterResult } from '../utils/autoUpdater.js';
-import { getGlobalConfig, saveGlobalConfig, getGlobalConfigWriteCount } from '../utils/config.js';
+import { getGlobalConfig, saveGlobalConfig, getGlobalConfigWriteCount } from '@claude-code/config';
 import { hasConsoleBillingAccess } from '../utils/billing.js';
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 } from 'src/services/eventLogger.js';
-import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/featureFlags.js';
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags';
 import {
   textForResubmit,
   handleMessageFromStream,
@@ -275,7 +275,7 @@ import { useAppState } from '../state/AppState.js';
 import { useReplAppState } from './repl/useReplAppState.js';
 import type { ContentBlockParam, ImageBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs';
 import type { ProcessUserInputContext } from '../utils/processUserInput/processUserInput.js';
-import type { PastedContent } from '../utils/config.js';
+import type { PastedContent } from '@claude-code/config';
 import { copyPlanForFork, copyPlanForResume, getPlanSlug, setPlanSlug } from '../utils/plans.js';
 import {
   clearSessionMetadata,

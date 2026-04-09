@@ -16,9 +16,9 @@ import type {
   SSEServerInfo,
   StdioServerInfo,
 } from '../../components/mcp/types.js'
-import { SearchBox } from '../../components/SearchBox.js'
+import { SearchBox } from '@anthropic/ink'
 import { useSearchInput } from '@anthropic/ink/search'
-import { useTerminalSize } from '../../hooks/useTerminalSize.js'
+import { useTerminalSize } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- useInput needed for raw search mode text input
 import { Box, Text, useInput, useTerminalFocus } from '@anthropic/ink'
 import {

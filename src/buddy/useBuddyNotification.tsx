@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import React, { useEffect } from 'react'
 import { useNotifications } from '../context/notifications.js'
 import { Text } from '@anthropic/ink'
-import { getGlobalConfig } from '../utils/config.js'
+import { getGlobalConfig } from '@claude-code/config'
 import { getRainbowColor } from '../utils/thinking.js'
 
 // Local date, not UTC — 24h rolling wave across timezones. Sustained Twitter
