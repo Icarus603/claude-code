@@ -26,7 +26,7 @@ startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
 import './runtime/bootstrap.js'
-import '@claude-code/app-host'
+import { createHeadlessHost } from '@claude-code/app-host'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
@@ -131,6 +131,10 @@ import {
 	loadSettingSourcesFromFlag,
 } from "./main/startup/settings.js";
 import { logSessionTelemetry, logStartupTelemetry } from "./main/startup/telemetry.js";
+import {
+  createRuntimeHandles,
+  syncRuntimeHandlesFromHeadlessParams,
+} from './runtime/runtimeHandles.js'
 import { createSystemMessage, createUserMessage } from "./utils/messages.js";
 
 export { startDeferredPrefetches };
@@ -598,6 +602,8 @@ const _pendingSSH: PendingSSH | undefined = feature("SSH_REMOTE")
 
 export async function main() {
 	profileCheckpoint("main_function_start");
+
+	const runtimeHandles = createRuntimeHandles();
 
 	// SECURITY: Prevent Windows from executing commands from current directory
 	// This must be set before ANY command execution to prevent PATH hijacking attacks
@@ -3568,7 +3574,14 @@ async function run(): Promise<CommanderCommand> {
 
 				// Headless mode supports all prompt commands and some local commands
 				// If disableSlashCommands is true, return empty array
-				const headlessSession = createHeadlessSession({
+				const headlessHost = createHeadlessHost(({ runtimeGraph }) => ({
+					runtimeGraph,
+					createSession: params => {
+						syncRuntimeHandlesFromHeadlessParams(runtimeGraph.handles, params.store);
+						return createHeadlessSession(params);
+					},
+				}), runtimeHandles);
+				const headlessSession = headlessHost.createSession({
 					commands,
 					disableSlashCommands,
 					store: {

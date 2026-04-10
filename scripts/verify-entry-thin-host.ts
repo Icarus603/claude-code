@@ -6,7 +6,11 @@ import '../src/commands.js'
 import '../src/services/mcp/client.js'
 
 async function main(): Promise<void> {
-  const mainContent = await readFile('./src/main.tsx', 'utf8')
+  const [mainContent, replContent, printContent] = await Promise.all([
+    readFile('./src/main.tsx', 'utf8'),
+    readFile('./src/screens/REPL.tsx', 'utf8'),
+    readFile('./src/cli/print.ts', 'utf8'),
+  ])
 
   const requiredEntrySeams = [
     './runtime/bootstrap.js',
@@ -18,6 +22,31 @@ async function main(): Promise<void> {
   for (const seam of requiredEntrySeams) {
     if (!mainContent.includes(seam)) {
       throw new Error(`main.tsx does not consume required seam: ${seam}`)
+    }
+  }
+
+  const disallowedMainImports = [
+    './services/packageHostSetup.js',
+    'src/services/packageHostSetup.js',
+    './services/api/providerHostSetup.js',
+    'src/services/api/providerHostSetup.js',
+  ]
+  for (const disallowed of disallowedMainImports) {
+    if (mainContent.includes(disallowed)) {
+      throw new Error(`main.tsx still imports owner logic seam: ${disallowed}`)
+    }
+  }
+
+  const disallowedHostOwnerImports = [
+    "from '../services/api/providerHostSetup.js'",
+    "from 'src/services/api/providerHostSetup.js'",
+  ]
+  for (const disallowed of disallowedHostOwnerImports) {
+    if (replContent.includes(disallowed)) {
+      throw new Error(`REPL.tsx still imports owner logic seam: ${disallowed}`)
+    }
+    if (printContent.includes(disallowed)) {
+      throw new Error(`print.ts still imports owner logic seam: ${disallowed}`)
     }
   }
 

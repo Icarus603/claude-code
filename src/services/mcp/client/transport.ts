@@ -6,7 +6,7 @@ export type WsClientLike = {
 	send(data: string): void;
 };
 
-const MCP_REQUEST_TIMEOUT_MS = 60000;
+export const MCP_REQUEST_TIMEOUT_MS = 60000;
 const MCP_STREAMABLE_HTTP_ACCEPT = "application/json, text/event-stream";
 
 export async function createNodeWsClient(

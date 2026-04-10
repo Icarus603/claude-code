@@ -46,4 +46,5 @@ export type ToolRegistryHostBindings<
       permissionContext: TPermissionContext,
     ) => TTool[]
   }) => TTool[]
+  replOnlyToolNames: () => ReadonlySet<string>
 }

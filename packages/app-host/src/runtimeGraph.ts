@@ -1,7 +1,7 @@
-import type { RuntimeGraph } from './contracts.js'
+import type { RuntimeGraph, RuntimeHandles } from './contracts.js'
 
 export function createRuntimeGraph(
-  handles: Record<string, unknown> = {},
+  handles: RuntimeHandles,
 ): RuntimeGraph {
   return {
     createdAt: Date.now(),

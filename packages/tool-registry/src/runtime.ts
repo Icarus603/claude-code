@@ -1,5 +1,4 @@
-// biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import { feature } from 'bun:bundle'
+import { ensureToolRegistryRuntimeInstalled } from './toolRuntimeInstaller.js'
 import {
   TOOL_PRESETS as PACKAGE_TOOL_PRESETS,
   assembleToolPool as assembleToolPoolFromPackage,
@@ -11,141 +10,73 @@ import {
   getToolsForDefaultPreset as getToolsForDefaultPresetFromPackage,
   parseToolPreset as parseToolPresetFromPackage,
 } from './api.js'
-import { installToolRegistryHostBindings } from './host.js'
-import { toolMatchesName, type Tool, type ToolPermissionContext, type Tools } from '@claude-code/app-compat/Tool.js'
+import type {
+  ToolLike,
+  ToolPermissionContextLike,
+} from './contracts.js'
+import { getToolRegistryHostBindings } from './host.js'
 import {
   ALL_AGENT_DISALLOWED_TOOLS,
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   ASYNC_AGENT_ALLOWED_TOOLS,
   COORDINATOR_MODE_ALLOWED_TOOLS,
-} from '@claude-code/app-compat/constants/tools.js'
-import { AgentTool } from '@claude-code/app-compat/tools/AgentTool/AgentTool.js'
-import { BashTool } from '@claude-code/app-compat/tools/BashTool/BashTool.js'
-import { FileEditTool } from '@claude-code/app-compat/tools/FileEditTool/FileEditTool.js'
-import { FileReadTool } from '@claude-code/app-compat/tools/FileReadTool/FileReadTool.js'
-import {
-  REPL_TOOL_NAME,
-  REPL_ONLY_TOOLS,
-  isReplModeEnabled,
-} from '@claude-code/app-compat/tools/REPLTool/constants.js'
-import { BuiltInToolsProvider } from '@claude-code/app-compat/tools/registry/providers/BuiltInToolsProvider.js'
-import { ReadMcpResourceTool } from '@claude-code/app-compat/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
-import { SendMessageTool } from '@claude-code/app-compat/tools/SendMessageTool/SendMessageTool.js'
-import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/app-compat/tools/SyntheticOutputTool/SyntheticOutputTool.js'
-import { TaskStopTool } from '@claude-code/app-compat/tools/TaskStopTool/TaskStopTool.js'
-import { ListMcpResourcesTool } from '@claude-code/app-compat/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
-import { isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
-import { getDenyRuleForTool } from '@claude-code/permission/permissions'
+} from './constants.js'
 
-/* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-const REPLTool =
-  process.env.USER_TYPE === 'ant'
-    ? require('@claude-code/app-compat/tools/REPLTool/REPLTool.js').REPLTool
-    : null
-const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('@claude-code/app-compat/coordinator/coordinatorMode.js') as typeof import('@claude-code/app-compat/coordinator/coordinatorMode.js'))
-  : null
-/* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
+export type Tool = ToolLike
+export type ToolPermissionContext = ToolPermissionContextLike
+export type Tools = readonly Tool[]
 
-let registryHostBindingsInstalled = false
+const REPL_ONLY_TOOLS_TARGET = new Set<string>()
+let replOnlyToolsInitialized = false
 
-export function installToolRegistryRuntimeBindings(): void {
-  if (registryHostBindingsInstalled) return
-
-  installToolRegistryHostBindings({
-    discoverBuiltInTools: () => BuiltInToolsProvider.discover() as Tool[],
-    getDenyRuleForTool: (permissionContext, tool) =>
-      getDenyRuleForTool(permissionContext as ToolPermissionContext, tool as any),
-    getModeAwareTools: ({
-      permissionContext,
-      baseTools,
-      filterToolsByDenyRules,
-    }) => {
-      const permissionCtx = permissionContext as ToolPermissionContext
-      const allTools = baseTools as Tool[]
-      const filterByDeny = (tools: readonly Tool[]): Tool[] =>
-        filterToolsByDenyRules(tools as Tool[], permissionCtx) as Tool[]
-
-      if (isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)) {
-        if (isReplModeEnabled() && REPLTool) {
-          const replSimple: Tool[] = [REPLTool]
-          if (
-            feature('COORDINATOR_MODE') &&
-            coordinatorModeModule?.isCoordinatorMode()
-          ) {
-            replSimple.push(TaskStopTool, SendMessageTool)
-          }
-          return filterByDeny(replSimple)
-        }
-
-        const simpleTools: Tool[] = [BashTool, FileReadTool, FileEditTool]
-        if (
-          feature('COORDINATOR_MODE') &&
-          coordinatorModeModule?.isCoordinatorMode()
-        ) {
-          simpleTools.push(AgentTool, TaskStopTool, SendMessageTool)
-        }
-        return filterByDeny(simpleTools)
-      }
-
-      const specialTools = new Set([
-        ListMcpResourcesTool.name,
-        ReadMcpResourceTool.name,
-        SYNTHETIC_OUTPUT_TOOL_NAME,
-      ])
-      const filtered = allTools.filter(tool => !specialTools.has(tool.name))
-      let allowedTools = filterByDeny(filtered)
-
-      if (isReplModeEnabled()) {
-        const replEnabled = allowedTools.some(tool =>
-          toolMatchesName(tool, REPL_TOOL_NAME),
-        )
-        if (replEnabled) {
-          allowedTools = allowedTools.filter(
-            tool => !REPL_ONLY_TOOLS.has(tool.name),
-          )
-        }
-      }
-
-      return allowedTools.filter(tool => tool.isEnabled())
-    },
-  })
-
-  registryHostBindingsInstalled = true
+function ensureReplOnlyToolsInitialized(): void {
+  if (replOnlyToolsInitialized) return
+  ensureToolRegistryRuntimeInstalled()
+  REPL_ONLY_TOOLS_TARGET.clear()
+  for (const name of getToolRegistryHostBindings().replOnlyToolNames()) {
+    REPL_ONLY_TOOLS_TARGET.add(name)
+  }
+  replOnlyToolsInitialized = true
 }
 
-// Install host bindings on module load so any direct
-// @claude-code/tool-registry caller can rely on an initialized runtime.
-installToolRegistryRuntimeBindings()
+export const REPL_ONLY_TOOLS = new Proxy(REPL_ONLY_TOOLS_TARGET, {
+  get(target, prop, receiver) {
+    ensureReplOnlyToolsInitialized()
+    const value = Reflect.get(target, prop, receiver)
+    return typeof value === 'function' ? value.bind(target) : value
+  },
+}) as Set<string>
 
 export {
   ALL_AGENT_DISALLOWED_TOOLS,
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   ASYNC_AGENT_ALLOWED_TOOLS,
   COORDINATOR_MODE_ALLOWED_TOOLS,
-  REPL_ONLY_TOOLS,
 }
 
 export const TOOL_PRESETS = PACKAGE_TOOL_PRESETS
 export type ToolPreset = (typeof TOOL_PRESETS)[number]
 
+export function installToolRegistryRuntimeBindings(): void {
+  ensureToolRegistryRuntimeInstalled()
+}
+
 export function parseToolPreset(preset: string): ToolPreset | null {
-  installToolRegistryRuntimeBindings()
   return parseToolPresetFromPackage(preset) as ToolPreset | null
 }
 
 export function getToolsForDefaultPreset(): string[] {
-  installToolRegistryRuntimeBindings()
+  ensureToolRegistryRuntimeInstalled()
   return getToolsForDefaultPresetFromPackage()
 }
 
 export function getToolRegistry() {
-  installToolRegistryRuntimeBindings()
+  ensureToolRegistryRuntimeInstalled()
   return getToolRegistryFromPackage()
 }
 
 export function getAllBaseTools(): Tools {
-  installToolRegistryRuntimeBindings()
+  ensureToolRegistryRuntimeInstalled()
   return getAllBaseToolsFromPackage() as unknown as Tools
 }
 
@@ -155,7 +86,7 @@ export function filterToolsByDenyRules<
     mcpInfo?: { serverName: string; toolName: string }
   },
 >(tools: readonly T[], permissionContext: ToolPermissionContext): T[] {
-  installToolRegistryRuntimeBindings()
+  ensureToolRegistryRuntimeInstalled()
   return filterToolsByDenyRulesFromPackage(
     tools,
     permissionContext as any,
@@ -163,7 +94,7 @@ export function filterToolsByDenyRules<
 }
 
 export function getTools(permissionContext: ToolPermissionContext): Tools {
-  installToolRegistryRuntimeBindings()
+  ensureToolRegistryRuntimeInstalled()
   return getToolsFromPackage(permissionContext as any) as unknown as Tools
 }
 
@@ -171,7 +102,7 @@ export function assembleToolPool(
   permissionContext: ToolPermissionContext,
   mcpTools: Tools,
 ): Tools {
-  installToolRegistryRuntimeBindings()
+  ensureToolRegistryRuntimeInstalled()
   return assembleToolPoolFromPackage(
     permissionContext as any,
     mcpTools as any,
@@ -182,7 +113,7 @@ export function getMergedTools(
   permissionContext: ToolPermissionContext,
   mcpTools: Tools,
 ): Tools {
-  installToolRegistryRuntimeBindings()
+  ensureToolRegistryRuntimeInstalled()
   return getMergedToolsFromPackage(
     permissionContext as any,
     mcpTools as any,

@@ -1,0 +1,80 @@
+import { installAgentHostBindings } from '@claude-code/agent'
+import { installCliHostBindings } from '@claude-code/cli'
+import { installConfigHostBindings } from '@claude-code/config'
+import { installMemoryHostBindings } from '@claude-code/memory'
+import { installPermissionHostBindings } from '@claude-code/permission'
+import { installHostBindings } from './host.js'
+
+let packageHostBindingsInstalled = false
+
+export type PackageHostBindingInstallers = {
+  installProviderBindings?: () => void
+  installToolRegistryBindings?: () => void
+  installCommandRuntimeBindings?: () => void
+  installMcpRuntimeBindings?: () => void
+  installCliBindings?: () => void
+}
+
+export type PackageHostCoreResolvers = {
+  getConfigHomeDir: () => string
+  getProjectRoot: () => string | undefined
+  logDebug: (message: string, metadata?: unknown) => void
+  now?: () => number
+}
+
+export function installCorePackageHostBindings(
+  resolvers: PackageHostCoreResolvers,
+): void {
+  if (packageHostBindingsInstalled) {
+    return
+  }
+
+  const now = resolvers.now ?? (() => Date.now())
+
+  installConfigHostBindings({
+    getConfigHomeDir: resolvers.getConfigHomeDir,
+    getProjectRoot: resolvers.getProjectRoot,
+    logDebug: resolvers.logDebug,
+  })
+
+  installPermissionHostBindings({
+    now,
+    logDebug: resolvers.logDebug,
+  })
+
+  installMemoryHostBindings({
+    now,
+    logDebug: resolvers.logDebug,
+  })
+
+  installAgentHostBindings({
+    now,
+    logDebug: resolvers.logDebug,
+  })
+
+  installCliHostBindings({
+    logDebug: resolvers.logDebug,
+  })
+
+  packageHostBindingsInstalled = true
+}
+
+export function installPackageHostBindings(
+  resolvers: PackageHostCoreResolvers,
+  installers: PackageHostBindingInstallers = {},
+): void {
+  installHostBindings({
+    installCorePackageBindings: () => installCorePackageHostBindings(resolvers),
+    installProviderBindings: installers.installProviderBindings,
+    installToolRegistryBindings: installers.installToolRegistryBindings,
+    installCommandRuntimeBindings: installers.installCommandRuntimeBindings,
+    installMcpRuntimeBindings: installers.installMcpRuntimeBindings,
+    installCliBindings:
+      installers.installCliBindings ??
+      (() => installCorePackageHostBindings(resolvers)),
+  })
+}
+
+export function resetPackageHostBindingsForTests(): void {
+  packageHostBindingsInstalled = false
+}

@@ -143,6 +143,16 @@ async function checkRuntimeSkeletonGuards() {
   const checks = [
     'scripts/verify-runtime-boundaries.ts',
     'scripts/verify-app-host-composition.ts',
+    'scripts/verify-agent-owner.ts',
+    'scripts/verify-provider-owner.ts',
+    'scripts/verify-app-state-boundaries.ts',
+    'scripts/verify-entry-thin-host.ts',
+    'scripts/verify-repl-owner.ts',
+    'scripts/verify-headless-host.ts',
+    'scripts/verify-command-registry.ts',
+    'scripts/verify-mcp-runtime.ts',
+    'scripts/verify-session-format-compat.ts',
+    'scripts/verify-optional-integration-slots.ts',
     'scripts/verify-output-targets.ts',
     'scripts/verify-storage-contracts.ts',
   ]
