@@ -7,6 +7,10 @@ export async function getCommands<TCommand extends CommandLike>(
   return getCommandRegistryHostBindings<TCommand>().getCommands(cwd)
 }
 
+export function clearCommandMemoizationCaches(): void {
+  getCommandRegistryHostBindings<CommandLike>().clearCommandMemoizationCaches()
+}
+
 export function clearCommandsCache(): void {
   getCommandRegistryHostBindings<CommandLike>().clearCommandsCache()
 }

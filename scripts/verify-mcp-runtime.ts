@@ -3,7 +3,7 @@ import {
   getMcpToolsCommandsAndResources,
   prefetchAllMcpResources,
 } from '@claude-code/mcp-runtime'
-import '../src/services/mcp/client.js'
+import '../src/services/mcp/runtimeHostSetup.js'
 
 async function main(): Promise<void> {
   const host = getMcpRuntimeHostBindings()

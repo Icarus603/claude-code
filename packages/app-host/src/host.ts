@@ -1,4 +1,8 @@
-import type { HostFactory, RuntimeBindingInstallers } from './contracts.js'
+import type {
+  HostFactory,
+  RuntimeBindingInstallers,
+  RuntimeGraph,
+} from './contracts.js'
 import { createRuntimeGraph } from './runtimeGraph.js'
 
 let runtimeBindingsInstalled = false
@@ -22,21 +26,21 @@ export function installHostBindings(
 
 export function createInteractiveHost<T>(
   factory: HostFactory<T>,
-  handles: Record<string, unknown> = {},
+  handles: RuntimeGraph['handles'],
 ): T {
   return factory({ runtimeGraph: createRuntimeGraph(handles) })
 }
 
 export function createHeadlessHost<T>(
   factory: HostFactory<T>,
-  handles: Record<string, unknown> = {},
+  handles: RuntimeGraph['handles'],
 ): T {
   return factory({ runtimeGraph: createRuntimeGraph(handles) })
 }
 
 export function createRemoteHost<T>(
   factory: HostFactory<T>,
-  handles: Record<string, unknown> = {},
+  handles: RuntimeGraph['handles'],
 ): T {
   return factory({ runtimeGraph: createRuntimeGraph(handles) })
 }

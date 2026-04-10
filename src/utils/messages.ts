@@ -85,6 +85,10 @@ import { quote } from './bash/shellQuote.js'
 import { formatNumber, formatTokens } from './format.js'
 import { getPewterLedgerVariant } from './planModeV2.js'
 import { jsonStringify } from './slowOperations.js'
+import {
+  SYNTHETIC_MESSAGES,
+  SYNTHETIC_MODEL,
+} from './messagesConstants.js'
 
 // Hook attachments that have a hookName field (excludes HookPermissionDecisionAttachment)
 type HookAttachmentWithName = Exclude<
@@ -298,15 +302,7 @@ export function buildClassifierUnavailableMessage(
   )
 }
 
-export const SYNTHETIC_MODEL = '<synthetic>'
-
-export const SYNTHETIC_MESSAGES = new Set([
-  INTERRUPT_MESSAGE,
-  INTERRUPT_MESSAGE_FOR_TOOL_USE,
-  CANCEL_MESSAGE,
-  REJECT_MESSAGE,
-  NO_RESPONSE_REQUESTED,
-])
+export { SYNTHETIC_MESSAGES, SYNTHETIC_MODEL } from './messagesConstants.js'
 
 export function isSyntheticMessage(message: Message): boolean {
   return (

@@ -51,6 +51,7 @@ export type ProviderHostBindings = {
     ) => void
     logForDebugging?: (message: string, options?: unknown) => void
   }
+  legacy?: Record<string, unknown>
 }
 
 let providerHostBindings: ProviderHostBindings | null = null

@@ -8,6 +8,10 @@ export function installToolRegistryHostBindings(
   toolRegistryHostBindings = bindings
 }
 
+export function hasToolRegistryHostBindings(): boolean {
+  return toolRegistryHostBindings !== null
+}
+
 export function getToolRegistryHostBindings(): ToolRegistryHostBindings {
   if (!toolRegistryHostBindings) {
     throw new Error(

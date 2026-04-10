@@ -6,6 +6,7 @@ import '../src/runtime/bootstrap.js'
 import '../src/services/api/providerHostSetup.js'
 import '../src/commands.js'
 import '../src/services/mcp/client.js'
+import { createRuntimeHandles } from '../src/runtime/runtimeHandles.js'
 
 async function main(): Promise<void> {
   const providerHost = getProviderHostBindings()
@@ -26,6 +27,20 @@ async function main(): Promise<void> {
   const mcpHost = getMcpRuntimeHostBindings()
   if (typeof mcpHost.getMcpToolsCommandsAndResources !== 'function') {
     throw new Error('MCP runtime host bindings are not installed')
+  }
+
+  const runtimeHandles = createRuntimeHandles()
+  if (
+    typeof runtimeHandles.permission.getContext !== 'function' ||
+    typeof runtimeHandles.mcp.getSnapshot !== 'function' ||
+    typeof runtimeHandles.plugins.getSnapshot !== 'function' ||
+    typeof runtimeHandles.agentCatalog.getDefinitions !== 'function' ||
+    typeof runtimeHandles.sessionStoreFactory.createInteractiveStore !==
+      'function' ||
+    typeof runtimeHandles.sessionStoreFactory.createHeadlessStore !==
+      'function'
+  ) {
+    throw new Error('Runtime handles are incomplete')
   }
 
   console.log('app-host composition verification passed')

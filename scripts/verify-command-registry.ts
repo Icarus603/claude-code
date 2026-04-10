@@ -2,12 +2,13 @@ import { enableConfigs } from '@claude-code/config'
 
 async function main(): Promise<void> {
   enableConfigs()
+  await import('../src/runtime/bootstrap.js')
 
   const {
     builtInCommandNames: builtInCommandNamesFromPackage,
     findCommand: findCommandFromPackage,
     getCommands: getCommandsFromPackage,
-  } = await import('@claude-code/command-registry')
+  } = await import('@claude-code/command-registry/runtime')
   const {
     builtInCommandNames: builtInCommandNamesFromSrc,
     findCommand: findCommandFromSrc,

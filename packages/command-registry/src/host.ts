@@ -11,6 +11,10 @@ export function installCommandRegistryHostBindings<
     bindings as unknown as CommandRegistryHostBindings<CommandLike>
 }
 
+export function hasCommandRegistryHostBindings(): boolean {
+  return commandRegistryHostBindings !== null
+}
+
 export function getCommandRegistryHostBindings<
   TCommand extends CommandLike,
 >(): CommandRegistryHostBindings<TCommand> {
@@ -21,4 +25,3 @@ export function getCommandRegistryHostBindings<
   }
   return commandRegistryHostBindings as CommandRegistryHostBindings<TCommand>
 }
-

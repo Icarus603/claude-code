@@ -14,6 +14,11 @@ const PACKAGE_PATHS = [
   'packages/storage/src',
   'packages/output/src',
   'packages/local-observability/src',
+  'packages/swarm',
+  'packages/ide/src',
+  'packages/teleport/src',
+  'packages/updater/src',
+  'packages/server/src',
 ]
 
 const DISALLOWED_PATTERNS = [
@@ -23,6 +28,33 @@ const DISALLOWED_PATTERNS = [
   "from '../src/",
   'from "../src/',
 ]
+
+const STRICT_PACKAGE_PATHS = new Set([
+  'packages/app-host/src',
+  'packages/storage/src',
+  'packages/output/src',
+  'packages/local-observability/src',
+  'packages/shell',
+  'packages/swarm',
+  'packages/ide/src',
+  'packages/teleport/src',
+  'packages/updater/src',
+  'packages/server/src',
+])
+
+const STRICT_DISALLOWED_PATTERNS = [...DISALLOWED_PATTERNS, '@claude-code/app-compat/']
+
+const TRANSITION_APP_COMPAT_REF_BUDGET: Record<string, number> = {
+  'packages/agent': 158,
+  'packages/provider': 0,
+  'packages/config': 117,
+  'packages/permission': 89,
+  'packages/memory': 83,
+  'packages/cli': 0,
+  'packages/tool-registry': 0,
+  'packages/command-registry': 0,
+  'packages/mcp-runtime': 0,
+}
 
 async function collectFiles(root: string): Promise<string[]> {
   const proc = Bun.spawn([
@@ -120,15 +152,11 @@ async function verifyRootFacadesStayThin(): Promise<string[]> {
     },
     {
       path: 'src/services/mcp/client.ts',
-      exportLine: "export * from '@claude-code/mcp-runtime/client'",
+      exportLine: "export * from './clientRuntime.js'",
     },
     {
       path: 'src/services/api/claudeLegacy.ts',
       exportLine: "export * from '@claude-code/provider/claudeLegacy'",
-    },
-    {
-      path: 'src/services/api/providerHostSetup.ts',
-      exportLine: "export * from '@claude-code/provider/providerHostSetup'",
     },
   ]
 
@@ -147,21 +175,52 @@ async function verifyRootFacadesStayThin(): Promise<string[]> {
     }
   }
 
+  const providerHostSetupRaw = await readFile(
+    'src/services/api/providerHostSetup.ts',
+    'utf8',
+  )
+  if (!providerHostSetupRaw.includes('installProviderRuntimeBindings(bindings)')) {
+    violations.push(
+      'src/services/api/providerHostSetup.ts: provider host bindings must be installed from root composition seam',
+    )
+  }
+
   return violations
 }
 
 async function main(): Promise<void> {
   const violations: string[] = []
+  const appCompatRefCountByPackage: Record<string, number> = {}
 
   for (const root of PACKAGE_PATHS) {
     const files = await collectFiles(root)
     for (const filePath of files) {
       const content = await readFile(filePath, 'utf8')
-      for (const pattern of DISALLOWED_PATTERNS) {
+      const disallowedPatterns = STRICT_PACKAGE_PATHS.has(root)
+        ? STRICT_DISALLOWED_PATTERNS
+        : DISALLOWED_PATTERNS
+
+      for (const pattern of disallowedPatterns) {
         if (content.includes(pattern)) {
           violations.push(`${filePath}: contains disallowed pattern "${pattern}"`)
         }
       }
+
+      if (root in TRANSITION_APP_COMPAT_REF_BUDGET) {
+        const refCount = (content.match(/@claude-code\/app-compat\//g) ?? [])
+          .length
+        appCompatRefCountByPackage[root] =
+          (appCompatRefCountByPackage[root] ?? 0) + refCount
+      }
+    }
+  }
+
+  for (const [root, budget] of Object.entries(TRANSITION_APP_COMPAT_REF_BUDGET)) {
+    const current = appCompatRefCountByPackage[root] ?? 0
+    if (current > budget) {
+      violations.push(
+        `${root}: @claude-code/app-compat refs budget exceeded (current=${current}, budget=${budget})`,
+      )
     }
   }
 
