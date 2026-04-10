@@ -26,7 +26,7 @@ startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
 import './runtime/bootstrap.js'
-import { createHeadlessHost } from '@claude-code/app-host'
+import { createHeadlessHost, createInteractiveHost, type RuntimeHandles } from '@claude-code/app-host'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
@@ -919,7 +919,7 @@ export async function main() {
 
 	profileCheckpoint("main_before_run");
 
-	await run();
+	await run(runtimeHandles);
 	profileCheckpoint("main_after_run");
 }
 
@@ -959,7 +959,7 @@ async function getInputPrompt(
 	return prompt;
 }
 
-async function run(): Promise<CommanderCommand> {
+async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 	profileCheckpoint("run_function_start");
 
 	// Create help config that sorts options by long option name.
@@ -4146,6 +4146,27 @@ async function run(): Promise<CommanderCommand> {
 						.catch(() => null)
 				: null;
 
+			const interactiveHost = createInteractiveHost(
+				({ runtimeGraph }) => ({
+					runtimeGraph,
+					launchRepl: (
+						root: Root,
+						appProps: Parameters<typeof launchRepl>[1],
+						replProps: Parameters<typeof launchRepl>[2],
+					) =>
+						launchRepl(
+							root,
+							appProps,
+							{
+								...replProps,
+								runtimeGraph,
+							},
+							renderAndRun,
+						),
+				}),
+				runtimeHandles,
+			);
+
 				const sessionConfig = {
 				debug: debug || debugToStderr,
 				commands: [...commands, ...mcpCommands],
@@ -4229,7 +4250,7 @@ async function run(): Promise<CommanderCommand> {
 					});
 					resumeSucceeded = true;
 
-					await launchRepl(
+					await interactiveHost.launchRepl(
 						root,
 						{
 							getFpsMetrics,
@@ -4249,7 +4270,6 @@ async function run(): Promise<CommanderCommand> {
 							initialAgentName: loaded.agentName,
 							initialAgentColor: loaded.agentColor,
 						},
-						renderAndRun,
 					);
 				} catch (error) {
 					if (!resumeSucceeded) {
@@ -4292,7 +4312,7 @@ async function run(): Promise<CommanderCommand> {
 					"info",
 				);
 
-				await launchRepl(
+				await interactiveHost.launchRepl(
 					root,
 					{ getFpsMetrics, stats, initialState },
 					{
@@ -4307,7 +4327,6 @@ async function run(): Promise<CommanderCommand> {
 						directConnectConfig,
 						thinkingConfig,
 					},
-					renderAndRun,
 				);
 				return;
 			} else if (feature("SSH_REMOTE") && _pendingSSH?.host) {
@@ -4387,7 +4406,7 @@ async function run(): Promise<CommanderCommand> {
 					"info",
 				);
 
-				await launchRepl(
+				await interactiveHost.launchRepl(
 					root,
 					{ getFpsMetrics, stats, initialState },
 					{
@@ -4402,7 +4421,6 @@ async function run(): Promise<CommanderCommand> {
 						sshSession,
 						thinkingConfig,
 					},
-					renderAndRun,
 				);
 				return;
 			} else if (
@@ -4524,7 +4542,7 @@ async function run(): Promise<CommanderCommand> {
 				};
 
 				const remoteCommands = filterCommandsForRemoteMode(commands);
-				await launchRepl(
+				await interactiveHost.launchRepl(
 					root,
 					{
 						getFpsMetrics,
@@ -4543,7 +4561,6 @@ async function run(): Promise<CommanderCommand> {
 						remoteSessionConfig,
 						thinkingConfig,
 					},
-					renderAndRun,
 				);
 				return;
 			} else if (
@@ -4737,7 +4754,7 @@ async function run(): Promise<CommanderCommand> {
 					// CCR's init response may further refine the list (via handleRemoteInit in REPL).
 					const remoteCommands =
 						filterCommandsForRemoteMode(commands);
-					await launchRepl(
+					await interactiveHost.launchRepl(
 						root,
 						{
 							getFpsMetrics,
@@ -4758,7 +4775,6 @@ async function run(): Promise<CommanderCommand> {
 							remoteSessionConfig,
 							thinkingConfig,
 						},
-						renderAndRun,
 					);
 					return;
 				} else if (teleport) {
@@ -5108,7 +5124,7 @@ async function run(): Promise<CommanderCommand> {
 					maybeActivateProactive(options);
 					maybeActivateBrief(options);
 
-					await launchRepl(
+					await interactiveHost.launchRepl(
 						root,
 						{
 							getFpsMetrics,
@@ -5128,7 +5144,6 @@ async function run(): Promise<CommanderCommand> {
 							initialAgentName: resumeData.agentName,
 							initialAgentColor: resumeData.agentColor,
 						},
-						renderAndRun,
 					);
 				} else {
 					// Show interactive selector (includes same-repo worktrees)
@@ -5207,7 +5222,7 @@ async function run(): Promise<CommanderCommand> {
 						? hookMessages
 						: undefined;
 
-				await launchRepl(
+				await interactiveHost.launchRepl(
 					root,
 					{ getFpsMetrics, stats, initialState },
 					{
@@ -5215,7 +5230,6 @@ async function run(): Promise<CommanderCommand> {
 						initialMessages,
 						pendingHookMessages,
 					},
-					renderAndRun,
 				);
 			}
 		})
