@@ -3,7 +3,10 @@ import { readFile } from 'fs/promises'
 const APP_STATE_LINE_BUDGET = 40
 
 async function main(): Promise<void> {
-  const content = await readFile('src/state/AppStateStore.ts', 'utf8')
+  const [content, runtimeHandlesContent] = await Promise.all([
+    readFile('src/state/AppStateStore.ts', 'utf8'),
+    readFile('src/runtime/runtimeHandles.ts', 'utf8'),
+  ])
 
   const disallowedPatterns = [
     '../query.js',
@@ -30,6 +33,18 @@ async function main(): Promise<void> {
     throw new Error(
       `AppStateStore grew beyond ratchet budget: current=${lineCount}, budget=${APP_STATE_LINE_BUDGET}`,
     )
+  }
+
+  const disallowedRuntimeHandlePatterns = [
+    'createInteractiveSessionStore',
+    'createInteractiveStore:',
+  ]
+  for (const pattern of disallowedRuntimeHandlePatterns) {
+    if (runtimeHandlesContent.includes(pattern)) {
+      throw new Error(
+        `runtimeHandles owner boundary regression: found forbidden seam "${pattern}"`,
+      )
+    }
   }
 
   console.log('app state boundary verification passed')

@@ -3,6 +3,10 @@ export type {
   HostFactory,
   HostFactoryOptions,
   HostSessionStore,
+  InteractiveHost,
+  InteractiveHostCreateSessionArgs,
+  InteractiveHostSession,
+  InteractiveSessionHostBindings,
   McpRuntimeHandle,
   PermissionRuntimeHandle,
   PluginRuntimeHandle,
@@ -16,7 +20,9 @@ export {
   createHeadlessHost,
   createInteractiveHost,
   createRemoteHost,
+  getInteractiveSessionHostBindings,
   installHostBindings,
+  installInteractiveSessionHostBindings,
   resetHostBindingsForTests,
 } from './host.js'
 export type {

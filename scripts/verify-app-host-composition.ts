@@ -8,6 +8,7 @@ import '../src/services/api/providerHostSetup.js'
 import '../src/commands.js'
 import '../src/services/mcp/client.js'
 import { createRuntimeHandles } from '../src/runtime/runtimeHandles.js'
+import { createInteractiveHost } from '@claude-code/app-host'
 
 async function main(): Promise<void> {
   const [mainContent, replLauncherContent] = await Promise.all([
@@ -41,17 +42,52 @@ async function main(): Promise<void> {
     typeof runtimeHandles.mcp.getSnapshot !== 'function' ||
     typeof runtimeHandles.plugins.getSnapshot !== 'function' ||
     typeof runtimeHandles.agentCatalog.getDefinitions !== 'function' ||
-    typeof runtimeHandles.sessionStoreFactory.createInteractiveStore !==
-      'function' ||
     typeof runtimeHandles.sessionStoreFactory.createHeadlessStore !==
       'function'
   ) {
     throw new Error('Runtime handles are incomplete')
   }
 
+  const interactiveHost = createInteractiveHost(
+    ({ runtimeGraph }) => ({ runtimeGraph }),
+    runtimeHandles,
+  )
+  const interactiveSession = interactiveHost.createSession({
+    initialAppState: {
+      toolPermissionContext: runtimeHandles.permission.getContext(),
+      mcp: {
+        clients: [],
+        tools: [],
+        commands: [],
+        resources: {},
+        pluginReconnectKey: 0,
+      },
+      plugins: {
+        enabled: [],
+        disabled: [],
+        commands: [],
+        errors: [],
+        installationStatus: {
+          marketplaces: [],
+          plugins: [],
+        },
+        needsRefresh: false,
+      },
+      agentDefinitions: { activeAgents: [], allAgents: [] },
+    },
+  })
+  if (
+    typeof interactiveSession.store.getState !== 'function' ||
+    typeof interactiveSession.syncFromStore !== 'function' ||
+    typeof interactiveSession.getRuntimeHandles !== 'function'
+  ) {
+    throw new Error('Interactive host session is incomplete')
+  }
+
   const requiredMainSeams = [
     'createInteractiveHost',
-    'interactiveHost.launchRepl(',
+    'interactiveHost.createSession(',
+    'launchInteractiveSession(',
     'createHeadlessHost',
   ]
   for (const seam of requiredMainSeams) {
@@ -61,14 +97,26 @@ async function main(): Promise<void> {
   }
 
   const requiredLauncherSeams = [
-    'sessionStoreFactory.createInteractiveStore',
-    'syncRuntimeHandlesFromAppState',
-    '<App {...appProps} store={store}>',
+    'session.store',
+    'session.runtimeGraph',
+    'store={session.store}',
   ]
   for (const seam of requiredLauncherSeams) {
     if (!replLauncherContent.includes(seam)) {
       throw new Error(
         `replLauncher.tsx missing interactive host composition seam: ${seam}`,
+      )
+    }
+  }
+
+  const disallowedLauncherSeams = [
+    'sessionStoreFactory.createInteractiveStore',
+    'syncRuntimeHandlesFromAppState',
+  ]
+  for (const seam of disallowedLauncherSeams) {
+    if (replLauncherContent.includes(seam)) {
+      throw new Error(
+        `replLauncher.tsx still owns interactive session assembly: ${seam}`,
       )
     }
   }

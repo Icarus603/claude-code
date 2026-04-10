@@ -26,7 +26,12 @@ startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
 import './runtime/bootstrap.js'
-import { createHeadlessHost, createInteractiveHost, type RuntimeHandles } from '@claude-code/app-host'
+import {
+	createHeadlessHost,
+	createInteractiveHost,
+	type InteractiveHostSession,
+	type RuntimeHandles,
+} from '@claude-code/app-host'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
@@ -55,7 +60,7 @@ import { addToHistory } from './history.js'
 import type { Root } from '@anthropic/ink'
 import { setThemeConfigCallbacks } from '@anthropic/ink'
 import { createHeadlessSession } from '@claude-code/cli'
-import { launchRepl } from './replLauncher.js'
+import { launchRepl, type AppWrapperProps } from './replLauncher.js'
 import {
 	hasGrowthBookEnvOverride,
 	initializeGrowthBook,
@@ -433,6 +438,7 @@ import {
 import { initializeLspServerManager } from "./services/lsp/manager.js";
 import { shouldEnablePromptSuggestion } from "./services/PromptSuggestion/promptSuggestion.js";
 import {
+	type AppState,
 	IDLE_SPECULATION_STATE,
 } from "./state/AppStateStore.js";
 import { asSessionId } from "./types/ids.js";
@@ -4151,21 +4157,41 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 					runtimeGraph,
 					launchRepl: (
 						root: Root,
-						appProps: Parameters<typeof launchRepl>[1],
-						replProps: Parameters<typeof launchRepl>[2],
+						session: InteractiveHostSession<AppState>,
+						appProps: AppWrapperProps,
+						replProps: Parameters<typeof launchRepl>[0]['replProps'],
 					) =>
 						launchRepl(
-							root,
-							appProps,
 							{
-								...replProps,
-								runtimeGraph,
+								root,
+								session,
+								appProps,
+								replProps,
+								renderAndRun,
 							},
-							renderAndRun,
 						),
 				}),
 				runtimeHandles,
 			);
+
+			const launchInteractiveSession = (
+				initialState: AppState,
+				replProps: Parameters<typeof launchRepl>[0]["replProps"],
+			) => {
+				const session = interactiveHost.createSession({
+					initialAppState: initialState,
+				});
+				return interactiveHost.launchRepl(
+					root,
+					session,
+					{
+						getFpsMetrics,
+						stats,
+						initialState,
+					},
+					replProps,
+				);
+			};
 
 				const sessionConfig = {
 				debug: debug || debugToStderr,
@@ -4250,13 +4276,8 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 					});
 					resumeSucceeded = true;
 
-					await interactiveHost.launchRepl(
-						root,
-						{
-							getFpsMetrics,
-							stats,
-							initialState: loaded.initialState,
-						},
+					await launchInteractiveSession(
+						loaded.initialState,
 						{
 							...sessionConfig,
 							mainThreadAgentDefinition:
@@ -4312,9 +4333,8 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 					"info",
 				);
 
-				await interactiveHost.launchRepl(
-					root,
-					{ getFpsMetrics, stats, initialState },
+				await launchInteractiveSession(
+					initialState,
 					{
 						debug: debug || debugToStderr,
 						commands,
@@ -4406,9 +4426,8 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 					"info",
 				);
 
-				await interactiveHost.launchRepl(
-					root,
-					{ getFpsMetrics, stats, initialState },
+				await launchInteractiveSession(
+					initialState,
 					{
 						debug: debug || debugToStderr,
 						commands,
@@ -4542,13 +4561,8 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 				};
 
 				const remoteCommands = filterCommandsForRemoteMode(commands);
-				await interactiveHost.launchRepl(
-					root,
-					{
-						getFpsMetrics,
-						stats,
-						initialState: assistantInitialState,
-					},
+				await launchInteractiveSession(
+					assistantInitialState,
 					{
 						debug: debug || debugToStderr,
 						commands: remoteCommands,
@@ -4754,13 +4768,8 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 					// CCR's init response may further refine the list (via handleRemoteInit in REPL).
 					const remoteCommands =
 						filterCommandsForRemoteMode(commands);
-					await interactiveHost.launchRepl(
-						root,
-						{
-							getFpsMetrics,
-							stats,
-							initialState: remoteInitialState,
-						},
+					await launchInteractiveSession(
+						remoteInitialState,
 						{
 							debug: debug || debugToStderr,
 							commands: remoteCommands,
@@ -5124,13 +5133,8 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 					maybeActivateProactive(options);
 					maybeActivateBrief(options);
 
-					await interactiveHost.launchRepl(
-						root,
-						{
-							getFpsMetrics,
-							stats,
-							initialState: resumeData.initialState,
-						},
+					await launchInteractiveSession(
+						resumeData.initialState,
 						{
 							...sessionConfig,
 							mainThreadAgentDefinition:
@@ -5222,9 +5226,8 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 						? hookMessages
 						: undefined;
 
-				await interactiveHost.launchRepl(
-					root,
-					{ getFpsMetrics, stats, initialState },
+				await launchInteractiveSession(
+					initialState,
 					{
 						...sessionConfig,
 						initialMessages,
