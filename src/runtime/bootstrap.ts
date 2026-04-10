@@ -1,4 +1,6 @@
 import { installPackageHostBindings } from '@claude-code/app-host/packageHostSetup'
+import { createInteractiveSessionStore } from '../state/sessionStores.js'
+import { syncRuntimeHandlesFromAppState } from './runtimeHandles.js'
 import { getCwd } from '../utils/cwd.js'
 import { logForDebugging } from '../utils/debug.js'
 import { getClaudeConfigHomeDir } from '../utils/envUtils.js'
@@ -12,10 +14,14 @@ export function installRuntimeSkeletonBindings(): void {
   }
 
   installPackageHostBindings({
+    createInteractiveStore: initialState =>
+      createInteractiveSessionStore(initialState as any),
     getConfigHomeDir: () => getClaudeConfigHomeDir(),
     getProjectRoot: () => findCanonicalGitRoot(getCwd()),
     logDebug: (message, metadata) => logForDebugging(message, metadata as any),
     now: () => Date.now(),
+    syncRuntimeHandlesFromAppState: (handles, state) =>
+      syncRuntimeHandlesFromAppState(handles, state as any),
   }, {
     installProviderBindings: () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports

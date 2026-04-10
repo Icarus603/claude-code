@@ -18,10 +18,7 @@ import type { ToolPermissionContext } from '../Tool.js'
 import { getEmptyToolPermissionContext } from '../Tool.js'
 import type { AppState } from '../state/AppStateCompat.js'
 import { getDefaultAppState } from '../state/AppStateCompat.js'
-import {
-  createHeadlessSessionStore,
-  createInteractiveSessionStore,
-} from '../state/sessionStores.js'
+import { createHeadlessSessionStore } from '../state/sessionStores.js'
 import { createStore, type Store } from '../state/store.js'
 import type { AgentDefinitionsResult } from '../tools/AgentTool/loadAgentsDir.js'
 import type { LoadedPlugin, PluginError } from '../types/plugin.js'
@@ -50,9 +47,6 @@ type RuntimeHandleSet = RuntimeHandles & {
   plugins: PluginRuntimeHandle<LoadedPlugin, Command, PluginError>
   agentCatalog: AgentCatalogHandle<AgentDefinitionsResult>
   sessionStoreFactory: {
-    createInteractiveStore: (
-      initialState?: AppState,
-    ) => HostSessionStore<AppState>
     createHeadlessStore: (
       params?: HeadlessStoreParams,
     ) => HostSessionStore<AppState>
@@ -149,7 +143,6 @@ export function createRuntimeHandles(
       refresh: () => {},
     },
     sessionStoreFactory: {
-      createInteractiveStore: initial => createInteractiveSessionStore(initial),
       createHeadlessStore: params =>
         createHeadlessSessionStore(
           (params ?? {

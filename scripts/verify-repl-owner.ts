@@ -10,7 +10,7 @@ async function main(): Promise<void> {
     readFile('packages/cli/src/index.ts', 'utf8'),
   ])
 
-  if (!mainContent.includes("import { launchRepl } from './replLauncher.js'")) {
+  if (!mainContent.includes("from './replLauncher.js'")) {
     throw new Error('main.tsx no longer consumes the dedicated repl launcher seam')
   }
 

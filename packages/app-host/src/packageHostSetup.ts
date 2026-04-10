@@ -3,7 +3,11 @@ import { installCliHostBindings } from '@claude-code/cli'
 import { installConfigHostBindings } from '@claude-code/config'
 import { installMemoryHostBindings } from '@claude-code/memory'
 import { installPermissionHostBindings } from '@claude-code/permission'
-import { installHostBindings } from './host.js'
+import {
+  installHostBindings,
+  installInteractiveSessionHostBindings,
+} from './host.js'
+import type { HostSessionStore, RuntimeHandles } from './contracts.js'
 
 let packageHostBindingsInstalled = false
 
@@ -16,10 +20,15 @@ export type PackageHostBindingInstallers = {
 }
 
 export type PackageHostCoreResolvers = {
+  createInteractiveStore: (initialState?: unknown) => HostSessionStore
   getConfigHomeDir: () => string
   getProjectRoot: () => string | undefined
   logDebug: (message: string, metadata?: unknown) => void
   now?: () => number
+  syncRuntimeHandlesFromAppState: (
+    handles: RuntimeHandles,
+    state: unknown,
+  ) => void
 }
 
 export function installCorePackageHostBindings(
@@ -54,6 +63,11 @@ export function installCorePackageHostBindings(
 
   installCliHostBindings({
     logDebug: resolvers.logDebug,
+  })
+
+  installInteractiveSessionHostBindings({
+    createInteractiveStore: resolvers.createInteractiveStore,
+    syncRuntimeHandles: resolvers.syncRuntimeHandlesFromAppState,
   })
 
   packageHostBindingsInstalled = true

@@ -37,6 +37,18 @@ async function main(): Promise<void> {
     }
   }
 
+  const disallowedInteractiveAssemblySeams = [
+    'syncRuntimeHandlesFromAppState(',
+    'sessionStoreFactory.createInteractiveStore',
+  ]
+  for (const disallowed of disallowedInteractiveAssemblySeams) {
+    if (mainContent.includes(disallowed)) {
+      throw new Error(
+        `main.tsx still performs interactive session assembly: ${disallowed}`,
+      )
+    }
+  }
+
   const disallowedHostOwnerImports = [
     "from '../services/api/providerHostSetup.js'",
     "from 'src/services/api/providerHostSetup.js'",

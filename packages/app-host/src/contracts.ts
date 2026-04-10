@@ -104,7 +104,6 @@ export type AgentCatalogHandle<TAgentDefinitions = unknown> = {
 }
 
 export type SessionStoreFactory = {
-  createInteractiveStore?: (initialState?: unknown) => HostSessionStore
   createHeadlessStore?: (params?: unknown) => HostSessionStore
 }
 
@@ -121,6 +120,11 @@ export type RuntimeGraph = {
   handles: RuntimeHandles
 }
 
+export type InteractiveSessionHostBindings<TState = unknown> = {
+  createInteractiveStore: (initialState?: TState) => HostSessionStore<TState>
+  syncRuntimeHandles: (handles: RuntimeHandles, state: TState) => void
+}
+
 export type HostFactoryOptions = {
   runtimeGraph: RuntimeGraph
 }
@@ -128,3 +132,24 @@ export type HostFactoryOptions = {
 export type HostFactory<T = unknown> = (
   options: HostFactoryOptions,
 ) => T
+
+export type InteractiveHostSession<TState = unknown> = {
+  runtimeGraph: RuntimeGraph
+  store: HostSessionStore<TState>
+  syncFromStore: () => void
+  getRuntimeHandles: () => RuntimeHandles
+}
+
+export type InteractiveHostCreateSessionArgs<TState = unknown> = {
+  initialAppState: TState
+  runtimeHandles?: RuntimeHandles
+}
+
+export type InteractiveHost<
+  TBase extends object = object,
+  TState = unknown,
+> = TBase & {
+  createSession: (
+    args: InteractiveHostCreateSessionArgs<TState>,
+  ) => InteractiveHostSession<TState>
+}
