@@ -56,9 +56,10 @@ async function collectFiles(root: string): Promise<string[]> {
 
 async function verifyEntryBootstrapSeams(): Promise<string[]> {
   const violations: string[] = []
-  const [main, print] = await Promise.all([
+  const [main, print, bootstrap] = await Promise.all([
     readFile('src/main.tsx', 'utf8'),
     readFile('src/cli/print.ts', 'utf8'),
+    readFile('src/runtime/bootstrap.ts', 'utf8'),
   ])
 
   if (!main.includes("./runtime/bootstrap.js")) {
@@ -91,6 +92,61 @@ async function verifyEntryBootstrapSeams(): Promise<string[]> {
     }
   }
 
+  const disallowedBootstrapPatterns = [
+    '../commands.js',
+    '../tools.js',
+    '../services/mcp/client.js',
+    '../services/api/providerHostSetup.js',
+  ]
+  for (const pattern of disallowedBootstrapPatterns) {
+    if (bootstrap.includes(pattern)) {
+      violations.push(
+        `src/runtime/bootstrap.ts: still contains deprecated bootstrap import "${pattern}"`,
+      )
+    }
+  }
+
+  return violations
+}
+
+async function verifyRootFacadesStayThin(): Promise<string[]> {
+  const violations: string[] = []
+
+  const facadeFiles = [
+    { path: 'src/tools.ts', exportLine: "export * from '@claude-code/tool-registry/runtime'" },
+    {
+      path: 'src/commands.ts',
+      exportLine: "export * from '@claude-code/command-registry/runtime'",
+    },
+    {
+      path: 'src/services/mcp/client.ts',
+      exportLine: "export * from '@claude-code/mcp-runtime/client'",
+    },
+    {
+      path: 'src/services/api/claudeLegacy.ts',
+      exportLine: "export * from '@claude-code/provider/claudeLegacy'",
+    },
+    {
+      path: 'src/services/api/providerHostSetup.ts',
+      exportLine: "export * from '@claude-code/provider/providerHostSetup'",
+    },
+  ]
+
+  for (const facade of facadeFiles) {
+    const raw = await readFile(facade.path, 'utf8')
+    const normalized = raw
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean)
+      .join('\n')
+
+    if (normalized !== facade.exportLine) {
+      violations.push(
+        `${facade.path}: root facade must stay pure re-export (${facade.exportLine})`,
+      )
+    }
+  }
+
   return violations
 }
 
@@ -110,6 +166,7 @@ async function main(): Promise<void> {
   }
 
   violations.push(...(await verifyEntryBootstrapSeams()))
+  violations.push(...(await verifyRootFacadesStayThin()))
 
   if (violations.length > 0) {
     throw new Error(`Runtime boundary violations:\n${violations.join('\n')}`)

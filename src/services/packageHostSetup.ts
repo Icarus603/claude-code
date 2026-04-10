@@ -18,6 +18,27 @@ export type PackageHostBindingInstallers = {
   installMcpRuntimeBindings?: () => void
 }
 
+function installDefaultRuntimeBindings(): Required<PackageHostBindingInstallers> {
+  return {
+    installProviderBindings: () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('@claude-code/provider/providerHostSetup')
+    },
+    installToolRegistryBindings: () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('@claude-code/tool-registry/runtime')
+    },
+    installCommandRuntimeBindings: () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('@claude-code/command-registry/runtime')
+    },
+    installMcpRuntimeBindings: () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('@claude-code/mcp-runtime/client')
+    },
+  }
+}
+
 export function installCorePackageHostBindings(): void {
   if (packageHostBindingsInstalled) {
     return
@@ -54,12 +75,21 @@ export function installCorePackageHostBindings(): void {
 export function installPackageHostBindings(
   installers: PackageHostBindingInstallers = {},
 ): void {
+  const defaultInstallers = installDefaultRuntimeBindings()
   installHostBindings({
     installCorePackageBindings: () => installCorePackageHostBindings(),
-    installProviderBindings: installers.installProviderBindings,
-    installToolRegistryBindings: installers.installToolRegistryBindings,
-    installCommandRuntimeBindings: installers.installCommandRuntimeBindings,
-    installMcpRuntimeBindings: installers.installMcpRuntimeBindings,
+    installProviderBindings:
+      installers.installProviderBindings ??
+      defaultInstallers.installProviderBindings,
+    installToolRegistryBindings:
+      installers.installToolRegistryBindings ??
+      defaultInstallers.installToolRegistryBindings,
+    installCommandRuntimeBindings:
+      installers.installCommandRuntimeBindings ??
+      defaultInstallers.installCommandRuntimeBindings,
+    installMcpRuntimeBindings:
+      installers.installMcpRuntimeBindings ??
+      defaultInstallers.installMcpRuntimeBindings,
     installCliBindings: () => installCorePackageHostBindings(),
   })
 }
