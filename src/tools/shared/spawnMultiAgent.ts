@@ -54,6 +54,7 @@ import {
   readTeamFileAsync,
   sanitizeAgentName,
   sanitizeName,
+  type TeamFile,
   writeTeamFileAsync,
 } from '@claude-code/swarm'
 import {
@@ -293,6 +294,66 @@ export async function generateUniqueTeammateName(
   return `${baseName}-${suffix}`
 }
 
+/**
+ * Loads the team file, reconstructing it from AppState when it is missing but
+ * the leader still believes they are in the team.
+ *
+ * Symptom this guards against: TeamCreate writes the team file and sets
+ * appState.teamContext, but by the time a later Agent spawn runs, the file has
+ * gone missing (disk cleanup, race across tool calls, corrupted write, etc.).
+ * Prior behavior threw "Team X does not exist. Call spawnTeam first" which
+ * misled the LLM into a TeamCreate → "Already leading team" loop.
+ *
+ * Recovery only fires when appState.teamContext.teamName matches the requested
+ * teamName — a legitimate "I passed the wrong team_name" case still throws.
+ * Reconstructed members lose metadata not kept in memory (description,
+ * createdAt, per-member model/prompt/color/planModeRequired/backendType);
+ * routing-critical fields (agentId, name, cwd, tmuxPaneId) survive.
+ *
+ * @internal Exported for testing
+ */
+export async function ensureTeamFile(
+  teamName: string,
+  appState: AppState,
+): Promise<TeamFile> {
+  const existing = await readTeamFileAsync(teamName)
+  if (existing) return existing
+
+  const ctx = appState.teamContext
+  if (!ctx || ctx.teamName !== teamName || !ctx.leadAgentId) {
+    throw new Error(
+      `Team "${teamName}" does not exist. Call TeamCreate first to create the team.`,
+    )
+  }
+
+  logForDebugging(
+    `[spawn] team file missing for "${teamName}", reconstructing from teamContext (${Object.keys(ctx.teammates).length} in-memory members)`,
+  )
+
+  const members: TeamFile['members'] = Object.entries(ctx.teammates).map(
+    ([agentId, t]) => ({
+      agentId,
+      name: t.name,
+      agentType: t.agentType,
+      joinedAt: t.spawnedAt,
+      tmuxPaneId: t.tmuxPaneId,
+      cwd: t.cwd,
+      subscriptions: [],
+    }),
+  )
+
+  const rebuilt: TeamFile = {
+    name: teamName,
+    createdAt: Date.now(),
+    leadAgentId: ctx.leadAgentId,
+    leadSessionId: getSessionId(),
+    members,
+  }
+
+  await writeTeamFileAsync(teamName, rebuilt)
+  return rebuilt
+}
+
 // ============================================================================
 // Spawn Handlers
 // ============================================================================
@@ -486,12 +547,7 @@ async function handleSpawnSplitPane(
   })
 
   // Register agent in the team file
-  const teamFile = await readTeamFileAsync(teamName)
-  if (!teamFile) {
-    throw new Error(
-      `Team "${teamName}" does not exist. Call spawnTeam first to create the team.`,
-    )
-  }
+  const teamFile = await ensureTeamFile(teamName, appState)
   teamFile.members.push({
     agentId: teammateId,
     name: sanitizedName,
@@ -700,12 +756,7 @@ async function handleSpawnSeparateWindow(
   })
 
   // Register agent in the team file
-  const teamFile = await readTeamFileAsync(teamName)
-  if (!teamFile) {
-    throw new Error(
-      `Team "${teamName}" does not exist. Call spawnTeam first to create the team.`,
-    )
-  }
+  const teamFile = await ensureTeamFile(teamName, appState)
   teamFile.members.push({
     agentId: teammateId,
     name: sanitizedName,
@@ -986,12 +1037,7 @@ async function handleSpawnInProcess(
   })
 
   // Register agent in the team file
-  const teamFile = await readTeamFileAsync(teamName)
-  if (!teamFile) {
-    throw new Error(
-      `Team "${teamName}" does not exist. Call spawnTeam first to create the team.`,
-    )
-  }
+  const teamFile = await ensureTeamFile(teamName, appState)
   teamFile.members.push({
     agentId: teammateId,
     name: sanitizedName,

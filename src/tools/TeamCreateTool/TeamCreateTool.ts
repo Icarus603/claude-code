@@ -133,9 +133,24 @@ export const TeamCreateTool: Tool<InputSchema, Output> = buildTool({
     const appState = getAppState()
     const existingTeam = appState.teamContext?.teamName
 
+    // Idempotent: re-calling TeamCreate with the same team name is a no-op.
+    // LLMs often re-emit TeamCreate alongside Agent spawns in later turns
+    // (especially after any spawn error). Treating that as a hard failure
+    // pushes them into a TeamCreate → "Already leading" → TeamDelete loop
+    // instead of just letting them retry the spawn.
+    if (existingTeam && existingTeam === team_name && appState.teamContext) {
+      return {
+        data: {
+          team_name: existingTeam,
+          team_file_path: appState.teamContext.teamFilePath,
+          lead_agent_id: appState.teamContext.leadAgentId,
+        },
+      }
+    }
+
     if (existingTeam) {
       throw new Error(
-        `Already leading team "${existingTeam}". A leader can only manage one team at a time. Use TeamDelete to end the current team before creating a new one.`,
+        `Already leading team "${existingTeam}", cannot create a different team "${team_name}". A leader can only manage one team at a time. Call TeamDelete on "${existingTeam}" first, or re-call TeamCreate with team_name="${existingTeam}" to get the current team's info.`,
       )
     }
 
