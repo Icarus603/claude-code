@@ -1,14 +1,17 @@
 import { readFile } from 'fs/promises'
 
 async function main(): Promise<void> {
-  const [mainContent, cliIndex, cliHeadless, printContent, cliBindings] =
+  const [mainContent, cliIndex, cliHeadless, printContent, cliBindings, modeDispatchContent] =
     await Promise.all([
       readFile('src/main.tsx', 'utf8'),
       readFile('packages/cli/src/index.ts', 'utf8'),
       readFile('packages/cli/src/headless.ts', 'utf8'),
       readFile('src/cli/print.ts', 'utf8'),
       readFile('src/runtime/installCliBindings.ts', 'utf8'),
+      readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
     ])
+  // After cut-E, the action handler body lives in mode-dispatch.ts.
+  const combinedMainContent = mainContent + modeDispatchContent
 
   const requiredMainSeams = [
     "createHeadlessHost",
@@ -17,7 +20,7 @@ async function main(): Promise<void> {
   ]
 
   for (const seam of requiredMainSeams) {
-    if (!mainContent.includes(seam)) {
+    if (!combinedMainContent.includes(seam)) {
       throw new Error(`main.tsx missing headless host seam: ${seam}`)
     }
   }
