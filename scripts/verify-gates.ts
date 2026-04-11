@@ -11,12 +11,15 @@
  */
 
 // We can't import feature() from bun:bundle in a standalone script,
-// so we test the GrowthBook layer directly.
+// so we test the feature-flags layer directly. GrowthBook was stubbed
+// out per CLAUDE.md ("Analytics / GrowthBook / Sentry | Empty
+// implementations"); the same API now lives in @claude-code/config/feature-flags
+// as local-defaults-only stubs.
 
 import {
   getFeatureValue_CACHED_MAY_BE_STALE,
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
-} from '../src/services/analytics/growthbook.js'
+} from '@claude-code/config/feature-flags'
 
 interface GateCheck {
   name: string
