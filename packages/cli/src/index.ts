@@ -38,3 +38,4 @@ export { createCanUseToolWithPermissionPrompt, getCanUseToolFn } from './headles
 export { handleInitializeRequest, handleSetPermissionMode, handleChannelEnable, reregisterChannelHandlerAfterReconnect } from './headless/sdk/control/handlers.js'
 export { loadInitialMessages, removeInterruptedMessage, emitLoadError } from './headless/sdk/session/load.js'
 export type { LoadInitialMessagesResult } from './headless/sdk/session/load.js'
+export { runHeadlessStreaming, handleRewindFiles } from './headless/sdk/session/run-streaming.js'
