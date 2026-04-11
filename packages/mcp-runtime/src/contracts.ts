@@ -85,5 +85,22 @@ export type McpRuntimeHostBindings<
     commands: TMcpCommand[]
     resources?: Record<string, TMcpResource[]>
   }>
+  /**
+   * SDK-side handler for mcp_set_servers control requests. Installed
+   * from root (src/cli/mcpServersHandlers.ts) via runtimeHostSetup.
+   * Types are opaque at the package boundary — callers cast the
+   * result to their local specialization.
+   */
+  handleMcpSetServers?: (
+    servers: Record<string, unknown>,
+    sdkState: unknown,
+    dynamicState: unknown,
+    setAppState: (f: (prev: unknown) => unknown) => void,
+  ) => Promise<unknown>
+  reconcileMcpServers?: (
+    desiredConfigs: Record<string, unknown>,
+    currentState: unknown,
+    setAppState: (f: (prev: unknown) => unknown) => void,
+  ) => Promise<unknown>
   legacy?: Record<string, unknown>
 }

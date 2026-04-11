@@ -168,3 +168,50 @@ export async function prefetchResources<
 
   return discover(configs)
 }
+
+/**
+ * SDK-side mcp_set_servers handler. Delegates to the root-installed
+ * implementation (see src/cli/mcpServersHandlers.ts). Callers cast the
+ * result to their local concrete type specialization — see V7 §10.2
+ * Cut 5 for details on why the types are opaque here.
+ */
+export async function handleMcpSetServers(
+  servers: Record<string, unknown>,
+  sdkState: unknown,
+  dynamicState: unknown,
+  setAppState: (f: (prev: unknown) => unknown) => void,
+): Promise<unknown> {
+  const host = getMcpRuntimeHostBindings<
+    unknown,
+    unknown,
+    unknown,
+    unknown,
+    unknown
+  >()
+  if (!host.handleMcpSetServers) {
+    throw new Error(
+      'MCP runtime host binding does not implement handleMcpSetServers',
+    )
+  }
+  return host.handleMcpSetServers(servers, sdkState, dynamicState, setAppState)
+}
+
+export async function reconcileMcpServers(
+  desiredConfigs: Record<string, unknown>,
+  currentState: unknown,
+  setAppState: (f: (prev: unknown) => unknown) => void,
+): Promise<unknown> {
+  const host = getMcpRuntimeHostBindings<
+    unknown,
+    unknown,
+    unknown,
+    unknown,
+    unknown
+  >()
+  if (!host.reconcileMcpServers) {
+    throw new Error(
+      'MCP runtime host binding does not implement reconcileMcpServers',
+    )
+  }
+  return host.reconcileMcpServers(desiredConfigs, currentState, setAppState)
+}
