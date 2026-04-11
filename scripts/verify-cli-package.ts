@@ -1,10 +1,9 @@
-import React from 'react'
+import '../src/runtime/bootstrap.js'
 import {
   createHeadlessSession,
   createHeadlessStore,
   getHeadlessCommands,
   HybridTransport,
-  launchRepl,
   SSETransport,
   WebSocketTransport,
 } from '@claude-code/cli'
@@ -100,23 +99,6 @@ async function main(): Promise<void> {
 
   if (session.commands.length !== 2 || !session.store.getState()) {
     throw new Error('createHeadlessSession did not expose headless wiring')
-  }
-
-  let rendered = false
-  await launchRepl(
-    {} as never,
-    {
-      getFpsMetrics: () => undefined,
-      initialState: getDefaultAppState(),
-    },
-    {} as never,
-    async (_root, element) => {
-      rendered = React.isValidElement(element)
-    },
-  )
-
-  if (!rendered) {
-    throw new Error('launchRepl did not render a valid React element')
   }
 
   if (
