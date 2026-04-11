@@ -32,3 +32,5 @@ export {
   WebSocketTransport,
   WorkerStateUploader,
 } from './transports.js'
+
+export { joinPromptValues, canBatchWith } from './headless/sdk/session/prompt-utils.js'
