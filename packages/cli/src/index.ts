@@ -36,3 +36,5 @@ export {
 export { joinPromptValues, canBatchWith } from './headless/sdk/session/prompt-utils.js'
 export { createCanUseToolWithPermissionPrompt, getCanUseToolFn } from './headless/sdk/control/permission-helpers.js'
 export { handleInitializeRequest, handleSetPermissionMode, handleChannelEnable, reregisterChannelHandlerAfterReconnect } from './headless/sdk/control/handlers.js'
+export { loadInitialMessages, removeInterruptedMessage, emitLoadError } from './headless/sdk/session/load.js'
+export type { LoadInitialMessagesResult } from './headless/sdk/session/load.js'
