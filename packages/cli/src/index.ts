@@ -43,3 +43,4 @@ export { runHeadlessStreaming, handleRewindFiles } from './headless/sdk/session/
 export { getTeammateModeSnapshot, isBeingDebugged, logManagedSettings } from './entry/bootstrap-utils.js'
 export { createSortedHelpConfig, createMainProgram } from './entry/commander.js'
 export { registerMcpCommands } from './commands/mcp-commands.js'
+export { registerMiscCommands } from './commands/misc-commands.js'
