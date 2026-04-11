@@ -109,8 +109,8 @@ import {
 } from 'src/services/mcp/channelAllowlist.js'
 import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
 import { validateUuid } from 'src/utils/uuid.js'
-import { fromArray } from 'src/utils/generators.js'
 import { ask } from '@claude-code/agent/query-engine'
+import { getStructuredIO } from '@claude-code/cli'
 import type { PermissionPromptTool } from 'src/utils/queryHelpers.js'
 import {
   createFileStateCacheWithSizeLimit,
@@ -133,7 +133,6 @@ import type {
   SDKStatus,
   ModelInfo,
   SDKMessage,
-  SDKUserMessage,
   SDKUserMessageReplay,
   PermissionResult,
   McpServerConfigForProcessTransport,
@@ -582,7 +581,7 @@ export async function runHeadless(
     return
   }
 
-  const structuredIO = getStructuredIO(inputPrompt, options)
+  const structuredIO = getStructuredIO(inputPrompt, options) as StructuredIO
 
   // When emitting NDJSON for SDK clients, any stray write to stdout (debug
   // prints, dependency console.log, library banners) breaks the client's
@@ -5197,44 +5196,6 @@ async function loadInitialMessages(
     messages: await (options.sessionStartHooksPromise ??
       processSessionStartHooks('startup')),
   }
-}
-
-function getStructuredIO(
-  inputPrompt: string | AsyncIterable<string>,
-  options: {
-    sdkUrl: string | undefined
-    replayUserMessages?: boolean
-  },
-): StructuredIO {
-  let inputStream: AsyncIterable<string>
-  if (typeof inputPrompt === 'string') {
-    if (inputPrompt.trim() !== '') {
-      // Normalize to a streaming input.
-      inputStream = fromArray([
-        jsonStringify({
-          type: 'user',
-          content: inputPrompt,
-          uuid: '',
-          session_id: '',
-          message: {
-            role: 'user',
-            content: inputPrompt,
-          },
-          parent_tool_use_id: null,
-        } satisfies SDKUserMessage),
-      ])
-    } else {
-      // Empty string - create empty stream
-      inputStream = fromArray([])
-    }
-  } else {
-    inputStream = inputPrompt
-  }
-
-  // Use RemoteIO if sdkUrl is provided, otherwise use regular StructuredIO
-  return options.sdkUrl
-    ? new RemoteIO(options.sdkUrl, inputStream, options.replayUserMessages)
-    : new StructuredIO(inputStream, options.replayUserMessages)
 }
 
 /**

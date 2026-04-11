@@ -1,5 +1,6 @@
 import { installCliHostBindings, type HeadlessStoreParams } from '@claude-code/cli'
 import { runHeadless } from '../cli/print.js'
+import { getStructuredIO } from '../cli/structuredIOHelper.js'
 import { createHeadlessSessionStore } from '../state/sessionStores.js'
 
 let cliBindingsInstalled = false
@@ -11,6 +12,7 @@ export function installCliBindings(): void {
     createHeadlessStore: params =>
       createHeadlessSessionStore(params as HeadlessStoreParams),
     runHeadless: (...args) => runHeadless(...(args as Parameters<typeof runHeadless>)),
+    getStructuredIO,
   })
 
   cliBindingsInstalled = true
