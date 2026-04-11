@@ -44,3 +44,5 @@ export { getTeammateModeSnapshot, isBeingDebugged, logManagedSettings } from './
 export { createSortedHelpConfig, createMainProgram } from './entry/commander.js'
 export { registerMcpCommands } from './commands/mcp-commands.js'
 export { registerMiscCommands } from './commands/misc-commands.js'
+export { runModeDispatch } from './entry/mode-dispatch.js'
+export type { ModeDispatchContext, PendingConnect, PendingSSH, PendingAssistantChat } from './entry/mode-dispatch.js'

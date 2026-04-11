@@ -11,10 +11,14 @@ import { createRuntimeHandles } from '../src/runtime/runtimeHandles.js'
 import { createInteractiveHost } from '@claude-code/app-host'
 
 async function main(): Promise<void> {
-  const [mainContent, replLauncherContent] = await Promise.all([
+  const [mainContent, replLauncherContent, modeDispatchContent] = await Promise.all([
     readFile('src/main.tsx', 'utf8'),
     readFile('src/replLauncher.tsx', 'utf8'),
+    readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
   ])
+  // After cut-E, the action handler body lives in mode-dispatch.ts.
+  // Seam checks that used to look in main.tsx now look in mode-dispatch.ts.
+  const combinedMainContent = mainContent + modeDispatchContent
 
   const providerHost = getProviderHostBindings()
   if (typeof providerHost.getAPIProvider !== 'function') {
@@ -91,7 +95,7 @@ async function main(): Promise<void> {
     'createHeadlessHost',
   ]
   for (const seam of requiredMainSeams) {
-    if (!mainContent.includes(seam)) {
+    if (!combinedMainContent.includes(seam)) {
       throw new Error(`main.tsx missing app-host composition seam: ${seam}`)
     }
   }
