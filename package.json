@@ -51,6 +51,7 @@
     "check:unused": "knip-bun",
     "health": "bun run scripts/health-check.ts",
     "check:transition-stubs": "bun run scripts/check-transition-stubs.ts",
+    "doctor:arch": "bun run scripts/doctor-architecture.ts",
     "verify:runtime-boundaries": "bun run scripts/verify-runtime-boundaries.ts",
     "verify:app-host-composition": "bun run scripts/verify-app-host-composition.ts",
     "verify:output-targets": "bun run scripts/verify-output-targets.ts",
