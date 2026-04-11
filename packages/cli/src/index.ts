@@ -34,3 +34,4 @@ export {
 } from './transports.js'
 
 export { joinPromptValues, canBatchWith } from './headless/sdk/session/prompt-utils.js'
+export { createCanUseToolWithPermissionPrompt, getCanUseToolFn } from './headless/sdk/control/permission-helpers.js'
