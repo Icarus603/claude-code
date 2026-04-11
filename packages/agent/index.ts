@@ -78,6 +78,8 @@ export type {
   SwarmShutdownEvent,
 } from './types/events.js'
 
+export { tee } from './tee.js'
+
 export type {
   AgentState,
   AgentInput,
