@@ -39,3 +39,5 @@ export { handleInitializeRequest, handleSetPermissionMode, handleChannelEnable, 
 export { loadInitialMessages, removeInterruptedMessage, emitLoadError } from './headless/sdk/session/load.js'
 export type { LoadInitialMessagesResult } from './headless/sdk/session/load.js'
 export { runHeadlessStreaming, handleRewindFiles } from './headless/sdk/session/run-streaming.js'
+
+export { getTeammateModeSnapshot, isBeingDebugged, logManagedSettings } from './entry/bootstrap-utils.js'
