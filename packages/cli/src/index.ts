@@ -5,8 +5,8 @@ export {
   createHeadlessSession,
   createHeadlessStore,
   getHeadlessCommands,
-  runHeadless,
 } from './headless.js'
+export { runHeadless } from './headless/sdk/session/run.js'
 
 export { getStructuredIO } from './transport.js'
 
