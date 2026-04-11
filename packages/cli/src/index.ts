@@ -1,4 +1,4 @@
-export type { CliHostBindings } from './contracts.js'
+export type { CliHostBindings, StructuredIOOptions } from './contracts.js'
 export { getCliHostBindings, installCliHostBindings } from './host.js'
 
 export {
@@ -7,6 +7,8 @@ export {
   getHeadlessCommands,
   runHeadless,
 } from './headless.js'
+
+export { getStructuredIO } from './transport.js'
 
 export type {
   HeadlessRunOptions,
