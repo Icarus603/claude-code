@@ -74,7 +74,7 @@ import { isEnvTruthy } from '../../../../../../src/utils/envUtils.js'
 import {
   runHeadlessStreaming,
   handleRewindFiles,
-} from '../../../../../../src/cli/print.js'
+} from './run-streaming.js'
 
 // Dead code elimination: conditional imports
 /* eslint-disable @typescript-eslint/no-require-imports */
