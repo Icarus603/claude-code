@@ -39,8 +39,8 @@ import {
 import { HooksSchema, type HooksSettings } from '../../utils/settings/types.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import { FILE_EDIT_TOOL_NAME } from '../FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from '../FileReadTool/prompt.js'
-import { FILE_WRITE_TOOL_NAME } from '../FileWriteTool/prompt.js'
+import { FILE_READ_TOOL_NAME } from '../FileReadTool/constants.js'
+import { FILE_WRITE_TOOL_NAME } from '../FileWriteTool/constants.js'
 import {
   AGENT_COLORS,
   type AgentColorName,
