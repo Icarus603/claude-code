@@ -13,7 +13,9 @@ export {
   discover,
   executeTool,
   getMcpToolsCommandsAndResources,
+  handleMcpSetServers,
   prefetchResources,
   prefetchAllMcpResources,
+  reconcileMcpServers,
 } from './api.js'
 export { toScopedConfig } from './config.js'
