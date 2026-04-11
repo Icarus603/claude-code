@@ -114,6 +114,12 @@ import {
   getStructuredIO,
   handleOrphanedPermissionResponse,
 } from '@claude-code/cli'
+import { toScopedConfig } from '@claude-code/mcp-runtime'
+import type {
+  DynamicMcpState as DynamicMcpStateBase,
+  McpSetServersResult as McpSetServersResultBase,
+  SdkMcpState as SdkMcpStateBase,
+} from '@claude-code/mcp-runtime'
 import type { PermissionPromptTool } from 'src/utils/queryHelpers.js'
 import {
   createFileStateCacheWithSizeLimit,
@@ -5205,43 +5211,25 @@ async function loadInitialMessages(
   }
 }
 
-export type DynamicMcpState = {
-  clients: MCPServerConnection[]
-  tools: Tools
-  configs: Record<string, ScopedMcpServerConfig>
-}
+export type DynamicMcpState = DynamicMcpStateBase<
+  MCPServerConnection,
+  Tools,
+  ScopedMcpServerConfig
+>
 
-/**
- * Converts a process transport config to a scoped config.
- * The types are structurally compatible, so we just add the scope.
- */
-function toScopedConfig(
-  config: McpServerConfigForProcessTransport,
-): ScopedMcpServerConfig {
-  // McpServerConfigForProcessTransport is a subset of McpServerConfig
-  // (it excludes IDE-specific types like sse-ide and ws-ide)
-  // Adding scope makes it a valid ScopedMcpServerConfig
-  return { ...config, scope: 'dynamic' } as ScopedMcpServerConfig
-}
+export type SdkMcpState = SdkMcpStateBase<
+  MCPServerConnection,
+  Tools,
+  McpSdkServerConfig
+>
 
-/**
- * State for SDK MCP servers that run in the SDK process.
- */
-export type SdkMcpState = {
-  configs: Record<string, McpSdkServerConfig>
-  clients: MCPServerConnection[]
-  tools: Tools
-}
-
-/**
- * Result of handleMcpSetServers - contains new state and response data.
- */
-export type McpSetServersResult = {
-  response: SDKControlMcpSetServersResponse
-  newSdkState: SdkMcpState
-  newDynamicState: DynamicMcpState
-  sdkServersChanged: boolean
-}
+export type McpSetServersResult = McpSetServersResultBase<
+  SDKControlMcpSetServersResponse,
+  MCPServerConnection,
+  Tools,
+  ScopedMcpServerConfig,
+  McpSdkServerConfig
+>
 
 /**
  * Handles mcp_set_servers requests by processing both SDK and process-based servers.
