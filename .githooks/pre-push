@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# doctor:arch runs every V7 architectural rule before any push.
+# If it fails, fix the rule or the code before pushing — do not bypass.
+# Override (emergency only): git push --no-verify
+set -e
+
+echo "→ Running doctor:arch before push..."
+bun run doctor:arch
