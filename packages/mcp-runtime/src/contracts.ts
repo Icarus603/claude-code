@@ -1,3 +1,42 @@
+/**
+ * Dynamic (non-SDK) MCP connection state. Maintained by the SDK host
+ * and passed to handleMcpSetServers / reconcileMcpServers. Runtime
+ * types for clients/tools/configs are generic — the package doesn't
+ * need to know the concrete shapes from root.
+ */
+export type DynamicMcpState<TConnection = unknown, TTools = unknown, TScopedConfig = unknown> = {
+  clients: TConnection[]
+  tools: TTools
+  configs: Record<string, TScopedConfig>
+}
+
+/**
+ * State for SDK MCP servers that run in the SDK process. Parallel to
+ * DynamicMcpState but uses SDK-shaped configs.
+ */
+export type SdkMcpState<TConnection = unknown, TTools = unknown, TSdkConfig = unknown> = {
+  configs: Record<string, TSdkConfig>
+  clients: TConnection[]
+  tools: TTools
+}
+
+/**
+ * Result of handleMcpSetServers — new state on both sides + a response
+ * envelope to deliver back to the SDK client.
+ */
+export type McpSetServersResult<
+  TResponse = unknown,
+  TConnection = unknown,
+  TTools = unknown,
+  TScopedConfig = unknown,
+  TSdkConfig = unknown,
+> = {
+  response: TResponse
+  newSdkState: SdkMcpState<TConnection, TTools, TSdkConfig>
+  newDynamicState: DynamicMcpState<TConnection, TTools, TScopedConfig>
+  sdkServersChanged: boolean
+}
+
 export type McpRuntimeHostBindings<
   TMcpTool,
   TMcpCommand,

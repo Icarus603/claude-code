@@ -1,4 +1,9 @@
-export type { McpRuntimeHostBindings } from './contracts.js'
+export type {
+  DynamicMcpState,
+  McpRuntimeHostBindings,
+  McpSetServersResult,
+  SdkMcpState,
+} from './contracts.js'
 export {
   getMcpRuntimeHostBindings,
   installMcpRuntimeHostBindings,
@@ -11,3 +16,4 @@ export {
   prefetchResources,
   prefetchAllMcpResources,
 } from './api.js'
+export { toScopedConfig } from './config.js'
