@@ -10,6 +10,14 @@ export {
 
 export { getStructuredIO } from './transport.js'
 
+export { handleOrphanedPermissionResponse } from './headless/handleOrphanedPermissionResponse.js'
+export type {
+  OrphanedPermissionDeps,
+  OrphanedPermissionMessage,
+  OrphanedPermissionResult,
+  OrphanedAssistantMessage,
+} from './headless/handleOrphanedPermissionResponse.js'
+
 export type {
   HeadlessRunOptions,
   HeadlessSessionParams,

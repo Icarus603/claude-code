@@ -110,7 +110,10 @@ import {
 import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
 import { validateUuid } from 'src/utils/uuid.js'
 import { ask } from '@claude-code/agent/query-engine'
-import { getStructuredIO } from '@claude-code/cli'
+import {
+  getStructuredIO,
+  handleOrphanedPermissionResponse,
+} from '@claude-code/cli'
 import type { PermissionPromptTool } from 'src/utils/queryHelpers.js'
 import {
   createFileStateCacheWithSizeLimit,
@@ -2766,12 +2769,16 @@ function runHeadlessStreaming(
   structuredIO.setUnexpectedResponseCallback(async message => {
     await handleOrphanedPermissionResponse({
       message,
-      setAppState,
       handledToolUseIds: handledOrphanedToolUseIds,
       onEnqueued: () => {
         // The first message of a session might be the orphaned permission
         // check rather than a user prompt, so kick off the loop.
         void run()
+      },
+      deps: {
+        findUnresolvedToolUse,
+        enqueue,
+        logDebug: logForDebugging,
       },
     })
   })
@@ -5196,78 +5203,6 @@ async function loadInitialMessages(
     messages: await (options.sessionStartHooksPromise ??
       processSessionStartHooks('startup')),
   }
-}
-
-/**
- * Handles unexpected permission responses by looking up the unresolved tool
- * call in the transcript and enqueuing it for execution.
- *
- * Returns true if a permission was enqueued, false otherwise.
- */
-export async function handleOrphanedPermissionResponse({
-  message,
-  setAppState,
-  onEnqueued,
-  handledToolUseIds,
-}: {
-  message: SDKControlResponse
-  setAppState: (f: (prev: AppState) => AppState) => void
-  onEnqueued?: () => void
-  handledToolUseIds: Set<string>
-}): Promise<boolean> {
-  const responseInner = message.response as { subtype?: string; response?: Record<string, unknown>; request_id?: string } | undefined
-  if (
-    responseInner?.subtype === 'success' &&
-    responseInner.response?.toolUseID &&
-    typeof responseInner.response.toolUseID === 'string'
-  ) {
-    const permissionResult = responseInner.response as PermissionResult & { toolUseID?: string }
-    const toolUseID = permissionResult.toolUseID
-    if (!toolUseID) {
-      return false
-    }
-
-    logForDebugging(
-      `handleOrphanedPermissionResponse: received orphaned control_response for toolUseID=${toolUseID} request_id=${responseInner.request_id}`,
-    )
-
-    // Prevent re-processing the same orphaned tool_use. Without this guard,
-    // duplicate control_response deliveries (e.g. from WebSocket reconnect)
-    // cause the same tool to be executed multiple times, producing duplicate
-    // tool_use IDs in the messages array and a 400 error from the API.
-    // Once corrupted, every retry accumulates more duplicates.
-    if (handledToolUseIds.has(toolUseID)) {
-      logForDebugging(
-        `handleOrphanedPermissionResponse: skipping duplicate orphaned permission for toolUseID=${toolUseID} (already handled)`,
-      )
-      return false
-    }
-
-    const assistantMessage = await findUnresolvedToolUse(toolUseID)
-    if (!assistantMessage) {
-      logForDebugging(
-        `handleOrphanedPermissionResponse: no unresolved tool_use found for toolUseID=${toolUseID} (already resolved in transcript)`,
-      )
-      return false
-    }
-
-    handledToolUseIds.add(toolUseID)
-    logForDebugging(
-      `handleOrphanedPermissionResponse: enqueuing orphaned permission for toolUseID=${toolUseID} messageID=${assistantMessage.message.id}`,
-    )
-    enqueue({
-      mode: 'orphaned-permission' as const,
-      value: [],
-      orphanedPermission: {
-        permissionResult,
-        assistantMessage,
-      },
-    })
-
-    onEnqueued?.()
-    return true
-  }
-  return false
 }
 
 export type DynamicMcpState = {
