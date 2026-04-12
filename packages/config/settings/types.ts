@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
-import { SandboxSettingsSchema } from '@claude-code/app-compat/entrypoints/sandboxTypes.js'
+import { SandboxSettingsSchema } from './schemas/sandbox.js'
 import { lazySchema } from '../internal/lazySchema.js'
 
 // V7 §11.4 — inlined tiny utilities to avoid src/ imports.
@@ -18,7 +18,7 @@ import { MarketplaceSourceSchema } from '@claude-code/app-compat/utils/plugins/s
 import { CLAUDE_CODE_SETTINGS_SCHEMA_URL } from './constants.js'
 import { PermissionRuleSchema } from './permissionValidation.js'
 
-// Re-export hook schemas and types from centralized location for backward compatibility
+// Re-export hook schemas and types from config-owned location for backward compat
 export {
   type AgentHook,
   type BashCommandHook,
@@ -30,10 +30,10 @@ export {
   type HooksSettings,
   type HttpHook,
   type PromptHook,
-} from '@claude-code/app-compat/schemas/hooks.js'
+} from './schemas/hooks.js'
 
 // Also import for use within this file
-import { type HookCommand, HooksSchema } from '@claude-code/app-compat/schemas/hooks.js'
+import { type HookCommand, HooksSchema } from './schemas/hooks.js'
 
 function count<T>(arr: readonly T[], pred: (x: T) => unknown): number {
   let n = 0
