@@ -22,7 +22,6 @@ export type PackageHostBindingInstallers = {
 export type PackageHostCoreResolvers = {
   createInteractiveStore: (initialState?: unknown) => HostSessionStore
   getConfigHomeDir: () => string
-  getGlobalClaudeFile?: () => string
   getProjectRoot: () => string | undefined
   logDebug: (message: string, metadata?: unknown) => void
   now?: () => number
@@ -50,7 +49,6 @@ export function installCorePackageHostBindings(
 
   installConfigHostBindings({
     getConfigHomeDir: resolvers.getConfigHomeDir,
-    getGlobalClaudeFile: resolvers.getGlobalClaudeFile,
     getProjectRoot: resolvers.getProjectRoot,
     logDebug: resolvers.logDebug,
     // V7 §8.6 — MCP error aggregation injected via host binding so config

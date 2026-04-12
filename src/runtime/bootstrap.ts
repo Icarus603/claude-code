@@ -4,7 +4,6 @@ import { syncRuntimeHandlesFromAppState } from './runtimeHandles.js'
 import { getCwd } from '../utils/cwd.js'
 import { logForDebugging } from '../utils/debug.js'
 import { getClaudeConfigHomeDir } from '../utils/envUtils.js'
-import { getGlobalClaudeFile } from '../utils/env.js'
 import { findCanonicalGitRoot } from '../utils/git.js'
 
 let runtimeSkeletonBindingsInstalled = false
@@ -18,7 +17,6 @@ export function installRuntimeSkeletonBindings(): void {
     createInteractiveStore: initialState =>
       createInteractiveSessionStore(initialState as any),
     getConfigHomeDir: () => getClaudeConfigHomeDir(),
-    getGlobalClaudeFile: () => getGlobalClaudeFile(),
     getProjectRoot: () => findCanonicalGitRoot(getCwd()),
     logDebug: (message, metadata) => logForDebugging(message, metadata as any),
     now: () => Date.now(),

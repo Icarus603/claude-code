@@ -14,7 +14,7 @@ type BillingType = unknown
 type ReferralEligibilityResponse = unknown
 // V7 §7 — getCwd via host binding
 import { getConfigHostBindings, tryGetConfigHostBindings } from '../host.js'
-// V7 §8.6 — getGlobalClaudeFile via host binding
+import { getGlobalClaudeFile } from '@claude-code/app-compat/utils/env.js'
 // V7 §11.4 — inlined tiny utilities
 function isEnvTruthy(envVar: string | boolean | undefined): boolean {
   if (!envVar) return false
@@ -35,12 +35,8 @@ class ConfigParseError extends Error {
     this.defaultConfig = defaultConfig
   }
 }
-import {
-  existsSync,
-  mkdirSync,
-  statSync,
-  writeFileSync as fsWriteFileSync,
-} from 'node:fs'
+import { writeFileSyncAndFlush_DEPRECATED } from '@claude-code/app-compat/utils/file.js'
+import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
 // V7 §8.6 — git utilities via host binding
 function safeParseJSON(json: string | null | undefined): unknown {
   if (!json) return null
@@ -50,7 +46,7 @@ const UTF8_BOM = '\uFEFF'
 function stripBOM(content: string): string {
   return content.startsWith(UTF8_BOM) ? content.slice(1) : content
 }
-import * as lockfile from '../internal/lockfile.js'
+import * as lockfile from '@claude-code/app-compat/utils/lockfile.js'
 function logError(e: unknown) { getConfigHostBindings().logDebug?.(`[error] ${e instanceof Error ? e.message : String(e)}`) }
 type MemoryType = string
 import { normalize } from 'path'
@@ -71,7 +67,9 @@ type ThemeSetting = string
 const teamMemPaths = feature('TEAMMEM')
   ? (require('@claude-code/memory/teamMemPaths') as typeof import('@claude-code/memory/teamMemPaths'))
   : null
-// V7 §8.6 — bridge auto-connect via host binding (config cannot import bridge)
+const ccrAutoConnect = feature('CCR_AUTO_CONNECT')
+  ? (require('@claude-code/app-compat/bridge/bridgeEnabled.js') as typeof import('@claude-code/app-compat/bridge/bridgeEnabled.js'))
+  : null
 
 /* eslint-enable @typescript-eslint/no-require-imports */
 type ImageDimensions = { originalWidth?: number; originalHeight?: number; displayWidth?: number; displayHeight?: number }
@@ -842,7 +840,7 @@ export function saveGlobalConfig(
   let written: GlobalConfig | null = null
   try {
     const didWrite = saveConfigWithLock(
-      getConfigHostBindings().getGlobalClaudeFile!(),
+      getGlobalClaudeFile(),
       createDefaultGlobalConfig,
       current => {
         const config = updater(current)
@@ -872,7 +870,7 @@ export function saveGlobalConfig(
     // getConfig returns defaults. Refuse to write those over a good cached
     // config to avoid wiping auth. See GH #3117.
     const currentConfig = getConfig(
-      getConfigHostBindings().getGlobalClaudeFile!(),
+      getGlobalClaudeFile(),
       createDefaultGlobalConfig,
     )
     if (wouldLoseAuthState(currentConfig)) {
@@ -892,7 +890,7 @@ export function saveGlobalConfig(
       ...config,
       projects: removeProjectHistory(currentConfig.projects),
     }
-    saveConfig(getConfigHostBindings().getGlobalClaudeFile!(), written, DEFAULT_GLOBAL_CONFIG)
+    saveConfig(getGlobalClaudeFile(), written, DEFAULT_GLOBAL_CONFIG)
     writeThroughGlobalConfigCache(written)
   }
 }
@@ -1029,7 +1027,7 @@ let freshnessWatcherStarted = false
 function startGlobalConfigFreshnessWatcher(): void {
   if (freshnessWatcherStarted || process.env.NODE_ENV === 'test') return
   freshnessWatcherStarted = true
-  const file = getConfigHostBindings().getGlobalClaudeFile!()
+  const file = getGlobalClaudeFile()
   watchFile(
     file,
     { interval: CONFIG_FRESHNESS_POLL_MS, persistent: false },
@@ -1039,7 +1037,8 @@ function startGlobalConfigFreshnessWatcher(): void {
       // Bun/Node also fire with curr.mtimeMs=0 when the file doesn't exist
       // (initial callback or deletion) — the <= handles that too.
       if (curr.mtimeMs <= globalConfigCache.mtime) return
-      void import('node:fs/promises').then(fsp => fsp.readFile(file, { encoding: 'utf-8' }))
+      void getFsImplementation()
+        .readFile(file, { encoding: 'utf-8' })
         .then(content => {
           // A write-through may have advanced the cache while we were reading;
           // don't regress to the stale snapshot watchFile stat'd.
@@ -1092,12 +1091,12 @@ export function getGlobalConfig(): GlobalConfig {
   try {
     let stats: { mtimeMs: number; size: number } | null = null
     try {
-      stats = statSync(getConfigHostBindings().getGlobalClaudeFile!())
+      stats = getFsImplementation().statSync(getGlobalClaudeFile())
     } catch {
       // File doesn't exist
     }
     const config = migrateConfigFields(
-      getConfig(getConfigHostBindings().getGlobalClaudeFile!(), createDefaultGlobalConfig),
+      getConfig(getGlobalClaudeFile(), createDefaultGlobalConfig),
     )
     globalConfigCache = {
       config,
@@ -1111,7 +1110,7 @@ export function getGlobalConfig(): GlobalConfig {
   } catch {
     // If anything goes wrong, fall back to uncached behavior
     return migrateConfigFields(
-      getConfig(getConfigHostBindings().getGlobalClaudeFile!(), createDefaultGlobalConfig),
+      getConfig(getGlobalClaudeFile(), createDefaultGlobalConfig),
     )
   }
 }
@@ -1126,7 +1125,7 @@ export function getRemoteControlAtStartup(): boolean {
   const explicit = getGlobalConfig().remoteControlAtStartup
   if (explicit !== undefined) return explicit
   if (feature('CCR_AUTO_CONNECT')) {
-    if (getConfigHostBindings().isBridgeAutoConnectDefault?.()) return true
+    if (ccrAutoConnect?.getCcrAutoConnectDefault()) return true
   }
   return false
 }
@@ -1151,7 +1150,7 @@ function saveConfig<A extends object>(
 ): void {
   // Ensure the directory exists before writing the config file
   const dir = dirname(file)
-  const fs = require('node:fs') as typeof import('node:fs')
+  const fs = getFsImplementation()
   // mkdirSync is already recursive in FsOperations implementation
   fs.mkdirSync(dir)
 
@@ -1162,7 +1161,7 @@ function saveConfig<A extends object>(
       JSON.stringify(value) !== JSON.stringify(defaultConfig[key as keyof A]),
   )
   // Write config file with secure permissions - mode only applies to new files
-  fsWriteFileSync(
+  writeFileSyncAndFlush_DEPRECATED(
     file,
     JSON.stringify(filteredConfig, null, 2),
     {
@@ -1170,7 +1169,7 @@ function saveConfig<A extends object>(
       mode: 0o600,
     },
   )
-  if (file === getConfigHostBindings().getGlobalClaudeFile!()) {
+  if (file === getGlobalClaudeFile()) {
     globalConfigWriteCount++
   }
 }
@@ -1188,7 +1187,7 @@ function saveConfigWithLock<A extends object>(
 ): boolean {
   const defaultConfig = createDefault()
   const dir = dirname(file)
-  const fs = require('node:fs') as typeof import('node:fs')
+  const fs = getFsImplementation()
 
   // Ensure directory exists (mkdirSync is already recursive in FsOperations)
   fs.mkdirSync(dir)
@@ -1218,7 +1217,7 @@ function saveConfigWithLock<A extends object>(
 
     // Check for stale write - file changed since we last read it
     // Only check for global config file since lastReadFileStats tracks that specific file
-    if (lastReadFileStats && file === getConfigHostBindings().getGlobalClaudeFile!()) {
+    if (lastReadFileStats && file === getGlobalClaudeFile()) {
       try {
         const currentStats = fs.statSync(file)
         if (
@@ -1245,7 +1244,7 @@ function saveConfigWithLock<A extends object>(
     // momentarily corrupted (concurrent writes, kill-during-write), this
     // returns defaults -- we must not write those back over good config.
     const currentConfig = getConfig(file, createDefault)
-    if (file === getConfigHostBindings().getGlobalClaudeFile!() && wouldLoseAuthState(currentConfig)) {
+    if (file === getGlobalClaudeFile() && wouldLoseAuthState(currentConfig)) {
       getConfigHostBindings().logDebug?.(
         'saveConfigWithLock: re-read config is missing auth that cache has; refusing to write to avoid wiping ~/.claude.json. See GH #3117.',
         { level: 'error' },
@@ -1340,7 +1339,7 @@ function saveConfigWithLock<A extends object>(
     }
 
     // Write config file with secure permissions - mode only applies to new files
-    fsWriteFileSync(
+    writeFileSyncAndFlush_DEPRECATED(
       file,
       JSON.stringify(filteredConfig, null, 2),
       {
@@ -1348,7 +1347,7 @@ function saveConfigWithLock<A extends object>(
         mode: 0o600,
       },
     )
-    if (file === getConfigHostBindings().getGlobalClaudeFile!()) {
+    if (file === getGlobalClaudeFile()) {
       globalConfigWriteCount++
     }
     return true
@@ -1376,7 +1375,7 @@ export function enableConfigs(): void {
   configReadingAllowed = true
   // We only check the global config because currently all the configs share a file
   getConfig(
-    getConfigHostBindings().getGlobalClaudeFile!(),
+    getGlobalClaudeFile(),
     createDefaultGlobalConfig,
     true /* throw on invalid */,
   )
@@ -1401,7 +1400,7 @@ function getConfigBackupDir(): string {
  * Returns the full path to the most recent backup, or null if none exist.
  */
 function findMostRecentBackup(file: string): string | null {
-  const fs = require('node:fs') as typeof import('node:fs')
+  const fs = getFsImplementation()
   const fileBase = basename(file)
   const backupDir = getConfigBackupDir()
 
@@ -1459,7 +1458,7 @@ function getConfig<A>(
     throw new Error('Config accessed before allowed.')
   }
 
-  const fs = require('node:fs') as typeof import('node:fs')
+  const fs = getFsImplementation()
 
   try {
     const fileContent = fs.readFileSync(file, {
@@ -1670,7 +1669,7 @@ export function saveCurrentProjectConfig(
   let written: GlobalConfig | null = null
   try {
     const didWrite = saveConfigWithLock(
-      getConfigHostBindings().getGlobalClaudeFile!(),
+      getGlobalClaudeFile(),
       createDefaultGlobalConfig,
       current => {
         const currentProjectConfig =
@@ -1700,7 +1699,7 @@ export function saveCurrentProjectConfig(
 
     // Same race window as saveGlobalConfig's fallback -- refuse to write
     // defaults over good cached config. See GH #3117.
-    const config = getConfig(getConfigHostBindings().getGlobalClaudeFile!(), createDefaultGlobalConfig)
+    const config = getConfig(getGlobalClaudeFile(), createDefaultGlobalConfig)
     if (wouldLoseAuthState(config)) {
       getConfigHostBindings().logDebug?.(
         'saveCurrentProjectConfig fallback: re-read config is missing auth that cache has; refusing to write. See GH #3117.',
@@ -1723,7 +1722,7 @@ export function saveCurrentProjectConfig(
         [absolutePath]: newProjectConfig,
       },
     }
-    saveConfig(getConfigHostBindings().getGlobalClaudeFile!(), written, DEFAULT_GLOBAL_CONFIG)
+    saveConfig(getGlobalClaudeFile(), written, DEFAULT_GLOBAL_CONFIG)
     writeThroughGlobalConfigCache(written)
   }
 }
