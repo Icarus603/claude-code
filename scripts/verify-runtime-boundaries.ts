@@ -48,8 +48,11 @@ const TRANSITION_APP_COMPAT_REF_BUDGET: Record<string, number> = {
   'packages/agent': 158,
   'packages/provider': 0,
   'packages/config': 117,
-  'packages/permission': 89,
-  'packages/memory': 83,
+  // permission: +3 from repairing broken `typeof import('./autoModeState.js')`
+  // references that ts couldn't resolve (verify-package-tsc-clean caught them)
+  'packages/permission': 92,
+  // memory: +2 for the same reason (findRelevantMemories + autoDream)
+  'packages/memory': 85,
   'packages/cli': 0,
   'packages/tool-registry': 0,
   'packages/command-registry': 0,

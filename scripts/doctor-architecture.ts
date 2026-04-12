@@ -196,6 +196,13 @@ const CHECKS: Check[] = [
     script: 'scripts/verify-empty-folders.ts',
     doc: 'V7 §19.5',
   },
+  {
+    id: 'package-tsc-clean',
+    layer: 'Cross-Cutting',
+    subsystem: 'tsc noise boundary',
+    script: 'scripts/verify-package-tsc-clean.ts',
+    doc: 'V7 §19.2',
+  },
 ]
 
 type CheckResult = {

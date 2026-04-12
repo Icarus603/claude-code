@@ -66,7 +66,7 @@ export async function findRelevantMemories(
   if (feature('MEMORY_SHAPE_TELEMETRY')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { logMemoryRecallShape } =
-      require('@claude-code/app-compat/memdir/memoryShapeTelemetry.js') as typeof import('./memoryShapeTelemetry.js')
+      require('@claude-code/app-compat/memdir/memoryShapeTelemetry.js') as typeof import('@claude-code/app-compat/memdir/memoryShapeTelemetry.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     logMemoryRecallShape(memories, selected)
   }

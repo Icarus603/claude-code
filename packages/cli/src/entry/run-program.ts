@@ -330,13 +330,17 @@ export async function runCliProgram(
   attachPreActionHook(program)
 
   program
-    .action(async (prompt, options) => {
-      await runModeDispatch(prompt, options as Record<string, unknown>, {
-        runtimeHandles,
-        pendingConnect: pendings.pendingConnect,
-        pendingSSH: pendings.pendingSSH,
-        pendingAssistantChat: pendings.pendingAssistantChat,
-      })
+    .action(async (prompt: unknown, options: unknown) => {
+      await runModeDispatch(
+        prompt as string | undefined,
+        options as unknown as Record<string, unknown>,
+        {
+          runtimeHandles,
+          pendingConnect: pendings.pendingConnect,
+          pendingSSH: pendings.pendingSSH,
+          pendingAssistantChat: pendings.pendingAssistantChat,
+        },
+      )
     })
     .version(`${MACRO.VERSION} (Claude Code)`, '-v, --version', 'Output the version number')
 
