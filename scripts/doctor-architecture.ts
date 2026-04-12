@@ -203,6 +203,20 @@ const CHECKS: Check[] = [
     script: 'scripts/verify-package-tsc-clean.ts',
     doc: 'V7 §19.2',
   },
+  {
+    id: 'testing-seams',
+    layer: 'Cross-Cutting',
+    subsystem: 'testing seams policy',
+    script: 'scripts/verify-testing-seams.ts',
+    doc: 'V7 §9.11',
+  },
+  {
+    id: 'error-namespaces',
+    layer: 'Cross-Cutting',
+    subsystem: 'typed error taxonomy',
+    script: 'scripts/verify-error-namespaces.ts',
+    doc: 'V7 §6.5 / §3.8',
+  },
 ]
 
 type CheckResult = {
