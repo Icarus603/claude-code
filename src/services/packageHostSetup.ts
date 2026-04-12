@@ -16,20 +16,6 @@ export function installPackageHostBindings(
       getProjectRoot: () => findCanonicalGitRoot(getCwd()),
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
-      // V7 §8.6 — global config file path + bridge auto-connect
-      getGlobalClaudeFile: () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { getGlobalClaudeFile } = require('../utils/env.js') as typeof import('../utils/env.js')
-        return getGlobalClaudeFile()
-      },
-      isBridgeAutoConnectDefault: () => {
-        try {
-          if (!require('bun:bundle').feature('CCR_AUTO_CONNECT')) return false
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { getCcrAutoConnectDefault } = require('../bridge/bridgeEnabled.js') as typeof import('../bridge/bridgeEnabled.js')
-          return getCcrAutoConnectDefault()
-        } catch { return false }
-      },
       // V7 §7 — bootstrap state + session accessors for config
       getCwd: () => { try { return require('../utils/cwd.js').getCwd() } catch { return process.cwd() } },
       getOriginalCwd: () => { try { return require('../bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },

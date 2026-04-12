@@ -42,11 +42,6 @@ export type ConfigHostBindings = {
   // V7 §8.6 — git utility bridge (config cannot import git utils).
   findCanonicalGitRoot?: (cwd: string) => string | undefined
   addFileGlobRuleToGitignore?: (dir: string, glob: string) => void
-  // V7 §8.6 — global config file path. Depends on legacy path detection
-  // + OAuth config suffix which live at the host level.
-  getGlobalClaudeFile?: () => string
-  // V7 §8.6 — bridge auto-connect default. Feature-gated bridge check.
-  isBridgeAutoConnectDefault?: () => boolean
   // V7 §8.24 — security check UI. The React dialog doesn't belong in
   // config (Wave 1 leaf). Host provides the implementation which renders
   // the Ink dialog; config only cares about the result.
