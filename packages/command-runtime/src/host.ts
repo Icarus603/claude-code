@@ -20,7 +20,7 @@ export function getCommandRegistryHostBindings<
 >(): CommandRegistryHostBindings<TCommand> {
   if (!commandRegistryHostBindings) {
     throw new Error(
-      'Command registry host bindings have not been installed. Install host bindings before using @claude-code/command-registry runtime APIs.',
+      'Command registry host bindings have not been installed. Install host bindings before using @claude-code/command-runtime runtime APIs.',
     )
   }
   return commandRegistryHostBindings as CommandRegistryHostBindings<TCommand>

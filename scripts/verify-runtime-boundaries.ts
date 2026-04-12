@@ -8,7 +8,7 @@ const PACKAGE_PATHS = [
   'packages/memory',
   'packages/cli',
   'packages/tool-registry',
-  'packages/command-registry',
+  'packages/command-runtime',
   'packages/mcp-runtime',
   'packages/app-host/src',
   'packages/storage/src',
@@ -55,7 +55,7 @@ const TRANSITION_APP_COMPAT_REF_BUDGET: Record<string, number> = {
   'packages/memory': 85,
   'packages/cli': 0,
   'packages/tool-registry': 0,
-  'packages/command-registry': 0,
+  'packages/command-runtime': 0,
   'packages/mcp-runtime': 0,
 }
 
@@ -151,7 +151,7 @@ async function verifyRootFacadesStayThin(): Promise<string[]> {
     { path: 'src/tools.ts', exportLine: "export * from '@claude-code/tool-registry/runtime'" },
     {
       path: 'src/commands.ts',
-      exportLine: "export * from '@claude-code/command-registry/runtime'",
+      exportLine: "export * from '@claude-code/command-runtime/runtime'",
     },
     {
       path: 'src/services/mcp/client.ts',

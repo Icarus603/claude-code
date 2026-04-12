@@ -8,7 +8,7 @@ async function main(): Promise<void> {
     builtInCommandNames: builtInCommandNamesFromPackage,
     findCommand: findCommandFromPackage,
     getCommands: getCommandsFromPackage,
-  } = await import('@claude-code/command-registry/runtime')
+  } = await import('@claude-code/command-runtime/runtime')
   const {
     builtInCommandNames: builtInCommandNamesFromSrc,
     findCommand: findCommandFromSrc,
@@ -23,14 +23,14 @@ async function main(): Promise<void> {
 
   if (packageCommands.length !== srcCommands.length) {
     throw new Error(
-      `Command registry mismatch: package=${packageCommands.length}, src=${srcCommands.length}`,
+      `Command runtime mismatch: package=${packageCommands.length}, src=${srcCommands.length}`,
     )
   }
 
   const packageHelp = findCommandFromPackage('help', packageCommands)
   const srcHelp = findCommandFromSrc('help', srcCommands)
   if (!packageHelp || !srcHelp) {
-    throw new Error('Failed to resolve /help command from command registry')
+    throw new Error('Failed to resolve /help command from command runtime')
   }
 
   const packageBuiltInNames = builtInCommandNamesFromPackage()
@@ -45,7 +45,7 @@ async function main(): Promise<void> {
     throw new Error('Built-in command set does not include help')
   }
 
-  console.log('command registry verification passed')
+  console.log('command runtime verification passed')
 }
 
 await main()

@@ -65,10 +65,10 @@ const CHECKS: Check[] = [
 
   // ── Platform Runtime ──────────────────────────────────────────────────
   {
-    id: 'command-registry',
+    id: 'command-runtime',
     layer: 'Platform Runtime',
     subsystem: 'command-runtime',
-    script: 'scripts/verify-command-registry.ts',
+    script: 'scripts/verify-command-runtime.ts',
     doc: 'V7 §8.8 / §10',
   },
   {

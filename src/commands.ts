@@ -1,1 +1,1 @@
-export * from '@claude-code/command-registry/runtime'
+export * from '@claude-code/command-runtime/runtime'

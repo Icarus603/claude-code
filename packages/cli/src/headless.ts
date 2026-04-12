@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { getCliHostBindings } from './host.js'
 import type { HeadlessStateStore } from './contracts.js'
-import type { Command } from '@claude-code/command-registry/runtime'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import type {
   Tool,
   ToolPermissionContext,

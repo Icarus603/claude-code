@@ -84,7 +84,7 @@
     "@claude-code/agent": "workspace:*",
     "@claude-code/app-host": "workspace:*",
     "@claude-code/cli": "workspace:*",
-    "@claude-code/command-registry": "workspace:*",
+    "@claude-code/command-runtime": "workspace:*",
     "@claude-code/config": "workspace:*",
     "@claude-code/local-observability": "workspace:*",
     "@claude-code/memory": "workspace:*",
