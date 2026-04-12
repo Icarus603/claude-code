@@ -6,39 +6,38 @@ import { homedir, tmpdir } from 'os'
 import { join, normalize, posix, sep } from 'path'
 import { hasAutoMemPathOverride, isAutoMemPath } from '@claude-code/memory/paths'
 import { isAgentMemoryPath } from '@claude-code/memory/agentMemory'
-import {
-  CLAUDE_FOLDER_PERMISSION_PATTERN,
-  FILE_EDIT_TOOL_NAME,
-  GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN,
-} from '@claude-code/app-compat/tools/FileEditTool/constants.js'
 import type { z } from 'zod/v4'
-import { getOriginalCwd, getSessionId } from '@claude-code/app-compat/bootstrap/state.js'
 import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { AnyObject, Tool, ToolPermissionContext } from '@claude-code/app-compat/Tool.js'
-import { FILE_READ_TOOL_NAME } from '@claude-code/app-compat/tools/FileReadTool/prompt.js'
-import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
-import { getClaudeConfigHomeDir } from '@claude-code/app-compat/utils/envUtils.js'
-import {
-  getFsImplementation,
-  getPathsForPermissionCheck,
-} from '@claude-code/app-compat/utils/fsOperations.js'
-import {
-  containsPathTraversal,
-  expandPath,
-  getDirectoryForPath,
-  sanitizePath,
-} from '@claude-code/app-compat/utils/path.js'
-import { getPlanSlug, getPlansDirectory } from '@claude-code/app-compat/utils/plans.js'
-import { getPlatform } from '@claude-code/app-compat/utils/platform.js'
-import { getProjectDir } from '@claude-code/app-compat/utils/sessionStorage.js'
-import { SETTING_SOURCES } from '@claude-code/app-compat/utils/settings/constants.js'
-import {
-  getSettingsFilePathForSource,
-  getSettingsRootPathForSource,
-} from '@claude-code/app-compat/utils/settings/settings.js'
-import { containsVulnerableUncPath } from '@claude-code/app-compat/utils/shell/readOnlyCommandValidation.js'
-import { getToolResultsDir } from '@claude-code/app-compat/utils/toolResultStorage.js'
-import { windowsPathToPosixPath } from '@claude-code/app-compat/utils/windowsPaths.js'
+import { SETTING_SOURCES, getSettingsFilePathForSource, getSettingsRootPathForSource } from '@claude-code/config'
+import { getPermissionHostBindings } from './host.js'
+
+// V7 §11.4 — inlined constants + types + host binding wrappers
+const FILE_EDIT_TOOL_NAME = 'Edit'
+const FILE_READ_TOOL_NAME = 'Read'
+const CLAUDE_FOLDER_PERMISSION_PATTERN = 'Edit(.claude/**)'
+const GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN = 'Edit(~/.claude/**)'
+type AnyObject = Record<string, unknown>
+type Tool = { name: string; [key: string]: unknown }
+type ToolPermissionContext = { permissionRules: unknown; [key: string]: unknown }
+function windowsPathToPosixPath(p: string): string { return p.replace(/\\/g, '/') }
+
+const _b = () => getPermissionHostBindings() as any
+function getOriginalCwd(): string { return _b().getOriginalCwd?.() ?? process.cwd() }
+function getSessionId(): string { return _b().getSessionId?.() ?? 'unknown' }
+function getCwd(): string { return _b().getCwd?.() ?? process.cwd() }
+function getClaudeConfigHomeDir(): string { return _b().getConfigHomeDir?.() ?? '' }
+function getFsImplementation(): any { return _b().getFsImplementation?.() ?? require('node:fs') }
+function getPathsForPermissionCheck(...args: unknown[]): string[] { return _b().getPathsForPermissionCheck?.(...args) ?? [] }
+function containsPathTraversal(p: string): boolean { return _b().containsPathTraversal?.(p) ?? false }
+function expandPath(p: string, cwd?: string): string { return _b().expandPath?.(p, cwd ?? getCwd()) ?? p }
+function getDirectoryForPath(p: string): string { return _b().getDirectoryForPath?.(p) ?? p }
+function sanitizePath(p: string): string { return _b().sanitizePath?.(p) ?? p }
+function getPlanSlug(): string | undefined { return _b().getPlanSlug?.() }
+function getPlansDirectory(): string { return _b().getPlansDirectory?.() ?? '' }
+function getPlatform(): string { return _b().getPlatform?.() ?? (process.platform === 'darwin' ? 'macos' : process.platform === 'win32' ? 'windows' : 'linux') }
+function getProjectDir(cwd: string): string { return _b().getProjectDir?.(cwd) ?? cwd }
+function containsVulnerableUncPath(p: string): boolean { return _b().containsVulnerableUncPath?.(p) ?? false }
+function getToolResultsDir(): string { return _b().getToolResultsDir?.() ?? '' }
 import type {
   PermissionDecision,
   PermissionResult,
