@@ -1,7 +1,12 @@
-import type { ConfigScope } from '@claude-code/app-compat/services/mcp/types.js'
 import type { ZodError, ZodIssue } from 'zod/v4'
-import { jsonParse } from '@claude-code/app-compat/utils/slowOperations.js'
-import { plural } from '@claude-code/app-compat/utils/stringUtils.js'
+
+// V7 §11.4 — inlined to avoid cross-layer imports from src/.
+// ConfigScope is a string union from mcp-runtime; config owns the type
+// reference only in the mcpErrorMetadata field of ValidationError.
+type ConfigScope = 'user' | 'project' | 'local' | 'dynamic' | 'enterprise' | 'claudeai' | 'managed'
+function plural(n: number, word: string, pluralWord = word + 's'): string {
+  return n === 1 ? word : pluralWord
+}
 import { validatePermissionRule } from './permissionValidation.js'
 import { generateSettingsJSONSchema } from './schemaOutput.js'
 import type { SettingsJson } from './types.js'
@@ -187,7 +192,7 @@ export function validateSettingsFileContent(content: string):
     } {
   try {
     // Parse the JSON first
-    const jsonData = jsonParse(content)
+    const jsonData = JSON.parse(content)
 
     // Validate against SettingsSchema in strict mode
     const result = SettingsSchema().strict().safeParse(jsonData)

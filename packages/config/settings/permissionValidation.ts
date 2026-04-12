@@ -1,8 +1,22 @@
 import { z } from 'zod/v4'
-import { mcpInfoFromString } from '@claude-code/app-compat/services/mcp/mcpStringUtils.js'
 import { lazySchema } from '../internal/lazySchema.js'
 import { permissionRuleValueFromString } from '@claude-code/permission/permissionRuleParser'
-import { capitalize } from '@claude-code/app-compat/utils/stringUtils.js'
+
+// V7 §11.4 — inlined tiny string utilities to avoid pulling in src/ files.
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function mcpInfoFromString(toolString: string): {
+  serverName: string
+  toolName: string | undefined
+} | null {
+  const parts = toolString.split('__')
+  const [mcpPart, serverName, ...toolNameParts] = parts
+  if (mcpPart !== 'mcp' || !serverName) return null
+  const toolName = toolNameParts.length > 0 ? toolNameParts.join('__') : undefined
+  return { serverName, toolName }
+}
 import {
   getCustomValidation,
   isBashPrefixTool,
