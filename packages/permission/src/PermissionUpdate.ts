@@ -1,17 +1,19 @@
 import { posix } from 'path'
-import type { ToolPermissionContext } from '@claude-code/app-compat/Tool.js'
+import {
+  type EditableSettingSource,
+  getSettingsForSource,
+  updateSettingsForSource,
+} from '@claude-code/config'
 import type {
   AdditionalWorkingDirectory,
   WorkingDirectorySource,
 } from './types/permissions.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import type { EditableSettingSource } from '@claude-code/app-compat/utils/settings/constants.js'
-import {
-  getSettingsForSource,
-  updateSettingsForSource,
-} from '@claude-code/app-compat/utils/settings/settings.js'
-import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
-import { addPermissionRulesToSettings } from '@claude-code/app-compat/utils/permissions/permissionsLoader.js'
+import { getPermissionHostBindings } from './host.js'
+
+// V7 §11.4 — inline types + host binding wrappers
+type ToolPermissionContext = { permissionRules: unknown; [key: string]: unknown }
+function logForDebugging(msg: string, meta?: unknown): void { getPermissionHostBindings().logDebug?.(msg, meta) }
+function addPermissionRulesToSettings(...a: unknown[]): boolean { return (getPermissionHostBindings() as any).addPermissionRulesToSettings?.(...a) ?? false }
 import { toPosixPath } from './filesystem.js'
 import type { PermissionRuleValue } from './PermissionRule.js'
 import type {
@@ -63,7 +65,7 @@ export function applyPermissionUpdate(
         permissionRuleValueToString(rule),
       )
       logForDebugging(
-        `Applying permission update: Adding ${update.rules.length} ${update.behavior} rule(s) to destination '${update.destination}': ${jsonStringify(ruleStrings)}`,
+        `Applying permission update: Adding ${update.rules.length} ${update.behavior} rule(s) to destination '${update.destination}': ${JSON.stringify(ruleStrings)}`,
       )
 
       const ruleKind =
@@ -90,7 +92,7 @@ export function applyPermissionUpdate(
         permissionRuleValueToString(rule),
       )
       logForDebugging(
-        `Replacing all ${update.behavior} rules for destination '${update.destination}' with ${update.rules.length} rule(s): ${jsonStringify(ruleStrings)}`,
+        `Replacing all ${update.behavior} rules for destination '${update.destination}' with ${update.rules.length} rule(s): ${JSON.stringify(ruleStrings)}`,
       )
 
       const ruleKind =
@@ -111,7 +113,7 @@ export function applyPermissionUpdate(
 
     case 'addDirectories': {
       logForDebugging(
-        `Applying permission update: Adding ${update.directories.length} director${update.directories.length === 1 ? 'y' : 'ies'} with destination '${update.destination}': ${jsonStringify(update.directories)}`,
+        `Applying permission update: Adding ${update.directories.length} director${update.directories.length === 1 ? 'y' : 'ies'} with destination '${update.destination}': ${JSON.stringify(update.directories)}`,
       )
       const newAdditionalDirs = new Map(context.additionalWorkingDirectories)
       for (const directory of update.directories) {
@@ -131,7 +133,7 @@ export function applyPermissionUpdate(
         permissionRuleValueToString(rule),
       )
       logForDebugging(
-        `Applying permission update: Removing ${update.rules.length} ${update.behavior} rule(s) from source '${update.destination}': ${jsonStringify(ruleStrings)}`,
+        `Applying permission update: Removing ${update.rules.length} ${update.behavior} rule(s) from source '${update.destination}': ${JSON.stringify(ruleStrings)}`,
       )
 
       const ruleKind =
@@ -158,7 +160,7 @@ export function applyPermissionUpdate(
 
     case 'removeDirectories': {
       logForDebugging(
-        `Applying permission update: Removing ${update.directories.length} director${update.directories.length === 1 ? 'y' : 'ies'}: ${jsonStringify(update.directories)}`,
+        `Applying permission update: Removing ${update.directories.length} director${update.directories.length === 1 ? 'y' : 'ies'}: ${JSON.stringify(update.directories)}`,
       )
       const newAdditionalDirs = new Map(context.additionalWorkingDirectories)
       for (const directory of update.directories) {

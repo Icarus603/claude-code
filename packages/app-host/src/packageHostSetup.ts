@@ -37,6 +37,13 @@ export type PackageHostCoreResolvers = {
     message: string
     source?: string
   }>
+  // V7 — extra bindings passed through to subsystem packages.
+  // ALL require('src/...') calls stay in src/services/packageHostSetup.ts;
+  // packages/app-host just forwards the resolved values.
+  extraConfigBindings?: Record<string, unknown>
+  extraPermissionBindings?: Record<string, unknown>
+  extraMemoryBindings?: Record<string, unknown>
+  extraAgentBindings?: Record<string, unknown>
 }
 
 export function installCorePackageHostBindings(
@@ -53,26 +60,27 @@ export function installCorePackageHostBindings(
     getGlobalClaudeFile: resolvers.getGlobalClaudeFile,
     getProjectRoot: resolvers.getProjectRoot,
     logDebug: resolvers.logDebug,
-    // V7 §8.6 — MCP error aggregation injected via host binding so config
-    // does not depend on mcp-runtime (integration layer). Lazy-imported
-    // because mcp-runtime may not be loaded at config init time.
     getMcpErrorsByScope: resolvers.getMcpErrorsByScope,
-  })
+    ...resolvers.extraConfigBindings,
+  } as any)
 
   installPermissionHostBindings({
     now,
     logDebug: resolvers.logDebug,
-  })
+    ...resolvers.extraPermissionBindings,
+  } as any)
 
   installMemoryHostBindings({
     now,
     logDebug: resolvers.logDebug,
-  })
+    ...resolvers.extraMemoryBindings,
+  } as any)
 
   installAgentHostBindings({
     now,
     logDebug: resolvers.logDebug,
-  })
+    ...resolvers.extraAgentBindings,
+  } as any)
 
   installCliHostBindings({
     logDebug: resolvers.logDebug,

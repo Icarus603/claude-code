@@ -50,6 +50,13 @@ export function installPackageHostBindings(
       getRepoRemoteHash: async () => { try { return await (require('../utils/git.js') as typeof import('../utils/git.js')).getRepoRemoteHash() } catch { return null } },
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
+      // V7 — extra subsystem bindings. ALL require() from src/ stays HERE
+      // (never in packages/app-host/src/ — see memory: no-require-in-apphost)
+      extraPermissionBindings: {
+        addPermissionRulesToSettings: (...a: unknown[]) => {
+          try { return require('../utils/permissions/permissionsLoader.js').addPermissionRulesToSettings(...a) } catch { return false }
+        },
+      },
       // V7 §7 — bootstrap state + session accessors for config
       getCwd: () => { try { return require('../utils/cwd.js').getCwd() } catch { return process.cwd() } },
       getOriginalCwd: () => { try { return require('../bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
