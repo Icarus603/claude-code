@@ -53,9 +53,23 @@ export function installPackageHostBindings(
       // V7 — extra subsystem bindings. ALL require() from src/ stays HERE
       // (never in packages/app-host/src/ — see memory: no-require-in-apphost)
       extraPermissionBindings: {
-        addPermissionRulesToSettings: (...a: unknown[]) => {
-          try { return require('../utils/permissions/permissionsLoader.js').addPermissionRulesToSettings(...a) } catch { return false }
-        },
+        addPermissionRulesToSettings: (...a: unknown[]) => { try { return require('../utils/permissions/permissionsLoader.js').addPermissionRulesToSettings(...a) } catch { return false } },
+        getOriginalCwd: () => { try { return require('../bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
+        getSessionId: () => { try { return require('../bootstrap/state.js').getSessionId() } catch { return 'unknown' } },
+        getCwd: () => { try { return require('../utils/cwd.js').getCwd() } catch { return process.cwd() } },
+        getConfigHomeDir: () => getClaudeConfigHomeDir(),
+        getFsImplementation: () => { try { return require('../utils/fsOperations.js').getFsImplementation() } catch { return require('node:fs') } },
+        getPathsForPermissionCheck: (...a: unknown[]) => { try { return require('../utils/fsOperations.js').getPathsForPermissionCheck(...a) } catch { return [] } },
+        containsPathTraversal: (p: string) => { try { return require('../utils/path.js').containsPathTraversal(p) } catch { return false } },
+        expandPath: (p: string, cwd: string) => { try { return require('../utils/path.js').expandPath(p, cwd) } catch { return p } },
+        getDirectoryForPath: (p: string) => { try { return require('../utils/path.js').getDirectoryForPath(p) } catch { return p } },
+        sanitizePath: (p: string) => { try { return require('../utils/path.js').sanitizePath(p) } catch { return p } },
+        getPlanSlug: () => { try { return require('../utils/plans.js').getPlanSlug() } catch { return undefined } },
+        getPlansDirectory: () => { try { return require('../utils/plans.js').getPlansDirectory() } catch { return '' } },
+        getPlatform: () => { try { return require('../utils/platform.js').getPlatform() } catch { return process.platform === 'darwin' ? 'macos' : 'linux' } },
+        getProjectDir: (...a: unknown[]) => { try { return require('../utils/sessionStorage.js').getProjectDir(...a) } catch { return process.cwd() } },
+        containsVulnerableUncPath: (p: string) => { try { return require('../utils/shell/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
+        getToolResultsDir: () => { try { return require('../utils/toolResultStorage.js').getToolResultsDir() } catch { return '' } },
       },
       // V7 §7 — bootstrap state + session accessors for config
       getCwd: () => { try { return require('../utils/cwd.js').getCwd() } catch { return process.cwd() } },
