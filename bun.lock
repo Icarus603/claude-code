@@ -27,19 +27,24 @@
         "@biomejs/biome": "^2.4.10",
         "@claude-code/agent": "workspace:*",
         "@claude-code/app-host": "workspace:*",
+        "@claude-code/bridge": "workspace:*",
         "@claude-code/cli": "workspace:*",
         "@claude-code/command-runtime": "workspace:*",
         "@claude-code/config": "workspace:*",
+        "@claude-code/daemon": "workspace:*",
+        "@claude-code/headless-sdk": "workspace:*",
         "@claude-code/local-observability": "workspace:*",
         "@claude-code/mcp-runtime": "workspace:*",
         "@claude-code/memory": "workspace:*",
         "@claude-code/output": "workspace:*",
         "@claude-code/permission": "workspace:*",
         "@claude-code/provider": "workspace:*",
+        "@claude-code/repl": "workspace:*",
         "@claude-code/shell": "workspace:*",
         "@claude-code/storage": "workspace:*",
         "@claude-code/swarm": "workspace:*",
         "@claude-code/tool-registry": "workspace:*",
+        "@claude-code/voice": "workspace:*",
         "@commander-js/extra-typings": "^14.0.0",
         "@growthbook/growthbook": "^1.6.5",
         "@modelcontextprotocol/sdk": "^1.29.0",
@@ -192,6 +197,10 @@
       "name": "audio-capture-napi",
       "version": "1.0.0",
     },
+    "packages/bridge": {
+      "name": "@claude-code/bridge",
+      "version": "0.0.0",
+    },
     "packages/cli": {
       "name": "@claude-code/cli",
       "version": "0.1.0",
@@ -210,6 +219,14 @@
     "packages/config": {
       "name": "@claude-code/config",
       "version": "0.1.0",
+    },
+    "packages/daemon": {
+      "name": "@claude-code/daemon",
+      "version": "0.0.0",
+    },
+    "packages/headless-sdk": {
+      "name": "@claude-code/headless-sdk",
+      "version": "0.0.0",
     },
     "packages/ide": {
       "name": "@claude-code/ide",
@@ -249,6 +266,10 @@
     "packages/provider": {
       "name": "@claude-code/provider",
       "version": "0.1.0",
+    },
+    "packages/repl": {
+      "name": "@claude-code/repl",
+      "version": "0.0.0",
     },
     "packages/server": {
       "name": "@claude-code/server",
@@ -290,6 +311,10 @@
     "packages/url-handler-napi": {
       "name": "url-handler-napi",
       "version": "1.0.0",
+    },
+    "packages/voice": {
+      "name": "@claude-code/voice",
+      "version": "0.0.0",
     },
   },
   "packages": {
@@ -443,11 +468,17 @@
 
     "@claude-code/app-host": ["@claude-code/app-host@workspace:packages/app-host"],
 
+    "@claude-code/bridge": ["@claude-code/bridge@workspace:packages/bridge"],
+
     "@claude-code/cli": ["@claude-code/cli@workspace:packages/cli"],
 
     "@claude-code/command-runtime": ["@claude-code/command-runtime@workspace:packages/command-runtime"],
 
     "@claude-code/config": ["@claude-code/config@workspace:packages/config"],
+
+    "@claude-code/daemon": ["@claude-code/daemon@workspace:packages/daemon"],
+
+    "@claude-code/headless-sdk": ["@claude-code/headless-sdk@workspace:packages/headless-sdk"],
 
     "@claude-code/ide": ["@claude-code/ide@workspace:packages/ide"],
 
@@ -463,6 +494,8 @@
 
     "@claude-code/provider": ["@claude-code/provider@workspace:packages/provider"],
 
+    "@claude-code/repl": ["@claude-code/repl@workspace:packages/repl"],
+
     "@claude-code/server": ["@claude-code/server@workspace:packages/server"],
 
     "@claude-code/shell": ["@claude-code/shell@workspace:packages/shell"],
@@ -476,6 +509,8 @@
     "@claude-code/tool-registry": ["@claude-code/tool-registry@workspace:packages/tool-registry"],
 
     "@claude-code/updater": ["@claude-code/updater@workspace:packages/updater"],
+
+    "@claude-code/voice": ["@claude-code/voice@workspace:packages/voice"],
 
     "@commander-js/extra-typings": ["@commander-js/extra-typings@14.0.0", "https://registry.npmmirror.com/@commander-js/extra-typings/-/extra-typings-14.0.0.tgz", { "peerDependencies": { "commander": "~14.0.0" } }, "sha512-hIn0ncNaJRLkZrxBIp5AsW/eXEHNKYQBh0aPdoUqNgD+Io3NIykQqpKFyKcuasZhicGaEZJX/JBSIkZ4e5x8Dg=="],
 
