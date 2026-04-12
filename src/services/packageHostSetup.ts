@@ -30,6 +30,13 @@ export function installPackageHostBindings(
             isEligible,
             baseApiUrl: getOauthConfig().BASE_API_URL,
             getAuthHeaders: async () => {
+              // Try API key first (Console users), then OAuth (Claude.ai users)
+              try {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { getAnthropicApiKeyWithSource } = require('../utils/auth.js') as typeof import('../utils/auth.js')
+                const { key } = getAnthropicApiKeyWithSource({ skipRetrievingKeyFromApiKeyHelper: true })
+                if (key) return { 'x-api-key': key }
+              } catch { /* no API key */ }
               const t = getClaudeAIOAuthTokens()
               if (t?.accessToken) return { Authorization: `Bearer ${t.accessToken}`, 'anthropic-beta': OAUTH_BETA_HEADER }
               return {}
