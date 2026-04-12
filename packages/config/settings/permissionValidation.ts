@@ -1,6 +1,6 @@
 import { z } from 'zod/v4'
 import { mcpInfoFromString } from '@claude-code/app-compat/services/mcp/mcpStringUtils.js'
-import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
+import { lazySchema } from '../internal/lazySchema.js'
 import { permissionRuleValueFromString } from '@claude-code/permission/permissionRuleParser'
 import { capitalize } from '@claude-code/app-compat/utils/stringUtils.js'
 import {
