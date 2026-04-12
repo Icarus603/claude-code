@@ -28,6 +28,42 @@ export function installPackageHostBindings(
           return []
         }
       },
+      // V7 §8.6 — bridge auth/provider eligibility check into config.
+      // The full logic (OAuth tokens, API key, provider type, base URL)
+      // stays at the host level where auth.ts and providers.ts are available.
+      checkRemoteSettingsEligibility: () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { CLAUDE_AI_INFERENCE_SCOPE } = require('../constants/oauth.js') as typeof import('../constants/oauth.js')
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { getAnthropicApiKeyWithSource, getClaudeAIOAuthTokens } = require('../utils/auth.js') as typeof import('../utils/auth.js')
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('../utils/model/providers.js') as typeof import('../utils/model/providers.js')
+
+          if (getAPIProvider() !== 'firstParty') return false
+          if (!isFirstPartyAnthropicBaseUrl()) return false
+          if (process.env.CLAUDE_CODE_ENTRYPOINT === 'local-agent') return false
+
+          const tokens = getClaudeAIOAuthTokens()
+          if (tokens?.accessToken && tokens.subscriptionType === null) return true
+          if (
+            tokens?.accessToken &&
+            tokens.scopes?.includes(CLAUDE_AI_INFERENCE_SCOPE) &&
+            (tokens.subscriptionType === 'enterprise' || tokens.subscriptionType === 'team')
+          ) return true
+
+          try {
+            const { key: apiKey } = getAnthropicApiKeyWithSource({
+              skipRetrievingKeyFromApiKeyHelper: true,
+            })
+            if (apiKey) return true
+          } catch { /* no API key available */ }
+
+          return false
+        } catch {
+          return false
+        }
+      },
     },
     {
       installProviderBindings:
