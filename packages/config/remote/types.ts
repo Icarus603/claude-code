@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
+import { lazySchema } from '../internal/lazySchema.js'
 import type { SettingsJson } from '../settings/types.js'
 
 /**

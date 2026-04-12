@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
 import { SandboxSettingsSchema } from '@claude-code/app-compat/entrypoints/sandboxTypes.js'
 import { isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
-import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
+import { lazySchema } from '../internal/lazySchema.js'
 import {
   EXTERNAL_PERMISSION_MODES,
   PERMISSION_MODES,
