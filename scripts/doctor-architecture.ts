@@ -189,6 +189,13 @@ const CHECKS: Check[] = [
     script: 'scripts/verify-gates.ts',
     doc: 'V7 §3.6',
   },
+  {
+    id: 'empty-folders',
+    layer: 'Cross-Cutting',
+    subsystem: 'wave-0 hygiene',
+    script: 'scripts/verify-empty-folders.ts',
+    doc: 'V7 §19.5',
+  },
 ]
 
 type CheckResult = {
