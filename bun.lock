@@ -28,7 +28,7 @@
         "@claude-code/agent": "workspace:*",
         "@claude-code/app-host": "workspace:*",
         "@claude-code/cli": "workspace:*",
-        "@claude-code/command-registry": "workspace:*",
+        "@claude-code/command-runtime": "workspace:*",
         "@claude-code/config": "workspace:*",
         "@claude-code/local-observability": "workspace:*",
         "@claude-code/mcp-runtime": "workspace:*",
@@ -203,12 +203,16 @@
         "highlight.js": "latest",
       },
     },
-    "packages/command-registry": {
-      "name": "@claude-code/command-registry",
+    "packages/command-runtime": {
+      "name": "@claude-code/command-runtime",
       "version": "0.1.0",
     },
     "packages/config": {
       "name": "@claude-code/config",
+      "version": "0.1.0",
+    },
+    "packages/ide": {
+      "name": "@claude-code/ide",
       "version": "0.1.0",
     },
     "packages/image-processor-napi": {
@@ -246,6 +250,10 @@
       "name": "@claude-code/provider",
       "version": "0.1.0",
     },
+    "packages/server": {
+      "name": "@claude-code/server",
+      "version": "0.1.0",
+    },
     "packages/shell": {
       "name": "@claude-code/shell",
       "version": "0.1.0",
@@ -267,9 +275,17 @@
         "zod": "^4.3.6",
       },
     },
+    "packages/teleport": {
+      "name": "@claude-code/teleport",
+      "version": "0.1.0",
+    },
     "packages/tool-registry": {
       "name": "@claude-code/tool-registry",
       "version": "1.0.0",
+    },
+    "packages/updater": {
+      "name": "@claude-code/updater",
+      "version": "0.1.0",
     },
     "packages/url-handler-napi": {
       "name": "url-handler-napi",
@@ -429,9 +445,11 @@
 
     "@claude-code/cli": ["@claude-code/cli@workspace:packages/cli"],
 
-    "@claude-code/command-registry": ["@claude-code/command-registry@workspace:packages/command-registry"],
+    "@claude-code/command-runtime": ["@claude-code/command-runtime@workspace:packages/command-runtime"],
 
     "@claude-code/config": ["@claude-code/config@workspace:packages/config"],
+
+    "@claude-code/ide": ["@claude-code/ide@workspace:packages/ide"],
 
     "@claude-code/local-observability": ["@claude-code/local-observability@workspace:packages/local-observability"],
 
@@ -445,13 +463,19 @@
 
     "@claude-code/provider": ["@claude-code/provider@workspace:packages/provider"],
 
+    "@claude-code/server": ["@claude-code/server@workspace:packages/server"],
+
     "@claude-code/shell": ["@claude-code/shell@workspace:packages/shell"],
 
     "@claude-code/storage": ["@claude-code/storage@workspace:packages/storage"],
 
     "@claude-code/swarm": ["@claude-code/swarm@workspace:packages/swarm"],
 
+    "@claude-code/teleport": ["@claude-code/teleport@workspace:packages/teleport"],
+
     "@claude-code/tool-registry": ["@claude-code/tool-registry@workspace:packages/tool-registry"],
+
+    "@claude-code/updater": ["@claude-code/updater@workspace:packages/updater"],
 
     "@commander-js/extra-typings": ["@commander-js/extra-typings@14.0.0", "https://registry.npmmirror.com/@commander-js/extra-typings/-/extra-typings-14.0.0.tgz", { "peerDependencies": { "commander": "~14.0.0" } }, "sha512-hIn0ncNaJRLkZrxBIp5AsW/eXEHNKYQBh0aPdoUqNgD+Io3NIykQqpKFyKcuasZhicGaEZJX/JBSIkZ4e5x8Dg=="],
 

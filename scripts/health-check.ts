@@ -149,7 +149,7 @@ async function checkRuntimeSkeletonGuards() {
     'scripts/verify-entry-thin-host.ts',
     'scripts/verify-repl-owner.ts',
     'scripts/verify-headless-host.ts',
-    'scripts/verify-command-registry.ts',
+    'scripts/verify-command-runtime.ts',
     'scripts/verify-mcp-runtime.ts',
     'scripts/verify-session-format-compat.ts',
     'scripts/verify-optional-integration-slots.ts',

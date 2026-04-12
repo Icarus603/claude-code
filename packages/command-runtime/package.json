@@ -1,5 +1,5 @@
 {
-  "name": "@claude-code/command-registry",
+  "name": "@claude-code/command-runtime",
   "version": "0.1.0",
   "private": true,
   "type": "module",

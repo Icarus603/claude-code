@@ -30,7 +30,7 @@ const WATCHED_PATH_PREFIXES = [
   'packages/memory/src/',
   'packages/config/src/',
   'packages/tool-registry/src/',
-  'packages/command-registry/src/',
+  'packages/command-runtime/src/',
   'packages/mcp-runtime/src/',
   'packages/app-host/src/',
   'packages/storage/src/',

@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises'
-import { getCommandRegistryHostBindings } from '@claude-code/command-registry'
+import { getCommandRegistryHostBindings } from '@claude-code/command-runtime'
 import { getMcpRuntimeHostBindings } from '@claude-code/mcp-runtime'
 import { getProviderHostBindings } from '@claude-code/provider'
 import { getToolRegistryHostBindings } from '@claude-code/tool-registry'
