@@ -16,6 +16,27 @@ export function installPackageHostBindings(
       getProjectRoot: () => findCanonicalGitRoot(getCwd()),
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
+      // V7 §8.6 — bootstrap state + lifecycle + hooks bindings for changeDetector
+      getIsRemoteMode: () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { getIsRemoteMode } = require('../bootstrap/state.js') as typeof import('../bootstrap/state.js')
+          return getIsRemoteMode()
+        } catch { return false }
+      },
+      registerCleanup: (fn: () => Promise<void>) => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { registerCleanup } = require('../utils/cleanupRegistry.js') as typeof import('../utils/cleanupRegistry.js')
+        return registerCleanup(fn)
+      },
+      executeConfigChangeHooks: async (source: string) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { executeConfigChangeHooks, hasBlockingResult } = require('../utils/hooks.js') as typeof import('../utils/hooks.js')
+          const results = await executeConfigChangeHooks(source as any)
+          return { blocked: hasBlockingResult(results) }
+        } catch { return { blocked: false } }
+      },
       // V7 §8.6 — bridge MCP validation errors into config without a
       // direct config → mcp-runtime dependency. Lazy-imported so the MCP
       // module tree doesn't load at config-init time.
