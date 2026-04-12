@@ -16,5 +16,13 @@ export type ConfigHostBindings = {
   // wires this to the full isRemoteManagedSettingsEligible() logic at
   // composition time. Config calls it and caches the boolean.
   checkRemoteSettingsEligibility?: () => boolean
+  // V7 §7 — bootstrap state bindings. Config reads these but does not own
+  // session-level bootstrap state (that's app-host).
+  getIsRemoteMode?: () => boolean
+  // V7 §8.6 — lifecycle hook for cleanup on process exit.
+  registerCleanup?: (fn: () => Promise<void>) => () => void
+  // V7 §8.6 — hook execution bridge. Config cannot import the hooks runtime.
+  // Returns true if any hook blocked the change.
+  executeConfigChangeHooks?: (source: string) => Promise<{ blocked: boolean }>
 }
 

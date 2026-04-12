@@ -1,17 +1,16 @@
 import chokidar, { type FSWatcher } from 'chokidar'
 import { stat } from 'fs/promises'
 import * as platformPath from 'path'
-import { getIsRemoteMode } from '@claude-code/app-compat/bootstrap/state.js'
-import { registerCleanup } from '@claude-code/app-compat/utils/cleanupRegistry.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { errorMessage } from '@claude-code/app-compat/utils/errors.js'
-import {
-  type ConfigChangeSource,
-  executeConfigChangeHooks,
-  hasBlockingResult,
-} from '@claude-code/app-compat/utils/hooks.js'
-import { createSignal } from '@claude-code/app-compat/utils/signal.js'
-import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+import { getConfigHostBindings } from '../host.js'
+import { createSignal } from '../internal/signal.js'
+
+// V7 §11.4 — inlined tiny utilities
+function errorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e)
+}
+
+// V7 §8.6 — type alias for config change sources (was from hooks.js)
+type ConfigChangeSource = string
 import { SETTING_SOURCES, type SettingSource } from './constants.js'
 import { clearInternalWrites, consumeInternalWrite } from './internalWrites.js'
 import { getManagedSettingsDropInDir } from './managedPath.js'
@@ -82,7 +81,7 @@ let testOverrides: {
  * Initialize file watching
  */
 export async function initialize(): Promise<void> {
-  if (getIsRemoteMode()) return
+  if (getConfigHostBindings().getIsRemoteMode?.()) return
   if (initialized || disposed) return
   initialized = true
 
@@ -90,13 +89,13 @@ export async function initialize(): Promise<void> {
   startMdmPoll()
 
   // Register cleanup to properly dispose during graceful shutdown
-  registerCleanup(dispose)
+  getConfigHostBindings().registerCleanup?.(dispose)
 
   const { dirs, settingsFiles, dropInDir } = await getWatchTargets()
   if (disposed) return // dispose() ran during the await
   if (dirs.length === 0) return
 
-  logForDebugging(
+  getConfigHostBindings().logDebug?.(
     `Watching for changes in setting files ${[...settingsFiles].join(', ')}...${dropInDir ? ` and drop-in directory ${dropInDir}` : ''}`,
   )
 
@@ -275,7 +274,7 @@ function handleChange(path: string): void {
   if (pendingTimer) {
     clearTimeout(pendingTimer)
     pendingDeletions.delete(path)
-    logForDebugging(
+    getConfigHostBindings().logDebug?.(
       `Cancelled pending deletion of ${path} — file was recreated`,
     )
   }
@@ -285,20 +284,22 @@ function handleChange(path: string): void {
     return
   }
 
-  logForDebugging(`Detected change to ${path}`)
+  getConfigHostBindings().logDebug?.(`Detected change to ${path}`)
 
   // Fire ConfigChange hook first — if blocked (exit code 2 or decision: 'block'),
   // skip applying the change to the session
-  void executeConfigChangeHooks(
-    settingSourceToConfigChangeSource(source),
-    path,
-  ).then(results => {
-    if (hasBlockingResult(results)) {
-      logForDebugging(`ConfigChange hook blocked change to ${path}`)
-      return
-    }
+  const executeHooks = getConfigHostBindings().executeConfigChangeHooks
+  if (executeHooks) {
+    void executeHooks(settingSourceToConfigChangeSource(source)).then(({ blocked }) => {
+      if (blocked) {
+        getConfigHostBindings().logDebug?.(`ConfigChange hook blocked change to ${path}`)
+        return
+      }
+      fanOut(source)
+    })
+  } else {
     fanOut(source)
-  })
+  }
 }
 
 /**
@@ -314,7 +315,7 @@ function handleAdd(path: string): void {
   if (pendingTimer) {
     clearTimeout(pendingTimer)
     pendingDeletions.delete(path)
-    logForDebugging(`Cancelled pending deletion of ${path} — file was re-added`)
+    getConfigHostBindings().logDebug?.(`Cancelled pending deletion of ${path} — file was re-added`)
   }
 
   // Treat as a change (re-read settings)
@@ -331,7 +332,7 @@ function handleDelete(path: string): void {
   const source = getSourceForPath(path)
   if (!source) return
 
-  logForDebugging(`Detected deletion of ${path}`)
+  getConfigHostBindings().logDebug?.(`Detected deletion of ${path}`)
 
   // If there's already a pending deletion for this path, let it run
   if (pendingDeletions.has(path)) return
@@ -341,16 +342,18 @@ function handleDelete(path: string): void {
       pendingDeletions.delete(p)
 
       // Fire ConfigChange hook first — if blocked, skip applying the deletion
-      void executeConfigChangeHooks(
-        settingSourceToConfigChangeSource(src),
-        p,
-      ).then(results => {
-        if (hasBlockingResult(results)) {
-          logForDebugging(`ConfigChange hook blocked deletion of ${p}`)
-          return
-        }
+      const execHooks = getConfigHostBindings().executeConfigChangeHooks
+      if (execHooks) {
+        void execHooks(settingSourceToConfigChangeSource(src)).then(({ blocked }) => {
+          if (blocked) {
+            getConfigHostBindings().logDebug?.(`ConfigChange hook blocked deletion of ${p}`)
+            return
+          }
+          fanOut(src)
+        })
+      } else {
         fanOut(src)
-      })
+      }
     },
     testOverrides?.deletionGrace ?? DELETION_GRACE_MS,
     path,
@@ -382,7 +385,7 @@ function startMdmPoll(): void {
   // Capture initial snapshot (includes both admin MDM and user-writable HKCU)
   const initial = getMdmSettings()
   const initialHkcu = getHkcuSettings()
-  lastMdmSnapshot = jsonStringify({
+  lastMdmSnapshot = JSON.stringify({
     mdm: initial.settings,
     hkcu: initialHkcu.settings,
   })
@@ -395,7 +398,7 @@ function startMdmPoll(): void {
         const { mdm: current, hkcu: currentHkcu } = await refreshMdmSettings()
         if (disposed) return
 
-        const currentSnapshot = jsonStringify({
+        const currentSnapshot = JSON.stringify({
           mdm: current.settings,
           hkcu: currentHkcu.settings,
         })
@@ -404,11 +407,11 @@ function startMdmPoll(): void {
           lastMdmSnapshot = currentSnapshot
           // Update the cache so sync readers pick up new values
           setMdmSettingsCache(current, currentHkcu)
-          logForDebugging('Detected MDM settings change via poll')
+          getConfigHostBindings().logDebug?.('Detected MDM settings change via poll')
           fanOut('policySettings')
         }
       } catch (error) {
-        logForDebugging(`MDM poll error: ${errorMessage(error)}`)
+        getConfigHostBindings().logDebug?.(`MDM poll error: ${errorMessage(error)}`)
       }
     })()
   }, testOverrides?.mdmPollInterval ?? MDM_POLL_INTERVAL_MS)
@@ -445,7 +448,7 @@ function fanOut(source: SettingSource): void {
  * that don't involve file system changes.
  */
 export function notifyChange(source: SettingSource): void {
-  logForDebugging(`Programmatic settings change notification for ${source}`)
+  getConfigHostBindings().logDebug?.(`Programmatic settings change notification for ${source}`)
   fanOut(source)
 }
 
