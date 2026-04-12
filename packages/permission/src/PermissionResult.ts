@@ -6,7 +6,7 @@ import type {
   PermissionDenyDecision,
   PermissionMetadata,
   PermissionResult,
-} from '@claude-code/app-compat/types/permissions.js'
+} from './types/permissions.js'
 
 export type {
   PermissionAllowDecision,

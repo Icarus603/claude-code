@@ -4,8 +4,8 @@ import type {
   PermissionRule,
   PermissionRuleSource,
   PermissionRuleValue,
-} from '@claude-code/app-compat/types/permissions.js'
-import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
+} from './types/permissions.js'
+import { lazySchema } from '../internal/lazySchema.js'
 
 export type {
   PermissionBehavior,

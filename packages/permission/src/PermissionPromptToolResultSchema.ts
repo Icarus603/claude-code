@@ -1,7 +1,10 @@
-import type { Tool, ToolUseContext } from '@claude-code/app-compat/Tool.js'
 import z from 'zod/v4'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
+import { getPermissionHostBindings } from './host.js'
+
+// V7 §11.4 — inlined type-only imports from Tool.ts
+type Tool = { name: string; [key: string]: unknown }
+type ToolUseContext = unknown
+import { lazySchema } from '../internal/lazySchema.js'
 import type {
   PermissionDecision,
   PermissionDecisionReason,
@@ -51,7 +54,7 @@ const PermissionAllowResultSchema = lazySchema(() =>
       .array(permissionUpdateSchema())
       .optional()
       .catch(ctx => {
-        logForDebugging(
+        getPermissionHostBindings().logDebug?.(
           `Malformed updatedPermissions from SDK host ignored: ${ctx.error.issues[0]?.message ?? 'unknown'}`,
           { level: 'warn' },
         )
@@ -115,7 +118,7 @@ export function permissionPromptToolResultToPermissionDecision(
       decisionReason,
     }
   } else if (result.behavior === 'deny' && result.interrupt) {
-    logForDebugging(
+    getPermissionHostBindings().logDebug?.(
       `SDK permission prompt deny+interrupt: tool=${tool.name} message=${result.message}`,
     )
     toolUseContext.abortController.abort()
