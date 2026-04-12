@@ -36,6 +36,17 @@ import type { Root } from '@anthropic/ink'
 import { createHeadlessSession } from '@claude-code/cli'
 import { getTeammateModeSnapshot, logManagedSettings } from '@claude-code/cli'
 import { launchRepl, type AppWrapperProps } from '../../../../src/replLauncher.js'
+import { initializeLspServerManager } from '../../../../src/services/lsp/manager.js'
+// Imports that were left behind when the .action() body moved from src/main.tsx
+// at commit 903c46b — the callsites survived the move, the import statements
+// didn't. Without these, each call site throws `undefined is not a function`,
+// which Ink's patchConsole swallows, leaving the REPL at a blank screen.
+import { shouldEnablePromptSuggestion } from '../../../../src/services/PromptSuggestion/promptSuggestion.js'
+import {
+  createDirectConnectSession,
+  DirectConnectError,
+} from '../../../../src/server/createDirectConnectSession.js'
+import { createRemoteSessionConfig } from '../../../../src/remote/RemoteSessionManager.js'
 import {
   hasGrowthBookEnvOverride,
   initializeGrowthBook,
@@ -4249,4 +4260,125 @@ export async function runModeDispatch(
 					},
 				);
 			}
+}
+
+// Moved from src/main.tsx along with the rest of the .action() body at commit
+// 903c46b. The original extraction left the function definition behind while
+// relocating every caller into this file, producing a silent runtime crash
+// (ReferenceError swallowed by Ink's patchConsole) that blanked the REPL.
+async function logTenguInit({
+	hasInitialPrompt,
+	hasStdin,
+	verbose,
+	debug,
+	debugToStderr,
+	print,
+	outputFormat,
+	inputFormat,
+	numAllowedTools,
+	numDisallowedTools,
+	mcpClientCount,
+	worktreeEnabled,
+	skipWebFetchPreflight,
+	githubActionInputs,
+	dangerouslySkipPermissionsPassed,
+	permissionMode,
+	modeIsBypass,
+	allowDangerouslySkipPermissionsPassed,
+	systemPromptFlag,
+	appendSystemPromptFlag,
+	thinkingConfig,
+	assistantActivationPath,
+}: {
+	hasInitialPrompt: boolean
+	hasStdin: boolean
+	verbose: boolean
+	debug: boolean
+	debugToStderr: boolean
+	print: boolean
+	outputFormat: string
+	inputFormat: string
+	numAllowedTools: number
+	numDisallowedTools: number
+	mcpClientCount: number
+	worktreeEnabled: boolean
+	skipWebFetchPreflight: boolean | undefined
+	githubActionInputs: string | undefined
+	dangerouslySkipPermissionsPassed: boolean
+	permissionMode: string
+	modeIsBypass: boolean
+	allowDangerouslySkipPermissionsPassed: boolean
+	systemPromptFlag: 'file' | 'flag' | undefined
+	appendSystemPromptFlag: 'file' | 'flag' | undefined
+	thinkingConfig: ThinkingConfig
+	assistantActivationPath: string | undefined
+}): Promise<void> {
+	try {
+		logEvent('tengu_init', {
+			entrypoint:
+				'claude' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			hasInitialPrompt,
+			hasStdin,
+			verbose,
+			debug,
+			debugToStderr,
+			print,
+			outputFormat:
+				outputFormat as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			inputFormat:
+				inputFormat as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			numAllowedTools,
+			numDisallowedTools,
+			mcpClientCount,
+			worktree: worktreeEnabled,
+			skipWebFetchPreflight,
+			...(githubActionInputs && {
+				githubActionInputs:
+					githubActionInputs as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			}),
+			dangerouslySkipPermissionsPassed,
+			permissionMode:
+				permissionMode as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			modeIsBypass,
+			inProtectedNamespace: isInProtectedNamespace(),
+			allowDangerouslySkipPermissionsPassed,
+			thinkingType:
+				thinkingConfig.type as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			...(systemPromptFlag && {
+				systemPromptFlag:
+					systemPromptFlag as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			}),
+			...(appendSystemPromptFlag && {
+				appendSystemPromptFlag:
+					appendSystemPromptFlag as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			}),
+			is_simple: isBareMode() || undefined,
+			is_coordinator:
+				feature('COORDINATOR_MODE') &&
+				coordinatorModeModule?.isCoordinatorMode()
+					? true
+					: undefined,
+			...(assistantActivationPath && {
+				assistantActivationPath:
+					assistantActivationPath as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			}),
+			autoUpdatesChannel: (getInitialSettings().autoUpdatesChannel ??
+				'latest') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+			...(process.env.USER_TYPE === 'ant'
+				? (() => {
+						const cwd = getCwd()
+						const gitRoot = findGitRoot(cwd)
+						const rp = gitRoot ? relative(gitRoot, cwd) || '.' : undefined
+						return rp
+							? {
+									relativeProjectPath:
+										rp as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+								}
+							: {}
+					})()
+				: {}),
+		})
+	} catch (error) {
+		logError(error)
+	}
 }
