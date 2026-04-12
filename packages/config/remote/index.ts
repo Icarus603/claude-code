@@ -15,12 +15,7 @@
 import axios from 'axios'
 import { createHash } from 'crypto'
 import { open, unlink } from 'fs/promises'
-import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/app-compat/constants/oauth.js'
-import {
-  checkAndRefreshOAuthTokenIfNeeded,
-  getAnthropicApiKeyWithSource,
-  getClaudeAIOAuthTokens,
-} from '@claude-code/app-compat/utils/auth.js'
+// V7 §8.6 — auth via host bindings (see getSettingsSyncAuth + getRemoteSettingsAuthHeaders)
 import { getConfigHostBindings } from '../host.js'
 import { settingsChangeDetector } from '../settings/changeDetector.js'
 import {
@@ -130,7 +125,8 @@ export function initializeRemoteManagedSettingsLoadingPromise(): void {
  * Uses the OAuth config base API URL
  */
 function getRemoteManagedSettingsEndpoint() {
-  return `${getOauthConfig().BASE_API_URL}/api/claude_code/settings`
+  const auth = getConfigHostBindings().getSettingsSyncAuth?.()
+  return `${auth?.baseApiUrl ?? 'https://api.anthropic.com'}/api/claude_code/settings`
 }
 
 /**
@@ -190,42 +186,17 @@ export async function waitForRemoteManagedSettingsToLoad(): Promise<void> {
  * This avoids circular dependencies during settings loading
  * Supports both API key and OAuth authentication
  */
-function getRemoteSettingsAuthHeaders(): {
+// V7 §8.6 — auth headers via host binding. Supports both API key and OAuth.
+async function getRemoteSettingsAuthHeaders(): Promise<{
   headers: Record<string, string>
   error?: string
-} {
-  // Try API key first (for Console users)
-  // Skip apiKeyHelper to avoid circular dependency with getSettings()
-  // Wrap in try-catch because getAnthropicApiKeyWithSource throws in CI/test environments
+}> {
+  const auth = getConfigHostBindings().getSettingsSyncAuth?.()
+  if (!auth) return { headers: {}, error: 'Auth binding not installed' }
   try {
-    const { key: apiKey } = getAnthropicApiKeyWithSource({
-      skipRetrievingKeyFromApiKeyHelper: true,
-    })
-    if (apiKey) {
-      return {
-        headers: {
-          'x-api-key': apiKey,
-        },
-      }
-    }
+    return { headers: await auth.getAuthHeaders() }
   } catch {
-    // No API key available - continue to check OAuth
-  }
-
-  // Fall back to OAuth tokens (for Claude.ai users)
-  const oauthTokens = getClaudeAIOAuthTokens()
-  if (oauthTokens?.accessToken) {
-    return {
-      headers: {
-        Authorization: `Bearer ${oauthTokens.accessToken}`,
-        'anthropic-beta': OAUTH_BETA_HEADER,
-      },
-    }
-  }
-
-  return {
-    headers: {},
-    error: 'No authentication available',
+    return { headers: {}, error: 'Failed to get auth headers' }
   }
 }
 
@@ -278,10 +249,10 @@ async function fetchRemoteManagedSettings(
   try {
     // Ensure OAuth token is fresh before fetching settings
     // This prevents 401 errors from stale cached tokens
-    await checkAndRefreshOAuthTokenIfNeeded()
+    await getConfigHostBindings().getSettingsSyncAuth?.()?.refreshToken?.()
 
     // Use local auth header getter to avoid circular dependency with getSettings()
-    const authHeaders = getRemoteSettingsAuthHeaders()
+    const authHeaders = await getRemoteSettingsAuthHeaders()
     if (authHeaders.error) {
       // Auth errors should not be retried - return a special flag to skip retries
       return {
