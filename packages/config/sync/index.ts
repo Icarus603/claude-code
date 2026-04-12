@@ -14,33 +14,32 @@ import axios from 'axios'
 import { mkdir, readFile, stat, writeFile } from 'fs/promises'
 import pickBy from 'lodash-es/pickBy.js'
 import { dirname } from 'path'
-import { getIsInteractive } from '@claude-code/app-compat/bootstrap/state.js'
-import {
-  CLAUDE_AI_INFERENCE_SCOPE,
-  getOauthConfig,
-  OAUTH_BETA_HEADER,
-} from '@claude-code/app-compat/constants/oauth.js'
-import {
-  checkAndRefreshOAuthTokenIfNeeded,
-  getClaudeAIOAuthTokens,
-} from '@claude-code/app-compat/utils/auth.js'
-import { clearMemoryFileCaches } from '@claude-code/app-compat/utils/claudemd.js'
+import { getConfigHostBindings, tryGetConfigHostBindings } from '../host.js'
 import { getMemoryPath } from '../global/config.js'
-import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
-import { classifyAxiosError } from '@claude-code/app-compat/utils/errors.js'
-import { getRepoRemoteHash } from '@claude-code/app-compat/utils/git.js'
-import {
-  getAPIProvider,
-  isFirstPartyAnthropicBaseUrl,
-} from '@claude-code/app-compat/utils/model/providers.js'
 import { markInternalWrite } from '../settings/internalWrites.js'
 import { getSettingsFilePathForSource } from '../settings/settings.js'
 import { resetSettingsCache } from '../settings/settingsCache.js'
-import { sleep } from '@claude-code/app-compat/utils/sleep.js'
-import { getClaudeCodeUserAgent } from '@claude-code/app-compat/utils/userAgent.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
-import { getRetryDelay } from '@claude-code/app-compat/services/api/withRetry.js'
+
+// V7 §11.4 — inlined utilities (same as remote/index.ts)
+function errorMessage(e: unknown): string { return e instanceof Error ? e.message : String(e) }
+type AxiosErrorKind = 'network' | 'timeout' | 'http' | 'unknown'
+function classifyAxiosError(e: unknown): { kind: AxiosErrorKind; status?: number; message: string } {
+  const message = errorMessage(e)
+  if (!e || typeof e !== 'object' || !('isAxiosError' in e)) return { kind: 'unknown', message }
+  const ae = e as { code?: string; response?: { status?: number } }
+  if (ae.code === 'ECONNABORTED') return { kind: 'timeout', message }
+  if (!ae.response) return { kind: 'network', message }
+  return { kind: 'http', status: ae.response.status, message }
+}
+function sleep(ms: number): Promise<void> { return new Promise(r => setTimeout(r, ms)) }
+const BASE_RETRY_DELAY_MS = 500
+function getRetryDelay(attempt: number, retryAfterHeader?: string | null, maxDelayMs = 32000): number {
+  if (retryAfterHeader) { const s = parseInt(retryAfterHeader, 10); if (!isNaN(s)) return s * 1000 }
+  const base = Math.min(BASE_RETRY_DELAY_MS * Math.pow(2, attempt - 1), maxDelayMs)
+  return base + Math.random() * 0.25 * base
+}
+function getClaudeCodeUserAgent(): string { return `claude-code/${MACRO.VERSION}` }
 import {
   type SettingsSyncFetchResult,
   type SettingsSyncUploadResult,
@@ -65,23 +64,23 @@ export async function uploadUserSettingsInBackground(): Promise<void> {
         'tengu_enable_settings_sync_push',
         false,
       ) ||
-      !getIsInteractive() ||
+      !getConfigHostBindings().isInteractive?.() ||
       !isUsingOAuth()
     ) {
-      logForDiagnosticsNoPII('info', 'settings_sync_upload_skipped')
-      logEvent('tengu_settings_sync_upload_skipped_ineligible', {})
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_upload_skipped')
+      tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_upload_skipped_ineligible', {})
       return
     }
 
-    logForDiagnosticsNoPII('info', 'settings_sync_upload_starting')
+    tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_upload_starting')
     const result = await fetchUserSettings()
     if (!result.success) {
-      logForDiagnosticsNoPII('warn', 'settings_sync_upload_fetch_failed')
-      logEvent('tengu_settings_sync_upload_fetch_failed', {})
+      tryGetConfigHostBindings().logDiagnostics?.('warn', 'settings_sync_upload_fetch_failed')
+      tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_upload_fetch_failed', {})
       return
     }
 
-    const projectId = await getRepoRemoteHash()
+    const projectId = await getConfigHostBindings().getRepoRemoteHash?.()
     const localEntries = await buildEntriesFromLocalFiles(projectId)
     const remoteEntries = result.isEmpty ? {} : result.data!.content.entries
     const changedEntries = pickBy(
@@ -91,22 +90,22 @@ export async function uploadUserSettingsInBackground(): Promise<void> {
 
     const entryCount = Object.keys(changedEntries).length
     if (entryCount === 0) {
-      logForDiagnosticsNoPII('info', 'settings_sync_upload_no_changes')
-      logEvent('tengu_settings_sync_upload_skipped', {})
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_upload_no_changes')
+      tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_upload_skipped', {})
       return
     }
 
     const uploadResult = await uploadUserSettings(changedEntries)
     if (uploadResult.success) {
-      logForDiagnosticsNoPII('info', 'settings_sync_upload_success')
-      logEvent('tengu_settings_sync_upload_success', { entryCount })
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_upload_success')
+      tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_upload_success', { entryCount })
     } else {
-      logForDiagnosticsNoPII('warn', 'settings_sync_upload_failed')
-      logEvent('tengu_settings_sync_upload_failed', { entryCount })
+      tryGetConfigHostBindings().logDiagnostics?.('warn', 'settings_sync_upload_failed')
+      tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_upload_failed', { entryCount })
     }
   } catch {
     // Fail-open: log unexpected errors but don't block startup
-    logForDiagnosticsNoPII('error', 'settings_sync_unexpected_error')
+    tryGetConfigHostBindings().logDiagnostics?.('error', 'settings_sync_unexpected_error')
   }
 }
 
@@ -163,38 +162,38 @@ async function doDownloadUserSettings(
         !getFeatureValue_CACHED_MAY_BE_STALE('tengu_strap_foyer', false) ||
         !isUsingOAuth()
       ) {
-        logForDiagnosticsNoPII('info', 'settings_sync_download_skipped')
-        logEvent('tengu_settings_sync_download_skipped', {})
+        tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_download_skipped')
+        tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_download_skipped', {})
         return false
       }
 
-      logForDiagnosticsNoPII('info', 'settings_sync_download_starting')
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_download_starting')
       const result = await fetchUserSettings(maxRetries)
       if (!result.success) {
-        logForDiagnosticsNoPII('warn', 'settings_sync_download_fetch_failed')
-        logEvent('tengu_settings_sync_download_fetch_failed', {})
+        tryGetConfigHostBindings().logDiagnostics?.('warn', 'settings_sync_download_fetch_failed')
+        tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_download_fetch_failed', {})
         return false
       }
 
       if (result.isEmpty) {
-        logForDiagnosticsNoPII('info', 'settings_sync_download_empty')
-        logEvent('tengu_settings_sync_download_empty', {})
+        tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_download_empty')
+        tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_download_empty', {})
         return false
       }
 
       const entries = result.data!.content.entries
-      const projectId = await getRepoRemoteHash()
+      const projectId = await getConfigHostBindings().getRepoRemoteHash?.()
       const entryCount = Object.keys(entries).length
-      logForDiagnosticsNoPII('info', 'settings_sync_download_applying', {
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_download_applying', {
         entryCount,
       })
       await applyRemoteEntriesToLocal(entries, projectId)
-      logEvent('tengu_settings_sync_download_success', { entryCount })
+      tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_download_success', { entryCount })
       return true
     } catch {
       // Fail-open: log error but don't block CCR startup
-      logForDiagnosticsNoPII('error', 'settings_sync_download_error')
-      logEvent('tengu_settings_sync_download_error', {})
+      tryGetConfigHostBindings().logDiagnostics?.('error', 'settings_sync_download_error')
+      tryGetConfigHostBindings().logEvent?.('tengu_settings_sync_download_error', {})
       return false
     }
   }
@@ -207,48 +206,37 @@ async function doDownloadUserSettings(
  *
  * Only checks user:inference (not user:profile) — CCR's file-descriptor token
  * hardcodes scopes to ['user:inference'] only, so requiring profile would make
- * download a no-op there. Upload is independently guarded by getIsInteractive().
+ * download a no-op there. Upload is independently guarded by getConfigHostBindings().isInteractive?.().
  */
+// V7 §8.6 — auth/provider logic delegated to host binding
 function isUsingOAuth(): boolean {
-  if (getAPIProvider() !== 'firstParty' || !isFirstPartyAnthropicBaseUrl()) {
-    return false
-  }
-
-  const tokens = getClaudeAIOAuthTokens()
-  return Boolean(
-    tokens?.accessToken && tokens.scopes?.includes(CLAUDE_AI_INFERENCE_SCOPE),
-  )
+  const auth = getConfigHostBindings().getSettingsSyncAuth?.()
+  return auth?.isEligible ?? false
 }
 
 function getSettingsSyncEndpoint(): string {
-  return `${getOauthConfig().BASE_API_URL}/api/claude_code/user_settings`
+  const auth = getConfigHostBindings().getSettingsSyncAuth?.()
+  return `${auth?.baseApiUrl ?? 'https://api.anthropic.com'}/api/claude_code/user_settings`
 }
 
-function getSettingsSyncAuthHeaders(): {
+async function getSettingsSyncAuthHeaders(): Promise<{
   headers: Record<string, string>
   error?: string
-} {
-  const oauthTokens = getClaudeAIOAuthTokens()
-  if (oauthTokens?.accessToken) {
-    return {
-      headers: {
-        Authorization: `Bearer ${oauthTokens.accessToken}`,
-        'anthropic-beta': OAUTH_BETA_HEADER,
-      },
-    }
-  }
-
-  return {
-    headers: {},
-    error: 'No OAuth token available',
+}> {
+  const auth = getConfigHostBindings().getSettingsSyncAuth?.()
+  if (!auth) return { headers: {}, error: 'Auth binding not installed' }
+  try {
+    return { headers: await auth.getAuthHeaders() }
+  } catch {
+    return { headers: {}, error: 'Failed to get auth headers' }
   }
 }
 
 async function fetchUserSettingsOnce(): Promise<SettingsSyncFetchResult> {
   try {
-    await checkAndRefreshOAuthTokenIfNeeded()
+    await getConfigHostBindings().getSettingsSyncAuth?.()?.refreshToken?.()
 
-    const authHeaders = getSettingsSyncAuthHeaders()
+    const authHeaders = await getSettingsSyncAuthHeaders()
     if (authHeaders.error) {
       return {
         success: false,
@@ -271,7 +259,7 @@ async function fetchUserSettingsOnce(): Promise<SettingsSyncFetchResult> {
 
     // 404 means no settings exist yet
     if (response.status === 404) {
-      logForDiagnosticsNoPII('info', 'settings_sync_fetch_empty')
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_fetch_empty')
       return {
         success: true,
         isEmpty: true,
@@ -280,14 +268,14 @@ async function fetchUserSettingsOnce(): Promise<SettingsSyncFetchResult> {
 
     const parsed = UserSyncDataSchema().safeParse(response.data)
     if (!parsed.success) {
-      logForDiagnosticsNoPII('warn', 'settings_sync_fetch_invalid_format')
+      tryGetConfigHostBindings().logDiagnostics?.('warn', 'settings_sync_fetch_invalid_format')
       return {
         success: false,
         error: 'Invalid settings sync response format',
       }
     }
 
-    logForDiagnosticsNoPII('info', 'settings_sync_fetch_success')
+    tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_fetch_success')
     return {
       success: true,
       data: parsed.data,
@@ -333,7 +321,7 @@ async function fetchUserSettings(
     }
 
     const delayMs = getRetryDelay(attempt)
-    logForDiagnosticsNoPII('info', 'settings_sync_retry', {
+    tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_retry', {
       attempt,
       maxRetries,
       delayMs,
@@ -348,9 +336,9 @@ async function uploadUserSettings(
   entries: Record<string, string>,
 ): Promise<SettingsSyncUploadResult> {
   try {
-    await checkAndRefreshOAuthTokenIfNeeded()
+    await getConfigHostBindings().getSettingsSyncAuth?.()?.refreshToken?.()
 
-    const authHeaders = getSettingsSyncAuthHeaders()
+    const authHeaders = await getSettingsSyncAuthHeaders()
     if (authHeaders.error) {
       return {
         success: false,
@@ -374,7 +362,7 @@ async function uploadUserSettings(
       },
     )
 
-    logForDiagnosticsNoPII('info', 'settings_sync_uploaded', {
+    tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_uploaded', {
       entryCount: Object.keys(entries).length,
     })
     return {
@@ -383,7 +371,7 @@ async function uploadUserSettings(
       lastModified: response.data?.lastModified,
     }
   } catch (error) {
-    logForDiagnosticsNoPII('warn', 'settings_sync_upload_error')
+    tryGetConfigHostBindings().logDiagnostics?.('warn', 'settings_sync_upload_error')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -399,7 +387,7 @@ async function tryReadFileForSync(filePath: string): Promise<string | null> {
   try {
     const stats = await stat(filePath)
     if (stats.size > MAX_FILE_SIZE_BYTES) {
-      logForDiagnosticsNoPII('info', 'settings_sync_file_too_large')
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_file_too_large')
       return null
     }
 
@@ -469,10 +457,10 @@ async function writeFileForSync(
     }
 
     await writeFile(filePath, content, 'utf8')
-    logForDiagnosticsNoPII('info', 'settings_sync_file_written')
+    tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_file_written')
     return true
   } catch {
-    logForDiagnosticsNoPII('warn', 'settings_sync_file_write_failed')
+    tryGetConfigHostBindings().logDiagnostics?.('warn', 'settings_sync_file_write_failed')
     return false
   }
 }
@@ -483,7 +471,7 @@ async function writeFileForSync(
  *
  * After writing, invalidates relevant caches:
  * - resetSettingsCache() for settings files
- * - clearMemoryFileCaches() for memory files (CLAUDE.md)
+ * - getConfigHostBindings().clearMemoryFileCaches?.() for memory files (CLAUDE.md)
  */
 async function applyRemoteEntriesToLocal(
   entries: Record<string, string>,
@@ -497,7 +485,7 @@ async function applyRemoteEntriesToLocal(
   const exceedsSizeLimit = (content: string, _path: string): boolean => {
     const sizeBytes = Buffer.byteLength(content, 'utf8')
     if (sizeBytes > MAX_FILE_SIZE_BYTES) {
-      logForDiagnosticsNoPII('info', 'settings_sync_file_too_large', {
+      tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_file_too_large', {
         sizeBytes,
         maxBytes: MAX_FILE_SIZE_BYTES,
       })
@@ -572,10 +560,10 @@ async function applyRemoteEntriesToLocal(
     resetSettingsCache()
   }
   if (memoryWritten) {
-    clearMemoryFileCaches()
+    getConfigHostBindings().clearMemoryFileCaches?.()
   }
 
-  logForDiagnosticsNoPII('info', 'settings_sync_applied', {
+  tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_sync_applied', {
     appliedCount,
   })
 }

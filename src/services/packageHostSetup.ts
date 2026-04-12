@@ -14,6 +14,33 @@ export function installPackageHostBindings(
     {
       getConfigHomeDir: () => getClaudeConfigHomeDir(),
       getProjectRoot: () => findCanonicalGitRoot(getCwd()),
+      // V7 §8.6 — auth bridge for settings sync
+      getSettingsSyncAuth: () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('../utils/model/providers.js') as typeof import('../utils/model/providers.js')
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { getClaudeAIOAuthTokens, checkAndRefreshOAuthTokenIfNeeded } = require('../utils/auth.js') as typeof import('../utils/auth.js')
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { CLAUDE_AI_INFERENCE_SCOPE, getOauthConfig, OAUTH_BETA_HEADER } = require('../constants/oauth.js') as typeof import('../constants/oauth.js')
+          if (getAPIProvider() !== 'firstParty' || !isFirstPartyAnthropicBaseUrl()) return null
+          const tokens = getClaudeAIOAuthTokens()
+          const isEligible = Boolean(tokens?.accessToken && tokens.scopes?.includes(CLAUDE_AI_INFERENCE_SCOPE))
+          return {
+            isEligible,
+            baseApiUrl: getOauthConfig().BASE_API_URL,
+            getAuthHeaders: async () => {
+              const t = getClaudeAIOAuthTokens()
+              if (t?.accessToken) return { Authorization: `Bearer ${t.accessToken}`, 'anthropic-beta': OAUTH_BETA_HEADER }
+              return {}
+            },
+            refreshToken: () => checkAndRefreshOAuthTokenIfNeeded(),
+          }
+        } catch { return null }
+      },
+      isInteractive: () => { try { return (require('../bootstrap/state.js') as typeof import('../bootstrap/state.js')).getIsInteractive() } catch { return false } },
+      clearMemoryFileCaches: () => { try { (require('../utils/claudemd.js') as typeof import('../utils/claudemd.js')).clearMemoryFileCaches() } catch {} },
+      getRepoRemoteHash: async () => { try { return await (require('../utils/git.js') as typeof import('../utils/git.js')).getRepoRemoteHash() } catch { return null } },
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
       // V7 §7 — bootstrap state + session accessors for config

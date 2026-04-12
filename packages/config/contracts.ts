@@ -44,6 +44,20 @@ export type ConfigHostBindings = {
   addFileGlobRuleToGitignore?: (dir: string, glob: string) => void
   // V7 §8.6 — global config file path (depends on legacy path detection + OAuth).
   getGlobalClaudeFile?: () => string
+  // V7 §8.6 — auth/provider bridge for settings sync + remote settings.
+  // Config cannot import auth.ts or providers.ts. Host provides the
+  // OAuth token retrieval, API provider check, and token refresh.
+  getSettingsSyncAuth?: () => {
+    isEligible: boolean
+    baseApiUrl: string
+    getAuthHeaders: () => Promise<Record<string, string>>
+    refreshToken: () => Promise<void>
+  } | null
+  isInteractive?: () => boolean
+  // V7 §8.6 — memory subsystem bridge (config cannot import claudemd).
+  clearMemoryFileCaches?: () => void
+  // V7 §8.6 — git repo hash for settings sync project ID.
+  getRepoRemoteHash?: () => Promise<string | null>
   // V7 §8.6 — fs operations bridge. Config MUST NOT use raw node:fs because
   // the virtual-fs layer (getFsImplementation) is load-bearing for sandbox
   // mode and REPL initialization. Host provides the correct fs facade.
