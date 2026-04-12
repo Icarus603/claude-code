@@ -1,6 +1,14 @@
-import type { ValidationResult } from '@claude-code/app-compat/Tool.js'
 import { isClaudeSettingsPath } from '@claude-code/permission/filesystem'
 import { validateSettingsFileContent } from './validation.js'
+
+// V7 §11.4 — config defines its own validation contract instead of importing
+// the tool-registry type (Wave 1 leaf cannot depend on a Domain Core package).
+// The FileEditTool call site converts this into the tool-registry ValidationResult.
+export type SettingsEditValidationFailure = {
+  result: false
+  message: string
+  errorCode: number
+}
 
 /**
  * Validates settings file edits to ensure the result conforms to SettingsSchema.
@@ -15,7 +23,7 @@ export function validateInputForSettingsFileEdit(
   filePath: string,
   originalContent: string,
   getUpdatedContent: () => string,
-): Extract<ValidationResult, { result: false }> | null {
+): SettingsEditValidationFailure | null {
   // Only validate Claude settings files
   if (!isClaudeSettingsPath(filePath)) {
     return null
