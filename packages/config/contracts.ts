@@ -42,6 +42,23 @@ export type ConfigHostBindings = {
   // V7 §8.6 — git utility bridge (config cannot import git utils).
   findCanonicalGitRoot?: (cwd: string) => string | undefined
   addFileGlobRuleToGitignore?: (dir: string, glob: string) => void
+  // V7 §8.6 — global config file path (depends on legacy path detection + OAuth).
+  getGlobalClaudeFile?: () => string
+  // V7 §8.6 — fs operations bridge. Config MUST NOT use raw node:fs because
+  // the virtual-fs layer (getFsImplementation) is load-bearing for sandbox
+  // mode and REPL initialization. Host provides the correct fs facade.
+  readFileSync?: (path: string, encoding: string) => string
+  writeFileSyncAndFlush?: (path: string, content: string, options?: { encoding?: string; mode?: number }) => void
+  statSync?: (path: string) => { mtimeMs: number; size: number }
+  existsSync?: (path: string) => boolean
+  mkdirSync?: (path: string) => void
+  readFileAsync?: (path: string, encoding: string) => Promise<string>
+  readdirSync?: (path: string) => Array<{ name: string; isFile(): boolean; isSymbolicLink(): boolean }>
+  // V7 §8.6 — lockfile bridge for atomic config writes.
+  lockSync?: (file: string, options?: { stale?: number; retries?: unknown }) => () => void
+  unlock?: (file: string) => Promise<void>
+  // V7 §8.6 — bridge auto-connect default. Feature-gated bridge check.
+  isBridgeAutoConnectDefault?: () => boolean
   // V7 §8.24 — security check UI. The React dialog doesn't belong in
   // config (Wave 1 leaf). Host provides the implementation which renders
   // the Ink dialog; config only cares about the result.
