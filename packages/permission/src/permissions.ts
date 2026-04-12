@@ -1,27 +1,34 @@
 import { feature } from 'bun:bundle'
 import { APIUserAbortError } from '@anthropic-ai/sdk'
-import type { CanUseToolFn } from '@claude-code/app-compat/hooks/useCanUseTool.js'
-import {
-  getToolNameForPermissionCheck,
-  mcpInfoFromString,
-} from '@claude-code/app-compat/services/mcp/mcpStringUtils.js'
-import type { Tool, ToolPermissionContext, ToolUseContext } from '@claude-code/app-compat/Tool.js'
-import { AGENT_TOOL_NAME } from '@claude-code/app-compat/tools/AgentTool/constants.js'
-import { shouldUseSandbox } from '@claude-code/app-compat/tools/BashTool/shouldUseSandbox.js'
-import { BASH_TOOL_NAME } from '@claude-code/app-compat/tools/BashTool/toolName.js'
-import { POWERSHELL_TOOL_NAME } from '@claude-code/app-compat/tools/PowerShellTool/toolName.js'
-import { REPL_TOOL_NAME } from '@claude-code/app-compat/tools/REPLTool/constants.js'
-import type { AssistantMessage } from '@claude-code/app-compat/types/message.js'
-import { extractOutputRedirections } from '@claude-code/app-compat/utils/bash/commands.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { AbortError, toError } from '@claude-code/app-compat/utils/errors.js'
-import { logError } from '@claude-code/app-compat/utils/log.js'
-import { SandboxManager } from '@claude-code/app-compat/utils/sandbox/sandbox-adapter.js'
-import {
-  getSettingSourceDisplayNameLowercase,
-  SETTING_SOURCES,
-} from '@claude-code/app-compat/utils/settings/constants.js'
-import { plural } from '@claude-code/app-compat/utils/stringUtils.js'
+import { SETTING_SOURCES, getSettingSourceDisplayNameLowercase } from '@claude-code/config'
+import { getPermissionHostBindings } from './host.js'
+
+// V7 §11.4 — inlined types, constants, utilities
+type CanUseToolFn = (...args: unknown[]) => unknown
+type Tool = { name: string; [key: string]: unknown }
+type ToolPermissionContext = { permissionRules: unknown; [key: string]: unknown }
+type ToolUseContext = unknown; type AssistantMessage = unknown
+const AGENT_TOOL_NAME = 'Agent'; const BASH_TOOL_NAME = 'Bash'
+const POWERSHELL_TOOL_NAME = 'PowerShell'; const REPL_TOOL_NAME = 'REPL'
+function plural(n: number, word: string, pluralWord = word + 's'): string { return n === 1 ? word : pluralWord }
+function toError(e: unknown): Error { return e instanceof Error ? e : new Error(String(e)) }
+class AbortError extends Error { constructor(msg?: string) { super(msg); this.name = 'AbortError' } }
+function mcpInfoFromString(s: string): { serverName: string; toolName: string | undefined } | null {
+  const parts = s.split('__'); const [mcp, server, ...rest] = parts
+  if (mcp !== 'mcp' || !server) return null
+  return { serverName: server, toolName: rest.length > 0 ? rest.join('__') : undefined }
+}
+function getToolNameForPermissionCheck(tool: { name: string; mcpInfo?: { serverName: string; toolName: string } }): string {
+  if (tool.mcpInfo) return `mcp__${tool.mcpInfo.serverName}__${tool.mcpInfo.toolName}`
+  return tool.name
+}
+
+// Host binding wrappers (via extraPermissionBindings — safe, no circular deps)
+const _b = () => getPermissionHostBindings() as any
+function logForDebugging(msg: string, meta?: unknown): void { _b().logDebug?.(msg, meta) }
+function logError(e: unknown): void { _b().logDebug?.(`[error] ${e instanceof Error ? e.message : String(e)}`) }
+function shouldUseSandbox(): boolean { return _b().shouldUseSandbox?.() ?? false }
+function extractOutputRedirections(cmd: string): string[] { return _b().extractOutputRedirections?.(cmd) ?? [] }
 import { permissionModeTitle } from './PermissionMode.js'
 import type {
   PermissionAskDecision,
@@ -49,48 +56,31 @@ import {
   permissionRuleValueFromString,
   permissionRuleValueToString,
 } from './permissionRuleParser.js'
-import {
-  deletePermissionRuleFromSettings,
-  type PermissionRuleFromEditableSettings,
-  shouldAllowManagedPermissionRulesOnly,
-} from '@claude-code/app-compat/utils/permissions/permissionsLoader.js'
-
-/* eslint-disable @typescript-eslint/no-require-imports */
-const classifierDecisionModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/app-compat/utils/permissions/classifierDecision.js') as typeof import('@claude-code/app-compat/utils/permissions/classifierDecision.js'))
-  : null
-const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('@claude-code/app-compat/utils/permissions/autoModeState.js'))
-  : null
-
-import {
-  addToTurnClassifierDuration,
-  getTotalCacheCreationInputTokens,
-  getTotalCacheReadInputTokens,
-  getTotalInputTokens,
-  getTotalOutputTokens,
-} from '@claude-code/app-compat/bootstrap/state.js'
 import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature-flags'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '@claude-code/app-compat/services/eventLogger.js'
-import { sanitizeToolNameForAnalytics } from '@claude-code/app-compat/services/eventMetadata.js'
-import {
-  clearClassifierChecking,
-  setClassifierChecking,
-} from '@claude-code/app-compat/utils/classifierApprovals.js'
-import { isInProtectedNamespace } from '@claude-code/app-compat/utils/envUtils.js'
-import { executePermissionRequestHooks } from '@claude-code/app-compat/utils/hooks.js'
-import {
-  AUTO_REJECT_MESSAGE,
-  buildClassifierUnavailableMessage,
-  buildYoloRejectionMessage,
-  DONT_ASK_REJECT_MESSAGE,
-} from '@claude-code/app-compat/utils/messages.js'
-import { calculateCostFromTokens } from '@claude-code/app-compat/utils/modelCost.js'
-/* eslint-enable @typescript-eslint/no-require-imports */
-import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+
+// V7 — more host binding wrappers (via extraPermissionBindings)
+type PermissionRuleFromEditableSettings = { source: string; ruleString: string; behavior: string }
+function deletePermissionRuleFromSettings(...a: unknown[]): boolean { return _b().deletePermissionRuleFromSettings?.(...a) ?? false }
+function shouldAllowManagedPermissionRulesOnly(): boolean { return _b().shouldAllowManagedPermissionRulesOnly?.() ?? false }
+const classifierDecisionModule = feature('TRANSCRIPT_CLASSIFIER') ? { classifyPermissionDecision: (...a: unknown[]) => _b().classifyPermissionDecision?.(...a) } : null
+const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER') ? { getAutoMode: () => _b().getAutoMode?.(), setAutoMode: (v: unknown) => _b().setAutoMode?.(v), setDirtyAutoMode: () => _b().setDirtyAutoMode?.(), clearDirtyAutoMode: () => _b().clearDirtyAutoMode?.() } : null
+function addToTurnClassifierDuration(ms: number): void { _b().addToTurnClassifierDuration?.(ms) }
+function getTotalInputTokens(): number { return _b().getTotalInputTokens?.() ?? 0 }
+function getTotalOutputTokens(): number { return _b().getTotalOutputTokens?.() ?? 0 }
+function getTotalCacheCreationInputTokens(): number { return _b().getTotalCacheCreationInputTokens?.() ?? 0 }
+function getTotalCacheReadInputTokens(): number { return _b().getTotalCacheReadInputTokens?.() ?? 0 }
+type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS = Record<string, unknown>
+function logEvent(event: string, metadata?: AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS): void { _b().logEvent?.(event, metadata) }
+function sanitizeToolNameForAnalytics(name: string): string { return _b().sanitizeToolNameForAnalytics?.(name) ?? name }
+function clearClassifierChecking(): void { _b().clearClassifierChecking?.() }
+function setClassifierChecking(v: boolean): void { _b().setClassifierChecking?.(v) }
+function isInProtectedNamespace(): boolean { return _b().isInProtectedNamespace?.() ?? false }
+function executePermissionRequestHooks(...a: unknown[]): Promise<unknown> { return _b().executePermissionRequestHooks?.(...a) ?? Promise.resolve(null) }
+const AUTO_REJECT_MESSAGE = 'Automatically rejected due to permission policy'
+const DONT_ASK_REJECT_MESSAGE = "Automatically rejected because the user selected \"Don't ask\""
+function buildClassifierUnavailableMessage(): string { return _b().buildClassifierUnavailableMessage?.() ?? 'Classifier unavailable' }
+function buildYoloRejectionMessage(...a: unknown[]): string { return _b().buildYoloRejectionMessage?.(...a) ?? 'Rejected by auto-mode policy' }
+function calculateCostFromTokens(...a: unknown[]): number { return _b().calculateCostFromTokens?.(...a) ?? 0 }
 import {
   createDenialTrackingState,
   DENIAL_LIMITS,
@@ -99,10 +89,8 @@ import {
   recordSuccess,
   shouldFallbackToPrompting,
 } from './denialTracking.js'
-import {
-  classifyYoloAction,
-  formatActionForClassifier,
-} from '@claude-code/app-compat/utils/permissions/yoloClassifier.js'
+function classifyYoloAction(...a: unknown[]): unknown { return _b().classifyYoloAction?.(...a) }
+function formatActionForClassifier(...a: unknown[]): unknown { return _b().formatActionForClassifier?.(...a) ?? '' }
 
 const CLASSIFIER_FAIL_CLOSED_REFRESH_MS = 30 * 60 * 1000 // 30 minutes
 
@@ -1090,8 +1078,8 @@ export async function checkRuleBasedPermissions(
   if (askRule) {
     const canSandboxAutoAllow =
       tool.name === BASH_TOOL_NAME &&
-      SandboxManager.isSandboxingEnabled() &&
-      SandboxManager.isAutoAllowBashIfSandboxedEnabled() &&
+      _b().isSandboxingEnabled?.() &&
+      _b().isAutoAllowBashIfSandboxedEnabled?.() &&
       shouldUseSandbox(input)
 
     if (!canSandboxAutoAllow) {
@@ -1185,8 +1173,8 @@ async function hasPermissionsToUseToolInner(
     // commands, dangerouslyDisableSandbox) still need to respect the ask rule.
     const canSandboxAutoAllow =
       tool.name === BASH_TOOL_NAME &&
-      SandboxManager.isSandboxingEnabled() &&
-      SandboxManager.isAutoAllowBashIfSandboxedEnabled() &&
+      _b().isSandboxingEnabled?.() &&
+      _b().isAutoAllowBashIfSandboxedEnabled?.() &&
       shouldUseSandbox(input)
 
     if (!canSandboxAutoAllow) {
@@ -1308,7 +1296,7 @@ async function hasPermissionsToUseToolInner(
 
   if (result.behavior === 'ask' && result.suggestions) {
     logForDebugging(
-      `Permission suggestions for ${tool.name}: ${jsonStringify(result.suggestions, null, 2)}`,
+      `Permission suggestions for ${tool.name}: ${JSON.stringify(result.suggestions, null, 2)}`,
     )
   }
 
