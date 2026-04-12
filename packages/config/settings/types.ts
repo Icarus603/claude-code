@@ -1,8 +1,15 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
 import { SandboxSettingsSchema } from '@claude-code/app-compat/entrypoints/sandboxTypes.js'
-import { isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
 import { lazySchema } from '../internal/lazySchema.js'
+
+// V7 §11.4 — inlined tiny utilities to avoid src/ imports.
+function isEnvTruthy(envVar: string | boolean | undefined): boolean {
+  if (!envVar) return false
+  if (typeof envVar === 'boolean') return envVar
+  const normalizedValue = envVar.toLowerCase().trim()
+  return ['1', 'true', 'yes', 'on'].includes(normalizedValue)
+}
 import {
   EXTERNAL_PERMISSION_MODES,
   PERMISSION_MODES,
@@ -27,7 +34,12 @@ export {
 
 // Also import for use within this file
 import { type HookCommand, HooksSchema } from '@claude-code/app-compat/schemas/hooks.js'
-import { count } from '@claude-code/app-compat/utils/array.js'
+
+function count<T>(arr: readonly T[], pred: (x: T) => unknown): number {
+  let n = 0
+  for (const x of arr) n += +!!pred(x)
+  return n
+}
 
 /**
  * Schema for environment variables
