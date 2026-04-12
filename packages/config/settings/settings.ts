@@ -17,10 +17,14 @@ function getErrnoCode(e: unknown): string | undefined {
   return undefined
 }
 function isENOENT(e: unknown): boolean { return getErrnoCode(e) === 'ENOENT' }
-import { writeFileSyncAndFlush_DEPRECATED } from '@claude-code/app-compat/utils/file.js'
-import { readFileSync } from '@claude-code/app-compat/utils/fileRead.js'
-import { getFsImplementation, safeResolvePath } from '@claude-code/app-compat/utils/fsOperations.js'
-import { addFileGlobRuleToGitignore } from '@claude-code/app-compat/utils/git/gitignore.js'
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync as fsReadFileSync,
+  realpathSync,
+  writeFileSync as fsWriteFileSync,
+} from 'node:fs'
 function safeParseJSON(json: string | null | undefined): unknown {
   if (!json) return null
   try { return JSON.parse(json) } catch { return null }
@@ -93,8 +97,7 @@ export function loadManagedFileSettings(): {
 
   const dropInDir = getManagedSettingsDropInDir()
   try {
-    const entries = getFsImplementation()
-      .readdirSync(dropInDir)
+    const entries = readdirSync(dropInDir, { withFileTypes: true })
       .filter(
         d =>
           (d.isFile() || d.isSymbolicLink()) &&
@@ -137,8 +140,7 @@ export function getManagedFileSettingsPresence(): {
   let hasDropIns = false
   const dropInDir = getManagedSettingsDropInDir()
   try {
-    hasDropIns = getFsImplementation()
-      .readdirSync(dropInDir)
+    hasDropIns = readdirSync(dropInDir, { withFileTypes: true })
       .some(
         d =>
           (d.isFile() || d.isSymbolicLink()) &&
@@ -206,8 +208,8 @@ function parseSettingsFileUncached(path: string): {
   errors: ValidationError[]
 } {
   try {
-    const { resolvedPath } = safeResolvePath(getFsImplementation(), path)
-    const content = readFileSync(resolvedPath)
+    const resolvedPath = realpathSync(path)
+    const content = fsReadFileSync(resolvedPath, 'utf8')
 
     if (content.trim() === '') {
       return { settings: {}, errors: [] }
@@ -391,7 +393,7 @@ export function getPolicySettingsOrigin():
   // 2. Admin-only MDM (HKLM / macOS plist)
   const mdmResult = getMdmSettings()
   if (Object.keys(mdmResult.settings).length > 0) {
-    return getPlatform() === 'macos' ? 'plist' : 'hklm'
+    return process.platform === 'darwin' ? 'plist' : 'hklm'
   }
 
   // 3. managed-settings.json + managed-settings.d/ (file-based, requires admin)
@@ -434,7 +436,7 @@ export function updateSettingsForSource(
   }
 
   try {
-    getFsImplementation().mkdirSync(dirname(filePath))
+    mkdirSync(dirname(filePath), { recursive: true })
 
     // Try to get existing settings with validation. Bypass the per-source
     // cache — mergeWith below mutates its target (including nested refs),
@@ -446,7 +448,7 @@ export function updateSettingsForSource(
     if (!existingSettings) {
       let content: string | null = null
       try {
-        content = readFileSync(filePath)
+        content = fsReadFileSync(filePath, 'utf8')
       } catch (e) {
         if (!isENOENT(e)) {
           throw e
@@ -500,19 +502,16 @@ export function updateSettingsForSource(
     // Mark this as an internal write before writing the file
     markInternalWrite(filePath)
 
-    writeFileSyncAndFlush_DEPRECATED(
-      filePath,
-      JSON.stringify(updatedSettings, null, 2) + '\n',
-    )
+    fsWriteFileSync(filePath, JSON.stringify(updatedSettings, null, 2) + '\n', 'utf8')
 
     // Invalidate the session cache since settings have been updated
     resetSettingsCache()
 
     if (source === 'localSettings') {
       // Okay to add to gitignore async without awaiting
-      void addFileGlobRuleToGitignore(
-        getRelativeSettingsFilePathForSource('localSettings'),
+      getConfigHostBindings().addFileGlobRuleToGitignore?.(
         ( getConfigHostBindings().getOriginalCwd?.() ?? process.cwd() ),
+        getRelativeSettingsFilePathForSource('localSettings'),
       )
     }
   } catch (e) {
@@ -997,8 +996,8 @@ export function rawSettingsContainsKey(key: string): boolean {
     }
 
     try {
-      const { resolvedPath } = safeResolvePath(getFsImplementation(), filePath)
-      const content = readFileSync(resolvedPath)
+      const resolvedPath = realpathSync(filePath)
+      const content = fsReadFileSync(resolvedPath, 'utf8')
       if (!content.trim()) {
         continue
       }
