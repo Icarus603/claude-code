@@ -21,13 +21,17 @@
  * subsequent read hits the cached bool instead of re-running the auth chain.
  */
 
+import { readFileSync as fsReadFileSync } from 'node:fs'
 import { join } from 'path'
-import { getClaudeConfigHomeDir } from '@claude-code/app-compat/utils/envUtils.js'
-import { readFileSync } from '@claude-code/app-compat/utils/fileRead.js'
-import { stripBOM } from '@claude-code/app-compat/utils/jsonRead.js'
+import { getConfigHostBindings } from '../host.js'
 import { resetSettingsCache } from '../settings/settingsCache.js'
 import type { SettingsJson } from '../settings/types.js'
-import { jsonParse } from '@claude-code/app-compat/utils/slowOperations.js'
+
+// V7 §11.4 — inlined 1-liners to avoid src/ imports.
+const UTF8_BOM = '\uFEFF'
+function stripBOM(content: string): string {
+  return content.startsWith(UTF8_BOM) ? content.slice(1) : content
+}
 
 const SETTINGS_FILENAME = 'remote-settings.json'
 
@@ -49,15 +53,17 @@ export function setEligibility(v: boolean): boolean {
 }
 
 export function getSettingsPath(): string {
-  return join(getClaudeConfigHomeDir(), SETTINGS_FILENAME)
+  const homeDir = getConfigHostBindings().getConfigHomeDir?.()
+  if (!homeDir) throw new Error('Config host binding getConfigHomeDir not installed')
+  return join(homeDir, SETTINGS_FILENAME)
 }
 
 // sync IO — settings pipeline is sync. fileRead and jsonRead are leaves;
 // file.ts and json.ts both sit in the settings SCC.
 function loadSettings(): SettingsJson | null {
   try {
-    const content = readFileSync(getSettingsPath())
-    const data: unknown = jsonParse(stripBOM(content))
+    const content = fsReadFileSync(getSettingsPath(), 'utf8')
+    const data: unknown = JSON.parse(stripBOM(content))
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
       return null
     }
