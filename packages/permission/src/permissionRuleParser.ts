@@ -1,15 +1,12 @@
 import { feature } from 'bun:bundle'
-import { AGENT_TOOL_NAME } from '@claude-code/app-compat/tools/AgentTool/constants.js'
-import { TASK_OUTPUT_TOOL_NAME } from '@claude-code/app-compat/tools/TaskOutputTool/constants.js'
-import { TASK_STOP_TOOL_NAME } from '@claude-code/app-compat/tools/TaskStopTool/prompt.js'
 import type { PermissionRuleValue } from './PermissionRule.js'
 
+// V7 §11.4 — inlined tool name constants (permission cannot depend on tool-registry)
+const AGENT_TOOL_NAME = 'Agent'
+const TASK_OUTPUT_TOOL_NAME = 'TaskOutput'
+const TASK_STOP_TOOL_NAME = 'TaskStop'
 const BRIEF_TOOL_NAME: string | null =
-  feature('KAIROS') || feature('KAIROS_BRIEF')
-    ? (
-        require('@claude-code/app-compat/tools/BriefTool/prompt.js') as typeof import('@claude-code/app-compat/tools/BriefTool/prompt.js')
-      ).BRIEF_TOOL_NAME
-    : null
+  feature('KAIROS') || feature('KAIROS_BRIEF') ? 'SendUserMessage' : null
 
 const LEGACY_TOOL_NAME_ALIASES: Record<string, string> = {
   Task: AGENT_TOOL_NAME,

@@ -2,8 +2,8 @@ import z from 'zod/v4'
 import type {
   PermissionUpdate,
   PermissionUpdateDestination,
-} from '@claude-code/app-compat/types/permissions.js'
-import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
+} from './types/permissions.js'
+import { lazySchema } from '../internal/lazySchema.js'
 import { externalPermissionModeSchema } from './PermissionMode.js'
 import {
   permissionBehaviorSchema,

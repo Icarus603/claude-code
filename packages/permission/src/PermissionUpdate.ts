@@ -3,7 +3,7 @@ import type { ToolPermissionContext } from '@claude-code/app-compat/Tool.js'
 import type {
   AdditionalWorkingDirectory,
   WorkingDirectorySource,
-} from '@claude-code/app-compat/types/permissions.js'
+} from './types/permissions.js'
 import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
 import type { EditableSettingSource } from '@claude-code/app-compat/utils/settings/constants.js'
 import {
