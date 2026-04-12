@@ -4,15 +4,15 @@ import { unwatchFile, watchFile } from 'fs'
 import memoize from 'lodash-es/memoize.js'
 import pickBy from 'lodash-es/pickBy.js'
 import { basename, dirname, join, resolve } from 'path'
-import { getOriginalCwd, getSessionTrustAccepted } from '@claude-code/app-compat/bootstrap/state.js'
+// V7 §7 — bootstrap state accessed via host bindings
 import { getAutoMemEntrypoint } from '@claude-code/memory/paths'
-import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
+// V7 §8.6 — logEvent via host binding
 // V7 §11.4 — type-only imports inlined to avoid cross-layer deps.
 // These types are used only in GlobalConfig type definition.
 type McpServerConfig = Record<string, unknown>
 type BillingType = unknown
 type ReferralEligibilityResponse = unknown
-import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
+// V7 §7 — getCwd via host binding
 import { getConfigHostBindings, tryGetConfigHostBindings } from '../host.js'
 import { getGlobalClaudeFile } from '@claude-code/app-compat/utils/env.js'
 // V7 §11.4 — inlined tiny utilities
@@ -37,7 +37,7 @@ class ConfigParseError extends Error {
 }
 import { writeFileSyncAndFlush_DEPRECATED } from '@claude-code/app-compat/utils/file.js'
 import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
-import { findCanonicalGitRoot } from '@claude-code/app-compat/utils/git.js'
+// V7 §8.6 — git utilities via host binding
 function safeParseJSON(json: string | null | undefined): unknown {
   if (!json) return null
   try { return JSON.parse(json) } catch { return null }
@@ -736,7 +736,7 @@ function computeTrustDialogAccepted(): boolean {
   // Check session-level trust (for home directory case where trust is not persisted)
   // When running from home dir, trust dialog is shown but acceptance is stored
   // in memory only. This allows hooks and other features to work during the session.
-  if (getSessionTrustAccepted()) {
+  if (getConfigHostBindings().getSessionTrustAccepted?.()) {
     return true
   }
 
@@ -752,7 +752,7 @@ function computeTrustDialogAccepted(): boolean {
 
   // Now check from current working directory and its parents
   // Normalize paths for consistent JSON key lookup
-  let currentPath = normalizePathForConfigKey(getCwd())
+  let currentPath = normalizePathForConfigKey(getConfigHostBindings().getCwd?.() ?? process.cwd())
 
   // Traverse all parent directories
   while (true) {
@@ -878,7 +878,7 @@ export function saveGlobalConfig(
         'saveGlobalConfig fallback: re-read config is missing auth that cache has; refusing to write. See GH #3117.',
         { level: 'error' },
       )
-      logEvent('tengu_config_auth_loss_prevented', {})
+      tryGetConfigHostBindings().logEvent?.('tengu_config_auth_loss_prevented', {})
       return
     }
     const config = updater(currentConfig)
@@ -919,7 +919,7 @@ export const CONFIG_WRITE_DISPLAY_THRESHOLD = 20
 function reportConfigCacheStats(): void {
   const total = configCacheHits + configCacheMisses
   if (total > 0) {
-    logEvent('tengu_config_cache_stats', {
+    tryGetConfigHostBindings().logEvent?.('tengu_config_cache_stats', {
       cache_hits: configCacheHits,
       cache_misses: configCacheMisses,
       hit_rate: configCacheHits / total,
@@ -1210,7 +1210,7 @@ function saveConfigWithLock<A extends object>(
       getConfigHostBindings().logDebug?.(
         'Lock acquisition took longer than expected - another Claude instance may be running',
       )
-      logEvent('tengu_config_lock_contention', {
+      tryGetConfigHostBindings().logEvent?.('tengu_config_lock_contention', {
         lock_time_ms: lockTime,
       })
     }
@@ -1224,7 +1224,7 @@ function saveConfigWithLock<A extends object>(
           currentStats.mtimeMs !== lastReadFileStats.mtime ||
           currentStats.size !== lastReadFileStats.size
         ) {
-          logEvent('tengu_config_stale_write', {
+          tryGetConfigHostBindings().logEvent?.('tengu_config_stale_write', {
             read_mtime: lastReadFileStats.mtime,
             write_mtime: currentStats.mtimeMs,
             read_size: lastReadFileStats.size,
@@ -1249,7 +1249,7 @@ function saveConfigWithLock<A extends object>(
         'saveConfigWithLock: re-read config is missing auth that cache has; refusing to write to avoid wiping ~/.claude.json. See GH #3117.',
         { level: 'error' },
       )
-      logEvent('tengu_config_auth_loss_prevented', {})
+      tryGetConfigHostBindings().logEvent?.('tengu_config_auth_loss_prevented', {})
       return false
     }
 
@@ -1522,7 +1522,7 @@ function getConfig<A>(
           } catch {
             // No backup
           }
-          logEvent('tengu_config_parse_error', {
+          tryGetConfigHostBindings().logEvent?.('tengu_config_parse_error', {
             has_backup: hasBackup,
           })
         } finally {
@@ -1616,8 +1616,8 @@ function getConfig<A>(
 
 // Memoized function to get the project path for config lookup
 export const getProjectPathForConfig = memoize((): string => {
-  const originalCwd = getOriginalCwd()
-  const gitRoot = findCanonicalGitRoot(originalCwd)
+  const originalCwd = getConfigHostBindings().getOriginalCwd?.() ?? process.cwd()
+  const gitRoot = getConfigHostBindings().findCanonicalGitRoot?.(originalCwd)
 
   if (gitRoot) {
     // Normalize for consistent JSON keys (forward slashes on all platforms)
@@ -1705,7 +1705,7 @@ export function saveCurrentProjectConfig(
         'saveCurrentProjectConfig fallback: re-read config is missing auth that cache has; refusing to write. See GH #3117.',
         { level: 'error' },
       )
-      logEvent('tengu_config_auth_loss_prevented', {})
+      tryGetConfigHostBindings().logEvent?.('tengu_config_auth_loss_prevented', {})
       return
     }
     const currentProjectConfig =
@@ -1811,7 +1811,7 @@ export function recordFirstStartTime(): void {
 }
 
 export function getMemoryPath(memoryType: MemoryType): string {
-  const cwd = getOriginalCwd()
+  const cwd = getConfigHostBindings().getOriginalCwd?.() ?? process.cwd()
 
   switch (memoryType) {
     case 'User':
