@@ -29,6 +29,13 @@ export type PackageHostCoreResolvers = {
     handles: RuntimeHandles,
     state: unknown,
   ) => void
+  // V7 §8.6 — bridge from mcp-runtime to config for error aggregation.
+  getMcpErrorsByScope?: (scope: string) => Array<{
+    file?: string
+    path: string
+    message: string
+    source?: string
+  }>
 }
 
 export function installCorePackageHostBindings(
@@ -44,6 +51,10 @@ export function installCorePackageHostBindings(
     getConfigHomeDir: resolvers.getConfigHomeDir,
     getProjectRoot: resolvers.getProjectRoot,
     logDebug: resolvers.logDebug,
+    // V7 §8.6 — MCP error aggregation injected via host binding so config
+    // does not depend on mcp-runtime (integration layer). Lazy-imported
+    // because mcp-runtime may not be loaded at config init time.
+    getMcpErrorsByScope: resolvers.getMcpErrorsByScope,
   })
 
   installPermissionHostBindings({

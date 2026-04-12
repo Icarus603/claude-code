@@ -1,6 +1,15 @@
 import memoize from 'lodash-es/memoize.js'
 import { join } from 'path'
-import { getPlatform } from '@claude-code/app-compat/utils/platform.js'
+
+// V7 §11.4 — config defines its own narrow platform check instead of pulling
+// in src/utils/platform.ts (which carries WSL detection + fs deps that config
+// has no use for). The full getPlatform util stays at its current location
+// for the host call sites that need WSL discrimination.
+function getManagedSettingsPlatform(): 'macos' | 'windows' | 'other' {
+  if (process.platform === 'darwin') return 'macos'
+  if (process.platform === 'win32') return 'windows'
+  return 'other'
+}
 
 /**
  * Get the path to the managed settings directory based on the current platform.
@@ -14,7 +23,7 @@ export const getManagedFilePath = memoize(function (): string {
     return process.env.CLAUDE_CODE_MANAGED_SETTINGS_PATH
   }
 
-  switch (getPlatform()) {
+  switch (getManagedSettingsPlatform()) {
     case 'macos':
       return '/Library/Application Support/ClaudeCode'
     case 'windows':

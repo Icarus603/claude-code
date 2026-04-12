@@ -16,6 +16,18 @@ export function installPackageHostBindings(
       getProjectRoot: () => findCanonicalGitRoot(getCwd()),
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
+      // V7 §8.6 — bridge MCP validation errors into config without a
+      // direct config → mcp-runtime dependency. Lazy-imported so the MCP
+      // module tree doesn't load at config-init time.
+      getMcpErrorsByScope: (scope: string) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { getMcpConfigsByScope } = require('../services/mcp/config.js') as typeof import('../services/mcp/config.js')
+          return getMcpConfigsByScope(scope as any).errors
+        } catch {
+          return []
+        }
+      },
     },
     {
       installProviderBindings:
