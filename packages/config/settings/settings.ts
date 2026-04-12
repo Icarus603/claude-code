@@ -9,20 +9,29 @@ import {
   getUseCoworkPlugins,
 } from '@claude-code/app-compat/bootstrap/state.js'
 import { getRemoteManagedSettingsSyncFromCache } from '../remote/syncCacheState.js'
-import { uniq } from '@claude-code/app-compat/utils/array.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
-import { getErrnoCode, isENOENT } from '@claude-code/app-compat/utils/errors.js'
+import { getConfigHostBindings, tryGetConfigHostBindings } from '../host.js'
+
+// V7 §11.4 — inlined tiny utilities
+function uniq<T>(xs: Iterable<T>): T[] { return [...new Set(xs)] }
+function isEnvTruthy(envVar: string | boolean | undefined): boolean {
+  if (!envVar) return false
+  if (typeof envVar === 'boolean') return envVar
+  return ['1', 'true', 'yes', 'on'].includes(String(envVar).toLowerCase().trim())
+}
+function getErrnoCode(e: unknown): string | undefined {
+  if (e && typeof e === 'object' && 'code' in e && typeof e.code === 'string') return e.code
+  return undefined
+}
+function isENOENT(e: unknown): boolean { return getErrnoCode(e) === 'ENOENT' }
 import { writeFileSyncAndFlush_DEPRECATED } from '@claude-code/app-compat/utils/file.js'
 import { readFileSync } from '@claude-code/app-compat/utils/fileRead.js'
 import { getFsImplementation, safeResolvePath } from '@claude-code/app-compat/utils/fsOperations.js'
 import { addFileGlobRuleToGitignore } from '@claude-code/app-compat/utils/git/gitignore.js'
-import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
-import { logError } from '@claude-code/app-compat/utils/log.js'
-import { getPlatform } from '@claude-code/app-compat/utils/platform.js'
-import { clone, jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
-import { profileCheckpoint } from '@claude-code/app-compat/utils/startupProfiler.js'
+function safeParseJSON(json: string | null | undefined): unknown {
+  if (!json) return null
+  try { return JSON.parse(json) } catch { return null }
+}
+function logError(e: unknown) { tryGetConfigHostBindings().logDebug?.(`[error] ${e instanceof Error ? e.message : String(e)}`) }
 import {
   type EditableSettingSource,
   getEnabledSettingSources,
@@ -161,7 +170,7 @@ function handleFileSystemError(error: unknown, path: string): void {
     'code' in error &&
     error.code === 'ENOENT'
   ) {
-    logForDebugging(
+    tryGetConfigHostBindings().logDebug?.(
       `Broken symlink or missing file encountered for settings.json at path: ${path}`,
     )
   } else {
@@ -184,7 +193,7 @@ export function parseSettingsFile(path: string): {
     // Clone so callers (e.g. mergeWith in getSettingsForSourceUncached,
     // updateSettingsForSource) can't mutate the cached entry.
     return {
-      settings: cached.settings ? clone(cached.settings) : null,
+      settings: cached.settings ? structuredClone(cached.settings) : null,
       errors: cached.errors,
     }
   }
@@ -193,7 +202,7 @@ export function parseSettingsFile(path: string): {
   // Clone the first return too — the caller may mutate before
   // another caller reads the same cache entry.
   return {
-    settings: result.settings ? clone(result.settings) : null,
+    settings: result.settings ? structuredClone(result.settings) : null,
     errors: result.errors,
   }
 }
@@ -239,7 +248,7 @@ function parseSettingsFileUncached(path: string): {
 export function getSettingsRootPathForSource(source: SettingSource): string {
   switch (source) {
     case 'userSettings':
-      return resolve(getClaudeConfigHomeDir())
+      return resolve(getConfigHostBindings().getConfigHomeDir?.() ?? join(process.env.HOME ?? '.', '.claude'))
     case 'policySettings':
     case 'projectSettings':
     case 'localSettings': {
@@ -463,7 +472,7 @@ export function updateSettingsForSource(
         }
         if (rawData && typeof rawData === 'object') {
           existingSettings = rawData as SettingsJson
-          logForDebugging(
+          tryGetConfigHostBindings().logDebug?.(
             `Using raw settings from ${filePath} due to validation failure`,
           )
         }
@@ -499,7 +508,7 @@ export function updateSettingsForSource(
 
     writeFileSyncAndFlush_DEPRECATED(
       filePath,
-      jsonStringify(updatedSettings, null, 2) + '\n',
+      JSON.stringify(updatedSettings, null, 2) + '\n',
     )
 
     // Invalidate the session cache since settings have been updated
@@ -649,8 +658,8 @@ function loadSettingsFromDisk(): SettingsWithErrors {
   }
 
   const startTime = Date.now()
-  profileCheckpoint('loadSettingsFromDisk_start')
-  logForDiagnosticsNoPII('info', 'settings_load_started')
+  tryGetConfigHostBindings().profileCheckpoint?.('loadSettingsFromDisk_start')
+  tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_load_started')
 
   isLoadingSettings = true
   try {
@@ -783,7 +792,7 @@ function loadSettingsFromDisk(): SettingsWithErrors {
       }
     }
 
-    logForDiagnosticsNoPII('info', 'settings_load_completed', {
+    tryGetConfigHostBindings().logDiagnostics?.('info', 'settings_load_completed', {
       duration_ms: Date.now() - startTime,
       source_count: seenFiles.size,
       error_count: allErrors.length,
@@ -862,7 +871,7 @@ export function getSettingsWithErrors(): SettingsWithErrors {
 
   // Load from disk and cache the result
   const result = loadSettingsFromDisk()
-  profileCheckpoint('loadSettingsFromDisk_end')
+  tryGetConfigHostBindings().profileCheckpoint?.('loadSettingsFromDisk_end')
   setSessionSettingsCache(result)
   return result
 }
@@ -902,7 +911,7 @@ export function hasAutoModeOptIn(): boolean {
     const policy =
       getSettingsForSource('policySettings')?.skipAutoPermissionPrompt
     const result = !!(user || local || flag || policy)
-    logForDebugging(
+    tryGetConfigHostBindings().logDebug?.(
       `[auto-mode] hasAutoModeOptIn=${result} skipAutoPermissionPrompt: user=${user} local=${local} flag=${flag} policy=${policy}`,
     )
     return result
