@@ -1,6 +1,16 @@
 export type { ConfigHostBindings } from './contracts.js'
 export { installConfigHostBindings, getConfigHostBindings } from './host.js'
 
+// V7 §7 — config owns the allowed-setting-sources state.
+// Consumers in src/bootstrap/state.ts import via the dedicated
+// /allowedSourcesState subpath to avoid pulling in the full config tree
+// during early module init. Re-exported here so package consumers can
+// also reach it via the main barrel without thinking about subpaths.
+export {
+  getAllowedSettingSources,
+  setAllowedSettingSources,
+} from './internal/allowedSourcesState.js'
+
 // @anthropic/config — Configuration Management Package
 // Phase 1: Re-export from existing src/ locations
 // Phase 2: Unified interfaces (SettingsManager, FeatureFlagProvider)
