@@ -15,3 +15,13 @@ export function getConfigHostBindings(): ConfigHostBindings {
   return configHostBindings
 }
 
+/**
+ * Safe accessor that returns empty bindings if not yet installed.
+ * Use this for module-level side effects and code paths that may run
+ * before host bootstrap completes. All binding calls must use `?.` optional
+ * chaining — missing bindings are silently no-op'd.
+ */
+export function tryGetConfigHostBindings(): ConfigHostBindings {
+  return configHostBindings ?? {}
+}
+

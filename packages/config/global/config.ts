@@ -7,30 +7,61 @@ import { basename, dirname, join, resolve } from 'path'
 import { getOriginalCwd, getSessionTrustAccepted } from '@claude-code/app-compat/bootstrap/state.js'
 import { getAutoMemEntrypoint } from '@claude-code/memory/paths'
 import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
-import type { McpServerConfig } from '@claude-code/app-compat/services/mcp/types.js'
-import type {
-  BillingType,
-  ReferralEligibilityResponse,
-} from '@claude-code/app-compat/services/oauth/types.js'
+// V7 §11.4 — type-only imports inlined to avoid cross-layer deps.
+// These types are used only in GlobalConfig type definition.
+type McpServerConfig = Record<string, unknown>
+type BillingType = unknown
+type ReferralEligibilityResponse = unknown
 import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
-import { registerCleanup } from '@claude-code/app-compat/utils/cleanupRegistry.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
+import { getConfigHostBindings, tryGetConfigHostBindings } from '../host.js'
 import { getGlobalClaudeFile } from '@claude-code/app-compat/utils/env.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
-import { ConfigParseError, getErrnoCode } from '@claude-code/app-compat/utils/errors.js'
+// V7 §11.4 — inlined tiny utilities
+function isEnvTruthy(envVar: string | boolean | undefined): boolean {
+  if (!envVar) return false
+  if (typeof envVar === 'boolean') return envVar
+  return ['1', 'true', 'yes', 'on'].includes(String(envVar).toLowerCase().trim())
+}
+function getErrnoCode(e: unknown): string | undefined {
+  if (e && typeof e === 'object' && 'code' in e && typeof e.code === 'string') return e.code
+  return undefined
+}
+class ConfigParseError extends Error {
+  filePath: string
+  defaultConfig: unknown
+  constructor(message: string, filePath: string, defaultConfig: unknown) {
+    super(message)
+    this.name = 'ConfigParseError'
+    this.filePath = filePath
+    this.defaultConfig = defaultConfig
+  }
+}
 import { writeFileSyncAndFlush_DEPRECATED } from '@claude-code/app-compat/utils/file.js'
 import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
 import { findCanonicalGitRoot } from '@claude-code/app-compat/utils/git.js'
-import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
-import { stripBOM } from '@claude-code/app-compat/utils/jsonRead.js'
+function safeParseJSON(json: string | null | undefined): unknown {
+  if (!json) return null
+  try { return JSON.parse(json) } catch { return null }
+}
+const UTF8_BOM = '\uFEFF'
+function stripBOM(content: string): string {
+  return content.startsWith(UTF8_BOM) ? content.slice(1) : content
+}
 import * as lockfile from '@claude-code/app-compat/utils/lockfile.js'
-import { logError } from '@claude-code/app-compat/utils/log.js'
-import type { MemoryType } from '@claude-code/app-compat/utils/memory/types.js'
-import { normalizePathForConfigKey } from '@claude-code/app-compat/utils/path.js'
-import { getEssentialTrafficOnlyReason } from '@claude-code/app-compat/utils/privacyLevel.js'
+function logError(e: unknown) { getConfigHostBindings().logDebug?.(`[error] ${e instanceof Error ? e.message : String(e)}`) }
+type MemoryType = string
+import { normalize } from 'path'
+function normalizePathForConfigKey(path: string): string {
+  return normalize(path).replace(/\\/g, '/')
+}
+function getEssentialTrafficOnlyReason(): string | null {
+  if (process.env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC) return 'CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC'
+  return null
+}
+function getConfigHomeDir(): string {
+  return getConfigHostBindings().getConfigHomeDir?.() ?? join(process.env.HOME ?? process.env.USERPROFILE ?? '.', '.claude')
+}
 import { getManagedFilePath } from '../settings/managedPath.js'
-import type { ThemeSetting } from '@claude-code/app-compat/utils/theme.js'
+type ThemeSetting = string
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const teamMemPaths = feature('TEAMMEM')
@@ -41,9 +72,8 @@ const ccrAutoConnect = feature('CCR_AUTO_CONNECT')
   : null
 
 /* eslint-enable @typescript-eslint/no-require-imports */
-import type { ImageDimensions } from '@claude-code/app-compat/utils/imageResizer.js'
-import type { ModelOption } from '@claude-code/app-compat/utils/model/modelOptions.js'
-import { jsonParse, jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+type ImageDimensions = { originalWidth?: number; originalHeight?: number; displayWidth?: number; displayHeight?: number }
+type ModelOption = { value: string; label: string; description: string; descriptionForModel?: string }
 
 // Re-entrancy guard: prevents getConfig → logEvent → getGlobalConfig → getConfig
 // infinite recursion when the config file is corrupted. logEvent's sampling check
@@ -267,7 +297,7 @@ export type GlobalConfig = {
   }
 
   // /buddy companion soul — bones regenerated from userId on read. See src/buddy/.
-  companion?: import('@claude-code/app-compat/buddy/types.js').StoredCompanion
+  companion?: unknown
   companionMuted?: boolean
 
   // Feedback survey tracking
@@ -832,7 +862,7 @@ export function saveGlobalConfig(
       writeThroughGlobalConfigCache(written)
     }
   } catch (error) {
-    logForDebugging(`Failed to save config with lock: ${error}`, {
+    getConfigHostBindings().logDebug?.(`Failed to save config with lock: ${error}`, {
       level: 'error',
     })
     // Fall back to non-locked version on error. This fallback is a race
@@ -844,7 +874,7 @@ export function saveGlobalConfig(
       createDefaultGlobalConfig,
     )
     if (wouldLoseAuthState(currentConfig)) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         'saveGlobalConfig fallback: re-read config is missing auth that cache has; refusing to write. See GH #3117.',
         { level: 'error' },
       )
@@ -901,7 +931,7 @@ function reportConfigCacheStats(): void {
 
 // Register cleanup to report cache stats at session end
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
-registerCleanup(async () => {
+tryGetConfigHostBindings().registerCleanup?.(async () => {
   reportConfigCacheStats()
 })
 
@@ -1027,7 +1057,7 @@ function startGlobalConfigFreshnessWatcher(): void {
         .catch(() => {})
     },
   )
-  registerCleanup(async () => {
+  getConfigHostBindings().registerCleanup?.(async () => {
     unwatchFile(file)
     freshnessWatcherStarted = false
   })
@@ -1128,12 +1158,12 @@ function saveConfig<A extends object>(
   const filteredConfig = pickBy(
     config,
     (value, key) =>
-      jsonStringify(value) !== jsonStringify(defaultConfig[key as keyof A]),
+      JSON.stringify(value) !== JSON.stringify(defaultConfig[key as keyof A]),
   )
   // Write config file with secure permissions - mode only applies to new files
   writeFileSyncAndFlush_DEPRECATED(
     file,
-    jsonStringify(filteredConfig, null, 2),
+    JSON.stringify(filteredConfig, null, 2),
     {
       encoding: 'utf-8',
       mode: 0o600,
@@ -1172,12 +1202,12 @@ function saveConfigWithLock<A extends object>(
         // Default onCompromised throws from a setTimeout callback, which
         // becomes an unhandled exception. Log instead -- the lock being
         // stolen (e.g. after a 10s event-loop stall) is recoverable.
-        logForDebugging(`Config lock compromised: ${err}`, { level: 'error' })
+        getConfigHostBindings().logDebug?.(`Config lock compromised: ${err}`, { level: 'error' })
       },
     })
     const lockTime = Date.now() - startTime
     if (lockTime > 100) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         'Lock acquisition took longer than expected - another Claude instance may be running',
       )
       logEvent('tengu_config_lock_contention', {
@@ -1215,7 +1245,7 @@ function saveConfigWithLock<A extends object>(
     // returns defaults -- we must not write those back over good config.
     const currentConfig = getConfig(file, createDefault)
     if (file === getGlobalClaudeFile() && wouldLoseAuthState(currentConfig)) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         'saveConfigWithLock: re-read config is missing auth that cache has; refusing to write to avoid wiping ~/.claude.json. See GH #3117.',
         { level: 'error' },
       )
@@ -1235,7 +1265,7 @@ function saveConfigWithLock<A extends object>(
     const filteredConfig = pickBy(
       mergedConfig,
       (value, key) =>
-        jsonStringify(value) !== jsonStringify(defaultConfig[key as keyof A]),
+        JSON.stringify(value) !== JSON.stringify(defaultConfig[key as keyof A]),
     )
 
     // Create timestamped backup of existing config before writing
@@ -1301,7 +1331,7 @@ function saveConfigWithLock<A extends object>(
     } catch (e) {
       const code = getErrnoCode(e)
       if (code !== 'ENOENT') {
-        logForDebugging(`Failed to backup config: ${e}`, {
+        getConfigHostBindings().logDebug?.(`Failed to backup config: ${e}`, {
           level: 'error',
         })
       }
@@ -1311,7 +1341,7 @@ function saveConfigWithLock<A extends object>(
     // Write config file with secure permissions - mode only applies to new files
     writeFileSyncAndFlush_DEPRECATED(
       file,
-      jsonStringify(filteredConfig, null, 2),
+      JSON.stringify(filteredConfig, null, 2),
       {
         encoding: 'utf-8',
         mode: 0o600,
@@ -1338,7 +1368,7 @@ export function enableConfigs(): void {
   }
 
   const startTime = Date.now()
-  logForDiagnosticsNoPII('info', 'enable_configs_started')
+  getConfigHostBindings().logDiagnostics?.('info', 'enable_configs_started')
 
   // Any reads to configuration before this flag is set show an console warning
   // to prevent us from adding config reading during module initialization
@@ -1350,7 +1380,7 @@ export function enableConfigs(): void {
     true /* throw on invalid */,
   )
 
-  logForDiagnosticsNoPII('info', 'enable_configs_completed', {
+  getConfigHostBindings().logDiagnostics?.('info', 'enable_configs_completed', {
     duration_ms: Date.now() - startTime,
   })
 }
@@ -1360,7 +1390,7 @@ export function enableConfigs(): void {
  * Uses ~/.claude/backups/ to keep the home directory clean.
  */
 function getConfigBackupDir(): string {
-  return join(getClaudeConfigHomeDir(), 'backups')
+  return join(getConfigHomeDir(), 'backups')
 }
 
 /**
@@ -1436,7 +1466,7 @@ function getConfig<A>(
     })
     try {
       // Strip BOM before parsing - PowerShell 5.x adds BOM to UTF-8 files
-      const parsedConfig = jsonParse(stripBOM(fileContent))
+      const parsedConfig = JSON.parse(stripBOM(fileContent))
       return {
         ...createDefault(),
         ...parsedConfig,
@@ -1469,7 +1499,7 @@ function getConfig<A>(
 
     // Log config parse errors so users know what happened
     if (error instanceof ConfigParseError) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         `Config file corrupted, resetting to defaults: ${error.message}`,
         { level: 'error' },
       )
@@ -1549,7 +1579,7 @@ function getConfig<A>(
         )
         try {
           fs.copyFileSync(file, corruptedBackupPath)
-          logForDebugging(
+          getConfigHostBindings().logDebug?.(
             `Corrupted config backed up to: ${corruptedBackupPath}`,
             {
               level: 'error',
@@ -1663,7 +1693,7 @@ export function saveCurrentProjectConfig(
       writeThroughGlobalConfigCache(written)
     }
   } catch (error) {
-    logForDebugging(`Failed to save config with lock: ${error}`, {
+    getConfigHostBindings().logDebug?.(`Failed to save config with lock: ${error}`, {
       level: 'error',
     })
 
@@ -1671,7 +1701,7 @@ export function saveCurrentProjectConfig(
     // defaults over good cached config. See GH #3117.
     const config = getConfig(getGlobalClaudeFile(), createDefaultGlobalConfig)
     if (wouldLoseAuthState(config)) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         'saveCurrentProjectConfig fallback: re-read config is missing auth that cache has; refusing to write. See GH #3117.',
         { level: 'error' },
       )
@@ -1785,7 +1815,7 @@ export function getMemoryPath(memoryType: MemoryType): string {
 
   switch (memoryType) {
     case 'User':
-      return join(getClaudeConfigHomeDir(), 'CLAUDE.md')
+      return join(getConfigHomeDir(), 'CLAUDE.md')
     case 'Local':
       return join(cwd, 'CLAUDE.local.md')
     case 'Project':
@@ -1807,7 +1837,7 @@ export function getManagedClaudeRulesDir(): string {
 }
 
 export function getUserClaudeRulesDir(): string {
-  return join(getClaudeConfigHomeDir(), 'rules')
+  return join(getConfigHomeDir(), 'rules')
 }
 
 // Exported for testing only
