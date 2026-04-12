@@ -47,7 +47,7 @@ const STRICT_DISALLOWED_PATTERNS = [...DISALLOWED_PATTERNS, '@claude-code/app-co
 const TRANSITION_APP_COMPAT_REF_BUDGET: Record<string, number> = {
   'packages/agent': 158,
   'packages/provider': 0,
-  'packages/config': 113,
+  'packages/config': 112,
   // permission: +3 from repairing broken `typeof import('./autoModeState.js')`
   // references that ts couldn't resolve (verify-package-tsc-clean caught them)
   'packages/permission': 92,
