@@ -24,5 +24,9 @@ export type ConfigHostBindings = {
   // V7 §8.6 — hook execution bridge. Config cannot import the hooks runtime.
   // Returns true if any hook blocked the change.
   executeConfigChangeHooks?: (source: string) => Promise<{ blocked: boolean }>
+  // V7 §8.6 — local-observability bridge for diagnostic logging (MDM telemetry).
+  logDiagnostics?: (level: string, event: string, data?: Record<string, unknown>) => void
+  // V7 §8.6 — startup profiler bridge (optional, no-op if not installed).
+  profileCheckpoint?: (name: string) => void
 }
 

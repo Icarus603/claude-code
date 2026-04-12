@@ -18,13 +18,18 @@
  *   settings.ts  — parsing, caching, first-source-wins logic (this file)
  */
 
+import { readdirSync, readFileSync as fsReadFileSync } from 'node:fs'
 import { join } from 'path'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
-import { readFileSync } from '@claude-code/app-compat/utils/fileRead.js'
-import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
-import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
-import { profileCheckpoint } from '@claude-code/app-compat/utils/startupProfiler.js'
+import { getConfigHostBindings } from '../../host.js'
+
+// V7 §11.4 — inlined utilities to avoid src/ deps.
+function safeParseJSON(json: string | null | undefined, _shouldLogError?: boolean): unknown {
+  if (!json) return null
+  try { return JSON.parse(json) } catch { return null }
+}
+function readFileSync(path: string): string {
+  return fsReadFileSync(path, 'utf8')
+}
 import {
   getManagedFilePath,
   getManagedSettingsDropInDir,
@@ -67,7 +72,7 @@ let mdmLoadPromise: Promise<void> | null = null
 export function startMdmSettingsLoad(): void {
   if (mdmLoadPromise) return
   mdmLoadPromise = (async () => {
-    profileCheckpoint('mdm_load_start')
+    getConfigHostBindings().profileCheckpoint?.('mdm_load_start')
     const startTime = Date.now()
 
     // Use the startup raw read if cli.tsx fired it, otherwise fire a fresh one.
@@ -76,16 +81,16 @@ export function startMdmSettingsLoad(): void {
     const { mdm, hkcu } = consumeRawReadResult(await rawPromise)
     mdmCache = mdm
     hkcuCache = hkcu
-    profileCheckpoint('mdm_load_end')
+    getConfigHostBindings().profileCheckpoint?.('mdm_load_end')
 
     const duration = Date.now() - startTime
-    logForDebugging(`MDM settings load completed in ${duration}ms`)
+    getConfigHostBindings().logDebug?.(`MDM settings load completed in ${duration}ms`)
     if (Object.keys(mdm.settings).length > 0) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         `MDM settings found: ${Object.keys(mdm.settings).join(', ')}`,
       )
       try {
-        logForDiagnosticsNoPII('info', 'mdm_settings_loaded', {
+        getConfigHostBindings().logDiagnostics?.('info', 'mdm_settings_loaded', {
           duration_ms: duration,
           key_count: Object.keys(mdm.settings).length,
           error_count: mdm.errors.length,
@@ -290,7 +295,7 @@ function hasManagedSettingsFile(): boolean {
   }
   try {
     const dropInDir = getManagedSettingsDropInDir()
-    const entries = getFsImplementation().readdirSync(dropInDir)
+    const entries = readdirSync(dropInDir, { withFileTypes: true })
     for (const d of entries) {
       if (
         !(d.isFile() || d.isSymbolicLink()) ||

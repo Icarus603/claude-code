@@ -16,6 +16,21 @@ export function installPackageHostBindings(
       getProjectRoot: () => findCanonicalGitRoot(getCwd()),
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
+      // V7 §8.6 — local-observability + profiler bindings for MDM subsystem
+      logDiagnostics: (level: string, event: string, data?: Record<string, unknown>) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { logForDiagnosticsNoPII } = require('../utils/diagLogs.js') as typeof import('../utils/diagLogs.js')
+          logForDiagnosticsNoPII(level as any, event, data)
+        } catch { /* diagnostic logging is best-effort */ }
+      },
+      profileCheckpoint: (name: string) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { profileCheckpoint } = require('../utils/startupProfiler.js') as typeof import('../utils/startupProfiler.js')
+          profileCheckpoint(name)
+        } catch { /* profiling is optional */ }
+      },
       // V7 §8.6 — bootstrap state + lifecycle + hooks bindings for changeDetector
       getIsRemoteMode: () => {
         try {
