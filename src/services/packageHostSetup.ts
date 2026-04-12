@@ -47,6 +47,54 @@ export function installPackageHostBindings(
           profileCheckpoint(name)
         } catch { /* profiling is optional */ }
       },
+      // V7 §8.24 — managed settings security check UI (React dialog).
+      checkManagedSettingsSecurity: async (cached: unknown, newSettings: unknown) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { getIsInteractive } = require('../bootstrap/state.js') as typeof import('../bootstrap/state.js')
+          if (!getIsInteractive()) return 'no_check_needed'
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const utils = require('../components/ManagedSettingsSecurityDialog/utils.js') as typeof import('../components/ManagedSettingsSecurityDialog/utils.js')
+          if (!newSettings || !utils.hasDangerousSettings(utils.extractDangerousSettings(newSettings as any))) return 'no_check_needed'
+          if (!utils.hasDangerousSettingsChanged(cached as any, newSettings as any)) return 'no_check_needed'
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { logEvent } = require('../services/eventLogger.js') as typeof import('../services/eventLogger.js')
+          logEvent('tengu_managed_settings_security_dialog_shown', {})
+          const React = require('react')
+          const { ManagedSettingsSecurityDialog } = require('../components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js')
+          const { render } = require('../ink.js')
+          const { KeybindingSetup } = require('../keybindings/KeybindingProviderSetup.js')
+          const { AppStateProvider } = require('../state/AppState.js')
+          const { getBaseRenderOptions } = require('../utils/renderOptions.js')
+          return new Promise<'approved' | 'rejected' | 'no_check_needed'>(resolve => {
+            void (async () => {
+              const { unmount } = await render(
+                React.createElement(AppStateProvider, null,
+                  React.createElement(KeybindingSetup, null,
+                    React.createElement(ManagedSettingsSecurityDialog, {
+                      settings: newSettings,
+                      onAccept: () => { logEvent('tengu_managed_settings_security_dialog_accepted', {}); unmount(); resolve('approved') },
+                      onReject: () => { logEvent('tengu_managed_settings_security_dialog_rejected', {}); unmount(); resolve('rejected') },
+                    })
+                  )
+                ),
+                getBaseRenderOptions(false),
+              )
+            })()
+          })
+        } catch { return 'no_check_needed' }
+      },
+      handleSecurityCheckResult: (result: 'approved' | 'rejected' | 'no_check_needed') => {
+        if (result === 'rejected') {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { gracefulShutdownSync } = require('../utils/gracefulShutdown.js') as typeof import('../utils/gracefulShutdown.js')
+            gracefulShutdownSync(1)
+          } catch { process.exit(1) }
+          return false
+        }
+        return true
+      },
       // V7 §8.6 — bootstrap state + lifecycle + hooks bindings for changeDetector
       getIsRemoteMode: () => {
         try {
