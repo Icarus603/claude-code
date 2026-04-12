@@ -57,10 +57,10 @@ import {
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const classifierDecisionModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/app-compat/utils/permissions/classifierDecision.js') as typeof import('./classifierDecision.js'))
+  ? (require('@claude-code/app-compat/utils/permissions/classifierDecision.js') as typeof import('@claude-code/app-compat/utils/permissions/classifierDecision.js'))
   : null
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('./autoModeState.js'))
+  ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('@claude-code/app-compat/utils/permissions/autoModeState.js'))
   : null
 
 import {

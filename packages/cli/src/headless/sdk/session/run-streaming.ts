@@ -121,6 +121,20 @@ import type {
   McpSetServersResult as McpSetServersResultBase,
   SdkMcpState as SdkMcpStateBase,
 } from '@claude-code/mcp-runtime'
+
+// Concrete parameterisations of the generic mcp-runtime contracts used in
+// this file — the generic `*Base` forms declare the type slots, these lock
+// them to the CLI's concrete client/tool/config shapes.
+type DynamicMcpState = DynamicMcpStateBase<
+  MCPServerConnection,
+  Tools,
+  ScopedMcpServerConfig
+>
+type SdkMcpState = SdkMcpStateBase<
+  MCPServerConnection,
+  Tools,
+  ScopedMcpServerConfig
+>
 import {
   createFileStateCacheWithSizeLimit,
   mergeFileStateCaches,
@@ -985,7 +999,7 @@ export function runHeadlessStreaming(
     }> => {
       const oldSdkClientNames = new Set(sdkClients.map(c => c.name))
 
-      const result = await handleMcpSetServers(
+      const result = await runtimeHandleMcpSetServers(
         servers,
         { configs: sdkMcpConfigs, clients: sdkClients, tools: sdkTools },
         dynamicMcpState,

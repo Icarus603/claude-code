@@ -281,7 +281,7 @@ ${sessionIds.map(id => `- ${id}`).join('\n')}`
  */
 function makeDreamProgressWatcher(
   taskId: string,
-  setAppState: import('../../Task.js').SetAppState,
+  setAppState: import('@claude-code/app-compat/Task.js').SetAppState,
 ): (msg: Message) => void {
   return msg => {
     if (msg.type !== 'assistant') return

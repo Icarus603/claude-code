@@ -30,7 +30,7 @@ import { loadAllPermissionRulesFromDisk } from '@claude-code/app-compat/utils/pe
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('./autoModeState.js'))
+  ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('@claude-code/app-compat/utils/permissions/autoModeState.js'))
   : null
 
 import { resolve } from 'path'
