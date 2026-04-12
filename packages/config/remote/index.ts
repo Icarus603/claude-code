@@ -21,18 +21,45 @@ import {
   getAnthropicApiKeyWithSource,
   getClaudeAIOAuthTokens,
 } from '@claude-code/app-compat/utils/auth.js'
-import { registerCleanup } from '@claude-code/app-compat/utils/cleanupRegistry.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { classifyAxiosError, getErrnoCode } from '@claude-code/app-compat/utils/errors.js'
+import { getConfigHostBindings } from '../host.js'
 import { settingsChangeDetector } from '../settings/changeDetector.js'
 import {
   type SettingsJson,
   SettingsSchema,
 } from '../settings/types.js'
-import { sleep } from '@claude-code/app-compat/utils/sleep.js'
-import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
-import { getClaudeCodeUserAgent } from '@claude-code/app-compat/utils/userAgent.js'
-import { getRetryDelay } from '@claude-code/app-compat/services/api/withRetry.js'
+
+// V7 §11.4 — inlined utilities to avoid src/ deps.
+function errorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e)
+}
+type AxiosErrorKind = 'network' | 'timeout' | 'http' | 'unknown'
+function classifyAxiosError(e: unknown): { kind: AxiosErrorKind; status?: number; message: string } {
+  const message = errorMessage(e)
+  if (!e || typeof e !== 'object' || !('isAxiosError' in e)) return { kind: 'unknown', message }
+  const ae = e as { code?: string; response?: { status?: number } }
+  if (ae.code === 'ECONNABORTED') return { kind: 'timeout', message }
+  if (!ae.response) return { kind: 'network', message }
+  return { kind: 'http', status: ae.response.status, message }
+}
+function getErrnoCode(e: unknown): string | undefined {
+  if (e && typeof e === 'object' && 'code' in e && typeof e.code === 'string') return e.code
+  return undefined
+}
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+const BASE_RETRY_DELAY_MS = 500
+function getRetryDelay(attempt: number, retryAfterHeader?: string | null, maxDelayMs = 32000): number {
+  if (retryAfterHeader) {
+    const seconds = parseInt(retryAfterHeader, 10)
+    if (!isNaN(seconds)) return seconds * 1000
+  }
+  const baseDelay = Math.min(BASE_RETRY_DELAY_MS * Math.pow(2, attempt - 1), maxDelayMs)
+  return baseDelay + Math.random() * 0.25 * baseDelay
+}
+function getClaudeCodeUserAgent(): string {
+  return `claude-code/${MACRO.VERSION}`
+}
 import {
   checkManagedSettingsSecurity,
   handleSecurityCheckResult,
@@ -87,7 +114,7 @@ export function initializeRemoteManagedSettingsLoadingPromise(): void {
       // This prevents deadlocks in Agent SDK tests and other non-CLI contexts
       setTimeout(() => {
         if (loadingCompleteResolve) {
-          logForDebugging(
+          getConfigHostBindings().logDebug?.(
             'Remote settings: Loading promise timed out, resolving anyway',
           )
           loadingCompleteResolve()
@@ -131,7 +158,7 @@ function sortKeysDeep(obj: unknown): unknown {
 export function computeChecksumFromSettings(settings: SettingsJson): string {
   const sorted = sortKeysDeep(settings)
   // No spaces after separators to match Python's separators=(",", ":")
-  const normalized = jsonStringify(sorted)
+  const normalized = JSON.stringify(sorted)
   const hash = createHash('sha256').update(normalized).digest('hex')
   return `sha256:${hash}`
 }
@@ -231,7 +258,7 @@ async function fetchWithRetry(
 
     // Calculate delay and wait before next retry
     const delayMs = getRetryDelay(attempt)
-    logForDebugging(
+    getConfigHostBindings().logDebug?.(
       `Remote settings: Retry ${attempt}/${DEFAULT_MAX_RETRIES} after ${delayMs}ms`,
     )
     await sleep(delayMs)
@@ -286,7 +313,7 @@ async function fetchRemoteManagedSettings(
 
     // Handle 304 Not Modified - cached version is still valid
     if (response.status === 304) {
-      logForDebugging('Remote settings: Using cached settings (304)')
+      getConfigHostBindings().logDebug?.('Remote settings: Using cached settings (304)')
       return {
         success: true,
         settings: null, // Signal that cache is valid
@@ -297,7 +324,7 @@ async function fetchRemoteManagedSettings(
     // Handle 204 No Content / 404 Not Found - no settings exist or feature flag is off.
     // Return empty object (not null) so callers don't fall back to cached settings.
     if (response.status === 204 || response.status === 404) {
-      logForDebugging(`Remote settings: No settings found (${response.status})`)
+      getConfigHostBindings().logDebug?.(`Remote settings: No settings found (${response.status})`)
       return {
         success: true,
         settings: {},
@@ -309,7 +336,7 @@ async function fetchRemoteManagedSettings(
       response.data,
     )
     if (!parsed.success) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         `Remote settings: Invalid response format - ${parsed.error.message}`,
       )
       return {
@@ -321,7 +348,7 @@ async function fetchRemoteManagedSettings(
     // Full validation of settings structure
     const settingsValidation = SettingsSchema().safeParse(parsed.data.settings)
     if (!settingsValidation.success) {
-      logForDebugging(
+      getConfigHostBindings().logDebug?.(
         `Remote settings: Settings validation failed - ${settingsValidation.error.message}`,
       )
       return {
@@ -330,7 +357,7 @@ async function fetchRemoteManagedSettings(
       }
     }
 
-    logForDebugging('Remote settings: Fetched successfully')
+    getConfigHostBindings().logDebug?.('Remote settings: Fetched successfully')
     return {
       success: true,
       settings: settingsValidation.data,
@@ -369,16 +396,16 @@ async function saveSettings(settings: SettingsJson): Promise<void> {
     const path = getSettingsPath()
     const handle = await open(path, 'w', 0o600)
     try {
-      await handle.writeFile(jsonStringify(settings, null, 2), {
+      await handle.writeFile(JSON.stringify(settings, null, 2), {
         encoding: 'utf-8',
       })
       await handle.datasync()
     } finally {
       await handle.close()
     }
-    logForDebugging(`Remote settings: Saved to ${path}`)
+    getConfigHostBindings().logDebug?.(`Remote settings: Saved to ${path}`)
   } catch (error) {
-    logForDebugging(
+    getConfigHostBindings().logDebug?.(
       `Remote settings: Failed to save - ${error instanceof Error ? error.message : 'unknown error'}`,
     )
     // Ignore save errors - we'll refetch on next startup
@@ -432,7 +459,7 @@ async function fetchAndLoadRemoteManagedSettings(): Promise<SettingsJson | null>
     if (!result.success) {
       // On fetch failure, use stale file if available (graceful degradation)
       if (cachedSettings) {
-        logForDebugging(
+        getConfigHostBindings().logDebug?.(
           'Remote settings: Using stale cache after fetch failure',
         )
         setSessionCache(cachedSettings)
@@ -444,7 +471,7 @@ async function fetchAndLoadRemoteManagedSettings(): Promise<SettingsJson | null>
 
     // Handle 304 Not Modified - cached settings are still valid
     if (result.settings === null && cachedSettings) {
-      logForDebugging('Remote settings: Cache still valid (304 Not Modified)')
+      getConfigHostBindings().logDebug?.('Remote settings: Cache still valid (304 Not Modified)')
       setSessionCache(cachedSettings)
       return cachedSettings
     }
@@ -461,7 +488,7 @@ async function fetchAndLoadRemoteManagedSettings(): Promise<SettingsJson | null>
       )
       if (!handleSecurityCheckResult(securityResult)) {
         // User rejected - don't apply settings, return cached or null
-        logForDebugging(
+        getConfigHostBindings().logDebug?.(
           'Remote settings: User rejected new settings, using cached settings',
         )
         return cachedSettings
@@ -469,7 +496,7 @@ async function fetchAndLoadRemoteManagedSettings(): Promise<SettingsJson | null>
 
       setSessionCache(newSettings)
       await saveSettings(newSettings)
-      logForDebugging('Remote settings: Applied new settings successfully')
+      getConfigHostBindings().logDebug?.('Remote settings: Applied new settings successfully')
       return newSettings
     }
 
@@ -479,11 +506,11 @@ async function fetchAndLoadRemoteManagedSettings(): Promise<SettingsJson | null>
     try {
       const path = getSettingsPath()
       await unlink(path)
-      logForDebugging('Remote settings: Deleted cached file (404 response)')
+      getConfigHostBindings().logDebug?.('Remote settings: Deleted cached file (404 response)')
     } catch (e) {
       const code = getErrnoCode(e)
       if (code !== 'ENOENT') {
-        logForDebugging(
+        getConfigHostBindings().logDebug?.(
           `Remote settings: Failed to delete cached file - ${e instanceof Error ? e.message : 'unknown error'}`,
         )
       }
@@ -492,7 +519,7 @@ async function fetchAndLoadRemoteManagedSettings(): Promise<SettingsJson | null>
   } catch {
     // On any error, use stale file if available (graceful degradation)
     if (cachedSettings) {
-      logForDebugging('Remote settings: Using stale cache after error')
+      getConfigHostBindings().logDebug?.('Remote settings: Using stale cache after error')
       setSessionCache(cachedSettings)
       return cachedSettings
     }
@@ -571,7 +598,7 @@ export async function refreshRemoteManagedSettings(): Promise<void> {
 
   // Try to load new settings (fails open if fetch fails)
   await fetchAndLoadRemoteManagedSettings()
-  logForDebugging('Remote settings: Refreshed after auth change')
+  getConfigHostBindings().logDebug?.('Remote settings: Refreshed after auth change')
 
   // Notify listeners. notifyChange resets the settings cache internally;
   // this triggers hot-reload (AppState update, env var application, etc.)
@@ -588,16 +615,16 @@ async function pollRemoteSettings(): Promise<void> {
 
   // Get current cached settings for comparison
   const prevCache = getRemoteManagedSettingsSyncFromCache()
-  const previousSettings = prevCache ? jsonStringify(prevCache) : null
+  const previousSettings = prevCache ? JSON.stringify(prevCache) : null
 
   try {
     await fetchAndLoadRemoteManagedSettings()
 
     // Check if settings actually changed
     const newCache = getRemoteManagedSettingsSyncFromCache()
-    const newSettings = newCache ? jsonStringify(newCache) : null
+    const newSettings = newCache ? JSON.stringify(newCache) : null
     if (newSettings !== previousSettings) {
-      logForDebugging('Remote settings: Changed during background poll')
+      getConfigHostBindings().logDebug?.('Remote settings: Changed during background poll')
       settingsChangeDetector.notifyChange('policySettings')
     }
   } catch {
@@ -624,7 +651,7 @@ export function startBackgroundPolling(): void {
   pollingIntervalId.unref()
 
   // Register cleanup to stop polling on shutdown
-  registerCleanup(async () => stopBackgroundPolling())
+  getConfigHostBindings().registerCleanup?.(async () => stopBackgroundPolling())
 }
 
 /**
