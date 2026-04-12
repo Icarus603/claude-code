@@ -6,6 +6,7 @@
  * Moved from src/main.tsx per V7 Phase 4 cut-A.
  */
 
+import { SHOW_CURSOR } from '@anthropic/ink'
 import { isRunningWithBun } from '../../../../src/utils/bundledMode.js'
 import {
   getManagedSettingsKeysForLogging,
@@ -78,4 +79,18 @@ export function isBeingDebugged() {
     // Ignore error and fall back to argument detection
     return hasInspectArg || hasInspectEnv
   }
+}
+
+/**
+ * Write SHOW_CURSOR to whichever stream is currently a TTY so that a killed
+ * Ink render doesn't leave the terminal cursor hidden. Installed as a
+ * `process.on('exit', ...)` handler during CLI bootstrap.
+ */
+export function resetCursor(): void {
+  const terminal = process.stderr.isTTY
+    ? process.stderr
+    : process.stdout.isTTY
+      ? process.stdout
+      : undefined
+  terminal?.write(SHOW_CURSOR)
 }

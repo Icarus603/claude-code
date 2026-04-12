@@ -6,23 +6,33 @@ import '../src/commands.js'
 import '../src/services/mcp/client.js'
 
 async function main(): Promise<void> {
-  const [mainContent, replContent, printContent] = await Promise.all([
+  const [mainContent, replContent, printContent, modeDispatchContent] = await Promise.all([
     readFile('./src/main.tsx', 'utf8'),
     readFile('./src/screens/REPL.tsx', 'utf8'),
     readFile('./src/cli/print.ts', 'utf8'),
+    readFile('./packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
   ])
 
-  const requiredEntrySeams = [
+  // V7 §10.1: main.tsx is the thin host — it only wires bootstrap and delegates
+  // to @claude-code/cli / @claude-code/app-host / @claude-code/config.
+  const requiredMainSeams = [
     './runtime/bootstrap.js',
     '@claude-code/app-host',
     '@claude-code/config',
     '@claude-code/cli',
-    '@claude-code/tool-registry',
   ]
-  for (const seam of requiredEntrySeams) {
+  for (const seam of requiredMainSeams) {
     if (!mainContent.includes(seam)) {
       throw new Error(`main.tsx does not consume required seam: ${seam}`)
     }
+  }
+
+  // V7 §10.1: tool-registry is consumed by the mode-dispatch action handler
+  // extracted into @claude-code/cli; main.tsx itself no longer imports it.
+  if (!modeDispatchContent.includes('@claude-code/tool-registry')) {
+    throw new Error(
+      'packages/cli/src/entry/mode-dispatch.ts does not consume required seam: @claude-code/tool-registry',
+    )
   }
 
   const disallowedMainImports = [

@@ -3,19 +3,24 @@ import { readFile } from 'fs/promises'
 const REPL_LINE_BUDGET = 120
 
 async function main(): Promise<void> {
-  const [mainContent, replLauncher, replContent, cliIndex] = await Promise.all([
-    readFile('src/main.tsx', 'utf8'),
+  const [replLauncher, replContent, cliIndex, modeDispatchContent] = await Promise.all([
     readFile('src/replLauncher.tsx', 'utf8'),
     readFile('src/screens/REPL.tsx', 'utf8'),
     readFile('packages/cli/src/index.ts', 'utf8'),
+    readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
   ])
 
-  if (!mainContent.includes("from './replLauncher.js'")) {
-    throw new Error('main.tsx no longer consumes the dedicated repl launcher seam')
+  // V7 §10.1: the REPL launch action moved to
+  // packages/cli/src/entry/mode-dispatch.ts, so the dedicated launcher seam
+  // must be consumed there — not from main.tsx.
+  if (!modeDispatchContent.includes("from '../../../../src/replLauncher.js'")) {
+    throw new Error(
+      'packages/cli/src/entry/mode-dispatch.ts no longer consumes the dedicated repl launcher seam',
+    )
   }
 
   if (cliIndex.includes('launchRepl(')) {
-    throw new Error('packages/cli should not own interactive REPL launch anymore')
+    throw new Error('packages/cli public surface should not call launchRepl directly')
   }
 
   const disallowedReplImports = [

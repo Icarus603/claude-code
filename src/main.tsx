@@ -26,441 +26,51 @@ startKeychainPrefetch();
 
 import { feature } from "bun:bundle";
 import './runtime/bootstrap.js'
-import {
-	createHeadlessHost,
-	createInteractiveHost,
-	type InteractiveHostSession,
-	type RuntimeHandles,
-} from '@claude-code/app-host'
-import {
-  checkHasTrustDialogAccepted,
-  getGlobalConfig,
-  getRemoteControlAtStartup,
-  isAutoUpdaterDisabled,
-  saveGlobalConfig,
-} from '@claude-code/config'
-import { settingsChangeDetector } from '@claude-code/config/changeDetector'
-import { getTools } from '@claude-code/tool-registry'
+import { type RuntimeHandles } from '@claude-code/app-host'
+
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+
 import {
   Command as CommanderCommand,
   Option,
 } from '@commander-js/extra-typings'
-import chalk from 'chalk'
-import { readFileSync } from 'fs'
-import mapValues from 'lodash-es/mapValues.js'
-import pickBy from 'lodash-es/pickBy.js'
-import uniqBy from 'lodash-es/uniqBy.js'
-import React from 'react'
-import { getOauthConfig } from './constants/oauth.js'
-import { getRemoteSessionUrl } from './constants/product.js'
-import { getSystemContext, getUserContext } from './context.js'
-import { init, initializeTelemetryAfterTrust } from './entrypoints/init.js'
-import { addToHistory } from './history.js'
-import type { Root } from '@anthropic/ink'
+
+import { init } from './entrypoints/init.js'
+
 import { setThemeConfigCallbacks } from '@anthropic/ink'
-import { createHeadlessSession } from '@claude-code/cli'
-import { getTeammateModeSnapshot, isBeingDebugged, logManagedSettings } from '@claude-code/cli'
-import { createSortedHelpConfig, createMainProgram, registerMcpCommands, registerMiscCommands, runModeDispatch } from '@claude-code/cli'
-import { launchRepl, type AppWrapperProps } from './replLauncher.js'
-import {
-	hasGrowthBookEnvOverride,
-	initializeGrowthBook,
-	refreshGrowthBookAfterAuthChange,
-} from "@claude-code/config/feature-flags";
-import { fetchBootstrapData } from "./services/api/bootstrap.js";
-import {
-	type DownloadResult,
-	downloadSessionFiles,
-	type FilesApiConfig,
-	parseFileSpecs,
-} from "./services/api/filesApi.js";
-import { prefetchPassesEligibility } from "./services/api/referral.js";
-import { prefetchOfficialMcpUrls } from "./services/mcp/officialRegistry.js";
-import type {
-	McpSdkServerConfig,
-	McpServerConfig,
-	ScopedMcpServerConfig,
-} from "./services/mcp/types.js";
-import {
-	isPolicyAllowed,
-	loadPolicyLimits,
-	refreshPolicyLimits,
-	waitForPolicyLimitsToLoad,
-} from "./services/policyLimits/index.js";
-import {
-	loadRemoteManagedSettings,
-	refreshRemoteManagedSettings,
-} from "./services/remoteManagedSettings/index.js";
-import type { ToolInputJSONSchema } from "./Tool.js";
-import {
-	createSyntheticOutputTool,
-	isSyntheticOutputToolEnabled,
-} from "./tools/SyntheticOutputTool/SyntheticOutputTool.js";
-import {
-	canUserConfigureAdvisor,
-	getInitialAdvisorSetting,
-	isAdvisorEnabled,
-	isValidAdvisorModel,
-	modelSupportsAdvisor,
-} from "./utils/advisor.js";
-import { isAgentSwarmsEnabled } from "./utils/agentSwarmsEnabled.js";
-import { count, uniq } from "./utils/array.js";
-import { installAsciicastRecorder } from "./utils/asciicast.js";
-import {
-	getSubscriptionType,
-	isClaudeAISubscriber,
-	prefetchAwsCredentialsAndBedRockInfoIfSafe,
-	prefetchGcpCredentialsIfSafe,
-	validateForceLoginOrg,
-} from "./utils/auth.js";
-import { seedEarlyInput, stopCapturingEarlyInput } from "./utils/earlyInput.js";
-import {
-	parseEffortValue,
-	toPersistableEffort,
-} from "./utils/effort.js";
-import {
-	getFastModeUnavailableReason,
-	isFastModeSupportedByModel,
-	isFastModeEnabled,
-	prefetchFastModeStatus,
-	resolveFastModeStatusFromCache,
-} from "./utils/fastMode.js";
-import { applyConfigEnvironmentVariables } from "./utils/managedEnv.js";
-import { extractTeammateOptions, type TeammateOptions } from "./main/cli/options.js";
-import { maybeActivateBrief, maybeActivateProactive } from "./main/cli/runtimeActivation.js";
-import { prefetchSystemContextIfSafe, startDeferredPrefetches } from "./main/startup/context.js";
-import {
-	eagerLoadSettings,
-	initializeEntrypoint,
-	runMigrations,
-	loadSettingsFromFlag,
-	loadSettingSourcesFromFlag,
-} from "./main/startup/settings.js";
-import { logSessionTelemetry, logStartupTelemetry } from "./main/startup/telemetry.js";
-import {
-  createRuntimeHandles,
-  syncRuntimeHandlesFromHeadlessParams,
-} from './runtime/runtimeHandles.js'
-import { createSystemMessage, createUserMessage } from "./utils/messages.js";
+
+import { getTeammateModeSnapshot, isBeingDebugged, logManagedSettings, resetCursor } from '@claude-code/cli'
+import { createMainProgram, registerMcpCommands, registerMiscCommands, runModeDispatch } from '@claude-code/cli'
+
+import { loadPolicyLimits } from './services/policyLimits/index.js'
+
+import { loadRemoteManagedSettings } from './services/remoteManagedSettings/index.js'
+
+import { canUserConfigureAdvisor } from './utils/advisor.js'
+
+import { stopCapturingEarlyInput } from './utils/earlyInput.js'
+
+import { startDeferredPrefetches } from './main/startup/context.js'
+import { eagerLoadSettings, initializeEntrypoint, runMigrations } from './main/startup/settings.js'
+
+import { createRuntimeHandles } from './runtime/runtimeHandles.js'
 
 export { startDeferredPrefetches };
-import { getPlatform } from "./utils/platform.js";
-import { getSessionIngressAuthToken } from "./utils/sessionIngressAuth.js";
-import { skillChangeDetector } from "./utils/skills/skillChangeDetector.js";
-import { jsonParse, writeFileSync_DEPRECATED } from "./utils/slowOperations.js";
-import { computeInitialTeamContext } from "@claude-code/swarm";
+
 import { initializeWarningHandler } from "./utils/warningHandler.js";
-import { isWorktreeModeEnabled } from "./utils/worktreeModeEnabled.js";
 
-// Lazy require to avoid circular dependency: teammate.ts -> AppState.tsx -> ... -> main.tsx
-/* eslint-disable @typescript-eslint/no-require-imports */
-const getTeammateUtils = () =>
-	require("./utils/teammate.js") as typeof import("./utils/teammate.js");
-const getTeammatePromptAddendum = () =>
-	require("@claude-code/swarm") as typeof import("@claude-code/swarm");
-/* eslint-enable @typescript-eslint/no-require-imports */
-// getTeammateModeSnapshot, logManagedSettings, isBeingDebugged moved to @claude-code/cli
-// Dead code elimination: conditional import for COORDINATOR_MODE
-/* eslint-disable @typescript-eslint/no-require-imports */
-const coordinatorModeModule = feature("COORDINATOR_MODE")
-	? (require("./coordinator/coordinatorMode.js") as typeof import("./coordinator/coordinatorMode.js"))
-	: null;
-/* eslint-enable @typescript-eslint/no-require-imports */
-// Dead code elimination: conditional import for KAIROS (assistant mode)
-/* eslint-disable @typescript-eslint/no-require-imports */
-const assistantModule = feature("KAIROS")
-	? (require("./assistant/index.js") as typeof import("./assistant/index.js"))
-	: null;
-const kairosGate = feature("KAIROS")
-	? (require("./assistant/gate.js") as typeof import("./assistant/gate.js"))
-	: null;
 
-import { relative, resolve } from "path";
-import { isAnalyticsDisabled } from "src/services/privacyConfig.js";
-import { getFeatureValue_CACHED_MAY_BE_STALE } from "@claude-code/config/feature-flags";
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from 'src/services/eventLogger.js'
-import {
-	getOriginalCwd,
-	setAdditionalDirectoriesForClaudeMd,
-	setIsRemoteMode,
-	setMainLoopModelOverride,
-	setMainThreadAgentType,
-	setTeleportedSessionInfo,
-} from "./bootstrap/state.js";
-import { filterCommandsForRemoteMode, getCommands } from "./commands.js";
-import type { StatsStore } from "./context/stats.js";
-import {
-  launchAssistantInstallWizard,
-  launchAssistantSessionChooser,
-  launchInvalidSettingsDialog,
-  launchResumeChooser,
-  launchSnapshotUpdateDialog,
-  launchTeleportRepoMismatchDialog,
-  launchTeleportResumeWrapper,
-} from './dialogLaunchers.js'
-import { SHOW_CURSOR } from '@anthropic/ink'
-import {
-	exitWithError,
-	exitWithMessage,
-	getRenderContext,
-	renderAndRun,
-	showSetupScreens,
-} from "./interactiveHelpers.js";
-import { initBuiltinPlugins } from "./plugins/bundled/index.js";
-/* eslint-enable @typescript-eslint/no-require-imports */
-import { checkQuotaStatus } from "./services/claudeAiLimits.js";
-import {
-	getMcpToolsCommandsAndResources,
-	prefetchAllMcpResources,
-} from "./services/mcp/client.js";
-import { initBundledSkills } from "./skills/bundled/index.js";
-import type { AgentColorName } from "./tools/AgentTool/agentColorManager.js";
-import {
-	getActiveAgentsFromList,
-	getAgentDefinitionsWithOverrides,
-	isBuiltInAgent,
-	isCustomAgent,
-	parseAgentsFromJson,
-} from "./tools/AgentTool/loadAgentsDir.js";
-import type { LogOption } from "./types/logs.js";
-import type { Message as MessageType } from "./types/message.js";
-import {
-	CLAUDE_IN_CHROME_SKILL_HINT,
-	CLAUDE_IN_CHROME_SKILL_HINT_WITH_WEBBROWSER,
-} from "./utils/claudeInChrome/prompt.js";
-import {
-	setupClaudeInChrome,
-	shouldAutoEnableClaudeInChrome,
-	shouldEnableClaudeInChrome,
-} from "./utils/claudeInChrome/setup.js";
-import { getContextWindowForModel } from "./utils/context.js";
-import { loadConversationForResume } from "./utils/conversationRecovery.js";
-import { buildDeepLinkBanner } from "./utils/deepLink/banner.js";
-import {
-	hasNodeOption,
-	isBareMode,
-	isEnvTruthy,
-	isInProtectedNamespace,
-} from "./utils/envUtils.js";
-import { refreshExampleCommands } from "./utils/exampleCommands.js";
-import type { FpsMetrics } from "./utils/fpsTracker.js";
-import { getWorktreePaths } from "./utils/getWorktreePaths.js";
-import {
-	findGitRoot,
-	getBranch,
-	getIsGit,
-	getWorktreeCount,
-} from "./utils/git.js";
-import { getGhAuthStatus } from "./utils/github/ghAuthStatus.js";
-import { safeParseJSON } from "./utils/json.js";
-import { logError } from "./utils/log.js";
-import { getModelDeprecationWarning } from "./utils/model/deprecation.js";
-import {
-	getDefaultMainLoopModel,
-	getUserSpecifiedModelSetting,
-	normalizeModelStringForAPI,
-	parseUserSpecifiedModel,
-} from "./utils/model/model.js";
-import { ensureModelStringsInitialized } from "./utils/model/modelStrings.js";
-import {
-	checkAndDisableBypassPermissions,
-	initializeToolPermissionContext,
-	initialPermissionModeFromCLI,
-	isDefaultPermissionModeAuto,
-	parseToolListFromCLI,
-	removeDangerousPermissions,
-	stripDangerousPermissionsForAutoMode,
-	verifyAutoModeGateAccess,
-} from "@claude-code/permission/permissionSetup";
-import { cleanupOrphanedPluginVersionsInBackground } from "./utils/plugins/cacheUtils.js";
-import { initializeVersionedPlugins } from "./utils/plugins/installedPluginsManager.js";
-import { getManagedPluginNames } from "./utils/plugins/managedPlugins.js";
-import { getGlobExclusionsForPluginCache } from "./utils/plugins/orphanedPluginFilter.js";
-import { getPluginSeedDirs } from "./utils/plugins/pluginDirectories.js";
-import { countFilesRoundedRg } from "./utils/ripgrep.js";
-import {
-	processSessionStartHooks,
-	processSetupHooks,
-} from "./utils/sessionStart.js";
-import {
-	cacheSessionTitle,
-	getSessionIdFromLog,
-	loadTranscriptFromFile,
-	saveAgentSetting,
-	saveMode,
-	searchSessionsByCustomTitle,
-	sessionIdExists,
-} from "./utils/sessionStorage.js";
+import { isEnvTruthy } from "./utils/envUtils.js";
+
 import { ensureMdmSettingsLoaded } from "./utils/settings/mdm/settings.js";
-import {
-	getInitialSettings,
-	getSettingsForSource,
-	getSettingsWithErrors,
-} from "./utils/settings/settings.js";
-import { resetSettingsCache } from "./utils/settings/settingsCache.js";
-import type { ValidationError } from "./utils/settings/validation.js";
-import {
-	DEFAULT_TASKS_MODE_TASK_LIST_ID,
-} from "./utils/tasks.js";
-import {
-	logPluginLoadErrors,
-	logPluginsEnabledForSession,
-} from "./utils/telemetry/pluginTelemetry.js";
-import { logSkillsLoaded } from "./utils/telemetry/skillLoadedEvent.js";
-import { generateTempFilePath } from "./utils/tempfile.js";
-import { validateUuid } from "./utils/uuid.js";
+
 // Plugin startup checks are now handled non-blockingly in REPL.tsx
 
-import { logPermissionContextForAnts } from "src/services/internalLogging.js";
-import { fetchClaudeAIMcpConfigsIfEligible } from "src/services/mcp/claudeai.js";
-import { clearServerCache } from "src/services/mcp/client.js";
-import {
-	areMcpConfigsAllowedWithEnterpriseMcpConfig,
-	dedupClaudeAiMcpServers,
-	doesEnterpriseMcpConfigExist,
-	filterMcpServersByPolicy,
-	getClaudeCodeMcpConfigs,
-	getMcpServerSignature,
-	parseMcpConfig,
-	parseMcpConfigFromFilePath,
-} from "src/services/mcp/config.js";
-import {
-	excludeCommandsByServer,
-	excludeResourcesByServer,
-} from "src/services/mcp/utils.js";
-import { getRelevantTips } from "src/services/tips/tipRegistry.js";
-import { logContextMetrics } from "src/utils/api.js";
-import {
-	CLAUDE_IN_CHROME_MCP_SERVER_NAME,
-	isClaudeInChromeMCPServer,
-} from "src/utils/claudeInChrome/common.js";
-import { registerCleanup } from "src/utils/cleanupRegistry.js";
-import { eagerParseCliFlag } from "src/utils/cliArgs.js";
-import { createEmptyAttributionState } from "src/utils/commitAttribution.js";
-import {
-	countConcurrentSessions,
-	registerSession,
-	updateSessionName,
-} from "src/utils/concurrentSessions.js";
-import { getCwd } from "src/utils/cwd.js";
-import { logForDebugging, setHasFormattedOutput } from "src/utils/debug.js";
-import {
-	errorMessage,
-	getErrnoCode,
-	isENOENT,
-	TeleportOperationError,
-	toError,
-} from "src/utils/errors.js";
-import {
-	getFsImplementation,
-	safeResolvePath,
-} from "src/utils/fsOperations.js";
-import {
-	gracefulShutdown,
-	gracefulShutdownSync,
-} from "src/utils/gracefulShutdown.js";
-import { setAllHookEventsEnabled } from "src/utils/hooks/hookEvents.js";
-import { refreshModelCapabilities } from "src/utils/model/modelCapabilities.js";
-import { peekForStdinData, writeToStderr } from "src/utils/process.js";
-import { setCwd } from "src/utils/Shell.js";
-import {
-	type ProcessedResume,
-	processResumedConversation,
-} from "src/utils/sessionRestore.js";
-import { parseSettingSourcesFlag } from "src/utils/settings/constants.js";
-import { plural } from "src/utils/stringUtils.js";
-import {
-	type ChannelEntry,
-	getInitialMainLoopModel,
-	getIsNonInteractiveSession,
-	getSdkBetas,
-	getSessionId,
-	getUserMsgOptIn,
-	setAllowedChannels,
-	setAllowedSettingSources,
-	setChromeFlagOverride,
-	setClientType,
-	setCwdState,
-	setDirectConnectServerUrl,
-	setFlagSettingsPath,
-	setInitialMainLoopModel,
-	setInlinePlugins,
-	setIsInteractive,
-	setKairosActive,
-	setOriginalCwd,
-	setQuestionPreviewFormat,
-	setSdkBetas,
-	setSessionBypassPermissionsMode,
-	setSessionPersistenceDisabled,
-	setSessionSource,
-	setUserMsgOptIn,
-	switchSession,
-} from "./bootstrap/state.js";
+import { gracefulShutdownSync } from "src/utils/gracefulShutdown.js";
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-const autoModeStateModule = feature("TRANSCRIPT_CLASSIFIER")
-	? (require("./utils/permissions/autoModeState.js") as typeof import("./utils/permissions/autoModeState.js"))
-	: null;
+import { setClientType, setInlinePlugins, setIsInteractive, setQuestionPreviewFormat, setSessionSource } from './bootstrap/state.js'
 
-// TeleportRepoMismatchDialog, TeleportResumeWrapper dynamically imported at call sites
-import { migrateBypassPermissionsAcceptedToSettings } from "./migrations/migrateBypassPermissionsAcceptedToSettings.js";
-import { migrateEnableAllProjectMcpServersToSettings } from "./migrations/migrateEnableAllProjectMcpServersToSettings.js";
-import { migrateFennecToOpus } from "./migrations/migrateFennecToOpus.js";
-import { migrateLegacyOpusToCurrent } from "./migrations/migrateLegacyOpusToCurrent.js";
-import { migrateOpusToOpus1m } from "./migrations/migrateOpusToOpus1m.js";
-import { migrateReplBridgeEnabledToRemoteControlAtStartup } from "./migrations/migrateReplBridgeEnabledToRemoteControlAtStartup.js";
-import { migrateSonnet1mToSonnet45 } from "./migrations/migrateSonnet1mToSonnet45.js";
-import { migrateSonnet45ToSonnet46 } from "./migrations/migrateSonnet45ToSonnet46.js";
-import { resetAutoModeOptInForDefaultOffer } from "./migrations/resetAutoModeOptInForDefaultOffer.js";
-import { resetProToOpusDefault } from "./migrations/resetProToOpusDefault.js";
-import { createRemoteSessionConfig } from "./remote/RemoteSessionManager.js";
-/* eslint-enable @typescript-eslint/no-require-imports */
-// teleportWithProgress dynamically imported at call site
-import {
-	createDirectConnectSession,
-	DirectConnectError,
-} from "./server/createDirectConnectSession.js";
-import { initializeLspServerManager } from "./services/lsp/manager.js";
-import { shouldEnablePromptSuggestion } from "./services/PromptSuggestion/promptSuggestion.js";
-import {
-	type AppState,
-	IDLE_SPECULATION_STATE,
-} from "./state/AppStateStore.js";
-import { asSessionId } from "./types/ids.js";
-import { filterAllowedSdkBetas } from "./utils/betas.js";
-import { isInBundledMode, isRunningWithBun } from "./utils/bundledMode.js";
-import { logForDiagnosticsNoPII } from "./utils/diagLogs.js";
-import {
-	filterExistingPaths,
-	getKnownPathsForRepo,
-} from "./utils/githubRepoPathMapping.js";
-import {
-	clearPluginCache,
-	loadAllPluginsCacheOnly,
-} from "./utils/plugins/pluginLoader.js";
-import { migrateChangelogFromConfig } from "./utils/releaseNotes.js";
-import { SandboxManager } from "./utils/sandbox/sandbox-adapter.js";
-import { fetchSession, prepareApiRequest } from "./utils/teleport/api.js";
-import {
-	checkOutTeleportedSessionBranch,
-	processMessagesForTeleportResume,
-	teleportToRemoteWithErrorHandling,
-	validateGitState,
-	validateSessionRepository,
-} from "./utils/teleport.js";
-import {
-  shouldEnableThinkingByDefault,
-  type ThinkingConfig,
-} from './utils/thinking.js'
-import { initUser, resetUserCache } from './utils/user.js'
-import {
-	getTmuxInstallInstructions,
-	isTmuxAvailable,
-	parsePRReference,
-} from "@claude-code/swarm";
+import { clearPluginCache } from './utils/plugins/pluginLoader.js'
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 profileCheckpoint("main_tsx_imports_loaded");
@@ -488,9 +98,6 @@ setThemeConfigCallbacks({
 })
 
 // logManagedSettings, isBeingDebugged moved to @claude-code/cli (packages/cli/src/entry/bootstrap-utils.ts)
-
-
-
 
 // Set by early argv processing when `claude open <url>` is detected (interactive mode only)
 type PendingConnect = {
@@ -861,42 +468,6 @@ export async function main() {
 	profileCheckpoint("main_after_run");
 }
 
-async function getInputPrompt(
-	prompt: string,
-	inputFormat: "text" | "stream-json",
-): Promise<string | AsyncIterable<string>> {
-	if (
-		!process.stdin.isTTY &&
-		// Input hijacking breaks MCP.
-		!process.argv.includes("mcp")
-	) {
-		if (inputFormat === "stream-json") {
-			return process.stdin;
-		}
-		process.stdin.setEncoding("utf8");
-		let data = "";
-		const onData = (chunk: string) => {
-			data += chunk;
-		};
-		process.stdin.on("data", onData);
-		// If no data arrives in 3s, stop waiting and warn. Stdin is likely an
-		// inherited pipe from a parent that isn't writing (subprocess spawned
-		// without explicit stdin handling). 3s covers slow producers like curl,
-		// jq on large files, python with import overhead. The warning makes
-		// silent data loss visible for the rare producer that's slower still.
-		const timedOut = await peekForStdinData(process.stdin, 3000);
-		process.stdin.off("data", onData);
-		if (timedOut) {
-			process.stderr.write(
-				"Warning: no stdin data received in 3s, proceeding without it. " +
-					"If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
-			);
-		}
-		return [prompt, data].filter(Boolean).join("\n");
-	}
-	return prompt;
-}
-
 async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 	profileCheckpoint("run_function_start");
 
@@ -1231,132 +802,4 @@ async function run(runtimeHandles: RuntimeHandles): Promise<CommanderCommand> {
 	profileReport();
 
 	return program;
-}
-
-async function logTenguInit({
-	hasInitialPrompt,
-	hasStdin,
-	verbose,
-	debug,
-	debugToStderr,
-	print,
-	outputFormat,
-	inputFormat,
-	numAllowedTools,
-	numDisallowedTools,
-	mcpClientCount,
-	worktreeEnabled,
-	skipWebFetchPreflight,
-	githubActionInputs,
-	dangerouslySkipPermissionsPassed,
-	permissionMode,
-	modeIsBypass,
-	allowDangerouslySkipPermissionsPassed,
-	systemPromptFlag,
-	appendSystemPromptFlag,
-	thinkingConfig,
-	assistantActivationPath,
-}: {
-	hasInitialPrompt: boolean;
-	hasStdin: boolean;
-	verbose: boolean;
-	debug: boolean;
-	debugToStderr: boolean;
-	print: boolean;
-	outputFormat: string;
-	inputFormat: string;
-	numAllowedTools: number;
-	numDisallowedTools: number;
-	mcpClientCount: number;
-	worktreeEnabled: boolean;
-	skipWebFetchPreflight: boolean | undefined;
-	githubActionInputs: string | undefined;
-	dangerouslySkipPermissionsPassed: boolean;
-	permissionMode: string;
-	modeIsBypass: boolean;
-	allowDangerouslySkipPermissionsPassed: boolean;
-	systemPromptFlag: "file" | "flag" | undefined;
-	appendSystemPromptFlag: "file" | "flag" | undefined;
-	thinkingConfig: ThinkingConfig;
-	assistantActivationPath: string | undefined;
-}): Promise<void> {
-	try {
-		logEvent("tengu_init", {
-			entrypoint:
-				"claude" as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			hasInitialPrompt,
-			hasStdin,
-			verbose,
-			debug,
-			debugToStderr,
-			print,
-			outputFormat:
-				outputFormat as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			inputFormat:
-				inputFormat as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			numAllowedTools,
-			numDisallowedTools,
-			mcpClientCount,
-			worktree: worktreeEnabled,
-			skipWebFetchPreflight,
-			...(githubActionInputs && {
-				githubActionInputs:
-					githubActionInputs as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			}),
-			dangerouslySkipPermissionsPassed,
-			permissionMode:
-				permissionMode as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			modeIsBypass,
-			inProtectedNamespace: isInProtectedNamespace(),
-			allowDangerouslySkipPermissionsPassed,
-			thinkingType:
-				thinkingConfig.type as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			...(systemPromptFlag && {
-				systemPromptFlag:
-					systemPromptFlag as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			}),
-			...(appendSystemPromptFlag && {
-				appendSystemPromptFlag:
-					appendSystemPromptFlag as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			}),
-			is_simple: isBareMode() || undefined,
-			is_coordinator:
-				feature("COORDINATOR_MODE") &&
-				coordinatorModeModule?.isCoordinatorMode()
-					? true
-					: undefined,
-			...(assistantActivationPath && {
-				assistantActivationPath:
-					assistantActivationPath as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			}),
-			autoUpdatesChannel: (getInitialSettings().autoUpdatesChannel ??
-				"latest") as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-			...(process.env.USER_TYPE === "ant"
-				? (() => {
-						const cwd = getCwd();
-						const gitRoot = findGitRoot(cwd);
-						const rp = gitRoot
-							? relative(gitRoot, cwd) || "."
-							: undefined;
-						return rp
-							? {
-									relativeProjectPath:
-										rp as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-								}
-							: {};
-					})()
-				: {}),
-		});
-	} catch (error) {
-		logError(error);
-	}
-}
-
-function resetCursor() {
-	const terminal = process.stderr.isTTY
-		? process.stderr
-		: process.stdout.isTTY
-			? process.stdout
-			: undefined;
-	terminal?.write(SHOW_CURSOR);
 }
