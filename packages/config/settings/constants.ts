@@ -1,4 +1,4 @@
-import { getAllowedSettingSources } from '@claude-code/app-compat/bootstrap/state.js'
+import { getAllowedSettingSources } from '../internal/allowedSourcesState.js'
 
 /**
  * All possible sources where settings can come from

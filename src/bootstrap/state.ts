@@ -18,7 +18,6 @@ import type { HookCallbackMatcher } from 'src/types/hooks.js'
 import { randomUUID } from 'src/utils/crypto.js'
 import type { ModelSetting } from 'src/utils/model/model.js'
 import type { ModelStrings } from 'src/utils/model/modelStrings.js'
-import type { SettingSource } from 'src/utils/settings/constants.js'
 import { resetSettingsCache } from 'src/utils/settings/settingsCache.js'
 import type { PluginHookMatcher } from 'src/utils/settings/types.js'
 import { createSignal } from 'src/utils/signal.js'
@@ -82,7 +81,6 @@ type State = {
   questionPreviewFormat: 'markdown' | 'html' | undefined
   flagSettingsPath: string | undefined
   flagSettingsInline: Record<string, unknown> | null
-  allowedSettingSources: SettingSource[]
   sessionIngressToken: string | null | undefined
   oauthTokenFromFd: string | null | undefined
   apiKeyFromFd: string | null | undefined
@@ -310,13 +308,6 @@ function getInitialState(): State {
     apiKeyFromFd: undefined,
     flagSettingsPath: undefined,
     flagSettingsInline: null,
-    allowedSettingSources: [
-      'userSettings',
-      'projectSettings',
-      'localSettings',
-      'flagSettings',
-      'policySettings',
-    ],
     // Telemetry state
     meter: null,
     sessionCounter: null,
@@ -1223,13 +1214,16 @@ export function addToInMemoryErrorLog(errorInfo: {
   STATE.inMemoryErrorLog.push(errorInfo)
 }
 
-export function getAllowedSettingSources(): SettingSource[] {
-  return STATE.allowedSettingSources
-}
-
-export function setAllowedSettingSources(sources: SettingSource[]): void {
-  STATE.allowedSettingSources = sources
-}
+// V7 §7 — config owns this state. Re-exported here for back-compat with the
+// many src/* call sites that still import from src/bootstrap/state.js. Both
+// names point to the same singleton inside @claude-code/config, so there is
+// only one allowedSettingSources value process-wide. Imported via the
+// dedicated /allowedSourcesState subpath instead of the package barrel so
+// the bootstrap module load order does not pull in the full config tree.
+export {
+  getAllowedSettingSources,
+  setAllowedSettingSources,
+} from '@claude-code/config/allowedSourcesState'
 
 export function preferThirdPartyAuthentication(): boolean {
   // IDE extension should behave as 1P for authentication reasons.

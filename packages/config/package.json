@@ -8,6 +8,7 @@
   "exports": {
     ".": "./index.ts",
     "./contracts": "./contracts.ts",
+    "./allowedSourcesState": "./internal/allowedSourcesState.ts",
     "./feature-flags": "./feature-flags.ts",
     "./settings": "./settings/settings.ts",
     "./changeDetector": "./settings/changeDetector.ts",
