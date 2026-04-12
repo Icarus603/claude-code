@@ -28,5 +28,19 @@ export type ConfigHostBindings = {
   logDiagnostics?: (level: string, event: string, data?: Record<string, unknown>) => void
   // V7 §8.6 — startup profiler bridge (optional, no-op if not installed).
   profileCheckpoint?: (name: string) => void
+  // V7 §7 — bootstrap state accessors. Config reads these but does not own
+  // session-level state (that's app-host). Added for global/config.ts +
+  // settings/settings.ts which need CWD, trust, and flag settings info.
+  getCwd?: () => string
+  getOriginalCwd?: () => string
+  getSessionTrustAccepted?: () => boolean
+  getFlagSettingsPath?: () => string | undefined
+  getFlagSettingsInline?: () => Record<string, unknown> | null
+  getUseCoworkPlugins?: () => boolean
+  // V7 §8.6 — event logging bridge (config cannot import eventLogger).
+  logEvent?: (event: string, metadata?: Record<string, unknown>) => void
+  // V7 §8.6 — git utility bridge (config cannot import git utils).
+  findCanonicalGitRoot?: (cwd: string) => string | undefined
+  addFileGlobRuleToGitignore?: (dir: string, glob: string) => void
 }
 

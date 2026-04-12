@@ -2,12 +2,6 @@ import { feature } from 'bun:bundle'
 import mergeWith from 'lodash-es/mergeWith.js'
 import { dirname, join, resolve } from 'path'
 import { z } from 'zod/v4'
-import {
-  getFlagSettingsInline,
-  getFlagSettingsPath,
-  getOriginalCwd,
-  getUseCoworkPlugins,
-} from '@claude-code/app-compat/bootstrap/state.js'
 import { getRemoteManagedSettingsSyncFromCache } from '../remote/syncCacheState.js'
 import { getConfigHostBindings, tryGetConfigHostBindings } from '../host.js'
 
@@ -252,11 +246,11 @@ export function getSettingsRootPathForSource(source: SettingSource): string {
     case 'policySettings':
     case 'projectSettings':
     case 'localSettings': {
-      return resolve(getOriginalCwd())
+      return resolve(( getConfigHostBindings().getOriginalCwd?.() ?? process.cwd() ))
     }
     case 'flagSettings': {
-      const path = getFlagSettingsPath()
-      return path ? dirname(resolve(path)) : resolve(getOriginalCwd())
+      const path = getConfigHostBindings().getFlagSettingsPath?.()
+      return path ? dirname(resolve(path)) : resolve(( getConfigHostBindings().getOriginalCwd?.() ?? process.cwd() ))
     }
   }
 }
@@ -272,7 +266,7 @@ export function getSettingsRootPathForSource(source: SettingSource): string {
  */
 function getUserSettingsFilePath(): string {
   if (
-    getUseCoworkPlugins() ||
+    getConfigHostBindings().getUseCoworkPlugins?.() ||
     isEnvTruthy(process.env.CLAUDE_CODE_USE_COWORK_PLUGINS)
   ) {
     return 'cowork_settings.json'
@@ -299,7 +293,7 @@ export function getSettingsFilePathForSource(
     case 'policySettings':
       return getManagedSettingsFilePath()
     case 'flagSettings': {
-      return getFlagSettingsPath()
+      return getConfigHostBindings().getFlagSettingsPath?.()
     }
   }
 }
@@ -360,7 +354,7 @@ function getSettingsForSourceUncached(
 
   // For flagSettings, merge in any inline settings set via the SDK
   if (source === 'flagSettings') {
-    const inlineSettings = getFlagSettingsInline()
+    const inlineSettings = getConfigHostBindings().getFlagSettingsInline?.()
     if (inlineSettings) {
       const parsed = SettingsSchema().safeParse(inlineSettings)
       if (parsed.success) {
@@ -518,7 +512,7 @@ export function updateSettingsForSource(
       // Okay to add to gitignore async without awaiting
       void addFileGlobRuleToGitignore(
         getRelativeSettingsFilePathForSource('localSettings'),
-        getOriginalCwd(),
+        ( getConfigHostBindings().getOriginalCwd?.() ?? process.cwd() ),
       )
     }
   } catch (e) {
@@ -778,7 +772,7 @@ function loadSettingsFromDisk(): SettingsWithErrors {
 
       // For flagSettings, also merge any inline settings set via the SDK
       if (source === 'flagSettings') {
-        const inlineSettings = getFlagSettingsInline()
+        const inlineSettings = getConfigHostBindings().getFlagSettingsInline?.()
         if (inlineSettings) {
           const parsed = SettingsSchema().safeParse(inlineSettings)
           if (parsed.success) {

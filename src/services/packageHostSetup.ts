@@ -16,6 +16,22 @@ export function installPackageHostBindings(
       getProjectRoot: () => findCanonicalGitRoot(getCwd()),
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
+      // V7 §7 — bootstrap state + session accessors for config
+      getCwd: () => { try { return require('../utils/cwd.js').getCwd() } catch { return process.cwd() } },
+      getOriginalCwd: () => { try { return require('../bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
+      getSessionTrustAccepted: () => { try { return require('../bootstrap/state.js').getSessionTrustAccepted() } catch { return false } },
+      getFlagSettingsPath: () => { try { return require('../bootstrap/state.js').getFlagSettingsPath() } catch { return undefined } },
+      getFlagSettingsInline: () => { try { return require('../bootstrap/state.js').getFlagSettingsInline() } catch { return null } },
+      getUseCoworkPlugins: () => { try { return require('../bootstrap/state.js').getUseCoworkPlugins() } catch { return false } },
+      logEvent: (event: string, metadata?: Record<string, unknown>) => {
+        try { require('../services/eventLogger.js').logEvent(event, metadata) } catch { /* best-effort */ }
+      },
+      findCanonicalGitRoot: (cwd: string) => {
+        try { return require('../utils/git.js').findCanonicalGitRoot(cwd) } catch { return undefined }
+      },
+      addFileGlobRuleToGitignore: (dir: string, glob: string) => {
+        try { require('../utils/git/gitignore.js').addFileGlobRuleToGitignore(dir, glob) } catch { /* best-effort */ }
+      },
       // V7 §8.6 — local-observability + profiler bindings for MDM subsystem
       logDiagnostics: (level: string, event: string, data?: Record<string, unknown>) => {
         try {
