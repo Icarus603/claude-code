@@ -729,7 +729,7 @@ function resolveBackupPath(backupFileName: string, sessionId?: string): string {
   return join(
     configDir,
     'file-history',
-    sessionId || getAgentHostBindings().getSessionId?.() ?? '',
+    sessionId || (getAgentHostBindings().getSessionId?.() ?? ''),
     backupFileName,
   )
 }
