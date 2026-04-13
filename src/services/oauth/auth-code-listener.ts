@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { createServer, type Server } from 'http'
 import type { AddressInfo } from 'net'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { getOauthConfig } from '../../constants/oauth.js'
 import { logError } from '../../utils/log.js'
 import { shouldUseClaudeAIAuth } from './client.js'

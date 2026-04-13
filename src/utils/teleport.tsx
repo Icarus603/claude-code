@@ -7,7 +7,7 @@ import { checkGate_CACHED_OR_BLOCKING } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { isPolicyAllowed } from 'src/services/policyLimits/index.js'
 import { z } from 'zod/v4'
 import {

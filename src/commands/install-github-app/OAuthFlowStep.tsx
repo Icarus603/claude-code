@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { KeyboardShortcutHint } from '@anthropic/ink'
 import { Spinner } from '../../components/Spinner.js'
 import TextInput from '../../components/TextInput.js'

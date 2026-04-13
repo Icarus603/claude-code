@@ -26,7 +26,7 @@ import {
 } from '../../../../../../src/bootstrap/state.js'
 import { EMPTY_USAGE } from '../../../../../../src/services/api/logging.js'
 import { jsonStringify } from '../../../../../../src/utils/slowOperations.js'
-import { logEvent } from '../../../../../../src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { logError } from '../../../../../../src/utils/log.js'
 import {
   gracefulShutdownSync,

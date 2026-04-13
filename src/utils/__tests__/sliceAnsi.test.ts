@@ -52,7 +52,8 @@ describe("sliceAnsi", () => {
     expect(result).toContain("\x1b[31m");
     expect(result).toContain("hello");
     // undoAnsiCodes uses specific close codes (e.g. \x1b[39m for foreground)
-    expect(result).toMatch(new RegExp("\\x1b\\[\\d+m"));
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional ANSI escape matching
+    expect(result).toMatch(/\x1b\[\d+m/);
     // The result should start with open code and end with a close code
     const withoutText = result.replace("hello", "");
     // Should have at least one open and one close code
@@ -103,6 +104,7 @@ describe("sliceAnsi", () => {
     // undoAnsiCodes uses \x1b[39m for foreground reset, not \x1b[0m
     expect(result).toContain("b");
     expect(result).toContain("\x1b[31m");
-    expect(result).toMatch(new RegExp("\\x1b\\[\\d+m.*\\x1b\\[\\d+m")); // open + close codes
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional ANSI escape matching
+    expect(result).toMatch(/\x1b\[\d+m.*\x1b\[\d+m/); // open + close codes
   });
 });

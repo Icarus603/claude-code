@@ -1,5 +1,5 @@
 import { dirname, isAbsolute, sep } from 'path'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { diagnosticTracker } from '../../services/diagnosticTracking.js'
 import { clearDeliveredDiagnosticsForFile } from '../../services/lsp/LSPDiagnosticRegistry.js'

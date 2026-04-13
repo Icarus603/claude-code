@@ -174,5 +174,15 @@ export class InMemoryConfig {
     // Managed settings security — always approve in tests.
     checkManagedSettingsSecurity: async () => 'no_check_needed',
     handleSecurityCheckResult: () => true,
+
+    // V7 §11.4 — Wave 1 testing stubs for permission/memory bridges.
+    parsePermissionRule: (rule: string) => {
+      const idx = rule.indexOf('(')
+      if (idx === -1) return { toolName: rule }
+      return { toolName: rule.substring(0, idx), ruleContent: rule.substring(idx + 1, rule.length - 1) }
+    },
+    isClaudeSettingsPath: () => false,
+    reconcilePermissionContext: (prev: unknown) => prev,
+    getAutoMemEntrypoint: () => '/test-config-home/memory/auto.md',
   }
 }

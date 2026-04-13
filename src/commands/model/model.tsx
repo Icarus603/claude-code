@@ -6,7 +6,7 @@ import { COMMON_HELP_ARGS, COMMON_INFO_ARGS } from '../../constants/xml.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '../../state/AppState.js'
 import type { LocalJSXCommandCall } from '../../types/command.js'
 import type { EffortLevel } from '../../utils/effort.js'
@@ -78,7 +78,7 @@ function ModelPickerWrapper({
     }
 
     // Turn off fast mode if switching to unsupported model
-    let wasFastModeToggledOn = undefined
+    let wasFastModeToggledOn 
     if (isFastModeEnabled()) {
       clearFastModeCooldown()
       if (!isFastModeSupportedByModel(model) && isFastMode) {
@@ -214,7 +214,7 @@ function SetModelAndClose({
       }))
       let message = `Set model to ${chalk.bold(renderModelLabel(modelValue))}`
 
-      let wasFastModeToggledOn = undefined
+      let wasFastModeToggledOn 
       if (isFastModeEnabled()) {
         clearFastModeCooldown()
         if (!isFastModeSupportedByModel(modelValue) && isFastMode) {

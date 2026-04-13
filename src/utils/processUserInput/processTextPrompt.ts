@@ -6,11 +6,11 @@ import type {
   SystemMessage,
   UserMessage,
 } from 'src/types/message.js'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { PermissionMode } from '../../types/permissions.js'
 import { createUserMessage } from '../messages.js'
 import { logOTelEvent, redactIfDisabled } from '../telemetry/events.js'
-import { startInteractionSpan } from '../telemetry/sessionTracing.js'
+import { startInteractionSpan } from '@claude-code/local-observability/spans'
 import {
   matchesKeepGoingKeyword,
   matchesNegativeKeyword,

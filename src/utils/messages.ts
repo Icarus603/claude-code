@@ -18,7 +18,7 @@ import last from 'lodash-es/last.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from 'src/services/eventMetadata.js'
 import type { AgentId } from 'src/types/ids.js'
 import { NO_CONTENT_MESSAGE } from '../constants/messages.js'
@@ -946,7 +946,6 @@ export function reorderMessagesInUI(
         })
       }
       toolUseGroups.get(toolUseID)!.postHooks.push(message)
-      continue
     }
   }
 
@@ -2278,7 +2277,6 @@ export function normalizeMessagesForAPI(
                 result[i] = mergeAssistantMessages(msg, normalizedMessage)
                 return
               }
-              continue
             }
           }
 
@@ -3553,7 +3551,6 @@ Read the team config to discover your teammates' names. Check the task list peri
   }
 
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- teammate_mailbox/team_context/skill_discovery/bagel_console handled above
-  // biome-ignore lint/nursery/useExhaustiveSwitchCases: teammate_mailbox/team_context/max_turns_reached/skill_discovery/bagel_console handled above, can't add case for dead code elimination
   switch (attachment.type) {
     case 'directory': {
       return wrapMessagesInSystemReminder([

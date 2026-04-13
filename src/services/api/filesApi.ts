@@ -17,10 +17,8 @@ import { logForDebugging } from '../../utils/debug.js'
 import { errorMessage } from '../../utils/errors.js'
 import { logError } from '../../utils/log.js'
 import { sleep } from '../../utils/sleep.js'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 
 // Files API is currently in beta. oauth-2025-04-20 enables Bearer OAuth
 // on public-api routes (auth.py: "oauth_auth" not in beta_versions → 404).
@@ -113,7 +111,7 @@ async function retryWithBackoff<T>(
     )
 
     if (attempt < MAX_RETRIES) {
-      const delayMs = BASE_DELAY_MS * Math.pow(2, attempt - 1)
+      const delayMs = BASE_DELAY_MS * 2 ** (attempt - 1)
       logDebug(`Retrying ${operation} in ${delayMs}ms...`)
       await sleep(delayMs)
     }

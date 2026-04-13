@@ -3,7 +3,7 @@ import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from 'src/services/eventMetadata.js'
 import type { ToolUseConfirm } from '../../components/permissions/PermissionRequest.js'
 import type {

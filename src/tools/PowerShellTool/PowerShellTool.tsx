@@ -15,7 +15,7 @@ import { TOOL_SUMMARY_MAX_LENGTH } from '../../constants/toolLimits.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import type {
   SetToolJSXFn,
   Tool,
@@ -908,7 +908,7 @@ async function* runPowerShellCommand({
   let lastProgressOutput = ''
   let lastTotalLines = 0
   let lastTotalBytes = 0
-  let backgroundShellId: string | undefined = undefined
+  let backgroundShellId: string | undefined 
   let interruptBackgroundingStarted = false
   let assistantAutoBackgrounded = false
 
@@ -1109,7 +1109,7 @@ async function* runPowerShellCommand({
   // Set up progress yielding with periodic checks
   const startTime = Date.now()
   let nextProgressTime = startTime + PROGRESS_THRESHOLD_MS
-  let foregroundTaskId: string | undefined = undefined
+  let foregroundTaskId: string | undefined 
 
   // Progress loop: wrap in try/finally so stopPolling is called on every exit
   // path — normal completion, timeout/interrupt backgrounding, and Ctrl+B

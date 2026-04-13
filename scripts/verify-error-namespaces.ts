@@ -81,7 +81,7 @@ const KNOWN_OWNERS: Record<string, Spec> = {
 // Packages whose error namespace MUST be present and complete. Add a name
 // here in the same commit that lands the contracts/errors.ts file.
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
-  // (empty until P3 lands the first typed error namespace)
+  'config',
 ])
 
 type Violation = { package: string; reason: string }
@@ -92,6 +92,7 @@ type Violation = { package: string; reason: string }
 //   - packages/<name>/src/contracts.ts (if errors are inlined into contracts)
 //   - packages/<name>/contracts.ts
 const ERROR_FILE_CANDIDATES = (name: string): string[] => [
+  `packages/${name}/errors.ts`,
   `packages/${name}/contracts/errors.ts`,
   `packages/${name}/src/contracts/errors.ts`,
   `packages/${name}/src/contracts.ts`,

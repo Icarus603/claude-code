@@ -12,7 +12,7 @@ import {
   type OptionWithDescription,
   Select,
 } from '../components/CustomSelect/index.js'
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { getAutoCompactThreshold } from '../services/compact/autoCompact.js'
 import {
   buildPostCompactMessages,

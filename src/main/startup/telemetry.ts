@@ -18,10 +18,8 @@ import { getInitialSettings } from "../../utils/settings/settings.js";
 import { getGhAuthStatus } from "../../utils/github/ghAuthStatus.js";
 import { isAutoUpdaterDisabled } from "@claude-code/config";
 import { isAnalyticsDisabled } from "../../services/privacyConfig.js";
-import {
-	logEvent,
-	type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from "../../services/eventLogger.js";
+import { logEvent } from "@claude-code/local-observability";
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from "@claude-code/local-observability/compat";
 
 export function logSessionTelemetry(): void {
 	const model = parseUserSpecifiedModel(

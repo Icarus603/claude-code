@@ -1,6 +1,6 @@
 import { homedir } from 'os'
 import React from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { setSessionTrustAccepted } from '../../bootstrap/state.js'
 import type { Command } from '../../commands.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'

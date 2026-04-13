@@ -1,4 +1,4 @@
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { openBrowser } from '../../utils/browser.js'
 import { AuthCodeListener } from './auth-code-listener.js'
 import * as client from './client.js'

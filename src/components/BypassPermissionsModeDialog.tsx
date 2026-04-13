@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { Box, Link, Newline, Text } from '@anthropic/ink'
 import { gracefulShutdownSync } from '../utils/gracefulShutdown.js'
 import { updateSettingsForSource } from '../utils/settings/settings.js'

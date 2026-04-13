@@ -11,7 +11,7 @@ import {
   setLastClassifierRequests,
 } from '../../bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/eventMetadata.js'
 import { getCacheControl } from '../../services/api/claude.js'
 import { parsePromptTooLongTokenCounts } from '../../services/api/errors.js'

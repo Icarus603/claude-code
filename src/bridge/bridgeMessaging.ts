@@ -17,7 +17,7 @@ import type {
   SDKControlResponse,
 } from '../entrypoints/sdk/controlTypes.js'
 import type { SDKResultSuccess } from '../entrypoints/sdk/coreTypes.js'
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { EMPTY_USAGE } from '../services/api/emptyUsage.js'
 import type { Message } from '../types/message.js'
 import { normalizeControlMessageKeys } from '../utils/controlMessageCompat.js'

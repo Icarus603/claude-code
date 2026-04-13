@@ -15,7 +15,7 @@
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS as SafeString,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { OFFICIAL_MARKETPLACE_NAME } from './officialMarketplace.js'
 
 export type PluginFetchSource =

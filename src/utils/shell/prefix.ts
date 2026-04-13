@@ -13,7 +13,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { queryHaiku } from '../../services/api/claude.js'
 import { startsWithApiErrorPrefix } from '../../services/api/errors.js'
 import { memoizeWithLRU } from '../memoize.js'
@@ -203,7 +203,6 @@ async function getCommandPrefixImpl(
         if (nonInteractive) {
           process.stderr.write(jsonStringify({ level: 'warn', message }) + '\n')
         } else {
-          // biome-ignore lint/suspicious/noConsole: intentional warning
           console.warn(chalk.yellow(`⚠️  ${message}`))
         }
       },

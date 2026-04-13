@@ -240,15 +240,10 @@ function BridgeStatusIndicator({
 }: BridgeStatusProps): React.ReactNode {
   if (!feature('BRIDGE_MODE')) return null
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
   const enabled = useAppState(s => s.replBridgeEnabled)
-  // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
   const connected = useAppState(s => s.replBridgeConnected)
-  // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
   const sessionActive = useAppState(s => s.replBridgeSessionActive)
-  // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
   const reconnecting = useAppState(s => s.replBridgeReconnecting)
-  // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
   const explicit = useAppState(s => s.replBridgeExplicit)
 
   // Failed state is surfaced via notification (useReplBridge), not a footer pill.

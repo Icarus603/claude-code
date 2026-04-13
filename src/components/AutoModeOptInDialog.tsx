@@ -1,5 +1,5 @@
 import React from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { Box, Dialog, Link, Text } from '@anthropic/ink'
 import { updateSettingsForSource } from '../utils/settings/settings.js'
 import { Select } from './CustomSelect/index.js'

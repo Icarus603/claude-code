@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { basename } from 'path'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { readFileSync } from 'src/utils/fileRead.js'
 import { expandPath } from 'src/utils/path.js'
 import type { PermissionOption } from '../components/permissions/FilePermissionDialog/permissionOptions.js'

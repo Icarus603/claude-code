@@ -33,7 +33,7 @@ import { basename, delimiter, dirname, join, resolve } from 'path'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { getMaxVersion, shouldSkipVersion } from '../autoUpdater.js'
 import { registerCleanup } from '../cleanupRegistry.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
@@ -224,7 +224,7 @@ async function tryWithVersionLock(
       if (attempts < maxAttempts) {
         // Wait before retrying with exponential backoff
         const timeout = Math.min(
-          minTimeout * Math.pow(2, attempts - 1),
+          minTimeout * 2 ** (attempts - 1),
           maxTimeout,
         )
         await sleep(timeout)

@@ -3,7 +3,7 @@ import type { RefObject } from 'react'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type {
   NormalizedUserMessage,
   RenderableMessage,
@@ -51,7 +51,6 @@ export function isNavigableMessage(msg: NavigableMessage): boolean {
       return !stripSystemReminders(b.text).startsWith('<')
     }
     case 'system':
-      // biome-ignore lint/nursery/useExhaustiveSwitchCases: blocklist — fallthrough return-true is the design
       switch (msg.subtype) {
         case 'api_metrics':
         case 'stop_hook_summary':

@@ -41,7 +41,7 @@ import { logError } from '../../utils/log.js'
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { isBridgeEnabled } from '../../bridge/bridgeEnabled.js'
 import { ThemePicker } from '../ThemePicker.js'
 import {

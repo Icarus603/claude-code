@@ -22,6 +22,7 @@ describe("escapeRegExp", () => {
   });
 
   test("escapes all special chars", () => {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing regex escape of literal ${} syntax
     expect(escapeRegExp("^${}()|[]\\.*+?")).toBe(
       "\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\\\.\\*\\+\\?"
     );

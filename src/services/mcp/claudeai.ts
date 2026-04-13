@@ -4,7 +4,7 @@ import { getOauthConfig } from 'src/constants/oauth.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'

@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from 'src/services/eventMetadata.js'
 import { BashTool } from 'src/tools/BashTool/BashTool.js'
 import { splitCommand_DEPRECATED } from 'src/utils/bash/commands.js'

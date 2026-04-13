@@ -10,7 +10,7 @@ import type {
   UserMessage,
 } from 'src/types/message.js'
 import type { ShellProgress } from 'src/types/tools.js'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { errorMessage, ShellError } from '../errors.js'
 import {
   createSyntheticUserCaveatMessage,

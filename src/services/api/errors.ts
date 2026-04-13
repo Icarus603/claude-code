@@ -39,10 +39,8 @@ import { isEnvTruthy } from '../../utils/envUtils.js'
 import { formatFileSize } from '../../utils/format.js'
 import { ImageResizeError } from '../../utils/imageResizer.js'
 import { ImageSizeError } from '../../utils/imageValidation.js'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   type ClaudeAILimits,
   getRateLimitErrorMessage,

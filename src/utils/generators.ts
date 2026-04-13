@@ -22,8 +22,8 @@ export async function returnValue<A>(
 }
 
 type QueuedGenerator<A> = {
-  done: boolean | void
-  value: A | void
+  done: boolean | undefined
+  value: A | undefined
   generator: AsyncGenerator<A, void>
   promise: Promise<QueuedGenerator<A>>
 }

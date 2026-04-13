@@ -20,9 +20,13 @@ mock.module("src/services/AgentSummary/agentSummary.js", () => ({
   startAgentSummarization: noop,
 }));
 
-mock.module("src/services/eventLogger.js", () => ({
+mock.module("@claude-code/local-observability", () => ({
   logEvent: noop,
   logEventAsync: async () => {},
+  shutdownLocalObservability: async () => {},
+}));
+
+mock.module("@claude-code/local-observability/compat", () => ({
   stripProtoFields: (v: any) => v,
   attachAnalyticsSink: noop,
   _resetForTesting: noop,

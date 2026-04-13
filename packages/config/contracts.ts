@@ -86,5 +86,18 @@ export type ConfigHostBindings = {
     newSettings: unknown,
   ) => Promise<'approved' | 'rejected' | 'no_check_needed'>
   handleSecurityCheckResult?: (result: 'approved' | 'rejected' | 'no_check_needed') => boolean
+  // V7 §11.4 — permission rule parsing bridge (config cannot import permission in Wave 1).
+  parsePermissionRule?: (rule: string) => { toolName: string; ruleContent?: string }
+  // V7 §11.4 — settings path check bridge.
+  isClaudeSettingsPath?: (filePath: string) => boolean
+  // V7 §11.4 — permission context reconciliation after settings change.
+  // Encapsulates syncPermissionRulesFromDisk + overly-broad filtering +
+  // bypass-mode check + plan-auto-mode transition.
+  reconcilePermissionContext?: (
+    prevContext: unknown,
+    updatedRules: unknown[],
+  ) => unknown
+  // V7 §11.4 — memory auto-entry path bridge.
+  getAutoMemEntrypoint?: () => string
 }
 

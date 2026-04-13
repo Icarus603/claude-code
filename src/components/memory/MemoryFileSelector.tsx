@@ -16,7 +16,7 @@ import {
   readLastConsolidatedAt,
 } from '@claude-code/memory'
 import * as teamMemPaths from '@claude-code/memory/teamMemPaths'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { useAppState } from '../../state/AppState.js'
 import { openPath } from '../../utils/browser.js'
 import { getMemoryFiles, type MemoryFileInfo } from '../../utils/claudemd.js'

@@ -1,5 +1,5 @@
 import type { LocalCommandResult } from '../../commands.js'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { openBrowser } from '../../utils/browser.js'
 import { saveGlobalConfig } from '@claude-code/config'
 

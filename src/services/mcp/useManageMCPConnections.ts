@@ -40,7 +40,7 @@ import reject from 'lodash-es/reject.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import {
   dedupClaudeAiMcpServers,
   doesEnterpriseMcpConfigExist,
@@ -445,7 +445,7 @@ export function useManageMCPConnections(
 
                   // Schedule next retry with exponential backoff
                   const backoffMs = Math.min(
-                    INITIAL_BACKOFF_MS * Math.pow(2, attempt - 1),
+                    INITIAL_BACKOFF_MS * 2 ** (attempt - 1),
                     MAX_BACKOFF_MS,
                   )
                   logMCPDebug(

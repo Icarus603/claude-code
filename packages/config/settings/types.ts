@@ -10,10 +10,11 @@ function isEnvTruthy(envVar: string | boolean | undefined): boolean {
   const normalizedValue = envVar.toLowerCase().trim()
   return ['1', 'true', 'yes', 'on'].includes(normalizedValue)
 }
-import {
-  EXTERNAL_PERMISSION_MODES,
-  PERMISSION_MODES,
-} from '@claude-code/permission/PermissionMode'
+// V7 §11.4 — inlined from permission to avoid Wave 2 dependency.
+// Config only needs these for Zod schema validation; the canonical
+// source remains @claude-code/permission/PermissionMode.
+const EXTERNAL_PERMISSION_MODES = ['acceptEdits', 'bypassPermissions', 'default', 'dontAsk', 'plan'] as const
+const PERMISSION_MODES = [...EXTERNAL_PERMISSION_MODES, 'auto'] as const
 import { MarketplaceSourceSchema } from './schemas/marketplace.js'
 import { CLAUDE_CODE_SETTINGS_SCHEMA_URL } from './constants.js'
 import { PermissionRuleSchema } from './permissionValidation.js'

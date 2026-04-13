@@ -36,10 +36,8 @@ import { disableKeepAlive } from '../../utils/proxy.js'
 import { sleep } from '../../utils/sleep.js'
 import type { ThinkingConfig } from '../../utils/thinking.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   checkMockRateLimitError,
   isMockRateLimitError,
@@ -540,7 +538,7 @@ export function getRetryDelay(
   }
 
   const baseDelay = Math.min(
-    BASE_DELAY_MS * Math.pow(2, attempt - 1),
+    BASE_DELAY_MS * 2 ** (attempt - 1),
     maxDelayMs,
   )
   const jitter = Math.random() * 0.25 * baseDelay

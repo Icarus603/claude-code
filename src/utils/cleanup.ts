@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises'
 import { homedir } from 'os'
 import { join } from 'path'
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { CACHE_PATHS } from './cachePaths.js'
 import { logForDebugging } from './debug.js'
 import { getClaudeConfigHomeDir } from './envUtils.js'

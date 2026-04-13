@@ -65,10 +65,8 @@ import {
 import { AwsAuthStatusManager } from '../../../../../../src/utils/awsAuthStatusManager.js'
 import { parseUserSpecifiedModel } from '../../../../../../src/utils/model/model.js'
 import { logMCPDebug } from '../../../../../../src/utils/log.js'
-import {
-  logEvent,
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from '../../../../../../src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { enqueue } from '../../../../../../src/utils/messageQueueManager.js'
 import { getCwd } from '../../../../../../src/utils/cwd.js'
 import { randomUUID } from 'crypto'

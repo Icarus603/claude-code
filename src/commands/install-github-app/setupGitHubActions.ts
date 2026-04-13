@@ -1,7 +1,7 @@
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { saveGlobalConfig } from '@claude-code/config'
 import {
   CODE_REVIEW_PLUGIN_WORKFLOW_CONTENT,

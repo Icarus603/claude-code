@@ -4,7 +4,7 @@ import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { shouldUseSessionMemoryCompaction } from '../../services/compact/sessionMemoryCompact.js'
 import type { Message } from '../../types/message.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'

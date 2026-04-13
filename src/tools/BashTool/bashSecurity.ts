@@ -1,4 +1,4 @@
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { extractHeredocs } from '../../utils/bash/heredoc.js'
 import { ParsedCommand } from '../../utils/bash/ParsedCommand.js'
 import {
@@ -26,6 +26,7 @@ const COMMAND_SUBSTITUTION_PATTERNS = [
     message: 'Zsh equals expansion (=cmd)',
   },
   { pattern: /\$\(/, message: '$() command substitution' },
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: intentional shell syntax pattern
   { pattern: /\$\{/, message: '${} parameter substitution' },
   { pattern: /\$\[/, message: '$[] legacy arithmetic expansion' },
   { pattern: /~\[/, message: 'Zsh-style parameter expansion' },
@@ -1573,7 +1574,6 @@ function hasBackslashEscapedWhitespace(command: string): boolean {
 
     if (char === "'" && !inDoubleQuote) {
       inSingleQuote = !inSingleQuote
-      continue
     }
   }
 
@@ -1686,7 +1686,6 @@ function hasBackslashEscapedOperator(command: string): boolean {
     }
     if (char === '"' && !inSingleQuote) {
       inDoubleQuote = !inDoubleQuote
-      continue
     }
   }
 
@@ -2248,6 +2247,7 @@ function validateZshDangerousCommands(
 // so an attacker can use them to slip metacharacters past our checks while
 // bash still executes them (e.g., "echo safe\x00; rm -rf /").
 // eslint-disable-next-line no-control-regex
+// biome-ignore lint/suspicious/noControlCharactersInRegex: intentional control character detection for security
 const CONTROL_CHAR_RE = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/
 
 /**

@@ -1,4 +1,4 @@
-import { isClaudeSettingsPath } from '@claude-code/permission/filesystem'
+import { tryGetConfigHostBindings } from '../host.js'
 import { validateSettingsFileContent } from './validation.js'
 
 // V7 §11.4 — config defines its own validation contract instead of importing
@@ -25,7 +25,8 @@ export function validateInputForSettingsFileEdit(
   getUpdatedContent: () => string,
 ): SettingsEditValidationFailure | null {
   // Only validate Claude settings files
-  if (!isClaudeSettingsPath(filePath)) {
+  const bindings = tryGetConfigHostBindings()
+  if (!bindings.isClaudeSettingsPath?.(filePath)) {
     return null
   }
 

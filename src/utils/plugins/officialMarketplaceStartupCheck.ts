@@ -10,7 +10,7 @@
 
 import { join } from 'path'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'
 import { isEnvTruthy } from '../envUtils.js'
@@ -66,7 +66,7 @@ export const RETRY_CONFIG = {
 function calculateNextRetryDelay(retryCount: number): number {
   const delay =
     RETRY_CONFIG.INITIAL_DELAY_MS *
-    Math.pow(RETRY_CONFIG.BACKOFF_MULTIPLIER, retryCount)
+    RETRY_CONFIG.BACKOFF_MULTIPLIER ** retryCount
   return Math.min(delay, RETRY_CONFIG.MAX_DELAY_MS)
 }
 

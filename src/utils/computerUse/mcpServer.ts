@@ -8,7 +8,7 @@ import { homedir } from 'os'
 
 import { enableConfigs } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'
-import { shutdownEventLoggers } from '../../services/eventLogger.js'
+import { shutdownEventLoggers } from '@claude-code/local-observability/compat'
 import { filterAppsForDescription } from './appNames.js'
 import { getChicagoCoordinateMode } from './gates.js'
 import { getComputerUseHostAdapter } from './hostAdapter.js'

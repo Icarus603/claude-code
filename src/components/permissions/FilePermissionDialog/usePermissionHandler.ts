@@ -1,7 +1,7 @@
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '../../../services/eventMetadata.js'
 import type { ToolPermissionContext } from '../../../Tool.js'
 import {

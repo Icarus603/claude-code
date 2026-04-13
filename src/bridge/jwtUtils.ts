@@ -1,4 +1,4 @@
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from '../utils/debug.js'
 import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
 import { errorMessage } from '../utils/errors.js'

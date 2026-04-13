@@ -7,7 +7,7 @@ import { getDynamicConfig_BLOCKS_ON_INIT } from '@claude-code/config/feature-fla
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { type ReleaseChannel, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from './debug.js'
 import { env } from './env.js'
@@ -81,7 +81,6 @@ export async function assertMinVersion(): Promise<void> {
       versionConfig.minVersion &&
       lt(MACRO.VERSION, versionConfig.minVersion)
     ) {
-      // biome-ignore lint/suspicious/noConsole:: intentional console output
       console.error(`
 It looks like your version of Claude Code (${MACRO.VERSION}) needs an update.
 A newer version (${versionConfig.minVersion} or higher) is required to continue.
@@ -478,7 +477,6 @@ export async function installGlobalPackage(
         currentVersion:
           MACRO.VERSION as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       })
-      // biome-ignore lint/suspicious/noConsole:: intentional console output
       console.error(`
 Error: Windows NPM detected in WSL
 

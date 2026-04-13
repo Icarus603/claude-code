@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import type { ToolUseContext } from '../Tool.js'
 import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js'
 import { isBuiltInAgent } from '../tools/AgentTool/loadAgentsDir.js'

@@ -1,7 +1,7 @@
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from 'src/services/eventMetadata.js'
 import type z from 'zod/v4'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'

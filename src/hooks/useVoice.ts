@@ -12,7 +12,7 @@ import { useTerminalFocus } from '@anthropic/ink'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { getVoiceKeyterms } from '../services/voiceKeyterms.js'
 import {
   connectVoiceStream,

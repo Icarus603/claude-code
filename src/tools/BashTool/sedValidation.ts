@@ -481,6 +481,7 @@ function containsDangerousOperations(expression: string): boolean {
   // Examples: ｗ (fullwidth), ᴡ (small capital), w̃ (combining tilde)
   // Check for characters outside ASCII range (0x01-0x7F, excluding null byte)
   // eslint-disable-next-line no-control-regex
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional non-ASCII detection
   if (/[^\x01-\x7F]/.test(cmd)) {
     return true
   }

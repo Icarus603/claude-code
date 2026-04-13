@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import {
   getLatestVersion,
   type InstallStatus,

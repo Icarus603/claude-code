@@ -13,7 +13,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '../state/AppState.js'
 import { count } from '../utils/array.js'
 import { getTerminalPanel } from '../utils/terminalPanel.js'
@@ -92,7 +92,7 @@ export function GlobalKeybindingHandlers({
   // Brief view has its own dedicated toggle on ctrl+shift+b.
   const isBriefOnly =
     feature('KAIROS') || feature('KAIROS_BRIEF')
-      ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+      ?
         useAppState(s => s.isBriefOnly)
       : false
   const handleToggleTranscript = useCallback(() => {
@@ -202,7 +202,6 @@ export function GlobalKeybindingHandlers({
     context: 'Global',
   })
   if (feature('KAIROS') || feature('KAIROS_BRIEF')) {
-    // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
     useKeybinding('app:toggleBrief', handleToggleBrief, {
       context: 'Global',
     })

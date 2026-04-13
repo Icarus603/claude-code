@@ -40,7 +40,7 @@ import {
   sep,
 } from 'path'
 import picomatch from 'picomatch'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import {
   getAdditionalDirectoriesForClaudeMd,
   getOriginalCwd,

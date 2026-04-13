@@ -46,10 +46,6 @@ export class FileIndex {
   private charBits: Int32Array = new Int32Array(0)
   private pathLens: Uint16Array = new Uint16Array(0)
   private topLevelCache: SearchResult[] | null = null
-  // During async build, tracks how many paths have bitmap/lowerPath filled.
-  // search() uses this to search the ready prefix while build continues.
-  private readyCount = 0
-
   /**
    * Load paths from an array of strings.
    * This is the main way to populate the index — ripgrep collects files, we just search them.
@@ -205,7 +201,7 @@ export class FileIndex {
 
     const { paths, lowerPaths, charBits, pathLens, readyCount } = this
 
-    outer: for (let i = 0; i < readyCount; i++) {
+    for (let i = 0; i < readyCount; i++) {
       // O(1) bitmap reject: path must contain every letter in the needle
       if ((charBits[i]! & needleBitmap) !== needleBitmap) continue
 

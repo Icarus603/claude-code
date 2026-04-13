@@ -19,7 +19,7 @@ import {
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import {
   type AppState,
   useAppState,
@@ -442,7 +442,7 @@ function PromptInput({
   // its own marginTop, so the gap stays even without ours.
   const briefOwnsGap =
     feature('KAIROS') || feature('KAIROS_BRIEF')
-      ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+      ?
         useAppState(s => s.isBriefOnly) && !viewingAgentTaskId
       : false
   const mainLoopModel_ = useAppState(s => s.mainLoopModel)

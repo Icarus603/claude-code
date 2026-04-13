@@ -39,7 +39,7 @@ import { resetSettingsCache } from '../../utils/settings/settingsCache.js'
 import { sleep } from '../../utils/sleep.js'
 import { getClaudeCodeUserAgent } from '../../utils/userAgent.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logEvent } from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { getRetryDelay } from '../api/withRetry.js'
 import {
   type SettingsSyncFetchResult,

@@ -100,7 +100,7 @@ import {
   registerLeaderSetToolPermissionContext,
   unregisterLeaderSetToolPermissionContext,
 } from '@claude-code/swarm';
-import { endInteractionSpan } from '../utils/telemetry/sessionTracing.js';
+import { endInteractionSpan } from '@claude-code/local-observability/spans';
 import { useLogMessages } from '../hooks/useLogMessages.js';
 import { useReplBridge } from '../hooks/useReplBridge.js';
 import {
@@ -212,7 +212,7 @@ import { hasConsoleBillingAccess } from '../utils/billing.js';
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/services/eventLogger.js';
+} from '@claude-code/local-observability';
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags';
 import {
   textForResubmit,
@@ -820,7 +820,7 @@ export function REPL({
   );
   const disableVirtualScroll = useMemo(() => isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_VIRTUAL_SCROLL), []);
   const disableMessageActions = feature('MESSAGE_ACTIONS')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+    ?
       useMemo(() => isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_MESSAGE_ACTIONS), [])
     : false;
 
@@ -1446,7 +1446,6 @@ export function REPL({
     messages.length,
   );
   if (feature('AWAY_SUMMARY')) {
-    // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
     useAwaySummary(messages, setMessages, isLoading);
   }
   const [cursor, setCursor] = useState<MessageActionsState | null>(null);
@@ -1483,7 +1482,7 @@ export function REPL({
   // the branch is dead-code-eliminated in non-KAIROS builds (same pattern
   // as useUnseenDivider above).
   const { maybeLoadOlder } = feature('KAIROS')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+    ?
       useAssistantHistory({
         config: remoteSessionConfig,
         setMessages,
@@ -4633,7 +4632,7 @@ export function REPL({
 
   // Voice input integration (VOICE_MODE builds only)
   const voice = feature('VOICE_MODE')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+    ?
       useVoiceIntegration({ setInputValueRaw, inputValueRef, insertTextRef })
     : {
         stripTrailing: () => 0,
@@ -4660,7 +4659,6 @@ export function REPL({
     // useScheduledTasks's effect (not here) since wrapping a hook call in a dynamic
     // condition would break rules-of-hooks.
     const assistantMode = store.getState().kairosEnabled;
-    // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
     useScheduledTasks!({ isLoading, assistantMode, setMessages });
   }
 
@@ -4671,7 +4669,6 @@ export function REPL({
   if (process.env.USER_TYPE === 'ant') {
     // Tasks mode: watch for tasks and auto-process them
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    // biome-ignore lint/correctness/useHookAtTopLevel: conditional for dead code elimination in external builds
     useTaskListWatcher({
       taskListId,
       isLoading,
@@ -4680,7 +4677,6 @@ export function REPL({
 
     // Loop mode: auto-tick when enabled (via /job command)
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    // biome-ignore lint/correctness/useHookAtTopLevel: conditional for dead code elimination in external builds
     useProactive?.({
       // Suppress ticks while an initial message is pending — the initial
       // message will be processed asynchronously and a premature tick would

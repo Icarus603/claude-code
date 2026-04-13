@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js'
 import { query } from '../../query.js'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/eventMetadata.js'
 import type { ToolUseContext } from '../../Tool.js'
 import { type Tool, toolMatchesName } from '../../Tool.js'
