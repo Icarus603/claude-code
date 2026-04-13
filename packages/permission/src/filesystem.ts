@@ -4,8 +4,6 @@ import ignore from 'ignore'
 import memoize from 'lodash-es/memoize.js'
 import { homedir, tmpdir } from 'os'
 import { join, normalize, posix, sep } from 'path'
-import { hasAutoMemPathOverride, isAutoMemPath } from '@claude-code/memory/paths'
-import { isAgentMemoryPath } from '@claude-code/memory/agentMemory'
 import type { z } from 'zod/v4'
 import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { SETTING_SOURCES, getSettingsFilePathForSource, getSettingsRootPathForSource } from '@claude-code/config'
@@ -38,6 +36,9 @@ function getPlatform(): string { return _b().getPlatform?.() ?? (process.platfor
 function getProjectDir(cwd: string): string { return _b().getProjectDir?.(cwd) ?? cwd }
 function containsVulnerableUncPath(p: string): boolean { return _b().containsVulnerableUncPath?.(p) ?? false }
 function getToolResultsDir(): string { return _b().getToolResultsDir?.() ?? '' }
+function hasAutoMemPathOverride(): boolean { return _b().hasAutoMemPathOverride?.() ?? false }
+function isAutoMemPath(p: string): boolean { return _b().isAutoMemPath?.(p) ?? false }
+function isAgentMemoryPath(p: string): boolean { return _b().isAgentMemoryPath?.(p) ?? false }
 import type {
   PermissionDecision,
   PermissionResult,

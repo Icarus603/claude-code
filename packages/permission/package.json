@@ -18,6 +18,8 @@
     "./PermissionPromptToolResultSchema": "./src/PermissionPromptToolResultSchema.ts",
     "./permissionRuleParser": "./src/permissionRuleParser.ts",
     "./filesystem": "./src/filesystem.ts",
-    "./denialTracking": "./src/denialTracking.ts"
+    "./denialTracking": "./src/denialTracking.ts",
+    "./errors": "./src/errors.ts",
+    "./testing": "./src/testing/index.ts"
   }
 }
