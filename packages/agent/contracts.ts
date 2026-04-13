@@ -46,6 +46,8 @@ export type AgentHostBindings = {
   logEvent?: (event: string, metadata?: Record<string, number | boolean | string>) => void
   logError?: (err: unknown) => void
   logAntError?: (message: string, err: unknown) => void
+  headlessProfilerCheckpoint?: (name: string) => void
+  queryCheckpoint?: (name: string) => void
 
   // ── Session state ────────────────────────────────────────────────────────────
   getProjectRoot?: () => string
@@ -140,6 +142,13 @@ export type AgentHostBindings = {
   createSystemMessage?: (content: string, level?: string) => AgentMessage
   createUserInterruptionMessage?: (opts: { toolUse: boolean }) => AgentMessage
   createUserMessage?: (opts: { content: string; isMeta?: boolean }) => AgentMessage
+  createCompactBoundaryMessage?: (
+    trigger: 'manual' | 'auto',
+    preTokens: number,
+    lastPreCompactMessageUuid?: string,
+    userContext?: string,
+    messagesSummarized?: number,
+  ) => AgentMessage
 
   // ── Teammate context ───────────────────────────────────────────────────────────
   isTeammate?: () => boolean
@@ -157,6 +166,25 @@ export type AgentHostBindings = {
   createCacheSafeParams?: (ctx: AgentREPLHookContext) => unknown
   saveCacheSafeParams?: (params: unknown) => void
 
+  // ── Session storage / debug capture ─────────────────────────────────────────
+  recordTranscript?: (
+    messages: AgentMessage[],
+    teamInfo?: unknown,
+    startingParentUuidHint?: string,
+    allMessages?: readonly AgentMessage[],
+  ) => Promise<string | null>
+  flushSessionStorage?: () => Promise<void>
+  recordContentReplacement?: (
+    replacements: unknown[],
+    agentId?: string,
+  ) => Promise<void>
+  createDumpPromptsFetch?: (
+    agentIdOrSessionId: string,
+  ) => (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ) => Promise<Response>
+
   // ── Features ────────────────────────────────────────────────────────────────────
   executePromptSuggestion?: (ctx: AgentREPLHookContext) => void
   classifyJobState?: (jobDir: string, messages: AgentMessage[]) => Promise<void>
@@ -168,6 +196,15 @@ export type AgentHostBindings = {
   getCurrentTurnTokenBudget?: () => number
   getTurnOutputTokens?: () => number
   incrementBudgetContinuationCount?: () => void
+  notifyCommandLifecycle?: (
+    uuid: string,
+    state: 'started' | 'completed',
+  ) => void
+  getCommandsByMaxPriority?: (
+    maxPriority: 'now' | 'next' | 'later',
+  ) => AgentMessage[]
+  removeCommandsFromQueue?: (commands: AgentMessage[]) => void
+  isSlashCommand?: (command: AgentMessage) => boolean
 
   // ── Timing ───────────────────────────────────────────────────────────────────
   now?: () => number

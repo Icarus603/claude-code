@@ -112,6 +112,78 @@ export function installPackageHostBindings(
         gracefulShutdown: (code) => { try { return require('../utils/gracefulShutdown.js').gracefulShutdown(code) } catch { return Promise.reject() } },
         getMainLoopModel: () => { try { return require('../utils/model/model.js').getMainLoopModel() } catch { return '' } },
       },
+      extraAgentBindings: {
+        headlessProfilerCheckpoint: (name: string) => {
+          try {
+            require('../utils/headlessProfiler.js').headlessProfilerCheckpoint(name)
+          } catch {}
+        },
+        queryCheckpoint: (name: string) => {
+          try {
+            require('../utils/queryProfiler.js').queryCheckpoint(name)
+          } catch {}
+        },
+        notifyCommandLifecycle: (uuid: string, state: 'started' | 'completed') => {
+          try {
+            require('../utils/commandLifecycle.js').notifyCommandLifecycle(uuid, state)
+          } catch {}
+        },
+        getCommandsByMaxPriority: (maxPriority: 'now' | 'next' | 'later') => {
+          try {
+            return require('../utils/messageQueueManager.js').getCommandsByMaxPriority(maxPriority)
+          } catch {
+            return []
+          }
+        },
+        removeCommandsFromQueue: (commands: unknown[]) => {
+          try {
+            require('../utils/messageQueueManager.js').remove(commands)
+          } catch {}
+        },
+        isSlashCommand: (command: unknown) => {
+          try {
+            return require('../utils/messageQueueManager.js').isSlashCommand(command)
+          } catch {
+            return false
+          }
+        },
+        createCompactBoundaryMessage: (...a: unknown[]) => {
+          try {
+            return require('../utils/messages.js').createCompactBoundaryMessage(...a)
+          } catch {
+            return undefined
+          }
+        },
+        recordTranscript: (...a: unknown[]) => {
+          try {
+            return require('../utils/sessionStorage.js').recordTranscript(...a)
+          } catch {
+            return Promise.resolve(null)
+          }
+        },
+        flushSessionStorage: () => {
+          try {
+            return require('../utils/sessionStorage.js').flushSessionStorage()
+          } catch {
+            return Promise.resolve()
+          }
+        },
+        recordContentReplacement: (...a: unknown[]) => {
+          try {
+            return require('../utils/sessionStorage.js').recordContentReplacement(...a)
+          } catch {
+            return Promise.resolve()
+          }
+        },
+        createDumpPromptsFetch: (agentIdOrSessionId: string) => {
+          try {
+            return require('../services/api/dumpPrompts.js').createDumpPromptsFetch(agentIdOrSessionId)
+          } catch {
+            return (input: RequestInfo | URL, init?: RequestInit) =>
+              globalThis.fetch(input, init)
+          }
+        },
+      },
       // V7 §7 — bootstrap state + session accessors for config
       getCwd: () => { try { return require('../utils/cwd.js').getCwd() } catch { return process.cwd() } },
       getOriginalCwd: () => { try { return require('../bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },

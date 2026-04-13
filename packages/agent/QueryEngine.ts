@@ -11,8 +11,11 @@ import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs
 import { randomUUID } from 'crypto'
 import last from 'lodash-es/last.js'
 import {
+  getCwdState,
+  getOriginalCwd,
   getSessionId,
   isSessionPersistenceDisabled,
+  setCwdState,
 } from '@claude-code/app-compat/bootstrap/state.js'
 import type {
   PermissionMode,
@@ -54,24 +57,19 @@ import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/app-compat/tools/Synthe
 import type { APIError } from '@anthropic-ai/sdk'
 import type { CompactMetadata, Message, SystemCompactBoundaryMessage } from '@claude-code/app-compat/types/message.js'
 import type { OrphanedPermission } from '@claude-code/app-compat/types/textInputTypes.js'
-import { createAbortController } from '@claude-code/app-compat/utils/abortController.js'
 import type { AttributionState } from '@claude-code/app-compat/utils/commitAttribution.js'
-import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
-import { isBareMode, isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
 import { getFastModeState } from '@claude-code/app-compat/utils/fastMode.js'
 import {
   type FileHistoryState,
   fileHistoryEnabled,
   fileHistoryMakeSnapshot,
-} from '@claude-code/app-compat/utils/fileHistory.js'
+} from './fileHistory.js'
 import {
   cloneFileStateCache,
   type FileStateCache,
-} from '@claude-code/app-compat/utils/fileStateCache.js'
-import { headlessProfilerCheckpoint } from '@claude-code/app-compat/utils/headlessProfiler.js'
+} from './internal/fileStateCache.js'
 import { registerStructuredOutputEnforcement } from '@claude-code/app-compat/utils/hooks/hookHelpers.js'
 import { getInMemoryErrors } from '@claude-code/app-compat/utils/log.js'
-import { countToolCalls, SYNTHETIC_MESSAGES } from '@claude-code/app-compat/utils/messages.js'
 import {
   getMainLoopModel,
   parseUserSpecifiedModel,
@@ -82,17 +80,20 @@ import {
   processUserInput,
 } from '@claude-code/app-compat/utils/processUserInput/processUserInput.js'
 import { fetchSystemPromptParts } from '@claude-code/app-compat/utils/queryContext.js'
-import { setCwd } from '@claude-code/app-compat/utils/Shell.js'
 import {
+  createCompactBoundaryMessage,
   flushSessionStorage,
   recordTranscript,
-} from '@claude-code/app-compat/utils/sessionStorage.js'
-import { asSystemPrompt } from '@claude-code/app-compat/utils/systemPromptType.js'
-import { resolveThemeSetting } from '@claude-code/app-compat/utils/systemTheme.js'
+} from './internal/runtimeBridges.js'
 import {
   shouldEnableThinkingByDefault,
   type ThinkingConfig,
 } from '@claude-code/app-compat/utils/thinking.js'
+import { createAbortController } from './internal/abortController.js'
+import { headlessProfilerCheckpoint } from './internal/runtimeSignals.js'
+import { countToolCalls, SYNTHETIC_MESSAGES } from './internal/messageHelpers.js'
+import { resolveThemeSetting } from './internal/systemTheme.js'
+import { asSystemPrompt, isBareMode, isEnvTruthy } from './internalUtils.js'
 
 // Lazy: MessageSelector.tsx pulls React/ink; only needed for message filtering at query time
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -103,8 +104,7 @@ const messageSelector =
 import {
   localCommandOutputToSDKAssistantMessage,
   toSDKCompactMetadata,
-} from '@claude-code/app-compat/utils/messages/mappers.js'
-import { createCompactBoundaryMessage } from '@claude-code/app-compat/utils/messages.js'
+} from './internal/sdkMappers.js'
 import {
   buildSystemInitMessage,
   sdkCompatToolName,
@@ -135,6 +135,18 @@ const snipProjection = feature('HISTORY_SNIP')
   ? (require('@claude-code/app-compat/services/compact/snipProjection.js') as typeof import('@claude-code/app-compat/services/compact/snipProjection.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
+
+function getCwd(): string {
+  try {
+    return getCwdState()
+  } catch {
+    return getOriginalCwd()
+  }
+}
+
+function setCwd(path: string): void {
+  setCwdState(path)
+}
 
 export type QueryEngineConfig = {
   cwd: string
@@ -607,7 +619,13 @@ export class QueryEngine {
           (msg.content.includes(`<${LOCAL_COMMAND_STDOUT_TAG}>`) ||
             msg.content.includes(`<${LOCAL_COMMAND_STDERR_TAG}>`))
         ) {
-          yield localCommandOutputToSDKAssistantMessage(msg.content, msg.uuid)
+          yield localCommandOutputToSDKAssistantMessage(
+            msg.content,
+            msg.uuid,
+            getSessionId(),
+            LOCAL_COMMAND_STDOUT_TAG,
+            LOCAL_COMMAND_STDERR_TAG,
+          )
         }
 
         if (msg.type === 'system' && msg.subtype === 'compact_boundary') {
