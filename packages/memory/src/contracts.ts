@@ -160,7 +160,7 @@ export type MemoryHostBindings = {
 
   // ── Task management (autoDream) ────────────────────────────────────────
   registerDreamTask?: (
-    setAppState: unknown,
+    toolUseContext: unknown,
     params: {
       sessionsReviewing: number
       priorMtime: number
@@ -171,10 +171,14 @@ export type MemoryHostBindings = {
     taskId: string,
     turn: { text: string; toolUseCount: number },
     paths: string[],
-    setAppState: unknown,
+    toolUseContext: unknown,
   ) => void
-  completeDreamTask?: (taskId: string, setAppState: unknown) => void
-  failDreamTask?: (taskId: string, setAppState: unknown) => void
+  completeDreamTask?: (taskId: string, toolUseContext: unknown) => void
+  failDreamTask?: (taskId: string, toolUseContext: unknown) => void
+  getDreamTaskState?: (
+    taskId: string,
+    toolUseContext: unknown,
+  ) => { filesTouched: string[]; status?: string } | undefined
   isDreamTask?: (
     state: unknown,
   ) => state is { filesTouched: string[]; status?: string }

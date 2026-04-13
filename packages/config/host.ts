@@ -1,4 +1,5 @@
 import type { ConfigHostBindings } from './contracts.js'
+import { HostBindingsError } from './errors.js'
 
 let configHostBindings: ConfigHostBindings | null = null
 
@@ -8,7 +9,7 @@ export function installConfigHostBindings(bindings: ConfigHostBindings): void {
 
 export function getConfigHostBindings(): ConfigHostBindings {
   if (!configHostBindings) {
-    throw new Error(
+    throw new HostBindingsError(
       'Config host bindings have not been installed. Install host bindings before using @claude-code/config runtime APIs.',
     )
   }
@@ -24,4 +25,3 @@ export function getConfigHostBindings(): ConfigHostBindings {
 export function tryGetConfigHostBindings(): ConfigHostBindings {
   return configHostBindings ?? {}
 }
-

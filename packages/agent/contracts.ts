@@ -46,12 +46,17 @@ export type AgentHostBindings = {
   logEvent?: (event: string, metadata?: Record<string, number | boolean | string>) => void
   logError?: (err: unknown) => void
   logAntError?: (message: string, err: unknown) => void
+  getInMemoryErrors?: () => unknown[]
+  categorizeRetryableAPIError?: (error: unknown) => unknown
   headlessProfilerCheckpoint?: (name: string) => void
   queryCheckpoint?: (name: string) => void
 
   // ── Session state ────────────────────────────────────────────────────────────
   getProjectRoot?: () => string
+  getCwdState?: () => string
+  setCwdState?: (cwd: string) => void
   getSessionId?: () => string
+  getSdkBetas?: () => string[]
   getOriginalCwd?: () => string
   getIsNonInteractiveSession?: () => boolean
   isSessionPersistenceDisabled?: () => boolean
@@ -165,6 +170,53 @@ export type AgentHostBindings = {
   // ── Cache / context ────────────────────────────────────────────────────────────
   createCacheSafeParams?: (ctx: AgentREPLHookContext) => unknown
   saveCacheSafeParams?: (params: unknown) => void
+  registerStructuredOutputEnforcement?: (
+    setAppState: (f: (prev: unknown) => unknown) => void,
+    sessionId: string,
+  ) => void
+  getMainLoopModel?: () => string
+  parseUserSpecifiedModel?: (model: string) => string
+  loadAllPluginsCacheOnly?: () => Promise<{
+    enabled: unknown[]
+    [key: string]: unknown
+  }>
+  processUserInput?: (params: unknown) => Promise<{
+    messages: AgentMessage[]
+    shouldQuery: boolean
+    allowedTools: unknown
+    model?: string
+    resultText?: string
+    [key: string]: unknown
+  }>
+  fetchSystemPromptParts?: (params: unknown) => Promise<{
+    defaultSystemPrompt: string[]
+    userContext: Record<string, string>
+    systemContext: Record<string, string>
+  }>
+  shouldEnableThinkingByDefault?: () => boolean | undefined
+  buildSystemInitMessage?: (params: unknown) => unknown
+  sdkCompatToolName?: (toolName: string) => string
+  handleOrphanedPermission?: (
+    orphanedPermission: unknown,
+    tools: unknown[],
+    messages: AgentMessage[],
+    context: unknown,
+  ) => AsyncGenerator<unknown>
+  isResultSuccessful?: (
+    result: AgentMessage | undefined,
+    lastStopReason: string | null,
+  ) => boolean
+  normalizeMessage?: (message: AgentMessage) => AsyncGenerator<unknown>
+  selectableUserMessagesFilter?: (message: AgentMessage) => boolean
+  getCoordinatorUserContext?: (
+    mcpClients: ReadonlyArray<{ name: string }>,
+    scratchpadDir?: string,
+  ) => Record<string, string>
+  isSnipBoundaryMessage?: (message: AgentMessage) => boolean
+  snipCompactIfNeeded?: (
+    messages: AgentMessage[],
+    options?: { force?: boolean },
+  ) => { messages: AgentMessage[]; executed: boolean } | undefined
 
   // ── Session storage / debug capture ─────────────────────────────────────────
   recordTranscript?: (
@@ -196,6 +248,27 @@ export type AgentHostBindings = {
   getCurrentTurnTokenBudget?: () => number
   getTurnOutputTokens?: () => number
   incrementBudgetContinuationCount?: () => void
+  microcompactMessages?: (
+    messages: AgentMessage[],
+    toolUseContext?: AgentToolUseContext,
+    querySource?: AgentQuerySource,
+  ) => Promise<{ messages: AgentMessage[]; [key: string]: unknown }>
+  autoCompactIfNeeded?: (
+    messages: AgentMessage[],
+    toolUseContext: AgentToolUseContext,
+    cacheSafeParams: unknown,
+    querySource?: AgentQuerySource,
+    tracking?: unknown,
+    snipTokensFreed?: number,
+  ) => Promise<{
+    wasCompacted: boolean
+    compactionResult?: unknown
+    consecutiveFailures?: number
+  }>
+  getTotalAPIDuration?: () => number
+  getTotalCost?: () => number
+  getModelUsage?: () => Record<string, unknown>
+  getFastModeState?: (model: string, fastMode?: boolean) => unknown
   notifyCommandLifecycle?: (
     uuid: string,
     state: 'started' | 'completed',

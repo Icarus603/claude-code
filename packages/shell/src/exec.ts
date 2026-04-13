@@ -26,6 +26,7 @@ import {
   wrapSpawn,
 } from './shellCommand.js'
 import { createProviderResolver } from './shellDiscovery.js'
+import { ExecError } from './errors.js'
 
 export type { ExecResult } from './types.js'
 export type { ExecOptions } from './types.js'
@@ -372,7 +373,7 @@ export function setCwd(
     physicalPath = realpathSync(resolved)
   } catch (e) {
     if (isENOENT(e)) {
-      throw new Error(`Path "${resolved}" does not exist`)
+      throw new ExecError(`Path "${resolved}" does not exist`)
     }
     throw e
   }

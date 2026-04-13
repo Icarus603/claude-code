@@ -1,3 +1,5 @@
+import { ConfigurationError } from '../errors.js'
+
 function getModelFamily(model: string): 'haiku' | 'sonnet' | 'opus' | null {
   if (/haiku/i.test(model)) return 'haiku'
   if (/opus/i.test(model)) return 'opus'
@@ -31,7 +33,7 @@ export function resolveGeminiModel(anthropicModel: string): string {
     return resolvedModel
   }
 
-  throw new Error(
+  throw new ConfigurationError(
     `Gemini provider requires GEMINI_MODEL or ${geminiEnvVar} (or ${sharedEnvVar} for backward compatibility) to be configured.`,
   )
 }

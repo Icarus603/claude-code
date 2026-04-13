@@ -23,6 +23,7 @@
 
 import { readFileSync as fsReadFileSync } from 'node:fs'
 import { join } from 'path'
+import { HostBindingsError } from '../errors.js'
 import { getConfigHostBindings } from '../host.js'
 import { resetSettingsCache } from '../settings/settingsCache.js'
 import type { SettingsJson } from '../settings/types.js'
@@ -54,7 +55,11 @@ export function setEligibility(v: boolean): boolean {
 
 export function getSettingsPath(): string {
   const homeDir = getConfigHostBindings().getConfigHomeDir?.()
-  if (!homeDir) throw new Error('Config host binding getConfigHomeDir not installed')
+  if (!homeDir) {
+    throw new HostBindingsError(
+      'Config host binding getConfigHomeDir not installed',
+    )
+  }
   return join(homeDir, SETTINGS_FILENAME)
 }
 

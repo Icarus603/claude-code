@@ -18,3 +18,9 @@ export class InvalidInputError extends ToolBaseError {
 export class ExecutionError extends ToolBaseError {
   constructor(message: string, options?: ErrorOptions) { super('TOOL_EXECUTION_ERROR', message, options); this.name = 'ToolExecutionError' }
 }
+export class HostBindingsError extends ToolBaseError {
+  constructor(message: string, options?: ErrorOptions) {
+    super('TOOL_HOST_BINDINGS_ERROR', message, options)
+    this.name = 'ToolHostBindingsError'
+  }
+}

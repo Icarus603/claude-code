@@ -21,6 +21,8 @@
     "./autoDreamConfig": "./src/autoDreamConfig.ts",
     "./consolidationLock": "./src/consolidationLock.ts",
     "./consolidationPrompt": "./src/consolidationPrompt.ts",
-    "./teamMemorySync": "./src/teamMemorySync.ts"
+    "./teamMemorySync": "./src/teamMemorySync.ts",
+    "./errors": "./src/errors.ts",
+    "./testing": "./testing/index.ts"
   }
 }

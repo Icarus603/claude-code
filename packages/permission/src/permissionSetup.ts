@@ -1,6 +1,7 @@
 import { feature } from 'bun:bundle'
 import { relative } from 'path'
 import { getPermissionHostBindings } from './host.js'
+import { ContextError } from './errors.js'
 const _b = () => getPermissionHostBindings() as any
 function getOriginalCwd(): string { return _b().getOriginalCwd?.() ?? process.cwd() }
 function handleAutoModeTransition(mode: unknown): void { _b().handleAutoModeTransition?.(mode) }
@@ -623,7 +624,7 @@ export function transitionPermissionMode(
 
     if (toUsesClassifier && !fromUsesClassifier) {
       if (!isAutoModeGateEnabled()) {
-        throw new Error('Cannot transition to auto mode: gate is not enabled')
+        throw new ContextError('Cannot transition to auto mode: gate is not enabled')
       }
       autoModeStateModule?.setAutoModeActive(true)
       context = stripDangerousPermissionsForAutoMode(context)

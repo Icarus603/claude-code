@@ -2,6 +2,7 @@ import { feature } from 'bun:bundle'
 import { APIUserAbortError } from '@anthropic-ai/sdk'
 import { SETTING_SOURCES, getSettingSourceDisplayNameLowercase } from '@claude-code/config'
 import { getPermissionHostBindings } from './host.js'
+import { AbortError, ContextError } from './errors.js'
 
 // V7 §11.4 — inlined types, constants, utilities
 type CanUseToolFn = (...args: unknown[]) => unknown
@@ -12,7 +13,6 @@ const AGENT_TOOL_NAME = 'Agent'; const BASH_TOOL_NAME = 'Bash'
 const POWERSHELL_TOOL_NAME = 'PowerShell'; const REPL_TOOL_NAME = 'REPL'
 function plural(n: number, word: string, pluralWord = word + 's'): string { return n === 1 ? word : pluralWord }
 function toError(e: unknown): Error { return e instanceof Error ? e : new Error(String(e)) }
-class AbortError extends Error { constructor(msg?: string) { super(msg); this.name = 'AbortError' } }
 function mcpInfoFromString(s: string): { serverName: string; toolName: string | undefined } | null {
   const parts = s.split('__'); const [mcp, server, ...rest] = parts
   if (mcp !== 'mcp' || !server) return null
@@ -1322,7 +1322,7 @@ export async function deletePermissionRule({
     rule.source === 'flagSettings' ||
     rule.source === 'command'
   ) {
-    throw new Error('Cannot delete permission rules from read-only settings')
+    throw new ContextError('Cannot delete permission rules from read-only settings')
   }
 
   const updatedContext = applyPermissionUpdate(initialContext, {

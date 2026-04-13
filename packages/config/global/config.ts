@@ -4,6 +4,7 @@ import { unwatchFile, watchFile } from 'fs'
 import memoize from 'lodash-es/memoize.js'
 import pickBy from 'lodash-es/pickBy.js'
 import { basename, dirname, join, resolve } from 'path'
+import { AccessError, ParseError as ConfigParseError } from '../errors.js'
 // V7 §7 — bootstrap state accessed via host bindings
 // V7 §8.6 — logEvent via host binding
 // V7 §11.4 — type-only imports inlined to avoid cross-layer deps.
@@ -23,16 +24,6 @@ function isEnvTruthy(envVar: string | boolean | undefined): boolean {
 function getErrnoCode(e: unknown): string | undefined {
   if (e && typeof e === 'object' && 'code' in e && typeof e.code === 'string') return e.code
   return undefined
-}
-class ConfigParseError extends Error {
-  filePath: string
-  defaultConfig: unknown
-  constructor(message: string, filePath: string, defaultConfig: unknown) {
-    super(message)
-    this.name = 'ConfigParseError'
-    this.filePath = filePath
-    this.defaultConfig = defaultConfig
-  }
 }
 // V7 — writeFileSyncAndFlush + getFsImplementation via host bindings
 // (MUST NOT use raw node:fs — virtual fs layer is load-bearing for sandbox)
@@ -1475,7 +1466,7 @@ function getConfig<A>(
 ): A {
   // Log a warning if config is accessed before it's allowed
   if (!configReadingAllowed && process.env.NODE_ENV !== 'test') {
-    throw new Error('Config accessed before allowed.')
+    throw new AccessError('Config accessed before allowed.')
   }
 
   const fs = _fs()

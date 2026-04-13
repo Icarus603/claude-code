@@ -9,6 +9,7 @@ import { logForDebugging } from './_deps.js'
 import { createBashShellProvider } from './providers/bashProvider.js'
 import { getCachedPowerShellPath } from './providers/powershellDetection.js'
 import { createPowerShellProvider } from './providers/powershellProvider.js'
+import { ExecError } from './errors.js'
 import type { ShellConfig, ShellProvider, ShellType } from './types.js'
 
 
@@ -88,7 +89,7 @@ export async function findSuitableShell(
   const shellPath = supportedShells.find(shell => shell && isExecutable(shell))
 
   if (!shellPath) {
-    throw new Error(
+    throw new ExecError(
       'No suitable shell found. Claude CLI requires a Posix shell environment. ' +
         'Please ensure you have a valid shell installed and the SHELL environment variable set.',
     )
@@ -126,7 +127,7 @@ export function createPsProviderFactory(
   return memoize(async (): Promise<ShellProvider> => {
     const psPath = await getCachedPowerShellPath()
     if (!psPath) {
-      throw new Error('PowerShell is not available')
+      throw new ExecError('PowerShell is not available')
     }
     return createPowerShellProvider(psPath, ctx)
   })

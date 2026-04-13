@@ -25,7 +25,6 @@ import {
 } from './consolidationLock.js'
 import type {
   MemREPLContext,
-  MemSetAppState,
 } from './internalTypes.js'
 
 // Tool name constants — inlined to avoid importing from app-compat
@@ -175,11 +174,8 @@ export function initAutoDream(): void {
       sessions_since: sessionIds.length,
     })
 
-    const setAppState =
-      (context.toolUseContext.setAppStateForTasks ??
-        context.toolUseContext.setAppState) as MemSetAppState
     const abortController = new AbortController()
-    const taskId = bindings.registerDreamTask?.(setAppState, {
+    const taskId = bindings.registerDreamTask?.(context.toolUseContext, {
       sessionsReviewing: sessionIds.length,
       priorMtime,
       abortController,
@@ -205,14 +201,14 @@ ${sessionIds.map(id => `- ${id}`).join('\n')}`
         forkLabel: 'auto_dream',
         skipTranscript: true,
         overrides: { abortController },
-        onMessage: makeDreamProgressWatcher(taskId, setAppState),
+        onMessage: makeDreamProgressWatcher(taskId, context.toolUseContext),
       })
 
       if (!result) return
 
-      bindings.completeDreamTask?.(taskId, setAppState)
+      bindings.completeDreamTask?.(taskId, context.toolUseContext)
       // Inline completion summary in the main transcript
-      const dreamState = context.toolUseContext.getAppState().tasks?.[taskId]
+      const dreamState = bindings.getDreamTaskState?.(taskId, context.toolUseContext)
       if (
         appendSystemMessage &&
         bindings.isDreamTask?.(dreamState) &&
@@ -242,7 +238,7 @@ ${sessionIds.map(id => `- ${id}`).join('\n')}`
       }
       bindings.logDebug?.(`[autoDream] fork failed: ${(e as Error).message}`)
       bindings.logEvent?.('tengu_auto_dream_failed', {})
-      bindings.failDreamTask?.(taskId, setAppState)
+      bindings.failDreamTask?.(taskId, context.toolUseContext)
       // Rewind mtime so time-gate passes again. Scan throttle is the backoff.
       await rollbackConsolidationLock(priorMtime)
     }
@@ -257,7 +253,7 @@ ${sessionIds.map(id => `- ${id}`).join('\n')}`
  */
 function makeDreamProgressWatcher(
   taskId: string,
-  setAppState: MemSetAppState,
+  toolUseContext: MemREPLContext['toolUseContext'],
 ): (msg: unknown) => void {
   const bindings = getMemoryHostBindings()
   return msg => {
@@ -287,7 +283,7 @@ function makeDreamProgressWatcher(
       taskId,
       { text: text.trim(), toolUseCount },
       touchedPaths,
-      setAppState,
+      toolUseContext,
     )
   }
 }

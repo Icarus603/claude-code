@@ -86,6 +86,20 @@ export function getMergedTools(
   return [...getTools(permissionContext), ...mcpTools]
 }
 
+export function toolMatchesName(
+  tool: Pick<ToolLike, 'name' | 'aliases'>,
+  name: string,
+): boolean {
+  return tool.name === name || (tool.aliases?.includes(name) ?? false)
+}
+
+export function findToolByName<TTool extends ToolLike>(
+  tools: readonly TTool[],
+  name: string,
+): TTool | undefined {
+  return tools.find(tool => toolMatchesName(tool, name))
+}
+
 export function __resetToolRegistryForTests(): void {
   registrySingleton = null
 }

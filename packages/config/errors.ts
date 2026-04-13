@@ -34,3 +34,34 @@ export class PermissionDeniedError extends ConfigBaseError {
     this.name = 'ConfigPermissionDeniedError'
   }
 }
+
+export class AccessError extends ConfigBaseError {
+  constructor(message: string, options?: ErrorOptions) {
+    super('CONFIG_ACCESS_ERROR', message, options)
+    this.name = 'ConfigAccessError'
+  }
+}
+
+export class HostBindingsError extends ConfigBaseError {
+  constructor(message: string, options?: ErrorOptions) {
+    super('CONFIG_HOST_BINDINGS_ERROR', message, options)
+    this.name = 'ConfigHostBindingsError'
+  }
+}
+
+export class ParseError extends ConfigBaseError {
+  readonly filePath: string
+  readonly defaultConfig: unknown
+
+  constructor(
+    message: string,
+    filePath: string,
+    defaultConfig: unknown,
+    options?: ErrorOptions,
+  ) {
+    super('CONFIG_PARSE_ERROR', message, options)
+    this.name = 'ConfigParseError'
+    this.filePath = filePath
+    this.defaultConfig = defaultConfig
+  }
+}

@@ -1,4 +1,8 @@
-export type { MemoryHostBindings } from './contracts.js'
+export type {
+  MemFsImplementation,
+  MemoryFileHeader,
+  MemoryHostBindings,
+} from './contracts.js'
 export { getMemoryHostBindings, installMemoryHostBindings } from './host.js'
 
 export * from './memdir.js'
@@ -15,3 +19,4 @@ export * from './consolidationLock.js'
 export * from './consolidationPrompt.js'
 export * from './teamMemorySync.js'
 export * from './agentMemory.js'
+export * from './errors.js'

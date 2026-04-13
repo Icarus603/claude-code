@@ -70,19 +70,11 @@ export type MemCanUseTool = (
 
 // ── REPL hook context ─────────────────────────────────────────────────────────
 
-/** Structural slice of AppState needed by memory package */
-export type MemAppState = {
-  tasks?: Record<string, unknown>
-  [key: string]: unknown
-}
-
 /** Structural slice of ToolUseContext needed by memory package */
 export type MemToolUseContext = {
   agentId?: string
-  setAppState: (f: (prev: MemAppState) => MemAppState) => void
-  setAppStateForTasks?: (f: (prev: MemAppState) => MemAppState) => void
-  getAppState: () => MemAppState
   appendSystemMessage?: (msg: MemSystemMessage) => void
+  [key: string]: unknown
 }
 
 /** Structural equivalent of REPLHookContext for memory package usage */
@@ -90,7 +82,3 @@ export type MemREPLContext = {
   messages: MemMessage[]
   toolUseContext: MemToolUseContext
 }
-
-// ── SetAppState ───────────────────────────────────────────────────────────────
-
-export type MemSetAppState = (f: (prev: MemAppState) => MemAppState) => void

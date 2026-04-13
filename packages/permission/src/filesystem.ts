@@ -8,6 +8,7 @@ import type { z } from 'zod/v4'
 import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { SETTING_SOURCES, getSettingsFilePathForSource, getSettingsRootPathForSource } from '@claude-code/config'
 import { getPermissionHostBindings } from './host.js'
+import { ContextError } from './errors.js'
 
 // V7 §11.4 — inlined constants + types + host binding wrappers
 const FILE_EDIT_TOOL_NAME = 'Edit'
@@ -393,7 +394,7 @@ export function getScratchpadDir(): string {
  */
 export async function ensureScratchpadDir(signal?: AbortSignal): Promise<string> {
   if (!isScratchpadEnabled()) {
-    throw new Error('Scratchpad directory feature is not enabled')
+    throw new ContextError('Scratchpad directory feature is not enabled')
   }
 
   const fs = getFsImplementation()
