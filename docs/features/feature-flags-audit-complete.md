@@ -33,7 +33,7 @@ Claude Code 使用三層門控系統:
 | 分類 | 數量 | 標誌名稱 |
 |------|------|----------|
 | COMPLETE | 22 | BRIDGE_MODE, COORDINATOR_MODE, CONTEXT_COLLAPSE, VOICE_MODE, TEAMMEM, COMMIT_ATTRIBUTION, ULTRAPLAN, BASH_CLASSIFIER, TRANSCRIPT_CLASSIFIER, EXTRACT_MEMORIES, CACHED_MICROCOMPACT, TOKEN_BUDGET, AGENT_TRIGGERS, REACTIVE_COMPACT, KAIROS_BRIEF, CCR_REMOTE_SETUP, SHOT_STATS, BG_SESSIONS, PROACTIVE, CHICAGO_MCP, VERIFICATION_AGENT, PROMPT_CACHE_BREAK_DETECTION |
-| PARTIAL | 19 | KAIROS, BUDDY, MONITOR_TOOL, HISTORY_SNIP, WORKFLOW_SCRIPTS, UDS_INBOX, KAIROS_CHANNELS, FORK_SUBAGENT, EXPERIMENTAL_SKILL_SEARCH, WEB_BROWSER_TOOL, MCP_SKILLS, REVIEW_ARTIFACT, KAIROS_GITHUB_WEBHOOKS, CONNECTOR_TEXT, TEMPLATES, LODESTONE, HISTORY_PICKER, MESSAGE_ACTIONS, TERMINAL_PANEL |
+| PARTIAL | 18 | KAIROS, MONITOR_TOOL, HISTORY_SNIP, WORKFLOW_SCRIPTS, UDS_INBOX, KAIROS_CHANNELS, FORK_SUBAGENT, EXPERIMENTAL_SKILL_SEARCH, WEB_BROWSER_TOOL, MCP_SKILLS, REVIEW_ARTIFACT, KAIROS_GITHUB_WEBHOOKS, CONNECTOR_TEXT, TEMPLATES, LODESTONE, HISTORY_PICKER, MESSAGE_ACTIONS, TERMINAL_PANEL |
 | STUB | 51 | TORCH, KAIROS_DREAM, KAIROS_PUSH_NOTIFICATION, DAEMON, DIRECT_CONNECT, SSH_REMOTE, STREAMLINED_OUTPUT, ANTI_DISTILLATION_CC, NATIVE_CLIENT_ATTESTATION, ABLATION_BASELINE, AGENT_MEMORY_SNAPSHOT, AGENT_TRIGGERS_REMOTE, ALLOW_TEST_VERSIONS, AUTO_THEME, AWAY_SUMMARY, BREAK_CACHE_COMMAND, BUILDING_CLAUDE_APPS, BUILTIN_EXPLORE_PLAN_AGENTS, BYOC_ENVIRONMENT_RUNNER, CCR_AUTO_CONNECT, CCR_MIRROR, COMPACTION_REMINDERS, COWORKER_TYPE_TELEMETRY, DOWNLOAD_USER_SETTINGS, DUMP_SYSTEM_PROMPT, ENHANCED_TELEMETRY_BETA, FILE_PERSISTENCE, HARD_FAIL, HOOK_PROMPTS, IS_LIBC_GLIBC, IS_LIBC_MUSL, MCP_RICH_OUTPUT, MEMORY_SHAPE_TELEMETRY, NATIVE_CLIPBOARD_IMAGE, NEW_INIT, OVERFLOW_TEST_TOOL, PERFETTO_TRACING, POWERSHELL_AUTO_MODE, QUICK_SEARCH, RUN_SKILL_GENERATOR, SELF_HOSTED_RUNNER, SKILL_IMPROVEMENT, SLOW_OPERATION_LOGGING, TREE_SITTER_BASH, TREE_SITTER_BASH_SHADOW, ULTRATHINK, UNATTENDED_RETRY, UPLOAD_USER_SETTINGS, SKIP_DETECTION_WHEN_AUTOUPDATES_DISABLED |
 
 ---
@@ -56,7 +56,6 @@ Claude Code 使用三層門控系統:
 | VERIFICATION_AGENT | **ON** | **ON** | compile+GB gate, 已驗證 | 本輪新增，對抗性驗證代理 |
 | KAIROS_BRIEF | **ON** | **ON** | compile+GB gate, 已驗證 | 本輪新增，Brief 精簡模式 |
 | AWAY_SUMMARY | **ON** | **ON** | compile+GB gate, 已驗證 | 本輪新增，離開摘要 |
-| BUDDY | off | **ON** | compile+GrowthBook | 僅 dev 模式 |
 | TRANSCRIPT_CLASSIFIER | off | **ON** | compile+GrowthBook | 僅 dev 模式 |
 | BRIDGE_MODE | off | **ON** | compile+remote | 僅 dev 模式，需 claude.ai 訂閱 |
 
@@ -881,42 +880,6 @@ src/utils/swarm/ 目錄（22 個文件）:
 - src/commands/assistant/gate.ts — 完全缺失
 
 **啓用所需修復**: 需要建立 `src/commands/assistant/` 目錄及其 `index.ts` 和 `gate.ts` 文件。
-
----
-
-## 24. BUDDY `[dev: ON]`
-
-**編譯時引用次數**: 18（單引號 16 + 雙引號 2）
-**功能描述**: 夥伴精靈功能。在 CLI 中顯示一個可愛的像素精靈角色作爲 AI 助手的化身，有動畫、表情、通知等。
-**分類**: PARTIAL
-**缺失原因**: `src/commands/buddy/index.ts` 命令入口文件缺失，但 `src/buddy/` 目錄下有完整的 1,298 行實現程式碼
-
-**核心實現文件（src/buddy/ 目錄，共 1,298 行）**:
-
-| 檔案路徑 | 行數 | 功能說明 |
-|----------|------|----------|
-| src/buddy/sprites.ts | 514 行 | 精靈圖形定義 |
-| src/buddy/CompanionSprite.tsx | 370 行 | 精靈 React 組件 |
-| src/buddy/types.ts | 148 行 | 類型定義 |
-| src/buddy/companion.ts | 133 行 | 夥伴核心邏輯 |
-| src/buddy/useBuddyNotification.tsx | 97 行 | 夥伴通知 Hook |
-| src/buddy/prompt.ts | 36 行 | 夥伴提示詞 |
-
-**引用該標誌的文件（8 個）**:
-1. src/buddy/CompanionSprite.tsx — 精靈組件
-2. src/buddy/prompt.ts — 提示詞
-3. src/buddy/useBuddyNotification.tsx — 通知
-4. src/commands.ts — 條件註冊 `/buddy` 命令（引用 `commands/buddy/index.js`）
-5. src/components/PromptInput/PromptInput.tsx — 提示輸入
-6. src/screens/REPL.tsx — REPL 集成
-7. src/utils/attachments.ts — 附件
-
-**缺失文件**:
-- src/commands/buddy/index.ts — 命令入口缺失
-
-**啓用所需修復**: 需要建立 `src/commands/buddy/index.ts` 命令入口文件。
-
----
 
 ## 25. MONITOR_TOOL
 
@@ -1863,7 +1826,6 @@ src/utils/swarm/ 目錄（22 個文件）:
 | WORKFLOW_SCRIPTS | commands/workflows/index.js | 整個 commands/workflows/ 目錄不存在 |
 | KAIROS_GITHUB_WEBHOOKS | commands/subscribe-pr.js | 文件完全不存在，無 .ts 版本 |
 | UDS_INBOX | commands/peers/index.js | 整個 commands/peers/ 目錄不存在 |
-| BUDDY | commands/buddy/index.js | 整個 commands/buddy/ 目錄不存在（但 src/buddy/ 有 1,298 行實現） |
 
 以下是源程式碼中通過條件 require 引用但內容爲空殼（1-5 行）的文件：
 
@@ -1909,7 +1871,6 @@ src/utils/swarm/ 目錄（22 個文件）:
 | 12 | KAIROS_CHANNELS | 21 | PARTIAL |
 | 13 | UDS_INBOX | 18 | PARTIAL |
 | 14 | CHICAGO_MCP | 16 | COMPLETE |
-| 15 | BUDDY | 18 | PARTIAL |
 | 16 | HISTORY_SNIP | 16 | PARTIAL |
 | 17 | MONITOR_TOOL | 13 | PARTIAL |
 | 18 | CACHED_MICROCOMPACT | 12 | COMPLETE |
@@ -1993,7 +1954,7 @@ src/utils/swarm/ 目錄（22 個文件）:
 | 分類 | 標誌數 | 總引用次數 | 專屬程式碼行數（估算） |
 |------|--------|------------|---------------------|
 | COMPLETE | 22 | 約 640 | 約 35,000 行 |
-| PARTIAL | 19 | 約 330 | 約 5,500 行 |
+| PARTIAL | 18 | 約 330 | 約 5,500 行 |
 | STUB | 51 | 約 95 | 約 2,000 行（主要是附帶的工具文件） |
 | **總計** | **92** | **約 1,065** | **約 42,500 行** |
 
@@ -2003,7 +1964,6 @@ src/utils/swarm/ 目錄（22 個文件）:
 3. SHOT_STATS: 2,722 行（統計系統）
 4. CONTEXT_COLLAPSE: 2,258 行（上下文分析）
 5. COMMIT_ATTRIBUTION: 1,354 行（提交歸屬）
-6. BUDDY: 1,298 行（夥伴精靈）
 7. VOICE_MODE: 1,410 行（語音模式）
 8. TEAMMEM: 1,026 行（團隊記憶）
 9. UDS_INBOX: 966 行（Unix 套接字訊息，但大部分是樁）

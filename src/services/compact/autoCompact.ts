@@ -5,6 +5,7 @@ import type { QuerySource } from '../../constants/querySource.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type { Message } from '../../types/message.js'
 import { getGlobalConfig } from '@claude-code/config'
+import { getInitialSettings } from '../../utils/settings/settings.js'
 import { getContextWindowForModel } from '../../utils/context.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'
@@ -315,7 +316,9 @@ export async function autoCompactIfNeeded(
       toolUseContext,
       cacheSafeParams,
       true, // Suppress user questions for autocompact
-      undefined, // No custom instructions for autocompact
+      getInitialSettings().language
+        ? `Always write this summary in ${getInitialSettings().language}. All section content must be in ${getInitialSettings().language}.`
+        : undefined, // language-aware custom instructions for autocompact
       true, // isAutoCompact
       recompactionInfo,
     )

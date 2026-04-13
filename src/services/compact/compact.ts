@@ -1301,9 +1301,7 @@ async function streamCompactSummary({
           ),
           context.options.tools,
         ),
-        systemPrompt: asSystemPrompt([
-          'You are a helpful AI assistant tasked with summarizing conversations.',
-        ]),
+        systemPrompt: cacheSafeParams.systemPrompt,
         thinkingConfig: { type: 'disabled' as const },
         tools,
         signal: context.abortController.signal,

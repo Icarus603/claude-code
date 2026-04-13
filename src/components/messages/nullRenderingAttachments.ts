@@ -32,7 +32,6 @@ const NULL_RENDERING_TYPES = [
   'context_efficiency',
   'deferred_tools_delta',
   'mcp_instructions_delta',
-  'companion_intro',
   'token_usage',
   'ultrathink_effort',
   'max_turns_reached',

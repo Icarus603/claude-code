@@ -14,7 +14,7 @@
 
 它最初來自公開的 Claude Code 社群分支演化，我們保留必要的來源說明與授權資訊，但後續 roadmap、重構方向與品質標準將以本倉庫為準。
 
-- ✅ V4：測試補強、Buddy、Auto Mode、Feature Flags
+- ✅ V4：測試補強、Auto Mode、Feature Flags
 - ✅ V5：Sentry / GrowthBook、自訂登入、OpenAI 相容、Web Search、Computer Use、Voice Mode、Bridge Mode
 - 🔮 V6：全面分包重構、模組邊界重整、建立獨立維護主線
 
@@ -59,7 +59,7 @@ bun run build
 所有功能旗標皆可透過 `FEATURE_<FLAG_NAME>=1` 環境變數啟用，例如：
 
 ```bash
-FEATURE_BUDDY=1 FEATURE_FORK_SUBAGENT=1 bun run dev
+FEATURE_FORK_SUBAGENT=1 FEATURE_TEMPLATES=1 bun run dev
 ```
 
 更完整的功能說明可參考 [`docs/features/`](docs/features/)。

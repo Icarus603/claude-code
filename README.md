@@ -14,7 +14,7 @@ This repository is maintained by **Icarus603** as an independent derivative line
 
 It originated from a public Claude Code community fork. We keep the necessary attribution and licensing context, but the roadmap, refactoring direction, and quality bar now belong to this repository.
 
-- V4: stronger tests, Buddy, Auto Mode, feature flags
+- V4: stronger tests, Auto Mode, feature flags
 - V5: Sentry / GrowthBook, custom login, OpenAI compatibility, Web Search, Computer Use, Voice Mode, Bridge Mode
 - V6: full modular packaging and large-scale architecture cleanup
 
@@ -59,7 +59,7 @@ Typical fields:
 Enable features with `FEATURE_<FLAG_NAME>=1`, for example:
 
 ```bash
-FEATURE_BUDDY=1 FEATURE_FORK_SUBAGENT=1 bun run dev
+FEATURE_FORK_SUBAGENT=1 FEATURE_TEMPLATES=1 bun run dev
 ```
 
 See [`docs/features/`](docs/features/) for details.
