@@ -159,6 +159,7 @@ export type AgentHostBindings = {
 
   // ── Features ────────────────────────────────────────────────────────────────────
   executePromptSuggestion?: (ctx: AgentREPLHookContext) => void
+  classifyJobState?: (jobDir: string, messages: AgentMessage[]) => Promise<void>
 
   // ── Computer use (CHICAGO_MCP) ────────────────────────────────────────────────
   cleanupComputerUseAfterTurn?: (toolUseContext: AgentToolUseContext) => Promise<void>
