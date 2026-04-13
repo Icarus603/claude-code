@@ -127,3 +127,13 @@ export function count<T>(arr: T[], pred: (item: T) => boolean): number {
   }
   return n
 }
+
+// ── System prompt utilities ───────────────────────────────────────────────────
+
+export type SystemPrompt = readonly string[] & {
+  readonly __brand: 'SystemPrompt'
+}
+
+export function asSystemPrompt(value: readonly string[]): SystemPrompt {
+  return value as SystemPrompt
+}

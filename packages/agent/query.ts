@@ -5,12 +5,6 @@ import type {
 } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { CanUseToolFn } from '@claude-code/app-compat/hooks/useCanUseTool.js'
 import { FallbackTriggeredError } from '@claude-code/app-compat/services/api/withRetry.js'
-import {
-  calculateTokenWarningState,
-  isAutoCompactEnabled,
-  type AutoCompactTrackingState,
-} from '@claude-code/app-compat/services/compact/autoCompact.js'
-import { buildPostCompactMessages } from '@claude-code/app-compat/services/compact/compact.js'
 /* eslint-disable @typescript-eslint/no-require-imports */
 const reactiveCompact = feature('REACTIVE_COMPACT')
   ? (require('@claude-code/app-compat/services/compact/reactiveCompact.js') as typeof import('@claude-code/app-compat/services/compact/reactiveCompact.js'))
@@ -19,14 +13,9 @@ const contextCollapse = feature('CONTEXT_COLLAPSE')
   ? (require('@claude-code/app-compat/services/contextCollapse/index.js') as typeof import('@claude-code/app-compat/services/contextCollapse/index.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
-import {
-  logEvent,
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from '@claude-code/app-compat/services/eventLogger.js'
 import { ImageSizeError } from '@claude-code/app-compat/utils/imageValidation.js'
 import { ImageResizeError } from '@claude-code/app-compat/utils/imageResizer.js'
 import { findToolByName, type ToolUseContext } from '@claude-code/app-compat/Tool.js'
-import { asSystemPrompt, type SystemPrompt } from '@claude-code/app-compat/utils/systemPromptType.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
@@ -37,21 +26,13 @@ import type {
   UserMessage,
   TombstoneMessage,
 } from '@claude-code/app-compat/types/message.js'
-import { logError } from '@claude-code/app-compat/utils/log.js'
 import {
   PROMPT_TOO_LONG_ERROR_MESSAGE,
   isPromptTooLongMessage,
 } from '@claude-code/app-compat/services/api/errors.js'
-import { logAntError, logForDebugging } from '@claude-code/app-compat/utils/debug.js'
 import {
-  createUserMessage,
-  createUserInterruptionMessage,
   normalizeMessagesForAPI,
-  createSystemMessage,
-  createAssistantAPIErrorMessage,
   getMessagesAfterCompactBoundary,
-  createToolUseSummaryMessage,
-  createMicrocompactBoundaryMessage,
   stripSignatureBlocks,
 } from '@claude-code/app-compat/utils/messages.js'
 import { generateToolUseSummary } from '@claude-code/app-compat/services/toolUseSummary/toolUseSummaryGenerator.js'
@@ -71,12 +52,10 @@ const jobClassifier = feature('TEMPLATES')
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 import {
-  remove as removeFromQueue,
   getCommandsByMaxPriority,
   isSlashCommand,
-} from '@claude-code/app-compat/utils/messageQueueManager.js'
-import { notifyCommandLifecycle } from '@claude-code/app-compat/utils/commandLifecycle.js'
-import { headlessProfilerCheckpoint } from '@claude-code/app-compat/utils/headlessProfiler.js'
+  remove as removeFromQueue,
+} from './internal/commandQueue.js'
 import {
   getRuntimeMainLoopModel,
   renderModelName,
@@ -86,35 +65,64 @@ import {
   finalContextTokensFromLastResponse,
   tokenCountWithEstimation,
 } from '@claude-code/app-compat/utils/tokens.js'
-import { ESCALATED_MAX_TOKENS } from '@claude-code/app-compat/utils/context.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import {
+  ESCALATED_MAX_TOKENS,
+  getContextWindowForModel,
+} from '@claude-code/app-compat/utils/context.js'
+import {
+  checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
+  getFeatureValue_CACHED_MAY_BE_STALE,
+} from '@claude-code/config/feature-flags'
+import { getGlobalConfig } from '@claude-code/config'
+import { getMaxOutputTokensForModel } from '@claude-code/provider/claudeLegacy'
 import { SLEEP_TOOL_NAME } from '@claude-code/app-compat/tools/SleepTool/prompt.js'
 import { executePostSamplingHooks } from '@claude-code/app-compat/utils/hooks/postSamplingHooks.js'
 import { executeStopFailureHooks } from '@claude-code/app-compat/utils/hooks.js'
 import type { QuerySource } from '@claude-code/app-compat/constants/querySource.js'
-import { createDumpPromptsFetch } from '@claude-code/app-compat/services/api/dumpPrompts.js'
 import { StreamingToolExecutor } from '@claude-code/app-compat/services/tools/StreamingToolExecutor.js'
 import { queryCheckpoint } from '@claude-code/app-compat/utils/queryProfiler.js'
 import { runTools } from '@claude-code/app-compat/services/tools/toolOrchestration.js'
 import { applyToolResultBudget } from '@claude-code/app-compat/utils/toolResultStorage.js'
-import { recordContentReplacement } from '@claude-code/app-compat/utils/sessionStorage.js'
+import {
+  buildPostCompactMessages,
+  calculateTokenWarningState as calculateTokenWarningStateCore,
+} from './compaction/index.js'
 import { handleStopHooks } from './hooks/index.js'
-import { buildQueryConfig } from '@claude-code/app-compat/query/config.js'
 import { productionDeps, type QueryDeps } from '@claude-code/app-compat/query/deps.js'
-import type { Terminal, Continue } from '@claude-code/app-compat/query/transitions.js'
 import { feature } from 'bun:bundle'
 import {
   getCurrentTurnTokenBudget,
+  getSdkBetas,
+  getSessionId,
   getTurnOutputTokens,
   incrementBudgetContinuationCount,
 } from '@claude-code/app-compat/bootstrap/state.js'
-import { createBudgetTracker, checkTokenBudget } from '@claude-code/app-compat/query/tokenBudget.js'
-import { count } from '@claude-code/app-compat/utils/array.js'
-import { createInitialQueryState, type QueryLoopState } from '@claude-code/app-compat/query/state.js'
 import {
-  isWithheldMaxOutputTokens,
-  yieldMissingToolResultBlocks,
-} from '@claude-code/app-compat/query/streaming.js'
+  createDumpPromptsFetch as createDumpPromptsFetchFromHost,
+  recordContentReplacement,
+} from './internal/runtimeBridges.js'
+import {
+  logAntError,
+  logError,
+  logEvent,
+  logForDebugging,
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+} from './internal/logging.js'
+import {
+  createAssistantAPIErrorMessage,
+  createMicrocompactBoundaryMessage,
+  createSystemMessage,
+  createToolUseSummaryMessage,
+  createUserInterruptionMessage,
+  createUserMessage,
+} from './internal/messageFactories.js'
+import {
+  headlessProfilerCheckpoint,
+  notifyCommandLifecycle,
+  queryCheckpoint,
+} from './internal/runtimeSignals.js'
+import { createBudgetTracker, checkTokenBudget } from './internal/tokenBudget.js'
+import { asSystemPrompt, count, isEnvTruthy, type SystemPrompt } from './internalUtils.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const snipModule = feature('HISTORY_SNIP')
@@ -139,6 +147,141 @@ const taskSummaryModule = feature('BG_SESSIONS')
  * rules, ye will be punished with an entire day of debugging and hair pulling.
  */
 const MAX_OUTPUT_TOKENS_RECOVERY_LIMIT = 3
+
+type QueryConfig = {
+  sessionId: string
+  gates: {
+    streamingToolExecution: boolean
+    emitToolUseSummaries: boolean
+    isAnt: boolean
+    fastModeEnabled: boolean
+  }
+}
+
+type AutoCompactTrackingState = {
+  compacted: boolean
+  turnCounter: number
+  turnId: string
+  consecutiveFailures?: number
+}
+
+function buildQueryConfig(): QueryConfig {
+  return {
+    sessionId: getSessionId(),
+    gates: {
+      streamingToolExecution: checkStatsigFeatureGate_CACHED_MAY_BE_STALE(
+        'tengu_streaming_tool_execution2',
+      ),
+      emitToolUseSummaries: isEnvTruthy(
+        process.env.CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES,
+      ),
+      isAnt: process.env.USER_TYPE === 'ant',
+      fastModeEnabled: !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_FAST_MODE),
+    },
+  }
+}
+
+function isAutoCompactEnabled(): boolean {
+  if (isEnvTruthy(process.env.DISABLE_COMPACT)) {
+    return false
+  }
+  if (isEnvTruthy(process.env.DISABLE_AUTO_COMPACT)) {
+    return false
+  }
+  return getGlobalConfig().autoCompactEnabled
+}
+
+function calculateTokenWarningState(tokenUsage: number, model: string) {
+  return calculateTokenWarningStateCore(
+    tokenUsage,
+    model,
+    {
+      getContextWindowSize: getContextWindowForModel,
+      getMaxOutputTokensForModel,
+      getSdkBetas,
+      getEnv: key => process.env[key],
+    },
+    isAutoCompactEnabled(),
+  )
+}
+
+type Continue = {
+  reason: string
+  [key: string]: unknown
+}
+
+type Terminal = {
+  reason: string
+  [key: string]: unknown
+}
+
+type QueryLoopState = {
+  messages: Message[]
+  toolUseContext: ToolUseContext
+  autoCompactTracking: AutoCompactTrackingState | undefined
+  maxOutputTokensRecoveryCount: number
+  hasAttemptedReactiveCompact: boolean
+  maxOutputTokensOverride: number | undefined
+  pendingToolUseSummary: Promise<ToolUseSummaryMessage | null> | undefined
+  stopHookActive: boolean | undefined
+  turnCount: number
+  transition: Continue | undefined
+}
+
+type State = QueryLoopState
+
+function createInitialQueryState(params: {
+  messages: Message[]
+  toolUseContext: ToolUseContext
+  maxOutputTokensOverride: number | undefined
+}): QueryLoopState {
+  return {
+    messages: params.messages,
+    toolUseContext: params.toolUseContext,
+    maxOutputTokensOverride: params.maxOutputTokensOverride,
+    autoCompactTracking: undefined,
+    stopHookActive: undefined,
+    maxOutputTokensRecoveryCount: 0,
+    hasAttemptedReactiveCompact: false,
+    turnCount: 1,
+    pendingToolUseSummary: undefined,
+    transition: undefined,
+  }
+}
+
+function* yieldMissingToolResultBlocks(
+  assistantMessages: AssistantMessage[],
+  errorMessage: string,
+) {
+  for (const assistantMessage of assistantMessages) {
+    const toolUseBlocks = (
+      Array.isArray(assistantMessage.message?.content)
+        ? assistantMessage.message.content
+        : []
+    ).filter((content: { type: string }) => content.type === 'tool_use') as ToolUseBlock[]
+
+    for (const toolUse of toolUseBlocks) {
+      yield createUserMessage({
+        content: [
+          {
+            type: 'tool_result',
+            content: errorMessage,
+            is_error: true,
+            tool_use_id: toolUse.id,
+          },
+        ],
+        toolUseResult: errorMessage,
+        sourceToolAssistantUUID: assistantMessage.uuid,
+      })
+    }
+  }
+}
+
+function isWithheldMaxOutputTokens(
+  msg: Message | StreamEvent | undefined,
+): msg is AssistantMessage {
+  return msg?.type === 'assistant' && msg.apiError === 'max_output_tokens'
+}
 
 /**
  * Is this a max_output_tokens error message? If so, the streaming loop should
@@ -535,7 +678,7 @@ async function* queryLoop(
     // Note: agentId is effectively constant during a query() call - it only changes
     // between queries (e.g., /clear command or session resume).
     const dumpPromptsFetch = config.gates.isAnt
-      ? createDumpPromptsFetch(toolUseContext.agentId ?? config.sessionId)
+      ? createDumpPromptsFetchFromHost(toolUseContext.agentId ?? config.sessionId)
       : undefined
 
     // Block if we've hit the hard blocking limit (only applies when auto-compact is OFF)
