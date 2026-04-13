@@ -1,22 +1,13 @@
 import memoize from 'lodash-es/memoize.js'
 import { homedir } from 'os'
 import { isAbsolute, join, normalize, sep } from 'path'
-import {
-  getIsNonInteractiveSession,
-  getProjectRoot,
-} from '@claude-code/app-compat/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import {
-  getClaudeConfigHomeDir,
-  isEnvDefinedFalsy,
-  isEnvTruthy,
-} from '@claude-code/app-compat/utils/envUtils.js'
-import { findCanonicalGitRoot } from '@claude-code/app-compat/utils/git.js'
-import { sanitizePath } from '@claude-code/app-compat/utils/path.js'
 import {
   getInitialSettings,
   getSettingsForSource,
-} from '@claude-code/app-compat/utils/settings/settings.js'
+} from '@claude-code/config/settings'
+import { isEnvDefinedFalsy, isEnvTruthy, sanitizePath } from './internalUtils.js'
+import { getMemoryHostBindings } from './host.js'
 
 export function isAutoMemoryEnabled(): boolean {
   const envVal = process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY
@@ -40,8 +31,9 @@ export function isExtractModeActive(): boolean {
   if (!getFeatureValue_CACHED_MAY_BE_STALE('tengu_passport_quail', false)) {
     return false
   }
+  const bindings = getMemoryHostBindings()
   return (
-    !getIsNonInteractiveSession() ||
+    !(bindings.getIsNonInteractiveSession?.() ?? false) ||
     getFeatureValue_CACHED_MAY_BE_STALE('tengu_slate_thimble', false)
   )
 }
@@ -50,7 +42,13 @@ export function getMemoryBaseDir(): string {
   if (process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR) {
     return process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR
   }
-  return getClaudeConfigHomeDir()
+  const bindings = getMemoryHostBindings()
+  return (
+    bindings.getConfigHomeDir?.() ??
+    (process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), '.claude')).normalize(
+      'NFC',
+    )
+  )
 }
 
 const AUTO_MEM_DIRNAME = 'memory'
@@ -108,7 +106,9 @@ export function hasAutoMemPathOverride(): boolean {
 }
 
 function getAutoMemBase(): string {
-  return findCanonicalGitRoot(getProjectRoot()) ?? getProjectRoot()
+  const bindings = getMemoryHostBindings()
+  const projectRoot = bindings.getProjectRoot?.() ?? process.cwd()
+  return bindings.findCanonicalGitRoot?.(projectRoot) ?? projectRoot
 }
 
 export const getAutoMemPath = memoize(
@@ -122,7 +122,7 @@ export const getAutoMemPath = memoize(
       join(projectsDir, sanitizePath(getAutoMemBase()), AUTO_MEM_DIRNAME) + sep
     ).normalize('NFC')
   },
-  () => getProjectRoot(),
+  () => getMemoryHostBindings().getProjectRoot?.(),
 )
 
 export function getAutoMemDailyLogPath(date: Date = new Date()): string {

@@ -1,14 +1,7 @@
 import { feature } from 'bun:bundle'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { errorMessage } from '@claude-code/app-compat/utils/errors.js'
-import { getDefaultSonnetModel } from '@claude-code/app-compat/utils/model/model.js'
-import { sideQuery } from '@claude-code/app-compat/utils/sideQuery.js'
-import { jsonParse } from '@claude-code/app-compat/utils/slowOperations.js'
-import {
-  formatMemoryManifest,
-  type MemoryHeader,
-  scanMemoryFiles,
-} from '@claude-code/app-compat/memdir/memoryScan.js'
+import { getMemoryHostBindings } from './host.js'
+import { errorMessage, jsonParse } from './internalUtils.js'
+import type { MemoryFileHeader } from './contracts.js'
 
 export type RelevantMemory = {
   path: string
@@ -43,7 +36,9 @@ export async function findRelevantMemories(
   recentTools: readonly string[] = [],
   alreadySurfaced: ReadonlySet<string> = new Set(),
 ): Promise<RelevantMemory[]> {
-  const memories = (await scanMemoryFiles(memoryDir, signal)).filter(
+  const bindings = getMemoryHostBindings()
+  const allMemories = await (bindings.scanMemoryFiles?.(memoryDir, signal) ?? Promise.resolve([]))
+  const memories = allMemories.filter(
     m => !alreadySurfaced.has(m.filePath),
   )
   if (memories.length === 0) {
@@ -59,16 +54,12 @@ export async function findRelevantMemories(
   const byFilename = new Map(memories.map(m => [m.filename, m]))
   const selected = selectedFilenames
     .map(filename => byFilename.get(filename))
-    .filter((m): m is MemoryHeader => m !== undefined)
+    .filter((m): m is MemoryFileHeader => m !== undefined)
 
   // Fires even on empty selection: selection-rate needs the denominator,
   // and -1 ages distinguish "ran, picked nothing" from "never ran".
   if (feature('MEMORY_SHAPE_TELEMETRY')) {
-    /* eslint-disable @typescript-eslint/no-require-imports */
-    const { logMemoryRecallShape } =
-      require('@claude-code/app-compat/memdir/memoryShapeTelemetry.js') as typeof import('@claude-code/app-compat/memdir/memoryShapeTelemetry.js')
-    /* eslint-enable @typescript-eslint/no-require-imports */
-    logMemoryRecallShape(memories, selected)
+    bindings.reportMemoryShapeTelemetry?.(memories, selected)
   }
 
   return selected.map(m => ({ path: m.filePath, mtimeMs: m.mtimeMs }))
@@ -76,27 +67,23 @@ export async function findRelevantMemories(
 
 async function selectRelevantMemories(
   query: string,
-  memories: MemoryHeader[],
+  memories: MemoryFileHeader[],
   signal: AbortSignal,
   recentTools: readonly string[],
 ): Promise<string[]> {
+  const bindings = getMemoryHostBindings()
   const validFilenames = new Set(memories.map(m => m.filename))
 
-  const manifest = formatMemoryManifest(memories)
+  const manifest = bindings.formatMemoryManifest?.(memories) ?? ''
 
-  // When Claude Code is actively using a tool (e.g. mcp__X__spawn),
-  // surfacing that tool's reference docs is noise — the conversation
-  // already contains working usage.  The selector otherwise matches
-  // on keyword overlap ("spawn" in query + "spawn" in a memory
-  // description → false positive).
   const toolsSection =
     recentTools.length > 0
       ? `\n\nRecently used tools: ${recentTools.join(', ')}`
       : ''
 
   try {
-    const result = await sideQuery({
-      model: getDefaultSonnetModel(),
+    const result = await bindings.sideQuery?.({
+      model: bindings.getDefaultSonnetModel?.() ?? 'claude-sonnet-4-5',
       system: SELECT_MEMORIES_SYSTEM_PROMPT,
       skipSystemPromptPrefix: true,
       messages: [
@@ -121,18 +108,19 @@ async function selectRelevantMemories(
       querySource: 'memdir_relevance',
     })
 
+    if (!result) return []
     const textBlock = result.content.find(block => block.type === 'text')
     if (!textBlock || textBlock.type !== 'text') {
       return []
     }
 
-    const parsed: { selected_memories: string[] } = jsonParse(textBlock.text)
+    const parsed: { selected_memories: string[] } = jsonParse(textBlock.text ?? '')
     return parsed.selected_memories.filter(f => validFilenames.has(f))
   } catch (e) {
     if (signal.aborted) {
       return []
     }
-    logForDebugging(
+    bindings.logDebug?.(
       `[memdir] selectRelevantMemories failed: ${errorMessage(e)}`,
       { level: 'warn' },
     )

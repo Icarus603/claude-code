@@ -1,13 +1,11 @@
 import { join, normalize, sep } from 'path'
-import { getProjectRoot } from '@claude-code/app-compat/bootstrap/state.js'
 import {
   buildMemoryPrompt,
   ensureMemoryDirExists,
 } from './memdir.js'
 import { getMemoryBaseDir } from './paths.js'
-import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
-import { findCanonicalGitRoot } from '@claude-code/app-compat/utils/git.js'
-import { sanitizePath } from '@claude-code/app-compat/utils/path.js'
+import { getMemoryHostBindings } from './host.js'
+import { sanitizePath } from './internalUtils.js'
 
 // Persistent agent memory scope: 'user' (~/.claude/agent-memory/), 'project' (.claude/agent-memory/), or 'local' (.claude/agent-memory-local/)
 export type AgentMemoryScope = 'user' | 'project' | 'local'
@@ -27,20 +25,23 @@ function sanitizeAgentTypeForPath(agentType: string): string {
  * Otherwise, uses <cwd>/.claude/agent-memory-local/<agentType>/.
  */
 function getLocalAgentMemoryDir(dirName: string): string {
+  const bindings = getMemoryHostBindings()
   if (process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR) {
+    const projectRoot = bindings.getProjectRoot?.() ?? process.cwd()
     return (
       join(
         process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR,
         'projects',
         sanitizePath(
-          findCanonicalGitRoot(getProjectRoot()) ?? getProjectRoot(),
+          bindings.findCanonicalGitRoot?.(projectRoot) ?? projectRoot,
         ),
         'agent-memory-local',
         dirName,
       ) + sep
     )
   }
-  return join(getCwd(), '.claude', 'agent-memory-local', dirName) + sep
+  const cwd = bindings.getCwd?.() ?? process.cwd()
+  return join(cwd, '.claude', 'agent-memory-local', dirName) + sep
 }
 
 /**
@@ -54,9 +55,12 @@ export function getAgentMemoryDir(
   scope: AgentMemoryScope,
 ): string {
   const dirName = sanitizeAgentTypeForPath(agentType)
+  const bindings = getMemoryHostBindings()
   switch (scope) {
-    case 'project':
-      return join(getCwd(), '.claude', 'agent-memory', dirName) + sep
+    case 'project': {
+      const cwd = bindings.getCwd?.() ?? process.cwd()
+      return join(cwd, '.claude', 'agent-memory', dirName) + sep
+    }
     case 'local':
       return getLocalAgentMemoryDir(dirName)
     case 'user':
@@ -69,6 +73,8 @@ export function isAgentMemoryPath(absolutePath: string): boolean {
   // SECURITY: Normalize to prevent path traversal bypasses via .. segments
   const normalizedPath = normalize(absolutePath)
   const memoryBase = getMemoryBaseDir()
+  const bindings = getMemoryHostBindings()
+  const cwd = bindings.getCwd?.() ?? process.cwd()
 
   // User scope: check memory base (may be custom dir or config home)
   if (normalizedPath.startsWith(join(memoryBase, 'agent-memory') + sep)) {
@@ -77,7 +83,7 @@ export function isAgentMemoryPath(absolutePath: string): boolean {
 
   // Project scope: always cwd-based (not redirected)
   if (
-    normalizedPath.startsWith(join(getCwd(), '.claude', 'agent-memory') + sep)
+    normalizedPath.startsWith(join(cwd, '.claude', 'agent-memory') + sep)
   ) {
     return true
   }
@@ -94,7 +100,7 @@ export function isAgentMemoryPath(absolutePath: string): boolean {
     }
   } else if (
     normalizedPath.startsWith(
-      join(getCwd(), '.claude', 'agent-memory-local') + sep,
+      join(cwd, '.claude', 'agent-memory-local') + sep,
     )
   ) {
     return true

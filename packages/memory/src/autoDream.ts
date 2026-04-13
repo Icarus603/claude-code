@@ -11,29 +11,10 @@
 // (tests call initAutoDream() in beforeEach for a fresh closure).
 
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
-import type { REPLHookContext } from '@claude-code/app-compat/utils/hooks/postSamplingHooks.js'
-import {
-  createCacheSafeParams,
-  runForkedAgent,
-} from '@claude-code/app-compat/utils/forkedAgent.js'
-import {
-  createUserMessage,
-  createMemorySavedMessage,
-} from '@claude-code/app-compat/utils/messages.js'
-import type { Message } from '@claude-code/app-compat/types/message.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import type { ToolUseContext } from '@claude-code/app-compat/Tool.js'
-import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
+import { getMemoryHostBindings } from './host.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isAutoMemoryEnabled, getAutoMemPath } from './paths.js'
 import { isAutoDreamEnabled } from './autoDreamConfig.js'
-import { getProjectDir } from '@claude-code/app-compat/utils/sessionStorage.js'
-import {
-  getOriginalCwd,
-  getKairosActive,
-  getIsRemoteMode,
-  getSessionId,
-} from '@claude-code/app-compat/bootstrap/state.js'
 import { createAutoMemCanUseTool } from './extractMemories.js'
 import { buildConsolidationPrompt } from './consolidationPrompt.js'
 import {
@@ -42,15 +23,14 @@ import {
   tryAcquireConsolidationLock,
   rollbackConsolidationLock,
 } from './consolidationLock.js'
-import {
-  registerDreamTask,
-  addDreamTurn,
-  completeDreamTask,
-  failDreamTask,
-  isDreamTask,
-} from '@claude-code/app-compat/tasks/DreamTask/DreamTask.js'
-import { FILE_EDIT_TOOL_NAME } from '@claude-code/app-compat/tools/FileEditTool/constants.js'
-import { FILE_WRITE_TOOL_NAME } from '@claude-code/app-compat/tools/FileWriteTool/prompt.js'
+import type {
+  MemREPLContext,
+  MemSetAppState,
+} from './internalTypes.js'
+
+// Tool name constants — inlined to avoid importing from app-compat
+const FILE_EDIT_TOOL_NAME = 'Edit'
+const FILE_WRITE_TOOL_NAME = 'Write'
 
 // Scan throttle: when time-gate passes but session-gate doesn't, the lock
 // mtime doesn't advance, so the time-gate keeps passing every turn.
@@ -68,8 +48,7 @@ const DEFAULTS: AutoDreamConfig = {
 
 /**
  * Thresholds from tengu_onyx_plover. The enabled gate lives in config.ts
- * (isAutoDreamEnabled); this returns only the scheduling knobs. Defensive
- * per-field validation since GB cache can return stale wrong-type values.
+ * (isAutoDreamEnabled); this returns only the scheduling knobs.
  */
 function getConfig(): AutoDreamConfig {
   const raw =
@@ -94,24 +73,22 @@ function getConfig(): AutoDreamConfig {
 }
 
 function isGateOpen(): boolean {
-  if (getKairosActive()) return false // KAIROS mode uses disk-skill dream
-  if (getIsRemoteMode()) return false
+  const bindings = getMemoryHostBindings()
+  if (bindings.getKairosActive?.()) return false
+  if (bindings.getIsRemoteMode?.()) return false
   if (!isAutoMemoryEnabled()) return false
   return isAutoDreamEnabled()
 }
 
-// Ant-build-only test override. Bypasses enabled/time/session gates but NOT
-// the lock (so repeated turns don't pile up dreams) or the memory-dir
-// precondition. Still scans sessions so the prompt's session-hint is populated.
 function isForced(): boolean {
   return false
 }
 
-type AppendSystemMessageFn = NonNullable<ToolUseContext['appendSystemMessage']>
+type AppendSystemMessageFn = (msg: unknown) => void
 
 let runner:
   | ((
-      context: REPLHookContext,
+      context: MemREPLContext,
       appendSystemMessage?: AppendSystemMessageFn,
     ) => Promise<void>)
   | null = null
@@ -124,6 +101,7 @@ export function initAutoDream(): void {
   let lastSessionScanAt = 0
 
   runner = async function runAutoDream(context, appendSystemMessage) {
+    const bindings = getMemoryHostBindings()
     const cfg = getConfig()
     const force = isForced()
     if (!force && !isGateOpen()) return
@@ -133,7 +111,7 @@ export function initAutoDream(): void {
     try {
       lastAt = await readLastConsolidatedAt()
     } catch (e: unknown) {
-      logForDebugging(
+      bindings.logDebug?.(
         `[autoDream] readLastConsolidatedAt failed: ${(e as Error).message}`,
       )
       return
@@ -144,7 +122,7 @@ export function initAutoDream(): void {
     // --- Scan throttle ---
     const sinceScanMs = Date.now() - lastSessionScanAt
     if (!force && sinceScanMs < SESSION_SCAN_INTERVAL_MS) {
-      logForDebugging(
+      bindings.logDebug?.(
         `[autoDream] scan throttle — time-gate passed but last scan was ${Math.round(sinceScanMs / 1000)}s ago`,
       )
       return
@@ -156,25 +134,24 @@ export function initAutoDream(): void {
     try {
       sessionIds = await listSessionsTouchedSince(lastAt)
     } catch (e: unknown) {
-      logForDebugging(
+      bindings.logDebug?.(
         `[autoDream] listSessionsTouchedSince failed: ${(e as Error).message}`,
       )
       return
     }
     // Exclude the current session (its mtime is always recent).
-    const currentSession = getSessionId()
-    sessionIds = sessionIds.filter(id => id !== currentSession)
+    const currentSession = bindings.getSessionId?.()
+    if (currentSession) {
+      sessionIds = sessionIds.filter(id => id !== currentSession)
+    }
     if (!force && sessionIds.length < cfg.minSessions) {
-      logForDebugging(
+      bindings.logDebug?.(
         `[autoDream] skip — ${sessionIds.length} sessions since last consolidation, need ${cfg.minSessions}`,
       )
       return
     }
 
     // --- Lock ---
-    // Under force, skip acquire entirely — use the existing mtime so
-    // kill's rollback is a no-op (rewinds to where it already is).
-    // The lock file stays untouched; next non-force turn sees it as-is.
     let priorMtime: number | null
     if (force) {
       priorMtime = lastAt
@@ -182,7 +159,7 @@ export function initAutoDream(): void {
       try {
         priorMtime = await tryAcquireConsolidationLock()
       } catch (e: unknown) {
-        logForDebugging(
+        bindings.logDebug?.(
           `[autoDream] lock acquire failed: ${(e as Error).message}`,
         )
         return
@@ -190,30 +167,28 @@ export function initAutoDream(): void {
       if (priorMtime === null) return
     }
 
-    logForDebugging(
+    bindings.logDebug?.(
       `[autoDream] firing — ${hoursSince.toFixed(1)}h since last, ${sessionIds.length} sessions to review`,
     )
-    logEvent('tengu_auto_dream_fired', {
+    bindings.logEvent?.('tengu_auto_dream_fired', {
       hours_since: Math.round(hoursSince),
       sessions_since: sessionIds.length,
     })
 
     const setAppState =
-      context.toolUseContext.setAppStateForTasks ??
-      context.toolUseContext.setAppState
+      (context.toolUseContext.setAppStateForTasks ??
+        context.toolUseContext.setAppState) as MemSetAppState
     const abortController = new AbortController()
-    const taskId = registerDreamTask(setAppState, {
+    const taskId = bindings.registerDreamTask?.(setAppState, {
       sessionsReviewing: sessionIds.length,
       priorMtime,
       abortController,
-    })
+    }) ?? ''
 
     try {
       const memoryRoot = getAutoMemPath()
-      const transcriptDir = getProjectDir(getOriginalCwd())
-      // Tool constraints note goes in `extra`, not the shared prompt body —
-      // manual /dream runs in the main loop with normal permissions and this
-      // would be misleading there.
+      const originalCwd = bindings.getOriginalCwd?.() ?? process.cwd()
+      const transcriptDir = bindings.getProjectDir?.(originalCwd) ?? originalCwd
       const extra = `
 
 **Tool constraints for this run:** Bash is restricted to read-only commands (\`ls\`, \`find\`, \`grep\`, \`cat\`, \`stat\`, \`wc\`, \`head\`, \`tail\`, and similar). Anything that writes, redirects to a file, or modifies state will be denied. Plan your exploration with this in mind — no need to probe.
@@ -222,10 +197,10 @@ Sessions since last consolidation (${sessionIds.length}):
 ${sessionIds.map(id => `- ${id}`).join('\n')}`
       const prompt = buildConsolidationPrompt(memoryRoot, transcriptDir, extra)
 
-      const result = await runForkedAgent({
-        promptMessages: [createUserMessage({ content: prompt })],
-        cacheSafeParams: createCacheSafeParams(context),
-        canUseTool: createAutoMemCanUseTool(memoryRoot),
+      const result = await bindings.runForkedAgent?.({
+        promptMessages: [bindings.createUserMessage?.({ content: prompt })],
+        cacheSafeParams: bindings.createCacheSafeParams?.(context),
+        canUseTool: createAutoMemCanUseTool(memoryRoot) as (tool: unknown, input: Record<string, unknown>) => Promise<unknown>,
         querySource: 'auto_dream',
         forkLabel: 'auto_dream',
         skipTranscript: true,
@@ -233,40 +208,41 @@ ${sessionIds.map(id => `- ${id}`).join('\n')}`
         onMessage: makeDreamProgressWatcher(taskId, setAppState),
       })
 
-      completeDreamTask(taskId, setAppState)
-      // Inline completion summary in the main transcript (same surface as
-      // extractMemories's "Saved N memories" message).
+      if (!result) return
+
+      bindings.completeDreamTask?.(taskId, setAppState)
+      // Inline completion summary in the main transcript
       const dreamState = context.toolUseContext.getAppState().tasks?.[taskId]
       if (
         appendSystemMessage &&
-        isDreamTask(dreamState) &&
+        bindings.isDreamTask?.(dreamState) &&
         dreamState.filesTouched.length > 0
       ) {
-        ;(appendSystemMessage as (msg: Message) => void)({
-          ...createMemorySavedMessage(dreamState.filesTouched),
-          verb: 'Improved',
-        })
+        const savedMsg = bindings.createMemorySavedMessage?.(dreamState.filesTouched)
+        if (savedMsg) {
+          (appendSystemMessage as (msg: unknown) => void)({
+            ...savedMsg,
+            verb: 'Improved',
+          })
+        }
       }
-      logForDebugging(
+      bindings.logDebug?.(
         `[autoDream] completed — cache: read=${result.totalUsage.cache_read_input_tokens} created=${result.totalUsage.cache_creation_input_tokens}`,
       )
-      logEvent('tengu_auto_dream_completed', {
+      bindings.logEvent?.('tengu_auto_dream_completed', {
         cache_read: result.totalUsage.cache_read_input_tokens,
         cache_created: result.totalUsage.cache_creation_input_tokens,
         output: result.totalUsage.output_tokens,
         sessions_reviewed: sessionIds.length,
       })
     } catch (e: unknown) {
-      // If the user killed from the bg-tasks dialog, DreamTask.kill already
-      // aborted, rolled back the lock, and set status=killed. Don't overwrite
-      // or double-rollback.
       if (abortController.signal.aborted) {
-        logForDebugging('[autoDream] aborted by user')
+        bindings.logDebug?.('[autoDream] aborted by user')
         return
       }
-      logForDebugging(`[autoDream] fork failed: ${(e as Error).message}`)
-      logEvent('tengu_auto_dream_failed', {})
-      failDreamTask(taskId, setAppState)
+      bindings.logDebug?.(`[autoDream] fork failed: ${(e as Error).message}`)
+      bindings.logEvent?.('tengu_auto_dream_failed', {})
+      bindings.failDreamTask?.(taskId, setAppState)
       // Rewind mtime so time-gate passes again. Scan throttle is the backoff.
       await rollbackConsolidationLock(priorMtime)
     }
@@ -281,31 +257,33 @@ ${sessionIds.map(id => `- ${id}`).join('\n')}`
  */
 function makeDreamProgressWatcher(
   taskId: string,
-  setAppState: import('@claude-code/app-compat/Task.js').SetAppState,
-): (msg: Message) => void {
+  setAppState: MemSetAppState,
+): (msg: unknown) => void {
+  const bindings = getMemoryHostBindings()
   return msg => {
-    if (msg.type !== 'assistant') return
+    const typedMsg = msg as { type?: string; message?: { content?: ContentBlockParam[] } }
+    if (typedMsg.type !== 'assistant') return
     let text = ''
     let toolUseCount = 0
     const touchedPaths: string[] = []
-    const contentBlocks = msg.message.content as ContentBlockParam[]
+    const contentBlocks = typedMsg.message?.content ?? []
     for (const block of contentBlocks) {
       if (block.type === 'text') {
-        text += block.text
+        text += (block as { text?: string }).text ?? ''
       } else if (block.type === 'tool_use') {
         toolUseCount++
         if (
           block.name === FILE_EDIT_TOOL_NAME ||
           block.name === FILE_WRITE_TOOL_NAME
         ) {
-          const input = block.input as { file_path?: unknown }
-          if (typeof input.file_path === 'string') {
+          const input = (block as { input?: { file_path?: unknown } }).input
+          if (typeof input?.file_path === 'string') {
             touchedPaths.push(input.file_path)
           }
         }
       }
     }
-    addDreamTurn(
+    bindings.addDreamTurn?.(
       taskId,
       { text: text.trim(), toolUseCount },
       touchedPaths,
@@ -319,7 +297,7 @@ function makeDreamProgressWatcher(
  * Per-turn cost when enabled: one GB cache read + one stat.
  */
 export async function executeAutoDream(
-  context: REPLHookContext,
+  context: MemREPLContext,
   appendSystemMessage?: AppendSystemMessageFn,
 ): Promise<void> {
   await runner?.(context, appendSystemMessage)
