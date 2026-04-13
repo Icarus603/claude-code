@@ -11,22 +11,16 @@ import {
   unlink,
 } from 'fs/promises'
 import { dirname, isAbsolute, join, relative } from 'path'
-import {
-  getIsNonInteractiveSession,
-  getOriginalCwd,
-  getSessionId,
-} from '@claude-code/app-compat/bootstrap/state.js'
-import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
-import { notifyVscodeFileUpdated } from '@claude-code/app-compat/services/mcp/vscodeSdkMcp.js'
-import type { LogOption } from '@claude-code/app-compat/types/logs.js'
 import { inspect } from 'util'
 import { getGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
-import { getErrnoCode, isENOENT } from '@claude-code/app-compat/utils/errors.js'
-import { pathExists } from '@claude-code/app-compat/utils/file.js'
-import { logError } from '@claude-code/app-compat/utils/log.js'
-import { recordFileHistorySnapshot } from '@claude-code/app-compat/utils/sessionStorage.js'
+import { getAgentHostBindings } from '../host.js'
+import type { AgentLogOption } from '../internalTypes.js'
+import {
+  getErrnoCode,
+  isENOENT,
+  isEnvTruthy,
+  pathExists,
+} from '../internalUtils.js'
 
 type BackupFileName = string | null // The null value means the file does not exist in this version
 
@@ -61,7 +55,7 @@ export type DiffStats =
   | undefined
 
 export function fileHistoryEnabled(): boolean {
-  if (getIsNonInteractiveSession()) {
+  if (getAgentHostBindings().getIsNonInteractiveSession?.() ?? false) {
     return fileHistoryEnabledSdk()
   }
   return (
@@ -107,8 +101,8 @@ export async function fileHistoryTrackEdit(
   if (!captured) return
   const mostRecent = captured.snapshots.at(-1)
   if (!mostRecent) {
-    logError(new Error('FileHistory: Missing most recent snapshot'))
-    logEvent('tengu_file_history_track_edit_failed', {})
+    getAgentHostBindings().logError?.(new Error('FileHistory: Missing most recent snapshot'))
+    getAgentHostBindings().logEvent?.('tengu_file_history_track_edit_failed', {})
     return
   }
   if (mostRecent.trackedFileBackups[trackingPath]) {
@@ -122,8 +116,8 @@ export async function fileHistoryTrackEdit(
   try {
     backup = await createBackup(filePath, 1)
   } catch (error) {
-    logError(error)
-    logEvent('tengu_file_history_track_edit_failed', {})
+    getAgentHostBindings().logError?.(error)
+    getAgentHostBindings().logEvent?.('tengu_file_history_track_edit_failed', {})
     return
   }
   const isAddingFile = backup.backupFileName === null
@@ -169,24 +163,24 @@ export async function fileHistoryTrackEdit(
       maybeDumpStateForDebug(updatedState)
 
       // Record a snapshot update since it has changed.
-      void recordFileHistorySnapshot(
+      void getAgentHostBindings().recordFileHistorySnapshot?.(
         messageId,
         updatedMostRecentSnapshot,
         true, // isSnapshotUpdate
       ).catch(error => {
-        logError(new Error(`FileHistory: Failed to record snapshot: ${error}`))
+        getAgentHostBindings().logError?.(new Error(`FileHistory: Failed to record snapshot: ${error}`))
       })
 
-      logEvent('tengu_file_history_track_edit_success', {
+      getAgentHostBindings().logEvent?.('tengu_file_history_track_edit_success', {
         isNewFile: isAddingFile,
         version: backup.version,
       })
-      logForDebugging(`FileHistory: Tracked file modification for ${filePath}`)
+      getAgentHostBindings().logDebug?.(`FileHistory: Tracked file modification for ${filePath}`)
 
       return updatedState
     } catch (error) {
-      logError(error)
-      logEvent('tengu_file_history_track_edit_failed', {})
+      getAgentHostBindings().logError?.(error)
+      getAgentHostBindings().logEvent?.('tengu_file_history_track_edit_failed', {})
       return state
     }
   })
@@ -221,7 +215,7 @@ export async function fileHistoryMakeSnapshot(
   const trackedFileBackups: Record<string, FileHistoryBackup> = {}
   const mostRecentSnapshot = captured.snapshots.at(-1)
   if (mostRecentSnapshot) {
-    logForDebugging(`FileHistory: Making snapshot for message ${messageId}`)
+    getAgentHostBindings().logDebug?.(`FileHistory: Making snapshot for message ${messageId}`)
     await Promise.all(
       Array.from(captured.trackedFiles, async trackingPath => {
         try {
@@ -244,10 +238,10 @@ export async function fileHistoryMakeSnapshot(
               version: nextVersion,
               backupTime: new Date(),
             }
-            logEvent('tengu_file_history_backup_deleted_file', {
+            getAgentHostBindings().logEvent?.('tengu_file_history_backup_deleted_file', {
               version: nextVersion,
             })
-            logForDebugging(
+            getAgentHostBindings().logDebug?.(
               `FileHistory: Missing tracked file: ${trackingPath}`,
             )
             return
@@ -274,8 +268,8 @@ export async function fileHistoryMakeSnapshot(
             nextVersion,
           )
         } catch (error) {
-          logError(error)
-          logEvent('tengu_file_history_backup_file_failed', {})
+          getAgentHostBindings().logError?.(error)
+          getAgentHostBindings().logEvent?.('tengu_file_history_backup_file_failed', {})
         }
       }),
     )
@@ -313,29 +307,29 @@ export async function fileHistoryMakeSnapshot(
       }
       maybeDumpStateForDebug(updatedState)
 
-      void notifyVscodeSnapshotFilesUpdated(state, updatedState).catch(logError)
+      void notifyVscodeSnapshotFilesUpdated(state, updatedState).catch(e => getAgentHostBindings().logError?.(e))
 
       // Record the file history snapshot to session storage for resume support
-      void recordFileHistorySnapshot(
+      void getAgentHostBindings().recordFileHistorySnapshot?.(
         messageId,
         newSnapshot,
         false, // isSnapshotUpdate
       ).catch(error => {
-        logError(new Error(`FileHistory: Failed to record snapshot: ${error}`))
+        getAgentHostBindings().logError?.(new Error(`FileHistory: Failed to record snapshot: ${error}`))
       })
 
-      logForDebugging(
+      getAgentHostBindings().logDebug?.(
         `FileHistory: Added snapshot for ${messageId}, tracking ${state.trackedFiles.size} files`,
       )
-      logEvent('tengu_file_history_snapshot_success', {
+      getAgentHostBindings().logEvent?.('tengu_file_history_snapshot_success', {
         trackedFilesCount: state.trackedFiles.size,
         snapshotCount: updatedState.snapshots.length,
       })
 
       return updatedState
     } catch (error) {
-      logError(error)
-      logEvent('tengu_file_history_snapshot_failed', {})
+      getAgentHostBindings().logError?.(error)
+      getAgentHostBindings().logEvent?.('tengu_file_history_snapshot_failed', {})
       return state
     }
   })
@@ -367,8 +361,8 @@ export async function fileHistoryRewind(
     snapshot => snapshot.messageId === messageId,
   )
   if (!targetSnapshot) {
-    logError(new Error(`FileHistory: Snapshot for ${messageId} not found`))
-    logEvent('tengu_file_history_rewind_failed', {
+    getAgentHostBindings().logError?.(new Error(`FileHistory: Snapshot for ${messageId} not found`))
+    getAgentHostBindings().logEvent?.('tengu_file_history_rewind_failed', {
       trackedFilesCount: captured.trackedFiles.size,
       snapshotFound: false,
     })
@@ -376,19 +370,19 @@ export async function fileHistoryRewind(
   }
 
   try {
-    logForDebugging(
+    getAgentHostBindings().logDebug?.(
       `FileHistory: [Rewind] Rewinding to snapshot for ${messageId}`,
     )
     const filesChanged = await applySnapshot(captured, targetSnapshot)
 
-    logForDebugging(`FileHistory: [Rewind] Finished rewinding to ${messageId}`)
-    logEvent('tengu_file_history_rewind_success', {
+    getAgentHostBindings().logDebug?.(`FileHistory: [Rewind] Finished rewinding to ${messageId}`)
+    getAgentHostBindings().logEvent?.('tengu_file_history_rewind_success', {
       trackedFilesCount: captured.trackedFiles.size,
       filesChangedCount: filesChanged.length,
     })
   } catch (error) {
-    logError(error)
-    logEvent('tengu_file_history_rewind_failed', {
+    getAgentHostBindings().logError?.(error)
+    getAgentHostBindings().logEvent?.('tengu_file_history_rewind_failed', {
       trackedFilesCount: captured.trackedFiles.size,
       snapshotFound: true,
     })
@@ -439,10 +433,10 @@ export async function fileHistoryGetDiffStats(
 
         if (backupFileName === undefined) {
           // Error resolving the backup, so don't touch the file
-          logError(
+          getAgentHostBindings().logError?.(
             new Error('FileHistory: Error finding the backup file to apply'),
           )
-          logEvent('tengu_file_history_rewind_restore_file_failed', {
+          getAgentHostBindings().logEvent?.('tengu_file_history_rewind_restore_file_failed', {
             dryRun: true,
           })
           return null
@@ -462,8 +456,8 @@ export async function fileHistoryGetDiffStats(
         }
         return null
       } catch (error) {
-        logError(error)
-        logEvent('tengu_file_history_rewind_restore_file_failed', {
+        getAgentHostBindings().logError?.(error)
+        getAgentHostBindings().logEvent?.('tengu_file_history_rewind_restore_file_failed', {
           dryRun: true,
         })
         return null
@@ -524,7 +518,7 @@ export async function fileHistoryHasAnyChanges(
       }
       if (await checkOriginFileChanged(filePath, backupFileName)) return true
     } catch (error) {
-      logError(error)
+      getAgentHostBindings().logError?.(error)
     }
   }
   return false
@@ -550,10 +544,10 @@ async function applySnapshot(
 
       if (backupFileName === undefined) {
         // Error resolving the backup, so don't touch the file
-        logError(
+        getAgentHostBindings().logError?.(
           new Error('FileHistory: Error finding the backup file to apply'),
         )
-        logEvent('tengu_file_history_rewind_restore_file_failed', {
+        getAgentHostBindings().logEvent?.('tengu_file_history_rewind_restore_file_failed', {
           dryRun: false,
         })
         continue
@@ -563,7 +557,7 @@ async function applySnapshot(
         // File did not exist at the target version; delete it if present.
         try {
           await unlink(filePath)
-          logForDebugging(`FileHistory: [Rewind] Deleted ${filePath}`)
+          getAgentHostBindings().logDebug?.(`FileHistory: [Rewind] Deleted ${filePath}`)
           filesChanged.push(filePath)
         } catch (e: unknown) {
           if (!isENOENT(e)) throw e
@@ -575,14 +569,14 @@ async function applySnapshot(
       // File should exist at a specific version. Restore only if it differs.
       if (await checkOriginFileChanged(filePath, backupFileName)) {
         await restoreBackup(filePath, backupFileName)
-        logForDebugging(
+        getAgentHostBindings().logDebug?.(
           `FileHistory: [Rewind] Restored ${filePath} from ${backupFileName}`,
         )
         filesChanged.push(filePath)
       }
     } catch (error) {
-      logError(error)
-      logEvent('tengu_file_history_rewind_restore_file_failed', {
+      getAgentHostBindings().logError?.(error)
+      getAgentHostBindings().logEvent?.('tengu_file_history_rewind_restore_file_failed', {
         dryRun: false,
       })
     }
@@ -712,7 +706,7 @@ async function computeDiffStatsForFile(
       }
     })
   } catch (error) {
-    logError(new Error(`FileHistory: Error generating diffStats: ${error}`))
+    getAgentHostBindings().logError?.(new Error(`FileHistory: Error generating diffStats: ${error}`))
   }
 
   return {
@@ -731,11 +725,11 @@ function getBackupFileName(filePath: string, version: number): string {
 }
 
 function resolveBackupPath(backupFileName: string, sessionId?: string): string {
-  const configDir = getClaudeConfigHomeDir()
+  const configDir = getAgentHostBindings().getClaudeConfigHomeDir?.() ?? ''
   return join(
     configDir,
     'file-history',
-    sessionId || getSessionId(),
+    sessionId || getAgentHostBindings().getSessionId?.() ?? '',
     backupFileName,
   )
 }
@@ -814,8 +808,8 @@ async function restoreBackup(
     backupStats = await stat(backupPath)
   } catch (e: unknown) {
     if (isENOENT(e)) {
-      logEvent('tengu_file_history_rewind_restore_file_failed', {})
-      logError(
+      getAgentHostBindings().logEvent?.('tengu_file_history_rewind_restore_file_failed', {})
+      getAgentHostBindings().logError?.(
         new Error(`FileHistory: [Rewind] Backup file not found: ${backupPath}`),
       )
       return
@@ -868,7 +862,7 @@ function maybeShortenFilePath(filePath: string): string {
   if (!isAbsolute(filePath)) {
     return filePath
   }
-  const cwd = getOriginalCwd()
+  const cwd = getAgentHostBindings().getOriginalCwd?.() ?? process.cwd()
   if (filePath.startsWith(cwd)) {
     return relative(cwd, filePath)
   }
@@ -879,7 +873,7 @@ function maybeExpandFilePath(filePath: string): string {
   if (isAbsolute(filePath)) {
     return filePath
   }
-  return join(getOriginalCwd(), filePath)
+  return join(getAgentHostBindings().getOriginalCwd?.() ?? process.cwd(), filePath)
 }
 
 /**
@@ -919,7 +913,7 @@ export function fileHistoryRestoreStateFromLog(
 /**
  * Copy file history snapshots for a given log option.
  */
-export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
+export async function copyFileHistoryForResume(log: AgentLogOption): Promise<void> {
   if (!fileHistoryEnabled()) {
     return
   }
@@ -931,7 +925,7 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
   const lastMessage = log.messages[log.messages.length - 1]
   const previousSessionId = lastMessage?.sessionId
   if (!previousSessionId) {
-    logError(
+    getAgentHostBindings().logError?.(
       new Error(
         `FileHistory: Failed to copy backups on restore (no previous session id)`,
       ),
@@ -939,9 +933,9 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
     return
   }
 
-  const sessionId = getSessionId()
+  const sessionId = getAgentHostBindings().getSessionId?.() ?? ''
   if (previousSessionId === sessionId) {
-    logForDebugging(
+    getAgentHostBindings().logDebug?.(
       `FileHistory: No need to copy file history for resuming with same session id: ${sessionId}`,
     )
     return
@@ -951,7 +945,7 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
     // All backups share the same directory: {configDir}/file-history/{sessionId}/
     // Create it once upfront instead of once per backup file
     const newBackupDir = join(
-      getClaudeConfigHomeDir(),
+      getAgentHostBindings().getClaudeConfigHomeDir?.() ?? '',
       'file-history',
       sessionId,
     )
@@ -984,14 +978,14 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
                 return
               }
               if (code === 'ENOENT') {
-                logError(
+                getAgentHostBindings().logError?.(
                   new Error(
                     `FileHistory: Failed to copy backup ${backupFileName} on restore (backup file does not exist in ${previousSessionId})`,
                   ),
                 )
                 throw e
               }
-              logError(
+              getAgentHostBindings().logError?.(
                 new Error(
                   `FileHistory: Error hard linking backup file from previous session`,
                 ),
@@ -1000,7 +994,7 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
               try {
                 await copyFile(oldBackupPath, newBackupPath)
               } catch (copyErr) {
-                logError(
+                getAgentHostBindings().logError?.(
                   new Error(
                     `FileHistory: Error copying over backup from previous session`,
                   ),
@@ -1009,7 +1003,7 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
               }
             }
 
-            logForDebugging(
+            getAgentHostBindings().logDebug?.(
               `FileHistory: Copied backup ${backupFileName} from session ${previousSessionId} to ${sessionId}`,
             )
           }),
@@ -1019,12 +1013,12 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
 
         // Record the snapshot only if we have successfully migrated the backup files
         if (!copyFailed) {
-          void recordFileHistorySnapshot(
+          void getAgentHostBindings().recordFileHistorySnapshot?.(
             snapshot.messageId,
             snapshot,
             false, // isSnapshotUpdate
           ).catch(_ => {
-            logError(
+            getAgentHostBindings().logError?.(
               new Error(`FileHistory: Failed to record copy backup snapshot`),
             )
           })
@@ -1035,13 +1029,13 @@ export async function copyFileHistoryForResume(log: LogOption): Promise<void> {
     )
 
     if (failedSnapshots > 0) {
-      logEvent('tengu_file_history_resume_copy_failed', {
+      getAgentHostBindings().logEvent?.('tengu_file_history_resume_copy_failed', {
         numSnapshots: fileHistorySnapshots.length,
         failedSnapshots,
       })
     }
   } catch (error) {
-    logError(error)
+    getAgentHostBindings().logError?.(error)
   }
 }
 
@@ -1092,7 +1086,7 @@ async function notifyVscodeSnapshotFilesUpdated(
 
     // Only notify if content actually changed
     if (oldContent !== newContent) {
-      notifyVscodeFileUpdated(filePath, oldContent, newContent)
+      getAgentHostBindings().notifyVscodeFileUpdated?.(filePath, oldContent, newContent)
     }
   }
 }
