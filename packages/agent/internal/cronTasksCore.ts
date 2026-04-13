@@ -14,21 +14,15 @@ import { readFileSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import {
-  addSessionCronTask,
-  getProjectRoot,
-  getSessionCronTasks,
-  removeSessionCronTasks,
-} from '@claude-code/app-compat/bootstrap/state.js'
-import {
   computeNextCronRun,
   parseCronExpression,
 } from './cronCore.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { isFsInaccessible } from '@claude-code/app-compat/utils/errors.js'
-import { getFsImplementation } from '@claude-code/app-compat/utils/fsOperations.js'
-import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
-import { logError } from '@claude-code/app-compat/utils/log.js'
-import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+import { getAgentHostBindings } from '../host.js'
+import {
+  isFsInaccessible,
+  jsonStringify,
+  safeParseJSON,
+} from '../internalUtils.js'
 
 export type CronTask = {
   id: string
@@ -82,7 +76,7 @@ const CRON_FILE_REL = join('.claude', 'scheduled_tasks.json')
  * SDK daemon, which has no bootstrap state).
  */
 export function getCronFilePath(dir?: string): string {
-  return join(dir ?? getProjectRoot(), CRON_FILE_REL)
+  return join(dir ?? getAgentHostBindings().getProjectRoot?.() ?? process.cwd(), CRON_FILE_REL)
 }
 
 /**
@@ -92,13 +86,14 @@ export function getCronFilePath(dir?: string): string {
  * blocks the whole file.
  */
 export async function readCronTasks(dir?: string): Promise<CronTask[]> {
-  const fs = getFsImplementation()
+  const bindings = getAgentHostBindings()
+  const fs = bindings.getFsImplementation?.() ?? { readFile: async (p: string, opts: { encoding: BufferEncoding }) => { const { readFile: fsReadFile } = await import('fs/promises'); return fsReadFile(p, opts) } }
   let raw: string
   try {
     raw = await fs.readFile(getCronFilePath(dir), { encoding: 'utf-8' })
   } catch (e: unknown) {
     if (isFsInaccessible(e)) return []
-    logError(e)
+    bindings.logError?.(e)
     return []
   }
 
@@ -116,13 +111,13 @@ export async function readCronTasks(dir?: string): Promise<CronTask[]> {
       typeof t.prompt !== 'string' ||
       typeof t.createdAt !== 'number'
     ) {
-      logForDebugging(
+      getAgentHostBindings().logDebug?.(
         `[ScheduledTasks] skipping malformed task: ${jsonStringify(t)}`,
       )
       continue
     }
     if (!parseCronExpression(t.cron)) {
-      logForDebugging(
+      getAgentHostBindings().logDebug?.(
         `[ScheduledTasks] skipping task ${t.id} with invalid cron '${t.cron}'`,
       )
       continue
@@ -169,7 +164,7 @@ export async function writeCronTasks(
   tasks: CronTask[],
   dir?: string,
 ): Promise<void> {
-  const root = dir ?? getProjectRoot()
+  const root = dir ?? getAgentHostBindings().getProjectRoot?.() ?? process.cwd()
   await mkdir(join(root, '.claude'), { recursive: true })
   // Strip the runtime-only `durable` flag — everything on disk is durable
   // by definition, and keeping the flag out means readCronTasks() naturally
@@ -212,7 +207,7 @@ export async function addCronTask(
     ...(recurring ? { recurring: true } : {}),
   }
   if (!durable) {
-    addSessionCronTask({ ...task, ...(agentId ? { agentId } : {}) })
+    getAgentHostBindings().addSessionCronTask?.({ ...task, ...(agentId ? { agentId } : {}) })
     return id
   }
   const tasks = await readCronTasks()
@@ -240,7 +235,7 @@ export async function removeCronTasks(
   // done — skip the file read entirely. removeSessionCronTasks is a no-op
   // (returns 0) on miss, so pre-existing durable-delete paths fall through
   // without allocating.
-  if (dir === undefined && removeSessionCronTasks(ids) === ids.length) {
+  if (dir === undefined && (getAgentHostBindings().removeSessionCronTasks?.(ids) ?? 0) === ids.length) {
     return
   }
   const idSet = new Set(ids)
@@ -291,7 +286,7 @@ export async function markCronTasksFired(
 export async function listAllCronTasks(dir?: string): Promise<CronTask[]> {
   const fileTasks = await readCronTasks(dir)
   if (dir !== undefined) return fileTasks
-  const sessionTasks = getSessionCronTasks().map(t => ({
+  const sessionTasks = (getAgentHostBindings().getSessionCronTasks?.() ?? []).map(t => ({
     ...t,
     durable: false as const,
   }))
