@@ -42,6 +42,8 @@ const KNOWN_OWNERS: Record<string, readonly string[]> = {
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
   'local-observability',
   'config',
+  'storage',
+  'output',
 ])
 
 type Violation = { package: string; reason: string }
