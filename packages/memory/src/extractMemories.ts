@@ -15,57 +15,39 @@
 
 import { feature } from 'bun:bundle'
 import { basename } from 'path'
-import { getIsRemoteMode } from '@claude-code/app-compat/bootstrap/state.js'
-import type { CanUseToolFn } from '@claude-code/app-compat/hooks/useCanUseTool.js'
 import { ENTRYPOINT_NAME } from './memdir.js'
-import {
-  formatMemoryManifest,
-  scanMemoryFiles,
-} from '@claude-code/app-compat/memdir/memoryScan.js'
 import {
   getAutoMemPath,
   isAutoMemoryEnabled,
   isAutoMemPath,
 } from './paths.js'
-import type { Tool } from '@claude-code/app-compat/Tool.js'
-import { BASH_TOOL_NAME } from '@claude-code/app-compat/tools/BashTool/toolName.js'
-import { FILE_EDIT_TOOL_NAME } from '@claude-code/app-compat/tools/FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from '@claude-code/app-compat/tools/FileReadTool/prompt.js'
-import { FILE_WRITE_TOOL_NAME } from '@claude-code/app-compat/tools/FileWriteTool/prompt.js'
-import { GLOB_TOOL_NAME } from '@claude-code/app-compat/tools/GlobTool/prompt.js'
-import { GREP_TOOL_NAME } from '@claude-code/app-compat/tools/GrepTool/prompt.js'
-import { REPL_TOOL_NAME } from '@claude-code/app-compat/tools/REPLTool/constants.js'
-import type {
-  AssistantMessage,
-  Message,
-  SystemLocalCommandMessage,
-  SystemMessage,
-} from '@claude-code/app-compat/types/message.js'
-import { createAbortController } from '@claude-code/app-compat/utils/abortController.js'
-import { count, uniq } from '@claude-code/app-compat/utils/array.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import {
-  createCacheSafeParams,
-  runForkedAgent,
-} from '@claude-code/app-compat/utils/forkedAgent.js'
-import type { REPLHookContext } from '@claude-code/app-compat/utils/hooks/postSamplingHooks.js'
-import {
-  createMemorySavedMessage,
-  createUserMessage,
-} from '@claude-code/app-compat/utils/messages.js'
+import { getMemoryHostBindings } from './host.js'
+import { count, uniq } from './internalUtils.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logEvent } from '@claude-code/app-compat/services/eventLogger.js'
-import { sanitizeToolNameForAnalytics } from '@claude-code/app-compat/services/eventMetadata.js'
-import {
-  buildExtractAutoOnlyPrompt,
-  buildExtractCombinedPrompt,
-} from '@claude-code/app-compat/services/extractMemories/prompts.js'
+import type {
+  MemREPLContext,
+  MemMessage,
+  MemAssistantMessage,
+  MemTool,
+  MemToolPermissionResult,
+  MemCanUseTool,
+  MemSystemMessage,
+} from './internalTypes.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const teamMemPaths = feature('TEAMMEM')
   ? (require('./teamMemPaths.js') as typeof import('./teamMemPaths.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
+
+// Tool name constants — inlined to avoid importing from app-compat
+const BASH_TOOL_NAME = 'Bash'
+const FILE_EDIT_TOOL_NAME = 'Edit'
+const FILE_READ_TOOL_NAME = 'Read'
+const FILE_WRITE_TOOL_NAME = 'Write'
+const GLOB_TOOL_NAME = 'Glob'
+const GREP_TOOL_NAME = 'Grep'
+const REPL_TOOL_NAME = 'REPL'
 
 // ============================================================================
 // Helpers
@@ -75,12 +57,12 @@ const teamMemPaths = feature('TEAMMEM')
  * Returns true if a message is visible to the model (sent in API calls).
  * Excludes progress, system, and attachment messages.
  */
-function isModelVisibleMessage(message: Message): boolean {
+function isModelVisibleMessage(message: MemMessage): boolean {
   return message.type === 'user' || message.type === 'assistant'
 }
 
 function countModelVisibleMessagesSince(
-  messages: Message[],
+  messages: MemMessage[],
   sinceUuid: string | undefined,
 ): number {
   if (sinceUuid === null || sinceUuid === undefined) {
@@ -112,14 +94,9 @@ function countModelVisibleMessagesSince(
 /**
  * Returns true if any assistant message after the cursor UUID contains a
  * Write/Edit tool_use block targeting an auto-memory path.
- *
- * The main agent's prompt has full save instructions — when it writes
- * memories, the forked extraction is redundant. runExtraction skips the
- * agent and advances the cursor past this range, making the main agent
- * and the background agent mutually exclusive per turn.
  */
 function hasMemoryWritesSince(
-  messages: Message[],
+  messages: MemMessage[],
   sinceUuid: string | undefined,
 ): boolean {
   let foundStart = sinceUuid === undefined
@@ -133,7 +110,7 @@ function hasMemoryWritesSince(
     if (message.type !== 'assistant') {
       continue
     }
-    const content = (message as AssistantMessage).message.content
+    const content = (message as MemAssistantMessage).message.content
     if (!Array.isArray(content)) {
       continue
     }
@@ -151,10 +128,11 @@ function hasMemoryWritesSince(
 // Tool Permissions
 // ============================================================================
 
-function denyAutoMemTool(tool: Tool, reason: string) {
-  logForDebugging(`[autoMem] denied ${tool.name}: ${reason}`)
-  logEvent('tengu_auto_mem_tool_denied', {
-    tool_name: sanitizeToolNameForAnalytics(tool.name),
+function denyAutoMemTool(tool: MemTool, reason: string): MemToolPermissionResult {
+  const bindings = getMemoryHostBindings()
+  bindings.logDebug?.(`[autoMem] denied ${tool.name}: ${reason}`)
+  bindings.logEvent?.('tengu_auto_mem_tool_denied', {
+    tool_name: bindings.sanitizeToolNameForAnalytics?.(tool.name) ?? tool.name,
   })
   return {
     behavior: 'deny' as const,
@@ -168,15 +146,9 @@ function denyAutoMemTool(tool: Tool, reason: string) {
  * read-only Bash commands, and Edit/Write only for paths within the
  * auto-memory directory. Shared by extractMemories and autoDream.
  */
-export function createAutoMemCanUseTool(memoryDir: string): CanUseToolFn {
-  return async (tool: Tool, input: Record<string, unknown>) => {
-    // Allow REPL — when REPL mode is enabled (ant-default), primitive tools
-    // are hidden from the tool list so the forked agent calls REPL instead.
-    // REPL's VM context re-invokes this canUseTool for each inner primitive
-    // (toolWrappers.ts createToolWrapper), so the Read/Bash/Edit/Write checks
-    // below still gate the actual file and shell operations. Giving the fork a
-    // different tool list would break prompt cache sharing (tools are part of
-    // the cache key — see CacheSafeParams in forkedAgent.ts).
+export function createAutoMemCanUseTool(memoryDir: string): MemCanUseTool {
+  return async (tool: MemTool, input: Record<string, unknown>) => {
+    // Allow REPL
     if (tool.name === REPL_TOOL_NAME) {
       return { behavior: 'allow' as const, updatedInput: input }
     }
@@ -191,10 +163,9 @@ export function createAutoMemCanUseTool(memoryDir: string): CanUseToolFn {
     }
 
     // Allow Bash only for commands that pass BashTool.isReadOnly.
-    // `tool` IS BashTool here — no static import needed.
     if (tool.name === BASH_TOOL_NAME) {
       const parsed = tool.inputSchema.safeParse(input)
-      if (parsed.success && tool.isReadOnly(parsed.data)) {
+      if (parsed.success && tool.isReadOnly?.(parsed.data)) {
         return { behavior: 'allow' as const, updatedInput: input }
       }
       return denyAutoMemTool(
@@ -227,7 +198,6 @@ export function createAutoMemCanUseTool(memoryDir: string): CanUseToolFn {
 
 /**
  * Extract file_path from a tool_use block's input, if present.
- * Returns undefined when the block is not an Edit/Write tool use or has no file_path.
  */
 function getWrittenFilePath(block: {
   type: string
@@ -248,13 +218,14 @@ function getWrittenFilePath(block: {
   return undefined
 }
 
-function extractWrittenPaths(agentMessages: Message[]): string[] {
+function extractWrittenPaths(agentMessages: unknown[]): string[] {
   const paths: string[] = []
   for (const message of agentMessages) {
-    if (message.type !== 'assistant') {
+    const msg = message as MemMessage
+    if (msg.type !== 'assistant') {
       continue
     }
-    const content = (message as AssistantMessage).message.content
+    const content = (msg as MemAssistantMessage).message.content
     if (!Array.isArray(content)) {
       continue
     }
@@ -273,13 +244,13 @@ function extractWrittenPaths(agentMessages: Message[]): string[] {
 // ============================================================================
 
 type AppendSystemMessageFn = (
-  msg: SystemMessage,
+  msg: MemSystemMessage,
 ) => void
 
 /** The active extractor function, set by initExtractMemories(). */
 let extractor:
   | ((
-      context: REPLHookContext,
+      context: MemREPLContext,
       appendSystemMessage?: AppendSystemMessageFn,
     ) => Promise<void>)
   | null = null
@@ -296,30 +267,19 @@ let drainer: (timeoutMs?: number) => Promise<void> = async () => {}
 export function initExtractMemories(): void {
   // --- Closure-scoped mutable state ---
 
-  /** Every promise handed out by the extractor that hasn't settled yet.
-   *  Coalesced calls that stash-and-return add fast-resolving promises
-   *  (harmless); the call that starts real work adds a promise covering the
-   *  full trailing-run chain via runExtraction's recursive finally. */
   const inFlightExtractions = new Set<Promise<void>>()
 
-  /** UUID of the last message processed — cursor so each run only
-   *  considers messages added since the previous extraction. */
   let lastMemoryMessageUuid: string | undefined
 
-  /** One-shot flag: once we log that the gate is disabled, don't repeat. */
   let hasLoggedGateFailure = false
 
-  /** True while runExtraction is executing — prevents overlapping runs. */
   let inProgress = false
 
-  /** Counts eligible turns since the last extraction run. Resets to 0 after each run. */
   let turnsSinceLastExtraction = 0
 
-  /** When a call arrives during an in-progress run, we stash the context here
-   *  and run one trailing extraction after the current one finishes. */
   let pendingContext:
     | {
-        context: REPLHookContext
+        context: MemREPLContext
         appendSystemMessage?: AppendSystemMessageFn
       }
     | undefined
@@ -331,10 +291,11 @@ export function initExtractMemories(): void {
     appendSystemMessage,
     isTrailingRun,
   }: {
-    context: REPLHookContext
+    context: MemREPLContext
     appendSystemMessage?: AppendSystemMessageFn
     isTrailingRun?: boolean
   }): Promise<void> {
+    const bindings = getMemoryHostBindings()
     const { messages } = context
     const memoryDir = getAutoMemPath()
     const newMessageCount = countModelVisibleMessagesSince(
@@ -343,17 +304,16 @@ export function initExtractMemories(): void {
     )
 
     // Mutual exclusion: when the main agent wrote memories, skip the
-    // forked agent and advance the cursor past this range so the next
-    // extraction only considers messages after the main agent's write.
+    // forked agent and advance the cursor past this range.
     if (hasMemoryWritesSince(messages, lastMemoryMessageUuid)) {
-      logForDebugging(
+      bindings.logDebug?.(
         '[extractMemories] skipping — conversation already wrote to memory files',
       )
       const lastMessage = messages.at(-1)
       if (lastMessage?.uuid) {
         lastMemoryMessageUuid = lastMessage.uuid
       }
-      logEvent('tengu_extract_memories_skipped_direct_write', {
+      bindings.logEvent?.('tengu_extract_memories_skipped_direct_write', {
         message_count: newMessageCount,
       })
       return
@@ -369,11 +329,9 @@ export function initExtractMemories(): void {
     )
 
     const canUseTool = createAutoMemCanUseTool(memoryDir)
-    const cacheSafeParams = createCacheSafeParams(context)
+    const cacheSafeParams = bindings.createCacheSafeParams?.(context)
 
     // Only run extraction every N eligible turns (tengu_bramble_lintel, default 1).
-    // Trailing extractions (from stashed contexts) skip this check since they
-    // process already-committed work that should not be throttled.
     if (!isTrailingRun) {
       turnsSinceLastExtraction++
       if (
@@ -388,54 +346,49 @@ export function initExtractMemories(): void {
     inProgress = true
     const startTime = Date.now()
     try {
-      logForDebugging(
+      bindings.logDebug?.(
         `[extractMemories] starting — ${newMessageCount} new messages, memoryDir=${memoryDir}`,
       )
 
       // Pre-inject the memory directory manifest so the agent doesn't spend
       // a turn on `ls`. Reuses findRelevantMemories' frontmatter scan.
-      // Placed after the throttle gate so skipped turns don't pay the scan cost.
-      const existingMemories = formatMemoryManifest(
-        await scanMemoryFiles(memoryDir, createAbortController().signal),
-      )
+      const abortController = bindings.createAbortController?.() ?? new AbortController()
+      const scanned = await (bindings.scanMemoryFiles?.(memoryDir, abortController.signal) ?? Promise.resolve([]))
+      const existingMemories = bindings.formatMemoryManifest?.(scanned) ?? ''
 
       const userPrompt =
         feature('TEAMMEM') && teamMemoryEnabled
-          ? buildExtractCombinedPrompt(
+          ? (bindings.buildExtractCombinedPrompt?.(
               newMessageCount,
               existingMemories,
               skipIndex,
-            )
-          : buildExtractAutoOnlyPrompt(
+            ) ?? '')
+          : (bindings.buildExtractAutoOnlyPrompt?.(
               newMessageCount,
               existingMemories,
               skipIndex,
-            )
+            ) ?? '')
 
-      const result = await runForkedAgent({
-        promptMessages: [createUserMessage({ content: userPrompt })],
+      const result = await bindings.runForkedAgent?.({
+        promptMessages: [bindings.createUserMessage?.({ content: userPrompt })],
         cacheSafeParams,
-        canUseTool,
+        canUseTool: canUseTool as (tool: unknown, input: Record<string, unknown>) => Promise<unknown>,
         querySource: 'extract_memories',
         forkLabel: 'extract_memories',
-        // The extractMemories subagent does not need to record to transcript.
-        // Doing so can create race conditions with the main thread.
         skipTranscript: true,
-        // Well-behaved extractions complete in 2-4 turns (read → write).
-        // A hard cap prevents verification rabbit-holes from burning turns.
         maxTurns: 5,
       })
 
-      // Advance the cursor only after a successful run. If the agent errors
-      // out (caught below), the cursor stays put so those messages are
-      // reconsidered on the next extraction.
+      if (!result) return
+
+      // Advance the cursor only after a successful run.
       const lastMessage = messages.at(-1)
       if (lastMessage?.uuid) {
         lastMemoryMessageUuid = lastMessage.uuid
       }
 
       const writtenPaths = extractWrittenPaths(result.messages)
-      const turnCount = count(result.messages, m => m.type === 'assistant')
+      const turnCount = count(result.messages as MemMessage[], m => m.type === 'assistant')
 
       const totalInput =
         result.totalUsage.input_tokens +
@@ -448,16 +401,16 @@ export function initExtractMemories(): void {
               100
             ).toFixed(1)
           : '0.0'
-      logForDebugging(
+      bindings.logDebug?.(
         `[extractMemories] finished — ${writtenPaths.length} files written, cache: read=${result.totalUsage.cache_read_input_tokens} create=${result.totalUsage.cache_creation_input_tokens} input=${result.totalUsage.input_tokens} (${hitPct}% hit)`,
       )
 
       if (writtenPaths.length > 0) {
-        logForDebugging(
+        bindings.logDebug?.(
           `[extractMemories] memories saved: ${writtenPaths.join(', ')}`,
         )
       } else {
-        logForDebugging('[extractMemories] no memories saved this run')
+        bindings.logDebug?.('[extractMemories] no memories saved this run')
       }
 
       // Index file updates are mechanical — the agent touches MEMORY.md to add
@@ -469,8 +422,7 @@ export function initExtractMemories(): void {
         ? count(memoryPaths, teamMemPaths!.isTeamMemPath)
         : 0
 
-      // Log extraction event with usage from the forked agent
-      logEvent('tengu_extract_memories_extraction', {
+      bindings.logEvent?.('tengu_extract_memories_extraction', {
         input_tokens: result.totalUsage.input_tokens,
         output_tokens: result.totalUsage.output_tokens,
         cache_read_input_tokens: result.totalUsage.cache_read_input_tokens,
@@ -484,33 +436,30 @@ export function initExtractMemories(): void {
         duration_ms: Date.now() - startTime,
       })
 
-      logForDebugging(
+      bindings.logDebug?.(
         `[extractMemories] writtenPaths=${writtenPaths.length} memoryPaths=${memoryPaths.length} appendSystemMessage defined=${appendSystemMessage != null}`,
       )
       if (memoryPaths.length > 0) {
-        const msg = createMemorySavedMessage(memoryPaths)
-        if (feature('TEAMMEM')) {
-          msg.teamCount = teamCount
+        const msg = bindings.createMemorySavedMessage?.(memoryPaths)
+        if (msg) {
+          if (feature('TEAMMEM')) {
+            msg.teamCount = teamCount
+          }
+          appendSystemMessage?.(msg as MemSystemMessage)
         }
-        appendSystemMessage?.(msg)
       }
     } catch (error) {
-      // Extraction is best-effort — log but don't notify on error
-      logForDebugging(`[extractMemories] error: ${error}`)
-      logEvent('tengu_extract_memories_error', {
+      bindings.logDebug?.(`[extractMemories] error: ${error}`)
+      bindings.logEvent?.('tengu_extract_memories_error', {
         duration_ms: Date.now() - startTime,
       })
     } finally {
       inProgress = false
 
-      // If a call arrived while we were running, run a trailing extraction
-      // with the latest stashed context. The trailing run will compute its
-      // newMessageCount relative to the cursor we just advanced — so it only
-      // picks up messages added between the two calls, not the full history.
       const trailing = pendingContext
       pendingContext = undefined
       if (trailing) {
-        logForDebugging(
+        bindings.logDebug?.(
           '[extractMemories] running trailing extraction for stashed context',
         )
         await runExtraction({
@@ -525,9 +474,10 @@ export function initExtractMemories(): void {
   // --- Public entry point (captured by extractor) ---
 
   async function executeExtractMemoriesImpl(
-    context: REPLHookContext,
+    context: MemREPLContext,
     appendSystemMessage?: AppendSystemMessageFn,
   ): Promise<void> {
+    const bindings = getMemoryHostBindings()
     // Only run for the main agent, not subagents
     if (context.toolUseContext.agentId) {
       return
@@ -536,7 +486,7 @@ export function initExtractMemories(): void {
     if (!getFeatureValue_CACHED_MAY_BE_STALE('tengu_passport_quail', false)) {
       if (process.env.USER_TYPE === 'ant' && !hasLoggedGateFailure) {
         hasLoggedGateFailure = true
-        logEvent('tengu_extract_memories_gate_disabled', {})
+        bindings.logEvent?.('tengu_extract_memories_gate_disabled', {})
       }
       return
     }
@@ -547,18 +497,15 @@ export function initExtractMemories(): void {
     }
 
     // Skip in remote mode
-    if (getIsRemoteMode()) {
+    if (bindings.getIsRemoteMode?.()) {
       return
     }
 
-    // If an extraction is already in progress, stash this context for a
-    // trailing run (overwrites any previously stashed context — only the
-    // latest matters since it has the most messages).
     if (inProgress) {
-      logForDebugging(
+      bindings.logDebug?.(
         '[extractMemories] extraction in progress — stashing for trailing run',
       )
-      logEvent('tengu_extract_memories_coalesced', {})
+      bindings.logEvent?.('tengu_extract_memories_coalesced', {})
       pendingContext = { context, appendSystemMessage }
       return
     }
@@ -596,7 +543,7 @@ export function initExtractMemories(): void {
  * No-ops until initExtractMemories() has been called.
  */
 export async function executeExtractMemories(
-  context: REPLHookContext,
+  context: MemREPLContext,
   appendSystemMessage?: AppendSystemMessageFn,
 ): Promise<void> {
   await extractor?.(context, appendSystemMessage)
@@ -605,8 +552,7 @@ export async function executeExtractMemories(
 /**
  * Awaits all in-flight extractions (including trailing stashed runs) with a
  * soft timeout. Called by print.ts after the response is flushed but before
- * gracefulShutdownSync, so the forked agent completes before the 5s shutdown
- * failsafe kills it. No-op until initExtractMemories() has been called.
+ * gracefulShutdownSync. No-op until initExtractMemories() has been called.
  */
 export async function drainPendingExtraction(
   timeoutMs?: number,

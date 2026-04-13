@@ -1,10 +1,6 @@
 import { mkdir, readFile, stat, unlink, utimes, writeFile } from 'fs/promises'
 import { join } from 'path'
-import { getOriginalCwd } from '@claude-code/app-compat/bootstrap/state.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { isProcessRunning } from '@claude-code/app-compat/utils/genericProcessUtils.js'
-import { listCandidates } from '@claude-code/app-compat/utils/listSessionsImpl.js'
-import { getProjectDir } from '@claude-code/app-compat/utils/sessionStorage.js'
+import { getMemoryHostBindings } from './host.js'
 import { getAutoMemPath } from './paths.js'
 
 const LOCK_FILE = '.consolidate-lock'
@@ -25,6 +21,7 @@ export async function readLastConsolidatedAt(): Promise<number> {
 
 export async function tryAcquireConsolidationLock(): Promise<number | null> {
   const path = lockPath()
+  const bindings = getMemoryHostBindings()
 
   let mtimeMs: number | undefined
   let holderPid: number | undefined
@@ -38,8 +35,8 @@ export async function tryAcquireConsolidationLock(): Promise<number | null> {
   }
 
   if (mtimeMs !== undefined && Date.now() - mtimeMs < HOLDER_STALE_MS) {
-    if (holderPid !== undefined && isProcessRunning(holderPid)) {
-      logForDebugging(
+    if (holderPid !== undefined && bindings.isProcessRunning?.(holderPid)) {
+      bindings.logDebug?.(
         `[autoDream] lock held by live PID ${holderPid} (mtime ${Math.round((Date.now() - mtimeMs) / 1000)}s ago)`,
       )
       return null
@@ -64,6 +61,7 @@ export async function rollbackConsolidationLock(
   priorMtime: number,
 ): Promise<void> {
   const path = lockPath()
+  const bindings = getMemoryHostBindings()
   try {
     if (priorMtime === 0) {
       await unlink(path)
@@ -73,7 +71,7 @@ export async function rollbackConsolidationLock(
     const t = priorMtime / 1000
     await utimes(path, t, t)
   } catch (e: unknown) {
-    logForDebugging(
+    bindings.logDebug?.(
       `[autoDream] rollback failed: ${(e as Error).message} — next trigger delayed to minHours`,
     )
   }
@@ -82,17 +80,20 @@ export async function rollbackConsolidationLock(
 export async function listSessionsTouchedSince(
   sinceMs: number,
 ): Promise<string[]> {
-  const dir = getProjectDir(getOriginalCwd())
-  const candidates = await listCandidates(dir, true)
+  const bindings = getMemoryHostBindings()
+  const originalCwd = bindings.getOriginalCwd?.() ?? process.cwd()
+  const dir = bindings.getProjectDir?.(originalCwd) ?? originalCwd
+  const candidates = await (bindings.listCandidates?.(dir, true) ?? Promise.resolve([]))
   return candidates.filter(c => c.mtime > sinceMs).map(c => c.sessionId)
 }
 
 export async function recordConsolidation(): Promise<void> {
+  const bindings = getMemoryHostBindings()
   try {
     await mkdir(getAutoMemPath(), { recursive: true })
     await writeFile(lockPath(), String(process.pid))
   } catch (e: unknown) {
-    logForDebugging(
+    bindings.logDebug?.(
       `[autoDream] recordConsolidation write failed: ${(e as Error).message}`,
     )
   }

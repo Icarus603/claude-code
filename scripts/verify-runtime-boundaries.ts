@@ -49,8 +49,7 @@ const TRANSITION_APP_COMPAT_REF_BUDGET: Record<string, number> = {
   'packages/provider': 0,
   'packages/config': 0,
   'packages/permission': 0,
-  // memory: +2 for the same reason (findRelevantMemories + autoDream)
-  'packages/memory': 85,
+  'packages/memory': 0,
   'packages/cli': 0,
   'packages/tool-registry': 0,
   'packages/command-runtime': 0,
