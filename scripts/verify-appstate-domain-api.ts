@@ -1,6 +1,9 @@
 import { enableConfigs } from '@claude-code/config'
+import { installConfigHostBindings } from '../packages/config/host.js'
 
 async function main(): Promise<void> {
+  // Install minimal host bindings so enableConfigs() doesn't throw.
+  installConfigHostBindings({})
   enableConfigs()
 
   const { getDefaultAppState } = await import('../src/state/AppStateStore.js')
