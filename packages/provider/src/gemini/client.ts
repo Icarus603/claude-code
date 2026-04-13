@@ -1,4 +1,4 @@
-import { parseSSEFrames } from '@claude-code/cli'
+import { parseSSEFrames } from './sseParser.js'
 import { getProviderNetworkLayer } from '../network.js'
 import { errorMessage } from '../runtimeHelpers.js'
 import type {

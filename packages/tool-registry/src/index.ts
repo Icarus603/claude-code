@@ -25,3 +25,4 @@ export {
   getMergedTools,
   __resetToolRegistryForTests,
 } from './api.js'
+export * from './errors.js'

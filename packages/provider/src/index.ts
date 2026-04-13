@@ -38,3 +38,4 @@ export {
 export * from './openai/index.js'
 export * from './gemini/index.js'
 export * from './grok/index.js'
+export * from './errors.js'

@@ -1,4 +1,10 @@
-import { describe, expect, test } from 'bun:test';
+import { beforeAll, describe, expect, test } from 'bun:test';
+import { installConfigHostBindings } from '@claude-code/config';
+
+beforeAll(() => {
+  try { installConfigHostBindings({} as any) } catch { /* already installed */ }
+});
+
 import { getDefaultAppState } from '../AppStateStore.js';
 import { selectElicitation, selectMcp } from '../mcpSelectors.js';
 import {

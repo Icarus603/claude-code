@@ -135,6 +135,7 @@ function getToolInputSchema(tool: ProviderTool): Record<string, unknown> {
 export async function toolToAPISchema(
   tool: ProviderTool,
   options: ProviderToolSchemaOptions,
+  signal?: AbortSignal,
 ): Promise<BetaToolUnion> {
   const schema: Record<string, unknown> = {
     name: tool.name,
@@ -201,6 +202,7 @@ export async function isToolSearchEnabled(
   _getToolPermissionContext: () => Promise<ProviderToolPermissionContext>,
   _agents: readonly { [key: string]: unknown }[],
   _querySource?: string,
+  signal?: AbortSignal,
 ): Promise<boolean> {
   return (
     process.env.ENABLE_TOOL_SEARCH !== 'false' &&
