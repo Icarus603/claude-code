@@ -82,6 +82,8 @@ const KNOWN_OWNERS: Record<string, Spec> = {
 // here in the same commit that lands the contracts/errors.ts file.
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
   'config',
+  'permission',
+  'shell',
   'storage',
 ])
 

@@ -124,3 +124,5 @@ export {
   setCreateTaskOutputFn,
   setGetSandboxTmpDirNameFn,
 } from './exec.js'
+
+export * from './errors.js'

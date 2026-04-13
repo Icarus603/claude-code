@@ -54,6 +54,9 @@ export function installPackageHostBindings(
       // (never in packages/app-host/src/ — see memory: no-require-in-apphost)
       extraPermissionBindings: {
         addPermissionRulesToSettings: (...a: unknown[]) => { try { return require('../utils/permissions/permissionsLoader.js').addPermissionRulesToSettings(...a) } catch { return false } },
+        hasAutoMemPathOverride: () => { try { return require('@claude-code/memory/paths').hasAutoMemPathOverride() } catch { return false } },
+        isAutoMemPath: (p: string) => { try { return require('@claude-code/memory/paths').isAutoMemPath(p) } catch { return false } },
+        isAgentMemoryPath: (p: string) => { try { return require('@claude-code/memory/agentMemory').isAgentMemoryPath(p) } catch { return false } },
         getOriginalCwd: () => { try { return require('../bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
         getSessionId: () => { try { return require('../bootstrap/state.js').getSessionId() } catch { return 'unknown' } },
         getCwd: () => { try { return require('../utils/cwd.js').getCwd() } catch { return process.cwd() } },
