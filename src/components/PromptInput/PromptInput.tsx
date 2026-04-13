@@ -33,11 +33,6 @@ import {
   popAllEditable,
 } from 'src/utils/messageQueueManager.js'
 import stripAnsi from 'strip-ansi'
-import { companionReservedColumns } from '../../buddy/CompanionSprite.js'
-import {
-  findBuddyTriggerPositions,
-  useBuddyNotification,
-} from '../../buddy/useBuddyNotification.js'
 import { FastModePicker } from '../../commands/fast/fast.js'
 import { isUltrareviewEnabled } from '../../commands/review/ultrareviewEnabled.js'
 import { getNativeCSIuTerminalDisplayName } from '../../commands/terminalSetup/terminalSetup.js'
@@ -440,10 +435,6 @@ function PromptInput({
   const viewingAgentTaskId = useAppState(s => s.viewingAgentTaskId)
   const viewSelectionMode = useAppState(s => s.viewSelectionMode)
   const showSpinnerTree = useAppState(s => s.expandedView) === 'teammates'
-  const { companion: _companion, companionMuted } = feature('BUDDY')
-    ? getGlobalConfig()
-    : { companion: undefined, companionMuted: undefined }
-  const companionFooterVisible = !!_companion && !companionMuted
   // Brief mode: BriefSpinner/BriefIdleStatus own the 2-row footprint above
   // the input. Dropping marginTop here lets the spinner sit flush against
   // the input bar. viewingAgentTaskId mirrors the gate on both (Spinner.tsx,
@@ -618,8 +609,7 @@ function PromptInput({
 
   // ─── Footer pill navigation ─────────────────────────────────────────────
   // Which pills render below the input box. Order here IS the nav order
-  // (down/right = forward, up/left = back). Selection lives in AppState so
-  // pills rendered outside PromptInput (CompanionSprite) can read focus.
+  // (down/right = forward, up/left = back).
   const runningTaskCount = useMemo(
     () => count(Object.values(tasks), t => t.status === 'running'),
     [tasks],
@@ -641,7 +631,6 @@ function PromptInput({
         bagelFooterVisible && 'bagel',
         teamsFooterVisible && 'teams',
         bridgeFooterVisible && 'bridge',
-        companionFooterVisible && 'companion',
       ].filter(Boolean) as FooterItem[],
     [
       tasksFooterVisible,
@@ -649,7 +638,6 @@ function PromptInput({
       bagelFooterVisible,
       teamsFooterVisible,
       bridgeFooterVisible,
-      companionFooterVisible,
     ],
   )
 
@@ -755,11 +743,6 @@ function PromptInput({
 
   const btwTriggers = useMemo(
     () => findBtwTriggerPositions(displayedValue),
-    [displayedValue],
-  )
-
-  const buddyTriggers = useMemo(
-    () => findBuddyTriggerPositions(displayedValue),
     [displayedValue],
   )
 
@@ -992,19 +975,6 @@ function PromptInput({
       }
     }
 
-    // Rainbow for /buddy
-    for (const trigger of buddyTriggers) {
-      for (let i = trigger.start; i < trigger.end; i++) {
-        highlights.push({
-          start: i,
-          end: i + 1,
-          color: getRainbowColor(i - trigger.start),
-          shimmerColor: getRainbowColor(i - trigger.start, true),
-          priority: 10,
-        })
-      }
-    }
-
     return highlights
   }, [
     isSearchingHistory,
@@ -1023,7 +993,6 @@ function PromptInput({
     thinkTriggers,
     ultraplanTriggers,
     ultrareviewTriggers,
-    buddyTriggers,
   ])
 
   const { addNotification, removeNotification } = useNotifications()
@@ -2307,12 +2276,6 @@ function PromptInput({
           return
         }
         switch (footerItemSelected) {
-          case 'companion':
-            if (feature('BUDDY')) {
-              selectFooterItem(null)
-              void onSubmit('/buddy')
-            }
-            break
           case 'tasks':
             if (isTeammateMode) {
               // Enter switches to the selected agent's view
@@ -2543,18 +2506,8 @@ function PromptInput({
     })
   }, [effortNotificationText, addNotification, removeNotification])
 
-  useBuddyNotification()
-
-  const companionSpeaking = feature('BUDDY')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
-      useAppState(s => s.companionReaction !== undefined)
-    : false
   const { columns, rows } = useTerminalSize()
-  const reservedCompanionColumns = companionReservedColumns(
-    columns,
-    companionSpeaking,
-  )
-  const promptAreaColumns = columns - reservedCompanionColumns
+  const promptAreaColumns = columns
   const textInputColumns = promptAreaColumns - 3
 
   // POC: click-to-position-cursor. Mouse tracking is only enabled inside

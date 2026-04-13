@@ -186,7 +186,6 @@ WebSearch 工具的預設適配器，抓取 Bing 搜索結果。
 | `/api/claude_code/managed_settings` | 企業託管設置 (1h 輪詢) | `src/services/remoteManagedSettings/index.ts` |
 | `/api/claude_code/team_memory?repo={}` | 團隊記憶同步 | `src/services/teamMemorySync/index.ts` |
 | `/api/auth/trusted_devices` | 可信設備註冊 | `src/bridge/trustedDevice.ts` |
-| `/api/organizations/{id}/claude_code/buddy_react` | Companion 反應 | `src/buddy/companionReact.ts` |
 | `/mcp-registry/v0/servers` | MCP 服務器註冊表 | `src/services/mcp/officialRegistry.ts` |
 | `/v1/files` | 文件上傳/下載 | `src/services/api/filesApi.ts` |
 | `/v1/sessions/{id}/events` | 會話歷史 | `src/assistant/sessionHistory.ts` |

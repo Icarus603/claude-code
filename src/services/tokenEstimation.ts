@@ -205,11 +205,24 @@ export async function countMessagesTokensWithAPI(
   })
 }
 
+// CJK Unified Ideographs + extensions + compatibility blocks + punctuation
+// Each CJK character is 1 JS string unit but ~1.5 BPE tokens on average,
+// making the standard /4 formula underestimate by 4-8x for Chinese/Japanese.
+const CJK_REGEX =
+  /[\u2e80-\u2eff\u2f00-\u2fdf\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u3100-\u312f\u3200-\u32ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f]/g
+
 export function roughTokenCountEstimation(
   content: string,
   bytesPerToken: number = 4,
 ): number {
-  return Math.round(content.length / bytesPerToken)
+  const cjkMatches = content.match(CJK_REGEX)
+  if (!cjkMatches || cjkMatches.length === 0) {
+    return Math.round(content.length / bytesPerToken)
+  }
+  const cjkCount = cjkMatches.length
+  const nonCjkLength = content.length - cjkCount
+  // CJK chars: ~1.5 tokens each; non-CJK: use caller-supplied ratio
+  return Math.round(nonCjkLength / bytesPerToken + cjkCount * 1.5)
 }
 
 /**

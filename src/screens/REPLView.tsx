@@ -442,7 +442,6 @@ const WebBrowserPanelModule = feature('WEB_BROWSER_TOOL')
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { IssueFlagBanner } from '../components/PromptInput/IssueFlagBanner.js';
 import { useIssueFlagBanner } from '../hooks/useIssueFlagBanner.js';
-import { CompanionSprite, CompanionFloatingBubble, MIN_COLS_FOR_FULL_SPRITE } from '../buddy/CompanionSprite.js';
 import { DevBar } from '../components/DevBar.js';
 import { UltraplanChoiceDialog } from '../components/ultraplan/UltraplanChoiceDialog.js';
 import { UltraplanLaunchDialog } from '../components/ultraplan/UltraplanLaunchDialog.js';
@@ -1501,14 +1500,6 @@ export function REPL({
       } else {
         onScrollAway(handle);
         if (feature('KAIROS')) maybeLoadOlder(handle);
-        // Dismiss the companion bubble on scroll — it's absolute-positioned
-        // at bottom-right and covers transcript content. Scrolling = user is
-        // trying to read something under it.
-        if (feature('BUDDY')) {
-          setAppState(prev =>
-            prev.companionReaction === undefined ? prev : { ...prev, companionReaction: undefined },
-          );
-        }
       }
     },
     [onRepin, onScrollAway, maybeLoadOlder, setAppState],
@@ -3221,12 +3212,6 @@ export function REPL({
         querySource: getQuerySourceForREPL(),
       })) {
         onQueryEvent(event);
-      }
-
-      if (feature('BUDDY') && typeof fireCompanionObserver === 'function') {
-        void fireCompanionObserver(messagesRef.current, reaction =>
-          setAppState(prev => (prev.companionReaction === reaction ? prev : { ...prev, companionReaction: reaction })),
-        );
       }
 
       queryCheckpoint('query_end');
@@ -5257,18 +5242,6 @@ export function REPL({
       />
     ) : null;
 
-  // Narrow terminals: companion collapses to a one-liner that REPL stacks
-  // on its own row (above input in fullscreen, below in scrollback) instead
-  // of row-beside. Wide terminals keep the row layout with sprite on the right.
-  const companionNarrow = transcriptCols < MIN_COLS_FOR_FULL_SPRITE;
-  // Hide the sprite when PromptInput early-returns BackgroundTasksDialog.
-  // The sprite sits as a row sibling of PromptInput, so the dialog's Pane
-  // divider draws at useTerminalSize() width but only gets terminalWidth -
-  // spriteWidth — divider stops short and dialog text wraps early. Don't
-  // check footerSelection: pill FOCUS (arrow-down to tasks pill) must keep
-  // the sprite visible so arrow-right can navigate to it.
-  const companionVisible = !toolJSX?.shouldHidePromptInput && !focusedInputDialog && !showBashesDialog;
-
   // In fullscreen, ALL local-jsx slash commands float in the modal slot —
   // FullscreenLayout wraps them in an absolute-positioned bottom-anchored
   // pane (▔ divider, ModalContext). Pane/Dialog inside detect the context
@@ -5326,9 +5299,7 @@ export function REPL({
         <FullscreenLayout
           scrollRef={scrollRef}
           overlay={toolPermissionOverlay}
-          bottomFloat={
-            feature('BUDDY') && companionVisible && !companionNarrow ? <CompanionFloatingBubble /> : undefined
-          }
+          bottomFloat={undefined}
           modal={centeredModal}
           modalScrollRef={modalScrollRef}
           dividerYRef={dividerYRef}
@@ -5414,14 +5385,7 @@ export function REPL({
             </>
           }
           bottom={
-            <Box
-              flexDirection={feature('BUDDY') && companionNarrow ? 'column' : 'row'}
-              width="100%"
-              alignItems={feature('BUDDY') && companionNarrow ? undefined : 'flex-end'}
-            >
-              {feature('BUDDY') && companionNarrow && isFullscreenEnvEnabled() && companionVisible ? (
-                <CompanionSprite />
-              ) : null}
+            <Box flexDirection="row" width="100%" alignItems="flex-end">
               <Box flexDirection="column" flexGrow={1}>
                 {permissionStickyFooter}
                 {/* Immediate local-jsx commands (/btw, /sandbox, /assistant,
@@ -6093,9 +6057,6 @@ export function REPL({
                 )}
                 {process.env.USER_TYPE === 'ant' && <DevBar />}
               </Box>
-              {feature('BUDDY') && !(companionNarrow && isFullscreenEnvEnabled()) && companionVisible ? (
-                <CompanionSprite />
-              ) : null}
             </Box>
           }
         />

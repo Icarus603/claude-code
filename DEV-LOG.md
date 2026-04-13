@@ -652,7 +652,6 @@ GrowthBook 功能開關係統原爲 Anthropic 內部構建設計，硬編碼 SDK
 | `src/components/SentryErrorBoundary.ts` | 添加 `componentDidCatch`，React 組件渲染錯誤上報到 Sentry（含 componentStack） |
 | `src/entrypoints/init.ts` | 網絡設定後呼叫 `initSentry()` |
 | `src/utils/gracefulShutdown.ts` | 優雅關閉時 flush Sentry 事件 |
-| `src/screens/REPL.tsx:2809` | `fireCompanionObserver` 呼叫增加 `typeof` 防護，BUDDY feature 啓用時不報錯（TODO: 待實現） |
 | `package.json` | devDependencies 新增 `@sentry/node` |
 
 **用法：** `SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx bun run dev`
@@ -717,23 +716,15 @@ GrowthBook 功能開關係統原爲 Anthropic 內部構建設計，硬編碼 SDK
 
 ---
 
-## Buddy 命令合入 + Feature Flag 規範修正 (2026-04-02)
+## Feature Flag 規範修正 (2026-04-02)
 
-合入 `pr/smallflyingpig/36` 分支（支援 buddy 命令 + 修復 rehatch），並修正 feature flag 使用方式。
+合入 `pr/smallflyingpig/36` 分支並修正 feature flag 使用方式。
 
 **合入內容（來自 PR）：**
-- `src/commands/buddy/buddy.ts` — 新增 `/buddy` 命令，支援 hatch / rehatch / pet / mute / unmute 子命令
-- `src/commands/buddy/index.ts` — 從 stub 改爲正確的 `Command` 類型導出
-- `src/buddy/companion.ts` — 新增 `generateSeed()`，`getCompanion()` 支援 seed 驅動的可復現 rolling
-- `src/buddy/types.ts` — `CompanionSoul` 增加 `seed?` 字段
 
 **合併後修正：**
-- `src/entrypoints/cli.tsx` — PR 硬編碼了 `const feature = (name) => name === "BUDDY"`，違反 feature flag 規範，恢復爲標準 `import { feature } from 'bun:bundle'`
-- `src/commands.ts` — PR 用靜態 `import buddy` 繞過了 feature gate，恢復爲 `feature('BUDDY') ? require(...) : null` + 條件展開
-- `src/commands/buddy/buddy.ts` — 刪除未使用的 `companionInfoText` 函數和多餘的 `Roll`/`SPECIES` import
 - `CLAUDE.md` — 重寫 Feature Flag System 章節，明確規範：程式碼中統一用 `import { feature } from 'bun:bundle'`，啓用走環境變量 `FEATURE_<NAME>=1`
 
-**用法：** `FEATURE_BUDDY=1 bun run dev`
 
 ---
 

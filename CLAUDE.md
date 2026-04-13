@@ -52,7 +52,7 @@ bun run docs:dev
 
 - **Runtime**: Bun (not Node.js). All imports, builds, and execution use Bun APIs.
 - **Build**: `build.ts` 執行 `Bun.build()` with `splitting: true`，入口 `src/entrypoints/cli.tsx`，輸出 `dist/cli.js` + chunk files。默認啓用 `AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE` feature。構建後自動替換 `import.meta.require` 爲 Node.js 兼容版本（產物 bun/node 都可運行）。
-- **Dev mode**: `scripts/dev.ts` 通過 Bun `-d` flag 注入 `MACRO.*` defines，運行 `src/entrypoints/cli.tsx`。默認啓用 `BUDDY`、`TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE` 六個 feature。
+- **Dev mode**: `scripts/dev.ts` 通過 Bun `-d` flag 注入 `MACRO.*` defines，運行 `src/entrypoints/cli.tsx`。默認啓用 `TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE` 等 feature。
 - **Module system**: ESM (`"type": "module"`), TSX with `react-jsx` transform.
 - **Monorepo**: Bun workspaces — internal packages live in `packages/` resolved via `workspace:*`.
 - **Lint/Format**: Biome (`biome.json`)。`bun run lint` / `bun run lint:fix` / `bun run format`。
@@ -131,10 +131,10 @@ bun run docs:dev
 Feature flags control which functionality is enabled at runtime:
 
 - **在代碼中使用**: 統一通過 `import { feature } from 'bun:bundle'` 導入，調用 `feature('FLAG_NAME')` 返回 `boolean`。**不要**在 `cli.tsx` 或其他文件裏自己定義 `feature` 函數或覆蓋這個 import。
-- **啓用方式**: 通過環境變量 `FEATURE_<FLAG_NAME>=1`。例如 `FEATURE_BUDDY=1 bun run dev` 啓用 BUDDY 功能。
-- **Dev 默認 features**: `BUDDY`、`TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE`（見 `scripts/dev.ts`）。
+- **啓用方式**: 通過環境變量 `FEATURE_<FLAG_NAME>=1`。例如 `FEATURE_FORK_SUBAGENT=1 bun run dev` 啓用對應功能。
+- **Dev 默認 features**: `TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE`（見 `scripts/dev.ts`）。
 - **Build 默認 features**: `AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE`（見 `build.ts`）。
-- **常見 flag**: `BUDDY`, `DAEMON`, `BRIDGE_MODE`, `BG_SESSIONS`, `PROACTIVE`, `KAIROS`, `VOICE_MODE`, `FORK_SUBAGENT`, `SSH_REMOTE`, `DIRECT_CONNECT`, `TEMPLATES`, `CHICAGO_MCP`, `BYOC_ENVIRONMENT_RUNNER`, `SELF_HOSTED_RUNNER`, `COORDINATOR_MODE`, `UDS_INBOX`, `LODESTONE`, `ABLATION_BASELINE` 等。
+- **常見 flag**: `DAEMON`, `BRIDGE_MODE`, `BG_SESSIONS`, `PROACTIVE`, `KAIROS`, `VOICE_MODE`, `FORK_SUBAGENT`, `SSH_REMOTE`, `DIRECT_CONNECT`, `TEMPLATES`, `CHICAGO_MCP`, `BYOC_ENVIRONMENT_RUNNER`, `SELF_HOSTED_RUNNER`, `COORDINATOR_MODE`, `UDS_INBOX`, `LODESTONE`, `ABLATION_BASELINE` 等。
 - **類型聲明**: `src/types/internal-modules.d.ts` 中聲明瞭 `bun:bundle` 模塊的 `feature` 函數簽名。
 
 **新增功能的正確做法**: 保留 `import { feature } from 'bun:bundle'` + `feature('FLAG_NAME')` 的標準模式，在運行時通過環境變量或配置控制，不要繞過 feature flag 直接 import。

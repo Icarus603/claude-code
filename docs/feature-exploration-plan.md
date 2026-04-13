@@ -3,7 +3,7 @@
 > 生成日期：2026-04-02
 > 程式碼庫中已識別 89 個 feature flag，本文件按實現完整度和探索價值分級，制定探索優先級和路線圖。
 >
-> **已完成**：BUDDY（✅ 2026-04-02）、TRANSCRIPT_CLASSIFIER / Auto Mode（✅ 2026-04-02）
+> **已完成**：TRANSCRIPT_CLASSIFIER / Auto Mode（✅ 2026-04-02）
 
 ---
 
@@ -24,7 +24,7 @@
 
 ```bash
 # 單個 feature
-FEATURE_BUDDY=1 bun run dev
+FEATURE_FORK_SUBAGENT=1 bun run dev
 
 # 多個 feature 組合
 FEATURE_KAIROS=1 FEATURE_PROACTIVE=1 FEATURE_FORK_SUBAGENT=1 bun run dev
@@ -176,14 +176,6 @@ FEATURE_KAIROS=1 FEATURE_PROACTIVE=1 FEATURE_FORK_SUBAGENT=1 bun run dev
 
 ---
 
-### ~~2.11 BUDDY（虛擬夥伴）~~ ✅ 已完成
-
-- **引用數**：16
-- **功能**：`/buddy` 命令，支援 hatch/rehatch/pet/mute/unmute
-- **狀態**：✅ 已合入，功能完整可用（2026-04-02 完成）
-
----
-
 ## 三、Tier 2 — 部分實現（需要補全）
 
 ### 3.1 PROACTIVE（主動模式）
@@ -277,11 +269,10 @@ FEATURE_KAIROS=1 FEATURE_PROACTIVE=1 FEATURE_FORK_SUBAGENT=1 bun run dev
 
 | 優先級 | Feature | 命令 | 預期效果 |
 |--------|---------|------|----------|
-| 1 | BUDDY | `FEATURE_BUDDY=1 bun run dev` | `/buddy hatch` 生成夥伴 |
-| 2 | FORK_SUBAGENT | `FEATURE_FORK_SUBAGENT=1 bun run dev` | Agent 可生成上下文繼承的子任務 |
-| 3 | TOKEN_BUDGET | `FEATURE_TOKEN_BUDGET=1 bun run dev` | 輸入 "spend 500k tokens" 測試自動持續 |
-| 4 | TREE_SITTER_BASH | `FEATURE_TREE_SITTER_BASH=1 bun run dev` | 更精確的 bash 權限匹配 |
-| 5 | MCP_SKILLS | `FEATURE_MCP_SKILLS=1 bun run dev` | MCP 服務器 prompt 提升爲技能 |
+| 1 | FORK_SUBAGENT | `FEATURE_FORK_SUBAGENT=1 bun run dev` | Agent 可生成上下文繼承的子任務 |
+| 2 | TOKEN_BUDGET | `FEATURE_TOKEN_BUDGET=1 bun run dev` | 輸入 "spend 500k tokens" 測試自動持續 |
+| 3 | TREE_SITTER_BASH | `FEATURE_TREE_SITTER_BASH=1 bun run dev` | 更精確的 bash 權限匹配 |
+| 4 | MCP_SKILLS | `FEATURE_MCP_SKILLS=1 bun run dev` | MCP 服務器 prompt 提升爲技能 |
 
 ### Phase 2：核心功能探索（需要 OAuth）
 
@@ -322,7 +313,6 @@ FEATURE_PROACTIVE=1 \
 FEATURE_FORK_SUBAGENT=1 \
 FEATURE_TOKEN_BUDGET=1 \
 FEATURE_TRANSCRIPT_CLASSIFIER=1 \
-FEATURE_BUDDY=1 \
 bun run dev
 ```
 
@@ -380,7 +370,6 @@ bun run dev
 | KAIROS_CHANNELS | 19 | 1 |
 | UDS_INBOX | 17 | 3 |
 | CHICAGO_MCP | 16 | 3 |
-| BUDDY | 16 | 1 |
 | HISTORY_SNIP | 15 | 2 |
 | MONITOR_TOOL | 13 | 3 |
 | COMMIT_ATTRIBUTION | 12 | — |
