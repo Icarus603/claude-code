@@ -1,5 +1,16 @@
 import { exec } from '../src/utils/Shell.js'
 
+// Install minimal host bindings so exec() doesn't throw. The verifier runs
+// outside the full app bootstrap.
+try {
+  const { installPermissionHostBindings } = await import('@claude-code/permission')
+  installPermissionHostBindings({ getPlatform: () => process.platform === 'darwin' ? 'macos' : 'linux' } as any)
+} catch { /* already installed */ }
+try {
+  const { installConfigHostBindings } = await import('@claude-code/config')
+  installConfigHostBindings({} as any)
+} catch { /* already installed */ }
+
 async function runBashSmoke(): Promise<void> {
   const command = await exec(
     "printf 'phase4-shell-bash-ok'",

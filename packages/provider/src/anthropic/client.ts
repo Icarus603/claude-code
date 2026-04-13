@@ -67,12 +67,14 @@ export async function getAnthropicClient({
   model,
   fetchOverride,
   source,
+  signal,
 }: {
   apiKey?: string
   maxRetries: number
   model?: string
   fetchOverride?: ClientOptions['fetch']
   source?: string
+  signal?: AbortSignal
 }): Promise<Anthropic> {
   const authProvider = getAnthropicAuthProvider()
   const networkLayer = getProviderNetworkLayer()

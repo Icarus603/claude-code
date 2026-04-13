@@ -135,6 +135,20 @@ async function collectAssistantText(
 }
 
 async function main(): Promise<void> {
+  // Install minimal host bindings so enableConfigs() and downstream calls
+  // don't throw. The verifier runs outside the full app bootstrap.
+  try {
+    const { installConfigHostBindings } = await import('@claude-code/config')
+    installConfigHostBindings({} as any)
+  } catch { /* already installed */ }
+  try {
+    const { installMemoryHostBindings } = await import('@claude-code/memory')
+    installMemoryHostBindings({} as any)
+  } catch { /* already installed */ }
+  try {
+    const { installPermissionHostBindings } = await import('@claude-code/permission')
+    installPermissionHostBindings({} as any)
+  } catch { /* already installed */ }
   enableConfigs()
 
   process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'provider-test'

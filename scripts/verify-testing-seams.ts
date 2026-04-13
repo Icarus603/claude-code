@@ -45,6 +45,9 @@ const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
   'storage',
   'output',
   'permission',
+  'provider',
+  'tool-registry',
+  'command-runtime',
 ])
 
 type Violation = { package: string; reason: string }

@@ -8,6 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./constants": "./src/constants.ts",
-    "./runtime": "./src/runtime.ts"
+    "./runtime": "./src/runtime.ts",
+    "./errors": "./src/errors.ts",
+    "./testing": "./src/testing/index.ts"
   }
 }

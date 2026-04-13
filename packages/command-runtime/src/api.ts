@@ -3,6 +3,7 @@ import { getCommandRegistryHostBindings } from './host.js'
 
 export async function getCommands<TCommand extends CommandLike>(
   cwd: string,
+  signal?: AbortSignal,
 ): Promise<TCommand[]> {
   return getCommandRegistryHostBindings<TCommand>().getCommands(cwd)
 }
@@ -63,12 +64,14 @@ export function getCommand<TCommand extends CommandLike>(
 
 export async function getSkillToolCommands<TCommand extends CommandLike>(
   cwd: string,
+  signal?: AbortSignal,
 ): Promise<TCommand[]> {
   return getCommandRegistryHostBindings<TCommand>().getSkillToolCommands(cwd)
 }
 
 export async function getSlashCommandToolSkills<TCommand extends CommandLike>(
   cwd: string,
+  signal?: AbortSignal,
 ): Promise<TCommand[]> {
   return getCommandRegistryHostBindings<TCommand>().getSlashCommandToolSkills(
     cwd,

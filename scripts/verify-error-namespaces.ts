@@ -83,8 +83,10 @@ const KNOWN_OWNERS: Record<string, Spec> = {
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
   'config',
   'permission',
+  'provider',
   'shell',
   'storage',
+  'tool-registry',
 ])
 
 type Violation = { package: string; reason: string }

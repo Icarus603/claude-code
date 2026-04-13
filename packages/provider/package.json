@@ -8,6 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./claudeLegacy": "./src/claudeLegacy.ts",
-    "./providerHostSetup": "./src/providerHostSetup.ts"
+    "./providerHostSetup": "./src/providerHostSetup.ts",
+    "./errors": "./src/errors.ts",
+    "./testing": "./src/testing/index.ts"
   }
 }
