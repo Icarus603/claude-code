@@ -7,16 +7,8 @@
 // tears everything down.
 
 import type { FSWatcher } from 'chokidar'
-import {
-  getScheduledTasksEnabled,
-  getSessionCronTasks,
-  removeSessionCronTasks,
-  setScheduledTasksEnabled,
-} from '@claude-code/app-compat/bootstrap/state.js'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '@claude-code/app-compat/services/eventLogger.js'
+import { getAgentHostBindings } from '../host.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../internalTypes.js'
 import { cronToHuman } from './cronCore.js'
 import {
   type CronJitterConfig,
@@ -35,7 +27,6 @@ import {
   releaseSchedulerLock,
   tryAcquireSchedulerLock,
 } from './cronTasksLockCore.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
 
 const CHECK_INTERVAL_MS = 1000
 const FILE_STABILITY_MS = 300
@@ -202,13 +193,9 @@ export function createCronScheduler(
         // removeCronTasks + chokidar reload chain is in progress.
         nextFireAt.set(t.id, Infinity)
       }
-      logEvent('tengu_scheduled_task_missed', {
+      getAgentHostBindings().logEvent?.('tengu_scheduled_task_missed', {
         count: missed.length,
-        taskIds: missed
-          .map(t => t.id)
-          .join(
-            ',',
-          ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        taskIds: missed.map(t => t.id).join(','),
       })
       if (onMissed) {
         onMissed(missed)
@@ -219,9 +206,9 @@ export function createCronScheduler(
         missed.map(t => t.id),
         dir,
       ).catch(e =>
-        logForDebugging(`[ScheduledTasks] failed to remove missed tasks: ${e}`),
+        getAgentHostBindings().logDebug?.(`[ScheduledTasks] failed to remove missed tasks: ${e}`),
       )
-      logForDebugging(
+      getAgentHostBindings().logDebug?.(
         `[ScheduledTasks] surfaced ${missed.length} missed one-shot task(s)`,
       )
     }
@@ -275,20 +262,19 @@ export function createCronScheduler(
               jitterCfg,
             ) ?? Infinity)
         nextFireAt.set(t.id, next)
-        logForDebugging(
+        getAgentHostBindings().logDebug?.(
           `[ScheduledTasks] scheduled ${t.id} for ${next === Infinity ? 'never' : new Date(next).toISOString()}`,
         )
       }
 
       if (now < next) return
 
-      logForDebugging(
+      getAgentHostBindings().logDebug?.(
         `[ScheduledTasks] firing ${t.id}${t.recurring ? ' (recurring)' : ''}`,
       )
-      logEvent('tengu_scheduled_task_fire', {
+      getAgentHostBindings().logEvent?.('tengu_scheduled_task_fire', {
         recurring: t.recurring ?? false,
-        taskId:
-          t.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        taskId: t.id,
       })
       if (onFireTask) {
         onFireTask(t)
@@ -302,12 +288,11 @@ export function createCronScheduler(
       const aged = isRecurringTaskAged(t, now, jitterCfg.recurringMaxAgeMs)
       if (aged) {
         const ageHours = Math.floor((now - t.createdAt) / 1000 / 60 / 60)
-        logForDebugging(
+        getAgentHostBindings().logDebug?.(
           `[ScheduledTasks] recurring task ${t.id} aged out (${ageHours}h since creation), deleting after final fire`,
         )
-        logEvent('tengu_scheduled_task_expired', {
-          taskId:
-            t.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        getAgentHostBindings().logEvent?.('tengu_scheduled_task_expired', {
+          taskId: t.id,
           ageHours,
         })
       }
@@ -326,7 +311,7 @@ export function createCronScheduler(
         // One-shot (or aged-out recurring) session task: synchronous memory
         // removal. No inFlight window — the next tick will read a session
         // store without this id.
-        removeSessionCronTasks([t.id])
+        getAgentHostBindings().removeSessionCronTasks?.([t.id])
         nextFireAt.delete(t.id)
       } else {
         // One-shot (or aged-out recurring) file task: delete from disk.
@@ -374,7 +359,7 @@ export function createCronScheduler(
     // is skipped on the daemon path (`dir !== undefined`) which never
     // touches bootstrap state.
     if (dir === undefined) {
-      for (const t of getSessionCronTasks()) process(t, true)
+      for (const t of getAgentHostBindings().getSessionCronTasks?.() ?? []) process(t, true)
     }
 
     if (seen.size === 0) {
@@ -430,7 +415,7 @@ export function createCronScheduler(
               }
             }
           })
-          .catch(e => logForDebugging(String(e), { level: 'error' }))
+          .catch(e => getAgentHostBindings().logDebug?.(`[ScheduledTasks] lock probe error: ${String(e)}`))
       }, LOCK_PROBE_INTERVAL_MS)
       lockProbeTimer.unref?.()
     }
@@ -466,30 +451,30 @@ export function createCronScheduler(
       // getScheduledTasksEnabled() would read a never-initialized flag. The
       // daemon is asking to schedule; just enable.
       if (dir !== undefined) {
-        logForDebugging(
+        getAgentHostBindings().logDebug?.(
           `[ScheduledTasks] scheduler start() — dir=${dir}, hasTasks=${hasCronTasksSync(dir)}`,
         )
         void enable()
         return
       }
-      logForDebugging(
-        `[ScheduledTasks] scheduler start() — enabled=${getScheduledTasksEnabled()}, hasTasks=${hasCronTasksSync()}`,
+      getAgentHostBindings().logDebug?.(
+        `[ScheduledTasks] scheduler start() — enabled=${getAgentHostBindings().getScheduledTasksEnabled?.()}, hasTasks=${hasCronTasksSync()}`,
       )
       // Auto-enable when scheduled_tasks.json has entries. CronCreateTool
       // also sets this when a task is created mid-session.
       if (
-        !getScheduledTasksEnabled() &&
+        !getAgentHostBindings().getScheduledTasksEnabled?.() &&
         (assistantMode || hasCronTasksSync())
       ) {
-        setScheduledTasksEnabled(true)
+        getAgentHostBindings().setScheduledTasksEnabled?.(true)
       }
-      if (getScheduledTasksEnabled()) {
+      if (getAgentHostBindings().getScheduledTasksEnabled?.()) {
         void enable()
         return
       }
       enablePoll = setInterval(
         en => {
-          if (getScheduledTasksEnabled()) void en()
+          if (getAgentHostBindings().getScheduledTasksEnabled?.()) void en()
         },
         CHECK_INTERVAL_MS,
         enable,

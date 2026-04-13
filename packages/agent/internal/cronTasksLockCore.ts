@@ -11,14 +11,13 @@
 import { mkdir, readFile, unlink, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import { z } from 'zod/v4'
-import { getProjectRoot, getSessionId } from '@claude-code/app-compat/bootstrap/state.js'
-import { registerCleanup } from '@claude-code/app-compat/utils/cleanupRegistry.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { getErrnoCode } from '@claude-code/app-compat/utils/errors.js'
-import { isProcessRunning } from '@claude-code/app-compat/utils/genericProcessUtils.js'
-import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
-import { lazySchema } from '@claude-code/app-compat/utils/lazySchema.js'
-import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+import { getAgentHostBindings } from '../host.js'
+import {
+  getErrnoCode,
+  jsonStringify,
+  lazySchema,
+  safeParseJSON,
+} from '../internalUtils.js'
 
 const LOCK_FILE_REL = join('.claude', 'scheduled_tasks.lock')
 
@@ -47,7 +46,7 @@ let unregisterCleanup: (() => void) | undefined
 let lastBlockedBy: string | undefined
 
 function getLockPath(dir?: string): string {
-  return join(dir ?? getProjectRoot(), LOCK_FILE_REL)
+  return join(dir ?? getAgentHostBindings().getProjectRoot?.() ?? process.cwd(), LOCK_FILE_REL)
 }
 
 async function readLock(dir?: string): Promise<SchedulerLock | undefined> {
@@ -92,7 +91,7 @@ async function tryCreateExclusive(
 
 function registerLockCleanup(opts?: SchedulerLockOptions): void {
   unregisterCleanup?.()
-  unregisterCleanup = registerCleanup(async () => {
+  unregisterCleanup = getAgentHostBindings().registerCleanup?.(async () => {
     await releaseSchedulerLock(opts)
   })
 }
@@ -115,7 +114,7 @@ export async function tryAcquireSchedulerLock(
   // "sessionId" in the lock file is really just a stable owner key. REPL
   // uses getSessionId(); daemon callers supply their own UUID. PID remains
   // the liveness signal regardless.
-  const sessionId = opts?.lockIdentity ?? getSessionId()
+  const sessionId = opts?.lockIdentity ?? (getAgentHostBindings().getSessionId?.() ?? 'default-session')
   const lock: SchedulerLock = {
     sessionId,
     pid: process.pid,
@@ -125,7 +124,7 @@ export async function tryAcquireSchedulerLock(
   if (await tryCreateExclusive(lock, dir)) {
     lastBlockedBy = undefined
     registerLockCleanup(opts)
-    logForDebugging(
+    getAgentHostBindings().logDebug?.(
       `[ScheduledTasks] acquired scheduler lock (PID ${process.pid})`,
     )
     return true
@@ -146,10 +145,10 @@ export async function tryAcquireSchedulerLock(
 
   // Corrupt or unparseable — treat as stale.
   // Another live session — blocked.
-  if (existing && isProcessRunning(existing.pid)) {
+  if (existing && (getAgentHostBindings().isProcessRunning?.(existing.pid) ?? false)) {
     if (lastBlockedBy !== existing.sessionId) {
       lastBlockedBy = existing.sessionId
-      logForDebugging(
+      getAgentHostBindings().logDebug?.(
         `[ScheduledTasks] scheduler lock held by session ${existing.sessionId} (PID ${existing.pid})`,
       )
     }
@@ -158,7 +157,7 @@ export async function tryAcquireSchedulerLock(
 
   // Stale — unlink and retry the exclusive create once.
   if (existing) {
-    logForDebugging(
+    getAgentHostBindings().logDebug?.(
       `[ScheduledTasks] recovering stale scheduler lock from PID ${existing.pid}`,
     )
   }
@@ -183,12 +182,12 @@ export async function releaseSchedulerLock(
   lastBlockedBy = undefined
 
   const dir = opts?.dir
-  const sessionId = opts?.lockIdentity ?? getSessionId()
+  const sessionId = opts?.lockIdentity ?? (getAgentHostBindings().getSessionId?.() ?? 'default-session')
   const existing = await readLock(dir)
   if (!existing || existing.sessionId !== sessionId) return
   try {
     await unlink(getLockPath(dir))
-    logForDebugging('[ScheduledTasks] released scheduler lock')
+    getAgentHostBindings().logDebug?.('[ScheduledTasks] released scheduler lock')
   } catch {
     // Already gone.
   }
