@@ -117,7 +117,7 @@ export const DIRS_EXIST_GUIDANCE =
  * (once per session via systemPromptSection cache) so the model can always
  * write without checking existence first.
  */
-export async function ensureMemoryDirExists(memoryDir: string): Promise<void> {
+export async function ensureMemoryDirExists(memoryDir: string, signal?: AbortSignal): Promise<void> {
   const bindings = getMemoryHostBindings()
   const fs = bindings.getFsImplementation?.()
   if (!fs) return
@@ -380,7 +380,7 @@ export function buildSearchingPastContextSection(autoMemDir: string): string[] {
 /**
  * Load the unified memory prompt for inclusion in the system prompt.
  */
-export async function loadMemoryPrompt(): Promise<string | null> {
+export async function loadMemoryPrompt(signal?: AbortSignal): Promise<string | null> {
   const autoEnabled = isAutoMemoryEnabled()
   const bindings = getMemoryHostBindings()
 

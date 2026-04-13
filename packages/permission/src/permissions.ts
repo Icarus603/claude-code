@@ -1057,6 +1057,7 @@ export async function checkRuleBasedPermissions(
   tool: Tool,
   input: { [key: string]: unknown },
   context: ToolUseContext,
+  signal?: AbortSignal,
 ): Promise<PermissionAskDecision | PermissionDenyDecision | null> {
   const appState = context.getAppState()
 
@@ -1315,7 +1316,7 @@ export async function deletePermissionRule({
   rule,
   initialContext,
   setToolPermissionContext,
-}: EditPermissionRuleArgs & { rule: PermissionRule }): Promise<void> {
+}: EditPermissionRuleArgs & { rule: PermissionRule }, signal?: AbortSignal): Promise<void> {
   if (
     rule.source === 'policySettings' ||
     rule.source === 'flagSettings' ||

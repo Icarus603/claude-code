@@ -29,6 +29,7 @@ export async function getCommandPrefixStatic(
   command: string,
   recursionDepth = 0,
   wrapperCount = 0,
+  signal?: AbortSignal,
 ): Promise<{ commandPrefix: string | null } | null> {
   if (wrapperCount > 2 || recursionDepth > 10) return null
 
@@ -135,6 +136,7 @@ async function handleWrapper(
 export async function getCompoundCommandPrefixesStatic(
   command: string,
   excludeSubcommand?: (subcommand: string) => boolean,
+  signal?: AbortSignal,
 ): Promise<string[]> {
   const subcommands = splitCommand_DEPRECATED(command)
   if (subcommands.length <= 1) {

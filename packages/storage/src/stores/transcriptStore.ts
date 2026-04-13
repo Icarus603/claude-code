@@ -11,12 +11,12 @@ export class FileTranscriptStore implements TranscriptStore {
     return join(this.sessionsDir, `${sessionId}.jsonl`)
   }
 
-  async appendSessionEvent(sessionId: string, event: string | Uint8Array): Promise<void> {
-    await this.backend.append(this.sessionPath(sessionId), event)
+  async appendSessionEvent(sessionId: string, event: string | Uint8Array, signal?: AbortSignal): Promise<void> {
+    await this.backend.append(this.sessionPath(sessionId), event, signal)
   }
 
-  async readSessionEvents(sessionId: string): Promise<string[]> {
-    const data = await this.backend.read(this.sessionPath(sessionId))
+  async readSessionEvents(sessionId: string, signal?: AbortSignal): Promise<string[]> {
+    const data = await this.backend.read(this.sessionPath(sessionId), signal)
     if (!data) {
       return []
     }

@@ -13,8 +13,9 @@ export class FileSessionMetadataStore implements SessionMetadataStore {
 
   async readSessionMetadata(
     sessionId: string,
+    signal?: AbortSignal,
   ): Promise<Record<string, unknown> | null> {
-    const data = await this.backend.read(this.metadataPath(sessionId))
+    const data = await this.backend.read(this.metadataPath(sessionId), signal)
     if (!data) {
       return null
     }
@@ -32,10 +33,12 @@ export class FileSessionMetadataStore implements SessionMetadataStore {
   async writeSessionMetadata(
     sessionId: string,
     metadata: Record<string, unknown>,
+    signal?: AbortSignal,
   ): Promise<void> {
     await this.backend.write(
       this.metadataPath(sessionId),
       JSON.stringify(metadata, null, 2),
+      signal,
     )
   }
 }

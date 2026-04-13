@@ -391,7 +391,7 @@ export function getScratchpadDir(): string {
  * Returns the path to the scratchpad directory.
  * @throws If scratchpad feature is not enabled
  */
-export async function ensureScratchpadDir(): Promise<string> {
+export async function ensureScratchpadDir(signal?: AbortSignal): Promise<string> {
   if (!isScratchpadEnabled()) {
     throw new Error('Scratchpad directory feature is not enabled')
   }

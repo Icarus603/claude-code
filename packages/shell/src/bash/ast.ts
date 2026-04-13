@@ -380,6 +380,7 @@ const DOLLAR = String.fromCharCode(0x24)
  */
 export async function parseForSecurity(
   cmd: string,
+  signal?: AbortSignal,
 ): Promise<ParseForSecurityResult> {
   // parseCommandRaw('') returns null (falsy check), so short-circuit here.
   // Don't use .trim() — it strips Unicode whitespace (\u00a0 etc.) which the

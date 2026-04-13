@@ -10,7 +10,7 @@ function lockPath(): string {
   return join(getAutoMemPath(), LOCK_FILE)
 }
 
-export async function readLastConsolidatedAt(): Promise<number> {
+export async function readLastConsolidatedAt(signal?: AbortSignal): Promise<number> {
   try {
     const s = await stat(lockPath())
     return s.mtimeMs
@@ -19,7 +19,7 @@ export async function readLastConsolidatedAt(): Promise<number> {
   }
 }
 
-export async function tryAcquireConsolidationLock(): Promise<number | null> {
+export async function tryAcquireConsolidationLock(signal?: AbortSignal): Promise<number | null> {
   const path = lockPath()
   const bindings = getMemoryHostBindings()
 
@@ -59,6 +59,7 @@ export async function tryAcquireConsolidationLock(): Promise<number | null> {
 
 export async function rollbackConsolidationLock(
   priorMtime: number,
+  signal?: AbortSignal,
 ): Promise<void> {
   const path = lockPath()
   const bindings = getMemoryHostBindings()
@@ -79,6 +80,7 @@ export async function rollbackConsolidationLock(
 
 export async function listSessionsTouchedSince(
   sinceMs: number,
+  signal?: AbortSignal,
 ): Promise<string[]> {
   const bindings = getMemoryHostBindings()
   const originalCwd = bindings.getOriginalCwd?.() ?? process.cwd()
@@ -87,7 +89,7 @@ export async function listSessionsTouchedSince(
   return candidates.filter(c => c.mtime > sinceMs).map(c => c.sessionId)
 }
 
-export async function recordConsolidation(): Promise<void> {
+export async function recordConsolidation(signal?: AbortSignal): Promise<void> {
   const bindings = getMemoryHostBindings()
   try {
     await mkdir(getAutoMemPath(), { recursive: true })
