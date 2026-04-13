@@ -40,7 +40,8 @@ const KNOWN_OWNERS: Record<string, readonly string[]> = {
 // Allowlist of packages whose /testing subpath is REQUIRED to be real (not
 // a placeholder `export {}`). Add a name here when its real fakes land.
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
-  // (empty until P3 lands the first real testing seam)
+  'local-observability',
+  'config',
 ])
 
 type Violation = { package: string; reason: string }

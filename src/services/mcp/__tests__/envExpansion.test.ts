@@ -33,6 +33,7 @@ describe("expandEnvVarsInString", () => {
 
   test("expands a single env var that exists", () => {
     process.env.TEST_HOME = "/home/user";
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${TEST_HOME}");
     expect(result.expanded).toBe("/home/user");
     expect(result.missingVars).toEqual([]);
@@ -40,13 +41,16 @@ describe("expandEnvVarsInString", () => {
 
   test("returns original placeholder and tracks missing var when not found", () => {
     delete process.env.MISSING;
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${MISSING}");
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     expect(result.expanded).toBe("${MISSING}");
     expect(result.missingVars).toEqual(["MISSING"]);
   });
 
   test("uses default value when var is missing and default is provided", () => {
     delete process.env.MISSING;
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${MISSING:-fallback}");
     expect(result.expanded).toBe("fallback");
     expect(result.missingVars).toEqual([]);
@@ -55,6 +59,7 @@ describe("expandEnvVarsInString", () => {
   test("expands multiple vars", () => {
     process.env.TEST_A = "hello";
     process.env.TEST_B = "world";
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${TEST_A}/${TEST_B}");
     expect(result.expanded).toBe("hello/world");
     expect(result.missingVars).toEqual([]);
@@ -63,7 +68,9 @@ describe("expandEnvVarsInString", () => {
   test("handles mix of found and missing vars", () => {
     process.env.TEST_FOUND = "yes";
     delete process.env.MISSING;
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${TEST_FOUND}-${MISSING}");
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     expect(result.expanded).toBe("yes-${MISSING}");
     expect(result.missingVars).toEqual(["MISSING"]);
   });
@@ -76,6 +83,7 @@ describe("expandEnvVarsInString", () => {
 
   test("expands empty env var value", () => {
     process.env.TEST_EMPTY = "";
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${TEST_EMPTY}");
     expect(result.expanded).toBe("");
     expect(result.missingVars).toEqual([]);
@@ -83,6 +91,7 @@ describe("expandEnvVarsInString", () => {
 
   test("prefers env var value over default when var exists", () => {
     process.env.TEST_X = "real";
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${TEST_X:-default}");
     expect(result.expanded).toBe("real");
     expect(result.missingVars).toEqual([]);
@@ -91,6 +100,7 @@ describe("expandEnvVarsInString", () => {
   test("handles default value containing colons", () => {
     // split(':-', 2) means only the first :- is the delimiter
     delete process.env.TEST_X;
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${TEST_X:-value:-with:-colons}");
     // The default is "value" because split(':-', 2) gives ["TEST_X", "value"]
     // Wait -- actually split(':-', 2) on "TEST_X:-value:-with:-colons" gives:
@@ -103,10 +113,12 @@ describe("expandEnvVarsInString", () => {
     // ${${VAR}} - the regex [^}]+ matches "${VAR" (up to first })
     // so varName would be "${VAR" which won't be found in env
     delete process.env.VAR;
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${${VAR}}");
     // The regex \$\{([^}]+)\} matches "${${VAR}" with capture "${VAR"
     // That env var won't exist, so it stays as "${${VAR}" + remaining "}"
     expect(result.missingVars).toEqual(["${VAR"]);
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     expect(result.expanded).toBe("${${VAR}}");
   });
 
@@ -118,6 +130,7 @@ describe("expandEnvVarsInString", () => {
 
   test("handles var surrounded by text", () => {
     process.env.TEST_A = "middle";
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("before-${TEST_A}-after");
     expect(result.expanded).toBe("before-middle-after");
     expect(result.missingVars).toEqual([]);
@@ -125,6 +138,7 @@ describe("expandEnvVarsInString", () => {
 
   test("handles default value that is empty string", () => {
     delete process.env.MISSING;
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString("${MISSING:-}");
     expect(result.expanded).toBe("");
     expect(result.missingVars).toEqual([]);

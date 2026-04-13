@@ -105,3 +105,5 @@ export function endSpan(
 }
 
 export async function shutdownLocalObservability(): Promise<void> {}
+
+export * from './spans.js'

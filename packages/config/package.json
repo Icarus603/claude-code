@@ -18,6 +18,7 @@
     "./managedPath": "./settings/managedPath.ts",
     "./pluginOnlyPolicy": "./settings/pluginOnlyPolicy.ts",
     "./validation": "./settings/validation.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./errors": "./errors.ts"
   }
 }

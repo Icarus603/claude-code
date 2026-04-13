@@ -101,19 +101,19 @@ export function useReplBridge(
   const store = useAppStateStore()
   const { addNotification } = useNotifications()
   const replBridgeEnabled = feature('BRIDGE_MODE')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+    ?
       useAppState(s => s.replBridgeEnabled)
     : false
   const replBridgeConnected = feature('BRIDGE_MODE')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+    ?
       useAppState(s => s.replBridgeConnected)
     : false
   const replBridgeOutboundOnly = feature('BRIDGE_MODE')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+    ?
       useAppState(s => s.replBridgeOutboundOnly)
     : false
   const replBridgeInitialName = feature('BRIDGE_MODE')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
+    ?
       useAppState(s => s.replBridgeInitialName)
     : undefined
 

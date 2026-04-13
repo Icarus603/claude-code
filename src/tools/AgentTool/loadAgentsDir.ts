@@ -7,7 +7,7 @@ import { z } from 'zod/v4'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import {
   type McpServerConfig,
   McpServerConfigSchema,

@@ -7,7 +7,7 @@ import { Select } from '../../components/CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 import { COMMON_HELP_ARGS, COMMON_INFO_ARGS } from '../../constants/xml.js'
 import { Box, Text } from '@anthropic/ink'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import { recursivelySanitizeUnicode } from '../../utils/sanitization.js'
 import {

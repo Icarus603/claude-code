@@ -1,6 +1,6 @@
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import type WsWebSocket from 'ws'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { CircularBuffer } from '../../utils/CircularBuffer.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { logForDiagnosticsNoPII } from '../../utils/diagLogs.js'
@@ -508,7 +508,7 @@ export class WebSocketTransport implements Transport {
       this.reconnectAttempts++
 
       const baseDelay = Math.min(
-        DEFAULT_BASE_RECONNECT_DELAY * Math.pow(2, this.reconnectAttempts - 1),
+        DEFAULT_BASE_RECONNECT_DELAY * 2 ** (this.reconnectAttempts - 1),
         DEFAULT_MAX_RECONNECT_DELAY,
       )
       // Add ±25% jitter to avoid thundering herd

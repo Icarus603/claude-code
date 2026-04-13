@@ -102,7 +102,6 @@ export function AppStateProvider({
         ),
       }))
     }
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional mount-only effect
   }, [])
 
   // Listen for external settings changes and sync to AppState.

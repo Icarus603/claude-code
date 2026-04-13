@@ -1,5 +1,5 @@
 import { API_IMAGE_MAX_BASE64_SIZE } from '../constants/apiLimits.js'
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { formatFileSize } from './format.js'
 
 /**

@@ -1,7 +1,7 @@
 import React, { Suspense, use, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { Message } from '../../types/message.js'
 import {
   generatePermissionExplanation,

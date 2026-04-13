@@ -12,7 +12,7 @@ import {
   resolve,
   sep,
 } from 'path'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getCwd } from '../utils/cwd.js'
 import { logForDebugging } from './debug.js'

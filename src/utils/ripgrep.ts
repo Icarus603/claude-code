@@ -3,7 +3,7 @@ import { execFile, spawn } from 'child_process'
 import memoize from 'lodash-es/memoize.js'
 import { homedir } from 'os'
 import * as path from 'path'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { fileURLToPath } from 'url'
 import { isInBundledMode } from './bundledMode.js'
 import { logForDebugging } from './debug.js'
@@ -504,7 +504,7 @@ export const countFilesRoundedRg = memoize(
       if (count === 0) return 0
 
       const magnitude = Math.floor(Math.log10(count))
-      const power = Math.pow(10, magnitude)
+      const power = 10 ** magnitude
 
       // Round to nearest power of 10
       // e.g., 8 -> 10, 42 -> 100, 350 -> 100, 750 -> 1000

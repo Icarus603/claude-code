@@ -5,7 +5,6 @@ import memoize from 'lodash-es/memoize.js'
 import pickBy from 'lodash-es/pickBy.js'
 import { basename, dirname, join, resolve } from 'path'
 // V7 §7 — bootstrap state accessed via host bindings
-import { getAutoMemEntrypoint } from '@claude-code/memory/paths'
 // V7 §8.6 — logEvent via host binding
 // V7 §11.4 — type-only imports inlined to avoid cross-layer deps.
 // These types are used only in GlobalConfig type definition.
@@ -1844,7 +1843,8 @@ export function getMemoryPath(memoryType: MemoryType): string {
     case 'Managed':
       return join(getManagedFilePath(), 'CLAUDE.md')
     case 'AutoMem':
-      return getAutoMemEntrypoint()
+      const cfgBindings = tryGetConfigHostBindings()
+      return cfgBindings.getAutoMemEntrypoint?.() ?? ''
   }
   // TeamMem is only a valid MemoryType when feature('TEAMMEM') is true
   if (feature('TEAMMEM')) {

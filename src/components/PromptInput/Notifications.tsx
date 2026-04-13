@@ -5,7 +5,7 @@ import {
   type Notification,
   useNotifications,
 } from 'src/context/notifications.js'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { useAppState } from 'src/state/AppState.js'
 import { useVoiceState } from '../../context/voice.js'
 import type { VerificationStatus } from '../../hooks/useApiKeyVerification.js'
@@ -254,19 +254,15 @@ function NotificationContent({
 
   // Voice state (VOICE_MODE builds only, runtime-gated by GrowthBook)
   const voiceState = feature('VOICE_MODE')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
-      useVoiceState(s => s.voiceState)
+    ? useVoiceState(s => s.voiceState)
     : ('idle' as const)
-  // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
   const voiceEnabled = feature('VOICE_MODE') ? useVoiceEnabled() : false
   const voiceError = feature('VOICE_MODE')
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
-      useVoiceState(s => s.voiceError)
+    ? useVoiceState(s => s.voiceError)
     : null
   const isBriefOnly =
     feature('KAIROS') || feature('KAIROS_BRIEF')
-      ? // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
-        useAppState(s => s.isBriefOnly)
+      ? useAppState(s => s.isBriefOnly)
       : false
 
   // When voice is actively recording or processing, replace all

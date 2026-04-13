@@ -20,7 +20,7 @@ import { basename, dirname, join } from 'path'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import {
   getOriginalCwd,
   getPlanSlugCache,
@@ -4901,7 +4901,6 @@ function extractFirstPromptFromChunk(chunk: string): string {
         return result
       }
     } catch {
-      continue
     }
   }
   // Session started with a slash command but had no subsequent real message —

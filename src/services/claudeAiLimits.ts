@@ -8,8 +8,8 @@ import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logError } from '../utils/log.js'
 import { getSmallFastModel } from '../utils/model/model.js'
 import { isEssentialTrafficOnly } from '../utils/privacyLevel.js'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from './eventLogger.js'
-import { logEvent } from './eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { getAPIMetadata } from './api/claude.js'
 import { getAnthropicClient } from './api/client.js'
 import {
@@ -205,7 +205,6 @@ async function makeTestQuery() {
   })
   const messages: MessageParam[] = [{ role: 'user', content: 'quota' }]
   const betas = getModelBetas(model)
-  // biome-ignore lint/plugin: quota check needs raw response access via asResponse()
   return anthropic.beta.messages
     .create({
       model,

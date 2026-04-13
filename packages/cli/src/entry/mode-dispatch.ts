@@ -133,10 +133,8 @@ import { computeInitialTeamContext } from '@claude-code/swarm'
 import { isWorktreeModeEnabled } from '../../../../src/utils/worktreeModeEnabled.js'
 import { relative, resolve } from 'path'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '../../../../src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   getOriginalCwd,
   setAdditionalDirectoriesForClaudeMd,

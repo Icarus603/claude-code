@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from '../debug.js'
 import {
   ensureParserInitialized,

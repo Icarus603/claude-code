@@ -5,11 +5,13 @@ import { basename, join, resolve } from 'path'
 import { getRemoteSessionUrl } from '../constants/product.js'
 import { checkGate_CACHED_OR_BLOCKING } from '@claude-code/config/feature-flags'
 import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
   logEventAsync,
+} from '@claude-code/local-observability'
+import {
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   shutdownEventLoggers,
-} from '../services/eventLogger.js'
+} from '@claude-code/local-observability/compat'
 import { isInBundledMode } from '../utils/bundledMode.js'
 import { logForDebugging } from '../utils/debug.js'
 import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
@@ -1660,7 +1662,7 @@ async function stopWorkWithRetry(
       }
       const errMsg = errorMessage(err)
       if (attempt < MAX_ATTEMPTS) {
-        const delay = addJitter(baseDelayMs * Math.pow(2, attempt - 1))
+        const delay = addJitter(baseDelayMs * 2 ** (attempt - 1))
         logger.logVerbose(
           `Failed to stop work ${workId} (attempt ${attempt}/${MAX_ATTEMPTS}), retrying in ${formatDelay(delay)}: ${errMsg}`,
         )
@@ -1948,7 +1950,6 @@ NOTES
   - You must be logged in with a Claude account that has a subscription
   - Run \`claude\` first in the directory to accept the workspace trust dialog
 ${serverNote}`
-  // biome-ignore lint/suspicious/noConsole: intentional help output
   console.log(help)
 }
 
@@ -1990,7 +1991,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     return
   }
   if (parsed.error) {
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(`Error: ${parsed.error}`)
     // eslint-disable-next-line custom-rules/no-process-exit
     process.exit(1)
@@ -2029,7 +2029,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     const { PERMISSION_MODES } = await import('../types/permissions.js')
     const valid: readonly string[] = PERMISSION_MODES
     if (!valid.includes(permissionMode)) {
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Invalid permission mode '${permissionMode}'. Valid modes: ${valid.join(', ')}`,
       )
@@ -2072,7 +2071,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
       shutdownEventLoggers(),
       sleep(500, undefined, { unref: true }),
     ]).catch(() => {})
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(
       'Error: Multi-session Remote Control is not enabled for your account yet.',
     )
@@ -2089,7 +2087,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // The bridge bypasses main.tsx (which renders the interactive TrustDialog via showSetupScreens),
   // so we must verify trust was previously established by a normal `claude` session.
   if (!checkHasTrustDialogAccepted()) {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(
       `Error: Workspace not trusted. Please run \`claude\` in ${dir} first to review and accept the workspace trust dialog.`,
     )
@@ -2106,7 +2103,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   const bridgeToken = getBridgeAccessToken()
   if (!bridgeToken) {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(BRIDGE_LOGIN_ERROR)
     // eslint-disable-next-line custom-rules/no-process-exit
     process.exit(1)
@@ -2125,7 +2121,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
       input: process.stdin,
       output: process.stdout,
     })
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(
       '\nRemote Control lets you access this CLI session from the web (claude.ai/code)\nor the Claude app, so you can pick up where you left off on any device.\n\nYou can disconnect remote access anytime by running /remote-control again.\n',
     )
@@ -2157,7 +2152,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     )
     const found = await readBridgePointerAcrossWorktrees(dir)
     if (!found) {
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: No recent session found in this directory or its worktrees. Run \`claude remote-control\` to start a new one.`,
       )
@@ -2168,7 +2162,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     const ageMin = Math.round(pointer.ageMs / 60_000)
     const ageStr = ageMin < 60 ? `${ageMin}m` : `${Math.round(ageMin / 60)}h`
     const fromWt = pointerDir !== dir ? ` from worktree ${pointerDir}` : ''
-    // biome-ignore lint/suspicious/noConsole: intentional info output
     console.error(
       `Resuming session ${pointer.sessionId} (${ageStr} ago)${fromWt}\u2026`,
     )
@@ -2189,7 +2182,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     !baseUrl.includes('localhost') &&
     !baseUrl.includes('127.0.0.1')
   ) {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(
       'Error: Remote Control base URL uses HTTP. Only HTTPS or localhost HTTP is allowed.',
     )
@@ -2228,7 +2220,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     ? getCurrentProjectConfig().remoteControlSpawnMode
     : undefined
   if (savedSpawnMode === 'worktree' && !worktreeAvailable) {
-    // biome-ignore lint/suspicious/noConsole: intentional warning output
     console.error(
       'Warning: Saved spawn mode is worktree but this directory is not a git repository. Falling back to same-dir.',
     )
@@ -2255,7 +2246,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
       input: process.stdin,
       output: process.stdout,
     })
-    // biome-ignore lint/suspicious/noConsole: intentional dialog output
     console.log(
       `\nClaude Remote Control is launching in spawn mode which lets you create new sessions in this project from Claude Code on Web or your Mobile app. Learn more here: https://code.claude.com/docs/en/remote-control\n\n` +
         `Spawn mode for this project:\n` +
@@ -2334,7 +2324,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // Only reachable via explicit --spawn=worktree (default is same-dir);
   // saved worktree pref was already guarded above.
   if (spawnMode === 'worktree' && !worktreeAvailable) {
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(
       `Error: Worktree mode requires a git repository or WorktreeCreate hooks configured. Use --spawn=session for single-session mode.`,
     )
@@ -2369,7 +2358,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     try {
       validateBridgeId(resumeSessionId, 'sessionId')
     } catch {
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Invalid session ID "${resumeSessionId}". Session IDs must not contain unsafe characters.`,
       )
@@ -2395,7 +2383,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
         const { clearBridgePointer } = await import('./bridgePointer.js')
         await clearBridgePointer(resumePointerDir)
       }
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Session ${resumeSessionId} not found. It may have been archived or expired, or your login may have lapsed (run \`claude /login\`).`,
       )
@@ -2407,7 +2394,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
         const { clearBridgePointer } = await import('./bridgePointer.js')
         await clearBridgePointer(resumePointerDir)
       }
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Session ${resumeSessionId} has no environment_id. It may never have been attached to a bridge.`,
       )
@@ -2461,7 +2447,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
       status: err instanceof BridgeFatalError ? err.status : undefined,
     })
     // Registration failures are fatal — print a clean message instead of a stack trace.
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(
       err instanceof BridgeFatalError && err.status === 404
         ? 'Remote Control environments are not available for your account.'
@@ -2486,7 +2471,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
           `Bridge resume env mismatch: requested ${reuseEnvironmentId}, backend returned ${environmentId}. Falling back to fresh session.`,
         ),
       )
-      // biome-ignore lint/suspicious/noConsole: intentional warning output
       console.warn(
         `Warning: Could not resume session ${resumeSessionId} — its environment has expired. Creating a fresh session instead.`,
       )
@@ -2537,7 +2521,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
           const { clearBridgePointer } = await import('./bridgePointer.js')
           await clearBridgePointer(resumePointerDir)
         }
-        // biome-ignore lint/suspicious/noConsole: intentional error output
         console.error(
           isFatal
             ? `Error: ${errorMessage(err)}`

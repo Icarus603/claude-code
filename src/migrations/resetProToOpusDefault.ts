@@ -1,4 +1,4 @@
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { isProSubscriber } from '../utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getAPIProvider } from '../utils/model/providers.js'

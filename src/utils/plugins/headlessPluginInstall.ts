@@ -9,7 +9,7 @@
  * ZIP creation on install and extraction on load transparently.
  */
 
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { registerCleanup } from '../cleanupRegistry.js'
 import { logForDebugging } from '../debug.js'
 import { withDiagnosticsTiming } from '../diagLogs.js'

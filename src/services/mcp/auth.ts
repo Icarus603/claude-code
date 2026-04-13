@@ -43,7 +43,7 @@ import { clearKeychainCache } from '../../utils/secureStorage/macOsKeychainHelpe
 import type { SecureStorageData } from '../../utils/secureStorage/types.js'
 import { sleep } from '../../utils/sleep.js'
 import { jsonParse, jsonStringify } from '../../utils/slowOperations.js'
-import { logEvent } from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../eventMetadata.js'
 import { buildRedirectUri, findAvailablePort } from './oauthPort.js'
 import type { McpHTTPServerConfig, McpSSEServerConfig } from './types.js'
@@ -2346,7 +2346,7 @@ export class ClaudeAuthProvider implements OAuthClientProvider {
           return undefined
         }
 
-        const delayMs = 1000 * Math.pow(2, attempt - 1) // 1s, 2s, 4s
+        const delayMs = 1000 * 2 ** (attempt - 1) // 1s, 2s, 4s
         logMCPDebug(
           this.serverName,
           `Token refresh failed, retrying in ${delayMs}ms (attempt ${attempt}/${MAX_ATTEMPTS})`,

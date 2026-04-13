@@ -8,7 +8,7 @@ import type { OptionWithDescription } from '../../components/CustomSelect/select
 import { Select } from '../../components/CustomSelect/select.js'
 import { Byline, KeyboardShortcutHint, Pane } from '@anthropic/ink'
 import { Box, setClipboard, Text, stringWidth, type KeyboardEvent } from '@anthropic/ink'
-import { logEvent } from '../../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { LocalJSXCommandCall } from '../../types/command.js'
 import type { AssistantMessage, Message } from '../../types/message.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

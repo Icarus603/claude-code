@@ -39,7 +39,7 @@ import {
 import { sequential } from '../../utils/sequential.js'
 import { asSystemPrompt } from '../../utils/systemPromptType.js'
 import { getTokenUsage, tokenCountWithEstimation } from '../../utils/tokens.js'
-import { logEvent } from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { isAutoCompactEnabled } from '../compact/autoCompact.js'
 import {
   buildSessionMemoryUpdatePrompt,

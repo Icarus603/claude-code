@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { appendFileSync } from 'fs'
 import React from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import {
   gracefulShutdown,
   gracefulShutdownSync,

@@ -9,7 +9,7 @@ import type {
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import {
   extractMcpToolDetails,
   extractSkillName,
@@ -98,7 +98,7 @@ import {
   startToolBlockedOnUserSpan,
   startToolExecutionSpan,
   startToolSpan,
-} from '../../utils/telemetry/sessionTracing.js'
+} from '@claude-code/local-observability/spans'
 import {
   formatError,
   formatZodValidationError,

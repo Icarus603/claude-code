@@ -22,7 +22,7 @@ import {
   getDynamicConfig_BLOCKS_ON_INIT,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
-import { logEvent } from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import {
   isSessionMemoryEmpty,
   truncateSessionMemoryForCompact,

@@ -14,7 +14,7 @@ import {
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { prefetchAllMcpResources } from 'src/services/mcp/client.js'
 import type { ScopedMcpServerConfig } from 'src/services/mcp/types.js'
 import { BashTool } from 'src/tools/BashTool/BashTool.js'
@@ -360,8 +360,8 @@ export function splitSysPromptPrefix(
   }
 
   if (useGlobalCacheFeature) {
-    const boundaryIndex = systemPrompt.findIndex(
-      s => s === SYSTEM_PROMPT_DYNAMIC_BOUNDARY,
+    const boundaryIndex = systemPrompt.indexOf(
+      SYSTEM_PROMPT_DYNAMIC_BOUNDARY,
     )
     if (boundaryIndex !== -1) {
       let attributionHeader: string | undefined

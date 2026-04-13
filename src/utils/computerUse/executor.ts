@@ -276,7 +276,7 @@ async function animatedMove(
   const totalFrames = Math.floor(durationSec * frameRate)
   for (let frame = 1; frame <= totalFrames; frame++) {
     const t = frame / totalFrames
-    const eased = 1 - Math.pow(1 - t, 3)
+    const eased = 1 - (1 - t) ** 3
     await input.moveMouse(
       Math.round(start.x + deltaX * eased),
       Math.round(start.y + deltaY * eased),
@@ -580,6 +580,7 @@ export function createCliExecutor(opts: {
       const needsClipboard =
         opts.viaClipboard ||
         process.platform === 'darwin' ||
+        // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional non-ASCII detection
         /[^\x00-\x7F]/.test(text)
       if (needsClipboard) {
         await drainRunLoop(() => typeViaClipboard(input, text))

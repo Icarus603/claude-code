@@ -1,6 +1,6 @@
 import { z } from 'zod/v4'
 import { lazySchema } from '../internal/lazySchema.js'
-import { permissionRuleValueFromString } from '@claude-code/permission/permissionRuleParser'
+import { tryGetConfigHostBindings } from '../host.js'
 
 // V7 §11.4 — inlined tiny string utilities to avoid pulling in src/ files.
 function capitalize(str: string): string {
@@ -111,7 +111,8 @@ export function validatePermissionRule(rule: string): {
   }
 
   // Parse the rule
-  const parsed = permissionRuleValueFromString(rule)
+  const bindings = tryGetConfigHostBindings()
+  const parsed = bindings.parsePermissionRule?.(rule) ?? { toolName: rule }
 
   // MCP validation - must be done before general tool validation
   const mcpInfo = mcpInfoFromString(parsed.toolName)

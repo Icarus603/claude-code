@@ -7,10 +7,8 @@ import {
 import { logMCPDebug } from "../../../utils/log.js";
 import { getLoggingSafeMcpBaseUrl } from "../utils.js";
 import type { MCPServerConnection, ScopedMcpServerConfig } from "../types.js";
-import {
-	logEvent,
-	type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from "../../eventLogger.js";
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { setMcpAuthCacheEntry } from "./authCache.js";
 
 export function mcpBaseUrlAnalytics(serverRef: ScopedMcpServerConfig): {

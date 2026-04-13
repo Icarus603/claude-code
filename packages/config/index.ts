@@ -260,3 +260,6 @@ export type {
 export {
   RemoteManagedSettingsResponseSchema,
 } from './remote/types.js'
+
+// --- Config Errors (V7 §6.5) ---
+export * from './errors.js'

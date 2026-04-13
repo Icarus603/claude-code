@@ -4,7 +4,7 @@ import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { AGENT_TOOL_NAME } from '../tools/AgentTool/constants.js'
 import { BASH_TOOL_NAME } from '../tools/BashTool/toolName.js'
 import { FILE_EDIT_TOOL_NAME } from '../tools/FileEditTool/constants.js'

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { Spinner } from '../components/Spinner.js'
 import { getOauthConfig } from '../constants/oauth.js'
 import { useTimeout } from '@anthropic/ink'

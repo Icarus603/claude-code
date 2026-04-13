@@ -3,7 +3,7 @@ import { execa } from 'execa'
 import { mkdir, stat } from 'fs/promises'
 import * as os from 'os'
 import { join } from 'path'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { registerCleanup } from '../cleanupRegistry.js'
 import { getCwd } from '../cwd.js'
 import { logForDebugging } from '../debug.js'
@@ -421,6 +421,7 @@ export const createAndSaveSnapshot = async (
 
   logForDebugging(`Creating shell snapshot for ${shellType} (${binShell})`)
 
+  // biome-ignore lint/suspicious/noAsyncPromiseExecutor: decompiled code
   return new Promise(async resolve => {
     try {
       const configFile = getConfigFile(binShell)

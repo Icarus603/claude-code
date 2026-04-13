@@ -1,12 +1,4 @@
 import { tryGetConfigHostBindings } from '../host.js'
-import {
-  createDisabledBypassPermissionsContext,
-  findOverlyBroadBashPermissions,
-  isBypassPermissionsModeDisabled,
-  removeDangerousPermissions,
-  transitionPlanAutoMode,
-} from '@claude-code/permission/permissionSetup'
-import { syncPermissionRulesFromDisk } from '@claude-code/permission/permissions'
 import type { SettingSource } from './constants.js'
 import { getInitialSettings } from './settings.js'
 
@@ -54,30 +46,7 @@ export function applySettingsChange(
   bindings.updateHooksConfigSnapshot?.()
 
   setAppState(prev => {
-    let newContext = syncPermissionRulesFromDisk(
-      prev.toolPermissionContext,
-      updatedRules,
-    )
-
-    // Ant-only: re-strip overly broad Bash allow rules after settings sync
-    if (
-      process.env.USER_TYPE === 'ant' &&
-      process.env.CLAUDE_CODE_ENTRYPOINT !== 'local-agent'
-    ) {
-      const overlyBroad = findOverlyBroadBashPermissions(updatedRules, [])
-      if (overlyBroad.length > 0) {
-        newContext = removeDangerousPermissions(newContext, overlyBroad)
-      }
-    }
-
-    if (
-      newContext.isBypassPermissionsModeAvailable &&
-      isBypassPermissionsModeDisabled()
-    ) {
-      newContext = createDisabledBypassPermissionsContext(newContext)
-    }
-
-    newContext = transitionPlanAutoMode(newContext)
+    const newContext = bindings.reconcilePermissionContext?.(prev.toolPermissionContext, updatedRules) ?? prev.toolPermissionContext
 
     // Sync effortLevel from settings to top-level AppState when it changes
     // (e.g. via applyFlagSettings from IDE). Only propagate if the setting

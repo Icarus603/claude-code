@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
 import { Byline, KeyboardShortcutHint } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- useInput needed for marketplace-specific u/r shortcuts and y/n confirmation not in keybinding schema
@@ -190,7 +190,6 @@ export function ManageMarketplaces({
     }
     void loadMarketplaces()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, [targetMarketplace, action, error])
 
   // Check if there are any pending changes

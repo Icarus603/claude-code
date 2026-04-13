@@ -1,4 +1,4 @@
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import {
   getDefaultMainLoopModelSetting,
   isOpus1mMergeEnabled,

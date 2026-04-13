@@ -10,7 +10,7 @@ import { stringWidth } from '@anthropic/ink'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { count } from '../../utils/array.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { toError } from '../../utils/errors.js'

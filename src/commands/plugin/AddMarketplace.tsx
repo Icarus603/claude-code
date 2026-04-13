@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
 import { Byline, KeyboardShortcutHint } from '@anthropic/ink'
 import { Spinner } from '../../components/Spinner.js'
@@ -133,7 +133,6 @@ export function AddMarketplace({
       void handleAdd()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, []) // Only run once on mount
 
   return (

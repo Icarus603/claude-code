@@ -5,7 +5,7 @@ import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
-import { logEvent } from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { ConnectedMCPServer, MCPServerConnection } from './types.js'
 
 // Mirror of AutoModeEnabledState in permissionSetup.ts — inlined because that

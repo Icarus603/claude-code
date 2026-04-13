@@ -96,10 +96,8 @@ import {
   persistToolResult,
 } from '../../utils/toolResultStorage.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '../eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   type ElicitationWaitingState,
   runElicitationHooks,
@@ -1171,6 +1169,7 @@ export const connectToServer = memoize(
               }
 
               // Wait for graceful shutdown with rapid escalation (total 500ms to keep CLI responsive)
+              // biome-ignore lint/suspicious/noAsyncPromiseExecutor: decompiled code
               await new Promise<void>(async resolve => {
                 let resolved = false
 

@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import * as path from 'path'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
@@ -61,7 +61,7 @@ function IDEScreen({
       } else if (value === 'None' && shouldShowDisableAutoConnectDialog()) {
         setShowDisableAutoConnectDialog(true)
       } else {
-        onSelect(availableIDEs.find(ide => ide.port === parseInt(value)))
+        onSelect(availableIDEs.find(ide => ide.port === parseInt(value, 10)))
       }
     },
     [availableIDEs, onSelect],
@@ -216,7 +216,7 @@ function IDEOpenSelection({
   const handleSelectIDE = useCallback(
     (value: string) => {
       const selectedIDE = availableIDEs.find(
-        ide => ide.port === parseInt(value),
+        ide => ide.port === parseInt(value, 10),
       )
       onSelectIDE(selectedIDE)
     },

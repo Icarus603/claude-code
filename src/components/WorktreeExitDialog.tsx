@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import type { CommandResultDisplay } from 'src/commands.js'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from 'src/utils/debug.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
 import { execFileNoThrow } from '../utils/execFileNoThrow.js'
@@ -63,7 +63,7 @@ export function WorktreeExitDialog({
           '--count',
           `${worktreeSession.originalHeadCommit}..HEAD`,
         ])
-        const count = parseInt(commitsStr.trim()) || 0
+        const count = parseInt(commitsStr.trim(), 10) || 0
         setCommitCount(count)
 
         // If no changes and no commits, clean up silently
@@ -94,7 +94,6 @@ export function WorktreeExitDialog({
     }
     void loadChanges()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, [worktreeSession])
 
   useEffect(() => {

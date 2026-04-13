@@ -7,7 +7,7 @@ import {
 } from '../history.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth, wrapAnsi } from '@anthropic/ink'
-import { logEvent } from '../services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import type { HistoryEntry } from '@claude-code/config'
 import { formatRelativeTimeAgo, truncateToWidth } from '../utils/format.js'
 import { FuzzyPicker } from '@anthropic/ink'

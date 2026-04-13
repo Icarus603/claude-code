@@ -54,14 +54,14 @@ import {
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { logOTelEvent } from './telemetry/events.js'
 import { ALLOWED_OFFICIAL_MARKETPLACE_NAMES } from './plugins/schemas.js'
 import {
   startHookSpan,
   endHookSpan,
   isBetaTracingEnabled,
-} from './telemetry/sessionTracing.js'
+} from '@claude-code/local-observability/spans'
 import {
   hookJSONOutputSchema,
   promptRequestSchema,
@@ -1235,7 +1235,6 @@ async function execCommandHook(
                 child.stdin.destroy()
               }
             })
-            continue
           }
         } catch {
           // Not JSON, just a normal line
@@ -1750,7 +1749,7 @@ export async function getMatchingHooks(
 
     // If you change the criteria below, then you must change
     // src/utils/hooks/hooksConfigManager.ts as well.
-    let matchQuery: string | undefined = undefined
+    let matchQuery: string | undefined 
     switch (hookInput.hook_event_name) {
       case 'PreToolUse':
       case 'PostToolUse':

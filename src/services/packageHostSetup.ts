@@ -85,7 +85,7 @@ export function installPackageHostBindings(
         getTotalOutputTokens: () => { try { return require('../bootstrap/state.js').getTotalOutputTokens() } catch { return 0 } },
         getTotalCacheCreationInputTokens: () => { try { return require('../bootstrap/state.js').getTotalCacheCreationInputTokens() } catch { return 0 } },
         getTotalCacheReadInputTokens: () => { try { return require('../bootstrap/state.js').getTotalCacheReadInputTokens() } catch { return 0 } },
-        logEvent: (event: string, metadata?: Record<string, unknown>) => { try { require('../services/eventLogger.js').logEvent(event, metadata) } catch {} },
+        logEvent: (event: string, metadata?: Record<string, unknown>) => { try { (require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')).logEvent(event, metadata) } catch {} },
         sanitizeToolNameForAnalytics: (name: string) => { try { return require('../services/eventMetadata.js').sanitizeToolNameForAnalytics(name) } catch { return name } },
         clearClassifierChecking: () => { try { require('../utils/classifierApprovals.js').clearClassifierChecking() } catch {} },
         setClassifierChecking: (v: boolean) => { try { require('../utils/classifierApprovals.js').setClassifierChecking(v) } catch {} },
@@ -192,7 +192,7 @@ export function installPackageHostBindings(
       getFlagSettingsInline: () => { try { return require('../bootstrap/state.js').getFlagSettingsInline() } catch { return null } },
       getUseCoworkPlugins: () => { try { return require('../bootstrap/state.js').getUseCoworkPlugins() } catch { return false } },
       logEvent: (event: string, metadata?: Record<string, unknown>) => {
-        try { require('../services/eventLogger.js').logEvent(event, metadata) } catch { /* best-effort */ }
+        try { (require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')).logEvent(event, metadata) } catch { /* best-effort */ }
       },
       findCanonicalGitRoot: (cwd: string) => {
         try { return require('../utils/git.js').findCanonicalGitRoot(cwd) } catch { return undefined }
@@ -226,7 +226,7 @@ export function installPackageHostBindings(
           if (!newSettings || !utils.hasDangerousSettings(utils.extractDangerousSettings(newSettings as any))) return 'no_check_needed'
           if (!utils.hasDangerousSettingsChanged(cached as any, newSettings as any)) return 'no_check_needed'
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { logEvent } = require('../services/eventLogger.js') as typeof import('../services/eventLogger.js')
+          const { logEvent } = require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')
           logEvent('tengu_managed_settings_security_dialog_shown', {})
           const React = require('react')
           const { ManagedSettingsSecurityDialog } = require('../components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js')
@@ -330,6 +330,60 @@ export function installPackageHostBindings(
           return false
         } catch {
           return false
+        }
+      },
+      // V7 §11.4 — permission rule parsing for config validation
+      parsePermissionRule: (rule: string) => {
+        try {
+          const { permissionRuleValueFromString } = require('@claude-code/permission/permissionRuleParser') as typeof import('@claude-code/permission/permissionRuleParser')
+          return permissionRuleValueFromString(rule)
+        } catch {
+          return { toolName: rule }
+        }
+      },
+      // V7 §11.4 — settings path check
+      isClaudeSettingsPath: (filePath: string) => {
+        try {
+          const { isClaudeSettingsPath } = require('@claude-code/permission/filesystem') as typeof import('@claude-code/permission/filesystem')
+          return isClaudeSettingsPath(filePath)
+        } catch {
+          return false
+        }
+      },
+      // V7 §11.4 — permission context reconciliation after settings change
+      reconcilePermissionContext: (prevContext: unknown, updatedRules: unknown[]) => {
+        try {
+          const {
+            syncPermissionRulesFromDisk,
+            findOverlyBroadBashPermissions,
+            removeDangerousPermissions,
+            isBypassPermissionsModeDisabled,
+            createDisabledBypassPermissionsContext,
+            transitionPlanAutoMode,
+          } = require('@claude-code/permission/permissionSetup') as typeof import('@claude-code/permission/permissionSetup')
+          let ctx = syncPermissionRulesFromDisk(prevContext, updatedRules)
+          if (process.env.USER_TYPE === 'ant' && process.env.CLAUDE_CODE_ENTRYPOINT !== 'local-agent') {
+            const overlyBroad = findOverlyBroadBashPermissions(updatedRules as any[], [])
+            if (overlyBroad.length > 0) {
+              ctx = removeDangerousPermissions(ctx, overlyBroad)
+            }
+          }
+          if ((ctx as any).isBypassPermissionsModeAvailable && isBypassPermissionsModeDisabled()) {
+            ctx = createDisabledBypassPermissionsContext(ctx)
+          }
+          ctx = transitionPlanAutoMode(ctx)
+          return ctx
+        } catch {
+          return prevContext
+        }
+      },
+      // V7 §11.4 — memory auto-entry path
+      getAutoMemEntrypoint: () => {
+        try {
+          const { getAutoMemEntrypoint } = require('@claude-code/memory/paths') as typeof import('@claude-code/memory/paths')
+          return getAutoMemEntrypoint()
+        } catch {
+          return ''
         }
       },
     },

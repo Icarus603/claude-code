@@ -5,7 +5,7 @@ import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { useSetAppState } from '../../state/AppState.js'
 import { type OptionWithDescription, Select } from '../CustomSelect/select.js'
 

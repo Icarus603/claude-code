@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { z } from 'zod/v4'
 import type { MCPServerConnection } from '../services/mcp/types.js'
 import { getConnectedIdeClient } from '../utils/ide.js'

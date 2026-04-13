@@ -58,6 +58,7 @@ export function renderToAnsiString(
   node: React.ReactNode,
   columns?: number,
 ): Promise<string> {
+  // biome-ignore lint/suspicious/noAsyncPromiseExecutor: decompiled code
   return new Promise(async resolve => {
     let output = ''
 

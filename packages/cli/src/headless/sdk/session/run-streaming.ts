@@ -35,10 +35,8 @@ import type { ThinkingConfig } from '../../../../../../src/utils/thinking.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { uniq } from '../../../../../../src/utils/array.js'
 import { mergeAndFilterTools } from '../../../../../../src/utils/toolPool.js'
-import {
-  logEvent,
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from '../../../../../../src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logForDebugging } from '../../../../../../src/utils/debug.js'
 import {

@@ -4,10 +4,12 @@ import * as React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { getLastAPIRequest } from 'src/bootstrap/state.js'
 import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
+} from '@claude-code/local-observability'
+import {
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEventTo1P,
-} from 'src/services/eventLogger.js'
+} from '@claude-code/local-observability/compat'
 import {
   getLastAssistantMessage,
   normalizeMessagesForAPI,

@@ -21,7 +21,7 @@ import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '../../services/eventLogger.js'
+} from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '../../state/AppState.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type {
@@ -54,7 +54,6 @@ function BridgeToggle({ onDone, name }: Props): React.ReactNode {
   const replBridgeOutboundOnly = useAppState(s => s.replBridgeOutboundOnly)
   const [showDisconnectDialog, setShowDisconnectDialog] = useState(false)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: bridge starts once, should not restart on state changes
   useEffect(() => {
     // If already connected or enabled in full bidirectional mode, show
     // disconnect confirmation. Outbound-only (CCR mirror) doesn't count —

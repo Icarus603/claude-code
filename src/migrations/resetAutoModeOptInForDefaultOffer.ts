@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import { logEvent } from 'src/services/eventLogger.js'
+import { logEvent } from '@claude-code/local-observability'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logError } from '../utils/log.js'
 import { getAutoModeEnabledState } from '@claude-code/permission/permissionSetup'
