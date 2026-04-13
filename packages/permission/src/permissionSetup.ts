@@ -1,37 +1,39 @@
 import { feature } from 'bun:bundle'
 import { relative } from 'path'
+import { getPermissionHostBindings } from './host.js'
+const _b = () => getPermissionHostBindings() as any
+function getOriginalCwd(): string { return _b().getOriginalCwd?.() ?? process.cwd() }
+function handleAutoModeTransition(mode: unknown): void { _b().handleAutoModeTransition?.(mode) }
+function handlePlanModeTransition(mode: unknown): void { _b().handlePlanModeTransition?.(mode) }
+function setHasExitedPlanMode(v: boolean): void { _b().setHasExitedPlanMode?.(v) }
+function setNeedsAutoModeExitAttachment(v: boolean): void { _b().setNeedsAutoModeExitAttachment?.(v) }
+type ToolPermissionContext = { permissionRules: unknown; [key: string]: unknown }
+type ToolPermissionRulesBySource = Record<string, unknown>
+function getCwd(): string { return _b().getCwd?.() ?? process.cwd() }
+function isEnvTruthy(v: string | boolean | undefined): boolean {
+  if (!v) return false; if (typeof v === 'boolean') return v
+  return ['1','true','yes','on'].includes(String(v).toLowerCase().trim())
+}
 import {
-  getOriginalCwd,
-  handleAutoModeTransition,
-  handlePlanModeTransition,
-  setHasExitedPlanMode,
-  setNeedsAutoModeExitAttachment,
-} from '@claude-code/app-compat/bootstrap/state.js'
-import type {
-  ToolPermissionContext,
-  ToolPermissionRulesBySource,
-} from '@claude-code/app-compat/Tool.js'
-import { getCwd } from '@claude-code/app-compat/utils/cwd.js'
-import { isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
-import type { SettingSource } from '@claude-code/app-compat/utils/settings/constants.js'
-import { SETTING_SOURCES } from '@claude-code/app-compat/utils/settings/constants.js'
-import {
+  type SettingSource,
+  SETTING_SOURCES,
   getSettings_DEPRECATED,
   getSettingsFilePathForSource,
   getUseAutoModeDuringPlan,
   hasAutoModeOptIn,
-} from '@claude-code/app-compat/utils/settings/settings.js'
+} from '@claude-code/config'
 import {
   type PermissionMode,
   permissionModeFromString,
 } from './PermissionMode.js'
 import { applyPermissionRulesToPermissionContext } from './permissions.js'
-import { loadAllPermissionRulesFromDisk } from '@claude-code/app-compat/utils/permissions/permissionsLoader.js'
+function loadAllPermissionRulesFromDisk(): unknown[] { return _b().loadAllPermissionRulesFromDisk?.() ?? [] }
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
   ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('@claude-code/app-compat/utils/permissions/autoModeState.js'))
   : null
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 import { resolve } from 'path'
 import {
@@ -40,31 +42,26 @@ import {
   getDynamicConfig_BLOCKS_ON_INIT,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
-import {
-  addDirHelpMessage,
-  validateDirectoryForWorkspace,
-} from '@claude-code/app-compat/commands/add-dir/validation.js'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '@claude-code/app-compat/services/eventLogger.js'
-import { AGENT_TOOL_NAME } from '@claude-code/app-compat/tools/AgentTool/constants.js'
-import { BASH_TOOL_NAME } from '@claude-code/app-compat/tools/BashTool/toolName.js'
+function addDirHelpMessage(): string { return _b().addDirHelpMessage?.() ?? '' }
+function validateDirectoryForWorkspace(dir: string, cwd: string): { valid: boolean; error?: string } { return _b().validateDirectoryForWorkspace?.(dir, cwd) ?? { valid: true } }
+type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS = Record<string, unknown>
+function logEvent(event: string, metadata?: AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS): void { _b().logEvent?.(event, metadata) }
+const AGENT_TOOL_NAME = 'Agent'
+const BASH_TOOL_NAME = 'Bash'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { POWERSHELL_TOOL_NAME } from '@claude-code/app-compat/tools/PowerShellTool/toolName.js'
-import { getToolsForDefaultPreset, parseToolPreset } from '@claude-code/app-compat/tools.js'
-import {
-  getFsImplementation,
-  safeResolvePath,
-} from '@claude-code/app-compat/utils/fsOperations.js'
-import { modelSupportsAutoMode } from '@claude-code/app-compat/utils/betas.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { gracefulShutdown } from '@claude-code/app-compat/utils/gracefulShutdown.js'
-import { getMainLoopModel } from '@claude-code/app-compat/utils/model/model.js'
+const POWERSHELL_TOOL_NAME = 'PowerShell'
+function getToolsForDefaultPreset(): string[] { return _b().getToolsForDefaultPreset?.() ?? [] }
+function parseToolPreset(preset: string): string[] { return _b().parseToolPreset?.(preset) ?? [] }
+function getFsImplementation(): any { return _b().getFsImplementation?.() ?? require('node:fs') }
+function safeResolvePath(fs: any, p: string): { resolvedPath: string } { return _b().safeResolvePath?.(fs, p) ?? { resolvedPath: p } }
+function modelSupportsAutoMode(model: string): boolean { return _b().modelSupportsAutoMode?.(model) ?? false }
+function logForDebugging(msg: string, meta?: unknown): void { _b().logDebug?.(msg, meta) }
+function gracefulShutdown(code?: number): Promise<never> { return _b().gracefulShutdown?.(code) ?? Promise.reject() }
+function getMainLoopModel(): string { return _b().getMainLoopModel?.() ?? '' }
 import {
   CROSS_PLATFORM_CODE_EXEC,
   DANGEROUS_BASH_PATTERNS,
-} from '@claude-code/app-compat/utils/permissions/dangerousPatterns.js'
+} from '@claude-code/app-compat/utils/permissions/dangerousPatterns.js' // V7: kept (array content needed)
 import type {
   PermissionRule,
   PermissionRuleSource,
