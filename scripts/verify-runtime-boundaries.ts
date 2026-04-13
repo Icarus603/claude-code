@@ -47,10 +47,8 @@ const STRICT_DISALLOWED_PATTERNS = [...DISALLOWED_PATTERNS, '@claude-code/app-co
 const TRANSITION_APP_COMPAT_REF_BUDGET: Record<string, number> = {
   'packages/agent': 158,
   'packages/provider': 0,
-  'packages/config': 5,
-  // permission: +3 from repairing broken `typeof import('./autoModeState.js')`
-  // references that ts couldn't resolve (verify-package-tsc-clean caught them)
-  'packages/permission': 22,
+  'packages/config': 0,
+  'packages/permission': 0,
   // memory: +2 for the same reason (findRelevantMemories + autoDream)
   'packages/memory': 85,
   'packages/cli': 0,

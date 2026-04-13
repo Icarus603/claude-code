@@ -14,7 +14,7 @@ import {
   EXTERNAL_PERMISSION_MODES,
   PERMISSION_MODES,
 } from '@claude-code/permission/PermissionMode'
-import { MarketplaceSourceSchema } from '@claude-code/app-compat/utils/plugins/schemas.js'
+import { MarketplaceSourceSchema } from './schemas/marketplace.js'
 import { CLAUDE_CODE_SETTINGS_SCHEMA_URL } from './constants.js'
 import { PermissionRuleSchema } from './permissionValidation.js'
 

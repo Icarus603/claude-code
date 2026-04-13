@@ -73,6 +73,11 @@ export type ConfigHostBindings = {
   unlock?: (file: string) => Promise<void>
   // V7 §8.6 — bridge auto-connect default. Feature-gated bridge check.
   isBridgeAutoConnectDefault?: () => boolean
+  // V7 §8.6 — settings-change side-effect bridges. Config triggers these
+  // when settings change so that permission rules and hooks snapshots stay
+  // in sync without config importing from permission or hooks directly.
+  loadAllPermissionRulesFromDisk?: () => unknown[]
+  updateHooksConfigSnapshot?: () => void
   // V7 §8.24 — security check UI. The React dialog doesn't belong in
   // config (Wave 1 leaf). Host provides the implementation which renders
   // the Ink dialog; config only cares about the result.

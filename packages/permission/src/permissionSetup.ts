@@ -31,7 +31,7 @@ function loadAllPermissionRulesFromDisk(): unknown[] { return _b().loadAllPermis
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('@claude-code/app-compat/utils/permissions/autoModeState.js'))
+  ? (require('./autoModeState.js') as typeof import('./autoModeState.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 
@@ -61,7 +61,7 @@ function getMainLoopModel(): string { return _b().getMainLoopModel?.() ?? '' }
 import {
   CROSS_PLATFORM_CODE_EXEC,
   DANGEROUS_BASH_PATTERNS,
-} from '@claude-code/app-compat/utils/permissions/dangerousPatterns.js' // V7: kept (array content needed)
+} from './dangerousPatterns.js'
 import type {
   PermissionRule,
   PermissionRuleSource,

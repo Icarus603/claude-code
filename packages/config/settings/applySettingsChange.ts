@@ -1,6 +1,4 @@
-import type { AppState } from '@claude-code/app-compat/state/AppState.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { updateHooksConfigSnapshot } from '@claude-code/app-compat/utils/hooks/hooksConfigSnapshot.js'
+import { tryGetConfigHostBindings } from '../host.js'
 import {
   createDisabledBypassPermissionsContext,
   findOverlyBroadBashPermissions,
@@ -9,9 +7,22 @@ import {
   transitionPlanAutoMode,
 } from '@claude-code/permission/permissionSetup'
 import { syncPermissionRulesFromDisk } from '@claude-code/permission/permissions'
-import { loadAllPermissionRulesFromDisk } from '@claude-code/app-compat/utils/permissions/permissionsLoader.js'
 import type { SettingSource } from './constants.js'
 import { getInitialSettings } from './settings.js'
+
+/**
+ * Minimal structural type for the state slice that applySettingsChange reads
+ * and updates. The full AppState is owned by app-host; config only needs these
+ * three fields plus an open index signature for the spread-back.
+ *
+ * V7 §7.2 — AppState is not a terminal owner; config cannot import it directly.
+ */
+type SettingsChangeTarget = {
+  toolPermissionContext: unknown
+  settings: { effortLevel?: unknown }
+  effortValue?: unknown
+  [key: string]: unknown
+}
 
 /**
  * Apply a settings change to app state. Re-reads settings from disk,
@@ -32,14 +43,15 @@ import { getInitialSettings } from './settings.js'
  */
 export function applySettingsChange(
   source: SettingSource,
-  setAppState: (f: (prev: AppState) => AppState) => void,
+  setAppState: (f: (prev: SettingsChangeTarget) => SettingsChangeTarget) => void,
 ): void {
+  const bindings = tryGetConfigHostBindings()
   const newSettings = getInitialSettings()
 
-  logForDebugging(`Settings changed from ${source}, updating app state`)
+  bindings.logDebug?.(`Settings changed from ${source}, updating app state`)
 
-  const updatedRules = loadAllPermissionRulesFromDisk()
-  updateHooksConfigSnapshot()
+  const updatedRules = bindings.loadAllPermissionRulesFromDisk?.() ?? []
+  bindings.updateHooksConfigSnapshot?.()
 
   setAppState(prev => {
     let newContext = syncPermissionRulesFromDisk(
