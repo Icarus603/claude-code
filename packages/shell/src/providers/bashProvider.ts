@@ -53,7 +53,7 @@ function getDisableExtglobCommand(shellPath: string): string | null {
 export async function createBashShellProvider(
   shellPath: string,
   ctx: Pick<ShellExecContext, 'getSessionEnvVars' | 'getSessionEnvironmentScript' | 'ensureTmuxSocket' | 'hasTmuxToolBeenUsed' | 'getTmuxEnv'>,
-  options?: { skipSnapshot?: boolean; snapshotCtx?: import('../context.js').SnapshotContext },
+  options?: { skipSnapshot?: boolean; snapshotCtx?: import('../context.js').SnapshotContext; signal?: AbortSignal },
 ): Promise<ShellProvider> {
   let currentSandboxTmpDir: string | undefined
   const snapshotPromise: Promise<string | undefined> = options?.skipSnapshot || !options?.snapshotCtx

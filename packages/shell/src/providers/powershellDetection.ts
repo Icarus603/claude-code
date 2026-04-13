@@ -20,7 +20,7 @@ async function probePath(p: string): Promise<string | null> {
  * binary at /opt/microsoft/powershell/7/pwsh is reliable. On
  * Windows/macOS, PATH is sufficient.
  */
-export async function findPowerShell(): Promise<string | null> {
+export async function findPowerShell(signal?: AbortSignal): Promise<string | null> {
   const pwshPath = await which('pwsh')
   if (pwshPath) {
     // Snap launcher hangs in subprocesses. Prefer the direct binary.
@@ -83,7 +83,7 @@ export type PowerShellEdition = 'core' | 'desktop'
  * the model doesn't emit `cmd1 && cmd2` on 5.1 (parser error) or avoid
  * `&&` on 7+ where it's the correct short-circuiting operator.
  */
-export async function getPowerShellEdition(): Promise<PowerShellEdition | null> {
+export async function getPowerShellEdition(signal?: AbortSignal): Promise<PowerShellEdition | null> {
   const p = await getCachedPowerShellPath()
   if (!p) return null
   // basename without extension, case-insensitive. Covers:

@@ -29,6 +29,7 @@ export type Option = {
 
 export async function loadFigSpec(
   command: string,
+  signal?: AbortSignal,
 ): Promise<CommandSpec | null> {
   if (!command || command.includes('/') || command.includes('\\')) return null
   if (command.includes('..')) return null

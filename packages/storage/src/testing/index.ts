@@ -25,15 +25,15 @@ export type {
 export class MemoryStorageBackend implements StorageBackend {
   private readonly _data = new Map<string, Uint8Array | string>()
 
-  async read(path: string): Promise<StorageReadResult> {
+  async read(path: string, signal?: AbortSignal): Promise<StorageReadResult> {
     return this._data.get(path) ?? null
   }
 
-  async write(path: string, data: StorageWriteData): Promise<void> {
+  async write(path: string, data: StorageWriteData, signal?: AbortSignal): Promise<void> {
     this._data.set(path, data)
   }
 
-  async append(path: string, data: StorageWriteData): Promise<void> {
+  async append(path: string, data: StorageWriteData, signal?: AbortSignal): Promise<void> {
     const existing = this._data.get(path)
     if (existing === undefined) {
       this._data.set(path, data)
@@ -44,11 +44,11 @@ export class MemoryStorageBackend implements StorageBackend {
     }
   }
 
-  async delete(path: string): Promise<void> {
+  async delete(path: string, signal?: AbortSignal): Promise<void> {
     this._data.delete(path)
   }
 
-  async list(path: string): Promise<string[]> {
+  async list(path: string, signal?: AbortSignal): Promise<string[]> {
     const prefix = path.endsWith('/') ? path : `${path}/`
     const results: string[] = []
     for (const key of this._data.keys()) {

@@ -36,6 +36,7 @@ function isExecutable(shellPath: string): boolean {
  */
 export async function findSuitableShell(
   whichFn: (command: string) => Promise<string | null>,
+  signal?: AbortSignal,
 ): Promise<string> {
   // Check for explicit shell override first
   const shellOverride = process.env.CLAUDE_CODE_SHELL

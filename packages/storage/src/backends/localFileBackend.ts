@@ -11,7 +11,7 @@ async function ensureParentDir(path: string): Promise<void> {
 }
 
 export class LocalFileStorageBackend implements StorageBackend {
-  async read(path: string): Promise<StorageReadResult> {
+  async read(path: string, signal?: AbortSignal): Promise<StorageReadResult> {
     try {
       const content = await readFile(path)
       return content
@@ -20,12 +20,12 @@ export class LocalFileStorageBackend implements StorageBackend {
     }
   }
 
-  async write(path: string, data: StorageWriteData): Promise<void> {
+  async write(path: string, data: StorageWriteData, signal?: AbortSignal): Promise<void> {
     await ensureParentDir(path)
     await writeFile(path, toBuffer(data))
   }
 
-  async append(path: string, data: StorageWriteData): Promise<void> {
+  async append(path: string, data: StorageWriteData, signal?: AbortSignal): Promise<void> {
     await ensureParentDir(path)
     const existing = await this.read(path)
     const next = Buffer.concat([
@@ -35,11 +35,11 @@ export class LocalFileStorageBackend implements StorageBackend {
     await writeFile(path, next)
   }
 
-  async delete(path: string): Promise<void> {
+  async delete(path: string, signal?: AbortSignal): Promise<void> {
     await rm(path, { force: true, recursive: true })
   }
 
-  async list(path: string): Promise<string[]> {
+  async list(path: string, signal?: AbortSignal): Promise<string[]> {
     try {
       const fileStat = await stat(path)
       if (fileStat.isFile()) {

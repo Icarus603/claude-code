@@ -299,6 +299,7 @@ function makeDreamProgressWatcher(
 export async function executeAutoDream(
   context: MemREPLContext,
   appendSystemMessage?: AppendSystemMessageFn,
+  signal?: AbortSignal,
 ): Promise<void> {
   await runner?.(context, appendSystemMessage)
 }

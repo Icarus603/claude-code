@@ -46,7 +46,7 @@ function logLoadOnce(success: boolean): void {
  * Awaits WASM init (Parser.init + Language.load). Must be called before
  * parseCommand/parseCommandRaw for the parser to be available. Idempotent.
  */
-export async function ensureInitialized(): Promise<void> {
+export async function ensureInitialized(signal?: AbortSignal): Promise<void> {
   if (feature('TREE_SITTER_BASH') || feature('TREE_SITTER_BASH_SHADOW')) {
     await ensureParserInitialized()
   }
@@ -54,6 +54,7 @@ export async function ensureInitialized(): Promise<void> {
 
 export async function parseCommand(
   command: string,
+  signal?: AbortSignal,
 ): Promise<ParsedCommandData | null> {
   if (!command || command.length > MAX_COMMAND_LENGTH) return null
 
@@ -102,6 +103,7 @@ export const PARSE_ABORTED = Symbol('parse-aborted')
  */
 export async function parseCommandRaw(
   command: string,
+  signal?: AbortSignal,
 ): Promise<Node | null | typeof PARSE_ABORTED> {
   if (!command || command.length > MAX_COMMAND_LENGTH) return null
   if (feature('TREE_SITTER_BASH') || feature('TREE_SITTER_BASH_SHADOW')) {

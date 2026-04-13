@@ -89,6 +89,7 @@ export async function buildPrefix(
   command: string,
   args: string[],
   spec: CommandSpec | null,
+  signal?: AbortSignal,
 ): Promise<string> {
   const maxDepth = await calculateDepth(command, args, spec)
   const parts = [command]

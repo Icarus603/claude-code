@@ -621,7 +621,7 @@ export function isTeamMemorySyncAvailable(): boolean {
 
 export async function pullTeamMemory(
   state: SyncState,
-  options?: { skipEtagCache?: boolean },
+  options?: { skipEtagCache?: boolean; signal?: AbortSignal },
 ): Promise<{
   success: boolean
   filesWritten: number
@@ -713,6 +713,7 @@ export async function pullTeamMemory(
 
 export async function pushTeamMemory(
   state: SyncState,
+  signal?: AbortSignal,
 ): Promise<TeamMemorySyncPushResult> {
   const bindings = getMemoryHostBindings()
   const startTime = Date.now()
@@ -915,7 +916,7 @@ export async function pushTeamMemory(
   }
 }
 
-export async function syncTeamMemory(state: SyncState): Promise<{
+export async function syncTeamMemory(state: SyncState, signal?: AbortSignal): Promise<{
   success: boolean
   filesPulled: number
   filesPushed: number

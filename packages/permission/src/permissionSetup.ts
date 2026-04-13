@@ -880,7 +880,7 @@ export async function initializeToolPermissionContext({
   permissionMode: PermissionMode
   allowDangerouslySkipPermissions: boolean
   addDirs: string[]
-}): Promise<{
+}, signal?: AbortSignal): Promise<{
   toolPermissionContext: ToolPermissionContext
   warnings: string[]
   dangerousPermissions: DangerousPermissionInfo[]
@@ -1079,6 +1079,7 @@ export async function verifyAutoModeGateAccess(
   // settings.fastMode (which is intentionally sticky across /model auto-
   // downgrades). Optional for callers without AppState (e.g. SDK init paths).
   fastMode?: boolean,
+  signal?: AbortSignal,
 ): Promise<AutoModeGateCheckResult> {
   // Auto-mode config — runs in ALL builds (circuit breaker, carousel, kick-out)
   // Fresh read of tengu_auto_mode_config.enabled — this async check runs once
@@ -1408,6 +1409,7 @@ export function createDisabledBypassPermissionsContext(
  */
 export async function checkAndDisableBypassPermissions(
   currentContext: ToolPermissionContext,
+  signal?: AbortSignal,
 ): Promise<void> {
   // Only proceed if bypassPermissions mode is available
   if (!currentContext.isBypassPermissionsModeAvailable) {
