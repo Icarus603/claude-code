@@ -8,6 +8,7 @@ import {
   parse as shellQuoteParse,
   quote as shellQuoteQuote,
 } from 'shell-quote'
+import { QuotingError } from '../errors.js'
 import { _logError as logError } from './internal.js'
 
 function jsonStringify(value: unknown): string {
@@ -64,22 +65,22 @@ export function tryQuoteShellArgs(args: unknown[]): ShellQuoteResult {
       }
 
       if (type === 'object') {
-        throw new Error(
+        throw new QuotingError(
           `Cannot quote argument at index ${index}: object values are not supported`,
         )
       }
       if (type === 'symbol') {
-        throw new Error(
+        throw new QuotingError(
           `Cannot quote argument at index ${index}: symbol values are not supported`,
         )
       }
       if (type === 'function') {
-        throw new Error(
+        throw new QuotingError(
           `Cannot quote argument at index ${index}: function values are not supported`,
         )
       }
 
-      throw new Error(
+      throw new QuotingError(
         `Cannot quote argument at index ${index}: unsupported type ${type}`,
       )
     })
@@ -302,6 +303,6 @@ export function quote(args: ReadonlyArray<unknown>): string {
     if (error instanceof Error) {
       logError(error)
     }
-    throw new Error('Failed to quote shell arguments safely')
+    throw new QuotingError('Failed to quote shell arguments safely')
   }
 }

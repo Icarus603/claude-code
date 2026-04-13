@@ -14,6 +14,7 @@ import {
   openAIAuthProvider,
 } from './auth.js'
 import { getProviderHostBindings } from './host.js'
+import { HostBindingsError, StreamError } from './errors.js'
 import { queryModelOpenAI } from './openai/indexImpl.js'
 import { queryModelGemini } from './gemini/indexImpl.js'
 import { queryModelGrok } from './grok/indexImpl.js'
@@ -41,7 +42,9 @@ function createAdapter(
           }
         }
         if (!assistantMessage) {
-          throw new Error(`Provider ${id} did not yield an assistant message.`)
+          throw new StreamError(
+            `Provider ${id} did not yield an assistant message.`,
+          )
         }
         return assistantMessage
       }),
@@ -104,7 +107,7 @@ export function getProviderAdapter(
     case 'firstParty':
     default:
       if (!overrides.anthropicQueryStream && !hostBindings.anthropic.queryStream) {
-        throw new Error(
+        throw new HostBindingsError(
           `Provider ${provider} requires an Anthropic query stream implementation.`,
         )
       }

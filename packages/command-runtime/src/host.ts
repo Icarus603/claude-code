@@ -1,4 +1,5 @@
 import type { CommandLike, CommandRegistryHostBindings } from './contracts.js'
+import { HostBindingsError } from './errors.js'
 
 let commandRegistryHostBindings:
   | CommandRegistryHostBindings<CommandLike>
@@ -19,7 +20,7 @@ export function getCommandRegistryHostBindings<
   TCommand extends CommandLike,
 >(): CommandRegistryHostBindings<TCommand> {
   if (!commandRegistryHostBindings) {
-    throw new Error(
+    throw new HostBindingsError(
       'Command registry host bindings have not been installed. Install host bindings before using @claude-code/command-runtime runtime APIs.',
     )
   }

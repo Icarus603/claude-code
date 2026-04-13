@@ -1,4 +1,5 @@
 import type { ToolRegistryHostBindings } from './contracts.js'
+import { HostBindingsError } from './errors.js'
 
 let toolRegistryHostBindings: ToolRegistryHostBindings | null = null
 
@@ -14,7 +15,7 @@ export function hasToolRegistryHostBindings(): boolean {
 
 export function getToolRegistryHostBindings(): ToolRegistryHostBindings {
   if (!toolRegistryHostBindings) {
-    throw new Error(
+    throw new HostBindingsError(
       'Tool registry host bindings have not been installed. Install host bindings before using @claude-code/tool-registry runtime APIs.',
     )
   }

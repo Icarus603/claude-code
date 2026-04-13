@@ -9,12 +9,14 @@
     ".": "./index.ts",
     "./compaction": "./compaction/index.ts",
     "./contracts": "./contracts.ts",
+    "./errors": "./errors.ts",
     "./file-history": "./fileHistory.ts",
     "./scheduler": "./scheduler.ts",
     "./hooks": "./hooks/index.ts",
     "./query": "./query.ts",
     "./query-engine": "./QueryEngine.ts",
-    "./tee": "./tee.ts"
+    "./tee": "./tee.ts",
+    "./testing": "./testing/index.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

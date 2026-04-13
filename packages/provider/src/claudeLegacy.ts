@@ -29,6 +29,7 @@ import type {
   ProviderTools,
 } from './contracts.js'
 import { getProviderHostBindings } from './host.js'
+import { HostBindingsError } from './errors.js'
 import type { ProviderRequestOptions } from './requestOptions.js'
 
 type JsonValue =
@@ -130,7 +131,7 @@ type ClaudeLegacyRuntime = {
 function getLegacyRuntime(): ClaudeLegacyRuntime {
   const legacy = getProviderHostBindings().legacy
   if (!legacy) {
-    throw new Error(
+    throw new HostBindingsError(
       'Provider claudeLegacy runtime bindings have not been installed.',
     )
   }

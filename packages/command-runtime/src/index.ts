@@ -16,4 +16,4 @@ export {
   hasCommand,
   isCommandEnabled,
 } from './api.js'
-
+export * from './errors.js'

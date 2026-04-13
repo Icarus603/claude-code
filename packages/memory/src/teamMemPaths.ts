@@ -1,18 +1,13 @@
 import { lstat, realpath } from 'fs/promises'
 import { dirname, join, resolve, sep } from 'path'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+export { PathTraversalError } from './errors.js'
+import { PathTraversalError } from './errors.js'
 function getErrnoCode(e: unknown): string | undefined {
   if (e && typeof e === 'object' && 'code' in e && typeof e.code === 'string') return e.code
   return undefined
 }
 import { getAutoMemPath, isAutoMemoryEnabled } from './paths.js'
-
-export class PathTraversalError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'PathTraversalError'
-  }
-}
 
 function sanitizePathKey(key: string): string {
   if (key.includes('\0')) {

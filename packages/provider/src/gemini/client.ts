@@ -1,6 +1,7 @@
 import { parseSSEFrames } from './sseParser.js'
 import { getProviderNetworkLayer } from '../network.js'
 import { errorMessage } from '../runtimeHelpers.js'
+import { StreamError, UpstreamError } from '../errors.js'
 import type {
   GeminiGenerateContentRequest,
   GeminiStreamChunk,
@@ -46,13 +47,13 @@ export async function* streamGeminiGenerateContent(params: {
 
   if (!response.ok) {
     const body = await response.text()
-    throw new Error(
+    throw new UpstreamError(
       `Gemini API request failed (${response.status} ${response.statusText}): ${body || 'empty response body'}`,
     )
   }
 
   if (!response.body) {
-    throw new Error('Gemini API returned no response body')
+    throw new StreamError('Gemini API returned no response body')
   }
 
   const reader = response.body.getReader()
@@ -73,7 +74,7 @@ export async function* streamGeminiGenerateContent(params: {
         try {
           yield JSON.parse(frame.data) as GeminiStreamChunk
         } catch (error) {
-          throw new Error(
+          throw new StreamError(
             `Failed to parse Gemini SSE payload: ${errorMessage(error)}`,
           )
         }
@@ -87,7 +88,7 @@ export async function* streamGeminiGenerateContent(params: {
       try {
         yield JSON.parse(frame.data) as GeminiStreamChunk
       } catch (error) {
-        throw new Error(
+        throw new StreamError(
           `Failed to parse trailing Gemini SSE payload: ${errorMessage(error)}`,
         )
       }

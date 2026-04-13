@@ -1,4 +1,5 @@
 import { getAllowedSettingSources } from '../internal/allowedSourcesState.js'
+import { ValidationError } from '../errors.js'
 
 /**
  * All possible sources where settings can come from
@@ -143,7 +144,7 @@ export function parseSettingSourcesFlag(flag: string): SettingSource[] {
         result.push('localSettings')
         break
       default:
-        throw new Error(
+        throw new ValidationError(
           `Invalid setting source: ${name}. Valid options are: user, project, local`,
         )
     }

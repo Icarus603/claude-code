@@ -39,3 +39,17 @@ export class StreamError extends ProviderBaseError {
     this.name = 'ProviderStreamError'
   }
 }
+
+export class HostBindingsError extends ProviderBaseError {
+  constructor(message: string, options?: ErrorOptions) {
+    super('PROVIDER_HOST_BINDINGS_ERROR', message, options)
+    this.name = 'ProviderHostBindingsError'
+  }
+}
+
+export class ConfigurationError extends ProviderBaseError {
+  constructor(message: string, options?: ErrorOptions) {
+    super('PROVIDER_CONFIGURATION_ERROR', message, options)
+    this.name = 'ProviderConfigurationError'
+  }
+}

@@ -16,6 +16,8 @@ export { BuiltInToolsProvider } from './providers/BuiltInToolsProvider.js'
 export {
   TOOL_PRESETS,
   parseToolPreset,
+  toolMatchesName,
+  findToolByName,
   getToolsForDefaultPreset,
   getToolRegistry,
   getAllBaseTools,

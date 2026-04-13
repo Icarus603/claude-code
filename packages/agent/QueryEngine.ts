@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { AgentCore } from './core/AgentCore.js'
-import '@claude-code/app-compat/utils/macroFallback.js'
+import './internal/macroFallback.js'
 import { getGlobalConfig } from '@claude-code/config'
 import {
   hasAutoMemPathOverride,
@@ -16,125 +16,149 @@ import {
   getSessionId,
   isSessionPersistenceDisabled,
   setCwdState,
-} from '@claude-code/app-compat/bootstrap/state.js'
-import type {
-  PermissionMode,
-  SDKCompactBoundaryMessage,
-  SDKMessage,
-  SDKPermissionDenial,
-  SDKStatus,
-  SDKUserMessageReplay,
-} from '@claude-code/app-compat/entrypoints/agentSdkTypes.js'
+} from './internal/sessionRuntime.js'
 import type { BetaMessageDeltaUsage } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
-import { accumulateUsage, updateUsage } from '@claude-code/app-compat/services/api/claude.js'
-import type { NonNullableUsage } from '@claude-code/app-compat/services/api/logging.js'
-import { EMPTY_USAGE } from '@claude-code/app-compat/services/api/logging.js'
+import { accumulateUsage, updateUsage } from '@claude-code/provider/claudeLegacy'
 import stripAnsi from 'strip-ansi'
-import type { Command } from '@claude-code/app-compat/commands.js'
-import { getSlashCommandToolSkills } from '@claude-code/app-compat/commands.js'
-import {
-  LOCAL_COMMAND_STDERR_TAG,
-  LOCAL_COMMAND_STDOUT_TAG,
-} from '@claude-code/app-compat/constants/xml.js'
-import {
-  getModelUsage,
-  getTotalAPIDuration,
-  getTotalCost,
-} from '@claude-code/app-compat/cost-tracker.js'
-import type { CanUseToolFn } from '@claude-code/app-compat/hooks/useCanUseTool.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
+import { getSlashCommandToolSkills } from '@claude-code/command-runtime/runtime'
+import type { ProviderThinkingConfig as ThinkingConfig } from '@claude-code/provider'
 import {
   createProductionDeps,
   fromAgentEvent,
   fromCoreMessages,
   toCoreMessages,
-} from '@claude-code/app-compat/agent/createDeps.js'
-import { categorizeRetryableAPIError } from '@claude-code/app-compat/services/api/errors.js'
-import type { MCPServerConnection } from '@claude-code/app-compat/services/mcp/types.js'
-import type { AppState } from '@claude-code/app-compat/state/AppState.js'
-import { type Tools, type ToolUseContext, toolMatchesName } from '@claude-code/app-compat/Tool.js'
-import type { AgentDefinition } from '@claude-code/app-compat/tools/AgentTool/loadAgentsDir.js'
-import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/app-compat/tools/SyntheticOutputTool/SyntheticOutputTool.js'
+} from './createDeps.js'
+import { toolMatchesName } from '@claude-code/tool-registry'
 import type { APIError } from '@anthropic-ai/sdk'
-import type { CompactMetadata, Message, SystemCompactBoundaryMessage } from '@claude-code/app-compat/types/message.js'
-import type { OrphanedPermission } from '@claude-code/app-compat/types/textInputTypes.js'
-import type { AttributionState } from '@claude-code/app-compat/utils/commitAttribution.js'
-import { getFastModeState } from '@claude-code/app-compat/utils/fastMode.js'
 import {
   type FileHistoryState,
   fileHistoryEnabled,
   fileHistoryMakeSnapshot,
 } from './fileHistory.js'
+import type { AgentMessage as Message, AgentToolUseContext as ToolUseContext } from './internalTypes.js'
 import {
   cloneFileStateCache,
   type FileStateCache,
 } from './internal/fileStateCache.js'
-import { registerStructuredOutputEnforcement } from '@claude-code/app-compat/utils/hooks/hookHelpers.js'
-import { getInMemoryErrors } from '@claude-code/app-compat/utils/log.js'
-import {
-  getMainLoopModel,
-  parseUserSpecifiedModel,
-} from '@claude-code/app-compat/utils/model/model.js'
-import { loadAllPluginsCacheOnly } from '@claude-code/app-compat/utils/plugins/pluginLoader.js'
-import {
-  type ProcessUserInputContext,
-  processUserInput,
-} from '@claude-code/app-compat/utils/processUserInput/processUserInput.js'
-import { fetchSystemPromptParts } from '@claude-code/app-compat/utils/queryContext.js'
 import {
   createCompactBoundaryMessage,
   flushSessionStorage,
   recordTranscript,
 } from './internal/runtimeBridges.js'
 import {
+  buildSystemInitMessage,
+  fetchSystemPromptParts,
+  getCoordinatorUserContext,
+  getMainLoopModel,
+  handleOrphanedPermission,
+  isResultSuccessful,
+  isSnipBoundaryMessage,
+  loadAllPluginsCacheOnly,
+  normalizeMessage,
+  parseUserSpecifiedModel,
+  processUserInput,
+  registerStructuredOutputEnforcement,
+  sdkCompatToolName,
+  selectableUserMessagesFilter,
   shouldEnableThinkingByDefault,
-  type ThinkingConfig,
-} from '@claude-code/app-compat/utils/thinking.js'
+  snipCompactIfNeeded,
+} from './internal/headlessRuntime.js'
 import { createAbortController } from './internal/abortController.js'
 import { headlessProfilerCheckpoint } from './internal/runtimeSignals.js'
+import {
+  categorizeRetryableAPIError,
+  getFastModeState,
+  getInMemoryErrors,
+  getModelUsage,
+  getTotalAPIDuration,
+  getTotalCost,
+} from './internal/sdkRuntime.js'
 import { countToolCalls, SYNTHETIC_MESSAGES } from './internal/messageHelpers.js'
 import { resolveThemeSetting } from './internal/systemTheme.js'
 import { asSystemPrompt, isBareMode, isEnvTruthy } from './internalUtils.js'
-
-// Lazy: MessageSelector.tsx pulls React/ink; only needed for message filtering at query time
-/* eslint-disable @typescript-eslint/no-require-imports */
-const messageSelector =
-  (): typeof import('@claude-code/app-compat/components/MessageSelector.js') =>
-    require('@claude-code/app-compat/components/MessageSelector.js')
-
 import {
   localCommandOutputToSDKAssistantMessage,
   toSDKCompactMetadata,
 } from './internal/sdkMappers.js'
-import {
-  buildSystemInitMessage,
-  sdkCompatToolName,
-} from '@claude-code/app-compat/utils/messages/systemInit.js'
-/* eslint-enable @typescript-eslint/no-require-imports */
-import {
-  handleOrphanedPermission,
-  isResultSuccessful,
-  normalizeMessage,
-} from '@claude-code/app-compat/utils/queryHelpers.js'
 
-// Dead code elimination: conditional import for coordinator mode
-/* eslint-disable @typescript-eslint/no-require-imports */
-const getCoordinatorUserContext: (
-  mcpClients: ReadonlyArray<{ name: string }>,
-  scratchpadDir?: string,
-) => { [k: string]: string } = feature('COORDINATOR_MODE')
-  ? require('@claude-code/app-compat/coordinator/coordinatorMode.js').getCoordinatorUserContext
-  : () => ({})
-/* eslint-enable @typescript-eslint/no-require-imports */
+type PermissionMode = string
+type SDKCompactBoundaryMessage = { type: string; [key: string]: unknown }
+type SDKMessage = { type: string; [key: string]: unknown }
+type SDKPermissionDenial = { [key: string]: unknown }
+type SDKStatus = string
+type SDKUserMessageReplay = { type: string; [key: string]: unknown }
+type NonNullableUsage = { [key: string]: unknown }
+type CanUseToolFn = (...args: unknown[]) => Promise<{
+  behavior: 'allow' | 'deny' | 'ask'
+  updatedInput?: unknown
+}>
+type MCPServerConnection = { name?: string; [key: string]: unknown }
+type AppState = {
+  toolPermissionContext: {
+    mode: string
+    shouldAvoidPermissionPrompts?: boolean
+    [key: string]: unknown
+  }
+  fastMode?: boolean
+  fileHistory: FileHistoryState
+  mcp?: {
+    tools?: unknown[]
+    clients?: Array<{ type?: string; [key: string]: unknown }>
+  }
+  [key: string]: unknown
+}
+type Tools = Array<{ name: string; aliases?: string[]; [key: string]: unknown }>
+type AgentDefinition = { [key: string]: unknown }
+type CompactMetadata = { [key: string]: unknown }
+type SystemCompactBoundaryMessage = Message & { compactMetadata: CompactMetadata }
+type OrphanedPermission = { [key: string]: unknown }
+type AttributionState = { [key: string]: unknown }
+type ProcessUserInputContext = {
+  messages: Message[]
+  setMessages: (fn: (prev: Message[]) => Message[]) => void
+  onChangeAPIKey: () => void
+  handleElicitation?: ToolUseContext['handleElicitation']
+  options: Record<string, unknown>
+  renderedSystemPrompt: unknown
+  getAppState: () => AppState
+  setAppState: (f: (prev: AppState) => AppState) => void
+  abortController: AbortController
+  readFileState: FileStateCache
+  nestedMemoryAttachmentTriggers: Set<string>
+  loadedNestedMemoryPaths: Set<string>
+  dynamicSkillDirTriggers: Set<string>
+  discoveredSkillNames: Set<string>
+  setInProgressToolUseIDs: (ids: string[]) => void
+  setResponseLength: (len: number) => void
+  updateFileHistoryState: (
+    updater: (prev: FileHistoryState) => FileHistoryState,
+  ) => void
+  updateAttributionState: (
+    updater: (prev: AttributionState) => AttributionState,
+  ) => void
+  setSDKStatus?: (status: SDKStatus) => void
+  [key: string]: unknown
+}
 
-// Dead code elimination: conditional import for snip compaction
-/* eslint-disable @typescript-eslint/no-require-imports */
-const snipModule = feature('HISTORY_SNIP')
-  ? (require('@claude-code/app-compat/services/compact/snipCompact.js') as typeof import('@claude-code/app-compat/services/compact/snipCompact.js'))
-  : null
-const snipProjection = feature('HISTORY_SNIP')
-  ? (require('@claude-code/app-compat/services/compact/snipProjection.js') as typeof import('@claude-code/app-compat/services/compact/snipProjection.js'))
-  : null
-/* eslint-enable @typescript-eslint/no-require-imports */
+const EMPTY_USAGE: NonNullableUsage = {
+  input_tokens: 0,
+  cache_creation_input_tokens: 0,
+  cache_read_input_tokens: 0,
+  output_tokens: 0,
+  server_tool_use: { web_search_requests: 0, web_fetch_requests: 0 },
+  service_tier: 'standard',
+  cache_creation: {
+    ephemeral_1h_input_tokens: 0,
+    ephemeral_5m_input_tokens: 0,
+  },
+  inference_geo: '',
+  iterations: [],
+  speed: 'standard',
+}
+const LOCAL_COMMAND_STDOUT_TAG = 'local-command-stdout'
+const LOCAL_COMMAND_STDERR_TAG = 'local-command-stderr'
+const SYNTHETIC_OUTPUT_TOOL_NAME = 'StructuredOutput'
 
 function getCwd(): string {
   try {
@@ -493,7 +517,7 @@ export class QueryEngine {
         (msg.type === 'user' &&
           !msg.isMeta && // Skip synthetic caveat messages
           !msg.toolUseResult && // Skip tool results (they'll be acked from query)
-          messageSelector().selectableUserMessagesFilter(msg)) || // Skip non-user-authored messages (task notifications, etc.)
+          selectableUserMessagesFilter(msg)) || // Skip non-user-authored messages (task notifications, etc.)
         (msg.type === 'system' && msg.subtype === 'compact_boundary'), // Always ack compact boundaries
     )
     const messagesToAck = replayUserMessages ? replayableMessages : []
@@ -675,7 +699,7 @@ export class QueryEngine {
 
     if (fileHistoryEnabled() && persistSession) {
       messagesFromUserInput
-        .filter(messageSelector().selectableUserMessagesFilter)
+        .filter(selectableUserMessagesFilter)
         .forEach(message => {
           void fileHistoryMakeSnapshot(
             (updater: (prev: FileHistoryState) => FileHistoryState) => {
@@ -1448,9 +1472,8 @@ export async function* ask({
     ...(feature('HISTORY_SNIP')
       ? {
           snipReplay: (yielded: Message, store: Message[]) => {
-            if (!snipProjection!.isSnipBoundaryMessage(yielded))
-              return undefined
-            return snipModule!.snipCompactIfNeeded(store, { force: true })
+            if (!isSnipBoundaryMessage(yielded)) return undefined
+            return snipCompactIfNeeded(store, { force: true })
           },
         }
       : {}),

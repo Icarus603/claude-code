@@ -30,3 +30,17 @@ export class ContextError extends PermissionBaseError {
     this.name = 'PermissionContextError'
   }
 }
+
+export class AbortError extends PermissionBaseError {
+  constructor(message: string = 'Permission request aborted', options?: ErrorOptions) {
+    super('PERMISSION_ABORTED', message, options)
+    this.name = 'PermissionAbortError'
+  }
+}
+
+export class HostBindingsError extends PermissionBaseError {
+  constructor(message: string, options?: ErrorOptions) {
+    super('PERMISSION_HOST_BINDINGS_ERROR', message, options)
+    this.name = 'PermissionHostBindingsError'
+  }
+}

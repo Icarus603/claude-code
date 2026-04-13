@@ -8,6 +8,7 @@ import type {
 } from './contracts.js'
 import type { ContextPipeline, NetworkLayer } from './types.js'
 import type { ProviderQueryFn, ProviderQueryStreamFn } from './types.js'
+import { HostBindingsError } from './errors.js'
 
 export type ProviderHostBindings = {
   contextPipeline: ContextPipeline
@@ -64,7 +65,7 @@ export function installProviderHostBindings(
 
 export function getProviderHostBindings(): ProviderHostBindings {
   if (!providerHostBindings) {
-    throw new Error(
+    throw new HostBindingsError(
       'Provider host bindings have not been installed. Install the application host bindings before using @claude-code/provider runtime APIs.',
     )
   }

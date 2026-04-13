@@ -13,6 +13,7 @@ import {
 import { dirname, isAbsolute, join, relative } from 'path'
 import { inspect } from 'util'
 import { getGlobalConfig } from '@claude-code/config'
+import { StateError } from '../errors.js'
 import { getAgentHostBindings } from '../host.js'
 import type { AgentLogOption } from '../internalTypes.js'
 import {
@@ -366,7 +367,7 @@ export async function fileHistoryRewind(
       trackedFilesCount: captured.trackedFiles.size,
       snapshotFound: false,
     })
-    throw new Error('The selected snapshot was not found')
+    throw new StateError('The selected snapshot was not found')
   }
 
   try {

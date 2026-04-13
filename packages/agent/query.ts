@@ -3,92 +3,24 @@ import type {
   ToolResultBlockParam,
   ToolUseBlock,
 } from '@anthropic-ai/sdk/resources/index.mjs'
-import type { CanUseToolFn } from '@claude-code/app-compat/hooks/useCanUseTool.js'
-import { FallbackTriggeredError } from '@claude-code/app-compat/services/api/withRetry.js'
-/* eslint-disable @typescript-eslint/no-require-imports */
-const reactiveCompact = feature('REACTIVE_COMPACT')
-  ? (require('@claude-code/app-compat/services/compact/reactiveCompact.js') as typeof import('@claude-code/app-compat/services/compact/reactiveCompact.js'))
-  : null
-const contextCollapse = feature('CONTEXT_COLLAPSE')
-  ? (require('@claude-code/app-compat/services/contextCollapse/index.js') as typeof import('@claude-code/app-compat/services/contextCollapse/index.js'))
-  : null
-/* eslint-enable @typescript-eslint/no-require-imports */
-import { ImageSizeError } from '@claude-code/app-compat/utils/imageValidation.js'
-import { ImageResizeError } from '@claude-code/app-compat/utils/imageResizer.js'
-import { findToolByName, type ToolUseContext } from '@claude-code/app-compat/Tool.js'
-import type {
-  AssistantMessage,
-  AttachmentMessage,
-  Message,
-  RequestStartEvent,
-  StreamEvent,
-  ToolUseSummaryMessage,
-  UserMessage,
-  TombstoneMessage,
-} from '@claude-code/app-compat/types/message.js'
-import {
-  PROMPT_TOO_LONG_ERROR_MESSAGE,
-  isPromptTooLongMessage,
-} from '@claude-code/app-compat/services/api/errors.js'
-import {
-  normalizeMessagesForAPI,
-  getMessagesAfterCompactBoundary,
-  stripSignatureBlocks,
-} from '@claude-code/app-compat/utils/messages.js'
-import { generateToolUseSummary } from '@claude-code/app-compat/services/toolUseSummary/toolUseSummaryGenerator.js'
-import { prependUserContext, appendSystemContext } from '@claude-code/app-compat/utils/api.js'
-import {
-  createAttachmentMessage,
-  filterDuplicateMemoryAttachments,
-  getAttachmentMessages,
-  startRelevantMemoryPrefetch,
-} from '@claude-code/app-compat/utils/attachments.js'
-/* eslint-disable @typescript-eslint/no-require-imports */
-const skillPrefetch = feature('EXPERIMENTAL_SKILL_SEARCH')
-  ? (require('@claude-code/app-compat/services/skillSearch/prefetch.js') as typeof import('@claude-code/app-compat/services/skillSearch/prefetch.js'))
-  : null
-const jobClassifier = feature('TEMPLATES')
-  ? (require('@claude-code/app-compat/jobs/classifier.js') as typeof import('@claude-code/app-compat/jobs/classifier.js'))
-  : null
-/* eslint-enable @typescript-eslint/no-require-imports */
+import { findToolByName } from '@claude-code/tool-registry'
 import {
   getCommandsByMaxPriority,
   isSlashCommand,
   remove as removeFromQueue,
 } from './internal/commandQueue.js'
 import {
-  getRuntimeMainLoopModel,
-  renderModelName,
-} from '@claude-code/app-compat/utils/model/model.js'
-import {
-  doesMostRecentAssistantMessageExceed200k,
-  finalContextTokensFromLastResponse,
-  tokenCountWithEstimation,
-} from '@claude-code/app-compat/utils/tokens.js'
-import {
-  ESCALATED_MAX_TOKENS,
-  getContextWindowForModel,
-} from '@claude-code/app-compat/utils/context.js'
-import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
 import { getGlobalConfig } from '@claude-code/config'
 import { getMaxOutputTokensForModel } from '@claude-code/provider/claudeLegacy'
-import { SLEEP_TOOL_NAME } from '@claude-code/app-compat/tools/SleepTool/prompt.js'
-import { executePostSamplingHooks } from '@claude-code/app-compat/utils/hooks/postSamplingHooks.js'
-import { executeStopFailureHooks } from '@claude-code/app-compat/utils/hooks.js'
-import type { QuerySource } from '@claude-code/app-compat/constants/querySource.js'
-import { StreamingToolExecutor } from '@claude-code/app-compat/services/tools/StreamingToolExecutor.js'
-import { queryCheckpoint } from '@claude-code/app-compat/utils/queryProfiler.js'
-import { runTools } from '@claude-code/app-compat/services/tools/toolOrchestration.js'
-import { applyToolResultBudget } from '@claude-code/app-compat/utils/toolResultStorage.js'
 import {
   buildPostCompactMessages,
   calculateTokenWarningState as calculateTokenWarningStateCore,
 } from './compaction/index.js'
 import { handleStopHooks } from './hooks/index.js'
-import { productionDeps, type QueryDeps } from '@claude-code/app-compat/query/deps.js'
+import { productionDeps, type QueryDeps } from './internal/queryDeps.js'
 import { feature } from 'bun:bundle'
 import {
   getCurrentTurnTokenBudget,
@@ -96,7 +28,7 @@ import {
   getSessionId,
   getTurnOutputTokens,
   incrementBudgetContinuationCount,
-} from '@claude-code/app-compat/bootstrap/state.js'
+} from './internal/sessionRuntime.js'
 import {
   createDumpPromptsFetch as createDumpPromptsFetchFromHost,
   recordContentReplacement,
@@ -121,17 +53,69 @@ import {
   notifyCommandLifecycle,
   queryCheckpoint,
 } from './internal/runtimeSignals.js'
+import type {
+  AgentAssistantMessage as AssistantMessage,
+  AgentMessage as Message,
+  AgentMessage as AttachmentMessage,
+  AgentMessage as UserMessage,
+  AgentQuerySource as QuerySource,
+  AgentRequestStartEvent as RequestStartEvent,
+  AgentStreamEvent as StreamEvent,
+  AgentTombstoneMessage as TombstoneMessage,
+  AgentToolUseContext as ToolUseContext,
+  AgentToolUseSummaryMessage as ToolUseSummaryMessage,
+} from './internalTypes.js'
 import { createBudgetTracker, checkTokenBudget } from './internal/tokenBudget.js'
 import { asSystemPrompt, count, isEnvTruthy, type SystemPrompt } from './internalUtils.js'
+import {
+  appendSystemContext,
+  applyContextCollapsesIfNeeded,
+  applyToolResultBudget,
+  cleanupComputerUseAfterTurn,
+  collectSkillDiscoveryPrefetch,
+  createAttachmentMessage,
+  createStreamingToolExecutor,
+  doesMostRecentAssistantMessageExceed200k,
+  executePostSamplingHooks,
+  executeStopFailureHooks,
+  filterDuplicateMemoryAttachments,
+  finalContextTokensFromLastResponse,
+  generateToolUseSummary,
+  getAttachmentMessages,
+  getContextWindowForModel,
+  getEscalatedMaxTokens,
+  getMessagesAfterCompactBoundary,
+  getPromptTooLongErrorMessage,
+  getRuntimeMainLoopModel,
+  isContextCollapseEnabled,
+  isFallbackTriggeredError,
+  isImageTransformError,
+  isPromptTooLongMessage,
+  isReactiveCompactEnabled,
+  isWithheldContextCollapsePromptTooLong,
+  isWithheldReactiveMediaSizeError,
+  isWithheldReactivePromptTooLong,
+  maybeGenerateTaskSummary,
+  normalizeMessagesForAPI,
+  prependUserContext,
+  recoverContextCollapseOverflow,
+  renderModelName,
+  runTools,
+  shouldGenerateTaskSummary,
+  snipCompactIfNeededWithMetadata,
+  startRelevantMemoryPrefetch,
+  startSkillDiscoveryPrefetch,
+  stripSignatureBlocks,
+  tokenCountWithEstimation,
+  tryReactiveCompact,
+  type StreamingToolExecutorLike,
+} from './internal/queryRuntime.js'
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-const snipModule = feature('HISTORY_SNIP')
-  ? (require('@claude-code/app-compat/services/compact/snipCompact.js') as typeof import('@claude-code/app-compat/services/compact/snipCompact.js'))
-  : null
-const taskSummaryModule = feature('BG_SESSIONS')
-  ? (require('@claude-code/app-compat/utils/taskSummary.js') as typeof import('@claude-code/app-compat/utils/taskSummary.js'))
-  : null
-/* eslint-enable @typescript-eslint/no-require-imports */
+const SLEEP_TOOL_NAME = 'Sleep'
+type CanUseToolFn = (...args: unknown[]) => Promise<{
+  behavior: 'allow' | 'deny' | 'ask'
+  updatedInput?: unknown
+}>
 
 /**
  * The rules of thinking are lengthy and fortuitous. They require plenty of thinking
@@ -420,11 +404,9 @@ async function* queryLoop(
     // nothing in prod). Turn-0 user-input discovery still blocks in
     // userInputAttachments — that's the one signal where there's no prior
     // work to hide under.
-    const pendingSkillPrefetch = skillPrefetch?.startSkillDiscoveryPrefetch(
-      null,
-      messages,
-      toolUseContext,
-    )
+    const pendingSkillPrefetch = feature('EXPERIMENTAL_SKILL_SEARCH')
+      ? startSkillDiscoveryPrefetch(null, messages, toolUseContext)
+      : null
 
     yield { type: 'stream_request_start' }
 
@@ -492,7 +474,7 @@ async function* queryLoop(
     let snipTokensFreed = 0
     if (feature('HISTORY_SNIP')) {
       queryCheckpoint('query_snip_start')
-      const snipResult = snipModule!.snipCompactIfNeeded(messagesForQuery)
+      const snipResult = snipCompactIfNeededWithMetadata(messagesForQuery)
       messagesForQuery = snipResult.messages
       snipTokensFreed = snipResult.tokensFreed
       if (snipResult.boundaryMessage) {
@@ -529,8 +511,8 @@ async function* queryLoop(
     // Within a turn, the view flows forward via state.messages at the
     // continue site (query.ts:1192), and the next projectView() no-ops
     // because the archived messages are already gone from its input.
-    if (feature('CONTEXT_COLLAPSE') && contextCollapse) {
-      const collapseResult = await contextCollapse.applyCollapsesIfNeeded(
+    if (feature('CONTEXT_COLLAPSE')) {
+      const collapseResult = await applyContextCollapsesIfNeeded(
         messagesForQuery,
         toolUseContext,
         querySource,
@@ -651,13 +633,14 @@ async function* queryLoop(
 
     queryCheckpoint('query_setup_start')
     const useStreamingToolExecution = config.gates.streamingToolExecution
-    let streamingToolExecutor = useStreamingToolExecution
-      ? new StreamingToolExecutor(
-          toolUseContext.options.tools,
-          canUseTool,
-          toolUseContext,
-        )
-      : null
+    let streamingToolExecutor: StreamingToolExecutorLike | null =
+      useStreamingToolExecution
+        ? createStreamingToolExecutor(
+            toolUseContext.options.tools,
+            canUseTool,
+            toolUseContext,
+          )
+        : null
 
     const appState = toolUseContext.getAppState()
     const permissionMode = appState.toolPermissionContext.mode
@@ -706,24 +689,19 @@ async function* queryLoop(
     // config — if they set DISABLE_AUTO_COMPACT, they get the preempt.
     let collapseOwnsIt = false
     if (feature('CONTEXT_COLLAPSE')) {
-      collapseOwnsIt =
-        (contextCollapse?.isContextCollapseEnabled() ?? false) &&
-        isAutoCompactEnabled()
+      collapseOwnsIt = isContextCollapseEnabled() && isAutoCompactEnabled()
     }
     // Hoist media-recovery gate once per turn. Withholding (inside the
     // stream loop) and recovery (after) must agree; CACHED_MAY_BE_STALE can
     // flip during the 5-30s stream, and withhold-without-recover would eat
     // the message. PTL doesn't hoist because its withholding is ungated —
     // it predates the experiment and is already the control-arm baseline.
-    const mediaRecoveryEnabled =
-      reactiveCompact?.isReactiveCompactEnabled() ?? false
+    const mediaRecoveryEnabled = isReactiveCompactEnabled()
     if (
       !compactionResult &&
       querySource !== 'compact' &&
       querySource !== 'session_memory' &&
-      !(
-        reactiveCompact?.isReactiveCompactEnabled() && isAutoCompactEnabled()
-      ) &&
+      !(isReactiveCompactEnabled() && isAutoCompactEnabled()) &&
       !collapseOwnsIt
     ) {
       const { isAtBlockingLimit } = calculateTokenWarningState(
@@ -732,7 +710,7 @@ async function* queryLoop(
       )
       if (isAtBlockingLimit) {
         yield createAssistantAPIErrorMessage({
-          content: PROMPT_TOO_LONG_ERROR_MESSAGE,
+          content: getPromptTooLongErrorMessage(),
           error: 'invalid_request',
         })
         return { reason: 'blocking_limit' }
@@ -824,7 +802,7 @@ async function* queryLoop(
               // from being yielded after the fallback response arrives.
               if (streamingToolExecutor) {
                 streamingToolExecutor.discard()
-                streamingToolExecutor = new StreamingToolExecutor(
+                streamingToolExecutor = createStreamingToolExecutor(
                   toolUseContext.options.tools,
                   canUseTool,
                   toolUseContext,
@@ -893,21 +871,20 @@ async function* queryLoop(
             let withheld = false
             if (feature('CONTEXT_COLLAPSE')) {
               if (
-                contextCollapse?.isWithheldPromptTooLong(
+                isWithheldContextCollapsePromptTooLong(
                   message as Message,
-                  isPromptTooLongMessage,
                   querySource,
                 )
               ) {
                 withheld = true
               }
             }
-            if (reactiveCompact?.isWithheldPromptTooLong(message as Message)) {
+            if (isWithheldReactivePromptTooLong(message as Message)) {
               withheld = true
             }
             if (
               mediaRecoveryEnabled &&
-              reactiveCompact?.isWithheldMediaSizeError(message as Message)
+              isWithheldReactiveMediaSizeError(message as Message)
             ) {
               withheld = true
             }
@@ -986,7 +963,7 @@ async function* queryLoop(
             }
           }
         } catch (innerError) {
-          if (innerError instanceof FallbackTriggeredError && fallbackModel) {
+          if (isFallbackTriggeredError(innerError) && fallbackModel) {
             // Fallback was triggered - switch model and retry
             currentModel = fallbackModel
             attemptWithFallback = true
@@ -1006,7 +983,7 @@ async function* queryLoop(
             // tool_use_ids) from leaking into the retry.
             if (streamingToolExecutor) {
               streamingToolExecutor.discard()
-              streamingToolExecutor = new StreamingToolExecutor(
+              streamingToolExecutor = createStreamingToolExecutor(
                 toolUseContext.options.tools,
                 canUseTool,
                 toolUseContext,
@@ -1062,10 +1039,7 @@ async function* queryLoop(
       })
 
       // Handle image size/resize errors with user-friendly messages
-      if (
-        error instanceof ImageSizeError ||
-        error instanceof ImageResizeError
-      ) {
+      if (isImageTransformError(error)) {
         yield createAssistantAPIErrorMessage({
           content: error.message,
         })
@@ -1127,9 +1101,6 @@ async function* queryLoop(
       // see stopHooks.ts for the subagent-releasing-main's-lock rationale.
       if (feature('CHICAGO_MCP') && !toolUseContext.agentId) {
         try {
-          const { cleanupComputerUseAfterTurn } = await import(
-            '@claude-code/app-compat/utils/computerUse/cleanup.js'
-          )
           await cleanupComputerUseAfterTurn(toolUseContext)
         } catch {
           // Failures are silent — this is dogfooding cleanup, not critical path
@@ -1176,17 +1147,17 @@ async function* queryLoop(
       // prevents a spiral and the error surfaces.
       const isWithheldMedia =
         mediaRecoveryEnabled &&
-        reactiveCompact?.isWithheldMediaSizeError(lastMessage)
+        Boolean(lastMessage) &&
+        isWithheldReactiveMediaSizeError(lastMessage)
       if (isWithheld413) {
         // First: drain all staged context-collapses. Gated on the PREVIOUS
         // transition not being collapse_drain_retry — if we already drained
         // and the retry still 413'd, fall through to reactive compact.
         if (
           feature('CONTEXT_COLLAPSE') &&
-          contextCollapse &&
           state.transition?.reason !== 'collapse_drain_retry'
         ) {
-          const drained = contextCollapse.recoverFromOverflow(
+          const drained = recoverContextCollapseOverflow(
             messagesForQuery,
             querySource,
           )
@@ -1211,8 +1182,8 @@ async function* queryLoop(
           }
         }
       }
-      if ((isWithheld413 || isWithheldMedia) && reactiveCompact) {
-        const compacted = await reactiveCompact.tryReactiveCompact({
+      if ((isWithheld413 || isWithheldMedia) && isReactiveCompactEnabled()) {
+        const compacted = await tryReactiveCompact({
           hasAttempted: hasAttemptedReactiveCompact,
           querySource,
           aborted: toolUseContext.abortController.signal.aborted,
@@ -1297,7 +1268,7 @@ async function* queryLoop(
           !process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS
         ) {
           logEvent('tengu_max_tokens_escalate', {
-            escalatedTo: ESCALATED_MAX_TOKENS,
+            escalatedTo: getEscalatedMaxTokens(),
           })
           const next: State = {
             messages: messagesForQuery,
@@ -1305,7 +1276,7 @@ async function* queryLoop(
             autoCompactTracking: tracking,
             maxOutputTokensRecoveryCount,
             hasAttemptedReactiveCompact,
-            maxOutputTokensOverride: ESCALATED_MAX_TOKENS,
+            maxOutputTokensOverride: getEscalatedMaxTokens(),
             pendingToolUseSummary: undefined,
             stopHookActive: undefined,
             turnCount,
@@ -1583,9 +1554,6 @@ async function* queryLoop(
       // Main thread only — see stopHooks.ts for the subagent rationale.
       if (feature('CHICAGO_MCP') && !toolUseContext.agentId) {
         try {
-          const { cleanupComputerUseAfterTurn } = await import(
-            '@claude-code/app-compat/utils/computerUse/cleanup.js'
-          )
           await cleanupComputerUseAfterTurn(toolUseContext)
         } catch {
           // Failures are silent — this is dogfooding cleanup, not critical path
@@ -1712,9 +1680,9 @@ async function* queryLoop(
     // Inject prefetched skill discovery. collectSkillDiscoveryPrefetch emits
     // hidden_by_main_turn — true when the prefetch resolved before this point
     // (should be >98% at AKI@250ms / Haiku@573ms vs turn durations of 2-30s).
-    if (skillPrefetch && pendingSkillPrefetch) {
+    if (feature('EXPERIMENTAL_SKILL_SEARCH') && pendingSkillPrefetch) {
       const skillAttachments =
-        await skillPrefetch.collectSkillDiscoveryPrefetch(pendingSkillPrefetch)
+        await collectSkillDiscoveryPrefetch(pendingSkillPrefetch)
       for (const att of skillAttachments) {
         const msg = createAttachmentMessage(att)
         yield msg
@@ -1780,9 +1748,9 @@ async function* queryLoop(
     if (feature('BG_SESSIONS')) {
       if (
         !toolUseContext.agentId &&
-        taskSummaryModule!.shouldGenerateTaskSummary()
+        shouldGenerateTaskSummary()
       ) {
-        taskSummaryModule!.maybeGenerateTaskSummary({
+        maybeGenerateTaskSummary({
           systemPrompt,
           userContext,
           systemContext,
