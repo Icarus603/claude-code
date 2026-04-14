@@ -5,7 +5,6 @@ import type { GeminiPart, GeminiStreamChunk } from './types.js'
 export async function* adaptGeminiStreamToAnthropic(
   stream: AsyncIterable<GeminiStreamChunk>,
   model: string,
-  signal?: AbortSignal,
 ): AsyncGenerator<BetaRawMessageStreamEvent, void> {
   const messageId = `msg_${randomUUID().replace(/-/g, '').slice(0, 24)}`
   let started = false
