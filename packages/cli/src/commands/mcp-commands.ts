@@ -1,9 +1,9 @@
 import type { Command } from '@commander-js/extra-typings'
 import { feature } from 'bun:bundle'
+import { isXaaEnabled } from '@claude-code/mcp-runtime'
 import { createSortedHelpConfig } from '../entry/commander.js'
 import { registerMcpAddCommand } from '../../../../src/commands/mcp/addCommand.js'
 import { registerMcpXaaIdpCommand } from '../../../../src/commands/mcp/xaaIdpCommand.js'
-import { isXaaEnabled } from '../../../../src/services/mcp/xaaIdpLogin.js'
 import {
   getOriginalCwd,
   setOriginalCwd,

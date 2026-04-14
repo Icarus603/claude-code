@@ -1,6 +1,7 @@
 import type { Command } from '@commander-js/extra-typings'
 import { Option } from '@commander-js/extra-typings'
 import { feature } from 'bun:bundle'
+import { bridgeMain } from '@claude-code/bridge'
 import { createSortedHelpConfig } from '../entry/commander.js'
 import {
   VALID_INSTALLABLE_SCOPES,
@@ -329,7 +330,6 @@ export function registerMiscCommands(program: Command): void {
       )
       .action(async () => {
         // Unreachable — cli.tsx fast-path handles this command before main.tsx loads.
-        const { bridgeMain } = await import('../../../../src/bridge/bridgeMain.js')
         await bridgeMain(process.argv.slice(3))
       })
   }

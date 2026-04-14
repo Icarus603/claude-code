@@ -10,6 +10,46 @@ export type DynamicMcpState<TConnection = unknown, TTools = unknown, TScopedConf
   configs: Record<string, TScopedConfig>
 }
 
+export type ConfigScope =
+  | 'local'
+  | 'user'
+  | 'project'
+  | 'dynamic'
+  | 'enterprise'
+  | 'claudeai'
+  | 'managed'
+
+export type McpSdkServerConfig = {
+  type: 'sdk'
+  name: string
+}
+
+export type McpServerConfig = {
+  type?: string
+  [key: string]: unknown
+}
+
+export type ScopedMcpServerConfig = McpServerConfig & {
+  scope: ConfigScope
+  pluginSource?: string
+}
+
+export type MCPServerConnection = {
+  name: string
+  type: 'connected' | 'failed' | 'needs-auth' | 'pending' | 'disabled'
+  config: ScopedMcpServerConfig
+  capabilities?: unknown
+  serverInfo?: {
+    name: string
+    version: string
+  }
+  instructions?: string
+  error?: string
+  reconnectAttempt?: number
+  maxReconnectAttempts?: number
+  client?: unknown
+}
+
 /**
  * State for SDK MCP servers that run in the SDK process. Parallel to
  * DynamicMcpState but uses SDK-shaped configs.

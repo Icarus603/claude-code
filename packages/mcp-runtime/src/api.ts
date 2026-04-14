@@ -1,4 +1,5 @@
 import { getMcpRuntimeHostBindings } from './host.js'
+import { HostBindingsError } from './errors.js'
 
 export async function getMcpToolsCommandsAndResources<
   TMcpTool,
@@ -135,7 +136,9 @@ export async function executeTool<TMcpConfig>(
     unknown
   >()
   if (!host.executeTool) {
-    throw new Error('MCP runtime host binding does not implement executeTool')
+    throw new HostBindingsError(
+      'MCP runtime host binding does not implement executeTool',
+    )
   }
   return host.executeTool(call)
 }
@@ -189,7 +192,7 @@ export async function handleMcpSetServers(
     unknown
   >()
   if (!host.handleMcpSetServers) {
-    throw new Error(
+    throw new HostBindingsError(
       'MCP runtime host binding does not implement handleMcpSetServers',
     )
   }
@@ -209,7 +212,7 @@ export async function reconcileMcpServers(
     unknown
   >()
   if (!host.reconcileMcpServers) {
-    throw new Error(
+    throw new HostBindingsError(
       'MCP runtime host binding does not implement reconcileMcpServers',
     )
   }

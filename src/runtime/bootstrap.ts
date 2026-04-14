@@ -46,6 +46,11 @@ export function installRuntimeSkeletonBindings(): void {
       require('./installCliBindings.js')
     },
   })
+  // Bridge bindings are not part of the app-host bootstrap contract yet,
+  // but CLI/headless package code imports @claude-code/bridge directly.
+  // Install them from the same runtime bootstrap seam.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./installBridgeBindings.js')
   runtimeSkeletonBindingsInstalled = true
 }
 
