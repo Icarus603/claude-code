@@ -1,5 +1,11 @@
-// V7 §8.22 — daemon integration contracts.
-// Public surface for the long-running supervisor (claude daemon).
-// Will host: daemon lifecycle, worker registry, worker supervision contracts.
-// Migration source: src/daemon/.
-export {}
+export type DaemonWorker = {
+  id: string
+  kind: string
+  stop(signal?: AbortSignal): Promise<void>
+}
+
+export type DaemonRuntime = {
+  start(signal?: AbortSignal): Promise<void>
+  stop(signal?: AbortSignal): Promise<void>
+  listWorkers(): DaemonWorker[]
+}

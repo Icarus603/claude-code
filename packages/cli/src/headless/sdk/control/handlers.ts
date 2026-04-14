@@ -9,6 +9,13 @@ import {
 import {
   getSettings_DEPRECATED,
 } from '@claude-code/config/settings'
+import {
+  ChannelMessageNotificationSchema,
+  findChannelEntry,
+  gateChannelServer,
+  type MCPServerConnection,
+  wrapChannelMessage,
+} from '@claude-code/mcp-runtime'
 import type { ToolPermissionContext } from '../../../../../../src/Tool.js'
 import type { Stream } from '../../../../../../src/utils/stream.js'
 import type {
@@ -16,9 +23,6 @@ import type {
   SDKControlInitializeRequest,
   SDKControlInitializeResponse,
 } from '../../../../../../src/entrypoints/sdk/controlTypes.js'
-import type {
-  MCPServerConnection,
-} from '../../../../../../src/services/mcp/types.js'
 import type {
   AgentDefinition,
 } from '../../../../../../src/tools/AgentTool/loadAgentsDir.js'
@@ -33,12 +37,6 @@ import type { HookCallbackMatcher } from '../../../../../../src/types/hooks.js'
 import type { HookEvent } from '../../../../../../src/entrypoints/agentSdkTypes.js'
 import type { PermissionMode as InternalPermissionMode } from '../../../../../../src/types/permissions.js'
 import type { AppState } from '../../../../../../src/state/AppStateStore.js'
-import {
-  ChannelMessageNotificationSchema,
-  gateChannelServer,
-  wrapChannelMessage,
-  findChannelEntry,
-} from '../../../../../../src/services/mcp/channelNotification.js'
 import { parsePluginIdentifier } from '../../../../../../src/utils/plugins/pluginIdentifier.js'
 import {
   getSessionId,

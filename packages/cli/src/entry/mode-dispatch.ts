@@ -8,6 +8,12 @@
 
 import { feature } from 'bun:bundle'
 import {
+  clearTrustedDeviceToken,
+  enrollTrustedDevice,
+  getBridgeDisabledReason,
+  isCcrMirrorEnabled,
+} from '@claude-code/bridge'
+import {
   createHeadlessHost,
   createInteractiveHost,
   type InteractiveHostSession,
@@ -35,6 +41,26 @@ import { addToHistory } from '../../../../src/history.js'
 import type { Root } from '@anthropic/ink'
 import { createHeadlessSession } from '@claude-code/cli'
 import { getTeammateModeSnapshot, logManagedSettings } from '@claude-code/cli'
+import {
+  areMcpConfigsAllowedWithEnterpriseMcpConfig,
+  clearServerCache,
+  dedupClaudeAiMcpServers,
+  doesEnterpriseMcpConfigExist,
+  excludeCommandsByServer,
+  excludeResourcesByServer,
+  fetchClaudeAIMcpConfigsIfEligible,
+  filterMcpServersByPolicy,
+  getClaudeCodeMcpConfigs,
+  getMcpServerSignature,
+  getMcpToolsCommandsAndResources,
+  parseMcpConfig,
+  parseMcpConfigFromFilePath,
+  prefetchAllMcpResources,
+  type McpSdkServerConfig,
+  type McpServerConfig,
+  type ScopedMcpServerConfig,
+} from '@claude-code/mcp-runtime'
+import { createRemoteSessionConfig } from '@claude-code/server'
 import { launchRepl, type AppWrapperProps } from '../../../../src/replLauncher.js'
 import { initializeLspServerManager } from '../../../../src/services/lsp/manager.js'
 // Imports that were left behind when the .action() body moved from src/main.tsx
@@ -46,7 +72,6 @@ import {
   createDirectConnectSession,
   DirectConnectError,
 } from '../../../../src/server/createDirectConnectSession.js'
-import { createRemoteSessionConfig } from '../../../../src/remote/RemoteSessionManager.js'
 import {
   hasGrowthBookEnvOverride,
   initializeGrowthBook,
@@ -60,11 +85,6 @@ import {
   parseFileSpecs,
 } from '../../../../src/services/api/filesApi.js'
 import { prefetchPassesEligibility } from '../../../../src/services/api/referral.js'
-import type {
-  McpSdkServerConfig,
-  McpServerConfig,
-  ScopedMcpServerConfig,
-} from '../../../../src/services/mcp/types.js'
 import {
   isPolicyAllowed,
   loadPolicyLimits,
@@ -163,10 +183,6 @@ import {
 } from '../../../../src/interactiveHelpers.js'
 import { initBuiltinPlugins } from '../../../../src/plugins/bundled/index.js'
 import { checkQuotaStatus } from '../../../../src/services/claudeAiLimits.js'
-import {
-  getMcpToolsCommandsAndResources,
-  prefetchAllMcpResources,
-} from '../../../../src/services/mcp/client.js'
 import { initBundledSkills } from '../../../../src/skills/bundled/index.js'
 import type { AgentColorName } from '../../../../src/tools/AgentTool/agentColorManager.js'
 import {
@@ -264,22 +280,6 @@ import { logSkillsLoaded } from '../../../../src/utils/telemetry/skillLoadedEven
 import { generateTempFilePath } from '../../../../src/utils/tempfile.js'
 import { validateUuid } from '../../../../src/utils/uuid.js'
 import { logPermissionContextForAnts } from '../../../../src/services/internalLogging.js'
-import { fetchClaudeAIMcpConfigsIfEligible } from '../../../../src/services/mcp/claudeai.js'
-import { clearServerCache } from '../../../../src/services/mcp/client.js'
-import {
-  areMcpConfigsAllowedWithEnterpriseMcpConfig,
-  dedupClaudeAiMcpServers,
-  doesEnterpriseMcpConfigExist,
-  filterMcpServersByPolicy,
-  getClaudeCodeMcpConfigs,
-  getMcpServerSignature,
-  parseMcpConfig,
-  parseMcpConfigFromFilePath,
-} from '../../../../src/services/mcp/config.js'
-import {
-  excludeCommandsByServer,
-  excludeResourcesByServer,
-} from '../../../../src/services/mcp/utils.js'
 import { getRelevantTips } from '../../../../src/services/tips/tipRegistry.js'
 import { logContextMetrics } from '../../../../src/utils/api.js'
 import {
@@ -2145,8 +2145,6 @@ export async function runModeDispatch(
 					feature("BRIDGE_MODE") &&
 					remoteControlOption !== undefined
 				) {
-					const { getBridgeDisabledReason } =
-						await import("../../../../src/bridge/bridgeEnabled.js");
 					const disabledReason = await getBridgeDisabledReason();
 					remoteControl = disabledReason === null;
 					if (disabledReason) {
@@ -2209,10 +2207,8 @@ export async function runModeDispatch(
 					// — enrollTrustedDevice() via checkGate_CACHED_OR_BLOCKING (awaits
 					// the GrowthBook reinit above), clearTrustedDeviceToken() via the
 					// sync cached check (acceptable since clear is idempotent).
-					void import("../../../../src/bridge/trustedDevice.js").then((m) => {
-						m.clearTrustedDeviceToken();
-						return m.enrollTrustedDevice();
-					});
+					clearTrustedDeviceToken();
+					void enrollTrustedDevice();
 				}
 
 				// Validate that the active token's org matches forceLoginOrgUUID (if set
@@ -2989,10 +2985,6 @@ export async function runModeDispatch(
 				remoteControl || getRemoteControlAtStartup() || kairosEnabled;
 			let ccrMirrorEnabled = false;
 			if (feature("CCR_MIRROR") && !fullRemoteControl) {
-				/* eslint-disable @typescript-eslint/no-require-imports */
-				const { isCcrMirrorEnabled } =
-					require("../../../../src/bridge/bridgeEnabled.js") as typeof import("../../../../src/bridge/bridgeEnabled.js");
-				/* eslint-enable @typescript-eslint/no-require-imports */
 				ccrMirrorEnabled = isCcrMirrorEnabled();
 			}
 

@@ -28,6 +28,14 @@ import { dirname, join, resolve } from 'node:path'
 const KNOWN_OWNERS: Record<string, readonly string[]> = {
   provider: ['InMemoryProvider', 'ErroringProvider', 'SlowProvider'],
   'mcp-runtime': ['InMemoryMcpRuntime'],
+  swarm: ['createSwarmHostDepsFixture'],
+  bridge: ['NullBridgeRuntime', 'createScriptedBridgeHandle'],
+  daemon: ['createStubWorker', 'createDaemonRuntimeFixture'],
+  voice: ['createNullVoiceRuntime', 'createScriptedVoiceChunks'],
+  server: ['InMemoryServerRuntime', 'createRemoteSessionConfigFixture'],
+  ide: ['createInactiveIdeHandle'],
+  teleport: ['createInactiveTeleportHandle'],
+  updater: ['createInactiveUpdaterHandle'],
   storage: ['MemoryStorageBackend'],
   output: ['CapturingOutputTarget'],
   permission: ['AllowAllPermission', 'DenyAllPermission', 'ScriptedPermission'],
@@ -41,13 +49,22 @@ const KNOWN_OWNERS: Record<string, readonly string[]> = {
 // a placeholder `export {}`). Add a name here when its real fakes land.
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
   'local-observability',
+  'mcp-runtime',
   'config',
   'storage',
   'output',
   'permission',
   'provider',
+  'swarm',
   'tool-registry',
   'command-runtime',
+  'bridge',
+  'daemon',
+  'voice',
+  'server',
+  'ide',
+  'teleport',
+  'updater',
 ])
 
 type Violation = { package: string; reason: string }

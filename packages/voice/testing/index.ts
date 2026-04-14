@@ -1,4 +1,22 @@
-// V7 §9.11 — voice in-memory fakes.
-// Will host NullVoice, RecordingVoice, ScriptedVoice for offline test runs.
-// Constraint: testing/* must NOT import from ../src/internal/.
-export {}
+import type {
+  VoiceRuntime,
+  VoiceTranscriptChunk,
+} from '../src/contracts.js'
+
+export function createNullVoiceRuntime(): VoiceRuntime {
+  return {
+    state: 'idle',
+    async start() {},
+    async stop() {},
+    pushTranscript(_chunk: VoiceTranscriptChunk) {},
+  }
+}
+
+export function createScriptedVoiceChunks(
+  texts: string[],
+): VoiceTranscriptChunk[] {
+  return texts.map((text, index) => ({
+    text,
+    isFinal: index === texts.length - 1,
+  }))
+}

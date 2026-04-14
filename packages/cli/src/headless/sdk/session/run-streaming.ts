@@ -80,15 +80,28 @@ import {
   loadConversationForResume,
   type TurnInterruptionState,
 } from '../../../../../../src/utils/conversationRecovery.js'
-import type {
-  MCPServerConnection,
-  McpSdkServerConfig,
-  ScopedMcpServerConfig,
-} from '../../../../../../src/services/mcp/types.js'
 import {
+  clearServerCache,
+  commandBelongsToServer,
+  filterToolsByServer,
+  getAllMcpConfigs,
+  getMcpConfigByName,
+  getMcpPrefix,
   isChannelAllowlisted,
   isChannelsEnabled,
-} from '../../../../../../src/services/mcp/channelAllowlist.js'
+  isMcpServerDisabled,
+  performMCPOAuthFlow,
+  reconnectMcpServerImpl,
+  revokeServerTokens,
+  runElicitationHooks,
+  runElicitationResultHooks,
+  setupSdkMcpClients,
+  setupVscodeSdkMcp,
+  setMcpServerEnabled,
+  type MCPServerConnection,
+  type McpSdkServerConfig,
+  type ScopedMcpServerConfig,
+} from '@claude-code/mcp-runtime'
 import { validateUuid } from '../../../../../../src/utils/uuid.js'
 import { ask } from '@claude-code/agent/query-engine'
 import { canBatchWith, joinPromptValues } from './prompt-utils.js'
@@ -173,11 +186,14 @@ import { getCwd } from '../../../../../../src/utils/cwd.js'
 import omit from 'lodash-es/omit.js'
 import reject from 'lodash-es/reject.js'
 import { isPolicyAllowed } from '../../../../../../src/services/policyLimits/index.js'
-import type { ReplBridgeHandle } from '../../../../../../src/bridge/replBridge.js'
+import {
+  buildBridgeConnectUrl,
+  extractInboundMessageFields,
+  initReplBridge,
+  resolveAndPrepend,
+  type ReplBridgeHandle,
+} from '@claude-code/bridge'
 import { getRemoteSessionUrl } from '../../../../../../src/constants/product.js'
-import { buildBridgeConnectUrl } from '../../../../../../src/bridge/bridgeStatusUtil.js'
-import { extractInboundMessageFields } from '../../../../../../src/bridge/inboundMessages.js'
-import { resolveAndPrepend } from '../../../../../../src/bridge/inboundAttachments.js'
 import type { CanUseToolFn } from '../../../../../../src/hooks/useCanUseTool.js'
 import { createAbortController } from '../../../../../../src/utils/abortController.js'
 import { generateSessionTitle } from '../../../../../../src/utils/sessionTitle.js'
@@ -224,36 +240,11 @@ import {
   restoreSessionMetadata,
 } from '../../../../../../src/utils/sessionStorage.js'
 import { incrementPromptCount } from '../../../../../../src/utils/commitAttribution.js'
-import {
-  setupSdkMcpClients,
-  clearServerCache,
-  reconnectMcpServerImpl,
-} from '../../../../../../src/services/mcp/client.js'
-import {
-  getMcpConfigByName,
-  isMcpServerDisabled,
-  setMcpServerEnabled,
-} from '../../../../../../src/services/mcp/config.js'
-import {
-  performMCPOAuthFlow,
-  revokeServerTokens,
-} from '../../../../../../src/services/mcp/auth.js'
-import {
-  runElicitationHooks,
-  runElicitationResultHooks,
-} from '../../../../../../src/services/mcp/elicitationHandler.js'
 import { executeNotificationHooks } from '../../../../../../src/utils/hooks.js'
 import {
   ElicitRequestSchema,
   ElicitationCompleteNotificationSchema,
 } from '@modelcontextprotocol/sdk/types.js'
-import { getMcpPrefix } from '../../../../../../src/services/mcp/mcpStringUtils.js'
-import {
-  commandBelongsToServer,
-  filterToolsByServer,
-} from '../../../../../../src/services/mcp/utils.js'
-import { setupVscodeSdkMcp } from '../../../../../../src/services/mcp/vscodeSdkMcp.js'
-import { getAllMcpConfigs } from '../../../../../../src/services/mcp/config.js'
 import {
   isQualifiedForGrove,
   checkGroveForNonInteractive,
@@ -3354,9 +3345,6 @@ export function runHeadlessStreaming(
               // instead of a generic "initialization failed".
               let bridgeFailureDetail: string | undefined
               try {
-                const { initReplBridge } = await import(
-                  '../../../../../../src/bridge/initReplBridge.js'
-                )
                 const handle = await initReplBridge({
                   onInboundMessage(msg) {
                     const fields = extractInboundMessageFields(msg)

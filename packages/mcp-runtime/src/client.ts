@@ -1,4 +1,5 @@
 import { getMcpRuntimeHostBindings } from './host.js'
+import { HostBindingsError } from './errors.js'
 
 export {
   connectAll,
@@ -54,18 +55,31 @@ function getLegacyRuntime(): McpLegacyRuntime {
     unknown
   >().legacy
   if (!legacy) {
-    throw new Error(
+    throw new HostBindingsError(
       'MCP runtime legacy bindings have not been installed.',
     )
   }
   return legacy as unknown as McpLegacyRuntime
 }
 
-export const McpAuthError = class extends (getLegacyRuntime().McpAuthError) {}
+export class McpAuthError extends Error {
+  constructor(...args: any[]) {
+    const Legacy = getLegacyRuntime().McpAuthError
+    const error = new Legacy(...args)
+    super(error.message, { cause: error.cause })
+    this.name = error.name
+  }
+}
 
-export const McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS = class extends (
-  getLegacyRuntime().McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
-) {}
+export class McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS extends Error {
+  constructor(...args: any[]) {
+    const Legacy =
+      getLegacyRuntime().McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
+    const error = new Legacy(...args)
+    super(error.message, { cause: error.cause })
+    this.name = error.name
+  }
+}
 
 export function isMcpSessionExpiredError(...args: any[]): boolean {
   return getLegacyRuntime().isMcpSessionExpiredError(...args)

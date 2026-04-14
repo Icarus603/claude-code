@@ -1,4 +1,26 @@
-// V7 §9.11 — daemon in-memory fakes.
-// Will host stub workers for daemon supervisor tests.
-// Constraint: testing/* must NOT import from ../src/internal/.
-export {}
+import type { DaemonRuntime, DaemonWorker } from '../src/contracts.js'
+
+export function createStubWorker(
+  overrides: Partial<DaemonWorker> = {},
+): DaemonWorker {
+  return {
+    id: 'worker-test',
+    kind: 'test',
+    stop: async () => {},
+    ...overrides,
+  }
+}
+
+export function createDaemonRuntimeFixture(
+  workers: DaemonWorker[] = [],
+): DaemonRuntime {
+  return {
+    async start() {},
+    async stop(signal?: AbortSignal) {
+      for (const worker of workers) {
+        await worker.stop(signal)
+      }
+    },
+    listWorkers: () => [...workers],
+  }
+}

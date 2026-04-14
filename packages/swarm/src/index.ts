@@ -19,6 +19,7 @@ export type {
   HostWorktreeManager,
   HostEnvironment,
 } from './types/deps.js'
+export * from './errors.js'
 
 export type {
   BackendType,

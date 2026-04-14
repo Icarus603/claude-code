@@ -45,6 +45,12 @@ export type ModelAlias = string
 export type PermissionUpdate = unknown;
 export type PermissionMode = string
 export type Task = unknown;
+export type TaskStateBase = {
+  id: string
+  status: string
+  [key: string]: unknown
+}
+export type SetAppState = (updater: (prev: AppState) => AppState) => void
 export type TeammateContext = unknown;
 export type AgentColorName = string
 

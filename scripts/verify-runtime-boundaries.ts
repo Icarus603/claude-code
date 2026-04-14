@@ -10,15 +10,18 @@ const PACKAGE_PATHS = [
   'packages/tool-registry',
   'packages/command-runtime',
   'packages/mcp-runtime',
+  'packages/swarm',
+  'packages/bridge',
+  'packages/daemon',
+  'packages/voice',
   'packages/app-host/src',
   'packages/storage/src',
   'packages/output/src',
   'packages/local-observability/src',
-  'packages/swarm',
-  'packages/ide/src',
-  'packages/teleport/src',
-  'packages/updater/src',
-  'packages/server/src',
+  'packages/ide',
+  'packages/teleport',
+  'packages/updater',
+  'packages/server',
 ]
 
 const DISALLOWED_PATTERNS = [
@@ -54,6 +57,14 @@ const TRANSITION_APP_COMPAT_REF_BUDGET: Record<string, number> = {
   'packages/tool-registry': 0,
   'packages/command-runtime': 0,
   'packages/mcp-runtime': 0,
+  'packages/swarm': 0,
+  'packages/bridge': 0,
+  'packages/daemon': 0,
+  'packages/voice': 0,
+  'packages/server': 0,
+  'packages/ide': 0,
+  'packages/teleport': 0,
+  'packages/updater': 0,
 }
 
 async function collectFiles(root: string): Promise<string[]> {
@@ -201,6 +212,12 @@ async function main(): Promise<void> {
         : DISALLOWED_PATTERNS
 
       for (const pattern of disallowedPatterns) {
+        const isSamePackageTestingSrcImport =
+          filePath.startsWith(`${root}/testing/`) &&
+          (pattern === "from '../src/" || pattern === 'from "../src/')
+        if (isSamePackageTestingSrcImport) {
+          continue
+        }
         if (content.includes(pattern)) {
           violations.push(`${filePath}: contains disallowed pattern "${pattern}"`)
         }

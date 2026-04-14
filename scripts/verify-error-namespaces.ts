@@ -58,6 +58,47 @@ const KNOWN_OWNERS: Record<string, Spec> = {
       'ElicitationError',
     ],
   },
+  swarm: {
+    base: 'SwarmBaseError',
+    subtypes: ['SpawnError', 'MailboxError', 'WorktreeError'],
+  },
+  bridge: {
+    base: 'BridgeBaseError',
+    subtypes: [
+      'SessionError',
+      'AuthError',
+      'TransportError',
+      'PermissionCallbackError',
+    ],
+  },
+  daemon: {
+    base: 'DaemonBaseError',
+    subtypes: ['LifecycleError', 'WorkerRegistryError', 'SupervisionError'],
+  },
+  voice: {
+    base: 'VoiceBaseError',
+    subtypes: ['CaptureError', 'AuthError', 'StreamError'],
+  },
+  server: {
+    base: 'ServerBaseError',
+    subtypes: ['LifecycleError', 'SessionTransportError', 'CoordinationError'],
+  },
+  ide: {
+    base: 'IdeBaseError',
+    subtypes: ['ConnectorError', 'SelectionError', 'IndexingError'],
+  },
+  teleport: {
+    base: 'TeleportBaseError',
+    subtypes: [
+      'EnvironmentSelectionError',
+      'ContextSyncError',
+      'ExecutionError',
+    ],
+  },
+  updater: {
+    base: 'UpdaterBaseError',
+    subtypes: ['CheckError', 'VerificationError', 'InstallError'],
+  },
   storage: {
     base: 'StorageBaseError',
     subtypes: ['NotFoundError', 'ConflictError', 'BackendError'],
@@ -82,11 +123,20 @@ const KNOWN_OWNERS: Record<string, Spec> = {
 // here in the same commit that lands the contracts/errors.ts file.
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
   'config',
+  'mcp-runtime',
   'permission',
   'provider',
   'shell',
   'storage',
+  'swarm',
   'tool-registry',
+  'bridge',
+  'daemon',
+  'voice',
+  'server',
+  'ide',
+  'teleport',
+  'updater',
 ])
 
 type Violation = { package: string; reason: string }

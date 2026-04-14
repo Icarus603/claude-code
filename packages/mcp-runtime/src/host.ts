@@ -1,4 +1,5 @@
 import type { McpRuntimeHostBindings } from './contracts.js'
+import { HostBindingsError } from './errors.js'
 
 type AnyMcpRuntimeHostBindings = McpRuntimeHostBindings<
   unknown,
@@ -42,7 +43,7 @@ export function getMcpRuntimeHostBindings<
   TMcpConnection
 > {
   if (!mcpRuntimeHostBindings) {
-    throw new Error(
+    throw new HostBindingsError(
       'MCP runtime host bindings have not been installed. Install host bindings before using @claude-code/mcp-runtime runtime APIs.',
     )
   }
