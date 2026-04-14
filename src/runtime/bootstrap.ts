@@ -6,7 +6,11 @@ import { logForDebugging } from '../utils/debug.js'
 import { getClaudeConfigHomeDir } from '../utils/envUtils.js'
 import { getGlobalClaudeFile } from '../utils/env.js'
 import { findCanonicalGitRoot } from '../utils/git.js'
-import { buildAgentHostExtraBindings } from '../services/agentHostBindings.js'
+import {
+  buildAgentHostExtraBindings,
+  buildMemoryHostExtraBindings,
+  buildPermissionHostExtraBindings,
+} from '../services/agentHostBindings.js'
 
 let runtimeSkeletonBindingsInstalled = false
 
@@ -26,6 +30,8 @@ export function installRuntimeSkeletonBindings(): void {
     syncRuntimeHandlesFromAppState: (handles, state) =>
       syncRuntimeHandlesFromAppState(handles, state as any),
     extraAgentBindings: buildAgentHostExtraBindings(),
+    extraPermissionBindings: buildPermissionHostExtraBindings(),
+    extraMemoryBindings: buildMemoryHostExtraBindings(),
   }, {
     installProviderBindings: () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
