@@ -46,7 +46,7 @@ import {
   loadMessageLogs,
   loadTranscriptFile,
   removeExtraFields,
-} from './sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import type { ContentReplacementRecord } from './toolResultStorage.js'
 
 // Dead code elimination: ant-only tool names are conditionally required so

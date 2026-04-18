@@ -2,7 +2,7 @@
 import type { SessionDep, CoreMessage } from '@claude-code/agent'
 import type { Message } from '../Tool.js'
 import { getSessionId } from '../bootstrap/state.js'
-import { recordTranscript } from '../utils/sessionStorage.js'
+import { recordTranscript } from '@claude-code/storage/sessionStorage.js'
 
 export class SessionDepImpl implements SessionDep {
   getSessionId(): string {

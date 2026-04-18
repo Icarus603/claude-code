@@ -21,7 +21,7 @@ import {
 } from 'src/utils/forkedAgent.js'
 import { logError } from 'src/utils/log.js'
 import { createUserMessage } from 'src/utils/messages.js'
-import { getAgentTranscript } from 'src/utils/sessionStorage.js'
+import { getAgentTranscript } from '@claude-code/storage/sessionStorage.js'
 
 const SUMMARY_INTERVAL_MS = 30_000
 

@@ -260,7 +260,7 @@ import {
   saveMode,
   searchSessionsByCustomTitle,
   sessionIdExists,
-} from '../../../../src/utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { ensureMdmSettingsLoaded } from '../../../../src/utils/settings/mdm/settings.js'
 import {
   getInitialSettings,

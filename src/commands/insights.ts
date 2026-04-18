@@ -31,7 +31,7 @@ import {
   getSessionFilesWithMtime,
   getSessionIdFromLog,
   loadAllLogsFromSessionFile,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
 import { countCharInString } from '../utils/stringUtils.js'
 import { asSystemPrompt } from '../utils/systemPromptType.js'

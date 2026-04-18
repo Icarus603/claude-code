@@ -63,7 +63,7 @@ import {
   recordSidechainTranscript,
   setAgentTranscriptSubdir,
   writeAgentMetadata,
-} from 'src/utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import {
   isRestrictedToPluginOnly,
   isSourceAdminTrusted,

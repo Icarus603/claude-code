@@ -48,7 +48,7 @@ import {
   type ModelName,
   renderModelName,
 } from '../utils/model/model.js'
-import { getCurrentSessionTitle } from '../utils/sessionStorage.js'
+import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {
   doesMostRecentAssistantMessageExceed200k,
   getCurrentUsage,

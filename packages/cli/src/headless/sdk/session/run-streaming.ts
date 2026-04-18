@@ -238,7 +238,7 @@ import {
   saveMode,
   saveAiGeneratedTitle,
   restoreSessionMetadata,
-} from '../../../../../../src/utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { incrementPromptCount } from '../../../../../../src/utils/commitAttribution.js'
 import { executeNotificationHooks } from '../../../../../../src/utils/hooks.js'
 import {

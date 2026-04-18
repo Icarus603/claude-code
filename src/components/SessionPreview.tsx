@@ -9,7 +9,7 @@ import {
   getSessionIdFromLog,
   isLiteLog,
   loadFullLog,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Messages } from './Messages.js'
 

@@ -41,7 +41,7 @@ import {
 } from '../../utils/messages.js'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
 import { extractReadFilesFromMessages } from '../../utils/queryHelpers.js'
-import { getTranscriptPath } from '../../utils/sessionStorage.js'
+import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'

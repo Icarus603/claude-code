@@ -28,7 +28,7 @@ import {
 import { registerCleanup } from '../../utils/cleanupRegistry.js'
 import { getToolSearchOrReadInfo } from '../../utils/collapseReadSearch.js'
 import { enqueuePendingNotification } from '../../utils/messageQueueManager.js'
-import { getAgentTranscriptPath } from '../../utils/sessionStorage.js'
+import { getAgentTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import {
   evictTaskOutput,
   getTaskOutputPath,

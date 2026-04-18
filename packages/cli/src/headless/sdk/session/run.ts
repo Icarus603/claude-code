@@ -61,7 +61,7 @@ import {
 } from '@claude-code/storage/sessionRestore.js'
 import {
   saveAgentSetting,
-} from '../../../../../../src/utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { notifySessionStateChanged } from '@claude-code/storage/sessionState.js'
 import {
   registerProcessOutputErrorHandlers,

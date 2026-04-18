@@ -14,7 +14,7 @@ import {
   resetSessionFilePointer,
   restoreSessionMetadata,
   saveMode,
-} from '../../../../../../src/utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import {
   restoreSessionStateFromLog,
 } from '@claude-code/storage/sessionRestore.js'

@@ -45,7 +45,7 @@ import {
 import {
   getTranscriptPathForSession,
   getAgentTranscriptPath,
-} from './sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import type { AgentId } from '../types/ids.js'
 import {
   getSettings_DEPRECATED,

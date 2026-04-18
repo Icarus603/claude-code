@@ -44,7 +44,7 @@ import { formatLogMetadata } from '../utils/format.js'
 import {
   getSessionIdFromLog,
   searchSessionsByCustomTitle,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import {
   applyCommandSuggestion,
   findMidInputSlashCommand,

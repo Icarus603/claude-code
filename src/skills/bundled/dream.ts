@@ -9,7 +9,7 @@ import {
   recordConsolidation,
 } from '@claude-code/memory'
 import { getOriginalCwd } from '../../bootstrap/state.js'
-import { getProjectDir } from '../../utils/sessionStorage.js'
+import { getProjectDir } from '@claude-code/storage/sessionStorage.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 
 const DREAM_PROMPT_PREFIX = `# Dream: Memory Consolidation (manual run)

@@ -287,7 +287,7 @@ import {
   isLoggableMessage,
   saveWorktreeState,
   getAgentTranscript,
-} from '../utils/sessionStorage.js';
+} from '@claude-code/storage/sessionStorage.js';
 import { deserializeMessages } from '../utils/conversationRecovery.js';
 import { extractReadFilesFromMessages, extractBashToolsFromMessages } from '../utils/queryHelpers.js';
 import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js';
@@ -310,7 +310,7 @@ import {
   fileHistoryHasAnyChanges,
 } from '@claude-code/agent/file-history';
 import { type AttributionState, incrementPromptCount } from '../utils/commitAttribution.js';
-import { recordAttributionSnapshot } from '../utils/sessionStorage.js';
+import { recordAttributionSnapshot } from '@claude-code/storage/sessionStorage.js';
 import {
   computeStandaloneAgentContext,
   restoreAgentFromSession,
@@ -2163,7 +2163,7 @@ export function REPL({
         // Persist the current mode so future resumes know what mode this session was in
         if (feature('COORDINATOR_MODE')) {
           /* eslint-disable @typescript-eslint/no-require-imports */
-          const { saveMode } = require('../utils/sessionStorage.js');
+          const { saveMode } = require('@claude-code/storage/sessionStorage.js');
           const { isCoordinatorMode } =
             require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js');
           /* eslint-enable @typescript-eslint/no-require-imports */

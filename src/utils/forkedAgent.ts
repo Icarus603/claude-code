@@ -35,7 +35,7 @@ import {
 } from './messages.js'
 import { createDenialTrackingState } from '@claude-code/permission/denialTracking'
 import { parseToolListFromCLI } from '@claude-code/permission/permissionSetup'
-import { recordSidechainTranscript } from './sessionStorage.js'
+import { recordSidechainTranscript } from '@claude-code/storage/sessionStorage.js'
 import type { SystemPrompt } from './systemPromptType.js'
 import {
   type ContentReplacementState,

@@ -3,7 +3,7 @@ import { count } from './array.js'
 import { logForDebugging } from './debug.js'
 import { getLogDisplayTitle, logError } from './log.js'
 import { getSmallFastModel } from './model/model.js'
-import { isLiteLog, loadFullLog } from './sessionStorage.js'
+import { isLiteLog, loadFullLog } from '@claude-code/storage/sessionStorage.js'
 import { sideQuery } from './sideQuery.js'
 import { jsonParse } from './slowOperations.js'
 

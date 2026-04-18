@@ -7,7 +7,7 @@ import { openBrowser } from '../utils/browser.js'
 
 import { errorMessage } from '../utils/errors.js'
 import { gracefulShutdown } from '../utils/gracefulShutdown.js'
-import { flushSessionStorage } from '../utils/sessionStorage.js'
+import { flushSessionStorage } from '@claude-code/storage/sessionStorage.js'
 
 const DESKTOP_DOCS_URL = 'https://clau.de/desktop'
 

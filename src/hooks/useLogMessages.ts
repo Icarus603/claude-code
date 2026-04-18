@@ -7,7 +7,7 @@ import {
   cleanMessagesForLogging,
   isChainParticipant,
   recordTranscript,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 
 /**
  * Hook that logs messages to the transcript

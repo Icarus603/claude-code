@@ -14,7 +14,7 @@ import {
   getTranscriptPath,
   saveAgentName,
   saveCustomTitle,
-} from '../../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { isTeammate } from '../../utils/teammate.js'
 import { generateSessionName } from './generateSessionName.js'
 

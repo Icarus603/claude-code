@@ -16,7 +16,7 @@ import type {
 import type { PastedContent } from '@claude-code/config'
 import { extractTextContent } from './messages.js'
 import { objectGroupBy } from './objectGroupBy.js'
-import { recordQueueOperation } from './sessionStorage.js'
+import { recordQueueOperation } from '@claude-code/storage/sessionStorage.js'
 import { createSignal } from './signal.js'
 
 export type SetAppState = (f: (prev: AppState) => AppState) => void

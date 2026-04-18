@@ -42,7 +42,7 @@ import { OFFICIAL_MARKETPLACE_NAME } from '../../utils/plugins/officialMarketpla
 import {
   getCurrentSessionAgentColor,
   isCustomTitleEnabled,
-} from '../../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   formatGrantAmount,

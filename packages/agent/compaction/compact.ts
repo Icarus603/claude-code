@@ -78,7 +78,7 @@ import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import {
   getTranscriptPath,
   reAppendSessionMetadata,
-} from 'src/utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { sleep } from 'src/utils/sleep.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 /* eslint-enable @typescript-eslint/no-require-imports */

@@ -7,7 +7,7 @@ import { useIsInsideModal } from '../../context/modalContext.js'
 import { Box, Text, useTheme } from '@anthropic/ink'
 import { type AppState, useAppState } from '../../state/AppState.js'
 import { getCwd } from '../../utils/cwd.js'
-import { getCurrentSessionTitle } from '../../utils/sessionStorage.js'
+import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {
   buildAccountProperties,
   buildAPIProviderProperties,

@@ -15,7 +15,7 @@ import {
 import { getMainLoopModel } from 'src/utils/model/model.js'
 import { getSessionMemoryPath } from '@claude-code/permission/filesystem'
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
-import { getTranscriptPath } from 'src/utils/sessionStorage.js'
+import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { tokenCountFromLastAPIResponse } from 'src/utils/tokens.js'
 import { extractDiscoveredToolNames } from 'src/utils/toolSearch.js'
 import {
