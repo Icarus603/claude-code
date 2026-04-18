@@ -10,6 +10,8 @@
     "./constants": "./src/constants.ts",
     "./runtime": "./src/runtime.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./tools/*.js": "./src/tools/*.ts",
+    "./tools/*": "./src/tools/*.ts"
   }
 }

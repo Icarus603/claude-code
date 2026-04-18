@@ -56,7 +56,7 @@ const getSuggestBackgroundPRTool = () =>
 
 const getSleepTool = () =>
   feature('PROACTIVE') || feature('KAIROS')
-    ? require('../../SleepTool/SleepTool.js').SleepTool as Tool
+    ? require('@claude-code/tool-registry/tools/SleepTool/SleepTool.js').SleepTool as Tool
     : null
 
 const getCronTools = (): Tool[] => [
