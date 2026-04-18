@@ -74,7 +74,7 @@ export async function preprocessCliArgv(pendings: PendingHandles): Promise<void>
     if (ccIdx !== -1 && pendingConnect) {
       const ccUrl = rawCliArgs[ccIdx]!
       const { parseConnectUrl } = await import(
-        '../../../../src/server/parseConnectUrl.js'
+        '@claude-code/server/parseConnectUrl.js'
       )
       const parsed = parseConnectUrl(ccUrl)
       pendingConnect.dangerouslySkipPermissions = rawCliArgs.includes(

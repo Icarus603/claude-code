@@ -71,7 +71,7 @@ import { shouldEnablePromptSuggestion } from '../../../../src/services/PromptSug
 import {
   createDirectConnectSession,
   DirectConnectError,
-} from '../../../../src/server/createDirectConnectSession.js'
+} from '@claude-code/server/createDirectConnectSession.js'
 import {
   hasGrowthBookEnvOverride,
   initializeGrowthBook,
