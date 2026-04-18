@@ -26,12 +26,12 @@ import { logEvent } from '@claude-code/local-observability'
 import {
   isSessionMemoryEmpty,
   truncateSessionMemoryForCompact,
-} from 'src/services/SessionMemory/prompts.js'
+} from '@claude-code/agent/SessionMemory/prompts.js'
 import {
   getLastSummarizedMessageId,
   getSessionMemoryContent,
   waitForSessionMemoryExtraction,
-} from 'src/services/SessionMemory/sessionMemoryUtils.js'
+} from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
 import {
   annotateBoundaryWithPreservedSegment,
   buildPostCompactMessages,

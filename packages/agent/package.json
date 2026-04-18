@@ -25,7 +25,9 @@
     "./agentHostBindings.js": "./agentHostBindings.ts",
     "./eventMetadata.js": "./eventMetadata.ts",
     "./internalLogging.js": "./internalLogging.ts",
-    "./tokenEstimation.js": "./tokenEstimation.ts"
+    "./tokenEstimation.js": "./tokenEstimation.ts",
+    "./sessionTranscript/*.js": "./sessionTranscript/*.ts",
+    "./SessionMemory/*.js": "./SessionMemory/*.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
