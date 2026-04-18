@@ -102,7 +102,7 @@ import {
   currentLimits,
   extractQuotaStatusFromError,
   extractQuotaStatusFromHeaders,
-} from 'src/services/claudeAiLimits.js'
+} from '@claude-code/provider/claudeAiLimits.js'
 import { getAPIContextManagement } from '@claude-code/agent/compaction/apiMicrocompact.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */

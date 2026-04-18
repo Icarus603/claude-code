@@ -41,7 +41,7 @@ import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 
 import {
   checkMockRateLimitError,
   isMockRateLimitError,
-} from '../rateLimitMocking.js'
+} from '@claude-code/provider/rateLimitMocking.js'
 import { REPEATED_529_ERROR_MESSAGE } from './errors.js'
 import { extractConnectionErrorDetails } from './errorUtils.js'
 

@@ -11,6 +11,11 @@
     "./providerHostSetup": "./src/providerHostSetup.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
-    "./oauth/*.js": "./src/oauth/*.ts"
+    "./oauth/*.js": "./src/oauth/*.ts",
+    "./claudeAiLimits.js": "./src/claudeAiLimits.ts",
+    "./claudeAiLimitsHook.js": "./src/claudeAiLimitsHook.ts",
+    "./mockRateLimits.js": "./src/mockRateLimits.ts",
+    "./rateLimitMessages.js": "./src/rateLimitMessages.ts",
+    "./rateLimitMocking.js": "./src/rateLimitMocking.ts"
   }
 }
