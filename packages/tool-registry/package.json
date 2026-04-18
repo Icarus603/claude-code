@@ -33,6 +33,8 @@
     "./tools/TaskOutputTool/TaskOutputTool.js": "./src/tools/TaskOutputTool/TaskOutputTool.tsx",
     "./tools/ScheduleCronTool/UI.js": "./src/tools/ScheduleCronTool/UI.tsx",
     "./tools/GrepTool/UI.js": "./src/tools/GrepTool/UI.tsx",
+    "./tools/SkillTool/UI.js": "./src/tools/SkillTool/UI.tsx",
+    "./tools/LSPTool/UI.js": "./src/tools/LSPTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }

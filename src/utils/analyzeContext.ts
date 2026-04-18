@@ -33,11 +33,11 @@ import type {
   AgentDefinition,
   AgentDefinitionsResult,
 } from '../tools/AgentTool/loadAgentsDir.js'
-import { SKILL_TOOL_NAME } from '../tools/SkillTool/constants.js'
+import { SKILL_TOOL_NAME } from '@claude-code/tool-registry/tools/SkillTool/constants.js'
 import {
   getLimitedSkillToolCommands,
   getSkillToolInfo as getSlashCommandInfo,
-} from '../tools/SkillTool/prompt.js'
+} from '@claude-code/tool-registry/tools/SkillTool/prompt.js'
 import type {
   AssistantMessage,
   AttachmentMessage,

@@ -38,32 +38,32 @@ import {
   addInvokedSkill,
   clearInvokedSkillsForAgent,
   getSessionId,
-} from '../../bootstrap/state.js'
-import { COMMAND_MESSAGE_TAG } from '../../constants/xml.js'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
+} from 'src/bootstrap/state.js'
+import { COMMAND_MESSAGE_TAG } from 'src/constants/xml.js'
+import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
-import { getAgentContext } from '../../utils/agentContext.js'
-import { errorMessage } from '../../utils/errors.js'
+import { getAgentContext } from 'src/utils/agentContext.js'
+import { errorMessage } from 'src/utils/errors.js'
 import {
   extractResultText,
   prepareForkedCommandContext,
-} from '../../utils/forkedAgent.js'
-import { parseFrontmatter } from '../../utils/frontmatterParser.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { createUserMessage, normalizeMessages } from '../../utils/messages.js'
-import type { ModelAlias } from '../../utils/model/aliases.js'
-import { resolveSkillModelOverride } from '../../utils/model/model.js'
-import { recordSkillUsage } from '../../utils/suggestions/skillUsageTracking.js'
-import { createAgentId } from '../../utils/uuid.js'
-import { runAgent } from '../AgentTool/runAgent.js'
+} from 'src/utils/forkedAgent.js'
+import { parseFrontmatter } from 'src/utils/frontmatterParser.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { createUserMessage, normalizeMessages } from 'src/utils/messages.js'
+import type { ModelAlias } from 'src/utils/model/aliases.js'
+import { resolveSkillModelOverride } from 'src/utils/model/model.js'
+import { recordSkillUsage } from 'src/utils/suggestions/skillUsageTracking.js'
+import { createAgentId } from 'src/utils/uuid.js'
+import { runAgent } from 'src/tools/AgentTool/runAgent.js'
 import {
   getToolUseIDFromParentMessage,
   tagMessagesWithToolUseID,
-} from '../utils.js'
+} from 'src/tools/utils.js'
 import { SKILL_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
 import {
@@ -94,9 +94,9 @@ async function getAllCommands(context: ToolUseContext): Promise<Command[]> {
 }
 
 // Re-export Progress from centralized types to break import cycles
-export type { SkillToolProgress as Progress } from '../../types/tools.js'
+export type { SkillToolProgress as Progress } from 'src/types/tools.js'
 
-import type { SkillToolProgress as Progress } from '../../types/tools.js'
+import type { SkillToolProgress as Progress } from 'src/types/tools.js'
 
 // Conditional require for remote skill modules — static imports here would
 // pull in akiBackend.ts (via remoteSkillLoader → akiBackend), which has
@@ -107,10 +107,10 @@ import type { SkillToolProgress as Progress } from '../../types/tools.js'
 /* eslint-disable @typescript-eslint/no-require-imports */
 const remoteSkillModules = feature('EXPERIMENTAL_SKILL_SEARCH')
   ? {
-      ...(require('../../services/skillSearch/remoteSkillState.js') as typeof import('../../services/skillSearch/remoteSkillState.js')),
-      ...(require('../../services/skillSearch/remoteSkillLoader.js') as typeof import('../../services/skillSearch/remoteSkillLoader.js')),
-      ...(require('../../services/skillSearch/telemetry.js') as typeof import('../../services/skillSearch/telemetry.js')),
-      ...(require('../../services/skillSearch/featureCheck.js') as typeof import('../../services/skillSearch/featureCheck.js')),
+      ...(require('src/services/skillSearch/remoteSkillState.js') as typeof import('src/services/skillSearch/remoteSkillState.js')),
+      ...(require('src/services/skillSearch/remoteSkillLoader.js') as typeof import('src/services/skillSearch/remoteSkillLoader.js')),
+      ...(require('src/services/skillSearch/telemetry.js') as typeof import('src/services/skillSearch/telemetry.js')),
+      ...(require('src/services/skillSearch/featureCheck.js') as typeof import('src/services/skillSearch/featureCheck.js')),
     }
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
