@@ -3,9 +3,9 @@ import {
   type HeadlessBridgeOpts,
   BridgeHeadlessPermanentError,
   runBridgeHeadless,
-} from '../bridge/bridgeMain.js'
-import { getClaudeAIOAuthTokens } from '../utils/auth.js'
-import { errorMessage } from '../utils/errors.js'
+} from 'src/bridge/bridgeMain.js'
+import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
+import { errorMessage } from 'src/utils/errors.js'
 
 /**
  * Exit codes the supervisor uses to decide retry vs park.

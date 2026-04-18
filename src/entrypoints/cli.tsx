@@ -120,7 +120,7 @@ async function main(): Promise<void> {
   // workers are lean. If a worker kind needs configs/auth (assistant will),
   // it calls them inside its run() fn.
   if (feature('DAEMON') && args[0] === '--daemon-worker') {
-    const { runDaemonWorker } = await import('../daemon/workerRegistry.js')
+    const { runDaemonWorker } = await import('@claude-code/daemon/workerRegistry.js')
     await runDaemonWorker(args[1])
     return
   }
@@ -187,7 +187,7 @@ async function main(): Promise<void> {
     enableConfigs()
     const { initSinks } = await import('../utils/sinks.js')
     initSinks()
-    const { daemonMain } = await import('../daemon/main.js')
+    const { daemonMain } = await import('@claude-code/daemon/main.js')
     await daemonMain(args.slice(1))
     return
   }
