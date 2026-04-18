@@ -23,7 +23,7 @@ import type {
   TaskStateBase,
 } from '../../Task.js'
 import { createTaskStateBase, generateTaskId } from '../../Task.js'
-import { TodoWriteTool } from '../../tools/TodoWriteTool/TodoWriteTool.js'
+import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/TodoWriteTool.js'
 import {
   type BackgroundRemoteSessionPrecondition,
   checkBackgroundRemoteSessionEligibility,
