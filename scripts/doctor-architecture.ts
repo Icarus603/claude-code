@@ -217,6 +217,55 @@ const CHECKS: Check[] = [
     script: 'scripts/verify-error-namespaces.ts',
     doc: 'V7 §6.5 / §3.8',
   },
+  {
+    id: 'ownership-gravity',
+    layer: 'Cross-Cutting',
+    subsystem: 'owner-over-shim',
+    script: 'scripts/verify-ownership-gravity.ts',
+    doc: 'V7 §3.1 / §10 / §14.1',
+  },
+  {
+    id: 'import-graph',
+    layer: 'Cross-Cutting',
+    subsystem: 'dependency rules',
+    script: 'scripts/verify-import-graph.ts',
+    doc: 'V7 §11.2 (ast-level replacement for runtime-boundaries string match)',
+  },
+  {
+    id: 'anti-patterns',
+    layer: 'Cross-Cutting',
+    subsystem: 'anti-pattern scanner',
+    script: 'scripts/verify-anti-patterns.ts',
+    doc: 'V7 §3.8 / §7.2',
+  },
+  {
+    id: 'ratchet',
+    layer: 'Cross-Cutting',
+    subsystem: 'regression ratchet',
+    script: 'scripts/verify-ratchet.ts',
+    doc: 'V7 §14 (one-way migration monotonicity)',
+  },
+  {
+    id: 'exemptions',
+    layer: 'Cross-Cutting',
+    subsystem: 'V7-EXEMPT enforcement',
+    script: 'scripts/verify-exemptions.ts',
+    doc: 'V7 §13.2',
+  },
+  {
+    id: 'non-negotiable-coverage',
+    layer: 'Cross-Cutting',
+    subsystem: 'verifier coverage',
+    script: 'scripts/verify-non-negotiable-coverage.ts',
+    doc: 'V7 §12 / §14.4',
+  },
+  {
+    id: 'event-spine',
+    layer: 'Core Domain',
+    subsystem: 'agent',
+    script: 'scripts/verify-event-spine.ts',
+    doc: 'V7 §9.10 (AgentEvent must carry turnId + ts)',
+  },
 ]
 
 type CheckResult = {
