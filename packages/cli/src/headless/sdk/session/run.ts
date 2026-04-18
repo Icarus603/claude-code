@@ -11,9 +11,9 @@ import { isBuiltInAgent } from '@claude-code/tool-registry/tools/AgentTool/loadA
 import type { ThinkingConfig } from '../../../../../../src/utils/thinking.js'
 import type { SDKMessage, SDKStatus } from '../../../../../../src/entrypoints/agentSdkTypes.js'
 import type { StdoutMessage } from '../../../../../../src/entrypoints/sdk/controlTypes.js'
-import type { RequiresActionDetails } from '../../../../../../src/utils/sessionState.js'
+import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'
 import type { StructuredIO } from '../../../../../../src/cli/structuredIO.js'
-import type { processSessionStartHooks } from '../../../../../../src/utils/sessionStart.js'
+import type { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import { applySettingsChange } from '@claude-code/config/applySettingsChange'
 import { settingsChangeDetector } from '@claude-code/config/changeDetector'
 import { filterToolsByDenyRules } from '@claude-code/tool-registry'
@@ -55,14 +55,14 @@ import { registerHookEventHandler } from '../../../../../../src/utils/hooks/hook
 import {
   processSetupHooks,
   takeInitialUserMessage,
-} from '../../../../../../src/utils/sessionStart.js'
+} from '@claude-code/storage/sessionStart.js'
 import {
   restoreAgentFromSession,
 } from '../../../../../../src/utils/sessionRestore.js'
 import {
   saveAgentSetting,
 } from '../../../../../../src/utils/sessionStorage.js'
-import { notifySessionStateChanged } from '../../../../../../src/utils/sessionState.js'
+import { notifySessionStateChanged } from '@claude-code/storage/sessionState.js'
 import {
   registerProcessOutputErrorHandlers,
   writeToStdout,

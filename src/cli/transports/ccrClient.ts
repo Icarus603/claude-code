@@ -11,7 +11,7 @@ import { createAxiosInstance } from '../../utils/proxy.js'
 import {
   registerSessionActivityCallback,
   unregisterSessionActivityCallback,
-} from '../../utils/sessionActivity.js'
+} from '@claude-code/storage/sessionActivity.js'
 import {
   getSessionIngressAuthHeaders,
   getSessionIngressAuthToken,
@@ -19,7 +19,7 @@ import {
 import type {
   RequiresActionDetails,
   SessionState,
-} from '../../utils/sessionState.js'
+} from '@claude-code/storage/sessionState.js'
 import { sleep } from '../../utils/sleep.js'
 import { getClaudeCodeUserAgent } from '../../utils/userAgent.js'
 import {

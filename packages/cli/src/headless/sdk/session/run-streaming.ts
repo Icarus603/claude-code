@@ -67,7 +67,7 @@ import {
   setPermissionModeChangedListener,
   type RequiresActionDetails,
   type SessionExternalMetadata,
-} from '../../../../../../src/utils/sessionState.js'
+} from '@claude-code/storage/sessionState.js'
 import { externalMetadataToAppState } from '../../../../../../src/state/onChangeAppState.js'
 import { getInMemoryErrors, logError, logMCPDebug } from '../../../../../../src/utils/log.js'
 import {
@@ -203,7 +203,7 @@ import {
   processSessionStartHooks,
   processSetupHooks,
   takeInitialUserMessage,
-} from '../../../../../../src/utils/sessionStart.js'
+} from '@claude-code/storage/sessionStart.js'
 import { TEAMMATE_MESSAGE_TAG, TICK_TAG } from '../../../../../../src/constants/xml.js'
 import {
   isFastModeEnabled,

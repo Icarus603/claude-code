@@ -10,6 +10,11 @@
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
-    "./cache-paths": "./src/cache-paths.ts"
+    "./cache-paths": "./src/cache-paths.ts",
+    "./sessionActivity.js": "./src/sessionActivity.ts",
+    "./sessionStart.js": "./src/sessionStart.ts",
+    "./sessionState.js": "./src/sessionState.ts",
+    "./sessionEnvironment.js": "./src/sessionEnvironment.ts",
+    "./sessionEnvVars.js": "./src/sessionEnvVars.ts"
   }
 }

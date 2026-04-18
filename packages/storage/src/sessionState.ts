@@ -23,9 +23,9 @@ export type RequiresActionDetails = {
   input?: Record<string, unknown>
 }
 
-import { isEnvTruthy } from './envUtils.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { enqueueSdkEvent } from './sdkEventQueue.js'
+import { enqueueSdkEvent } from 'src/utils/sdkEventQueue.js'
 
 // CCR external_metadata keys — push in onChangeAppState, restore in
 // externalMetadataToAppState.

@@ -14,8 +14,8 @@ import {
 } from '../bash/shellQuoting.js'
 import { logForDebugging } from '../debug.js'
 import { getPlatform } from '../platform.js'
-import { getSessionEnvironmentScript } from '../sessionEnvironment.js'
-import { getSessionEnvVars } from '../sessionEnvVars.js'
+import { getSessionEnvironmentScript } from '@claude-code/storage/sessionEnvironment.js'
+import { getSessionEnvVars } from '@claude-code/storage/sessionEnvVars.js'
 import {
   ensureSocketInitialized,
   getClaudeTmuxEnv,

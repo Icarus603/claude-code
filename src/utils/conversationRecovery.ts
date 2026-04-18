@@ -35,7 +35,7 @@ import {
   normalizeMessages,
 } from './messages.js'
 import { copyPlanForResume } from './plans.js'
-import { processSessionStartHooks } from './sessionStart.js'
+import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import {
   buildConversationChain,
   checkResumeConsistency,
