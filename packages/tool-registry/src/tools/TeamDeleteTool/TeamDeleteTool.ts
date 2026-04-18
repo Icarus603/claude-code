@@ -1,11 +1,11 @@
 import { z } from 'zod/v4'
 import { logEvent } from '@claude-code/local-observability'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/eventMetadata.js'
-import type { Tool } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 'src/services/eventMetadata.js'
+import type { Tool } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import {
   cleanupTeamDirectories,
@@ -13,7 +13,7 @@ import {
   unregisterTeamForSessionCleanup,
 } from '@claude-code/swarm'
 import { clearTeammateColors } from '@claude-code/swarm'
-import { clearLeaderTeamName } from '../../utils/tasks.js'
+import { clearLeaderTeamName } from 'src/utils/tasks.js'
 import { TEAM_DELETE_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'

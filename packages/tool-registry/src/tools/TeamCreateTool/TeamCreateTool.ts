@@ -1,18 +1,18 @@
 import { z } from 'zod/v4'
-import { getSessionId } from '../../bootstrap/state.js'
+import { getSessionId } from 'src/bootstrap/state.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/eventMetadata.js'
-import type { Tool } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { formatAgentId } from '../../utils/agentId.js'
-import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
-import { getCwd } from '../../utils/cwd.js'
-import { lazySchema } from '../../utils/lazySchema.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 'src/services/eventMetadata.js'
+import type { Tool } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { formatAgentId } from 'src/utils/agentId.js'
+import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   getDefaultMainLoopModel,
   parseUserSpecifiedModel,
-} from '../../utils/model/model.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/model/model.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { getResolvedTeammateMode } from '@claude-code/swarm'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import type { TeamFile } from '@claude-code/swarm'
@@ -28,8 +28,8 @@ import {
   ensureTasksDir,
   resetTaskList,
   setLeaderTeamName,
-} from '../../utils/tasks.js'
-import { generateWordSlug } from '../../utils/words.js'
+} from 'src/utils/tasks.js'
+import { generateWordSlug } from 'src/utils/words.js'
 import { TEAM_CREATE_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
 import { renderToolUseMessage } from './UI.js'

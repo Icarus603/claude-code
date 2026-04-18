@@ -12,8 +12,8 @@ import { FILE_READ_TOOL_NAME } from '../tools/FileReadTool/prompt.js'
 import { SEND_MESSAGE_TOOL_NAME } from '../tools/SendMessageTool/constants.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { TASK_STOP_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskStopTool/prompt.js'
-import { TEAM_CREATE_TOOL_NAME } from '../tools/TeamCreateTool/constants.js'
-import { TEAM_DELETE_TOOL_NAME } from '../tools/TeamDeleteTool/constants.js'
+import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCreateTool/constants.js'
+import { TEAM_DELETE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamDeleteTool/constants.js'
 import { isEnvTruthy } from '../utils/envUtils.js'
 
 // Checks the same gate as isScratchpadEnabled() in

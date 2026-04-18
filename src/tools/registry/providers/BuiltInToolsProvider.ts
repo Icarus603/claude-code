@@ -134,10 +134,10 @@ const getWorkflowTool = () =>
     : null
 
 const getTeamCreateTool = () =>
-  require('../../TeamCreateTool/TeamCreateTool.js').TeamCreateTool as Tool
+  require('@claude-code/tool-registry/tools/TeamCreateTool/TeamCreateTool.js').TeamCreateTool as Tool
 
 const getTeamDeleteTool = () =>
-  require('../../TeamDeleteTool/TeamDeleteTool.js').TeamDeleteTool as Tool
+  require('@claude-code/tool-registry/tools/TeamDeleteTool/TeamDeleteTool.js').TeamDeleteTool as Tool
 
 const getLSPTool = () =>
   isEnvTruthy(process.env.ENABLE_LSP_TOOL)
