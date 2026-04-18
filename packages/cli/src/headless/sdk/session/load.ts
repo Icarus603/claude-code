@@ -17,7 +17,7 @@ import {
 } from '../../../../../../src/utils/sessionStorage.js'
 import {
   restoreSessionStateFromLog,
-} from '../../../../../../src/utils/sessionRestore.js'
+} from '@claude-code/storage/sessionRestore.js'
 import {
   getSessionId,
   setMainLoopModelOverride,

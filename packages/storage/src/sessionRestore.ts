@@ -8,10 +8,10 @@ import {
   setMainThreadAgentType,
   setOriginalCwd,
   switchSession,
-} from '../bootstrap/state.js'
-import { clearSystemPromptSections } from '../constants/systemPromptSections.js'
-import { restoreCostStateForSession } from '../cost-tracker.js'
-import type { AppState } from '../state/AppState.js'
+} from 'src/bootstrap/state.js'
+import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
+import { restoreCostStateForSession } from 'src/cost-tracker.js'
+import type { AppState } from 'src/state/AppState.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import {
   type AgentDefinition,
@@ -20,30 +20,30 @@ import {
   getAgentDefinitionsWithOverrides,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
-import { asSessionId } from '../types/ids.js'
+import { asSessionId } from 'src/types/ids.js'
 import type {
   AttributionSnapshotMessage,
   ContextCollapseCommitEntry,
   ContextCollapseSnapshotEntry,
   PersistedWorktreeSession,
-} from '../types/logs.js'
-import type { Message } from '../types/message.js'
-import { renameRecordingForSession } from './asciicast.js'
-import { clearMemoryFileCaches } from './claudemd.js'
+} from 'src/types/logs.js'
+import type { Message } from 'src/types/message.js'
+import { renameRecordingForSession } from 'src/utils/asciicast.js'
+import { clearMemoryFileCaches } from 'src/utils/claudemd.js'
 import {
   type AttributionState,
   attributionRestoreStateFromLog,
   restoreAttributionStateFromSnapshots,
-} from './commitAttribution.js'
-import { updateSessionName } from './concurrentSessions.js'
-import { getCwd } from './cwd.js'
-import { logForDebugging } from './debug.js'
-import type { FileHistorySnapshot } from './fileHistory.js'
-import { fileHistoryRestoreStateFromLog } from './fileHistory.js'
-import { createSystemMessage } from './messages.js'
-import { parseUserSpecifiedModel } from './model/model.js'
-import { getPlansDirectory } from './plans.js'
-import { setCwd } from './Shell.js'
+} from 'src/utils/commitAttribution.js'
+import { updateSessionName } from 'src/utils/concurrentSessions.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import type { FileHistorySnapshot } from 'src/utils/fileHistory.js'
+import { fileHistoryRestoreStateFromLog } from 'src/utils/fileHistory.js'
+import { createSystemMessage } from 'src/utils/messages.js'
+import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
+import { getPlansDirectory } from 'src/utils/plans.js'
+import { setCwd } from 'src/utils/Shell.js'
 import {
   adoptResumedSessionFile,
   recordContentReplacement,
@@ -51,11 +51,11 @@ import {
   restoreSessionMetadata,
   saveMode,
   saveWorktreeState,
-} from './sessionStorage.js'
-import { isTodoV2Enabled } from './tasks.js'
-import type { TodoList } from './todo/types.js'
-import { TodoListSchema } from './todo/types.js'
-import type { ContentReplacementRecord } from './toolResultStorage.js'
+} from 'src/utils/sessionStorage.js'
+import { isTodoV2Enabled } from 'src/utils/tasks.js'
+import type { TodoList } from 'src/utils/todo/types.js'
+import { TodoListSchema } from 'src/utils/todo/types.js'
+import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'
 import {
   getCurrentWorktreeSession,
   restoreWorktreeSession,

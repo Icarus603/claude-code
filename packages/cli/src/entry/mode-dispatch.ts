@@ -318,7 +318,7 @@ import { setCwd } from '../../../../src/utils/Shell.js'
 import {
   type ProcessedResume,
   processResumedConversation,
-} from '../../../../src/utils/sessionRestore.js'
+} from '@claude-code/storage/sessionRestore.js'
 import { parseSettingSourcesFlag } from '../../../../src/utils/settings/constants.js'
 import { plural } from '../../../../src/utils/stringUtils.js'
 import {
