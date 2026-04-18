@@ -217,7 +217,7 @@ import {
 } from '../../../../../../src/services/PromptSuggestion/promptSuggestion.js'
 import { getLastCacheSafeParams } from '../../../../../../src/utils/forkedAgent.js'
 import { getAccountInformation } from '../../../../../../src/utils/auth.js'
-import { OAuthService } from '../../../../../../src/services/oauth/index.js'
+import { OAuthService } from '@claude-code/provider/oauth/index.js'
 import { installOAuthTokens } from '../../../../../../src/cli/handlers/auth.js'
 import { getAPIProvider } from '../../../../../../src/utils/model/providers.js'
 import { AwsAuthStatusManager } from '../../../../../../src/utils/awsAuthStatusManager.js'

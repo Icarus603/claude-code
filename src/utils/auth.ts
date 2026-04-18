@@ -23,9 +23,9 @@ import {
   isOAuthTokenExpired,
   refreshOAuthToken,
   shouldUseClaudeAIAuth,
-} from '../services/oauth/client.js'
-import { getOauthProfileFromOauthToken } from '../services/oauth/getOauthProfile.js'
-import type { OAuthTokens, SubscriptionType } from '../services/oauth/types.js'
+} from '@claude-code/provider/oauth/client.js'
+import { getOauthProfileFromOauthToken } from '@claude-code/provider/oauth/getOauthProfile.js'
+import type { OAuthTokens, SubscriptionType } from '@claude-code/provider/oauth/types.js'
 import {
   getApiKeyFromFileDescriptor,
   getOAuthTokenFromFileDescriptor,

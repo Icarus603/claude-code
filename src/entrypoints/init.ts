@@ -6,7 +6,7 @@ import { getIsNonInteractiveSession } from 'src/bootstrap/state.js'
 import type { AttributedCounter } from '../bootstrap/state.js'
 import { getSessionCounter, setMeter } from '../bootstrap/state.js'
 import { shutdownLspServerManager } from '@claude-code/ide/lsp/manager.js'
-import { populateOAuthAccountInfoIfNeeded } from '../services/oauth/client.js'
+import { populateOAuthAccountInfoIfNeeded } from '@claude-code/provider/oauth/client.js'
 import {
   initializePolicyLimitsLoadingPromise,
   isPolicyLimitsEligible,

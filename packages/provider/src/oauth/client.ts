@@ -9,17 +9,17 @@ import {
   CLAUDE_AI_INFERENCE_SCOPE,
   CLAUDE_AI_OAUTH_SCOPES,
   getOauthConfig,
-} from '../../constants/oauth.js'
+} from 'src/constants/oauth.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
   hasProfileScope,
   isClaudeAISubscriber,
   saveApiKey,
-} from '../../utils/auth.js'
+} from 'src/utils/auth.js'
 import type { AccountInfo } from '@claude-code/config'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from '../../utils/debug.js'
+import { logForDebugging } from 'src/utils/debug.js'
 import { getOauthProfileFromOauthToken } from './getOauthProfile.js'
 import type {
   BillingType,

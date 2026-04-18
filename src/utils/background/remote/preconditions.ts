@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { getOauthConfig } from 'src/constants/oauth.js'
-import { getOrganizationUUID } from 'src/services/oauth/client.js'
+import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   checkAndRefreshOAuthTokenIfNeeded,

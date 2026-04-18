@@ -9,7 +9,7 @@ import { setClipboard, useTerminalNotification, Box, Link, Text, KeyboardShortcu
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getSSLErrorHint } from '../services/api/errorUtils.js'
 import { sendNotification } from '../services/notifier.js'
-import { OAuthService } from '../services/oauth/index.js'
+import { OAuthService } from '@claude-code/provider/oauth/index.js'
 import { getOauthAccountInfo, validateForceLoginOrg } from '../utils/auth.js'
 import { logError } from '../utils/log.js'
 import { getSettings_DEPRECATED, updateSettingsForSource } from '../utils/settings/settings.js'

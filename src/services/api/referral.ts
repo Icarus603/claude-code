@@ -15,7 +15,7 @@ import type {
   ReferralEligibilityResponse,
   ReferralRedemptionsResponse,
   ReferrerRewardInfo,
-} from '../oauth/types.js'
+} from '@claude-code/provider/oauth/types.js'
 
 // Cache expiration time: 24 hours (eligibility changes only on subscription/experiment changes)
 const CACHE_EXPIRATION_MS = 24 * 60 * 60 * 1000
