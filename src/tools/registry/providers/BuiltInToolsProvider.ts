@@ -25,7 +25,7 @@ import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/To
 import { WebSearchTool } from '@claude-code/tool-registry/tools/WebSearchTool/WebSearchTool.js'
 import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
 import { AskUserQuestionTool } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
-import { SkillTool } from '../../SkillTool/SkillTool.js'
+import { SkillTool } from '@claude-code/tool-registry/tools/SkillTool/SkillTool.js'
 import { EnterPlanModeTool } from '@claude-code/tool-registry/tools/EnterPlanModeTool/EnterPlanModeTool.js'
 import { SendMessageTool } from '@claude-code/tool-registry/tools/SendMessageTool/SendMessageTool.js'
 import { TaskCreateTool } from '@claude-code/tool-registry/tools/TaskCreateTool/TaskCreateTool.js'
@@ -141,7 +141,7 @@ const getTeamDeleteTool = () =>
 
 const getLSPTool = () =>
   isEnvTruthy(process.env.ENABLE_LSP_TOOL)
-    ? require('../../LSPTool/LSPTool.js').LSPTool as Tool
+    ? require('@claude-code/tool-registry/tools/LSPTool/LSPTool.js').LSPTool as Tool
     : null
 
 const getPowerShellTool = () =>

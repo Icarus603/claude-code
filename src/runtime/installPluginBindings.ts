@@ -210,11 +210,11 @@ export function installPluginBindings(): void {
   )
   setSkillToolPromptFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../tools/SkillTool/prompt.js'),
+    require('@claude-code/tool-registry/tools/SkillTool/prompt.js'),
   )
   setGetCharBudgetFn(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../tools/SkillTool/prompt.js')
+    const mod = require('@claude-code/tool-registry/tools/SkillTool/prompt.js')
     return mod.getCharBudget?.() ?? 10000
   })
 

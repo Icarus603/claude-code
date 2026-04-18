@@ -138,7 +138,7 @@ export function clearSessionCaches(
     ({ clearAgentDefinitionsCache }) => clearAgentDefinitionsCache(),
   )
   // Clear SkillTool prompt cache (accumulates per project root)
-  void import('../../tools/SkillTool/prompt.js').then(({ clearPromptCache }) =>
+  void import('@claude-code/tool-registry/tools/SkillTool/prompt.js').then(({ clearPromptCache }) =>
     clearPromptCache(),
   )
 }

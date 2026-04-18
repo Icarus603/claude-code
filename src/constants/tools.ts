@@ -8,7 +8,7 @@ import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/As
 import { TASK_STOP_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskStopTool/prompt.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
 import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/NotebookEditTool/constants.js'
-import { SKILL_TOOL_NAME } from '../tools/SkillTool/constants.js'
+import { SKILL_TOOL_NAME } from '@claude-code/tool-registry/tools/SkillTool/constants.js'
 import { SEND_MESSAGE_TOOL_NAME } from '@claude-code/tool-registry/tools/SendMessageTool/constants.js'
 import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCreateTool/constants.js'
 import { TASK_GET_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskGetTool/constants.js'

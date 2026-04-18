@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
-import { getCharBudget } from '../../tools/SkillTool/prompt.js'
+import { getCharBudget } from '@claude-code/tool-registry/tools/SkillTool/prompt.js'
 
 /**
  * Logs a tengu_skill_loaded event for each skill available at session startup.

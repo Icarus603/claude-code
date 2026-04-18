@@ -12,9 +12,9 @@ import type {
   SymbolInformation,
   SymbolKind,
 } from 'vscode-languageserver-types'
-import { logForDebugging } from '../../utils/debug.js'
-import { errorMessage } from '../../utils/errors.js'
-import { plural } from '../../utils/stringUtils.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { plural } from 'src/utils/stringUtils.js'
 
 /**
  * Formats a URI by converting it to a relative path if possible.
@@ -61,7 +61,7 @@ function formatUri(uri: string | undefined, cwd?: string): string {
     // Only use relative path if it's shorter and doesn't start with ../..
     if (
       relativePath.length < filePath.length &&
-      !relativePath.startsWith('../../')
+      !relativePath.startsWith('src/')
     ) {
       return relativePath
     }

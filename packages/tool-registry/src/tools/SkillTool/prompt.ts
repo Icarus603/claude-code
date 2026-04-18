@@ -5,17 +5,17 @@ import {
   getSkillToolCommands,
   getSlashCommandToolSkills,
 } from 'src/commands.js'
-import { COMMAND_NAME_TAG } from '../../constants/xml.js'
+import { COMMAND_NAME_TAG } from 'src/constants/xml.js'
 import { stringWidth } from '@anthropic/ink'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { count } from '../../utils/array.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { toError } from '../../utils/errors.js'
-import { truncate } from '../../utils/format.js'
-import { logError } from '../../utils/log.js'
+import { count } from 'src/utils/array.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { toError } from 'src/utils/errors.js'
+import { truncate } from 'src/utils/format.js'
+import { logError } from 'src/utils/log.js'
 
 // Skill listing gets 1% of the context window (in characters)
 export const SKILL_BUDGET_CONTEXT_PERCENT = 0.01
