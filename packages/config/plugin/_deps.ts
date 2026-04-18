@@ -63,10 +63,20 @@ export type PluginFsImpl = {
   readdirSync(path: string): string[]
   statSync(path: string): { mtime: Date; isDirectory(): boolean; size: number }
   rmSync(path: string, options?: { recursive?: boolean; force?: boolean }): void
+  rmdirSync(path: string): void
   renameSync(oldPath: string, newPath: string): void
   appendFileSync(path: string, data: string): void
   cwd(): string
   realpathSync(path: string): string
+  // Async methods (used by marketplaceManager, pluginLoader, etc)
+  readFile(path: string, options?: { encoding?: 'utf-8' | 'utf8' }): Promise<string>
+  readFileBytes(path: string): Promise<Uint8Array>
+  writeFile(path: string, data: string | Uint8Array): Promise<void>
+  mkdir(path: string, options?: { recursive?: boolean }): Promise<void>
+  readdir(path: string): Promise<string[]>
+  stat(path: string): Promise<{ mtime: Date; isDirectory(): boolean; size: number }>
+  rm(path: string, options?: { recursive?: boolean; force?: boolean }): Promise<void>
+  rename(oldPath: string, newPath: string): Promise<void>
 }
 
 let _fs: PluginFsImpl | null = null
@@ -74,6 +84,8 @@ let _fs: PluginFsImpl | null = null
 function nodeFsFallback(): PluginFsImpl {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const fs = require('node:fs') as typeof import('node:fs')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const fsp = require('node:fs/promises') as typeof import('node:fs/promises')
   return {
     existsSync: p => fs.existsSync(p),
     mkdirSync: (p, o) => fs.mkdirSync(p, { recursive: true, ...(o ?? {}) }),
@@ -87,10 +99,27 @@ function nodeFsFallback(): PluginFsImpl {
         size: number
       },
     rmSync: (p, o) => fs.rmSync(p, o),
+    rmdirSync: p => fs.rmdirSync(p),
     renameSync: (o, n) => fs.renameSync(o, n),
     appendFileSync: (p, d) => fs.appendFileSync(p, d),
     cwd: () => process.cwd(),
     realpathSync: p => fs.realpathSync(p),
+    readFile: async (p, opts) =>
+      (await fsp.readFile(p, opts?.encoding ?? 'utf-8')) as string,
+    readFileBytes: async p => new Uint8Array(await fsp.readFile(p)),
+    writeFile: async (p, d) => fsp.writeFile(p, d),
+    mkdir: async (p, o) => {
+      await fsp.mkdir(p, { recursive: true, ...(o ?? {}) })
+    },
+    readdir: async p => (await fsp.readdir(p)) as string[],
+    stat: async p =>
+      (await fsp.stat(p)) as {
+        mtime: Date
+        isDirectory(): boolean
+        size: number
+      },
+    rm: async (p, o) => fsp.rm(p, o),
+    rename: async (o, n) => fsp.rename(o, n),
   }
 }
 
@@ -668,9 +697,6 @@ export function getArgumentSubstitution(): unknown {
   return _argumentSubstitution
 }
 
-export function setBuiltinPluginsFn(v: unknown): void {
-  _builtinPlugins = v
-}
 export function setClaudeCodeHintsFn(v: unknown): void {
   _claudeCodeHints = v
 }
@@ -678,15 +704,115 @@ export function setArgumentSubstitutionFn(v: unknown): void {
   _argumentSubstitution = v
 }
 
-// Named export passthroughs commonly imported from these modules
-// (structural typing: unknown; callers handle as any/generic).
-export const BUILTIN_PLUGINS: unknown = {}
-export const BUILTIN_PLUGIN_IDS: string[] = []
-export function isBuiltinPluginId(_id: string): boolean {
-  return false
+// Setter-based exports — callers that previously imported direct functions
+// from src/plugins/builtinPlugins.ts now receive dynamic references. Host-side
+// installPluginBindings wires real implementations at startup; defaults
+// return the empty shapes the callers expect (so spread doesn't throw).
+type BuiltinPluginResult = { enabled: unknown[]; disabled: unknown[] }
+
+let _getBuiltinPluginsFn: () => BuiltinPluginResult = () => ({
+  enabled: [],
+  disabled: [],
+})
+let _isBuiltinPluginIdFn: (id: string) => boolean = () => false
+let _getBuiltinPluginDefinitionFn: (id: string) => unknown = () => undefined
+
+// getBuiltinPlugins — returns { enabled, disabled } of LoadedPlugins.
+// Host wires this to src/plugins/builtinPlugins.ts#getBuiltinPlugins.
+export function getBuiltinPlugins(): BuiltinPluginResult {
+  return _getBuiltinPluginsFn()
 }
-export const applyArgumentSubstitutions = (s: string): string => s
-export const getHintsProvider = (): unknown => null
+
+// isBuiltinPluginId — "is this id a builtin?" predicate.
+export function isBuiltinPluginId(id: string): boolean {
+  return _isBuiltinPluginIdFn(id)
+}
+
+// getBuiltinPluginDefinition — per-id definition lookup.
+export function getBuiltinPluginDefinition(id: string): unknown {
+  return _getBuiltinPluginDefinitionFn(id)
+}
+
+// Constant-lookalike collections kept as getter-backed proxies so existing
+// callers that iterate them (e.g., `for (const id of BUILTIN_PLUGIN_IDS)`)
+// see the wired contents.
+function getBuiltinSnapshot(): {
+  idList: string[]
+  map: Record<string, unknown>
+} {
+  const result = _getBuiltinPluginsFn()
+  const all = [...result.enabled, ...result.disabled]
+  const map: Record<string, unknown> = {}
+  const idList: string[] = []
+  for (const plugin of all) {
+    const pid = (plugin as { id?: string; name?: string })?.id ??
+      (plugin as { name?: string })?.name
+    if (pid) {
+      map[pid] = plugin
+      idList.push(pid)
+    }
+  }
+  return { idList, map }
+}
+
+export const BUILTIN_PLUGINS: Record<string, unknown> = new Proxy(
+  {} as Record<string, unknown>,
+  {
+    ownKeys: () => Object.keys(getBuiltinSnapshot().map),
+    getOwnPropertyDescriptor: (_t, key) =>
+      Object.getOwnPropertyDescriptor(getBuiltinSnapshot().map, key),
+    has: (_t, key) => key in getBuiltinSnapshot().map,
+    get: (_t, key) => getBuiltinSnapshot().map[key as string],
+  },
+)
+
+export const BUILTIN_PLUGIN_IDS: string[] = new Proxy([] as string[], {
+  get: (_t, key) => {
+    const snap = getBuiltinSnapshot().idList
+    if (key === 'length') return snap.length
+    if (typeof key === 'string' && /^\d+$/.test(key)) return snap[Number(key)]
+    return (snap as unknown as Record<string | symbol, unknown>)[key]
+  },
+  has: (_t, key) => key in getBuiltinSnapshot().idList,
+  ownKeys: () => Object.keys(getBuiltinSnapshot().idList),
+  getOwnPropertyDescriptor: (_t, key) =>
+    Object.getOwnPropertyDescriptor(getBuiltinSnapshot().idList, key),
+}) as unknown as string[]
+
+export function setGetBuiltinPluginsFn(fn: () => BuiltinPluginResult): void {
+  _getBuiltinPluginsFn = fn
+}
+export function setIsBuiltinPluginIdFn(fn: (id: string) => boolean): void {
+  _isBuiltinPluginIdFn = fn
+}
+export function setGetBuiltinPluginDefinitionFn(
+  fn: (id: string) => unknown,
+): void {
+  _getBuiltinPluginDefinitionFn = fn
+}
+// Backward compat — some call sites setter-named variants
+export const setBuiltinPluginsFn = setGetBuiltinPluginsFn as unknown as (
+  fn: () => BuiltinPluginResult,
+) => void
+export const setBuiltinPluginIdsListFn = (): void => {}
+
+let _applyArgumentSubstitutionsFn: (s: string, ...args: unknown[]) => string = s => s
+export function applyArgumentSubstitutions(s: string, ...args: unknown[]): string {
+  return _applyArgumentSubstitutionsFn(s, ...args)
+}
+export function setApplyArgumentSubstitutionsFn(
+  fn: (s: string, ...args: unknown[]) => string,
+): void {
+  _applyArgumentSubstitutionsFn = fn
+}
+
+let _getHintsProviderFn: () => unknown = () => null
+export function getHintsProvider(): unknown {
+  return _getHintsProviderFn()
+}
+export function setGetHintsProviderFn(fn: () => unknown): void {
+  _getHintsProviderFn = fn
+}
 
 // ---------------------------------------------------------------------------
 // Round-4 batch additions: stub setters/exports for the 59 additional names

@@ -66,9 +66,12 @@ export const SUBSYSTEM_MIRRORS: SubsystemMirror[] = [
     ownerPackage: 'packages/config',
     srcMirrors: [
       'src/utils/settings',
+      'src/utils/plugins',
       'src/services/plugins',
       'src/services/remoteManagedSettings',
       'src/services/settingsSync',
+      'src/plugins',
+      'src/types/plugin.ts',
       'src/utils/managedEnv.ts',
       'src/utils/managedEnvConstants.ts',
       'src/utils/env.ts',
@@ -83,6 +86,9 @@ export const SUBSYSTEM_MIRRORS: SubsystemMirror[] = [
     ],
     wave: 1,
     v7Ref: '§8.6 / §10.1 plugin→config/plugin',
+    note:
+      'Plugin subsystem (src/utils/plugins, src/services/plugins, src/plugins) ' +
+      'added to mirror in Round 4. src/commands/plugin UI stays as Wave-6 REPL.',
   },
 
   // ── Wave 2 — Platform Foundations ────────────────────────────────────

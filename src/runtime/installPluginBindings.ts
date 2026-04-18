@@ -122,7 +122,11 @@ export function installPluginBindings(): void {
   setGetSettingsForSourceFn(source => getSettingsForSource(source as any) as any)
   setIsSettingSourceEnabledFn(source => isSettingSourceEnabled(source as any))
 
-  // --- fs / path
+  // --- fs / path (both sync + async methods)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const nodeFs = require('node:fs') as typeof import('node:fs')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const nodeFsp = require('node:fs/promises') as typeof import('node:fs/promises')
   setFsImplementationFn({
     existsSync: p => getFsImplementation().existsSync(p),
     mkdirSync: (p, o) => getFsImplementation().mkdirSync(p, o),
@@ -131,10 +135,22 @@ export function installPluginBindings(): void {
     readdirSync: p => getFsImplementation().readdirSync(p) as string[],
     statSync: p => getFsImplementation().statSync(p) as any,
     rmSync: (p, o) => getFsImplementation().rmSync(p, o as any),
+    rmdirSync: p => nodeFs.rmdirSync(p),
     renameSync: (o, n) => getFsImplementation().renameSync(o, n),
     appendFileSync: (p, d) => getFsImplementation().appendFileSync(p, d),
     cwd: () => getFsImplementation().cwd(),
     realpathSync: p => getFsImplementation().realpathSync(p) as string,
+    readFile: async (p, opts) =>
+      (await nodeFsp.readFile(p, opts?.encoding ?? 'utf-8')) as string,
+    readFileBytes: async p => new Uint8Array(await nodeFsp.readFile(p)),
+    writeFile: async (p, d) => nodeFsp.writeFile(p, d),
+    mkdir: async (p, o) => {
+      await nodeFsp.mkdir(p, { recursive: true, ...(o ?? {}) })
+    },
+    readdir: async p => (await nodeFsp.readdir(p)) as string[],
+    stat: async p => (await nodeFsp.stat(p)) as any,
+    rm: async (p, o) => nodeFsp.rm(p, o),
+    rename: async (o, n) => nodeFsp.rename(o, n),
   })
   setPathExistsFn(p => pathExists(p))
   setSafeResolvePathFn((base, rel) => safeResolvePath(base, rel) ?? null)
@@ -289,6 +305,47 @@ export function installPluginBindings(): void {
       return env
     }
   })
+
+  // --- builtin plugins (setter-based since originals are const arrays)
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../plugins/builtinPlugins.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const {
+      setGetBuiltinPluginsFn: _sgb,
+      setIsBuiltinPluginIdFn: _sid,
+      setGetBuiltinPluginDefinitionFn: _sgd,
+    } = require('@claude-code/config/plugin/_deps')
+    if (mod.getBuiltinPlugins) _sgb(() => mod.getBuiltinPlugins())
+    if (mod.isBuiltinPluginId) _sid(mod.isBuiltinPluginId)
+    if (mod.getBuiltinPluginDefinition) _sgd(mod.getBuiltinPluginDefinition)
+  } catch (e) {
+    // Builtin plugins not available — fall back to empty structure.
+  }
+
+  // --- argumentSubstitution + hints providers
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const argMod = require('../utils/argumentSubstitution.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { setApplyArgumentSubstitutionsFn: _sas } = require(
+      '@claude-code/config/plugin/_deps',
+    )
+    if (argMod.applyArgumentSubstitutions) _sas(argMod.applyArgumentSubstitutions)
+  } catch {
+    // ignore
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const hintMod = require('../utils/claudeCodeHints.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { setGetHintsProviderFn: _gh } = require(
+      '@claude-code/config/plugin/_deps',
+    )
+    if (hintMod.getHintsProvider) _gh(hintMod.getHintsProvider)
+  } catch {
+    // ignore
+  }
 }
 
 installPluginBindings()
