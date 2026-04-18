@@ -23,8 +23,8 @@ import { getTaskOutput } from 'src/utils/task/diskOutput.js'
 import { updateTaskState } from 'src/utils/task/framework.js'
 import { formatTaskOutput } from 'src/utils/task/outputFormatting.js'
 import type { ThemeName } from 'src/utils/theme.js'
-import { AgentPromptDisplay, AgentResponseDisplay } from 'src/tools/AgentTool/UI.js'
-import BashToolResultMessage from 'src/tools/BashTool/BashToolResultMessage.js'
+import { AgentPromptDisplay, AgentResponseDisplay } from '@claude-code/tool-registry/tools/AgentTool/UI.js'
+import BashToolResultMessage from '@claude-code/tool-registry/tools/BashTool/BashToolResultMessage.js'
 import { TASK_OUTPUT_TOOL_NAME } from './constants.js'
 
 const inputSchema = lazySchema(() =>

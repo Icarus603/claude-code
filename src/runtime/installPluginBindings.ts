@@ -189,12 +189,12 @@ export function installPluginBindings(): void {
   // These are `() => require(...).X` so they don't cause module eagerness.
   setLoadAgentsDirFn(async (...args: unknown[]) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../tools/AgentTool/loadAgentsDir.js')
+    const mod = require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
     return mod.loadAgentsDir(...(args as any)) as Promise<unknown[]>
   })
   setAgentColorManagerFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../tools/AgentTool/agentColorManager.js'),
+    require('@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'),
   )
   setFileEditConstantsFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports

@@ -6,7 +6,7 @@ import { useExitOnCtrlCDWithKeybindings } from '../../../hooks/useExitOnCtrlCDWi
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Newline, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { BashTool } from '../../../tools/BashTool/BashTool.js'
+import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js'
 import type {
   PermissionBehavior,

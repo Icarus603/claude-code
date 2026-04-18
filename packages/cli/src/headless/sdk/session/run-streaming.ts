@@ -47,7 +47,7 @@ import { toolMatchesName, type Tool, type Tools } from '../../../../../../src/To
 import {
   type AgentDefinition,
   isBuiltInAgent,
-} from '../../../../../../src/tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { Message, NormalizedUserMessage } from '../../../../../../src/types/message.js'
 import type { QueuedCommand } from '../../../../../../src/types/textInputTypes.js'
 import {

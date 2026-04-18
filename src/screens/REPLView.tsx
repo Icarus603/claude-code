@@ -205,7 +205,7 @@ import { stripDangerousPermissionsForAutoMode } from '@claude-code/permission/pe
 import { getScratchpadDir, isScratchpadEnabled } from '@claude-code/permission/filesystem';
 import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js';
 import { SLEEP_TOOL_NAME } from '@claude-code/tool-registry/tools/SleepTool/prompt.js';
-import { clearSpeculativeChecks } from '../tools/BashTool/bashPermissions.js';
+import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js';
 import type { AutoUpdaterResult } from '../utils/autoUpdater.js';
 import { getGlobalConfig, saveGlobalConfig, getGlobalConfigWriteCount } from '@claude-code/config';
 import { hasConsoleBillingAccess } from '../utils/billing.js';
@@ -264,9 +264,9 @@ import { processSessionStartHooks } from '../utils/sessionStart.js';
 import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from '../utils/hooks.js';
 import { type IDESelection } from '../hooks/useIdeSelection.js';
 import { assembleToolPool } from '../tools.js';
-import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js';
-import { resolveAgentTools } from '../tools/AgentTool/agentToolUtils.js';
-import { resumeAgentBackground } from '../tools/AgentTool/resumeAgent.js';
+import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js';
+import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js';
+import { resumeAgentBackground } from '@claude-code/tool-registry/tools/AgentTool/resumeAgent.js';
 import { useMainLoopModel } from '../hooks/useMainLoopModel.js';
 import { useAppState } from '../state/AppState.js';
 import { useReplActions } from './repl/useReplActions.js';
@@ -299,7 +299,7 @@ import {
 } from '../utils/toolResultStorage.js';
 import { partialCompactConversation } from '../services/compact/compact.js';
 import type { LogOption } from '../types/logs.js';
-import type { AgentColorName } from '../tools/AgentTool/agentColorManager.js';
+import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js';
 import {
   fileHistoryMakeSnapshot,
   type FileHistoryState,
@@ -2022,7 +2022,7 @@ export function REPL({
             // reflect the new coordinator/normal mode
             /* eslint-disable @typescript-eslint/no-require-imports */
             const { getAgentDefinitionsWithOverrides, getActiveAgentsFromList } =
-              require('../tools/AgentTool/loadAgentsDir.js') as typeof import('../tools/AgentTool/loadAgentsDir.js');
+              require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js') as typeof import('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js');
             /* eslint-enable @typescript-eslint/no-require-imports */
             getAgentDefinitionsWithOverrides.cache.clear?.();
             const freshAgentDefs = await getAgentDefinitionsWithOverrides(getOriginalCwd());

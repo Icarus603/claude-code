@@ -61,8 +61,8 @@ import {
   getToolResultPath,
   PREVIEW_SIZE_BYTES,
 } from 'src/utils/toolResultStorage.js'
-import { shouldUseSandbox } from 'src/tools/BashTool/shouldUseSandbox.js'
-import { BackgroundHint } from 'src/tools/BashTool/UI.js'
+import { shouldUseSandbox } from '@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js'
+import { BackgroundHint } from '@claude-code/tool-registry/tools/BashTool/UI.js'
 import {
   buildImageToolResult,
   isImageOutput,
@@ -70,7 +70,7 @@ import {
   resizeShellImageOutput,
   stdErrAppendShellResetMessage,
   stripEmptyLines,
-} from 'src/tools/BashTool/utils.js'
+} from '@claude-code/tool-registry/tools/BashTool/utils.js'
 import { trackGitOperations } from 'src/tools/shared/gitOperationTracking.js'
 import { interpretCommandResult } from './commandSemantics.js'
 import { powershellToolHasPermission } from './powershellPermissions.js'

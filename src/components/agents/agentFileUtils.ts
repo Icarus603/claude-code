@@ -7,7 +7,7 @@ import {
   type AgentDefinition,
   isBuiltInAgent,
   isPluginAgent,
-} from '../../tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { getCwd } from '../../utils/cwd.js'
 import type { EffortValue } from '../../utils/effort.js'
 import { getClaudeConfigHomeDir } from '../../utils/envUtils.js'

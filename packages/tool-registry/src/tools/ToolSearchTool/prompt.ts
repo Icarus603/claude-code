@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { isReplBridgeActive } from 'src/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { Tool } from 'src/Tool.js'
-import { AGENT_TOOL_NAME } from 'src/tools/AgentTool/constants.js'
+import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 
 // Dead code elimination: Brief tool name only needed when KAIROS or KAIROS_BRIEF is on
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -74,9 +74,9 @@ export function isDeferredTool(tool: Tool): boolean {
   // Lazy require: static import of forkSubagent → coordinatorMode creates a cycle
   // through constants/tools.ts at module init.
   if (feature('FORK_SUBAGENT') && tool.name === AGENT_TOOL_NAME) {
-    type ForkMod = typeof import('../AgentTool/forkSubagent.js')
+    type ForkMod = typeof import('@claude-code/tool-registry/tools/AgentTool/forkSubagent.js')
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const m = require('../AgentTool/forkSubagent.js') as ForkMod
+    const m = require('@claude-code/tool-registry/tools/AgentTool/forkSubagent.js') as ForkMod
     if (m.isForkSubagentEnabled()) return false
   }
 

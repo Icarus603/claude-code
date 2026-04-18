@@ -611,7 +611,7 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     getProjectDir: (...a: unknown[]) => { try { return require('../utils/sessionStorage.js').getProjectDir(...a) } catch { return process.cwd() } },
     containsVulnerableUncPath: (p: string) => { try { return require('../utils/shell/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
     getToolResultsDir: () => { try { return require('../utils/toolResultStorage.js').getToolResultsDir() } catch { return '' } },
-    shouldUseSandbox: () => { try { return require('../tools/BashTool/shouldUseSandbox.js').shouldUseSandbox() } catch { return false } },
+    shouldUseSandbox: () => { try { return require('@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js').shouldUseSandbox() } catch { return false } },
     extractOutputRedirections: (cmd: string) => { try { return require('../utils/bash/commands.js').extractOutputRedirections(cmd) } catch { return [] } },
     deletePermissionRuleFromSettings: (...a: unknown[]) => { try { return require('../utils/permissions/permissionsLoader.js').deletePermissionRuleFromSettings(...a) } catch { return false } },
     shouldAllowManagedPermissionRulesOnly: () => { try { return require('../utils/permissions/permissionsLoader.js').shouldAllowManagedPermissionRulesOnly() } catch { return false } },

@@ -73,7 +73,7 @@ import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js
 import { readFileInRange } from 'src/utils/readFileInRange.js'
 import { semanticNumber } from 'src/utils/semanticNumber.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
-import { BASH_TOOL_NAME } from 'src/tools/BashTool/toolName.js'
+import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { getDefaultFileReadingLimits } from './limits.js'
 import {
   DESCRIPTION,

@@ -67,8 +67,8 @@ import {
 import { getHardcodedTeammateModelFallback } from '@claude-code/swarm'
 import { registerTask } from '../../utils/task/framework.js'
 import { writeToMailbox } from '@claude-code/swarm'
-import type { CustomAgentDefinition } from '../AgentTool/loadAgentsDir.js'
-import { isCustomAgent } from '../AgentTool/loadAgentsDir.js'
+import type { CustomAgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
+import { isCustomAgent } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 
 function getDefaultTeammateModel(leaderModel: string | null): string {
   const configured = getGlobalConfig().teammateDefaultModel

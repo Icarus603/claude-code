@@ -10,9 +10,9 @@ import { isToolSearchEnabledOptimistic } from '../../../utils/toolSearch.js'
 import type { ToolProvider } from '../types.js'
 
 // Static imports — always loaded
-import { AgentTool } from '../../AgentTool/AgentTool.js'
+import { AgentTool } from '@claude-code/tool-registry/tools/AgentTool/AgentTool.js'
 import { TaskOutputTool } from '@claude-code/tool-registry/tools/TaskOutputTool/TaskOutputTool.js'
-import { BashTool } from '../../BashTool/BashTool.js'
+import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { GlobTool } from '@claude-code/tool-registry/tools/GlobTool/GlobTool.js'
 import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'
 import { ExitPlanModeV2Tool } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'

@@ -32,7 +32,7 @@ import {
 import type {
   AgentDefinition,
   AgentDefinitionsResult,
-} from '../tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { SKILL_TOOL_NAME } from '@claude-code/tool-registry/tools/SkillTool/constants.js'
 import {
   getLimitedSkillToolCommands,

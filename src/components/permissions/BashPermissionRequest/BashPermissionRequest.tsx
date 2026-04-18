@@ -10,14 +10,14 @@ import {
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '../../../services/eventMetadata.js'
 import { useAppState } from '../../../state/AppState.js'
-import { BashTool } from '../../../tools/BashTool/BashTool.js'
+import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import {
   getFirstWordPrefix,
   getSimpleCommandPrefix,
-} from '../../../tools/BashTool/bashPermissions.js'
-import { getDestructiveCommandWarning } from '../../../tools/BashTool/destructiveCommandWarning.js'
-import { parseSedEditCommand } from '../../../tools/BashTool/sedEditParser.js'
-import { shouldUseSandbox } from '../../../tools/BashTool/shouldUseSandbox.js'
+} from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
+import { getDestructiveCommandWarning } from '@claude-code/tool-registry/tools/BashTool/destructiveCommandWarning.js'
+import { parseSedEditCommand } from '@claude-code/tool-registry/tools/BashTool/sedEditParser.js'
+import { shouldUseSandbox } from '@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js'
 import { getCompoundCommandPrefixesStatic } from '../../../utils/bash/prefix.js'
 import {
   createPromptRuleContent,

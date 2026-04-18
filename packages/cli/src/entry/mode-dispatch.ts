@@ -184,14 +184,14 @@ import {
 import { initBuiltinPlugins } from '../../../../src/plugins/bundled/index.js'
 import { checkQuotaStatus } from '../../../../src/services/claudeAiLimits.js'
 import { initBundledSkills } from '../../../../src/skills/bundled/index.js'
-import type { AgentColorName } from '../../../../src/tools/AgentTool/agentColorManager.js'
+import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import {
   getActiveAgentsFromList,
   getAgentDefinitionsWithOverrides,
   isBuiltInAgent,
   isCustomAgent,
   parseAgentsFromJson,
-} from '../../../../src/tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { LogOption } from '../../../../src/types/logs.js'
 import type { Message as MessageType } from '../../../../src/types/message.js'
 import {

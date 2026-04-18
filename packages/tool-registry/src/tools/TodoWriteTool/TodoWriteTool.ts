@@ -6,7 +6,7 @@ import { buildTool, type ToolDef } from 'src/Tool.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { isTodoV2Enabled } from 'src/utils/tasks.js'
 import { TodoListSchema } from 'src/utils/todo/types.js'
-import { VERIFICATION_AGENT_TYPE } from 'src/tools/AgentTool/constants.js'
+import { VERIFICATION_AGENT_TYPE } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { TODO_WRITE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
 

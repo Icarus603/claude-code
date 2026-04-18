@@ -26,7 +26,7 @@ import {
   getTeamName,
 } from 'src/utils/teammate.js'
 import { writeToMailbox } from '@claude-code/swarm'
-import { VERIFICATION_AGENT_TYPE } from 'src/tools/AgentTool/constants.js'
+import { VERIFICATION_AGENT_TYPE } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { TASK_UPDATE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
 

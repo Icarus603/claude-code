@@ -137,7 +137,7 @@ export async function loadInitialMessages(
               getActiveAgentsFromList,
             } =
               // eslint-disable-next-line @typescript-eslint/no-require-imports
-              require('../../../../../../src/tools/AgentTool/loadAgentsDir.js') as typeof import('../../../../../../src/tools/AgentTool/loadAgentsDir.js')
+              require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js') as typeof import('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
             getAgentDefinitionsWithOverrides.cache.clear?.()
             const freshAgentDefs = await getAgentDefinitionsWithOverrides(
               getCwd(),
@@ -339,7 +339,7 @@ export async function loadInitialMessages(
           // Refresh agent definitions to reflect the mode switch
           const { getAgentDefinitionsWithOverrides, getActiveAgentsFromList } =
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            require('../../../../../../src/tools/AgentTool/loadAgentsDir.js') as typeof import('../../../../../../src/tools/AgentTool/loadAgentsDir.js')
+            require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js') as typeof import('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
           getAgentDefinitionsWithOverrides.cache.clear?.()
           const freshAgentDefs = await getAgentDefinitionsWithOverrides(
             getCwd(),

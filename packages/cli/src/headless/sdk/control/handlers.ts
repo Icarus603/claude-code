@@ -25,8 +25,8 @@ import type {
 } from '../../../../../../src/entrypoints/sdk/controlTypes.js'
 import type {
   AgentDefinition,
-} from '../../../../../../src/tools/AgentTool/loadAgentsDir.js'
-import { isBuiltInAgent, parseAgentsFromJson } from '../../../../../../src/tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
+import { isBuiltInAgent, parseAgentsFromJson } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { Command } from '../../../../../../src/commands.js'
 import {
   formatDescriptionWithSource,
