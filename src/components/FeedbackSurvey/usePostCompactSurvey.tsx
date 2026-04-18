@@ -5,7 +5,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { shouldUseSessionMemoryCompaction } from '../../services/compact/sessionMemoryCompact.js'
+import { shouldUseSessionMemoryCompaction } from '@claude-code/agent/compaction/sessionMemoryCompact.js'
 import type { Message } from '../../types/message.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'
 import { isCompactBoundaryMessage } from '../../utils/messages.js'

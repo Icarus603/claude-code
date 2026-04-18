@@ -290,14 +290,14 @@ import {
 } from '../utils/sessionStorage.js';
 import { deserializeMessages } from '../utils/conversationRecovery.js';
 import { extractReadFilesFromMessages, extractBashToolsFromMessages } from '../utils/queryHelpers.js';
-import { resetMicrocompactState } from '../services/compact/microCompact.js';
-import { runPostCompactCleanup } from '../services/compact/postCompactCleanup.js';
+import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js';
+import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js';
 import {
   provisionContentReplacementState,
   reconstructContentReplacementState,
   type ContentReplacementRecord,
 } from '../utils/toolResultStorage.js';
-import { partialCompactConversation } from '../services/compact/compact.js';
+import { partialCompactConversation } from '@claude-code/agent/compaction/compact.js';
 import type { LogOption } from '../types/logs.js';
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js';
 import {

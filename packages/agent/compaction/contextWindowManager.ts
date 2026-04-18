@@ -2,7 +2,7 @@
  *
  */
 
-import type { TokenWarningState } from '../types/compaction.js'
+import type { TokenWarningState } from 'src/services/types/compaction.js'
 
 
 const MAX_OUTPUT_TOKENS_FOR_SUMMARY = 20_000

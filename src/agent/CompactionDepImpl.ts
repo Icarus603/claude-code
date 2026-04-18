@@ -1,9 +1,9 @@
 
 import type { CompactionDep, CompactionResult, CoreMessage } from '@claude-code/agent'
 import type { ToolUseContext, Message } from '../Tool.js'
-import { autoCompactIfNeeded, isAutoCompactEnabled } from '../services/compact/autoCompact.js'
-import { microcompactMessages } from '../services/compact/microCompact.js'
-import { buildPostCompactMessages } from '../services/compact/compact.js'
+import { autoCompactIfNeeded, isAutoCompactEnabled } from '@claude-code/agent/compaction/autoCompact.js'
+import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
+import { buildPostCompactMessages } from '@claude-code/agent/compaction/compact.js'
 
 export class CompactionDepImpl implements CompactionDep {
   private toolUseContext: ToolUseContext

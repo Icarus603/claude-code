@@ -103,7 +103,7 @@ import {
   extractQuotaStatusFromError,
   extractQuotaStatusFromHeaders,
 } from 'src/services/claudeAiLimits.js'
-import { getAPIContextManagement } from 'src/services/compact/apiMicrocompact.js'
+import { getAPIContextManagement } from '@claude-code/agent/compaction/apiMicrocompact.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
@@ -226,7 +226,7 @@ import {
   getPinnedCacheEdits,
   markToolsSentToAPIState,
   pinCacheEdits,
-} from 'src/services/compact/microCompact.js'
+} from '@claude-code/agent/compaction/microCompact.js'
 import { getInitializationStatus } from '@claude-code/ide/lsp/manager.js'
 import { isToolFromMcpServer } from 'src/services/mcp/utils.js'
 import { withStreamingVCR, withVCR } from 'src/services/vcr.js'
@@ -1208,7 +1208,7 @@ async function* queryModel(
       isCachedMicrocompactEnabled,
       isModelSupportedForCacheEditing,
       getCachedMCConfig,
-    } = await import('src/services/compact/cachedMicrocompact.js')
+    } = await import('@claude-code/agent/compaction/cachedMicrocompact.js')
     const betas = await import('src/constants/betas.js')
     cacheEditingBetaHeader = betas.CACHE_EDITING_BETA_HEADER.trim()
     const featureEnabled = isCachedMicrocompactEnabled()

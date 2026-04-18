@@ -1,15 +1,15 @@
 import { feature } from 'bun:bundle'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
-import type { QuerySource } from '../../constants/querySource.js'
-import type { ToolUseContext } from '../../Tool.js'
-import type { Message } from '../../types/message.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { getMainLoopModel } from '../../utils/model/model.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+import type { QuerySource } from 'src/constants/querySource.js'
+import type { ToolUseContext } from 'src/Tool.js'
+import type { Message } from 'src/types/message.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { getMainLoopModel } from 'src/utils/model/model.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
-import { notifyCacheDeletion } from '../api/promptCacheBreakDetection.js'
-import { roughTokenCountEstimation } from '../tokenEstimation.js'
+import { notifyCacheDeletion } from 'src/services/api/promptCacheBreakDetection.js'
+import { roughTokenCountEstimation } from 'src/services/tokenEstimation.js'
 import {
   clearCompactWarningSuppression,
   suppressCompactWarning,

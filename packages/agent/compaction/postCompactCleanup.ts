@@ -1,12 +1,12 @@
 import { feature } from 'bun:bundle'
-import type { QuerySource } from '../../constants/querySource.js'
-import { clearSystemPromptSections } from '../../constants/systemPromptSections.js'
-import { getUserContext } from '../../context.js'
+import type { QuerySource } from 'src/constants/querySource.js'
+import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
+import { getUserContext } from 'src/context.js'
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
-import { clearClassifierApprovals } from '../../utils/classifierApprovals.js'
-import { resetGetMemoryFilesCache } from '../../utils/claudemd.js'
-import { clearSessionMessagesCache } from '../../utils/sessionStorage.js'
-import { clearBetaTracingState } from '../../utils/telemetry/betaSessionTracing.js'
+import { clearClassifierApprovals } from 'src/utils/classifierApprovals.js'
+import { resetGetMemoryFilesCache } from 'src/utils/claudemd.js'
+import { clearSessionMessagesCache } from 'src/utils/sessionStorage.js'
+import { clearBetaTracingState } from 'src/utils/telemetry/betaSessionTracing.js'
 import { resetMicrocompactState } from './microCompact.js'
 
 /**
@@ -43,7 +43,7 @@ export function runPostCompactCleanup(querySource?: QuerySource): void {
     if (isMainThreadCompact) {
       /* eslint-disable @typescript-eslint/no-require-imports */
       ;(
-        require('../contextCollapse/index.js') as typeof import('../contextCollapse/index.js')
+        require('src/services/contextCollapse/index.js') as typeof import('src/services/contextCollapse/index.js')
       ).resetContextCollapse()
       /* eslint-enable @typescript-eslint/no-require-imports */
     }
@@ -69,7 +69,7 @@ export function runPostCompactCleanup(querySource?: QuerySource): void {
   // cacheUtils resets. See compactConversation() for full rationale.
   clearBetaTracingState()
   if (feature('COMMIT_ATTRIBUTION')) {
-    void import('../../utils/attributionHooks.js').then(m =>
+    void import('src/utils/attributionHooks.js').then(m =>
       m.sweepFileContentCache(),
     )
   }

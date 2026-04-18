@@ -4,7 +4,7 @@ import {
   getSystemPrompt,
   SYSTEM_PROMPT_DYNAMIC_BOUNDARY,
 } from 'src/constants/prompts.js'
-import { microcompactMessages } from 'src/services/compact/microCompact.js'
+import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
 import { getSdkBetas } from '../bootstrap/state.js'
 import { getCommandName } from '../commands.js'
 import { getSystemContext } from '../context.js'
@@ -14,7 +14,7 @@ import {
   getEffectiveContextWindowSize,
   isAutoCompactEnabled,
   MANUAL_COMPACT_BUFFER_TOKENS,
-} from '../services/compact/autoCompact.js'
+} from '@claude-code/agent/compaction/autoCompact.js'
 import {
   countMessagesTokensWithAPI,
   countTokensViaHaikuFallback,

@@ -6,7 +6,7 @@ import type {
   ContextEditStrategy,
   ContextManagementConfig,
   ToolNameConstants,
-} from '../types/compaction.js'
+} from 'src/services/types/compaction.js'
 
 
 export interface ApiMicrocompactDeps {
