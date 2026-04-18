@@ -215,7 +215,7 @@ import {
 import {
   getEffectiveContextWindowSize,
   isAutoCompactEnabled,
-} from '../services/compact/autoCompact.js'
+} from '@claude-code/agent/compaction/autoCompact.js'
 import {
   findRelevantMemories,
   getAutoMemPath,
@@ -3962,7 +3962,7 @@ export function getContextEfficiencyAttachment(
   // isn't in the tool list. Lazy require keeps this file snip-string-free.
   const { isSnipRuntimeEnabled, shouldNudgeForSnips } =
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../services/compact/snipCompact.js') as typeof import('../services/compact/snipCompact.js')
+    require('@claude-code/agent/compaction/snipCompact.js') as typeof import('@claude-code/agent/compaction/snipCompact.js')
   if (!isSnipRuntimeEnabled()) {
     return []
   }

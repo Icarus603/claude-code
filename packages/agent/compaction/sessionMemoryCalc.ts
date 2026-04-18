@@ -2,7 +2,7 @@
  *
  */
 
-import type { SessionMemoryCompactConfig } from '../types/compaction.js'
+import type { SessionMemoryCompactConfig } from 'src/services/types/compaction.js'
 
 
 /**

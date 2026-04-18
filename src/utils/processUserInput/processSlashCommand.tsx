@@ -34,8 +34,8 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { getDumpPromptsPath } from '../../services/api/dumpPrompts.js'
-import { buildPostCompactMessages } from '../../services/compact/compact.js'
-import { resetMicrocompactState } from '../../services/compact/microCompact.js'
+import { buildPostCompactMessages } from '@claude-code/agent/compaction/compact.js'
+import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js'
 import type { Progress as AgentProgress } from '@claude-code/tool-registry/tools/AgentTool/AgentTool.js'
 import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
 import { renderToolUseProgressMessage } from '@claude-code/tool-registry/tools/AgentTool/UI.js'

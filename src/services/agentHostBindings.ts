@@ -98,7 +98,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     microcompactMessages: (...args: unknown[]) => {
       try {
-        return require('../services/compact/microCompact.js').microcompactMessages(...args)
+        return require('@claude-code/agent/compaction/microCompact.js').microcompactMessages(...args)
       } catch {
         const [messages] = args
         return Promise.resolve({ messages })
@@ -106,7 +106,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     autoCompactIfNeeded: (...args: unknown[]) => {
       try {
-        return require('../services/compact/autoCompact.js').autoCompactIfNeeded(...args)
+        return require('@claude-code/agent/compaction/autoCompact.js').autoCompactIfNeeded(...args)
       } catch {
         return Promise.resolve({ wasCompacted: false })
       }
@@ -217,14 +217,14 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     isSnipBoundaryMessage: (message: unknown) => {
       try {
-        return require('../services/compact/snipProjection.js').isSnipBoundaryMessage(message)
+        return require('@claude-code/agent/compaction/snipProjection.js').isSnipBoundaryMessage(message)
       } catch {
         return false
       }
     },
     snipCompactIfNeeded: (messages: unknown[], options?: { force?: boolean }) => {
       try {
-        return require('../services/compact/snipCompact.js').snipCompactIfNeeded(messages, options)
+        return require('@claude-code/agent/compaction/snipCompact.js').snipCompactIfNeeded(messages, options)
       } catch {
         return undefined
       }
@@ -497,7 +497,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     snipCompactWithMetadata: (messages: unknown[]) => {
       try {
-        return require('../services/compact/snipCompact.js').snipCompactIfNeeded(messages)
+        return require('@claude-code/agent/compaction/snipCompact.js').snipCompactIfNeeded(messages)
       } catch {
         return { messages, tokensFreed: 0 }
       }
@@ -536,28 +536,28 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     isReactiveCompactEnabled: () => {
       try {
-        return require('../services/compact/reactiveCompact.js').isReactiveCompactEnabled()
+        return require('@claude-code/agent/compaction/reactiveCompact.js').isReactiveCompactEnabled()
       } catch {
         return false
       }
     },
     isWithheldReactivePromptTooLong: (message: unknown) => {
       try {
-        return require('../services/compact/reactiveCompact.js').isWithheldPromptTooLong(message)
+        return require('@claude-code/agent/compaction/reactiveCompact.js').isWithheldPromptTooLong(message)
       } catch {
         return false
       }
     },
     isWithheldReactiveMediaSizeError: (message: unknown) => {
       try {
-        return require('../services/compact/reactiveCompact.js').isWithheldMediaSizeError(message)
+        return require('@claude-code/agent/compaction/reactiveCompact.js').isWithheldMediaSizeError(message)
       } catch {
         return false
       }
     },
     tryReactiveCompact: (params: unknown) => {
       try {
-        return require('../services/compact/reactiveCompact.js').tryReactiveCompact(params)
+        return require('@claude-code/agent/compaction/reactiveCompact.js').tryReactiveCompact(params)
       } catch {
         return Promise.resolve(undefined)
       }

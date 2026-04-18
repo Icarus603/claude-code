@@ -208,9 +208,9 @@ function MessageImpl({
       if (feature('HISTORY_SNIP')) {
         /* eslint-disable @typescript-eslint/no-require-imports */
         const { isSnipBoundaryMessage } =
-          require('../services/compact/snipProjection.js') as typeof import('../services/compact/snipProjection.js')
+          require('@claude-code/agent/compaction/snipProjection.js') as typeof import('@claude-code/agent/compaction/snipProjection.js')
         const { isSnipMarkerMessage } =
-          require('../services/compact/snipCompact.js') as typeof import('../services/compact/snipCompact.js')
+          require('@claude-code/agent/compaction/snipCompact.js') as typeof import('@claude-code/agent/compaction/snipCompact.js')
         /* eslint-enable @typescript-eslint/no-require-imports */
         if (isSnipBoundaryMessage(message)) {
           /* eslint-disable @typescript-eslint/no-require-imports */

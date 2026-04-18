@@ -15,7 +15,7 @@ import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { useVoiceEnabled } from '../../hooks/useVoiceEnabled.js'
 import { Box, Text } from '@anthropic/ink'
 import { useClaudeAiLimits } from '../../services/claudeAiLimitsHook.js'
-import { calculateTokenWarningState } from '../../services/compact/autoCompact.js'
+import { calculateTokenWarningState } from '@claude-code/agent/compaction/autoCompact.js'
 import type { MCPServerConnection } from '../../services/mcp/types.js'
 import type { Message } from '../../types/message.js'
 import {

@@ -13,7 +13,7 @@ export type {
   PostCompactCleanupActions,
   ToolNameConstants,
   SessionMemoryCompactConfig,
-} from '../types/compaction.js'
+} from 'src/services/types/compaction.js'
 
 export type {
   CompactionDeps,
@@ -36,7 +36,7 @@ export type {
   ActivityDep,
   TranscriptDep,
   ContextCleanupDep,
-} from '../types/compaction-deps.js'
+} from 'src/services/types/compaction-deps.js'
 
 export { groupMessagesByApiRound } from './grouping.js'
 export { isSnipBoundaryMessage, projectSnippedView } from './snipProjection.js'

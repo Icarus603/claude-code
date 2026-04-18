@@ -12,11 +12,11 @@ import {
   ERROR_MESSAGE_NOT_ENOUGH_MESSAGES,
   ERROR_MESSAGE_USER_ABORT,
   mergeHookInstructions,
-} from '../../services/compact/compact.js'
-import { suppressCompactWarning } from '../../services/compact/compactWarningState.js'
-import { microcompactMessages } from '../../services/compact/microCompact.js'
-import { runPostCompactCleanup } from '../../services/compact/postCompactCleanup.js'
-import { trySessionMemoryCompaction } from '../../services/compact/sessionMemoryCompact.js'
+} from '@claude-code/agent/compaction/compact.js'
+import { suppressCompactWarning } from '@claude-code/agent/compaction/compactWarningState.js'
+import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
+import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js'
+import { trySessionMemoryCompaction } from '@claude-code/agent/compaction/sessionMemoryCompact.js'
 import { setLastSummarizedMessageId } from '../../services/SessionMemory/sessionMemoryUtils.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type { LocalCommandCall } from '../../types/command.js'
@@ -33,7 +33,7 @@ import {
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const reactiveCompact = feature('REACTIVE_COMPACT')
-  ? (require('../../services/compact/reactiveCompact.js') as typeof import('../../services/compact/reactiveCompact.js'))
+  ? (require('@claude-code/agent/compaction/reactiveCompact.js') as typeof import('@claude-code/agent/compaction/reactiveCompact.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 

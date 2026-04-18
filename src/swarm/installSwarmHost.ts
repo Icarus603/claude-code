@@ -13,13 +13,13 @@ import {
   Select,
 } from '../components/CustomSelect/index.js'
 import { logEvent } from '@claude-code/local-observability'
-import { getAutoCompactThreshold } from '../services/compact/autoCompact.js'
+import { getAutoCompactThreshold } from '@claude-code/agent/compaction/autoCompact.js'
 import {
   buildPostCompactMessages,
   compactConversation,
   ERROR_MESSAGE_USER_ABORT,
-} from '../services/compact/compact.js'
-import { resetMicrocompactState } from '../services/compact/microCompact.js'
+} from '@claude-code/agent/compaction/compact.js'
+import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js'
 import {
   createTaskStateBase,
   generateTaskId,

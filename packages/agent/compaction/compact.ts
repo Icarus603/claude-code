@@ -4,23 +4,23 @@ import uniqBy from 'lodash-es/uniqBy.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const sessionTranscriptModule = feature('KAIROS')
-  ? (require('../sessionTranscript/sessionTranscript.js') as typeof import('../sessionTranscript/sessionTranscript.js'))
+  ? (require('src/services/sessionTranscript/sessionTranscript.js') as typeof import('src/services/sessionTranscript/sessionTranscript.js'))
   : null
 
 import { APIUserAbortError } from '@anthropic-ai/sdk'
 import { markPostCompaction } from 'src/bootstrap/state.js'
-import { getInvokedSkillsForAgent } from '../../bootstrap/state.js'
-import type { QuerySource } from '../../constants/querySource.js'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import type { Tool, ToolUseContext } from '../../Tool.js'
-import type { LocalAgentTaskState } from '../../tasks/LocalAgentTask/LocalAgentTask.js'
+import { getInvokedSkillsForAgent } from 'src/bootstrap/state.js'
+import type { QuerySource } from 'src/constants/querySource.js'
+import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import type { Tool, ToolUseContext } from 'src/Tool.js'
+import type { LocalAgentTaskState } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import {
   FILE_READ_TOOL_NAME,
   FILE_UNCHANGED_STUB,
 } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
-import type { AgentId } from '../../types/ids.js'
+import type { AgentId } from 'src/types/ids.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
@@ -32,33 +32,33 @@ import type {
   SystemCompactBoundaryMessage,
   SystemMessage,
   UserMessage,
-} from '../../types/message.js'
+} from 'src/types/message.js'
 import {
   createAttachmentMessage,
   generateFileAttachment,
   getAgentListingDeltaAttachment,
   getDeferredToolsDeltaAttachment,
   getMcpInstructionsDeltaAttachment,
-} from '../../utils/attachments.js'
+} from 'src/utils/attachments.js'
 import { getMemoryPath } from '@claude-code/config'
-import { COMPACT_MAX_OUTPUT_TOKENS } from '../../utils/context.js'
+import { COMPACT_MAX_OUTPUT_TOKENS } from 'src/utils/context.js'
 import {
   analyzeContext,
   tokenStatsToStatsigMetrics,
-} from '../../utils/contextAnalysis.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { hasExactErrorMessage } from '../../utils/errors.js'
-import { cacheToObject } from '../../utils/fileStateCache.js'
+} from 'src/utils/contextAnalysis.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { hasExactErrorMessage } from 'src/utils/errors.js'
+import { cacheToObject } from 'src/utils/fileStateCache.js'
 import {
   type CacheSafeParams,
   runForkedAgent,
-} from '../../utils/forkedAgent.js'
+} from 'src/utils/forkedAgent.js'
 import {
   executePostCompactHooks,
   executePreCompactHooks,
-} from '../../utils/hooks.js'
-import { logError } from '../../utils/log.js'
-import { MEMORY_TYPE_VALUES } from '../../utils/memory/types.js'
+} from 'src/utils/hooks.js'
+import { logError } from 'src/utils/log.js'
+import { MEMORY_TYPE_VALUES } from 'src/utils/memory/types.js'
 import {
   createCompactBoundaryMessage,
   createUserMessage,
@@ -67,9 +67,9 @@ import {
   getMessagesAfterCompactBoundary,
   isCompactBoundaryMessage,
   normalizeMessagesForAPI,
-} from '../../utils/messages.js'
-import { expandPath } from '../../utils/path.js'
-import { getPlan, getPlanFilePath } from '../../utils/plans.js'
+} from 'src/utils/messages.js'
+import { expandPath } from 'src/utils/path.js'
+import { getPlan, getPlanFilePath } from 'src/utils/plans.js'
 import {
   isSessionActivityTrackingActive,
   sendSessionActivitySignal,
@@ -78,40 +78,40 @@ import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import {
   getTranscriptPath,
   reAppendSessionMetadata,
-} from '../../utils/sessionStorage.js'
-import { sleep } from '../../utils/sleep.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/sessionStorage.js'
+import { sleep } from 'src/utils/sleep.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { asSystemPrompt } from '../../utils/systemPromptType.js'
-import { getTaskOutputPath } from '../../utils/task/diskOutput.js'
+import { asSystemPrompt } from 'src/utils/systemPromptType.js'
+import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
 import {
   getTokenUsage,
   tokenCountFromLastAPIResponse,
   tokenCountWithEstimation,
-} from '../../utils/tokens.js'
+} from 'src/utils/tokens.js'
 import {
   extractDiscoveredToolNames,
   isToolSearchEnabled,
-} from '../../utils/toolSearch.js'
+} from 'src/utils/toolSearch.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   getMaxOutputTokensForModel,
   queryModelWithStreaming,
-} from '../api/claude.js'
+} from 'src/services/api/claude.js'
 import {
   getPromptTooLongTokenGap,
   PROMPT_TOO_LONG_ERROR_MESSAGE,
   startsWithApiErrorPrefix,
-} from '../api/errors.js'
-import { notifyCompaction } from '../api/promptCacheBreakDetection.js'
-import { getRetryDelay } from '../api/withRetry.js'
-import { logPermissionContextForAnts } from '../internalLogging.js'
+} from 'src/services/api/errors.js'
+import { notifyCompaction } from 'src/services/api/promptCacheBreakDetection.js'
+import { getRetryDelay } from 'src/services/api/withRetry.js'
+import { logPermissionContextForAnts } from 'src/services/internalLogging.js'
 import {
   roughTokenCountEstimation,
   roughTokenCountEstimationForMessages,
-} from '../tokenEstimation.js'
+} from 'src/services/tokenEstimation.js'
 import { groupMessagesByApiRound } from '@claude-code/agent/compaction'
 import {
   getCompactPrompt,

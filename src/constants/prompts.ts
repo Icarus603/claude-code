@@ -71,7 +71,7 @@ const ISSUES_EXPLAINER =
 /* eslint-disable @typescript-eslint/no-require-imports */
 const getCachedMCConfigForFRC = feature('CACHED_MICROCOMPACT')
   ? (
-      require('../services/compact/cachedMCConfig.js') as typeof import('../services/compact/cachedMCConfig.js')
+      require('@claude-code/agent/compaction/cachedMCConfig.js') as typeof import('@claude-code/agent/compaction/cachedMCConfig.js')
     ).getCachedMCConfig
   : null
 

@@ -2,22 +2,22 @@
  * EXPERIMENT: Session memory compaction
  */
 
-import type { AgentId } from '../../types/ids.js'
-import type { HookResultMessage, Message } from '../../types/message.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
-import { errorMessage } from '../../utils/errors.js'
+import type { AgentId } from 'src/types/ids.js'
+import type { HookResultMessage, Message } from 'src/types/message.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { errorMessage } from 'src/utils/errors.js'
 import {
   createCompactBoundaryMessage,
   createUserMessage,
   isCompactBoundaryMessage,
-} from '../../utils/messages.js'
-import { getMainLoopModel } from '../../utils/model/model.js'
+} from 'src/utils/messages.js'
+import { getMainLoopModel } from 'src/utils/model/model.js'
 import { getSessionMemoryPath } from '@claude-code/permission/filesystem'
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
-import { getTranscriptPath } from '../../utils/sessionStorage.js'
-import { tokenCountFromLastAPIResponse } from '../../utils/tokens.js'
-import { extractDiscoveredToolNames } from '../../utils/toolSearch.js'
+import { getTranscriptPath } from 'src/utils/sessionStorage.js'
+import { tokenCountFromLastAPIResponse } from 'src/utils/tokens.js'
+import { extractDiscoveredToolNames } from 'src/utils/toolSearch.js'
 import {
   getDynamicConfig_BLOCKS_ON_INIT,
   getFeatureValue_CACHED_MAY_BE_STALE,
@@ -26,12 +26,12 @@ import { logEvent } from '@claude-code/local-observability'
 import {
   isSessionMemoryEmpty,
   truncateSessionMemoryForCompact,
-} from '../SessionMemory/prompts.js'
+} from 'src/services/SessionMemory/prompts.js'
 import {
   getLastSummarizedMessageId,
   getSessionMemoryContent,
   waitForSessionMemoryExtraction,
-} from '../SessionMemory/sessionMemoryUtils.js'
+} from 'src/services/SessionMemory/sessionMemoryUtils.js'
 import {
   annotateBoundaryWithPreservedSegment,
   buildPostCompactMessages,

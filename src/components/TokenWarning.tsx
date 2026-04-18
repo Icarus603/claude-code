@@ -7,8 +7,8 @@ import {
   calculateTokenWarningState,
   getEffectiveContextWindowSize,
   isAutoCompactEnabled,
-} from '../services/compact/autoCompact.js'
-import { useCompactWarningSuppression } from '../services/compact/compactWarningHook.js'
+} from '@claude-code/agent/compaction/autoCompact.js'
+import { useCompactWarningSuppression } from '@claude-code/agent/compaction/compactWarningHook.js'
 import { getUpgradeMessage } from '../utils/model/contextWindowUpgradeCheck.js'
 
 type Props = {
