@@ -5,7 +5,7 @@ import { useAppState } from '../../../state/AppState.js'
 import type {
   Question,
   QuestionOption,
-} from '../../../tools/AskUserQuestionTool/AskUserQuestionTool.js'
+} from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import type { PastedContent } from '@claude-code/config'
 import { getExternalEditor } from '../../../utils/editor.js'
 import { toIDEDisplayName } from '../../../utils/ide.js'

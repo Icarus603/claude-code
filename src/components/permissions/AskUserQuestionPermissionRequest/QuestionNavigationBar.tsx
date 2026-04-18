@@ -2,7 +2,7 @@ import figures from 'figures'
 import React, { useMemo } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
-import type { Question } from '../../../tools/AskUserQuestionTool/AskUserQuestionTool.js'
+import type { Question } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import { truncateToWidth } from '../../../utils/format.js'
 
 type Props = {

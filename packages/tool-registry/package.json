@@ -11,6 +11,8 @@
     "./runtime": "./src/runtime.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
+    "./tools/AskUserQuestionTool/AskUserQuestionTool.js": "./src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx",
+    "./tools/TaskStopTool/UI.js": "./src/tools/TaskStopTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }
