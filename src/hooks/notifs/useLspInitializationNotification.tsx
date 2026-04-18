@@ -6,7 +6,7 @@ import { Text } from '@anthropic/ink'
 import {
   getInitializationStatus,
   getLspServerManager,
-} from '../../services/lsp/manager.js'
+} from '@claude-code/ide/lsp/manager.js'
 import { useSetAppState } from '../../state/AppState.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'

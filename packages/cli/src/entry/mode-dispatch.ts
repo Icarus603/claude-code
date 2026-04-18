@@ -62,7 +62,7 @@ import {
 } from '@claude-code/mcp-runtime'
 import { createRemoteSessionConfig } from '@claude-code/server'
 import { launchRepl, type AppWrapperProps } from '../../../../src/replLauncher.js'
-import { initializeLspServerManager } from '../../../../src/services/lsp/manager.js'
+import { initializeLspServerManager } from '@claude-code/ide/lsp/manager.js'
 // Imports that were left behind when the .action() body moved from src/main.tsx
 // at commit 903c46b — the callsites survived the move, the import statements
 // didn't. Without these, each call site throws `undefined is not a function`,

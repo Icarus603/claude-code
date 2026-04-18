@@ -30,7 +30,7 @@ import {
   isSupportedVSCodeTerminal,
   isVSCodeInstalled,
   isWindsurfInstalled,
-} from '../../utils/ide.js'
+} from '@claude-code/ide/ide.js'
 import {
   getMainLoopModel,
   getUserSpecifiedModelSetting,

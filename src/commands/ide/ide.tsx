@@ -29,7 +29,7 @@ import {
   isSupportedJetBrainsTerminal,
   isSupportedTerminal,
   toIDEDisplayName,
-} from '../../utils/ide.js'
+} from '@claude-code/ide/ide.js'
 import { getCurrentWorktreeSession } from '@claude-code/swarm'
 
 type IDEScreenProps = {

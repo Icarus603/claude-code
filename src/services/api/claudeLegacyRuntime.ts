@@ -227,7 +227,7 @@ import {
   markToolsSentToAPIState,
   pinCacheEdits,
 } from 'src/services/compact/microCompact.js'
-import { getInitializationStatus } from 'src/services/lsp/manager.js'
+import { getInitializationStatus } from '@claude-code/ide/lsp/manager.js'
 import { isToolFromMcpServer } from 'src/services/mcp/utils.js'
 import { withStreamingVCR, withVCR } from 'src/services/vcr.js'
 import { CLIENT_REQUEST_ID_HEADER, getAnthropicClient } from '@claude-code/provider'

@@ -22,7 +22,7 @@ import {
   type IDEExtensionInstallationStatus,
   isJetBrainsIde,
   toIDEDisplayName,
-} from './ide.js'
+} from '@claude-code/ide/ide.js'
 import {
   getClaudeAiUserDefaultModelDescription,
   modelDisplayString,
