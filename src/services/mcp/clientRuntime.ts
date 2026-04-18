@@ -51,7 +51,7 @@ import {
   toolMatchesName,
 } from '../../Tool.js'
 import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
-import { type MCPProgress, MCPTool } from '../../tools/MCPTool/MCPTool.js'
+import { type MCPProgress, MCPTool } from '@claude-code/tool-registry/tools/MCPTool/MCPTool.js'
 import { createMcpAuthTool } from '@claude-code/tool-registry/tools/McpAuthTool/McpAuthTool.js'
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { createAbortController } from '../../utils/abortController.js'
@@ -149,7 +149,7 @@ const fetchMcpSkillsForClient = feature('MCP_SKILLS')
 import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js'
 import type { AssistantMessage } from '../../types/message.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { classifyMcpToolForCollapse } from '../../tools/MCPTool/classifyForCollapse.js'
+import { classifyMcpToolForCollapse } from '@claude-code/tool-registry/tools/MCPTool/classifyForCollapse.js'
 import { clearKeychainCache } from '../../utils/secureStorage/macOsKeychainHelpers.js'
 import { sleep } from '../../utils/sleep.js'
 import {

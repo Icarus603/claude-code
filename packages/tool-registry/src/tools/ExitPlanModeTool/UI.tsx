@@ -5,11 +5,11 @@ import { RejectedPlanMessage } from 'src/components/messages/UserToolResultMessa
 import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { Box, Text } from '@anthropic/ink'
-import type { ToolProgressData } from '../../Tool.js'
-import type { ProgressMessage } from '../../types/message.js'
-import { getDisplayPath } from '../../utils/file.js'
-import { getPlan } from '../../utils/plans.js'
-import type { ThemeName } from '../../utils/theme.js'
+import type { ToolProgressData } from 'src/Tool.js'
+import type { ProgressMessage } from 'src/types/message.js'
+import { getDisplayPath } from 'src/utils/file.js'
+import { getPlan } from 'src/utils/plans.js'
+import type { ThemeName } from 'src/utils/theme.js'
 import type { Output } from './ExitPlanModeV2Tool.js'
 
 export function renderToolUseMessage(): React.ReactNode {

@@ -3,23 +3,23 @@ import figures from 'figures'
 import * as React from 'react'
 import type { z } from 'zod/v4'
 import { ProgressBar } from '@anthropic/ink'
-import { MessageResponse } from '../../components/MessageResponse.js'
+import { MessageResponse } from 'src/components/MessageResponse.js'
 import {
   linkifyUrlsInText,
   OutputLine,
-} from '../../components/shell/OutputLine.js'
+} from 'src/components/shell/OutputLine.js'
 import { Ansi, Box, Text, stringWidth } from '@anthropic/ink'
-import { createHyperlink } from '../../utils/hyperlink.js'
-import type { ToolProgressData } from '../../Tool.js'
-import type { ProgressMessage } from '../../types/message.js'
-import type { MCPProgress } from '../../types/tools.js'
-import { formatNumber } from '../../utils/format.js'
+import { createHyperlink } from 'src/utils/hyperlink.js'
+import type { ToolProgressData } from 'src/Tool.js'
+import type { ProgressMessage } from 'src/types/message.js'
+import type { MCPProgress } from 'src/types/tools.js'
+import { formatNumber } from 'src/utils/format.js'
 
 import {
   getContentSizeEstimate,
   type MCPToolResult,
-} from '../../utils/mcpValidation.js'
-import { jsonParse, jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/mcpValidation.js'
+import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
 import type { inputSchema } from './MCPTool.js'
 
 // Threshold for displaying warning about large MCP responses

@@ -8,11 +8,11 @@ import type {
   BetaWebSearchTool20250305,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { queryModelWithStreaming } from '../../../services/api/claude.js'
-import { createUserMessage } from '../../../utils/messages.js'
-import { getMainLoopModel, getSmallFastModel } from '../../../utils/model/model.js'
-import { jsonParse } from '../../../utils/slowOperations.js'
-import { asSystemPrompt } from '../../../utils/systemPromptType.js'
+import { queryModelWithStreaming } from 'src/services/api/claude.js'
+import { createUserMessage } from 'src/utils/messages.js'
+import { getMainLoopModel, getSmallFastModel } from 'src/utils/model/model.js'
+import { jsonParse } from 'src/utils/slowOperations.js'
+import { asSystemPrompt } from 'src/utils/systemPromptType.js'
 import type { SearchResult, SearchOptions, WebSearchAdapter } from './types.js'
 
 function makeToolSchema(input: { allowedDomains?: string[]; blockedDomains?: string[] }): BetaWebSearchTool20250305 {

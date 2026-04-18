@@ -24,6 +24,11 @@
     "./tools/GlobTool/UI.js": "./src/tools/GlobTool/UI.tsx",
     "./tools/NotebookEditTool/UI.js": "./src/tools/NotebookEditTool/UI.tsx",
     "./tools/ConfigTool/UI.js": "./src/tools/ConfigTool/UI.tsx",
+    "./tools/ExitPlanModeTool/UI.js": "./src/tools/ExitPlanModeTool/UI.tsx",
+    "./tools/MCPTool/UI.js": "./src/tools/MCPTool/UI.tsx",
+    "./tools/SendMessageTool/UI.js": "./src/tools/SendMessageTool/UI.tsx",
+    "./tools/WebFetchTool/UI.js": "./src/tools/WebFetchTool/UI.tsx",
+    "./tools/WebSearchTool/UI.js": "./src/tools/WebSearchTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }

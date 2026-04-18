@@ -1,8 +1,8 @@
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { lazySchema } from '../../utils/lazySchema.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
-import { isOutputLineTruncated } from '../../utils/terminal.js'
+import { isOutputLineTruncated } from 'src/utils/terminal.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
 import {
   renderToolResultMessage,
@@ -22,7 +22,7 @@ type OutputSchema = ReturnType<typeof outputSchema>
 export type Output = z.infer<OutputSchema>
 
 // Re-export MCPProgress from centralized types to break import cycles
-export type { MCPProgress } from '../../types/tools.js'
+export type { MCPProgress } from 'src/types/tools.js'
 
 export const MCPTool = buildTool({
   isMcp: true,

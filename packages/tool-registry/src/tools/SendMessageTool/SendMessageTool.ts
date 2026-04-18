@@ -1,26 +1,26 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
-import { isReplBridgeActive } from '../../bootstrap/state.js'
-import { getReplBridgeHandle } from '../../bridge/replBridgeHandle.js'
-import type { Tool, ToolUseContext } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
+import { isReplBridgeActive } from 'src/bootstrap/state.js'
+import { getReplBridgeHandle } from 'src/bridge/replBridgeHandle.js'
+import type { Tool, ToolUseContext } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
 import { findTeammateTaskByAgentId } from '@claude-code/swarm'
 import {
   isLocalAgentTask,
   queuePendingMessage,
-} from '../../tasks/LocalAgentTask/LocalAgentTask.js'
-import { isMainSessionTask } from '../../tasks/LocalMainSessionTask.js'
-import { toAgentId } from '../../types/ids.js'
-import { generateRequestId } from '../../utils/agentId.js'
-import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { errorMessage } from '../../utils/errors.js'
-import { truncate } from '../../utils/format.js'
-import { gracefulShutdown } from '../../utils/gracefulShutdown.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { parseAddress } from '../../utils/peerAddress.js'
-import { semanticBoolean } from '../../utils/semanticBoolean.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+import { isMainSessionTask } from 'src/tasks/LocalMainSessionTask.js'
+import { toAgentId } from 'src/types/ids.js'
+import { generateRequestId } from 'src/utils/agentId.js'
+import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { truncate } from 'src/utils/format.js'
+import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { parseAddress } from 'src/utils/peerAddress.js'
+import { semanticBoolean } from 'src/utils/semanticBoolean.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import type { BackendType } from '@claude-code/swarm'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import { readTeamFileAsync } from '@claude-code/swarm'
@@ -31,14 +31,14 @@ import {
   getTeamName,
   isTeamLead,
   isTeammate,
-} from '../../utils/teammate.js'
+} from 'src/utils/teammate.js'
 import {
   createShutdownApprovedMessage,
   createShutdownRejectedMessage,
   createShutdownRequestMessage,
   writeToMailbox,
 } from '@claude-code/swarm'
-import { resumeAgentBackground } from '../AgentTool/resumeAgent.js'
+import { resumeAgentBackground } from 'src/tools/AgentTool/resumeAgent.js'
 import { SEND_MESSAGE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, getPrompt } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'
@@ -756,7 +756,7 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
           }
           /* eslint-disable @typescript-eslint/no-require-imports */
           const { postInterClaudeMessage } =
-            require('../../bridge/peerSessions.js') as typeof import('../../bridge/peerSessions.js')
+            require('src/bridge/peerSessions.js') as typeof import('src/bridge/peerSessions.js')
           /* eslint-enable @typescript-eslint/no-require-imports */
           const result = await postInterClaudeMessage(
             addr.target,
@@ -775,7 +775,7 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
         if (addr.scheme === 'uds') {
           /* eslint-disable @typescript-eslint/no-require-imports */
           const { sendToUdsSocket } =
-            require('../../utils/udsClient.js') as typeof import('../../utils/udsClient.js')
+            require('src/utils/udsClient.js') as typeof import('src/utils/udsClient.js')
           /* eslint-enable @typescript-eslint/no-require-imports */
           try {
             await sendToUdsSocket(addr.target, input.message)

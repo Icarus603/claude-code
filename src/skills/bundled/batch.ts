@@ -1,7 +1,7 @@
 import { AGENT_TOOL_NAME } from '../../tools/AgentTool/constants.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 import { ENTER_PLAN_MODE_TOOL_NAME } from '@claude-code/tool-registry/tools/EnterPlanModeTool/constants.js'
-import { EXIT_PLAN_MODE_TOOL_NAME } from '../../tools/ExitPlanModeTool/constants.js'
+import { EXIT_PLAN_MODE_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
 import { SKILL_TOOL_NAME } from '../../tools/SkillTool/constants.js'
 import { getIsGit } from '../../utils/git.js'
 import { registerBundledSkill } from '../bundledSkills.js'
