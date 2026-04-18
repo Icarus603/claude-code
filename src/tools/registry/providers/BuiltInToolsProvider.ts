@@ -34,7 +34,7 @@ import { TaskUpdateTool } from '@claude-code/tool-registry/tools/TaskUpdateTool/
 import { TaskListTool } from '@claude-code/tool-registry/tools/TaskListTool/TaskListTool.js'
 import { ListMcpResourcesTool } from '../../ListMcpResourcesTool/ListMcpResourcesTool.js'
 import { ReadMcpResourceTool } from '../../ReadMcpResourceTool/ReadMcpResourceTool.js'
-import { ToolSearchTool } from '../../ToolSearchTool/ToolSearchTool.js'
+import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
 import { ConfigTool } from '../../ConfigTool/ConfigTool.js'
 import { TungstenTool } from '../../TungstenTool/TungstenTool.js'
 import { BriefTool } from '../../BriefTool/BriefTool.js'

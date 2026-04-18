@@ -19,7 +19,7 @@ import {
   FILE_READ_TOOL_NAME,
   FILE_UNCHANGED_STUB,
 } from '../../tools/FileReadTool/prompt.js'
-import { ToolSearchTool } from '../../tools/ToolSearchTool/ToolSearchTool.js'
+import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
 import type { AgentId } from '../../types/ids.js'
 import type {
   AssistantMessage,

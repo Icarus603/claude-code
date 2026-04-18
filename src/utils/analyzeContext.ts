@@ -384,7 +384,7 @@ async function countBuiltInToolTokens(
 
   // Check if tool search is enabled
   const { isToolSearchEnabled } = await import('./toolSearch.js')
-  const { isDeferredTool } = await import('../tools/ToolSearchTool/prompt.js')
+  const { isDeferredTool } = await import('@claude-code/tool-registry/tools/ToolSearchTool/prompt.js')
   const isDeferred = await isToolSearchEnabled(
     model ?? '',
     tools,
@@ -668,7 +668,7 @@ export async function countMcpToolTokens(
   // Check if tool search is enabled - if so, MCP tools are deferred
   // isToolSearchEnabled handles threshold calculation internally for TstAuto mode
   const { isToolSearchEnabled } = await import('./toolSearch.js')
-  const { isDeferredTool } = await import('../tools/ToolSearchTool/prompt.js')
+  const { isDeferredTool } = await import('@claude-code/tool-registry/tools/ToolSearchTool/prompt.js')
 
   const isDeferred = await isToolSearchEnabled(
     model,

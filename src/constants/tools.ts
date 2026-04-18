@@ -14,7 +14,7 @@ import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCrea
 import { TASK_GET_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskGetTool/constants.js'
 import { TASK_LIST_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskListTool/constants.js'
 import { TASK_UPDATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskUpdateTool/constants.js'
-import { TOOL_SEARCH_TOOL_NAME } from '../tools/ToolSearchTool/prompt.js'
+import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { ENTER_WORKTREE_TOOL_NAME } from '../tools/EnterWorktreeTool/constants.js'
 import { EXIT_WORKTREE_TOOL_NAME } from '../tools/ExitWorktreeTool/constants.js'
