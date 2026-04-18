@@ -25,11 +25,11 @@ import { randomUUID } from 'crypto'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from '@claude-code/app-compat/utils/model/providers.js'
+} from 'src/utils/model/providers.js'
 import {
   getAttributionHeader,
   getCLISyspromptPrefix,
-} from '@claude-code/app-compat/constants/system.js'
+} from 'src/constants/system.js'
 import {
   getEmptyToolPermissionContext,
   type QueryChainTracking,
@@ -37,13 +37,13 @@ import {
   type ToolPermissionContext,
   type Tools,
   toolMatchesName,
-} from '@claude-code/app-compat/Tool.js'
-import type { AgentDefinition } from '@claude-code/app-compat/tools/AgentTool/loadAgentsDir.js'
+} from 'src/Tool.js'
+import type { AgentDefinition } from 'src/tools/AgentTool/loadAgentsDir.js'
 import {
   type ConnectorTextBlock,
   type ConnectorTextDelta,
   isConnectorTextBlock,
-} from '@claude-code/app-compat/types/connectorText.js'
+} from 'src/types/connectorText.js'
 import type {
   AssistantMessage,
   Message,
@@ -51,31 +51,31 @@ import type {
   StreamEvent,
   SystemAPIErrorMessage,
   UserMessage,
-} from '@claude-code/app-compat/types/message.js'
+} from 'src/types/message.js'
 import {
   type CacheScope,
   logAPIPrefix,
   splitSysPromptPrefix,
   toolToAPISchema,
-} from '@claude-code/app-compat/utils/api.js'
-import { getOauthAccountInfo } from '@claude-code/app-compat/utils/auth.js'
+} from 'src/utils/api.js'
+import { getOauthAccountInfo } from 'src/utils/auth.js'
 import {
   getBedrockExtraBodyParamsBetas,
   getMergedBetas,
   getModelBetas,
   sanitizeBetaHeaders,
-} from '@claude-code/app-compat/utils/betas.js'
+} from 'src/utils/betas.js'
 import { getOrCreateUserID } from '@claude-code/config'
 import {
   CAPPED_DEFAULT_MAX_TOKENS,
   getModelMaxOutputTokens,
   getSonnet1mExpTreatmentEnabled,
-} from '@claude-code/app-compat/utils/context.js'
-import { resolveAppliedEffort } from '@claude-code/app-compat/utils/effort.js'
-import { isEnvTruthy } from '@claude-code/app-compat/utils/envUtils.js'
-import { errorMessage } from '@claude-code/app-compat/utils/errors.js'
-import { computeFingerprintFromMessages } from '@claude-code/app-compat/utils/fingerprint.js'
-import { captureAPIRequest, logError } from '@claude-code/app-compat/utils/log.js'
+} from 'src/utils/context.js'
+import { resolveAppliedEffort } from 'src/utils/effort.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { computeFingerprintFromMessages } from 'src/utils/fingerprint.js'
+import { captureAPIRequest, logError } from 'src/utils/log.js'
 import {
   createAssistantAPIErrorMessage,
   createUserMessage,
@@ -85,29 +85,29 @@ import {
   stripAdvisorBlocks,
   stripCallerFieldFromAssistantMessage,
   stripToolReferenceBlocksFromUserMessage,
-} from '@claude-code/app-compat/utils/messages.js'
+} from 'src/utils/messages.js'
 import {
   getDefaultOpusModel,
   getDefaultSonnetModel,
   getSmallFastModel,
   isNonCustomOpusModel,
-} from '@claude-code/app-compat/utils/model/model.js'
+} from 'src/utils/model/model.js'
 import {
   asSystemPrompt,
   type SystemPrompt,
-} from '@claude-code/app-compat/utils/systemPromptType.js'
-import { tokenCountFromLastAPIResponse } from '@claude-code/app-compat/utils/tokens.js'
+} from 'src/utils/systemPromptType.js'
+import { tokenCountFromLastAPIResponse } from 'src/utils/tokens.js'
 import { getDynamicConfig_BLOCKS_ON_INIT } from '@claude-code/config/feature-flags'
 import {
   currentLimits,
   extractQuotaStatusFromError,
   extractQuotaStatusFromHeaders,
-} from '@claude-code/app-compat/services/claudeAiLimits.js'
-import { getAPIContextManagement } from '@claude-code/app-compat/services/compact/apiMicrocompact.js'
+} from 'src/services/claudeAiLimits.js'
+import { getAPIContextManagement } from 'src/services/compact/apiMicrocompact.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/app-compat/utils/permissions/autoModeState.js') as typeof import('@claude-code/app-compat/utils/permissions/autoModeState.js'))
+  ? (require('src/utils/permissions/autoModeState.js') as typeof import('src/utils/permissions/autoModeState.js'))
   : null
 
 import { feature } from 'bun:bundle'
@@ -133,7 +133,7 @@ import {
   setPromptCache1hAllowlist,
   setPromptCache1hEligible,
   setThinkingClearLatched,
-} from '@claude-code/app-compat/bootstrap/state.js'
+} from 'src/bootstrap/state.js'
 import {
   AFK_MODE_BETA_HEADER,
   CONTEXT_1M_BETA_HEADER,
@@ -144,75 +144,75 @@ import {
   REDACT_THINKING_BETA_HEADER,
   STRUCTURED_OUTPUTS_BETA_HEADER,
   TASK_BUDGETS_BETA_HEADER,
-} from '@claude-code/app-compat/constants/betas.js'
-import type { QuerySource } from '@claude-code/app-compat/constants/querySource.js'
-import type { Notification } from '@claude-code/app-compat/context/notifications.js'
-import { addToTotalSessionCost } from '@claude-code/app-compat/cost-tracker.js'
+} from 'src/constants/betas.js'
+import type { QuerySource } from 'src/constants/querySource.js'
+import type { Notification } from 'src/context/notifications.js'
+import { addToTotalSessionCost } from 'src/cost-tracker.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { AgentId } from '@claude-code/app-compat/types/ids.js'
+import type { AgentId } from 'src/types/ids.js'
 import {
   ADVISOR_TOOL_INSTRUCTIONS,
   getExperimentAdvisorModels,
   isAdvisorEnabled,
   isValidAdvisorModel,
   modelSupportsAdvisor,
-} from '@claude-code/app-compat/utils/advisor.js'
-import { getAgentContext } from '@claude-code/app-compat/utils/agentContext.js'
-import { isClaudeAISubscriber } from '@claude-code/app-compat/utils/auth.js'
+} from 'src/utils/advisor.js'
+import { getAgentContext } from 'src/utils/agentContext.js'
+import { isClaudeAISubscriber } from 'src/utils/auth.js'
 import {
   getToolSearchBetaHeader,
   modelSupportsStructuredOutputs,
   shouldIncludeFirstPartyOnlyBetas,
   shouldUseGlobalCacheScope,
-} from '@claude-code/app-compat/utils/betas.js'
-import { CLAUDE_IN_CHROME_MCP_SERVER_NAME } from '@claude-code/app-compat/utils/claudeInChrome/common.js'
-import { CHROME_TOOL_SEARCH_INSTRUCTIONS } from '@claude-code/app-compat/utils/claudeInChrome/prompt.js'
-import { getMaxThinkingTokensForModel } from '@claude-code/app-compat/utils/context.js'
-import { logForDebugging } from '@claude-code/app-compat/utils/debug.js'
-import { logForDiagnosticsNoPII } from '@claude-code/app-compat/utils/diagLogs.js'
-import { type EffortValue, modelSupportsEffort } from '@claude-code/app-compat/utils/effort.js'
+} from 'src/utils/betas.js'
+import { CLAUDE_IN_CHROME_MCP_SERVER_NAME } from 'src/utils/claudeInChrome/common.js'
+import { CHROME_TOOL_SEARCH_INSTRUCTIONS } from 'src/utils/claudeInChrome/prompt.js'
+import { getMaxThinkingTokensForModel } from 'src/utils/context.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { type EffortValue, modelSupportsEffort } from 'src/utils/effort.js'
 import {
   isFastModeAvailable,
   isFastModeCooldown,
   isFastModeEnabled,
   isFastModeSupportedByModel,
-} from '@claude-code/app-compat/utils/fastMode.js'
-import { returnValue } from '@claude-code/app-compat/utils/generators.js'
-import { headlessProfilerCheckpoint } from '@claude-code/app-compat/utils/headlessProfiler.js'
-import { isMcpInstructionsDeltaEnabled } from '@claude-code/app-compat/utils/mcpInstructionsDelta.js'
-import { calculateUSDCost } from '@claude-code/app-compat/utils/modelCost.js'
-import { endQueryProfile, queryCheckpoint } from '@claude-code/app-compat/utils/queryProfiler.js'
+} from 'src/utils/fastMode.js'
+import { returnValue } from 'src/utils/generators.js'
+import { headlessProfilerCheckpoint } from 'src/utils/headlessProfiler.js'
+import { isMcpInstructionsDeltaEnabled } from 'src/utils/mcpInstructionsDelta.js'
+import { calculateUSDCost } from 'src/utils/modelCost.js'
+import { endQueryProfile, queryCheckpoint } from 'src/utils/queryProfiler.js'
 import {
   modelSupportsAdaptiveThinking,
   modelSupportsThinking,
   type ThinkingConfig,
-} from '@claude-code/app-compat/utils/thinking.js'
+} from 'src/utils/thinking.js'
 import {
   extractDiscoveredToolNames,
   isDeferredToolsDeltaEnabled,
   isToolSearchEnabled,
-} from '@claude-code/app-compat/utils/toolSearch.js'
-import { API_MAX_MEDIA_PER_REQUEST } from '@claude-code/app-compat/constants/apiLimits.js'
-import { ADVISOR_BETA_HEADER } from '@claude-code/app-compat/constants/betas.js'
+} from 'src/utils/toolSearch.js'
+import { API_MAX_MEDIA_PER_REQUEST } from 'src/constants/apiLimits.js'
+import { ADVISOR_BETA_HEADER } from 'src/constants/betas.js'
 import {
   formatDeferredToolLine,
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
 } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
-import { count } from '@claude-code/app-compat/utils/array.js'
-import { insertBlockAfterToolResults } from '@claude-code/app-compat/utils/contentArray.js'
-import { validateBoundedIntEnvVar } from '@claude-code/app-compat/utils/envValidation.js'
-import { safeParseJSON } from '@claude-code/app-compat/utils/json.js'
-import { getInferenceProfileBackingModel } from '@claude-code/app-compat/utils/model/bedrock.js'
+import { count } from 'src/utils/array.js'
+import { insertBlockAfterToolResults } from 'src/utils/contentArray.js'
+import { validateBoundedIntEnvVar } from 'src/utils/envValidation.js'
+import { safeParseJSON } from 'src/utils/json.js'
+import { getInferenceProfileBackingModel } from 'src/utils/model/bedrock.js'
 import {
   normalizeModelStringForAPI,
   parseUserSpecifiedModel,
-} from '@claude-code/app-compat/utils/model/model.js'
+} from 'src/utils/model/model.js'
 import {
   startSessionActivity,
   stopSessionActivity,
-} from '@claude-code/app-compat/utils/sessionActivity.js'
-import { jsonStringify } from '@claude-code/app-compat/utils/slowOperations.js'
+} from 'src/utils/sessionActivity.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import {
   isBetaTracingEnabled,
   type LLMRequestNewContext,
@@ -226,17 +226,17 @@ import {
   getPinnedCacheEdits,
   markToolsSentToAPIState,
   pinCacheEdits,
-} from '@claude-code/app-compat/services/compact/microCompact.js'
-import { getInitializationStatus } from '@claude-code/app-compat/services/lsp/manager.js'
-import { isToolFromMcpServer } from '@claude-code/app-compat/services/mcp/utils.js'
-import { withStreamingVCR, withVCR } from '@claude-code/app-compat/services/vcr.js'
+} from 'src/services/compact/microCompact.js'
+import { getInitializationStatus } from 'src/services/lsp/manager.js'
+import { isToolFromMcpServer } from 'src/services/mcp/utils.js'
+import { withStreamingVCR, withVCR } from 'src/services/vcr.js'
 import { CLIENT_REQUEST_ID_HEADER, getAnthropicClient } from '@claude-code/provider'
 import {
   API_ERROR_MESSAGE_PREFIX,
   CUSTOM_OFF_SWITCH_MESSAGE,
   getAssistantMessageFromError,
   getErrorMessageIfRefusal,
-} from '@claude-code/app-compat/services/api/errors.js'
+} from 'src/services/api/errors.js'
 import {
   EMPTY_USAGE,
   type GlobalCacheStrategy,
@@ -244,19 +244,19 @@ import {
   logAPIQuery,
   logAPISuccessAndDuration,
   type NonNullableUsage,
-} from '@claude-code/app-compat/services/api/logging.js'
+} from 'src/services/api/logging.js'
 import {
   CACHE_TTL_1HOUR_MS,
   checkResponseForCacheBreak,
   recordPromptState,
-} from '@claude-code/app-compat/services/api/promptCacheBreakDetection.js'
+} from 'src/services/api/promptCacheBreakDetection.js'
 import {
   CannotRetryError,
   FallbackTriggeredError,
   is529Error,
   type RetryContext,
   withRetry,
-} from '@claude-code/app-compat/services/api/withRetry.js'
+} from 'src/services/api/withRetry.js'
 
 // Define a type that represents valid JSON values
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray
@@ -1208,8 +1208,8 @@ async function* queryModel(
       isCachedMicrocompactEnabled,
       isModelSupportedForCacheEditing,
       getCachedMCConfig,
-    } = await import('@claude-code/app-compat/services/compact/cachedMicrocompact.js')
-    const betas = await import('@claude-code/app-compat/constants/betas.js')
+    } = await import('src/services/compact/cachedMicrocompact.js')
+    const betas = await import('src/constants/betas.js')
     cacheEditingBetaHeader = betas.CACHE_EDITING_BETA_HEADER.trim()
     const featureEnabled = isCachedMicrocompactEnabled()
     const modelSupported = isModelSupportedForCacheEditing(options.model)
