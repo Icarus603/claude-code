@@ -1,8 +1,4 @@
-import { findGitRoot } from '../git.js'
-
-// Note: This is used to check git repo status synchronously
-// Uses findGitRoot which walks the filesystem (no subprocess)
-// Prefer `dirIsInGitRepo()` for async checks
-export function projectIsInGitRepo(cwd: string): boolean {
-  return findGitRoot(cwd) !== null
-}
+/**
+ * V7 §10.3 facade — moved to `@claude-code/memory/projectGitInfo`.
+ */
+export { projectIsInGitRepo } from '@claude-code/memory/projectGitInfo'
