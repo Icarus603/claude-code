@@ -312,7 +312,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: () => false,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 
@@ -330,7 +330,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: () => false,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 
@@ -364,7 +364,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: () => false,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 
@@ -393,7 +393,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: () => false,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 
@@ -422,7 +422,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: () => false,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 
@@ -448,7 +448,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: (e: any) => e?.__CANCEL__ === true,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 
@@ -456,7 +456,7 @@ describe('BingSearchAdapter.search', () => {
     const controller = new AbortController()
     controller.abort()
 
-    const { AbortError } = await import('../../../utils/errors')
+    const { AbortError } = await import('src/utils/errors')
     await expect(
       adapter.search('test', { signal: controller.signal }),
     ).rejects.toThrow(AbortError)
@@ -470,7 +470,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: () => false,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 
@@ -486,7 +486,7 @@ describe('BingSearchAdapter.search', () => {
         isCancel: () => false,
       },
     }))
-    mock.module('../../../utils/http', () => ({
+    mock.module('src/utils/http', () => ({
       getWebFetchUserAgent: () => 'TestAgent/1.0',
     }))
 

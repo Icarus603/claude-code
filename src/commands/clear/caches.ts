@@ -126,7 +126,7 @@ export function clearSessionCaches(
   // Clear session environment variables
   clearSessionEnvVars()
   // Clear WebFetch URL cache (up to 50MB of cached page content)
-  void import('../../tools/WebFetchTool/utils.js').then(
+  void import('@claude-code/tool-registry/tools/WebFetchTool/utils.js').then(
     ({ clearWebFetchCache }) => clearWebFetchCache(),
   )
   // Clear ToolSearch description cache (full tool prompts, ~500KB for 50 MCP tools)

@@ -7,7 +7,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Box, Newline, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { BashTool } from '../../../tools/BashTool/BashTool.js'
-import { WebFetchTool } from '../../../tools/WebFetchTool/WebFetchTool.js'
+import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js'
 import type {
   PermissionBehavior,
   PermissionRuleValue,

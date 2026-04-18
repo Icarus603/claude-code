@@ -113,7 +113,7 @@ import { areExplorePlanAgentsEnabled } from 'src/tools/AgentTool/builtInAgents.j
 import { AGENT_TOOL_NAME } from 'src/tools/AgentTool/constants.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 import { BashTool } from 'src/tools/BashTool/BashTool.js'
-import { ExitPlanModeV2Tool } from 'src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
+import { ExitPlanModeV2Tool } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
 import { FileEditTool } from 'src/tools/FileEditTool/FileEditTool.js'
 import {
   FILE_READ_TOOL_NAME,
@@ -143,7 +143,7 @@ import {
   FileReadTool,
   type Output as FileReadToolOutput,
 } from '../tools/FileReadTool/FileReadTool.js'
-import { SEND_MESSAGE_TOOL_NAME } from '../tools/SendMessageTool/constants.js'
+import { SEND_MESSAGE_TOOL_NAME } from '@claude-code/tool-registry/tools/SendMessageTool/constants.js'
 import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCreateTool/constants.js'
 import { TASK_OUTPUT_TOOL_NAME } from '../tools/TaskOutputTool/constants.js'
 import { TASK_UPDATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskUpdateTool/constants.js'

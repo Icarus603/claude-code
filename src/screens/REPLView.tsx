@@ -203,7 +203,7 @@ import {
 import { buildPermissionUpdates } from '../components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.js';
 import { stripDangerousPermissionsForAutoMode } from '@claude-code/permission/permissionSetup';
 import { getScratchpadDir, isScratchpadEnabled } from '@claude-code/permission/filesystem';
-import { WEB_FETCH_TOOL_NAME } from '../tools/WebFetchTool/prompt.js';
+import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js';
 import { SLEEP_TOOL_NAME } from '@claude-code/tool-registry/tools/SleepTool/prompt.js';
 import { clearSpeculativeChecks } from '../tools/BashTool/bashPermissions.js';
 import type { AutoUpdaterResult } from '../utils/autoUpdater.js';

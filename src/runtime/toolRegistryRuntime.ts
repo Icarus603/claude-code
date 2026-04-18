@@ -30,7 +30,7 @@ import {
 } from '../tools/REPLTool/constants.js'
 import { BuiltInToolsProvider } from '../tools/registry/providers/BuiltInToolsProvider.js'
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
-import { SendMessageTool } from '../tools/SendMessageTool/SendMessageTool.js'
+import { SendMessageTool } from '@claude-code/tool-registry/tools/SendMessageTool/SendMessageTool.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
 import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'

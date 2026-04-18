@@ -7,38 +7,38 @@ import {
   setHasExitedPlanMode,
   setNeedsAutoModeExitAttachment,
   setNeedsPlanModeExitAttachment,
-} from '../../bootstrap/state.js'
+} from 'src/bootstrap/state.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/eventMetadata.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 'src/services/eventMetadata.js'
 import {
   buildTool,
   type Tool,
   type ToolDef,
   toolMatchesName,
-} from '../../Tool.js'
-import { formatAgentId, generateRequestId } from '../../utils/agentId.js'
-import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
-import { logForDebugging } from '../../utils/debug.js'
+} from 'src/Tool.js'
+import { formatAgentId, generateRequestId } from 'src/utils/agentId.js'
+import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { logForDebugging } from 'src/utils/debug.js'
 import {
   findInProcessTeammateTaskId,
   setAwaitingPlanApproval,
-} from '../../utils/inProcessTeammateHelpers.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logError } from '../../utils/log.js'
+} from 'src/utils/inProcessTeammateHelpers.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logError } from 'src/utils/log.js'
 import {
   getPlan,
   getPlanFilePath,
   persistFileSnapshotIfRemote,
-} from '../../utils/plans.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/plans.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import {
   getAgentName,
   getTeamName,
   isPlanModeRequired,
   isTeammate,
-} from '../../utils/teammate.js'
+} from 'src/utils/teammate.js'
 import { writeToMailbox } from '@claude-code/swarm'
-import { AGENT_TOOL_NAME } from '../AgentTool/constants.js'
+import { AGENT_TOOL_NAME } from 'src/tools/AgentTool/constants.js'
 import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCreateTool/constants.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from './constants.js'
 import { EXIT_PLAN_MODE_V2_TOOL_PROMPT } from './prompt.js'
@@ -50,7 +50,7 @@ import {
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('../../utils/permissions/autoModeState.js') as typeof import('../../utils/permissions/autoModeState.js'))
+  ? (require('src/utils/permissions/autoModeState.js') as typeof import('src/utils/permissions/autoModeState.js'))
   : null
 const permissionSetupModule = feature('TRANSCRIPT_CLASSIFIER')
   ? (require('@claude-code/permission/permissionSetup') as typeof import('@claude-code/permission/permissionSetup'))

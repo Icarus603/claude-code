@@ -1,8 +1,8 @@
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { createAdapter } from './adapters/index.js'
 import { getWebSearchPrompt, WEB_SEARCH_TOOL_NAME } from './prompt.js'
 import {
@@ -58,9 +58,9 @@ type OutputSchema = ReturnType<typeof outputSchema>
 export type Output = z.infer<OutputSchema>
 
 // Re-export WebSearchProgress from centralized types to break import cycles
-export type { WebSearchProgress } from '../../types/tools.js'
+export type { WebSearchProgress } from 'src/types/tools.js'
 
-import type { WebSearchProgress } from '../../types/tools.js'
+import type { WebSearchProgress } from 'src/types/tools.js'
 
 export const WebSearchTool = buildTool({
   name: WEB_SEARCH_TOOL_NAME,
