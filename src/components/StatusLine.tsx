@@ -26,7 +26,7 @@ import {
 import { useMainLoopModel } from '../hooks/useMainLoopModel.js'
 import { type ReadonlySettings, useSettings } from '../hooks/useSettings.js'
 import { Ansi, Box, Text } from '@anthropic/ink'
-import { getRawUtilization } from '../services/claudeAiLimits.js'
+import { getRawUtilization } from '@claude-code/provider/claudeAiLimits.js'
 import type { Message } from '../types/message.js'
 import type { StatusLineCommandInput } from '../types/statusLine.js'
 import type { VimMode } from '../types/textInputTypes.js'

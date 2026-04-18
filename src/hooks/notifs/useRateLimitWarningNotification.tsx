@@ -5,8 +5,8 @@ import { Text } from '@anthropic/ink'
 import {
   getRateLimitWarning,
   getUsingOverageText,
-} from 'src/services/claudeAiLimits.js'
-import { useClaudeAiLimits } from 'src/services/claudeAiLimitsHook.js'
+} from '@claude-code/provider/claudeAiLimits.js'
+import { useClaudeAiLimits } from '@claude-code/provider/claudeAiLimitsHook.js'
 import { getSubscriptionType } from 'src/utils/auth.js'
 import { hasClaudeAiBillingAccess } from 'src/utils/billing.js'
 import { getIsRemoteMode } from '../../bootstrap/state.js'

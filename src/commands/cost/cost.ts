@@ -1,5 +1,5 @@
 import { formatTotalCost } from '../../cost-tracker.js'
-import { currentLimits } from '../../services/claudeAiLimits.js'
+import { currentLimits } from '@claude-code/provider/claudeAiLimits.js'
 import type { LocalCommandCall } from '../../types/command.js'
 import { isClaudeAISubscriber } from '../../utils/auth.js'
 

@@ -45,8 +45,8 @@ import {
   type ClaudeAILimits,
   getRateLimitErrorMessage,
   type OverageDisabledReason,
-} from '../claudeAiLimits.js'
-import { shouldProcessRateLimits } from '../rateLimitMocking.js' // Used for /mock-limits command
+} from '@claude-code/provider/claudeAiLimits.js'
+import { shouldProcessRateLimits } from '@claude-code/provider/rateLimitMocking.js' // Used for /mock-limits command
 import { extractConnectionErrorDetails, formatAPIError } from './errorUtils.js'
 
 export const API_ERROR_MESSAGE_PREFIX = 'API Error'

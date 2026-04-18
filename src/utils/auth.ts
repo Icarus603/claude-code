@@ -18,7 +18,7 @@ import {
 import {
   getMockSubscriptionType,
   shouldUseMockSubscription,
-} from 'src/services/mockRateLimits.js'
+} from '@claude-code/provider/mockRateLimits.js'
 import {
   isOAuthTokenExpired,
   refreshOAuthToken,
