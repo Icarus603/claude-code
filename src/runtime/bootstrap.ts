@@ -67,6 +67,9 @@ export function installRuntimeSkeletonBindings(): void {
   // config/env (Wave-1 leaf) — wire env setters used by paths.ts / dynamic.ts.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('./installConfigEnvBindings.js')
+  // output (Wave-2 leaf) — wire setters used by formatters/capture/asciicast.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./installOutputBindings.js')
   runtimeSkeletonBindingsInstalled = true
 }
 

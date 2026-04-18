@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./cache-paths": "./src/cache-paths.ts"
   }
 }
