@@ -45,7 +45,7 @@ import {
 } from '@claude-code/permission/filesystem'
 import { loadMemoryPrompt } from '@claude-code/memory'
 import { isEnvTruthy } from '../utils/envUtils.js'
-import { isReplModeEnabled } from '../tools/REPLTool/constants.js'
+import { isReplModeEnabled } from '@claude-code/tool-registry/tools/REPLTool/constants.js'
 import { feature } from 'bun:bundle'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { shouldUseGlobalCacheScope } from '../utils/betas.js'

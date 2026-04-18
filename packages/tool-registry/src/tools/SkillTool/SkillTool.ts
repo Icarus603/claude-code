@@ -63,7 +63,7 @@ import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js
 import {
   getToolUseIDFromParentMessage,
   tagMessagesWithToolUseID,
-} from 'src/tools/utils.js'
+} from '@claude-code/tool-registry/tools/utils.js'
 import { SKILL_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
 import {

@@ -1,12 +1,12 @@
 import { feature } from 'bun:bundle'
-import type { Tool, Tools } from '../../../Tool.js'
-import { hasEmbeddedSearchTools } from '../../../utils/embeddedTools.js'
-import { isEnvTruthy } from '../../../utils/envUtils.js'
-import { isPowerShellToolEnabled } from '../../../utils/shell/shellToolUtils.js'
-import { isAgentSwarmsEnabled } from '../../../utils/agentSwarmsEnabled.js'
-import { isWorktreeModeEnabled } from '../../../utils/worktreeModeEnabled.js'
-import { isTodoV2Enabled } from '../../../utils/tasks.js'
-import { isToolSearchEnabledOptimistic } from '../../../utils/toolSearch.js'
+import type { Tool, Tools } from 'src/Tool.js'
+import { hasEmbeddedSearchTools } from 'src/utils/embeddedTools.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isPowerShellToolEnabled } from 'src/utils/shell/shellToolUtils.js'
+import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isWorktreeModeEnabled } from 'src/utils/worktreeModeEnabled.js'
+import { isTodoV2Enabled } from 'src/utils/tasks.js'
+import { isToolSearchEnabledOptimistic } from 'src/utils/toolSearch.js'
 import type { ToolProvider } from '../types.js'
 
 // Static imports — always loaded
@@ -36,9 +36,9 @@ import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpRe
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
 import { ConfigTool } from '@claude-code/tool-registry/tools/ConfigTool/ConfigTool.js'
-import { TungstenTool } from '../../TungstenTool/TungstenTool.js'
+import { TungstenTool } from 'src/tools/TungstenTool/TungstenTool.js'
 import { BriefTool } from '@claude-code/tool-registry/tools/BriefTool/BriefTool.js'
-import { TestingPermissionTool } from '../../testing/TestingPermissionTool.js'
+import { TestingPermissionTool } from '@claude-code/tool-registry/tools/testing/TestingPermissionTool.js'
 import { EnterWorktreeTool } from '@claude-code/tool-registry/tools/EnterWorktreeTool/EnterWorktreeTool.js'
 import { ExitWorktreeTool } from '@claude-code/tool-registry/tools/ExitWorktreeTool/ExitWorktreeTool.js'
 
@@ -46,12 +46,12 @@ import { ExitWorktreeTool } from '@claude-code/tool-registry/tools/ExitWorktreeT
 /* eslint-disable @typescript-eslint/no-require-imports */
 const getREPLTool = () =>
   process.env.USER_TYPE === 'ant'
-    ? require('../../REPLTool/REPLTool.js').REPLTool as Tool
+    ? require('@claude-code/tool-registry/tools/REPLTool/REPLTool.js').REPLTool as Tool
     : null
 
 const getSuggestBackgroundPRTool = () =>
   process.env.USER_TYPE === 'ant'
-    ? require('../../SuggestBackgroundPRTool/SuggestBackgroundPRTool.js').SuggestBackgroundPRTool as Tool
+    ? require('src/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js').SuggestBackgroundPRTool as Tool
     : null
 
 const getSleepTool = () =>
@@ -72,64 +72,64 @@ const getRemoteTriggerTool = () =>
 
 const getMonitorTool = () =>
   feature('MONITOR_TOOL')
-    ? require('../../MonitorTool/MonitorTool.js').MonitorTool as Tool
+    ? require('src/tools/MonitorTool/MonitorTool.js').MonitorTool as Tool
     : null
 
 const getSendUserFileTool = () =>
   feature('KAIROS')
-    ? require('../../SendUserFileTool/SendUserFileTool.js').SendUserFileTool as Tool
+    ? require('src/tools/SendUserFileTool/SendUserFileTool.js').SendUserFileTool as Tool
     : null
 
 const getPushNotificationTool = () =>
   feature('KAIROS') || feature('KAIROS_PUSH_NOTIFICATION')
-    ? require('../../PushNotificationTool/PushNotificationTool.js').PushNotificationTool as Tool
+    ? require('src/tools/PushNotificationTool/PushNotificationTool.js').PushNotificationTool as Tool
     : null
 
 const getSubscribePRTool = () =>
   feature('KAIROS_GITHUB_WEBHOOKS')
-    ? require('../../SubscribePRTool/SubscribePRTool.js').SubscribePRTool as Tool
+    ? require('src/tools/SubscribePRTool/SubscribePRTool.js').SubscribePRTool as Tool
     : null
 
 const getVerifyPlanExecutionTool = () =>
   process.env.CLAUDE_CODE_VERIFY_PLAN === 'true'
-    ? require('../../VerifyPlanExecutionTool/VerifyPlanExecutionTool.js').VerifyPlanExecutionTool as Tool
+    ? require('src/tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js').VerifyPlanExecutionTool as Tool
     : null
 
 const getOverflowTestTool = () =>
   feature('OVERFLOW_TEST_TOOL')
-    ? require('../../OverflowTestTool/OverflowTestTool.js').OverflowTestTool as Tool
+    ? require('src/tools/OverflowTestTool/OverflowTestTool.js').OverflowTestTool as Tool
     : null
 
 const getCtxInspectTool = () =>
   feature('CONTEXT_COLLAPSE')
-    ? require('../../CtxInspectTool/CtxInspectTool.js').CtxInspectTool as Tool
+    ? require('src/tools/CtxInspectTool/CtxInspectTool.js').CtxInspectTool as Tool
     : null
 
 const getTerminalCaptureTool = () =>
   feature('TERMINAL_PANEL')
-    ? require('../../TerminalCaptureTool/TerminalCaptureTool.js').TerminalCaptureTool as Tool
+    ? require('src/tools/TerminalCaptureTool/TerminalCaptureTool.js').TerminalCaptureTool as Tool
     : null
 
 const getWebBrowserTool = () =>
   feature('WEB_BROWSER_TOOL')
-    ? require('../../WebBrowserTool/WebBrowserTool.js').WebBrowserTool as Tool
+    ? require('src/tools/WebBrowserTool/WebBrowserTool.js').WebBrowserTool as Tool
     : null
 
 const getSnipTool = () =>
   feature('HISTORY_SNIP')
-    ? require('../../SnipTool/SnipTool.js').SnipTool as Tool
+    ? require('src/tools/SnipTool/SnipTool.js').SnipTool as Tool
     : null
 
 const getListPeersTool = () =>
   feature('UDS_INBOX')
-    ? require('../../ListPeersTool/ListPeersTool.js').ListPeersTool as Tool
+    ? require('src/tools/ListPeersTool/ListPeersTool.js').ListPeersTool as Tool
     : null
 
 const getWorkflowTool = () =>
   feature('WORKFLOW_SCRIPTS')
     ? (() => {
-        require('../../WorkflowTool/bundled/index.js').initBundledWorkflows()
-        return require('../../WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
+        require('src/tools/WorkflowTool/bundled/index.js').initBundledWorkflows()
+        return require('src/tools/WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
       })()
     : null
 

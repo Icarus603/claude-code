@@ -1,4 +1,4 @@
-import type { Tool, Tools } from '../../Tool.js'
+import type { Tool, Tools } from 'src/Tool.js'
 
 /**
  * Tool category — identifies where a tool came from.

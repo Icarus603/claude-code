@@ -87,7 +87,7 @@ import {
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { BackgroundHint } from '@claude-code/tool-registry/tools/BashTool/UI.js'
 import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
-import { spawnTeammate } from 'src/tools/shared/spawnMultiAgent.js'
+import { spawnTeammate } from '@claude-code/tool-registry/tools/shared/spawnMultiAgent.js'
 import { setAgentColor } from './agentColorManager.js'
 import {
   agentToolResultSchema,

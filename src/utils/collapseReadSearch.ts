@@ -5,14 +5,14 @@ import { extractBashCommentLabel } from '@claude-code/tool-registry/tools/BashTo
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/prompt.js'
-import { REPL_TOOL_NAME } from '../tools/REPLTool/constants.js'
-import { getReplPrimitiveTools } from '../tools/REPLTool/primitiveTools.js'
+import { REPL_TOOL_NAME } from '@claude-code/tool-registry/tools/REPLTool/constants.js'
+import { getReplPrimitiveTools } from '@claude-code/tool-registry/tools/REPLTool/primitiveTools.js'
 import {
   type BranchAction,
   type CommitKind,
   detectGitOperation,
   type PrAction,
-} from '../tools/shared/gitOperationTracking.js'
+} from '@claude-code/tool-registry/tools/shared/gitOperationTracking.js'
 import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import type {
   CollapsedReadSearchGroup,

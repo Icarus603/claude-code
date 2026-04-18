@@ -71,7 +71,7 @@ import {
   stdErrAppendShellResetMessage,
   stripEmptyLines,
 } from '@claude-code/tool-registry/tools/BashTool/utils.js'
-import { trackGitOperations } from 'src/tools/shared/gitOperationTracking.js'
+import { trackGitOperations } from '@claude-code/tool-registry/tools/shared/gitOperationTracking.js'
 import { interpretCommandResult } from './commandSemantics.js'
 import { powershellToolHasPermission } from './powershellPermissions.js'
 import { getDefaultTimeoutMs, getMaxTimeoutMs, getPrompt } from './prompt.js'
