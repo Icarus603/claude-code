@@ -24,19 +24,19 @@ import {
   addToToolDuration,
   getCodeEditToolDecisionCounter,
   getStatsStore,
-} from '../../bootstrap/state.js'
+} from 'src/bootstrap/state.js'
 import {
   buildCodeEditToolAttributes,
   isCodeEditingTool,
-} from '../../hooks/toolPermission/permissionLogging.js'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
+} from 'src/hooks/toolPermission/permissionLogging.js'
+import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
 import {
   findToolByName,
   type Tool,
   type ToolProgress,
   type ToolProgressData,
   type ToolUseContext,
-} from '../../Tool.js'
+} from 'src/Tool.js'
 import type { BashToolInput } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { startSpeculativeClassifierCheck } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
@@ -50,26 +50,26 @@ import {
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
 } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
-import type { HookProgress } from '../../types/hooks.js'
+import type { HookProgress } from 'src/types/hooks.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
   Message,
   ProgressMessage,
   StopHookInfo,
-} from '../../types/message.js'
-import { count } from '../../utils/array.js'
-import { createAttachmentMessage } from '../../utils/attachments.js'
-import { logForDebugging } from '../../utils/debug.js'
+} from 'src/types/message.js'
+import { count } from 'src/utils/array.js'
+import { createAttachmentMessage } from 'src/utils/attachments.js'
+import { logForDebugging } from 'src/utils/debug.js'
 import {
   AbortError,
   errorMessage,
   getErrnoCode,
   ShellError,
   TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from '../../utils/errors.js'
-import { executePermissionDeniedHooks } from '../../utils/hooks.js'
-import { logError } from '../../utils/log.js'
+} from 'src/utils/errors.js'
+import { executePermissionDeniedHooks } from 'src/utils/hooks.js'
+import { logError } from 'src/utils/log.js'
 import {
   CANCEL_MESSAGE,
   createProgressMessage,
@@ -77,7 +77,7 @@ import {
   createToolResultStopMessage,
   createUserMessage,
   withMemoryCorrectionHint,
-} from '../../utils/messages.js'
+} from 'src/utils/messages.js'
 import type {
   PermissionDecisionReason,
   PermissionResult,
@@ -86,9 +86,9 @@ import {
   startSessionActivity,
   stopSessionActivity,
 } from '@claude-code/storage/sessionActivity.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
-import { Stream } from '../../utils/stream.js'
-import { logOTelEvent } from '../../utils/telemetry/events.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
+import { Stream } from 'src/utils/stream.js'
+import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import {
   addToolContentEvent,
   endToolBlockedOnUserSpan,
@@ -102,28 +102,28 @@ import {
 import {
   formatError,
   formatZodValidationError,
-} from '../../utils/toolErrors.js'
+} from 'src/utils/toolErrors.js'
 import {
   processPreMappedToolResultBlock,
   processToolResultBlock,
-} from '../../utils/toolResultStorage.js'
+} from 'src/utils/toolResultStorage.js'
 import {
   extractDiscoveredToolNames,
   isToolSearchEnabledOptimistic,
   isToolSearchToolAvailable,
-} from '../../utils/toolSearch.js'
+} from 'src/utils/toolSearch.js'
 import {
   McpAuthError,
   McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from '../mcp/client.js'
-import { mcpInfoFromString } from '../mcp/mcpStringUtils.js'
-import { normalizeNameForMCP } from '../mcp/normalization.js'
-import type { MCPServerConnection } from '../mcp/types.js'
+} from 'src/services/mcp/client.js'
+import { mcpInfoFromString } from 'src/services/mcp/mcpStringUtils.js'
+import { normalizeNameForMCP } from 'src/services/mcp/normalization.js'
+import type { MCPServerConnection } from 'src/services/mcp/types.js'
 import {
   getLoggingSafeMcpBaseUrl,
   getMcpServerScopeFromToolName,
   isMcpTool,
-} from '../mcp/utils.js'
+} from 'src/services/mcp/utils.js'
 import {
   resolveHookPermissionDecision,
   runPostToolUseFailureHooks,

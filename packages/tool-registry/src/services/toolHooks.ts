@@ -4,32 +4,32 @@ import {
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import type z from 'zod/v4'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import type { AnyObject, Tool, ToolUseContext } from '../../Tool.js'
-import type { HookProgress } from '../../types/hooks.js'
+import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import type { AnyObject, Tool, ToolUseContext } from 'src/Tool.js'
+import type { HookProgress } from 'src/types/hooks.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
   ProgressMessage,
-} from '../../types/message.js'
-import type { PermissionDecision } from '../../types/permissions.js'
-import { createAttachmentMessage } from '../../utils/attachments.js'
-import { logForDebugging } from '../../utils/debug.js'
+} from 'src/types/message.js'
+import type { PermissionDecision } from 'src/types/permissions.js'
+import { createAttachmentMessage } from 'src/utils/attachments.js'
+import { logForDebugging } from 'src/utils/debug.js'
 import {
   executePostToolHooks,
   executePostToolUseFailureHooks,
   executePreToolHooks,
   getPreToolHookBlockingMessage,
-} from '../../utils/hooks.js'
-import { logError } from '../../utils/log.js'
+} from 'src/utils/hooks.js'
+import { logError } from 'src/utils/log.js'
 import {
   getRuleBehaviorDescription,
   type PermissionDecisionReason,
   type PermissionResult,
 } from '@claude-code/permission/PermissionResult'
 import { checkRuleBasedPermissions } from '@claude-code/permission/permissions'
-import { formatError } from '../../utils/toolErrors.js'
-import { isMcpTool } from '../mcp/utils.js'
+import { formatError } from 'src/utils/toolErrors.js'
+import { isMcpTool } from 'src/services/mcp/utils.js'
 import type { McpServerType, MessageUpdateLazy } from './toolExecution.js'
 
 export type PostToolUseHooksResult<Output> =
