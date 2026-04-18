@@ -1,8 +1,9 @@
-export function redactIfDisabled(content: string): string {
-  return content
-}
+/**
+ * V7 §10.3 facade — OTel event stubs now in
+ * `@claude-code/local-observability/telemetry`.
+ */
 
-export async function logOTelEvent(
-  _eventName: string,
-  _metadata: { [key: string]: string | undefined } = {},
-): Promise<void> {}
+export {
+  logOTelEvent,
+  redactIfDisabled,
+} from '@claude-code/local-observability/telemetry'

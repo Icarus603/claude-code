@@ -59,6 +59,11 @@ export function installRuntimeSkeletonBindings(): void {
   // Install them from the same runtime bootstrap seam.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('./installBridgeBindings.js')
+  // local-observability (Wave-1 leaf) has its own _deps setter surface;
+  // its bindings don't flow through app-host's installPackageHostBindings
+  // because app-host itself depends on local-observability.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./installLocalObservabilityBindings.js')
   runtimeSkeletonBindingsInstalled = true
 }
 
