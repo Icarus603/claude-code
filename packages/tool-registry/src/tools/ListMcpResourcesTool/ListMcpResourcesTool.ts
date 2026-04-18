@@ -2,13 +2,13 @@ import { z } from 'zod/v4'
 import {
   ensureConnectedClient,
   fetchResourcesForClient,
-} from '../../services/mcp/client.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { errorMessage } from '../../utils/errors.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logMCPError } from '../../utils/log.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
-import { isOutputLineTruncated } from '../../utils/terminal.js'
+} from 'src/services/mcp/client.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logMCPError } from 'src/utils/log.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
+import { isOutputLineTruncated } from 'src/utils/terminal.js'
 import { DESCRIPTION, LIST_MCP_RESOURCES_TOOL_NAME, PROMPT } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'
 
