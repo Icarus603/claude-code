@@ -7,7 +7,7 @@ import {
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   IN_PROCESS_TEAMMATE_ALLOWED_TOOLS,
 } from 'src/constants/tools.js'
-import { startAgentSummarization } from 'src/services/AgentSummary/agentSummary.js'
+import { startAgentSummarization } from '@claude-code/agent/AgentSummary/agentSummary.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

@@ -16,7 +16,8 @@
     "./query": "./query.ts",
     "./query-engine": "./QueryEngine.ts",
     "./tee": "./tee.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./AgentSummary/*.js": "./AgentSummary/*.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
