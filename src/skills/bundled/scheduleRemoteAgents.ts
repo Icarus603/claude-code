@@ -2,7 +2,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import type { MCPServerConnection } from '../../services/mcp/types.js'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
 import type { ToolUseContext } from '../../Tool.js'
-import { ASK_USER_QUESTION_TOOL_NAME } from '../../tools/AskUserQuestionTool/prompt.js'
+import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 import { REMOTE_TRIGGER_TOOL_NAME } from '../../tools/RemoteTriggerTool/prompt.js'
 import { getClaudeAIOAuthTokens } from '../../utils/auth.js'
 import { checkRepoForRemoteAccess } from '../../utils/background/remote/preconditions.js'

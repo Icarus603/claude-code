@@ -19,8 +19,8 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useAppState } from '../../../state/AppState.js'
-import type { Question } from '../../../tools/AskUserQuestionTool/AskUserQuestionTool.js'
-import { AskUserQuestionTool } from '../../../tools/AskUserQuestionTool/AskUserQuestionTool.js'
+import type { Question } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
+import { AskUserQuestionTool } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import {
   type CliHighlight,
   getCliHighlightPromise,

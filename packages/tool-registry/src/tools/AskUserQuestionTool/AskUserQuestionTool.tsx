@@ -9,9 +9,9 @@ import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { z } from 'zod/v4'
 import { Box, Text } from '@anthropic/ink'
-import type { Tool } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { lazySchema } from '../../utils/lazySchema.js'
+import type { Tool } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   ASK_USER_QUESTION_TOOL_CHIP_WIDTH,
   ASK_USER_QUESTION_TOOL_NAME,
