@@ -127,7 +127,7 @@ export function restoreSessionStateFromLog(
   if (feature('CONTEXT_COLLAPSE')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     ;(
-      require('../services/contextCollapse/persist.js') as typeof import('../services/contextCollapse/persist.js')
+      require('@claude-code/agent/contextCollapse/persist.js') as typeof import('@claude-code/agent/contextCollapse/persist.js')
     ).restoreFromEntries(
       result.contextCollapseCommits ?? [],
       result.contextCollapseSnapshot,
@@ -494,7 +494,7 @@ export async function processResumedConversation(
   if (feature('CONTEXT_COLLAPSE')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     ;(
-      require('../services/contextCollapse/persist.js') as typeof import('../services/contextCollapse/persist.js')
+      require('@claude-code/agent/contextCollapse/persist.js') as typeof import('@claude-code/agent/contextCollapse/persist.js')
     ).restoreFromEntries(
       result.contextCollapseCommits ?? [],
       result.contextCollapseSnapshot,

@@ -50,7 +50,7 @@ export async function collectContextData(
   if (feature('CONTEXT_COLLAPSE')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { projectView } =
-      require('../../services/contextCollapse/operations.js') as typeof import('../../services/contextCollapse/operations.js')
+      require('@claude-code/agent/contextCollapse/operations.js') as typeof import('@claude-code/agent/contextCollapse/operations.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     apiView = projectView(apiView)
   }
@@ -113,7 +113,7 @@ function formatContextAsMarkdownTable(data: ContextData): string {
   if (feature('CONTEXT_COLLAPSE')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { getStats, isContextCollapseEnabled } =
-      require('../../services/contextCollapse/index.js') as typeof import('../../services/contextCollapse/index.js')
+      require('@claude-code/agent/contextCollapse/index.js') as typeof import('@claude-code/agent/contextCollapse/index.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     if (isContextCollapseEnabled()) {
       const s = getStats()

@@ -677,7 +677,7 @@ export function installPackageHostBindings(
         },
         applyContextCollapsesIfNeeded: (...args: unknown[]) => {
           try {
-            return require('../services/contextCollapse/index.js').applyCollapsesIfNeeded(...args)
+            return require('@claude-code/agent/contextCollapse/index.js').applyCollapsesIfNeeded(...args)
           } catch {
             const [messages] = args
             return Promise.resolve({ messages })
@@ -685,7 +685,7 @@ export function installPackageHostBindings(
         },
         recoverContextCollapseOverflow: (...args: unknown[]) => {
           try {
-            return require('../services/contextCollapse/index.js').recoverFromOverflow(...args)
+            return require('@claude-code/agent/contextCollapse/index.js').recoverFromOverflow(...args)
           } catch {
             const [messages] = args
             return { messages, committed: 0 }
@@ -693,14 +693,14 @@ export function installPackageHostBindings(
         },
         isContextCollapseEnabled: () => {
           try {
-            return require('../services/contextCollapse/index.js').isContextCollapseEnabled()
+            return require('@claude-code/agent/contextCollapse/index.js').isContextCollapseEnabled()
           } catch {
             return false
           }
         },
         isWithheldContextCollapsePromptTooLong: (message: unknown, querySource: unknown) => {
           try {
-            const { isWithheldPromptTooLong } = require('../services/contextCollapse/index.js')
+            const { isWithheldPromptTooLong } = require('@claude-code/agent/contextCollapse/index.js')
             const { isPromptTooLongMessage } = require('../services/api/errors.js')
             return isWithheldPromptTooLong(message, isPromptTooLongMessage, querySource)
           } catch {

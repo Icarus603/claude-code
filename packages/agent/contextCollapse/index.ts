@@ -1,7 +1,7 @@
 // Auto-generated stub — replace with real implementation
-import type { Message } from '../../types/message.js'
-import type { ToolUseContext } from '../../Tool.js'
-import type { QuerySource } from '../../constants/querySource.js'
+import type { Message } from 'src/types/message.js'
+import type { ToolUseContext } from 'src/Tool.js'
+import type { QuerySource } from 'src/constants/querySource.js'
 
 export interface ContextCollapseHealth {
   totalSpawns: number
