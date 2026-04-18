@@ -3,7 +3,7 @@ import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/As
 import { ENTER_PLAN_MODE_TOOL_NAME } from '@claude-code/tool-registry/tools/EnterPlanModeTool/constants.js'
 import { EXIT_PLAN_MODE_TOOL_NAME } from '../../tools/ExitPlanModeTool/constants.js'
 import { FILE_READ_TOOL_NAME } from '../../tools/FileReadTool/prompt.js'
-import { GLOB_TOOL_NAME } from '../../tools/GlobTool/prompt.js'
+import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt.js'
 import { GREP_TOOL_NAME } from '../../tools/GrepTool/prompt.js'
 import { LIST_MCP_RESOURCES_TOOL_NAME } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/prompt.js'
 import { LSP_TOOL_NAME } from '../../tools/LSPTool/prompt.js'

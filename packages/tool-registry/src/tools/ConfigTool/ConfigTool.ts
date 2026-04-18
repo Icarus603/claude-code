@@ -4,21 +4,21 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { buildTool, type ToolDef } from '../../Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
 import {
   type GlobalConfig,
   getGlobalConfig,
   getRemoteControlAtStartup,
   saveGlobalConfig,
 } from '@claude-code/config'
-import { errorMessage } from '../../utils/errors.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logError } from '../../utils/log.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logError } from 'src/utils/log.js'
 import {
   getInitialSettings,
   updateSettingsForSource,
-} from '../../utils/settings/settings.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/settings/settings.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { CONFIG_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, generatePrompt } from './prompt.js'
 import {
@@ -115,7 +115,7 @@ export const ConfigTool = buildTool({
     // voiceEnabled as an unknown setting so no voice-specific strings leak.
     if (feature('VOICE_MODE') && setting === 'voiceEnabled') {
       const { isVoiceGrowthBookEnabled } = await import(
-        '../../voice/voiceModeEnabled.js'
+        'src/voice/voiceModeEnabled.js'
       )
       if (!isVoiceGrowthBookEnabled()) {
         return {
@@ -235,10 +235,10 @@ export const ConfigTool = buildTool({
       finalValue === true
     ) {
       const { isVoiceModeEnabled } = await import(
-        '../../voice/voiceModeEnabled.js'
+        'src/voice/voiceModeEnabled.js'
       )
       if (!isVoiceModeEnabled()) {
-        const { isAnthropicAuthEnabled } = await import('../../utils/auth.js')
+        const { isAnthropicAuthEnabled } = await import('src/utils/auth.js')
         return {
           data: {
             success: false,
@@ -249,13 +249,13 @@ export const ConfigTool = buildTool({
         }
       }
       const { isVoiceStreamAvailable } = await import(
-        '../../services/voiceStreamSTT.js'
+        'src/services/voiceStreamSTT.js'
       )
       const {
         checkRecordingAvailability,
         checkVoiceDependencies,
         requestMicrophonePermission,
-      } = await import('../../services/voice.js')
+      } = await import('src/services/voice.js')
 
       const recording = await checkRecordingAvailability()
       if (!recording.available) {
@@ -347,7 +347,7 @@ export const ConfigTool = buildTool({
       // and the settings cache resets for the next /voice read.
       if (feature('VOICE_MODE') && setting === 'voiceEnabled') {
         const { settingsChangeDetector } = await import(
-          '../../utils/settings/changeDetector.js'
+          'src/utils/settings/changeDetector.js'
         )
         settingsChangeDetector.notifyChange('userSettings')
       }

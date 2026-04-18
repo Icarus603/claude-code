@@ -120,7 +120,7 @@ import {
   MAX_LINES_TO_READ,
 } from 'src/tools/FileReadTool/prompt.js'
 import { FileWriteTool } from 'src/tools/FileWriteTool/FileWriteTool.js'
-import { GLOB_TOOL_NAME } from 'src/tools/GlobTool/prompt.js'
+import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt.js'
 import { GREP_TOOL_NAME } from 'src/tools/GrepTool/prompt.js'
 import type { DeepImmutable } from 'src/types/utils.js'
 import { getStrictToolResultPairing } from '../bootstrap/state.js'

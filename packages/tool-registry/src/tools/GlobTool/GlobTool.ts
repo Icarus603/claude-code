@@ -1,19 +1,19 @@
 import { z } from 'zod/v4'
-import type { ValidationResult } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { getCwd } from '../../utils/cwd.js'
-import { isENOENT } from '../../utils/errors.js'
+import type { ValidationResult } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { isENOENT } from 'src/utils/errors.js'
 import {
   FILE_NOT_FOUND_CWD_NOTE,
   suggestPathUnderCwd,
-} from '../../utils/file.js'
-import { getFsImplementation } from '../../utils/fsOperations.js'
-import { glob } from '../../utils/glob.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { expandPath, toRelativePath } from '../../utils/path.js'
+} from 'src/utils/file.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { glob } from 'src/utils/glob.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { expandPath, toRelativePath } from 'src/utils/path.js'
 import { checkReadPermissionForTool } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from '../../utils/permissions/shellRuleMatching.js'
+import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
 import { DESCRIPTION, GLOB_TOOL_NAME } from './prompt.js'
 import {
   getToolUseSummary,
