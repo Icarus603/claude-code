@@ -11,6 +11,9 @@
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
     "./compat": "./src/compat.ts",
-    "./spans": "./src/spans.ts"
+    "./spans": "./src/spans.ts",
+    "./_deps": "./src/_deps.ts",
+    "./logging": "./src/logging/index.ts",
+    "./telemetry": "./src/telemetry/index.ts"
   }
 }

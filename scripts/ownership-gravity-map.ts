@@ -47,7 +47,6 @@ export const SUBSYSTEM_MIRRORS: SubsystemMirror[] = [
     ownerPackage: 'packages/local-observability',
     srcMirrors: [
       'src/services/internalLogging.ts',
-      'src/services/diagnosticTracking.ts',
       'src/utils/telemetry',
       'src/utils/log.ts',
       'src/utils/diagLogs.ts',
@@ -57,7 +56,10 @@ export const SUBSYSTEM_MIRRORS: SubsystemMirror[] = [
     ],
     wave: 1,
     v7Ref: '§8.12 / §10.3',
-    note: 'Includes telemetry dir (sessionTracing, perfettoTracing, etc. per §10.3).',
+    note:
+      'Includes telemetry dir (sessionTracing, perfettoTracing, etc. per §10.3). ' +
+      'Excludes src/services/diagnosticTracking.ts (LSP diagnostics — belongs ' +
+      'to `ide` subsystem per V7 §8.15 once that package is activated).',
   },
   {
     subsystem: 'config',
