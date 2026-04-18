@@ -9,6 +9,8 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./main.js": "./src/main.ts",
+    "./workerRegistry.js": "./src/workerRegistry.ts"
   }
 }
