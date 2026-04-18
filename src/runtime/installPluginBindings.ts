@@ -1,0 +1,294 @@
+/**
+ * installPluginBindings — wire every `@claude-code/config/plugin/_deps`
+ * setter to the host's real implementation.
+ *
+ * Plugin subsystem was moved out of src/utils/plugins/ in Round 4. 53
+ * external deps (bootstrap/state, tools/*, services/lsp, services/mcp,
+ * commands.js, AppState, various utils) are funneled through setter
+ * injection to keep the package src/-free.
+ *
+ * Must run during runtime bootstrap, BEFORE any code path touches the
+ * plugin package. The require-time side effect at the bottom of this
+ * file handles that as long as this module is imported early.
+ */
+
+import {
+  setBuildPluginTelemetryFieldsFn,
+  setCheckBinaryExistsFn,
+  setClassifyPluginCommandErrorFn,
+  setCloneFn,
+  setExecFileNoThrowFn,
+  setExecFileNoThrowWithCwdFn,
+  setFileEditConstantsFn,
+  setFileReadPromptFn,
+  setFileWritePromptFn,
+  setFsImplementationFn,
+  setGetAppStateFn,
+  setGetCharBudgetFn,
+  setGetCwdFn,
+  setGetHeadForDirFn,
+  setGetInlinePluginsFn,
+  setGetOriginalCwdFn,
+  setGetSessionIdFn,
+  setGetSettingsForSourceFn,
+  setGetSettings_DEPRECATEDFn,
+  setGitExeFn,
+  setIsSettingSourceEnabledFn,
+  setJsonParseFn,
+  setJsonStringifyFn,
+  setLoadAgentsDirFn,
+  setLogErrorFn,
+  setLogForDebuggingFn,
+  setLogForDiagnosticsNoPIIFn,
+  setLoadMarkdownConfigFn,
+  setPathExistsFn,
+  setPluginOperationsFn,
+  setRegisterCleanupFn,
+  setSafeResolvePathFn,
+  setSanitizePathFn,
+  setSkillToolPromptFn,
+  setWhichFn,
+  setWriteFileSyncAndFlushFn,
+  setAgentColorManagerFn,
+  setRgPathFn,
+  setSecureStorageReadFn,
+  setSecureStorageWriteFn,
+  setExpandMcpEnvFn,
+  setGetLspManagerFn,
+  setGetMcpTypesFn,
+  setParseMarkdownFrontmatterFn,
+  setWalkMarkdownFilesFn,
+} from '@claude-code/config/plugin/_deps'
+
+import {
+  getInlinePlugins,
+  getOriginalCwd,
+  getSessionId,
+} from '../bootstrap/state.js'
+import { isBinaryInstalled } from '../utils/binaryCheck.js'
+import { registerCleanup } from '../utils/cleanupRegistry.js'
+import { getCwd } from '../utils/cwd.js'
+import { logForDebugging } from '../utils/debug.js'
+import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
+import {
+  toError as _toError, // kept for clarity though _deps has own
+} from '../utils/errors.js'
+import {
+  execFileNoThrow,
+  execFileNoThrowWithCwd,
+} from '../utils/execFileNoThrow.js'
+import { pathExists, writeFileSyncAndFlush_DEPRECATED } from '../utils/file.js'
+import { getFsImplementation, safeResolvePath } from '../utils/fsOperations.js'
+import { gitExe } from '../utils/git.js'
+import { getHeadForDir } from '../utils/git/gitFilesystem.js'
+import { logError } from '../utils/log.js'
+import { clone, jsonParse, jsonStringify } from '../utils/slowOperations.js'
+import { which } from '../utils/which.js'
+import {
+  getSettingsForSource,
+  getSettings_DEPRECATED,
+} from '../utils/settings/settings.js'
+import { isSettingSourceEnabled } from '../utils/settings/constants.js'
+import {
+  buildPluginTelemetryFields,
+  classifyPluginCommandError,
+} from '../utils/telemetry/pluginTelemetry.js'
+
+let installed = false
+
+export function installPluginBindings(): void {
+  if (installed) return
+  installed = true
+
+  // --- logging
+  setLogForDebuggingFn((message, ...args) =>
+    logForDebugging(message, ...(args as any)),
+  )
+  setLogErrorFn(error => logError(error))
+  setLogForDiagnosticsNoPIIFn((level, event, data) =>
+    logForDiagnosticsNoPII(level, event, data),
+  )
+
+  // --- session / cwd
+  setGetSessionIdFn(() => getSessionId())
+  setGetOriginalCwdFn(() => getOriginalCwd())
+  setGetCwdFn(() => getCwd())
+  setGetInlinePluginsFn(() =>
+    getInlinePlugins() as Record<string, unknown> | undefined,
+  )
+
+  // --- settings
+  setGetSettings_DEPRECATEDFn(() => getSettings_DEPRECATED() as any)
+  setGetSettingsForSourceFn(source => getSettingsForSource(source as any) as any)
+  setIsSettingSourceEnabledFn(source => isSettingSourceEnabled(source as any))
+
+  // --- fs / path
+  setFsImplementationFn({
+    existsSync: p => getFsImplementation().existsSync(p),
+    mkdirSync: (p, o) => getFsImplementation().mkdirSync(p, o),
+    writeFileSync: (p, d) => getFsImplementation().writeFileSync(p, d),
+    readFileSync: (p, e) => getFsImplementation().readFileSync(p, e) as string,
+    readdirSync: p => getFsImplementation().readdirSync(p) as string[],
+    statSync: p => getFsImplementation().statSync(p) as any,
+    rmSync: (p, o) => getFsImplementation().rmSync(p, o as any),
+    renameSync: (o, n) => getFsImplementation().renameSync(o, n),
+    appendFileSync: (p, d) => getFsImplementation().appendFileSync(p, d),
+    cwd: () => getFsImplementation().cwd(),
+    realpathSync: p => getFsImplementation().realpathSync(p) as string,
+  })
+  setPathExistsFn(p => pathExists(p))
+  setSafeResolvePathFn((base, rel) => safeResolvePath(base, rel) ?? null)
+  setWriteFileSyncAndFlushFn((p, d) => writeFileSyncAndFlush_DEPRECATED(p, d))
+  setSanitizePathFn(p => p) // no-op; plugin files have own sanitizePath
+  setRegisterCleanupFn(fn => registerCleanup(fn))
+
+  // --- git
+  setGitExeFn(() => gitExe() as any)
+  setGetHeadForDirFn(dir => getHeadForDir(dir))
+
+  // --- subprocess
+  setExecFileNoThrowFn((cmd, args, options) =>
+    execFileNoThrow(cmd, args, options) as any,
+  )
+  setExecFileNoThrowWithCwdFn((cmd, args, cwd, options) =>
+    execFileNoThrowWithCwd(cmd, args, cwd, options) as any,
+  )
+  setWhichFn(cmd => which(cmd))
+  setCheckBinaryExistsFn(cmd => isBinaryInstalled(cmd))
+
+  // --- slow ops
+  setJsonStringifyFn(v => jsonStringify(v))
+  setJsonParseFn(t => jsonParse(t) as unknown)
+  setCloneFn(v => clone(v))
+
+  // --- telemetry
+  setBuildPluginTelemetryFieldsFn((...args) =>
+    buildPluginTelemetryFields(...(args as any)),
+  )
+  setClassifyPluginCommandErrorFn(error =>
+    classifyPluginCommandError(error) as any,
+  )
+
+  // --- lazy-resolved integrations (Ant-internal or heavy modules)
+  // These are `() => require(...).X` so they don't cause module eagerness.
+  setLoadAgentsDirFn(async (...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../tools/AgentTool/loadAgentsDir.js')
+    return mod.loadAgentsDir(...(args as any)) as Promise<unknown[]>
+  })
+  setAgentColorManagerFn(
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../tools/AgentTool/agentColorManager.js'),
+  )
+  setFileEditConstantsFn(
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../tools/FileEditTool/constants.js'),
+  )
+  setFileReadPromptFn(
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../tools/FileReadTool/prompt.js'),
+  )
+  setFileWritePromptFn(
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../tools/FileWriteTool/prompt.js'),
+  )
+  setSkillToolPromptFn(
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../tools/SkillTool/prompt.js'),
+  )
+  setGetCharBudgetFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../tools/SkillTool/prompt.js')
+    return mod.getCharBudget?.() ?? 10000
+  })
+
+  // --- app state
+  setGetAppStateFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../state/AppState.js') as {
+      getAppState: () => unknown
+    }
+    return mod.getAppState?.() ?? {}
+  })
+
+  // --- services/plugins/pluginOperations (cyclic with plugin utils)
+  setPluginOperationsFn(
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../services/plugins/pluginOperations.js'),
+  )
+
+  // --- misc helpers
+  setRgPathFn(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require('../utils/ripgrep.js')
+      return mod.rgPath?.() ?? null
+    } catch {
+      return null
+    }
+  })
+  setSecureStorageReadFn(async key => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require('../utils/secureStorage/index.js')
+      return mod.secureStorageRead ? await mod.secureStorageRead(key) : null
+    } catch {
+      return null
+    }
+  })
+  setSecureStorageWriteFn(async (key, value) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require('../utils/secureStorage/index.js')
+      if (mod.secureStorageWrite) await mod.secureStorageWrite(key, value)
+    } catch {
+      // ignore
+    }
+  })
+  setParseMarkdownFrontmatterFn(text => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../utils/frontmatterParser.js')
+    return mod.parseMarkdownFrontmatter
+      ? mod.parseMarkdownFrontmatter(text)
+      : { frontmatter: {}, body: '' }
+  })
+  setWalkMarkdownFilesFn(async dir => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../utils/markdownConfigLoader.js')
+    return mod.walkMarkdownFiles
+      ? ((await mod.walkMarkdownFiles(dir)) as string[])
+      : []
+  })
+  setLoadMarkdownConfigFn(path => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../utils/markdownConfigLoader.js')
+    return mod.loadMarkdownConfig ? mod.loadMarkdownConfig(path) : null
+  })
+  setGetLspManagerFn(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('../services/lsp/manager.js')
+    } catch {
+      return undefined
+    }
+  })
+  setGetMcpTypesFn(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('../services/mcp/types.js')
+    } catch {
+      return undefined
+    }
+  })
+  setExpandMcpEnvFn(env => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require('../services/mcp/envExpansion.js')
+      return mod.expandMcpEnv ? mod.expandMcpEnv(env) : env
+    } catch {
+      return env
+    }
+  })
+}
+
+installPluginBindings()
