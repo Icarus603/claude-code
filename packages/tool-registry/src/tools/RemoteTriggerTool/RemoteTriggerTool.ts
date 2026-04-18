@@ -1,17 +1,17 @@
 import axios from 'axios'
 import { z } from 'zod/v4'
-import { getOauthConfig } from '../../constants/oauth.js'
+import { getOauthConfig } from 'src/constants/oauth.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { getOrganizationUUID } from '../../services/oauth/client.js'
-import { isPolicyAllowed } from '../../services/policyLimits/index.js'
-import type { ToolUseContext } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
+import { getOrganizationUUID } from 'src/services/oauth/client.js'
+import { isPolicyAllowed } from 'src/services/policyLimits/index.js'
+import type { ToolUseContext } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
-} from '../../utils/auth.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/auth.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { DESCRIPTION, PROMPT, REMOTE_TRIGGER_TOOL_NAME } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'
 

@@ -67,7 +67,7 @@ const getCronTools = (): Tool[] => [
 
 const getRemoteTriggerTool = () =>
   feature('AGENT_TRIGGERS_REMOTE')
-    ? require('../../RemoteTriggerTool/RemoteTriggerTool.js').RemoteTriggerTool as Tool
+    ? require('@claude-code/tool-registry/tools/RemoteTriggerTool/RemoteTriggerTool.js').RemoteTriggerTool as Tool
     : null
 
 const getMonitorTool = () =>
