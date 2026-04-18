@@ -1011,3 +1011,25 @@ export const setGetSecureStorageFn = setGetSecureStorageFn_
 export const setUninstallPluginOpFn = setUninstallPluginOpFn_
 export const setUpdatePluginOpFn = setUpdatePluginOpFn_
 export const setWriteFileSync_DEPRECATEDFn = setWriteFileSync_DEPRECATEDFn_
+
+// ---------------------------------------------------------------------------
+// Round-4-extended additions (for services/plugins files): process helpers
+// ---------------------------------------------------------------------------
+
+let _writeToStdout: (text: string) => void = text => process.stdout.write(text)
+export function writeToStdout(text: string): void {
+  _writeToStdout(text)
+}
+export function setWriteToStdoutFn(fn: typeof _writeToStdout): void {
+  _writeToStdout = fn
+}
+
+let _gracefulShutdown: (code: number) => Promise<never> = async code => {
+  process.exit(code)
+}
+export function gracefulShutdown(code: number): Promise<never> {
+  return _gracefulShutdown(code)
+}
+export function setGracefulShutdownFn(fn: typeof _gracefulShutdown): void {
+  _gracefulShutdown = fn
+}

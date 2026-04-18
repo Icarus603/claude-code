@@ -99,6 +99,9 @@
     "./plugin/zipCacheAdapters": "./plugin/zipCacheAdapters.ts",
     "./plugin/parseMarketplaceInput": "./plugin/parseMarketplaceInput.ts",
     "./plugin/validatePlugin": "./plugin/validatePlugin.ts",
-    "./lazySchema": "./internal/lazySchema.ts"
+    "./lazySchema": "./internal/lazySchema.ts",
+    "./plugin/pluginOperations": "./plugin/pluginOperations.ts",
+    "./plugin/pluginCliCommands": "./plugin/pluginCliCommands.ts",
+    "./plugin/PluginInstallationManager": "./plugin/PluginInstallationManager.ts"
   }
 }
