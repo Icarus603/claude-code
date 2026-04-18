@@ -13,7 +13,7 @@ import {
 import {
   createDirectConnectSession,
   DirectConnectError,
-} from '../../../../src/server/createDirectConnectSession.js'
+} from '@claude-code/server/createDirectConnectSession.js'
 
 interface PendingConnect {
   url: string | undefined
@@ -162,13 +162,13 @@ export function registerMcpCommands(
           maxSessions: string
         }) => {
           const { randomBytes } = await import('crypto')
-          const { startServer } = await import('../../../../src/server/server.js')
-          const { SessionManager } = await import('../../../../src/server/sessionManager.js')
-          const { DangerousBackend } = await import('../../../../src/server/backends/dangerousBackend.js')
-          const { printBanner } = await import('../../../../src/server/serverBanner.js')
-          const { createServerLogger } = await import('../../../../src/server/serverLog.js')
+          const { startServer } = await import('@claude-code/server/server.js')
+          const { SessionManager } = await import('@claude-code/server/sessionManager.js')
+          const { DangerousBackend } = await import('@claude-code/server/backends/dangerousBackend.js')
+          const { printBanner } = await import('@claude-code/server/serverBanner.js')
+          const { createServerLogger } = await import('@claude-code/server/serverLog.js')
           const { writeServerLock, removeServerLock, probeRunningServer } = await import(
-            '../../../../src/server/lockfile.js'
+            '@claude-code/server/lockfile.js'
           )
 
           const existing = await probeRunningServer()
@@ -282,7 +282,7 @@ export function registerMcpCommands(
             outputFormat: string
           },
         ) => {
-          const { parseConnectUrl } = await import('../../../../src/server/parseConnectUrl.js')
+          const { parseConnectUrl } = await import('@claude-code/server/parseConnectUrl.js')
           const { serverUrl, authToken } = parseConnectUrl(ccUrl)
 
           let connectConfig
@@ -305,7 +305,7 @@ export function registerMcpCommands(
             process.exit(1)
           }
 
-          const { runConnectHeadless } = await import('../../../../src/server/connectHeadless.js')
+          const { runConnectHeadless } = await import('@claude-code/server/connectHeadless.js')
 
           const prompt = typeof opts.print === 'string' ? opts.print : ''
           const interactive = opts.print === true

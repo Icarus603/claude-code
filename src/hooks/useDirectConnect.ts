@@ -12,7 +12,7 @@ import {
 import {
   type DirectConnectConfig,
   DirectConnectSessionManager,
-} from '../server/directConnectManager.js'
+} from '@claude-code/server/directConnectManager.js'
 import type { Tool } from '../Tool.js'
 import { findToolByName } from '../Tool.js'
 import type { Message as MessageType } from '../types/message.js'

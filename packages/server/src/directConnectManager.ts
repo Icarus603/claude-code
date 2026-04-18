@@ -1,14 +1,14 @@
 /* eslint-disable eslint-plugin-n/no-unsupported-features/node-builtins */
 
-import type { SDKMessage } from '../entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
 import type {
   SDKControlPermissionRequest,
   StdoutMessage,
-} from '../entrypoints/sdk/controlTypes.js'
-import type { RemotePermissionResponse } from '../remote/RemoteSessionManager.js'
-import { logForDebugging } from '../utils/debug.js'
-import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
-import type { RemoteMessageContent } from '../utils/teleport/api.js'
+} from 'src/entrypoints/sdk/controlTypes.js'
+import type { RemotePermissionResponse } from 'src/remote/RemoteSessionManager.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import type { RemoteMessageContent } from 'src/utils/teleport/api.js'
 
 export type DirectConnectConfig = {
   serverUrl: string
