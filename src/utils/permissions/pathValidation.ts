@@ -10,7 +10,7 @@ import {
 } from '../fsOperations.js'
 import { containsPathTraversal } from '../path.js'
 import { SandboxManager } from '../sandbox/sandbox-adapter.js'
-import { containsVulnerableUncPath } from '../shell/readOnlyCommandValidation.js'
+import { containsVulnerableUncPath } from '@claude-code/shell/legacy/readOnlyCommandValidation.js'
 import {
   checkEditableInternalPath,
   checkPathSafetyForAutoEdit,

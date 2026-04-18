@@ -11,7 +11,7 @@
 import { HOOK_EVENTS, type HookEvent } from 'src/entrypoints/agentSdkTypes.js'
 import { z } from 'zod/v4'
 import { lazySchema } from '../utils/lazySchema.js'
-import { SHELL_TYPES } from '../utils/shell/shellProvider.js'
+import { SHELL_TYPES } from '@claude-code/shell/legacy/shellProvider.js'
 
 // Shared schema for the `if` condition field.
 // Uses permission rule syntax (e.g., "Bash(git *)", "Read(*.ts)") to filter hooks

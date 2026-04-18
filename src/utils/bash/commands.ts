@@ -5,7 +5,7 @@ import {
   type CommandSubcommandPrefixResult,
   createCommandPrefixExtractor,
   createSubcommandPrefixExtractor,
-} from '../shell/prefix.js'
+} from '@claude-code/shell/legacy/prefix.js'
 import { extractHeredocs, restoreHeredocs } from './heredoc.js'
 import { quote, tryParseShellCommand } from './shellQuote.js'
 

@@ -18,9 +18,9 @@ import {
 import { subprocessEnv } from './subprocessEnv.js'
 import { getPlatform } from './platform.js'
 import { findGitBashPath, windowsPathToPosixPath } from './windowsPaths.js'
-import { getCachedPowerShellPath } from './shell/powershellDetection.js'
-import { DEFAULT_HOOK_SHELL } from './shell/shellProvider.js'
-import { buildPowerShellArgs } from './shell/powershellProvider.js'
+import { getCachedPowerShellPath } from '@claude-code/shell/legacy/powershellDetection.js'
+import { DEFAULT_HOOK_SHELL } from '@claude-code/shell/legacy/shellProvider.js'
+import { buildPowerShellArgs } from '@claude-code/shell/legacy/powershellProvider.js'
 import {
   loadPluginOptions,
   substituteUserConfigVariables,

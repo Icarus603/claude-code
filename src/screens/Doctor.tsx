@@ -50,7 +50,7 @@ import { getInitialSettings } from '../utils/settings/settings.js'
 import {
   BASH_MAX_OUTPUT_DEFAULT,
   BASH_MAX_OUTPUT_UPPER_LIMIT,
-} from '../utils/shell/outputLimits.js'
+} from '@claude-code/shell/legacy/outputLimits.js'
 import {
   TASK_MAX_OUTPUT_DEFAULT,
   TASK_MAX_OUTPUT_UPPER_LIMIT,

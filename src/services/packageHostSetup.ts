@@ -72,7 +72,7 @@ export function installPackageHostBindings(
         getPlansDirectory: () => { try { return require('../utils/plans.js').getPlansDirectory() } catch { return '' } },
         getPlatform: () => { try { return require('../utils/platform.js').getPlatform() } catch { return process.platform === 'darwin' ? 'macos' : 'linux' } },
         getProjectDir: (...a: unknown[]) => { try { return require('@claude-code/storage/sessionStorage.js').getProjectDir(...a) } catch { return process.cwd() } },
-        containsVulnerableUncPath: (p: string) => { try { return require('../utils/shell/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
+        containsVulnerableUncPath: (p: string) => { try { return require('@claude-code/shell/legacy/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
         getToolResultsDir: () => { try { return require('../utils/toolResultStorage.js').getToolResultsDir() } catch { return '' } },
         // permissions.ts bindings
         shouldUseSandbox: () => { try { return require('@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js').shouldUseSandbox() } catch { return false } },

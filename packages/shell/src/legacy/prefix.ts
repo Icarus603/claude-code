@@ -8,17 +8,17 @@
  */
 
 import chalk from 'chalk'
-import type { QuerySource } from '../../constants/querySource.js'
+import type { QuerySource } from 'src/constants/querySource.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { queryHaiku } from '../../services/api/claude.js'
-import { startsWithApiErrorPrefix } from '../../services/api/errors.js'
-import { memoizeWithLRU } from '../memoize.js'
-import { jsonStringify } from '../slowOperations.js'
-import { asSystemPrompt } from '../systemPromptType.js'
+import { queryHaiku } from 'src/services/api/claude.js'
+import { startsWithApiErrorPrefix } from 'src/services/api/errors.js'
+import { memoizeWithLRU } from 'src/utils/memoize.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
+import { asSystemPrompt } from 'src/utils/systemPromptType.js'
 
 /**
  * Shell executables that must never be accepted as bare prefixes.

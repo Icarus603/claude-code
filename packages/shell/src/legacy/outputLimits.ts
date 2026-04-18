@@ -1,4 +1,4 @@
-import { validateBoundedIntEnvVar } from '../envValidation.js'
+import { validateBoundedIntEnvVar } from '../_deps.js'
 
 export const BASH_MAX_OUTPUT_UPPER_LIMIT = 150_000
 export const BASH_MAX_OUTPUT_DEFAULT = 30_000

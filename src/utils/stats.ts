@@ -9,7 +9,7 @@ import { getFsImplementation } from './fsOperations.js'
 import { readJSONLFile } from './json.js'
 import { SYNTHETIC_MODEL } from './messages.js'
 import { getProjectsDir, isTranscriptMessage } from '@claude-code/storage/sessionStorage.js'
-import { SHELL_TOOL_NAMES } from './shell/shellToolUtils.js'
+import { SHELL_TOOL_NAMES } from '@claude-code/shell/legacy/shellToolUtils.js'
 import { jsonParse } from './slowOperations.js'
 import {
   getTodayDateString,

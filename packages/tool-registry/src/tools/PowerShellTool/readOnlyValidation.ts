@@ -19,14 +19,14 @@ import {
   isNullRedirectionTarget,
   isPowerShellParameter,
 } from 'src/utils/powershell/parser.js'
-import type { ExternalCommandConfig } from 'src/utils/shell/readOnlyCommandValidation.js'
+import type { ExternalCommandConfig } from '@claude-code/shell/legacy/readOnlyCommandValidation.js'
 import {
   DOCKER_READ_ONLY_COMMANDS,
   EXTERNAL_READONLY_COMMANDS,
   GH_READ_ONLY_COMMANDS,
   GIT_READ_ONLY_COMMANDS,
   validateFlags,
-} from 'src/utils/shell/readOnlyCommandValidation.js'
+} from '@claude-code/shell/legacy/readOnlyCommandValidation.js'
 import { COMMON_PARAMETERS } from './commonParameters.js'
 
 const DOTNET_READ_ONLY_FLAGS = new Set([
