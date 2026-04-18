@@ -13,18 +13,18 @@
 
 import type { ClientRequest, IncomingMessage } from 'http'
 import WebSocket from 'ws'
-import { getOauthConfig } from '../constants/oauth.js'
+import { getOauthConfig } from 'src/constants/oauth.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
   isAnthropicAuthEnabled,
-} from '../utils/auth.js'
-import { logForDebugging } from '../utils/debug.js'
-import { getUserAgent } from '../utils/http.js'
-import { logError } from '../utils/log.js'
-import { getWebSocketTLSOptions } from '../utils/mtls.js'
-import { getWebSocketProxyAgent, getWebSocketProxyUrl } from '../utils/proxy.js'
-import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
+} from 'src/utils/auth.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { getUserAgent } from 'src/utils/http.js'
+import { logError } from 'src/utils/log.js'
+import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
+import { getWebSocketProxyAgent, getWebSocketProxyUrl } from 'src/utils/proxy.js'
+import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
 
 const KEEPALIVE_MSG = '{"type":"KeepAlive"}'
 const CLOSE_STREAM_MSG = '{"type":"CloseStream"}'

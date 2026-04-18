@@ -5,8 +5,8 @@
 // names that would otherwise be misheard.
 
 import { basename } from 'path'
-import { getProjectRoot } from '../bootstrap/state.js'
-import { getBranch } from '../utils/git.js'
+import { getProjectRoot } from 'src/bootstrap/state.js'
+import { getBranch } from 'src/utils/git.js'
 
 // ─── Global keyterms ────────────────────────────────────────────────
 

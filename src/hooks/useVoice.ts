@@ -13,13 +13,13 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getVoiceKeyterms } from '../services/voiceKeyterms.js'
+import { getVoiceKeyterms } from '@claude-code/voice/voiceKeyterms.js'
 import {
   connectVoiceStream,
   type FinalizeSource,
   isVoiceStreamAvailable,
   type VoiceStreamConnection,
-} from '../services/voiceStreamSTT.js'
+} from '@claude-code/voice/voiceStreamSTT.js'
 import { logForDebugging } from '../utils/debug.js'
 import { toError } from '../utils/errors.js'
 import { getSystemLocaleLanguage } from '../utils/intl.js'
@@ -137,7 +137,7 @@ export function normalizeLanguageForSTT(language: string | undefined): {
 // audio-capture-napi dependency) until voice input is actually activated.
 // On macOS, loading the native audio module can trigger a TCC microphone
 // permission prompt — we must avoid that until voice input is actually enabled.
-type VoiceModule = typeof import('../services/voice.js')
+type VoiceModule = typeof import('@claude-code/voice/voice.js')
 let voiceModule: VoiceModule | null = null
 
 type VoiceState = 'idle' | 'recording' | 'processing'
@@ -529,7 +529,7 @@ export function useVoice({
   // dlopen still blocks. The first voice keypress pays the dlopen cost instead.
   useEffect(() => {
     if (enabled && !voiceModule) {
-      void import('../services/voice.js').then(mod => {
+      void import('@claude-code/voice/voice.js').then(mod => {
         voiceModule = mod
       })
     }
@@ -610,7 +610,7 @@ export function useVoice({
       } else {
         // Voice module is loading (async import resolves from cache as a
         // microtask). Wait for it before starting the recording session.
-        void import('../services/voice.js').then(mod => {
+        void import('@claude-code/voice/voice.js').then(mod => {
           voiceModule = mod
           beginFocusRecording()
         })
