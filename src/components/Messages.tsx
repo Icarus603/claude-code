@@ -109,7 +109,7 @@ const BRIEF_TOOL_NAME: string | null =
     : null
 const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS')
   ? (
-      require('../tools/SendUserFileTool/prompt.js') as typeof import('../tools/SendUserFileTool/prompt.js')
+      require('@claude-code/tool-registry/tools/SendUserFileTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/SendUserFileTool/prompt.js')
     ).SEND_USER_FILE_TOOL_NAME
   : null
 

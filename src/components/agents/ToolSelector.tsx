@@ -18,7 +18,7 @@ import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpRes
 import { TaskOutputTool } from '@claude-code/tool-registry/tools/TaskOutputTool/TaskOutputTool.js'
 import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
 import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/TodoWriteTool.js'
-import { TungstenTool } from 'src/tools/TungstenTool/TungstenTool.js'
+import { TungstenTool } from '@claude-code/tool-registry/tools/TungstenTool/TungstenTool.js'
 import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js'
 import { WebSearchTool } from '@claude-code/tool-registry/tools/WebSearchTool/WebSearchTool.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
