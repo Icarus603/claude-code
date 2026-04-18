@@ -64,6 +64,9 @@ export function installRuntimeSkeletonBindings(): void {
   // because app-host itself depends on local-observability.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('./installLocalObservabilityBindings.js')
+  // config/env (Wave-1 leaf) — wire env setters used by paths.ts / dynamic.ts.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./installConfigEnvBindings.js')
   runtimeSkeletonBindingsInstalled = true
 }
 

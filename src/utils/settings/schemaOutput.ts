@@ -1,8 +1,4 @@
-import { toJSONSchema } from 'zod/v4'
-import { jsonStringify } from '../slowOperations.js'
-import { SettingsSchema } from './types.js'
-
-export function generateSettingsJSONSchema(): string {
-  const jsonSchema = toJSONSchema(SettingsSchema(), { unrepresentable: 'any' })
-  return jsonStringify(jsonSchema, null, 2)
-}
+/**
+ * V7 §10.3 facade — moved to `@claude-code/config/settings/schemaOutput`.
+ */
+export * from '@claude-code/config/settings/schemaOutput'

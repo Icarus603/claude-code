@@ -386,11 +386,13 @@ export const SettingsSchema = lazySchema(() =>
         .optional()
         .describe('Tool usage permissions configuration'),
       modelType: z
-        .enum(['anthropic', 'openai'])
+        .enum(['anthropic', 'openai', 'gemini'])
         .optional()
         .describe(
-          'API provider type. "anthropic" uses the Anthropic API (default), "openai" uses the OpenAI Chat Completions API (/v1/chat/completions). ' +
-            'When set to "openai", configure OPENAI_API_KEY, OPENAI_BASE_URL, and OPENAI_MODEL in env.',
+          'API provider type. "anthropic" uses the Anthropic API (default), ' +
+            '"openai" uses the OpenAI Chat Completions API (/v1/chat/completions), ' +
+            '"gemini" uses the Google Gemini API. Configure provider-specific ' +
+            'env vars (OPENAI_*/GEMINI_*) accordingly.',
         ),
       model: z
         .string()
