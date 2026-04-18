@@ -10,6 +10,7 @@
     "./claudeLegacy": "./src/claudeLegacy.ts",
     "./providerHostSetup": "./src/providerHostSetup.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./oauth/*.js": "./src/oauth/*.ts"
   }
 }

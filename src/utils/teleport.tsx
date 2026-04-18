@@ -24,7 +24,7 @@ import {
   getSessionLogsViaOAuth,
   getTeleportEvents,
 } from '../services/api/sessionIngress.js'
-import { getOrganizationUUID } from '../services/oauth/client.js'
+import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
 import { AppStateProvider } from '../state/AppState.js'
 import type { Message, SystemMessage } from '../types/message.js'
 import type { PermissionMode } from '../types/permissions.js'

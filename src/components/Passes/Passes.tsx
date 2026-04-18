@@ -16,7 +16,7 @@ import {
 import type {
   ReferralRedemptionsResponse,
   ReferrerRewardInfo,
-} from '../../services/oauth/types.js'
+} from '@claude-code/provider/oauth/types.js'
 import { count } from '../../utils/array.js'
 import { logError } from '../../utils/log.js'
 import { Pane } from '@anthropic/ink'

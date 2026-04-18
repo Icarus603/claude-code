@@ -16,10 +16,10 @@ import {
   refreshOAuthToken,
   shouldUseClaudeAIAuth,
   storeOAuthAccountInfo,
-} from '../../services/oauth/client.js'
-import { getOauthProfileFromOauthToken } from '../../services/oauth/getOauthProfile.js'
-import { OAuthService } from '../../services/oauth/index.js'
-import type { OAuthTokens } from '../../services/oauth/types.js'
+} from '@claude-code/provider/oauth/client.js'
+import { getOauthProfileFromOauthToken } from '@claude-code/provider/oauth/getOauthProfile.js'
+import { OAuthService } from '@claude-code/provider/oauth/index.js'
+import type { OAuthTokens } from '@claude-code/provider/oauth/types.js'
 import {
   clearOAuthTokenCache,
   getAnthropicApiKeyWithSource,
