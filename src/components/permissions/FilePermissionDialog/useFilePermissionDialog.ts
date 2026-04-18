@@ -5,7 +5,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { sanitizeToolNameForAnalytics } from '../../../services/eventMetadata.js'
+import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import type { CompletionType } from '../../../utils/unaryLogging.js'
 import type { ToolUseConfirm } from '../PermissionRequest.js'

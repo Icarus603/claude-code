@@ -107,11 +107,11 @@ import {
 } from 'src/services/api/errors.js'
 import { notifyCompaction } from 'src/services/api/promptCacheBreakDetection.js'
 import { getRetryDelay } from 'src/services/api/withRetry.js'
-import { logPermissionContextForAnts } from 'src/services/internalLogging.js'
+import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
 import {
   roughTokenCountEstimation,
   roughTokenCountEstimationForMessages,
-} from 'src/services/tokenEstimation.js'
+} from '@claude-code/agent/tokenEstimation.js'
 import { groupMessagesByApiRound } from '@claude-code/agent/compaction'
 import {
   getCompactPrompt,

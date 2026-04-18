@@ -8,7 +8,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { sanitizeToolNameForAnalytics } from '../../../services/eventMetadata.js'
+import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import { useAppState } from '../../../state/AppState.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import {

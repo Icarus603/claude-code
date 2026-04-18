@@ -10,7 +10,7 @@ import {
   buildAgentHostExtraBindings,
   buildMemoryHostExtraBindings,
   buildPermissionHostExtraBindings,
-} from '../services/agentHostBindings.js'
+} from '@claude-code/agent/agentHostBindings.js'
 
 let runtimeSkeletonBindingsInstalled = false
 

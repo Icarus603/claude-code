@@ -90,7 +90,7 @@ export function installPackageHostBindings(
         getTotalCacheCreationInputTokens: () => { try { return require('../bootstrap/state.js').getTotalCacheCreationInputTokens() } catch { return 0 } },
         getTotalCacheReadInputTokens: () => { try { return require('../bootstrap/state.js').getTotalCacheReadInputTokens() } catch { return 0 } },
         logEvent: (event: string, metadata?: Record<string, unknown>) => { try { (require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')).logEvent(event, metadata) } catch {} },
-        sanitizeToolNameForAnalytics: (name: string) => { try { return require('../services/eventMetadata.js').sanitizeToolNameForAnalytics(name) } catch { return name } },
+        sanitizeToolNameForAnalytics: (name: string) => { try { return require('@claude-code/agent/eventMetadata.js').sanitizeToolNameForAnalytics(name) } catch { return name } },
         clearClassifierChecking: () => { try { require('../utils/classifierApprovals.js').clearClassifierChecking() } catch {} },
         setClassifierChecking: (v: boolean) => { try { require('../utils/classifierApprovals.js').setClassifierChecking(v) } catch {} },
         isInProtectedNamespace: () => { try { return require('../utils/envUtils.js').isInProtectedNamespace() } catch { return false } },

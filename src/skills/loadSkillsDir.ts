@@ -17,7 +17,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { roughTokenCountEstimation } from '../services/tokenEstimation.js'
+import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
 import type { Command, PromptCommand } from '../types/command.js'
 import {
   parseArgumentNames,

@@ -9,7 +9,7 @@ import {
   setNeedsPlanModeExitAttachment,
 } from 'src/bootstrap/state.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 'src/services/eventMetadata.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
 import {
   buildTool,
   type Tool,

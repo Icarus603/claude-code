@@ -3,7 +3,7 @@ import type {
   ContentBlock,
   ContentBlockParam,
 } from '@anthropic-ai/sdk/resources/index.mjs'
-import { roughTokenCountEstimation as countTokens } from '../services/tokenEstimation.js'
+import { roughTokenCountEstimation as countTokens } from '@claude-code/agent/tokenEstimation.js'
 import type {
   AssistantMessage,
   Message,
