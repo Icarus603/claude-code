@@ -4,11 +4,11 @@ import {
   REJECT_MESSAGE,
   withMemoryCorrectionHint,
 } from 'src/utils/messages.js'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import { findToolByName, type Tools, type ToolUseContext } from '../../Tool.js'
+import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import { findToolByName, type Tools, type ToolUseContext } from 'src/Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import type { AssistantMessage, Message } from '../../types/message.js'
-import { createChildAbortController } from '../../utils/abortController.js'
+import type { AssistantMessage, Message } from 'src/types/message.js'
+import { createChildAbortController } from 'src/utils/abortController.js'
 import { runToolUse } from './toolExecution.js'
 
 type MessageUpdate = {

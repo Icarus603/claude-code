@@ -474,7 +474,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     createStreamingToolExecutor: (...args: unknown[]) => {
       try {
-        const { StreamingToolExecutor } = require('src/services/services/tools/StreamingToolExecutor.js')
+        const { StreamingToolExecutor } = require('@claude-code/tool-registry/services/StreamingToolExecutor.js')
         return new StreamingToolExecutor(...args)
       } catch {
         return null
@@ -482,7 +482,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     runTools: (...args: unknown[]) => {
       try {
-        return require('src/services/services/tools/toolOrchestration.js').runTools(...args)
+        return require('@claude-code/tool-registry/services/toolOrchestration.js').runTools(...args)
       } catch {
         return (async function* () {})()
       }
