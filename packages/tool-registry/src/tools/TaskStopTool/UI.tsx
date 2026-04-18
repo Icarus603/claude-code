@@ -1,7 +1,7 @@
 import React from 'react'
-import { MessageResponse } from '../../components/MessageResponse.js'
+import { MessageResponse } from 'src/components/MessageResponse.js'
 import { Text, stringWidth } from '@anthropic/ink'
-import { truncateToWidthNoEllipsis } from '../../utils/format.js'
+import { truncateToWidthNoEllipsis } from 'src/utils/format.js'
 import type { Output } from './TaskStopTool.js'
 
 export function renderToolUseMessage(): React.ReactNode {
