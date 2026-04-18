@@ -214,7 +214,7 @@ export function Config({
   const showDefaultViewPicker =
     feature('KAIROS') || feature('KAIROS_BRIEF')
       ? (
-          require('../../tools/BriefTool/BriefTool.js') as typeof import('../../tools/BriefTool/BriefTool.js')
+          require('@claude-code/tool-registry/tools/BriefTool/BriefTool.js') as typeof import('@claude-code/tool-registry/tools/BriefTool/BriefTool.js')
         ).isBriefEntitled()
       : false
   /* eslint-enable @typescript-eslint/no-require-imports */

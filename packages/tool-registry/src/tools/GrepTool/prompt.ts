@@ -1,5 +1,5 @@
-import { AGENT_TOOL_NAME } from '../AgentTool/constants.js'
-import { BASH_TOOL_NAME } from '../BashTool/toolName.js'
+import { AGENT_TOOL_NAME } from 'src/tools/AgentTool/constants.js'
+import { BASH_TOOL_NAME } from 'src/tools/BashTool/toolName.js'
 
 export const GREP_TOOL_NAME = 'Grep'
 

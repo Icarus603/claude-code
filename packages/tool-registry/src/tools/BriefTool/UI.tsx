@@ -1,12 +1,12 @@
 import figures from 'figures'
 import React from 'react'
-import { Markdown } from '../../components/Markdown.js'
-import { BLACK_CIRCLE } from '../../constants/figures.js'
+import { Markdown } from 'src/components/Markdown.js'
+import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
-import type { ProgressMessage } from '../../types/message.js'
-import { getDisplayPath } from '../../utils/file.js'
-import { formatFileSize } from '../../utils/format.js'
-import { formatBriefTimestamp } from '../../utils/formatBriefTimestamp.js'
+import type { ProgressMessage } from 'src/types/message.js'
+import { getDisplayPath } from 'src/utils/file.js'
+import { formatFileSize } from 'src/utils/format.js'
+import { formatBriefTimestamp } from 'src/utils/formatBriefTimestamp.js'
 import type { Output } from './BriefTool.js'
 
 export function renderToolUseMessage(): React.ReactNode {
