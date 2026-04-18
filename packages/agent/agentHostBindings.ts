@@ -272,21 +272,21 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     recordTranscript: (...a: unknown[]) => {
       try {
-        return require('src/utils/sessionStorage.js').recordTranscript(...a)
+        return require('@claude-code/storage/sessionStorage.js').recordTranscript(...a)
       } catch {
         return Promise.resolve(null)
       }
     },
     flushSessionStorage: () => {
       try {
-        return require('src/utils/sessionStorage.js').flushSessionStorage()
+        return require('@claude-code/storage/sessionStorage.js').flushSessionStorage()
       } catch {
         return Promise.resolve()
       }
     },
     recordContentReplacement: (...a: unknown[]) => {
       try {
-        return require('src/utils/sessionStorage.js').recordContentReplacement(...a)
+        return require('@claude-code/storage/sessionStorage.js').recordContentReplacement(...a)
       } catch {
         return Promise.resolve()
       }
@@ -608,7 +608,7 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     getPlanSlug: () => { try { return require('src/utils/plans.js').getPlanSlug() } catch { return undefined } },
     getPlansDirectory: () => { try { return require('src/utils/plans.js').getPlansDirectory() } catch { return '' } },
     getPlatform: () => { try { return require('src/utils/platform.js').getPlatform() } catch { return process.platform === 'darwin' ? 'macos' : 'linux' } },
-    getProjectDir: (...a: unknown[]) => { try { return require('src/utils/sessionStorage.js').getProjectDir(...a) } catch { return process.cwd() } },
+    getProjectDir: (...a: unknown[]) => { try { return require('@claude-code/storage/sessionStorage.js').getProjectDir(...a) } catch { return process.cwd() } },
     containsVulnerableUncPath: (p: string) => { try { return require('src/utils/shell/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
     getToolResultsDir: () => { try { return require('src/utils/toolResultStorage.js').getToolResultsDir() } catch { return '' } },
     shouldUseSandbox: () => { try { return require('@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js').shouldUseSandbox() } catch { return false } },

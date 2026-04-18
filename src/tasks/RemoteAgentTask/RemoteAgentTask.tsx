@@ -38,7 +38,7 @@ import {
   listRemoteAgentMetadata,
   type RemoteAgentMetadata,
   writeRemoteAgentMetadata,
-} from '../../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import {
   appendTaskOutput,

@@ -21,7 +21,7 @@ import { Spinner } from './Spinner.js'
 function recordWorktreeExit(): void {
   /* eslint-disable @typescript-eslint/no-require-imports */
   ;(
-    require('../utils/sessionStorage.js') as typeof import('../utils/sessionStorage.js')
+    require('@claude-code/storage/sessionStorage.js') as typeof import('@claude-code/storage/sessionStorage.js')
   ).saveWorktreeState(null)
   /* eslint-enable @typescript-eslint/no-require-imports */
 }

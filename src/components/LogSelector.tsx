@@ -19,7 +19,7 @@ import {
   getSessionIdFromLog,
   isCustomTitleEnabled,
   saveCustomTitle,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { getTheme } from '../utils/theme.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Select } from './CustomSelect/select.js'

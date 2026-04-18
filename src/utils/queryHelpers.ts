@@ -34,7 +34,7 @@ import type {
   outputSchema as permissionToolOutputSchema,
 } from '@claude-code/permission/PermissionPromptToolResultSchema'
 import type { ProcessUserInputContext } from './processUserInput/processUserInput.js'
-import { recordTranscript } from './sessionStorage.js'
+import { recordTranscript } from '@claude-code/storage/sessionStorage.js'
 
 export type PermissionPromptTool = Tool<
   ReturnType<typeof permissionToolInputSchema>,

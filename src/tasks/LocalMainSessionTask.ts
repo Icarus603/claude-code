@@ -42,7 +42,7 @@ import { emitTaskTerminatedSdk } from '../utils/sdkEventQueue.js'
 import {
   getAgentTranscriptPath,
   recordSidechainTranscript,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import {
   evictTaskOutput,
   getTaskOutputPath,

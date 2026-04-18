@@ -16,7 +16,7 @@ import { updateHooksConfigSnapshot } from 'src/utils/hooks/hooksConfigSnapshot.j
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { getPlansDirectory } from 'src/utils/plans.js'
 import { setCwd } from 'src/utils/Shell.js'
-import { saveWorktreeState } from 'src/utils/sessionStorage.js'
+import { saveWorktreeState } from '@claude-code/storage/sessionStorage.js'
 import {
   cleanupWorktree,
   getCurrentWorktreeSession,

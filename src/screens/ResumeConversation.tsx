@@ -48,7 +48,7 @@ import {
   resetSessionFilePointer,
   restoreSessionMetadata,
   type SessionLogResult,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import type { ThinkingConfig } from '../utils/thinking.js'
 import type { ContentReplacementRecord } from '../utils/toolResultStorage.js'
 import { REPL } from './REPL.js'
@@ -287,7 +287,7 @@ export function ResumeConversation({
 
       if (feature('COORDINATOR_MODE')) {
         /* eslint-disable @typescript-eslint/no-require-imports */
-        const { saveMode } = require('../utils/sessionStorage.js')
+        const { saveMode } = require('@claude-code/storage/sessionStorage.js')
         const { isCoordinatorMode } =
           require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js')
         /* eslint-enable @typescript-eslint/no-require-imports */

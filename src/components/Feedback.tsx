@@ -34,7 +34,7 @@ import {
   getTranscriptPath,
   loadAllSubagentTranscriptsFromDisk,
   MAX_TRANSCRIPT_READ_BYTES,
-} from '../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { jsonStringify } from '../utils/slowOperations.js'
 import { asSystemPrompt } from '../utils/systemPromptType.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'

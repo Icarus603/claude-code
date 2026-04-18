@@ -14,7 +14,7 @@ import {
   getCurrentSessionTag,
   getTranscriptPath,
   saveTag,
-} from '../../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 
 function ConfirmRemoveTag({
   tagName,

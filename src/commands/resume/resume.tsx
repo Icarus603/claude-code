@@ -26,7 +26,7 @@ import {
   loadFullLog,
   loadSameRepoMessageLogs,
   searchSessionsByCustomTitle,
-} from '../../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { validateUuid } from '../../utils/uuid.js'
 
 type ResumeResult =

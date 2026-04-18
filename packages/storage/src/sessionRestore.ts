@@ -51,7 +51,7 @@ import {
   restoreSessionMetadata,
   saveMode,
   saveWorktreeState,
-} from 'src/utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { isTodoV2Enabled } from 'src/utils/tasks.js'
 import type { TodoList } from 'src/utils/todo/types.js'
 import { TodoListSchema } from 'src/utils/todo/types.js'

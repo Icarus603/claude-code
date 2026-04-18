@@ -79,7 +79,7 @@ import {
   getTranscriptPath,
   saveAgentName,
   saveCustomTitle,
-} from '../../../utils/sessionStorage.js'
+} from '@claude-code/storage/sessionStorage.js'
 import { getSettings_DEPRECATED } from '../../../utils/settings/settings.js'
 import { type OptionWithDescription, Select } from '../../CustomSelect/index.js'
 import { Markdown } from '../../Markdown.js'

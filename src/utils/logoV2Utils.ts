@@ -11,7 +11,7 @@ import {
 } from './format.js'
 import { getStoredChangelogFromMemory, parseChangelog } from './releaseNotes.js'
 import { gt } from './semver.js'
-import { loadMessageLogs } from './sessionStorage.js'
+import { loadMessageLogs } from '@claude-code/storage/sessionStorage.js'
 import { getInitialSettings } from './settings/settings.js'
 
 // Layout constants

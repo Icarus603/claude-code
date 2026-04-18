@@ -42,7 +42,7 @@ import {
   isSyntheticMessage,
 } from 'src/utils/messages.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { getCurrentSessionTitle } from 'src/utils/sessionStorage.js'
+import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {
   extractConversationText,
   generateSessionTitle,
