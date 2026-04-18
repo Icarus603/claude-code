@@ -309,7 +309,7 @@ export function installPluginBindings(): void {
   // --- builtin plugins (setter-based since originals are const arrays)
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../plugins/builtinPlugins.js')
+    const mod = require('@claude-code/config/plugin/builtin')
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const {
       setGetBuiltinPluginsFn: _sgb,
