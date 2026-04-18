@@ -225,7 +225,7 @@ import {
   getInitJsonSchema,
   setSdkAgentProgressSummariesEnabled,
 } from '../../../../../../src/bootstrap/state.js'
-import { createSyntheticOutputTool } from '../../../../../../src/tools/SyntheticOutputTool/SyntheticOutputTool.js'
+import { createSyntheticOutputTool } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { parseSessionIdentifier } from '../../../../../../src/utils/sessionUrl.js'
 import {
   hydrateRemoteSession,

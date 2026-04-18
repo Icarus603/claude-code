@@ -99,7 +99,7 @@ import type { ToolInputJSONSchema } from '../../../../src/Tool.js'
 import {
   createSyntheticOutputTool,
   isSyntheticOutputToolEnabled,
-} from '../../../../src/tools/SyntheticOutputTool/SyntheticOutputTool.js'
+} from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import {
   canUserConfigureAdvisor,
   getInitialAdvisorSetting,
