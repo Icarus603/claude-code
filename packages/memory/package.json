@@ -23,6 +23,15 @@
     "./consolidationPrompt": "./src/consolidationPrompt.ts",
     "./teamMemorySync": "./src/teamMemorySync.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./memorySourceTypes": "./src/memorySourceTypes.ts",
+    "./teamMemSecretGuard": "./src/teamMemSecretGuard.ts",
+    "./teamMemSecretScanner": "./src/teamMemSecretScanner.ts",
+    "./teamMemSyncTypes": "./src/teamMemSyncTypes.ts",
+    "./teamMemoryOps": "./src/teamMemoryOps.ts",
+    "./extractMemoriesPrompts": "./src/extractMemoriesPrompts.ts",
+    "./sessionMemoryUtils": "./src/sessionMemoryUtils.ts",
+    "./sessionMemoryPrompts": "./src/sessionMemoryPrompts.ts",
+    "./teamMemorySyncWatcher": "./src/teamMemorySyncWatcher.ts"
   }
 }
