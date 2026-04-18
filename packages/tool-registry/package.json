@@ -19,6 +19,11 @@
     "./tools/TeamCreateTool/UI.js": "./src/tools/TeamCreateTool/UI.tsx",
     "./tools/ReadMcpResourceTool/UI.js": "./src/tools/ReadMcpResourceTool/UI.tsx",
     "./tools/ListMcpResourcesTool/UI.js": "./src/tools/ListMcpResourcesTool/UI.tsx",
+    "./tools/EnterWorktreeTool/UI.js": "./src/tools/EnterWorktreeTool/UI.tsx",
+    "./tools/ExitWorktreeTool/UI.js": "./src/tools/ExitWorktreeTool/UI.tsx",
+    "./tools/GlobTool/UI.js": "./src/tools/GlobTool/UI.tsx",
+    "./tools/NotebookEditTool/UI.js": "./src/tools/NotebookEditTool/UI.tsx",
+    "./tools/ConfigTool/UI.js": "./src/tools/ConfigTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }

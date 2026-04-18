@@ -4,19 +4,19 @@ import {
   getProjectRoot,
   setOriginalCwd,
   setProjectRoot,
-} from '../../bootstrap/state.js'
-import { clearSystemPromptSections } from '../../constants/systemPromptSections.js'
+} from 'src/bootstrap/state.js'
+import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { Tool } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { count } from '../../utils/array.js'
-import { clearMemoryFileCaches } from '../../utils/claudemd.js'
-import { execFileNoThrow } from '../../utils/execFileNoThrow.js'
-import { updateHooksConfigSnapshot } from '../../utils/hooks/hooksConfigSnapshot.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { getPlansDirectory } from '../../utils/plans.js'
-import { setCwd } from '../../utils/Shell.js'
-import { saveWorktreeState } from '../../utils/sessionStorage.js'
+import type { Tool } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { count } from 'src/utils/array.js'
+import { clearMemoryFileCaches } from 'src/utils/claudemd.js'
+import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
+import { updateHooksConfigSnapshot } from 'src/utils/hooks/hooksConfigSnapshot.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { getPlansDirectory } from 'src/utils/plans.js'
+import { setCwd } from 'src/utils/Shell.js'
+import { saveWorktreeState } from 'src/utils/sessionStorage.js'
 import {
   cleanupWorktree,
   getCurrentWorktreeSession,

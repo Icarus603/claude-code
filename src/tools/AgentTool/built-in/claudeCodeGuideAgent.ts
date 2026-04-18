@@ -1,6 +1,6 @@
 import { BASH_TOOL_NAME } from 'src/tools/BashTool/toolName.js'
 import { FILE_READ_TOOL_NAME } from 'src/tools/FileReadTool/constants.js'
-import { GLOB_TOOL_NAME } from 'src/tools/GlobTool/prompt.js'
+import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt.js'
 import { GREP_TOOL_NAME } from 'src/tools/GrepTool/prompt.js'
 import { SEND_MESSAGE_TOOL_NAME } from 'src/tools/SendMessageTool/constants.js'
 import { WEB_FETCH_TOOL_NAME } from 'src/tools/WebFetchTool/prompt.js'
