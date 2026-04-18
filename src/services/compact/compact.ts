@@ -73,8 +73,8 @@ import { getPlan, getPlanFilePath } from '../../utils/plans.js'
 import {
   isSessionActivityTrackingActive,
   sendSessionActivitySignal,
-} from '../../utils/sessionActivity.js'
-import { processSessionStartHooks } from '../../utils/sessionStart.js'
+} from '@claude-code/storage/sessionActivity.js'
+import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import {
   getTranscriptPath,
   reAppendSessionMetadata,

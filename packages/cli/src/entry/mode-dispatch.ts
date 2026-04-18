@@ -251,7 +251,7 @@ import { countFilesRoundedRg } from '../../../../src/utils/ripgrep.js'
 import {
   processSessionStartHooks,
   processSetupHooks,
-} from '../../../../src/utils/sessionStart.js'
+} from '@claude-code/storage/sessionStart.js'
 import {
   cacheSessionTitle,
   getSessionIdFromLog,

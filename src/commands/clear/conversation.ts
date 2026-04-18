@@ -32,7 +32,7 @@ import {
 import { logError } from '../../utils/log.js'
 import { clearAllPlanSlugs } from '../../utils/plans.js'
 import { setCwd } from '../../utils/Shell.js'
-import { processSessionStartHooks } from '../../utils/sessionStart.js'
+import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import {
   clearSessionMetadata,
   getAgentTranscriptPath,

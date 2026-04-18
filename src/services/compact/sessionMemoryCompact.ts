@@ -14,7 +14,7 @@ import {
 } from '../../utils/messages.js'
 import { getMainLoopModel } from '../../utils/model/model.js'
 import { getSessionMemoryPath } from '@claude-code/permission/filesystem'
-import { processSessionStartHooks } from '../../utils/sessionStart.js'
+import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import { getTranscriptPath } from '../../utils/sessionStorage.js'
 import { tokenCountFromLastAPIResponse } from '../../utils/tokens.js'
 import { extractDiscoveredToolNames } from '../../utils/toolSearch.js'

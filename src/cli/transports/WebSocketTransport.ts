@@ -13,7 +13,7 @@ import {
 import {
   registerSessionActivityCallback,
   unregisterSessionActivityCallback,
-} from '../../utils/sessionActivity.js'
+} from '@claude-code/storage/sessionActivity.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import type { Transport } from './Transport.js'
 

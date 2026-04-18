@@ -211,7 +211,7 @@ import {
 import {
   startSessionActivity,
   stopSessionActivity,
-} from 'src/utils/sessionActivity.js'
+} from '@claude-code/storage/sessionActivity.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import {
   isBetaTracingEnabled,

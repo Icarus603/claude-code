@@ -14,7 +14,7 @@ import { formatShellPrefixCommand } from './bash/shellPrefix.js'
 import {
   getHookEnvFilePath,
   invalidateSessionEnvCache,
-} from './sessionEnvironment.js'
+} from '@claude-code/storage/sessionEnvironment.js'
 import { subprocessEnv } from './subprocessEnv.js'
 import { getPlatform } from './platform.js'
 import { findGitBashPath, windowsPathToPosixPath } from './windowsPaths.js'

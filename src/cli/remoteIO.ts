@@ -16,7 +16,7 @@ import { getSessionIngressAuthToken } from '../utils/sessionIngressAuth.js'
 import {
   setSessionMetadataChangedListener,
   setSessionStateChangedListener,
-} from '../utils/sessionState.js'
+} from '@claude-code/storage/sessionState.js'
 import {
   setInternalEventReader,
   setInternalEventWriter,

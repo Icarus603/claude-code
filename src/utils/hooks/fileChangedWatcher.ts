@@ -8,7 +8,7 @@ import {
   executeFileChangedHooks,
   type HookOutsideReplResult,
 } from '../hooks.js'
-import { clearCwdEnvFiles } from '../sessionEnvironment.js'
+import { clearCwdEnvFiles } from '@claude-code/storage/sessionEnvironment.js'
 import { getHooksConfigFromSnapshot } from './hooksConfigSnapshot.js'
 
 let watcher: FSWatcher | null = null

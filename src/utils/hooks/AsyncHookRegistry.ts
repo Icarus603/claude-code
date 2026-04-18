@@ -5,7 +5,7 @@ import type {
 } from 'src/entrypoints/agentSdkTypes.js'
 import { logForDebugging } from '../debug.js'
 import type { ShellCommand } from '../ShellCommand.js'
-import { invalidateSessionEnvCache } from '../sessionEnvironment.js'
+import { invalidateSessionEnvCache } from '@claude-code/storage/sessionEnvironment.js'
 import { jsonParse, jsonStringify } from '../slowOperations.js'
 import { emitHookResponse, startHookProgressInterval } from './hookEvents.js'
 

@@ -3,7 +3,7 @@ import { dirname } from 'path'
 import { randomUUID } from 'crypto'
 import type { Message, NormalizedUserMessage } from '../../../../../../src/types/message.js'
 import type { AppState } from '../../../../../../src/state/AppStateStore.js'
-import type { SessionExternalMetadata } from '../../../../../../src/utils/sessionState.js'
+import type { SessionExternalMetadata } from '@claude-code/storage/sessionState.js'
 import {
   loadConversationForResume,
   type TurnInterruptionState,
@@ -35,7 +35,7 @@ import { isPolicyAllowed } from '../../../../../../src/services/policyLimits/ind
 import { parseSessionIdentifier } from '../../../../../../src/utils/sessionUrl.js'
 import {
   processSessionStartHooks,
-} from '../../../../../../src/utils/sessionStart.js'
+} from '@claude-code/storage/sessionStart.js'
 import { externalMetadataToAppState } from '../../../../../../src/state/onChangeAppState.js'
 import { asSessionId } from '../../../../../../src/types/ids.js'
 import { getCwd } from '../../../../../../src/utils/cwd.js'
