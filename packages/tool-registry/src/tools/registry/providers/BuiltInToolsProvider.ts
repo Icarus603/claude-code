@@ -36,7 +36,7 @@ import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpRe
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
 import { ConfigTool } from '@claude-code/tool-registry/tools/ConfigTool/ConfigTool.js'
-import { TungstenTool } from 'src/tools/TungstenTool/TungstenTool.js'
+import { TungstenTool } from '@claude-code/tool-registry/tools/TungstenTool/TungstenTool.js'
 import { BriefTool } from '@claude-code/tool-registry/tools/BriefTool/BriefTool.js'
 import { TestingPermissionTool } from '@claude-code/tool-registry/tools/testing/TestingPermissionTool.js'
 import { EnterWorktreeTool } from '@claude-code/tool-registry/tools/EnterWorktreeTool/EnterWorktreeTool.js'
@@ -51,7 +51,7 @@ const getREPLTool = () =>
 
 const getSuggestBackgroundPRTool = () =>
   process.env.USER_TYPE === 'ant'
-    ? require('src/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js').SuggestBackgroundPRTool as Tool
+    ? require('@claude-code/tool-registry/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js').SuggestBackgroundPRTool as Tool
     : null
 
 const getSleepTool = () =>
@@ -72,12 +72,12 @@ const getRemoteTriggerTool = () =>
 
 const getMonitorTool = () =>
   feature('MONITOR_TOOL')
-    ? require('src/tools/MonitorTool/MonitorTool.js').MonitorTool as Tool
+    ? require('@claude-code/tool-registry/tools/MonitorTool/MonitorTool.js').MonitorTool as Tool
     : null
 
 const getSendUserFileTool = () =>
   feature('KAIROS')
-    ? require('src/tools/SendUserFileTool/SendUserFileTool.js').SendUserFileTool as Tool
+    ? require('@claude-code/tool-registry/tools/SendUserFileTool/SendUserFileTool.js').SendUserFileTool as Tool
     : null
 
 const getPushNotificationTool = () =>
@@ -92,12 +92,12 @@ const getSubscribePRTool = () =>
 
 const getVerifyPlanExecutionTool = () =>
   process.env.CLAUDE_CODE_VERIFY_PLAN === 'true'
-    ? require('src/tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js').VerifyPlanExecutionTool as Tool
+    ? require('@claude-code/tool-registry/tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js').VerifyPlanExecutionTool as Tool
     : null
 
 const getOverflowTestTool = () =>
   feature('OVERFLOW_TEST_TOOL')
-    ? require('src/tools/OverflowTestTool/OverflowTestTool.js').OverflowTestTool as Tool
+    ? require('@claude-code/tool-registry/tools/OverflowTestTool/OverflowTestTool.js').OverflowTestTool as Tool
     : null
 
 const getCtxInspectTool = () =>
@@ -107,17 +107,17 @@ const getCtxInspectTool = () =>
 
 const getTerminalCaptureTool = () =>
   feature('TERMINAL_PANEL')
-    ? require('src/tools/TerminalCaptureTool/TerminalCaptureTool.js').TerminalCaptureTool as Tool
+    ? require('@claude-code/tool-registry/tools/TerminalCaptureTool/TerminalCaptureTool.js').TerminalCaptureTool as Tool
     : null
 
 const getWebBrowserTool = () =>
   feature('WEB_BROWSER_TOOL')
-    ? require('src/tools/WebBrowserTool/WebBrowserTool.js').WebBrowserTool as Tool
+    ? require('@claude-code/tool-registry/tools/WebBrowserTool/WebBrowserTool.js').WebBrowserTool as Tool
     : null
 
 const getSnipTool = () =>
   feature('HISTORY_SNIP')
-    ? require('src/tools/SnipTool/SnipTool.js').SnipTool as Tool
+    ? require('@claude-code/tool-registry/tools/SnipTool/SnipTool.js').SnipTool as Tool
     : null
 
 const getListPeersTool = () =>
@@ -128,8 +128,8 @@ const getListPeersTool = () =>
 const getWorkflowTool = () =>
   feature('WORKFLOW_SCRIPTS')
     ? (() => {
-        require('src/tools/WorkflowTool/bundled/index.js').initBundledWorkflows()
-        return require('src/tools/WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
+        require('@claude-code/tool-registry/tools/WorkflowTool/bundled/index.js').initBundledWorkflows()
+        return require('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
       })()
     : null
 

@@ -34,7 +34,7 @@ import { WebFetchPermissionRequest } from './WebFetchPermissionRequest/WebFetchP
 /* eslint-disable @typescript-eslint/no-require-imports */
 const ReviewArtifactTool = feature('REVIEW_ARTIFACT')
   ? (
-      require('../../tools/ReviewArtifactTool/ReviewArtifactTool.js') as typeof import('../../tools/ReviewArtifactTool/ReviewArtifactTool.js')
+      require('@claude-code/tool-registry/tools/ReviewArtifactTool/ReviewArtifactTool.js') as typeof import('@claude-code/tool-registry/tools/ReviewArtifactTool/ReviewArtifactTool.js')
     ).ReviewArtifactTool
   : null
 
@@ -46,19 +46,19 @@ const ReviewArtifactPermissionRequest = feature('REVIEW_ARTIFACT')
 
 const WorkflowTool = feature('WORKFLOW_SCRIPTS')
   ? (
-      require('../../tools/WorkflowTool/WorkflowTool.js') as typeof import('../../tools/WorkflowTool/WorkflowTool.js')
+      require('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js') as typeof import('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js')
     ).WorkflowTool
   : null
 
 const WorkflowPermissionRequest = feature('WORKFLOW_SCRIPTS')
   ? (
-      require('../../tools/WorkflowTool/WorkflowPermissionRequest.js') as typeof import('../../tools/WorkflowTool/WorkflowPermissionRequest.js')
+      require('@claude-code/tool-registry/tools/WorkflowTool/WorkflowPermissionRequest.js') as typeof import('@claude-code/tool-registry/tools/WorkflowTool/WorkflowPermissionRequest.js')
     ).WorkflowPermissionRequest
   : null
 
 const MonitorTool = feature('MONITOR_TOOL')
   ? (
-      require('../../tools/MonitorTool/MonitorTool.js') as typeof import('../../tools/MonitorTool/MonitorTool.js')
+      require('@claude-code/tool-registry/tools/MonitorTool/MonitorTool.js') as typeof import('@claude-code/tool-registry/tools/MonitorTool/MonitorTool.js')
     ).MonitorTool
   : null
 

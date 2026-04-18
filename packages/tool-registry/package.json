@@ -47,6 +47,9 @@
     "./tools/AgentTool/UI.js": "./src/tools/AgentTool/UI.tsx",
     "./tools/REPLTool/REPLTool.js": "./src/tools/REPLTool/REPLTool.js",
     "./tools/testing/TestingPermissionTool.js": "./src/tools/testing/TestingPermissionTool.tsx",
+    "./tools/TungstenTool/TungstenTool.js": "./src/tools/TungstenTool/TungstenTool.js",
+    "./tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js": "./src/tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js",
+    "./tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js": "./src/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }

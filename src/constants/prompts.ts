@@ -93,7 +93,7 @@ const DISCOVER_SKILLS_TOOL_NAME: string | null = feature(
   'EXPERIMENTAL_SKILL_SEARCH',
 )
   ? (
-      require('../tools/DiscoverSkillsTool/prompt.js') as typeof import('../tools/DiscoverSkillsTool/prompt.js')
+      require('@claude-code/tool-registry/tools/DiscoverSkillsTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/DiscoverSkillsTool/prompt.js')
     ).DISCOVER_SKILLS_TOOL_NAME
   : null
 // Capture the module (not .isSkillSearchEnabled directly) so spyOn() in tests
