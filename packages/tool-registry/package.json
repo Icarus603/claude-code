@@ -14,6 +14,7 @@
     "./tools/AskUserQuestionTool/AskUserQuestionTool.js": "./src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx",
     "./tools/TaskStopTool/UI.js": "./src/tools/TaskStopTool/UI.tsx",
     "./tools/RemoteTriggerTool/UI.js": "./src/tools/RemoteTriggerTool/UI.tsx",
+    "./tools/EnterPlanModeTool/UI.js": "./src/tools/EnterPlanModeTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }
