@@ -6,39 +6,39 @@
 
 import { writeFile } from 'fs/promises'
 import memoize from 'lodash-es/memoize.js'
-import { getIsRemoteMode } from '../../bootstrap/state.js'
-import { getSystemPrompt } from '../../constants/prompts.js'
-import { getSystemContext, getUserContext } from '../../context.js'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import type { Tool, ToolUseContext } from '../../Tool.js'
+import { getIsRemoteMode } from 'src/bootstrap/state.js'
+import { getSystemPrompt } from 'src/constants/prompts.js'
+import { getSystemContext, getUserContext } from 'src/context.js'
+import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import type { Tool, ToolUseContext } from 'src/Tool.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import {
   FileReadTool,
   type Output as FileReadToolOutput,
 } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
-import type { Message } from '../../types/message.js'
-import { count } from '../../utils/array.js'
+import type { Message } from 'src/types/message.js'
+import { count } from 'src/utils/array.js'
 import {
   createCacheSafeParams,
   createSubagentContext,
   runForkedAgent,
-} from '../../utils/forkedAgent.js'
-import { getFsImplementation } from '../../utils/fsOperations.js'
+} from 'src/utils/forkedAgent.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
 import {
   type REPLHookContext,
   registerPostSamplingHook,
-} from '../../utils/hooks/postSamplingHooks.js'
+} from 'src/utils/hooks/postSamplingHooks.js'
 import {
   createUserMessage,
   hasToolCallsInLastAssistantTurn,
-} from '../../utils/messages.js'
+} from 'src/utils/messages.js'
 import {
   getSessionMemoryDir,
   getSessionMemoryPath,
 } from '@claude-code/permission/filesystem'
-import { sequential } from '../../utils/sequential.js'
-import { asSystemPrompt } from '../../utils/systemPromptType.js'
-import { getTokenUsage, tokenCountWithEstimation } from '../../utils/tokens.js'
+import { sequential } from 'src/utils/sequential.js'
+import { asSystemPrompt } from 'src/utils/systemPromptType.js'
+import { getTokenUsage, tokenCountWithEstimation } from 'src/utils/tokens.js'
 import { logEvent } from '@claude-code/local-observability'
 import { isAutoCompactEnabled } from '@claude-code/agent/compaction/autoCompact.js'
 import {
@@ -67,7 +67,7 @@ import {
 // These functions return cached values from disk immediately without blocking
 // on GrowthBook initialization. Values may be stale but are updated in background.
 
-import { errorMessage, getErrnoCode } from '../../utils/errors.js'
+import { errorMessage, getErrnoCode } from 'src/utils/errors.js'
 import {
   getDynamicConfig_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,

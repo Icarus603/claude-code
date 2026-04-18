@@ -1,5 +1,5 @@
 // Auto-generated stub — replace with real implementation
-import type { Message } from '../../types/message.js';
+import type { Message } from 'src/types/message.js';
 
 export {};
 export const writeSessionTranscriptSegment: (messages: Message[]) => void = (() => {});
