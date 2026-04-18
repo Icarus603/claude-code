@@ -102,6 +102,8 @@
     "./lazySchema": "./internal/lazySchema.ts",
     "./plugin/pluginOperations": "./plugin/pluginOperations.ts",
     "./plugin/pluginCliCommands": "./plugin/pluginCliCommands.ts",
-    "./plugin/PluginInstallationManager": "./plugin/PluginInstallationManager.ts"
+    "./plugin/PluginInstallationManager": "./plugin/PluginInstallationManager.ts",
+    "./plugin/builtin": "./plugin/builtin.ts",
+    "./plugin/bundled-init": "./plugin/bundled-init.ts"
   }
 }

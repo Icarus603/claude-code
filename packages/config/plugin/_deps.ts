@@ -1033,3 +1033,51 @@ export function gracefulShutdown(code: number): Promise<never> {
 export function setGracefulShutdownFn(fn: typeof _gracefulShutdown): void {
   _gracefulShutdown = fn
 }
+
+// ---------------------------------------------------------------------------
+// Forward-compat type slots — precise definitions live in higher-layer
+// subsystems (Wave 3 tool-registry for Command, Wave 5 skills for
+// BundledSkillDefinition). Using `unknown`-equivalent structural types keeps
+// the plugin package layer-clean.
+// ---------------------------------------------------------------------------
+
+export type Command = {
+  type: string
+  name: string
+  description?: string
+  hasUserSpecifiedDescription?: boolean
+  allowedTools?: string[]
+  argumentHint?: string
+  whenToUse?: string
+  model?: string
+  disableModelInvocation?: boolean
+  userInvocable?: boolean
+  contentLength?: number
+  source?: string
+  loadedFrom?: string
+  hooks?: unknown
+  context?: unknown
+  agent?: unknown
+  isEnabled?: () => boolean
+  isHidden?: boolean
+  progressMessage?: string
+  getPromptForCommand?: unknown
+  [key: string]: unknown
+}
+
+export type BundledSkillDefinition = {
+  name: string
+  description?: string
+  allowedTools?: string[]
+  argumentHint?: string
+  whenToUse?: string
+  model?: string
+  disableModelInvocation?: boolean
+  userInvocable?: boolean
+  hooks?: unknown
+  context?: unknown
+  agent?: unknown
+  isEnabled?: () => boolean
+  getPromptForCommand?: unknown
+  [key: string]: unknown
+}
