@@ -2,9 +2,9 @@ import * as React from 'react'
 import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { Box, Text } from '@anthropic/ink'
-import type { ToolProgressData } from '../../Tool.js'
-import type { ProgressMessage } from '../../types/message.js'
-import type { ThemeName } from '../../utils/theme.js'
+import type { ToolProgressData } from 'src/Tool.js'
+import type { ProgressMessage } from 'src/types/message.js'
+import type { ThemeName } from 'src/utils/theme.js'
 import type { Output } from './EnterPlanModeTool.js'
 
 export function renderToolUseMessage(): React.ReactNode {

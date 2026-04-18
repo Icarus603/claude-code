@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import { EnterPlanModeTool } from 'src/tools/EnterPlanModeTool/EnterPlanModeTool.js'
+import { EnterPlanModeTool } from '@claude-code/tool-registry/tools/EnterPlanModeTool/EnterPlanModeTool.js'
 import { ExitPlanModeV2Tool } from 'src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
 import { useNotifyAfterTimeout } from '../../hooks/useNotifyAfterTimeout.js'
 import { useKeybinding } from '@anthropic/ink/keybindings'
