@@ -13,7 +13,7 @@ import {
   detectGitOperation,
   type PrAction,
 } from '../tools/shared/gitOperationTracking.js'
-import { TOOL_SEARCH_TOOL_NAME } from '../tools/ToolSearchTool/prompt.js'
+import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import type {
   CollapsedReadSearchGroup,
   CollapsibleMessage,

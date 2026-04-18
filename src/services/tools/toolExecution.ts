@@ -49,7 +49,7 @@ import { parseGitCommitId } from '../../tools/shared/gitOperationTracking.js'
 import {
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
-} from '../../tools/ToolSearchTool/prompt.js'
+} from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import type { HookProgress } from '../../types/hooks.js'
 import type {
   AssistantMessage,

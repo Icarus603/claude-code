@@ -23,7 +23,7 @@ import {
   formatDeferredToolLine,
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
-} from '../tools/ToolSearchTool/prompt.js'
+} from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import type { Message } from '../types/message.js'
 import {
   countToolDefinitionTokens,

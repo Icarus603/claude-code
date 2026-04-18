@@ -1,20 +1,20 @@
 import { feature } from 'bun:bundle'
-import { isReplBridgeActive } from '../../bootstrap/state.js'
+import { isReplBridgeActive } from 'src/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { Tool } from '../../Tool.js'
-import { AGENT_TOOL_NAME } from '../AgentTool/constants.js'
+import type { Tool } from 'src/Tool.js'
+import { AGENT_TOOL_NAME } from 'src/tools/AgentTool/constants.js'
 
 // Dead code elimination: Brief tool name only needed when KAIROS or KAIROS_BRIEF is on
 /* eslint-disable @typescript-eslint/no-require-imports */
 const BRIEF_TOOL_NAME: string | null =
   feature('KAIROS') || feature('KAIROS_BRIEF')
     ? (
-        require('../BriefTool/prompt.js') as typeof import('../BriefTool/prompt.js')
+        require('src/tools/BriefTool/prompt.js') as typeof import('src/tools/BriefTool/prompt.js')
       ).BRIEF_TOOL_NAME
     : null
 const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS')
   ? (
-      require('../SendUserFileTool/prompt.js') as typeof import('../SendUserFileTool/prompt.js')
+      require('src/tools/SendUserFileTool/prompt.js') as typeof import('src/tools/SendUserFileTool/prompt.js')
     ).SEND_USER_FILE_TOOL_NAME
   : null
 
