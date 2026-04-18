@@ -2,7 +2,7 @@ import type { Command } from '../../commands.js'
 import {
   isVoiceGrowthBookEnabled,
   isVoiceModeEnabled,
-} from '../../voice/voiceModeEnabled.js'
+} from '@claude-code/voice/voiceModeEnabled.js'
 
 const voice = {
   type: 'local',

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getInitialSettings } from '../../utils/settings/settings.js'
-import { isVoiceModeEnabled } from '../../voice/voiceModeEnabled.js'
+import { isVoiceModeEnabled } from '@claude-code/voice/voiceModeEnabled.js'
 import { AnimatedAsterisk } from './AnimatedAsterisk.js'
 import { shouldShowOpus1mMergeNotice } from './Opus1mMergeNotice.js'
 

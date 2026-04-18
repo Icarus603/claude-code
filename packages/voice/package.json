@@ -9,6 +9,10 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./voiceModeEnabled.js": "./src/voiceModeEnabled.ts",
+    "./voice.js": "./src/voice.ts",
+    "./voiceKeyterms.js": "./src/voiceKeyterms.ts",
+    "./voiceStreamSTT.js": "./src/voiceStreamSTT.ts"
   }
 }

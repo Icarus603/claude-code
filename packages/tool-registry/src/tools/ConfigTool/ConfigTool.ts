@@ -115,7 +115,7 @@ export const ConfigTool = buildTool({
     // voiceEnabled as an unknown setting so no voice-specific strings leak.
     if (feature('VOICE_MODE') && setting === 'voiceEnabled') {
       const { isVoiceGrowthBookEnabled } = await import(
-        'src/voice/voiceModeEnabled.js'
+        '@claude-code/voice/voiceModeEnabled.js'
       )
       if (!isVoiceGrowthBookEnabled()) {
         return {
@@ -235,7 +235,7 @@ export const ConfigTool = buildTool({
       finalValue === true
     ) {
       const { isVoiceModeEnabled } = await import(
-        'src/voice/voiceModeEnabled.js'
+        '@claude-code/voice/voiceModeEnabled.js'
       )
       if (!isVoiceModeEnabled()) {
         const { isAnthropicAuthEnabled } = await import('src/utils/auth.js')
@@ -249,13 +249,13 @@ export const ConfigTool = buildTool({
         }
       }
       const { isVoiceStreamAvailable } = await import(
-        'src/services/voiceStreamSTT.js'
+        '@claude-code/voice/voiceStreamSTT.js'
       )
       const {
         checkRecordingAvailability,
         checkVoiceDependencies,
         requestMicrophonePermission,
-      } = await import('src/services/voice.js')
+      } = await import('@claude-code/voice/voice.js')
 
       const recording = await checkRecordingAvailability()
       if (!recording.available) {

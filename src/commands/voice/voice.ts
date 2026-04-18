@@ -9,7 +9,7 @@ import {
   getInitialSettings,
   updateSettingsForSource,
 } from '../../utils/settings/settings.js'
-import { isVoiceModeEnabled } from '../../voice/voiceModeEnabled.js'
+import { isVoiceModeEnabled } from '@claude-code/voice/voiceModeEnabled.js'
 
 const LANG_HINT_MAX_SHOWS = 2
 
@@ -56,9 +56,9 @@ export const call: LocalCommandCall = async () => {
 
   // Toggle ON — run pre-flight checks first
   const { isVoiceStreamAvailable } = await import(
-    '../../services/voiceStreamSTT.js'
+    '@claude-code/voice/voiceStreamSTT.js'
   )
-  const { checkRecordingAvailability } = await import('../../services/voice.js')
+  const { checkRecordingAvailability } = await import('@claude-code/voice/voice.js')
 
   // Check recording availability (microphone access)
   const recording = await checkRecordingAvailability()
@@ -81,7 +81,7 @@ export const call: LocalCommandCall = async () => {
 
   // Check for recording tools
   const { checkVoiceDependencies, requestMicrophonePermission } = await import(
-    '../../services/voice.js'
+    '@claude-code/voice/voice.js'
   )
   const deps = await checkVoiceDependencies()
   if (!deps.available) {

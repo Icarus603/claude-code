@@ -3,7 +3,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import {
   getClaudeAIOAuthTokens,
   isAnthropicAuthEnabled,
-} from '../utils/auth.js'
+} from 'src/utils/auth.js'
 
 /**
  * Kill-switch check for voice mode. Returns true unless the
