@@ -12,7 +12,7 @@ import { pathInAllowedWorkingPath } from '@claude-code/permission/filesystem'
 import { setCwd } from 'src/utils/Shell.js'
 import { shouldMaintainProjectWorkingDir } from 'src/utils/envUtils.js'
 import { maybeResizeAndDownsampleImageBuffer } from 'src/utils/imageResizer.js'
-import { getMaxOutputLength } from 'src/utils/shell/outputLimits.js'
+import { getMaxOutputLength } from '@claude-code/shell/legacy/outputLimits.js'
 import { countCharInString, plural } from 'src/utils/stringUtils.js'
 /**
  * Strips leading and trailing lines that contain only whitespace/newlines.

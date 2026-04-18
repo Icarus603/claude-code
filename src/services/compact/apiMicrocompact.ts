@@ -6,7 +6,7 @@ import { GREP_TOOL_NAME } from '@claude-code/tool-registry/tools/GrepTool/prompt
 import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/NotebookEditTool/constants.js'
 import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js'
 import { WEB_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebSearchTool/prompt.js'
-import { SHELL_TOOL_NAMES } from 'src/utils/shell/shellToolUtils.js'
+import { SHELL_TOOL_NAMES } from '@claude-code/shell/legacy/shellToolUtils.js'
 
 export type {
   ContextEditStrategy,

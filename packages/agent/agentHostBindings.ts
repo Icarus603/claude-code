@@ -609,7 +609,7 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     getPlansDirectory: () => { try { return require('src/utils/plans.js').getPlansDirectory() } catch { return '' } },
     getPlatform: () => { try { return require('src/utils/platform.js').getPlatform() } catch { return process.platform === 'darwin' ? 'macos' : 'linux' } },
     getProjectDir: (...a: unknown[]) => { try { return require('@claude-code/storage/sessionStorage.js').getProjectDir(...a) } catch { return process.cwd() } },
-    containsVulnerableUncPath: (p: string) => { try { return require('src/utils/shell/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
+    containsVulnerableUncPath: (p: string) => { try { return require('@claude-code/shell/legacy/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
     getToolResultsDir: () => { try { return require('src/utils/toolResultStorage.js').getToolResultsDir() } catch { return '' } },
     shouldUseSandbox: () => { try { return require('@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js').shouldUseSandbox() } catch { return false } },
     extractOutputRedirections: (cmd: string) => { try { return require('src/utils/bash/commands.js').extractOutputRedirections(cmd) } catch { return [] } },

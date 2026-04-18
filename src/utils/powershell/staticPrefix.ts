@@ -13,7 +13,7 @@
  */
 
 import { getCommandSpec } from '../bash/registry.js'
-import { buildPrefix, DEPTH_RULES } from '../shell/specPrefix.js'
+import { buildPrefix, DEPTH_RULES } from '@claude-code/shell/legacy/specPrefix.js'
 import { countCharInString } from '../stringUtils.js'
 import { NEVER_SUGGEST } from './dangerousCmdlets.js'
 import {

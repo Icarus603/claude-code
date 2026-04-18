@@ -9,7 +9,7 @@ import {
   getSettingsForSource,
 } from '../settings/settings.js'
 import type { HookCommand, HookMatcher } from '../settings/types.js'
-import { DEFAULT_HOOK_SHELL } from '../shell/shellProvider.js'
+import { DEFAULT_HOOK_SHELL } from '@claude-code/shell/legacy/shellProvider.js'
 import { getSessionHooks } from './sessionHooks.js'
 
 export type HookSource =

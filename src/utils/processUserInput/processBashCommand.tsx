@@ -18,8 +18,8 @@ import {
   createUserMessage,
   prepareUserContent,
 } from '../messages.js'
-import { resolveDefaultShell } from '../shell/resolveDefaultShell.js'
-import { isPowerShellToolEnabled } from '../shell/shellToolUtils.js'
+import { resolveDefaultShell } from '@claude-code/shell/legacy/resolveDefaultShell.js'
+import { isPowerShellToolEnabled } from '@claude-code/shell/legacy/shellToolUtils.js'
 import { processToolResultBlock } from '../toolResultStorage.js'
 import { escapeXml } from '../xml.js'
 import type { ProcessUserInputContext } from './processUserInput.js'

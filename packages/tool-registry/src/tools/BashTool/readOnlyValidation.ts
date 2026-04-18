@@ -20,7 +20,7 @@ import {
   PYRIGHT_READ_ONLY_COMMANDS,
   RIPGREP_READ_ONLY_COMMANDS,
   validateFlags,
-} from 'src/utils/shell/readOnlyCommandValidation.js'
+} from '@claude-code/shell/legacy/readOnlyCommandValidation.js'
 import type { BashTool } from './BashTool.js'
 import { isNormalizedGitCommand } from './bashPermissions.js'
 import { bashCommandIsSafe_DEPRECATED } from './bashSecurity.js'
