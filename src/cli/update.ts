@@ -4,7 +4,7 @@ import {
   getLatestVersion,
   type InstallStatus,
   installGlobalPackage,
-} from 'src/utils/autoUpdater.js'
+} from '@claude-code/updater/autoUpdater.js'
 import { regenerateCompletionCache } from 'src/utils/completionCache.js'
 import {
   getGlobalConfig,

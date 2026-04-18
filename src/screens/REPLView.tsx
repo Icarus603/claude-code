@@ -206,7 +206,7 @@ import { getScratchpadDir, isScratchpadEnabled } from '@claude-code/permission/f
 import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js';
 import { SLEEP_TOOL_NAME } from '@claude-code/tool-registry/tools/SleepTool/prompt.js';
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js';
-import type { AutoUpdaterResult } from '../utils/autoUpdater.js';
+import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js';
 import { getGlobalConfig, saveGlobalConfig, getGlobalConfigWriteCount } from '@claude-code/config';
 import { hasConsoleBillingAccess } from '../utils/billing.js';
 import {

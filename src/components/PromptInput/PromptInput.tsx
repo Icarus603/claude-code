@@ -106,7 +106,7 @@ import type {
 } from '../../types/textInputTypes.js'
 import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
 import { count } from '../../utils/array.js'
-import type { AutoUpdaterResult } from '../../utils/autoUpdater.js'
+import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { Cursor } from '../../utils/Cursor.js'
 import {
   getGlobalConfig,

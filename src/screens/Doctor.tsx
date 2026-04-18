@@ -29,7 +29,7 @@ import {
   getGcsDistTags,
   getNpmDistTags,
   type NpmDistTags,
-} from '../utils/autoUpdater.js'
+} from '@claude-code/updater/autoUpdater.js'
 import {
   type ContextWarnings,
   checkContextWarnings,

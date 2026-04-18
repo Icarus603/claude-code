@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import type { AutoUpdaterResult } from '../utils/autoUpdater.js'
+import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { isAutoUpdaterDisabled } from '@claude-code/config'
 import { logForDebugging } from '../utils/debug.js'
 import { getCurrentInstallationType } from '../utils/doctorDiagnostic.js'
