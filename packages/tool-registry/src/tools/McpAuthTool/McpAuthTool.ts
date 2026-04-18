@@ -1,23 +1,23 @@
 import reject from 'lodash-es/reject.js'
 import { z } from 'zod/v4'
-import { performMCPOAuthFlow } from '../../services/mcp/auth.js'
+import { performMCPOAuthFlow } from 'src/services/mcp/auth.js'
 import {
   clearMcpAuthCache,
   reconnectMcpServerImpl,
-} from '../../services/mcp/client.js'
+} from 'src/services/mcp/client.js'
 import {
   buildMcpToolName,
   getMcpPrefix,
-} from '../../services/mcp/mcpStringUtils.js'
+} from 'src/services/mcp/mcpStringUtils.js'
 import type {
   McpHTTPServerConfig,
   McpSSEServerConfig,
   ScopedMcpServerConfig,
-} from '../../services/mcp/types.js'
-import type { Tool } from '../../Tool.js'
-import { errorMessage } from '../../utils/errors.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logMCPDebug, logMCPError } from '../../utils/log.js'
+} from 'src/services/mcp/types.js'
+import type { Tool } from 'src/Tool.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logMCPDebug, logMCPError } from 'src/utils/log.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 
 const inputSchema = lazySchema(() => z.object({}))
