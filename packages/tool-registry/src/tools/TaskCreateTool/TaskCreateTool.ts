@@ -1,17 +1,17 @@
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from '../../Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
 import {
   executeTaskCreatedHooks,
   getTaskCreatedHookMessage,
-} from '../../utils/hooks.js'
-import { lazySchema } from '../../utils/lazySchema.js'
+} from 'src/utils/hooks.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   createTask,
   deleteTask,
   getTaskListId,
   isTodoV2Enabled,
-} from '../../utils/tasks.js'
-import { getAgentName, getTeamName } from '../../utils/teammate.js'
+} from 'src/utils/tasks.js'
+import { getAgentName, getTeamName } from 'src/utils/teammate.js'
 import { TASK_CREATE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, getPrompt } from './prompt.js'
 
