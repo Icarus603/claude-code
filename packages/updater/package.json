@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./autoUpdater.js": "./src/autoUpdater.ts"
   }
 }

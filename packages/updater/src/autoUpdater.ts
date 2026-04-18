@@ -9,23 +9,23 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { type ReleaseChannel, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from './debug.js'
-import { env } from './env.js'
-import { getClaudeConfigHomeDir } from './envUtils.js'
-import { ClaudeError, getErrnoCode, isENOENT } from './errors.js'
-import { execFileNoThrowWithCwd } from './execFileNoThrow.js'
-import { getFsImplementation } from './fsOperations.js'
-import { gracefulShutdownSync } from './gracefulShutdown.js'
-import { logError } from './log.js'
-import { gte, lt } from './semver.js'
-import { getInitialSettings } from './settings/settings.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { env } from 'src/utils/env.js'
+import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { ClaudeError, getErrnoCode, isENOENT } from 'src/utils/errors.js'
+import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
+import { logError } from 'src/utils/log.js'
+import { gte, lt } from 'src/utils/semver.js'
+import { getInitialSettings } from 'src/utils/settings/settings.js'
 import {
   filterClaudeAliases,
   getShellConfigPaths,
   readFileLines,
   writeFileLines,
-} from './shellConfig.js'
-import { jsonParse } from './slowOperations.js'
+} from 'src/utils/shellConfig.js'
+import { jsonParse } from 'src/utils/slowOperations.js'
 
 const GCS_BUCKET_URL =
   'https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases'
