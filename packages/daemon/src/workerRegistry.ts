@@ -3,7 +3,7 @@ import {
   type HeadlessBridgeOpts,
   BridgeHeadlessPermanentError,
   runBridgeHeadless,
-} from 'src/bridge/bridgeMain.js'
+} from '@claude-code/bridge/bridgeMain.js'
 import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
 import { errorMessage } from 'src/utils/errors.js'
 

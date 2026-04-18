@@ -1,1 +1,1 @@
-import '../bridge/runtimeHostSetup.js'
+import '@claude-code/bridge/runtimeHostSetup.js'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { clearTrustedDeviceTokenCache } from '../../bridge/trustedDevice.js'
+import { clearTrustedDeviceTokenCache } from '@claude-code/bridge/trustedDevice.js'
 import { Text } from '@anthropic/ink'
 import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-flags'
 import {

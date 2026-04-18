@@ -6,7 +6,7 @@ import {
   computeGlimmerIndex,
   computeShimmerSegments,
   SHIMMER_INTERVAL_MS,
-} from '../bridge/bridgeStatusUtil.js'
+} from '@claude-code/bridge/bridgeStatusUtil.js'
 import { feature } from 'bun:bundle'
 import { getKairosActive, getUserMsgOptIn } from '../bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

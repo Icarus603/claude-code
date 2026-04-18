@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react'
-import { isBridgeEnabled } from '../bridge/bridgeEnabled.js'
+import { isBridgeEnabled } from '@claude-code/bridge/bridgeEnabled.js'
 import { Box, Text } from '@anthropic/ink'
 import { getClaudeAIOAuthTokens } from '../utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

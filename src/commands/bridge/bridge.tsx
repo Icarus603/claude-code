@@ -2,17 +2,17 @@ import { feature } from 'bun:bundle'
 import { toString as qrToString } from 'qrcode'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { getBridgeAccessToken } from '../../bridge/bridgeConfig.js'
+import { getBridgeAccessToken } from '@claude-code/bridge/bridgeConfig.js'
 import {
   checkBridgeMinVersion,
   getBridgeDisabledReason,
   isEnvLessBridgeEnabled,
-} from '../../bridge/bridgeEnabled.js'
-import { checkEnvLessBridgeMinVersion } from '../../bridge/envLessBridgeConfig.js'
+} from '@claude-code/bridge/bridgeEnabled.js'
+import { checkEnvLessBridgeMinVersion } from '@claude-code/bridge/envLessBridgeConfig.js'
 import {
   BRIDGE_LOGIN_INSTRUCTION,
   REMOTE_CONTROL_DISCONNECTED_MSG,
-} from '../../bridge/types.js'
+} from '@claude-code/bridge/types.js'
 import { Dialog, ListItem } from '@anthropic/ink'
 import { shouldShowRemoteCallout } from '../../components/RemoteCallout.js'
 import { useRegisterOverlay } from '../../context/overlayContext.js'

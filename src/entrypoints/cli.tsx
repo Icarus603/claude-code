@@ -142,10 +142,10 @@ async function main(): Promise<void> {
     enableConfigs()
 
     const { getBridgeDisabledReason, checkBridgeMinVersion } = await import(
-      '../bridge/bridgeEnabled.js'
+      '@claude-code/bridge/bridgeEnabled.js'
     )
-    const { BRIDGE_LOGIN_ERROR } = await import('../bridge/types.js')
-    const { bridgeMain } = await import('../bridge/bridgeMain.js')
+    const { BRIDGE_LOGIN_ERROR } = await import('@claude-code/bridge/types.js')
+    const { bridgeMain } = await import('@claude-code/bridge/bridgeMain.js')
     const { exitWithError } = await import('../utils/process.js')
 
     // Auth check must come before the GrowthBook gate check — without auth,

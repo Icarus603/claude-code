@@ -1,11 +1,11 @@
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
-import { CCRClient } from '../cli/transports/ccrClient.js'
-import type { HybridTransport } from '../cli/transports/HybridTransport.js'
-import { SSETransport } from '../cli/transports/SSETransport.js'
-import { logForDebugging } from '../utils/debug.js'
-import { errorMessage } from '../utils/errors.js'
-import { updateSessionIngressAuthToken } from '../utils/sessionIngressAuth.js'
-import type { SessionState } from '../utils/sessionState.js'
+import { CCRClient } from 'src/cli/transports/ccrClient.js'
+import type { HybridTransport } from 'src/cli/transports/HybridTransport.js'
+import { SSETransport } from 'src/cli/transports/SSETransport.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { updateSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import type { SessionState } from 'src/utils/sessionState.js'
 import { registerWorker } from './workSecret.js'
 
 /**

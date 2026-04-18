@@ -1,15 +1,15 @@
 import { mkdir, readFile, stat, unlink, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import { z } from 'zod/v4'
-import { logForDebugging } from '../utils/debug.js'
-import { isENOENT } from '../utils/errors.js'
-import { getWorktreePathsPortable } from '../utils/getWorktreePathsPortable.js'
-import { lazySchema } from '../utils/lazySchema.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { isENOENT } from 'src/utils/errors.js'
+import { getWorktreePathsPortable } from 'src/utils/getWorktreePathsPortable.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   getProjectsDir,
   sanitizePath,
-} from '../utils/sessionStoragePortable.js'
-import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
+} from 'src/utils/sessionStoragePortable.js'
+import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
 
 /**
  * Upper bound on worktree fanout. git worktree list is naturally bounded

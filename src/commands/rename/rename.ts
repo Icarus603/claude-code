@@ -3,7 +3,7 @@ import { getSessionId } from '../../bootstrap/state.js'
 import {
   getBridgeBaseUrlOverride,
   getBridgeTokenOverride,
-} from '../../bridge/bridgeConfig.js'
+} from '@claude-code/bridge/bridgeConfig.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type {
   LocalJSXCommandContext,
@@ -63,7 +63,7 @@ export async function call(
   const bridgeSessionId = appState.replBridgeSessionId
   if (bridgeSessionId) {
     const tokenOverride = getBridgeTokenOverride()
-    void import('../../bridge/createSession.js').then(
+    void import('@claude-code/bridge/createSession.js').then(
       ({ updateBridgeSessionTitle }) =>
         updateBridgeSessionTitle(bridgeSessionId, newName, {
           baseUrl: getBridgeBaseUrlOverride(),

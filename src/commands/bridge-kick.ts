@@ -1,4 +1,4 @@
-import { getBridgeDebugHandle } from '../bridge/bridgeDebug.js'
+import { getBridgeDebugHandle } from '@claude-code/bridge/bridgeDebug.js'
 import type { Command } from '../commands.js'
 import type { LocalCommandCall } from '../types/command.js'
 
@@ -152,7 +152,7 @@ const call: LocalCommandCall = async args => {
       return {
         type: 'text',
         value:
-          'Next 2 POST /bridge/reconnect calls will 404. doReconnect Strategy 1 falls through to Strategy 2.',
+          '@claude-code/bridge/reconnect calls will 404. doReconnect Strategy 1 falls through to Strategy 2.',
       }
     }
 

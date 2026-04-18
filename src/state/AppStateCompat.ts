@@ -5,7 +5,7 @@ import type { DenialTrackingState } from '@claude-code/permission/denialTracking
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import type { Notification } from 'src/context/notifications.js'
 import type { TodoList } from 'src/utils/todo/types.js'
-import type { BridgePermissionCallbacks } from '../bridge/bridgePermissionCallbacks.js'
+import type { BridgePermissionCallbacks } from '@claude-code/bridge/bridgePermissionCallbacks.js'
 import type { Command } from '../commands.js'
 import type { ChannelPermissionCallbacks } from '../services/mcp/channelPermissions.js'
 import type { ElicitationRequestEvent } from '../services/mcp/elicitationHandler.js'

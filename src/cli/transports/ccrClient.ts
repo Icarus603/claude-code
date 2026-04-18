@@ -3,7 +3,7 @@ import type {
   SDKPartialAssistantMessage,
   StdoutMessage,
 } from 'src/entrypoints/sdk/controlTypes.js'
-import { decodeJwtExpiry } from '../../bridge/jwtUtils.js'
+import { decodeJwtExpiry } from '@claude-code/bridge/jwtUtils.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { logForDiagnosticsNoPII } from '../../utils/diagLogs.js'
 import { errorMessage, getErrnoCode } from '../../utils/errors.js'

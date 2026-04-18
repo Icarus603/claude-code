@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { randomUUID } from 'crypto'
 import { hostname, tmpdir } from 'os'
 import { basename, join, resolve } from 'path'
-import { getRemoteSessionUrl } from '../constants/product.js'
+import { getRemoteSessionUrl } from 'src/constants/product.js'
 import { checkGate_CACHED_OR_BLOCKING } from '@claude-code/config/feature-flags'
 import {
   logEvent,
@@ -12,14 +12,14 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   shutdownEventLoggers,
 } from '@claude-code/local-observability/compat'
-import { isInBundledMode } from '../utils/bundledMode.js'
-import { logForDebugging } from '../utils/debug.js'
-import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
-import { isEnvTruthy, isInProtectedNamespace } from '../utils/envUtils.js'
-import { errorMessage } from '../utils/errors.js'
-import { truncateToWidth } from '../utils/format.js'
-import { logError } from '../utils/log.js'
-import { sleep } from '../utils/sleep.js'
+import { isInBundledMode } from 'src/utils/bundledMode.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { isEnvTruthy, isInProtectedNamespace } from 'src/utils/envUtils.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { truncateToWidth } from 'src/utils/format.js'
+import { logError } from 'src/utils/log.js'
+import { sleep } from 'src/utils/sleep.js'
 import { createAgentWorktree, removeAgentWorktree } from '@claude-code/swarm'
 import {
   BridgeFatalError,
@@ -151,7 +151,7 @@ export async function runBridgeLoop(
   initialSessionId?: string,
   getAccessToken?: () => string | undefined | Promise<string | undefined>,
 ): Promise<void> {
-  const { installSwarmHost } = await import('../swarm/installSwarmHost.js')
+  const { installSwarmHost } = await import('src/swarm/installSwarmHost.js')
   installSwarmHost()
 
   // Local abort controller so that onSessionDone can stop the poll loop.
@@ -1893,7 +1893,7 @@ export function parseArgs(args: string[]): ParsedArgs {
 async function printHelp(): Promise<void> {
   // Use EXTERNAL_PERMISSION_MODES for help text — internal modes (bubble)
   // are ant-only and auto is feature-gated; they're still accepted by validation.
-  const { EXTERNAL_PERMISSION_MODES } = await import('../types/permissions.js')
+  const { EXTERNAL_PERMISSION_MODES } = await import('src/types/permissions.js')
   const modes = EXTERNAL_PERMISSION_MODES.join(', ')
   const showServer = await isMultiSessionSpawnEnabled()
   const serverOptions = showServer
@@ -1981,7 +1981,7 @@ async function fetchSessionTitle(
 }
 
 export async function bridgeMain(args: string[]): Promise<void> {
-  const { installSwarmHost } = await import('../swarm/installSwarmHost.js')
+  const { installSwarmHost } = await import('src/swarm/installSwarmHost.js')
   installSwarmHost()
 
   const parsed = parseArgs(args)
@@ -2026,7 +2026,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // Validate permission mode early so the user gets an error before
   // the bridge starts polling for work.
   if (permissionMode !== undefined) {
-    const { PERMISSION_MODES } = await import('../types/permissions.js')
+    const { PERMISSION_MODES } = await import('src/types/permissions.js')
     const valid: readonly string[] = PERMISSION_MODES
     if (!valid.includes(permissionMode)) {
       console.error(
@@ -2048,7 +2048,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   // Initialize analytics and error reporting sinks. The bridge bypasses the
   // setup() init flow, so we call initSinks() directly to attach sinks here.
-  const { initSinks } = await import('../utils/sinks.js')
+  const { initSinks } = await import('src/utils/sinks.js')
   initSinks()
 
   // Gate-aware validation: --spawn / --capacity / --create-session-in-dir require
@@ -2080,7 +2080,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   // Set the bootstrap CWD so that trust checks, project config lookups, and
   // git utilities (getBranch, getRemoteUrl) resolve against the correct path.
-  const { setOriginalCwd, setCwdState } = await import('../bootstrap/state.js')
+  const { setOriginalCwd, setCwdState } = await import('src/bootstrap/state.js')
   setOriginalCwd(dir)
   setCwdState(dir)
 
@@ -2096,7 +2096,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   // Resolve auth
   const { clearOAuthTokenCache, checkAndRefreshOAuthTokenIfNeeded } =
-    await import('../utils/auth.js')
+    await import('src/utils/auth.js')
   const { getBridgeAccessToken, getBridgeBaseUrl } = await import(
     './bridgeConfig.js'
   )
@@ -2201,12 +2201,12 @@ export async function bridgeMain(args: string[]): Promise<void> {
       : baseUrl
 
   const { getBranch, getRemoteUrl, findGitRoot } = await import(
-    '../utils/git.js'
+    'src/utils/git.js'
   )
 
   // Precheck worktree availability for the first-run dialog and the `w`
   // toggle. Unconditional so we know upfront whether worktree is an option.
-  const { hasWorktreeCreateHook } = await import('../utils/hooks.js')
+  const { hasWorktreeCreateHook } = await import('src/utils/hooks.js')
   const worktreeAvailable = hasWorktreeCreateHook() || findGitRoot(dir) !== null
 
   // Load saved per-project spawn-mode preference. Gated by multiSessionEnabled
@@ -2336,7 +2336,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   const machineName = hostname()
   const bridgeId = randomUUID()
 
-  const { handleOAuth401Error } = await import('../utils/auth.js')
+  const { handleOAuth401Error } = await import('src/utils/auth.js')
   const api = createBridgeApiClient({
     baseUrl,
     getAccessToken: getBridgeAccessToken,
@@ -2579,7 +2579,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   })
 
   const logger = createBridgeLogger({ verbose })
-  const { parseGitHubRepository } = await import('../utils/detectRepository.js')
+  const { parseGitHubRepository } = await import('src/utils/detectRepository.js')
   const ownerRepo = gitRepoUrl ? parseGitHubRepository(gitRepoUrl) : null
   // Use the repo name from the parsed owner/repo, or fall back to the dir basename
   const repoName = ownerRepo ? ownerRepo.split('/').pop()! : basename(dir)
@@ -2799,7 +2799,7 @@ export async function runBridgeHeadless(
   opts: HeadlessBridgeOpts,
   signal: AbortSignal,
 ): Promise<void> {
-  const { installSwarmHost } = await import('../swarm/installSwarmHost.js')
+  const { installSwarmHost } = await import('src/swarm/installSwarmHost.js')
   installSwarmHost()
 
   const { dir, log } = opts
@@ -2808,7 +2808,7 @@ export async function runBridgeHeadless(
   // (getBranch/getRemoteUrl) — which read from bootstrap CWD state set
   // below — resolve against the right repo.
   process.chdir(dir)
-  const { setOriginalCwd, setCwdState } = await import('../bootstrap/state.js')
+  const { setOriginalCwd, setCwdState } = await import('src/bootstrap/state.js')
   setOriginalCwd(dir)
   setCwdState(dir)
 
@@ -2816,7 +2816,7 @@ export async function runBridgeHeadless(
     '@claude-code/config'
   )
   enableConfigs()
-  const { initSinks } = await import('../utils/sinks.js')
+  const { initSinks } = await import('src/utils/sinks.js')
   initSinks()
 
   if (!checkHasTrustDialogAccepted()) {
@@ -2848,9 +2848,9 @@ export async function runBridgeHeadless(
       : baseUrl
 
   const { getBranch, getRemoteUrl, findGitRoot } = await import(
-    '../utils/git.js'
+    'src/utils/git.js'
   )
-  const { hasWorktreeCreateHook } = await import('../utils/hooks.js')
+  const { hasWorktreeCreateHook } = await import('src/utils/hooks.js')
 
   if (opts.spawnMode === 'worktree') {
     const worktreeAvailable =
