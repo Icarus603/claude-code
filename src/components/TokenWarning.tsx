@@ -29,7 +29,7 @@ function CollapseLabel({
 }): React.ReactNode {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const { getStats, subscribe } =
-    require('../services/contextCollapse/index.js') as typeof import('../services/contextCollapse/index.js')
+    require('@claude-code/agent/contextCollapse/index.js') as typeof import('@claude-code/agent/contextCollapse/index.js')
   /* eslint-enable @typescript-eslint/no-require-imports */
 
   // Snapshot must be referentially stable across calls when the
@@ -103,7 +103,7 @@ export function TokenWarning({ tokenUsage, model }: Props): React.ReactNode {
   if (feature('CONTEXT_COLLAPSE')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { isContextCollapseEnabled } =
-      require('../services/contextCollapse/index.js') as typeof import('../services/contextCollapse/index.js')
+      require('@claude-code/agent/contextCollapse/index.js') as typeof import('@claude-code/agent/contextCollapse/index.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     if (isContextCollapseEnabled()) {
       collapseMode = true

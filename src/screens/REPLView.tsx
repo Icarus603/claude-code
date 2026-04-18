@@ -4223,7 +4223,7 @@ export function REPL({
         // threshold crossing.
         /* eslint-disable @typescript-eslint/no-require-imports */
         (
-          require('../services/contextCollapse/index.js') as typeof import('../services/contextCollapse/index.js')
+          require('@claude-code/agent/contextCollapse/index.js') as typeof import('@claude-code/agent/contextCollapse/index.js')
         ).resetContextCollapse();
         /* eslint-enable @typescript-eslint/no-require-imports */
       }
