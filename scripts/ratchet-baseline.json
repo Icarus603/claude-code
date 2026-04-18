@@ -1,0 +1,12 @@
+{
+  "appstate_imports": 31,
+  "src_components_files": 396,
+  "src_commands_subdirs": 92,
+  "src_services_api_files": 41,
+  "src_services_mcp_files": 35,
+  "src_tools_subdirs": 55,
+  "cc_app_imports": 78,
+  "host_string_error_cmp": 63,
+  "src_agent_depimpls": 8,
+  "empty_shell_packages": 13
+}
