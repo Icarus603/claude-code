@@ -4,8 +4,8 @@ import type {
   ImageBlockParam,
 } from '@anthropic-ai/sdk/resources/messages.mjs'
 import type { UUID } from 'crypto'
-import type { SDKMessage } from '../entrypoints/agentSdkTypes.js'
-import { detectImageFormatFromBase64 } from '../utils/imageResizer.js'
+import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import { detectImageFormatFromBase64 } from 'src/utils/imageResizer.js'
 
 /**
  * Process an inbound user message from the bridge, extracting content

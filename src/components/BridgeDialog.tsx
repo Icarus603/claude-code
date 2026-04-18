@@ -8,7 +8,7 @@ import {
   buildIdleFooterText,
   FAILED_FOOTER_TEXT,
   getBridgeStatus,
-} from '../bridge/bridgeStatusUtil.js'
+} from '@claude-code/bridge/bridgeStatusUtil.js'
 import {
   BRIDGE_FAILED_INDICATOR,
   BRIDGE_READY_INDICATOR,

@@ -72,7 +72,7 @@ const assistantCommand = feature('KAIROS')
   ? require('../commands/assistant/index.js').default
   : null
 const bridge = feature('BRIDGE_MODE')
-  ? require('../commands/bridge/index.js').default
+  ? require('@claude-code/bridge/index.js').default
   : null
 const remoteControlServerCommand =
   feature('DAEMON') && feature('BRIDGE_MODE')

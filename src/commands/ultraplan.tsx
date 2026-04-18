@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { REMOTE_CONTROL_DISCONNECTED_MSG } from '../bridge/types.js';
+import { REMOTE_CONTROL_DISCONNECTED_MSG } from '@claude-code/bridge/types.js';
 import type { Command } from '../commands.js';
 import { DIAMOND_OPEN } from '../constants/figures.js';
 import { getRemoteSessionUrl } from '../constants/product.js';

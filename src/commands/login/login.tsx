@@ -4,7 +4,7 @@ import { resetCostState } from '../../bootstrap/state.js'
 import {
   clearTrustedDeviceToken,
   enrollTrustedDevice,
-} from '../../bridge/trustedDevice.js'
+} from '@claude-code/bridge/trustedDevice.js'
 import type { LocalJSXCommandContext } from '../../commands.js'
 import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
 import { ConsoleOAuthFlow } from '../../components/ConsoleOAuthFlow.js'

@@ -5,11 +5,11 @@ import {
   type BridgePermissionCallbacks,
   type BridgePermissionResponse,
   isBridgePermissionResponse,
-} from '../bridge/bridgePermissionCallbacks.js'
-import { buildBridgeConnectUrl } from '../bridge/bridgeStatusUtil.js'
-import { extractInboundMessageFields } from '../bridge/inboundMessages.js'
-import type { BridgeState, ReplBridgeHandle } from '../bridge/replBridge.js'
-import { setReplBridgeHandle } from '../bridge/replBridgeHandle.js'
+} from '@claude-code/bridge/bridgePermissionCallbacks.js'
+import { buildBridgeConnectUrl } from '@claude-code/bridge/bridgeStatusUtil.js'
+import { extractInboundMessageFields } from '@claude-code/bridge/inboundMessages.js'
+import type { BridgeState, ReplBridgeHandle } from '@claude-code/bridge/replBridge.js'
+import { setReplBridgeHandle } from '@claude-code/bridge/replBridgeHandle.js'
 import type { Command } from '../commands.js'
 import { getSlashCommandToolSkills, isBridgeSafeCommand } from '../commands.js'
 import { getRemoteSessionUrl } from '../constants/product.js'
@@ -186,9 +186,9 @@ export function useReplBridge(
           if (cancelled) return
 
           // Dynamic import so the module is tree-shaken in external builds
-          const { initReplBridge } = await import('../bridge/initReplBridge.js')
+          const { initReplBridge } = await import('@claude-code/bridge/initReplBridge.js')
           const { shouldShowAppUpgradeMessage } = await import(
-            '../bridge/envLessBridgeConfig.js'
+            '@claude-code/bridge/envLessBridgeConfig.js'
           )
 
           // Assistant mode: perpetual bridge session — claude.ai shows one
@@ -223,13 +223,13 @@ export function useReplBridge(
 
               // Dynamic import keeps the bridge code out of non-BRIDGE_MODE builds.
               const { resolveAndPrepend } = await import(
-                '../bridge/inboundAttachments.js'
+                '@claude-code/bridge/inboundAttachments.js'
               )
               let sanitized = fields.content
               if (feature('KAIROS_GITHUB_WEBHOOKS')) {
                 /* eslint-disable @typescript-eslint/no-require-imports */
                 const { sanitizeInboundWebhookContent } =
-                  require('../bridge/webhookSanitizer.js') as typeof import('../bridge/webhookSanitizer.js')
+                  require('@claude-code/bridge/webhookSanitizer.js') as typeof import('@claude-code/bridge/webhookSanitizer.js')
                 /* eslint-enable @typescript-eslint/no-require-imports */
                 sanitized = sanitizeInboundWebhookContent(fields.content)
               }

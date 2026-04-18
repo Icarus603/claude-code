@@ -22,7 +22,7 @@ import { z } from 'zod/v4'
 import {
   getBridgeAccessToken,
   getBridgeBaseUrlOverride,
-} from 'src/bridge/bridgeConfig.js'
+} from '@claude-code/bridge/bridgeConfig.js'
 import { getOauthConfig } from 'src/constants/oauth.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { lazySchema } from 'src/utils/lazySchema.js'

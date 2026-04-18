@@ -3,7 +3,7 @@ import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs
 import { randomUUID } from 'crypto'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getAllowedChannels } from '../../../bootstrap/state.js'
-import type { BridgePermissionCallbacks } from '../../../bridge/bridgePermissionCallbacks.js'
+import type { BridgePermissionCallbacks } from '@claude-code/bridge/bridgePermissionCallbacks.js'
 import { getTerminalFocused } from '@anthropic/ink'
 import {
   CHANNEL_PERMISSION_REQUEST_METHOD,

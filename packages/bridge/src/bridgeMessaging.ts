@@ -11,21 +11,21 @@
  */
 
 import { randomUUID } from 'crypto'
-import type { SDKMessage } from '../entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
 import type {
   SDKControlRequest,
   SDKControlResponse,
-} from '../entrypoints/sdk/controlTypes.js'
-import type { SDKResultSuccess } from '../entrypoints/sdk/coreTypes.js'
+} from 'src/entrypoints/sdk/controlTypes.js'
+import type { SDKResultSuccess } from 'src/entrypoints/sdk/coreTypes.js'
 import { logEvent } from '@claude-code/local-observability'
-import { EMPTY_USAGE } from '../services/api/emptyUsage.js'
-import type { Message } from '../types/message.js'
-import { normalizeControlMessageKeys } from '../utils/controlMessageCompat.js'
-import { logForDebugging } from '../utils/debug.js'
-import { stripDisplayTagsAllowEmpty } from '../utils/displayTags.js'
-import { errorMessage } from '../utils/errors.js'
+import { EMPTY_USAGE } from 'src/services/api/emptyUsage.js'
+import type { Message } from 'src/types/message.js'
+import { normalizeControlMessageKeys } from 'src/utils/controlMessageCompat.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { stripDisplayTagsAllowEmpty } from 'src/utils/displayTags.js'
+import { errorMessage } from 'src/utils/errors.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { jsonParse } from '../utils/slowOperations.js'
+import { jsonParse } from 'src/utils/slowOperations.js'
 import type { ReplBridgeTransport } from './replBridgeTransport.js'
 
 // ─── Type guards ─────────────────────────────────────────────────────────────

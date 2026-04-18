@@ -15,39 +15,39 @@
 
 import { feature } from 'bun:bundle'
 import { hostname } from 'os'
-import { getOriginalCwd, getSessionId } from '../bootstrap/state.js'
-import type { SDKMessage } from '../entrypoints/agentSdkTypes.js'
-import type { SDKControlResponse } from '../entrypoints/sdk/controlTypes.js'
+import { getOriginalCwd, getSessionId } from 'src/bootstrap/state.js'
+import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import type { SDKControlResponse } from 'src/entrypoints/sdk/controlTypes.js'
 import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature-flags'
-import { getOrganizationUUID } from '../services/oauth/client.js'
+import { getOrganizationUUID } from 'src/services/oauth/client.js'
 import {
   isPolicyAllowed,
   waitForPolicyLimitsToLoad,
-} from '../services/policyLimits/index.js'
-import type { Message } from '../types/message.js'
+} from 'src/services/policyLimits/index.js'
+import type { Message } from 'src/types/message.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
   handleOAuth401Error,
-} from '../utils/auth.js'
+} from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from '../utils/debug.js'
-import { stripDisplayTagsAllowEmpty } from '../utils/displayTags.js'
-import { errorMessage } from '../utils/errors.js'
-import { getBranch, getRemoteUrl } from '../utils/git.js'
-import { toSDKMessages } from '../utils/messages/mappers.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { stripDisplayTagsAllowEmpty } from 'src/utils/displayTags.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { getBranch, getRemoteUrl } from 'src/utils/git.js'
+import { toSDKMessages } from 'src/utils/messages/mappers.js'
 import {
   getContentText,
   getMessagesAfterCompactBoundary,
   isSyntheticMessage,
-} from '../utils/messages.js'
+} from 'src/utils/messages.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { getCurrentSessionTitle } from '../utils/sessionStorage.js'
+import { getCurrentSessionTitle } from 'src/utils/sessionStorage.js'
 import {
   extractConversationText,
   generateSessionTitle,
-} from '../utils/sessionTitle.js'
-import { generateShortWordSlug } from '../utils/words.js'
+} from 'src/utils/sessionTitle.js'
+import { generateShortWordSlug } from 'src/utils/words.js'
 import {
   getBridgeAccessToken,
   getBridgeBaseUrl,
@@ -477,7 +477,7 @@ export async function initReplBridge(
   if (feature('KAIROS')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { isAssistantMode } =
-      require('../assistant/index.js') as typeof import('../assistant/index.js')
+      require('src/assistant/index.js') as typeof import('src/assistant/index.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     if (isAssistantMode()) {
       workerType = 'claude_code_assistant'
