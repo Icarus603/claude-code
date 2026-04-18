@@ -37,7 +37,7 @@ import {
   computeStandaloneAgentContext,
   restoreAgentFromSession,
   restoreWorktreeForResume,
-} from '../utils/sessionRestore.js'
+} from '@claude-code/storage/sessionRestore.js'
 import {
   adoptResumedSessionFile,
   enrichLogs,

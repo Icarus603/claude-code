@@ -317,7 +317,7 @@ import {
   restoreSessionStateFromLog,
   restoreWorktreeForResume,
   exitRestoredWorktree,
-} from '../utils/sessionRestore.js';
+} from '@claude-code/storage/sessionRestore.js';
 import { isBgSession, updateSessionName, updateSessionActivity } from '../utils/concurrentSessions.js';
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
 import { restoreRemoteAgentTasks } from '../tasks/RemoteAgentTask/RemoteAgentTask.js';

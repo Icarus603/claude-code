@@ -58,7 +58,7 @@ import {
 } from '@claude-code/storage/sessionStart.js'
 import {
   restoreAgentFromSession,
-} from '../../../../../../src/utils/sessionRestore.js'
+} from '@claude-code/storage/sessionRestore.js'
 import {
   saveAgentSetting,
 } from '../../../../../../src/utils/sessionStorage.js'

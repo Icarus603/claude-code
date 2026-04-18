@@ -300,7 +300,7 @@ import {
 import {
   restoreAgentFromSession,
   restoreSessionStateFromLog,
-} from '../../../../../../src/utils/sessionRestore.js'
+} from '@claude-code/storage/sessionRestore.js'
 import { SandboxManager } from '../../../../../../src/utils/sandbox/sandbox-adapter.js'
 import {
   headlessProfilerStartTurn,
