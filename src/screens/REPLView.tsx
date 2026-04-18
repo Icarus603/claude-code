@@ -450,7 +450,7 @@ import { getFocusedInputDialog } from './repl/dialogs.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '../remote/RemoteSessionManager.js'
 import { REMOTE_SAFE_COMMANDS } from '../commands.js'
-import type { RemoteMessageContent } from '../utils/teleport/api.js'
+import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 import {
   FullscreenLayout,
   useUnseenDivider,

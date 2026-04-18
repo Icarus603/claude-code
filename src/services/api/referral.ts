@@ -9,7 +9,7 @@ import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../../utils/debug.js'
 import { logError } from '../../utils/log.js'
 import { isEssentialTrafficOnly } from '../../utils/privacyLevel.js'
-import { getOAuthHeaders, prepareApiRequest } from '../../utils/teleport/api.js'
+import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'
 import type {
   ReferralCampaign,
   ReferralEligibilityResponse,

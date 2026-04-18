@@ -12,8 +12,8 @@ import { logForDebugging } from '../../debug.js'
 import { detectCurrentRepository } from '../../detectRepository.js'
 import { errorMessage } from '../../errors.js'
 import { findGitRoot, getIsClean } from '../../git.js'
-import { getOAuthHeaders } from '../../teleport/api.js'
-import { fetchEnvironments } from '../../teleport/environments.js'
+import { getOAuthHeaders } from '@claude-code/teleport/api.js'
+import { fetchEnvironments } from '@claude-code/teleport/environments.js'
 
 /**
  * Checks if user needs to log in with Claude.ai

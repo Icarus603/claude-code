@@ -10,7 +10,7 @@ import { logError } from '../utils/log.js'
 import {
   type RemoteMessageContent,
   sendEventToRemoteSession,
-} from '../utils/teleport/api.js'
+} from '@claude-code/teleport/api.js'
 import {
   SessionsWebSocket,
   type SessionsWebSocketCallbacks,

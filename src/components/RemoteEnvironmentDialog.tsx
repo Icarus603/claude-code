@@ -11,8 +11,8 @@ import {
   type SettingSource,
 } from '../utils/settings/constants.js'
 import { updateSettingsForSource } from '../utils/settings/settings.js'
-import { getEnvironmentSelectionInfo } from '../utils/teleport/environmentSelection.js'
-import type { EnvironmentResource } from '../utils/teleport/environments.js'
+import { getEnvironmentSelectionInfo } from '@claude-code/teleport/environmentSelection.js'
+import type { EnvironmentResource } from '@claude-code/teleport/environments.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Select } from './CustomSelect/select.js'
 import { Byline, Dialog, KeyboardShortcutHint, LoadingState } from '@anthropic/ink'

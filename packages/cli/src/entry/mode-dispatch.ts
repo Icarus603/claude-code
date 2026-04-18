@@ -366,7 +366,7 @@ import {
 } from '../../../../src/utils/plugins/pluginLoader.js'
 import { migrateChangelogFromConfig } from '../../../../src/utils/releaseNotes.js'
 import { SandboxManager } from '../../../../src/utils/sandbox/sandbox-adapter.js'
-import { fetchSession, prepareApiRequest } from '../../../../src/utils/teleport/api.js'
+import { fetchSession, prepareApiRequest } from '@claude-code/teleport/api.js'
 import {
   checkOutTeleportedSessionBranch,
   processMessagesForTeleportResume,

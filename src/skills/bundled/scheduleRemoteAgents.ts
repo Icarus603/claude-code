@@ -17,7 +17,7 @@ import {
   createDefaultCloudEnvironment,
   type EnvironmentResource,
   fetchEnvironments,
-} from '../../utils/teleport/environments.js'
+} from '@claude-code/teleport/environments.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 
 // Base58 alphabet (Bitcoin-style) used by the tagged ID system

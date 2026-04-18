@@ -3,7 +3,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import {
   type CodeSession,
   fetchCodeSessionsFromSessionsAPI,
-} from 'src/utils/teleport/api.js'
+} from '@claude-code/teleport/api.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow list navigation
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'

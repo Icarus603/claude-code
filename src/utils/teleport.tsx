@@ -64,9 +64,9 @@ import {
   getBranchFromSession,
   getOAuthHeaders,
   type SessionResource,
-} from './teleport/api.js'
-import { fetchEnvironments } from './teleport/environments.js'
-import { createAndUploadGitBundle } from './teleport/gitBundle.js'
+} from '@claude-code/teleport/api.js'
+import { fetchEnvironments } from '@claude-code/teleport/environments.js'
+import { createAndUploadGitBundle } from '@claude-code/teleport/gitBundle.js'
 
 export type TeleportResult = {
   messages: Message[]
