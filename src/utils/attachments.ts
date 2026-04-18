@@ -35,7 +35,7 @@ import {
   isTodoV2Enabled,
 } from './tasks.js'
 import { getPlanFilePath, getPlan } from './plans.js'
-import { getConnectedIdeName } from './ide.js'
+import { getConnectedIdeName } from '@claude-code/ide/ide.js'
 import {
   filterInjectedMemoryFiles,
   getManagedAndUserConditionalRules,
@@ -186,7 +186,7 @@ import {
 import {
   checkForLSPDiagnostics,
   clearAllLSPDiagnostics,
-} from '../services/lsp/LSPDiagnosticRegistry.js'
+} from '@claude-code/ide/lsp/LSPDiagnosticRegistry.js'
 import { logForDebugging } from './debug.js'
 import {
   extractTextContent,

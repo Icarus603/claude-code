@@ -76,7 +76,7 @@ import { SearchBox } from '@anthropic/ink'
 import {
   isSupportedTerminal,
   hasAccessToIDEExtensionDiffFeature,
-} from '../../utils/ide.js'
+} from '@claude-code/ide/ide.js'
 import {
   getInitialSettings,
   getSettingsForSource,

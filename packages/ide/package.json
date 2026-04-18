@@ -9,6 +9,9 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./ide.js": "./src/ide.ts",
+    "./idePathConversion.js": "./src/idePathConversion.ts",
+    "./lsp/*.js": "./src/lsp/*.ts"
   }
 }

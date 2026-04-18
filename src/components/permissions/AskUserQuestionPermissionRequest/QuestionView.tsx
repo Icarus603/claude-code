@@ -8,7 +8,7 @@ import type {
 } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import type { PastedContent } from '@claude-code/config'
 import { getExternalEditor } from '../../../utils/editor.js'
-import { toIDEDisplayName } from '../../../utils/ide.js'
+import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import type { ImageDimensions } from '../../../utils/imageResizer.js'
 import { editPromptInEditor } from '../../../utils/promptEditor.js'
 import {

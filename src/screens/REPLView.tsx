@@ -344,7 +344,7 @@ import {
   closeOpenDiffs,
   getConnectedIdeClient,
   type IdeType,
-} from '../utils/ide.js';
+} from '@claude-code/ide/ide.js';
 import { useIDEIntegration } from '../hooks/useIDEIntegration.js';
 import exit from '../commands/exit/index.js';
 import { ExitFlow } from '../components/ExitFlow.js';

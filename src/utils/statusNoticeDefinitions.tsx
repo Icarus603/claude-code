@@ -26,7 +26,7 @@ import {
   isSupportedJetBrainsTerminal,
   toIDEDisplayName,
   getTerminalIdeType,
-} from './ide.js'
+} from '@claude-code/ide/ide.js'
 import { isJetBrainsPluginInstalledCachedSync } from './jetbrains.js'
 
 // Types

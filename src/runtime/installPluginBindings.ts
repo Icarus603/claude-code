@@ -283,7 +283,7 @@ export function installPluginBindings(): void {
   setGetLspManagerFn(() => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require('../services/lsp/manager.js')
+      return require('@claude-code/ide/lsp/manager.js')
     } catch {
       return undefined
     }

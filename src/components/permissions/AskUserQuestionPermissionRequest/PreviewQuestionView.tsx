@@ -9,7 +9,7 @@ import {
 import { useAppState } from '../../../state/AppState.js'
 import type { Question } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import { getExternalEditor } from '../../../utils/editor.js'
-import { toIDEDisplayName } from '../../../utils/ide.js'
+import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { editPromptInEditor } from '../../../utils/promptEditor.js'
 import { Divider } from '@anthropic/ink'
 import TextInput from '../../TextInput.js'

@@ -5,7 +5,7 @@ import type {
   ConnectedMCPServer,
   MCPServerConnection,
 } from '../services/mcp/types.js'
-import { getConnectedIdeClient } from '../utils/ide.js'
+import { getConnectedIdeClient } from '@claude-code/ide/ide.js'
 import { lazySchema } from '../utils/lazySchema.js'
 export type SelectionPoint = {
   line: number

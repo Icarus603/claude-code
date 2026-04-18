@@ -42,7 +42,7 @@ import {
 } from '../../../utils/context.js'
 import { getExternalEditor } from '../../../utils/editor.js'
 import { getDisplayPath } from '../../../utils/file.js'
-import { toIDEDisplayName } from '../../../utils/ide.js'
+import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { logError } from '../../../utils/log.js'
 import { enqueuePendingNotification } from '../../../utils/messageQueueManager.js'
 import { createUserMessage } from '../../../utils/messages.js'

@@ -8,7 +8,7 @@ import {
   type IDEExtensionInstallationStatus,
   isJetBrainsIde,
   isSupportedTerminal,
-} from 'src/utils/ide.js'
+} from '@claude-code/ide/ide.js'
 import { getIsRemoteMode } from '../../bootstrap/state.js'
 import { useIdeConnectionStatus } from '../useIdeConnectionStatus.js'
 import type { IDESelection } from '../useIdeSelection.js'
