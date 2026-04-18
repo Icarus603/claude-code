@@ -279,7 +279,7 @@ import {
 import { logSkillsLoaded } from '../../../../src/utils/telemetry/skillLoadedEvent.js'
 import { generateTempFilePath } from '../../../../src/utils/tempfile.js'
 import { validateUuid } from '../../../../src/utils/uuid.js'
-import { logPermissionContextForAnts } from '../../../../src/services/internalLogging.js'
+import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
 import { getRelevantTips } from '../../../../src/services/tips/tipRegistry.js'
 import { logContextMetrics } from '../../../../src/utils/api.js'
 import {

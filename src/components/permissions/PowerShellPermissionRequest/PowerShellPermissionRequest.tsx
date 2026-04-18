@@ -6,7 +6,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { sanitizeToolNameForAnalytics } from '../../../services/eventMetadata.js'
+import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import { getDestructiveCommandWarning } from '@claude-code/tool-registry/tools/PowerShellTool/destructiveCommandWarning.js'
 import { PowerShellTool } from '@claude-code/tool-registry/tools/PowerShellTool/PowerShellTool.js'
 import { isAllowlistedCommand } from '@claude-code/tool-registry/tools/PowerShellTool/readOnlyValidation.js'

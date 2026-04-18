@@ -1,6 +1,6 @@
 import { z } from 'zod/v4'
 import { logEvent } from '@claude-code/local-observability'
-import { sanitizeToolNameForAnalytics } from '../../services/eventMetadata.js'
+import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import type { AssistantMessage, Message } from '../../types/message.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'

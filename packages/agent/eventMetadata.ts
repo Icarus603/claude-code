@@ -2,8 +2,8 @@ export type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS = never
 export type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED = never
 
 import { extname } from 'path'
-import { isEnvTruthy } from '../utils/envUtils.js'
-import { jsonStringify } from '../utils/slowOperations.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 
 export function sanitizeToolNameForAnalytics(
   toolName: string,

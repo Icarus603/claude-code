@@ -15,11 +15,11 @@ import { logEvent } from '@claude-code/local-observability'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   getFileExtensionForAnalytics,
-} from 'src/services/eventMetadata.js'
+} from '@claude-code/agent/eventMetadata.js'
 import {
   countTokensWithAPI,
   roughTokenCountEstimationForFileType,
-} from 'src/services/tokenEstimation.js'
+} from '@claude-code/agent/tokenEstimation.js'
 import {
   activateConditionalSkillsForPaths,
   addSkillDirectories,

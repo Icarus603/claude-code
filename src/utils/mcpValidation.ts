@@ -7,7 +7,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import {
   countMessagesTokensWithAPI,
   roughTokenCountEstimation,
-} from '../services/tokenEstimation.js'
+} from '@claude-code/agent/tokenEstimation.js'
 import { compressImageBlock } from './imageResizer.js'
 import { logError } from './log.js'
 

@@ -9,7 +9,7 @@
  * to preserve the existing API.
  */
 
-import type { ToolPermissionContext } from '../Tool.js'
+import type { ToolPermissionContext } from 'src/services/Tool.js'
 import {
   getContainerId,
   logPermissionContextForAnts as _logPermissionContextForAnts,

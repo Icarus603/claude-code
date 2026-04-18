@@ -21,7 +21,11 @@
     "./compaction/*.js": "./compaction/*.ts",
     "./contextCollapse/*.js": "./contextCollapse/*.ts",
     "./extractMemories/*.js": "./extractMemories/*.ts",
-    "./tokenEstimation/*.js": "./tokenEstimation/*.ts"
+    "./tokenEstimation/*.js": "./tokenEstimation/*.ts",
+    "./agentHostBindings.js": "./agentHostBindings.ts",
+    "./eventMetadata.js": "./eventMetadata.ts",
+    "./internalLogging.js": "./internalLogging.ts",
+    "./tokenEstimation.js": "./tokenEstimation.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

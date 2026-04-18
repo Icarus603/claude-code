@@ -19,7 +19,7 @@ import {
   isToolDetailsLoggingEnabled,
   mcpToolDetailsForAnalytics,
   sanitizeToolNameForAnalytics,
-} from 'src/services/eventMetadata.js'
+} from '@claude-code/agent/eventMetadata.js'
 import {
   addToToolDuration,
   getCodeEditToolDecisionCounter,
