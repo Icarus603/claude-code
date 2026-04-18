@@ -30,8 +30,8 @@ import {
   type StreamingToolUse,
 } from '../utils/messages.js'
 import { generateSessionTitle } from '../utils/sessionTitle.js'
-import type { RemoteMessageContent } from '../utils/teleport/api.js'
-import { updateSessionTitle } from '../utils/teleport/api.js'
+import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
+import { updateSessionTitle } from '@claude-code/teleport/api.js'
 
 // How long to wait for a response before showing a warning
 const RESPONSE_TIMEOUT_MS = 60000 // 60 seconds

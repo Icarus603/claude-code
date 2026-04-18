@@ -15,12 +15,12 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { type FilesApiConfig, uploadFile } from '../../services/api/filesApi.js'
-import { getCwd } from '../cwd.js'
-import { logForDebugging } from '../debug.js'
-import { execFileNoThrowWithCwd } from '../execFileNoThrow.js'
-import { findGitRoot, gitExe } from '../git.js'
-import { generateTempFilePath } from '../tempfile.js'
+import { type FilesApiConfig, uploadFile } from 'src/services/api/filesApi.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
+import { findGitRoot, gitExe } from 'src/utils/git.js'
+import { generateTempFilePath } from 'src/utils/tempfile.js'
 
 // Tunable via tengu_ccr_bundle_max_bytes.
 const DEFAULT_BUNDLE_MAX_BYTES = 100 * 1024 * 1024

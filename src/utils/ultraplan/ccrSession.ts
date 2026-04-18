@@ -12,7 +12,7 @@ import type { SDKMessage } from '../../entrypoints/agentSdkTypes.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
 import { logForDebugging } from '../debug.js'
 import { sleep } from '../sleep.js'
-import { isTransientNetworkError } from '../teleport/api.js'
+import { isTransientNetworkError } from '@claude-code/teleport/api.js'
 import {
   type PollRemoteSessionResponse,
   pollRemoteSessionEvents,

@@ -1,7 +1,7 @@
 // Auto-generated stub — replace with real implementation
 import type { SDKMessage } from '../entrypoints/sdk/coreTypes.js'
 import type { PermissionUpdate } from '../types/permissions.js'
-import type { RemoteMessageContent } from '../utils/teleport/api.js'
+import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 
 export interface SSHSessionManagerOptions {
   onMessage: (sdkMessage: SDKMessage) => void

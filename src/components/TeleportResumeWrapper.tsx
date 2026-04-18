@@ -4,7 +4,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import type { TeleportRemoteResponse } from 'src/utils/conversationRecovery.js'
-import type { CodeSession } from 'src/utils/teleport/api.js'
+import type { CodeSession } from '@claude-code/teleport/api.js'
 import {
   type TeleportSource,
   useTeleportResume,

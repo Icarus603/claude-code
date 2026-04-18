@@ -28,7 +28,7 @@ import type { Message as MessageType } from '../types/message.js'
 import type { PermissionAskDecision } from '../types/permissions.js'
 import { logForDebugging } from '../utils/debug.js'
 import { gracefulShutdown } from '../utils/gracefulShutdown.js'
-import type { RemoteMessageContent } from '../utils/teleport/api.js'
+import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 
 type UseSSHSessionResult = {
   isRemoteMode: boolean

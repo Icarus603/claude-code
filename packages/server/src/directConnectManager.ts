@@ -8,7 +8,7 @@ import type {
 import type { RemotePermissionResponse } from 'src/remote/RemoteSessionManager.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
-import type { RemoteMessageContent } from 'src/utils/teleport/api.js'
+import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 
 export type DirectConnectConfig = {
   serverUrl: string

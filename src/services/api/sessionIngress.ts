@@ -10,7 +10,7 @@ import { sequential } from '../../utils/sequential.js'
 import { getSessionIngressAuthToken } from '../../utils/sessionIngressAuth.js'
 import { sleep } from '../../utils/sleep.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
-import { getOAuthHeaders } from '../../utils/teleport/api.js'
+import { getOAuthHeaders } from '@claude-code/teleport/api.js'
 
 interface SessionIngressError {
   error?: {
