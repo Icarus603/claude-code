@@ -4,13 +4,13 @@
  */
 
 import { resolve } from 'path'
-import type { ToolPermissionContext, ToolUseContext } from '../../Tool.js'
+import type { ToolPermissionContext, ToolUseContext } from 'src/Tool.js'
 import type {
   PermissionDecisionReason,
   PermissionResult,
-} from '../../types/permissions.js'
-import { getCwd } from '../../utils/cwd.js'
-import { isCurrentDirectoryBareGitRepo } from '../../utils/git.js'
+} from 'src/types/permissions.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { isCurrentDirectoryBareGitRepo } from 'src/utils/git.js'
 import type { PermissionRule } from '@claude-code/permission/PermissionRule'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {
@@ -22,7 +22,7 @@ import {
   parsePermissionRule,
   type ShellPermissionRule,
   suggestionForExactCommand as sharedSuggestionForExactCommand,
-} from '../../utils/permissions/shellRuleMatching.js'
+} from 'src/utils/permissions/shellRuleMatching.js'
 import {
   classifyCommandName,
   deriveSecurityFlags,
@@ -33,8 +33,8 @@ import {
   PS_TOKENIZER_DASH_CHARS,
   parsePowerShellCommand,
   stripModulePrefix,
-} from '../../utils/powershell/parser.js'
-import { containsVulnerableUncPath } from '../../utils/shell/readOnlyCommandValidation.js'
+} from 'src/utils/powershell/parser.js'
+import { containsVulnerableUncPath } from 'src/utils/shell/readOnlyCommandValidation.js'
 import { isDotGitPathPS, isGitInternalPathPS } from './gitSafety.js'
 import {
   checkPermissionMode,

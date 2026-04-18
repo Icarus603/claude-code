@@ -1,5 +1,5 @@
 import { BASH_TOOL_NAME } from '../tools/BashTool/toolName.js'
-import { FILE_READ_TOOL_NAME } from '../tools/FileReadTool/prompt.js'
+import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { GREP_TOOL_NAME } from '@claude-code/tool-registry/tools/GrepTool/prompt.js'
 import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js'
 import type { ContextData } from './analyzeContext.js'

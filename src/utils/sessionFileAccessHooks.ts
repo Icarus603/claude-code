@@ -10,12 +10,12 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { FILE_EDIT_TOOL_NAME } from '../tools/FileEditTool/constants.js'
-import { inputSchema as editInputSchema } from '../tools/FileEditTool/types.js'
-import { FileReadTool } from '../tools/FileReadTool/FileReadTool.js'
-import { FILE_READ_TOOL_NAME } from '../tools/FileReadTool/prompt.js'
-import { FileWriteTool } from '../tools/FileWriteTool/FileWriteTool.js'
-import { FILE_WRITE_TOOL_NAME } from '../tools/FileWriteTool/prompt.js'
+import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
+import { inputSchema as editInputSchema } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
+import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
+import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
+import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
+import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/prompt.js'
 import { GlobTool } from '@claude-code/tool-registry/tools/GlobTool/GlobTool.js'
 import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt.js'
 import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'

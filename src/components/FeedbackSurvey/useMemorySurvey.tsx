@@ -7,7 +7,7 @@ import {
 } from '@claude-code/local-observability'
 import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
-import { FILE_READ_TOOL_NAME } from '../../tools/FileReadTool/prompt.js'
+import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import type { Message } from '../../types/message.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '../../utils/envUtils.js'

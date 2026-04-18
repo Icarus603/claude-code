@@ -50,8 +50,8 @@ import type { SettingsJson } from '../settings/types.js'
 // ============================================================================
 
 import { BASH_TOOL_NAME } from 'src/tools/BashTool/toolName.js'
-import { FILE_EDIT_TOOL_NAME } from 'src/tools/FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from 'src/tools/FileReadTool/prompt.js'
+import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
+import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js'
 import { errorMessage } from '../errors.js'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'

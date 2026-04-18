@@ -10,8 +10,8 @@ import * as React from 'react'
 import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
 import type { AppState } from 'src/state/AppState.js'
 import { z } from 'zod/v4'
-import { getKairosActive } from '../../bootstrap/state.js'
-import { TOOL_SUMMARY_MAX_LENGTH } from '../../constants/toolLimits.js'
+import { getKairosActive } from 'src/bootstrap/state.js'
+import { TOOL_SUMMARY_MAX_LENGTH } from 'src/constants/toolLimits.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -21,48 +21,48 @@ import type {
   Tool,
   ToolCallProgress,
   ValidationResult,
-} from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
+} from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
 import {
   backgroundExistingForegroundTask,
   markTaskNotified,
   registerForeground,
   spawnShellTask,
   unregisterForeground,
-} from '../../tasks/LocalShellTask/LocalShellTask.js'
-import type { AgentId } from '../../types/ids.js'
-import type { AssistantMessage } from '../../types/message.js'
-import { extractClaudeCodeHints } from '../../utils/claudeCodeHints.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
+} from 'src/tasks/LocalShellTask/LocalShellTask.js'
+import type { AgentId } from 'src/types/ids.js'
+import type { AssistantMessage } from 'src/types/message.js'
+import { extractClaudeCodeHints } from 'src/utils/claudeCodeHints.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 import {
   errorMessage as getErrorMessage,
   ShellError,
-} from '../../utils/errors.js'
-import { truncate } from '../../utils/format.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logError } from '../../utils/log.js'
+} from 'src/utils/errors.js'
+import { truncate } from 'src/utils/format.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logError } from 'src/utils/log.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
-import { getPlatform } from '../../utils/platform.js'
-import { maybeRecordPluginHint } from '../../utils/plugins/hintRecommendation.js'
-import { exec } from '../../utils/Shell.js'
-import type { ExecResult } from '../../utils/ShellCommand.js'
-import { SandboxManager } from '../../utils/sandbox/sandbox-adapter.js'
-import { semanticBoolean } from '../../utils/semanticBoolean.js'
-import { semanticNumber } from '../../utils/semanticNumber.js'
-import { getCachedPowerShellPath } from '../../utils/shell/powershellDetection.js'
-import { EndTruncatingAccumulator } from '../../utils/stringUtils.js'
-import { getTaskOutputPath } from '../../utils/task/diskOutput.js'
-import { TaskOutput } from '../../utils/task/TaskOutput.js'
-import { isOutputLineTruncated } from '../../utils/terminal.js'
+import { getPlatform } from 'src/utils/platform.js'
+import { maybeRecordPluginHint } from 'src/utils/plugins/hintRecommendation.js'
+import { exec } from 'src/utils/Shell.js'
+import type { ExecResult } from 'src/utils/ShellCommand.js'
+import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { semanticBoolean } from 'src/utils/semanticBoolean.js'
+import { semanticNumber } from 'src/utils/semanticNumber.js'
+import { getCachedPowerShellPath } from 'src/utils/shell/powershellDetection.js'
+import { EndTruncatingAccumulator } from 'src/utils/stringUtils.js'
+import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
+import { TaskOutput } from 'src/utils/task/TaskOutput.js'
+import { isOutputLineTruncated } from 'src/utils/terminal.js'
 import {
   buildLargeToolResultMessage,
   ensureToolResultsDir,
   generatePreview,
   getToolResultPath,
   PREVIEW_SIZE_BYTES,
-} from '../../utils/toolResultStorage.js'
-import { shouldUseSandbox } from '../BashTool/shouldUseSandbox.js'
-import { BackgroundHint } from '../BashTool/UI.js'
+} from 'src/utils/toolResultStorage.js'
+import { shouldUseSandbox } from 'src/tools/BashTool/shouldUseSandbox.js'
+import { BackgroundHint } from 'src/tools/BashTool/UI.js'
 import {
   buildImageToolResult,
   isImageOutput,
@@ -70,8 +70,8 @@ import {
   resizeShellImageOutput,
   stdErrAppendShellResetMessage,
   stripEmptyLines,
-} from '../BashTool/utils.js'
-import { trackGitOperations } from '../shared/gitOperationTracking.js'
+} from 'src/tools/BashTool/utils.js'
+import { trackGitOperations } from 'src/tools/shared/gitOperationTracking.js'
 import { interpretCommandResult } from './commandSemantics.js'
 import { powershellToolHasPermission } from './powershellPermissions.js'
 import { getDefaultTimeoutMs, getMaxTimeoutMs, getPrompt } from './prompt.js'
@@ -353,9 +353,9 @@ const outputSchema = lazySchema(() =>
 type OutputSchema = ReturnType<typeof outputSchema>
 export type Out = z.infer<OutputSchema>
 
-import type { PowerShellProgress } from '../../types/tools.js'
+import type { PowerShellProgress } from 'src/types/tools.js'
 
-export type { PowerShellProgress } from '../../types/tools.js'
+export type { PowerShellProgress } from 'src/types/tools.js'
 
 const COMMON_BACKGROUND_COMMANDS = [
   'npm',

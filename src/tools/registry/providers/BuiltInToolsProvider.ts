@@ -16,9 +16,9 @@ import { BashTool } from '../../BashTool/BashTool.js'
 import { GlobTool } from '@claude-code/tool-registry/tools/GlobTool/GlobTool.js'
 import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'
 import { ExitPlanModeV2Tool } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
-import { FileReadTool } from '../../FileReadTool/FileReadTool.js'
-import { FileEditTool } from '../../FileEditTool/FileEditTool.js'
-import { FileWriteTool } from '../../FileWriteTool/FileWriteTool.js'
+import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
+import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'
+import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
 import { NotebookEditTool } from '@claude-code/tool-registry/tools/NotebookEditTool/NotebookEditTool.js'
 import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js'
 import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/TodoWriteTool.js'
@@ -146,7 +146,7 @@ const getLSPTool = () =>
 
 const getPowerShellTool = () =>
   isPowerShellToolEnabled()
-    ? (require('../../PowerShellTool/PowerShellTool.js') as typeof import('../../PowerShellTool/PowerShellTool.js')).PowerShellTool
+    ? (require('@claude-code/tool-registry/tools/PowerShellTool/PowerShellTool.js') as typeof import('@claude-code/tool-registry/tools/PowerShellTool/PowerShellTool.js')).PowerShellTool
     : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 

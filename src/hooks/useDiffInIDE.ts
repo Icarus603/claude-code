@@ -11,11 +11,11 @@ import type {
   McpWebSocketIDEServerConfig,
 } from '../services/mcp/types.js'
 import type { ToolUseContext } from '../Tool.js'
-import type { FileEdit } from '../tools/FileEditTool/types.js'
+import type { FileEdit } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
 import {
   getEditsForPatch,
   getPatchForEdits,
-} from '../tools/FileEditTool/utils.js'
+} from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { getPatchFromContents } from '../utils/diff.js'
 import { isENOENT } from '../utils/errors.js'

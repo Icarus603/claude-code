@@ -198,15 +198,15 @@ export function installPluginBindings(): void {
   )
   setFileEditConstantsFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../tools/FileEditTool/constants.js'),
+    require('@claude-code/tool-registry/tools/FileEditTool/constants.js'),
   )
   setFileReadPromptFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../tools/FileReadTool/prompt.js'),
+    require('@claude-code/tool-registry/tools/FileReadTool/prompt.js'),
   )
   setFileWritePromptFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../tools/FileWriteTool/prompt.js'),
+    require('@claude-code/tool-registry/tools/FileWriteTool/prompt.js'),
   )
   setSkillToolPromptFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports

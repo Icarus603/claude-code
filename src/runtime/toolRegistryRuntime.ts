@@ -21,8 +21,8 @@ import {
 } from '../constants/tools.js'
 import { AgentTool } from '../tools/AgentTool/AgentTool.js'
 import { BashTool } from '../tools/BashTool/BashTool.js'
-import { FileEditTool } from '../tools/FileEditTool/FileEditTool.js'
-import { FileReadTool } from '../tools/FileReadTool/FileReadTool.js'
+import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'
+import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import {
   REPL_TOOL_NAME,
   REPL_ONLY_TOOLS,

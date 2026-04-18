@@ -3,11 +3,11 @@ import * as React from 'react'
 import { Suspense, use, useState } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
-import type { FileEdit } from '../tools/FileEditTool/types.js'
+import type { FileEdit } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
 import {
   findActualString,
   preserveQuoteStyle,
-} from '../tools/FileEditTool/utils.js'
+} from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import {
   adjustHunkLineNumbers,
   CONTEXT_LINES,

@@ -35,6 +35,11 @@
     "./tools/GrepTool/UI.js": "./src/tools/GrepTool/UI.tsx",
     "./tools/SkillTool/UI.js": "./src/tools/SkillTool/UI.tsx",
     "./tools/LSPTool/UI.js": "./src/tools/LSPTool/UI.tsx",
+    "./tools/PowerShellTool/PowerShellTool.js": "./src/tools/PowerShellTool/PowerShellTool.tsx",
+    "./tools/PowerShellTool/UI.js": "./src/tools/PowerShellTool/UI.tsx",
+    "./tools/FileReadTool/UI.js": "./src/tools/FileReadTool/UI.tsx",
+    "./tools/FileWriteTool/UI.js": "./src/tools/FileWriteTool/UI.tsx",
+    "./tools/FileEditTool/UI.js": "./src/tools/FileEditTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }

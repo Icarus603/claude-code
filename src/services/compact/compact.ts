@@ -14,11 +14,11 @@ import type { QuerySource } from '../../constants/querySource.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from '../../Tool.js'
 import type { LocalAgentTaskState } from '../../tasks/LocalAgentTask/LocalAgentTask.js'
-import { FileReadTool } from '../../tools/FileReadTool/FileReadTool.js'
+import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import {
   FILE_READ_TOOL_NAME,
   FILE_UNCHANGED_STUB,
-} from '../../tools/FileReadTool/prompt.js'
+} from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
 import type { AgentId } from '../../types/ids.js'
 import type {

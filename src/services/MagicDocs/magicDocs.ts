@@ -9,12 +9,12 @@
 import type { Tool, ToolUseContext } from '../../Tool.js'
 import type { BuiltInAgentDefinition } from '../../tools/AgentTool/loadAgentsDir.js'
 import { runAgent } from '../../tools/AgentTool/runAgent.js'
-import { FILE_EDIT_TOOL_NAME } from '../../tools/FileEditTool/constants.js'
+import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import {
   FileReadTool,
   type Output as FileReadToolOutput,
   registerFileReadListener,
-} from '../../tools/FileReadTool/FileReadTool.js'
+} from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import { isFsInaccessible } from '../../utils/errors.js'
 import { cloneFileStateCache } from '../../utils/fileStateCache.js'
 import {

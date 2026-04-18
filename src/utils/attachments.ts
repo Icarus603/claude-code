@@ -14,7 +14,7 @@ import {
   MaxFileReadTokenExceededError,
   type Output as FileReadToolOutput,
   readImageWithTokenBudget,
-} from '../tools/FileReadTool/FileReadTool.js'
+} from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import { FileTooLargeError, readFileInRange } from './readFileInRange.js'
 import { expandPath } from './path.js'
 import { countCharInString } from './stringUtils.js'
@@ -64,7 +64,7 @@ import {
 } from 'src/types/textInputTypes.js'
 import { randomUUID, type UUID } from 'crypto'
 import { getSettings_DEPRECATED } from './settings/settings.js'
-import { getSnippetForTwoFileDiff } from 'src/tools/FileEditTool/utils.js'
+import { getSnippetForTwoFileDiff } from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import type {
   ContentBlockParam,
   ImageBlockParam,
@@ -107,8 +107,8 @@ const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
 import {
   MAX_LINES_TO_READ,
   FILE_READ_TOOL_NAME,
-} from 'src/tools/FileReadTool/prompt.js'
-import { getDefaultFileReadingLimits } from 'src/tools/FileReadTool/limits.js'
+} from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
+import { getDefaultFileReadingLimits } from '@claude-code/tool-registry/tools/FileReadTool/limits.js'
 import { cacheKeys, type FileStateCache } from './fileStateCache.js'
 import {
   createAbortController,
