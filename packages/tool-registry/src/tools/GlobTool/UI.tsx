@@ -7,7 +7,7 @@ import { TOOL_SUMMARY_MAX_LENGTH } from 'src/constants/toolLimits.js'
 import { Text } from '@anthropic/ink'
 import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from 'src/utils/file.js'
 import { truncate } from 'src/utils/format.js'
-import { GrepTool } from 'src/tools/GrepTool/GrepTool.js'
+import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'
 
 export function userFacingName(): string {
   return 'Search'

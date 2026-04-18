@@ -11,10 +11,10 @@ import type { ToolProvider } from '../types.js'
 
 // Static imports — always loaded
 import { AgentTool } from '../../AgentTool/AgentTool.js'
-import { TaskOutputTool } from '../../TaskOutputTool/TaskOutputTool.js'
+import { TaskOutputTool } from '@claude-code/tool-registry/tools/TaskOutputTool/TaskOutputTool.js'
 import { BashTool } from '../../BashTool/BashTool.js'
 import { GlobTool } from '@claude-code/tool-registry/tools/GlobTool/GlobTool.js'
-import { GrepTool } from '../../GrepTool/GrepTool.js'
+import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'
 import { ExitPlanModeV2Tool } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
 import { FileReadTool } from '../../FileReadTool/FileReadTool.js'
 import { FileEditTool } from '../../FileEditTool/FileEditTool.js'
@@ -37,7 +37,7 @@ import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpRes
 import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
 import { ConfigTool } from '@claude-code/tool-registry/tools/ConfigTool/ConfigTool.js'
 import { TungstenTool } from '../../TungstenTool/TungstenTool.js'
-import { BriefTool } from '../../BriefTool/BriefTool.js'
+import { BriefTool } from '@claude-code/tool-registry/tools/BriefTool/BriefTool.js'
 import { TestingPermissionTool } from '../../testing/TestingPermissionTool.js'
 import { EnterWorktreeTool } from '@claude-code/tool-registry/tools/EnterWorktreeTool/EnterWorktreeTool.js'
 import { ExitWorktreeTool } from '@claude-code/tool-registry/tools/ExitWorktreeTool/ExitWorktreeTool.js'
@@ -60,9 +60,9 @@ const getSleepTool = () =>
     : null
 
 const getCronTools = (): Tool[] => [
-  require('../../ScheduleCronTool/CronCreateTool.js').CronCreateTool,
-  require('../../ScheduleCronTool/CronDeleteTool.js').CronDeleteTool,
-  require('../../ScheduleCronTool/CronListTool.js').CronListTool,
+  require('@claude-code/tool-registry/tools/ScheduleCronTool/CronCreateTool.js').CronCreateTool,
+  require('@claude-code/tool-registry/tools/ScheduleCronTool/CronDeleteTool.js').CronDeleteTool,
+  require('@claude-code/tool-registry/tools/ScheduleCronTool/CronListTool.js').CronListTool,
 ]
 
 const getRemoteTriggerTool = () =>

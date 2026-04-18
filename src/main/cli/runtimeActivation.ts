@@ -25,7 +25,7 @@ export function maybeActivateBrief(options: unknown): void {
 	if (!briefFlag && !briefEnv) return;
 	/* eslint-disable @typescript-eslint/no-require-imports */
 	const { isBriefEntitled } =
-		require("../../tools/BriefTool/BriefTool.js") as typeof import("../../tools/BriefTool/BriefTool.js");
+		require("@claude-code/tool-registry/tools/BriefTool/BriefTool.js") as typeof import("@claude-code/tool-registry/tools/BriefTool/BriefTool.js");
 	/* eslint-enable @typescript-eslint/no-require-imports */
 	const entitled = isBriefEntitled();
 	if (entitled) {

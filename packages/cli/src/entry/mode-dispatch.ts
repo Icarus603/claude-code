@@ -1412,9 +1412,9 @@ export async function runModeDispatch(
 			) {
 				/* eslint-disable @typescript-eslint/no-require-imports */
 				const { BRIEF_TOOL_NAME, LEGACY_BRIEF_TOOL_NAME } =
-					require("../../../../src/tools/BriefTool/prompt.js") as typeof import("../../../../src/tools/BriefTool/prompt.js");
+					require("@claude-code/tool-registry/tools/BriefTool/prompt.js") as typeof import("@claude-code/tool-registry/tools/BriefTool/prompt.js");
 				const { isBriefEntitled } =
-					require("../../../../src/tools/BriefTool/BriefTool.js") as typeof import("../../../../src/tools/BriefTool/BriefTool.js");
+					require("@claude-code/tool-registry/tools/BriefTool/BriefTool.js") as typeof import("@claude-code/tool-registry/tools/BriefTool/BriefTool.js");
 				/* eslint-enable @typescript-eslint/no-require-imports */
 				const parsed = parseToolListFromCLI(baseTools);
 				if (
@@ -2058,7 +2058,7 @@ export async function runModeDispatch(
 			) {
 				/* eslint-disable @typescript-eslint/no-require-imports */
 				const { isBriefEntitled } =
-					require("../../../../src/tools/BriefTool/BriefTool.js") as typeof import("../../../../src/tools/BriefTool/BriefTool.js");
+					require("@claude-code/tool-registry/tools/BriefTool/BriefTool.js") as typeof import("@claude-code/tool-registry/tools/BriefTool/BriefTool.js");
 				/* eslint-enable @typescript-eslint/no-require-imports */
 				if (isBriefEntitled()) {
 					setUserMsgOptIn(true);
@@ -2077,7 +2077,7 @@ export async function runModeDispatch(
 				const briefVisibility =
 					feature("KAIROS") || feature("KAIROS_BRIEF")
 						? (
-								require("../../../../src/tools/BriefTool/BriefTool.js") as typeof import("../../../../src/tools/BriefTool/BriefTool.js")
+								require("@claude-code/tool-registry/tools/BriefTool/BriefTool.js") as typeof import("@claude-code/tool-registry/tools/BriefTool/BriefTool.js")
 							).isBriefEnabled()
 							? "Call SendUserMessage at checkpoints to mark where things stand."
 							: "The user will see any text you output."

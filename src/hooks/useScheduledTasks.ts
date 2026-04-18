@@ -5,7 +5,7 @@ import {
   findTeammateTaskByAgentId,
   injectUserMessageToTeammate,
 } from '@claude-code/swarm'
-import { isKairosCronEnabled } from '../tools/ScheduleCronTool/prompt.js'
+import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
 import type { Message } from '../types/message.js'
 import { createCronScheduler, removeCronTasks } from '@claude-code/agent/scheduler'
 import { getCronJitterConfig } from '../utils/cronJitterConfig.js'

@@ -29,6 +29,10 @@
     "./tools/SendMessageTool/UI.js": "./src/tools/SendMessageTool/UI.tsx",
     "./tools/WebFetchTool/UI.js": "./src/tools/WebFetchTool/UI.tsx",
     "./tools/WebSearchTool/UI.js": "./src/tools/WebSearchTool/UI.tsx",
+    "./tools/BriefTool/UI.js": "./src/tools/BriefTool/UI.tsx",
+    "./tools/TaskOutputTool/TaskOutputTool.js": "./src/tools/TaskOutputTool/TaskOutputTool.tsx",
+    "./tools/ScheduleCronTool/UI.js": "./src/tools/ScheduleCronTool/UI.tsx",
+    "./tools/GrepTool/UI.js": "./src/tools/GrepTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }
