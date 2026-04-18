@@ -2,46 +2,46 @@ import { dirname, sep } from 'path'
 import { logEvent } from '@claude-code/local-observability'
 import { z } from 'zod/v4'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { diagnosticTracker } from '../../services/diagnosticTracking.js'
-import { clearDeliveredDiagnosticsForFile } from '../../services/lsp/LSPDiagnosticRegistry.js'
-import { getLspServerManager } from '../../services/lsp/manager.js'
-import { notifyVscodeFileUpdated } from '../../services/mcp/vscodeSdkMcp.js'
-import { checkTeamMemSecrets } from '../../services/teamMemorySync/teamMemSecretGuard.js'
+import { diagnosticTracker } from 'src/services/diagnosticTracking.js'
+import { clearDeliveredDiagnosticsForFile } from 'src/services/lsp/LSPDiagnosticRegistry.js'
+import { getLspServerManager } from 'src/services/lsp/manager.js'
+import { notifyVscodeFileUpdated } from 'src/services/mcp/vscodeSdkMcp.js'
+import { checkTeamMemSecrets } from 'src/services/teamMemorySync/teamMemSecretGuard.js'
 import {
   activateConditionalSkillsForPaths,
   addSkillDirectories,
   discoverSkillDirsForPaths,
-} from '../../skills/loadSkillsDir.js'
-import type { ToolUseContext } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { getCwd } from '../../utils/cwd.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { countLinesChanged, getPatchForDisplay } from '../../utils/diff.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
-import { isENOENT } from '../../utils/errors.js'
-import { getFileModificationTime, writeTextContent } from '../../utils/file.js'
+} from 'src/skills/loadSkillsDir.js'
+import type { ToolUseContext } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { countLinesChanged, getPatchForDisplay } from 'src/utils/diff.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isENOENT } from 'src/utils/errors.js'
+import { getFileModificationTime, writeTextContent } from 'src/utils/file.js'
 import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,
-} from '../../utils/fileHistory.js'
-import { logFileOperation } from '../../utils/fileOperationAnalytics.js'
-import { readFileSyncWithMetadata } from '../../utils/fileRead.js'
-import { getFsImplementation } from '../../utils/fsOperations.js'
+} from 'src/utils/fileHistory.js'
+import { logFileOperation } from 'src/utils/fileOperationAnalytics.js'
+import { readFileSyncWithMetadata } from 'src/utils/fileRead.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
 import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,
-} from '../../utils/gitDiff.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logError } from '../../utils/log.js'
-import { expandPath } from '../../utils/path.js'
+} from 'src/utils/gitDiff.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logError } from 'src/utils/log.js'
+import { expandPath } from 'src/utils/path.js'
 import {
   checkWritePermissionForTool,
   matchingRuleForInput,
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from '../../utils/permissions/shellRuleMatching.js'
-import { FILE_UNEXPECTEDLY_MODIFIED_ERROR } from '../FileEditTool/constants.js'
-import { gitDiffSchema, hunkSchema } from '../FileEditTool/types.js'
+import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
+import { FILE_UNEXPECTEDLY_MODIFIED_ERROR } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
+import { gitDiffSchema, hunkSchema } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
 import { FILE_WRITE_TOOL_NAME, getWriteToolDescription } from './prompt.js'
 import {
   getToolUseSummary,

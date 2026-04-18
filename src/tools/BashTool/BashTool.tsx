@@ -74,7 +74,7 @@ import {
   getToolResultPath,
   PREVIEW_SIZE_BYTES,
 } from '../../utils/toolResultStorage.js'
-import { userFacingName as fileEditUserFacingName } from '../FileEditTool/UI.js'
+import { userFacingName as fileEditUserFacingName } from '@claude-code/tool-registry/tools/FileEditTool/UI.js'
 import { trackGitOperations } from '../shared/gitOperationTracking.js'
 import {
   bashToolHasPermission,

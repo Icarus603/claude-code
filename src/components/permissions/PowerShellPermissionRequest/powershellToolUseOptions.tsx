@@ -1,4 +1,4 @@
-import { POWERSHELL_TOOL_NAME } from '../../../tools/PowerShellTool/toolName.js'
+import { POWERSHELL_TOOL_NAME } from '@claude-code/tool-registry/tools/PowerShellTool/toolName.js'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { shouldShowAlwaysAllowOptions } from '../../../utils/permissions/permissionsLoader.js'
 import type { OptionWithDescription } from '../../CustomSelect/select.js'

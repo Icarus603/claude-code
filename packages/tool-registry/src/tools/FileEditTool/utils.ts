@@ -6,13 +6,13 @@ import {
   DIFF_TIMEOUT_MS,
   getPatchForDisplay,
   getPatchFromContents,
-} from '../../utils/diff.js'
-import { errorMessage, isENOENT } from '../../utils/errors.js'
+} from 'src/utils/diff.js'
+import { errorMessage, isENOENT } from 'src/utils/errors.js'
 import {
   addLineNumbers,
   convertLeadingTabsToSpaces,
   readFileSyncCached,
-} from '../../utils/file.js'
+} from 'src/utils/file.js'
 import type { EditInput, FileEdit } from './types.js'
 
 // Claude can't output curly quotes, so we define them as constants here for Claude to use

@@ -86,7 +86,7 @@ import {
 } from '@claude-code/swarm'
 import { BASH_TOOL_NAME } from '../BashTool/toolName.js'
 import { BackgroundHint } from '../BashTool/UI.js'
-import { FILE_READ_TOOL_NAME } from '../FileReadTool/prompt.js'
+import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { spawnTeammate } from '../shared/spawnMultiAgent.js'
 import { setAgentColor } from './agentColorManager.js'
 import {

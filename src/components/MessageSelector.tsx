@@ -43,8 +43,8 @@ function isTextBlock(block: ContentBlockParam): block is TextBlockParam {
 
 import * as path from 'path'
 import { useTerminalSize } from '@anthropic/ink'
-import type { FileEditOutput } from 'src/tools/FileEditTool/types.js'
-import type { Output as FileWriteToolOutput } from 'src/tools/FileWriteTool/FileWriteTool.js'
+import type { FileEditOutput } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
+import type { Output as FileWriteToolOutput } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
 import {
   BASH_STDERR_TAG,
   BASH_STDOUT_TAG,

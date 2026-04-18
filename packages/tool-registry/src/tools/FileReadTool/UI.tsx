@@ -1,15 +1,15 @@
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
 import { extractTag } from 'src/utils/messages.js'
-import { FallbackToolUseErrorMessage } from '../../components/FallbackToolUseErrorMessage.js'
+import { FallbackToolUseErrorMessage } from 'src/components/FallbackToolUseErrorMessage.js'
 
-import { MessageResponse } from '../../components/MessageResponse.js'
+import { MessageResponse } from 'src/components/MessageResponse.js'
 import { Text } from '@anthropic/ink'
-import { FilePathLink } from '../../components/FilePathLink.js'
-import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from '../../utils/file.js'
-import { formatFileSize } from '../../utils/format.js'
-import { getPlansDirectory } from '../../utils/plans.js'
-import { getTaskOutputDir } from '../../utils/task/diskOutput.js'
+import { FilePathLink } from 'src/components/FilePathLink.js'
+import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from 'src/utils/file.js'
+import { formatFileSize } from 'src/utils/format.js'
+import { getPlansDirectory } from 'src/utils/plans.js'
+import { getTaskOutputDir } from 'src/utils/task/diskOutput.js'
 import type { Input, Output } from './FileReadTool.js'
 
 /**

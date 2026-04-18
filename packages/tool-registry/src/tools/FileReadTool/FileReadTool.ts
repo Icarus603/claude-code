@@ -7,39 +7,39 @@ import {
   PDF_AT_MENTION_INLINE_THRESHOLD,
   PDF_EXTRACT_SIZE_THRESHOLD,
   PDF_MAX_PAGES_PER_READ,
-} from '../../constants/apiLimits.js'
-import { hasBinaryExtension } from '../../constants/files.js'
+} from 'src/constants/apiLimits.js'
+import { hasBinaryExtension } from 'src/constants/files.js'
 import { memoryFreshnessNote } from '@claude-code/memory/memoryAge'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   getFileExtensionForAnalytics,
-} from '../../services/eventMetadata.js'
+} from 'src/services/eventMetadata.js'
 import {
   countTokensWithAPI,
   roughTokenCountEstimationForFileType,
-} from '../../services/tokenEstimation.js'
+} from 'src/services/tokenEstimation.js'
 import {
   activateConditionalSkillsForPaths,
   addSkillDirectories,
   discoverSkillDirsForPaths,
-} from '../../skills/loadSkillsDir.js'
-import type { ToolUseContext } from '../../Tool.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { getCwd } from '../../utils/cwd.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from '../../utils/envUtils.js'
-import { getErrnoCode, isENOENT } from '../../utils/errors.js'
+} from 'src/skills/loadSkillsDir.js'
+import type { ToolUseContext } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { getClaudeConfigHomeDir, isEnvTruthy } from 'src/utils/envUtils.js'
+import { getErrnoCode, isENOENT } from 'src/utils/errors.js'
 import {
   addLineNumbers,
   FILE_NOT_FOUND_CWD_NOTE,
   findSimilarFile,
   getFileModificationTimeAsync,
   suggestPathUnderCwd,
-} from '../../utils/file.js'
-import { logFileOperation } from '../../utils/fileOperationAnalytics.js'
-import { formatFileSize } from '../../utils/format.js'
-import { getFsImplementation } from '../../utils/fsOperations.js'
+} from 'src/utils/file.js'
+import { logFileOperation } from 'src/utils/fileOperationAnalytics.js'
+import { formatFileSize } from 'src/utils/format.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
 import {
   compressImageBufferWithTokenLimit,
   createImageMetadataText,
@@ -47,33 +47,33 @@ import {
   type ImageDimensions,
   ImageResizeError,
   maybeResizeAndDownsampleImageBuffer,
-} from '../../utils/imageResizer.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logError } from '../../utils/log.js'
-import { isAutoMemFile } from '../../utils/memoryFileDetection.js'
-import { createUserMessage } from '../../utils/messages.js'
-import { getCanonicalName, getMainLoopModel } from '../../utils/model/model.js'
+} from 'src/utils/imageResizer.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logError } from 'src/utils/log.js'
+import { isAutoMemFile } from 'src/utils/memoryFileDetection.js'
+import { createUserMessage } from 'src/utils/messages.js'
+import { getCanonicalName, getMainLoopModel } from 'src/utils/model/model.js'
 import {
   mapNotebookCellsToToolResult,
   readNotebook,
-} from '../../utils/notebook.js'
-import { expandPath } from '../../utils/path.js'
-import { extractPDFPages, getPDFPageCount, readPDF } from '../../utils/pdf.js'
+} from 'src/utils/notebook.js'
+import { expandPath } from 'src/utils/path.js'
+import { extractPDFPages, getPDFPageCount, readPDF } from 'src/utils/pdf.js'
 import {
   isPDFExtension,
   isPDFSupported,
   parsePDFPageRange,
-} from '../../utils/pdfUtils.js'
+} from 'src/utils/pdfUtils.js'
 import {
   checkReadPermissionForTool,
   matchingRuleForInput,
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from '../../utils/permissions/shellRuleMatching.js'
-import { readFileInRange } from '../../utils/readFileInRange.js'
-import { semanticNumber } from '../../utils/semanticNumber.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
-import { BASH_TOOL_NAME } from '../BashTool/toolName.js'
+import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
+import { readFileInRange } from 'src/utils/readFileInRange.js'
+import { semanticNumber } from 'src/utils/semanticNumber.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
+import { BASH_TOOL_NAME } from 'src/tools/BashTool/toolName.js'
 import { getDefaultFileReadingLimits } from './limits.js'
 import {
   DESCRIPTION,

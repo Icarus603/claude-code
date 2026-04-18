@@ -9,13 +9,13 @@ import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
 import { runTools } from '../services/tools/toolOrchestration.js'
 import { findToolByName, type Tool, type Tools } from '../Tool.js'
 import { BASH_TOOL_NAME } from '../tools/BashTool/toolName.js'
-import { FILE_EDIT_TOOL_NAME } from '../tools/FileEditTool/constants.js'
-import type { Input as FileReadInput } from '../tools/FileReadTool/FileReadTool.js'
+import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
+import type { Input as FileReadInput } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import {
   FILE_READ_TOOL_NAME,
   FILE_UNCHANGED_STUB,
-} from '../tools/FileReadTool/prompt.js'
-import { FILE_WRITE_TOOL_NAME } from '../tools/FileWriteTool/prompt.js'
+} from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
+import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/prompt.js'
 import type { Message } from '../types/message.js'
 import type { OrphanedPermission } from '../types/textInputTypes.js'
 import { logForDebugging } from './debug.js'

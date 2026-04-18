@@ -8,7 +8,7 @@ import {
   CLAUDE_FOLDER_PERMISSION_PATTERN,
   FILE_EDIT_TOOL_NAME,
   GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN,
-} from '../../../tools/FileEditTool/constants.js'
+} from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import { env } from '../../../utils/env.js'
 import { generateSuggestions } from '@claude-code/permission/filesystem'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
