@@ -9,7 +9,7 @@ import {
   AGENT_COLORS,
   type AgentColorName,
   getAgentColor,
-} from '../../tools/AgentTool/agentColorManager.js'
+} from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { getStandaloneAgentName } from '../../utils/standaloneAgent.js'
 import { isInsideTmux } from '@claude-code/swarm'
 import {

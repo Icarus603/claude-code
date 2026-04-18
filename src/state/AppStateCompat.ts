@@ -20,8 +20,8 @@ import {
   type ToolPermissionContext,
 } from '../Tool.js'
 import type { TaskState } from '../tasks/types.js'
-import type { AgentColorName } from '../tools/AgentTool/agentColorManager.js'
-import type { AgentDefinitionsResult } from '../tools/AgentTool/loadAgentsDir.js'
+import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
+import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { AllowedPrompt } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
 import type { AgentId } from '../types/ids.js'
 import type { Message, UserMessage } from '../types/message.js'

@@ -40,6 +40,11 @@
     "./tools/FileReadTool/UI.js": "./src/tools/FileReadTool/UI.tsx",
     "./tools/FileWriteTool/UI.js": "./src/tools/FileWriteTool/UI.tsx",
     "./tools/FileEditTool/UI.js": "./src/tools/FileEditTool/UI.tsx",
+    "./tools/BashTool/BashTool.js": "./src/tools/BashTool/BashTool.tsx",
+    "./tools/BashTool/BashToolResultMessage.js": "./src/tools/BashTool/BashToolResultMessage.tsx",
+    "./tools/BashTool/UI.js": "./src/tools/BashTool/UI.tsx",
+    "./tools/AgentTool/AgentTool.js": "./src/tools/AgentTool/AgentTool.tsx",
+    "./tools/AgentTool/UI.js": "./src/tools/AgentTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }

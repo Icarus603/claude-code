@@ -20,7 +20,7 @@ import type { AppState } from '../state/AppStateCompat.js'
 import { getDefaultAppState } from '../state/AppStateCompat.js'
 import { createHeadlessSessionStore } from '../state/sessionStores.js'
 import { createStore, type Store } from '../state/store.js'
-import type { AgentDefinitionsResult } from '../tools/AgentTool/loadAgentsDir.js'
+import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { LoadedPlugin, PluginError } from '../types/plugin.js'
 import type { Command } from '../commands.js'
 import type {

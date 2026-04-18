@@ -38,7 +38,7 @@ import {
   type Tools,
   toolMatchesName,
 } from 'src/Tool.js'
-import type { AgentDefinition } from 'src/tools/AgentTool/loadAgentsDir.js'
+import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import {
   type ConnectorTextBlock,
   type ConnectorTextDelta,

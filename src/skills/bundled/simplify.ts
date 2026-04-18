@@ -1,4 +1,4 @@
-import { AGENT_TOOL_NAME } from '../../tools/AgentTool/constants.js'
+import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 
 const SIMPLIFY_PROMPT = `# Simplify: Code Review and Cleanup

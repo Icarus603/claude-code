@@ -7,7 +7,7 @@ import { isInProcessTeammateTask } from '@claude-code/swarm'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
   type AgentColorName,
-} from '../tools/AgentTool/agentColorManager.js'
+} from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { isAgentSwarmsEnabled } from '../utils/agentSwarmsEnabled.js'
 import { count } from '../utils/array.js'
 import { summarizeRecentActivities } from '../utils/collapseReadSearch.js'

@@ -4,8 +4,8 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import type { ToolUseContext } from '../Tool.js'
-import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js'
-import { isBuiltInAgent } from '../tools/AgentTool/loadAgentsDir.js'
+import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
+import { isBuiltInAgent } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { isEnvTruthy } from './envUtils.js'
 import { asSystemPrompt, type SystemPrompt } from './systemPromptType.js'
 

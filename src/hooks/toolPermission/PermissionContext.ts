@@ -11,8 +11,8 @@ import type {
   Tool as ToolType,
   ToolUseContext,
 } from '../../Tool.js'
-import { awaitClassifierAutoApproval } from '../../tools/BashTool/bashPermissions.js'
-import { BASH_TOOL_NAME } from '../../tools/BashTool/toolName.js'
+import { awaitClassifierAutoApproval } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
+import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import type { AssistantMessage } from '../../types/message.js'
 import type {
   PendingClassifierCheck,

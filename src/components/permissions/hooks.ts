@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from 'src/services/eventMetadata.js'
-import { BashTool } from 'src/tools/BashTool/BashTool.js'
+import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { splitCommand_DEPRECATED } from 'src/utils/bash/commands.js'
 import type {
   PermissionDecisionReason,

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { use } from 'react'
 import { Box } from '@anthropic/ink'
-import type { AgentDefinitionsResult } from '../tools/AgentTool/loadAgentsDir.js'
+import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { getMemoryFiles } from '../utils/claudemd.js'
 import { getGlobalConfig } from '@claude-code/config'
 import {

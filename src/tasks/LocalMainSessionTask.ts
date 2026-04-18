@@ -26,7 +26,7 @@ import { createTaskStateBase } from '../Task.js'
 import type {
   AgentDefinition,
   CustomAgentDefinition,
-} from '../tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { asAgentId } from '../types/ids.js'
 import type { Message } from '../types/message.js'
 import { createAbortController } from '../utils/abortController.js'

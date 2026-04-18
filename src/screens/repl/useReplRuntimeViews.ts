@@ -12,10 +12,10 @@ import type { Tool, ToolPermissionContext } from '../../Tool.js'
 import type {
   AgentDefinition,
   AgentDefinitionsResult,
-} from '../../tools/AgentTool/loadAgentsDir.js'
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { LoadedPlugin, PluginError } from '../../types/plugin.js'
 import { getTools } from '../../tools.js'
-import { resolveAgentTools } from '../../tools/AgentTool/agentToolUtils.js'
+import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js'
 import { getInteractiveMcpClients } from './integrations.js'
 
 type McpSnapshot = {

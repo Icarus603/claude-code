@@ -7,8 +7,8 @@
  */
 
 import type { Tool, ToolUseContext } from '../../Tool.js'
-import type { BuiltInAgentDefinition } from '../../tools/AgentTool/loadAgentsDir.js'
-import { runAgent } from '../../tools/AgentTool/runAgent.js'
+import type { BuiltInAgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
+import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import {
   FileReadTool,

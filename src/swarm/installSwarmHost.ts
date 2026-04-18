@@ -31,10 +31,10 @@ import {
   getProgressUpdate,
   updateProgressFromMessage,
 } from '../tasks/LocalAgentTask/LocalAgentTask.js'
-import { AGENT_COLORS } from '../tools/AgentTool/agentColorManager.js'
-import { runAgent } from '../tools/AgentTool/runAgent.js'
-import { awaitClassifierAutoApproval } from '../tools/BashTool/bashPermissions.js'
-import { BASH_TOOL_NAME } from '../tools/BashTool/toolName.js'
+import { AGENT_COLORS } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
+import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
+import { awaitClassifierAutoApproval } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
+import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { SEND_MESSAGE_TOOL_NAME } from '@claude-code/tool-registry/tools/SendMessageTool/constants.js'
 import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCreateTool/constants.js'
 import { TASK_GET_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskGetTool/constants.js'

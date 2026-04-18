@@ -38,7 +38,7 @@ import {
   createShutdownRequestMessage,
   writeToMailbox,
 } from '@claude-code/swarm'
-import { resumeAgentBackground } from 'src/tools/AgentTool/resumeAgent.js'
+import { resumeAgentBackground } from '@claude-code/tool-registry/tools/AgentTool/resumeAgent.js'
 import { SEND_MESSAGE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, getPrompt } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'
