@@ -3,15 +3,15 @@ import {
   ReadResourceResultSchema,
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
-import { ensureConnectedClient } from '../../services/mcp/client.js'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import { lazySchema } from '../../utils/lazySchema.js'
+import { ensureConnectedClient } from 'src/services/mcp/client.js'
+import { buildTool, type ToolDef } from 'src/Tool.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   getBinaryBlobSavedMessage,
   persistBinaryContent,
-} from '../../utils/mcpOutputStorage.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
-import { isOutputLineTruncated } from '../../utils/terminal.js'
+} from 'src/utils/mcpOutputStorage.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
+import { isOutputLineTruncated } from 'src/utils/terminal.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
 import {
   renderToolResultMessage,

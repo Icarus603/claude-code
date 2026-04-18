@@ -29,11 +29,11 @@ import {
   isReplModeEnabled,
 } from '../tools/REPLTool/constants.js'
 import { BuiltInToolsProvider } from '../tools/registry/providers/BuiltInToolsProvider.js'
-import { ReadMcpResourceTool } from '../tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
+import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { SendMessageTool } from '../tools/SendMessageTool/SendMessageTool.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
-import { ListMcpResourcesTool } from '../tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
+import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
 import { isEnvTruthy } from '../utils/envUtils.js'
 import { getDenyRuleForTool } from '@claude-code/permission/permissions'
 

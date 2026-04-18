@@ -17,6 +17,8 @@
     "./tools/EnterPlanModeTool/UI.js": "./src/tools/EnterPlanModeTool/UI.tsx",
     "./tools/TeamDeleteTool/UI.js": "./src/tools/TeamDeleteTool/UI.tsx",
     "./tools/TeamCreateTool/UI.js": "./src/tools/TeamCreateTool/UI.tsx",
+    "./tools/ReadMcpResourceTool/UI.js": "./src/tools/ReadMcpResourceTool/UI.tsx",
+    "./tools/ListMcpResourcesTool/UI.js": "./src/tools/ListMcpResourcesTool/UI.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }
