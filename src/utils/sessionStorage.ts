@@ -34,7 +34,7 @@ import { builtInCommandNames } from '../commands.js'
 import { COMMAND_NAME_TAG, TICK_TAG } from '../constants/xml.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import * as sessionIngress from '../services/api/sessionIngress.js'
-import { REPL_TOOL_NAME } from '../tools/REPLTool/constants.js'
+import { REPL_TOOL_NAME } from '@claude-code/tool-registry/tools/REPLTool/constants.js'
 import {
   type AgentId,
   asAgentId,

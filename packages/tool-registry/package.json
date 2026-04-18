@@ -45,6 +45,8 @@
     "./tools/BashTool/UI.js": "./src/tools/BashTool/UI.tsx",
     "./tools/AgentTool/AgentTool.js": "./src/tools/AgentTool/AgentTool.tsx",
     "./tools/AgentTool/UI.js": "./src/tools/AgentTool/UI.tsx",
+    "./tools/REPLTool/REPLTool.js": "./src/tools/REPLTool/REPLTool.js",
+    "./tools/testing/TestingPermissionTool.js": "./src/tools/testing/TestingPermissionTool.tsx",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts"
   }

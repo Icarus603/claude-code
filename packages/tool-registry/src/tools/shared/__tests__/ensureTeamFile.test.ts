@@ -2,14 +2,14 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:tes
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { installSwarmAppRuntime } from '../../../../packages/swarm/src/adapters/appRuntime.js'
+import { installSwarmAppRuntime } from 'src/../packages/swarm/src/adapters/appRuntime.js'
 import {
   readTeamFileAsync,
   type TeamFile,
   writeTeamFileAsync,
 } from '@claude-code/swarm'
 import { ensureTeamFile } from '../spawnMultiAgent.js'
-import type { AppState } from '../../../state/AppState.js'
+import type { AppState } from 'src/state/AppState.js'
 
 // The swarm runtime uses late-bound export-lets. installSwarmAppRuntime() is
 // strict — it throws if any expected key is missing — so we stub every key

@@ -45,7 +45,7 @@ import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTo
 import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/prompt.js'
 import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/NotebookEditTool/constants.js'
 import { POWERSHELL_TOOL_NAME } from '@claude-code/tool-registry/tools/PowerShellTool/toolName.js'
-import { parseGitCommitId } from '../../tools/shared/gitOperationTracking.js'
+import { parseGitCommitId } from '@claude-code/tool-registry/tools/shared/gitOperationTracking.js'
 import {
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,

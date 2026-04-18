@@ -27,8 +27,8 @@ import {
   REPL_TOOL_NAME,
   REPL_ONLY_TOOLS,
   isReplModeEnabled,
-} from '../tools/REPLTool/constants.js'
-import { BuiltInToolsProvider } from '../tools/registry/providers/BuiltInToolsProvider.js'
+} from '@claude-code/tool-registry/tools/REPLTool/constants.js'
+import { BuiltInToolsProvider } from '@claude-code/tool-registry/tools/registry/providers/BuiltInToolsProvider.js'
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { SendMessageTool } from '@claude-code/tool-registry/tools/SendMessageTool/SendMessageTool.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
@@ -40,7 +40,7 @@ import { getDenyRuleForTool } from '@claude-code/permission/permissions'
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const REPLTool =
   process.env.USER_TYPE === 'ant'
-    ? require('../tools/REPLTool/REPLTool.js').REPLTool
+    ? require('@claude-code/tool-registry/tools/REPLTool/REPLTool.js').REPLTool
     : null
 const coordinatorModeModule = feature('COORDINATOR_MODE')
   ? (require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js'))

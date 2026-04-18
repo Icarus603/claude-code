@@ -8,7 +8,7 @@
  * external binaries with the same argv syntax).
  */
 
-import { getCommitCounter, getPrCounter } from '../../bootstrap/state.js'
+import { getCommitCounter, getPrCounter } from 'src/bootstrap/state.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -229,9 +229,9 @@ export function trackGitOperations(
       const prInfo = findPrInStdout(stdout)
       if (prInfo) {
         // Import is done dynamically to avoid circular dependency
-        void import('../../utils/sessionStorage.js').then(
+        void import('src/utils/sessionStorage.js').then(
           ({ linkSessionToPR }) => {
-            void import('../../bootstrap/state.js').then(({ getSessionId }) => {
+            void import('src/bootstrap/state.js').then(({ getSessionId }) => {
               const sessionId = getSessionId()
               if (sessionId) {
                 void linkSessionToPR(
