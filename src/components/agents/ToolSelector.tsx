@@ -17,7 +17,7 @@ import { NotebookEditTool } from 'src/tools/NotebookEditTool/NotebookEditTool.js
 import { ReadMcpResourceTool } from 'src/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { TaskOutputTool } from 'src/tools/TaskOutputTool/TaskOutputTool.js'
 import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
-import { TodoWriteTool } from 'src/tools/TodoWriteTool/TodoWriteTool.js'
+import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/TodoWriteTool.js'
 import { TungstenTool } from 'src/tools/TungstenTool/TungstenTool.js'
 import { WebFetchTool } from 'src/tools/WebFetchTool/WebFetchTool.js'
 import { WebSearchTool } from 'src/tools/WebSearchTool/WebSearchTool.js'
