@@ -15,10 +15,10 @@ External behavior that must remain unchanged during V6 refactor:
 ## Entrypoint Hash Snapshot
 
 ```text
-ee80d10e594db512b58d87915d016149c065c4f09279dc5e93507a5af06efcf1  src/entrypoints/agentSdkTypes.ts
+43678d3116f2bad133c74b8b0bb897079490d9cbdb665fb38f8273709dc61e84  packages/headless-sdk/src/agentSdkTypes.ts
 f47711802145f795a14fec0ba87e1f9b64abc0fc9bec05983df0e1a4c1526a94  src/entrypoints/init.ts
 a075a60a18118f2c22310ae667362ddc2374f5da41b549eae77e6702f553fc67  src/entrypoints/mcp.ts
-73e33ed7d68ee31dc33029ffec32797a79b8cc3d5fa722be7bb6129cc2ca8d5d  src/entrypoints/sandboxTypes.ts
+16c80fad68fb750679b8d6b344fdf184f946292b559055a8f083f3465c9c7a25  packages/headless-sdk/src/sandboxTypes.ts
 f6371808ab47f2f57cd75d6f6ac7926ebb8a8d2b818a8871b8f7cf1d099f8baf  src/entrypoints/sdk/controlSchemas.ts
 d3918b6119e629f2a17967bc217d730b16fe5a9dd9f1673341364dbfe2c2a774  src/entrypoints/sdk/controlTypes.ts
 7c4e83756565d421d6d338a2b8356147d95b30132e555c68012ea2551fb3ea9e  src/entrypoints/sdk/coreSchemas.ts
