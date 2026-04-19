@@ -194,7 +194,7 @@ import {
   type ReplBridgeHandle,
 } from '@claude-code/bridge'
 import { getRemoteSessionUrl } from '../../../../../../src/constants/product.js'
-import type { CanUseToolFn } from '../../../../../../src/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { generateSessionTitle } from '../../../../../../src/utils/sessionTitle.js'
 import { buildSideQuestionFallbackParams } from '../../../../../../src/utils/queryContext.js'

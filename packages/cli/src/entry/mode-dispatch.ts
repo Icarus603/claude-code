@@ -2173,7 +2173,7 @@ export async function runModeDispatch(
 					});
 					if (choice === "merge") {
 						const { buildMergePrompt } =
-							await import("../../../../src/components/agents/SnapshotUpdateDialog.js");
+							await import("@claude-code/repl/components/agents/SnapshotUpdateDialog.js");
 						const mergePrompt = buildMergePrompt(
 							agentDef.agentType,
 							agentDef.memory!,
@@ -3890,7 +3890,7 @@ export async function runModeDispatch(
 
 							// Use progress UI for teleport
 							const { teleportWithProgress } =
-								await import("../../../../src/components/TeleportProgress.js");
+								await import("@claude-code/repl/components/TeleportProgress.js");
 							const result = await teleportWithProgress(
 								root,
 								teleport,
