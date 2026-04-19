@@ -1,34 +1,34 @@
 import chalk from 'chalk'
 import * as React from 'react'
-import type { CommandResultDisplay } from '../../commands.js'
-import { ModelPicker } from '../../components/ModelPicker.js'
-import { COMMON_HELP_ARGS, COMMON_INFO_ARGS } from '../../constants/xml.js'
+import type { CommandResultDisplay } from 'src/commands.js'
+import { ModelPicker } from 'src/components/ModelPicker.js'
+import { COMMON_HELP_ARGS, COMMON_INFO_ARGS } from 'src/constants/xml.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { useAppState, useSetAppState } from '../../state/AppState.js'
-import type { LocalJSXCommandCall } from '../../types/command.js'
-import type { EffortLevel } from '../../utils/effort.js'
-import { isBilledAsExtraUsage } from '../../utils/extraUsage.js'
+import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import type { LocalJSXCommandCall } from 'src/types/command.js'
+import type { EffortLevel } from 'src/utils/effort.js'
+import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
 import {
   clearFastModeCooldown,
   isFastModeAvailable,
   isFastModeEnabled,
   isFastModeSupportedByModel,
-} from '../../utils/fastMode.js'
-import { MODEL_ALIASES } from '../../utils/model/aliases.js'
+} from 'src/utils/fastMode.js'
+import { MODEL_ALIASES } from 'src/utils/model/aliases.js'
 import {
   checkOpus1mAccess,
   checkSonnet1mAccess,
-} from '../../utils/model/check1mAccess.js'
+} from 'src/utils/model/check1mAccess.js'
 import {
   getDefaultMainLoopModelSetting,
   isOpus1mMergeEnabled,
   renderDefaultModelSetting,
-} from '../../utils/model/model.js'
-import { isModelAllowed } from '../../utils/model/modelAllowlist.js'
-import { validateModel } from '../../utils/model/validateModel.js'
+} from 'src/utils/model/model.js'
+import { isModelAllowed } from 'src/utils/model/modelAllowlist.js'
+import { validateModel } from 'src/utils/model/validateModel.js'
 
 function ModelPickerWrapper({
   onDone,
