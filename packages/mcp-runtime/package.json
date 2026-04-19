@@ -16,6 +16,14 @@
     "./mcpWebSocketTransport.js": "./src/mcpWebSocketTransport.ts",
     "./mcpOutputStorage.js": "./src/mcpOutputStorage.ts",
     "./dateTimeParser.js": "./src/dateTimeParser.ts",
-    "./elicitationValidation.js": "./src/elicitationValidation.ts"
+    "./elicitationValidation.js": "./src/elicitationValidation.ts",
+    "./normalization.js": "./src/normalization.ts",
+    "./envExpansion.js": "./src/envExpansion.ts",
+    "./InProcessTransport.js": "./src/InProcessTransport.ts",
+    "./officialRegistry.js": "./src/officialRegistry.ts",
+    "./channelAllowlist.js": "./src/channelAllowlist.ts",
+    "./oauthPort.js": "./src/oauthPort.ts",
+    "./mcpStringUtils.js": "./src/mcpStringUtils.ts",
+    "./vscodeSdkMcp.js": "./src/vscodeSdkMcp.ts"
   }
 }

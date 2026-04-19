@@ -116,8 +116,8 @@ import {
   McpAuthError,
   McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 } from 'src/services/mcp/client.js'
-import { mcpInfoFromString } from 'src/services/mcp/mcpStringUtils.js'
-import { normalizeNameForMCP } from 'src/services/mcp/normalization.js'
+import { mcpInfoFromString } from '@claude-code/mcp-runtime/mcpStringUtils.js'
+import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'
 import type { MCPServerConnection } from 'src/services/mcp/types.js'
 import {
   getLoggingSafeMcpBaseUrl,

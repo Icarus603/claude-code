@@ -3,7 +3,7 @@ import { Text } from '@anthropic/ink'
 import {
   extractMcpToolDisplayName,
   getMcpDisplayName,
-} from '../../services/mcp/mcpStringUtils.js'
+} from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import { filterToolsByServer } from '../../services/mcp/utils.js'
 import { useAppState } from '../../state/AppState.js'
 import type { Tool } from '../../Tool.js'

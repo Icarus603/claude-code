@@ -8,7 +8,7 @@ import {
 import {
   buildMcpToolName,
   getMcpPrefix,
-} from 'src/services/mcp/mcpStringUtils.js'
+} from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import type {
   McpHTTPServerConfig,
   McpSSEServerConfig,

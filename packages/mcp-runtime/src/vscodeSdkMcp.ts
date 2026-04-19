@@ -1,12 +1,12 @@
 import { logForDebugging } from 'src/utils/debug.js'
 import { z } from 'zod/v4'
-import { lazySchema } from '../../utils/lazySchema.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
-import type { ConnectedMCPServer, MCPServerConnection } from './types.js'
+import type { ConnectedMCPServer, MCPServerConnection } from 'src/services/mcp/types.js'
 
 // Mirror of AutoModeEnabledState in permissionSetup.ts — inlined because that
 // file pulls in too many deps for this thin IPC module.

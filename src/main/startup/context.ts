@@ -11,7 +11,7 @@ import {
 } from "../../utils/auth.js";
 import { countFilesRoundedRg } from "../../utils/ripgrep.js";
 import { getCwd } from "../../utils/cwd.js";
-import { prefetchOfficialMcpUrls } from "../../services/mcp/officialRegistry.js";
+import { prefetchOfficialMcpUrls } from '@claude-code/mcp-runtime/officialRegistry.js';
 import { refreshModelCapabilities } from "../../utils/model/modelCapabilities.js";
 import { settingsChangeDetector } from "../../utils/settings/changeDetector.js";
 import { skillChangeDetector } from "../../utils/skills/skillChangeDetector.js";

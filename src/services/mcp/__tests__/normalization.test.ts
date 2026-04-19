@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeNameForMCP } from "../normalization";
+import { normalizeNameForMCP } from "@claude-code/mcp-runtime/normalization.js";
 
 describe("normalizeNameForMCP", () => {
   test("returns simple valid name unchanged", () => {

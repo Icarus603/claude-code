@@ -1,6 +1,6 @@
 import figures from 'figures'
 import React, { useCallback, useMemo, useState } from 'react'
-import { mcpInfoFromString } from 'src/services/mcp/mcpStringUtils.js'
+import { mcpInfoFromString } from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import { isMcpTool } from 'src/services/mcp/utils.js'
 import type { Tool, Tools } from 'src/Tool.js'
 import { filterToolsForAgent } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js'

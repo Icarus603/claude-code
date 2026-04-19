@@ -34,7 +34,7 @@ import {
   runElicitationHooks,
   runElicitationResultHooks,
 } from './elicitationHandler.js'
-import { setupVscodeSdkMcp } from './vscodeSdkMcp.js'
+import { setupVscodeSdkMcp } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
 
 let installed = false
 

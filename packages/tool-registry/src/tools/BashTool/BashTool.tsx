@@ -16,7 +16,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { notifyVscodeFileUpdated } from 'src/services/mcp/vscodeSdkMcp.js'
+import { notifyVscodeFileUpdated } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
 import type {
   SetToolJSXFn,
   ToolCallProgress,
