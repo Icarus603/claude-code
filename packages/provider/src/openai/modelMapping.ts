@@ -2,6 +2,7 @@
  * Default mapping from Anthropic model names to OpenAI model names.
  * Used only when ANTHROPIC_DEFAULT_*_MODEL env vars are not set.
  */
+import { readEnv } from '@claude-code/config/env'
 const DEFAULT_MODEL_MAP: Record<string, string> = {
   'claude-sonnet-4-20250514': 'gpt-4o',
   'claude-sonnet-4-5-20250929': 'gpt-4o',

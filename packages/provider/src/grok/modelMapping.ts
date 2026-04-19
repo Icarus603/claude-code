@@ -5,6 +5,7 @@
  * or override the entire mapping via GROK_MODEL_MAP env var (JSON string):
  *   GROK_MODEL_MAP='{"opus":"grok-4","sonnet":"grok-3","haiku":"grok-3-mini-fast"}'
  */
+import { readEnv } from '@claude-code/config/env'
 const DEFAULT_MODEL_MAP: Record<string, string> = {
   'claude-sonnet-4-20250514': 'grok-3-mini-fast',
   'claude-sonnet-4-5-20250929': 'grok-3-mini-fast',
