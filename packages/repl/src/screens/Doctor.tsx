@@ -14,17 +14,17 @@ import { getModelMaxOutputTokens } from 'src/utils/context.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
 import type { SettingSource } from 'src/utils/settings/constants.js'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
-import type { CommandResultDisplay } from '../commands.js'
+import type { CommandResultDisplay } from 'src/commands.js'
 import { Pane } from '@anthropic/ink'
-import { PressEnterToContinue } from '../components/PressEnterToContinue.js'
-import { SandboxDoctorSection } from '../components/sandbox/SandboxDoctorSection.js'
-import { ValidationErrorsList } from '../components/ValidationErrorsList.js'
-import { useSettingsErrors } from '../hooks/notifs/useSettingsErrors.js'
-import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
+import { PressEnterToContinue } from 'src/components/PressEnterToContinue.js'
+import { SandboxDoctorSection } from 'src/components/sandbox/SandboxDoctorSection.js'
+import { ValidationErrorsList } from 'src/components/ValidationErrorsList.js'
+import { useSettingsErrors } from 'src/hooks/notifs/useSettingsErrors.js'
+import { useExitOnCtrlCDWithKeybindings } from 'src/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useAppState } from '../state/AppState.js'
-import { getPluginErrorMessage } from '../types/plugin.js'
+import { useAppState } from 'src/state/AppState.js'
+import { getPluginErrorMessage } from 'src/types/plugin.js'
 import {
   getGcsDistTags,
   getNpmDistTags,
@@ -33,20 +33,20 @@ import {
 import {
   type ContextWarnings,
   checkContextWarnings,
-} from '../utils/doctorContextWarnings.js'
+} from 'src/utils/doctorContextWarnings.js'
 import {
   type DiagnosticInfo,
   getDoctorDiagnostic,
-} from '../utils/doctorDiagnostic.js'
-import { validateBoundedIntEnvVar } from '../utils/envValidation.js'
-import { pathExists } from '../utils/file.js'
+} from 'src/utils/doctorDiagnostic.js'
+import { validateBoundedIntEnvVar } from 'src/utils/envValidation.js'
+import { pathExists } from 'src/utils/file.js'
 import {
   cleanupStaleLocks,
   getAllLockInfo,
   isPidBasedLockingEnabled,
   type LockInfo,
-} from '../utils/nativeInstaller/pidLock.js'
-import { getInitialSettings } from '../utils/settings/settings.js'
+} from 'src/utils/nativeInstaller/pidLock.js'
+import { getInitialSettings } from 'src/utils/settings/settings.js'
 import {
   BASH_MAX_OUTPUT_DEFAULT,
   BASH_MAX_OUTPUT_UPPER_LIMIT,
@@ -54,8 +54,8 @@ import {
 import {
   TASK_MAX_OUTPUT_DEFAULT,
   TASK_MAX_OUTPUT_UPPER_LIMIT,
-} from '../utils/task/outputFormatting.js'
-import { getXDGStateHome } from '../utils/xdg.js'
+} from 'src/utils/task/outputFormatting.js'
+import { getXDGStateHome } from 'src/utils/xdg.js'
 
 type Props = {
   onDone: (

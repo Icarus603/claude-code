@@ -21,7 +21,7 @@ import type { ValidationError } from './utils/settings/validation.js'
 // Type-only access to ResumeConversation's Props via the module type.
 // No runtime cost - erased at compile time.
 type ResumeConversationProps = React.ComponentProps<
-  typeof import('./screens/ResumeConversation.js').ResumeConversation
+  typeof import('@claude-code/repl/screens/ResumeConversation.js').ResumeConversation
 >
 
 /**
@@ -183,7 +183,7 @@ export async function launchResumeChooser(
 ): Promise<void> {
   const [worktreePaths, { ResumeConversation }, { App }] = await Promise.all([
     worktreePathsPromise,
-    import('./screens/ResumeConversation.js'),
+    import('@claude-code/repl/screens/ResumeConversation.js'),
     import('./components/App.js'),
   ])
   await renderAndRun(

@@ -20,7 +20,7 @@ import { useIsOverlayActive } from '../context/overlayContext.js'
 import { useCommandQueue } from '../hooks/useCommandQueue.js'
 import { getShortcutDisplay } from '../keybindings/shortcutFormat.js'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { Screen } from '../screens/REPL.js'
+import type { Screen } from '@claude-code/repl/screens/REPL.js'
 import { exitTeammateView } from '../state/teammateViewHelpers.js'
 import {
   killAllRunningAgentTasks,

@@ -1,26 +1,26 @@
-import { useAppState, useAppStateStore, useSetAppState } from "../../state/AppState.js";
-import { selectElicitation, selectMcp } from "../../state/mcpSelectors.js";
+import { useAppState, useAppStateStore, useSetAppState } from "src/state/AppState.js";
+import { selectElicitation, selectMcp } from "src/state/mcpSelectors.js";
 import {
 	selectPendingSandboxRequest,
 	selectPendingWorkerRequest,
 	selectToolPermissionContext,
 	selectWorkerSandboxPermissions,
-} from "../../state/permissionSelectors.js";
-import { selectAgentDefinitions, selectPlugins } from "../../state/pluginSelectors.js";
+} from "src/state/permissionSelectors.js";
+import { selectAgentDefinitions, selectPlugins } from "src/state/pluginSelectors.js";
 import {
 	selectInitialMessage,
 	selectIsBriefOnly,
 	selectShowRemoteCallout,
 	selectSpinnerTip,
 	selectVerbose,
-} from "../../state/sessionSelectors.js";
-import { selectFileHistory, selectTasks, selectViewingAgentTaskId } from "../../state/taskSelectors.js";
-import { selectTeamContext } from "../../state/teamSelectors.js";
+} from "src/state/sessionSelectors.js";
+import { selectFileHistory, selectTasks, selectViewingAgentTaskId } from "src/state/taskSelectors.js";
+import { selectTeamContext } from "src/state/teamSelectors.js";
 import {
 	selectShowExpandedTodos,
 	selectUltraplanLaunchPending,
 	selectUltraplanPendingChoice,
-} from "../../state/uiSelectors.js";
+} from "src/state/uiSelectors.js";
 
 export function useReplAppState() {
 	const verbose = useAppState(selectVerbose);
