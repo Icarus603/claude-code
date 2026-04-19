@@ -1,4 +1,4 @@
-import { parseFrontmatter } from '../../utils/frontmatterParser.js'
+import { parseFrontmatter } from 'src/utils/frontmatterParser.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 import { SKILL_FILES, SKILL_MD } from './verifyContent.js'
 

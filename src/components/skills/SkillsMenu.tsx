@@ -12,7 +12,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   estimateSkillFrontmatterTokens,
   getSkillsPath,
-} from '../../skills/loadSkillsDir.js'
+} from '@claude-code/command-runtime/skills/loadSkillsDir.js'
 import { getDisplayPath } from '../../utils/file.js'
 import { formatTokens } from '../../utils/format.js'
 import {

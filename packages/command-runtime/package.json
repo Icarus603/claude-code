@@ -13,6 +13,7 @@
     "./testing": "./src/testing/index.ts",
     "./slashCommandParsing.js": "./src/slashCommandParsing.ts",
     "./argumentSubstitution.js": "./src/argumentSubstitution.ts",
-    "./exampleCommands.js": "./src/exampleCommands.ts"
+    "./exampleCommands.js": "./src/exampleCommands.ts",
+    "./skills/*.js": "./src/skills/*.ts"
   }
 }

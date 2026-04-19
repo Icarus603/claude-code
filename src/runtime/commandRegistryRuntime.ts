@@ -154,8 +154,8 @@ import {
   getSkillDirCommands,
   clearSkillCaches,
   getDynamicSkills,
-} from '../skills/loadSkillsDir.js'
-import { getBundledSkills } from '../skills/bundledSkills.js'
+} from '@claude-code/command-runtime/skills/loadSkillsDir.js'
+import { getBundledSkills } from '@claude-code/command-runtime/skills/bundledSkills.js'
 import { getBuiltinPluginSkillCommands } from '../plugins/builtinPlugins.js'
 import {
   getPluginCommands,
