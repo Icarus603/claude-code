@@ -44,6 +44,7 @@ import {
 } from '@claude-code/provider/rateLimitMocking.js'
 import { REPEATED_529_ERROR_MESSAGE } from '@claude-code/provider/errors.js'
 import { extractConnectionErrorDetails } from '@claude-code/provider/errorUtils.js'
+import { readEnv } from '@claude-code/config/env'
 
 const abortError = () => new APIUserAbortError()
 
@@ -97,7 +98,7 @@ const HEARTBEAT_INTERVAL_MS = 30_000
 
 function isPersistentRetryEnabled(): boolean {
   return feature('UNATTENDED_RETRY')
-    ? isEnvTruthy(process.env.CLAUDE_CODE_UNATTENDED_RETRY)
+    ? isEnvTruthy(readEnv('CLAUDE_CODE_UNATTENDED_RETRY'))
     : false
 }
 
@@ -197,7 +198,7 @@ export async function* withRetry<T>(
 
     try {
       // Check for mock rate limits (used by /mock-limits command for Ant employees)
-      if (process.env.USER_TYPE === 'ant') {
+      if (readEnv('USER_TYPE') === 'ant') {
         const mockError = checkMockRateLimitError(
           retryContext.model,
           wasFastModeActive,
@@ -326,7 +327,7 @@ export async function* withRetry<T>(
         is529Error(error) &&
         // If FALLBACK_FOR_ALL_PRIMARY_MODELS is not set, fall through only if the primary model is a non-custom Opus model.
         // TODO: Revisit if the isNonCustomOpusModel check should still exist, or if isNonCustomOpusModel is a stale artifact of when Claude Code was hardcoded on Opus.
-        (process.env.FALLBACK_FOR_ALL_PRIMARY_MODELS ||
+        (readEnv('FALLBACK_FOR_ALL_PRIMARY_MODELS') ||
           (!isClaudeAISubscriber() && isNonCustomOpusModel(options.model)))
       ) {
         consecutive529Errors++
@@ -349,8 +350,8 @@ export async function* withRetry<T>(
           }
 
           if (
-            process.env.USER_TYPE === 'external' &&
-            !process.env.IS_SANDBOX &&
+            readEnv('USER_TYPE') === 'external' &&
+            !readEnv('IS_SANDBOX') &&
             !isPersistentRetryEnabled()
           ) {
             logEvent('tengu_api_custom_529_overloaded_error', {})
@@ -627,7 +628,7 @@ function isOAuthTokenRevokedError(error: unknown): boolean {
 }
 
 function isBedrockAuthError(error: unknown): boolean {
-  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) {
     // AWS libs reject without an API call if .aws holds a past Expiration value
     // otherwise, API calls that receive expired tokens give generic 403
     // "The security token included in the request is invalid"
@@ -666,7 +667,7 @@ function isGoogleAuthLibraryCredentialError(error: unknown): boolean {
 }
 
 function isVertexAuthError(error: unknown): boolean {
-  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) {
     // SDK-level: google-auth-library fails in prepareOptions() before the HTTP call
     if (isGoogleAuthLibraryCredentialError(error)) {
       return true
@@ -708,7 +709,7 @@ function shouldRetry(error: APIError): boolean {
   // credentials. Bypass x-should-retry:false — the server assumes we'd retry
   // the same bad key, but our key is fine.
   if (
-    isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) &&
+    isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE')) &&
     (error.status === 401 || error.status === 403)
   ) {
     return true
@@ -743,7 +744,7 @@ function shouldRetry(error: APIError): boolean {
   // For other status codes (401, 403, 400, 429, etc.), respect the header.
   if (shouldRetryHeader === 'false') {
     const is5xxError = error.status !== undefined && error.status >= 500
-    if (!(process.env.USER_TYPE === 'ant' && is5xxError)) {
+    if (!(readEnv('USER_TYPE') === 'ant' && is5xxError)) {
       return false
     }
   }
@@ -785,8 +786,8 @@ function shouldRetry(error: APIError): boolean {
 }
 
 export function getDefaultMaxRetries(): number {
-  if (process.env.CLAUDE_CODE_MAX_RETRIES) {
-    return parseInt(process.env.CLAUDE_CODE_MAX_RETRIES, 10)
+  if (readEnv('CLAUDE_CODE_MAX_RETRIES')) {
+    return parseInt(readEnv('CLAUDE_CODE_MAX_RETRIES'), 10)
   }
   return DEFAULT_MAX_RETRIES
 }
