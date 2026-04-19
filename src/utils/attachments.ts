@@ -113,7 +113,7 @@ import { cacheKeys, type FileStateCache } from './fileStateCache.js'
 import {
   createAbortController,
   createChildAbortController,
-} from './abortController.js'
+} from '@claude-code/agent/abortController.js'
 import { isAbortError } from './errors.js'
 import {
   getFileModificationTimeAsync,

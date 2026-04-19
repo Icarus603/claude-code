@@ -17,7 +17,7 @@ import {
   type PromptInputMode,
   type QueuedCommand,
 } from '../types/textInputTypes.js'
-import { createAbortController } from './abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import type { PastedContent } from '@claude-code/config'
 import { logForDebugging } from './debug.js'
 import type { EffortValue } from './effort.js'

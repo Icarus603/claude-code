@@ -17,7 +17,7 @@ import {
   type ToolUseContext,
 } from '../Tool.js'
 import { getTools } from '@claude-code/tool-registry'
-import { createAbortController } from '../utils/abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { createFileStateCacheWithSizeLimit } from '../utils/fileStateCache.js'
 import { logError } from '../utils/log.js'
 import { createAssistantMessage } from '../utils/messages.js'

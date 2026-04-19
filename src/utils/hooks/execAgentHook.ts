@@ -9,7 +9,7 @@ import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/Syn
 import { ALL_AGENT_DISALLOWED_TOOLS } from '../../tools.js'
 import { asAgentId } from '../../types/ids.js'
 import type { Message } from '../../types/message.js'
-import { createAbortController } from '../abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { createAttachmentMessage } from '../attachments.js'
 import { createCombinedAbortSignal } from '../combinedAbortSignal.js'
 import { logForDebugging } from '../debug.js'

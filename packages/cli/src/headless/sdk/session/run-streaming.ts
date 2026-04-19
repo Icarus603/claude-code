@@ -195,7 +195,7 @@ import {
 } from '@claude-code/bridge'
 import { getRemoteSessionUrl } from '../../../../../../src/constants/product.js'
 import type { CanUseToolFn } from '../../../../../../src/hooks/useCanUseTool.js'
-import { createAbortController } from '../../../../../../src/utils/abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { generateSessionTitle } from '../../../../../../src/utils/sessionTitle.js'
 import { buildSideQuestionFallbackParams } from '../../../../../../src/utils/queryContext.js'
 import { runSideQuestion } from '../../../../../../src/utils/sideQuestion.js'

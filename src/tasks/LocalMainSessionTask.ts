@@ -29,7 +29,7 @@ import type {
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { asAgentId } from '../types/ids.js'
 import type { Message } from '../types/message.js'
-import { createAbortController } from '../utils/abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import {
   runWithAgentContext,
   type SubagentContext,
