@@ -8,7 +8,16 @@ import type {
 } from './contracts.js'
 import type { ContextPipeline, NetworkLayer } from './types.js'
 import type { ProviderQueryFn, ProviderQueryStreamFn } from './types.js'
-import { HostBindingsError } from './errors.js'
+// Keep HostBindingsError inline to avoid top-level import of errors.js,
+// which transitively loads src/services/api/providerHostSetup.ts and
+// causes TDZ on host.ts's module-level state if install() fires during init.
+class HostBindingsError extends Error {
+  readonly code = 'PROVIDER_HOST_BINDINGS_NOT_INSTALLED'
+  constructor(message: string) {
+    super(message)
+    this.name = 'ProviderHostBindingsError'
+  }
+}
 
 export type ProviderHostBindings = {
   contextPipeline: ContextPipeline
@@ -55,19 +64,21 @@ export type ProviderHostBindings = {
   legacy?: Record<string, unknown>
 }
 
-let providerHostBindings: ProviderHostBindings | null = null
+// Module-level state held in a const container so circular-import re-entry
+// during top-level install() can't trip TDZ on a `let`.
+const state: { bindings: ProviderHostBindings | null } = { bindings: null }
 
 export function installProviderHostBindings(
   bindings: ProviderHostBindings,
 ): void {
-  providerHostBindings = bindings
+  state.bindings = bindings
 }
 
 export function getProviderHostBindings(): ProviderHostBindings {
-  if (!providerHostBindings) {
+  if (!state.bindings) {
     throw new HostBindingsError(
       'Provider host bindings have not been installed. Install the application host bindings before using @claude-code/provider runtime APIs.',
     )
   }
-  return providerHostBindings
+  return state.bindings
 }
