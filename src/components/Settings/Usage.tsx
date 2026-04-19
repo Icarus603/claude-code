@@ -11,7 +11,7 @@ import {
   fetchUtilization,
   type RateLimit,
   type Utilization,
-} from '../../services/api/usage.js'
+} from '@claude-code/provider/usage.js'
 import { formatResetText } from '../../utils/format.js'
 import { logError } from '../../utils/log.js'
 import { jsonStringify } from '../../utils/slowOperations.js'

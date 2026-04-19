@@ -77,7 +77,7 @@ import {
   initializeGrowthBook,
   refreshGrowthBookAfterAuthChange,
 } from '@claude-code/config/feature-flags'
-import { fetchBootstrapData } from '../../../../src/services/api/bootstrap.js'
+import { fetchBootstrapData } from '@claude-code/provider/bootstrap.js'
 import {
   type DownloadResult,
   downloadSessionFiles,

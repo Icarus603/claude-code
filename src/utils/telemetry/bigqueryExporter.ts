@@ -8,7 +8,7 @@ import {
   type ResourceMetrics,
 } from '@opentelemetry/sdk-metrics'
 import axios from 'axios'
-import { checkMetricsEnabled } from 'src/services/api/metricsOptOut.js'
+import { checkMetricsEnabled } from '@claude-code/provider/metricsOptOut.js'
 import { getIsNonInteractiveSession } from '../../bootstrap/state.js'
 import { getSubscriptionType, isClaudeAISubscriber } from '../auth.js'
 import { checkHasTrustDialogAccepted } from '@claude-code/config'

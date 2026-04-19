@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { getOauthConfig } from '../../constants/oauth.js'
-import { getOauthAccountInfo } from '../../utils/auth.js'
+import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthAccountInfo } from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logError } from '../../utils/log.js'
-import { isEssentialTrafficOnly } from '../../utils/privacyLevel.js'
+import { logError } from 'src/utils/log.js'
+import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'
 
 export type OverageCreditGrantInfo = {

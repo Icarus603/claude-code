@@ -6,15 +6,15 @@ import {
   hasProfileScope,
 } from 'src/utils/auth.js'
 import { z } from 'zod'
-import { getOauthConfig, OAUTH_BETA_HEADER } from '../../constants/oauth.js'
+import { getOauthConfig, OAUTH_BETA_HEADER } from 'src/constants/oauth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from '../../utils/debug.js'
-import { withOAuth401Retry } from '../../utils/http.js'
-import { lazySchema } from '../../utils/lazySchema.js'
-import { logError } from '../../utils/log.js'
-import { getAPIProvider } from '../../utils/model/providers.js'
-import { isEssentialTrafficOnly } from '../../utils/privacyLevel.js'
-import { getClaudeCodeUserAgent } from '../../utils/userAgent.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { withOAuth401Retry } from 'src/utils/http.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
+import { logError } from 'src/utils/log.js'
+import { getAPIProvider } from 'src/utils/model/providers.js'
+import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
+import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
 
 const bootstrapResponseSchema = lazySchema(() =>
   z.object({

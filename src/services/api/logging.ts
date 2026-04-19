@@ -33,7 +33,7 @@ import { consumeInvokingRequestId } from '../../utils/agentContext.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import { EMPTY_USAGE } from './emptyUsage.js'
+import { EMPTY_USAGE } from '@claude-code/provider/emptyUsage.js'
 import { classifyAPIError } from './errors.js'
 import { extractConnectionErrorDetails } from './errorUtils.js'
 
