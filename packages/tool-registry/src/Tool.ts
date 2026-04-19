@@ -20,7 +20,7 @@ export type ToolInputJSONSchema = {
   }
 }
 
-import type { Notification } from './context/notifications.js'
+import type { Notification } from 'src/context/notifications.js'
 import type {
   MCPServerConnection,
   ServerResource,
@@ -72,8 +72,8 @@ export type {
   WebSearchProgress,
 }
 
-import type { SpinnerMode } from './components/Spinner.js'
-import type { QuerySource } from './constants/querySource.js'
+import type { SpinnerMode } from '@claude-code/repl/components/Spinner.js'
+import type { QuerySource } from 'src/constants/querySource.js'
 import type { SDKStatus } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { AppState } from 'src/state/AppState.js'
 import type {
