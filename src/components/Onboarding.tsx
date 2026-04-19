@@ -7,7 +7,7 @@ import {
   setupTerminal,
   shouldOfferTerminalSetup,
 } from '../commands/terminalSetup/terminalSetup.js'
-import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Newline, Text, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { isAnthropicAuthEnabled } from '../utils/auth.js'

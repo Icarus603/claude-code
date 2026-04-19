@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text } from '@anthropic/ink'
 
 type Props = {

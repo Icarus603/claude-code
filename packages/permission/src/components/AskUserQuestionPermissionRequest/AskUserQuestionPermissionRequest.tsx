@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { useSettings } from 'src/hooks/useSettings.js'
+import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { stringWidth, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'

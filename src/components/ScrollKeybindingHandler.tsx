@@ -3,7 +3,7 @@ import { useNotifications } from '../context/notifications.js'
 import {
   useCopyOnSelect,
   useSelectionBgColor,
-} from '../hooks/useCopyOnSelect.js'
+} from '@claude-code/repl/hooks/useCopyOnSelect.js'
 import type { ScrollBoxHandle, FocusMove, SelectionState } from '@anthropic/ink'
 import { useSelection, type Key, useInput, isXtermJs, getClipboardPath } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'

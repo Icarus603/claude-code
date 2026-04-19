@@ -7,7 +7,7 @@ import type {
 import figures from 'figures'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRegisterOverlay } from '../../context/overlayContext.js'
-import { useNotifyAfterTimeout } from '../../hooks/useNotifyAfterTimeout.js'
+import { useNotifyAfterTimeout } from '@claude-code/repl/hooks/useNotifyAfterTimeout.js'
 import { useTerminalSize } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw text input for elicitation form
 import { Box, Text, useInput } from '@anthropic/ink'

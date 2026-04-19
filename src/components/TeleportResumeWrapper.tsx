@@ -8,7 +8,7 @@ import type { CodeSession } from '@claude-code/teleport/api.js'
 import {
   type TeleportSource,
   useTeleportResume,
-} from '../hooks/useTeleportResume.js'
+} from '@claude-code/repl/hooks/useTeleportResume.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { ResumeTask } from './ResumeTask.js'

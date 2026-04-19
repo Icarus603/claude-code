@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { type ReactNode, useEffect } from 'react'
-import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
+import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
 import { useAppState } from '../../state/AppState.js'

@@ -7,7 +7,7 @@ import {
   link,
 } from 'fs/promises'
 import * as React from 'react'
-import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
 import { z } from 'zod/v4'
 import { getKairosActive } from '@claude-code/app-host/bootstrap/state.js'

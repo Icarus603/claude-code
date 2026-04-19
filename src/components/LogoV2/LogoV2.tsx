@@ -76,7 +76,7 @@ import {
 import { plural } from '../../utils/stringUtils.js'
 import { useAppState } from '../../state/AppState.js'
 import { getEffortSuffix } from '../../utils/effort.js'
-import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
+import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import { renderModelSetting } from '../../utils/model/model.js'
 
 const LEFT_PANEL_MAX_WIDTH = 50

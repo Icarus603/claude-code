@@ -7,7 +7,7 @@
 import { cwd } from 'process'
 import React from 'react'
 import { WelcomeV2 } from 'src/components/LogoV2/WelcomeV2.js'
-import { useManagePlugins } from 'src/hooks/useManagePlugins.js'
+import { useManagePlugins } from '@claude-code/repl/hooks/useManagePlugins.js'
 import type { Root } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'

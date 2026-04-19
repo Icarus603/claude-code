@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { useMemo } from 'react'
-import { useCommandQueue } from 'src/hooks/useCommandQueue.js'
+import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
 import { useAppState } from 'src/state/AppState.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { getExampleCommandFromCache } from '@claude-code/command-runtime/exampleCommands.js'

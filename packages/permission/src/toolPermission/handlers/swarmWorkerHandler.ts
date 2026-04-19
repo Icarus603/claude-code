@@ -11,7 +11,7 @@ import {
   isSwarmWorker,
   sendPermissionRequestViaMailbox,
 } from '@claude-code/swarm'
-import { registerPermissionCallback } from 'src/hooks/useSwarmPermissionPoller.js'
+import { registerPermissionCallback } from '@claude-code/repl/hooks/useSwarmPermissionPoller.js'
 import type { PermissionContext } from '../PermissionContext.js'
 import { createResolveOnce } from '../PermissionContext.js'
 

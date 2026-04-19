@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useMemoryUsage } from '../hooks/useMemoryUsage.js'
+import { useMemoryUsage } from '@claude-code/repl/hooks/useMemoryUsage.js'
 import { Box, Text } from '@anthropic/ink'
 import { formatFileSize } from '../utils/format.js'
 

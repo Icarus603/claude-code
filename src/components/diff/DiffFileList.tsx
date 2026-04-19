@@ -1,6 +1,6 @@
 import figures from 'figures'
 import React, { useMemo } from 'react'
-import type { DiffFile } from '../../hooks/useDiffData.js'
+import type { DiffFile } from '@claude-code/repl/hooks/useDiffData.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { truncateStartToWidth } from '../../utils/format.js'

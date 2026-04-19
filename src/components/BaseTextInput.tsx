@@ -1,6 +1,6 @@
 import React from 'react'
-import { renderPlaceholder } from '../hooks/renderPlaceholder.js'
-import { usePasteHandler } from '../hooks/usePasteHandler.js'
+import { renderPlaceholder } from '@claude-code/repl/hooks/renderPlaceholder.js'
+import { usePasteHandler } from '@claude-code/repl/hooks/usePasteHandler.js'
 import { useDeclaredCursor } from '@anthropic/ink'
 import { Ansi, Box, Text, useInput } from '@anthropic/ink'
 import type {

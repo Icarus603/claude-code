@@ -27,7 +27,7 @@ import type {
 } from 'src/types/message.js'
 import { addInvokedSkill, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG } from '../../constants/xml.js'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,

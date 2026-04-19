@@ -1,7 +1,7 @@
 import type { StructuredPatchHunk } from 'diff'
 import * as React from 'react'
 import { memo } from 'react'
-import { useSettings } from '../hooks/useSettings.js'
+import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { Box, NoSelect, RawAnsi, useTheme } from '@anthropic/ink'
 import { isFullscreenEnvEnabled } from '../utils/fullscreen.js'
 import sliceAnsi from '../utils/sliceAnsi.js'

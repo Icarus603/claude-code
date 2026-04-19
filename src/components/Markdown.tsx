@@ -1,6 +1,6 @@
 import { marked, type Token, type Tokens } from 'marked'
 import React, { Suspense, use, useMemo, useRef } from 'react'
-import { useSettings } from '../hooks/useSettings.js'
+import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { Ansi, Box, useTheme } from '@anthropic/ink'
 import {
   type CliHighlight,

@@ -5,7 +5,7 @@ import {
   isSessionPersistenceDisabled,
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { runTools } from '@claude-code/tool-registry/services/toolOrchestration.js'
 import { findToolByName, type Tool, type Tools } from '../Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'

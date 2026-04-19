@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useExitOnCtrlCDWithKeybindings } from 'src/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import {
   builtInCommandNames,

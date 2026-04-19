@@ -5,7 +5,7 @@ import { join } from 'path'
 import * as React from 'react'
 import { use, useEffect, useState } from 'react'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
-import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text, ListItem } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import {

@@ -5,8 +5,8 @@ import {
   processMailboxPermissionResponse,
   registerPermissionCallback,
   unregisterPermissionCallback,
-} from '../hooks/useSwarmPermissionPoller.js'
-import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
+} from '@claude-code/repl/hooks/useSwarmPermissionPoller.js'
+import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Spinner } from '../components/Spinner.js'
 import {
   type OptionWithDescription,
