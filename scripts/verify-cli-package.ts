@@ -1,4 +1,4 @@
-import '../src/runtime/bootstrap.js'
+import '@claude-code/app-host/runtime/bootstrap.js'
 import {
   createHeadlessSession,
   createHeadlessStore,

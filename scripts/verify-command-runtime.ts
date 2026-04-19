@@ -5,7 +5,7 @@ async function main(): Promise<void> {
   // Install minimal host bindings so enableConfigs() doesn't throw.
   installConfigHostBindings({})
   enableConfigs()
-  await import('../src/runtime/bootstrap.js')
+  await import('@claude-code/app-host/runtime/bootstrap.js')
 
   const {
     builtInCommandNames: builtInCommandNamesFromPackage,

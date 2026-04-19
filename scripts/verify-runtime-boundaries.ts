@@ -101,8 +101,8 @@ async function verifyEntryBootstrapSeams(): Promise<string[]> {
   const violations: string[] = []
   const [main, print, bootstrap] = await Promise.all([
     readFile('src/main.tsx', 'utf8'),
-    readFile('src/cli/print.ts', 'utf8'),
-    readFile('src/runtime/bootstrap.ts', 'utf8'),
+    readFile('packages/cli/src/print.ts', 'utf8'),
+    readFile('@claude-code/app-host/runtime/bootstrap.ts', 'utf8'),
   ])
 
   if (!main.includes("./runtime/bootstrap.js")) {
@@ -110,9 +110,9 @@ async function verifyEntryBootstrapSeams(): Promise<string[]> {
       'src/main.tsx: missing runtime skeleton bootstrap seam import',
     )
   }
-  if (!print.includes("src/runtime/bootstrap.js")) {
+  if (!print.includes("@claude-code/app-host/runtime/bootstrap.js")) {
     violations.push(
-      'src/cli/print.ts: missing runtime skeleton bootstrap seam import',
+      'packages/cli/src/print.ts: missing runtime skeleton bootstrap seam import',
     )
   }
 
@@ -187,12 +187,12 @@ async function verifyRootFacadesStayThin(): Promise<string[]> {
   }
 
   const providerHostSetupRaw = await readFile(
-    'src/services/api/providerHostSetup.ts',
+    'packages/app-host/src/providerHostSetup.ts',
     'utf8',
   )
   if (!providerHostSetupRaw.includes('installProviderRuntimeBindings(bindings)')) {
     violations.push(
-      'src/services/api/providerHostSetup.ts: provider host bindings must be installed from root composition seam',
+      'packages/app-host/src/providerHostSetup.ts: provider host bindings must be installed from root composition seam',
     )
   }
 
