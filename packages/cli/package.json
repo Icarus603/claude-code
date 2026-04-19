@@ -14,6 +14,13 @@
     "./mcpServersHandlers.js": "./src/mcpServersHandlers.ts",
     "./structuredIO.js": "./src/structuredIO.ts",
     "./structuredIOHelper.js": "./src/structuredIOHelper.ts",
-    "./transports/*.js": "./src/transports/*.ts"
+    "./transports/*.js": "./src/transports/*.ts",
+    "./handlers/*.js": "./src/handlers/*.ts",
+    "./handlers/util.js": "./src/handlers/util.tsx",
+    "./handlers/mcp.js": "./src/handlers/mcp.tsx",
+    "./exit.js": "./src/exit.ts",
+    "./print.js": "./src/print.ts",
+    "./rollback.js": "./src/rollback.ts",
+    "./up.js": "./src/up.ts"
   }
 }

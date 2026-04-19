@@ -3,7 +3,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { installOAuthTokens } from '../cli/handlers/auth.js'
+import { installOAuthTokens } from '@claude-code/cli/handlers/auth.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { setClipboard, useTerminalNotification, Box, Link, Text, KeyboardShortcutHint } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'

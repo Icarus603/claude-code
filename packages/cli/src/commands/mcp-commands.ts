@@ -50,7 +50,7 @@ export function registerMcpCommands(
         debug?: boolean
         verbose?: boolean
       }) => {
-        const { mcpServeHandler } = await import('../../../../src/cli/handlers/mcp.js')
+        const { mcpServeHandler } = await import('@claude-code/cli/handlers/mcp.js')
         await mcpServeHandler({ debug, verbose })
       },
     )
@@ -70,7 +70,7 @@ export function registerMcpCommands(
       'Configuration scope (local, user, or project) - if not specified, removes from whichever scope it exists in',
     )
     .action(async (name: string, options: { scope?: string }) => {
-      const { mcpRemoveHandler } = await import('../../../../src/cli/handlers/mcp.js')
+      const { mcpRemoveHandler } = await import('@claude-code/cli/handlers/mcp.js')
       await mcpRemoveHandler(name, options)
     })
 
@@ -80,7 +80,7 @@ export function registerMcpCommands(
       'List configured MCP servers. Note: The workspace trust dialog is skipped and stdio servers from .mcp.json are spawned for health checks. Only use this command in directories you trust.',
     )
     .action(async () => {
-      const { mcpListHandler } = await import('../../../../src/cli/handlers/mcp.js')
+      const { mcpListHandler } = await import('@claude-code/cli/handlers/mcp.js')
       await mcpListHandler()
     })
 
@@ -90,7 +90,7 @@ export function registerMcpCommands(
       'Get details about an MCP server. Note: The workspace trust dialog is skipped and stdio servers from .mcp.json are spawned for health checks. Only use this command in directories you trust.',
     )
     .action(async (name: string) => {
-      const { mcpGetHandler } = await import('../../../../src/cli/handlers/mcp.js')
+      const { mcpGetHandler } = await import('@claude-code/cli/handlers/mcp.js')
       await mcpGetHandler(name)
     })
 
@@ -108,7 +108,7 @@ export function registerMcpCommands(
         json: string,
         options: { scope?: string; clientSecret?: true },
       ) => {
-        const { mcpAddJsonHandler } = await import('../../../../src/cli/handlers/mcp.js')
+        const { mcpAddJsonHandler } = await import('@claude-code/cli/handlers/mcp.js')
         await mcpAddJsonHandler(name, json, options)
       },
     )
@@ -118,7 +118,7 @@ export function registerMcpCommands(
     .description('Import MCP servers from Claude Desktop (Mac and WSL only)')
     .option('-s, --scope <scope>', 'Configuration scope (local, user, or project)', 'local')
     .action(async (options: { scope?: string }) => {
-      const { mcpAddFromDesktopHandler } = await import('../../../../src/cli/handlers/mcp.js')
+      const { mcpAddFromDesktopHandler } = await import('@claude-code/cli/handlers/mcp.js')
       await mcpAddFromDesktopHandler(options)
     })
 
@@ -128,7 +128,7 @@ export function registerMcpCommands(
       'Reset all approved and rejected project-scoped (.mcp.json) servers within this project',
     )
     .action(async () => {
-      const { mcpResetChoicesHandler } = await import('../../../../src/cli/handlers/mcp.js')
+      const { mcpResetChoicesHandler } = await import('@claude-code/cli/handlers/mcp.js')
       await mcpResetChoicesHandler()
     })
 

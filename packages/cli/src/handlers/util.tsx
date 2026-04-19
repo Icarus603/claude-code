@@ -6,23 +6,23 @@
 
 import { cwd } from 'process'
 import React from 'react'
-import { WelcomeV2 } from '../../components/LogoV2/WelcomeV2.js'
-import { useManagePlugins } from '../../hooks/useManagePlugins.js'
+import { WelcomeV2 } from 'src/components/LogoV2/WelcomeV2.js'
+import { useManagePlugins } from 'src/hooks/useManagePlugins.js'
 import type { Root } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
-import { KeybindingSetup } from '../../keybindings/KeybindingProviderSetup.js'
+import { KeybindingSetup } from 'src/keybindings/KeybindingProviderSetup.js'
 import { logEvent } from '@claude-code/local-observability'
-import { MCPConnectionManager } from '../../services/mcp/MCPConnectionManager.js'
-import { AppStateProvider } from '../../state/AppState.js'
-import { onChangeAppState } from '../../state/onChangeAppState.js'
-import { isAnthropicAuthEnabled } from '../../utils/auth.js'
+import { MCPConnectionManager } from 'src/services/mcp/MCPConnectionManager.js'
+import { AppStateProvider } from 'src/state/AppState.js'
+import { onChangeAppState } from 'src/state/onChangeAppState.js'
+import { isAnthropicAuthEnabled } from 'src/utils/auth.js'
 
 export async function setupTokenHandler(root: Root): Promise<void> {
   logEvent('tengu_setup_token_command', {})
 
   const showAuthWarning = !isAnthropicAuthEnabled()
   const { ConsoleOAuthFlow } = await import(
-    '../../components/ConsoleOAuthFlow.js'
+    'src/components/ConsoleOAuthFlow.js'
   )
   await new Promise<void>(resolve => {
     root.render(
@@ -60,7 +60,7 @@ export async function setupTokenHandler(root: Root): Promise<void> {
 
 // DoctorWithPlugins wrapper + doctor handler
 const DoctorLazy = React.lazy(() =>
-  import('../../screens/Doctor.js').then(m => ({ default: m.Doctor })),
+  import('src/screens/Doctor.js').then(m => ({ default: m.Doctor })),
 )
 
 function DoctorWithPlugins({
@@ -106,9 +106,9 @@ export async function installHandler(
   target: string | undefined,
   options: { force?: boolean },
 ): Promise<void> {
-  const { setup } = await import('../../setup.js')
+  const { setup } = await import('src/setup.js')
   await setup(cwd(), 'default', false, false, undefined, false)
-  const { install } = await import('../../commands/install.js')
+  const { install } = await import('src/commands/install.js')
   await new Promise<void>(resolve => {
     const args: string[] = []
     if (target) args.push(target)

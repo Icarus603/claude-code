@@ -29,19 +29,19 @@ import {
   isUsing3PServices,
   saveOAuthTokensIfNeeded,
   validateForceLoginOrg,
-} from '../../utils/auth.js'
+} from 'src/utils/auth.js'
 import { saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from '../../utils/debug.js'
-import { isRunningOnHomespace } from '../../utils/envUtils.js'
-import { errorMessage } from '../../utils/errors.js'
-import { logError } from '../../utils/log.js'
-import { getAPIProvider } from '../../utils/model/providers.js'
-import { getInitialSettings } from '../../utils/settings/settings.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { isRunningOnHomespace } from 'src/utils/envUtils.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { logError } from 'src/utils/log.js'
+import { getAPIProvider } from 'src/utils/model/providers.js'
+import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import {
   buildAccountProperties,
   buildAPIProviderProperties,
-} from '../../utils/status.js'
+} from 'src/utils/status.js'
 
 /**
  * Shared post-token-acquisition logic. Saves tokens, fetches profile/roles,

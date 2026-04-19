@@ -7,9 +7,9 @@ import { stat } from 'fs/promises'
 import pMap from 'p-map'
 import { cwd } from 'process'
 import React from 'react'
-import { MCPServerDesktopImportDialog } from '../../components/MCPServerDesktopImportDialog.js'
+import { MCPServerDesktopImportDialog } from 'src/components/MCPServerDesktopImportDialog.js'
 import { wrappedRender as render } from '@anthropic/ink'
-import { KeybindingSetup } from '../../keybindings/KeybindingProviderSetup.js'
+import { KeybindingSetup } from 'src/keybindings/KeybindingProviderSetup.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -24,7 +24,7 @@ import {
 import {
   connectToServer,
   getMcpServerConnectionBatchSize,
-} from '../../services/mcp/client.js'
+} from 'src/services/mcp/client.js'
 import {
   addMcpConfig,
   getAllMcpConfigs,
@@ -41,16 +41,16 @@ import {
   ensureConfigScope,
   getScopeLabel,
 } from '@claude-code/mcp-runtime/utils.js'
-import { AppStateProvider } from '../../state/AppState.js'
+import { AppStateProvider } from 'src/state/AppState.js'
 import {
   getCurrentProjectConfig,
   getGlobalConfig,
   saveCurrentProjectConfig,
 } from '@claude-code/config'
-import { isFsInaccessible } from '../../utils/errors.js'
-import { gracefulShutdown } from '../../utils/gracefulShutdown.js'
-import { safeParseJSON } from '../../utils/json.js'
-import { getPlatform } from '../../utils/platform.js'
+import { isFsInaccessible } from 'src/utils/errors.js'
+import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { safeParseJSON } from 'src/utils/json.js'
+import { getPlatform } from 'src/utils/platform.js'
 import { cliError, cliOk } from '../exit.js'
 
 async function checkMcpServerHealth(
@@ -92,9 +92,9 @@ export async function mcpServeHandler({
   }
 
   try {
-    const { setup } = await import('../../setup.js')
+    const { setup } = await import('src/setup.js')
     await setup(providedCwd, 'default', false, false, undefined, false)
-    const { startMCPServer } = await import('../../entrypoints/mcp.js')
+    const { startMCPServer } = await import('src/entrypoints/mcp.js')
     await startMCPServer(providedCwd, debug ?? false, verbose ?? false)
   } catch (error) {
     cliError(`Error: Failed to start MCP server: ${error}`)
@@ -385,7 +385,7 @@ export async function mcpAddFromDesktopHandler(options: {
     })
 
     const { readClaudeDesktopMcpServers } = await import(
-      '../../utils/claudeDesktop.js'
+      'src/utils/claudeDesktop.js'
     )
     const servers = await readClaudeDesktopMcpServers()
 
