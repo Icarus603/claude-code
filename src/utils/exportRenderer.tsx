@@ -5,7 +5,7 @@ import { KeybindingProvider } from '@anthropic/ink/keybindings'
 import { loadKeybindingsSyncWithWarnings } from '@claude-code/repl/keybindings/loadUserBindings.js'
 import type { KeybindingContextName } from '@anthropic/ink/keybindings'
 import { AppStateProvider } from '../state/AppState.js'
-import type { Tools } from '../Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '../types/message.js'
 import { renderToAnsiString } from './staticRender.js'
 

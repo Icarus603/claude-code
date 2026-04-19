@@ -83,7 +83,7 @@ import {
   exitTeammateView,
   stopOrDismissAgent,
 } from 'src/state/teammateViewHelpers.js'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { getRunningTeammatesSorted } from '@claude-code/swarm'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import {

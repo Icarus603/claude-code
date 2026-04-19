@@ -8,9 +8,9 @@ import type {
 } from '@modelcontextprotocol/sdk/types.js'
 import type { UUID } from 'crypto'
 import type { z } from 'zod/v4'
-import type { Command } from './commands.js'
-import type { CanUseToolFn } from './hooks/useCanUseTool.js'
-import type { ThinkingConfig } from './utils/thinking.js'
+import type { Command } from 'src/commands.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
+import type { ThinkingConfig } from 'src/utils/thinking.js'
 
 export type ToolInputJSONSchema = {
   [x: string]: unknown
@@ -37,14 +37,14 @@ import type {
   SystemLocalCommandMessage,
   SystemMessage,
   UserMessage,
-} from './types/message.js'
+} from 'src/types/message.js'
 // Import permission types from centralized location to break import cycles
 // Import PermissionResult from centralized location to break import cycles
 import type {
   AdditionalWorkingDirectory,
   PermissionMode,
   PermissionResult,
-} from './types/permissions.js'
+} from 'src/types/permissions.js'
 // Import tool progress types from centralized location to break import cycles
 import type {
   AgentToolProgress,
@@ -55,11 +55,11 @@ import type {
   TaskOutputProgress,
   ToolProgressData,
   WebSearchProgress,
-} from './types/tools.js'
-import type { FileStateCache } from './utils/fileStateCache.js'
+} from 'src/types/tools.js'
+import type { FileStateCache } from 'src/utils/fileStateCache.js'
 import type { DenialTrackingState } from '@claude-code/permission/denialTracking'
-import type { SystemPrompt } from './utils/systemPromptType.js'
-import type { ContentReplacementState } from './utils/toolResultStorage.js'
+import type { SystemPrompt } from 'src/utils/systemPromptType.js'
+import type { ContentReplacementState } from 'src/utils/toolResultStorage.js'
 
 // Re-export progress types for backwards compatibility
 export type {
@@ -75,17 +75,17 @@ export type {
 import type { SpinnerMode } from './components/Spinner.js'
 import type { QuerySource } from './constants/querySource.js'
 import type { SDKStatus } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { AppState } from './state/AppState.js'
+import type { AppState } from 'src/state/AppState.js'
 import type {
   HookProgress,
   PromptRequest,
   PromptResponse,
-} from './types/hooks.js'
-import type { AgentId } from './types/ids.js'
-import type { DeepImmutable } from './types/utils.js'
-import type { AttributionState } from './utils/commitAttribution.js'
-import type { FileHistoryState } from './utils/fileHistory.js'
-import type { Theme, ThemeName } from './utils/theme.js'
+} from 'src/types/hooks.js'
+import type { AgentId } from 'src/types/ids.js'
+import type { DeepImmutable } from 'src/types/utils.js'
+import type { AttributionState } from 'src/utils/commitAttribution.js'
+import type { FileHistoryState } from 'src/utils/fileHistory.js'
+import type { Theme, ThemeName } from 'src/utils/theme.js'
 
 export type QueryChainTracking = {
   chainId: string
@@ -114,7 +114,7 @@ export type SetToolJSXFn = (
 ) => void
 
 // Import tool permission types from centralized location to break import cycles
-import type { ToolPermissionRulesBySource } from './types/permissions.js'
+import type { ToolPermissionRulesBySource } from 'src/types/permissions.js'
 
 // Re-export for backwards compatibility
 export type { ToolPermissionRulesBySource }

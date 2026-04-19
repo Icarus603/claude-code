@@ -15,7 +15,7 @@ import {
   type Tool,
   type ToolDef,
   toolMatchesName,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import { formatAgentId, generateRequestId } from 'src/utils/agentId.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { logForDebugging } from 'src/utils/debug.js'

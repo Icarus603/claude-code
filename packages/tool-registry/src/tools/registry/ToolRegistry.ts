@@ -3,7 +3,7 @@ import {
   type Tool,
   type ToolPermissionContext,
   type Tools,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import { getDenyRuleForTool } from '@claude-code/permission/permissions'
 import uniqBy from 'lodash-es/uniqBy.js'
 import type {

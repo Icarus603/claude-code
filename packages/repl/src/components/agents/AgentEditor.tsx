@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   type AgentColorName,
   setAgentColor,

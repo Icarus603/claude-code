@@ -1,7 +1,7 @@
 import figures from 'figures'
 import React, { useMemo, useState } from 'react'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { ToolUseContext } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { DeepImmutable } from 'src/types/utils.js'
 import type { CommandResultDisplay } from 'src/commands.js'
 import { DIAMOND_FILLED, DIAMOND_OPEN } from 'src/constants/figures.js'

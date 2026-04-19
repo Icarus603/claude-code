@@ -6,7 +6,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
 import { findCanonicalGitRoot } from 'src/utils/git.js'
 import { getCwd } from 'src/utils/cwd.js'
-import type { ToolUseContext } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 
 export function installPackageHostBindings(
   installers: PackageHostBindingInstallers = {},

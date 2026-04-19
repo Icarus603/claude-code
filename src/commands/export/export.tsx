@@ -1,7 +1,7 @@
 import { join } from 'path'
 import React from 'react'
 import { ExportDialog } from '@claude-code/repl/components/ExportDialog.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import type { Message } from '../../types/message.js'
 import { getCwd } from '../../utils/cwd.js'

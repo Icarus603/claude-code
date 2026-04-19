@@ -12,7 +12,7 @@ import {
   useAppStateStore,
   useSetAppState,
 } from '@claude-code/repl/appStateHooks.js'
-import { findToolByName } from 'src/Tool.js'
+import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 import { getAllBaseTools } from '@claude-code/tool-registry'
 import type { PermissionUpdate } from 'src/types/permissions.js'

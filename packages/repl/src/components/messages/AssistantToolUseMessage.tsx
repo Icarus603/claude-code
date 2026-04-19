@@ -11,7 +11,7 @@ import {
   type Tool,
   type ToolProgressData,
   type Tools,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from 'src/types/message.js'
 import { useIsClassifierChecking } from 'src/utils/classifierApprovalsHook.js'
 import { logError } from 'src/utils/log.js'

@@ -11,7 +11,7 @@ import { Dialog } from '@anthropic/ink'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import { useClaudeAiLimits } from '@claude-code/provider/claudeAiLimitsHook.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import {
   getOauthAccountInfo,

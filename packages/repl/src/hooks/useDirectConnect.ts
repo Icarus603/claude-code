@@ -13,8 +13,8 @@ import {
   type DirectConnectConfig,
   DirectConnectSessionManager,
 } from '@claude-code/server/directConnectManager.js'
-import type { Tool } from 'src/Tool.js'
-import { findToolByName } from 'src/Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
+import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { Message as MessageType } from 'src/types/message.js'
 import type { PermissionAskDecision } from 'src/types/permissions.js'
 import { logForDebugging } from 'src/utils/debug.js'

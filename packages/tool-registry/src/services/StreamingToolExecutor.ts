@@ -5,7 +5,7 @@ import {
   withMemoryCorrectionHint,
 } from 'src/utils/messages.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import { findToolByName, type Tools, type ToolUseContext } from 'src/Tool.js'
+import { findToolByName, type Tools, type ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import type { AssistantMessage, Message } from 'src/types/message.js'
 import { createChildAbortController } from '@claude-code/agent/abortController.js'

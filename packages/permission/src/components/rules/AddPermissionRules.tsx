@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCallback } from 'react'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Box, Dialog, Text } from '@anthropic/ink'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type {
   PermissionBehavior,
   PermissionRule,

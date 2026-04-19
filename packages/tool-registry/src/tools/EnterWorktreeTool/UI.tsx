@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import type { ToolProgressData } from 'src/Tool.js'
+import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from 'src/types/message.js'
 import type { ThemeName } from 'src/utils/theme.js'
 import type { Output } from './EnterWorktreeTool.js'

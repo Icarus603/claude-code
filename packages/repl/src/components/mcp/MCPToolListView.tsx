@@ -6,7 +6,7 @@ import {
 } from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import { filterToolsByServer } from '@claude-code/mcp-runtime/utils.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
-import type { Tool } from 'src/Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { plural } from 'src/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Select } from '../CustomSelect/index.js'

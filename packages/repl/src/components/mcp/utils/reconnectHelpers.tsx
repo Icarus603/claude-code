@@ -3,7 +3,7 @@ import type {
   MCPServerConnection,
   ServerResource,
 } from '@claude-code/mcp-runtime/types.js'
-import type { Tool } from 'src/Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
 
 export interface ReconnectResult {
   message: string

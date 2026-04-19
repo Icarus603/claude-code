@@ -24,7 +24,7 @@ import {
   createTaskStateBase,
   generateTaskId,
   isTerminalTaskStatus,
-} from '../Task.js'
+} from '@claude-code/tool-registry/Task.js'
 import {
   createActivityDescriptionResolver,
   createProgressTracker,

@@ -7,7 +7,7 @@ import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitO
 import { useMergedTools } from '@claude-code/repl/hooks/useMergedTools.js'
 import { Box, Text } from '@anthropic/ink'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   type ResolvedAgent,
   resolveAgentOverrides,

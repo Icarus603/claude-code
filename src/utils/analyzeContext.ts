@@ -28,7 +28,7 @@ import {
   type Tools,
   type ToolUseContext,
   toolMatchesName,
-} from '../Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import type {
   AgentDefinition,
   AgentDefinitionsResult,

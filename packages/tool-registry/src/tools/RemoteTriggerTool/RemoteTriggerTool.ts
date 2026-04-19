@@ -4,8 +4,8 @@ import { getOauthConfig } from 'src/constants/oauth.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
-import type { ToolUseContext } from 'src/Tool.js'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,

@@ -13,7 +13,7 @@ import type {
   ToolPermissionContext,
   Tool as ToolType,
   ToolUseContext,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import {
   consumeSpeculativeClassifierCheck,
   peekSpeculativeClassifierCheck,

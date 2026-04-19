@@ -23,7 +23,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '../../state/AppState.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type {
   LocalJSXCommandContext,
   LocalJSXCommandOnDone,

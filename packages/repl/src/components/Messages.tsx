@@ -14,8 +14,8 @@ import { useTerminalNotification } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import type { Screen } from '@claude-code/repl/screens/REPL.js'
-import type { Tools } from 'src/Tool.js'
-import { findToolByName } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
+import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type {
   Message as MessageType,

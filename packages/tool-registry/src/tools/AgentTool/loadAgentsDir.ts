@@ -12,7 +12,7 @@ import {
   type McpServerConfig,
   McpServerConfigSchema,
 } from '@claude-code/mcp-runtime/types.js'
-import type { ToolUseContext } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {
   EFFORT_LEVELS,

@@ -52,6 +52,8 @@
     "./tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js": "./src/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts",
-    "./services/*.js": "./src/services/*.ts"
+    "./services/*.js": "./src/services/*.ts",
+    "./Tool.js": "./src/Tool.ts",
+    "./Task.js": "./src/Task.ts"
   }
 }

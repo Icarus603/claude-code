@@ -30,7 +30,7 @@ import {
 } from '../../../../../../src/commands.js'
 import { createStreamlinedTransformer } from '../../../../../../src/utils/streamlinedTransform.js'
 import { installStreamJsonStdoutGuard } from '../../../../../../src/utils/streamJsonStdoutGuard.js'
-import type { ToolPermissionContext } from '../../../../../../src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type { ThinkingConfig } from '../../../../../../src/utils/thinking.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { uniq } from '../../../../../../src/utils/array.js'
@@ -43,7 +43,7 @@ import {
   logForDiagnosticsNoPII,
   withDiagnosticsTiming,
 } from '../../../../../../src/utils/diagLogs.js'
-import { toolMatchesName, type Tool, type Tools } from '../../../../../../src/Tool.js'
+import { toolMatchesName, type Tool, type Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   type AgentDefinition,
   isBuiltInAgent,

@@ -3,7 +3,7 @@ import { basename } from 'path'
 import React, { useRef } from 'react'
 import { useMinDisplayTime } from '@anthropic/ink'
 import { Ansi, Box, Text, useTheme } from '@anthropic/ink'
-import { findToolByName, type Tools } from 'src/Tool.js'
+import { findToolByName, type Tools } from '@claude-code/tool-registry/Tool.js'
 import { getReplPrimitiveTools } from '@claude-code/tool-registry/tools/REPLTool/primitiveTools.js'
 import type {
   CollapsedReadSearchGroup,

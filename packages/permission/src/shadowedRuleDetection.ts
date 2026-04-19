@@ -1,4 +1,4 @@
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import type { PermissionRule, PermissionRuleSource } from '@claude-code/permission/PermissionRule'
 import {

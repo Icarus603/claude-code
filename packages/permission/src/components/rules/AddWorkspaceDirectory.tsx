@@ -9,7 +9,7 @@ import {
 import TextInput from '@claude-code/repl/components/TextInput.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { getDirectoryCompletions } from 'src/utils/suggestions/directoryCompletion.js'
 import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'

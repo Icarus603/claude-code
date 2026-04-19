@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { cronToHuman } from 'src/utils/cron.js'
 import { listAllCronTasks } from 'src/utils/cronTasks.js'
 import { truncate } from 'src/utils/format.js'

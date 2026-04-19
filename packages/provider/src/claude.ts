@@ -1,5 +1,5 @@
 import { getProviderAdapter } from '@claude-code/provider'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type {
   AssistantMessage,
   Message,

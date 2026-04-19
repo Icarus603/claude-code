@@ -49,7 +49,7 @@ import {
   type Tool,
   type ToolCallProgress,
   toolMatchesName,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
 import { type MCPProgress, MCPTool } from '@claude-code/tool-registry/tools/MCPTool/MCPTool.js'
 import { createMcpAuthTool } from '@claude-code/tool-registry/tools/McpAuthTool/McpAuthTool.js'

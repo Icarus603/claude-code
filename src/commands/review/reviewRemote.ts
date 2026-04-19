@@ -17,7 +17,7 @@ import {
 } from '@claude-code/local-observability'
 import { fetchUltrareviewQuota } from '@claude-code/provider/ultrareviewQuota.js'
 import { fetchUtilization } from '@claude-code/provider/usage.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import {
   checkRemoteAgentEligibility,
   formatPreconditionError,

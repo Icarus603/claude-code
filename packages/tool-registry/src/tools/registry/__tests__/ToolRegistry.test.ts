@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'bun:test'
-import type { Tool, Tools } from 'src/Tool.js'
-import { buildTool } from 'src/Tool.js'
+import type { Tool, Tools } from '@claude-code/tool-registry/Tool.js'
+import { buildTool } from '@claude-code/tool-registry/Tool.js'
 import { ToolRegistry } from '../ToolRegistry.js'
 import type { ToolProvider } from '../types.js'
 

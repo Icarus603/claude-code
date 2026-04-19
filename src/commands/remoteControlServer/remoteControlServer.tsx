@@ -10,7 +10,7 @@ import { ListItem } from '@anthropic/ink';
 import { useRegisterOverlay } from '../../context/overlayContext.js';
 import { Box, Text } from '@anthropic/ink';
 import { useKeybindings } from '@anthropic/ink/keybindings';
-import type { ToolUseContext } from '../../Tool.js';
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js';
 import type { LocalJSXCommandContext, LocalJSXCommandOnDone } from '../../types/command.js';
 import { errorMessage } from '../../utils/errors.js';
 

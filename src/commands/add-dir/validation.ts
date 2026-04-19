@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import { stat } from 'fs/promises'
 import { dirname, resolve } from 'path'
-import type { ToolPermissionContext } from '../../Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { getErrnoCode } from '../../utils/errors.js'
 import { expandPath } from '../../utils/path.js'
 import {

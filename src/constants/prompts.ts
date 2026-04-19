@@ -16,7 +16,7 @@ import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTo
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
 import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCreateTool/constants.js'
-import type { Tools } from '../Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Command } from '../types/command.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import {

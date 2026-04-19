@@ -35,7 +35,7 @@ import {
   getPdfTooLargeErrorMessage,
   getRequestTooLargeErrorMessage,
 } from '@claude-code/provider/errors.js'
-import type { AnyObject, Progress } from '../Tool.js'
+import type { AnyObject, Progress } from '@claude-code/tool-registry/Tool.js'
 import { isConnectorTextBlock } from '../types/connectorText.js'
 import type {
   AssistantMessage,
@@ -138,7 +138,7 @@ import {
   type Tool,
   type Tools,
   toolMatchesName,
-} from '../Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import {
   FileReadTool,
   type Output as FileReadToolOutput,

@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react'
 import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { WizardProvider } from '../../wizard/index.js'
 import type { WizardStepComponent } from '../../wizard/types.js'

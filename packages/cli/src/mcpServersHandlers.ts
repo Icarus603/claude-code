@@ -27,7 +27,7 @@ import type {
   ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime/types.js'
 import type { AppState } from 'src/state/AppStateStore.js'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import { toError } from 'src/utils/errors.js'
 import { logError } from 'src/utils/log.js'
 

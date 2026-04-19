@@ -1,5 +1,5 @@
 // Auto-generated stub — replace with real implementation
-import type { TaskStateBase, SetAppState } from '../../Task.js'
+import type { TaskStateBase, SetAppState } from '@claude-code/tool-registry/Task.js'
 
 export type LocalWorkflowTaskState = TaskStateBase & {
   type: 'local_workflow'

@@ -1,6 +1,6 @@
 import type { UUID } from 'crypto'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import {
   AGENT_COLORS,
   type AgentColorName,

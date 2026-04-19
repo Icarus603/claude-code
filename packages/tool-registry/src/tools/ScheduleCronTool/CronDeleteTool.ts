@@ -1,6 +1,6 @@
 import { z } from 'zod/v4'
-import type { ValidationResult } from 'src/Tool.js'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import {
   getCronFilePath,
   listAllCronTasks,

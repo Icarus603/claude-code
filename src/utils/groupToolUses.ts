@@ -1,6 +1,6 @@
 import type { BetaToolUseBlock } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type { ContentBlockParam, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages/messages.mjs'
-import type { Tools } from '../Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type {
   GroupedToolUseMessage,
   NormalizedAssistantMessage,

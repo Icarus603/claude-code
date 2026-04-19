@@ -1,5 +1,5 @@
 import type { QuerySource } from '../../constants/querySource.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '../../types/message.js'
 import { toError } from '../errors.js'
 import { logError } from '../log.js'

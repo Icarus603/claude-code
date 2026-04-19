@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text } from '@anthropic/ink'
-import type { Tools } from 'src/Tool.js'
-import { findToolByName } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
+import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { ToolActivity } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import type { ThemeName } from 'src/utils/theme.js'
 

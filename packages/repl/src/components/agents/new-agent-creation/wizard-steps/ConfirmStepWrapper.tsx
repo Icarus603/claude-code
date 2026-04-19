@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { getActiveAgentsFromList } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { editFileInEditor } from 'src/utils/promptEditor.js'

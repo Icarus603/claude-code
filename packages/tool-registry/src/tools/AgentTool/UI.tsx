@@ -19,7 +19,7 @@ import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js
 import { ToolUseLoader } from '@claude-code/repl/components/ToolUseLoader.js'
 import { Box, Text } from '@anthropic/ink'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
-import { findToolByName, type Tools } from 'src/Tool.js'
+import { findToolByName, type Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Message, ProgressMessage } from 'src/types/message.js'
 import type { AgentToolProgress } from 'src/types/tools.js'
 import { count } from 'src/utils/array.js'

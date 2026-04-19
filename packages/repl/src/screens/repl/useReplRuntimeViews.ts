@@ -8,7 +8,7 @@ import type {
   MCPServerConnection,
   ServerResource,
 } from '@claude-code/mcp-runtime/types.js'
-import type { Tool, ToolPermissionContext } from 'src/Tool.js'
+import type { Tool, ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type {
   AgentDefinition,
   AgentDefinitionsResult,

@@ -12,7 +12,7 @@ import {
   isTerminalTaskStatus,
   type TaskStatus,
   type TaskType,
-} from '../../Task.js'
+} from '@claude-code/tool-registry/Task.js'
 import type { TaskState } from '../../tasks/types.js'
 import { enqueuePendingNotification } from '../messageQueueManager.js'
 import { enqueueSdkEvent } from '../sdkEventQueue.js'

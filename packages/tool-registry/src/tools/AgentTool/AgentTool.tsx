@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import { buildTool, type ToolDef, toolMatchesName } from 'src/Tool.js'
+import { buildTool, type ToolDef, toolMatchesName } from '@claude-code/tool-registry/Tool.js'
 import type {
   Message as MessageType,
   NormalizedUserMessage,

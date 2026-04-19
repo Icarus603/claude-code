@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import type { Tool, Tools } from 'src/Tool.js'
+import type { Tool, Tools } from '@claude-code/tool-registry/Tool.js'
 import { hasEmbeddedSearchTools } from 'src/utils/embeddedTools.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { isPowerShellToolEnabled } from '@claude-code/shell/legacy/shellToolUtils.js'
