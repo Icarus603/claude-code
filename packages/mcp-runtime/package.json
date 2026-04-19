@@ -14,6 +14,8 @@
     "./mcpInstructionsDelta.js": "./src/mcpInstructionsDelta.ts",
     "./mcpValidation.js": "./src/mcpValidation.ts",
     "./mcpWebSocketTransport.js": "./src/mcpWebSocketTransport.ts",
-    "./mcpOutputStorage.js": "./src/mcpOutputStorage.ts"
+    "./mcpOutputStorage.js": "./src/mcpOutputStorage.ts",
+    "./dateTimeParser.js": "./src/dateTimeParser.ts",
+    "./elicitationValidation.js": "./src/elicitationValidation.ts"
   }
 }

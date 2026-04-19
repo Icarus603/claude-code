@@ -24,7 +24,7 @@ import {
   isMultiSelectEnumSchema,
   validateElicitationInput,
   validateElicitationInputAsync,
-} from '../../utils/mcp/elicitationValidation.js'
+} from '@claude-code/mcp-runtime/elicitationValidation.js'
 import { plural } from '../../utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'

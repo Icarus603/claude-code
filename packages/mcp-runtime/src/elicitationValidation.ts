@@ -5,8 +5,8 @@ import type {
   StringSchema,
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
-import { jsonStringify } from '../slowOperations.js'
-import { plural } from '../stringUtils.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
+import { plural } from 'src/utils/stringUtils.js'
 import {
   looksLikeISO8601,
   parseNaturalLanguageDateTime,
