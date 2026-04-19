@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react'
-import { Select } from '../../components/CustomSelect/select.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Box, Dialog, Text } from '@anthropic/ink'
 
 type Props = {

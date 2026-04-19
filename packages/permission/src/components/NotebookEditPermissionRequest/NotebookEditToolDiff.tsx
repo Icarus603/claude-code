@@ -12,8 +12,8 @@ import { getPatchForDisplay } from 'src/utils/diff.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { parseCellId } from 'src/utils/notebook.js'
-import { HighlightedCode } from 'src/components/HighlightedCode.js'
-import { StructuredDiff } from 'src/components/StructuredDiff.js'
+import { HighlightedCode } from '@claude-code/repl/components/HighlightedCode.js'
+import { StructuredDiff } from '@claude-code/repl/components/StructuredDiff.js'
 
 type Props = {
   notebook_path: string

@@ -7,7 +7,7 @@ import {
 } from '@claude-code/local-observability'
 import { useAppState } from '../../appStateHooks.js'
 import { isPlanModeInterviewPhaseEnabled } from 'src/utils/planModeV2.js'
-import { Select } from 'src/components/CustomSelect/index.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import { PermissionDialog } from '../PermissionDialog.js'
 import type { PermissionRequestProps } from '../PermissionRequest.js'
 

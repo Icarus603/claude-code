@@ -5,7 +5,7 @@
  */
 
 import * as React from 'react'
-import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { Box, Byline, Text } from '@anthropic/ink'
 import type { PluginMarketplaceEntry } from '../../utils/plugins/schemas.js'
 

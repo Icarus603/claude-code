@@ -1,9 +1,9 @@
 import React from 'react'
 import { removeSandboxViolationTags } from 'src/utils/sandbox/sandbox-ui-utils.js'
 import { KeyboardShortcutHint } from '@anthropic/ink'
-import { MessageResponse } from 'src/components/MessageResponse.js'
-import { OutputLine } from 'src/components/shell/OutputLine.js'
-import { ShellTimeDisplay } from 'src/components/shell/ShellTimeDisplay.js'
+import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
+import { OutputLine } from '@claude-code/repl/components/shell/OutputLine.js'
+import { ShellTimeDisplay } from '@claude-code/repl/components/shell/ShellTimeDisplay.js'
 import { Box, Text } from '@anthropic/ink'
 import type { Out as BashOut } from './BashTool.js'
 

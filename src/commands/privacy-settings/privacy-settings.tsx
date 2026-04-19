@@ -3,7 +3,7 @@ import {
   type GroveDecision,
   GroveDialog,
   PrivacySettingsDialog,
-} from '../../components/grove/Grove.js'
+} from '@claude-code/repl/components/grove/Grove.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

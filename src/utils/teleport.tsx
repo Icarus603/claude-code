@@ -14,7 +14,7 @@ import {
   getTeleportErrors,
   TeleportError,
   type TeleportLocalErrorType,
-} from '../components/TeleportError.js'
+} from '@claude-code/repl/components/TeleportError.js'
 import { getOauthConfig } from '../constants/oauth.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { Root } from '@anthropic/ink'

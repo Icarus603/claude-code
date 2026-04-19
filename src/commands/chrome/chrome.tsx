@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   type OptionWithDescription,
   Select,
-} from '../../components/CustomSelect/select.js'
+} from '@claude-code/repl/components/CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { useAppState } from '../../state/AppState.js'

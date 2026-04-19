@@ -4,18 +4,18 @@ import * as fs from 'fs/promises'
 import * as path from 'path'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { Byline } from '@anthropic/ink'
-import { MCPRemoteServerMenu } from '../../components/mcp/MCPRemoteServerMenu.js'
-import { MCPStdioServerMenu } from '../../components/mcp/MCPStdioServerMenu.js'
-import { MCPToolDetailView } from '../../components/mcp/MCPToolDetailView.js'
-import { MCPToolListView } from '../../components/mcp/MCPToolListView.js'
+import { MCPRemoteServerMenu } from '@claude-code/repl/components/mcp/MCPRemoteServerMenu.js'
+import { MCPStdioServerMenu } from '@claude-code/repl/components/mcp/MCPStdioServerMenu.js'
+import { MCPToolDetailView } from '@claude-code/repl/components/mcp/MCPToolDetailView.js'
+import { MCPToolListView } from '@claude-code/repl/components/mcp/MCPToolListView.js'
 import type {
   ClaudeAIServerInfo,
   HTTPServerInfo,
   SSEServerInfo,
   StdioServerInfo,
-} from '../../components/mcp/types.js'
+} from '@claude-code/repl/components/mcp/types.js'
 import { SearchBox } from '@anthropic/ink'
 import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '@anthropic/ink'

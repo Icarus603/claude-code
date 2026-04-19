@@ -6,8 +6,8 @@ import {
   enrollTrustedDevice,
 } from '@claude-code/bridge/trustedDevice.js'
 import type { LocalJSXCommandContext } from 'src/commands.js'
-import { ConfigurableShortcutHint } from 'src/components/ConfigurableShortcutHint.js'
-import { ConsoleOAuthFlow } from 'src/components/ConsoleOAuthFlow.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
+import { ConsoleOAuthFlow } from '@claude-code/repl/components/ConsoleOAuthFlow.js'
 import { Dialog } from '@anthropic/ink'
 import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import { Text } from '@anthropic/ink'

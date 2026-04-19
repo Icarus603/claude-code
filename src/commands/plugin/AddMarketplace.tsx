@@ -4,10 +4,10 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { Byline, KeyboardShortcutHint } from '@anthropic/ink'
-import { Spinner } from '../../components/Spinner.js'
-import TextInput from '../../components/TextInput.js'
+import { Spinner } from '@claude-code/repl/components/Spinner.js'
+import TextInput from '@claude-code/repl/components/TextInput.js'
 import { Box, Text } from '@anthropic/ink'
 import { toError } from '../../utils/errors.js'
 import { logError } from '../../utils/log.js'

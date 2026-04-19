@@ -1,6 +1,6 @@
 import * as React from 'react'
 import type { LocalJSXCommandContext } from '../../commands.js'
-import { Settings } from '../../components/Settings/Settings.js'
+import { Settings } from '@claude-code/repl/components/Settings/Settings.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 
 export async function call(

@@ -376,7 +376,7 @@ export function installPackageHostBindings(
         },
         selectableUserMessagesFilter: (message: unknown) => {
           try {
-            return require('src/components/MessageSelector.js').selectableUserMessagesFilter(message)
+            return require('@claude-code/repl/components/MessageSelector.js').selectableUserMessagesFilter(message)
           } catch {
             return true
           }
@@ -793,14 +793,14 @@ export function installPackageHostBindings(
           const { getIsInteractive } = require('./bootstrap/state.js') as typeof import('./bootstrap/state.js')
           if (!getIsInteractive()) return 'no_check_needed'
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const utils = require('src/components/ManagedSettingsSecurityDialog/utils.js') as typeof import('src/components/ManagedSettingsSecurityDialog/utils.js')
+          const utils = require('@claude-code/repl/components/ManagedSettingsSecurityDialog/utils.js') as typeof import('@claude-code/repl/components/ManagedSettingsSecurityDialog/utils.js')
           if (!newSettings || !utils.hasDangerousSettings(utils.extractDangerousSettings(newSettings as any))) return 'no_check_needed'
           if (!utils.hasDangerousSettingsChanged(cached as any, newSettings as any)) return 'no_check_needed'
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { logEvent } = require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')
           logEvent('tengu_managed_settings_security_dialog_shown', {})
           const React = require('react')
-          const { ManagedSettingsSecurityDialog } = require('src/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js')
+          const { ManagedSettingsSecurityDialog } = require('@claude-code/repl/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js')
           const { render } = require('src/ink.js')
           const { KeybindingSetup } = require('@claude-code/repl/keybindings/KeybindingProviderSetup.js')
           const { AppStateProvider } = require('src/state/AppState.js')

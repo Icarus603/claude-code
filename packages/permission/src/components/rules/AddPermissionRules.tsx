@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useCallback } from 'react'
-import { Select } from 'src/components/CustomSelect/select.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Box, Dialog, Text } from '@anthropic/ink'
 import type { ToolPermissionContext } from 'src/Tool.js'
 import type {
@@ -24,7 +24,7 @@ import {
 } from 'src/utils/settings/constants.js'
 import { getRelativeSettingsFilePathForSource } from 'src/utils/settings/settings.js'
 import { plural } from 'src/utils/stringUtils.js'
-import type { OptionWithDescription } from 'src/components/CustomSelect/select.js'
+import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 import { PermissionRuleDescription } from './PermissionRuleDescription.js'
 
 export function optionForPermissionSaveDestination(

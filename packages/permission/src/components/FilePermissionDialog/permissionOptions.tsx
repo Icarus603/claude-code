@@ -10,7 +10,7 @@ import {
   normalizeCaseForComparison,
   pathInAllowedWorkingPath,
 } from '@claude-code/permission/filesystem'
-import type { OptionWithDescription } from 'src/components/CustomSelect/select.js'
+import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 /**
  * Check if a path is within the project's .claude/ folder.
  * This is used to determine whether to show the special ".claude folder" permission option.

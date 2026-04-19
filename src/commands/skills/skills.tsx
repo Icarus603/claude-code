@@ -1,6 +1,6 @@
 import * as React from 'react'
 import type { LocalJSXCommandContext } from '../../commands.js'
-import { SkillsMenu } from '../../components/skills/SkillsMenu.js'
+import { SkillsMenu } from '@claude-code/repl/components/skills/SkillsMenu.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 
 export async function call(

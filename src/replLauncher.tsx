@@ -27,7 +27,7 @@ export async function launchRepl({
   replProps,
   renderAndRun,
 }: LaunchReplArgs): Promise<void> {
-  const { App } = await import('./components/App.js')
+  const { App } = await import('@claude-code/repl/components/App.js')
   const { REPL } = await import('@claude-code/repl/screens/REPL.js')
 
   await renderAndRun(

@@ -6,14 +6,14 @@ import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
 } from '../../commands.js'
-import { Select } from '../../components/CustomSelect/index.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import { Dialog } from '@anthropic/ink'
 import {
   IdeAutoConnectDialog,
   IdeDisableAutoConnectDialog,
   shouldShowAutoConnectDialog,
   shouldShowDisableAutoConnectDialog,
-} from '../../components/IdeAutoConnectDialog.js'
+} from '@claude-code/repl/components/IdeAutoConnectDialog.js'
 import { Box, Text } from '@anthropic/ink'
 import { clearServerCache } from '../../services/mcp/client.js'
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js'

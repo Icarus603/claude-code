@@ -1,6 +1,6 @@
 import React from 'react'
 import type { CommandResultDisplay } from '../../commands.js'
-import { DesktopHandoff } from '../../components/DesktopHandoff.js'
+import { DesktopHandoff } from '@claude-code/repl/components/DesktopHandoff.js'
 
 export async function call(
   onDone: (

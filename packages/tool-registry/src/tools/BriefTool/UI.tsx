@@ -1,6 +1,6 @@
 import figures from 'figures'
 import React from 'react'
-import { Markdown } from 'src/components/Markdown.js'
+import { Markdown } from '@claude-code/repl/components/Markdown.js'
 import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ProgressMessage } from 'src/types/message.js'

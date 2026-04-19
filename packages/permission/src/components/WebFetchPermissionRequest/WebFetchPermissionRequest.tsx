@@ -5,7 +5,7 @@ import { shouldShowAlwaysAllowOptions } from '@claude-code/permission/permission
 import {
   type OptionWithDescription,
   Select,
-} from 'src/components/CustomSelect/select.js'
+} from '@claude-code/repl/components/CustomSelect/select.js'
 import { type UnaryEvent, usePermissionRequestLogging } from '../hooks.js'
 import { PermissionDialog } from '../PermissionDialog.js'
 import type { PermissionRequestProps } from '../PermissionRequest.js'

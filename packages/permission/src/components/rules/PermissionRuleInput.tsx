@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { useState } from 'react'
-import TextInput from 'src/components/TextInput.js'
+import TextInput from '@claude-code/repl/components/TextInput.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Newline, Text } from '@anthropic/ink'

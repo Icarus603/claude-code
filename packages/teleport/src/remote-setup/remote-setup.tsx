@@ -1,7 +1,7 @@
 import { execa } from 'execa'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { Select } from '../../components/CustomSelect/index.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import { Box, Dialog, LoadingState, Text } from '@anthropic/ink'
 import {
   logEvent,

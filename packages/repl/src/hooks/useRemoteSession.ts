@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { BoundedUUIDSet } from '@claude-code/bridge/bridgeMessaging.js'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
-import type { SpinnerMode } from 'src/components/Spinner/types.js'
+import type { SpinnerMode } from '@claude-code/repl/components/Spinner/types.js'
 import {
   type RemotePermissionResponse,
   type RemoteSessionConfig,

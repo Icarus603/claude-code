@@ -10,8 +10,8 @@ import { useMemo, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { plural } from 'src/utils/stringUtils.js'
-import type { OptionWithDescription } from 'src/components/CustomSelect/select.js'
-import { Select } from 'src/components/CustomSelect/select.js'
+import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 
 type ComputerUseApprovalProps = {

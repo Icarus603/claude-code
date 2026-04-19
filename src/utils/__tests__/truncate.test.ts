@@ -114,7 +114,7 @@ describe("truncatePathMiddle", () => {
   });
 
   test("truncates middle of long path", () => {
-    const path = "src/components/deeply/nested/folder/MyComponent.tsx";
+    const path = "@claude-code/repl/components/deeply/nested/folder/MyComponent.tsx";
     const result = truncatePathMiddle(path, 30);
     expect(result).toContain("…");
     expect(result.endsWith("MyComponent.tsx")).toBe(true);
@@ -130,7 +130,7 @@ describe("truncatePathMiddle", () => {
   });
 
   test("handles short maxLength < 5", () => {
-    expect(truncatePathMiddle("src/components/foo.ts", 4)).toBe("src…");
+    expect(truncatePathMiddle("@claude-code/repl/components/foo.ts", 4)).toBe("src…");
   });
 
   test("handles very short maxLength 1", () => {

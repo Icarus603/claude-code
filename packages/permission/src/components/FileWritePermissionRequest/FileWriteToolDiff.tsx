@@ -4,8 +4,8 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Box, NoSelect, Text } from '@anthropic/ink'
 import { intersperse } from 'src/utils/array.js'
 import { getPatchForDisplay } from 'src/utils/diff.js'
-import { HighlightedCode } from 'src/components/HighlightedCode.js'
-import { StructuredDiff } from 'src/components/StructuredDiff.js'
+import { HighlightedCode } from '@claude-code/repl/components/HighlightedCode.js'
+import { StructuredDiff } from '@claude-code/repl/components/StructuredDiff.js'
 
 type Props = {
   file_path: string

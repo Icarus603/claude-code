@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MessageResponse } from '../../components/MessageResponse.js'
+import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { supportsHyperlinks } from '@anthropic/ink'
 import { Link, Text } from '@anthropic/ink'
 import { renderToolResultMessage as renderDefaultMCPToolResultMessage } from '@claude-code/tool-registry/tools/MCPTool/UI.js'

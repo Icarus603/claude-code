@@ -5,7 +5,7 @@ import type {
   LocalJSXCommandContext,
 } from '../../commands.js'
 import { Dialog } from '@anthropic/ink'
-import { FastIcon, getFastIconString } from '../../components/FastIcon.js'
+import { FastIcon, getFastIconString } from '@claude-code/repl/components/FastIcon.js'
 import { Box, Link, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import {

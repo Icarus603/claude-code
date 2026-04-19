@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { ctrlOToExpand } from '../components/CtrlOToExpand.js'
+import { ctrlOToExpand } from '@claude-code/repl/components/CtrlOToExpand.js'
 import { stringWidth } from '@anthropic/ink'
 import sliceAnsi from './sliceAnsi.js'
 
