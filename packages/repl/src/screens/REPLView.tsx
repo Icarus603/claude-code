@@ -3326,6 +3326,12 @@ export function REPL({
       }
 
       try {
+        // DIAGNOSTIC: log to /tmp/claude-repl-diag.log so any silent crash surfaces
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        try {
+          require('fs').appendFileSync('/tmp/claude-repl-diag.log',
+            `${new Date().toISOString()} onQuery entered shouldQuery=${shouldQuery} msgs=${newMessages.length} gen=${thisGeneration}\n`);
+        } catch {}
         // isLoading is derived from queryGuard — tryStart() above already
         // transitioned dispatching→running, so no setter call needed here.
         resetTimingRefs();
@@ -3367,7 +3373,21 @@ export function REPL({
           mainLoopModelParam,
           effort,
         );
+      } catch (diagErr) {
+        // DIAGNOSTIC: surface silent crashes
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('fs').appendFileSync('/tmp/claude-repl-diag.log',
+            `${new Date().toISOString()} onQuery CAUGHT: ${(diagErr as Error)?.stack || diagErr}\n`);
+        } catch {}
+        throw diagErr;
       } finally {
+        // DIAGNOSTIC: log exit
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          require('fs').appendFileSync('/tmp/claude-repl-diag.log',
+            `${new Date().toISOString()} onQuery finally\n`);
+        } catch {}
         // queryGuard.end() atomically checks generation and transitions
         // running→idle. Returns false if a newer query owns the guard
         // (cancel+resubmit race where the stale finally fires as a microtask).
