@@ -17,7 +17,7 @@ import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
   type AutoModeDenial,
   getAutoModeDenials,
-} from 'src/utils/autoModeDenials.js'
+} from '@claude-code/permission/autoModeDenials.js'
 import type {
   PermissionBehavior,
   PermissionRule,

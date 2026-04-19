@@ -5,7 +5,7 @@ import { Box, Text, useInput } from '@anthropic/ink'
 import {
   type AutoModeDenial,
   getAutoModeDenials,
-} from 'src/utils/autoModeDenials.js'
+} from '@claude-code/permission/autoModeDenials.js'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { StatusIcon } from '@anthropic/ink'
 
