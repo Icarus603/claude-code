@@ -8,7 +8,7 @@ import {
 } from '../../utils/auth.js'
 import { openBrowser } from '../../utils/browser.js'
 import { logError } from '../../utils/log.js'
-import { Login } from '../login/login.js'
+import { Login } from '@claude-code/provider/commands/login/login.js'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,

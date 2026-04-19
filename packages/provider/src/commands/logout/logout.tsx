@@ -5,24 +5,24 @@ import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-fl
 import {
   getGroveNoticeConfig,
   getGroveSettings,
-} from '../../services/api/grove.js'
+} from 'src/services/api/grove.js'
 import { clearPolicyLimitsCache } from '@claude-code/provider/policyLimits/index.js'
 // flushTelemetry is loaded lazily to avoid pulling in ~1.1MB of OpenTelemetry at startup
-import { clearRemoteManagedSettingsCache } from '../../services/remoteManagedSettings/index.js'
-import { getClaudeAIOAuthTokens, removeApiKey } from '../../utils/auth.js'
-import { clearBetasCaches } from '../../utils/betas.js'
+import { clearRemoteManagedSettingsCache } from 'src/services/remoteManagedSettings/index.js'
+import { getClaudeAIOAuthTokens, removeApiKey } from 'src/utils/auth.js'
+import { clearBetasCaches } from 'src/utils/betas.js'
 import { saveGlobalConfig } from '@claude-code/config'
-import { gracefulShutdownSync } from '../../utils/gracefulShutdown.js'
-import { getSecureStorage } from '../../utils/secureStorage/index.js'
-import { clearToolSchemaCache } from '../../utils/toolSchemaCache.js'
-import { resetUserCache } from '../../utils/user.js'
+import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
+import { getSecureStorage } from 'src/utils/secureStorage/index.js'
+import { clearToolSchemaCache } from 'src/utils/toolSchemaCache.js'
+import { resetUserCache } from 'src/utils/user.js'
 
 export async function performLogout({
   clearOnboarding = false,
 }): Promise<void> {
   // Flush telemetry BEFORE clearing credentials to prevent org data leakage
   const { flushTelemetry } = await import(
-    '../../utils/telemetry/instrumentation.js'
+    'src/utils/telemetry/instrumentation.js'
   )
   await flushTelemetry()
 
