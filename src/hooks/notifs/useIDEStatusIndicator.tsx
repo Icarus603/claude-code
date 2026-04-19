@@ -10,7 +10,7 @@ import {
   isSupportedTerminal,
 } from '@claude-code/ide/ide.js'
 import { getIsRemoteMode } from '../../bootstrap/state.js'
-import { useIdeConnectionStatus } from '../useIdeConnectionStatus.js'
+import { useIdeConnectionStatus } from '@claude-code/ide/hooks/useIdeConnectionStatus.js'
 import type { IDESelection } from '../useIdeSelection.js'
 
 const MAX_IDE_HINT_SHOW_COUNT = 5

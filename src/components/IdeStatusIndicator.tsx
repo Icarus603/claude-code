@@ -1,7 +1,7 @@
 import { basename } from 'path'
 import * as React from 'react'
-import { useIdeConnectionStatus } from '../hooks/useIdeConnectionStatus.js'
-import type { IDESelection } from '../hooks/useIdeSelection.js'
+import { useIdeConnectionStatus } from '@claude-code/ide/hooks/useIdeConnectionStatus.js'
+import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
 import { Text } from '@anthropic/ink'
 import type { MCPServerConnection } from '../services/mcp/types.js'
 

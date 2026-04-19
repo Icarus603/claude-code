@@ -4,9 +4,9 @@ import { z } from 'zod/v4'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,
-} from '../services/mcp/types.js'
+} from 'src/services/mcp/types.js'
 import { getConnectedIdeClient } from '@claude-code/ide/ide.js'
-import { lazySchema } from '../utils/lazySchema.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 export type SelectionPoint = {
   line: number
   character: number
