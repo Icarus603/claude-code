@@ -6,8 +6,8 @@ async function main(): Promise<void> {
       readFile('src/main.tsx', 'utf8'),
       readFile('packages/cli/src/index.ts', 'utf8'),
       readFile('packages/cli/src/headless.ts', 'utf8'),
-      readFile('src/cli/print.ts', 'utf8'),
-      readFile('src/runtime/installCliBindings.ts', 'utf8'),
+      readFile('packages/cli/src/print.ts', 'utf8'),
+      readFile('packages/app-host/src/runtime/installCliBindings.ts', 'utf8'),
       readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
     ])
   // After cut-E, the action handler body lives in mode-dispatch.ts.
@@ -41,18 +41,18 @@ async function main(): Promise<void> {
 
   if (!cliBindings.includes('installCliHostBindings({')) {
     throw new Error(
-      'src/runtime/installCliBindings.ts must install root CLI headless bindings',
+      '@claude-code/app-host/runtime/installCliBindings.ts must install root CLI headless bindings',
     )
   }
 
   if (cliBindings.includes('AppStateStore')) {
     throw new Error(
-      'src/runtime/installCliBindings.ts must not import AppStateStore directly',
+      '@claude-code/app-host/runtime/installCliBindings.ts must not import AppStateStore directly',
     )
   }
 
-  if (!printContent.includes("import 'src/runtime/bootstrap.js'")) {
-    throw new Error('src/cli/print.ts must load runtime bootstrap before headless flow')
+  if (!printContent.includes("import '@claude-code/app-host/runtime/bootstrap.js'")) {
+    throw new Error('packages/cli/src/print.ts must load runtime bootstrap before headless flow')
   }
 
   console.log('headless host verification passed')

@@ -5,7 +5,7 @@ const REPL_LINE_BUDGET = 120
 async function main(): Promise<void> {
   const [replLauncher, replContent, cliIndex, modeDispatchContent] = await Promise.all([
     readFile('src/replLauncher.tsx', 'utf8'),
-    readFile('src/screens/REPL.tsx', 'utf8'),
+    readFile('packages/repl/src/screens/REPL.tsx', 'utf8'),
     readFile('packages/cli/src/index.ts', 'utf8'),
     readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
   ])
@@ -36,7 +36,7 @@ async function main(): Promise<void> {
     }
   }
 
-  if (!replLauncher.includes("const { REPL } = await import('./screens/REPL.js')")) {
+  if (!replLauncher.includes("const { REPL } = await import('@claude-code/repl/screens/REPL.js')")) {
     throw new Error('replLauncher.tsx no longer lazily composes the REPL screen')
   }
 

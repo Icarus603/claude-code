@@ -1,22 +1,22 @@
 import { readFile } from 'fs/promises'
 import { getCommandRegistryHostBindings } from '@claude-code/command-runtime'
 import { getMcpRuntimeHostBindings } from '@claude-code/mcp-runtime'
-import '../src/runtime/bootstrap.js'
+import '@claude-code/app-host/runtime/bootstrap.js'
 import '../src/commands.js'
 import '../src/services/mcp/client.js'
 
 async function main(): Promise<void> {
   const [mainContent, replContent, printContent, modeDispatchContent] = await Promise.all([
     readFile('./src/main.tsx', 'utf8'),
-    readFile('./src/screens/REPL.tsx', 'utf8'),
-    readFile('./src/cli/print.ts', 'utf8'),
+    readFile('./packages/repl/src/screens/REPL.tsx', 'utf8'),
+    readFile('./packages/cli/src/print.ts', 'utf8'),
     readFile('./packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
   ])
 
   // V7 §10.1: main.tsx is the thin host — it only wires bootstrap and delegates
   // to @claude-code/cli / @claude-code/app-host / @claude-code/config.
   const requiredMainSeams = [
-    './runtime/bootstrap.js',
+    '@claude-code/app-host/runtime/bootstrap.js',
     '@claude-code/app-host',
     '@claude-code/config',
     '@claude-code/cli',

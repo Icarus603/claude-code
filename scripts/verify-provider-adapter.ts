@@ -1,5 +1,5 @@
 import { getProviderAdapter } from '@claude-code/provider'
-import '../src/services/api/providerHostSetup.js'
+import '@claude-code/app-host/providerHostSetup.js'
 import { getEmptyToolPermissionContext } from '../src/Tool.js'
 import { createUserMessage } from '../src/utils/messages.js'
 import { enableConfigs } from '@claude-code/config'

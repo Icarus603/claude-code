@@ -6,7 +6,7 @@ async function main(): Promise<void> {
   const [claudeLegacyFacade, providerHostSetupRoot, providerHostSetupPkg, providerLegacy] =
     await Promise.all([
       readFile('src/services/api/claudeLegacy.ts', 'utf8'),
-      readFile('src/services/api/providerHostSetup.ts', 'utf8'),
+      readFile('packages/app-host/src/providerHostSetup.ts', 'utf8'),
       readFile('packages/provider/src/providerHostSetup.ts', 'utf8'),
       readFile('packages/provider/src/claudeLegacy.ts', 'utf8'),
     ])
@@ -22,7 +22,7 @@ async function main(): Promise<void> {
 
   if (!providerHostSetupRoot.includes('installProviderRuntimeBindings(bindings)')) {
     throw new Error(
-      'src/services/api/providerHostSetup.ts no longer owns root provider binding composition',
+      'packages/app-host/src/providerHostSetup.ts no longer owns root provider binding composition',
     )
   }
 
