@@ -39,6 +39,7 @@
     "./errorUtils.js": "./src/errorUtils.ts",
     "./referral.js": "./src/referral.ts",
     "./dumpPrompts.js": "./src/dumpPrompts.ts",
-    "./withRetry.js": "./src/withRetry.ts"
+    "./withRetry.js": "./src/withRetry.ts",
+    "./context.js": "./src/context.ts"
   }
 }

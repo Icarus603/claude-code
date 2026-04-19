@@ -10,7 +10,7 @@ import {
   enhanceSystemPromptWithEnvDetails,
 } from 'src/constants/prompts.js'
 import type { QuerySource } from 'src/constants/querySource.js'
-import { getSystemContext, getUserContext } from 'src/context.js'
+import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
 import { query } from 'src/query.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

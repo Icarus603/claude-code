@@ -5,7 +5,7 @@ import type {
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { createHash } from 'crypto'
 import { SYSTEM_PROMPT_DYNAMIC_BOUNDARY } from 'src/constants/prompts.js'
-import { getSystemContext, getUserContext } from 'src/context.js'
+import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import { isAnalyticsDisabled } from 'src/services/privacyConfig.js'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,

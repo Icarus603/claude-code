@@ -14,7 +14,7 @@ import {
   getSystemContext,
   getUserContext,
   setSystemPromptInjection,
-} from '../../context.js'
+} from '@claude-code/provider/context.js'
 import { clearFileSuggestionCaches } from '../../hooks/fileSuggestions.js'
 import { clearAllPendingCallbacks } from '../../hooks/useSwarmPermissionPoller.js'
 import { clearAllDumpState } from '@claude-code/provider/dumpPrompts.js'

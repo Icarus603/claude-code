@@ -17,7 +17,7 @@ export {
   DEFAULT_HOOK_SHELL,
 } from './types.js'
 
-export type { ShellExecContext, SnapshotContext } from './context.js'
+export type { ShellExecContext, SnapshotContext } from '@claude-code/provider/context.js'
 
 export { quote, tryParseShellCommand, tryQuoteShellArgs, hasMalformedTokens, hasShellQuoteSingleQuoteBug, type ParseEntry, type ShellParseResult, type ShellQuoteResult } from './bash/shellQuote.js'
 export { quoteShellCommand, shouldAddStdinRedirect, rewriteWindowsNullRedirect, hasStdinRedirect } from './bash/shellQuoting.js'
