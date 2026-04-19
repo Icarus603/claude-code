@@ -7,7 +7,7 @@ import { stat } from 'fs/promises'
 import pMap from 'p-map'
 import { cwd } from 'process'
 import React from 'react'
-import { MCPServerDesktopImportDialog } from 'src/components/MCPServerDesktopImportDialog.js'
+import { MCPServerDesktopImportDialog } from '@claude-code/repl/components/MCPServerDesktopImportDialog.js'
 import { wrappedRender as render } from '@anthropic/ink'
 import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
 import {

@@ -37,7 +37,7 @@ export async function launchSnapshotUpdateDialog(
   },
 ): Promise<'merge' | 'keep' | 'replace'> {
   const { SnapshotUpdateDialog } = await import(
-    './components/agents/SnapshotUpdateDialog.js'
+    '@claude-code/repl/components/agents/SnapshotUpdateDialog.js'
   )
   return showSetupDialog<'merge' | 'keep' | 'replace'>(root, done => (
     <SnapshotUpdateDialog
@@ -62,7 +62,7 @@ export async function launchInvalidSettingsDialog(
   },
 ): Promise<void> {
   const { InvalidSettingsDialog } = await import(
-    './components/InvalidSettingsDialog.js'
+    '@claude-code/repl/components/InvalidSettingsDialog.js'
   )
   return showSetupDialog(root, done => (
     <InvalidSettingsDialog
@@ -131,7 +131,7 @@ export async function launchTeleportResumeWrapper(
   root: Root,
 ): Promise<TeleportRemoteResponse | null> {
   const { TeleportResumeWrapper } = await import(
-    './components/TeleportResumeWrapper.js'
+    '@claude-code/repl/components/TeleportResumeWrapper.js'
   )
   return showSetupDialog<TeleportRemoteResponse | null>(root, done => (
     <TeleportResumeWrapper
@@ -154,7 +154,7 @@ export async function launchTeleportRepoMismatchDialog(
   },
 ): Promise<string | null> {
   const { TeleportRepoMismatchDialog } = await import(
-    './components/TeleportRepoMismatchDialog.js'
+    '@claude-code/repl/components/TeleportRepoMismatchDialog.js'
   )
   return showSetupDialog<string | null>(root, done => (
     <TeleportRepoMismatchDialog
@@ -184,7 +184,7 @@ export async function launchResumeChooser(
   const [worktreePaths, { ResumeConversation }, { App }] = await Promise.all([
     worktreePathsPromise,
     import('@claude-code/repl/screens/ResumeConversation.js'),
-    import('./components/App.js'),
+    import('@claude-code/repl/components/App.js'),
   ])
   await renderAndRun(
     root,

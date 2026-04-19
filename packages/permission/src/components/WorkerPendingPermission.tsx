@@ -5,7 +5,7 @@ import {
   getTeammateColor,
   getTeamName,
 } from 'src/utils/teammate.js'
-import { Spinner } from 'src/components/Spinner.js'
+import { Spinner } from '@claude-code/repl/components/Spinner.js'
 import { WorkerBadge } from './WorkerBadge.js'
 
 type Props = {

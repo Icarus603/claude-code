@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { Box, Byline, Text } from '@anthropic/ink'
 import {
   useKeybinding,

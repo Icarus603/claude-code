@@ -81,8 +81,8 @@ import {
   saveCustomTitle,
 } from '@claude-code/storage/sessionStorage.js'
 import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
-import { type OptionWithDescription, Select } from 'src/components/CustomSelect/index.js'
-import { Markdown } from 'src/components/Markdown.js'
+import { type OptionWithDescription, Select } from '@claude-code/repl/components/CustomSelect/index.js'
+import { Markdown } from '@claude-code/repl/components/Markdown.js'
 import { PermissionDialog } from '../PermissionDialog.js'
 import type { PermissionRequestProps } from '../PermissionRequest.js'
 import { PermissionRuleExplanation } from '../PermissionRuleExplanation.js'

@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { SearchBox } from '@anthropic/ink'
 import { Byline } from '@anthropic/ink'
 import { useSearchInput } from '@anthropic/ink/search'

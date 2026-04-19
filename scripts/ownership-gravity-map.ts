@@ -96,7 +96,7 @@ export const SUBSYSTEM_MIRRORS: SubsystemMirror[] = [
     subsystem: 'permission',
     ownerPackage: 'packages/permission',
     srcMirrors: [
-      'src/components/permissions',
+      '@claude-code/repl/components/permissions',
       'src/utils/permissions',
       'src/commands/permissions',
       'src/commands/auto-mode',

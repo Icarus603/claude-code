@@ -4,8 +4,8 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { KeyboardShortcutHint } from '@anthropic/ink'
-import { Spinner } from '../../components/Spinner.js'
-import TextInput from '../../components/TextInput.js'
+import { Spinner } from '@claude-code/repl/components/Spinner.js'
+import TextInput from '@claude-code/repl/components/TextInput.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { type KeyboardEvent, setClipboard, Box, Link, Text } from '@anthropic/ink'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'

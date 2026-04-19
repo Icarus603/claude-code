@@ -1,0 +1,32 @@
+import chalk from 'chalk'
+import * as React from 'react'
+import { LIGHTNING_BOLT } from 'src/constants/figures.js'
+import { Text, color } from '@anthropic/ink'
+import { getGlobalConfig } from '@claude-code/config'
+import { resolveThemeSetting } from 'src/utils/systemTheme.js'
+
+type Props = {
+  cooldown?: boolean
+}
+
+export function FastIcon({ cooldown }: Props): React.ReactNode {
+  if (cooldown) {
+    return (
+      <Text color="promptBorder" dimColor>
+        {LIGHTNING_BOLT}
+      </Text>
+    )
+  }
+  return <Text color="fastMode">{LIGHTNING_BOLT}</Text>
+}
+
+export function getFastIconString(applyColor = true, cooldown = false): string {
+  if (!applyColor) {
+    return LIGHTNING_BOLT
+  }
+  const themeName = resolveThemeSetting(getGlobalConfig().theme)
+  if (cooldown) {
+    return chalk.dim(color('promptBorder', themeName)(LIGHTNING_BOLT))
+  }
+  return color('fastMode', themeName)(LIGHTNING_BOLT)
+}

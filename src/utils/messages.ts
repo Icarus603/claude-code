@@ -124,7 +124,7 @@ import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt
 import { GREP_TOOL_NAME } from '@claude-code/tool-registry/tools/GrepTool/prompt.js'
 import type { DeepImmutable } from 'src/types/utils.js'
 import { getStrictToolResultPairing } from '@claude-code/app-host/bootstrap/state.js'
-import type { SpinnerMode } from '../components/Spinner.js'
+import type { SpinnerMode } from '@claude-code/repl/components/Spinner.js'
 import {
   COMMAND_ARGS_TAG,
   COMMAND_MESSAGE_TAG,

@@ -25,7 +25,7 @@ import React, {
   useEffect,
   useState,
 } from 'react'
-import type { SuggestionItem } from '../components/PromptInput/PromptInputFooterSuggestions.js'
+import type { SuggestionItem } from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
 
 export type PromptOverlayData = {
   suggestions: SuggestionItem[]

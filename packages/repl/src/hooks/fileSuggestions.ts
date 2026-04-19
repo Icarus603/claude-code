@@ -5,7 +5,7 @@ import {
   CLAUDE_CONFIG_DIRECTORIES,
   loadMarkdownFilesForSubdir,
 } from 'src/utils/markdownConfigLoader.js'
-import type { SuggestionItem } from 'src/components/PromptInput/PromptInputFooterSuggestions.js'
+import type { SuggestionItem } from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
 import {
   CHUNK_MS,
   FileIndex,

@@ -9,8 +9,8 @@ import {
   type PermissionExplanation as PermissionExplanationType,
   type RiskLevel,
 } from '@claude-code/permission/permissionExplainer.js'
-import { ShimmerChar } from 'src/components/Spinner/ShimmerChar.js'
-import { useShimmerAnimation } from 'src/components/Spinner/useShimmerAnimation.js'
+import { ShimmerChar } from '@claude-code/repl/components/Spinner/ShimmerChar.js'
+import { useShimmerAnimation } from '@claude-code/repl/components/Spinner/useShimmerAnimation.js'
 
 const LOADING_MESSAGE = 'Loading explanation…'
 

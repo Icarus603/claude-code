@@ -1,6 +1,6 @@
 import React from 'react'
-import { MCPServerApprovalDialog } from '../components/MCPServerApprovalDialog.js'
-import { MCPServerMultiselectDialog } from '../components/MCPServerMultiselectDialog.js'
+import { MCPServerApprovalDialog } from '@claude-code/repl/components/MCPServerApprovalDialog.js'
+import { MCPServerMultiselectDialog } from '@claude-code/repl/components/MCPServerMultiselectDialog.js'
 import type { Root } from '@anthropic/ink'
 import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
 import { AppStateProvider } from '../state/AppState.js'

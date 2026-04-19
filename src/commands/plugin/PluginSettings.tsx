@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { useCallback, useEffect, useState } from 'react'
-import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { Byline, Pane, Tab, Tabs } from '@anthropic/ink'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text } from '@anthropic/ink'

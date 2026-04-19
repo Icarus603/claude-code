@@ -15,9 +15,9 @@ import {
   type OptionWithDescription,
   Select,
   SelectMulti,
-} from 'src/components/CustomSelect/index.js'
+} from '@claude-code/repl/components/CustomSelect/index.js'
 import { Divider } from '@anthropic/ink'
-import { FilePathLink } from 'src/components/FilePathLink.js'
+import { FilePathLink } from '@claude-code/repl/components/FilePathLink.js'
 
 import { PermissionRequestTitle } from '../PermissionRequestTitle.js'
 import { PreviewQuestionView } from './PreviewQuestionView.js'

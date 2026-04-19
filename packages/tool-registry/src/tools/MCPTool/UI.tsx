@@ -3,11 +3,11 @@ import figures from 'figures'
 import * as React from 'react'
 import type { z } from 'zod/v4'
 import { ProgressBar } from '@anthropic/ink'
-import { MessageResponse } from 'src/components/MessageResponse.js'
+import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import {
   linkifyUrlsInText,
   OutputLine,
-} from 'src/components/shell/OutputLine.js'
+} from '@claude-code/repl/components/shell/OutputLine.js'
 import { Ansi, Box, Text, stringWidth } from '@anthropic/ink'
 import { createHyperlink } from 'src/utils/hyperlink.js'
 import type { ToolProgressData } from 'src/Tool.js'

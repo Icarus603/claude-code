@@ -8,7 +8,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { Select } from 'src/components/CustomSelect/select.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { PermissionDialog } from './PermissionDialog.js'
 
 export type SandboxPermissionRequestProps = {

@@ -7,9 +7,9 @@ import {
   getSettingsForSource,
 } from 'src/utils/settings/settings.js'
 import { shouldOfferTerminalSetup } from '../../commands/terminalSetup/terminalSetup.js'
-import { getDesktopUpsellConfig } from '../../components/DesktopUpsell/DesktopUpsellStartup.js'
+import { getDesktopUpsellConfig } from '@claude-code/repl/components/DesktopUpsell/DesktopUpsellStartup.js'
 import { color } from '@anthropic/ink'
-import { shouldShowOverageCreditUpsell } from '../../components/LogoV2/OverageCreditUpsell.js'
+import { shouldShowOverageCreditUpsell } from '@claude-code/repl/components/LogoV2/OverageCreditUpsell.js'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
 import { is1PApiCustomer } from '../../utils/auth.js'

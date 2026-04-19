@@ -7,11 +7,11 @@ import {
   unregisterPermissionCallback,
 } from '@claude-code/repl/hooks/useSwarmPermissionPoller.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
-import { Spinner } from '../components/Spinner.js'
+import { Spinner } from '@claude-code/repl/components/Spinner.js'
 import {
   type OptionWithDescription,
   Select,
-} from '../components/CustomSelect/index.js'
+} from '@claude-code/repl/components/CustomSelect/index.js'
 import { logEvent } from '@claude-code/local-observability'
 import { getAutoCompactThreshold } from '@claude-code/agent/compaction/autoCompact.js'
 import {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AgentsMenu } from '../../components/agents/AgentsMenu.js'
+import { AgentsMenu } from '@claude-code/repl/components/agents/AgentsMenu.js'
 import type { ToolUseContext } from '../../Tool.js'
 import { getTools } from '../../tools.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'

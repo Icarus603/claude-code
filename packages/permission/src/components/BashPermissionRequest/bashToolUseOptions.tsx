@@ -4,7 +4,7 @@ import { isClassifierPermissionsEnabled } from '@claude-code/permission/bashClas
 import type { PermissionDecisionReason } from '@claude-code/permission/PermissionResult'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { shouldShowAlwaysAllowOptions } from '@claude-code/permission/permissionsLoader.js'
-import type { OptionWithDescription } from 'src/components/CustomSelect/select.js'
+import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 import { generateShellSuggestionsLabel } from '../shellPermissionHelpers.js'
 
 export type BashToolUseOption =

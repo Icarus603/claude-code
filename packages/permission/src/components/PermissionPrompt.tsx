@@ -7,7 +7,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useSetAppState } from '../appStateHooks.js'
-import { type OptionWithDescription, Select } from 'src/components/CustomSelect/select.js'
+import { type OptionWithDescription, Select } from '@claude-code/repl/components/CustomSelect/select.js'
 
 export type FeedbackType = 'accept' | 'reject'
 

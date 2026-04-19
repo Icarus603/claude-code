@@ -1,5 +1,5 @@
 import React from 'react'
-import { MessageResponse } from 'src/components/MessageResponse.js'
+import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { TOOL_SUMMARY_MAX_LENGTH } from 'src/constants/toolLimits.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ProgressMessage } from 'src/types/message.js'

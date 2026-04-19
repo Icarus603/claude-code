@@ -6,8 +6,8 @@ import { getGraphemeSegmenter } from './intl.js'
 /**
  * Truncates a file path in the middle to preserve both directory context and filename.
  * Width-aware: uses stringWidth() for correct CJK/emoji measurement.
- * For example: "src/components/deeply/nested/folder/MyComponent.tsx" becomes
- * "src/components/…/MyComponent.tsx" when maxLength is 30.
+ * For example: "@claude-code/repl/components/deeply/nested/folder/MyComponent.tsx" becomes
+ * "@claude-code/repl/components/…/MyComponent.tsx" when maxLength is 30.
  *
  * @param path The file path to truncate
  * @param maxLength Maximum display width of the result in terminal columns (must be > 0)

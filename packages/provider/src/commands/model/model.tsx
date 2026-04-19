@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import * as React from 'react'
 import type { CommandResultDisplay } from 'src/commands.js'
-import { ModelPicker } from 'src/components/ModelPicker.js'
+import { ModelPicker } from '@claude-code/repl/components/ModelPicker.js'
 import { COMMON_HELP_ARGS, COMMON_INFO_ARGS } from 'src/constants/xml.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

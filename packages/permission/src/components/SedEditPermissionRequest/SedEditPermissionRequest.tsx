@@ -1,6 +1,6 @@
 import { basename, relative } from 'path'
 import React, { Suspense, use, useMemo } from 'react'
-import { FileEditToolDiff } from 'src/components/FileEditToolDiff.js'
+import { FileEditToolDiff } from '@claude-code/repl/components/FileEditToolDiff.js'
 import { getCwd } from 'src/utils/cwd.js'
 import { isENOENT } from 'src/utils/errors.js'
 import { detectEncodingForResolvedPath } from 'src/utils/fileRead.js'

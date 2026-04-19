@@ -6,18 +6,18 @@ import {
   addDirHelpMessage,
   validateDirectoryForWorkspace,
 } from 'src/commands/add-dir/validation.js'
-import TextInput from 'src/components/TextInput.js'
+import TextInput from '@claude-code/repl/components/TextInput.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { ToolPermissionContext } from 'src/Tool.js'
 import { getDirectoryCompletions } from 'src/utils/suggestions/directoryCompletion.js'
-import { ConfigurableShortcutHint } from 'src/components/ConfigurableShortcutHint.js'
-import { Select } from 'src/components/CustomSelect/select.js'
+import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import {
   PromptInputFooterSuggestions,
   type SuggestionItem,
-} from 'src/components/PromptInput/PromptInputFooterSuggestions.js'
+} from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
 
 type Props = {
   onAddDirectory: (path: string, remember?: boolean) => void

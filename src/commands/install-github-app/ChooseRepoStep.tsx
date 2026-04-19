@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import TextInput from '../../components/TextInput.js'
+import TextInput from '@claude-code/repl/components/TextInput.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'

@@ -214,7 +214,7 @@ export const init = memoize(async (): Promise<void> => {
       }
 
       // Show the invalid config dialog with the error object and wait for it to complete
-      return import('src/components/InvalidConfigDialog.js').then(m =>
+      return import('@claude-code/repl/components/InvalidConfigDialog.js').then(m =>
         m.showInvalidConfigDialog({ error }),
       )
       // Dialog itself handles process.exit, so we don't need additional cleanup here

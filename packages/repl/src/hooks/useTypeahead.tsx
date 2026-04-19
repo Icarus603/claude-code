@@ -8,11 +8,11 @@ import { type Command, getCommandName } from 'src/commands.js'
 import {
   getModeFromInput,
   getValueFromInput,
-} from 'src/components/PromptInput/inputModes.js'
+} from '@claude-code/repl/components/PromptInput/inputModes.js'
 import type {
   SuggestionItem,
   SuggestionType,
-} from 'src/components/PromptInput/PromptInputFooterSuggestions.js'
+} from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
 import {
   useIsModalOverlayActive,
   useRegisterOverlay,

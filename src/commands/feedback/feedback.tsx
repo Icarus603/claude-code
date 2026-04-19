@@ -3,7 +3,7 @@ import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
 } from '../../commands.js'
-import { Feedback } from '../../components/Feedback.js'
+import { Feedback } from '@claude-code/repl/components/Feedback.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import type { Message } from '../../types/message.js'
 

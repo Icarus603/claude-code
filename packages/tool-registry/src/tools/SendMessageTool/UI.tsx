@@ -1,5 +1,5 @@
 import React from 'react'
-import { MessageResponse } from 'src/components/MessageResponse.js'
+import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { Text } from '@anthropic/ink'
 import { jsonParse } from 'src/utils/slowOperations.js'
 import type { Input, SendMessageToolOutput } from './SendMessageTool.js'

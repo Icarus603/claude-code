@@ -6,7 +6,7 @@
 
 import { cwd } from 'process'
 import React from 'react'
-import { WelcomeV2 } from 'src/components/LogoV2/WelcomeV2.js'
+import { WelcomeV2 } from '@claude-code/repl/components/LogoV2/WelcomeV2.js'
 import { useManagePlugins } from '@claude-code/repl/hooks/useManagePlugins.js'
 import type { Root } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
@@ -22,7 +22,7 @@ export async function setupTokenHandler(root: Root): Promise<void> {
 
   const showAuthWarning = !isAnthropicAuthEnabled()
   const { ConsoleOAuthFlow } = await import(
-    'src/components/ConsoleOAuthFlow.js'
+    '@claude-code/repl/components/ConsoleOAuthFlow.js'
   )
   await new Promise<void>(resolve => {
     root.render(

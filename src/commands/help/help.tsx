@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { HelpV2 } from '../../components/HelpV2/HelpV2.js'
+import { HelpV2 } from '@claude-code/repl/components/HelpV2/HelpV2.js'
 import type { LocalJSXCommandCall } from '../../types/command.js'
 
 export const call: LocalJSXCommandCall = async (

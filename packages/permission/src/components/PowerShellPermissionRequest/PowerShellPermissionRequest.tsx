@@ -12,7 +12,7 @@ import { PowerShellTool } from '@claude-code/tool-registry/tools/PowerShellTool/
 import { isAllowlistedCommand } from '@claude-code/tool-registry/tools/PowerShellTool/readOnlyValidation.js'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { getCompoundCommandPrefixesStatic } from 'src/utils/powershell/staticPrefix.js'
-import { Select } from 'src/components/CustomSelect/select.js'
+import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { type UnaryEvent, usePermissionRequestLogging } from '../hooks.js'
 import { PermissionDecisionDebugInfo } from '../PermissionDecisionDebugInfo.js'
 import { PermissionDialog } from '../PermissionDialog.js'

@@ -12,9 +12,9 @@ import {
   useAppStateStore,
   useSetAppState,
 } from 'src/state/AppState.js'
-import { isVimModeEnabled } from 'src/components/PromptInput/utils.js'
+import { isVimModeEnabled } from '@claude-code/repl/components/PromptInput/utils.js'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
-import type { SpinnerMode } from 'src/components/Spinner/types.js'
+import type { SpinnerMode } from '@claude-code/repl/components/Spinner/types.js'
 import { useNotifications } from 'src/context/notifications.js'
 import { useIsOverlayActive } from 'src/context/overlayContext.js'
 import { useCommandQueue } from './useCommandQueue.js'

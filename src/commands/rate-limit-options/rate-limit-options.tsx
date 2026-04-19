@@ -6,7 +6,7 @@ import type {
 import {
   type OptionWithDescription,
   Select,
-} from '../../components/CustomSelect/select.js'
+} from '@claude-code/repl/components/CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
