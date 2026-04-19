@@ -58,7 +58,7 @@ import {
   updateTaskState,
 } from '../utils/task/framework.js'
 import { tokenCountWithEstimation } from '../utils/tokens.js'
-import { createAbortController } from '../utils/abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { runWithAgentContext } from '../utils/agentContext.js'
 import { count } from '../utils/array.js'
 import { logForDebugging } from '../utils/debug.js'

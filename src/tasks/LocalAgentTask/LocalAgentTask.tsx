@@ -24,7 +24,7 @@ import type { Message } from '../../types/message.js'
 import {
   createAbortController,
   createChildAbortController,
-} from '../../utils/abortController.js'
+} from '@claude-code/agent/abortController.js'
 import { registerCleanup } from '../../utils/cleanupRegistry.js'
 import { getToolSearchOrReadInfo } from '../../utils/collapseReadSearch.js'
 import { enqueuePendingNotification } from '../../utils/messageQueueManager.js'

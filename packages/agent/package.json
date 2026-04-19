@@ -29,7 +29,8 @@
     "./sessionTranscript/*.js": "./sessionTranscript/*.ts",
     "./SessionMemory/*.js": "./SessionMemory/*.ts",
     "./awaySummary.js": "./awaySummary.ts",
-    "./attribution.js": "./attribution.ts"
+    "./attribution.js": "./attribution.ts",
+    "./abortController.js": "./abortController.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

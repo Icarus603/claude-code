@@ -34,7 +34,7 @@ const ideOnboardingDialog =
   (): typeof import('src/components/IdeOnboardingDialog.js') =>
     require('src/components/IdeOnboardingDialog.js')
 
-import { createAbortController } from 'src/utils/abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { envDynamic } from 'src/utils/envDynamic.js'
 import { errorMessage, isFsInaccessible } from 'src/utils/errors.js'

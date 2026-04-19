@@ -54,7 +54,7 @@ import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpRe
 import { type MCPProgress, MCPTool } from '@claude-code/tool-registry/tools/MCPTool/MCPTool.js'
 import { createMcpAuthTool } from '@claude-code/tool-registry/tools/McpAuthTool/McpAuthTool.js'
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
-import { createAbortController } from '../../utils/abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { count } from '../../utils/array.js'
 import { registerCleanup } from '../../utils/cleanupRegistry.js'
 import { detectCodeIndexingFromMcpServerName } from '../../utils/codeIndexing.js'

@@ -13,7 +13,7 @@ import { type KeyboardEvent, type ScrollBoxHandle, ScrollBox } from '@anthropic/
 import { Box, Text } from '@anthropic/ink'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import type { Message } from '../../types/message.js'
-import { createAbortController } from '../../utils/abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { errorMessage } from '../../utils/errors.js'
 import {

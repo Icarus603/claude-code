@@ -40,7 +40,7 @@ import type { Progress as AgentProgress } from '@claude-code/tool-registry/tools
 import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
 import { renderToolUseProgressMessage } from '@claude-code/tool-registry/tools/AgentTool/UI.js'
 import type { CommandResultDisplay } from '../../types/command.js'
-import { createAbortController } from '../abortController.js'
+import { createAbortController } from '@claude-code/agent/abortController.js'
 import { getAgentContext } from '../agentContext.js'
 import {
   createAttachmentMessage,
