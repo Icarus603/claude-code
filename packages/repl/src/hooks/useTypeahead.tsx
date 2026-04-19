@@ -25,7 +25,7 @@ import {
 } from '@anthropic/ink/keybindings'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
-import { useAppState, useAppStateStore } from 'src/state/AppState.js'
+import { useAppState, useAppStateStore } from '@claude-code/repl/appStateHooks.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type {
   InlineGhostText,

@@ -3,7 +3,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { SentryErrorBoundary } from '../../SentryErrorBoundary.js'
 import { Box, Text, useTheme } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import {
   filterToolProgressMessages,
   type Tool,

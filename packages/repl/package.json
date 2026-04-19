@@ -442,6 +442,7 @@
     "./components/wizard/WizardProvider.js": "./src/components/wizard/WizardProvider.tsx",
     "./components/wizard/index.js": "./src/components/wizard/index.ts",
     "./components/wizard/types.js": "./src/components/wizard/types.ts",
-    "./components/wizard/useWizard.js": "./src/components/wizard/useWizard.ts"
+    "./components/wizard/useWizard.js": "./src/components/wizard/useWizard.ts",
+    "./appStateHooks.js": "./src/appStateHooks.ts"
   }
 }

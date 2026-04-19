@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import type { Root } from '@anthropic/ink'
 import { Box, Text, useAnimationFrame } from '@anthropic/ink'
-import { AppStateProvider } from 'src/state/AppState.js'
+import { AppStateProvider } from '@claude-code/repl/appStateHooks.js'
 import {
   checkOutTeleportedSessionBranch,
   processMessagesForTeleportResume,

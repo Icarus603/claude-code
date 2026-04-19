@@ -25,8 +25,8 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from 'src/state/AppState.js'
-import type { FooterItem } from 'src/state/AppStateStore.js'
+} from '@claude-code/repl/appStateHooks.js'
+import type { FooterItem } from '@claude-code/repl/appStateHooks.js'
 import { getCwd } from 'src/utils/cwd.js'
 import {
   isQueuedCommandEditable,

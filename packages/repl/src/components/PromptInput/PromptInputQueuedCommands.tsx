@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { useMemo } from 'react'
 import { Box } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import {
   STATUS_TAG,
   SUMMARY_TAG,

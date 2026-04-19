@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { abortSpeculation } from 'src/services/PromptSuggestion/speculation.js'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 
 type Props = {
   inputValue: string

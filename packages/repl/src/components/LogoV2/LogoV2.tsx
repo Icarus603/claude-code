@@ -74,7 +74,7 @@ import {
   createOverageCreditFeed,
 } from './OverageCreditUpsell.js'
 import { plural } from 'src/utils/stringUtils.js'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getEffortSuffix } from 'src/utils/effort.js'
 import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import { renderModelSetting } from 'src/utils/model/model.js'

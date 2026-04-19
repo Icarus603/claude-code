@@ -6,7 +6,7 @@ import {
   useNotifications,
 } from 'src/context/notifications.js'
 import { logEvent } from '@claude-code/local-observability'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { useVoiceState } from 'src/context/voice.js'
 import type { VerificationStatus } from '@claude-code/repl/hooks/useApiKeyVerification.js'
 import { useIdeConnectionStatus } from '@claude-code/ide/hooks/useIdeConnectionStatus.js'

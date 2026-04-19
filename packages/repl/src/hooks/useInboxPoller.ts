@@ -11,7 +11,7 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from 'src/state/AppState.js'
+} from '@claude-code/repl/appStateHooks.js'
 import { findToolByName } from 'src/Tool.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 import { getAllBaseTools } from '@claude-code/tool-registry'

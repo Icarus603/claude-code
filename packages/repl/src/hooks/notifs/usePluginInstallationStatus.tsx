@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'react'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { useNotifications } from 'src/context/notifications.js'
 import { Text } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { plural } from 'src/utils/stringUtils.js'
 

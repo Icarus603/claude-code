@@ -48,7 +48,7 @@ import {
   useAppState,
   useSetAppState,
   useAppStateStore,
-} from 'src/state/AppState.js'
+} from '@claude-code/repl/appStateHooks.js'
 import { ModelPicker } from '../ModelPicker.js'
 import {
   modelDisplayString,

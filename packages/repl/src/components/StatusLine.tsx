@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { memo, useCallback, useEffect, useRef } from 'react'
 import { logEvent } from '@claude-code/local-observability'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import {
   getIsRemoteMode,

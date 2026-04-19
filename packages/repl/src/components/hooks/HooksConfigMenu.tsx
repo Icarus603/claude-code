@@ -13,7 +13,7 @@
 import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import { useAppState, useAppStateStore } from 'src/state/AppState.js'
+import { useAppState, useAppStateStore } from '@claude-code/repl/appStateHooks.js'
 import type { CommandResultDisplay } from 'src/commands.js'
 import { useSettingsChange } from '@claude-code/repl/hooks/useSettingsChange.js'
 import { Box, Text } from '@anthropic/ink'

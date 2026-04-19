@@ -29,7 +29,7 @@ import {
   excludeToolsByServer,
   filterMcpPromptsByServer,
 } from '@claude-code/mcp-runtime/utils.js'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { getOauthAccountInfo } from 'src/utils/auth.js'
 import { openBrowser } from 'src/utils/browser.js'
 import { errorMessage } from 'src/utils/errors.js'

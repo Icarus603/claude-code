@@ -268,7 +268,7 @@ import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js';
 import { resumeAgentBackground } from '@claude-code/tool-registry/tools/AgentTool/resumeAgent.js';
 import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js';
-import { useAppState } from 'src/state/AppState.js';
+import { useAppState } from '@claude-code/repl/appStateHooks.js';
 import { useReplActions } from './repl/useReplActions.js';
 import { useReplAppState } from './repl/useReplAppState.js';
 import { useReplRuntimeViews } from './repl/useReplRuntimeViews.js';

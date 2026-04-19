@@ -5,7 +5,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import type { Message } from 'src/types/message.js'
 import type { SkillUpdate } from 'src/utils/hooks/skillImprovement.js'
 import { applySkillImprovement } from 'src/utils/hooks/skillImprovement.js'

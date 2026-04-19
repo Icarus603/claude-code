@@ -6,7 +6,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { reinitializeLspServerManager } from '@claude-code/ide/lsp/manager.js'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { count } from 'src/utils/array.js'
 import { logForDebugging } from 'src/utils/debug.js'

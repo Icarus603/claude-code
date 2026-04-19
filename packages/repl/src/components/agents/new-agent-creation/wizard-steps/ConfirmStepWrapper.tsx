@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { useSetAppState } from 'src/state/AppState.js'
+import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import type { Tools } from 'src/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { getActiveAgentsFromList } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'

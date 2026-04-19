@@ -17,7 +17,7 @@ import {
 } from '@claude-code/memory'
 import * as teamMemPaths from '@claude-code/memory/teamMemPaths'
 import { logEvent } from '@claude-code/local-observability'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { openPath } from 'src/utils/browser.js'
 import { getMemoryFiles, type MemoryFileInfo } from 'src/utils/claudemd.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'

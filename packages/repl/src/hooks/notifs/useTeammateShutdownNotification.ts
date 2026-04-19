@@ -4,7 +4,7 @@ import {
   type Notification,
   useNotifications,
 } from 'src/context/notifications.js'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 
 function parseCount(notif: Notification): number {

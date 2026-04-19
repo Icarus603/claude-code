@@ -39,7 +39,7 @@ import {
 import { getGlobalConfig } from '@claude-code/config'
 import { Text as ThemedText } from '@anthropic/ink'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'
-import { useAppStateStore } from 'src/state/AppState.js'
+import { useAppStateStore } from '@claude-code/repl/appStateHooks.js'
 import { isBackgroundTask, type TaskState } from 'src/tasks/types.js'
 import { getPillLabel } from 'src/tasks/pillLabel.js'
 import { useSelectedMessageBg } from '../messageActions.js'

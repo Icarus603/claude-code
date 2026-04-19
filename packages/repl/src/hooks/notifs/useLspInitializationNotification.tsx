@@ -7,7 +7,7 @@ import {
   getInitializationStatus,
   getLspServerManager,
 } from '@claude-code/ide/lsp/manager.js'
-import { useSetAppState } from 'src/state/AppState.js'
+import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 

@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { Box, Text, type TextProps } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getRunningTeammatesSorted } from '@claude-code/swarm'
 import { formatNumber } from 'src/utils/format.js'
 import { TeammateSpinnerLine } from './TeammateSpinnerLine.js'

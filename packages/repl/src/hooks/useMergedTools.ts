@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import 'src/tools.js'
 import type { Tools, ToolPermissionContext } from 'src/Tool.js'
 import { assembleToolPool } from '@claude-code/tool-registry'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { mergeAndFilterTools } from 'src/utils/toolPool.js'
 
 /**
