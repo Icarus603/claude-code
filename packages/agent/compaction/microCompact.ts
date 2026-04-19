@@ -270,9 +270,15 @@ export async function microcompactMessages(
   if (feature('CACHED_MICROCOMPACT')) {
     const mod = await getCachedMCModule()
     const model = toolUseContext?.options.mainLoopModel ?? getMainLoopModel()
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const featureFlags = require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')
+    const cachedMCConfig = (await import('@claude-code/agent/compaction/cachedMCConfig.js')).getCachedMCConfig({
+      getEnv: key => process.env[key],
+      getFeatureValue: featureFlags.getFeatureValue_CACHED_MAY_BE_STALE,
+    })
     if (
-      mod.isCachedMicrocompactEnabled() &&
-      mod.isModelSupportedForCacheEditing(model) &&
+      mod.isCachedMicrocompactEnabled(cachedMCConfig) &&
+      mod.isModelSupportedForCacheEditing(model, cachedMCConfig) &&
       isMainThreadSource(querySource)
     ) {
       return await cachedMicrocompactPath(messages, querySource)
@@ -302,7 +308,12 @@ async function cachedMicrocompactPath(
 ): Promise<MicrocompactResult> {
   const mod = await getCachedMCModule()
   const state = ensureCachedMCState()
-  const config = mod.getCachedMCConfig()
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const featureFlags = require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')
+  const config = (await import('@claude-code/agent/compaction/cachedMCConfig.js')).getCachedMCConfig({
+    getEnv: key => process.env[key],
+    getFeatureValue: featureFlags.getFeatureValue_CACHED_MAY_BE_STALE,
+  })
 
   const compactableToolIds = new Set(collectCompactableToolIds(messages))
   // Second pass: register tool results grouped by user message
@@ -323,7 +334,7 @@ async function cachedMicrocompactPath(
     }
   }
 
-  const toolsToDelete = mod.getToolResultsToDelete(state)
+  const toolsToDelete = mod.getToolResultsToDelete(state, config)
 
   if (toolsToDelete.length > 0) {
     // Create and queue the cache_edits block for the API layer
@@ -417,7 +428,10 @@ export function evaluateTimeBasedTrigger(
   messages: Message[],
   querySource: QuerySource | undefined,
 ): { gapMinutes: number; config: TimeBasedMCConfig } | null {
-  const config = getTimeBasedMCConfig()
+  const config = getTimeBasedMCConfig({
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    getFeatureValue: (require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')).getFeatureValue_CACHED_MAY_BE_STALE,
+  })
   // Require an explicit main-thread querySource. isMainThreadSource treats
   // undefined as main-thread (for cached-MC backward-compat), but several
   // callers (/context, /compact, analyzeContext) invoke microcompactMessages
