@@ -31,7 +31,7 @@ import {
   getMcpConfigByName,
   getMcpConfigsByScope,
   removeMcpConfig,
-} from '../../services/mcp/config.js'
+} from '@claude-code/mcp-runtime/config.js'
 import type {
   ConfigScope,
   ScopedMcpServerConfig,

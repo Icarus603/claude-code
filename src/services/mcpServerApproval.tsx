@@ -4,7 +4,7 @@ import { MCPServerMultiselectDialog } from '../components/MCPServerMultiselectDi
 import type { Root } from '@anthropic/ink'
 import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js'
 import { AppStateProvider } from '../state/AppState.js'
-import { getMcpConfigsByScope } from './mcp/config.js'
+import { getMcpConfigsByScope } from '@claude-code/mcp-runtime/config.js'
 import { getProjectMcpServerStatus } from '@claude-code/mcp-runtime/utils.js'
 
 /**

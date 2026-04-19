@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import type { CommandResultDisplay } from '../../commands.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, color, Text, useTheme } from '@anthropic/ink'
-import { getMcpConfigByName } from '../../services/mcp/config.js'
+import { getMcpConfigByName } from '@claude-code/mcp-runtime/config.js'
 import {
   useMcpReconnect,
   useMcpToggleEnabled,

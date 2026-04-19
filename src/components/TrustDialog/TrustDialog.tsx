@@ -6,7 +6,7 @@ import type { Command } from '../../commands.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { getMcpConfigsByScope } from '../../services/mcp/config.js'
+import { getMcpConfigsByScope } from '@claude-code/mcp-runtime/config.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import {
   checkHasTrustDialogAccepted,

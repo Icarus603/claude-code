@@ -21,7 +21,7 @@ import {
   connectToServer,
   fetchToolsForClient,
 } from '../services/mcp/client.js'
-import { filterMcpServersByPolicy } from '../services/mcp/config.js'
+import { filterMcpServersByPolicy } from '@claude-code/mcp-runtime/config.js'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
