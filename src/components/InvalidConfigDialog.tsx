@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Dialog, wrappedRender as render, Text } from '@anthropic/ink'
-import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js'
+import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
 import { AppStateProvider } from '../state/AppState.js'
 import type { ConfigParseError } from '../utils/errors.js'
 import { getBaseRenderOptions } from '../utils/renderOptions.js'

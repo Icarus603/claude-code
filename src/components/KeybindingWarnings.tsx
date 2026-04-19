@@ -4,7 +4,7 @@ import {
   getCachedKeybindingWarnings,
   getKeybindingsPath,
   isKeybindingCustomizationEnabled,
-} from '../keybindings/loadUserBindings.js'
+} from '@claude-code/repl/keybindings/loadUserBindings.js'
 
 /**
  * Displays keybinding validation warnings in the UI.

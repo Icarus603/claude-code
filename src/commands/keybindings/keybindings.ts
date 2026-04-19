@@ -3,8 +3,8 @@ import { dirname } from 'path'
 import {
   getKeybindingsPath,
   isKeybindingCustomizationEnabled,
-} from '../../keybindings/loadUserBindings.js'
-import { generateKeybindingsTemplate } from '../../keybindings/template.js'
+} from '@claude-code/repl/keybindings/loadUserBindings.js'
+import { generateKeybindingsTemplate } from '@claude-code/repl/keybindings/template.js'
 import { getErrnoCode } from '../../utils/errors.js'
 import { editFileInEditor } from '../../utils/promptEditor.js'
 

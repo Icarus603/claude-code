@@ -1,5 +1,5 @@
 import { normalizeLanguageForSTT } from '@claude-code/voice/hooks/useVoice.js'
-import { getShortcutDisplay } from '../../keybindings/shortcutFormat.js'
+import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { LocalCommandCall } from '../../types/command.js'
 import { isAnthropicAuthEnabled } from '../../utils/auth.js'

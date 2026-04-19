@@ -9,7 +9,7 @@ import { cwd } from 'process'
 import React from 'react'
 import { MCPServerDesktopImportDialog } from 'src/components/MCPServerDesktopImportDialog.js'
 import { wrappedRender as render } from '@anthropic/ink'
-import { KeybindingSetup } from 'src/keybindings/KeybindingProviderSetup.js'
+import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

@@ -1,5 +1,5 @@
 import type { Command } from '../../commands.js'
-import { isKeybindingCustomizationEnabled } from '../../keybindings/loadUserBindings.js'
+import { isKeybindingCustomizationEnabled } from '@claude-code/repl/keybindings/loadUserBindings.js'
 
 const keybindings = {
   name: 'keybindings',

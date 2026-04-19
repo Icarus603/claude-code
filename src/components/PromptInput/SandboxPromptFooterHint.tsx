@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import { SandboxManager } from '../../utils/sandbox/sandbox-adapter.js'
 
 export function SandboxPromptFooterHint(): ReactNode {

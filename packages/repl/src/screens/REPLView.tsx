@@ -148,9 +148,9 @@ import { prependToShellHistoryCache } from 'src/utils/suggestions/shellHistoryCo
 import { useApiKeyVerification } from 'src/hooks/useApiKeyVerification.js';
 import { GlobalKeybindingHandlers } from 'src/hooks/useGlobalKeybindings.js';
 import { CommandKeybindingHandlers } from 'src/hooks/useCommandKeybindings.js';
-import { KeybindingSetup } from 'src/keybindings/KeybindingProviderSetup.js';
-import { useShortcutDisplay } from 'src/keybindings/useShortcutDisplay.js';
-import { getShortcutDisplay } from 'src/keybindings/shortcutFormat.js';
+import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js';
+import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js';
+import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js';
 import { CancelRequestHandler } from 'src/hooks/useCancelRequest.js';
 import { useBackgroundTaskNavigation } from 'src/hooks/useBackgroundTaskNavigation.js';
 import { useSwarmInitialization } from 'src/hooks/useSwarmInitialization.js';

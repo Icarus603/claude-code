@@ -3,7 +3,7 @@
  * Generates a well-documented template file for ~/.claude/keybindings.json
  */
 
-import { jsonStringify } from '../utils/slowOperations.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { DEFAULT_BINDINGS } from './defaultBindings.js'
 import {
   NON_REBINDABLE,

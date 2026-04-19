@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useNotifications } from '../context/notifications.js'
-import { getShortcutDisplay } from '../keybindings/shortcutFormat.js'
+import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import { hasImageInClipboard } from '../utils/imagePaste.js'
 
 const NOTIFICATION_KEY = 'clipboard-image-hint'

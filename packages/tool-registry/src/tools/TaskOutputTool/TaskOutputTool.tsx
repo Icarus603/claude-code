@@ -4,7 +4,7 @@ import { FallbackToolUseErrorMessage } from 'src/components/FallbackToolUseError
 import { FallbackToolUseRejectedMessage } from 'src/components/FallbackToolUseRejectedMessage.js'
 import { MessageResponse } from 'src/components/MessageResponse.js'
 import { Box, Text } from '@anthropic/ink'
-import { useShortcutDisplay } from 'src/keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import type { TaskType } from 'src/Task.js'
 import type { Tool } from 'src/Tool.js'
 import { buildTool, type ToolDef } from 'src/Tool.js'
