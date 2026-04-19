@@ -244,12 +244,12 @@ import {
   logAPIQuery,
   logAPISuccessAndDuration,
   type NonNullableUsage,
-} from 'src/services/api/logging.js'
+} from '@claude-code/provider/logging.js'
 import {
   CACHE_TTL_1HOUR_MS,
   checkResponseForCacheBreak,
   recordPromptState,
-} from 'src/services/api/promptCacheBreakDetection.js'
+} from '@claude-code/provider/promptCacheBreakDetection.js'
 import {
   CannotRetryError,
   FallbackTriggeredError,

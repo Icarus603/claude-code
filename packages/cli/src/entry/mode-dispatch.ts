@@ -83,8 +83,8 @@ import {
   downloadSessionFiles,
   type FilesApiConfig,
   parseFileSpecs,
-} from '../../../../src/services/api/filesApi.js'
-import { prefetchPassesEligibility } from '../../../../src/services/api/referral.js'
+} from '@claude-code/provider/filesApi.js'
+import { prefetchPassesEligibility } from '@claude-code/provider/referral.js'
 import {
   isPolicyAllowed,
   loadPolicyLimits,

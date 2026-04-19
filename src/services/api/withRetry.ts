@@ -43,7 +43,7 @@ import {
   isMockRateLimitError,
 } from '@claude-code/provider/rateLimitMocking.js'
 import { REPEATED_529_ERROR_MESSAGE } from './errors.js'
-import { extractConnectionErrorDetails } from './errorUtils.js'
+import { extractConnectionErrorDetails } from '@claude-code/provider/errorUtils.js'
 
 const abortError = () => new APIUserAbortError()
 

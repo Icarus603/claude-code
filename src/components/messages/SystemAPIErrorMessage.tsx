@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { formatAPIError } from 'src/services/api/errorUtils.js'
+import { formatAPIError } from '@claude-code/provider/errorUtils.js'
 import type { SystemAPIErrorMessage } from 'src/types/message.js'
 import { useInterval } from 'usehooks-ts'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'

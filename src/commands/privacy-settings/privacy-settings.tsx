@@ -12,7 +12,7 @@ import {
   getGroveNoticeConfig,
   getGroveSettings,
   isQualifiedForGrove,
-} from '../../services/api/grove.js'
+} from '@claude-code/provider/grove.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 
 const FALLBACK_MESSAGE =

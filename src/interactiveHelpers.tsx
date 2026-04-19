@@ -27,7 +27,7 @@ import {
   initializeGrowthBook,
   resetGrowthBook,
 } from '@claude-code/config/feature-flags'
-import { isQualifiedForGrove } from './services/api/grove.js'
+import { isQualifiedForGrove } from '@claude-code/provider/grove.js'
 import { handleMcpjsonServerApprovals } from './services/mcpServerApproval.js'
 import { AppStateProvider } from './state/AppState.js'
 import { onChangeAppState } from './state/onChangeAppState.js'

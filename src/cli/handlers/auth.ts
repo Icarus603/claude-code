@@ -8,7 +8,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getSSLErrorHint } from '../../services/api/errorUtils.js'
+import { getSSLErrorHint } from '@claude-code/provider/errorUtils.js'
 import { fetchAndStoreClaudeCodeFirstTokenDate } from '@claude-code/provider/firstTokenDate.js'
 import {
   createAndStoreApiKey,

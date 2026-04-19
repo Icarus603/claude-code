@@ -12,7 +12,7 @@ import {
   fetchReferralRedemptions,
   formatCreditAmount,
   getCachedOrFetchPassesEligibility,
-} from '../../services/api/referral.js'
+} from '@claude-code/provider/referral.js'
 import type {
   ReferralRedemptionsResponse,
   ReferrerRewardInfo,

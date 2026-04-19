@@ -105,7 +105,7 @@ import {
   PROMPT_TOO_LONG_ERROR_MESSAGE,
   startsWithApiErrorPrefix,
 } from 'src/services/api/errors.js'
-import { notifyCompaction } from 'src/services/api/promptCacheBreakDetection.js'
+import { notifyCompaction } from '@claude-code/provider/promptCacheBreakDetection.js'
 import { getRetryDelay } from 'src/services/api/withRetry.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
 import {

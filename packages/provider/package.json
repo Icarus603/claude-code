@@ -30,6 +30,14 @@
     "./adminRequests.js": "./src/adminRequests.ts",
     "./overageCreditGrant.js": "./src/overageCreditGrant.ts",
     "./metricsOptOut.js": "./src/metricsOptOut.ts",
-    "./bootstrap.js": "./src/bootstrap.ts"
+    "./bootstrap.js": "./src/bootstrap.ts",
+    "./sessionIngress.js": "./src/sessionIngress.ts",
+    "./promptCacheBreakDetection.js": "./src/promptCacheBreakDetection.ts",
+    "./filesApi.js": "./src/filesApi.ts",
+    "./logging.js": "./src/logging.ts",
+    "./grove.js": "./src/grove.ts",
+    "./errorUtils.js": "./src/errorUtils.ts",
+    "./referral.js": "./src/referral.ts",
+    "./dumpPrompts.js": "./src/dumpPrompts.ts"
   }
 }

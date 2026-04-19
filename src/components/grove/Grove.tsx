@@ -12,7 +12,7 @@ import {
   getGroveSettings,
   markGroveNoticeViewed,
   updateGroveSettings,
-} from '../../services/api/grove.js'
+} from '@claude-code/provider/grove.js'
 import { Select } from '../CustomSelect/index.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 

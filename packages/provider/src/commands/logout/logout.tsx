@@ -5,7 +5,7 @@ import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-fl
 import {
   getGroveNoticeConfig,
   getGroveSettings,
-} from 'src/services/api/grove.js'
+} from '@claude-code/provider/grove.js'
 import { clearPolicyLimitsCache } from '@claude-code/provider/policyLimits/index.js'
 // flushTelemetry is loaded lazily to avoid pulling in ~1.1MB of OpenTelemetry at startup
 import { clearRemoteManagedSettingsCache } from 'src/services/remoteManagedSettings/index.js'

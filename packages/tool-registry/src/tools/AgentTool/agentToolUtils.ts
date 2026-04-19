@@ -12,7 +12,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { clearDumpState } from 'src/services/api/dumpPrompts.js'
+import { clearDumpState } from '@claude-code/provider/dumpPrompts.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
 import type {
   Tool,

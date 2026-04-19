@@ -14,8 +14,8 @@ import { getSystemContext, getUserContext } from 'src/context.js'
 import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
 import { query } from 'src/query.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { getDumpPromptsPath } from 'src/services/api/dumpPrompts.js'
-import { cleanupAgentTracking } from 'src/services/api/promptCacheBreakDetection.js'
+import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
+import { cleanupAgentTracking } from '@claude-code/provider/promptCacheBreakDetection.js'
 import {
   connectToServer,
   fetchToolsForClient,
