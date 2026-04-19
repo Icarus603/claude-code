@@ -24,6 +24,8 @@
     "./commands/index.js": "./src/commands/index.ts",
     "./commands/permissions.js": "./src/commands/permissions.tsx",
     "./toolPermission/*.js": "./src/toolPermission/*.ts",
-    "./toolPermission/handlers/*.js": "./src/toolPermission/handlers/*.ts"
+    "./toolPermission/handlers/*.js": "./src/toolPermission/handlers/*.ts",
+    "./autoModeState.js": "./src/autoModeState.ts",
+    "./dangerousPatterns.js": "./src/dangerousPatterns.ts"
   }
 }

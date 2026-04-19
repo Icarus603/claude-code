@@ -146,7 +146,7 @@ import {
   isOpus1mMergeEnabled,
   modelDisplayString,
 } from '../../utils/model/model.js'
-import { setAutoModeActive } from '../../utils/permissions/autoModeState.js'
+import { setAutoModeActive } from '@claude-code/permission/autoModeState.js'
 import {
   cyclePermissionMode,
   getNextPermissionMode,
