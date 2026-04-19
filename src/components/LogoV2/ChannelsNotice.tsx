@@ -12,7 +12,7 @@ import {
   getHasDevChannels,
 } from '../../bootstrap/state.js'
 import { Box, Text } from '@anthropic/ink'
-import { isChannelsEnabled } from '../../services/mcp/channelAllowlist.js'
+import { isChannelsEnabled } from '@claude-code/mcp-runtime/channelAllowlist.js'
 import { getEffectiveChannelAllowlist } from '../../services/mcp/channelNotification.js'
 import { getMcpConfigsByScope } from '../../services/mcp/config.js'
 import {

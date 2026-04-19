@@ -128,7 +128,7 @@ import {
 } from '@claude-code/tool-registry/tools/AgentTool/prompt.js'
 import { filterDeniedAgents } from '@claude-code/permission/permissions'
 import { getSubscriptionType } from './auth.js'
-import { mcpInfoFromString } from '../services/mcp/mcpStringUtils.js'
+import { mcpInfoFromString } from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import {
   matchingRuleForInput,
   pathInAllowedWorkingPath,

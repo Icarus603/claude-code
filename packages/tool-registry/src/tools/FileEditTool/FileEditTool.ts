@@ -4,7 +4,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import { diagnosticTracker } from 'src/services/diagnosticTracking.js'
 import { clearDeliveredDiagnosticsForFile } from '@claude-code/ide/lsp/LSPDiagnosticRegistry.js'
 import { getLspServerManager } from '@claude-code/ide/lsp/manager.js'
-import { notifyVscodeFileUpdated } from 'src/services/mcp/vscodeSdkMcp.js'
+import { notifyVscodeFileUpdated } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
 import { checkTeamMemSecrets } from 'src/services/teamMemorySync/teamMemSecretGuard.js'
 import {
   activateConditionalSkillsForPaths,

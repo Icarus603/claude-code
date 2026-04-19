@@ -103,8 +103,8 @@ import {
   runElicitationHooks,
   runElicitationResultHooks,
 } from './elicitationHandler.js'
-import { buildMcpToolName } from './mcpStringUtils.js'
-import { normalizeNameForMCP } from './normalization.js'
+import { buildMcpToolName } from '@claude-code/mcp-runtime/mcpStringUtils.js'
+import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'
 import {
   clearMcpAuthCache,
   getMcpAuthCache,

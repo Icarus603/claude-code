@@ -14,8 +14,8 @@ import {
 } from '../../utils/settings/settings.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import { getEnterpriseMcpFilePath, getMcpConfigByName } from './config.js'
-import { mcpInfoFromString } from './mcpStringUtils.js'
-import { normalizeNameForMCP } from './normalization.js'
+import { mcpInfoFromString } from '@claude-code/mcp-runtime/mcpStringUtils.js'
+import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'
 import {
   type ConfigScope,
   ConfigScopeSchema,

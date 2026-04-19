@@ -3,7 +3,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   extractMcpToolDisplayName,
   getMcpDisplayName,
-} from '../../services/mcp/mcpStringUtils.js'
+} from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import type { Tool } from '../../Tool.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Dialog } from '@anthropic/ink'
