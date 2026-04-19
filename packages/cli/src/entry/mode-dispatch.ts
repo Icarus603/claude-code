@@ -350,8 +350,8 @@ import {
 } from '../../../../src/bootstrap/state.js'
 import {
   type AppState,
-  IDLE_SPECULATION_STATE,
-} from '../../../../src/state/AppStateStore.js'
+  getIdleSpeculationState,
+} from '../state-shim.js'
 import { asSessionId } from '../../../../src/types/ids.js'
 import { filterAllowedSdkBetas } from '../../../../src/utils/betas.js'
 import { isInBundledMode, isRunningWithBun } from '../../../../src/utils/bundledMode.js'
@@ -3094,7 +3094,7 @@ export async function runModeDispatch(
 					acceptedAt: 0,
 					generationRequestId: null,
 				},
-				speculation: IDLE_SPECULATION_STATE,
+				speculation: getIdleSpeculationState(),
 				speculationSessionTimeSavedMs: 0,
 				skillImprovement: {
 					suggestion: null,

@@ -29,6 +29,17 @@ export type ToolRegistryEvents<TTool extends ToolLike = ToolLike> = {
   onUnregister?: (name: string) => void
 }
 
+/**
+ * Structural stand-in for app-level AppState, used by tools that need to
+ * type setAppState callbacks or inspect permission context without
+ * importing src/state/AppState (V7 §7.2).
+ */
+export type AppStateLike = {
+  toolPermissionContext?: ToolPermissionContextLike
+  mainLoopModel?: string
+  [key: string]: unknown
+}
+
 export type ToolRegistryHostBindings<
   TTool extends ToolLike = ToolLike,
   TPermissionContext extends ToolPermissionContextLike = ToolPermissionContextLike,

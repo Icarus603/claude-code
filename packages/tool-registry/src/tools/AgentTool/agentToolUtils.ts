@@ -13,7 +13,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { clearDumpState } from 'src/services/api/dumpPrompts.js'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppStateLike as AppState } from '../../contracts.js'
 import type {
   Tool,
   ToolPermissionContext,

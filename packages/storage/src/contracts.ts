@@ -27,3 +27,12 @@ export type ArtifactStore = {
   writeArtifact(path: string, data: StorageWriteData, signal?: AbortSignal): Promise<void>
   readArtifact(path: string, signal?: AbortSignal): Promise<StorageReadResult>
 }
+
+/**
+ * Structural stand-in for app-level AppState used by session restore
+ * helpers to type state shape without importing src/state/AppState
+ * (V7 §7.2).
+ */
+export type AppStateLike = {
+  [key: string]: unknown
+}

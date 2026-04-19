@@ -7,7 +7,7 @@ import { ShellProgressMessage } from 'src/components/shell/ShellProgressMessage.
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from 'src/keybindings/useShortcutDisplay.js'
-import { useAppStateStore, useSetAppState } from 'src/state/AppState.js'
+import { useAppStateStore, useSetAppState } from '../../hooks/appState.js'
 import type { Tool } from 'src/Tool.js'
 import { backgroundAll } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 import type { ProgressMessage } from 'src/types/message.js'

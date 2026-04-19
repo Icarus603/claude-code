@@ -17,3 +17,12 @@ export type CliHostBindings = {
     options: StructuredIOOptions,
   ) => unknown
 }
+
+/**
+ * Structural stand-in for app-level AppState used by cli handlers that
+ * need to type state interactions without importing src/state/AppState
+ * (V7 §7.2).
+ */
+export type AppStateLike = {
+  [key: string]: unknown
+}
