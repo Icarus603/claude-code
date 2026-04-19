@@ -60,7 +60,7 @@ export async function setupTokenHandler(root: Root): Promise<void> {
 
 // DoctorWithPlugins wrapper + doctor handler
 const DoctorLazy = React.lazy(() =>
-  import('src/screens/Doctor.js').then(m => ({ default: m.Doctor })),
+  import('@claude-code/repl/screens/Doctor.js').then(m => ({ default: m.Doctor })),
 )
 
 function DoctorWithPlugins({

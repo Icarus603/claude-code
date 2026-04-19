@@ -9,8 +9,8 @@ import {
   getBudgetContinuationCount,
   getTotalInputTokens,
 } from '@claude-code/app-host/bootstrap/state.js';
-import { parseTokenBudget } from '../utils/tokenBudget.js';
-import { count } from '../utils/array.js';
+import { parseTokenBudget } from 'src/utils/tokenBudget.js';
+import { count } from 'src/utils/array.js';
 import { dirname, join } from 'path';
 import { tmpdir } from 'os';
 import figures from 'figures';
@@ -19,13 +19,13 @@ import { useInput } from '@anthropic/ink'
 import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '@anthropic/ink'
 import { useSearchHighlight } from '@anthropic/ink'
-import type { JumpHandle } from '../components/VirtualMessageList.js'
-import { renderMessagesToPlainText } from '../utils/exportRenderer.js'
-import { openFileInExternalEditor } from '../utils/editor.js'
+import type { JumpHandle } from 'src/components/VirtualMessageList.js'
+import { renderMessagesToPlainText } from 'src/utils/exportRenderer.js'
+import { openFileInExternalEditor } from 'src/utils/editor.js'
 import { writeFile } from 'fs/promises'
 import { type TabStatusKind, Box, Text, useStdin, useTheme, useTerminalFocus, useTerminalTitle, useTabStatus } from '@anthropic/ink'
-import { CostThresholdDialog } from '../components/CostThresholdDialog.js'
-import { IdleReturnDialog } from '../components/IdleReturnDialog.js'
+import { CostThresholdDialog } from 'src/components/CostThresholdDialog.js'
+import { IdleReturnDialog } from 'src/components/IdleReturnDialog.js'
 import * as React from 'react'
 import {
   useEffect,
@@ -37,18 +37,18 @@ import {
   useLayoutEffect,
   type RefObject,
 } from 'react'
-import { useNotifications } from '../context/notifications.js'
-import { sendNotification } from '../services/notifier.js'
+import { useNotifications } from 'src/context/notifications.js'
+import { sendNotification } from 'src/services/notifier.js'
 import {
   startPreventSleep,
   stopPreventSleep,
-} from '../services/preventSleep.js'
+} from 'src/services/preventSleep.js'
 import { useTerminalNotification, hasCursorUpViewportYankBug } from '@anthropic/ink'
 import {
   createFileStateCacheWithSizeLimit,
   mergeFileStateCaches,
   READ_FILE_STATE_CACHE_SIZE,
-} from '../utils/fileStateCache.js';
+} from 'src/utils/fileStateCache.js';
 import {
   updateLastInteractionTime,
   getLastInteractionTime,
@@ -67,12 +67,12 @@ import {
   getTurnClassifierCount,
   resetTurnClassifierDuration,
 } from '@claude-code/app-host/bootstrap/state.js';
-import { asSessionId, asAgentId } from '../types/ids.js';
-import { logForDebugging } from '../utils/debug.js';
-import { QueryGuard } from '../utils/QueryGuard.js';
-import { isEnvTruthy } from '../utils/envUtils.js';
-import { formatTokens, truncateToWidth } from '../utils/format.js';
-import { consumeEarlyInput } from '../utils/earlyInput.js';
+import { asSessionId, asAgentId } from 'src/types/ids.js';
+import { logForDebugging } from 'src/utils/debug.js';
+import { QueryGuard } from 'src/utils/QueryGuard.js';
+import { isEnvTruthy } from 'src/utils/envUtils.js';
+import { formatTokens, truncateToWidth } from 'src/utils/format.js';
+import { consumeEarlyInput } from 'src/utils/earlyInput.js';
 
 import { setMemberActive } from '@claude-code/swarm';
 import {
@@ -81,8 +81,8 @@ import {
   sendSandboxPermissionRequestViaMailbox,
   sendSandboxPermissionResponseViaMailbox,
 } from '@claude-code/swarm';
-import { registerSandboxPermissionCallback } from '../hooks/useSwarmPermissionPoller.js';
-import { getTeamName, getAgentName } from '../utils/teammate.js';
+import { registerSandboxPermissionCallback } from 'src/hooks/useSwarmPermissionPoller.js';
+import { getTeamName, getAgentName } from 'src/utils/teammate.js';
 import { WorkerPendingPermission } from '@claude-code/permission/components/WorkerPendingPermission.js';
 import {
   injectUserMessageToTeammate,
@@ -93,7 +93,7 @@ import {
   queuePendingMessage,
   appendMessageToLocalAgent,
   type LocalAgentTaskState,
-} from '../tasks/LocalAgentTask/LocalAgentTask.js';
+} from 'src/tasks/LocalAgentTask/LocalAgentTask.js';
 import {
   registerLeaderToolUseConfirmQueue,
   unregisterLeaderToolUseConfirmQueue,
@@ -101,63 +101,63 @@ import {
   unregisterLeaderSetToolPermissionContext,
 } from '@claude-code/swarm';
 import { endInteractionSpan } from '@claude-code/local-observability/spans';
-import { useLogMessages } from '../hooks/useLogMessages.js';
-import { useReplBridge } from '../hooks/useReplBridge.js';
+import { useLogMessages } from 'src/hooks/useLogMessages.js';
+import { useReplBridge } from 'src/hooks/useReplBridge.js';
 import {
   type Command,
   type CommandResultDisplay,
   type ResumeEntrypoint,
   getCommandName,
   isCommandEnabled,
-} from '../commands.js';
-import type { PromptInputMode, QueuedCommand, VimMode } from '../types/textInputTypes.js';
+} from 'src/commands.js';
+import type { PromptInputMode, QueuedCommand, VimMode } from 'src/types/textInputTypes.js';
 import {
   MessageSelector,
   selectableUserMessagesFilter,
   messagesAfterAreOnlySynthetic,
-} from '../components/MessageSelector.js';
+} from 'src/components/MessageSelector.js';
 import { PermissionRequest, type ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js';
-import { ElicitationDialog } from '../components/mcp/ElicitationDialog.js';
-import { PromptDialog } from '../components/hooks/PromptDialog.js';
-import type { PromptRequest, PromptResponse } from '../types/hooks.js';
-import PromptInput from '../components/PromptInput/PromptInput.js';
-import { PromptInputQueuedCommands } from '../components/PromptInput/PromptInputQueuedCommands.js';
-import { useRemoteSession } from '../hooks/useRemoteSession.js';
-import { useDirectConnect } from '../hooks/useDirectConnect.js';
+import { ElicitationDialog } from 'src/components/mcp/ElicitationDialog.js';
+import { PromptDialog } from 'src/components/hooks/PromptDialog.js';
+import type { PromptRequest, PromptResponse } from 'src/types/hooks.js';
+import PromptInput from 'src/components/PromptInput/PromptInput.js';
+import { PromptInputQueuedCommands } from 'src/components/PromptInput/PromptInputQueuedCommands.js';
+import { useRemoteSession } from 'src/hooks/useRemoteSession.js';
+import { useDirectConnect } from 'src/hooks/useDirectConnect.js';
 import type { DirectConnectConfig } from '@claude-code/server/directConnectManager.js';
-import { useSSHSession } from '../hooks/useSSHSession.js';
-import { useAssistantHistory } from '../hooks/useAssistantHistory.js';
-import type { SSHSession } from '../ssh/createSSHSession.js';
-import { SkillImprovementSurvey } from '../components/SkillImprovementSurvey.js';
-import { useSkillImprovementSurvey } from '../hooks/useSkillImprovementSurvey.js';
-import { useMoreRight } from '../moreright/useMoreRight.js';
-import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '../components/Spinner.js';
-import { getSystemPrompt } from '../constants/prompts.js';
-import { buildEffectiveSystemPrompt } from '../utils/systemPrompt.js';
+import { useSSHSession } from 'src/hooks/useSSHSession.js';
+import { useAssistantHistory } from 'src/hooks/useAssistantHistory.js';
+import type { SSHSession } from 'src/ssh/createSSHSession.js';
+import { SkillImprovementSurvey } from 'src/components/SkillImprovementSurvey.js';
+import { useSkillImprovementSurvey } from 'src/hooks/useSkillImprovementSurvey.js';
+import { useMoreRight } from 'src/moreright/useMoreRight.js';
+import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from 'src/components/Spinner.js';
+import { getSystemPrompt } from 'src/constants/prompts.js';
+import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js';
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
-import { getMemoryFiles } from '../utils/claudemd.js';
-import { startBackgroundHousekeeping } from '../utils/backgroundHousekeeping.js';
-import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from '../cost-tracker.js';
-import { useCostSummary } from '../costHook.js';
-import { useFpsMetrics } from '../context/fpsMetrics.js';
-import { useAfterFirstRender } from '../hooks/useAfterFirstRender.js';
-import { useDeferredHookMessages } from '../hooks/useDeferredHookMessages.js';
-import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from '../history.js';
-import { prependModeCharacterToInput } from '../components/PromptInput/inputModes.js';
-import { prependToShellHistoryCache } from '../utils/suggestions/shellHistoryCompletion.js';
-import { useApiKeyVerification } from '../hooks/useApiKeyVerification.js';
-import { GlobalKeybindingHandlers } from '../hooks/useGlobalKeybindings.js';
-import { CommandKeybindingHandlers } from '../hooks/useCommandKeybindings.js';
-import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js';
-import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js';
-import { getShortcutDisplay } from '../keybindings/shortcutFormat.js';
-import { CancelRequestHandler } from '../hooks/useCancelRequest.js';
-import { useBackgroundTaskNavigation } from '../hooks/useBackgroundTaskNavigation.js';
-import { useSwarmInitialization } from '../hooks/useSwarmInitialization.js';
-import { useTeammateViewAutoExit } from '../hooks/useTeammateViewAutoExit.js';
-import { errorMessage } from '../utils/errors.js';
-import { isHumanTurn } from '../utils/messagePredicates.js';
-import { logError } from '../utils/log.js';
+import { getMemoryFiles } from 'src/utils/claudemd.js';
+import { startBackgroundHousekeeping } from 'src/utils/backgroundHousekeeping.js';
+import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from 'src/cost-tracker.js';
+import { useCostSummary } from 'src/costHook.js';
+import { useFpsMetrics } from 'src/context/fpsMetrics.js';
+import { useAfterFirstRender } from 'src/hooks/useAfterFirstRender.js';
+import { useDeferredHookMessages } from 'src/hooks/useDeferredHookMessages.js';
+import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from 'src/history.js';
+import { prependModeCharacterToInput } from 'src/components/PromptInput/inputModes.js';
+import { prependToShellHistoryCache } from 'src/utils/suggestions/shellHistoryCompletion.js';
+import { useApiKeyVerification } from 'src/hooks/useApiKeyVerification.js';
+import { GlobalKeybindingHandlers } from 'src/hooks/useGlobalKeybindings.js';
+import { CommandKeybindingHandlers } from 'src/hooks/useCommandKeybindings.js';
+import { KeybindingSetup } from 'src/keybindings/KeybindingProviderSetup.js';
+import { useShortcutDisplay } from 'src/keybindings/useShortcutDisplay.js';
+import { getShortcutDisplay } from 'src/keybindings/shortcutFormat.js';
+import { CancelRequestHandler } from 'src/hooks/useCancelRequest.js';
+import { useBackgroundTaskNavigation } from 'src/hooks/useBackgroundTaskNavigation.js';
+import { useSwarmInitialization } from 'src/hooks/useSwarmInitialization.js';
+import { useTeammateViewAutoExit } from 'src/hooks/useTeammateViewAutoExit.js';
+import { errorMessage } from 'src/utils/errors.js';
+import { isHumanTurn } from 'src/utils/messagePredicates.js';
+import { logError } from 'src/utils/log.js';
 // Dead code elimination: conditional imports
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const useVoiceIntegration: typeof import('@claude-code/voice/hooks/useVoiceIntegration.js').useVoiceIntegration = feature('VOICE_MODE')
@@ -175,26 +175,26 @@ const VoiceKeybindingHandler: typeof import('@claude-code/voice/hooks/useVoiceIn
 // Frustration detection is ant-only (dogfooding). Conditional require so external
 // builds eliminate the module entirely (including its two O(n) useMemos that run
 // on every messages change, plus the GrowthBook fetch).
-const useFrustrationDetection: typeof import('../components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection =
+const useFrustrationDetection: typeof import('src/components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection =
   process.env.USER_TYPE === 'ant'
-    ? require('../components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection
+    ? require('src/components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection
     : () => ({ state: 'closed', handleTranscriptSelect: () => {} });
 // Ant-only org warning. Conditional require so the org UUID list is
 // eliminated from external builds (one UUID is on excluded-strings).
-const useAntOrgWarningNotification: typeof import('../hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification =
+const useAntOrgWarningNotification: typeof import('src/hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification =
   process.env.USER_TYPE === 'ant'
-    ? require('../hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification
+    ? require('src/hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification
     : () => {};
 // Dead code elimination: conditional import for coordinator mode
 const getCoordinatorUserContext: (
   mcpClients: ReadonlyArray<{ name: string }>,
   scratchpadDir?: string,
 ) => { [k: string]: string } = feature('COORDINATOR_MODE')
-  ? require('../coordinator/coordinatorMode.js').getCoordinatorUserContext
+  ? require('src/coordinator/coordinatorMode.js').getCoordinatorUserContext
   : () => ({});
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-import useCanUseTool from '../hooks/useCanUseTool.js';
-import type { ToolPermissionContext, Tool } from '../Tool.js';
+import useCanUseTool from 'src/hooks/useCanUseTool.js';
+import type { ToolPermissionContext, Tool } from 'src/Tool.js';
 import {
   applyPermissionUpdate,
   applyPermissionUpdates,
@@ -208,7 +208,7 @@ import { SLEEP_TOOL_NAME } from '@claude-code/tool-registry/tools/SleepTool/prom
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js';
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js';
 import { getGlobalConfig, saveGlobalConfig, getGlobalConfigWriteCount } from '@claude-code/config';
-import { hasConsoleBillingAccess } from '../utils/billing.js';
+import { hasConsoleBillingAccess } from 'src/utils/billing.js';
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -230,52 +230,52 @@ import {
   createSystemMessage,
   createCommandInputMessage,
   formatCommandInputTags,
-} from '../utils/messages.js';
-import { generateSessionTitle } from '../utils/sessionTitle.js';
-import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from '../constants/xml.js';
-import { escapeXml } from '../utils/xml.js';
-import type { ThinkingConfig } from '../utils/thinking.js';
-import { gracefulShutdownSync } from '../utils/gracefulShutdown.js';
-import { handlePromptSubmit, type PromptInputHelpers } from '../utils/handlePromptSubmit.js';
-import { useQueueProcessor } from '../hooks/useQueueProcessor.js';
-import { useMailboxBridge } from '../hooks/useMailboxBridge.js';
-import { queryCheckpoint, logQueryProfileReport } from '../utils/queryProfiler.js';
+} from 'src/utils/messages.js';
+import { generateSessionTitle } from 'src/utils/sessionTitle.js';
+import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from 'src/constants/xml.js';
+import { escapeXml } from 'src/utils/xml.js';
+import type { ThinkingConfig } from 'src/utils/thinking.js';
+import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js';
+import { handlePromptSubmit, type PromptInputHelpers } from 'src/utils/handlePromptSubmit.js';
+import { useQueueProcessor } from 'src/hooks/useQueueProcessor.js';
+import { useMailboxBridge } from 'src/hooks/useMailboxBridge.js';
+import { queryCheckpoint, logQueryProfileReport } from 'src/utils/queryProfiler.js';
 import type {
   Message as MessageType,
   UserMessage,
   ProgressMessage,
   HookResultMessage,
   PartialCompactDirection,
-} from '../types/message.js';
-import { query } from '../query.js';
-import { mergeClients } from '../hooks/useMergedClients.js';
-import { getQuerySourceForREPL } from '../utils/promptCategory.js';
-import { mergeAndFilterTools } from '../utils/toolPool.js';
-import { useSkillsChange } from '../hooks/useSkillsChange.js';
-import { Messages } from '../components/Messages.js';
-import { TaskListV2 } from '../components/TaskListV2.js';
-import { TeammateViewHeader } from '../components/TeammateViewHeader.js';
-import { useTasksV2WithCollapseEffect } from '../hooks/useTasksV2.js';
-import { maybeMarkProjectOnboardingComplete } from '../projectOnboardingState.js';
+} from 'src/types/message.js';
+import { query } from 'src/query.js';
+import { mergeClients } from 'src/hooks/useMergedClients.js';
+import { getQuerySourceForREPL } from 'src/utils/promptCategory.js';
+import { mergeAndFilterTools } from 'src/utils/toolPool.js';
+import { useSkillsChange } from 'src/hooks/useSkillsChange.js';
+import { Messages } from 'src/components/Messages.js';
+import { TaskListV2 } from 'src/components/TaskListV2.js';
+import { TeammateViewHeader } from 'src/components/TeammateViewHeader.js';
+import { useTasksV2WithCollapseEffect } from 'src/hooks/useTasksV2.js';
+import { maybeMarkProjectOnboardingComplete } from 'src/projectOnboardingState.js';
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js';
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js';
 import { randomUUID, type UUID } from 'crypto';
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js';
-import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from '../utils/hooks.js';
+import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from 'src/utils/hooks.js';
 import { type IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js';
-import { assembleToolPool } from '../tools.js';
+import { assembleToolPool } from 'src/tools.js';
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js';
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js';
 import { resumeAgentBackground } from '@claude-code/tool-registry/tools/AgentTool/resumeAgent.js';
-import { useMainLoopModel } from '../hooks/useMainLoopModel.js';
-import { useAppState } from '../state/AppState.js';
+import { useMainLoopModel } from 'src/hooks/useMainLoopModel.js';
+import { useAppState } from 'src/state/AppState.js';
 import { useReplActions } from './repl/useReplActions.js';
 import { useReplAppState } from './repl/useReplAppState.js';
 import { useReplRuntimeViews } from './repl/useReplRuntimeViews.js';
 import type { ContentBlockParam, ImageBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs';
-import type { ProcessUserInputContext } from '../utils/processUserInput/processUserInput.js';
+import type { ProcessUserInputContext } from 'src/utils/processUserInput/processUserInput.js';
 import type { PastedContent } from '@claude-code/config';
-import { copyPlanForFork, copyPlanForResume, getPlanSlug, setPlanSlug } from '../utils/plans.js';
+import { copyPlanForFork, copyPlanForResume, getPlanSlug, setPlanSlug } from 'src/utils/plans.js';
 import {
   clearSessionMetadata,
   resetSessionFilePointer,
@@ -288,17 +288,17 @@ import {
   saveWorktreeState,
   getAgentTranscript,
 } from '@claude-code/storage/sessionStorage.js';
-import { deserializeMessages } from '../utils/conversationRecovery.js';
-import { extractReadFilesFromMessages, extractBashToolsFromMessages } from '../utils/queryHelpers.js';
+import { deserializeMessages } from 'src/utils/conversationRecovery.js';
+import { extractReadFilesFromMessages, extractBashToolsFromMessages } from 'src/utils/queryHelpers.js';
 import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js';
 import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js';
 import {
   provisionContentReplacementState,
   reconstructContentReplacementState,
   type ContentReplacementRecord,
-} from '../utils/toolResultStorage.js';
+} from 'src/utils/toolResultStorage.js';
 import { partialCompactConversation } from '@claude-code/agent/compaction/compact.js';
-import type { LogOption } from '../types/logs.js';
+import type { LogOption } from 'src/types/logs.js';
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js';
 import {
   fileHistoryMakeSnapshot,
@@ -309,7 +309,7 @@ import {
   fileHistoryEnabled,
   fileHistoryHasAnyChanges,
 } from '@claude-code/agent/file-history';
-import { type AttributionState, incrementPromptCount } from '../utils/commitAttribution.js';
+import { type AttributionState, incrementPromptCount } from 'src/utils/commitAttribution.js';
 import { recordAttributionSnapshot } from '@claude-code/storage/sessionStorage.js';
 import {
   computeStandaloneAgentContext,
@@ -318,26 +318,26 @@ import {
   restoreWorktreeForResume,
   exitRestoredWorktree,
 } from '@claude-code/storage/sessionRestore.js';
-import { isBgSession, updateSessionName, updateSessionActivity } from '../utils/concurrentSessions.js';
+import { isBgSession, updateSessionName, updateSessionActivity } from 'src/utils/concurrentSessions.js';
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
-import { restoreRemoteAgentTasks } from '../tasks/RemoteAgentTask/RemoteAgentTask.js';
-import { useInboxPoller } from '../hooks/useInboxPoller.js';
+import { restoreRemoteAgentTasks } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js';
+import { useInboxPoller } from 'src/hooks/useInboxPoller.js';
 import { getViewedLocalAgentTask } from './repl/backgrounding.js';
 import { getInteractiveMcpClients } from './repl/integrations.js';
 import { parseImmediateCommandInput } from './repl/submission.js';
 // Dead code elimination: conditional import for loop mode
 /* eslint-disable @typescript-eslint/no-require-imports */
-const proactiveModule = feature('PROACTIVE') || feature('KAIROS') ? require('../proactive/index.js') : null;
+const proactiveModule = feature('PROACTIVE') || feature('KAIROS') ? require('src/proactive/index.js') : null;
 const PROACTIVE_NO_OP_SUBSCRIBE = (_cb: () => void) => () => {};
 const PROACTIVE_FALSE = () => false;
 const SUGGEST_BG_PR_NOOP = (_p: string, _n: string): boolean => false;
 const useProactive =
-  feature('PROACTIVE') || feature('KAIROS') ? require('../proactive/useProactive.js').useProactive : null;
-const useScheduledTasks = feature('AGENT_TRIGGERS') ? require('../hooks/useScheduledTasks.js').useScheduledTasks : null;
+  feature('PROACTIVE') || feature('KAIROS') ? require('src/proactive/useProactive.js').useProactive : null;
+const useScheduledTasks = feature('AGENT_TRIGGERS') ? require('src/hooks/useScheduledTasks.js').useScheduledTasks : null;
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { isAgentSwarmsEnabled } from '../utils/agentSwarmsEnabled.js';
-import { useTaskListWatcher } from '../hooks/useTaskListWatcher.js';
-import type { SandboxAskCallback, NetworkHostPattern } from '../utils/sandbox/sandbox-adapter.js';
+import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js';
+import { useTaskListWatcher } from 'src/hooks/useTaskListWatcher.js';
+import type { SandboxAskCallback, NetworkHostPattern } from 'src/utils/sandbox/sandbox-adapter.js';
 
 import {
   type IDEExtensionInstallationStatus,
@@ -346,8 +346,8 @@ import {
   type IdeType,
 } from '@claude-code/ide/ide.js';
 import { useIDEIntegration } from '@claude-code/ide/hooks/useIDEIntegration.js';
-import exit from '../commands/exit/index.js';
-import { ExitFlow } from '../components/ExitFlow.js';
+import exit from 'src/commands/exit/index.js';
+import { ExitFlow } from 'src/components/ExitFlow.js';
 import { getCurrentWorktreeSession } from '@claude-code/swarm';
 import {
   popAllEditable,
@@ -356,28 +356,28 @@ import {
   getCommandQueue,
   getCommandQueueLength,
   removeByFilter,
-} from '../utils/messageQueueManager.js';
-import { useCommandQueue } from '../hooks/useCommandQueue.js';
-import { SessionBackgroundHint } from '../components/SessionBackgroundHint.js';
-import { startBackgroundSession } from '../tasks/LocalMainSessionTask.js';
-import { useSessionBackgrounding } from '../hooks/useSessionBackgrounding.js';
-import { diagnosticTracker } from '../services/diagnosticTracking.js';
-import { handleSpeculationAccept, type ActiveSpeculationState } from '../services/PromptSuggestion/speculation.js';
-import { IdeOnboardingDialog } from '../components/IdeOnboardingDialog.js';
-import { EffortCallout, shouldShowEffortCallout } from '../components/EffortCallout.js';
-import type { EffortValue } from '../utils/effort.js';
-import { RemoteCallout } from '../components/RemoteCallout.js';
+} from 'src/utils/messageQueueManager.js';
+import { useCommandQueue } from 'src/hooks/useCommandQueue.js';
+import { SessionBackgroundHint } from 'src/components/SessionBackgroundHint.js';
+import { startBackgroundSession } from 'src/tasks/LocalMainSessionTask.js';
+import { useSessionBackgrounding } from 'src/hooks/useSessionBackgrounding.js';
+import { diagnosticTracker } from 'src/services/diagnosticTracking.js';
+import { handleSpeculationAccept, type ActiveSpeculationState } from 'src/services/PromptSuggestion/speculation.js';
+import { IdeOnboardingDialog } from 'src/components/IdeOnboardingDialog.js';
+import { EffortCallout, shouldShowEffortCallout } from 'src/components/EffortCallout.js';
+import type { EffortValue } from 'src/utils/effort.js';
+import { RemoteCallout } from 'src/components/RemoteCallout.js';
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const AntModelSwitchCallout =
-  process.env.USER_TYPE === 'ant' ? require('../components/AntModelSwitchCallout.js').AntModelSwitchCallout : null;
+  process.env.USER_TYPE === 'ant' ? require('src/components/AntModelSwitchCallout.js').AntModelSwitchCallout : null;
 const shouldShowAntModelSwitch =
   process.env.USER_TYPE === 'ant'
-    ? require('../components/AntModelSwitchCallout.js').shouldShowModelSwitchCallout
+    ? require('src/components/AntModelSwitchCallout.js').shouldShowModelSwitchCallout
     : (): boolean => false;
 const UndercoverAutoCallout =
-  process.env.USER_TYPE === 'ant' ? require('../components/UndercoverAutoCallout.js').UndercoverAutoCallout : null;
+  process.env.USER_TYPE === 'ant' ? require('src/components/UndercoverAutoCallout.js').UndercoverAutoCallout : null;
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-import { activityManager } from '../utils/activityManager.js';
+import { activityManager } from 'src/utils/activityManager.js';
 import { createAbortController } from '@claude-code/agent/abortController.js';
 import { MCPConnectionManager } from 'src/services/mcp/MCPConnectionManager.js';
 import { useFeedbackSurvey } from 'src/components/FeedbackSurvey/useFeedbackSurvey.js';
@@ -417,7 +417,7 @@ import {
 import { usePluginInstallationStatus } from 'src/hooks/notifs/usePluginInstallationStatus.js';
 import { usePluginAutoupdateNotification } from 'src/hooks/notifs/usePluginAutoupdateNotification.js';
 import { UserTextMessage } from 'src/components/messages/UserTextMessage.js';
-import { AwsAuthStatusBox } from '../components/AwsAuthStatusBox.js';
+import { AwsAuthStatusBox } from 'src/components/AwsAuthStatusBox.js';
 import { useRateLimitWarningNotification } from 'src/hooks/notifs/useRateLimitWarningNotification.js';
 import { useDeprecationWarningNotification } from 'src/hooks/notifs/useDeprecationWarningNotification.js';
 import { useNpmDeprecationNotification } from 'src/hooks/notifs/useNpmDeprecationNotification.js';
@@ -432,37 +432,37 @@ import {
   getAutoRunIssueReasonText,
   getAutoRunCommand,
   type AutoRunIssueReason,
-} from '../utils/autoRunIssue.js';
-import type { HookProgress } from '../types/hooks.js';
+} from 'src/utils/autoRunIssue.js';
+import type { HookProgress } from 'src/types/hooks.js';
 import { TungstenLiveMonitor } from '@claude-code/tool-registry/tools/TungstenTool/TungstenLiveMonitor.js';
 /* eslint-disable @typescript-eslint/no-require-imports */
 const WebBrowserPanelModule = feature('WEB_BROWSER_TOOL')
   ? (require('@claude-code/tool-registry/tools/WebBrowserTool/WebBrowserPanel.js') as typeof import('@claude-code/tool-registry/tools/WebBrowserTool/WebBrowserPanel.js'))
   : null;
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { IssueFlagBanner } from '../components/PromptInput/IssueFlagBanner.js';
-import { useIssueFlagBanner } from '../hooks/useIssueFlagBanner.js';
-import { DevBar } from '../components/DevBar.js';
-import { UltraplanChoiceDialog } from '../components/ultraplan/UltraplanChoiceDialog.js';
-import { UltraplanLaunchDialog } from '../components/ultraplan/UltraplanLaunchDialog.js';
-import { launchUltraplan } from '../commands/ultraplan.js';
+import { IssueFlagBanner } from 'src/components/PromptInput/IssueFlagBanner.js';
+import { useIssueFlagBanner } from 'src/hooks/useIssueFlagBanner.js';
+import { DevBar } from 'src/components/DevBar.js';
+import { UltraplanChoiceDialog } from 'src/components/ultraplan/UltraplanChoiceDialog.js';
+import { UltraplanLaunchDialog } from 'src/components/ultraplan/UltraplanLaunchDialog.js';
+import { launchUltraplan } from 'src/commands/ultraplan.js';
 import { getFocusedInputDialog } from './repl/dialogs.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
-import { REMOTE_SAFE_COMMANDS } from '../commands.js'
+import { REMOTE_SAFE_COMMANDS } from 'src/commands.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 import {
   FullscreenLayout,
   useUnseenDivider,
   computeUnseenDivider,
-} from '../components/FullscreenLayout.js'
+} from 'src/components/FullscreenLayout.js'
 import {
   isFullscreenEnvEnabled,
   maybeGetTmuxMouseHint,
   isMouseTrackingEnabled,
-} from '../utils/fullscreen.js'
+} from 'src/utils/fullscreen.js'
 import { AlternateScreen } from '@anthropic/ink'
-import { ScrollKeybindingHandler } from '../components/ScrollKeybindingHandler.js'
+import { ScrollKeybindingHandler } from 'src/components/ScrollKeybindingHandler.js'
 import {
   useMessageActions,
   MessageActionsKeybindings,
@@ -470,13 +470,13 @@ import {
   type MessageActionsState,
   type MessageActionsNav,
   type MessageActionCaps,
-} from '../components/messageActions.js'
+} from 'src/components/messageActions.js'
 import { setClipboard } from '@anthropic/ink'
 import type { ScrollBoxHandle } from '@anthropic/ink'
 import {
   createAttachmentMessage,
   getQueuedCommandAttachments,
-} from '../utils/attachments.js'
+} from 'src/utils/attachments.js'
 
 // Stable stub for useAssistantHistory's non-KAIROS branch — avoids a new
 // function identity each render, which would break composedOnScroll's memo.
@@ -1209,9 +1209,9 @@ export function REPL({
     if (process.env.USER_TYPE === 'ant') {
       void (async () => {
         // Wait for repo classification to settle (memoized, no-op if primed).
-        const { isInternalModelRepo } = await import('../utils/commitAttribution.js');
+        const { isInternalModelRepo } = await import('src/utils/commitAttribution.js');
         await isInternalModelRepo();
-        const { shouldShowUndercoverAutoNotice } = await import('../utils/undercover.js');
+        const { shouldShowUndercoverAutoNotice } = await import('src/utils/undercover.js');
         if (shouldShowUndercoverAutoNotice()) {
           setShowUndercoverCallout(true);
         }
@@ -2014,7 +2014,7 @@ export function REPL({
         if (feature('COORDINATOR_MODE')) {
           /* eslint-disable @typescript-eslint/no-require-imports */
           const coordinatorModule =
-            require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js');
+            require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js');
           /* eslint-enable @typescript-eslint/no-require-imports */
           const warning = coordinatorModule.matchSessionMode(log.mode);
           if (warning) {
@@ -2116,7 +2116,7 @@ export function REPL({
         // current originalCwd.
         switchSession(asSessionId(sessionId), log.fullPath ? dirname(log.fullPath) : null);
         // Rename asciicast recording to match the resumed session ID
-        const { renameRecordingForSession } = await import('../utils/asciicast.js');
+        const { renameRecordingForSession } = await import('src/utils/asciicast.js');
         await renameRecordingForSession();
         await resetSessionFilePointer();
 
@@ -2165,7 +2165,7 @@ export function REPL({
           /* eslint-disable @typescript-eslint/no-require-imports */
           const { saveMode } = require('@claude-code/storage/sessionStorage.js');
           const { isCoordinatorMode } =
-            require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js');
+            require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js');
           /* eslint-enable @typescript-eslint/no-require-imports */
           saveMode(isCoordinatorMode() ? 'coordinator' : 'normal');
         }
@@ -3506,7 +3506,7 @@ export function REPL({
         // can access the same plan file after regenerateSessionId()
         const oldPlanSlug = initialMsg.message.planContent ? getPlanSlug() : undefined;
 
-        const { clearConversation } = await import('../commands/clear/conversation.js');
+        const { clearConversation } = await import('src/commands/clear/conversation.js');
         await clearConversation({
           setMessages,
           readFileState: readFileState.current,
@@ -5626,7 +5626,7 @@ export function REPL({
                         });
                       }
                       if (action === 'clear') {
-                        const { clearConversation } = await import('../commands/clear/conversation.js');
+                        const { clearConversation } = await import('src/commands/clear/conversation.js');
                         await clearConversation({
                           setMessages,
                           readFileState: readFileState.current,

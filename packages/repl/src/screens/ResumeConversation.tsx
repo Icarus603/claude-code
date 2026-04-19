@@ -3,10 +3,10 @@ import { dirname } from 'path'
 import React from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { getOriginalCwd, switchSession } from '@claude-code/app-host/bootstrap/state.js'
-import type { Command } from '../commands.js'
-import { LogSelector } from '../components/LogSelector.js'
-import { Spinner } from '../components/Spinner.js'
-import { restoreCostStateForSession } from '../cost-tracker.js'
+import type { Command } from 'src/commands.js'
+import { LogSelector } from 'src/components/LogSelector.js'
+import { Spinner } from 'src/components/Spinner.js'
+import { restoreCostStateForSession } from 'src/cost-tracker.js'
 import { setClipboard } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
@@ -18,21 +18,21 @@ import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime/types.js'
-import { useAppState, useSetAppState } from '../state/AppState.js'
-import type { Tool } from '../Tool.js'
+import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import type { Tool } from 'src/Tool.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { asSessionId } from '../types/ids.js'
-import type { LogOption } from '../types/logs.js'
-import type { Message } from '../types/message.js'
-import { agenticSessionSearch } from '../utils/agenticSessionSearch.js'
-import { renameRecordingForSession } from '../utils/asciicast.js'
-import { updateSessionName } from '../utils/concurrentSessions.js'
-import { loadConversationForResume } from '../utils/conversationRecovery.js'
-import { checkCrossProjectResume } from '../utils/crossProjectResume.js'
-import type { FileHistorySnapshot } from '../utils/fileHistory.js'
-import { logError } from '../utils/log.js'
-import { createSystemMessage } from '../utils/messages.js'
+import { asSessionId } from 'src/types/ids.js'
+import type { LogOption } from 'src/types/logs.js'
+import type { Message } from 'src/types/message.js'
+import { agenticSessionSearch } from 'src/utils/agenticSessionSearch.js'
+import { renameRecordingForSession } from 'src/utils/asciicast.js'
+import { updateSessionName } from 'src/utils/concurrentSessions.js'
+import { loadConversationForResume } from 'src/utils/conversationRecovery.js'
+import { checkCrossProjectResume } from 'src/utils/crossProjectResume.js'
+import type { FileHistorySnapshot } from 'src/utils/fileHistory.js'
+import { logError } from 'src/utils/log.js'
+import { createSystemMessage } from 'src/utils/messages.js'
 import {
   computeStandaloneAgentContext,
   restoreAgentFromSession,
@@ -49,8 +49,8 @@ import {
   restoreSessionMetadata,
   type SessionLogResult,
 } from '@claude-code/storage/sessionStorage.js'
-import type { ThinkingConfig } from '../utils/thinking.js'
-import type { ContentReplacementRecord } from '../utils/toolResultStorage.js'
+import type { ThinkingConfig } from 'src/utils/thinking.js'
+import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'
 import { REPL } from './REPL.js'
 
 function parsePrIdentifier(value: string): number | null {
@@ -242,7 +242,7 @@ export function ResumeConversation({
       if (feature('COORDINATOR_MODE')) {
         /* eslint-disable @typescript-eslint/no-require-imports */
         const coordinatorModule =
-          require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js')
+          require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js')
         /* eslint-enable @typescript-eslint/no-require-imports */
         const warning = coordinatorModule.matchSessionMode(result.mode)
         if (warning) {
@@ -289,7 +289,7 @@ export function ResumeConversation({
         /* eslint-disable @typescript-eslint/no-require-imports */
         const { saveMode } = require('@claude-code/storage/sessionStorage.js')
         const { isCoordinatorMode } =
-          require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js')
+          require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js')
         /* eslint-enable @typescript-eslint/no-require-imports */
         saveMode(isCoordinatorMode() ? 'coordinator' : 'normal')
       }

@@ -1,20 +1,20 @@
 import type { RuntimeGraph } from '@claude-code/app-host'
 import { useEffect, useMemo, useSyncExternalStore } from 'react'
-import type { Command } from '../../commands.js'
-import { useMergedClients } from '../../hooks/useMergedClients.js'
-import { useMergedCommands } from '../../hooks/useMergedCommands.js'
-import { useMergedTools } from '../../hooks/useMergedTools.js'
+import type { Command } from 'src/commands.js'
+import { useMergedClients } from 'src/hooks/useMergedClients.js'
+import { useMergedCommands } from 'src/hooks/useMergedCommands.js'
+import { useMergedTools } from 'src/hooks/useMergedTools.js'
 import type {
   MCPServerConnection,
   ServerResource,
 } from '@claude-code/mcp-runtime/types.js'
-import type { Tool, ToolPermissionContext } from '../../Tool.js'
+import type { Tool, ToolPermissionContext } from 'src/Tool.js'
 import type {
   AgentDefinition,
   AgentDefinitionsResult,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { LoadedPlugin, PluginError } from '../../types/plugin.js'
-import { getTools } from '../../tools.js'
+import type { LoadedPlugin, PluginError } from 'src/types/plugin.js'
+import { getTools } from 'src/tools.js'
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js'
 import { getInteractiveMcpClients } from './integrations.js'
 

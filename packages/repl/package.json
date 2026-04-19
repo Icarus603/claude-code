@@ -8,6 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./screens/*.js": "./src/screens/*.tsx",
+    "./screens/*": "./src/screens/*"
   }
 }

@@ -2,7 +2,7 @@ import React from 'react'
 import type { StatsStore } from './context/stats.js'
 import type { Root } from '@anthropic/ink'
 import type { InteractiveHostSession } from '@claude-code/app-host'
-import type { Props as REPLProps } from './screens/REPL.js'
+import type { Props as REPLProps } from '@claude-code/repl/screens/REPL.js'
 import type { AppState } from './state/AppStateStore.js'
 import type { FpsMetrics } from './utils/fpsTracker.js'
 
@@ -28,7 +28,7 @@ export async function launchRepl({
   renderAndRun,
 }: LaunchReplArgs): Promise<void> {
   const { App } = await import('./components/App.js')
-  const { REPL } = await import('./screens/REPL.js')
+  const { REPL } = await import('@claude-code/repl/screens/REPL.js')
 
   await renderAndRun(
     root,
