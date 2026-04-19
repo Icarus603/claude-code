@@ -25,7 +25,7 @@ import { filterMcpServersByPolicy } from '../services/mcp/config.js'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
-} from '../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { AppState } from '../state/AppStateStore.js'
 import type { Tools } from '../Tool.js'
 import { toError } from '../utils/errors.js'

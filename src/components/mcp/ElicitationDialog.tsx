@@ -12,7 +12,7 @@ import { useTerminalSize } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw text input for elicitation form
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { ElicitationRequestEvent } from '../../services/mcp/elicitationHandler.js'
+import type { ElicitationRequestEvent } from '@claude-code/mcp-runtime/elicitationHandler.js'
 import { openBrowser } from '../../utils/browser.js'
 import {
   getEnumLabel,

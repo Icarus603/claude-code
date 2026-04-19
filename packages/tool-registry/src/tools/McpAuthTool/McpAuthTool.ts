@@ -1,6 +1,6 @@
 import reject from 'lodash-es/reject.js'
 import { z } from 'zod/v4'
-import { performMCPOAuthFlow } from 'src/services/mcp/auth.js'
+import { performMCPOAuthFlow } from '@claude-code/mcp-runtime/auth.js'
 import {
   clearMcpAuthCache,
   reconnectMcpServerImpl,
@@ -13,7 +13,7 @@ import type {
   McpHTTPServerConfig,
   McpSSEServerConfig,
   ScopedMcpServerConfig,
-} from 'src/services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { Tool } from 'src/Tool.js'
 import { errorMessage } from 'src/utils/errors.js'
 import { lazySchema } from 'src/utils/lazySchema.js'

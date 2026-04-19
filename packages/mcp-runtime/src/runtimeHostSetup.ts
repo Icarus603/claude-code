@@ -5,7 +5,7 @@ import {
 import {
   handleMcpSetServers,
   reconcileMcpServers,
-} from '../../cli/mcpServersHandlers.js'
+} from 'src/cli/mcpServersHandlers.js'
 import {
   ChannelMessageNotificationSchema,
   gateChannelServer,
@@ -29,7 +29,7 @@ import {
   parseMcpConfig,
   parseMcpConfigFromFilePath,
   setMcpServerEnabled,
-} from './config.js'
+} from 'src/services/mcp/config.js'
 import {
   runElicitationHooks,
   runElicitationResultHooks,

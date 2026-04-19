@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react'
 import { getMcpConfigsByScope } from 'src/services/mcp/config.js'
-import type { ConfigScope } from 'src/services/mcp/types.js'
+import type { ConfigScope } from '@claude-code/mcp-runtime/types.js'
 import {
   describeMcpConfigFilePath,
   getScopeLabel,
-} from 'src/services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/utils.js'
 import type { ValidationError } from 'src/utils/settings/validation.js'
 import { Box, Link, Text } from '@anthropic/ink'
 

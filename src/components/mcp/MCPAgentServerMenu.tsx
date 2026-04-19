@@ -6,7 +6,7 @@ import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
   AuthenticationCancelledError,
   performMCPOAuthFlow,
-} from '../../services/mcp/auth.js'
+} from '@claude-code/mcp-runtime/auth.js'
 import { capitalize } from '../../utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Select } from '../CustomSelect/index.js'

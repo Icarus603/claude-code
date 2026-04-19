@@ -1,10 +1,10 @@
-import { getIsNonInteractiveSession } from '../../bootstrap/state.js'
+import { getIsNonInteractiveSession } from 'src/bootstrap/state.js'
 import { checkHasTrustDialogAccepted } from '@claude-code/config'
-import { logAntError } from '../../utils/debug.js'
-import { errorMessage } from '../../utils/errors.js'
-import { execFileNoThrowWithCwd } from '../../utils/execFileNoThrow.js'
-import { logError, logMCPDebug, logMCPError } from '../../utils/log.js'
-import { jsonParse } from '../../utils/slowOperations.js'
+import { logAntError } from 'src/utils/debug.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
+import { logError, logMCPDebug, logMCPError } from 'src/utils/log.js'
+import { jsonParse } from 'src/utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type {
   McpHTTPServerConfig,

@@ -5,7 +5,7 @@ import type { Root } from '@anthropic/ink'
 import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js'
 import { AppStateProvider } from '../state/AppState.js'
 import { getMcpConfigsByScope } from './mcp/config.js'
-import { getProjectMcpServerStatus } from './mcp/utils.js'
+import { getProjectMcpServerStatus } from '@claude-code/mcp-runtime/utils.js'
 
 /**
  * Show MCP server approval dialogs for pending project servers.

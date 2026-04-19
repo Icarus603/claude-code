@@ -7,7 +7,7 @@ import { useMergedTools } from '../../hooks/useMergedTools.js'
 import type {
   MCPServerConnection,
   ServerResource,
-} from '../../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { Tool, ToolPermissionContext } from '../../Tool.js'
 import type {
   AgentDefinition,

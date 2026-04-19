@@ -65,7 +65,7 @@ import {
   useKeybinding,
   useKeybindings,
 } from '@anthropic/ink/keybindings'
-import type { MCPServerConnection } from '../../services/mcp/types.js'
+import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import {
   abortPromptSuggestion,
   logSuggestionSuppressed,

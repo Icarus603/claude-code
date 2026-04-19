@@ -5,7 +5,7 @@ import {
 	handleOAuth401Error,
 } from "../../../utils/auth.js";
 import { logMCPDebug } from "../../../utils/log.js";
-import { getLoggingSafeMcpBaseUrl } from "../utils.js";
+import { getLoggingSafeMcpBaseUrl } from "@claude-code/mcp-runtime/utils.js";
 import type { MCPServerConnection, ScopedMcpServerConfig } from "../types.js";
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'

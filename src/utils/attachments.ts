@@ -174,7 +174,7 @@ import {
 } from '@claude-code/mcp-runtime/mcpInstructionsDelta.js'
 import { CLAUDE_IN_CHROME_MCP_SERVER_NAME } from './claudeInChrome/common.js'
 import { CHROME_TOOL_SEARCH_INSTRUCTIONS } from './claudeInChrome/prompt.js'
-import type { MCPServerConnection } from '../services/mcp/types.js'
+import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import type {
   HookEvent,
   SyncHookJSONOutput,

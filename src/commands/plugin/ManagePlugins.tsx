@@ -33,8 +33,8 @@ import type {
   McpHTTPServerConfig,
   McpSSEServerConfig,
   McpStdioServerConfig,
-} from '../../services/mcp/types.js'
-import { filterToolsByServer } from '../../services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/types.js'
+import { filterToolsByServer } from '@claude-code/mcp-runtime/utils.js'
 import {
   disablePluginOp,
   enablePluginOp,

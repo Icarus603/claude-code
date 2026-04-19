@@ -29,7 +29,7 @@ import {
 } from '@claude-code/permission/PermissionResult'
 import { checkRuleBasedPermissions } from '@claude-code/permission/permissions'
 import { formatError } from 'src/utils/toolErrors.js'
-import { isMcpTool } from 'src/services/mcp/utils.js'
+import { isMcpTool } from '@claude-code/mcp-runtime/utils.js'
 import type { McpServerType, MessageUpdateLazy } from './toolExecution.js'
 
 export type PostToolUseHooksResult<Output> =

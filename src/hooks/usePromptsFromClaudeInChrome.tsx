@@ -6,7 +6,7 @@ import { callIdeRpc } from '../services/mcp/client.js'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,
-} from '../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { PermissionMode } from '../types/permissions.js'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,

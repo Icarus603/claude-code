@@ -11,7 +11,7 @@ import {
 import {
   describeMcpConfigFilePath,
   filterMcpPromptsByServer,
-} from '../../services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/utils.js'
 import { useAppState } from '../../state/AppState.js'
 import { errorMessage } from '../../utils/errors.js'
 import { capitalize } from '../../utils/stringUtils.js'

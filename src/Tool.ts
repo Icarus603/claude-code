@@ -24,7 +24,7 @@ import type { Notification } from './context/notifications.js'
 import type {
   MCPServerConnection,
   ServerResource,
-} from './services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type {
   AgentDefinition,
   AgentDefinitionsResult,

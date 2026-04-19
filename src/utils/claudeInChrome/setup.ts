@@ -9,7 +9,7 @@ import {
   getSessionBypassPermissionsMode,
 } from '../../bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { ScopedMcpServerConfig } from '../../services/mcp/types.js'
+import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js'
 import { isInBundledMode } from '../bundledMode.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'

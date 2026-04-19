@@ -38,7 +38,7 @@ import type { ValidationError } from '../../utils/settings/validation.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
-import { fetchClaudeAIMcpConfigsIfEligible } from './claudeai.js'
+import { fetchClaudeAIMcpConfigsIfEligible } from '@claude-code/mcp-runtime/claudeai.js'
 import { expandEnvVarsInString } from '@claude-code/mcp-runtime/envExpansion.js'
 import {
   type ConfigScope,
@@ -51,8 +51,8 @@ import {
   type McpStdioServerConfig,
   type McpWebSocketServerConfig,
   type ScopedMcpServerConfig,
-} from './types.js'
-import { getProjectMcpServerStatus } from './utils.js'
+} from '@claude-code/mcp-runtime/types.js'
+import { getProjectMcpServerStatus } from '@claude-code/mcp-runtime/utils.js'
 
 /**
  * Get the path to the managed MCP configuration file

@@ -10,8 +10,8 @@ import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
   ServerResource,
-} from './types.js'
-import { useManageMCPConnections } from './useManageMCPConnections.js'
+} from '@claude-code/mcp-runtime/types.js'
+import { useManageMCPConnections } from '@claude-code/mcp-runtime/useManageMCPConnections.js'
 
 interface MCPConnectionContextValue {
   reconnectMcpServer: (serverName: string) => Promise<{

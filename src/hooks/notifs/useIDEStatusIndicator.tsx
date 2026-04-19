@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useNotifications } from 'src/context/notifications.js'
 import { Text } from '@anthropic/ink'
-import type { MCPServerConnection } from 'src/services/mcp/types.js'
+import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import {
   detectIDEs,
