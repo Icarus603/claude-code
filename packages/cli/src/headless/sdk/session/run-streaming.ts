@@ -75,7 +75,7 @@ import {
   registerProcessOutputErrorHandlers,
 } from '../../../../../../src/utils/process.js'
 import type { Stream } from '../../../../../../src/utils/stream.js'
-import { EMPTY_USAGE } from '../../../../../../src/services/api/logging.js'
+import { EMPTY_USAGE } from '@claude-code/provider/logging.js'
 import {
   loadConversationForResume,
   type TurnInterruptionState,
@@ -248,7 +248,7 @@ import {
 import {
   isQualifiedForGrove,
   checkGroveForNonInteractive,
-} from '../../../../../../src/services/api/grove.js'
+} from '@claude-code/provider/grove.js'
 import {
   toInternalMessages,
   toSDKRateLimitInfo,

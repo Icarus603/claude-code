@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Passes } from '../../components/Passes/Passes.js'
 import { logEvent } from '@claude-code/local-observability'
-import { getCachedRemainingPasses } from '../../services/api/referral.js'
+import { getCachedRemainingPasses } from '@claude-code/provider/referral.js'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 

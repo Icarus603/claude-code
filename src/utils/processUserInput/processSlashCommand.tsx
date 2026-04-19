@@ -33,7 +33,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
-import { getDumpPromptsPath } from '../../services/api/dumpPrompts.js'
+import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { buildPostCompactMessages } from '@claude-code/agent/compaction/compact.js'
 import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js'
 import type { Progress as AgentProgress } from '@claude-code/tool-registry/tools/AgentTool/AgentTool.js'

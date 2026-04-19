@@ -19,7 +19,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { accumulateUsage, updateUsage } from '../services/api/claude.js'
-import { EMPTY_USAGE, type NonNullableUsage } from '../services/api/logging.js'
+import { EMPTY_USAGE, type NonNullableUsage } from '@claude-code/provider/logging.js'
 import type { ToolUseContext } from '../Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { AgentId } from '../types/ids.js'

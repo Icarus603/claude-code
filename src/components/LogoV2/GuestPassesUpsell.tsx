@@ -7,7 +7,7 @@ import {
   formatCreditAmount,
   getCachedReferrerReward,
   getCachedRemainingPasses,
-} from '../../services/api/referral.js'
+} from '@claude-code/provider/referral.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 
 function resetIfPassesRefreshed(): void {

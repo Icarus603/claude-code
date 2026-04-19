@@ -9,15 +9,15 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { writeToStderr } from 'src/utils/process.js'
-import { getOauthConfig } from '../../constants/oauth.js'
+import { getOauthConfig } from 'src/constants/oauth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import {
   getAuthHeaders,
   getUserAgent,
   withOAuth401Retry,
-} from '../../utils/http.js'
-import { logError } from '../../utils/log.js'
-import { getClaudeCodeUserAgent } from '../../utils/userAgent.js'
+} from 'src/utils/http.js'
+import { logError } from 'src/utils/log.js'
+import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
 
 // Cache expiration: 24 hours
 const GROVE_CACHE_EXPIRATION_MS = 24 * 60 * 60 * 1000

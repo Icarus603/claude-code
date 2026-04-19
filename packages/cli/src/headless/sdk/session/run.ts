@@ -42,7 +42,7 @@ import {
 import {
   isQualifiedForGrove,
   checkGroveForNonInteractive,
-} from '../../../../../../src/services/api/grove.js'
+} from '@claude-code/provider/grove.js'
 import { initializeGrowthBook } from '@claude-code/config/feature-flags'
 import {
   gracefulShutdownSync,

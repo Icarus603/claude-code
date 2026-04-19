@@ -39,7 +39,7 @@ import {
 import { CondensedLogo } from './CondensedLogo.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
 import { checkForReleaseNotesSync } from '../../utils/releaseNotes.js'
-import { getDumpPromptsPath } from 'src/services/api/dumpPrompts.js'
+import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import {
   getStartupPerfLogPath,

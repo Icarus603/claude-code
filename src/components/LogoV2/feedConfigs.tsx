@@ -6,7 +6,7 @@ import type { Step } from '../../projectOnboardingState.js'
 import {
   formatCreditAmount,
   getCachedReferrerReward,
-} from '../../services/api/referral.js'
+} from '@claude-code/provider/referral.js'
 import type { LogOption } from '../../types/logs.js'
 import { getCwd } from '../../utils/cwd.js'
 import { formatRelativeTimeAgo } from '../../utils/format.js'

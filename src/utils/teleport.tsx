@@ -23,7 +23,7 @@ import { queryHaiku } from '../services/api/claude.js'
 import {
   getSessionLogsViaOAuth,
   getTeleportEvents,
-} from '../services/api/sessionIngress.js'
+} from '@claude-code/provider/sessionIngress.js'
 import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
 import { AppStateProvider } from '../state/AppState.js'
 import type { Message, SystemMessage } from '../types/message.js'

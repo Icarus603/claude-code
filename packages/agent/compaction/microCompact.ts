@@ -8,7 +8,7 @@ import { getMainLoopModel } from 'src/utils/model/model.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
-import { notifyCacheDeletion } from 'src/services/api/promptCacheBreakDetection.js'
+import { notifyCacheDeletion } from '@claude-code/provider/promptCacheBreakDetection.js'
 import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
 import {
   clearCompactWarningSuppression,

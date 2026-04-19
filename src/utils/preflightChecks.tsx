@@ -5,7 +5,7 @@ import { Spinner } from '../components/Spinner.js'
 import { getOauthConfig } from '../constants/oauth.js'
 import { useTimeout } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
-import { getSSLErrorHint } from '../services/api/errorUtils.js'
+import { getSSLErrorHint } from '@claude-code/provider/errorUtils.js'
 import { getUserAgent } from './http.js'
 import { logError } from './log.js'
 
