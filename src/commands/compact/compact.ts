@@ -18,7 +18,7 @@ import { microcompactMessages } from '@claude-code/agent/compaction/microCompact
 import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js'
 import { trySessionMemoryCompaction } from '@claude-code/agent/compaction/sessionMemoryCompact.js'
 import { setLastSummarizedMessageId } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { LocalCommandCall } from '../../types/command.js'
 import type { Message } from '../../types/message.js'
 import { hasExactErrorMessage } from '../../utils/errors.js'

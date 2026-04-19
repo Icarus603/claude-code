@@ -45,7 +45,7 @@ import {
   updatePluginOp,
 } from '../../services/plugins/pluginOperations.js'
 import { useAppState } from '../../state/AppState.js'
-import type { Tool } from '../../Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import type { LoadedPlugin, PluginError } from '../../types/plugin.js'
 import { count } from '../../utils/array.js'
 import { openBrowser } from '../../utils/browser.js'

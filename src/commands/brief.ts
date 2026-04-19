@@ -6,7 +6,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { ToolUseContext } from '../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { isBriefEntitled } from '@claude-code/tool-registry/tools/BriefTool/BriefTool.js'
 import { BRIEF_TOOL_NAME } from '@claude-code/tool-registry/tools/BriefTool/prompt.js'
 import type {

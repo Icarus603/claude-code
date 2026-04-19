@@ -9,7 +9,7 @@ import { expandPastedTextRefs, parseReferences } from '../history.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
 import type { AppState } from '../state/AppState.js'
-import type { SetToolJSXFn } from '../Tool.js'
+import type { SetToolJSXFn } from '@claude-code/tool-registry/Tool.js'
 import type { LocalJSXCommandOnDone } from '../types/command.js'
 import type { Message } from '../types/message.js'
 import {

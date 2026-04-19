@@ -13,8 +13,8 @@ import {
   getSessionId,
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
-import { createTaskStateBase, generateTaskId } from 'src/Task.js'
-import type { ToolUseContext } from 'src/Tool.js'
+import { createTaskStateBase, generateTaskId } from '@claude-code/tool-registry/Task.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import { formatAgentId } from 'src/utils/agentId.js'
 import { quote } from 'src/utils/bash/shellQuote.js'

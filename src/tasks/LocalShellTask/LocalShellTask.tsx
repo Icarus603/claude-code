@@ -16,8 +16,8 @@ import type {
   Task,
   TaskContext,
   TaskHandle,
-} from '../../Task.js'
-import { createTaskStateBase } from '../../Task.js'
+} from '@claude-code/tool-registry/Task.js'
+import { createTaskStateBase } from '@claude-code/tool-registry/Task.js'
 import type { AgentId } from '../../types/ids.js'
 import { registerCleanup } from '../../utils/cleanupRegistry.js'
 import { tailFile } from '../../utils/fsOperations.js'

@@ -7,7 +7,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'
-import { getEmptyToolPermissionContext } from '../../Tool.js'
+import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '../../types/message.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { count } from '../array.js'

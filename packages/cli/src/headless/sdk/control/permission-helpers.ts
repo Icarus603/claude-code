@@ -3,8 +3,8 @@ import {
   outputSchema as permissionToolOutputSchema,
   permissionPromptToolResultToPermissionDecision,
 } from '@claude-code/permission/PermissionPromptToolResultSchema'
-import type { Tool } from '../../../../../../src/Tool.js'
-import { toolMatchesName } from '../../../../../../src/Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
+import { toolMatchesName } from '@claude-code/tool-registry/Tool.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { StructuredIO } from '../../../structuredIO.js'
 import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'

@@ -8,7 +8,7 @@ import {
   filterToolProgressMessages,
   type Tool,
   type Tools,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import type {
   NormalizedUserMessage,
   ProgressMessage,

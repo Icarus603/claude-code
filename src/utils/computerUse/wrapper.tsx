@@ -28,7 +28,7 @@ import {
 import * as React from 'react'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { ComputerUseApproval } from '@claude-code/permission/components/ComputerUseApproval/ComputerUseApproval.js'
-import type { Tool, ToolUseContext } from '../../Tool.js'
+import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'
 import {

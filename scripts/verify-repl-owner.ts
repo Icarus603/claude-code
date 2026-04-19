@@ -55,7 +55,7 @@ async function main(): Promise<void> {
     '@claude-code/repl/components/',
     '@claude-code/repl/hooks/',
     '../utils/',
-    '../Tool.js',
+    '@claude-code/tool-registry/Tool.js',
     '../commands.js',
   ]
   for (const pattern of disallowedThinEntryImports) {

@@ -14,8 +14,8 @@ import {
   persistPermissionUpdates,
 } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
-import type { ToolPermissionContext } from 'src/Tool.js'
-import { getEmptyToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
+import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type { AppState } from 'src/state/AppStateCompat.js'
 import { getDefaultAppState } from 'src/state/AppStateCompat.js'
 import { createHeadlessSessionStore } from 'src/state/sessionStores.js'

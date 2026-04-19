@@ -22,7 +22,7 @@ import {
 import memoize from 'lodash-es/memoize.js'
 import { isAbsolute, resolve } from 'path'
 import { getOriginalCwd, getSessionId, setCwdState } from '@claude-code/app-host/bootstrap/state.js'
-import { generateTaskId } from '../Task.js'
+import { generateTaskId } from '@claude-code/tool-registry/Task.js'
 import { pwd } from './cwd.js'
 import { logForDebugging } from './debug.js'
 import { isENOENT } from './errors.js'

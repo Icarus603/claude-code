@@ -1,6 +1,6 @@
 import type { ToolUseBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import { useMemo } from 'react'
-import { findToolByName, type Tool, type Tools } from 'src/Tool.js'
+import { findToolByName, type Tool, type Tools } from '@claude-code/tool-registry/Tool.js'
 import type { buildMessageLookups } from 'src/utils/messages.js'
 
 export function useGetToolFromMessages(

@@ -21,8 +21,8 @@ import {
 } from '../constants/xml.js'
 import { type QueryParams, query } from '../query.js'
 import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
-import type { SetAppState } from '../Task.js'
-import { createTaskStateBase } from '../Task.js'
+import type { SetAppState } from '@claude-code/tool-registry/Task.js'
+import { createTaskStateBase } from '@claude-code/tool-registry/Task.js'
 import type {
   AgentDefinition,
   CustomAgentDefinition,

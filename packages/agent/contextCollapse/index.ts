@@ -1,6 +1,6 @@
 // Auto-generated stub — replace with real implementation
 import type { Message } from 'src/types/message.js'
-import type { ToolUseContext } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { QuerySource } from 'src/constants/querySource.js'
 
 export interface ContextCollapseHealth {

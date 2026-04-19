@@ -12,7 +12,7 @@ import {
   installToolRegistryHostBindings,
   parseToolPreset as parseToolPresetFromPackage,
 } from '@claude-code/tool-registry'
-import { toolMatchesName, type Tool, type ToolPermissionContext, type Tools } from 'src/Tool.js'
+import { toolMatchesName, type Tool, type ToolPermissionContext, type Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   ALL_AGENT_DISALLOWED_TOOLS,
   CUSTOM_AGENT_DISALLOWED_TOOLS,

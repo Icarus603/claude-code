@@ -18,7 +18,7 @@ import {
   getEmptyToolPermissionContext,
   type Tool,
   type ToolPermissionContext,
-} from '../Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import type { TaskState } from '../tasks/types.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'

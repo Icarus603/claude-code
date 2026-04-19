@@ -4,7 +4,7 @@ import React, { type ReactNode } from 'react'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { Text } from '@anthropic/ink'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { expandPath, getDirectoryForPath } from 'src/utils/path.js'
 import {
   normalizeCaseForComparison,

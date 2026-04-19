@@ -1,4 +1,4 @@
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 
 import { logForDebugging } from '../debug.js'
 import { errorMessage } from '../errors.js'

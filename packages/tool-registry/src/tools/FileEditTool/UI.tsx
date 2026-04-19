@@ -10,7 +10,7 @@ import { FileEditToolUpdatedMessage } from '@claude-code/repl/components/FileEdi
 
 import { Text } from '@anthropic/ink'
 import { FilePathLink } from '@claude-code/repl/components/FilePathLink.js'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Message, ProgressMessage } from 'src/types/message.js'
 import { adjustHunkLineNumbers, CONTEXT_LINES } from 'src/utils/diff.js'
 import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from 'src/utils/file.js'

@@ -10,7 +10,7 @@
  * key matching but denied via canUseTool callback.
  */
 
-import type { TaskContext } from 'src/Task.js'
+import type { TaskContext } from '@claude-code/tool-registry/Task.js'
 import { updateAgentSummary } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { filterIncompleteToolCalls } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
 import type { AgentId } from 'src/types/ids.js'

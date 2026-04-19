@@ -5,7 +5,7 @@ import { RejectedPlanMessage } from '@claude-code/repl/components/messages/UserT
 import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { Box, Text } from '@anthropic/ink'
-import type { ToolProgressData } from 'src/Tool.js'
+import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from 'src/types/message.js'
 import { getDisplayPath } from 'src/utils/file.js'
 import { getPlan } from 'src/utils/plans.js'

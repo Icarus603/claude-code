@@ -4,7 +4,7 @@ import {
   extractMcpToolDisplayName,
   getMcpDisplayName,
 } from '@claude-code/mcp-runtime/mcpStringUtils.js'
-import type { Tool } from 'src/Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Dialog } from '@anthropic/ink'
 import type { ServerInfo } from './types.js'

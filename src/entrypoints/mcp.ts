@@ -15,7 +15,7 @@ import {
   findToolByName,
   getEmptyToolPermissionContext,
   type ToolUseContext,
-} from '../Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import { getTools } from '@claude-code/tool-registry'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { createFileStateCacheWithSizeLimit } from '../utils/fileStateCache.js'

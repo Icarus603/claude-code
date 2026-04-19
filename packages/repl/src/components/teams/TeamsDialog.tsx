@@ -13,7 +13,7 @@ import {
   useAppState,
   useSetAppState,
 } from '@claude-code/repl/appStateHooks.js'
-import { getEmptyToolPermissionContext } from 'src/Tool.js'
+import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { AGENT_COLOR_TO_THEME_COLOR } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'

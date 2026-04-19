@@ -21,8 +21,8 @@ import type {
   Task,
   TaskContext,
   TaskStateBase,
-} from '../../Task.js'
-import { createTaskStateBase, generateTaskId } from '../../Task.js'
+} from '@claude-code/tool-registry/Task.js'
+import { createTaskStateBase, generateTaskId } from '@claude-code/tool-registry/Task.js'
 import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/TodoWriteTool.js'
 import {
   type BackgroundRemoteSessionPrecondition,

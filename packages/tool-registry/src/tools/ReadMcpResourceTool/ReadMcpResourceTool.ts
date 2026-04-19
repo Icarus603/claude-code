@@ -4,7 +4,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
 import { ensureConnectedClient } from 'src/services/mcp/client.js'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   getBinaryBlobSavedMessage,

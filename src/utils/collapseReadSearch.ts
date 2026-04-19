@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import type { UUID } from 'crypto'
-import { findToolByName, type Tools } from '../Tool.js'
+import { findToolByName, type Tools } from '@claude-code/tool-registry/Tool.js'
 import { extractBashCommentLabel } from '@claude-code/tool-registry/tools/BashTool/commentLabel.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'

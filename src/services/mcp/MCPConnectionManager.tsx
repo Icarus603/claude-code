@@ -5,7 +5,7 @@ import React, {
   useMemo,
 } from 'react'
 import type { Command } from '../../commands.js'
-import type { Tool } from '../../Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,

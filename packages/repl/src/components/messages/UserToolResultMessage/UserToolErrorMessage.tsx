@@ -7,7 +7,7 @@ import {
   filterToolProgressMessages,
   type Tool,
   type Tools,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from 'src/types/message.js'
 import {
   INTERRUPT_MESSAGE_FOR_TOOL_USE,

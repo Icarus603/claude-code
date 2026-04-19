@@ -8,7 +8,7 @@ import { pathToFileURL } from 'url'
 import { supportsHyperlinks } from '@anthropic/ink'
 import { color } from '@anthropic/ink'
 import { maybeMarkProjectOnboardingComplete } from '../../projectOnboardingState.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type {
   LocalJSXCommandContext,
   LocalJSXCommandOnDone,

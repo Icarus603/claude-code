@@ -1,5 +1,5 @@
 import { logEvent } from '@claude-code/local-observability'
-import { isTerminalTaskStatus } from '../Task.js'
+import { isTerminalTaskStatus } from '@claude-code/tool-registry/Task.js'
 import type { LocalAgentTaskState } from '../tasks/LocalAgentTask/LocalAgentTask.js'
 
 // Inlined from framework.ts — importing creates a cycle through

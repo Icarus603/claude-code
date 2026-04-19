@@ -5,7 +5,7 @@ import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import type { CommandResultDisplay } from 'src/commands.js'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Box, Text } from '@anthropic/ink'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 
 type Props = {
   onExit: (

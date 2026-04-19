@@ -1,7 +1,7 @@
 // Auto-generated stub — replace with real implementation
 import type { Attachment } from '../../utils/attachments.js'
 import type { Message } from '../../types/message.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 
 export const startSkillDiscoveryPrefetch: (
   input: string | null,

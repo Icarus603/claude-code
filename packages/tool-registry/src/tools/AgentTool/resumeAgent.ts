@@ -3,7 +3,7 @@ import { getSdkAgentProgressSummariesEnabled } from '@claude-code/app-host/boots
 import { getSystemPrompt } from 'src/constants/prompts.js'
 import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import type { ToolUseContext } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { registerAsyncAgent } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { assembleToolPool } from 'src/tools.js'
 import { asAgentId } from 'src/types/ids.js'

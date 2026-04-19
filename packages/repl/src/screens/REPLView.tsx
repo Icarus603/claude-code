@@ -194,7 +194,7 @@ const getCoordinatorUserContext: (
   : () => ({});
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 import useCanUseTool from '@claude-code/repl/hooks/useCanUseTool.js';
-import type { ToolPermissionContext, Tool } from 'src/Tool.js';
+import type { ToolPermissionContext, Tool } from '@claude-code/tool-registry/Tool.js';
 import {
   applyPermissionUpdate,
   applyPermissionUpdates,

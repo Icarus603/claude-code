@@ -2,7 +2,7 @@ import * as React from 'react'
 import type { Command } from 'src/commands.js'
 import { Box } from '@anthropic/ink'
 import type { Screen } from '@claude-code/repl/screens/REPL.js'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { RenderableMessage } from 'src/types/message.js'
 import {
   getDisplayMessageFromCollapsed,

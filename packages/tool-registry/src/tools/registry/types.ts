@@ -1,4 +1,4 @@
-import type { Tool, Tools } from 'src/Tool.js'
+import type { Tool, Tools } from '@claude-code/tool-registry/Tool.js'
 
 /**
  * Tool category — identifies where a tool came from.

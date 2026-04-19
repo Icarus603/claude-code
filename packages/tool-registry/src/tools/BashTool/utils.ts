@@ -6,7 +6,7 @@ import type {
 import { readFile, stat } from 'fs/promises'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { getCwd } from 'src/utils/cwd.js'
 import { pathInAllowedWorkingPath } from '@claude-code/permission/filesystem'
 import { setCwd } from 'src/utils/Shell.js'

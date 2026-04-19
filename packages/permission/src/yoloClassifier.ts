@@ -16,7 +16,7 @@ import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 
 import { getCacheControl } from '@claude-code/provider/claude.js'
 import { parsePromptTooLongTokenCounts } from '@claude-code/provider/errors.js'
 import { getDefaultMaxRetries } from '@claude-code/provider/withRetry.js'
-import type { Tool, ToolPermissionContext, Tools } from 'src/Tool.js'
+import type { Tool, ToolPermissionContext, Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from 'src/types/message.js'
 import type {
   ClassifierUsage,

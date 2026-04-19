@@ -16,7 +16,7 @@ import {
   type PromptCommand,
 } from 'src/commands.js'
 import { NO_CONTENT_MESSAGE } from 'src/constants/messages.js'
-import type { SetToolJSXFn, ToolUseContext } from 'src/Tool.js'
+import type { SetToolJSXFn, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type {
   AssistantMessage,
   AttachmentMessage,

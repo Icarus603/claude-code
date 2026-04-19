@@ -11,7 +11,7 @@ import {
   type Tool,
   type ToolDef,
   type Tools,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { escapeRegExp } from 'src/utils/stringUtils.js'

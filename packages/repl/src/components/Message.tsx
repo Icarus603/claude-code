@@ -11,7 +11,7 @@ import * as React from 'react'
 import type { Command } from 'src/commands.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box } from '@anthropic/ink'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   type ConnectorTextBlock,
   isConnectorTextBlock,

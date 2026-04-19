@@ -7,7 +7,7 @@ import {
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { runTools } from '@claude-code/tool-registry/services/toolOrchestration.js'
-import { findToolByName, type Tool, type Tools } from '../Tool.js'
+import { findToolByName, type Tool, type Tools } from '@claude-code/tool-registry/Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import type { Input as FileReadInput } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'

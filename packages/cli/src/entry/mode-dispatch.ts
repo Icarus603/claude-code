@@ -95,7 +95,7 @@ import {
   loadRemoteManagedSettings,
   refreshRemoteManagedSettings,
 } from '../../../../src/services/remoteManagedSettings/index.js'
-import type { ToolInputJSONSchema } from '../../../../src/Tool.js'
+import type { ToolInputJSONSchema } from '@claude-code/tool-registry/Tool.js'
 import {
   createSyntheticOutputTool,
   isSyntheticOutputToolEnabled,

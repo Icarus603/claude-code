@@ -19,7 +19,7 @@ import type {
   ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime/types.js'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import type { Tool } from 'src/Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { asSessionId } from 'src/types/ids.js'

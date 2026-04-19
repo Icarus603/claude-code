@@ -4,8 +4,8 @@
 // surfacing via the existing task registry.
 
 import { rollbackConsolidationLock } from '@claude-code/memory/consolidationLock'
-import type { SetAppState, Task, TaskStateBase } from '../../Task.js'
-import { createTaskStateBase, generateTaskId } from '../../Task.js'
+import type { SetAppState, Task, TaskStateBase } from '@claude-code/tool-registry/Task.js'
+import { createTaskStateBase, generateTaskId } from '@claude-code/tool-registry/Task.js'
 import { registerTask, updateTaskState } from '../../utils/task/framework.js'
 
 // Keep only the N most recent turns for live display.

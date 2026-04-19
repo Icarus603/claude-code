@@ -12,12 +12,12 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { Tool } from '../Tool.js'
+import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import {
   type ToolPermissionContext,
   type Tools,
   toolMatchesName,
-} from '../Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import {
   formatDeferredToolLine,

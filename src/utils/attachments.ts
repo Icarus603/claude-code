@@ -8,7 +8,7 @@ import {
   type Tools,
   type ToolUseContext,
   type ToolPermissionContext,
-} from '../Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import {
   FileReadTool,
   MaxFileReadTokenExceededError,
@@ -139,7 +139,7 @@ import {
 } from './task/framework.js'
 import { getTaskOutputPath } from './task/diskOutput.js'
 import { drainPendingMessages } from '../tasks/LocalAgentTask/LocalAgentTask.js'
-import type { TaskType, TaskStatus } from '../Task.js'
+import type { TaskType, TaskStatus } from '@claude-code/tool-registry/Task.js'
 import {
   getOriginalCwd,
   getSessionId,

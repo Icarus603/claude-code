@@ -25,8 +25,8 @@ import {
   addSkillDirectories,
   discoverSkillDirsForPaths,
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
-import type { ToolUseContext } from 'src/Tool.js'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { getCwd } from 'src/utils/cwd.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from 'src/utils/envUtils.js'
 import { getErrnoCode, isENOENT } from 'src/utils/errors.js'

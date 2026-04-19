@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { QuerySource } from 'src/constants/querySource.js'
-import type { ToolUseContext } from 'src/Tool.js'
+import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from 'src/types/message.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getMainLoopModel } from 'src/utils/model/model.js'

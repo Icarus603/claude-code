@@ -4,7 +4,7 @@ import { EnterPlanModeTool } from '@claude-code/tool-registry/tools/EnterPlanMod
 import { ExitPlanModeV2Tool } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
 import { useNotifyAfterTimeout } from '@claude-code/repl/hooks/useNotifyAfterTimeout.js'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { AnyObject, Tool, ToolUseContext } from 'src/Tool.js'
+import type { AnyObject, Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { AskUserQuestionTool } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'

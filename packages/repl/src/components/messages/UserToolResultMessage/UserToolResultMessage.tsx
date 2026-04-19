@@ -1,6 +1,6 @@
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type {
   NormalizedUserMessage,
   ProgressMessage,

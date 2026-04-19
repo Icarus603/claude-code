@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react'
-import type { Tools } from 'src/Tool.js'
+import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import { Byline, KeyboardShortcutHint } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from '../../../ConfigurableShortcutHint.js'
 import { useWizard } from '../../../wizard/index.js'

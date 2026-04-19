@@ -37,7 +37,7 @@ import {
   type ToolPermissionContext,
   type Tools,
   toolMatchesName,
-} from 'src/Tool.js'
+} from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import {
   type ConnectorTextBlock,
