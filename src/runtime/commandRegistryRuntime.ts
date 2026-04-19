@@ -91,7 +91,7 @@ const workflowsCmd = feature('WORKFLOW_SCRIPTS')
   : null
 const webCmd = feature('CCR_REMOTE_SETUP')
   ? (
-      require('../commands/remote-setup/index.js') as typeof import('../commands/remote-setup/index.js')
+      require('@claude-code/teleport/remote-setup/index.js') as typeof import('@claude-code/teleport/remote-setup/index.js')
     ).default
   : null
 const clearSkillIndexCache = feature('EXPERIMENTAL_SKILL_SEARCH')
