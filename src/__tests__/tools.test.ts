@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { parseToolPreset, filterToolsByDenyRules } from '../tools'
-import { getEmptyToolPermissionContext } from '../Tool'
+import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 
 describe('parseToolPreset', () => {
   test('returns "default" for "default" input', () => {

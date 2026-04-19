@@ -12,7 +12,7 @@ const {
   truncateForPreview,
   PERMISSION_REPLY_RE,
   createChannelPermissionCallbacks,
-} = await import("../channelPermissions");
+} = await import("@claude-code/mcp-runtime/channelPermissions");
 
 describe("shortRequestId", () => {
   test("returns 5-char string from tool use ID", () => {

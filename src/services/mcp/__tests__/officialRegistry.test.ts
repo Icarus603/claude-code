@@ -11,7 +11,7 @@ mock.module("src/utils/errors.js", () => ({
 }));
 
 const { isOfficialMcpUrl, resetOfficialMcpUrlsForTesting } = await import(
-  "../officialRegistry"
+  "@claude-code/mcp-runtime/officialRegistry"
 );
 
 describe("isOfficialMcpUrl", () => {

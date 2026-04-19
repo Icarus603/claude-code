@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
-import { expandEnvVarsInString } from "../envExpansion";
+import { expandEnvVarsInString } from "@claude-code/mcp-runtime/envExpansion";
 
 describe("expandEnvVarsInString", () => {
   // Save and restore env vars touched by tests

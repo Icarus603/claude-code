@@ -4,7 +4,7 @@ import {
   findToolByName,
   getEmptyToolPermissionContext,
   buildTool,
-} from "../../src/Tool.ts";
+} from "@claude-code/tool-registry/Tool.js";
 
 // ─── Tool Registration & Discovery ──────────────────────────────────────
 

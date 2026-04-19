@@ -5,7 +5,7 @@ import {
   findToolByName,
   getEmptyToolPermissionContext,
   filterToolProgressMessages,
-} from '../Tool'
+} from '@claude-code/tool-registry/Tool.js'
 
 // Minimal tool definition for testing buildTool
 function makeMinimalToolDef(overrides: Record<string, unknown> = {}) {
