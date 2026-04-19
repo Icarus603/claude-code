@@ -10,7 +10,7 @@
  * Arguments are parsed using shell-quote for proper shell argument handling.
  */
 
-import { tryParseShellCommand } from './bash/shellQuote.js'
+import { tryParseShellCommand } from '@claude-code/shell/bash/shellQuote.js'
 
 /**
  * Parse an arguments string into an array of individual arguments.

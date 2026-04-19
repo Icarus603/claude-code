@@ -35,7 +35,7 @@ import { isAgentSwarmsEnabled } from '../utils/agentSwarmsEnabled.js'
 import {
   generateProgressiveArgumentHint,
   parseArguments,
-} from '../utils/argumentSubstitution.js'
+} from '@claude-code/command-runtime/argumentSubstitution.js'
 import {
   getShellCompletions,
   type ShellCompletionType,

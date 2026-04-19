@@ -212,7 +212,7 @@ import {
   isEnvTruthy,
   isInProtectedNamespace,
 } from '../../../../src/utils/envUtils.js'
-import { refreshExampleCommands } from '../../../../src/utils/exampleCommands.js'
+import { refreshExampleCommands } from '@claude-code/command-runtime/exampleCommands.js'
 import type { FpsMetrics } from '../../../../src/utils/fpsTracker.js'
 import { getWorktreePaths } from '../../../../src/utils/getWorktreePaths.js'
 import {

@@ -10,6 +10,9 @@
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
     "./runtime": "./src/runtime.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./slashCommandParsing.js": "./src/slashCommandParsing.ts",
+    "./argumentSubstitution.js": "./src/argumentSubstitution.ts",
+    "./exampleCommands.js": "./src/exampleCommands.ts"
   }
 }

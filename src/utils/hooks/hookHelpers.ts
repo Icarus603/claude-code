@@ -4,7 +4,7 @@ import {
   SYNTHETIC_OUTPUT_TOOL_NAME,
   SyntheticOutputTool,
 } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
-import { substituteArguments } from '../argumentSubstitution.js'
+import { substituteArguments } from '@claude-code/command-runtime/argumentSubstitution.js'
 import { lazySchema } from '../lazySchema.js'
 import type { SetAppState } from '../messageQueueManager.js'
 import { hasSuccessfulToolCall } from '../messages.js'

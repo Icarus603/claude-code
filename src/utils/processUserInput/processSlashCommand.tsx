@@ -83,7 +83,7 @@ import {
   isRestrictedToPluginOnly,
   isSourceAdminTrusted,
 } from '../settings/pluginOnlyPolicy.js'
-import { parseSlashCommand } from '../slashCommandParsing.js'
+import { parseSlashCommand } from '@claude-code/command-runtime/slashCommandParsing.js'
 import { sleep } from '../sleep.js'
 import { recordSkillUsage } from '../suggestions/skillUsageTracking.js'
 import { logOTelEvent, redactIfDisabled } from '../telemetry/events.js'
