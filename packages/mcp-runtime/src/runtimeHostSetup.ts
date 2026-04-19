@@ -5,7 +5,7 @@ import {
 import {
   handleMcpSetServers,
   reconcileMcpServers,
-} from 'src/cli/mcpServersHandlers.js'
+} from '@claude-code/cli/mcpServersHandlers.js'
 import {
   ChannelMessageNotificationSchema,
   gateChannelServer,

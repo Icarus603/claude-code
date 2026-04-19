@@ -1,18 +1,18 @@
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import { PassThrough } from 'stream'
 import { URL } from 'url'
-import { getSessionId } from '../bootstrap/state.js'
+import { getSessionId } from 'src/bootstrap/state.js'
 import { getPollIntervalConfig } from '@claude-code/bridge/pollConfig.js'
-import { registerCleanup } from '../utils/cleanupRegistry.js'
+import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { setCommandLifecycleListener } from '@claude-code/shell/commandLifecycle.js'
-import { isDebugMode, logForDebugging } from '../utils/debug.js'
-import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
-import { isEnvTruthy } from '../utils/envUtils.js'
-import { errorMessage } from '../utils/errors.js'
-import { gracefulShutdown } from '../utils/gracefulShutdown.js'
-import { logError } from '../utils/log.js'
-import { writeToStdout } from '../utils/process.js'
-import { getSessionIngressAuthToken } from '../utils/sessionIngressAuth.js'
+import { isDebugMode, logForDebugging } from 'src/utils/debug.js'
+import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { logError } from 'src/utils/log.js'
+import { writeToStdout } from 'src/utils/process.js'
+import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
 import {
   setSessionMetadataChangedListener,
   setSessionStateChangedListener,
@@ -22,11 +22,11 @@ import {
   setInternalEventWriter,
 } from '@claude-code/storage/sessionStorage.js'
 import { ndjsonSafeStringify } from './ndjsonSafeStringify.js'
-import { StructuredIO } from './structuredIO.js'
-import { CCRClient, CCRInitError } from './transports/ccrClient.js'
-import { SSETransport } from './transports/SSETransport.js'
-import type { Transport } from './transports/Transport.js'
-import { getTransportForUrl } from './transports/transportUtils.js'
+import { StructuredIO } from 'src/cli/structuredIO.js'
+import { CCRClient, CCRInitError } from 'src/cli/transports/ccrClient.js'
+import { SSETransport } from 'src/cli/transports/SSETransport.js'
+import type { Transport } from 'src/cli/transports/Transport.js'
+import { getTransportForUrl } from 'src/cli/transports/transportUtils.js'
 
 /**
  * Bidirectional streaming for SDK mode with session tracking

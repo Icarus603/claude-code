@@ -1,7 +1,7 @@
 import type { SDKUserMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { fromArray } from '../utils/generators.js'
 import { jsonStringify } from '../utils/slowOperations.js'
-import { RemoteIO } from './remoteIO.js'
+import { RemoteIO } from '@claude-code/cli/remoteIO.js'
 import { StructuredIO } from './structuredIO.js'
 
 export function getStructuredIO(
