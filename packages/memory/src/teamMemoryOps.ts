@@ -1,11 +1,11 @@
-import { isTeamMemFile } from './teamMemPaths.js'
+import { isTeamMemPath } from './teamMemPaths.js'
 
 // Inlined from src/tools/{FileEditTool,FileWriteTool} to keep this Wave-2
 // leaf file src/-free. Constants are stable tool-name strings.
 const FILE_EDIT_TOOL_NAME = 'Edit'
 const FILE_WRITE_TOOL_NAME = 'Write'
 
-export { isTeamMemFile }
+export { isTeamMemPath }
 
 /**
  * Check if a search tool use targets team memory files by examining its path.
@@ -15,7 +15,7 @@ export function isTeamMemorySearch(toolInput: unknown): boolean {
     | { path?: string; pattern?: string; glob?: string }
     | undefined
   if (!input) return false
-  if (input.path && isTeamMemFile(input.path)) return true
+  if (input.path && isTeamMemPath(input.path)) return true
   return false
 }
 
@@ -31,7 +31,7 @@ export function isTeamMemoryWriteOrEdit(
   }
   const input = toolInput as { file_path?: string; path?: string } | undefined
   const filePath = input?.file_path ?? input?.path
-  return filePath !== undefined && isTeamMemFile(filePath)
+  return filePath !== undefined && isTeamMemPath(filePath)
 }
 
 /**
