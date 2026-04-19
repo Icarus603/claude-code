@@ -15,7 +15,7 @@ import {
   rewriteWindowsNullRedirect,
   shouldAddStdinRedirect,
 } from '../bash/shellQuoting.js'
-import type { ShellExecContext } from '../context.js'
+import type { ShellExecContext } from '@claude-code/provider/context.js'
 import { getPlatform, logForDebugging, windowsPathToPosixPath } from '../_deps.js'
 import type { ShellProvider } from './shellProvider.js'
 

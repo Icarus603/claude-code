@@ -9,9 +9,9 @@ import type {
 import type { SystemPrompt } from '../../utils/systemPromptType.js'
 import type { ThinkingConfig } from '../../utils/thinking.js'
 import './providerHostSetup.js'
-import type { Options } from './claudeLegacy.js'
+import type { Options } from '@claude-code/provider/claudeLegacy'
 
-export * from './claudeLegacy.js'
+export * from '@claude-code/provider/claudeLegacy'
 
 export async function queryModelWithoutStreaming({
   messages,

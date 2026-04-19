@@ -5,7 +5,7 @@ import { constants as fsConstants, readFileSync, unlinkSync } from 'fs'
 import { type FileHandle, mkdir, open, realpath } from 'fs/promises'
 import { isAbsolute, resolve } from 'path'
 import { join as posixJoin } from 'path/posix'
-import type { ShellExecContext } from './context.js'
+import type { ShellExecContext } from '@claude-code/provider/context.js'
 import {
   errorMessage,
   generateTaskId,

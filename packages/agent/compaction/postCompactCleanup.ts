@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import type { QuerySource } from 'src/constants/querySource.js'
 import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
-import { getUserContext } from 'src/context.js'
+import { getUserContext } from '@claude-code/provider/context.js'
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
 import { clearClassifierApprovals } from 'src/utils/classifierApprovals.js'
 import { resetGetMemoryFilesCache } from 'src/utils/claudemd.js'

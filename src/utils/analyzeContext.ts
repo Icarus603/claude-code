@@ -7,7 +7,7 @@ import {
 import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
 import { getSdkBetas } from '../bootstrap/state.js'
 import { getCommandName } from '../commands.js'
-import { getSystemContext } from '../context.js'
+import { getSystemContext } from '@claude-code/provider/context.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   AUTOCOMPACT_BUFFER_TOKENS,

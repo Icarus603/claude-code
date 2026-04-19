@@ -19,7 +19,7 @@ import {
   shouldBypassProxy,
 } from '../../utils/proxy.js'
 import { getOauthConfig } from '../../constants/oauth.js'
-import { getUserContext, getSystemContext } from '../../context.js'
+import { getUserContext, getSystemContext } from '@claude-code/provider/context.js'
 import { getUserAgent } from '../../utils/http.js'
 import { getSmallFastModel } from '../../utils/model/model.js'
 import {
