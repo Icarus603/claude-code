@@ -15,11 +15,11 @@ import type { ToolUseConfirm } from '../components/permissions/PermissionRequest
 import {
   createSyntheticAssistantMessage,
   createToolStub,
-} from '../remote/remotePermissionBridge.js'
+} from '@claude-code/server/remote/remotePermissionBridge.js'
 import {
   convertSDKMessage,
   isSessionEndMessage,
-} from '../remote/sdkMessageAdapter.js'
+} from '@claude-code/server/remote/sdkMessageAdapter.js'
 import type { SSHSession } from '../ssh/createSSHSession.js'
 import type { SSHSessionManager, SSHPermissionRequest } from '../ssh/SSHSessionManager.js'
 import type { Tool } from '../Tool.js'

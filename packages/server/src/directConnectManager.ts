@@ -5,7 +5,7 @@ import type {
   SDKControlPermissionRequest,
   StdoutMessage,
 } from 'src/entrypoints/sdk/controlTypes.js'
-import type { RemotePermissionResponse } from 'src/remote/RemoteSessionManager.js'
+import type { RemotePermissionResponse } from '@claude-code/server/remote/RemoteSessionManager.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'

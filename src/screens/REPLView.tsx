@@ -448,7 +448,7 @@ import { UltraplanLaunchDialog } from '../components/ultraplan/UltraplanLaunchDi
 import { launchUltraplan } from '../commands/ultraplan.js';
 import { getFocusedInputDialog } from './repl/dialogs.js';
 // Session manager removed - using AppState now
-import type { RemoteSessionConfig } from '../remote/RemoteSessionManager.js'
+import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
 import { REMOTE_SAFE_COMMANDS } from '../commands.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 import {
