@@ -14,8 +14,8 @@ import {
   type HistoryPage,
 } from '../assistant/sessionHistory.js'
 import type { ScrollBoxHandle } from '@anthropic/ink'
-import type { RemoteSessionConfig } from '../remote/RemoteSessionManager.js'
-import { convertSDKMessage } from '../remote/sdkMessageAdapter.js'
+import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
+import { convertSDKMessage } from '@claude-code/server/remote/sdkMessageAdapter.js'
 import type { Message, SystemInformationalMessage } from '../types/message.js'
 import { logForDebugging } from '../utils/debug.js'
 
