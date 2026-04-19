@@ -19,8 +19,8 @@
  */
 
 import { SHELL_KEYWORDS } from './bashParser.js'
-import type { Node } from './parser.js'
-import { PARSE_ABORTED, parseCommandRaw } from './parser.js'
+import type { Node } from '@claude-code/shell/bash/parser.js'
+import { PARSE_ABORTED, parseCommandRaw } from '@claude-code/shell/bash/parser.js'
 
 export type Redirect = {
   op: '>' | '>>' | '<' | '<<' | '>&' | '>|' | '<&' | '&>' | '&>>' | '<<<'
