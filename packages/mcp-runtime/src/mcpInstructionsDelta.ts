@@ -3,7 +3,7 @@ import { logEvent } from '@claude-code/local-observability'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,
-} from 'src/services/mcp/types.js'
+} from './types.js'
 import type { Message } from 'src/types/message.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
 

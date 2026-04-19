@@ -6,7 +6,7 @@ import {
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
-import type { ConnectedMCPServer, MCPServerConnection } from 'src/services/mcp/types.js'
+import type { ConnectedMCPServer, MCPServerConnection } from './types.js'
 
 // Mirror of AutoModeEnabledState in permissionSetup.ts — inlined because that
 // file pulls in too many deps for this thin IPC module.

@@ -436,7 +436,7 @@ const kairosGate = feature('KAIROS')
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/permission/autoModeState.js') as typeof import('../../../../src/utils/permissions/autoModeState.js'))
+  ? (require('@claude-code/permission/autoModeState.js') as typeof import('@claude-code/permission/autoModeState.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 
