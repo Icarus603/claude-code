@@ -26,6 +26,7 @@ export type RequiresActionDetails = {
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { enqueueSdkEvent } from 'src/utils/sdkEventQueue.js'
+import { readEnv } from '@claude-code/config/env'
 
 // CCR external_metadata keys — push in onChangeAppState, restore in
 // externalMetadataToAppState.
@@ -124,7 +125,7 @@ export function notifySessionStateChanged(
   // their isWorking() last-message heuristics — the trailing idle event
   // currently pins them at "Running...".
   // https://anthropic.slack.com/archives/C093BJBD1CP/p1774152406752229
-  if (isEnvTruthy(process.env.CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS'))) {
     enqueueSdkEvent({
       type: 'system',
       subtype: 'session_state_changed',

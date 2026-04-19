@@ -19,6 +19,7 @@ import { logError } from 'src/utils/log.js'
 import { sleep } from 'src/utils/sleep.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
+import { readEnv } from '@claude-code/config/env'
 
 // Files API is currently in beta. oauth-2025-04-20 enables Bearer OAuth
 // on public-api routes (auth.py: "oauth_auth" not in beta_versions → 404).
@@ -29,8 +30,8 @@ const ANTHROPIC_VERSION = '2023-06-01'
 // Falls back to public API for standalone usage
 function getDefaultApiBaseUrl(): string {
   return (
-    process.env.ANTHROPIC_BASE_URL ||
-    process.env.CLAUDE_CODE_API_BASE_URL ||
+    readEnv('ANTHROPIC_BASE_URL') ||
+    readEnv('CLAUDE_CODE_API_BASE_URL') ||
     'https://api.anthropic.com'
   )
 }

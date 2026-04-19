@@ -7,6 +7,7 @@ import {
   isAutoModeGateEnabled,
   transitionPermissionMode,
 } from '@claude-code/permission/permissionSetup'
+import { readEnv } from '@claude-code/config/env'
 
 // Checks both the cached isAutoModeAvailable (set at startup by
 // verifyAutoModeGateAccess) and the live isAutoModeGateEnabled() — these can
@@ -38,7 +39,7 @@ export function getNextPermissionMode(
   switch (toolPermissionContext.mode) {
     case 'default':
       // Ants skip acceptEdits and plan — auto mode replaces them
-      if (process.env.USER_TYPE === 'ant') {
+      if (readEnv('USER_TYPE') === 'ant') {
         if (toolPermissionContext.isBypassPermissionsModeAvailable) {
           return 'bypassPermissions'
         }

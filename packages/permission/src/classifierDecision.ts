@@ -20,6 +20,7 @@ import { TEAM_DELETE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamDele
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
 import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import { YOLO_CLASSIFIER_TOOL_NAME } from './yoloClassifier.js'
+import { readEnv } from '@claude-code/config/env'
 
 // Ant-only tool names: conditional require so Bun can DCE these in external builds.
 // Gates mirror tools.ts. Keeps the tool name strings out of cli.js.
@@ -35,7 +36,7 @@ const OVERFLOW_TEST_TOOL_NAME = feature('OVERFLOW_TEST_TOOL')
     ).OVERFLOW_TEST_TOOL_NAME
   : null
 const VERIFY_PLAN_EXECUTION_TOOL_NAME =
-  process.env.USER_TYPE === 'ant'
+  readEnv('USER_TYPE') === 'ant'
     ? (
         require('@claude-code/tool-registry/tools/VerifyPlanExecutionTool/constants.js') as typeof import('@claude-code/tool-registry/tools/VerifyPlanExecutionTool/constants.js')
       ).VERIFY_PLAN_EXECUTION_TOOL_NAME
