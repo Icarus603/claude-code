@@ -27,7 +27,9 @@
     "./internalLogging.js": "./internalLogging.ts",
     "./tokenEstimation.js": "./tokenEstimation.ts",
     "./sessionTranscript/*.js": "./sessionTranscript/*.ts",
-    "./SessionMemory/*.js": "./SessionMemory/*.ts"
+    "./SessionMemory/*.js": "./SessionMemory/*.ts",
+    "./awaySummary.js": "./awaySummary.ts",
+    "./attribution.js": "./attribution.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

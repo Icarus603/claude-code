@@ -1,14 +1,14 @@
 import { APIUserAbortError } from '@anthropic-ai/sdk'
-import { getEmptyToolPermissionContext } from '../Tool.js'
-import type { Message } from '../types/message.js'
-import { logForDebugging } from '../utils/debug.js'
+import { getEmptyToolPermissionContext } from 'src/Tool.js'
+import type { Message } from 'src/types/message.js'
+import { logForDebugging } from 'src/utils/debug.js'
 import {
   createUserMessage,
   getAssistantMessageText,
-} from '../utils/messages.js'
-import { getSmallFastModel } from '../utils/model/model.js'
-import { asSystemPrompt } from '../utils/systemPromptType.js'
-import { queryModelWithoutStreaming } from './api/claude.js'
+} from 'src/utils/messages.js'
+import { getSmallFastModel } from 'src/utils/model/model.js'
+import { asSystemPrompt } from 'src/utils/systemPromptType.js'
+import { queryModelWithoutStreaming } from 'src/services/api/claude.js'
 import { getSessionMemoryContent } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
 
 // Recap only needs recent context — truncate to avoid "prompt too long" on
