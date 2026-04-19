@@ -8,6 +8,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
-    "./packageHostSetup": "./src/packageHostSetup.ts"
+    "./packageHostSetup": "./src/packageHostSetup.ts",
+    "./runtime/*.js": "./src/runtime/*.ts"
   }
 }

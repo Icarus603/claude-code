@@ -144,7 +144,7 @@ import { logSessionTelemetry, logStartupTelemetry } from '../../../../src/main/s
 import {
   createRuntimeHandles,
   syncRuntimeHandlesFromHeadlessParams,
-} from '../../../../src/runtime/runtimeHandles.js'
+} from '@claude-code/app-host/runtime/runtimeHandles.js'
 import { createSystemMessage, createUserMessage } from '../../../../src/utils/messages.js'
 import { getPlatform } from '../../../../src/utils/platform.js'
 import { getSessionIngressAuthToken } from '../../../../src/utils/sessionIngressAuth.js'

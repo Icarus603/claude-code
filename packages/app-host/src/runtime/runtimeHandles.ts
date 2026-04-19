@@ -14,15 +14,15 @@ import {
   persistPermissionUpdates,
 } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
-import type { ToolPermissionContext } from '../Tool.js'
-import { getEmptyToolPermissionContext } from '../Tool.js'
-import type { AppState } from '../state/AppStateCompat.js'
-import { getDefaultAppState } from '../state/AppStateCompat.js'
-import { createHeadlessSessionStore } from '../state/sessionStores.js'
-import { createStore, type Store } from '../state/store.js'
+import type { ToolPermissionContext } from 'src/Tool.js'
+import { getEmptyToolPermissionContext } from 'src/Tool.js'
+import type { AppState } from 'src/state/AppStateCompat.js'
+import { getDefaultAppState } from 'src/state/AppStateCompat.js'
+import { createHeadlessSessionStore } from 'src/state/sessionStores.js'
+import { createStore, type Store } from 'src/state/store.js'
 import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { LoadedPlugin, PluginError } from '../types/plugin.js'
-import type { Command } from '../commands.js'
+import type { LoadedPlugin, PluginError } from 'src/types/plugin.js'
+import type { Command } from 'src/commands.js'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,

@@ -64,35 +64,35 @@ import {
   getInlinePlugins,
   getOriginalCwd,
   getSessionId,
-} from '../bootstrap/state.js'
+} from 'src/bootstrap/state.js'
 import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
-import { registerCleanup } from '../utils/cleanupRegistry.js'
-import { getCwd } from '../utils/cwd.js'
-import { logForDebugging } from '../utils/debug.js'
-import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
+import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import {
   toError as _toError, // kept for clarity though _deps has own
-} from '../utils/errors.js'
+} from 'src/utils/errors.js'
 import {
   execFileNoThrow,
   execFileNoThrowWithCwd,
-} from '../utils/execFileNoThrow.js'
-import { pathExists, writeFileSyncAndFlush_DEPRECATED } from '../utils/file.js'
-import { getFsImplementation, safeResolvePath } from '../utils/fsOperations.js'
-import { gitExe } from '../utils/git.js'
-import { getHeadForDir } from '../utils/git/gitFilesystem.js'
-import { logError } from '../utils/log.js'
-import { clone, jsonParse, jsonStringify } from '../utils/slowOperations.js'
-import { which } from '../utils/which.js'
+} from 'src/utils/execFileNoThrow.js'
+import { pathExists, writeFileSyncAndFlush_DEPRECATED } from 'src/utils/file.js'
+import { getFsImplementation, safeResolvePath } from 'src/utils/fsOperations.js'
+import { gitExe } from 'src/utils/git.js'
+import { getHeadForDir } from 'src/utils/git/gitFilesystem.js'
+import { logError } from 'src/utils/log.js'
+import { clone, jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { which } from 'src/utils/which.js'
 import {
   getSettingsForSource,
   getSettings_DEPRECATED,
-} from '../utils/settings/settings.js'
-import { isSettingSourceEnabled } from '../utils/settings/constants.js'
+} from 'src/utils/settings/settings.js'
+import { isSettingSourceEnabled } from 'src/utils/settings/constants.js'
 import {
   buildPluginTelemetryFields,
   classifyPluginCommandError,
-} from '../utils/telemetry/pluginTelemetry.js'
+} from 'src/utils/telemetry/pluginTelemetry.js'
 
 let installed = false
 
@@ -221,7 +221,7 @@ export function installPluginBindings(): void {
   // --- app state
   setGetAppStateFn(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../state/AppState.js') as {
+    const mod = require('src/state/AppState.js') as {
       getAppState: () => unknown
     }
     return mod.getAppState?.() ?? {}
@@ -230,14 +230,14 @@ export function installPluginBindings(): void {
   // --- services/plugins/pluginOperations (cyclic with plugin utils)
   setPluginOperationsFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../services/plugins/pluginOperations.js'),
+    require('src/services/plugins/pluginOperations.js'),
   )
 
   // --- misc helpers
   setRgPathFn(() => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('../utils/ripgrep.js')
+      const mod = require('src/utils/ripgrep.js')
       return mod.rgPath?.() ?? null
     } catch {
       return null
@@ -246,7 +246,7 @@ export function installPluginBindings(): void {
   setSecureStorageReadFn(async key => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('../utils/secureStorage/index.js')
+      const mod = require('src/utils/secureStorage/index.js')
       return mod.secureStorageRead ? await mod.secureStorageRead(key) : null
     } catch {
       return null
@@ -255,7 +255,7 @@ export function installPluginBindings(): void {
   setSecureStorageWriteFn(async (key, value) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('../utils/secureStorage/index.js')
+      const mod = require('src/utils/secureStorage/index.js')
       if (mod.secureStorageWrite) await mod.secureStorageWrite(key, value)
     } catch {
       // ignore
@@ -263,21 +263,21 @@ export function installPluginBindings(): void {
   })
   setParseMarkdownFrontmatterFn(text => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../utils/frontmatterParser.js')
+    const mod = require('src/utils/frontmatterParser.js')
     return mod.parseMarkdownFrontmatter
       ? mod.parseMarkdownFrontmatter(text)
       : { frontmatter: {}, body: '' }
   })
   setWalkMarkdownFilesFn(async dir => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../utils/markdownConfigLoader.js')
+    const mod = require('src/utils/markdownConfigLoader.js')
     return mod.walkMarkdownFiles
       ? ((await mod.walkMarkdownFiles(dir)) as string[])
       : []
   })
   setLoadMarkdownConfigFn(path => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../utils/markdownConfigLoader.js')
+    const mod = require('src/utils/markdownConfigLoader.js')
     return mod.loadMarkdownConfig ? mod.loadMarkdownConfig(path) : null
   })
   setGetLspManagerFn(() => {
@@ -291,7 +291,7 @@ export function installPluginBindings(): void {
   setGetMcpTypesFn(() => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require('../services/mcp/types.js')
+      return require('src/services/mcp/types.js')
     } catch {
       return undefined
     }
@@ -299,7 +299,7 @@ export function installPluginBindings(): void {
   setExpandMcpEnvFn(env => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('../services/mcp/envExpansion.js')
+      const mod = require('src/services/mcp/envExpansion.js')
       return mod.expandMcpEnv ? mod.expandMcpEnv(env) : env
     } catch {
       return env
@@ -326,7 +326,7 @@ export function installPluginBindings(): void {
   // --- argumentSubstitution + hints providers
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const argMod = require('../utils/argumentSubstitution.js')
+    const argMod = require('src/utils/argumentSubstitution.js')
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { setApplyArgumentSubstitutionsFn: _sas } = require(
       '@claude-code/config/plugin/_deps',
@@ -337,7 +337,7 @@ export function installPluginBindings(): void {
   }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const hintMod = require('../utils/claudeCodeHints.js')
+    const hintMod = require('src/utils/claudeCodeHints.js')
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { setGetHintsProviderFn: _gh } = require(
       '@claude-code/config/plugin/_deps',

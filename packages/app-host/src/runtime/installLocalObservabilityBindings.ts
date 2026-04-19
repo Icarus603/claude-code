@@ -37,23 +37,23 @@ import {
   setLastAPIRequest,
   setLastAPIRequestMessages,
   getSessionId,
-} from '../bootstrap/state.js'
-import { getOauthAccountInfo } from '../utils/auth.js'
-import { CACHE_PATHS } from '../utils/cachePaths.js'
-import { registerCleanup } from '../utils/cleanupRegistry.js'
-import { logForDebugging } from '../utils/debug.js'
-import { envDynamic } from '../utils/envDynamic.js'
-import { getClaudeConfigHomeDir } from '../utils/envUtils.js'
-import { getFsImplementation } from '../utils/fsOperations.js'
-import { isEssentialTrafficOnly } from '../utils/privacyLevel.js'
-import { captureException } from '../utils/sentry.js'
-import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
-import { toTaggedId } from '../utils/taggedId.js'
+} from 'src/bootstrap/state.js'
+import { getOauthAccountInfo } from 'src/utils/auth.js'
+import { CACHE_PATHS } from 'src/utils/cachePaths.js'
+import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { envDynamic } from 'src/utils/envDynamic.js'
+import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
+import { captureException } from 'src/utils/sentry.js'
+import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { toTaggedId } from 'src/utils/taggedId.js'
 import {
   getAgentId,
   getAgentName,
   getParentSessionId,
-} from '../utils/teammate.js'
+} from 'src/utils/teammate.js'
 
 let installed = false
 

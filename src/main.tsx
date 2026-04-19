@@ -21,14 +21,14 @@ import { startKeychainPrefetch } from "./utils/secureStorage/keychainPrefetch.js
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 startKeychainPrefetch();
 
-import './runtime/bootstrap.js'
+import '@claude-code/app-host/runtime/bootstrap.js'
 
 import type { RuntimeHandles } from '@claude-code/app-host'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { setThemeConfigCallbacks } from '@anthropic/ink'
 import { runClaudeCode } from '@claude-code/cli'
 
-import { createRuntimeHandles } from './runtime/runtimeHandles.js'
+import { createRuntimeHandles } from '@claude-code/app-host/runtime/runtimeHandles.js'
 import { startDeferredPrefetches } from './main/startup/context.js'
 
 export { startDeferredPrefetches };
