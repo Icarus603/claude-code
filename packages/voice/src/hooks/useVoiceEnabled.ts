@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from 'src/state/AppState.js'
 import {
   hasVoiceAuth,
   isVoiceGrowthBookEnabled,
