@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { useDoublePress } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import {
   useAppState,
   useAppStateStore,

@@ -802,7 +802,7 @@ export function installPackageHostBindings(
           const React = require('react')
           const { ManagedSettingsSecurityDialog } = require('src/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js')
           const { render } = require('src/ink.js')
-          const { KeybindingSetup } = require('src/keybindings/KeybindingProviderSetup.js')
+          const { KeybindingSetup } = require('@claude-code/repl/keybindings/KeybindingProviderSetup.js')
           const { AppStateProvider } = require('src/state/AppState.js')
           const { getBaseRenderOptions } = require('src/utils/renderOptions.js')
           return new Promise<'approved' | 'rejected' | 'no_check_needed'>(resolve => {

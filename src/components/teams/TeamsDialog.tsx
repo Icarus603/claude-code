@@ -7,7 +7,7 @@ import { useRegisterOverlay } from '../../context/overlayContext.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow dialog navigation
 import { Box, Text, useInput, stringWidth } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import {
   type AppState,
   useAppState,

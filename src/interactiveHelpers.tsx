@@ -20,7 +20,7 @@ import { getSystemContext } from '@claude-code/provider/context.js'
 import { initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { isSynchronizedOutputSupported } from '@anthropic/ink'
 import type { RenderOptions, Root, TextProps } from '@anthropic/ink'
-import { KeybindingSetup } from './keybindings/KeybindingProviderSetup.js'
+import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
 import { startDeferredPrefetches } from './main.js'
 import {
   checkGate_CACHED_OR_BLOCKING,

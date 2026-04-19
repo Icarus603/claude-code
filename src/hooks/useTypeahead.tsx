@@ -24,7 +24,7 @@ import {
   useRegisterKeybindingContext,
 } from '@anthropic/ink/keybindings'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import { useAppState, useAppStateStore } from '../state/AppState.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type {

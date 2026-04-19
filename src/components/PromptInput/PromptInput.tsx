@@ -60,7 +60,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { useTypeahead } from '../../hooks/useTypeahead.js'
 import { Box, type BorderTextOptions, type ClickEvent, type Key, stringWidth, Text, useInput } from '@anthropic/ink'
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
-import { getShortcutDisplay } from '../../keybindings/shortcutFormat.js'
+import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import {
   useKeybinding,
   useKeybindings,

@@ -19,7 +19,7 @@ import {
 import type { VimMode, PromptInputMode } from '../../types/textInputTypes.js'
 import type { ToolPermissionContext } from '../../Tool.js'
 import { isVimModeEnabled } from './utils.js'
-import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import {
   isDefaultMode,
   permissionModeSymbol,

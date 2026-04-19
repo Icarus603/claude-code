@@ -10,6 +10,9 @@
     "./contracts": "./src/contracts.ts",
     "./testing": "./testing/index.ts",
     "./screens/*.js": "./src/screens/*.tsx",
-    "./screens/*": "./src/screens/*"
+    "./screens/*": "./src/screens/*",
+    "./keybindings/KeybindingProviderSetup.js": "./src/keybindings/KeybindingProviderSetup.tsx",
+    "./keybindings/*.js": "./src/keybindings/*.ts",
+    "./keybindings/*": "./src/keybindings/*"
   }
 }

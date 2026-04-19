@@ -1,16 +1,16 @@
-import { DEFAULT_BINDINGS } from 'src/keybindings/defaultBindings.js'
-import { isKeybindingCustomizationEnabled } from 'src/keybindings/loadUserBindings.js'
+import { DEFAULT_BINDINGS } from '@claude-code/repl/keybindings/defaultBindings.js'
+import { isKeybindingCustomizationEnabled } from '@claude-code/repl/keybindings/loadUserBindings.js'
 import {
   MACOS_RESERVED,
   NON_REBINDABLE,
   TERMINAL_RESERVED,
-} from 'src/keybindings/reservedShortcuts.js'
-import type { KeybindingsSchemaType } from 'src/keybindings/schema.js'
+} from '@claude-code/repl/keybindings/reservedShortcuts.js'
+import type { KeybindingsSchemaType } from '@claude-code/repl/keybindings/schema.js'
 import {
   KEYBINDING_ACTIONS,
   KEYBINDING_CONTEXT_DESCRIPTIONS,
   KEYBINDING_CONTEXTS,
-} from 'src/keybindings/schema.js'
+} from '@claude-code/repl/keybindings/schema.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 
