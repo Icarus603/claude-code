@@ -131,7 +131,7 @@ import {
   COMMAND_NAME_TAG,
   LOCAL_COMMAND_CAVEAT_TAG,
   LOCAL_COMMAND_STDOUT_TAG,
-} from '../constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { DiagnosticTrackingService } from '../services/diagnosticTracking.js'
 import {
   findToolByName,

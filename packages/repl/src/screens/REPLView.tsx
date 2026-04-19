@@ -232,7 +232,7 @@ import {
   formatCommandInputTags,
 } from 'src/utils/messages.js';
 import { generateSessionTitle } from 'src/utils/sessionTitle.js';
-import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from 'src/constants/xml.js';
+import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js';
 import { escapeXml } from 'src/utils/xml.js';
 import type { ThinkingConfig } from 'src/utils/thinking.js';
 import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js';

@@ -9,7 +9,7 @@ import {
   WORKTREE_BRANCH_TAG,
   WORKTREE_PATH_TAG,
   WORKTREE_TAG,
-} from '../../constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { abortSpeculation } from '../../services/PromptSuggestion/speculation.js'
 import type { AppState } from '../../state/AppState.js'
 import type { SetAppState, Task, TaskStateBase } from '@claude-code/tool-registry/Task.js'

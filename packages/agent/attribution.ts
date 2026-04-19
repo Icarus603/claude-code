@@ -6,7 +6,7 @@ import {
   isRemoteSessionLocal,
   PRODUCT_URL,
 } from 'src/constants/product.js'
-import { TERMINAL_OUTPUT_TAGS } from 'src/constants/xml.js'
+import { TERMINAL_OUTPUT_TAGS } from '@claude-code/command-runtime/xml.js'
 // AppState type borrowed via ambient shape to avoid src/ boundary violation
 type AppState = Record<string, unknown>
 import type { Entry } from 'src/types/logs.js'

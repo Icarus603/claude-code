@@ -1,7 +1,7 @@
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import figures from 'figures'
 import * as React from 'react'
-import { TEAMMATE_MESSAGE_TAG } from 'src/constants/xml.js'
+import { TEAMMATE_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { Ansi, Box, Text, type TextProps } from '@anthropic/ink'
 import { toInkColor } from 'src/utils/ink.js'
 

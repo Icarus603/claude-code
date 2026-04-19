@@ -28,7 +28,7 @@ import {
   type ErrorLogSink,
 } from '@claude-code/local-observability/logging'
 
-import { TICK_TAG } from '../constants/xml.js'
+import { TICK_TAG } from '@claude-code/command-runtime/xml.js'
 import { type LogOption, type SerializedMessage, sortLogs } from '../types/logs.js'
 import { CACHE_PATHS } from './cachePaths.js'
 import { stripDisplayTags, stripDisplayTagsAllowEmpty } from './displayTags.js'

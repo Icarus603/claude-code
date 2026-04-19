@@ -5,7 +5,7 @@ import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import {
   LOCAL_COMMAND_STDERR_TAG,
   LOCAL_COMMAND_STDOUT_TAG,
-} from 'src/constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import type {
   SDKAssistantMessage,
   SDKCompactBoundaryMessage,

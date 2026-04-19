@@ -7,7 +7,7 @@ import {
   TASK_ID_TAG,
   TASK_NOTIFICATION_TAG,
   TOOL_USE_ID_TAG,
-} from '../../constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { abortSpeculation } from '../../services/PromptSuggestion/speculation.js'
 import type { AppState } from '../../state/AppState.js'
 import type {

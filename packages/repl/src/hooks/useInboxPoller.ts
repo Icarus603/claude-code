@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useInterval } from 'usehooks-ts'
 import 'src/tools.js'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
-import { TEAMMATE_MESSAGE_TAG } from 'src/constants/xml.js'
+import { TEAMMATE_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { useTerminalNotification } from '@anthropic/ink'
 import { sendNotification } from 'src/services/notifier.js'
 import {

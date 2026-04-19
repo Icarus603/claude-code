@@ -1,6 +1,6 @@
 import { installSwarmAppRuntime } from '../../packages/swarm/src/adapters/appRuntime.js'
 import { installSwarmAppUi } from '../../packages/swarm/src/adapters/appUi.js'
-import { TEAMMATE_MESSAGE_TAG } from '../constants/xml.js'
+import { TEAMMATE_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import {
   processMailboxPermissionResponse,
   registerPermissionCallback,

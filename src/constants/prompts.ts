@@ -56,7 +56,7 @@ import {
   resolveSystemPromptSections,
 } from './systemPromptSections.js'
 import { SLEEP_TOOL_NAME } from '@claude-code/tool-registry/tools/SleepTool/prompt.js'
-import { TICK_TAG } from './xml.js'
+import { TICK_TAG } from '@claude-code/command-runtime/xml.js'
 import { logForDebugging } from '../utils/debug.js'
 import { isUndercover } from '../utils/undercover.js'
 import { getAntModelOverrideConfig } from '../utils/model/antModels.js'

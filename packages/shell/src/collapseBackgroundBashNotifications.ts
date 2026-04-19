@@ -2,7 +2,7 @@ import {
   STATUS_TAG,
   SUMMARY_TAG,
   TASK_NOTIFICATION_TAG,
-} from 'src/constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { BACKGROUND_BASH_SUMMARY_PREFIX } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 import type {
   NormalizedUserMessage,
