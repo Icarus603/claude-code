@@ -1,5 +1,5 @@
 import { installCliHostBindings, type HeadlessStoreParams } from '@claude-code/cli'
-import { runHeadless } from '../cli/print.js'
+import { runHeadless } from '@claude-code/cli/print.js'
 import { getStructuredIO } from '@claude-code/cli/structuredIOHelper.js'
 import { createHeadlessSessionStore } from '../state/sessionStores.js'
 

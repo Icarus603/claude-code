@@ -218,7 +218,7 @@ import {
 import { getLastCacheSafeParams } from '../../../../../../src/utils/forkedAgent.js'
 import { getAccountInformation } from '../../../../../../src/utils/auth.js'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'
-import { installOAuthTokens } from '../../../../../../src/cli/handlers/auth.js'
+import { installOAuthTokens } from '../../../handlers/auth.js'
 import { getAPIProvider } from '../../../../../../src/utils/model/providers.js'
 import { AwsAuthStatusManager } from '../../../../../../src/utils/awsAuthStatusManager.js'
 import {
