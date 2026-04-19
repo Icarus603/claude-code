@@ -53,7 +53,7 @@ import {
   createUserMessage,
 } from '../messages.js'
 import { queryCheckpoint } from '../queryProfiler.js'
-import { parseSlashCommand } from '../slashCommandParsing.js'
+import { parseSlashCommand } from '@claude-code/command-runtime/slashCommandParsing.js'
 import {
   hasUltraplanKeyword,
   replaceUltraplanKeyword,

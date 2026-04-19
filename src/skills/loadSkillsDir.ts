@@ -22,7 +22,7 @@ import type { Command, PromptCommand } from '../types/command.js'
 import {
   parseArgumentNames,
   substituteArguments,
-} from '../utils/argumentSubstitution.js'
+} from '@claude-code/command-runtime/argumentSubstitution.js'
 import { logForDebugging } from '../utils/debug.js'
 import {
   EFFORT_LEVELS,
