@@ -85,6 +85,8 @@
     "./components/SkillPermissionRequest/SkillPermissionRequest.js": "./src/components/SkillPermissionRequest/SkillPermissionRequest.tsx",
     "./components/EnterPlanModePermissionRequest/EnterPlanModePermissionRequest.js": "./src/components/EnterPlanModePermissionRequest/EnterPlanModePermissionRequest.tsx",
     "./shellRuleMatching": "./src/shellRuleMatching.ts",
-    "./dangerousPatterns": "./src/dangerousPatterns.ts"
+    "./dangerousPatterns": "./src/dangerousPatterns.ts",
+    "./classifierApprovals.js": "./src/classifierApprovals.ts",
+    "./classifierApprovalsHook.js": "./src/classifierApprovalsHook.ts"
   }
 }
