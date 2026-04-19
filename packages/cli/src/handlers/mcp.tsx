@@ -41,7 +41,7 @@ import {
   ensureConfigScope,
   getScopeLabel,
 } from '@claude-code/mcp-runtime/utils.js'
-import { AppStateProvider } from '@claude-code/repl/appStateHooks.js'
+import { AppStateProvider } from 'src/state/AppState.js'
 import {
   getCurrentProjectConfig,
   getGlobalConfig,
