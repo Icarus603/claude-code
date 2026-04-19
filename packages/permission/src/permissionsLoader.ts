@@ -1,18 +1,18 @@
-import { readFileSync } from '../fileRead.js'
-import { getFsImplementation, safeResolvePath } from '../fsOperations.js'
-import { safeParseJSON } from '../json.js'
-import { logError } from '../log.js'
+import { readFileSync } from 'src/utils/fileRead.js'
+import { getFsImplementation, safeResolvePath } from 'src/utils/fsOperations.js'
+import { safeParseJSON } from 'src/utils/json.js'
+import { logError } from 'src/utils/log.js'
 import {
   type EditableSettingSource,
   getEnabledSettingSources,
   type SettingSource,
-} from '../settings/constants.js'
+} from 'src/utils/settings/constants.js'
 import {
   getSettingsFilePathForSource,
   getSettingsForSource,
   updateSettingsForSource,
-} from '../settings/settings.js'
-import type { SettingsJson } from '../settings/types.js'
+} from 'src/utils/settings/settings.js'
+import type { SettingsJson } from 'src/utils/settings/types.js'
 import type {
   PermissionBehavior,
   PermissionRule,

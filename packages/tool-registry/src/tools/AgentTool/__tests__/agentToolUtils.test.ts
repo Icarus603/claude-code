@@ -128,7 +128,7 @@ mock.module("src/utils/errors.js", () => ({
 
 mock.module("src/utils/forkedAgent.js", () => ({}));
 
-mock.module("src/utils/permissions/yoloClassifier.js", () => ({
+mock.module("@claude-code/permission/yoloClassifier.js", () => ({
   buildTranscriptForClassifier: () => "",
   classifyYoloAction: () => null,
 }));

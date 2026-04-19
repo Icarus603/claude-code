@@ -54,7 +54,7 @@ export function installPackageHostBindings(
       // V7 — extra subsystem bindings. ALL require() from src/ stays HERE
       // (never in packages/app-host/src/ — see memory: no-require-in-apphost)
       extraPermissionBindings: {
-        addPermissionRulesToSettings: (...a: unknown[]) => { try { return require('../utils/permissions/permissionsLoader.js').addPermissionRulesToSettings(...a) } catch { return false } },
+        addPermissionRulesToSettings: (...a: unknown[]) => { try { return require('@claude-code/permission/permissionsLoader.js').addPermissionRulesToSettings(...a) } catch { return false } },
         hasAutoMemPathOverride: () => { try { return require('@claude-code/memory/paths').hasAutoMemPathOverride() } catch { return false } },
         isAutoMemPath: (p: string) => { try { return require('@claude-code/memory/paths').isAutoMemPath(p) } catch { return false } },
         isAgentMemoryPath: (p: string) => { try { return require('@claude-code/memory/agentMemory').isAgentMemoryPath(p) } catch { return false } },
@@ -77,8 +77,8 @@ export function installPackageHostBindings(
         // permissions.ts bindings
         shouldUseSandbox: () => { try { return require('@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js').shouldUseSandbox() } catch { return false } },
         extractOutputRedirections: (cmd: string) => { try { return require('../utils/bash/commands.js').extractOutputRedirections(cmd) } catch { return [] } },
-        deletePermissionRuleFromSettings: (...a: unknown[]) => { try { return require('../utils/permissions/permissionsLoader.js').deletePermissionRuleFromSettings(...a) } catch { return false } },
-        shouldAllowManagedPermissionRulesOnly: () => { try { return require('../utils/permissions/permissionsLoader.js').shouldAllowManagedPermissionRulesOnly() } catch { return false } },
+        deletePermissionRuleFromSettings: (...a: unknown[]) => { try { return require('@claude-code/permission/permissionsLoader.js').deletePermissionRuleFromSettings(...a) } catch { return false } },
+        shouldAllowManagedPermissionRulesOnly: () => { try { return require('@claude-code/permission/permissionsLoader.js').shouldAllowManagedPermissionRulesOnly() } catch { return false } },
         classifyPermissionDecision: (...a: unknown[]) => { try { return require('@claude-code/permission/classifierDecision.js').classifyPermissionDecision(...a) } catch { return null } },
         getAutoMode: () => { try { return require('@claude-code/permission/autoModeState.js').getAutoMode() } catch { return null } },
         setAutoMode: (v: unknown) => { try { require('@claude-code/permission/autoModeState.js').setAutoMode(v) } catch {} },
@@ -100,14 +100,14 @@ export function installPackageHostBindings(
         calculateCostFromTokens: (...a: unknown[]) => { try { return require('../utils/modelCost.js').calculateCostFromTokens(...a) } catch { return 0 } },
         isSandboxingEnabled: () => { try { return require('../utils/sandbox/sandbox-adapter.js').SandboxManager.isSandboxingEnabled() } catch { return false } },
         isAutoAllowBashIfSandboxedEnabled: () => { try { return require('../utils/sandbox/sandbox-adapter.js').SandboxManager.isAutoAllowBashIfSandboxedEnabled() } catch { return false } },
-        classifyYoloAction: (...a: unknown[]) => { try { return require('../utils/permissions/yoloClassifier.js').classifyYoloAction(...a) } catch { return null } },
-        formatActionForClassifier: (...a: unknown[]) => { try { return require('../utils/permissions/yoloClassifier.js').formatActionForClassifier(...a) } catch { return '' } },
+        classifyYoloAction: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').classifyYoloAction(...a) } catch { return null } },
+        formatActionForClassifier: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').formatActionForClassifier(...a) } catch { return '' } },
         getToolsForDefaultPreset: () => { try { return require("../tools.js").getToolsForDefaultPreset() } catch { return [] } },
         handleAutoModeTransition: (mode) => { try { require('../bootstrap/state.js').handleAutoModeTransition(mode) } catch {} },
         handlePlanModeTransition: (mode) => { try { require('../bootstrap/state.js').handlePlanModeTransition(mode) } catch {} },
         setHasExitedPlanMode: (v) => { try { require('../bootstrap/state.js').setHasExitedPlanMode(v) } catch {} },
         setNeedsAutoModeExitAttachment: (v) => { try { require('../bootstrap/state.js').setNeedsAutoModeExitAttachment(v) } catch {} },
-        loadAllPermissionRulesFromDisk: () => { try { return require('../utils/permissions/permissionsLoader.js').loadAllPermissionRulesFromDisk() } catch { return [] } },
+        loadAllPermissionRulesFromDisk: () => { try { return require('@claude-code/permission/permissionsLoader.js').loadAllPermissionRulesFromDisk() } catch { return [] } },
         addDirHelpMessage: () => { try { return require('../commands/add-dir/validation.js').addDirHelpMessage() } catch { return '' } },
         validateDirectoryForWorkspace: (dir, cwd) => { try { return require('../commands/add-dir/validation.js').validateDirectoryForWorkspace(dir, cwd) } catch { return { valid: true } } },
         parseToolPreset: (preset) => { try { return require('../tools.js').parseToolPreset(preset) } catch { return [] } },
