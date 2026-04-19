@@ -1,5 +1,5 @@
-import type { Command } from '../../commands.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
+import type { Command } from 'src/commands.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 
 export default {
   type: 'local-jsx',

@@ -1,9 +1,9 @@
-import type { Command } from '../commands.js'
-import type { LocalCommandCall } from '../types/command.js'
-import { getAPIProvider } from '../utils/model/providers.js'
-import { updateSettingsForSource } from '../utils/settings/settings.js'
-import { getSettings_DEPRECATED } from '../utils/settings/settings.js'
-import { applyConfigEnvironmentVariables } from '../utils/managedEnv.js'
+import type { Command } from 'src/commands.js'
+import type { LocalCommandCall } from 'src/types/command.js'
+import { getAPIProvider } from 'src/utils/model/providers.js'
+import { updateSettingsForSource } from 'src/utils/settings/settings.js'
+import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
+import { applyConfigEnvironmentVariables } from 'src/utils/managedEnv.js'
 
 function getEnvVarForProvider(provider: string): string {
   switch (provider) {

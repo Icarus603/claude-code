@@ -1,28 +1,28 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import { resetCostState } from '../../bootstrap/state.js'
+import { resetCostState } from 'src/bootstrap/state.js'
 import {
   clearTrustedDeviceToken,
   enrollTrustedDevice,
 } from '@claude-code/bridge/trustedDevice.js'
-import type { LocalJSXCommandContext } from '../../commands.js'
-import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js'
-import { ConsoleOAuthFlow } from '../../components/ConsoleOAuthFlow.js'
+import type { LocalJSXCommandContext } from 'src/commands.js'
+import { ConfigurableShortcutHint } from 'src/components/ConfigurableShortcutHint.js'
+import { ConsoleOAuthFlow } from 'src/components/ConsoleOAuthFlow.js'
 import { Dialog } from '@anthropic/ink'
-import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
+import { useMainLoopModel } from 'src/hooks/useMainLoopModel.js'
 import { Text } from '@anthropic/ink'
 import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-flags'
 import { refreshPolicyLimits } from '@claude-code/provider/policyLimits/index.js'
-import { refreshRemoteManagedSettings } from '../../services/remoteManagedSettings/index.js'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import { stripSignatureBlocks } from '../../utils/messages.js'
+import { refreshRemoteManagedSettings } from 'src/services/remoteManagedSettings/index.js'
+import type { LocalJSXCommandOnDone } from 'src/types/command.js'
+import { stripSignatureBlocks } from 'src/utils/messages.js'
 import {
   checkAndDisableAutoModeIfNeeded,
   checkAndDisableBypassPermissionsIfNeeded,
   resetAutoModeGateCheck,
   resetBypassPermissionsCheck,
-} from '../../utils/permissions/bypassPermissionsKillswitch.js'
-import { resetUserCache } from '../../utils/user.js'
+} from 'src/utils/permissions/bypassPermissionsKillswitch.js'
+import { resetUserCache } from 'src/utils/user.js'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,

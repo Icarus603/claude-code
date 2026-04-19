@@ -17,6 +17,11 @@
     "./mockRateLimits.js": "./src/mockRateLimits.ts",
     "./rateLimitMessages.js": "./src/rateLimitMessages.ts",
     "./rateLimitMocking.js": "./src/rateLimitMocking.ts",
-    "./policyLimits/*.js": "./src/policyLimits/*.ts"
+    "./policyLimits/*.js": "./src/policyLimits/*.ts",
+    "./commands/provider.js": "./src/commands/provider.ts",
+    "./commands/login/index.js": "./src/commands/login/index.ts",
+    "./commands/login/login.js": "./src/commands/login/login.tsx",
+    "./commands/logout/index.js": "./src/commands/logout/index.ts",
+    "./commands/logout/logout.js": "./src/commands/logout/logout.tsx"
   }
 }
