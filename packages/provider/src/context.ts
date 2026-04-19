@@ -16,6 +16,7 @@ import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { getBranch, getDefaultBranch, getIsGit, gitExe } from 'src/utils/git.js'
 import { shouldIncludeGitInstructions } from 'src/utils/gitSettings.js'
 import { logError } from 'src/utils/log.js'
+import { readEnv } from '@claude-code/config/env'
 
 const MAX_STATUS_CHARS = 2000
 
@@ -34,7 +35,7 @@ export function setSystemPromptInjection(value: string | null): void {
 }
 
 export const getGitStatus = memoize(async (): Promise<string | null> => {
-  if (process.env.NODE_ENV === 'test') {
+  if (readEnv('NODE_ENV') === 'test') {
     // Avoid cycles in tests
     return null
   }
@@ -122,7 +123,7 @@ export const getSystemContext = memoize(
 
     // Skip git status in CCR (unnecessary overhead on resume) or when git instructions are disabled
     const gitStatus =
-      isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) ||
+      isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE')) ||
       !shouldIncludeGitInstructions()
         ? null
         : await getGitStatus()
@@ -163,7 +164,7 @@ export const getUserContext = memoize(
     // --bare: skip auto-discovery (cwd walk), BUT honor explicit --add-dir.
     // --bare means "skip what I didn't ask for", not "ignore what I asked for".
     const shouldDisableClaudeMd =
-      isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS) ||
+      isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_CLAUDE_MDS')) ||
       (isBareMode() && getAdditionalDirectoriesForClaudeMd().length === 0)
     // Await the async I/O (readFile/readdir directory walk) so the event
     // loop yields naturally at the first fs.readFile.
