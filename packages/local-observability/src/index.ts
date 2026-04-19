@@ -108,3 +108,7 @@ export async function shutdownLocalObservability(): Promise<void> {}
 
 export * from './spans.js'
 export * from './errors.js'
+export type {
+  AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
+} from './compat.js'
