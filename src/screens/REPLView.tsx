@@ -160,17 +160,17 @@ import { isHumanTurn } from '../utils/messagePredicates.js';
 import { logError } from '../utils/log.js';
 // Dead code elimination: conditional imports
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-const useVoiceIntegration: typeof import('../hooks/useVoiceIntegration.js').useVoiceIntegration = feature('VOICE_MODE')
-  ? require('../hooks/useVoiceIntegration.js').useVoiceIntegration
+const useVoiceIntegration: typeof import('@claude-code/voice/hooks/useVoiceIntegration.js').useVoiceIntegration = feature('VOICE_MODE')
+  ? require('@claude-code/voice/hooks/useVoiceIntegration.js').useVoiceIntegration
   : () => ({
       stripTrailing: () => 0,
       handleKeyEvent: () => {},
       resetAnchor: () => {},
     });
-const VoiceKeybindingHandler: typeof import('../hooks/useVoiceIntegration.js').VoiceKeybindingHandler = feature(
+const VoiceKeybindingHandler: typeof import('@claude-code/voice/hooks/useVoiceIntegration.js').VoiceKeybindingHandler = feature(
   'VOICE_MODE',
 )
-  ? require('../hooks/useVoiceIntegration.js').VoiceKeybindingHandler
+  ? require('@claude-code/voice/hooks/useVoiceIntegration.js').VoiceKeybindingHandler
   : () => null;
 // Frustration detection is ant-only (dogfooding). Conditional require so external
 // builds eliminate the module entirely (including its two O(n) useMemos that run

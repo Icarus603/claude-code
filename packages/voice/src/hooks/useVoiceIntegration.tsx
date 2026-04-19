@@ -1,19 +1,19 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { useNotifications } from '../context/notifications.js'
-import { useIsModalOverlayActive } from '../context/overlayContext.js'
+import { useNotifications } from 'src/context/notifications.js'
+import { useIsModalOverlayActive } from 'src/context/overlayContext.js'
 import {
   useGetVoiceState,
   useSetVoiceState,
   useVoiceState,
-} from '../context/voice.js'
+} from 'src/context/voice.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until REPL wires handleKeyDown to <Box onKeyDown>
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
 import { keystrokesEqual } from '@anthropic/ink/keybindings'
 import type { ParsedKeystroke } from '@anthropic/ink/keybindings'
-import { normalizeFullWidthSpace } from '../utils/stringUtils.js'
+import { normalizeFullWidthSpace } from 'src/utils/stringUtils.js'
 import { useVoiceEnabled } from './useVoiceEnabled.js'
 
 // Dead code elimination: conditional import for voice input hook.

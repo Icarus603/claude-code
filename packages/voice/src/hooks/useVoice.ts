@@ -7,7 +7,7 @@
 // endpoint (conversation_engine) for STT.
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSetVoiceState } from '../context/voice.js'
+import { useSetVoiceState } from 'src/context/voice.js'
 import { useTerminalFocus } from '@anthropic/ink'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -20,12 +20,12 @@ import {
   isVoiceStreamAvailable,
   type VoiceStreamConnection,
 } from '@claude-code/voice/voiceStreamSTT.js'
-import { logForDebugging } from '../utils/debug.js'
-import { toError } from '../utils/errors.js'
-import { getSystemLocaleLanguage } from '../utils/intl.js'
-import { logError } from '../utils/log.js'
-import { getInitialSettings } from '../utils/settings/settings.js'
-import { sleep } from '../utils/sleep.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { toError } from 'src/utils/errors.js'
+import { getSystemLocaleLanguage } from 'src/utils/intl.js'
+import { logError } from 'src/utils/log.js'
+import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { sleep } from 'src/utils/sleep.js'
 
 // ─── Language normalization ─────────────────────────────────────────────
 
