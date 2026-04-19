@@ -14,7 +14,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
 import { getCacheControl } from '../../services/api/claude.js'
-import { parsePromptTooLongTokenCounts } from '../../services/api/errors.js'
+import { parsePromptTooLongTokenCounts } from '@claude-code/provider/errors.js'
 import { getDefaultMaxRetries } from '@claude-code/provider/withRetry.js'
 import type { Tool, ToolPermissionContext, Tools } from '../../Tool.js'
 import type { Message } from '../../types/message.js'

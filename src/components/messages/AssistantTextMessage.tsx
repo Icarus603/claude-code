@@ -16,7 +16,7 @@ import {
   PROMPT_TOO_LONG_ERROR_MESSAGE,
   startsWithApiErrorPrefix,
   TOKEN_REVOKED_ERROR_MESSAGE,
-} from '../../services/api/errors.js'
+} from '@claude-code/provider/errors.js'
 import {
   isEmptyMessageText,
   NO_RESPONSE_REQUESTED,

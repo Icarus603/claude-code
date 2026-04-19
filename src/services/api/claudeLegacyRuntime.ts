@@ -236,7 +236,7 @@ import {
   CUSTOM_OFF_SWITCH_MESSAGE,
   getAssistantMessageFromError,
   getErrorMessageIfRefusal,
-} from 'src/services/api/errors.js'
+} from '@claude-code/provider/errors.js'
 import {
   EMPTY_USAGE,
   type GlobalCacheStrategy,

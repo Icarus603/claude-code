@@ -15,7 +15,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { queryHaiku } from 'src/services/api/claude.js'
-import { startsWithApiErrorPrefix } from 'src/services/api/errors.js'
+import { startsWithApiErrorPrefix } from '@claude-code/provider/errors.js'
 import { memoizeWithLRU } from 'src/utils/memoize.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'
