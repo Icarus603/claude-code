@@ -38,6 +38,7 @@
     "./grove.js": "./src/grove.ts",
     "./errorUtils.js": "./src/errorUtils.ts",
     "./referral.js": "./src/referral.ts",
-    "./dumpPrompts.js": "./src/dumpPrompts.ts"
+    "./dumpPrompts.js": "./src/dumpPrompts.ts",
+    "./withRetry.js": "./src/withRetry.ts"
   }
 }

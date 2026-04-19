@@ -256,7 +256,7 @@ import {
   is529Error,
   type RetryContext,
   withRetry,
-} from 'src/services/api/withRetry.js'
+} from '@claude-code/provider/withRetry.js'
 
 // Define a type that represents valid JSON values
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray
