@@ -120,6 +120,15 @@ import {
   isPluginZipCacheEnabled,
 } from './zipCache.js'
 
+/** Thrown when plugin manifest JSON parses but fails schema validation. */
+export class InvalidManifestError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'InvalidManifestError'
+  }
+}
+
+
 /**
  * Get the path where plugin cache is stored
  */
@@ -998,16 +1007,13 @@ export async function cachePlugin(
           level: 'error',
         })
 
-        throw new Error(
+        throw new InvalidManifestError(
           `Plugin has an invalid manifest file at ${manifestPath}. Validation errors: ${errors}`,
         )
       }
     } catch (error) {
       // Check if this is a validation error we just threw
-      if (
-        error instanceof Error &&
-        error.message.includes('invalid manifest file')
-      ) {
+      if (error instanceof InvalidManifestError) {
         throw error
       }
 
@@ -1045,16 +1051,13 @@ export async function cachePlugin(
           { level: 'error' },
         )
 
-        throw new Error(
+        throw new InvalidManifestError(
           `Plugin has an invalid manifest file at ${legacyManifestPath}. Validation errors: ${errors}`,
         )
       }
     } catch (error) {
       // Check if this is a validation error we just threw
-      if (
-        error instanceof Error &&
-        error.message.includes('invalid manifest file')
-      ) {
+      if (error instanceof InvalidManifestError) {
         throw error
       }
 
@@ -1191,10 +1194,7 @@ export async function loadPluginManifest(
     )
   } catch (error) {
     // Check if this is the error we just threw (validation error)
-    if (
-      error instanceof Error &&
-      error.message.includes('invalid manifest file')
-    ) {
+    if (error instanceof InvalidManifestError) {
       throw error
     }
 

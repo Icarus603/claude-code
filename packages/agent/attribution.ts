@@ -7,7 +7,8 @@ import {
   PRODUCT_URL,
 } from 'src/constants/product.js'
 import { TERMINAL_OUTPUT_TAGS } from 'src/constants/xml.js'
-import type { AppState } from 'src/state/AppState.js'
+// AppState type borrowed via ambient shape to avoid src/ boundary violation
+type AppState = Record<string, unknown>
 import type { Entry } from 'src/types/logs.js'
 import {
   type AttributionData,
@@ -30,6 +31,7 @@ import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { readTranscriptForLoad } from 'src/utils/sessionStoragePortable.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
 import { isUndercover } from 'src/utils/undercover.js'
+import { readEnv } from '@claude-code/config/env'
 
 export type AttributionTexts = {
   commit: string
@@ -45,14 +47,14 @@ export type AttributionTexts = {
  * - Remote mode: returns session URL for attribution
  */
 export function getAttributionTexts(): AttributionTexts {
-  if (process.env.USER_TYPE === 'ant' && isUndercover()) {
+  if (readEnv('USER_TYPE') === 'ant' && isUndercover()) {
     return { commit: '', pr: '' }
   }
 
   if (getClientType() === 'remote') {
-    const remoteSessionId = process.env.CLAUDE_CODE_REMOTE_SESSION_ID
+    const remoteSessionId = readEnv('CLAUDE_CODE_REMOTE_SESSION_ID')
     if (remoteSessionId) {
-      const ingressUrl = process.env.SESSION_INGRESS_URL
+      const ingressUrl = readEnv('SESSION_INGRESS_URL')
       // Skip for local dev - URLs won't persist
       if (!isRemoteSessionLocal(remoteSessionId, ingressUrl)) {
         const sessionUrl = getRemoteSessionUrl(remoteSessionId, ingressUrl)
@@ -292,14 +294,14 @@ async function getTranscriptStats(): Promise<{
 export async function getEnhancedPRAttribution(
   getAppState: () => AppState,
 ): Promise<string> {
-  if (process.env.USER_TYPE === 'ant' && isUndercover()) {
+  if (readEnv('USER_TYPE') === 'ant' && isUndercover()) {
     return ''
   }
 
   if (getClientType() === 'remote') {
-    const remoteSessionId = process.env.CLAUDE_CODE_REMOTE_SESSION_ID
+    const remoteSessionId = readEnv('CLAUDE_CODE_REMOTE_SESSION_ID')
     if (remoteSessionId) {
-      const ingressUrl = process.env.SESSION_INGRESS_URL
+      const ingressUrl = readEnv('SESSION_INGRESS_URL')
       // Skip for local dev - URLs won't persist
       if (!isRemoteSessionLocal(remoteSessionId, ingressUrl)) {
         return getRemoteSessionUrl(remoteSessionId, ingressUrl)
