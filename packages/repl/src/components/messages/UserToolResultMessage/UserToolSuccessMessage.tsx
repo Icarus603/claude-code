@@ -17,7 +17,7 @@ import {
   deleteClassifierApproval,
   getClassifierApproval,
   getYoloClassifierApproval,
-} from 'src/utils/classifierApprovals.js'
+} from '@claude-code/permission/classifierApprovals.js'
 import type { buildMessageLookups } from 'src/utils/messages.js'
 import { MessageResponse } from '../../MessageResponse.js'
 import { HookProgressMessage } from '../HookProgressMessage.js'

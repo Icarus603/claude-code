@@ -25,7 +25,7 @@ import {
   clearClassifierChecking,
   setClassifierApproval,
   setYoloClassifierApproval,
-} from 'src/utils/classifierApprovals.js'
+} from '@claude-code/permission/classifierApprovals.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { AbortError } from 'src/utils/errors.js'
 import { logError } from 'src/utils/log.js'

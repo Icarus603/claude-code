@@ -23,7 +23,7 @@ import {
   setClassifierApproval,
   setClassifierChecking,
   setYoloClassifierApproval,
-} from 'src/utils/classifierApprovals.js'
+} from '@claude-code/permission/classifierApprovals.js'
 import { errorMessage } from 'src/utils/errors.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'

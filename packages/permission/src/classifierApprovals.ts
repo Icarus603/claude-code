@@ -4,7 +4,7 @@
  */
 
 import { feature } from 'bun:bundle'
-import { createSignal } from './signal.js'
+import { createSignal } from 'src/utils/signal.js'
 
 type ClassifierApproval = {
   classifier: 'bash' | 'auto-mode'

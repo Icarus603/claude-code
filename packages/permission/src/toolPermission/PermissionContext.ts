@@ -20,7 +20,7 @@ import type {
   PermissionDecisionReason,
   PermissionDenyDecision,
 } from 'src/types/permissions.js'
-import { setClassifierApproval } from 'src/utils/classifierApprovals.js'
+import { setClassifierApproval } from '@claude-code/permission/classifierApprovals.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { executePermissionRequestHooks } from 'src/utils/hooks.js'
 import {
