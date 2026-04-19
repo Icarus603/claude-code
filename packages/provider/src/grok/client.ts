@@ -1,5 +1,6 @@
 import { getProviderNetworkLayer } from '../network.js'
 import OpenAI from 'openai'
+import { readEnv } from '@claude-code/config/env'
 
 /**
  * Environment variables:
@@ -20,14 +21,14 @@ export function getGrokClient(options?: {
   if (cachedClient) return cachedClient
   const networkLayer = getProviderNetworkLayer()
 
-  const apiKey = process.env.GROK_API_KEY || process.env.XAI_API_KEY || ''
-  const baseURL = process.env.GROK_BASE_URL || DEFAULT_BASE_URL
+  const apiKey = readEnv('GROK_API_KEY') || readEnv('XAI_API_KEY') || ''
+  const baseURL = readEnv('GROK_BASE_URL') || DEFAULT_BASE_URL
 
   const client = new OpenAI({
     apiKey,
     baseURL,
     maxRetries: options?.maxRetries ?? 0,
-    timeout: parseInt(process.env.API_TIMEOUT_MS || String(600 * 1000), 10),
+    timeout: parseInt(readEnv('API_TIMEOUT_MS') || String(600 * 1000), 10),
     dangerouslyAllowBrowser: true,
     fetchOptions: networkLayer.getProxyFetchOptions({
       forAnthropicAPI: false,

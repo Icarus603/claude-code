@@ -17,7 +17,7 @@ function getSystemThemeName(): SystemTheme {
 }
 
 function detectFromColorFgBg(): SystemTheme | undefined {
-  const colorfgbg = process.env.COLORFGBG
+  const colorfgbg = readEnv('COLORFGBG')
   if (!colorfgbg) return undefined
   const parts = colorfgbg.split(';')
   const bg = parts[parts.length - 1]

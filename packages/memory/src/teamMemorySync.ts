@@ -40,6 +40,7 @@ import {
   type TeamMemorySyncPushResult,
   type TeamMemorySyncUploadResult,
 } from './teamMemTypes.js'
+import { readEnv } from '@claude-code/config/env'
 
 const TEAM_MEMORY_SYNC_TIMEOUT_MS = 30_000
 const MAX_FILE_SIZE_BYTES = 250_000
@@ -94,7 +95,7 @@ function isUsingOAuth(): boolean {
 function getTeamMemorySyncEndpoint(repoSlug: string): string {
   const bindings = getMemoryHostBindings()
   const baseUrl =
-    process.env.TEAM_MEMORY_SYNC_URL ?? (bindings.oauthBaseApiUrl ?? 'https://claude.ai')
+    readEnv('TEAM_MEMORY_SYNC_URL') ?? (bindings.oauthBaseApiUrl ?? 'https://claude.ai')
   return `${baseUrl}/api/claude_code/team_memory?repo=${encodeURIComponent(repoSlug)}`
 }
 

@@ -66,7 +66,7 @@ export function isEnvDefinedFalsy(envVar: string | boolean | undefined): boolean
  */
 export function isBareMode(): boolean {
   return (
-    isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE) ||
+    isEnvTruthy(readEnv('CLAUDE_CODE_SIMPLE')) ||
     process.argv.includes('--bare')
   )
 }
@@ -74,6 +74,8 @@ export function isBareMode(): boolean {
 // ── Filesystem utilities ───────────────────────────────────────────────────────
 
 import { stat } from 'fs/promises'
+import { readEnv } from '@claude-code/config/env'
+import { readEnv } from '@claude-code/config/env'
 
 /** Check if a path exists (async, swallows errors). */
 export async function pathExists(path: string): Promise<boolean> {

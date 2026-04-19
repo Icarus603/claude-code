@@ -25,6 +25,7 @@ import {
 } from './compact.js'
 import { runPostCompactCleanup } from './postCompactCleanup.js'
 import { trySessionMemoryCompaction } from './sessionMemoryCompact.js'
+import { readEnv } from '@claude-code/config/env'
 
 // Reserve this many tokens for output during compaction
 // Based on p99.99 of compact summary output being 17,387 tokens.
@@ -38,7 +39,7 @@ export function getEffectiveContextWindowSize(model: string): number {
   )
   let contextWindow = getContextWindowForModel(model, getSdkBetas())
 
-  const autoCompactWindow = process.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW
+  const autoCompactWindow = readEnv('CLAUDE_CODE_AUTO_COMPACT_WINDOW')
   if (autoCompactWindow) {
     const parsed = parseInt(autoCompactWindow, 10)
     if (!isNaN(parsed) && parsed > 0) {
@@ -77,7 +78,7 @@ export function getAutoCompactThreshold(model: string): number {
     effectiveContextWindow - AUTOCOMPACT_BUFFER_TOKENS
 
   // Override for easier testing of autocompact
-  const envPercent = process.env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE
+  const envPercent = readEnv('CLAUDE_AUTOCOMPACT_PCT_OVERRIDE')
   if (envPercent) {
     const parsed = parseFloat(envPercent)
     if (!isNaN(parsed) && parsed > 0 && parsed <= 100) {
@@ -125,7 +126,7 @@ export function calculateTokenWarningState(
     actualContextWindow - MANUAL_COMPACT_BUFFER_TOKENS
 
   // Allow override for testing
-  const blockingLimitOverride = process.env.CLAUDE_CODE_BLOCKING_LIMIT_OVERRIDE
+  const blockingLimitOverride = readEnv('CLAUDE_CODE_BLOCKING_LIMIT_OVERRIDE')
   const parsedOverride = blockingLimitOverride
     ? parseInt(blockingLimitOverride, 10)
     : NaN
@@ -146,11 +147,11 @@ export function calculateTokenWarningState(
 }
 
 export function isAutoCompactEnabled(): boolean {
-  if (isEnvTruthy(process.env.DISABLE_COMPACT)) {
+  if (isEnvTruthy(readEnv('DISABLE_COMPACT'))) {
     return false
   }
   // Allow disabling just auto-compact (keeps manual /compact working)
-  if (isEnvTruthy(process.env.DISABLE_AUTO_COMPACT)) {
+  if (isEnvTruthy(readEnv('DISABLE_AUTO_COMPACT'))) {
     return false
   }
   // Check if user has disabled auto-compact in their settings
@@ -251,7 +252,7 @@ export async function autoCompactIfNeeded(
   compactionResult?: CompactionResult
   consecutiveFailures?: number
 }> {
-  if (isEnvTruthy(process.env.DISABLE_COMPACT)) {
+  if (isEnvTruthy(readEnv('DISABLE_COMPACT'))) {
     return { wasCompacted: false }
   }
 

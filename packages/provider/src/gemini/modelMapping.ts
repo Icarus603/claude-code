@@ -1,4 +1,5 @@
 import { ConfigurationError } from '../errors.js'
+import { readEnv } from '@claude-code/config/env'
 
 function getModelFamily(model: string): 'haiku' | 'sonnet' | 'opus' | null {
   if (/haiku/i.test(model)) return 'haiku'
@@ -8,8 +9,8 @@ function getModelFamily(model: string): 'haiku' | 'sonnet' | 'opus' | null {
 }
 
 export function resolveGeminiModel(anthropicModel: string): string {
-  if (process.env.GEMINI_MODEL) {
-    return process.env.GEMINI_MODEL
+  if (readEnv('GEMINI_MODEL')) {
+    return readEnv('GEMINI_MODEL')
   }
 
   const cleanModel = anthropicModel.replace(/\[1m\]$/i, '')
@@ -21,14 +22,14 @@ export function resolveGeminiModel(anthropicModel: string): string {
 
   // First, try Gemini-specific DEFAULT variables (separated from Anthropic)
   const geminiEnvVar = `GEMINI_DEFAULT_${family.toUpperCase()}_MODEL`
-  const geminiModel = process.env[geminiEnvVar]
+  const geminiModel = readEnv(geminiEnvVar)
   if (geminiModel) {
     return geminiModel
   }
 
   // Fallback to Anthropic DEFAULT variables for backward compatibility
   const sharedEnvVar = `ANTHROPIC_DEFAULT_${family.toUpperCase()}_MODEL`
-  const resolvedModel = process.env[sharedEnvVar]
+  const resolvedModel = readEnv(sharedEnvVar)
   if (resolvedModel) {
     return resolvedModel
   }

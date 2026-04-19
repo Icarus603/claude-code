@@ -1,5 +1,6 @@
 import { getProviderNetworkLayer } from '../network.js'
 import OpenAI from 'openai'
+import { readEnv } from '@claude-code/config/env'
 
 /**
  * Environment variables:
@@ -20,17 +21,17 @@ export function getOpenAIClient(options?: {
   if (cachedClient) return cachedClient
   const networkLayer = getProviderNetworkLayer()
 
-  const apiKey = process.env.OPENAI_API_KEY || ''
-  const baseURL = process.env.OPENAI_BASE_URL
+  const apiKey = readEnv('OPENAI_API_KEY') || ''
+  const baseURL = readEnv('OPENAI_BASE_URL')
 
   const client = new OpenAI({
     apiKey,
     ...(baseURL && { baseURL }),
     maxRetries: options?.maxRetries ?? 0,
-    timeout: parseInt(process.env.API_TIMEOUT_MS || String(600 * 1000), 10),
+    timeout: parseInt(readEnv('API_TIMEOUT_MS') || String(600 * 1000), 10),
     dangerouslyAllowBrowser: true,
-    ...(process.env.OPENAI_ORG_ID && { organization: process.env.OPENAI_ORG_ID }),
-    ...(process.env.OPENAI_PROJECT_ID && { project: process.env.OPENAI_PROJECT_ID }),
+    ...(readEnv('OPENAI_ORG_ID') && { organization: readEnv('OPENAI_ORG_ID') }),
+    ...(readEnv('OPENAI_PROJECT_ID') && { project: readEnv('OPENAI_PROJECT_ID') }),
     fetchOptions: networkLayer.getProxyFetchOptions({
       forAnthropicAPI: false,
     }) as any,

@@ -40,7 +40,7 @@ function getModelFamily(model: string): 'haiku' | 'sonnet' | 'opus' | null {
  * Accepts JSON like: {"opus":"grok-4","sonnet":"grok-3","haiku":"grok-3-mini-fast"}
  */
 function getUserModelMap(): Record<string, string> | null {
-  const raw = process.env.GROK_MODEL_MAP
+  const raw = readEnv('GROK_MODEL_MAP')
   if (!raw) return null
   try {
     const parsed = JSON.parse(raw)
@@ -67,8 +67,8 @@ function getUserModelMap(): Record<string, string> | null {
  */
 export function resolveGrokModel(anthropicModel: string): string {
   // 1. Global override
-  if (process.env.GROK_MODEL) {
-    return process.env.GROK_MODEL
+  if (readEnv('GROK_MODEL')) {
+    return readEnv('GROK_MODEL')
   }
 
   const cleanModel = anthropicModel.replace(/\[1m\]$/, '')
@@ -83,12 +83,12 @@ export function resolveGrokModel(anthropicModel: string): string {
   if (family) {
     // 3. Grok-specific family override
     const grokEnvVar = `GROK_DEFAULT_${family.toUpperCase()}_MODEL`
-    const grokOverride = process.env[grokEnvVar]
+    const grokOverride = readEnv(grokEnvVar)
     if (grokOverride) return grokOverride
 
     // 4. Anthropic env var (backward compat)
     const anthropicEnvVar = `ANTHROPIC_DEFAULT_${family.toUpperCase()}_MODEL`
-    const anthropicOverride = process.env[anthropicEnvVar]
+    const anthropicOverride = readEnv(anthropicEnvVar)
     if (anthropicOverride) return anthropicOverride
   }
 

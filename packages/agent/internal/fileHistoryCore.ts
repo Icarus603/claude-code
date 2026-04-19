@@ -22,6 +22,7 @@ import {
   isEnvTruthy,
   pathExists,
 } from '../internalUtils.js'
+import { readEnv } from '@claude-code/config/env'
 
 type BackupFileName = string | null // The null value means the file does not exist in this version
 
@@ -61,14 +62,14 @@ export function fileHistoryEnabled(): boolean {
   }
   return (
     getGlobalConfig().fileCheckpointingEnabled !== false &&
-    !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING)
+    !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING'))
   )
 }
 
 function fileHistoryEnabledSdk(): boolean {
   return (
-    isEnvTruthy(process.env.CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING) &&
-    !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING)
+    isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING')) &&
+    !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING'))
   )
 }
 

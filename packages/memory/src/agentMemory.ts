@@ -6,6 +6,7 @@ import {
 import { getMemoryBaseDir } from './paths.js'
 import { getMemoryHostBindings } from './host.js'
 import { sanitizePath } from './internalUtils.js'
+import { readEnv } from '@claude-code/config/env'
 
 // Persistent agent memory scope: 'user' (~/.claude/agent-memory/), 'project' (.claude/agent-memory/), or 'local' (.claude/agent-memory-local/)
 export type AgentMemoryScope = 'user' | 'project' | 'local'
@@ -26,11 +27,11 @@ function sanitizeAgentTypeForPath(agentType: string): string {
  */
 function getLocalAgentMemoryDir(dirName: string): string {
   const bindings = getMemoryHostBindings()
-  if (process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR) {
+  if (readEnv('CLAUDE_CODE_REMOTE_MEMORY_DIR')) {
     const projectRoot = bindings.getProjectRoot?.() ?? process.cwd()
     return (
       join(
-        process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR,
+        readEnv('CLAUDE_CODE_REMOTE_MEMORY_DIR'),
         'projects',
         sanitizePath(
           bindings.findCanonicalGitRoot?.(projectRoot) ?? projectRoot,
@@ -89,11 +90,11 @@ export function isAgentMemoryPath(absolutePath: string): boolean {
   }
 
   // Local scope: persisted to mount when CLAUDE_CODE_REMOTE_MEMORY_DIR is set, otherwise cwd-based
-  if (process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR) {
+  if (readEnv('CLAUDE_CODE_REMOTE_MEMORY_DIR')) {
     if (
       normalizedPath.includes(sep + 'agent-memory-local' + sep) &&
       normalizedPath.startsWith(
-        join(process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR, 'projects') + sep,
+        join(readEnv('CLAUDE_CODE_REMOTE_MEMORY_DIR'), 'projects') + sep,
       )
     ) {
       return true
@@ -171,7 +172,7 @@ export function loadAgentMemoryPrompt(
   void ensureMemoryDirExists(memoryDir)
 
   const coworkExtraGuidelines =
-    process.env.CLAUDE_COWORK_MEMORY_EXTRA_GUIDELINES
+    readEnv('CLAUDE_COWORK_MEMORY_EXTRA_GUIDELINES')
   return buildMemoryPrompt({
     displayName: 'Persistent Agent Memory',
     memoryDir,

@@ -30,6 +30,7 @@ import {
   WHAT_NOT_TO_SAVE_SECTION,
   WHEN_TO_ACCESS_SECTION,
 } from './memoryTypes.js'
+import { readEnv } from '@claude-code/config/env'
 
 export const ENTRYPOINT_NAME = 'MEMORY.md'
 export const MAX_ENTRYPOINT_LINES = 200
@@ -398,7 +399,7 @@ export async function loadMemoryPrompt(signal?: AbortSignal): Promise<string | n
   }
 
   const coworkExtraGuidelines =
-    process.env.CLAUDE_COWORK_MEMORY_EXTRA_GUIDELINES
+    readEnv('CLAUDE_COWORK_MEMORY_EXTRA_GUIDELINES')
   const extraGuidelines =
     coworkExtraGuidelines && coworkExtraGuidelines.trim().length > 0
       ? [coworkExtraGuidelines]
@@ -441,10 +442,10 @@ export async function loadMemoryPrompt(signal?: AbortSignal): Promise<string | n
 
   bindings.logEvent?.('tengu_memdir_disabled', {
     disabled_by_env_var: isEnvTruthy(
-      process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY,
+      readEnv('CLAUDE_CODE_DISABLE_AUTO_MEMORY'),
     ),
     disabled_by_setting:
-      !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY) &&
+      !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_AUTO_MEMORY')) &&
       getInitialSettings().autoMemoryEnabled === false,
   })
   if (getFeatureValue_CACHED_MAY_BE_STALE('tengu_herring_clock', false)) {

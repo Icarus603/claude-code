@@ -30,6 +30,7 @@ import type {
   SubscriptionType,
   UserRolesResponse,
 } from './types.js'
+import { readEnv } from '@claude-code/config/env'
 
 /**
  * Check if the user has Claude.ai authentication scope
@@ -454,9 +455,9 @@ export async function populateOAuthAccountInfoIfNeeded(): Promise<boolean> {
   // eliminates the race condition where early telemetry events lack account info.
   // NB: If/when adding additional SDK-relevant functionality requiring _other_ OAuth account properties,
   // please reach out to #proj-cowork so the team can add additional env var fallbacks.
-  const envAccountUuid = process.env.CLAUDE_CODE_ACCOUNT_UUID
-  const envUserEmail = process.env.CLAUDE_CODE_USER_EMAIL
-  const envOrganizationUuid = process.env.CLAUDE_CODE_ORGANIZATION_UUID
+  const envAccountUuid = readEnv('CLAUDE_CODE_ACCOUNT_UUID')
+  const envUserEmail = readEnv('CLAUDE_CODE_USER_EMAIL')
+  const envOrganizationUuid = readEnv('CLAUDE_CODE_ORGANIZATION_UUID')
   const hasEnvVars = Boolean(
     envAccountUuid && envUserEmail && envOrganizationUuid,
   )

@@ -38,8 +38,8 @@ function getModelFamily(model: string): 'haiku' | 'sonnet' | 'opus' | null {
  */
 export function resolveOpenAIModel(anthropicModel: string): string {
   // Highest priority: explicit override
-  if (process.env.OPENAI_MODEL) {
-    return process.env.OPENAI_MODEL
+  if (readEnv('OPENAI_MODEL')) {
+    return readEnv('OPENAI_MODEL')
   }
 
   // Strip [1m] suffix if present (Claude-specific modifier)
@@ -50,12 +50,12 @@ export function resolveOpenAIModel(anthropicModel: string): string {
   if (family) {
     // OpenAI-specific family override (preferred for openai provider)
     const openaiEnvVar = `OPENAI_DEFAULT_${family.toUpperCase()}_MODEL`
-    const openaiOverride = process.env[openaiEnvVar]
+    const openaiOverride = readEnv(openaiEnvVar)
     if (openaiOverride) return openaiOverride
 
     // Anthropic env var (backward compatibility)
     const anthropicEnvVar = `ANTHROPIC_DEFAULT_${family.toUpperCase()}_MODEL`
-    const anthropicOverride = process.env[anthropicEnvVar]
+    const anthropicOverride = readEnv(anthropicEnvVar)
     if (anthropicOverride) return anthropicOverride
   }
 

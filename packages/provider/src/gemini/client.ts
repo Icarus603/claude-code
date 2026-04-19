@@ -6,6 +6,7 @@ import type {
   GeminiGenerateContentRequest,
   GeminiStreamChunk,
 } from './types.js'
+import { readEnv } from '@claude-code/config/env'
 
 const DEFAULT_GEMINI_BASE_URL =
   'https://generativelanguage.googleapis.com/v1beta'
@@ -13,7 +14,7 @@ const DEFAULT_GEMINI_BASE_URL =
 const STREAM_DECODE_OPTS: TextDecodeOptions = { stream: true }
 
 function getGeminiBaseUrl(): string {
-  return (process.env.GEMINI_BASE_URL || DEFAULT_GEMINI_BASE_URL).replace(
+  return (readEnv('GEMINI_BASE_URL') || DEFAULT_GEMINI_BASE_URL).replace(
     /\/+$/,
     '',
   )
@@ -38,7 +39,7 @@ export async function* streamGeminiGenerateContent(params: {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-goog-api-key': process.env.GEMINI_API_KEY || '',
+      'x-goog-api-key': readEnv('GEMINI_API_KEY') || '',
     },
     body: JSON.stringify(params.body),
     signal: params.signal,

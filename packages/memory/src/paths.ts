@@ -8,15 +8,16 @@ import {
 } from '@claude-code/config/settings'
 import { isEnvDefinedFalsy, isEnvTruthy, sanitizePath } from './internalUtils.js'
 import { getMemoryHostBindings } from './host.js'
+import { readEnv } from '@claude-code/config/env'
 
 export function isAutoMemoryEnabled(): boolean {
-  const envVal = process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY
+  const envVal = readEnv('CLAUDE_CODE_DISABLE_AUTO_MEMORY')
   if (isEnvTruthy(envVal)) return false
   if (isEnvDefinedFalsy(envVal)) return true
-  if (isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)) return false
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_SIMPLE'))) return false
   if (
-    isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) &&
-    !process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR
+    isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE')) &&
+    !readEnv('CLAUDE_CODE_REMOTE_MEMORY_DIR')
   ) {
     return false
   }
@@ -39,13 +40,13 @@ export function isExtractModeActive(): boolean {
 }
 
 export function getMemoryBaseDir(): string {
-  if (process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR) {
-    return process.env.CLAUDE_CODE_REMOTE_MEMORY_DIR
+  if (readEnv('CLAUDE_CODE_REMOTE_MEMORY_DIR')) {
+    return readEnv('CLAUDE_CODE_REMOTE_MEMORY_DIR')
   }
   const bindings = getMemoryHostBindings()
   return (
     bindings.getConfigHomeDir?.() ??
-    (process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), '.claude')).normalize(
+    (readEnv('CLAUDE_CONFIG_DIR') ?? join(homedir(), '.claude')).normalize(
       'NFC',
     )
   )
@@ -87,7 +88,7 @@ function validateMemoryPath(
 
 function getAutoMemPathOverride(): string | undefined {
   return validateMemoryPath(
-    process.env.CLAUDE_COWORK_MEMORY_PATH_OVERRIDE,
+    readEnv('CLAUDE_COWORK_MEMORY_PATH_OVERRIDE'),
     false,
   )
 }
