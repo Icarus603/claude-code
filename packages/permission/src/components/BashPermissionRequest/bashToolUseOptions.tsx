@@ -6,6 +6,7 @@ import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateS
 import { shouldShowAlwaysAllowOptions } from '@claude-code/permission/permissionsLoader.js'
 import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 import { generateShellSuggestionsLabel } from '../shellPermissionHelpers.js'
+import { readEnv } from '@claude-code/config/env'
 
 export type BashToolUseOption =
   | 'yes'
@@ -141,7 +142,7 @@ export function bashToolUseOptions({
       o => o.value === 'yes-prefix-edited',
     )
     if (
-      process.env.USER_TYPE === 'ant' &&
+      readEnv('USER_TYPE') === 'ant' &&
       !editablePrefixShown &&
       isClassifierPermissionsEnabled() &&
       onClassifierDescriptionChange &&

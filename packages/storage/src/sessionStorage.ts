@@ -93,6 +93,7 @@ import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
 import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
 import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'
 import { validateUuid } from 'src/utils/uuid.js'
+import { readEnv } from '@claude-code/config/env'
 
 // Cache MACRO.VERSION at module level to work around bun --define bug in async contexts
 // See: https://github.com/oven-sh/bun/issues/26168
@@ -412,16 +413,16 @@ export function sessionIdExists(sessionId: string): boolean {
 
 // exported for testing
 export function getNodeEnv(): string {
-  return process.env.NODE_ENV || 'development'
+  return readEnv('NODE_ENV') || 'development'
 }
 
 // exported for testing
 export function getUserType(): string {
-  return process.env.USER_TYPE || 'external'
+  return readEnv('USER_TYPE') || 'external'
 }
 
 function getEntrypoint(): string | undefined {
-  return process.env.CLAUDE_CODE_ENTRYPOINT
+  return readEnv('CLAUDE_CODE_ENTRYPOINT')
 }
 
 export function isCustomTitleEnabled(): boolean {
@@ -959,13 +960,13 @@ class Project {
    */
   private shouldSkipPersistence(): boolean {
     const allowTestPersistence = isEnvTruthy(
-      process.env.TEST_ENABLE_SESSION_PERSISTENCE,
+      readEnv('TEST_ENABLE_SESSION_PERSISTENCE'),
     )
     return (
       (getNodeEnv() === 'test' && !allowTestPersistence) ||
       getSettings_DEPRECATED()?.cleanupPeriodDays === 0 ||
       isSessionPersistenceDisabled() ||
-      isEnvTruthy(process.env.CLAUDE_CODE_SKIP_PROMPT_HISTORY)
+      isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_PROMPT_HISTORY'))
     )
   }
 
@@ -1325,7 +1326,7 @@ class Project {
 
     // v1 Session Ingress path
     if (
-      !isEnvTruthy(process.env.ENABLE_SESSION_PERSISTENCE) ||
+      !isEnvTruthy(readEnv('ENABLE_SESSION_PERSISTENCE')) ||
       !this.remoteIngressUrl
     ) {
       return
@@ -3534,7 +3535,7 @@ export async function loadTranscriptFile(
     let buf: Buffer | null = null
     let metadataLines: string[] | null = null
     let hasPreservedSegment = false
-    if (!isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_PRECOMPACT_SKIP)) {
+    if (!isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_PRECOMPACT_SKIP'))) {
       const { size } = await stat(filePath)
       if (size > SKIP_PRECOMPACT_THRESHOLD) {
         const scan = await readTranscriptForLoad(filePath, size)
@@ -3573,7 +3574,7 @@ export async function loadTranscriptFile(
     if (
       !opts?.keepAllLeaves &&
       !hasPreservedSegment &&
-      !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_PRECOMPACT_SKIP) &&
+      !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_PRECOMPACT_SKIP')) &&
       buf.length > SKIP_PRECOMPACT_THRESHOLD
     ) {
       buf = walkChainBeforeParse(buf)
@@ -4358,7 +4359,7 @@ export function isLoggableMessage(m: Message): boolean {
   if (m.type === 'attachment' && getUserType() !== 'ant') {
     if (
       m.attachment.type === 'hook_additional_context' &&
-      isEnvTruthy(process.env.CLAUDE_CODE_SAVE_HOOK_ADDITIONAL_CONTEXT)
+      isEnvTruthy(readEnv('CLAUDE_CODE_SAVE_HOOK_ADDITIONAL_CONTEXT'))
     ) {
       return true
     }

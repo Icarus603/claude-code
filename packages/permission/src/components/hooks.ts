@@ -22,6 +22,7 @@ import { useSetAppState } from '../appStateHooks.js'
 import { env } from 'src/utils/env.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { type CompletionType, logUnaryEvent } from 'src/utils/unaryLogging.js'
+import { readEnv } from '@claude-code/config/env'
 
 export type UnaryEvent = {
   completion_type: CompletionType
@@ -139,7 +140,7 @@ export function usePermissionRequestLogging(
       sandboxEnabled: SandboxManager.isSandboxingEnabled(),
     })
 
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       const permissionResult = toolUseConfirm.permissionResult
       if (
         toolUseConfirm.tool.name === BashTool.name &&
@@ -166,7 +167,7 @@ export function usePermissionRequestLogging(
 
     // [ANT-ONLY] Log bash tool calls, so we can categorize
     // & burn down calls that should have been allowed
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       const parsedInput = BashTool.inputSchema.safeParse(toolUseConfirm.input)
       if (
         toolUseConfirm.tool.name === BashTool.name &&

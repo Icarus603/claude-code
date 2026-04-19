@@ -14,6 +14,7 @@
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { readEnv } from '@claude-code/config/env'
 
 const SESSION_ACTIVITY_INTERVAL_MS = 30_000
 
@@ -33,7 +34,7 @@ function startHeartbeatTimer(): void {
     logForDiagnosticsNoPII('debug', 'session_keepalive_heartbeat', {
       refcount,
     })
-    if (isEnvTruthy(process.env.CLAUDE_CODE_REMOTE_SEND_KEEPALIVES)) {
+    if (isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE_SEND_KEEPALIVES'))) {
       activityCallback?.()
     }
   }, SESSION_ACTIVITY_INTERVAL_MS)
@@ -76,7 +77,7 @@ export function unregisterSessionActivityCallback(): void {
 }
 
 export function sendSessionActivitySignal(): void {
-  if (isEnvTruthy(process.env.CLAUDE_CODE_REMOTE_SEND_KEEPALIVES)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE_SEND_KEEPALIVES'))) {
     activityCallback?.()
   }
 }

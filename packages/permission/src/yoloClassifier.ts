@@ -42,6 +42,7 @@ import {
   parseClassifierResponse,
 } from '@claude-code/permission/classifierShared.js'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
+import { readEnv } from '@claude-code/config/env'
 
 // Dead code elimination: conditional imports for auto mode classifier prompts.
 // At build time, the bundler inlines .txt files as string literals. At test
@@ -63,13 +64,13 @@ const EXTERNAL_PERMISSIONS_TEMPLATE: string = feature('TRANSCRIPT_CLASSIFIER')
   : ''
 
 const ANTHROPIC_PERMISSIONS_TEMPLATE: string =
-  feature('TRANSCRIPT_CLASSIFIER') && process.env.USER_TYPE === 'ant'
+  feature('TRANSCRIPT_CLASSIFIER') && readEnv('USER_TYPE') === 'ant'
     ? txtRequire(require('./yolo-classifier-prompts/permissions_anthropic.txt'))
     : ''
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 
 function isUsingExternalPermissions(): boolean {
-  if (process.env.USER_TYPE !== 'ant') return true
+  if (readEnv('USER_TYPE') !== 'ant') return true
   const config = getFeatureValue_CACHED_MAY_BE_STALE(
     'tengu_auto_mode_config',
     {} as AutoModeConfig,
@@ -156,8 +157,8 @@ async function maybeDumpAutoMode(
   timestamp: number,
   suffix?: string,
 ): Promise<void> {
-  if (process.env.USER_TYPE !== 'ant') return
-  if (!isEnvTruthy(process.env.CLAUDE_CODE_DUMP_AUTO_MODE)) return
+  if (readEnv('USER_TYPE') !== 'ant') return
+  if (!isEnvTruthy(readEnv('CLAUDE_CODE_DUMP_AUTO_MODE'))) return
   const base = suffix ? `${timestamp}.${suffix}` : `${timestamp}`
   try {
     await mkdir(getAutoModeDumpDir(), { recursive: true })
@@ -684,7 +685,7 @@ function getClassifierThinkingConfig(
   model: string,
 ): [false | undefined, number] {
   if (
-    process.env.USER_TYPE === 'ant' &&
+    readEnv('USER_TYPE') === 'ant' &&
     resolveAntModel(model)?.alwaysOnThinking
   ) {
     return [undefined, 2048]
@@ -1332,8 +1333,8 @@ type AutoModeConfig = {
  * then the main loop model.
  */
 function getClassifierModel(): string {
-  if (process.env.USER_TYPE === 'ant') {
-    const envModel = process.env.CLAUDE_CODE_AUTO_MODE_MODEL
+  if (readEnv('USER_TYPE') === 'ant') {
+    const envModel = readEnv('CLAUDE_CODE_AUTO_MODE_MODEL')
     if (envModel) return envModel
   }
   const config = getFeatureValue_CACHED_MAY_BE_STALE(
@@ -1355,8 +1356,8 @@ function resolveTwoStageClassifier():
   | 'fast'
   | 'thinking'
   | undefined {
-  if (process.env.USER_TYPE === 'ant') {
-    const env = process.env.CLAUDE_CODE_TWO_STAGE_CLASSIFIER
+  if (readEnv('USER_TYPE') === 'ant') {
+    const env = readEnv('CLAUDE_CODE_TWO_STAGE_CLASSIFIER')
     if (env === 'fast' || env === 'thinking') return env
     if (isEnvTruthy(env)) return true
     if (isEnvDefinedFalsy(env)) return false
@@ -1377,8 +1378,8 @@ function isTwoStageClassifierEnabled(): boolean {
 }
 
 function isJsonlTranscriptEnabled(): boolean {
-  if (process.env.USER_TYPE === 'ant') {
-    const env = process.env.CLAUDE_CODE_JSONL_TRANSCRIPT
+  if (readEnv('USER_TYPE') === 'ant') {
+    const env = readEnv('CLAUDE_CODE_JSONL_TRANSCRIPT')
     if (isEnvTruthy(env)) return true
     if (isEnvDefinedFalsy(env)) return false
   }

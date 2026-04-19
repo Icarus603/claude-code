@@ -36,6 +36,7 @@ import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.j
 import { EMPTY_USAGE } from '@claude-code/provider/emptyUsage.js'
 import { classifyAPIError } from '@claude-code/provider/errors.js'
 import { extractConnectionErrorDetails } from './errorUtils.js'
+import { readEnv } from '@claude-code/config/env'
 
 export type { NonNullableUsage }
 export { EMPTY_USAGE }
@@ -138,19 +139,19 @@ function detectGateway({
 
 function getAnthropicEnvMetadata() {
   return {
-    ...(process.env.ANTHROPIC_BASE_URL
+    ...(readEnv('ANTHROPIC_BASE_URL')
       ? {
           baseUrl: process.env
             .ANTHROPIC_BASE_URL as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         }
       : {}),
-    ...(process.env.ANTHROPIC_MODEL
+    ...(readEnv('ANTHROPIC_MODEL')
       ? {
           envModel: process.env
             .ANTHROPIC_MODEL as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         }
       : {}),
-    ...(process.env.ANTHROPIC_SMALL_FAST_MODEL
+    ...(readEnv('ANTHROPIC_SMALL_FAST_MODEL')
       ? {
           envSmallFastModel: process.env
             .ANTHROPIC_SMALL_FAST_MODEL as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -272,7 +273,7 @@ export function logAPIError({
   const gateway = detectGateway({
     headers:
       error instanceof APIError && error.headers ? error.headers : headers,
-    baseUrl: process.env.ANTHROPIC_BASE_URL,
+    baseUrl: readEnv('ANTHROPIC_BASE_URL'),
   })
 
   const errStr = getErrorMessage(error)
@@ -638,7 +639,7 @@ export function logAPISuccessAndDuration({
 }): void {
   const gateway = detectGateway({
     headers,
-    baseUrl: process.env.ANTHROPIC_BASE_URL,
+    baseUrl: readEnv('ANTHROPIC_BASE_URL'),
   })
 
   let textContentLength: number | undefined
@@ -745,7 +746,7 @@ export function logAPISuccessAndDuration({
         .join('\n') || undefined
 
     // Thinking output - Ant-only (build-time gated)
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       thinkingOutput =
         newMessages
           .flatMap(m => {

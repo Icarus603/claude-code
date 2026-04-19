@@ -5,6 +5,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
 import { errorMessage, getErrnoCode } from 'src/utils/errors.js'
 import { getPlatform } from 'src/utils/platform.js'
+import { readEnv } from '@claude-code/config/env'
 
 // Cache states:
 // undefined = not yet loaded (need to check disk)
@@ -71,7 +72,7 @@ export async function getSessionEnvironmentScript(): Promise<string | null> {
 
   // Check for CLAUDE_ENV_FILE passed from parent process (e.g., HFI trajectory runner)
   // This allows venv/conda activation to persist across shell commands
-  const envFile = process.env.CLAUDE_ENV_FILE
+  const envFile = readEnv('CLAUDE_ENV_FILE')
   if (envFile) {
     try {
       const envScript = (await readFile(envFile, 'utf8')).trim()

@@ -10,6 +10,7 @@ import {
 } from '@claude-code/local-observability'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { PermissionDialog } from './PermissionDialog.js'
+import { readEnv } from '@claude-code/config/env'
 
 export type SandboxPermissionRequestProps = {
   hostPattern: NetworkHostPattern
@@ -27,7 +28,7 @@ export function SandboxPermissionRequest({
     // We may want to better unify this dialog with other permission dialogs
     // and use their logging, but this is slightly different and we don't have
     // the tool context here. For now, just use basic logging for basic data.
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       logEvent('tengu_sandbox_network_dialog_result', {
         host: host as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         result:
@@ -89,7 +90,7 @@ export function SandboxPermissionRequest({
             options={options}
             onChange={onSelect}
             onCancel={() => {
-              if (process.env.USER_TYPE === 'ant') {
+              if (readEnv('USER_TYPE') === 'ant') {
                 logEvent('tengu_sandbox_network_dialog_result', {
                   host: host as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
                   result:

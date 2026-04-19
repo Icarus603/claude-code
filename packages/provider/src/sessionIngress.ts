@@ -11,6 +11,7 @@ import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
 import { sleep } from 'src/utils/sleep.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { getOAuthHeaders } from '@claude-code/teleport/api.js'
+import { readEnv } from '@claude-code/config/env'
 
 interface SessionIngressError {
   error?: {
@@ -427,7 +428,7 @@ async function fetchSessionLogsFromUrl(
       headers,
       timeout: 20000,
       validateStatus: status => status < 500,
-      params: isEnvTruthy(process.env.CLAUDE_AFTER_LAST_COMPACT)
+      params: isEnvTruthy(readEnv('CLAUDE_AFTER_LAST_COMPACT'))
         ? { after_last_compact: true }
         : undefined,
     })
