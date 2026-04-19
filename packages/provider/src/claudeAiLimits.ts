@@ -10,7 +10,7 @@ import { getSmallFastModel } from 'src/utils/model/model.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
-import { getAPIMetadata } from 'src/services/api/claude.js'
+import { getAPIMetadata } from './claude.js'
 import { getAnthropicClient } from 'src/services/api/client.js'
 import {
   processRateLimitHeaders,

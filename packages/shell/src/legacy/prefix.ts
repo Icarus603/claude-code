@@ -14,7 +14,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { queryHaiku } from 'src/services/api/claude.js'
+import { queryHaiku } from '@claude-code/provider/claude.js'
 import { startsWithApiErrorPrefix } from '@claude-code/provider/errors.js'
 import { memoizeWithLRU } from 'src/utils/memoize.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'

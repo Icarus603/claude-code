@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { queryHaiku } from 'src/services/api/claude.js'
+import { queryHaiku } from '@claude-code/provider/claude.js'
 import { AbortError } from 'src/utils/errors.js'
 import { getWebFetchUserAgent } from 'src/utils/http.js'
 import { logError } from 'src/utils/log.js'

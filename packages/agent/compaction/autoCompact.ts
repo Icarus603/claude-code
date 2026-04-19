@@ -14,7 +14,7 @@ import type { CacheSafeParams } from 'src/utils/forkedAgent.js'
 import { logError } from 'src/utils/log.js'
 import { tokenCountWithEstimation } from 'src/utils/tokens.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { getMaxOutputTokensForModel } from 'src/services/api/claude.js'
+import { getMaxOutputTokensForModel } from '@claude-code/provider/claude.js'
 import { notifyCompaction } from '@claude-code/provider/promptCacheBreakDetection.js'
 import { setLastSummarizedMessageId } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
 import {

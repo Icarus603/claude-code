@@ -1,13 +1,13 @@
 import { getProviderAdapter } from '@claude-code/provider'
-import type { Tools } from '../../Tool.js'
+import type { Tools } from 'src/Tool.js'
 import type {
   AssistantMessage,
   Message,
   StreamEvent,
   SystemAPIErrorMessage,
-} from '../../types/message.js'
-import type { SystemPrompt } from '../../utils/systemPromptType.js'
-import type { ThinkingConfig } from '../../utils/thinking.js'
+} from 'src/types/message.js'
+import type { SystemPrompt } from 'src/utils/systemPromptType.js'
+import type { ThinkingConfig } from 'src/utils/thinking.js'
 import './providerHostSetup.js'
 import type { Options } from '@claude-code/provider/claudeLegacy'
 
