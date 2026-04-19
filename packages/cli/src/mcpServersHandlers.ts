@@ -14,22 +14,22 @@ import type {
   McpServerConfigForProcessTransport,
   McpSdkServerConfig,
 } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { SDKControlMcpSetServersResponse } from '../entrypoints/sdk/controlTypes.js'
+import type { SDKControlMcpSetServersResponse } from 'src/entrypoints/sdk/controlTypes.js'
 import {
   areMcpConfigsEqual,
   clearServerCache,
   connectToServer,
   fetchToolsForClient,
-} from '../services/mcp/client.js'
+} from 'src/services/mcp/client.js'
 import { filterMcpServersByPolicy } from '@claude-code/mcp-runtime/config.js'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime/types.js'
-import type { AppState } from '../state/AppStateStore.js'
-import type { Tools } from '../Tool.js'
-import { toError } from '../utils/errors.js'
-import { logError } from '../utils/log.js'
+import type { AppState } from 'src/state/AppStateStore.js'
+import type { Tools } from 'src/Tool.js'
+import { toError } from 'src/utils/errors.js'
+import { logError } from 'src/utils/log.js'
 
 export type DynamicMcpState = DynamicMcpStateBase<
   MCPServerConnection,

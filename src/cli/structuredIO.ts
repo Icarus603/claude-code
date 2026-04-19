@@ -53,7 +53,7 @@ import {
 } from '@claude-code/storage/sessionState.js'
 import { jsonParse } from '../utils/slowOperations.js'
 import { Stream } from '../utils/stream.js'
-import { ndjsonSafeStringify } from './ndjsonSafeStringify.js'
+import { ndjsonSafeStringify } from '@claude-code/cli/ndjsonSafeStringify.js'
 
 /**
  * Synthetic tool name used when forwarding sandbox network permission

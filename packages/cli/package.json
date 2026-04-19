@@ -7,6 +7,10 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./contracts": "./src/contracts.ts"
+    "./contracts": "./src/contracts.ts",
+    "./ndjsonSafeStringify.js": "./src/ndjsonSafeStringify.ts",
+    "./bg.js": "./src/bg.ts",
+    "./remoteIO.js": "./src/remoteIO.ts",
+    "./mcpServersHandlers.js": "./src/mcpServersHandlers.ts"
   }
 }
