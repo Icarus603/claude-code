@@ -17,7 +17,7 @@ import { feature } from 'bun:bundle'
 import type { RuntimeHandles } from '@claude-code/app-host'
 
 import { init } from '../../../../src/entrypoints/init.js'
-import { loadPolicyLimits } from '../../../../src/services/policyLimits/index.js'
+import { loadPolicyLimits } from '@claude-code/provider/policyLimits/index.js'
 import { loadRemoteManagedSettings } from '../../../../src/services/remoteManagedSettings/index.js'
 import { setInlinePlugins } from '../../../../src/bootstrap/state.js'
 import { clearPluginCache } from '../../../../src/utils/plugins/pluginLoader.js'

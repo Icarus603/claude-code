@@ -6,7 +6,7 @@ import {
   getGroveNoticeConfig,
   getGroveSettings,
 } from '../../services/api/grove.js'
-import { clearPolicyLimitsCache } from '../../services/policyLimits/index.js'
+import { clearPolicyLimitsCache } from '@claude-code/provider/policyLimits/index.js'
 // flushTelemetry is loaded lazily to avoid pulling in ~1.1MB of OpenTelemetry at startup
 import { clearRemoteManagedSettingsCache } from '../../services/remoteManagedSettings/index.js'
 import { getClaudeAIOAuthTokens, removeApiKey } from '../../utils/auth.js'

@@ -23,7 +23,7 @@ import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
 import {
   isPolicyAllowed,
   waitForPolicyLimitsToLoad,
-} from 'src/services/policyLimits/index.js'
+} from '@claude-code/provider/policyLimits/index.js'
 import type { Message } from 'src/types/message.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,

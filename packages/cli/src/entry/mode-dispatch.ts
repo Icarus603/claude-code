@@ -90,7 +90,7 @@ import {
   loadPolicyLimits,
   refreshPolicyLimits,
   waitForPolicyLimitsToLoad,
-} from '../../../../src/services/policyLimits/index.js'
+} from '@claude-code/provider/policyLimits/index.js'
 import {
   loadRemoteManagedSettings,
   refreshRemoteManagedSettings,

@@ -3,7 +3,7 @@ import { z } from 'zod/v4'
 import { getOauthConfig } from 'src/constants/oauth.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
-import { isPolicyAllowed } from 'src/services/policyLimits/index.js'
+import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import type { ToolUseContext } from 'src/Tool.js'
 import { buildTool, type ToolDef } from 'src/Tool.js'
 import {

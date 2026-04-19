@@ -31,7 +31,7 @@ import { logError } from '../../../../../../src/utils/log.js'
 import {
   gracefulShutdownSync,
 } from '../../../../../../src/utils/gracefulShutdown.js'
-import { isPolicyAllowed } from '../../../../../../src/services/policyLimits/index.js'
+import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { parseSessionIdentifier } from '../../../../../../src/utils/sessionUrl.js'
 import {
   processSessionStartHooks,

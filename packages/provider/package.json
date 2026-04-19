@@ -16,6 +16,7 @@
     "./claudeAiLimitsHook.js": "./src/claudeAiLimitsHook.ts",
     "./mockRateLimits.js": "./src/mockRateLimits.ts",
     "./rateLimitMessages.js": "./src/rateLimitMessages.ts",
-    "./rateLimitMocking.js": "./src/rateLimitMocking.ts"
+    "./rateLimitMocking.js": "./src/rateLimitMocking.ts",
+    "./policyLimits/*.js": "./src/policyLimits/*.ts"
   }
 }
