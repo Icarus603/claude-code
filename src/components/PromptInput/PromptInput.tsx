@@ -15,7 +15,7 @@ import { useCommandQueue } from 'src/hooks/useCommandQueue.js'
 import {
   type IDEAtMentioned,
   useIdeAtMentioned,
-} from 'src/hooks/useIdeAtMentioned.js'
+} from '@claude-code/ide/hooks/useIdeAtMentioned.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -52,7 +52,7 @@ import {
 } from '../../hooks/useArrowKeyHistory.js'
 import { useDoublePress } from '@anthropic/ink'
 import { useHistorySearch } from '../../hooks/useHistorySearch.js'
-import type { IDESelection } from '../../hooks/useIdeSelection.js'
+import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
 import { useInputBuffer } from '../../hooks/useInputBuffer.js'
 import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { usePromptSuggestion } from '../../hooks/usePromptSuggestion.js'

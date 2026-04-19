@@ -262,7 +262,7 @@ import type { ScopedMcpServerConfig } from '../services/mcp/types.js';
 import { randomUUID, type UUID } from 'crypto';
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js';
 import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from '../utils/hooks.js';
-import { type IDESelection } from '../hooks/useIdeSelection.js';
+import { type IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js';
 import { assembleToolPool } from '../tools.js';
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js';
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js';
@@ -345,7 +345,7 @@ import {
   getConnectedIdeClient,
   type IdeType,
 } from '@claude-code/ide/ide.js';
-import { useIDEIntegration } from '../hooks/useIDEIntegration.js';
+import { useIDEIntegration } from '@claude-code/ide/hooks/useIDEIntegration.js';
 import exit from '../commands/exit/index.js';
 import { ExitFlow } from '../components/ExitFlow.js';
 import { getCurrentWorktreeSession } from '@claude-code/swarm';
