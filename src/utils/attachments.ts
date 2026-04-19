@@ -101,7 +101,7 @@ const skillSearchModules = feature('EXPERIMENTAL_SKILL_SEARCH')
     }
   : null
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('./permissions/autoModeState.js') as typeof import('./permissions/autoModeState.js'))
+  ? (require('@claude-code/permission/autoModeState.js') as typeof import('@claude-code/permission/autoModeState.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 import {

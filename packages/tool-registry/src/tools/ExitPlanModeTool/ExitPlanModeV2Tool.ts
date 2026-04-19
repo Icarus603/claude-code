@@ -50,7 +50,7 @@ import {
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('src/utils/permissions/autoModeState.js') as typeof import('src/utils/permissions/autoModeState.js'))
+  ? (require('@claude-code/permission/autoModeState.js') as typeof import('src/utils/permissions/autoModeState.js'))
   : null
 const permissionSetupModule = feature('TRANSCRIPT_CLASSIFIER')
   ? (require('@claude-code/permission/permissionSetup') as typeof import('@claude-code/permission/permissionSetup'))

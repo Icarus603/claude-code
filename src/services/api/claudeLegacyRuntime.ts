@@ -107,7 +107,7 @@ import { getAPIContextManagement } from '@claude-code/agent/compaction/apiMicroc
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('src/utils/permissions/autoModeState.js') as typeof import('src/utils/permissions/autoModeState.js'))
+  ? (require('@claude-code/permission/autoModeState.js') as typeof import('src/utils/permissions/autoModeState.js'))
   : null
 
 import { feature } from 'bun:bundle'
