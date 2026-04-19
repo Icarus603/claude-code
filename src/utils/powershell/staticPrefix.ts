@@ -12,7 +12,7 @@
  * edits it down if needed.
  */
 
-import { getCommandSpec } from '../bash/registry.js'
+import { getCommandSpec } from '@claude-code/shell/bash/registry.js'
 import { buildPrefix, DEPTH_RULES } from '@claude-code/shell/legacy/specPrefix.js'
 import { countCharInString } from '../stringUtils.js'
 import { NEVER_SUGGEST } from './dangerousCmdlets.js'
