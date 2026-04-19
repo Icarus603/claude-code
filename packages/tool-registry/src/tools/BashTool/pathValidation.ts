@@ -19,7 +19,7 @@ import {
   formatDirectoryList,
   isDangerousRemovalPath,
   validatePath,
-} from 'src/utils/permissions/pathValidation.js'
+} from '@claude-code/permission/pathValidation.js'
 import type { BashTool } from './BashTool.js'
 import { stripSafeWrappers } from './bashPermissions.js'
 import { sedCommandIsAllowedByAllowlist } from './sedValidation.js'

@@ -30,7 +30,7 @@ import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateS
 import {
   isDangerousRemovalPath,
   isPathInSandboxWriteAllowlist,
-} from 'src/utils/permissions/pathValidation.js'
+} from '@claude-code/permission/pathValidation.js'
 import { getPlatform } from 'src/utils/platform.js'
 import type {
   ParsedCommandElement,

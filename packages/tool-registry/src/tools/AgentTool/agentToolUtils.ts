@@ -52,7 +52,7 @@ import { permissionRuleValueFromString } from '@claude-code/permission/permissio
 import {
   buildTranscriptForClassifier,
   classifyYoloAction,
-} from 'src/utils/permissions/yoloClassifier.js'
+} from '@claude-code/permission/yoloClassifier.js'
 import { emitTaskProgress as emitTaskProgressEvent } from 'src/utils/task/sdkProgress.js'
 import { isInProcessTeammate } from 'src/utils/teammateContext.js'
 import { getTokenCountFromUsage } from 'src/utils/tokens.js'

@@ -34,6 +34,10 @@
     "./bypassPermissionsKillswitch.js": "./src/bypassPermissionsKillswitch.ts",
     "./shellRuleMatching.js": "./src/shellRuleMatching.ts",
     "./shadowedRuleDetection.js": "./src/shadowedRuleDetection.ts",
-    "./permissionExplainer.js": "./src/permissionExplainer.ts"
+    "./permissionExplainer.js": "./src/permissionExplainer.ts",
+    "./pathValidation.js": "./src/pathValidation.ts",
+    "./permissionsLoader.js": "./src/permissionsLoader.ts",
+    "./yoloClassifier.js": "./src/yoloClassifier.ts",
+    "./yolo-classifier-prompts/*.js": "./src/yolo-classifier-prompts/*.ts"
   }
 }

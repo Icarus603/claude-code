@@ -6,7 +6,7 @@ import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.j
 import { SKILL_TOOL_NAME } from '@claude-code/tool-registry/tools/SkillTool/constants.js'
 import { SkillTool } from '@claude-code/tool-registry/tools/SkillTool/SkillTool.js'
 import { env } from '../../../utils/env.js'
-import { shouldShowAlwaysAllowOptions } from '../../../utils/permissions/permissionsLoader.js'
+import { shouldShowAlwaysAllowOptions } from '@claude-code/permission/permissionsLoader.js'
 import { logUnaryEvent } from '../../../utils/unaryLogging.js'
 import { type UnaryEvent, usePermissionRequestLogging } from '../hooks.js'
 import { PermissionDialog } from '../PermissionDialog.js'
