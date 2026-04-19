@@ -1,10 +1,10 @@
-import { profileCheckpoint } from '../utils/startupProfiler.js'
-import '../bootstrap/state.js'
+import { profileCheckpoint } from 'src/utils/startupProfiler.js'
+import './bootstrap/state.js'
 import type { Attributes, MetricOptions } from '@opentelemetry/api'
 import memoize from 'lodash-es/memoize.js'
-import { getIsNonInteractiveSession } from 'src/bootstrap/state.js'
-import type { AttributedCounter } from '../bootstrap/state.js'
-import { getSessionCounter, setMeter } from '../bootstrap/state.js'
+import { getIsNonInteractiveSession } from './bootstrap/state.js'
+import type { AttributedCounter } from './bootstrap/state.js'
+import { getSessionCounter, setMeter } from './bootstrap/state.js'
 import { shutdownLspServerManager } from '@claude-code/ide/lsp/manager.js'
 import { populateOAuthAccountInfoIfNeeded } from '@claude-code/provider/oauth/client.js'
 import {
@@ -15,27 +15,27 @@ import {
   initializeRemoteManagedSettingsLoadingPromise,
   isEligibleForRemoteManagedSettings,
   waitForRemoteManagedSettingsToLoad,
-} from '../services/remoteManagedSettings/index.js'
-import { preconnectAnthropicApi } from '../utils/apiPreconnect.js'
-import { applyExtraCACertsFromConfig } from '../utils/caCertsConfig.js'
-import { registerCleanup } from '../utils/cleanupRegistry.js'
+} from 'src/services/remoteManagedSettings/index.js'
+import { preconnectAnthropicApi } from 'src/utils/apiPreconnect.js'
+import { applyExtraCACertsFromConfig } from 'src/utils/caCertsConfig.js'
+import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { enableConfigs, recordFirstStartTime } from '@claude-code/config'
-import { logForDebugging } from '../utils/debug.js'
-import { detectCurrentRepository } from '../utils/detectRepository.js'
-import { logForDiagnosticsNoPII } from '../utils/diagLogs.js'
-import { initJetBrainsDetection } from '../utils/envDynamic.js'
-import { isEnvTruthy } from '../utils/envUtils.js'
-import { ConfigParseError, errorMessage } from '../utils/errors.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { detectCurrentRepository } from 'src/utils/detectRepository.js'
+import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { initJetBrainsDetection } from 'src/utils/envDynamic.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { ConfigParseError, errorMessage } from 'src/utils/errors.js'
 // showInvalidConfigDialog is dynamically imported in the error path to avoid loading React at init
 import {
   gracefulShutdownSync,
   setupGracefulShutdown,
-} from '../utils/gracefulShutdown.js'
+} from 'src/utils/gracefulShutdown.js'
 import {
   applyConfigEnvironmentVariables,
   applySafeConfigEnvironmentVariables,
-} from '../utils/managedEnv.js'
-import { configureGlobalMTLS } from '../utils/mtls.js'
+} from 'src/utils/managedEnv.js'
+import { configureGlobalMTLS } from 'src/utils/mtls.js'
 import {
   ensureScratchpadDir,
   isScratchpadEnabled,
@@ -43,11 +43,11 @@ import {
 // initializeTelemetry is loaded lazily via import() in setMeterState() to defer
 // ~400KB of OpenTelemetry + protobuf modules until telemetry is actually initialized.
 // gRPC exporters (~700KB via @grpc/grpc-js) are further lazy-loaded within instrumentation.ts.
-import { configureGlobalAgents } from '../utils/proxy.js'
-import { isBetaTracingEnabled } from '../utils/telemetry/betaSessionTracing.js'
-import { getTelemetryAttributes } from '../utils/telemetryAttributes.js'
-import { setShellIfWindows } from '../utils/windowsPaths.js'
-import { initSentry } from '../utils/sentry.js'
+import { configureGlobalAgents } from 'src/utils/proxy.js'
+import { isBetaTracingEnabled } from 'src/utils/telemetry/betaSessionTracing.js'
+import { getTelemetryAttributes } from 'src/utils/telemetryAttributes.js'
+import { setShellIfWindows } from 'src/utils/windowsPaths.js'
+import { initSentry } from 'src/utils/sentry.js'
 
 // initialize1PEventLogging is dynamically imported to defer OpenTelemetry sdk-logs/resources
 
@@ -155,10 +155,10 @@ export const init = memoize(async (): Promise<void> => {
     if (isEnvTruthy(process.env.CLAUDE_CODE_REMOTE)) {
       try {
         const { initUpstreamProxy, getUpstreamProxyEnv } = await import(
-          '../upstreamproxy/upstreamproxy.js'
+          'src/upstreamproxy/upstreamproxy.js'
         )
         const { registerUpstreamProxyEnvFn } = await import(
-          '../utils/subprocessEnv.js'
+          'src/utils/subprocessEnv.js'
         )
         registerUpstreamProxyEnvFn(getUpstreamProxyEnv)
         await initUpstreamProxy()
@@ -214,7 +214,7 @@ export const init = memoize(async (): Promise<void> => {
       }
 
       // Show the invalid config dialog with the error object and wait for it to complete
-      return import('../components/InvalidConfigDialog.js').then(m =>
+      return import('src/components/InvalidConfigDialog.js').then(m =>
         m.showInvalidConfigDialog({ error }),
       )
       // Dialog itself handles process.exit, so we don't need additional cleanup here
@@ -256,7 +256,7 @@ async function doInitializeTelemetry(): Promise<void> {
 async function setMeterState(): Promise<void> {
   // Lazy-load instrumentation to defer ~400KB of OpenTelemetry + protobuf
   const { initializeTelemetry } = await import(
-    '../utils/telemetry/instrumentation.js'
+    'src/utils/telemetry/instrumentation.js'
   )
   // Initialize customer OTLP telemetry (metrics, logs, traces)
   const meter = await initializeTelemetry()

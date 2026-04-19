@@ -7,7 +7,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import { getCodeEditToolDecisionCounter } from 'src/bootstrap/state.js'
+import { getCodeEditToolDecisionCounter } from '@claude-code/app-host/bootstrap/state.js'
 import type { Tool as ToolType, ToolUseContext } from 'src/Tool.js'
 import { getLanguageName } from 'src/utils/cliHighlight.js'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'

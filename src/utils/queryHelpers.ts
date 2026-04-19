@@ -3,7 +3,7 @@ import last from 'lodash-es/last.js'
 import {
   getSessionId,
   isSessionPersistenceDisabled,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
 import { runTools } from '@claude-code/tool-registry/services/toolOrchestration.js'

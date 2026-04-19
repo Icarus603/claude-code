@@ -1,4 +1,4 @@
-import { getDirectConnectServerUrl, getSessionId } from '../bootstrap/state.js'
+import { getDirectConnectServerUrl, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { stringWidth } from '@anthropic/ink'
 import type { LogOption } from '../types/logs.js'
 import { getSubscriptionName, isClaudeAISubscriber } from './auth.js'

@@ -8,7 +8,7 @@ import {
   isAutoMemoryEnabled,
   recordConsolidation,
 } from '@claude-code/memory'
-import { getOriginalCwd } from 'src/bootstrap/state.js'
+import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { getProjectDir } from '@claude-code/storage/sessionStorage.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 

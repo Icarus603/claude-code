@@ -4,7 +4,7 @@
  * Also tracks memdir file access via Read, Grep, Glob, Edit, and Write tools.
  */
 import { feature } from 'bun:bundle'
-import { registerHookCallbacks } from '../bootstrap/state.js'
+import { registerHookCallbacks } from '@claude-code/app-host/bootstrap/state.js'
 import type { HookInput, HookJSONOutput } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

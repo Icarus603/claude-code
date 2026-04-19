@@ -3,7 +3,7 @@ import type { BetaToolUnion } from '@anthropic-ai/sdk/resources/beta/messages.js
 import {
   getLastApiCompletionTimestamp,
   setLastApiCompletionTimestamp,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { STRUCTURED_OUTPUTS_BETA_HEADER } from '../constants/betas.js'
 import type { QuerySource } from '../constants/querySource.js'
 import {

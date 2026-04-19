@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { getLastInteractionTime } from '../bootstrap/state.js'
+import { getLastInteractionTime } from '@claude-code/app-host/bootstrap/state.js'
 import { fetchPrStatus, type PrReviewState } from '../utils/ghPrStatus.js'
 
 const POLL_INTERVAL_MS = 60_000

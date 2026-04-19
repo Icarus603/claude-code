@@ -6,7 +6,7 @@
 
 import figures from 'figures'
 import * as React from 'react'
-import { getIsRemoteMode } from '../bootstrap/state.js'
+import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import type { useNotifications } from '../context/notifications.js'
 import { Text } from '@anthropic/ink'
 import { logError } from '../utils/log.js'

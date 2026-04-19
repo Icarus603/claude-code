@@ -7,7 +7,7 @@ import {
   openSync,
 } from 'fs'
 import lodashCloneDeep from 'lodash-es/cloneDeep.js'
-import { addSlowOperation } from '../bootstrap/state.js'
+import { addSlowOperation } from '@claude-code/app-host/bootstrap/state.js'
 import { logForDebugging } from './debug.js'
 
 // Extended WriteFileOptions to include 'flush' which is available in Node.js 20.1.0+

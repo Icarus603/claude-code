@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
-import { getKairosActive, getUserMsgOptIn } from 'src/bootstrap/state.js'
+import { getKairosActive, getUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { ValidationResult } from 'src/Tool.js'

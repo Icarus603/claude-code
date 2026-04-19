@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
-import { clearInvokedSkillsForAgent } from 'src/bootstrap/state.js'
+import { clearInvokedSkillsForAgent } from '@claude-code/app-host/bootstrap/state.js'
 import {
   ALL_AGENT_DISALLOWED_TOOLS,
   ASYNC_AGENT_ALLOWED_TOOLS,

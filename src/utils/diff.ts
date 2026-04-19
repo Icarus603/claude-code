@@ -1,6 +1,6 @@
 import { type StructuredPatchHunk, structuredPatch } from 'diff'
 import { logEvent } from '@claude-code/local-observability'
-import { getLocCounter } from '../bootstrap/state.js'
+import { getLocCounter } from '@claude-code/app-host/bootstrap/state.js'
 import { addToTotalLinesChanged } from '../cost-tracker.js'
 import type { FileEdit } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
 import { count } from './array.js'

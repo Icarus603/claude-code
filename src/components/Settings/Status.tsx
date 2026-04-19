@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { Suspense, use } from 'react'
-import { getSessionId } from '../../bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { LocalJSXCommandContext } from '../../commands.js'
 import { useIsInsideModal } from '../../context/modalContext.js'
 import { Box, Text, useTheme } from '@anthropic/ink'

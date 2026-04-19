@@ -35,7 +35,7 @@ import {
   addToTurnHookDuration,
   getOriginalCwd,
   getMainThreadAgentType,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import {
   getHooksConfigFromSnapshot,

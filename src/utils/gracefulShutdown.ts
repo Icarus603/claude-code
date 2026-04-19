@@ -9,7 +9,7 @@ import {
   getLastMainRequestId,
   getSessionId,
   isSessionPersistenceDisabled,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { DISABLE_KITTY_KEYBOARD, DISABLE_MODIFY_OTHER_KEYS, DBP, DFE, DISABLE_MOUSE_TRACKING, EXIT_ALT_SCREEN, SHOW_CURSOR, CLEAR_ITERM2_PROGRESS, CLEAR_TAB_STATUS, CLEAR_TERMINAL_TITLE, instances, supportsTabStatus, wrapForMultiplexer } from '@anthropic/ink'
 import {
   logEvent,

@@ -1,5 +1,5 @@
 import React from 'react'
-import { handlePlanModeTransition } from 'src/bootstrap/state.js'
+import { handlePlanModeTransition } from '@claude-code/app-host/bootstrap/state.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

@@ -9,7 +9,7 @@ import { PermissionDialog } from '@claude-code/permission/components/PermissionD
 import { useSetAppState } from '../../state/AppState.js';
 import type { AppState } from '../../state/AppStateStore.js';
 import type { Message } from '../../types/message.js';
-import { getSessionId } from '../../bootstrap/state.js';
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js';
 import { clearConversation } from '../../commands/clear/conversation.js';
 import { createCommandInputMessage } from '../../utils/messages.js';
 import { enqueuePendingNotification } from '../../utils/messageQueueManager.js';

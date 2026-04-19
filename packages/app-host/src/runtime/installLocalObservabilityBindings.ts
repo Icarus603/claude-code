@@ -37,7 +37,7 @@ import {
   setLastAPIRequest,
   setLastAPIRequestMessages,
   getSessionId,
-} from 'src/bootstrap/state.js'
+} from '../bootstrap/state.js'
 import { getOauthAccountInfo } from 'src/utils/auth.js'
 import { CACHE_PATHS } from 'src/utils/cachePaths.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'

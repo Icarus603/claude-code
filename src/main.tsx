@@ -29,7 +29,7 @@ import { setThemeConfigCallbacks } from '@anthropic/ink'
 import { runClaudeCode } from '@claude-code/cli'
 
 import { createRuntimeHandles } from '@claude-code/app-host/runtime/runtimeHandles.js'
-import { startDeferredPrefetches } from './main/startup/context.js'
+import { startDeferredPrefetches } from '@claude-code/app-host/main/startup/context.js'
 
 export { startDeferredPrefetches };
 

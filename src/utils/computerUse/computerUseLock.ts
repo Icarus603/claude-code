@@ -1,6 +1,6 @@
 import { mkdir, readFile, unlink, writeFile } from 'fs/promises'
 import { join } from 'path'
-import { getSessionId } from '../../bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { registerCleanup } from '../../utils/cleanupRegistry.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { getClaudeConfigHomeDir } from '../../utils/envUtils.js'

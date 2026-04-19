@@ -1,6 +1,6 @@
 import { relative } from 'path'
 import React from 'react'
-import { getCwdState } from '../../bootstrap/state.js'
+import { getCwdState } from '@claude-code/app-host/bootstrap/state.js'
 import { SandboxSettings } from '../../components/sandbox/SandboxSettings.js'
 import { color } from '@anthropic/ink'
 import { getPlatform } from '../../utils/platform.js'

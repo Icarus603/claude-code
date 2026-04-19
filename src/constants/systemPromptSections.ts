@@ -3,7 +3,7 @@ import {
   clearSystemPromptSectionState,
   getSystemPromptSectionCache,
   setSystemPromptSectionCacheEntry,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 
 type ComputeFn = () => string | null | Promise<string | null>
 

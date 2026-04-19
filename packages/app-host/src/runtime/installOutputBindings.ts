@@ -24,7 +24,7 @@ import {
   setSanitizePathFn,
 } from '@claude-code/output/_deps'
 
-import { getOriginalCwd, getSessionId } from 'src/bootstrap/state.js'
+import { getOriginalCwd, getSessionId } from '../bootstrap/state.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { getRelativeTimeFormat, getTimeZone } from 'src/utils/intl.js'

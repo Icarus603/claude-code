@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { getOriginalCwd } from 'src/bootstrap/state.js'
+import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { Box, Text, useTheme } from '@anthropic/ink'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import { env } from 'src/utils/env.js'

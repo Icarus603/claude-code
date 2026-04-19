@@ -7,7 +7,7 @@ import {
   getIsInteractive,
   getIsNonInteractiveSession,
   getSessionBypassPermissionsMode,
-} from '../../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js'
 import { isInBundledMode } from '../bundledMode.js'

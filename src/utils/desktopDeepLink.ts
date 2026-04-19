@@ -1,7 +1,7 @@
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { coerce as semverCoerce } from 'semver'
-import { getSessionId } from '../bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getCwd } from './cwd.js'
 import { logForDebugging } from './debug.js'
 import { execFileNoThrow } from './execFileNoThrow.js'

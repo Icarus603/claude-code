@@ -17,7 +17,7 @@ import {
   setOriginalCwd,
   setProjectRoot,
   switchSession,
-} from './bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { getCommands } from './commands.js'
 import { initSessionMemory } from '@claude-code/agent/SessionMemory/sessionMemory.js'
 import { asSessionId } from './types/ids.js'

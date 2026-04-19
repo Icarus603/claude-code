@@ -10,7 +10,7 @@ const registerProtocolModule = feature('LODESTONE')
 
 /* eslint-enable @typescript-eslint/no-require-imports */
 
-import { getIsInteractive, getLastInteractionTime } from '../bootstrap/state.js'
+import { getIsInteractive, getLastInteractionTime } from '@claude-code/app-host/bootstrap/state.js'
 import {
   cleanupNpmCacheForAnthropicPackages,
   cleanupOldMessageFilesInBackground,

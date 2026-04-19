@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
-import { isReplBridgeActive } from 'src/bootstrap/state.js'
+import { isReplBridgeActive } from '@claude-code/app-host/bootstrap/state.js'
 import { getReplBridgeHandle } from '@claude-code/bridge/replBridgeHandle.js'
 import type { Tool, ToolUseContext } from 'src/Tool.js'
 import { buildTool, type ToolDef } from 'src/Tool.js'

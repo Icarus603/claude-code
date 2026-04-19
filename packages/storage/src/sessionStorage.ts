@@ -29,7 +29,7 @@ import {
   getSessionProjectDir,
   isSessionPersistenceDisabled,
   switchSession,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { builtInCommandNames } from 'src/commands.js'
 import { COMMAND_NAME_TAG, TICK_TAG } from 'src/constants/xml.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

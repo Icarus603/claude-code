@@ -30,7 +30,7 @@ import {
   getIsRemoteMode,
   getSessionId,
   getMainThreadAgentType,
-} from '../../../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   isFastModeEnabled,
 } from '../../../../../../src/utils/fastMode.js'

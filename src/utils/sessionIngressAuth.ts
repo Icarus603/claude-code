@@ -1,7 +1,7 @@
 import {
   getSessionIngressToken,
   setSessionIngressToken,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   CCR_SESSION_INGRESS_TOKEN_PATH,
   maybePersistTokenForSubprocesses,

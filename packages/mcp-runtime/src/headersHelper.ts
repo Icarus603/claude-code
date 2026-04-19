@@ -1,4 +1,4 @@
-import { getIsNonInteractiveSession } from 'src/bootstrap/state.js'
+import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import { logAntError } from 'src/utils/debug.js'
 import { errorMessage } from 'src/utils/errors.js'

@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import { getSessionId } from '../../bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { AppState } from '../../state/AppState.js'
 import type { EditableSettingSource } from '../settings/constants.js'
 import { SOURCES } from '../settings/constants.js'

@@ -9,7 +9,7 @@ import {
   getLastClassifierRequests,
   getSessionId,
   setLastClassifierRequests,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'

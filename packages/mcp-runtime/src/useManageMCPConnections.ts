@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { basename } from 'path'
 import { useCallback, useEffect, useRef } from 'react'
-import { getSessionId } from 'src/bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { Command } from 'src/commands.js'
 import type { Tool } from 'src/Tool.js'
 import {
@@ -52,7 +52,7 @@ import {
 import type { AppState } from 'src/state/AppState.js'
 import type { PluginError } from 'src/types/plugin.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getAllowedChannels } from 'src/bootstrap/state.js'
+import { getAllowedChannels } from '@claude-code/app-host/bootstrap/state.js'
 import { useNotifications } from 'src/context/notifications.js'
 import {
   useAppState,

@@ -36,7 +36,7 @@ import React from 'react'
 import { getOauthConfig } from '../../../../src/constants/oauth.js'
 import { getRemoteSessionUrl } from '../../../../src/constants/product.js'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
-import { init, initializeTelemetryAfterTrust } from '../../../../src/entrypoints/init.js'
+import { init, initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { addToHistory } from '../../../../src/history.js'
 import type { Root } from '@anthropic/ink'
 import { createHeadlessSession } from '@claude-code/cli'
@@ -130,17 +130,17 @@ import {
   resolveFastModeStatusFromCache,
 } from '../../../../src/utils/fastMode.js'
 import { applyConfigEnvironmentVariables } from '../../../../src/utils/managedEnv.js'
-import { extractTeammateOptions, type TeammateOptions } from '../../../../src/main/cli/options.js'
-import { maybeActivateBrief, maybeActivateProactive } from '../../../../src/main/cli/runtimeActivation.js'
-import { prefetchSystemContextIfSafe, startDeferredPrefetches } from '../../../../src/main/startup/context.js'
+import { extractTeammateOptions, type TeammateOptions } from '@claude-code/app-host/main/cli/options.js'
+import { maybeActivateBrief, maybeActivateProactive } from '@claude-code/app-host/main/cli/runtimeActivation.js'
+import { prefetchSystemContextIfSafe, startDeferredPrefetches } from '@claude-code/app-host/main/startup/context.js'
 import {
   eagerLoadSettings,
   initializeEntrypoint,
   runMigrations,
   loadSettingsFromFlag,
   loadSettingSourcesFromFlag,
-} from '../../../../src/main/startup/settings.js'
-import { logSessionTelemetry, logStartupTelemetry } from '../../../../src/main/startup/telemetry.js'
+} from '@claude-code/app-host/main/startup/settings.js'
+import { logSessionTelemetry, logStartupTelemetry } from '@claude-code/app-host/main/startup/telemetry.js'
 import {
   createRuntimeHandles,
   syncRuntimeHandlesFromHeadlessParams,
@@ -162,7 +162,7 @@ import {
   setMainLoopModelOverride,
   setMainThreadAgentType,
   setTeleportedSessionInfo,
-} from '../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { filterCommandsForRemoteMode, getCommands } from '../../../../src/commands.js'
 import type { StatsStore } from '../../../../src/context/stats.js'
 import {
@@ -347,7 +347,7 @@ import {
   setSessionSource,
   setUserMsgOptIn,
   switchSession,
-} from '../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   type AppState,
   getIdleSpeculationState,

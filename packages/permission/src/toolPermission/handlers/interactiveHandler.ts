@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs'
 import { randomUUID } from 'crypto'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getAllowedChannels } from 'src/bootstrap/state.js'
+import { getAllowedChannels } from '@claude-code/app-host/bootstrap/state.js'
 import type { BridgePermissionCallbacks } from '@claude-code/bridge/bridgePermissionCallbacks.js'
 import { getTerminalFocused } from '@anthropic/ink'
 import {

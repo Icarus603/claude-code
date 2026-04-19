@@ -1,5 +1,5 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import { getInitialMainLoopModel } from '../../bootstrap/state.js'
+import { getInitialMainLoopModel } from '@claude-code/app-host/bootstrap/state.js'
 import {
   isClaudeAISubscriber,
   isMaxSubscriber,

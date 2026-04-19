@@ -1,7 +1,7 @@
 import { createHash, randomUUID, type UUID } from 'crypto'
 import { stat } from 'fs/promises'
 import { isAbsolute, join, relative, sep } from 'path'
-import { getOriginalCwd, getSessionId } from '../bootstrap/state.js'
+import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type {
   AttributionSnapshotMessage,
   FileAttributionState,

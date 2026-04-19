@@ -11,7 +11,7 @@ import {
   getOriginalCwd,
   getSdkBetas,
   getSessionId,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { DEFAULT_OUTPUT_STYLE_NAME } from '../constants/outputStyles.js'
 import { useNotifications } from '../context/notifications.js'
 import {

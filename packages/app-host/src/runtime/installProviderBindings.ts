@@ -1,1 +1,1 @@
-import 'src/services/api/providerHostSetup.js'
+import '../providerHostSetup.js'

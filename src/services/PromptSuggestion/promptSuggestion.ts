@@ -1,4 +1,4 @@
-import { getIsNonInteractiveSession } from '../../bootstrap/state.js'
+import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import type { AppState } from '../../state/AppState.js'
 import type { Message } from '../../types/message.js'
 import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'

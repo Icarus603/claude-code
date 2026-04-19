@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { setTeleportedSessionInfo } from 'src/bootstrap/state.js'
+import { setTeleportedSessionInfo } from '@claude-code/app-host/bootstrap/state.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

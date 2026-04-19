@@ -224,7 +224,7 @@ import { AwsAuthStatusManager } from '../../../../../../src/utils/awsAuthStatusM
 import {
   getInitJsonSchema,
   setSdkAgentProgressSummariesEnabled,
-} from '../../../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { createSyntheticOutputTool } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { parseSessionIdentifier } from '../../../../../../src/utils/sessionUrl.js'
 import {
@@ -285,7 +285,7 @@ import {
   getFlagSettingsInline,
   setFlagSettingsInline,
   getMainThreadAgentType,
-} from '../../../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { runWithWorkload, WORKLOAD_CRON } from '../../../../../../src/utils/workloadContext.js'
 import type { UUID } from 'crypto'
 import { randomUUID } from 'crypto'

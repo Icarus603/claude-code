@@ -1,4 +1,4 @@
-import { getSdkAgentProgressSummariesEnabled } from '../../bootstrap/state.js'
+import { getSdkAgentProgressSummariesEnabled } from '@claude-code/app-host/bootstrap/state.js'
 import {
   OUTPUT_FILE_TAG,
   STATUS_TAG,

@@ -4,7 +4,7 @@ import {
   getOauthTokenFromFd,
   setApiKeyFromFd,
   setOauthTokenFromFd,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { logForDebugging } from './debug.js'
 import { isEnvTruthy } from './envUtils.js'
 import { errorMessage, isENOENT } from './errors.js'

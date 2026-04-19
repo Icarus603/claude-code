@@ -18,7 +18,7 @@
 
 import type { ServerCapabilities } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
-import { type ChannelEntry, getAllowedChannels } from 'src/bootstrap/state.js'
+import { type ChannelEntry, getAllowedChannels } from '@claude-code/app-host/bootstrap/state.js'
 import { CHANNEL_TAG } from 'src/constants/xml.js'
 import {
   getClaudeAIOAuthTokens,

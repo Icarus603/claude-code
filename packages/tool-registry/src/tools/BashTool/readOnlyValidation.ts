@@ -1,5 +1,5 @@
 import type { z } from 'zod/v4'
-import { getOriginalCwd } from 'src/bootstrap/state.js'
+import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import {
   extractOutputRedirections,
   splitCommand_DEPRECATED,

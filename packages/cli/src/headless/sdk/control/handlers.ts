@@ -48,7 +48,7 @@ import {
   type ChannelEntry,
   registerHookCallbacks,
   setInitJsonSchema,
-} from '../../../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   DEFAULT_OUTPUT_STYLE_NAME,
   getAllOutputStyles,

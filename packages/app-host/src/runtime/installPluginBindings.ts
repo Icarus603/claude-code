@@ -64,7 +64,7 @@ import {
   getInlinePlugins,
   getOriginalCwd,
   getSessionId,
-} from 'src/bootstrap/state.js'
+} from '../bootstrap/state.js'
 import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { getCwd } from 'src/utils/cwd.js'

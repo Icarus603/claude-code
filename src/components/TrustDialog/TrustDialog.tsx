@@ -1,7 +1,7 @@
 import { homedir } from 'os'
 import React from 'react'
 import { logEvent } from '@claude-code/local-observability'
-import { setSessionTrustAccepted } from '../../bootstrap/state.js'
+import { setSessionTrustAccepted } from '@claude-code/app-host/bootstrap/state.js'
 import type { Command } from '../../commands.js'
 import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Text } from '@anthropic/ink'

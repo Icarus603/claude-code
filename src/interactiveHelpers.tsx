@@ -13,11 +13,11 @@ import {
   setHasDevChannels,
   setSessionTrustAccepted,
   setStatsStore,
-} from './bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import type { Command } from './commands.js'
 import { createStatsStore, type StatsStore } from './context/stats.js'
 import { getSystemContext } from '@claude-code/provider/context.js'
-import { initializeTelemetryAfterTrust } from './entrypoints/init.js'
+import { initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { isSynchronizedOutputSupported } from '@anthropic/ink'
 import type { RenderOptions, Root, TextProps } from '@anthropic/ink'
 import { KeybindingSetup } from './keybindings/KeybindingProviderSetup.js'

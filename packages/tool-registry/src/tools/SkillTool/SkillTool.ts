@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { dirname } from 'path'
-import { getProjectRoot } from 'src/bootstrap/state.js'
+import { getProjectRoot } from '@claude-code/app-host/bootstrap/state.js'
 import {
   builtInCommandNames,
   findCommand,
@@ -38,7 +38,7 @@ import {
   addInvokedSkill,
   clearInvokedSkillsForAgent,
   getSessionId,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { COMMAND_MESSAGE_TAG } from 'src/constants/xml.js'
 import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
 import {

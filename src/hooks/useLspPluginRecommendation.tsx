@@ -15,7 +15,7 @@ import * as React from 'react'
 import {
   hasShownLspRecommendationThisSession,
   setLspRecommendationShownThisSession,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { useNotifications } from '../context/notifications.js'
 import { useAppState } from '../state/AppState.js'
 import { saveGlobalConfig } from '@claude-code/config'

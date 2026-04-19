@@ -26,7 +26,7 @@ import {
   type ScreenshotDims,
 } from '@ant/computer-use-mcp'
 import * as React from 'react'
-import { getSessionId } from '../../bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { ComputerUseApproval } from '@claude-code/permission/components/ComputerUseApproval/ComputerUseApproval.js'
 import type { Tool, ToolUseContext } from '../../Tool.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

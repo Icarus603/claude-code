@@ -116,7 +116,7 @@ import {
   getSessionBypassPermissionsMode,
   getSessionCreatedTeams,
   getSessionId,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { quote } from '../utils/bash/shellQuote.js'
 import { isInBundledMode } from '../utils/bundledMode.js'
 import { getPlatform } from '../utils/platform.js'

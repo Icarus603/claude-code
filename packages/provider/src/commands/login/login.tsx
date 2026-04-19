@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import { resetCostState } from 'src/bootstrap/state.js'
+import { resetCostState } from '@claude-code/app-host/bootstrap/state.js'
 import {
   clearTrustedDeviceToken,
   enrollTrustedDevice,

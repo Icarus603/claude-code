@@ -4,7 +4,7 @@ import type {
   TextBlockParam,
 } from '@anthropic-ai/sdk/resources'
 import { randomUUID } from 'crypto'
-import { setPromptId } from 'src/bootstrap/state.js'
+import { setPromptId } from '@claude-code/app-host/bootstrap/state.js'
 import {
   builtInCommandNames,
   type Command,
@@ -25,7 +25,7 @@ import type {
   ProgressMessage,
   UserMessage,
 } from 'src/types/message.js'
-import { addInvokedSkill, getSessionId } from '../../bootstrap/state.js'
+import { addInvokedSkill, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG } from '../../constants/xml.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
 import {

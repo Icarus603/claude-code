@@ -1,4 +1,4 @@
-import { setMainLoopModelOverride } from '../bootstrap/state.js'
+import { setMainLoopModelOverride } from '@claude-code/app-host/bootstrap/state.js'
 import {
   clearApiKeyHelperCache,
   clearAwsCredentialsCache,

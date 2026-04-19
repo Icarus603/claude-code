@@ -3,7 +3,7 @@ import { z } from 'zod/v4'
 import {
   getAllowedChannels,
   handlePlanModeTransition,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import type { Tool } from 'src/Tool.js'
 import { buildTool, type ToolDef } from 'src/Tool.js'
 import { lazySchema } from 'src/utils/lazySchema.js'

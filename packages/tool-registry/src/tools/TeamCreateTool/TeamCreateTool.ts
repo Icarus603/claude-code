@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { getSessionId } from 'src/bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
 import type { Tool } from 'src/Tool.js'

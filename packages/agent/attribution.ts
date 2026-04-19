@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { stat } from 'fs/promises'
-import { getClientType } from 'src/bootstrap/state.js'
+import { getClientType } from '@claude-code/app-host/bootstrap/state.js'
 import {
   getRemoteSessionUrl,
   isRemoteSessionLocal,

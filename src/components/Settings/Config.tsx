@@ -82,7 +82,7 @@ import {
   getSettingsForSource,
   updateSettingsForSource,
 } from '../../utils/settings/settings.js'
-import { getUserMsgOptIn, setUserMsgOptIn } from '../../bootstrap/state.js'
+import { getUserMsgOptIn, setUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { DEFAULT_OUTPUT_STYLE_NAME } from 'src/constants/outputStyles.js'
 import { isEnvTruthy, isRunningOnHomespace } from 'src/utils/envUtils.js'
 import type {

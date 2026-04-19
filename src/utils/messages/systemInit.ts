@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { randomUUID } from 'crypto'
-import { getSdkBetas, getSessionId } from 'src/bootstrap/state.js'
+import { getSdkBetas, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { DEFAULT_OUTPUT_STYLE_NAME } from 'src/constants/outputStyles.js'
 import type {
   ApiKeySource,
