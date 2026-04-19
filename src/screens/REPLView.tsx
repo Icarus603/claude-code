@@ -397,7 +397,7 @@ import {
   useKickOffCheckAndDisableAutoModeIfNeeded,
 } from '@claude-code/permission/bypassPermissionsKillswitch.js';
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js';
-import { SANDBOX_NETWORK_ACCESS_TOOL_NAME } from 'src/cli/structuredIO.js';
+import { SANDBOX_NETWORK_ACCESS_TOOL_NAME } from '@claude-code/cli/structuredIO.js';
 import { useFileHistorySnapshotInit } from 'src/hooks/useFileHistorySnapshotInit.js';
 import { SandboxPermissionRequest } from '@claude-code/permission/components/SandboxPermissionRequest.js';
 import { SandboxViolationExpandedView } from 'src/components/SandboxViolationExpandedView.js';

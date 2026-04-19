@@ -21,7 +21,7 @@ import {
   redownloadUserSettings,
 } from '../../../../../../src/services/settingsSync/index.js'
 import { waitForRemoteManagedSettingsToLoad } from '../../../../../../src/services/remoteManagedSettings/index.js'
-import { StructuredIO } from '../../../../../../src/cli/structuredIO.js'
+import { StructuredIO } from '../../../structuredIO.js'
 import { RemoteIO } from '../../../remoteIO.js'
 import {
   type Command,

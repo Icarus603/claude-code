@@ -31,7 +31,7 @@ import {
 import { toCompatSessionId, toInfraSessionId } from './sessionIdCompat.js'
 import { updateSessionBridgeId } from 'src/utils/concurrentSessions.js'
 import { getTrustedDeviceToken } from './trustedDevice.js'
-import { HybridTransport } from 'src/cli/transports/HybridTransport.js'
+import { HybridTransport } from '@claude-code/cli/transports/HybridTransport.js'
 import {
   type ReplBridgeTransport,
   createV1ReplTransport,

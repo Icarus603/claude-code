@@ -10,36 +10,36 @@ export type Transport = {
 function loadSSEModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require(
-    `${process.cwd()}/src/cli/transports/SSETransport.js`,
-  ) as typeof import('../../../src/cli/transports/SSETransport.js')
+    `${process.cwd()}/packages/cli/src/transports/SSETransport.js`,
+  ) as typeof import('../../../packages/cli/src/transports/SSETransport.js')
 }
 
 function loadWebSocketModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require(
-    `${process.cwd()}/src/cli/transports/WebSocketTransport.js`,
-  ) as typeof import('../../../src/cli/transports/WebSocketTransport.js')
+    `${process.cwd()}/packages/cli/src/transports/WebSocketTransport.js`,
+  ) as typeof import('../../../packages/cli/src/transports/WebSocketTransport.js')
 }
 
 function loadHybridModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require(
-    `${process.cwd()}/src/cli/transports/HybridTransport.js`,
-  ) as typeof import('../../../src/cli/transports/HybridTransport.js')
+    `${process.cwd()}/packages/cli/src/transports/HybridTransport.js`,
+  ) as typeof import('../../../packages/cli/src/transports/HybridTransport.js')
 }
 
 function loadSerialUploaderModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require(
-    `${process.cwd()}/src/cli/transports/SerialBatchEventUploader.js`,
-  ) as typeof import('../../../src/cli/transports/SerialBatchEventUploader.js')
+    `${process.cwd()}/packages/cli/src/transports/SerialBatchEventUploader.js`,
+  ) as typeof import('../../../packages/cli/src/transports/SerialBatchEventUploader.js')
 }
 
 function loadWorkerStateModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require(
-    `${process.cwd()}/src/cli/transports/WorkerStateUploader.js`,
-  ) as typeof import('../../../src/cli/transports/WorkerStateUploader.js')
+    `${process.cwd()}/packages/cli/src/transports/WorkerStateUploader.js`,
+  ) as typeof import('../../../packages/cli/src/transports/WorkerStateUploader.js')
 }
 
 function instantiate<T>(Ctor: TransportConstructor<T>, args: any[]): T {
