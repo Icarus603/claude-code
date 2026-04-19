@@ -164,7 +164,7 @@ import {
   isPlanModeInterviewPhaseEnabled,
 } from './planModeV2.js'
 import { escapeRegExp } from './stringUtils.js'
-import { isTodoV2Enabled } from './tasks.js'
+import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
 
 // Lazy import to avoid circular dependency while keeping swarm ownership in the package.
 function getTeammateMailbox(): typeof import('@claude-code/swarm') {

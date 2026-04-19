@@ -52,7 +52,7 @@ import {
   saveMode,
   saveWorktreeState,
 } from '@claude-code/storage/sessionStorage.js'
-import { isTodoV2Enabled } from 'src/utils/tasks.js'
+import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
 import type { TodoList } from 'src/utils/todo/types.js'
 import { TodoListSchema } from 'src/utils/todo/types.js'
 import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'

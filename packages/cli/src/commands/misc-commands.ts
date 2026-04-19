@@ -10,7 +10,7 @@ import {
 import { getAutoModeEnabledStateIfCached } from '@claude-code/permission/permissionSetup'
 import { getBaseRenderOptions } from '../../../../src/utils/renderOptions.js'
 import { validateUuid } from '../../../../src/utils/uuid.js'
-import { TASK_STATUSES } from '../../../../src/utils/tasks.js'
+import { TASK_STATUSES } from '@claude-code/agent/tasks.js'
 
 export function registerMiscCommands(program: Command): void {
   // claude auth

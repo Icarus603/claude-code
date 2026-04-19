@@ -271,7 +271,7 @@ import { resetSettingsCache } from '../../../../src/utils/settings/settingsCache
 import type { ValidationError } from '../../../../src/utils/settings/validation.js'
 import {
   DEFAULT_TASKS_MODE_TASK_LIST_ID,
-} from '../../../../src/utils/tasks.js'
+} from '@claude-code/agent/tasks.js'
 import {
   logPluginLoadErrors,
   logPluginsEnabledForSession,
