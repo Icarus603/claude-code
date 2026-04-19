@@ -167,7 +167,7 @@ async function main(): Promise<void> {
 
     // Bridge is a remote control feature - check policy limits
     const { waitForPolicyLimitsToLoad, isPolicyAllowed } = await import(
-      '../services/policyLimits/index.js'
+      '@claude-code/provider/policyLimits/index.js'
     )
     await waitForPolicyLimitsToLoad()
     if (!isPolicyAllowed('allow_remote_control')) {

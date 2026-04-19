@@ -1,5 +1,5 @@
 import type { Command } from '../../commands.js'
-import { isPolicyAllowed } from '../../services/policyLimits/index.js'
+import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'
 import { isEssentialTrafficOnly } from '../../utils/privacyLevel.js'
 

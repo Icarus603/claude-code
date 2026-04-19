@@ -185,7 +185,7 @@ import { cwd } from 'process'
 import { getCwd } from '../../../../../../src/utils/cwd.js'
 import omit from 'lodash-es/omit.js'
 import reject from 'lodash-es/reject.js'
-import { isPolicyAllowed } from '../../../../../../src/services/policyLimits/index.js'
+import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import {
   buildBridgeConnectUrl,
   extractInboundMessageFields,

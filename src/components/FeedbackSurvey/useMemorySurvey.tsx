@@ -6,7 +6,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
-import { isPolicyAllowed } from '../../services/policyLimits/index.js'
+import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import type { Message } from '../../types/message.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

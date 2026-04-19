@@ -1,6 +1,6 @@
 import type { Command } from '../../commands.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { isPolicyAllowed } from '../../services/policyLimits/index.js'
+import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 
 const web = {
   type: 'local-jsx',

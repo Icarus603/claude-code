@@ -10,7 +10,7 @@ import { populateOAuthAccountInfoIfNeeded } from '@claude-code/provider/oauth/cl
 import {
   initializePolicyLimitsLoadingPromise,
   isPolicyLimitsEligible,
-} from '../services/policyLimits/index.js'
+} from '@claude-code/provider/policyLimits/index.js'
 import {
   initializeRemoteManagedSettingsLoadingPromise,
   isEligibleForRemoteManagedSettings,
