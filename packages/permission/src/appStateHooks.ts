@@ -1,10 +1,12 @@
 // V7 §7.2 — lazy require() shim so permission package UI components don't
-// import src/state/AppState directly at top level.
+// import src/state/AppState directly at top level. Forwards args verbatim.
 
-export function useAppState<T = unknown>(): T {
+export function useAppState<T>(selector: (state: unknown) => T): T {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as { useAppState: <T>() => T }
-  return mod.useAppState<T>()
+  const mod = require('src/state/AppState.js') as {
+    useAppState: <U>(s: (state: unknown) => U) => U
+  }
+  return mod.useAppState<T>(selector)
 }
 
 export function useSetAppState(): (updater: (prev: unknown) => unknown) => void {
@@ -15,18 +17,18 @@ export function useSetAppState(): (updater: (prev: unknown) => unknown) => void 
   return mod.useSetAppState()
 }
 
-export function useAppStateStore<T = unknown>(): {
-  getState: () => T
-  setState: (updater: (prev: T) => T) => void
+export function useAppStateStore(): {
+  getState: () => unknown
+  setState: (updater: (prev: unknown) => unknown) => void
   subscribe: (listener: () => void) => () => void
 } {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mod = require('src/state/AppState.js') as {
-    useAppStateStore: <T>() => {
-      getState: () => T
-      setState: (updater: (prev: T) => T) => void
+    useAppStateStore: () => {
+      getState: () => unknown
+      setState: (updater: (prev: unknown) => unknown) => void
       subscribe: (listener: () => void) => () => void
     }
   }
-  return mod.useAppStateStore<T>()
+  return mod.useAppStateStore()
 }

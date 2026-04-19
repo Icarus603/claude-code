@@ -1,4 +1,4 @@
-import { queryHaiku } from 'src/services/api/claude.js'
+import { queryHaiku } from '@claude-code/provider/claude.js'
 import { logError } from 'src/utils/log.js'
 import { extractTextContent } from 'src/utils/messages.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'

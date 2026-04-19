@@ -18,7 +18,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { accumulateUsage, updateUsage } from '../services/api/claude.js'
+import { accumulateUsage, updateUsage } from '@claude-code/provider/claude.js'
 import { EMPTY_USAGE, type NonNullableUsage } from '@claude-code/provider/logging.js'
 import type { ToolUseContext } from '../Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'

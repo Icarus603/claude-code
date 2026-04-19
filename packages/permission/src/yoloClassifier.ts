@@ -13,7 +13,7 @@ import {
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
-import { getCacheControl } from 'src/services/api/claude.js'
+import { getCacheControl } from '@claude-code/provider/claude.js'
 import { parsePromptTooLongTokenCounts } from '@claude-code/provider/errors.js'
 import { getDefaultMaxRetries } from '@claude-code/provider/withRetry.js'
 import type { Tool, ToolPermissionContext, Tools } from 'src/Tool.js'

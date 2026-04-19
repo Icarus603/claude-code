@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
 import type { QuerySource } from '../../constants/querySource.js'
-import { queryModelWithoutStreaming } from '../../services/api/claude.js'
+import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'
 import type { Message } from '../../types/message.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { logError } from '../../utils/log.js'

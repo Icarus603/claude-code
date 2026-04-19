@@ -99,7 +99,7 @@ import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 
 import {
   getMaxOutputTokensForModel,
   queryModelWithStreaming,
-} from 'src/services/api/claude.js'
+} from '@claude-code/provider/claude.js'
 import {
   getPromptTooLongTokenGap,
   PROMPT_TOO_LONG_ERROR_MESSAGE,

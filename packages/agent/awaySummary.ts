@@ -8,7 +8,7 @@ import {
 } from 'src/utils/messages.js'
 import { getSmallFastModel } from 'src/utils/model/model.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'
-import { queryModelWithoutStreaming } from 'src/services/api/claude.js'
+import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'
 import { getSessionMemoryContent } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
 
 // Recap only needs recent context — truncate to avoid "prompt too long" on

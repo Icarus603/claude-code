@@ -19,7 +19,7 @@ import { getOauthConfig } from '../constants/oauth.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { Root } from '@anthropic/ink'
 import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js'
-import { queryHaiku } from '../services/api/claude.js'
+import { queryHaiku } from '@claude-code/provider/claude.js'
 import {
   getSessionLogsViaOAuth,
   getTeleportEvents,

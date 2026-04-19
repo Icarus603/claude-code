@@ -23,7 +23,7 @@ import {
 } from 'src/utils/model/model.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { isToolReferenceBlock } from 'src/utils/toolSearch.js'
-import { getAPIMetadata, getExtraBodyParams } from 'src/services/api/claude.js'
+import { getAPIMetadata, getExtraBodyParams } from '@claude-code/provider/claude.js'
 import { getAnthropicClient } from 'src/services/api/client.js'
 import { withTokenCountVCR } from 'src/services/vcr.js'
 import { readEnv } from '@claude-code/config/env'

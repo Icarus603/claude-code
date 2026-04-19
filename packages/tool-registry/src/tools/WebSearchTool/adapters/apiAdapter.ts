@@ -8,7 +8,7 @@ import type {
   BetaWebSearchTool20250305,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { queryModelWithStreaming } from 'src/services/api/claude.js'
+import { queryModelWithStreaming } from '@claude-code/provider/claude.js'
 import { createUserMessage } from 'src/utils/messages.js'
 import { getMainLoopModel, getSmallFastModel } from 'src/utils/model/model.js'
 import { jsonParse } from 'src/utils/slowOperations.js'

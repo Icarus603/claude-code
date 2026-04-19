@@ -40,6 +40,7 @@
     "./referral.js": "./src/referral.ts",
     "./dumpPrompts.js": "./src/dumpPrompts.ts",
     "./withRetry.js": "./src/withRetry.ts",
-    "./context.js": "./src/context.ts"
+    "./context.js": "./src/context.ts",
+    "./claude.js": "./src/claude.ts"
   }
 }
