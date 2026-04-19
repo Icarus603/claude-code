@@ -1,4 +1,4 @@
-import type { Command } from '../../commands.js'
+import type { Command } from 'src/commands.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 

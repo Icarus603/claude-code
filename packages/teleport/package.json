@@ -10,6 +10,7 @@
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
-    "./*.js": "./src/*.ts"
+    "./*.js": "./src/*.ts",
+    "./remote-setup/*.js": "./src/remote-setup/*.ts"
   }
 }
