@@ -3,15 +3,15 @@ import { access } from 'fs/promises'
 import { tmpdir as osTmpdir } from 'os'
 import { join as nativeJoin } from 'path'
 import { join as posixJoin } from 'path/posix'
-import { rearrangePipeCommand } from 'src/utils/bash/bashPipeCommand.js'
+import { rearrangePipeCommand } from '@claude-code/shell/bash/bashPipeCommand.js'
 import { createAndSaveSnapshot } from 'src/utils/bash/ShellSnapshot.js'
-import { formatShellPrefixCommand } from 'src/utils/bash/shellPrefix.js'
+import { formatShellPrefixCommand } from '@claude-code/shell/bash/shellPrefix.js'
 import { quote } from 'src/utils/bash/shellQuote.js'
 import {
   quoteShellCommand,
   rewriteWindowsNullRedirect,
   shouldAddStdinRedirect,
-} from 'src/utils/bash/shellQuoting.js'
+} from '@claude-code/shell/bash/shellQuoting.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getPlatform } from 'src/utils/platform.js'
 import { getSessionEnvironmentScript } from '@claude-code/storage/sessionEnvironment.js'
