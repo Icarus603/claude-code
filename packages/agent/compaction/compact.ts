@@ -104,7 +104,7 @@ import {
   getPromptTooLongTokenGap,
   PROMPT_TOO_LONG_ERROR_MESSAGE,
   startsWithApiErrorPrefix,
-} from 'src/services/api/errors.js'
+} from '@claude-code/provider/errors.js'
 import { notifyCompaction } from '@claude-code/provider/promptCacheBreakDetection.js'
 import { getRetryDelay } from '@claude-code/provider/withRetry.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
