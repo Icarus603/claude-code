@@ -6,7 +6,7 @@ import {
   getMcpDisplayName,
   getToolNameForPermissionCheck,
   extractMcpToolDisplayName,
-} from "../mcpStringUtils";
+} from "@claude-code/mcp-runtime/mcpStringUtils";
 
 // ─── mcpInfoFromString ─────────────────────────────────────────────────
 

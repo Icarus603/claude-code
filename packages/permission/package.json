@@ -83,6 +83,8 @@
     "./components/rules/AddPermissionRules.js": "./src/components/rules/AddPermissionRules.tsx",
     "./components/rules/PermissionRuleInput.js": "./src/components/rules/PermissionRuleInput.tsx",
     "./components/SkillPermissionRequest/SkillPermissionRequest.js": "./src/components/SkillPermissionRequest/SkillPermissionRequest.tsx",
-    "./components/EnterPlanModePermissionRequest/EnterPlanModePermissionRequest.js": "./src/components/EnterPlanModePermissionRequest/EnterPlanModePermissionRequest.tsx"
+    "./components/EnterPlanModePermissionRequest/EnterPlanModePermissionRequest.js": "./src/components/EnterPlanModePermissionRequest/EnterPlanModePermissionRequest.tsx",
+    "./shellRuleMatching": "./src/shellRuleMatching.ts",
+    "./dangerousPatterns": "./src/dangerousPatterns.ts"
   }
 }

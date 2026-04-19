@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   createAbortController,
   createChildAbortController,
-} from "../abortController";
+} from "@claude-code/agent/abortController";
 
 describe("createAbortController", () => {
   test("returns an AbortController that is not aborted", () => {

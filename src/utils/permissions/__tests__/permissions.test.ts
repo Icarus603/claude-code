@@ -37,7 +37,7 @@ const {
   filterDeniedAgents,
 } = await import("@claude-code/permission/permissions");
 
-import { getEmptyToolPermissionContext } from "../../../Tool";
+import { getEmptyToolPermissionContext } from "@claude-code/tool-registry/Tool.js";
 
 // ─── Helper ─────────────────────────────────────────────────────────────
 
