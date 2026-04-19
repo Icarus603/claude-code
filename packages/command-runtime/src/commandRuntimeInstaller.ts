@@ -9,6 +9,6 @@ export function ensureCommandRuntimeInstalled(): void {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(`${process.cwd()}/src/runtime/installCommandRuntimeBindings.js`)
+  require(`${process.cwd()}/packages/app-host/src/runtime/installCommandRuntimeBindings.js`)
   commandRuntimeInstalled = true
 }

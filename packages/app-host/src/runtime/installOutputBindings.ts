@@ -24,15 +24,15 @@ import {
   setSanitizePathFn,
 } from '@claude-code/output/_deps'
 
-import { getOriginalCwd, getSessionId } from '../bootstrap/state.js'
-import { getClaudeConfigHomeDir } from '../utils/envUtils.js'
-import { getFsImplementation } from '../utils/fsOperations.js'
-import { getRelativeTimeFormat, getTimeZone } from '../utils/intl.js'
-import { logError } from '../utils/log.js'
-import { logForDebugging } from '../utils/debug.js'
-import { registerCleanup } from '../utils/cleanupRegistry.js'
-import { sanitizePath } from '../utils/path.js'
-import { jsonStringify } from '../utils/slowOperations.js'
+import { getOriginalCwd, getSessionId } from 'src/bootstrap/state.js'
+import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getRelativeTimeFormat, getTimeZone } from 'src/utils/intl.js'
+import { logError } from 'src/utils/log.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { sanitizePath } from 'src/utils/path.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 
 let installed = false
 

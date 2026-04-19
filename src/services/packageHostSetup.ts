@@ -963,25 +963,25 @@ export function installPackageHostBindings(
         installers.installProviderBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('../runtime/installProviderBindings.js')
+          require('@claude-code/app-host/runtime/installProviderBindings.js')
         }),
       installToolRegistryBindings:
         installers.installToolRegistryBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('../runtime/installToolRegistryBindings.js')
+          require('@claude-code/app-host/runtime/installToolRegistryBindings.js')
         }),
       installCommandRuntimeBindings:
         installers.installCommandRuntimeBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('../runtime/installCommandRuntimeBindings.js')
+          require('@claude-code/app-host/runtime/installCommandRuntimeBindings.js')
         }),
       installMcpRuntimeBindings:
         installers.installMcpRuntimeBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('../runtime/installMcpRuntimeBindings.js')
+          require('@claude-code/app-host/runtime/installMcpRuntimeBindings.js')
         }),
     },
   )

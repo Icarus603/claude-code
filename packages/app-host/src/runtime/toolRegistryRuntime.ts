@@ -12,13 +12,13 @@ import {
   installToolRegistryHostBindings,
   parseToolPreset as parseToolPresetFromPackage,
 } from '@claude-code/tool-registry'
-import { toolMatchesName, type Tool, type ToolPermissionContext, type Tools } from '../Tool.js'
+import { toolMatchesName, type Tool, type ToolPermissionContext, type Tools } from 'src/Tool.js'
 import {
   ALL_AGENT_DISALLOWED_TOOLS,
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   ASYNC_AGENT_ALLOWED_TOOLS,
   COORDINATOR_MODE_ALLOWED_TOOLS,
-} from '../constants/tools.js'
+} from 'src/constants/tools.js'
 import { AgentTool } from '@claude-code/tool-registry/tools/AgentTool/AgentTool.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'
@@ -34,7 +34,7 @@ import { SendMessageTool } from '@claude-code/tool-registry/tools/SendMessageToo
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
 import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
-import { isEnvTruthy } from '../utils/envUtils.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { getDenyRuleForTool } from '@claude-code/permission/permissions'
 
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
@@ -43,7 +43,7 @@ const REPLTool =
     ? require('@claude-code/tool-registry/tools/REPLTool/REPLTool.js').REPLTool
     : null
 const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('../coordinator/coordinatorMode.js') as typeof import('../coordinator/coordinatorMode.js'))
+  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
   : null
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 

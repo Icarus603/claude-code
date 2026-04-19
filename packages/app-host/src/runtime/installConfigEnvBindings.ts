@@ -17,13 +17,13 @@ import {
   setWhichFn,
 } from '@claude-code/config/env/_deps'
 
-import { fileSuffixForOauthConfig } from '../constants/oauth.js'
-import { isRunningWithBun } from '../utils/bundledMode.js'
-import { execFileNoThrow } from '../utils/execFileNoThrow.js'
+import { fileSuffixForOauthConfig } from 'src/constants/oauth.js'
+import { isRunningWithBun } from 'src/utils/bundledMode.js'
+import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { findExecutable } from '@claude-code/shell/findExecutable.js'
-import { getFsImplementation } from '../utils/fsOperations.js'
-import { getAncestorCommandsAsync } from '../utils/genericProcessUtils.js'
-import { which } from '../utils/which.js'
+import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getAncestorCommandsAsync } from 'src/utils/genericProcessUtils.js'
+import { which } from 'src/utils/which.js'
 
 let installed = false
 
