@@ -16,7 +16,7 @@
 import { feature } from 'bun:bundle'
 import { hostname } from 'os'
 import { getOriginalCwd, getSessionId } from 'src/bootstrap/state.js'
-import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { SDKControlResponse } from 'src/entrypoints/sdk/controlTypes.js'
 import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature-flags'
 import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'

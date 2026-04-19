@@ -106,7 +106,7 @@ import type {
 import type {
   HookEvent,
   SDKAssistantMessageError,
-} from 'src/entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { EXPLORE_AGENT } from '@claude-code/tool-registry/tools/AgentTool/built-in/exploreAgent.js'
 import { PLAN_AGENT } from '@claude-code/tool-registry/tools/AgentTool/built-in/planAgent.js'
 import { areExplorePlanAgentsEnabled } from '@claude-code/tool-registry/tools/AgentTool/builtInAgents.js'

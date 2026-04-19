@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js'
+import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { buildMessageLookups } from 'src/utils/messages.js'
 import { Box, Text } from '@anthropic/ink'
 import { MessageResponse } from '../MessageResponse.js'

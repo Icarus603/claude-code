@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import { writeSync } from 'fs'
 import memoize from 'lodash-es/memoize.js'
 import { onExit } from 'signal-exit'
-import type { ExitReason } from 'src/entrypoints/agentSdkTypes.js'
+import type { ExitReason } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import {
   getIsInteractive,
   getIsScrollDraining,

@@ -32,9 +32,9 @@ import {
   formatDescriptionWithSource,
   getCommandName,
 } from '../../../../../../src/commands.js'
-import type { ModelInfo } from '../../../../../../src/entrypoints/agentSdkTypes.js'
+import type { ModelInfo } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { HookCallbackMatcher } from '../../../../../../src/types/hooks.js'
-import type { HookEvent } from '../../../../../../src/entrypoints/agentSdkTypes.js'
+import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { PermissionMode as InternalPermissionMode } from '../../../../../../src/types/permissions.js'
 import type { AppStateLike as AppState } from '../../../contracts.js'
 import { parsePluginIdentifier } from '../../../../../../src/utils/plugins/pluginIdentifier.js'

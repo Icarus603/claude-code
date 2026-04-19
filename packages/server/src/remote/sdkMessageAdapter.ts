@@ -8,7 +8,7 @@ import type {
   SDKSystemMessage,
   SDKToolProgressMessage,
   SDKUserMessage,
-} from 'src/entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   AssistantMessage,
   Message,

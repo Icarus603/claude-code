@@ -1,4 +1,4 @@
-import { HOOK_EVENTS, type HookEvent } from 'src/entrypoints/agentSdkTypes.js'
+import { HOOK_EVENTS, type HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { AppState } from 'src/state/AppState.js'
 import type { Message } from 'src/types/message.js'
 import { logForDebugging } from '../debug.js'

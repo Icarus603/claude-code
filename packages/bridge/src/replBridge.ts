@@ -46,7 +46,7 @@ import {
   logBridgeSkip,
 } from './debugUtils.js'
 import type { Message } from 'src/types/message.js'
-import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import type {
   SDKControlRequest,

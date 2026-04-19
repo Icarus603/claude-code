@@ -1,4 +1,4 @@
-import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { checkGate_CACHED_OR_BLOCKING } from '@claude-code/config/feature-flags'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { detectCurrentRepositoryWithHost } from '../../detectRepository.js'
