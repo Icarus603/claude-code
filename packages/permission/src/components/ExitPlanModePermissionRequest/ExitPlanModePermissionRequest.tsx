@@ -18,7 +18,7 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from 'src/state/AppState.js'
+} from '../../appStateHooks.js'
 import {
   getSdkBetas,
   getSessionId,
@@ -30,7 +30,7 @@ import {
 import { generateSessionName } from 'src/commands/rename/generateSessionName.js'
 import { launchUltraplan } from 'src/commands/ultraplan.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
-import type { AppState } from 'src/state/AppStateStore.js'
+type AppState = Record<string, unknown>
 import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
 import type { AllowedPrompt } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'

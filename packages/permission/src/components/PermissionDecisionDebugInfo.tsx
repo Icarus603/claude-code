@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import figures from 'figures'
 import React, { useMemo } from 'react'
 import { Ansi, Box, color, Text, useTheme } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '../appStateHooks.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { permissionModeTitle } from '@claude-code/permission/PermissionMode'
 import type {

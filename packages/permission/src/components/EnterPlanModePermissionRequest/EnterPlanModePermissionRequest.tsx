@@ -5,7 +5,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '../../appStateHooks.js'
 import { isPlanModeInterviewPhaseEnabled } from 'src/utils/planModeV2.js'
 import { Select } from 'src/components/CustomSelect/index.js'
 import { PermissionDialog } from '../PermissionDialog.js'

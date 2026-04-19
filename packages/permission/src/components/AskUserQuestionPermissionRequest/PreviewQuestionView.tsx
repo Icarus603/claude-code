@@ -6,7 +6,7 @@ import {
   useKeybinding,
   useKeybindings,
 } from '@anthropic/ink/keybindings'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '../../appStateHooks.js'
 import type { Question } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import { getExternalEditor } from 'src/utils/editor.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
