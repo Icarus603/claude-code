@@ -24,7 +24,7 @@ import type {
   RenderableMessage,
 } from '../types/message.js'
 import { type AdvisorBlock, isAdvisorBlock } from '../utils/advisor.js'
-import { collapseBackgroundBashNotifications } from '../utils/collapseBackgroundBashNotifications.js'
+import { collapseBackgroundBashNotifications } from '@claude-code/shell/collapseBackgroundBashNotifications.js'
 import { collapseHookSummaries } from '../utils/collapseHookSummaries.js'
 import { collapseReadSearchGroups } from '../utils/collapseReadSearch.js'
 import { collapseTeammateShutdowns } from '../utils/collapseTeammateShutdowns.js'

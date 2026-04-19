@@ -6,7 +6,7 @@ import {
 import { instances } from '@anthropic/ink'
 import type { PastedContent } from '@claude-code/config'
 import { classifyGuiEditor, getExternalEditor } from './editor.js'
-import { execSync_DEPRECATED } from './execSyncWrapper.js'
+import { execSync_DEPRECATED } from '@claude-code/shell/execSyncWrapper.js'
 import { getFsImplementation } from './fsOperations.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { writeFileSync_DEPRECATED } from './slowOperations.js'

@@ -59,7 +59,7 @@ import {
   subscribeToCommandQueue,
   getCommandsByMaxPriority,
 } from '../../../../../../src/utils/messageQueueManager.js'
-import { notifyCommandLifecycle } from '../../../../../../src/utils/commandLifecycle.js'
+import { notifyCommandLifecycle } from '@claude-code/shell/commandLifecycle.js'
 import {
   getSessionState,
   notifySessionStateChanged,
