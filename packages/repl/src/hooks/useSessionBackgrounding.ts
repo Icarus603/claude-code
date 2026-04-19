@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useEffect, useRef } from 'react'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import type { Message } from 'src/types/message.js'
 
 type UseSessionBackgroundingProps = {

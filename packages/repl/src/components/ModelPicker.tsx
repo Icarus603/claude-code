@@ -14,7 +14,7 @@ import {
 } from 'src/utils/fastMode.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import {
   convertEffortValueToLevel,
   type EffortLevel,

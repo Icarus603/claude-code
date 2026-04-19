@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useAppState, useAppStateStore } from 'src/state/AppState.js'
+import { useAppState, useAppStateStore } from '@claude-code/repl/appStateHooks.js'
 import {
   getActiveAgentForInput,
   getViewedTeammateTask,

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 
 type Props = {
   teamsSelected: boolean

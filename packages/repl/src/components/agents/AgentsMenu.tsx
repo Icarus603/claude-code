@@ -6,7 +6,7 @@ import type { CommandResultDisplay } from 'src/commands.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useMergedTools } from '@claude-code/repl/hooks/useMergedTools.js'
 import { Box, Text } from '@anthropic/ink'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import type { Tools } from 'src/Tool.js'
 import {
   type ResolvedAgent,

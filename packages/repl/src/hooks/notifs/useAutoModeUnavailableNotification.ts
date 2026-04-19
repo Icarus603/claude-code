@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { useEffect, useRef } from 'react'
 import { useNotifications } from 'src/context/notifications.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import {
   getAutoModeUnavailableNotification,

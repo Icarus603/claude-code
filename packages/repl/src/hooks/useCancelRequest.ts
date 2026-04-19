@@ -11,7 +11,7 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from 'src/state/AppState.js'
+} from '@claude-code/repl/appStateHooks.js'
 import { isVimModeEnabled } from '@claude-code/repl/components/PromptInput/utils.js'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
 import type { SpinnerMode } from '@claude-code/repl/components/Spinner/types.js'

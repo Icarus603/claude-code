@@ -23,7 +23,7 @@ import { useSettingsErrors } from '@claude-code/repl/hooks/notifs/useSettingsErr
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getPluginErrorMessage } from 'src/types/plugin.js'
 import {
   getGcsDistTags,

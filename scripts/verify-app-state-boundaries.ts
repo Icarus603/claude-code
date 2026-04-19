@@ -5,7 +5,7 @@ const APP_STATE_LINE_BUDGET = 40
 async function main(): Promise<void> {
   const [content, runtimeHandlesContent] = await Promise.all([
     readFile('src/state/AppStateStore.ts', 'utf8'),
-    readFile('src/runtime/runtimeHandles.ts', 'utf8'),
+    readFile('packages/app-host/src/runtime/runtimeHandles.ts', 'utf8'),
   ])
 
   const disallowedPatterns = [

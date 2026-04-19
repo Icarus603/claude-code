@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import type { CommandResultDisplay } from 'src/commands.js'
 import { Box, color, Text, useTheme } from '@anthropic/ink'
 import { useMcpReconnect } from 'src/services/mcp/MCPConnectionManager.js'
-import { useAppStateStore } from 'src/state/AppState.js'
+import { useAppStateStore } from '@claude-code/repl/appStateHooks.js'
 import { Spinner } from '../Spinner.js'
 
 type Props = {

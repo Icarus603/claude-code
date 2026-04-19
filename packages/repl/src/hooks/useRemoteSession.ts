@@ -15,8 +15,8 @@ import {
   convertSDKMessage,
   isSessionEndMessage,
 } from '@claude-code/server/remote/sdkMessageAdapter.js'
-import { useSetAppState } from 'src/state/AppState.js'
-import type { AppState } from 'src/state/AppStateStore.js'
+import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import type { AppState } from '@claude-code/repl/appStateHooks.js'
 import type { Tool } from 'src/Tool.js'
 import { findToolByName } from 'src/Tool.js'
 import type { Message as MessageType } from 'src/types/message.js'

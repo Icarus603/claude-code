@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useMemo, useState } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { stringWidth } from '@anthropic/ink'
-import { useAppState, useSetAppState } from 'src/state/AppState.js'
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,

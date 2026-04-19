@@ -8,7 +8,7 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from 'src/state/AppState.js'
+} from '@claude-code/repl/appStateHooks.js'
 import {
   backgroundAll,
   hasForegroundTasks,

@@ -15,7 +15,7 @@ import {
   type AppState,
   useAppState,
   useSetAppState,
-} from 'src/state/AppState.js'
+} from '@claude-code/repl/appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,

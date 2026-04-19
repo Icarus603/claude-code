@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Box, Text, Link } from '@anthropic/ink';
 import { Select } from '../CustomSelect/select.js';
 import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js';
-import { useAppState, useSetAppState } from 'src/state/AppState.js';
+import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js';
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config';
 import { CCR_TERMS_URL } from 'src/commands/ultraplan.js';
 
