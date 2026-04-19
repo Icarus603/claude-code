@@ -20,9 +20,9 @@ import {
   handleOAuth401Error,
   isClaudeAISubscriber,
   isEnterpriseSubscriber,
-} from '../../utils/auth.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
-import { errorMessage } from '../../utils/errors.js'
+} from 'src/utils/auth.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { errorMessage } from 'src/utils/errors.js'
 import {
   type CooldownReason,
   handleFastModeOverageRejection,
@@ -30,11 +30,11 @@ import {
   isFastModeCooldown,
   isFastModeEnabled,
   triggerFastModeCooldown,
-} from '../../utils/fastMode.js'
-import { isNonCustomOpusModel } from '../../utils/model/model.js'
-import { disableKeepAlive } from '../../utils/proxy.js'
-import { sleep } from '../../utils/sleep.js'
-import type { ThinkingConfig } from '../../utils/thinking.js'
+} from 'src/utils/fastMode.js'
+import { isNonCustomOpusModel } from 'src/utils/model/model.js'
+import { disableKeepAlive } from 'src/utils/proxy.js'
+import { sleep } from 'src/utils/sleep.js'
+import type { ThinkingConfig } from 'src/utils/thinking.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
@@ -42,7 +42,7 @@ import {
   checkMockRateLimitError,
   isMockRateLimitError,
 } from '@claude-code/provider/rateLimitMocking.js'
-import { REPEATED_529_ERROR_MESSAGE } from './errors.js'
+import { REPEATED_529_ERROR_MESSAGE } from 'src/services/api/errors.js'
 import { extractConnectionErrorDetails } from '@claude-code/provider/errorUtils.js'
 
 const abortError = () => new APIUserAbortError()
