@@ -36,11 +36,11 @@ import { tokenCountWithEstimation } from '../tokens.js'
 import {
   getBashPromptAllowDescriptions,
   getBashPromptDenyDescriptions,
-} from './bashClassifier.js'
+} from '@claude-code/permission/bashClassifier.js'
 import {
   extractToolUseBlock,
   parseClassifierResponse,
-} from './classifierShared.js'
+} from '@claude-code/permission/classifierShared.js'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
 
 // Dead code elimination: conditional imports for auto mode classifier prompts.

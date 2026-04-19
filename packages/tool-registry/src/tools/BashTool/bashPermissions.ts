@@ -32,14 +32,14 @@ import { AbortError } from 'src/utils/errors.js'
 import type {
   ClassifierBehavior,
   ClassifierResult,
-} from 'src/utils/permissions/bashClassifier.js'
+} from '@claude-code/permission/bashClassifier.js'
 import {
   classifyBashCommand,
   getBashPromptAllowDescriptions,
   getBashPromptAskDescriptions,
   getBashPromptDenyDescriptions,
   isClassifierPermissionsEnabled,
-} from 'src/utils/permissions/bashClassifier.js'
+} from '@claude-code/permission/bashClassifier.js'
 import type {
   PermissionDecisionReason,
   PermissionResult,
@@ -62,7 +62,7 @@ import {
   permissionRuleExtractPrefix as sharedPermissionRuleExtractPrefix,
   suggestionForExactCommand as sharedSuggestionForExactCommand,
   suggestionForPrefix as sharedSuggestionForPrefix,
-} from 'src/utils/permissions/shellRuleMatching.js'
+} from '@claude-code/permission/shellRuleMatching.js'
 import { getPlatform } from 'src/utils/platform.js'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'

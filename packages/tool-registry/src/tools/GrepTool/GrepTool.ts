@@ -16,7 +16,7 @@ import {
   normalizePatternsToPath,
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
+import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { getGlobExclusionsForPluginCache } from 'src/utils/plugins/orphanedPluginFilter.js'
 import { ripGrep } from 'src/utils/ripgrep.js'
 import { semanticBoolean } from 'src/utils/semanticBoolean.js'

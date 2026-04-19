@@ -3,7 +3,7 @@ import React, { type ReactNode } from 'react'
 import { getOriginalCwd } from '../../bootstrap/state.js'
 import { Text } from '@anthropic/ink'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
-import { permissionRuleExtractPrefix } from '../../utils/permissions/shellRuleMatching.js'
+import { permissionRuleExtractPrefix } from '@claude-code/permission/shellRuleMatching.js'
 
 function commandListDisplay(commands: string[]): ReactNode {
   switch (commands.length) {

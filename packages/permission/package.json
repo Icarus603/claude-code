@@ -26,6 +26,14 @@
     "./toolPermission/*.js": "./src/toolPermission/*.ts",
     "./toolPermission/handlers/*.js": "./src/toolPermission/handlers/*.ts",
     "./autoModeState.js": "./src/autoModeState.ts",
-    "./dangerousPatterns.js": "./src/dangerousPatterns.ts"
+    "./dangerousPatterns.js": "./src/dangerousPatterns.ts",
+    "./classifierShared.js": "./src/classifierShared.ts",
+    "./bashClassifier.js": "./src/bashClassifier.ts",
+    "./classifierDecision.js": "./src/classifierDecision.ts",
+    "./getNextPermissionMode.js": "./src/getNextPermissionMode.ts",
+    "./bypassPermissionsKillswitch.js": "./src/bypassPermissionsKillswitch.ts",
+    "./shellRuleMatching.js": "./src/shellRuleMatching.ts",
+    "./shadowedRuleDetection.js": "./src/shadowedRuleDetection.ts",
+    "./permissionExplainer.js": "./src/permissionExplainer.ts"
   }
 }

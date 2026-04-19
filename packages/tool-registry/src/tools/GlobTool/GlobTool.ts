@@ -13,7 +13,7 @@ import { lazySchema } from 'src/utils/lazySchema.js'
 import { expandPath, toRelativePath } from 'src/utils/path.js'
 import { checkReadPermissionForTool } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
+import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { DESCRIPTION, GLOB_TOOL_NAME } from './prompt.js'
 import {
   getToolUseSummary,

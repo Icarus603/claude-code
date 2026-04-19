@@ -150,7 +150,7 @@ import { setAutoModeActive } from '@claude-code/permission/autoModeState.js'
 import {
   cyclePermissionMode,
   getNextPermissionMode,
-} from '../../utils/permissions/getNextPermissionMode.js'
+} from '@claude-code/permission/getNextPermissionMode.js'
 import { transitionPermissionMode } from '@claude-code/permission/permissionSetup'
 import { getPlatform } from '../../utils/platform.js'
 import type { ProcessUserInputContext } from '../../utils/processUserInput/processUserInput.js'

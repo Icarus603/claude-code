@@ -18,7 +18,7 @@ import { AGENT_COLOR_TO_THEME_COLOR } from '@claude-code/tool-registry/tools/Age
 import { logForDebugging } from '../../utils/debug.js'
 import { execFileNoThrow } from '../../utils/execFileNoThrow.js'
 import { truncateToWidth } from '../../utils/format.js'
-import { getNextPermissionMode } from '../../utils/permissions/getNextPermissionMode.js'
+import { getNextPermissionMode } from '@claude-code/permission/getNextPermissionMode.js'
 import {
   getModeColor,
   type PermissionMode,

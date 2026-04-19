@@ -47,7 +47,7 @@ import {
   matchingRuleForInput,
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
+import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { validateInputForSettingsFileEdit } from 'src/utils/settings/validateEditTool.js'
 import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/NotebookEditTool/constants.js'
 import {

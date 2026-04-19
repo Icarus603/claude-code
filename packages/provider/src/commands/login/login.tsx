@@ -21,7 +21,7 @@ import {
   checkAndDisableBypassPermissionsIfNeeded,
   resetAutoModeGateCheck,
   resetBypassPermissionsCheck,
-} from 'src/utils/permissions/bypassPermissionsKillswitch.js'
+} from '@claude-code/permission/bypassPermissionsKillswitch.js'
 import { resetUserCache } from 'src/utils/user.js'
 
 export async function call(

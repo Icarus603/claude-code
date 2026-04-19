@@ -24,7 +24,7 @@ import {
   generateGenericDescription,
   getBashPromptAllowDescriptions,
   isClassifierPermissionsEnabled,
-} from '../../../utils/permissions/bashClassifier.js'
+} from '@claude-code/permission/bashClassifier.js'
 import { extractRules } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { SandboxManager } from '../../../utils/sandbox/sandbox-adapter.js'
