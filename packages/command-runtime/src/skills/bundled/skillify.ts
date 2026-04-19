@@ -1,6 +1,6 @@
 import { getSessionMemoryContent } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
-import type { Message } from '../../types/message.js'
-import { getMessagesAfterCompactBoundary } from '../../utils/messages.js'
+import type { Message } from 'src/types/message.js'
+import { getMessagesAfterCompactBoundary } from 'src/utils/messages.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 
 function extractUserMessages(messages: Message[]): string[] {

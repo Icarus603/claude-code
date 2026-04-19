@@ -183,7 +183,7 @@ import {
 } from '../../../../src/interactiveHelpers.js'
 import { initBuiltinPlugins } from '../../../../src/plugins/bundled/index.js'
 import { checkQuotaStatus } from '@claude-code/provider/claudeAiLimits.js'
-import { initBundledSkills } from '../../../../src/skills/bundled/index.js'
+import { initBundledSkills } from '@claude-code/command-runtime/skills/bundled/index.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import {
   getActiveAgentsFromList,

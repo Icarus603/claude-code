@@ -20,7 +20,7 @@ import {
   countTokensViaHaikuFallback,
   roughTokenCountEstimation,
 } from '@claude-code/agent/tokenEstimation.js'
-import { estimateSkillFrontmatterTokens } from '../skills/loadSkillsDir.js'
+import { estimateSkillFrontmatterTokens } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
 import {
   findToolByName,
   type Tool,

@@ -142,7 +142,7 @@ export {
 /* eslint-disable @typescript-eslint/no-require-imports */
 const fetchMcpSkillsForClient = feature('MCP_SKILLS')
   ? (
-      require('../../skills/mcpSkills.js') as typeof import('../../skills/mcpSkills.js')
+      require('@claude-code/command-runtime/skills/mcpSkills.js') as typeof import('@claude-code/command-runtime/skills/mcpSkills.js')
     ).fetchMcpSkillsForClient
   : null
 
