@@ -1207,15 +1207,19 @@ async function* queryModel(
     const {
       isCachedMicrocompactEnabled,
       isModelSupportedForCacheEditing,
-      getCachedMCConfig,
     } = await import('@claude-code/agent/compaction/cachedMicrocompact.js')
+    const { getCachedMCConfig } = await import('@claude-code/agent/compaction/cachedMCConfig.js')
     const betas = await import('src/constants/betas.js')
     cacheEditingBetaHeader = betas.CACHE_EDITING_BETA_HEADER.trim()
-    const featureEnabled = isCachedMicrocompactEnabled()
-    const modelSupported = isModelSupportedForCacheEditing(options.model)
+    const config = getCachedMCConfig({
+      getEnv: key => process.env[key],
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      getFeatureValue: (require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')).getFeatureValue_CACHED_MAY_BE_STALE,
+    })
+    const featureEnabled = isCachedMicrocompactEnabled(config)
+    const modelSupported = isModelSupportedForCacheEditing(options.model, config)
     cachedMCEnabled =
       featureEnabled && modelSupported && cacheEditingBetaHeader.length > 0
-    const config = getCachedMCConfig()
     logForDebugging(
       `Cached MC gate: enabled=${featureEnabled} modelSupported=${modelSupported} header=${cacheEditingBetaHeader || '<empty>'} model=${options.model} supportedModels=${jsonStringify((config as any).supportedModels)}`,
     )
