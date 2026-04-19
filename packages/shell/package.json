@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
-    "./legacy/*.js": "./src/legacy/*.ts"
+    "./legacy/*.js": "./src/legacy/*.ts",
+    "./bash/*.js": "./src/bash/*.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",
