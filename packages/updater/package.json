@@ -10,6 +10,8 @@
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
-    "./autoUpdater.js": "./src/autoUpdater.ts"
+    "./autoUpdater.js": "./src/autoUpdater.ts",
+    "./binaryCheck.js": "./src/binaryCheck.ts",
+    "./update.js": "./src/update.ts"
   }
 }

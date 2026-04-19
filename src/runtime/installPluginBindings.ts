@@ -65,7 +65,7 @@ import {
   getOriginalCwd,
   getSessionId,
 } from '../bootstrap/state.js'
-import { isBinaryInstalled } from '../utils/binaryCheck.js'
+import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
 import { registerCleanup } from '../utils/cleanupRegistry.js'
 import { getCwd } from '../utils/cwd.js'
 import { logForDebugging } from '../utils/debug.js'
