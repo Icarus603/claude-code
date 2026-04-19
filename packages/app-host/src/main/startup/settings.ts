@@ -1,34 +1,34 @@
 import { feature } from "bun:bundle";
 import chalk from "chalk";
 import { readFileSync } from "fs";
-import { safeParseJSON } from "../../utils/json.js";
-import { writeFileSync_DEPRECATED } from "../../utils/slowOperations.js";
-import { generateTempFilePath } from "../../utils/tempfile.js";
-import { getFsImplementation, safeResolvePath } from "../../utils/fsOperations.js";
-import { errorMessage, isENOENT } from "../../utils/errors.js";
-import { resetSettingsCache } from "../../utils/settings/settingsCache.js";
-import { eagerParseCliFlag } from "../../utils/cliArgs.js";
-import { parseSettingSourcesFlag } from "../../utils/settings/constants.js";
+import { safeParseJSON } from "src/utils/json.js";
+import { writeFileSync_DEPRECATED } from "src/utils/slowOperations.js";
+import { generateTempFilePath } from "src/utils/tempfile.js";
+import { getFsImplementation, safeResolvePath } from "src/utils/fsOperations.js";
+import { errorMessage, isENOENT } from "src/utils/errors.js";
+import { resetSettingsCache } from "src/utils/settings/settingsCache.js";
+import { eagerParseCliFlag } from "src/utils/cliArgs.js";
+import { parseSettingSourcesFlag } from "src/utils/settings/constants.js";
 import {
 	setAllowedSettingSources,
 	setFlagSettingsPath,
 } from "../../bootstrap/state.js";
 import {
 	migrateBypassPermissionsAcceptedToSettings,
-} from "../../migrations/migrateBypassPermissionsAcceptedToSettings.js";
-import { migrateEnableAllProjectMcpServersToSettings } from "../../migrations/migrateEnableAllProjectMcpServersToSettings.js";
-import { resetProToOpusDefault } from "../../migrations/resetProToOpusDefault.js";
-import { migrateSonnet1mToSonnet45 } from "../../migrations/migrateSonnet1mToSonnet45.js";
-import { migrateLegacyOpusToCurrent } from "../../migrations/migrateLegacyOpusToCurrent.js";
-import { migrateSonnet45ToSonnet46 } from "../../migrations/migrateSonnet45ToSonnet46.js";
-import { migrateOpusToOpus1m } from "../../migrations/migrateOpusToOpus1m.js";
-import { migrateReplBridgeEnabledToRemoteControlAtStartup } from "../../migrations/migrateReplBridgeEnabledToRemoteControlAtStartup.js";
-import { resetAutoModeOptInForDefaultOffer } from "../../migrations/resetAutoModeOptInForDefaultOffer.js";
-import { migrateFennecToOpus } from "../../migrations/migrateFennecToOpus.js";
-import { migrateChangelogFromConfig } from "../../utils/releaseNotes.js";
+} from "src/migrations/migrateBypassPermissionsAcceptedToSettings.js";
+import { migrateEnableAllProjectMcpServersToSettings } from "src/migrations/migrateEnableAllProjectMcpServersToSettings.js";
+import { resetProToOpusDefault } from "src/migrations/resetProToOpusDefault.js";
+import { migrateSonnet1mToSonnet45 } from "src/migrations/migrateSonnet1mToSonnet45.js";
+import { migrateLegacyOpusToCurrent } from "src/migrations/migrateLegacyOpusToCurrent.js";
+import { migrateSonnet45ToSonnet46 } from "src/migrations/migrateSonnet45ToSonnet46.js";
+import { migrateOpusToOpus1m } from "src/migrations/migrateOpusToOpus1m.js";
+import { migrateReplBridgeEnabledToRemoteControlAtStartup } from "src/migrations/migrateReplBridgeEnabledToRemoteControlAtStartup.js";
+import { resetAutoModeOptInForDefaultOffer } from "src/migrations/resetAutoModeOptInForDefaultOffer.js";
+import { migrateFennecToOpus } from "src/migrations/migrateFennecToOpus.js";
+import { migrateChangelogFromConfig } from "src/utils/releaseNotes.js";
 import { getGlobalConfig, saveGlobalConfig } from "@claude-code/config";
-import { profileCheckpoint } from "../../utils/startupProfiler.js";
-import { isEnvTruthy } from "../../utils/envUtils.js";
+import { profileCheckpoint } from "src/utils/startupProfiler.js";
+import { isEnvTruthy } from "src/utils/envUtils.js";
 
 const CURRENT_MIGRATION_VERSION = 11;
 

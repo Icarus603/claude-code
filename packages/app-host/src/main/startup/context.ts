@@ -2,21 +2,21 @@ import { feature } from "bun:bundle";
 import { getSystemContext, getUserContext } from "@claude-code/provider/context.js";
 import { checkHasTrustDialogAccepted } from "@claude-code/config";
 import { getIsNonInteractiveSession } from "../../bootstrap/state.js";
-import { logForDiagnosticsNoPII } from "../../utils/diagLogs.js";
-import { initUser } from "../../utils/user.js";
-import { getRelevantTips } from "../../services/tips/tipRegistry.js";
+import { logForDiagnosticsNoPII } from "src/utils/diagLogs.js";
+import { initUser } from "src/utils/user.js";
+import { getRelevantTips } from "src/services/tips/tipRegistry.js";
 import {
 	prefetchAwsCredentialsAndBedRockInfoIfSafe,
 	prefetchGcpCredentialsIfSafe,
-} from "../../utils/auth.js";
-import { countFilesRoundedRg } from "../../utils/ripgrep.js";
-import { getCwd } from "../../utils/cwd.js";
+} from "src/utils/auth.js";
+import { countFilesRoundedRg } from "src/utils/ripgrep.js";
+import { getCwd } from "src/utils/cwd.js";
 import { prefetchOfficialMcpUrls } from '@claude-code/mcp-runtime/officialRegistry.js';
-import { refreshModelCapabilities } from "../../utils/model/modelCapabilities.js";
-import { settingsChangeDetector } from "../../utils/settings/changeDetector.js";
-import { skillChangeDetector } from "../../utils/skills/skillChangeDetector.js";
-import { isEnvTruthy } from "../../utils/envUtils.js";
-import { isBareMode } from "../../utils/envUtils.js";
+import { refreshModelCapabilities } from "src/utils/model/modelCapabilities.js";
+import { settingsChangeDetector } from "src/utils/settings/changeDetector.js";
+import { skillChangeDetector } from "src/utils/skills/skillChangeDetector.js";
+import { isEnvTruthy } from "src/utils/envUtils.js";
+import { isBareMode } from "src/utils/envUtils.js";
 
 export function prefetchSystemContextIfSafe(): void {
 	const isNonInteractiveSession = getIsNonInteractiveSession();
@@ -67,7 +67,7 @@ export function startDeferredPrefetches(): void {
 		void skillChangeDetector.initialize();
 	}
 	if (process.env.USER_TYPE === "ant") {
-		void import("../../utils/eventLoopStallDetector.js").then((m) =>
+		void import("src/utils/eventLoopStallDetector.js").then((m) =>
 			m.startEventLoopStallDetector(),
 		);
 	}

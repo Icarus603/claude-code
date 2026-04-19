@@ -1,6 +1,6 @@
 import { basename, sep } from 'path'
 import React, { type ReactNode } from 'react'
-import { getOriginalCwd } from 'src/bootstrap/state.js'
+import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { Text } from '@anthropic/ink'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { permissionRuleExtractPrefix } from '@claude-code/permission/shellRuleMatching.js'

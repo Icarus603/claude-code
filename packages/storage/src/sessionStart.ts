@@ -1,4 +1,4 @@
-import { getMainThreadAgentType } from 'src/bootstrap/state.js'
+import { getMainThreadAgentType } from '@claude-code/app-host/bootstrap/state.js'
 import type { HookResultMessage } from 'src/types/message.js'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
 import { logForDebugging } from 'src/utils/debug.js'

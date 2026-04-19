@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import React, { useContext, useMemo } from 'react'
-import { getKairosActive, getUserMsgOptIn } from '../../bootstrap/state.js'
+import { getKairosActive, getUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { Box } from '@anthropic/ink'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { useAppState } from '../../state/AppState.js'

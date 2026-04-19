@@ -23,7 +23,7 @@ import {
   setMainLoopModelOverride,
   switchSession,
   isSessionPersistenceDisabled,
-} from '../../../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { EMPTY_USAGE } from '@claude-code/provider/logging.js'
 import { jsonStringify } from '../../../../../../src/utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'

@@ -44,7 +44,7 @@ import { logEvent } from '@claude-code/local-observability'
 import {
   getAdditionalDirectoriesForClaudeMd,
   getOriginalCwd,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { truncateEntrypointContent } from '@claude-code/memory/memdir'
 import { getAutoMemEntrypoint, isAutoMemoryEnabled } from '@claude-code/memory/paths'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

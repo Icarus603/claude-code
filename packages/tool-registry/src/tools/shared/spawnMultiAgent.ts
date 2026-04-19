@@ -11,7 +11,7 @@ import {
   getMainLoopModelOverride,
   getSessionBypassPermissionsMode,
   getSessionId,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
 import { createTaskStateBase, generateTaskId } from 'src/Task.js'
 import type { ToolUseContext } from 'src/Tool.js'

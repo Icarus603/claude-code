@@ -9,7 +9,7 @@ import {
   setOriginalCwd,
   setCwdState,
   setDirectConnectServerUrl,
-} from '../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   createDirectConnectSession,
   DirectConnectError,

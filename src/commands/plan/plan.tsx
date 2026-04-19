@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { handlePlanModeTransition } from '../../bootstrap/state.js'
+import { handlePlanModeTransition } from '@claude-code/app-host/bootstrap/state.js'
 import type { LocalJSXCommandContext } from '../../commands.js'
 import { Box, Text } from '@anthropic/ink'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'

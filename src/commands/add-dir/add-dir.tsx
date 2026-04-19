@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import {
   getAdditionalDirectoriesForClaudeMd,
   setAdditionalDirectoriesForClaudeMd,
-} from '../../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import type { LocalJSXCommandContext } from '../../commands.js'
 import { MessageResponse } from '../../components/MessageResponse.js'
 import { AddWorkspaceDirectory } from '@claude-code/permission/components/rules/AddWorkspaceDirectory.js'

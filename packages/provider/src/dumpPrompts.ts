@@ -2,7 +2,7 @@ import type { ClientOptions } from '@anthropic-ai/sdk'
 import { createHash } from 'crypto'
 import { promises as fs } from 'fs'
 import { dirname, join } from 'path'
-import { getSessionId } from 'src/bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
 import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
 

@@ -1,7 +1,7 @@
 import { APIError } from '@anthropic-ai/sdk'
 import type { MessageParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import isEqual from 'lodash-es/isEqual.js'
-import { getIsNonInteractiveSession } from 'src/bootstrap/state.js'
+import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import { isClaudeAISubscriber } from 'src/utils/auth.js'
 import { getModelBetas } from 'src/utils/betas.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

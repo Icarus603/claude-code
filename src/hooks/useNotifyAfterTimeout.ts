@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import {
   getLastInteractionTime,
   updateLastInteractionTime,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { useTerminalNotification } from '@anthropic/ink'
 import { sendNotification } from '../services/notifier.js'
 // The time threshold in milliseconds for considering an interaction "recent" (6 seconds)

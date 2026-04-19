@@ -8,7 +8,7 @@ import {
   SHIMMER_INTERVAL_MS,
 } from '@claude-code/bridge/bridgeStatusUtil.js'
 import { feature } from 'bun:bundle'
-import { getKairosActive, getUserMsgOptIn } from '../bootstrap/state.js'
+import { getKairosActive, getUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isEnvTruthy } from '../utils/envUtils.js'
 import { count } from '../utils/array.js'
@@ -41,7 +41,7 @@ import figures from 'figures'
 import {
   getCurrentTurnTokenBudget,
   getTurnOutputTokens,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 
 import { TeammateSpinnerTree } from './Spinner/TeammateSpinnerTree.js'
 import { useAnimationFrame } from '@anthropic/ink'

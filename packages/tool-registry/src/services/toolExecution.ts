@@ -24,7 +24,7 @@ import {
   addToToolDuration,
   getCodeEditToolDecisionCounter,
   getStatsStore,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   buildCodeEditToolAttributes,
   isCodeEditingTool,

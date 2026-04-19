@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import { isReplBridgeActive } from 'src/bootstrap/state.js'
+import { isReplBridgeActive } from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { Tool } from 'src/Tool.js'
 import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'

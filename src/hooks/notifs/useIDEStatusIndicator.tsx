@@ -9,7 +9,7 @@ import {
   isJetBrainsIde,
   isSupportedTerminal,
 } from '@claude-code/ide/ide.js'
-import { getIsRemoteMode } from '../../bootstrap/state.js'
+import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { useIdeConnectionStatus } from '@claude-code/ide/hooks/useIdeConnectionStatus.js'
 import type { IDESelection } from '../useIdeSelection.js'
 

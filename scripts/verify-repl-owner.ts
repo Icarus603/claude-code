@@ -25,7 +25,7 @@ async function main(): Promise<void> {
 
   const disallowedReplImports = [
     "../services/api/providerHostSetup.js",
-    "src/services/api/providerHostSetup.js",
+    "@claude-code/app-host/providerHostSetup.js",
     "../services/packageHostSetup.js",
     "src/services/packageHostSetup.js",
   ]

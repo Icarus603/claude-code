@@ -11,10 +11,10 @@ import {
   setIsInteractive,
   setQuestionPreviewFormat,
   setSessionSource,
-} from '../../../../src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { stopCapturingEarlyInput } from '../../../../src/utils/earlyInput.js'
 import { isEnvTruthy } from '../../../../src/utils/envUtils.js'
-import { initializeEntrypoint } from '../../../../src/main/startup/settings.js'
+import { initializeEntrypoint } from '@claude-code/app-host/main/startup/settings.js'
 
 /**
  * Resolve the client type string from process env + entrypoint hints.

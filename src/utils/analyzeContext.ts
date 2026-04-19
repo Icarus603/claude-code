@@ -5,7 +5,7 @@ import {
   SYSTEM_PROMPT_DYNAMIC_BOUNDARY,
 } from 'src/constants/prompts.js'
 import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
-import { getSdkBetas } from '../bootstrap/state.js'
+import { getSdkBetas } from '@claude-code/app-host/bootstrap/state.js'
 import { getCommandName } from '../commands.js'
 import { getSystemContext } from '@claude-code/provider/context.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

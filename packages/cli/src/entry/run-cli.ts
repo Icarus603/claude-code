@@ -12,7 +12,7 @@ import { initializeWarningHandler } from '../../../../src/utils/warningHandler.j
 import { profileCheckpoint } from '../../../../src/utils/startupProfiler.js'
 import {
   eagerLoadSettings,
-} from '../../../../src/main/startup/settings.js'
+} from '@claude-code/app-host/main/startup/settings.js'
 
 import { resetCursor } from './bootstrap-utils.js'
 import { detectRuntimeMode } from './detect-mode.js'

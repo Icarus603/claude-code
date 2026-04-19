@@ -2080,7 +2080,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   // Set the bootstrap CWD so that trust checks, project config lookups, and
   // git utilities (getBranch, getRemoteUrl) resolve against the correct path.
-  const { setOriginalCwd, setCwdState } = await import('src/bootstrap/state.js')
+  const { setOriginalCwd, setCwdState } = await import('@claude-code/app-host/bootstrap/state.js')
   setOriginalCwd(dir)
   setCwdState(dir)
 
@@ -2808,7 +2808,7 @@ export async function runBridgeHeadless(
   // (getBranch/getRemoteUrl) — which read from bootstrap CWD state set
   // below — resolve against the right repo.
   process.chdir(dir)
-  const { setOriginalCwd, setCwdState } = await import('src/bootstrap/state.js')
+  const { setOriginalCwd, setCwdState } = await import('@claude-code/app-host/bootstrap/state.js')
   setOriginalCwd(dir)
   setCwdState(dir)
 

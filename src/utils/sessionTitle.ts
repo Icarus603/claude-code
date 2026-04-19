@@ -13,7 +13,7 @@
  */
 
 import { z } from 'zod/v4'
-import { getIsNonInteractiveSession } from '../bootstrap/state.js'
+import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import { logEvent } from '@claude-code/local-observability'
 import { queryHaiku } from '@claude-code/provider/claude.js'
 import type { Message } from '../types/message.js'

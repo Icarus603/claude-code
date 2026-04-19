@@ -20,7 +20,7 @@ import type {
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { Stream } from '@anthropic-ai/sdk/streaming.mjs'
 import { getProviderAdapter } from '@claude-code/provider'
-import './providerHostSetup.js'
+import '@claude-code/app-host/providerHostSetup.js'
 import { randomUUID } from 'crypto'
 import {
   getAPIProvider,
@@ -133,7 +133,7 @@ import {
   setPromptCache1hAllowlist,
   setPromptCache1hEligible,
   setThinkingClearLatched,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   AFK_MODE_BETA_HEADER,
   CONTEXT_1M_BETA_HEADER,

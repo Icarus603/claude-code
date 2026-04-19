@@ -1,4 +1,4 @@
-import { getIsNonInteractiveSession } from '../../bootstrap/state.js'
+import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import type { Command } from '../../commands.js'
 
 export const context: Command = {

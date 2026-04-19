@@ -2,7 +2,7 @@ import axios from 'axios'
 import { readFile, stat } from 'fs/promises'
 import * as React from 'react'
 import { useCallback, useEffect, useState } from 'react'
-import { getLastAPIRequest } from 'src/bootstrap/state.js'
+import { getLastAPIRequest } from '@claude-code/app-host/bootstrap/state.js'
 import {
   logEvent,
 } from '@claude-code/local-observability'

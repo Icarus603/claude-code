@@ -1,5 +1,5 @@
 import { feature } from "bun:bundle";
-import { isEnvTruthy } from "../../utils/envUtils.js";
+import { isEnvTruthy } from "src/utils/envUtils.js";
 import { setUserMsgOptIn } from "../../bootstrap/state.js";
 import { logEvent } from "@claude-code/local-observability";
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from "@claude-code/local-observability/compat";
@@ -11,7 +11,7 @@ export function maybeActivateProactive(options: unknown): void {
 			isEnvTruthy(process.env.CLAUDE_CODE_PROACTIVE))
 	) {
 		// eslint-disable-next-line @typescript-eslint/no-require-imports
-		const proactiveModule = require("../../proactive/index.js");
+		const proactiveModule = require("src/proactive/index.js");
 		if (!proactiveModule.isProactiveActive()) {
 			proactiveModule.activateProactive("command");
 		}

@@ -2,7 +2,7 @@ import {
   installProviderRuntimeBindings,
   type ProviderHostBindings,
 } from '@claude-code/provider/providerHostSetup'
-import * as claudeLegacyRuntime from './claudeLegacyRuntime.js'
+import * as claudeLegacyRuntime from 'src/services/api/claudeLegacyRuntime.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getAnthropicApiKey,
@@ -11,33 +11,33 @@ import {
   isClaudeAISubscriber,
   refreshAndGetAwsCredentials,
   refreshGcpCredentialsIfNeeded,
-} from '../../utils/auth.js'
+} from 'src/utils/auth.js'
 import {
   createAxiosInstance,
   getProxyFetchOptions,
   getProxyUrl,
   shouldBypassProxy,
-} from '../../utils/proxy.js'
-import { getOauthConfig } from '../../constants/oauth.js'
+} from 'src/utils/proxy.js'
+import { getOauthConfig } from 'src/constants/oauth.js'
 import { getUserContext, getSystemContext } from '@claude-code/provider/context.js'
-import { getUserAgent } from '../../utils/http.js'
-import { getSmallFastModel } from '../../utils/model/model.js'
+import { getUserAgent } from 'src/utils/http.js'
+import { getSmallFastModel } from 'src/utils/model/model.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from '../../utils/model/providers.js'
-import { getModelOptions } from '../../utils/model/modelOptions.js'
+} from 'src/utils/model/providers.js'
+import { getModelOptions } from 'src/utils/model/modelOptions.js'
 import {
   getIsNonInteractiveSession,
   getSessionId,
-} from '../../bootstrap/state.js'
-import { isDebugToStdErr, logForDebugging } from '../../utils/debug.js'
+} from './bootstrap/state.js'
+import { isDebugToStdErr, logForDebugging } from 'src/utils/debug.js'
 import {
   getAWSRegion,
   getVertexRegionForModel,
   isEnvTruthy,
-} from '../../utils/envUtils.js'
-import { addToTotalSessionCost } from '../../cost-tracker.js'
+} from 'src/utils/envUtils.js'
+import { addToTotalSessionCost } from 'src/cost-tracker.js'
 
 const anthropicQueryBinding: NonNullable<
   ProviderHostBindings['anthropic']['query']

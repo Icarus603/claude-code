@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { useCallback, useEffect } from 'react'
-import { getOriginalCwd } from 'src/bootstrap/state.js'
+import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import type { CommandResultDisplay } from 'src/commands.js'
 import { Select } from 'src/components/CustomSelect/select.js'
 import { Box, Text } from '@anthropic/ink'

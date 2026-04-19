@@ -8,7 +8,7 @@ import {
   getTurnOutputTokens,
   getBudgetContinuationCount,
   getTotalInputTokens,
-} from '../bootstrap/state.js';
+} from '@claude-code/app-host/bootstrap/state.js';
 import { parseTokenBudget } from '../utils/tokenBudget.js';
 import { count } from '../utils/array.js';
 import { dirname, join } from 'path';
@@ -66,7 +66,7 @@ import {
   getTurnClassifierDurationMs,
   getTurnClassifierCount,
   resetTurnClassifierDuration,
-} from '../bootstrap/state.js';
+} from '@claude-code/app-host/bootstrap/state.js';
 import { asSessionId, asAgentId } from '../types/ids.js';
 import { logForDebugging } from '../utils/debug.js';
 import { QueryGuard } from '../utils/QueryGuard.js';

@@ -2,7 +2,7 @@ import { basename } from 'path'
 import { toString as qrToString } from 'qrcode'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { getOriginalCwd } from '../bootstrap/state.js'
+import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import {
   buildActiveFooterText,
   buildIdleFooterText,

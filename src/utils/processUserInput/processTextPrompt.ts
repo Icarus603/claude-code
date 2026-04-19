@@ -1,6 +1,6 @@
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources'
 import { randomUUID } from 'crypto'
-import { setPromptId } from 'src/bootstrap/state.js'
+import { setPromptId } from '@claude-code/app-host/bootstrap/state.js'
 import type {
   AttachmentMessage,
   SystemMessage,

@@ -10,7 +10,7 @@ import { z } from 'zod/v4'
 import {
   clearInvokedSkillsForAgent,
   getSdkAgentProgressSummariesEnabled,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   enhanceSystemPromptWithEnvDetails,
   getSystemPrompt,

@@ -16,7 +16,7 @@
  */
 
 import { spawn, spawnSync } from 'child_process'
-import { getSessionId } from '../bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { instances } from '@anthropic/ink'
 import { registerCleanup } from './cleanupRegistry.js'
 import { pwd } from './cwd.js'

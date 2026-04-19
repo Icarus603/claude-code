@@ -1,23 +1,23 @@
-import { SandboxManager } from "../../utils/sandbox/sandbox-adapter.js";
-import { parseUserSpecifiedModel, getDefaultMainLoopModel } from "../../utils/model/model.js";
-import { getContextWindowForModel } from "../../utils/context.js";
+import { SandboxManager } from "src/utils/sandbox/sandbox-adapter.js";
+import { parseUserSpecifiedModel, getDefaultMainLoopModel } from "src/utils/model/model.js";
+import { getContextWindowForModel } from "src/utils/context.js";
 import { getInitialMainLoopModel, getSdkBetas } from "../../bootstrap/state.js";
-import { logSkillsLoaded } from "../../utils/telemetry/skillLoadedEvent.js";
-import { getCwd } from "../../utils/cwd.js";
-import { loadAllPluginsCacheOnly } from "../../utils/plugins/pluginLoader.js";
-import { getManagedPluginNames } from "../../utils/plugins/managedPlugins.js";
-import { getPluginSeedDirs } from "../../utils/plugins/pluginDirectories.js";
+import { logSkillsLoaded } from "src/utils/telemetry/skillLoadedEvent.js";
+import { getCwd } from "src/utils/cwd.js";
+import { loadAllPluginsCacheOnly } from "src/utils/plugins/pluginLoader.js";
+import { getManagedPluginNames } from "src/utils/plugins/managedPlugins.js";
+import { getPluginSeedDirs } from "src/utils/plugins/pluginDirectories.js";
 import {
 	logPluginLoadErrors,
 	logPluginsEnabledForSession,
-} from "../../utils/telemetry/pluginTelemetry.js";
-import { logError } from "../../utils/log.js";
-import { hasNodeOption } from "../../utils/envUtils.js";
-import { getIsGit, getWorktreeCount } from "../../utils/git.js";
-import { getInitialSettings } from "../../utils/settings/settings.js";
-import { getGhAuthStatus } from "../../utils/github/ghAuthStatus.js";
+} from "src/utils/telemetry/pluginTelemetry.js";
+import { logError } from "src/utils/log.js";
+import { hasNodeOption } from "src/utils/envUtils.js";
+import { getIsGit, getWorktreeCount } from "src/utils/git.js";
+import { getInitialSettings } from "src/utils/settings/settings.js";
+import { getGhAuthStatus } from "src/utils/github/ghAuthStatus.js";
 import { isAutoUpdaterDisabled } from "@claude-code/config";
-import { isAnalyticsDisabled } from "../../services/privacyConfig.js";
+import { isAnalyticsDisabled } from "src/services/privacyConfig.js";
 import { logEvent } from "@claude-code/local-observability";
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from "@claude-code/local-observability/compat";
 

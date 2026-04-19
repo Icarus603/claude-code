@@ -3,7 +3,7 @@ import memoize from 'lodash-es/memoize.js'
 import {
   getAdditionalDirectoriesForClaudeMd,
   setCachedClaudeMdContent,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { getLocalISODate } from 'src/constants/common.js'
 import {
   filterInjectedMemoryFiles,

@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { useEffect, useRef } from 'react'
 import { useNotifications } from 'src/context/notifications.js'
-import { getIsRemoteMode } from '../../bootstrap/state.js'
+import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { useAppState } from '../../state/AppState.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import {

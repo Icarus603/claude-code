@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useState } from 'react'
-import { getSlowOperations } from '../bootstrap/state.js'
+import { getSlowOperations } from '@claude-code/app-host/bootstrap/state.js'
 import { Text, useInterval } from '@anthropic/ink'
 
 // Show DevBar for dev builds or all ants

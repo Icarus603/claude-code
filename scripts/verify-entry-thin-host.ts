@@ -39,7 +39,7 @@ async function main(): Promise<void> {
     './services/packageHostSetup.js',
     'src/services/packageHostSetup.js',
     './services/api/providerHostSetup.js',
-    'src/services/api/providerHostSetup.js',
+    '@claude-code/app-host/providerHostSetup.js',
   ]
   for (const disallowed of disallowedMainImports) {
     if (mainContent.includes(disallowed)) {
@@ -61,7 +61,7 @@ async function main(): Promise<void> {
 
   const disallowedHostOwnerImports = [
     "from '../services/api/providerHostSetup.js'",
-    "from 'src/services/api/providerHostSetup.js'",
+    "from '@claude-code/app-host/providerHostSetup.js'",
   ]
   for (const disallowed of disallowedHostOwnerImports) {
     if (replContent.includes(disallowed)) {

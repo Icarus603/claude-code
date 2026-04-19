@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { logError } from 'src/utils/log.js'
-import { getOriginalCwd } from 'src/bootstrap/state.js'
+import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { Box, Text } from '@anthropic/ink'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import { SKILL_TOOL_NAME } from '@claude-code/tool-registry/tools/SkillTool/constants.js'

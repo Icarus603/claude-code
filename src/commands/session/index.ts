@@ -1,4 +1,4 @@
-import { getIsRemoteMode } from '../../bootstrap/state.js'
+import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import type { Command } from '../../commands.js'
 
 const session = {

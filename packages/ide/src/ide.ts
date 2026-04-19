@@ -7,7 +7,7 @@ import { createConnection } from 'net'
 import * as os from 'os'
 import { basename, join, sep as pathSeparator, resolve } from 'path'
 import { logEvent } from '@claude-code/local-observability'
-import { getIsScrollDraining, getOriginalCwd } from 'src/bootstrap/state.js'
+import { getIsScrollDraining, getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { callIdeRpc } from 'src/services/mcp/client.js'
 import type {
   ConnectedMCPServer,

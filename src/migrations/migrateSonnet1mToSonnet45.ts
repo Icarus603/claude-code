@@ -1,7 +1,7 @@
 import {
   getMainLoopModelOverride,
   setMainLoopModelOverride,
-} from '../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import {
   getSettingsForSource,

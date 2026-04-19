@@ -1,6 +1,6 @@
 import { randomUUID, type UUID } from 'crypto'
 import { mkdir, readFile, writeFile } from 'fs/promises'
-import { getOriginalCwd, getSessionId } from '../../bootstrap/state.js'
+import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { LocalJSXCommandContext } from '../../commands.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'

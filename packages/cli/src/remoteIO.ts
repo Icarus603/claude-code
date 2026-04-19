@@ -1,7 +1,7 @@
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import { PassThrough } from 'stream'
 import { URL } from 'url'
-import { getSessionId } from 'src/bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getPollIntervalConfig } from '@claude-code/bridge/pollConfig.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { setCommandLifecycleListener } from '@claude-code/shell/commandLifecycle.js'

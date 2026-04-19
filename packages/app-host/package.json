@@ -9,6 +9,11 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./packageHostSetup": "./src/packageHostSetup.ts",
-    "./runtime/*.js": "./src/runtime/*.ts"
+    "./runtime/*.js": "./src/runtime/*.ts",
+    "./bootstrap/*.js": "./src/bootstrap/*.ts",
+    "./main/*.js": "./src/main/*.ts",
+    "./init.js": "./src/init.ts",
+    "./providerHostSetup.js": "./src/providerHostSetup.ts",
+    "./packageHostSetupOrchestrator.js": "./src/packageHostSetupOrchestrator.ts"
   }
 }

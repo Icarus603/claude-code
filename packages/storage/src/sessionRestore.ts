@@ -8,7 +8,7 @@ import {
   setMainThreadAgentType,
   setOriginalCwd,
   switchSession,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
 import { restoreCostStateForSession } from 'src/cost-tracker.js'
 import type { AppStateLike as AppState } from './contracts.js'

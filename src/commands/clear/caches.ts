@@ -6,7 +6,7 @@ import { feature } from 'bun:bundle'
 import {
   clearInvokedSkills,
   setLastEmittedDate,
-} from '../../bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import { clearCommandsCache } from '../../commands.js'
 import { getSessionStartDate } from '../../constants/common.js'
 import {

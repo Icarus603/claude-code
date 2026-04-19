@@ -14,7 +14,7 @@ import { getAPIProvider } from 'src/utils/model/providers.js'
 import {
   getIsNonInteractiveSession,
   preferThirdPartyAuthentication,
-} from 'src/bootstrap/state.js'
+} from '@claude-code/app-host/bootstrap/state.js'
 import {
   getMockSubscriptionType,
   shouldUseMockSubscription,
