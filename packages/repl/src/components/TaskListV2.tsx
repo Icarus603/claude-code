@@ -12,7 +12,7 @@ import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { count } from 'src/utils/array.js'
 import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
 import { truncateToWidth } from 'src/utils/format.js'
-import { isTodoV2Enabled, type Task } from 'src/utils/tasks.js'
+import { isTodoV2Enabled, type Task } from '@claude-code/agent/tasks.js'
 import type { Theme } from 'src/utils/theme.js'
 import { Text as ThemedText } from '@anthropic/ink'
 

@@ -9,7 +9,7 @@ import {
   listTasks,
   type Task,
   updateTask,
-} from 'src/utils/tasks.js'
+} from '@claude-code/agent/tasks.js'
 
 const DEBOUNCE_MS = 1000
 

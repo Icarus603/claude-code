@@ -81,7 +81,7 @@ import {
   sanitizePathComponent,
   getTasksDir,
   notifyTasksUpdated,
-} from '../utils/tasks.js'
+} from '@claude-code/agent/tasks.js'
 import { PermissionModeSchema } from '../entrypoints/sdk/coreSchemas.js'
 import {
   createTeammateContext,

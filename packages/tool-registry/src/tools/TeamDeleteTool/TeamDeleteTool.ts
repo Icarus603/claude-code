@@ -13,7 +13,7 @@ import {
   unregisterTeamForSessionCleanup,
 } from '@claude-code/swarm'
 import { clearTeammateColors } from '@claude-code/swarm'
-import { clearLeaderTeamName } from 'src/utils/tasks.js'
+import { clearLeaderTeamName } from '@claude-code/agent/tasks.js'
 import { TEAM_DELETE_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'

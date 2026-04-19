@@ -33,7 +33,7 @@ import {
   listTasks,
   getTaskListId,
   isTodoV2Enabled,
-} from './tasks.js'
+} from '@claude-code/agent/tasks.js'
 import { getPlanFilePath, getPlan } from './plans.js'
 import { getConnectedIdeName } from '@claude-code/ide/ide.js'
 import {
@@ -252,7 +252,7 @@ import {
   isTeamLead,
 } from './teammate.js'
 import { isInProcessTeammate } from './teammateContext.js'
-import { unassignTeammateTasks } from './tasks.js'
+import { unassignTeammateTasks } from '@claude-code/agent/tasks.js'
 
 export const TODO_REMINDER_CONFIG = {
   TURNS_SINCE_WRITE: 10,

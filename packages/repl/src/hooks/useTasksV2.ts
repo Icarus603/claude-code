@@ -2,7 +2,7 @@ import { type FSWatcher, watch } from 'fs'
 import { useEffect, useSyncExternalStore } from 'react'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { createSignal } from 'src/utils/signal.js'
-import type { Task } from 'src/utils/tasks.js'
+import type { Task } from '@claude-code/agent/tasks.js'
 import {
   getTaskListId,
   getTasksDir,
@@ -10,7 +10,7 @@ import {
   listTasks,
   onTasksUpdated,
   resetTaskList,
-} from 'src/utils/tasks.js'
+} from '@claude-code/agent/tasks.js'
 import { isTeamLead } from 'src/utils/teammate.js'
 
 const HIDE_DELAY_MS = 5000

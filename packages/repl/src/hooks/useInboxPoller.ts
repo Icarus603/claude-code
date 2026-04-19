@@ -41,7 +41,7 @@ import {
   removeTeammateFromTeamFile,
   setMemberMode,
 } from '@claude-code/swarm'
-import { unassignTeammateTasks } from 'src/utils/tasks.js'
+import { unassignTeammateTasks } from '@claude-code/agent/tasks.js'
 import {
   getAgentName,
   isPlanModeRequired,

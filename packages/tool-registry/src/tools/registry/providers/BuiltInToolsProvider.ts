@@ -5,7 +5,7 @@ import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { isPowerShellToolEnabled } from '@claude-code/shell/legacy/shellToolUtils.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { isWorktreeModeEnabled } from 'src/utils/worktreeModeEnabled.js'
-import { isTodoV2Enabled } from 'src/utils/tasks.js'
+import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
 import { isToolSearchEnabledOptimistic } from 'src/utils/toolSearch.js'
 import type { ToolProvider } from '../types.js'
 

@@ -51,7 +51,7 @@ import {
   listTasks,
   type Task,
   unassignTeammateTasks,
-} from 'src/utils/tasks.js'
+} from '@claude-code/agent/tasks.js'
 import {
   getTeammateStatuses,
   type TeammateStatus,

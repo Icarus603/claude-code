@@ -32,7 +32,8 @@
     "./attribution.js": "./attribution.ts",
     "./abortController.js": "./abortController.ts",
     "./toolUseSummaryGenerator.js": "./toolUseSummaryGenerator.ts",
-    "./abortController": "./abortController.ts"
+    "./abortController": "./abortController.ts",
+    "./tasks.js": "./tasks.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

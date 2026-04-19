@@ -18,7 +18,7 @@ import {
   type TaskStatus,
   TaskStatusSchema,
   updateTask,
-} from 'src/utils/tasks.js'
+} from '@claude-code/agent/tasks.js'
 import {
   getAgentId,
   getAgentName,

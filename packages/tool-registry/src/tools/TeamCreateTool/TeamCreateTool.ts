@@ -28,7 +28,7 @@ import {
   ensureTasksDir,
   resetTaskList,
   setLeaderTeamName,
-} from 'src/utils/tasks.js'
+} from '@claude-code/agent/tasks.js'
 import { generateWordSlug } from 'src/utils/words.js'
 import { TEAM_CREATE_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
