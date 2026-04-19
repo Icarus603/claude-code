@@ -466,11 +466,11 @@ const darkTheme: Theme = {
   warning: 'rgb(255,193,7)', // Bright amber
   merged: 'rgb(175,135,255)', // Electric violet (matches autoAccept)
   warningShimmer: 'rgb(255,223,57)', // Lighter amber for shimmer
-  diffAdded: 'rgb(20,54,20)', // Dark green
+  diffAdded: 'rgb(14,42,22)', // Deep dark emerald
   diffRemoved: 'rgb(74,0,31)', // Dark red
-  diffAddedDimmed: 'rgb(38,48,38)', // Very dark green
+  diffAddedDimmed: 'rgb(28,38,30)', // Very dark emerald
   diffRemovedDimmed: 'rgb(57,38,46)', // Very dark red
-  diffAddedWord: 'rgb(34,139,34)', // Medium green
+  diffAddedWord: 'rgb(24,110,48)', // Deep emerald green (pairs with wine-red)
   diffRemovedWord: 'rgb(162,0,67)', // Softer red (less intense than bright red)
   // Agent colors
   red_FOR_SUBAGENTS_ONLY: 'rgb(220,38,38)', // Red 600
