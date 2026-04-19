@@ -5,14 +5,14 @@ import {
   ElicitRequestSchema,
   type ElicitResult,
 } from '@modelcontextprotocol/sdk/types.js'
-import type { AppState } from '../../state/AppState.js'
+import type { AppState } from 'src/state/AppState.js'
 import {
   executeElicitationHooks,
   executeElicitationResultHooks,
   executeNotificationHooks,
-} from '../../utils/hooks.js'
-import { logMCPDebug, logMCPError } from '../../utils/log.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/hooks.js'
+import { logMCPDebug, logMCPError } from 'src/utils/log.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 

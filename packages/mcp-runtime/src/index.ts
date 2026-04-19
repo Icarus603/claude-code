@@ -25,4 +25,4 @@ export {
   reconcileMcpServers,
 } from './api.js'
 export * from './compat.js'
-export { toScopedConfig } from './config.js'
+export { toScopedConfig } from 'src/services/mcp/config.js'

@@ -12,7 +12,7 @@ import { callIdeRpc } from 'src/services/mcp/client.js'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,
-} from 'src/services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from 'src/utils/env.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from 'src/utils/envUtils.js'

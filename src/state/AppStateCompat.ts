@@ -7,12 +7,12 @@ import type { Notification } from 'src/context/notifications.js'
 import type { TodoList } from 'src/utils/todo/types.js'
 import type { BridgePermissionCallbacks } from '@claude-code/bridge/bridgePermissionCallbacks.js'
 import type { Command } from '../commands.js'
-import type { ChannelPermissionCallbacks } from '../services/mcp/channelPermissions.js'
-import type { ElicitationRequestEvent } from '../services/mcp/elicitationHandler.js'
+import type { ChannelPermissionCallbacks } from '@claude-code/mcp-runtime/channelPermissions.js'
+import type { ElicitationRequestEvent } from '@claude-code/mcp-runtime/elicitationHandler.js'
 import type {
   MCPServerConnection,
   ServerResource,
-} from '../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import { shouldEnablePromptSuggestion } from '../services/PromptSuggestion/promptSuggestion.js'
 import {
   getEmptyToolPermissionContext,

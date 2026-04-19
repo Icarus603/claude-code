@@ -24,7 +24,7 @@ import { getMcpConfigByName } from 'src/services/mcp/config.js'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
-} from 'src/services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { Tool, Tools, ToolUseContext } from 'src/Tool.js'
 import { killShellTasksForAgent } from 'src/tasks/LocalShellTask/killShellTasks.js'
 import type { Command } from 'src/types/command.js'

@@ -4,7 +4,7 @@ import { z } from 'zod/v4'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,
-} from 'src/services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import { getConnectedIdeClient } from '@claude-code/ide/ide.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 export type IDEAtMentioned = {

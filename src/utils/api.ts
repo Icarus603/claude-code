@@ -16,7 +16,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { prefetchAllMcpResources } from 'src/services/mcp/client.js'
-import type { ScopedMcpServerConfig } from 'src/services/mcp/types.js'
+import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'
 import {

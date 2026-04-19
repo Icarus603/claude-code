@@ -27,7 +27,7 @@ import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
   ServerResource,
-} from '../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 
 type SnapshotStore<T> = Store<T>
 

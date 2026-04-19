@@ -9,7 +9,7 @@ import type {
   MCPServerConnection,
   McpSSEIDEServerConfig,
   McpWebSocketIDEServerConfig,
-} from 'src/services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { ToolUseContext } from '../Tool.js'
 import type { FileEdit } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
 import {

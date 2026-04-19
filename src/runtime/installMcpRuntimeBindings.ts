@@ -1,1 +1,1 @@
-import '../services/mcp/runtimeHostSetup.js'
+import '@claude-code/mcp-runtime/runtimeHostSetup.js'

@@ -20,7 +20,7 @@ import {
   getMcpClientConfig,
   readClientSecret,
   saveMcpClientSecret,
-} from '../../services/mcp/auth.js'
+} from '@claude-code/mcp-runtime/auth.js'
 import {
   connectToServer,
   getMcpServerConnectionBatchSize,
@@ -35,12 +35,12 @@ import {
 import type {
   ConfigScope,
   ScopedMcpServerConfig,
-} from '../../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import {
   describeMcpConfigFilePath,
   ensureConfigScope,
   getScopeLabel,
-} from '../../services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/utils.js'
 import { AppStateProvider } from '../../state/AppState.js'
 import {
   getCurrentProjectConfig,

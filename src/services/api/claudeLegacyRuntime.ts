@@ -228,7 +228,7 @@ import {
   pinCacheEdits,
 } from '@claude-code/agent/compaction/microCompact.js'
 import { getInitializationStatus } from '@claude-code/ide/lsp/manager.js'
-import { isToolFromMcpServer } from 'src/services/mcp/utils.js'
+import { isToolFromMcpServer } from '@claude-code/mcp-runtime/utils.js'
 import { withStreamingVCR, withVCR } from 'src/services/vcr.js'
 import { CLIENT_REQUEST_ID_HEADER, getAnthropicClient } from '@claude-code/provider'
 import {

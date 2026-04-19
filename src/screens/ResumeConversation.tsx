@@ -17,7 +17,7 @@ import {
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
-} from '../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import { useAppState, useSetAppState } from '../state/AppState.js'
 import type { Tool } from '../Tool.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'

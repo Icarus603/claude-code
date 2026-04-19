@@ -24,6 +24,20 @@
     "./channelAllowlist.js": "./src/channelAllowlist.ts",
     "./oauthPort.js": "./src/oauthPort.ts",
     "./mcpStringUtils.js": "./src/mcpStringUtils.ts",
-    "./vscodeSdkMcp.js": "./src/vscodeSdkMcp.ts"
+    "./vscodeSdkMcp.js": "./src/vscodeSdkMcp.ts",
+    "./clientRuntime.js": "./src/clientRuntime.ts",
+    "./auth.js": "./src/auth.ts",
+    "./useManageMCPConnections.js": "./src/useManageMCPConnections.ts",
+    "./utils.js": "./src/utils.ts",
+    "./xaa.js": "./src/xaa.ts",
+    "./xaaIdpLogin.js": "./src/xaaIdpLogin.ts",
+    "./channelNotification.js": "./src/channelNotification.ts",
+    "./elicitationHandler.js": "./src/elicitationHandler.ts",
+    "./types.js": "./src/types.ts",
+    "./channelPermissions.js": "./src/channelPermissions.ts",
+    "./claudeai.js": "./src/claudeai.ts",
+    "./headersHelper.js": "./src/headersHelper.ts",
+    "./SdkControlTransport.js": "./src/SdkControlTransport.ts",
+    "./runtimeHostSetup.js": "./src/runtimeHostSetup.ts"
   }
 }

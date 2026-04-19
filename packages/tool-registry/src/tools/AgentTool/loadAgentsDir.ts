@@ -11,7 +11,7 @@ import {
 import {
   type McpServerConfig,
   McpServerConfigSchema,
-} from 'src/services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { ToolUseContext } from 'src/Tool.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {

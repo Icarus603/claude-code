@@ -16,7 +16,7 @@ import {
   AuthenticationCancelledError,
   performMCPOAuthFlow,
   revokeServerTokens,
-} from '../../services/mcp/auth.js'
+} from '@claude-code/mcp-runtime/auth.js'
 import { clearServerCache } from '../../services/mcp/client.js'
 import {
   useMcpReconnect,
@@ -28,7 +28,7 @@ import {
   excludeResourcesByServer,
   excludeToolsByServer,
   filterMcpPromptsByServer,
-} from '../../services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/utils.js'
 import { useAppState, useSetAppState } from '../../state/AppState.js'
 import { getOauthAccountInfo } from '../../utils/auth.js'
 import { openBrowser } from '../../utils/browser.js'

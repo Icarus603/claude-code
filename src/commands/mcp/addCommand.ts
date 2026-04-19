@@ -12,18 +12,18 @@ import {
 import {
   readClientSecret,
   saveMcpClientSecret,
-} from '../../services/mcp/auth.js'
+} from '@claude-code/mcp-runtime/auth.js'
 import { addMcpConfig } from '../../services/mcp/config.js'
 import {
   describeMcpConfigFilePath,
   ensureConfigScope,
   ensureTransport,
   parseHeaders,
-} from '../../services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/utils.js'
 import {
   getXaaIdpSettings,
   isXaaEnabled,
-} from '../../services/mcp/xaaIdpLogin.js'
+} from '@claude-code/mcp-runtime/xaaIdpLogin.js'
 import { parseEnvVars } from '../../utils/envUtils.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 

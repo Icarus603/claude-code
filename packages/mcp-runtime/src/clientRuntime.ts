@@ -40,34 +40,34 @@ import mapValues from 'lodash-es/mapValues.js'
 import memoize from 'lodash-es/memoize.js'
 import zipObject from 'lodash-es/zipObject.js'
 import pMap from 'p-map'
-import { getOriginalCwd, getSessionId } from '../../bootstrap/state.js'
-import type { Command } from '../../commands.js'
-import { getOauthConfig } from '../../constants/oauth.js'
-import { PRODUCT_URL } from '../../constants/product.js'
-import type { AppState } from '../../state/AppState.js'
+import { getOriginalCwd, getSessionId } from 'src/bootstrap/state.js'
+import type { Command } from 'src/commands.js'
+import { getOauthConfig } from 'src/constants/oauth.js'
+import { PRODUCT_URL } from 'src/constants/product.js'
+import type { AppState } from 'src/state/AppState.js'
 import {
   type Tool,
   type ToolCallProgress,
   toolMatchesName,
-} from '../../Tool.js'
+} from 'src/Tool.js'
 import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
 import { type MCPProgress, MCPTool } from '@claude-code/tool-registry/tools/MCPTool/MCPTool.js'
 import { createMcpAuthTool } from '@claude-code/tool-registry/tools/McpAuthTool/McpAuthTool.js'
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
-import { count } from '../../utils/array.js'
-import { registerCleanup } from '../../utils/cleanupRegistry.js'
-import { detectCodeIndexingFromMcpServerName } from '../../utils/codeIndexing.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { isEnvDefinedFalsy, isEnvTruthy } from '../../utils/envUtils.js'
+import { count } from 'src/utils/array.js'
+import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { detectCodeIndexingFromMcpServerName } from 'src/utils/codeIndexing.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
 import {
   errorMessage,
   TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from '../../utils/errors.js'
-import { getMCPUserAgent } from '../../utils/http.js'
+} from 'src/utils/errors.js'
+import { getMCPUserAgent } from 'src/utils/http.js'
 import { maybeNotifyIDEConnected } from '@claude-code/ide/ide.js'
-import { maybeResizeAndDownsampleImageBuffer } from '../../utils/imageResizer.js'
-import { logMCPDebug, logMCPError } from '../../utils/log.js'
+import { maybeResizeAndDownsampleImageBuffer } from 'src/utils/imageResizer.js'
+import { logMCPDebug, logMCPError } from 'src/utils/log.js'
 import {
   getBinaryBlobSavedMessage,
   getFormatDescription,
@@ -81,21 +81,21 @@ import {
   truncateMcpContentIfNeeded,
 } from '@claude-code/mcp-runtime/mcpValidation.js'
 import { WebSocketTransport } from '@claude-code/mcp-runtime/mcpWebSocketTransport.js'
-import { memoizeWithLRU } from '../../utils/memoize.js'
-import { getWebSocketTLSOptions } from '../../utils/mtls.js'
+import { memoizeWithLRU } from 'src/utils/memoize.js'
+import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
 import {
   getProxyFetchOptions,
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,
-} from '../../utils/proxy.js'
-import { recursivelySanitizeUnicode } from '../../utils/sanitization.js'
-import { getSessionIngressAuthToken } from '../../utils/sessionIngressAuth.js'
-import { subprocessEnv } from '../../utils/subprocessEnv.js'
+} from 'src/utils/proxy.js'
+import { recursivelySanitizeUnicode } from 'src/utils/sanitization.js'
+import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { subprocessEnv } from 'src/utils/subprocessEnv.js'
 import {
   isPersistError,
   persistToolResult,
-} from '../../utils/toolResultStorage.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+} from 'src/utils/toolResultStorage.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
@@ -111,12 +111,12 @@ import {
   getMcpAuthCachePath,
   isMcpAuthCached,
   setMcpAuthCacheEntry,
-} from './client/authCache.js'
+} from 'src/services/mcp/client/authCache.js'
 import {
   createClaudeAiProxyFetch,
   handleRemoteAuthFailure,
   mcpBaseUrlAnalytics,
-} from './client/auth.js'
+} from 'src/services/mcp/client/auth.js'
 import {
   createNodeWsClient,
   getConnectionTimeoutMs,
@@ -125,12 +125,12 @@ import {
   getRemoteMcpServerConnectionBatchSize,
   type WsClientLike,
   wrapFetchWithTimeout,
-} from './client/transport.js'
+} from 'src/services/mcp/client/transport.js'
 import {
   addServerNameToResources,
   buildMcpPromptCommandName,
   supportsMcpResources,
-} from './client/discovery.js'
+} from 'src/services/mcp/client/discovery.js'
 
 export {
   clearMcpAuthCache,
@@ -147,19 +147,19 @@ const fetchMcpSkillsForClient = feature('MCP_SKILLS')
   : null
 
 import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js'
-import type { AssistantMessage } from '../../types/message.js'
+import type { AssistantMessage } from 'src/types/message.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { classifyMcpToolForCollapse } from '@claude-code/tool-registry/tools/MCPTool/classifyForCollapse.js'
-import { clearKeychainCache } from '../../utils/secureStorage/macOsKeychainHelpers.js'
-import { sleep } from '../../utils/sleep.js'
+import { clearKeychainCache } from 'src/utils/secureStorage/macOsKeychainHelpers.js'
+import { sleep } from 'src/utils/sleep.js'
 import {
   ClaudeAuthProvider,
   hasMcpDiscoveryButNoToken,
   wrapFetchWithStepUpDetection,
 } from './auth.js'
 import { markClaudeAiMcpConnected } from './claudeai.js'
-import { getAllMcpConfigs, isMcpServerDisabled } from './config.js'
-import { getClaudeAIOAuthTokens } from '../../utils/auth.js'
+import { getAllMcpConfigs, isMcpServerDisabled } from 'src/services/mcp/config.js'
+import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
 import { getMcpServerHeaders } from './headersHelper.js'
 import { SdkControlClientTransport } from './SdkControlTransport.js'
 import type {
@@ -256,23 +256,23 @@ function getMcpToolTimeoutMs(): number {
   )
 }
 
-import { isClaudeInChromeMCPServer } from '../../utils/claudeInChrome/common.js'
+import { isClaudeInChromeMCPServer } from 'src/utils/claudeInChrome/common.js'
 
 // Lazy: toolRendering.tsx pulls React/ink; only needed when Claude-in-Chrome MCP server is connected
 /* eslint-disable @typescript-eslint/no-require-imports */
 const claudeInChromeToolRendering =
   (): typeof import('../../utils/claudeInChrome/toolRendering.js') =>
-    require('../../utils/claudeInChrome/toolRendering.js')
+    require('src/utils/claudeInChrome/toolRendering.js')
 // Lazy: wrapper.tsx → hostAdapter.ts → executor.ts pulls both native modules
 // (@ant/computer-use-input + @ant/computer-use-swift). Runtime-gated by
 // GrowthBook tengu_malort_pedway (see gates.ts).
 const computerUseWrapper = feature('CHICAGO_MCP')
   ? (): typeof import('../../utils/computerUse/wrapper.js') =>
-      require('../../utils/computerUse/wrapper.js')
+      require('src/utils/computerUse/wrapper.js')
   : undefined
 const isComputerUseMCPServer = feature('CHICAGO_MCP')
   ? (
-      require('../../utils/computerUse/common.js') as typeof import('../../utils/computerUse/common.js')
+      require('src/utils/computerUse/common.js') as typeof import('../../utils/computerUse/common.js')
     ).isComputerUseMCPServer
   : undefined
 

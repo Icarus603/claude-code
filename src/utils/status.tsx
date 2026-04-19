@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import figures from 'figures'
 import * as React from 'react'
 import { color, Text } from '@anthropic/ink'
-import type { MCPServerConnection } from '../services/mcp/types.js'
+import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import { getAccountInformation, isClaudeAISubscriber } from './auth.js'
 import {
   getLargeMemoryFiles,

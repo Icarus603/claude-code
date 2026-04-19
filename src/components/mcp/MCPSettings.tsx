@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo } from 'react'
 import type { CommandResultDisplay } from '../../commands.js'
-import { ClaudeAuthProvider } from '../../services/mcp/auth.js'
+import { ClaudeAuthProvider } from '@claude-code/mcp-runtime/auth.js'
 import type {
   McpClaudeAIProxyServerConfig,
   McpHTTPServerConfig,
   McpSSEServerConfig,
   McpStdioServerConfig,
-} from '../../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import {
   extractAgentMcpServers,
   filterToolsByServer,
-} from '../../services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/utils.js'
 import { useAppState } from '../../state/AppState.js'
 import { getSessionIngressAuthToken } from '../../utils/sessionIngressAuth.js'
 import { MCPAgentServerMenu } from './MCPAgentServerMenu.js'

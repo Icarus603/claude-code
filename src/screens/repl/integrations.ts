@@ -1,4 +1,4 @@
-import type { MCPServerConnection } from '../../services/mcp/types.js';
+import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js';
 
 const EMPTY_MCP_CLIENTS: MCPServerConnection[] = [];
 

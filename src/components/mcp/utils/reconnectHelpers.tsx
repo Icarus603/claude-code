@@ -2,7 +2,7 @@ import type { Command } from '../../../commands.js'
 import type {
   MCPServerConnection,
   ServerResource,
-} from '../../../services/mcp/types.js'
+} from '@claude-code/mcp-runtime/types.js'
 import type { Tool } from '../../../Tool.js'
 
 export interface ReconnectResult {

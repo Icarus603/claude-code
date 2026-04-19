@@ -4,7 +4,7 @@ import {
   extractMcpToolDisplayName,
   getMcpDisplayName,
 } from '@claude-code/mcp-runtime/mcpStringUtils.js'
-import { filterToolsByServer } from '../../services/mcp/utils.js'
+import { filterToolsByServer } from '@claude-code/mcp-runtime/utils.js'
 import { useAppState } from '../../state/AppState.js'
 import type { Tool } from '../../Tool.js'
 import { plural } from '../../utils/stringUtils.js'

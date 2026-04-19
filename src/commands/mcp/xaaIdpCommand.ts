@@ -17,7 +17,7 @@ import {
   issuerKey,
   saveIdpClientSecret,
   saveIdpIdTokenFromJwt,
-} from '../../services/mcp/xaaIdpLogin.js'
+} from '@claude-code/mcp-runtime/xaaIdpLogin.js'
 import { errorMessage } from '../../utils/errors.js'
 import { updateSettingsForSource } from '../../utils/settings/settings.js'
 

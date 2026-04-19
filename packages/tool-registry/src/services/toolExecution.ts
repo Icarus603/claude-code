@@ -118,12 +118,12 @@ import {
 } from 'src/services/mcp/client.js'
 import { mcpInfoFromString } from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'
-import type { MCPServerConnection } from 'src/services/mcp/types.js'
+import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import {
   getLoggingSafeMcpBaseUrl,
   getMcpServerScopeFromToolName,
   isMcpTool,
-} from 'src/services/mcp/utils.js'
+} from '@claude-code/mcp-runtime/utils.js'
 import {
   resolveHookPermissionDecision,
   runPostToolUseFailureHooks,

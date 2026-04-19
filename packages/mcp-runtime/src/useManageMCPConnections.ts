@@ -1,9 +1,9 @@
 import { feature } from 'bun:bundle'
 import { basename } from 'path'
 import { useCallback, useEffect, useRef } from 'react'
-import { getSessionId } from '../../bootstrap/state.js'
-import type { Command } from '../../commands.js'
-import type { Tool } from '../../Tool.js'
+import { getSessionId } from 'src/bootstrap/state.js'
+import type { Command } from 'src/commands.js'
+import type { Tool } from 'src/Tool.js'
 import {
   clearServerCache,
   fetchCommandsForClient,
@@ -26,7 +26,7 @@ const fetchMcpSkillsForClient = feature('MCP_SKILLS')
   : null
 const clearSkillIndexCache = feature('EXPERIMENTAL_SKILL_SEARCH')
   ? (
-      require('../skillSearch/localSearch.js') as typeof import('../skillSearch/localSearch.js')
+      require('src/services/skillSearch/localSearch.js') as typeof import('../skillSearch/localSearch.js')
     ).clearSkillIndexCache
   : null
 
@@ -52,17 +52,17 @@ import {
 import type { AppState } from 'src/state/AppState.js'
 import type { PluginError } from 'src/types/plugin.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getAllowedChannels } from '../../bootstrap/state.js'
-import { useNotifications } from '../../context/notifications.js'
+import { getAllowedChannels } from 'src/bootstrap/state.js'
+import { useNotifications } from 'src/context/notifications.js'
 import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from '../../state/AppState.js'
-import { errorMessage } from '../../utils/errors.js'
+} from 'src/state/AppState.js'
+import { errorMessage } from 'src/utils/errors.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { logMCPDebug, logMCPError } from '../../utils/log.js'
-import { enqueue } from '../../utils/messageQueueManager.js'
+import { logMCPDebug, logMCPError } from 'src/utils/log.js'
+import { enqueue } from 'src/utils/messageQueueManager.js'
 import {
   CHANNEL_PERMISSION_METHOD,
   ChannelMessageNotificationSchema,
