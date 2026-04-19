@@ -2,7 +2,7 @@ import type { Command } from '../commands.js'
 import {
   getAttributionTexts,
   getEnhancedPRAttribution,
-} from '../utils/attribution.js'
+} from '@claude-code/agent/attribution.js'
 import { getDefaultBranch } from '../utils/git.js'
 import { executeShellCommandsInPrompt } from '../utils/promptShellExecution.js'
 import { getUndercoverInstructions, isUndercover } from '../utils/undercover.js'

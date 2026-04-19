@@ -1,5 +1,5 @@
 import type { Command } from '../commands.js'
-import { getAttributionTexts } from '../utils/attribution.js'
+import { getAttributionTexts } from '@claude-code/agent/attribution.js'
 import { executeShellCommandsInPrompt } from '../utils/promptShellExecution.js'
 import { getUndercoverInstructions, isUndercover } from '../utils/undercover.js'
 

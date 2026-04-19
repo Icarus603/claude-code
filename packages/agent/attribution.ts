@@ -1,35 +1,35 @@
 import { feature } from 'bun:bundle'
 import { stat } from 'fs/promises'
-import { getClientType } from '../bootstrap/state.js'
+import { getClientType } from 'src/bootstrap/state.js'
 import {
   getRemoteSessionUrl,
   isRemoteSessionLocal,
   PRODUCT_URL,
-} from '../constants/product.js'
-import { TERMINAL_OUTPUT_TAGS } from '../constants/xml.js'
-import type { AppState } from '../state/AppState.js'
-import type { Entry } from '../types/logs.js'
+} from 'src/constants/product.js'
+import { TERMINAL_OUTPUT_TAGS } from 'src/constants/xml.js'
+import type { AppState } from 'src/state/AppState.js'
+import type { Entry } from 'src/types/logs.js'
 import {
   type AttributionData,
   calculateCommitAttribution,
   isInternalModelRepo,
   isInternalModelRepoCached,
   sanitizeModelName,
-} from './commitAttribution.js'
-import { logForDebugging } from './debug.js'
-import { parseJSONL } from './json.js'
-import { logError } from './log.js'
+} from 'src/utils/commitAttribution.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { parseJSONL } from 'src/utils/json.js'
+import { logError } from 'src/utils/log.js'
 import {
   getCanonicalName,
   getMainLoopModel,
   getPublicModelDisplayName,
   getPublicModelName,
-} from './model/model.js'
-import { isMemoryFileAccess } from './sessionFileAccessHooks.js'
+} from 'src/utils/model/model.js'
+import { isMemoryFileAccess } from 'src/utils/sessionFileAccessHooks.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
-import { readTranscriptForLoad } from './sessionStoragePortable.js'
-import { getInitialSettings } from './settings/settings.js'
-import { isUndercover } from './undercover.js'
+import { readTranscriptForLoad } from 'src/utils/sessionStoragePortable.js'
+import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { isUndercover } from 'src/utils/undercover.js'
 
 export type AttributionTexts = {
   commit: string
