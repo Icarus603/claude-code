@@ -8,7 +8,7 @@ import {
 } from 'fs/promises'
 import * as React from 'react'
 import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppStateLike as AppState } from '../../contracts.js'
 import { z } from 'zod/v4'
 import { getKairosActive } from 'src/bootstrap/state.js'
 import { TOOL_SUMMARY_MAX_LENGTH } from 'src/constants/toolLimits.js'

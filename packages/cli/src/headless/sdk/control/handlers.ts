@@ -36,7 +36,7 @@ import type { ModelInfo } from '../../../../../../src/entrypoints/agentSdkTypes.
 import type { HookCallbackMatcher } from '../../../../../../src/types/hooks.js'
 import type { HookEvent } from '../../../../../../src/entrypoints/agentSdkTypes.js'
 import type { PermissionMode as InternalPermissionMode } from '../../../../../../src/types/permissions.js'
-import type { AppState } from '../../../../../../src/state/AppStateStore.js'
+import type { AppStateLike as AppState } from '../../../contracts.js'
 import { parsePluginIdentifier } from '../../../../../../src/utils/plugins/pluginIdentifier.js'
 import {
   getSessionId,

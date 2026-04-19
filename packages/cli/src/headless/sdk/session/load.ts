@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { dirname } from 'path'
 import { randomUUID } from 'crypto'
 import type { Message, NormalizedUserMessage } from '../../../../../../src/types/message.js'
-import type { AppState } from '../../../../../../src/state/AppStateStore.js'
+import type { AppStateLike as AppState } from '../../../contracts.js'
 import type { SessionExternalMetadata } from '@claude-code/storage/sessionState.js'
 import {
   loadConversationForResume,

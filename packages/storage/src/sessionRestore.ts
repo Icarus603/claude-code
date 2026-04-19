@@ -11,7 +11,7 @@ import {
 } from 'src/bootstrap/state.js'
 import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
 import { restoreCostStateForSession } from 'src/cost-tracker.js'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppStateLike as AppState } from './contracts.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import {
   type AgentDefinition,
