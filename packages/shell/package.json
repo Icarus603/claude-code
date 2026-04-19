@@ -15,7 +15,8 @@
     "./collapseBackgroundBashNotifications.js": "./src/collapseBackgroundBashNotifications.ts",
     "./commandLifecycle.js": "./src/commandLifecycle.ts",
     "./immediateCommand.js": "./src/immediateCommand.ts",
-    "./execSyncWrapper.js": "./src/execSyncWrapper.ts"
+    "./execSyncWrapper.js": "./src/execSyncWrapper.ts",
+    "./shellConfig.js": "./src/shellConfig.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

@@ -39,7 +39,7 @@ import {
   findClaudeAlias,
   findValidClaudeAlias,
   getShellConfigPaths,
-} from './shellConfig.js'
+} from '@claude-code/shell/shellConfig.js'
 import { jsonParse } from './slowOperations.js'
 import { which } from './which.js'
 
