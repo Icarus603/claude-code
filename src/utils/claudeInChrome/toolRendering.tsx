@@ -3,7 +3,7 @@ import { MessageResponse } from '../../components/MessageResponse.js'
 import { supportsHyperlinks } from '@anthropic/ink'
 import { Link, Text } from '@anthropic/ink'
 import { renderToolResultMessage as renderDefaultMCPToolResultMessage } from '@claude-code/tool-registry/tools/MCPTool/UI.js'
-import type { MCPToolResult } from '../../utils/mcpValidation.js'
+import type { MCPToolResult } from '@claude-code/mcp-runtime/mcpValidation.js'
 import { truncateToWidth } from '../format.js'
 import { trackClaudeInChromeTabId } from './common.js'
 

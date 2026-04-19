@@ -11,7 +11,7 @@ import { logError } from 'src/utils/log.js'
 import {
   isBinaryContentType,
   persistBinaryContent,
-} from 'src/utils/mcpOutputStorage.js'
+} from '@claude-code/mcp-runtime/mcpOutputStorage.js'
 import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'
 import { isPreapprovedHost } from './preapproved.js'

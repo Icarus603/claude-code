@@ -4,11 +4,11 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { MCPResultType } from '../services/mcp/client.js'
-import { toError } from './errors.js'
-import { formatFileSize } from './format.js'
-import { logError } from './log.js'
-import { ensureToolResultsDir, getToolResultsDir } from './toolResultStorage.js'
+import type { MCPResultType } from 'src/services/mcp/client.js'
+import { toError } from 'src/utils/errors.js'
+import { formatFileSize } from 'src/utils/format.js'
+import { logError } from 'src/utils/log.js'
+import { ensureToolResultsDir, getToolResultsDir } from 'src/utils/toolResultStorage.js'
 
 /**
  * Generates a format description string based on the MCP result type and schema.

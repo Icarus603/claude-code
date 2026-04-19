@@ -60,7 +60,7 @@ import { TICK_TAG } from './xml.js'
 import { logForDebugging } from '../utils/debug.js'
 import { isUndercover } from '../utils/undercover.js'
 import { getAntModelOverrideConfig } from '../utils/model/antModels.js'
-import { isMcpInstructionsDeltaEnabled } from '../utils/mcpInstructionsDelta.js'
+import { isMcpInstructionsDeltaEnabled } from '@claude-code/mcp-runtime/mcpInstructionsDelta.js'
 
 const ISSUES_EXPLAINER =
   typeof globalThis.MACRO !== 'undefined'
