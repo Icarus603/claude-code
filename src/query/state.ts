@@ -1,7 +1,7 @@
 import type { ToolUseSummaryMessage } from "../types/message.js";
 import type { Message } from "../types/message.js";
 import type { ToolUseContext } from "../Tool.js";
-import type { AutoCompactTrackingState } from "../services/compact/autoCompact.js";
+import type { AutoCompactTrackingState } from "@claude-code/agent/compaction/autoCompact.js";
 import type { Continue } from "./transitions.js";
 
 export type QueryLoopState = {

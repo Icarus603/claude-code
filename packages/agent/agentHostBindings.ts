@@ -357,7 +357,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     generateToolUseSummary: (params: unknown) => {
       try {
-        return require('src/services/services/toolUseSummary/toolUseSummaryGenerator.js').generateToolUseSummary(params)
+        return require('@claude-code/agent/toolUseSummaryGenerator.js').generateToolUseSummary(params)
       } catch {
         return Promise.resolve(null)
       }

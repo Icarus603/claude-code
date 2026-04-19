@@ -30,7 +30,8 @@
     "./SessionMemory/*.js": "./SessionMemory/*.ts",
     "./awaySummary.js": "./awaySummary.ts",
     "./attribution.js": "./attribution.ts",
-    "./abortController.js": "./abortController.ts"
+    "./abortController.js": "./abortController.ts",
+    "./toolUseSummaryGenerator.js": "./toolUseSummaryGenerator.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
