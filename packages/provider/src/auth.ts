@@ -5,13 +5,14 @@ import type {
   ProviderAvailability,
 } from './types.js'
 import { getProviderHostBindings } from './host.js'
+import { readEnv } from '@claude-code/config/env'
 
 async function getAnthropicAuthorizationHeader(
   context?: ProviderAuthContext,
 ): Promise<string | null> {
   const { auth } = getProviderHostBindings()
   const token =
-    process.env.ANTHROPIC_AUTH_TOKEN ||
+    readEnv('ANTHROPIC_AUTH_TOKEN') ||
     (await auth.getApiKeyFromApiKeyHelper(
       context?.isNonInteractiveSession ?? false,
     ))
@@ -44,8 +45,8 @@ export const anthropicAuthProvider: AuthProvider<AnthropicCredentials> = {
       authorizationHeader: subscriber
         ? null
         : await getAnthropicAuthorizationHeader(context),
-      ...(process.env.USER_TYPE === 'ant' &&
-      auth.isEnvTruthy(process.env.USE_STAGING_OAUTH)
+      ...(readEnv('USER_TYPE') === 'ant' &&
+      auth.isEnvTruthy(readEnv('USE_STAGING_OAUTH'))
         ? { baseURL: auth.getOauthConfig().BASE_API_URL }
         : {}),
     }
@@ -85,19 +86,19 @@ function createEnvAuthProvider(
 
 export const openAIAuthProvider = createEnvAuthProvider(
   'openai',
-  () => process.env.OPENAI_API_KEY,
+  () => readEnv('OPENAI_API_KEY'),
   'OPENAI_API_KEY is not configured.',
 )
 
 export const geminiAuthProvider = createEnvAuthProvider(
   'gemini',
-  () => process.env.GEMINI_API_KEY,
+  () => readEnv('GEMINI_API_KEY'),
   'GEMINI_API_KEY is not configured.',
 )
 
 export const grokAuthProvider = createEnvAuthProvider(
   'grok',
-  () => process.env.GROK_API_KEY || process.env.XAI_API_KEY,
+  () => readEnv('GROK_API_KEY') || readEnv('XAI_API_KEY'),
   'GROK_API_KEY or XAI_API_KEY is not configured.',
 )
 

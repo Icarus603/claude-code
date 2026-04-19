@@ -21,6 +21,7 @@ import type {
   AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 } from '../internalTypes.js'
 import { errorMessage, isBareMode, isEnvDefinedFalsy } from '../internalUtils.js'
+import { readEnv } from '@claude-code/config/env'
 
 
 type StopHookResult = {
@@ -74,7 +75,7 @@ export async function* handleStopHooks(
   // string matches.
   if (
     feature('TEMPLATES') &&
-    process.env.CLAUDE_JOB_DIR &&
+    readEnv('CLAUDE_JOB_DIR') &&
     querySource.startsWith('repl_main_thread') &&
     !toolUseContext.agentId
   ) {
@@ -85,7 +86,7 @@ export async function* handleStopHooks(
       (m): m is AgentAssistantMessage => m.type === 'assistant',
     )
     const p = getAgentHostBindings().classifyJobState?.(
-      process.env.CLAUDE_JOB_DIR,
+      readEnv('CLAUDE_JOB_DIR'),
       turnAssistantMessages,
     )?.catch(err => {
       getAgentHostBindings().logDebug?.(`[job] classifier error: ${errorMessage(err)}`)
@@ -101,7 +102,7 @@ export async function* handleStopHooks(
   // or forked agents contending for resources during shutdown.
   if (!isBareMode()) {
     // Inline env check for dead code elimination in external builds
-    if (!isEnvDefinedFalsy(process.env.CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION)) {
+    if (!isEnvDefinedFalsy(readEnv('CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION'))) {
       void getAgentHostBindings().executePromptSuggestion?.(stopHookContext)
     }
     if (

@@ -48,6 +48,7 @@ import type { PermissionRule, PermissionRuleSource } from './PermissionRule.js'
 import { createReadRuleSuggestion } from './PermissionUpdate.js'
 import type { PermissionUpdate } from './PermissionUpdateSchema.js'
 import { getRuleByContentsForToolName } from './permissions.js'
+import { readEnv } from '@claude-code/config/env'
 
 declare const MACRO: { VERSION: string }
 
@@ -331,7 +332,7 @@ export function getClaudeTempDirName(): string {
 // fixed at startup, and the realpath of the system tmp dir does not change mid-session.
 export const getClaudeTempDir = memoize(function getClaudeTempDir(): string {
   const baseTmpDir =
-    process.env.CLAUDE_CODE_TMPDIR ||
+    readEnv('CLAUDE_CODE_TMPDIR') ||
     (getPlatform() === 'windows' ? tmpdir() : '/tmp')
 
   // Resolve symlinks in the base temp directory (e.g., /tmp -> /private/tmp on macOS)
@@ -1520,7 +1521,7 @@ export function checkEditableInternalPath(
   // sides handles the macOS /tmp → /private/tmp case where the config dir
   // lives under a symlinked root.
   if (feature('TEMPLATES')) {
-    const jobDir = process.env.CLAUDE_JOB_DIR
+    const jobDir = readEnv('CLAUDE_JOB_DIR')
     if (jobDir) {
       const jobsRoot = join(getClaudeConfigHomeDir(), 'jobs')
       const jobDirForms = getPathsForPermissionCheck(jobDir).map(normalize)

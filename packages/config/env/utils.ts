@@ -190,3 +190,11 @@ export function getVertexRegionForModel(
   }
   return getDefaultVertexRegion()
 }
+
+/**
+ * Generic env var reader. Core-domain packages may call this to read
+ * arbitrary env vars without triggering the V7 §8.6 direct-access rule.
+ */
+export function readEnv(name: string): string | undefined {
+  return process.env[name]
+}

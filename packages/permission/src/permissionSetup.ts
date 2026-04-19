@@ -78,6 +78,7 @@ import {
   permissionRuleValueFromString,
   permissionRuleValueToString,
 } from './permissionRuleParser.js'
+import { readEnv } from '@claude-code/config/env'
 
 /**
  * Checks if a Bash permission rule is dangerous for auto mode.
@@ -271,7 +272,7 @@ function isDangerousClassifierPermission(
   toolName: string,
   ruleContent: string | undefined,
 ): boolean {
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     // Tmux send-keys executes arbitrary shell, bypassing the classifier same as Bash(*)
     if (toolName === 'Tmux') return true
   }
@@ -744,7 +745,7 @@ export function initialPermissionModeFromCLI({
     // settings (e.g. bypassPermissions would otherwise silently grant full
     // access in a remote environment).
     if (
-      isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) &&
+      isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE')) &&
       !['acceptEdits', 'plan', 'default'].includes(settingsMode)
     ) {
       logForDebugging(
@@ -912,8 +913,8 @@ export async function initializeToolPermissionContext({
     string,
     AdditionalWorkingDirectory
   >()
-  // process.env.PWD may be a symlink, while getOriginalCwd() uses the real path
-  const processPwd = process.env.PWD
+  // readEnv('PWD') may be a symlink, while getOriginalCwd() uses the real path
+  const processPwd = readEnv('PWD')
   if (
     processPwd &&
     processPwd !== getOriginalCwd() &&
@@ -949,9 +950,9 @@ export async function initializeToolPermissionContext({
   // Variable name kept for return-field compat; contains both shells.
   let overlyBroadBashPermissions: DangerousPermissionInfo[] = []
   if (
-    process.env.USER_TYPE === 'ant' &&
-    !isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) &&
-    process.env.CLAUDE_CODE_ENTRYPOINT !== 'local-agent'
+    readEnv('USER_TYPE') === 'ant' &&
+    !isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE')) &&
+    readEnv('CLAUDE_CODE_ENTRYPOINT') !== 'local-agent'
   ) {
     overlyBroadBashPermissions = [
       ...findOverlyBroadBashPermissions(rulesFromDisk, parsedAllowedToolsCli),
@@ -1057,7 +1058,7 @@ export function getAutoModeUnavailableNotification(
       base = 'auto mode unavailable for this model'
       break
   }
-  return process.env.USER_TYPE === 'ant'
+  return readEnv('USER_TYPE') === 'ant'
     ? `${base} · #claude-code-feedback`
     : base
 }
@@ -1110,7 +1111,7 @@ export async function verifyAutoModeGateAccess(
   const disableFastModeBreakerFires =
     !!autoModeConfig?.disableFastMode &&
     (!!fastMode ||
-      (process.env.USER_TYPE === 'ant' &&
+      (readEnv('USER_TYPE') === 'ant' &&
         mainModel.toLowerCase().includes('-fast')))
   const modelSupported =
     modelSupportsAutoMode(mainModel) && !disableFastModeBreakerFires

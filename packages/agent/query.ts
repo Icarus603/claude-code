@@ -110,6 +110,7 @@ import {
   tryReactiveCompact,
   type StreamingToolExecutorLike,
 } from './internal/queryRuntime.js'
+import { readEnv } from '@claude-code/config/env'
 
 const SLEEP_TOOL_NAME = 'Sleep'
 type CanUseToolFn = (...args: unknown[]) => Promise<{
@@ -157,19 +158,19 @@ function buildQueryConfig(): QueryConfig {
         'tengu_streaming_tool_execution2',
       ),
       emitToolUseSummaries: isEnvTruthy(
-        process.env.CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES,
+        readEnv('CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES'),
       ),
-      isAnt: process.env.USER_TYPE === 'ant',
-      fastModeEnabled: !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_FAST_MODE),
+      isAnt: readEnv('USER_TYPE') === 'ant',
+      fastModeEnabled: !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_FAST_MODE')),
     },
   }
 }
 
 function isAutoCompactEnabled(): boolean {
-  if (isEnvTruthy(process.env.DISABLE_COMPACT)) {
+  if (isEnvTruthy(readEnv('DISABLE_COMPACT'))) {
     return false
   }
-  if (isEnvTruthy(process.env.DISABLE_AUTO_COMPACT)) {
+  if (isEnvTruthy(readEnv('DISABLE_AUTO_COMPACT'))) {
     return false
   }
   return getGlobalConfig().autoCompactEnabled
@@ -183,7 +184,7 @@ function calculateTokenWarningState(tokenUsage: number, model: string) {
       getContextWindowSize: getContextWindowForModel,
       getMaxOutputTokensForModel,
       getSdkBetas,
-      getEnv: key => process.env[key],
+      getEnv: key => readEnv(key),
     },
     isAutoCompactEnabled(),
   )
@@ -996,7 +997,7 @@ async function* queryLoop(
             // Thinking signatures are model-bound: replaying a protected-thinking
             // block (e.g. capybara) to an unprotected fallback (e.g. opus) 400s.
             // Strip before retry so the fallback model gets clean history.
-            if (process.env.USER_TYPE === 'ant') {
+            if (readEnv('USER_TYPE') === 'ant') {
               messagesForQuery = stripSignatureBlocks(messagesForQuery)
             }
 
@@ -1265,7 +1266,7 @@ async function* queryLoop(
         if (
           capEnabled &&
           maxOutputTokensOverride === undefined &&
-          !process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS
+          !readEnv('CLAUDE_CODE_MAX_OUTPUT_TOKENS')
         ) {
           logEvent('tengu_max_tokens_escalate', {
             escalatedTo: getEscalatedMaxTokens(),

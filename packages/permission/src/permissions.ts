@@ -89,6 +89,7 @@ import {
   recordSuccess,
   shouldFallbackToPrompting,
 } from './denialTracking.js'
+import { readEnv } from '@claude-code/config/env'
 function classifyYoloAction(...a: unknown[]): unknown { return _b().classifyYoloAction?.(...a) }
 function formatActionForClassifier(...a: unknown[]): unknown { return _b().formatActionForClassifier?.(...a) ?? '' }
 
@@ -688,7 +689,7 @@ export const hasPermissionsToUseTool: CanUseToolFn = async (
 
       // Notify ants when classifier error dumped prompts (will be in /share)
       if (
-        process.env.USER_TYPE === 'ant' &&
+        readEnv('USER_TYPE') === 'ant' &&
         classifierResult.errorDumpPath &&
         context.addNotification
       ) {

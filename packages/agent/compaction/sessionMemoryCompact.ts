@@ -40,6 +40,7 @@ import {
 } from './compact.js'
 import { estimateMessageTokens } from './microCompact.js'
 import { getCompactUserSummaryMessage } from './prompt.js'
+import { readEnv } from '@claude-code/config/env'
 
 /**
  * Configuration for session memory compaction thresholds
@@ -402,10 +403,10 @@ export function calculateMessagesToKeepIndex(
  */
 export function shouldUseSessionMemoryCompaction(): boolean {
   // Allow env var override for eval runs and testing
-  if (isEnvTruthy(process.env.ENABLE_CLAUDE_CODE_SM_COMPACT)) {
+  if (isEnvTruthy(readEnv('ENABLE_CLAUDE_CODE_SM_COMPACT'))) {
     return true
   }
-  if (isEnvTruthy(process.env.DISABLE_CLAUDE_CODE_SM_COMPACT)) {
+  if (isEnvTruthy(readEnv('DISABLE_CLAUDE_CODE_SM_COMPACT'))) {
     return false
   }
 
@@ -420,7 +421,7 @@ export function shouldUseSessionMemoryCompaction(): boolean {
   const shouldUse = sessionMemoryFlag && smCompactFlag
 
   // Log flag states for debugging (ant-only to avoid noise in external logs)
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     logEvent('tengu_sm_compact_flag_check', {
       tengu_session_memory: sessionMemoryFlag,
       tengu_sm_compact: smCompactFlag,
@@ -622,7 +623,7 @@ export async function trySessionMemoryCompaction(
     // Use logEvent instead of logError since errors here are expected
     // (e.g., file not found, path issues) and shouldn't go to error logs
     logEvent('tengu_sm_compact_error', {})
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       logForDebugging(`Session memory compaction error: ${errorMessage(error)}`)
     }
     return null

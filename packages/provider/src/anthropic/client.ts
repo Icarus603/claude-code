@@ -4,6 +4,7 @@ import { getProviderHostBindings } from '../host.js'
 import { getProviderNetworkLayer } from '../network.js'
 import { randomUUID } from 'crypto'
 import type { GoogleAuth } from 'google-auth-library'
+import { readEnv } from '@claude-code/config/env'
 
 /**
  * Environment variables for different client types:
@@ -79,9 +80,9 @@ export async function getAnthropicClient({
   const authProvider = getAnthropicAuthProvider()
   const networkLayer = getProviderNetworkLayer()
   const { anthropic } = getProviderHostBindings()
-  const containerId = process.env.CLAUDE_CODE_CONTAINER_ID
-  const remoteSessionId = process.env.CLAUDE_CODE_REMOTE_SESSION_ID
-  const clientApp = process.env.CLAUDE_AGENT_SDK_CLIENT_APP
+  const containerId = readEnv('CLAUDE_CODE_CONTAINER_ID')
+  const remoteSessionId = readEnv('CLAUDE_CODE_REMOTE_SESSION_ID')
+  const clientApp = readEnv('CLAUDE_AGENT_SDK_CLIENT_APP')
   const customHeaders = getCustomHeaders()
   const defaultHeaders: { [key: string]: string } = {
     'x-app': 'cli',
@@ -98,12 +99,12 @@ export async function getAnthropicClient({
 
   // Log API client configuration for HFI debugging
   anthropic.logForDebugging(
-    `[API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: ${!!process.env.ANTHROPIC_CUSTOM_HEADERS}, has Authorization header: ${!!customHeaders['Authorization']}`,
+    `[API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: ${!!readEnv('ANTHROPIC_CUSTOM_HEADERS')}, has Authorization header: ${!!customHeaders['Authorization']}`,
   )
 
   // Add additional protection header if enabled via env var
   const additionalProtectionEnabled = anthropic.isEnvTruthy(
-    process.env.CLAUDE_CODE_ADDITIONAL_PROTECTION,
+    readEnv('CLAUDE_CODE_ADDITIONAL_PROTECTION'),
   )
   if (additionalProtectionEnabled) {
     defaultHeaders['x-anthropic-additional-protection'] = 'true'
@@ -127,7 +128,7 @@ export async function getAnthropicClient({
   const ARGS = {
     defaultHeaders,
     maxRetries,
-    timeout: parseInt(process.env.API_TIMEOUT_MS || String(600 * 1000), 10),
+    timeout: parseInt(readEnv('API_TIMEOUT_MS') || String(600 * 1000), 10),
     dangerouslyAllowBrowser: true,
     fetchOptions: networkLayer.getProxyFetchOptions({
       forAnthropicAPI: true,
@@ -136,34 +137,34 @@ export async function getAnthropicClient({
       fetch: resolvedFetch,
     }),
   }
-  if (anthropic.isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)) {
+  if (anthropic.isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) {
     const { AnthropicBedrock } = await import('@anthropic-ai/bedrock-sdk')
     // Use region override for small fast model if specified
     const awsRegion =
       model === anthropic.getSmallFastModel() &&
-      process.env.ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION
-        ? process.env.ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION
+      readEnv('ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION')
+        ? readEnv('ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION')
         : anthropic.getAWSRegion()
 
     const bedrockArgs: Record<string, unknown> = {
       ...ARGS,
       awsRegion,
-      ...(anthropic.isEnvTruthy(process.env.CLAUDE_CODE_SKIP_BEDROCK_AUTH) && {
+      ...(anthropic.isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_BEDROCK_AUTH')) && {
         skipAuth: true,
       }),
       ...(anthropic.isDebugToStdErr() && { logger: createStderrLogger() }),
     }
 
     // Add API key authentication if available
-    if (process.env.AWS_BEARER_TOKEN_BEDROCK) {
+    if (readEnv('AWS_BEARER_TOKEN_BEDROCK')) {
       bedrockArgs.skipAuth = true
       // Add the Bearer token for Bedrock API key authentication
       bedrockArgs.defaultHeaders = {
         ...(bedrockArgs.defaultHeaders as Record<string, string> | undefined),
-        Authorization: `Bearer ${process.env.AWS_BEARER_TOKEN_BEDROCK}`,
+        Authorization: `Bearer ${readEnv('AWS_BEARER_TOKEN_BEDROCK')}`,
       }
     } else if (
-      !anthropic.isEnvTruthy(process.env.CLAUDE_CODE_SKIP_BEDROCK_AUTH)
+      !anthropic.isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_BEDROCK_AUTH'))
     ) {
       // Refresh auth and get credentials with cache clearing
       const cachedCredentials = await anthropic.refreshAndGetAwsCredentials()
@@ -176,13 +177,13 @@ export async function getAnthropicClient({
     // we have always been lying about the return type - this doesn't support batching or models
     return new AnthropicBedrock(bedrockArgs) as unknown as Anthropic
   }
-  if (anthropic.isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)) {
+  if (anthropic.isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY'))) {
     const { AnthropicFoundry } = await import('@anthropic-ai/foundry-sdk')
     // Determine Azure AD token provider based on configuration
     // SDK reads ANTHROPIC_FOUNDRY_API_KEY by default
     let azureADTokenProvider: (() => Promise<string>) | undefined
-    if (!process.env.ANTHROPIC_FOUNDRY_API_KEY) {
-      if (anthropic.isEnvTruthy(process.env.CLAUDE_CODE_SKIP_FOUNDRY_AUTH)) {
+    if (!readEnv('ANTHROPIC_FOUNDRY_API_KEY')) {
+      if (anthropic.isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_FOUNDRY_AUTH'))) {
         // Mock token provider for testing/proxy scenarios (similar to Vertex mock GoogleAuth)
         azureADTokenProvider = () => Promise.resolve('')
       } else {
@@ -206,10 +207,10 @@ export async function getAnthropicClient({
     // we have always been lying about the return type - this doesn't support batching or models
     return new AnthropicFoundry(foundryArgs) as unknown as Anthropic
   }
-  if (anthropic.isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)) {
+  if (anthropic.isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) {
     // Refresh GCP credentials if gcpAuthRefresh is configured and credentials are expired
     // This is similar to how we handle AWS credential refresh for Bedrock
-    if (!anthropic.isEnvTruthy(process.env.CLAUDE_CODE_SKIP_VERTEX_AUTH)) {
+    if (!anthropic.isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_VERTEX_AUTH'))) {
       await anthropic.refreshGcpCredentialsIfNeeded()
     }
 
@@ -239,20 +240,20 @@ export async function getAnthropicClient({
     // Check project environment variables in same order as google-auth-library
     // See: https://github.com/googleapis/google-auth-library-nodejs/blob/main/src/auth/googleauth.ts
     const hasProjectEnvVar =
-      process.env['GCLOUD_PROJECT'] ||
-      process.env['GOOGLE_CLOUD_PROJECT'] ||
-      process.env['gcloud_project'] ||
-      process.env['google_cloud_project']
+      readEnv('GCLOUD_PROJECT') ||
+      readEnv('GOOGLE_CLOUD_PROJECT') ||
+      readEnv('gcloud_project') ||
+      readEnv('google_cloud_project')
 
     // Check for credential file paths (service account or ADC)
     // Note: We're checking both standard and lowercase variants to be safe,
     // though we should verify what google-auth-library actually checks
     const hasKeyFile =
-      process.env['GOOGLE_APPLICATION_CREDENTIALS'] ||
-      process.env['google_application_credentials']
+      readEnv('GOOGLE_APPLICATION_CREDENTIALS') ||
+      readEnv('google_application_credentials')
 
     const googleAuth = anthropic.isEnvTruthy(
-      process.env.CLAUDE_CODE_SKIP_VERTEX_AUTH,
+      readEnv('CLAUDE_CODE_SKIP_VERTEX_AUTH'),
     )
       ? ({
           // Mock GoogleAuth for testing/proxy scenarios
@@ -273,7 +274,7 @@ export async function getAnthropicClient({
           ...(hasProjectEnvVar || hasKeyFile
             ? {}
             : {
-                projectId: process.env.ANTHROPIC_VERTEX_PROJECT_ID,
+                projectId: readEnv('ANTHROPIC_VERTEX_PROJECT_ID'),
               }),
         })
 
@@ -301,7 +302,7 @@ export async function getAnthropicClient({
 
 function getCustomHeaders(): Record<string, string> {
   const customHeaders: Record<string, string> = {}
-  const customHeadersEnv = process.env.ANTHROPIC_CUSTOM_HEADERS
+  const customHeadersEnv = readEnv('ANTHROPIC_CUSTOM_HEADERS')
 
   if (!customHeadersEnv) return customHeaders
 

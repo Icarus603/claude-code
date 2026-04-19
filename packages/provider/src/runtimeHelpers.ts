@@ -9,6 +9,7 @@ import type {
   ProviderTools,
   ProviderToolSchemaOptions,
 } from './contracts.js'
+import { readEnv } from '@claude-code/config/env'
 
 export const TOOL_SEARCH_TOOL_NAME = 'ToolSearch'
 
@@ -205,7 +206,7 @@ export async function isToolSearchEnabled(
   signal?: AbortSignal,
 ): Promise<boolean> {
   return (
-    process.env.ENABLE_TOOL_SEARCH !== 'false' &&
+    readEnv('ENABLE_TOOL_SEARCH') !== 'false' &&
     tools.some(tool => tool.name === TOOL_SEARCH_TOOL_NAME)
   )
 }

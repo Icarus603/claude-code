@@ -81,6 +81,7 @@ import {
   localCommandOutputToSDKAssistantMessage,
   toSDKCompactMetadata,
 } from './internal/sdkMappers.js'
+import { readEnv } from '@claude-code/config/env'
 
 type PermissionMode = string
 type SDKCompactBoundaryMessage = { type: string; [key: string]: unknown }
@@ -503,8 +504,8 @@ export class QueryEngine {
       } else {
         await transcriptPromise
         if (
-          isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-          isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK)
+          isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+          isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK'))
         ) {
           await flushSessionStorage()
         }
@@ -667,8 +668,8 @@ export class QueryEngine {
       if (persistSession) {
         await recordTranscript(messages)
         if (
-          isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-          isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK)
+          isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+          isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK'))
         ) {
           await flushSessionStorage()
         }
@@ -760,8 +761,8 @@ export class QueryEngine {
         if (event.reason === 'max_turns') {
           if (
             persistSession &&
-            (isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-              isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK))
+            (isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+              isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK')))
           ) {
             await flushSessionStorage()
           }
@@ -793,8 +794,8 @@ export class QueryEngine {
         if (event.reason === 'error') {
           if (
             persistSession &&
-            (isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-              isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK))
+            (isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+              isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK')))
           ) {
             await flushSessionStorage()
           }
@@ -1032,8 +1033,8 @@ export class QueryEngine {
           else if (attachment.type === 'max_turns_reached') {
             if (persistSession) {
               if (
-                isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-                isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK)
+                isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+                isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK'))
               ) {
                 await flushSessionStorage()
               }
@@ -1168,8 +1169,8 @@ export class QueryEngine {
       if (maxBudgetUsd !== undefined && getTotalCost() >= maxBudgetUsd) {
         if (persistSession) {
           if (
-            isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-            isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK)
+            isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+            isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK'))
           ) {
             await flushSessionStorage()
           }
@@ -1205,14 +1206,14 @@ export class QueryEngine {
         )
         const callsThisQuery = currentCalls - initialStructuredOutputCalls
         const maxRetries = parseInt(
-          process.env.MAX_STRUCTURED_OUTPUT_RETRIES || '5',
+          readEnv('MAX_STRUCTURED_OUTPUT_RETRIES') || '5',
           10,
         )
         if (callsThisQuery >= maxRetries) {
           if (persistSession) {
             if (
-              isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-              isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK)
+              isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+              isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK'))
             ) {
               await flushSessionStorage()
             }
@@ -1268,8 +1269,8 @@ export class QueryEngine {
     // result message, so any unflushed writes would be lost.
     if (persistSession) {
       if (
-        isEnvTruthy(process.env.CLAUDE_CODE_EAGER_FLUSH) ||
-        isEnvTruthy(process.env.CLAUDE_CODE_IS_COWORK)
+        isEnvTruthy(readEnv('CLAUDE_CODE_EAGER_FLUSH')) ||
+        isEnvTruthy(readEnv('CLAUDE_CODE_IS_COWORK'))
       ) {
         await flushSessionStorage()
       }

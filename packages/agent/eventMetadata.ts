@@ -4,6 +4,7 @@ export type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED = never
 import { extname } from 'path'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
+import { readEnv } from '@claude-code/config/env'
 
 export function sanitizeToolNameForAnalytics(
   toolName: string,
@@ -15,7 +16,7 @@ export function sanitizeToolNameForAnalytics(
 }
 
 export function isToolDetailsLoggingEnabled(): boolean {
-  return isEnvTruthy(process.env.OTEL_LOG_TOOL_DETAILS)
+  return isEnvTruthy(readEnv('OTEL_LOG_TOOL_DETAILS'))
 }
 
 export function extractMcpToolDetails(toolName: string):

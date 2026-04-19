@@ -72,6 +72,7 @@ import {
   getDynamicConfig_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
+import { readEnv } from '@claude-code/config/env'
 
 /**
  * Check if session memory feature is enabled.
@@ -283,7 +284,7 @@ const extractSessionMemory = sequential(async function (
   // Check gate lazily when hook runs (cached, non-blocking)
   if (!isSessionMemoryGateEnabled()) {
     // Log gate failure once per session (ant-only)
-    if (process.env.USER_TYPE === 'ant' && !hasLoggedGateFailure) {
+    if (readEnv('USER_TYPE') === 'ant' && !hasLoggedGateFailure) {
       hasLoggedGateFailure = true
       logEvent('tengu_session_memory_gate_disabled', {})
     }
@@ -360,7 +361,7 @@ export function initSessionMemory(): void {
   const autoCompactEnabled = isAutoCompactEnabled()
 
   // Log initialization state (ant-only to avoid noise in external logs)
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     logEvent('tengu_session_memory_init', {
       auto_compact_enabled: autoCompactEnabled,
     })

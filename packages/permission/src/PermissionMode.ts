@@ -8,6 +8,7 @@ import {
   type PermissionMode,
 } from './types/permissions.js'
 import { lazySchema } from '../internal/lazySchema.js'
+import { readEnv } from '@claude-code/config/env'
 
 export {
   EXTERNAL_PERMISSION_MODES,
@@ -91,7 +92,7 @@ const PERMISSION_MODE_CONFIG: Partial<
 export function isExternalPermissionMode(
   mode: PermissionMode,
 ): mode is ExternalPermissionMode {
-  if (process.env.USER_TYPE !== 'ant') {
+  if (readEnv('USER_TYPE') !== 'ant') {
     return true
   }
   return mode !== 'auto' && mode !== 'bubble'
