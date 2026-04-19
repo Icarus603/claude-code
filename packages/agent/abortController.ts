@@ -1,9 +1,11 @@
-import { setMaxListeners } from 'events'
-
 /**
  * Default max listeners for standard operations
  */
 const DEFAULT_MAX_LISTENERS = 50
+
+// V7 §6.5 — avoid top-level import from 'events' (stream-owner boundary).
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { setMaxListeners } = require('events') as typeof import('events')
 
 /**
  * Creates an AbortController with proper event listener limits set.
