@@ -1,4 +1,4 @@
-import { normalizeLanguageForSTT } from '../../hooks/useVoice.js'
+import { normalizeLanguageForSTT } from '@claude-code/voice/hooks/useVoice.js'
 import { getShortcutDisplay } from '../../keybindings/shortcutFormat.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { LocalCommandCall } from '../../types/command.js'
