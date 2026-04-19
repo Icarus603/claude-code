@@ -5,7 +5,7 @@ import figures from 'figures';
 import { Box, Text, useInput, wrapText } from '@anthropic/ink';
 import { useTerminalSize } from '@anthropic/ink';
 import { Select } from '../CustomSelect/select.js';
-import { PermissionDialog } from '../permissions/PermissionDialog.js';
+import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js';
 import { useSetAppState } from '../../state/AppState.js';
 import type { AppState } from '../../state/AppStateStore.js';
 import type { Message } from '../../types/message.js';

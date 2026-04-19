@@ -27,7 +27,7 @@ import {
 } from '@ant/computer-use-mcp'
 import * as React from 'react'
 import { getSessionId } from '../../bootstrap/state.js'
-import { ComputerUseApproval } from '../../components/permissions/ComputerUseApproval/ComputerUseApproval.js'
+import { ComputerUseApproval } from '@claude-code/permission/components/ComputerUseApproval/ComputerUseApproval.js'
 import type { Tool, ToolUseContext } from '../../Tool.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '../debug.js'

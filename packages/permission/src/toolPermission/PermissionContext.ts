@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import type { ToolUseConfirm } from 'src/components/permissions/PermissionRequest.js'
+import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
 import type {
   ToolPermissionContext,
   Tool as ToolType,

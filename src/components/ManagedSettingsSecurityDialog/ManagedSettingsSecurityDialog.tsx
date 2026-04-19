@@ -4,7 +4,7 @@ import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { SettingsJson } from '../../utils/settings/types.js'
 import { Select } from '../CustomSelect/index.js'
-import { PermissionDialog } from '../permissions/PermissionDialog.js'
+import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'
 import {
   extractDangerousSettings,
   formatDangerousSettingsList,

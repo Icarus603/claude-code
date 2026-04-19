@@ -83,7 +83,7 @@ import {
 } from '@claude-code/swarm';
 import { registerSandboxPermissionCallback } from '../hooks/useSwarmPermissionPoller.js';
 import { getTeamName, getAgentName } from '../utils/teammate.js';
-import { WorkerPendingPermission } from '../components/permissions/WorkerPendingPermission.js';
+import { WorkerPendingPermission } from '@claude-code/permission/components/WorkerPendingPermission.js';
 import {
   injectUserMessageToTeammate,
   getAllInProcessTeammateTasks,
@@ -116,7 +116,7 @@ import {
   selectableUserMessagesFilter,
   messagesAfterAreOnlySynthetic,
 } from '../components/MessageSelector.js';
-import { PermissionRequest, type ToolUseConfirm } from '../components/permissions/PermissionRequest.js';
+import { PermissionRequest, type ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js';
 import { ElicitationDialog } from '../components/mcp/ElicitationDialog.js';
 import { PromptDialog } from '../components/hooks/PromptDialog.js';
 import type { PromptRequest, PromptResponse } from '../types/hooks.js';
@@ -200,7 +200,7 @@ import {
   applyPermissionUpdates,
   persistPermissionUpdate,
 } from '@claude-code/permission/PermissionUpdate';
-import { buildPermissionUpdates } from '../components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.js';
+import { buildPermissionUpdates } from '@claude-code/permission/components/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.js';
 import { stripDangerousPermissionsForAutoMode } from '@claude-code/permission/permissionSetup';
 import { getScratchpadDir, isScratchpadEnabled } from '@claude-code/permission/filesystem';
 import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js';
@@ -399,7 +399,7 @@ import {
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js';
 import { SANDBOX_NETWORK_ACCESS_TOOL_NAME } from 'src/cli/structuredIO.js';
 import { useFileHistorySnapshotInit } from 'src/hooks/useFileHistorySnapshotInit.js';
-import { SandboxPermissionRequest } from 'src/components/permissions/SandboxPermissionRequest.js';
+import { SandboxPermissionRequest } from '@claude-code/permission/components/SandboxPermissionRequest.js';
 import { SandboxViolationExpandedView } from 'src/components/SandboxViolationExpandedView.js';
 import { useSettingsErrors } from 'src/hooks/notifs/useSettingsErrors.js';
 import { useMcpConnectivityStatus } from 'src/hooks/notifs/useMcpConnectivityStatus.js';

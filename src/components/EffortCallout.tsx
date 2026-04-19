@@ -18,7 +18,7 @@ import { updateSettingsForSource } from '../utils/settings/settings.js'
 import type { OptionWithDescription } from './CustomSelect/select.js'
 import { Select } from './CustomSelect/select.js'
 import { effortLevelToSymbol } from './EffortIndicator.js'
-import { PermissionDialog } from './permissions/PermissionDialog.js'
+import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'
 
 type EffortCalloutSelection = EffortLevel | undefined | 'dismiss'
 
