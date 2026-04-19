@@ -13,7 +13,7 @@ import { toScopedConfig } from '@claude-code/mcp-runtime'
 import type {
   McpServerConfigForProcessTransport,
   McpSdkServerConfig,
-} from '../entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { SDKControlMcpSetServersResponse } from '../entrypoints/sdk/controlTypes.js'
 import {
   areMcpConfigsEqual,

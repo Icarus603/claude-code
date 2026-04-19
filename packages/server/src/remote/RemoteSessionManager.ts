@@ -1,4 +1,4 @@
-import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   SDKControlCancelRequest,
   SDKControlPermissionRequest,

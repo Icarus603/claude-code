@@ -4,7 +4,7 @@ import type {
   ImageBlockParam,
 } from '@anthropic-ai/sdk/resources/messages.mjs'
 import type { UUID } from 'crypto'
-import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { detectImageFormatFromBase64 } from 'src/utils/imageResizer.js'
 
 /**

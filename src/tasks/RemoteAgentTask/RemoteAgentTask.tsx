@@ -15,7 +15,7 @@ import {
 import type {
   SDKAssistantMessage,
   SDKMessage,
-} from '../../entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   SetAppState,
   Task,

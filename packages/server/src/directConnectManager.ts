@@ -1,6 +1,6 @@
 /* eslint-disable eslint-plugin-n/no-unsupported-features/node-builtins */
 
-import type { SDKMessage } from 'src/entrypoints/agentSdkTypes.js'
+import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   SDKControlPermissionRequest,
   StdoutMessage,

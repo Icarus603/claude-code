@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { open } from 'fs/promises'
 import { basename, dirname, join, sep } from 'path'
-import type { ModelUsage } from 'src/entrypoints/agentSdkTypes.js'
+import type { ModelUsage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { Entry, TranscriptMessage } from '../types/logs.js'
 import { logForDebugging } from './debug.js'
 import { errorMessage, isENOENT } from './errors.js'

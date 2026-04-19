@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js'
+import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { queryModelWithoutStreaming } from '../../services/api/claude.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type { Message } from '../../types/message.js'

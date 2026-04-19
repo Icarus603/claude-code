@@ -11,7 +11,7 @@ import type {
   SDKCompactBoundaryMessage,
   SDKMessage,
   SDKRateLimitInfo,
-} from 'src/entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { ClaudeAILimits } from '@claude-code/provider/claudeAiLimits.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
 import type {

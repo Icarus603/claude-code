@@ -17,7 +17,7 @@ import { useNotifications } from '../context/notifications.js'
 import type {
   PermissionMode,
   SDKMessage,
-} from '../entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { SDKControlResponse } from '../entrypoints/sdk/controlTypes.js'
 import { Text } from '@anthropic/ink'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

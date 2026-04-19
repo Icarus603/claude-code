@@ -2,7 +2,7 @@ import type {
   AsyncHookJSONOutput,
   HookEvent,
   SyncHookJSONOutput,
-} from 'src/entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { logForDebugging } from '../debug.js'
 import type { ShellCommand } from '../ShellCommand.js'
 import { invalidateSessionEnvCache } from '@claude-code/storage/sessionEnvironment.js'

@@ -12,7 +12,7 @@
  */
 import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
-import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js'
+import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { useAppState, useAppStateStore } from 'src/state/AppState.js'
 import type { CommandResultDisplay } from '../../commands.js'
 import { useSettingsChange } from '../../hooks/useSettingsChange.js'

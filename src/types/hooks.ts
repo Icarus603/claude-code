@@ -6,12 +6,12 @@ import {
   HOOK_EVENTS,
   type HookInput,
   type PermissionUpdate,
-} from 'src/entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   HookJSONOutput,
   AsyncHookJSONOutput,
   SyncHookJSONOutput,
-} from 'src/entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { Message } from 'src/types/message.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { permissionBehaviorSchema } from '@claude-code/permission/PermissionRule'

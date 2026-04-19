@@ -178,7 +178,7 @@ import type { MCPServerConnection } from '../services/mcp/types.js'
 import type {
   HookEvent,
   SyncHookJSONOutput,
-} from 'src/entrypoints/agentSdkTypes.js'
+} from '@claude-code/headless-sdk/agentSdkTypes.js'
 import {
   checkForAsyncHookResponses,
   removeDeliveredAsyncHooks,

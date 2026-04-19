@@ -5,7 +5,7 @@
  */
 import { feature } from 'bun:bundle'
 import { registerHookCallbacks } from '../bootstrap/state.js'
-import type { HookInput, HookJSONOutput } from '../entrypoints/agentSdkTypes.js'
+import type { HookInput, HookJSONOutput } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
