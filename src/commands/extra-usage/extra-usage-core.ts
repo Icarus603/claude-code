@@ -2,9 +2,9 @@ import {
   checkAdminRequestEligibility,
   createAdminRequest,
   getMyAdminRequests,
-} from '../../services/api/adminRequests.js'
-import { invalidateOverageCreditGrantCache } from '../../services/api/overageCreditGrant.js'
-import { type ExtraUsage, fetchUtilization } from '../../services/api/usage.js'
+} from '@claude-code/provider/adminRequests.js'
+import { invalidateOverageCreditGrantCache } from '@claude-code/provider/overageCreditGrant.js'
+import { type ExtraUsage, fetchUtilization } from '@claude-code/provider/usage.js'
 import { getSubscriptionType } from '../../utils/auth.js'
 import { hasClaudeAiBillingAccess } from '../../utils/billing.js'
 import { openBrowser } from '../../utils/browser.js'

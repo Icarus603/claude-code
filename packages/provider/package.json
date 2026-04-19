@@ -22,6 +22,14 @@
     "./commands/login/index.js": "./src/commands/login/index.ts",
     "./commands/login/login.js": "./src/commands/login/login.tsx",
     "./commands/logout/index.js": "./src/commands/logout/index.ts",
-    "./commands/logout/logout.js": "./src/commands/logout/logout.tsx"
+    "./commands/logout/logout.js": "./src/commands/logout/logout.tsx",
+    "./emptyUsage.js": "./src/emptyUsage.ts",
+    "./ultrareviewQuota.js": "./src/ultrareviewQuota.ts",
+    "./firstTokenDate.js": "./src/firstTokenDate.ts",
+    "./usage.js": "./src/usage.ts",
+    "./adminRequests.js": "./src/adminRequests.ts",
+    "./overageCreditGrant.js": "./src/overageCreditGrant.ts",
+    "./metricsOptOut.js": "./src/metricsOptOut.ts",
+    "./bootstrap.js": "./src/bootstrap.ts"
   }
 }

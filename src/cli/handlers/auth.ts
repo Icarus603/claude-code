@@ -9,7 +9,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { getSSLErrorHint } from '../../services/api/errorUtils.js'
-import { fetchAndStoreClaudeCodeFirstTokenDate } from '../../services/api/firstTokenDate.js'
+import { fetchAndStoreClaudeCodeFirstTokenDate } from '@claude-code/provider/firstTokenDate.js'
 import {
   createAndStoreApiKey,
   fetchAndStoreUserRoles,

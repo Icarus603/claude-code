@@ -15,8 +15,8 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { fetchUltrareviewQuota } from '../../services/api/ultrareviewQuota.js'
-import { fetchUtilization } from '../../services/api/usage.js'
+import { fetchUltrareviewQuota } from '@claude-code/provider/ultrareviewQuota.js'
+import { fetchUtilization } from '@claude-code/provider/usage.js'
 import type { ToolUseContext } from '../../Tool.js'
 import {
   checkRemoteAgentEligibility,

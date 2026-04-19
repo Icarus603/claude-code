@@ -47,7 +47,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import {
   formatGrantAmount,
   getCachedOverageCreditGrant,
-} from '../api/overageCreditGrant.js'
+} from '@claude-code/provider/overageCreditGrant.js'
 import {
   checkCachedPassesEligibility,
   formatCreditAmount,
