@@ -18,7 +18,7 @@ import {
 import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
 import type { ToolUseConfirm } from 'src/components/permissions/PermissionRequest.js'
-import { useSetAppState } from 'src/state/AppState.js'
+import { useSetAppState } from '../appStateHooks.js'
 import { env } from 'src/utils/env.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { type CompletionType, logUnaryEvent } from 'src/utils/unaryLogging.js'

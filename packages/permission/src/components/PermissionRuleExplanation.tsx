@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import React from 'react'
 import { Ansi, Box, Text } from '@anthropic/ink'
 import { Text as ThemedText } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '../appStateHooks.js'
 import type {
   PermissionDecision,
   PermissionDecisionReason,

@@ -9,7 +9,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '../../appStateHooks.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import {
   getFirstWordPrefix,

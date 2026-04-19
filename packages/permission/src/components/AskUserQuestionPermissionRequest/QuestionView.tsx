@@ -1,7 +1,7 @@
 import figures from 'figures'
 import React, { useCallback, useState } from 'react'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
-import { useAppState } from 'src/state/AppState.js'
+import { useAppState } from '../../appStateHooks.js'
 import type {
   Question,
   QuestionOption,
