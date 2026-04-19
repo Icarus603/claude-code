@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { PermissionRuleList } from '../../components/permissions/rules/PermissionRuleList.js'
-import type { LocalJSXCommandCall } from '../../types/command.js'
-import { createPermissionRetryMessage } from '../../utils/messages.js'
+import { PermissionRuleList } from 'src/components/permissions/rules/PermissionRuleList.js'
+import type { LocalJSXCommandCall } from 'src/types/command.js'
+import { createPermissionRetryMessage } from 'src/utils/messages.js'
 
 export const call: LocalJSXCommandCall = async (onDone, context) => {
   return (

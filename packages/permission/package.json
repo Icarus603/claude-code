@@ -20,6 +20,10 @@
     "./filesystem": "./src/filesystem.ts",
     "./denialTracking": "./src/denialTracking.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./commands/index.js": "./src/commands/index.ts",
+    "./commands/permissions.js": "./src/commands/permissions.tsx",
+    "./toolPermission/*.js": "./src/toolPermission/*.ts",
+    "./toolPermission/handlers/*.js": "./src/toolPermission/handlers/*.ts"
   }
 }

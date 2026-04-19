@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs'
 import { randomUUID } from 'crypto'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getAllowedChannels } from '../../../bootstrap/state.js'
+import { getAllowedChannels } from 'src/bootstrap/state.js'
 import type { BridgePermissionCallbacks } from '@claude-code/bridge/bridgePermissionCallbacks.js'
 import { getTerminalFocused } from '@anthropic/ink'
 import {
@@ -23,8 +23,8 @@ import {
   setClassifierApproval,
   setClassifierChecking,
   setYoloClassifierApproval,
-} from '../../../utils/classifierApprovals.js'
-import { errorMessage } from '../../../utils/errors.js'
+} from 'src/utils/classifierApprovals.js'
+import { errorMessage } from 'src/utils/errors.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'

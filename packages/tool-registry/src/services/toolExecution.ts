@@ -28,7 +28,7 @@ import {
 import {
   buildCodeEditToolAttributes,
   isCodeEditingTool,
-} from 'src/hooks/toolPermission/permissionLogging.js'
+} from '@claude-code/permission/toolPermission/permissionLogging.js'
 import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
 import {
   findToolByName,
