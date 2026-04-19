@@ -43,6 +43,7 @@
     "./context.js": "./src/context.ts",
     "./claude.js": "./src/claude.ts",
     "./commands/model/index.js": "./src/commands/model/index.ts",
-    "./commands/model/model.js": "./src/commands/model/model.tsx"
+    "./commands/model/model.js": "./src/commands/model/model.tsx",
+    "./errors.js": "./src/errors.ts"
   }
 }
