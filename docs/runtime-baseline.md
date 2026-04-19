@@ -16,7 +16,7 @@ External behavior that must remain unchanged during V6 refactor:
 
 ```text
 ee80d10e594db512b58d87915d016149c065c4f09279dc5e93507a5af06efcf1  src/entrypoints/agentSdkTypes.ts
-379a9d4787f14e08d1458f803910383c83ca88ecd6943995d9454617d2e41be7  src/entrypoints/init.ts
+f47711802145f795a14fec0ba87e1f9b64abc0fc9bec05983df0e1a4c1526a94  src/entrypoints/init.ts
 a075a60a18118f2c22310ae667362ddc2374f5da41b549eae77e6702f553fc67  src/entrypoints/mcp.ts
 73e33ed7d68ee31dc33029ffec32797a79b8cc3d5fa722be7bb6129cc2ca8d5d  src/entrypoints/sandboxTypes.ts
 f6371808ab47f2f57cd75d6f6ac7926ebb8a8d2b818a8871b8f7cf1d099f8baf  src/entrypoints/sdk/controlSchemas.ts
