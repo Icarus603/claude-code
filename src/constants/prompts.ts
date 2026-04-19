@@ -828,7 +828,11 @@ function getFunctionResultClearingSection(model: string): string | null {
   if (!feature('CACHED_MICROCOMPACT') || !getCachedMCConfigForFRC) {
     return null
   }
-  const config = getCachedMCConfigForFRC()
+  const config = getCachedMCConfigForFRC({
+    getEnv: key => process.env[key],
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    getFeatureValue: (require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')).getFeatureValue_CACHED_MAY_BE_STALE,
+  })
   const isModelSupported = config.supportedModels?.some(pattern =>
     model.includes(pattern),
   )
