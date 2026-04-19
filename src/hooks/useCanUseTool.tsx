@@ -32,14 +32,14 @@ import { logError } from '../utils/log.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'
 import { jsonStringify } from '../utils/slowOperations.js'
-import { handleCoordinatorPermission } from './toolPermission/handlers/coordinatorHandler.js'
-import { handleInteractivePermission } from './toolPermission/handlers/interactiveHandler.js'
-import { handleSwarmWorkerPermission } from './toolPermission/handlers/swarmWorkerHandler.js'
+import { handleCoordinatorPermission } from '@claude-code/permission/toolPermission/handlers/coordinatorHandler.js'
+import { handleInteractivePermission } from '@claude-code/permission/toolPermission/handlers/interactiveHandler.js'
+import { handleSwarmWorkerPermission } from '@claude-code/permission/toolPermission/handlers/swarmWorkerHandler.js'
 import {
   createPermissionContext,
   createPermissionQueueOps,
-} from './toolPermission/PermissionContext.js'
-import { logPermissionDecision } from './toolPermission/permissionLogging.js'
+} from '@claude-code/permission/toolPermission/PermissionContext.js'
+import { logPermissionDecision } from '@claude-code/permission/toolPermission/permissionLogging.js'
 
 export type CanUseToolFn<
   Input extends Record<string, unknown> = Record<string, unknown>,

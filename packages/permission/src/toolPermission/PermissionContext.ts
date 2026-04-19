@@ -5,31 +5,31 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import type { ToolUseConfirm } from '../../components/permissions/PermissionRequest.js'
+import type { ToolUseConfirm } from 'src/components/permissions/PermissionRequest.js'
 import type {
   ToolPermissionContext,
   Tool as ToolType,
   ToolUseContext,
-} from '../../Tool.js'
+} from 'src/Tool.js'
 import { awaitClassifierAutoApproval } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import type { AssistantMessage } from '../../types/message.js'
+import type { AssistantMessage } from 'src/types/message.js'
 import type {
   PendingClassifierCheck,
   PermissionAllowDecision,
   PermissionDecisionReason,
   PermissionDenyDecision,
-} from '../../types/permissions.js'
-import { setClassifierApproval } from '../../utils/classifierApprovals.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { executePermissionRequestHooks } from '../../utils/hooks.js'
+} from 'src/types/permissions.js'
+import { setClassifierApproval } from 'src/utils/classifierApprovals.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { executePermissionRequestHooks } from 'src/utils/hooks.js'
 import {
   REJECT_MESSAGE,
   REJECT_MESSAGE_WITH_REASON_PREFIX,
   SUBAGENT_REJECT_MESSAGE,
   SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX,
   withMemoryCorrectionHint,
-} from '../../utils/messages.js'
+} from 'src/utils/messages.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import {
   applyPermissionUpdates,
