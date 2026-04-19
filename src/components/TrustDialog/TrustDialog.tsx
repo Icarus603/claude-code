@@ -16,7 +16,7 @@ import { getCwd } from '../../utils/cwd.js'
 import { getFsImplementation } from '../../utils/fsOperations.js'
 import { gracefulShutdownSync } from '../../utils/gracefulShutdown.js'
 import { Select } from '../CustomSelect/index.js'
-import { PermissionDialog } from '../permissions/PermissionDialog.js'
+import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'
 import {
   getApiKeyHelperSources,
   getAwsCommandsSources,

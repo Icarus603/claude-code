@@ -7,7 +7,7 @@ import {
 } from '../../bootstrap/state.js'
 import type { LocalJSXCommandContext } from '../../commands.js'
 import { MessageResponse } from '../../components/MessageResponse.js'
-import { AddWorkspaceDirectory } from '../../components/permissions/rules/AddWorkspaceDirectory.js'
+import { AddWorkspaceDirectory } from '@claude-code/permission/components/rules/AddWorkspaceDirectory.js'
 import { Box, Text } from '@anthropic/ink'
 import type { LocalJSXCommandOnDone } from '../../types/command.js'
 import {

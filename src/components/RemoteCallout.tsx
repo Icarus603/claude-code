@@ -5,7 +5,7 @@ import { getClaudeAIOAuthTokens } from '../utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import type { OptionWithDescription } from './CustomSelect/select.js'
 import { Select } from './CustomSelect/select.js'
-import { PermissionDialog } from './permissions/PermissionDialog.js'
+import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'
 
 type RemoteCalloutSelection = 'enable' | 'dismiss'
 

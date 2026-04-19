@@ -3,7 +3,7 @@ import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { PromptRequest } from '../../types/hooks.js'
 import { Select } from '../CustomSelect/select.js'
-import { PermissionDialog } from '../permissions/PermissionDialog.js'
+import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'
 
 type Props = {
   title: string
