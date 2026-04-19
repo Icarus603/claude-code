@@ -5,7 +5,7 @@ import {
 } from '@claude-code/permission/PermissionPromptToolResultSchema'
 import type { Tool } from '../../../../../../src/Tool.js'
 import { toolMatchesName } from '../../../../../../src/Tool.js'
-import type { CanUseToolFn } from '../../../../../../src/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { StructuredIO } from '../../../structuredIO.js'
 import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'
 import { gracefulShutdownSync } from '../../../../../../src/utils/gracefulShutdown.js'
