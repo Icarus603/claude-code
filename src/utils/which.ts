@@ -1,5 +1,5 @@
 import { execa } from 'execa'
-import { execSync_DEPRECATED } from './execSyncWrapper.js'
+import { execSync_DEPRECATED } from '@claude-code/shell/execSyncWrapper.js'
 
 async function whichNodeAsync(command: string): Promise<string | null> {
   if (process.platform === 'win32') {

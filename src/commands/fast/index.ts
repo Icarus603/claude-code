@@ -3,7 +3,7 @@ import {
   FAST_MODE_MODEL_DISPLAY,
   isFastModeEnabled,
 } from '../../utils/fastMode.js'
-import { shouldInferenceConfigCommandBeImmediate } from '../../utils/immediateCommand.js'
+import { shouldInferenceConfigCommandBeImmediate } from '@claude-code/shell/immediateCommand.js'
 
 const fast = {
   type: 'local-jsx',

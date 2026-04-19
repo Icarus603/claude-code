@@ -1,4 +1,4 @@
-import { whichSync } from './which.js'
+import { whichSync } from 'src/utils/which.js'
 
 /**
  * Find an executable by searching PATH, similar to `which`.

@@ -10,7 +10,12 @@
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
     "./legacy/*.js": "./src/legacy/*.ts",
-    "./bash/*.js": "./src/bash/*.ts"
+    "./bash/*.js": "./src/bash/*.ts",
+    "./findExecutable.js": "./src/findExecutable.ts",
+    "./collapseBackgroundBashNotifications.js": "./src/collapseBackgroundBashNotifications.ts",
+    "./commandLifecycle.js": "./src/commandLifecycle.ts",
+    "./immediateCommand.js": "./src/immediateCommand.ts",
+    "./execSyncWrapper.js": "./src/execSyncWrapper.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",
