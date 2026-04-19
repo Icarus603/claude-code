@@ -171,7 +171,7 @@ import {
   getMcpInstructionsDelta,
   isMcpInstructionsDeltaEnabled,
   type ClientSideInstruction,
-} from './mcpInstructionsDelta.js'
+} from '@claude-code/mcp-runtime/mcpInstructionsDelta.js'
 import { CLAUDE_IN_CHROME_MCP_SERVER_NAME } from './claudeInChrome/common.js'
 import { CHROME_TOOL_SEARCH_INSTRUCTIONS } from './claudeInChrome/prompt.js'
 import type { MCPServerConnection } from '../services/mcp/types.js'

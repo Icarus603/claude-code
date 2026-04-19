@@ -3,9 +3,9 @@ import { logEvent } from '@claude-code/local-observability'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,
-} from '../services/mcp/types.js'
-import type { Message } from '../types/message.js'
-import { isEnvDefinedFalsy, isEnvTruthy } from './envUtils.js'
+} from 'src/services/mcp/types.js'
+import type { Message } from 'src/types/message.js'
+import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
 
 export type McpInstructionsDelta = {
   /** Server names — for stateless-scan reconstruction. */

@@ -18,7 +18,7 @@ import { formatNumber } from 'src/utils/format.js'
 import {
   getContentSizeEstimate,
   type MCPToolResult,
-} from 'src/utils/mcpValidation.js'
+} from '@claude-code/mcp-runtime/mcpValidation.js'
 import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
 import type { inputSchema } from './MCPTool.js'
 

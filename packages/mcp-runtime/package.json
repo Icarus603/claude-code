@@ -10,6 +10,10 @@
     "./contracts": "./src/contracts.ts",
     "./client": "./src/client.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./mcpInstructionsDelta.js": "./src/mcpInstructionsDelta.ts",
+    "./mcpValidation.js": "./src/mcpValidation.ts",
+    "./mcpWebSocketTransport.js": "./src/mcpWebSocketTransport.ts",
+    "./mcpOutputStorage.js": "./src/mcpOutputStorage.ts"
   }
 }
