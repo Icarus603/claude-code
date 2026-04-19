@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
-import type { ToolPermissionContext } from '../../Tool.js'
-import { logForDebugging } from '../debug.js'
+import type { ToolPermissionContext } from 'src/Tool.js'
+import { logForDebugging } from 'src/utils/debug.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import {
   getAutoModeUnavailableReason,

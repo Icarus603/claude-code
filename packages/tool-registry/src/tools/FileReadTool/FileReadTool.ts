@@ -69,7 +69,7 @@ import {
   matchingRuleForInput,
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
+import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { readFileInRange } from 'src/utils/readFileInRange.js'
 import { semanticNumber } from 'src/utils/semanticNumber.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'

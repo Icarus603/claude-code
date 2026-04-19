@@ -31,7 +31,7 @@ import {
   getDenyRules,
   permissionRuleSourceDisplayString,
 } from '@claude-code/permission/permissions'
-import type { UnreachableRule } from '../../../utils/permissions/shadowedRuleDetection.js'
+import type { UnreachableRule } from '@claude-code/permission/shadowedRuleDetection.js'
 import { jsonStringify } from '../../../utils/slowOperations.js'
 import { Pane, Tab, Tabs, useTabHeaderFocus, useTabsWidth } from '@anthropic/ink'
 import { SearchBox } from '@anthropic/ink'

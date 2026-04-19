@@ -9,7 +9,7 @@ import {
 } from './claudemd.js'
 import { getMainLoopModel } from './model/model.js'
 import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
-import { detectUnreachableRules } from './permissions/shadowedRuleDetection.js'
+import { detectUnreachableRules } from '@claude-code/permission/shadowedRuleDetection.js'
 import { SandboxManager } from './sandbox/sandbox-adapter.js'
 import {
   AGENT_DESCRIPTIONS_THRESHOLD,

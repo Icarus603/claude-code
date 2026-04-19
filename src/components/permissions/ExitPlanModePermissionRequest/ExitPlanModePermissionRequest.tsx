@@ -54,7 +54,7 @@ import {
   createPromptRuleContent,
   isClassifierPermissionsEnabled,
   PROMPT_PREFIX,
-} from '../../../utils/permissions/bashClassifier.js'
+} from '@claude-code/permission/bashClassifier.js'
 import {
   type PermissionMode,
   toExternalPermissionMode,

@@ -22,7 +22,7 @@ import {
   parsePermissionRule,
   type ShellPermissionRule,
   suggestionForExactCommand as sharedSuggestionForExactCommand,
-} from 'src/utils/permissions/shellRuleMatching.js'
+} from '@claude-code/permission/shellRuleMatching.js'
 import {
   classifyCommandName,
   deriveSecurityFlags,

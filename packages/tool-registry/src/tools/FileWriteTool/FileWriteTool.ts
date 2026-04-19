@@ -39,7 +39,7 @@ import {
   matchingRuleForInput,
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { matchWildcardPattern } from 'src/utils/permissions/shellRuleMatching.js'
+import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { FILE_UNEXPECTEDLY_MODIFIED_ERROR } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import { gitDiffSchema, hunkSchema } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
 import { FILE_WRITE_TOOL_NAME, getWriteToolDescription } from './prompt.js'

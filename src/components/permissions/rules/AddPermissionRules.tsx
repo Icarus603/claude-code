@@ -16,7 +16,7 @@ import { permissionRuleValueToString } from '@claude-code/permission/permissionR
 import {
   detectUnreachableRules,
   type UnreachableRule,
-} from '../../../utils/permissions/shadowedRuleDetection.js'
+} from '@claude-code/permission/shadowedRuleDetection.js'
 import { SandboxManager } from '../../../utils/sandbox/sandbox-adapter.js'
 import {
   type EditableSettingSource,

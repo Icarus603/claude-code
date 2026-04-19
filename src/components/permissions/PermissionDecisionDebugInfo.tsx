@@ -13,7 +13,7 @@ import type {
 import { extractRules } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
-import { detectUnreachableRules } from '../../utils/permissions/shadowedRuleDetection.js'
+import { detectUnreachableRules } from '@claude-code/permission/shadowedRuleDetection.js'
 import { SandboxManager } from '../../utils/sandbox/sandbox-adapter.js'
 import { getSettingSourceDisplayNameLowercase } from '../../utils/settings/constants.js'
 

@@ -615,7 +615,7 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     extractOutputRedirections: (cmd: string) => { try { return require('src/utils/bash/commands.js').extractOutputRedirections(cmd) } catch { return [] } },
     deletePermissionRuleFromSettings: (...a: unknown[]) => { try { return require('src/utils/permissions/permissionsLoader.js').deletePermissionRuleFromSettings(...a) } catch { return false } },
     shouldAllowManagedPermissionRulesOnly: () => { try { return require('src/utils/permissions/permissionsLoader.js').shouldAllowManagedPermissionRulesOnly() } catch { return false } },
-    classifyPermissionDecision: (...a: unknown[]) => { try { return require('src/utils/permissions/classifierDecision.js').classifyPermissionDecision(...a) } catch { return null } },
+    classifyPermissionDecision: (...a: unknown[]) => { try { return require('@claude-code/permission/classifierDecision.js').classifyPermissionDecision(...a) } catch { return null } },
     getAutoMode: () => { try { return require('@claude-code/permission/autoModeState.js').getAutoMode() } catch { return null } },
     setAutoMode: (v: unknown) => { try { require('@claude-code/permission/autoModeState.js').setAutoMode(v) } catch {} },
     setDirtyAutoMode: () => { try { require('@claude-code/permission/autoModeState.js').setDirtyAutoMode() } catch {} },
