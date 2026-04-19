@@ -13,7 +13,7 @@ import {
   readClientSecret,
   saveMcpClientSecret,
 } from '@claude-code/mcp-runtime/auth.js'
-import { addMcpConfig } from '../../services/mcp/config.js'
+import { addMcpConfig } from '@claude-code/mcp-runtime/config.js'
 import {
   describeMcpConfigFilePath,
   ensureConfigScope,

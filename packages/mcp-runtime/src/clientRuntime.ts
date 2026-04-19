@@ -158,7 +158,7 @@ import {
   wrapFetchWithStepUpDetection,
 } from './auth.js'
 import { markClaudeAiMcpConnected } from './claudeai.js'
-import { getAllMcpConfigs, isMcpServerDisabled } from 'src/services/mcp/config.js'
+import { getAllMcpConfigs, isMcpServerDisabled } from './config.js'
 import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
 import { getMcpServerHeaders } from './headersHelper.js'
 import { SdkControlClientTransport } from './SdkControlTransport.js'

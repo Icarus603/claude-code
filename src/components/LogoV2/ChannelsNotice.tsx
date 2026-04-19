@@ -14,7 +14,7 @@ import {
 import { Box, Text } from '@anthropic/ink'
 import { isChannelsEnabled } from '@claude-code/mcp-runtime/channelAllowlist.js'
 import { getEffectiveChannelAllowlist } from '@claude-code/mcp-runtime/channelNotification.js'
-import { getMcpConfigsByScope } from '../../services/mcp/config.js'
+import { getMcpConfigsByScope } from '@claude-code/mcp-runtime/config.js'
 import {
   getClaudeAIOAuthTokens,
   getSubscriptionType,

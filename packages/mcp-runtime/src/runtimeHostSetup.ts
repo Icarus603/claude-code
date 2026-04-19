@@ -29,7 +29,7 @@ import {
   parseMcpConfig,
   parseMcpConfigFromFilePath,
   setMcpServerEnabled,
-} from 'src/services/mcp/config.js'
+} from './config.js'
 import {
   runElicitationHooks,
   runElicitationResultHooks,

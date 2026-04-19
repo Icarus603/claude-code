@@ -13,7 +13,7 @@ import {
   hasSkipDangerousModePermissionPrompt,
 } from 'src/utils/settings/settings.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
-import { getEnterpriseMcpFilePath, getMcpConfigByName } from 'src/services/mcp/config.js'
+import { getEnterpriseMcpFilePath, getMcpConfigByName } from './config.js'
 import { mcpInfoFromString } from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'
 import {

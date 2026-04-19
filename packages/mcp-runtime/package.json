@@ -38,6 +38,7 @@
     "./claudeai.js": "./src/claudeai.ts",
     "./headersHelper.js": "./src/headersHelper.ts",
     "./SdkControlTransport.js": "./src/SdkControlTransport.ts",
-    "./runtimeHostSetup.js": "./src/runtimeHostSetup.ts"
+    "./runtimeHostSetup.js": "./src/runtimeHostSetup.ts",
+    "./config.js": "./src/config.ts"
   }
 }

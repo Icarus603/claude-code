@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { getMcpConfigsByScope } from 'src/services/mcp/config.js'
+import { getMcpConfigsByScope } from '@claude-code/mcp-runtime/config.js'
 import type { ConfigScope } from '@claude-code/mcp-runtime/types.js'
 import {
   describeMcpConfigFilePath,

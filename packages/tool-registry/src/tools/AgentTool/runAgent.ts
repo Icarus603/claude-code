@@ -20,7 +20,7 @@ import {
   connectToServer,
   fetchToolsForClient,
 } from 'src/services/mcp/client.js'
-import { getMcpConfigByName } from 'src/services/mcp/config.js'
+import { getMcpConfigByName } from '@claude-code/mcp-runtime/config.js'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
