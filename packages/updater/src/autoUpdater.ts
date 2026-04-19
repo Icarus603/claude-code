@@ -24,7 +24,7 @@ import {
   getShellConfigPaths,
   readFileLines,
   writeFileLines,
-} from 'src/utils/shellConfig.js'
+} from '@claude-code/shell/shellConfig.js'
 import { jsonParse } from 'src/utils/slowOperations.js'
 
 const GCS_BUCKET_URL =

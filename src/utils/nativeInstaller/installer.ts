@@ -53,7 +53,7 @@ import {
   getShellConfigPaths,
   readFileLines,
   writeFileLines,
-} from '../shellConfig.js'
+} from '@claude-code/shell/shellConfig.js'
 import { sleep } from '../sleep.js'
 import {
   getUserBinDir,
