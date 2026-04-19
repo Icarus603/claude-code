@@ -68,7 +68,7 @@ import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 
 import { enqueue } from '../../../../../../src/utils/messageQueueManager.js'
 import { getCwd } from '../../../../../../src/utils/cwd.js'
 import { randomUUID } from 'crypto'
-import { StructuredIO } from '../../../../../../src/cli/structuredIO.js'
+import { StructuredIO } from '../../../structuredIO.js'
 
 export async function handleInitializeRequest(
   request: SDKControlInitializeRequest,

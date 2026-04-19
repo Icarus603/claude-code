@@ -11,6 +11,9 @@
     "./ndjsonSafeStringify.js": "./src/ndjsonSafeStringify.ts",
     "./bg.js": "./src/bg.ts",
     "./remoteIO.js": "./src/remoteIO.ts",
-    "./mcpServersHandlers.js": "./src/mcpServersHandlers.ts"
+    "./mcpServersHandlers.js": "./src/mcpServersHandlers.ts",
+    "./structuredIO.js": "./src/structuredIO.ts",
+    "./structuredIOHelper.js": "./src/structuredIOHelper.ts",
+    "./transports/*.js": "./src/transports/*.ts"
   }
 }

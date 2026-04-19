@@ -22,11 +22,11 @@ import {
   setInternalEventWriter,
 } from '@claude-code/storage/sessionStorage.js'
 import { ndjsonSafeStringify } from './ndjsonSafeStringify.js'
-import { StructuredIO } from 'src/cli/structuredIO.js'
-import { CCRClient, CCRInitError } from 'src/cli/transports/ccrClient.js'
-import { SSETransport } from 'src/cli/transports/SSETransport.js'
-import type { Transport } from 'src/cli/transports/Transport.js'
-import { getTransportForUrl } from 'src/cli/transports/transportUtils.js'
+import { StructuredIO } from './structuredIO.js'
+import { CCRClient, CCRInitError } from './transports/ccrClient.js'
+import { SSETransport } from './transports/SSETransport.js'
+import type { Transport } from './transports/Transport.js'
+import { getTransportForUrl } from './transports/transportUtils.js'
 
 /**
  * Bidirectional streaming for SDK mode with session tracking

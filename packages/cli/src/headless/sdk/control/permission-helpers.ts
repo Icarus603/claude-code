@@ -6,7 +6,7 @@ import {
 import type { Tool } from '../../../../../../src/Tool.js'
 import { toolMatchesName } from '../../../../../../src/Tool.js'
 import type { CanUseToolFn } from '../../../../../../src/hooks/useCanUseTool.js'
-import { StructuredIO } from '../../../../../../src/cli/structuredIO.js'
+import { StructuredIO } from '../../../structuredIO.js'
 import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'
 import { gracefulShutdownSync } from '../../../../../../src/utils/gracefulShutdown.js'
 import { safeParseJSON } from '../../../../../../src/utils/json.js'

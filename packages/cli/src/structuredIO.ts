@@ -40,8 +40,8 @@ import { writeToStdout } from 'src/utils/process.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { z } from 'zod/v4'
 import { notifyCommandLifecycle } from '@claude-code/shell/commandLifecycle.js'
-import { normalizeControlMessageKeys } from '../utils/controlMessageCompat.js'
-import { executePermissionRequestHooks } from '../utils/hooks.js'
+import { normalizeControlMessageKeys } from 'src/utils/controlMessageCompat.js'
+import { executePermissionRequestHooks } from 'src/utils/hooks.js'
 import {
   applyPermissionUpdates,
   persistPermissionUpdates,
@@ -51,8 +51,8 @@ import {
   type RequiresActionDetails,
   type SessionExternalMetadata,
 } from '@claude-code/storage/sessionState.js'
-import { jsonParse } from '../utils/slowOperations.js'
-import { Stream } from '../utils/stream.js'
+import { jsonParse } from 'src/utils/slowOperations.js'
+import { Stream } from 'src/utils/stream.js'
 import { ndjsonSafeStringify } from '@claude-code/cli/ndjsonSafeStringify.js'
 
 /**

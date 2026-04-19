@@ -1,20 +1,20 @@
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import type WsWebSocket from 'ws'
 import { logEvent } from '@claude-code/local-observability'
-import { CircularBuffer } from '../../utils/CircularBuffer.js'
-import { logForDebugging } from '../../utils/debug.js'
-import { logForDiagnosticsNoPII } from '../../utils/diagLogs.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
-import { getWebSocketTLSOptions } from '../../utils/mtls.js'
+import { CircularBuffer } from 'src/utils/CircularBuffer.js'
+import { logForDebugging } from 'src/utils/debug.js'
+import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
 import {
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,
-} from '../../utils/proxy.js'
+} from 'src/utils/proxy.js'
 import {
   registerSessionActivityCallback,
   unregisterSessionActivityCallback,
 } from '@claude-code/storage/sessionActivity.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import type { Transport } from './Transport.js'
 
 const KEEP_ALIVE_FRAME = '{"type":"keep_alive"}\n'
