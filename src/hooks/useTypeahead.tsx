@@ -39,7 +39,7 @@ import {
 import {
   getShellCompletions,
   type ShellCompletionType,
-} from '../utils/bash/shellCompletion.js'
+} from '@claude-code/shell/bash/shellCompletion.js'
 import { formatLogMetadata } from '../utils/format.js'
 import {
   getSessionIdFromLog,
