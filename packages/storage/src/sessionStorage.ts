@@ -31,7 +31,7 @@ import {
   switchSession,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { builtInCommandNames } from 'src/commands.js'
-import { COMMAND_NAME_TAG, TICK_TAG } from 'src/constants/xml.js'
+import { COMMAND_NAME_TAG, TICK_TAG } from '@claude-code/command-runtime/xml.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import * as sessionIngress from '@claude-code/provider/sessionIngress.js'
 import { REPL_TOOL_NAME } from '@claude-code/tool-registry/tools/REPLTool/constants.js'

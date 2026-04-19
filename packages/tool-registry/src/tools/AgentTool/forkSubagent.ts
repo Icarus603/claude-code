@@ -5,7 +5,7 @@ import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/stat
 import {
   FORK_BOILERPLATE_TAG,
   FORK_DIRECTIVE_PREFIX,
-} from 'src/constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
 import type {
   AssistantMessage,

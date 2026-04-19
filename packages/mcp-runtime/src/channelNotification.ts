@@ -19,7 +19,7 @@
 import type { ServerCapabilities } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
 import { type ChannelEntry, getAllowedChannels } from '@claude-code/app-host/bootstrap/state.js'
-import { CHANNEL_TAG } from 'src/constants/xml.js'
+import { CHANNEL_TAG } from '@claude-code/command-runtime/xml.js'
 import {
   getClaudeAIOAuthTokens,
   getSubscriptionType,

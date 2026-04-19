@@ -1,4 +1,4 @@
-import { TICK_TAG } from 'src/constants/xml.js'
+import { TICK_TAG } from '@claude-code/command-runtime/xml.js'
 
 export const SLEEP_TOOL_NAME = 'Sleep'
 

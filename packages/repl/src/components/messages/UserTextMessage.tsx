@@ -8,7 +8,7 @@ import {
   TASK_NOTIFICATION_TAG,
   TEAMMATE_MESSAGE_TAG,
   TICK_TAG,
-} from 'src/constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import {
   extractTag,

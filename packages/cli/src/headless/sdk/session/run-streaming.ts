@@ -204,7 +204,7 @@ import {
   processSetupHooks,
   takeInitialUserMessage,
 } from '@claude-code/storage/sessionStart.js'
-import { TEAMMATE_MESSAGE_TAG, TICK_TAG } from '../../../../../../src/constants/xml.js'
+import { TEAMMATE_MESSAGE_TAG, TICK_TAG } from '@claude-code/command-runtime/xml.js'
 import {
   isFastModeEnabled,
   isFastModeSupportedByModel,
@@ -255,7 +255,7 @@ import {
 } from '../../../../../../src/utils/messages/mappers.js'
 import { createModelSwitchBreadcrumbs } from '../../../../../../src/utils/messages.js'
 import { collectContextData } from '../../../../../../src/commands/context/context-noninteractive.js'
-import { LOCAL_COMMAND_STDOUT_TAG } from '../../../../../../src/constants/xml.js'
+import { LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js'
 import {
   statusListeners,
   type ClaudeAILimits,

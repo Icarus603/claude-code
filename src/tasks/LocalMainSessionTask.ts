@@ -18,7 +18,7 @@ import {
   TASK_ID_TAG,
   TASK_NOTIFICATION_TAG,
   TOOL_USE_ID_TAG,
-} from '../constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { type QueryParams, query } from '../query.js'
 import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
 import type { SetAppState } from '@claude-code/tool-registry/Task.js'

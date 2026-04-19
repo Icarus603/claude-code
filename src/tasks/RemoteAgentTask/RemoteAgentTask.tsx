@@ -11,7 +11,7 @@ import {
   TASK_TYPE_TAG,
   TOOL_USE_ID_TAG,
   ULTRAPLAN_TAG,
-} from '../../constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import type {
   SDKAssistantMessage,
   SDKMessage,

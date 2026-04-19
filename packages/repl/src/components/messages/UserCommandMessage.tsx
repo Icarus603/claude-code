@@ -1,7 +1,7 @@
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import figures from 'figures'
 import * as React from 'react'
-import { COMMAND_MESSAGE_TAG } from 'src/constants/xml.js'
+import { COMMAND_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { Box, Text } from '@anthropic/ink'
 import { extractTag } from 'src/utils/messages.js'
 

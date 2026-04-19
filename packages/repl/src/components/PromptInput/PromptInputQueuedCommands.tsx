@@ -7,7 +7,7 @@ import {
   STATUS_TAG,
   SUMMARY_TAG,
   TASK_NOTIFICATION_TAG,
-} from 'src/constants/xml.js'
+} from '@claude-code/command-runtime/xml.js'
 import { QueuedMessageProvider } from 'src/context/QueuedMessageContext.js'
 import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
 import type { QueuedCommand } from 'src/types/textInputTypes.js'
