@@ -10,7 +10,7 @@ import { wrapSpawn } from './ShellCommand.js'
 import { TaskOutput } from './task/TaskOutput.js'
 import { getCwd } from './cwd.js'
 import { randomUUID } from 'crypto'
-import { formatShellPrefixCommand } from './bash/shellPrefix.js'
+import { formatShellPrefixCommand } from '@claude-code/shell/bash/shellPrefix.js'
 import {
   getHookEnvFilePath,
   invalidateSessionEnvCache,

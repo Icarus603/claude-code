@@ -7,7 +7,7 @@ import {
   buildParsedCommandFromRoot,
   type IParsedCommand,
   ParsedCommand,
-} from 'src/utils/bash/ParsedCommand.js'
+} from '@claude-code/shell/bash/ParsedCommand.js'
 import { type Node, PARSE_ABORTED } from 'src/utils/bash/parser.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
