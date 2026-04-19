@@ -4,7 +4,7 @@ import {
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import type z from 'zod/v4'
-import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { AnyObject, Tool, ToolUseContext } from 'src/Tool.js'
 import type { HookProgress } from 'src/types/hooks.js'
 import type {

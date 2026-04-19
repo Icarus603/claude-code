@@ -13,7 +13,7 @@ import {
   isBypassPermissionsModeDisabled,
 } from '@claude-code/permission/permissionSetup'
 import { MailboxProvider } from '../context/mailbox.js'
-import { useSettingsChange } from '../hooks/useSettingsChange.js'
+import { useSettingsChange } from '@claude-code/repl/hooks/useSettingsChange.js'
 import { logForDebugging } from '../utils/debug.js'
 import { createStore } from './store.js'
 

@@ -1,6 +1,6 @@
 import { APIUserAbortError } from '@anthropic-ai/sdk'
 import React, { type ReactNode, useCallback, useRef, useState } from 'react'
-import { useMainLoopModel } from '../../../../hooks/useMainLoopModel.js'
+import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import { Box, Byline, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { createAbortController } from '@claude-code/agent/abortController.js'

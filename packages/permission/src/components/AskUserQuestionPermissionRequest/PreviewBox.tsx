@@ -1,5 +1,5 @@
 import React, { Suspense, use, useMemo } from 'react'
-import { useSettings } from 'src/hooks/useSettings.js'
+import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, Box, Text, stringWidth, useTheme } from '@anthropic/ink'
 import {

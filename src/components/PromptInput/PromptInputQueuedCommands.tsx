@@ -9,7 +9,7 @@ import {
   TASK_NOTIFICATION_TAG,
 } from '../../constants/xml.js'
 import { QueuedMessageProvider } from '../../context/QueuedMessageContext.js'
-import { useCommandQueue } from '../../hooks/useCommandQueue.js'
+import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
 import type { QueuedCommand } from '../../types/textInputTypes.js'
 import { isQueuedCommandVisible } from '../../utils/messageQueueManager.js'
 import {

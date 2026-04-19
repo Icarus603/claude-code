@@ -23,8 +23,8 @@ import {
   getTotalLinesRemoved,
   getTotalOutputTokens,
 } from '../cost-tracker.js'
-import { useMainLoopModel } from '../hooks/useMainLoopModel.js'
-import { type ReadonlySettings, useSettings } from '../hooks/useSettings.js'
+import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
+import { type ReadonlySettings, useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { Ansi, Box, Text } from '@anthropic/ink'
 import { getRawUtilization } from '@claude-code/provider/claudeAiLimits.js'
 import type { Message } from '../types/message.js'

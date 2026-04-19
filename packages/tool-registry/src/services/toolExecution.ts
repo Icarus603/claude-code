@@ -29,7 +29,7 @@ import {
   buildCodeEditToolAttributes,
   isCodeEditingTool,
 } from '@claude-code/permission/toolPermission/permissionLogging.js'
-import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import {
   findToolByName,
   type Tool,

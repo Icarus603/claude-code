@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import type { DeepImmutable } from 'src/types/utils.js'
-import { useElapsedTime } from '../../hooks/useElapsedTime.js'
+import { useElapsedTime } from '@claude-code/repl/hooks/useElapsedTime.js'
 import { type KeyboardEvent, Box, Text, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { getEmptyToolPermissionContext } from '../../Tool.js'

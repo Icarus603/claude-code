@@ -15,7 +15,7 @@ import { useCallback, useMemo, useState } from 'react'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { useAppState, useAppStateStore } from 'src/state/AppState.js'
 import type { CommandResultDisplay } from '../../commands.js'
-import { useSettingsChange } from '../../hooks/useSettingsChange.js'
+import { useSettingsChange } from '@claude-code/repl/hooks/useSettingsChange.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import {

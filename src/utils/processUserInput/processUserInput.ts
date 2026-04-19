@@ -14,7 +14,7 @@ import {
   isBridgeSafeCommand,
   type LocalJSXCommandContext,
 } from '../../commands.js'
-import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
 import type { SetToolJSXFn, ToolUseContext } from '../../Tool.js'
 import type {

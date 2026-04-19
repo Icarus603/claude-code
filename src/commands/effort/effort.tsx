@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
+import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

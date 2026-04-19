@@ -10,7 +10,7 @@ import {
 import type { PermissionUpdateDestination } from '@claude-code/permission/PermissionUpdateSchema'
 import type { CommandResultDisplay } from 'src/commands.js'
 import { Select } from 'src/components/CustomSelect/select.js'
-import { useExitOnCtrlCDWithKeybindings } from 'src/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useSearchInput } from '@anthropic/ink/search'
 import { type KeyboardEvent, Box, Text, useTerminalFocus } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'

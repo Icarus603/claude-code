@@ -11,7 +11,7 @@ import {
   useSyncExternalStore,
 } from 'react'
 import { useNotifications } from 'src/context/notifications.js'
-import { useCommandQueue } from 'src/hooks/useCommandQueue.js'
+import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
 import {
   type IDEAtMentioned,
   useIdeAtMentioned,
@@ -45,19 +45,19 @@ import {
   getPastedTextRefNumLines,
   parseReferences,
 } from '../../history.js'
-import type { VerificationStatus } from '../../hooks/useApiKeyVerification.js'
+import type { VerificationStatus } from '@claude-code/repl/hooks/useApiKeyVerification.js'
 import {
   type HistoryMode,
   useArrowKeyHistory,
-} from '../../hooks/useArrowKeyHistory.js'
+} from '@claude-code/repl/hooks/useArrowKeyHistory.js'
 import { useDoublePress } from '@anthropic/ink'
-import { useHistorySearch } from '../../hooks/useHistorySearch.js'
+import { useHistorySearch } from '@claude-code/repl/hooks/useHistorySearch.js'
 import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
-import { useInputBuffer } from '../../hooks/useInputBuffer.js'
-import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
-import { usePromptSuggestion } from '../../hooks/usePromptSuggestion.js'
+import { useInputBuffer } from '@claude-code/repl/hooks/useInputBuffer.js'
+import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
+import { usePromptSuggestion } from '@claude-code/repl/hooks/usePromptSuggestion.js'
 import { useTerminalSize } from '@anthropic/ink'
-import { useTypeahead } from '../../hooks/useTypeahead.js'
+import { useTypeahead } from '@claude-code/repl/hooks/useTypeahead.js'
 import { Box, type BorderTextOptions, type ClickEvent, type Key, stringWidth, Text, useInput } from '@anthropic/ink'
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'

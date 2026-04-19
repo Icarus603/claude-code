@@ -53,7 +53,7 @@ async function main(): Promise<void> {
   const disallowedThinEntryImports = [
     '../services/',
     '../components/',
-    '../hooks/',
+    '@claude-code/repl/hooks/',
     '../utils/',
     '../Tool.js',
     '../commands.js',

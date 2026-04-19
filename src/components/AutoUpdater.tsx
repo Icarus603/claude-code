@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useInterval } from 'usehooks-ts'
-import { useUpdateNotification } from '../hooks/useUpdateNotification.js'
+import { useUpdateNotification } from '@claude-code/repl/hooks/useUpdateNotification.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   type AutoUpdaterResult,

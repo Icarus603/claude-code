@@ -20,7 +20,7 @@ import type {
   StdoutMessage,
 } from 'src/entrypoints/sdk/controlTypes.js'
 import type { PermissionUpdate as InternalPermissionUpdate } from 'src/types/permissions.js'
-import type { CanUseToolFn } from 'src/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from 'src/Tool.js'
 import { type HookCallback, hookJSONOutputSchema } from 'src/types/hooks.js'
 import { logForDebugging } from 'src/utils/debug.js'
