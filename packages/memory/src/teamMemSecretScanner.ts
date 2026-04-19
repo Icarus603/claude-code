@@ -1,10 +1,9 @@
-/**
-
 // Inlined from src/utils/stringUtils.ts — keep this leaf src/-free.
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
+/**
  * Client-side secret scanner for team memory (PSR M22174).
  *
  * Scans content for credentials before upload so secrets never leave the
