@@ -1660,11 +1660,47 @@ async function* queryModel(
     }
 
     // Get API context management strategies if enabled
-    const contextManagement = getAPIContextManagement({
-      hasThinking,
-      isRedactThinkingActive: betasParams.includes(REDACT_THINKING_BETA_HEADER),
-      clearAllThinking: thinkingClearLatched,
-    })
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { SHELL_TOOL_NAMES } = require('@claude-code/shell/legacy/shellToolUtils.js') as typeof import('@claude-code/shell/legacy/shellToolUtils.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { BashTool } = require('@claude-code/tool-registry/tools/BashTool/BashTool.js') as typeof import('@claude-code/tool-registry/tools/BashTool/BashTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { FileEditTool } = require('@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js') as typeof import('@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { FileReadTool } = require('@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js') as typeof import('@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { FileWriteTool } = require('@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js') as typeof import('@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { GlobTool } = require('@claude-code/tool-registry/tools/GlobTool/GlobTool.js') as typeof import('@claude-code/tool-registry/tools/GlobTool/GlobTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { GrepTool } = require('@claude-code/tool-registry/tools/GrepTool/GrepTool.js') as typeof import('@claude-code/tool-registry/tools/GrepTool/GrepTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { WebFetchTool } = require('@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js') as typeof import('@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { WebSearchTool } = require('@claude-code/tool-registry/tools/WebSearchTool/WebSearchTool.js') as typeof import('@claude-code/tool-registry/tools/WebSearchTool/WebSearchTool.js')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { NotebookEditTool } = require('@claude-code/tool-registry/tools/NotebookEditTool/NotebookEditTool.js') as typeof import('@claude-code/tool-registry/tools/NotebookEditTool/NotebookEditTool.js')
+    const contextManagement = getAPIContextManagement(
+      {
+        toolNames: {
+          shellToolNames: [...SHELL_TOOL_NAMES, BashTool.name],
+          fileEdit: FileEditTool.name,
+          fileRead: FileReadTool.name,
+          fileWrite: FileWriteTool.name,
+          glob: GlobTool.name,
+          grep: GrepTool.name,
+          webFetch: WebFetchTool.name,
+          webSearch: WebSearchTool.name,
+          notebookEdit: NotebookEditTool.name,
+        },
+        getEnv: key => process.env[key],
+      },
+      {
+        hasThinking,
+        isRedactThinkingActive: betasParams.includes(REDACT_THINKING_BETA_HEADER),
+        clearAllThinking: thinkingClearLatched,
+      },
+    )
 
     const enablePromptCaching =
       options.enablePromptCaching ?? getPromptCachingEnabled(retryContext.model)
