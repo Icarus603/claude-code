@@ -49,7 +49,7 @@ import {
   isMcpServerDisabled,
   setMcpServerEnabled,
 } from './config.js'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppState } from '@claude-code/permission/appStateHooks'
 import type { PluginError } from 'src/types/plugin.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getAllowedChannels } from '@claude-code/app-host/bootstrap/state.js'
@@ -58,7 +58,7 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from 'src/state/AppState.js'
+} from '@claude-code/permission/appStateHooks'
 import { errorMessage } from 'src/utils/errors.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { logMCPDebug, logMCPError } from 'src/utils/log.js'

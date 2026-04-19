@@ -5,7 +5,7 @@ import {
   ElicitRequestSchema,
   type ElicitResult,
 } from '@modelcontextprotocol/sdk/types.js'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppState } from '@claude-code/permission/appStateHooks'
 import {
   executeElicitationHooks,
   executeElicitationResultHooks,

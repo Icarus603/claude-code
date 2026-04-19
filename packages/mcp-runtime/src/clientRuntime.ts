@@ -44,7 +44,7 @@ import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/st
 import type { Command } from 'src/commands.js'
 import { getOauthConfig } from 'src/constants/oauth.js'
 import { PRODUCT_URL } from 'src/constants/product.js'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppState } from '@claude-code/permission/appStateHooks'
 import {
   type Tool,
   type ToolCallProgress,
