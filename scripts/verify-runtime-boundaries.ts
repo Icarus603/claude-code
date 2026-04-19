@@ -102,10 +102,10 @@ async function verifyEntryBootstrapSeams(): Promise<string[]> {
   const [main, print, bootstrap] = await Promise.all([
     readFile('src/main.tsx', 'utf8'),
     readFile('packages/cli/src/print.ts', 'utf8'),
-    readFile('@claude-code/app-host/runtime/bootstrap.ts', 'utf8'),
+    readFile('packages/app-host/src/runtime/bootstrap.ts', 'utf8'),
   ])
 
-  if (!main.includes("./runtime/bootstrap.js")) {
+  if (!main.includes("@claude-code/app-host/runtime/bootstrap.js")) {
     violations.push(
       'src/main.tsx: missing runtime skeleton bootstrap seam import',
     )
