@@ -6,10 +6,10 @@ import { createSortedHelpConfig } from '../entry/commander.js'
 import {
   VALID_INSTALLABLE_SCOPES,
   VALID_UPDATE_SCOPES,
-} from '../../../../src/services/plugins/pluginCliCommands.js'
+} from 'src/services/plugins/pluginCliCommands.js'
 import { getAutoModeEnabledStateIfCached } from '@claude-code/permission/permissionSetup'
-import { getBaseRenderOptions } from '../../../../src/utils/renderOptions.js'
-import { validateUuid } from '../../../../src/utils/uuid.js'
+import { getBaseRenderOptions } from 'src/utils/renderOptions.js'
+import { validateUuid } from 'src/utils/uuid.js'
 import { TASK_STATUSES } from '@claude-code/agent/tasks.js'
 
 export function registerMiscCommands(program: Command): void {

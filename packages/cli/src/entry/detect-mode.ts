@@ -12,8 +12,8 @@ import {
   setQuestionPreviewFormat,
   setSessionSource,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { stopCapturingEarlyInput } from '../../../../src/utils/earlyInput.js'
-import { isEnvTruthy } from '../../../../src/utils/envUtils.js'
+import { stopCapturingEarlyInput } from 'src/utils/earlyInput.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { initializeEntrypoint } from '@claude-code/app-host/main/startup/settings.js'
 
 /**

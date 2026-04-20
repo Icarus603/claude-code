@@ -18,18 +18,18 @@ import type { RuntimeHandles } from '@claude-code/app-host'
 
 import { init } from '@claude-code/app-host/init.js'
 import { loadPolicyLimits } from '@claude-code/provider/policyLimits/index.js'
-import { loadRemoteManagedSettings } from '../../../../src/services/remoteManagedSettings/index.js'
+import { loadRemoteManagedSettings } from 'src/services/remoteManagedSettings/index.js'
 import { setInlinePlugins } from '@claude-code/app-host/bootstrap/state.js'
-import { clearPluginCache } from '../../../../src/utils/plugins/pluginLoader.js'
+import { clearPluginCache } from 'src/utils/plugins/pluginLoader.js'
 import { runMigrations } from '@claude-code/app-host/main/startup/settings.js'
-import { canUserConfigureAdvisor } from '../../../../src/utils/advisor.js'
-import { ensureMdmSettingsLoaded } from '../../../../src/utils/settings/mdm/settings.js'
-import { ensureKeychainPrefetchCompleted } from '../../../../src/utils/secureStorage/keychainPrefetch.js'
+import { canUserConfigureAdvisor } from 'src/utils/advisor.js'
+import { ensureMdmSettingsLoaded } from 'src/utils/settings/mdm/settings.js'
+import { ensureKeychainPrefetchCompleted } from 'src/utils/secureStorage/keychainPrefetch.js'
 import {
   profileCheckpoint,
   profileReport,
-} from '../../../../src/utils/startupProfiler.js'
-import { isEnvTruthy } from '../../../../src/utils/envUtils.js'
+} from 'src/utils/startupProfiler.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 
 import { createMainProgram } from './commander.js'
 import { runModeDispatch } from './mode-dispatch.js'

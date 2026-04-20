@@ -33,11 +33,11 @@ import mapValues from 'lodash-es/mapValues.js'
 import pickBy from 'lodash-es/pickBy.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import React from 'react'
-import { getOauthConfig } from '../../../../src/constants/oauth.js'
-import { getRemoteSessionUrl } from '../../../../src/constants/product.js'
+import { getOauthConfig } from 'src/constants/oauth.js'
+import { getRemoteSessionUrl } from 'src/constants/product.js'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import { init, initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
-import { addToHistory } from '../../../../src/history.js'
+import { addToHistory } from 'src/history.js'
 import type { Root } from '@anthropic/ink'
 import { createHeadlessSession } from '@claude-code/cli'
 import { getTeammateModeSnapshot, logManagedSettings } from '@claude-code/cli'
@@ -67,7 +67,7 @@ import { initializeLspServerManager } from '@claude-code/ide/lsp/manager.js'
 // at commit 903c46b — the callsites survived the move, the import statements
 // didn't. Without these, each call site throws `undefined is not a function`,
 // which Ink's patchConsole swallows, leaving the REPL at a blank screen.
-import { shouldEnablePromptSuggestion } from '../../../../src/services/PromptSuggestion/promptSuggestion.js'
+import { shouldEnablePromptSuggestion } from 'src/services/PromptSuggestion/promptSuggestion.js'
 import {
   createDirectConnectSession,
   DirectConnectError,
@@ -94,7 +94,7 @@ import {
 import {
   loadRemoteManagedSettings,
   refreshRemoteManagedSettings,
-} from '../../../../src/services/remoteManagedSettings/index.js'
+} from 'src/services/remoteManagedSettings/index.js'
 import type { ToolInputJSONSchema } from '@claude-code/tool-registry/Tool.js'
 import {
   createSyntheticOutputTool,
@@ -106,30 +106,30 @@ import {
   isAdvisorEnabled,
   isValidAdvisorModel,
   modelSupportsAdvisor,
-} from '../../../../src/utils/advisor.js'
-import { isAgentSwarmsEnabled } from '../../../../src/utils/agentSwarmsEnabled.js'
-import { count, uniq } from '../../../../src/utils/array.js'
-import { installAsciicastRecorder } from '../../../../src/utils/asciicast.js'
+} from 'src/utils/advisor.js'
+import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { count, uniq } from 'src/utils/array.js'
+import { installAsciicastRecorder } from 'src/utils/asciicast.js'
 import {
   getSubscriptionType,
   isClaudeAISubscriber,
   prefetchAwsCredentialsAndBedRockInfoIfSafe,
   prefetchGcpCredentialsIfSafe,
   validateForceLoginOrg,
-} from '../../../../src/utils/auth.js'
-import { seedEarlyInput, stopCapturingEarlyInput } from '../../../../src/utils/earlyInput.js'
+} from 'src/utils/auth.js'
+import { seedEarlyInput, stopCapturingEarlyInput } from 'src/utils/earlyInput.js'
 import {
   parseEffortValue,
   toPersistableEffort,
-} from '../../../../src/utils/effort.js'
+} from 'src/utils/effort.js'
 import {
   getFastModeUnavailableReason,
   isFastModeSupportedByModel,
   isFastModeEnabled,
   prefetchFastModeStatus,
   resolveFastModeStatusFromCache,
-} from '../../../../src/utils/fastMode.js'
-import { applyConfigEnvironmentVariables } from '../../../../src/utils/managedEnv.js'
+} from 'src/utils/fastMode.js'
+import { applyConfigEnvironmentVariables } from 'src/utils/managedEnv.js'
 import { extractTeammateOptions, type TeammateOptions } from '@claude-code/app-host/main/cli/options.js'
 import { maybeActivateBrief, maybeActivateProactive } from '@claude-code/app-host/main/cli/runtimeActivation.js'
 import { prefetchSystemContextIfSafe, startDeferredPrefetches } from '@claude-code/app-host/main/startup/context.js'
@@ -145,12 +145,12 @@ import {
   createRuntimeHandles,
   syncRuntimeHandlesFromHeadlessParams,
 } from '@claude-code/app-host/runtime/runtimeHandles.js'
-import { createSystemMessage, createUserMessage } from '../../../../src/utils/messages.js'
-import { getPlatform } from '../../../../src/utils/platform.js'
-import { getSessionIngressAuthToken } from '../../../../src/utils/sessionIngressAuth.js'
-import { jsonParse, writeFileSync_DEPRECATED } from '../../../../src/utils/slowOperations.js'
+import { createSystemMessage, createUserMessage } from 'src/utils/messages.js'
+import { getPlatform } from 'src/utils/platform.js'
+import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { jsonParse, writeFileSync_DEPRECATED } from 'src/utils/slowOperations.js'
 import { computeInitialTeamContext } from '@claude-code/swarm'
-import { isWorktreeModeEnabled } from '../../../../src/utils/worktreeModeEnabled.js'
+import { isWorktreeModeEnabled } from 'src/utils/worktreeModeEnabled.js'
 import { relative, resolve } from 'path'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
@@ -163,8 +163,8 @@ import {
   setMainThreadAgentType,
   setTeleportedSessionInfo,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { filterCommandsForRemoteMode, getCommands } from '../../../../src/commands.js'
-import type { StatsStore } from '../../../../src/context/stats.js'
+import { filterCommandsForRemoteMode, getCommands } from 'src/commands.js'
+import type { StatsStore } from 'src/context/stats.js'
 import {
   launchAssistantInstallWizard,
   launchAssistantSessionChooser,
@@ -173,15 +173,15 @@ import {
   launchSnapshotUpdateDialog,
   launchTeleportRepoMismatchDialog,
   launchTeleportResumeWrapper,
-} from '../../../../src/dialogLaunchers.js'
+} from 'src/dialogLaunchers.js'
 import {
   exitWithError,
   exitWithMessage,
   getRenderContext,
   renderAndRun,
   showSetupScreens,
-} from '../../../../src/interactiveHelpers.js'
-import { initBuiltinPlugins } from '../../../../src/plugins/bundled/index.js'
+} from 'src/interactiveHelpers.js'
+import { initBuiltinPlugins } from 'src/plugins/bundled/index.js'
 import { checkQuotaStatus } from '@claude-code/provider/claudeAiLimits.js'
 import { initBundledSkills } from '@claude-code/command-runtime/skills/bundled/index.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
@@ -192,46 +192,46 @@ import {
   isCustomAgent,
   parseAgentsFromJson,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { LogOption } from '../../../../src/types/logs.js'
-import type { Message as MessageType } from '../../../../src/types/message.js'
+import type { LogOption } from 'src/types/logs.js'
+import type { Message as MessageType } from 'src/types/message.js'
 import {
   CLAUDE_IN_CHROME_SKILL_HINT,
   CLAUDE_IN_CHROME_SKILL_HINT_WITH_WEBBROWSER,
-} from '../../../../src/utils/claudeInChrome/prompt.js'
+} from 'src/utils/claudeInChrome/prompt.js'
 import {
   setupClaudeInChrome,
   shouldAutoEnableClaudeInChrome,
   shouldEnableClaudeInChrome,
-} from '../../../../src/utils/claudeInChrome/setup.js'
-import { getContextWindowForModel } from '../../../../src/utils/context.js'
-import { loadConversationForResume } from '../../../../src/utils/conversationRecovery.js'
-import { buildDeepLinkBanner } from '../../../../src/utils/deepLink/banner.js'
+} from 'src/utils/claudeInChrome/setup.js'
+import { getContextWindowForModel } from 'src/utils/context.js'
+import { loadConversationForResume } from 'src/utils/conversationRecovery.js'
+import { buildDeepLinkBanner } from 'src/utils/deepLink/banner.js'
 import {
   hasNodeOption,
   isBareMode,
   isEnvTruthy,
   isInProtectedNamespace,
-} from '../../../../src/utils/envUtils.js'
+} from 'src/utils/envUtils.js'
 import { refreshExampleCommands } from '@claude-code/command-runtime/exampleCommands.js'
-import type { FpsMetrics } from '../../../../src/utils/fpsTracker.js'
-import { getWorktreePaths } from '../../../../src/utils/getWorktreePaths.js'
+import type { FpsMetrics } from 'src/utils/fpsTracker.js'
+import { getWorktreePaths } from 'src/utils/getWorktreePaths.js'
 import {
   findGitRoot,
   getBranch,
   getIsGit,
   getWorktreeCount,
-} from '../../../../src/utils/git.js'
-import { getGhAuthStatus } from '../../../../src/utils/github/ghAuthStatus.js'
-import { safeParseJSON } from '../../../../src/utils/json.js'
-import { logError } from '../../../../src/utils/log.js'
-import { getModelDeprecationWarning } from '../../../../src/utils/model/deprecation.js'
+} from 'src/utils/git.js'
+import { getGhAuthStatus } from 'src/utils/github/ghAuthStatus.js'
+import { safeParseJSON } from 'src/utils/json.js'
+import { logError } from 'src/utils/log.js'
+import { getModelDeprecationWarning } from 'src/utils/model/deprecation.js'
 import {
   getDefaultMainLoopModel,
   getUserSpecifiedModelSetting,
   normalizeModelStringForAPI,
   parseUserSpecifiedModel,
-} from '../../../../src/utils/model/model.js'
-import { ensureModelStringsInitialized } from '../../../../src/utils/model/modelStrings.js'
+} from 'src/utils/model/model.js'
+import { ensureModelStringsInitialized } from 'src/utils/model/modelStrings.js'
 import {
   checkAndDisableBypassPermissions,
   initializeToolPermissionContext,
@@ -242,12 +242,12 @@ import {
   stripDangerousPermissionsForAutoMode,
   verifyAutoModeGateAccess,
 } from '@claude-code/permission/permissionSetup'
-import { cleanupOrphanedPluginVersionsInBackground } from '../../../../src/utils/plugins/cacheUtils.js'
-import { initializeVersionedPlugins } from '../../../../src/utils/plugins/installedPluginsManager.js'
-import { getManagedPluginNames } from '../../../../src/utils/plugins/managedPlugins.js'
-import { getGlobExclusionsForPluginCache } from '../../../../src/utils/plugins/orphanedPluginFilter.js'
-import { getPluginSeedDirs } from '../../../../src/utils/plugins/pluginDirectories.js'
-import { countFilesRoundedRg } from '../../../../src/utils/ripgrep.js'
+import { cleanupOrphanedPluginVersionsInBackground } from 'src/utils/plugins/cacheUtils.js'
+import { initializeVersionedPlugins } from 'src/utils/plugins/installedPluginsManager.js'
+import { getManagedPluginNames } from 'src/utils/plugins/managedPlugins.js'
+import { getGlobExclusionsForPluginCache } from 'src/utils/plugins/orphanedPluginFilter.js'
+import { getPluginSeedDirs } from 'src/utils/plugins/pluginDirectories.js'
+import { countFilesRoundedRg } from 'src/utils/ripgrep.js'
 import {
   processSessionStartHooks,
   processSetupHooks,
@@ -261,66 +261,66 @@ import {
   searchSessionsByCustomTitle,
   sessionIdExists,
 } from '@claude-code/storage/sessionStorage.js'
-import { ensureMdmSettingsLoaded } from '../../../../src/utils/settings/mdm/settings.js'
+import { ensureMdmSettingsLoaded } from 'src/utils/settings/mdm/settings.js'
 import {
   getInitialSettings,
   getSettingsForSource,
   getSettingsWithErrors,
-} from '../../../../src/utils/settings/settings.js'
-import { resetSettingsCache } from '../../../../src/utils/settings/settingsCache.js'
-import type { ValidationError } from '../../../../src/utils/settings/validation.js'
+} from 'src/utils/settings/settings.js'
+import { resetSettingsCache } from 'src/utils/settings/settingsCache.js'
+import type { ValidationError } from 'src/utils/settings/validation.js'
 import {
   DEFAULT_TASKS_MODE_TASK_LIST_ID,
 } from '@claude-code/agent/tasks.js'
 import {
   logPluginLoadErrors,
   logPluginsEnabledForSession,
-} from '../../../../src/utils/telemetry/pluginTelemetry.js'
-import { logSkillsLoaded } from '../../../../src/utils/telemetry/skillLoadedEvent.js'
-import { generateTempFilePath } from '../../../../src/utils/tempfile.js'
-import { validateUuid } from '../../../../src/utils/uuid.js'
+} from 'src/utils/telemetry/pluginTelemetry.js'
+import { logSkillsLoaded } from 'src/utils/telemetry/skillLoadedEvent.js'
+import { generateTempFilePath } from 'src/utils/tempfile.js'
+import { validateUuid } from 'src/utils/uuid.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
-import { getRelevantTips } from '../../../../src/services/tips/tipRegistry.js'
-import { logContextMetrics } from '../../../../src/utils/api.js'
+import { getRelevantTips } from 'src/services/tips/tipRegistry.js'
+import { logContextMetrics } from 'src/utils/api.js'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isClaudeInChromeMCPServer,
-} from '../../../../src/utils/claudeInChrome/common.js'
-import { registerCleanup } from '../../../../src/utils/cleanupRegistry.js'
-import { eagerParseCliFlag } from '../../../../src/utils/cliArgs.js'
-import { createEmptyAttributionState } from '../../../../src/utils/commitAttribution.js'
+} from 'src/utils/claudeInChrome/common.js'
+import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { eagerParseCliFlag } from 'src/utils/cliArgs.js'
+import { createEmptyAttributionState } from 'src/utils/commitAttribution.js'
 import {
   countConcurrentSessions,
   registerSession,
   updateSessionName,
-} from '../../../../src/utils/concurrentSessions.js'
-import { getCwd } from '../../../../src/utils/cwd.js'
-import { logForDebugging, setHasFormattedOutput } from '../../../../src/utils/debug.js'
+} from 'src/utils/concurrentSessions.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { logForDebugging, setHasFormattedOutput } from 'src/utils/debug.js'
 import {
   errorMessage,
   getErrnoCode,
   isENOENT,
   TeleportOperationError,
   toError,
-} from '../../../../src/utils/errors.js'
+} from 'src/utils/errors.js'
 import {
   getFsImplementation,
   safeResolvePath,
-} from '../../../../src/utils/fsOperations.js'
+} from 'src/utils/fsOperations.js'
 import {
   gracefulShutdown,
   gracefulShutdownSync,
-} from '../../../../src/utils/gracefulShutdown.js'
-import { setAllHookEventsEnabled } from '../../../../src/utils/hooks/hookEvents.js'
-import { refreshModelCapabilities } from '../../../../src/utils/model/modelCapabilities.js'
-import { peekForStdinData, writeToStderr } from '../../../../src/utils/process.js'
-import { setCwd } from '../../../../src/utils/Shell.js'
+} from 'src/utils/gracefulShutdown.js'
+import { setAllHookEventsEnabled } from 'src/utils/hooks/hookEvents.js'
+import { refreshModelCapabilities } from 'src/utils/model/modelCapabilities.js'
+import { peekForStdinData, writeToStderr } from 'src/utils/process.js'
+import { setCwd } from 'src/utils/Shell.js'
 import {
   type ProcessedResume,
   processResumedConversation,
 } from '@claude-code/storage/sessionRestore.js'
-import { parseSettingSourcesFlag } from '../../../../src/utils/settings/constants.js'
-import { plural } from '../../../../src/utils/stringUtils.js'
+import { parseSettingSourcesFlag } from 'src/utils/settings/constants.js'
+import { plural } from 'src/utils/stringUtils.js'
 import {
   type ChannelEntry,
   getInitialMainLoopModel,
@@ -352,20 +352,20 @@ import {
   type AppState,
   getIdleSpeculationState,
 } from '../state-shim.js'
-import { asSessionId } from '../../../../src/types/ids.js'
-import { filterAllowedSdkBetas } from '../../../../src/utils/betas.js'
-import { isInBundledMode, isRunningWithBun } from '../../../../src/utils/bundledMode.js'
-import { logForDiagnosticsNoPII } from '../../../../src/utils/diagLogs.js'
+import { asSessionId } from 'src/types/ids.js'
+import { filterAllowedSdkBetas } from 'src/utils/betas.js'
+import { isInBundledMode, isRunningWithBun } from 'src/utils/bundledMode.js'
+import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import {
   filterExistingPaths,
   getKnownPathsForRepo,
-} from '../../../../src/utils/githubRepoPathMapping.js'
+} from 'src/utils/githubRepoPathMapping.js'
 import {
   clearPluginCache,
   loadAllPluginsCacheOnly,
-} from '../../../../src/utils/plugins/pluginLoader.js'
-import { migrateChangelogFromConfig } from '../../../../src/utils/releaseNotes.js'
-import { SandboxManager } from '../../../../src/utils/sandbox/sandbox-adapter.js'
+} from 'src/utils/plugins/pluginLoader.js'
+import { migrateChangelogFromConfig } from 'src/utils/releaseNotes.js'
+import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
 import { fetchSession, prepareApiRequest } from '@claude-code/teleport/api.js'
 import {
   checkOutTeleportedSessionBranch,
@@ -373,19 +373,19 @@ import {
   teleportToRemoteWithErrorHandling,
   validateGitState,
   validateSessionRepository,
-} from '../../../../src/utils/teleport.js'
+} from 'src/utils/teleport.js'
 import {
   shouldEnableThinkingByDefault,
   type ThinkingConfig,
-} from '../../../../src/utils/thinking.js'
-import { initUser, resetUserCache } from '../../../../src/utils/user.js'
+} from 'src/utils/thinking.js'
+import { initUser, resetUserCache } from 'src/utils/user.js'
 import {
   getTmuxInstallInstructions,
   isTmuxAvailable,
   parsePRReference,
 } from '@claude-code/swarm'
-import { isAnalyticsDisabled } from '../../../../src/services/privacyConfig.js'
-import { profileCheckpoint } from '../../../../src/utils/startupProfiler.js'
+import { isAnalyticsDisabled } from 'src/services/privacyConfig.js'
+import { profileCheckpoint } from 'src/utils/startupProfiler.js'
 
 // Types for closure variables passed as context
 export type PendingConnect = {

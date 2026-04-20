@@ -7,11 +7,11 @@
  */
 
 import { SHOW_CURSOR } from '@anthropic/ink'
-import { isRunningWithBun } from '../../../../src/utils/bundledMode.js'
+import { isRunningWithBun } from 'src/utils/bundledMode.js'
 import {
   getManagedSettingsKeysForLogging,
   getSettingsForSource,
-} from '../../../../src/utils/settings/settings.js'
+} from 'src/utils/settings/settings.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 
