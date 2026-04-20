@@ -4,8 +4,8 @@ import mapValues from 'lodash-es/mapValues.js'
 import memoize from 'lodash-es/memoize.js'
 import { dirname, join, parse } from 'path'
 import { getPlatform } from 'src/utils/platform.js'
-import type { PluginError } from 'src/types/plugin.js'
-import { getPluginErrorMessage } from 'src/types/plugin.js'
+import type { PluginError } from '@claude-code/config/plugin/types'
+import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
 import { isClaudeInChromeMCPServer } from 'src/utils/claudeInChrome/common.js'
 import {
   getCurrentProjectConfig,

@@ -24,7 +24,7 @@ import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitO
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
-import { getPluginErrorMessage } from 'src/types/plugin.js'
+import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
 import {
   getGcsDistTags,
   getNpmDistTags,
