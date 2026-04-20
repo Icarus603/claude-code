@@ -18,6 +18,8 @@
     "./authFileDescriptor.js": "./src/authFileDescriptor.ts",
     "./fingerprint.js": "./src/fingerprint.ts",
     "./model/bedrock.js": "./src/model/bedrock.ts",
+    "./model/modelStrings.js": "./src/model/modelStrings.ts",
+    "./model/configs.js": "./src/model/configs.ts",
     "./claudeAiLimits.js": "./src/claudeAiLimits.ts",
     "./claudeAiLimitsHook.js": "./src/claudeAiLimitsHook.ts",
     "./mockRateLimits.js": "./src/mockRateLimits.ts",
