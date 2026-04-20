@@ -25,7 +25,7 @@ import {
   executeFileSuggestionCommand,
 } from 'src/utils/hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import { ripGrep } from 'src/utils/ripgrep.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { createSignal } from '@claude-code/config/signal'

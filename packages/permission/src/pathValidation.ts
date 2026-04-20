@@ -8,7 +8,7 @@ import {
   getPathsForPermissionCheck,
   safeResolvePath,
 } from '@claude-code/storage/fsOperations.js'
-import { containsPathTraversal } from 'src/utils/path.js'
+import { containsPathTraversal } from '@claude-code/storage/path.js'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
 import { containsVulnerableUncPath } from '@claude-code/shell/legacy/readOnlyCommandValidation.js'
 import {

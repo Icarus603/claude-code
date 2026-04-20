@@ -1,6 +1,6 @@
 import { type StructuredPatchHunk, structuredPatch } from 'diff'
 import { logError } from '@claude-code/local-observability/logging'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import {
   DIFF_TIMEOUT_MS,

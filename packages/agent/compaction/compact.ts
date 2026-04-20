@@ -68,7 +68,7 @@ import {
   isCompactBoundaryMessage,
   normalizeMessagesForAPI,
 } from 'src/utils/messages.js'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import { getPlan, getPlanFilePath } from 'src/utils/plans.js'
 import {
   isSessionActivityTrackingActive,

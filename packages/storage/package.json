@@ -20,6 +20,7 @@
     "./sessionStorage.js": "./src/sessionStorage.ts",
     "./tempfile.js": "./src/tempfile.ts",
     "./lockfile.js": "./src/lockfile.ts",
-    "./fsOperations.js": "./src/fsOperations.ts"
+    "./fsOperations.js": "./src/fsOperations.ts",
+    "./path.js": "./src/path.ts"
   }
 }

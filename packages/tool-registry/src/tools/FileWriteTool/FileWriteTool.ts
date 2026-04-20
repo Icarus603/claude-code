@@ -33,7 +33,7 @@ import {
 } from 'src/utils/gitDiff.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import {
   checkWritePermissionForTool,
   matchingRuleForInput,
