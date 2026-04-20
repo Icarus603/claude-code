@@ -18,7 +18,7 @@ import {
 } from '@claude-code/config/env/_deps'
 
 import { fileSuffixForOauthConfig } from 'src/constants/oauth.js'
-import { isRunningWithBun } from 'src/utils/bundledMode.js'
+import { isRunningWithBun } from '@claude-code/config/bundledMode'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { findExecutable } from '@claude-code/shell/findExecutable.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'

@@ -12,7 +12,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   shutdownEventLoggers,
 } from '@claude-code/local-observability/compat'
-import { isInBundledMode } from 'src/utils/bundledMode.js'
+import { isInBundledMode } from '@claude-code/config/bundledMode'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import { isEnvTruthy, isInProtectedNamespace } from 'src/utils/envUtils.js'
