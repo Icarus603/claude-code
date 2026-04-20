@@ -7,7 +7,7 @@ import { getDefaultSubagentModel } from 'src/utils/model/agent.js'
 import {
   getSourceDisplayName,
   type SettingSource,
-} from 'src/utils/settings/constants.js'
+} from '@claude-code/config/constants'
 import type { AgentDefinition } from './loadAgentsDir.js'
 
 type AgentSource = SettingSource | 'built-in' | 'plugin'

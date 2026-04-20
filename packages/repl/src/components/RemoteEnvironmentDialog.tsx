@@ -9,7 +9,7 @@ import { logError } from '@claude-code/local-observability/logging'
 import {
   getSettingSourceName,
   type SettingSource,
-} from 'src/utils/settings/constants.js'
+} from '@claude-code/config/constants'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 import { getEnvironmentSelectionInfo } from '@claude-code/teleport/environmentSelection.js'
 import type { EnvironmentResource } from '@claude-code/teleport/environments.js'

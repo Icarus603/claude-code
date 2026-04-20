@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import memoize from 'lodash-es/memoize.js'
 import { basename } from 'path'
 import { isAutoMemoryEnabled } from '@claude-code/memory'
-import type { SettingSource } from 'src/utils/settings/constants.js'
+import type { SettingSource } from '@claude-code/config/constants'
 import { z } from 'zod/v4'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

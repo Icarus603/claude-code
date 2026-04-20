@@ -199,7 +199,7 @@ const usageReport: Command = {
 }
 import oauthRefresh from 'src/commands/oauth-refresh/index.js'
 import debugToolCall from 'src/commands/debug-tool-call/index.js'
-import { getSettingSourceName } from 'src/utils/settings/constants.js'
+import { getSettingSourceName } from '@claude-code/config/constants'
 import {
   type Command,
   getCommandName,

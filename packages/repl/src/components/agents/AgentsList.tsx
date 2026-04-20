@@ -1,6 +1,6 @@
 import figures from 'figures'
 import * as React from 'react'
-import type { SettingSource } from 'src/utils/settings/constants.js'
+import type { SettingSource } from '@claude-code/config/constants'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import type { ResolvedAgent } from '@claude-code/tool-registry/tools/AgentTool/agentDisplay.js'
 import {

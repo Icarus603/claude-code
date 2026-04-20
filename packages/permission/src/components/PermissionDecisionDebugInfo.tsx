@@ -15,7 +15,7 @@ import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateS
 import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
 import { detectUnreachableRules } from '@claude-code/permission/shadowedRuleDetection.js'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
-import { getSettingSourceDisplayNameLowercase } from 'src/utils/settings/constants.js'
+import { getSettingSourceDisplayNameLowercase } from '@claude-code/config/constants'
 
 type PermissionDecisionInfoItemProps = {
   title?: string
