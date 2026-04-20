@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { extraUsage as extraUsageCommand } from 'src/commands/extra-usage/index.js'
-import { formatCost } from 'src/cost-tracker.js'
+import { formatCost } from '@claude-code/provider/costTracker.js'
 import { getSubscriptionType } from '@claude-code/provider/authAlias.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'

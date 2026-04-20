@@ -5,7 +5,7 @@ import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 import { REMOTE_TRIGGER_TOOL_NAME } from '@claude-code/tool-registry/tools/RemoteTriggerTool/prompt.js'
 import { getClaudeAIOAuthTokens } from '@claude-code/provider/authAlias.js'
-import { checkRepoForRemoteAccess } from 'src/utils/background/remote/preconditions.js'
+import { checkRepoForRemoteAccess } from '@claude-code/agent/background/preconditions.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   detectCurrentRepositoryWithHost,

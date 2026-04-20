@@ -20,7 +20,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   findInProcessTeammateTaskId,
   handlePlanApprovalResponse,
-} from 'src/utils/inProcessTeammateHelpers.js'
+} from '@claude-code/agent/inProcessTeammateHelpers.js'
 import { createAssistantMessage } from '@claude-code/agent/messages.js'
 import {
   permissionModeFromString,

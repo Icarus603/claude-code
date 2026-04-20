@@ -7,7 +7,7 @@
 // endpoint (conversation_engine) for STT.
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSetVoiceState } from 'src/context/voice.js'
+import { useSetVoiceState } from '@claude-code/voice/voiceContext.js'
 import { useTerminalFocus } from '@anthropic/ink'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

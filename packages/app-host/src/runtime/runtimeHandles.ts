@@ -19,7 +19,7 @@ import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.j
 import type { AppState } from './appStateCompatShim.js'
 import { getDefaultAppState } from './appStateCompatShim.js'
 import { createHeadlessSessionStore } from '@claude-code/agent/sessionStores.js'
-import { createStore, type Store } from 'src/state/store.js'
+import { createStore, type Store } from '@claude-code/repl/stateStore.js'
 import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { LoadedPlugin, PluginError } from '@claude-code/config/plugin/types'
 import type { Command } from '@claude-code/command-runtime/runtime'

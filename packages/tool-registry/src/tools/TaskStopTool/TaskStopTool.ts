@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 import type { TaskStateBase } from '@claude-code/tool-registry/Task.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { stopTask } from 'src/tasks/stopTask.js'
+import { stopTask } from '@claude-code/agent/tasks/stopTask.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { DESCRIPTION, TASK_STOP_TOOL_NAME } from './prompt.js'

@@ -21,7 +21,7 @@ export type {
   SDKControlResponse,
 } from '@claude-code/headless-sdk/controlTypes.js'
 // Re-export core types (common serializable types)
-export * from 'src/entrypoints/sdk/coreTypes.js'
+export * from '@claude-code/headless-sdk/coreTypes.js'
 // Re-export runtime types (callbacks, interfaces with methods)
 export * from 'src/entrypoints/sdk/runtimeTypes.js'
 
@@ -39,7 +39,7 @@ import type {
   SDKResultMessage,
   SDKSessionInfo,
   SDKUserMessage,
-} from 'src/entrypoints/sdk/coreTypes.js'
+} from '@claude-code/headless-sdk/coreTypes.js'
 // Import types needed for function signatures
 import type {
   AnyZodRawShape,

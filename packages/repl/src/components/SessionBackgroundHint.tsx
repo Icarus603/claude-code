@@ -12,7 +12,7 @@ import {
 import {
   backgroundAll,
   hasForegroundTasks,
-} from 'src/tasks/LocalShellTask/LocalShellTask.js'
+} from '@claude-code/agent/tasks/LocalShellTask.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from '@claude-code/config/env/paths'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

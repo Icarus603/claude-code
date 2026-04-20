@@ -7,7 +7,7 @@ import {
 } from '@anthropic-ai/sdk'
 import type { QuerySource } from '@claude-code/agent/querySource'
 import type { SystemAPIErrorMessage } from '@claude-code/agent/messageShapes'
-import { isAwsCredentialsProviderError } from 'src/utils/aws.js'
+import { isAwsCredentialsProviderError } from '@claude-code/provider/aws.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { createSystemAPIErrorMessage } from '@claude-code/agent/messages.js'

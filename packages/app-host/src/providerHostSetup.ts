@@ -37,7 +37,7 @@ import {
   getVertexRegionForModel,
   isEnvTruthy,
 } from '@claude-code/config/env/utils'
-import { addToTotalSessionCost } from 'src/cost-tracker.js'
+import { addToTotalSessionCost } from '@claude-code/provider/costTracker.js'
 
 const anthropicQueryBinding: NonNullable<
   ProviderHostBindings['anthropic']['query']

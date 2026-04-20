@@ -83,6 +83,7 @@
     "./taskOutput.js": "./src/taskOutput.ts",
     "./peerAddress.js": "./src/peerAddress.ts",
     "./claudeCodeHints.js": "./src/claudeCodeHints.ts",
-    "./markdownConfigLoader.js": "./src/markdownConfigLoader.ts"
+    "./markdownConfigLoader.js": "./src/markdownConfigLoader.ts",
+    "./toolsList.js": "./src/toolsList.ts"
   }
 }

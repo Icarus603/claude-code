@@ -6,7 +6,7 @@ import { getOriginalCwd, switchSession } from '@claude-code/app-host/bootstrap/s
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { LogSelector } from '@claude-code/repl/components/LogSelector.js'
 import { Spinner } from '@claude-code/repl/components/Spinner.js'
-import { restoreCostStateForSession } from 'src/cost-tracker.js'
+import { restoreCostStateForSession } from '@claude-code/provider/costTracker.js'
 import { setClipboard } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
