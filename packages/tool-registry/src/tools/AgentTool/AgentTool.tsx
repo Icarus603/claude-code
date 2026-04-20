@@ -71,7 +71,7 @@ import {
 import { enqueueSdkEvent } from '@claude-code/agent/sdkEventQueue.js'
 import { writeAgentMetadata } from '@claude-code/storage/sessionStorage.js'
 import { sleep } from '@claude-code/config/sleep'
-import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js'
+import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import { getParentSessionId, isTeammate } from '@claude-code/swarm/teammateState.js'

@@ -134,7 +134,7 @@ import { useSkillImprovementSurvey } from '@claude-code/repl/hooks/useSkillImpro
 import { useMoreRight } from 'src/moreright/useMoreRight.js';
 import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '@claude-code/repl/components/Spinner.js';
 import { getSystemPrompt } from '@claude-code/agent/prompts.js';
-import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js';
+import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js';
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
 import { getMemoryFiles } from '@claude-code/storage/claudemd.js';
 import { startBackgroundHousekeeping } from 'src/utils/backgroundHousekeeping.js';

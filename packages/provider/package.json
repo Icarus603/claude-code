@@ -66,6 +66,7 @@
     "./workloadContext.js": "./src/workloadContext.ts",
     "./thinking.js": "./src/thinking.ts",
     "./modelOptions.js": "./src/modelOptions.ts",
-    "./validateModel.js": "./src/validateModel.ts"
+    "./validateModel.js": "./src/validateModel.ts",
+    "./systemPrompt.js": "./src/systemPrompt.ts"
   }
 }

@@ -22,7 +22,7 @@ import {
   getAgentTranscript,
   readAgentMetadata,
 } from '@claude-code/storage/sessionStorage.js'
-import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js'
+import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js'
 import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import { getParentSessionId } from '@claude-code/swarm/teammateState.js'
