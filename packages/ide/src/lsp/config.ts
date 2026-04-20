@@ -1,4 +1,4 @@
-import type { PluginError } from 'src/types/plugin.js'
+import type { PluginError } from '@claude-code/config/plugin/types'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'

@@ -21,7 +21,7 @@ import { loadPluginMcpServers } from 'src/utils/plugins/mcpPluginIntegration.js'
 import { detectAndUninstallDelistedPlugins } from 'src/utils/plugins/pluginBlocklist.js'
 import { getFlaggedPlugins } from 'src/utils/plugins/pluginFlagging.js'
 import { loadAllPlugins } from 'src/utils/plugins/pluginLoader.js'
-import type { PluginLoadResult } from 'src/types/plugin.js'
+import type { PluginLoadResult } from '@claude-code/config/plugin/types'
 
 /**
  * Hook to manage plugin state and synchronize with AppState.
