@@ -25,7 +25,7 @@ import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { clearAllCaches } from '@claude-code/config/plugin/cacheUtils'
-import { getInstallCounts } from 'src/utils/plugins/installCounts.js'
+import { getInstallCounts } from '@claude-code/config/plugin/installCounts'
 import {
   isPluginInstalled,
   loadInstalledPluginsV2,
@@ -33,7 +33,7 @@ import {
 import {
   createPluginId,
   loadMarketplacesWithGracefulDegradation,
-} from 'src/utils/plugins/marketplaceHelpers.js'
+} from '@claude-code/config/plugin/marketplaceHelpers'
 import {
   addMarketplaceSource,
   loadKnownMarketplacesConfig,
@@ -43,18 +43,18 @@ import {
   saveMarketplaceToSettings,
 } from '@claude-code/config/plugin/marketplaceManager'
 import { loadPluginMcpServers } from '@claude-code/config/plugin/mcpPluginIntegration'
-import { parseMarketplaceInput } from 'src/utils/plugins/parseMarketplaceInput.js'
+import { parseMarketplaceInput } from '@claude-code/config/plugin/parseMarketplaceInput'
 import {
   parsePluginIdentifier,
   scopeToSettingSource,
 } from '@claude-code/config/plugin/pluginIdentifier'
 import { loadAllPlugins } from '@claude-code/config/plugin/pluginLoader'
-import type { PluginSource } from 'src/utils/plugins/schemas.js'
+import type { PluginSource } from '@claude-code/config/plugin/schemas'
 import {
   type ValidationResult,
   validateManifest,
   validatePluginContents,
-} from 'src/utils/plugins/validatePlugin.js'
+} from '@claude-code/config/plugin/validatePlugin'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { cliError, cliOk } from '../exit.js'
