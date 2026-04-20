@@ -9,7 +9,7 @@ import {
 import {
   enterTeammateView,
   exitTeammateView,
-} from 'src/state/teammateViewHelpers.js'
+} from '@claude-code/repl/teammateViewHelpers.js'
 import {
   getRunningTeammatesSorted,
   InProcessTeammateTask,

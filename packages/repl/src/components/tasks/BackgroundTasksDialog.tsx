@@ -19,7 +19,7 @@ import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,
-} from 'src/state/teammateViewHelpers.js'
+} from '@claude-code/repl/teammateViewHelpers.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import {
   DreamTask,

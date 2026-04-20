@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import { exitTeammateView } from 'src/state/teammateViewHelpers.js'
+import { exitTeammateView } from '@claude-code/repl/teammateViewHelpers.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 
 /**
