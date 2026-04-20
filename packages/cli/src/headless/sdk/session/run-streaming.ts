@@ -214,7 +214,7 @@ import {
   logSuggestionOutcome,
   logSuggestionSuppressed,
   type PromptVariant,
-} from 'src/services/PromptSuggestion/promptSuggestion.js'
+} from '@claude-code/repl/promptSuggestion.js'
 import { getLastCacheSafeParams } from 'src/utils/forkedAgent.js'
 import { getAccountInformation } from '@claude-code/provider/authAlias.js'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'

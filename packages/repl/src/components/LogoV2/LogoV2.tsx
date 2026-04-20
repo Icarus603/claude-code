@@ -35,7 +35,7 @@ import {
   getSteps,
   shouldShowProjectOnboarding,
   incrementProjectOnboardingSeenCount,
-} from 'src/projectOnboardingState.js'
+} from '@claude-code/repl/projectOnboardingState.js'
 import { CondensedLogo } from './CondensedLogo.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
 import { checkForReleaseNotesSync } from 'src/utils/releaseNotes.js'

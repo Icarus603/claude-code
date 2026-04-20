@@ -17,7 +17,7 @@ import {
   PromptOverlayProvider,
   usePromptOverlay,
   usePromptOverlayDialog,
-} from 'src/context/promptOverlayContext.js'
+} from '@claude-code/repl/promptOverlayContext.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, ScrollBox, type ScrollBoxHandle, Text, instances } from '@anthropic/ink'
 import type { Message } from '@claude-code/agent/messageShapes'

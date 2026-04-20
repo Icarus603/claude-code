@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { extraUsage } from 'src/commands/extra-usage/index.js'
+import { extraUsage } from '@claude-code/repl/extraUsage.js'
 import { Box, Text } from '@anthropic/ink'
 import { useClaudeAiLimits } from '@claude-code/provider/claudeAiLimitsHook.js'
 import { shouldProcessMockLimits } from '@claude-code/provider/rateLimitMocking.js' // Used for /mock-limits command

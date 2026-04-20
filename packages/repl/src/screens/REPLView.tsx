@@ -257,7 +257,7 @@ import { Messages } from '@claude-code/repl/components/Messages.js';
 import { TaskListV2 } from '@claude-code/repl/components/TaskListV2.js';
 import { TeammateViewHeader } from '@claude-code/repl/components/TeammateViewHeader.js';
 import { useTasksV2WithCollapseEffect } from '@claude-code/repl/hooks/useTasksV2.js';
-import { maybeMarkProjectOnboardingComplete } from 'src/projectOnboardingState.js';
+import { maybeMarkProjectOnboardingComplete } from '@claude-code/repl/projectOnboardingState.js';
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js';
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js';
 import { randomUUID, type UUID } from 'crypto';
@@ -363,7 +363,7 @@ import { SessionBackgroundHint } from '@claude-code/repl/components/SessionBackg
 import { startBackgroundSession } from '@claude-code/agent/tasks/LocalMainSessionTask.js';
 import { useSessionBackgrounding } from '@claude-code/repl/hooks/useSessionBackgrounding.js';
 import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking.js';
-import { handleSpeculationAccept, type ActiveSpeculationState } from 'src/services/PromptSuggestion/speculation.js';
+import { handleSpeculationAccept, type ActiveSpeculationState } from '@claude-code/repl/promptSuggestionSpeculation.js';
 import { IdeOnboardingDialog } from '@claude-code/repl/components/IdeOnboardingDialog.js';
 import { EffortCallout, shouldShowEffortCallout } from '@claude-code/repl/components/EffortCallout.js';
 import type { EffortValue } from '@claude-code/agent/effort.js';
