@@ -17,7 +17,7 @@ import {
   toolMatchesName,
 } from '@claude-code/tool-registry/Tool.js'
 import { formatAgentId, generateRequestId } from '@claude-code/agent/agentIdUtils'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {
   findInProcessTeammateTaskId,

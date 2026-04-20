@@ -90,7 +90,7 @@ import type {
   CommandResultDisplay,
 } from '@claude-code/command-runtime/runtime'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   getCliTeammateModeOverride,
   clearCliTeammateModeOverride,

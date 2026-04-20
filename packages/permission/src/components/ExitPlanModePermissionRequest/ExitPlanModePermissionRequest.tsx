@@ -35,7 +35,7 @@ import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/cons
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
 import type { AllowedPrompt } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
 import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCreateTool/constants.js'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   calculateContextPercentages,
   getContextWindowForModel,

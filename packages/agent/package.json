@@ -39,7 +39,8 @@
     "./messageQueueTypes": "./messageQueueTypes.ts",
     "./querySource": "./querySource.ts",
     "./agentIdUtils": "./agentIdUtils.ts",
-    "./tokenBudget": "./tokenBudget.ts"
+    "./tokenBudget": "./tokenBudget.ts",
+    "./agentSwarmsEnabled.js": "./agentSwarmsEnabled.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
