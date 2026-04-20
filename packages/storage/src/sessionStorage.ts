@@ -64,7 +64,7 @@ import type {
 } from '@claude-code/agent/messageShapes'
 import type { QueueOperationMessage } from '@claude-code/agent/messageQueueTypes'
 import { uniq } from '@claude-code/tool-registry/utils/array.js'
-import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { updateSessionName } from 'src/utils/concurrentSessions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'

@@ -66,7 +66,7 @@ import {
   getSessionId,
 } from '../bootstrap/state.js'
 import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
-import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'

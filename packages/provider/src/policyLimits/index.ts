@@ -27,7 +27,7 @@ import {
   getAnthropicApiKeyWithSource,
   getClaudeAIOAuthTokens,
 } from 'src/utils/auth.js'
-import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { classifyAxiosError } from '@claude-code/local-observability/errorHelpers.js'

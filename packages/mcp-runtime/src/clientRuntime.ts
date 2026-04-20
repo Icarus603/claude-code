@@ -56,7 +56,7 @@ import { createMcpAuthTool } from '@claude-code/tool-registry/tools/McpAuthTool/
 import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
-import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { detectCodeIndexingFromMcpServerName } from 'src/utils/codeIndexing.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
