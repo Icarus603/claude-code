@@ -5,7 +5,7 @@
 import { z } from 'zod/v4'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
 const NAME = 'TestingPermission'
 

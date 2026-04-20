@@ -21,7 +21,7 @@ import {
 } from 'src/utils/effort.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { parsePositiveIntFromFrontmatter } from 'src/utils/frontmatterParser.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
 import {
   loadMarkdownFilesForSubdir,

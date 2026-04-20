@@ -6,7 +6,7 @@ import type {
   MCPServerConnection,
 } from '@claude-code/mcp-runtime/types.js'
 import { getConnectedIdeClient } from '@claude-code/ide/ide.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 export type IDEAtMentioned = {
   filePath: string
   lineStart?: number

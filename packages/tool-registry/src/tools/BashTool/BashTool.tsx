@@ -54,7 +54,7 @@ import {
 } from 'src/utils/fileHistory.js'
 import { truncate } from 'src/utils/format.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { expandPath } from 'src/utils/path.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { maybeRecordPluginHint } from 'src/utils/plugins/hintRecommendation.js'

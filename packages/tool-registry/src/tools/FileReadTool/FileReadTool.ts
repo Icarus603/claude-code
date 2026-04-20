@@ -48,7 +48,7 @@ import {
   ImageResizeError,
   maybeResizeAndDownsampleImageBuffer,
 } from 'src/utils/imageResizer.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
 import { isAutoMemFile } from 'src/utils/memoryFileDetection.js'
 import { createUserMessage } from 'src/utils/messages.js'

@@ -9,7 +9,7 @@ import {
   listAllCronTasks,
   nextCronRunMs,
 } from 'src/utils/cronTasks.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { semanticBoolean } from 'src/utils/semanticBoolean.js'
 import { getTeammateContext } from 'src/utils/teammateContext.js'
 import {

@@ -1,6 +1,6 @@
 import { logForDebugging } from 'src/utils/debug.js'
 import { z } from 'zod/v4'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,

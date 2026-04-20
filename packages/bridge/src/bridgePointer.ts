@@ -4,7 +4,7 @@ import { z } from 'zod/v4'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isENOENT } from 'src/utils/errors.js'
 import { getWorktreePathsPortable } from 'src/utils/getWorktreePathsPortable.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   getProjectsDir,
   sanitizePath,

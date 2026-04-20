@@ -22,7 +22,7 @@ import {
 } from '@modelcontextprotocol/sdk/client/auth.js'
 import type { FetchLike } from '@modelcontextprotocol/sdk/shared/transport.js'
 import { z } from 'zod/v4'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logMCPDebug } from 'src/utils/log.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 
