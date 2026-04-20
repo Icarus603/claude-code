@@ -287,7 +287,7 @@ import {
   isClaudeInChromeMCPServer,
 } from 'src/utils/claudeInChrome/common.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
-import { eagerParseCliFlag } from 'src/utils/cliArgs.js'
+import { eagerParseCliFlag } from '@claude-code/app-host/cliArgs.js'
 import { createEmptyAttributionState } from 'src/utils/commitAttribution.js'
 import {
   countConcurrentSessions,
