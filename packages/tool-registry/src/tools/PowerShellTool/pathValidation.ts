@@ -35,11 +35,11 @@ import { getPlatform } from '@claude-code/config/platform'
 import type {
   ParsedCommandElement,
   ParsedPowerShellCommand,
-} from 'src/utils/powershell/parser.js'
+} from '@claude-code/shell/powershell/parser.js'
 import {
   isNullRedirectionTarget,
   isPowerShellParameter,
-} from 'src/utils/powershell/parser.js'
+} from '@claude-code/shell/powershell/parser.js'
 import { COMMON_SWITCHES, COMMON_VALUE_PARAMS } from './commonParameters.js'
 import { resolveToCanonical } from './readOnlyValidation.js'
 

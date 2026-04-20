@@ -16,7 +16,7 @@ import {
 import type {
   ParsedCommandElement,
   ParsedPowerShellCommand,
-} from 'src/utils/powershell/parser.js'
+} from '@claude-code/shell/powershell/parser.js'
 import {
   COMMON_ALIASES,
   commandHasArgAbbreviation,
@@ -24,7 +24,7 @@ import {
   getAllCommands,
   getVariablesByScope,
   hasCommandNamed,
-} from 'src/utils/powershell/parser.js'
+} from '@claude-code/shell/powershell/parser.js'
 import { isClmAllowedType } from './clmTypes.js'
 
 type PowerShellSecurityResult = {
