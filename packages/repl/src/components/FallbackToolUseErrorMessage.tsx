@@ -2,7 +2,7 @@ import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages/
 import * as React from 'react'
 import { stripUnderlineAnsi } from './shell/OutputLine.js'
 import { extractTag } from '@claude-code/agent/messages.js'
-import { removeSandboxViolationTags } from 'src/utils/sandbox/sandbox-ui-utils.js'
+import { removeSandboxViolationTags } from '@claude-code/shell/sandboxUiUtils.js'
 import { Box, Text } from '@anthropic/ink'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'

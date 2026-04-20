@@ -20,6 +20,7 @@
     "./fileOperationAnalytics": "./src/fileOperationAnalytics.ts",
     "./debug.js": "./src/debug.ts",
     "./telemetryEvents.js": "./src/telemetryEvents.ts",
-    "./sentry.js": "./src/sentry.ts"
+    "./sentry.js": "./src/sentry.ts",
+    "./betaSessionTracing.js": "./src/betaSessionTracing.ts"
   }
 }

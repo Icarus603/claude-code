@@ -53,7 +53,7 @@ import {
   buildTranscriptForClassifier,
   classifyYoloAction,
 } from '@claude-code/permission/yoloClassifier.js'
-import { emitTaskProgress as emitTaskProgressEvent } from 'src/utils/task/sdkProgress.js'
+import { emitTaskProgress as emitTaskProgressEvent } from '@claude-code/agent/sdkProgress.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
 import { getTokenCountFromUsage } from '@claude-code/agent/tokens.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'

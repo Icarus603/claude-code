@@ -8,7 +8,7 @@ import {
   suggestPathUnderCwd,
 } from '@claude-code/storage/file.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { glob } from 'src/utils/glob.js'
+import { glob } from '@claude-code/storage/glob.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { expandPath, toRelativePath } from '@claude-code/storage/path.js'
 import { checkReadPermissionForTool } from '@claude-code/permission/filesystem'

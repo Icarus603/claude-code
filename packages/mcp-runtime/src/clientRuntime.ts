@@ -256,7 +256,7 @@ function getMcpToolTimeoutMs(): number {
   )
 }
 
-import { isClaudeInChromeMCPServer } from 'src/utils/claudeInChrome/common.js'
+import { isClaudeInChromeMCPServer } from '@claude-code/agent/claudeInChromeCommon.js'
 
 // Lazy: toolRendering.tsx pulls React/ink; only needed when Claude-in-Chrome MCP server is connected
 /* eslint-disable @typescript-eslint/no-require-imports */

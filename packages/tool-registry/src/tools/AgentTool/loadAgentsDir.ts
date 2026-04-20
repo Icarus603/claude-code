@@ -35,7 +35,7 @@ import {
 import {
   clearPluginAgentCache,
   loadPluginAgents,
-} from 'src/utils/plugins/loadPluginAgents.js'
+} from '@claude-code/config/plugin/loadPluginAgentsAlias.js'
 import { HooksSchema, type HooksSettings } from '@claude-code/config/types'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'

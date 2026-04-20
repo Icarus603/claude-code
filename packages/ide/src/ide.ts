@@ -23,7 +23,7 @@ import {
 } from '@claude-code/shell/execFileNoThrow.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getAncestorPidsAsync } from '@claude-code/shell/genericProcessUtils.js'
-import { isJetBrainsPluginInstalledCached } from 'src/utils/jetbrains.js'
+import { isJetBrainsPluginInstalledCached } from '@claude-code/agent/jetbrains.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPlatform } from '@claude-code/config/platform'
 import { lt } from '@claude-code/config/semver'

@@ -11,7 +11,7 @@ import type { PermissionMode } from '@claude-code/permission/permissionTypes'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isTrackedClaudeInChromeTabId,
-} from 'src/utils/claudeInChrome/common.js'
+} from '@claude-code/agent/claudeInChromeCommon.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
 

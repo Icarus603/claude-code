@@ -120,6 +120,8 @@
     "./embeddedTools.js": "./embeddedTools.ts",
     "./commonConstants.js": "./commonConstants.ts",
     "./configConstants.js": "./configConstants.ts",
-    "./memoize.js": "./memoize.ts"
+    "./memoize.js": "./memoize.ts",
+    "./plugin/loadPluginAgentsAlias.js": "./plugin/loadPluginAgentsAlias.ts",
+    "./managedEnv.js": "./managedEnv.ts"
   }
 }

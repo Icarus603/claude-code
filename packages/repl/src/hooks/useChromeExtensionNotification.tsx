@@ -4,7 +4,7 @@ import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 import {
   isChromeExtensionInstalled,
   shouldEnableClaudeInChrome,
-} from 'src/utils/claudeInChrome/setup.js'
+} from '@claude-code/agent/claudeInChromeSetup.js'
 import { isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { useStartupNotification } from './notifs/useStartupNotification.js'
 

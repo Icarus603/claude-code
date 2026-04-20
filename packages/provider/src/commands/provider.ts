@@ -3,7 +3,7 @@ import type { LocalCommandCall } from '@claude-code/agent/command.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
-import { applyConfigEnvironmentVariables } from 'src/utils/managedEnv.js'
+import { applyConfigEnvironmentVariables } from '@claude-code/config/managedEnv.js'
 import { deleteEnv, getAllEnv, readEnv, setEnv } from '@claude-code/config/env'
 
 function getEnvVarForProvider(provider: string): string {

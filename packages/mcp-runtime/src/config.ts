@@ -6,7 +6,7 @@ import { dirname, join, parse } from 'path'
 import { getPlatform } from '@claude-code/config/platform'
 import type { PluginError } from '@claude-code/config/plugin/types'
 import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
-import { isClaudeInChromeMCPServer } from 'src/utils/claudeInChrome/common.js'
+import { isClaudeInChromeMCPServer } from '@claude-code/agent/claudeInChromeCommon.js'
 import {
   getCurrentProjectConfig,
   getGlobalConfig,

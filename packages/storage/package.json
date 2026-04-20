@@ -38,6 +38,8 @@
     "./getWorktreePathsPortable.js": "./src/getWorktreePathsPortable.ts",
     "./getWorktreePaths.js": "./src/getWorktreePaths.ts",
     "./detectRepository.js": "./src/detectRepository.ts",
-    "./sessionStoragePortable.js": "./src/sessionStoragePortable.ts"
+    "./sessionStoragePortable.js": "./src/sessionStoragePortable.ts",
+    "./pdfUtils.js": "./src/pdfUtils.ts",
+    "./glob.js": "./src/glob.ts"
   }
 }

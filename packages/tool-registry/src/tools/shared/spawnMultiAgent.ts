@@ -65,7 +65,7 @@ import {
   sendCommandToPane,
 } from '@claude-code/swarm'
 import { getHardcodedTeammateModelFallback } from '@claude-code/swarm'
-import { registerTask } from 'src/utils/task/framework.js'
+import { registerTask } from '@claude-code/agent/taskFramework.js'
 import { writeToMailbox } from '@claude-code/swarm'
 import type { CustomAgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { isCustomAgent } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'

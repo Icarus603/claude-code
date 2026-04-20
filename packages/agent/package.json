@@ -71,7 +71,15 @@
     "./sessionTitle.js": "./sessionTitle.ts",
     "./messageQueueManager.js": "./messageQueueManager.ts",
     "./commitAttribution.js": "./commitAttribution.ts",
-    "./messagesMappers.js": "./messagesMappers.ts"
+    "./messagesMappers.js": "./messagesMappers.ts",
+    "./sdkProgress.js": "./sdkProgress.ts",
+    "./taskFramework.js": "./taskFramework.ts",
+    "./taggedId.js": "./taggedId.ts",
+    "./sessionFileAccessHooks.js": "./sessionFileAccessHooks.ts",
+    "./jetbrains.js": "./jetbrains.ts",
+    "./hooksConfigSnapshot.js": "./hooksConfigSnapshot.ts",
+    "./claudeInChromeSetup.js": "./claudeInChromeSetup.ts",
+    "./claudeInChromeCommon.js": "./claudeInChromeCommon.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
