@@ -6,7 +6,7 @@ import {
   isClaudeAISubscriber,
 } from 'src/utils/auth.js'
 import { getAuthHeaders } from 'src/utils/http.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 import { isOAuthTokenExpired } from '@claude-code/provider/oauth/client.js'
 
 export type RateLimit = {

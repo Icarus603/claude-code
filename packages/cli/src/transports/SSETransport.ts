@@ -6,7 +6,7 @@ import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getSessionIngressAuthHeaders } from 'src/utils/sessionIngressAuth.js'
 import { sleep } from 'src/utils/sleep.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 import type { Transport } from './Transport.js'
 
 // ---------------------------------------------------------------------------

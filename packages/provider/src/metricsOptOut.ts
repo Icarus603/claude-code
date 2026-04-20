@@ -7,7 +7,7 @@ import { getAuthHeaders, withOAuth401Retry } from 'src/utils/http.js'
 import { logError } from 'src/utils/log.js'
 import { memoizeWithTTLAsync } from 'src/utils/memoize.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 
 type MetricsEnabledResponse = {
   metrics_logging_enabled: boolean

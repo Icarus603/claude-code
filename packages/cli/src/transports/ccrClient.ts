@@ -21,7 +21,7 @@ import type {
   SessionState,
 } from '@claude-code/storage/sessionState.js'
 import { sleep } from 'src/utils/sleep.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 import {
   RetryableError,
   SerialBatchEventUploader,
