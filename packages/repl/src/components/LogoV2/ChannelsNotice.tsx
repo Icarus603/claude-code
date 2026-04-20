@@ -18,7 +18,7 @@ import { getMcpConfigsByScope } from '@claude-code/mcp-runtime/config.js'
 import {
   getClaudeAIOAuthTokens,
   getSubscriptionType,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { loadInstalledPluginsV2 } from '@claude-code/config/plugin/installedPluginsManager'
 import { getSettingsForSource } from '@claude-code/config/settings'
 

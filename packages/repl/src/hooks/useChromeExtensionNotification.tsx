@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text } from '@anthropic/ink'
-import { isClaudeAISubscriber } from 'src/utils/auth.js'
+import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 import {
   isChromeExtensionInstalled,
   shouldEnableClaudeInChrome,

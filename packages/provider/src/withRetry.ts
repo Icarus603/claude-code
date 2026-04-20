@@ -20,7 +20,7 @@ import {
   handleOAuth401Error,
   isClaudeAISubscriber,
   isEnterpriseSubscriber,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {

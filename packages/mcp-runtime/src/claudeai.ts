@@ -5,7 +5,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
+import { getClaudeAIOAuthTokens } from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy } from '@claude-code/config/env/utils'

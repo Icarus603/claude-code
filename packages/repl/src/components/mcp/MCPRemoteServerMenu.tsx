@@ -30,7 +30,7 @@ import {
   filterMcpPromptsByServer,
 } from '@claude-code/mcp-runtime/utils.js'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import { getOauthAccountInfo } from 'src/utils/auth.js'
+import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
 import { openBrowser } from 'src/utils/browser.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logMCPDebug } from '@claude-code/local-observability/logging'

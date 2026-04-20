@@ -26,7 +26,7 @@ import {
   checkAndRefreshOAuthTokenIfNeeded,
   getAnthropicApiKeyWithSource,
   getClaudeAIOAuthTokens,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'

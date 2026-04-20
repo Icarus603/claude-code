@@ -11,7 +11,7 @@ import {
   isClaudeAISubscriber,
   refreshAndGetAwsCredentials,
   refreshGcpCredentialsIfNeeded,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import {
   createAxiosInstance,
   getProxyFetchOptions,

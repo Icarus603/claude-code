@@ -7,7 +7,7 @@ import {
   getRateLimitTier,
   getSubscriptionType,
   isClaudeAISubscriber,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { hasClaudeAiBillingAccess } from 'src/utils/billing.js'
 import { MessageResponse } from '../MessageResponse.js'
 

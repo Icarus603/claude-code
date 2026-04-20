@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { readFile, stat } from 'fs/promises'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { checkAndRefreshOAuthTokenIfNeeded } from 'src/utils/auth.js'
+import { checkAndRefreshOAuthTokenIfNeeded } from '@claude-code/provider/authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getAuthHeaders, getUserAgent } from 'src/utils/http.js'

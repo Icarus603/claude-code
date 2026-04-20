@@ -15,7 +15,7 @@ import { logEvent } from '@claude-code/local-observability'
 import { MCPConnectionManager } from 'src/services/mcp/MCPConnectionManager.js'
 import { AppStateProvider } from '../appStateShim.js'
 import { onChangeAppState } from 'src/state/onChangeAppState.js'
-import { isAnthropicAuthEnabled } from 'src/utils/auth.js'
+import { isAnthropicAuthEnabled } from '@claude-code/provider/authAlias.js'
 
 export async function setupTokenHandler(root: Root): Promise<void> {
   logEvent('tengu_setup_token_command', {})

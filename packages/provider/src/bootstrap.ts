@@ -4,7 +4,7 @@ import {
   getAnthropicApiKey,
   getClaudeAIOAuthTokens,
   hasProfileScope,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { z } from 'zod'
 import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

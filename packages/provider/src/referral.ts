@@ -4,7 +4,7 @@ import {
   getOauthAccountInfo,
   getSubscriptionType,
   isClaudeAISubscriber,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'

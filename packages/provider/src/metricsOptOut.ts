@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { hasProfileScope, isClaudeAISubscriber } from 'src/utils/auth.js'
+import { hasProfileScope, isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'

@@ -159,7 +159,7 @@ import {
 } from './auth.js'
 import { markClaudeAiMcpConnected } from './claudeai.js'
 import { getAllMcpConfigs, isMcpServerDisabled } from './config.js'
-import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
+import { getClaudeAIOAuthTokens } from '@claude-code/provider/authAlias.js'
 import { getMcpServerHeaders } from './headersHelper.js'
 import { SdkControlClientTransport } from './SdkControlTransport.js'
 import type {

@@ -22,7 +22,7 @@ import {
   getApiKeyHelperElapsedMs,
   getConfiguredApiKeyHelper,
   getSubscriptionType,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { getExternalEditor } from 'src/utils/editor.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

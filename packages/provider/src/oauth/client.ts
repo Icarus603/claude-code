@@ -16,7 +16,7 @@ import {
   hasProfileScope,
   isClaudeAISubscriber,
   saveApiKey,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import type { AccountInfo } from '@claude-code/config'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

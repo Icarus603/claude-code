@@ -74,7 +74,7 @@ import {
   getClaudeAIOAuthTokens,
   getOauthAccountInfo,
   isClaudeAISubscriber,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import {
   createAssistantAPIErrorMessage,
   NO_RESPONSE_REQUESTED,

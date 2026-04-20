@@ -4,7 +4,7 @@ import {
   isMaxSubscriber,
   isProSubscriber,
   isTeamSubscriber,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import type { EffortLevel } from 'src/utils/effort.js'
 import {

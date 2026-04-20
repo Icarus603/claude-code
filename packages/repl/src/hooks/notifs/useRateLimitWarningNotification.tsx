@@ -7,7 +7,7 @@ import {
   getUsingOverageText,
 } from '@claude-code/provider/claudeAiLimits.js'
 import { useClaudeAiLimits } from '@claude-code/provider/claudeAiLimitsHook.js'
-import { getSubscriptionType } from 'src/utils/auth.js'
+import { getSubscriptionType } from '@claude-code/provider/authAlias.js'
 import { hasClaudeAiBillingAccess } from 'src/utils/billing.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 

@@ -5,7 +5,7 @@ import { GREP_TOOL_NAME } from '@claude-code/tool-registry/tools/GrepTool/prompt
 import { SEND_MESSAGE_TOOL_NAME } from '@claude-code/tool-registry/tools/SendMessageTool/constants.js'
 import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTool/prompt.js'
 import { WEB_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebSearchTool/prompt.js'
-import { isUsing3PServices } from 'src/utils/auth.js'
+import { isUsing3PServices } from '@claude-code/provider/authAlias.js'
 import { hasEmbeddedSearchTools } from '@claude-code/config/embeddedTools.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'

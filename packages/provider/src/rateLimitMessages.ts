@@ -7,7 +7,7 @@ import {
   getOauthAccountInfo,
   getSubscriptionType,
   isOverageProvisioningAllowed,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { hasClaudeAiBillingAccess } from 'src/utils/billing.js'
 import { formatResetTime } from '@claude-code/output/formatters'
 import type { ClaudeAILimits } from './claudeAiLimits.js'
