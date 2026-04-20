@@ -18,7 +18,7 @@ import {
 } from 'src/services/remoteManagedSettings/index.js'
 import { preconnectAnthropicApi } from 'src/utils/apiPreconnect.js'
 import { applyExtraCACertsFromConfig } from 'src/utils/caCertsConfig.js'
-import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { enableConfigs, recordFirstStartTime } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
 import { detectCurrentRepository } from 'src/utils/detectRepository.js'
