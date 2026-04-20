@@ -18,7 +18,7 @@ import { archiveRemoteSession } from 'src/utils/teleport.js';
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js';
 import { toRelativePath } from 'src/utils/path.js';
 import type { UUID } from 'src/utils/uuid.js';
-import type { FileStateCache } from 'src/utils/fileStateCache.js';
+import type { FileStateCache } from '@claude-code/tool-registry/fileStateCache';
 
 /** Maximum visible lines for the plan preview. */
 const MAX_VISIBLE_LINES = 24;
