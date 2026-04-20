@@ -37,7 +37,7 @@ import {
 import {
   type DiagnosticInfo,
   getDoctorDiagnostic,
-} from 'src/utils/doctorDiagnostic.js'
+} from '@claude-code/repl/doctorDiagnostic.js'
 import { validateBoundedIntEnvVar } from '@claude-code/config/env/validation'
 import { pathExists } from '@claude-code/storage/file.js'
 import {

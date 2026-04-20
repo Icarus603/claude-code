@@ -446,6 +446,9 @@
     "./appStateHooks.js": "./src/appStateHooks.ts",
     "./notifications.js": "./src/notifications.ts",
     "./promptEditor.js": "./src/promptEditor.ts",
-    "./fullscreen.js": "./src/fullscreen.ts"
+    "./fullscreen.js": "./src/fullscreen.ts",
+    "./fastMode.js": "./src/fastMode.ts",
+    "./doctorDiagnostic.js": "./src/doctorDiagnostic.ts",
+    "./imagePaste.js": "./src/imagePaste.ts"
   }
 }

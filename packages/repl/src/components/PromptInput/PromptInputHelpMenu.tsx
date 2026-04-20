@@ -5,7 +5,7 @@ import { getPlatform } from '@claude-code/config/platform'
 import { isKeybindingCustomizationEnabled } from '@claude-code/repl/keybindings/loadUserBindings.js'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { isFastModeAvailable, isFastModeEnabled } from 'src/utils/fastMode.js'
+import { isFastModeAvailable, isFastModeEnabled } from '@claude-code/repl/fastMode.js'
 import { getNewlineInstructions } from './utils.js'
 
 /** Format a shortcut for display in the help menu (e.g., "ctrl+o" → "ctrl + o") */

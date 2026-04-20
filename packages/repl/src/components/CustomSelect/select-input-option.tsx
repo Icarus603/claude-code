@@ -6,7 +6,7 @@ import {
   useKeybindings,
 } from '@anthropic/ink/keybindings'
 import type { PastedContent } from '@claude-code/config'
-import { getImageFromClipboard } from 'src/utils/imagePaste.js'
+import { getImageFromClipboard } from '@claude-code/repl/imagePaste.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { ClickableImageRef } from '../ClickableImageRef.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

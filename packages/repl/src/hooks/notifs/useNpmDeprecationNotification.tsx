@@ -1,5 +1,5 @@
 import { isInBundledMode } from '@claude-code/config/bundledMode'
-import { getCurrentInstallationType } from 'src/utils/doctorDiagnostic.js'
+import { getCurrentInstallationType } from '@claude-code/repl/doctorDiagnostic.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { useStartupNotification } from './useStartupNotification.js'
 
