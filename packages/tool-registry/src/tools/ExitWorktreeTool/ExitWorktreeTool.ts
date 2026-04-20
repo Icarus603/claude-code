@@ -5,7 +5,7 @@ import {
   setOriginalCwd,
   setProjectRoot,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
+import { clearSystemPromptSections } from '@claude-code/provider/systemPromptSections'
 import { logEvent } from '@claude-code/local-observability'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'

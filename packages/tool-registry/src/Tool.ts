@@ -73,7 +73,7 @@ export type {
 }
 
 import type { SpinnerMode } from '@claude-code/repl/components/Spinner.js'
-import type { QuerySource } from 'src/constants/querySource.js'
+import type { QuerySource } from '@claude-code/agent/querySource'
 import type { SDKStatus } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { AppState } from './appStateTypes.js'
 import type {

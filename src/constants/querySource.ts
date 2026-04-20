@@ -1,2 +1,2 @@
-// Auto-generated stub — replace with real implementation
-export type QuerySource = unknown;
+// Canonical owner is @claude-code/agent/querySource.
+export type * from '@claude-code/agent/querySource'

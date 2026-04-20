@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
-import type { QuerySource } from 'src/constants/querySource.js'
-import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js'
+import type { QuerySource } from '@claude-code/agent/querySource'
+import { clearSystemPromptSections } from '@claude-code/provider/systemPromptSections'
 import { getUserContext } from '@claude-code/provider/context.js'
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
 import { clearClassifierApprovals } from '@claude-code/permission/classifierApprovals.js'

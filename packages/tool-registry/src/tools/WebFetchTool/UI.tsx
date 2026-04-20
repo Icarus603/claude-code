@@ -1,6 +1,6 @@
 import React from 'react'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
-import { TOOL_SUMMARY_MAX_LENGTH } from 'src/constants/toolLimits.js'
+import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'

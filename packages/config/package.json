@@ -109,6 +109,7 @@
     "./bundledMode": "./bundledMode.ts",
     "./signal": "./signal.ts",
     "./sleep": "./sleep.ts",
-    "./semver": "./semver.ts"
+    "./semver": "./semver.ts",
+    "./product": "./product.ts"
   }
 }

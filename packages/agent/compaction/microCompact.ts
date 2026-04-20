@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { readEnv } from '@claude-code/config/env'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
-import type { QuerySource } from 'src/constants/querySource.js'
+import type { QuerySource } from '@claude-code/agent/querySource'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'

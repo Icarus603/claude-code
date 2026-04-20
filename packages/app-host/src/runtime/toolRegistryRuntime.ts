@@ -18,7 +18,7 @@ import {
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   ASYNC_AGENT_ALLOWED_TOOLS,
   COORDINATOR_MODE_ALLOWED_TOOLS,
-} from 'src/constants/tools.js'
+} from '@claude-code/tool-registry/toolConstants'
 import { AgentTool } from '@claude-code/tool-registry/tools/AgentTool/AgentTool.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'

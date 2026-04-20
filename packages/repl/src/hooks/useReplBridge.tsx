@@ -12,7 +12,7 @@ import type { BridgeState, ReplBridgeHandle } from '@claude-code/bridge/replBrid
 import { setReplBridgeHandle } from '@claude-code/bridge/replBridgeHandle.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { getSlashCommandToolSkills, isBridgeSafeCommand } from '@claude-code/command-runtime/runtime'
-import { getRemoteSessionUrl } from 'src/constants/product.js'
+import { getRemoteSessionUrl } from '@claude-code/config/product'
 import { useNotifications } from 'src/context/notifications.js'
 import type {
   PermissionMode,
