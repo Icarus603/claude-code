@@ -80,6 +80,7 @@
     "./hooksConfigSnapshot.js": "./hooksConfigSnapshot.ts",
     "./claudeInChromeSetup.js": "./claudeInChromeSetup.ts",
     "./claudeInChromeCommon.js": "./claudeInChromeCommon.ts",
+    "./claudeInChromeSetupPortable.js": "./claudeInChromeSetupPortable.ts",
     "./statusAlias.js": "./statusAlias.ts",
     "./inProcessTeammateHelpers.js": "./inProcessTeammateHelpers.ts",
     "./fileChangedWatcher.js": "./fileChangedWatcher.ts",
