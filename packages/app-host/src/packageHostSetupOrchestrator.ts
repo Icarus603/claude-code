@@ -3,7 +3,7 @@ import {
   type PackageHostBindingInstallers,
 } from '@claude-code/app-host/packageHostSetup'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { findCanonicalGitRoot } from 'src/utils/git.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'

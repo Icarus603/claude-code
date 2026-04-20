@@ -18,7 +18,7 @@ import { basename, join } from 'path'
 import { z } from 'zod/v4'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { getBridgeAccessToken, getBridgeBaseUrl } from './bridgeConfig.js'
 

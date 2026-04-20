@@ -5,7 +5,7 @@ import type {
   MCPServerConnection,
 } from './types.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 
 export type McpInstructionsDelta = {
   /** Server names — for stateless-scan reconstruction. */

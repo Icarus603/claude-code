@@ -4,7 +4,7 @@ import {
   getSyntaxTheme as nativeGetSyntaxTheme,
   type SyntaxTheme,
 } from 'color-diff-napi'
-import { isEnvDefinedFalsy } from 'src/utils/envUtils.js'
+import { isEnvDefinedFalsy } from '@claude-code/config/env/utils'
 
 export type ColorModuleUnavailableReason = 'env'
 

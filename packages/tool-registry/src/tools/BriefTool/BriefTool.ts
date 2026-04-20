@@ -5,7 +5,7 @@ import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature
 import { logEvent } from '@claude-code/local-observability'
 import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { plural } from 'src/utils/stringUtils.js'
 import { resolveAttachments, validateAttachmentPaths } from './attachments.js'

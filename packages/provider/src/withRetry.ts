@@ -21,7 +21,7 @@ import {
   isClaudeAISubscriber,
   isEnterpriseSubscriber,
 } from 'src/utils/auth.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
   type CooldownReason,

@@ -34,7 +34,7 @@ import { SendMessageTool } from '@claude-code/tool-registry/tools/SendMessageToo
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
 import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getDenyRuleForTool } from '@claude-code/permission/permissions'
 
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */

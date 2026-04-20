@@ -15,7 +15,7 @@ import type {
 } from '@claude-code/mcp-runtime/types.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from 'src/utils/env.js'
-import { getClaudeConfigHomeDir, isEnvTruthy } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   execFileNoThrow,
   execFileNoThrowWithCwd,

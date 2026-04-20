@@ -90,7 +90,7 @@ import {
   API_PDF_MAX_PAGES,
   PDF_TARGET_RAW_SIZE,
 } from 'src/constants/apiLimits.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { ImageResizeError } from 'src/utils/imageResizer.js'
 import { ImageSizeError } from 'src/utils/imageValidation.js'

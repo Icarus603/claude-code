@@ -25,7 +25,7 @@ import {
 } from 'src/utils/auth.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { getExternalEditor } from 'src/utils/editor.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatDuration } from '@claude-code/output/formatters'
 import { setEnvHookNotifier } from 'src/utils/hooks/fileChangedWatcher.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'

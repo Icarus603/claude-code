@@ -40,7 +40,7 @@ import { CondensedLogo } from './CondensedLogo.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
 import { checkForReleaseNotesSync } from 'src/utils/releaseNotes.js'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   getStartupPerfLogPath,
   isDetailedProfilingEnabled,

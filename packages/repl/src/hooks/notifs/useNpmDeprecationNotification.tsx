@@ -1,6 +1,6 @@
 import { isInBundledMode } from '@claude-code/config/bundledMode'
 import { getCurrentInstallationType } from 'src/utils/doctorDiagnostic.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { useStartupNotification } from './useStartupNotification.js'
 
 const NPM_DEPRECATION_MESSAGE =

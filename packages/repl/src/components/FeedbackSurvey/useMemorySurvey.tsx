@@ -10,7 +10,7 @@ import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isAutoManagedMemoryFile } from '@claude-code/memory/memoryFileDetection'
 import {
   extractTextContent,

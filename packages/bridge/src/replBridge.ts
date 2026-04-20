@@ -38,7 +38,7 @@ import {
   createV2ReplTransport,
 } from './replBridgeTransport.js'
 import { updateSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
-import { isEnvTruthy, isInProtectedNamespace } from 'src/utils/envUtils.js'
+import { isEnvTruthy, isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { validateBridgeId } from './bridgeApi.js'
 import {
   describeAxiosError,

@@ -10,7 +10,7 @@ import {
 import { feature } from 'bun:bundle'
 import { getKairosActive, getUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { count } from 'src/utils/array.js'
 import sample from 'lodash-es/sample.js'
 import { formatDuration, formatNumber, formatSecondsShort } from '@claude-code/output/formatters'

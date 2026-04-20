@@ -7,7 +7,7 @@ import { getAPIProvider } from 'src/utils/model/providers.js'
 import { VERTEX_COUNT_TOKENS_ALLOWED_BETAS } from 'src/constants/betas.js'
 import type { Attachment } from 'src/utils/attachments.js'
 import { getModelBetas } from 'src/utils/betas.js'
-import { getVertexRegionForModel, isEnvTruthy } from 'src/utils/envUtils.js'
+import { getVertexRegionForModel, isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from 'src/utils/log.js'
 import { normalizeAttachmentForAPI } from 'src/utils/messages.js'
 import {

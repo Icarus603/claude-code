@@ -7,7 +7,7 @@ import {
 } from '@claude-code/local-observability'
 import { shouldUseSessionMemoryCompaction } from '@claude-code/agent/compaction/sessionMemoryCompact.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isCompactBoundaryMessage } from 'src/utils/messages.js'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import { useSurveyState } from './useSurveyState.js'

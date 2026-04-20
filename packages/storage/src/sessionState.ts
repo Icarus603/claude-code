@@ -23,7 +23,7 @@ export type RequiresActionDetails = {
   input?: Record<string, unknown>
 }
 
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { enqueueSdkEvent } from 'src/utils/sdkEventQueue.js'
 import { readEnv } from '@claude-code/config/env'
