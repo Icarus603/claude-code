@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { useEffect, useRef } from 'react'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'

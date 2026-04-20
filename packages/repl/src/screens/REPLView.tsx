@@ -37,7 +37,7 @@ import {
   useLayoutEffect,
   type RefObject,
 } from 'react'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { sendNotification } from 'src/services/notifier.js'
 import {
   startPreventSleep,

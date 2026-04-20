@@ -13,7 +13,7 @@ import { setReplBridgeHandle } from '@claude-code/bridge/replBridgeHandle.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { getSlashCommandToolSkills, isBridgeSafeCommand } from '@claude-code/command-runtime/runtime'
 import { getRemoteSessionUrl } from '@claude-code/config/product'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import type {
   PermissionMode,
   SDKMessage,

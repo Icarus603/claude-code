@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import { hasImageInClipboard } from 'src/utils/imagePaste.js'
 

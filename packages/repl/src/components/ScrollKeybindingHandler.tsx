@@ -1,5 +1,5 @@
 import React, { type RefObject, useEffect, useRef } from 'react'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import {
   useCopyOnSelect,
   useSelectionBgColor,

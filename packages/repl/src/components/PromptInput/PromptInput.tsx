@@ -10,7 +10,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
 import {
   type IDEAtMentioned,

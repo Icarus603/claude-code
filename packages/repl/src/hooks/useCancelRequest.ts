@@ -15,7 +15,7 @@ import {
 import { isVimModeEnabled } from '@claude-code/repl/components/PromptInput/utils.js'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
 import type { SpinnerMode } from '@claude-code/repl/components/Spinner/types.js'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { useIsOverlayActive } from 'src/context/overlayContext.js'
 import { useCommandQueue } from './useCommandQueue.js'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'

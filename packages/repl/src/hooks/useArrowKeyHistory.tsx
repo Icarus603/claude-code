@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { getModeFromInput } from '@claude-code/repl/components/PromptInput/inputModes.js'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { FOOTER_TEMPORARY_STATUS_TIMEOUT } from '@claude-code/repl/components/PromptInput/Notifications.js'
 import { getHistory } from 'src/history.js'
