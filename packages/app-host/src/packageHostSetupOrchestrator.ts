@@ -2,7 +2,7 @@ import {
   installPackageHostBindings as installPackageHostBindingsFromAppHost,
   type PackageHostBindingInstallers,
 } from '@claude-code/app-host/packageHostSetup'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { findCanonicalGitRoot } from 'src/utils/git.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'

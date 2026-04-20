@@ -51,7 +51,7 @@ import {
 } from './config.js'
 import type { AppState } from './appStateHooks.js'
 import type { PluginError } from '@claude-code/config/plugin/types'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getAllowedChannels } from '@claude-code/app-host/bootstrap/state.js'
 import { useNotifications } from 'src/context/notifications.js'
 import {

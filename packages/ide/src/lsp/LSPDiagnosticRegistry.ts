@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
 import { LRUCache } from 'lru-cache'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'

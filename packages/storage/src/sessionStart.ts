@@ -1,7 +1,7 @@
 import { getMainThreadAgentType } from '@claude-code/app-host/bootstrap/state.js'
 import type { HookResultMessage } from '@claude-code/agent/messageShapes'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { withDiagnosticsTiming } from '@claude-code/local-observability/logging'
 import { isBareMode } from '@claude-code/config/env/utils'
 import { updateWatchPaths } from 'src/utils/hooks/fileChangedWatcher.js'

@@ -17,7 +17,7 @@ import {
   isInternalModelRepoCached,
   sanitizeModelName,
 } from 'src/utils/commitAttribution.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { parseJSONL } from 'src/utils/json.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {

@@ -35,7 +35,7 @@ const ideOnboardingDialog =
     require('@claude-code/repl/components/IdeOnboardingDialog.js')
 
 import { createAbortController } from '@claude-code/agent/abortController.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { envDynamic } from '@claude-code/config/env/dynamic'
 import { errorMessage, isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 /* eslint-enable @typescript-eslint/no-require-imports */

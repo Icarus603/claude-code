@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { hasProfileScope, isClaudeAISubscriber } from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getAuthHeaders, withOAuth401Retry } from 'src/utils/http.js'
 import { logError } from '@claude-code/local-observability/logging'

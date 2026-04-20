@@ -23,7 +23,7 @@ import {
   parseArgumentNames,
   substituteArguments,
 } from '@claude-code/command-runtime/argumentSubstitution.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   EFFORT_LEVELS,
   type EffortValue,

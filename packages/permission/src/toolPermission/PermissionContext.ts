@@ -21,7 +21,7 @@ import type {
   PermissionDenyDecision,
 } from '@claude-code/permission/permissionTypes'
 import { setClassifierApproval } from '@claude-code/permission/classifierApprovals.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { executePermissionRequestHooks } from 'src/utils/hooks.js'
 import {
   REJECT_MESSAGE,

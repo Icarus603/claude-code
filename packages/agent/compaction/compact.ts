@@ -46,7 +46,7 @@ import {
   analyzeContext,
   tokenStatsToStatsigMetrics,
 } from 'src/utils/contextAnalysis.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { hasExactErrorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { cacheToObject } from '@claude-code/tool-registry/fileStateCache'
 import {

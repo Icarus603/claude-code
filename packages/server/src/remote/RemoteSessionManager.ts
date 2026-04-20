@@ -5,7 +5,7 @@ import type {
   SDKControlRequest,
   SDKControlResponse,
 } from 'src/entrypoints/sdk/controlTypes.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   type RemoteMessageContent,

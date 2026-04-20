@@ -14,7 +14,7 @@ import {
   saveGlobalConfig,
 } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { safeParseJSON } from 'src/utils/json.js'

@@ -29,7 +29,7 @@ import {
   isDebugMode,
   isDebugToStdErr,
   getDebugLogPath,
-} from 'src/utils/debug.js'
+} from '@claude-code/local-observability/debug.js'
 import { useEffect, useState } from 'react'
 import {
   getSteps,

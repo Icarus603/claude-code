@@ -31,7 +31,7 @@ import {
   handleOAuth401Error,
 } from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { stripDisplayTagsAllowEmpty } from '@claude-code/output/utils/displayTags.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getBranch, getRemoteUrl } from 'src/utils/git.js'

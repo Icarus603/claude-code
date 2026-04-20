@@ -1,7 +1,7 @@
 import figures from 'figures'
 import React, { useEffect, useState } from 'react'
 import { Box, Text, Dialog } from '@anthropic/ink'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { GitFileStatus } from 'src/utils/git.js'
 import { getFileStatus, stashToCleanState } from 'src/utils/git.js'
 import { Select } from './CustomSelect/index.js'

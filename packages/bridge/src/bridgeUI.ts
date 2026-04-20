@@ -6,7 +6,7 @@ import {
   BRIDGE_SPINNER_FRAMES,
 } from '@claude-code/output/constants/figures.js'
 import { stringWidth } from '@anthropic/ink'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   buildActiveFooterText,
   buildBridgeConnectUrl,

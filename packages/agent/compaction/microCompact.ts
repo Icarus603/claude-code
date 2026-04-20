@@ -4,7 +4,7 @@ import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs
 import type { QuerySource } from '@claude-code/agent/querySource'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getMainLoopModel } from 'src/utils/model/model.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'

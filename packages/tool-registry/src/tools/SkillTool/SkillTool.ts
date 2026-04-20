@@ -25,7 +25,7 @@ import type {
   SystemMessage,
   UserMessage,
 } from '@claude-code/agent/messageShapes'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { getRuleByContentsForTool } from '@claude-code/permission/permissions'
 import {

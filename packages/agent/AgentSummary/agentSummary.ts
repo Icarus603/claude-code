@@ -14,7 +14,7 @@ import type { TaskContext } from '@claude-code/tool-registry/Task.js'
 import { updateAgentSummary } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { filterIncompleteToolCalls } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   type CacheSafeParams,
   runForkedAgent,

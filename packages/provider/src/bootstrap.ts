@@ -8,7 +8,7 @@ import {
 import { z } from 'zod'
 import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { withOAuth401Retry } from 'src/utils/http.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'

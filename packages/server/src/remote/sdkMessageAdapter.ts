@@ -15,7 +15,7 @@ import type {
   StreamEvent,
   SystemMessage,
 } from '@claude-code/agent/messageShapes'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { fromSDKCompactMetadata } from 'src/utils/messages/mappers.js'
 import { createUserMessage } from 'src/utils/messages.js'
 

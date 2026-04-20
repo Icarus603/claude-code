@@ -16,7 +16,7 @@ import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 import { getAllBaseTools } from '@claude-code/tool-registry'
 import type { PermissionUpdate } from '@claude-code/permission/permissionTypes'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   findInProcessTeammateTaskId,
   handlePlanApprovalResponse,

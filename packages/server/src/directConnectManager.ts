@@ -6,7 +6,7 @@ import type {
   StdoutMessage,
 } from 'src/entrypoints/sdk/controlTypes.js'
 import type { RemotePermissionResponse } from '@claude-code/server/remote/RemoteSessionManager.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 

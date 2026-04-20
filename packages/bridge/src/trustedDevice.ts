@@ -6,7 +6,7 @@ import {
   checkGate_CACHED_OR_BLOCKING,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { getSecureStorage } from 'src/utils/secureStorage/index.js'

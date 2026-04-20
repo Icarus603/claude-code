@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { getOauthAccountInfo, isConsumerSubscriber } from 'src/utils/auth.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { writeToStderr } from '@claude-code/shell/process.js'

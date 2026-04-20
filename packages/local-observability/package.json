@@ -17,6 +17,7 @@
     "./telemetry": "./src/telemetry/index.ts",
     "./slowOperations.js": "./src/slowOperations.ts",
     "./errorHelpers.js": "./src/errorHelpers.ts",
-    "./fileOperationAnalytics": "./src/fileOperationAnalytics.ts"
+    "./fileOperationAnalytics": "./src/fileOperationAnalytics.ts",
+    "./debug.js": "./src/debug.ts"
   }
 }
