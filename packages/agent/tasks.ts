@@ -12,8 +12,8 @@ import * as lockfile from 'src/utils/lockfile.js'
 import { logError } from 'src/utils/log.js'
 import { createSignal } from 'src/utils/signal.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { getTeamName } from 'src/utils/teammate.js'
-import { getTeammateContext } from 'src/utils/teammateContext.js'
+import { getTeamName } from '@claude-code/swarm/teammateState.js'
+import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'
 
 // Listeners for task list updates (used for immediate UI refresh in same process)
 const tasksUpdated = createSignal()

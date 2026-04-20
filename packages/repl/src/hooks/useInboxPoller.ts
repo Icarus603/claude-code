@@ -47,8 +47,8 @@ import {
   isPlanModeRequired,
   isTeamLead,
   isTeammate,
-} from 'src/utils/teammate.js'
-import { isInProcessTeammate } from 'src/utils/teammateContext.js'
+} from '@claude-code/swarm/teammateState.js'
+import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
 import {
   isModeSetRequest,
   isPermissionRequest,

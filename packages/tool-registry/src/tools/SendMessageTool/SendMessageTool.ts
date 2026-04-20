@@ -31,7 +31,7 @@ import {
   getTeamName,
   isTeamLead,
   isTeammate,
-} from 'src/utils/teammate.js'
+} from '@claude-code/swarm/teammateState.js'
 import {
   createShutdownApprovedMessage,
   createShutdownRejectedMessage,
