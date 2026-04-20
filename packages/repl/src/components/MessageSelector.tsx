@@ -55,7 +55,7 @@ import {
   TEAMMATE_MESSAGE_TAG,
   TICK_TAG,
 } from '@claude-code/command-runtime/xml.js'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import type { Theme } from 'src/utils/theme.js'

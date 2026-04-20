@@ -15,7 +15,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import { getTerminalPanel } from 'src/utils/terminalPanel.js'
 
 type Props = {

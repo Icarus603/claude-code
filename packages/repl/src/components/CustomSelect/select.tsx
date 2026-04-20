@@ -1,7 +1,7 @@
 import figures from 'figures'
 import React, { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Ansi, Box, Text, stringWidth, useDeclaredCursor } from '@anthropic/ink'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import type { PastedContent } from '@claude-code/config'
 import type { ImageDimensions } from 'src/utils/imageResizer.js'
 import { SelectInputOption } from './select-input-option.js'

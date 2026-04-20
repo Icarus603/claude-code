@@ -22,7 +22,7 @@ import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { findToolByName, type Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Message, ProgressMessage } from '@claude-code/agent/messageShapes'
 import type { AgentToolProgress } from '@claude-code/tool-registry/progressTypes'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import {
   getSearchOrReadFromContent,
   getSearchReadSummaryText,

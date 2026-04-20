@@ -10,7 +10,7 @@ import {
   getTotalInputTokens,
 } from '@claude-code/app-host/bootstrap/state.js';
 import { parseTokenBudget } from 'src/utils/tokenBudget.js';
-import { count } from 'src/utils/array.js';
+import { count } from '@claude-code/tool-registry/utils/array.js';
 import { dirname, join } from 'path';
 import { tmpdir } from 'os';
 import figures from 'figures';

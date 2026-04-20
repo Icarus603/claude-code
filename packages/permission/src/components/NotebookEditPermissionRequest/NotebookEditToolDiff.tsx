@@ -6,7 +6,7 @@ import type {
   NotebookCellType,
   NotebookContent,
 } from '@claude-code/tool-registry/notebookTypes'
-import { intersperse } from 'src/utils/array.js'
+import { intersperse } from '@claude-code/tool-registry/utils/array.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getPatchForDisplay } from 'src/utils/diff.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'

@@ -63,7 +63,7 @@ import type {
   UserMessage,
 } from '@claude-code/agent/messageShapes'
 import type { QueueOperationMessage } from '@claude-code/agent/messageQueueTypes'
-import { uniq } from 'src/utils/array.js'
+import { uniq } from '@claude-code/tool-registry/utils/array.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { updateSessionName } from 'src/utils/concurrentSessions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'

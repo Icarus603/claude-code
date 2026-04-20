@@ -9,7 +9,7 @@ import {
   type AgentColorName,
 } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { isTodoV2Enabled, type Task } from '@claude-code/agent/tasks.js'

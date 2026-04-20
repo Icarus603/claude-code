@@ -9,7 +9,7 @@ import { clearSystemPromptSections } from 'src/constants/systemPromptSections.js
 import { logEvent } from '@claude-code/local-observability'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import { clearMemoryFileCaches } from 'src/utils/claudemd.js'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { updateHooksConfigSnapshot } from 'src/utils/hooks/hooksConfigSnapshot.js'

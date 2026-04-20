@@ -8,7 +8,7 @@ import {
 } from '@claude-code/local-observability'
 import type { ToolPermissionContext, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { PendingClassifierCheck } from '@claude-code/permission/permissionTypes'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import {
   checkSemantics,
   nodeTypeId,
