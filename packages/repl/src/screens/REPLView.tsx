@@ -235,7 +235,7 @@ import {
 import { generateSessionTitle } from 'src/utils/sessionTitle.js';
 import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js';
 import { escapeXml } from '@claude-code/output/xml';
-import type { ThinkingConfig } from 'src/utils/thinking.js';
+import type { ThinkingConfig } from '@claude-code/provider/thinking.js';
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js';
 import { handlePromptSubmit, type PromptInputHelpers } from 'src/utils/handlePromptSubmit.js';
 import { useQueueProcessor } from '@claude-code/repl/hooks/useQueueProcessor.js';
@@ -250,7 +250,7 @@ import type {
 } from '@claude-code/agent/messageShapes';
 import { query } from 'src/query.js';
 import { mergeClients } from '@claude-code/repl/hooks/useMergedClients.js';
-import { getQuerySourceForREPL } from 'src/utils/promptCategory.js';
+import { getQuerySourceForREPL } from '@claude-code/agent/promptCategory.js';
 import { mergeAndFilterTools } from 'src/utils/toolPool.js';
 import { useSkillsChange } from '@claude-code/repl/hooks/useSkillsChange.js';
 import { Messages } from '@claude-code/repl/components/Messages.js';

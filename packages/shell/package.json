@@ -24,7 +24,9 @@
     "./powershell/parser.js": "./src/powershell/parser.ts",
     "./execFileNoThrow.js": "./src/execFileNoThrow.ts",
     "./Shell.js": "./src/Shell.ts",
-    "./bash/ast-alias.js": "./src/bash/ast-alias.ts"
+    "./bash/ast-alias.js": "./src/bash/ast-alias.ts",
+    "./ShellCommand.js": "./src/ShellCommand.ts",
+    "./subprocessEnv.js": "./src/subprocessEnv.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

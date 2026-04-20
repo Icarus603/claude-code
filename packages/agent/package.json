@@ -63,7 +63,10 @@
     "./logsTypes.js": "./logsTypes.ts",
     "./frontmatterParser.js": "./frontmatterParser.ts",
     "./effort.js": "./effort.ts",
-    "./agentContext.js": "./agentContext.ts"
+    "./agentContext.js": "./agentContext.ts",
+    "./coordinatorMode.js": "./coordinatorMode.ts",
+    "./promptCategory.js": "./promptCategory.ts",
+    "./sdkEventQueue.js": "./sdkEventQueue.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

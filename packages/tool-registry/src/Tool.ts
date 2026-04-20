@@ -10,7 +10,7 @@ import type { UUID } from 'crypto'
 import type { z } from 'zod/v4'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import type { ThinkingConfig } from 'src/utils/thinking.js'
+import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 
 export type ToolInputJSONSchema = {
   [x: string]: unknown

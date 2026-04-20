@@ -28,7 +28,7 @@ import {
   renderDefaultModelSetting,
 } from '@claude-code/provider/model.js'
 import { isModelAllowed } from 'src/utils/model/modelAllowlist.js'
-import { validateModel } from 'src/utils/model/validateModel.js'
+import { validateModel } from '@claude-code/provider/validateModel.js'
 
 function ModelPickerWrapper({
   onDone,

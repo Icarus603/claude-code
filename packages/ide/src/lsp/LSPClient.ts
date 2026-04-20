@@ -14,7 +14,7 @@ import type {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { subprocessEnv } from 'src/utils/subprocessEnv.js'
+import { subprocessEnv } from '@claude-code/shell/subprocessEnv.js'
 /**
  * LSP client interface.
  */

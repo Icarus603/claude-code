@@ -8,7 +8,7 @@ import {
   findThinkingTriggerPositions,
   getRainbowColor,
   isUltrathinkEnabled,
-} from 'src/utils/thinking.js'
+} from '@claude-code/provider/thinking.js'
 import { MessageActionsSelectedContext } from '../messageActions.js'
 
 type Props = {

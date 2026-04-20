@@ -25,7 +25,7 @@ export type RequiresActionDetails = {
 
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { enqueueSdkEvent } from 'src/utils/sdkEventQueue.js'
+import { enqueueSdkEvent } from '@claude-code/agent/sdkEventQueue.js'
 import { readEnv } from '@claude-code/config/env'
 
 // CCR external_metadata keys — push in onChangeAppState, restore in

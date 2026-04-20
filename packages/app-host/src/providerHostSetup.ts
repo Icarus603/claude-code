@@ -26,7 +26,7 @@ import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
 } from '@claude-code/provider/providers.js'
-import { getModelOptions } from 'src/utils/model/modelOptions.js'
+import { getModelOptions } from '@claude-code/provider/modelOptions.js'
 import {
   getIsNonInteractiveSession,
   getSessionId,

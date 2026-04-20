@@ -78,6 +78,8 @@
     "./validateEditTool.js": "./src/validateEditTool.ts",
     "./orphanedPluginFilter.js": "./src/orphanedPluginFilter.ts",
     "./ripgrep.js": "./src/ripgrep.ts",
-    "./collapseReadSearch.js": "./src/collapseReadSearch.ts"
+    "./collapseReadSearch.js": "./src/collapseReadSearch.ts",
+    "./todoTypes.js": "./src/todoTypes.ts",
+    "./taskOutput.js": "./src/taskOutput.ts"
   }
 }

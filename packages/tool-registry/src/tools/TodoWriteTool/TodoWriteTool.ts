@@ -5,7 +5,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
-import { TodoListSchema } from 'src/utils/todo/types.js'
+import { TodoListSchema } from '@claude-code/tool-registry/todoTypes.js'
 import { VERIFICATION_AGENT_TYPE } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { TODO_WRITE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'

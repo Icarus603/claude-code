@@ -1,7 +1,7 @@
 import { promises as fsp } from 'fs'
 import { getSdkAgentProgressSummariesEnabled } from '@claude-code/app-host/bootstrap/state.js'
 import { getSystemPrompt } from '@claude-code/agent/prompts.js'
-import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
+import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { registerAsyncAgent } from '@claude-code/agent/localAgentTask.js'
@@ -17,7 +17,7 @@ import {
   filterWhitespaceOnlyAssistantMessages,
 } from '@claude-code/agent/messages.js'
 import { getAgentModel } from '@claude-code/provider/modelAgent.js'
-import { getQuerySourceForAgent } from 'src/utils/promptCategory.js'
+import { getQuerySourceForAgent } from '@claude-code/agent/promptCategory.js'
 import {
   getAgentTranscript,
   readAgentMetadata,

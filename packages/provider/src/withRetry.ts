@@ -34,7 +34,7 @@ import {
 import { isNonCustomOpusModel } from '@claude-code/provider/model.js'
 import { disableKeepAlive } from '@claude-code/provider/proxy.js'
 import { sleep } from '@claude-code/config/sleep'
-import type { ThinkingConfig } from 'src/utils/thinking.js'
+import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
