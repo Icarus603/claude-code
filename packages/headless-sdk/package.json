@@ -16,6 +16,8 @@
     "./sdkUtilityTypes.js": "./src/sdkUtilityTypes.ts",
     "./runtimeTypes.js": "./src/runtimeTypes.ts",
     "./coreTypes.generated.js": "./src/coreTypes.generated.ts",
-    "./coreTypes.js": "./src/coreTypes.ts"
+    "./coreTypes.js": "./src/coreTypes.ts",
+    "./coreSchemas.js": "./src/coreSchemas.ts",
+    "./controlSchemas.js": "./src/controlSchemas.ts"
   }
 }
