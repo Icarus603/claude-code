@@ -36,6 +36,8 @@
     "./editor.js": "./src/editor.ts",
     "./imageResizer.js": "./src/imageResizer.ts",
     "./imageValidation.js": "./src/imageValidation.ts",
+    "./filePersistence/types.js": "./src/filePersistence/types.ts",
+    "./filePersistence/outputsScanner.js": "./src/filePersistence/outputsScanner.ts",
     "./windowsPaths.js": "./src/windowsPaths.ts",
     "./getWorktreePathsPortable.js": "./src/getWorktreePathsPortable.ts",
     "./getWorktreePaths.js": "./src/getWorktreePaths.ts",
