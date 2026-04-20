@@ -166,7 +166,7 @@ import {
 } from 'src/utils/suggestions/slackChannelSuggestions.js'
 import { isInProcessEnabled } from '@claude-code/swarm'
 import { syncTeammateMode } from '@claude-code/swarm'
-import type { TeamSummary } from 'src/utils/teamDiscovery.js'
+import type { TeamSummary } from '@claude-code/swarm/teamDiscovery.js'
 import { getTeammateColor } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
 import { writeToMailbox } from '@claude-code/swarm'
@@ -177,7 +177,7 @@ import {
   getRainbowColor,
   isUltrathinkEnabled,
 } from 'src/utils/thinking.js'
-import { findTokenBudgetPositions } from 'src/utils/tokenBudget.js'
+import { findTokenBudgetPositions } from '@claude-code/agent/tokenBudget'
 import {
   findUltraplanTriggerPositions,
   findUltrareviewTriggerPositions,

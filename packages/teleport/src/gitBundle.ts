@@ -20,7 +20,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
 import { findGitRoot, gitExe } from 'src/utils/git.js'
-import { generateTempFilePath } from 'src/utils/tempfile.js'
+import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
 
 // Tunable via tengu_ccr_bundle_max_bytes.
 const DEFAULT_BUNDLE_MAX_BYTES = 100 * 1024 * 1024

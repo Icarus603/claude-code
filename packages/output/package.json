@@ -21,6 +21,8 @@
     "./utils/cliHighlight.js": "./src/utils/cliHighlight.ts",
     "./utils/displayTags.js": "./src/utils/displayTags.ts",
     "./utils/sliceAnsi.js": "./src/utils/sliceAnsi.ts",
+    "./xml": "./src/xml.ts",
+    "./hyperlink.js": "./src/hyperlink.ts",
     "./formatters/truncate.js": "./src/formatters/truncate.ts",
     "./render/exportRenderer.js": "./src/render/exportRenderer.tsx"
   }

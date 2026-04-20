@@ -38,7 +38,8 @@
     "./idTypes": "./idTypes.ts",
     "./messageQueueTypes": "./messageQueueTypes.ts",
     "./querySource": "./querySource.ts",
-    "./agentIdUtils": "./agentIdUtils.ts"
+    "./agentIdUtils": "./agentIdUtils.ts",
+    "./tokenBudget": "./tokenBudget.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

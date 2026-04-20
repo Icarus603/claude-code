@@ -36,7 +36,7 @@ import {
   getSessionMemoryDir,
   getSessionMemoryPath,
 } from '@claude-code/permission/filesystem'
-import { sequential } from 'src/utils/sequential.js'
+import { sequential } from '@claude-code/config/sequential'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTokenUsage, tokenCountWithEstimation } from 'src/utils/tokens.js'
 import { logEvent } from '@claude-code/local-observability'
