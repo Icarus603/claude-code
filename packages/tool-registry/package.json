@@ -63,6 +63,7 @@
     "./notebook.js": "./src/notebook.ts",
     "./diagnosticTracking.js": "./src/diagnosticTracking.ts",
     "./utils/array.js": "./src/utils/array.ts",
+    "./utils/objectGroupBy.js": "./src/utils/objectGroupBy.ts",
     "./utils/inkColor.js": "./src/utils/inkColor.ts",
     "./toolLimits": "./src/toolLimits.ts",
     "./toolConstants": "./src/toolConstants.ts",
