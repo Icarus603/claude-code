@@ -458,6 +458,7 @@
     "./history.js": "./src/history.ts",
     "./modalContext.js": "./src/modalContext.ts",
     "./teammateViewHelpers.js": "./src/teammateViewHelpers.ts",
+    "./Cursor.js": "./src/Cursor.ts",
     "./onChangeAppState.js": "./src/onChangeAppState.ts",
     "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts",
     "./collapseTeammateShutdowns.js": "./src/collapseTeammateShutdowns.ts",

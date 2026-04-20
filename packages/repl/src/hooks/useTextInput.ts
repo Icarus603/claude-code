@@ -17,7 +17,7 @@ import {
   resetYankState,
   updateYankLength,
   yankPop,
-} from 'src/utils/Cursor.js'
+} from '@claude-code/repl/Cursor.js'
 import { env } from '@claude-code/config/env/paths'
 import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'

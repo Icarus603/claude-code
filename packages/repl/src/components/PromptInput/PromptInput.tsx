@@ -107,7 +107,7 @@ import type {
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
-import { Cursor } from 'src/utils/Cursor.js'
+import { Cursor } from '@claude-code/repl/Cursor.js'
 import {
   getGlobalConfig,
   type PastedContent,
