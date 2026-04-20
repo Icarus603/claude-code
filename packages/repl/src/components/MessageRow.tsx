@@ -16,7 +16,7 @@ import {
   getProgressMessagesFromLookup,
   getSiblingToolUseIDsFromLookup,
   getToolUseID,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { hasThinkingContent, Message } from './Message.js'
 import { MessageModel } from './MessageModel.js'
 import { shouldRenderStatically } from './Messages.js'

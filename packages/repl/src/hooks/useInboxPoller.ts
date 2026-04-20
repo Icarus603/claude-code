@@ -21,7 +21,7 @@ import {
   findInProcessTeammateTaskId,
   handlePlanApprovalResponse,
 } from 'src/utils/inProcessTeammateHelpers.js'
-import { createAssistantMessage } from 'src/utils/messages.js'
+import { createAssistantMessage } from '@claude-code/agent/messages.js'
 import {
   permissionModeFromString,
   toExternalPermissionMode,

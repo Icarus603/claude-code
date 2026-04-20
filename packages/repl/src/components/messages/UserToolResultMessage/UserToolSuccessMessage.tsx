@@ -18,7 +18,7 @@ import {
   getClassifierApproval,
   getYoloClassifierApproval,
 } from '@claude-code/permission/classifierApprovals.js'
-import type { buildMessageLookups } from 'src/utils/messages.js'
+import type { buildMessageLookups } from '@claude-code/agent/messages.js'
 import { MessageResponse } from '../../MessageResponse.js'
 import { HookProgressMessage } from '../HookProgressMessage.js'
 

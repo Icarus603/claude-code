@@ -10,7 +10,7 @@ import {
   CANCEL_MESSAGE,
   INTERRUPT_MESSAGE_FOR_TOOL_USE,
   REJECT_MESSAGE,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { UserToolCanceledMessage } from './UserToolCanceledMessage.js'
 import { UserToolErrorMessage } from './UserToolErrorMessage.js'
 import { UserToolRejectMessage } from './UserToolRejectMessage.js'

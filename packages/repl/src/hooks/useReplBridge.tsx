@@ -35,7 +35,7 @@ import { buildSystemInitMessage } from 'src/utils/messages/systemInit.js'
 import {
   createBridgeStatusMessage,
   createSystemMessage,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import {
   getAutoModeUnavailableNotification,
   getAutoModeUnavailableReason,

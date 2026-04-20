@@ -8,7 +8,7 @@ import type {
   NormalizedUserMessage,
   RenderableMessage,
 } from '@claude-code/agent/messageShapes'
-import { isEmptyMessageText, SYNTHETIC_MESSAGES } from 'src/utils/messages.js'
+import { isEmptyMessageText, SYNTHETIC_MESSAGES } from '@claude-code/agent/messages.js'
 
 const NAVIGABLE_TYPES = [
   'user',

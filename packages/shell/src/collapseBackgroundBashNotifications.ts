@@ -9,7 +9,7 @@ import type {
   RenderableMessage,
 } from '@claude-code/agent/messageShapes'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 
 function isCompletedBackgroundBash(
   msg: RenderableMessage,

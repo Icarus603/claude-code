@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Suspense, use, useState } from 'react'
 import { FileEditToolUseRejectedMessage } from '@claude-code/repl/components/FileEditToolUseRejectedMessage.js'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import { FallbackToolUseErrorMessage } from '@claude-code/repl/components/FallbackToolUseErrorMessage.js'
 import { FileEditToolUpdatedMessage } from '@claude-code/repl/components/FileEditToolUpdatedMessage.js'
 

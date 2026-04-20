@@ -46,7 +46,7 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   extractTextContent,
   getLastAssistantMessage,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { permissionRuleValueFromString } from '@claude-code/permission/permissionRuleParser'
 import {

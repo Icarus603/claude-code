@@ -14,7 +14,7 @@ import {
   isClassifierDenial,
   PLAN_REJECTION_PREFIX,
   REJECT_MESSAGE_WITH_REASON_PREFIX,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { FallbackToolUseErrorMessage } from '../../FallbackToolUseErrorMessage.js'
 import { InterruptedByUser } from '../../InterruptedByUser.js'
 import { MessageResponse } from '../../MessageResponse.js'

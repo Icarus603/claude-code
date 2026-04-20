@@ -20,7 +20,7 @@ import {
 import {
   isEmptyMessageText,
   NO_RESPONSE_REQUESTED,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { getUpgradeMessage } from 'src/utils/model/contextWindowUpgradeCheck.js'
 import {
   getDefaultSonnetModel,

@@ -16,7 +16,7 @@ import {
   createUserMessage,
   EMPTY_LOOKUPS,
   normalizeMessages,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { Message } from '../Message.js'
 

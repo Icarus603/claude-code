@@ -28,7 +28,7 @@ import {
   extractTextContent,
   handleMessageFromStream,
   type StreamingToolUse,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { generateSessionTitle } from 'src/utils/sessionTitle.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 import { updateSessionTitle } from '@claude-code/teleport/api.js'

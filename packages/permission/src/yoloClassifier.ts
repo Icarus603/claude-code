@@ -26,7 +26,7 @@ import { isDebugMode, logForDebugging } from '@claude-code/local-observability/d
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { extractTextContent } from 'src/utils/messages.js'
+import { extractTextContent } from '@claude-code/agent/messages.js'
 import { resolveAntModel } from 'src/utils/model/antModels.js'
 import { getMainLoopModel } from 'src/utils/model/model.js'
 import { getAutoModeConfig } from '@claude-code/config/settings'

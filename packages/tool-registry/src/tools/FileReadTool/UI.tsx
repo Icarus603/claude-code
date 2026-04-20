@@ -1,6 +1,6 @@
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import { FallbackToolUseErrorMessage } from '@claude-code/repl/components/FallbackToolUseErrorMessage.js'
 
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'

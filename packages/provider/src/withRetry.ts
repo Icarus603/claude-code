@@ -10,7 +10,7 @@ import type { SystemAPIErrorMessage } from '@claude-code/agent/messageShapes'
 import { isAwsCredentialsProviderError } from 'src/utils/aws.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { createSystemAPIErrorMessage } from 'src/utils/messages.js'
+import { createSystemAPIErrorMessage } from '@claude-code/agent/messages.js'
 import { getAPIProviderForStatsig } from 'src/utils/model/providers.js'
 import {
   clearApiKeyHelperCache,

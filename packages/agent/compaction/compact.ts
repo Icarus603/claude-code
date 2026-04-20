@@ -67,7 +67,7 @@ import {
   getMessagesAfterCompactBoundary,
   isCompactBoundaryMessage,
   normalizeMessagesForAPI,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { expandPath } from '@claude-code/storage/path.js'
 import { getPlan, getPlanFilePath } from 'src/utils/plans.js'
 import {

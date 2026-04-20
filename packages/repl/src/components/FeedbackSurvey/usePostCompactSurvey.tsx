@@ -8,7 +8,7 @@ import {
 import { shouldUseSessionMemoryCompaction } from '@claude-code/agent/compaction/sessionMemoryCompact.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { isCompactBoundaryMessage } from 'src/utils/messages.js'
+import { isCompactBoundaryMessage } from '@claude-code/agent/messages.js'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import { useSurveyState } from './useSurveyState.js'
 import type { FeedbackSurveyResponse } from './utils.js'

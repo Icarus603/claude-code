@@ -33,7 +33,7 @@ import {
   isEmptyMessageText,
   isSyntheticMessage,
   isToolUseResultMessage,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { type OptionWithDescription, Select } from './CustomSelect/select.js'
 import { Spinner } from './Spinner.js'
 

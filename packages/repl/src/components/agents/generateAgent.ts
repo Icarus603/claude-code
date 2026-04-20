@@ -7,7 +7,7 @@ import { prependUserContext } from 'src/utils/api.js'
 import {
   createUserMessage,
   normalizeMessagesForAPI,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type { ModelName } from 'src/utils/model/model.js'
 import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
 import {

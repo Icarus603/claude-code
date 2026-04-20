@@ -5,7 +5,7 @@ import { FallbackToolUseErrorMessage } from '@claude-code/repl/components/Fallba
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { Box, Text } from '@anthropic/ink'
 import { getDisplayPath } from 'src/utils/file.js'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import type { Input, Output } from './LSPTool.js'
 import { getSymbolAtPosition } from './symbolContext.js'
 

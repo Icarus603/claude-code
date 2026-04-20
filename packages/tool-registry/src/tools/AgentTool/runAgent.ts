@@ -55,7 +55,7 @@ import {
 import { registerFrontmatterHooks } from 'src/utils/hooks/registerFrontmatterHooks.js'
 import { clearSessionHooks } from 'src/utils/hooks/sessionHooks.js'
 import { executeSubagentStartHooks } from 'src/utils/hooks.js'
-import { createUserMessage } from 'src/utils/messages.js'
+import { createUserMessage } from '@claude-code/agent/messages.js'
 import { getAgentModel } from 'src/utils/model/agent.js'
 import type { ModelAlias } from 'src/utils/model/aliases.js'
 import {

@@ -42,7 +42,7 @@ import {
   createBaseHookInput,
   executeStatusLineCommand,
 } from 'src/utils/hooks.js'
-import { getLastAssistantMessage } from 'src/utils/messages.js'
+import { getLastAssistantMessage } from '@claude-code/agent/messages.js'
 import {
   getRuntimeMainLoopModel,
   type ModelName,

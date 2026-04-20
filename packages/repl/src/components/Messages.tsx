@@ -46,7 +46,7 @@ import {
   type StreamingThinking,
   type StreamingToolUse,
   shouldShowUserMessage,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { renderableSearchText } from 'src/utils/transcriptSearch.js'
 import { Divider } from '@anthropic/ink'

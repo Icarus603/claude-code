@@ -5,7 +5,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   createUserMessage,
   getAssistantMessageText,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { getSmallFastModel } from 'src/utils/model/model.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'

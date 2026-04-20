@@ -11,7 +11,7 @@ import { createCronScheduler, removeCronTasks } from '@claude-code/agent/schedul
 import { getCronJitterConfig } from 'src/utils/cronJitterConfig.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js'
-import { createScheduledTaskFireMessage } from 'src/utils/messages.js'
+import { createScheduledTaskFireMessage } from '@claude-code/agent/messages.js'
 import { WORKLOAD_CRON } from 'src/utils/workloadContext.js'
 
 type Props = {

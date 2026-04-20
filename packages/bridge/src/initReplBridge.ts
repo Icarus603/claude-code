@@ -40,7 +40,7 @@ import {
   getContentText,
   getMessagesAfterCompactBoundary,
   isSyntheticMessage,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {

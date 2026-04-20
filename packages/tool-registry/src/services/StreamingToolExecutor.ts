@@ -3,7 +3,7 @@ import {
   createUserMessage,
   REJECT_MESSAGE,
   withMemoryCorrectionHint,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { findToolByName, type Tools, type ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'

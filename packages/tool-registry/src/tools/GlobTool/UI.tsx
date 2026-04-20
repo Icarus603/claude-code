@@ -1,7 +1,7 @@
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import React from 'react'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import { FallbackToolUseErrorMessage } from '@claude-code/repl/components/FallbackToolUseErrorMessage.js'
 import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
 import { Text } from '@anthropic/ink'

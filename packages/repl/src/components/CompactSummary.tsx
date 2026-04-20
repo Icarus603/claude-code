@@ -3,7 +3,7 @@ import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
 import type { Screen } from '@claude-code/repl/screens/REPL.js'
 import type { NormalizedUserMessage } from '@claude-code/agent/messageShapes'
-import { getUserMessageText } from 'src/utils/messages.js'
+import { getUserMessageText } from '@claude-code/agent/messages.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { MessageResponse } from './MessageResponse.js'
 

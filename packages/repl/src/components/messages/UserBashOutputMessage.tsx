@@ -1,6 +1,6 @@
 import * as React from 'react'
 import BashToolResultMessage from '@claude-code/tool-registry/tools/BashTool/BashToolResultMessage.js'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 
 export function UserBashOutputMessage({
   content,

@@ -60,7 +60,7 @@ import {
   extractTextContent,
   isSyntheticMessage,
   normalizeMessages,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { getAgentModel } from 'src/utils/model/agent.js'
 import { permissionModeSchema } from '@claude-code/permission/PermissionMode'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
