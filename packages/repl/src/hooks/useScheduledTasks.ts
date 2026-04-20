@@ -10,7 +10,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import { createCronScheduler, removeCronTasks } from '@claude-code/agent/scheduler'
 import { getCronJitterConfig } from 'src/utils/cronJitterConfig.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js'
+import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
 import { createScheduledTaskFireMessage } from '@claude-code/agent/messages.js'
 import { WORKLOAD_CRON } from '@claude-code/provider/workloadContext.js'
 

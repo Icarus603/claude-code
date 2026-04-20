@@ -30,7 +30,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { enqueue } from 'src/utils/messageQueueManager.js'
+import { enqueue } from '@claude-code/agent/messageQueueManager.js'
 import { buildSystemInitMessage } from 'src/utils/messages/systemInit.js'
 import {
   createBridgeStatusMessage,

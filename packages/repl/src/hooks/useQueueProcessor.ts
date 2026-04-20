@@ -3,7 +3,7 @@ import type { QueuedCommand } from 'src/types/textInputTypes.js'
 import {
   getCommandQueueSnapshot,
   subscribeToCommandQueue,
-} from 'src/utils/messageQueueManager.js'
+} from '@claude-code/agent/messageQueueManager.js'
 import type { QueryGuard } from 'src/utils/QueryGuard.js'
 import { processQueueIfReady } from 'src/utils/queueProcessor.js'
 

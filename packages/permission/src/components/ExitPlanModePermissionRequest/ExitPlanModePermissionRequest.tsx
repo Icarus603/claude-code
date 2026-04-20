@@ -44,7 +44,7 @@ import { getExternalEditor } from '@claude-code/storage/editor.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js'
+import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
 import { createUserMessage } from '@claude-code/agent/messages.js'
 import {
   getMainLoopModel,

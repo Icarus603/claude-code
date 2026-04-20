@@ -4,7 +4,7 @@ import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { getExampleCommandFromCache } from '@claude-code/command-runtime/exampleCommands.js'
-import { isQueuedCommandEditable } from 'src/utils/messageQueueManager.js'
+import { isQueuedCommandEditable } from '@claude-code/agent/messageQueueManager.js'
 
 // Dead code elimination: conditional import for proactive mode
 /* eslint-disable @typescript-eslint/no-require-imports */
