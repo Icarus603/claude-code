@@ -13,7 +13,7 @@ import {
 } from "src/utils/telemetry/pluginTelemetry.js";
 import { logError } from "src/utils/log.js";
 import { hasNodeOption } from "@claude-code/config/env/utils";
-import { getIsGit, getWorktreeCount } from "src/utils/git.js";
+import { getIsGit, getWorktreeCount } from "@claude-code/storage/git.js";
 import { getInitialSettings } from "src/utils/settings/settings.js";
 import { getGhAuthStatus } from "src/utils/github/ghAuthStatus.js";
 import { isAutoUpdaterDisabled } from "@claude-code/config";

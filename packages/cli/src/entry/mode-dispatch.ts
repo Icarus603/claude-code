@@ -220,7 +220,7 @@ import {
   getBranch,
   getIsGit,
   getWorktreeCount,
-} from 'src/utils/git.js'
+} from '@claude-code/storage/git.js'
 import { getGhAuthStatus } from 'src/utils/github/ghAuthStatus.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
 import { logError } from '@claude-code/local-observability/log.js'
@@ -306,7 +306,7 @@ import {
 import {
   getFsImplementation,
   safeResolvePath,
-} from 'src/utils/fsOperations.js'
+} from '@claude-code/storage/fsOperations.js'
 import {
   gracefulShutdown,
   gracefulShutdownSync,

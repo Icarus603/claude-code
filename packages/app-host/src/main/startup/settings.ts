@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import { safeParseJSON } from "src/utils/json.js";
 import { writeFileSync_DEPRECATED } from "@claude-code/local-observability/slowOperations.js";
 import { generateTempFilePath } from "src/utils/tempfile.js";
-import { getFsImplementation, safeResolvePath } from "src/utils/fsOperations.js";
+import { getFsImplementation, safeResolvePath } from "@claude-code/storage/fsOperations.js";
 import { errorMessage, isENOENT } from "@claude-code/local-observability/errorHelpers.js";
 import { resetSettingsCache } from "@claude-code/config/settings/settingsCache";
 import { eagerParseCliFlag } from "src/utils/cliArgs.js";
