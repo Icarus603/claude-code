@@ -7,7 +7,7 @@ import { getAgentColor } from '@claude-code/tool-registry/tools/AgentTool/agentC
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { logError } from 'src/utils/log.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 
 type FileSuggestionSource = {
   type: 'file'

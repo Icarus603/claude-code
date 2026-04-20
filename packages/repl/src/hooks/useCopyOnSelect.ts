@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useTheme } from '@anthropic/ink'
 import type { useSelection } from '@anthropic/ink'
 import { getGlobalConfig } from '@claude-code/config'
-import { getTheme } from 'src/utils/theme.js'
+import { getTheme } from '@anthropic/ink'
 
 type Selection = ReturnType<typeof useSelection>
 

@@ -24,7 +24,7 @@ import {
   isTeammate,
 } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 
 type SwarmBannerInfo = {
   text: string

@@ -3,7 +3,7 @@ import { Text } from '@anthropic/ink'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { ToolActivity } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
-import type { ThemeName } from 'src/utils/theme.js'
+import type { ThemeName } from '@anthropic/ink'
 
 export function renderToolActivity(
   activity: ToolActivity,

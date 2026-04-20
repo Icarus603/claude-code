@@ -21,7 +21,7 @@ import {
   isCustomTitleEnabled,
   saveCustomTitle,
 } from '@claude-code/storage/sessionStorage.js'
-import { getTheme } from 'src/utils/theme.js'
+import { getTheme } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Select } from './CustomSelect/select.js'
 import { SearchBox } from '@anthropic/ink'

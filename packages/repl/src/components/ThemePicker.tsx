@@ -10,7 +10,7 @@ import { useKeybinding } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { updateSettingsForSource } from 'src/utils/settings/settings.js'
-import type { ThemeSetting } from 'src/utils/theme.js'
+import type { ThemeSetting } from '@anthropic/ink'
 import { Select } from './CustomSelect/index.js'
 import { Byline, KeyboardShortcutHint } from '@anthropic/ink'
 import {

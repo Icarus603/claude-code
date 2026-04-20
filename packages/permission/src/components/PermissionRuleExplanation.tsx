@@ -9,7 +9,7 @@ import type {
   PermissionDecisionReason,
 } from '@claude-code/permission/PermissionResult'
 import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 
 export type PermissionRuleExplanationProps = {
   permissionResult: PermissionDecision

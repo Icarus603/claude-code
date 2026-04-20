@@ -22,7 +22,7 @@ import {
   AGENT_COLORS,
   type AgentColorName,
 } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 import { KeyboardShortcutHint } from '@anthropic/ink'
 import { shouldHideTasksFooter } from './taskStatusUtils.js'
 

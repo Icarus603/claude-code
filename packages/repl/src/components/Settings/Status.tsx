@@ -22,7 +22,7 @@ import {
   getModelDisplayLabel,
   type Property,
 } from 'src/utils/status.js'
-import type { ThemeName } from 'src/utils/theme.js'
+import type { ThemeName } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 
 type Props = {

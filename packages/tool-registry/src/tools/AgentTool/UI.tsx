@@ -40,7 +40,7 @@ import {
   parseUserSpecifiedModel,
   renderModelName,
 } from 'src/utils/model/model.js'
-import type { Theme, ThemeName } from 'src/utils/theme.js'
+import type { Theme, ThemeName } from '@anthropic/ink'
 import type {
   outputSchema,
   Progress,

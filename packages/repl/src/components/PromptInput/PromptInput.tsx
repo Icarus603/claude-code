@@ -171,7 +171,7 @@ import { getTeammateColor } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
 import { writeToMailbox } from '@claude-code/swarm'
 import type { TextHighlight } from 'src/utils/textHighlighting.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 import {
   findThinkingTriggerPositions,
   getRainbowColor,

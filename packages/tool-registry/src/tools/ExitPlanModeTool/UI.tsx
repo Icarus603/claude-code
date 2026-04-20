@@ -9,7 +9,7 @@ import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { getDisplayPath } from 'src/utils/file.js'
 import { getPlan } from 'src/utils/plans.js'
-import type { ThemeName } from 'src/utils/theme.js'
+import type { ThemeName } from '@anthropic/ink'
 import type { Output } from './ExitPlanModeV2Tool.js'
 
 export function renderToolUseMessage(): React.ReactNode {

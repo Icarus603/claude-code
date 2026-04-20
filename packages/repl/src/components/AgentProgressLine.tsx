@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { formatNumber } from '@claude-code/output/formatters'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 
 type Props = {
   agentType: string

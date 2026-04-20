@@ -1,7 +1,7 @@
 import type { ToolUseBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import React, { useMemo } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
-import type { ThemeName } from 'src/utils/theme.js'
+import type { ThemeName } from '@anthropic/ink'
 import type { Command } from 'src/commands.js'
 import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { Box, Text, stringWidth, useTheme } from '@anthropic/ink'

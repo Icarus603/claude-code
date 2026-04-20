@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Text, stringWidth, useTheme } from '@anthropic/ink'
 import { getGraphemeSegmenter } from 'src/utils/intl.js'
-import { getTheme, type Theme } from 'src/utils/theme.js'
+import { getTheme, type Theme } from '@anthropic/ink'
 import type { SpinnerMode } from './types.js'
 import { interpolateColor, parseRGB, toRGBColor } from './utils.js'
 
