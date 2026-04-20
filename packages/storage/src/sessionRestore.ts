@@ -28,7 +28,7 @@ import type {
   PersistedWorktreeSession,
 } from 'src/types/logs.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { renameRecordingForSession } from 'src/utils/asciicast.js'
+import { renameRecordingForSession } from '@claude-code/output/capture'
 import { clearMemoryFileCaches } from 'src/utils/claudemd.js'
 import {
   type AttributionState,

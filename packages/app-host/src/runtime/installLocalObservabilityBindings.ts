@@ -39,7 +39,7 @@ import {
   getSessionId,
 } from '../bootstrap/state.js'
 import { getOauthAccountInfo } from 'src/utils/auth.js'
-import { CACHE_PATHS } from 'src/utils/cachePaths.js'
+import { CACHE_PATHS } from '@claude-code/storage/cache-paths'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { envDynamic } from '@claude-code/config/env/dynamic'
