@@ -3,7 +3,7 @@ import { getModeFromInput } from '@claude-code/repl/components/PromptInput/input
 import { useNotifications } from '@claude-code/repl/notifications.js'
 import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { FOOTER_TEMPORARY_STATUS_TIMEOUT } from '@claude-code/repl/components/PromptInput/Notifications.js'
-import { getHistory } from 'src/history.js'
+import { getHistory } from '@claude-code/repl/history.js'
 import { Text } from '@anthropic/ink'
 import type { PromptInputMode } from 'src/types/textInputTypes.js'
 import type { HistoryEntry, PastedContent } from '@claude-code/config'

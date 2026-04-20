@@ -4,7 +4,7 @@ import {
   getModeFromInput,
   getValueFromInput,
 } from '@claude-code/repl/components/PromptInput/inputModes.js'
-import { makeHistoryReader } from 'src/history.js'
+import { makeHistoryReader } from '@claude-code/repl/history.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until consumers wire handleKeyDown to <Box onKeyDown>
 import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'

@@ -1,4 +1,4 @@
-import { expandPastedTextRefs } from 'src/history.js';
+import { expandPastedTextRefs } from '@claude-code/repl/history.js';
 import type { PastedContent } from '@claude-code/config';
 
 export function parseImmediateCommandInput(input: string, pastedContents: Record<number, PastedContent>) {

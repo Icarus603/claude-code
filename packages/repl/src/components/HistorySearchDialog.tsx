@@ -4,7 +4,7 @@ import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
 import {
   getTimestampedHistory,
   type TimestampedHistoryEntry,
-} from 'src/history.js'
+} from '@claude-code/repl/history.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth, wrapAnsi } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
