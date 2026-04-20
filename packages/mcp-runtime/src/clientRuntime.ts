@@ -88,7 +88,7 @@ import {
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,
 } from '@claude-code/provider/proxy.js'
-import { recursivelySanitizeUnicode } from 'src/utils/sanitization.js'
+import { recursivelySanitizeUnicode } from '@claude-code/mcp-runtime/sanitization.js'
 import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { subprocessEnv } from '@claude-code/shell/subprocessEnv.js'
 import {
