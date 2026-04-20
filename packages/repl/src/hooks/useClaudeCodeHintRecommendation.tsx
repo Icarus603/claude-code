@@ -20,7 +20,7 @@ import {
   getPendingHintSnapshot,
   markShownThisSession,
   subscribeToPendingHint,
-} from 'src/utils/claudeCodeHints.js'
+} from '@claude-code/tool-registry/claudeCodeHints.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   disableHintRecommendations,

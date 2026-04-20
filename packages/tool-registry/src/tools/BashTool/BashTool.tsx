@@ -38,7 +38,7 @@ import {
   splitCommand_DEPRECATED,
   splitCommandWithOperators,
 } from '@claude-code/shell/bash/commands.js'
-import { extractClaudeCodeHints } from 'src/utils/claudeCodeHints.js'
+import { extractClaudeCodeHints } from '@claude-code/tool-registry/claudeCodeHints.js'
 import { detectCodeIndexingFromCommand } from 'src/utils/codeIndexing.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT, ShellError } from '@claude-code/local-observability/errorHelpers.js'
