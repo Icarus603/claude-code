@@ -28,6 +28,7 @@
     "./plans.js": "./src/plans.ts",
     "./task/diskOutput.js": "./src/task/diskOutput.ts",
     "./secureStorage.js": "./src/secureStorage.ts",
+    "./secureStorage/macOsKeychainStorage.js": "./src/secureStorage/macOsKeychainStorage.ts",
     "./toolResultStorage.js": "./src/toolResultStorage.ts",
     "./fileRead.js": "./src/fileRead.ts",
     "./browser.js": "./src/browser.ts",
