@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Box } from '@anthropic/ink'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import { Clawd, type ClawdPose } from './Clawd.js'
 
 type Frame = { pose: ClawdPose; offset: number }

@@ -25,7 +25,7 @@ import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logMCPDebug } from '@claude-code/local-observability/logging'
 import { getPlatform } from 'src/utils/platform.js'
 import { getSecureStorage } from 'src/utils/secureStorage/index.js'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { buildRedirectUri, findAvailablePort } from '@claude-code/mcp-runtime/oauthPort.js'
 

@@ -46,7 +46,7 @@ import {
   isPidBasedLockingEnabled,
   type LockInfo,
 } from 'src/utils/nativeInstaller/pidLock.js'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import {
   BASH_MAX_OUTPUT_DEFAULT,
   BASH_MAX_OUTPUT_UPPER_LIMIT,

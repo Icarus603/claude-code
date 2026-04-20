@@ -6,7 +6,7 @@ import {
 import {
   getSettings_DEPRECATED,
   updateSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { Select } from './CustomSelect/index.js'
 import { Dialog } from '@anthropic/ink'
 import { MCPServerDialogCopy } from './MCPServerDialogCopy.js'

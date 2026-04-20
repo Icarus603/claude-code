@@ -5,7 +5,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   getSettings_DEPRECATED,
   updateSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { SelectMulti } from './CustomSelect/SelectMulti.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'

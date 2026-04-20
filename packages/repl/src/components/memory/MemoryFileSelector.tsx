@@ -24,7 +24,7 @@ import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getDisplayPath } from 'src/utils/file.js'
 import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import { projectIsInGitRepo } from 'src/utils/memory/versions.js'
-import { updateSettingsForSource } from 'src/utils/settings/settings.js'
+import { updateSettingsForSource } from '@claude-code/config/settings'
 import { Select } from '../CustomSelect/index.js'
 
 interface ExtendedMemoryFileInfo extends MemoryFileInfo {

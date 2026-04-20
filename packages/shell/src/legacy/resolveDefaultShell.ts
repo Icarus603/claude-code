@@ -1,4 +1,4 @@
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 
 /**
  * Resolve the default shell for input-box `!` commands.

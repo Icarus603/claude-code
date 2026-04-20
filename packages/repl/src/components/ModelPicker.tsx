@@ -34,7 +34,7 @@ import { getModelOptions } from 'src/utils/model/modelOptions.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Select } from './CustomSelect/index.js'
 import { Byline, KeyboardShortcutHint, Pane } from '@anthropic/ink'

@@ -17,7 +17,7 @@ import { logError } from '@claude-code/local-observability/logging'
 import {
   getInitialSettings,
   updateSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { CONFIG_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, generatePrompt } from './prompt.js'

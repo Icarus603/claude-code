@@ -11,7 +11,7 @@ import {
   getSettingsFilePathForSource,
   getSettingsForSource,
   updateSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import type { SettingsJson } from 'src/utils/settings/types.js'
 import type {
   PermissionBehavior,

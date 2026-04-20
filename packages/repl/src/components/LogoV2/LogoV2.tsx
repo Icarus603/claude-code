@@ -24,7 +24,7 @@ import {
 } from './feedConfigs.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { resolveThemeSetting } from 'src/utils/systemTheme.js'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import {
   isDebugMode,
   isDebugToStdErr,

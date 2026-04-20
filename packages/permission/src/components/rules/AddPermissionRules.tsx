@@ -22,7 +22,7 @@ import {
   type EditableSettingSource,
   SOURCES,
 } from 'src/utils/settings/constants.js'
-import { getRelativeSettingsFilePathForSource } from 'src/utils/settings/settings.js'
+import { getRelativeSettingsFilePathForSource } from '@claude-code/config/settings'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 import { PermissionRuleDescription } from './PermissionRuleDescription.js'

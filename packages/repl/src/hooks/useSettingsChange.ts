@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { settingsChangeDetector } from 'src/utils/settings/changeDetector.js'
 import type { SettingSource } from 'src/utils/settings/constants.js'
-import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
+import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import type { SettingsJson } from 'src/utils/settings/types.js'
 
 export function useSettingsChange(

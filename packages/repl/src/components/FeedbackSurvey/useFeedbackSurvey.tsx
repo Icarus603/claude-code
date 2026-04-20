@@ -11,7 +11,7 @@ import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getLastAssistantMessage } from 'src/utils/messages.js'
 import { getMainLoopModel } from 'src/utils/model/model.js'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import {
   submitTranscriptShare,

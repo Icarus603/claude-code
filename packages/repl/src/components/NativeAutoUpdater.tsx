@@ -11,7 +11,7 @@ import { getMaxVersion, getMaxVersionMessage } from '@claude-code/updater/autoUp
 import { isAutoUpdaterDisabled } from '@claude-code/config'
 import { installLatest } from 'src/utils/nativeInstaller/index.js'
 import { gt } from '@claude-code/config/semver'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 
 /**
  * Categorize error messages for analytics

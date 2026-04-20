@@ -13,7 +13,7 @@ import {
   buildDefaultExternalSystemPrompt,
   getDefaultExternalAutoModeRules,
 } from '@claude-code/permission/yoloClassifier.js'
-import { getAutoModeConfig } from 'src/utils/settings/settings.js'
+import { getAutoModeConfig } from '@claude-code/config/settings'
 import { sideQuery } from 'src/utils/sideQuery.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
