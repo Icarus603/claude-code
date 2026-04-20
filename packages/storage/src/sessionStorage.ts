@@ -41,7 +41,7 @@ import {
   asSessionId,
   type SessionId,
 } from '@claude-code/agent/idTypes'
-import type { AttributionSnapshotMessage } from 'src/types/logs.js'
+import type { AttributionSnapshotMessage } from '@claude-code/agent/logsTypes.js'
 import {
   type ContentReplacementEntry,
   type ContextCollapseCommitEntry,
@@ -53,7 +53,7 @@ import {
   type SerializedMessage,
   sortLogs,
   type TranscriptMessage,
-} from 'src/types/logs.js'
+} from '@claude-code/agent/logsTypes.js'
 import type {
   AssistantMessage,
   AttachmentMessage,

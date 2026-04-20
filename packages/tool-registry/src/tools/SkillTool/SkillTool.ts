@@ -46,13 +46,13 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
-import { getAgentContext } from 'src/utils/agentContext.js'
+import { getAgentContext } from '@claude-code/agent/agentContext.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
   extractResultText,
   prepareForkedCommandContext,
 } from '@claude-code/agent/forkedAgent.js'
-import { parseFrontmatter } from 'src/utils/frontmatterParser.js'
+import { parseFrontmatter } from '@claude-code/agent/frontmatterParser.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { createUserMessage, normalizeMessages } from '@claude-code/agent/messages.js'
 import type { ModelAlias } from '@claude-code/provider/modelAliases.js'

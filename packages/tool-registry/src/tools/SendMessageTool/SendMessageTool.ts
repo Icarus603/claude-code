@@ -8,7 +8,7 @@ import { findTeammateTaskByAgentId } from '@claude-code/swarm'
 import {
   isLocalAgentTask,
   queuePendingMessage,
-} from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+} from '@claude-code/agent/localAgentTask.js'
 import { isMainSessionTask } from 'src/tasks/LocalMainSessionTask.js'
 import { toAgentId } from '@claude-code/agent/idTypes'
 import { generateRequestId } from '@claude-code/agent/agentIdUtils'

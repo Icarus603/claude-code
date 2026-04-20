@@ -94,7 +94,7 @@ import {
   queuePendingMessage,
   appendMessageToLocalAgent,
   type LocalAgentTaskState,
-} from 'src/tasks/LocalAgentTask/LocalAgentTask.js';
+} from '@claude-code/agent/localAgentTask.js';
 import {
   registerLeaderToolUseConfirmQueue,
   unregisterLeaderToolUseConfirmQueue,
@@ -299,7 +299,7 @@ import {
   type ContentReplacementRecord,
 } from '@claude-code/storage/toolResultStorage.js';
 import { partialCompactConversation } from '@claude-code/agent/compaction/compact.js';
-import type { LogOption } from 'src/types/logs.js';
+import type { LogOption } from '@claude-code/agent/logsTypes.js';
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js';
 import {
   fileHistoryMakeSnapshot,
@@ -366,7 +366,7 @@ import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking
 import { handleSpeculationAccept, type ActiveSpeculationState } from 'src/services/PromptSuggestion/speculation.js';
 import { IdeOnboardingDialog } from '@claude-code/repl/components/IdeOnboardingDialog.js';
 import { EffortCallout, shouldShowEffortCallout } from '@claude-code/repl/components/EffortCallout.js';
-import type { EffortValue } from 'src/utils/effort.js';
+import type { EffortValue } from '@claude-code/agent/effort.js';
 import { RemoteCallout } from '@claude-code/repl/components/RemoteCallout.js';
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const AntModelSwitchCallout =

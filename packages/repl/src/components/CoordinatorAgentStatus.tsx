@@ -23,7 +23,7 @@ import {
 import {
   isPanelAgentTask,
   type LocalAgentTaskState,
-} from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+} from '@claude-code/agent/localAgentTask.js'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import { evictTerminalTask } from 'src/utils/task/framework.js'
 import { isTerminalStatus } from './tasks/taskStatusUtils.js'

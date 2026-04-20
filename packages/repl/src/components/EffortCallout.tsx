@@ -6,13 +6,13 @@ import {
   isTeamSubscriber,
 } from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import type { EffortLevel } from 'src/utils/effort.js'
+import type { EffortLevel } from '@claude-code/agent/effort.js'
 import {
   convertEffortValueToLevel,
   getDefaultEffortForModel,
   getOpusDefaultEffortConfig,
   toPersistableEffort,
-} from 'src/utils/effort.js'
+} from '@claude-code/agent/effort.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 import type { OptionWithDescription } from './CustomSelect/select.js'

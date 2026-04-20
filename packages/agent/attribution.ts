@@ -9,7 +9,7 @@ import {
 import { TERMINAL_OUTPUT_TAGS } from '@claude-code/command-runtime/xml.js'
 // AppState type borrowed via ambient shape to avoid src/ boundary violation
 type AppState = Record<string, unknown>
-import type { Entry } from 'src/types/logs.js'
+import type { Entry } from '@claude-code/agent/logsTypes.js'
 import {
   type AttributionData,
   calculateCommitAttribution,

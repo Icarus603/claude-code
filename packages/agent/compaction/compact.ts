@@ -13,7 +13,7 @@ import { getInvokedSkillsForAgent } from '@claude-code/app-host/bootstrap/state.
 import type { QuerySource } from '@claude-code/agent/querySource'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { LocalAgentTaskState } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import {
   FILE_READ_TOOL_NAME,

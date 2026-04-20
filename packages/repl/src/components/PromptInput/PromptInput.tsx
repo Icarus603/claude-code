@@ -89,7 +89,7 @@ import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import {
   isPanelAgentTask,
   type LocalAgentTaskState,
-} from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+} from '@claude-code/agent/localAgentTask.js'
 import { isBackgroundTask } from 'src/tasks/types.js'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
@@ -118,7 +118,7 @@ import {
   parseDirectMemberMessage,
   sendDirectMemberMessage,
 } from 'src/utils/directMemberMessage.js'
-import type { EffortLevel } from 'src/utils/effort.js'
+import type { EffortLevel } from '@claude-code/agent/effort.js'
 import { env } from '@claude-code/config/env/paths'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'

@@ -7,7 +7,7 @@ import {
   formatCreditAmount,
   getCachedReferrerReward,
 } from '@claude-code/provider/referral.js'
-import type { LogOption } from 'src/types/logs.js'
+import type { LogOption } from '@claude-code/agent/logsTypes.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import type { FeedConfig, FeedLine } from './Feed.js'

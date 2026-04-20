@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { Box, Text, Byline, KeyboardShortcutHint, LoadingState } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getAllBaseTools } from 'src/tools.js'
-import type { LogOption } from 'src/types/logs.js'
+import type { LogOption } from '@claude-code/agent/logsTypes.js'
 import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import {
   getSessionIdFromLog,
