@@ -36,7 +36,8 @@
     "./tasks.js": "./tasks.ts",
     "./messageShapes": "./messageShapes.ts",
     "./idTypes": "./idTypes.ts",
-    "./messageQueueTypes": "./messageQueueTypes.ts"
+    "./messageQueueTypes": "./messageQueueTypes.ts",
+    "./querySource": "./querySource.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

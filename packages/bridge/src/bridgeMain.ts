@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { randomUUID } from 'crypto'
 import { hostname, tmpdir } from 'os'
 import { basename, join, resolve } from 'path'
-import { getRemoteSessionUrl } from 'src/constants/product.js'
+import { getRemoteSessionUrl } from '@claude-code/config/product'
 import { checkGate_CACHED_OR_BLOCKING } from '@claude-code/config/feature-flags'
 import {
   logEvent,

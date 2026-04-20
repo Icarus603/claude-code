@@ -10,7 +10,7 @@ import { djb2Hash } from 'src/utils/hash.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import type { QuerySource } from 'src/constants/querySource.js'
+import type { QuerySource } from '@claude-code/agent/querySource'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 

@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { markPostCompaction } from '@claude-code/app-host/bootstrap/state.js'
 import { getSdkBetas } from '@claude-code/app-host/bootstrap/state.js'
-import type { QuerySource } from 'src/constants/querySource.js'
+import type { QuerySource } from '@claude-code/agent/querySource'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { getGlobalConfig } from '@claude-code/config'

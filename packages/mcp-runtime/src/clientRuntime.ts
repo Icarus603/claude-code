@@ -43,7 +43,7 @@ import pMap from 'p-map'
 import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
-import { PRODUCT_URL } from 'src/constants/product.js'
+import { PRODUCT_URL } from '@claude-code/config/product'
 import type { AppState } from './appStateHooks.js'
 import {
   type Tool,

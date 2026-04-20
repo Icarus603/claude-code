@@ -9,7 +9,7 @@ import {
   DEFAULT_AGENT_PROMPT,
   enhanceSystemPromptWithEnvDetails,
 } from 'src/constants/prompts.js'
-import type { QuerySource } from 'src/constants/querySource.js'
+import type { QuerySource } from '@claude-code/agent/querySource'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { query } from 'src/query.js'

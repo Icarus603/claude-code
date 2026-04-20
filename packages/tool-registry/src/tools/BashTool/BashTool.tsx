@@ -11,7 +11,7 @@ import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
 import { z } from 'zod/v4'
 import { getKairosActive } from '@claude-code/app-host/bootstrap/state.js'
-import { TOOL_SUMMARY_MAX_LENGTH } from 'src/constants/toolLimits.js'
+import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
