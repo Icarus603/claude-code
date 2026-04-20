@@ -1,3 +1,2 @@
-// Thin alias — canonical owner is src/utils/plugins/pluginLoader.ts.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/plugins/pluginLoader.js'
+// Canonical owner is @claude-code/config/plugin/pluginLoader.
+export * from '@claude-code/config/plugin/pluginLoader'
