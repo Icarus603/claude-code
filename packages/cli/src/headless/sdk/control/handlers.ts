@@ -33,11 +33,11 @@ import {
   getCommandName,
 } from '@claude-code/command-runtime/runtime'
 import type { ModelInfo } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { HookCallbackMatcher } from 'src/types/hooks.js'
+import type { HookCallbackMatcher } from '@claude-code/agent/types/hooks.js'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { PermissionMode as InternalPermissionMode } from '@claude-code/permission/permissionTypes'
 import type { AppStateLike as AppState } from '../../../contracts.js'
-import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
+import { parsePluginIdentifier } from '@claude-code/config/plugin/pluginIdentifier'
 import {
   getSessionId,
   setMainLoopModelOverride,
