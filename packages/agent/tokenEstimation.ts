@@ -14,7 +14,7 @@ import {
   createBedrockRuntimeClient,
   getInferenceProfileBackingModel,
   isFoundationModel,
-} from 'src/utils/model/bedrock.js'
+} from '@claude-code/provider/model/bedrock.js'
 import {
   getDefaultSonnetModel,
   getMainLoopModel,
