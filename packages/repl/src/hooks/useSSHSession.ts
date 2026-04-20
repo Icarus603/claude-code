@@ -25,7 +25,7 @@ import type { SSHSessionManager, SSHPermissionRequest } from 'src/ssh/SSHSession
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { Message as MessageType } from '@claude-code/agent/messageShapes'
-import type { PermissionAskDecision } from 'src/types/permissions.js'
+import type { PermissionAskDecision } from '@claude-code/permission/permissionTypes'
 import { logForDebugging } from 'src/utils/debug.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'

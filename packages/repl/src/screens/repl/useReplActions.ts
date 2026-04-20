@@ -9,7 +9,7 @@ import type { AppState } from '@claude-code/repl/appStateHooks.js'
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import { performStartupChecks } from 'src/utils/plugins/performStartupChecks.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type { PermissionMode } from 'src/types/permissions.js'
+import type { PermissionMode } from '@claude-code/permission/permissionTypes'
 
 type SetAppState = (f: (prevState: AppState) => AppState) => void
 

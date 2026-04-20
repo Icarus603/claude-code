@@ -12,7 +12,7 @@ import type {
   AttachmentMessage,
   ProgressMessage,
 } from '@claude-code/agent/messageShapes'
-import type { PermissionDecision } from 'src/types/permissions.js'
+import type { PermissionDecision } from '@claude-code/permission/permissionTypes'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {

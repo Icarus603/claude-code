@@ -44,7 +44,7 @@ import type {
   AdditionalWorkingDirectory,
   PermissionMode,
   PermissionResult,
-} from 'src/types/permissions.js'
+} from '@claude-code/permission/permissionTypes'
 // Import tool progress types from centralized location to break import cycles
 import type {
   AgentToolProgress,
@@ -114,7 +114,7 @@ export type SetToolJSXFn = (
 ) => void
 
 // Import tool permission types from centralized location to break import cycles
-import type { ToolPermissionRulesBySource } from 'src/types/permissions.js'
+import type { ToolPermissionRulesBySource } from '@claude-code/permission/permissionTypes'
 
 // Re-export for backwards compatibility
 export type { ToolPermissionRulesBySource }
