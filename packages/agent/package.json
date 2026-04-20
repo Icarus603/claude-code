@@ -63,6 +63,7 @@
     "./logsTypes.js": "./logsTypes.ts",
     "./frontmatterParser.js": "./frontmatterParser.ts",
     "./yaml.js": "./yaml.ts",
+    "./task/framework.js": "./task/framework.ts",
     "./effort.js": "./effort.ts",
     "./agentContext.js": "./agentContext.ts",
     "./coordinatorMode.js": "./coordinatorMode.ts",

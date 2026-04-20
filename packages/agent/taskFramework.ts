@@ -1,3 +1,2 @@
-// Thin alias — canonical owner is src/utils/task/framework.js.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/task/framework.js'
+// Re-export from canonical @claude-code/agent/task/framework.
+export * from './task/framework.js'
