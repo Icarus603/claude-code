@@ -391,7 +391,7 @@ export async function gracefulShutdown(
   // failsafe can scale with it. Without this, a user-configured 10s hook
   // budget is silently truncated by the 5s failsafe (gh-32712 follow-up).
   const { executeSessionEndHooks, getSessionEndHookTimeoutMs } = await import(
-    './hooks.js'
+    '@claude-code/agent/hooks.js'
   )
   const sessionEndTimeoutMs = getSessionEndHookTimeoutMs()
 
