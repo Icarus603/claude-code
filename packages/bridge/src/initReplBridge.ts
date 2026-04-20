@@ -34,7 +34,7 @@ import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { stripDisplayTagsAllowEmpty } from '@claude-code/output/utils/displayTags.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { getBranch, getRemoteUrl } from 'src/utils/git.js'
+import { getBranch, getRemoteUrl } from '@claude-code/storage/git.js'
 import { toSDKMessages } from 'src/utils/messages/mappers.js'
 import {
   getContentText,

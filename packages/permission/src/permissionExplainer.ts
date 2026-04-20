@@ -8,7 +8,7 @@ import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
-import { sideQuery } from 'src/utils/sideQuery.js'
+import { sideQuery } from '@claude-code/agent/sideQuery.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH'

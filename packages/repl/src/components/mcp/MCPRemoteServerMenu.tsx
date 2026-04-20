@@ -31,7 +31,7 @@ import {
 } from '@claude-code/mcp-runtime/utils.js'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
-import { openBrowser } from 'src/utils/browser.js'
+import { openBrowser } from '@claude-code/storage/browser.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logMCPDebug } from '@claude-code/local-observability/logging'
 import { capitalize } from '@claude-code/output/utils/stringUtils.js'

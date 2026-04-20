@@ -6,7 +6,7 @@ import {
   DIFF_TIMEOUT_MS,
   getPatchForDisplay,
   getPatchFromContents,
-} from 'src/utils/diff.js'
+} from '@claude-code/agent/diff.js'
 import { errorMessage, isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
   addLineNumbers,

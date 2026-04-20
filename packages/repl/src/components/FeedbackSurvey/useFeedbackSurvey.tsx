@@ -12,7 +12,7 @@ import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getLastAssistantMessage } from '@claude-code/agent/messages.js'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getInitialSettings } from '@claude-code/config/settings'
-import { logOTelEvent } from 'src/utils/telemetry/events.js'
+import { logOTelEvent } from '@claude-code/local-observability/telemetryEvents.js'
 import {
   submitTranscriptShare,
   type TranscriptShareTrigger,

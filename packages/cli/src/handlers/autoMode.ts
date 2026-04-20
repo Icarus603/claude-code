@@ -14,7 +14,7 @@ import {
   getDefaultExternalAutoModeRules,
 } from '@claude-code/permission/yoloClassifier.js'
 import { getAutoModeConfig } from '@claude-code/config/settings'
-import { sideQuery } from 'src/utils/sideQuery.js'
+import { sideQuery } from '@claude-code/agent/sideQuery.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 function writeRules(rules: AutoModeRules): void {

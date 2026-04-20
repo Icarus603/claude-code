@@ -1,4 +1,4 @@
-import { updateSessionBridgeId } from 'src/utils/concurrentSessions.js'
+import { updateSessionBridgeId } from '@claude-code/agent/concurrentSessions.js'
 import type { ReplBridgeHandle } from './replBridge.js'
 import { toCompatSessionId } from './sessionIdCompat.js'
 

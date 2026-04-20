@@ -16,7 +16,7 @@ import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { countLinesChanged, getPatchForDisplay } from 'src/utils/diff.js'
+import { countLinesChanged, getPatchForDisplay } from '@claude-code/agent/diff.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import { getFileModificationTime, writeTextContent } from '@claude-code/storage/file.js'
@@ -25,7 +25,7 @@ import {
   fileHistoryTrackEdit,
 } from '@claude-code/agent/file-history'
 import { logFileOperation } from '@claude-code/local-observability/fileOperationAnalytics'
-import { readFileSyncWithMetadata } from 'src/utils/fileRead.js'
+import { readFileSyncWithMetadata } from '@claude-code/storage/fileRead.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   fetchSingleFileGitDiff,

@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto'
 import { basename } from 'path'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { logEvent } from '@claude-code/local-observability'
-import { readFileSync } from 'src/utils/fileRead.js'
+import { readFileSync } from '@claude-code/storage/fileRead.js'
 import { expandPath } from '@claude-code/storage/path.js'
 import type { PermissionOption } from '@claude-code/permission/components/FilePermissionDialog/permissionOptions.js'
 import type {
@@ -17,7 +17,7 @@ import {
   getPatchForEdits,
 } from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import { getGlobalConfig } from '@claude-code/config'
-import { getPatchFromContents } from 'src/utils/diff.js'
+import { getPatchFromContents } from '@claude-code/agent/diff.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
   callIdeRpc,

@@ -13,7 +13,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { ElicitationRequestEvent } from '@claude-code/mcp-runtime/elicitationHandler.js'
-import { openBrowser } from 'src/utils/browser.js'
+import { openBrowser } from '@claude-code/storage/browser.js'
 import {
   getEnumLabel,
   getEnumValues,

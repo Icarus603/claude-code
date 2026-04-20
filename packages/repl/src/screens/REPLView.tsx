@@ -21,7 +21,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { useSearchHighlight } from '@anthropic/ink'
 import type { JumpHandle } from '@claude-code/repl/components/VirtualMessageList.js'
 import { renderMessagesToPlainText } from '@claude-code/output/render/exportRenderer.js'
-import { openFileInExternalEditor } from 'src/utils/editor.js'
+import { openFileInExternalEditor } from '@claude-code/storage/editor.js'
 import { writeFile } from 'fs/promises'
 import { type TabStatusKind, Box, Text, useStdin, useTheme, useTerminalFocus, useTerminalTitle, useTabStatus } from '@anthropic/ink'
 import { CostThresholdDialog } from '@claude-code/repl/components/CostThresholdDialog.js'
@@ -136,7 +136,7 @@ import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '@claude-code
 import { getSystemPrompt } from 'src/constants/prompts.js';
 import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js';
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
-import { getMemoryFiles } from 'src/utils/claudemd.js';
+import { getMemoryFiles } from '@claude-code/storage/claudemd.js';
 import { startBackgroundHousekeeping } from 'src/utils/backgroundHousekeeping.js';
 import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from 'src/cost-tracker.js';
 import { useCostSummary } from 'src/costHook.js';
@@ -319,7 +319,7 @@ import {
   restoreWorktreeForResume,
   exitRestoredWorktree,
 } from '@claude-code/storage/sessionRestore.js';
-import { isBgSession, updateSessionName, updateSessionActivity } from 'src/utils/concurrentSessions.js';
+import { isBgSession, updateSessionName, updateSessionActivity } from '@claude-code/agent/concurrentSessions.js';
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
 import { restoreRemoteAgentTasks } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js';
 import { useInboxPoller } from '@claude-code/repl/hooks/useInboxPoller.js';

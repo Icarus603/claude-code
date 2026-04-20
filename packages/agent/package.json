@@ -46,7 +46,11 @@
     "./messages.js": "./messages.ts",
     "./hooks.js": "./hooks.ts",
     "./forkedAgent.js": "./forkedAgent.ts",
-    "./attachments.js": "./attachments.ts"
+    "./attachments.js": "./attachments.ts",
+    "./sideQuery.js": "./sideQuery.ts",
+    "./concurrentSessions.js": "./concurrentSessions.ts",
+    "./diff.js": "./diff.ts",
+    "./uuid.js": "./uuid.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

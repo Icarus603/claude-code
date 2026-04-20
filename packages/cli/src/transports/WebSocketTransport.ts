@@ -9,7 +9,7 @@ import { getWebSocketTLSOptions } from '@claude-code/provider/mtls.js'
 import {
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,
-} from 'src/utils/proxy.js'
+} from '@claude-code/provider/proxy.js'
 import {
   registerSessionActivityCallback,
   unregisterSessionActivityCallback,

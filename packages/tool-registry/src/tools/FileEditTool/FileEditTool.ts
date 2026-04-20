@@ -15,7 +15,7 @@ import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { countLinesChanged } from 'src/utils/diff.js'
+import { countLinesChanged } from '@claude-code/agent/diff.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
@@ -33,7 +33,7 @@ import { logFileOperation } from '@claude-code/local-observability/fileOperation
 import {
   type LineEndingType,
   readFileSyncWithMetadata,
-} from 'src/utils/fileRead.js'
+} from '@claude-code/storage/fileRead.js'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {

@@ -13,7 +13,7 @@ import type { LogOption, SerializedMessage } from 'src/types/logs.js'
 import { formatLogMetadata } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { getWorktreePaths } from 'src/utils/getWorktreePaths.js'
-import { getBranch } from 'src/utils/git.js'
+import { getBranch } from '@claude-code/storage/git.js'
 import { getLogDisplayTitle } from 'src/utils/log.js'
 import {
   getFirstMeaningfulUserMessageTextContent,

@@ -22,7 +22,7 @@ import { logError } from '@claude-code/local-observability/logging'
 import { getAPIProviderForStatsig } from '@claude-code/provider/providers.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { logOTelEvent } from 'src/utils/telemetry/events.js'
+import { logOTelEvent } from '@claude-code/local-observability/telemetryEvents.js'
 import {
   endLLMRequestSpan,
   isBetaTracingEnabled,

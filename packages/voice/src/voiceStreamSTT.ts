@@ -20,10 +20,10 @@ import {
   isAnthropicAuthEnabled,
 } from '@claude-code/provider/authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { getUserAgent } from 'src/utils/http.js'
+import { getUserAgent } from '@claude-code/provider/http.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getWebSocketTLSOptions } from '@claude-code/provider/mtls.js'
-import { getWebSocketProxyAgent, getWebSocketProxyUrl } from 'src/utils/proxy.js'
+import { getWebSocketProxyAgent, getWebSocketProxyUrl } from '@claude-code/provider/proxy.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 const KEEPALIVE_MSG = '{"type":"KeepAlive"}'

@@ -8,7 +8,7 @@ import type {
 } from '@claude-code/tool-registry/notebookTypes'
 import { intersperse } from '@claude-code/tool-registry/utils/array.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { getPatchForDisplay } from 'src/utils/diff.js'
+import { getPatchForDisplay } from '@claude-code/agent/diff.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
 import { parseCellId } from 'src/utils/notebook.js'

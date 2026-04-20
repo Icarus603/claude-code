@@ -11,7 +11,7 @@ import { getCodeEditToolDecisionCounter } from '@claude-code/app-host/bootstrap/
 import type { Tool as ToolType, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { getLanguageName } from '@claude-code/output/utils/cliHighlight.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
-import { logOTelEvent } from 'src/utils/telemetry/events.js'
+import { logOTelEvent } from '@claude-code/local-observability/telemetryEvents.js'
 import type {
   PermissionApprovalSource,
   PermissionRejectionSource,

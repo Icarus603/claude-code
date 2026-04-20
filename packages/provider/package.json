@@ -54,6 +54,8 @@
     "./model.js": "./src/model.ts",
     "./providers.js": "./src/providers.ts",
     "./mtls.js": "./src/mtls.ts",
-    "./sessionIngressAuth.js": "./src/sessionIngressAuth.ts"
+    "./sessionIngressAuth.js": "./src/sessionIngressAuth.ts",
+    "./http.js": "./src/http.ts",
+    "./proxy.js": "./src/proxy.ts"
   }
 }

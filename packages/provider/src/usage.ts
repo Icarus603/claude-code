@@ -5,7 +5,7 @@ import {
   hasProfileScope,
   isClaudeAISubscriber,
 } from '@claude-code/provider/authAlias.js'
-import { getAuthHeaders } from 'src/utils/http.js'
+import { getAuthHeaders } from '@claude-code/provider/http.js'
 import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 import { isOAuthTokenExpired } from '@claude-code/provider/oauth/client.js'
 

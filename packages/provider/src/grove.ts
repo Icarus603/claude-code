@@ -15,7 +15,7 @@ import {
   getAuthHeaders,
   getUserAgent,
   withOAuth401Retry,
-} from 'src/utils/http.js'
+} from '@claude-code/provider/http.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 

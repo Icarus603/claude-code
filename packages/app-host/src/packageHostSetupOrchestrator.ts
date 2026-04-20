@@ -4,7 +4,7 @@ import {
 } from '@claude-code/app-host/packageHostSetup'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
-import { findCanonicalGitRoot } from 'src/utils/git.js'
+import { findCanonicalGitRoot } from '@claude-code/storage/git.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 

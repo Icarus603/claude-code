@@ -4,7 +4,7 @@ import { clearSystemPromptSections } from '@claude-code/provider/systemPromptSec
 import { getUserContext } from '@claude-code/provider/context.js'
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
 import { clearClassifierApprovals } from '@claude-code/permission/classifierApprovals.js'
-import { resetGetMemoryFilesCache } from 'src/utils/claudemd.js'
+import { resetGetMemoryFilesCache } from '@claude-code/storage/claudemd.js'
 import { clearSessionMessagesCache } from '@claude-code/storage/sessionStorage.js'
 import { clearBetaTracingState } from 'src/utils/telemetry/betaSessionTracing.js'
 import { resetMicrocompactState } from './microCompact.js'
