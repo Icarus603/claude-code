@@ -3,7 +3,7 @@ import { z } from 'zod/v4'
 import type { Tool, ToolInputJSONSchema } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from 'src/utils/errors.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 

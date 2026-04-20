@@ -6,7 +6,7 @@ import { logEvent } from '@claude-code/local-observability'
 import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { plural } from 'src/utils/stringUtils.js'
 import { resolveAttachments, validateAttachmentPaths } from './attachments.js'
 import {

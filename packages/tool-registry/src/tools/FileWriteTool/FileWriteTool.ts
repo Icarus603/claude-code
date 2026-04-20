@@ -31,7 +31,7 @@ import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,
 } from 'src/utils/gitDiff.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
 import { expandPath } from 'src/utils/path.js'
 import {

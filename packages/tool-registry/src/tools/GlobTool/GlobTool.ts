@@ -9,7 +9,7 @@ import {
 } from 'src/utils/file.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { glob } from 'src/utils/glob.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { expandPath, toRelativePath } from 'src/utils/path.js'
 import { checkReadPermissionForTool } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'

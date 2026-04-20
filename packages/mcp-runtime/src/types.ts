@@ -4,7 +4,7 @@ import type {
   ServerCapabilities,
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
 // Configuration schemas and types
 export const ConfigScopeSchema = lazySchema(() =>

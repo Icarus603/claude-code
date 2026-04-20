@@ -39,7 +39,7 @@ import {
   ShellError,
 } from 'src/utils/errors.js'
 import { truncate } from 'src/utils/format.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { getPlatform } from 'src/utils/platform.js'

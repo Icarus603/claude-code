@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod/v4'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
 /**
  * Valid context names where keybindings can be applied.

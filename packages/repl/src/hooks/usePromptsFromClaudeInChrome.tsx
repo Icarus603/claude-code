@@ -12,7 +12,7 @@ import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isTrackedClaudeInChromeTabId,
 } from 'src/utils/claudeInChrome/common.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js'
 
 // Schema for the prompt notification from Chrome extension (JSON-RPC 2.0 format)

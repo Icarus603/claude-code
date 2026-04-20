@@ -54,6 +54,7 @@
     "./tools/*": "./src/tools/*.ts",
     "./services/*.js": "./src/services/*.ts",
     "./Tool.js": "./src/Tool.ts",
-    "./Task.js": "./src/Task.ts"
+    "./Task.js": "./src/Task.ts",
+    "./utils/lazySchema.js": "./src/utils/lazySchema.ts"
   }
 }

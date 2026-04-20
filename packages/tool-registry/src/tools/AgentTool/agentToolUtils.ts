@@ -42,7 +42,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { isInProtectedNamespace } from 'src/utils/envUtils.js'
 import { AbortError, errorMessage } from 'src/utils/errors.js'
 import type { CacheSafeParams } from 'src/utils/forkedAgent.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   extractTextContent,
   getLastAssistantMessage,

@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod/v4'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
 /**
  * Network configuration schema for sandbox.
