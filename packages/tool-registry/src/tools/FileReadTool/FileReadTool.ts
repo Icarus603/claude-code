@@ -7,7 +7,7 @@ import {
   PDF_AT_MENTION_INLINE_THRESHOLD,
   PDF_EXTRACT_SIZE_THRESHOLD,
   PDF_MAX_PAGES_PER_READ,
-} from 'src/constants/apiLimits.js'
+} from '@claude-code/provider/apiLimits.js'
 import { hasBinaryExtension } from 'src/constants/files.js'
 import { memoryFreshnessNote } from '@claude-code/memory/memoryAge'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

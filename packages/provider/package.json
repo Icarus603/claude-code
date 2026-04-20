@@ -12,6 +12,7 @@
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
     "./oauth/*.js": "./src/oauth/*.ts",
+    "./apiLimits.js": "./src/apiLimits.ts",
     "./claudeAiLimits.js": "./src/claudeAiLimits.ts",
     "./claudeAiLimitsHook.js": "./src/claudeAiLimitsHook.ts",
     "./mockRateLimits.js": "./src/mockRateLimits.ts",
