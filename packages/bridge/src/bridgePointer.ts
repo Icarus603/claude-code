@@ -3,7 +3,7 @@ import { dirname, join } from 'path'
 import { z } from 'zod/v4'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
-import { getWorktreePathsPortable } from 'src/utils/getWorktreePathsPortable.js'
+import { getWorktreePathsPortable } from '@claude-code/storage/getWorktreePathsPortable.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   getProjectsDir,
