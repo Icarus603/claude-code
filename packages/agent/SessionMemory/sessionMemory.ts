@@ -7,7 +7,7 @@
 import { writeFile } from 'fs/promises'
 import memoize from 'lodash-es/memoize.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import { getSystemPrompt } from 'src/constants/prompts.js'
+import { getSystemPrompt } from '@claude-code/agent/prompts.js'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
@@ -27,7 +27,7 @@ import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   type REPLHookContext,
   registerPostSamplingHook,
-} from 'src/utils/hooks/postSamplingHooks.js'
+} from '@claude-code/agent/postSamplingHooks.js'
 import {
   createUserMessage,
   hasToolCallsInLastAssistantTurn,

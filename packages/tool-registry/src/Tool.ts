@@ -80,7 +80,7 @@ import type {
   HookProgress,
   PromptRequest,
   PromptResponse,
-} from 'src/types/hooks.js'
+} from '@claude-code/agent/types/hooks.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import type { AttributionState } from 'src/utils/commitAttribution.js'

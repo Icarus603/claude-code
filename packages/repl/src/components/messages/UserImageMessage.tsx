@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { pathToFileURL } from 'url'
 import { Box, Link, supportsHyperlinks, Text } from '@anthropic/ink'
-import { getStoredImagePath } from 'src/utils/imageStore.js'
+import { getStoredImagePath } from '@claude-code/tool-registry/imageStore.js'
 import { MessageResponse } from '../MessageResponse.js'
 
 type Props = {

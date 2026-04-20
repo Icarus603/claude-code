@@ -55,7 +55,7 @@ import {
 import { parseFrontmatter } from 'src/utils/frontmatterParser.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { createUserMessage, normalizeMessages } from '@claude-code/agent/messages.js'
-import type { ModelAlias } from 'src/utils/model/aliases.js'
+import type { ModelAlias } from '@claude-code/provider/modelAliases.js'
 import { resolveSkillModelOverride } from '@claude-code/provider/model.js'
 import { recordSkillUsage } from 'src/utils/suggestions/skillUsageTracking.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'

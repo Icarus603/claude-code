@@ -47,7 +47,7 @@ import {
   extractConversationText,
   generateSessionTitle,
 } from 'src/utils/sessionTitle.js'
-import { generateShortWordSlug } from 'src/utils/words.js'
+import { generateShortWordSlug } from '@claude-code/tool-registry/words.js'
 import {
   getBridgeAccessToken,
   getBridgeBaseUrl,

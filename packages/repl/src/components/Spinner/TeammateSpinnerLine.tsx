@@ -9,7 +9,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
 import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
-import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
+import { summarizeRecentActivities } from '@claude-code/tool-registry/collapseReadSearch.js'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 

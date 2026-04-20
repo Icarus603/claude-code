@@ -26,7 +26,7 @@ import {
 } from '@claude-code/agent/hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from '@claude-code/storage/path.js'
-import { ripGrep } from 'src/utils/ripgrep.js'
+import { ripGrep } from '@claude-code/tool-registry/ripgrep.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { createSignal } from '@claude-code/config/signal'
 

@@ -50,7 +50,7 @@ import {
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
 } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
-import type { HookProgress } from 'src/types/hooks.js'
+import type { HookProgress } from '@claude-code/agent/types/hooks.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
@@ -102,7 +102,7 @@ import {
 import {
   formatError,
   formatZodValidationError,
-} from 'src/utils/toolErrors.js'
+} from '@claude-code/tool-registry/toolErrors.js'
 import {
   processPreMappedToolResultBlock,
   processToolResultBlock,

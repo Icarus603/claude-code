@@ -21,7 +21,7 @@ import {
   getClaudeTmuxEnv,
   hasTmuxToolBeenUsed,
 } from 'src/utils/tmuxSocket.js'
-import { windowsPathToPosixPath } from 'src/utils/windowsPaths.js'
+import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
 import type { ShellProvider } from './shellProvider.js'
 
 /**

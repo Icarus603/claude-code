@@ -33,7 +33,7 @@ import {
 } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
-import { parseForSecurity } from 'src/utils/bash/ast.js'
+import { parseForSecurity } from '@claude-code/shell/bash/ast-alias.js'
 import {
   splitCommand_DEPRECATED,
   splitCommandWithOperators,

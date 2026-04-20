@@ -39,7 +39,7 @@ import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,
-} from 'src/utils/gitDiff.js'
+} from '@claude-code/tool-registry/gitDiff.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from '@claude-code/storage/path.js'
 import {
@@ -48,7 +48,7 @@ import {
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
-import { validateInputForSettingsFileEdit } from 'src/utils/settings/validateEditTool.js'
+import { validateInputForSettingsFileEdit } from '@claude-code/tool-registry/validateEditTool.js'
 import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/NotebookEditTool/constants.js'
 import {
   FILE_EDIT_TOOL_NAME,

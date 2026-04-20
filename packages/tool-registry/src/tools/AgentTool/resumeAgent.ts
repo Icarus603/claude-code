@@ -1,6 +1,6 @@
 import { promises as fsp } from 'fs'
 import { getSdkAgentProgressSummariesEnabled } from '@claude-code/app-host/bootstrap/state.js'
-import { getSystemPrompt } from 'src/constants/prompts.js'
+import { getSystemPrompt } from '@claude-code/agent/prompts.js'
 import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'

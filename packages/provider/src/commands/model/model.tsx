@@ -17,7 +17,7 @@ import {
   isFastModeEnabled,
   isFastModeSupportedByModel,
 } from 'src/utils/fastMode.js'
-import { MODEL_ALIASES } from 'src/utils/model/aliases.js'
+import { MODEL_ALIASES } from '@claude-code/provider/modelAliases.js'
 import {
   checkOpus1mAccess,
   checkSonnet1mAccess,

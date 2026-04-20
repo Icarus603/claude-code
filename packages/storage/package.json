@@ -33,6 +33,7 @@
     "./git.js": "./src/git.ts",
     "./claudemd.js": "./src/claudemd.ts",
     "./editor.js": "./src/editor.ts",
-    "./imageResizer.js": "./src/imageResizer.ts"
+    "./imageResizer.js": "./src/imageResizer.ts",
+    "./windowsPaths.js": "./src/windowsPaths.ts"
   }
 }

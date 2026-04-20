@@ -29,7 +29,7 @@ import {
   resetTaskList,
   setLeaderTeamName,
 } from '@claude-code/agent/tasks.js'
-import { generateWordSlug } from 'src/utils/words.js'
+import { generateWordSlug } from '@claude-code/tool-registry/words.js'
 import { TEAM_CREATE_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
 import { renderToolUseMessage } from './UI.js'

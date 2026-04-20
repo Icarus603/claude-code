@@ -4,7 +4,7 @@ import stripAnsi from 'strip-ansi'
 import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, stringWidth, useTheme, wrapAnsi } from '@anthropic/ink'
 import type { CliHighlight } from '@claude-code/output/utils/cliHighlight.js'
-import { formatToken, padAligned } from 'src/utils/markdown.js'
+import { formatToken, padAligned } from '@claude-code/output/markdown.js'
 
 /** Accounts for parent indentation (e.g. message dot prefix) and terminal
  *  resize races. Without enough margin the table overflows its layout box

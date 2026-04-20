@@ -46,7 +46,7 @@ import {
 import { configureGlobalAgents } from '@claude-code/provider/proxy.js'
 import { isBetaTracingEnabled } from 'src/utils/telemetry/betaSessionTracing.js'
 import { getTelemetryAttributes } from '@claude-code/local-observability/telemetry'
-import { setShellIfWindows } from 'src/utils/windowsPaths.js'
+import { setShellIfWindows } from '@claude-code/storage/windowsPaths.js'
 import { initSentry } from 'src/utils/sentry.js'
 
 // initialize1PEventLogging is dynamically imported to defer OpenTelemetry sdk-logs/resources

@@ -8,7 +8,7 @@ import { getCommand, getSkillToolCommands, hasCommand } from '@claude-code/comma
 import {
   DEFAULT_AGENT_PROMPT,
   enhanceSystemPromptWithEnvDetails,
-} from 'src/constants/prompts.js'
+} from '@claude-code/agent/prompts.js'
 import type { QuerySource } from '@claude-code/agent/querySource'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
@@ -57,7 +57,7 @@ import { clearSessionHooks } from 'src/utils/hooks/sessionHooks.js'
 import { executeSubagentStartHooks } from '@claude-code/agent/hooks.js'
 import { createUserMessage } from '@claude-code/agent/messages.js'
 import { getAgentModel } from 'src/utils/model/agent.js'
-import type { ModelAlias } from 'src/utils/model/aliases.js'
+import type { ModelAlias } from '@claude-code/provider/modelAliases.js'
 import {
   clearAgentTranscriptSubdir,
   recordSidechainTranscript,

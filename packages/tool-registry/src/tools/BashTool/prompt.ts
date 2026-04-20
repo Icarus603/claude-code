@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import { prependBullets } from 'src/constants/prompts.js'
+import { prependBullets } from '@claude-code/agent/prompts.js'
 import { getAttributionTexts } from '@claude-code/agent/attribution.js'
 import { hasEmbeddedSearchTools } from '@claude-code/config/embeddedTools.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
@@ -14,7 +14,7 @@ import {
 import {
   getUndercoverInstructions,
   isUndercover,
-} from 'src/utils/undercover.js'
+} from '@claude-code/tool-registry/undercover.js'
 import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'

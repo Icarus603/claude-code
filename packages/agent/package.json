@@ -55,7 +55,10 @@
     "./sessionStores.js": "./sessionStores.ts",
     "./tokens.js": "./tokens.ts",
     "./toolSearch.js": "./toolSearch.ts",
-    "./context.js": "./context.ts"
+    "./context.js": "./context.ts",
+    "./types/hooks.js": "./types/hooks.ts",
+    "./prompts.js": "./prompts.ts",
+    "./postSamplingHooks.js": "./postSamplingHooks.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

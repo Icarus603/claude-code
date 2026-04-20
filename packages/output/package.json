@@ -27,6 +27,7 @@
     "./hyperlink.js": "./src/hyperlink.ts",
     "./textHighlighting.js": "./src/textHighlighting.ts",
     "./formatters/truncate.js": "./src/formatters/truncate.ts",
-    "./render/exportRenderer.js": "./src/render/exportRenderer.tsx"
+    "./render/exportRenderer.js": "./src/render/exportRenderer.tsx",
+    "./markdown.js": "./src/markdown.ts"
   }
 }

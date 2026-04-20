@@ -26,7 +26,7 @@ import type {
 import { type AdvisorBlock, isAdvisorBlock } from 'src/utils/advisor.js'
 import { collapseBackgroundBashNotifications } from '@claude-code/shell/collapseBackgroundBashNotifications.js'
 import { collapseHookSummaries } from 'src/utils/collapseHookSummaries.js'
-import { collapseReadSearchGroups } from 'src/utils/collapseReadSearch.js'
+import { collapseReadSearchGroups } from '@claude-code/tool-registry/collapseReadSearch.js'
 import { collapseTeammateShutdowns } from 'src/utils/collapseTeammateShutdowns.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

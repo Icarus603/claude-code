@@ -9,7 +9,7 @@ import {
   getToolSearchOrReadInfo,
   getToolUseIdsFromCollapsedGroup,
   hasAnyToolInProgress,
-} from 'src/utils/collapseReadSearch.js'
+} from '@claude-code/tool-registry/collapseReadSearch.js'
 import {
   type buildMessageLookups,
   EMPTY_STRING_SET,

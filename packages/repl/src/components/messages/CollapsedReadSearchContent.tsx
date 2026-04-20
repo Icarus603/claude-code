@@ -10,7 +10,7 @@ import type {
   NormalizedAssistantMessage,
 } from '@claude-code/agent/messageShapes'
 import { uniq } from '@claude-code/tool-registry/utils/array.js'
-import { getToolUseIdsFromCollapsedGroup } from 'src/utils/collapseReadSearch.js'
+import { getToolUseIdsFromCollapsedGroup } from '@claude-code/tool-registry/collapseReadSearch.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { formatDuration, formatSecondsShort } from '@claude-code/output/formatters'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'

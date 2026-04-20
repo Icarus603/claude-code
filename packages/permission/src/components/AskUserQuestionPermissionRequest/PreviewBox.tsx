@@ -6,7 +6,7 @@ import {
   type CliHighlight,
   getCliHighlightPromise,
 } from '@claude-code/output/utils/cliHighlight.js'
-import { applyMarkdown } from 'src/utils/markdown.js'
+import { applyMarkdown } from '@claude-code/output/markdown.js'
 import sliceAnsi from '@claude-code/output/utils/sliceAnsi.js'
 
 type PreviewBoxProps = {

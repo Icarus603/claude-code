@@ -14,7 +14,7 @@ import {
 import {
   enhanceSystemPromptWithEnvDetails,
   getSystemPrompt,
-} from 'src/constants/prompts.js'
+} from '@claude-code/agent/prompts.js'
 import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
 import { startAgentSummarization } from '@claude-code/agent/AgentSummary/agentSummary.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
