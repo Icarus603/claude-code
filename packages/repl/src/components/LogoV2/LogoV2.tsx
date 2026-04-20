@@ -44,7 +44,7 @@ import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   getStartupPerfLogPath,
   isDetailedProfilingEnabled,
-} from 'src/utils/startupProfiler.js'
+} from '@claude-code/app-host/startup/startupProfiler.js'
 import { EmergencyTip } from './EmergencyTip.js'
 import { VoiceModeNotice } from './VoiceModeNotice.js'
 import { Opus1mMergeNotice } from './Opus1mMergeNotice.js'
