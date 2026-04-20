@@ -7,7 +7,7 @@
  */
 
 import { SHOW_CURSOR } from '@anthropic/ink'
-import { isRunningWithBun } from 'src/utils/bundledMode.js'
+import { isRunningWithBun } from '@claude-code/config/bundledMode'
 import {
   getManagedSettingsKeysForLogging,
   getSettingsForSource,

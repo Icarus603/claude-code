@@ -22,7 +22,7 @@ import { loadRemoteManagedSettings } from 'src/services/remoteManagedSettings/in
 import { setInlinePlugins } from '@claude-code/app-host/bootstrap/state.js'
 import { clearPluginCache } from 'src/utils/plugins/pluginLoader.js'
 import { runMigrations } from '@claude-code/app-host/main/startup/settings.js'
-import { canUserConfigureAdvisor } from 'src/utils/advisor.js'
+import { canUserConfigureAdvisor } from '@claude-code/provider/advisor.js'
 import { ensureMdmSettingsLoaded } from 'src/utils/settings/mdm/settings.js'
 import { ensureKeychainPrefetchCompleted } from 'src/utils/secureStorage/keychainPrefetch.js'
 import {

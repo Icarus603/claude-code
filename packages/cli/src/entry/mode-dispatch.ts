@@ -106,9 +106,9 @@ import {
   isAdvisorEnabled,
   isValidAdvisorModel,
   modelSupportsAdvisor,
-} from 'src/utils/advisor.js'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
-import { count, uniq } from 'src/utils/array.js'
+} from '@claude-code/provider/advisor.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
+import { count, uniq } from '@claude-code/tool-registry/utils/array.js'
 import { installAsciicastRecorder } from 'src/utils/asciicast.js'
 import {
   getSubscriptionType,
@@ -146,11 +146,11 @@ import {
   syncRuntimeHandlesFromHeadlessParams,
 } from '@claude-code/app-host/runtime/runtimeHandles.js'
 import { createSystemMessage, createUserMessage } from 'src/utils/messages.js'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
 import { jsonParse, writeFileSync_DEPRECATED } from 'src/utils/slowOperations.js'
 import { computeInitialTeamContext } from '@claude-code/swarm'
-import { isWorktreeModeEnabled } from 'src/utils/worktreeModeEnabled.js'
+import { isWorktreeModeEnabled } from '@claude-code/agent/worktreeModeEnabled.js'
 import { relative, resolve } from 'path'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
@@ -214,7 +214,7 @@ import {
 } from 'src/utils/envUtils.js'
 import { refreshExampleCommands } from '@claude-code/command-runtime/exampleCommands.js'
 import type { FpsMetrics } from 'src/utils/fpsTracker.js'
-import { getWorktreePaths } from 'src/utils/getWorktreePaths.js'
+import { getWorktreePaths } from '@claude-code/storage/getWorktreePaths.js'
 import {
   findGitRoot,
   getBranch,
@@ -277,7 +277,7 @@ import {
   logPluginsEnabledForSession,
 } from 'src/utils/telemetry/pluginTelemetry.js'
 import { logSkillsLoaded } from 'src/utils/telemetry/skillLoadedEvent.js'
-import { generateTempFilePath } from 'src/utils/tempfile.js'
+import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
 import { validateUuid } from 'src/utils/uuid.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
 import { getRelevantTips } from 'src/services/tips/tipRegistry.js'
@@ -302,7 +302,7 @@ import {
   isENOENT,
   TeleportOperationError,
   toError,
-} from 'src/utils/errors.js'
+} from '@claude-code/local-observability/errorHelpers.js'
 import {
   getFsImplementation,
   safeResolvePath,
@@ -313,14 +313,14 @@ import {
 } from 'src/utils/gracefulShutdown.js'
 import { setAllHookEventsEnabled } from 'src/utils/hooks/hookEvents.js'
 import { refreshModelCapabilities } from 'src/utils/model/modelCapabilities.js'
-import { peekForStdinData, writeToStderr } from 'src/utils/process.js'
+import { peekForStdinData, writeToStderr } from '@claude-code/shell/process.js'
 import { setCwd } from 'src/utils/Shell.js'
 import {
   type ProcessedResume,
   processResumedConversation,
 } from '@claude-code/storage/sessionRestore.js'
 import { parseSettingSourcesFlag } from 'src/utils/settings/constants.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import {
   type ChannelEntry,
   getInitialMainLoopModel,
@@ -354,7 +354,7 @@ import {
 } from '../state-shim.js'
 import { asSessionId } from 'src/types/ids.js'
 import { filterAllowedSdkBetas } from 'src/utils/betas.js'
-import { isInBundledMode, isRunningWithBun } from 'src/utils/bundledMode.js'
+import { isInBundledMode, isRunningWithBun } from '@claude-code/config/bundledMode'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import {
   filterExistingPaths,
