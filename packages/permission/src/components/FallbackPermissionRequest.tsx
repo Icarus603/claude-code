@@ -5,7 +5,7 @@ import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.j
 import { env } from 'src/utils/env.js'
 import { shouldShowAlwaysAllowOptions } from '@claude-code/permission/permissionsLoader.js'
 import { truncateToLines } from 'src/utils/stringUtils.js'
-import { logUnaryEvent } from 'src/utils/unaryLogging.js'
+import { logUnaryEvent } from '@claude-code/local-observability/logging'
 import { type UnaryEvent, usePermissionRequestLogging } from './hooks.js'
 import { PermissionDialog } from './PermissionDialog.js'
 import {

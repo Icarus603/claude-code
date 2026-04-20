@@ -7,7 +7,7 @@ import { SKILL_TOOL_NAME } from '@claude-code/tool-registry/tools/SkillTool/cons
 import { SkillTool } from '@claude-code/tool-registry/tools/SkillTool/SkillTool.js'
 import { env } from 'src/utils/env.js'
 import { shouldShowAlwaysAllowOptions } from '@claude-code/permission/permissionsLoader.js'
-import { logUnaryEvent } from 'src/utils/unaryLogging.js'
+import { logUnaryEvent } from '@claude-code/local-observability/logging'
 import { type UnaryEvent, usePermissionRequestLogging } from '../hooks.js'
 import { PermissionDialog } from '../PermissionDialog.js'
 import {

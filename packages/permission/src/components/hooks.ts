@@ -21,7 +21,7 @@ import type { ToolUseConfirm } from './PermissionRequest.js'
 import { useSetAppState } from '../appStateHooks.js'
 import { env } from 'src/utils/env.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { type CompletionType, logUnaryEvent } from 'src/utils/unaryLogging.js'
+import { type CompletionType, logUnaryEvent } from '@claude-code/local-observability/logging'
 import { readEnv } from '@claude-code/config/env'
 
 export type UnaryEvent = {
