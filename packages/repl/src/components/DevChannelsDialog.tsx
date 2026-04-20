@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import type { ChannelEntry } from '@claude-code/app-host/bootstrap/state.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
-import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { Select } from './CustomSelect/index.js'
 
 type Props = {

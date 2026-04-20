@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { logEvent } from '@claude-code/local-observability'
 import { Box, Link, Newline, Text } from '@anthropic/ink'
-import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 import { Select } from './CustomSelect/index.js'
 import { Dialog } from '@anthropic/ink'

@@ -14,7 +14,7 @@ import { clearMemoryFileCaches } from 'src/utils/claudemd.js'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { updateHooksConfigSnapshot } from 'src/utils/hooks/hooksConfigSnapshot.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { getPlansDirectory } from 'src/utils/plans.js'
+import { getPlansDirectory } from '@claude-code/storage/plans.js'
 import { setCwd } from 'src/utils/Shell.js'
 import { saveWorktreeState } from '@claude-code/storage/sessionStorage.js'
 import {

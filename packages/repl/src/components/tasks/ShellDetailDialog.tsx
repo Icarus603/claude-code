@@ -14,7 +14,7 @@ import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
 import { formatDuration, formatFileSize } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { tailFile } from '@claude-code/storage/fsOperations.js'
-import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
+import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 
 type Props = {

@@ -18,7 +18,7 @@ import {
   sanitizeModelName,
 } from 'src/utils/commitAttribution.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { parseJSONL } from 'src/utils/json.js'
+import { parseJSONL } from '@claude-code/storage/json.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   getCanonicalName,

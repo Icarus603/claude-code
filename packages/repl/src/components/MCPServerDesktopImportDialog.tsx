@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { writeToStdout } from '@claude-code/shell/process.js'
 import { Box, color, Text, useTheme, Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { addMcpConfig, getAllMcpConfigs } from '@claude-code/mcp-runtime/config.js'

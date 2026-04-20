@@ -48,8 +48,8 @@ import {
   saveCurrentProjectConfig,
 } from '@claude-code/config'
 import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
-import { safeParseJSON } from 'src/utils/json.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
+import { safeParseJSON } from '@claude-code/storage/json.js'
 import { getPlatform } from '@claude-code/config/platform'
 import { cliError, cliOk } from '../exit.js'
 

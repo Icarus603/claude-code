@@ -1,6 +1,6 @@
 import sample from 'lodash-es/sample.js'
 import React from 'react'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { WorktreeExitDialog } from './WorktreeExitDialog.js'
 
 const GOODBYE_MESSAGES = ['Goodbye!', 'See ya!', 'Bye!', 'Catch you later!']

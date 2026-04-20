@@ -20,7 +20,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getPatchForDisplay } from 'src/utils/diff.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getPlansDirectory } from 'src/utils/plans.js'
+import { getPlansDirectory } from '@claude-code/storage/plans.js'
 import { openForScan, readCapped } from 'src/utils/readEditContext.js'
 import type { Output } from './FileWriteTool.js'
 

@@ -6,7 +6,7 @@ import {
 } from '@claude-code/local-observability'
 import { getOauthAccountInfo, isConsumerSubscriber } from '@claude-code/provider/authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { writeToStderr } from '@claude-code/shell/process.js'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'

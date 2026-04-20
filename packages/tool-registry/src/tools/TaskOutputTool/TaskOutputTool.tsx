@@ -19,7 +19,7 @@ import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolea
 import { sleep } from '@claude-code/config/sleep'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
-import { getTaskOutput } from 'src/utils/task/diskOutput.js'
+import { getTaskOutput } from '@claude-code/storage/task/diskOutput.js'
 import { updateTaskState } from 'src/utils/task/framework.js'
 import { formatTaskOutput } from 'src/utils/task/outputFormatting.js'
 import type { ThemeName } from '@anthropic/ink'

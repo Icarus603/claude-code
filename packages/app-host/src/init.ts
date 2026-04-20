@@ -30,7 +30,7 @@ import { ConfigParseError, errorMessage } from '@claude-code/local-observability
 import {
   gracefulShutdownSync,
   setupGracefulShutdown,
-} from 'src/utils/gracefulShutdown.js'
+} from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import {
   applyConfigEnvironmentVariables,
   applySafeConfigEnvironmentVariables,

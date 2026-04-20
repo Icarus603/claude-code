@@ -3,7 +3,7 @@ import {
   checkIsGitClean,
   checkNeedsClaudeAiLogin,
 } from 'src/utils/background/remote/preconditions.js'
-import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { Box, Text } from '@anthropic/ink'
 import { ConsoleOAuthFlow } from './ConsoleOAuthFlow.js'
 import { Select } from './CustomSelect/index.js'

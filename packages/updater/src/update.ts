@@ -13,7 +13,7 @@ import {
 } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getDoctorDiagnostic } from 'src/utils/doctorDiagnostic.js'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import {
   installOrUpdateClaudePackage,
   localInstallationExists,

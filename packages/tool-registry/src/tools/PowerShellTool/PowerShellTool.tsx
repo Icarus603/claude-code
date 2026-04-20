@@ -51,9 +51,9 @@ import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolea
 import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js'
 import { getCachedPowerShellPath } from '@claude-code/shell/legacy/powershellDetection.js'
 import { EndTruncatingAccumulator } from '@claude-code/output/utils/stringUtils.js'
-import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
+import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import { TaskOutput } from 'src/utils/task/TaskOutput.js'
-import { isOutputLineTruncated } from 'src/utils/terminal.js'
+import { isOutputLineTruncated } from '@claude-code/output/terminal.js'
 import {
   buildLargeToolResultMessage,
   ensureToolResultsDir,

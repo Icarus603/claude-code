@@ -9,7 +9,7 @@ import { isDebugMode, logForDebugging } from '@claude-code/local-observability/d
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { writeToStdout } from '@claude-code/shell/process.js'
 import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'

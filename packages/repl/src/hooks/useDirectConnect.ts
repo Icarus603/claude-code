@@ -18,7 +18,7 @@ import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { Message as MessageType } from '@claude-code/agent/messageShapes'
 import type { PermissionAskDecision } from '@claude-code/permission/permissionTypes'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 
 type UseDirectConnectResult = {

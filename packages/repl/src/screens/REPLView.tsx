@@ -236,7 +236,7 @@ import { generateSessionTitle } from 'src/utils/sessionTitle.js';
 import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js';
 import { escapeXml } from '@claude-code/output/xml';
 import type { ThinkingConfig } from 'src/utils/thinking.js';
-import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js';
+import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js';
 import { handlePromptSubmit, type PromptInputHelpers } from 'src/utils/handlePromptSubmit.js';
 import { useQueueProcessor } from '@claude-code/repl/hooks/useQueueProcessor.js';
 import { useMailboxBridge } from '@claude-code/repl/hooks/useMailboxBridge.js';
@@ -276,7 +276,7 @@ import { useReplRuntimeViews } from './repl/useReplRuntimeViews.js';
 import type { ContentBlockParam, ImageBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs';
 import type { ProcessUserInputContext } from 'src/utils/processUserInput/processUserInput.js';
 import type { PastedContent } from '@claude-code/config';
-import { copyPlanForFork, copyPlanForResume, getPlanSlug, setPlanSlug } from 'src/utils/plans.js';
+import { copyPlanForFork, copyPlanForResume, getPlanSlug, setPlanSlug } from '@claude-code/storage/plans.js';
 import {
   clearSessionMetadata,
   resetSessionFilePointer,

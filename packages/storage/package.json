@@ -22,6 +22,9 @@
     "./lockfile.js": "./src/lockfile.ts",
     "./fsOperations.js": "./src/fsOperations.ts",
     "./path.js": "./src/path.ts",
-    "./file.js": "./src/file.ts"
+    "./file.js": "./src/file.ts",
+    "./json.js": "./src/json.ts",
+    "./plans.js": "./src/plans.ts",
+    "./task/diskOutput.js": "./src/task/diskOutput.ts"
   }
 }

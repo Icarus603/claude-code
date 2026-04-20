@@ -8,8 +8,8 @@ import { Text } from '@anthropic/ink'
 import { FilePathLink } from '@claude-code/repl/components/FilePathLink.js'
 import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from '@claude-code/storage/file.js'
 import { formatFileSize } from '@claude-code/output/formatters'
-import { getPlansDirectory } from 'src/utils/plans.js'
-import { getTaskOutputDir } from 'src/utils/task/diskOutput.js'
+import { getPlansDirectory } from '@claude-code/storage/plans.js'
+import { getTaskOutputDir } from '@claude-code/storage/task/diskOutput.js'
 import type { Input, Output } from './FileReadTool.js'
 
 /**

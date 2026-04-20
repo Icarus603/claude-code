@@ -42,7 +42,7 @@ import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { fileHistoryRestoreStateFromLog } from '@claude-code/agent/file-history'
 import { createSystemMessage } from '@claude-code/agent/messages.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
-import { getPlansDirectory } from 'src/utils/plans.js'
+import { getPlansDirectory } from '@claude-code/storage/plans.js'
 import { setCwd } from 'src/utils/Shell.js'
 import {
   adoptResumedSessionFile,
