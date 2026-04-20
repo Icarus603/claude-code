@@ -68,7 +68,7 @@ import {
 import {
   getPewterLedgerVariant,
   isPlanModeInterviewPhaseEnabled,
-} from 'src/utils/planModeV2.js'
+} from '@claude-code/permission/planModeV2.js'
 import { getPlan, getPlanFilePath } from '@claude-code/storage/plans.js'
 import {
   editFileInEditor,

@@ -12,7 +12,7 @@ import {
   filterToolsByServer,
 } from '@claude-code/mcp-runtime/utils.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
-import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { MCPAgentServerMenu } from './MCPAgentServerMenu.js'
 import { MCPListPanel } from './MCPListPanel.js'
 import { MCPRemoteServerMenu } from './MCPRemoteServerMenu.js'

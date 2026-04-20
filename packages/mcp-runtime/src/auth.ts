@@ -38,7 +38,7 @@ import { errorMessage, getErrnoCode } from '@claude-code/local-observability/err
 import * as lockfile from '@claude-code/storage/lockfile.js'
 import { logMCPDebug } from '@claude-code/local-observability/logging'
 import { getPlatform } from '@claude-code/config/platform'
-import { getSecureStorage } from 'src/utils/secureStorage/index.js'
+import { getSecureStorage } from '@claude-code/storage/secureStorage.js'
 import { clearKeychainCache } from 'src/utils/secureStorage/macOsKeychainHelpers.js'
 import type { SecureStorageData } from 'src/utils/secureStorage/types.js'
 import { sleep } from '@claude-code/config/sleep'

@@ -40,7 +40,7 @@ import type {
   ToolUseSummaryMessage,
   UserMessage,
 } from '@claude-code/agent/messageShapes'
-import { createAttachmentMessage } from 'src/utils/attachments.js'
+import { createAttachmentMessage } from '@claude-code/agent/attachments.js'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import {
@@ -77,7 +77,7 @@ import {
   registerAgent as registerPerfettoAgent,
   unregisterAgent as unregisterPerfettoAgent,
 } from 'src/utils/telemetry/perfettoTracing.js'
-import type { ContentReplacementState } from 'src/utils/toolResultStorage.js'
+import type { ContentReplacementState } from '@claude-code/storage/toolResultStorage.js'
 import { createAgentId } from 'src/utils/uuid.js'
 import { resolveAgentTools } from './agentToolUtils.js'
 import { type AgentDefinition, isBuiltInAgent } from './loadAgentsDir.js'

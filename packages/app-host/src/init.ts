@@ -35,7 +35,7 @@ import {
   applyConfigEnvironmentVariables,
   applySafeConfigEnvironmentVariables,
 } from 'src/utils/managedEnv.js'
-import { configureGlobalMTLS } from 'src/utils/mtls.js'
+import { configureGlobalMTLS } from '@claude-code/provider/mtls.js'
 import {
   ensureScratchpadDir,
   isScratchpadEnabled,

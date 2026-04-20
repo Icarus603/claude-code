@@ -5,7 +5,7 @@ import { CircularBuffer } from '@claude-code/output/buffers'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
+import { getWebSocketTLSOptions } from '@claude-code/provider/mtls.js'
 import {
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,

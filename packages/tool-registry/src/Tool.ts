@@ -59,7 +59,7 @@ import type {
 import type { FileStateCache } from '@claude-code/tool-registry/fileStateCache'
 import type { DenialTrackingState } from '@claude-code/permission/denialTracking'
 import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
-import type { ContentReplacementState } from 'src/utils/toolResultStorage.js'
+import type { ContentReplacementState } from '@claude-code/storage/toolResultStorage.js'
 
 // Re-export progress types for backwards compatibility
 export type {

@@ -59,7 +59,7 @@ import type {
   StopHookInfo,
 } from '@claude-code/agent/messageShapes'
 import { count } from '@claude-code/tool-registry/utils/array.js'
-import { createAttachmentMessage } from 'src/utils/attachments.js'
+import { createAttachmentMessage } from '@claude-code/agent/attachments.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   AbortError,
@@ -106,7 +106,7 @@ import {
 import {
   processPreMappedToolResultBlock,
   processToolResultBlock,
-} from 'src/utils/toolResultStorage.js'
+} from '@claude-code/storage/toolResultStorage.js'
 import {
   extractDiscoveredToolNames,
   isToolSearchEnabledOptimistic,

@@ -12,7 +12,7 @@ import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { writeToStdout } from '@claude-code/shell/process.js'
-import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import {
   setSessionMetadataChangedListener,
   setSessionStateChangedListener,

@@ -45,7 +45,8 @@
     "./types/messages.js": "./types/messages.ts",
     "./messages.js": "./messages.ts",
     "./hooks.js": "./hooks.ts",
-    "./forkedAgent.js": "./forkedAgent.ts"
+    "./forkedAgent.js": "./forkedAgent.ts",
+    "./attachments.js": "./attachments.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

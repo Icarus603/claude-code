@@ -2,7 +2,7 @@ import axios, { type AxiosError } from 'axios'
 import type { StdoutMessage } from '@claude-code/headless-sdk/controlTypes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
-import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { SerialBatchEventUploader } from './SerialBatchEventUploader.js'
 import {
   WebSocketTransport,

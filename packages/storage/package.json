@@ -25,6 +25,8 @@
     "./file.js": "./src/file.ts",
     "./json.js": "./src/json.ts",
     "./plans.js": "./src/plans.ts",
-    "./task/diskOutput.js": "./src/task/diskOutput.ts"
+    "./task/diskOutput.js": "./src/task/diskOutput.ts",
+    "./secureStorage.js": "./src/secureStorage.ts",
+    "./toolResultStorage.js": "./src/toolResultStorage.ts"
   }
 }

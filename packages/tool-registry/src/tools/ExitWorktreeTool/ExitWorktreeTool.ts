@@ -15,7 +15,7 @@ import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { updateHooksConfigSnapshot } from 'src/utils/hooks/hooksConfigSnapshot.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { getPlansDirectory } from '@claude-code/storage/plans.js'
-import { setCwd } from 'src/utils/Shell.js'
+import { setCwd } from '@claude-code/shell/Shell.js'
 import { saveWorktreeState } from '@claude-code/storage/sessionStorage.js'
 import {
   cleanupWorktree,

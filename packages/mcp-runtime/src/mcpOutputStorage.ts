@@ -8,7 +8,7 @@ import type { MCPResultType } from '@claude-code/mcp-runtime/clientRuntime.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { logError } from '@claude-code/local-observability/logging'
-import { ensureToolResultsDir, getToolResultsDir } from 'src/utils/toolResultStorage.js'
+import { ensureToolResultsDir, getToolResultsDir } from '@claude-code/storage/toolResultStorage.js'
 
 /**
  * Generates a format description string based on the MCP result type and schema.

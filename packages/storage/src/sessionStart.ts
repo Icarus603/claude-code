@@ -1,6 +1,6 @@
 import { getMainThreadAgentType } from '@claude-code/app-host/bootstrap/state.js'
 import type { HookResultMessage } from '@claude-code/agent/messageShapes'
-import { createAttachmentMessage } from 'src/utils/attachments.js'
+import { createAttachmentMessage } from '@claude-code/agent/attachments.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { withDiagnosticsTiming } from '@claude-code/local-observability/logging'
 import { isBareMode } from '@claude-code/config/env/utils'

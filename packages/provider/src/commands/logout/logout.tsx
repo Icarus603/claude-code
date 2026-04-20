@@ -13,7 +13,7 @@ import { getClaudeAIOAuthTokens, removeApiKey } from '@claude-code/provider/auth
 import { clearBetasCaches } from 'src/utils/betas.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
-import { getSecureStorage } from 'src/utils/secureStorage/index.js'
+import { getSecureStorage } from '@claude-code/storage/secureStorage.js'
 import { clearToolSchemaCache } from 'src/utils/toolSchemaCache.js'
 import { resetUserCache } from 'src/utils/user.js'
 

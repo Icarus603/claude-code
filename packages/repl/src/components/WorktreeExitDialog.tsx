@@ -5,7 +5,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { getPlansDirectory } from '@claude-code/storage/plans.js'
-import { setCwd } from 'src/utils/Shell.js'
+import { setCwd } from '@claude-code/shell/Shell.js'
 import {
   cleanupWorktree,
   getCurrentWorktreeSession,

@@ -43,7 +43,7 @@ import { fileHistoryRestoreStateFromLog } from '@claude-code/agent/file-history'
 import { createSystemMessage } from '@claude-code/agent/messages.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { getPlansDirectory } from '@claude-code/storage/plans.js'
-import { setCwd } from 'src/utils/Shell.js'
+import { setCwd } from '@claude-code/shell/Shell.js'
 import {
   adoptResumedSessionFile,
   recordContentReplacement,
@@ -55,7 +55,7 @@ import {
 import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
 import type { TodoList } from 'src/utils/todo/types.js'
 import { TodoListSchema } from 'src/utils/todo/types.js'
-import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'
+import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'
 import {
   getCurrentWorktreeSession,
   restoreWorktreeSession,

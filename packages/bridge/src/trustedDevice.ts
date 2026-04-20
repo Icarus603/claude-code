@@ -9,7 +9,7 @@ import {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
-import { getSecureStorage } from 'src/utils/secureStorage/index.js'
+import { getSecureStorage } from '@claude-code/storage/secureStorage.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 /**

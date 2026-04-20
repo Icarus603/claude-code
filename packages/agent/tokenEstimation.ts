@@ -5,7 +5,7 @@ import type { BetaMessageParam as MessageParam } from '@anthropic-ai/sdk/resourc
 import type { CountTokensCommandInput } from '@aws-sdk/client-bedrock-runtime'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { VERTEX_COUNT_TOKENS_ALLOWED_BETAS } from 'src/constants/betas.js'
-import type { Attachment } from 'src/utils/attachments.js'
+import type { Attachment } from '@claude-code/agent/attachments.js'
 import { getModelBetas } from 'src/utils/betas.js'
 import { getVertexRegionForModel, isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
