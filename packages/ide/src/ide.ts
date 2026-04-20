@@ -22,7 +22,7 @@ import {
   execSyncWithDefaults_DEPRECATED,
 } from 'src/utils/execFileNoThrow.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
-import { getAncestorPidsAsync } from 'src/utils/genericProcessUtils.js'
+import { getAncestorPidsAsync } from '@claude-code/shell/genericProcessUtils.js'
 import { isJetBrainsPluginInstalledCached } from 'src/utils/jetbrains.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPlatform } from 'src/utils/platform.js'

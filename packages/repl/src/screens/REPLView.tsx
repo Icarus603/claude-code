@@ -378,7 +378,7 @@ const shouldShowAntModelSwitch =
 const UndercoverAutoCallout =
   process.env.USER_TYPE === 'ant' ? require('@claude-code/repl/components/UndercoverAutoCallout.js').UndercoverAutoCallout : null;
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-import { activityManager } from 'src/utils/activityManager.js';
+import { activityManager } from '@claude-code/app-host/activityManager.js';
 import { createAbortController } from '@claude-code/agent/abortController.js';
 import { MCPConnectionManager } from 'src/services/mcp/MCPConnectionManager.js';
 import { useFeedbackSurvey } from '@claude-code/repl/components/FeedbackSurvey/useFeedbackSurvey.js';

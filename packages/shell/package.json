@@ -18,7 +18,8 @@
     "./execSyncWrapper.js": "./src/execSyncWrapper.ts",
     "./shellConfig.js": "./src/shellConfig.ts",
     "./which.js": "./src/which.ts",
-    "./process.js": "./src/process.ts"
+    "./process.js": "./src/process.ts",
+    "./genericProcessUtils.js": "./src/genericProcessUtils.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",
