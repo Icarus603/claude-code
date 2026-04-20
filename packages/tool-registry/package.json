@@ -80,6 +80,7 @@
     "./ripgrep.js": "./src/ripgrep.ts",
     "./collapseReadSearch.js": "./src/collapseReadSearch.ts",
     "./todoTypes.js": "./src/todoTypes.ts",
-    "./taskOutput.js": "./src/taskOutput.ts"
+    "./taskOutput.js": "./src/taskOutput.ts",
+    "./peerAddress.js": "./src/peerAddress.ts"
   }
 }

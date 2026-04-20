@@ -4,7 +4,7 @@ import {
   EDITOR_MODES,
   NOTIFICATION_CHANNELS,
   TEAMMATE_MODES,
-} from 'src/utils/configConstants.js'
+} from '@claude-code/config/configConstants.js'
 import { getModelOptions } from '@claude-code/provider/modelOptions.js'
 import { validateModel } from '@claude-code/provider/validateModel.js'
 import { THEME_NAMES, THEME_SETTINGS } from '@anthropic/ink'
