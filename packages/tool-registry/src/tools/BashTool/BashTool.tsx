@@ -37,7 +37,7 @@ import { parseForSecurity } from 'src/utils/bash/ast.js'
 import {
   splitCommand_DEPRECATED,
   splitCommandWithOperators,
-} from 'src/utils/bash/commands.js'
+} from '@claude-code/shell/bash/commands.js'
 import { extractClaudeCodeHints } from 'src/utils/claudeCodeHints.js'
 import { detectCodeIndexingFromCommand } from 'src/utils/codeIndexing.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

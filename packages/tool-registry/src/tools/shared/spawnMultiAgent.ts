@@ -17,7 +17,7 @@ import { createTaskStateBase, generateTaskId } from '@claude-code/tool-registry/
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import { formatAgentId } from '@claude-code/agent/agentIdUtils'
-import { quote } from 'src/utils/bash/shellQuote.js'
+import { quote } from '@claude-code/shell/bash/shellQuote.js'
 import { isInBundledMode } from '@claude-code/config/bundledMode'
 import { getGlobalConfig } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'

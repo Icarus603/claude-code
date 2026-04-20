@@ -6,8 +6,8 @@ import type { Redirect, SimpleCommand } from 'src/utils/bash/ast.js'
 import {
   extractOutputRedirections,
   splitCommand_DEPRECATED,
-} from 'src/utils/bash/commands.js'
-import { tryParseShellCommand } from 'src/utils/bash/shellQuote.js'
+} from '@claude-code/shell/bash/commands.js'
+import { tryParseShellCommand } from '@claude-code/shell/bash/shellQuote.js'
 import { getDirectoryForPath } from '@claude-code/storage/path.js'
 import { allWorkingDirectories } from '@claude-code/permission/filesystem'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
