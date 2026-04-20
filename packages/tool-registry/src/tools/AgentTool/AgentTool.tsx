@@ -44,7 +44,7 @@ import {
   formatPreconditionError,
   getRemoteTaskSessionUrl,
   registerRemoteAgentTask,
-} from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js'
+} from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
 import { assembleToolPool } from '@claude-code/tool-registry/toolsList.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
 import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
@@ -76,7 +76,7 @@ import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import { getParentSessionId, isTeammate } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
-import { teleportToRemote } from 'src/utils/teleport.js'
+import { teleportToRemote } from '@claude-code/tool-registry/teleport.js'
 import { getAssistantMessageContentLength } from '@claude-code/agent/tokens.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'
 import {

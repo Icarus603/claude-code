@@ -7,7 +7,7 @@ import {
 import type { TeleportRemoteResponse } from '@claude-code/repl/conversationRecovery.js'
 import type { CodeSession } from '@claude-code/teleport/api.js'
 import { errorMessage, TeleportOperationError } from '@claude-code/local-observability/errorHelpers.js'
-import { teleportResumeCodeSession } from 'src/utils/teleport.js'
+import { teleportResumeCodeSession } from '@claude-code/tool-registry/teleport.js'
 
 export type TeleportResumeError = {
   message: string

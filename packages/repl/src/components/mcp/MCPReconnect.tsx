@@ -2,7 +2,7 @@ import figures from 'figures'
 import React, { useEffect, useState } from 'react'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { Box, color, Text, useTheme } from '@anthropic/ink'
-import { useMcpReconnect } from 'src/services/mcp/MCPConnectionManager.js'
+import { useMcpReconnect } from '@claude-code/mcp-runtime/MCPConnectionManager.js'
 import { useAppStateStore } from '@claude-code/repl/appStateHooks.js'
 import { Spinner } from '../Spinner.js'
 

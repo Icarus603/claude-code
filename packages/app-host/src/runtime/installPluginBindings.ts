@@ -80,7 +80,7 @@ import {
 import { pathExists, writeFileSyncAndFlush_DEPRECATED } from '@claude-code/storage/file.js'
 import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
 import { gitExe } from '@claude-code/storage/git.js'
-import { getHeadForDir } from 'src/utils/git/gitFilesystem.js'
+import { getHeadForDir } from '@claude-code/config/gitFilesystem.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { clone, jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { which } from '@claude-code/shell/which.js'
@@ -92,7 +92,7 @@ import { isSettingSourceEnabled } from '@claude-code/config/constants'
 import {
   buildPluginTelemetryFields,
   classifyPluginCommandError,
-} from 'src/utils/telemetry/pluginTelemetry.js'
+} from '@claude-code/tool-registry/telemetry/pluginTelemetry.js'
 
 let installed = false
 

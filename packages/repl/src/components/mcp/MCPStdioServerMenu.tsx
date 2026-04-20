@@ -7,7 +7,7 @@ import { getMcpConfigByName } from '@claude-code/mcp-runtime/config.js'
 import {
   useMcpReconnect,
   useMcpToggleEnabled,
-} from 'src/services/mcp/MCPConnectionManager.js'
+} from '@claude-code/mcp-runtime/MCPConnectionManager.js'
 import {
   describeMcpConfigFilePath,
   filterMcpPromptsByServer,

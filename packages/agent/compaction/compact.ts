@@ -45,7 +45,7 @@ import { COMPACT_MAX_OUTPUT_TOKENS } from '@claude-code/agent/context.js'
 import {
   analyzeContext,
   tokenStatsToStatsigMetrics,
-} from 'src/utils/contextAnalysis.js'
+} from '@claude-code/agent/contextAnalysis.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { hasExactErrorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { cacheToObject } from '@claude-code/tool-registry/fileStateCache'
@@ -58,7 +58,7 @@ import {
   executePreCompactHooks,
 } from '@claude-code/agent/hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { MEMORY_TYPE_VALUES } from 'src/utils/memory/types.js'
+import { MEMORY_TYPE_VALUES } from '@claude-code/agent/memory/types.js'
 import {
   createCompactBoundaryMessage,
   createUserMessage,

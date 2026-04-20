@@ -32,7 +32,7 @@ import {
   isOfficialMarketplaceName,
   parsePluginIdentifier,
 } from '@claude-code/config/plugin/pluginIdentifier'
-import { buildPluginCommandTelemetryFields } from 'src/utils/telemetry/pluginTelemetry.js'
+import { buildPluginCommandTelemetryFields } from '@claude-code/tool-registry/telemetry/pluginTelemetry.js'
 import { z } from 'zod/v4'
 import {
   addInvokedSkill,
@@ -57,7 +57,7 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { createUserMessage, normalizeMessages } from '@claude-code/agent/messages.js'
 import type { ModelAlias } from '@claude-code/provider/modelAliases.js'
 import { resolveSkillModelOverride } from '@claude-code/provider/model.js'
-import { recordSkillUsage } from 'src/utils/suggestions/skillUsageTracking.js'
+import { recordSkillUsage } from '@claude-code/tool-registry/suggestions/skillUsageTracking.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'
 import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
 import {

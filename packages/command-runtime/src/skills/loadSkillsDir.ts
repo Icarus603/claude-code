@@ -45,7 +45,7 @@ import {
   splitPathInFrontmatter,
 } from '@claude-code/agent/frontmatterParser.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { isPathGitignored } from 'src/utils/git/gitignore.js'
+import { isPathGitignored } from '@claude-code/command-runtime/gitignore.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   extractDescriptionFromMarkdown,
@@ -55,7 +55,7 @@ import {
   parseSlashCommandToolsFromFrontmatter,
 } from '@claude-code/tool-registry/markdownConfigLoader.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
-import { executeShellCommandsInPrompt } from 'src/utils/promptShellExecution.js'
+import { executeShellCommandsInPrompt } from '@claude-code/command-runtime/promptShellExecution.js'
 import type { SettingSource } from '@claude-code/config/constants'
 import { isSettingSourceEnabled } from '@claude-code/config/constants'
 import { getManagedFilePath } from '@claude-code/config/managedPath'

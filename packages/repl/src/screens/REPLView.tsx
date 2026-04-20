@@ -321,7 +321,7 @@ import {
 } from '@claude-code/storage/sessionRestore.js';
 import { isBgSession, updateSessionName, updateSessionActivity } from '@claude-code/agent/concurrentSessions.js';
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
-import { restoreRemoteAgentTasks } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js';
+import { restoreRemoteAgentTasks } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js';
 import { useInboxPoller } from '@claude-code/repl/hooks/useInboxPoller.js';
 import { getViewedLocalAgentTask } from './repl/backgrounding.js';
 import { getInteractiveMcpClients } from './repl/integrations.js';
@@ -380,7 +380,7 @@ const UndercoverAutoCallout =
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 import { activityManager } from '@claude-code/app-host/activityManager.js';
 import { createAbortController } from '@claude-code/agent/abortController.js';
-import { MCPConnectionManager } from 'src/services/mcp/MCPConnectionManager.js';
+import { MCPConnectionManager } from '@claude-code/mcp-runtime/MCPConnectionManager.js';
 import { useFeedbackSurvey } from '@claude-code/repl/components/FeedbackSurvey/useFeedbackSurvey.js';
 import { useMemorySurvey } from '@claude-code/repl/components/FeedbackSurvey/useMemorySurvey.js';
 import { usePostCompactSurvey } from '@claude-code/repl/components/FeedbackSurvey/usePostCompactSurvey.js';

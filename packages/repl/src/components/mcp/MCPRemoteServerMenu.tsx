@@ -21,7 +21,7 @@ import { clearServerCache } from '@claude-code/mcp-runtime/clientRuntime.js'
 import {
   useMcpReconnect,
   useMcpToggleEnabled,
-} from 'src/services/mcp/MCPConnectionManager.js'
+} from '@claude-code/mcp-runtime/MCPConnectionManager.js'
 import {
   describeMcpConfigFilePath,
   excludeCommandsByServer,

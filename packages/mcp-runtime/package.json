@@ -43,6 +43,9 @@
     "./envExpansion": "./src/envExpansion.ts",
     "./channelPermissions": "./src/channelPermissions.ts",
     "./officialRegistry": "./src/officialRegistry.ts",
-    "./mcpStringUtils": "./src/mcpStringUtils.ts"
+    "./mcpStringUtils": "./src/mcpStringUtils.ts",
+    "./MCPConnectionManager.js": "./src/MCPConnectionManager.ts",
+    "./macOsKeychainHelpers.js": "./src/macOsKeychainHelpers.ts",
+    "./secureStorageTypes.js": "./src/secureStorageTypes.ts"
   }
 }
