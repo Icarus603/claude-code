@@ -25,7 +25,7 @@ import { migrateOpusToOpus1m } from "src/migrations/migrateOpusToOpus1m.js";
 import { migrateReplBridgeEnabledToRemoteControlAtStartup } from "src/migrations/migrateReplBridgeEnabledToRemoteControlAtStartup.js";
 import { resetAutoModeOptInForDefaultOffer } from "src/migrations/resetAutoModeOptInForDefaultOffer.js";
 import { migrateFennecToOpus } from "src/migrations/migrateFennecToOpus.js";
-import { migrateChangelogFromConfig } from "src/utils/releaseNotes.js";
+import { migrateChangelogFromConfig } from "@claude-code/repl/releaseNotes.js";
 import { getGlobalConfig, saveGlobalConfig } from "@claude-code/config";
 import { profileCheckpoint } from "src/utils/startupProfiler.js";
 import { isEnvTruthy } from "@claude-code/config/env/utils";

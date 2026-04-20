@@ -481,6 +481,7 @@
     "./projectOnboardingState.js": "./src/projectOnboardingState.ts",
     "./promptOverlayContext.js": "./src/promptOverlayContext.ts",
     "./extraUsage.js": "./src/extraUsage.ts",
+    "./releaseNotes.js": "./src/releaseNotes.ts",
     "./onChangeAppState.js": "./src/onChangeAppState.ts",
     "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts",
     "./collapseTeammateShutdowns.js": "./src/collapseTeammateShutdowns.ts",
