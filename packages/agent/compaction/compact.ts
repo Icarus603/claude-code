@@ -82,7 +82,7 @@ import {
 import { sleep } from 'src/utils/sleep.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { asSystemPrompt } from 'src/utils/systemPromptType.js'
+import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
 import {
   getTokenUsage,

@@ -1,14 +1,3 @@
-/**
- * Branded type for system prompt arrays.
- *
- * This module is intentionally dependency-free so it can be imported
- * from anywhere without risking circular initialization issues.
- */
-
-export type SystemPrompt = readonly string[] & {
-  readonly __brand: 'SystemPrompt'
-}
-
-export function asSystemPrompt(value: readonly string[]): SystemPrompt {
-  return value as SystemPrompt
-}
+// Canonical owner is @claude-code/provider/systemPromptType.js.
+export { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
+export type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'

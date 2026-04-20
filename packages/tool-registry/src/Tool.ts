@@ -58,7 +58,7 @@ import type {
 } from 'src/types/tools.js'
 import type { FileStateCache } from 'src/utils/fileStateCache.js'
 import type { DenialTrackingState } from '@claude-code/permission/denialTracking'
-import type { SystemPrompt } from 'src/utils/systemPromptType.js'
+import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import type { ContentReplacementState } from 'src/utils/toolResultStorage.js'
 
 // Re-export progress types for backwards compatibility

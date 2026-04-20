@@ -15,7 +15,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
-import { asSystemPrompt } from 'src/utils/systemPromptType.js'
+import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 
 type GeneratedAgent = {
   identifier: string

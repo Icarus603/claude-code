@@ -44,6 +44,7 @@
     "./claude.js": "./src/claude.ts",
     "./commands/model/index.js": "./src/commands/model/index.ts",
     "./commands/model/model.js": "./src/commands/model/model.tsx",
-    "./errors.js": "./src/errors.ts"
+    "./errors.js": "./src/errors.ts",
+    "./systemPromptType.js": "./src/systemPromptType.ts"
   }
 }
