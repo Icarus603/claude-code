@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import { useRegisterOverlay } from 'src/context/overlayContext.js'
+import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
 import {
   getTimestampedHistory,
   type TimestampedHistoryEntry,

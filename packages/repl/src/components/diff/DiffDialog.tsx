@@ -1,7 +1,7 @@
 import type { StructuredPatchHunk } from 'diff'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
-import { useRegisterOverlay } from 'src/context/overlayContext.js'
+import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
 import { type DiffData, useDiffData } from '@claude-code/repl/hooks/useDiffData.js'
 import { type TurnDiff, useTurnDiffs } from '@claude-code/repl/hooks/useTurnDiffs.js'
 import { Box, Text } from '@anthropic/ink'
