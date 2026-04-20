@@ -3,7 +3,7 @@ import React from 'react'
 import { useClipboardImageHint } from '@claude-code/repl/hooks/useClipboardImageHint.js'
 import { useVimInput } from '@claude-code/repl/hooks/useVimInput.js'
 import { Box, color, useTerminalFocus, useTheme } from '@anthropic/ink'
-import type { VimTextInputProps } from 'src/types/textInputTypes.js'
+import type { VimTextInputProps } from '@claude-code/repl/textInputTypes.js'
 import type { TextHighlight } from '@claude-code/output/textHighlighting.js'
 import { BaseTextInput } from './BaseTextInput.js'
 

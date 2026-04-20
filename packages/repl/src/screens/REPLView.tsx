@@ -111,7 +111,7 @@ import {
   getCommandName,
   isCommandEnabled,
 } from '@claude-code/command-runtime/runtime';
-import type { PromptInputMode, QueuedCommand, VimMode } from 'src/types/textInputTypes.js';
+import type { PromptInputMode, QueuedCommand, VimMode } from '@claude-code/repl/textInputTypes.js';
 import {
   MessageSelector,
   selectableUserMessagesFilter,

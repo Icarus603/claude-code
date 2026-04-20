@@ -10,7 +10,7 @@ import {
 } from '@claude-code/command-runtime/xml.js'
 import { QueuedMessageProvider } from 'src/context/QueuedMessageContext.js'
 import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
-import type { QueuedCommand } from 'src/types/textInputTypes.js'
+import type { QueuedCommand } from '@claude-code/repl/textInputTypes.js'
 import { isQueuedCommandVisible } from '@claude-code/agent/messageQueueManager.js'
 import {
   createUserMessage,

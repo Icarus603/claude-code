@@ -6,7 +6,7 @@ import { useClipboardImageHint } from '@claude-code/repl/hooks/useClipboardImage
 import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { useTextInput } from '@claude-code/repl/hooks/useTextInput.js'
 import { Box, color, useAnimationFrame, useTerminalFocus, useTheme } from '@anthropic/ink'
-import type { BaseTextInputProps } from 'src/types/textInputTypes.js'
+import type { BaseTextInputProps } from '@claude-code/repl/textInputTypes.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import type { TextHighlight } from '@claude-code/output/textHighlighting.js'
 import { BaseTextInput } from './BaseTextInput.js'

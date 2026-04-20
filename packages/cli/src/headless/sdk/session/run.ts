@@ -10,7 +10,7 @@ import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool
 import { isBuiltInAgent } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import type { SDKMessage, SDKStatus } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
+import type { StdoutMessage } from '@claude-code/headless-sdk/controlTypes.js'
 import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'
 import type { StructuredIO } from '../../../structuredIO.js'
 import type { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'

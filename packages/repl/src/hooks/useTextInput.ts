@@ -7,7 +7,7 @@ import type { Key } from '@anthropic/ink'
 import type {
   InlineGhostText,
   TextInputState,
-} from 'src/types/textInputTypes.js'
+} from '@claude-code/repl/textInputTypes.js'
 import {
   Cursor,
   getLastKill,

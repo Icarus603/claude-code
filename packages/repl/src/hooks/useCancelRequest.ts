@@ -26,7 +26,7 @@ import {
   killAllRunningAgentTasks,
   markAgentsNotified,
 } from '@claude-code/agent/localAgentTask.js'
-import type { PromptInputMode, VimMode } from 'src/types/textInputTypes.js'
+import type { PromptInputMode, VimMode } from '@claude-code/repl/textInputTypes.js'
 import {
   clearCommandQueue,
   enqueuePendingNotification,

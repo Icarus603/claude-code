@@ -103,7 +103,7 @@ import type {
   BaseTextInputProps,
   PromptInputMode,
   VimMode,
-} from 'src/types/textInputTypes.js'
+} from '@claude-code/repl/textInputTypes.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'

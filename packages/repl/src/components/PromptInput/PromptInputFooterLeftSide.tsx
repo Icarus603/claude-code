@@ -16,7 +16,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
-import type { VimMode, PromptInputMode } from 'src/types/textInputTypes.js'
+import type { VimMode, PromptInputMode } from '@claude-code/repl/textInputTypes.js'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { isVimModeEnabled } from './utils.js'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'

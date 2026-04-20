@@ -6,7 +6,7 @@ import { Ansi, Box, Text, useInput } from '@anthropic/ink'
 import type {
   BaseInputState,
   BaseTextInputProps,
-} from 'src/types/textInputTypes.js'
+} from '@claude-code/repl/textInputTypes.js'
 import type { TextHighlight } from '@claude-code/output/textHighlighting.js'
 import { HighlightedInput } from './PromptInput/ShimmeredInput.js'
 

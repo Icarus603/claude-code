@@ -1,5 +1,5 @@
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs'
-import type { QueuedCommand } from 'src/types/textInputTypes.js'
+import type { QueuedCommand } from '@claude-code/repl/textInputTypes.js'
 
 type PromptValue = string | ContentBlockParam[]
 

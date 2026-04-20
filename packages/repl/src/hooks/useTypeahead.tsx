@@ -30,7 +30,7 @@ import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool
 import type {
   InlineGhostText,
   PromptInputMode,
-} from 'src/types/textInputTypes.js'
+} from '@claude-code/repl/textInputTypes.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   generateProgressiveArgumentHint,
