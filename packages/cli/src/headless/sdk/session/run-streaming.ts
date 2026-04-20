@@ -48,7 +48,7 @@ import {
   type AgentDefinition,
   isBuiltInAgent,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { Message, NormalizedUserMessage } from 'src/types/message.js'
+import type { Message, NormalizedUserMessage } from '@claude-code/agent/messageShapes'
 import type { QueuedCommand } from 'src/types/textInputTypes.js'
 import {
   dequeue,
@@ -193,7 +193,7 @@ import {
   resolveAndPrepend,
   type ReplBridgeHandle,
 } from '@claude-code/bridge'
-import { getRemoteSessionUrl } from 'src/constants/product.js'
+import { getRemoteSessionUrl } from '@claude-code/config/product'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { generateSessionTitle } from '@claude-code/agent/sessionTitle.js'
@@ -311,7 +311,7 @@ import {
   startQueryProfile,
   logQueryProfileReport,
 } from 'src/utils/queryProfiler.js'
-import { asSessionId } from 'src/types/ids.js'
+import { asSessionId } from '@claude-code/agent/idTypes'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { skillChangeDetector } from 'src/utils/skills/skillChangeDetector.js'
 import { getCommands, clearCommandsCache } from '@claude-code/command-runtime/runtime'
