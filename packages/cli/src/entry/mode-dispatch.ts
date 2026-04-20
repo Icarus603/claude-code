@@ -242,11 +242,11 @@ import {
   stripDangerousPermissionsForAutoMode,
   verifyAutoModeGateAccess,
 } from '@claude-code/permission/permissionSetup'
-import { cleanupOrphanedPluginVersionsInBackground } from 'src/utils/plugins/cacheUtils.js'
-import { initializeVersionedPlugins } from 'src/utils/plugins/installedPluginsManager.js'
-import { getManagedPluginNames } from 'src/utils/plugins/managedPlugins.js'
+import { cleanupOrphanedPluginVersionsInBackground } from '@claude-code/config/plugin/cacheUtils'
+import { initializeVersionedPlugins } from '@claude-code/config/plugin/installedPluginsManager'
+import { getManagedPluginNames } from '@claude-code/config/plugin/managedPlugins'
 import { getGlobExclusionsForPluginCache } from '@claude-code/tool-registry/orphanedPluginFilter.js'
-import { getPluginSeedDirs } from 'src/utils/plugins/pluginDirectories.js'
+import { getPluginSeedDirs } from '@claude-code/config/plugin/pluginDirectories'
 import { countFilesRoundedRg } from '@claude-code/tool-registry/ripgrep.js'
 import {
   processSessionStartHooks,
