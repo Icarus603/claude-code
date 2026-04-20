@@ -161,7 +161,7 @@ import {
   gracefulShutdownSync,
   isShuttingDown,
 } from 'src/utils/gracefulShutdown.js'
-import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { createIdleTimeoutManager } from 'src/utils/idleTimeout.js'
 import type {
   SDKStatus,

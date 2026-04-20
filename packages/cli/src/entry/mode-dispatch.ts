@@ -286,7 +286,7 @@ import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isClaudeInChromeMCPServer,
 } from 'src/utils/claudeInChrome/common.js'
-import { registerCleanup } from 'src/utils/cleanupRegistry.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { eagerParseCliFlag } from 'src/utils/cliArgs.js'
 import { createEmptyAttributionState } from 'src/utils/commitAttribution.js'
 import {
