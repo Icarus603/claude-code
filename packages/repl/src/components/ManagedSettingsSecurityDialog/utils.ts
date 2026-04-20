@@ -1,7 +1,7 @@
 import {
   DANGEROUS_SHELL_SETTINGS,
   SAFE_ENV_VARS,
-} from 'src/utils/managedEnvConstants.js'
+} from '@claude-code/config/env/managed-constants'
 import type { SettingsJson } from 'src/utils/settings/types.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

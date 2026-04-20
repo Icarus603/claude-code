@@ -10,7 +10,7 @@ import {
   getClaudeMds,
   getMemoryFiles,
 } from 'src/utils/claudemd.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isBareMode, isEnvTruthy } from '@claude-code/config/env/utils'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { getBranch, getDefaultBranch, getIsGit, gitExe } from 'src/utils/git.js'

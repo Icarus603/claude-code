@@ -1,7 +1,7 @@
 import axios, { type AxiosError } from 'axios'
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
 import { SerialBatchEventUploader } from './SerialBatchEventUploader.js'
 import {

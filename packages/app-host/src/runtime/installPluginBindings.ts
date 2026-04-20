@@ -69,7 +69,7 @@ import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import {
   toError as _toError, // kept for clarity though _deps has own
 } from '@claude-code/local-observability/errorHelpers.js'

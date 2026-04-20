@@ -1,5 +1,5 @@
 import React from 'react'
-import { envDynamic } from 'src/utils/envDynamic.js'
+import { envDynamic } from '@claude-code/config/env/dynamic'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
