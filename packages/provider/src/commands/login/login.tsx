@@ -14,7 +14,7 @@ import { Text } from '@anthropic/ink'
 import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-flags'
 import { refreshPolicyLimits } from '@claude-code/provider/policyLimits/index.js'
 import { refreshRemoteManagedSettings } from '@claude-code/config/remote'
-import type { LocalJSXCommandOnDone } from 'src/types/command.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import { stripSignatureBlocks } from '@claude-code/agent/messages.js'
 import {
   checkAndDisableAutoModeIfNeeded,

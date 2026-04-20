@@ -26,8 +26,8 @@ import {
   getCliHighlightPromise,
 } from '@claude-code/output/utils/cliHighlight.js'
 import type { PastedContent } from '@claude-code/config'
-import type { ImageDimensions } from 'src/utils/imageResizer.js'
-import { maybeResizeAndDownsampleImageBlock } from 'src/utils/imageResizer.js'
+import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
+import { maybeResizeAndDownsampleImageBlock } from '@claude-code/storage/imageResizer.js'
 import { cacheImagePath, storeImage } from 'src/utils/imageStore.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { applyMarkdown } from 'src/utils/markdown.js'

@@ -19,7 +19,7 @@ import {
   openForScan,
   readCapped,
   scanForContext,
-} from 'src/utils/readEditContext.js'
+} from '@claude-code/tool-registry/readEditContext.js'
 import { firstLineOf } from '@claude-code/output/utils/stringUtils.js'
 import { StructuredDiffList } from './StructuredDiffList.js'
 

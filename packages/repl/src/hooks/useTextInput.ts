@@ -20,7 +20,7 @@ import {
 } from 'src/utils/Cursor.js'
 import { env } from '@claude-code/config/env/paths'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
-import type { ImageDimensions } from 'src/utils/imageResizer.js'
+import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { isModifierPressed, prewarmModifiers } from 'src/utils/modifiers.js'
 import { useDoublePress } from '@anthropic/ink'
 

@@ -8,7 +8,7 @@ import {
 } from '@claude-code/provider/claudeAiLimits.js'
 import { useClaudeAiLimits } from '@claude-code/provider/claudeAiLimitsHook.js'
 import { getSubscriptionType } from '@claude-code/provider/authAlias.js'
-import { hasClaudeAiBillingAccess } from 'src/utils/billing.js'
+import { hasClaudeAiBillingAccess } from '@claude-code/provider/billing.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 
 export function useRateLimitWarningNotification(model: string): void {

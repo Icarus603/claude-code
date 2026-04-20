@@ -11,7 +11,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { pathInAllowedWorkingPath } from '@claude-code/permission/filesystem'
 import { setCwd } from '@claude-code/shell/Shell.js'
 import { shouldMaintainProjectWorkingDir } from '@claude-code/config/env/utils'
-import { maybeResizeAndDownsampleImageBuffer } from 'src/utils/imageResizer.js'
+import { maybeResizeAndDownsampleImageBuffer } from '@claude-code/storage/imageResizer.js'
 import { getMaxOutputLength } from '@claude-code/shell/legacy/outputLimits.js'
 import { countCharInString, plural } from '@claude-code/output/utils/stringUtils.js'
 /**

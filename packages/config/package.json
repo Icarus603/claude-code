@@ -117,6 +117,7 @@
     "./sequential": "./sequential.ts",
     "./generators": "./generators.ts",
     "./platform": "./platform.ts",
-    "./embeddedTools.js": "./embeddedTools.ts"
+    "./embeddedTools.js": "./embeddedTools.ts",
+    "./commonConstants.js": "./commonConstants.ts"
   }
 }

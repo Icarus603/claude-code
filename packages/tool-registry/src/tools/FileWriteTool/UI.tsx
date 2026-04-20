@@ -21,7 +21,7 @@ import { getPatchForDisplay } from '@claude-code/agent/diff.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPlansDirectory } from '@claude-code/storage/plans.js'
-import { openForScan, readCapped } from 'src/utils/readEditContext.js'
+import { openForScan, readCapped } from '@claude-code/tool-registry/readEditContext.js'
 import type { Output } from './FileWriteTool.js'
 
 const MAX_LINES_TO_RENDER = 10

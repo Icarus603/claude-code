@@ -47,7 +47,7 @@ import {
   type ImageDimensions,
   ImageResizeError,
   maybeResizeAndDownsampleImageBuffer,
-} from 'src/utils/imageResizer.js'
+} from '@claude-code/storage/imageResizer.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { isAutoMemFile } from '@claude-code/memory/memoryFileDetection'

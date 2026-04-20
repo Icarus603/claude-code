@@ -16,7 +16,7 @@ import { adjustHunkLineNumbers, CONTEXT_LINES } from '@claude-code/agent/diff.js
 import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from '@claude-code/storage/file.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPlansDirectory } from '@claude-code/storage/plans.js'
-import { readEditContext } from 'src/utils/readEditContext.js'
+import { readEditContext } from '@claude-code/tool-registry/readEditContext.js'
 import { firstLineOf } from '@claude-code/output/utils/stringUtils.js'
 import type { ThemeName } from '@anthropic/ink'
 import type { FileEditOutput } from './types.js'

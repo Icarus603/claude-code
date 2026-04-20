@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, color, Link, Text, useTheme, Pane, Tab, Tabs, useTabHeaderFocus } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import type { CommandResultDisplay } from 'src/types/command.js'
+import type { CommandResultDisplay } from '@claude-code/agent/command.js'
 import type { SandboxDependencyCheck } from '@claude-code/shell/sandbox.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'

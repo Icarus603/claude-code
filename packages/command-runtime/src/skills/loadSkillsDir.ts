@@ -18,7 +18,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
-import type { Command, PromptCommand } from 'src/types/command.js'
+import type { Command, PromptCommand } from '@claude-code/agent/command.js'
 import {
   parseArgumentNames,
   substituteArguments,

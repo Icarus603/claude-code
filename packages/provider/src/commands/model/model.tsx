@@ -8,7 +8,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '../../appStateHooks.js'
-import type { LocalJSXCommandCall } from 'src/types/command.js'
+import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'
 import type { EffortLevel } from 'src/utils/effort.js'
 import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
 import {

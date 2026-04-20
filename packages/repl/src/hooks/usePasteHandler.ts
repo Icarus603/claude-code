@@ -9,7 +9,7 @@ import {
   PASTE_THRESHOLD,
   tryReadImageFromPath,
 } from 'src/utils/imagePaste.js'
-import type { ImageDimensions } from 'src/utils/imageResizer.js'
+import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { getPlatform } from '@claude-code/config/platform'
 
 const CLIPBOARD_CHECK_DEBOUNCE_MS = 50

@@ -1,4 +1,4 @@
-import { getLocalMonthYear } from 'src/constants/common.js'
+import { getLocalMonthYear } from '@claude-code/config/commonConstants.js'
 
 export const WEB_SEARCH_TOOL_NAME = 'WebSearch'
 
