@@ -21,7 +21,7 @@ import {
   type Diagnostic,
   getModelDisplayLabel,
   type Property,
-} from 'src/utils/status.js'
+} from '@claude-code/agent/statusAlias.js'
 import type { ThemeName } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 

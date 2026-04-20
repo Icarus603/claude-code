@@ -5,7 +5,7 @@
  * Used by the SDK to provide high-level progress updates to clients.
  */
 
-import { E_TOOL_USE_SUMMARY_GENERATION_FAILED } from 'src/constants/errorIds.js'
+import { E_TOOL_USE_SUMMARY_GENERATION_FAILED } from '@claude-code/local-observability/errorIds.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'

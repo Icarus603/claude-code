@@ -79,7 +79,16 @@
     "./jetbrains.js": "./jetbrains.ts",
     "./hooksConfigSnapshot.js": "./hooksConfigSnapshot.ts",
     "./claudeInChromeSetup.js": "./claudeInChromeSetup.ts",
-    "./claudeInChromeCommon.js": "./claudeInChromeCommon.ts"
+    "./claudeInChromeCommon.js": "./claudeInChromeCommon.ts",
+    "./statusAlias.js": "./statusAlias.ts",
+    "./inProcessTeammateHelpers.js": "./inProcessTeammateHelpers.ts",
+    "./fileChangedWatcher.js": "./fileChangedWatcher.ts",
+    "./claudeInChrome/prompt.js": "./claudeInChrome/prompt.ts",
+    "./background/preconditions.js": "./background/preconditions.ts",
+    "./tasks/stopTask.js": "./tasks/stopTask.ts",
+    "./tasks/LocalShellTask.js": "./tasks/LocalShellTask.ts",
+    "./tasks/LocalMainSessionTask.js": "./tasks/LocalMainSessionTask.ts",
+    "./compactionDeps.js": "./compactionDeps.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

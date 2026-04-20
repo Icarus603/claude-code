@@ -21,6 +21,7 @@
     "./debug.js": "./src/debug.ts",
     "./telemetryEvents.js": "./src/telemetryEvents.ts",
     "./sentry.js": "./src/sentry.ts",
-    "./betaSessionTracing.js": "./src/betaSessionTracing.ts"
+    "./betaSessionTracing.js": "./src/betaSessionTracing.ts",
+    "./errorIds.js": "./src/errorIds.ts"
   }
 }

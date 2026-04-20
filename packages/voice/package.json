@@ -16,6 +16,7 @@
     "./voiceStreamSTT.js": "./src/voiceStreamSTT.ts",
     "./hooks/useVoice.js": "./src/hooks/useVoice.ts",
     "./hooks/useVoiceEnabled.js": "./src/hooks/useVoiceEnabled.ts",
-    "./hooks/useVoiceIntegration.js": "./src/hooks/useVoiceIntegration.tsx"
+    "./hooks/useVoiceIntegration.js": "./src/hooks/useVoiceIntegration.tsx",
+    "./voiceContext.js": "./src/voiceContext.ts"
   }
 }

@@ -28,7 +28,7 @@ import {
 import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
-import { LocalShellTask } from 'src/tasks/LocalShellTask/LocalShellTask.js'
+import { LocalShellTask } from '@claude-code/agent/tasks/LocalShellTask.js'
 // Type import is erased at build time — safe even though module is ant-gated.
 import type { LocalWorkflowTaskState } from 'src/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
 import type { MonitorMcpTaskState } from 'src/tasks/MonitorMcpTask/MonitorMcpTask.js'

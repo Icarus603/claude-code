@@ -69,6 +69,8 @@
     "./validateModel.js": "./src/validateModel.ts",
     "./systemPrompt.js": "./src/systemPrompt.ts",
     "./extraUsage.js": "./src/extraUsage.ts",
-    "./advisor.js": "./src/advisor.ts"
+    "./advisor.js": "./src/advisor.ts",
+    "./aws.js": "./src/aws.ts",
+    "./costTracker.js": "./src/costTracker.ts"
   }
 }

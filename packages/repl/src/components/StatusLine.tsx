@@ -22,7 +22,7 @@ import {
   getTotalLinesAdded,
   getTotalLinesRemoved,
   getTotalOutputTokens,
-} from 'src/cost-tracker.js'
+} from '@claude-code/provider/costTracker.js'
 import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import { type ReadonlySettings, useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { Ansi, Box, Text } from '@anthropic/ink'

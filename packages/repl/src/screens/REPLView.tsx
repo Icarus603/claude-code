@@ -138,7 +138,7 @@ import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.j
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
 import { getMemoryFiles } from '@claude-code/storage/claudemd.js';
 import { startBackgroundHousekeeping } from 'src/utils/backgroundHousekeeping.js';
-import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from 'src/cost-tracker.js';
+import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from '@claude-code/provider/costTracker.js';
 import { useCostSummary } from 'src/costHook.js';
 import { useFpsMetrics } from 'src/context/fpsMetrics.js';
 import { useAfterFirstRender } from '@claude-code/repl/hooks/useAfterFirstRender.js';
@@ -264,7 +264,7 @@ import { randomUUID, type UUID } from 'crypto';
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js';
 import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from '@claude-code/agent/hooks.js';
 import { type IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js';
-import { assembleToolPool } from 'src/tools.js';
+import { assembleToolPool } from '@claude-code/tool-registry/toolsList.js';
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js';
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js';
 import { resumeAgentBackground } from '@claude-code/tool-registry/tools/AgentTool/resumeAgent.js';
@@ -360,7 +360,7 @@ import {
 } from '@claude-code/agent/messageQueueManager.js';
 import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js';
 import { SessionBackgroundHint } from '@claude-code/repl/components/SessionBackgroundHint.js';
-import { startBackgroundSession } from 'src/tasks/LocalMainSessionTask.js';
+import { startBackgroundSession } from '@claude-code/agent/tasks/LocalMainSessionTask.js';
 import { useSessionBackgrounding } from '@claude-code/repl/hooks/useSessionBackgrounding.js';
 import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking.js';
 import { handleSpeculationAccept, type ActiveSpeculationState } from 'src/services/PromptSuggestion/speculation.js';

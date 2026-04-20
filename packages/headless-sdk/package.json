@@ -13,6 +13,7 @@
     "./sandboxTypes.js": "./src/sandboxTypes.ts",
     "./controlMessageCompat": "./src/controlMessageCompat.ts",
     "./controlTypes.js": "./src/controlTypes.ts",
-    "./sdkUtilityTypes.js": "./src/sdkUtilityTypes.ts"
+    "./sdkUtilityTypes.js": "./src/sdkUtilityTypes.ts",
+    "./coreTypes.js": "./src/coreTypes.ts"
   }
 }

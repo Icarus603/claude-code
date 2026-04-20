@@ -22,7 +22,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   findInProcessTeammateTaskId,
   setAwaitingPlanApproval,
-} from 'src/utils/inProcessTeammateHelpers.js'
+} from '@claude-code/agent/inProcessTeammateHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {

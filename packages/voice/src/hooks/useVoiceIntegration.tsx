@@ -7,7 +7,7 @@ import {
   useGetVoiceState,
   useSetVoiceState,
   useVoiceState,
-} from 'src/context/voice.js'
+} from '@claude-code/voice/voiceContext.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until REPL wires handleKeyDown to <Box onKeyDown>
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'

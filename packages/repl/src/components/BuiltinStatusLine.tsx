@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { formatCost } from 'src/cost-tracker.js';
+import { formatCost } from '@claude-code/provider/costTracker.js';
 import { Box, Text, ProgressBar } from '@anthropic/ink';
 import { formatTokens } from '@claude-code/output/formatters';
 import { useTerminalSize } from '@anthropic/ink';

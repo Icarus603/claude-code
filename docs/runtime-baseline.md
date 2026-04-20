@@ -15,7 +15,7 @@ External behavior that must remain unchanged during V6 refactor:
 ## Entrypoint Hash Snapshot
 
 ```text
-17be8cd67fc72e5e495a841381b0fd829dff18d190dd36201c0e00add1ed80c5  packages/headless-sdk/src/agentSdkTypes.ts
+e9fb0b906d57e69aa2a5ddb904452f2cad561030782467eba2b35d6021bedbe3  packages/headless-sdk/src/agentSdkTypes.ts
 775b0689fca304d0dcdacaa524db56da6fad9bb5ce26d5dc7f83891fa490d537  packages/app-host/src/init.ts
 fca81a0d4fc34e818699aa737ccd18e3fd0ed1141efa7d4317968539f765c065  src/entrypoints/mcp.ts
 e15167a170952be204091d6808b0ee9ed7ccc114e34e9396eb060789aac33f4b  packages/headless-sdk/src/sandboxTypes.ts

@@ -30,7 +30,7 @@ import {
   registerForeground,
   spawnShellTask,
   unregisterForeground,
-} from 'src/tasks/LocalShellTask/LocalShellTask.js'
+} from '@claude-code/agent/tasks/LocalShellTask.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { parseForSecurity } from '@claude-code/shell/bash/ast-alias.js'

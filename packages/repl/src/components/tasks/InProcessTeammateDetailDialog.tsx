@@ -5,7 +5,7 @@ import { type KeyboardEvent, Box, Text, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
-import { getTools } from 'src/tools.js'
+import { getTools } from '@claude-code/tool-registry/toolsList.js'
 import { formatNumber } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 

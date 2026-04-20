@@ -16,7 +16,7 @@ import type {
   SDKControlRequest,
   SDKControlResponse,
 } from '@claude-code/headless-sdk/controlTypes.js'
-import type { SDKResultSuccess } from 'src/entrypoints/sdk/coreTypes.js'
+import type { SDKResultSuccess } from '@claude-code/headless-sdk/coreTypes.js'
 import { logEvent } from '@claude-code/local-observability'
 import { EMPTY_USAGE } from '@claude-code/provider/emptyUsage.js'
 import type { Message } from '@claude-code/agent/messageShapes'

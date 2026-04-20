@@ -36,7 +36,7 @@ export type {
   ActivityDep,
   TranscriptDep,
   ContextCleanupDep,
-} from 'src/services/types/compaction-deps.js'
+} from '@claude-code/agent/compactionDeps.js'
 
 export { groupMessagesByApiRound } from './grouping.js'
 export { isSnipBoundaryMessage, projectSnippedView } from './snipProjection.js'

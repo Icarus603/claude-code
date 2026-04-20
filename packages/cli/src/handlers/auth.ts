@@ -41,7 +41,7 @@ import { jsonStringify } from '@claude-code/local-observability/slowOperations.j
 import {
   buildAccountProperties,
   buildAPIProviderProperties,
-} from 'src/utils/status.js'
+} from '@claude-code/agent/statusAlias.js'
 
 /**
  * Shared post-token-acquisition logic. Saves tokens, fetches profile/roles,
