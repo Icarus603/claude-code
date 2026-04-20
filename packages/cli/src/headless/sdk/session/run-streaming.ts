@@ -42,7 +42,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   logForDiagnosticsNoPII,
   withDiagnosticsTiming,
-} from 'src/utils/diagLogs.js'
+} from '@claude-code/local-observability/logging'
 import { toolMatchesName, type Tool, type Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   type AgentDefinition,
@@ -252,7 +252,7 @@ import {
 import {
   toInternalMessages,
   toSDKRateLimitInfo,
-} from 'src/utils/messages/mappers.js'
+} from '@claude-code/agent/messages/mappers.js'
 import { createModelSwitchBreadcrumbs } from '@claude-code/agent/messages.js'
 import { collectContextData } from 'src/commands/context/context-noninteractive.js'
 import { LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js'
