@@ -6,7 +6,7 @@ import figures from 'figures'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import type { TaskStatus } from '@claude-code/tool-registry/Task.js'
 import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
-import { isBackgroundTask, type TaskState } from 'src/tasks/types.js'
+import { isBackgroundTask, type TaskState } from '@claude-code/repl/tasksTypes.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { summarizeRecentActivities } from '@claude-code/tool-registry/collapseReadSearch.js'
 

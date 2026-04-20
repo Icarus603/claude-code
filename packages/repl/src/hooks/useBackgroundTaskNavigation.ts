@@ -18,7 +18,7 @@ import {
   type InProcessTeammateTaskState,
   isInProcessTeammateTask,
 } from '@claude-code/swarm'
-import { isBackgroundTask } from 'src/tasks/types.js'
+import { isBackgroundTask } from '@claude-code/repl/tasksTypes.js'
 
 // Step teammate selection by delta, wrapping across leader(-1)..teammates(0..n-1)..hide(n).
 // First step from a collapsed tree expands it and parks on leader.

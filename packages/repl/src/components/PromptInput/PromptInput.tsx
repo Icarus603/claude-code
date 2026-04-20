@@ -90,7 +90,7 @@ import {
   isPanelAgentTask,
   type LocalAgentTaskState,
 } from '@claude-code/agent/localAgentTask.js'
-import { isBackgroundTask } from 'src/tasks/types.js'
+import { isBackgroundTask } from '@claude-code/repl/tasksTypes.js'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
   AGENT_COLORS,

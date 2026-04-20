@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Text } from '@anthropic/ink'
 import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
-import type { BackgroundTaskState } from 'src/tasks/types.js'
+import type { BackgroundTaskState } from '@claude-code/repl/tasksTypes.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 

@@ -28,7 +28,7 @@ import {
   setNeedsPlanModeExitAttachment,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { generateSessionName } from 'src/commands/rename/generateSessionName.js'
-import { launchUltraplan } from 'src/commands/ultraplan.js'
+import { launchUltraplan } from '@claude-code/repl/ultraplan.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 type AppState = Record<string, unknown>
 import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
