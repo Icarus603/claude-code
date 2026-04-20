@@ -11,7 +11,7 @@ import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTo
 import type { Message } from 'src/types/message.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { isAutoManagedMemoryFile } from 'src/utils/memoryFileDetection.js'
+import { isAutoManagedMemoryFile } from '@claude-code/memory/memoryFileDetection'
 import {
   extractTextContent,
   getLastAssistantMessage,

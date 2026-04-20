@@ -6,7 +6,7 @@ import { Box, Text } from '@anthropic/ink'
 import type { ProgressMessage } from 'src/types/message.js'
 import { getDisplayPath } from 'src/utils/file.js'
 import { formatFileSize } from '@claude-code/output/formatters'
-import { formatBriefTimestamp } from 'src/utils/formatBriefTimestamp.js'
+import { formatBriefTimestamp } from '@claude-code/output/formatters'
 import type { Output } from './BriefTool.js'
 
 export function renderToolUseMessage(): React.ReactNode {

@@ -45,7 +45,7 @@ import {
 // gRPC exporters (~700KB via @grpc/grpc-js) are further lazy-loaded within instrumentation.ts.
 import { configureGlobalAgents } from 'src/utils/proxy.js'
 import { isBetaTracingEnabled } from 'src/utils/telemetry/betaSessionTracing.js'
-import { getTelemetryAttributes } from 'src/utils/telemetryAttributes.js'
+import { getTelemetryAttributes } from '@claude-code/local-observability/telemetry'
 import { setShellIfWindows } from 'src/utils/windowsPaths.js'
 import { initSentry } from 'src/utils/sentry.js'
 
