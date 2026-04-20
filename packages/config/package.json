@@ -107,6 +107,7 @@
     "./plugin/bundled-init": "./plugin/bundled-init.ts",
     "./bundledMode": "./bundledMode.ts",
     "./signal": "./signal.ts",
-    "./sleep": "./sleep.ts"
+    "./sleep": "./sleep.ts",
+    "./semver": "./semver.ts"
   }
 }

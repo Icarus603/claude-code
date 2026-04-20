@@ -23,7 +23,7 @@ import {
   localInstallationExists,
 } from 'src/utils/localInstaller.js'
 import { removeInstalledSymlink } from 'src/utils/nativeInstaller/index.js'
-import { gt, gte } from 'src/utils/semver.js'
+import { gt, gte } from '@claude-code/config/semver'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
 
 type Props = {

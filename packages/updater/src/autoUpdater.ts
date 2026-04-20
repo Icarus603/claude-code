@@ -17,7 +17,7 @@ import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { gte, lt } from 'src/utils/semver.js'
+import { gte, lt } from '@claude-code/config/semver'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
 import {
   filterClaudeAliases,

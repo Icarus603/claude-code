@@ -14,7 +14,7 @@ import {
   getPackageManager,
   type PackageManager,
 } from 'src/utils/nativeInstaller/packageManagers.js'
-import { gt, gte } from 'src/utils/semver.js'
+import { gt, gte } from '@claude-code/config/semver'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
 
 type Props = {

@@ -83,7 +83,7 @@ import { gitExe } from 'src/utils/git.js'
 import { getHeadForDir } from 'src/utils/git/gitFilesystem.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { clone, jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { which } from 'src/utils/which.js'
+import { which } from '@claude-code/shell/which.js'
 import {
   getSettingsForSource,
   getSettings_DEPRECATED,
