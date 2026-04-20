@@ -1,14 +1,14 @@
-import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 
 // Default to prod config, override with test/staging if enabled
 type OauthConfigType = 'prod' | 'staging' | 'local'
 
 function getOauthConfigType(): OauthConfigType {
-  if (process.env.USER_TYPE === 'ant') {
-    if (isEnvTruthy(process.env.USE_LOCAL_OAUTH)) {
+  if (readEnv('USER_TYPE') === 'ant') {
+    if (isEnvTruthy(readEnv('USE_LOCAL_OAUTH'))) {
       return 'local'
     }
-    if (isEnvTruthy(process.env.USE_STAGING_OAUTH)) {
+    if (isEnvTruthy(readEnv('USE_STAGING_OAUTH'))) {
       return 'staging'
     }
   }
@@ -16,7 +16,7 @@ function getOauthConfigType(): OauthConfigType {
 }
 
 export function fileSuffixForOauthConfig(): string {
-  if (process.env.CLAUDE_CODE_CUSTOM_OAUTH_URL) {
+  if (readEnv('CLAUDE_CODE_CUSTOM_OAUTH_URL')) {
     return '-custom-oauth'
   }
   switch (getOauthConfigType()) {
@@ -116,7 +116,7 @@ export const MCP_CLIENT_METADATA_URL =
 // Staging OAuth configuration - only included in ant builds with staging flag
 // Uses literal check for dead code elimination
 const STAGING_OAUTH_CONFIG =
-  process.env.USER_TYPE === 'ant'
+  readEnv('USER_TYPE') === 'ant'
     ? ({
         BASE_API_URL: 'https://api-staging.anthropic.com',
         CONSOLE_AUTHORIZE_URL:
@@ -147,13 +147,13 @@ const STAGING_OAUTH_CONFIG =
 // scripts/claude-localhost override if your layout differs.
 function getLocalOauthConfig(): OauthConfig {
   const api =
-    process.env.CLAUDE_LOCAL_OAUTH_API_BASE?.replace(/\/$/, '') ??
+    readEnv('CLAUDE_LOCAL_OAUTH_API_BASE')?.replace(/\/$/, '') ??
     'http://localhost:8000'
   const apps =
-    process.env.CLAUDE_LOCAL_OAUTH_APPS_BASE?.replace(/\/$/, '') ??
+    readEnv('CLAUDE_LOCAL_OAUTH_APPS_BASE')?.replace(/\/$/, '') ??
     'http://localhost:4000'
   const consoleBase =
-    process.env.CLAUDE_LOCAL_OAUTH_CONSOLE_BASE?.replace(/\/$/, '') ??
+    readEnv('CLAUDE_LOCAL_OAUTH_CONSOLE_BASE')?.replace(/\/$/, '') ??
     'http://localhost:3000'
   return {
     BASE_API_URL: api,
@@ -197,7 +197,7 @@ export function getOauthConfig(): OauthConfig {
 
   // Allow overriding all OAuth URLs to point to an approved FedStart deployment.
   // Only allowlisted base URLs are accepted to prevent credential leakage.
-  const oauthBaseUrl = process.env.CLAUDE_CODE_CUSTOM_OAUTH_URL
+  const oauthBaseUrl = readEnv('CLAUDE_CODE_CUSTOM_OAUTH_URL')
   if (oauthBaseUrl) {
     const base = oauthBaseUrl.replace(/\/$/, '')
     if (!ALLOWED_OAUTH_BASE_URLS.includes(base)) {
@@ -222,7 +222,7 @@ export function getOauthConfig(): OauthConfig {
   }
 
   // Allow CLIENT_ID override via environment variable (e.g., for Xcode integration)
-  const clientIdOverride = process.env.CLAUDE_CODE_OAUTH_CLIENT_ID
+  const clientIdOverride = readEnv('CLAUDE_CODE_OAUTH_CLIENT_ID')
   if (clientIdOverride) {
     config = {
       ...config,
