@@ -6,7 +6,7 @@ import { env } from '@claude-code/config/env/paths'
 import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'
 import { getIsGit, gitExe } from '@claude-code/storage/git.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getGitEmail } from 'src/utils/user.js'
+import { getGitEmail } from '@claude-code/provider/user.js'
 
 // Patterns that mark a file as non-core (auto-generated, dependency, or config).
 // Used to filter example-command filename suggestions deterministically

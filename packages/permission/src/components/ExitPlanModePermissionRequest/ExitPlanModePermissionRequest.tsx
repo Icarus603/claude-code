@@ -73,7 +73,7 @@ import { getPlan, getPlanFilePath } from '@claude-code/storage/plans.js'
 import {
   editFileInEditor,
   editPromptInEditor,
-} from 'src/utils/promptEditor.js'
+} from '@claude-code/repl/promptEditor.js'
 import {
   getCurrentSessionTitle,
   getTranscriptPath,

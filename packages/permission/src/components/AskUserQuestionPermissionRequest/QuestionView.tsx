@@ -10,7 +10,7 @@ import type { PastedContent } from '@claude-code/config'
 import { getExternalEditor } from '@claude-code/storage/editor.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
-import { editPromptInEditor } from 'src/utils/promptEditor.js'
+import { editPromptInEditor } from '@claude-code/repl/promptEditor.js'
 import {
   type OptionWithDescription,
   Select,
