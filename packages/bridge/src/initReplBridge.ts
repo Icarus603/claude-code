@@ -46,7 +46,7 @@ import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {
   extractConversationText,
   generateSessionTitle,
-} from 'src/utils/sessionTitle.js'
+} from '@claude-code/agent/sessionTitle.js'
 import { generateShortWordSlug } from '@claude-code/tool-registry/words.js'
 import {
   getBridgeAccessToken,
