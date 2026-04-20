@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:tes
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { installSwarmAppRuntime } from 'src/../packages/swarm/src/adapters/appRuntime.js'
+import { installSwarmAppRuntime } from '@claude-code/swarm/adapters/appRuntime.js'
 import {
   readTeamFileAsync,
   type TeamFile,
