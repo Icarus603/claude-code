@@ -122,6 +122,7 @@ const KNOWN_OWNERS: Record<string, Spec> = {
 // Packages whose error namespace MUST be present and complete. Add a name
 // here in the same commit that lands the contracts/errors.ts file.
 const ACTIVE_PACKAGES: ReadonlySet<string> = new Set<string>([
+  'agent',
   'config',
   'mcp-runtime',
   'permission',
