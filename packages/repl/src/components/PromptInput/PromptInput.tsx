@@ -44,7 +44,7 @@ import {
   formatPastedTextRef,
   getPastedTextRefNumLines,
   parseReferences,
-} from 'src/history.js'
+} from '@claude-code/repl/history.js'
 import type { VerificationStatus } from '@claude-code/repl/hooks/useApiKeyVerification.js'
 import {
   type HistoryMode,

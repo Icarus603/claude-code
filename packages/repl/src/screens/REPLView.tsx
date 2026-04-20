@@ -143,7 +143,7 @@ import { useCostSummary } from 'src/costHook.js';
 import { useFpsMetrics } from 'src/context/fpsMetrics.js';
 import { useAfterFirstRender } from '@claude-code/repl/hooks/useAfterFirstRender.js';
 import { useDeferredHookMessages } from '@claude-code/repl/hooks/useDeferredHookMessages.js';
-import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from 'src/history.js';
+import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from '@claude-code/repl/history.js';
 import { prependModeCharacterToInput } from '@claude-code/repl/components/PromptInput/inputModes.js';
 import { prependToShellHistoryCache } from 'src/utils/suggestions/shellHistoryCompletion.js';
 import { useApiKeyVerification } from '@claude-code/repl/hooks/useApiKeyVerification.js';
