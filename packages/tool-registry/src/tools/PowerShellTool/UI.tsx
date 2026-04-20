@@ -9,7 +9,7 @@ import { ShellTimeDisplay } from '@claude-code/repl/components/shell/ShellTimeDi
 import { Box, Text } from '@anthropic/ink'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
-import type { PowerShellProgress } from 'src/types/tools.js'
+import type { PowerShellProgress } from '@claude-code/tool-registry/progressTypes'
 import type { ThemeName } from 'src/utils/theme.js'
 import type { Out, PowerShellToolInput } from './PowerShellTool.js'
 

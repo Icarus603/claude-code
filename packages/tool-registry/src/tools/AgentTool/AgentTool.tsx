@@ -330,7 +330,7 @@ export type RemoteLaunchedOutput = {
 
 type InternalOutput = Output | TeammateSpawnedOutput | RemoteLaunchedOutput
 
-import type { AgentToolProgress, ShellProgress } from 'src/types/tools.js'
+import type { AgentToolProgress, ShellProgress } from '@claude-code/tool-registry/progressTypes'
 // AgentTool forwards both its own progress events and shell progress
 // events from the sub-agent so the SDK receives tool_progress updates during bash/powershell runs.
 export type Progress = AgentToolProgress | ShellProgress

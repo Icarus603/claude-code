@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box } from '@anthropic/ink'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
-import type { ShellProgress } from 'src/types/tools.js'
+import type { ShellProgress } from '@claude-code/tool-registry/progressTypes'
 import { UserBashInputMessage } from './messages/UserBashInputMessage.js'
 import { ShellProgressMessage } from './shell/ShellProgressMessage.js'
 
