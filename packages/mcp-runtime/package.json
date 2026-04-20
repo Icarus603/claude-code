@@ -46,6 +46,10 @@
     "./mcpStringUtils": "./src/mcpStringUtils.ts",
     "./MCPConnectionManager.js": "./src/MCPConnectionManager.tsx",
     "./macOsKeychainHelpers.js": "./src/macOsKeychainHelpers.ts",
+    "./client/authCache.js": "./src/client/authCache.ts",
+    "./client/auth.js": "./src/client/auth.ts",
+    "./client/transport.js": "./src/client/transport.ts",
+    "./client/discovery.js": "./src/client/discovery.ts",
     "./secureStorageTypes.js": "./src/secureStorageTypes.ts",
     "./sanitization.js": "./src/sanitization.ts"
   }
