@@ -1,4 +1,4 @@
-import { checkInstall } from 'src/utils/nativeInstaller/index.js'
+import { checkInstall } from '@claude-code/updater/nativeInstaller/index.js'
 import { useStartupNotification } from './useStartupNotification.js'
 
 export function useInstallMessages(): void {
