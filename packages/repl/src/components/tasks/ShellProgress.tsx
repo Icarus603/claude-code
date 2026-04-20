@@ -3,7 +3,7 @@ import React from 'react'
 import { Text } from '@anthropic/ink'
 import type { TaskStatus } from '@claude-code/tool-registry/Task.js'
 import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
-import type { DeepImmutable } from 'src/types/utils.js'
+import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 
 type TaskStatusTextProps = {
   status: TaskStatus

@@ -82,7 +82,7 @@ import type {
   PromptResponse,
 } from 'src/types/hooks.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
-import type { DeepImmutable } from 'src/types/utils.js'
+import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import type { AttributionState } from 'src/utils/commitAttribution.js'
 import type { FileHistoryState } from 'src/utils/fileHistory.js'
 import type { Theme, ThemeName } from 'src/utils/theme.js'
