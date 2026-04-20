@@ -1,7 +1,7 @@
 import { readdir, readFile } from 'fs/promises'
 import memoize from 'lodash-es/memoize.js'
 import { release as osRelease } from 'os'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { logError } from '@claude-code/local-observability/logging'
 
 export type Platform = 'macos' | 'windows' | 'wsl' | 'linux' | 'unknown'

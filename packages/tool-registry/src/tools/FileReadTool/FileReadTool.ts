@@ -39,7 +39,7 @@ import {
 } from 'src/utils/file.js'
 import { logFileOperation } from '@claude-code/local-observability/fileOperationAnalytics'
 import { formatFileSize } from '@claude-code/output/formatters'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   compressImageBufferWithTokenLimit,
   createImageMetadataText,

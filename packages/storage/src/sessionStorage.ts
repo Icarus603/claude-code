@@ -73,7 +73,7 @@ import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/uti
 import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { formatFileSize } from '@claude-code/output/formatters'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getWorktreePaths } from 'src/utils/getWorktreePaths.js'
 import { getBranch } from 'src/utils/git.js'
 import { gracefulShutdownSync, isShuttingDown } from 'src/utils/gracefulShutdown.js'

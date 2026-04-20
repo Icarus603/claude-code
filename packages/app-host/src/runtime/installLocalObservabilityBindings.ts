@@ -44,7 +44,7 @@ import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { envDynamic } from '@claude-code/config/env/dynamic'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { captureException } from 'src/utils/sentry.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'

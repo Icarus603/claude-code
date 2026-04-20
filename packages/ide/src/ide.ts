@@ -21,7 +21,7 @@ import {
   execFileNoThrowWithCwd,
   execSyncWithDefaults_DEPRECATED,
 } from 'src/utils/execFileNoThrow.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getAncestorPidsAsync } from '@claude-code/shell/genericProcessUtils.js'
 import { isJetBrainsPluginInstalledCached } from 'src/utils/jetbrains.js'
 import { logError } from '@claude-code/local-observability/logging'

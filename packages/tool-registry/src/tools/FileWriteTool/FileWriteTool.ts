@@ -26,7 +26,7 @@ import {
 } from '@claude-code/agent/file-history'
 import { logFileOperation } from '@claude-code/local-observability/fileOperationAnalytics'
 import { readFileSyncWithMetadata } from 'src/utils/fileRead.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,

@@ -13,7 +13,7 @@ import {
   saveCurrentProjectConfig,
 } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
 import { Select } from '../CustomSelect/index.js'
 import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'

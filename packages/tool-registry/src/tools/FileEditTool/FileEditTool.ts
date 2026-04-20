@@ -35,7 +35,7 @@ import {
   readFileSyncWithMetadata,
 } from 'src/utils/fileRead.js'
 import { formatFileSize } from '@claude-code/output/formatters'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,
