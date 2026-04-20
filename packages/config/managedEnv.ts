@@ -5,7 +5,7 @@ import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   isProviderManagedEnvVar,
   SAFE_ENV_VARS,
-} from './managedEnvConstants.js'
+} from '@claude-code/config/env/managed-constants'
 import { clearMTLSCache } from '@claude-code/provider/mtls.js'
 import { clearProxyCache, configureGlobalAgents } from '@claude-code/provider/proxy.js'
 import { isSettingSourceEnabled } from '@claude-code/config/constants'
