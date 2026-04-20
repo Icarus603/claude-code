@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { isFeedbackSurveyDisabled } from 'src/services/privacyConfig.js'
+import { isFeedbackSurveyDisabled } from '@claude-code/config/env/privacy'
 import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

@@ -13,7 +13,7 @@ import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
 import { Text } from '@anthropic/ink'
 import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-flags'
 import { refreshPolicyLimits } from '@claude-code/provider/policyLimits/index.js'
-import { refreshRemoteManagedSettings } from 'src/services/remoteManagedSettings/index.js'
+import { refreshRemoteManagedSettings } from '@claude-code/config/remote'
 import type { LocalJSXCommandOnDone } from 'src/types/command.js'
 import { stripSignatureBlocks } from 'src/utils/messages.js'
 import {

@@ -6,7 +6,7 @@ import { diagnosticTracker } from 'src/services/diagnosticTracking.js'
 import { clearDeliveredDiagnosticsForFile } from '@claude-code/ide/lsp/LSPDiagnosticRegistry.js'
 import { getLspServerManager } from '@claude-code/ide/lsp/manager.js'
 import { notifyVscodeFileUpdated } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
-import { checkTeamMemSecrets } from 'src/services/teamMemorySync/teamMemSecretGuard.js'
+import { checkTeamMemSecrets } from '@claude-code/memory/teamMemSecretGuard'
 import {
   activateConditionalSkillsForPaths,
   addSkillDirectories,
