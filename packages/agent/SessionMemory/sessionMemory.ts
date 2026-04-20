@@ -38,7 +38,7 @@ import {
 } from '@claude-code/permission/filesystem'
 import { sequential } from '@claude-code/config/sequential'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
-import { getTokenUsage, tokenCountWithEstimation } from 'src/utils/tokens.js'
+import { getTokenUsage, tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
 import { logEvent } from '@claude-code/local-observability'
 import { isAutoCompactEnabled } from '@claude-code/agent/compaction/autoCompact.js'
 import {

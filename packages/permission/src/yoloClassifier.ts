@@ -32,7 +32,7 @@ import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getAutoModeConfig } from '@claude-code/config/settings'
 import { sideQuery } from '@claude-code/agent/sideQuery.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { tokenCountWithEstimation } from 'src/utils/tokens.js'
+import { tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
 import {
   getBashPromptAllowDescriptions,
   getBashPromptDenyDescriptions,

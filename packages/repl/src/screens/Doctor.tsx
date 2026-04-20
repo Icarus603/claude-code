@@ -10,7 +10,7 @@ import React, {
 } from 'react'
 import { KeybindingWarnings } from '@claude-code/repl/components/KeybindingWarnings.js'
 import { McpParsingWarnings } from '@claude-code/repl/components/mcp/McpParsingWarnings.js'
-import { getModelMaxOutputTokens } from 'src/utils/context.js'
+import { getModelMaxOutputTokens } from '@claude-code/agent/context.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import type { SettingSource } from '@claude-code/config/constants'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'

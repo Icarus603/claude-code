@@ -15,7 +15,7 @@ import {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { escapeRegExp } from '@claude-code/output/utils/stringUtils.js'
-import { isToolSearchEnabledOptimistic } from 'src/utils/toolSearch.js'
+import { isToolSearchEnabledOptimistic } from '@claude-code/agent/toolSearch.js'
 import { getPrompt, isDeferredTool, TOOL_SEARCH_TOOL_NAME } from './prompt.js'
 
 export const inputSchema = lazySchema(() =>

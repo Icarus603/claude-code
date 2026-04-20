@@ -41,7 +41,7 @@ import {
   getMcpInstructionsDeltaAttachment,
 } from '@claude-code/agent/attachments.js'
 import { getMemoryPath } from '@claude-code/config'
-import { COMPACT_MAX_OUTPUT_TOKENS } from 'src/utils/context.js'
+import { COMPACT_MAX_OUTPUT_TOKENS } from '@claude-code/agent/context.js'
 import {
   analyzeContext,
   tokenStatsToStatsigMetrics,
@@ -88,11 +88,11 @@ import {
   getTokenUsage,
   tokenCountFromLastAPIResponse,
   tokenCountWithEstimation,
-} from 'src/utils/tokens.js'
+} from '@claude-code/agent/tokens.js'
 import {
   extractDiscoveredToolNames,
   isToolSearchEnabled,
-} from 'src/utils/toolSearch.js'
+} from '@claude-code/agent/toolSearch.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'

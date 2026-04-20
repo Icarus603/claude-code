@@ -39,7 +39,7 @@ import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   calculateContextPercentages,
   getContextWindowForModel,
-} from 'src/utils/context.js'
+} from '@claude-code/agent/context.js'
 import { getExternalEditor } from '@claude-code/storage/editor.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
