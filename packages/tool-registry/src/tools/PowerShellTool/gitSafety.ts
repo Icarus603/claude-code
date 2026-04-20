@@ -9,7 +9,7 @@
 
 import { basename, posix, resolve, sep } from 'path'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { PS_TOKENIZER_DASH_CHARS } from 'src/utils/powershell/parser.js'
+import { PS_TOKENIZER_DASH_CHARS } from '@claude-code/shell/powershell/parser.js'
 
 /**
  * If a normalized path starts with `../<cwd-basename>/`, it re-enters cwd

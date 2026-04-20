@@ -7,7 +7,7 @@
 import type {
   ParsedCommandElement,
   ParsedPowerShellCommand,
-} from 'src/utils/powershell/parser.js'
+} from '@claude-code/shell/powershell/parser.js'
 
 type ParsedStatement = ParsedPowerShellCommand['statements'][number]
 
@@ -18,7 +18,7 @@ import {
   getPipelineSegments,
   isNullRedirectionTarget,
   isPowerShellParameter,
-} from 'src/utils/powershell/parser.js'
+} from '@claude-code/shell/powershell/parser.js'
 import type { ExternalCommandConfig } from '@claude-code/shell/legacy/readOnlyCommandValidation.js'
 import {
   DOCKER_READ_ONLY_COMMANDS,

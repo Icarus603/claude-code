@@ -20,7 +20,8 @@
     "./which.js": "./src/which.ts",
     "./process.js": "./src/process.ts",
     "./genericProcessUtils.js": "./src/genericProcessUtils.ts",
-    "./sandbox.js": "./src/sandbox.ts"
+    "./sandbox.js": "./src/sandbox.ts",
+    "./powershell/parser.js": "./src/powershell/parser.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",
