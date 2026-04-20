@@ -12,7 +12,7 @@ import { getCronJitterConfig } from 'src/utils/cronJitterConfig.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js'
 import { createScheduledTaskFireMessage } from '@claude-code/agent/messages.js'
-import { WORKLOAD_CRON } from 'src/utils/workloadContext.js'
+import { WORKLOAD_CRON } from '@claude-code/provider/workloadContext.js'
 
 type Props = {
   isLoading: boolean

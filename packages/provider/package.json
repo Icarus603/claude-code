@@ -62,6 +62,7 @@
     "./betas.js": "./src/betas.ts",
     "./modelAliases.js": "./src/modelAliases.ts",
     "./antModels.js": "./src/antModels.ts",
-    "./modelAgent.js": "./src/modelAgent.ts"
+    "./modelAgent.js": "./src/modelAgent.ts",
+    "./workloadContext.js": "./src/workloadContext.ts"
   }
 }
