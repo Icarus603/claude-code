@@ -29,7 +29,7 @@ import {
   getPlan,
   getPlanFilePath,
   persistFileSnapshotIfRemote,
-} from 'src/utils/plans.js'
+} from '@claude-code/storage/plans.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {
   getAgentName,

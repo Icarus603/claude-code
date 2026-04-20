@@ -4,7 +4,7 @@ import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
-import { getPlansDirectory } from 'src/utils/plans.js'
+import { getPlansDirectory } from '@claude-code/storage/plans.js'
 import { setCwd } from 'src/utils/Shell.js'
 import {
   cleanupWorktree,

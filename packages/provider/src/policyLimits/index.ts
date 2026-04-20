@@ -31,7 +31,7 @@ import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { classifyAxiosError } from '@claude-code/local-observability/errorHelpers.js'
-import { safeParseJSON } from 'src/utils/json.js'
+import { safeParseJSON } from '@claude-code/storage/json.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,

@@ -69,7 +69,7 @@ import {
   normalizeMessagesForAPI,
 } from '@claude-code/agent/messages.js'
 import { expandPath } from '@claude-code/storage/path.js'
-import { getPlan, getPlanFilePath } from 'src/utils/plans.js'
+import { getPlan, getPlanFilePath } from '@claude-code/storage/plans.js'
 import {
   isSessionActivityTrackingActive,
   sendSessionActivitySignal,
@@ -83,7 +83,7 @@ import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
-import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
+import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import {
   getTokenUsage,
   tokenCountFromLastAPIResponse,

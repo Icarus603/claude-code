@@ -23,6 +23,7 @@
     "./utils/sliceAnsi.js": "./src/utils/sliceAnsi.ts",
     "./xml": "./src/xml.ts",
     "./constants/figures.js": "./src/constants/figures.ts",
+    "./terminal.js": "./src/terminal.ts",
     "./hyperlink.js": "./src/hyperlink.ts",
     "./textHighlighting.js": "./src/textHighlighting.ts",
     "./formatters/truncate.js": "./src/formatters/truncate.ts",

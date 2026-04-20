@@ -2,7 +2,7 @@ import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
-import { isOutputLineTruncated } from 'src/utils/terminal.js'
+import { isOutputLineTruncated } from '@claude-code/output/terminal.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
 import {
   renderToolResultMessage,

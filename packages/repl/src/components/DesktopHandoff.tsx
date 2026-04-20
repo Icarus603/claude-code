@@ -6,7 +6,7 @@ import { getDesktopInstallStatus, openCurrentSessionInDesktop } from 'src/utils/
 import { openBrowser } from 'src/utils/browser.js'
 
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { flushSessionStorage } from '@claude-code/storage/sessionStorage.js'
 
 const DESKTOP_DOCS_URL = 'https://clau.de/desktop'

@@ -5,7 +5,7 @@ import { Ansi, Text } from '@anthropic/ink'
 import { createHyperlink } from '@claude-code/output/hyperlink.js'
 
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { renderTruncatedContent } from 'src/utils/terminal.js'
+import { renderTruncatedContent } from '@claude-code/output/terminal.js'
 import { MessageResponse } from '../MessageResponse.js'
 import { InVirtualListContext } from '../messageActions.js'
 import { useExpandShellOutput } from './ExpandShellOutputContext.js'
