@@ -456,6 +456,8 @@
     "./stateStore.js": "./src/stateStore.ts",
     "./overlayContext.js": "./src/overlayContext.ts",
     "./onChangeAppState.js": "./src/onChangeAppState.ts",
-    "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts"
+    "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts",
+    "./collapseTeammateShutdowns.js": "./src/collapseTeammateShutdowns.ts",
+    "./collapseHookSummaries.js": "./src/collapseHookSummaries.ts"
   }
 }
