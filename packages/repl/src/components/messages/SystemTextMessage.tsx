@@ -9,7 +9,7 @@ import {
   BLACK_CIRCLE,
   REFERENCE_MARK,
   TEARDROP_ASTERISK,
-} from 'src/constants/figures.js'
+} from '@claude-code/output/constants/figures.js'
 import figures from 'figures'
 import { basename } from 'path'
 import { MessageResponse } from '../MessageResponse.js'

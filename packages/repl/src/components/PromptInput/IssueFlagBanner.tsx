@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FLAG_ICON } from 'src/constants/figures.js'
+import { FLAG_ICON } from '@claude-code/output/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
 
 /**

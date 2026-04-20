@@ -1,5 +1,5 @@
 import React from 'react'
-import { BLACK_CIRCLE } from 'src/constants/figures.js'
+import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 
 import { Box, Text } from '@anthropic/ink'
 import { useBlink } from '@claude-code/repl/hooks/useBlink.js'

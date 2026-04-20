@@ -4,7 +4,7 @@ import {
   BRIDGE_FAILED_INDICATOR,
   BRIDGE_READY_INDICATOR,
   BRIDGE_SPINNER_FRAMES,
-} from 'src/constants/figures.js'
+} from '@claude-code/output/constants/figures.js'
 import { stringWidth } from '@anthropic/ink'
 import { logForDebugging } from 'src/utils/debug.js'
 import {

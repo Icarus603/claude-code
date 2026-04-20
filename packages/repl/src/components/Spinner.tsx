@@ -32,7 +32,7 @@ import { getAllInProcessTeammateTasks } from '@claude-code/swarm'
 import { getEffortSuffix } from 'src/utils/effort.js'
 import { getMainLoopModel } from 'src/utils/model/model.js'
 import { getViewedTeammateTask } from 'src/state/selectors.js'
-import { TEARDROP_ASTERISK } from 'src/constants/figures.js'
+import { TEARDROP_ASTERISK } from '@claude-code/output/constants/figures.js'
 import figures from 'figures'
 import {
   getCurrentTurnTokenBudget,
