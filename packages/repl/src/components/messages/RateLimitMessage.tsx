@@ -8,7 +8,7 @@ import {
   getSubscriptionType,
   isClaudeAISubscriber,
 } from '@claude-code/provider/authAlias.js'
-import { hasClaudeAiBillingAccess } from 'src/utils/billing.js'
+import { hasClaudeAiBillingAccess } from '@claude-code/provider/billing.js'
 import { MessageResponse } from '../MessageResponse.js'
 
 type UpsellParams = {

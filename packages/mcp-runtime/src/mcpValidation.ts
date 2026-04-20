@@ -8,7 +8,7 @@ import {
   countMessagesTokensWithAPI,
   roughTokenCountEstimation,
 } from '@claude-code/agent/tokenEstimation.js'
-import { compressImageBlock } from 'src/utils/imageResizer.js'
+import { compressImageBlock } from '@claude-code/storage/imageResizer.js'
 import { logError } from '@claude-code/local-observability/logging'
 
 export const MCP_TOKEN_COUNT_THRESHOLD_FACTOR = 0.5

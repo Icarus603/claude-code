@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { PermissionRuleList } from '@claude-code/permission/components/rules/PermissionRuleList.js'
-import type { LocalJSXCommandCall } from 'src/types/command.js'
+import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'
 import { createPermissionRetryMessage } from '@claude-code/agent/messages.js'
 
 export const call: LocalJSXCommandCall = async (onDone, context) => {

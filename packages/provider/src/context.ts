@@ -4,7 +4,7 @@ import {
   getAdditionalDirectoriesForClaudeMd,
   setCachedClaudeMdContent,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { getLocalISODate } from 'src/constants/common.js'
+import { getLocalISODate } from '@claude-code/config/commonConstants.js'
 import {
   filterInjectedMemoryFiles,
   getClaudeMds,

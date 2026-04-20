@@ -50,7 +50,9 @@
     "./sideQuery.js": "./sideQuery.ts",
     "./concurrentSessions.js": "./concurrentSessions.ts",
     "./diff.js": "./diff.ts",
-    "./uuid.js": "./uuid.ts"
+    "./uuid.js": "./uuid.ts",
+    "./command.js": "./command.ts",
+    "./sessionStores.js": "./sessionStores.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

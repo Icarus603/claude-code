@@ -209,7 +209,7 @@ import { SLEEP_TOOL_NAME } from '@claude-code/tool-registry/tools/SleepTool/prom
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js';
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js';
 import { getGlobalConfig, saveGlobalConfig, getGlobalConfigWriteCount } from '@claude-code/config';
-import { hasConsoleBillingAccess } from 'src/utils/billing.js';
+import { hasConsoleBillingAccess } from '@claude-code/provider/billing.js';
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

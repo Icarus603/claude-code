@@ -17,7 +17,7 @@ import type {
   ValidationResult,
 } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import type { Command } from 'src/types/command.js'
+import type { Command } from '@claude-code/agent/command.js'
 import type {
   AssistantMessage,
   AttachmentMessage,

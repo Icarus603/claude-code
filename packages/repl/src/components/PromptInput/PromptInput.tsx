@@ -135,7 +135,7 @@ import {
   getImageFromClipboard,
   PASTE_THRESHOLD,
 } from 'src/utils/imagePaste.js'
-import type { ImageDimensions } from 'src/utils/imageResizer.js'
+import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { cacheImagePath, storeImage } from 'src/utils/imageStore.js'
 import {
   isMacosOptionChar,

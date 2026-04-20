@@ -1,5 +1,5 @@
 import { installPackageHostBindings } from '@claude-code/app-host/packageHostSetup'
-import { createInteractiveSessionStore } from 'src/state/sessionStores.js'
+import { createInteractiveSessionStore } from '@claude-code/agent/sessionStores.js'
 import { syncRuntimeHandlesFromAppState } from './runtimeHandles.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

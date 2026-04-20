@@ -204,7 +204,7 @@ import {
   type Command,
   getCommandName,
   isCommandEnabled,
-} from 'src/types/command.js'
+} from '@claude-code/agent/command.js'
 
 // Re-export types from the centralized location
 export type {
@@ -215,8 +215,8 @@ export type {
   LocalJSXCommandContext,
   PromptCommand,
   ResumeEntrypoint,
-} from 'src/types/command.js'
-export { getCommandName, isCommandEnabled } from 'src/types/command.js'
+} from '@claude-code/agent/command.js'
+export { getCommandName, isCommandEnabled } from '@claude-code/agent/command.js'
 
 // Commands that get eliminated from the external build
 export const INTERNAL_ONLY_COMMANDS = [

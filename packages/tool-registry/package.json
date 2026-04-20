@@ -67,6 +67,7 @@
     "./toolLimits": "./src/toolLimits.ts",
     "./toolConstants": "./src/toolConstants.ts",
     "./utils/semanticNumber.js": "./src/utils/semanticNumber.ts",
-    "./fileStateCache": "./src/fileStateCache.ts"
+    "./fileStateCache": "./src/fileStateCache.ts",
+    "./readEditContext.js": "./src/readEditContext.ts"
   }
 }
