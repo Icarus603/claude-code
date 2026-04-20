@@ -19,7 +19,7 @@ import type {
 export type {
   SDKControlRequest,
   SDKControlResponse,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 // Re-export core types (common serializable types)
 export * from 'src/entrypoints/sdk/coreTypes.js'
 // Re-export runtime types (callbacks, interfaces with methods)

@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto'
 import type {
   SDKPartialAssistantMessage,
   StdoutMessage,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import { decodeJwtExpiry } from '@claude-code/bridge/jwtUtils.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'

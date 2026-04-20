@@ -19,7 +19,7 @@ import { cleanupAgentTracking } from '@claude-code/provider/promptCacheBreakDete
 import {
   connectToServer,
   fetchToolsForClient,
-} from 'src/services/mcp/client.js'
+} from '@claude-code/mcp-runtime/clientRuntime.js'
 import { getMcpConfigByName } from '@claude-code/mcp-runtime/config.js'
 import type {
   MCPServerConnection,

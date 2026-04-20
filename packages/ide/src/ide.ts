@@ -8,7 +8,7 @@ import * as os from 'os'
 import { basename, join, sep as pathSeparator, resolve } from 'path'
 import { logEvent } from '@claude-code/local-observability'
 import { getIsScrollDraining, getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
-import { callIdeRpc } from 'src/services/mcp/client.js'
+import { callIdeRpc } from '@claude-code/mcp-runtime/clientRuntime.js'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,
@@ -20,7 +20,7 @@ import {
   execFileNoThrow,
   execFileNoThrowWithCwd,
   execSyncWithDefaults_DEPRECATED,
-} from 'src/utils/execFileNoThrow.js'
+} from '@claude-code/shell/execFileNoThrow.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getAncestorPidsAsync } from '@claude-code/shell/genericProcessUtils.js'
 import { isJetBrainsPluginInstalledCached } from 'src/utils/jetbrains.js'

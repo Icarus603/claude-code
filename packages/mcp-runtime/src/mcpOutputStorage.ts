@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { MCPResultType } from 'src/services/mcp/client.js'
+import type { MCPResultType } from '@claude-code/mcp-runtime/clientRuntime.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { logError } from '@claude-code/local-observability/logging'

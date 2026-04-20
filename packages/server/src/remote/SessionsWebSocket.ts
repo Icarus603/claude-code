@@ -6,7 +6,7 @@ import type {
   SDKControlRequest,
   SDKControlRequestInner,
   SDKControlResponse,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'

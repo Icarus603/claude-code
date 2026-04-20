@@ -4,7 +4,7 @@ import { performMCPOAuthFlow } from '@claude-code/mcp-runtime/auth.js'
 import {
   clearMcpAuthCache,
   reconnectMcpServerImpl,
-} from 'src/services/mcp/client.js'
+} from '@claude-code/mcp-runtime/clientRuntime.js'
 import {
   buildMcpToolName,
   getMcpPrefix,

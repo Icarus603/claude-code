@@ -17,7 +17,7 @@ import { getGlobalConfig } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
+import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { findGitRoot, gitExe } from 'src/utils/git.js'
 import {

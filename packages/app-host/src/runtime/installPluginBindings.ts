@@ -76,7 +76,7 @@ import {
 import {
   execFileNoThrow,
   execFileNoThrowWithCwd,
-} from 'src/utils/execFileNoThrow.js'
+} from '@claude-code/shell/execFileNoThrow.js'
 import { pathExists, writeFileSyncAndFlush_DEPRECATED } from '@claude-code/storage/file.js'
 import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
 import { gitExe } from 'src/utils/git.js'

@@ -1,4 +1,4 @@
-import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
+import type { StdoutMessage } from '@claude-code/headless-sdk/controlTypes.js'
 import type WsWebSocket from 'ws'
 import { logEvent } from '@claude-code/local-observability'
 import { CircularBuffer } from '@claude-code/output/buffers'

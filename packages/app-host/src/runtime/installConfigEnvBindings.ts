@@ -19,7 +19,7 @@ import {
 
 import { fileSuffixForOauthConfig } from '@claude-code/provider/oauthConstants'
 import { isRunningWithBun } from '@claude-code/config/bundledMode'
-import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
+import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { findExecutable } from '@claude-code/shell/findExecutable.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getAncestorCommandsAsync } from '@claude-code/shell/genericProcessUtils.js'

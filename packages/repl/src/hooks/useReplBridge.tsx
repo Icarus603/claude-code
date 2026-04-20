@@ -18,7 +18,7 @@ import type {
   PermissionMode,
   SDKMessage,
 } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { SDKControlResponse } from 'src/entrypoints/sdk/controlTypes.js'
+import type { SDKControlResponse } from '@claude-code/headless-sdk/controlTypes.js'
 import { Text } from '@anthropic/ink'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {

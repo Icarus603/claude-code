@@ -18,7 +18,7 @@ import type {
   SDKControlResponse,
   StdinMessage,
   StdoutMessage,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import type { PermissionUpdate as InternalPermissionUpdate } from '@claude-code/permission/permissionTypes'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'

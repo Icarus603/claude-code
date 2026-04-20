@@ -1,4 +1,4 @@
-import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
+import type { StdoutMessage } from '@claude-code/headless-sdk/controlTypes.js'
 import { CCRClient } from '@claude-code/cli/transports/ccrClient.js'
 import type { HybridTransport } from '@claude-code/cli/transports/HybridTransport.js'
 import { SSETransport } from '@claude-code/cli/transports/SSETransport.js'
