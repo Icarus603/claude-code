@@ -13,7 +13,7 @@ import { setCwd } from 'src/utils/Shell.js'
 import { shouldMaintainProjectWorkingDir } from '@claude-code/config/env/utils'
 import { maybeResizeAndDownsampleImageBuffer } from 'src/utils/imageResizer.js'
 import { getMaxOutputLength } from '@claude-code/shell/legacy/outputLimits.js'
-import { countCharInString, plural } from 'src/utils/stringUtils.js'
+import { countCharInString, plural } from '@claude-code/output/utils/stringUtils.js'
 /**
  * Strips leading and trailing lines that contain only whitespace/newlines.
  * Unlike trim(), this preserves whitespace within content lines and only removes

@@ -21,7 +21,7 @@ import { getGlobExclusionsForPluginCache } from 'src/utils/plugins/orphanedPlugi
 import { ripGrep } from 'src/utils/ripgrep.js'
 import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
 import { semanticNumber } from 'src/utils/semanticNumber.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { GREP_TOOL_NAME, getDescription } from './prompt.js'
 import {
   getToolUseSummary,

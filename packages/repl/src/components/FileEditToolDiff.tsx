@@ -20,7 +20,7 @@ import {
   readCapped,
   scanForContext,
 } from 'src/utils/readEditContext.js'
-import { firstLineOf } from 'src/utils/stringUtils.js'
+import { firstLineOf } from '@claude-code/output/utils/stringUtils.js'
 import { StructuredDiffList } from './StructuredDiffList.js'
 
 type Props = {

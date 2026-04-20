@@ -25,7 +25,7 @@ import {
   validateElicitationInput,
   validateElicitationInputAsync,
 } from '@claude-code/mcp-runtime/elicitationValidation.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import TextInput from '../TextInput.js'

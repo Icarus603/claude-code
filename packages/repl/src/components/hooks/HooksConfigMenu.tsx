@@ -30,7 +30,7 @@ import {
   getSettings_DEPRECATED,
   getSettingsForSource,
 } from 'src/utils/settings/settings.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { Dialog } from '@anthropic/ink'
 import { SelectEventMode } from './SelectEventMode.js'
 import { SelectHookMode } from './SelectHookMode.js'

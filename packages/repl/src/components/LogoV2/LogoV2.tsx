@@ -73,7 +73,7 @@ import {
   incrementOverageCreditUpsellSeenCount,
   createOverageCreditFeed,
 } from './OverageCreditUpsell.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getEffortSuffix } from 'src/utils/effort.js'
 import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'

@@ -19,7 +19,7 @@ import {
   getSettingSourceName,
   type SettingSource,
 } from 'src/utils/settings/constants.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Dialog } from '@anthropic/ink'
 

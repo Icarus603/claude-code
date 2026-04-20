@@ -6,7 +6,7 @@ import type {
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import {
   looksLikeISO8601,
   parseNaturalLanguageDateTime,

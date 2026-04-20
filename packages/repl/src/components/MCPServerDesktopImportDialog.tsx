@@ -8,7 +8,7 @@ import type {
   McpServerConfig,
   ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime/types.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { SelectMulti } from './CustomSelect/SelectMulti.js'
 

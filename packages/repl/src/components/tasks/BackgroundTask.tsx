@@ -5,7 +5,7 @@ import type { BackgroundTaskState } from 'src/tasks/types.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { DIAMOND_FILLED, DIAMOND_OPEN } from 'src/constants/figures.js'
 import { RemoteSessionProgress } from './RemoteSessionProgress.js'
 import { ShellProgress, TaskStatusText } from './ShellProgress.js'

@@ -47,7 +47,7 @@ import {
   type StreamingToolUse,
   shouldShowUserMessage,
 } from 'src/utils/messages.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { renderableSearchText } from 'src/utils/transcriptSearch.js'
 import { Divider } from '@anthropic/ink'
 import type { UnseenDivider } from './FullscreenLayout.js'

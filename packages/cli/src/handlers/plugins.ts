@@ -56,7 +56,7 @@ import {
   validatePluginContents,
 } from 'src/utils/plugins/validatePlugin.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { cliError, cliOk } from '../exit.js'
 
 // Re-export for main.tsx to reference in option definitions

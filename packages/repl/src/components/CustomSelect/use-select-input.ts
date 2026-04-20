@@ -5,7 +5,7 @@ import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
   normalizeFullWidthDigits,
   normalizeFullWidthSpace,
-} from 'src/utils/stringUtils.js'
+} from '@claude-code/output/utils/stringUtils.js'
 import type { OptionWithDescription } from './select.js'
 import type { SelectState } from './use-select-state.js'
 

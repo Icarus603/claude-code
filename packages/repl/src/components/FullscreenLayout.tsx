@@ -23,7 +23,7 @@ import { Box, ScrollBox, type ScrollBoxHandle, Text, instances } from '@anthropi
 import type { Message } from '@claude-code/agent/messageShapes'
 import { openBrowser, openPath } from 'src/utils/browser.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { isNullRenderingAttachment } from './messages/nullRenderingAttachments.js'
 import PromptInputFooterSuggestions from './PromptInput/PromptInputFooterSuggestions.js'
 import type { StickyPrompt } from './VirtualMessageList.js'

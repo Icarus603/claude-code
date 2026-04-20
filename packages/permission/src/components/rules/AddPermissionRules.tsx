@@ -23,7 +23,7 @@ import {
   SOURCES,
 } from 'src/utils/settings/constants.js'
 import { getRelativeSettingsFilePathForSource } from 'src/utils/settings/settings.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 import { PermissionRuleDescription } from './PermissionRuleDescription.js'
 
