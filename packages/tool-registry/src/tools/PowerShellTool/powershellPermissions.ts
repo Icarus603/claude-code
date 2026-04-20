@@ -10,7 +10,7 @@ import type {
   PermissionResult,
 } from '@claude-code/permission/permissionTypes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { isCurrentDirectoryBareGitRepo } from 'src/utils/git.js'
+import { isCurrentDirectoryBareGitRepo } from '@claude-code/storage/git.js'
 import type { PermissionRule } from '@claude-code/permission/PermissionRule'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import {

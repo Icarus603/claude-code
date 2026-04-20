@@ -29,13 +29,13 @@ import type {
 } from 'src/types/logs.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { renameRecordingForSession } from '@claude-code/output/capture'
-import { clearMemoryFileCaches } from 'src/utils/claudemd.js'
+import { clearMemoryFileCaches } from '@claude-code/storage/claudemd.js'
 import {
   type AttributionState,
   attributionRestoreStateFromLog,
   restoreAttributionStateFromSnapshots,
 } from 'src/utils/commitAttribution.js'
-import { updateSessionName } from 'src/utils/concurrentSessions.js'
+import { updateSessionName } from '@claude-code/agent/concurrentSessions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'

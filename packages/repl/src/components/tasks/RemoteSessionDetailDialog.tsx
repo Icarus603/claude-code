@@ -15,7 +15,7 @@ import {
 } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
-import { openBrowser } from 'src/utils/browser.js'
+import { openBrowser } from '@claude-code/storage/browser.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { formatDuration } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'

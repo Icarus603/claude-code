@@ -5,7 +5,7 @@ import { Text } from '@anthropic/ink'
 import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
-import { readFileSync } from 'src/utils/fileRead.js'
+import { readFileSync } from '@claude-code/storage/fileRead.js'
 import { FilePermissionDialog } from '../FilePermissionDialog/FilePermissionDialog.js'
 import {
   createSingleEditDiffConfig,

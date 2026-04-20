@@ -64,7 +64,7 @@ import {
   errorMessage,
   TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 } from '@claude-code/local-observability/errorHelpers.js'
-import { getMCPUserAgent } from 'src/utils/http.js'
+import { getMCPUserAgent } from '@claude-code/provider/http.js'
 import { maybeNotifyIDEConnected } from '@claude-code/ide/ide.js'
 import { maybeResizeAndDownsampleImageBuffer } from 'src/utils/imageResizer.js'
 import { logMCPDebug, logMCPError } from '@claude-code/local-observability/logging'
@@ -87,7 +87,7 @@ import {
   getProxyFetchOptions,
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,
-} from 'src/utils/proxy.js'
+} from '@claude-code/provider/proxy.js'
 import { recursivelySanitizeUnicode } from 'src/utils/sanitization.js'
 import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { subprocessEnv } from 'src/utils/subprocessEnv.js'

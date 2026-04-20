@@ -17,7 +17,7 @@ import { updateTaskState } from 'src/utils/task/framework.js';
 import { archiveRemoteSession } from 'src/utils/teleport.js';
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js';
 import { toRelativePath } from '@claude-code/storage/path.js';
-import type { UUID } from 'src/utils/uuid.js';
+import type { UUID } from '@claude-code/agent/uuid.js';
 import type { FileStateCache } from '@claude-code/tool-registry/fileStateCache';
 
 /** Maximum visible lines for the plan preview. */

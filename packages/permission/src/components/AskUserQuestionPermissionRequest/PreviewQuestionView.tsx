@@ -8,7 +8,7 @@ import {
 } from '@anthropic/ink/keybindings'
 import { useAppState } from '../../appStateHooks.js'
 import type { Question } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
-import { getExternalEditor } from 'src/utils/editor.js'
+import { getExternalEditor } from '@claude-code/storage/editor.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { editPromptInEditor } from 'src/utils/promptEditor.js'
 import { Divider } from '@anthropic/ink'

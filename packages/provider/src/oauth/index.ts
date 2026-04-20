@@ -1,5 +1,5 @@
 import { logEvent } from '@claude-code/local-observability'
-import { openBrowser } from 'src/utils/browser.js'
+import { openBrowser } from '@claude-code/storage/browser.js'
 import { AuthCodeListener } from './auth-code-listener.js'
 import * as client from './client.js'
 import * as crypto from './crypto.js'

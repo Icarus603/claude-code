@@ -4,7 +4,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getCurrentProjectConfig, saveCurrentProjectConfig } from '@claude-code/config'
 import { env } from '@claude-code/config/env/paths'
 import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'
-import { getIsGit, gitExe } from 'src/utils/git.js'
+import { getIsGit, gitExe } from '@claude-code/storage/git.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getGitEmail } from 'src/utils/user.js'
 

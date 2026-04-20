@@ -32,7 +32,7 @@ import {
   triggerFastModeCooldown,
 } from 'src/utils/fastMode.js'
 import { isNonCustomOpusModel } from '@claude-code/provider/model.js'
-import { disableKeepAlive } from 'src/utils/proxy.js'
+import { disableKeepAlive } from '@claude-code/provider/proxy.js'
 import { sleep } from '@claude-code/config/sleep'
 import type { ThinkingConfig } from 'src/utils/thinking.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

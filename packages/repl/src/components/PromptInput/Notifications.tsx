@@ -24,7 +24,7 @@ import {
   getSubscriptionType,
 } from '@claude-code/provider/authAlias.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
-import { getExternalEditor } from 'src/utils/editor.js'
+import { getExternalEditor } from '@claude-code/storage/editor.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatDuration } from '@claude-code/output/formatters'
 import { setEnvHookNotifier } from 'src/utils/hooks/fileChangedWatcher.js'

@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, NoSelect, Text } from '@anthropic/ink'
 import { intersperse } from '@claude-code/tool-registry/utils/array.js'
-import { getPatchForDisplay } from 'src/utils/diff.js'
+import { getPatchForDisplay } from '@claude-code/agent/diff.js'
 import { HighlightedCode } from '@claude-code/repl/components/HighlightedCode.js'
 import { StructuredDiff } from '@claude-code/repl/components/StructuredDiff.js'
 

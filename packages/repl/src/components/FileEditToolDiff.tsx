@@ -12,7 +12,7 @@ import {
   adjustHunkLineNumbers,
   CONTEXT_LINES,
   getPatchForDisplay,
-} from 'src/utils/diff.js'
+} from '@claude-code/agent/diff.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   CHUNK_SIZE,

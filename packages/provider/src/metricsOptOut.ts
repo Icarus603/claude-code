@@ -3,7 +3,7 @@ import { hasProfileScope, isClaudeAISubscriber } from '@claude-code/provider/aut
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { getAuthHeaders, withOAuth401Retry } from 'src/utils/http.js'
+import { getAuthHeaders, withOAuth401Retry } from '@claude-code/provider/http.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { memoizeWithTTLAsync } from 'src/utils/memoize.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'

@@ -16,7 +16,7 @@ import {
   extractTextContent,
   getLastAssistantMessage,
 } from '@claude-code/agent/messages.js'
-import { logOTelEvent } from 'src/utils/telemetry/events.js'
+import { logOTelEvent } from '@claude-code/local-observability/telemetryEvents.js'
 import { submitTranscriptShare } from './submitTranscriptShare.js'
 import type { TranscriptShareResponse } from './TranscriptSharePrompt.js'
 import { useSurveyState } from './useSurveyState.js'

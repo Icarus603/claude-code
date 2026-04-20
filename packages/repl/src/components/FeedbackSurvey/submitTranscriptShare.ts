@@ -4,7 +4,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import { checkAndRefreshOAuthTokenIfNeeded } from '@claude-code/provider/authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { getAuthHeaders, getUserAgent } from 'src/utils/http.js'
+import { getAuthHeaders, getUserAgent } from '@claude-code/provider/http.js'
 import { normalizeMessagesForAPI } from '@claude-code/agent/messages.js'
 import {
   extractAgentIdsFromMessages,

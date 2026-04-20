@@ -29,7 +29,7 @@ import {
   sameSessionId,
 } from './workSecret.js'
 import { toCompatSessionId, toInfraSessionId } from './sessionIdCompat.js'
-import { updateSessionBridgeId } from 'src/utils/concurrentSessions.js'
+import { updateSessionBridgeId } from '@claude-code/agent/concurrentSessions.js'
 import { getTrustedDeviceToken } from './trustedDevice.js'
 import { HybridTransport } from '@claude-code/cli/transports/HybridTransport.js'
 import {

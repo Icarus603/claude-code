@@ -78,7 +78,7 @@ import {
   unregisterAgent as unregisterPerfettoAgent,
 } from 'src/utils/telemetry/perfettoTracing.js'
 import type { ContentReplacementState } from '@claude-code/storage/toolResultStorage.js'
-import { createAgentId } from 'src/utils/uuid.js'
+import { createAgentId } from '@claude-code/agent/uuid.js'
 import { resolveAgentTools } from './agentToolUtils.js'
 import { type AgentDefinition, isBuiltInAgent } from './loadAgentsDir.js'
 

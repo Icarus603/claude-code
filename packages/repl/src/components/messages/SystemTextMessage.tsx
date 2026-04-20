@@ -14,7 +14,7 @@ import figures from 'figures'
 import { basename } from 'path'
 import { MessageResponse } from '../MessageResponse.js'
 
-import { openPath } from 'src/utils/browser.js'
+import { openPath } from '@claude-code/storage/browser.js'
 /* eslint-disable @typescript-eslint/no-require-imports */
 const teamMemSaved = feature('TEAMMEM')
   ? (require('./teamMemSaved.js') as typeof import('./teamMemSaved.js'))

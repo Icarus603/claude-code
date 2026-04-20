@@ -40,7 +40,7 @@ import {
   calculateContextPercentages,
   getContextWindowForModel,
 } from 'src/utils/context.js'
-import { getExternalEditor } from 'src/utils/editor.js'
+import { getExternalEditor } from '@claude-code/storage/editor.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { logError } from '@claude-code/local-observability/logging'

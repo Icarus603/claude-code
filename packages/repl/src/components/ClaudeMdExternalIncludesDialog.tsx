@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { logEvent } from '@claude-code/local-observability'
 import { Box, Dialog, Link, Text } from '@anthropic/ink'
-import type { ExternalClaudeMdInclude } from 'src/utils/claudemd.js'
+import type { ExternalClaudeMdInclude } from '@claude-code/storage/claudemd.js'
 import { saveCurrentProjectConfig } from '@claude-code/config'
 import { Select } from './CustomSelect/index.js'
 

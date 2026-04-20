@@ -79,7 +79,7 @@ import {
 } from '@claude-code/shell/execFileNoThrow.js'
 import { pathExists, writeFileSyncAndFlush_DEPRECATED } from '@claude-code/storage/file.js'
 import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
-import { gitExe } from 'src/utils/git.js'
+import { gitExe } from '@claude-code/storage/git.js'
 import { getHeadForDir } from 'src/utils/git/gitFilesystem.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { clone, jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'

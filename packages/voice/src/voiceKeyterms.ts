@@ -6,7 +6,7 @@
 
 import { basename } from 'path'
 import { getProjectRoot } from '@claude-code/app-host/bootstrap/state.js'
-import { getBranch } from 'src/utils/git.js'
+import { getBranch } from '@claude-code/storage/git.js'
 
 // ─── Global keyterms ────────────────────────────────────────────────
 

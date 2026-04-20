@@ -5,7 +5,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getGlobalClaudeFile } from '@claude-code/config/env/paths'
-import { findCanonicalGitRoot } from 'src/utils/git.js'
+import { findCanonicalGitRoot } from '@claude-code/storage/git.js'
 import {
   buildAgentHostExtraBindings,
   buildMemoryHostExtraBindings,
