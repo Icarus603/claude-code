@@ -1,6 +1,6 @@
 import { SandboxManager } from "src/utils/sandbox/sandbox-adapter.js";
 import { parseUserSpecifiedModel, getDefaultMainLoopModel } from "src/utils/model/model.js";
-import { getContextWindowForModel } from "src/utils/context.js";
+import { getContextWindowForModel } from "@claude-code/agent/context.js";
 import { getInitialMainLoopModel, getSdkBetas } from "../../bootstrap/state.js";
 import { logSkillsLoaded } from "src/utils/telemetry/skillLoadedEvent.js";
 import { getCwd } from "@claude-code/app-host/bootstrap/cwd.js";
@@ -11,10 +11,10 @@ import {
 	logPluginLoadErrors,
 	logPluginsEnabledForSession,
 } from "@claude-code/tool-registry/telemetry/pluginTelemetry.js";
-import { logError } from "src/utils/log.js";
+import { logError } from "@claude-code/local-observability/logging";
 import { hasNodeOption } from "@claude-code/config/env/utils";
 import { getIsGit, getWorktreeCount } from "@claude-code/storage/git.js";
-import { getInitialSettings } from "src/utils/settings/settings.js";
+import { getInitialSettings } from "@claude-code/config/settings";
 import { getGhAuthStatus } from "src/utils/github/ghAuthStatus.js";
 import { isAutoUpdaterDisabled } from "@claude-code/config";
 import { isAnalyticsDisabled } from "@claude-code/config/env/privacy";
