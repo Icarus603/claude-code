@@ -38,7 +38,7 @@ import { mergeAndFilterTools } from 'src/utils/toolPool.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   logForDiagnosticsNoPII,
   withDiagnosticsTiming,
@@ -253,7 +253,7 @@ import {
   toInternalMessages,
   toSDKRateLimitInfo,
 } from 'src/utils/messages/mappers.js'
-import { createModelSwitchBreadcrumbs } from 'src/utils/messages.js'
+import { createModelSwitchBreadcrumbs } from '@claude-code/agent/messages.js'
 import { collectContextData } from 'src/commands/context/context-noninteractive.js'
 import { LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js'
 import {
@@ -274,7 +274,7 @@ import {
   resolveAppliedEffort,
 } from 'src/utils/effort.js'
 import { modelSupportsAdaptiveThinking } from '@claude-code/provider/thinking.js'
-import { modelSupportsAutoMode } from 'src/utils/betas.js'
+import { modelSupportsAutoMode } from '@claude-code/provider/betas.js'
 import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
 import {
   getSessionId,

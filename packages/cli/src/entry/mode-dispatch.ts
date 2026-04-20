@@ -145,7 +145,7 @@ import {
   createRuntimeHandles,
   syncRuntimeHandlesFromHeadlessParams,
 } from '@claude-code/app-host/runtime/runtimeHandles.js'
-import { createSystemMessage, createUserMessage } from 'src/utils/messages.js'
+import { createSystemMessage, createUserMessage } from '@claude-code/agent/messages.js'
 import { getPlatform } from '@claude-code/config/platform'
 import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
 import { jsonParse, writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
@@ -247,7 +247,7 @@ import { initializeVersionedPlugins } from 'src/utils/plugins/installedPluginsMa
 import { getManagedPluginNames } from 'src/utils/plugins/managedPlugins.js'
 import { getGlobExclusionsForPluginCache } from 'src/utils/plugins/orphanedPluginFilter.js'
 import { getPluginSeedDirs } from 'src/utils/plugins/pluginDirectories.js'
-import { countFilesRoundedRg } from 'src/utils/ripgrep.js'
+import { countFilesRoundedRg } from '@claude-code/tool-registry/ripgrep.js'
 import {
   processSessionStartHooks,
   processSetupHooks,
@@ -295,7 +295,7 @@ import {
   updateSessionName,
 } from 'src/utils/concurrentSessions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { logForDebugging, setHasFormattedOutput } from 'src/utils/debug.js'
+import { logForDebugging, setHasFormattedOutput } from '@claude-code/local-observability/debug.js'
 import {
   errorMessage,
   getErrnoCode,
@@ -353,7 +353,7 @@ import {
   getIdleSpeculationState,
 } from '../state-shim.js'
 import { asSessionId } from '@claude-code/agent/idTypes'
-import { filterAllowedSdkBetas } from 'src/utils/betas.js'
+import { filterAllowedSdkBetas } from '@claude-code/provider/betas.js'
 import { isInBundledMode, isRunningWithBun } from '@claude-code/config/bundledMode'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import {
