@@ -4,7 +4,7 @@ import type {
   JSONRPCMessage,
 } from '@modelcontextprotocol/sdk/types.js'
 import { randomUUID } from 'crypto'
-import type { AssistantMessage } from 'src//types/message.js'
+import type { AssistantMessage } from '@claude-code/agent/messageShapes.js'
 import type {
   HookInput,
   HookJSONOutput,

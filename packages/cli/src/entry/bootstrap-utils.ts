@@ -11,7 +11,7 @@ import { isRunningWithBun } from '@claude-code/config/bundledMode'
 import {
   getManagedSettingsKeysForLogging,
   getSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 
