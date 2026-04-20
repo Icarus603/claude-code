@@ -11,7 +11,7 @@ import {
 // namespace after mock.module() (daemon/auth.test.ts), breaking spyOn.
 import * as authModule from 'src/utils/auth.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { lt } from 'src/utils/semver.js'
+import { lt } from '@claude-code/config/semver'
 
 /**
  * Runtime check for bridge mode entitlement.

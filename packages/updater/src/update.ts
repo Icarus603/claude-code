@@ -24,7 +24,7 @@ import {
 } from 'src/utils/nativeInstaller/index.js'
 import { getPackageManager } from 'src/utils/nativeInstaller/packageManagers.js'
 import { writeToStdout } from 'src/utils/process.js'
-import { gte } from 'src/utils/semver.js'
+import { gte } from '@claude-code/config/semver'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
 
 export async function update() {

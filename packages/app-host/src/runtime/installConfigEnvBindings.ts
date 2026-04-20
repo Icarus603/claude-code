@@ -23,7 +23,7 @@ import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { findExecutable } from '@claude-code/shell/findExecutable.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { getAncestorCommandsAsync } from 'src/utils/genericProcessUtils.js'
-import { which } from 'src/utils/which.js'
+import { which } from '@claude-code/shell/which.js'
 
 let installed = false
 
