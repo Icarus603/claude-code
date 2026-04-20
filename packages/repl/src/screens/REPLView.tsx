@@ -67,7 +67,7 @@ import {
   getTurnClassifierCount,
   resetTurnClassifierDuration,
 } from '@claude-code/app-host/bootstrap/state.js';
-import { asSessionId, asAgentId } from 'src/types/ids.js';
+import { asSessionId, asAgentId } from '@claude-code/agent/idTypes';
 import { logForDebugging } from 'src/utils/debug.js';
 import { QueryGuard } from 'src/utils/QueryGuard.js';
 import { isEnvTruthy } from 'src/utils/envUtils.js';

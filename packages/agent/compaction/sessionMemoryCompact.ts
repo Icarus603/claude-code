@@ -2,7 +2,7 @@
  * EXPERIMENT: Session memory compaction
  */
 
-import type { AgentId } from 'src/types/ids.js'
+import type { AgentId } from '@claude-code/agent/idTypes'
 import type { HookResultMessage, Message } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'

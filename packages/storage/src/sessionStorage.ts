@@ -40,7 +40,7 @@ import {
   asAgentId,
   asSessionId,
   type SessionId,
-} from 'src/types/ids.js'
+} from '@claude-code/agent/idTypes'
 import type { AttributionSnapshotMessage } from 'src/types/logs.js'
 import {
   type ContentReplacementEntry,

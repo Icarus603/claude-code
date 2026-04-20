@@ -20,7 +20,7 @@ import {
   FILE_UNCHANGED_STUB,
 } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
-import type { AgentId } from 'src/types/ids.js'
+import type { AgentId } from '@claude-code/agent/idTypes'
 import type {
   AssistantMessage,
   AttachmentMessage,

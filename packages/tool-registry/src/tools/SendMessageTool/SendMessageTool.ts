@@ -10,7 +10,7 @@ import {
   queuePendingMessage,
 } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { isMainSessionTask } from 'src/tasks/LocalMainSessionTask.js'
-import { toAgentId } from 'src/types/ids.js'
+import { toAgentId } from '@claude-code/agent/idTypes'
 import { generateRequestId } from 'src/utils/agentId.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { logForDebugging } from 'src/utils/debug.js'

@@ -20,7 +20,7 @@ import {
   getAgentDefinitionsWithOverrides,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
-import { asSessionId } from 'src/types/ids.js'
+import { asSessionId } from '@claude-code/agent/idTypes'
 import type {
   AttributionSnapshotMessage,
   ContextCollapseCommitEntry,
