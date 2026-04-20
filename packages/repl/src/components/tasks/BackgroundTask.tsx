@@ -3,7 +3,7 @@ import { Text } from '@anthropic/ink'
 import { toInkColor } from 'src/utils/ink.js'
 import type { BackgroundTaskState } from 'src/tasks/types.js'
 import type { DeepImmutable } from 'src/types/utils.js'
-import { truncate } from 'src/utils/format.js'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 
 import { plural } from 'src/utils/stringUtils.js'
 import { DIAMOND_FILLED, DIAMOND_OPEN } from 'src/constants/figures.js'

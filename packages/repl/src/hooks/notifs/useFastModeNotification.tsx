@@ -9,7 +9,7 @@ import {
   onFastModeOverageRejection,
   onOrgFastModeChanged,
 } from 'src/utils/fastMode.js'
-import { formatDuration } from 'src/utils/format.js'
+import { formatDuration } from '@claude-code/output/formatters'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 
 const COOLDOWN_STARTED_KEY = 'fast-mode-cooldown-started'

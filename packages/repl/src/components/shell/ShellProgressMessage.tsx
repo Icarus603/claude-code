@@ -1,7 +1,7 @@
 import React from 'react'
 import stripAnsi from 'strip-ansi'
 import { Box, Text } from '@anthropic/ink'
-import { formatFileSize } from 'src/utils/format.js'
+import { formatFileSize } from '@claude-code/output/formatters'
 import { MessageResponse } from '../MessageResponse.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
 import { ShellTimeDisplay } from './ShellTimeDisplay.js'

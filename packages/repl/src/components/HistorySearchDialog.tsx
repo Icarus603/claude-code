@@ -9,7 +9,8 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth, wrapAnsi } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
 import type { HistoryEntry } from '@claude-code/config'
-import { formatRelativeTimeAgo, truncateToWidth } from 'src/utils/format.js'
+import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { FuzzyPicker } from '@anthropic/ink'
 
 type Props = {

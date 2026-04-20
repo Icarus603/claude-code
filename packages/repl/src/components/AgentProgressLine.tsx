@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { formatNumber } from 'src/utils/format.js'
+import { formatNumber } from '@claude-code/output/formatters'
 import type { Theme } from 'src/utils/theme.js'
 
 type Props = {

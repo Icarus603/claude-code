@@ -31,11 +31,7 @@ import type {
   SystemMemorySavedMessage,
 } from 'src/types/message.js'
 import { SystemAPIErrorMessage } from './SystemAPIErrorMessage.js'
-import {
-  formatDuration,
-  formatNumber,
-  formatSecondsShort,
-} from 'src/utils/format.js'
+import { formatDuration, formatNumber, formatSecondsShort } from '@claude-code/output/formatters'
 import { getGlobalConfig } from '@claude-code/config'
 import { Text as ThemedText } from '@anthropic/ink'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'

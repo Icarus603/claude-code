@@ -9,7 +9,7 @@ import {
 } from '@claude-code/provider/referral.js'
 import type { LogOption } from 'src/types/logs.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { formatRelativeTimeAgo } from 'src/utils/format.js'
+import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import type { FeedConfig, FeedLine } from './Feed.js'
 
 export function createRecentActivityFeed(activities: LogOption[]): FeedConfig {

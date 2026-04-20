@@ -8,7 +8,7 @@ import {
   refreshOverageCreditGrantCache,
 } from '@claude-code/provider/overageCreditGrant.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { truncate } from 'src/utils/format.js'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 import type { FeedConfig } from './Feed.js'
 
 const MAX_IMPRESSIONS = 3

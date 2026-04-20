@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import type { DiffFile } from '@claude-code/repl/hooks/useDiffData.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
-import { truncateStartToWidth } from 'src/utils/format.js'
+import { truncateStartToWidth } from '@claude-code/output/formatters/truncate.js'
 import { plural } from 'src/utils/stringUtils.js'
 
 const MAX_VISIBLE_FILES = 5

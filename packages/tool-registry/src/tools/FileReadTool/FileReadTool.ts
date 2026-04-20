@@ -38,7 +38,7 @@ import {
   suggestPathUnderCwd,
 } from 'src/utils/file.js'
 import { logFileOperation } from 'src/utils/fileOperationAnalytics.js'
-import { formatFileSize } from 'src/utils/format.js'
+import { formatFileSize } from '@claude-code/output/formatters'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import {
   compressImageBufferWithTokenLimit,

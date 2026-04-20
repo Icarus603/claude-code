@@ -3,7 +3,8 @@ import {
   getRemoteSessionUrl,
 } from 'src/constants/product.js'
 import { stringWidth } from '@anthropic/ink'
-import { formatDuration, truncateToWidth } from 'src/utils/format.js'
+import { formatDuration } from '@claude-code/output/formatters'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { getGraphemeSegmenter } from 'src/utils/intl.js'
 
 /** Bridge status state machine states. */

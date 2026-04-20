@@ -10,11 +10,8 @@ import { Box, Text, stringWidth } from '@anthropic/ink'
 import { toInkColor } from 'src/utils/ink.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
-import {
-  formatDuration,
-  formatNumber,
-  truncateToWidth,
-} from 'src/utils/format.js'
+import { formatDuration, formatNumber } from '@claude-code/output/formatters'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 
 import { TEAMMATE_SELECT_HINT } from './teammateSelectHint.js'
 

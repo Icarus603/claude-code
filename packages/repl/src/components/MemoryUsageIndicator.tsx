@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useMemoryUsage } from '@claude-code/repl/hooks/useMemoryUsage.js'
 import { Box, Text } from '@anthropic/ink'
-import { formatFileSize } from 'src/utils/format.js'
+import { formatFileSize } from '@claude-code/output/formatters'
 
 export function MemoryUsageIndicator(): React.ReactNode {
   // Ant-only: the /heapdump link is an internal debugging aid. Gating before

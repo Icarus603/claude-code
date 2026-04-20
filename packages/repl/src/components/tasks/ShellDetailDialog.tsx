@@ -11,11 +11,8 @@ import { useTerminalSize } from '@anthropic/ink'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
-import {
-  formatDuration,
-  formatFileSize,
-  truncateToWidth,
-} from 'src/utils/format.js'
+import { formatDuration, formatFileSize } from '@claude-code/output/formatters'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { tailFile } from 'src/utils/fsOperations.js'
 import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'

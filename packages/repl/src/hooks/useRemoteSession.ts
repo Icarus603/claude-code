@@ -22,7 +22,7 @@ import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { Message as MessageType } from 'src/types/message.js'
 import type { PermissionAskDecision } from 'src/types/permissions.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { truncateToWidth } from 'src/utils/format.js'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import {
   createSystemMessage,
   extractTextContent,

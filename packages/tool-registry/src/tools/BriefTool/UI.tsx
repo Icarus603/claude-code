@@ -5,7 +5,7 @@ import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ProgressMessage } from 'src/types/message.js'
 import { getDisplayPath } from 'src/utils/file.js'
-import { formatFileSize } from 'src/utils/format.js'
+import { formatFileSize } from '@claude-code/output/formatters'
 import { formatBriefTimestamp } from 'src/utils/formatBriefTimestamp.js'
 import type { Output } from './BriefTool.js'
 

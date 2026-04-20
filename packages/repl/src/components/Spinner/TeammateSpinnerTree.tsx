@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Box, Text, type TextProps } from '@anthropic/ink'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getRunningTeammatesSorted } from '@claude-code/swarm'
-import { formatNumber } from 'src/utils/format.js'
+import { formatNumber } from '@claude-code/output/formatters'
 import { TeammateSpinnerLine } from './TeammateSpinnerLine.js'
 import { TEAMMATE_SELECT_HINT } from './teammateSelectHint.js'
 

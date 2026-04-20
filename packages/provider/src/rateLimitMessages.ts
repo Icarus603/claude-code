@@ -9,7 +9,7 @@ import {
   isOverageProvisioningAllowed,
 } from 'src/utils/auth.js'
 import { hasClaudeAiBillingAccess } from 'src/utils/billing.js'
-import { formatResetTime } from 'src/utils/format.js'
+import { formatResetTime } from '@claude-code/output/formatters'
 import type { ClaudeAILimits } from './claudeAiLimits.js'
 import { readEnv } from '@claude-code/config/env'
 

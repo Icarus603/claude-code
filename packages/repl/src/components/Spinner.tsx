@@ -13,11 +13,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { count } from 'src/utils/array.js'
 import sample from 'lodash-es/sample.js'
-import {
-  formatDuration,
-  formatNumber,
-  formatSecondsShort,
-} from 'src/utils/format.js'
+import { formatDuration, formatNumber, formatSecondsShort } from '@claude-code/output/formatters'
 import type { Theme } from 'src/utils/theme.js'
 import { activityManager } from 'src/utils/activityManager.js'
 import { getSpinnerVerbs } from 'src/constants/spinnerVerbs.js'

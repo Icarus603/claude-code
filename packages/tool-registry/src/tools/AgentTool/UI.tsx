@@ -28,7 +28,7 @@ import {
   getSearchReadSummaryText,
 } from 'src/utils/collapseReadSearch.js'
 import { getDisplayPath } from 'src/utils/file.js'
-import { formatDuration, formatNumber } from 'src/utils/format.js'
+import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import {
   buildSubagentLookups,
   createAssistantMessage,

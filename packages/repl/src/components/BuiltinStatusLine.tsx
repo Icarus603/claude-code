@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { formatCost } from 'src/cost-tracker.js';
 import { Box, Text, ProgressBar } from '@anthropic/ink';
-import { formatTokens } from 'src/utils/format.js';
+import { formatTokens } from '@claude-code/output/formatters';
 import { useTerminalSize } from '@anthropic/ink';
 
 type RateLimitBucket = {

@@ -4,7 +4,7 @@ import { useMemo, useRef } from 'react'
 import { Box, Text, useAnimationFrame, stringWidth, Byline } from '@anthropic/ink'
 import { toInkColor } from 'src/utils/ink.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
-import { formatDuration, formatNumber } from 'src/utils/format.js'
+import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 
 import type { Theme } from 'src/utils/theme.js'
 
