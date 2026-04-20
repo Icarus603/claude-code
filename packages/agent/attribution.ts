@@ -16,7 +16,7 @@ import {
   isInternalModelRepo,
   isInternalModelRepoCached,
   sanitizeModelName,
-} from 'src/utils/commitAttribution.js'
+} from '@claude-code/agent/commitAttribution.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { parseJSONL } from '@claude-code/storage/json.js'
 import { logError } from '@claude-code/local-observability/logging'
@@ -28,7 +28,7 @@ import {
 } from '@claude-code/provider/model.js'
 import { isMemoryFileAccess } from 'src/utils/sessionFileAccessHooks.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
-import { readTranscriptForLoad } from 'src/utils/sessionStoragePortable.js'
+import { readTranscriptForLoad } from '@claude-code/storage/sessionStoragePortable.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { isUndercover } from '@claude-code/tool-registry/undercover.js'
 import { readEnv } from '@claude-code/config/env'

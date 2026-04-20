@@ -27,7 +27,7 @@ import {
   loadMarkdownFilesForSubdir,
   parseAgentToolsFromFrontmatter,
   parseSlashCommandToolsFromFrontmatter,
-} from 'src/utils/markdownConfigLoader.js'
+} from '@claude-code/tool-registry/markdownConfigLoader.js'
 import {
   PERMISSION_MODES,
   type PermissionMode,

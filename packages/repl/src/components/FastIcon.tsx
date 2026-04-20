@@ -3,7 +3,7 @@ import * as React from 'react'
 import { LIGHTNING_BOLT } from '@claude-code/output/constants/figures.js'
 import { Text, color } from '@anthropic/ink'
 import { getGlobalConfig } from '@claude-code/config'
-import { resolveThemeSetting } from 'src/utils/systemTheme.js'
+import { resolveThemeSetting } from '@claude-code/repl/systemTheme.js'
 
 type Props = {
   cooldown?: boolean

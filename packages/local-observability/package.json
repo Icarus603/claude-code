@@ -19,6 +19,7 @@
     "./errorHelpers.js": "./src/errorHelpers.ts",
     "./fileOperationAnalytics": "./src/fileOperationAnalytics.ts",
     "./debug.js": "./src/debug.ts",
-    "./telemetryEvents.js": "./src/telemetryEvents.ts"
+    "./telemetryEvents.js": "./src/telemetryEvents.ts",
+    "./sentry.js": "./src/sentry.ts"
   }
 }

@@ -119,6 +119,7 @@
     "./platform": "./platform.ts",
     "./embeddedTools.js": "./embeddedTools.ts",
     "./commonConstants.js": "./commonConstants.ts",
-    "./configConstants.js": "./configConstants.ts"
+    "./configConstants.js": "./configConstants.ts",
+    "./memoize.js": "./memoize.ts"
   }
 }

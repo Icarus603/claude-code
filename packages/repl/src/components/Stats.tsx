@@ -27,7 +27,7 @@ import {
   type DailyModelTokens,
   type StatsDateRange,
 } from 'src/utils/stats.js'
-import { resolveThemeSetting } from 'src/utils/systemTheme.js'
+import { resolveThemeSetting } from '@claude-code/repl/systemTheme.js'
 import { getTheme, themeColorToAnsi } from '@anthropic/ink'
 import { Spinner } from './Spinner.js'
 

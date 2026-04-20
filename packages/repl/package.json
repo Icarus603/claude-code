@@ -449,6 +449,9 @@
     "./fullscreen.js": "./src/fullscreen.ts",
     "./fastMode.js": "./src/fastMode.ts",
     "./doctorDiagnostic.js": "./src/doctorDiagnostic.ts",
-    "./imagePaste.js": "./src/imagePaste.ts"
+    "./imagePaste.js": "./src/imagePaste.ts",
+    "./conversationRecovery.js": "./src/conversationRecovery.ts",
+    "./localInstaller.js": "./src/localInstaller.ts",
+    "./systemTheme.js": "./src/systemTheme.ts"
   }
 }

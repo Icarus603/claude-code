@@ -81,7 +81,7 @@ import {
   truncateMcpContentIfNeeded,
 } from '@claude-code/mcp-runtime/mcpValidation.js'
 import { WebSocketTransport } from '@claude-code/mcp-runtime/mcpWebSocketTransport.js'
-import { memoizeWithLRU } from 'src/utils/memoize.js'
+import { memoizeWithLRU } from '@claude-code/config/memoize.js'
 import { getWebSocketTLSOptions } from '@claude-code/provider/mtls.js'
 import {
   getProxyFetchOptions,

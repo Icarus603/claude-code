@@ -21,7 +21,7 @@ import { applyExtraCACertsFromConfig } from 'src/utils/caCertsConfig.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { enableConfigs, recordFirstStartTime } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { detectCurrentRepository } from 'src/utils/detectRepository.js'
+import { detectCurrentRepository } from '@claude-code/storage/detectRepository.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { initJetBrainsDetection } from '@claude-code/config/env/dynamic'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
@@ -47,7 +47,7 @@ import { configureGlobalAgents } from '@claude-code/provider/proxy.js'
 import { isBetaTracingEnabled } from 'src/utils/telemetry/betaSessionTracing.js'
 import { getTelemetryAttributes } from '@claude-code/local-observability/telemetry'
 import { setShellIfWindows } from '@claude-code/storage/windowsPaths.js'
-import { initSentry } from 'src/utils/sentry.js'
+import { initSentry } from '@claude-code/local-observability/sentry.js'
 
 // initialize1PEventLogging is dynamically imported to defer OpenTelemetry sdk-logs/resources
 

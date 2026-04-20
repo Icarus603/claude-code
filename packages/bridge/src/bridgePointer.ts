@@ -8,7 +8,7 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   getProjectsDir,
   sanitizePath,
-} from 'src/utils/sessionStoragePortable.js'
+} from '@claude-code/storage/sessionStoragePortable.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 /**

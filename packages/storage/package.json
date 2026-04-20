@@ -36,6 +36,8 @@
     "./imageResizer.js": "./src/imageResizer.ts",
     "./windowsPaths.js": "./src/windowsPaths.ts",
     "./getWorktreePathsPortable.js": "./src/getWorktreePathsPortable.ts",
-    "./getWorktreePaths.js": "./src/getWorktreePaths.ts"
+    "./getWorktreePaths.js": "./src/getWorktreePaths.ts",
+    "./detectRepository.js": "./src/detectRepository.ts",
+    "./sessionStoragePortable.js": "./src/sessionStoragePortable.ts"
   }
 }

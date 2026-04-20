@@ -17,7 +17,7 @@ import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdo
 import {
   installOrUpdateClaudePackage,
   localInstallationExists,
-} from 'src/utils/localInstaller.js'
+} from '@claude-code/repl/localInstaller.js'
 import {
   installLatest as installLatestNative,
   removeInstalledSymlink,

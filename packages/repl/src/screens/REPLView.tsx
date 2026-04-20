@@ -289,7 +289,7 @@ import {
   saveWorktreeState,
   getAgentTranscript,
 } from '@claude-code/storage/sessionStorage.js';
-import { deserializeMessages } from 'src/utils/conversationRecovery.js';
+import { deserializeMessages } from '@claude-code/repl/conversationRecovery.js';
 import { extractReadFilesFromMessages, extractBashToolsFromMessages } from 'src/utils/queryHelpers.js';
 import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js';
 import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js';
@@ -310,7 +310,7 @@ import {
   fileHistoryEnabled,
   fileHistoryHasAnyChanges,
 } from '@claude-code/agent/file-history';
-import { type AttributionState, incrementPromptCount } from 'src/utils/commitAttribution.js';
+import { type AttributionState, incrementPromptCount } from '@claude-code/agent/commitAttribution.js';
 import { recordAttributionSnapshot } from '@claude-code/storage/sessionStorage.js';
 import {
   computeStandaloneAgentContext,
