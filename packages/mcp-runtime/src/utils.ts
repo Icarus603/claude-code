@@ -6,7 +6,7 @@ import type { AgentMcpServerInfo } from '@claude-code/repl/components/mcp/types.
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { getGlobalClaudeFile } from 'src/utils/env.js'
+import { getGlobalClaudeFile } from '@claude-code/config/env/paths'
 import { isSettingSourceEnabled } from 'src/utils/settings/constants.js'
 import {
   getSettings_DEPRECATED,

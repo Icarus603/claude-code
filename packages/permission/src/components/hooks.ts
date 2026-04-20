@@ -19,7 +19,7 @@ import { permissionRuleValueToString } from '@claude-code/permission/permissionR
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
 import type { ToolUseConfirm } from './PermissionRequest.js'
 import { useSetAppState } from '../appStateHooks.js'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { type CompletionType, logUnaryEvent } from '@claude-code/local-observability/logging'
 import { readEnv } from '@claude-code/config/env'

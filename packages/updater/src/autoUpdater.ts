@@ -10,7 +10,7 @@ import {
 } from '@claude-code/local-observability'
 import { type ReleaseChannel, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { ClaudeError, getErrnoCode, isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'

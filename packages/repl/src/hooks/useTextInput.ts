@@ -18,7 +18,7 @@ import {
   updateYankLength,
   yankPop,
 } from 'src/utils/Cursor.js'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import type { ImageDimensions } from 'src/utils/imageResizer.js'
 import { isModifierPressed, prewarmModifiers } from 'src/utils/modifiers.js'

@@ -119,7 +119,7 @@ import {
   sendDirectMemberMessage,
 } from 'src/utils/directMemberMessage.js'
 import type { EffortLevel } from 'src/utils/effort.js'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
 import {

@@ -3,7 +3,7 @@ import { envDynamic } from 'src/utils/envDynamic.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 import {
   getTerminalIdeType,
   type IDEExtensionInstallationStatus,

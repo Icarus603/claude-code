@@ -14,7 +14,7 @@ import {
   hasForegroundTasks,
 } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { KeyboardShortcutHint } from '@anthropic/ink'
 
