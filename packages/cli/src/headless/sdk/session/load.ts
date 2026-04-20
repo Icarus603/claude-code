@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { dirname } from 'path'
 import { randomUUID } from 'crypto'
-import type { Message, NormalizedUserMessage } from 'src/types/message.js'
+import type { Message, NormalizedUserMessage } from '@claude-code/agent/messageShapes'
 import type { AppStateLike as AppState } from '../../../contracts.js'
 import type { SessionExternalMetadata } from '@claude-code/storage/sessionState.js'
 import {
@@ -37,7 +37,7 @@ import {
   processSessionStartHooks,
 } from '@claude-code/storage/sessionStart.js'
 import { externalMetadataToAppState } from 'src/state/onChangeAppState.js'
-import { asSessionId } from 'src/types/ids.js'
+import { asSessionId } from '@claude-code/agent/idTypes'
 import { getCwd } from 'src/utils/cwd.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 

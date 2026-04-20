@@ -33,8 +33,8 @@ import mapValues from 'lodash-es/mapValues.js'
 import pickBy from 'lodash-es/pickBy.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import React from 'react'
-import { getOauthConfig } from 'src/constants/oauth.js'
-import { getRemoteSessionUrl } from 'src/constants/product.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
+import { getRemoteSessionUrl } from '@claude-code/config/product'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import { init, initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { addToHistory } from 'src/history.js'
@@ -193,7 +193,7 @@ import {
   parseAgentsFromJson,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { LogOption } from 'src/types/logs.js'
-import type { Message as MessageType } from 'src/types/message.js'
+import type { Message as MessageType } from '@claude-code/agent/messageShapes'
 import {
   CLAUDE_IN_CHROME_SKILL_HINT,
   CLAUDE_IN_CHROME_SKILL_HINT_WITH_WEBBROWSER,
@@ -352,7 +352,7 @@ import {
   type AppState,
   getIdleSpeculationState,
 } from '../state-shim.js'
-import { asSessionId } from 'src/types/ids.js'
+import { asSessionId } from '@claude-code/agent/idTypes'
 import { filterAllowedSdkBetas } from 'src/utils/betas.js'
 import { isInBundledMode, isRunningWithBun } from '@claude-code/config/bundledMode'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
