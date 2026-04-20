@@ -32,7 +32,7 @@ import {
   gracefulShutdownSync,
 } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
-import { parseSessionIdentifier } from 'src/utils/sessionUrl.js'
+import { parseSessionIdentifier } from '@claude-code/agent/sessionUrl.js'
 import {
   processSessionStartHooks,
 } from '@claude-code/storage/sessionStart.js'

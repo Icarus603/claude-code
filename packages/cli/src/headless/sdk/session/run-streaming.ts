@@ -162,7 +162,7 @@ import {
   isShuttingDown,
 } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
-import { createIdleTimeoutManager } from 'src/utils/idleTimeout.js'
+import { createIdleTimeoutManager } from '@claude-code/agent/idleTimeout.js'
 import type {
   SDKStatus,
   ModelInfo,
@@ -226,7 +226,7 @@ import {
   setSdkAgentProgressSummariesEnabled,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { createSyntheticOutputTool } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
-import { parseSessionIdentifier } from 'src/utils/sessionUrl.js'
+import { parseSessionIdentifier } from '@claude-code/agent/sessionUrl.js'
 import {
   hydrateRemoteSession,
   hydrateFromCCRv2InternalEvents,
