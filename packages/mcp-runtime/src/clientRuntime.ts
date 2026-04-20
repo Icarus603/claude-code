@@ -42,7 +42,7 @@ import zipObject from 'lodash-es/zipObject.js'
 import pMap from 'p-map'
 import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { PRODUCT_URL } from 'src/constants/product.js'
 import type { AppState } from './appStateHooks.js'
 import {

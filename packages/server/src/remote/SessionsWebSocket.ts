@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   SDKControlCancelRequest,

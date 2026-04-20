@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { z } from 'zod/v4'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'

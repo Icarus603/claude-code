@@ -23,7 +23,7 @@ import {
   getBridgeAccessToken,
   getBridgeBaseUrlOverride,
 } from '@claude-code/bridge/bridgeConfig.js'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { logForDebugging } from 'src/utils/debug.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'

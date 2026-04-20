@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'
 import { fetchEnvironments } from '@claude-code/teleport/environments.js'

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getAuthHeaders } from 'src/utils/http.js'
 import { logError } from '@claude-code/local-observability/logging'

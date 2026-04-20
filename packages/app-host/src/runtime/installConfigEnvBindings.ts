@@ -17,7 +17,7 @@ import {
   setWhichFn,
 } from '@claude-code/config/env/_deps'
 
-import { fileSuffixForOauthConfig } from 'src/constants/oauth.js'
+import { fileSuffixForOauthConfig } from '@claude-code/provider/oauthConstants'
 import { isRunningWithBun } from '@claude-code/config/bundledMode'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { findExecutable } from '@claude-code/shell/findExecutable.js'
