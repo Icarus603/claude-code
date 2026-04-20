@@ -15,7 +15,7 @@ import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateS
 import {
   type CompletionType,
   logUnaryEvent,
-} from 'src/utils/unaryLogging.js'
+} from '@claude-code/local-observability/logging'
 import type { ToolUseConfirm } from '../PermissionRequest.js'
 import type {
   FileOperationType,

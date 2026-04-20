@@ -10,7 +10,7 @@ import {
   safeResolvePath,
 } from 'src/utils/fsOperations.js'
 import { expandPath } from 'src/utils/path.js'
-import type { CompletionType } from 'src/utils/unaryLogging.js'
+import type { CompletionType } from '@claude-code/local-observability/logging'
 import { Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import { ShowInIDEPrompt } from '@claude-code/repl/components/ShowInIDEPrompt.js'
 import { usePermissionRequestLogging } from '../hooks.js'

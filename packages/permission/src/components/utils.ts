@@ -1,5 +1,5 @@
 import { getHostPlatformForAnalytics } from 'src/utils/env.js'
-import { type CompletionType, logUnaryEvent } from 'src/utils/unaryLogging.js'
+import { type CompletionType, logUnaryEvent } from '@claude-code/local-observability/logging'
 import type { ToolUseConfirm } from './PermissionRequest.js'
 
 export function logUnaryPermissionEvent(
