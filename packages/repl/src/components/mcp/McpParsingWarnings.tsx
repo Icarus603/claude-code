@@ -5,7 +5,7 @@ import {
   describeMcpConfigFilePath,
   getScopeLabel,
 } from '@claude-code/mcp-runtime/utils.js'
-import type { ValidationError } from 'src/utils/settings/validation.js'
+import type { ValidationError } from '@claude-code/config/validation'
 import { Box, Link, Text } from '@anthropic/ink'
 
 function McpConfigErrorSection({

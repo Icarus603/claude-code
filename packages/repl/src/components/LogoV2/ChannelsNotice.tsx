@@ -19,7 +19,7 @@ import {
   getClaudeAIOAuthTokens,
   getSubscriptionType,
 } from 'src/utils/auth.js'
-import { loadInstalledPluginsV2 } from 'src/utils/plugins/installedPluginsManager.js'
+import { loadInstalledPluginsV2 } from '@claude-code/config/plugin/installedPluginsManager'
 import { getSettingsForSource } from '@claude-code/config/settings'
 
 export function ChannelsNotice(): React.ReactNode {

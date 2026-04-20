@@ -2,7 +2,7 @@ import React from 'react'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { SettingsJson } from 'src/utils/settings/types.js'
+import type { SettingsJson } from '@claude-code/config/types'
 import { Select } from '../CustomSelect/index.js'
 import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'
 import {

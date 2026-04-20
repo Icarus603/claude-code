@@ -25,7 +25,7 @@ import {
   getSubscriptionType,
 } from 'src/utils/auth.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
+import { parsePluginIdentifier } from '@claude-code/config/plugin/pluginIdentifier'
 import { getSettingsForSource } from '@claude-code/config/settings'
 import { escapeXmlAttr } from '@claude-code/output/xml'
 import {

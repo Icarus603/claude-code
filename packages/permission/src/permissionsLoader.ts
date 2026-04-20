@@ -12,7 +12,7 @@ import {
   getSettingsForSource,
   updateSettingsForSource,
 } from '@claude-code/config/settings'
-import type { SettingsJson } from 'src/utils/settings/types.js'
+import type { SettingsJson } from '@claude-code/config/types'
 import type {
   PermissionBehavior,
   PermissionRule,

@@ -67,7 +67,7 @@ import {
 import {
   isRestrictedToPluginOnly,
   isSourceAdminTrusted,
-} from 'src/utils/settings/pluginOnlyPolicy.js'
+} from '@claude-code/config/pluginOnlyPolicy'
 import {
   asSystemPrompt,
   type SystemPrompt,

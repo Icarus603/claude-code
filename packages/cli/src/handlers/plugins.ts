@@ -29,7 +29,7 @@ import { getInstallCounts } from 'src/utils/plugins/installCounts.js'
 import {
   isPluginInstalled,
   loadInstalledPluginsV2,
-} from 'src/utils/plugins/installedPluginsManager.js'
+} from '@claude-code/config/plugin/installedPluginsManager'
 import {
   createPluginId,
   loadMarketplacesWithGracefulDegradation,
@@ -41,14 +41,14 @@ import {
   refreshMarketplace,
   removeMarketplaceSource,
   saveMarketplaceToSettings,
-} from 'src/utils/plugins/marketplaceManager.js'
-import { loadPluginMcpServers } from 'src/utils/plugins/mcpPluginIntegration.js'
+} from '@claude-code/config/plugin/marketplaceManager'
+import { loadPluginMcpServers } from '@claude-code/config/plugin/mcpPluginIntegration'
 import { parseMarketplaceInput } from 'src/utils/plugins/parseMarketplaceInput.js'
 import {
   parsePluginIdentifier,
   scopeToSettingSource,
-} from 'src/utils/plugins/pluginIdentifier.js'
-import { loadAllPlugins } from 'src/utils/plugins/pluginLoader.js'
+} from '@claude-code/config/plugin/pluginIdentifier'
+import { loadAllPlugins } from '@claude-code/config/plugin/pluginLoader'
 import type { PluginSource } from 'src/utils/plugins/schemas.js'
 import {
   type ValidationResult,

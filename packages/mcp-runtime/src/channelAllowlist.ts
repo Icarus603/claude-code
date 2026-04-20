@@ -17,7 +17,7 @@
 
 import { z } from 'zod/v4'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
+import { parsePluginIdentifier } from '@claude-code/config/plugin/pluginIdentifier'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 
 export type ChannelAllowlistEntry = {

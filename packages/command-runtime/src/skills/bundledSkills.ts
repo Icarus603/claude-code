@@ -6,7 +6,7 @@ import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { Command } from 'src/types/command.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getBundledSkillsRoot } from '@claude-code/permission/filesystem'
-import type { HooksSettings } from 'src/utils/settings/types.js'
+import type { HooksSettings } from '@claude-code/config/types'
 
 /**
  * Definition for a bundled skill that ships with the CLI.

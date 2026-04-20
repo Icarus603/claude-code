@@ -8,7 +8,7 @@ import { updateWatchPaths } from 'src/utils/hooks/fileChangedWatcher.js'
 import { shouldAllowManagedHooksOnly } from 'src/utils/hooks/hooksConfigSnapshot.js'
 import { executeSessionStartHooks, executeSetupHooks } from 'src/utils/hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { loadPluginHooks } from 'src/utils/plugins/loadPluginHooks.js'
+import { loadPluginHooks } from '@claude-code/config/plugin/loadPluginHooks'
 
 type SessionStartHooksOptions = {
   sessionId?: string

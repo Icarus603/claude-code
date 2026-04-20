@@ -2,8 +2,8 @@ import type { PluginError } from '@claude-code/config/plugin/types'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getPluginLspServers } from 'src/utils/plugins/lspPluginIntegration.js'
-import { loadAllPluginsCacheOnly } from 'src/utils/plugins/pluginLoader.js'
+import { getPluginLspServers } from '@claude-code/config/plugin/lspPluginIntegration'
+import { loadAllPluginsCacheOnly } from '@claude-code/config/plugin/pluginLoader'
 import type { ScopedLspServerConfig } from './types.js'
 
 /**

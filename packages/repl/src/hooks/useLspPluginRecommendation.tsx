@@ -26,7 +26,7 @@ import {
   getMatchingLspPlugins,
   incrementIgnoredCount,
 } from 'src/utils/plugins/lspRecommendation.js'
-import { cacheAndRegisterPlugin } from 'src/utils/plugins/pluginInstallationHelpers.js'
+import { cacheAndRegisterPlugin } from '@claude-code/config/plugin/pluginInstallationHelpers'
 import {
   getSettingsForSource,
   updateSettingsForSource,

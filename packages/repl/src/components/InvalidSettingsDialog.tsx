@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, Dialog } from '@anthropic/ink'
-import type { ValidationError } from 'src/utils/settings/validation.js'
+import type { ValidationError } from '@claude-code/config/validation'
 import { Select } from './CustomSelect/index.js'
 import { ValidationErrorsList } from './ValidationErrorsList.js'
 

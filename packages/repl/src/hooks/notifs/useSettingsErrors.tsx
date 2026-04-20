@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNotifications } from 'src/context/notifications.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { getSettingsWithAllErrors } from 'src/utils/settings/allErrors.js'
-import type { ValidationError } from 'src/utils/settings/validation.js'
+import type { ValidationError } from '@claude-code/config/validation'
 import { useSettingsChange } from '../useSettingsChange.js'
 
 const SETTINGS_ERRORS_NOTIFICATION_KEY = 'settings-errors'
