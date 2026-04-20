@@ -25,21 +25,21 @@ import {
   isSessionPersistenceDisabled,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { EMPTY_USAGE } from '@claude-code/provider/logging.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import { logError } from 'src/utils/log.js'
 import {
   gracefulShutdownSync,
-} from 'src/utils/gracefulShutdown.js'
+} from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { parseSessionIdentifier } from 'src/utils/sessionUrl.js'
 import {
   processSessionStartHooks,
 } from '@claude-code/storage/sessionStart.js'
-import { externalMetadataToAppState } from 'src/state/onChangeAppState.js'
+import { externalMetadataToAppState } from '@claude-code/repl/onChangeAppState.js'
 import { asSessionId } from '@claude-code/agent/idTypes'
-import { getCwd } from 'src/utils/cwd.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const coordinatorModeModule = feature('COORDINATOR_MODE')

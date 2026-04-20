@@ -33,7 +33,7 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js'
 import {
   isFastModeEnabled,
-} from 'src/utils/fastMode.js'
+} from '@claude-code/repl/fastMode.js'
 import {
   headlessProfilerStartTurn,
   headlessProfilerCheckpoint,
@@ -46,10 +46,10 @@ import {
 import { initializeGrowthBook } from '@claude-code/config/feature-flags'
 import {
   gracefulShutdownSync,
-} from 'src/utils/gracefulShutdown.js'
-import { validateUuid } from 'src/utils/uuid.js'
+} from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
+import { validateUuid } from '@claude-code/agent/uuid.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { registerHookEventHandler } from 'src/utils/hooks/hookEvents.js'
 import {
@@ -67,10 +67,10 @@ import {
   registerProcessOutputErrorHandlers,
   writeToStdout,
 } from '@claude-code/shell/process.js'
-import { ensureModelStringsInitialized } from 'src/utils/model/modelStrings.js'
+import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
 import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   runHeadlessStreaming,
   handleRewindFiles,

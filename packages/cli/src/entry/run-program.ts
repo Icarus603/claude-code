@@ -29,7 +29,7 @@ import {
   profileCheckpoint,
   profileReport,
 } from 'src/utils/startupProfiler.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 import { createMainProgram } from './commander.js'
 import { runModeDispatch } from './mode-dispatch.js'

@@ -68,7 +68,7 @@ import {
   type RequiresActionDetails,
   type SessionExternalMetadata,
 } from '@claude-code/storage/sessionState.js'
-import { externalMetadataToAppState } from 'src/state/onChangeAppState.js'
+import { externalMetadataToAppState } from '@claude-code/repl/onChangeAppState.js'
 import { getInMemoryErrors, logError, logMCPDebug } from 'src/utils/log.js'
 import {
   writeToStdout,
@@ -102,7 +102,7 @@ import {
   type McpSdkServerConfig,
   type ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime'
-import { validateUuid } from 'src/utils/uuid.js'
+import { validateUuid } from '@claude-code/agent/uuid.js'
 import { ask } from '@claude-code/agent/query-engine'
 import { canBatchWith, joinPromptValues } from './prompt-utils.js'
 import {
@@ -160,7 +160,7 @@ import {
   gracefulShutdown,
   gracefulShutdownSync,
   isShuttingDown,
-} from 'src/utils/gracefulShutdown.js'
+} from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { createIdleTimeoutManager } from 'src/utils/idleTimeout.js'
 import type {
@@ -182,7 +182,7 @@ import type {
 } from 'src/entrypoints/sdk/controlTypes.js'
 import type { PermissionMode } from '@anthropic-ai/claude-agent-sdk'
 import { cwd } from 'process'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import omit from 'lodash-es/omit.js'
 import reject from 'lodash-es/reject.js'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
@@ -208,7 +208,7 @@ import { TEAMMATE_MESSAGE_TAG, TICK_TAG } from '@claude-code/command-runtime/xml
 import {
   isFastModeEnabled,
   isFastModeSupportedByModel,
-} from 'src/utils/fastMode.js'
+} from '@claude-code/repl/fastMode.js'
 import {
   tryGenerateSuggestion,
   logSuggestionOutcome,
@@ -216,10 +216,10 @@ import {
   type PromptVariant,
 } from 'src/services/PromptSuggestion/promptSuggestion.js'
 import { getLastCacheSafeParams } from 'src/utils/forkedAgent.js'
-import { getAccountInformation } from 'src/utils/auth.js'
+import { getAccountInformation } from '@claude-code/provider/authAlias.js'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'
 import { installOAuthTokens } from '../../../handlers/auth.js'
-import { getAPIProvider } from 'src/utils/model/providers.js'
+import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { AwsAuthStatusManager } from 'src/utils/awsAuthStatusManager.js'
 import {
   getInitJsonSchema,
@@ -275,7 +275,7 @@ import {
 } from 'src/utils/effort.js'
 import { modelSupportsAdaptiveThinking } from 'src/utils/thinking.js'
 import { modelSupportsAutoMode } from 'src/utils/betas.js'
-import { ensureModelStringsInitialized } from 'src/utils/model/modelStrings.js'
+import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
 import {
   getSessionId,
   setMainLoopModelOverride,
@@ -301,7 +301,7 @@ import {
   restoreAgentFromSession,
   restoreSessionStateFromLog,
 } from '@claude-code/storage/sessionRestore.js'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import {
   headlessProfilerStartTurn,
   headlessProfilerCheckpoint,
@@ -312,14 +312,14 @@ import {
   logQueryProfileReport,
 } from 'src/utils/queryProfiler.js'
 import { asSessionId } from '@claude-code/agent/idTypes'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { skillChangeDetector } from 'src/utils/skills/skillChangeDetector.js'
 import { getCommands, clearCommandsCache } from '@claude-code/command-runtime/runtime'
 import {
   isBareMode,
   isEnvTruthy,
   isEnvDefinedFalsy,
-} from 'src/utils/envUtils.js'
+} from '@claude-code/config/env/utils'
 import { installPluginsForHeadless } from 'src/utils/plugins/headlessPluginInstall.js'
 import { refreshActivePlugins } from 'src/utils/plugins/refresh.js'
 import { loadAllPluginsCacheOnly } from 'src/utils/plugins/pluginLoader.js'

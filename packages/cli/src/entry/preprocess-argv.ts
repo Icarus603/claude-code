@@ -12,7 +12,7 @@
  */
 
 import { feature } from 'bun:bundle'
-import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
+import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import type {
   PendingAssistantChat,
   PendingConnect,
