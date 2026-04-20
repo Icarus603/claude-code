@@ -10,7 +10,7 @@ import { StructuredIO } from '../../../structuredIO.js'
 import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
-import { createCombinedAbortSignal } from 'src/utils/combinedAbortSignal.js'
+import { createCombinedAbortSignal } from '@claude-code/agent/combinedAbortSignal.js'
 import type { PermissionPromptTool } from 'src/utils/queryHelpers.js'
 
 /**
