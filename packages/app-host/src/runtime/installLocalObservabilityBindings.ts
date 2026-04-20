@@ -47,7 +47,7 @@ import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { captureException } from 'src/utils/sentry.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { toTaggedId } from 'src/utils/taggedId.js'
 import {
   getAgentId,

@@ -4,7 +4,7 @@ import { promises as fs } from 'fs'
 import { dirname, join } from 'path'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { readEnv } from '@claude-code/config/env'
 
 function hashString(str: string): string {

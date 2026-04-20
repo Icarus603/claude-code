@@ -35,7 +35,7 @@ import {
   type SettingsJson,
 } from 'src/utils/settings/types.js'
 import type { ValidationError } from 'src/utils/settings/validation.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { fetchClaudeAIMcpConfigsIfEligible } from '@claude-code/mcp-runtime/claudeai.js'

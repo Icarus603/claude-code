@@ -19,7 +19,7 @@ import {
   getContentSizeEstimate,
   type MCPToolResult,
 } from '@claude-code/mcp-runtime/mcpValidation.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { inputSchema } from './MCPTool.js'
 
 // Threshold for displaying warning about large MCP responses

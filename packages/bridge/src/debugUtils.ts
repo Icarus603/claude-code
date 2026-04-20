@@ -4,7 +4,7 @@ import {
 } from '@claude-code/local-observability'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage } from 'src/utils/errors.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 const DEBUG_MSG_LIMIT = 2000
 

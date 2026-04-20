@@ -7,7 +7,7 @@ import type {
 } from 'src/entrypoints/sdk/controlTypes.js'
 import type { RemotePermissionResponse } from '@claude-code/server/remote/RemoteSessionManager.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 
 export type DirectConnectConfig = {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Markdown } from '../Markdown.js'
 import { Box, Text } from '@anthropic/ink'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import {
   type IdleNotificationMessage,
   isIdleNotification,

@@ -17,7 +17,7 @@ import {
 import { queryHaiku } from '@claude-code/provider/claude.js'
 import { startsWithApiErrorPrefix } from '@claude-code/provider/errors.js'
 import { memoizeWithLRU } from 'src/utils/memoize.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'
 
 /**

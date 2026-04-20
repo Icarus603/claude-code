@@ -5,7 +5,7 @@ import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import { errorMessage } from 'src/utils/errors.js'
 import { getSessionIngressAuthHeaders } from 'src/utils/sessionIngressAuth.js'
 import { sleep } from 'src/utils/sleep.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
 import type { Transport } from './Transport.js'
 

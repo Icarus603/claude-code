@@ -14,7 +14,7 @@ import {
 } from '@claude-code/provider/usage.js'
 import { formatResetText } from '@claude-code/output/formatters'
 import { logError } from 'src/utils/log.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Byline, ProgressBar } from '@anthropic/ink'
 import {

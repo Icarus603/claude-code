@@ -1,7 +1,7 @@
 /* eslint-disable eslint-plugin-n/no-unsupported-features/node-builtins */
 
 import { errorMessage } from 'src/utils/errors.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { DirectConnectConfig } from './directConnectManager.js'
 import { connectResponseSchema } from './types.js'
 

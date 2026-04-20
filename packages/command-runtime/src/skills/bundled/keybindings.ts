@@ -11,7 +11,7 @@ import {
   KEYBINDING_CONTEXT_DESCRIPTIONS,
   KEYBINDING_CONTEXTS,
 } from '@claude-code/repl/keybindings/schema.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 
 /**

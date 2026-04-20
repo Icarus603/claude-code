@@ -12,7 +12,7 @@ import { errorMessage } from 'src/utils/errors.js'
 import { logError } from 'src/utils/log.js'
 import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
 import { getWebSocketProxyAgent, getWebSocketProxyUrl } from 'src/utils/proxy.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 const RECONNECT_DELAY_MS = 2000
 const MAX_RECONNECT_ATTEMPTS = 5

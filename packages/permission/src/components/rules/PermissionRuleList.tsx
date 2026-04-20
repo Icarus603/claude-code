@@ -32,7 +32,7 @@ import {
   permissionRuleSourceDisplayString,
 } from '@claude-code/permission/permissions'
 import type { UnreachableRule } from '@claude-code/permission/shadowedRuleDetection.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { Pane, Tab, Tabs, useTabHeaderFocus, useTabsWidth } from '@anthropic/ink'
 import { SearchBox } from '@anthropic/ink'
 import type { Option } from '@claude-code/repl/components/ui/option.js'

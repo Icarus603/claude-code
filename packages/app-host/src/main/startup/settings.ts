@@ -2,7 +2,7 @@ import { feature } from "bun:bundle";
 import chalk from "chalk";
 import { readFileSync } from "fs";
 import { safeParseJSON } from "src/utils/json.js";
-import { writeFileSync_DEPRECATED } from "src/utils/slowOperations.js";
+import { writeFileSync_DEPRECATED } from "@claude-code/local-observability/slowOperations.js";
 import { generateTempFilePath } from "src/utils/tempfile.js";
 import { getFsImplementation, safeResolvePath } from "src/utils/fsOperations.js";
 import { errorMessage, isENOENT } from "src/utils/errors.js";

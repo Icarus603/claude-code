@@ -14,7 +14,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'
 
 type GeneratedAgent = {

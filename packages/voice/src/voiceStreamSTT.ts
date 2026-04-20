@@ -24,7 +24,7 @@ import { getUserAgent } from 'src/utils/http.js'
 import { logError } from 'src/utils/log.js'
 import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
 import { getWebSocketProxyAgent, getWebSocketProxyUrl } from 'src/utils/proxy.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 const KEEPALIVE_MSG = '{"type":"KeepAlive"}'
 const CLOSE_STREAM_MSG = '{"type":"CloseStream"}'

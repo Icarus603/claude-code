@@ -11,7 +11,7 @@ import { lazySchema } from 'src/utils/lazySchema.js'
 import * as lockfile from 'src/utils/lockfile.js'
 import { logError } from 'src/utils/log.js'
 import { createSignal } from 'src/utils/signal.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getTeamName } from 'src/utils/teammate.js'
 import { getTeammateContext } from 'src/utils/teammateContext.js'
 

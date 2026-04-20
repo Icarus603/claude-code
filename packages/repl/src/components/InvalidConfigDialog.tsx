@@ -7,7 +7,7 @@ import { getBaseRenderOptions } from 'src/utils/renderOptions.js'
 import {
   jsonStringify,
   writeFileSync_DEPRECATED,
-} from 'src/utils/slowOperations.js'
+} from '@claude-code/local-observability/slowOperations.js'
 import type { ThemeName } from 'src/utils/theme.js'
 import { Select } from './CustomSelect/index.js'
 

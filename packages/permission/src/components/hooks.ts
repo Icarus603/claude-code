@@ -20,7 +20,7 @@ import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
 import type { ToolUseConfirm } from './PermissionRequest.js'
 import { useSetAppState } from '../appStateHooks.js'
 import { env } from 'src/utils/env.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { type CompletionType, logUnaryEvent } from 'src/utils/unaryLogging.js'
 import { readEnv } from '@claude-code/config/env'
 

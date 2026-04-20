@@ -5,7 +5,7 @@ import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import {
   cleanupTeamDirectories,

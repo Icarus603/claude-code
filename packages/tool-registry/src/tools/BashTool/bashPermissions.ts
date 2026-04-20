@@ -65,7 +65,7 @@ import {
 } from '@claude-code/permission/shellRuleMatching.js'
 import { getPlatform } from 'src/utils/platform.js'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { windowsPathToPosixPath } from 'src/utils/windowsPaths.js'
 import { BashTool } from './BashTool.js'
 import { checkCommandOperatorPermissions } from './bashCommandHelpers.js'

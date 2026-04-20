@@ -14,7 +14,7 @@ import {
   registerSessionActivityCallback,
   unregisterSessionActivityCallback,
 } from '@claude-code/storage/sessionActivity.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { Transport } from './Transport.js'
 
 const KEEP_ALIVE_FRAME = '{"type":"keep_alive"}\n'

@@ -6,7 +6,7 @@ import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { shouldIncludeGitInstructions } from 'src/utils/gitSettings.js'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {
   getDefaultBashTimeoutMs,
   getMaxBashTimeoutMs,

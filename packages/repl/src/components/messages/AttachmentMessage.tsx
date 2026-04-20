@@ -16,7 +16,7 @@ import { getContentText } from 'src/utils/messages.js'
 import type { Theme } from 'src/utils/theme.js'
 import { UserImageMessage } from './UserImageMessage.js'
 
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { plural } from 'src/utils/stringUtils.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'

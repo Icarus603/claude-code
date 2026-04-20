@@ -37,7 +37,7 @@ import type {
 } from '@claude-code/permission/PermissionResult'
 import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'
 import { writeToStdout } from 'src/utils/process.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { z } from 'zod/v4'
 import { notifyCommandLifecycle } from '@claude-code/shell/commandLifecycle.js'
 import { normalizeControlMessageKeys } from 'src/utils/controlMessageCompat.js'
@@ -51,7 +51,7 @@ import {
   type RequiresActionDetails,
   type SessionExternalMetadata,
 } from '@claude-code/storage/sessionState.js'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { Stream } from 'src/utils/stream.js'
 import { ndjsonSafeStringify } from '@claude-code/cli/ndjsonSafeStringify.js'
 

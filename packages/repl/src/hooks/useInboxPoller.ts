@@ -27,7 +27,7 @@ import {
   toExternalPermissionMode,
 } from '@claude-code/permission/PermissionMode'
 import { applyPermissionUpdate } from '@claude-code/permission/PermissionUpdate'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { isInsideTmux } from '@claude-code/swarm'
 import {
   ensureBackendsRegistered,

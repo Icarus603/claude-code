@@ -1,5 +1,5 @@
 import React from 'react'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import type { Output } from './TeamDeleteTool.js'
 
 export function renderToolUseMessage(

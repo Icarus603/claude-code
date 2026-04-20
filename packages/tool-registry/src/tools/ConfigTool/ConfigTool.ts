@@ -18,7 +18,7 @@ import {
   getInitialSettings,
   updateSettingsForSource,
 } from 'src/utils/settings/settings.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { CONFIG_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, generatePrompt } from './prompt.js'
 import {

@@ -10,7 +10,7 @@
 import axios from 'axios'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage } from 'src/utils/errors.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { extractErrorDetail } from './debugUtils.js'
 
 const ANTHROPIC_VERSION = '2023-06-01'

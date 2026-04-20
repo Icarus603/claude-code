@@ -25,7 +25,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { stripDisplayTagsAllowEmpty } from 'src/utils/displayTags.js'
 import { errorMessage } from 'src/utils/errors.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import type { ReplBridgeTransport } from './replBridgeTransport.js'
 
 // ─── Type guards ─────────────────────────────────────────────────────────────

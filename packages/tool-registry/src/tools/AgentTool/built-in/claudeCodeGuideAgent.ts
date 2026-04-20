@@ -8,7 +8,7 @@ import { WEB_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebSearch
 import { isUsing3PServices } from 'src/utils/auth.js'
 import { hasEmbeddedSearchTools } from 'src/utils/embeddedTools.js'
 import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type {
   AgentDefinition,
   BuiltInAgentDefinition,
