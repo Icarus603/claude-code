@@ -4,7 +4,7 @@ import {
 } from 'src/commands/terminalSetup/terminalSetup.js'
 import type { Key } from '@anthropic/ink'
 import { getGlobalConfig } from '@claude-code/config'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 /**
  * Helper function to check if vim mode is currently enabled
  * @returns boolean indicating if vim mode is active

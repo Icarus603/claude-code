@@ -14,7 +14,7 @@ import type {
   MCPServerConnection,
 } from '@claude-code/mcp-runtime/types.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   execFileNoThrow,

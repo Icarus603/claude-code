@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { env } from 'src/utils/env.js'
+import { env } from '@claude-code/config/env/paths'
 
 export type ClawdPose =
   | 'default'

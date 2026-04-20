@@ -1,4 +1,4 @@
-import { getHostPlatformForAnalytics } from 'src/utils/env.js'
+import { getHostPlatformForAnalytics } from '@claude-code/config/env/paths'
 import { type CompletionType, logUnaryEvent } from '@claude-code/local-observability/logging'
 import type { ToolUseConfirm } from './PermissionRequest.js'
 
