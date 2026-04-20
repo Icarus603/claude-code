@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import { Box } from '@anthropic/ink'
 import type { Screen } from '@claude-code/repl/screens/REPL.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'

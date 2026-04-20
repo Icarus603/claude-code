@@ -1,10 +1,10 @@
 import { memoize } from 'lodash-es'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import {
   getCommandName,
   getSkillToolCommands,
   getSlashCommandToolSkills,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 import { COMMAND_NAME_TAG } from '@claude-code/command-runtime/xml.js'
 import { stringWidth } from '@anthropic/ink'
 import {

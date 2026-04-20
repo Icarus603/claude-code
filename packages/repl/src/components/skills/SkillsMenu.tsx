@@ -7,7 +7,7 @@ import {
   type CommandResultDisplay,
   getCommandName,
   type PromptCommand,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 import { Box, Text } from '@anthropic/ink'
 import {
   estimateSkillFrontmatterTokens,

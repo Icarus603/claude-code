@@ -1,4 +1,4 @@
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import type { LocalCommandCall } from 'src/types/command.js'
 import { getAPIProvider } from 'src/utils/model/providers.js'
 import { updateSettingsForSource } from 'src/utils/settings/settings.js'

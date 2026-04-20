@@ -110,7 +110,7 @@ import {
   type ResumeEntrypoint,
   getCommandName,
   isCommandEnabled,
-} from 'src/commands.js';
+} from '@claude-code/command-runtime/runtime';
 import type { PromptInputMode, QueuedCommand, VimMode } from 'src/types/textInputTypes.js';
 import {
   MessageSelector,
@@ -450,7 +450,7 @@ import { launchUltraplan } from 'src/commands/ultraplan.js';
 import { getFocusedInputDialog } from './repl/dialogs.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
-import { REMOTE_SAFE_COMMANDS } from 'src/commands.js'
+import { REMOTE_SAFE_COMMANDS } from '@claude-code/command-runtime/runtime'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 import {
   FullscreenLayout,

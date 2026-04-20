@@ -11,7 +11,7 @@ import React, {
   useState,
 } from 'react'
 import stripAnsi from 'strip-ansi'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { useTerminalSize } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow stats navigation
 import { Ansi, applyColor, Box, Text, useInput, stringWidth as getStringWidth, type Color, Pane, Tab, Tabs, useTabHeaderFocus } from '@anthropic/ink'

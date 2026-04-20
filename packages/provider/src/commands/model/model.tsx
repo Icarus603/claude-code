@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import * as React from 'react'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { ModelPicker } from '@claude-code/repl/components/ModelPicker.js'
 import { COMMON_HELP_ARGS, COMMON_INFO_ARGS } from '@claude-code/command-runtime/xml.js'
 import {

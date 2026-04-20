@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { getOauthConfig } from 'src/constants/oauth.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useTerminalSize } from '@anthropic/ink'

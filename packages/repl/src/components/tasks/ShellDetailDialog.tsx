@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { useTerminalSize } from '@anthropic/ink'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'

@@ -1,6 +1,6 @@
 import figures from 'figures'
 import React, { useState } from 'react'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, color, Text, useTheme } from '@anthropic/ink'
 import { getMcpConfigByName } from '@claude-code/mcp-runtime/config.js'

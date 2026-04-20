@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useMemo } from 'react'
-import { type Command, formatDescriptionWithSource } from 'src/commands.js'
+import { type Command, formatDescriptionWithSource } from '@claude-code/command-runtime/runtime'
 import { Box, Text } from '@anthropic/ink'
 
 type Props = {

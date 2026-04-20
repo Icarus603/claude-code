@@ -15,7 +15,7 @@ import { Usage } from './Usage.js'
 import type {
   LocalJSXCommandContext,
   CommandResultDisplay,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 
 type Props = {
   onClose: (

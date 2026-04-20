@@ -22,7 +22,7 @@ import { createHeadlessSessionStore } from 'src/state/sessionStores.js'
 import { createStore, type Store } from 'src/state/store.js'
 import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { LoadedPlugin, PluginError } from '@claude-code/config/plugin/types'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import type {
   MCPServerConnection,
   ScopedMcpServerConfig,

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useCallback, useEffect, useState } from 'react'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { TEARDROP_ASTERISK } from 'src/constants/figures.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { setClipboard } from '@anthropic/ink'

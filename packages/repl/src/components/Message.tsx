@@ -8,7 +8,7 @@ import type {
   ToolUseBlockParam,
 } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box } from '@anthropic/ink'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
