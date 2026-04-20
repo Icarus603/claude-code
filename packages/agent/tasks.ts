@@ -10,7 +10,7 @@ import { errorMessage, getErrnoCode } from '@claude-code/local-observability/err
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import * as lockfile from 'src/utils/lockfile.js'
 import { logError } from 'src/utils/log.js'
-import { createSignal } from 'src/utils/signal.js'
+import { createSignal } from '@claude-code/config/signal'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getTeamName } from '@claude-code/swarm/teammateState.js'
 import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'

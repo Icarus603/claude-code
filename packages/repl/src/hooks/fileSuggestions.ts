@@ -28,7 +28,7 @@ import { logError } from 'src/utils/log.js'
 import { expandPath } from 'src/utils/path.js'
 import { ripGrep } from 'src/utils/ripgrep.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
-import { createSignal } from 'src/utils/signal.js'
+import { createSignal } from '@claude-code/config/signal'
 
 // Lazily constructed singleton
 let fileIndex: FileIndex | null = null
