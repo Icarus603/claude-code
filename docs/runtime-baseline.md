@@ -16,9 +16,9 @@ External behavior that must remain unchanged during V6 refactor:
 
 ```text
 43678d3116f2bad133c74b8b0bb897079490d9cbdb665fb38f8273709dc61e84  packages/headless-sdk/src/agentSdkTypes.ts
-3bd61cc50b21f0c5ba6a2c78440e9741c2affb2f2bc726ba1143bc38f6c19c93  packages/app-host/src/init.ts
+a7a9380fccebf284e870f3745609d2a2169ce247a7369161b1630264ef88da6a  packages/app-host/src/init.ts
 fca81a0d4fc34e818699aa737ccd18e3fd0ed1141efa7d4317968539f765c065  src/entrypoints/mcp.ts
-16c80fad68fb750679b8d6b344fdf184f946292b559055a8f083f3465c9c7a25  packages/headless-sdk/src/sandboxTypes.ts
+e15167a170952be204091d6808b0ee9ed7ccc114e34e9396eb060789aac33f4b  packages/headless-sdk/src/sandboxTypes.ts
 f6371808ab47f2f57cd75d6f6ac7926ebb8a8d2b818a8871b8f7cf1d099f8baf  src/entrypoints/sdk/controlSchemas.ts
 d3918b6119e629f2a17967bc217d730b16fe5a9dd9f1673341364dbfe2c2a774  src/entrypoints/sdk/controlTypes.ts
 7c4e83756565d421d6d338a2b8356147d95b30132e555c68012ea2551fb3ea9e  src/entrypoints/sdk/coreSchemas.ts
