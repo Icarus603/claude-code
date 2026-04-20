@@ -35,6 +35,7 @@
     "./claudemd.js": "./src/claudemd.ts",
     "./editor.js": "./src/editor.ts",
     "./imageResizer.js": "./src/imageResizer.ts",
+    "./fileReadCache.js": "./src/fileReadCache.ts",
     "./imageValidation.js": "./src/imageValidation.ts",
     "./filePersistence/types.js": "./src/filePersistence/types.ts",
     "./filePersistence/outputsScanner.js": "./src/filePersistence/outputsScanner.ts",
