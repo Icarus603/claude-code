@@ -46,6 +46,7 @@
     "./commands/model/model.js": "./src/commands/model/model.tsx",
     "./errors.js": "./src/errors.ts",
     "./systemPromptType.js": "./src/systemPromptType.ts",
-    "./userAgent.js": "./src/userAgent.ts"
+    "./userAgent.js": "./src/userAgent.ts",
+    "./connectorTextTypes": "./src/connectorTextTypes.ts"
   }
 }

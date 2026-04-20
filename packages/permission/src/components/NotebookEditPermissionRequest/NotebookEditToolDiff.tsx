@@ -5,7 +5,7 @@ import { Box, NoSelect, Text } from '@anthropic/ink'
 import type {
   NotebookCellType,
   NotebookContent,
-} from 'src/types/notebook.js'
+} from '@claude-code/tool-registry/notebookTypes'
 import { intersperse } from 'src/utils/array.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getPatchForDisplay } from 'src/utils/diff.js'

@@ -35,7 +35,8 @@
     "./abortController": "./abortController.ts",
     "./tasks.js": "./tasks.ts",
     "./messageShapes": "./messageShapes.ts",
-    "./idTypes": "./idTypes.ts"
+    "./idTypes": "./idTypes.ts",
+    "./messageQueueTypes": "./messageQueueTypes.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
