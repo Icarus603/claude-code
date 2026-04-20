@@ -27,7 +27,7 @@ import {
   useSetAppState,
 } from '@claude-code/repl/appStateHooks.js'
 import type { FooterItem } from '@claude-code/repl/appStateHooks.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
   isQueuedCommandEditable,
   popAllEditable,

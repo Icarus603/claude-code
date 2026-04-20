@@ -13,7 +13,7 @@ import {
   saveCurrentProjectConfig,
   saveGlobalConfig,
 } from '@claude-code/config'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getErrnoCode } from 'src/utils/errors.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'

@@ -1,7 +1,7 @@
 import { mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { z } from 'zod/v4'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'

@@ -1,6 +1,6 @@
 import memoize from 'lodash-es/memoize.js'
 import sample from 'lodash-es/sample.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getCurrentProjectConfig, saveCurrentProjectConfig } from '@claude-code/config'
 import { env } from 'src/utils/env.js'
 import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'

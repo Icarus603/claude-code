@@ -1,7 +1,7 @@
 import { installPackageHostBindings } from '@claude-code/app-host/packageHostSetup'
 import { createInteractiveSessionStore } from 'src/state/sessionStores.js'
 import { syncRuntimeHandlesFromAppState } from './runtimeHandles.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
 import { getGlobalClaudeFile } from 'src/utils/env.js'

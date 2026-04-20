@@ -8,7 +8,7 @@ import { registerAsyncAgent } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { assembleToolPool } from 'src/tools.js'
 import { asAgentId } from 'src/types/ids.js'
 import { runWithAgentContext } from 'src/utils/agentContext.js'
-import { runWithCwdOverride } from 'src/utils/cwd.js'
+import { runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {
   createUserMessage,

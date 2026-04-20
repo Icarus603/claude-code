@@ -4,7 +4,7 @@ import type { ExitState } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybi
 import { useTerminalSize } from '@anthropic/ink'
 import { setClipboard, Box, Text, Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { writeFileSync_DEPRECATED } from 'src/utils/slowOperations.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Select } from './CustomSelect/select.js'

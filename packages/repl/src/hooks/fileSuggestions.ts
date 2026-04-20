@@ -14,7 +14,7 @@ import {
 import { logEvent } from '@claude-code/local-observability'
 import type { FileSuggestionCommandInput } from 'src/types/fileSuggestion.js'
 import { getGlobalConfig } from '@claude-code/config'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage } from 'src/utils/errors.js'
 import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'

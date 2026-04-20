@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isENOENT } from 'src/utils/errors.js'
 import {
   FILE_NOT_FOUND_CWD_NOTE,

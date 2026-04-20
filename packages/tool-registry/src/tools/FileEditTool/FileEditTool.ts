@@ -13,7 +13,7 @@ import {
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { countLinesChanged } from 'src/utils/diff.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'

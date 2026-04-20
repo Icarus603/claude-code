@@ -7,7 +7,7 @@ import type {
   NotebookContent,
 } from 'src/types/notebook.js'
 import { intersperse } from 'src/utils/array.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getPatchForDisplay } from 'src/utils/diff.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { safeParseJSON } from 'src/utils/json.js'

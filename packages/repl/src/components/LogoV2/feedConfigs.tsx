@@ -8,7 +8,7 @@ import {
   getCachedReferrerReward,
 } from '@claude-code/provider/referral.js'
 import type { LogOption } from 'src/types/logs.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { formatRelativeTimeAgo } from 'src/utils/format.js'
 import type { FeedConfig, FeedLine } from './Feed.js'
 

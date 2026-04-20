@@ -1,7 +1,7 @@
 import { basename, relative } from 'path'
 import React from 'react'
 import { Box, Text, Pane } from '@anthropic/ink'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isSupportedVSCodeTerminal } from '@claude-code/ide/ide.js'
 import { Select } from './CustomSelect/index.js'
 import type {

@@ -3,7 +3,7 @@ import { parseUserSpecifiedModel, getDefaultMainLoopModel } from "src/utils/mode
 import { getContextWindowForModel } from "src/utils/context.js";
 import { getInitialMainLoopModel, getSdkBetas } from "../../bootstrap/state.js";
 import { logSkillsLoaded } from "src/utils/telemetry/skillLoadedEvent.js";
-import { getCwd } from "src/utils/cwd.js";
+import { getCwd } from "@claude-code/app-host/bootstrap/cwd.js";
 import { loadAllPluginsCacheOnly } from "src/utils/plugins/pluginLoader.js";
 import { getManagedPluginNames } from "src/utils/plugins/managedPlugins.js";
 import { getPluginSeedDirs } from "src/utils/plugins/pluginDirectories.js";

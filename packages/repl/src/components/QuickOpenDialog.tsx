@@ -6,7 +6,7 @@ import { generateFileSuggestions } from '@claude-code/repl/hooks/fileSuggestions
 import { useTerminalSize } from '@anthropic/ink'
 import { Text } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { openFileInExternalEditor } from 'src/utils/editor.js'
 import { truncatePathMiddle, truncateToWidth } from 'src/utils/format.js'
 import { highlightMatch } from 'src/utils/highlightMatch.js'

@@ -35,7 +35,7 @@ import {
   calculateContextPercentages,
   getContextWindowForModel,
 } from 'src/utils/context.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import {
