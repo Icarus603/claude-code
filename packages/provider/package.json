@@ -14,6 +14,8 @@
     "./oauth/*.js": "./src/oauth/*.ts",
     "./apiLimits.js": "./src/apiLimits.ts",
     "./fileConstants.js": "./src/fileConstants.ts",
+    "./sessionIngressAuth.js": "./src/sessionIngressAuth.ts",
+    "./authFileDescriptor.js": "./src/authFileDescriptor.ts",
     "./claudeAiLimits.js": "./src/claudeAiLimits.ts",
     "./claudeAiLimitsHook.js": "./src/claudeAiLimitsHook.ts",
     "./mockRateLimits.js": "./src/mockRateLimits.ts",
