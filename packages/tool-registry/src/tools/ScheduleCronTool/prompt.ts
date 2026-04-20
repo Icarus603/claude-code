@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature-flags'
 import { DEFAULT_CRON_JITTER_CONFIG } from 'src/utils/cronTasks.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 const KAIROS_CRON_REFRESH_MS = 5 * 60 * 1000
 

@@ -5,7 +5,7 @@ import {
   isChromeExtensionInstalled,
   shouldEnableClaudeInChrome,
 } from 'src/utils/claudeInChrome/setup.js'
-import { isRunningOnHomespace } from 'src/utils/envUtils.js'
+import { isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { useStartupNotification } from './notifs/useStartupNotification.js'
 
 function getChromeFlag(): boolean | undefined {

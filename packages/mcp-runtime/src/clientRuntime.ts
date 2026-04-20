@@ -59,7 +59,7 @@ import { count } from 'src/utils/array.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { detectCodeIndexingFromMcpServerName } from 'src/utils/codeIndexing.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   errorMessage,
   TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

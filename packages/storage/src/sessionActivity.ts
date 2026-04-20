@@ -13,7 +13,7 @@
 
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { readEnv } from '@claude-code/config/env'
 
 const SESSION_ACTIVITY_INTERVAL_MS = 30_000

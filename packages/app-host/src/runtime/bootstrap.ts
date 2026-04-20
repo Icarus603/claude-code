@@ -3,7 +3,7 @@ import { createInteractiveSessionStore } from 'src/state/sessionStores.js'
 import { syncRuntimeHandlesFromAppState } from './runtimeHandles.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getGlobalClaudeFile } from 'src/utils/env.js'
 import { findCanonicalGitRoot } from 'src/utils/git.js'
 import {

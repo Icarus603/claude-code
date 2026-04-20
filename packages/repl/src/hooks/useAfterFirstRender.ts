@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 export function useAfterFirstRender(): void {
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import type { Tool, Tools } from '@claude-code/tool-registry/Tool.js'
 import { hasEmbeddedSearchTools } from 'src/utils/embeddedTools.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isPowerShellToolEnabled } from '@claude-code/shell/legacy/shellToolUtils.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { isWorktreeModeEnabled } from 'src/utils/worktreeModeEnabled.js'

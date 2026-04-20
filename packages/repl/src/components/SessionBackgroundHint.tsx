@@ -15,7 +15,7 @@ import {
 } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from 'src/utils/env.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { KeyboardShortcutHint } from '@anthropic/ink'
 
 type Props = {

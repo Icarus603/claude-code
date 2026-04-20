@@ -29,7 +29,7 @@ import { collapseHookSummaries } from 'src/utils/collapseHookSummaries.js'
 import { collapseReadSearchGroups } from 'src/utils/collapseReadSearch.js'
 import { collapseTeammateShutdowns } from 'src/utils/collapseTeammateShutdowns.js'
 import { getGlobalConfig } from '@claude-code/config'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import { applyGrouping } from 'src/utils/groupToolUses.js'
 import {

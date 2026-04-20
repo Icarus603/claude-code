@@ -5,7 +5,7 @@ import { getKairosActive, getUserMsgOptIn } from '@claude-code/app-host/bootstra
 import { Box } from '@anthropic/ink'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from 'src/utils/log.js'
 import { countCharInString } from 'src/utils/stringUtils.js'
 import { MessageActionsSelectedContext } from '../messageActions.js'

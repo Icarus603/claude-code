@@ -11,7 +11,7 @@ import { stat } from 'fs/promises'
 import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { IMAGE_EXTENSION_REGEX } from 'src/utils/imagePaste.js'
 import { expandPath } from 'src/utils/path.js'

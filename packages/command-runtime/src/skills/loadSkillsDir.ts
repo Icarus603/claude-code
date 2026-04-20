@@ -33,7 +33,7 @@ import {
   getClaudeConfigHomeDir,
   isBareMode,
   isEnvTruthy,
-} from 'src/utils/envUtils.js'
+} from '@claude-code/config/env/utils'
 import { isENOENT, isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 import {
   coerceDescriptionToString,

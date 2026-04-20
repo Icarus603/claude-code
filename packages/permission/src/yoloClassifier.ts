@@ -23,7 +23,7 @@ import type {
   YoloClassifierResult,
 } from '@claude-code/permission/permissionTypes'
 import { isDebugMode, logForDebugging } from 'src/utils/debug.js'
-import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { extractTextContent } from 'src/utils/messages.js'

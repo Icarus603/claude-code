@@ -11,7 +11,7 @@ import React, {
 import { KeybindingWarnings } from '@claude-code/repl/components/KeybindingWarnings.js'
 import { McpParsingWarnings } from '@claude-code/repl/components/mcp/McpParsingWarnings.js'
 import { getModelMaxOutputTokens } from 'src/utils/context.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import type { SettingSource } from 'src/utils/settings/constants.js'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import type { CommandResultDisplay } from 'src/commands.js'

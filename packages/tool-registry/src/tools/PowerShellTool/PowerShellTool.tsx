@@ -33,7 +33,7 @@ import {
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { extractClaudeCodeHints } from 'src/utils/claudeCodeHints.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   errorMessage as getErrorMessage,
   ShellError,

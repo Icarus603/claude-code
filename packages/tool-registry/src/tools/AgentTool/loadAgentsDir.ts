@@ -19,7 +19,7 @@ import {
   type EffortValue,
   parseEffortValue,
 } from 'src/utils/effort.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { parsePositiveIntFromFrontmatter } from 'src/utils/frontmatterParser.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'

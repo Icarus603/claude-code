@@ -27,7 +27,7 @@ import { parseCommandRaw } from '@claude-code/shell/bash/parser.js'
 import { tryParseShellCommand } from 'src/utils/bash/shellQuote.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import type {
   ClassifierBehavior,

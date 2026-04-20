@@ -1,4 +1,4 @@
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getMaxOutputLength } from '@claude-code/shell/legacy/outputLimits.js'
 import {
   getPowerShellEdition,

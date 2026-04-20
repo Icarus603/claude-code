@@ -15,7 +15,7 @@ import {
 import { isInBundledMode } from '@claude-code/config/bundledMode'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
-import { isEnvTruthy, isInProtectedNamespace } from 'src/utils/envUtils.js'
+import { isEnvTruthy, isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { logError } from 'src/utils/log.js'

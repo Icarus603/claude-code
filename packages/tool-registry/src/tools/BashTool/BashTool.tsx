@@ -40,7 +40,7 @@ import {
 } from 'src/utils/bash/commands.js'
 import { extractClaudeCodeHints } from 'src/utils/claudeCodeHints.js'
 import { detectCodeIndexingFromCommand } from 'src/utils/codeIndexing.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT, ShellError } from '@claude-code/local-observability/errorHelpers.js'
 import {
   detectFileEncoding,

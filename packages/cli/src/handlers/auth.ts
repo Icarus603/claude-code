@@ -32,7 +32,7 @@ import {
 } from 'src/utils/auth.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
-import { isRunningOnHomespace } from 'src/utils/envUtils.js'
+import { isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import { getAPIProvider } from 'src/utils/model/providers.js'

@@ -84,7 +84,7 @@ import {
 } from 'src/utils/settings/settings.js'
 import { getUserMsgOptIn, setUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { DEFAULT_OUTPUT_STYLE_NAME } from 'src/constants/outputStyles.js'
-import { isEnvTruthy, isRunningOnHomespace } from 'src/utils/envUtils.js'
+import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
 import type {
   LocalJSXCommandContext,
   CommandResultDisplay,

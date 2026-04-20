@@ -9,7 +9,7 @@ import {
 } from '@claude-code/ide/lsp/manager.js'
 import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 const LSP_POLL_INTERVAL_MS = 5000
 

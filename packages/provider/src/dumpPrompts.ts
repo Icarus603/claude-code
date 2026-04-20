@@ -3,7 +3,7 @@ import { createHash } from 'crypto'
 import { promises as fs } from 'fs'
 import { dirname, join } from 'path'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { readEnv } from '@claude-code/config/env'
 

@@ -5,7 +5,7 @@
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { HookResultMessage, Message } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
   createCompactBoundaryMessage,
