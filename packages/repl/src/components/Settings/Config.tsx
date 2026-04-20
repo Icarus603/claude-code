@@ -105,7 +105,7 @@ import {
   isFastModeEnabled,
   getFastModeModel,
   isFastModeSupportedByModel,
-} from 'src/utils/fastMode.js'
+} from '@claude-code/repl/fastMode.js'
 import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 
 type Props = {

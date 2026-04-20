@@ -11,7 +11,7 @@ import {
   isFastModeAvailable,
   isFastModeCooldown,
   isFastModeEnabled,
-} from 'src/utils/fastMode.js'
+} from '@claude-code/repl/fastMode.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'

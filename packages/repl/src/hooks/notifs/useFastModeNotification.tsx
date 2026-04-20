@@ -8,7 +8,7 @@ import {
   onCooldownTriggered,
   onFastModeOverageRejection,
   onOrgFastModeChanged,
-} from 'src/utils/fastMode.js'
+} from '@claude-code/repl/fastMode.js'
 import { formatDuration } from '@claude-code/output/formatters'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 

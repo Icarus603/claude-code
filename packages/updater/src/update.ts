@@ -12,7 +12,7 @@ import {
   saveGlobalConfig,
 } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { getDoctorDiagnostic } from 'src/utils/doctorDiagnostic.js'
+import { getDoctorDiagnostic } from '@claude-code/repl/doctorDiagnostic.js'
 import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import {
   installOrUpdateClaudePackage,

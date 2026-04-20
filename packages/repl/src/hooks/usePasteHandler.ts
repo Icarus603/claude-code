@@ -8,7 +8,7 @@ import {
   isImageFilePath,
   PASTE_THRESHOLD,
   tryReadImageFromPath,
-} from 'src/utils/imagePaste.js'
+} from '@claude-code/repl/imagePaste.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { getPlatform } from '@claude-code/config/platform'
 

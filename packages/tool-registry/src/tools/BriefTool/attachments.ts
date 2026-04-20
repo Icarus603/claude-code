@@ -13,7 +13,7 @@ import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
-import { IMAGE_EXTENSION_REGEX } from 'src/utils/imagePaste.js'
+import { IMAGE_EXTENSION_REGEX } from '@claude-code/repl/imagePaste.js'
 import { expandPath } from '@claude-code/storage/path.js'
 
 export type ResolvedAttachment = {
