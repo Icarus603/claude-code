@@ -95,6 +95,7 @@
     "./skills/skillChangeDetector.js": "./src/skills/skillChangeDetector.ts",
     "./suggestions/skillUsageTracking.js": "./src/suggestions/skillUsageTracking.ts",
     "./codeIndexing.js": "./src/codeIndexing.ts",
+    "./generatedFiles.js": "./src/generatedFiles.ts",
     "./toolPool.js": "./src/toolPool.ts"
   }
 }
