@@ -62,6 +62,7 @@
     "./localAgentTask.js": "./localAgentTask.ts",
     "./logsTypes.js": "./logsTypes.ts",
     "./frontmatterParser.js": "./frontmatterParser.ts",
+    "./yaml.js": "./yaml.ts",
     "./effort.js": "./effort.ts",
     "./agentContext.js": "./agentContext.ts",
     "./coordinatorMode.js": "./coordinatorMode.ts",
