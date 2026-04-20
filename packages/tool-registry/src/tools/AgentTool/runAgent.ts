@@ -41,7 +41,7 @@ import type {
   UserMessage,
 } from 'src/types/message.js'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
-import { AbortError } from 'src/utils/errors.js'
+import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import { getDisplayPath } from 'src/utils/file.js'
 import {
   cloneFileStateCache,

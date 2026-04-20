@@ -33,7 +33,7 @@ import {
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
 import { stripDisplayTagsAllowEmpty } from 'src/utils/displayTags.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getBranch, getRemoteUrl } from 'src/utils/git.js'
 import { toSDKMessages } from 'src/utils/messages/mappers.js'
 import {

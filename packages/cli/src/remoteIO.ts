@@ -8,7 +8,7 @@ import { setCommandLifecycleListener } from '@claude-code/shell/commandLifecycle
 import { isDebugMode, logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { logError } from 'src/utils/log.js'
 import { writeToStdout } from 'src/utils/process.js'

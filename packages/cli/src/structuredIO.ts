@@ -25,7 +25,7 @@ import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { type HookCallback, hookJSONOutputSchema } from 'src/types/hooks.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
-import { AbortError } from 'src/utils/errors.js'
+import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import {
   type Output as PermissionToolOutput,
   permissionPromptToolResultToPermissionDecision,

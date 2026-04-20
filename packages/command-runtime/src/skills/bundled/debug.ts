@@ -2,7 +2,7 @@ import { open, stat } from 'fs/promises'
 import { CLAUDE_CODE_GUIDE_AGENT_TYPE } from '@claude-code/tool-registry/tools/AgentTool/built-in/claudeCodeGuideAgent.js'
 import { getSettingsFilePathForSource } from 'src/utils/settings/settings.js'
 import { enableDebugLogging, getDebugLogPath } from 'src/utils/debug.js'
-import { errorMessage, isENOENT } from 'src/utils/errors.js'
+import { errorMessage, isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { registerBundledSkill } from '../bundledSkills.js'
 

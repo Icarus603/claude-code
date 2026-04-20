@@ -12,7 +12,7 @@ import type { LocalAgentTaskState } from 'src/tasks/LocalAgentTask/LocalAgentTas
 import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
 import type { RemoteAgentTaskState } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js'
 import type { TaskState } from 'src/tasks/types.js'
-import { AbortError } from 'src/utils/errors.js'
+import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { extractTextContent } from 'src/utils/messages.js'
 import { semanticBoolean } from 'src/utils/semanticBoolean.js'

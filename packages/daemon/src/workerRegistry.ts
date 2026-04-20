@@ -5,7 +5,7 @@ import {
   runBridgeHeadless,
 } from '@claude-code/bridge/bridgeMain.js'
 import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 
 /**
  * Exit codes the supervisor uses to decide retry vs park.

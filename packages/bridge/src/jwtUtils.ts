@@ -1,7 +1,7 @@
 import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 
 /** Format a millisecond duration as a human-readable string (e.g. "5m 30s"). */

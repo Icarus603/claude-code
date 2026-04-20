@@ -29,7 +29,7 @@ import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from 'src/utils/envUtils.js'
-import { getErrnoCode, isENOENT } from 'src/utils/errors.js'
+import { getErrnoCode, isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
   addLineNumbers,
   FILE_NOT_FOUND_CWD_NOTE,

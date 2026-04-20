@@ -47,7 +47,7 @@ import {
   getGlobalConfig,
   saveCurrentProjectConfig,
 } from '@claude-code/config'
-import { isFsInaccessible } from 'src/utils/errors.js'
+import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { getPlatform } from 'src/utils/platform.js'

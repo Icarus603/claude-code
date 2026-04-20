@@ -21,7 +21,7 @@ import {
   type VoiceStreamConnection,
 } from '@claude-code/voice/voiceStreamSTT.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { getSystemLocaleLanguage } from 'src/utils/intl.js'
 import { logError } from 'src/utils/log.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'

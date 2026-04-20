@@ -18,7 +18,7 @@ import {
 } from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { getPatchFromContents } from 'src/utils/diff.js'
-import { isENOENT } from 'src/utils/errors.js'
+import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
   callIdeRpc,
   getConnectedIdeClient,

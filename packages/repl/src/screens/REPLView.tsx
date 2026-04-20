@@ -156,7 +156,7 @@ import { CancelRequestHandler } from '@claude-code/repl/hooks/useCancelRequest.j
 import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgroundTaskNavigation.js';
 import { useSwarmInitialization } from '@claude-code/repl/hooks/useSwarmInitialization.js';
 import { useTeammateViewAutoExit } from '@claude-code/repl/hooks/useTeammateViewAutoExit.js';
-import { errorMessage } from 'src/utils/errors.js';
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js';
 import { isHumanTurn } from 'src/utils/messagePredicates.js';
 import { logError } from 'src/utils/log.js';
 // Dead code elimination: conditional imports

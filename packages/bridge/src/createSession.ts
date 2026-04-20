@@ -1,6 +1,6 @@
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { extractErrorDetail } from './debugUtils.js'
 import { toCompatSessionId } from './sessionIdCompat.js'
 

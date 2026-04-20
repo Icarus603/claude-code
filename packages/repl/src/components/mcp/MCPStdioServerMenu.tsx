@@ -13,7 +13,7 @@ import {
   filterMcpPromptsByServer,
 } from '@claude-code/mcp-runtime/utils.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { capitalize } from 'src/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Select } from '../CustomSelect/index.js'

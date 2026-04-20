@@ -72,7 +72,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import {
   toError as _toError, // kept for clarity though _deps has own
-} from 'src/utils/errors.js'
+} from '@claude-code/local-observability/errorHelpers.js'
 import {
   execFileNoThrow,
   execFileNoThrowWithCwd,

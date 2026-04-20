@@ -6,7 +6,7 @@ import {
 } from '@claude-code/local-observability'
 import type { TeleportRemoteResponse } from 'src/utils/conversationRecovery.js'
 import type { CodeSession } from '@claude-code/teleport/api.js'
-import { errorMessage, TeleportOperationError } from 'src/utils/errors.js'
+import { errorMessage, TeleportOperationError } from '@claude-code/local-observability/errorHelpers.js'
 import { teleportResumeCodeSession } from 'src/utils/teleport.js'
 
 export type TeleportResumeError = {

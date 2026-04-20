@@ -120,7 +120,7 @@ import {
 } from 'src/utils/directMemberMessage.js'
 import type { EffortLevel } from 'src/utils/effort.js'
 import { env } from 'src/utils/env.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
 import {
   getFastModeUnavailableReason,

@@ -15,7 +15,7 @@ import {
 } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getErrnoCode } from 'src/utils/errors.js'
+import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { logError } from 'src/utils/log.js'

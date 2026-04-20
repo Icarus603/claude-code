@@ -5,7 +5,7 @@
 
 import axios from 'axios'
 import he from 'he'
-import { AbortError } from 'src/utils/errors.js'
+import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import type { SearchResult, SearchOptions, WebSearchAdapter } from './types.js'
 
 const FETCH_TIMEOUT_MS = 30_000

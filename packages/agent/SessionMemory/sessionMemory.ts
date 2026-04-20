@@ -67,7 +67,7 @@ import {
 // These functions return cached values from disk immediately without blocking
 // on GrowthBook initialization. Values may be stale but are updated in background.
 
-import { errorMessage, getErrnoCode } from 'src/utils/errors.js'
+import { errorMessage, getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import {
   getDynamicConfig_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,

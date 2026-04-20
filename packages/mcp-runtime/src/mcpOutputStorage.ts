@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import type { MCPResultType } from 'src/services/mcp/client.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { logError } from 'src/utils/log.js'
 import { ensureToolResultsDir, getToolResultsDir } from 'src/utils/toolResultStorage.js'

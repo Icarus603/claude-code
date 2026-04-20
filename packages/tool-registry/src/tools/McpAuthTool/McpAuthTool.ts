@@ -15,7 +15,7 @@ import type {
   ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime/types.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { logMCPDebug, logMCPError } from 'src/utils/log.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'

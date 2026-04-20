@@ -37,7 +37,7 @@ const ideOnboardingDialog =
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { envDynamic } from 'src/utils/envDynamic.js'
-import { errorMessage, isFsInaccessible } from 'src/utils/errors.js'
+import { errorMessage, isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import {
   checkWSLDistroMatch,

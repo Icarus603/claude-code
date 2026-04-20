@@ -6,7 +6,7 @@
  */
 
 import { E_TOOL_USE_SUMMARY_GENERATION_FAILED } from 'src/constants/errorIds.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'

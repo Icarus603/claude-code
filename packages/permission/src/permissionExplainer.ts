@@ -4,7 +4,7 @@ import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.j
 import type { AssistantMessage, Message } from 'src/types/message.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
 import { getMainLoopModel } from 'src/utils/model/model.js'

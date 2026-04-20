@@ -11,7 +11,7 @@ import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool
 import { count } from 'src/utils/array.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import { loadPluginAgents } from 'src/utils/plugins/loadPluginAgents.js'
 import { getPluginCommands } from 'src/utils/plugins/loadPluginCommands.js'

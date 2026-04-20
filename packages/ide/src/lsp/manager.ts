@@ -1,6 +1,6 @@
 import { logForDebugging } from 'src/utils/debug.js'
 import { isBareMode } from 'src/utils/envUtils.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import {
   createLSPServerManager,

@@ -52,7 +52,7 @@ import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { getCwd, runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { AbortError, errorMessage, toError } from 'src/utils/errors.js'
+import { AbortError, errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import type { CacheSafeParams } from 'src/utils/forkedAgent.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { logForDebugging } from 'src/utils/debug.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { validateBridgeId } from './bridgeApi.js'
 import { getBridgeAccessToken } from './bridgeConfig.js'
 import { getReplBridgeHandle } from './replBridgeHandle.js'

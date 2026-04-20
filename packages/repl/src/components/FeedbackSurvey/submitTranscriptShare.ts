@@ -3,7 +3,7 @@ import { readFile, stat } from 'fs/promises'
 import type { Message } from 'src/types/message.js'
 import { checkAndRefreshOAuthTokenIfNeeded } from 'src/utils/auth.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getAuthHeaders, getUserAgent } from 'src/utils/http.js'
 import { normalizeMessagesForAPI } from 'src/utils/messages.js'
 import {

@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'child_process'
 import { resolve } from 'path'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 
 /**
  * Exit code used by workers for permanent (non-retryable) failures.
