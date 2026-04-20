@@ -51,7 +51,7 @@ import {
 import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,
-} from 'src/utils/fileHistory.js'
+} from '@claude-code/agent/file-history'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'

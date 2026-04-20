@@ -8,7 +8,7 @@ import {
   getCronFilePath,
   listAllCronTasks,
   nextCronRunMs,
-} from 'src/utils/cronTasks.js'
+} from '@claude-code/agent/scheduler'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
 import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'
