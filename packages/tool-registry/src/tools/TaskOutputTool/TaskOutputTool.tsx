@@ -65,7 +65,7 @@ type TaskOutputToolOutput = {
 }
 
 // Re-export Progress from centralized types to break import cycles
-export type { TaskOutputProgress as Progress } from 'src/types/tools.js'
+export type { TaskOutputProgress as Progress } from '@claude-code/tool-registry/progressTypes'
 
 // Get output for any task type
 async function getTaskOutputData(task: TaskState): Promise<TaskOutput> {

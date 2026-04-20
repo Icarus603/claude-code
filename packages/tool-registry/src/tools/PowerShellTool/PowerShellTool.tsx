@@ -353,9 +353,9 @@ const outputSchema = lazySchema(() =>
 type OutputSchema = ReturnType<typeof outputSchema>
 export type Out = z.infer<OutputSchema>
 
-import type { PowerShellProgress } from 'src/types/tools.js'
+import type { PowerShellProgress } from '@claude-code/tool-registry/progressTypes'
 
-export type { PowerShellProgress } from 'src/types/tools.js'
+export type { PowerShellProgress } from '@claude-code/tool-registry/progressTypes'
 
 const COMMON_BACKGROUND_COMMANDS = [
   'npm',

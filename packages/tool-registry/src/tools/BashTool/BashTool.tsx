@@ -506,9 +506,9 @@ type OutputSchema = ReturnType<typeof outputSchema>
 export type Out = z.infer<OutputSchema>
 
 // Re-export BashProgress from centralized types to break import cycles
-export type { BashProgress } from 'src/types/tools.js'
+export type { BashProgress } from '@claude-code/tool-registry/progressTypes'
 
-import type { BashProgress } from 'src/types/tools.js'
+import type { BashProgress } from '@claude-code/tool-registry/progressTypes'
 
 /**
  * Checks if a command is allowed to be automatically backgrounded

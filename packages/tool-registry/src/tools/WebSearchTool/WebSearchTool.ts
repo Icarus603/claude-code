@@ -58,9 +58,9 @@ type OutputSchema = ReturnType<typeof outputSchema>
 export type Output = z.infer<OutputSchema>
 
 // Re-export WebSearchProgress from centralized types to break import cycles
-export type { WebSearchProgress } from 'src/types/tools.js'
+export type { WebSearchProgress } from '@claude-code/tool-registry/progressTypes'
 
-import type { WebSearchProgress } from 'src/types/tools.js'
+import type { WebSearchProgress } from '@claude-code/tool-registry/progressTypes'
 
 export const WebSearchTool = buildTool({
   name: WEB_SEARCH_TOOL_NAME,

@@ -12,7 +12,7 @@ import { Ansi, Box, Text, stringWidth } from '@anthropic/ink'
 import { createHyperlink } from 'src/utils/hyperlink.js'
 import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
-import type { MCPProgress } from 'src/types/tools.js'
+import type { MCPProgress } from '@claude-code/tool-registry/progressTypes'
 import { formatNumber } from '@claude-code/output/formatters'
 
 import {

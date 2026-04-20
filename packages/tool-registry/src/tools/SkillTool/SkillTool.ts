@@ -94,9 +94,9 @@ async function getAllCommands(context: ToolUseContext): Promise<Command[]> {
 }
 
 // Re-export Progress from centralized types to break import cycles
-export type { SkillToolProgress as Progress } from 'src/types/tools.js'
+export type { SkillToolProgress as Progress } from '@claude-code/tool-registry/progressTypes'
 
-import type { SkillToolProgress as Progress } from 'src/types/tools.js'
+import type { SkillToolProgress as Progress } from '@claude-code/tool-registry/progressTypes'
 
 // Conditional require for remote skill modules — static imports here would
 // pull in akiBackend.ts (via remoteSkillLoader → akiBackend), which has
