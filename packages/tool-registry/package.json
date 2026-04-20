@@ -75,6 +75,7 @@
     "./imageStore.js": "./src/imageStore.ts",
     "./undercover.js": "./src/undercover.ts",
     "./words.js": "./src/words.ts",
+    "./pdf.js": "./src/pdf.ts",
     "./gitDiff.js": "./src/gitDiff.ts",
     "./validateEditTool.js": "./src/validateEditTool.ts",
     "./orphanedPluginFilter.js": "./src/orphanedPluginFilter.ts",
