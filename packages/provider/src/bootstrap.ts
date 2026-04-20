@@ -13,7 +13,7 @@ import { withOAuth401Retry } from 'src/utils/http.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getAPIProvider } from 'src/utils/model/providers.js'
-import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
+import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 
 const bootstrapResponseSchema = lazySchema(() =>

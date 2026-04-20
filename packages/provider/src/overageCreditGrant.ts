@@ -3,7 +3,7 @@ import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { getOauthAccountInfo } from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logError } from '@claude-code/local-observability/logging'
-import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
+import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'
 
 export type OverageCreditGrantInfo = {

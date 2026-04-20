@@ -8,7 +8,7 @@ import {
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
+import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'
 import type {
   ReferralCampaign,
