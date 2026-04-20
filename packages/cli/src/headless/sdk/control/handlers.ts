@@ -17,27 +17,27 @@ import {
   wrapChannelMessage,
 } from '@claude-code/mcp-runtime'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import type { Stream } from '../../../../../../src/utils/stream.js'
+import type { Stream } from 'src/utils/stream.js'
 import type {
   StdoutMessage,
   SDKControlInitializeRequest,
   SDKControlInitializeResponse,
-} from '../../../../../../src/entrypoints/sdk/controlTypes.js'
+} from 'src/entrypoints/sdk/controlTypes.js'
 import type {
   AgentDefinition,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { isBuiltInAgent, parseAgentsFromJson } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { Command } from '../../../../../../src/commands.js'
+import type { Command } from 'src/commands.js'
 import {
   formatDescriptionWithSource,
   getCommandName,
-} from '../../../../../../src/commands.js'
+} from 'src/commands.js'
 import type { ModelInfo } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { HookCallbackMatcher } from '../../../../../../src/types/hooks.js'
+import type { HookCallbackMatcher } from 'src/types/hooks.js'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { PermissionMode as InternalPermissionMode } from '../../../../../../src/types/permissions.js'
+import type { PermissionMode as InternalPermissionMode } from 'src/types/permissions.js'
 import type { AppStateLike as AppState } from '../../../contracts.js'
-import { parsePluginIdentifier } from '../../../../../../src/utils/plugins/pluginIdentifier.js'
+import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
 import {
   getSessionId,
   setMainLoopModelOverride,
@@ -52,21 +52,21 @@ import {
 import {
   DEFAULT_OUTPUT_STYLE_NAME,
   getAllOutputStyles,
-} from '../../../../../../src/constants/outputStyles.js'
-import { getAccountInformation } from '../../../../../../src/utils/auth.js'
-import { getAPIProvider } from '../../../../../../src/utils/model/providers.js'
+} from 'src/constants/outputStyles.js'
+import { getAccountInformation } from 'src/utils/auth.js'
+import { getAPIProvider } from 'src/utils/model/providers.js'
 import {
   isFastModeEnabled,
   isFastModeAvailable,
   getFastModeState,
-} from '../../../../../../src/utils/fastMode.js'
-import { AwsAuthStatusManager } from '../../../../../../src/utils/awsAuthStatusManager.js'
-import { parseUserSpecifiedModel } from '../../../../../../src/utils/model/model.js'
-import { logMCPDebug } from '../../../../../../src/utils/log.js'
+} from 'src/utils/fastMode.js'
+import { AwsAuthStatusManager } from 'src/utils/awsAuthStatusManager.js'
+import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
+import { logMCPDebug } from 'src/utils/log.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
-import { enqueue } from '../../../../../../src/utils/messageQueueManager.js'
-import { getCwd } from '../../../../../../src/utils/cwd.js'
+import { enqueue } from 'src/utils/messageQueueManager.js'
+import { getCwd } from 'src/utils/cwd.js'
 import { randomUUID } from 'crypto'
 import { StructuredIO } from '../../../structuredIO.js'
 

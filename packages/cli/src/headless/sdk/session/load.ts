@@ -1,13 +1,13 @@
 import { feature } from 'bun:bundle'
 import { dirname } from 'path'
 import { randomUUID } from 'crypto'
-import type { Message, NormalizedUserMessage } from '../../../../../../src/types/message.js'
+import type { Message, NormalizedUserMessage } from 'src/types/message.js'
 import type { AppStateLike as AppState } from '../../../contracts.js'
 import type { SessionExternalMetadata } from '@claude-code/storage/sessionState.js'
 import {
   loadConversationForResume,
   type TurnInterruptionState,
-} from '../../../../../../src/utils/conversationRecovery.js'
+} from 'src/utils/conversationRecovery.js'
 import {
   hydrateRemoteSession,
   hydrateFromCCRv2InternalEvents,
@@ -25,21 +25,21 @@ import {
   isSessionPersistenceDisabled,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { EMPTY_USAGE } from '@claude-code/provider/logging.js'
-import { jsonStringify } from '../../../../../../src/utils/slowOperations.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
-import { logError } from '../../../../../../src/utils/log.js'
+import { logError } from 'src/utils/log.js'
 import {
   gracefulShutdownSync,
-} from '../../../../../../src/utils/gracefulShutdown.js'
+} from 'src/utils/gracefulShutdown.js'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
-import { parseSessionIdentifier } from '../../../../../../src/utils/sessionUrl.js'
+import { parseSessionIdentifier } from 'src/utils/sessionUrl.js'
 import {
   processSessionStartHooks,
 } from '@claude-code/storage/sessionStart.js'
-import { externalMetadataToAppState } from '../../../../../../src/state/onChangeAppState.js'
-import { asSessionId } from '../../../../../../src/types/ids.js'
-import { getCwd } from '../../../../../../src/utils/cwd.js'
-import { isEnvTruthy } from '../../../../../../src/utils/envUtils.js'
+import { externalMetadataToAppState } from 'src/state/onChangeAppState.js'
+import { asSessionId } from 'src/types/ids.js'
+import { getCwd } from 'src/utils/cwd.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const coordinatorModeModule = feature('COORDINATOR_MODE')
