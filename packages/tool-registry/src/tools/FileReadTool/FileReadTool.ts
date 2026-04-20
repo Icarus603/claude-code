@@ -58,7 +58,7 @@ import {
   readNotebook,
 } from '@claude-code/tool-registry/notebook.js'
 import { expandPath } from '@claude-code/storage/path.js'
-import { extractPDFPages, getPDFPageCount, readPDF } from 'src/utils/pdf.js'
+import { extractPDFPages, getPDFPageCount, readPDF } from '@claude-code/tool-registry/pdf.js'
 import {
   isPDFExtension,
   isPDFSupported,
