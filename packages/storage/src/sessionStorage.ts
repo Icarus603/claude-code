@@ -88,7 +88,7 @@ import {
   readHeadAndTail,
   readTranscriptForLoad,
   SKIP_PRECOMPACT_THRESHOLD,
-} from 'src/utils/sessionStoragePortable.js'
+} from '@claude-code/storage/sessionStoragePortable.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'

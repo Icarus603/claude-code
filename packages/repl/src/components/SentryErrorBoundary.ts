@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { captureException } from 'src/utils/sentry.js'
+import { captureException } from '@claude-code/local-observability/sentry.js'
 
 interface Props {
   children: React.ReactNode

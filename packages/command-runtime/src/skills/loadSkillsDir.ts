@@ -53,7 +53,7 @@ import {
   loadMarkdownFilesForSubdir,
   type MarkdownFile,
   parseSlashCommandToolsFromFrontmatter,
-} from 'src/utils/markdownConfigLoader.js'
+} from '@claude-code/tool-registry/markdownConfigLoader.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { executeShellCommandsInPrompt } from 'src/utils/promptShellExecution.js'
 import type { SettingSource } from '@claude-code/config/constants'

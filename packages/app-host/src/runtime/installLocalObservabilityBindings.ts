@@ -46,7 +46,7 @@ import { envDynamic } from '@claude-code/config/env/dynamic'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
-import { captureException } from 'src/utils/sentry.js'
+import { captureException } from '@claude-code/local-observability/sentry.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { toTaggedId } from 'src/utils/taggedId.js'
 import {

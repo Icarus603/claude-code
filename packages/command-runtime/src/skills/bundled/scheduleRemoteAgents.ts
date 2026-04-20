@@ -10,7 +10,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   detectCurrentRepositoryWithHost,
   parseGitRemote,
-} from 'src/utils/detectRepository.js'
+} from '@claude-code/storage/detectRepository.js'
 import { getRemoteUrl } from '@claude-code/storage/git.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {

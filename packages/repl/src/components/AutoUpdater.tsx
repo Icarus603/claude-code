@@ -21,7 +21,7 @@ import { getCurrentInstallationType } from '@claude-code/repl/doctorDiagnostic.j
 import {
   installOrUpdateClaudePackage,
   localInstallationExists,
-} from 'src/utils/localInstaller.js'
+} from '@claude-code/repl/localInstaller.js'
 import { removeInstalledSymlink } from 'src/utils/nativeInstaller/index.js'
 import { gt, gte } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'

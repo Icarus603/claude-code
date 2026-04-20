@@ -34,7 +34,7 @@ import {
   type AttributionState,
   attributionRestoreStateFromLog,
   restoreAttributionStateFromSnapshots,
-} from 'src/utils/commitAttribution.js'
+} from '@claude-code/agent/commitAttribution.js'
 import { updateSessionName } from '@claude-code/agent/concurrentSessions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

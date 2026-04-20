@@ -23,7 +23,7 @@ import {
   createGuestPassesFeed,
 } from './feedConfigs.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { resolveThemeSetting } from 'src/utils/systemTheme.js'
+import { resolveThemeSetting } from '@claude-code/repl/systemTheme.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import {
   isDebugMode,
