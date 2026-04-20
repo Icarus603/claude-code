@@ -21,7 +21,7 @@ import { useCommandQueue } from './useCommandQueue.js'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { Screen } from '@claude-code/repl/screens/REPL.js'
-import { exitTeammateView } from 'src/state/teammateViewHelpers.js'
+import { exitTeammateView } from '@claude-code/repl/teammateViewHelpers.js'
 import {
   killAllRunningAgentTasks,
   markAgentsNotified,

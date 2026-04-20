@@ -7,7 +7,7 @@ import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,
-} from 'src/state/teammateViewHelpers.js'
+} from '@claude-code/repl/teammateViewHelpers.js'
 import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
 import { getPillLabel, pillNeedsCta } from 'src/tasks/pillLabel.js'
 import {
