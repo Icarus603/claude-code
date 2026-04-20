@@ -3,14 +3,14 @@ import { randomUUID } from 'crypto'
 import type { UUID } from 'crypto'
 import type { McpSdkServerConfig } from '@claude-code/mcp-runtime'
 import type { AppStateLike as AppState } from '../../../contracts.js'
-import type { Command } from '../../../../../../src/commands.js'
+import type { Command } from 'src/commands.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import { toolMatchesName } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { isBuiltInAgent } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { ThinkingConfig } from '../../../../../../src/utils/thinking.js'
+import type { ThinkingConfig } from 'src/utils/thinking.js'
 import type { SDKMessage, SDKStatus } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { StdoutMessage } from '../../../../../../src/entrypoints/sdk/controlTypes.js'
+import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'
 import type { StructuredIO } from '../../../structuredIO.js'
 import type { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
@@ -25,7 +25,7 @@ import {
 } from '../../../index.js'
 import {
   downloadUserSettings,
-} from '../../../../../../src/services/settingsSync/index.js'
+} from 'src/services/settingsSync/index.js'
 import {
   getIsRemoteMode,
   getSessionId,
@@ -33,12 +33,12 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js'
 import {
   isFastModeEnabled,
-} from '../../../../../../src/utils/fastMode.js'
+} from 'src/utils/fastMode.js'
 import {
   headlessProfilerStartTurn,
   headlessProfilerCheckpoint,
   logHeadlessProfilerTurn,
-} from '../../../../../../src/utils/headlessProfiler.js'
+} from 'src/utils/headlessProfiler.js'
 import {
   isQualifiedForGrove,
   checkGroveForNonInteractive,
@@ -46,12 +46,12 @@ import {
 import { initializeGrowthBook } from '@claude-code/config/feature-flags'
 import {
   gracefulShutdownSync,
-} from '../../../../../../src/utils/gracefulShutdown.js'
-import { validateUuid } from '../../../../../../src/utils/uuid.js'
-import { installStreamJsonStdoutGuard } from '../../../../../../src/utils/streamJsonStdoutGuard.js'
-import { SandboxManager } from '../../../../../../src/utils/sandbox/sandbox-adapter.js'
-import { errorMessage } from '../../../../../../src/utils/errors.js'
-import { registerHookEventHandler } from '../../../../../../src/utils/hooks/hookEvents.js'
+} from 'src/utils/gracefulShutdown.js'
+import { validateUuid } from 'src/utils/uuid.js'
+import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
+import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { errorMessage } from 'src/utils/errors.js'
+import { registerHookEventHandler } from 'src/utils/hooks/hookEvents.js'
 import {
   processSetupHooks,
   takeInitialUserMessage,
@@ -66,11 +66,11 @@ import { notifySessionStateChanged } from '@claude-code/storage/sessionState.js'
 import {
   registerProcessOutputErrorHandlers,
   writeToStdout,
-} from '../../../../../../src/utils/process.js'
-import { ensureModelStringsInitialized } from '../../../../../../src/utils/model/modelStrings.js'
-import { createStreamlinedTransformer } from '../../../../../../src/utils/streamlinedTransform.js'
-import { jsonStringify } from '../../../../../../src/utils/slowOperations.js'
-import { isEnvTruthy } from '../../../../../../src/utils/envUtils.js'
+} from 'src/utils/process.js'
+import { ensureModelStringsInitialized } from 'src/utils/model/modelStrings.js'
+import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
+import { jsonStringify } from 'src/utils/slowOperations.js'
+import { isEnvTruthy } from 'src/utils/envUtils.js'
 import {
   runHeadlessStreaming,
   handleRewindFiles,
