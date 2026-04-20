@@ -162,7 +162,7 @@ import {
   clearPluginCommandCache,
   getPluginSkills,
   clearPluginSkillsCache,
-} from 'src/utils/plugins/loadPluginCommands.js'
+} from '@claude-code/config/plugin/loadPluginCommands'
 import memoize from 'lodash-es/memoize.js'
 import { isUsing3PServices, isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 import { isFirstPartyAnthropicBaseUrl } from '@claude-code/provider/providers.js'
