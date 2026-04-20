@@ -66,7 +66,8 @@
     "./agentContext.js": "./agentContext.ts",
     "./coordinatorMode.js": "./coordinatorMode.ts",
     "./promptCategory.js": "./promptCategory.ts",
-    "./sdkEventQueue.js": "./sdkEventQueue.ts"
+    "./sdkEventQueue.js": "./sdkEventQueue.ts",
+    "./worktreeModeEnabled.js": "./worktreeModeEnabled.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
