@@ -35,6 +35,7 @@
     "./claudemd.js": "./src/claudemd.ts",
     "./editor.js": "./src/editor.ts",
     "./imageResizer.js": "./src/imageResizer.ts",
+    "./imageValidation.js": "./src/imageValidation.ts",
     "./windowsPaths.js": "./src/windowsPaths.ts",
     "./getWorktreePathsPortable.js": "./src/getWorktreePathsPortable.ts",
     "./getWorktreePaths.js": "./src/getWorktreePaths.ts",
