@@ -22,6 +22,7 @@
     "./model/configs.js": "./src/model/configs.ts",
     "./model/modelAllowlist.js": "./src/model/modelAllowlist.ts",
     "./model/modelSupportOverrides.js": "./src/model/modelSupportOverrides.ts",
+    "./systemConstants.js": "./src/systemConstants.ts",
     "./claudeAiLimits.js": "./src/claudeAiLimits.ts",
     "./claudeAiLimitsHook.js": "./src/claudeAiLimitsHook.ts",
     "./mockRateLimits.js": "./src/mockRateLimits.ts",
