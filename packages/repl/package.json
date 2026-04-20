@@ -455,6 +455,7 @@
     "./systemTheme.js": "./src/systemTheme.ts",
     "./stateStore.js": "./src/stateStore.ts",
     "./overlayContext.js": "./src/overlayContext.ts",
-    "./onChangeAppState.js": "./src/onChangeAppState.ts"
+    "./onChangeAppState.js": "./src/onChangeAppState.ts",
+    "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts"
   }
 }
