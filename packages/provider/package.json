@@ -25,6 +25,7 @@
     "./systemConstants.js": "./src/systemConstants.ts",
     "./fastMode.js": "./src/fastMode.ts",
     "./modelCost.js": "./src/modelCost.ts",
+    "./cyberRiskInstruction.js": "./src/cyberRiskInstruction.ts",
     "./claudeAiLimits.js": "./src/claudeAiLimits.ts",
     "./claudeAiLimitsHook.js": "./src/claudeAiLimitsHook.ts",
     "./mockRateLimits.js": "./src/mockRateLimits.ts",
