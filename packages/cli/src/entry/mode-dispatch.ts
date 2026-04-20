@@ -147,7 +147,7 @@ import {
 } from '@claude-code/app-host/runtime/runtimeHandles.js'
 import { createSystemMessage, createUserMessage } from '@claude-code/agent/messages.js'
 import { getPlatform } from '@claude-code/config/platform'
-import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { jsonParse, writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
 import { computeInitialTeamContext } from '@claude-code/swarm'
 import { isWorktreeModeEnabled } from '@claude-code/agent/worktreeModeEnabled.js'
@@ -245,7 +245,7 @@ import {
 import { cleanupOrphanedPluginVersionsInBackground } from 'src/utils/plugins/cacheUtils.js'
 import { initializeVersionedPlugins } from 'src/utils/plugins/installedPluginsManager.js'
 import { getManagedPluginNames } from 'src/utils/plugins/managedPlugins.js'
-import { getGlobExclusionsForPluginCache } from 'src/utils/plugins/orphanedPluginFilter.js'
+import { getGlobExclusionsForPluginCache } from '@claude-code/tool-registry/orphanedPluginFilter.js'
 import { getPluginSeedDirs } from 'src/utils/plugins/pluginDirectories.js'
 import { countFilesRoundedRg } from '@claude-code/tool-registry/ripgrep.js'
 import {
@@ -314,7 +314,7 @@ import {
 import { setAllHookEventsEnabled } from '@claude-code/repl/hookEvents.js'
 import { refreshModelCapabilities } from '@claude-code/provider/modelCapabilities.js'
 import { peekForStdinData, writeToStderr } from '@claude-code/shell/process.js'
-import { setCwd } from 'src/utils/Shell.js'
+import { setCwd } from '@claude-code/shell/Shell.js'
 import {
   type ProcessedResume,
   processResumedConversation,
@@ -373,7 +373,7 @@ import {
   teleportToRemoteWithErrorHandling,
   validateGitState,
   validateSessionRepository,
-} from 'src/utils/teleport.js'
+} from '@claude-code/tool-registry/teleport.js'
 import {
   shouldEnableThinkingByDefault,
   type ThinkingConfig,
