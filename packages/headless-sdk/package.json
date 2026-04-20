@@ -15,6 +15,7 @@
     "./controlTypes.js": "./src/controlTypes.ts",
     "./sdkUtilityTypes.js": "./src/sdkUtilityTypes.ts",
     "./runtimeTypes.js": "./src/runtimeTypes.ts",
+    "./coreTypes.generated.js": "./src/coreTypes.generated.ts",
     "./coreTypes.js": "./src/coreTypes.ts"
   }
 }
