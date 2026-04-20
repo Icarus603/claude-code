@@ -13,7 +13,7 @@ import { Box, Text } from '@anthropic/ink'
 import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
 import { logEvent } from '@claude-code/local-observability'
 import { MCPConnectionManager } from 'src/services/mcp/MCPConnectionManager.js'
-import { AppStateProvider } from 'src/state/AppState.js'
+import { AppStateProvider } from '../appStateShim.js'
 import { onChangeAppState } from 'src/state/onChangeAppState.js'
 import { isAnthropicAuthEnabled } from 'src/utils/auth.js'
 

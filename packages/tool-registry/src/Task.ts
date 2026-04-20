@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppState } from './appStateTypes.js'
 import type { AgentId } from 'src/types/ids.js'
 import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
 
