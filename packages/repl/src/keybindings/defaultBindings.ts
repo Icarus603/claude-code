@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { satisfies } from 'src/utils/semver.js'
-import { isRunningWithBun } from 'src/utils/bundledMode.js'
+import { isRunningWithBun } from '@claude-code/config/bundledMode'
 import { getPlatform } from 'src/utils/platform.js'
 import type { KeybindingBlock } from './types.js'
 

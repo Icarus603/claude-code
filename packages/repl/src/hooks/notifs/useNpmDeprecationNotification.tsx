@@ -1,4 +1,4 @@
-import { isInBundledMode } from 'src/utils/bundledMode.js'
+import { isInBundledMode } from '@claude-code/config/bundledMode'
 import { getCurrentInstallationType } from 'src/utils/doctorDiagnostic.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { useStartupNotification } from './useStartupNotification.js'
