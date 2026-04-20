@@ -12,7 +12,7 @@ import {
   DANGEROUS_SCRIPT_BLOCK_CMDLETS,
   FILEPATH_EXECUTION_CMDLETS,
   MODULE_LOADING_CMDLETS,
-} from 'src/utils/powershell/dangerousCmdlets.js'
+} from '@claude-code/shell/powershell/dangerousCmdlets.js'
 import type {
   ParsedCommandElement,
   ParsedPowerShellCommand,

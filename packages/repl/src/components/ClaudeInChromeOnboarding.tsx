@@ -2,7 +2,7 @@ import React from 'react'
 import { logEvent } from '@claude-code/local-observability'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- enter to continue
 import { Box, Dialog, Link, Newline, Text, useInput } from '@anthropic/ink'
-import { isChromeExtensionInstalled } from 'src/utils/claudeInChrome/setup.js'
+import { isChromeExtensionInstalled } from '@claude-code/agent/claudeInChromeSetup.js'
 import { saveGlobalConfig } from '@claude-code/config'
 
 const CHROME_EXTENSION_URL = 'https://claude.ai/chrome'

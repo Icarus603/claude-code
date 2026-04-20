@@ -63,7 +63,7 @@ import {
   isPDFExtension,
   isPDFSupported,
   parsePDFPageRange,
-} from 'src/utils/pdfUtils.js'
+} from '@claude-code/storage/pdfUtils.js'
 import {
   checkReadPermissionForTool,
   matchingRuleForInput,

@@ -26,7 +26,7 @@ import {
   getPublicModelDisplayName,
   getPublicModelName,
 } from '@claude-code/provider/model.js'
-import { isMemoryFileAccess } from 'src/utils/sessionFileAccessHooks.js'
+import { isMemoryFileAccess } from '@claude-code/agent/sessionFileAccessHooks.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { readTranscriptForLoad } from '@claude-code/storage/sessionStoragePortable.js'
 import { getInitialSettings } from '@claude-code/config/settings'

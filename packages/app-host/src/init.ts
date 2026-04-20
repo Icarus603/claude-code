@@ -34,7 +34,7 @@ import {
 import {
   applyConfigEnvironmentVariables,
   applySafeConfigEnvironmentVariables,
-} from 'src/utils/managedEnv.js'
+} from '@claude-code/config/managedEnv.js'
 import { configureGlobalMTLS } from '@claude-code/provider/mtls.js'
 import {
   ensureScratchpadDir,
@@ -44,7 +44,7 @@ import {
 // ~400KB of OpenTelemetry + protobuf modules until telemetry is actually initialized.
 // gRPC exporters (~700KB via @grpc/grpc-js) are further lazy-loaded within instrumentation.ts.
 import { configureGlobalAgents } from '@claude-code/provider/proxy.js'
-import { isBetaTracingEnabled } from 'src/utils/telemetry/betaSessionTracing.js'
+import { isBetaTracingEnabled } from '@claude-code/local-observability/betaSessionTracing.js'
 import { getTelemetryAttributes } from '@claude-code/local-observability/telemetry'
 import { setShellIfWindows } from '@claude-code/storage/windowsPaths.js'
 import { initSentry } from '@claude-code/local-observability/sentry.js'

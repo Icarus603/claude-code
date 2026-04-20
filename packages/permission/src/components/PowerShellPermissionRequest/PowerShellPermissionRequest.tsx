@@ -11,7 +11,7 @@ import { getDestructiveCommandWarning } from '@claude-code/tool-registry/tools/P
 import { PowerShellTool } from '@claude-code/tool-registry/tools/PowerShellTool/PowerShellTool.js'
 import { isAllowlistedCommand } from '@claude-code/tool-registry/tools/PowerShellTool/readOnlyValidation.js'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
-import { getCompoundCommandPrefixesStatic } from 'src/utils/powershell/staticPrefix.js'
+import { getCompoundCommandPrefixesStatic } from '@claude-code/shell/powershell/staticPrefix.js'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { type UnaryEvent, usePermissionRequestLogging } from '../hooks.js'
 import { PermissionDecisionDebugInfo } from '../PermissionDecisionDebugInfo.js'

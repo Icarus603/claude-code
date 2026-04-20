@@ -25,7 +25,7 @@ import {
   type LocalAgentTaskState,
 } from '@claude-code/agent/localAgentTask.js'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
-import { evictTerminalTask } from 'src/utils/task/framework.js'
+import { evictTerminalTask } from '@claude-code/agent/taskFramework.js'
 import { isTerminalStatus } from './tasks/taskStatusUtils.js'
 
 /**
