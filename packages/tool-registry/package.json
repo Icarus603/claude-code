@@ -64,6 +64,7 @@
     "./utils/inkColor.js": "./src/utils/inkColor.ts",
     "./toolLimits": "./src/toolLimits.ts",
     "./toolConstants": "./src/toolConstants.ts",
-    "./utils/semanticNumber.js": "./src/utils/semanticNumber.ts"
+    "./utils/semanticNumber.js": "./src/utils/semanticNumber.ts",
+    "./fileStateCache": "./src/fileStateCache.ts"
   }
 }

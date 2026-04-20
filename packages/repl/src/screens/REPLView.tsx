@@ -48,7 +48,7 @@ import {
   createFileStateCacheWithSizeLimit,
   mergeFileStateCaches,
   READ_FILE_STATE_CACHE_SIZE,
-} from 'src/utils/fileStateCache.js';
+} from '@claude-code/tool-registry/fileStateCache';
 import {
   updateLastInteractionTime,
   getLastInteractionTime,
