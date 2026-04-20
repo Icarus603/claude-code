@@ -390,46 +390,7 @@ export function LogoV2(): React.ReactNode {
               </Box>
             </Box>
 
-            {/* Vertical divider */}
-            {layoutMode === 'horizontal' && (
-              <Box
-                height="100%"
-                borderStyle="single"
-                borderColor="claude"
-                borderDimColor
-                borderTop={false}
-                borderBottom={false}
-                borderLeft={false}
-              />
-            )}
-
-            {/* Right Panel - Project Onboarding or Recent Activity and What's New */}
-            {layoutMode === 'horizontal' && (
-              <FeedColumn
-                feeds={
-                  showOnboarding
-                    ? [
-                        createProjectOnboardingFeed(getSteps()),
-                        createRecentActivityFeed(activities),
-                      ]
-                    : showGuestPassesUpsell
-                      ? [
-                          createRecentActivityFeed(activities),
-                          createGuestPassesFeed(),
-                        ]
-                      : showOverageCreditUpsell
-                        ? [
-                            createRecentActivityFeed(activities),
-                            createOverageCreditFeed(),
-                          ]
-                        : [
-                            createRecentActivityFeed(activities),
-                            createWhatsNewFeed(changelog),
-                          ]
-                }
-                maxWidth={rightWidth}
-              />
-            )}
+            {/* Right Panel hidden */}
           </Box>
         </Box>
       </OffscreenFreeze>
