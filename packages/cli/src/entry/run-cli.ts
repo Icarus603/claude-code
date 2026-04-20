@@ -8,7 +8,7 @@
 
 import type { RuntimeHandles } from '@claude-code/app-host'
 
-import { initializeWarningHandler } from 'src/utils/warningHandler.js'
+import { initializeWarningHandler } from '@claude-code/cli/utils/warningHandler.js'
 import { profileCheckpoint } from '@claude-code/app-host/startup/startupProfiler.js'
 import {
   eagerLoadSettings,
