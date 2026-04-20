@@ -29,7 +29,7 @@ import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,
 } from '@claude-code/agent/file-history'
-import { logFileOperation } from 'src/utils/fileOperationAnalytics.js'
+import { logFileOperation } from '@claude-code/local-observability/fileOperationAnalytics'
 import {
   type LineEndingType,
   readFileSyncWithMetadata,

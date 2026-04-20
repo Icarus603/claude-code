@@ -24,7 +24,7 @@ import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,
 } from '@claude-code/agent/file-history'
-import { logFileOperation } from 'src/utils/fileOperationAnalytics.js'
+import { logFileOperation } from '@claude-code/local-observability/fileOperationAnalytics'
 import { readFileSyncWithMetadata } from 'src/utils/fileRead.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import {

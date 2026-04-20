@@ -1,10 +1,10 @@
 import { extname } from 'path'
 import React, { Suspense, use, useMemo } from 'react'
 import { Ansi, Text } from '@anthropic/ink'
-import { getCliHighlightPromise } from 'src/utils/cliHighlight.js'
+import { getCliHighlightPromise } from '@claude-code/output/utils/cliHighlight.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { convertLeadingTabsToSpaces } from 'src/utils/file.js'
-import { hashPair } from 'src/utils/hash.js'
+import { hashPair } from '@claude-code/config/hash'
 
 type Props = {
   code: string

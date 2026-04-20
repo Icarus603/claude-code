@@ -110,6 +110,7 @@
     "./signal": "./signal.ts",
     "./sleep": "./sleep.ts",
     "./semver": "./semver.ts",
-    "./product": "./product.ts"
+    "./product": "./product.ts",
+    "./hash": "./hash.ts"
   }
 }

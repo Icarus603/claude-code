@@ -5,8 +5,8 @@ import { Ansi, Box, useTheme } from '@anthropic/ink'
 import {
   type CliHighlight,
   getCliHighlightPromise,
-} from 'src/utils/cliHighlight.js'
-import { hashContent } from 'src/utils/hash.js'
+} from '@claude-code/output/utils/cliHighlight.js'
+import { hashContent } from '@claude-code/config/hash'
 import { configureMarked, formatToken } from 'src/utils/markdown.js'
 import { stripPromptXMLTags } from 'src/utils/messages.js'
 import { MarkdownTable } from './MarkdownTable.js'

@@ -18,6 +18,9 @@
     "./render": "./src/render/index.ts",
     "./utils/intl.js": "./src/utils/intl.ts",
     "./utils/stringUtils.js": "./src/utils/stringUtils.ts",
+    "./utils/cliHighlight.js": "./src/utils/cliHighlight.ts",
+    "./utils/displayTags.js": "./src/utils/displayTags.ts",
+    "./utils/sliceAnsi.js": "./src/utils/sliceAnsi.ts",
     "./formatters/truncate.js": "./src/formatters/truncate.ts",
     "./render/exportRenderer.js": "./src/render/exportRenderer.tsx"
   }
