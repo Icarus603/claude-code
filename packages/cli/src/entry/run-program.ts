@@ -23,7 +23,7 @@ import { setInlinePlugins } from '@claude-code/app-host/bootstrap/state.js'
 import { clearPluginCache } from '@claude-code/cli/pluginLoader.js'
 import { runMigrations } from '@claude-code/app-host/main/startup/settings.js'
 import { canUserConfigureAdvisor } from '@claude-code/provider/advisor.js'
-import { ensureMdmSettingsLoaded } from 'src/utils/settings/mdm/settings.js'
+import { ensureMdmSettingsLoaded } from '@claude-code/config/settings/mdm/settings'
 import { ensureKeychainPrefetchCompleted } from '@claude-code/cli/secureStorage/keychainPrefetch.js'
 import {
   profileCheckpoint,
