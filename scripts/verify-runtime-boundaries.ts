@@ -163,7 +163,7 @@ async function verifyRootFacadesStayThin(): Promise<string[]> {
     },
     {
       path: 'src/services/mcp/client.ts',
-      exportLine: "export * from './clientRuntime.js'",
+      exportLine: "export * from '@claude-code/mcp-runtime/clientRuntime.js'",
     },
     {
       path: 'src/services/api/claudeLegacy.ts',
