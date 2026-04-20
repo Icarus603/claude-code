@@ -14,7 +14,7 @@ import { getCwd } from "@claude-code/app-host/bootstrap/cwd.js";
 import { prefetchOfficialMcpUrls } from '@claude-code/mcp-runtime/officialRegistry.js';
 import { refreshModelCapabilities } from "src/utils/model/modelCapabilities.js";
 import { settingsChangeDetector } from "@claude-code/config/changeDetector";
-import { skillChangeDetector } from "src/utils/skills/skillChangeDetector.js";
+import { skillChangeDetector } from "@claude-code/tool-registry/skills/skillChangeDetector.js";
 import { isEnvTruthy } from "@claude-code/config/env/utils";
 import { isBareMode } from "@claude-code/config/env/utils";
 

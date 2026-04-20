@@ -7,7 +7,7 @@ import {
 } from '@claude-code/command-runtime/runtime'
 import { onGrowthBookRefresh } from '@claude-code/config/feature-flags'
 import { logError } from '@claude-code/local-observability/logging'
-import { skillChangeDetector } from 'src/utils/skills/skillChangeDetector.js'
+import { skillChangeDetector } from '@claude-code/tool-registry/skills/skillChangeDetector.js'
 
 /**
  * Keep the commands list fresh across two triggers:

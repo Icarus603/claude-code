@@ -313,7 +313,7 @@ import {
 } from 'src/utils/queryProfiler.js'
 import { asSessionId } from '@claude-code/agent/idTypes'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { skillChangeDetector } from 'src/utils/skills/skillChangeDetector.js'
+import { skillChangeDetector } from '@claude-code/tool-registry/skills/skillChangeDetector.js'
 import { getCommands, clearCommandsCache } from '@claude-code/command-runtime/runtime'
 import {
   isBareMode,
