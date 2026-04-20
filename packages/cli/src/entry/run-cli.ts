@@ -9,7 +9,7 @@
 import type { RuntimeHandles } from '@claude-code/app-host'
 
 import { initializeWarningHandler } from 'src/utils/warningHandler.js'
-import { profileCheckpoint } from 'src/utils/startupProfiler.js'
+import { profileCheckpoint } from '@claude-code/app-host/startup/startupProfiler.js'
 import {
   eagerLoadSettings,
 } from '@claude-code/app-host/main/startup/settings.js'

@@ -1,4 +1,4 @@
-import { profileCheckpoint } from 'src/utils/startupProfiler.js'
+import { profileCheckpoint } from '@claude-code/app-host/startup/startupProfiler.js'
 import './bootstrap/state.js'
 import type { Attributes, MetricOptions } from '@opentelemetry/api'
 import memoize from 'lodash-es/memoize.js'

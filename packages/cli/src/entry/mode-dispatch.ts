@@ -385,7 +385,7 @@ import {
   parsePRReference,
 } from '@claude-code/swarm'
 import { isAnalyticsDisabled } from 'src/services/privacyConfig.js'
-import { profileCheckpoint } from 'src/utils/startupProfiler.js'
+import { profileCheckpoint } from '@claude-code/app-host/startup/startupProfiler.js'
 
 // Types for closure variables passed as context
 export type PendingConnect = {

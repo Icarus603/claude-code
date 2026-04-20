@@ -28,7 +28,7 @@ import { ensureKeychainPrefetchCompleted } from 'src/utils/secureStorage/keychai
 import {
   profileCheckpoint,
   profileReport,
-} from 'src/utils/startupProfiler.js'
+} from '@claude-code/app-host/startup/startupProfiler.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 import { createMainProgram } from './commander.js'
