@@ -12,7 +12,7 @@ import {
 } from 'src/utils/claudemd.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isBareMode, isEnvTruthy } from '@claude-code/config/env/utils'
-import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
+import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { getBranch, getDefaultBranch, getIsGit, gitExe } from 'src/utils/git.js'
 import { shouldIncludeGitInstructions } from '@claude-code/config/env/git-settings'
 import { logError } from '@claude-code/local-observability/logging'

@@ -68,7 +68,7 @@ import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   SDKControlRequest,
   SDKControlResponse,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 
 const ANTHROPIC_VERSION = '2023-06-01'

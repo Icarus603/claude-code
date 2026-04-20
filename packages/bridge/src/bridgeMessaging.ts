@@ -15,7 +15,7 @@ import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   SDKControlRequest,
   SDKControlResponse,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import type { SDKResultSuccess } from 'src/entrypoints/sdk/coreTypes.js'
 import { logEvent } from '@claude-code/local-observability'
 import { EMPTY_USAGE } from '@claude-code/provider/emptyUsage.js'

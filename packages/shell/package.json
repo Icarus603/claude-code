@@ -21,7 +21,8 @@
     "./process.js": "./src/process.ts",
     "./genericProcessUtils.js": "./src/genericProcessUtils.ts",
     "./sandbox.js": "./src/sandbox.ts",
-    "./powershell/parser.js": "./src/powershell/parser.ts"
+    "./powershell/parser.js": "./src/powershell/parser.ts",
+    "./execFileNoThrow.js": "./src/execFileNoThrow.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

@@ -1,4 +1,4 @@
-import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
+import type { StdoutMessage } from '@claude-code/headless-sdk/controlTypes.js'
 import { PassThrough } from 'stream'
 import { URL } from 'url'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'

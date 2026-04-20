@@ -17,7 +17,7 @@ import {
   performMCPOAuthFlow,
   revokeServerTokens,
 } from '@claude-code/mcp-runtime/auth.js'
-import { clearServerCache } from 'src/services/mcp/client.js'
+import { clearServerCache } from '@claude-code/mcp-runtime/clientRuntime.js'
 import {
   useMcpReconnect,
   useMcpToggleEnabled,

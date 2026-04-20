@@ -51,7 +51,7 @@ import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import type {
   SDKControlRequest,
   SDKControlResponse,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import { createCapacityWake, type CapacitySignal } from './capacityWake.js'
 import { FlushGate } from './flushGate.js'
 import {

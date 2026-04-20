@@ -2,7 +2,7 @@ import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/stat
 import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import { logAntError } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
+import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'
 import { logError, logMCPDebug, logMCPError } from '@claude-code/local-observability/logging'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'

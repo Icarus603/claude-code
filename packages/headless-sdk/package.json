@@ -11,6 +11,7 @@
     "./testing": "./testing/index.ts",
     "./agentSdkTypes.js": "./src/agentSdkTypes.ts",
     "./sandboxTypes.js": "./src/sandboxTypes.ts",
-    "./controlMessageCompat": "./src/controlMessageCompat.ts"
+    "./controlMessageCompat": "./src/controlMessageCompat.ts",
+    "./controlTypes.js": "./src/controlTypes.ts"
   }
 }

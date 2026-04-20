@@ -24,7 +24,7 @@ import {
 import {
   connectToServer,
   getMcpServerConnectionBatchSize,
-} from 'src/services/mcp/client.js'
+} from '@claude-code/mcp-runtime/clientRuntime.js'
 import {
   addMcpConfig,
   getAllMcpConfigs,

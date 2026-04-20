@@ -3,7 +3,7 @@ import {
   ReadResourceResultSchema,
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod/v4'
-import { ensureConnectedClient } from 'src/services/mcp/client.js'
+import { ensureConnectedClient } from '@claude-code/mcp-runtime/clientRuntime.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {

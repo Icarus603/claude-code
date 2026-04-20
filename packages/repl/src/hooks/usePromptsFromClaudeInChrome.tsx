@@ -2,7 +2,7 @@ import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs
 import { useEffect, useRef } from 'react'
 import { logError } from '@claude-code/local-observability/logging'
 import { z } from 'zod/v4'
-import { callIdeRpc } from 'src/services/mcp/client.js'
+import { callIdeRpc } from '@claude-code/mcp-runtime/clientRuntime.js'
 import type {
   ConnectedMCPServer,
   MCPServerConnection,

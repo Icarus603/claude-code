@@ -14,13 +14,13 @@ import type {
   McpServerConfigForProcessTransport,
   McpSdkServerConfig,
 } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { SDKControlMcpSetServersResponse } from 'src/entrypoints/sdk/controlTypes.js'
+import type { SDKControlMcpSetServersResponse } from '@claude-code/headless-sdk/controlTypes.js'
 import {
   areMcpConfigsEqual,
   clearServerCache,
   connectToServer,
   fetchToolsForClient,
-} from 'src/services/mcp/client.js'
+} from '@claude-code/mcp-runtime/clientRuntime.js'
 import { filterMcpServersByPolicy } from '@claude-code/mcp-runtime/config.js'
 import type {
   MCPServerConnection,
