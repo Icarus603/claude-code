@@ -12,7 +12,7 @@ import {
   getSdkBetas,
   getSessionId,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { DEFAULT_OUTPUT_STYLE_NAME } from 'src/constants/outputStyles.js'
+import { DEFAULT_OUTPUT_STYLE_NAME } from '@claude-code/config/outputStyles.js'
 import { useNotifications } from '@claude-code/repl/notifications.js'
 import {
   getTotalAPIDuration,
