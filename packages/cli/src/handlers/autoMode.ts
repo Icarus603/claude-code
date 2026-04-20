@@ -7,7 +7,7 @@ import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
   getMainLoopModel,
   parseUserSpecifiedModel,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import {
   type AutoModeRules,
   buildDefaultExternalSystemPrompt,

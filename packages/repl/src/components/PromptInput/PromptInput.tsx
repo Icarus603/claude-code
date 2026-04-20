@@ -145,7 +145,7 @@ import { logError } from '@claude-code/local-observability/logging'
 import {
   isOpus1mMergeEnabled,
   modelDisplayString,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { setAutoModeActive } from '@claude-code/permission/autoModeState.js'
 import {
   cyclePermissionMode,

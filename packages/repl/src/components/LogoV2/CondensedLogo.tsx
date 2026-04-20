@@ -12,7 +12,7 @@ import {
   getLogoDisplayData,
   truncatePath,
 } from 'src/utils/logoV2Utils.js'
-import { renderModelSetting } from 'src/utils/model/model.js'
+import { renderModelSetting } from '@claude-code/provider/model.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
 import { AnimatedClawd } from './AnimatedClawd.js'
 import { Clawd } from './Clawd.js'

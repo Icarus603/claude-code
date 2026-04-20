@@ -53,7 +53,7 @@ import { ModelPicker } from '../ModelPicker.js'
 import {
   modelDisplayString,
   isOpus1mMergeEnabled,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
 import { ClaudeMdExternalIncludesDialog } from '../ClaudeMdExternalIncludesDialog.js'
 import {

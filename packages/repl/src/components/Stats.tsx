@@ -19,7 +19,7 @@ import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getGlobalConfig } from '@claude-code/config'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import { generateHeatmap } from 'src/utils/heatmap.js'
-import { renderModelName } from 'src/utils/model/model.js'
+import { renderModelName } from '@claude-code/provider/model.js'
 import { copyAnsiToClipboard } from 'src/utils/screenshotClipboard.js'
 import {
   aggregateClaudeCodeStatsForRange,

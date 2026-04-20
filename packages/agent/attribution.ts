@@ -25,7 +25,7 @@ import {
   getMainLoopModel,
   getPublicModelDisplayName,
   getPublicModelName,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { isMemoryFileAccess } from 'src/utils/sessionFileAccessHooks.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { readTranscriptForLoad } from 'src/utils/sessionStoragePortable.js'

@@ -49,7 +49,7 @@ import { createUserMessage } from '@claude-code/agent/messages.js'
 import {
   getMainLoopModel,
   getRuntimeMainLoopModel,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import {
   createPromptRuleContent,
   isClassifierPermissionsEnabled,

@@ -12,7 +12,7 @@ import {
   createUserMessage,
   isCompactBoundaryMessage,
 } from '@claude-code/agent/messages.js'
-import { getMainLoopModel } from 'src/utils/model/model.js'
+import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getSessionMemoryPath } from '@claude-code/permission/filesystem'
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'

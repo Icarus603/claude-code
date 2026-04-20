@@ -29,7 +29,7 @@ import {
   type ModelSetting,
   modelDisplayString,
   parseUserSpecifiedModel,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { getModelOptions } from 'src/utils/model/modelOptions.js'
 import {
   getSettingsForSource,

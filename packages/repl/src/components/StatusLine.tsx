@@ -47,7 +47,7 @@ import {
   getRuntimeMainLoopModel,
   type ModelName,
   renderModelName,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {
   doesMostRecentAssistantMessageExceed200k,

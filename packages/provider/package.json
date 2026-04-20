@@ -50,6 +50,7 @@
     "./connectorTextTypes": "./src/connectorTextTypes.ts",
     "./oauthConstants": "./src/oauthConstants.ts",
     "./systemPromptSections": "./src/systemPromptSections.ts",
-    "./authAlias.js": "./src/authAlias.ts"
+    "./authAlias.js": "./src/authAlias.ts",
+    "./model.js": "./src/model.ts"
   }
 }

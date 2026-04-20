@@ -10,7 +10,7 @@ import type {
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { queryModelWithStreaming } from '@claude-code/provider/claude.js'
 import { createUserMessage } from '@claude-code/agent/messages.js'
-import { getMainLoopModel, getSmallFastModel } from 'src/utils/model/model.js'
+import { getMainLoopModel, getSmallFastModel } from '@claude-code/provider/model.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import type { SearchResult, SearchOptions, WebSearchAdapter } from './types.js'

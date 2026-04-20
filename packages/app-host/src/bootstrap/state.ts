@@ -16,7 +16,7 @@ import type { HookCallbackMatcher } from 'src/types/hooks.js'
 // (rule only checks ./ and / prefixes); explicit disable documents intent.
 // eslint-disable-next-line custom-rules/bootstrap-isolation
 import { randomUUID } from 'src/utils/crypto.js'
-import type { ModelSetting } from 'src/utils/model/model.js'
+import type { ModelSetting } from '@claude-code/provider/model.js'
 import type { ModelStrings } from 'src/utils/model/modelStrings.js'
 import { resetSettingsCache } from '@claude-code/config/settings/settingsCache'
 import type { PluginHookMatcher } from '@claude-code/config/types'

@@ -1,6 +1,6 @@
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { shouldInferenceConfigCommandBeImmediate } from '@claude-code/shell/immediateCommand.js'
-import { getMainLoopModel, renderModelName } from 'src/utils/model/model.js'
+import { getMainLoopModel, renderModelName } from '@claude-code/provider/model.js'
 
 export default {
   type: 'local-jsx',

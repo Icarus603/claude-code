@@ -41,7 +41,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { fileHistoryRestoreStateFromLog } from '@claude-code/agent/file-history'
 import { createSystemMessage } from '@claude-code/agent/messages.js'
-import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
+import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { getPlansDirectory } from 'src/utils/plans.js'
 import { setCwd } from 'src/utils/Shell.js'
 import {

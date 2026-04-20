@@ -7,7 +7,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getMainLoopModel } from 'src/utils/model/model.js'
+import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { sideQuery } from 'src/utils/sideQuery.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
