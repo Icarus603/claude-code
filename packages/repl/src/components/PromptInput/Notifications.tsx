@@ -4,7 +4,7 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   type Notification,
   useNotifications,
-} from 'src/context/notifications.js'
+} from '@claude-code/repl/notifications.js'
 import { logEvent } from '@claude-code/local-observability'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { useVoiceState } from 'src/context/voice.js'

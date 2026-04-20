@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useInterval } from 'usehooks-ts'
 import { getIsRemoteMode, getIsScrollDraining } from '@claude-code/app-host/bootstrap/state.js'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { Text } from '@anthropic/ink'
 import {
   getInitializationStatus,

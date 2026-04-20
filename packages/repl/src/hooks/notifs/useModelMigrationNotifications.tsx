@@ -1,4 +1,4 @@
-import type { Notification } from 'src/context/notifications.js'
+import type { Notification } from '@claude-code/repl/notifications.js'
 import { type GlobalConfig, getGlobalConfig } from '@claude-code/config'
 import { useStartupNotification } from './useStartupNotification.js'
 

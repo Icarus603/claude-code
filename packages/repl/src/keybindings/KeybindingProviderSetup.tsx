@@ -5,7 +5,7 @@
  * file watching, debug logging) and re-exports as KeybindingSetup.
  */
 import { useCallback } from 'react'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'

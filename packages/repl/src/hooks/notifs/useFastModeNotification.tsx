@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import {
   type CooldownReason,

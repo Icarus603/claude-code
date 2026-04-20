@@ -7,7 +7,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import type { useNotifications } from 'src/context/notifications.js'
+import type { useNotifications } from '@claude-code/repl/notifications.js'
 import { Text } from '@anthropic/ink'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPluginById } from '@claude-code/config/plugin/marketplaceManager'

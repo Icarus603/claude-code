@@ -16,7 +16,7 @@ import {
   hasShownLspRecommendationThisSession,
   setLspRecommendationShownThisSession,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { useNotifications } from 'src/context/notifications.js'
+import { useNotifications } from '@claude-code/repl/notifications.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
