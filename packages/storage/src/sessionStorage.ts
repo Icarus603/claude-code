@@ -74,7 +74,7 @@ import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { getWorktreePaths } from 'src/utils/getWorktreePaths.js'
+import { getWorktreePaths } from '@claude-code/storage/getWorktreePaths.js'
 import { getBranch } from '@claude-code/storage/git.js'
 import { gracefulShutdownSync, isShuttingDown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { parseJSONL } from '@claude-code/storage/json.js'
