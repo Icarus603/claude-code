@@ -20,7 +20,7 @@ import {
   getSubscriptionType,
 } from 'src/utils/auth.js'
 import { loadInstalledPluginsV2 } from 'src/utils/plugins/installedPluginsManager.js'
-import { getSettingsForSource } from 'src/utils/settings/settings.js'
+import { getSettingsForSource } from '@claude-code/config/settings'
 
 export function ChannelsNotice(): React.ReactNode {
   // Snapshot all reads at mount. This notice enters scrollback immediately

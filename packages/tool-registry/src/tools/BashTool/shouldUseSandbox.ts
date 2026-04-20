@@ -1,7 +1,7 @@
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { splitCommand_DEPRECATED } from 'src/utils/bash/commands.js'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
-import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
+import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import {
   BINARY_HIJACK_VARS,
   bashPermissionRule,

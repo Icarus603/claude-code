@@ -1,5 +1,5 @@
 import type { PermissionRule } from '@claude-code/permission/PermissionRule'
-import { getSettingsForSource } from 'src/utils/settings/settings.js'
+import { getSettingsForSource } from '@claude-code/config/settings'
 import type { SettingsJson } from 'src/utils/settings/types.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { SAFE_ENV_VARS } from '@claude-code/config/env/managed-constants'

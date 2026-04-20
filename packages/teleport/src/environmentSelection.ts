@@ -2,7 +2,7 @@ import { SETTING_SOURCES, type SettingSource } from 'src/utils/settings/constant
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { type EnvironmentResource, fetchEnvironments } from './environments.js'
 
 export type EnvironmentSelectionInfo = {

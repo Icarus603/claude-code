@@ -89,7 +89,7 @@ import {
   readTranscriptForLoad,
   SKIP_PRECOMPACT_THRESHOLD,
 } from 'src/utils/sessionStoragePortable.js'
-import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
+import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'
 import { validateUuid } from 'src/utils/uuid.js'

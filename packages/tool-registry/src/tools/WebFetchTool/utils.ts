@@ -12,7 +12,7 @@ import {
   isBinaryContentType,
   persistBinaryContent,
 } from '@claude-code/mcp-runtime/mcpOutputStorage.js'
-import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
+import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { isPreapprovedHost } from './preapproved.js'
 import { makeSecondaryModelPrompt } from './prompt.js'

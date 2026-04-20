@@ -7,7 +7,7 @@ import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTo
 import { WEB_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebSearchTool/prompt.js'
 import { isUsing3PServices } from 'src/utils/auth.js'
 import { hasEmbeddedSearchTools } from 'src/utils/embeddedTools.js'
-import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
+import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type {
   AgentDefinition,

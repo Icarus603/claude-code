@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { TEARDROP_ASTERISK } from 'src/constants/figures.js'
 import { Box, Text, useAnimationFrame } from '@anthropic/ink'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import { hueToRgb, toRGBColor } from '../Spinner/utils.js'
 
 const SWEEP_DURATION_MS = 1500

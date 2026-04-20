@@ -29,7 +29,7 @@ import {
 import { isMemoryFileAccess } from 'src/utils/sessionFileAccessHooks.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { readTranscriptForLoad } from 'src/utils/sessionStoragePortable.js'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import { isUndercover } from 'src/utils/undercover.js'
 import { readEnv } from '@claude-code/config/env'
 

@@ -18,7 +18,7 @@ import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { gte, lt } from '@claude-code/config/semver'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import {
   filterClaudeAliases,
   getShellConfigPaths,

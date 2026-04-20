@@ -24,7 +24,7 @@ import {
 } from 'src/utils/localInstaller.js'
 import { removeInstalledSymlink } from 'src/utils/nativeInstaller/index.js'
 import { gt, gte } from '@claude-code/config/semver'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 
 type Props = {
   isUpdating: boolean

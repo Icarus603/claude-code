@@ -27,7 +27,7 @@ import {
 import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from 'src/utils/path.js'
 import { ripGrep } from 'src/utils/ripgrep.js'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 import { createSignal } from '@claude-code/config/signal'
 
 // Lazily constructed singleton

@@ -25,7 +25,7 @@ import {
 import { getPackageManager } from 'src/utils/nativeInstaller/packageManagers.js'
 import { writeToStdout } from 'src/utils/process.js'
 import { gte } from '@claude-code/config/semver'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 
 export async function update() {
   logEvent('tengu_update_check', {})

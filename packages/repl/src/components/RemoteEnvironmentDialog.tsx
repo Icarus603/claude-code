@@ -10,7 +10,7 @@ import {
   getSettingSourceName,
   type SettingSource,
 } from 'src/utils/settings/constants.js'
-import { updateSettingsForSource } from 'src/utils/settings/settings.js'
+import { updateSettingsForSource } from '@claude-code/config/settings'
 import { getEnvironmentSelectionInfo } from '@claude-code/teleport/environmentSelection.js'
 import type { EnvironmentResource } from '@claude-code/teleport/environments.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'

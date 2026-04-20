@@ -11,7 +11,7 @@ import { isSettingSourceEnabled } from 'src/utils/settings/constants.js'
 import {
   getSettings_DEPRECATED,
   hasSkipDangerousModePermissionPrompt,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getEnterpriseMcpFilePath, getMcpConfigByName } from './config.js'
 import { mcpInfoFromString } from '@claude-code/mcp-runtime/mcpStringUtils.js'

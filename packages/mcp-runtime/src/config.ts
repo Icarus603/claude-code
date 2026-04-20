@@ -27,7 +27,7 @@ import { isRestrictedToPluginOnly } from 'src/utils/settings/pluginOnlyPolicy.js
 import {
   getInitialSettings,
   getSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import {
   isMcpServerCommandEntry,
   isMcpServerNameEntry,

@@ -1,7 +1,7 @@
 import React from 'react'
 import { logEvent } from '@claude-code/local-observability'
 import { Box, Dialog, Link, Text } from '@anthropic/ink'
-import { updateSettingsForSource } from 'src/utils/settings/settings.js'
+import { updateSettingsForSource } from '@claude-code/config/settings'
 import { Select } from './CustomSelect/index.js'
 
 // NOTE: This copy is legally reviewed — do not modify without Legal team approval.

@@ -30,7 +30,7 @@ import { cacheAndRegisterPlugin } from 'src/utils/plugins/pluginInstallationHelp
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import {
   installPluginAndNotify,
   usePluginRecommendationBase,

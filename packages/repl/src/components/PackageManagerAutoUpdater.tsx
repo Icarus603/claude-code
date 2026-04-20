@@ -15,7 +15,7 @@ import {
   type PackageManager,
 } from 'src/utils/nativeInstaller/packageManagers.js'
 import { gt, gte } from '@claude-code/config/semver'
-import { getInitialSettings } from 'src/utils/settings/settings.js'
+import { getInitialSettings } from '@claude-code/config/settings'
 
 type Props = {
   isUpdating: boolean

@@ -8,7 +8,7 @@ import {
   getAutoModeUnavailableNotification,
   getAutoModeUnavailableReason,
 } from '@claude-code/permission/permissionSetup'
-import { hasAutoModeOptIn } from 'src/utils/settings/settings.js'
+import { hasAutoModeOptIn } from '@claude-code/config/settings'
 
 /**
  * Shows a one-shot notification when the shift-tab carousel wraps past where

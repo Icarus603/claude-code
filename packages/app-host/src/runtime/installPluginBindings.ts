@@ -87,7 +87,7 @@ import { which } from '@claude-code/shell/which.js'
 import {
   getSettingsForSource,
   getSettings_DEPRECATED,
-} from 'src/utils/settings/settings.js'
+} from '@claude-code/config/settings'
 import { isSettingSourceEnabled } from 'src/utils/settings/constants.js'
 import {
   buildPluginTelemetryFields,

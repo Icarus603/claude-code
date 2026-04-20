@@ -155,7 +155,7 @@ import { transitionPermissionMode } from '@claude-code/permission/permissionSetu
 import { getPlatform } from 'src/utils/platform.js'
 import type { ProcessUserInputContext } from 'src/utils/processUserInput/processUserInput.js'
 import { editPromptInEditor } from 'src/utils/promptEditor.js'
-import { hasAutoModeOptIn } from 'src/utils/settings/settings.js'
+import { hasAutoModeOptIn } from '@claude-code/config/settings'
 import { findBtwTriggerPositions } from 'src/utils/sideQuestion.js'
 import { findSlashCommandPositions } from 'src/utils/suggestions/commandSuggestions.js'
 import {
