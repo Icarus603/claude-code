@@ -355,7 +355,7 @@ import {
 import { asSessionId } from '@claude-code/agent/idTypes'
 import { filterAllowedSdkBetas } from '@claude-code/provider/betas.js'
 import { isInBundledMode, isRunningWithBun } from '@claude-code/config/bundledMode'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import {
   filterExistingPaths,
   getKnownPathsForRepo,
