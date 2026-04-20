@@ -10,7 +10,7 @@ import { stat } from 'fs/promises'
 
 import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { getErrnoCode } from 'src/utils/errors.js'
 import { IMAGE_EXTENSION_REGEX } from 'src/utils/imagePaste.js'

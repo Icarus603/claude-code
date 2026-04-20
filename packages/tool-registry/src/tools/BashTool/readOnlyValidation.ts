@@ -5,7 +5,7 @@ import {
   splitCommand_DEPRECATED,
 } from 'src/utils/bash/commands.js'
 import { tryParseShellCommand } from 'src/utils/bash/shellQuote.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isCurrentDirectoryBareGitRepo } from 'src/utils/git.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { getPlatform } from 'src/utils/platform.js'

@@ -7,7 +7,7 @@ import {
 } from 'src/constants/outputStyles.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
 import type { OutputStyle } from '@claude-code/config'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import type { OptionWithDescription } from './CustomSelect/select.js'
 import { Select } from './CustomSelect/select.js'
 

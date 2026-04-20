@@ -15,7 +15,7 @@ import { createCommandInputMessage } from 'src/utils/messages.js';
 import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js';
 import { updateTaskState } from 'src/utils/task/framework.js';
 import { archiveRemoteSession } from 'src/utils/teleport.js';
-import { getCwd } from 'src/utils/cwd.js';
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js';
 import { toRelativePath } from 'src/utils/path.js';
 import type { UUID } from 'src/utils/uuid.js';
 import type { FileStateCache } from 'src/utils/fileStateCache.js';

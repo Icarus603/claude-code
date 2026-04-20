@@ -6,7 +6,7 @@ import type { LocalJSXCommandContext } from 'src/commands.js'
 import { useIsInsideModal } from 'src/context/modalContext.js'
 import { Box, Text, useTheme } from '@anthropic/ink'
 import { type AppState, useAppState } from '@claude-code/repl/appStateHooks.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {
   buildAccountProperties,

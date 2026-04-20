@@ -16,7 +16,7 @@ import {
 } from '@claude-code/local-observability'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { type FilesApiConfig, uploadFile } from '@claude-code/provider/filesApi.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
 import { findGitRoot, gitExe } from 'src/utils/git.js'

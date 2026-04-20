@@ -4,7 +4,7 @@ import { useDiffInIDE } from '@claude-code/ide/hooks/useDiffInIDE.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { getLanguageName } from 'src/utils/cliHighlight.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
   getFsImplementation,
   safeResolvePath,

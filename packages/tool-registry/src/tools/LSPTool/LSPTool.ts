@@ -21,7 +21,7 @@ import {
 import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { uniq } from 'src/utils/array.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isENOENT, toError } from 'src/utils/errors.js'
 import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'

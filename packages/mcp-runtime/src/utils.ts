@@ -5,7 +5,7 @@ import type { Command } from 'src/commands.js'
 import type { AgentMcpServerInfo } from '@claude-code/repl/components/mcp/types.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getGlobalClaudeFile } from 'src/utils/env.js'
 import { isSettingSourceEnabled } from 'src/utils/settings/constants.js'
 import {

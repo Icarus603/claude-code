@@ -27,7 +27,7 @@ import {
   useSetAppState,
 } from '@claude-code/repl/appStateHooks.js'
 import type { Message } from 'src/types/message.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage } from 'src/utils/errors.js'
 import { enqueue } from 'src/utils/messageQueueManager.js'

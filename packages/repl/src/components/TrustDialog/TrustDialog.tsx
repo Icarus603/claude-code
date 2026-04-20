@@ -12,7 +12,7 @@ import {
   checkHasTrustDialogAccepted,
   saveCurrentProjectConfig,
 } from '@claude-code/config'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js'
 import { Select } from '../CustomSelect/index.js'
