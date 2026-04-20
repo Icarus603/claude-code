@@ -23,7 +23,7 @@ import {
   removeInstalledSymlink,
 } from 'src/utils/nativeInstaller/index.js'
 import { getPackageManager } from 'src/utils/nativeInstaller/packageManagers.js'
-import { writeToStdout } from 'src/utils/process.js'
+import { writeToStdout } from '@claude-code/shell/process.js'
 import { gte } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 

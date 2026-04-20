@@ -37,7 +37,7 @@ import {
   getFileModificationTimeAsync,
   suggestPathUnderCwd,
 } from 'src/utils/file.js'
-import { logFileOperation } from 'src/utils/fileOperationAnalytics.js'
+import { logFileOperation } from '@claude-code/local-observability/fileOperationAnalytics'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import {
@@ -71,7 +71,7 @@ import {
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { readFileInRange } from 'src/utils/readFileInRange.js'
-import { semanticNumber } from 'src/utils/semanticNumber.js'
+import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { getDefaultFileReadingLimits } from './limits.js'

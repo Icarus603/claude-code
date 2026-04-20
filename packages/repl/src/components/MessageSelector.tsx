@@ -26,7 +26,7 @@ import type {
   PartialCompactDirection,
   UserMessage,
 } from '@claude-code/agent/messageShapes'
-import { stripDisplayTags } from 'src/utils/displayTags.js'
+import { stripDisplayTags } from '@claude-code/output/utils/displayTags.js'
 import {
   createUserMessage,
   extractTag,

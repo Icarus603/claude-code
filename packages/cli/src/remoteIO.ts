@@ -11,7 +11,7 @@ import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { writeToStdout } from 'src/utils/process.js'
+import { writeToStdout } from '@claude-code/shell/process.js'
 import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
 import {
   setSessionMetadataChangedListener,

@@ -17,7 +17,8 @@
     "./immediateCommand.js": "./src/immediateCommand.ts",
     "./execSyncWrapper.js": "./src/execSyncWrapper.ts",
     "./shellConfig.js": "./src/shellConfig.ts",
-    "./which.js": "./src/which.ts"
+    "./which.js": "./src/which.ts",
+    "./process.js": "./src/process.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

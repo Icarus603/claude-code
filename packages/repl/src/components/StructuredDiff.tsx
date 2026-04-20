@@ -4,7 +4,7 @@ import { memo } from 'react'
 import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { Box, NoSelect, RawAnsi, useTheme } from '@anthropic/ink'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
-import sliceAnsi from 'src/utils/sliceAnsi.js'
+import sliceAnsi from '@claude-code/output/utils/sliceAnsi.js'
 import { expectColorDiff } from './StructuredDiff/colorDiff.js'
 import { StructuredDiffFallback } from './StructuredDiff/Fallback.js'
 

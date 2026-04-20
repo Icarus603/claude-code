@@ -24,7 +24,7 @@ import { AskUserQuestionTool } from '@claude-code/tool-registry/tools/AskUserQue
 import {
   type CliHighlight,
   getCliHighlightPromise,
-} from 'src/utils/cliHighlight.js'
+} from '@claude-code/output/utils/cliHighlight.js'
 import type { PastedContent } from '@claude-code/config'
 import type { ImageDimensions } from 'src/utils/imageResizer.js'
 import { maybeResizeAndDownsampleImageBlock } from 'src/utils/imageResizer.js'

@@ -3,7 +3,7 @@ import React from 'react'
 import stripAnsi from 'strip-ansi'
 import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, stringWidth, useTheme, wrapAnsi } from '@anthropic/ink'
-import type { CliHighlight } from 'src/utils/cliHighlight.js'
+import type { CliHighlight } from '@claude-code/output/utils/cliHighlight.js'
 import { formatToken, padAligned } from 'src/utils/markdown.js'
 
 /** Accounts for parent indentation (e.g. message dot prefix) and terminal

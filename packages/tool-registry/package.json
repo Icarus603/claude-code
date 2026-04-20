@@ -63,6 +63,7 @@
     "./utils/array.js": "./src/utils/array.ts",
     "./utils/inkColor.js": "./src/utils/inkColor.ts",
     "./toolLimits": "./src/toolLimits.ts",
-    "./toolConstants": "./src/toolConstants.ts"
+    "./toolConstants": "./src/toolConstants.ts",
+    "./utils/semanticNumber.js": "./src/utils/semanticNumber.ts"
   }
 }
