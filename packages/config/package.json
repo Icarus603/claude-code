@@ -118,6 +118,7 @@
     "./generators": "./generators.ts",
     "./platform": "./platform.ts",
     "./embeddedTools.js": "./embeddedTools.ts",
-    "./commonConstants.js": "./commonConstants.ts"
+    "./commonConstants.js": "./commonConstants.ts",
+    "./configConstants.js": "./configConstants.ts"
   }
 }
