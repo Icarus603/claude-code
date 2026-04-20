@@ -21,7 +21,7 @@ import { safeParseJSON } from 'src/utils/json.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPluginMcpServers } from 'src/utils/plugins/mcpPluginIntegration.js'
 import { loadAllPluginsCacheOnly } from 'src/utils/plugins/pluginLoader.js'
-import { isSettingSourceEnabled } from 'src/utils/settings/constants.js'
+import { isSettingSourceEnabled } from '@claude-code/config/constants'
 import { getManagedFilePath } from 'src/utils/settings/managedPath.js'
 import { isRestrictedToPluginOnly } from 'src/utils/settings/pluginOnlyPolicy.js'
 import {

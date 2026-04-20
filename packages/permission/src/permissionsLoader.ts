@@ -6,7 +6,7 @@ import {
   type EditableSettingSource,
   getEnabledSettingSources,
   type SettingSource,
-} from 'src/utils/settings/constants.js'
+} from '@claude-code/config/constants'
 import {
   getSettingsFilePathForSource,
   getSettingsForSource,

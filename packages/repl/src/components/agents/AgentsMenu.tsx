@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
-import type { SettingSource } from 'src/utils/settings/constants.js'
+import type { SettingSource } from '@claude-code/config/constants'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useMergedTools } from '@claude-code/repl/hooks/useMergedTools.js'

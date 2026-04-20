@@ -8,7 +8,7 @@ import { formatTokens } from '@claude-code/output/formatters'
 import {
   getSourceDisplayName,
   type SettingSource,
-} from 'src/utils/settings/constants.js'
+} from '@claude-code/config/constants'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { ContextSuggestions } from './ContextSuggestions.js'
 

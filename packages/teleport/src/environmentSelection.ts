@@ -1,4 +1,4 @@
-import { SETTING_SOURCES, type SettingSource } from 'src/utils/settings/constants.js'
+import { SETTING_SOURCES, type SettingSource } from '@claude-code/config/constants'
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,

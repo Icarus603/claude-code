@@ -1,4 +1,4 @@
-import type { SettingSource } from 'src/utils/settings/constants.js'
+import type { SettingSource } from '@claude-code/config/constants'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 
 export const AGENT_PATHS = {
