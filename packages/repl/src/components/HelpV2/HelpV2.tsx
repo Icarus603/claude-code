@@ -7,7 +7,7 @@ import {
   type CommandResultDisplay,
   INTERNAL_ONLY_COMMANDS,
 } from '@claude-code/command-runtime/runtime'
-import { useIsInsideModal } from 'src/context/modalContext.js'
+import { useIsInsideModal } from '@claude-code/repl/modalContext.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Link, Text, Tab, Tabs, Pane } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'

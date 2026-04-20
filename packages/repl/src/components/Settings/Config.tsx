@@ -71,7 +71,7 @@ import {
 } from '@claude-code/storage/claudemd.js'
 import { Byline, KeyboardShortcutHint, useTabHeaderFocus } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
-import { useIsInsideModal } from 'src/context/modalContext.js'
+import { useIsInsideModal } from '@claude-code/repl/modalContext.js'
 import { SearchBox } from '@anthropic/ink'
 import {
   isSupportedTerminal,
