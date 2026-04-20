@@ -9,7 +9,7 @@ import {
   writeTeamFileAsync,
 } from '@claude-code/swarm'
 import { ensureTeamFile } from '../spawnMultiAgent.js'
-import type { AppState } from 'src/state/AppState.js'
+import type { AppState } from '../../../appStateTypes.js'
 
 // The swarm runtime uses late-bound export-lets. installSwarmAppRuntime() is
 // strict — it throws if any expected key is missing — so we stub every key
