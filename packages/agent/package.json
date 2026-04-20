@@ -40,7 +40,9 @@
     "./querySource": "./querySource.ts",
     "./agentIdUtils": "./agentIdUtils.ts",
     "./tokenBudget": "./tokenBudget.ts",
-    "./agentSwarmsEnabled.js": "./agentSwarmsEnabled.ts"
+    "./agentSwarmsEnabled.js": "./agentSwarmsEnabled.ts",
+    "./types/compaction.js": "./types/compaction.ts",
+    "./types/messages.js": "./types/messages.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

@@ -13,7 +13,7 @@ export type {
   PostCompactCleanupActions,
   ToolNameConstants,
   SessionMemoryCompactConfig,
-} from 'src/services/types/compaction.js'
+} from '@claude-code/agent/types/compaction.js'
 
 export type {
   CompactionDeps,

@@ -2,7 +2,7 @@
  *
  */
 
-import type { CachedMCConfig } from 'src/services/types/compaction.js'
+import type { CachedMCConfig } from '@claude-code/agent/types/compaction.js'
 
 
 export interface CachedMCConfigDeps {
