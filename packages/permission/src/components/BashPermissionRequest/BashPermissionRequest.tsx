@@ -27,7 +27,7 @@ import {
 } from '@claude-code/permission/bashClassifier.js'
 import { extractRules } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { ShimmerChar } from '@claude-code/repl/components/Spinner/ShimmerChar.js'
 import { useShimmerAnimation } from '@claude-code/repl/components/Spinner/useShimmerAnimation.js'

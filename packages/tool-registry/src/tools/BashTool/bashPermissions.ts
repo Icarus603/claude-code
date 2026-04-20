@@ -64,7 +64,7 @@ import {
   suggestionForPrefix as sharedSuggestionForPrefix,
 } from '@claude-code/permission/shellRuleMatching.js'
 import { getPlatform } from '@claude-code/config/platform'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { windowsPathToPosixPath } from 'src/utils/windowsPaths.js'
 import { BashTool } from './BashTool.js'

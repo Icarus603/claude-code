@@ -16,7 +16,7 @@ import {
   hasRules,
 } from '@claude-code/permission/PermissionUpdate'
 import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import type { ToolUseConfirm } from './PermissionRequest.js'
 import { useSetAppState } from '../appStateHooks.js'
 import { env } from '@claude-code/config/env/paths'

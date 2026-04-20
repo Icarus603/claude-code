@@ -9,7 +9,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isCurrentDirectoryBareGitRepo } from 'src/utils/git.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { getPlatform } from '@claude-code/config/platform'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import {
   containsVulnerableUncPath,
   DOCKER_READ_ONLY_COMMANDS,

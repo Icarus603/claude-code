@@ -63,7 +63,7 @@ const ChannelsNoticeModule =
     ? (require('./ChannelsNotice.js') as typeof import('./ChannelsNotice.js'))
     : null
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import {
   useShowGuestPassesUpsell,
   incrementGuestPassesSeenCount,

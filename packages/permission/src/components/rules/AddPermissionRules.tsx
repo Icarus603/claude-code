@@ -17,7 +17,7 @@ import {
   detectUnreachableRules,
   type UnreachableRule,
 } from '@claude-code/permission/shadowedRuleDetection.js'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import {
   type EditableSettingSource,
   SOURCES,

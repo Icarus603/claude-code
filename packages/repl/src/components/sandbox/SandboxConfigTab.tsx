@@ -3,7 +3,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   SandboxManager,
   shouldAllowManagedSandboxDomainsOnly,
-} from 'src/utils/sandbox/sandbox-adapter.js'
+} from '@claude-code/shell/sandbox.js'
 
 export function SandboxConfigTab(): React.ReactNode {
   const isEnabled = SandboxManager.isSandboxingEnabled()

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 
 export function SandboxDoctorSection(): React.ReactNode {
   if (!SandboxManager.isSupportedPlatform()) {
