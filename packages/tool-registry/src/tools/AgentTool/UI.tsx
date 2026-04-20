@@ -39,7 +39,7 @@ import {
   getMainLoopModel,
   parseUserSpecifiedModel,
   renderModelName,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import type { Theme, ThemeName } from '@anthropic/ink'
 import type {
   outputSchema,

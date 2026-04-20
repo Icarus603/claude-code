@@ -24,7 +24,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
-import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
+import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { isTmuxAvailable } from '@claude-code/swarm'
 import {

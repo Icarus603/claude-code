@@ -21,7 +21,7 @@ import {
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { getUserContext, getSystemContext } from '@claude-code/provider/context.js'
 import { getUserAgent } from 'src/utils/http.js'
-import { getSmallFastModel } from 'src/utils/model/model.js'
+import { getSmallFastModel } from '@claude-code/provider/model.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,

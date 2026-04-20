@@ -13,7 +13,7 @@ import {
   getOpusDefaultEffortConfig,
   toPersistableEffort,
 } from 'src/utils/effort.js'
-import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
+import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 import type { OptionWithDescription } from './CustomSelect/select.js'
 import { Select } from './CustomSelect/select.js'

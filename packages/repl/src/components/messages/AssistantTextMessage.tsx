@@ -25,7 +25,7 @@ import { getUpgradeMessage } from 'src/utils/model/contextWindowUpgradeCheck.js'
 import {
   getDefaultSonnetModel,
   renderModelName,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { isMacOsKeychainLocked } from 'src/utils/secureStorage/macOsKeychainStorage.js'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'
 import { InterruptedByUser } from '../InterruptedByUser.js'

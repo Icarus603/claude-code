@@ -52,7 +52,7 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { isAutoMemFile } from '@claude-code/memory/memoryFileDetection'
 import { createUserMessage } from '@claude-code/agent/messages.js'
-import { getCanonicalName, getMainLoopModel } from 'src/utils/model/model.js'
+import { getCanonicalName, getMainLoopModel } from '@claude-code/provider/model.js'
 import {
   mapNotebookCellsToToolResult,
   readNotebook,

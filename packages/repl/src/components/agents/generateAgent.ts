@@ -8,7 +8,7 @@ import {
   createUserMessage,
   normalizeMessagesForAPI,
 } from '@claude-code/agent/messages.js'
-import type { ModelName } from 'src/utils/model/model.js'
+import type { ModelName } from '@claude-code/provider/model.js'
 import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

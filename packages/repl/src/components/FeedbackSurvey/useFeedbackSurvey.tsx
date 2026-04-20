@@ -10,7 +10,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getLastAssistantMessage } from '@claude-code/agent/messages.js'
-import { getMainLoopModel } from 'src/utils/model/model.js'
+import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import {

@@ -6,7 +6,7 @@ import {
   createUserMessage,
   getAssistantMessageText,
 } from '@claude-code/agent/messages.js'
-import { getSmallFastModel } from 'src/utils/model/model.js'
+import { getSmallFastModel } from '@claude-code/provider/model.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'
 import { getSessionMemoryContent } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'

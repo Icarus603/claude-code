@@ -11,7 +11,7 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   getDefaultMainLoopModel,
   parseUserSpecifiedModel,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getResolvedTeammateMode } from '@claude-code/swarm'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'

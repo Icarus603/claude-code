@@ -54,7 +54,7 @@ import {
   type MarkdownFile,
   parseSlashCommandToolsFromFrontmatter,
 } from 'src/utils/markdownConfigLoader.js'
-import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
+import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { executeShellCommandsInPrompt } from 'src/utils/promptShellExecution.js'
 import type { SettingSource } from '@claude-code/config/constants'
 import { isSettingSourceEnabled } from '@claude-code/config/constants'

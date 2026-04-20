@@ -26,7 +26,7 @@ import {
   getDefaultMainLoopModelSetting,
   isOpus1mMergeEnabled,
   renderDefaultModelSetting,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { isModelAllowed } from 'src/utils/model/modelAllowlist.js'
 import { validateModel } from 'src/utils/model/validateModel.js'
 
