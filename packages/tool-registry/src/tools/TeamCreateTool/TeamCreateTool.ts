@@ -12,7 +12,7 @@ import {
   getDefaultMainLoopModel,
   parseUserSpecifiedModel,
 } from 'src/utils/model/model.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getResolvedTeammateMode } from '@claude-code/swarm'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import type { TeamFile } from '@claude-code/swarm'

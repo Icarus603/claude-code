@@ -10,7 +10,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage } from 'src/utils/errors.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { getSecureStorage } from 'src/utils/secureStorage/index.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 /**
  * Trusted device token source for bridge (remote-control) sessions.

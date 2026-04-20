@@ -16,7 +16,7 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { parseCellId } from 'src/utils/notebook.js'
 import { checkWritePermissionForTool } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { NOTEBOOK_EDIT_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
 import {

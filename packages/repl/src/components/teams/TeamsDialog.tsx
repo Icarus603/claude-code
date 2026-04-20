@@ -25,7 +25,7 @@ import {
   permissionModeFromString,
   permissionModeSymbol,
 } from '@claude-code/permission/PermissionMode'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {
   IT2_COMMAND,
   isInsideTmuxSync,

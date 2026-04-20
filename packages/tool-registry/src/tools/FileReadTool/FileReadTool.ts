@@ -72,7 +72,7 @@ import type { PermissionDecision } from '@claude-code/permission/PermissionResul
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { readFileInRange } from 'src/utils/readFileInRange.js'
 import { semanticNumber } from 'src/utils/semanticNumber.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
 import { getDefaultFileReadingLimits } from './limits.js'
 import {

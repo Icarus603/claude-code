@@ -26,7 +26,7 @@ import { logMCPDebug } from 'src/utils/log.js'
 import { getPlatform } from 'src/utils/platform.js'
 import { getSecureStorage } from 'src/utils/secureStorage/index.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { buildRedirectUri, findAvailablePort } from '@claude-code/mcp-runtime/oauthPort.js'
 
 export function isXaaEnabled(): boolean {

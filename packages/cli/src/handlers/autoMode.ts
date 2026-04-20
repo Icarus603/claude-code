@@ -15,7 +15,7 @@ import {
 } from '@claude-code/permission/yoloClassifier.js'
 import { getAutoModeConfig } from 'src/utils/settings/settings.js'
 import { sideQuery } from 'src/utils/sideQuery.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 function writeRules(rules: AutoModeRules): void {
   process.stdout.write(jsonStringify(rules, null, 2) + '\n')

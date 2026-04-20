@@ -21,7 +21,7 @@ import {
   getSmallFastModel,
   normalizeModelStringForAPI,
 } from 'src/utils/model/model.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { isToolReferenceBlock } from 'src/utils/toolSearch.js'
 import { getAPIMetadata, getExtraBodyParams } from '@claude-code/provider/claude.js'
 import { getAnthropicClient } from '@claude-code/provider'

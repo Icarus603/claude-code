@@ -35,7 +35,7 @@ import {
   loadAllSubagentTranscriptsFromDisk,
   MAX_TRANSCRIPT_READ_BYTES,
 } from '@claude-code/storage/sessionStorage.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'

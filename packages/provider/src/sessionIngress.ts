@@ -9,7 +9,7 @@ import { logError } from 'src/utils/log.js'
 import { sequential } from 'src/utils/sequential.js'
 import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
 import { sleep } from 'src/utils/sleep.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getOAuthHeaders } from '@claude-code/teleport/api.js'
 import { readEnv } from '@claude-code/config/env'
 

@@ -5,7 +5,7 @@ import { TEAMMATE_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { Ansi, Box, Text, type TextProps } from '@anthropic/ink'
 import { toInkColor } from 'src/utils/ink.js'
 
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { isShutdownApproved } from '@claude-code/swarm'
 import { MessageResponse } from '../MessageResponse.js'
 import { tryRenderPlanApprovalMessage } from './PlanApprovalMessage.js'

@@ -55,7 +55,7 @@ import {
   validateManifest,
   validatePluginContents,
 } from 'src/utils/plugins/validatePlugin.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { plural } from 'src/utils/stringUtils.js'
 import { cliError, cliOk } from '../exit.js'
 

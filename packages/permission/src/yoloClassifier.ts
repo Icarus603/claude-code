@@ -31,7 +31,7 @@ import { resolveAntModel } from 'src/utils/model/antModels.js'
 import { getMainLoopModel } from 'src/utils/model/model.js'
 import { getAutoModeConfig } from 'src/utils/settings/settings.js'
 import { sideQuery } from 'src/utils/sideQuery.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { tokenCountWithEstimation } from 'src/utils/tokens.js'
 import {
   getBashPromptAllowDescriptions,

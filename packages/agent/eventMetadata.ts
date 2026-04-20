@@ -3,7 +3,7 @@ export type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED = never
 
 import { extname } from 'path'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { readEnv } from '@claude-code/config/env'
 
 export function sanitizeToolNameForAnalytics(

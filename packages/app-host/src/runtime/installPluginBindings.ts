@@ -82,7 +82,7 @@ import { getFsImplementation, safeResolvePath } from 'src/utils/fsOperations.js'
 import { gitExe } from 'src/utils/git.js'
 import { getHeadForDir } from 'src/utils/git/gitFilesystem.js'
 import { logError } from 'src/utils/log.js'
-import { clone, jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { clone, jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { which } from 'src/utils/which.js'
 import {
   getSettingsForSource,

@@ -44,7 +44,7 @@ import {
   WindowsToWSLConverter,
 } from './idePathConversion.js'
 import { sleep } from 'src/utils/sleep.js'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 
 function isProcessRunning(pid: number): boolean {
   try {

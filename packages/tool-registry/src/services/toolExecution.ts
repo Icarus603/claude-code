@@ -86,7 +86,7 @@ import {
   startSessionActivity,
   stopSessionActivity,
 } from '@claude-code/storage/sessionActivity.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { Stream } from 'src/utils/stream.js'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import {

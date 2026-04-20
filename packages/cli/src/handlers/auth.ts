@@ -37,7 +37,7 @@ import { errorMessage } from 'src/utils/errors.js'
 import { logError } from 'src/utils/log.js'
 import { getAPIProvider } from 'src/utils/model/providers.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {
   buildAccountProperties,
   buildAPIProviderProperties,

@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto'
 import type { SDKControlPermissionRequest } from 'src/entrypoints/sdk/controlTypes.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import type { AssistantMessage } from 'src/types/message.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 /**
  * Create a synthetic AssistantMessage for remote permission requests.

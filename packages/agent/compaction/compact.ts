@@ -80,7 +80,7 @@ import {
   reAppendSessionMetadata,
 } from '@claude-code/storage/sessionStorage.js'
 import { sleep } from 'src/utils/sleep.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { asSystemPrompt } from 'src/utils/systemPromptType.js'
 import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'

@@ -32,7 +32,7 @@ import { logError } from 'src/utils/log.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import { sanitizePath } from 'src/utils/path.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 let installed = false
 

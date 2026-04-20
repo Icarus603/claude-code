@@ -17,7 +17,7 @@ import {
   EMPTY_LOOKUPS,
   normalizeMessages,
 } from 'src/utils/messages.js'
-import { jsonParse } from 'src/utils/slowOperations.js'
+import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { Message } from '../Message.js'
 
 const EMPTY_SET = new Set<string>()

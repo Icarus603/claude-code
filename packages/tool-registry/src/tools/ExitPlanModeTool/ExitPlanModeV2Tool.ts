@@ -30,7 +30,7 @@ import {
   getPlanFilePath,
   persistFileSnapshotIfRemote,
 } from 'src/utils/plans.js'
-import { jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {
   getAgentName,
   getTeamName,

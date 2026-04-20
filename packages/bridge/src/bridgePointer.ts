@@ -9,7 +9,7 @@ import {
   getProjectsDir,
   sanitizePath,
 } from 'src/utils/sessionStoragePortable.js'
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 /**
  * Upper bound on worktree fanout. git worktree list is naturally bounded

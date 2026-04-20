@@ -4,7 +4,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, Text } from '@anthropic/ink'
 import { createHyperlink } from 'src/utils/hyperlink.js'
 
-import { jsonParse, jsonStringify } from 'src/utils/slowOperations.js'
+import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { renderTruncatedContent } from 'src/utils/terminal.js'
 import { MessageResponse } from '../MessageResponse.js'
 import { InVirtualListContext } from '../messageActions.js'
