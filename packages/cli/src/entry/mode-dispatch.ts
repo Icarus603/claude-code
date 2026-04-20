@@ -230,7 +230,7 @@ import {
   getUserSpecifiedModelSetting,
   normalizeModelStringForAPI,
   parseUserSpecifiedModel,
-} from 'src/utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
 import {
   checkAndDisableBypassPermissions,
@@ -312,7 +312,7 @@ import {
   gracefulShutdownSync,
 } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { setAllHookEventsEnabled } from 'src/utils/hooks/hookEvents.js'
-import { refreshModelCapabilities } from 'src/utils/model/modelCapabilities.js'
+import { refreshModelCapabilities } from '@claude-code/provider/modelCapabilities.js'
 import { peekForStdinData, writeToStderr } from '@claude-code/shell/process.js'
 import { setCwd } from 'src/utils/Shell.js'
 import {
@@ -377,7 +377,7 @@ import {
 import {
   shouldEnableThinkingByDefault,
   type ThinkingConfig,
-} from 'src/utils/thinking.js'
+} from '@claude-code/provider/thinking.js'
 import { initUser, resetUserCache } from 'src/utils/user.js'
 import {
   getTmuxInstallInstructions,
