@@ -9,7 +9,7 @@
 import { homedir } from 'os'
 import { isAbsolute, resolve } from 'path'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import type { PermissionRule } from 'src/types/permissions.js'
+import type { PermissionRule } from '@claude-code/permission/permissionTypes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
   getFsImplementation,

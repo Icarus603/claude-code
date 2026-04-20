@@ -8,7 +8,7 @@ import type { ToolPermissionContext, ToolUseContext } from '@claude-code/tool-re
 import type {
   PermissionDecisionReason,
   PermissionResult,
-} from 'src/types/permissions.js'
+} from '@claude-code/permission/permissionTypes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isCurrentDirectoryBareGitRepo } from 'src/utils/git.js'
 import type { PermissionRule } from '@claude-code/permission/PermissionRule'

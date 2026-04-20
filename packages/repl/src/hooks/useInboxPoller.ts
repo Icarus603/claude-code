@@ -15,7 +15,7 @@ import {
 import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 import { getAllBaseTools } from '@claude-code/tool-registry'
-import type { PermissionUpdate } from 'src/types/permissions.js'
+import type { PermissionUpdate } from '@claude-code/permission/permissionTypes'
 import { logForDebugging } from 'src/utils/debug.js'
 import {
   findInProcessTeammateTaskId,

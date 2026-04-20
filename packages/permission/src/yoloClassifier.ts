@@ -21,7 +21,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import type {
   ClassifierUsage,
   YoloClassifierResult,
-} from 'src/types/permissions.js'
+} from '@claude-code/permission/permissionTypes'
 import { isDebugMode, logForDebugging } from 'src/utils/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'

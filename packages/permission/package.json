@@ -88,6 +88,7 @@
     "./dangerousPatterns": "./src/dangerousPatterns.ts",
     "./classifierApprovals.js": "./src/classifierApprovals.ts",
     "./classifierApprovalsHook.js": "./src/classifierApprovalsHook.ts",
-    "./autoModeDenials.js": "./src/autoModeDenials.ts"
+    "./autoModeDenials.js": "./src/autoModeDenials.ts",
+    "./permissionTypes": "./src/permissionTypes.ts"
   }
 }

@@ -98,7 +98,7 @@ import {
 } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type { PermissionMode } from 'src/types/permissions.js'
+import type { PermissionMode } from '@claude-code/permission/permissionTypes'
 import type {
   BaseTextInputProps,
   PromptInputMode,

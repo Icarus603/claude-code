@@ -7,7 +7,7 @@ import type {
   ConnectedMCPServer,
   MCPServerConnection,
 } from '@claude-code/mcp-runtime/types.js'
-import type { PermissionMode } from 'src/types/permissions.js'
+import type { PermissionMode } from '@claude-code/permission/permissionTypes'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isTrackedClaudeInChromeTabId,
