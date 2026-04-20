@@ -7,7 +7,7 @@ import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.j
 import type { LocalAgentTaskState } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { getTools } from 'src/tools.js'
 import { formatNumber } from '@claude-code/output/formatters'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { UserPlanMessage } from '../messages/UserPlanMessage.js'
 import { renderToolActivity } from './renderToolActivity.js'

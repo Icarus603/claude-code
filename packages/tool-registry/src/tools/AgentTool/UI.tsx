@@ -33,7 +33,7 @@ import {
   buildSubagentLookups,
   createAssistantMessage,
   EMPTY_LOOKUPS,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type { ModelAlias } from 'src/utils/model/aliases.js'
 import {
   getMainLoopModel,

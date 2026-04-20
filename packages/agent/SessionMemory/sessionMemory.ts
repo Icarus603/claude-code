@@ -31,7 +31,7 @@ import {
 import {
   createUserMessage,
   hasToolCallsInLastAssistantTurn,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import {
   getSessionMemoryDir,
   getSessionMemoryPath,

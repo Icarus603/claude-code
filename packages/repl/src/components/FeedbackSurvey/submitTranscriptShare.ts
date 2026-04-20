@@ -5,7 +5,7 @@ import { checkAndRefreshOAuthTokenIfNeeded } from '@claude-code/provider/authAli
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getAuthHeaders, getUserAgent } from 'src/utils/http.js'
-import { normalizeMessagesForAPI } from 'src/utils/messages.js'
+import { normalizeMessagesForAPI } from '@claude-code/agent/messages.js'
 import {
   extractAgentIdsFromMessages,
   getTranscriptPath,

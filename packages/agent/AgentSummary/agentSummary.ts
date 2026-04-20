@@ -20,7 +20,7 @@ import {
   runForkedAgent,
 } from 'src/utils/forkedAgent.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { createUserMessage } from 'src/utils/messages.js'
+import { createUserMessage } from '@claude-code/agent/messages.js'
 import { getAgentTranscript } from '@claude-code/storage/sessionStorage.js'
 
 const SUMMARY_INTERVAL_MS = 30_000

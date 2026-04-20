@@ -28,7 +28,7 @@ import type {
 import { type AdvisorBlock, isAdvisorBlock } from 'src/utils/advisor.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import { logError } from '@claude-code/local-observability/logging'
-import type { buildMessageLookups } from 'src/utils/messages.js'
+import type { buildMessageLookups } from '@claude-code/agent/messages.js'
 import { CompactSummary } from './CompactSummary.js'
 import { AdvisorMessage } from './messages/AdvisorMessage.js'
 import { AssistantRedactedThinkingMessage } from './messages/AssistantRedactedThinkingMessage.js'

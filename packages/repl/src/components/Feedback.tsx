@@ -13,7 +13,7 @@ import {
 import {
   getLastAssistantMessage,
   normalizeMessagesForAPI,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, useInput } from '@anthropic/ink'

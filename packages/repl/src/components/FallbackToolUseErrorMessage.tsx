@@ -1,7 +1,7 @@
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages/messages.mjs'
 import * as React from 'react'
 import { stripUnderlineAnsi } from './shell/OutputLine.js'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import { removeSandboxViolationTags } from 'src/utils/sandbox/sandbox-ui-utils.js'
 import { Box, Text } from '@anthropic/ink'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'

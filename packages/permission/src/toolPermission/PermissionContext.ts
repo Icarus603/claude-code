@@ -29,7 +29,7 @@ import {
   SUBAGENT_REJECT_MESSAGE,
   SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX,
   withMemoryCorrectionHint,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import {
   applyPermissionUpdates,

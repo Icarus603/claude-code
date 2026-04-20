@@ -8,7 +8,7 @@ import {
 } from '@claude-code/output/utils/cliHighlight.js'
 import { hashContent } from '@claude-code/config/hash'
 import { configureMarked, formatToken } from 'src/utils/markdown.js'
-import { stripPromptXMLTags } from 'src/utils/messages.js'
+import { stripPromptXMLTags } from '@claude-code/agent/messages.js'
 import { MarkdownTable } from './MarkdownTable.js'
 
 type Props = {

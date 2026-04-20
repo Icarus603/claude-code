@@ -14,7 +14,7 @@ import { getToolUseIdsFromCollapsedGroup } from 'src/utils/collapseReadSearch.js
 import { getDisplayPath } from 'src/utils/file.js'
 import { formatDuration, formatSecondsShort } from '@claude-code/output/formatters'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
-import type { buildMessageLookups } from 'src/utils/messages.js'
+import type { buildMessageLookups } from '@claude-code/agent/messages.js'
 import type { ThemeName } from '@anthropic/ink'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'
 import { useSelectedMessageBg } from '../messageActions.js'

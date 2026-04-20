@@ -15,7 +15,7 @@ import { isAutoManagedMemoryFile } from '@claude-code/memory/memoryFileDetection
 import {
   extractTextContent,
   getLastAssistantMessage,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import { submitTranscriptShare } from './submitTranscriptShare.js'
 import type { TranscriptShareResponse } from './TranscriptSharePrompt.js'

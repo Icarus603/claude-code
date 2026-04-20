@@ -1,7 +1,7 @@
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
 import type { Message, ProgressMessage } from '@claude-code/agent/messageShapes'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import type { ThemeName } from '@anthropic/ink'
 import type { z } from 'zod/v4'
 import { FallbackToolUseErrorMessage } from '@claude-code/repl/components/FallbackToolUseErrorMessage.js'

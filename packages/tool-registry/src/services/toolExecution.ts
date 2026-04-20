@@ -77,7 +77,7 @@ import {
   createToolResultStopMessage,
   createUserMessage,
   withMemoryCorrectionHint,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import type {
   PermissionDecisionReason,
   PermissionResult,

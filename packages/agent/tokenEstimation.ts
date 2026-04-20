@@ -9,7 +9,7 @@ import type { Attachment } from 'src/utils/attachments.js'
 import { getModelBetas } from 'src/utils/betas.js'
 import { getVertexRegionForModel, isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
-import { normalizeAttachmentForAPI } from 'src/utils/messages.js'
+import { normalizeAttachmentForAPI } from '@claude-code/agent/messages.js'
 import {
   createBedrockRuntimeClient,
   getInferenceProfileBackingModel,

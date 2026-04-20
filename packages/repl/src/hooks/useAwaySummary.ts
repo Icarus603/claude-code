@@ -4,7 +4,7 @@ import { getTerminalFocusState, subscribeTerminalFocus } from '@anthropic/ink'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { generateAwaySummary } from '@claude-code/agent/awaySummary.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { createAwaySummaryMessage } from 'src/utils/messages.js'
+import { createAwaySummaryMessage } from '@claude-code/agent/messages.js'
 
 const BLUR_DELAY_MS = 5 * 60_000
 

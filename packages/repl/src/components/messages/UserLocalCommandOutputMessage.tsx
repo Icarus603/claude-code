@@ -2,7 +2,7 @@ import * as React from 'react'
 import { DIAMOND_FILLED, DIAMOND_OPEN } from '@claude-code/output/constants/figures.js'
 import { NO_CONTENT_MESSAGE } from 'src/constants/messages.js'
 import { Box, Text } from '@anthropic/ink'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import { Markdown } from '../Markdown.js'
 import { MessageResponse } from '../MessageResponse.js'
 

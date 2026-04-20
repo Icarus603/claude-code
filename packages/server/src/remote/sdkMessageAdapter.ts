@@ -17,7 +17,7 @@ import type {
 } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { fromSDKCompactMetadata } from 'src/utils/messages/mappers.js'
-import { createUserMessage } from 'src/utils/messages.js'
+import { createUserMessage } from '@claude-code/agent/messages.js'
 
 /**
  * Converts SDKMessage from CCR to REPL Message types.

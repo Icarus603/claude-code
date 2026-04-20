@@ -14,7 +14,7 @@ import {
   extractTag,
   INTERRUPT_MESSAGE,
   INTERRUPT_MESSAGE_FOR_TOOL_USE,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { InterruptedByUser } from '../InterruptedByUser.js'
 import { MessageResponse } from '../MessageResponse.js'
 import { UserAgentNotificationMessage } from './UserAgentNotificationMessage.js'

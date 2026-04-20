@@ -78,7 +78,7 @@ import {
 import {
   createAssistantAPIErrorMessage,
   NO_RESPONSE_REQUESTED,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import {
   getDefaultMainLoopModelSetting,
   isNonCustomOpusModel,

@@ -14,7 +14,7 @@ import type { RemoteAgentTaskState } from 'src/tasks/RemoteAgentTask/RemoteAgent
 import type { TaskState } from 'src/tasks/types.js'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { extractTextContent } from 'src/utils/messages.js'
+import { extractTextContent } from '@claude-code/agent/messages.js'
 import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'

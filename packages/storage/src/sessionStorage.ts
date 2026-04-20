@@ -79,7 +79,7 @@ import { getBranch } from 'src/utils/git.js'
 import { gracefulShutdownSync, isShuttingDown } from 'src/utils/gracefulShutdown.js'
 import { parseJSONL } from 'src/utils/json.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { extractTag, isCompactBoundaryMessage } from 'src/utils/messages.js'
+import { extractTag, isCompactBoundaryMessage } from '@claude-code/agent/messages.js'
 import { sanitizePath } from '@claude-code/storage/path.js'
 import {
   extractJsonStringField,

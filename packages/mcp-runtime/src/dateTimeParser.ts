@@ -1,6 +1,6 @@
 import { queryHaiku } from '@claude-code/provider/claude.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { extractTextContent } from 'src/utils/messages.js'
+import { extractTextContent } from '@claude-code/agent/messages.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 
 export type DateTimeParseResult =

@@ -2,7 +2,7 @@ import sample from 'lodash-es/sample.js'
 import * as React from 'react'
 import { useMemo } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 import { MessageResponse } from '../MessageResponse.js'
 
 function getSavingMessage(): string {

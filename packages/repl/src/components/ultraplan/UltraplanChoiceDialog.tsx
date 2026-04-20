@@ -11,7 +11,7 @@ import type { AppState } from '@claude-code/repl/appStateHooks.js';
 import type { Message } from '@claude-code/agent/messageShapes';
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js';
 import { clearConversation } from 'src/commands/clear/conversation.js';
-import { createCommandInputMessage } from 'src/utils/messages.js';
+import { createCommandInputMessage } from '@claude-code/agent/messages.js';
 import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js';
 import { updateTaskState } from 'src/utils/task/framework.js';
 import { archiveRemoteSession } from 'src/utils/teleport.js';

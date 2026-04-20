@@ -15,7 +15,7 @@ import {
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { useIsClassifierChecking } from '@claude-code/permission/classifierApprovalsHook.js'
 import { logError } from '@claude-code/local-observability/logging'
-import type { buildMessageLookups } from 'src/utils/messages.js'
+import type { buildMessageLookups } from '@claude-code/agent/messages.js'
 import { MessageResponse } from '../MessageResponse.js'
 import { useSelectedMessageBg } from '../messageActions.js'
 import { SentryErrorBoundary } from '../SentryErrorBoundary.js'

@@ -3,7 +3,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { COMMAND_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { Box, Text } from '@anthropic/ink'
-import { extractTag } from 'src/utils/messages.js'
+import { extractTag } from '@claude-code/agent/messages.js'
 
 type Props = {
   addMargin: boolean

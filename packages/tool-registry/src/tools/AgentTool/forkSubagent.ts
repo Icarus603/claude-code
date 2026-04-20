@@ -12,7 +12,7 @@ import type {
   Message as MessageType,
 } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { createUserMessage } from 'src/utils/messages.js'
+import { createUserMessage } from '@claude-code/agent/messages.js'
 import type { BuiltInAgentDefinition } from './loadAgentsDir.js'
 
 /**

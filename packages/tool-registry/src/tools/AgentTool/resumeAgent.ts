@@ -15,7 +15,7 @@ import {
   filterOrphanedThinkingOnlyMessages,
   filterUnresolvedToolUses,
   filterWhitespaceOnlyAssistantMessages,
-} from 'src/utils/messages.js'
+} from '@claude-code/agent/messages.js'
 import { getAgentModel } from 'src/utils/model/agent.js'
 import { getQuerySourceForAgent } from 'src/utils/promptCategory.js'
 import {
