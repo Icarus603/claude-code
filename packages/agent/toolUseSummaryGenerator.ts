@@ -9,7 +9,7 @@ import { E_TOOL_USE_SUMMARY_GENERATION_FAILED } from 'src/constants/errorIds.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { asSystemPrompt } from 'src/utils/systemPromptType.js'
+import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { queryHaiku } from '@claude-code/provider/claude.js'
 
 const TOOL_USE_SUMMARY_SYSTEM_PROMPT = `Write a short summary label describing what these tool calls accomplished. It appears as a single-line row in a mobile app and truncates around 30 characters, so think git-commit-subject, not sentence.

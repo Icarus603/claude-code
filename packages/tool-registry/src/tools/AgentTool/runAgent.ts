@@ -71,7 +71,7 @@ import {
 import {
   asSystemPrompt,
   type SystemPrompt,
-} from 'src/utils/systemPromptType.js'
+} from '@claude-code/provider/systemPromptType.js'
 import {
   isPerfettoTracingEnabled,
   registerAgent as registerPerfettoAgent,

@@ -6,7 +6,7 @@ import type {
   StreamEvent,
   SystemAPIErrorMessage,
 } from 'src/types/message.js'
-import type { SystemPrompt } from 'src/utils/systemPromptType.js'
+import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import type { ThinkingConfig } from 'src/utils/thinking.js'
 import './providerHostSetup.js'
 import type { Options } from '@claude-code/provider/claudeLegacy'

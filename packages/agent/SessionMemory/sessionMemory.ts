@@ -37,7 +37,7 @@ import {
   getSessionMemoryPath,
 } from '@claude-code/permission/filesystem'
 import { sequential } from 'src/utils/sequential.js'
-import { asSystemPrompt } from 'src/utils/systemPromptType.js'
+import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTokenUsage, tokenCountWithEstimation } from 'src/utils/tokens.js'
 import { logEvent } from '@claude-code/local-observability'
 import { isAutoCompactEnabled } from '@claude-code/agent/compaction/autoCompact.js'
