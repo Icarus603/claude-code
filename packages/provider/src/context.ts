@@ -15,7 +15,7 @@ import { isBareMode, isEnvTruthy } from '@claude-code/config/env/utils'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { getBranch, getDefaultBranch, getIsGit, gitExe } from 'src/utils/git.js'
 import { shouldIncludeGitInstructions } from '@claude-code/config/env/git-settings'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { readEnv } from '@claude-code/config/env'
 
 const MAX_STATUS_CHARS = 2000

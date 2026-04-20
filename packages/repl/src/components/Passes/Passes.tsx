@@ -18,7 +18,7 @@ import type {
   ReferrerRewardInfo,
 } from '@claude-code/provider/oauth/types.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { Pane } from '@anthropic/ink'
 
 type PassStatus = {

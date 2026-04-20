@@ -7,7 +7,7 @@ import { isBareMode } from '@claude-code/config/env/utils'
 import { updateWatchPaths } from 'src/utils/hooks/fileChangedWatcher.js'
 import { shouldAllowManagedHooksOnly } from 'src/utils/hooks/hooksConfigSnapshot.js'
 import { executeSessionStartHooks, executeSetupHooks } from 'src/utils/hooks.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { loadPluginHooks } from 'src/utils/plugins/loadPluginHooks.js'
 
 type SessionStartHooksOptions = {

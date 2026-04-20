@@ -40,7 +40,7 @@ import {
 } from '@claude-code/local-observability/errorHelpers.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { getPlatform } from 'src/utils/platform.js'
 import { maybeRecordPluginHint } from 'src/utils/plugins/hintRecommendation.js'

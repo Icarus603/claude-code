@@ -31,7 +31,7 @@ import { updateSessionName } from 'src/utils/concurrentSessions.js'
 import { loadConversationForResume } from 'src/utils/conversationRecovery.js'
 import { checkCrossProjectResume } from 'src/utils/crossProjectResume.js'
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { createSystemMessage } from 'src/utils/messages.js'
 import {
   computeStandaloneAgentContext,

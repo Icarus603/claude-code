@@ -23,7 +23,7 @@ import {
 import { logForDebugging } from 'src/utils/debug.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { getSystemLocaleLanguage } from '@claude-code/output/utils/intl.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
 import { sleep } from '@claude-code/config/sleep'
 

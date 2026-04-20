@@ -49,7 +49,7 @@ import {
   maybeResizeAndDownsampleImageBuffer,
 } from 'src/utils/imageResizer.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { isAutoMemFile } from '@claude-code/memory/memoryFileDetection'
 import { createUserMessage } from 'src/utils/messages.js'
 import { getCanonicalName, getMainLoopModel } from 'src/utils/model/model.js'

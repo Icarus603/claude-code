@@ -19,7 +19,7 @@ import {
   type CacheSafeParams,
   runForkedAgent,
 } from 'src/utils/forkedAgent.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { createUserMessage } from 'src/utils/messages.js'
 import { getAgentTranscript } from '@claude-code/storage/sessionStorage.js'
 

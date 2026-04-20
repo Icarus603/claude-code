@@ -147,7 +147,7 @@ import chrome from 'src/commands/chrome/index.js'
 import stickers from 'src/commands/stickers/index.js'
 import advisor from 'src/commands/advisor.js'
 import provider from '@claude-code/provider/commands/provider.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {

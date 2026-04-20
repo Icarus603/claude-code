@@ -46,7 +46,7 @@ import {
 } from 'src/utils/frontmatterParser.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { isPathGitignored } from 'src/utils/git/gitignore.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   extractDescriptionFromMarkdown,
   getProjectDirsUpToHome,

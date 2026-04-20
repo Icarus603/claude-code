@@ -29,7 +29,7 @@ import type {
 import type { AppState } from './appStateShim.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 
 export type DynamicMcpState = DynamicMcpStateBase<
   MCPServerConnection,

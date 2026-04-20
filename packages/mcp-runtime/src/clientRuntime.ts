@@ -67,7 +67,7 @@ import {
 import { getMCPUserAgent } from 'src/utils/http.js'
 import { maybeNotifyIDEConnected } from '@claude-code/ide/ide.js'
 import { maybeResizeAndDownsampleImageBuffer } from 'src/utils/imageResizer.js'
-import { logMCPDebug, logMCPError } from 'src/utils/log.js'
+import { logMCPDebug, logMCPError } from '@claude-code/local-observability/logging'
 import {
   getBinaryBlobSavedMessage,
   getFormatDescription,

@@ -158,7 +158,7 @@ import { useSwarmInitialization } from '@claude-code/repl/hooks/useSwarmInitiali
 import { useTeammateViewAutoExit } from '@claude-code/repl/hooks/useTeammateViewAutoExit.js';
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js';
 import { isHumanTurn } from 'src/utils/messagePredicates.js';
-import { logError } from 'src/utils/log.js';
+import { logError } from '@claude-code/local-observability/logging';
 // Dead code elimination: conditional imports
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const useVoiceIntegration: typeof import('@claude-code/voice/hooks/useVoiceIntegration.js').useVoiceIntegration = feature('VOICE_MODE')

@@ -8,7 +8,7 @@ import { type ChildProcess, spawn, spawnSync } from 'child_process'
 import { readFile } from 'fs/promises'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getPlatform } from 'src/utils/platform.js'
 
 // Lazy-loaded native audio module. audio-capture.node links against

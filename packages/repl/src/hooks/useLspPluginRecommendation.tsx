@@ -20,7 +20,7 @@ import { useNotifications } from 'src/context/notifications.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   addToNeverSuggest,
   getMatchingLspPlugins,

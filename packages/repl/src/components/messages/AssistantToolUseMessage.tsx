@@ -14,7 +14,7 @@ import {
 } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { useIsClassifierChecking } from '@claude-code/permission/classifierApprovalsHook.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import type { buildMessageLookups } from 'src/utils/messages.js'
 import { MessageResponse } from '../MessageResponse.js'
 import { useSelectedMessageBg } from '../messageActions.js'

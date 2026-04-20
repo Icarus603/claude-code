@@ -5,7 +5,7 @@ import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/stat
 import { isClaudeAISubscriber } from 'src/utils/auth.js'
 import { getModelBetas } from 'src/utils/betas.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getSmallFastModel } from 'src/utils/model/model.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { logEvent } from '@claude-code/local-observability'

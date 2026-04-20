@@ -21,7 +21,7 @@ import {
   executePreToolHooks,
   getPreToolHookBlockingMessage,
 } from 'src/utils/hooks.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   getRuleBehaviorDescription,
   type PermissionDecisionReason,

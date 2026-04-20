@@ -24,7 +24,7 @@ import {
   createBaseHookInput,
   executeFileSuggestionCommand,
 } from 'src/utils/hooks.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from 'src/utils/path.js'
 import { ripGrep } from 'src/utils/ripgrep.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'

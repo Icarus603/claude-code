@@ -17,7 +17,7 @@ import type {
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { logMCPDebug, logMCPError } from 'src/utils/log.js'
+import { logMCPDebug, logMCPError } from '@claude-code/local-observability/logging'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 
 const inputSchema = lazySchema(() => z.object({}))

@@ -24,7 +24,7 @@ import {
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { getAncestorPidsAsync } from 'src/utils/genericProcessUtils.js'
 import { isJetBrainsPluginInstalledCached } from 'src/utils/jetbrains.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getPlatform } from 'src/utils/platform.js'
 import { lt } from 'src/utils/semver.js'
 

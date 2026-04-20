@@ -40,7 +40,7 @@ import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,
 } from 'src/utils/gitDiff.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from 'src/utils/path.js'
 import {
   checkWritePermissionForTool,

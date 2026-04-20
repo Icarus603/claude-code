@@ -23,7 +23,7 @@ import {
 } from '@claude-code/config/plugin/pluginCliCommands'
 import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { clearAllCaches } from 'src/utils/plugins/cacheUtils.js'
 import { getInstallCounts } from 'src/utils/plugins/installCounts.js'
 import {

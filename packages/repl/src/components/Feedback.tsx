@@ -27,7 +27,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { env } from '@claude-code/config/env/paths'
 import { type GitRepoState, getGitState, getIsGit } from 'src/utils/git.js'
 import { getAuthHeaders, getUserAgent } from 'src/utils/http.js'
-import { getInMemoryErrors, logError } from 'src/utils/log.js'
+import { getInMemoryErrors, logError } from '@claude-code/local-observability/logging'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import {
   extractTeammateTranscriptsFromTasks,

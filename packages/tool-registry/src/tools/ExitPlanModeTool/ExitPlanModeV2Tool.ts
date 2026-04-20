@@ -24,7 +24,7 @@ import {
   setAwaitingPlanApproval,
 } from 'src/utils/inProcessTeammateHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   getPlan,
   getPlanFilePath,

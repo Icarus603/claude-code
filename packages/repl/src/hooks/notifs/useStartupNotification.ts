@@ -4,7 +4,7 @@ import {
   type Notification,
   useNotifications,
 } from 'src/context/notifications.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 
 type Result = Notification | Notification[] | null | any
 

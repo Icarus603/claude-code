@@ -16,7 +16,7 @@ import {
   getUserAgent,
   withOAuth401Retry,
 } from 'src/utils/http.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 
 // Cache expiration: 24 hours
