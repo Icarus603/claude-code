@@ -13,7 +13,7 @@ import {
   type Tools,
 } from '@claude-code/tool-registry/Tool.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { lazySchema } from 'src/utils/lazySchema.js'
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { escapeRegExp } from 'src/utils/stringUtils.js'
 import { isToolSearchEnabledOptimistic } from 'src/utils/toolSearch.js'
 import { getPrompt, isDeferredTool, TOOL_SEARCH_TOOL_NAME } from './prompt.js'
