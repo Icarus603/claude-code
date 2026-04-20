@@ -10,7 +10,7 @@ import {
 import { useAppState, useSetAppState } from '../../appStateHooks.js'
 import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'
 import type { EffortLevel } from '@claude-code/agent/effort.js'
-import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
+import { isBilledAsExtraUsage } from '@claude-code/provider/extraUsage.js'
 import {
   clearFastModeCooldown,
   isFastModeAvailable,

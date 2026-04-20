@@ -121,7 +121,7 @@ import {
 import type { EffortLevel } from '@claude-code/agent/effort.js'
 import { env } from '@claude-code/config/env/paths'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
+import { isBilledAsExtraUsage } from '@claude-code/provider/extraUsage.js'
 import {
   getFastModeUnavailableReason,
   isFastModeAvailable,

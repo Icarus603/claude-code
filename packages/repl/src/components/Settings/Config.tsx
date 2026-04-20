@@ -54,7 +54,7 @@ import {
   modelDisplayString,
   isOpus1mMergeEnabled,
 } from '@claude-code/provider/model.js'
-import { isBilledAsExtraUsage } from 'src/utils/extraUsage.js'
+import { isBilledAsExtraUsage } from '@claude-code/provider/extraUsage.js'
 import { ClaudeMdExternalIncludesDialog } from '../ClaudeMdExternalIncludesDialog.js'
 import {
   ChannelDowngradeDialog,
