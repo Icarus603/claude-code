@@ -1,3 +1,5 @@
-// Thin alias — canonical owner is src/utils/telemetry/events.js.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/telemetry/events.js'
+// Canonical owner is @claude-code/local-observability/telemetry.
+export {
+  logOTelEvent,
+  redactIfDisabled,
+} from '@claude-code/local-observability/telemetry'

@@ -1,3 +1,12 @@
-// Thin alias — canonical owner is src/utils/telemetry/betaSessionTracing.js.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/telemetry/betaSessionTracing.js'
+// Canonical owner is @claude-code/local-observability/telemetry.
+export type { LLMRequestNewContext } from '@claude-code/local-observability/telemetry'
+export {
+  addBetaInteractionAttributes,
+  addBetaLLMRequestAttributes,
+  addBetaLLMResponseAttributes,
+  addBetaToolInputAttributes,
+  addBetaToolResultAttributes,
+  clearBetaTracingState,
+  isBetaTracingEnabled,
+  truncateContent,
+} from '@claude-code/local-observability/telemetry'
