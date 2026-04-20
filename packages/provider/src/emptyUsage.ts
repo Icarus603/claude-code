@@ -1,4 +1,4 @@
-import type { NonNullableUsage } from 'src/entrypoints/sdk/sdkUtilityTypes.js'
+import type { NonNullableUsage } from '@claude-code/headless-sdk/sdkUtilityTypes.js'
 
 /**
  * Zero-initialized usage object. Extracted from logging.ts so that

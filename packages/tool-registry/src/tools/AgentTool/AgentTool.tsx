@@ -5,7 +5,7 @@ import type {
   Message as MessageType,
   NormalizedUserMessage,
 } from '@claude-code/agent/messageShapes'
-import { getQuerySourceForAgent } from 'src/utils/promptCategory.js'
+import { getQuerySourceForAgent } from '@claude-code/agent/promptCategory.js'
 import { z } from 'zod/v4'
 import {
   clearInvokedSkillsForAgent,
@@ -15,7 +15,7 @@ import {
   enhanceSystemPromptWithEnvDetails,
   getSystemPrompt,
 } from '@claude-code/agent/prompts.js'
-import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
+import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
 import { startAgentSummarization } from '@claude-code/agent/AgentSummary/agentSummary.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
@@ -68,7 +68,7 @@ import {
   filterDeniedAgents,
   getDenyRuleForAgent,
 } from '@claude-code/permission/permissions'
-import { enqueueSdkEvent } from 'src/utils/sdkEventQueue.js'
+import { enqueueSdkEvent } from '@claude-code/agent/sdkEventQueue.js'
 import { writeAgentMetadata } from '@claude-code/storage/sessionStorage.js'
 import { sleep } from '@claude-code/config/sleep'
 import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js'

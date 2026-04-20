@@ -49,7 +49,7 @@ import {
   restoreSessionMetadata,
   type SessionLogResult,
 } from '@claude-code/storage/sessionStorage.js'
-import type { ThinkingConfig } from 'src/utils/thinking.js'
+import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'
 import { REPL } from './REPL.js'
 

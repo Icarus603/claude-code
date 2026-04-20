@@ -7,7 +7,7 @@ import type {
   SystemAPIErrorMessage,
 } from '@claude-code/agent/messageShapes'
 import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
-import type { ThinkingConfig } from 'src/utils/thinking.js'
+import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import './providerHostSetup.js'
 import type { Options } from '@claude-code/provider/claudeLegacy'
 

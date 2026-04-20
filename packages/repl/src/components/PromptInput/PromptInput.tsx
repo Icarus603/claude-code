@@ -176,7 +176,7 @@ import {
   findThinkingTriggerPositions,
   getRainbowColor,
   isUltrathinkEnabled,
-} from 'src/utils/thinking.js'
+} from '@claude-code/provider/thinking.js'
 import { findTokenBudgetPositions } from '@claude-code/agent/tokenBudget'
 import {
   findUltraplanTriggerPositions,

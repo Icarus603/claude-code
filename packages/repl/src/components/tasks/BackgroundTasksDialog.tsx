@@ -13,7 +13,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
+import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import {

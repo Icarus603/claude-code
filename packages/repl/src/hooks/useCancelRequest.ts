@@ -32,7 +32,7 @@ import {
   enqueuePendingNotification,
   hasCommandsInQueue,
 } from 'src/utils/messageQueueManager.js'
-import { emitTaskTerminatedSdk } from 'src/utils/sdkEventQueue.js'
+import { emitTaskTerminatedSdk } from '@claude-code/agent/sdkEventQueue.js'
 
 /** Time window in ms during which a second press kills all background agents. */
 const KILL_AGENTS_CONFIRM_WINDOW_MS = 3000

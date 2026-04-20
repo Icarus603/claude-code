@@ -6,7 +6,7 @@ import {
   FORK_BOILERPLATE_TAG,
   FORK_DIRECTIVE_PREFIX,
 } from '@claude-code/command-runtime/xml.js'
-import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
+import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
 import type {
   AssistantMessage,
   Message as MessageType,

@@ -30,7 +30,7 @@ import {
   modelDisplayString,
   parseUserSpecifiedModel,
 } from '@claude-code/provider/model.js'
-import { getModelOptions } from 'src/utils/model/modelOptions.js'
+import { getModelOptions } from '@claude-code/provider/modelOptions.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,

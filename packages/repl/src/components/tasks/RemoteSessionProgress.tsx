@@ -5,7 +5,7 @@ import { DIAMOND_FILLED, DIAMOND_OPEN } from '@claude-code/output/constants/figu
 import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
 import { Text, useAnimationFrame } from '@anthropic/ink'
 import { count } from '@claude-code/tool-registry/utils/array.js'
-import { getRainbowColor } from 'src/utils/thinking.js'
+import { getRainbowColor } from '@claude-code/provider/thinking.js'
 
 const TICK_MS = 80
 

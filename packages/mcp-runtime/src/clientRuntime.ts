@@ -90,7 +90,7 @@ import {
 } from '@claude-code/provider/proxy.js'
 import { recursivelySanitizeUnicode } from 'src/utils/sanitization.js'
 import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
-import { subprocessEnv } from 'src/utils/subprocessEnv.js'
+import { subprocessEnv } from '@claude-code/shell/subprocessEnv.js'
 import {
   isPersistError,
   persistToolResult,

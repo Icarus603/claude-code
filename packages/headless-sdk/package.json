@@ -12,6 +12,7 @@
     "./agentSdkTypes.js": "./src/agentSdkTypes.ts",
     "./sandboxTypes.js": "./src/sandboxTypes.ts",
     "./controlMessageCompat": "./src/controlMessageCompat.ts",
-    "./controlTypes.js": "./src/controlTypes.ts"
+    "./controlTypes.js": "./src/controlTypes.ts",
+    "./sdkUtilityTypes.js": "./src/sdkUtilityTypes.ts"
   }
 }
