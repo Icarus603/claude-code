@@ -1,3 +1,2 @@
-// Thin alias — canonical owner is src/utils/toolPool.ts.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/toolPool.js'
+// Canonical owner is @claude-code/tool-registry/toolPool.
+export * from '@claude-code/tool-registry/toolPool.js'
