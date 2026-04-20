@@ -10,7 +10,7 @@ import { formatNumber } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
-import { toInkColor } from 'src/utils/ink.js'
+import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
 import { renderToolActivity } from './renderToolActivity.js'
 import { describeTeammateActivity } from './taskStatusUtils.js'
 

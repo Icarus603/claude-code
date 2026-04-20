@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react'
 import { Ansi, Box, Text } from '@anthropic/ink'
 import { FilePathLink } from '../FilePathLink.js'
-import { toInkColor } from 'src/utils/ink.js'
+import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
 import type { Attachment } from 'src/utils/attachments.js'
 import type { NullRenderingAttachmentType } from './nullRenderingAttachments.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
