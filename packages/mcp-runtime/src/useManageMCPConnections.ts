@@ -62,7 +62,7 @@ import {
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { logMCPDebug, logMCPError } from '@claude-code/local-observability/logging'
-import { enqueue } from 'src/utils/messageQueueManager.js'
+import { enqueue } from '@claude-code/agent/messageQueueManager.js'
 import {
   CHANNEL_PERMISSION_METHOD,
   ChannelMessageNotificationSchema,

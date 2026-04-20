@@ -31,7 +31,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
   isQueuedCommandEditable,
   popAllEditable,
-} from 'src/utils/messageQueueManager.js'
+} from '@claude-code/agent/messageQueueManager.js'
 import stripAnsi from 'strip-ansi'
 import { FastModePicker } from 'src/commands/fast/fast.js'
 import { isUltrareviewEnabled } from 'src/commands/review/ultrareviewEnabled.js'

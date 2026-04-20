@@ -357,7 +357,7 @@ import {
   getCommandQueue,
   getCommandQueueLength,
   removeByFilter,
-} from 'src/utils/messageQueueManager.js';
+} from '@claude-code/agent/messageQueueManager.js';
 import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js';
 import { SessionBackgroundHint } from '@claude-code/repl/components/SessionBackgroundHint.js';
 import { startBackgroundSession } from 'src/tasks/LocalMainSessionTask.js';

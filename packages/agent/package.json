@@ -68,7 +68,8 @@
     "./promptCategory.js": "./promptCategory.ts",
     "./sdkEventQueue.js": "./sdkEventQueue.ts",
     "./worktreeModeEnabled.js": "./worktreeModeEnabled.ts",
-    "./sessionTitle.js": "./sessionTitle.ts"
+    "./sessionTitle.js": "./sessionTitle.ts",
+    "./messageQueueManager.js": "./messageQueueManager.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
