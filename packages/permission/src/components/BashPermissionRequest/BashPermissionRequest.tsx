@@ -18,7 +18,7 @@ import {
 import { getDestructiveCommandWarning } from '@claude-code/tool-registry/tools/BashTool/destructiveCommandWarning.js'
 import { parseSedEditCommand } from '@claude-code/tool-registry/tools/BashTool/sedEditParser.js'
 import { shouldUseSandbox } from '@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js'
-import { getCompoundCommandPrefixesStatic } from 'src/utils/bash/prefix.js'
+import { getCompoundCommandPrefixesStatic } from '@claude-code/shell/bash/prefix.js'
 import {
   createPromptRuleContent,
   generateGenericDescription,

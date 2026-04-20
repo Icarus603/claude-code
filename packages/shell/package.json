@@ -28,7 +28,9 @@
     "./subprocessEnv.js": "./src/subprocessEnv.ts",
     "./sandboxUiUtils.js": "./src/sandboxUiUtils.ts",
     "./powershell/staticPrefix.js": "./src/powershell/staticPrefix.ts",
-    "./powershell/dangerousCmdlets.js": "./src/powershell/dangerousCmdlets.ts"
+    "./powershell/dangerousCmdlets.js": "./src/powershell/dangerousCmdlets.ts",
+    "./shellCommand.js": "./src/shellCommand.ts",
+    "./bash/prefix.js": "./src/bash/prefix.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

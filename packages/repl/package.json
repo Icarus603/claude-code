@@ -453,6 +453,7 @@
     "./conversationRecovery.js": "./src/conversationRecovery.ts",
     "./localInstaller.js": "./src/localInstaller.ts",
     "./systemTheme.js": "./src/systemTheme.ts",
-    "./stateStore.js": "./src/stateStore.ts"
+    "./stateStore.js": "./src/stateStore.ts",
+    "./overlayContext.js": "./src/overlayContext.ts"
   }
 }
