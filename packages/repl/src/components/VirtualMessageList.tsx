@@ -18,7 +18,7 @@ import { ScrollChromeContext } from './FullscreenLayout.js'
 const HEADROOM = 3
 
 import { logForDebugging } from 'src/utils/debug.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { renderableSearchText } from 'src/utils/transcriptSearch.js'
 import {
   isNavigableMessage,

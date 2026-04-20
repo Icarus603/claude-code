@@ -70,7 +70,7 @@ import {
 } from '@claude-code/permission/permissions'
 import { enqueueSdkEvent } from 'src/utils/sdkEventQueue.js'
 import { writeAgentMetadata } from '@claude-code/storage/sessionStorage.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'

@@ -25,7 +25,7 @@ import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { getSystemLocaleLanguage } from '@claude-code/output/utils/intl.js'
 import { logError } from 'src/utils/log.js'
 import { getInitialSettings } from 'src/utils/settings/settings.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 
 // ─── Language normalization ─────────────────────────────────────────────
 

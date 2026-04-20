@@ -1,4 +1,4 @@
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 
 /**
  * Coalescing uploader for PUT /worker (session state + metadata).

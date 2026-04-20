@@ -106,6 +106,7 @@
     "./plugin/builtin": "./plugin/builtin.ts",
     "./plugin/bundled-init": "./plugin/bundled-init.ts",
     "./bundledMode": "./bundledMode.ts",
-    "./signal": "./signal.ts"
+    "./signal": "./signal.ts",
+    "./sleep": "./sleep.ts"
   }
 }

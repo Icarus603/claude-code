@@ -59,7 +59,7 @@ import {
   type PollIntervalConfig,
 } from './pollConfigDefaults.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import {
   wrapApiForFaultInjection,
   registerBridgeDebugHandle,

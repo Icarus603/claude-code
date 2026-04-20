@@ -9,7 +9,7 @@ import { parseGitHubRepository } from 'src/utils/detectRepository.js'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 // Retry configuration for teleport API requests

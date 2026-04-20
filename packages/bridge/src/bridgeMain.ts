@@ -19,7 +19,7 @@ import { isEnvTruthy, isInProtectedNamespace } from '@claude-code/config/env/uti
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { logError } from 'src/utils/log.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { createAgentWorktree, removeAgentWorktree } from '@claude-code/swarm'
 import {
   BridgeFatalError,
