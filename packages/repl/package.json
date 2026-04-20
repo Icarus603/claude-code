@@ -479,7 +479,7 @@
     "./promptSuggestionSpeculation.js": "./src/promptSuggestionSpeculation.ts",
     "./promptSuggestion.js": "./src/promptSuggestion.ts",
     "./projectOnboardingState.js": "./src/projectOnboardingState.ts",
-    "./promptOverlayContext.js": "./src/promptOverlayContext.ts",
+    "./promptOverlayContext.js": "./src/promptOverlayContext.tsx",
     "./extraUsage.js": "./src/extraUsage.ts",
     "./releaseNotes.js": "./src/releaseNotes.ts",
     "./onChangeAppState.js": "./src/onChangeAppState.ts",
