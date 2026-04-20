@@ -46,7 +46,7 @@ import {
   registerRemoteAgentTask,
 } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js'
 import { assembleToolPool } from 'src/tools.js'
-import { asAgentId } from 'src/types/ids.js'
+import { asAgentId } from '@claude-code/agent/idTypes'
 import { runWithAgentContext } from 'src/utils/agentContext.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { getCwd, runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'

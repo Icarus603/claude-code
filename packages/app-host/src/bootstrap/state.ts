@@ -25,7 +25,7 @@ import { createSignal } from '@claude-code/config/signal'
 // Union type for registered hooks - can be SDK callbacks or native plugin hooks
 type RegisteredHookMatcher = HookCallbackMatcher | PluginHookMatcher
 
-import type { SessionId } from 'src/types/ids.js'
+import type { SessionId } from '@claude-code/agent/idTypes'
 
 // DO NOT ADD MORE STATE HERE - BE JUDICIOUS WITH GLOBAL STATE
 

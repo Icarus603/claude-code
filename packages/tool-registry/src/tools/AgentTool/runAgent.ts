@@ -28,7 +28,7 @@ import type {
 import type { Tool, Tools, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { killShellTasksForAgent } from 'src/tasks/LocalShellTask/killShellTasks.js'
 import type { Command } from 'src/types/command.js'
-import type { AgentId } from 'src/types/ids.js'
+import type { AgentId } from '@claude-code/agent/idTypes'
 import type {
   AssistantMessage,
   Message,
