@@ -19,7 +19,7 @@ import { UserImageMessage } from './UserImageMessage.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   tryRenderPlanApprovalMessage,
   formatTeammateMessageContent,

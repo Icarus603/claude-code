@@ -31,7 +31,7 @@ import type {
   InlineGhostText,
   PromptInputMode,
 } from 'src/types/textInputTypes.js'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   generateProgressiveArgumentHint,
   parseArguments,

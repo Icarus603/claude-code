@@ -104,7 +104,7 @@ import type {
   PromptInputMode,
   VimMode,
 } from 'src/types/textInputTypes.js'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { Cursor } from 'src/utils/Cursor.js'

@@ -1,4 +1,4 @@
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 
 export const DESCRIPTION = 'List all tasks in the task list'
 

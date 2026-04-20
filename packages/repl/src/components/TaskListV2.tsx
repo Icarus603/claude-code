@@ -8,7 +8,7 @@ import {
   AGENT_COLOR_TO_THEME_COLOR,
   type AgentColorName,
 } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'

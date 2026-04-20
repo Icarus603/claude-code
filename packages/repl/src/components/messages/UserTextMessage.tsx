@@ -9,7 +9,7 @@ import {
   TEAMMATE_MESSAGE_TAG,
   TICK_TAG,
 } from '@claude-code/command-runtime/xml.js'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   extractTag,
   INTERRUPT_MESSAGE,

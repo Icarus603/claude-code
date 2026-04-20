@@ -48,7 +48,7 @@ import {
 import { assembleToolPool } from 'src/tools.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
 import { runWithAgentContext } from 'src/utils/agentContext.js'
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { getCwd, runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

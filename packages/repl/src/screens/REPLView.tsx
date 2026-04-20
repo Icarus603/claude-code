@@ -336,7 +336,7 @@ const useProactive =
   feature('PROACTIVE') || feature('KAIROS') ? require('src/proactive/useProactive.js').useProactive : null;
 const useScheduledTasks = feature('AGENT_TRIGGERS') ? require('@claude-code/repl/hooks/useScheduledTasks.js').useScheduledTasks : null;
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js';
+import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js';
 import { useTaskListWatcher } from '@claude-code/repl/hooks/useTaskListWatcher.js';
 import type { SandboxAskCallback, NetworkHostPattern } from 'src/utils/sandbox/sandbox-adapter.js';
 
