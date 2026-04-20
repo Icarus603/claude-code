@@ -129,7 +129,7 @@ import {
   prefetchFastModeStatus,
   resolveFastModeStatusFromCache,
 } from '@claude-code/repl/fastMode.js'
-import { applyConfigEnvironmentVariables } from 'src/utils/managedEnv.js'
+import { applyConfigEnvironmentVariables } from '@claude-code/config/managedEnv.js'
 import { extractTeammateOptions, type TeammateOptions } from '@claude-code/app-host/main/cli/options.js'
 import { maybeActivateBrief, maybeActivateProactive } from '@claude-code/app-host/main/cli/runtimeActivation.js'
 import { prefetchSystemContextIfSafe, startDeferredPrefetches } from '@claude-code/app-host/main/startup/context.js'
@@ -197,13 +197,13 @@ import type { Message as MessageType } from '@claude-code/agent/messageShapes'
 import {
   CLAUDE_IN_CHROME_SKILL_HINT,
   CLAUDE_IN_CHROME_SKILL_HINT_WITH_WEBBROWSER,
-} from 'src/utils/claudeInChrome/prompt.js'
+} from '@claude-code/agent/claudeInChrome/prompt.js'
 import {
   setupClaudeInChrome,
   shouldAutoEnableClaudeInChrome,
   shouldEnableClaudeInChrome,
-} from 'src/utils/claudeInChrome/setup.js'
-import { getContextWindowForModel } from 'src/utils/context.js'
+} from '@claude-code/agent/claudeInChromeSetup.js'
+import { getContextWindowForModel } from '@claude-code/agent/context.js'
 import { loadConversationForResume } from '@claude-code/repl/conversationRecovery.js'
 import { buildDeepLinkBanner } from 'src/utils/deepLink/banner.js'
 import {
@@ -285,7 +285,7 @@ import { logContextMetrics } from 'src/utils/api.js'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isClaudeInChromeMCPServer,
-} from 'src/utils/claudeInChrome/common.js'
+} from '@claude-code/agent/claudeInChromeCommon.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { eagerParseCliFlag } from '@claude-code/app-host/cliArgs.js'
 import { createEmptyAttributionState } from '@claude-code/agent/commitAttribution.js'
@@ -293,7 +293,7 @@ import {
   countConcurrentSessions,
   registerSession,
   updateSessionName,
-} from 'src/utils/concurrentSessions.js'
+} from '@claude-code/agent/concurrentSessions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging, setHasFormattedOutput } from '@claude-code/local-observability/debug.js'
 import {
