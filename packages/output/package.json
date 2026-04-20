@@ -30,6 +30,7 @@
     "./render/exportRenderer.js": "./src/render/exportRenderer.tsx",
     "./markdown.js": "./src/markdown.ts",
     "./fpsTracker.js": "./src/fpsTracker.ts",
-    "./modifiers.js": "./src/modifiers.ts"
+    "./modifiers.js": "./src/modifiers.ts",
+    "./setUtils.js": "./src/setUtils.ts"
   }
 }

@@ -15,6 +15,7 @@
     "./init.js": "./src/init.ts",
     "./providerHostSetup.js": "./src/providerHostSetup.ts",
     "./packageHostSetupOrchestrator.js": "./src/packageHostSetupOrchestrator.ts",
-    "./activityManager.js": "./src/activityManager.ts"
+    "./activityManager.js": "./src/activityManager.ts",
+    "./cliArgs.js": "./src/cliArgs.ts"
   }
 }

@@ -8,7 +8,7 @@ import {
   VALID_UPDATE_SCOPES,
 } from 'src/services/plugins/pluginCliCommands.js'
 import { getAutoModeEnabledStateIfCached } from '@claude-code/permission/permissionSetup'
-import { getBaseRenderOptions } from 'src/utils/renderOptions.js'
+import { getBaseRenderOptions } from '@claude-code/output/render-options'
 import { validateUuid } from '@claude-code/agent/uuid.js'
 import { TASK_STATUSES } from '@claude-code/agent/tasks.js'
 
