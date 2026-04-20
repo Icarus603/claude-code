@@ -3,7 +3,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useInterval } from 'usehooks-ts'
-import { useRegisterOverlay } from 'src/context/overlayContext.js'
+import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow dialog navigation
 import { Box, Text, useInput, stringWidth } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'

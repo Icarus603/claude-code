@@ -6,7 +6,7 @@ import type {
 } from '@modelcontextprotocol/sdk/types.js'
 import figures from 'figures'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useRegisterOverlay } from 'src/context/overlayContext.js'
+import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
 import { useNotifyAfterTimeout } from '@claude-code/repl/hooks/useNotifyAfterTimeout.js'
 import { useTerminalSize } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw text input for elicitation form

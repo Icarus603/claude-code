@@ -16,7 +16,7 @@ import type {
 import {
   useIsModalOverlayActive,
   useRegisterOverlay,
-} from 'src/context/overlayContext.js'
+} from '@claude-code/repl/overlayContext.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until consumers wire handleKeyDown to <Box onKeyDown>
 import {

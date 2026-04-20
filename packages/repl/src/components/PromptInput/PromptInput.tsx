@@ -37,7 +37,7 @@ import { FastModePicker } from 'src/commands/fast/fast.js'
 import { isUltrareviewEnabled } from 'src/commands/review/ultrareviewEnabled.js'
 import { getNativeCSIuTerminalDisplayName } from 'src/commands/terminalSetup/terminalSetup.js'
 import { type Command, hasCommand } from '@claude-code/command-runtime/runtime'
-import { useIsModalOverlayActive } from 'src/context/overlayContext.js'
+import { useIsModalOverlayActive } from '@claude-code/repl/overlayContext.js'
 import { useSetPromptOverlayDialog } from 'src/context/promptOverlayContext.js'
 import {
   formatImageRef,

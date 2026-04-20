@@ -1,7 +1,7 @@
 import { resolve as resolvePath } from 'path'
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { useRegisterOverlay } from 'src/context/overlayContext.js'
+import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Text } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
