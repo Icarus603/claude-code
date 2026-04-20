@@ -72,6 +72,7 @@
     "./messageQueueManager.js": "./messageQueueManager.ts",
     "./commitAttribution.js": "./commitAttribution.ts",
     "./messagesMappers.js": "./messagesMappers.ts",
+    "./messages/mappers.js": "./messages/mappers.ts",
     "./sdkProgress.js": "./sdkProgress.ts",
     "./taskFramework.js": "./taskFramework.ts",
     "./taggedId.js": "./taggedId.ts",
