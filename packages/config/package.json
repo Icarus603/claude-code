@@ -48,6 +48,7 @@
     "./env/utils": "./env/utils.ts",
     "./env/validation": "./env/validation.ts",
     "./env/privacy": "./env/privacy.ts",
+    "./env/privacy-level": "./env/privacy-level.ts",
     "./env/git-settings": "./env/git-settings.ts",
     "./env/managed-constants": "./env/managed-constants.ts",
     "./env/paths": "./env/paths.ts",

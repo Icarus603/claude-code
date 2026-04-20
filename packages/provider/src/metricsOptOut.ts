@@ -6,7 +6,7 @@ import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getAuthHeaders, withOAuth401Retry } from 'src/utils/http.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { memoizeWithTTLAsync } from 'src/utils/memoize.js'
-import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
+import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 
 type MetricsEnabledResponse = {

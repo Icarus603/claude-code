@@ -8,7 +8,7 @@ import {
 } from '@claude-code/config/feature-flags'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
+import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { getSecureStorage } from 'src/utils/secureStorage/index.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
