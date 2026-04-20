@@ -23,7 +23,8 @@
     "./sandbox.js": "./src/sandbox.ts",
     "./powershell/parser.js": "./src/powershell/parser.ts",
     "./execFileNoThrow.js": "./src/execFileNoThrow.ts",
-    "./Shell.js": "./src/Shell.ts"
+    "./Shell.js": "./src/Shell.ts",
+    "./bash/ast-alias.js": "./src/bash/ast-alias.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

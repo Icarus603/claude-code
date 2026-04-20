@@ -16,7 +16,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import type { PromptInputMode, VimMode } from 'src/types/textInputTypes.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
-import { isUndercover } from 'src/utils/undercover.js'
+import { isUndercover } from '@claude-code/tool-registry/undercover.js'
 import {
   CoordinatorTaskPanel,
   useCoordinatorTaskCount,

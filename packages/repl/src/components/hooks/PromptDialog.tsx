@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { PromptRequest } from 'src/types/hooks.js'
+import type { PromptRequest } from '@claude-code/agent/types/hooks.js'
 import { Select } from '../CustomSelect/select.js'
 import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js'
 

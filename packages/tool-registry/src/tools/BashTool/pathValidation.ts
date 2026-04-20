@@ -2,7 +2,7 @@ import { homedir } from 'os'
 import { isAbsolute, resolve } from 'path'
 import type { z } from 'zod/v4'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import type { Redirect, SimpleCommand } from 'src/utils/bash/ast.js'
+import type { Redirect, SimpleCommand } from '@claude-code/shell/bash/ast-alias.js'
 import {
   extractOutputRedirections,
   splitCommand_DEPRECATED,

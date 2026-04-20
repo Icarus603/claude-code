@@ -100,7 +100,7 @@ import type {
 import type { PastedContent } from '@claude-code/config'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { maybeResizeAndDownsampleImageBlock } from '@claude-code/storage/imageResizer.js'
-import { cacheImagePath, storeImage } from 'src/utils/imageStore.js'
+import { cacheImagePath, storeImage } from '@claude-code/tool-registry/imageStore.js'
 
 type ResponseValue =
   | 'yes-bypass-permissions'

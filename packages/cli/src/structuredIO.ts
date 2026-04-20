@@ -22,7 +22,7 @@ import type {
 import type { PermissionUpdate as InternalPermissionUpdate } from '@claude-code/permission/permissionTypes'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import { type HookCallback, hookJSONOutputSchema } from 'src/types/hooks.js'
+import { type HookCallback, hookJSONOutputSchema } from '@claude-code/agent/types/hooks.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'

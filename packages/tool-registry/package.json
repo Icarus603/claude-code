@@ -68,6 +68,16 @@
     "./toolConstants": "./src/toolConstants.ts",
     "./utils/semanticNumber.js": "./src/utils/semanticNumber.ts",
     "./fileStateCache": "./src/fileStateCache.ts",
-    "./readEditContext.js": "./src/readEditContext.ts"
+    "./readEditContext.js": "./src/readEditContext.ts",
+    "./toolErrors.js": "./src/toolErrors.ts",
+    "./toolSchemaCache.js": "./src/toolSchemaCache.ts",
+    "./imageStore.js": "./src/imageStore.ts",
+    "./undercover.js": "./src/undercover.ts",
+    "./words.js": "./src/words.ts",
+    "./gitDiff.js": "./src/gitDiff.ts",
+    "./validateEditTool.js": "./src/validateEditTool.ts",
+    "./orphanedPluginFilter.js": "./src/orphanedPluginFilter.ts",
+    "./ripgrep.js": "./src/ripgrep.ts",
+    "./collapseReadSearch.js": "./src/collapseReadSearch.ts"
   }
 }

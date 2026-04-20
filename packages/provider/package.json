@@ -58,6 +58,9 @@
     "./http.js": "./src/http.ts",
     "./proxy.js": "./src/proxy.ts",
     "./billing.js": "./src/billing.ts",
-    "./user.js": "./src/user.ts"
+    "./user.js": "./src/user.ts",
+    "./betas.js": "./src/betas.ts",
+    "./modelAliases.js": "./src/modelAliases.ts",
+    "./antModels.js": "./src/antModels.ts"
   }
 }

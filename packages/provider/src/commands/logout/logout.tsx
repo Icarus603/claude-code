@@ -10,11 +10,11 @@ import { clearPolicyLimitsCache } from '@claude-code/provider/policyLimits/index
 // flushTelemetry is loaded lazily to avoid pulling in ~1.1MB of OpenTelemetry at startup
 import { clearRemoteManagedSettingsCache } from '@claude-code/config/remote'
 import { getClaudeAIOAuthTokens, removeApiKey } from '@claude-code/provider/authAlias.js'
-import { clearBetasCaches } from 'src/utils/betas.js'
+import { clearBetasCaches } from '@claude-code/provider/betas.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { getSecureStorage } from '@claude-code/storage/secureStorage.js'
-import { clearToolSchemaCache } from 'src/utils/toolSchemaCache.js'
+import { clearToolSchemaCache } from '@claude-code/tool-registry/toolSchemaCache.js'
 import { resetUserCache } from '@claude-code/provider/user.js'
 
 export async function performLogout({

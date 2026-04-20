@@ -16,7 +16,7 @@ import {
   parseForSecurityFromAst,
   type Redirect,
   type SimpleCommand,
-} from 'src/utils/bash/ast.js'
+} from '@claude-code/shell/bash/ast-alias.js'
 import {
   type CommandPrefixResult,
   extractOutputRedirections,
@@ -66,7 +66,7 @@ import {
 import { getPlatform } from '@claude-code/config/platform'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { windowsPathToPosixPath } from 'src/utils/windowsPaths.js'
+import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
 import { BashTool } from './BashTool.js'
 import { checkCommandOperatorPermissions } from './bashCommandHelpers.js'
 import {

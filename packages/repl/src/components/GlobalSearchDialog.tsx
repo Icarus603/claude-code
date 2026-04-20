@@ -11,7 +11,7 @@ import { truncatePathMiddle, truncateToWidth } from '@claude-code/output/formatt
 import { highlightMatch } from 'src/utils/highlightMatch.js'
 import { relativePath } from '@claude-code/permission/filesystem'
 import { readFileInRange } from 'src/utils/readFileInRange.js'
-import { ripGrepStream } from 'src/utils/ripgrep.js'
+import { ripGrepStream } from '@claude-code/tool-registry/ripgrep.js'
 import { FuzzyPicker, LoadingState } from '@anthropic/ink'
 
 type Props = {

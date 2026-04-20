@@ -120,7 +120,7 @@ import {
 import { PermissionRequest, type ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js';
 import { ElicitationDialog } from '@claude-code/repl/components/mcp/ElicitationDialog.js';
 import { PromptDialog } from '@claude-code/repl/components/hooks/PromptDialog.js';
-import type { PromptRequest, PromptResponse } from 'src/types/hooks.js';
+import type { PromptRequest, PromptResponse } from '@claude-code/agent/types/hooks.js';
 import PromptInput from '@claude-code/repl/components/PromptInput/PromptInput.js';
 import { PromptInputQueuedCommands } from '@claude-code/repl/components/PromptInput/PromptInputQueuedCommands.js';
 import { useRemoteSession } from '@claude-code/repl/hooks/useRemoteSession.js';
@@ -133,7 +133,7 @@ import { SkillImprovementSurvey } from '@claude-code/repl/components/SkillImprov
 import { useSkillImprovementSurvey } from '@claude-code/repl/hooks/useSkillImprovementSurvey.js';
 import { useMoreRight } from 'src/moreright/useMoreRight.js';
 import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '@claude-code/repl/components/Spinner.js';
-import { getSystemPrompt } from 'src/constants/prompts.js';
+import { getSystemPrompt } from '@claude-code/agent/prompts.js';
 import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js';
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
 import { getMemoryFiles } from '@claude-code/storage/claudemd.js';
@@ -434,7 +434,7 @@ import {
   getAutoRunCommand,
   type AutoRunIssueReason,
 } from 'src/utils/autoRunIssue.js';
-import type { HookProgress } from 'src/types/hooks.js';
+import type { HookProgress } from '@claude-code/agent/types/hooks.js';
 import { TungstenLiveMonitor } from '@claude-code/tool-registry/tools/TungstenTool/TungstenLiveMonitor.js';
 /* eslint-disable @typescript-eslint/no-require-imports */
 const WebBrowserPanelModule = feature('WEB_BROWSER_TOOL')

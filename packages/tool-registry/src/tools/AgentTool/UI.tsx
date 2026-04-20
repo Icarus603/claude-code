@@ -26,7 +26,7 @@ import { count } from '@claude-code/tool-registry/utils/array.js'
 import {
   getSearchOrReadFromContent,
   getSearchReadSummaryText,
-} from 'src/utils/collapseReadSearch.js'
+} from '@claude-code/tool-registry/collapseReadSearch.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import {
@@ -34,7 +34,7 @@ import {
   createAssistantMessage,
   EMPTY_LOOKUPS,
 } from '@claude-code/agent/messages.js'
-import type { ModelAlias } from 'src/utils/model/aliases.js'
+import type { ModelAlias } from '@claude-code/provider/modelAliases.js'
 import {
   getMainLoopModel,
   parseUserSpecifiedModel,

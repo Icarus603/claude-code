@@ -11,7 +11,8 @@
     "./testing": "./testing/index.ts",
     "./teammateState.js": "./src/teammateState.ts",
     "./teammateContext.js": "./src/teammateContext.ts",
-    "./teamDiscovery.js": "./src/teamDiscovery.ts"
+    "./teamDiscovery.js": "./src/teamDiscovery.ts",
+    "./teammateContextAlias.js": "./src/teammateContextAlias.ts"
   },
   "dependencies": {
     "@claude-code/agent": "workspace:*",

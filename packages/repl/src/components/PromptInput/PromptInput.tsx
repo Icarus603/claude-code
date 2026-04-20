@@ -136,7 +136,7 @@ import {
   PASTE_THRESHOLD,
 } from 'src/utils/imagePaste.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
-import { cacheImagePath, storeImage } from 'src/utils/imageStore.js'
+import { cacheImagePath, storeImage } from '@claude-code/tool-registry/imageStore.js'
 import {
   isMacosOptionChar,
   MACOS_OPTION_SPECIAL_CHARS,

@@ -8,7 +8,7 @@ import type { TaskStatus } from '@claude-code/tool-registry/Task.js'
 import { isPanelAgentTask } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { isBackgroundTask, type TaskState } from 'src/tasks/types.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
-import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
+import { summarizeRecentActivities } from '@claude-code/tool-registry/collapseReadSearch.js'
 
 /**
  * Returns true if the given task status represents a terminal (finished) state.
