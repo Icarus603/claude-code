@@ -40,6 +40,7 @@
     "./detectRepository.js": "./src/detectRepository.ts",
     "./sessionStoragePortable.js": "./src/sessionStoragePortable.ts",
     "./pdfUtils.js": "./src/pdfUtils.ts",
-    "./glob.js": "./src/glob.ts"
+    "./glob.js": "./src/glob.ts",
+    "./xdg.js": "./src/xdg.ts"
   }
 }
