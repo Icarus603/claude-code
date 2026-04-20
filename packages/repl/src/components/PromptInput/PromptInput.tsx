@@ -140,7 +140,7 @@ import { cacheImagePath, storeImage } from '@claude-code/tool-registry/imageStor
 import {
   isMacosOptionChar,
   MACOS_OPTION_SPECIAL_CHARS,
-} from 'src/utils/keyboardShortcuts.js'
+} from '@claude-code/repl/keyboardShortcuts.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   isOpus1mMergeEnabled,
