@@ -24,7 +24,7 @@ import {
   tryRenderPlanApprovalMessage,
   formatTeammateMessageContent,
 } from './PlanApprovalMessage.js'
-import { BLACK_CIRCLE } from 'src/constants/figures.js'
+import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { TeammateMessageContent } from './UserTeammateMessage.js'
 import { isShutdownApproved } from '@claude-code/swarm'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'

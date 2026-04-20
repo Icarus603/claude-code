@@ -3,7 +3,7 @@ import {
   EFFORT_LOW,
   EFFORT_MAX,
   EFFORT_MEDIUM,
-} from 'src/constants/figures.js'
+} from '@claude-code/output/constants/figures.js'
 import {
   type EffortLevel,
   type EffortValue,

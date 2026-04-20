@@ -8,7 +8,7 @@
 
 import figures from 'figures'
 import * as React from 'react'
-import { BLACK_CIRCLE, PAUSE_ICON, PLAY_ICON } from 'src/constants/figures.js'
+import { BLACK_CIRCLE, PAUSE_ICON, PLAY_ICON } from '@claude-code/output/constants/figures.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth, wrapText } from '@anthropic/ink'
 import {

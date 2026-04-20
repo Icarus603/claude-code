@@ -5,7 +5,7 @@ import {
   getQuestionPreviewFormat,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
-import { BLACK_CIRCLE } from 'src/constants/figures.js'
+import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { z } from 'zod/v4'
 import { Box, Text } from '@anthropic/ink'

@@ -1,6 +1,6 @@
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
-import { BLACK_CIRCLE } from 'src/constants/figures.js'
+import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { Box, Text, type TextProps } from '@anthropic/ink'
 import { extractTag } from 'src/utils/messages.js'
 

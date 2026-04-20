@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { BLACK_CIRCLE, BULLET_OPERATOR } from 'src/constants/figures.js'
+import { BLACK_CIRCLE, BULLET_OPERATOR } from '@claude-code/output/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
 import type { SkillUpdate } from 'src/utils/hooks/skillImprovement.js'
 import { normalizeFullWidthDigits } from '@claude-code/output/utils/stringUtils.js'

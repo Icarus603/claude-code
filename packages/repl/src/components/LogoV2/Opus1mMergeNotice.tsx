@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { UP_ARROW } from 'src/constants/figures.js'
+import { UP_ARROW } from '@claude-code/output/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isOpus1mMergeEnabled } from 'src/utils/model/model.js'

@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
-import { BULLET_OPERATOR } from 'src/constants/figures.js'
+import { BULLET_OPERATOR } from '@claude-code/output/constants/figures.js'
 import { Text } from '@anthropic/ink'
 import {
   filterToolProgressMessages,

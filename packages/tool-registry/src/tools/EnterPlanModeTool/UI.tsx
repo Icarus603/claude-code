@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BLACK_CIRCLE } from 'src/constants/figures.js'
+import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
