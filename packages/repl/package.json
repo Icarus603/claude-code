@@ -454,7 +454,7 @@
     "./localInstaller.js": "./src/localInstaller.ts",
     "./systemTheme.js": "./src/systemTheme.ts",
     "./stateStore.js": "./src/stateStore.ts",
-    "./overlayContext.js": "./src/overlayContext.ts",
+    "./overlayContext.js": "./src/overlayContext.tsx",
     "./history.js": "./src/history.ts",
     "./modalContext.js": "./src/modalContext.ts",
     "./teammateViewHelpers.js": "./src/teammateViewHelpers.ts",
