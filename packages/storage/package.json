@@ -24,6 +24,7 @@
     "./path.js": "./src/path.ts",
     "./file.js": "./src/file.ts",
     "./json.js": "./src/json.ts",
+    "./jsonRead.js": "./src/jsonRead.ts",
     "./plans.js": "./src/plans.ts",
     "./task/diskOutput.js": "./src/task/diskOutput.ts",
     "./secureStorage.js": "./src/secureStorage.ts",
