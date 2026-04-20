@@ -14,6 +14,7 @@
     "./controlMessageCompat": "./src/controlMessageCompat.ts",
     "./controlTypes.js": "./src/controlTypes.ts",
     "./sdkUtilityTypes.js": "./src/sdkUtilityTypes.ts",
+    "./runtimeTypes.js": "./src/runtimeTypes.ts",
     "./coreTypes.js": "./src/coreTypes.ts"
   }
 }
