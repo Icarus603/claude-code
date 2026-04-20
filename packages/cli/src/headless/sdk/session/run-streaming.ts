@@ -151,7 +151,7 @@ import {
   mergeFileStateCaches,
   READ_FILE_STATE_CACHE_SIZE,
 } from '@claude-code/tool-registry/fileStateCache'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import { extractReadFilesFromMessages } from '@claude-code/repl/queryHelpers.js'
 import { registerHookEventHandler } from '@claude-code/repl/hookEvents.js'
 import { executeFilePersistence } from 'src/utils/filePersistence/filePersistence.js'
