@@ -15,7 +15,7 @@ External behavior that must remain unchanged during V6 refactor:
 ## Entrypoint Hash Snapshot
 
 ```text
-e9fb0b906d57e69aa2a5ddb904452f2cad561030782467eba2b35d6021bedbe3  packages/headless-sdk/src/agentSdkTypes.ts
+32fac612b3eb829471144a79449b617ac55d2f71d0355e7e88278500e5ad4157  packages/headless-sdk/src/agentSdkTypes.ts
 b24508ad060b7bd04e7e874b671aef618c525ad1a20dc9bc19fcaeeb4da329be  packages/app-host/src/init.ts
 fca81a0d4fc34e818699aa737ccd18e3fd0ed1141efa7d4317968539f765c065  src/entrypoints/mcp.ts
 e15167a170952be204091d6808b0ee9ed7ccc114e34e9396eb060789aac33f4b  packages/headless-sdk/src/sandboxTypes.ts
@@ -24,7 +24,7 @@ d3918b6119e629f2a17967bc217d730b16fe5a9dd9f1673341364dbfe2c2a774  src/entrypoint
 7c4e83756565d421d6d338a2b8356147d95b30132e555c68012ea2551fb3ea9e  src/entrypoints/sdk/coreSchemas.ts
 b4d2efdaa82872990c6244afc6e85db73b48279185792a3ee38811eeceea02b7  src/entrypoints/sdk/coreTypes.generated.ts
 1ffd4643759f1e2342b07d6fe0d6627463b1d39ffa1775a11f10aab17dae2bcd  src/entrypoints/sdk/coreTypes.ts
-b86bd365fbcacfbf3d93eeb8a5680b98b8e2db3bd90473dca316a3dce07255d5  src/entrypoints/sdk/runtimeTypes.ts
+995677acf16256c3844da39768c8d0851df42a9be403f650d86191161cef1803  src/entrypoints/sdk/runtimeTypes.ts
 15b2e94fa97ca2774d343364c6d4abefbee878060fa1d2ca7634c9f2d1b0c7b8  src/entrypoints/sdk/sdkUtilityTypes.ts
 83829b32f2292b6492fac186b20762a0c448e01c40f8105f3eed2bc3fcfccaf2  src/entrypoints/sdk/settingsTypes.generated.ts
 6feda2402a88aefc1b23993e493dd3356e525881fe86e5e490d4aa08b74c223d  src/entrypoints/sdk/toolTypes.ts

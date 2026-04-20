@@ -23,7 +23,7 @@ export type {
 // Re-export core types (common serializable types)
 export * from '@claude-code/headless-sdk/coreTypes.js'
 // Re-export runtime types (callbacks, interfaces with methods)
-export * from 'src/entrypoints/sdk/runtimeTypes.js'
+export * from '@claude-code/headless-sdk/runtimeTypes.js'
 
 // Re-export settings types (generated from settings JSON schema)
 export type { Settings } from 'src/entrypoints/sdk/settingsTypes.generated.js'
@@ -59,7 +59,7 @@ import type {
   SdkMcpToolDefinition,
   SessionMessage,
   SessionMutationOptions,
-} from 'src/entrypoints/sdk/runtimeTypes.js'
+} from '@claude-code/headless-sdk/runtimeTypes.js'
 
 export type {
   ListSessionsOptions,
