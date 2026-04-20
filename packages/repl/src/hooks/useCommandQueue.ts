@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import type { QueuedCommand } from 'src/types/textInputTypes.js'
+import type { QueuedCommand } from '@claude-code/repl/textInputTypes.js'
 import {
   getCommandQueueSnapshot,
   subscribeToCommandQueue,

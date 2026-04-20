@@ -49,7 +49,7 @@ import {
   isBuiltInAgent,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { Message, NormalizedUserMessage } from '@claude-code/agent/messageShapes'
-import type { QueuedCommand } from 'src/types/textInputTypes.js'
+import type { QueuedCommand } from '@claude-code/repl/textInputTypes.js'
 import {
   dequeue,
   dequeueAllMatching,
@@ -179,7 +179,7 @@ import type {
   SDKControlResponse,
   SDKControlMcpSetServersResponse,
   SDKControlReloadPluginsResponse,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import type { PermissionMode } from '@anthropic-ai/claude-agent-sdk'
 import { cwd } from 'process'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'

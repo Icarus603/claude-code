@@ -5,7 +5,7 @@ import { ConfigurableShortcutHint } from '@claude-code/repl/components/Configura
 import { FOOTER_TEMPORARY_STATUS_TIMEOUT } from '@claude-code/repl/components/PromptInput/Notifications.js'
 import { getHistory } from '@claude-code/repl/history.js'
 import { Text } from '@anthropic/ink'
-import type { PromptInputMode } from 'src/types/textInputTypes.js'
+import type { PromptInputMode } from '@claude-code/repl/textInputTypes.js'
 import type { HistoryEntry, PastedContent } from '@claude-code/config'
 
 export type HistoryMode = PromptInputMode

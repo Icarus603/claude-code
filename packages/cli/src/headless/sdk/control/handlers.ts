@@ -22,7 +22,7 @@ import type {
   StdoutMessage,
   SDKControlInitializeRequest,
   SDKControlInitializeResponse,
-} from 'src/entrypoints/sdk/controlTypes.js'
+} from '@claude-code/headless-sdk/controlTypes.js'
 import type {
   AgentDefinition,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'

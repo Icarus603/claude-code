@@ -8,7 +8,7 @@ import { makeHistoryReader } from '@claude-code/repl/history.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until consumers wire handleKeyDown to <Box onKeyDown>
 import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'
-import type { PromptInputMode } from 'src/types/textInputTypes.js'
+import type { PromptInputMode } from '@claude-code/repl/textInputTypes.js'
 import type { HistoryEntry } from '@claude-code/config'
 
 export function useHistorySearch(
