@@ -9,6 +9,11 @@ import * as Sentry from '@sentry/node'
 import { readEnv } from '@claude-code/config/env/utils'
 import { logForDebugging } from './debug.js'
 
+// Build-time constant injected via Bun.build({ define }) in build.ts, or left
+// undefined at dev time. Declared inline so this package doesn't depend on
+// src/types/global.d.ts (V7 §11.2).
+declare const BUILD_ENV: string | undefined
+
 let initialized = false
 
 /**
