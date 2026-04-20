@@ -31,7 +31,7 @@ import { isBackgroundTask } from 'src/tasks/types.js'
 import { getAllInProcessTeammateTasks } from '@claude-code/swarm'
 import { getEffortSuffix } from '@claude-code/agent/effort.js'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
-import { getViewedTeammateTask } from 'src/state/selectors.js'
+import { getViewedTeammateTask } from '@claude-code/repl/selectors.js'
 import { TEARDROP_ASTERISK } from '@claude-code/output/constants/figures.js'
 import figures from 'figures'
 import {

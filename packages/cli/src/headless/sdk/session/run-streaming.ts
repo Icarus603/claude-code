@@ -79,7 +79,7 @@ import { EMPTY_USAGE } from '@claude-code/provider/logging.js'
 import {
   loadConversationForResume,
   type TurnInterruptionState,
-} from 'src/utils/conversationRecovery.js'
+} from '@claude-code/repl/conversationRecovery.js'
 import {
   clearServerCache,
   commandBelongsToServer,

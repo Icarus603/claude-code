@@ -3,7 +3,7 @@ import { useAppState, useAppStateStore } from '@claude-code/repl/appStateHooks.j
 import {
   getActiveAgentForInput,
   getViewedTeammateTask,
-} from 'src/state/selectors.js'
+} from '@claude-code/repl/selectors.js'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
   AGENT_COLORS,

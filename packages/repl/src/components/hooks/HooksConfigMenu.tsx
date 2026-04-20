@@ -25,7 +25,7 @@ import {
   getSortedMatchersForEvent,
   groupHooksByEventAndMatcher,
 } from 'src/utils/hooks/hooksConfigManager.js'
-import type { IndividualHookConfig } from 'src/utils/hooks/hooksSettings.js'
+import type { IndividualHookConfig } from '@claude-code/repl/hooksSettings.js'
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,

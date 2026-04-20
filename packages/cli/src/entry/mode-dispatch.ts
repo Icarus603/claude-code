@@ -204,7 +204,7 @@ import {
   shouldEnableClaudeInChrome,
 } from 'src/utils/claudeInChrome/setup.js'
 import { getContextWindowForModel } from 'src/utils/context.js'
-import { loadConversationForResume } from 'src/utils/conversationRecovery.js'
+import { loadConversationForResume } from '@claude-code/repl/conversationRecovery.js'
 import { buildDeepLinkBanner } from 'src/utils/deepLink/banner.js'
 import {
   hasNodeOption,
