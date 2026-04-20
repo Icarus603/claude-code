@@ -1,9 +1,24 @@
 // V7 §7.2 — lazy require() shim so repl package UI doesn't directly
 // import src/state/AppState at top level. Forwards args verbatim.
-import type { ReactNode } from 'react'
+import type { Context, ReactNode } from 'react'
 
 export type AppState = unknown
 export type FooterItem = unknown
+
+/**
+ * Lazy accessor for the AppStoreContext singleton. Returns the same React
+ * Context instance each call — safe to pass to useContext(). Consumers that
+ * need the Context at render time should call this inline:
+ *
+ *   const store = useContext(getAppStoreContext())
+ */
+export function getAppStoreContext(): Context<unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mod = require('src/state/AppState.js') as {
+    AppStoreContext: Context<unknown>
+  }
+  return mod.AppStoreContext
+}
 
 export function useAppState<T>(selector: (state: unknown) => T): T {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
