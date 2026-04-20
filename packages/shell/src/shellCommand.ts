@@ -9,7 +9,7 @@ import type { ExecResult, ShellCommand } from './types.js'
 import type { TaskOutputPort } from './taskOutputPort.js'
 import { generateTaskId } from './_deps.js'
 
-export type { ExecResult } from './types.js'
+export type { ExecResult, ShellCommand } from './types.js'
 
 
 const SIGKILL = 137
