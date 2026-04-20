@@ -82,6 +82,7 @@
     "./collapseReadSearch.js": "./src/collapseReadSearch.ts",
     "./todoTypes.js": "./src/todoTypes.ts",
     "./taskOutput.js": "./src/taskOutput.ts",
+    "./task/TaskOutput.js": "./src/task/TaskOutput.ts",
     "./peerAddress.js": "./src/peerAddress.ts",
     "./claudeCodeHints.js": "./src/claudeCodeHints.ts",
     "./markdownConfigLoader.js": "./src/markdownConfigLoader.ts",
