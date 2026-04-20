@@ -6,7 +6,7 @@ import {
   hasProfileScope,
 } from 'src/utils/auth.js'
 import { z } from 'zod'
-import { getOauthConfig, OAUTH_BETA_HEADER } from 'src/constants/oauth.js'
+import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from 'src/utils/debug.js'
 import { withOAuth401Retry } from 'src/utils/http.js'

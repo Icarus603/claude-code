@@ -1,6 +1,6 @@
 import axios, { type AxiosError } from 'axios'
 import type { UUID } from 'crypto'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import type { Entry, TranscriptMessage } from 'src/types/logs.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'

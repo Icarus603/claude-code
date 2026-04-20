@@ -21,7 +21,7 @@ import {
   CLAUDE_AI_INFERENCE_SCOPE,
   getOauthConfig,
   OAUTH_BETA_HEADER,
-} from 'src/constants/oauth.js'
+} from '@claude-code/provider/oauthConstants'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getAnthropicApiKeyWithSource,

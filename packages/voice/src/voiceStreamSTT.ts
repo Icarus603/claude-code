@@ -13,7 +13,7 @@
 
 import type { ClientRequest, IncomingMessage } from 'http'
 import WebSocket from 'ws'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import {
   getOauthAccountInfo,
   getSubscriptionType,

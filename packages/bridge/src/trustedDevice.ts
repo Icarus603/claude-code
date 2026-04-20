@@ -1,7 +1,7 @@
 import axios from 'axios'
 import memoize from 'lodash-es/memoize.js'
 import { hostname } from 'os'
-import { getOauthConfig } from 'src/constants/oauth.js'
+import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import {
   checkGate_CACHED_OR_BLOCKING,
   getFeatureValue_CACHED_MAY_BE_STALE,

@@ -47,6 +47,7 @@
     "./errors.js": "./src/errors.ts",
     "./systemPromptType.js": "./src/systemPromptType.ts",
     "./userAgent.js": "./src/userAgent.ts",
-    "./connectorTextTypes": "./src/connectorTextTypes.ts"
+    "./connectorTextTypes": "./src/connectorTextTypes.ts",
+    "./oauthConstants": "./src/oauthConstants.ts"
   }
 }
