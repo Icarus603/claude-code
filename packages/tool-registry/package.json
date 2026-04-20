@@ -84,6 +84,7 @@
     "./todoTypes.js": "./src/todoTypes.ts",
     "./taskOutput.js": "./src/taskOutput.ts",
     "./task/TaskOutput.js": "./src/task/TaskOutput.ts",
+    "./task/outputFormatting.js": "./src/task/outputFormatting.ts",
     "./peerAddress.js": "./src/peerAddress.ts",
     "./claudeCodeHints.js": "./src/claudeCodeHints.ts",
     "./markdownConfigLoader.js": "./src/markdownConfigLoader.ts",
