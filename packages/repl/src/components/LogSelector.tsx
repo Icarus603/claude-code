@@ -14,7 +14,7 @@ import { formatLogMetadata } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { getWorktreePaths } from '@claude-code/storage/getWorktreePaths.js'
 import { getBranch } from '@claude-code/storage/git.js'
-import { getLogDisplayTitle } from 'src/utils/log.js'
+import { getLogDisplayTitle } from '@claude-code/local-observability/log.js'
 import {
   getFirstMeaningfulUserMessageTextContent,
   getSessionIdFromLog,

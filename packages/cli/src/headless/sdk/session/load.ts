@@ -27,7 +27,7 @@ import {
 import { EMPTY_USAGE } from '@claude-code/provider/logging.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/log.js'
 import {
   gracefulShutdownSync,
 } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'

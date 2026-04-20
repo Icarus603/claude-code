@@ -69,7 +69,7 @@ import {
   type SessionExternalMetadata,
 } from '@claude-code/storage/sessionState.js'
 import { externalMetadataToAppState } from '@claude-code/repl/onChangeAppState.js'
-import { getInMemoryErrors, logError, logMCPDebug } from 'src/utils/log.js'
+import { getInMemoryErrors, logError, logMCPDebug } from '@claude-code/local-observability/log.js'
 import {
   writeToStdout,
   registerProcessOutputErrorHandlers,
