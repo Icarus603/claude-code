@@ -19,11 +19,11 @@ import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getPluginMcpServers } from 'src/utils/plugins/mcpPluginIntegration.js'
-import { loadAllPluginsCacheOnly } from 'src/utils/plugins/pluginLoader.js'
+import { getPluginMcpServers } from '@claude-code/config/plugin/mcpPluginIntegration'
+import { loadAllPluginsCacheOnly } from '@claude-code/config/plugin/pluginLoader'
 import { isSettingSourceEnabled } from '@claude-code/config/constants'
-import { getManagedFilePath } from 'src/utils/settings/managedPath.js'
-import { isRestrictedToPluginOnly } from 'src/utils/settings/pluginOnlyPolicy.js'
+import { getManagedFilePath } from '@claude-code/config/managedPath'
+import { isRestrictedToPluginOnly } from '@claude-code/config/pluginOnlyPolicy'
 import {
   getInitialSettings,
   getSettingsForSource,
@@ -33,8 +33,8 @@ import {
   isMcpServerNameEntry,
   isMcpServerUrlEntry,
   type SettingsJson,
-} from 'src/utils/settings/types.js'
-import type { ValidationError } from 'src/utils/settings/validation.js'
+} from '@claude-code/config/types'
+import type { ValidationError } from '@claude-code/config/validation'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'

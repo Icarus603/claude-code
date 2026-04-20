@@ -31,7 +31,7 @@ import { getRuleByContentsForTool } from '@claude-code/permission/permissions'
 import {
   isOfficialMarketplaceName,
   parsePluginIdentifier,
-} from 'src/utils/plugins/pluginIdentifier.js'
+} from '@claude-code/config/plugin/pluginIdentifier'
 import { buildPluginCommandTelemetryFields } from 'src/utils/telemetry/pluginTelemetry.js'
 import { z } from 'zod/v4'
 import {

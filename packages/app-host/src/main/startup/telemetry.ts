@@ -4,7 +4,7 @@ import { getContextWindowForModel } from "src/utils/context.js";
 import { getInitialMainLoopModel, getSdkBetas } from "../../bootstrap/state.js";
 import { logSkillsLoaded } from "src/utils/telemetry/skillLoadedEvent.js";
 import { getCwd } from "@claude-code/app-host/bootstrap/cwd.js";
-import { loadAllPluginsCacheOnly } from "src/utils/plugins/pluginLoader.js";
+import { loadAllPluginsCacheOnly } from "@claude-code/config/plugin/pluginLoader";
 import { getManagedPluginNames } from "src/utils/plugins/managedPlugins.js";
 import { getPluginSeedDirs } from "src/utils/plugins/pluginDirectories.js";
 import {

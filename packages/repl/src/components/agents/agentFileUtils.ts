@@ -1,7 +1,7 @@
 import { mkdir, open, unlink } from 'fs/promises'
 import { join } from 'path'
 import type { SettingSource } from '@claude-code/config/constants'
-import { getManagedFilePath } from 'src/utils/settings/managedPath.js'
+import { getManagedFilePath } from '@claude-code/config/managedPath'
 import type { AgentMemoryScope } from '@claude-code/memory/agentMemory'
 import {
   type AgentDefinition,

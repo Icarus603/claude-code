@@ -6,7 +6,7 @@ import { writeFileSync_DEPRECATED } from "@claude-code/local-observability/slowO
 import { generateTempFilePath } from "src/utils/tempfile.js";
 import { getFsImplementation, safeResolvePath } from "src/utils/fsOperations.js";
 import { errorMessage, isENOENT } from "@claude-code/local-observability/errorHelpers.js";
-import { resetSettingsCache } from "src/utils/settings/settingsCache.js";
+import { resetSettingsCache } from "@claude-code/config/settings/settingsCache";
 import { eagerParseCliFlag } from "src/utils/cliArgs.js";
 import { parseSettingSourcesFlag } from "src/utils/settings/constants.js";
 import {

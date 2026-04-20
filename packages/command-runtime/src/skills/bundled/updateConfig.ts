@@ -1,5 +1,5 @@
 import { toJSONSchema } from 'zod/v4'
-import { SettingsSchema } from 'src/utils/settings/types.js'
+import { SettingsSchema } from '@claude-code/config/types'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 

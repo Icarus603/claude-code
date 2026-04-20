@@ -10,7 +10,7 @@ import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import type { useNotifications } from 'src/context/notifications.js'
 import { Text } from '@anthropic/ink'
 import { logError } from '@claude-code/local-observability/logging'
-import { getPluginById } from 'src/utils/plugins/marketplaceManager.js'
+import { getPluginById } from '@claude-code/config/plugin/marketplaceManager'
 
 type AddNotification = ReturnType<typeof useNotifications>['addNotification']
 type PluginData = NonNullable<Awaited<ReturnType<typeof getPluginById>>>

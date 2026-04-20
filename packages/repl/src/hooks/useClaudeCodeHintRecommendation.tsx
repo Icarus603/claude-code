@@ -27,8 +27,8 @@ import {
   markHintPluginShown,
   type PluginHintRecommendation,
   resolvePluginHint,
-} from 'src/utils/plugins/hintRecommendation.js'
-import { installPluginFromMarketplace } from 'src/utils/plugins/pluginInstallationHelpers.js'
+} from '@claude-code/config/plugin/hintRecommendation'
+import { installPluginFromMarketplace } from '@claude-code/config/plugin/pluginInstallationHelpers'
 import {
   installPluginAndNotify,
   usePluginRecommendationBase,
