@@ -25,7 +25,19 @@ import { jsonStringify } from '@claude-code/local-observability/slowOperations.j
 import { isToolReferenceBlock } from '@claude-code/agent/toolSearch.js'
 import { getAPIMetadata, getExtraBodyParams } from '@claude-code/provider/claude.js'
 import { getAnthropicClient } from '@claude-code/provider'
-import { withTokenCountVCR } from 'src/services/vcr.js'
+// Production noop of withTokenCountVCR — the src/ version gates on
+// NODE_ENV==='test' || (USER_TYPE==='ant' && FORCE_VCR) and returns await f()
+// in all other cases. Token counting has no test fixtures in this repo
+// (see src/utils/__tests__/tokens.test.ts which mocks countMessagesTokensWithAPI),
+// so the vcr gate is always false at runtime. Inlining breaks the @claude-code/
+// agent → src/services/vcr import cycle without behavior change.
+async function withTokenCountVCR(
+  _messages: unknown[],
+  _tools: unknown[],
+  f: () => Promise<number | null>,
+): Promise<number | null> {
+  return await f()
+}
 import { readEnv } from '@claude-code/config/env'
 
 // Minimal values for token counting with thinking enabled
