@@ -13,7 +13,7 @@ import { count } from '@claude-code/tool-registry/utils/array.js'
 import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { isTodoV2Enabled, type Task } from '@claude-code/agent/tasks.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 import { Text as ThemedText } from '@anthropic/ink'
 
 type Props = {

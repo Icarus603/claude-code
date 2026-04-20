@@ -58,7 +58,7 @@ import {
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 type RestoreOption =
   | 'both'
   | 'conversation'

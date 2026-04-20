@@ -13,7 +13,7 @@ import { basename, sep } from 'path'
 import { UserTextMessage } from './UserTextMessage.js'
 import { DiagnosticsDisplay } from '../DiagnosticsDisplay.js'
 import { getContentText } from 'src/utils/messages.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 import { UserImageMessage } from './UserImageMessage.js'
 
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'

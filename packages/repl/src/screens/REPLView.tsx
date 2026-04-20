@@ -390,7 +390,7 @@ import { useAwaySummary } from '@claude-code/repl/hooks/useAwaySummary.js';
 import { useChromeExtensionNotification } from '@claude-code/repl/hooks/useChromeExtensionNotification.js';
 import { useOfficialMarketplaceNotification } from '@claude-code/repl/hooks/useOfficialMarketplaceNotification.js';
 import { getTipToShowOnSpinner, recordShownTip } from 'src/services/tips/tipScheduler.js';
-import type { Theme } from 'src/utils/theme.js';
+import type { Theme } from '@anthropic/ink';
 import {
   checkAndDisableBypassPermissionsIfNeeded,
   checkAndDisableAutoModeIfNeeded,

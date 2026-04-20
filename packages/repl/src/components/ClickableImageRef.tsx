@@ -2,7 +2,7 @@ import * as React from 'react'
 import { pathToFileURL } from 'url'
 import { Link, supportsHyperlinks, Text } from '@anthropic/ink'
 import { getStoredImagePath } from 'src/utils/imageStore.js'
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 
 type Props = {
   imageId: number

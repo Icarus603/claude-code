@@ -28,7 +28,7 @@ import {
   type StatsDateRange,
 } from 'src/utils/stats.js'
 import { resolveThemeSetting } from 'src/utils/systemTheme.js'
-import { getTheme, themeColorToAnsi } from 'src/utils/theme.js'
+import { getTheme, themeColorToAnsi } from '@anthropic/ink'
 import { Spinner } from './Spinner.js'
 
 function formatPeakDay(dateStr: string): string {

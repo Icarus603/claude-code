@@ -18,7 +18,7 @@ import { logError } from 'src/utils/log.js'
 import { getPlansDirectory } from 'src/utils/plans.js'
 import { readEditContext } from 'src/utils/readEditContext.js'
 import { firstLineOf } from 'src/utils/stringUtils.js'
-import type { ThemeName } from 'src/utils/theme.js'
+import type { ThemeName } from '@anthropic/ink'
 import type { FileEditOutput } from './types.js'
 import {
   findActualString,

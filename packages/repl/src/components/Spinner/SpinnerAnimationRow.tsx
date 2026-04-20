@@ -6,7 +6,7 @@ import { toInkColor } from 'src/utils/ink.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 
-import type { Theme } from 'src/utils/theme.js'
+import type { Theme } from '@anthropic/ink'
 
 import { GlimmerMessage } from './GlimmerMessage.js'
 import { SpinnerGlyph } from './SpinnerGlyph.js'

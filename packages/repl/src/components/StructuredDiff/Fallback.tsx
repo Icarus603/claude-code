@@ -1,7 +1,7 @@
 import { diffWordsWithSpace, type StructuredPatchHunk } from 'diff'
 import * as React from 'react'
 import { useMemo } from 'react'
-import type { ThemeName } from 'src/utils/theme.js'
+import type { ThemeName } from '@anthropic/ink'
 import { Box, NoSelect, Text, stringWidth, useTheme, wrapText } from '@anthropic/ink'
 
 /*

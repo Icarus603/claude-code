@@ -1,5 +1,5 @@
 import { type ColorType, colorize, type Color } from '@anthropic/ink'
-import { getTheme, type Theme, type ThemeName } from 'src/utils/theme.js'
+import { getTheme, type Theme, type ThemeName } from '@anthropic/ink'
 
 /**
  * Curried theme-aware color function. Resolves theme keys to raw color

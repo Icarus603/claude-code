@@ -8,7 +8,7 @@ import {
   jsonStringify,
   writeFileSync_DEPRECATED,
 } from '@claude-code/local-observability/slowOperations.js'
-import type { ThemeName } from 'src/utils/theme.js'
+import type { ThemeName } from '@anthropic/ink'
 import { Select } from './CustomSelect/index.js'
 
 interface InvalidConfigHandlerProps {

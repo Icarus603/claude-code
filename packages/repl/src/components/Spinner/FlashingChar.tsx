@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, useTheme } from '@anthropic/ink'
-import { getTheme, type Theme } from 'src/utils/theme.js'
+import { getTheme, type Theme } from '@anthropic/ink'
 import { interpolateColor, parseRGB, toRGBColor } from './utils.js'
 
 type Props = {
