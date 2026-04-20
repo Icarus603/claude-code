@@ -38,7 +38,7 @@ import {
 } from '@claude-code/repl/projectOnboardingState.js'
 import { CondensedLogo } from './CondensedLogo.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
-import { checkForReleaseNotesSync } from 'src/utils/releaseNotes.js'
+import { checkForReleaseNotesSync } from '@claude-code/repl/releaseNotes.js'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {

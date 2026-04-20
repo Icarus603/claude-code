@@ -192,7 +192,7 @@ import {
   isCustomAgent,
   parseAgentsFromJson,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { LogOption } from 'src/types/logs.js'
+import type { LogOption } from '@claude-code/agent/logsTypes.js'
 import type { Message as MessageType } from '@claude-code/agent/messageShapes'
 import {
   CLAUDE_IN_CHROME_SKILL_HINT,
@@ -364,7 +364,7 @@ import {
   clearPluginCache,
   loadAllPluginsCacheOnly,
 } from '@claude-code/cli/pluginLoader.js'
-import { migrateChangelogFromConfig } from 'src/utils/releaseNotes.js'
+import { migrateChangelogFromConfig } from '@claude-code/repl/releaseNotes.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { fetchSession, prepareApiRequest } from '@claude-code/teleport/api.js'
 import {
