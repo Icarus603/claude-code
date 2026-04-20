@@ -152,7 +152,7 @@ import {
   getNextPermissionMode,
 } from '@claude-code/permission/getNextPermissionMode.js'
 import { transitionPermissionMode } from '@claude-code/permission/permissionSetup'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import type { ProcessUserInputContext } from 'src/utils/processUserInput/processUserInput.js'
 import { editPromptInEditor } from 'src/utils/promptEditor.js'
 import { hasAutoModeOptIn } from '@claude-code/config/settings'

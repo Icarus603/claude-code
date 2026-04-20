@@ -31,7 +31,7 @@ import {
   isDangerousRemovalPath,
   isPathInSandboxWriteAllowlist,
 } from '@claude-code/permission/pathValidation.js'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import type {
   ParsedCommandElement,
   ParsedPowerShellCommand,

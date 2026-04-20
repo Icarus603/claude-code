@@ -9,7 +9,7 @@ import { readFile } from 'fs/promises'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 
 // Lazy-loaded native audio module. audio-capture.node links against
 // CoreAudio.framework + AudioUnit.framework; dlopen is synchronous and

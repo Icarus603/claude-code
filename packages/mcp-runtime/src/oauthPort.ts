@@ -3,7 +3,7 @@
  * auth.ts ↔ xaaIdpLogin.ts circular dependency.
  */
 import { createServer } from 'http'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 
 // Windows dynamic port range 49152-65535 is reserved
 const REDIRECT_PORT_RANGE =
