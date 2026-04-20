@@ -3,7 +3,7 @@ import { Ansi, Box, Text, useAnimationFrame } from '@anthropic/ink'
 import {
   segmentTextByHighlights,
   type TextHighlight,
-} from 'src/utils/textHighlighting.js'
+} from '@claude-code/output/textHighlighting.js'
 import { ShimmerChar } from '../Spinner/ShimmerChar.js'
 
 type Props = {
