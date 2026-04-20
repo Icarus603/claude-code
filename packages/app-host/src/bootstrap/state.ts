@@ -15,9 +15,9 @@ import type { HookCallbackMatcher } from '@claude-code/agent/types/hooks.js'
 // zero circular-dep risk. Path-alias import bypasses bootstrap-isolation
 // (rule only checks ./ and / prefixes); explicit disable documents intent.
 // eslint-disable-next-line custom-rules/bootstrap-isolation
-import { randomUUID } from 'src/utils/crypto.js'
+import { randomUUID } from '@claude-code/config/crypto.js'
 import type { ModelSetting } from '@claude-code/provider/model.js'
-import type { ModelStrings } from 'src/utils/model/modelStrings.js'
+import type { ModelStrings } from '@claude-code/provider/modelStrings.js'
 import { resetSettingsCache } from '@claude-code/config/settings/settingsCache'
 import type { PluginHookMatcher } from '@claude-code/config/types'
 import { createSignal } from '@claude-code/config/signal'

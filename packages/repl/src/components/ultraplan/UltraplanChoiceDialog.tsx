@@ -14,7 +14,7 @@ import { clearConversation } from 'src/commands/clear/conversation.js';
 import { createCommandInputMessage } from '@claude-code/agent/messages.js';
 import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js';
 import { updateTaskState } from '@claude-code/agent/taskFramework.js';
-import { archiveRemoteSession } from 'src/utils/teleport.js';
+import { archiveRemoteSession } from '@claude-code/tool-registry/teleport.js';
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js';
 import { toRelativePath } from '@claude-code/storage/path.js';
 import type { UUID } from '@claude-code/agent/uuid.js';

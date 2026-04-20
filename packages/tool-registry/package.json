@@ -84,6 +84,11 @@
     "./peerAddress.js": "./src/peerAddress.ts",
     "./claudeCodeHints.js": "./src/claudeCodeHints.ts",
     "./markdownConfigLoader.js": "./src/markdownConfigLoader.ts",
-    "./toolsList.js": "./src/toolsList.ts"
+    "./toolsList.js": "./src/toolsList.ts",
+    "./tasks/RemoteAgentTask.js": "./src/tasks/RemoteAgentTask.ts",
+    "./teleport.js": "./src/teleport.ts",
+    "./telemetry/pluginTelemetry.js": "./src/telemetry/pluginTelemetry.ts",
+    "./suggestions/skillUsageTracking.js": "./src/suggestions/skillUsageTracking.ts",
+    "./codeIndexing.js": "./src/codeIndexing.ts"
   }
 }

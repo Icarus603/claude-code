@@ -10,7 +10,7 @@ import {
   type TeleportProgressStep,
   type TeleportResult,
   teleportResumeCodeSession,
-} from 'src/utils/teleport.js'
+} from '@claude-code/tool-registry/teleport.js'
 
 type Props = {
   currentStep: TeleportProgressStep

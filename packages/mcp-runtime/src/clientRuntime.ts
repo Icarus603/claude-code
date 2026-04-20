@@ -57,7 +57,7 @@ import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpRes
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
-import { detectCodeIndexingFromMcpServerName } from 'src/utils/codeIndexing.js'
+import { detectCodeIndexingFromMcpServerName } from '@claude-code/tool-registry/codeIndexing.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import {
@@ -150,7 +150,7 @@ import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { classifyMcpToolForCollapse } from '@claude-code/tool-registry/tools/MCPTool/classifyForCollapse.js'
-import { clearKeychainCache } from 'src/utils/secureStorage/macOsKeychainHelpers.js'
+import { clearKeychainCache } from '@claude-code/mcp-runtime/macOsKeychainHelpers.js'
 import { sleep } from '@claude-code/config/sleep'
 import {
   ClaudeAuthProvider,

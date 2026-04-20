@@ -21,13 +21,13 @@ import { MODEL_ALIASES } from '@claude-code/provider/modelAliases.js'
 import {
   checkOpus1mAccess,
   checkSonnet1mAccess,
-} from 'src/utils/model/check1mAccess.js'
+} from '@claude-code/provider/model/check1mAccess.js'
 import {
   getDefaultMainLoopModelSetting,
   isOpus1mMergeEnabled,
   renderDefaultModelSetting,
 } from '@claude-code/provider/model.js'
-import { isModelAllowed } from 'src/utils/model/modelAllowlist.js'
+import { isModelAllowed } from '@claude-code/provider/model/modelAllowlist.js'
 import { validateModel } from '@claude-code/provider/validateModel.js'
 
 function ModelPickerWrapper({

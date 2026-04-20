@@ -83,7 +83,7 @@ import {
   getDefaultMainLoopModelSetting,
   isNonCustomOpusModel,
 } from '@claude-code/provider/model.js'
-import { getModelStrings } from 'src/utils/model/modelStrings.js'
+import { getModelStrings } from '@claude-code/provider/modelStrings.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import {

@@ -122,6 +122,8 @@
     "./configConstants.js": "./configConstants.ts",
     "./memoize.js": "./memoize.ts",
     "./plugin/loadPluginAgentsAlias.js": "./plugin/loadPluginAgentsAlias.ts",
-    "./managedEnv.js": "./managedEnv.ts"
+    "./managedEnv.js": "./managedEnv.ts",
+    "./crypto.js": "./crypto.ts",
+    "./gitFilesystem.js": "./gitFilesystem.ts"
   }
 }

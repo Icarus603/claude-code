@@ -454,6 +454,7 @@
     "./localInstaller.js": "./src/localInstaller.ts",
     "./systemTheme.js": "./src/systemTheme.ts",
     "./stateStore.js": "./src/stateStore.ts",
-    "./overlayContext.js": "./src/overlayContext.ts"
+    "./overlayContext.js": "./src/overlayContext.ts",
+    "./onChangeAppState.js": "./src/onChangeAppState.ts"
   }
 }

@@ -12,7 +12,7 @@ import type {
   SDKMessage,
   SDKUserMessage,
 } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import { SDKControlElicitationResponseSchema } from 'src/entrypoints/sdk/controlSchemas.js'
+import { SDKControlElicitationResponseSchema } from '@claude-code/agent/sdkControlSchemas.js'
 import type {
   SDKControlRequest,
   SDKControlResponse,

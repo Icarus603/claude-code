@@ -35,7 +35,7 @@ import type { MonitorMcpTaskState } from 'src/tasks/MonitorMcpTask/MonitorMcpTas
 import {
   RemoteAgentTask,
   type RemoteAgentTaskState,
-} from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js'
+} from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
 import {
   type BackgroundTaskState,
   isBackgroundTask,
