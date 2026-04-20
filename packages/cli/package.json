@@ -24,6 +24,7 @@
     "./print.js": "./src/print.ts",
     "./rollback.js": "./src/rollback.ts",
     "./up.js": "./src/up.ts",
-    "./utils/warningHandler.js": "./src/utils/warningHandler.ts"
+    "./utils/warningHandler.js": "./src/utils/warningHandler.ts",
+    "./secureStorage/keychainPrefetch.js": "./src/secureStorage/keychainPrefetch.ts"
   }
 }
