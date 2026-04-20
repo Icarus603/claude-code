@@ -55,7 +55,7 @@ import {
   TASK_MAX_OUTPUT_DEFAULT,
   TASK_MAX_OUTPUT_UPPER_LIMIT,
 } from 'src/utils/task/outputFormatting.js'
-import { getXDGStateHome } from 'src/utils/xdg.js'
+import { getXDGStateHome } from '@claude-code/storage/xdg.js'
 
 type Props = {
   onDone: (
