@@ -1,3 +1,2 @@
-// Auto-generated stub — replace with real implementation
-export type SecureStorage = unknown;
-export type SecureStorageData = unknown;
+// Canonical owner is @claude-code/mcp-runtime/secureStorageTypes.
+export * from '@claude-code/mcp-runtime/secureStorageTypes'
