@@ -27,7 +27,7 @@ import {
   setNeedsAutoModeExitAttachment,
   setNeedsPlanModeExitAttachment,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { generateSessionName } from 'src/commands/rename/generateSessionName.js'
+import { generateSessionName } from '@claude-code/permission/commands/rename/generateSessionName.js'
 import { launchUltraplan } from '@claude-code/repl/ultraplan.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 type AppState = Record<string, unknown>

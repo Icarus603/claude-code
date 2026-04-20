@@ -24,6 +24,7 @@
     "./commands/index.js": "./src/commands/index.ts",
     "./commands/permissions.js": "./src/commands/permissions.tsx",
     "./commands/add-dir/validation.js": "./src/commands/add-dir/validation.ts",
+    "./commands/rename/generateSessionName.js": "./src/commands/rename/generateSessionName.ts",
     "./toolPermission/*.js": "./src/toolPermission/*.ts",
     "./toolPermission/handlers/*.js": "./src/toolPermission/handlers/*.ts",
     "./autoModeState.js": "./src/autoModeState.ts",
