@@ -60,12 +60,12 @@ import {
   isFastModeAvailable,
   getFastModeState,
 } from '@claude-code/repl/fastMode.js'
-import { AwsAuthStatusManager } from 'src/utils/awsAuthStatusManager.js'
+import { AwsAuthStatusManager } from '@claude-code/repl/awsAuthStatusManager.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { logMCPDebug } from '@claude-code/local-observability/log.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
-import { enqueue } from 'src/utils/messageQueueManager.js'
+import { enqueue } from '@claude-code/agent/messageQueueManager.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { randomUUID } from 'crypto'
 import { StructuredIO } from '../../../structuredIO.js'

@@ -10,7 +10,7 @@ import { openFileInExternalEditor } from '@claude-code/storage/editor.js'
 import { truncatePathMiddle, truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { highlightMatch } from 'src/utils/highlightMatch.js'
 import { relativePath } from '@claude-code/permission/filesystem'
-import { readFileInRange } from 'src/utils/readFileInRange.js'
+import { readFileInRange } from '@claude-code/repl/readFileInRange.js'
 import { ripGrepStream } from '@claude-code/tool-registry/ripgrep.js'
 import { FuzzyPicker, LoadingState } from '@anthropic/ink'
 

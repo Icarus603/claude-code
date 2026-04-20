@@ -94,7 +94,7 @@ import {
 import {
   loadRemoteManagedSettings,
   refreshRemoteManagedSettings,
-} from 'src/services/remoteManagedSettings/index.js'
+} from '@claude-code/cli/remoteManagedSettings.js'
 import type { ToolInputJSONSchema } from '@claude-code/tool-registry/Tool.js'
 import {
   createSyntheticOutputTool,
@@ -117,11 +117,11 @@ import {
   prefetchGcpCredentialsIfSafe,
   validateForceLoginOrg,
 } from '@claude-code/provider/authAlias.js'
-import { seedEarlyInput, stopCapturingEarlyInput } from 'src/utils/earlyInput.js'
+import { seedEarlyInput, stopCapturingEarlyInput } from '@claude-code/repl/earlyInput.js'
 import {
   parseEffortValue,
   toPersistableEffort,
-} from 'src/utils/effort.js'
+} from '@claude-code/agent/effort.js'
 import {
   getFastModeUnavailableReason,
   isFastModeSupportedByModel,
@@ -288,7 +288,7 @@ import {
 } from 'src/utils/claudeInChrome/common.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { eagerParseCliFlag } from '@claude-code/app-host/cliArgs.js'
-import { createEmptyAttributionState } from 'src/utils/commitAttribution.js'
+import { createEmptyAttributionState } from '@claude-code/agent/commitAttribution.js'
 import {
   countConcurrentSessions,
   registerSession,
@@ -311,7 +311,7 @@ import {
   gracefulShutdown,
   gracefulShutdownSync,
 } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
-import { setAllHookEventsEnabled } from 'src/utils/hooks/hookEvents.js'
+import { setAllHookEventsEnabled } from '@claude-code/repl/hookEvents.js'
 import { refreshModelCapabilities } from '@claude-code/provider/modelCapabilities.js'
 import { peekForStdinData, writeToStderr } from '@claude-code/shell/process.js'
 import { setCwd } from 'src/utils/Shell.js'
@@ -363,7 +363,7 @@ import {
 import {
   clearPluginCache,
   loadAllPluginsCacheOnly,
-} from 'src/utils/plugins/pluginLoader.js'
+} from '@claude-code/cli/pluginLoader.js'
 import { migrateChangelogFromConfig } from 'src/utils/releaseNotes.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { fetchSession, prepareApiRequest } from '@claude-code/teleport/api.js'

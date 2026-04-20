@@ -1,7 +1,7 @@
 import { isInputModeCharacter } from '@claude-code/repl/components/PromptInput/inputModes.js'
 import { useNotifications } from '@claude-code/repl/notifications.js'
 import stripAnsi from 'strip-ansi'
-import { markBackslashReturnUsed } from 'src/commands/terminalSetup/terminalSetup.js'
+import { markBackslashReturnUsed } from '@claude-code/repl/terminalSetup.js'
 import { addToHistory } from '@claude-code/repl/history.js'
 import type { Key } from '@anthropic/ink'
 import type {

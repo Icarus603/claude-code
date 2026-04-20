@@ -6,7 +6,7 @@ import {
 import {
   setupTerminal,
   shouldOfferTerminalSetup,
-} from 'src/commands/terminalSetup/terminalSetup.js'
+} from '@claude-code/repl/terminalSetup.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Newline, Text, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'

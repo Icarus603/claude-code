@@ -10,6 +10,8 @@
     "./contracts": "./src/contracts.ts",
     "./ndjsonSafeStringify.js": "./src/ndjsonSafeStringify.ts",
     "./bg.js": "./src/bg.ts",
+    "./pluginLoader.js": "./src/pluginLoader.ts",
+    "./remoteManagedSettings.js": "./src/remoteManagedSettings.ts",
     "./remoteIO.js": "./src/remoteIO.ts",
     "./mcpServersHandlers.js": "./src/mcpServersHandlers.ts",
     "./structuredIO.js": "./src/structuredIO.ts",
