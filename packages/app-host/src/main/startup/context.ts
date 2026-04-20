@@ -9,7 +9,7 @@ import {
 	prefetchAwsCredentialsAndBedRockInfoIfSafe,
 	prefetchGcpCredentialsIfSafe,
 } from "src/utils/auth.js";
-import { countFilesRoundedRg } from "src/utils/ripgrep.js";
+import { countFilesRoundedRg } from "@claude-code/tool-registry/ripgrep.js";
 import { getCwd } from "@claude-code/app-host/bootstrap/cwd.js";
 import { prefetchOfficialMcpUrls } from '@claude-code/mcp-runtime/officialRegistry.js';
 import { refreshModelCapabilities } from "src/utils/model/modelCapabilities.js";

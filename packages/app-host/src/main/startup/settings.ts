@@ -1,14 +1,14 @@
 import { feature } from "bun:bundle";
 import chalk from "chalk";
 import { readFileSync } from "fs";
-import { safeParseJSON } from "src/utils/json.js";
+import { safeParseJSON } from "@claude-code/storage/json.js";
 import { writeFileSync_DEPRECATED } from "@claude-code/local-observability/slowOperations.js";
-import { generateTempFilePath } from "src/utils/tempfile.js";
+import { generateTempFilePath } from "@claude-code/storage/tempfile.js";
 import { getFsImplementation, safeResolvePath } from "@claude-code/storage/fsOperations.js";
 import { errorMessage, isENOENT } from "@claude-code/local-observability/errorHelpers.js";
 import { resetSettingsCache } from "@claude-code/config/settings/settingsCache";
-import { eagerParseCliFlag } from "src/utils/cliArgs.js";
-import { parseSettingSourcesFlag } from "src/utils/settings/constants.js";
+import { eagerParseCliFlag } from "@claude-code/app-host/cliArgs.js";
+import { parseSettingSourcesFlag } from "@claude-code/config/constants";
 import {
 	setAllowedSettingSources,
 	setFlagSettingsPath,
