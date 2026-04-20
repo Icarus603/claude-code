@@ -25,6 +25,8 @@
     "./rollback.js": "./src/rollback.ts",
     "./up.js": "./src/up.ts",
     "./utils/warningHandler.js": "./src/utils/warningHandler.ts",
-    "./secureStorage/keychainPrefetch.js": "./src/secureStorage/keychainPrefetch.ts"
+    "./secureStorage/keychainPrefetch.js": "./src/secureStorage/keychainPrefetch.ts",
+    "./commands/mcp/addCommand.js": "./src/commands/mcp/addCommand.ts",
+    "./commands/mcp/xaaIdpCommand.js": "./src/commands/mcp/xaaIdpCommand.ts"
   }
 }
