@@ -11,7 +11,7 @@ import { isAwsCredentialsProviderError } from 'src/utils/aws.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { createSystemAPIErrorMessage } from '@claude-code/agent/messages.js'
-import { getAPIProviderForStatsig } from 'src/utils/model/providers.js'
+import { getAPIProviderForStatsig } from '@claude-code/provider/providers.js'
 import {
   clearApiKeyHelperCache,
   clearAwsCredentialsCache,

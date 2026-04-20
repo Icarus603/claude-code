@@ -43,7 +43,9 @@
     "./agentSwarmsEnabled.js": "./agentSwarmsEnabled.ts",
     "./types/compaction.js": "./types/compaction.ts",
     "./types/messages.js": "./types/messages.ts",
-    "./messages.js": "./messages.ts"
+    "./messages.js": "./messages.ts",
+    "./hooks.js": "./hooks.ts",
+    "./forkedAgent.js": "./forkedAgent.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

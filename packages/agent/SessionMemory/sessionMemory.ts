@@ -22,7 +22,7 @@ import {
   createCacheSafeParams,
   createSubagentContext,
   runForkedAgent,
-} from 'src/utils/forkedAgent.js'
+} from '@claude-code/agent/forkedAgent.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   type REPLHookContext,

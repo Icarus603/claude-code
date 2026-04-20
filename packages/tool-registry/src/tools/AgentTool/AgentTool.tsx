@@ -53,7 +53,7 @@ import { getCwd, runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { AbortError, errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
-import type { CacheSafeParams } from 'src/utils/forkedAgent.js'
+import type { CacheSafeParams } from '@claude-code/agent/forkedAgent.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   createUserMessage,

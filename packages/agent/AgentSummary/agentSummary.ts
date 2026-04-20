@@ -18,7 +18,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   type CacheSafeParams,
   runForkedAgent,
-} from 'src/utils/forkedAgent.js'
+} from '@claude-code/agent/forkedAgent.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { createUserMessage } from '@claude-code/agent/messages.js'
 import { getAgentTranscript } from '@claude-code/storage/sessionStorage.js'

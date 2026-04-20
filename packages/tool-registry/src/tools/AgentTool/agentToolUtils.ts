@@ -41,7 +41,7 @@ import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { AbortError, errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import type { CacheSafeParams } from 'src/utils/forkedAgent.js'
+import type { CacheSafeParams } from '@claude-code/agent/forkedAgent.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   extractTextContent,

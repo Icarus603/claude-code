@@ -20,7 +20,7 @@ import {
   executePostToolUseFailureHooks,
   executePreToolHooks,
   getPreToolHookBlockingMessage,
-} from 'src/utils/hooks.js'
+} from '@claude-code/agent/hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   getRuleBehaviorDescription,

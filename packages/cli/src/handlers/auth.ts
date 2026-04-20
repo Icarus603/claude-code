@@ -35,7 +35,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getAPIProvider } from 'src/utils/model/providers.js'
+import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {

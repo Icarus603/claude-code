@@ -6,7 +6,7 @@ import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   executeTaskCompletedHooks,
   getTaskCompletedHookMessage,
-} from 'src/utils/hooks.js'
+} from '@claude-code/agent/hooks.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   blockTask,

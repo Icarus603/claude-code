@@ -23,7 +23,7 @@ import { findGitRoot, gitExe } from 'src/utils/git.js'
 import {
   createBaseHookInput,
   executeFileSuggestionCommand,
-} from 'src/utils/hooks.js'
+} from '@claude-code/agent/hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from '@claude-code/storage/path.js'
 import { ripGrep } from 'src/utils/ripgrep.js'

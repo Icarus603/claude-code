@@ -262,7 +262,7 @@ import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js';
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js';
 import { randomUUID, type UUID } from 'crypto';
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js';
-import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from 'src/utils/hooks.js';
+import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from '@claude-code/agent/hooks.js';
 import { type IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js';
 import { assembleToolPool } from 'src/tools.js';
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js';
