@@ -29,7 +29,7 @@ import {
   handleMessageFromStream,
   type StreamingToolUse,
 } from '@claude-code/agent/messages.js'
-import { generateSessionTitle } from 'src/utils/sessionTitle.js'
+import { generateSessionTitle } from '@claude-code/agent/sessionTitle.js'
 import type { RemoteMessageContent } from '@claude-code/teleport/api.js'
 import { updateSessionTitle } from '@claude-code/teleport/api.js'
 

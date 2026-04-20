@@ -232,7 +232,7 @@ import {
   createCommandInputMessage,
   formatCommandInputTags,
 } from '@claude-code/agent/messages.js';
-import { generateSessionTitle } from 'src/utils/sessionTitle.js';
+import { generateSessionTitle } from '@claude-code/agent/sessionTitle.js';
 import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js';
 import { escapeXml } from '@claude-code/output/xml';
 import type { ThinkingConfig } from '@claude-code/provider/thinking.js';
