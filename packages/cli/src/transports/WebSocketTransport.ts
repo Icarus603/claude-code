@@ -1,7 +1,7 @@
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import type WsWebSocket from 'ws'
 import { logEvent } from '@claude-code/local-observability'
-import { CircularBuffer } from 'src/utils/CircularBuffer.js'
+import { CircularBuffer } from '@claude-code/output/buffers'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'

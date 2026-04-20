@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useContext } from 'react'
 import { useQueuedMessage } from 'src/context/QueuedMessageContext.js'
 import { Box, Text } from '@anthropic/ink'
-import { formatBriefTimestamp } from 'src/utils/formatBriefTimestamp.js'
+import { formatBriefTimestamp } from '@claude-code/output/formatters'
 import {
   findThinkingTriggerPositions,
   getRainbowColor,
