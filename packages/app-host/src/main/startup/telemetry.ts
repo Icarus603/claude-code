@@ -17,7 +17,7 @@ import { getIsGit, getWorktreeCount } from "src/utils/git.js";
 import { getInitialSettings } from "src/utils/settings/settings.js";
 import { getGhAuthStatus } from "src/utils/github/ghAuthStatus.js";
 import { isAutoUpdaterDisabled } from "@claude-code/config";
-import { isAnalyticsDisabled } from "src/services/privacyConfig.js";
+import { isAnalyticsDisabled } from "@claude-code/config/env/privacy";
 import { logEvent } from "@claude-code/local-observability";
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from "@claude-code/local-observability/compat";
 
