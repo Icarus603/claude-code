@@ -50,7 +50,7 @@ import {
 import { validateUuid } from 'src/utils/uuid.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
 import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { registerHookEventHandler } from 'src/utils/hooks/hookEvents.js'
 import {
   processSetupHooks,
@@ -66,7 +66,7 @@ import { notifySessionStateChanged } from '@claude-code/storage/sessionState.js'
 import {
   registerProcessOutputErrorHandlers,
   writeToStdout,
-} from 'src/utils/process.js'
+} from '@claude-code/shell/process.js'
 import { ensureModelStringsInitialized } from 'src/utils/model/modelStrings.js'
 import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'

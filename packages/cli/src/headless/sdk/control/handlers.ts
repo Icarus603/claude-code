@@ -17,7 +17,7 @@ import {
   wrapChannelMessage,
 } from '@claude-code/mcp-runtime'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import type { Stream } from 'src/utils/stream.js'
+import type { Stream } from '@claude-code/config/stream'
 import type {
   StdoutMessage,
   SDKControlInitializeRequest,

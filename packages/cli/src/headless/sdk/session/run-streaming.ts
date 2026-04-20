@@ -33,7 +33,7 @@ import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type { ThinkingConfig } from 'src/utils/thinking.js'
 import uniqBy from 'lodash-es/uniqBy.js'
-import { uniq } from 'src/utils/array.js'
+import { uniq } from '@claude-code/tool-registry/utils/array.js'
 import { mergeAndFilterTools } from 'src/utils/toolPool.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
@@ -73,8 +73,8 @@ import { getInMemoryErrors, logError, logMCPDebug } from 'src/utils/log.js'
 import {
   writeToStdout,
   registerProcessOutputErrorHandlers,
-} from 'src/utils/process.js'
-import type { Stream } from 'src/utils/stream.js'
+} from '@claude-code/shell/process.js'
+import type { Stream } from '@claude-code/config/stream'
 import { EMPTY_USAGE } from '@claude-code/provider/logging.js'
 import {
   loadConversationForResume,
@@ -150,7 +150,7 @@ import {
   createFileStateCacheWithSizeLimit,
   mergeFileStateCaches,
   READ_FILE_STATE_CACHE_SIZE,
-} from 'src/utils/fileStateCache.js'
+} from '@claude-code/tool-registry/fileStateCache'
 import { expandPath } from 'src/utils/path.js'
 import { extractReadFilesFromMessages } from 'src/utils/queryHelpers.js'
 import { registerHookEventHandler } from 'src/utils/hooks/hookEvents.js'
@@ -196,7 +196,7 @@ import {
 import { getRemoteSessionUrl } from 'src/constants/product.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
-import { generateSessionTitle } from 'src/utils/sessionTitle.js'
+import { generateSessionTitle } from '@claude-code/agent/sessionTitle.js'
 import { buildSideQuestionFallbackParams } from 'src/utils/queryContext.js'
 import { runSideQuestion } from 'src/utils/sideQuestion.js'
 import {
@@ -341,8 +341,8 @@ import { isBackgroundTask } from 'src/tasks/types.js'
 import { stopTask } from 'src/tasks/stopTask.js'
 import { drainSdkEvents } from 'src/utils/sdkEventQueue.js'
 import { initializeGrowthBook } from '@claude-code/config/feature-flags'
-import { errorMessage, toError } from 'src/utils/errors.js'
-import { sleep } from 'src/utils/sleep.js'
+import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
+import { sleep } from '@claude-code/config/sleep'
 import { isExtractModeActive } from '@claude-code/memory/paths'
 
 // Dead code elimination: conditional imports
