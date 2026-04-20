@@ -362,7 +362,7 @@ import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js';
 import { SessionBackgroundHint } from '@claude-code/repl/components/SessionBackgroundHint.js';
 import { startBackgroundSession } from 'src/tasks/LocalMainSessionTask.js';
 import { useSessionBackgrounding } from '@claude-code/repl/hooks/useSessionBackgrounding.js';
-import { diagnosticTracker } from 'src/services/diagnosticTracking.js';
+import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking.js';
 import { handleSpeculationAccept, type ActiveSpeculationState } from 'src/services/PromptSuggestion/speculation.js';
 import { IdeOnboardingDialog } from '@claude-code/repl/components/IdeOnboardingDialog.js';
 import { EffortCallout, shouldShowEffortCallout } from '@claude-code/repl/components/EffortCallout.js';

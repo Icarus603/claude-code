@@ -11,7 +11,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getPatchForDisplay } from '@claude-code/agent/diff.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
-import { parseCellId } from 'src/utils/notebook.js'
+import { parseCellId } from '@claude-code/tool-registry/notebook.js'
 import { HighlightedCode } from '@claude-code/repl/components/HighlightedCode.js'
 import { StructuredDiff } from '@claude-code/repl/components/StructuredDiff.js'
 

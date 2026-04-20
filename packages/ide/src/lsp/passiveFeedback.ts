@@ -4,7 +4,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import type { DiagnosticFile } from 'src/services/diagnosticTracking.js'
+import type { DiagnosticFile } from '@claude-code/tool-registry/diagnosticTracking.js'
 import { registerPendingLSPDiagnostic } from './LSPDiagnosticRegistry.js'
 import type { LSPServerManager } from './LSPServerManager.js'
 

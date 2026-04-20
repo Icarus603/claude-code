@@ -1,7 +1,7 @@
 import { dirname, isAbsolute, sep } from 'path'
 import { logEvent } from '@claude-code/local-observability'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { diagnosticTracker } from 'src/services/diagnosticTracking.js'
+import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking.js'
 import { clearDeliveredDiagnosticsForFile } from '@claude-code/ide/lsp/LSPDiagnosticRegistry.js'
 import { getLspServerManager } from '@claude-code/ide/lsp/manager.js'
 import { notifyVscodeFileUpdated } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
