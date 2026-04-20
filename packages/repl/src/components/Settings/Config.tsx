@@ -106,7 +106,7 @@ import {
   getFastModeModel,
   isFastModeSupportedByModel,
 } from 'src/utils/fastMode.js'
-import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
+import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 
 type Props = {
   onClose: (

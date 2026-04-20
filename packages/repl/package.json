@@ -445,6 +445,7 @@
     "./components/wizard/useWizard.js": "./src/components/wizard/useWizard.ts",
     "./appStateHooks.js": "./src/appStateHooks.ts",
     "./notifications.js": "./src/notifications.ts",
-    "./promptEditor.js": "./src/promptEditor.ts"
+    "./promptEditor.js": "./src/promptEditor.ts",
+    "./fullscreen.js": "./src/fullscreen.ts"
   }
 }
