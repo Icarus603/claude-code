@@ -10,7 +10,7 @@ import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
 import type {
   AssistantMessage,
   Message as MessageType,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
 import { createUserMessage } from 'src/utils/messages.js'
 import type { BuiltInAgentDefinition } from './loadAgentsDir.js'

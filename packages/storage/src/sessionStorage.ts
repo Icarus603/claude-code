@@ -61,7 +61,7 @@ import type {
   SystemCompactBoundaryMessage,
   SystemMessage,
   UserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import type { QueueOperationMessage } from 'src/types/messageQueueTypes.js'
 import { uniq } from 'src/utils/array.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'

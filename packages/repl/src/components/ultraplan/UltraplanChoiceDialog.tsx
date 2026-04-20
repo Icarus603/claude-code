@@ -8,7 +8,7 @@ import { Select } from '../CustomSelect/select.js';
 import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js';
 import { useSetAppState } from '@claude-code/repl/appStateHooks.js';
 import type { AppState } from '@claude-code/repl/appStateHooks.js';
-import type { Message } from 'src/types/message.js';
+import type { Message } from '@claude-code/agent/messageShapes';
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js';
 import { clearConversation } from 'src/commands/clear/conversation.js';
 import { createCommandInputMessage } from 'src/utils/messages.js';

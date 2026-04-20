@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import type { HookResultMessage, Message } from 'src/types/message.js'
+import type { HookResultMessage, Message } from '@claude-code/agent/messageShapes'
 
 /**
  * Manages deferred SessionStart hook messages so the REPL can render

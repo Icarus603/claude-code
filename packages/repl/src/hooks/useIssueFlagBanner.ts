@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { getUserMessageText } from 'src/utils/messages.js'
 
 const EXTERNAL_COMMAND_PATTERNS = [

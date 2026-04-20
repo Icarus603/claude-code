@@ -37,7 +37,7 @@ import type {
   SystemLocalCommandMessage,
   SystemMessage,
   UserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 // Import permission types from centralized location to break import cycles
 // Import PermissionResult from centralized location to break import cycles
 import type {

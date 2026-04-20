@@ -68,7 +68,7 @@ import type {
   AssistantMessage,
   Message,
   UserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import {
   getAnthropicApiKeyWithSource,
   getClaudeAIOAuthTokens,

@@ -6,7 +6,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { getLastAssistantMessage } from 'src/utils/messages.js'

@@ -11,7 +11,7 @@ import type {
   AssistantMessage,
   AttachmentMessage,
   ProgressMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import type { PermissionDecision } from 'src/types/permissions.js'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
 import { logForDebugging } from 'src/utils/debug.js'

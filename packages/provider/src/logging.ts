@@ -15,7 +15,7 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { QueryChainTracking } from '@claude-code/tool-registry/Tool.js'
 import { isConnectorTextBlock } from 'src/types/connectorText.js'
-import type { AssistantMessage } from 'src/types/message.js'
+import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
 import type { EffortLevel } from 'src/utils/effort.js'
 import { logError } from 'src/utils/log.js'

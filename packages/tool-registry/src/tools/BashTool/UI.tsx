@@ -10,7 +10,7 @@ import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDis
 import { useAppStateStore, useSetAppState } from '../../hooks/appState.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { backgroundAll } from 'src/tasks/LocalShellTask/LocalShellTask.js'
-import type { ProgressMessage } from 'src/types/message.js'
+import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { env } from 'src/utils/env.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { getDisplayPath } from 'src/utils/file.js'

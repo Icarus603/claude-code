@@ -29,7 +29,7 @@ import type {
   SystemTurnDurationMessage,
   SystemThinkingMessage,
   SystemMemorySavedMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { SystemAPIErrorMessage } from './SystemAPIErrorMessage.js'
 import { formatDuration, formatNumber, formatSecondsShort } from '@claude-code/output/formatters'
 import { getGlobalConfig } from '@claude-code/config'

@@ -1,5 +1,5 @@
 import type { Attachment } from 'src/utils/attachments.js'
-import type { Message, NormalizedMessage } from 'src/types/message.js'
+import type { Message, NormalizedMessage } from '@claude-code/agent/messageShapes'
 
 /**
  * Attachment types that AttachmentMessage renders as `null` unconditionally

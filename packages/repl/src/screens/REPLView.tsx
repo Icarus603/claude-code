@@ -247,7 +247,7 @@ import type {
   ProgressMessage,
   HookResultMessage,
   PartialCompactDirection,
-} from 'src/types/message.js';
+} from '@claude-code/agent/messageShapes';
 import { query } from 'src/query.js';
 import { mergeClients } from '@claude-code/repl/hooks/useMergedClients.js';
 import { getQuerySourceForREPL } from 'src/utils/promptCategory.js';

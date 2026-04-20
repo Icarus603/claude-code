@@ -32,7 +32,7 @@ import type {
   SystemCompactBoundaryMessage,
   SystemMessage,
   UserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import {
   createAttachmentMessage,
   generateFileAttachment,

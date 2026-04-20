@@ -8,7 +8,7 @@ import { getReplPrimitiveTools } from '@claude-code/tool-registry/tools/REPLTool
 import type {
   CollapsedReadSearchGroup,
   NormalizedAssistantMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { uniq } from 'src/utils/array.js'
 import { getToolUseIdsFromCollapsedGroup } from 'src/utils/collapseReadSearch.js'
 import { getDisplayPath } from 'src/utils/file.js'

@@ -3,7 +3,7 @@ import type {
   AttachmentMessage,
   SystemMessage,
   UserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 
 /**
  * Tags user messages with a sourceToolUseID so they stay transient until the tool resolves.

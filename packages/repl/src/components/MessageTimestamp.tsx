@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Text, stringWidth } from '@anthropic/ink'
-import type { NormalizedMessage } from 'src/types/message.js'
+import type { NormalizedMessage } from '@claude-code/agent/messageShapes'
 
 type Props = {
   message: NormalizedMessage

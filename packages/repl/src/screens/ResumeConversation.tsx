@@ -24,7 +24,7 @@ import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { asSessionId } from 'src/types/ids.js'
 import type { LogOption } from 'src/types/logs.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { agenticSessionSearch } from 'src/utils/agenticSessionSearch.js'
 import { renameRecordingForSession } from 'src/utils/asciicast.js'
 import { updateSessionName } from 'src/utils/concurrentSessions.js'

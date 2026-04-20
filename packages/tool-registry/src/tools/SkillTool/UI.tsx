@@ -10,7 +10,7 @@ import { Message as MessageComponent } from '@claude-code/repl/components/Messag
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { Box, Text } from '@anthropic/ink'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
-import type { ProgressMessage } from 'src/types/message.js'
+import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { buildSubagentLookups, EMPTY_LOOKUPS } from 'src/utils/messages.js'
 import { plural } from 'src/utils/stringUtils.js'
 import type { inputSchema, Output, Progress } from './SkillTool.js'

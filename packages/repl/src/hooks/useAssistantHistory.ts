@@ -16,7 +16,7 @@ import {
 import type { ScrollBoxHandle } from '@anthropic/ink'
 import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
 import { convertSDKMessage } from '@claude-code/server/remote/sdkMessageAdapter.js'
-import type { Message, SystemInformationalMessage } from 'src/types/message.js'
+import type { Message, SystemInformationalMessage } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
 
 type Props = {

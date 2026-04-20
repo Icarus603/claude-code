@@ -33,7 +33,8 @@
     "./abortController.js": "./abortController.ts",
     "./toolUseSummaryGenerator.js": "./toolUseSummaryGenerator.ts",
     "./abortController": "./abortController.ts",
-    "./tasks.js": "./tasks.ts"
+    "./tasks.js": "./tasks.ts",
+    "./messageShapes": "./messageShapes.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

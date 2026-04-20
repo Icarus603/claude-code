@@ -4,7 +4,7 @@ import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type {
   NormalizedUserMessage,
   ProgressMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import {
   type buildMessageLookups,
   CANCEL_MESSAGE,

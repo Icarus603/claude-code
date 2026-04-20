@@ -4,7 +4,7 @@ import type {
   ConnectedMCPServer,
   MCPServerConnection,
 } from './types.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
 
 export type McpInstructionsDelta = {

@@ -3,7 +3,7 @@ import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js
 import { TOOL_SUMMARY_MAX_LENGTH } from 'src/constants/toolLimits.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
-import type { ProgressMessage } from 'src/types/message.js'
+import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import type { Output } from './WebFetchTool.js'

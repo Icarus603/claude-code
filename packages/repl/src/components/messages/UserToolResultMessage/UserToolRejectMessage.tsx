@@ -6,7 +6,7 @@ import {
   type Tool,
   type Tools,
 } from '@claude-code/tool-registry/Tool.js'
-import type { ProgressMessage } from 'src/types/message.js'
+import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import type { buildMessageLookups } from 'src/utils/messages.js'
 import { FallbackToolUseRejectedMessage } from '../../FallbackToolUseRejectedMessage.js'
 

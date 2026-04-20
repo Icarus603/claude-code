@@ -57,7 +57,7 @@ import type {
   Message,
   ProgressMessage,
   StopHookInfo,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { count } from 'src/utils/array.js'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
 import { logForDebugging } from 'src/utils/debug.js'

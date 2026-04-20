@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text } from '@anthropic/ink'
-import type { CollapsedReadSearchGroup } from 'src/types/message.js'
+import type { CollapsedReadSearchGroup } from '@claude-code/agent/messageShapes'
 
 /**
  * Plain function (not a React component) so the React Compiler won't

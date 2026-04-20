@@ -4,7 +4,7 @@ import { buildTool, type ToolDef, toolMatchesName } from '@claude-code/tool-regi
 import type {
   Message as MessageType,
   NormalizedUserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { getQuerySourceForAgent } from 'src/utils/promptCategory.js'
 import { z } from 'zod/v4'
 import {

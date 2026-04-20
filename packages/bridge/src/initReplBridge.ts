@@ -24,7 +24,7 @@ import {
   isPolicyAllowed,
   waitForPolicyLimitsToLoad,
 } from '@claude-code/provider/policyLimits/index.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
