@@ -9,7 +9,7 @@ import type {
 import { intersperse } from '@claude-code/tool-registry/utils/array.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getPatchForDisplay } from 'src/utils/diff.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { parseCellId } from 'src/utils/notebook.js'
 import { HighlightedCode } from '@claude-code/repl/components/HighlightedCode.js'

@@ -44,7 +44,7 @@ import {
   parseShellFrontmatter,
   splitPathInFrontmatter,
 } from 'src/utils/frontmatterParser.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { isPathGitignored } from 'src/utils/git/gitignore.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {

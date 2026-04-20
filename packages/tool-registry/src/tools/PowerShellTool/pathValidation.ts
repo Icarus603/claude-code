@@ -14,7 +14,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
   getFsImplementation,
   safeResolvePath,
-} from 'src/utils/fsOperations.js'
+} from '@claude-code/storage/fsOperations.js'
 import { containsPathTraversal, getDirectoryForPath } from 'src/utils/path.js'
 import {
   allWorkingDirectories,

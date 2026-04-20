@@ -4,7 +4,7 @@ import { FileEditToolDiff } from '@claude-code/repl/components/FileEditToolDiff.
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import { detectEncodingForResolvedPath } from 'src/utils/fileRead.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { Text } from '@anthropic/ink'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import {

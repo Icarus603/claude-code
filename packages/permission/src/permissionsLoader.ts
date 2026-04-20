@@ -1,5 +1,5 @@
 import { readFileSync } from 'src/utils/fileRead.js'
-import { getFsImplementation, safeResolvePath } from 'src/utils/fsOperations.js'
+import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {

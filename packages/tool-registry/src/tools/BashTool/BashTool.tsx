@@ -53,7 +53,7 @@ import {
   fileHistoryTrackEdit,
 } from '@claude-code/agent/file-history'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { expandPath } from 'src/utils/path.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'

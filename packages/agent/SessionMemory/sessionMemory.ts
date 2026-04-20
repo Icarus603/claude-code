@@ -23,7 +23,7 @@ import {
   createSubagentContext,
   runForkedAgent,
 } from 'src/utils/forkedAgent.js'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   type REPLHookContext,
   registerPostSamplingHook,

@@ -26,7 +26,7 @@ import {
 
 import { getOriginalCwd, getSessionId } from '../bootstrap/state.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
-import { getFsImplementation } from 'src/utils/fsOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getRelativeTimeFormat, getTimeZone } from '@claude-code/output/utils/intl.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
