@@ -125,6 +125,7 @@
     "./managedEnv.js": "./managedEnv.ts",
     "./crypto.js": "./crypto.ts",
     "./gitFilesystem.js": "./gitFilesystem.ts",
+    "./git/gitConfigParser.js": "./git/gitConfigParser.ts",
     "./outputStyles.js": "./outputStyles.ts"
   }
 }
