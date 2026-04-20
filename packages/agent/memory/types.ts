@@ -1,3 +1,2 @@
-// Thin alias — canonical owner is src/utils/memory/types.js.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/memory/types.js'
+// Canonical owner is @claude-code/memory/memorySourceTypes.
+export * from '@claude-code/memory/memorySourceTypes'
