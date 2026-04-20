@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import type { SandboxDependencyCheck } from 'src/utils/sandbox/sandbox-adapter.js'
 
 type Props = {

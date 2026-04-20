@@ -115,6 +115,7 @@
     "./timeouts": "./timeouts.ts",
     "./stream": "./stream.ts",
     "./sequential": "./sequential.ts",
-    "./generators": "./generators.ts"
+    "./generators": "./generators.ts",
+    "./platform": "./platform.ts"
   }
 }

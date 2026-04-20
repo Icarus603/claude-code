@@ -13,7 +13,7 @@ import {
   shouldAddStdinRedirect,
 } from '@claude-code/shell/bash/shellQuoting.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import { getSessionEnvironmentScript } from '@claude-code/storage/sessionEnvironment.js'
 import { getSessionEnvVars } from '@claude-code/storage/sessionEnvVars.js'
 import {

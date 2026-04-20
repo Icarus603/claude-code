@@ -49,7 +49,7 @@ import { useVoiceState } from 'src/context/voice.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import { isXtermJs, useHasSelection, useSelection } from '@anthropic/ink'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import { PrBadge } from '../PrBadge.js'
 
 // Dead code elimination: conditional import for proactive mode

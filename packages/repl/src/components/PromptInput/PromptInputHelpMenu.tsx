@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import { isKeybindingCustomizationEnabled } from '@claude-code/repl/keybindings/loadUserBindings.js'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'

@@ -50,7 +50,7 @@ import {
 import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { safeParseJSON } from 'src/utils/json.js'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import { cliError, cliOk } from '../exit.js'
 
 async function checkMcpServerHealth(

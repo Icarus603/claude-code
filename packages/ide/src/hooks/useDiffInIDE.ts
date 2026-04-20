@@ -27,7 +27,7 @@ import {
 } from '@claude-code/ide/ide.js'
 import { WindowsToWSLConverter } from '@claude-code/ide/idePathConversion.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 
 type Props = {
   onChange(

@@ -1,4 +1,4 @@
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 
 /**
  * Shortcuts that are typically intercepted by the OS, terminal, or shell

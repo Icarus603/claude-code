@@ -25,7 +25,7 @@ import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { getAncestorPidsAsync } from '@claude-code/shell/genericProcessUtils.js'
 import { isJetBrainsPluginInstalledCached } from 'src/utils/jetbrains.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getPlatform } from 'src/utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform'
 import { lt } from '@claude-code/config/semver'
 
 // Lazy: IdeOnboardingDialog.tsx pulls React/ink; only needed in interactive onboarding path
