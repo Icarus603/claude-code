@@ -11,7 +11,7 @@ import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
 import { createCombinedAbortSignal } from '@claude-code/agent/combinedAbortSignal.js'
-import type { PermissionPromptTool } from 'src/utils/queryHelpers.js'
+import type { PermissionPromptTool } from '@claude-code/repl/queryHelpers.js'
 
 /**
  * Creates a CanUseToolFn that incorporates a custom permission prompt tool.

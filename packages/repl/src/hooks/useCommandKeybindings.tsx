@@ -12,7 +12,7 @@ import { useMemo } from 'react'
 import { useIsModalOverlayActive } from '@claude-code/repl/overlayContext.js'
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import type { PromptInputHelpers } from 'src/utils/handlePromptSubmit.js'
+import type { PromptInputHelpers } from '@claude-code/repl/handlePromptSubmit.js'
 
 type Props = {
   // onSubmit accepts additional parameters beyond what we pass here,

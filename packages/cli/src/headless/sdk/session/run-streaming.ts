@@ -20,7 +20,7 @@ import {
   downloadUserSettings,
   redownloadUserSettings,
 } from 'src/services/settingsSync/index.js'
-import { waitForRemoteManagedSettingsToLoad } from 'src/services/remoteManagedSettings/index.js'
+import { waitForRemoteManagedSettingsToLoad } from '@claude-code/cli/remoteManagedSettings.js'
 import { StructuredIO } from '../../../structuredIO.js'
 import { RemoteIO } from '../../../remoteIO.js'
 import {
@@ -34,7 +34,7 @@ import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { uniq } from '@claude-code/tool-registry/utils/array.js'
-import { mergeAndFilterTools } from 'src/utils/toolPool.js'
+import { mergeAndFilterTools } from '@claude-code/repl/toolPool.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
@@ -58,7 +58,7 @@ import {
   peek,
   subscribeToCommandQueue,
   getCommandsByMaxPriority,
-} from 'src/utils/messageQueueManager.js'
+} from '@claude-code/agent/messageQueueManager.js'
 import { notifyCommandLifecycle } from '@claude-code/shell/commandLifecycle.js'
 import {
   getSessionState,
@@ -152,8 +152,8 @@ import {
   READ_FILE_STATE_CACHE_SIZE,
 } from '@claude-code/tool-registry/fileStateCache'
 import { expandPath } from 'src/utils/path.js'
-import { extractReadFilesFromMessages } from 'src/utils/queryHelpers.js'
-import { registerHookEventHandler } from 'src/utils/hooks/hookEvents.js'
+import { extractReadFilesFromMessages } from '@claude-code/repl/queryHelpers.js'
+import { registerHookEventHandler } from '@claude-code/repl/hookEvents.js'
 import { executeFilePersistence } from 'src/utils/filePersistence/filePersistence.js'
 import { finalizePendingAsyncHooks } from 'src/utils/hooks/AsyncHookRegistry.js'
 import {
@@ -220,7 +220,7 @@ import { getAccountInformation } from '@claude-code/provider/authAlias.js'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'
 import { installOAuthTokens } from '../../../handlers/auth.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { AwsAuthStatusManager } from 'src/utils/awsAuthStatusManager.js'
+import { AwsAuthStatusManager } from '@claude-code/repl/awsAuthStatusManager.js'
 import {
   getInitJsonSchema,
   setSdkAgentProgressSummariesEnabled,
@@ -239,7 +239,7 @@ import {
   saveAiGeneratedTitle,
   restoreSessionMetadata,
 } from '@claude-code/storage/sessionStorage.js'
-import { incrementPromptCount } from 'src/utils/commitAttribution.js'
+import { incrementPromptCount } from '@claude-code/agent/commitAttribution.js'
 import { executeNotificationHooks } from 'src/utils/hooks.js'
 import {
   ElicitRequestSchema,
@@ -272,7 +272,7 @@ import {
   modelSupportsMaxEffort,
   EFFORT_LEVELS,
   resolveAppliedEffort,
-} from 'src/utils/effort.js'
+} from '@claude-code/agent/effort.js'
 import { modelSupportsAdaptiveThinking } from '@claude-code/provider/thinking.js'
 import { modelSupportsAutoMode } from '@claude-code/provider/betas.js'
 import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
@@ -322,7 +322,7 @@ import {
 } from '@claude-code/config/env/utils'
 import { installPluginsForHeadless } from 'src/utils/plugins/headlessPluginInstall.js'
 import { refreshActivePlugins } from 'src/utils/plugins/refresh.js'
-import { loadAllPluginsCacheOnly } from 'src/utils/plugins/pluginLoader.js'
+import { loadAllPluginsCacheOnly } from '@claude-code/cli/pluginLoader.js'
 import {
   isTeamLead,
   hasActiveInProcessTeammates,

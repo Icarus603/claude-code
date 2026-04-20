@@ -1,7 +1,7 @@
 import {
   hasUsedBackslashReturn,
   isShiftEnterKeyBindingInstalled,
-} from 'src/commands/terminalSetup/terminalSetup.js'
+} from '@claude-code/repl/terminalSetup.js'
 import type { Key } from '@anthropic/ink'
 import { getGlobalConfig } from '@claude-code/config'
 import { env } from '@claude-code/config/env/paths'

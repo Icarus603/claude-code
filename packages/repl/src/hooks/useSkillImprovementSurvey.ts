@@ -7,8 +7,8 @@ import {
 } from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type { SkillUpdate } from 'src/utils/hooks/skillImprovement.js'
-import { applySkillImprovement } from 'src/utils/hooks/skillImprovement.js'
+import type { SkillUpdate } from '@claude-code/repl/skillImprovement.js'
+import { applySkillImprovement } from '@claude-code/repl/skillImprovement.js'
 import { createSystemMessage } from '@claude-code/agent/messages.js'
 
 type SkillImprovementSuggestion = {

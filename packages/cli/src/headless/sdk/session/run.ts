@@ -51,7 +51,7 @@ import { validateUuid } from '@claude-code/agent/uuid.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { registerHookEventHandler } from 'src/utils/hooks/hookEvents.js'
+import { registerHookEventHandler } from '@claude-code/repl/hookEvents.js'
 import {
   processSetupHooks,
   takeInitialUserMessage,

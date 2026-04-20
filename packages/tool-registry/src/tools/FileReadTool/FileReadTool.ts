@@ -70,7 +70,7 @@ import {
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
-import { readFileInRange } from 'src/utils/readFileInRange.js'
+import { readFileInRange } from '@claude-code/repl/readFileInRange.js'
 import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'

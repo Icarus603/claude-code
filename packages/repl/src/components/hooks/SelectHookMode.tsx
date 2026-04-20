@@ -7,7 +7,7 @@
  */
 import * as React from 'react'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { HookEventMetadata } from 'src/utils/hooks/hooksConfigManager.js'
+import type { HookEventMetadata } from '@claude-code/repl/hooksConfigManager.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   getHookDisplayText,

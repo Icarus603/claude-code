@@ -4,7 +4,7 @@ import 'src/tools.js'
 import type { Tools, ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { assembleToolPool } from '@claude-code/tool-registry'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
-import { mergeAndFilterTools } from 'src/utils/toolPool.js'
+import { mergeAndFilterTools } from '@claude-code/repl/toolPool.js'
 
 /**
  * React hook that assembles the full tool pool for the REPL.

@@ -73,7 +73,7 @@ import { QueryGuard } from 'src/utils/QueryGuard.js';
 import { isEnvTruthy } from '@claude-code/config/env/utils';
 import { formatTokens } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js';
-import { consumeEarlyInput } from 'src/utils/earlyInput.js';
+import { consumeEarlyInput } from '@claude-code/repl/earlyInput.js';
 
 import { setMemberActive } from '@claude-code/swarm';
 import {
@@ -237,7 +237,7 @@ import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_ST
 import { escapeXml } from '@claude-code/output/xml';
 import type { ThinkingConfig } from '@claude-code/provider/thinking.js';
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js';
-import { handlePromptSubmit, type PromptInputHelpers } from 'src/utils/handlePromptSubmit.js';
+import { handlePromptSubmit, type PromptInputHelpers } from '@claude-code/repl/handlePromptSubmit.js';
 import { useQueueProcessor } from '@claude-code/repl/hooks/useQueueProcessor.js';
 import { useMailboxBridge } from '@claude-code/repl/hooks/useMailboxBridge.js';
 import { queryCheckpoint, logQueryProfileReport } from 'src/utils/queryProfiler.js';
@@ -251,7 +251,7 @@ import type {
 import { query } from 'src/query.js';
 import { mergeClients } from '@claude-code/repl/hooks/useMergedClients.js';
 import { getQuerySourceForREPL } from '@claude-code/agent/promptCategory.js';
-import { mergeAndFilterTools } from 'src/utils/toolPool.js';
+import { mergeAndFilterTools } from '@claude-code/repl/toolPool.js';
 import { useSkillsChange } from '@claude-code/repl/hooks/useSkillsChange.js';
 import { Messages } from '@claude-code/repl/components/Messages.js';
 import { TaskListV2 } from '@claude-code/repl/components/TaskListV2.js';
@@ -290,7 +290,7 @@ import {
   getAgentTranscript,
 } from '@claude-code/storage/sessionStorage.js';
 import { deserializeMessages } from '@claude-code/repl/conversationRecovery.js';
-import { extractReadFilesFromMessages, extractBashToolsFromMessages } from 'src/utils/queryHelpers.js';
+import { extractReadFilesFromMessages, extractBashToolsFromMessages } from '@claude-code/repl/queryHelpers.js';
 import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js';
 import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js';
 import {

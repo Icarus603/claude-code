@@ -35,7 +35,7 @@ import {
 import stripAnsi from 'strip-ansi'
 import { FastModePicker } from 'src/commands/fast/fast.js'
 import { isUltrareviewEnabled } from 'src/commands/review/ultrareviewEnabled.js'
-import { getNativeCSIuTerminalDisplayName } from 'src/commands/terminalSetup/terminalSetup.js'
+import { getNativeCSIuTerminalDisplayName } from '@claude-code/repl/terminalSetup.js'
 import { type Command, hasCommand } from '@claude-code/command-runtime/runtime'
 import { useIsModalOverlayActive } from '@claude-code/repl/overlayContext.js'
 import { useSetPromptOverlayDialog } from 'src/context/promptOverlayContext.js'
@@ -130,7 +130,7 @@ import {
   isFastModeSupportedByModel,
 } from '@claude-code/repl/fastMode.js'
 import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
-import type { PromptInputHelpers } from 'src/utils/handlePromptSubmit.js'
+import type { PromptInputHelpers } from '@claude-code/repl/handlePromptSubmit.js'
 import {
   getImageFromClipboard,
   PASTE_THRESHOLD,
