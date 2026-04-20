@@ -53,20 +53,20 @@ import {
   DEFAULT_OUTPUT_STYLE_NAME,
   getAllOutputStyles,
 } from 'src/constants/outputStyles.js'
-import { getAccountInformation } from 'src/utils/auth.js'
-import { getAPIProvider } from 'src/utils/model/providers.js'
+import { getAccountInformation } from '@claude-code/provider/authAlias.js'
+import { getAPIProvider } from '@claude-code/provider/providers.js'
 import {
   isFastModeEnabled,
   isFastModeAvailable,
   getFastModeState,
-} from 'src/utils/fastMode.js'
+} from '@claude-code/repl/fastMode.js'
 import { AwsAuthStatusManager } from 'src/utils/awsAuthStatusManager.js'
 import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
 import { logMCPDebug } from 'src/utils/log.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { enqueue } from 'src/utils/messageQueueManager.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { randomUUID } from 'crypto'
 import { StructuredIO } from '../../../structuredIO.js'
 

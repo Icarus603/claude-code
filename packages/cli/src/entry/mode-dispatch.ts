@@ -116,7 +116,7 @@ import {
   prefetchAwsCredentialsAndBedRockInfoIfSafe,
   prefetchGcpCredentialsIfSafe,
   validateForceLoginOrg,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { seedEarlyInput, stopCapturingEarlyInput } from 'src/utils/earlyInput.js'
 import {
   parseEffortValue,
@@ -128,7 +128,7 @@ import {
   isFastModeEnabled,
   prefetchFastModeStatus,
   resolveFastModeStatusFromCache,
-} from 'src/utils/fastMode.js'
+} from '@claude-code/repl/fastMode.js'
 import { applyConfigEnvironmentVariables } from 'src/utils/managedEnv.js'
 import { extractTeammateOptions, type TeammateOptions } from '@claude-code/app-host/main/cli/options.js'
 import { maybeActivateBrief, maybeActivateProactive } from '@claude-code/app-host/main/cli/runtimeActivation.js'
@@ -148,7 +148,7 @@ import {
 import { createSystemMessage, createUserMessage } from 'src/utils/messages.js'
 import { getPlatform } from '@claude-code/config/platform'
 import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
-import { jsonParse, writeFileSync_DEPRECATED } from 'src/utils/slowOperations.js'
+import { jsonParse, writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
 import { computeInitialTeamContext } from '@claude-code/swarm'
 import { isWorktreeModeEnabled } from '@claude-code/agent/worktreeModeEnabled.js'
 import { relative, resolve } from 'path'
@@ -211,7 +211,7 @@ import {
   isBareMode,
   isEnvTruthy,
   isInProtectedNamespace,
-} from 'src/utils/envUtils.js'
+} from '@claude-code/config/env/utils'
 import { refreshExampleCommands } from '@claude-code/command-runtime/exampleCommands.js'
 import type { FpsMetrics } from '@claude-code/output/fpsTracker.js'
 import { getWorktreePaths } from '@claude-code/storage/getWorktreePaths.js'
@@ -222,7 +222,7 @@ import {
   getWorktreeCount,
 } from 'src/utils/git.js'
 import { getGhAuthStatus } from 'src/utils/github/ghAuthStatus.js'
-import { safeParseJSON } from 'src/utils/json.js'
+import { safeParseJSON } from '@claude-code/storage/json.js'
 import { logError } from 'src/utils/log.js'
 import { getModelDeprecationWarning } from 'src/utils/model/deprecation.js'
 import {
@@ -231,7 +231,7 @@ import {
   normalizeModelStringForAPI,
   parseUserSpecifiedModel,
 } from 'src/utils/model/model.js'
-import { ensureModelStringsInitialized } from 'src/utils/model/modelStrings.js'
+import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
 import {
   checkAndDisableBypassPermissions,
   initializeToolPermissionContext,
@@ -278,7 +278,7 @@ import {
 } from 'src/utils/telemetry/pluginTelemetry.js'
 import { logSkillsLoaded } from 'src/utils/telemetry/skillLoadedEvent.js'
 import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
-import { validateUuid } from 'src/utils/uuid.js'
+import { validateUuid } from '@claude-code/agent/uuid.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
 import { getRelevantTips } from 'src/services/tips/tipRegistry.js'
 import { logContextMetrics } from 'src/utils/api.js'
@@ -294,7 +294,7 @@ import {
   registerSession,
   updateSessionName,
 } from 'src/utils/concurrentSessions.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging, setHasFormattedOutput } from 'src/utils/debug.js'
 import {
   errorMessage,
@@ -310,7 +310,7 @@ import {
 import {
   gracefulShutdown,
   gracefulShutdownSync,
-} from 'src/utils/gracefulShutdown.js'
+} from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { setAllHookEventsEnabled } from 'src/utils/hooks/hookEvents.js'
 import { refreshModelCapabilities } from 'src/utils/model/modelCapabilities.js'
 import { peekForStdinData, writeToStderr } from '@claude-code/shell/process.js'
@@ -365,7 +365,7 @@ import {
   loadAllPluginsCacheOnly,
 } from 'src/utils/plugins/pluginLoader.js'
 import { migrateChangelogFromConfig } from 'src/utils/releaseNotes.js'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { fetchSession, prepareApiRequest } from '@claude-code/teleport/api.js'
 import {
   checkOutTeleportedSessionBranch,
