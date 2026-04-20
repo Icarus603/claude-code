@@ -261,14 +261,14 @@ import {
   searchSessionsByCustomTitle,
   sessionIdExists,
 } from '@claude-code/storage/sessionStorage.js'
-import { ensureMdmSettingsLoaded } from 'src/utils/settings/mdm/settings.js'
+import { ensureMdmSettingsLoaded } from '@claude-code/config/settings/mdm/settings'
 import {
   getInitialSettings,
   getSettingsForSource,
   getSettingsWithErrors,
-} from 'src/utils/settings/settings.js'
-import { resetSettingsCache } from 'src/utils/settings/settingsCache.js'
-import type { ValidationError } from 'src/utils/settings/validation.js'
+} from '@claude-code/config/settings'
+import { resetSettingsCache } from '@claude-code/config/settings/settingsCache'
+import type { ValidationError } from '@claude-code/config/validation'
 import {
   DEFAULT_TASKS_MODE_TASK_LIST_ID,
 } from '@claude-code/agent/tasks.js'
@@ -319,7 +319,7 @@ import {
   type ProcessedResume,
   processResumedConversation,
 } from '@claude-code/storage/sessionRestore.js'
-import { parseSettingSourcesFlag } from 'src/utils/settings/constants.js'
+import { parseSettingSourcesFlag } from '@claude-code/config/constants'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import {
   type ChannelEntry,
