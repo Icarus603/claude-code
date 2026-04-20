@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { getAgentModelOptions } from 'src/utils/model/agent.js'
+import { getAgentModelOptions } from '@claude-code/provider/modelAgent.js'
 import { Select } from '../CustomSelect/select.js'
 
 interface ModelSelectorProps {

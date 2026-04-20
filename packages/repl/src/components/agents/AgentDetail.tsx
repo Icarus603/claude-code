@@ -10,7 +10,7 @@ import {
   type AgentDefinition,
   isBuiltInAgent,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { getAgentModelDisplay } from 'src/utils/model/agent.js'
+import { getAgentModelDisplay } from '@claude-code/provider/modelAgent.js'
 import { Markdown } from '../Markdown.js'
 import { getActualRelativeAgentFilePath } from './agentFileUtils.js'
 

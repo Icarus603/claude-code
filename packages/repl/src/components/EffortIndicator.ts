@@ -9,7 +9,7 @@ import {
   type EffortValue,
   getDisplayedEffortLevel,
   modelSupportsEffort,
-} from 'src/utils/effort.js'
+} from '@claude-code/agent/effort.js'
 
 /**
  * Build the text for the effort-changed notification, e.g. "◐ medium · /effort".

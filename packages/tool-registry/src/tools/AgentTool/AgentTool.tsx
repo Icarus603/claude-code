@@ -38,7 +38,7 @@ import {
   unregisterAgentForeground,
   updateAgentProgress as updateAsyncAgentProgress,
   updateProgressFromMessage,
-} from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+} from '@claude-code/agent/localAgentTask.js'
 import {
   checkRemoteAgentEligibility,
   formatPreconditionError,
@@ -47,7 +47,7 @@ import {
 } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js'
 import { assembleToolPool } from 'src/tools.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
-import { runWithAgentContext } from 'src/utils/agentContext.js'
+import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { getCwd, runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
@@ -61,7 +61,7 @@ import {
   isSyntheticMessage,
   normalizeMessages,
 } from '@claude-code/agent/messages.js'
-import { getAgentModel } from 'src/utils/model/agent.js'
+import { getAgentModel } from '@claude-code/provider/modelAgent.js'
 import { permissionModeSchema } from '@claude-code/permission/PermissionMode'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import {

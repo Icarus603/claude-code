@@ -23,7 +23,7 @@ import {
   modelSupportsMaxEffort,
   resolvePickerEffortPersistence,
   toPersistableEffort,
-} from 'src/utils/effort.js'
+} from '@claude-code/agent/effort.js'
 import {
   getDefaultMainLoopModel,
   type ModelSetting,

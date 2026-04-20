@@ -8,7 +8,7 @@ import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDis
 import type { TaskType } from '@claude-code/tool-registry/Task.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import type { LocalAgentTaskState } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
 import type { RemoteAgentTaskState } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js'
 import type { TaskState } from 'src/tasks/types.js'

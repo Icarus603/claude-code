@@ -34,7 +34,7 @@ import {
   type ProgressTracker,
   updateAgentProgress as updateAsyncAgentProgress,
   updateProgressFromMessage,
-} from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+} from '@claude-code/agent/localAgentTask.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
 import type { Message as MessageType, ContentItem } from '@claude-code/agent/messageShapes'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'

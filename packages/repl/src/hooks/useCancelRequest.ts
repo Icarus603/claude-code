@@ -25,7 +25,7 @@ import { exitTeammateView } from 'src/state/teammateViewHelpers.js'
 import {
   killAllRunningAgentTasks,
   markAgentsNotified,
-} from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+} from '@claude-code/agent/localAgentTask.js'
 import type { PromptInputMode, VimMode } from 'src/types/textInputTypes.js'
 import {
   clearCommandQueue,

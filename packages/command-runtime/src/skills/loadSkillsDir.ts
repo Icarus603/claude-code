@@ -28,7 +28,7 @@ import {
   EFFORT_LEVELS,
   type EffortValue,
   parseEffortValue,
-} from 'src/utils/effort.js'
+} from '@claude-code/agent/effort.js'
 import {
   getClaudeConfigHomeDir,
   isBareMode,
@@ -43,7 +43,7 @@ import {
   parseFrontmatter,
   parseShellFrontmatter,
   splitPathInFrontmatter,
-} from 'src/utils/frontmatterParser.js'
+} from '@claude-code/agent/frontmatterParser.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { isPathGitignored } from 'src/utils/git/gitignore.js'
 import { logError } from '@claude-code/local-observability/logging'

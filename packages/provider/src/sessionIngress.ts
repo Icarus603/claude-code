@@ -1,7 +1,7 @@
 import axios, { type AxiosError } from 'axios'
 import type { UUID } from 'crypto'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
-import type { Entry, TranscriptMessage } from 'src/types/logs.js'
+import type { Entry, TranscriptMessage } from '@claude-code/agent/logsTypes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

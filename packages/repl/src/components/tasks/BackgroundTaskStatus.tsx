@@ -8,7 +8,7 @@ import {
   enterTeammateView,
   exitTeammateView,
 } from 'src/state/teammateViewHelpers.js'
-import { isPanelAgentTask } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
 import { getPillLabel, pillNeedsCta } from 'src/tasks/pillLabel.js'
 import {
   type BackgroundTaskState,

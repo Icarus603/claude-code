@@ -28,7 +28,7 @@ import {
 } from '@claude-code/permission/PermissionMode'
 import { BackgroundTaskStatus } from '../tasks/BackgroundTaskStatus.js'
 import { isBackgroundTask } from 'src/tasks/types.js'
-import { isPanelAgentTask } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
 import { getVisibleAgentTasks } from '../CoordinatorAgentStatus.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { shouldHideTasksFooter } from '../tasks/taskStatusUtils.js'

@@ -3,7 +3,7 @@
  * Used by both the CLI `claude agents` handler and the interactive `/agents` command.
  */
 
-import { getDefaultSubagentModel } from 'src/utils/model/agent.js'
+import { getDefaultSubagentModel } from '@claude-code/provider/modelAgent.js'
 import {
   getSourceDisplayName,
   type SettingSource,

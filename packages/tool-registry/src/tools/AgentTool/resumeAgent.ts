@@ -4,10 +4,10 @@ import { getSystemPrompt } from '@claude-code/agent/prompts.js'
 import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import { registerAsyncAgent } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+import { registerAsyncAgent } from '@claude-code/agent/localAgentTask.js'
 import { assembleToolPool } from 'src/tools.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
-import { runWithAgentContext } from 'src/utils/agentContext.js'
+import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
 import { runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
@@ -16,7 +16,7 @@ import {
   filterUnresolvedToolUses,
   filterWhitespaceOnlyAssistantMessages,
 } from '@claude-code/agent/messages.js'
-import { getAgentModel } from 'src/utils/model/agent.js'
+import { getAgentModel } from '@claude-code/provider/modelAgent.js'
 import { getQuerySourceForAgent } from 'src/utils/promptCategory.js'
 import {
   getAgentTranscript,

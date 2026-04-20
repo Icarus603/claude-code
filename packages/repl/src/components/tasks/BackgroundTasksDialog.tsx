@@ -25,8 +25,8 @@ import {
   DreamTask,
   type DreamTaskState,
 } from 'src/tasks/DreamTask/DreamTask.js'
-import type { LocalAgentTaskState } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
-import { LocalAgentTask } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
+import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
+import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
 import { LocalShellTask } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 // Type import is erased at build time — safe even though module is ant-gated.

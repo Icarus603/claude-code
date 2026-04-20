@@ -58,7 +58,12 @@
     "./context.js": "./context.ts",
     "./types/hooks.js": "./types/hooks.ts",
     "./prompts.js": "./prompts.ts",
-    "./postSamplingHooks.js": "./postSamplingHooks.ts"
+    "./postSamplingHooks.js": "./postSamplingHooks.ts",
+    "./localAgentTask.js": "./localAgentTask.ts",
+    "./logsTypes.js": "./logsTypes.ts",
+    "./frontmatterParser.js": "./frontmatterParser.ts",
+    "./effort.js": "./effort.ts",
+    "./agentContext.js": "./agentContext.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
