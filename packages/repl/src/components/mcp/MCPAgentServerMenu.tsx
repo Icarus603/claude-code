@@ -1,6 +1,6 @@
 import figures from 'figures'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { Box, color, Link, Text, useTheme } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import {

@@ -88,7 +88,7 @@ import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils
 import type {
   LocalJSXCommandContext,
   CommandResultDisplay,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import {

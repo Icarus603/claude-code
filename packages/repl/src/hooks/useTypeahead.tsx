@@ -4,7 +4,7 @@ import { useNotifications } from 'src/context/notifications.js'
 import { Text } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
 import { useDebounceCallback } from 'usehooks-ts'
-import { type Command, getCommandName } from 'src/commands.js'
+import { type Command, getCommandName } from '@claude-code/command-runtime/runtime'
 import {
   getModeFromInput,
   getValueFromInput,

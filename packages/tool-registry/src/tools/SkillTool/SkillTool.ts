@@ -8,7 +8,7 @@ import {
   findCommand,
   getCommands,
   type PromptCommand,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 import type {
   Tool,
   ToolCallProgress,

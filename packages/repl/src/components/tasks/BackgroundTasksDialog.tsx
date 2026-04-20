@@ -44,7 +44,7 @@ import {
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { intersperse } from '@claude-code/tool-registry/utils/array.js'
 import { stopUltraplan } from 'src/commands/ultraplan.js'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { useRegisterOverlay } from 'src/context/overlayContext.js'
 import type { ExitState } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'

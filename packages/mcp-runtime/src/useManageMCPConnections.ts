@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { basename } from 'path'
 import { useCallback, useEffect, useRef } from 'react'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import {
   clearServerCache,

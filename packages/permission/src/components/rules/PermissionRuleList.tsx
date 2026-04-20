@@ -8,7 +8,7 @@ import {
   persistPermissionUpdate,
 } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdateDestination } from '@claude-code/permission/PermissionUpdateSchema'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useSearchInput } from '@anthropic/ink/search'

@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import type { RuntimeGraph } from '@claude-code/app-host'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import type { Props as REPLViewProps } from 'src/REPLView.js'
 
 export type ControlledREPLProps = REPLViewProps & {

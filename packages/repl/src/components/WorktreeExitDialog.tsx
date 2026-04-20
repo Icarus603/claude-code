@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import type { CommandResultDisplay } from 'src/commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from 'src/utils/debug.js'
 import { Box, Text, Dialog } from '@anthropic/ink'

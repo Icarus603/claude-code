@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import {
   clearCommandMemoizationCaches,
   clearCommandsCache,
   getCommands,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 import { onGrowthBookRefresh } from '@claude-code/config/feature-flags'
 import { logError } from 'src/utils/log.js'
 import { skillChangeDetector } from 'src/utils/skills/skillChangeDetector.js'

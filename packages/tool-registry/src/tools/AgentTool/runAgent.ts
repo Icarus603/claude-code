@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getProjectRoot, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import { getCommand, getSkillToolCommands, hasCommand } from 'src/commands.js'
+import { getCommand, getSkillToolCommands, hasCommand } from '@claude-code/command-runtime/runtime'
 import {
   DEFAULT_AGENT_PROMPT,
   enhanceSystemPromptWithEnvDetails,
