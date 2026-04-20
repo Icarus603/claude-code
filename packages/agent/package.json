@@ -52,7 +52,10 @@
     "./diff.js": "./diff.ts",
     "./uuid.js": "./uuid.ts",
     "./command.js": "./command.ts",
-    "./sessionStores.js": "./sessionStores.ts"
+    "./sessionStores.js": "./sessionStores.ts",
+    "./tokens.js": "./tokens.ts",
+    "./toolSearch.js": "./toolSearch.ts",
+    "./context.js": "./context.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

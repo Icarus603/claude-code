@@ -6,7 +6,7 @@ import { isPowerShellToolEnabled } from '@claude-code/shell/legacy/shellToolUtil
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { isWorktreeModeEnabled } from 'src/utils/worktreeModeEnabled.js'
 import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
-import { isToolSearchEnabledOptimistic } from 'src/utils/toolSearch.js'
+import { isToolSearchEnabledOptimistic } from '@claude-code/agent/toolSearch.js'
 import type { ToolProvider } from '../types.js'
 
 // Static imports — always loaded

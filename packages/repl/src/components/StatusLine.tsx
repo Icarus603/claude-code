@@ -34,7 +34,7 @@ import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import {
   calculateContextPercentages,
   getContextWindowForModel,
-} from 'src/utils/context.js'
+} from '@claude-code/agent/context.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
@@ -52,7 +52,7 @@ import { getCurrentSessionTitle } from '@claude-code/storage/sessionStorage.js'
 import {
   doesMostRecentAssistantMessageExceed200k,
   getCurrentUsage,
-} from 'src/utils/tokens.js'
+} from '@claude-code/agent/tokens.js'
 import { getCurrentWorktreeSession } from '@claude-code/swarm'
 import { isVimModeEnabled } from './PromptInput/utils.js'
 

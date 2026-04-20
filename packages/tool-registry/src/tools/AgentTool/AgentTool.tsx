@@ -77,7 +77,7 @@ import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import { getParentSessionId, isTeammate } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
 import { teleportToRemote } from 'src/utils/teleport.js'
-import { getAssistantMessageContentLength } from 'src/utils/tokens.js'
+import { getAssistantMessageContentLength } from '@claude-code/agent/tokens.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'
 import {
   createAgentWorktree,

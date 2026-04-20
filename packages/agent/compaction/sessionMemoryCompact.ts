@@ -16,8 +16,8 @@ import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getSessionMemoryPath } from '@claude-code/permission/filesystem'
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
-import { tokenCountFromLastAPIResponse } from 'src/utils/tokens.js'
-import { extractDiscoveredToolNames } from 'src/utils/toolSearch.js'
+import { tokenCountFromLastAPIResponse } from '@claude-code/agent/tokens.js'
+import { extractDiscoveredToolNames } from '@claude-code/agent/toolSearch.js'
 import {
   getDynamicConfig_BLOCKS_ON_INIT,
   getFeatureValue_CACHED_MAY_BE_STALE,
