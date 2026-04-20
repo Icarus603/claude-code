@@ -61,7 +61,7 @@ import {
   getFastModeState,
 } from '@claude-code/repl/fastMode.js'
 import { AwsAuthStatusManager } from 'src/utils/awsAuthStatusManager.js'
-import { parseUserSpecifiedModel } from 'src/utils/model/model.js'
+import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { logMCPDebug } from '@claude-code/local-observability/log.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'

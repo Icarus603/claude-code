@@ -31,7 +31,7 @@ import {
 import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import type { ThinkingConfig } from 'src/utils/thinking.js'
+import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { uniq } from '@claude-code/tool-registry/utils/array.js'
 import { mergeAndFilterTools } from 'src/utils/toolPool.js'
@@ -265,15 +265,15 @@ import {
   getMainLoopModel,
   modelDisplayString,
   parseUserSpecifiedModel,
-} from 'src/utils/model/model.js'
-import { getModelOptions } from 'src/utils/model/modelOptions.js'
+} from '@claude-code/provider/model.js'
+import { getModelOptions } from '@claude-code/provider/modelOptions.js'
 import {
   modelSupportsEffort,
   modelSupportsMaxEffort,
   EFFORT_LEVELS,
   resolveAppliedEffort,
 } from 'src/utils/effort.js'
-import { modelSupportsAdaptiveThinking } from 'src/utils/thinking.js'
+import { modelSupportsAdaptiveThinking } from '@claude-code/provider/thinking.js'
 import { modelSupportsAutoMode } from 'src/utils/betas.js'
 import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
 import {
