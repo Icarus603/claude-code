@@ -16,7 +16,7 @@ import {
   fileHistoryCanRestore,
   fileHistoryEnabled,
   fileHistoryGetDiffStats,
-} from 'src/utils/fileHistory.js'
+} from '@claude-code/agent/file-history'
 import { logError } from 'src/utils/log.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text, Divider } from '@anthropic/ink'

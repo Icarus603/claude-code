@@ -30,7 +30,7 @@ import { renameRecordingForSession } from 'src/utils/asciicast.js'
 import { updateSessionName } from 'src/utils/concurrentSessions.js'
 import { loadConversationForResume } from 'src/utils/conversationRecovery.js'
 import { checkCrossProjectResume } from 'src/utils/crossProjectResume.js'
-import type { FileHistorySnapshot } from 'src/utils/fileHistory.js'
+import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { logError } from 'src/utils/log.js'
 import { createSystemMessage } from 'src/utils/messages.js'
 import {

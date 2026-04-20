@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { cronToHuman } from '@claude-code/agent/scheduler'
-import { listAllCronTasks } from 'src/utils/cronTasks.js'
+import { listAllCronTasks } from '@claude-code/agent/scheduler'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'

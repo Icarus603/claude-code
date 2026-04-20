@@ -84,7 +84,7 @@ import type {
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import type { AttributionState } from 'src/utils/commitAttribution.js'
-import type { FileHistoryState } from 'src/utils/fileHistory.js'
+import type { FileHistoryState } from '@claude-code/agent/file-history'
 import type { Theme, ThemeName } from '@anthropic/ink'
 
 export type QueryChainTracking = {

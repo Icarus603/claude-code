@@ -5,7 +5,7 @@ import {
   getCronFilePath,
   listAllCronTasks,
   removeCronTasks,
-} from 'src/utils/cronTasks.js'
+} from '@claude-code/agent/scheduler'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'
 import {

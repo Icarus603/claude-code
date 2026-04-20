@@ -3,7 +3,7 @@ import { extname, isAbsolute, resolve } from 'path'
 import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,
-} from 'src/utils/fileHistory.js'
+} from '@claude-code/agent/file-history'
 import { z } from 'zod/v4'
 import { buildTool, type ToolDef, type ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { NotebookCell, NotebookContent } from '@claude-code/tool-registry/notebookTypes'

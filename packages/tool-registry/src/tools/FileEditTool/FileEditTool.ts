@@ -28,7 +28,7 @@ import {
 import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,
-} from 'src/utils/fileHistory.js'
+} from '@claude-code/agent/file-history'
 import { logFileOperation } from 'src/utils/fileOperationAnalytics.js'
 import {
   type LineEndingType,
