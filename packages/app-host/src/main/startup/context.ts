@@ -2,7 +2,7 @@ import { feature } from "bun:bundle";
 import { getSystemContext, getUserContext } from "@claude-code/provider/context.js";
 import { checkHasTrustDialogAccepted } from "@claude-code/config";
 import { getIsNonInteractiveSession } from "../../bootstrap/state.js";
-import { logForDiagnosticsNoPII } from "src/utils/diagLogs.js";
+import { logForDiagnosticsNoPII } from "@claude-code/local-observability/logging";
 import { initUser } from "src/utils/user.js";
 import { getRelevantTips } from "src/services/tips/tipRegistry.js";
 import {
@@ -15,8 +15,8 @@ import { prefetchOfficialMcpUrls } from '@claude-code/mcp-runtime/officialRegist
 import { refreshModelCapabilities } from "src/utils/model/modelCapabilities.js";
 import { settingsChangeDetector } from "src/utils/settings/changeDetector.js";
 import { skillChangeDetector } from "src/utils/skills/skillChangeDetector.js";
-import { isEnvTruthy } from "src/utils/envUtils.js";
-import { isBareMode } from "src/utils/envUtils.js";
+import { isEnvTruthy } from "@claude-code/config/env/utils";
+import { isBareMode } from "@claude-code/config/env/utils";
 
 export function prefetchSystemContextIfSafe(): void {
 	const isNonInteractiveSession = getIsNonInteractiveSession();

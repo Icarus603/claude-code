@@ -1,5 +1,5 @@
 import { feature } from "bun:bundle";
-import { isEnvTruthy } from "src/utils/envUtils.js";
+import { isEnvTruthy } from "@claude-code/config/env/utils";
 import { setUserMsgOptIn } from "../../bootstrap/state.js";
 import { logEvent } from "@claude-code/local-observability";
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from "@claude-code/local-observability/compat";

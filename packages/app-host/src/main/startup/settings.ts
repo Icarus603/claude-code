@@ -28,7 +28,7 @@ import { migrateFennecToOpus } from "src/migrations/migrateFennecToOpus.js";
 import { migrateChangelogFromConfig } from "src/utils/releaseNotes.js";
 import { getGlobalConfig, saveGlobalConfig } from "@claude-code/config";
 import { profileCheckpoint } from "src/utils/startupProfiler.js";
-import { isEnvTruthy } from "src/utils/envUtils.js";
+import { isEnvTruthy } from "@claude-code/config/env/utils";
 
 const CURRENT_MIGRATION_VERSION = 11;
 
