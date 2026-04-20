@@ -7,7 +7,7 @@ import {
   type AgentColorName,
 } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import type { PromptInputMode } from 'src/types/textInputTypes.js'
-import { getTeammateColor } from 'src/utils/teammate.js'
+import { getTeammateColor } from '@claude-code/swarm/teammateState.js'
 import type { Theme } from 'src/utils/theme.js'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 

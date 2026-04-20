@@ -11,7 +11,7 @@ import {
   getTaskListId,
   isTodoV2Enabled,
 } from '@claude-code/agent/tasks.js'
-import { getAgentName, getTeamName } from 'src/utils/teammate.js'
+import { getAgentName, getTeamName } from '@claude-code/swarm/teammateState.js'
 import { TASK_CREATE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, getPrompt } from './prompt.js'
 

@@ -36,7 +36,7 @@ import {
   getTeamName,
   isPlanModeRequired,
   isTeammate,
-} from 'src/utils/teammate.js'
+} from '@claude-code/swarm/teammateState.js'
 import { writeToMailbox } from '@claude-code/swarm'
 import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
 import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCreateTool/constants.js'

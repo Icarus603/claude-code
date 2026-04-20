@@ -83,7 +83,7 @@ import {
   sendSandboxPermissionResponseViaMailbox,
 } from '@claude-code/swarm';
 import { registerSandboxPermissionCallback } from '@claude-code/repl/hooks/useSwarmPermissionPoller.js';
-import { getTeamName, getAgentName } from 'src/utils/teammate.js';
+import { getTeamName, getAgentName } from '@claude-code/swarm/teammateState.js';
 import { WorkerPendingPermission } from '@claude-code/permission/components/WorkerPendingPermission.js';
 import {
   injectUserMessageToTeammate,

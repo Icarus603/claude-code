@@ -8,7 +8,9 @@
   "exports": {
     ".": "./src/index.ts",
     "./errors": "./src/errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./teammateState.js": "./src/teammateState.ts",
+    "./teammateContext.js": "./src/teammateContext.ts"
   },
   "dependencies": {
     "@claude-code/agent": "workspace:*",

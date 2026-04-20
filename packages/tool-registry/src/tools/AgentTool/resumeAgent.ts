@@ -25,7 +25,7 @@ import {
 import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt.js'
 import type { SystemPrompt } from 'src/utils/systemPromptType.js'
 import { getTaskOutputPath } from 'src/utils/task/diskOutput.js'
-import { getParentSessionId } from 'src/utils/teammate.js'
+import { getParentSessionId } from '@claude-code/swarm/teammateState.js'
 import { reconstructForSubagentResume } from 'src/utils/toolResultStorage.js'
 import { runAsyncAgentLifecycle } from './agentToolUtils.js'
 import { GENERAL_PURPOSE_AGENT } from './built-in/generalPurposeAgent.js'

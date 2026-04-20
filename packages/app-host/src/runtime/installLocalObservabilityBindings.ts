@@ -53,7 +53,7 @@ import {
   getAgentId,
   getAgentName,
   getParentSessionId,
-} from 'src/utils/teammate.js'
+} from '@claude-code/swarm/teammateState.js'
 
 let installed = false
 

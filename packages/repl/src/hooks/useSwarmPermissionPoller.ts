@@ -23,7 +23,7 @@ import {
   pollForResponse,
   removeWorkerResponse,
 } from '@claude-code/swarm'
-import { getAgentName, getTeamName } from 'src/utils/teammate.js'
+import { getAgentName, getTeamName } from '@claude-code/swarm/teammateState.js'
 
 const POLL_INTERVAL_MS = 500
 
