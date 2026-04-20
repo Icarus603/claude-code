@@ -9,7 +9,7 @@ import { Box, Text } from '@anthropic/ink'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { getMaxVersion, getMaxVersionMessage } from '@claude-code/updater/autoUpdater.js'
 import { isAutoUpdaterDisabled } from '@claude-code/config'
-import { installLatest } from 'src/utils/nativeInstaller/index.js'
+import { installLatest } from '@claude-code/updater/nativeInstaller/index.js'
 import { gt } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 

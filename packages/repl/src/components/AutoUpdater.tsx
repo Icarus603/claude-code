@@ -22,7 +22,7 @@ import {
   installOrUpdateClaudePackage,
   localInstallationExists,
 } from '@claude-code/repl/localInstaller.js'
-import { removeInstalledSymlink } from 'src/utils/nativeInstaller/index.js'
+import { removeInstalledSymlink } from '@claude-code/updater/nativeInstaller/index.js'
 import { gt, gte } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 

@@ -13,7 +13,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   getPackageManager,
   type PackageManager,
-} from 'src/utils/nativeInstaller/packageManagers.js'
+} from '@claude-code/updater/nativeInstaller/packageManagers.js'
 import { gt, gte } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 
