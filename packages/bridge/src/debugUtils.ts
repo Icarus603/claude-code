@@ -2,7 +2,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

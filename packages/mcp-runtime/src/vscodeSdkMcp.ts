@@ -1,4 +1,4 @@
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { z } from 'zod/v4'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {

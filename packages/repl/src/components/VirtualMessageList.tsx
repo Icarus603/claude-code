@@ -17,7 +17,7 @@ import { ScrollChromeContext } from './FullscreenLayout.js'
 // Rows of breathing room above the target when we scrollTo.
 const HEADROOM = 3
 
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { sleep } from '@claude-code/config/sleep'
 import { renderableSearchText } from 'src/utils/transcriptSearch.js'
 import {

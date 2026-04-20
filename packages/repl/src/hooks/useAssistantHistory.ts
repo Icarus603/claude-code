@@ -17,7 +17,7 @@ import type { ScrollBoxHandle } from '@anthropic/ink'
 import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
 import { convertSDKMessage } from '@claude-code/server/remote/sdkMessageAdapter.js'
 import type { Message, SystemInformationalMessage } from '@claude-code/agent/messageShapes'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 
 type Props = {
   /** Gated on viewerOnly — non-viewer sessions have no remote history to page. */

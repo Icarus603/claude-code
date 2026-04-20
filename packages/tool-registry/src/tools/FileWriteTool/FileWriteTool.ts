@@ -15,7 +15,7 @@ import {
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { countLinesChanged, getPatchForDisplay } from 'src/utils/diff.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'

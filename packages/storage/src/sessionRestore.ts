@@ -37,7 +37,7 @@ import {
 } from 'src/utils/commitAttribution.js'
 import { updateSessionName } from 'src/utils/concurrentSessions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { fileHistoryRestoreStateFromLog } from '@claude-code/agent/file-history'
 import { createSystemMessage } from 'src/utils/messages.js'

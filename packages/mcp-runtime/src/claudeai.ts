@@ -7,7 +7,7 @@ import {
 } from '@claude-code/local-observability'
 import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy } from '@claude-code/config/env/utils'
 import { clearMcpAuthCache } from './client.js'
 import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'

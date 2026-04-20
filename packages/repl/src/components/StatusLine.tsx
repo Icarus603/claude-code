@@ -36,7 +36,7 @@ import {
   getContextWindowForModel,
 } from 'src/utils/context.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import {
   createBaseHookInput,

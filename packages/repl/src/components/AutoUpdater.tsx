@@ -16,7 +16,7 @@ import {
   shouldSkipVersion,
 } from '@claude-code/updater/autoUpdater.js'
 import { getGlobalConfig, isAutoUpdaterDisabled } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getCurrentInstallationType } from 'src/utils/doctorDiagnostic.js'
 import {
   installOrUpdateClaudePackage,

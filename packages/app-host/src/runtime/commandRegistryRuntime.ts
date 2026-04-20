@@ -149,7 +149,7 @@ import advisor from 'src/commands/advisor.js'
 import provider from '@claude-code/provider/commands/provider.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   getSkillDirCommands,
   clearSkillCaches,

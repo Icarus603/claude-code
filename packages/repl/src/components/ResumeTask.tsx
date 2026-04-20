@@ -8,7 +8,7 @@ import {
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { detectCurrentRepository } from 'src/utils/detectRepository.js'
 import { formatRelativeTime } from '@claude-code/output/formatters'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'

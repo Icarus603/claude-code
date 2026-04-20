@@ -26,7 +26,7 @@ import {
   setClassifierApproval,
   setYoloClassifierApproval,
 } from '@claude-code/permission/classifierApprovals.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'

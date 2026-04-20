@@ -1,7 +1,7 @@
 import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { errorMessage, getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { getPlatform } from '@claude-code/config/platform'

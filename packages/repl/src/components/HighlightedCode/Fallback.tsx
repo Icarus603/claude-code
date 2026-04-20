@@ -2,7 +2,7 @@ import { extname } from 'path'
 import React, { Suspense, use, useMemo } from 'react'
 import { Ansi, Text } from '@anthropic/ink'
 import { getCliHighlightPromise } from '@claude-code/output/utils/cliHighlight.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { convertLeadingTabsToSpaces } from 'src/utils/file.js'
 import { hashPair } from '@claude-code/config/hash'
 

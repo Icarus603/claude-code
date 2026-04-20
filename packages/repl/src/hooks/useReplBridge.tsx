@@ -28,7 +28,7 @@ import {
 } from '@claude-code/repl/appStateHooks.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { enqueue } from 'src/utils/messageQueueManager.js'
 import { buildSystemInitMessage } from 'src/utils/messages/systemInit.js'

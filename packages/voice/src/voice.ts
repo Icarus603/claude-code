@@ -6,7 +6,7 @@
 
 import { type ChildProcess, spawn, spawnSync } from 'child_process'
 import { readFile } from 'fs/promises'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPlatform } from '@claude-code/config/platform'

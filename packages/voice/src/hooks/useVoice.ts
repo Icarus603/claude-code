@@ -20,7 +20,7 @@ import {
   isVoiceStreamAvailable,
   type VoiceStreamConnection,
 } from '@claude-code/voice/voiceStreamSTT.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { getSystemLocaleLanguage } from '@claude-code/output/utils/intl.js'
 import { logError } from '@claude-code/local-observability/logging'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { Notification } from 'src/context/notifications.js'
 import { Text } from '@anthropic/ink'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { checkAndInstallOfficialMarketplace } from 'src/utils/plugins/officialMarketplaceStartupCheck.js'
 import { useStartupNotification } from './notifs/useStartupNotification.js'
 

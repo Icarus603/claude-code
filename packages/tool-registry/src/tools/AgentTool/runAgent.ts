@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import type { UUID } from 'crypto'
 import { randomUUID } from 'crypto'
 import uniqBy from 'lodash-es/uniqBy.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getProjectRoot, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getCommand, getSkillToolCommands, hasCommand } from '@claude-code/command-runtime/runtime'
 import {

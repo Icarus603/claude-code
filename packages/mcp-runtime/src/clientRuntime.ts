@@ -58,7 +58,7 @@ import { createAbortController } from '@claude-code/agent/abortController.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { detectCodeIndexingFromMcpServerName } from 'src/utils/codeIndexing.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   errorMessage,

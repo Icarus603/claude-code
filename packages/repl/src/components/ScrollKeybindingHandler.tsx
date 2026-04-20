@@ -7,7 +7,7 @@ import {
 import type { ScrollBoxHandle, FocusMove, SelectionState } from '@anthropic/ink'
 import { useSelection, type Key, useInput, isXtermJs, getClipboardPath } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 
 type Props = {
   scrollRef: RefObject<ScrollBoxHandle | null>

@@ -60,7 +60,7 @@ import type {
 } from '@claude-code/agent/messageShapes'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   AbortError,
   errorMessage,

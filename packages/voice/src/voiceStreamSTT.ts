@@ -19,7 +19,7 @@ import {
   getClaudeAIOAuthTokens,
   isAnthropicAuthEnabled,
 } from 'src/utils/auth.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getUserAgent } from 'src/utils/http.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getWebSocketTLSOptions } from 'src/utils/mtls.js'

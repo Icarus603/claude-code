@@ -16,7 +16,7 @@ import {
 import type { QueryChainTracking } from '@claude-code/tool-registry/Tool.js'
 import { isConnectorTextBlock } from '@claude-code/provider/connectorTextTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { EffortLevel } from 'src/utils/effort.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getAPIProviderForStatsig } from 'src/utils/model/providers.js'

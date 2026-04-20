@@ -8,7 +8,7 @@
  */
 
 import axios from 'axios'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { extractErrorDetail } from './debugUtils.js'

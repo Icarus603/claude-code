@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { logEvent } from '@claude-code/local-observability'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
 import { getPlansDirectory } from 'src/utils/plans.js'

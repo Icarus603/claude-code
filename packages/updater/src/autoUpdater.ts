@@ -9,7 +9,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { type ReleaseChannel, saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { env } from '@claude-code/config/env/paths'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { ClaudeError, getErrnoCode, isENOENT } from '@claude-code/local-observability/errorHelpers.js'

@@ -31,7 +31,7 @@ import {
   validateForceLoginOrg,
 } from 'src/utils/auth.js'
 import { saveGlobalConfig } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'

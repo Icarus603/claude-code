@@ -28,7 +28,7 @@ import {
   getClaudeAIOAuthTokens,
 } from 'src/utils/auth.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { classifyAxiosError } from '@claude-code/local-observability/errorHelpers.js'
 import { safeParseJSON } from 'src/utils/json.js'

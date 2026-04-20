@@ -9,7 +9,7 @@ import { assembleToolPool } from 'src/tools.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
 import { runWithAgentContext } from 'src/utils/agentContext.js'
 import { runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   createUserMessage,
   filterOrphanedThinkingOnlyMessages,

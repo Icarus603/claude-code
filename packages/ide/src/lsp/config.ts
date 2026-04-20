@@ -1,5 +1,5 @@
 import type { PluginError } from '@claude-code/config/plugin/types'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPluginLspServers } from '@claude-code/config/plugin/lspPluginIntegration'

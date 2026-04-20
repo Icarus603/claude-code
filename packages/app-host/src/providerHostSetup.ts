@@ -31,7 +31,7 @@ import {
   getIsNonInteractiveSession,
   getSessionId,
 } from './bootstrap/state.js'
-import { isDebugToStdErr, logForDebugging } from 'src/utils/debug.js'
+import { isDebugToStdErr, logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   getAWSRegion,
   getVertexRegionForModel,

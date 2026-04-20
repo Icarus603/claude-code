@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { useNotifications } from 'src/context/notifications.js'
 import { Text } from '@anthropic/ink'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { onPluginsAutoUpdated } from 'src/utils/plugins/pluginAutoupdate.js'
 
 /**

@@ -12,7 +12,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { count } from '@claude-code/tool-registry/utils/array.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { logError } from '@claude-code/local-observability/logging'

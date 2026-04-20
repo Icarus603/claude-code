@@ -113,7 +113,7 @@ import {
   type PastedContent,
   saveGlobalConfig,
 } from '@claude-code/config'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   parseDirectMemberMessage,
   sendDirectMemberMessage,

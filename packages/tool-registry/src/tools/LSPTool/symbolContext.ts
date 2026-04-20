@@ -1,4 +1,4 @@
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import { expandPath } from 'src/utils/path.js'

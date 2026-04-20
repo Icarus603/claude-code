@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { logEvent } from '@claude-code/local-observability'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { useInterval } from 'usehooks-ts'
 import { useUpdateNotification } from '@claude-code/repl/hooks/useUpdateNotification.js'

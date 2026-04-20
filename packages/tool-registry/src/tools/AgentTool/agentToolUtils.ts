@@ -38,7 +38,7 @@ import {
 import { asAgentId } from '@claude-code/agent/idTypes'
 import type { Message as MessageType, ContentItem } from '@claude-code/agent/messageShapes'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { AbortError, errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import type { CacheSafeParams } from 'src/utils/forkedAgent.js'
