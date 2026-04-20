@@ -43,7 +43,7 @@ import {
   checkWSLDistroMatch,
   WindowsToWSLConverter,
 } from './idePathConversion.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 
 function isProcessRunning(pid: number): boolean {

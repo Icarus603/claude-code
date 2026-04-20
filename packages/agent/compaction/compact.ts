@@ -79,7 +79,7 @@ import {
   getTranscriptPath,
   reAppendSessionMetadata,
 } from '@claude-code/storage/sessionStorage.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'

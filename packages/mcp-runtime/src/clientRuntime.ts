@@ -151,7 +151,7 @@ import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { classifyMcpToolForCollapse } from '@claude-code/tool-registry/tools/MCPTool/classifyForCollapse.js'
 import { clearKeychainCache } from 'src/utils/secureStorage/macOsKeychainHelpers.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import {
   ClaudeAuthProvider,
   hasMcpDiscoveryButNoToken,

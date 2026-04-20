@@ -37,7 +37,7 @@ import {
   isFirstPartyAnthropicBaseUrl,
 } from 'src/utils/model/providers.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 import { getRetryDelay } from '@claude-code/provider/withRetry.js'

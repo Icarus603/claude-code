@@ -33,7 +33,7 @@ import {
 } from 'src/utils/fastMode.js'
 import { isNonCustomOpusModel } from 'src/utils/model/model.js'
 import { disableKeepAlive } from 'src/utils/proxy.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import type { ThinkingConfig } from 'src/utils/thinking.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'

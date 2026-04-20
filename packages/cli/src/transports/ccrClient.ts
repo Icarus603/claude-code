@@ -20,7 +20,7 @@ import type {
   RequiresActionDetails,
   SessionState,
 } from '@claude-code/storage/sessionState.js'
-import { sleep } from 'src/utils/sleep.js'
+import { sleep } from '@claude-code/config/sleep'
 import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 import {
   RetryableError,
