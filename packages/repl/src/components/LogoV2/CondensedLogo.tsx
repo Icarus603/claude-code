@@ -5,7 +5,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getEffortSuffix } from 'src/utils/effort.js'
-import { truncate } from 'src/utils/format.js'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import {
   formatModelAndBilling,

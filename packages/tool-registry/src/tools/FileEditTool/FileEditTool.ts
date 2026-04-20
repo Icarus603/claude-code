@@ -34,7 +34,7 @@ import {
   type LineEndingType,
   readFileSyncWithMetadata,
 } from 'src/utils/fileRead.js'
-import { formatFileSize } from 'src/utils/format.js'
+import { formatFileSize } from '@claude-code/output/formatters'
 import { getFsImplementation } from 'src/utils/fsOperations.js'
 import {
   fetchSingleFileGitDiff,

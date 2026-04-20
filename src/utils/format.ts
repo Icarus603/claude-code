@@ -27,4 +27,4 @@ export {
   truncateToWidth,
   truncateToWidthNoEllipsis,
   wrapText,
-} from './truncate.js'
+} from '@claude-code/output/formatters/truncate.js'

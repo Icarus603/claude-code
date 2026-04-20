@@ -17,7 +17,7 @@ import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.j
 import { AGENT_COLOR_TO_THEME_COLOR } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { execFileNoThrow } from 'src/utils/execFileNoThrow.js'
-import { truncateToWidth } from 'src/utils/format.js'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { getNextPermissionMode } from '@claude-code/permission/getNextPermissionMode.js'
 import {
   getModeColor,

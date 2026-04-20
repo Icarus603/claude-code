@@ -12,7 +12,7 @@ import {
   getRecentReleaseNotesSync,
   getLogoDisplayData,
 } from 'src/utils/logoV2Utils.js'
-import { truncate } from 'src/utils/format.js'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getDisplayPath } from 'src/utils/file.js'
 import { Clawd } from './Clawd.js'
 import { FeedColumn } from './FeedColumn.js'

@@ -1,7 +1,7 @@
 import React from 'react'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { Text } from '@anthropic/ink'
-import { truncate } from 'src/utils/format.js'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 import type { CreateOutput } from './CronCreateTool.js'
 import type { DeleteOutput } from './CronDeleteTool.js'
 import type { ListOutput } from './CronListTool.js'

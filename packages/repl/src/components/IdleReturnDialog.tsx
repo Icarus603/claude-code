@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { formatTokens } from 'src/utils/format.js'
+import { formatTokens } from '@claude-code/output/formatters'
 import { Select } from './CustomSelect/index.js'
 import { Dialog } from '@anthropic/ink'
 

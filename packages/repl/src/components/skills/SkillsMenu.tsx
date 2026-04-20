@@ -14,7 +14,7 @@ import {
   getSkillsPath,
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
 import { getDisplayPath } from 'src/utils/file.js'
-import { formatTokens } from 'src/utils/format.js'
+import { formatTokens } from '@claude-code/output/formatters'
 import {
   getSettingSourceName,
   type SettingSource,

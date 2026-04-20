@@ -5,7 +5,7 @@ import { generateFileSuggestions } from './fileSuggestions.js'
 import type { ServerResource } from '@claude-code/mcp-runtime/types.js'
 import { getAgentColor } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { truncateToWidth } from 'src/utils/format.js'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import { logError } from 'src/utils/log.js'
 import type { Theme } from 'src/utils/theme.js'
 

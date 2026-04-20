@@ -71,7 +71,8 @@ import { asSessionId, asAgentId } from 'src/types/ids.js';
 import { logForDebugging } from 'src/utils/debug.js';
 import { QueryGuard } from 'src/utils/QueryGuard.js';
 import { isEnvTruthy } from 'src/utils/envUtils.js';
-import { formatTokens, truncateToWidth } from 'src/utils/format.js';
+import { formatTokens } from '@claude-code/output/formatters'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js';
 import { consumeEarlyInput } from 'src/utils/earlyInput.js';
 
 import { setMemberActive } from '@claude-code/swarm';

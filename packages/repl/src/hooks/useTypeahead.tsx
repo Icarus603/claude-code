@@ -40,7 +40,7 @@ import {
   getShellCompletions,
   type ShellCompletionType,
 } from '@claude-code/shell/bash/shellCompletion.js'
-import { formatLogMetadata } from 'src/utils/format.js'
+import { formatLogMetadata } from '@claude-code/output/formatters'
 import {
   getSessionIdFromLog,
   searchSessionsByCustomTitle,

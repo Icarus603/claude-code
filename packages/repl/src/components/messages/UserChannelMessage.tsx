@@ -3,7 +3,7 @@ import * as React from 'react'
 import { CHANNEL_ARROW } from 'src/constants/figures.js'
 import { CHANNEL_TAG } from '@claude-code/command-runtime/xml.js'
 import { Box, Text } from '@anthropic/ink'
-import { truncateToWidth } from 'src/utils/format.js'
+import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 
 type Props = {
   addMargin: boolean

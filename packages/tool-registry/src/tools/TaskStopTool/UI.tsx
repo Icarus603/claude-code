@@ -1,7 +1,7 @@
 import React from 'react'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { Text, stringWidth } from '@anthropic/ink'
-import { truncateToWidthNoEllipsis } from 'src/utils/format.js'
+import { truncateToWidthNoEllipsis } from '@claude-code/output/formatters/truncate.js'
 import type { Output } from './TaskStopTool.js'
 
 export function renderToolUseMessage(): React.ReactNode {

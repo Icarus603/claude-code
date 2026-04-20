@@ -4,7 +4,7 @@ import { Box, Text, Byline, KeyboardShortcutHint, LoadingState } from '@anthropi
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getAllBaseTools } from 'src/tools.js'
 import type { LogOption } from 'src/types/logs.js'
-import { formatRelativeTimeAgo } from 'src/utils/format.js'
+import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import {
   getSessionIdFromLog,
   isLiteLog,

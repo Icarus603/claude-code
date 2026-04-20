@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Text, stringWidth } from '@anthropic/ink'
-import { truncate } from 'src/utils/format.js'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 
 export type FeedLine = {
   text: string

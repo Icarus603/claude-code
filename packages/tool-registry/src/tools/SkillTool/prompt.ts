@@ -14,7 +14,7 @@ import {
 import { count } from 'src/utils/array.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { toError } from 'src/utils/errors.js'
-import { truncate } from 'src/utils/format.js'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { logError } from 'src/utils/log.js'
 
 // Skill listing gets 1% of the context window (in characters)

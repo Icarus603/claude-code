@@ -12,7 +12,7 @@ import {
   type RateLimit,
   type Utilization,
 } from '@claude-code/provider/usage.js'
-import { formatResetText } from 'src/utils/format.js'
+import { formatResetText } from '@claude-code/output/formatters'
 import { logError } from 'src/utils/log.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

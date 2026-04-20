@@ -12,7 +12,7 @@ import type {
 import { uniq } from 'src/utils/array.js'
 import { getToolUseIdsFromCollapsedGroup } from 'src/utils/collapseReadSearch.js'
 import { getDisplayPath } from 'src/utils/file.js'
-import { formatDuration, formatSecondsShort } from 'src/utils/format.js'
+import { formatDuration, formatSecondsShort } from '@claude-code/output/formatters'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import type { buildMessageLookups } from 'src/utils/messages.js'
 import type { ThemeName } from 'src/utils/theme.js'

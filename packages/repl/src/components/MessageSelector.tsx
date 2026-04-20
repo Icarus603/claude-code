@@ -56,7 +56,8 @@ import {
   TICK_TAG,
 } from '@claude-code/command-runtime/xml.js'
 import { count } from 'src/utils/array.js'
-import { formatRelativeTimeAgo, truncate } from 'src/utils/format.js'
+import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
 import type { Theme } from 'src/utils/theme.js'
 type RestoreOption =
   | 'both'

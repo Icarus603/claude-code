@@ -4,7 +4,7 @@ import { Box, Text } from '@anthropic/ink'
 import type { ContextData } from 'src/utils/analyzeContext.js'
 import { generateContextSuggestions } from 'src/utils/contextSuggestions.js'
 import { getDisplayPath } from 'src/utils/file.js'
-import { formatTokens } from 'src/utils/format.js'
+import { formatTokens } from '@claude-code/output/formatters'
 import {
   getSourceDisplayName,
   type SettingSource,

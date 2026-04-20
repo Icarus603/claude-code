@@ -91,7 +91,7 @@ import {
   PDF_TARGET_RAW_SIZE,
 } from 'src/constants/apiLimits.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { formatFileSize } from 'src/utils/format.js'
+import { formatFileSize } from '@claude-code/output/formatters'
 import { ImageResizeError } from 'src/utils/imageResizer.js'
 import { ImageSizeError } from 'src/utils/imageValidation.js'
 import { logEvent } from '@claude-code/local-observability'

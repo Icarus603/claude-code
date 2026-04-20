@@ -26,7 +26,7 @@ import {
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { getExternalEditor } from 'src/utils/editor.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { formatDuration } from 'src/utils/format.js'
+import { formatDuration } from '@claude-code/output/formatters'
 import { setEnvHookNotifier } from 'src/utils/hooks/fileChangedWatcher.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { getMessagesAfterCompactBoundary } from 'src/utils/messages.js'

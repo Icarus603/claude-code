@@ -2,7 +2,7 @@ import * as React from 'react'
 import { memo, type ReactNode } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
-import { truncatePathMiddle, truncateToWidth } from 'src/utils/format.js'
+import { truncatePathMiddle, truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import type { Theme } from 'src/utils/theme.js'
 
 export type SuggestionItem = {

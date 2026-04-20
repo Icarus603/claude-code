@@ -4,7 +4,7 @@ import {
   executeTaskCreatedHooks,
   getTaskCreatedHookMessage,
 } from 'src/utils/hooks.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from 'src/utils/lazySchema.js'
 import {
   createTask,
   deleteTask,
