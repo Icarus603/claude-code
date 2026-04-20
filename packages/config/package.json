@@ -124,6 +124,7 @@
     "./plugin/loadPluginAgentsAlias.js": "./plugin/loadPluginAgentsAlias.ts",
     "./managedEnv.js": "./managedEnv.ts",
     "./crypto.js": "./crypto.ts",
-    "./gitFilesystem.js": "./gitFilesystem.ts"
+    "./gitFilesystem.js": "./gitFilesystem.ts",
+    "./outputStyles.js": "./outputStyles.ts"
   }
 }
