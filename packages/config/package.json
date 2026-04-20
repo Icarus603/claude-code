@@ -116,6 +116,7 @@
     "./stream": "./stream.ts",
     "./sequential": "./sequential.ts",
     "./generators": "./generators.ts",
-    "./platform": "./platform.ts"
+    "./platform": "./platform.ts",
+    "./embeddedTools.js": "./embeddedTools.ts"
   }
 }

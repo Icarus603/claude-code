@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import { prependBullets } from 'src/constants/prompts.js'
 import { getAttributionTexts } from '@claude-code/agent/attribution.js'
-import { hasEmbeddedSearchTools } from 'src/utils/embeddedTools.js'
+import { hasEmbeddedSearchTools } from '@claude-code/config/embeddedTools.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { shouldIncludeGitInstructions } from '@claude-code/config/env/git-settings'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
