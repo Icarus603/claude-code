@@ -52,6 +52,8 @@
     "./systemPromptSections": "./src/systemPromptSections.ts",
     "./authAlias.js": "./src/authAlias.ts",
     "./model.js": "./src/model.ts",
-    "./providers.js": "./src/providers.ts"
+    "./providers.js": "./src/providers.ts",
+    "./mtls.js": "./src/mtls.ts",
+    "./sessionIngressAuth.js": "./src/sessionIngressAuth.ts"
   }
 }

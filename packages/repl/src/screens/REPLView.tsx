@@ -297,7 +297,7 @@ import {
   provisionContentReplacementState,
   reconstructContentReplacementState,
   type ContentReplacementRecord,
-} from 'src/utils/toolResultStorage.js';
+} from '@claude-code/storage/toolResultStorage.js';
 import { partialCompactConversation } from '@claude-code/agent/compaction/compact.js';
 import type { LogOption } from 'src/types/logs.js';
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js';
@@ -477,7 +477,7 @@ import type { ScrollBoxHandle } from '@anthropic/ink'
 import {
   createAttachmentMessage,
   getQueuedCommandAttachments,
-} from 'src/utils/attachments.js'
+} from '@claude-code/agent/attachments.js'
 
 // Stable stub for useAssistantHistory's non-KAIROS branch — avoids a new
 // function identity each render, which would break composedOnScroll's memo.

@@ -7,7 +7,7 @@ import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
 import { sequential } from '@claude-code/config/sequential'
-import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getOAuthHeaders } from '@claude-code/teleport/api.js'

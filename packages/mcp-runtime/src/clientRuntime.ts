@@ -82,19 +82,19 @@ import {
 } from '@claude-code/mcp-runtime/mcpValidation.js'
 import { WebSocketTransport } from '@claude-code/mcp-runtime/mcpWebSocketTransport.js'
 import { memoizeWithLRU } from 'src/utils/memoize.js'
-import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
+import { getWebSocketTLSOptions } from '@claude-code/provider/mtls.js'
 import {
   getProxyFetchOptions,
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,
 } from 'src/utils/proxy.js'
 import { recursivelySanitizeUnicode } from 'src/utils/sanitization.js'
-import { getSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { subprocessEnv } from 'src/utils/subprocessEnv.js'
 import {
   isPersistError,
   persistToolResult,
-} from 'src/utils/toolResultStorage.js'
+} from '@claude-code/storage/toolResultStorage.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'

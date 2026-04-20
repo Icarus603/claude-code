@@ -22,7 +22,7 @@ import {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getUserAgent } from 'src/utils/http.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
+import { getWebSocketTLSOptions } from '@claude-code/provider/mtls.js'
 import { getWebSocketProxyAgent, getWebSocketProxyUrl } from 'src/utils/proxy.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

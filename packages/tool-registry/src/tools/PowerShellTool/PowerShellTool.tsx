@@ -44,7 +44,7 @@ import { logError } from '@claude-code/local-observability/logging'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { getPlatform } from '@claude-code/config/platform'
 import { maybeRecordPluginHint } from '@claude-code/config/plugin/hintRecommendation'
-import { exec } from 'src/utils/Shell.js'
+import { exec } from '@claude-code/shell/Shell.js'
 import type { ExecResult } from 'src/utils/ShellCommand.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
@@ -60,7 +60,7 @@ import {
   generatePreview,
   getToolResultPath,
   PREVIEW_SIZE_BYTES,
-} from 'src/utils/toolResultStorage.js'
+} from '@claude-code/storage/toolResultStorage.js'
 import { shouldUseSandbox } from '@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js'
 import { BackgroundHint } from '@claude-code/tool-registry/tools/BashTool/UI.js'
 import {

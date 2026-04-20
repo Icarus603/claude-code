@@ -39,7 +39,7 @@ import {
   getAgentListingDeltaAttachment,
   getDeferredToolsDeltaAttachment,
   getMcpInstructionsDeltaAttachment,
-} from 'src/utils/attachments.js'
+} from '@claude-code/agent/attachments.js'
 import { getMemoryPath } from '@claude-code/config'
 import { COMPACT_MAX_OUTPUT_TOKENS } from 'src/utils/context.js'
 import {

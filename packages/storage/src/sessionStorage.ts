@@ -91,7 +91,7 @@ import {
 } from 'src/utils/sessionStoragePortable.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'
+import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'
 import { validateUuid } from 'src/utils/uuid.js'
 import { readEnv } from '@claude-code/config/env'
 

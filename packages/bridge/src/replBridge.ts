@@ -37,7 +37,7 @@ import {
   createV1ReplTransport,
   createV2ReplTransport,
 } from './replBridgeTransport.js'
-import { updateSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { updateSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { isEnvTruthy, isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { validateBridgeId } from './bridgeApi.js'
 import {

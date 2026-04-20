@@ -1,4 +1,4 @@
-import type { Attachment } from 'src/utils/attachments.js'
+import type { Attachment } from '@claude-code/agent/attachments.js'
 import type { Message, NormalizedMessage } from '@claude-code/agent/messageShapes'
 
 /**

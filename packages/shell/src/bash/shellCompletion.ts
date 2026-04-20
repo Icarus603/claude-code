@@ -6,7 +6,7 @@ import {
 } from './shellQuote.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getShellType } from 'src/utils/localInstaller.js'
-import * as Shell from 'src/utils/Shell.js'
+import * as Shell from '@claude-code/shell/Shell.js'
 
 // Constants
 const MAX_SHELL_COMPLETIONS = 15

@@ -15,7 +15,7 @@ import {
 import {
   getSessionIngressAuthHeaders,
   getSessionIngressAuthToken,
-} from 'src/utils/sessionIngressAuth.js'
+} from '@claude-code/provider/sessionIngressAuth.js'
 import type {
   RequiresActionDetails,
   SessionState,

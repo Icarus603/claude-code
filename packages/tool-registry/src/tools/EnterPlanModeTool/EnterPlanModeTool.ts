@@ -9,7 +9,7 @@ import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { applyPermissionUpdate } from '@claude-code/permission/PermissionUpdate'
 import { prepareContextForPlanMode } from '@claude-code/permission/permissionSetup'
-import { isPlanModeInterviewPhaseEnabled } from 'src/utils/planModeV2.js'
+import { isPlanModeInterviewPhaseEnabled } from '@claude-code/permission/planModeV2.js'
 import { ENTER_PLAN_MODE_TOOL_NAME } from './constants.js'
 import { getEnterPlanModeToolPrompt } from './prompt.js'
 import {

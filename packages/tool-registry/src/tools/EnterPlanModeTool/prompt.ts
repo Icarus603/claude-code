@@ -1,4 +1,4 @@
-import { isPlanModeInterviewPhaseEnabled } from 'src/utils/planModeV2.js'
+import { isPlanModeInterviewPhaseEnabled } from '@claude-code/permission/planModeV2.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 
 const WHAT_HAPPENS_SECTION = `## What Happens in Plan Mode

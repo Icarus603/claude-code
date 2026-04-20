@@ -4,7 +4,7 @@ import type { HybridTransport } from '@claude-code/cli/transports/HybridTranspor
 import { SSETransport } from '@claude-code/cli/transports/SSETransport.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { updateSessionIngressAuthToken } from 'src/utils/sessionIngressAuth.js'
+import { updateSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import type { SessionState } from '@claude-code/storage/sessionState.js'
 import { registerWorker } from './workSecret.js'
 

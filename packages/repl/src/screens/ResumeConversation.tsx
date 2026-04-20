@@ -50,7 +50,7 @@ import {
   type SessionLogResult,
 } from '@claude-code/storage/sessionStorage.js'
 import type { ThinkingConfig } from 'src/utils/thinking.js'
-import type { ContentReplacementRecord } from 'src/utils/toolResultStorage.js'
+import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'
 import { REPL } from './REPL.js'
 
 function parsePrIdentifier(value: string): number | null {

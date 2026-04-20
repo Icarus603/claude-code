@@ -13,7 +13,7 @@ import type {
   ProgressMessage,
 } from '@claude-code/agent/messageShapes'
 import type { PermissionDecision } from '@claude-code/permission/permissionTypes'
-import { createAttachmentMessage } from 'src/utils/attachments.js'
+import { createAttachmentMessage } from '@claude-code/agent/attachments.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   executePostToolHooks,
