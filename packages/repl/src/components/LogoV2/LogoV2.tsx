@@ -13,7 +13,7 @@ import {
   getLogoDisplayData,
 } from 'src/utils/logoV2Utils.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import { Clawd } from './Clawd.js'
 import { FeedColumn } from './FeedColumn.js'
 import {

@@ -42,7 +42,7 @@ import type {
 } from '@claude-code/agent/messageShapes'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import {
   cloneFileStateCache,
   createFileStateCacheWithSizeLimit,

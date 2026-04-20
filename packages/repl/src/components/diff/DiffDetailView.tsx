@@ -4,7 +4,7 @@ import React, { useMemo } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { readFileSafe } from 'src/utils/file.js'
+import { readFileSafe } from '@claude-code/storage/file.js'
 import { Divider } from '@anthropic/ink'
 import { StructuredDiff } from '../StructuredDiff.js'
 

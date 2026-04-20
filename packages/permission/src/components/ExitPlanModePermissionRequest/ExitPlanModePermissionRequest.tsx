@@ -41,7 +41,7 @@ import {
   getContextWindowForModel,
 } from 'src/utils/context.js'
 import { getExternalEditor } from 'src/utils/editor.js'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js'

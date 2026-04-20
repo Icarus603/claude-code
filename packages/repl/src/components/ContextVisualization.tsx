@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
 import type { ContextData } from 'src/utils/analyzeContext.js'
 import { generateContextSuggestions } from 'src/utils/contextSuggestions.js'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import { formatTokens } from '@claude-code/output/formatters'
 import {
   getSourceDisplayName,

@@ -9,7 +9,7 @@ import { buildTool, type ToolDef, type ToolUseContext } from '@claude-code/tool-
 import type { NotebookCell, NotebookContent } from '@claude-code/tool-registry/notebookTypes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
-import { getFileModificationTime, writeTextContent } from 'src/utils/file.js'
+import { getFileModificationTime, writeTextContent } from '@claude-code/storage/file.js'
 import { readFileSyncWithMetadata } from 'src/utils/fileRead.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'

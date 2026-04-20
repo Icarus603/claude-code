@@ -13,7 +13,7 @@ import {
   estimateSkillFrontmatterTokens,
   getSkillsPath,
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import { formatTokens } from '@claude-code/output/formatters'
 import {
   getSettingSourceName,

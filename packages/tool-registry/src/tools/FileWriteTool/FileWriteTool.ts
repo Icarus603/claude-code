@@ -19,7 +19,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { countLinesChanged, getPatchForDisplay } from 'src/utils/diff.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
-import { getFileModificationTime, writeTextContent } from 'src/utils/file.js'
+import { getFileModificationTime, writeTextContent } from '@claude-code/storage/file.js'
 import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,

@@ -12,7 +12,7 @@ import { NotebookEditToolUseRejectedMessage } from '@claude-code/repl/components
 import { Box, Text } from '@anthropic/ink'
 import { FilePathLink } from '@claude-code/repl/components/FilePathLink.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import type { inputSchema, Output } from './NotebookEditTool.js'
 
 export function getToolUseSummary(

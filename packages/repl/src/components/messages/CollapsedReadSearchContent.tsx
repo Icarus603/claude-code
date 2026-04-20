@@ -11,7 +11,7 @@ import type {
 } from '@claude-code/agent/messageShapes'
 import { uniq } from '@claude-code/tool-registry/utils/array.js'
 import { getToolUseIdsFromCollapsedGroup } from 'src/utils/collapseReadSearch.js'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import { formatDuration, formatSecondsShort } from '@claude-code/output/formatters'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import type { buildMessageLookups } from '@claude-code/agent/messages.js'

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { getDisplayPath } from 'src/utils/file.js'
+import { getDisplayPath } from '@claude-code/storage/file.js'
 import {
   removePathFromRepo,
   validateRepoAtPath,

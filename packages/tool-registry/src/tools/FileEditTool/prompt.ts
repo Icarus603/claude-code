@@ -1,4 +1,4 @@
-import { isCompactLinePrefixEnabled } from 'src/utils/file.js'
+import { isCompactLinePrefixEnabled } from '@claude-code/storage/file.js'
 import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 
 function getPreReadInstruction(): string {

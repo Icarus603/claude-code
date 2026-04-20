@@ -7,7 +7,7 @@ import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
-import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from 'src/utils/file.js'
+import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from '@claude-code/storage/file.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { extractTag } from '@claude-code/agent/messages.js'
 

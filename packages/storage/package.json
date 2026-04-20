@@ -21,6 +21,7 @@
     "./tempfile.js": "./src/tempfile.ts",
     "./lockfile.js": "./src/lockfile.ts",
     "./fsOperations.js": "./src/fsOperations.ts",
-    "./path.js": "./src/path.ts"
+    "./path.js": "./src/path.ts",
+    "./file.js": "./src/file.ts"
   }
 }

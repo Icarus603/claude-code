@@ -6,7 +6,7 @@ import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
   FILE_NOT_FOUND_CWD_NOTE,
   suggestPathUnderCwd,
-} from 'src/utils/file.js'
+} from '@claude-code/storage/file.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { glob } from 'src/utils/glob.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
