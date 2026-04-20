@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
 import type { OAuthProfileResponse } from './types.js'
-import { getAnthropicApiKey } from 'src/utils/auth.js'
+import { getAnthropicApiKey } from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { logError } from '@claude-code/local-observability/logging'
 export async function getOauthProfileFromApiKey(): Promise<

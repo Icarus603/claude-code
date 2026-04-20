@@ -4,7 +4,7 @@ import {
   BridgeHeadlessPermanentError,
   runBridgeHeadless,
 } from '@claude-code/bridge/bridgeMain.js'
-import { getClaudeAIOAuthTokens } from 'src/utils/auth.js'
+import { getClaudeAIOAuthTokens } from '@claude-code/provider/authAlias.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 
 /**

@@ -29,7 +29,7 @@ import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
   handleOAuth401Error,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { stripDisplayTagsAllowEmpty } from '@claude-code/output/utils/displayTags.js'

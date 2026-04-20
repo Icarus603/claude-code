@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { getOauthProfileFromApiKey } from '@claude-code/provider/oauth/getOauthProfile.js'
-import { isClaudeAISubscriber } from 'src/utils/auth.js'
+import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 import { Text } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

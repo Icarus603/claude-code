@@ -49,6 +49,7 @@
     "./userAgent.js": "./src/userAgent.ts",
     "./connectorTextTypes": "./src/connectorTextTypes.ts",
     "./oauthConstants": "./src/oauthConstants.ts",
-    "./systemPromptSections": "./src/systemPromptSections.ts"
+    "./systemPromptSections": "./src/systemPromptSections.ts",
+    "./authAlias.js": "./src/authAlias.ts"
   }
 }

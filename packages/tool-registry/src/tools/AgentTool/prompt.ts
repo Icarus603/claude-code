@@ -1,5 +1,5 @@
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { getSubscriptionType } from 'src/utils/auth.js'
+import { getSubscriptionType } from '@claude-code/provider/authAlias.js'
 import { hasEmbeddedSearchTools } from '@claude-code/config/embeddedTools.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import { isTeammate } from '@claude-code/swarm/teammateState.js'

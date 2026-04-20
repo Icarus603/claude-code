@@ -29,7 +29,7 @@ import {
   isUsing3PServices,
   saveOAuthTokensIfNeeded,
   validateForceLoginOrg,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isRunningOnHomespace } from '@claude-code/config/env/utils'

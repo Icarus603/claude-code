@@ -9,7 +9,7 @@ import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
-} from 'src/utils/auth.js'
+} from '@claude-code/provider/authAlias.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { DESCRIPTION, PROMPT, REMOTE_TRIGGER_TOOL_NAME } from './prompt.js'

@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getOauthAccountInfo, isConsumerSubscriber } from 'src/utils/auth.js'
+import { getOauthAccountInfo, isConsumerSubscriber } from '@claude-code/provider/authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'

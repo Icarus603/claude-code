@@ -10,7 +10,7 @@ import {
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Newline, Text, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { isAnthropicAuthEnabled } from 'src/utils/auth.js'
+import { isAnthropicAuthEnabled } from '@claude-code/provider/authAlias.js'
 import { normalizeApiKeyForConfig } from 'src/utils/authPortable.js'
 import { getCustomApiKeyStatus } from '@claude-code/config'
 import { env } from '@claude-code/config/env/paths'

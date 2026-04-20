@@ -38,7 +38,7 @@ import {
   setLastAPIRequestMessages,
   getSessionId,
 } from '../bootstrap/state.js'
-import { getOauthAccountInfo } from 'src/utils/auth.js'
+import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
 import { CACHE_PATHS } from '@claude-code/storage/cache-paths'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
