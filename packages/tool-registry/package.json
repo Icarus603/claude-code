@@ -90,6 +90,7 @@
     "./telemetry/pluginTelemetry.js": "./src/telemetry/pluginTelemetry.ts",
     "./skills/skillChangeDetector.js": "./src/skills/skillChangeDetector.ts",
     "./suggestions/skillUsageTracking.js": "./src/suggestions/skillUsageTracking.ts",
-    "./codeIndexing.js": "./src/codeIndexing.ts"
+    "./codeIndexing.js": "./src/codeIndexing.ts",
+    "./toolPool.js": "./src/toolPool.ts"
   }
 }
