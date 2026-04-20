@@ -3,7 +3,7 @@ import type WsWebSocket from 'ws'
 import { logEvent } from '@claude-code/local-observability'
 import { CircularBuffer } from '@claude-code/output/buffers'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
 import {

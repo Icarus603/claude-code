@@ -14,7 +14,7 @@ import {
 } from '@claude-code/local-observability/compat'
 import { isInBundledMode } from '@claude-code/config/bundledMode'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isEnvTruthy, isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'

@@ -4,7 +4,7 @@ import {
   JSONRPCMessageSchema,
 } from '@modelcontextprotocol/sdk/types.js'
 import type WsWebSocket from 'ws'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

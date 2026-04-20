@@ -1,6 +1,6 @@
 import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 

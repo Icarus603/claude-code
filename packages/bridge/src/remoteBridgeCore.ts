@@ -53,7 +53,7 @@ import {
 } from './bridgeMessaging.js'
 import { logBridgeSkip } from './debugUtils.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { sleep } from 'src/utils/sleep.js'

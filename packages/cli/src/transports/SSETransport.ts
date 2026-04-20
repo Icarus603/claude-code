@@ -1,7 +1,7 @@
 import axios, { type AxiosError } from 'axios'
 import type { StdoutMessage } from 'src/entrypoints/sdk/controlTypes.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
+import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getSessionIngressAuthHeaders } from 'src/utils/sessionIngressAuth.js'
 import { sleep } from 'src/utils/sleep.js'
