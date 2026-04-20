@@ -8,7 +8,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 import { parseGitHubRepository } from 'src/utils/detectRepository.js'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

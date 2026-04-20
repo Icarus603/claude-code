@@ -13,7 +13,7 @@ import {
   CONTEXT_LINES,
   getPatchForDisplay,
 } from 'src/utils/diff.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   CHUNK_SIZE,
   openForScan,

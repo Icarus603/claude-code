@@ -78,7 +78,7 @@ import { getWorktreePaths } from 'src/utils/getWorktreePaths.js'
 import { getBranch } from 'src/utils/git.js'
 import { gracefulShutdownSync, isShuttingDown } from 'src/utils/gracefulShutdown.js'
 import { parseJSONL } from 'src/utils/json.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { extractTag, isCompactBoundaryMessage } from 'src/utils/messages.js'
 import { sanitizePath } from 'src/utils/path.js'
 import {

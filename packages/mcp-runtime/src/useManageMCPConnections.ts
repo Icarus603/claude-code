@@ -61,7 +61,7 @@ import {
 } from './appStateHooks.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { logMCPDebug, logMCPError } from 'src/utils/log.js'
+import { logMCPDebug, logMCPError } from '@claude-code/local-observability/logging'
 import { enqueue } from 'src/utils/messageQueueManager.js'
 import {
   CHANNEL_PERMISSION_METHOD,

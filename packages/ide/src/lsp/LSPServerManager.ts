@@ -2,7 +2,7 @@ import * as path from 'path'
 import { pathToFileURL } from 'url'
 import { logForDebugging } from 'src/utils/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getAllLspServers } from './config.js'
 import {
   createLSPServerInstance,

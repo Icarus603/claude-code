@@ -6,7 +6,7 @@ import {
   getCommands,
 } from '@claude-code/command-runtime/runtime'
 import { onGrowthBookRefresh } from '@claude-code/config/feature-flags'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { skillChangeDetector } from 'src/utils/skills/skillChangeDetector.js'
 
 /**

@@ -18,7 +18,7 @@ import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging
 import { isEnvTruthy, isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { sleep } from '@claude-code/config/sleep'
 import { createAgentWorktree, removeAgentWorktree } from '@claude-code/swarm'
 import {

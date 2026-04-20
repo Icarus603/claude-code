@@ -21,7 +21,7 @@ import {
 } from 'src/utils/auth.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getUserAgent } from 'src/utils/http.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getWebSocketTLSOptions } from 'src/utils/mtls.js'
 import { getWebSocketProxyAgent, getWebSocketProxyUrl } from 'src/utils/proxy.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'

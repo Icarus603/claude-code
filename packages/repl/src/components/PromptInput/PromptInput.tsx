@@ -141,7 +141,7 @@ import {
   isMacosOptionChar,
   MACOS_OPTION_SPECIAL_CHARS,
 } from 'src/utils/keyboardShortcuts.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   isOpus1mMergeEnabled,
   modelDisplayString,

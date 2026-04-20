@@ -3,7 +3,7 @@ import { createServer, type Server } from 'http'
 import type { AddressInfo } from 'net'
 import { logEvent } from '@claude-code/local-observability'
 import { getOauthConfig } from 'src/constants/oauth.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { shouldUseClaudeAIAuth } from './client.js'
 
 /**

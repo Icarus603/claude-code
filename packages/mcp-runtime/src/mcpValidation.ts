@@ -9,7 +9,7 @@ import {
   roughTokenCountEstimation,
 } from '@claude-code/agent/tokenEstimation.js'
 import { compressImageBlock } from 'src/utils/imageResizer.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 
 export const MCP_TOKEN_COUNT_THRESHOLD_FACTOR = 0.5
 export const IMAGE_TOKEN_ESTIMATE = 1600

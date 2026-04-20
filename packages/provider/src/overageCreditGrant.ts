@@ -2,7 +2,7 @@ import axios from 'axios'
 import { getOauthConfig } from 'src/constants/oauth.js'
 import { getOauthAccountInfo } from 'src/utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'
 

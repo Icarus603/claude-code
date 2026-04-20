@@ -57,7 +57,7 @@ import {
   executePostCompactHooks,
   executePreCompactHooks,
 } from 'src/utils/hooks.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { MEMORY_TYPE_VALUES } from 'src/utils/memory/types.js'
 import {
   createCompactBoundaryMessage,

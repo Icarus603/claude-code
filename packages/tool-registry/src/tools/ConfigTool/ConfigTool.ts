@@ -13,7 +13,7 @@ import {
 } from '@claude-code/config'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   getInitialSettings,
   updateSettingsForSource,

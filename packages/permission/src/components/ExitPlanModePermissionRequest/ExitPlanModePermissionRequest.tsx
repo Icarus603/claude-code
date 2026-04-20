@@ -43,7 +43,7 @@ import {
 import { getExternalEditor } from 'src/utils/editor.js'
 import { getDisplayPath } from 'src/utils/file.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { enqueuePendingNotification } from 'src/utils/messageQueueManager.js'
 import { createUserMessage } from 'src/utils/messages.js'
 import {

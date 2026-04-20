@@ -6,7 +6,7 @@ import type {
   SDKControlResponse,
 } from 'src/entrypoints/sdk/controlTypes.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   type RemoteMessageContent,
   sendEventToRemoteSession,

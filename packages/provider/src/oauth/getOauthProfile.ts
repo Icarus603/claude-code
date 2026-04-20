@@ -3,7 +3,7 @@ import { getOauthConfig, OAUTH_BETA_HEADER } from 'src/constants/oauth.js'
 import type { OAuthProfileResponse } from './types.js'
 import { getAnthropicApiKey } from 'src/utils/auth.js'
 import { getGlobalConfig } from '@claude-code/config'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 export async function getOauthProfileFromApiKey(): Promise<
   OAuthProfileResponse | undefined
 > {

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import {
   getSettingSourceName,
   type SettingSource,

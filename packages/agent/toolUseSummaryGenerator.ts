@@ -7,7 +7,7 @@
 
 import { E_TOOL_USE_SUMMARY_GENERATION_FAILED } from 'src/constants/errorIds.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { queryHaiku } from '@claude-code/provider/claude.js'

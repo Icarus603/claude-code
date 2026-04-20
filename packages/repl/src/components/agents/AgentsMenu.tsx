@@ -17,7 +17,7 @@ import {
   getActiveAgentsFromList,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { Select } from '../CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 import { AgentDetail } from './AgentDetail.js'

@@ -5,7 +5,7 @@ import { getCurrentProjectConfig, saveCurrentProjectConfig } from '@claude-code/
 import { env } from '@claude-code/config/env/paths'
 import { execFileNoThrowWithCwd } from 'src/utils/execFileNoThrow.js'
 import { getIsGit, gitExe } from 'src/utils/git.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getGitEmail } from 'src/utils/user.js'
 
 // Patterns that mark a file as non-core (auto-generated, dependency, or config).

@@ -15,7 +15,7 @@ import { count } from '@claude-code/tool-registry/utils/array.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 
 // Skill listing gets 1% of the context window (in characters)
 export const SKILL_BUDGET_CONTEXT_PERCENT = 0.01

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { z } from 'zod/v4'
 import type {
   ConnectedMCPServer,

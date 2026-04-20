@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import type { PendingClassifierCheck } from '@claude-code/permission/permissionTypes'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import type { PermissionContext } from '../PermissionContext.js'

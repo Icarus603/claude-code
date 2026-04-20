@@ -26,7 +26,7 @@ import {
   hasAccessToIDEExtensionDiffFeature,
 } from '@claude-code/ide/ide.js'
 import { WindowsToWSLConverter } from '@claude-code/ide/idePathConversion.js'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getPlatform } from 'src/utils/platform.js'
 
 type Props = {

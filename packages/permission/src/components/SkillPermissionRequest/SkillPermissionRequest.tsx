@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { logError } from 'src/utils/log.js'
+import { logError } from '@claude-code/local-observability/logging'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { Box, Text } from '@anthropic/ink'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
