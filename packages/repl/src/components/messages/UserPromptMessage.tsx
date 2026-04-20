@@ -7,7 +7,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
-import { countCharInString } from 'src/utils/stringUtils.js'
+import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import { MessageActionsSelectedContext } from '../messageActions.js'
 import { HighlightedThinkingText } from './HighlightedThinkingText.js'
 

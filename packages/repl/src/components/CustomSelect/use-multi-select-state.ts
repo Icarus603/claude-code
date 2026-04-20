@@ -5,7 +5,7 @@ import { type InputEvent, useInput } from '@anthropic/ink'
 import {
   normalizeFullWidthDigits,
   normalizeFullWidthSpace,
-} from 'src/utils/stringUtils.js'
+} from '@claude-code/output/utils/stringUtils.js'
 import type { OptionWithDescription } from './select.js'
 import { useSelectNavigation } from './use-select-navigation.js'
 

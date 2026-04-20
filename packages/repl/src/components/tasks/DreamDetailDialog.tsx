@@ -4,7 +4,7 @@ import { useElapsedTime } from '@claude-code/repl/hooks/useElapsedTime.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import type { DreamTaskState } from 'src/tasks/DreamTask/DreamTask.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 
 type Props = {

@@ -17,7 +17,7 @@ import type { Theme } from '@anthropic/ink'
 import { UserImageMessage } from './UserImageMessage.js'
 
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import {

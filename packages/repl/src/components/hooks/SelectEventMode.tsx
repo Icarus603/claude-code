@@ -12,7 +12,7 @@ import * as React from 'react'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { HookEventMetadata } from 'src/utils/hooks/hooksConfigManager.js'
 import { Box, Link, Text } from '@anthropic/ink'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { Select } from '../CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 

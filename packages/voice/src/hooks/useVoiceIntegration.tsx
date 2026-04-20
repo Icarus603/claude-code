@@ -13,7 +13,7 @@ import { KeyboardEvent, useInput } from '@anthropic/ink'
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
 import { keystrokesEqual } from '@anthropic/ink/keybindings'
 import type { ParsedKeystroke } from '@anthropic/ink/keybindings'
-import { normalizeFullWidthSpace } from 'src/utils/stringUtils.js'
+import { normalizeFullWidthSpace } from '@claude-code/output/utils/stringUtils.js'
 import { useVoiceEnabled } from './useVoiceEnabled.js'
 
 // Dead code elimination: conditional import for voice input hook.

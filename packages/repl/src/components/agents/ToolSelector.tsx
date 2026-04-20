@@ -24,7 +24,7 @@ import { WebSearchTool } from '@claude-code/tool-registry/tools/WebSearchTool/We
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { count } from '@claude-code/tool-registry/utils/array.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { Divider } from '@anthropic/ink'
 
 type Props = {

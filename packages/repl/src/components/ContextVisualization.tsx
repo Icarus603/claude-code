@@ -9,7 +9,7 @@ import {
   getSourceDisplayName,
   type SettingSource,
 } from 'src/utils/settings/constants.js'
-import { plural } from 'src/utils/stringUtils.js'
+import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { ContextSuggestions } from './ContextSuggestions.js'
 
 const RESERVED_CATEGORY_NAME = 'Autocompact buffer'

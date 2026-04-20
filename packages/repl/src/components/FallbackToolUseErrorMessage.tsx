@@ -5,7 +5,7 @@ import { extractTag } from 'src/utils/messages.js'
 import { removeSandboxViolationTags } from 'src/utils/sandbox/sandbox-ui-utils.js'
 import { Box, Text } from '@anthropic/ink'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
-import { countCharInString } from 'src/utils/stringUtils.js'
+import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import { MessageResponse } from './MessageResponse.js'
 
 const MAX_RENDERED_LINES = 10

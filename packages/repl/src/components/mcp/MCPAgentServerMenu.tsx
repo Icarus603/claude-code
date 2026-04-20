@@ -7,7 +7,7 @@ import {
   AuthenticationCancelledError,
   performMCPOAuthFlow,
 } from '@claude-code/mcp-runtime/auth.js'
-import { capitalize } from 'src/utils/stringUtils.js'
+import { capitalize } from '@claude-code/output/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import { Select } from '../CustomSelect/index.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
