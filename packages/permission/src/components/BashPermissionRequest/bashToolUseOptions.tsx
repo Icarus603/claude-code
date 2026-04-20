@@ -1,5 +1,5 @@
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import { extractOutputRedirections } from 'src/utils/bash/commands.js'
+import { extractOutputRedirections } from '@claude-code/shell/bash/commands.js'
 import { isClassifierPermissionsEnabled } from '@claude-code/permission/bashClassifier.js'
 import type { PermissionDecisionReason } from '@claude-code/permission/PermissionResult'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'

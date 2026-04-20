@@ -6,7 +6,7 @@ import { join as posixJoin } from 'path/posix'
 import { rearrangePipeCommand } from '@claude-code/shell/bash/bashPipeCommand.js'
 import { createAndSaveSnapshot } from 'src/utils/bash/ShellSnapshot.js'
 import { formatShellPrefixCommand } from '@claude-code/shell/bash/shellPrefix.js'
-import { quote } from 'src/utils/bash/shellQuote.js'
+import { quote } from '@claude-code/shell/bash/shellQuote.js'
 import {
   quoteShellCommand,
   rewriteWindowsNullRedirect,

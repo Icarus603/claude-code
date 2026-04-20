@@ -22,9 +22,9 @@ import {
   extractOutputRedirections,
   getCommandSubcommandPrefix,
   splitCommand_DEPRECATED,
-} from 'src/utils/bash/commands.js'
+} from '@claude-code/shell/bash/commands.js'
 import { parseCommandRaw } from '@claude-code/shell/bash/parser.js'
-import { tryParseShellCommand } from 'src/utils/bash/shellQuote.js'
+import { tryParseShellCommand } from '@claude-code/shell/bash/shellQuote.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

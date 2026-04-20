@@ -1,5 +1,5 @@
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { splitCommand_DEPRECATED } from 'src/utils/bash/commands.js'
+import { splitCommand_DEPRECATED } from '@claude-code/shell/bash/commands.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import {

@@ -2,7 +2,7 @@ import type { z } from 'zod/v4'
 import {
   isUnsafeCompoundCommand_DEPRECATED,
   splitCommand_DEPRECATED,
-} from 'src/utils/bash/commands.js'
+} from '@claude-code/shell/bash/commands.js'
 import {
   buildParsedCommandFromRoot,
   type IParsedCommand,

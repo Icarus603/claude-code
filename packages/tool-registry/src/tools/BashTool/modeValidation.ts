@@ -1,6 +1,6 @@
 import type { z } from 'zod/v4'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import { splitCommand_DEPRECATED } from 'src/utils/bash/commands.js'
+import { splitCommand_DEPRECATED } from '@claude-code/shell/bash/commands.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import type { BashTool } from './BashTool.js'
 
