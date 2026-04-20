@@ -16,7 +16,7 @@ import {
   isEligibleForRemoteManagedSettings,
   waitForRemoteManagedSettingsToLoad,
 } from '@claude-code/config/remote'
-import { preconnectAnthropicApi } from 'src/utils/apiPreconnect.js'
+import { preconnectAnthropicApi } from '@claude-code/app-host/startup/apiPreconnect.js'
 import { applyExtraCACertsFromConfig } from 'src/utils/caCertsConfig.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { enableConfigs, recordFirstStartTime } from '@claude-code/config'
