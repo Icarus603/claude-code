@@ -25,7 +25,6 @@
     "./execFileNoThrow.js": "./src/execFileNoThrow.ts",
     "./Shell.js": "./src/Shell.ts",
     "./bash/ast-alias.js": "./src/bash/ast-alias.ts",
-    "./ShellCommand.js": "./src/ShellCommand.ts",
     "./subprocessEnv.js": "./src/subprocessEnv.ts"
   },
   "dependencies": {
