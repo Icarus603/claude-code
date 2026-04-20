@@ -2,7 +2,7 @@ import {
   installProviderRuntimeBindings,
   type ProviderHostBindings,
 } from '@claude-code/provider/providerHostSetup'
-import * as claudeLegacyRuntime from 'src/services/api/claudeLegacyRuntime.js'
+import * as claudeLegacyRuntime from '@claude-code/provider/claudeLegacyRuntime.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getAnthropicApiKey,

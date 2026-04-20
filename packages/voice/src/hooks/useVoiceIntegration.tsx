@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useNotifications } from '@claude-code/repl/notifications.js'
-import { useIsModalOverlayActive } from 'src/context/overlayContext.js'
+import { useIsModalOverlayActive } from '@claude-code/repl/overlayContext.js'
 import {
   useGetVoiceState,
   useSetVoiceState,

@@ -6,7 +6,7 @@ import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import { formatAgentId } from '@claude-code/agent/agentIdUtils'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
-import { getCwd } from 'src/utils/cwd.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   getDefaultMainLoopModel,
