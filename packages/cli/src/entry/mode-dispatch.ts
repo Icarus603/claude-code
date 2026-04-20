@@ -213,7 +213,7 @@ import {
   isInProtectedNamespace,
 } from 'src/utils/envUtils.js'
 import { refreshExampleCommands } from '@claude-code/command-runtime/exampleCommands.js'
-import type { FpsMetrics } from 'src/utils/fpsTracker.js'
+import type { FpsMetrics } from '@claude-code/output/fpsTracker.js'
 import { getWorktreePaths } from '@claude-code/storage/getWorktreePaths.js'
 import {
   findGitRoot,
