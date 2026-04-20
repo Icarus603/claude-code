@@ -1,3 +1,8 @@
-// Thin alias — canonical owner is src/utils/sandbox/sandbox-ui-utils.js.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/sandbox/sandbox-ui-utils.js'
+/**
+ * UI utilities for sandbox violations
+ * Used for displaying sandbox-related information in the UI.
+ */
+
+export function removeSandboxViolationTags(text: string): string {
+  return text.replace(/<sandbox_violations>[\s\S]*?<\/sandbox_violations>/g, '')
+}
