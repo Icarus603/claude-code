@@ -21,7 +21,7 @@ import {
 import { env } from '@claude-code/config/env/paths'
 import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
-import { isModifierPressed, prewarmModifiers } from 'src/utils/modifiers.js'
+import { isModifierPressed, prewarmModifiers } from '@claude-code/output/modifiers.js'
 import { useDoublePress } from '@anthropic/ink'
 
 type MaybeCursor = undefined | Cursor

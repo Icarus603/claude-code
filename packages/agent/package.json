@@ -91,7 +91,9 @@
     "./compactionDeps.js": "./compactionDeps.ts",
     "./contextAnalysis.js": "./contextAnalysis.ts",
     "./memory/types.js": "./memory/types.ts",
-    "./sdkControlSchemas.js": "./sdkControlSchemas.ts"
+    "./sdkControlSchemas.js": "./sdkControlSchemas.ts",
+    "./combinedAbortSignal.js": "./combinedAbortSignal.ts",
+    "./contentArray.js": "./contentArray.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

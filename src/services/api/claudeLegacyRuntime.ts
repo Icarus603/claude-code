@@ -200,7 +200,7 @@ import {
   TOOL_SEARCH_TOOL_NAME,
 } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import { count } from 'src/utils/array.js'
-import { insertBlockAfterToolResults } from 'src/utils/contentArray.js'
+import { insertBlockAfterToolResults } from '@claude-code/agent/contentArray.js'
 import { validateBoundedIntEnvVar } from 'src/utils/envValidation.js'
 import { safeParseJSON } from 'src/utils/json.js'
 import { getInferenceProfileBackingModel } from 'src/utils/model/bedrock.js'
