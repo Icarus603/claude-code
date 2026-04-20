@@ -5,7 +5,7 @@ import {
 import { stringWidth } from '@anthropic/ink'
 import { formatDuration } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
-import { getGraphemeSegmenter } from 'src/utils/intl.js'
+import { getGraphemeSegmenter } from '@claude-code/output/utils/intl.js'
 
 /** Bridge status state machine states. */
 export type StatusState =

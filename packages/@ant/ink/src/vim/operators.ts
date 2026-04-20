@@ -1,5 +1,5 @@
 import { Cursor } from 'src/utils/Cursor.js'
-import { firstGrapheme, lastGrapheme } from 'src/utils/intl.js'
+import { firstGrapheme, lastGrapheme } from '@claude-code/output/utils/intl.js'
 import { countCharInString } from 'src/utils/stringUtils.js'
 import {
   isInclusiveMotion,
