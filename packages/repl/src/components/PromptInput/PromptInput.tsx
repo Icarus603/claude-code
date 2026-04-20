@@ -77,7 +77,7 @@ import {
 import {
   getActiveAgentForInput,
   getViewedTeammateTask,
-} from 'src/state/selectors.js'
+} from '@claude-code/repl/selectors.js'
 import {
   enterTeammateView,
   exitTeammateView,

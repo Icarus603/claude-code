@@ -7,7 +7,7 @@ import type { SessionExternalMetadata } from '@claude-code/storage/sessionState.
 import {
   loadConversationForResume,
   type TurnInterruptionState,
-} from 'src/utils/conversationRecovery.js'
+} from '@claude-code/repl/conversationRecovery.js'
 import {
   hydrateRemoteSession,
   hydrateFromCCRv2InternalEvents,

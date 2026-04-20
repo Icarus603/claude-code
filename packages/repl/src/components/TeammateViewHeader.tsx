@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Box, Text, KeyboardShortcutHint } from '@anthropic/ink'
 import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
-import { getViewedTeammateTask } from 'src/state/selectors.js'
+import { getViewedTeammateTask } from '@claude-code/repl/selectors.js'
 
 import { OffscreenFreeze } from './OffscreenFreeze.js'
 

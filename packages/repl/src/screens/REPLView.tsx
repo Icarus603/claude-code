@@ -38,7 +38,7 @@ import {
   type RefObject,
 } from 'react'
 import { useNotifications } from '@claude-code/repl/notifications.js'
-import { sendNotification } from 'src/services/notifier.js'
+import { sendNotification } from '@claude-code/repl/notifier.js'
 import {
   startPreventSleep,
   stopPreventSleep,
