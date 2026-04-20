@@ -80,7 +80,7 @@ import {
 /* eslint-disable @typescript-eslint/no-require-imports */
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
-    ? (require('../../../../../../src/proactive/index.js') as typeof import('../../../../../../src/proactive/index.js'))
+    ? (require('src/proactive/index.js') as typeof import('src/proactive/index.js'))
     : null
 const extractMemoriesModule = feature('EXTRACT_MEMORIES')
   ? (require('@claude-code/memory/extractMemories') as typeof import('@claude-code/memory/extractMemories'))

@@ -415,23 +415,23 @@ export type ModeDispatchContext = {
 // Module-level lazy requires (re-declared from main.tsx module scope)
 /* eslint-disable @typescript-eslint/no-require-imports */
 const getTeammateUtils = () =>
-  require('../../../../src/utils/teammate.js') as typeof import('../../../../src/utils/teammate.js')
+  require('src/utils/teammate.js') as typeof import('src/utils/teammate.js')
 const getTeammatePromptAddendum = () =>
   require('@claude-code/swarm') as typeof import('@claude-code/swarm')
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('../../../../src/coordinator/coordinatorMode.js') as typeof import('../../../../src/coordinator/coordinatorMode.js'))
+  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const assistantModule = feature('KAIROS')
-  ? (require('../../../../src/assistant/index.js') as typeof import('../../../../src/assistant/index.js'))
+  ? (require('src/assistant/index.js') as typeof import('src/assistant/index.js'))
   : null
 const kairosGate = feature('KAIROS')
-  ? (require('../../../../src/assistant/gate.js') as typeof import('../../../../src/assistant/gate.js'))
+  ? (require('src/assistant/gate.js') as typeof import('src/assistant/gate.js'))
   : null
 
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -1103,7 +1103,7 @@ export async function runModeDispatch(
 						const {
 							isComputerUseMCPServer,
 							COMPUTER_USE_MCP_SERVER_NAME,
-						} = await import("../../../../src/utils/computerUse/common.js");
+						} = await import("src/utils/computerUse/common.js");
 						if (nonSdkConfigNames.some(isComputerUseMCPServer)) {
 							reservedNameError = `Invalid MCP configuration: "${COMPUTER_USE_MCP_SERVER_NAME}" is a reserved MCP name.`;
 						}
@@ -1265,10 +1265,10 @@ export async function runModeDispatch(
 			) {
 				try {
 					const { getChicagoEnabled } =
-						await import("../../../../src/utils/computerUse/gates.js");
+						await import("src/utils/computerUse/gates.js");
 					if (getChicagoEnabled()) {
 						const { setupComputerUseMCP } =
-							await import("../../../../src/utils/computerUse/setup.js");
+							await import("src/utils/computerUse/setup.js");
 						const { mcpConfig, allowedTools: cuTools } =
 							setupComputerUseMCP();
 						dynamicMcpConfig = {
@@ -1621,7 +1621,7 @@ export async function runModeDispatch(
 				isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE)
 			) {
 				const { applyCoordinatorToolFilter } =
-					await import("../../../../src/utils/toolPool.js");
+					await import("src/utils/toolPool.js");
 				tools = applyCoordinatorToolFilter(tools);
 			}
 
@@ -1669,7 +1669,7 @@ export async function runModeDispatch(
 			profileCheckpoint("action_before_setup");
 			logForDebugging("[STARTUP] Running setup()...");
 			const setupStart = Date.now();
-			const { setup } = await import("../../../../src/setup.js");
+			const { setup } = await import("src/setup.js");
 			const messagingSocketPath = feature("UDS_INBOX")
 				? (options as { messagingSocketPath?: string })
 						.messagingSocketPath
@@ -2896,11 +2896,11 @@ export async function runModeDispatch(
 				// that scripted calls don't need — the next interactive session reconciles.
 				if (!isBareMode()) {
 					startDeferredPrefetches();
-					void import("../../../../src/utils/backgroundHousekeeping.js").then((m) =>
+					void import("src/utils/backgroundHousekeeping.js").then((m) =>
 						m.startBackgroundHousekeeping(),
 					);
 					if (process.env.USER_TYPE === "ant") {
-						void import("../../../../src/utils/sdkHeapDumpMonitor.js").then((m) =>
+						void import("src/utils/sdkHeapDumpMonitor.js").then((m) =>
 							m.startSdkMemoryMonitor(),
 						);
 					}
@@ -3154,7 +3154,7 @@ export async function runModeDispatch(
 			// Import is dynamic + async to avoid adding startup latency.
 			const sessionUploaderPromise =
 				process.env.USER_TYPE === "ant"
-					? import("../../../../src/utils/sessionDataUploader.js")
+					? import("src/utils/sessionDataUploader.js")
 					: null;
 
 			// Defer session uploader resolution to the onTurnComplete callback to avoid
@@ -3249,7 +3249,7 @@ export async function runModeDispatch(
 
 					// Clear stale caches before resuming to ensure fresh file/skill discovery
 					const { clearSessionCaches } =
-						await import("../../../../src/commands/clear/caches.js");
+						await import("src/commands/clear/caches.js");
 					clearSessionCaches();
 
 					const result = await loadConversationForResume(
@@ -3374,7 +3374,7 @@ export async function runModeDispatch(
 					createSSHSession,
 					createLocalSSHSession,
 					SSHSessionError,
-				} = await import("../../../../src/ssh/createSSHSession.js");
+				} = await import("src/ssh/createSSHSession.js");
 				let sshSession;
 				try {
 					if (_pendingSSH.local) {
@@ -3468,7 +3468,7 @@ export async function runModeDispatch(
 				// process streams live events and POSTs messages. History is lazy-
 				// loaded by useAssistantHistory on scroll-up (no blocking fetch here).
 				const { discoverAssistantSessions } =
-					await import("../../../../src/assistant/sessionDiscovery.js");
+					await import("src/assistant/sessionDiscovery.js");
 
 				let targetSessionId = _pendingAssistantChat.sessionId;
 
@@ -3533,7 +3533,7 @@ export async function runModeDispatch(
 				const {
 					checkAndRefreshOAuthTokenIfNeeded,
 					getClaudeAIOAuthTokens,
-				} = await import("../../../../src/utils/auth.js");
+				} = await import("src/utils/auth.js");
 				await checkAndRefreshOAuthTokenIfNeeded();
 				let apiCreds;
 				try {
@@ -3602,7 +3602,7 @@ export async function runModeDispatch(
 
 				// Clear stale caches before resuming to ensure fresh file/skill discovery
 				const { clearSessionCaches } =
-					await import("../../../../src/commands/clear/caches.js");
+					await import("src/commands/clear/caches.js");
 				clearSessionCaches();
 
 				let messages: MessageType[] | null = null;
@@ -3750,7 +3750,7 @@ export async function runModeDispatch(
 
 					// Create remote session config for the REPL
 					const { getClaudeAIOAuthTokens: getTokensForRemote } =
-						await import("../../../../src/utils/auth.js");
+						await import("src/utils/auth.js");
 					const getAccessTokenForRemote = (): string =>
 						getTokensForRemote()?.accessToken ??
 						apiCreds.accessToken;
@@ -3923,7 +3923,7 @@ export async function runModeDispatch(
 					) {
 						// Check for ccshare URL (e.g. https://go/ccshare/boris-20260311-211036)
 						const { parseCcshareId, loadCcshare } =
-							await import("../../../../src/utils/ccshareResume.js");
+							await import("src/utils/ccshareResume.js");
 						const ccshareId = parseCcshareId(options.resume);
 						if (ccshareId) {
 							try {
