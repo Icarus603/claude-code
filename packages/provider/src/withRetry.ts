@@ -22,7 +22,7 @@ import {
   isEnterpriseSubscriber,
 } from 'src/utils/auth.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
   type CooldownReason,
   handleFastModeOverageRejection,

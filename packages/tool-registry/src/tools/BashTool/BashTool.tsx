@@ -41,7 +41,7 @@ import {
 import { extractClaudeCodeHints } from 'src/utils/claudeCodeHints.js'
 import { detectCodeIndexingFromCommand } from 'src/utils/codeIndexing.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { isENOENT, ShellError } from 'src/utils/errors.js'
+import { isENOENT, ShellError } from '@claude-code/local-observability/errorHelpers.js'
 import {
   detectFileEncoding,
   detectLineEndings,

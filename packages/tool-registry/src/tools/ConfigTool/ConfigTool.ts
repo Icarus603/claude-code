@@ -11,7 +11,7 @@ import {
   getRemoteControlAtStartup,
   saveGlobalConfig,
 } from '@claude-code/config'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
 import {

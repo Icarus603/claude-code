@@ -37,7 +37,7 @@ import { isEnvTruthy } from 'src/utils/envUtils.js'
 import {
   errorMessage as getErrorMessage,
   ShellError,
-} from 'src/utils/errors.js'
+} from '@claude-code/local-observability/errorHelpers.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'

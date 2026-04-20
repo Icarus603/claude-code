@@ -22,7 +22,7 @@ import {
   VALID_UPDATE_SCOPES,
 } from 'src/services/plugins/pluginCliCommands.js'
 import { getPluginErrorMessage } from 'src/types/plugin.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import { clearAllCaches } from 'src/utils/plugins/cacheUtils.js'
 import { getInstallCounts } from 'src/utils/plugins/installCounts.js'

@@ -67,7 +67,7 @@ import {
   getErrnoCode,
   ShellError,
   TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/utils/errors.js'
+} from '@claude-code/local-observability/errorHelpers.js'
 import { executePermissionDeniedHooks } from 'src/utils/hooks.js'
 import { logError } from 'src/utils/log.js'
 import {

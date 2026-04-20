@@ -58,7 +58,7 @@ import {
   DEFAULT_POLL_CONFIG,
   type PollIntervalConfig,
 } from './pollConfigDefaults.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { sleep } from 'src/utils/sleep.js'
 import {
   wrapApiForFaultInjection,

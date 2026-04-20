@@ -15,6 +15,7 @@
     "./_deps": "./src/_deps.ts",
     "./logging": "./src/logging/index.ts",
     "./telemetry": "./src/telemetry/index.ts",
-    "./slowOperations.js": "./src/slowOperations.ts"
+    "./slowOperations.js": "./src/slowOperations.ts",
+    "./errorHelpers.js": "./src/errorHelpers.ts"
   }
 }

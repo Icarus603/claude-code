@@ -11,7 +11,7 @@ import {
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import type { EffortValue } from 'src/utils/effort.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
-import { getErrnoCode } from 'src/utils/errors.js'
+import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { AGENT_PATHS } from './types.js'
 
 /**

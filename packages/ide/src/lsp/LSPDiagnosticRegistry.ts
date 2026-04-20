@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { LRUCache } from 'lru-cache'
 import { logForDebugging } from 'src/utils/debug.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import type { DiagnosticFile } from 'src/services/diagnosticTracking.js'

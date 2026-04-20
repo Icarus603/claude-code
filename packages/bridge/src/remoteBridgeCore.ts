@@ -55,7 +55,7 @@ import { logBridgeSkip } from './debugUtils.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
 import { isInProtectedNamespace } from 'src/utils/envUtils.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { sleep } from 'src/utils/sleep.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
 import {

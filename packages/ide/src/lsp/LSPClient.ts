@@ -12,7 +12,7 @@ import type {
   ServerCapabilities,
 } from 'vscode-languageserver-protocol'
 import { logForDebugging } from 'src/utils/debug.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 import { subprocessEnv } from 'src/utils/subprocessEnv.js'
 /**

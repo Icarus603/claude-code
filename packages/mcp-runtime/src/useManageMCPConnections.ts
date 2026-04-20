@@ -59,7 +59,7 @@ import {
   useAppStateStore,
   useSetAppState,
 } from './appStateHooks.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { logMCPDebug, logMCPError } from 'src/utils/log.js'
 import { enqueue } from 'src/utils/messageQueueManager.js'

@@ -63,7 +63,7 @@ import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
 import {
   errorMessage,
   TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from 'src/utils/errors.js'
+} from '@claude-code/local-observability/errorHelpers.js'
 import { getMCPUserAgent } from 'src/utils/http.js'
 import { maybeNotifyIDEConnected } from '@claude-code/ide/ide.js'
 import { maybeResizeAndDownsampleImageBuffer } from 'src/utils/imageResizer.js'

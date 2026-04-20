@@ -28,7 +28,7 @@ import type {
 } from '@claude-code/mcp-runtime/types.js'
 import type { AppState } from './appStateShim.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
 
 export type DynamicMcpState = DynamicMcpStateBase<

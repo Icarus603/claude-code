@@ -47,7 +47,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { getAgentContext } from 'src/utils/agentContext.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
   extractResultText,
   prepareForkedCommandContext,

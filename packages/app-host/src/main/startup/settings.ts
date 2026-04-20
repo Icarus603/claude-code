@@ -5,7 +5,7 @@ import { safeParseJSON } from "src/utils/json.js";
 import { writeFileSync_DEPRECATED } from "@claude-code/local-observability/slowOperations.js";
 import { generateTempFilePath } from "src/utils/tempfile.js";
 import { getFsImplementation, safeResolvePath } from "src/utils/fsOperations.js";
-import { errorMessage, isENOENT } from "src/utils/errors.js";
+import { errorMessage, isENOENT } from "@claude-code/local-observability/errorHelpers.js";
 import { resetSettingsCache } from "src/utils/settings/settingsCache.js";
 import { eagerParseCliFlag } from "src/utils/cliArgs.js";
 import { parseSettingSourcesFlag } from "src/utils/settings/constants.js";

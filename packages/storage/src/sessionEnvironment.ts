@@ -3,7 +3,7 @@ import { join } from 'path'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
-import { errorMessage, getErrnoCode } from 'src/utils/errors.js'
+import { errorMessage, getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { getPlatform } from 'src/utils/platform.js'
 import { readEnv } from '@claude-code/config/env'
 

@@ -34,7 +34,7 @@ import {
   isBareMode,
   isEnvTruthy,
 } from 'src/utils/envUtils.js'
-import { isENOENT, isFsInaccessible } from 'src/utils/errors.js'
+import { isENOENT, isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 import {
   coerceDescriptionToString,
   type FrontmatterData,

@@ -24,7 +24,7 @@ import type {
 } from 'src/types/permissions.js'
 import { isDebugMode, logForDebugging } from 'src/utils/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from 'src/utils/envUtils.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { extractTextContent } from 'src/utils/messages.js'
 import { resolveAntModel } from 'src/utils/model/antModels.js'

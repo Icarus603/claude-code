@@ -24,7 +24,7 @@ import {
   setClassifierChecking,
   setYoloClassifierApproval,
 } from '@claude-code/permission/classifierApprovals.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'

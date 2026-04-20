@@ -5,7 +5,7 @@ import { Box, Text, useInput, LoadingState } from '@anthropic/ink'
 import { getDesktopInstallStatus, openCurrentSessionInDesktop } from 'src/utils/desktopDeepLink.js'
 import { openBrowser } from 'src/utils/browser.js'
 
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { gracefulShutdown } from 'src/utils/gracefulShutdown.js'
 import { flushSessionStorage } from '@claude-code/storage/sessionStorage.js'
 

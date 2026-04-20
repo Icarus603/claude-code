@@ -29,7 +29,7 @@ import {
 import type { Message } from 'src/types/message.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { enqueue } from 'src/utils/messageQueueManager.js'
 import { buildSystemInitMessage } from 'src/utils/messages/systemInit.js'
 import {

@@ -18,7 +18,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { countLinesChanged, getPatchForDisplay } from 'src/utils/diff.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
-import { isENOENT } from 'src/utils/errors.js'
+import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import { getFileModificationTime, writeTextContent } from 'src/utils/file.js'
 import {
   fileHistoryEnabled,

@@ -148,7 +148,7 @@ import stickers from 'src/commands/stickers/index.js'
 import advisor from 'src/commands/advisor.js'
 import provider from '@claude-code/provider/commands/provider.js'
 import { logError } from 'src/utils/log.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import {
   getSkillDirCommands,

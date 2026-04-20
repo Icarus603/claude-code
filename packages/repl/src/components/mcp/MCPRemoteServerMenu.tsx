@@ -32,7 +32,7 @@ import {
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { getOauthAccountInfo } from 'src/utils/auth.js'
 import { openBrowser } from 'src/utils/browser.js'
-import { errorMessage } from 'src/utils/errors.js'
+import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logMCPDebug } from 'src/utils/log.js'
 import { capitalize } from 'src/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

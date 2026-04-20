@@ -13,7 +13,7 @@ import {
 } from '@claude-code/local-observability'
 import { count } from 'src/utils/array.js'
 import { logForDebugging } from 'src/utils/debug.js'
-import { toError } from 'src/utils/errors.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { logError } from 'src/utils/log.js'
 

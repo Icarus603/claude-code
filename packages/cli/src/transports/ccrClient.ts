@@ -6,7 +6,7 @@ import type {
 import { decodeJwtExpiry } from '@claude-code/bridge/jwtUtils.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logForDiagnosticsNoPII } from 'src/utils/diagLogs.js'
-import { errorMessage, getErrnoCode } from 'src/utils/errors.js'
+import { errorMessage, getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { createAxiosInstance } from 'src/utils/proxy.js'
 import {
   registerSessionActivityCallback,
