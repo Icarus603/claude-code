@@ -15,7 +15,7 @@ import {
   getFsImplementation,
   safeResolvePath,
 } from '@claude-code/storage/fsOperations.js'
-import { containsPathTraversal, getDirectoryForPath } from 'src/utils/path.js'
+import { containsPathTraversal, getDirectoryForPath } from '@claude-code/storage/path.js'
 import {
   allWorkingDirectories,
   checkEditableInternalPath,

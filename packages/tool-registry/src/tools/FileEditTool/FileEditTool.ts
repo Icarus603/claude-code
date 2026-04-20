@@ -41,7 +41,7 @@ import {
   type ToolUseDiff,
 } from 'src/utils/gitDiff.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import {
   checkWritePermissionForTool,
   matchingRuleForInput,

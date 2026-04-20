@@ -5,7 +5,7 @@ import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { Text } from '@anthropic/ink'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import { expandPath, getDirectoryForPath } from 'src/utils/path.js'
+import { expandPath, getDirectoryForPath } from '@claude-code/storage/path.js'
 import {
   normalizeCaseForComparison,
   pathInAllowedWorkingPath,

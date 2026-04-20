@@ -55,7 +55,7 @@ import {
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { maybeRecordPluginHint } from '@claude-code/config/plugin/hintRecommendation'
 import { exec } from 'src/utils/Shell.js'

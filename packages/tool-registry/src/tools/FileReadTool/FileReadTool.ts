@@ -57,7 +57,7 @@ import {
   mapNotebookCellsToToolResult,
   readNotebook,
 } from 'src/utils/notebook.js'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 import { extractPDFPages, getPDFPageCount, readPDF } from 'src/utils/pdf.js'
 import {
   isPDFExtension,

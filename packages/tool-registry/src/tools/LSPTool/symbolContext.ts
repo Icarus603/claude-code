@@ -1,7 +1,7 @@
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { expandPath } from 'src/utils/path.js'
+import { expandPath } from '@claude-code/storage/path.js'
 
 const MAX_READ_BYTES = 64 * 1024
 

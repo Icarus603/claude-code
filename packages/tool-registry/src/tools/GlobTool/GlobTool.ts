@@ -10,7 +10,7 @@ import {
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { glob } from 'src/utils/glob.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { expandPath, toRelativePath } from 'src/utils/path.js'
+import { expandPath, toRelativePath } from '@claude-code/storage/path.js'
 import { checkReadPermissionForTool } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
