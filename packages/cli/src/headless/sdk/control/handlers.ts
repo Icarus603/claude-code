@@ -27,11 +27,11 @@ import type {
   AgentDefinition,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { isBuiltInAgent, parseAgentsFromJson } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { Command } from 'src/commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import {
   formatDescriptionWithSource,
   getCommandName,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 import type { ModelInfo } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { HookCallbackMatcher } from 'src/types/hooks.js'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'

@@ -163,7 +163,7 @@ import {
   setMainThreadAgentType,
   setTeleportedSessionInfo,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { filterCommandsForRemoteMode, getCommands } from 'src/commands.js'
+import { filterCommandsForRemoteMode, getCommands } from '@claude-code/command-runtime/runtime'
 import type { StatsStore } from 'src/context/stats.js'
 import {
   launchAssistantInstallWizard,

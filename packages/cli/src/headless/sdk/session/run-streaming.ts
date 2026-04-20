@@ -27,7 +27,7 @@ import {
   type Command,
   formatDescriptionWithSource,
   getCommandName,
-} from 'src/commands.js'
+} from '@claude-code/command-runtime/runtime'
 import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
@@ -314,7 +314,7 @@ import {
 import { asSessionId } from 'src/types/ids.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
 import { skillChangeDetector } from 'src/utils/skills/skillChangeDetector.js'
-import { getCommands, clearCommandsCache } from 'src/commands.js'
+import { getCommands, clearCommandsCache } from '@claude-code/command-runtime/runtime'
 import {
   isBareMode,
   isEnvTruthy,
