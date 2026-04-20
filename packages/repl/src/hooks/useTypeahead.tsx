@@ -56,7 +56,7 @@ import {
   getDirectoryCompletions,
   getPathCompletions,
   isPathLikeToken,
-} from 'src/utils/suggestions/directoryCompletion.js'
+} from '@claude-code/repl/utils/suggestions/directoryCompletion.js'
 import { getShellHistoryCompletion } from 'src/utils/suggestions/shellHistoryCompletion.js'
 import {
   getSlackChannelSuggestions,
