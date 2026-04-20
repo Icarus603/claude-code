@@ -1,3 +1,55 @@
-// Thin alias — canonical owner is src/utils/model/providers.ts.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/model/providers.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
+import { getInitialSettings } from '@claude-code/config/settings'
+import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
+
+export type APIProvider =
+  | 'firstParty'
+  | 'bedrock'
+  | 'vertex'
+  | 'foundry'
+  | 'openai'
+  | 'gemini'
+  | 'grok'
+
+export function getAPIProvider(): APIProvider {
+  const modelType = getInitialSettings().modelType
+  if (modelType === 'openai') return 'openai'
+  if (modelType === 'gemini') return 'gemini'
+  if (modelType === 'grok') return 'grok'
+
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) return 'bedrock'
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY'))) return 'foundry'
+
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_OPENAI'))) return 'openai'
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GEMINI'))) return 'gemini'
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GROK'))) return 'grok'
+
+  return 'firstParty'
+}
+
+export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS {
+  return getAPIProvider() as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
+}
+
+/**
+ * Check if ANTHROPIC_BASE_URL is a first-party Anthropic API URL.
+ * Returns true if not set (default API) or points to api.anthropic.com
+ * (or api-staging.anthropic.com for ant users).
+ */
+export function isFirstPartyAnthropicBaseUrl(): boolean {
+  const baseUrl = readEnv('ANTHROPIC_BASE_URL')
+  if (!baseUrl) {
+    return true
+  }
+  try {
+    const host = new URL(baseUrl).host
+    const allowedHosts = ['api.anthropic.com']
+    if (readEnv('USER_TYPE') === 'ant') {
+      allowedHosts.push('api-staging.anthropic.com')
+    }
+    return allowedHosts.includes(host)
+  } catch {
+    return false
+  }
+}
