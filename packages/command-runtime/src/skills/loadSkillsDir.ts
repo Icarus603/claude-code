@@ -61,7 +61,7 @@ import { isSettingSourceEnabled } from 'src/utils/settings/constants.js'
 import { getManagedFilePath } from 'src/utils/settings/managedPath.js'
 import { isRestrictedToPluginOnly } from 'src/utils/settings/pluginOnlyPolicy.js'
 import { HooksSchema, type HooksSettings } from 'src/utils/settings/types.js'
-import { createSignal } from 'src/utils/signal.js'
+import { createSignal } from '@claude-code/config/signal'
 import { registerMCPSkillBuilders } from './mcpSkillBuilders.js'
 
 export type LoadedFrom =

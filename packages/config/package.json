@@ -105,6 +105,7 @@
     "./plugin/PluginInstallationManager": "./plugin/PluginInstallationManager.ts",
     "./plugin/builtin": "./plugin/builtin.ts",
     "./plugin/bundled-init": "./plugin/bundled-init.ts",
-    "./bundledMode": "./bundledMode.ts"
+    "./bundledMode": "./bundledMode.ts",
+    "./signal": "./signal.ts"
   }
 }
