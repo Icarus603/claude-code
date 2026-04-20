@@ -52,7 +52,7 @@ import {
 import {
   DEFAULT_OUTPUT_STYLE_NAME,
   getAllOutputStyles,
-} from 'src/constants/outputStyles.js'
+} from '@claude-code/config/outputStyles.js'
 import { getAccountInformation } from '@claude-code/provider/authAlias.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import {

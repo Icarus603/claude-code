@@ -4,7 +4,7 @@ import {
   getAllOutputStyles,
   OUTPUT_STYLE_CONFIG,
   type OutputStyleConfig,
-} from 'src/constants/outputStyles.js'
+} from '@claude-code/config/outputStyles.js'
 import { Box, Text, Dialog } from '@anthropic/ink'
 import type { OutputStyle } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
