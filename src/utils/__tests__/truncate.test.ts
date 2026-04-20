@@ -130,7 +130,9 @@ describe("truncatePathMiddle", () => {
   });
 
   test("handles short maxLength < 5", () => {
-    expect(truncatePathMiddle("@claude-code/repl/components/foo.ts", 4)).toBe("src…");
+    // For maxLength < 5, impl falls back to truncateToWidth(path, maxLength)
+    // which truncates from the end, keeping the prefix.
+    expect(truncatePathMiddle("@claude-code/repl/components/foo.ts", 4)).toBe("@cl…");
   });
 
   test("handles very short maxLength 1", () => {
