@@ -17,6 +17,7 @@
     "./render-options": "./src/render-options.ts",
     "./render": "./src/render/index.ts",
     "./utils/intl.js": "./src/utils/intl.ts",
-    "./formatters/truncate.js": "./src/formatters/truncate.ts"
+    "./formatters/truncate.js": "./src/formatters/truncate.ts",
+    "./render/exportRenderer.js": "./src/render/exportRenderer.tsx"
   }
 }
