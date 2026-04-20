@@ -446,7 +446,7 @@ import { useIssueFlagBanner } from '@claude-code/repl/hooks/useIssueFlagBanner.j
 import { DevBar } from '@claude-code/repl/components/DevBar.js';
 import { UltraplanChoiceDialog } from '@claude-code/repl/components/ultraplan/UltraplanChoiceDialog.js';
 import { UltraplanLaunchDialog } from '@claude-code/repl/components/ultraplan/UltraplanLaunchDialog.js';
-import { launchUltraplan } from 'src/commands/ultraplan.js';
+import { launchUltraplan } from '@claude-code/repl/ultraplan.js';
 import { getFocusedInputDialog } from './repl/dialogs.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'

@@ -14,7 +14,7 @@ import {
   type BackgroundTaskState,
   isBackgroundTask,
   type TaskState,
-} from 'src/tasks/types.js'
+} from '@claude-code/repl/tasksTypes.js'
 import { calculateHorizontalScrollWindow } from 'src/utils/horizontalScroll.js'
 import { Box, Text } from '@anthropic/ink'
 import {

@@ -27,7 +27,7 @@ import {
 } from 'src/tasks/DreamTask/DreamTask.js'
 import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
-import type { LocalShellTaskState } from 'src/tasks/LocalShellTask/guards.js'
+import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'
 import { LocalShellTask } from '@claude-code/agent/tasks/LocalShellTask.js'
 // Type import is erased at build time — safe even though module is ant-gated.
 import type { LocalWorkflowTaskState } from 'src/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
@@ -40,10 +40,10 @@ import {
   type BackgroundTaskState,
   isBackgroundTask,
   type TaskState,
-} from 'src/tasks/types.js'
+} from '@claude-code/repl/tasksTypes.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { intersperse } from '@claude-code/tool-registry/utils/array.js'
-import { stopUltraplan } from 'src/commands/ultraplan.js'
+import { stopUltraplan } from '@claude-code/repl/ultraplan.js'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
 import type { ExitState } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
