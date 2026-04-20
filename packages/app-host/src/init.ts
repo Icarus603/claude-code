@@ -15,7 +15,7 @@ import {
   initializeRemoteManagedSettingsLoadingPromise,
   isEligibleForRemoteManagedSettings,
   waitForRemoteManagedSettingsToLoad,
-} from 'src/services/remoteManagedSettings/index.js'
+} from '@claude-code/config/remote'
 import { preconnectAnthropicApi } from 'src/utils/apiPreconnect.js'
 import { applyExtraCACertsFromConfig } from 'src/utils/caCertsConfig.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'

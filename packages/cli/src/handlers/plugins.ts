@@ -20,7 +20,7 @@ import {
   updatePluginCli,
   VALID_INSTALLABLE_SCOPES,
   VALID_UPDATE_SCOPES,
-} from 'src/services/plugins/pluginCliCommands.js'
+} from '@claude-code/config/plugin/pluginCliCommands'
 import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from 'src/utils/log.js'
