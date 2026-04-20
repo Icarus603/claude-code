@@ -14,7 +14,7 @@ import {
   setLastApiCompletionTimestamp,
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { QueryChainTracking } from '@claude-code/tool-registry/Tool.js'
-import { isConnectorTextBlock } from 'src/types/connectorText.js'
+import { isConnectorTextBlock } from '@claude-code/provider/connectorTextTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
 import type { EffortLevel } from 'src/utils/effort.js'

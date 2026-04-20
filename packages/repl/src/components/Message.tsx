@@ -15,7 +15,7 @@ import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   type ConnectorTextBlock,
   isConnectorTextBlock,
-} from 'src/types/connectorText.js'
+} from '@claude-code/provider/connectorTextTypes'
 import type {
   AssistantMessage,
   AttachmentMessage as AttachmentMessageType,

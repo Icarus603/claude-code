@@ -6,7 +6,7 @@ import {
 } from 'src/utils/fileHistory.js'
 import { z } from 'zod/v4'
 import { buildTool, type ToolDef, type ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { NotebookCell, NotebookContent } from 'src/types/notebook.js'
+import type { NotebookCell, NotebookContent } from '@claude-code/tool-registry/notebookTypes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import { getFileModificationTime, writeTextContent } from 'src/utils/file.js'

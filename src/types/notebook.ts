@@ -1,8 +1,2 @@
-// Auto-generated stub — replace with real implementation
-export type NotebookCell = unknown;
-export type NotebookContent = unknown;
-export type NotebookCellOutput = unknown;
-export type NotebookCellSource = unknown;
-export type NotebookCellSourceOutput = unknown;
-export type NotebookOutputImage = unknown;
-export type NotebookCellType = unknown;
+// Canonical owner is @claude-code/tool-registry/notebookTypes.
+export type * from '@claude-code/tool-registry/notebookTypes'
