@@ -8,7 +8,7 @@ import { useTextInput } from '@claude-code/repl/hooks/useTextInput.js'
 import { Box, color, useAnimationFrame, useTerminalFocus, useTheme } from '@anthropic/ink'
 import type { BaseTextInputProps } from 'src/types/textInputTypes.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import type { TextHighlight } from 'src/utils/textHighlighting.js'
+import type { TextHighlight } from '@claude-code/output/textHighlighting.js'
 import { BaseTextInput } from './BaseTextInput.js'
 import { hueToRgb } from './Spinner/utils.js'
 

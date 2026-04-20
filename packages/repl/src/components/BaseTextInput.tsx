@@ -7,7 +7,7 @@ import type {
   BaseInputState,
   BaseTextInputProps,
 } from 'src/types/textInputTypes.js'
-import type { TextHighlight } from 'src/utils/textHighlighting.js'
+import type { TextHighlight } from '@claude-code/output/textHighlighting.js'
 import { HighlightedInput } from './PromptInput/ShimmeredInput.js'
 
 type BaseTextInputComponentProps = BaseTextInputProps & {
