@@ -10,7 +10,7 @@ import { getPluginSeedDirs } from "src/utils/plugins/pluginDirectories.js";
 import {
 	logPluginLoadErrors,
 	logPluginsEnabledForSession,
-} from "src/utils/telemetry/pluginTelemetry.js";
+} from "@claude-code/tool-registry/telemetry/pluginTelemetry.js";
 import { logError } from "src/utils/log.js";
 import { hasNodeOption } from "@claude-code/config/env/utils";
 import { getIsGit, getWorktreeCount } from "@claude-code/storage/git.js";
