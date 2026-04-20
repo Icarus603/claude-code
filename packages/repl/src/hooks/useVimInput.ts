@@ -20,7 +20,7 @@ import {
   type VimState,
 } from '@anthropic/ink/vim'
 import type { VimInputState, VimMode } from 'src/types/textInputTypes.js'
-import { Cursor } from 'src/utils/Cursor.js'
+import { Cursor } from '@claude-code/repl/Cursor.js'
 import { lastGrapheme } from '@claude-code/output/utils/intl.js'
 import { type UseTextInputProps, useTextInput } from './useTextInput.js'
 
