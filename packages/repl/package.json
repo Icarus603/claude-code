@@ -233,6 +233,7 @@
     "./components/PromptInput/PromptInputFooter.js": "./src/components/PromptInput/PromptInputFooter.tsx",
     "./components/PromptInput/PromptInputFooterLeftSide.js": "./src/components/PromptInput/PromptInputFooterLeftSide.tsx",
     "./components/PromptInput/PromptInputFooterSuggestions.js": "./src/components/PromptInput/PromptInputFooterSuggestions.tsx",
+    "./utils/suggestions/directoryCompletion.js": "./src/utils/suggestions/directoryCompletion.ts",
     "./components/PromptInput/PromptInputHelpMenu.js": "./src/components/PromptInput/PromptInputHelpMenu.tsx",
     "./components/PromptInput/PromptInputModeIndicator.js": "./src/components/PromptInput/PromptInputModeIndicator.tsx",
     "./components/PromptInput/PromptInputQueuedCommands.js": "./src/components/PromptInput/PromptInputQueuedCommands.tsx",

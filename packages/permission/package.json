@@ -23,6 +23,7 @@
     "./testing": "./src/testing/index.ts",
     "./commands/index.js": "./src/commands/index.ts",
     "./commands/permissions.js": "./src/commands/permissions.tsx",
+    "./commands/add-dir/validation.js": "./src/commands/add-dir/validation.ts",
     "./toolPermission/*.js": "./src/toolPermission/*.ts",
     "./toolPermission/handlers/*.js": "./src/toolPermission/handlers/*.ts",
     "./autoModeState.js": "./src/autoModeState.ts",
