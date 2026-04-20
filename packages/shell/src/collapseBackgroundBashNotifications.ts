@@ -7,7 +7,7 @@ import { BACKGROUND_BASH_SUMMARY_PREFIX } from 'src/tasks/LocalShellTask/LocalSh
 import type {
   NormalizedUserMessage,
   RenderableMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import { extractTag } from 'src/utils/messages.js'
 

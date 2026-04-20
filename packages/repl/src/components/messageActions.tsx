@@ -7,7 +7,7 @@ import { logEvent } from '@claude-code/local-observability'
 import type {
   NormalizedUserMessage,
   RenderableMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { isEmptyMessageText, SYNTHETIC_MESSAGES } from 'src/utils/messages.js'
 
 const NAVIGABLE_TYPES = [

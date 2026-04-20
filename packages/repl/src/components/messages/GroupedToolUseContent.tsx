@@ -8,7 +8,7 @@ import {
   findToolByName,
   type Tools,
 } from '@claude-code/tool-registry/Tool.js'
-import type { GroupedToolUseMessage } from 'src/types/message.js'
+import type { GroupedToolUseMessage } from '@claude-code/agent/messageShapes'
 import type { buildMessageLookups } from 'src/utils/messages.js'
 
 type Props = {

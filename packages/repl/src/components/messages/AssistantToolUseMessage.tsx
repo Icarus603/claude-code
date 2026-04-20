@@ -12,7 +12,7 @@ import {
   type ToolProgressData,
   type Tools,
 } from '@claude-code/tool-registry/Tool.js'
-import type { ProgressMessage } from 'src/types/message.js'
+import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { useIsClassifierChecking } from '@claude-code/permission/classifierApprovalsHook.js'
 import { logError } from 'src/utils/log.js'
 import type { buildMessageLookups } from 'src/utils/messages.js'

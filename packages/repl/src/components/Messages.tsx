@@ -22,7 +22,7 @@ import type {
   NormalizedMessage,
   ProgressMessage as ProgressMessageType,
   RenderableMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { type AdvisorBlock, isAdvisorBlock } from 'src/utils/advisor.js'
 import { collapseBackgroundBashNotifications } from '@claude-code/shell/collapseBackgroundBashNotifications.js'
 import { collapseHookSummaries } from 'src/utils/collapseHookSummaries.js'

@@ -7,7 +7,7 @@ import { type TurnDiff, useTurnDiffs } from '@claude-code/repl/hooks/useTurnDiff
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { plural } from 'src/utils/stringUtils.js'
 import { Byline, Dialog } from '@anthropic/ink'
 import { DiffDetailView } from './DiffDetailView.js'

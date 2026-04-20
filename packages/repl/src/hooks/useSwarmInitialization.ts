@@ -10,7 +10,7 @@
 import { useEffect } from 'react'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { AppState } from '@claude-code/repl/appStateHooks.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { isAgentSwarmsEnabled } from 'src/utils/agentSwarmsEnabled.js'
 import { initializeTeammateContextFromSession } from '@claude-code/swarm'
 import { readTeamFile } from '@claude-code/swarm'

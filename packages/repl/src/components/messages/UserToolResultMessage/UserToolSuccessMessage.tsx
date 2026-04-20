@@ -12,7 +12,7 @@ import {
 import type {
   NormalizedUserMessage,
   ProgressMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import {
   deleteClassifierApproval,
   getClassifierApproval,

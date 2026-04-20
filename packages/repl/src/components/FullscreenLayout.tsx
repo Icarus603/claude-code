@@ -20,7 +20,7 @@ import {
 } from 'src/context/promptOverlayContext.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, ScrollBox, type ScrollBoxHandle, Text, instances } from '@anthropic/ink'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { openBrowser, openPath } from 'src/utils/browser.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import { plural } from 'src/utils/stringUtils.js'

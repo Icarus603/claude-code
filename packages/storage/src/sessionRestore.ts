@@ -27,7 +27,7 @@ import type {
   ContextCollapseSnapshotEntry,
   PersistedWorktreeSession,
 } from 'src/types/logs.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { renameRecordingForSession } from 'src/utils/asciicast.js'
 import { clearMemoryFileCaches } from 'src/utils/claudemd.js'
 import {

@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 
 type UseSessionBackgroundingProps = {
   setMessages: (messages: Message[] | ((prev: Message[]) => Message[])) => void

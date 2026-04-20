@@ -8,7 +8,7 @@ import {
   type Tool,
   type Tools,
 } from '@claude-code/tool-registry/Tool.js'
-import type { ProgressMessage } from 'src/types/message.js'
+import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import {
   INTERRUPT_MESSAGE_FOR_TOOL_USE,
   isClassifierDenial,

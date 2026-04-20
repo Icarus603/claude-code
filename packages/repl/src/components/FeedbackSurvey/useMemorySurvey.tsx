@@ -8,7 +8,7 @@ import {
 import { isAutoMemoryEnabled } from '@claude-code/memory/paths'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { isAutoManagedMemoryFile } from '@claude-code/memory/memoryFileDetection'

@@ -147,7 +147,7 @@ const fetchMcpSkillsForClient = feature('MCP_SKILLS')
   : null
 
 import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js'
-import type { AssistantMessage } from 'src/types/message.js'
+import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { classifyMcpToolForCollapse } from '@claude-code/tool-registry/tools/MCPTool/classifyForCollapse.js'
 import { clearKeychainCache } from 'src/utils/secureStorage/macOsKeychainHelpers.js'

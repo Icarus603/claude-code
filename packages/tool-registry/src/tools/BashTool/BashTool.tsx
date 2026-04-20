@@ -32,7 +32,7 @@ import {
   unregisterForeground,
 } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 import type { AgentId } from 'src/types/ids.js'
-import type { AssistantMessage } from 'src/types/message.js'
+import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { parseForSecurity } from 'src/utils/bash/ast.js'
 import {
   splitCommand_DEPRECATED,

@@ -6,7 +6,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import type { SkillUpdate } from 'src/utils/hooks/skillImprovement.js'
 import { applySkillImprovement } from 'src/utils/hooks/skillImprovement.js'
 import { createSystemMessage } from 'src/utils/messages.js'

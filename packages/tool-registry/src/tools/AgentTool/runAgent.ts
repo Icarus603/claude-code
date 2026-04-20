@@ -39,7 +39,7 @@ import type {
   TombstoneMessage,
   ToolUseSummaryMessage,
   UserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { createAttachmentMessage } from 'src/utils/attachments.js'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
 import { getDisplayPath } from 'src/utils/file.js'

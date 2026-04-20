@@ -6,7 +6,7 @@ import { loadKeybindingsSyncWithWarnings } from '@claude-code/repl/keybindings/l
 import type { KeybindingContextName } from '@anthropic/ink/keybindings'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 // eslint-disable-next-line no-restricted-imports
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { renderToAnsiString } from './static-render.js'
 
 // Lazy AppStateProvider access — avoids a static import from src/state/AppState.js

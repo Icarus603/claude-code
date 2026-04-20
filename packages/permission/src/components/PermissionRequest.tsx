@@ -16,7 +16,7 @@ import { NotebookEditTool } from '@claude-code/tool-registry/tools/NotebookEditT
 import { PowerShellTool } from '@claude-code/tool-registry/tools/PowerShellTool/PowerShellTool.js'
 import { SkillTool } from '@claude-code/tool-registry/tools/SkillTool/SkillTool.js'
 import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js'
-import type { AssistantMessage } from 'src/types/message.js'
+import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { AskUserQuestionPermissionRequest } from './AskUserQuestionPermissionRequest/AskUserQuestionPermissionRequest.js'
 import { BashPermissionRequest } from './BashPermissionRequest/BashPermissionRequest.js'

@@ -1,6 +1,6 @@
 import { APIUserAbortError } from '@anthropic-ai/sdk'
 import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
 import {
   createUserMessage,

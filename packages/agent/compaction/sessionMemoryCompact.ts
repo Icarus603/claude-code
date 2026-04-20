@@ -3,7 +3,7 @@
  */
 
 import type { AgentId } from 'src/types/ids.js'
-import type { HookResultMessage, Message } from 'src/types/message.js'
+import type { HookResultMessage, Message } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'

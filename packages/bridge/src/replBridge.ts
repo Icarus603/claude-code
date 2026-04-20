@@ -45,7 +45,7 @@ import {
   extractHttpStatus,
   logBridgeSkip,
 } from './debugUtils.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import type {

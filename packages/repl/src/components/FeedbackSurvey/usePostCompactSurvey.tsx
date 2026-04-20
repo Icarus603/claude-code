@@ -6,7 +6,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { shouldUseSessionMemoryCompaction } from '@claude-code/agent/compaction/sessionMemoryCompact.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import { isCompactBoundaryMessage } from 'src/utils/messages.js'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'

@@ -31,7 +31,7 @@ import {
   unregisterForeground,
 } from 'src/tasks/LocalShellTask/LocalShellTask.js'
 import type { AgentId } from 'src/types/ids.js'
-import type { AssistantMessage } from 'src/types/message.js'
+import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { extractClaudeCodeHints } from 'src/utils/claudeCodeHints.js'
 import { isEnvTruthy } from 'src/utils/envUtils.js'
 import {

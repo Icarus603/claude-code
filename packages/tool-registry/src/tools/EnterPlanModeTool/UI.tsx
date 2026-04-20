@@ -3,7 +3,7 @@ import { BLACK_CIRCLE } from 'src/constants/figures.js'
 import { getModeColor } from '@claude-code/permission/PermissionMode'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
-import type { ProgressMessage } from 'src/types/message.js'
+import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import type { ThemeName } from 'src/utils/theme.js'
 import type { Output } from './EnterPlanModeTool.js'
 

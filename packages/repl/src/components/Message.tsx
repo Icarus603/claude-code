@@ -24,7 +24,7 @@ import type {
   NormalizedUserMessage,
   ProgressMessage,
   SystemMessage,
-} from 'src/types/message.js'
+} from '@claude-code/agent/messageShapes'
 import { type AdvisorBlock, isAdvisorBlock } from 'src/utils/advisor.js'
 import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import { logError } from 'src/utils/log.js'

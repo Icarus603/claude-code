@@ -1,5 +1,5 @@
 import { getSessionMemoryContent } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { getMessagesAfterCompactBoundary } from 'src/utils/messages.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 

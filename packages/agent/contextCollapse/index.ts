@@ -1,5 +1,5 @@
 // Auto-generated stub — replace with real implementation
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { QuerySource } from 'src/constants/querySource.js'
 

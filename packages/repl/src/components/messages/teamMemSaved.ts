@@ -1,4 +1,4 @@
-import type { SystemMemorySavedMessage } from 'src/types/message.js'
+import type { SystemMemorySavedMessage } from '@claude-code/agent/messageShapes'
 
 /**
  * Returns the team-memory segment for the memory-saved UI, plus the count so

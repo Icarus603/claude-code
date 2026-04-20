@@ -63,7 +63,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import type { ReplBridgeHandle, BridgeState } from './replBridge.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   SDKControlRequest,

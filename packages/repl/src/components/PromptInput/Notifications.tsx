@@ -17,7 +17,7 @@ import { Box, Text } from '@anthropic/ink'
 import { useClaudeAiLimits } from '@claude-code/provider/claudeAiLimitsHook.js'
 import { calculateTokenWarningState } from '@claude-code/agent/compaction/autoCompact.js'
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import {
   getApiKeyHelperElapsedMs,
   getConfiguredApiKeyHelper,

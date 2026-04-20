@@ -6,7 +6,7 @@ import {
   APIUserAbortError,
 } from '@anthropic-ai/sdk'
 import type { QuerySource } from 'src/constants/querySource.js'
-import type { SystemAPIErrorMessage } from 'src/types/message.js'
+import type { SystemAPIErrorMessage } from '@claude-code/agent/messageShapes'
 import { isAwsCredentialsProviderError } from 'src/utils/aws.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { logError } from 'src/utils/log.js'

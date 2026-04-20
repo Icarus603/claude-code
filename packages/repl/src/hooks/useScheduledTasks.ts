@@ -6,7 +6,7 @@ import {
   injectUserMessageToTeammate,
 } from '@claude-code/swarm'
 import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
-import type { Message } from 'src/types/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { createCronScheduler, removeCronTasks } from '@claude-code/agent/scheduler'
 import { getCronJitterConfig } from 'src/utils/cronJitterConfig.js'
 import { logForDebugging } from 'src/utils/debug.js'

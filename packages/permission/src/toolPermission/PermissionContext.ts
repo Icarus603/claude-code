@@ -13,7 +13,7 @@ import type {
 } from '@claude-code/tool-registry/Tool.js'
 import { awaitClassifierAutoApproval } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import type { AssistantMessage } from 'src/types/message.js'
+import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import type {
   PendingClassifierCheck,
   PermissionAllowDecision,
