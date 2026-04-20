@@ -67,7 +67,7 @@ import { initializeLspServerManager } from '@claude-code/ide/lsp/manager.js'
 // at commit 903c46b — the callsites survived the move, the import statements
 // didn't. Without these, each call site throws `undefined is not a function`,
 // which Ink's patchConsole swallows, leaving the REPL at a blank screen.
-import { shouldEnablePromptSuggestion } from 'src/services/PromptSuggestion/promptSuggestion.js'
+import { shouldEnablePromptSuggestion } from '@claude-code/repl/promptSuggestion.js'
 import {
   createDirectConnectSession,
   DirectConnectError,

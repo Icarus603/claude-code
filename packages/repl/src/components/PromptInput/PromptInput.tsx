@@ -38,7 +38,7 @@ import { isUltrareviewEnabled } from 'src/commands/review/ultrareviewEnabled.js'
 import { getNativeCSIuTerminalDisplayName } from '@claude-code/repl/terminalSetup.js'
 import { type Command, hasCommand } from '@claude-code/command-runtime/runtime'
 import { useIsModalOverlayActive } from '@claude-code/repl/overlayContext.js'
-import { useSetPromptOverlayDialog } from 'src/context/promptOverlayContext.js'
+import { useSetPromptOverlayDialog } from '@claude-code/repl/promptOverlayContext.js'
 import {
   formatImageRef,
   formatPastedTextRef,
@@ -69,11 +69,11 @@ import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import {
   abortPromptSuggestion,
   logSuggestionSuppressed,
-} from 'src/services/PromptSuggestion/promptSuggestion.js'
+} from '@claude-code/repl/promptSuggestion.js'
 import {
   type ActiveSpeculationState,
   abortSpeculation,
-} from 'src/services/PromptSuggestion/speculation.js'
+} from '@claude-code/repl/promptSuggestionSpeculation.js'
 import {
   getActiveAgentForInput,
   getViewedTeammateTask,

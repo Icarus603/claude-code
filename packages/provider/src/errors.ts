@@ -62,7 +62,7 @@ import type {
   BetaMessage,
   BetaStopReason,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
-import { AFK_MODE_BETA_HEADER } from 'src/constants/betas.js'
+import { AFK_MODE_BETA_HEADER } from '@claude-code/provider/betasConstants.js'
 import type { SDKAssistantMessageError } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   AssistantMessage,

@@ -4,7 +4,7 @@ import type { BetaMessageParam as MessageParam } from '@anthropic-ai/sdk/resourc
 // to defer ~279KB of AWS SDK code until a Bedrock call is actually made
 import type { CountTokensCommandInput } from '@aws-sdk/client-bedrock-runtime'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { VERTEX_COUNT_TOKENS_ALLOWED_BETAS } from 'src/constants/betas.js'
+import { VERTEX_COUNT_TOKENS_ALLOWED_BETAS } from '@claude-code/provider/betasConstants.js'
 import type { Attachment } from '@claude-code/agent/attachments.js'
 import { getModelBetas } from '@claude-code/provider/betas.js'
 import { getVertexRegionForModel, isEnvTruthy } from '@claude-code/config/env/utils'

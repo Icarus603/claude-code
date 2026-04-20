@@ -177,7 +177,7 @@ import upgrade from 'src/commands/upgrade/index.js'
 import {
   extraUsage,
   extraUsageNonInteractive,
-} from 'src/commands/extra-usage/index.js'
+} from '@claude-code/repl/extraUsage.js'
 import rateLimitOptions from 'src/commands/rate-limit-options/index.js'
 import statusline from 'src/commands/statusline.js'
 import effort from 'src/commands/effort/index.js'
