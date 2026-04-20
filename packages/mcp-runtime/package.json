@@ -44,7 +44,7 @@
     "./channelPermissions": "./src/channelPermissions.ts",
     "./officialRegistry": "./src/officialRegistry.ts",
     "./mcpStringUtils": "./src/mcpStringUtils.ts",
-    "./MCPConnectionManager.js": "./src/MCPConnectionManager.ts",
+    "./MCPConnectionManager.js": "./src/MCPConnectionManager.tsx",
     "./macOsKeychainHelpers.js": "./src/macOsKeychainHelpers.ts",
     "./secureStorageTypes.js": "./src/secureStorageTypes.ts",
     "./sanitization.js": "./src/sanitization.ts"
