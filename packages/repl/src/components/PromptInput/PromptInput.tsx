@@ -129,7 +129,7 @@ import {
   isFastModeEnabled,
   isFastModeSupportedByModel,
 } from 'src/utils/fastMode.js'
-import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
+import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 import type { PromptInputHelpers } from 'src/utils/handlePromptSubmit.js'
 import {
   getImageFromClipboard,

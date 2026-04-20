@@ -6,7 +6,7 @@ import { Box, Text, stringWidth } from '@anthropic/ink'
 import { useAppState } from '@claude-code/repl/appStateHooks.js'
 import { getEffortSuffix } from '@claude-code/agent/effort.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
+import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 import {
   formatModelAndBilling,
   getLogoDisplayData,

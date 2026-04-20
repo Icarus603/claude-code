@@ -37,7 +37,7 @@ import {
 } from '@claude-code/agent/context.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
+import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 import {
   createBaseHookInput,
   executeStatusLineCommand,

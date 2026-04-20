@@ -461,7 +461,7 @@ import {
   isFullscreenEnvEnabled,
   maybeGetTmuxMouseHint,
   isMouseTrackingEnabled,
-} from 'src/utils/fullscreen.js'
+} from '@claude-code/repl/fullscreen.js'
 import { AlternateScreen } from '@anthropic/ink'
 import { ScrollKeybindingHandler } from '@claude-code/repl/components/ScrollKeybindingHandler.js'
 import {

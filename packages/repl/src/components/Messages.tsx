@@ -30,7 +30,7 @@ import { collapseReadSearchGroups } from '@claude-code/tool-registry/collapseRea
 import { collapseTeammateShutdowns } from 'src/utils/collapseTeammateShutdowns.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
+import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
 import { applyGrouping } from 'src/utils/groupToolUses.js'
 import {
   buildMessageLookups,
