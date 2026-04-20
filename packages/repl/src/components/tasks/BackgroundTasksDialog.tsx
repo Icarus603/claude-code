@@ -41,7 +41,7 @@ import {
   isBackgroundTask,
   type TaskState,
 } from 'src/tasks/types.js'
-import type { DeepImmutable } from 'src/types/utils.js'
+import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { intersperse } from 'src/utils/array.js'
 import { stopUltraplan } from 'src/commands/ultraplan.js'
 import type { CommandResultDisplay } from 'src/commands.js'

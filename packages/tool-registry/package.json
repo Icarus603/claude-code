@@ -57,6 +57,7 @@
     "./Task.js": "./src/Task.ts",
     "./utils/lazySchema.js": "./src/utils/lazySchema.ts",
     "./utils/semanticBoolean.js": "./src/utils/semanticBoolean.ts",
-    "./progressTypes": "./src/progressTypes.ts"
+    "./progressTypes": "./src/progressTypes.ts",
+    "./genericTypeUtils": "./src/genericTypeUtils.ts"
   }
 }

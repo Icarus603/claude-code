@@ -7,7 +7,7 @@ import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import type { TaskStatus } from '@claude-code/tool-registry/Task.js'
 import { isPanelAgentTask } from 'src/tasks/LocalAgentTask/LocalAgentTask.js'
 import { isBackgroundTask, type TaskState } from 'src/tasks/types.js'
-import type { DeepImmutable } from 'src/types/utils.js'
+import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { summarizeRecentActivities } from 'src/utils/collapseReadSearch.js'
 
 /**

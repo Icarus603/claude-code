@@ -1,5 +1,5 @@
 import React from 'react'
-import type { DeepImmutable } from 'src/types/utils.js'
+import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { useElapsedTime } from '@claude-code/repl/hooks/useElapsedTime.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
