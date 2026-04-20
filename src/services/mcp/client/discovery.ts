@@ -1,16 +1,2 @@
-import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js';
-
-export function supportsMcpResources(capabilities: { resources?: unknown } | undefined): boolean {
-  return !!capabilities?.resources;
-}
-
-export function buildMcpPromptCommandName(serverName: string, promptName: string): string {
-  return `mcp__${normalizeNameForMCP(serverName)}__${promptName}`;
-}
-
-export function addServerNameToResources<T extends object>(resources: T[], server: string) {
-  return resources.map(resource => ({
-    ...resource,
-    server,
-  }));
-}
+// Canonical owner is @claude-code/mcp-runtime/client/discovery.
+export * from '@claude-code/mcp-runtime/client/discovery.js'

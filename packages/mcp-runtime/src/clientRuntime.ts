@@ -111,12 +111,12 @@ import {
   getMcpAuthCachePath,
   isMcpAuthCached,
   setMcpAuthCacheEntry,
-} from 'src/services/mcp/client/authCache.js'
+} from '@claude-code/mcp-runtime/client/authCache.js'
 import {
   createClaudeAiProxyFetch,
   handleRemoteAuthFailure,
   mcpBaseUrlAnalytics,
-} from 'src/services/mcp/client/auth.js'
+} from '@claude-code/mcp-runtime/client/auth.js'
 import {
   createNodeWsClient,
   getConnectionTimeoutMs,
@@ -125,12 +125,12 @@ import {
   getRemoteMcpServerConnectionBatchSize,
   type WsClientLike,
   wrapFetchWithTimeout,
-} from 'src/services/mcp/client/transport.js'
+} from '@claude-code/mcp-runtime/client/transport.js'
 import {
   addServerNameToResources,
   buildMcpPromptCommandName,
   supportsMcpResources,
-} from 'src/services/mcp/client/discovery.js'
+} from '@claude-code/mcp-runtime/client/discovery.js'
 
 export {
   clearMcpAuthCache,
