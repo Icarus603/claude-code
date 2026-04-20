@@ -35,7 +35,7 @@ import { safeParseJSON } from '@claude-code/storage/json.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from 'src/utils/model/providers.js'
+} from '@claude-code/provider/providers.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'

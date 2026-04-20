@@ -3,7 +3,7 @@ import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
 import {
   executeTaskCreatedHooks,
   getTaskCreatedHookMessage,
-} from 'src/utils/hooks.js'
+} from '@claude-code/agent/hooks.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import {
   createTask,

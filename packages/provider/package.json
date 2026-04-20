@@ -51,6 +51,7 @@
     "./oauthConstants": "./src/oauthConstants.ts",
     "./systemPromptSections": "./src/systemPromptSections.ts",
     "./authAlias.js": "./src/authAlias.ts",
-    "./model.js": "./src/model.ts"
+    "./model.js": "./src/model.ts",
+    "./providers.js": "./src/providers.ts"
   }
 }

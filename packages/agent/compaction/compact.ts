@@ -52,11 +52,11 @@ import { cacheToObject } from '@claude-code/tool-registry/fileStateCache'
 import {
   type CacheSafeParams,
   runForkedAgent,
-} from 'src/utils/forkedAgent.js'
+} from '@claude-code/agent/forkedAgent.js'
 import {
   executePostCompactHooks,
   executePreCompactHooks,
-} from 'src/utils/hooks.js'
+} from '@claude-code/agent/hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { MEMORY_TYPE_VALUES } from 'src/utils/memory/types.js'
 import {

@@ -51,7 +51,7 @@ import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
   extractResultText,
   prepareForkedCommandContext,
-} from 'src/utils/forkedAgent.js'
+} from '@claude-code/agent/forkedAgent.js'
 import { parseFrontmatter } from 'src/utils/frontmatterParser.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { createUserMessage, normalizeMessages } from '@claude-code/agent/messages.js'

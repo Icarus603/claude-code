@@ -22,7 +22,7 @@ import type {
 } from '@claude-code/permission/permissionTypes'
 import { setClassifierApproval } from '@claude-code/permission/classifierApprovals.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { executePermissionRequestHooks } from 'src/utils/hooks.js'
+import { executePermissionRequestHooks } from '@claude-code/agent/hooks.js'
 import {
   REJECT_MESSAGE,
   REJECT_MESSAGE_WITH_REASON_PREFIX,

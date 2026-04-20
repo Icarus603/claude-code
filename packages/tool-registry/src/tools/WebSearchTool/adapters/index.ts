@@ -3,7 +3,7 @@
  * whether the API base URL points to Anthropic's official endpoint.
  */
 
-import { isFirstPartyAnthropicBaseUrl } from 'src/utils/model/providers.js'
+import { isFirstPartyAnthropicBaseUrl } from '@claude-code/provider/providers.js'
 import { ApiSearchAdapter } from './apiAdapter.js'
 import { BingSearchAdapter } from './bingAdapter.js'
 import type { WebSearchAdapter } from './types.js'

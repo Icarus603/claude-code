@@ -41,7 +41,7 @@ import { isFullscreenEnvEnabled } from 'src/utils/fullscreen.js'
 import {
   createBaseHookInput,
   executeStatusLineCommand,
-} from 'src/utils/hooks.js'
+} from '@claude-code/agent/hooks.js'
 import { getLastAssistantMessage } from '@claude-code/agent/messages.js'
 import {
   getRuntimeMainLoopModel,

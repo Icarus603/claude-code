@@ -41,7 +41,7 @@ import { jsonStringify } from '@claude-code/local-observability/slowOperations.j
 import { z } from 'zod/v4'
 import { notifyCommandLifecycle } from '@claude-code/shell/commandLifecycle.js'
 import { normalizeControlMessageKeys } from '@claude-code/headless-sdk/controlMessageCompat'
-import { executePermissionRequestHooks } from 'src/utils/hooks.js'
+import { executePermissionRequestHooks } from '@claude-code/agent/hooks.js'
 import {
   applyPermissionUpdates,
   persistPermissionUpdates,

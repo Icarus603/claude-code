@@ -25,7 +25,7 @@ import { getSmallFastModel } from '@claude-code/provider/model.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from 'src/utils/model/providers.js'
+} from '@claude-code/provider/providers.js'
 import { getModelOptions } from 'src/utils/model/modelOptions.js'
 import {
   getIsNonInteractiveSession,

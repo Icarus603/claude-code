@@ -10,7 +10,7 @@ import {
   executeElicitationHooks,
   executeElicitationResultHooks,
   executeNotificationHooks,
-} from 'src/utils/hooks.js'
+} from '@claude-code/agent/hooks.js'
 import { logMCPDebug, logMCPError } from '@claude-code/local-observability/logging'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
