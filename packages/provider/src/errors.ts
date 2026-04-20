@@ -89,7 +89,7 @@ import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/stat
 import {
   API_PDF_MAX_PAGES,
   PDF_TARGET_RAW_SIZE,
-} from 'src/constants/apiLimits.js'
+} from '@claude-code/provider/apiLimits.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { ImageResizeError } from '@claude-code/storage/imageResizer.js'
