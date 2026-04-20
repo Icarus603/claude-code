@@ -13,7 +13,7 @@ import { getFileModificationTime, writeTextContent } from '@claude-code/storage/
 import { readFileSyncWithMetadata } from '@claude-code/storage/fileRead.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { parseCellId } from 'src/utils/notebook.js'
+import { parseCellId } from '@claude-code/tool-registry/notebook.js'
 import { checkWritePermissionForTool } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'

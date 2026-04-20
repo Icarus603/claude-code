@@ -1,7 +1,7 @@
 import { relative } from 'path'
 import React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { DiagnosticTrackingService } from 'src/services/diagnosticTracking.js'
+import { DiagnosticTrackingService } from '@claude-code/tool-registry/diagnosticTracking.js'
 import type { Attachment } from '@claude-code/agent/attachments.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { CtrlOToExpand } from './CtrlOToExpand.js'

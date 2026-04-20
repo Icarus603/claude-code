@@ -1,7 +1,7 @@
 // Auto-generated stub — replace with real implementation
 export {};
 
-import type { Message } from 'src/types/message';
+import type { Message } from '@claude-code/agent/messageShapes';
 import type { CompactionResult } from './compact.js';
 
 export const isReactiveOnlyMode: () => boolean = () => false;

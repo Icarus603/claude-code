@@ -1,7 +1,7 @@
 // Auto-generated stub — replace with real implementation
 export {};
 
-import type { Message } from 'src/types/message';
+import type { Message } from '@claude-code/agent/messageShapes';
 
 export const isSnipMarkerMessage: (message: Message) => boolean = () => false;
 export const snipCompactIfNeeded: (
