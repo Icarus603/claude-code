@@ -348,14 +348,14 @@ import { isExtractModeActive } from '@claude-code/memory/paths'
 // Dead code elimination: conditional imports
 /* eslint-disable @typescript-eslint/no-require-imports */
 const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('../../../../../../src/coordinator/coordinatorMode.js') as typeof import('../../../../../../src/coordinator/coordinatorMode.js'))
+  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
   : null
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
-    ? (require('../../../../../../src/proactive/index.js') as typeof import('../../../../../../src/proactive/index.js'))
+    ? (require('src/proactive/index.js') as typeof import('src/proactive/index.js'))
     : null
 const cronSchedulerModule = require('@claude-code/agent/scheduler') as typeof import('@claude-code/agent/scheduler')
-const cronJitterConfigModule = require('../../../../../../src/utils/cronJitterConfig.js') as typeof import('../../../../../../src/utils/cronJitterConfig.js')
+const cronJitterConfigModule = require('src/utils/cronJitterConfig.js') as typeof import('src/utils/cronJitterConfig.js')
 const cronGate = require('@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js')
 const extractMemoriesModule = feature('EXTRACT_MEMORIES')
   ? (require('@claude-code/memory/extractMemories') as typeof import('@claude-code/memory/extractMemories'))
@@ -1342,7 +1342,7 @@ export function runHeadlessStreaming(
       // Set up hot-reload for plugin hooks now that the initial install is done.
       // In sync-install mode, setup.ts skips this to avoid racing with the install.
       const { setupPluginHookHotReload } = await import(
-        '../../../../../../src/utils/plugins/loadPluginHooks.js'
+        'src/utils/plugins/loadPluginHooks.js'
       )
       setupPluginHookHotReload()
     }
@@ -1686,7 +1686,7 @@ export function runHeadlessStreaming(
 
           if (feature('FILE_PERSISTENCE') && turnStartTime !== undefined) {
             void executeFilePersistence(
-              { turnStartTime } as import('../../../../../../src/utils/filePersistence/types.js').TurnStartTime,
+              { turnStartTime } as import('src/utils/filePersistence/types.js').TurnStartTime,
               abortController.signal,
               result => {
                 output.enqueue({
@@ -2115,7 +2115,7 @@ export function runHeadlessStreaming(
   // when a message arrives via the UDS socket in headless mode.
   if (feature('UDS_INBOX')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
-    const { setOnEnqueue } = require('../../../../../../src/utils/udsMessaging.js')
+    const { setOnEnqueue } = require('src/utils/udsMessaging.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     setOnEnqueue(() => {
       if (!inputClosed) {

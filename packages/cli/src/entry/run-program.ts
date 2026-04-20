@@ -70,7 +70,7 @@ function attachPreActionHook(program: CommanderCommand): void {
     // a sink attaches. setup() attaches sinks for the default command, but
     // subcommands (doctor, mcp, plugin, auth) never call setup() and would
     // silently drop events on process.exit(). Both inits are idempotent.
-    const { initSinks } = await import('../../../../src/utils/sinks.js')
+    const { initSinks } = await import('src/utils/sinks.js')
     initSinks()
     profileCheckpoint('preAction_after_sinks')
 
@@ -107,7 +107,7 @@ function attachPreActionHook(program: CommanderCommand): void {
     // Load settings sync (non-blocking, fail-open)
     // CLI: uploads local settings to remote (CCR download is handled by print.ts)
     if (feature('UPLOAD_USER_SETTINGS')) {
-      void import('../../../../src/services/settingsSync/index.js').then(m =>
+      void import('src/services/settingsSync/index.js').then(m =>
         m.uploadUserSettingsInBackground(),
       )
     }

@@ -43,7 +43,7 @@ import { isEnvTruthy } from 'src/utils/envUtils.js'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('../../../../../../src/coordinator/coordinatorMode.js') as typeof import('../../../../../../src/coordinator/coordinatorMode.js'))
+  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
   : null
 
 /**
@@ -217,7 +217,7 @@ export async function loadInitialMessages(
         processMessagesForTeleportResume,
         teleportResumeCodeSession,
         validateGitState,
-      } = await import('../../../../../../src/utils/teleport.js')
+      } = await import('src/utils/teleport.js')
       await validateGitState()
       const teleportResult = await teleportResumeCodeSession(options.teleport)
       const { branchError } = await checkOutTeleportedSessionBranch(

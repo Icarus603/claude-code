@@ -113,7 +113,7 @@ export async function preprocessCliArgv(pendings: PendingHandles): Promise<void>
       enableConfigs()
       const uri = process.argv[handleUriIdx + 1]!
       const { handleDeepLinkUri } = await import(
-        '../../../../src/utils/deepLink/protocolHandler.js'
+        'src/utils/deepLink/protocolHandler.js'
       )
       const exitCode = await handleDeepLinkUri(uri)
       process.exit(exitCode)
@@ -130,7 +130,7 @@ export async function preprocessCliArgv(pendings: PendingHandles): Promise<void>
       const { enableConfigs } = await import('@claude-code/config')
       enableConfigs()
       const { handleUrlSchemeLaunch } = await import(
-        '../../../../src/utils/deepLink/protocolHandler.js'
+        'src/utils/deepLink/protocolHandler.js'
       )
       const urlSchemeResult = await handleUrlSchemeLaunch()
       process.exit(urlSchemeResult ?? 1)
