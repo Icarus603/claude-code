@@ -27,7 +27,7 @@ import {
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { parsePluginIdentifier } from 'src/utils/plugins/pluginIdentifier.js'
 import { getSettingsForSource } from '@claude-code/config/settings'
-import { escapeXmlAttr } from 'src/utils/xml.js'
+import { escapeXmlAttr } from '@claude-code/output/xml'
 import {
   type ChannelAllowlistEntry,
   getChannelAllowlist,

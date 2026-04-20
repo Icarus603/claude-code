@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useMemo } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, Text } from '@anthropic/ink'
-import { createHyperlink } from 'src/utils/hyperlink.js'
+import { createHyperlink } from '@claude-code/output/hyperlink.js'
 
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { renderTruncatedContent } from 'src/utils/terminal.js'

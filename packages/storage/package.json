@@ -17,6 +17,8 @@
     "./sessionEnvironment.js": "./src/sessionEnvironment.ts",
     "./sessionEnvVars.js": "./src/sessionEnvVars.ts",
     "./sessionRestore.js": "./src/sessionRestore.ts",
-    "./sessionStorage.js": "./src/sessionStorage.ts"
+    "./sessionStorage.js": "./src/sessionStorage.ts",
+    "./tempfile.js": "./src/tempfile.ts",
+    "./lockfile.js": "./src/lockfile.ts"
   }
 }

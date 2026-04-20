@@ -8,7 +8,7 @@ import { getClaudeConfigHomeDir, getTeamsDir, isEnvTruthy } from '@claude-code/c
 import { readEnv } from '@claude-code/config/env'
 import { errorMessage, getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import * as lockfile from 'src/utils/lockfile.js'
+import * as lockfile from '@claude-code/storage/lockfile.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { createSignal } from '@claude-code/config/signal'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'

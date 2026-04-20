@@ -56,7 +56,7 @@ import {
   getTeammateStatuses,
   type TeammateStatus,
   type TeamSummary,
-} from 'src/utils/teamDiscovery.js'
+} from '@claude-code/swarm/teamDiscovery.js'
 import {
   createModeSetRequestMessage,
   sendShutdownRequestToMailbox,

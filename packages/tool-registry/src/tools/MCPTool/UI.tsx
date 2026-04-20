@@ -9,7 +9,7 @@ import {
   OutputLine,
 } from '@claude-code/repl/components/shell/OutputLine.js'
 import { Ansi, Box, Text, stringWidth } from '@anthropic/ink'
-import { createHyperlink } from 'src/utils/hyperlink.js'
+import { createHyperlink } from '@claude-code/output/hyperlink.js'
 import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import type { MCPProgress } from '@claude-code/tool-registry/progressTypes'

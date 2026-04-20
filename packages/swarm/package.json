@@ -10,7 +10,8 @@
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
     "./teammateState.js": "./src/teammateState.ts",
-    "./teammateContext.js": "./src/teammateContext.ts"
+    "./teammateContext.js": "./src/teammateContext.ts",
+    "./teamDiscovery.js": "./src/teamDiscovery.ts"
   },
   "dependencies": {
     "@claude-code/agent": "workspace:*",

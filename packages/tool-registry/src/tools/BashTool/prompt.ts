@@ -10,7 +10,7 @@ import { jsonStringify } from '@claude-code/local-observability/slowOperations.j
 import {
   getDefaultBashTimeoutMs,
   getMaxBashTimeoutMs,
-} from 'src/utils/timeouts.js'
+} from '@claude-code/config/timeouts'
 import {
   getUndercoverInstructions,
   isUndercover,

@@ -9,7 +9,7 @@ import {
   getBudgetContinuationCount,
   getTotalInputTokens,
 } from '@claude-code/app-host/bootstrap/state.js';
-import { parseTokenBudget } from 'src/utils/tokenBudget.js';
+import { parseTokenBudget } from '@claude-code/agent/tokenBudget';
 import { count } from '@claude-code/tool-registry/utils/array.js';
 import { dirname, join } from 'path';
 import { tmpdir } from 'os';
@@ -234,7 +234,7 @@ import {
 } from 'src/utils/messages.js';
 import { generateSessionTitle } from 'src/utils/sessionTitle.js';
 import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js';
-import { escapeXml } from 'src/utils/xml.js';
+import { escapeXml } from '@claude-code/output/xml';
 import type { ThinkingConfig } from 'src/utils/thinking.js';
 import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js';
 import { handlePromptSubmit, type PromptInputHelpers } from 'src/utils/handlePromptSubmit.js';

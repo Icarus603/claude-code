@@ -111,6 +111,10 @@
     "./sleep": "./sleep.ts",
     "./semver": "./semver.ts",
     "./product": "./product.ts",
-    "./hash": "./hash.ts"
+    "./hash": "./hash.ts",
+    "./timeouts": "./timeouts.ts",
+    "./stream": "./stream.ts",
+    "./sequential": "./sequential.ts",
+    "./generators": "./generators.ts"
   }
 }

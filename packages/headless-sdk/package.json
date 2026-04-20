@@ -10,6 +10,7 @@
     "./contracts": "./src/contracts.ts",
     "./testing": "./testing/index.ts",
     "./agentSdkTypes.js": "./src/agentSdkTypes.ts",
-    "./sandboxTypes.js": "./src/sandboxTypes.ts"
+    "./sandboxTypes.js": "./src/sandboxTypes.ts",
+    "./controlMessageCompat": "./src/controlMessageCompat.ts"
   }
 }
