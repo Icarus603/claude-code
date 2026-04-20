@@ -93,7 +93,9 @@
     "./memory/types.js": "./memory/types.ts",
     "./sdkControlSchemas.js": "./sdkControlSchemas.ts",
     "./combinedAbortSignal.js": "./combinedAbortSignal.ts",
-    "./contentArray.js": "./contentArray.ts"
+    "./contentArray.js": "./contentArray.ts",
+    "./idleTimeout.js": "./idleTimeout.ts",
+    "./sessionUrl.js": "./sessionUrl.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
