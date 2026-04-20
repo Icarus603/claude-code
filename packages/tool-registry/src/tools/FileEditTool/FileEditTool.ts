@@ -24,7 +24,7 @@ import {
   getFileModificationTime,
   suggestPathUnderCwd,
   writeTextContent,
-} from 'src/utils/file.js'
+} from '@claude-code/storage/file.js'
 import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,

@@ -12,7 +12,7 @@ import {
   addLineNumbers,
   convertLeadingTabsToSpaces,
   readFileSyncCached,
-} from 'src/utils/file.js'
+} from '@claude-code/storage/file.js'
 import type { EditInput, FileEdit } from './types.js'
 
 // Claude can't output curly quotes, so we define them as constants here for Claude to use

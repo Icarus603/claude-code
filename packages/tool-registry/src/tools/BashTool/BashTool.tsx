@@ -47,7 +47,7 @@ import {
   detectLineEndings,
   getFileModificationTime,
   writeTextContent,
-} from 'src/utils/file.js'
+} from '@claude-code/storage/file.js'
 import {
   fileHistoryEnabled,
   fileHistoryTrackEdit,
