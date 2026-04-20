@@ -3,7 +3,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { TEAMMATE_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { Ansi, Box, Text, type TextProps } from '@anthropic/ink'
-import { toInkColor } from 'src/utils/ink.js'
+import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
 
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { isShutdownApproved } from '@claude-code/swarm'

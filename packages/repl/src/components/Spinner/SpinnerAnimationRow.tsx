@@ -2,7 +2,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { useMemo, useRef } from 'react'
 import { Box, Text, useAnimationFrame, stringWidth, Byline } from '@anthropic/ink'
-import { toInkColor } from 'src/utils/ink.js'
+import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 
