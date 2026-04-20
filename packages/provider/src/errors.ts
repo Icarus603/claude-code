@@ -93,7 +93,7 @@ import {
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { ImageResizeError } from '@claude-code/storage/imageResizer.js'
-import { ImageSizeError } from 'src/utils/imageValidation.js'
+import { ImageSizeError } from '@claude-code/storage/imageValidation.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
