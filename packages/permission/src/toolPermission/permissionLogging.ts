@@ -10,7 +10,7 @@ import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.j
 import { getCodeEditToolDecisionCounter } from '@claude-code/app-host/bootstrap/state.js'
 import type { Tool as ToolType, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { getLanguageName } from '@claude-code/output/utils/cliHighlight.js'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { logOTelEvent } from 'src/utils/telemetry/events.js'
 import type {
   PermissionApprovalSource,

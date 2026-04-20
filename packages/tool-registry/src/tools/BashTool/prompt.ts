@@ -5,7 +5,7 @@ import { hasEmbeddedSearchTools } from '@claude-code/config/embeddedTools.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { shouldIncludeGitInstructions } from '@claude-code/config/env/git-settings'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import {
   getDefaultBashTimeoutMs,

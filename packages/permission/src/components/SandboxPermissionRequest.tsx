@@ -3,7 +3,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   type NetworkHostPattern,
   shouldAllowManagedSandboxDomainsOnly,
-} from 'src/utils/sandbox/sandbox-adapter.js'
+} from '@claude-code/shell/sandbox.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

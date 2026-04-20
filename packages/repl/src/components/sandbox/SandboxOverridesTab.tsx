@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, color, Link, Text, useTheme, useTabHeaderFocus } from '@anthropic/ink'
 import type { CommandResultDisplay } from 'src/types/command.js'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { Select } from '../CustomSelect/select.js'
 
 type Props = {

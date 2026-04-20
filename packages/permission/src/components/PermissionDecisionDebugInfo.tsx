@@ -14,7 +14,7 @@ import { extractRules } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
 import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
 import { detectUnreachableRules } from '@claude-code/permission/shadowedRuleDetection.js'
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { getSettingSourceDisplayNameLowercase } from '@claude-code/config/constants'
 
 type PermissionDecisionInfoItemProps = {

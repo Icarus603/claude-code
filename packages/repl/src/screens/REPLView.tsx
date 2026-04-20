@@ -338,7 +338,7 @@ const useScheduledTasks = feature('AGENT_TRIGGERS') ? require('@claude-code/repl
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js';
 import { useTaskListWatcher } from '@claude-code/repl/hooks/useTaskListWatcher.js';
-import type { SandboxAskCallback, NetworkHostPattern } from 'src/utils/sandbox/sandbox-adapter.js';
+import type { SandboxAskCallback, NetworkHostPattern } from '@claude-code/shell/sandbox.js';
 
 import {
   type IDEExtensionInstallationStatus,
@@ -397,7 +397,7 @@ import {
   useKickOffCheckAndDisableBypassPermissionsIfNeeded,
   useKickOffCheckAndDisableAutoModeIfNeeded,
 } from '@claude-code/permission/bypassPermissionsKillswitch.js';
-import { SandboxManager } from 'src/utils/sandbox/sandbox-adapter.js';
+import { SandboxManager } from '@claude-code/shell/sandbox.js';
 import { SANDBOX_NETWORK_ACCESS_TOOL_NAME } from '@claude-code/cli/structuredIO.js';
 import { useFileHistorySnapshotInit } from '@claude-code/repl/hooks/useFileHistorySnapshotInit.js';
 import { SandboxPermissionRequest } from '@claude-code/permission/components/SandboxPermissionRequest.js';
