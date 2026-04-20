@@ -1,7 +1,7 @@
 import figures from 'figures'
 import React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import type { AdvisorBlock } from 'src/utils/advisor.js'
+import type { AdvisorBlock } from '@claude-code/provider/advisor.js'
 import { renderModelName } from '@claude-code/provider/model.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'

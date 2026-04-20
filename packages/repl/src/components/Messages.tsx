@@ -23,7 +23,7 @@ import type {
   ProgressMessage as ProgressMessageType,
   RenderableMessage,
 } from '@claude-code/agent/messageShapes'
-import { type AdvisorBlock, isAdvisorBlock } from 'src/utils/advisor.js'
+import { type AdvisorBlock, isAdvisorBlock } from '@claude-code/provider/advisor.js'
 import { collapseBackgroundBashNotifications } from '@claude-code/shell/collapseBackgroundBashNotifications.js'
 import { collapseHookSummaries } from 'src/utils/collapseHookSummaries.js'
 import { collapseReadSearchGroups } from '@claude-code/tool-registry/collapseReadSearch.js'
