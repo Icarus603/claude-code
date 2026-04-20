@@ -141,20 +141,23 @@ function getAnthropicEnvMetadata() {
   return {
     ...(readEnv('ANTHROPIC_BASE_URL')
       ? {
-          baseUrl: process.env
-            .ANTHROPIC_BASE_URL as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          baseUrl: readEnv(
+            'ANTHROPIC_BASE_URL',
+          ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         }
       : {}),
     ...(readEnv('ANTHROPIC_MODEL')
       ? {
-          envModel: process.env
-            .ANTHROPIC_MODEL as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          envModel: readEnv(
+            'ANTHROPIC_MODEL',
+          ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         }
       : {}),
     ...(readEnv('ANTHROPIC_SMALL_FAST_MODEL')
       ? {
-          envSmallFastModel: process.env
-            .ANTHROPIC_SMALL_FAST_MODEL as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          envSmallFastModel: readEnv(
+            'ANTHROPIC_SMALL_FAST_MODEL',
+          ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         }
       : {}),
   }

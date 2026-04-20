@@ -198,3 +198,27 @@ export function getVertexRegionForModel(
 export function readEnv(name: string): string | undefined {
   return process.env[name]
 }
+
+/**
+ * Snapshot of the full environment. Use when passing env through to a
+ * subprocess or merging with settings. Core-domain packages should prefer
+ * this over `{ ...process.env }` to stay inside V7 §8.6 boundaries.
+ */
+export function getAllEnv(): Record<string, string | undefined> {
+  return { ...process.env }
+}
+
+/**
+ * Assign an env var at runtime. Only use from core-domain packages that need
+ * to flip provider/feature flags mid-session. Stays inside V7 §8.6.
+ */
+export function setEnv(name: string, value: string): void {
+  process.env[name] = value
+}
+
+/**
+ * Unset an env var at runtime.
+ */
+export function deleteEnv(name: string): void {
+  delete process.env[name]
+}

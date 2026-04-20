@@ -4,7 +4,7 @@ import { getAPIProvider } from 'src/utils/model/providers.js'
 import { updateSettingsForSource } from 'src/utils/settings/settings.js'
 import { getSettings_DEPRECATED } from 'src/utils/settings/settings.js'
 import { applyConfigEnvironmentVariables } from 'src/utils/managedEnv.js'
-import { readEnv } from '@claude-code/config/env'
+import { deleteEnv, getAllEnv, readEnv, setEnv } from '@claude-code/config/env'
 
 function getEnvVarForProvider(provider: string): string {
   switch (provider) {
@@ -26,7 +26,7 @@ function getEnvVarForProvider(provider: string): string {
 // Get merged env: process.env + settings.env (from userSettings)
 function getMergedEnv(): Record<string, string> {
   const settings = getSettings_DEPRECATED()
-  const merged = { ...process.env }
+  const merged = getAllEnv()
   if (settings?.env) {
     Object.assign(merged, settings.env)
   }
@@ -137,12 +137,12 @@ const call: LocalCommandCall = async (args, context) => {
     return { type: 'text', value: `API provider set to ${arg}.` }
   } else {
     // Cloud providers: set env vars only, do NOT touch settings.json
-    delete readEnv('CLAUDE_CODE_USE_OPENAI')
-    delete readEnv('OPENAI_API_KEY')
-    delete readEnv('OPENAI_BASE_URL')
-    delete readEnv('CLAUDE_CODE_USE_GEMINI')
-    delete readEnv('CLAUDE_CODE_USE_GROK')
-    process.env[getEnvVarForProvider(arg)] = '1'
+    deleteEnv('CLAUDE_CODE_USE_OPENAI')
+    deleteEnv('OPENAI_API_KEY')
+    deleteEnv('OPENAI_BASE_URL')
+    deleteEnv('CLAUDE_CODE_USE_GEMINI')
+    deleteEnv('CLAUDE_CODE_USE_GROK')
+    setEnv(getEnvVarForProvider(arg), '1')
     // Do not modify settings.json - cloud providers controlled solely by env vars
     applyConfigEnvironmentVariables()
     return {

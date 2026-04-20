@@ -1,4 +1,5 @@
 import { feature } from 'bun:bundle'
+import { readEnv } from '@claude-code/config/env'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { QuerySource } from 'src/constants/querySource.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
@@ -273,7 +274,7 @@ export async function microcompactMessages(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const featureFlags = require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')
     const cachedMCConfig = (await import('@claude-code/agent/compaction/cachedMCConfig.js')).getCachedMCConfig({
-      getEnv: key => process.env[key],
+      getEnv: key => readEnv(key),
       getFeatureValue: featureFlags.getFeatureValue_CACHED_MAY_BE_STALE,
     })
     if (
@@ -311,7 +312,7 @@ async function cachedMicrocompactPath(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const featureFlags = require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')
   const config = (await import('@claude-code/agent/compaction/cachedMCConfig.js')).getCachedMCConfig({
-    getEnv: key => process.env[key],
+    getEnv: key => readEnv(key),
     getFeatureValue: featureFlags.getFeatureValue_CACHED_MAY_BE_STALE,
   })
 

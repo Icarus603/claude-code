@@ -5,6 +5,7 @@ import { getIsNonInteractiveSession, getSessionId } from '@claude-code/app-host/
 import { uniq } from 'src/utils/array.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { getClaudeConfigHomeDir, getTeamsDir, isEnvTruthy } from 'src/utils/envUtils.js'
+import { readEnv } from '@claude-code/config/env'
 import { errorMessage, getErrnoCode } from 'src/utils/errors.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import * as lockfile from 'src/utils/lockfile.js'
@@ -132,7 +133,7 @@ async function writeHighWaterMark(
 
 export function isTodoV2Enabled(): boolean {
   // Force-enable tasks in non-interactive mode (e.g. SDK users who want Task tools over TodoWrite)
-  if (isEnvTruthy(process.env.CLAUDE_CODE_ENABLE_TASKS)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_TASKS'))) {
     return true
   }
   return !getIsNonInteractiveSession()
@@ -197,8 +198,9 @@ export async function resetTaskList(taskListId: string): Promise<void> {
  * 5. Session ID - fallback for standalone sessions
  */
 export function getTaskListId(): string {
-  if (process.env.CLAUDE_CODE_TASK_LIST_ID) {
-    return process.env.CLAUDE_CODE_TASK_LIST_ID
+  const taskListId = readEnv('CLAUDE_CODE_TASK_LIST_ID')
+  if (taskListId) {
+    return taskListId
   }
   // In-process teammates use the leader's team name so they share the same
   // task list that tmux/iTerm2 teammates also resolve to.
@@ -317,7 +319,7 @@ export async function getTask(
     const data = jsonParse(content) as { status?: string }
 
     // TEMPORARY: Migrate old status names for existing sessions (ant-only)
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       if (data.status === 'open') data.status = 'pending'
       else if (data.status === 'resolved') data.status = 'completed'
       // Migrate development task statuses to in_progress
