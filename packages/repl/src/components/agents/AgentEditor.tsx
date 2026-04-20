@@ -16,7 +16,7 @@ import {
   isCustomAgent,
   isPluginAgent,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { editFileInEditor } from 'src/utils/promptEditor.js'
+import { editFileInEditor } from '@claude-code/repl/promptEditor.js'
 import { getActualAgentFilePath, updateAgentFile } from './agentFileUtils.js'
 import { ColorPicker } from './ColorPicker.js'
 import { ModelSelector } from './ModelSelector.js'

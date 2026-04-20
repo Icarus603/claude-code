@@ -15,7 +15,7 @@ import { saveGlobalConfig } from '@claude-code/config'
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { getSecureStorage } from '@claude-code/storage/secureStorage.js'
 import { clearToolSchemaCache } from 'src/utils/toolSchemaCache.js'
-import { resetUserCache } from 'src/utils/user.js'
+import { resetUserCache } from '@claude-code/provider/user.js'
 
 export async function performLogout({
   clearOnboarding = false,

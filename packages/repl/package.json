@@ -444,6 +444,7 @@
     "./components/wizard/types.js": "./src/components/wizard/types.ts",
     "./components/wizard/useWizard.js": "./src/components/wizard/useWizard.ts",
     "./appStateHooks.js": "./src/appStateHooks.ts",
-    "./notifications.js": "./src/notifications.ts"
+    "./notifications.js": "./src/notifications.ts",
+    "./promptEditor.js": "./src/promptEditor.ts"
   }
 }

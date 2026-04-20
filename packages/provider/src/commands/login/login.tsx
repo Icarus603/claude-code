@@ -22,7 +22,7 @@ import {
   resetAutoModeGateCheck,
   resetBypassPermissionsCheck,
 } from '@claude-code/permission/bypassPermissionsKillswitch.js'
-import { resetUserCache } from 'src/utils/user.js'
+import { resetUserCache } from '@claude-code/provider/user.js'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,

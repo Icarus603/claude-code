@@ -57,6 +57,7 @@
     "./sessionIngressAuth.js": "./src/sessionIngressAuth.ts",
     "./http.js": "./src/http.ts",
     "./proxy.js": "./src/proxy.ts",
-    "./billing.js": "./src/billing.ts"
+    "./billing.js": "./src/billing.ts",
+    "./user.js": "./src/user.ts"
   }
 }
