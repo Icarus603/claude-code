@@ -3,7 +3,7 @@ import { getOauthConfig } from 'src/constants/oauth.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getAuthHeaders } from 'src/utils/http.js'
 import { logError } from 'src/utils/log.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 
 /**
  * Fetch the user's first Claude Code token date and store in config.

@@ -14,7 +14,7 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from 'src/utils/log.js'
 import { getAPIProvider } from 'src/utils/model/providers.js'
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 
 const bootstrapResponseSchema = lazySchema(() =>
   z.object({

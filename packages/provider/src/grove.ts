@@ -17,7 +17,7 @@ import {
   withOAuth401Retry,
 } from 'src/utils/http.js'
 import { logError } from 'src/utils/log.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 
 // Cache expiration: 24 hours
 const GROVE_CACHE_EXPIRATION_MS = 24 * 60 * 60 * 1000

@@ -39,7 +39,7 @@ import {
 import { isEssentialTrafficOnly } from 'src/utils/privacyLevel.js'
 import { sleep } from 'src/utils/sleep.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { getClaudeCodeUserAgent } from 'src/utils/userAgent.js'
+import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
 import { getRetryDelay } from '@claude-code/provider/withRetry.js'
 import {
   type PolicyLimitsFetchResult,
