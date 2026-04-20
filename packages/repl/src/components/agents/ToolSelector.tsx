@@ -23,7 +23,7 @@ import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebF
 import { WebSearchTool } from '@claude-code/tool-registry/tools/WebSearchTool/WebSearchTool.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import { plural } from 'src/utils/stringUtils.js'
 import { Divider } from '@anthropic/ink'
 

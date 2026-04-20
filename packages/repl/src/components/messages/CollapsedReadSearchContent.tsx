@@ -9,7 +9,7 @@ import type {
   CollapsedReadSearchGroup,
   NormalizedAssistantMessage,
 } from '@claude-code/agent/messageShapes'
-import { uniq } from 'src/utils/array.js'
+import { uniq } from '@claude-code/tool-registry/utils/array.js'
 import { getToolUseIdsFromCollapsedGroup } from 'src/utils/collapseReadSearch.js'
 import { getDisplayPath } from 'src/utils/file.js'
 import { formatDuration, formatSecondsShort } from '@claude-code/output/formatters'

@@ -20,7 +20,7 @@ import {
 } from '@claude-code/ide/lsp/manager.js'
 import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
 import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { uniq } from 'src/utils/array.js'
+import { uniq } from '@claude-code/tool-registry/utils/array.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { isENOENT, toError } from '@claude-code/local-observability/errorHelpers.js'

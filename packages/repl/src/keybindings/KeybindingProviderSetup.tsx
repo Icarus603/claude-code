@@ -6,7 +6,7 @@
  */
 import { useCallback } from 'react'
 import { useNotifications } from 'src/context/notifications.js'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { plural } from 'src/utils/stringUtils.js'
 import { KeybindingSetup as InkKeybindingSetup } from '@anthropic/ink'

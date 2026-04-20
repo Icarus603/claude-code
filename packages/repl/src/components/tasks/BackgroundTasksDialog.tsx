@@ -42,7 +42,7 @@ import {
   type TaskState,
 } from 'src/tasks/types.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
-import { intersperse } from 'src/utils/array.js'
+import { intersperse } from '@claude-code/tool-registry/utils/array.js'
 import { stopUltraplan } from 'src/commands/ultraplan.js'
 import type { CommandResultDisplay } from 'src/commands.js'
 import { useRegisterOverlay } from 'src/context/overlayContext.js'
@@ -50,7 +50,7 @@ import type { ExitState } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybi
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { AsyncAgentDetailDialog } from './AsyncAgentDetailDialog.js'
 import { BackgroundTask as BackgroundTaskComponent } from './BackgroundTask.js'

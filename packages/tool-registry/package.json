@@ -59,6 +59,7 @@
     "./utils/semanticBoolean.js": "./src/utils/semanticBoolean.ts",
     "./progressTypes": "./src/progressTypes.ts",
     "./genericTypeUtils": "./src/genericTypeUtils.ts",
-    "./notebookTypes": "./src/notebookTypes.ts"
+    "./notebookTypes": "./src/notebookTypes.ts",
+    "./utils/array.js": "./src/utils/array.ts"
   }
 }

@@ -17,7 +17,7 @@ import {
   type Output as FileReadToolOutput,
 } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { count } from 'src/utils/array.js'
+import { count } from '@claude-code/tool-registry/utils/array.js'
 import {
   createCacheSafeParams,
   createSubagentContext,
