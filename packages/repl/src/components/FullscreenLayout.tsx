@@ -12,7 +12,7 @@ import React, {
   useSyncExternalStore,
 } from 'react'
 import { fileURLToPath } from 'url'
-import { ModalContext } from 'src/context/modalContext.js'
+import { ModalContext } from '@claude-code/repl/modalContext.js'
 import {
   PromptOverlayProvider,
   usePromptOverlay,

@@ -7,7 +7,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import {
   useIsInsideModal,
   useModalOrTerminalSize,
-} from 'src/context/modalContext.js'
+} from '@claude-code/repl/modalContext.js'
 import { Pane, Tab, Tabs } from '@anthropic/ink'
 import { Status, buildDiagnostics } from './Status.js'
 import { Config } from './Config.js'

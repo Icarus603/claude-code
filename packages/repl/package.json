@@ -456,6 +456,7 @@
     "./stateStore.js": "./src/stateStore.ts",
     "./overlayContext.js": "./src/overlayContext.ts",
     "./history.js": "./src/history.ts",
+    "./modalContext.js": "./src/modalContext.ts",
     "./onChangeAppState.js": "./src/onChangeAppState.ts",
     "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts",
     "./collapseTeammateShutdowns.js": "./src/collapseTeammateShutdowns.ts",
