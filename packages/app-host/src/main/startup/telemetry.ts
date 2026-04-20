@@ -12,7 +12,7 @@ import {
 	logPluginsEnabledForSession,
 } from "src/utils/telemetry/pluginTelemetry.js";
 import { logError } from "src/utils/log.js";
-import { hasNodeOption } from "src/utils/envUtils.js";
+import { hasNodeOption } from "@claude-code/config/env/utils";
 import { getIsGit, getWorktreeCount } from "src/utils/git.js";
 import { getInitialSettings } from "src/utils/settings/settings.js";
 import { getGhAuthStatus } from "src/utils/github/ghAuthStatus.js";
