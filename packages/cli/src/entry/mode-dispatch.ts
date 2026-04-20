@@ -275,7 +275,7 @@ import {
 import {
   logPluginLoadErrors,
   logPluginsEnabledForSession,
-} from 'src/utils/telemetry/pluginTelemetry.js'
+} from '@claude-code/tool-registry/telemetry/pluginTelemetry.js'
 import { logSkillsLoaded } from 'src/utils/telemetry/skillLoadedEvent.js'
 import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
 import { validateUuid } from '@claude-code/agent/uuid.js'
@@ -378,7 +378,7 @@ import {
   shouldEnableThinkingByDefault,
   type ThinkingConfig,
 } from '@claude-code/provider/thinking.js'
-import { initUser, resetUserCache } from 'src/utils/user.js'
+import { initUser, resetUserCache } from '@claude-code/provider/user.js'
 import {
   getTmuxInstallInstructions,
   isTmuxAvailable,

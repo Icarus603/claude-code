@@ -3,7 +3,7 @@ import { getSystemContext, getUserContext } from "@claude-code/provider/context.
 import { checkHasTrustDialogAccepted } from "@claude-code/config";
 import { getIsNonInteractiveSession } from "../../bootstrap/state.js";
 import { logForDiagnosticsNoPII } from "@claude-code/local-observability/logging";
-import { initUser } from "src/utils/user.js";
+import { initUser } from "@claude-code/provider/user.js";
 import { getRelevantTips } from "src/services/tips/tipRegistry.js";
 import {
 	prefetchAwsCredentialsAndBedRockInfoIfSafe,
