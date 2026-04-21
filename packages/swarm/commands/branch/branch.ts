@@ -1,17 +1,17 @@
 import { randomUUID, type UUID } from 'crypto'
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import type { LocalJSXCommandContext } from '../../commands.js'
+import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
 import { logEvent } from '@claude-code/local-observability'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import type {
   ContentReplacementEntry,
   Entry,
   LogOption,
   SerializedMessage,
   TranscriptMessage,
-} from '../../types/logs.js'
-import { parseJSONL } from '../../utils/json.js'
+} from '@claude-code/agent/logsTypes.js'
+import { parseJSONL } from '@claude-code/storage/json.js'
 import {
   getProjectDir,
   getTranscriptPath,
@@ -20,8 +20,8 @@ import {
   saveCustomTitle,
   searchSessionsByCustomTitle,
 } from '@claude-code/storage/sessionStorage.js'
-import { jsonStringify } from '../../utils/slowOperations.js'
-import { escapeRegExp } from '../../utils/stringUtils.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
+import { escapeRegExp } from '@claude-code/output/utils/stringUtils.js'
 
 type TranscriptEntry = TranscriptMessage & {
   forkedFrom?: {
