@@ -18,6 +18,7 @@
     "./xml.js": "./src/xml.ts",
     "./gitignore.js": "./src/gitignore.ts",
     "./promptShellExecution.js": "./src/promptShellExecution.ts",
-    "./createMovedToPluginCommand.js": "./src/createMovedToPluginCommand.ts"
+    "./createMovedToPluginCommand.js": "./src/createMovedToPluginCommand.ts",
+    "./stubs/stubCommand.js": "./src/stubs/stubCommand.ts"
   }
 }
