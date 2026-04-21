@@ -17,6 +17,7 @@
     "./skills/*.js": "./src/skills/*.ts",
     "./xml.js": "./src/xml.ts",
     "./gitignore.js": "./src/gitignore.ts",
-    "./promptShellExecution.js": "./src/promptShellExecution.ts"
+    "./promptShellExecution.js": "./src/promptShellExecution.ts",
+    "./createMovedToPluginCommand.js": "./src/createMovedToPluginCommand.ts"
   }
 }

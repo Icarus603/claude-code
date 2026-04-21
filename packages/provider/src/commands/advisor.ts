@@ -1,17 +1,17 @@
-import type { Command } from '../commands.js'
-import type { LocalCommandCall } from '../types/command.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
+import type { LocalCommandCall } from '@claude-code/agent/command.js'
 import {
   canUserConfigureAdvisor,
   isValidAdvisorModel,
   modelSupportsAdvisor,
-} from '../utils/advisor.js'
+} from '@claude-code/provider/advisor.js'
 import {
   getDefaultMainLoopModelSetting,
   normalizeModelStringForAPI,
   parseUserSpecifiedModel,
-} from '../utils/model/model.js'
-import { validateModel } from '../utils/model/validateModel.js'
-import { updateSettingsForSource } from '../utils/settings/settings.js'
+} from '@claude-code/provider/model.js'
+import { validateModel } from '@claude-code/provider/validateModel.js'
+import { updateSettingsForSource } from '@claude-code/config/settings'
 
 const call: LocalCommandCall = async (args, context) => {
   const arg = args.trim().toLowerCase()
