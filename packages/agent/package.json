@@ -102,6 +102,7 @@
     "./sessionUrl.js": "./sessionUrl.ts",
     "./commands/security-review.js": "./commands/security-review.ts",
     "./commands/commit.js": "./commands/commit.ts",
+    "./commands/brief.js": "./commands/brief.ts",
     "./commands/commit-push-pr.js": "./commands/commit-push-pr.ts"
   },
   "dependencies": {
