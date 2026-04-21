@@ -44,7 +44,7 @@ import {
   getScratchpadDir,
 } from '@claude-code/permission/filesystem'
 import { loadMemoryPrompt } from '@claude-code/memory'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import { isReplModeEnabled } from '@claude-code/tool-registry/tools/REPLTool/constants.js'
 import { feature } from 'bun:bundle'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
@@ -453,7 +453,7 @@ export async function getSystemPrompt(
   additionalWorkingDirectories?: string[],
   mcpClients?: MCPServerConnection[],
 ): Promise<string[]> {
-  if (isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_SIMPLE'))) {
     return [
       `You are Claude Code, Anthropic's official CLI for Claude.\n\nCWD: ${getCwd()}\nDate: ${getSessionStartDate()}`,
     ]
@@ -736,7 +736,7 @@ function getKnowledgeCutoff(modelId: string): string | null {
 }
 
 function getShellInfoLine(): string {
-  const shell = process.env.SHELL || 'unknown'
+  const shell = readEnv('SHELL') || 'unknown'
   const shellName = shell.includes('zsh')
     ? 'zsh'
     : shell.includes('bash')
@@ -829,7 +829,7 @@ function getFunctionResultClearingSection(model: string): string | null {
     return null
   }
   const config = getCachedMCConfigForFRC({
-    getEnv: key => process.env[key],
+    getEnv: key => readEnv(key),
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     getFeatureValue: (require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')).getFeatureValue_CACHED_MAY_BE_STALE,
   })
