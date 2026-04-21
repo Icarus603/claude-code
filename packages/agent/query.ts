@@ -160,7 +160,7 @@ function buildQueryConfig(): QueryConfig {
       emitToolUseSummaries: isEnvTruthy(
         readEnv('CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES'),
       ),
-      isAnt: readEnv('USER_TYPE') === 'ant',
+      isAnt: process.env.USER_TYPE === 'ant',
       fastModeEnabled: !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_FAST_MODE')),
     },
   }
@@ -997,7 +997,7 @@ async function* queryLoop(
             // Thinking signatures are model-bound: replaying a protected-thinking
             // block (e.g. capybara) to an unprotected fallback (e.g. opus) 400s.
             // Strip before retry so the fallback model gets clean history.
-            if (readEnv('USER_TYPE') === 'ant') {
+            if (process.env.USER_TYPE === 'ant') {
               messagesForQuery = stripSignatureBlocks(messagesForQuery)
             }
 

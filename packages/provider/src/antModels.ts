@@ -33,7 +33,7 @@ export type AntModelOverrideConfig = {
 // @[MODEL LAUNCH]: Update tengu_ant_model_override with new ant-only models
 // @[MODEL LAUNCH]: Add the codename to scripts/excluded-strings.txt to prevent it from leaking to external builds.
 export function getAntModelOverrideConfig(): AntModelOverrideConfig | null {
-  if (readEnv('USER_TYPE') !== 'ant') {
+  if (process.env.USER_TYPE !== 'ant') {
     return null
   }
   return getFeatureValue_CACHED_MAY_BE_STALE<AntModelOverrideConfig | null>(
@@ -43,7 +43,7 @@ export function getAntModelOverrideConfig(): AntModelOverrideConfig | null {
 }
 
 export function getAntModels(): AntModel[] {
-  if (readEnv('USER_TYPE') !== 'ant') {
+  if (process.env.USER_TYPE !== 'ant') {
     return []
   }
   return getAntModelOverrideConfig()?.antModels ?? []
@@ -52,7 +52,7 @@ export function getAntModels(): AntModel[] {
 export function resolveAntModel(
   model: string | undefined,
 ): AntModel | undefined {
-  if (readEnv('USER_TYPE') !== 'ant') {
+  if (process.env.USER_TYPE !== 'ant') {
     return undefined
   }
   if (model === undefined) {

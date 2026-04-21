@@ -2,7 +2,7 @@
 /**
  * Ensure that any model codenames introduced here are also added to
  * scripts/excluded-strings.txt to avoid leaking them. Wrap any codename string
- * literals with readEnv('USER_TYPE') === 'ant' for Bun to remove the codenames
+ * literals with process.env.USER_TYPE === 'ant' for Bun to remove the codenames
  * during dead code elimination
  */
 import { getMainLoopModelOverride } from '@claude-code/app-host/bootstrap/state.js'
@@ -29,6 +29,7 @@ import { LIGHTNING_BOLT } from '@claude-code/output/constants/figures.js'
 import { isModelAllowed } from '@claude-code/provider/model/modelAllowlist.js'
 import { type ModelAlias, isModelAlias } from '@claude-code/provider/modelAliases.js'
 import { capitalize } from '@claude-code/output/utils/stringUtils.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 export type ModelShortName = string
 export type ModelName = string
@@ -220,7 +221,7 @@ export function getRuntimeMainLoopModel(params: {
  */
 export function getDefaultMainLoopModelSetting(): ModelName | ModelAlias {
   // Ants default to defaultModel from flag config, or Opus 1M if not configured
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     return (
       (getAntModelOverrideConfig()?.defaultModel as string) ??
       getDefaultOpusModel() + '[1m]'
@@ -440,7 +441,7 @@ export function renderModelName(model: ModelName): string {
   if (publicName) {
     return publicName
   }
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     const resolved = parseUserSpecifiedModel(model)
     const antModel = resolveAntModel(model)
     if (antModel) {
@@ -525,7 +526,7 @@ export function parseUserSpecifiedModel(
     return getDefaultOpusModel() + (has1mTag ? '[1m]' : '')
   }
 
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     const has1mAntTag = has1mContext(normalizedModel)
     const baseAntModel = normalizedModel.replace(/\[1m]$/i, '').trim()
 
@@ -598,7 +599,7 @@ export function isLegacyModelRemapEnabled(): boolean {
 
 export function modelDisplayString(model: ModelSetting): string {
   if (model === null) {
-    if (readEnv('USER_TYPE') === 'ant') {
+    if (process.env.USER_TYPE === 'ant') {
       return `Default for Ants (${renderDefaultModelSetting(getDefaultMainLoopModelSetting())})`
     } else if (isClaudeAISubscriber()) {
       return `Default (${getClaudeAiUserDefaultModelDescription()})`

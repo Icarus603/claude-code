@@ -10,6 +10,7 @@ import { getGlobalConfig, getOrCreateUserID } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { type env, getHostPlatformForAnalytics } from '@claude-code/config/env/paths'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { readEnv } from '@claude-code/config/env/utils'
 
 // Cache for email fetched asynchronously at startup
 let cachedEmail: string | undefined | null = null // null means not fetched yet
@@ -109,7 +110,7 @@ export const getCoreUserData = memoize(
       platform: getHostPlatformForAnalytics(),
       organizationUuid,
       accountUuid,
-      userType: readEnv('USER_TYPE'),
+      userType: process.env.USER_TYPE,
       subscriptionType,
       rateLimitTier,
       firstTokenTime,
@@ -147,7 +148,7 @@ function getEmail(): string | undefined {
   }
 
   // Ant-only fallbacks below (no execSync)
-  if (readEnv('USER_TYPE') !== 'ant') {
+  if (process.env.USER_TYPE !== 'ant') {
     return undefined
   }
 
@@ -167,7 +168,7 @@ async function getEmailAsync(): Promise<string | undefined> {
   }
 
   // Ant-only fallbacks below
-  if (readEnv('USER_TYPE') !== 'ant') {
+  if (process.env.USER_TYPE !== 'ant') {
     return undefined
   }
 

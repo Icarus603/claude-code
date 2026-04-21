@@ -4,7 +4,7 @@ import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 type OauthConfigType = 'prod' | 'staging' | 'local'
 
 function getOauthConfigType(): OauthConfigType {
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     if (isEnvTruthy(readEnv('USE_LOCAL_OAUTH'))) {
       return 'local'
     }
@@ -116,7 +116,7 @@ export const MCP_CLIENT_METADATA_URL =
 // Staging OAuth configuration - only included in ant builds with staging flag
 // Uses literal check for dead code elimination
 const STAGING_OAUTH_CONFIG =
-  readEnv('USER_TYPE') === 'ant'
+  process.env.USER_TYPE === 'ant'
     ? ({
         BASE_API_URL: 'https://api-staging.anthropic.com',
         CONSOLE_AUTHORIZE_URL:

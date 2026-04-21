@@ -3,6 +3,7 @@ import { refreshAndGetAwsCredentials } from '@claude-code/provider/authAlias.js'
 import { getAWSRegion, isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
 import { getAWSClientProxyConfig } from '@claude-code/provider/proxy.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 export const getBedrockInferenceProfiles = memoize(async function (): Promise<
   string[]

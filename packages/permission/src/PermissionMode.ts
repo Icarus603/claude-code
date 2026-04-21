@@ -92,7 +92,7 @@ const PERMISSION_MODE_CONFIG: Partial<
 export function isExternalPermissionMode(
   mode: PermissionMode,
 ): mode is ExternalPermissionMode {
-  if (readEnv('USER_TYPE') !== 'ant') {
+  if (process.env.USER_TYPE !== 'ant') {
     return true
   }
   return mode !== 'auto' && mode !== 'bubble'

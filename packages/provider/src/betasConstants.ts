@@ -25,7 +25,7 @@ export const AFK_MODE_BETA_HEADER = feature('TRANSCRIPT_CLASSIFIER')
   ? 'afk-mode-2026-01-31'
   : ''
 export const CLI_INTERNAL_BETA_HEADER =
-  readEnv('USER_TYPE') === 'ant' ? 'cli-internal-2026-02-09' : ''
+  process.env.USER_TYPE === 'ant' ? 'cli-internal-2026-02-09' : ''
 export const ADVISOR_BETA_HEADER = 'advisor-tool-2026-03-01'
 
 /**

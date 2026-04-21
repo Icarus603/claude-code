@@ -2,6 +2,7 @@ import memoize from 'lodash-es/memoize.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { hasNodeOption } from '@claude-code/config/env/utils'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 /**
  * Load CA certificates for TLS connections.

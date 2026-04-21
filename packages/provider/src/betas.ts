@@ -31,6 +31,7 @@ import { getCanonicalName } from '@claude-code/provider/model.js'
 import { get3PModelCapabilityOverride } from '@claude-code/provider/model/modelSupportOverrides.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { getInitialSettings } from '@claude-code/config/settings'
+import { readEnv } from '@claude-code/config/env/utils'
 
 /**
  * SDK-provided betas that are allowed for API key users.
@@ -154,7 +155,7 @@ export function modelSupportsStructuredOutputs(model: string): boolean {
 export function modelSupportsAutoMode(model: string): boolean {
   if (feature('TRANSCRIPT_CLASSIFIER')) {
     const m = getCanonicalName(model)
-    if (readEnv('USER_TYPE') !== 'ant' && getAPIProvider() !== 'firstParty') {
+    if (process.env.USER_TYPE !== 'ant' && getAPIProvider() !== 'firstParty') {
       return false
     }
     const config = getFeatureValue_CACHED_MAY_BE_STALE<{
@@ -168,7 +169,7 @@ export function modelSupportsAutoMode(model: string): boolean {
     ) {
       return true
     }
-    if (readEnv('USER_TYPE') === 'ant') {
+    if (process.env.USER_TYPE === 'ant') {
       if (m.includes('claude-3-')) return false
       if (/claude-(opus|sonnet|haiku)-4(?!-[6-9])/.test(m)) return false
       return true
@@ -214,7 +215,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
   if (!isHaiku) {
     betaHeaders.push(CLAUDE_CODE_20250219_BETA_HEADER)
     if (
-      readEnv('USER_TYPE') === 'ant' &&
+      process.env.USER_TYPE === 'ant' &&
       readEnv('CLAUDE_CODE_ENTRYPOINT') === 'cli'
     ) {
       if (CLI_INTERNAL_BETA_HEADER) {
@@ -246,7 +247,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
 
   const antOptedIntoToolClearing =
     isEnvTruthy(readEnv('USE_API_CONTEXT_MANAGEMENT')) &&
-    readEnv('USER_TYPE') === 'ant'
+    process.env.USER_TYPE === 'ant'
 
   const thinkingPreservationEnabled = modelSupportsContextManagement(model)
 
@@ -269,7 +270,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
     betaHeaders.push(STRUCTURED_OUTPUTS_BETA_HEADER)
   }
   if (
-    readEnv('USER_TYPE') === 'ant' &&
+    process.env.USER_TYPE === 'ant' &&
     includeFirstPartyOnlyBetas &&
     tokenEfficientToolsEnabled
   ) {
@@ -334,7 +335,7 @@ export function getMergedBetas(
       baseBetas.push(CLAUDE_CODE_20250219_BETA_HEADER)
     }
     if (
-      readEnv('USER_TYPE') === 'ant' &&
+      process.env.USER_TYPE === 'ant' &&
       readEnv('CLAUDE_CODE_ENTRYPOINT') === 'cli' &&
       CLI_INTERNAL_BETA_HEADER &&
       !baseBetas.includes(CLI_INTERNAL_BETA_HEADER)
