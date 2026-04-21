@@ -2,11 +2,11 @@ import { join } from 'path'
 import React from 'react'
 import { ExportDialog } from '@claude-code/repl/components/ExportDialog.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import type { Message } from '../../types/message.js'
-import { getCwd } from '../../utils/cwd.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
+import type { Message } from '@claude-code/agent/messageShapes'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { renderMessagesToPlainText } from '@claude-code/output/render/exportRenderer.js'
-import { writeFileSync_DEPRECATED } from '../../utils/slowOperations.js'
+import { writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
 
 function formatTimestamp(date: Date): string {
   const year = date.getFullYear()

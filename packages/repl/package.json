@@ -490,6 +490,18 @@
     "./fileIndex/index.js": "./src/fileIndex/index.ts",
     "./commands/color/index.js": "./src/commands/color/index.ts",
     "./commands/color/color.js": "./src/commands/color/color.ts",
-    "./commands/statusline.js": "./src/commands/statusline.tsx"
+    "./commands/statusline.js": "./src/commands/statusline.tsx",
+    "./commands/diff/diff.js": "./src/commands/diff/diff.tsx",
+    "./commands/diff/index.js": "./src/commands/diff/index.ts",
+    "./commands/usage/usage.js": "./src/commands/usage/usage.tsx",
+    "./commands/usage/index.js": "./src/commands/usage/index.ts",
+    "./commands/stats/stats.js": "./src/commands/stats/stats.tsx",
+    "./commands/stats/index.js": "./src/commands/stats/index.ts",
+    "./commands/config/config.js": "./src/commands/config/config.tsx",
+    "./commands/config/index.js": "./src/commands/config/index.ts",
+    "./commands/doctor/doctor.js": "./src/commands/doctor/doctor.tsx",
+    "./commands/doctor/index.js": "./src/commands/doctor/index.ts",
+    "./commands/export/export.js": "./src/commands/export/export.tsx",
+    "./commands/export/index.js": "./src/commands/export/index.ts"
   }
 }
