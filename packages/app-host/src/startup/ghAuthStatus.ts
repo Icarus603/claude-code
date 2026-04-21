@@ -1,5 +1,5 @@
 import { execa } from 'execa'
-import { which } from '../which.js'
+import { which } from '@claude-code/shell/which.js'
 
 export type GhAuthStatus =
   | 'authenticated'
