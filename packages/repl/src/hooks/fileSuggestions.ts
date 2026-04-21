@@ -10,7 +10,7 @@ import {
   CHUNK_MS,
   FileIndex,
   yieldToEventLoop,
-} from 'src/native-ts/file-index/index.js'
+} from '@claude-code/repl/fileIndex/index.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { FileSuggestionCommandInput } from 'src/types/fileSuggestion.js'
 import { getGlobalConfig } from '@claude-code/config'
