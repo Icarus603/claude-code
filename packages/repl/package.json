@@ -487,6 +487,8 @@
     "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts",
     "./collapseTeammateShutdowns.js": "./src/collapseTeammateShutdowns.ts",
     "./collapseHookSummaries.js": "./src/collapseHookSummaries.ts",
-    "./fileIndex/index.js": "./src/fileIndex/index.ts"
+    "./fileIndex/index.js": "./src/fileIndex/index.ts",
+    "./commands/color/index.js": "./src/commands/color/index.ts",
+    "./commands/color/color.js": "./src/commands/color/color.ts"
   }
 }
