@@ -21,6 +21,7 @@
     "./launchRepl": "./src/launchRepl.tsx",
     "./launchRepl.js": "./src/launchRepl.tsx",
     "./commands/initCommand.js": "./src/commands/initCommand.ts",
-    "./commands/init-verifiers.js": "./src/commands/init-verifiers.ts"
+    "./commands/init-verifiers.js": "./src/commands/init-verifiers.ts",
+    "./heapDumpService.js": "./src/heapDumpService.ts"
   }
 }

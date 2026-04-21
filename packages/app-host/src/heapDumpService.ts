@@ -15,12 +15,12 @@ import {
 } from 'v8'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { logEvent } from '@claude-code/local-observability'
-import { logForDebugging } from './debug.js'
-import { toError } from './errors.js'
-import { getDesktopPath } from './file.js'
-import { getFsImplementation } from './fsOperations.js'
-import { logError } from './log.js'
-import { jsonStringify } from './slowOperations.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
+import { getDesktopPath } from '@claude-code/storage/file.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { logError } from '@claude-code/local-observability/log.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 export type HeapDumpResult = {
   success: boolean
