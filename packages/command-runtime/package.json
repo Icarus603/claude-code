@@ -19,6 +19,8 @@
     "./gitignore.js": "./src/gitignore.ts",
     "./promptShellExecution.js": "./src/promptShellExecution.ts",
     "./createMovedToPluginCommand.js": "./src/createMovedToPluginCommand.ts",
-    "./stubs/stubCommand.js": "./src/stubs/stubCommand.ts"
+    "./stubs/stubCommand.js": "./src/stubs/stubCommand.ts",
+    "./commands/skills/index.js": "./src/commands/skills/index.ts",
+    "./commands/skills/skills.js": "./src/commands/skills/skills.tsx"
   }
 }
