@@ -129,6 +129,10 @@
     "./git/gitConfigParser.js": "./git/gitConfigParser.ts",
     "./outputStyles.js": "./outputStyles.ts",
     "./plugin/commands/reload-plugins/index.js": "./plugin/commands/reload-plugins/index.ts",
-    "./plugin/commands/reload-plugins/reload-plugins.js": "./plugin/commands/reload-plugins/reload-plugins.ts"
+    "./plugin/commands/reload-plugins/reload-plugins.js": "./plugin/commands/reload-plugins/reload-plugins.ts",
+    "./plugin/commands/thinkback/index.js": "./plugin/commands/thinkback/index.ts",
+    "./plugin/commands/thinkback/thinkback.js": "./plugin/commands/thinkback/thinkback.tsx",
+    "./plugin/commands/thinkback-play/thinkback-play.js": "./plugin/commands/thinkback-play/thinkback-play.ts",
+    "./plugin/commands/thinkback-play/index.js": "./plugin/commands/thinkback-play/index.ts"
   }
 }
