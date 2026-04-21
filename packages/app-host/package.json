@@ -19,6 +19,8 @@
     "./cliArgs.js": "./src/cliArgs.ts",
     "./startup/*.js": "./src/startup/*.ts",
     "./launchRepl": "./src/launchRepl.tsx",
-    "./launchRepl.js": "./src/launchRepl.tsx"
+    "./launchRepl.js": "./src/launchRepl.tsx",
+    "./commands/initCommand.js": "./src/commands/initCommand.ts",
+    "./commands/init-verifiers.js": "./src/commands/init-verifiers.ts"
   }
 }
