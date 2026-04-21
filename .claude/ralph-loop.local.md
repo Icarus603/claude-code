@@ -1,10 +1,10 @@
 ---
 active: true
-iteration: 3
+iteration: 1
 session_id: 
-max_iterations: 1000
+max_iterations: 100000
 completion_promise: null
-started_at: "2026-04-20T23:22:57Z"
+started_at: "2026-04-21T07:18:28Z"
 ---
 
-不要停，一直跟著 Task List 做！不要問我！自己合理安排！嚴格按照 Task List 做
+不要停，一直跟著 Task List 做！不要問我！自己合理安排！嚴格按照 Task List 做！不要為了圖快就不紮實完成！每個重構步驟都要穩扎穩打落到實處！

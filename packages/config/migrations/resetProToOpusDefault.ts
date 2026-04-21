@@ -1,8 +1,8 @@
 import { logEvent } from '@claude-code/local-observability'
-import { isProSubscriber } from '../utils/auth.js'
+import { isProSubscriber } from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { getAPIProvider } from '../utils/model/providers.js'
-import { getSettings_DEPRECATED } from '../utils/settings/settings.js'
+import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 
 export function resetProToOpusDefault(): void {
   const config = getGlobalConfig()

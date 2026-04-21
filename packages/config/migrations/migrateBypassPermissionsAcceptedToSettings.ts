@@ -1,10 +1,10 @@
 import { logEvent } from '@claude-code/local-observability'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logError } from '../utils/log.js'
+import { logError } from '@claude-code/local-observability/log.js'
 import {
   hasSkipDangerousModePermissionPrompt,
   updateSettingsForSource,
-} from '../utils/settings/settings.js'
+} from '@claude-code/config/settings'
 
 /**
  * Migration: Move bypassPermissionsModeAccepted from global config to settings.json

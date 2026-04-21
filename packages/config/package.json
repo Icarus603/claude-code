@@ -54,6 +54,7 @@
     "./env/paths": "./env/paths.ts",
     "./env/dynamic": "./env/dynamic.ts",
     "./env/_deps": "./env/_deps.ts",
+    "./migrations/*.js": "./migrations/*.ts",
     "./plugin": "./plugin/index.ts",
     "./plugin/_deps": "./plugin/_deps.ts",
     "./plugin/types": "./plugin/types.ts",
