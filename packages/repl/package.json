@@ -489,6 +489,7 @@
     "./collapseHookSummaries.js": "./src/collapseHookSummaries.ts",
     "./fileIndex/index.js": "./src/fileIndex/index.ts",
     "./commands/color/index.js": "./src/commands/color/index.ts",
-    "./commands/color/color.js": "./src/commands/color/color.ts"
+    "./commands/color/color.js": "./src/commands/color/color.ts",
+    "./commands/statusline.js": "./src/commands/statusline.tsx"
   }
 }

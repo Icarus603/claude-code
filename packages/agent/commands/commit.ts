@@ -1,7 +1,7 @@
-import type { Command } from '../commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import { getAttributionTexts } from '@claude-code/agent/attribution.js'
-import { executeShellCommandsInPrompt } from '../utils/promptShellExecution.js'
-import { getUndercoverInstructions, isUndercover } from '../utils/undercover.js'
+import { executeShellCommandsInPrompt } from '@claude-code/command-runtime/promptShellExecution.js'
+import { getUndercoverInstructions, isUndercover } from '@claude-code/tool-registry/undercover.js'
 
 const ALLOWED_TOOLS = [
   'Bash(git add:*)',

@@ -10,6 +10,7 @@
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
-    "./*.js": "./src/*.ts"
+    "./*.js": "./src/*.ts",
+    "./commands/bridge-kick.js": "./commands/bridge-kick.ts"
   }
 }
