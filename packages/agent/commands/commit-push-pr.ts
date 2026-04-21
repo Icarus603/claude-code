@@ -1,11 +1,12 @@
-import type { Command } from '../commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import {
   getAttributionTexts,
   getEnhancedPRAttribution,
 } from '@claude-code/agent/attribution.js'
-import { getDefaultBranch } from '../utils/git.js'
-import { executeShellCommandsInPrompt } from '../utils/promptShellExecution.js'
-import { getUndercoverInstructions, isUndercover } from '../utils/undercover.js'
+import { getDefaultBranch } from '@claude-code/storage/git.js'
+import { executeShellCommandsInPrompt } from '@claude-code/command-runtime/promptShellExecution.js'
+import { getUndercoverInstructions, isUndercover } from '@claude-code/tool-registry/undercover.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 const ALLOWED_TOOLS = [
   'Bash(git checkout --branch:*)',
@@ -31,8 +32,8 @@ function getPromptContent(
     getAttributionTexts()
   // Use provided PR attribution or fall back to default
   const effectivePrAttribution = prAttribution ?? defaultPrAttribution
-  const safeUser = process.env.SAFEUSER || ''
-  const username = process.env.USER || ''
+  const safeUser = readEnv('SAFEUSER') || ''
+  const username = readEnv('USER') || ''
 
   let prefix = ''
   let reviewerArg = ' and `--reviewer anthropics/claude-code`'

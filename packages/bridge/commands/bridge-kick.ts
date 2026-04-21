@@ -1,6 +1,6 @@
 import { getBridgeDebugHandle } from '@claude-code/bridge/bridgeDebug.js'
-import type { Command } from '../commands.js'
-import type { LocalCommandCall } from '../types/command.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
+import type { LocalCommandCall } from '@claude-code/agent/command.js'
 
 /**
  * Ant-only: inject bridge failure states to manually test recovery paths.
