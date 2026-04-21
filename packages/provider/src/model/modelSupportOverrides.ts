@@ -1,5 +1,6 @@
 import memoize from 'lodash-es/memoize.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 export type ModelCapabilityOverride =
   | 'effort'
@@ -50,8 +51,8 @@ export const get3PModelCapabilityOverride = memoize(
     const m = model.toLowerCase()
     const tiers = getAPIProvider() === 'openai' ? OPENAI_TIERS : ANTHROPIC_TIERS
     for (const tier of tiers) {
-      const pinned = process.env[tier.modelEnvVar]
-      const capabilities = process.env[tier.capabilitiesEnvVar]
+      const pinned = readEnv(tier.modelEnvVar)
+      const capabilities = readEnv(tier.capabilitiesEnvVar)
       if (!pinned || capabilities === undefined) continue
       if (m !== pinned.toLowerCase()) continue
       return capabilities
