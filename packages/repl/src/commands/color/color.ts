@@ -13,7 +13,7 @@ import {
   getTranscriptPath,
   saveAgentColor,
 } from '@claude-code/storage/sessionStorage.js'
-import { isTeammate } from '../../utils/teammate.js'
+import { isTeammate } from '@claude-code/swarm/teammateState.js'
 
 const RESET_ALIASES = ['default', 'reset', 'none', 'gray', 'grey'] as const
 
