@@ -95,7 +95,7 @@ import type { DiscoverySignal } from '../services/skillSearch/signals.js'
 const skillSearchModules = feature('EXPERIMENTAL_SKILL_SEARCH')
   ? {
       featureCheck:
-        require('../services/skillSearch/featureCheck.js') as typeof import('../services/skillSearch/featureCheck.js'),
+        require('@claude-code/command-runtime/skills/featureCheck.js') as typeof import('@claude-code/command-runtime/skills/featureCheck'),
       prefetch:
         require('../services/skillSearch/prefetch.js') as typeof import('../services/skillSearch/prefetch.js'),
     }

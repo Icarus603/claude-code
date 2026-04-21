@@ -19,7 +19,7 @@ import {
 import type {
   SecureStorage,
   SecureStorageData,
-} from '@claude-code/mcp-runtime/secureStorageTypes'
+} from '@claude-code/mcp-runtime/secureStorageTypes.js'
 
 // `security -i` reads stdin with a 4096-byte fgets() buffer (BUFSIZ on darwin).
 // A command line longer than this is truncated mid-argument: the first 4096

@@ -61,7 +61,7 @@ import {
   type ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime'
 import { createRemoteSessionConfig } from '@claude-code/server'
-import { launchRepl, type AppWrapperProps } from '../../../../src/replLauncher.js'
+import { launchRepl, type AppWrapperProps } from '@claude-code/app-host/launchRepl.js'
 import { initializeLspServerManager } from '@claude-code/ide/lsp/manager.js'
 // Imports that were left behind when the .action() body moved from src/main.tsx
 // at commit 903c46b — the callsites survived the move, the import statements

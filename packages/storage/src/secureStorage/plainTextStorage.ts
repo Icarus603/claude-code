@@ -11,7 +11,7 @@ import {
 import type {
   SecureStorage,
   SecureStorageData,
-} from '@claude-code/mcp-runtime/secureStorageTypes'
+} from '@claude-code/mcp-runtime/secureStorageTypes.js'
 
 function getStoragePath(): { storageDir: string; storagePath: string } {
   const storageDir = getClaudeConfigHomeDir()

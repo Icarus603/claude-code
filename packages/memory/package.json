@@ -34,6 +34,7 @@
     "./sessionMemoryPrompts": "./src/sessionMemoryPrompts.ts",
     "./teamMemorySyncWatcher": "./src/teamMemorySyncWatcher.ts",
     "./memoryFileDetection": "./src/memoryFileDetection.ts",
-    "./projectGitInfo": "./src/projectGitInfo.ts"
+    "./projectGitInfo": "./src/projectGitInfo.ts",
+    "./memoryShapeTelemetry": "./src/memoryShapeTelemetry.ts"
   }
 }

@@ -1,7 +1,7 @@
 import { createFallbackStorage } from './fallbackStorage.js'
 import { macOsKeychainStorage } from './macOsKeychainStorage.js'
 import { plainTextStorage } from './plainTextStorage.js'
-import type { SecureStorage } from '@claude-code/mcp-runtime/secureStorageTypes'
+import type { SecureStorage } from '@claude-code/mcp-runtime/secureStorageTypes.js'
 
 /**
  * Get the appropriate secure storage implementation for the current platform
