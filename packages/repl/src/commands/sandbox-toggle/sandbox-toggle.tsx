@@ -3,16 +3,16 @@ import React from 'react'
 import { getCwdState } from '@claude-code/app-host/bootstrap/state.js'
 import { SandboxSettings } from '@claude-code/repl/components/sandbox/SandboxSettings.js'
 import { color } from '@anthropic/ink'
-import { getPlatform } from '../../utils/platform.js'
+import { getPlatform } from '@claude-code/config/platform.js'
 import {
   addToExcludedCommands,
   SandboxManager,
-} from '../../utils/sandbox/sandbox-adapter.js'
+} from '@claude-code/shell/sandbox/sandbox-adapter.js'
 import {
   getSettings_DEPRECATED,
   getSettingsFilePathForSource,
-} from '../../utils/settings/settings.js'
-import type { ThemeName } from '../../utils/theme.js'
+} from '@claude-code/config/settings'
+import type { ThemeName } from '@anthropic/ink'
 
 export async function call(
   onDone: (result?: string) => void,

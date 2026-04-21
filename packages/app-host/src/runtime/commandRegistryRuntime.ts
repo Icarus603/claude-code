@@ -1,5 +1,5 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import addDir from 'src/commands/add-dir/index.js'
+import addDir from '@claude-code/repl/commands/add-dir/index.js'
 import { installCommandRegistryHostBindings } from '@claude-code/command-runtime'
 import autofixPr from '@claude-code/command-runtime/stubs/stubCommand.js'
 import backfillSessions from '@claude-code/command-runtime/stubs/stubCommand.js'
@@ -142,7 +142,7 @@ import {
 } from '@claude-code/command-runtime/stubs/resetLimitsStub.js'
 import antTrace from '@claude-code/command-runtime/stubs/stubCommand.js'
 import perfIssue from '@claude-code/command-runtime/stubs/stubCommand.js'
-import sandboxToggle from 'src/commands/sandbox-toggle/index.js'
+import sandboxToggle from '@claude-code/repl/commands/sandbox-toggle/index.js'
 import chrome from 'src/commands/chrome/index.js'
 import stickers from '@claude-code/repl/commands/stickers/index.js'
 import advisor from '@claude-code/provider/commands/advisor.js'
