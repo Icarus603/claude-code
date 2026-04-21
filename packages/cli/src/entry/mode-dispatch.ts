@@ -221,7 +221,7 @@ import {
   getIsGit,
   getWorktreeCount,
 } from '@claude-code/storage/git.js'
-import { getGhAuthStatus } from 'src/utils/github/ghAuthStatus.js'
+import { getGhAuthStatus } from '@claude-code/app-host/startup/ghAuthStatus.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { getModelDeprecationWarning } from '@claude-code/provider/model/deprecation.js'
@@ -276,7 +276,7 @@ import {
   logPluginLoadErrors,
   logPluginsEnabledForSession,
 } from '@claude-code/tool-registry/telemetry/pluginTelemetry.js'
-import { logSkillsLoaded } from 'src/utils/telemetry/skillLoadedEvent.js'
+import { logSkillsLoaded } from '@claude-code/app-host/startup/skillLoadedEvent.js'
 import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
 import { validateUuid } from '@claude-code/agent/uuid.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
