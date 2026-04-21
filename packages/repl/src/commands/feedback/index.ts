@@ -1,7 +1,7 @@
-import type { Command } from '../../commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
-import { isEssentialTrafficOnly } from '../../utils/privacyLevel.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 
 const feedback = {
   aliases: ['bug'],

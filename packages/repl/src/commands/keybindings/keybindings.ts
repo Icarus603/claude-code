@@ -5,8 +5,8 @@ import {
   isKeybindingCustomizationEnabled,
 } from '@claude-code/repl/keybindings/loadUserBindings.js'
 import { generateKeybindingsTemplate } from '@claude-code/repl/keybindings/template.js'
-import { getErrnoCode } from '../../utils/errors.js'
-import { editFileInEditor } from '../../utils/promptEditor.js'
+import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
+import { editFileInEditor } from '@claude-code/repl/promptEditor.js'
 
 export async function call(): Promise<{ type: 'text'; value: string }> {
   if (!isKeybindingCustomizationEnabled()) {

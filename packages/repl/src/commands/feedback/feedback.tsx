@@ -2,10 +2,10 @@ import * as React from 'react'
 import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
-} from '../../commands.js'
+} from '@claude-code/command-runtime/runtime'
 import { Feedback } from '@claude-code/repl/components/Feedback.js'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import type { Message } from '../../types/message.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 
 // Shared function to render the Feedback component
 export function renderFeedbackComponent(

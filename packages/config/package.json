@@ -127,6 +127,8 @@
     "./crypto.js": "./crypto.ts",
     "./gitFilesystem.js": "./gitFilesystem.ts",
     "./git/gitConfigParser.js": "./git/gitConfigParser.ts",
-    "./outputStyles.js": "./outputStyles.ts"
+    "./outputStyles.js": "./outputStyles.ts",
+    "./plugin/commands/reload-plugins/index.js": "./plugin/commands/reload-plugins/index.ts",
+    "./plugin/commands/reload-plugins/reload-plugins.js": "./plugin/commands/reload-plugins/reload-plugins.ts"
   }
 }

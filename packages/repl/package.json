@@ -525,6 +525,18 @@
     "./commands/release-notes/release-notes.js": "./src/commands/release-notes/release-notes.ts",
     "./commands/release-notes/index.js": "./src/commands/release-notes/index.ts",
     "./commands/files/index.js": "./src/commands/files/index.ts",
-    "./commands/files/files.js": "./src/commands/files/files.ts"
+    "./commands/files/files.js": "./src/commands/files/files.ts",
+    "./commands/tag/tag.js": "./src/commands/tag/tag.tsx",
+    "./commands/tag/index.js": "./src/commands/tag/index.ts",
+    "./commands/hooks/hooks.js": "./src/commands/hooks/hooks.tsx",
+    "./commands/hooks/index.js": "./src/commands/hooks/index.ts",
+    "./commands/keybindings/keybindings.js": "./src/commands/keybindings/keybindings.ts",
+    "./commands/keybindings/index.js": "./src/commands/keybindings/index.ts",
+    "./commands/exit/exit.js": "./src/commands/exit/exit.tsx",
+    "./commands/exit/index.js": "./src/commands/exit/index.ts",
+    "./commands/feedback/index.js": "./src/commands/feedback/index.ts",
+    "./commands/feedback/feedback.js": "./src/commands/feedback/feedback.tsx",
+    "./commands/plan/plan.js": "./src/commands/plan/plan.tsx",
+    "./commands/plan/index.js": "./src/commands/plan/index.ts"
   }
 }
