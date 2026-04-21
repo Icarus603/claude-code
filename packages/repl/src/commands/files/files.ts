@@ -1,8 +1,8 @@
 import { relative } from 'path'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { LocalCommandResult } from '../../types/command.js'
-import { getCwd } from '../../utils/cwd.js'
-import { cacheKeys } from '../../utils/fileStateCache.js'
+import type { LocalCommandResult } from '@claude-code/agent/command.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
+import { cacheKeys } from '@claude-code/tool-registry/fileStateCache.js'
 
 export async function call(
   _args: string,

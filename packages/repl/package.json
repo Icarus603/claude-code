@@ -517,6 +517,14 @@
     "./commands/vim/vim.js": "./src/commands/vim/vim.ts",
     "./commands/vim/index.js": "./src/commands/vim/index.ts",
     "./commands/rewind/rewind.js": "./src/commands/rewind/rewind.ts",
-    "./commands/rewind/index.js": "./src/commands/rewind/index.ts"
+    "./commands/rewind/index.js": "./src/commands/rewind/index.ts",
+    "./commands/install-slack-app/install-slack-app.js": "./src/commands/install-slack-app/install-slack-app.ts",
+    "./commands/install-slack-app/index.js": "./src/commands/install-slack-app/index.ts",
+    "./commands/stickers/stickers.js": "./src/commands/stickers/stickers.ts",
+    "./commands/stickers/index.js": "./src/commands/stickers/index.ts",
+    "./commands/release-notes/release-notes.js": "./src/commands/release-notes/release-notes.ts",
+    "./commands/release-notes/index.js": "./src/commands/release-notes/index.ts",
+    "./commands/files/index.js": "./src/commands/files/index.ts",
+    "./commands/files/files.js": "./src/commands/files/files.ts"
   }
 }
