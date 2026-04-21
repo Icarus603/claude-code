@@ -30,7 +30,8 @@
     "./powershell/staticPrefix.js": "./src/powershell/staticPrefix.ts",
     "./powershell/dangerousCmdlets.js": "./src/powershell/dangerousCmdlets.ts",
     "./shellCommand.js": "./src/shellCommand.ts",
-    "./bash/prefix.js": "./src/bash/prefix.ts"
+    "./bash/prefix.js": "./src/bash/prefix.ts",
+    "./sandbox/sandbox-adapter.js": "./src/sandbox/sandbox-adapter.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",
