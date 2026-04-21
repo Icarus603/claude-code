@@ -543,6 +543,11 @@
     "./tips/tipHistory.js": "./src/tips/tipHistory.ts",
     "./tips/tipScheduler.js": "./src/tips/tipScheduler.ts",
     "./tips/types.js": "./src/tips/types.ts",
-    "./tips/tipRegistry.js": "./src/tips/tipRegistry.ts"
+    "./tips/tipRegistry.js": "./src/tips/tipRegistry.ts",
+    "./commands/add-dir/validation.js": "./src/commands/add-dir/validation.ts",
+    "./commands/add-dir/add-dir.js": "./src/commands/add-dir/add-dir.tsx",
+    "./commands/add-dir/index.js": "./src/commands/add-dir/index.ts",
+    "./commands/sandbox-toggle/sandbox-toggle.js": "./src/commands/sandbox-toggle/sandbox-toggle.tsx",
+    "./commands/sandbox-toggle/index.js": "./src/commands/sandbox-toggle/index.ts"
   }
 }

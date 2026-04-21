@@ -5,17 +5,17 @@ import {
   getAdditionalDirectoriesForClaudeMd,
   setAdditionalDirectoriesForClaudeMd,
 } from '@claude-code/app-host/bootstrap/state.js'
-import type { LocalJSXCommandContext } from '../../commands.js'
+import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { AddWorkspaceDirectory } from '@claude-code/permission/components/rules/AddWorkspaceDirectory.js'
 import { Box, Text } from '@anthropic/ink'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import {
   applyPermissionUpdate,
   persistPermissionUpdate,
 } from '@claude-code/permission/PermissionUpdate'
 import type { PermissionUpdateDestination } from '@claude-code/permission/PermissionUpdateSchema'
-import { SandboxManager } from '../../utils/sandbox/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox/sandbox-adapter.js'
 import {
   addDirHelpMessage,
   validateDirectoryForWorkspace,
