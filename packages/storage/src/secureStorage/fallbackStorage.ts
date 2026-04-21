@@ -1,7 +1,7 @@
 import type {
   SecureStorage,
   SecureStorageData,
-} from '@claude-code/mcp-runtime/secureStorageTypes'
+} from '@claude-code/mcp-runtime/secureStorageTypes.js'
 
 /**
  * Creates a fallback storage that tries to use the primary storage first,

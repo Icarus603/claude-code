@@ -52,7 +52,7 @@ import {
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const teamMemOps = feature('TEAMMEM')
-  ? (require('./teamMemoryOps.js') as typeof import('./teamMemoryOps.js'))
+  ? (require('@claude-code/memory/teamMemoryOps') as typeof import('@claude-code/memory/teamMemoryOps'))
   : null
 const SNIP_TOOL_NAME = feature('HISTORY_SNIP')
   ? (

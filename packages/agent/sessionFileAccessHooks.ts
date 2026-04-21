@@ -33,10 +33,10 @@ const teamMemPaths = feature('TEAMMEM')
   ? (require('@claude-code/memory/teamMemPaths') as typeof import('@claude-code/memory/teamMemPaths'))
   : null
 const teamMemWatcher = feature('TEAMMEM')
-  ? (require('../services/teamMemorySync/watcher.js') as typeof import('../services/teamMemorySync/watcher.js'))
+  ? (require('@claude-code/memory/teamMemorySyncWatcher') as typeof import('@claude-code/memory/teamMemorySyncWatcher'))
   : null
 const memoryShapeTelemetry = feature('MEMORY_SHAPE_TELEMETRY')
-  ? (require('../memdir/memoryShapeTelemetry.js') as typeof import('../memdir/memoryShapeTelemetry.js'))
+  ? (require('@claude-code/memory/memoryShapeTelemetry') as typeof import('@claude-code/memory/memoryShapeTelemetry'))
   : null
 
 /* eslint-enable @typescript-eslint/no-require-imports */

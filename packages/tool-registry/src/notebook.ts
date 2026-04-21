@@ -12,7 +12,7 @@ import type {
   NotebookCellSourceOutput,
   NotebookContent,
   NotebookOutputImage,
-} from '../types/notebook.js'
+} from './notebookTypes.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { expandPath } from '@claude-code/storage/path.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
