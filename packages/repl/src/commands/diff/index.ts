@@ -1,4 +1,4 @@
-import type { Command } from '../../commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 
 export default {
   type: 'local-jsx',

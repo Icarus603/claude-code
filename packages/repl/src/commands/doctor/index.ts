@@ -1,5 +1,5 @@
-import type { Command } from '../../commands.js'
-import { isEnvTruthy } from '../../utils/envUtils.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 const doctor: Command = {
   name: 'doctor',
