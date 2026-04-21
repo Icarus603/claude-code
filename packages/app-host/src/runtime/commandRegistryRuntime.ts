@@ -51,7 +51,7 @@ const agentsPlatform =
     ? require('src/commands/agents-platform/index.js').default
     : null
 /* eslint-enable @typescript-eslint/no-require-imports */
-import securityReview from 'src/commands/security-review.js'
+import securityReview from '@claude-code/agent/commands/security-review.js'
 import bughunter from 'src/commands/bughunter/index.js'
 import terminalSetup from 'src/commands/terminalSetup/index.js'
 import usage from 'src/commands/usage/index.js'
@@ -145,7 +145,7 @@ import perfIssue from 'src/commands/perf-issue/index.js'
 import sandboxToggle from 'src/commands/sandbox-toggle/index.js'
 import chrome from 'src/commands/chrome/index.js'
 import stickers from 'src/commands/stickers/index.js'
-import advisor from 'src/commands/advisor.js'
+import advisor from '@claude-code/provider/commands/advisor.js'
 import provider from '@claude-code/provider/commands/provider.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'

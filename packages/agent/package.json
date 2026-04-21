@@ -99,7 +99,8 @@
     "./combinedAbortSignal.js": "./combinedAbortSignal.ts",
     "./contentArray.js": "./contentArray.ts",
     "./idleTimeout.js": "./idleTimeout.ts",
-    "./sessionUrl.js": "./sessionUrl.ts"
+    "./sessionUrl.js": "./sessionUrl.ts",
+    "./commands/security-review.js": "./commands/security-review.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
