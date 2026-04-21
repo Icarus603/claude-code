@@ -9,7 +9,7 @@ import {
   isAutoCompactEnabled,
 } from '@claude-code/agent/compaction/autoCompact.js'
 import { useCompactWarningSuppression } from '@claude-code/agent/compaction/compactWarningHook.js'
-import { getUpgradeMessage } from 'src/utils/model/contextWindowUpgradeCheck.js'
+import { getUpgradeMessage } from '@claude-code/provider/model/contextWindowUpgradeCheck.js'
 
 type Props = {
   tokenUsage: number

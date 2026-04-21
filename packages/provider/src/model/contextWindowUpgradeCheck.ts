@@ -1,5 +1,5 @@
-import { checkOpus1mAccess, checkSonnet1mAccess } from './check1mAccess.js'
-import { getUserSpecifiedModelSetting } from './model.js'
+import { checkOpus1mAccess, checkSonnet1mAccess } from '@claude-code/provider/model/check1mAccess.js'
+import { getUserSpecifiedModelSetting } from '@claude-code/provider/model.js'
 
 // @[MODEL LAUNCH]: Add a branch for the new model if it supports a 1M context upgrade path.
 /**

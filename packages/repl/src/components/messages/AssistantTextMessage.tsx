@@ -21,7 +21,7 @@ import {
   isEmptyMessageText,
   NO_RESPONSE_REQUESTED,
 } from '@claude-code/agent/messages.js'
-import { getUpgradeMessage } from 'src/utils/model/contextWindowUpgradeCheck.js'
+import { getUpgradeMessage } from '@claude-code/provider/model/contextWindowUpgradeCheck.js'
 import {
   getDefaultSonnetModel,
   renderModelName,
