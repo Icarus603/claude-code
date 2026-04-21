@@ -15,19 +15,19 @@ import {
 } from "../../bootstrap/state.js";
 import {
 	migrateBypassPermissionsAcceptedToSettings,
-} from "src/migrations/migrateBypassPermissionsAcceptedToSettings.js";
-import { migrateEnableAllProjectMcpServersToSettings } from "src/migrations/migrateEnableAllProjectMcpServersToSettings.js";
-import { resetProToOpusDefault } from "src/migrations/resetProToOpusDefault.js";
-import { migrateSonnet1mToSonnet45 } from "src/migrations/migrateSonnet1mToSonnet45.js";
-import { migrateLegacyOpusToCurrent } from "src/migrations/migrateLegacyOpusToCurrent.js";
-import { migrateSonnet45ToSonnet46 } from "src/migrations/migrateSonnet45ToSonnet46.js";
-import { migrateOpusToOpus1m } from "src/migrations/migrateOpusToOpus1m.js";
-import { migrateReplBridgeEnabledToRemoteControlAtStartup } from "src/migrations/migrateReplBridgeEnabledToRemoteControlAtStartup.js";
-import { resetAutoModeOptInForDefaultOffer } from "src/migrations/resetAutoModeOptInForDefaultOffer.js";
-import { migrateFennecToOpus } from "src/migrations/migrateFennecToOpus.js";
+} from "@claude-code/config/migrations/migrateBypassPermissionsAcceptedToSettings.js";
+import { migrateEnableAllProjectMcpServersToSettings } from "@claude-code/config/migrations/migrateEnableAllProjectMcpServersToSettings.js";
+import { resetProToOpusDefault } from "@claude-code/config/migrations/resetProToOpusDefault.js";
+import { migrateSonnet1mToSonnet45 } from "@claude-code/config/migrations/migrateSonnet1mToSonnet45.js";
+import { migrateLegacyOpusToCurrent } from "@claude-code/config/migrations/migrateLegacyOpusToCurrent.js";
+import { migrateSonnet45ToSonnet46 } from "@claude-code/config/migrations/migrateSonnet45ToSonnet46.js";
+import { migrateOpusToOpus1m } from "@claude-code/config/migrations/migrateOpusToOpus1m.js";
+import { migrateReplBridgeEnabledToRemoteControlAtStartup } from "@claude-code/config/migrations/migrateReplBridgeEnabledToRemoteControlAtStartup.js";
+import { resetAutoModeOptInForDefaultOffer } from "@claude-code/config/migrations/resetAutoModeOptInForDefaultOffer.js";
+import { migrateFennecToOpus } from "@claude-code/config/migrations/migrateFennecToOpus.js";
 import { migrateChangelogFromConfig } from "@claude-code/repl/releaseNotes.js";
 import { getGlobalConfig, saveGlobalConfig } from "@claude-code/config";
-import { profileCheckpoint } from "src/utils/startupProfiler.js";
+import { profileCheckpoint } from "@claude-code/app-host/startup/startupProfiler.js";
 import { isEnvTruthy } from "@claude-code/config/env/utils";
 
 const CURRENT_MIGRATION_VERSION = 11;

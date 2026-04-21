@@ -3,11 +3,11 @@ import {
   getDefaultMainLoopModelSetting,
   isOpus1mMergeEnabled,
   parseUserSpecifiedModel,
-} from '../utils/model/model.js'
+} from '@claude-code/provider/model.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '../utils/settings/settings.js'
+} from '@claude-code/config/settings'
 
 /**
  * Migrate users with 'opus' pinned in their settings to 'opus[1m]' when they

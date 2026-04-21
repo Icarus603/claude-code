@@ -1,10 +1,10 @@
 import { logEvent } from '@claude-code/local-observability'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { logError } from '../utils/log.js'
+import { logError } from '@claude-code/local-observability/log.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '../utils/settings/settings.js'
+} from '@claude-code/config/settings'
 /**
  * Migration: Move user-set autoUpdates preference to settings.json env var
  * Only migrates if user explicitly disabled auto-updates (not for protection)

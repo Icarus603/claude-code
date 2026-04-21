@@ -3,12 +3,12 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { saveGlobalConfig } from '@claude-code/config'
-import { isLegacyModelRemapEnabled } from '../utils/model/model.js'
-import { getAPIProvider } from '../utils/model/providers.js'
+import { isLegacyModelRemapEnabled } from '@claude-code/provider/model.js'
+import { getAPIProvider } from '@claude-code/provider/providers.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '../utils/settings/settings.js'
+} from '@claude-code/config/settings'
 
 /**
  * Migrate first-party users off explicit Opus 4.0/4.1 model strings.
