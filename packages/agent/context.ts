@@ -50,7 +50,7 @@ export function getContextWindowForModel(
 ): number {
   // Allow override via environment variable (ant-only)
   const maxCtxToken = readEnv('CLAUDE_CODE_MAX_CONTEXT_TOKENS')
-  if (readEnv('USER_TYPE') === 'ant' && maxCtxToken) {
+  if (process.env.USER_TYPE === 'ant' && maxCtxToken) {
     const override = parseInt(maxCtxToken, 10)
     if (!isNaN(override) && override > 0) {
       return override
@@ -79,7 +79,7 @@ export function getContextWindowForModel(
   if (getSonnet1mExpTreatmentEnabled(model)) {
     return 1_000_000
   }
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     const antModel = resolveAntModel(model)
     if (antModel?.contextWindow) {
       return antModel.contextWindow
@@ -142,7 +142,7 @@ export function getModelMaxOutputTokens(model: string): {
   let defaultTokens: number
   let upperLimit: number
 
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     const antModel = resolveAntModel(model.toLowerCase())
     if (antModel) {
       defaultTokens = antModel.defaultMaxTokens ?? MAX_OUTPUT_TOKENS_DEFAULT

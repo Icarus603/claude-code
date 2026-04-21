@@ -55,7 +55,7 @@ export function getPlanModeV2ExploreAgentCount(): number {
  */
 export function isPlanModeInterviewPhaseEnabled(): boolean {
   // Always on for ants
-  if (readEnv('USER_TYPE') === 'ant') return true
+  if (process.env.USER_TYPE === 'ant') return true
 
   const env = readEnv('CLAUDE_CODE_PLAN_MODE_INTERVIEW_PHASE')
   if (isEnvTruthy(env)) return true

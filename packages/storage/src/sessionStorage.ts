@@ -418,7 +418,7 @@ export function getNodeEnv(): string {
 
 // exported for testing
 export function getUserType(): string {
-  return readEnv('USER_TYPE') || 'external'
+  return process.env.USER_TYPE || 'external'
 }
 
 function getEntrypoint(): string | undefined {

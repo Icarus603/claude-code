@@ -26,7 +26,7 @@ import { getGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 
 export function isUndercover(): boolean {
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     if (isEnvTruthy(readEnv('CLAUDE_CODE_UNDERCOVER'))) return true
     // Auto: active unless we've positively confirmed we're in an allowlisted
     // internal repo. 'external', 'none', and null (check not yet run) all
@@ -37,7 +37,7 @@ export function isUndercover(): boolean {
 }
 
 export function getUndercoverInstructions(): string {
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     return `## UNDERCOVER MODE — CRITICAL
 
 You are operating UNDERCOVER in a PUBLIC/OPEN-SOURCE repository. Your commit
@@ -78,7 +78,7 @@ BAD (never write these):
  * flag on mount.
  */
 export function shouldShowUndercoverAutoNotice(): boolean {
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     // If forced via env, user already knows; don't nag.
     if (isEnvTruthy(readEnv('CLAUDE_CODE_UNDERCOVER'))) return false
     if (!isUndercover()) return false

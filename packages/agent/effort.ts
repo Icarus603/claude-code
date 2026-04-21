@@ -61,7 +61,7 @@ export function modelSupportsMaxEffort(model: string): boolean {
   if (model.toLowerCase().includes('opus-4-6')) {
     return true
   }
-  if (readEnv('USER_TYPE') === 'ant' && resolveAntModel(model)) {
+  if (process.env.USER_TYPE === 'ant' && resolveAntModel(model)) {
     return true
   }
   return false
@@ -101,7 +101,7 @@ export function toPersistableEffort(
   if (value === 'low' || value === 'medium' || value === 'high') {
     return value
   }
-  if (value === 'max' && readEnv('USER_TYPE') === 'ant') {
+  if (value === 'max' && process.env.USER_TYPE === 'ant') {
     return value
   }
   return undefined
@@ -203,7 +203,7 @@ export function convertEffortValueToLevel(value: EffortValue): EffortLevel {
   if (typeof value === 'string') {
     return isEffortLevel(value) ? value : 'high'
   }
-  if (readEnv('USER_TYPE') === 'ant' && typeof value === 'number') {
+  if (process.env.USER_TYPE === 'ant' && typeof value === 'number') {
     if (value <= 50) return 'low'
     if (value <= 85) return 'medium'
     if (value <= 100) return 'high'
@@ -232,7 +232,7 @@ export function getEffortLevelDescription(level: EffortLevel): string {
  * Get user-facing description for effort values (both string and numeric)
  */
 export function getEffortValueDescription(value: EffortValue): string {
-  if (readEnv('USER_TYPE') === 'ant' && typeof value === 'number') {
+  if (process.env.USER_TYPE === 'ant' && typeof value === 'number') {
     return `[ANT-ONLY] Numeric effort value of ${value}`
   }
 
@@ -270,7 +270,7 @@ export function getOpusDefaultEffortConfig(): OpusDefaultEffortConfig {
 export function getDefaultEffortForModel(
   model: string,
 ): EffortValue | undefined {
-  if (readEnv('USER_TYPE') === 'ant') {
+  if (process.env.USER_TYPE === 'ant') {
     const config = getAntModelOverrideConfig()
     const isDefaultModel =
       config?.defaultModel !== undefined &&

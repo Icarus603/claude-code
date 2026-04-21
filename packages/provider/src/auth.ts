@@ -45,7 +45,7 @@ export const anthropicAuthProvider: AuthProvider<AnthropicCredentials> = {
       authorizationHeader: subscriber
         ? null
         : await getAnthropicAuthorizationHeader(context),
-      ...(readEnv('USER_TYPE') === 'ant' &&
+      ...(process.env.USER_TYPE === 'ant' &&
       auth.isEnvTruthy(readEnv('USE_STAGING_OAUTH'))
         ? { baseURL: auth.getOauthConfig().BASE_API_URL }
         : {}),

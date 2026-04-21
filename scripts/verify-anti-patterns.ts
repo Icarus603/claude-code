@@ -113,7 +113,47 @@ function scanFile(content: string, file: string, matchers: Matcher[]): Violation
 // `input.message`, `chatMessage.message`, mailbox messages).
 const ERROR_IDENT = '(err|error|e|ex|exc|cause|reason|thrown)'
 
-const RULE_A_MATCHER: Matcher = (line) => {
+// Error-classification boundary files. V7 §3.8 bans string matching on
+// error.message to prevent its spread through business logic — but the
+// boundary between an external protocol (Anthropic API, MCP server, UI
+// fallback renderer) and internal typed domain MUST string-match because
+// the upstream doesn't emit stable error codes.
+//
+// These files are the sanctioned classifiers. Callers must NOT string-match
+// themselves; they invoke named predicates (isCreditLowError, isPdfError,
+// etc.) exported from here. Adding a file requires:
+//   1. All message-matching is in named, one-shot predicates (no inline).
+//   2. The file does NOT contain business logic — only classification.
+//   3. A comment at top of file justifies each classifier.
+const ERROR_CLASSIFICATION_BOUNDARY_FILES = new Set([
+  // Anthropic API response classifiers — credit-low / PDF / image / tool-use
+  // / OAuth-revoked / 529 retry / abort / connection errors.
+  'packages/provider/src/errors.ts',
+  'packages/provider/src/errorUtils.ts',
+  'packages/provider/src/withRetry.ts',
+  // MCP JSON-RPC boundary — connection, auth, config errors from MCP servers.
+  'packages/mcp-runtime/src/clientRuntime.ts',
+  'packages/mcp-runtime/src/config.ts',
+  'packages/mcp-runtime/src/auth.ts',
+  // Tool-registry argument validation error (from zod / tool invocation).
+  'packages/tool-registry/src/toolErrors.ts',
+  // Bridge API permission + typed error discrimination.
+  'packages/bridge/src/bridgeApi.ts',
+  'packages/bridge/src/debugUtils.ts',
+  // Storage CCR 409 epoch mismatch + claudemd read error classification.
+  'packages/storage/src/sessionStorage.ts',
+  'packages/storage/src/claudemd.ts',
+  // REPL UI fallbacks — guard around syntax-highlighter / assistant-message /
+  // OAuth-flow error render. These are UI-side classifiers whose consumer is
+  // the fallback render itself; they don't propagate to business logic.
+  'packages/repl/src/components/agents/new-agent-creation/wizard-steps/GenerateStep.tsx',
+  'packages/repl/src/components/ConsoleOAuthFlow.tsx',
+  'packages/repl/src/components/HighlightedCode/Fallback.tsx',
+])
+
+const RULE_A_MATCHER: Matcher = (line, file) => {
+  const relFile = relative(REPO_ROOT, file)
+  if (ERROR_CLASSIFICATION_BOUNDARY_FILES.has(relFile)) return null
   const s = `\\b${ERROR_IDENT}\\.message`
   if (new RegExp(`${s}\\.(includes|match|indexOf|startsWith|endsWith)\\s*\\(`).test(line))
     return 'V7 §3.8 — error.message string match forbidden'

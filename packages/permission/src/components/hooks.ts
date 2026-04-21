@@ -140,7 +140,7 @@ export function usePermissionRequestLogging(
       sandboxEnabled: SandboxManager.isSandboxingEnabled(),
     })
 
-    if (readEnv('USER_TYPE') === 'ant') {
+    if (process.env.USER_TYPE === 'ant') {
       const permissionResult = toolUseConfirm.permissionResult
       if (
         toolUseConfirm.tool.name === BashTool.name &&
@@ -167,7 +167,7 @@ export function usePermissionRequestLogging(
 
     // [ANT-ONLY] Log bash tool calls, so we can categorize
     // & burn down calls that should have been allowed
-    if (readEnv('USER_TYPE') === 'ant') {
+    if (process.env.USER_TYPE === 'ant') {
       const parsedInput = BashTool.inputSchema.safeParse(toolUseConfirm.input)
       if (
         toolUseConfirm.tool.name === BashTool.name &&

@@ -13,7 +13,7 @@ const DEV_EXTENSION_ID = 'dihbgbndebgnbjfmelmegjepbnkhlgni'
 const ANT_EXTENSION_ID = 'dngcpimnedloihjnnfngkgjoidhnaolf'
 
 function getExtensionIds(): string[] {
-  return readEnv('USER_TYPE') === 'ant'
+  return process.env.USER_TYPE === 'ant'
     ? [PROD_EXTENSION_ID, DEV_EXTENSION_ID, ANT_EXTENSION_ID]
     : [PROD_EXTENSION_ID]
 }

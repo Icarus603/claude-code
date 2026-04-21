@@ -3,10 +3,10 @@ import { stat } from 'fs/promises'
 import { isAbsolute, join, relative, sep } from 'path'
 import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type {
-import { readEnv } from '@claude-code/config/env/utils'
   AttributionSnapshotMessage,
   FileAttributionState,
 } from '@claude-code/agent/logsTypes.js'
+import { readEnv } from '@claude-code/config/env/utils'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'

@@ -738,7 +738,7 @@ export function getAssistantMessageFromError(
       }
     }
 
-    if (readEnv('USER_TYPE') === 'ant') {
+    if (process.env.USER_TYPE === 'ant') {
       const baseMessage = `API Error: 400 ${error.message}\n\nRun /share and post the JSON file to ${MACRO.FEEDBACK_CHANNEL}.`
       const rewindInstruction = getIsNonInteractiveSession()
         ? ''
@@ -805,7 +805,7 @@ export function getAssistantMessageFromError(
   // defaulting to a custom internal-only model for Ants, and there might be
   // Ants using new or unknown org IDs that haven't been gated in.
   if (
-    readEnv('USER_TYPE') === 'ant' &&
+    process.env.USER_TYPE === 'ant' &&
     !readEnv('ANTHROPIC_MODEL') &&
     error instanceof Error &&
     error.message.toLowerCase().includes('invalid model name')

@@ -25,7 +25,7 @@ export function getUserAgent(): string {
     : ''
   const workload = getWorkload()
   const workloadSuffix = workload ? `, workload/${workload}` : ''
-  return `claude-cli/${MACRO.VERSION} (${readEnv('USER_TYPE')}, ${readEnv('CLAUDE_CODE_ENTRYPOINT') ?? 'cli'}${agentSdkVersion}${clientApp}${workloadSuffix})`
+  return `claude-cli/${MACRO.VERSION} (${process.env.USER_TYPE}, ${readEnv('CLAUDE_CODE_ENTRYPOINT') ?? 'cli'}${agentSdkVersion}${clientApp}${workloadSuffix})`
 }
 
 export function getMCPUserAgent(): string {

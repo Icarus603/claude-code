@@ -47,7 +47,7 @@ export function clearAllDumpState(): void {
 }
 
 export function addApiRequestToCache(requestData: unknown): void {
-  if (readEnv('USER_TYPE') !== 'ant') return
+  if (process.env.USER_TYPE !== 'ant') return
   cachedApiRequests.push({
     timestamp: new Date().toISOString(),
     request: requestData,
@@ -98,7 +98,7 @@ function dumpRequest(
     const req = jsonParse(body) as Record<string, unknown>
     addApiRequestToCache(req)
 
-    if (readEnv('USER_TYPE') !== 'ant') return
+    if (process.env.USER_TYPE !== 'ant') return
     const entries: string[] = []
     const messages = (req.messages ?? []) as Array<{ role?: string }>
 
@@ -172,7 +172,7 @@ export function createDumpPromptsFetch(
     const response = await globalThis.fetch(input, init)
 
     // Save response async
-    if (timestamp && response.ok && readEnv('USER_TYPE') === 'ant') {
+    if (timestamp && response.ok && process.env.USER_TYPE === 'ant') {
       const cloned = response.clone()
       void (async () => {
         try {
