@@ -2,14 +2,14 @@ import chalk from 'chalk'
 import type { UUID } from 'crypto'
 import * as React from 'react'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import type { CommandResultDisplay } from '../../commands.js'
+import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 import { COMMON_HELP_ARGS, COMMON_INFO_ARGS } from '@claude-code/command-runtime/xml.js'
 import { Box, Text } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import { recursivelySanitizeUnicode } from '../../utils/sanitization.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
+import { recursivelySanitizeUnicode } from '@claude-code/mcp-runtime/sanitization.js'
 import {
   getCurrentSessionTag,
   getTranscriptPath,

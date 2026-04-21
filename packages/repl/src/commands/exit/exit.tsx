@@ -3,9 +3,9 @@ import { spawnSync } from 'child_process'
 import sample from 'lodash-es/sample.js'
 import * as React from 'react'
 import { ExitFlow } from '@claude-code/repl/components/ExitFlow.js'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import { isBgSession } from '../../utils/concurrentSessions.js'
-import { gracefulShutdown } from '../../utils/gracefulShutdown.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
+import { isBgSession } from '@claude-code/agent/concurrentSessions.js'
+import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { getCurrentWorktreeSession } from '@claude-code/swarm'
 
 const GOODBYE_MESSAGES = ['Goodbye!', 'See ya!', 'Bye!', 'Catch you later!']

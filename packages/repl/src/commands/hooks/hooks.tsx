@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { HooksConfigMenu } from '@claude-code/repl/components/hooks/HooksConfigMenu.js'
 import { logEvent } from '@claude-code/local-observability'
-import { getTools } from '../../tools.js'
-import type { LocalJSXCommandCall } from '../../types/command.js'
+import { getTools } from '@claude-code/tool-registry/runtime'
+import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'
 
 export const call: LocalJSXCommandCall = async (onDone, context) => {
   logEvent('tengu_hooks_command', {})

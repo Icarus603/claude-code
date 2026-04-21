@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { handlePlanModeTransition } from '@claude-code/app-host/bootstrap/state.js'
-import type { LocalJSXCommandContext } from '../../commands.js'
+import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
 import { Box, Text } from '@anthropic/ink'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import { getExternalEditor } from '../../utils/editor.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
+import { getExternalEditor } from '@claude-code/storage/editor.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
 import { applyPermissionUpdate } from '@claude-code/permission/PermissionUpdate'
 import { prepareContextForPlanMode } from '@claude-code/permission/permissionSetup'
-import { getPlan, getPlanFilePath } from '../../utils/plans.js'
-import { editFileInEditor } from '../../utils/promptEditor.js'
-import { renderToString } from '../../utils/staticRender.js'
+import { getPlan, getPlanFilePath } from '@claude-code/storage/plans.js'
+import { editFileInEditor } from '@claude-code/repl/promptEditor.js'
+import { renderToString } from '@claude-code/output/render/static-render.js'
 
 function PlanDisplay({
   planContent,
