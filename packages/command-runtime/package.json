@@ -21,6 +21,8 @@
     "./createMovedToPluginCommand.js": "./src/createMovedToPluginCommand.ts",
     "./stubs/stubCommand.js": "./src/stubs/stubCommand.ts",
     "./commands/skills/index.js": "./src/commands/skills/index.ts",
-    "./commands/skills/skills.js": "./src/commands/skills/skills.tsx"
+    "./commands/skills/skills.js": "./src/commands/skills/skills.tsx",
+    "./stubs/emptyCommandStub.js": "./src/stubs/emptyCommandStub.ts",
+    "./stubs/resetLimitsStub.js": "./src/stubs/resetLimitsStub.ts"
   }
 }
