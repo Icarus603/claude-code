@@ -88,7 +88,6 @@
     "./costTracker.js": "./src/costTracker.ts",
     "./claudeLegacyRuntime.js": "./src/claudeLegacyRuntime.ts",
     "./model/check1mAccess.js": "./src/model/check1mAccess.ts",
-    "./model/modelAllowlist.js": "./src/model/modelAllowlist.ts",
     "./modelStrings.js": "./src/modelStrings.ts",
     "./caCerts.js": "./src/caCerts.ts",
     "./modelCapabilities.js": "./src/modelCapabilities.ts",
