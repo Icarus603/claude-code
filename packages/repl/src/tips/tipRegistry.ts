@@ -1,27 +1,27 @@
 import chalk from 'chalk'
-import { logForDebugging } from 'src/utils/debug.js'
-import { fileHistoryEnabled } from 'src/utils/fileHistory.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { fileHistoryEnabled } from '@claude-code/agent/file-history'
 import {
   getInitialSettings,
   getSettings_DEPRECATED,
   getSettingsForSource,
-} from 'src/utils/settings/settings.js'
-import { shouldOfferTerminalSetup } from '../../commands/terminalSetup/terminalSetup.js'
+} from '@claude-code/config/settings'
+import { shouldOfferTerminalSetup } from '@claude-code/repl/terminalSetup.js'
 import { getDesktopUpsellConfig } from '@claude-code/repl/components/DesktopUpsell/DesktopUpsellStartup.js'
 import { color } from '@anthropic/ink'
 import { shouldShowOverageCreditUpsell } from '@claude-code/repl/components/LogoV2/OverageCreditUpsell.js'
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
 import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
-import { is1PApiCustomer } from '../../utils/auth.js'
-import { countConcurrentSessions } from '../../utils/concurrentSessions.js'
+import { is1PApiCustomer } from '@claude-code/provider/authAlias.js'
+import { countConcurrentSessions } from '@claude-code/agent/concurrentSessions.js'
 import { getGlobalConfig } from '@claude-code/config'
 import {
   getEffortEnvOverride,
   modelSupportsEffort,
-} from '../../utils/effort.js'
-import { env } from '../../utils/env.js'
-import { cacheKeys } from '../../utils/fileStateCache.js'
-import { getWorktreeCount } from '../../utils/git.js'
+} from '@claude-code/agent/effort.js'
+import { env } from '@claude-code/config/env/paths'
+import { cacheKeys } from '@claude-code/tool-registry/fileStateCache.js'
+import { getWorktreeCount } from '@claude-code/storage/git.js'
 import {
   detectRunningIDEsCached,
   getSortedIdeLockfiles,
@@ -34,11 +34,11 @@ import {
 import {
   getMainLoopModel,
   getUserSpecifiedModelSetting,
-} from '../../utils/model/model.js'
-import { getPlatform } from '../../utils/platform.js'
-import { isPluginInstalled } from '../../utils/plugins/installedPluginsManager.js'
-import { loadKnownMarketplacesConfigSafe } from '../../utils/plugins/marketplaceManager.js'
-import { OFFICIAL_MARKETPLACE_NAME } from '../../utils/plugins/officialMarketplace.js'
+} from '@claude-code/provider/model.js'
+import { getPlatform } from '@claude-code/config/platform.js'
+import { isPluginInstalled } from '@claude-code/config/plugin/installedPluginsManager'
+import { loadKnownMarketplacesConfigSafe } from '@claude-code/config/plugin/marketplaceManager'
+import { OFFICIAL_MARKETPLACE_NAME } from '@claude-code/config/plugin/officialMarketplace'
 import {
   getCurrentSessionAgentColor,
   isCustomTitleEnabled,
