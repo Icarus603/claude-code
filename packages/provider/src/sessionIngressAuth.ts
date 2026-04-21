@@ -10,6 +10,7 @@ import {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 /**
  * Read token via file descriptor, falling back to well-known file.
@@ -22,12 +23,12 @@ function getTokenFromFileDescriptor(): string | null {
     return cachedToken
   }
 
-  const fdEnv = process.env.CLAUDE_CODE_WEBSOCKET_AUTH_FILE_DESCRIPTOR
+  const fdEnv = readEnv('CLAUDE_CODE_WEBSOCKET_AUTH_FILE_DESCRIPTOR')
   if (!fdEnv) {
     // No FD env var — either we're not in CCR, or we're a subprocess whose
     // parent stripped the (useless) FD env var. Try the well-known file.
     const path =
-      process.env.CLAUDE_SESSION_INGRESS_TOKEN_FILE ??
+      readEnv('CLAUDE_SESSION_INGRESS_TOKEN_FILE') ??
       CCR_SESSION_INGRESS_TOKEN_PATH
     const fromFile = readTokenFromWellKnownFile(path, 'session ingress token')
     setSessionIngressToken(fromFile)
@@ -77,7 +78,7 @@ function getTokenFromFileDescriptor(): string | null {
     // FD env var was set but read failed — typically a subprocess that
     // inherited the env var but not the FD (ENXIO). Try the well-known file.
     const path =
-      process.env.CLAUDE_SESSION_INGRESS_TOKEN_FILE ??
+      readEnv('CLAUDE_SESSION_INGRESS_TOKEN_FILE') ??
       CCR_SESSION_INGRESS_TOKEN_PATH
     const fromFile = readTokenFromWellKnownFile(path, 'session ingress token')
     setSessionIngressToken(fromFile)
@@ -100,7 +101,7 @@ function getTokenFromFileDescriptor(): string | null {
  */
 export function getSessionIngressAuthToken(): string | null {
   // 1. Check environment variable
-  const envToken = process.env.CLAUDE_CODE_SESSION_ACCESS_TOKEN
+  const envToken = readEnv('CLAUDE_CODE_SESSION_ACCESS_TOKEN')
   if (envToken) {
     return envToken
   }
@@ -121,7 +122,7 @@ export function getSessionIngressAuthHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
       Cookie: `sessionKey=${token}`,
     }
-    const orgUuid = process.env.CLAUDE_CODE_ORGANIZATION_UUID
+    const orgUuid = readEnv('CLAUDE_CODE_ORGANIZATION_UUID')
     if (orgUuid) {
       headers['X-Organization-Uuid'] = orgUuid
     }

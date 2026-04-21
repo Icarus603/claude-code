@@ -2,7 +2,7 @@
 /**
  * Ensure that any model codenames introduced here are also added to
  * scripts/excluded-strings.txt to avoid leaking them. Wrap any codename string
- * literals with process.env.USER_TYPE === 'ant' for Bun to remove the codenames
+ * literals with readEnv('USER_TYPE') === 'ant' for Bun to remove the codenames
  * during dead code elimination
  */
 import { getMainLoopModelOverride } from '@claude-code/app-host/bootstrap/state.js'
@@ -37,14 +37,14 @@ export type ModelSetting = ModelName | ModelAlias | null
 export function getSmallFastModel(): ModelName {
   const provider = getAPIProvider()
   // Provider-specific small fast model
-  if (provider === 'openai' && process.env.OPENAI_SMALL_FAST_MODEL) {
-    return process.env.OPENAI_SMALL_FAST_MODEL
+  if (provider === 'openai' && readEnv('OPENAI_SMALL_FAST_MODEL')) {
+    return readEnv('OPENAI_SMALL_FAST_MODEL')
   }
-  if (provider === 'gemini' && process.env.GEMINI_SMALL_FAST_MODEL) {
-    return process.env.GEMINI_SMALL_FAST_MODEL
+  if (provider === 'gemini' && readEnv('GEMINI_SMALL_FAST_MODEL')) {
+    return readEnv('GEMINI_SMALL_FAST_MODEL')
   }
   // Anthropic-specific or fallback
-  return process.env.ANTHROPIC_SMALL_FAST_MODEL || getDefaultHaikuModel()
+  return readEnv('ANTHROPIC_SMALL_FAST_MODEL') || getDefaultHaikuModel()
 }
 
 export function isNonCustomOpusModel(model: ModelName): boolean {
@@ -76,7 +76,7 @@ export function getUserSpecifiedModelSetting(): ModelSetting | undefined {
     specifiedModel = modelOverride
   } else {
     const settings = getSettings_DEPRECATED() || {}
-    specifiedModel = process.env.ANTHROPIC_MODEL || settings.model || undefined
+    specifiedModel = readEnv('ANTHROPIC_MODEL') || settings.model || undefined
   }
 
   // Ignore the user-specified model if it's not in the availableModels allowlist.
@@ -115,16 +115,16 @@ export function getBestModel(): ModelName {
 export function getDefaultOpusModel(): ModelName {
   const provider = getAPIProvider()
   // For OpenAI provider, check OPENAI_DEFAULT_OPUS_MODEL first
-  if (provider === 'openai' && process.env.OPENAI_DEFAULT_OPUS_MODEL) {
-    return process.env.OPENAI_DEFAULT_OPUS_MODEL
+  if (provider === 'openai' && readEnv('OPENAI_DEFAULT_OPUS_MODEL')) {
+    return readEnv('OPENAI_DEFAULT_OPUS_MODEL')
   }
   // For Gemini provider, check GEMINI_DEFAULT_OPUS_MODEL
-  if (provider === 'gemini' && process.env.GEMINI_DEFAULT_OPUS_MODEL) {
-    return process.env.GEMINI_DEFAULT_OPUS_MODEL
+  if (provider === 'gemini' && readEnv('GEMINI_DEFAULT_OPUS_MODEL')) {
+    return readEnv('GEMINI_DEFAULT_OPUS_MODEL')
   }
   // Anthropic-specific override (for first-party and other 3P providers)
-  if (process.env.ANTHROPIC_DEFAULT_OPUS_MODEL) {
-    return process.env.ANTHROPIC_DEFAULT_OPUS_MODEL
+  if (readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL')) {
+    return readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL')
   }
   // 3P providers (Bedrock, Vertex, Foundry) — kept as a separate branch
   // even when values match, since 3P availability lags firstParty and
@@ -141,17 +141,17 @@ export function getDefaultSonnetModel(): ModelName {
   // For OpenAI provider, check OPENAI_DEFAULT_SONNET_MODEL first
   if (
     provider === 'openai' &&
-    process.env.OPENAI_DEFAULT_SONNET_MODEL
+    readEnv('OPENAI_DEFAULT_SONNET_MODEL')
   ) {
-    return process.env.OPENAI_DEFAULT_SONNET_MODEL
+    return readEnv('OPENAI_DEFAULT_SONNET_MODEL')
   }
   // For Gemini provider, check GEMINI_DEFAULT_SONNET_MODEL
-  if (provider === 'gemini' && process.env.GEMINI_DEFAULT_SONNET_MODEL) {
-    return process.env.GEMINI_DEFAULT_SONNET_MODEL
+  if (provider === 'gemini' && readEnv('GEMINI_DEFAULT_SONNET_MODEL')) {
+    return readEnv('GEMINI_DEFAULT_SONNET_MODEL')
   }
   // Anthropic-specific override (for first-party and other 3P providers)
-  if (process.env.ANTHROPIC_DEFAULT_SONNET_MODEL) {
-    return process.env.ANTHROPIC_DEFAULT_SONNET_MODEL
+  if (readEnv('ANTHROPIC_DEFAULT_SONNET_MODEL')) {
+    return readEnv('ANTHROPIC_DEFAULT_SONNET_MODEL')
   }
   // Default to Sonnet 4.5 for 3P since they may not have 4.6 yet
   if (provider !== 'firstParty') {
@@ -164,16 +164,16 @@ export function getDefaultSonnetModel(): ModelName {
 export function getDefaultHaikuModel(): ModelName {
   const provider = getAPIProvider()
   // For OpenAI provider, check OPENAI_DEFAULT_HAIKU_MODEL first
-  if (provider === 'openai' && process.env.OPENAI_DEFAULT_HAIKU_MODEL) {
-    return process.env.OPENAI_DEFAULT_HAIKU_MODEL
+  if (provider === 'openai' && readEnv('OPENAI_DEFAULT_HAIKU_MODEL')) {
+    return readEnv('OPENAI_DEFAULT_HAIKU_MODEL')
   }
   // For Gemini provider, check GEMINI_DEFAULT_HAIKU_MODEL
-  if (provider === 'gemini' && process.env.GEMINI_DEFAULT_HAIKU_MODEL) {
-    return process.env.GEMINI_DEFAULT_HAIKU_MODEL
+  if (provider === 'gemini' && readEnv('GEMINI_DEFAULT_HAIKU_MODEL')) {
+    return readEnv('GEMINI_DEFAULT_HAIKU_MODEL')
   }
   // Anthropic-specific override (for first-party and other 3P providers)
-  if (process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL) {
-    return process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL
+  if (readEnv('ANTHROPIC_DEFAULT_HAIKU_MODEL')) {
+    return readEnv('ANTHROPIC_DEFAULT_HAIKU_MODEL')
   }
 
   // Haiku 4.5 is available on all platforms (first-party, Foundry, Bedrock, Vertex)
@@ -220,7 +220,7 @@ export function getRuntimeMainLoopModel(params: {
  */
 export function getDefaultMainLoopModelSetting(): ModelName | ModelAlias {
   // Ants default to defaultModel from flag config, or Opus 1M if not configured
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     return (
       (getAntModelOverrideConfig()?.defaultModel as string) ??
       getDefaultOpusModel() + '[1m]'
@@ -440,7 +440,7 @@ export function renderModelName(model: ModelName): string {
   if (publicName) {
     return publicName
   }
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     const resolved = parseUserSpecifiedModel(model)
     const antModel = resolveAntModel(model)
     if (antModel) {
@@ -525,7 +525,7 @@ export function parseUserSpecifiedModel(
     return getDefaultOpusModel() + (has1mTag ? '[1m]' : '')
   }
 
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     const has1mAntTag = has1mContext(normalizedModel)
     const baseAntModel = normalizedModel.replace(/\[1m]$/i, '').trim()
 
@@ -593,12 +593,12 @@ function isLegacyOpusFirstParty(model: string): boolean {
  * Opt-out for the legacy Opus 4.0/4.1 → current Opus remap.
  */
 export function isLegacyModelRemapEnabled(): boolean {
-  return !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP)
+  return !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP'))
 }
 
 export function modelDisplayString(model: ModelSetting): string {
   if (model === null) {
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       return `Default for Ants (${renderDefaultModelSetting(getDefaultMainLoopModelSetting())})`
     } else if (isClaudeAISubscriber()) {
       return `Default (${getClaudeAiUserDefaultModelDescription()})`

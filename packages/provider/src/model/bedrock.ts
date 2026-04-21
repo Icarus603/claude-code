@@ -55,12 +55,12 @@ async function createBedrockClient() {
   // This ensures we query profiles from the same region the client will use
   const region = getAWSRegion()
 
-  const skipAuth = isEnvTruthy(process.env.CLAUDE_CODE_SKIP_BEDROCK_AUTH)
+  const skipAuth = isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_BEDROCK_AUTH'))
 
   const clientConfig: ConstructorParameters<typeof BedrockClient>[0] = {
     region,
-    ...(process.env.ANTHROPIC_BEDROCK_BASE_URL && {
-      endpoint: process.env.ANTHROPIC_BEDROCK_BASE_URL,
+    ...(readEnv('ANTHROPIC_BEDROCK_BASE_URL') && {
+      endpoint: readEnv('ANTHROPIC_BEDROCK_BASE_URL'),
     }),
     ...(await getAWSClientProxyConfig()),
     ...(skipAuth && {
@@ -78,7 +78,7 @@ async function createBedrockClient() {
     }),
   }
 
-  if (!skipAuth && !process.env.AWS_BEARER_TOKEN_BEDROCK) {
+  if (!skipAuth && !readEnv('AWS_BEARER_TOKEN_BEDROCK')) {
     // Only refresh credentials if not using API key authentication
     const cachedCredentials = await refreshAndGetAwsCredentials()
     if (cachedCredentials) {
@@ -98,12 +98,12 @@ export async function createBedrockRuntimeClient() {
     '@aws-sdk/client-bedrock-runtime'
   )
   const region = getAWSRegion()
-  const skipAuth = isEnvTruthy(process.env.CLAUDE_CODE_SKIP_BEDROCK_AUTH)
+  const skipAuth = isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_BEDROCK_AUTH'))
 
   const clientConfig: ConstructorParameters<typeof BedrockRuntimeClient>[0] = {
     region,
-    ...(process.env.ANTHROPIC_BEDROCK_BASE_URL && {
-      endpoint: process.env.ANTHROPIC_BEDROCK_BASE_URL,
+    ...(readEnv('ANTHROPIC_BEDROCK_BASE_URL') && {
+      endpoint: readEnv('ANTHROPIC_BEDROCK_BASE_URL'),
     }),
     ...(await getAWSClientProxyConfig()),
     ...(skipAuth && {
@@ -123,7 +123,7 @@ export async function createBedrockRuntimeClient() {
     }),
   }
 
-  if (!skipAuth && !process.env.AWS_BEARER_TOKEN_BEDROCK) {
+  if (!skipAuth && !readEnv('AWS_BEARER_TOKEN_BEDROCK')) {
     // Only refresh credentials if not using API key authentication
     const cachedCredentials = await refreshAndGetAwsCredentials()
     if (cachedCredentials) {

@@ -30,7 +30,7 @@ function getSessionsDir(): string {
  */
 function envSessionKind(): SessionKind | undefined {
   if (feature('BG_SESSIONS')) {
-    const k = process.env.CLAUDE_CODE_SESSION_KIND
+    const k = readEnv('CLAUDE_CODE_SESSION_KIND')
     if (k === 'bg' || k === 'daemon' || k === 'daemon-worker') return k
   }
   return undefined
@@ -82,15 +82,15 @@ export async function registerSession(): Promise<boolean> {
         cwd: getOriginalCwd(),
         startedAt: Date.now(),
         kind,
-        entrypoint: process.env.CLAUDE_CODE_ENTRYPOINT,
+        entrypoint: readEnv('CLAUDE_CODE_ENTRYPOINT'),
         ...(feature('UDS_INBOX')
-          ? { messagingSocketPath: process.env.CLAUDE_CODE_MESSAGING_SOCKET }
+          ? { messagingSocketPath: readEnv('CLAUDE_CODE_MESSAGING_SOCKET') }
           : {}),
         ...(feature('BG_SESSIONS')
           ? {
-              name: process.env.CLAUDE_CODE_SESSION_NAME,
-              logPath: process.env.CLAUDE_CODE_SESSION_LOG,
-              agent: process.env.CLAUDE_CODE_AGENT,
+              name: readEnv('CLAUDE_CODE_SESSION_NAME'),
+              logPath: readEnv('CLAUDE_CODE_SESSION_LOG'),
+              agent: readEnv('CLAUDE_CODE_AGENT'),
             }
           : {}),
       }),

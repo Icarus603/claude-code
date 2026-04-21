@@ -3,6 +3,7 @@ import { stat } from 'fs/promises'
 import { isAbsolute, join, relative, sep } from 'path'
 import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type {
+import { readEnv } from '@claude-code/config/env/utils'
   AttributionSnapshotMessage,
   FileAttributionState,
 } from '@claude-code/agent/logsTypes.js'
@@ -227,7 +228,7 @@ export type AttributionData = {
  * Get the current client surface from environment.
  */
 export function getClientSurface(): string {
-  return process.env.CLAUDE_CODE_ENTRYPOINT ?? 'cli'
+  return readEnv('CLAUDE_CODE_ENTRYPOINT') ?? 'cli'
 }
 
 /**

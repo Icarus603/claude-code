@@ -30,7 +30,7 @@ export type EffortValue = EffortLevel | number
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports the effort parameter.
 export function modelSupportsEffort(model: string): boolean {
   const m = model.toLowerCase()
-  if (isEnvTruthy(process.env.CLAUDE_CODE_ALWAYS_ENABLE_EFFORT)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_ALWAYS_ENABLE_EFFORT'))) {
     return true
   }
   const supported3P = get3PModelCapabilityOverride(model, 'effort')
@@ -61,7 +61,7 @@ export function modelSupportsMaxEffort(model: string): boolean {
   if (model.toLowerCase().includes('opus-4-6')) {
     return true
   }
-  if (process.env.USER_TYPE === 'ant' && resolveAntModel(model)) {
+  if (readEnv('USER_TYPE') === 'ant' && resolveAntModel(model)) {
     return true
   }
   return false
@@ -101,7 +101,7 @@ export function toPersistableEffort(
   if (value === 'low' || value === 'medium' || value === 'high') {
     return value
   }
-  if (value === 'max' && process.env.USER_TYPE === 'ant') {
+  if (value === 'max' && readEnv('USER_TYPE') === 'ant') {
     return value
   }
   return undefined
@@ -135,7 +135,7 @@ export function resolvePickerEffortPersistence(
 }
 
 export function getEffortEnvOverride(): EffortValue | null | undefined {
-  const envOverride = process.env.CLAUDE_CODE_EFFORT_LEVEL
+  const envOverride = readEnv('CLAUDE_CODE_EFFORT_LEVEL')
   return envOverride?.toLowerCase() === 'unset' ||
     envOverride?.toLowerCase() === 'auto'
     ? null
@@ -203,7 +203,7 @@ export function convertEffortValueToLevel(value: EffortValue): EffortLevel {
   if (typeof value === 'string') {
     return isEffortLevel(value) ? value : 'high'
   }
-  if (process.env.USER_TYPE === 'ant' && typeof value === 'number') {
+  if (readEnv('USER_TYPE') === 'ant' && typeof value === 'number') {
     if (value <= 50) return 'low'
     if (value <= 85) return 'medium'
     if (value <= 100) return 'high'
@@ -232,7 +232,7 @@ export function getEffortLevelDescription(level: EffortLevel): string {
  * Get user-facing description for effort values (both string and numeric)
  */
 export function getEffortValueDescription(value: EffortValue): string {
-  if (process.env.USER_TYPE === 'ant' && typeof value === 'number') {
+  if (readEnv('USER_TYPE') === 'ant' && typeof value === 'number') {
     return `[ANT-ONLY] Numeric effort value of ${value}`
   }
 
@@ -270,7 +270,7 @@ export function getOpusDefaultEffortConfig(): OpusDefaultEffortConfig {
 export function getDefaultEffortForModel(
   model: string,
 ): EffortValue | undefined {
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     const config = getAntModelOverrideConfig()
     const isDefaultModel =
       config?.defaultModel !== undefined &&

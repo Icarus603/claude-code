@@ -109,18 +109,18 @@ export const getCoreUserData = memoize(
       platform: getHostPlatformForAnalytics(),
       organizationUuid,
       accountUuid,
-      userType: process.env.USER_TYPE,
+      userType: readEnv('USER_TYPE'),
       subscriptionType,
       rateLimitTier,
       firstTokenTime,
-      ...(isEnvTruthy(process.env.GITHUB_ACTIONS) && {
+      ...(isEnvTruthy(readEnv('GITHUB_ACTIONS')) && {
         githubActionsMetadata: {
-          actor: process.env.GITHUB_ACTOR,
-          actorId: process.env.GITHUB_ACTOR_ID,
-          repository: process.env.GITHUB_REPOSITORY,
-          repositoryId: process.env.GITHUB_REPOSITORY_ID,
-          repositoryOwner: process.env.GITHUB_REPOSITORY_OWNER,
-          repositoryOwnerId: process.env.GITHUB_REPOSITORY_OWNER_ID,
+          actor: readEnv('GITHUB_ACTOR'),
+          actorId: readEnv('GITHUB_ACTOR_ID'),
+          repository: readEnv('GITHUB_REPOSITORY'),
+          repositoryId: readEnv('GITHUB_REPOSITORY_ID'),
+          repositoryOwner: readEnv('GITHUB_REPOSITORY_OWNER'),
+          repositoryOwnerId: readEnv('GITHUB_REPOSITORY_OWNER_ID'),
         },
       }),
     }
@@ -147,12 +147,12 @@ function getEmail(): string | undefined {
   }
 
   // Ant-only fallbacks below (no execSync)
-  if (process.env.USER_TYPE !== 'ant') {
+  if (readEnv('USER_TYPE') !== 'ant') {
     return undefined
   }
 
-  if (process.env.COO_CREATOR) {
-    return `${process.env.COO_CREATOR}@anthropic.com`
+  if (readEnv('COO_CREATOR')) {
+    return `${readEnv('COO_CREATOR')}@anthropic.com`
   }
 
   // If initUser() wasn't called, we return undefined instead of blocking
@@ -167,12 +167,12 @@ async function getEmailAsync(): Promise<string | undefined> {
   }
 
   // Ant-only fallbacks below
-  if (process.env.USER_TYPE !== 'ant') {
+  if (readEnv('USER_TYPE') !== 'ant') {
     return undefined
   }
 
-  if (process.env.COO_CREATOR) {
-    return `${process.env.COO_CREATOR}@anthropic.com`
+  if (readEnv('COO_CREATOR')) {
+    return `${readEnv('COO_CREATOR')}@anthropic.com`
   }
 
   return getGitEmail()

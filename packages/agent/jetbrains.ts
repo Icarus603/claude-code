@@ -2,6 +2,7 @@ import { homedir, platform } from 'os'
 import { join } from 'path'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import type { IdeType } from '@claude-code/ide/ide.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 const PLUGIN_PREFIX = 'claude-code-jetbrains-plugin'
 
@@ -34,9 +35,9 @@ function buildCommonPluginDirectoryPaths(ideName: string): string[] {
     return directories
   }
 
-  const appData = process.env.APPDATA || join(homeDir, 'AppData', 'Roaming')
+  const appData = readEnv('APPDATA') || join(homeDir, 'AppData', 'Roaming')
   const localAppData =
-    process.env.LOCALAPPDATA || join(homeDir, 'AppData', 'Local')
+    readEnv('LOCALAPPDATA') || join(homeDir, 'AppData', 'Local')
 
   switch (platform()) {
     case 'darwin':

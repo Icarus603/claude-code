@@ -32,7 +32,7 @@ export function maybePersistTokenForSubprocesses(
   token: string,
   tokenName: string,
 ): void {
-  if (!isEnvTruthy(process.env.CLAUDE_CODE_REMOTE)) {
+  if (!isEnvTruthy(readEnv('CLAUDE_CODE_REMOTE'))) {
     return
   }
   try {

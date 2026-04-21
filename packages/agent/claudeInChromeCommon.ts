@@ -8,6 +8,7 @@ import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { getPlatform } from '@claude-code/config/platform'
 import { which } from '@claude-code/shell/which.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 export const CLAUDE_IN_CHROME_MCP_SERVER_NAME = 'claude-in-chrome'
 
@@ -535,6 +536,6 @@ function getUsername(): string {
   try {
     return userInfo().username || 'default'
   } catch {
-    return process.env.USER || process.env.USERNAME || 'default'
+    return readEnv('USER') || readEnv('USERNAME') || 'default'
   }
 }
