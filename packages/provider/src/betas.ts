@@ -154,7 +154,7 @@ export function modelSupportsStructuredOutputs(model: string): boolean {
 export function modelSupportsAutoMode(model: string): boolean {
   if (feature('TRANSCRIPT_CLASSIFIER')) {
     const m = getCanonicalName(model)
-    if (process.env.USER_TYPE !== 'ant' && getAPIProvider() !== 'firstParty') {
+    if (readEnv('USER_TYPE') !== 'ant' && getAPIProvider() !== 'firstParty') {
       return false
     }
     const config = getFeatureValue_CACHED_MAY_BE_STALE<{
@@ -168,7 +168,7 @@ export function modelSupportsAutoMode(model: string): boolean {
     ) {
       return true
     }
-    if (process.env.USER_TYPE === 'ant') {
+    if (readEnv('USER_TYPE') === 'ant') {
       if (m.includes('claude-3-')) return false
       if (/claude-(opus|sonnet|haiku)-4(?!-[6-9])/.test(m)) return false
       return true
@@ -194,14 +194,14 @@ export function getToolSearchBetaHeader(): string {
 export function shouldIncludeFirstPartyOnlyBetas(): boolean {
   return (
     (getAPIProvider() === 'firstParty' || getAPIProvider() === 'foundry') &&
-    !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS)
+    !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS'))
   )
 }
 
 export function shouldUseGlobalCacheScope(): boolean {
   return (
     getAPIProvider() === 'firstParty' &&
-    !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS)
+    !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS'))
   )
 }
 
@@ -214,8 +214,8 @@ export const getAllModelBetas = memoize((model: string): string[] => {
   if (!isHaiku) {
     betaHeaders.push(CLAUDE_CODE_20250219_BETA_HEADER)
     if (
-      process.env.USER_TYPE === 'ant' &&
-      process.env.CLAUDE_CODE_ENTRYPOINT === 'cli'
+      readEnv('USER_TYPE') === 'ant' &&
+      readEnv('CLAUDE_CODE_ENTRYPOINT') === 'cli'
     ) {
       if (CLI_INTERNAL_BETA_HEADER) {
         betaHeaders.push(CLI_INTERNAL_BETA_HEADER)
@@ -229,7 +229,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
     betaHeaders.push(CONTEXT_1M_BETA_HEADER)
   }
   if (
-    !isEnvTruthy(process.env.DISABLE_INTERLEAVED_THINKING) &&
+    !isEnvTruthy(readEnv('DISABLE_INTERLEAVED_THINKING')) &&
     modelSupportsISP(model)
   ) {
     betaHeaders.push(INTERLEAVED_THINKING_BETA_HEADER)
@@ -245,8 +245,8 @@ export const getAllModelBetas = memoize((model: string): string[] => {
   }
 
   const antOptedIntoToolClearing =
-    isEnvTruthy(process.env.USE_API_CONTEXT_MANAGEMENT) &&
-    process.env.USER_TYPE === 'ant'
+    isEnvTruthy(readEnv('USE_API_CONTEXT_MANAGEMENT')) &&
+    readEnv('USER_TYPE') === 'ant'
 
   const thinkingPreservationEnabled = modelSupportsContextManagement(model)
 
@@ -269,7 +269,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
     betaHeaders.push(STRUCTURED_OUTPUTS_BETA_HEADER)
   }
   if (
-    process.env.USER_TYPE === 'ant' &&
+    readEnv('USER_TYPE') === 'ant' &&
     includeFirstPartyOnlyBetas &&
     tokenEfficientToolsEnabled
   ) {
@@ -287,9 +287,9 @@ export const getAllModelBetas = memoize((model: string): string[] => {
     betaHeaders.push(PROMPT_CACHING_SCOPE_BETA_HEADER)
   }
 
-  if (process.env.ANTHROPIC_BETAS) {
+  if (readEnv('ANTHROPIC_BETAS')) {
     betaHeaders.push(
-      ...process.env.ANTHROPIC_BETAS.split(',')
+      ...readEnv('ANTHROPIC_BETAS').split(',')
         .map(_ => _.trim())
         .filter(Boolean),
     )
@@ -334,8 +334,8 @@ export function getMergedBetas(
       baseBetas.push(CLAUDE_CODE_20250219_BETA_HEADER)
     }
     if (
-      process.env.USER_TYPE === 'ant' &&
-      process.env.CLAUDE_CODE_ENTRYPOINT === 'cli' &&
+      readEnv('USER_TYPE') === 'ant' &&
+      readEnv('CLAUDE_CODE_ENTRYPOINT') === 'cli' &&
       CLI_INTERNAL_BETA_HEADER &&
       !baseBetas.includes(CLI_INTERNAL_BETA_HEADER)
     ) {

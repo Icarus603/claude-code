@@ -21,7 +21,7 @@ import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
  * Memoized for performance. Call clearCACertsCache() to invalidate after
  * environment variable changes (e.g., after trust dialog applies settings.json).
  *
- * Reads ONLY `process.env.NODE_EXTRA_CA_CERTS`. `caCertsConfig.ts` populates
+ * Reads ONLY `readEnv('NODE_EXTRA_CA_CERTS')`. `caCertsConfig.ts` populates
  * that env var from settings.json at CLI init; this module stays config-free
  * so `proxy.ts`/`mtls.ts` don't transitively pull in the command registry.
  */
@@ -29,7 +29,7 @@ export const getCACertificates = memoize((): string[] | undefined => {
   const useSystemCA =
     hasNodeOption('--use-system-ca') || hasNodeOption('--use-openssl-ca')
 
-  const extraCertsPath = process.env.NODE_EXTRA_CA_CERTS
+  const extraCertsPath = readEnv('NODE_EXTRA_CA_CERTS')
 
   logForDebugging(
     `CA certs: useSystemCA=${useSystemCA}, extraCertsPath=${extraCertsPath}`,

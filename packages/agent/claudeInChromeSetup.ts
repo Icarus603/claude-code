@@ -51,10 +51,10 @@ export function shouldEnableClaudeInChrome(chromeFlag?: boolean): boolean {
   }
 
   // Check environment variables
-  if (isEnvTruthy(process.env.CLAUDE_CODE_ENABLE_CFC)) {
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_CFC'))) {
     return true
   }
-  if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_ENABLE_CFC)) {
+  if (isEnvDefinedFalsy(readEnv('CLAUDE_CODE_ENABLE_CFC'))) {
     return false
   }
 
@@ -77,7 +77,7 @@ export function shouldAutoEnableClaudeInChrome(): boolean {
   shouldAutoEnable =
     getIsInteractive() &&
     isChromeExtensionInstalled_CACHED_MAY_BE_STALE() &&
-    (process.env.USER_TYPE === 'ant' ||
+    (readEnv('USER_TYPE') === 'ant' ||
       getFeatureValue_CACHED_MAY_BE_STALE('tengu_chrome_auto_enable', false))
 
   return shouldAutoEnable
@@ -180,7 +180,7 @@ function getNativeMessagingHostsDirs(): string[] {
   if (platform === 'windows') {
     // Windows uses a single location with registry entries pointing to it
     const home = homedir()
-    const appData = process.env.APPDATA || join(home, 'AppData', 'Local')
+    const appData = readEnv('APPDATA') || join(home, 'AppData', 'Local')
     return [join(appData, 'Claude Code', 'ChromeNativeHost')]
   }
 
@@ -203,7 +203,7 @@ export async function installChromeNativeHostManifest(
     type: 'stdio',
     allowed_origins: [
       `chrome-extension://fcoeoabgfenejglbffodgkkbkcdhcgfn/`, // PROD_EXTENSION_ID
-      ...(process.env.USER_TYPE === 'ant'
+      ...(readEnv('USER_TYPE') === 'ant'
         ? [
             'chrome-extension://dihbgbndebgnbjfmelmegjepbnkhlgni/', // DEV_EXTENSION_ID
             'chrome-extension://dngcpimnedloihjnnfngkgjoidhnaolf/', // ANT_EXTENSION_ID

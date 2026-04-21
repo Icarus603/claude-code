@@ -33,6 +33,7 @@ import {
 } from '@claude-code/provider/model.js'
 import { has1mContext } from '@claude-code/agent/context.js'
 import { getGlobalConfig } from '@claude-code/config'
+import { readEnv } from '@claude-code/config/env/utils'
 
 // @[MODEL LAUNCH]: Update all the available and default model option strings below.
 
@@ -44,7 +45,7 @@ export type ModelOption = {
 }
 
 export function getDefaultOptionForUser(fastMode = false): ModelOption {
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     const currentModel = renderDefaultModelSetting(
       getDefaultMainLoopModelSetting(),
     )
@@ -80,26 +81,26 @@ function getCustomSonnetOption(): ModelOption | undefined {
   // Use provider-specific DEFAULT_SONNET_MODEL
   const customSonnetModel =
     provider === 'openai'
-      ? process.env.OPENAI_DEFAULT_SONNET_MODEL
+      ? readEnv('OPENAI_DEFAULT_SONNET_MODEL')
       : provider === 'gemini'
-      ? process.env.GEMINI_DEFAULT_SONNET_MODEL
-      : process.env.ANTHROPIC_DEFAULT_SONNET_MODEL
+      ? readEnv('GEMINI_DEFAULT_SONNET_MODEL')
+      : readEnv('ANTHROPIC_DEFAULT_SONNET_MODEL')
   // When a 3P user has a custom sonnet model string, show it directly
   if (is3P && customSonnetModel) {
     const is1m = has1mContext(customSonnetModel)
     // Use appropriate NAME/DESCRIPTION env vars based on provider
     const nameEnv =
       provider === 'openai'
-        ? process.env.OPENAI_DEFAULT_SONNET_MODEL_NAME
+        ? readEnv('OPENAI_DEFAULT_SONNET_MODEL_NAME')
         : provider === 'gemini'
-        ? process.env.GEMINI_DEFAULT_SONNET_MODEL_NAME
-        : process.env.ANTHROPIC_DEFAULT_SONNET_MODEL_NAME
+        ? readEnv('GEMINI_DEFAULT_SONNET_MODEL_NAME')
+        : readEnv('ANTHROPIC_DEFAULT_SONNET_MODEL_NAME')
     const descEnv =
       provider === 'openai'
-        ? process.env.OPENAI_DEFAULT_SONNET_MODEL_DESCRIPTION
+        ? readEnv('OPENAI_DEFAULT_SONNET_MODEL_DESCRIPTION')
         : provider === 'gemini'
-        ? process.env.GEMINI_DEFAULT_SONNET_MODEL_DESCRIPTION
-        : process.env.ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION
+        ? readEnv('GEMINI_DEFAULT_SONNET_MODEL_DESCRIPTION')
+        : readEnv('ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION')
     return {
       value: 'sonnet',
       label: nameEnv ?? customSonnetModel,
@@ -129,26 +130,26 @@ function getCustomOpusOption(): ModelOption | undefined {
   // Use provider-specific DEFAULT_OPUS_MODEL
   const customOpusModel =
     provider === 'openai'
-      ? process.env.OPENAI_DEFAULT_OPUS_MODEL
+      ? readEnv('OPENAI_DEFAULT_OPUS_MODEL')
       : provider === 'gemini'
-      ? process.env.GEMINI_DEFAULT_OPUS_MODEL
-      : process.env.ANTHROPIC_DEFAULT_OPUS_MODEL
+      ? readEnv('GEMINI_DEFAULT_OPUS_MODEL')
+      : readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL')
   // When a 3P user has a custom opus model string, show it directly
   if (is3P && customOpusModel) {
     const is1m = has1mContext(customOpusModel)
     // Use appropriate NAME/DESCRIPTION env vars based on provider
     const nameEnv =
       provider === 'openai'
-        ? process.env.OPENAI_DEFAULT_OPUS_MODEL_NAME
+        ? readEnv('OPENAI_DEFAULT_OPUS_MODEL_NAME')
         : provider === 'gemini'
-        ? process.env.GEMINI_DEFAULT_OPUS_MODEL_NAME
-        : process.env.ANTHROPIC_DEFAULT_OPUS_MODEL_NAME
+        ? readEnv('GEMINI_DEFAULT_OPUS_MODEL_NAME')
+        : readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL_NAME')
     const descEnv =
       provider === 'openai'
-        ? process.env.OPENAI_DEFAULT_OPUS_MODEL_DESCRIPTION
+        ? readEnv('OPENAI_DEFAULT_OPUS_MODEL_DESCRIPTION')
         : provider === 'gemini'
-        ? process.env.GEMINI_DEFAULT_OPUS_MODEL_DESCRIPTION
-        : process.env.ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION
+        ? readEnv('GEMINI_DEFAULT_OPUS_MODEL_DESCRIPTION')
+        : readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION')
     return {
       value: 'opus',
       label: nameEnv ?? customOpusModel,
@@ -205,25 +206,25 @@ function getCustomHaikuOption(): ModelOption | undefined {
   // Use provider-specific DEFAULT_HAIKU_MODEL
   const customHaikuModel =
     provider === 'openai'
-      ? process.env.OPENAI_DEFAULT_HAIKU_MODEL
+      ? readEnv('OPENAI_DEFAULT_HAIKU_MODEL')
       : provider === 'gemini'
-      ? process.env.GEMINI_DEFAULT_HAIKU_MODEL
-      : process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL
+      ? readEnv('GEMINI_DEFAULT_HAIKU_MODEL')
+      : readEnv('ANTHROPIC_DEFAULT_HAIKU_MODEL')
   // When a 3P user has a custom haiku model string, show it directly
   if (is3P && customHaikuModel) {
     // Use appropriate NAME/DESCRIPTION env vars based on provider
     const nameEnv =
       provider === 'openai'
-        ? process.env.OPENAI_DEFAULT_HAIKU_MODEL_NAME
+        ? readEnv('OPENAI_DEFAULT_HAIKU_MODEL_NAME')
         : provider === 'gemini'
-        ? process.env.GEMINI_DEFAULT_HAIKU_MODEL_NAME
-        : process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME
+        ? readEnv('GEMINI_DEFAULT_HAIKU_MODEL_NAME')
+        : readEnv('ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME')
     const descEnv =
       provider === 'openai'
-        ? process.env.OPENAI_DEFAULT_HAIKU_MODEL_DESCRIPTION
+        ? readEnv('OPENAI_DEFAULT_HAIKU_MODEL_DESCRIPTION')
         : provider === 'gemini'
-        ? process.env.GEMINI_DEFAULT_HAIKU_MODEL_DESCRIPTION
-        : process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL_DESCRIPTION
+        ? readEnv('GEMINI_DEFAULT_HAIKU_MODEL_DESCRIPTION')
+        : readEnv('ANTHROPIC_DEFAULT_HAIKU_MODEL_DESCRIPTION')
     return {
       value: 'haiku',
       label: nameEnv ?? customHaikuModel,
@@ -324,7 +325,7 @@ function getOpusPlanOption(): ModelOption {
 // @[MODEL LAUNCH]: Update the model picker lists below to include/reorder options for the new model.
 // Each user tier (ant, Max/Team Premium, Pro/Team Standard/Enterprise, PAYG 1P, PAYG 3P) has its own list.
 function getModelOptionsBase(fastMode = false): ModelOption[] {
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     // Build options from antModels config
     const antModelOptions: ModelOption[] = getAntModels().map(m => ({
       value: m.alias,
@@ -517,16 +518,16 @@ export function getModelOptions(fastMode = false): ModelOption[] {
   const options = getModelOptionsBase(fastMode)
 
   // Add the custom model from the ANTHROPIC_CUSTOM_MODEL_OPTION env var
-  const envCustomModel = process.env.ANTHROPIC_CUSTOM_MODEL_OPTION
+  const envCustomModel = readEnv('ANTHROPIC_CUSTOM_MODEL_OPTION')
   if (
     envCustomModel &&
     !options.some(existing => existing.value === envCustomModel)
   ) {
     options.push({
       value: envCustomModel,
-      label: process.env.ANTHROPIC_CUSTOM_MODEL_OPTION_NAME ?? envCustomModel,
+      label: readEnv('ANTHROPIC_CUSTOM_MODEL_OPTION_NAME') ?? envCustomModel,
       description:
-        process.env.ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION ??
+        readEnv('ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION') ??
         `Custom model (${envCustomModel})`,
     })
   }

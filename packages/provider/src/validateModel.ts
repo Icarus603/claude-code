@@ -10,6 +10,7 @@ import {
   AuthenticationError,
 } from '@anthropic-ai/sdk'
 import { getModelStrings } from '@claude-code/provider/model/modelStrings.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 // Cache valid models to avoid repeated API calls
 const validModelCache = new Map<string, boolean>()
@@ -42,7 +43,7 @@ export async function validateModel(
   }
 
   // Check if it matches ANTHROPIC_CUSTOM_MODEL_OPTION (pre-validated by the user)
-  if (normalizedModel === process.env.ANTHROPIC_CUSTOM_MODEL_OPTION) {
+  if (normalizedModel === readEnv('ANTHROPIC_CUSTOM_MODEL_OPTION')) {
     return { valid: true }
   }
 

@@ -7,6 +7,7 @@ import { get3PModelCapabilityOverride } from '@claude-code/provider/model/modelS
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { getSettingsWithErrors } from '@claude-code/config/settings'
 import { resolveAntModel } from '@claude-code/provider/antModels.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 export type ThinkingConfig =
   | { type: 'adaptive' }
@@ -93,7 +94,7 @@ export function modelSupportsThinking(model: string): boolean {
   if (supported3P !== undefined) {
     return supported3P
   }
-  if (process.env.USER_TYPE === 'ant') {
+  if (readEnv('USER_TYPE') === 'ant') {
     if (resolveAntModel(model.toLowerCase())) {
       return true
     }
@@ -143,8 +144,8 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
 }
 
 export function shouldEnableThinkingByDefault(): boolean {
-  if (process.env.MAX_THINKING_TOKENS) {
-    return parseInt(process.env.MAX_THINKING_TOKENS, 10) > 0
+  if (readEnv('MAX_THINKING_TOKENS')) {
+    return parseInt(readEnv('MAX_THINKING_TOKENS'), 10) > 0
   }
 
   const { settings } = getSettingsWithErrors()

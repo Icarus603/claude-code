@@ -11,6 +11,7 @@ import {
   parseUserSpecifiedModel,
 } from '@claude-code/provider/model.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { readEnv } from '@claude-code/config/env/utils'
 
 export const AGENT_MODEL_OPTIONS = [...MODEL_ALIASES, 'inherit'] as const
 export type AgentModelAlias = (typeof AGENT_MODEL_OPTIONS)[number]
@@ -43,8 +44,8 @@ export function getAgentModel(
   toolSpecifiedModel?: ModelAlias,
   permissionMode?: PermissionMode,
 ): string {
-  if (process.env.CLAUDE_CODE_SUBAGENT_MODEL) {
-    return parseUserSpecifiedModel(process.env.CLAUDE_CODE_SUBAGENT_MODEL)
+  if (readEnv('CLAUDE_CODE_SUBAGENT_MODEL')) {
+    return parseUserSpecifiedModel(readEnv('CLAUDE_CODE_SUBAGENT_MODEL'))
   }
 
   const parentRegionPrefix = getBedrockRegionPrefix(parentModel)

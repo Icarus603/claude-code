@@ -36,7 +36,7 @@ import {
 import { createSignal } from '@claude-code/config/signal'
 
 export function isFastModeEnabled(): boolean {
-  return !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_FAST_MODE)
+  return !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_FAST_MODE'))
 }
 
 export function isFastModeAvailable(): boolean {
@@ -125,7 +125,7 @@ export function getFastModeUnavailableReason(): string | null {
       // endpoint. We add CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS=1 to
       // bypass this check in the CC binary. This is OK since we have
       // another check in the API to error out when disabled by org.
-      if (isEnvTruthy(process.env.CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS)) {
+      if (isEnvTruthy(readEnv('CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS'))) {
         return null
       }
     }
@@ -396,7 +396,7 @@ export function resolveFastModeStatusFromCache(): void {
   if (orgStatus.status !== 'pending') {
     return
   }
-  const isAnt = process.env.USER_TYPE === 'ant'
+  const isAnt = readEnv('USER_TYPE') === 'ant'
   const cachedEnabled = getGlobalConfig().penguinModeOrgEnabled === true
   orgStatus =
     isAnt || cachedEnabled
@@ -428,7 +428,7 @@ export async function prefetchFastModeStatus(): Promise<void> {
   const hasUsableOAuth =
     getClaudeAIOAuthTokens()?.accessToken && hasProfileScope()
   if (!hasUsableOAuth && !apiKey) {
-    const isAnt = process.env.USER_TYPE === 'ant'
+    const isAnt = readEnv('USER_TYPE') === 'ant'
     const cachedEnabled = getGlobalConfig().penguinModeOrgEnabled === true
     orgStatus =
       isAnt || cachedEnabled
@@ -511,7 +511,7 @@ export async function prefetchFastModeStatus(): Promise<void> {
       // On failure: ants default to enabled (don't block internal users).
       // External users: fall back to the cached penguinModeOrgEnabled value;
       // if no positive cache, disable with network_error reason.
-      const isAnt = process.env.USER_TYPE === 'ant'
+      const isAnt = readEnv('USER_TYPE') === 'ant'
       const cachedEnabled = getGlobalConfig().penguinModeOrgEnabled === true
       orgStatus =
         isAnt || cachedEnabled
