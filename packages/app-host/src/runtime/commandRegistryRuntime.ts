@@ -86,7 +86,7 @@ const forceSnip = feature('HISTORY_SNIP')
   : null
 const workflowsCmd = feature('WORKFLOW_SCRIPTS')
   ? (
-      require('src/commands/workflows/index.js') as typeof import('src/commands/workflows/index.js')
+      require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
     ).default
   : null
 const webCmd = feature('CCR_REMOTE_SETUP')
@@ -108,12 +108,12 @@ const ultraplan = feature('ULTRAPLAN')
 const torch = feature('TORCH') ? require('src/commands/torch.js').default : null
 const peersCmd = feature('UDS_INBOX')
   ? (
-      require('src/commands/peers/index.js') as typeof import('src/commands/peers/index.js')
+      require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
     ).default
   : null
 const forkCmd = feature('FORK_SUBAGENT')
   ? (
-      require('src/commands/fork/index.js') as typeof import('src/commands/fork/index.js')
+      require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
     ).default
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
@@ -139,7 +139,7 @@ import summary from '@claude-code/command-runtime/stubs/stubCommand.js'
 import {
   resetLimits,
   resetLimitsNonInteractive,
-} from 'src/commands/reset-limits/index.js'
+} from '@claude-code/command-runtime/stubs/resetLimitsStub.js'
 import antTrace from '@claude-code/command-runtime/stubs/stubCommand.js'
 import perfIssue from '@claude-code/command-runtime/stubs/stubCommand.js'
 import sandboxToggle from 'src/commands/sandbox-toggle/index.js'
