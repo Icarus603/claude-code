@@ -1,4 +1,3 @@
-// Thin alias — canonical owner is src/utils/sandbox/sandbox-adapter.ts.
-// SandboxManager holds process-wide sandbox state; route packages/* here.
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/utils/sandbox/sandbox-adapter.js'
+// Canonical owner is now @claude-code/shell/sandbox/sandbox-adapter.
+// SandboxManager holds process-wide sandbox state.
+export * from './sandbox/sandbox-adapter.js'
