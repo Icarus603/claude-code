@@ -486,6 +486,7 @@
     "./onChangeAppState.js": "./src/onChangeAppState.ts",
     "./keyboardShortcuts.js": "./src/keyboardShortcuts.ts",
     "./collapseTeammateShutdowns.js": "./src/collapseTeammateShutdowns.ts",
-    "./collapseHookSummaries.js": "./src/collapseHookSummaries.ts"
+    "./collapseHookSummaries.js": "./src/collapseHookSummaries.ts",
+    "./fileIndex/index.js": "./src/fileIndex/index.ts"
   }
 }
