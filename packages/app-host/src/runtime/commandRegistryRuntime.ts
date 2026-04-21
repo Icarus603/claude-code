@@ -117,8 +117,8 @@ const forkCmd = feature('FORK_SUBAGENT')
     ).default
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
-import thinkback from 'src/commands/thinkback/index.js'
-import thinkbackPlay from 'src/commands/thinkback-play/index.js'
+import thinkback from '@claude-code/config/plugin/commands/thinkback/index.js'
+import thinkbackPlay from '@claude-code/config/plugin/commands/thinkback-play/index.js'
 import permissions from '@claude-code/permission/commands/index.js'
 import plan from '@claude-code/repl/commands/plan/index.js'
 import fast from 'src/commands/fast/index.js'
