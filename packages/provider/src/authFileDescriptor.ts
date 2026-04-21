@@ -6,7 +6,7 @@ import {
   setOauthTokenFromFd,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import { errorMessage, isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 
@@ -112,7 +112,7 @@ function getCredentialFromFd({
     return cached
   }
 
-  const fdEnv = process.env[envVar]
+  const fdEnv = readEnv(envVar)
   if (!fdEnv) {
     // No FD env var — either we're not in CCR, or we're a subprocess whose
     // parent stripped the (useless) FD env var. Try the well-known file.
