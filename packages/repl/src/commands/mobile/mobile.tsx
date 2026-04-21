@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Pane } from '@anthropic/ink'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 
 type Platform = 'ios' | 'android'
 

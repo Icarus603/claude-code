@@ -502,6 +502,21 @@
     "./commands/doctor/doctor.js": "./src/commands/doctor/doctor.tsx",
     "./commands/doctor/index.js": "./src/commands/doctor/index.ts",
     "./commands/export/export.js": "./src/commands/export/export.tsx",
-    "./commands/export/index.js": "./src/commands/export/index.ts"
+    "./commands/export/index.js": "./src/commands/export/index.ts",
+    "./commands/assistant/assistant.js": "./src/commands/assistant/assistant.ts",
+    "./commands/desktop/desktop.js": "./src/commands/desktop/desktop.tsx",
+    "./commands/desktop/index.js": "./src/commands/desktop/index.ts",
+    "./commands/help/help.js": "./src/commands/help/help.tsx",
+    "./commands/help/index.js": "./src/commands/help/index.ts",
+    "./commands/mobile/mobile.js": "./src/commands/mobile/mobile.tsx",
+    "./commands/mobile/index.js": "./src/commands/mobile/index.ts",
+    "./commands/output-style/output-style.js": "./src/commands/output-style/output-style.tsx",
+    "./commands/output-style/index.js": "./src/commands/output-style/index.ts",
+    "./commands/passes/passes.js": "./src/commands/passes/passes.tsx",
+    "./commands/passes/index.js": "./src/commands/passes/index.ts",
+    "./commands/vim/vim.js": "./src/commands/vim/vim.ts",
+    "./commands/vim/index.js": "./src/commands/vim/index.ts",
+    "./commands/rewind/rewind.js": "./src/commands/rewind/rewind.ts",
+    "./commands/rewind/index.js": "./src/commands/rewind/index.ts"
   }
 }

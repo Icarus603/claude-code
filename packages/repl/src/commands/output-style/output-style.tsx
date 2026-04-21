@@ -1,4 +1,4 @@
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 
 export async function call(onDone: LocalJSXCommandOnDone): Promise<undefined> {
   onDone(

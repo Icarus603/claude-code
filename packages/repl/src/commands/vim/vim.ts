@@ -2,7 +2,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { LocalCommandCall } from '../../types/command.js'
+import type { LocalCommandCall } from '@claude-code/agent/command.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 
 export const call: LocalCommandCall = async () => {

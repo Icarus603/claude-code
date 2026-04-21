@@ -103,7 +103,10 @@
     "./commands/security-review.js": "./commands/security-review.ts",
     "./commands/commit.js": "./commands/commit.ts",
     "./commands/brief.js": "./commands/brief.ts",
-    "./commands/commit-push-pr.js": "./commands/commit-push-pr.ts"
+    "./commands/commit-push-pr.js": "./commands/commit-push-pr.ts",
+    "./commands/pr_comments/index.js": "./commands/pr_comments/index.ts",
+    "./commands/tasks/index.js": "./commands/tasks/index.ts",
+    "./commands/tasks/tasks.js": "./commands/tasks/tasks.tsx"
   },
   "dependencies": {
     "zod": "^4.3.6"

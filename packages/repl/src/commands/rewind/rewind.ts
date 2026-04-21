@@ -1,4 +1,4 @@
-import type { LocalCommandResult } from '../../commands.js'
+import type { LocalCommandResult } from '@claude-code/command-runtime/runtime'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 
 export async function call(
