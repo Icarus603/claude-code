@@ -280,7 +280,7 @@ import { logSkillsLoaded } from '@claude-code/app-host/startup/skillLoadedEvent.
 import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
 import { validateUuid } from '@claude-code/agent/uuid.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
-import { getRelevantTips } from 'src/services/tips/tipRegistry.js'
+import { getRelevantTips } from '@claude-code/repl/tips/tipRegistry.js'
 import { logContextMetrics } from 'src/utils/api.js'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,

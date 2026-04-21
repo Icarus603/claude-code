@@ -539,6 +539,10 @@
     "./commands/plan/plan.js": "./src/commands/plan/plan.tsx",
     "./commands/plan/index.js": "./src/commands/plan/index.ts",
     "./commands/heapdump/heapdump.js": "./src/commands/heapdump/heapdump.ts",
-    "./commands/heapdump/index.js": "./src/commands/heapdump/index.ts"
+    "./commands/heapdump/index.js": "./src/commands/heapdump/index.ts",
+    "./tips/tipHistory.js": "./src/tips/tipHistory.ts",
+    "./tips/tipScheduler.js": "./src/tips/tipScheduler.ts",
+    "./tips/types.js": "./src/tips/types.ts",
+    "./tips/tipRegistry.js": "./src/tips/tipRegistry.ts"
   }
 }

@@ -389,7 +389,7 @@ import { useInstallMessages } from '@claude-code/repl/hooks/notifs/useInstallMes
 import { useAwaySummary } from '@claude-code/repl/hooks/useAwaySummary.js';
 import { useChromeExtensionNotification } from '@claude-code/repl/hooks/useChromeExtensionNotification.js';
 import { useOfficialMarketplaceNotification } from '@claude-code/repl/hooks/useOfficialMarketplaceNotification.js';
-import { getTipToShowOnSpinner, recordShownTip } from 'src/services/tips/tipScheduler.js';
+import { getTipToShowOnSpinner, recordShownTip } from '@claude-code/repl/tips/tipScheduler.js';
 import type { Theme } from '@anthropic/ink';
 import {
   checkAndDisableBypassPermissionsIfNeeded,
