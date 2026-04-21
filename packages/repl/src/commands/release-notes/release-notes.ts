@@ -1,10 +1,10 @@
-import type { LocalCommandResult } from '../../types/command.js'
+import type { LocalCommandResult } from '@claude-code/agent/command.js'
 import {
   CHANGELOG_URL,
   fetchAndStoreChangelog,
   getAllReleaseNotes,
   getStoredChangelog,
-} from '../../utils/releaseNotes.js'
+} from '@claude-code/repl/releaseNotes.js'
 
 function formatReleaseNotes(notes: Array<[string, string[]]>): string {
   return notes
