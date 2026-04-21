@@ -537,6 +537,8 @@
     "./commands/feedback/index.js": "./src/commands/feedback/index.ts",
     "./commands/feedback/feedback.js": "./src/commands/feedback/feedback.tsx",
     "./commands/plan/plan.js": "./src/commands/plan/plan.tsx",
-    "./commands/plan/index.js": "./src/commands/plan/index.ts"
+    "./commands/plan/index.js": "./src/commands/plan/index.ts",
+    "./commands/heapdump/heapdump.js": "./src/commands/heapdump/heapdump.ts",
+    "./commands/heapdump/index.js": "./src/commands/heapdump/index.ts"
   }
 }
