@@ -128,6 +128,20 @@ const RULE_B_MATCHER: Matcher = (line) => {
   return null
 }
 
+// Build-time --define identifiers. These names are compile-time substituted
+// via `bun build --define` / `esbuild define`, so the bundler can constant-
+// fold the comparisons and eliminate dead branches. Callers MUST keep the
+// identifier inlined (`process.env.USER_TYPE === 'ant'`), because routing
+// through a helper like `readEnv('USER_TYPE')` is an opaque function call
+// that defeats DCE — shipping ant-only branches into external builds.
+//
+// When adding entries here, make sure scripts/defines.ts (the build-time
+// substitution source) actually substitutes the identifier — otherwise
+// exempting it is lying about the DCE guarantee.
+const BUILD_DEFINE_ENV_IDENTIFIERS = new Set([
+  'USER_TYPE',
+])
+
 const RULE_C_MATCHER: Matcher = (line) => {
   // process.env.FOO or process.env['FOO'] READS. We use a crude heuristic:
   // any `process.env.` access is flagged unless it is a WRITE:
@@ -137,6 +151,11 @@ const RULE_C_MATCHER: Matcher = (line) => {
   // allow pure writes: `process.env.FOO = ...`
   if (/\bprocess\.env\.[A-Z_][A-Z0-9_]*\s*=[^=]/.test(line)) return null
   if (/\bprocess\.env\[['"][^'"]+['"]\]\s*=[^=]/.test(line)) return null
+  // allow build-define identifiers (see BUILD_DEFINE_ENV_IDENTIFIERS).
+  const accessMatch = line.match(/\bprocess\.env\.([A-Z_][A-Z0-9_]*)/)
+  if (accessMatch && BUILD_DEFINE_ENV_IDENTIFIERS.has(accessMatch[1]!)) {
+    return null
+  }
   return 'V7 §8.6 — core-domain package must go through config for env access'
 }
 
