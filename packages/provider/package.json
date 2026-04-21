@@ -64,6 +64,8 @@
     "./connectorTextTypes": "./src/connectorTextTypes.ts",
     "./oauthConstants": "./src/oauthConstants.ts",
     "./systemPromptSections": "./src/systemPromptSections.ts",
+    "./auth.js": "./src/auth.ts",
+    "./authPortable.js": "./src/authPortable.ts",
     "./authAlias.js": "./src/authAlias.ts",
     "./model.js": "./src/model.ts",
     "./providers.js": "./src/providers.ts",
