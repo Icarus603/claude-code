@@ -13,7 +13,7 @@ import { createInteractiveHost } from '@claude-code/app-host'
 async function main(): Promise<void> {
   const [mainContent, replLauncherContent, modeDispatchContent] = await Promise.all([
     readFile('src/main.tsx', 'utf8'),
-    readFile('src/replLauncher.tsx', 'utf8'),
+    readFile('packages/app-host/src/launchRepl.tsx', 'utf8'),
     readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
   ])
   // After cut-E, the action handler body lives in mode-dispatch.ts.
@@ -108,7 +108,7 @@ async function main(): Promise<void> {
   for (const seam of requiredLauncherSeams) {
     if (!replLauncherContent.includes(seam)) {
       throw new Error(
-        `replLauncher.tsx missing interactive host composition seam: ${seam}`,
+        `packages/app-host/src/launchRepl.tsx missing interactive host composition seam: ${seam}`,
       )
     }
   }

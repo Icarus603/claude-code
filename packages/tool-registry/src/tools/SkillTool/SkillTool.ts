@@ -110,7 +110,7 @@ const remoteSkillModules = feature('EXPERIMENTAL_SKILL_SEARCH')
       ...(require('src/services/skillSearch/remoteSkillState.js') as typeof import('src/services/skillSearch/remoteSkillState.js')),
       ...(require('src/services/skillSearch/remoteSkillLoader.js') as typeof import('src/services/skillSearch/remoteSkillLoader.js')),
       ...(require('src/services/skillSearch/telemetry.js') as typeof import('src/services/skillSearch/telemetry.js')),
-      ...(require('src/services/skillSearch/featureCheck.js') as typeof import('src/services/skillSearch/featureCheck.js')),
+      ...(require('@claude-code/command-runtime/skills/featureCheck.js') as typeof import('@claude-code/command-runtime/skills/featureCheck.js')),
     }
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */

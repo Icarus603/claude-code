@@ -4,7 +4,7 @@ const REPL_LINE_BUDGET = 120
 
 async function main(): Promise<void> {
   const [replLauncher, replContent, cliIndex, modeDispatchContent] = await Promise.all([
-    readFile('src/replLauncher.tsx', 'utf8'),
+    readFile('packages/app-host/src/launchRepl.tsx', 'utf8'),
     readFile('packages/repl/src/screens/REPL.tsx', 'utf8'),
     readFile('packages/cli/src/index.ts', 'utf8'),
     readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
@@ -13,7 +13,7 @@ async function main(): Promise<void> {
   // V7 §10.1: the REPL launch action moved to
   // packages/cli/src/entry/mode-dispatch.ts, so the dedicated launcher seam
   // must be consumed there — not from main.tsx.
-  if (!modeDispatchContent.includes("from '../../../../src/replLauncher.js'")) {
+  if (!modeDispatchContent.includes("from '@claude-code/app-host/launchRepl.js'")) {
     throw new Error(
       'packages/cli/src/entry/mode-dispatch.ts no longer consumes the dedicated repl launcher seam',
     )
