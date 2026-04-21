@@ -224,7 +224,7 @@ import {
 import { getGhAuthStatus } from 'src/utils/github/ghAuthStatus.js'
 import { safeParseJSON } from '@claude-code/storage/json.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { getModelDeprecationWarning } from 'src/utils/model/deprecation.js'
+import { getModelDeprecationWarning } from '@claude-code/provider/model/deprecation.js'
 import {
   getDefaultMainLoopModel,
   getUserSpecifiedModelSetting,
