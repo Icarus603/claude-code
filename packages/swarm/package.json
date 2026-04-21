@@ -13,7 +13,11 @@
     "./teammateContext.js": "./src/teammateContext.ts",
     "./teamDiscovery.js": "./src/teamDiscovery.ts",
     "./teammateContextAlias.js": "./src/teammateContextAlias.ts",
-    "./adapters/appRuntime.js": "./src/adapters/appRuntime.ts"
+    "./adapters/appRuntime.js": "./src/adapters/appRuntime.ts",
+    "./commands/agents/agents.js": "./commands/agents/agents.tsx",
+    "./commands/agents/index.js": "./commands/agents/index.ts",
+    "./commands/branch/branch.js": "./commands/branch/branch.ts",
+    "./commands/branch/index.js": "./commands/branch/index.ts"
   },
   "dependencies": {
     "@claude-code/agent": "workspace:*",
