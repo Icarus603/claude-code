@@ -1,4 +1,5 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
+import { readEnv } from '@claude-code/config/env/utils'
 import { isUltrathinkEnabled } from '@claude-code/provider/thinking.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import {

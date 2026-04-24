@@ -1,3 +1,5 @@
+import { readEnv } from '@claude-code/config/env/utils'
+
 type SystemTheme = 'dark' | 'light'
 
 let cachedSystemTheme: SystemTheme | undefined
