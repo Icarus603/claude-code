@@ -1,5 +1,8 @@
-import { SandboxManager } from "src/utils/sandbox/sandbox-adapter.js";
-import { parseUserSpecifiedModel, getDefaultMainLoopModel } from "src/utils/model/model.js";
+import { SandboxManager } from "@claude-code/shell/sandbox/sandbox-adapter.js";
+import {
+	parseUserSpecifiedModel,
+	getDefaultMainLoopModel,
+} from "@claude-code/provider/model.js";
 import { getContextWindowForModel } from "@claude-code/agent/context.js";
 import { getInitialMainLoopModel, getSdkBetas } from "../../bootstrap/state.js";
 import { logSkillsLoaded } from "@claude-code/app-host/startup/skillLoadedEvent.js";
