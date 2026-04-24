@@ -66,7 +66,7 @@ const proactive =
     : null
 const briefCommand =
   feature('KAIROS') || feature('KAIROS_BRIEF')
-    ? require('src/commands/brief.js').default
+    ? require('@claude-code/agent/commands/brief.js').default
     : null
 const assistantCommand = feature('KAIROS')
   ? require('@claude-code/repl/commands/assistant/index.js').default
