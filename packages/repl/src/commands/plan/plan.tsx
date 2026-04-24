@@ -9,7 +9,7 @@ import { applyPermissionUpdate } from '@claude-code/permission/PermissionUpdate'
 import { prepareContextForPlanMode } from '@claude-code/permission/permissionSetup'
 import { getPlan, getPlanFilePath } from '@claude-code/storage/plans.js'
 import { editFileInEditor } from '@claude-code/repl/promptEditor.js'
-import { renderToString } from '@claude-code/output/render/static-render.js'
+import { renderToString } from '@claude-code/output/render'
 
 function PlanDisplay({
   planContent,
