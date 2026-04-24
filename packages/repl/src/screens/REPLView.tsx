@@ -347,7 +347,7 @@ import {
   type IdeType,
 } from '@claude-code/ide/ide.js';
 import { useIDEIntegration } from '@claude-code/ide/hooks/useIDEIntegration.js';
-import exit from 'src/commands/exit/index.js';
+import exit from '@claude-code/repl/commands/exit/index.js';
 import { ExitFlow } from '@claude-code/repl/components/ExitFlow.js';
 import { getCurrentWorktreeSession } from '@claude-code/swarm';
 import {
