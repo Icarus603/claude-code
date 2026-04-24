@@ -1,4 +1,5 @@
 import { BROWSER_TOOLS } from '@ant/claude-for-chrome-mcp'
+import { readEnv } from '@claude-code/config/env/utils'
 import { chmod, mkdir, readFile, writeFile } from 'fs/promises'
 import { homedir } from 'os'
 import { join } from 'path'

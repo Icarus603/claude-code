@@ -1,4 +1,5 @@
 import { feature } from 'bun:bundle'
+import { readEnv } from '@claude-code/config/env/utils'
 import { chmod, mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises'
 import { join } from 'path'
 import {
