@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/plugin/dependencyResolver`.
- */
-export * from '@claude-code/config/plugin/dependencyResolver'
+// Forward shim — canonical owner is packages/config/plugin/v7/dependencyResolver.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/config/plugin/v7/dependencyResolver.js'

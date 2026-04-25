@@ -25,10 +25,19 @@ export * from '@claude-code/headless-sdk/coreTypes.js'
 // Re-export runtime types (callbacks, interfaces with methods)
 export * from '@claude-code/headless-sdk/runtimeTypes.js'
 
-// Re-export settings types (generated from settings JSON schema)
-export type { Settings } from 'src/entrypoints/sdk/settingsTypes.generated.js'
+// Settings types (generated from settings JSON schema). Inlined from
+// src/entrypoints/sdk/settingsTypes.generated.ts which was a 4-LOC stub.
+export type Settings = Record<string, unknown>
 // Re-export tool types (all marked @internal until SDK API stabilizes)
-export * from 'src/entrypoints/sdk/toolTypes.js'
+// V7-flipped: was `export * from '@claude-code/headless-sdk/agentSdkTypes.js'`. Inlined
+// because toolTypes.ts was a 9-LOC stub with one type alias.
+/** @internal */
+export type SdkToolDefinition = {
+  name: string
+  description: string
+  inputSchema: Record<string, unknown>
+  [key: string]: unknown
+}
 
 // ============================================================================
 // Functions

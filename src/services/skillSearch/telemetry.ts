@@ -1,11 +1,3 @@
-// Auto-generated stub — replace with real implementation
-export function logRemoteSkillLoaded(_data: {
-  slug: string;
-  cacheHit: boolean;
-  latencyMs: number;
-  urlScheme: string;
-  error?: string;
-  fileCount?: number;
-  totalBytes?: number;
-  fetchMethod?: string;
-}): void {}
+// Forward shim — canonical owner is packages/agent/skillSearch/telemetry.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/skillSearch/telemetry.js'

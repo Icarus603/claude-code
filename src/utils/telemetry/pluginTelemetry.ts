@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/tool-registry/telemetry/pluginTelemetry.
-export * from '@claude-code/tool-registry/telemetry/pluginTelemetry.js'
+// Forward shim — canonical owner is packages/local-observability/src/telemetry/pluginTelemetry.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/local-observability/telemetry/pluginTelemetry.js'

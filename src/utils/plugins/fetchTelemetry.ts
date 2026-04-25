@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/plugin/fetchTelemetry`.
- */
-export * from '@claude-code/config/plugin/fetchTelemetry'
+// Forward shim — canonical owner is packages/config/plugin/v7/fetchTelemetry.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/config/plugin/v7/fetchTelemetry.js'

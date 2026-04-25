@@ -6,7 +6,7 @@ import * as React from 'react'
 export type AppState = unknown
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const mod = require('src/state/AppState.js') as {
+const mod = require('@claude-code/app-host/state/AppState.js') as {
   AppStateProvider: React.ComponentType<{
     children?: React.ReactNode
     onChangeAppState?: (prev: unknown, next: unknown) => void

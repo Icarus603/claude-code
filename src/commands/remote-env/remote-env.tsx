@@ -1,9 +1,3 @@
-import * as React from 'react'
-import { RemoteEnvironmentDialog } from '@claude-code/repl/components/RemoteEnvironmentDialog.js'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-
-export async function call(
-  onDone: LocalJSXCommandOnDone,
-): Promise<React.ReactNode> {
-  return <RemoteEnvironmentDialog onDone={onDone} />
-}
+// Forward shim — canonical owner is packages/command-runtime/src/commands/remote-env/remote-env.tsx.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/remote-env/remote-env.js'

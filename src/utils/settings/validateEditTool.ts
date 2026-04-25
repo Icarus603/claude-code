@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/settings/validateEditTool`.
- */
-export * from '@claude-code/config/settings/validateEditTool'
+// Forward shim — canonical owner is packages/config/settings/v7/validateEditTool.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/config/settings/v7/validateEditTool.js'

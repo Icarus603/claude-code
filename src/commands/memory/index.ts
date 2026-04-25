@@ -1,10 +1,3 @@
-import type { Command } from '../../commands.js'
-
-const memory: Command = {
-  type: 'local-jsx',
-  name: 'memory',
-  description: 'Edit Claude memory files',
-  load: () => import('./memory.js'),
-}
-
-export default memory
+// Forward shim — canonical owner is packages/command-runtime/src/commands/memory/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/memory/index.js'

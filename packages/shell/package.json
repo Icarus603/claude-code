@@ -31,7 +31,14 @@
     "./powershell/dangerousCmdlets.js": "./src/powershell/dangerousCmdlets.ts",
     "./shellCommand.js": "./src/shellCommand.ts",
     "./bash/prefix.js": "./src/bash/prefix.ts",
-    "./sandbox/sandbox-adapter.js": "./src/sandbox/sandbox-adapter.ts"
+    "./sandbox/sandbox-adapter.js": "./src/sandbox/sandbox-adapter.ts",
+    "./sandboxDir/sandbox-ui-utils.js": "./src/sandboxDir/sandbox-ui-utils.ts",
+    "./sandboxDir/sandbox-adapter.js": "./src/sandboxDir/sandbox-adapter.ts",
+    "./legacy_v7/ShellCommand.js": "./src/legacy_v7/ShellCommand.ts",
+    "./legacy_v7/appleTerminalBackup.js": "./src/legacy_v7/appleTerminalBackup.ts",
+    "./legacy_v7/iTermBackup.js": "./src/legacy_v7/iTermBackup.ts",
+    "./legacy_v7/terminalPanel.js": "./src/legacy_v7/terminalPanel.ts",
+    "./legacy_v7/tmuxSocket.js": "./src/legacy_v7/tmuxSocket.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

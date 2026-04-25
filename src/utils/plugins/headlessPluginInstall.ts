@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/plugin/headlessPluginInstall`.
- */
-export * from '@claude-code/config/plugin/headlessPluginInstall'
+// Forward shim — canonical owner is packages/config/plugin/v7/headlessPluginInstall.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/config/plugin/v7/headlessPluginInstall.js'

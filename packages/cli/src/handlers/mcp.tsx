@@ -385,7 +385,7 @@ export async function mcpAddFromDesktopHandler(options: {
     })
 
     const { readClaudeDesktopMcpServers } = await import(
-      'src/utils/claudeDesktop.js'
+      '@claude-code/repl/legacy/diagnostics/claudeDesktop.js'
     )
     const servers = await readClaudeDesktopMcpServers()
 

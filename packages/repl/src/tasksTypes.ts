@@ -1,4 +1,46 @@
-// Thin alias — canonical owner is src/tasks/types.ts (TaskState union over
-// all concrete task types in src/tasks/*).
-// eslint-disable-next-line no-restricted-imports
-export * from 'src/tasks/types.js'
+// Union of all concrete task state types
+// Use this for components that need to work with any task type
+
+import type { DreamTaskState } from 'src/tasks/DreamTask/DreamTask.js'
+import type { InProcessTeammateTaskState } from './InProcessTeammateTask/types.js'
+import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
+import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'
+import type { LocalWorkflowTaskState } from 'src/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
+import type { MonitorMcpTaskState } from 'src/tasks/MonitorMcpTask/MonitorMcpTask.js'
+import type { RemoteAgentTaskState } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
+
+export type TaskState =
+  | LocalShellTaskState
+  | LocalAgentTaskState
+  | RemoteAgentTaskState
+  | InProcessTeammateTaskState
+  | LocalWorkflowTaskState
+  | MonitorMcpTaskState
+  | DreamTaskState
+
+// Task types that can appear in the background tasks indicator
+export type BackgroundTaskState =
+  | LocalShellTaskState
+  | LocalAgentTaskState
+  | RemoteAgentTaskState
+  | InProcessTeammateTaskState
+  | LocalWorkflowTaskState
+  | MonitorMcpTaskState
+  | DreamTaskState
+
+/**
+ * Check if a task should be shown in the background tasks indicator.
+ * A task is considered a background task if:
+ * 1. It is running or pending
+ * 2. It has been explicitly backgrounded (not a foreground task)
+ */
+export function isBackgroundTask(task: TaskState): task is BackgroundTaskState {
+  if (task.status !== 'running' && task.status !== 'pending') {
+    return false
+  }
+  // Foreground tasks (isBackgrounded === false) are not yet "background tasks"
+  if ('isBackgrounded' in task && task.isBackgrounded === false) {
+    return false
+  }
+  return true
+}

@@ -3,7 +3,7 @@ import { feature } from 'bun:bundle'
 // Dead code elimination: conditional import for COORDINATOR_MODE
 /* eslint-disable @typescript-eslint/no-require-imports */
 const coordinatorModule = feature('COORDINATOR_MODE')
-  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
+  ? (require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js'))
   : undefined
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { Box, Text, Link } from '@anthropic/ink'

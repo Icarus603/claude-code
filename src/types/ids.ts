@@ -1,3 +1,3 @@
-// Canonical owner is @claude-code/agent/idTypes.
-export { asAgentId, asSessionId, toAgentId } from '@claude-code/agent/idTypes'
-export type { AgentId, SessionId } from '@claude-code/agent/idTypes'
+// Forward shim — canonical owner is packages/repl/src/types_v7/ids.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/repl/types_v7/ids.js'

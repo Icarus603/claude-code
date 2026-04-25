@@ -14,7 +14,7 @@ export type FooterItem = unknown
  */
 export function getAppStoreContext(): Context<unknown> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as {
+  const mod = require('@claude-code/app-host/state/AppState.js') as {
     AppStoreContext: Context<unknown>
   }
   return mod.AppStoreContext
@@ -22,7 +22,7 @@ export function getAppStoreContext(): Context<unknown> {
 
 export function useAppState<T>(selector: (state: unknown) => T): T {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as {
+  const mod = require('@claude-code/app-host/state/AppState.js') as {
     useAppState: <U>(s: (state: unknown) => U) => U
   }
   return mod.useAppState<T>(selector)
@@ -32,7 +32,7 @@ export function useAppStateMaybeOutsideOfProvider<T>(
   selector: (state: unknown) => T,
 ): T | undefined {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as {
+  const mod = require('@claude-code/app-host/state/AppState.js') as {
     useAppStateMaybeOutsideOfProvider: <U>(s: (state: unknown) => U) => U | undefined
   }
   return mod.useAppStateMaybeOutsideOfProvider<T>(selector)
@@ -40,7 +40,7 @@ export function useAppStateMaybeOutsideOfProvider<T>(
 
 export function useSetAppState(): (updater: (prev: unknown) => unknown) => void {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as {
+  const mod = require('@claude-code/app-host/state/AppState.js') as {
     useSetAppState: () => (updater: (prev: unknown) => unknown) => void
   }
   return mod.useSetAppState()
@@ -52,7 +52,7 @@ export function useAppStateStore(): {
   subscribe: (listener: () => void) => () => void
 } {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as {
+  const mod = require('@claude-code/app-host/state/AppState.js') as {
     useAppStateStore: () => {
       getState: () => unknown
       setState: (updater: (prev: unknown) => unknown) => void
@@ -67,7 +67,7 @@ export function AppStateProvider(props: {
   children: ReactNode
 }): ReactNode {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as {
+  const mod = require('@claude-code/app-host/state/AppState.js') as {
     AppStateProvider: (p: { initialState: unknown; children: ReactNode }) => ReactNode
   }
   return mod.AppStateProvider(props)

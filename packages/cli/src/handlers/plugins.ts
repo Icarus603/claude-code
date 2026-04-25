@@ -154,7 +154,7 @@ export async function pluginListHandler(options: {
 
   const installedData = loadInstalledPluginsV2()
   const { getPluginEditableScopes } = await import(
-    'src/utils/plugins/pluginStartupCheck.js'
+    '@claude-code/config/plugin/pluginStartupCheck'
   )
   const enabledPlugins = getPluginEditableScopes()
 

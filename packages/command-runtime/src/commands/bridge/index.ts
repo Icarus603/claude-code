@@ -1,0 +1,26 @@
+import { feature } from 'bun:bundle'
+import { isBridgeEnabled } from '@claude-code/bridge/bridgeEnabled.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
+
+function isEnabled(): boolean {
+  if (!feature('BRIDGE_MODE')) {
+    return false
+  }
+  return isBridgeEnabled()
+}
+
+const bridge = {
+  type: 'local-jsx',
+  name: 'remote-control',
+  aliases: ['rc'],
+  description: 'Connect this terminal for remote-control sessions',
+  argumentHint: '[name]',
+  isEnabled,
+  get isHidden() {
+    return !isEnabled()
+  },
+  immediate: true,
+  load: () => import('@claude-code/command-runtime/commands/bridge/bridge.js'),
+} satisfies Command
+
+export default bridge

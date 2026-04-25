@@ -1,4 +1,3 @@
-import type { AppState } from './AppStateStore.js';
-
-export const selectMcp = (state: AppState) => state.mcp;
-export const selectElicitation = (state: AppState) => state.elicitation;
+// Forward shim — canonical owner is packages/app-host/src/state/mcpSelectors.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/app-host/state/mcpSelectors.js'

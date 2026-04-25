@@ -22,7 +22,7 @@ export async function performLogout({
 }): Promise<void> {
   // Flush telemetry BEFORE clearing credentials to prevent org data leakage
   const { flushTelemetry } = await import(
-    'src/utils/telemetry/instrumentation.js'
+    '@claude-code/local-observability/telemetry'
   )
   await flushTelemetry()
 

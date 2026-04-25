@@ -18,15 +18,15 @@ import { Ansi, applyColor, Box, Text, useInput, stringWidth as getStringWidth, t
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getGlobalConfig } from '@claude-code/config'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
-import { generateHeatmap } from 'src/utils/heatmap.js'
+import { generateHeatmap } from '@claude-code/local-observability/legacy/heatmap.js'
 import { renderModelName } from '@claude-code/provider/model.js'
-import { copyAnsiToClipboard } from 'src/utils/screenshotClipboard.js'
+import { copyAnsiToClipboard } from '@claude-code/repl/legacy/clipboard/screenshotClipboard.js'
 import {
   aggregateClaudeCodeStatsForRange,
   type ClaudeCodeStats,
   type DailyModelTokens,
   type StatsDateRange,
-} from 'src/utils/stats.js'
+} from '@claude-code/local-observability/legacy/stats.js'
 import { resolveThemeSetting } from '@claude-code/repl/systemTheme.js'
 import { getTheme, themeColorToAnsi } from '@anthropic/ink'
 import { Spinner } from './Spinner.js'

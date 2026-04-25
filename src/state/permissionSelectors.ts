@@ -1,6 +1,3 @@
-import type { AppState } from './AppStateStore.js';
-
-export const selectToolPermissionContext = (state: AppState) => state.toolPermissionContext;
-export const selectPendingWorkerRequest = (state: AppState) => state.pendingWorkerRequest;
-export const selectPendingSandboxRequest = (state: AppState) => state.pendingSandboxRequest;
-export const selectWorkerSandboxPermissions = (state: AppState) => state.workerSandboxPermissions;
+// Forward shim — canonical owner is packages/app-host/src/state/permissionSelectors.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/app-host/state/permissionSelectors.js'

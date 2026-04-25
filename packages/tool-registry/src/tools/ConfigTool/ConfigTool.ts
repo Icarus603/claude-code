@@ -238,7 +238,7 @@ export const ConfigTool = buildTool({
         '@claude-code/voice/voiceModeEnabled.js'
       )
       if (!isVoiceModeEnabled()) {
-        const { isAnthropicAuthEnabled } = await import('src/utils/auth.js')
+        const { isAnthropicAuthEnabled } = await import('@claude-code/provider/authAlias.js')
         return {
           data: {
             success: false,
@@ -347,7 +347,7 @@ export const ConfigTool = buildTool({
       // and the settings cache resets for the next /voice read.
       if (feature('VOICE_MODE') && setting === 'voiceEnabled') {
         const { settingsChangeDetector } = await import(
-          'src/utils/settings/changeDetector.js'
+          '@claude-code/config/settings/v7/changeDetector.js'
         )
         settingsChangeDetector.notifyChange('userSettings')
       }

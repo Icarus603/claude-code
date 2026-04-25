@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/shell/sandboxUiUtils.
-export * from '@claude-code/shell/sandboxUiUtils'
+// Forward shim — canonical owner is packages/shell/src/sandboxDir/sandbox-ui-utils.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/shell/sandboxDir/sandbox-ui-utils.js'

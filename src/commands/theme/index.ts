@@ -1,10 +1,3 @@
-import type { Command } from '../../commands.js'
-
-const theme = {
-  type: 'local-jsx',
-  name: 'theme',
-  description: 'Change the theme',
-  load: () => import('./theme.js'),
-} satisfies Command
-
-export default theme
+// Forward shim — canonical owner is packages/command-runtime/src/commands/theme/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/theme/index.js'

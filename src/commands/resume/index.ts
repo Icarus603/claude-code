@@ -1,12 +1,3 @@
-import type { Command } from '../../commands.js'
-
-const resume: Command = {
-  type: 'local-jsx',
-  name: 'resume',
-  description: 'Resume a previous conversation',
-  aliases: ['continue'],
-  argumentHint: '[conversation id or search term]',
-  load: () => import('./resume.js'),
-}
-
-export default resume
+// Forward shim — canonical owner is packages/command-runtime/src/commands/resume/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/resume/index.js'

@@ -4,7 +4,7 @@ import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { useNotifications } from '@claude-code/repl/notifications.js'
 import { Text } from '@anthropic/ink'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { onPluginsAutoUpdated } from 'src/utils/plugins/pluginAutoupdate.js'
+import { onPluginsAutoUpdated } from '@claude-code/config/plugin/pluginAutoupdate'
 
 /**
  * Hook that displays a notification when plugins have been auto-updated.

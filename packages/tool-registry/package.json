@@ -89,13 +89,15 @@
     "./claudeCodeHints.js": "./src/claudeCodeHints.ts",
     "./markdownConfigLoader.js": "./src/markdownConfigLoader.ts",
     "./toolsList.js": "./src/toolsList.ts",
-    "./tasks/RemoteAgentTask.js": "./src/tasks/RemoteAgentTask.ts",
-    "./teleport.js": "./src/teleport.ts",
+    "./tasks/RemoteAgentTask.js": "./src/tasks/RemoteAgentTask.tsx",
+    "./teleport.js": "./src/teleport.tsx",
     "./telemetry/pluginTelemetry.js": "./src/telemetry/pluginTelemetry.ts",
     "./skills/skillChangeDetector.js": "./src/skills/skillChangeDetector.ts",
     "./suggestions/skillUsageTracking.js": "./src/suggestions/skillUsageTracking.ts",
     "./codeIndexing.js": "./src/codeIndexing.ts",
     "./generatedFiles.js": "./src/generatedFiles.ts",
-    "./toolPool.js": "./src/toolPool.ts"
+    "./toolPool.js": "./src/toolPool.ts",
+    "./skillsDir/skillChangeDetector.js": "./src/skillsDir/skillChangeDetector.ts",
+    "./todo/types.js": "./src/todo/types.ts"
   }
 }

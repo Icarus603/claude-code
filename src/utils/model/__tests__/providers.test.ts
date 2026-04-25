@@ -3,7 +3,7 @@ import { mock } from "bun:test";
 
 let mockedModelType: "gemini" | undefined;
 
-mock.module("../../settings/settings.js", () => ({
+mock.module("@claude-code/config/settings", () => ({
   getInitialSettings: () =>
     mockedModelType ? { modelType: mockedModelType } : {},
 }));

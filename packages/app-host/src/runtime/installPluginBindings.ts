@@ -221,7 +221,7 @@ export function installPluginBindings(): void {
   // --- app state
   setGetAppStateFn(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('src/state/AppState.js') as {
+    const mod = require('@claude-code/app-host/state/AppState.js') as {
       getAppState: () => unknown
     }
     return mod.getAppState?.() ?? {}
@@ -230,14 +230,14 @@ export function installPluginBindings(): void {
   // --- services/plugins/pluginOperations (cyclic with plugin utils)
   setPluginOperationsFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('src/services/plugins/pluginOperations.js'),
+    require('@claude-code/config/plugin/pluginOperations'),
   )
 
   // --- misc helpers
   setRgPathFn(() => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('src/utils/ripgrep.js')
+      const mod = require('@claude-code/tool-registry/ripgrep.js')
       return mod.rgPath?.() ?? null
     } catch {
       return null
@@ -246,7 +246,7 @@ export function installPluginBindings(): void {
   setSecureStorageReadFn(async key => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('src/utils/secureStorage/index.js')
+      const mod = require('@claude-code/storage/secureStorage.js')
       return mod.secureStorageRead ? await mod.secureStorageRead(key) : null
     } catch {
       return null
@@ -255,7 +255,7 @@ export function installPluginBindings(): void {
   setSecureStorageWriteFn(async (key, value) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('src/utils/secureStorage/index.js')
+      const mod = require('@claude-code/storage/secureStorage.js')
       if (mod.secureStorageWrite) await mod.secureStorageWrite(key, value)
     } catch {
       // ignore
@@ -263,21 +263,21 @@ export function installPluginBindings(): void {
   })
   setParseMarkdownFrontmatterFn(text => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('src/utils/frontmatterParser.js')
+    const mod = require('@claude-code/agent/frontmatterParser.js')
     return mod.parseMarkdownFrontmatter
       ? mod.parseMarkdownFrontmatter(text)
       : { frontmatter: {}, body: '' }
   })
   setWalkMarkdownFilesFn(async dir => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('src/utils/markdownConfigLoader.js')
+    const mod = require('@claude-code/tool-registry/markdownConfigLoader.js')
     return mod.walkMarkdownFiles
       ? ((await mod.walkMarkdownFiles(dir)) as string[])
       : []
   })
   setLoadMarkdownConfigFn(path => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('src/utils/markdownConfigLoader.js')
+    const mod = require('@claude-code/tool-registry/markdownConfigLoader.js')
     return mod.loadMarkdownConfig ? mod.loadMarkdownConfig(path) : null
   })
   setGetLspManagerFn(() => {
@@ -337,7 +337,7 @@ export function installPluginBindings(): void {
   }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const hintMod = require('src/utils/claudeCodeHints.js')
+    const hintMod = require('@claude-code/tool-registry/claudeCodeHints.js')
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { setGetHintsProviderFn: _gh } = require(
       '@claude-code/config/plugin/_deps',

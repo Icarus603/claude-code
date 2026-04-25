@@ -4,3 +4,4 @@
 
 export * from './format.js'
 export * from './brief-timestamp.js'
+export * from './truncate.js'

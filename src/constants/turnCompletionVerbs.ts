@@ -1,12 +1,3 @@
-// Past tense verbs for turn completion messages
-// These verbs work naturally with "for [duration]" (e.g., "Worked for 5s")
-export const TURN_COMPLETION_VERBS = [
-  'Baked',
-  'Brewed',
-  'Churned',
-  'Cogitated',
-  'Cooked',
-  'Crunched',
-  'Sautéed',
-  'Worked',
-]
+// Forward shim — canonical owner is packages/agent/constants_v7/turnCompletionVerbs.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/constants_v7/turnCompletionVerbs.js'

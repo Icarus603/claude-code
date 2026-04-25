@@ -11,7 +11,7 @@ import {
   getRecentActivitySync,
   getRecentReleaseNotesSync,
   getLogoDisplayData,
-} from 'src/utils/logoV2Utils.js'
+} from '@claude-code/repl/legacy/uiHelpers/logoV2Utils.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { Clawd } from './Clawd.js'

@@ -33,8 +33,8 @@ import {
   popAllEditable,
 } from '@claude-code/agent/messageQueueManager.js'
 import stripAnsi from 'strip-ansi'
-import { FastModePicker } from 'src/commands/fast/fast.js'
-import { isUltrareviewEnabled } from 'src/commands/review/ultrareviewEnabled.js'
+import { FastModePicker } from '@claude-code/command-runtime/commands/fast/fast.js'
+import { isUltrareviewEnabled } from '@claude-code/command-runtime/commands/review/ultrareviewEnabled.js'
 import { getNativeCSIuTerminalDisplayName } from '@claude-code/repl/terminalSetup.js'
 import { type Command, hasCommand } from '@claude-code/command-runtime/runtime'
 import { useIsModalOverlayActive } from '@claude-code/repl/overlayContext.js'
@@ -117,7 +117,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   parseDirectMemberMessage,
   sendDirectMemberMessage,
-} from 'src/utils/directMemberMessage.js'
+} from '@claude-code/agent/legacy_misc/directMemberMessage.js'
 import type { EffortLevel } from '@claude-code/agent/effort.js'
 import { env } from '@claude-code/config/env/paths'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
@@ -153,17 +153,17 @@ import {
 } from '@claude-code/permission/getNextPermissionMode.js'
 import { transitionPermissionMode } from '@claude-code/permission/permissionSetup'
 import { getPlatform } from '@claude-code/config/platform'
-import type { ProcessUserInputContext } from 'src/utils/processUserInput/processUserInput.js'
+import type { ProcessUserInputContext } from '@claude-code/repl/processUserInput/processUserInput.js'
 import { editPromptInEditor } from '@claude-code/repl/promptEditor.js'
 import { hasAutoModeOptIn } from '@claude-code/config/settings'
-import { findBtwTriggerPositions } from 'src/utils/sideQuestion.js'
-import { findSlashCommandPositions } from 'src/utils/suggestions/commandSuggestions.js'
+import { findBtwTriggerPositions } from '@claude-code/agent/sideQuestion.js'
+import { findSlashCommandPositions } from '@claude-code/repl/suggestions/commandSuggestions.js'
 import {
   findSlackChannelPositions,
   getKnownChannelsVersion,
   hasSlackMcpServer,
   subscribeKnownChannels,
-} from 'src/utils/suggestions/slackChannelSuggestions.js'
+} from '@claude-code/repl/suggestions/slackChannelSuggestions.js'
 import { isInProcessEnabled } from '@claude-code/swarm'
 import { syncTeammateMode } from '@claude-code/swarm'
 import type { TeamSummary } from '@claude-code/swarm/teamDiscovery.js'
@@ -181,7 +181,7 @@ import { findTokenBudgetPositions } from '@claude-code/agent/tokenBudget'
 import {
   findUltraplanTriggerPositions,
   findUltrareviewTriggerPositions,
-} from 'src/utils/ultraplan/keyword.js'
+} from '@claude-code/repl/ultraplan_dir/keyword.js'
 import { AutoModeOptInDialog } from '../AutoModeOptInDialog.js'
 import { BridgeDialog } from '../BridgeDialog.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

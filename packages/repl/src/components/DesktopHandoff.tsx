@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw input for "any key" dismiss and y/n prompt
 import { Box, Text, useInput, LoadingState } from '@anthropic/ink'
-import { getDesktopInstallStatus, openCurrentSessionInDesktop } from 'src/utils/desktopDeepLink.js'
+import { getDesktopInstallStatus, openCurrentSessionInDesktop } from '@claude-code/repl/legacy/diagnostics/desktopDeepLink.js'
 import { openBrowser } from '@claude-code/storage/browser.js'
 
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'

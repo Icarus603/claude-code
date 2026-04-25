@@ -26,7 +26,7 @@ const fetchMcpSkillsForClient = feature('MCP_SKILLS')
   : null
 const clearSkillIndexCache = feature('EXPERIMENTAL_SKILL_SEARCH')
   ? (
-      require('src/services/skillSearch/localSearch.js') as typeof import('src/services/skillSearch/localSearch.js')
+      require('@claude-code/agent/skillSearch/localSearch.js') as typeof import('@claude-code/agent/skillSearch/localSearch.js')
     ).clearSkillIndexCache
   : null
 

@@ -51,17 +51,17 @@ import {
   generateCommandSuggestions,
   getBestCommandMatch,
   isCommandInput,
-} from 'src/utils/suggestions/commandSuggestions.js'
+} from '@claude-code/repl/suggestions/commandSuggestions.js'
 import {
   getDirectoryCompletions,
   getPathCompletions,
   isPathLikeToken,
 } from '@claude-code/repl/utils/suggestions/directoryCompletion.js'
-import { getShellHistoryCompletion } from 'src/utils/suggestions/shellHistoryCompletion.js'
+import { getShellHistoryCompletion } from '@claude-code/repl/suggestions/shellHistoryCompletion.js'
 import {
   getSlackChannelSuggestions,
   hasSlackMcpServer,
-} from 'src/utils/suggestions/slackChannelSuggestions.js'
+} from '@claude-code/repl/suggestions/slackChannelSuggestions.js'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import {
   applyFileSuggestion,

@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/config/outputStyles.
-export * from '@claude-code/config/outputStyles.js'
+// Forward shim — canonical owner is packages/agent/constants_v7/outputStyles.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/constants_v7/outputStyles.js'

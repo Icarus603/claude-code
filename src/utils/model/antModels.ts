@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/provider/antModels.
-export * from '@claude-code/provider/antModels.js'
+// Forward shim — canonical owner is packages/provider/src/model/antModels.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/provider/model/antModels.js'

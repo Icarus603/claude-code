@@ -31,7 +31,7 @@ import { collapseTeammateShutdowns } from '@claude-code/repl/collapseTeammateShu
 import { getGlobalConfig } from '@claude-code/config'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
-import { applyGrouping } from 'src/utils/groupToolUses.js'
+import { applyGrouping } from '@claude-code/repl/legacy/uiHelpers/groupToolUses.js'
 import {
   buildMessageLookups,
   createAssistantMessage,
@@ -48,7 +48,7 @@ import {
   shouldShowUserMessage,
 } from '@claude-code/agent/messages.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
-import { renderableSearchText } from 'src/utils/transcriptSearch.js'
+import { renderableSearchText } from '@claude-code/agent/legacy/transcriptSearch.js'
 import { Divider } from '@anthropic/ink'
 import type { UnseenDivider } from './FullscreenLayout.js'
 import { LogoV2 } from './LogoV2/LogoV2.js'

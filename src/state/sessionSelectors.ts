@@ -1,8 +1,3 @@
-import type { AppState } from './AppStateStore.js';
-
-export const selectVerbose = (state: AppState) => state.verbose;
-export const selectIsBriefOnly = (state: AppState) => state.isBriefOnly;
-export const selectInitialMessage = (state: AppState) => state.initialMessage;
-export const selectSpinnerTip = (state: AppState) => state.spinnerTip;
-export const selectShowRemoteCallout = (state: AppState) => state.showRemoteCallout;
-export const selectRemoteSessionUrl = (state: AppState) => state.remoteSessionUrl;
+// Forward shim — canonical owner is packages/app-host/src/state/sessionSelectors.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/app-host/state/sessionSelectors.js'

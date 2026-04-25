@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/settings/validationTips`.
- */
-export * from '@claude-code/config/settings/validationTips'
+// Forward shim — canonical owner is packages/config/settings/v7/validationTips.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/config/settings/v7/validationTips.js'

@@ -107,9 +107,9 @@ import type { SkillToolProgress as Progress } from '@claude-code/tool-registry/p
 /* eslint-disable @typescript-eslint/no-require-imports */
 const remoteSkillModules = feature('EXPERIMENTAL_SKILL_SEARCH')
   ? {
-      ...(require('src/services/skillSearch/remoteSkillState.js') as typeof import('src/services/skillSearch/remoteSkillState.js')),
-      ...(require('src/services/skillSearch/remoteSkillLoader.js') as typeof import('src/services/skillSearch/remoteSkillLoader.js')),
-      ...(require('src/services/skillSearch/telemetry.js') as typeof import('src/services/skillSearch/telemetry.js')),
+      ...(require('@claude-code/agent/skillSearch/remoteSkillState.js') as typeof import('@claude-code/agent/skillSearch/remoteSkillState.js')),
+      ...(require('@claude-code/agent/skillSearch/remoteSkillLoader.js') as typeof import('@claude-code/agent/skillSearch/remoteSkillLoader.js')),
+      ...(require('@claude-code/agent/skillSearch/telemetry.js') as typeof import('@claude-code/agent/skillSearch/telemetry.js')),
       ...(require('@claude-code/command-runtime/skills/featureCheck.js') as typeof import('@claude-code/command-runtime/skills/featureCheck.js')),
     }
   : null
@@ -634,7 +634,7 @@ export const SkillTool: Tool<InputSchema, Output, Progress> = buildTool({
 
     // Process the skill with optional args
     const { processPromptSlashCommand } = await import(
-      'src/utils/processUserInput/processSlashCommand.js'
+      '@claude-code/repl/processUserInput/processSlashCommand.js'
     )
     const processedCommand = await processPromptSlashCommand(
       commandName,

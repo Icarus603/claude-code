@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/command-runtime/gitignore.
-export * from '@claude-code/command-runtime/gitignore.js'
+// Forward shim — canonical owner is packages/agent/git/gitignore.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/git/gitignore.js'

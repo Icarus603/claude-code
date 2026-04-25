@@ -20,7 +20,7 @@ const teamMemSaved = feature('TEAMMEM')
   ? (require('./teamMemSaved.js') as typeof import('./teamMemSaved.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { TURN_COMPLETION_VERBS } from 'src/constants/turnCompletionVerbs.js'
+import { TURN_COMPLETION_VERBS } from '@claude-code/agent/constants_v7/turnCompletionVerbs.js'
 import { useTerminalSize } from '@anthropic/ink'
 import type {
   SystemMessage,
@@ -37,7 +37,7 @@ import { Text as ThemedText } from '@anthropic/ink'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'
 import { useAppStateStore } from '@claude-code/repl/appStateHooks.js'
 import { isBackgroundTask, type TaskState } from '@claude-code/repl/tasksTypes.js'
-import { getPillLabel } from 'src/tasks/pillLabel.js'
+import { getPillLabel } from '@claude-code/agent/tasks/pillLabel.js'
 import { useSelectedMessageBg } from '../messageActions.js'
 
 type Props = {

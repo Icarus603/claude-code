@@ -89,6 +89,7 @@ mock.module("src/tasks/LocalAgentTask/LocalAgentTask.js", () => ({
   killAsyncAgent: noop,
   updateAgentProgress: noop,
   updateProgressFromMessage: noop,
+  LocalAgentTask: {},
 }));
 
 mock.module("src/utils/debug.js", () => ({

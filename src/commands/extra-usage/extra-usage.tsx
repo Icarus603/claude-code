@@ -1,29 +1,3 @@
-import React from 'react'
-import type { LocalJSXCommandContext } from '../../commands.js'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import { Login } from '@claude-code/provider/commands/login/login.js'
-import { runExtraUsage } from './extra-usage-core.js'
-
-export async function call(
-  onDone: LocalJSXCommandOnDone,
-  context: LocalJSXCommandContext,
-): Promise<React.ReactNode | null> {
-  const result = await runExtraUsage()
-
-  if (result.type === 'message') {
-    onDone(result.value)
-    return null
-  }
-
-  return (
-    <Login
-      startingMessage={
-        'Starting new login following /extra-usage. Exit with Ctrl-C to use existing account.'
-      }
-      onDone={success => {
-        context.onChangeAPIKey()
-        onDone(success ? 'Login successful' : 'Login interrupted')
-      }}
-    />
-  )
-}
+// Forward shim — canonical owner is packages/command-runtime/src/commands/extra-usage/extra-usage.tsx.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/extra-usage/extra-usage.js'

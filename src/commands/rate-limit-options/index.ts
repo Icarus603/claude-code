@@ -1,19 +1,3 @@
-import type { Command } from '../../commands.js'
-import { isClaudeAISubscriber } from '../../utils/auth.js'
-
-const rateLimitOptions = {
-  type: 'local-jsx',
-  name: 'rate-limit-options',
-  description: 'Show options when rate limit is reached',
-  isEnabled: () => {
-    if (!isClaudeAISubscriber()) {
-      return false
-    }
-
-    return true
-  },
-  isHidden: true, // Hidden from help - only used internally
-  load: () => import('./rate-limit-options.js'),
-} satisfies Command
-
-export default rateLimitOptions
+// Forward shim — canonical owner is packages/command-runtime/src/commands/rate-limit-options/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/rate-limit-options/index.js'

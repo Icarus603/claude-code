@@ -6,7 +6,7 @@ export type AppState = unknown
 
 export function getDefaultAppState(): unknown {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppStateCompat.js') as {
+  const mod = require('@claude-code/app-host/state/AppStateCompat.js') as {
     getDefaultAppState: () => unknown
   }
   return mod.getDefaultAppState()

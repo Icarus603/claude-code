@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/provider/cyberRiskInstruction.
-export * from '@claude-code/provider/cyberRiskInstruction.js'
+// Forward shim — canonical owner is packages/agent/constants_v7/cyberRiskInstruction.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/constants_v7/cyberRiskInstruction.js'

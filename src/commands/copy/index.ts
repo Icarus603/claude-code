@@ -1,15 +1,3 @@
-/**
- * Copy command - minimal metadata only.
- * Implementation is lazy-loaded from copy.tsx to reduce startup time.
- */
-import type { Command } from '../../commands.js'
-
-const copy = {
-  type: 'local-jsx',
-  name: 'copy',
-  description:
-    "Copy Claude's last response to clipboard (or /copy N for the Nth-latest)",
-  load: () => import('./copy.js'),
-} satisfies Command
-
-export default copy
+// Forward shim — canonical owner is packages/command-runtime/src/commands/copy/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/copy/index.js'

@@ -1,12 +1,3 @@
-import type { Command } from '../../commands.js'
-
-const rename = {
-  type: 'local-jsx',
-  name: 'rename',
-  description: 'Rename the current conversation',
-  immediate: true,
-  argumentHint: '[name]',
-  load: () => import('./rename.js'),
-} satisfies Command
-
-export default rename
+// Forward shim — canonical owner is packages/command-runtime/src/commands/rename/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/rename/index.js'

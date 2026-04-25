@@ -1,4 +1,4 @@
-import { Cursor } from 'src/utils/Cursor.js'
+import { Cursor } from '@claude-code/repl/Cursor.js'
 import { firstGrapheme, lastGrapheme } from '@claude-code/output/utils/intl.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import {

@@ -12,12 +12,12 @@ type SetAppState = (updater: (prev: unknown) => unknown) => void
 
 export function useAppStateStore(): Store<unknown> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as { useAppStateStore: () => Store<unknown> }
+  const mod = require('@claude-code/app-host/state/AppState.js') as { useAppStateStore: () => Store<unknown> }
   return mod.useAppStateStore()
 }
 
 export function useSetAppState(): SetAppState {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('src/state/AppState.js') as { useSetAppState: () => SetAppState }
+  const mod = require('@claude-code/app-host/state/AppState.js') as { useSetAppState: () => SetAppState }
   return mod.useSetAppState()
 }

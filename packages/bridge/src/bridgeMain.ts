@@ -151,7 +151,7 @@ export async function runBridgeLoop(
   initialSessionId?: string,
   getAccessToken?: () => string | undefined | Promise<string | undefined>,
 ): Promise<void> {
-  const { installSwarmHost } = await import('src/swarm/installSwarmHost.js')
+  const { installSwarmHost } = await import('@claude-code/swarm/swarm_v7/installSwarmHost.js')
   installSwarmHost()
 
   // Local abort controller so that onSessionDone can stop the poll loop.
@@ -1893,7 +1893,7 @@ export function parseArgs(args: string[]): ParsedArgs {
 async function printHelp(): Promise<void> {
   // Use EXTERNAL_PERMISSION_MODES for help text — internal modes (bubble)
   // are ant-only and auto is feature-gated; they're still accepted by validation.
-  const { EXTERNAL_PERMISSION_MODES } = await import('src/types/permissions.js')
+  const { EXTERNAL_PERMISSION_MODES } = await import('@claude-code/permission/permissionTypes')
   const modes = EXTERNAL_PERMISSION_MODES.join(', ')
   const showServer = await isMultiSessionSpawnEnabled()
   const serverOptions = showServer
@@ -1981,7 +1981,7 @@ async function fetchSessionTitle(
 }
 
 export async function bridgeMain(args: string[]): Promise<void> {
-  const { installSwarmHost } = await import('src/swarm/installSwarmHost.js')
+  const { installSwarmHost } = await import('@claude-code/swarm/swarm_v7/installSwarmHost.js')
   installSwarmHost()
 
   const parsed = parseArgs(args)
@@ -2026,7 +2026,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // Validate permission mode early so the user gets an error before
   // the bridge starts polling for work.
   if (permissionMode !== undefined) {
-    const { PERMISSION_MODES } = await import('src/types/permissions.js')
+    const { PERMISSION_MODES } = await import('@claude-code/permission/permissionTypes')
     const valid: readonly string[] = PERMISSION_MODES
     if (!valid.includes(permissionMode)) {
       console.error(
@@ -2096,7 +2096,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   // Resolve auth
   const { clearOAuthTokenCache, checkAndRefreshOAuthTokenIfNeeded } =
-    await import('src/utils/auth.js')
+    await import('@claude-code/provider/authAlias.js')
   const { getBridgeAccessToken, getBridgeBaseUrl } = await import(
     './bridgeConfig.js'
   )
@@ -2201,12 +2201,12 @@ export async function bridgeMain(args: string[]): Promise<void> {
       : baseUrl
 
   const { getBranch, getRemoteUrl, findGitRoot } = await import(
-    'src/utils/git.js'
+    '@claude-code/storage/git.js'
   )
 
   // Precheck worktree availability for the first-run dialog and the `w`
   // toggle. Unconditional so we know upfront whether worktree is an option.
-  const { hasWorktreeCreateHook } = await import('src/utils/hooks.js')
+  const { hasWorktreeCreateHook } = await import('@claude-code/agent/hooks.js')
   const worktreeAvailable = hasWorktreeCreateHook() || findGitRoot(dir) !== null
 
   // Load saved per-project spawn-mode preference. Gated by multiSessionEnabled
@@ -2336,7 +2336,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   const machineName = hostname()
   const bridgeId = randomUUID()
 
-  const { handleOAuth401Error } = await import('src/utils/auth.js')
+  const { handleOAuth401Error } = await import('@claude-code/provider/authAlias.js')
   const api = createBridgeApiClient({
     baseUrl,
     getAccessToken: getBridgeAccessToken,
@@ -2579,7 +2579,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   })
 
   const logger = createBridgeLogger({ verbose })
-  const { parseGitHubRepository } = await import('src/utils/detectRepository.js')
+  const { parseGitHubRepository } = await import('@claude-code/storage/detectRepository.js')
   const ownerRepo = gitRepoUrl ? parseGitHubRepository(gitRepoUrl) : null
   // Use the repo name from the parsed owner/repo, or fall back to the dir basename
   const repoName = ownerRepo ? ownerRepo.split('/').pop()! : basename(dir)
@@ -2799,7 +2799,7 @@ export async function runBridgeHeadless(
   opts: HeadlessBridgeOpts,
   signal: AbortSignal,
 ): Promise<void> {
-  const { installSwarmHost } = await import('src/swarm/installSwarmHost.js')
+  const { installSwarmHost } = await import('@claude-code/swarm/swarm_v7/installSwarmHost.js')
   installSwarmHost()
 
   const { dir, log } = opts
@@ -2848,9 +2848,9 @@ export async function runBridgeHeadless(
       : baseUrl
 
   const { getBranch, getRemoteUrl, findGitRoot } = await import(
-    'src/utils/git.js'
+    '@claude-code/storage/git.js'
   )
-  const { hasWorktreeCreateHook } = await import('src/utils/hooks.js')
+  const { hasWorktreeCreateHook } = await import('@claude-code/agent/hooks.js')
 
   if (opts.spawnMode === 'worktree') {
     const worktreeAvailable =

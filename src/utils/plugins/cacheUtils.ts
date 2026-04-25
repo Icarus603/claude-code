@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/plugin/cacheUtils`.
- */
-export * from '@claude-code/config/plugin/cacheUtils'
+// Forward shim — canonical owner is packages/config/plugin/v7/cacheUtils.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/config/plugin/v7/cacheUtils.js'

@@ -1,2 +1,3 @@
-// Auto-generated stub — replace with real implementation
-export type StatusLineCommandInput = unknown;
+// Forward shim — canonical owner is packages/repl/src/types_v7/statusLine.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/repl/types_v7/statusLine.js'

@@ -254,7 +254,7 @@ import {
   toSDKRateLimitInfo,
 } from '@claude-code/agent/messages/mappers.js'
 import { createModelSwitchBreadcrumbs } from '@claude-code/agent/messages.js'
-import { collectContextData } from 'src/commands/context/context-noninteractive.js'
+import { collectContextData } from '@claude-code/command-runtime/commands/context/context-noninteractive.js'
 import { LOCAL_COMMAND_STDOUT_TAG } from '@claude-code/command-runtime/xml.js'
 import {
   statusListeners,
@@ -348,14 +348,14 @@ import { isExtractModeActive } from '@claude-code/memory/paths'
 // Dead code elimination: conditional imports
 /* eslint-disable @typescript-eslint/no-require-imports */
 const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
+  ? (require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js'))
   : null
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
     ? (require('src/proactive/index.js') as typeof import('src/proactive/index.js'))
     : null
 const cronSchedulerModule = require('@claude-code/agent/scheduler') as typeof import('@claude-code/agent/scheduler')
-const cronJitterConfigModule = require('src/utils/cronJitterConfig.js') as typeof import('src/utils/cronJitterConfig.js')
+const cronJitterConfigModule = require('@claude-code/agent/legacy_misc/cronJitterConfig.js') as typeof import('@claude-code/agent/legacy_misc/cronJitterConfig.js')
 const cronGate = require('@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js')
 const extractMemoriesModule = feature('EXTRACT_MEMORIES')
   ? (require('@claude-code/memory/extractMemories') as typeof import('@claude-code/memory/extractMemories'))
@@ -1342,7 +1342,7 @@ export function runHeadlessStreaming(
       // Set up hot-reload for plugin hooks now that the initial install is done.
       // In sync-install mode, setup.ts skips this to avoid racing with the install.
       const { setupPluginHookHotReload } = await import(
-        'src/utils/plugins/loadPluginHooks.js'
+        '@claude-code/config/plugin/loadPluginHooks'
       )
       setupPluginHookHotReload()
     }

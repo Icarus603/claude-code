@@ -1,5 +1,3 @@
-import type { AppState } from './AppStateStore.js';
-
-export const selectShowExpandedTodos = (state: AppState) => state.expandedView === 'tasks';
-export const selectUltraplanPendingChoice = (state: AppState) => state.ultraplanPendingChoice;
-export const selectUltraplanLaunchPending = (state: AppState) => state.ultraplanLaunchPending;
+// Forward shim — canonical owner is packages/app-host/src/state/uiSelectors.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/app-host/state/uiSelectors.js'

@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/constants`.
- */
-export * from '@claude-code/config/constants'
+// Forward shim — canonical owner is packages/config/settings/v7/constants.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/config/settings/v7/constants.js'

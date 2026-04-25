@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/agent/postSamplingHooks.
-export * from '@claude-code/agent/postSamplingHooks.js'
+// Forward shim — canonical owner is packages/agent/hooks/postSamplingHooks.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/hooks/postSamplingHooks.js'
