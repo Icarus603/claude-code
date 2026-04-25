@@ -40,6 +40,7 @@
     "./imageValidation.js": "./src/imageValidation.ts",
     "./filePersistence/types.js": "./src/filePersistence/types.ts",
     "./filePersistence/outputsScanner.js": "./src/filePersistence/outputsScanner.ts",
+    "./filePersistence/filePersistence.js": "./src/filePersistence/filePersistence.ts",
     "./windowsPaths.js": "./src/windowsPaths.ts",
     "./getWorktreePathsPortable.js": "./src/getWorktreePathsPortable.ts",
     "./getWorktreePaths.js": "./src/getWorktreePaths.ts",

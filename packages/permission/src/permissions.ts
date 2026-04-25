@@ -62,8 +62,21 @@ import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature
 type PermissionRuleFromEditableSettings = { source: string; ruleString: string; behavior: string }
 function deletePermissionRuleFromSettings(...a: unknown[]): boolean { return _b().deletePermissionRuleFromSettings?.(...a) ?? false }
 function shouldAllowManagedPermissionRulesOnly(): boolean { return _b().shouldAllowManagedPermissionRulesOnly?.() ?? false }
-const classifierDecisionModule = feature('TRANSCRIPT_CLASSIFIER') ? { classifyPermissionDecision: (...a: unknown[]) => _b().classifyPermissionDecision?.(...a) } : null
-const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER') ? { getAutoMode: () => _b().getAutoMode?.(), setAutoMode: (v: unknown) => _b().setAutoMode?.(v), setDirtyAutoMode: () => _b().setDirtyAutoMode?.(), clearDirtyAutoMode: () => _b().clearDirtyAutoMode?.() } : null
+// V7 §11.4 — classifierDecision exports isAutoModeAllowlistedTool (used at line ~653).
+// Earlier inline host-binding stub had only classifyPermissionDecision (which has
+// no callsite anyway), causing `classifierDecisionModule.isAutoModeAllowlistedTool
+// is not a function` and a downstream spurious abort in auto mode (caught by
+// useCanUseTool .catch on every tool that reaches the classifier path).
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const classifierDecisionModule = feature('TRANSCRIPT_CLASSIFIER') ? (require('./classifierDecision.js') as typeof import('./classifierDecision.js')) : null
+// V7 §11.4 — autoModeState owns module-level singleton state (active flag,
+// CLI flag, circuit-broken flag). Must require() the real module so its
+// {is,set}AutoModeActive / {is,set}AutoModeCircuitBroken / {get,set}AutoModeFlagCli
+// are wired. Earlier inline host-binding stub omitted these methods, causing
+// `autoModeStateModule?.isAutoModeActive is not a function` and a downstream
+// spurious abort in plan/auto mode (caught by useCanUseTool .catch).
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER') ? (require('./autoModeState.js') as typeof import('./autoModeState.js')) : null
 function addToTurnClassifierDuration(ms: number): void { _b().addToTurnClassifierDuration?.(ms) }
 function getTotalInputTokens(): number { return _b().getTotalInputTokens?.() ?? 0 }
 function getTotalOutputTokens(): number { return _b().getTotalOutputTokens?.() ?? 0 }
