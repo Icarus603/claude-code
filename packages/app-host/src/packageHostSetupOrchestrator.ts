@@ -21,7 +21,7 @@ export function installPackageHostBindings(
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('src/utils/model/providers.js') as typeof import('src/utils/model/providers.js')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { getClaudeAIOAuthTokens, checkAndRefreshOAuthTokenIfNeeded } = require('src/utils/auth.js') as typeof import('src/utils/auth.js')
+          const { getClaudeAIOAuthTokens, checkAndRefreshOAuthTokenIfNeeded } = require('@claude-code/provider/authAlias.js') as typeof import('@claude-code/provider/authAlias.js')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { CLAUDE_AI_INFERENCE_SCOPE, getOauthConfig, OAUTH_BETA_HEADER } = require('src/constants/oauth.js') as typeof import('src/constants/oauth.js')
           if (getAPIProvider() !== 'firstParty' || !isFirstPartyAnthropicBaseUrl()) return null
@@ -34,7 +34,7 @@ export function installPackageHostBindings(
               // Try API key first (Console users), then OAuth (Claude.ai users)
               try {
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const { getAnthropicApiKeyWithSource } = require('src/utils/auth.js') as typeof import('src/utils/auth.js')
+                const { getAnthropicApiKeyWithSource } = require('@claude-code/provider/authAlias.js') as typeof import('@claude-code/provider/authAlias.js')
                 const { key } = getAnthropicApiKeyWithSource({ skipRetrievingKeyFromApiKeyHelper: true })
                 if (key) return { 'x-api-key': key }
               } catch { /* no API key */ }
@@ -94,9 +94,9 @@ export function installPackageHostBindings(
         clearClassifierChecking: () => { try { require('@claude-code/permission/classifierApprovals.js').clearClassifierChecking() } catch {} },
         setClassifierChecking: (v: boolean) => { try { require('@claude-code/permission/classifierApprovals.js').setClassifierChecking(v) } catch {} },
         isInProtectedNamespace: () => { try { return require('src/utils/envUtils.js').isInProtectedNamespace() } catch { return false } },
-        executePermissionRequestHooks: (...a: unknown[]) => { try { return require('src/utils/hooks.js').executePermissionRequestHooks(...a) } catch { return Promise.resolve(null) } },
-        buildClassifierUnavailableMessage: () => { try { return require('src/utils/messages.js').buildClassifierUnavailableMessage() } catch { return '' } },
-        buildYoloRejectionMessage: (...a: unknown[]) => { try { return require('src/utils/messages.js').buildYoloRejectionMessage(...a) } catch { return '' } },
+        executePermissionRequestHooks: (...a: unknown[]) => { try { return require('@claude-code/agent/hooks.js').executePermissionRequestHooks(...a) } catch { return Promise.resolve(null) } },
+        buildClassifierUnavailableMessage: () => { try { return require('@claude-code/agent/messages.js').buildClassifierUnavailableMessage() } catch { return '' } },
+        buildYoloRejectionMessage: (...a: unknown[]) => { try { return require('@claude-code/agent/messages.js').buildYoloRejectionMessage(...a) } catch { return '' } },
         calculateCostFromTokens: (...a: unknown[]) => { try { return require('src/utils/modelCost.js').calculateCostFromTokens(...a) } catch { return 0 } },
         isSandboxingEnabled: () => { try { return require('src/utils/sandbox/sandbox-adapter.js').SandboxManager.isSandboxingEnabled() } catch { return false } },
         isAutoAllowBashIfSandboxedEnabled: () => { try { return require('src/utils/sandbox/sandbox-adapter.js').SandboxManager.isAutoAllowBashIfSandboxedEnabled() } catch { return false } },
@@ -438,7 +438,7 @@ export function installPackageHostBindings(
         },
         createCompactBoundaryMessage: (...a: unknown[]) => {
           try {
-            return require('src/utils/messages.js').createCompactBoundaryMessage(...a)
+            return require('@claude-code/agent/messages.js').createCompactBoundaryMessage(...a)
           } catch {
             return undefined
           }
@@ -509,21 +509,21 @@ export function installPackageHostBindings(
         },
         normalizeMessagesForAPI: (messages: unknown[], tools: unknown[]) => {
           try {
-            return require('src/utils/messages.js').normalizeMessagesForAPI(messages, tools)
+            return require('@claude-code/agent/messages.js').normalizeMessagesForAPI(messages, tools)
           } catch {
             return messages
           }
         },
         getMessagesAfterCompactBoundary: (messages: unknown[]) => {
           try {
-            return require('src/utils/messages.js').getMessagesAfterCompactBoundary(messages)
+            return require('@claude-code/agent/messages.js').getMessagesAfterCompactBoundary(messages)
           } catch {
             return messages
           }
         },
         stripSignatureBlocks: (messages: unknown[]) => {
           try {
-            return require('src/utils/messages.js').stripSignatureBlocks(messages)
+            return require('@claude-code/agent/messages.js').stripSignatureBlocks(messages)
           } catch {
             return messages
           }
@@ -551,28 +551,28 @@ export function installPackageHostBindings(
         },
         createAttachmentMessage: (attachment: unknown) => {
           try {
-            return require('src/utils/attachments.js').createAttachmentMessage(attachment)
+            return require('@claude-code/agent/attachments.js').createAttachmentMessage(attachment)
           } catch {
             return undefined
           }
         },
         filterDuplicateMemoryAttachments: (attachments: unknown[], readFileState: unknown) => {
           try {
-            return require('src/utils/attachments.js').filterDuplicateMemoryAttachments(attachments, readFileState)
+            return require('@claude-code/agent/attachments.js').filterDuplicateMemoryAttachments(attachments, readFileState)
           } catch {
             return attachments
           }
         },
         getAttachmentMessages: (...args: unknown[]) => {
           try {
-            return require('src/utils/attachments.js').getAttachmentMessages(...args)
+            return require('@claude-code/agent/attachments.js').getAttachmentMessages(...args)
           } catch {
             return (async function* () {})()
           }
         },
         startRelevantMemoryPrefetch: (...args: unknown[]) => {
           try {
-            return require('src/utils/attachments.js').startRelevantMemoryPrefetch(...args)
+            return require('@claude-code/agent/attachments.js').startRelevantMemoryPrefetch(...args)
           } catch {
             return undefined
           }
@@ -850,7 +850,7 @@ export function installPackageHostBindings(
       executeConfigChangeHooks: async (source: string) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { executeConfigChangeHooks, hasBlockingResult } = require('src/utils/hooks.js') as typeof import('src/utils/hooks.js')
+          const { executeConfigChangeHooks, hasBlockingResult } = require('@claude-code/agent/hooks.js') as typeof import('@claude-code/agent/hooks.js')
           const results = await executeConfigChangeHooks(source as any)
           return { blocked: hasBlockingResult(results) }
         } catch { return { blocked: false } }
@@ -875,7 +875,7 @@ export function installPackageHostBindings(
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { CLAUDE_AI_INFERENCE_SCOPE } = require('src/constants/oauth.js') as typeof import('src/constants/oauth.js')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { getAnthropicApiKeyWithSource, getClaudeAIOAuthTokens } = require('src/utils/auth.js') as typeof import('src/utils/auth.js')
+          const { getAnthropicApiKeyWithSource, getClaudeAIOAuthTokens } = require('@claude-code/provider/authAlias.js') as typeof import('@claude-code/provider/authAlias.js')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('src/utils/model/providers.js') as typeof import('src/utils/model/providers.js')
 

@@ -1,4 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, test } from "bun:test";
+import { installConfigHostBindings } from "@claude-code/config";
+import { InMemoryConfig } from "@claude-code/config/testing";
 import {
   deriveShortMessageId,
   INTERRUPT_MESSAGE,
@@ -31,6 +33,10 @@ import {
 import type { Message, AssistantMessage, UserMessage } from "../../types/message";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
+
+beforeAll(() => {
+  installConfigHostBindings(new InMemoryConfig().bindings);
+});
 
 function makeAssistantMsg(
   contentBlocks: Array<{ type: string; text?: string; [key: string]: any }>

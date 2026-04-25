@@ -19,7 +19,7 @@ import { dirname } from 'path'
 import {
   downloadUserSettings,
   redownloadUserSettings,
-} from 'src/services/settingsSync/index.js'
+} from '@claude-code/config/sync'
 import { waitForRemoteManagedSettingsToLoad } from '@claude-code/cli/remoteManagedSettings.js'
 import { StructuredIO } from '../../../structuredIO.js'
 import { RemoteIO } from '../../../remoteIO.js'
@@ -28,8 +28,8 @@ import {
   formatDescriptionWithSource,
   getCommandName,
 } from '@claude-code/command-runtime/runtime'
-import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
-import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
+import { createStreamlinedTransformer } from './utils/streamlinedTransform.js'
+import { installStreamJsonStdoutGuard } from './utils/streamJsonStdoutGuard.js'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import uniqBy from 'lodash-es/uniqBy.js'
@@ -154,8 +154,8 @@ import {
 import { expandPath } from '@claude-code/storage/path.js'
 import { extractReadFilesFromMessages } from '@claude-code/repl/queryHelpers.js'
 import { registerHookEventHandler } from '@claude-code/repl/hookEvents.js'
-import { executeFilePersistence } from 'src/utils/filePersistence/filePersistence.js'
-import { finalizePendingAsyncHooks } from 'src/utils/hooks/AsyncHookRegistry.js'
+import { executeFilePersistence } from '@claude-code/storage/filePersistence/filePersistence.js'
+import { finalizePendingAsyncHooks } from '@claude-code/agent/hooks/AsyncHookRegistry.js'
 import {
   gracefulShutdown,
   gracefulShutdownSync,
@@ -197,8 +197,8 @@ import { getRemoteSessionUrl } from '@claude-code/config/product'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import { generateSessionTitle } from '@claude-code/agent/sessionTitle.js'
-import { buildSideQuestionFallbackParams } from 'src/utils/queryContext.js'
-import { runSideQuestion } from 'src/utils/sideQuestion.js'
+import { buildSideQuestionFallbackParams } from '@claude-code/agent/queryContext.js'
+import { runSideQuestion } from '@claude-code/agent/sideQuestion.js'
 import {
   processSessionStartHooks,
   processSetupHooks,
@@ -215,7 +215,7 @@ import {
   logSuggestionSuppressed,
   type PromptVariant,
 } from '@claude-code/repl/promptSuggestion.js'
-import { getLastCacheSafeParams } from 'src/utils/forkedAgent.js'
+import { getLastCacheSafeParams } from '@claude-code/agent/forkedAgent.js'
 import { getAccountInformation } from '@claude-code/provider/authAlias.js'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'
 import { installOAuthTokens } from '../../../handlers/auth.js'
@@ -240,7 +240,7 @@ import {
   restoreSessionMetadata,
 } from '@claude-code/storage/sessionStorage.js'
 import { incrementPromptCount } from '@claude-code/agent/commitAttribution.js'
-import { executeNotificationHooks } from 'src/utils/hooks.js'
+import { executeNotificationHooks } from '@claude-code/agent/hooks.js'
 import {
   ElicitRequestSchema,
   ElicitationCompleteNotificationSchema,
@@ -286,7 +286,7 @@ import {
   setFlagSettingsInline,
   getMainThreadAgentType,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { runWithWorkload, WORKLOAD_CRON } from 'src/utils/workloadContext.js'
+import { runWithWorkload, WORKLOAD_CRON } from '@claude-code/provider/workloadContext.js'
 import type { UUID } from 'crypto'
 import { randomUUID } from 'crypto'
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs'
@@ -296,7 +296,7 @@ import {
   fileHistoryCanRestore,
   fileHistoryEnabled,
   fileHistoryGetDiffStats,
-} from 'src/utils/fileHistory.js'
+} from '@claude-code/agent/file-history'
 import {
   restoreAgentFromSession,
   restoreSessionStateFromLog,
@@ -306,11 +306,11 @@ import {
   headlessProfilerStartTurn,
   headlessProfilerCheckpoint,
   logHeadlessProfilerTurn,
-} from 'src/utils/headlessProfiler.js'
+} from '@claude-code/provider/headlessProfiler.js'
 import {
   startQueryProfile,
   logQueryProfileReport,
-} from 'src/utils/queryProfiler.js'
+} from '@claude-code/provider/queryProfiler.js'
 import { asSessionId } from '@claude-code/agent/idTypes'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { skillChangeDetector } from '@claude-code/tool-registry/skills/skillChangeDetector.js'
@@ -320,15 +320,15 @@ import {
   isEnvTruthy,
   isEnvDefinedFalsy,
 } from '@claude-code/config/env/utils'
-import { installPluginsForHeadless } from 'src/utils/plugins/headlessPluginInstall.js'
-import { refreshActivePlugins } from 'src/utils/plugins/refresh.js'
+import { installPluginsForHeadless } from '@claude-code/config/plugin/headlessPluginInstall'
+import { refreshActivePlugins } from '@claude-code/config/plugin/refresh'
 import { loadAllPluginsCacheOnly } from '@claude-code/cli/pluginLoader.js'
 import {
   isTeamLead,
   hasActiveInProcessTeammates,
   hasWorkingInProcessTeammates,
   waitForTeammatesToBecomeIdle,
-} from 'src/utils/teammate.js'
+} from '@claude-code/swarm/teammateState.js'
 import {
   readUnreadMessages,
   markMessagesAsRead,
@@ -336,10 +336,10 @@ import {
 } from '@claude-code/swarm'
 import { removeTeammateFromTeamFile } from '@claude-code/swarm'
 import { unassignTeammateTasks } from '@claude-code/agent/tasks.js'
-import { getRunningTasks } from 'src/utils/task/framework.js'
+import { getRunningTasks } from '@claude-code/agent/task/framework.js'
 import { isBackgroundTask } from '@claude-code/repl/tasksTypes.js'
-import { stopTask } from 'src/tasks/stopTask.js'
-import { drainSdkEvents } from 'src/utils/sdkEventQueue.js'
+import { stopTask } from '@claude-code/agent/tasks/stopTask.js'
+import { drainSdkEvents } from '@claude-code/agent/sdkEventQueue.js'
 import { initializeGrowthBook } from '@claude-code/config/feature-flags'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { sleep } from '@claude-code/config/sleep'
@@ -1686,7 +1686,7 @@ export function runHeadlessStreaming(
 
           if (feature('FILE_PERSISTENCE') && turnStartTime !== undefined) {
             void executeFilePersistence(
-              { turnStartTime } as import('src/utils/filePersistence/types.js').TurnStartTime,
+              { turnStartTime } as import('@claude-code/storage/filePersistence/types.js').TurnStartTime,
               abortController.signal,
               result => {
                 output.enqueue({
