@@ -19,11 +19,11 @@ export function installPackageHostBindings(
       getSettingsSyncAuth: () => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('src/utils/model/providers.js') as typeof import('src/utils/model/providers.js')
+          const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('@claude-code/provider/providers.js') as typeof import('@claude-code/provider/providers.js')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { getClaudeAIOAuthTokens, checkAndRefreshOAuthTokenIfNeeded } = require('@claude-code/provider/authAlias.js') as typeof import('@claude-code/provider/authAlias.js')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { CLAUDE_AI_INFERENCE_SCOPE, getOauthConfig, OAUTH_BETA_HEADER } = require('src/constants/oauth.js') as typeof import('src/constants/oauth.js')
+          const { CLAUDE_AI_INFERENCE_SCOPE, getOauthConfig, OAUTH_BETA_HEADER } = require('@claude-code/provider/oauthConstants') as typeof import('@claude-code/provider/oauthConstants')
           if (getAPIProvider() !== 'firstParty' || !isFirstPartyAnthropicBaseUrl()) return null
           const tokens = getClaudeAIOAuthTokens()
           const isEligible = Boolean(tokens?.accessToken && tokens.scopes?.includes(CLAUDE_AI_INFERENCE_SCOPE))
@@ -47,8 +47,8 @@ export function installPackageHostBindings(
         } catch { return null }
       },
       isInteractive: () => { try { return (require('./bootstrap/state.js') as typeof import('./bootstrap/state.js')).getIsInteractive() } catch { return false } },
-      clearMemoryFileCaches: () => { try { (require('src/utils/claudemd.js') as typeof import('src/utils/claudemd.js')).clearMemoryFileCaches() } catch {} },
-      getRepoRemoteHash: async () => { try { return await (require('src/utils/git.js') as typeof import('src/utils/git.js')).getRepoRemoteHash() } catch { return null } },
+      clearMemoryFileCaches: () => { try { (require('@claude-code/storage/claudemd.js') as typeof import('@claude-code/storage/claudemd.js')).clearMemoryFileCaches() } catch {} },
+      getRepoRemoteHash: async () => { try { return await (require('@claude-code/storage/git.js') as typeof import('@claude-code/storage/git.js')).getRepoRemoteHash() } catch { return null } },
       logDebug: (message, metadata) => logForDebugging(message, metadata as any),
       now: () => Date.now(),
       // V7 — extra subsystem bindings. ALL require() from src/ stays HERE
@@ -60,23 +60,23 @@ export function installPackageHostBindings(
         isAgentMemoryPath: (p: string) => { try { return require('@claude-code/memory/agentMemory').isAgentMemoryPath(p) } catch { return false } },
         getOriginalCwd: () => { try { return require('./bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
         getSessionId: () => { try { return require('./bootstrap/state.js').getSessionId() } catch { return 'unknown' } },
-        getCwd: () => { try { return require('src/utils/cwd.js').getCwd() } catch { return process.cwd() } },
+        getCwd: () => { try { return require('@claude-code/app-host/bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
         getConfigHomeDir: () => getClaudeConfigHomeDir(),
-        getFsImplementation: () => { try { return require('src/utils/fsOperations.js').getFsImplementation() } catch { return require('node:fs') } },
-        getPathsForPermissionCheck: (...a: unknown[]) => { try { return require('src/utils/fsOperations.js').getPathsForPermissionCheck(...a) } catch { return [] } },
-        containsPathTraversal: (p: string) => { try { return require('src/utils/path.js').containsPathTraversal(p) } catch { return false } },
-        expandPath: (p: string, cwd: string) => { try { return require('src/utils/path.js').expandPath(p, cwd) } catch { return p } },
-        getDirectoryForPath: (p: string) => { try { return require('src/utils/path.js').getDirectoryForPath(p) } catch { return p } },
-        sanitizePath: (p: string) => { try { return require('src/utils/path.js').sanitizePath(p) } catch { return p } },
-        getPlanSlug: () => { try { return require('src/utils/plans.js').getPlanSlug() } catch { return undefined } },
-        getPlansDirectory: () => { try { return require('src/utils/plans.js').getPlansDirectory() } catch { return '' } },
-        getPlatform: () => { try { return require('src/utils/platform.js').getPlatform() } catch { return process.platform === 'darwin' ? 'macos' : 'linux' } },
+        getFsImplementation: () => { try { return require('@claude-code/storage/fsOperations.js').getFsImplementation() } catch { return require('node:fs') } },
+        getPathsForPermissionCheck: (...a: unknown[]) => { try { return require('@claude-code/storage/fsOperations.js').getPathsForPermissionCheck(...a) } catch { return [] } },
+        containsPathTraversal: (p: string) => { try { return require('@claude-code/storage/path.js').containsPathTraversal(p) } catch { return false } },
+        expandPath: (p: string, cwd: string) => { try { return require('@claude-code/storage/path.js').expandPath(p, cwd) } catch { return p } },
+        getDirectoryForPath: (p: string) => { try { return require('@claude-code/storage/path.js').getDirectoryForPath(p) } catch { return p } },
+        sanitizePath: (p: string) => { try { return require('@claude-code/storage/path.js').sanitizePath(p) } catch { return p } },
+        getPlanSlug: () => { try { return require('@claude-code/storage/plans.js').getPlanSlug() } catch { return undefined } },
+        getPlansDirectory: () => { try { return require('@claude-code/storage/plans.js').getPlansDirectory() } catch { return '' } },
+        getPlatform: () => { try { return require('@claude-code/config/platform').getPlatform() } catch { return process.platform === 'darwin' ? 'macos' : 'linux' } },
         getProjectDir: (...a: unknown[]) => { try { return require('@claude-code/storage/sessionStorage.js').getProjectDir(...a) } catch { return process.cwd() } },
         containsVulnerableUncPath: (p: string) => { try { return require('@claude-code/shell/legacy/readOnlyCommandValidation.js').containsVulnerableUncPath(p) } catch { return false } },
-        getToolResultsDir: () => { try { return require('src/utils/toolResultStorage.js').getToolResultsDir() } catch { return '' } },
+        getToolResultsDir: () => { try { return require('@claude-code/storage/toolResultStorage.js').getToolResultsDir() } catch { return '' } },
         // permissions.ts bindings
         shouldUseSandbox: () => { try { return require('@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js').shouldUseSandbox() } catch { return false } },
-        extractOutputRedirections: (cmd: string) => { try { return require('src/utils/bash/commands.js').extractOutputRedirections(cmd) } catch { return [] } },
+        extractOutputRedirections: (cmd: string) => { try { return require('@claude-code/shell/bash/commands.js').extractOutputRedirections(cmd) } catch { return [] } },
         deletePermissionRuleFromSettings: (...a: unknown[]) => { try { return require('@claude-code/permission/permissionsLoader.js').deletePermissionRuleFromSettings(...a) } catch { return false } },
         shouldAllowManagedPermissionRulesOnly: () => { try { return require('@claude-code/permission/permissionsLoader.js').shouldAllowManagedPermissionRulesOnly() } catch { return false } },
         classifyPermissionDecision: (...a: unknown[]) => { try { return require('@claude-code/permission/classifierDecision.js').classifyPermissionDecision(...a) } catch { return null } },
@@ -97,12 +97,12 @@ export function installPackageHostBindings(
         executePermissionRequestHooks: (...a: unknown[]) => { try { return require('@claude-code/agent/hooks.js').executePermissionRequestHooks(...a) } catch { return Promise.resolve(null) } },
         buildClassifierUnavailableMessage: () => { try { return require('@claude-code/agent/messages.js').buildClassifierUnavailableMessage() } catch { return '' } },
         buildYoloRejectionMessage: (...a: unknown[]) => { try { return require('@claude-code/agent/messages.js').buildYoloRejectionMessage(...a) } catch { return '' } },
-        calculateCostFromTokens: (...a: unknown[]) => { try { return require('src/utils/modelCost.js').calculateCostFromTokens(...a) } catch { return 0 } },
-        isSandboxingEnabled: () => { try { return require('src/utils/sandbox/sandbox-adapter.js').SandboxManager.isSandboxingEnabled() } catch { return false } },
-        isAutoAllowBashIfSandboxedEnabled: () => { try { return require('src/utils/sandbox/sandbox-adapter.js').SandboxManager.isAutoAllowBashIfSandboxedEnabled() } catch { return false } },
+        calculateCostFromTokens: (...a: unknown[]) => { try { return require('@claude-code/provider/modelCost.js').calculateCostFromTokens(...a) } catch { return 0 } },
+        isSandboxingEnabled: () => { try { return require('@claude-code/shell/sandbox/sandbox-adapter.js').SandboxManager.isSandboxingEnabled() } catch { return false } },
+        isAutoAllowBashIfSandboxedEnabled: () => { try { return require('@claude-code/shell/sandbox/sandbox-adapter.js').SandboxManager.isAutoAllowBashIfSandboxedEnabled() } catch { return false } },
         classifyYoloAction: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').classifyYoloAction(...a) } catch { return null } },
         formatActionForClassifier: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').formatActionForClassifier(...a) } catch { return '' } },
-        getToolsForDefaultPreset: () => { try { return require("src/tools.js").getToolsForDefaultPreset() } catch { return [] } },
+        getToolsForDefaultPreset: () => { try { return require('@claude-code/tool-registry/runtime').getToolsForDefaultPreset() } catch { return [] } },
         handleAutoModeTransition: (mode) => { try { require('./bootstrap/state.js').handleAutoModeTransition(mode) } catch {} },
         handlePlanModeTransition: (mode) => { try { require('./bootstrap/state.js').handlePlanModeTransition(mode) } catch {} },
         setHasExitedPlanMode: (v) => { try { require('./bootstrap/state.js').setHasExitedPlanMode(v) } catch {} },
@@ -110,11 +110,11 @@ export function installPackageHostBindings(
         loadAllPermissionRulesFromDisk: () => { try { return require('@claude-code/permission/permissionsLoader.js').loadAllPermissionRulesFromDisk() } catch { return [] } },
         addDirHelpMessage: () => { try { return require('src/commands/add-dir/validation.js').addDirHelpMessage() } catch { return '' } },
         validateDirectoryForWorkspace: (dir, cwd) => { try { return require('src/commands/add-dir/validation.js').validateDirectoryForWorkspace(dir, cwd) } catch { return { valid: true } } },
-        parseToolPreset: (preset) => { try { return require('src/tools.js').parseToolPreset(preset) } catch { return [] } },
-        safeResolvePath: (fs, p) => { try { return require('src/utils/fsOperations.js').safeResolvePath(fs, p) } catch { return { resolvedPath: p } } },
-        modelSupportsAutoMode: (model) => { try { return require('src/utils/betas.js').modelSupportsAutoMode(model) } catch { return false } },
-        gracefulShutdown: (code) => { try { return require('src/utils/gracefulShutdown.js').gracefulShutdown(code) } catch { return Promise.reject() } },
-        getMainLoopModel: () => { try { return require('src/utils/model/model.js').getMainLoopModel() } catch { return '' } },
+        parseToolPreset: (preset) => { try { return require('@claude-code/tool-registry/runtime').parseToolPreset(preset) } catch { return [] } },
+        safeResolvePath: (fs, p) => { try { return require('@claude-code/storage/fsOperations.js').safeResolvePath(fs, p) } catch { return { resolvedPath: p } } },
+        modelSupportsAutoMode: (model) => { try { return require('@claude-code/provider/betas.js').modelSupportsAutoMode(model) } catch { return false } },
+        gracefulShutdown: (code) => { try { return require('@claude-code/app-host/bootstrap/gracefulShutdown.js').gracefulShutdown(code) } catch { return Promise.reject() } },
+        getMainLoopModel: () => { try { return require('@claude-code/provider/model.js').getMainLoopModel() } catch { return '' } },
       },
       extraMemoryBindings: {
         registerDreamTask: (toolUseContext: unknown, params: unknown) => {
@@ -229,35 +229,35 @@ export function installPackageHostBindings(
         },
         getTotalAPIDuration: () => {
           try {
-            return require('src/cost-tracker.js').getTotalAPIDuration()
+            return require('@claude-code/provider/costTracker.js').getTotalAPIDuration()
           } catch {
             return 0
           }
         },
         getTotalCost: () => {
           try {
-            return require('src/cost-tracker.js').getTotalCost()
+            return require('@claude-code/provider/costTracker.js').getTotalCost()
           } catch {
             return 0
           }
         },
         getModelUsage: () => {
           try {
-            return require('src/cost-tracker.js').getModelUsage()
+            return require('@claude-code/provider/costTracker.js').getModelUsage()
           } catch {
             return {}
           }
         },
         getFastModeState: (model: string, fastMode?: boolean) => {
           try {
-            return require('src/utils/fastMode.js').getFastModeState(model, fastMode)
+            return require('@claude-code/provider/fastMode.js').getFastModeState(model, fastMode)
           } catch {
             return null
           }
         },
         getInMemoryErrors: () => {
           try {
-            return require('src/utils/log.js').getInMemoryErrors()
+            return require('@claude-code/local-observability/log.js').getInMemoryErrors()
           } catch {
             return []
           }
@@ -286,33 +286,33 @@ export function installPackageHostBindings(
         },
         registerStructuredOutputEnforcement: (setAppState, sessionId) => {
           try {
-            require('src/utils/hooks/hookHelpers.js').registerStructuredOutputEnforcement(setAppState, sessionId)
+            require('@claude-code/agent/hooks/hookHelpers.js').registerStructuredOutputEnforcement(setAppState, sessionId)
           } catch {}
         },
         getMainLoopModel: () => {
           try {
-            return require('src/utils/model/model.js').getMainLoopModel()
+            return require('@claude-code/provider/model.js').getMainLoopModel()
           } catch {
             return ''
           }
         },
         parseUserSpecifiedModel: (model: string) => {
           try {
-            return require('src/utils/model/model.js').parseUserSpecifiedModel(model)
+            return require('@claude-code/provider/model.js').parseUserSpecifiedModel(model)
           } catch {
             return model
           }
         },
         loadAllPluginsCacheOnly: () => {
           try {
-            return require('src/utils/plugins/pluginLoader.js').loadAllPluginsCacheOnly()
+            return require('@claude-code/config/plugin/pluginLoader').loadAllPluginsCacheOnly()
           } catch {
             return Promise.resolve({ enabled: [] })
           }
         },
         processUserInput: (params: unknown) => {
           try {
-            return require('src/utils/processUserInput/processUserInput.js').processUserInput(params)
+            return require('@claude-code/repl/processUserInput/processUserInput.js').processUserInput(params)
           } catch {
             return Promise.resolve({
               messages: [],
@@ -323,7 +323,7 @@ export function installPackageHostBindings(
         },
         fetchSystemPromptParts: (params: unknown) => {
           try {
-            return require('src/utils/queryContext.js').fetchSystemPromptParts(params)
+            return require('@claude-code/agent/queryContext.js').fetchSystemPromptParts(params)
           } catch {
             return Promise.resolve({
               defaultSystemPrompt: [],
@@ -334,42 +334,42 @@ export function installPackageHostBindings(
         },
         shouldEnableThinkingByDefault: () => {
           try {
-            return require('src/utils/thinking.js').shouldEnableThinkingByDefault()
+            return require('@claude-code/provider/thinking.js').shouldEnableThinkingByDefault()
           } catch {
             return undefined
           }
         },
         buildSystemInitMessage: (params: unknown) => {
           try {
-            return require('src/utils/messages/systemInit.js').buildSystemInitMessage(params)
+            return require('@claude-code/agent/messagesDir/systemInit.js').buildSystemInitMessage(params)
           } catch {
             return undefined
           }
         },
         sdkCompatToolName: (toolName: string) => {
           try {
-            return require('src/utils/messages/systemInit.js').sdkCompatToolName(toolName)
+            return require('@claude-code/agent/messagesDir/systemInit.js').sdkCompatToolName(toolName)
           } catch {
             return toolName
           }
         },
         handleOrphanedPermission: (...args: unknown[]) => {
           try {
-            return require('src/utils/queryHelpers.js').handleOrphanedPermission(...args)
+            return require('@claude-code/repl/queryHelpers.js').handleOrphanedPermission(...args)
           } catch {
             return (async function* () {})()
           }
         },
         isResultSuccessful: (result: unknown, lastStopReason: string | null) => {
           try {
-            return require('src/utils/queryHelpers.js').isResultSuccessful(result, lastStopReason)
+            return require('@claude-code/repl/queryHelpers.js').isResultSuccessful(result, lastStopReason)
           } catch {
             return false
           }
         },
         normalizeMessage: (message: unknown) => {
           try {
-            return require('src/utils/queryHelpers.js').normalizeMessage(message)
+            return require('@claude-code/repl/queryHelpers.js').normalizeMessage(message)
           } catch {
             return (async function* () {})()
           }
@@ -383,7 +383,7 @@ export function installPackageHostBindings(
         },
         getCoordinatorUserContext: (mcpClients: ReadonlyArray<{ name: string }>, scratchpadDir?: string) => {
           try {
-            return require('src/coordinator/coordinatorMode.js').getCoordinatorUserContext(mcpClients, scratchpadDir)
+            return require('@claude-code/agent/coordinatorMode.js').getCoordinatorUserContext(mcpClients, scratchpadDir)
           } catch {
             return {}
           }
@@ -404,12 +404,12 @@ export function installPackageHostBindings(
         },
         headlessProfilerCheckpoint: (name: string) => {
           try {
-            require('src/utils/headlessProfiler.js').headlessProfilerCheckpoint(name)
+            require('@claude-code/local-observability/legacy/headlessProfiler.js').headlessProfilerCheckpoint(name)
           } catch {}
         },
         queryCheckpoint: (name: string) => {
           try {
-            require('src/utils/queryProfiler.js').queryCheckpoint(name)
+            require('@claude-code/local-observability/legacy/queryProfiler.js').queryCheckpoint(name)
           } catch {}
         },
         notifyCommandLifecycle: (uuid: string, state: 'started' | 'completed') => {
@@ -419,19 +419,19 @@ export function installPackageHostBindings(
         },
         getCommandsByMaxPriority: (maxPriority: 'now' | 'next' | 'later') => {
           try {
-            return require('src/utils/messageQueueManager.js').getCommandsByMaxPriority(maxPriority)
+            return require('@claude-code/agent/messageQueueManager.js').getCommandsByMaxPriority(maxPriority)
           } catch {
             return []
           }
         },
         removeCommandsFromQueue: (commands: unknown[]) => {
           try {
-            require('src/utils/messageQueueManager.js').remove(commands)
+            require('@claude-code/agent/messageQueueManager.js').remove(commands)
           } catch {}
         },
         isSlashCommand: (command: unknown) => {
           try {
-            return require('src/utils/messageQueueManager.js').isSlashCommand(command)
+            return require('@claude-code/agent/messageQueueManager.js').isSlashCommand(command)
           } catch {
             return false
           }
@@ -481,14 +481,14 @@ export function installPackageHostBindings(
         },
         imageSizeErrorCtor: () => {
           try {
-            return require('src/utils/imageValidation.js').ImageSizeError
+            return require('@claude-code/storage/imageValidation.js').ImageSizeError
           } catch {
             return undefined
           }
         },
         imageResizeErrorCtor: () => {
           try {
-            return require('src/utils/imageResizer.js').ImageResizeError
+            return require('@claude-code/storage/imageResizer.js').ImageResizeError
           } catch {
             return undefined
           }
@@ -537,14 +537,14 @@ export function installPackageHostBindings(
         },
         prependUserContext: (messages: unknown[], userContext: Record<string, string>) => {
           try {
-            return require('src/utils/api.js').prependUserContext(messages, userContext)
+            return require('@claude-code/provider/legacy/api.js').prependUserContext(messages, userContext)
           } catch {
             return messages
           }
         },
         appendSystemContext: (systemPrompt: readonly string[], systemContext: Record<string, string>) => {
           try {
-            return require('src/utils/api.js').appendSystemContext(systemPrompt, systemContext)
+            return require('@claude-code/provider/legacy/api.js').appendSystemContext(systemPrompt, systemContext)
           } catch {
             return systemPrompt
           }
@@ -579,70 +579,70 @@ export function installPackageHostBindings(
         },
         startSkillDiscoveryPrefetch: (...args: unknown[]) => {
           try {
-            return require('src/services/skillSearch/prefetch.js').startSkillDiscoveryPrefetch(...args)
+            return require('@claude-code/agent/skillSearch/prefetch.js').startSkillDiscoveryPrefetch(...args)
           } catch {
             return undefined
           }
         },
         collectSkillDiscoveryPrefetch: (...args: unknown[]) => {
           try {
-            return require('src/services/skillSearch/prefetch.js').collectSkillDiscoveryPrefetch(...args)
+            return require('@claude-code/agent/skillSearch/prefetch.js').collectSkillDiscoveryPrefetch(...args)
           } catch {
             return Promise.resolve([])
           }
         },
         getRuntimeMainLoopModel: (params: unknown) => {
           try {
-            return require('src/utils/model/model.js').getRuntimeMainLoopModel(params)
+            return require('@claude-code/provider/model.js').getRuntimeMainLoopModel(params)
           } catch {
             return ''
           }
         },
         renderModelName: (model: string) => {
           try {
-            return require('src/utils/model/model.js').renderModelName(model)
+            return require('@claude-code/provider/model.js').renderModelName(model)
           } catch {
             return model
           }
         },
         doesMostRecentAssistantMessageExceed200k: (messages: unknown[]) => {
           try {
-            return require('src/utils/tokens.js').doesMostRecentAssistantMessageExceed200k(messages)
+            return require('@claude-code/agent/tokens.js').doesMostRecentAssistantMessageExceed200k(messages)
           } catch {
             return false
           }
         },
         finalContextTokensFromLastResponse: (messages: unknown[]) => {
           try {
-            return require('src/utils/tokens.js').finalContextTokensFromLastResponse(messages)
+            return require('@claude-code/agent/tokens.js').finalContextTokensFromLastResponse(messages)
           } catch {
             return 0
           }
         },
         tokenCountWithEstimation: (messages: unknown[]) => {
           try {
-            return require('src/utils/tokens.js').tokenCountWithEstimation(messages)
+            return require('@claude-code/agent/tokens.js').tokenCountWithEstimation(messages)
           } catch {
             return 0
           }
         },
         escalatedMaxTokens: (() => {
           try {
-            return require('src/utils/context.js').ESCALATED_MAX_TOKENS
+            return require('@claude-code/agent/context.js').ESCALATED_MAX_TOKENS
           } catch {
             return 64000
           }
         })(),
         getContextWindowForModel: (model: string) => {
           try {
-            return require('src/utils/context.js').getContextWindowForModel(model)
+            return require('@claude-code/agent/context.js').getContextWindowForModel(model)
           } catch {
             return 0
           }
         },
         executePostSamplingHooks: (...args: unknown[]) => {
           try {
-            require('src/utils/hooks/postSamplingHooks.js').executePostSamplingHooks(...args)
+            require('@claude-code/agent/postSamplingHooks.js').executePostSamplingHooks(...args)
           } catch {}
         },
         createStreamingToolExecutor: (...args: unknown[]) => {
@@ -662,7 +662,7 @@ export function installPackageHostBindings(
         },
         applyToolResultBudget: (...args: unknown[]) => {
           try {
-            return require('src/utils/toolResultStorage.js').applyToolResultBudget(...args)
+            return require('@claude-code/storage/toolResultStorage.js').applyToolResultBudget(...args)
           } catch {
             const [messages] = args
             return Promise.resolve(messages)
@@ -756,7 +756,7 @@ export function installPackageHostBindings(
         },
       },
       // V7 §7 — bootstrap state + session accessors for config
-      getCwd: () => { try { return require('src/utils/cwd.js').getCwd() } catch { return process.cwd() } },
+      getCwd: () => { try { return require('@claude-code/app-host/bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
       getOriginalCwd: () => { try { return require('./bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
       getSessionTrustAccepted: () => { try { return require('./bootstrap/state.js').getSessionTrustAccepted() } catch { return false } },
       getFlagSettingsPath: () => { try { return require('./bootstrap/state.js').getFlagSettingsPath() } catch { return undefined } },
@@ -766,23 +766,23 @@ export function installPackageHostBindings(
         try { (require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')).logEvent(event, metadata) } catch { /* best-effort */ }
       },
       findCanonicalGitRoot: (cwd: string) => {
-        try { return require('src/utils/git.js').findCanonicalGitRoot(cwd) } catch { return undefined }
+        try { return require('@claude-code/storage/git.js').findCanonicalGitRoot(cwd) } catch { return undefined }
       },
       addFileGlobRuleToGitignore: (dir: string, glob: string) => {
-        try { require('src/utils/git/gitignore.js').addFileGlobRuleToGitignore(dir, glob) } catch { /* best-effort */ }
+        try { require('@claude-code/command-runtime/gitignore.js').addFileGlobRuleToGitignore(dir, glob) } catch { /* best-effort */ }
       },
       // V7 §8.6 — local-observability + profiler bindings for MDM subsystem
       logDiagnostics: (level: string, event: string, data?: Record<string, unknown>) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { logForDiagnosticsNoPII } = require('src/utils/diagLogs.js') as typeof import('src/utils/diagLogs.js')
+          const { logForDiagnosticsNoPII } = require('@claude-code/local-observability/logging') as typeof import('@claude-code/local-observability/logging')
           logForDiagnosticsNoPII(level as any, event, data)
         } catch { /* diagnostic logging is best-effort */ }
       },
       profileCheckpoint: (name: string) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { profileCheckpoint } = require('src/utils/startupProfiler.js') as typeof import('src/utils/startupProfiler.js')
+          const { profileCheckpoint } = require('@claude-code/app-host/startup/startupProfiler.js') as typeof import('@claude-code/app-host/startup/startupProfiler.js')
           profileCheckpoint(name)
         } catch { /* profiling is optional */ }
       },
@@ -803,8 +803,8 @@ export function installPackageHostBindings(
           const { ManagedSettingsSecurityDialog } = require('@claude-code/repl/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js')
           const { render } = require('src/ink.js')
           const { KeybindingSetup } = require('@claude-code/repl/keybindings/KeybindingProviderSetup.js')
-          const { AppStateProvider } = require('src/state/AppState.js')
-          const { getBaseRenderOptions } = require('src/utils/renderOptions.js')
+          const { AppStateProvider } = require('@claude-code/app-host/state/AppState.js')
+          const { getBaseRenderOptions } = require('@claude-code/output/render-options')
           return new Promise<'approved' | 'rejected' | 'no_check_needed'>(resolve => {
             void (async () => {
               const { unmount } = await render(
@@ -827,7 +827,7 @@ export function installPackageHostBindings(
         if (result === 'rejected') {
           try {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const { gracefulShutdownSync } = require('src/utils/gracefulShutdown.js') as typeof import('src/utils/gracefulShutdown.js')
+            const { gracefulShutdownSync } = require('@claude-code/app-host/bootstrap/gracefulShutdown.js') as typeof import('@claude-code/app-host/bootstrap/gracefulShutdown.js')
             gracefulShutdownSync(1)
           } catch { process.exit(1) }
           return false
@@ -844,7 +844,7 @@ export function installPackageHostBindings(
       },
       registerCleanup: (fn: () => Promise<void>) => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { registerCleanup } = require('src/utils/cleanupRegistry.js') as typeof import('src/utils/cleanupRegistry.js')
+        const { registerCleanup } = require('@claude-code/app-host/bootstrap/cleanupRegistry.js') as typeof import('@claude-code/app-host/bootstrap/cleanupRegistry.js')
         return registerCleanup(fn)
       },
       executeConfigChangeHooks: async (source: string) => {
@@ -873,11 +873,11 @@ export function installPackageHostBindings(
       checkRemoteSettingsEligibility: () => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { CLAUDE_AI_INFERENCE_SCOPE } = require('src/constants/oauth.js') as typeof import('src/constants/oauth.js')
+          const { CLAUDE_AI_INFERENCE_SCOPE } = require('@claude-code/provider/oauthConstants') as typeof import('@claude-code/provider/oauthConstants')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { getAnthropicApiKeyWithSource, getClaudeAIOAuthTokens } = require('@claude-code/provider/authAlias.js') as typeof import('@claude-code/provider/authAlias.js')
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('src/utils/model/providers.js') as typeof import('src/utils/model/providers.js')
+          const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = require('@claude-code/provider/providers.js') as typeof import('@claude-code/provider/providers.js')
 
           if (getAPIProvider() !== 'firstParty') return false
           if (!isFirstPartyAnthropicBaseUrl()) return false

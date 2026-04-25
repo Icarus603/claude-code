@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/agent/hooksConfigSnapshot.
-export * from '@claude-code/agent/hooksConfigSnapshot.js'
+// Forward shim — canonical owner is packages/agent/hooks/hooksConfigSnapshot.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/hooks/hooksConfigSnapshot.js'

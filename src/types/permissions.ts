@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/permission/permissionTypes.
-export * from '@claude-code/permission/permissionTypes'
+// Forward shim — canonical owner is packages/repl/src/types_v7/permissions.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/repl/types_v7/permissions.js'

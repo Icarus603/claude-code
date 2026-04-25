@@ -4,7 +4,7 @@ import { getDisplayPath } from '@claude-code/storage/file.js'
 import {
   removePathFromRepo,
   validateRepoAtPath,
-} from 'src/utils/githubRepoPathMapping.js'
+} from '@claude-code/repl/legacy/github/githubRepoPathMapping.js'
 import { Select } from './CustomSelect/index.js'
 import { Dialog } from '@anthropic/ink'
 import { Spinner } from './Spinner.js'

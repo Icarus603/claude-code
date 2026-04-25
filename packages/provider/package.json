@@ -98,6 +98,22 @@
     "./modelStrings.js": "./src/modelStrings.ts",
     "./caCerts.js": "./src/caCerts.ts",
     "./modelCapabilities.js": "./src/modelCapabilities.ts",
-    "./betasConstants.js": "./src/betasConstants.ts"
+    "./betasConstants.js": "./src/betasConstants.ts",
+    "./legacy/api.js": "./src/legacy/api.ts",
+    "./openaiDir/client.js": "./src/openaiDir/client.ts",
+    "./openaiDir/index.js": "./src/openaiDir/index.ts",
+    "./openaiDir/convertTools.js": "./src/openaiDir/convertTools.ts",
+    "./geminiDir/types.js": "./src/geminiDir/types.ts",
+    "./geminiDir/index.js": "./src/geminiDir/index.ts",
+    "./geminiDir/convertTools.js": "./src/geminiDir/convertTools.ts",
+    "./model/aliases.js": "./src/model/aliases.ts",
+    "./model/model.js": "./src/model/model.ts",
+    "./model/providers.js": "./src/model/providers.ts",
+    "./model/agent.js": "./src/model/agent.ts",
+    "./model/antModels.js": "./src/model/antModels.ts",
+    "./model/modelOptions.js": "./src/model/modelOptions.ts",
+    "./model/validateModel.js": "./src/model/validateModel.ts",
+    "./model/modelCapabilities.js": "./src/model/modelCapabilities.ts",
+    "./vcr.js": "./src/vcr.ts"
   }
 }

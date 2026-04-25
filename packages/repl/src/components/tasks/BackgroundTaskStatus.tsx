@@ -9,13 +9,13 @@ import {
   exitTeammateView,
 } from '@claude-code/repl/teammateViewHelpers.js'
 import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
-import { getPillLabel, pillNeedsCta } from 'src/tasks/pillLabel.js'
+import { getPillLabel, pillNeedsCta } from '@claude-code/agent/tasks/pillLabel.js'
 import {
   type BackgroundTaskState,
   isBackgroundTask,
   type TaskState,
 } from '@claude-code/repl/tasksTypes.js'
-import { calculateHorizontalScrollWindow } from 'src/utils/horizontalScroll.js'
+import { calculateHorizontalScrollWindow } from '@claude-code/repl/legacy/uiHelpers/horizontalScroll.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   AGENT_COLOR_TO_THEME_COLOR,

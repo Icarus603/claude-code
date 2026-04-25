@@ -10,6 +10,8 @@
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
-    "./*.js": "./src/*.ts"
+    "./*.js": "./src/*.ts",
+    "./upstreamproxy/upstreamproxy.js": "./src/upstreamproxy/upstreamproxy.ts",
+    "./upstreamproxy/relay.js": "./src/upstreamproxy/relay.ts"
   }
 }

@@ -2,7 +2,7 @@ import {
   isVimPunctuation,
   isVimWhitespace,
   isVimWordChar,
-} from 'src/utils/Cursor.js'
+} from '@claude-code/repl/Cursor.js'
 import { getGraphemeSegmenter } from '@claude-code/output/utils/intl.js'
 
 export type TextObjectRange = { start: number; end: number } | null

@@ -3,46 +3,46 @@ import addDir from '@claude-code/repl/commands/add-dir/index.js'
 import { installCommandRegistryHostBindings } from '@claude-code/command-runtime'
 import autofixPr from '@claude-code/command-runtime/stubs/stubCommand.js'
 import backfillSessions from '@claude-code/command-runtime/stubs/stubCommand.js'
-import btw from 'src/commands/btw/index.js'
+import btw from '@claude-code/command-runtime/commands/btw/index.js'
 import goodClaude from '@claude-code/command-runtime/stubs/stubCommand.js'
 import issue from '@claude-code/command-runtime/stubs/stubCommand.js'
 import feedback from '@claude-code/repl/commands/feedback/index.js'
-import clear from 'src/commands/clear/index.js'
+import clear from '@claude-code/command-runtime/commands/clear/index.js'
 import color from '@claude-code/repl/commands/color/index.js'
 import commit from '@claude-code/agent/commands/commit.js'
-import copy from 'src/commands/copy/index.js'
+import copy from '@claude-code/command-runtime/commands/copy/index.js'
 import desktop from '@claude-code/repl/commands/desktop/index.js'
 import commitPushPr from '@claude-code/agent/commands/commit-push-pr.js'
-import compact from 'src/commands/compact/index.js'
+import compact from '@claude-code/command-runtime/commands/compact/index.js'
 import config from '@claude-code/repl/commands/config/index.js'
-import { context, contextNonInteractive } from 'src/commands/context/index.js'
-import cost from 'src/commands/cost/index.js'
+import { context, contextNonInteractive } from '@claude-code/command-runtime/commands/context/index.js'
+import cost from '@claude-code/command-runtime/commands/cost/index.js'
 import diff from '@claude-code/repl/commands/diff/index.js'
 import ctx_viz from '@claude-code/command-runtime/stubs/stubCommand.js'
 import doctor from '@claude-code/repl/commands/doctor/index.js'
-import memory from 'src/commands/memory/index.js'
+import memory from '@claude-code/command-runtime/commands/memory/index.js'
 import help from '@claude-code/repl/commands/help/index.js'
-import ide from 'src/commands/ide/index.js'
+import ide from '@claude-code/command-runtime/commands/ide/index.js'
 import init from '@claude-code/app-host/commands/initCommand.js'
 import initVerifiers from '@claude-code/app-host/commands/init-verifiers.js'
 import keybindings from '@claude-code/repl/commands/keybindings/index.js'
 import login from '@claude-code/provider/commands/login/index.js'
 import logout from '@claude-code/provider/commands/logout/index.js'
-import installGitHubApp from 'src/commands/install-github-app/index.js'
+import installGitHubApp from '@claude-code/command-runtime/commands/install-github-app/index.js'
 import installSlackApp from '@claude-code/repl/commands/install-slack-app/index.js'
 import breakCache from '@claude-code/command-runtime/stubs/stubCommand.js'
-import mcp from 'src/commands/mcp/index.js'
+import mcp from '@claude-code/command-runtime/commands/mcp/index.js'
 import mobile from '@claude-code/repl/commands/mobile/index.js'
 import onboarding from '@claude-code/command-runtime/stubs/stubCommand.js'
 import pr_comments from '@claude-code/agent/commands/pr_comments/index.js'
 import releaseNotes from '@claude-code/repl/commands/release-notes/index.js'
-import rename from 'src/commands/rename/index.js'
-import resume from 'src/commands/resume/index.js'
-import review, { ultrareview } from 'src/commands/review.js'
-import session from 'src/commands/session/index.js'
+import rename from '@claude-code/command-runtime/commands/rename/index.js'
+import resume from '@claude-code/command-runtime/commands/resume/index.js'
+import review, { ultrareview } from '@claude-code/command-runtime/commands/review/review.js'
+import session from '@claude-code/command-runtime/commands/session/index.js'
 import share from '@claude-code/command-runtime/stubs/stubCommand.js'
 import skills from '@claude-code/command-runtime/commands/skills/index.js'
-import status from 'src/commands/status/index.js'
+import status from '@claude-code/command-runtime/commands/status/index.js'
 import tasks from '@claude-code/agent/commands/tasks/index.js'
 import teleport from '@claude-code/command-runtime/stubs/stubCommand.js'
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -53,9 +53,9 @@ const agentsPlatform =
 /* eslint-enable @typescript-eslint/no-require-imports */
 import securityReview from '@claude-code/agent/commands/security-review.js'
 import bughunter from '@claude-code/command-runtime/stubs/stubCommand.js'
-import terminalSetup from 'src/commands/terminalSetup/index.js'
+import terminalSetup from '@claude-code/command-runtime/commands/terminalSetup/index.js'
 import usage from '@claude-code/repl/commands/usage/index.js'
-import theme from 'src/commands/theme/index.js'
+import theme from '@claude-code/command-runtime/commands/theme/index.js'
 import vim from '@claude-code/repl/commands/vim/index.js'
 import { feature } from 'bun:bundle'
 // Dead code elimination: conditional imports
@@ -76,10 +76,10 @@ const bridge = feature('BRIDGE_MODE')
   : null
 const remoteControlServerCommand =
   feature('DAEMON') && feature('BRIDGE_MODE')
-    ? require('src/commands/remoteControlServer/index.js').default
+    ? require('@claude-code/command-runtime/commands/remoteControlServer/index.js').default
     : null
 const voiceCommand = feature('VOICE_MODE')
-  ? require('src/commands/voice/index.js').default
+  ? require('@claude-code/command-runtime/commands/voice/index.js').default
   : null
 const forceSnip = feature('HISTORY_SNIP')
   ? require('src/commands/force-snip.js').default
@@ -96,14 +96,14 @@ const webCmd = feature('CCR_REMOTE_SETUP')
   : null
 const clearSkillIndexCache = feature('EXPERIMENTAL_SKILL_SEARCH')
   ? (
-      require('src/services/skillSearch/localSearch.js') as typeof import('src/services/skillSearch/localSearch.js')
+      require('@claude-code/agent/skillSearch/localSearch.js') as typeof import('@claude-code/agent/skillSearch/localSearch.js')
     ).clearSkillIndexCache
   : null
 const subscribePr = feature('KAIROS_GITHUB_WEBHOOKS')
   ? require('src/commands/subscribe-pr.js').default
   : null
 const ultraplan = feature('ULTRAPLAN')
-  ? require('src/commands/ultraplan.js').default
+  ? require('@claude-code/repl/ultraplan.js').default
   : null
 const torch = feature('TORCH') ? require('src/commands/torch.js').default : null
 const peersCmd = feature('UDS_INBOX')
@@ -121,14 +121,14 @@ import thinkback from '@claude-code/config/plugin/commands/thinkback/index.js'
 import thinkbackPlay from '@claude-code/config/plugin/commands/thinkback-play/index.js'
 import permissions from '@claude-code/permission/commands/index.js'
 import plan from '@claude-code/repl/commands/plan/index.js'
-import fast from 'src/commands/fast/index.js'
+import fast from '@claude-code/command-runtime/commands/fast/index.js'
 import passes from '@claude-code/repl/commands/passes/index.js'
-import privacySettings from 'src/commands/privacy-settings/index.js'
+import privacySettings from '@claude-code/command-runtime/commands/privacy-settings/index.js'
 import hooks from '@claude-code/repl/commands/hooks/index.js'
 import files from '@claude-code/repl/commands/files/index.js'
 import branch from '@claude-code/swarm/commands/branch/index.js'
 import agents from '@claude-code/swarm/commands/agents/index.js'
-import plugin from 'src/commands/plugin/index.js'
+import plugin from '@claude-code/command-runtime/commands/plugin/index.js'
 import reloadPlugins from '@claude-code/config/plugin/commands/reload-plugins/index.js'
 import rewind from '@claude-code/repl/commands/rewind/index.js'
 import heapDump from '@claude-code/repl/commands/heapdump/index.js'
@@ -143,7 +143,7 @@ import {
 import antTrace from '@claude-code/command-runtime/stubs/stubCommand.js'
 import perfIssue from '@claude-code/command-runtime/stubs/stubCommand.js'
 import sandboxToggle from '@claude-code/repl/commands/sandbox-toggle/index.js'
-import chrome from 'src/commands/chrome/index.js'
+import chrome from '@claude-code/command-runtime/commands/chrome/index.js'
 import stickers from '@claude-code/repl/commands/stickers/index.js'
 import advisor from '@claude-code/provider/commands/advisor.js'
 import provider from '@claude-code/provider/commands/provider.js'
@@ -156,7 +156,7 @@ import {
   getDynamicSkills,
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
 import { getBundledSkills } from '@claude-code/command-runtime/skills/bundledSkills.js'
-import { getBuiltinPluginSkillCommands } from 'src/plugins/builtinPlugins.js'
+import { getBuiltinPluginSkillCommands } from '@claude-code/config/plugin/builtin'
 import {
   getPluginCommands,
   clearPluginCommandCache,
@@ -172,15 +172,15 @@ import exportCommand from '@claude-code/repl/commands/export/index.js'
 import model from '@claude-code/provider/commands/model/index.js'
 import tag from '@claude-code/repl/commands/tag/index.js'
 import outputStyle from '@claude-code/repl/commands/output-style/index.js'
-import remoteEnv from 'src/commands/remote-env/index.js'
-import upgrade from 'src/commands/upgrade/index.js'
+import remoteEnv from '@claude-code/command-runtime/commands/remote-env/index.js'
+import upgrade from '@claude-code/command-runtime/commands/upgrade/index.js'
 import {
   extraUsage,
   extraUsageNonInteractive,
 } from '@claude-code/repl/extraUsage.js'
-import rateLimitOptions from 'src/commands/rate-limit-options/index.js'
+import rateLimitOptions from '@claude-code/command-runtime/commands/rate-limit-options/index.js'
 import statusline from '@claude-code/repl/commands/statusline.js'
-import effort from 'src/commands/effort/index.js'
+import effort from '@claude-code/command-runtime/commands/effort/index.js'
 import stats from '@claude-code/repl/commands/stats/index.js'
 // insights.ts is 113KB (3200 lines, includes diffLines/html rendering). Lazy
 // shim defers the heavy module until /insights is actually invoked.
@@ -192,7 +192,7 @@ const usageReport: Command = {
   progressMessage: 'analyzing your sessions',
   source: 'builtin',
   async getPromptForCommand(args, context) {
-    const real = (await import('src/commands/insights.js')).default
+    const real = (await import('@claude-code/command-runtime/commands/insights/insights.js')).default
     if (real.type !== 'prompt') throw new Error('unreachable')
     return real.getPromptForCommand(args, context)
   },

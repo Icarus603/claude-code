@@ -1,16 +1,3 @@
-import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import type { Command } from '../../commands.js'
-
-const session = {
-  type: 'local-jsx',
-  name: 'session',
-  aliases: ['remote'],
-  description: 'Show remote session URL and QR code',
-  isEnabled: () => getIsRemoteMode(),
-  get isHidden() {
-    return !getIsRemoteMode()
-  },
-  load: () => import('./session.js'),
-} satisfies Command
-
-export default session
+// Forward shim — canonical owner is packages/command-runtime/src/commands/session/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/session/index.js'

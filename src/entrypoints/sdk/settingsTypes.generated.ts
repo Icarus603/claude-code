@@ -1,4 +1,2 @@
-/**
- * Stub: SDK Settings Types (generated from settings JSON schema).
- */
-export type Settings = Record<string, unknown>
+// Forward shim — canonical owner is packages/headless-sdk/src/agentSdkTypes.ts.
+export type { Settings } from '@claude-code/headless-sdk/agentSdkTypes.js'

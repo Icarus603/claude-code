@@ -23,6 +23,17 @@
     "./telemetryEvents.js": "./src/telemetryEvents.ts",
     "./sentry.js": "./src/sentry.ts",
     "./betaSessionTracing.js": "./src/betaSessionTracing.ts",
-    "./errorIds.js": "./src/errorIds.ts"
+    "./errorIds.js": "./src/errorIds.ts",
+    "./telemetry/sessionTracing.js": "./src/telemetry/sessionTracing.ts",
+    "./telemetry/bigqueryExporter.js": "./src/telemetry/bigqueryExporter.ts",
+    "./telemetry/pluginTelemetry.js": "./src/telemetry/pluginTelemetry.ts",
+    "./telemetry/perfettoTracing.js": "./src/telemetry/perfettoTracing.ts",
+    "./telemetry/betaSessionTracing.js": "./src/telemetry/betaSessionTracing.ts",
+    "./legacy/cleanup.js": "./src/legacy/cleanup.ts",
+    "./legacy/headlessProfiler.js": "./src/legacy/headlessProfiler.ts",
+    "./legacy/heatmap.js": "./src/legacy/heatmap.ts",
+    "./legacy/queryProfiler.js": "./src/legacy/queryProfiler.ts",
+    "./legacy/stats.js": "./src/legacy/stats.ts",
+    "./legacy/statsCache.js": "./src/legacy/statsCache.ts"
   }
 }

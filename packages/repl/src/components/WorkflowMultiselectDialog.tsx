@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import type { Workflow } from 'src/commands/install-github-app/types.js'
+import type { Workflow } from '@claude-code/command-runtime/commands/install-github-app/types.js'
 import type { ExitState } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Link, Text, Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'

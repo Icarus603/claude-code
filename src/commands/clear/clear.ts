@@ -1,7 +1,3 @@
-import type { LocalCommandCall } from '../../types/command.js'
-import { clearConversation } from './conversation.js'
-
-export const call: LocalCommandCall = async (_, context) => {
-  await clearConversation(context)
-  return { type: 'text', value: '' }
-}
+// Forward shim — canonical owner is packages/command-runtime/src/commands/clear/clear.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/clear/clear.js'

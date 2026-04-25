@@ -108,7 +108,7 @@ export async function installHandler(
 ): Promise<void> {
   const { setup } = await import('src/setup.js')
   await setup(cwd(), 'default', false, false, undefined, false)
-  const { install } = await import('src/commands/install.js')
+  const { install } = await import('@claude-code/command-runtime/commands/install/install.js')
   await new Promise<void>(resolve => {
     const args: string[] = []
     if (target) args.push(target)

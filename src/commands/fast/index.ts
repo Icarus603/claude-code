@@ -1,26 +1,3 @@
-import type { Command } from '../../commands.js'
-import {
-  FAST_MODE_MODEL_DISPLAY,
-  isFastModeEnabled,
-} from '../../utils/fastMode.js'
-import { shouldInferenceConfigCommandBeImmediate } from '@claude-code/shell/immediateCommand.js'
-
-const fast = {
-  type: 'local-jsx',
-  name: 'fast',
-  get description() {
-    return `Toggle fast mode (${FAST_MODE_MODEL_DISPLAY} only)`
-  },
-  availability: ['claude-ai', 'console'],
-  isEnabled: () => isFastModeEnabled(),
-  get isHidden() {
-    return !isFastModeEnabled()
-  },
-  argumentHint: '[on|off]',
-  get immediate() {
-    return shouldInferenceConfigCommandBeImmediate()
-  },
-  load: () => import('./fast.js'),
-} satisfies Command
-
-export default fast
+// Forward shim — canonical owner is packages/command-runtime/src/commands/fast/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/fast/index.js'

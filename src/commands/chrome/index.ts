@@ -1,13 +1,3 @@
-import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
-import type { Command } from '../../commands.js'
-
-const command: Command = {
-  name: 'chrome',
-  description: 'Claude in Chrome (Beta) settings',
-  availability: [],
-  isEnabled: () => !getIsNonInteractiveSession(),
-  type: 'local-jsx',
-  load: () => import('./chrome.js'),
-}
-
-export default command
+// Forward shim — canonical owner is packages/command-runtime/src/commands/chrome/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/chrome/index.js'

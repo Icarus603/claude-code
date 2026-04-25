@@ -12,7 +12,7 @@ import {
 import type { QuerySource } from '@claude-code/agent/querySource'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import { query } from 'src/query.js'
+import { query } from '@claude-code/agent/query'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { cleanupAgentTracking } from '@claude-code/provider/promptCacheBreakDetection.js'
@@ -52,8 +52,8 @@ import {
   type CacheSafeParams,
   createSubagentContext,
 } from '@claude-code/agent/forkedAgent.js'
-import { registerFrontmatterHooks } from 'src/utils/hooks/registerFrontmatterHooks.js'
-import { clearSessionHooks } from 'src/utils/hooks/sessionHooks.js'
+import { registerFrontmatterHooks } from '@claude-code/agent/hooks/registerFrontmatterHooks.js'
+import { clearSessionHooks } from '@claude-code/agent/hooks/sessionHooks.js'
 import { executeSubagentStartHooks } from '@claude-code/agent/hooks.js'
 import { createUserMessage } from '@claude-code/agent/messages.js'
 import { getAgentModel } from '@claude-code/provider/modelAgent.js'
@@ -76,7 +76,7 @@ import {
   isPerfettoTracingEnabled,
   registerAgent as registerPerfettoAgent,
   unregisterAgent as unregisterPerfettoAgent,
-} from 'src/utils/telemetry/perfettoTracing.js'
+} from '@claude-code/local-observability/telemetry/perfettoTracing.js'
 import type { ContentReplacementState } from '@claude-code/storage/toolResultStorage.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'
 import { resolveAgentTools } from './agentToolUtils.js'
@@ -616,7 +616,7 @@ export async function* runAgent({
 
     // Load all skill contents concurrently and add to initial messages
     const { formatSkillLoadingMetadata } = await import(
-      'src/utils/processUserInput/processSlashCommand.js'
+      '@claude-code/repl/processUserInput/processSlashCommand.js'
     )
     const loaded = await Promise.all(
       validSkills.map(async ({ skillName, skill }) => ({

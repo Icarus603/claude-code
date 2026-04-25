@@ -155,10 +155,10 @@ export const init = memoize(async (): Promise<void> => {
     if (isEnvTruthy(process.env.CLAUDE_CODE_REMOTE)) {
       try {
         const { initUpstreamProxy, getUpstreamProxyEnv } = await import(
-          'src/upstreamproxy/upstreamproxy.js'
+          '@claude-code/server/upstreamproxy/upstreamproxy.js'
         )
         const { registerUpstreamProxyEnvFn } = await import(
-          'src/utils/subprocessEnv.js'
+          '@claude-code/shell/subprocessEnv.js'
         )
         registerUpstreamProxyEnvFn(getUpstreamProxyEnv)
         await initUpstreamProxy()
@@ -256,7 +256,7 @@ async function doInitializeTelemetry(): Promise<void> {
 async function setMeterState(): Promise<void> {
   // Lazy-load instrumentation to defer ~400KB of OpenTelemetry + protobuf
   const { initializeTelemetry } = await import(
-    'src/utils/telemetry/instrumentation.js'
+    '@claude-code/local-observability/telemetry'
   )
   // Initialize customer OTLP telemetry (metrics, logs, traces)
   const meter = await initializeTelemetry()

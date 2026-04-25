@@ -109,7 +109,7 @@ import {
 } from '@claude-code/provider/advisor.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { count, uniq } from '@claude-code/tool-registry/utils/array.js'
-import { installAsciicastRecorder } from 'src/utils/asciicast.js'
+import { installAsciicastRecorder } from '@claude-code/output/capture'
 import {
   getSubscriptionType,
   isClaudeAISubscriber,
@@ -164,7 +164,7 @@ import {
   setTeleportedSessionInfo,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { filterCommandsForRemoteMode, getCommands } from '@claude-code/command-runtime/runtime'
-import type { StatsStore } from 'src/context/stats.js'
+import type { StatsStore } from '@claude-code/app-host/context_v7/stats.js'
 import {
   launchAssistantInstallWizard,
   launchAssistantSessionChooser,
@@ -181,7 +181,7 @@ import {
   renderAndRun,
   showSetupScreens,
 } from 'src/interactiveHelpers.js'
-import { initBuiltinPlugins } from 'src/plugins/bundled/index.js'
+import { initBuiltinPlugins } from '@claude-code/config/plugin/bundled-init'
 import { checkQuotaStatus } from '@claude-code/provider/claudeAiLimits.js'
 import { initBundledSkills } from '@claude-code/command-runtime/skills/bundled/index.js'
 import type { AgentColorName } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
@@ -205,7 +205,7 @@ import {
 } from '@claude-code/agent/claudeInChromeSetup.js'
 import { getContextWindowForModel } from '@claude-code/agent/context.js'
 import { loadConversationForResume } from '@claude-code/repl/conversationRecovery.js'
-import { buildDeepLinkBanner } from 'src/utils/deepLink/banner.js'
+import { buildDeepLinkBanner } from '@claude-code/repl/deepLink/banner.js'
 import {
   hasNodeOption,
   isBareMode,
@@ -281,7 +281,7 @@ import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
 import { validateUuid } from '@claude-code/agent/uuid.js'
 import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
 import { getRelevantTips } from '@claude-code/repl/tips/tipRegistry.js'
-import { logContextMetrics } from 'src/utils/api.js'
+import { logContextMetrics } from '@claude-code/provider/legacy/api.js'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isClaudeInChromeMCPServer,
@@ -359,7 +359,7 @@ import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging
 import {
   filterExistingPaths,
   getKnownPathsForRepo,
-} from 'src/utils/githubRepoPathMapping.js'
+} from '@claude-code/repl/legacy/github/githubRepoPathMapping.js'
 import {
   clearPluginCache,
   loadAllPluginsCacheOnly,
@@ -384,7 +384,7 @@ import {
   isTmuxAvailable,
   parsePRReference,
 } from '@claude-code/swarm'
-import { isAnalyticsDisabled } from 'src/services/privacyConfig.js'
+import { isAnalyticsDisabled } from '@claude-code/agent/services_topdir/privacyConfig.js'
 import { profileCheckpoint } from '@claude-code/app-host/startup/startupProfiler.js'
 
 // Types for closure variables passed as context
@@ -415,14 +415,14 @@ export type ModeDispatchContext = {
 // Module-level lazy requires (re-declared from main.tsx module scope)
 /* eslint-disable @typescript-eslint/no-require-imports */
 const getTeammateUtils = () =>
-  require('src/utils/teammate.js') as typeof import('src/utils/teammate.js')
+  require('@claude-code/swarm/teammateState.js') as typeof import('@claude-code/swarm/teammateState.js')
 const getTeammatePromptAddendum = () =>
   require('@claude-code/swarm') as typeof import('@claude-code/swarm')
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
+  ? (require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 
@@ -1621,7 +1621,7 @@ export async function runModeDispatch(
 				isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE)
 			) {
 				const { applyCoordinatorToolFilter } =
-					await import("src/utils/toolPool.js");
+					await import('@claude-code/tool-registry/toolPool.js');
 				tools = applyCoordinatorToolFilter(tools);
 			}
 
@@ -2896,7 +2896,7 @@ export async function runModeDispatch(
 				// that scripted calls don't need — the next interactive session reconciles.
 				if (!isBareMode()) {
 					startDeferredPrefetches();
-					void import("src/utils/backgroundHousekeeping.js").then((m) =>
+					void import('@claude-code/agent/legacy_runtime/backgroundHousekeeping.js').then((m) =>
 						m.startBackgroundHousekeeping(),
 					);
 					if (process.env.USER_TYPE === "ant") {
@@ -3249,7 +3249,7 @@ export async function runModeDispatch(
 
 					// Clear stale caches before resuming to ensure fresh file/skill discovery
 					const { clearSessionCaches } =
-						await import("src/commands/clear/caches.js");
+						await import('@claude-code/command-runtime/commands/clear/caches.js');
 					clearSessionCaches();
 
 					const result = await loadConversationForResume(
@@ -3533,7 +3533,7 @@ export async function runModeDispatch(
 				const {
 					checkAndRefreshOAuthTokenIfNeeded,
 					getClaudeAIOAuthTokens,
-				} = await import("src/utils/auth.js");
+				} = await import('@claude-code/provider/authAlias.js');
 				await checkAndRefreshOAuthTokenIfNeeded();
 				let apiCreds;
 				try {
@@ -3602,7 +3602,7 @@ export async function runModeDispatch(
 
 				// Clear stale caches before resuming to ensure fresh file/skill discovery
 				const { clearSessionCaches } =
-					await import("src/commands/clear/caches.js");
+					await import('@claude-code/command-runtime/commands/clear/caches.js');
 				clearSessionCaches();
 
 				let messages: MessageType[] | null = null;
@@ -3750,7 +3750,7 @@ export async function runModeDispatch(
 
 					// Create remote session config for the REPL
 					const { getClaudeAIOAuthTokens: getTokensForRemote } =
-						await import("src/utils/auth.js");
+						await import('@claude-code/provider/authAlias.js');
 					const getAccessTokenForRemote = (): string =>
 						getTokensForRemote()?.accessToken ??
 						apiCreds.accessToken;

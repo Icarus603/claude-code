@@ -14,7 +14,7 @@ import {
   getCurrentProjectConfig,
   type OutputStyle,
 } from '@claude-code/config'
-import { normalizeApiKeyForConfig } from 'src/utils/authPortable.js'
+import { normalizeApiKeyForConfig } from '@claude-code/provider/authPortable.js'
 import {
   getGlobalConfig,
   getAutoUpdaterDisabledReason,

@@ -1,26 +1,3 @@
-import { feature } from 'bun:bundle'
-import { isBridgeEnabled } from '@claude-code/bridge/bridgeEnabled.js'
-import type { Command } from '../../commands.js'
-
-function isEnabled(): boolean {
-  if (!feature('DAEMON') || !feature('BRIDGE_MODE')) {
-    return false
-  }
-  return isBridgeEnabled()
-}
-
-const remoteControlServer = {
-  type: 'local-jsx',
-  name: 'remote-control-server',
-  aliases: ['rcs'],
-  description:
-    'Start a persistent Remote Control server (daemon) that accepts multiple sessions',
-  isEnabled,
-  get isHidden() {
-    return !isEnabled()
-  },
-  immediate: true,
-  load: () => import('./remoteControlServer.js'),
-} satisfies Command
-
-export default remoteControlServer
+// Forward shim — canonical owner is packages/command-runtime/src/commands/remoteControlServer/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/remoteControlServer/index.js'

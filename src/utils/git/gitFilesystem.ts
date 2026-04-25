@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/config/gitFilesystem.
-export * from '@claude-code/config/gitFilesystem.js'
+// Forward shim — canonical owner is packages/agent/git/gitFilesystem.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/git/gitFilesystem.js'

@@ -3,7 +3,7 @@ import { getUserContext } from '@claude-code/provider/context.js'
 import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'
 import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
-import { prependUserContext } from 'src/utils/api.js'
+import { prependUserContext } from '@claude-code/provider/legacy/api.js'
 import {
   createUserMessage,
   normalizeMessagesForAPI,

@@ -28,7 +28,7 @@ import { type ReadonlySettings, useSettings } from '@claude-code/repl/hooks/useS
 import { Ansi, Box, Text } from '@anthropic/ink'
 import { getRawUtilization } from '@claude-code/provider/claudeAiLimits.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type { StatusLineCommandInput } from 'src/types/statusLine.js'
+import type { StatusLineCommandInput } from '@claude-code/repl/types_v7/statusLine.js'
 import type { VimMode } from '@claude-code/repl/textInputTypes.js'
 import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import {

@@ -4,7 +4,7 @@ import { tmpdir as osTmpdir } from 'os'
 import { join as nativeJoin } from 'path'
 import { join as posixJoin } from 'path/posix'
 import { rearrangePipeCommand } from '@claude-code/shell/bash/bashPipeCommand.js'
-import { createAndSaveSnapshot } from 'src/utils/bash/ShellSnapshot.js'
+import { createAndSaveSnapshot } from '@claude-code/shell/bash/ShellSnapshot.js'
 import { formatShellPrefixCommand } from '@claude-code/shell/bash/shellPrefix.js'
 import { quote } from '@claude-code/shell/bash/shellQuote.js'
 import {
@@ -20,7 +20,7 @@ import {
   ensureSocketInitialized,
   getClaudeTmuxEnv,
   hasTmuxToolBeenUsed,
-} from 'src/utils/tmuxSocket.js'
+} from '@claude-code/shell/legacy_v7/tmuxSocket.js'
 import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
 import type { ShellProvider } from './shellProvider.js'
 

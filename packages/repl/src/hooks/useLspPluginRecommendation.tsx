@@ -25,7 +25,7 @@ import {
   addToNeverSuggest,
   getMatchingLspPlugins,
   incrementIgnoredCount,
-} from 'src/utils/plugins/lspRecommendation.js'
+} from '@claude-code/config/plugin/lspRecommendation'
 import { cacheAndRegisterPlugin } from '@claude-code/config/plugin/pluginInstallationHelpers'
 import {
   getSettingsForSource,

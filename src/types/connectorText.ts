@@ -1,8 +1,3 @@
-// Canonical owner is @claude-code/provider/connectorTextTypes.
-export {
-  isConnectorTextBlock,
-} from '@claude-code/provider/connectorTextTypes'
-export type {
-  ConnectorTextBlock,
-  ConnectorTextDelta,
-} from '@claude-code/provider/connectorTextTypes'
+// Forward shim — canonical owner is packages/repl/src/types_v7/connectorText.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/repl/types_v7/connectorText.js'

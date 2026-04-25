@@ -1,12 +1,3 @@
-import type { Command } from '../../commands.js'
-
-const plugin = {
-  type: 'local-jsx',
-  name: 'plugin',
-  aliases: ['plugins', 'marketplace'],
-  description: 'Manage Claude Code plugins',
-  immediate: true,
-  load: () => import('./plugin.js'),
-} satisfies Command
-
-export default plugin
+// Forward shim — canonical owner is packages/command-runtime/src/commands/plugin/index.tsx.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/plugin/index.js'

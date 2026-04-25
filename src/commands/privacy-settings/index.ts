@@ -1,14 +1,3 @@
-import type { Command } from '../../commands.js'
-import { isConsumerSubscriber } from '../../utils/auth.js'
-
-const privacySettings = {
-  type: 'local-jsx',
-  name: 'privacy-settings',
-  description: 'View and update your privacy settings',
-  isEnabled: () => {
-    return isConsumerSubscriber()
-  },
-  load: () => import('./privacy-settings.js'),
-} satisfies Command
-
-export default privacySettings
+// Forward shim — canonical owner is packages/command-runtime/src/commands/privacy-settings/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/privacy-settings/index.js'

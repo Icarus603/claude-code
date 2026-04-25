@@ -25,11 +25,11 @@ import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool
 import { asSessionId } from '@claude-code/agent/idTypes'
 import type { LogOption } from '@claude-code/agent/logsTypes.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { agenticSessionSearch } from 'src/utils/agenticSessionSearch.js'
+import { agenticSessionSearch } from '@claude-code/agent/legacy/agenticSessionSearch.js'
 import { renameRecordingForSession } from '@claude-code/output/capture'
 import { updateSessionName } from '@claude-code/agent/concurrentSessions.js'
 import { loadConversationForResume } from '@claude-code/repl/conversationRecovery.js'
-import { checkCrossProjectResume } from 'src/utils/crossProjectResume.js'
+import { checkCrossProjectResume } from '@claude-code/agent/legacy/crossProjectResume.js'
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { logError } from '@claude-code/local-observability/logging'
 import { createSystemMessage } from '@claude-code/agent/messages.js'
@@ -242,7 +242,7 @@ export function ResumeConversation({
       if (feature('COORDINATOR_MODE')) {
         /* eslint-disable @typescript-eslint/no-require-imports */
         const coordinatorModule =
-          require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js')
+          require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js')
         /* eslint-enable @typescript-eslint/no-require-imports */
         const warning = coordinatorModule.matchSessionMode(result.mode)
         if (warning) {
@@ -289,7 +289,7 @@ export function ResumeConversation({
         /* eslint-disable @typescript-eslint/no-require-imports */
         const { saveMode } = require('@claude-code/storage/sessionStorage.js')
         const { isCoordinatorMode } =
-          require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js')
+          require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js')
         /* eslint-enable @typescript-eslint/no-require-imports */
         saveMode(isCoordinatorMode() ? 'coordinator' : 'normal')
       }

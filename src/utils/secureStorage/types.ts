@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/mcp-runtime/secureStorageTypes.
-export * from '@claude-code/mcp-runtime/secureStorageTypes'
+// Forward shim — canonical owner is packages/storage/src/secureStorage/types.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/storage/secureStorage/types.js'

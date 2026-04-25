@@ -1,4 +1,3 @@
-// Auto-generated stub — replace with real implementation
-export type Workflow = unknown;
-export type State = unknown;
-export type Warning = unknown;
+// Forward shim — canonical owner is packages/command-runtime/src/commands/install-github-app/types.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/install-github-app/types.js'

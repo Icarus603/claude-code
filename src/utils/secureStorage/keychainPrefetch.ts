@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/cli/secureStorage/keychainPrefetch.
-export * from '@claude-code/cli/secureStorage/keychainPrefetch.js'
+// Forward shim — canonical owner is packages/storage/src/secureStorage/keychainPrefetch.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/storage/secureStorage/keychainPrefetch.js'

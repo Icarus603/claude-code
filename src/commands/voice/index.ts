@@ -1,20 +1,3 @@
-import type { Command } from '../../commands.js'
-import {
-  isVoiceGrowthBookEnabled,
-  isVoiceModeEnabled,
-} from '@claude-code/voice/voiceModeEnabled.js'
-
-const voice = {
-  type: 'local',
-  name: 'voice',
-  description: 'Toggle voice mode',
-  availability: ['claude-ai'],
-  isEnabled: () => isVoiceGrowthBookEnabled(),
-  get isHidden() {
-    return !isVoiceModeEnabled()
-  },
-  supportsNonInteractive: false,
-  load: () => import('./voice.js'),
-} satisfies Command
-
-export default voice
+// Forward shim — canonical owner is packages/command-runtime/src/commands/voice/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/voice/index.js'

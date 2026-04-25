@@ -1,17 +1,3 @@
-export {
-  GEMINI_THOUGHT_SIGNATURE_FIELD,
-} from '@claude-code/provider'
-export type {
-  GeminiCandidate,
-  GeminiContent,
-  GeminiFunctionCall,
-  GeminiFunctionCallingConfig,
-  GeminiFunctionDeclaration,
-  GeminiFunctionResponse,
-  GeminiGenerateContentRequest,
-  GeminiInlineData,
-  GeminiPart,
-  GeminiStreamChunk,
-  GeminiTool,
-  GeminiUsageMetadata,
-} from '@claude-code/provider'
+// Forward shim — canonical owner is packages/provider/src/geminiDir/types.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/provider/geminiDir/types.js'

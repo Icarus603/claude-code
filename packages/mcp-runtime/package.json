@@ -51,6 +51,9 @@
     "./client/transport.js": "./src/client/transport.ts",
     "./client/discovery.js": "./src/client/discovery.ts",
     "./secureStorageTypes.js": "./src/secureStorageTypes.ts",
-    "./sanitization.js": "./src/sanitization.ts"
+    "./sanitization.js": "./src/sanitization.ts",
+    "./mcp/MCPConnectionManager.js": "./src/mcp/MCPConnectionManager.tsx",
+    "./mcp/client.js": "./src/mcp/client.ts",
+    "./secureStorageTypes": "./src/secureStorageTypes.ts"
   }
 }

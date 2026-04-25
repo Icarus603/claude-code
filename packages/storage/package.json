@@ -48,6 +48,14 @@
     "./sessionStoragePortable.js": "./src/sessionStoragePortable.ts",
     "./pdfUtils.js": "./src/pdfUtils.ts",
     "./glob.js": "./src/glob.ts",
-    "./xdg.js": "./src/xdg.ts"
+    "./xdg.js": "./src/xdg.ts",
+    "./secureStorage/macOsKeychainHelpers.js": "./src/secureStorage/macOsKeychainHelpers.ts",
+    "./secureStorage/keychainPrefetch.js": "./src/secureStorage/keychainPrefetch.ts",
+    "./secureStorage/types.js": "./src/secureStorage/types.ts",
+    "./filePersistenceDir/outputsScanner.js": "./src/filePersistenceDir/outputsScanner.ts",
+    "./filePersistenceDir/types.js": "./src/filePersistenceDir/types.ts",
+    "./secureStorage/plainTextStorage.js": "./src/secureStorage/plainTextStorage.ts",
+    "./secureStorage/index.js": "./src/secureStorage/index.ts",
+    "./secureStorage/fallbackStorage.js": "./src/secureStorage/fallbackStorage.ts"
   }
 }

@@ -12,7 +12,7 @@ import {
   yieldToEventLoop,
 } from '@claude-code/repl/fileIndex/index.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { FileSuggestionCommandInput } from 'src/types/fileSuggestion.js'
+import type { FileSuggestionCommandInput } from '@claude-code/repl/types_v7/fileSuggestion.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

@@ -107,7 +107,7 @@ function attachPreActionHook(program: CommanderCommand): void {
     // Load settings sync (non-blocking, fail-open)
     // CLI: uploads local settings to remote (CCR download is handled by print.ts)
     if (feature('UPLOAD_USER_SETTINGS')) {
-      void import('src/services/settingsSync/index.js').then(m =>
+      void import('@claude-code/config/sync').then(m =>
         m.uploadUserSettingsInBackground(),
       )
     }

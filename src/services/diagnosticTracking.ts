@@ -1,2 +1,3 @@
-// Canonical owner is @claude-code/tool-registry/diagnosticTracking.
-export * from '@claude-code/tool-registry/diagnosticTracking.js'
+// Forward shim — canonical owner is packages/agent/services_topdir/diagnosticTracking.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/services_topdir/diagnosticTracking.js'

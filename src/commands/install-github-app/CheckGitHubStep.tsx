@@ -1,6 +1,3 @@
-import React from 'react'
-import { Text } from '@anthropic/ink'
-
-export function CheckGitHubStep() {
-  return <Text>Checking GitHub CLI installation…</Text>
-}
+// Forward shim — canonical owner is packages/command-runtime/src/commands/install-github-app/CheckGitHubStep.tsx.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/install-github-app/CheckGitHubStep.js'

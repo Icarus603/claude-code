@@ -1,13 +1,3 @@
-import type { Command } from '../../commands.js'
-
-const btw = {
-  type: 'local-jsx',
-  name: 'btw',
-  description:
-    'Ask a quick side question without interrupting the main conversation',
-  immediate: true,
-  argumentHint: '<question>',
-  load: () => import('./btw.js'),
-} satisfies Command
-
-export default btw
+// Forward shim — canonical owner is packages/command-runtime/src/commands/btw/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/command-runtime/commands/btw/index.js'

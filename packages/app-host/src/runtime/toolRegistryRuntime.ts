@@ -43,7 +43,7 @@ const REPLTool =
     ? require('@claude-code/tool-registry/tools/REPLTool/REPLTool.js').REPLTool
     : null
 const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js'))
+  ? (require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js'))
   : null
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 

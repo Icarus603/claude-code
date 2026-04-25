@@ -1,4 +1,3 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/plugin/types`.
- */
-export * from '@claude-code/config/plugin/types'
+// Forward shim — canonical owner is packages/repl/src/types_v7/plugin.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/repl/types_v7/plugin.js'

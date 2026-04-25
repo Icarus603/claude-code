@@ -42,7 +42,7 @@ import { sendNotification } from '@claude-code/repl/notifier.js'
 import {
   startPreventSleep,
   stopPreventSleep,
-} from 'src/services/preventSleep.js'
+} from '@claude-code/agent/services_topdir/preventSleep.js'
 import { useTerminalNotification, hasCursorUpViewportYankBug } from '@anthropic/ink'
 import {
   createFileStateCacheWithSizeLimit,
@@ -69,7 +69,7 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js';
 import { asSessionId, asAgentId } from '@claude-code/agent/idTypes';
 import { logForDebugging } from '@claude-code/local-observability/debug.js';
-import { QueryGuard } from 'src/utils/QueryGuard.js';
+import { QueryGuard } from '@claude-code/agent/legacy_runtime/QueryGuard.js';
 import { isEnvTruthy } from '@claude-code/config/env/utils';
 import { formatTokens } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js';
@@ -137,20 +137,29 @@ import { getSystemPrompt } from '@claude-code/agent/prompts.js';
 import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js';
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
 import { getMemoryFiles } from '@claude-code/storage/claudemd.js';
-import { startBackgroundHousekeeping } from 'src/utils/backgroundHousekeeping.js';
+import { startBackgroundHousekeeping } from '@claude-code/agent/legacy_runtime/backgroundHousekeeping.js';
 import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from '@claude-code/provider/costTracker.js';
 import { useCostSummary } from 'src/costHook.js';
-import { useFpsMetrics } from 'src/context/fpsMetrics.js';
+import { useFpsMetrics } from '@claude-code/app-host/context_v7/fpsMetrics.js';
 import { useAfterFirstRender } from '@claude-code/repl/hooks/useAfterFirstRender.js';
 import { useDeferredHookMessages } from '@claude-code/repl/hooks/useDeferredHookMessages.js';
 import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from '@claude-code/repl/history.js';
 import { prependModeCharacterToInput } from '@claude-code/repl/components/PromptInput/inputModes.js';
-import { prependToShellHistoryCache } from 'src/utils/suggestions/shellHistoryCompletion.js';
+import { prependToShellHistoryCache } from '@claude-code/repl/suggestions/shellHistoryCompletion.js';
 import { useApiKeyVerification } from '@claude-code/repl/hooks/useApiKeyVerification.js';
 import { GlobalKeybindingHandlers } from '@claude-code/repl/hooks/useGlobalKeybindings.js';
 import { CommandKeybindingHandlers } from '@claude-code/repl/hooks/useCommandKeybindings.js';
 import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js';
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js';
+import { TranscriptModeFooter } from '@claude-code/repl/screens/repl/TranscriptModeFooter.js';
+import { TranscriptSearchBar } from '@claude-code/repl/screens/repl/TranscriptSearchBar.js';
+import { AnimatedTerminalTitle } from '@claude-code/repl/screens/repl/AnimatedTerminalTitle.js';
+import { median } from '@claude-code/repl/screens/repl/median.js';
+import { findRawIndex } from '@claude-code/repl/screens/repl/findRawIndex.js';
+import { useReplEnvFlags } from '@claude-code/repl/screens/repl/useReplEnvFlags.js';
+import { isOnlySleepToolActive } from '@claude-code/repl/screens/repl/onlySleepToolActive.js';
+import { deriveStopHookSpinnerSuffix } from '@claude-code/repl/screens/repl/stopHookSpinnerSuffix.js';
+import { useSuspendResumeHandlers } from '@claude-code/repl/screens/repl/useSuspendResumeHandlers.js';
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js';
 import { CancelRequestHandler } from '@claude-code/repl/hooks/useCancelRequest.js';
 import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgroundTaskNavigation.js';
@@ -191,7 +200,7 @@ const getCoordinatorUserContext: (
   mcpClients: ReadonlyArray<{ name: string }>,
   scratchpadDir?: string,
 ) => { [k: string]: string } = feature('COORDINATOR_MODE')
-  ? require('src/coordinator/coordinatorMode.js').getCoordinatorUserContext
+  ? require('@claude-code/agent/coordinatorMode.js').getCoordinatorUserContext
   : () => ({});
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 import useCanUseTool from '@claude-code/repl/hooks/useCanUseTool.js';
@@ -240,7 +249,7 @@ import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulSh
 import { handlePromptSubmit, type PromptInputHelpers } from '@claude-code/repl/handlePromptSubmit.js';
 import { useQueueProcessor } from '@claude-code/repl/hooks/useQueueProcessor.js';
 import { useMailboxBridge } from '@claude-code/repl/hooks/useMailboxBridge.js';
-import { queryCheckpoint, logQueryProfileReport } from 'src/utils/queryProfiler.js';
+import { queryCheckpoint, logQueryProfileReport } from '@claude-code/local-observability/legacy/queryProfiler.js';
 import type {
   Message as MessageType,
   UserMessage,
@@ -248,7 +257,7 @@ import type {
   HookResultMessage,
   PartialCompactDirection,
 } from '@claude-code/agent/messageShapes';
-import { query } from 'src/query.js';
+import { query } from '@claude-code/agent/query';
 import { mergeClients } from '@claude-code/repl/hooks/useMergedClients.js';
 import { getQuerySourceForREPL } from '@claude-code/agent/promptCategory.js';
 import { mergeAndFilterTools } from '@claude-code/repl/toolPool.js';
@@ -274,7 +283,7 @@ import { useReplActions } from './repl/useReplActions.js';
 import { useReplAppState } from './repl/useReplAppState.js';
 import { useReplRuntimeViews } from './repl/useReplRuntimeViews.js';
 import type { ContentBlockParam, ImageBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs';
-import type { ProcessUserInputContext } from 'src/utils/processUserInput/processUserInput.js';
+import type { ProcessUserInputContext } from '@claude-code/repl/processUserInput/processUserInput.js';
 import type { PastedContent } from '@claude-code/config';
 import { copyPlanForFork, copyPlanForResume, getPlanSlug, setPlanSlug } from '@claude-code/storage/plans.js';
 import {
@@ -433,7 +442,7 @@ import {
   getAutoRunIssueReasonText,
   getAutoRunCommand,
   type AutoRunIssueReason,
-} from 'src/utils/autoRunIssue.js';
+} from '@claude-code/repl/legacy/diagnostics/autoRunIssue.js';
 import type { HookProgress } from '@claude-code/agent/types/hooks.js';
 import { TungstenLiveMonitor } from '@claude-code/tool-registry/tools/TungstenTool/TungstenLiveMonitor.js';
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -492,246 +501,9 @@ const RECENT_SCROLL_REPIN_WINDOW_MS = 3000;
 // 100 files should be sufficient for most coding sessions while preventing
 // memory issues when working across many files in large projects
 
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0 ? Math.round((sorted[mid - 1]! + sorted[mid]!) / 2) : sorted[mid]!;
-}
 
-/**
- * Small component to display transcript mode footer with dynamic keybinding.
- * Must be rendered inside KeybindingSetup to access keybinding context.
- */
-function TranscriptModeFooter({
-  showAllInTranscript,
-  virtualScroll,
-  searchBadge,
-  suppressShowAll = false,
-  status,
-}: {
-  showAllInTranscript: boolean;
-  virtualScroll: boolean;
-  /** Minimap while navigating a closed-bar search. Shows n/N hints +
-   *  right-aligned count instead of scroll hints. */
-  searchBadge?: { current: number; count: number };
-  /** Hide the ctrl+e hint. The [ dump path shares this footer with
-   *  env-opted dump (CLAUDE_CODE_NO_FLICKER=0 / DISABLE_VIRTUAL_SCROLL=1),
-   *  but ctrl+e only works in the env case — useGlobalKeybindings.tsx
-   *  gates on !virtualScrollActive which is env-derived, doesn't know
-   *  [ happened. */
-  suppressShowAll?: boolean;
-  /** Transient status (v-for-editor progress). Notifications render inside
-   *  PromptInput which isn't mounted in transcript — addNotification queues
-   *  but nothing draws it. */
-  status?: string;
-}): React.ReactNode {
-  const toggleShortcut = useShortcutDisplay('app:toggleTranscript', 'Global', 'ctrl+o');
-  const showAllShortcut = useShortcutDisplay('transcript:toggleShowAll', 'Transcript', 'ctrl+e');
-  return (
-    <Box
-      noSelect
-      alignItems="center"
-      alignSelf="center"
-      borderTopDimColor
-      borderBottom={false}
-      borderLeft={false}
-      borderRight={false}
-      borderStyle="single"
-      marginTop={1}
-      paddingLeft={2}
-      width="100%"
-    >
-      <Text dimColor>
-        Showing detailed transcript · {toggleShortcut} to toggle
-        {searchBadge
-          ? ' · n/N to navigate'
-          : virtualScroll
-            ? ` · ${figures.arrowUp}${figures.arrowDown} scroll · home/end top/bottom`
-            : suppressShowAll
-              ? ''
-              : ` · ${showAllShortcut} to ${showAllInTranscript ? 'collapse' : 'show all'}`}
-      </Text>
-      {status ? (
-        // v-for-editor render progress — transient, preempts the search
-        // badge since the user just pressed v and wants to see what's
-        // happening. Clears after 4s.
-        <>
-          <Box flexGrow={1} />
-          <Text>{status} </Text>
-        </>
-      ) : searchBadge ? (
-        // Engine-counted — close enough for a rough location hint. May
-        // drift from render-count for ghost/phantom messages.
-        <>
-          <Box flexGrow={1} />
-          <Text dimColor>
-            {searchBadge.current}/{searchBadge.count}
-            {'  '}
-          </Text>
-        </>
-      ) : null}
-    </Box>
-  );
-}
 
-/** less-style / bar. 1-row, same border-top styling as TranscriptModeFooter
- *  so swapping them in the bottom slot doesn't shift ScrollBox height.
- *  useSearchInput handles readline editing; we report query changes and
- *  render the counter. Incremental — re-search + highlight per keystroke. */
-function TranscriptSearchBar({
-  jumpRef,
-  count,
-  current,
-  onClose,
-  onCancel,
-  setHighlight,
-  initialQuery,
-}: {
-  jumpRef: RefObject<JumpHandle | null>;
-  count: number;
-  current: number;
-  /** Enter — commit. Query persists for n/N. */
-  onClose: (lastQuery: string) => void;
-  /** Esc/ctrl+c/ctrl+g — undo to pre-/ state. */
-  onCancel: () => void;
-  setHighlight: (query: string) => void;
-  // Seed with the previous query (less: / shows last pattern). Mount-fire
-  // of the effect re-scans with the same query — idempotent (same matches,
-  // nearest-ptr, same highlights). User can edit or clear.
-  initialQuery: string;
-}): React.ReactNode {
-  const { query, cursorOffset } = useSearchInput({
-    isActive: true,
-    initialQuery,
-    onExit: () => onClose(query),
-    onCancel,
-  });
-  // Index warm-up runs before the query effect so it measures the real
-  // cost — otherwise setSearchQuery fills the cache first and warm
-  // reports ~0ms while the user felt the actual lag.
-  // First / in a transcript session pays the extractSearchText cost.
-  // Subsequent / return 0 immediately (indexWarmed ref in VML).
-  // Transcript is frozen at ctrl+o so the cache stays valid.
-  // Initial 'building' so warmDone is false on mount — the [query] effect
-  // waits for the warm effect's first resolve instead of racing it. With
-  // null initial, warmDone would be true on mount → [query] fires →
-  // setSearchQuery fills cache → warm reports ~0ms while the user felt
-  // the real lag.
-  const [indexStatus, setIndexStatus] = React.useState<'building' | { ms: number } | null>('building');
-  React.useEffect(() => {
-    let alive = true;
-    const warm = jumpRef.current?.warmSearchIndex;
-    if (!warm) {
-      setIndexStatus(null); // VML not mounted yet — rare, skip indicator
-      return;
-    }
-    setIndexStatus('building');
-    warm().then(ms => {
-      if (!alive) return;
-      // <20ms = imperceptible. No point showing "indexed in 3ms".
-      if (ms < 20) {
-        setIndexStatus(null);
-      } else {
-        setIndexStatus({ ms });
-        setTimeout(() => alive && setIndexStatus(null), 2000);
-      }
-    });
-    return () => {
-      alive = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // mount-only: bar opens once per /
-  // Gate the query effect on warm completion. setHighlight stays instant
-  // (screen-space overlay, no indexing). setSearchQuery (the scan) waits.
-  const warmDone = indexStatus !== 'building';
-  useEffect(() => {
-    if (!warmDone) return;
-    jumpRef.current?.setSearchQuery(query);
-    setHighlight(query);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, warmDone]);
-  const off = cursorOffset;
-  const cursorChar = off < query.length ? query[off] : ' ';
-  return (
-    <Box
-      borderTopDimColor
-      borderBottom={false}
-      borderLeft={false}
-      borderRight={false}
-      borderStyle="single"
-      marginTop={1}
-      paddingLeft={2}
-      width="100%"
-      // applySearchHighlight scans the whole screen buffer. The query
-      // text rendered here IS on screen — /foo matches its own 'foo' in
-      // the bar. With no content matches that's the ONLY visible match →
-      // gets CURRENT → underlined. noSelect makes searchHighlight.ts:76
-      // skip these cells (same exclusion as gutters). You can't text-
-      // select the bar either; it's transient chrome, fine.
-      noSelect
-    >
-      <Text>/</Text>
-      <Text>{query.slice(0, off)}</Text>
-      <Text inverse>{cursorChar}</Text>
-      {off < query.length && <Text>{query.slice(off + 1)}</Text>}
-      <Box flexGrow={1} />
-      {indexStatus === 'building' ? (
-        <Text dimColor>indexing… </Text>
-      ) : indexStatus ? (
-        <Text dimColor>indexed in {indexStatus.ms}ms </Text>
-      ) : count === 0 && query ? (
-        <Text color="error">no matches </Text>
-      ) : count > 0 ? (
-        // Engine-counted (indexOf on extractSearchText). May drift from
-        // render-count for ghost/phantom messages — badge is a rough
-        // location hint. scanElement gives exact per-message positions
-        // but counting ALL would cost ~1-3ms × matched-messages.
-        <Text dimColor>
-          {current}/{count}
-          {'  '}
-        </Text>
-      ) : null}
-    </Box>
-  );
-}
 
-const TITLE_ANIMATION_FRAMES = ['⠂', '⠐'];
-const TITLE_STATIC_PREFIX = '✳';
-const TITLE_ANIMATION_INTERVAL_MS = 960;
-
-/**
- * Sets the terminal tab title, with an animated prefix glyph while a query
- * is running. Isolated from REPL so the 960ms animation tick re-renders only
- * this leaf component (which returns null — pure side-effect) instead of the
- * entire REPL tree. Before extraction, the tick was ~1 REPL render/sec for
- * the duration of every turn, dragging PromptInput and friends along.
- */
-function AnimatedTerminalTitle({
-  isAnimating,
-  title,
-  disabled,
-  noPrefix,
-}: {
-  isAnimating: boolean;
-  title: string;
-  disabled: boolean;
-  noPrefix: boolean;
-}): null {
-  const terminalFocused = useTerminalFocus();
-  const [frame, setFrame] = useState(0);
-  useEffect(() => {
-    if (disabled || noPrefix || !isAnimating || !terminalFocused) return;
-    const interval = setInterval(
-      setFrame => setFrame(f => (f + 1) % TITLE_ANIMATION_FRAMES.length),
-      TITLE_ANIMATION_INTERVAL_MS,
-      setFrame,
-    );
-    return () => clearInterval(interval);
-  }, [disabled, noPrefix, isAnimating, terminalFocused]);
-  const prefix = isAnimating ? (TITLE_ANIMATION_FRAMES[frame] ?? TITLE_STATIC_PREFIX) : TITLE_STATIC_PREFIX;
-  useTerminalTitle(disabled ? null : noPrefix ? title : `${prefix} ${title}`);
-  return null;
-}
 
 export type Props = {
   runtimeGraph?: RuntimeGraph;
@@ -814,12 +586,7 @@ export function REPL({
 
   // Env-var gates hoisted to mount-time — isEnvTruthy does toLowerCase+trim+
   // includes, and these were on the render path (hot during PageUp spam).
-  const titleDisabled = useMemo(() => isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_TERMINAL_TITLE), []);
-  const moreRightEnabled = useMemo(
-    () => process.env.USER_TYPE === 'ant' && isEnvTruthy(process.env.CLAUDE_MORERIGHT),
-    [],
-  );
-  const disableVirtualScroll = useMemo(() => isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_VIRTUAL_SCROLL), []);
+  const { titleDisabled, moreRightEnabled, disableVirtualScroll } = useReplEnvFlags();
   const disableMessageActions = feature('MESSAGE_ACTIONS')
     ?
       useMemo(() => isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_MESSAGE_ACTIONS), [])
@@ -1210,9 +977,9 @@ export function REPL({
     if (process.env.USER_TYPE === 'ant') {
       void (async () => {
         // Wait for repo classification to settle (memoized, no-op if primed).
-        const { isInternalModelRepo } = await import('src/utils/commitAttribution.js');
+        const { isInternalModelRepo } = await import('@claude-code/agent/commitAttribution.js');
         await isInternalModelRepo();
-        const { shouldShowUndercoverAutoNotice } = await import('src/utils/undercover.js');
+        const { shouldShowUndercoverAutoNotice } = await import('@claude-code/tool-registry/undercover.js');
         if (shouldShowUndercoverAutoNotice()) {
           setShowUndercoverCallout(true);
         }
@@ -1892,17 +1659,10 @@ export function REPL({
   }, [setMessages]);
 
   // Hide spinner when the only in-progress tool is Sleep
-  const onlySleepToolActive = useMemo(() => {
-    const lastAssistant = messages.findLast(m => m.type === 'assistant');
-    if (lastAssistant?.type !== 'assistant') return false;
-    const inProgressToolUses = lastAssistant.message.content.filter(
-      b => b.type === 'tool_use' && inProgressToolUseIDs.has(b.id),
-    );
-    return (
-      inProgressToolUses.length > 0 &&
-      inProgressToolUses.every(b => b.type === 'tool_use' && b.name === SLEEP_TOOL_NAME)
-    );
-  }, [messages, inProgressToolUseIDs]);
+  const onlySleepToolActive = useMemo(
+    () => isOnlySleepToolActive(messages, inProgressToolUseIDs),
+    [messages, inProgressToolUseIDs],
+  );
 
   const {
     onBeforeQuery: mrOnBeforeQuery,
@@ -2015,7 +1775,7 @@ export function REPL({
         if (feature('COORDINATOR_MODE')) {
           /* eslint-disable @typescript-eslint/no-require-imports */
           const coordinatorModule =
-            require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js');
+            require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js');
           /* eslint-enable @typescript-eslint/no-require-imports */
           const warning = coordinatorModule.matchSessionMode(log.mode);
           if (warning) {
@@ -2117,7 +1877,7 @@ export function REPL({
         // current originalCwd.
         switchSession(asSessionId(sessionId), log.fullPath ? dirname(log.fullPath) : null);
         // Rename asciicast recording to match the resumed session ID
-        const { renameRecordingForSession } = await import('src/utils/asciicast.js');
+        const { renameRecordingForSession } = await import('@claude-code/output/capture');
         await renameRecordingForSession();
         await resetSessionFilePointer();
 
@@ -2166,7 +1926,7 @@ export function REPL({
           /* eslint-disable @typescript-eslint/no-require-imports */
           const { saveMode } = require('@claude-code/storage/sessionStorage.js');
           const { isCoordinatorMode } =
-            require('src/coordinator/coordinatorMode.js') as typeof import('src/coordinator/coordinatorMode.js');
+            require('@claude-code/agent/coordinatorMode.js') as typeof import('@claude-code/agent/coordinatorMode.js');
           /* eslint-enable @typescript-eslint/no-require-imports */
           saveMode(isCoordinatorMode() ? 'coordinator' : 'normal');
         }
@@ -3507,7 +3267,7 @@ export function REPL({
         // can access the same plan file after regenerateSessionId()
         const oldPlanSlug = initialMsg.message.planContent ? getPlanSlug() : undefined;
 
-        const { clearConversation } = await import('src/commands/clear/conversation.js');
+        const { clearConversation } = await import('@claude-code/command-runtime/commands/clear/conversation.js');
         await clearConversation({
           setMessages,
           readFileState: readFileState.current,
@@ -4300,12 +4060,6 @@ export function REPL({
     [restoreMessageSync],
   );
 
-  // Not memoized — hook stores caps via ref, reads latest closure at dispatch.
-  // 24-char prefix: deriveUUID preserves first 24, renderable uuid prefix-matches raw source.
-  const findRawIndex = (uuid: string) => {
-    const prefix = uuid.slice(0, 24);
-    return messages.findIndex(m => m.uuid.slice(0, 24) === prefix);
-  };
   const messageActionCaps: MessageActionCaps = {
     copy: text =>
       // setClipboard RETURNS OSC 52 — caller must stdout.write (tmux side-effects load-buffer, but that's tmux-only).
@@ -4322,7 +4076,7 @@ export function REPL({
       }),
     edit: async msg => {
       // Same skip-confirm check as /rewind: lossless → direct, else confirm dialog.
-      const rawIdx = findRawIndex(msg.uuid);
+      const rawIdx = findRawIndex(messages, msg.uuid);
       const raw = rawIdx >= 0 ? messages[rawIdx] : undefined;
       if (!raw || !selectableUserMessagesFilter(raw)) return;
       const noFileChanges = !(await fileHistoryHasAnyChanges(fileHistory, raw.uuid));
@@ -4714,87 +4468,12 @@ export function REPL({
   // Listen for suspend/resume events
   const { internal_eventEmitter } = useStdin();
   const [remountKey, setRemountKey] = useState(0);
-  useEffect(() => {
-    const handleSuspend = () => {
-      // Print suspension instructions
-      process.stdout.write(
-        `\nClaude Code has been suspended. Run \`fg\` to bring Claude Code back.\nNote: ctrl + z now suspends Claude Code, ctrl + _ undoes input.\n`,
-      );
-    };
+  useSuspendResumeHandlers(internal_eventEmitter, setRemountKey);
 
-    const handleResume = () => {
-      // Force complete component tree replacement instead of terminal clear
-      // Ink now handles line count reset internally on SIGCONT
-      setRemountKey(prev => prev + 1);
-    };
-
-    internal_eventEmitter?.on('suspend', handleSuspend);
-    internal_eventEmitter?.on('resume', handleResume);
-    return () => {
-      internal_eventEmitter?.off('suspend', handleSuspend);
-      internal_eventEmitter?.off('resume', handleResume);
-    };
-  }, [internal_eventEmitter]);
-
-  // Derive stop hook spinner suffix from messages state
-  const stopHookSpinnerSuffix = useMemo(() => {
-    if (!isLoading) return null;
-
-    // Find stop hook progress messages
-    const progressMsgs = messages.filter(
-      (m): m is ProgressMessage<HookProgress> =>
-        m.type === 'progress' &&
-        m.data.type === 'hook_progress' &&
-        (m.data.hookEvent === 'Stop' || m.data.hookEvent === 'SubagentStop'),
-    );
-    if (progressMsgs.length === 0) return null;
-
-    // Get the most recent stop hook execution
-    const currentToolUseID = progressMsgs.at(-1)?.toolUseID;
-    if (!currentToolUseID) return null;
-
-    // Check if there's already a summary message for this execution (hooks completed)
-    const hasSummaryForCurrentExecution = messages.some(
-      m => m.type === 'system' && m.subtype === 'stop_hook_summary' && m.toolUseID === currentToolUseID,
-    );
-    if (hasSummaryForCurrentExecution) return null;
-
-    const currentHooks = progressMsgs.filter(p => p.toolUseID === currentToolUseID);
-    const total = currentHooks.length;
-
-    // Count completed hooks
-    const completedCount = count(messages, m => {
-      if (m.type !== 'attachment') return false;
-      const attachment = m.attachment;
-      return (
-        'hookEvent' in attachment &&
-        (attachment.hookEvent === 'Stop' || attachment.hookEvent === 'SubagentStop') &&
-        'toolUseID' in attachment &&
-        attachment.toolUseID === currentToolUseID
-      );
-    });
-
-    // Check if any hook has a custom status message
-    const customMessage = currentHooks.find(p => p.data.statusMessage)?.data.statusMessage;
-
-    if (customMessage) {
-      // Use custom message with progress counter if multiple hooks
-      return total === 1 ? `${customMessage}…` : `${customMessage}… ${completedCount}/${total}`;
-    }
-
-    // Fall back to default behavior
-    const hookType = currentHooks[0]?.data.hookEvent === 'SubagentStop' ? 'subagent stop' : 'stop';
-
-    if (process.env.USER_TYPE === 'ant') {
-      const cmd = currentHooks[completedCount]?.data.command;
-      const label = cmd ? ` '${truncateToWidth(cmd, 40)}'` : '';
-      return total === 1
-        ? `running ${hookType} hook${label}`
-        : `running ${hookType} hook${label}\u2026 ${completedCount}/${total}`;
-    }
-
-    return total === 1 ? `running ${hookType} hook` : `running stop hooks… ${completedCount}/${total}`;
-  }, [messages, isLoading]);
+  const stopHookSpinnerSuffix = useMemo(
+    () => deriveStopHookSpinnerSuffix(messages, isLoading),
+    [messages, isLoading],
+  );
 
   // Callback to capture frozen state when entering transcript mode
   const handleEnterTranscript = useCallback(() => {
@@ -5627,7 +5306,7 @@ export function REPL({
                         });
                       }
                       if (action === 'clear') {
-                        const { clearConversation } = await import('src/commands/clear/conversation.js');
+                        const { clearConversation } = await import('@claude-code/command-runtime/commands/clear/conversation.js');
                         await clearConversation({
                           setMessages,
                           readFileState: readFileState.current,

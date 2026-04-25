@@ -8,7 +8,7 @@ import {
   SUMMARY_TAG,
   TASK_NOTIFICATION_TAG,
 } from '@claude-code/command-runtime/xml.js'
-import { QueuedMessageProvider } from 'src/context/QueuedMessageContext.js'
+import { QueuedMessageProvider } from '@claude-code/app-host/context_v7/QueuedMessageContext.js'
 import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
 import type { QueuedCommand } from '@claude-code/repl/textInputTypes.js'
 import { isQueuedCommandVisible } from '@claude-code/agent/messageQueueManager.js'

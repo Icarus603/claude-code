@@ -1,7 +1,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import { useContext } from 'react'
-import { useQueuedMessage } from 'src/context/QueuedMessageContext.js'
+import { useQueuedMessage } from '@claude-code/app-host/context_v7/QueuedMessageContext.js'
 import { Box, Text } from '@anthropic/ink'
 import { formatBriefTimestamp } from '@claude-code/output/formatters'
 import {

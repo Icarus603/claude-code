@@ -1,13 +1,34 @@
 {
-    "name": "@ant/computer-use-mcp",
-    "version": "1.0.0",
-    "private": true,
-    "type": "module",
-    "main": "./src/index.ts",
-    "types": "./src/index.ts",
-    "exports": {
-        ".": "./src/index.ts",
-        "./sentinelApps": "./src/sentinelApps.ts",
-        "./types": "./src/types.ts"
-    }
+  "name": "@ant/computer-use-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sentinelApps": "./src/sentinelApps.ts",
+    "./types": "./src/types.ts",
+    "./legacy/executor.js": "./src/legacy/executor.ts",
+    "./legacy/inputLoader.js": "./src/legacy/inputLoader.ts",
+    "./legacy/mcpServer.js": "./src/legacy/mcpServer.ts",
+    "./legacy/common.js": "./src/legacy/common.ts",
+    "./legacy/setup.js": "./src/legacy/setup.ts",
+    "./legacy/drainRunLoop.js": "./src/legacy/drainRunLoop.ts",
+    "./legacy/hostAdapter.js": "./src/legacy/hostAdapter.ts",
+    "./legacy/cleanup.js": "./src/legacy/cleanup.ts",
+    "./legacy/executorCrossPlatform.js": "./src/legacy/executorCrossPlatform.ts",
+    "./legacy/computerUseLock.js": "./src/legacy/computerUseLock.ts",
+    "./legacy/gates.js": "./src/legacy/gates.ts",
+    "./legacy/escHotkey.js": "./src/legacy/escHotkey.ts",
+    "./legacy/appNames.js": "./src/legacy/appNames.ts",
+    "./legacy/toolRendering.js": "./src/legacy/toolRendering.tsx",
+    "./legacy/wrapper.js": "./src/legacy/wrapper.tsx",
+    "./legacy/swiftLoader.js": "./src/legacy/swiftLoader.ts",
+    "./legacy/platforms/linux.js": "./src/legacy/platforms/linux.ts",
+    "./legacy/platforms/darwin.js": "./src/legacy/platforms/darwin.ts",
+    "./legacy/platforms/win32.js": "./src/legacy/platforms/win32.ts",
+    "./legacy/platforms/types.js": "./src/legacy/platforms/types.ts",
+    "./legacy/platforms/index.js": "./src/legacy/platforms/index.ts"
+  }
 }

@@ -8,6 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
+    "./headless/sdk/session/utils/streamJsonStdoutGuard.js": "./src/headless/sdk/session/utils/streamJsonStdoutGuard.ts",
+    "./headless/sdk/session/utils/streamlinedTransform.js": "./src/headless/sdk/session/utils/streamlinedTransform.ts",
     "./ndjsonSafeStringify.js": "./src/ndjsonSafeStringify.ts",
     "./bg.js": "./src/bg.ts",
     "./pluginLoader.js": "./src/pluginLoader.ts",

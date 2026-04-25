@@ -26,7 +26,7 @@ import {
   getDefaultSonnetModel,
   renderModelName,
 } from '@claude-code/provider/model.js'
-import { isMacOsKeychainLocked } from 'src/utils/secureStorage/macOsKeychainStorage.js'
+import { isMacOsKeychainLocked } from '@claude-code/storage/secureStorage/macOsKeychainStorage.js'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'
 import { InterruptedByUser } from '../InterruptedByUser.js'
 import { Markdown } from '../Markdown.js'

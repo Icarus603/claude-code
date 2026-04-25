@@ -33,7 +33,7 @@ import {
 import {
   type ContextWarnings,
   checkContextWarnings,
-} from 'src/utils/doctorContextWarnings.js'
+} from '@claude-code/repl/legacy/diagnostics/doctorContextWarnings.js'
 import {
   type DiagnosticInfo,
   getDoctorDiagnostic,
@@ -45,7 +45,7 @@ import {
   getAllLockInfo,
   isPidBasedLockingEnabled,
   type LockInfo,
-} from 'src/utils/nativeInstaller/pidLock.js'
+} from '@claude-code/updater/nativeInstaller/pidLock.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import {
   BASH_MAX_OUTPUT_DEFAULT,
@@ -54,7 +54,7 @@ import {
 import {
   TASK_MAX_OUTPUT_DEFAULT,
   TASK_MAX_OUTPUT_UPPER_LIMIT,
-} from 'src/utils/task/outputFormatting.js'
+} from '@claude-code/tool-registry/task/outputFormatting.js'
 import { getXDGStateHome } from '@claude-code/storage/xdg.js'
 
 type Props = {
