@@ -9,7 +9,7 @@ import {
   isMcpServerCommandEntry,
   isMcpServerUrlEntry,
   CUSTOMIZATION_SURFACES,
-} from 'src/utils/settings/types';
+} from '@claude-code/config/types';
 import {
   SETTING_SOURCES,
   SOURCES,
@@ -19,12 +19,12 @@ import {
   getSettingSourceDisplayNameLowercase,
   getSettingSourceDisplayNameCapitalized,
   parseSettingSourcesFlag,
-} from 'src/utils/settings/constants';
+} from '@claude-code/config/constants';
 import {
   formatZodError,
   filterInvalidPermissionRules,
   validateSettingsFileContent,
-} from 'src/utils/settings/validation';
+} from '@claude-code/config/validation';
 
 // ─── Settings Schema Validation ──────────────────────────────────────────
 
