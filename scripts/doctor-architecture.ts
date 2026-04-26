@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'facade-budget',
+    layer: 'Cross-Cutting',
+    subsystem: 'src/ facade ratchet',
+    script: 'scripts/verify-facade-budget.ts',
+    doc: 'V7 §10.3 — init-side-effect facades in src/ may shrink but not grow',
+  },
+  {
     id: 'cross-package-coupling',
     layer: 'Cross-Cutting',
     subsystem: 'coupling',
