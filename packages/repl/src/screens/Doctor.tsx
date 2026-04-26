@@ -33,7 +33,7 @@ import {
 import {
   type ContextWarnings,
   checkContextWarnings,
-} from '@claude-code/repl/legacy/diagnostics/doctorContextWarnings.js'
+} from '@claude-code/repl/diagnostics/doctorContextWarnings.js'
 import {
   type DiagnosticInfo,
   getDoctorDiagnostic,

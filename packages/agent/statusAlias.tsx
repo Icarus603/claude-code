@@ -32,12 +32,12 @@ import { getAPIProvider } from '@claude-code/provider/model/providers.js'
 import { getMTLSConfig } from '@claude-code/provider/mtls.js'
 import { checkInstall } from '@claude-code/updater/nativeInstaller/index.js'
 import { getProxyUrl } from '@claude-code/provider/proxy.js'
-import { SandboxManager } from '@claude-code/shell/sandboxDir/sandbox-adapter.js'
-import { getSettingsWithAllErrors } from '@claude-code/config/settings/v7/allErrors.js'
+import { SandboxManager } from '@claude-code/shell/sandbox/sandbox-adapter.js'
+import { getSettingsWithAllErrors } from '@claude-code/config/settings/core/allErrors.js'
 import {
   getEnabledSettingSources,
   getSettingSourceDisplayNameCapitalized,
-} from '@claude-code/config/settings/v7/constants.js'
+} from '@claude-code/config/settings/core/constants.js'
 import {
   getManagedFileSettingsPresence,
   getPolicySettingsOrigin,

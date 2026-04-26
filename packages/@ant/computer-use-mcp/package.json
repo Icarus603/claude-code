@@ -29,6 +29,20 @@
     "./legacy/platforms/darwin.js": "./src/legacy/platforms/darwin.ts",
     "./legacy/platforms/win32.js": "./src/legacy/platforms/win32.ts",
     "./legacy/platforms/types.js": "./src/legacy/platforms/types.ts",
-    "./legacy/platforms/index.js": "./src/legacy/platforms/index.ts"
+    "./legacy/platforms/index.js": "./src/legacy/platforms/index.ts",
+    "./legacy/win32/windowMessage.js": "./src/legacy/win32/windowMessage.ts",
+    "./legacy/win32/accessibilitySnapshot.js": "./src/legacy/win32/accessibilitySnapshot.ts",
+    "./legacy/win32/inputIndicator.js": "./src/legacy/win32/inputIndicator.ts",
+    "./legacy/win32/windowBorder.js": "./src/legacy/win32/windowBorder.ts",
+    "./legacy/win32/uiAutomation.js": "./src/legacy/win32/uiAutomation.ts",
+    "./legacy/win32/shared.js": "./src/legacy/win32/shared.ts",
+    "./legacy/win32/ocr.js": "./src/legacy/win32/ocr.ts",
+    "./legacy/win32/bridgeClient.js": "./src/legacy/win32/bridgeClient.ts",
+    "./legacy/win32/virtualCursor.js": "./src/legacy/win32/virtualCursor.ts",
+    "./legacy/win32/windowEnum.js": "./src/legacy/win32/windowEnum.ts",
+    "./legacy/win32/comWord.js": "./src/legacy/win32/comWord.ts",
+    "./legacy/win32/appDispatcher.js": "./src/legacy/win32/appDispatcher.ts",
+    "./legacy/win32/comExcel.js": "./src/legacy/win32/comExcel.ts",
+    "./legacy/win32/windowCapture.js": "./src/legacy/win32/windowCapture.ts"
   }
 }

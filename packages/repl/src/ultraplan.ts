@@ -24,7 +24,7 @@ import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManag
 import { ALL_MODEL_CONFIGS } from '@claude-code/provider/model/configs.js';
 import { updateTaskState } from '@claude-code/agent/task/framework.js';
 import { archiveRemoteSession, teleportToRemote } from '@claude-code/tool-registry/teleport.js';
-import { pollForApprovedExitPlanMode, UltraplanPollError } from '@claude-code/repl/ultraplan_dir/ccrSession.js';
+import { pollForApprovedExitPlanMode, UltraplanPollError } from '@claude-code/repl/ultraplan/ccrSession.js';
 
 // TODO(prod-hardening): OAuth token may go stale over the 30min poll;
 // consider refresh.

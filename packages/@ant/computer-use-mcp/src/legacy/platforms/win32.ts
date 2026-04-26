@@ -44,7 +44,7 @@ import {
   VK_MAP,
   MODIFIER_KEYS,
 } from 'src/utils/computerUse/win32/shared.js'
-import { logForDebugging } from 'src/utils/debug.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 
 // ---------------------------------------------------------------------------
 // Python Bridge (lazy-loaded, preferred over PowerShell for screenshots)

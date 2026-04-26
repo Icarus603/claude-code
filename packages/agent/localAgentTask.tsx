@@ -19,8 +19,8 @@ import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { AgentToolResult } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
-import { asAgentId } from '@claude-code/repl/types_v7/ids.js'
-import type { Message } from '@claude-code/repl/types_v7/message.js'
+import { asAgentId } from '@claude-code/repl/replTypes/ids.js'
+import type { Message } from '@claude-code/repl/replTypes/message.js'
 import {
   createAbortController,
   createChildAbortController,

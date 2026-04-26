@@ -1,5 +1,5 @@
 import type { ToolUseBlock } from '@anthropic-ai/sdk/resources'
-import { getRemoteSessionUrl } from '@claude-code/agent/constants_v7/product.js'
+import { getRemoteSessionUrl } from '@claude-code/agent/constants/product.js'
 import {
   OUTPUT_FILE_TAG,
   REMOTE_REVIEW_PROGRESS_TAG,
@@ -27,7 +27,7 @@ import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/To
 import {
   type BackgroundRemoteSessionPrecondition,
   checkBackgroundRemoteSessionEligibility,
-} from 'src/utils/background/remote/remoteSession.js'
+} from '@claude-code/agent/background/remote/remoteSession.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
@@ -53,7 +53,7 @@ import {
   pollRemoteSessionEvents,
 } from '@claude-code/tool-registry/teleport.js'
 import type { TodoList } from '@claude-code/tool-registry/todo/types.js'
-import type { UltraplanPhase } from '@claude-code/repl/ultraplan_dir/ccrSession.js'
+import type { UltraplanPhase } from '@claude-code/repl/ultraplan/ccrSession.js'
 
 export type RemoteAgentTaskState = TaskStateBase & {
   type: 'remote_agent'

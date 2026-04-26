@@ -31,8 +31,8 @@ import { enqueue } from '@claude-code/agent/messageQueueManager.js'
 import { resolveSkillModelOverride } from '@claude-code/provider/model.js'
 import type { ProcessUserInputContext } from '@claude-code/repl/processUserInput/processUserInput.js'
 import { processUserInput } from '@claude-code/repl/processUserInput/processUserInput.js'
-import type { QueryGuard } from '@claude-code/agent/legacy_runtime/QueryGuard.js'
-import { queryCheckpoint, startQueryProfile } from '@claude-code/local-observability/legacy/queryProfiler.js'
+import type { QueryGuard } from '@claude-code/agent/runtime/QueryGuard.js'
+import { queryCheckpoint, startQueryProfile } from '@claude-code/local-observability/aggregates/queryProfiler.js'
 import { runWithWorkload } from '@claude-code/provider/workloadContext.js'
 
 function exit(): void {

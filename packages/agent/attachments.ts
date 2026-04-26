@@ -50,13 +50,13 @@ import { getViewedTeammateTask } from '@claude-code/app-host/state/selectors.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { logAntError } from '@claude-code/local-observability/debug.js'
 import { isENOENT, toError } from '@claude-code/local-observability/errorHelpers.js'
-import type { DiagnosticFile } from '@claude-code/agent/services_topdir/diagnosticTracking.js'
-import { diagnosticTracker } from '@claude-code/agent/services_topdir/diagnosticTracking.js'
+import type { DiagnosticFile } from '@claude-code/agent/services/diagnosticTracking.js'
+import { diagnosticTracker } from '@claude-code/agent/services/diagnosticTracking.js'
 import type {
   AttachmentMessage,
   Message,
   MessageOrigin,
-} from '@claude-code/repl/types_v7/message.js'
+} from '@claude-code/repl/replTypes/message.js'
 import {
   type QueuedCommand,
   getImagePasteIds,
@@ -80,7 +80,7 @@ import {
 } from '@claude-code/provider/model/model.js'
 import type { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js'
 import { getSkillToolCommands, getMcpSkillCommands } from '@claude-code/command-runtime/runtime'
-import type { Command } from '@claude-code/repl/types_v7/command.js'
+import type { Command } from '@claude-code/repl/replTypes/command.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { getProjectRoot } from '@claude-code/app-host/bootstrap/state.js'
 import { formatCommandsWithinBudget } from '@claude-code/tool-registry/tools/SkillTool/prompt.js'
@@ -158,7 +158,7 @@ import {
   setLastEmittedDate,
   getKairosActive,
 } from '@claude-code/app-host/bootstrap/state.js'
-import type { QuerySource } from '@claude-code/agent/constants_v7/querySource.js'
+import type { QuerySource } from '@claude-code/agent/constants/querySource.js'
 import {
   getDeferredToolsDelta,
   isDeferredToolsDeltaEnabled,
@@ -235,9 +235,9 @@ import {
 } from '@claude-code/agent/hooks.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { isPDFExtension } from '@claude-code/storage/pdfUtils.js'
-import { getLocalISODate } from '@claude-code/agent/constants_v7/common.js'
+import { getLocalISODate } from '@claude-code/agent/constants/common.js'
 import { getPDFPageCount } from '@claude-code/tool-registry/pdf.js'
-import { PDF_AT_MENTION_INLINE_THRESHOLD } from '@claude-code/agent/constants_v7/apiLimits.js'
+import { PDF_AT_MENTION_INLINE_THRESHOLD } from '@claude-code/agent/constants/apiLimits.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   readUnreadMessages,

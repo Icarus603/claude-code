@@ -347,7 +347,7 @@ export const ConfigTool = buildTool({
       // and the settings cache resets for the next /voice read.
       if (feature('VOICE_MODE') && setting === 'voiceEnabled') {
         const { settingsChangeDetector } = await import(
-          '@claude-code/config/settings/v7/changeDetector.js'
+          '@claude-code/config/settings/core/changeDetector.js'
         )
         settingsChangeDetector.notifyChange('userSettings')
       }

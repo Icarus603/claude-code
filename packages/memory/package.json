@@ -35,6 +35,8 @@
     "./teamMemorySyncWatcher": "./src/teamMemorySyncWatcher.ts",
     "./memoryFileDetection": "./src/memoryFileDetection.ts",
     "./projectGitInfo": "./src/projectGitInfo.ts",
-    "./memoryShapeTelemetry": "./src/memoryShapeTelemetry.ts"
+    "./memoryShapeTelemetry": "./src/memoryShapeTelemetry.ts",
+    "./memdir/memoryShapeTelemetry.js": "./src/memdir/memoryShapeTelemetry.ts",
+    "./memdir/memoryScan.js": "./src/memdir/memoryScan.ts"
   }
 }

@@ -12,7 +12,7 @@ import {
   createDisabledBypassPermissionsContext,
   isBypassPermissionsModeDisabled,
 } from '@claude-code/permission/permissionSetup'
-import { MailboxProvider } from '@claude-code/app-host/context_v7/mailbox.js'
+import { MailboxProvider } from '@claude-code/app-host/context/mailbox.js'
 import { useSettingsChange } from '@claude-code/repl/hooks/useSettingsChange.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { createStore } from '@claude-code/app-host/state/store.js'

@@ -12,7 +12,7 @@ import {
   hashPastedText,
   retrievePastedText,
   storePastedText,
-} from '@claude-code/repl/legacy/clipboard/pasteStore.js'
+} from '@claude-code/repl/clipboard/pasteStore.js'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

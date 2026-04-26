@@ -6,7 +6,7 @@
 import { basename } from 'path'
 import { spawn, type ChildProcessWithoutNullStreams } from 'child_process'
 import { pathExists } from '@claude-code/storage/file.js'
-import { wrapSpawn } from '@claude-code/shell/legacy_v7/ShellCommand.js'
+import { wrapSpawn } from '@claude-code/shell/terminal/ShellCommand.js'
 import { TaskOutput } from '@claude-code/tool-registry/task/TaskOutput.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { randomUUID } from 'crypto'
@@ -24,8 +24,8 @@ import { buildPowerShellArgs } from '@claude-code/shell/legacy/powershellProvide
 import {
   loadPluginOptions,
   substituteUserConfigVariables,
-} from '@claude-code/config/plugin/v7/pluginOptionsStorage.js'
-import { getPluginDataDir } from '@claude-code/config/plugin/v7/pluginDirectories.js'
+} from '@claude-code/config/plugin/core/pluginOptionsStorage.js'
+import { getPluginDataDir } from '@claude-code/config/plugin/core/pluginDirectories.js'
 import {
   getSessionId,
   getProjectRoot,
@@ -46,7 +46,7 @@ import {
   getTranscriptPathForSession,
   getAgentTranscriptPath,
 } from '@claude-code/storage/sessionStorage.js'
-import type { AgentId } from '@claude-code/repl/types_v7/ids.js'
+import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,
@@ -56,7 +56,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 } from '@claude-code/local-observability'
 import { logOTelEvent } from '@claude-code/local-observability/telemetry'
-import { ALLOWED_OFFICIAL_MARKETPLACE_NAMES } from '@claude-code/config/plugin/v7/schemas.js'
+import { ALLOWED_OFFICIAL_MARKETPLACE_NAMES } from '@claude-code/config/plugin/core/schemas.js'
 import {
   startHookSpan,
   endHookSpan,
@@ -72,7 +72,7 @@ import {
   isAsyncHookJSONOutput,
   isSyncHookJSONOutput,
   type PermissionRequestResult,
-} from '@claude-code/repl/types_v7/hooks.js'
+} from '@claude-code/repl/replTypes/hooks.js'
 import type {
   HookEvent,
   HookInput,
@@ -107,17 +107,17 @@ import type {
   SyncHookJSONOutput,
   AsyncHookJSONOutput,
 } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { StatusLineCommandInput } from '@claude-code/repl/types_v7/statusLine.js'
+import type { StatusLineCommandInput } from '@claude-code/repl/replTypes/statusLine.js'
 import type { ElicitResult } from '@modelcontextprotocol/sdk/types.js'
-import type { FileSuggestionCommandInput } from '@claude-code/repl/types_v7/fileSuggestion.js'
-import type { HookResultMessage } from '@claude-code/repl/types_v7/message.js'
+import type { FileSuggestionCommandInput } from '@claude-code/repl/replTypes/fileSuggestion.js'
+import type { HookResultMessage } from '@claude-code/repl/replTypes/message.js'
 import chalk from 'chalk'
 import type {
   HookMatcher,
   HookCommand,
   PluginHookMatcher,
   SkillHookMatcher,
-} from '@claude-code/config/settings/v7/types.js'
+} from '@claude-code/config/settings/core/types.js'
 import { getHookDisplayText } from '@claude-code/repl/hooksSettings.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
@@ -128,7 +128,7 @@ import {
   permissionRuleValueFromString,
 } from '@claude-code/permission/permissionRuleParser'
 import { logError } from '@claude-code/local-observability/log.js'
-import { SandboxManager } from '@claude-code/shell/sandboxDir/sandbox-adapter.js'
+import { SandboxManager } from '@claude-code/shell/sandbox/sandbox-adapter.js'
 import { createCombinedAbortSignal } from '@claude-code/agent/combinedAbortSignal.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { registerPendingAsyncHook } from '@claude-code/agent/hooks/AsyncHookRegistry.js'
@@ -147,10 +147,10 @@ import { createAttachmentMessage } from '@claude-code/agent/attachments.js'
 import { all } from '@claude-code/config/generators'
 import { findToolByName, type Tools, type ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { execPromptHook } from '@claude-code/agent/hooks/execPromptHook.js'
-import type { Message, AssistantMessage } from '@claude-code/repl/types_v7/message.js'
+import type { Message, AssistantMessage } from '@claude-code/repl/replTypes/message.js'
 import { execAgentHook } from '@claude-code/agent/hooks/execAgentHook.js'
 import { execHttpHook } from '@claude-code/agent/hooks/execHttpHook.js'
-import type { ShellCommand } from '@claude-code/shell/legacy_v7/ShellCommand.js'
+import type { ShellCommand } from '@claude-code/shell/terminal/ShellCommand.js'
 import {
   getSessionHooks,
   getSessionFunctionHooks,

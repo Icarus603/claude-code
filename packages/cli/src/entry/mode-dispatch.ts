@@ -164,7 +164,7 @@ import {
   setTeleportedSessionInfo,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { filterCommandsForRemoteMode, getCommands } from '@claude-code/command-runtime/runtime'
-import type { StatsStore } from '@claude-code/app-host/context_v7/stats.js'
+import type { StatsStore } from '@claude-code/app-host/context/stats.js'
 import {
   launchAssistantInstallWizard,
   launchAssistantSessionChooser,
@@ -173,14 +173,14 @@ import {
   launchSnapshotUpdateDialog,
   launchTeleportRepoMismatchDialog,
   launchTeleportResumeWrapper,
-} from 'src/dialogLaunchers.js'
+} from '@claude-code/repl/dialogLaunchers/dialogLaunchers.js'
 import {
   exitWithError,
   exitWithMessage,
   getRenderContext,
   renderAndRun,
   showSetupScreens,
-} from 'src/interactiveHelpers.js'
+} from '@claude-code/repl/interactiveHelpers/interactiveHelpers.js'
 import { initBuiltinPlugins } from '@claude-code/config/plugin/bundled-init'
 import { checkQuotaStatus } from '@claude-code/provider/claudeAiLimits.js'
 import { initBundledSkills } from '@claude-code/command-runtime/skills/bundled/index.js'
@@ -359,7 +359,7 @@ import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging
 import {
   filterExistingPaths,
   getKnownPathsForRepo,
-} from '@claude-code/repl/legacy/github/githubRepoPathMapping.js'
+} from '@claude-code/repl/github/githubRepoPathMapping.js'
 import {
   clearPluginCache,
   loadAllPluginsCacheOnly,
@@ -384,7 +384,7 @@ import {
   isTmuxAvailable,
   parsePRReference,
 } from '@claude-code/swarm'
-import { isAnalyticsDisabled } from '@claude-code/agent/services_topdir/privacyConfig.js'
+import { isAnalyticsDisabled } from '@claude-code/agent/services/privacyConfig.js'
 import { profileCheckpoint } from '@claude-code/app-host/startup/startupProfiler.js'
 
 // Types for closure variables passed as context
@@ -428,10 +428,10 @@ const coordinatorModeModule = feature('COORDINATOR_MODE')
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const assistantModule = feature('KAIROS')
-  ? (require('src/assistant/index.js') as typeof import('src/assistant/index.js'))
+  ? (require('@claude-code/agent/assistant/index.js') as typeof import('@claude-code/agent/assistant/index.js'))
   : null
 const kairosGate = feature('KAIROS')
-  ? (require('src/assistant/gate.js') as typeof import('src/assistant/gate.js'))
+  ? (require('@claude-code/agent/assistant/gate.js') as typeof import('@claude-code/agent/assistant/gate.js'))
   : null
 
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -1669,7 +1669,7 @@ export async function runModeDispatch(
 			profileCheckpoint("action_before_setup");
 			logForDebugging("[STARTUP] Running setup()...");
 			const setupStart = Date.now();
-			const { setup } = await import("src/setup.js");
+			const { setup } = await import('@claude-code/cli/setup/setup.js');
 			const messagingSocketPath = feature("UDS_INBOX")
 				? (options as { messagingSocketPath?: string })
 						.messagingSocketPath
@@ -2896,7 +2896,7 @@ export async function runModeDispatch(
 				// that scripted calls don't need — the next interactive session reconciles.
 				if (!isBareMode()) {
 					startDeferredPrefetches();
-					void import('@claude-code/agent/legacy_runtime/backgroundHousekeeping.js').then((m) =>
+					void import('@claude-code/agent/runtime/backgroundHousekeeping.js').then((m) =>
 						m.startBackgroundHousekeeping(),
 					);
 					if (process.env.USER_TYPE === "ant") {
@@ -3374,7 +3374,7 @@ export async function runModeDispatch(
 					createSSHSession,
 					createLocalSSHSession,
 					SSHSessionError,
-				} = await import("src/ssh/createSSHSession.js");
+				} = await import('@claude-code/cli/ssh/createSSHSession.js');
 				let sshSession;
 				try {
 					if (_pendingSSH.local) {
@@ -3468,7 +3468,7 @@ export async function runModeDispatch(
 				// process streams live events and POSTs messages. History is lazy-
 				// loaded by useAssistantHistory on scroll-up (no blocking fetch here).
 				const { discoverAssistantSessions } =
-					await import("src/assistant/sessionDiscovery.js");
+					await import('@claude-code/agent/assistant/sessionDiscovery.js');
 
 				let targetSessionId = _pendingAssistantChat.sessionId;
 

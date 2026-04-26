@@ -37,14 +37,14 @@
     "./state/permissionSelectors.js": "./src/state/permissionSelectors.ts",
     "./state/mcpSelectors.js": "./src/state/mcpSelectors.ts",
     "./state/store.js": "./src/state/store.ts",
-    "./context_v7/promptOverlayContext.js": "./src/context_v7/promptOverlayContext.tsx",
-    "./context_v7/fpsMetrics.js": "./src/context_v7/fpsMetrics.tsx",
-    "./context_v7/overlayContext.js": "./src/context_v7/overlayContext.tsx",
-    "./context_v7/mailbox.js": "./src/context_v7/mailbox.tsx",
-    "./context_v7/QueuedMessageContext.js": "./src/context_v7/QueuedMessageContext.tsx",
-    "./context_v7/notifications.js": "./src/context_v7/notifications.tsx",
-    "./context_v7/stats.js": "./src/context_v7/stats.tsx",
-    "./context_v7/modalContext.js": "./src/context_v7/modalContext.tsx",
-    "./context_v7/voice.js": "./src/context_v7/voice.tsx"
+    "./context/promptOverlayContext.js": "./src/context/promptOverlayContext.tsx",
+    "./context/fpsMetrics.js": "./src/context/fpsMetrics.tsx",
+    "./context/overlayContext.js": "./src/context/overlayContext.tsx",
+    "./context/mailbox.js": "./src/context/mailbox.tsx",
+    "./context/QueuedMessageContext.js": "./src/context/QueuedMessageContext.tsx",
+    "./context/notifications.js": "./src/context/notifications.tsx",
+    "./context/stats.js": "./src/context/stats.tsx",
+    "./context/modalContext.js": "./src/context/modalContext.tsx",
+    "./context/voice.js": "./src/context/voice.tsx"
   }
 }

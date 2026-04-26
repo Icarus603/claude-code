@@ -4,8 +4,8 @@ import {
   getCommandQueueSnapshot,
   subscribeToCommandQueue,
 } from '@claude-code/agent/messageQueueManager.js'
-import type { QueryGuard } from '@claude-code/agent/legacy_runtime/QueryGuard.js'
-import { processQueueIfReady } from '@claude-code/agent/legacy_runtime/queueProcessor.js'
+import type { QueryGuard } from '@claude-code/agent/runtime/QueryGuard.js'
+import { processQueueIfReady } from '@claude-code/agent/runtime/queueProcessor.js'
 
 type UseQueueProcessorParams = {
   executeQueuedInput: (commands: QueuedCommand[]) => Promise<void>

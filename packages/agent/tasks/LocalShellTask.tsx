@@ -18,12 +18,12 @@ import type {
   TaskHandle,
 } from '@claude-code/tool-registry/Task.js'
 import { createTaskStateBase } from '@claude-code/tool-registry/Task.js'
-import type { AgentId } from '@claude-code/repl/types_v7/ids.js'
+import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { tailFile } from '@claude-code/storage/fsOperations.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
-import type { ShellCommand } from '@claude-code/shell/legacy_v7/ShellCommand.js'
+import type { ShellCommand } from '@claude-code/shell/terminal/ShellCommand.js'
 import {
   evictTaskOutput,
   getTaskOutputPath,
@@ -40,7 +40,7 @@ import {
   isLocalShellTask,
   type LocalShellTaskState,
 } from '@claude-code/repl/localShellTaskGuards.js'
-import { killTask } from 'src/tasks/LocalShellTask/killShellTasks.js'
+import { killTask } from '@claude-code/agent/tasks/LocalShellTask/killShellTasks.js'
 
 /** Prefix that identifies a LocalShellTask summary to the UI collapse transform. */
 export const BACKGROUND_BASH_SUMMARY_PREFIX = 'Background command '

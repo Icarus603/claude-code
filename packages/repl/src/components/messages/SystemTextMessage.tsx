@@ -20,7 +20,7 @@ const teamMemSaved = feature('TEAMMEM')
   ? (require('./teamMemSaved.js') as typeof import('./teamMemSaved.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { TURN_COMPLETION_VERBS } from '@claude-code/agent/constants_v7/turnCompletionVerbs.js'
+import { TURN_COMPLETION_VERBS } from '@claude-code/agent/constants/turnCompletionVerbs.js'
 import { useTerminalSize } from '@anthropic/ink'
 import type {
   SystemMessage,

@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { WorkflowMultiselectDialog } from '@claude-code/repl/components/WorkflowMultiselectDialog.js'
-import { GITHUB_ACTION_SETUP_DOCS_URL } from '@claude-code/agent/constants_v7/github-app.js'
+import { GITHUB_ACTION_SETUP_DOCS_URL } from '@claude-code/agent/constants/github-app.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { type KeyboardEvent, Box } from '@anthropic/ink'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'

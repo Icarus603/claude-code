@@ -15,7 +15,7 @@ import {
   hasCommand,
   type PromptCommand,
 } from '@claude-code/command-runtime/runtime'
-import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants_v7/messages.js'
+import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants/messages.js'
 import type { SetToolJSXFn, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type {
   AssistantMessage,

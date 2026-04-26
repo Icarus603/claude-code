@@ -27,8 +27,8 @@ import type {
   AgentDefinition,
   CustomAgentDefinition,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { asAgentId } from '@claude-code/repl/types_v7/ids.js'
-import type { Message } from '@claude-code/repl/types_v7/message.js'
+import { asAgentId } from '@claude-code/repl/replTypes/ids.js'
+import type { Message } from '@claude-code/repl/replTypes/message.js'
 import { createAbortController } from '@claude-code/agent/abortController.js'
 import {
   runWithAgentContext,

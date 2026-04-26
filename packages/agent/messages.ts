@@ -21,9 +21,9 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import type { AgentId } from '@claude-code/repl/types_v7/ids.js'
-import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants_v7/messages.js'
-import { OUTPUT_STYLE_CONFIG } from '@claude-code/agent/constants_v7/outputStyles.js'
+import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
+import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants/messages.js'
+import { OUTPUT_STYLE_CONFIG } from '@claude-code/agent/constants/outputStyles.js'
 import { isAutoMemoryEnabled } from '@claude-code/memory'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
@@ -37,7 +37,7 @@ import {
   getRequestTooLargeErrorMessage,
 } from '@claude-code/provider/errors.js'
 import type { AnyObject, Progress } from '@claude-code/tool-registry/Tool.js'
-import { isConnectorTextBlock } from '@claude-code/repl/types_v7/connectorText.js'
+import { isConnectorTextBlock } from '@claude-code/repl/replTypes/connectorText.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
@@ -71,7 +71,7 @@ import type {
   TombstoneMessage,
   ToolUseSummaryMessage,
   UserMessage,
-} from '@claude-code/repl/types_v7/message.js'
+} from '@claude-code/repl/replTypes/message.js'
 import { isAdvisorBlock } from '@claude-code/provider/advisor.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
@@ -123,7 +123,7 @@ import {
 import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
 import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt.js'
 import { GREP_TOOL_NAME } from '@claude-code/tool-registry/tools/GrepTool/prompt.js'
-import type { DeepImmutable } from '@claude-code/repl/types_v7/utils.js'
+import type { DeepImmutable } from '@claude-code/repl/replTypes/utils.js'
 import { getStrictToolResultPairing } from '@claude-code/app-host/bootstrap/state.js'
 import type { SpinnerMode } from '@claude-code/repl/components/Spinner.js'
 import {
@@ -133,7 +133,7 @@ import {
   LOCAL_COMMAND_CAVEAT_TAG,
   LOCAL_COMMAND_STDOUT_TAG,
 } from '@claude-code/command-runtime/xml.js'
-import { DiagnosticTrackingService } from '@claude-code/agent/services_topdir/diagnosticTracking.js'
+import { DiagnosticTrackingService } from '@claude-code/agent/services/diagnosticTracking.js'
 import {
   findToolByName,
   type Tool,
@@ -148,7 +148,7 @@ import { SEND_MESSAGE_TOOL_NAME } from '@claude-code/tool-registry/tools/SendMes
 import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCreateTool/constants.js'
 import { TASK_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskOutputTool/constants.js'
 import { TASK_UPDATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskUpdateTool/constants.js'
-import type { PermissionMode } from '@claude-code/repl/types_v7/permissions.js'
+import type { PermissionMode } from '@claude-code/repl/replTypes/permissions.js'
 import { normalizeToolInput, normalizeToolInputForAPI } from '@claude-code/provider/legacy/api.js'
 import { getCurrentProjectConfig } from '@claude-code/config'
 import { logAntError, logForDebugging } from '@claude-code/local-observability/debug.js'

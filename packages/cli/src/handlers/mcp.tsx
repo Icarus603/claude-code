@@ -92,7 +92,7 @@ export async function mcpServeHandler({
   }
 
   try {
-    const { setup } = await import('src/setup.js')
+    const { setup } = await import('@claude-code/cli/setup/setup.js')
     await setup(providedCwd, 'default', false, false, undefined, false)
     const { startMCPServer } = await import('src/entrypoints/mcp.js')
     await startMCPServer(providedCwd, debug ?? false, verbose ?? false)
@@ -385,7 +385,7 @@ export async function mcpAddFromDesktopHandler(options: {
     })
 
     const { readClaudeDesktopMcpServers } = await import(
-      '@claude-code/repl/legacy/diagnostics/claudeDesktop.js'
+      '@claude-code/repl/diagnostics/claudeDesktop.js'
     )
     const servers = await readClaudeDesktopMcpServers()
 

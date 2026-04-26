@@ -7,7 +7,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import {
   analyzeContextUsage,
   type ContextData,
-} from '@claude-code/agent/legacy/analyzeContext.js'
+} from '@claude-code/agent/sessionTools/analyzeContext.js'
 import { formatTokens } from '@claude-code/output/formatters'
 import { getMessagesAfterCompactBoundary } from '@claude-code/agent/messages.js'
 import { getSourceDisplayName } from '@claude-code/config/constants'

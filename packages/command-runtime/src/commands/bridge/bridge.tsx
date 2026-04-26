@@ -263,7 +263,7 @@ async function checkBridgePrerequisites(): Promise<string | null> {
   // initReplBridge onto the v1 path — so the prerequisite check must match.
   let useV2 = isEnvLessBridgeEnabled()
   if (feature('KAIROS') && useV2) {
-    const { isAssistantMode } = await import('src/assistant/index.js')
+    const { isAssistantMode } = await import('@claude-code/agent/assistant/index.js')
     if (isAssistantMode()) {
       useV2 = false
     }

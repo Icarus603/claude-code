@@ -32,13 +32,12 @@
     "./shellCommand.js": "./src/shellCommand.ts",
     "./bash/prefix.js": "./src/bash/prefix.ts",
     "./sandbox/sandbox-adapter.js": "./src/sandbox/sandbox-adapter.ts",
-    "./sandboxDir/sandbox-ui-utils.js": "./src/sandboxDir/sandbox-ui-utils.ts",
-    "./sandboxDir/sandbox-adapter.js": "./src/sandboxDir/sandbox-adapter.ts",
-    "./legacy_v7/ShellCommand.js": "./src/legacy_v7/ShellCommand.ts",
-    "./legacy_v7/appleTerminalBackup.js": "./src/legacy_v7/appleTerminalBackup.ts",
-    "./legacy_v7/iTermBackup.js": "./src/legacy_v7/iTermBackup.ts",
-    "./legacy_v7/terminalPanel.js": "./src/legacy_v7/terminalPanel.ts",
-    "./legacy_v7/tmuxSocket.js": "./src/legacy_v7/tmuxSocket.ts"
+    "./terminal/ShellCommand.js": "./src/terminal/ShellCommand.ts",
+    "./terminal/appleTerminalBackup.js": "./src/terminal/appleTerminalBackup.ts",
+    "./terminal/iTermBackup.js": "./src/terminal/iTermBackup.ts",
+    "./terminal/terminalPanel.js": "./src/terminal/terminalPanel.ts",
+    "./terminal/tmuxSocket.js": "./src/terminal/tmuxSocket.ts",
+    "./sandbox/sandbox-ui-utils.js": "./src/sandbox/sandbox-ui-utils.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

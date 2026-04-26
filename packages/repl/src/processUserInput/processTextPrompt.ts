@@ -14,7 +14,7 @@ import { startInteractionSpan } from '@claude-code/local-observability/spans'
 import {
   matchesKeepGoingKeyword,
   matchesNegativeKeyword,
-} from 'src/utils/userPromptKeywords.js'
+} from '@claude-code/agent/userPromptKeywords/userPromptKeywords.js'
 
 export function processTextPrompt(
   input: string | Array<ContentBlockParam>,

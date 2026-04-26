@@ -24,11 +24,11 @@ import {
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
 } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
-import type { Message } from '@claude-code/repl/types_v7/message.js'
+import type { Message } from '@claude-code/repl/replTypes/message.js'
 import {
   countToolDefinitionTokens,
   TOOL_TOKEN_COUNT_OVERHEAD,
-} from '@claude-code/agent/legacy/analyzeContext.js'
+} from '@claude-code/agent/sessionTools/analyzeContext.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { getMergedBetas } from '@claude-code/provider/betas.js'
 import { getContextWindowForModel } from '@claude-code/agent/context.js'
@@ -39,7 +39,7 @@ import {
   isFirstPartyAnthropicBaseUrl,
 } from '@claude-code/provider/model/providers.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { zodToJsonSchema } from 'src/utils/zodToJsonSchema.js'
+import { zodToJsonSchema } from '@claude-code/agent/zodSchema/zodToJsonSchema.js'
 
 /**
  * Default percentage of context window at which to auto-enable tool search.

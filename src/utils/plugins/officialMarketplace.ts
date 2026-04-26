@@ -1,3 +1,3 @@
 // Forward shim — canonical owner is packages/config/plugin/v7/officialMarketplace.ts.
 // V7 batch move via scripts/move-to-package.ts.
-export * from '@claude-code/config/plugin/v7/officialMarketplace.js'
+export * from '@claude-code/config/plugin/core/officialMarketplace.js'

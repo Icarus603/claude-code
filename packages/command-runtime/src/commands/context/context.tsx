@@ -5,7 +5,7 @@ import { ContextVisualization } from '@claude-code/repl/components/ContextVisual
 import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import { analyzeContextUsage } from '@claude-code/agent/legacy/analyzeContext.js'
+import { analyzeContextUsage } from '@claude-code/agent/sessionTools/analyzeContext.js'
 import { getMessagesAfterCompactBoundary } from '@claude-code/agent/messages.js'
 import { renderToAnsiString } from '@claude-code/output/render'
 

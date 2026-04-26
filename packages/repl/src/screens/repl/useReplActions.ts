@@ -7,7 +7,7 @@ import { usePromptsFromClaudeInChrome } from '@claude-code/repl/hooks/usePrompts
 import { useSwarmInitialization } from '@claude-code/repl/hooks/useSwarmInitialization.js'
 import type { AppState } from '@claude-code/repl/appStateHooks.js'
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
-import { performStartupChecks } from '@claude-code/config/plugin/v7/performStartupChecks.js'
+import { performStartupChecks } from '@claude-code/config/plugin/core/performStartupChecks.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import type { PermissionMode } from '@claude-code/permission/permissionTypes'
 

@@ -1,7 +1,3 @@
-// Auto-generated stub — replace with real implementation
-import type { MemoryHeader } from './memoryScan.js';
-import type { MemoryScope } from '../utils/memoryFileDetection.js';
-
-export {};
-export const logMemoryRecallShape: (memories: MemoryHeader[], selected: MemoryHeader[]) => void = (() => {});
-export const logMemoryWriteShape: (toolName: string, toolInput: Record<string, unknown>, filePath: string, scope: MemoryScope) => void = (() => {});
+// Forward shim — canonical owner is packages/memory/src/memdir/memoryShapeTelemetry.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/memory/memdir/memoryShapeTelemetry.js'

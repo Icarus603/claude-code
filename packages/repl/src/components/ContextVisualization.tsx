@@ -1,8 +1,8 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import type { ContextData } from '@claude-code/agent/legacy/analyzeContext.js'
-import { generateContextSuggestions } from '@claude-code/agent/legacy/contextSuggestions.js'
+import type { ContextData } from '@claude-code/agent/sessionTools/analyzeContext.js'
+import { generateContextSuggestions } from '@claude-code/agent/sessionTools/contextSuggestions.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { formatTokens } from '@claude-code/output/formatters'
 import {

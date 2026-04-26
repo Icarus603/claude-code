@@ -18,7 +18,7 @@ import {
   checkAndRestoreTerminalBackup,
   getTerminalPlistPath,
   markTerminalSetupComplete,
-} from '@claude-code/shell/legacy_v7/appleTerminalBackup.js'
+} from '@claude-code/shell/terminal/appleTerminalBackup.js'
 import { setupShellCompletion } from '@claude-code/updater/completionCache.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from '@claude-code/config/env/paths'

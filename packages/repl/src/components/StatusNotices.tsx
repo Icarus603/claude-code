@@ -7,7 +7,7 @@ import { getGlobalConfig } from '@claude-code/config'
 import {
   getActiveNotices,
   type StatusNoticeContext,
-} from '@claude-code/repl/legacy/uiHelpers/statusNoticeDefinitions.js'
+} from '@claude-code/repl/uiHelpers/statusNoticeDefinitions.js'
 
 type Props = {
   agentDefinitions?: AgentDefinitionsResult

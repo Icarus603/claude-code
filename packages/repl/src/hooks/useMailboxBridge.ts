@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react'
-import { useMailbox } from '@claude-code/app-host/context_v7/mailbox.js'
+import { useMailbox } from '@claude-code/app-host/context/mailbox.js'
 
 type Props = {
   isLoading: boolean

@@ -42,7 +42,7 @@ import { sendNotification } from '@claude-code/repl/notifier.js'
 import {
   startPreventSleep,
   stopPreventSleep,
-} from '@claude-code/agent/services_topdir/preventSleep.js'
+} from '@claude-code/agent/services/preventSleep.js'
 import { useTerminalNotification, hasCursorUpViewportYankBug } from '@anthropic/ink'
 import {
   createFileStateCacheWithSizeLimit,
@@ -69,7 +69,7 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js';
 import { asSessionId, asAgentId } from '@claude-code/agent/idTypes';
 import { logForDebugging } from '@claude-code/local-observability/debug.js';
-import { QueryGuard } from '@claude-code/agent/legacy_runtime/QueryGuard.js';
+import { QueryGuard } from '@claude-code/agent/runtime/QueryGuard.js';
 import { isEnvTruthy } from '@claude-code/config/env/utils';
 import { formatTokens } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js';
@@ -128,7 +128,7 @@ import { useDirectConnect } from '@claude-code/repl/hooks/useDirectConnect.js';
 import type { DirectConnectConfig } from '@claude-code/server/directConnectManager.js';
 import { useSSHSession } from '@claude-code/repl/hooks/useSSHSession.js';
 import { useAssistantHistory } from '@claude-code/repl/hooks/useAssistantHistory.js';
-import type { SSHSession } from 'src/ssh/createSSHSession.js';
+import type { SSHSession } from '@claude-code/cli/ssh/createSSHSession.js';
 import { SkillImprovementSurvey } from '@claude-code/repl/components/SkillImprovementSurvey.js';
 import { useSkillImprovementSurvey } from '@claude-code/repl/hooks/useSkillImprovementSurvey.js';
 import { useMoreRight } from 'src/moreright/useMoreRight.js';
@@ -137,10 +137,10 @@ import { getSystemPrompt } from '@claude-code/agent/prompts.js';
 import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js';
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
 import { getMemoryFiles } from '@claude-code/storage/claudemd.js';
-import { startBackgroundHousekeeping } from '@claude-code/agent/legacy_runtime/backgroundHousekeeping.js';
+import { startBackgroundHousekeeping } from '@claude-code/agent/runtime/backgroundHousekeeping.js';
 import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from '@claude-code/provider/costTracker.js';
-import { useCostSummary } from 'src/costHook.js';
-import { useFpsMetrics } from '@claude-code/app-host/context_v7/fpsMetrics.js';
+import { useCostSummary } from '@claude-code/repl/costHook/costHook.js';
+import { useFpsMetrics } from '@claude-code/app-host/context/fpsMetrics.js';
 import { useAfterFirstRender } from '@claude-code/repl/hooks/useAfterFirstRender.js';
 import { useDeferredHookMessages } from '@claude-code/repl/hooks/useDeferredHookMessages.js';
 import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from '@claude-code/repl/history.js';
@@ -160,6 +160,7 @@ import { useReplEnvFlags } from '@claude-code/repl/screens/repl/useReplEnvFlags.
 import { isOnlySleepToolActive } from '@claude-code/repl/screens/repl/onlySleepToolActive.js';
 import { deriveStopHookSpinnerSuffix } from '@claude-code/repl/screens/repl/stopHookSpinnerSuffix.js';
 import { useSuspendResumeHandlers } from '@claude-code/repl/screens/repl/useSuspendResumeHandlers.js';
+import { useTranscriptFreeze } from '@claude-code/repl/screens/repl/useTranscriptFreeze.js';
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js';
 import { CancelRequestHandler } from '@claude-code/repl/hooks/useCancelRequest.js';
 import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgroundTaskNavigation.js';
@@ -249,7 +250,7 @@ import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulSh
 import { handlePromptSubmit, type PromptInputHelpers } from '@claude-code/repl/handlePromptSubmit.js';
 import { useQueueProcessor } from '@claude-code/repl/hooks/useQueueProcessor.js';
 import { useMailboxBridge } from '@claude-code/repl/hooks/useMailboxBridge.js';
-import { queryCheckpoint, logQueryProfileReport } from '@claude-code/local-observability/legacy/queryProfiler.js';
+import { queryCheckpoint, logQueryProfileReport } from '@claude-code/local-observability/aggregates/queryProfiler.js';
 import type {
   Message as MessageType,
   UserMessage,
@@ -442,7 +443,7 @@ import {
   getAutoRunIssueReasonText,
   getAutoRunCommand,
   type AutoRunIssueReason,
-} from '@claude-code/repl/legacy/diagnostics/autoRunIssue.js';
+} from '@claude-code/repl/diagnostics/autoRunIssue.js';
 import type { HookProgress } from '@claude-code/agent/types/hooks.js';
 import { TungstenLiveMonitor } from '@claude-code/tool-registry/tools/TungstenTool/TungstenLiveMonitor.js';
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -1287,11 +1288,7 @@ export function REPL({
     );
   }
 
-  // Frozen state for transcript mode - stores lengths instead of cloning arrays for memory efficiency
-  const [frozenTranscriptState, setFrozenTranscriptState] = useState<{
-    messagesLength: number;
-    streamingToolUsesLength: number;
-  } | null>(null);
+  const { frozenTranscriptState, handleEnterTranscript, handleExitTranscript } = useTranscriptFreeze(messages.length, streamingToolUses.length);
   // Initialize input with any early input that was captured before REPL was ready.
   // Using lazy initialization ensures cursor offset is set correctly in PromptInput.
   const [inputValue, setInputValueRaw] = useState(() => consumeEarlyInput());
@@ -4475,18 +4472,6 @@ export function REPL({
     [messages, isLoading],
   );
 
-  // Callback to capture frozen state when entering transcript mode
-  const handleEnterTranscript = useCallback(() => {
-    setFrozenTranscriptState({
-      messagesLength: messages.length,
-      streamingToolUsesLength: streamingToolUses.length,
-    });
-  }, [messages.length, streamingToolUses.length]);
-
-  // Callback to clear frozen state when exiting transcript mode
-  const handleExitTranscript = useCallback(() => {
-    setFrozenTranscriptState(null);
-  }, []);
 
   // Props for GlobalKeybindingHandlers component (rendered inside KeybindingSetup)
   const virtualScrollActive = isFullscreenEnvEnabled() && !disableVirtualScroll;

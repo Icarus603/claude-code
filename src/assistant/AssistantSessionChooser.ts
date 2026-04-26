@@ -1,3 +1,3 @@
-// Auto-generated stub — replace with real implementation
-export {};
-export const AssistantSessionChooser: (props: Record<string, unknown>) => null = () => null;
+// Forward shim — canonical owner is packages/agent/assistant/AssistantSessionChooser.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/assistant/AssistantSessionChooser.js'

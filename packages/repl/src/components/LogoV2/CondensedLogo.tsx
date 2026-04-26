@@ -11,7 +11,7 @@ import {
   formatModelAndBilling,
   getLogoDisplayData,
   truncatePath,
-} from '@claude-code/repl/legacy/uiHelpers/logoV2Utils.js'
+} from '@claude-code/repl/uiHelpers/logoV2Utils.js'
 import { renderModelSetting } from '@claude-code/provider/model.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
 import { AnimatedClawd } from './AnimatedClawd.js'

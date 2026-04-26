@@ -151,7 +151,7 @@ export async function runBridgeLoop(
   initialSessionId?: string,
   getAccessToken?: () => string | undefined | Promise<string | undefined>,
 ): Promise<void> {
-  const { installSwarmHost } = await import('@claude-code/swarm/swarm_v7/installSwarmHost.js')
+  const { installSwarmHost } = await import('@claude-code/swarm/install/installSwarmHost.js')
   installSwarmHost()
 
   // Local abort controller so that onSessionDone can stop the poll loop.
@@ -1981,7 +1981,7 @@ async function fetchSessionTitle(
 }
 
 export async function bridgeMain(args: string[]): Promise<void> {
-  const { installSwarmHost } = await import('@claude-code/swarm/swarm_v7/installSwarmHost.js')
+  const { installSwarmHost } = await import('@claude-code/swarm/install/installSwarmHost.js')
   installSwarmHost()
 
   const parsed = parseArgs(args)
@@ -2799,7 +2799,7 @@ export async function runBridgeHeadless(
   opts: HeadlessBridgeOpts,
   signal: AbortSignal,
 ): Promise<void> {
-  const { installSwarmHost } = await import('@claude-code/swarm/swarm_v7/installSwarmHost.js')
+  const { installSwarmHost } = await import('@claude-code/swarm/install/installSwarmHost.js')
   installSwarmHost()
 
   const { dir, log } = opts
