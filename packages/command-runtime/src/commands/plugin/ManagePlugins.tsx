@@ -694,9 +694,19 @@ export function ManagePlugins({
       childMcps: Array<{ displayName: string; client: MCPServerConnection }>
     }
     const pluginsWithChildren: PluginWithChildren[] = []
+    // De-dup by pluginId — same plugin can appear multiple times when a
+    // marketplace's plugin entries share the same `source` path (both
+    // entries' manifest.name resolves to the same parent plugin.json).
+    // Without this, every duplicate becomes a list row with the same
+    // React Fragment key, which Ink's virtual-scroll then re-paints
+    // across the visible window during scroll → user sees the same
+    // plugin name stamped 30+ times.
+    const seenPluginIds = new Set<string>()
 
     for (const state of pluginStates) {
       const pluginId = `${state.plugin.name}@${state.marketplace}`
+      if (seenPluginIds.has(pluginId)) continue
+      seenPluginIds.add(pluginId)
       const isEnabled = mergedSettings?.enabledPlugins?.[pluginId] !== false
       const errors = pluginErrors.filter(
         e =>

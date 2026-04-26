@@ -60,7 +60,7 @@ export type PluginFsImpl = {
   mkdirSync(path: string, options?: { recursive?: boolean }): void
   writeFileSync(path: string, data: string): void
   readFileSync(path: string, encoding: 'utf8'): string
-  readdirSync(path: string): string[]
+  readdirSync(path: string): Array<{ name: string; isFile(): boolean; isDirectory(): boolean }>
   statSync(path: string): { mtime: Date; isDirectory(): boolean; size: number }
   rmSync(path: string, options?: { recursive?: boolean; force?: boolean }): void
   rmdirSync(path: string): void
@@ -73,7 +73,7 @@ export type PluginFsImpl = {
   readFileBytes(path: string): Promise<Uint8Array>
   writeFile(path: string, data: string | Uint8Array): Promise<void>
   mkdir(path: string, options?: { recursive?: boolean }): Promise<void>
-  readdir(path: string): Promise<string[]>
+  readdir(path: string): Promise<Array<{ name: string; isFile(): boolean; isDirectory(): boolean }>>
   stat(path: string): Promise<{ mtime: Date; isDirectory(): boolean; size: number }>
   rm(path: string, options?: { recursive?: boolean; force?: boolean }): Promise<void>
   rename(oldPath: string, newPath: string): Promise<void>
@@ -91,7 +91,12 @@ function nodeFsFallback(): PluginFsImpl {
     mkdirSync: (p, o) => fs.mkdirSync(p, { recursive: true, ...(o ?? {}) }),
     writeFileSync: (p, d) => fs.writeFileSync(p, d),
     readFileSync: (p, e) => fs.readFileSync(p, e) as string,
-    readdirSync: p => fs.readdirSync(p) as string[],
+    readdirSync: p =>
+      fs.readdirSync(p, { withFileTypes: true }) as Array<{
+        name: string
+        isFile(): boolean
+        isDirectory(): boolean
+      }>,
     statSync: p =>
       fs.statSync(p) as {
         mtime: Date
@@ -111,7 +116,12 @@ function nodeFsFallback(): PluginFsImpl {
     mkdir: async (p, o) => {
       await fsp.mkdir(p, { recursive: true, ...(o ?? {}) })
     },
-    readdir: async p => (await fsp.readdir(p)) as string[],
+    readdir: async p =>
+      (await fsp.readdir(p, { withFileTypes: true })) as Array<{
+        name: string
+        isFile(): boolean
+        isDirectory(): boolean
+      }>,
     stat: async p =>
       (await fsp.stat(p)) as {
         mtime: Date
@@ -841,7 +851,26 @@ export class ConfigParseError extends Error {
 }
 export type FrontmatterData = Record<string, unknown>
 export type ScopedMcpServerConfig = unknown
-export const McpServerConfigSchema: unknown = null
+// V7 §3.2 — McpServerConfigSchema lazy-resolved from mcp-runtime to avoid
+// the static config → mcp-runtime cycle (mcp-runtime already imports from
+// config). We require() at first call, cache, and re-throw with diagnostic
+// context if mcp-runtime is missing.
+let _cachedMcpServerConfigSchema: (() => unknown) | null = null
+export const McpServerConfigSchema: () => unknown = () => {
+  if (_cachedMcpServerConfigSchema == null) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('@claude-code/mcp-runtime/types.js') as {
+      McpServerConfigSchema?: () => unknown
+    }
+    if (typeof mod.McpServerConfigSchema !== 'function') {
+      throw new Error(
+        'McpServerConfigSchema lazy-load failed: @claude-code/mcp-runtime/types.js did not export it as a function',
+      )
+    }
+    _cachedMcpServerConfigSchema = mod.McpServerConfigSchema
+  }
+  return _cachedMcpServerConfigSchema()
+}
 
 // Setter-based functions — default implementations are no-ops or conservative
 // fallbacks. Host wires the real impl in installPluginBindings.
@@ -876,13 +905,39 @@ export function coerceDescriptionToString(v: unknown): string {
 }
 const [_getExtractDescriptionFromMarkdown, setExtractDescriptionFromMarkdownFn_] = makeSetter((_text: string): string => '')
 const [_getExpandTilde, setExpandTildeFn_] = makeSetter((p: string): string => p)
-const [_getExpandEnvVarsInString, setExpandEnvVarsInStringFn_] = makeSetter((s: string): string => s)
+// V7 §3.2 — expandEnvVarsInString lazy-resolved from mcp-runtime to avoid
+// the static config → mcp-runtime cycle. The canonical impl returns
+// `{ expanded, missingVars }`; the previous default returned a bare string,
+// which made destructuring callers crash with "Spread syntax requires
+// ...iterable not be null or undefined" (missingVars was undefined).
+type ExpandEnvVarsResult = { expanded: string; missingVars: string[] }
+let _cachedExpandEnvVarsInString: ((s: string) => ExpandEnvVarsResult) | null = null
+const [_getExpandEnvVarsInString, setExpandEnvVarsInStringFn_] = makeSetter(
+  (s: string): ExpandEnvVarsResult => {
+    if (_cachedExpandEnvVarsInString == null) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const mod = require('@claude-code/mcp-runtime/envExpansion.js') as {
+          expandEnvVarsInString?: (s: string) => ExpandEnvVarsResult
+        }
+        if (typeof mod.expandEnvVarsInString === 'function') {
+          _cachedExpandEnvVarsInString = mod.expandEnvVarsInString
+        }
+      } catch {
+        // mcp-runtime not loadable — fall back to no-op
+      }
+    }
+    return _cachedExpandEnvVarsInString
+      ? _cachedExpandEnvVarsInString(s)
+      : { expanded: s, missingVars: [] }
+  },
+)
 const [_getExecuteShellCommandsInPrompt, setExecuteShellCommandsInPromptFn_] = makeSetter(async (_prompt: string): Promise<string> => '')
 const [_getRipGrep, setRipGrepFn_] = makeSetter(async (..._args: unknown[]): Promise<string> => '')
 const [_getUnzipFile, setUnzipFileFn_] = makeSetter(async (_zipPath: string, _destDir: string): Promise<void> => {})
 export function extractDescriptionFromMarkdown(text: string): string { return _getExtractDescriptionFromMarkdown()(text) }
 export function expandTilde(p: string): string { return _getExpandTilde()(p) }
-export function expandEnvVarsInString(s: string): string { return _getExpandEnvVarsInString()(s) }
+export function expandEnvVarsInString(s: string): ExpandEnvVarsResult { return _getExpandEnvVarsInString()(s) }
 export function executeShellCommandsInPrompt(prompt: string): Promise<string> { return _getExecuteShellCommandsInPrompt()(prompt) }
 export function ripGrep(...args: unknown[]): Promise<string> { return _getRipGrep()(...args) }
 export function unzipFile(zipPath: string, destDir: string): Promise<void> { return _getUnzipFile()(zipPath, destDir) }
@@ -894,7 +949,33 @@ export const setRipGrepFn = setRipGrepFn_
 export const setUnzipFileFn = setUnzipFileFn_
 
 // -- frontmatter parsers
-const [_getParseFrontmatter, setParseFrontmatterFn_] = makeSetter((_t: string): FrontmatterData => ({}))
+// V7 §3.2 — parseFrontmatter lazy-resolved from agent/frontmatterParser.
+// Canonical signature is (markdown, sourcePath?) => { frontmatter, content };
+// the previous default returned just FrontmatterData, so destructuring
+// callers got `{ frontmatter, content } = {}` → `frontmatter` undefined →
+// "frontmatter.description" TypeError on every plugin command load.
+type ParsedMarkdown = { frontmatter: FrontmatterData; content: string }
+let _cachedParseFrontmatter: ((md: string, src?: string) => ParsedMarkdown) | null = null
+const [_getParseFrontmatter, setParseFrontmatterFn_] = makeSetter(
+  (md: string, src?: string): ParsedMarkdown => {
+    if (_cachedParseFrontmatter == null) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const mod = require('@claude-code/agent/frontmatterParser.js') as {
+          parseFrontmatter?: (md: string, src?: string) => ParsedMarkdown
+        }
+        if (typeof mod.parseFrontmatter === 'function') {
+          _cachedParseFrontmatter = mod.parseFrontmatter
+        }
+      } catch {
+        // agent not loadable — fall back to no-frontmatter
+      }
+    }
+    return _cachedParseFrontmatter
+      ? _cachedParseFrontmatter(md, src)
+      : { frontmatter: {}, content: md }
+  },
+)
 const [_getParseAgentToolsFromFrontmatter, setParseAgentToolsFromFrontmatterFn_] = makeSetter((_v: unknown): string[] => [])
 const [_getParseSlashCommandToolsFromFrontmatter, setParseSlashCommandToolsFromFrontmatterFn_] = makeSetter((_v: unknown): string[] => [])
 const [_getParseShellFrontmatter, setParseShellFrontmatterFn_] = makeSetter((_v: unknown): unknown => null)
@@ -907,7 +988,7 @@ const [_getParseUserSpecifiedModel, setParseUserSpecifiedModelFn_] = makeSetter(
 const [_getParseZipModes, setParseZipModesFn_] = makeSetter((_v: unknown): unknown => null)
 const [_getSubstituteArguments, setSubstituteArgumentsFn_] = makeSetter((s: string, _args: Record<string, string>): string => s)
 const [_getParseAndValidateManifestFromBytes, setParseAndValidateManifestFromBytesFn_] = makeSetter(async (_bytes: Uint8Array): Promise<unknown> => null)
-export function parseFrontmatter(t: string): FrontmatterData { return _getParseFrontmatter()(t) }
+export function parseFrontmatter(t: string, src?: string): ParsedMarkdown { return _getParseFrontmatter()(t, src) }
 export function parseAgentToolsFromFrontmatter(v: unknown): string[] { return _getParseAgentToolsFromFrontmatter()(v) }
 export function parseSlashCommandToolsFromFrontmatter(v: unknown): string[] { return _getParseSlashCommandToolsFromFrontmatter()(v) }
 export function parseShellFrontmatter(v: unknown): unknown { return _getParseShellFrontmatter()(v) }

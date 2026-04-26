@@ -9,7 +9,7 @@ mock.module("@claude-code/config/settings", () => ({
 }));
 
 const { getAPIProvider, isFirstPartyAnthropicBaseUrl } =
-  await import("../providers");
+  await import("@claude-code/provider/model/providers.js");
 
 describe("getAPIProvider", () => {
   const envKeys = [
