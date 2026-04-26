@@ -24,7 +24,7 @@ import {
 } from '@claude-code/updater/nativeInstaller/index.js'
 import { getPackageManager } from '@claude-code/updater/nativeInstaller/packageManagers.js'
 import { writeToStdout } from '@claude-code/shell/process.js'
-import { gte } from '@claude-code/config/semver'
+import { isVersionNewer } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 
 export async function update() {
@@ -122,7 +122,7 @@ export async function update() {
     if (packageManager === 'homebrew') {
       writeToStdout('Claude is managed by Homebrew.\n')
       const latest = await getLatestVersion(channel)
-      if (latest && !gte(MACRO.VERSION, latest)) {
+      if (latest && isVersionNewer(latest, MACRO.VERSION)) {
         writeToStdout(`Update available: ${MACRO.VERSION} → ${latest}\n`)
         writeToStdout('\n')
         writeToStdout('To update, run:\n')
@@ -133,7 +133,7 @@ export async function update() {
     } else if (packageManager === 'winget') {
       writeToStdout('Claude is managed by winget.\n')
       const latest = await getLatestVersion(channel)
-      if (latest && !gte(MACRO.VERSION, latest)) {
+      if (latest && isVersionNewer(latest, MACRO.VERSION)) {
         writeToStdout(`Update available: ${MACRO.VERSION} → ${latest}\n`)
         writeToStdout('\n')
         writeToStdout('To update, run:\n')
@@ -146,7 +146,7 @@ export async function update() {
     } else if (packageManager === 'apk') {
       writeToStdout('Claude is managed by apk.\n')
       const latest = await getLatestVersion(channel)
-      if (latest && !gte(MACRO.VERSION, latest)) {
+      if (latest && isVersionNewer(latest, MACRO.VERSION)) {
         writeToStdout(`Update available: ${MACRO.VERSION} → ${latest}\n`)
         writeToStdout('\n')
         writeToStdout('To update, run:\n')
