@@ -39,30 +39,55 @@ packages/             – domain ownership, one package per V7 §8 subsystem
   voice/                 – push-to-talk + STT (VOICE_MODE)
 ```
 
-## Doctor rules (42 total, all passing)
+## Doctor rules (47 total, all passing)
 
 The full ratcheted set lives in `scripts/doctor-architecture.ts`. Each rule
 has its own `scripts/verify-*.ts`. Key invariants enforced:
 
-- **Owner-over-shim** (`reverse-shims`, `duplicate-canonicals`): every concept
-  has exactly one canonical home in `packages/`; src/ may only forward-shim,
-  never fork.
-- **Thin host** (`replview-shrinks`, `entry-thin-host`): REPLView and the CLI
-  entry decrease monotonically; new logic must land in submodules.
-- **src/ evacuation** (`src-shrinks`): non-entrypoint src/ LOC ratchets toward
-  zero. Entrypoints (cli.tsx, main.tsx) and §10.3 facades excluded.
-- **Encapsulation** (`package-private-src`, `package-exports`): cross-package
-  imports go through the public exports map; `@claude-code/X/src/...` is
-  forbidden.
-- **Documentation** (`package-readme`): every package documents its V7
-  responsibility.
-- **Coupling** (`cross-package-coupling`): per-package distinct dependency
-  counts may shrink but never grow.
-- **Build integrity** (`build-resolves`, `runtime-boundaries`,
-  `require-src-imports`): `bun build` resolves end-to-end; static and dynamic
-  imports do not bypass the boundary checks.
-- **Naming hygiene** (`no-holding-pens`): no `*_v7`, `*_dir`, `*_topdir`,
-  `legacy_*` suffixes in `packages/`.
+### Owner-over-shim
+- `reverse-shims`: packages must not export back into src/.
+- `duplicate-canonicals`: same-name impl in src/ and packages/ is a silent fork.
+- `package-private-src`: `@claude-code/X/src/...` is forbidden — cross-package
+  consumers go through the public exports map.
+
+### Thin hosts
+- `replview-shrinks`: REPLView LOC monotonic decrease (currently ≤5658).
+- `entry-thin-host`: cli.tsx + main.tsx must stay slim.
+
+### src/ evacuation
+- `src-shrinks`: non-entrypoint src/ LOC ratchets toward zero (currently ≤2515).
+- `src-classifier`: per-class budgets — entrypoint=3, facade≤35, shim≤470,
+  test=0, generated=4, other≤30. Catches regressions invisible to the LOC
+  aggregate (e.g., a new "other" file that shifts the mix).
+- `facade-budget`: V7 §10.3 init-side-effect facades capped at ≤47.
+
+### Encapsulation / boundaries
+- `package-exports`: every cross-package import resolves through that
+  package's `package.json` exports map. Catches missing entries before
+  `bun build`.
+- `feature-canonical`: every `feature(...)` call comes from `bun:bundle`,
+  not a local shadow.
+- `runtime-boundaries`, `require-src-imports`: static + dynamic imports
+  do not bypass the layered architecture.
+
+### Build / type integrity
+- `build-resolves`: `bun build` (full bundle, NOT `--no-bundle`) resolves
+  every import including dynamic `await import('...')`.
+- `tsc-errors`: ratcheted at ≤3472 (decompiled noise only — count must
+  shrink, never grow).
+- `no-cycles`: import cycles in `packages/` capped at ≤44; new cycles fail
+  immediately.
+
+### Docs / hygiene
+- `package-readme`: every package documents its V7 responsibility.
+- `cross-package-coupling`: per-package distinct dependency counts may
+  shrink but never grow.
+- `no-holding-pens`: no `*_v7`, `*_dir`, `*_topdir`, `legacy_*`
+  suffixes in `packages/`.
+
+### Pre-commit
+`.githooks/pre-commit` runs the fast subset (~8 rules, <2s) on every
+local commit. CI runs the full 47-rule sweep.
 
 ## What still requires care
 
@@ -108,4 +133,6 @@ read these before non-trivial moves:
   coupling budget, the verifier will block. Either reduce another dep
   in the same package or update the budget with a justification.
 
-doctor:arch as of HEAD: **42 passed · 0 failed · 0 missing.**
+doctor:arch as of HEAD: **47 rules total** (43 passing on a clean tree;
+test/build/Opus-4.7-migration in-flight may transiently fail provider /
+swarm-e2e / build-resolves).
