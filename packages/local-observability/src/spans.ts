@@ -1,8 +1,8 @@
 import {
   endSpan as endObsSpan,
   startSpan as startObsSpan,
-  type Span as ObsSpan,
-} from './index.js'
+} from './core.js'
+import type { Span as ObsSpan } from './contracts.js'
 
 export type Span = {
   spanContext?: () => { spanId?: string }

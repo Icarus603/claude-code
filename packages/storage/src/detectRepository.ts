@@ -1,12 +1,9 @@
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getRemoteUrl } from './git.js'
+import { parseGitRemote, type ParsedRepository } from './parseGitRemote.js'
 
-export type ParsedRepository = {
-  host: string
-  owner: string
-  name: string
-}
+export { parseGitRemote, type ParsedRepository }
 
 const repositoryWithHostCache = new Map<string, ParsedRepository | null>()
 
@@ -84,45 +81,6 @@ export function getCachedRepository(): string | null {
  *
  * Note: repo names can contain dots (e.g., cc.kurs.web)
  */
-export function parseGitRemote(input: string): ParsedRepository | null {
-  const trimmed = input.trim()
-
-  // SSH format: git@host:owner/repo.git
-  const sshMatch = trimmed.match(/^git@([^:]+):([^/]+)\/([^/]+?)(?:\.git)?$/)
-  if (sshMatch?.[1] && sshMatch[2] && sshMatch[3]) {
-    if (!looksLikeRealHostname(sshMatch[1])) return null
-    return {
-      host: sshMatch[1],
-      owner: sshMatch[2],
-      name: sshMatch[3],
-    }
-  }
-
-  // URL format: https://host/owner/repo.git, ssh://git@host/owner/repo, git://host/owner/repo
-  const urlMatch = trimmed.match(
-    /^(https?|ssh|git):\/\/(?:[^@]+@)?([^/:]+(?::\d+)?)\/([^/]+)\/([^/]+?)(?:\.git)?$/,
-  )
-  if (urlMatch?.[1] && urlMatch[2] && urlMatch[3] && urlMatch[4]) {
-    const protocol = urlMatch[1]
-    const hostWithPort = urlMatch[2]
-    const hostWithoutPort = hostWithPort.split(':')[0] ?? ''
-    if (!looksLikeRealHostname(hostWithoutPort)) return null
-    // Only preserve port for HTTPS — SSH/git ports are not usable for constructing
-    // web URLs (e.g. ssh://git@ghe.corp.com:2222 → port 2222 is SSH, not HTTPS).
-    const host =
-      protocol === 'https' || protocol === 'http'
-        ? hostWithPort
-        : hostWithoutPort
-    return {
-      host,
-      owner: urlMatch[3],
-      name: urlMatch[4],
-    }
-  }
-
-  return null
-}
-
 /**
  * Parses a git remote URL or "owner/repo" string and returns "owner/repo".
  * Only returns results for github.com hosts — GHE URLs return null.
@@ -160,19 +118,4 @@ export function parseGitHubRepository(input: string): string | null {
   return null
 }
 
-/**
- * Checks whether a hostname looks like a real domain name rather than an
- * SSH config alias. A simple dot-check is not enough because aliases like
- * "github.com-work" still contain a dot. We additionally require that the
- * last segment (the TLD) is purely alphabetic — real TLDs (com, org, io, net)
- * never contain hyphens or digits.
- */
-function looksLikeRealHostname(host: string): boolean {
-  if (!host.includes('.')) return false
-  const lastSegment = host.split('.').pop()
-  if (!lastSegment) return false
-  // Real TLDs are purely alphabetic (e.g., "com", "org", "io").
-  // SSH aliases like "github.com-work" have a last segment "com-work" which
-  // contains a hyphen.
-  return /^[a-zA-Z]+$/.test(lastSegment)
-}
+// looksLikeRealHostname moved to ./parseGitRemote.ts (private helper).

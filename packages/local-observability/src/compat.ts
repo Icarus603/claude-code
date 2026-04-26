@@ -1,4 +1,4 @@
-import { logEvent, logEventAsync, shutdownLocalObservability } from './index.js'
+import { logEvent, logEventAsync, shutdownLocalObservability } from './core.js'
 import type { EventMetadata } from './contracts.js'
 
 export type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS = never
