@@ -903,8 +903,51 @@ export function coerceDescriptionToString(v: unknown): string {
   if (v == null) return ''
   return String(v)
 }
-const [_getExtractDescriptionFromMarkdown, setExtractDescriptionFromMarkdownFn_] = makeSetter((_text: string): string => '')
-const [_getExpandTilde, setExpandTildeFn_] = makeSetter((p: string): string => p)
+// V7 §3.2 — extractDescriptionFromMarkdown lazy-resolved from
+// tool-registry/markdownConfigLoader. Default `() => ''` would silently
+// truncate every plugin command description loaded by getPluginCommands.
+let _cachedExtractDescriptionFromMarkdown:
+  | ((text: string, label?: string) => string)
+  | null = null
+const [_getExtractDescriptionFromMarkdown, setExtractDescriptionFromMarkdownFn_] =
+  makeSetter((text: string, label?: string): string => {
+    if (_cachedExtractDescriptionFromMarkdown == null) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const mod = require('@claude-code/tool-registry/markdownConfigLoader.js') as {
+          extractDescriptionFromMarkdown?: (text: string, label?: string) => string
+        }
+        if (typeof mod.extractDescriptionFromMarkdown === 'function') {
+          _cachedExtractDescriptionFromMarkdown = mod.extractDescriptionFromMarkdown
+        }
+      } catch {
+        /* tool-registry not loadable — fall back */
+      }
+    }
+    return _cachedExtractDescriptionFromMarkdown
+      ? _cachedExtractDescriptionFromMarkdown(text, label)
+      : ''
+  })
+
+// V7 §3.2 — expandTilde lazy-resolved from permission/pathValidation.
+// Default returns input unchanged; canonical actually resolves ~/foo.
+let _cachedExpandTilde: ((p: string) => string) | null = null
+const [_getExpandTilde, setExpandTildeFn_] = makeSetter((p: string): string => {
+  if (_cachedExpandTilde == null) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require('@claude-code/permission/pathValidation.js') as {
+        expandTilde?: (p: string) => string
+      }
+      if (typeof mod.expandTilde === 'function') {
+        _cachedExpandTilde = mod.expandTilde
+      }
+    } catch {
+      /* permission not loadable — fall back to identity */
+    }
+  }
+  return _cachedExpandTilde ? _cachedExpandTilde(p) : p
+})
 // V7 §3.2 — expandEnvVarsInString lazy-resolved from mcp-runtime to avoid
 // the static config → mcp-runtime cycle. The canonical impl returns
 // `{ expanded, missingVars }`; the previous default returned a bare string,
@@ -932,7 +975,35 @@ const [_getExpandEnvVarsInString, setExpandEnvVarsInStringFn_] = makeSetter(
       : { expanded: s, missingVars: [] }
   },
 )
-const [_getExecuteShellCommandsInPrompt, setExecuteShellCommandsInPromptFn_] = makeSetter(async (_prompt: string): Promise<string> => '')
+// V7 §3.2 — executeShellCommandsInPrompt lazy-resolved from
+// command-runtime/promptShellExecution. Default returns empty string,
+// which would silently strip all `!cmd` shell-substitution markers
+// from plugin command bodies.
+let _cachedExecuteShellCommandsInPrompt:
+  | ((prompt: string, ...rest: unknown[]) => Promise<string>)
+  | null = null
+const [_getExecuteShellCommandsInPrompt, setExecuteShellCommandsInPromptFn_] =
+  makeSetter(async (prompt: string, ...rest: unknown[]): Promise<string> => {
+    if (_cachedExecuteShellCommandsInPrompt == null) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const mod = require('@claude-code/command-runtime/promptShellExecution.js') as {
+          executeShellCommandsInPrompt?: (
+            prompt: string,
+            ...rest: unknown[]
+          ) => Promise<string>
+        }
+        if (typeof mod.executeShellCommandsInPrompt === 'function') {
+          _cachedExecuteShellCommandsInPrompt = mod.executeShellCommandsInPrompt
+        }
+      } catch {
+        /* command-runtime not loadable — fall back to passthrough */
+      }
+    }
+    return _cachedExecuteShellCommandsInPrompt
+      ? _cachedExecuteShellCommandsInPrompt(prompt, ...rest)
+      : prompt
+  })
 const [_getRipGrep, setRipGrepFn_] = makeSetter(async (..._args: unknown[]): Promise<string> => '')
 const [_getUnzipFile, setUnzipFileFn_] = makeSetter(async (_zipPath: string, _destDir: string): Promise<void> => {})
 export function extractDescriptionFromMarkdown(text: string): string { return _getExtractDescriptionFromMarkdown()(text) }
