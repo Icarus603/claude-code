@@ -32,8 +32,16 @@ import {
 } from './memoryTypes.js'
 import { readEnv } from '@claude-code/config/env'
 
-export const ENTRYPOINT_NAME = 'MEMORY.md'
-export const MAX_ENTRYPOINT_LINES = 200
+export {
+  ENTRYPOINT_NAME,
+  MAX_ENTRYPOINT_LINES,
+  DIRS_EXIST_GUIDANCE,
+  buildSearchingPastContextSection,
+} from './memoryEntrypoint.js'
+import {
+  ENTRYPOINT_NAME,
+  MAX_ENTRYPOINT_LINES,
+} from './memoryEntrypoint.js'
 // ~125 chars/line at 200 lines. At p97 today; catches long-line indexes that
 // slip past the line cap (p100 observed: 197KB under 200 lines).
 export const MAX_ENTRYPOINT_BYTES = 25_000
@@ -110,8 +118,6 @@ export function truncateEntrypointContent(raw: string): EntrypointTruncation {
  */
 export const DIR_EXISTS_GUIDANCE =
   'This directory already exists — write to it directly with the Write tool (do not run mkdir or check for its existence).'
-export const DIRS_EXIST_GUIDANCE =
-  'Both directories already exist — write to them directly with the Write tool (do not run mkdir or check for their existence).'
 
 /**
  * Ensure a memory directory exists. Idempotent — called from loadMemoryPrompt
@@ -337,45 +343,6 @@ function buildAssistantDailyLogPrompt(skipIndex = false): string {
   ]
 
   return lines.join('\n')
-}
-
-/**
- * Build the "Searching past context" section if the feature gate is enabled.
- */
-export function buildSearchingPastContextSection(autoMemDir: string): string[] {
-  if (!getFeatureValue_CACHED_MAY_BE_STALE('tengu_coral_fern', false)) {
-    return []
-  }
-  const bindings = getMemoryHostBindings()
-  const originalCwd = bindings.getOriginalCwd?.() ?? process.cwd()
-  const projectDir = bindings.getProjectDir?.(originalCwd) ?? originalCwd
-  // Ant-native builds alias grep to embedded ugrep and remove the dedicated
-  // Grep tool, so give the model a real shell invocation there.
-  const embedded =
-    (bindings.hasEmbeddedSearchTools?.() ?? false) ||
-    (bindings.isReplModeEnabled?.() ?? false)
-  const grepToolName = bindings.grepToolName ?? 'Grep'
-  const memSearch = embedded
-    ? `grep -rn "<search term>" ${autoMemDir} --include="*.md"`
-    : `${grepToolName} with pattern="<search term>" path="${autoMemDir}" glob="*.md"`
-  const transcriptSearch = embedded
-    ? `grep -rn "<search term>" ${projectDir}/ --include="*.jsonl"`
-    : `${grepToolName} with pattern="<search term>" path="${projectDir}/" glob="*.jsonl"`
-  return [
-    '## Searching past context',
-    '',
-    'When looking for past context:',
-    '1. Search topic files in your memory directory:',
-    '```',
-    memSearch,
-    '```',
-    '2. Session transcript logs (last resort — large files, slow):',
-    '```',
-    transcriptSearch,
-    '```',
-    'Use narrow search terms (error messages, file paths, function names) rather than broad keywords.',
-    '',
-  ]
 }
 
 /**

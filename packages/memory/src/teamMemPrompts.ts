@@ -3,7 +3,7 @@ import {
   DIRS_EXIST_GUIDANCE,
   ENTRYPOINT_NAME,
   MAX_ENTRYPOINT_LINES,
-} from './memdir.js'
+} from './memoryEntrypoint.js'
 import {
   MEMORY_DRIFT_CAVEAT,
   MEMORY_FRONTMATTER_EXAMPLE,

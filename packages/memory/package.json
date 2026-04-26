@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./memdir": "./src/memdir.ts",
+    "./memoryEntrypoint": "./src/memoryEntrypoint.ts",
     "./agentMemory": "./src/agentMemory.ts",
     "./memoryAge": "./src/memoryAge.ts",
     "./findRelevantMemories": "./src/findRelevantMemories.ts",
