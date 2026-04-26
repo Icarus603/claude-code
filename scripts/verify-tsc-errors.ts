@@ -13,7 +13,7 @@
 
 import { spawnSync } from 'child_process'
 
-const BUDGET = 3472 // post-#90 — fixed 6 broken cross-package import paths (TS2307)
+const BUDGET = 3417 // post-#108 batch 1 — narrowed appState in computer-use-mcp/legacy (-55 TS2339)
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

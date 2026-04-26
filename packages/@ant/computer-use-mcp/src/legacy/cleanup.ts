@@ -27,13 +27,22 @@ const UNHIDE_TIMEOUT_MS = 5000
  *
  * No-ops cheaply on non-CU turns: both gate checks are zero-syscall.
  */
+// Local typed view of the slice of AppState this module touches. AppState
+// itself is typed as `unknown` at the V7 boundary (§7.2), so we narrow here.
+type ComputerUseAppStateSlice = {
+  computerUseMcpState?: {
+    hiddenDuringTurn?: Set<string>
+    allowedApps?: string[]
+  }
+}
+
 export async function cleanupComputerUseAfterTurn(
   ctx: Pick<
     ToolUseContext,
     'getAppState' | 'setAppState' | 'sendOSNotification'
   >,
 ): Promise<void> {
-  const appState = ctx.getAppState()
+  const appState = ctx.getAppState() as ComputerUseAppStateSlice
 
   const hidden = appState.computerUseMcpState?.hiddenDuringTurn
   if (hidden && hidden.size > 0) {
@@ -48,17 +57,17 @@ export async function cleanupComputerUseAfterTurn(
     await Promise.race([unhide, timeout.promise]).finally(() =>
       clearTimeout(timer),
     )
-    ctx.setAppState(prev =>
-      prev.computerUseMcpState?.hiddenDuringTurn === undefined
-        ? prev
-        : {
-            ...prev,
-            computerUseMcpState: {
-              ...prev.computerUseMcpState,
-              hiddenDuringTurn: undefined,
-            },
-          },
-    )
+    ctx.setAppState((prev: unknown) => {
+      const slice = prev as ComputerUseAppStateSlice
+      if (slice.computerUseMcpState?.hiddenDuringTurn === undefined) return prev
+      return {
+        ...(slice as object),
+        computerUseMcpState: {
+          ...slice.computerUseMcpState,
+          hiddenDuringTurn: undefined,
+        },
+      }
+    })
   }
 
   // Zero-syscall pre-check so non-CU turns don't touch disk. Release is still
