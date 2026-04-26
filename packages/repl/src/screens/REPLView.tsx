@@ -161,6 +161,10 @@ import { isOnlySleepToolActive } from '@claude-code/repl/screens/repl/onlySleepT
 import { deriveStopHookSpinnerSuffix } from '@claude-code/repl/screens/repl/stopHookSpinnerSuffix.js';
 import { useSuspendResumeHandlers } from '@claude-code/repl/screens/repl/useSuspendResumeHandlers.js';
 import { useTranscriptFreeze } from '@claude-code/repl/screens/repl/useTranscriptFreeze.js';
+import { useFeedbackSurveyAutoIssue } from '@claude-code/repl/screens/repl/useFeedbackSurveyAutoIssue.js';
+import { useAutoRunIssueHandlers } from '@claude-code/repl/screens/repl/useAutoRunIssueHandlers.js';
+import { useHandleExit } from '@claude-code/repl/screens/repl/useHandleExit.js';
+import { useSurveyAndRateLimitHandlers } from '@claude-code/repl/screens/repl/useSurveyAndRateLimitHandlers.js';
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js';
 import { CancelRequestHandler } from '@claude-code/repl/hooks/useCancelRequest.js';
 import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgroundTaskNavigation.js';
@@ -1710,22 +1714,14 @@ export function REPL({
   const showIssueFlagBanner = useIssueFlagBanner(messages, submitCount);
 
   // Wrap feedback survey handler to trigger auto-run /issue
-  const feedbackSurvey = useMemo(
-    () => ({
-      ...feedbackSurveyOriginal,
-      handleSelect: (selected: 'dismissed' | 'bad' | 'fine' | 'good') => {
-        // Reset the ref when a new survey response comes in
-        didAutoRunIssueRef.current = false;
-        const showedTranscriptPrompt = feedbackSurveyOriginal.handleSelect(selected);
-        // Auto-run /issue for "bad" if transcript prompt wasn't shown
-        if (selected === 'bad' && !showedTranscriptPrompt && shouldAutoRunIssue('feedback_survey_bad')) {
-          setAutoRunIssueReason('feedback_survey_bad');
-          didAutoRunIssueRef.current = true;
-        }
-      },
-    }),
-    [feedbackSurveyOriginal],
-  );
+  const feedbackSurvey = useFeedbackSurveyAutoIssue(feedbackSurveyOriginal, {
+    resetMarker: () => { didAutoRunIssueRef.current = false; },
+    shouldAutoRun: shouldAutoRunIssue,
+    triggerAutoRun: (reason) => {
+      setAutoRunIssueReason(reason as AutoRunIssueReason);
+      didAutoRunIssueRef.current = true;
+    },
+  });
 
   // Post-compact survey: shown after compaction if feature gate is enabled
   const postCompactSurvey = usePostCompactSurvey(messages, isLoading, hasActivePrompt, { enabled: !isRemoteSession });
@@ -3866,84 +3862,14 @@ export function REPL({
     [setAppState, setInputValue, getToolUseContext, canUseTool, mainLoopModel, addNotification],
   );
 
-  // Handlers for auto-run /issue or /good-claude (defined after onSubmit)
-  const handleAutoRunIssue = useCallback(() => {
-    const command = autoRunIssueReason ? getAutoRunCommand(autoRunIssueReason) : '/issue';
-    setAutoRunIssueReason(null); // Clear the state
-    onSubmit(command, {
-      setCursorOffset: () => {},
-      clearBuffer: () => {},
-      resetHistory: () => {},
-    }).catch(err => {
-      logForDebugging(`Auto-run ${command} failed: ${errorMessage(err)}`);
-    });
-  }, [onSubmit, autoRunIssueReason]);
+  const { handleAutoRunIssue, handleCancelAutoRunIssue } = useAutoRunIssueHandlers(
+    onSubmit, autoRunIssueReason, setAutoRunIssueReason,
+  );
 
-  const handleCancelAutoRunIssue = useCallback(() => {
-    setAutoRunIssueReason(null);
-  }, []);
+  const { handleSurveyRequestFeedback, handleOpenRateLimitOptions } =
+    useSurveyAndRateLimitHandlers(onSubmit);
 
-  // Handler for when user presses 1 on survey thanks screen to share details
-  const handleSurveyRequestFeedback = useCallback(() => {
-    const command = process.env.USER_TYPE === 'ant' ? '/issue' : '/feedback';
-    onSubmit(command, {
-      setCursorOffset: () => {},
-      clearBuffer: () => {},
-      resetHistory: () => {},
-    }).catch(err => {
-      logForDebugging(`Survey feedback request failed: ${err instanceof Error ? err.message : String(err)}`);
-    });
-  }, [onSubmit]);
-
-  // onSubmit is unstable (deps include `messages` which changes every turn).
-  // `handleOpenRateLimitOptions` is prop-drilled to every MessageRow, and each
-  // MessageRow fiber pins the closure (and transitively the entire REPL render
-  // scope, ~1.8KB) at mount time. Using a ref keeps this callback stable so
-  // old REPL scopes can be GC'd — saves ~35MB over a 1000-turn session.
-  const onSubmitRef = useRef(onSubmit);
-  onSubmitRef.current = onSubmit;
-  const handleOpenRateLimitOptions = useCallback(() => {
-    void onSubmitRef.current('/rate-limit-options', {
-      setCursorOffset: () => {},
-      clearBuffer: () => {},
-      resetHistory: () => {},
-    });
-  }, []);
-
-  const handleExit = useCallback(async () => {
-    setIsExiting(true);
-    // In bg sessions, always detach instead of kill — even when a worktree is
-    // active. Without this guard, the worktree branch below short-circuits into
-    // ExitFlow (which calls gracefulShutdown) before exit.tsx is ever loaded.
-    if (feature('BG_SESSIONS') && isBgSession()) {
-      spawnSync('tmux', ['detach-client'], { stdio: 'ignore' });
-      setIsExiting(false);
-      return;
-    }
-    const showWorktree = getCurrentWorktreeSession() !== null;
-    if (showWorktree) {
-      setExitFlow(
-        <ExitFlow
-          showWorktree
-          onDone={() => {}}
-          onCancel={() => {
-            setExitFlow(null);
-            setIsExiting(false);
-          }}
-        />,
-      );
-      return;
-    }
-    const exitMod = await exit.load();
-    const exitFlowResult = await exitMod.call(() => {});
-    setExitFlow(exitFlowResult);
-    // If call() returned without killing the process (bg session detach),
-    // clear isExiting so the UI is usable on reattach. No-op on the normal
-    // path — gracefulShutdown's process.exit() means we never get here.
-    if (exitFlowResult === null) {
-      setIsExiting(false);
-    }
-  }, []);
+  const handleExit = useHandleExit(setIsExiting, setExitFlow);
 
   const handleShowMessageSelector = useCallback(() => {
     setIsMessageSelectorVisible(prev => !prev);
