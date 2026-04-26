@@ -30,7 +30,7 @@ import {
   DONT_ASK_REJECT_MESSAGE,
   SYNTHETIC_MODEL,
 } from '@claude-code/agent/messages.js';
-import type { Message, AssistantMessage, UserMessage } from 'src/types/message';
+import type { Message, AssistantMessage, UserMessage } from '@claude-code/repl/replTypes/message.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
 
