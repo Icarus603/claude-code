@@ -33,28 +33,26 @@ ccb --version
 ccb --help
 ```
 
-First run prompts `/login`. See [`docs/`](docs/) for feature reference.
+First run prompts `/login`. The dialog lets you pick a provider:
 
-### Provider config
+- **Anthropic Compatible** — any Anthropic-format endpoint (Anthropic itself, third-party proxies, self-hosted)
+- **OpenAI Compatible** — OpenAI itself plus anything that speaks the protocol (DeepSeek, Ollama, vLLM, …)
+- **Gemini API** — Google Gemini native REST/SSE
+- **Anthropic Console account** — OAuth flow for claude.ai
 
-```bash
-# OpenAI-compatible (DeepSeek, Ollama, vLLM, ...)
-export CLAUDE_CODE_USE_OPENAI=1
-export OPENAI_API_KEY=...
-export OPENAI_BASE_URL=...
-export OPENAI_DEFAULT_SONNET_MODEL=...
+You paste base URL + API key + model IDs inside the dialog; nothing to set in your shell. Switch providers anytime with `/login` again.
 
-# Google Gemini
-export CLAUDE_CODE_USE_GEMINI=1
-export GEMINI_API_KEY=...
-export GEMINI_DEFAULT_SONNET_MODEL=...
-```
+See [`docs/`](docs/) for per-feature deep dives.
+
+### Headless / scripted use
+
+For CI or `--print` mode where there's no REPL to drive `/login`, env vars work too:
 
 | Variable | Purpose |
 |----------|---------|
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL` | Anthropic auth + endpoint |
-| `CLAUDE_CODE_USE_OPENAI=1` | OpenAI-compat provider |
-| `CLAUDE_CODE_USE_GEMINI=1` | Gemini provider |
+| `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_DEFAULT_*_MODEL` | OpenAI-compat endpoint |
+| `GEMINI_API_KEY`, `GEMINI_BASE_URL`, `GEMINI_DEFAULT_*_MODEL` | Gemini endpoint |
 | `FEATURE_<FLAG>=1` | Enable a build-time feature gate at runtime |
 
 ---

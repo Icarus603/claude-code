@@ -33,28 +33,26 @@ ccb --version
 ccb --help
 ```
 
-第一次執行會提示 `/login`。功能參考見 [`docs/`](docs/)。
+第一次執行會提示 `/login`。對話框讓你選 provider:
 
-### Provider 配置
+- **Anthropic Compatible** — 任何 Anthropic 格式端點(Anthropic 本身、第三方 proxy、自架)
+- **OpenAI Compatible** — OpenAI 本身 + 所有相容 protocol(DeepSeek、Ollama、vLLM、...)
+- **Gemini API** — Google Gemini 原生 REST/SSE
+- **Anthropic Console account** — claude.ai 的 OAuth 登入
 
-```bash
-# OpenAI 相容(DeepSeek、Ollama、vLLM、...)
-export CLAUDE_CODE_USE_OPENAI=1
-export OPENAI_API_KEY=...
-export OPENAI_BASE_URL=...
-export OPENAI_DEFAULT_SONNET_MODEL=...
+Base URL、API key、模型 ID 都在對話框裡填,shell 不用 export。要換 provider 再敲 `/login`。
 
-# Google Gemini
-export CLAUDE_CODE_USE_GEMINI=1
-export GEMINI_API_KEY=...
-export GEMINI_DEFAULT_SONNET_MODEL=...
-```
+各功能深入文檔見 [`docs/`](docs/)。
+
+### Headless / 腳本用法
+
+CI 或 `--print` 模式下沒 REPL 可以開 `/login`,env vars 也支援:
 
 | 變數 | 用途 |
 |------|------|
 | `ANTHROPIC_API_KEY`、`ANTHROPIC_BASE_URL` | Anthropic 認證 + 端點 |
-| `CLAUDE_CODE_USE_OPENAI=1` | OpenAI 相容 provider |
-| `CLAUDE_CODE_USE_GEMINI=1` | Gemini provider |
+| `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_DEFAULT_*_MODEL` | OpenAI 相容端點 |
+| `GEMINI_API_KEY`、`GEMINI_BASE_URL`、`GEMINI_DEFAULT_*_MODEL` | Gemini 端點 |
 | `FEATURE_<FLAG>=1` | runtime 啟用 build-time feature flag |
 
 ---
