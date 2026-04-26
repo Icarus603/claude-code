@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'feature-canonical',
+    layer: 'Cross-Cutting',
+    subsystem: 'feature flag boundary',
+    script: 'scripts/verify-feature-canonical.ts',
+    doc: 'CLAUDE.md §Feature Flag System — feature() must come from bun:bundle',
+  },
+  {
     id: 'no-cycles',
     layer: 'Cross-Cutting',
     subsystem: 'import graph cycles',
