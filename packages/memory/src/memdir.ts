@@ -41,6 +41,7 @@ export {
 import {
   ENTRYPOINT_NAME,
   MAX_ENTRYPOINT_LINES,
+  buildSearchingPastContextSection,
 } from './memoryEntrypoint.js'
 // ~125 chars/line at 200 lines. At p97 today; catches long-line indexes that
 // slip past the line cap (p100 observed: 197KB under 200 lines).
