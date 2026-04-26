@@ -7,7 +7,7 @@ import '@claude-code/mcp-runtime/clientRuntime.js'
 
 async function main(): Promise<void> {
   const [mainContent, replContent, printContent, modeDispatchContent] = await Promise.all([
-    readFile('./src/main.tsx', 'utf8'),
+    readFile('./packages/cli/src/entry/main.tsx', 'utf8'),
     readFile('./packages/repl/src/screens/REPL.tsx', 'utf8'),
     readFile('./packages/cli/src/print.ts', 'utf8'),
     readFile('./packages/cli/src/entry/mode-dispatch.ts', 'utf8'),

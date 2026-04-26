@@ -63,7 +63,7 @@ const features = [...new Set([...DEFAULT_BUILD_FEATURES, ...envFeatures])]
 // `bun build --compile`), which is the right deliverable for "single-file
 // distribution that doesn't need Node/Bun installed".
 const result = await Bun.build({
-  entrypoints: ['src/entrypoints/cli.tsx'],
+  entrypoints: ['packages/cli/src/entry/cli.tsx'],
   outdir,
   target: 'bun',
   splitting: false,
@@ -111,7 +111,7 @@ console.log(`Copied vendor/audio-capture/ → ${vendorDir}/`)
 // Step 4.1: Copy pre-downloaded ripgrep binary into dist when available.
 // This keeps Glob/Grep working in local dist runs without requiring a separate
 // post-build download step.
-const ripgrepSourceDir = 'src/utils/vendor/ripgrep'
+const ripgrepSourceDir = 'packages/shell/vendor/ripgrep'
 const ripgrepTargetDir = join(outdir, 'vendor', 'ripgrep')
 try {
   await cp(ripgrepSourceDir, ripgrepTargetDir, { recursive: true })

@@ -12,7 +12,7 @@ import { createInteractiveHost } from '@claude-code/app-host'
 
 async function main(): Promise<void> {
   const [mainContent, replLauncherContent, modeDispatchContent] = await Promise.all([
-    readFile('src/main.tsx', 'utf8'),
+    readFile('packages/cli/src/entry/main.tsx', 'utf8'),
     readFile('packages/app-host/src/launchRepl.tsx', 'utf8'),
     readFile('packages/cli/src/entry/mode-dispatch.ts', 'utf8'),
   ])

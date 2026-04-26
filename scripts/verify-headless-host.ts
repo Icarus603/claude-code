@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises'
 async function main(): Promise<void> {
   const [mainContent, cliIndex, cliHeadless, printContent, cliBindings, modeDispatchContent] =
     await Promise.all([
-      readFile('src/main.tsx', 'utf8'),
+      readFile('packages/cli/src/entry/main.tsx', 'utf8'),
       readFile('packages/cli/src/index.ts', 'utf8'),
       readFile('packages/cli/src/headless.ts', 'utf8'),
       readFile('packages/cli/src/print.ts', 'utf8'),

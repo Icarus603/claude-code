@@ -17,7 +17,7 @@ External behavior that must remain unchanged during V6 refactor:
 ```text
 cbb0d46f220fd5181ad09575b3c26ca22747bbfa8465c5036eb734bde2614c51  packages/headless-sdk/src/agentSdkTypes.ts
 d08c6ea72c10a269752687d4ccfe1dca9bfa0a13d0670c86c7a005cb2c49f4ae  packages/app-host/src/init.ts
-3baea7b978df3f30f8391b11810edcd750ff5f36008f2b70a45ef1377863dbc9  src/entrypoints/mcp.ts
+53fd1f1194f863c613e673c3116dfd72f0760fdce89c8dfd98407da853013ccb  packages/cli/src/entry/mcp.ts
 e15167a170952be204091d6808b0ee9ed7ccc114e34e9396eb060789aac33f4b  packages/headless-sdk/src/sandboxTypes.ts
 7898a3ae61119fa7a7cb45da99d5de86c45aaec8a568752d1cca8d3b59237e2b  packages/headless-sdk/src/controlSchemas.ts
 d3918b6119e629f2a17967bc217d730b16fe5a9dd9f1673341364dbfe2c2a774  packages/headless-sdk/src/controlTypes.ts

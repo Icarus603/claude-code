@@ -80,15 +80,12 @@ const getSendUserFileTool = () =>
     ? require('@claude-code/tool-registry/tools/SendUserFileTool/SendUserFileTool.js').SendUserFileTool as Tool
     : null
 
-const getPushNotificationTool = () =>
-  feature('KAIROS') || feature('KAIROS_PUSH_NOTIFICATION')
-    ? require('src/tools/PushNotificationTool/PushNotificationTool.js').PushNotificationTool as Tool
-    : null
-
-const getSubscribePRTool = () =>
-  feature('KAIROS_GITHUB_WEBHOOKS')
-    ? require('src/tools/SubscribePRTool/SubscribePRTool.js').SubscribePRTool as Tool
-    : null
+// PushNotificationTool, SubscribePRTool: ant-internal tools not present in
+// this build. Their src/ shims were never replaced with canonical packages,
+// so the require() targets don't exist. Feature gates default false →
+// returning null is correct behavior.
+const getPushNotificationTool = () => null
+const getSubscribePRTool = () => null
 
 const getVerifyPlanExecutionTool = () =>
   process.env.CLAUDE_CODE_VERIFY_PLAN === 'true'
@@ -100,10 +97,9 @@ const getOverflowTestTool = () =>
     ? require('@claude-code/tool-registry/tools/OverflowTestTool/OverflowTestTool.js').OverflowTestTool as Tool
     : null
 
-const getCtxInspectTool = () =>
-  feature('CONTEXT_COLLAPSE')
-    ? require('src/tools/CtxInspectTool/CtxInspectTool.js').CtxInspectTool as Tool
-    : null
+// CtxInspectTool: src/ shim never replaced with canonical package. Feature
+// gate CONTEXT_COLLAPSE defaults false in this build.
+const getCtxInspectTool = () => null
 
 const getTerminalCaptureTool = () =>
   feature('TERMINAL_PANEL')
@@ -120,10 +116,9 @@ const getSnipTool = () =>
     ? require('@claude-code/tool-registry/tools/SnipTool/SnipTool.js').SnipTool as Tool
     : null
 
-const getListPeersTool = () =>
-  feature('UDS_INBOX')
-    ? require('src/tools/ListPeersTool/ListPeersTool.js').ListPeersTool as Tool
-    : null
+// ListPeersTool: src/ shim never replaced with canonical package. Feature
+// gate UDS_INBOX defaults false in this build.
+const getListPeersTool = () => null
 
 const getWorkflowTool = () =>
   feature('WORKFLOW_SCRIPTS')

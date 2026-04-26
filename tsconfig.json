@@ -11,12 +11,8 @@
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "types": ["bun"],
-        "paths": {
-            "src/*": ["./src/*"],
-            "@cc-app/*": ["./src/*"],
-            "@claude-code/app-compat/*": ["./src/*"]
-        }
+        "paths": {}
     },
-    "include": ["src/**/*.ts", "src/**/*.tsx"],
-    "exclude": ["node_modules"]
+    "include": ["packages/**/*.ts", "packages/**/*.tsx"],
+    "exclude": ["node_modules", "**/__tests__/**", "**/*.test.ts", "**/*.test.tsx"]
 }

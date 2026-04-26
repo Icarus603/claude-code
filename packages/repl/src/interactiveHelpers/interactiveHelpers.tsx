@@ -21,7 +21,7 @@ import { initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { isSynchronizedOutputSupported } from '@anthropic/ink'
 import type { RenderOptions, Root, TextProps } from '@anthropic/ink'
 import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
-import { startDeferredPrefetches } from 'src/main.js'
+import { startDeferredPrefetches } from '@claude-code/app-host/main/startup/context.js'
 import {
   checkGate_CACHED_OR_BLOCKING,
   initializeGrowthBook,

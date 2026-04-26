@@ -861,7 +861,7 @@ export function installPackageHostBindings(
       getMcpErrorsByScope: (scope: string) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { getMcpConfigsByScope } = require('src/services/mcp/config.js') as typeof import('src/services/mcp/config.js')
+          const { getMcpConfigsByScope } = require('@claude-code/mcp-runtime/config.js') as typeof import('@claude-code/mcp-runtime/config.js')
           return getMcpConfigsByScope(scope as any).errors
         } catch {
           return []
