@@ -53,12 +53,21 @@ const envFeatures = Object.keys(process.env)
   .map(k => k.replace('FEATURE_', ''))
 const features = [...new Set([...DEFAULT_BUILD_FEATURES, ...envFeatures])]
 
-// Step 2: Bundle with splitting
+// Step 2: Bundle as a single file. We previously used `splitting: true` which
+// fanned 510+ chunk-*.js files into dist/ — that was useful for lazy loading
+// of feature-gated paths but produced an unreadable 35MB tree of opaque
+// chunks. With `splitting: false` we get one self-contained `dist/cli.js`
+// (~13MB minified, ~25MB unminified). Cold-start penalty is negligible
+// because Bun's parser is fast and the whole bundle is mmap'd. Build the
+// standalone executable separately via `bun run build:standalone` (uses
+// `bun build --compile`), which is the right deliverable for "single-file
+// distribution that doesn't need Node/Bun installed".
 const result = await Bun.build({
   entrypoints: ['src/entrypoints/cli.tsx'],
   outdir,
   target: 'bun',
-  splitting: true,
+  splitting: false,
+  minify: process.env.BUILD_MINIFY !== 'false',
   define: getMacroDefines(),
   features,
 })
