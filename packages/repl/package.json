@@ -615,6 +615,11 @@
     "./dialogLaunchers/dialogLaunchers.js": "./src/dialogLaunchers/dialogLaunchers.tsx",
     "./costHook/costHook.js": "./src/costHook/costHook.ts",
     "./highlight/highlightMatch.js": "./src/highlight/highlightMatch.tsx",
-    "./screens/repl/useTranscriptFreeze.js": "./src/screens/repl/useTranscriptFreeze.ts"
+    "./screens/repl/useTranscriptFreeze.js": "./src/screens/repl/useTranscriptFreeze.ts",
+    "./screens/repl/useFeedbackSurveyAutoIssue.js": "./src/screens/repl/useFeedbackSurveyAutoIssue.ts",
+    "./screens/repl/useAutoRunIssueHandlers.js": "./src/screens/repl/useAutoRunIssueHandlers.ts",
+    "./screens/repl/useHandleExit.js": "./src/screens/repl/useHandleExit.tsx",
+    "./screens/repl/useSurveyAndRateLimitHandlers.js": "./src/screens/repl/useSurveyAndRateLimitHandlers.ts",
+    "./commands/assistant/index.js": "./src/commands/assistant/index.ts"
   }
 }
