@@ -132,9 +132,11 @@ for (const v of graph.keys()) {
 }
 
 // Ratchet: count tightened from 44 → 20 after fixing detector false
-// positives (comment-stripping + type-only-import filtering). The
-// remaining 20 are real runtime cycles to be broken incrementally.
-const BUDGET = 20
+// positives (comment-stripping + type-only-import filtering); then to
+// 15 by extracting leaf modules (storage/fileEncoding,
+// memory/memoryEntrypoint, permission/permissionSourceTypes,
+// updater/platform). The remaining 15 are real runtime cycles.
+const BUDGET = 15
 
 // Diagnostic mode: print cycles to stdout when --list flag is passed
 if (process.argv.includes('--list')) {
