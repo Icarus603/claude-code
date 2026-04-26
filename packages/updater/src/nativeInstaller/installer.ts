@@ -91,17 +91,13 @@ function getBaseDirectories() {
   const platform = getPlatform()
   const executableName = getBinaryName(platform)
 
+  // ccb shares Anthropic's XDG layout shape but under its own dir name —
+  // matches install.sh's `~/.local/share/ccb/versions/<version>` so the
+  // bootstrap installer and the in-app auto-updater write to the same place.
   return {
-    // Data directories (permanent storage)
-    versions: join(getXDGDataHome(), 'claude', 'versions'),
-
-    // Cache directories (can be deleted)
-    staging: join(getXDGCacheHome(), 'claude', 'staging'),
-
-    // State directories
-    locks: join(getXDGStateHome(), 'claude', 'locks'),
-
-    // User bin
+    versions: join(getXDGDataHome(), 'ccb', 'versions'),
+    staging: join(getXDGCacheHome(), 'ccb', 'staging'),
+    locks: join(getXDGStateHome(), 'ccb', 'locks'),
     executable: join(getUserBinDir(), executableName),
   }
 }

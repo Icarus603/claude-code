@@ -151,6 +151,12 @@ async function main(): Promise<void> {
   } catch { /* already installed */ }
   enableConfigs()
 
+  // Dummy creds for adapter init (mock fetch returns the real responses).
+  // ANTHROPIC_API_KEY must be set BEFORE getProviderAdapter('firstParty')
+  // touches getAnthropicApiKeyWithSource() — that fn throws if no key is
+  // present and no OAuth token file descriptor is set, causing CI to
+  // fail when run on a fresh runner with no env (gh-#138 follow-up).
+  process.env.ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || 'provider-test'
   process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'provider-test'
   process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'provider-test'
   process.env.GEMINI_MODEL =

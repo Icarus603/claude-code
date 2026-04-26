@@ -103,6 +103,19 @@ download() {
   fi
 }
 
+# Like download() but silent + non-fatal on 404. Used for optional sidecar
+# files (.sha256). Returns 0 on success, non-zero if the file isn't there.
+download_quiet() {
+  local url="$1" dest="$2"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$url" -o "$dest" 2>/dev/null
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$url" -O "$dest" 2>/dev/null
+  else
+    return 1
+  fi
+}
+
 # Warn if the bin dir isn't on PATH (rare on modern setups but possible).
 check_path() {
   case ":$PATH:" in
@@ -144,6 +157,26 @@ main() {
   # the network drops mid-download.
   local tmp="$versioned_path.partial"
   download "$url" "$tmp"
+
+  # Verify SHA256 if a sibling .sha256 was published. Releases since
+  # the auto-updater landing point all carry these; older releases
+  # fall through silently (TLS still pinned the wire).
+  local sha_url="${url}.sha256"
+  local sha_tmp="$tmp.sha256"
+  if download_quiet "$sha_url" "$sha_tmp"; then
+    local expected actual
+    expected="$(awk '{print $1; exit}' "$sha_tmp")"
+    actual="$(shasum -a 256 "$tmp" | awk '{print $1}')"
+    if [ "$expected" != "$actual" ]; then
+      rm -f "$tmp" "$sha_tmp"
+      fatal "checksum mismatch: expected $expected, got $actual"
+    fi
+    rm -f "$sha_tmp"
+    ok "checksum verified"
+  else
+    warn "no .sha256 published for this release — skipping content verify"
+  fi
+
   chmod +x "$tmp"
   mv -f "$tmp" "$versioned_path"
 
