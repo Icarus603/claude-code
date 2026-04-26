@@ -1006,7 +1006,12 @@ const [_getExecuteShellCommandsInPrompt, setExecuteShellCommandsInPromptFn_] =
   })
 const [_getRipGrep, setRipGrepFn_] = makeSetter(async (..._args: unknown[]): Promise<string> => '')
 const [_getUnzipFile, setUnzipFileFn_] = makeSetter(async (_zipPath: string, _destDir: string): Promise<void> => {})
-export function extractDescriptionFromMarkdown(text: string): string { return _getExtractDescriptionFromMarkdown()(text) }
+export function extractDescriptionFromMarkdown(text: string, defaultDescription?: string): string {
+  // Forward optional second arg to canonical (was dropped, defaulting to
+  // 'Custom item' for every plugin without an explicit description —
+  // same root cause as executeShellCommandsInPrompt arg-drop bug).
+  return _getExtractDescriptionFromMarkdown()(text, defaultDescription)
+}
 export function expandTilde(p: string): string { return _getExpandTilde()(p) }
 export function expandEnvVarsInString(s: string): ExpandEnvVarsResult { return _getExpandEnvVarsInString()(s) }
 export function executeShellCommandsInPrompt(
@@ -1066,7 +1071,38 @@ const [_getParseYaml, setParseYamlFn_] = makeSetter((_s: string): unknown => nul
 const [_getParseArgumentNames, setParseArgumentNamesFn_] = makeSetter((_s: string): string[] => [])
 const [_getParseUserSpecifiedModel, setParseUserSpecifiedModelFn_] = makeSetter((_v: unknown): string | undefined => undefined)
 const [_getParseZipModes, setParseZipModesFn_] = makeSetter((_v: unknown): unknown => null)
-const [_getSubstituteArguments, setSubstituteArgumentsFn_] = makeSetter((s: string, _args: Record<string, string>): string => s)
+// V7 §3.2 — substituteArguments lazy-resolved from
+// command-runtime/argumentSubstitution. Default `(s, _) => s` was an
+// identity passthrough; every plugin slash command's $ARGUMENTS
+// placeholder was preserved literally, so shell scripts saw `$ARGUMENTS`
+// as a literal and rejected "No prompt provided".
+type SubstituteArgumentsFn = (
+  content: string,
+  args: string | undefined,
+  appendIfNoPlaceholder?: boolean,
+  argumentNames?: string[],
+) => string
+let _cachedSubstituteArguments: SubstituteArgumentsFn | null = null
+const [_getSubstituteArguments, setSubstituteArgumentsFn_] = makeSetter(
+  ((content, args, appendIfNoPlaceholder, argumentNames) => {
+    if (_cachedSubstituteArguments == null) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const mod = require('@claude-code/command-runtime/argumentSubstitution.js') as {
+          substituteArguments?: SubstituteArgumentsFn
+        }
+        if (typeof mod.substituteArguments === 'function') {
+          _cachedSubstituteArguments = mod.substituteArguments
+        }
+      } catch {
+        /* command-runtime not loadable — fall back to identity */
+      }
+    }
+    return _cachedSubstituteArguments
+      ? _cachedSubstituteArguments(content, args, appendIfNoPlaceholder, argumentNames)
+      : content
+  }) as SubstituteArgumentsFn,
+)
 const [_getParseAndValidateManifestFromBytes, setParseAndValidateManifestFromBytesFn_] = makeSetter(async (_bytes: Uint8Array): Promise<unknown> => null)
 export function parseFrontmatter(t: string, src?: string): ParsedMarkdown { return _getParseFrontmatter()(t, src) }
 export function parseAgentToolsFromFrontmatter(v: unknown): string[] { return _getParseAgentToolsFromFrontmatter()(v) }
@@ -1079,7 +1115,18 @@ export function parseYaml(s: string): unknown { return _getParseYaml()(s) }
 export function parseArgumentNames(s: string): string[] { return _getParseArgumentNames()(s) }
 export function parseUserSpecifiedModel(v: unknown): string | undefined { return _getParseUserSpecifiedModel()(v) }
 export function parseZipModes(v: unknown): unknown { return _getParseZipModes()(v) }
-export function substituteArguments(s: string, args: Record<string, string>): string { return _getSubstituteArguments()(s, args) }
+export function substituteArguments(
+  content: string,
+  args: string | undefined,
+  appendIfNoPlaceholder?: boolean,
+  argumentNames?: string[],
+): string {
+  // Forward ALL 4 args (was 2). Caller in loadPluginCommands.ts passes
+  // (content, args, true, argumentNames). Dropping the last 2 had two
+  // user-visible effects: $ARGUMENTS placeholder stayed literal (shell
+  // scripts crashed), and named-arg substitution silently no-op'd.
+  return _getSubstituteArguments()(content, args, appendIfNoPlaceholder, argumentNames)
+}
 export function parseAndValidateManifestFromBytes(bytes: Uint8Array): Promise<unknown> { return _getParseAndValidateManifestFromBytes()(bytes) }
 export const setParseFrontmatterFn = setParseFrontmatterFn_
 export const setParseAgentToolsFromFrontmatterFn = setParseAgentToolsFromFrontmatterFn_
