@@ -84,33 +84,8 @@ export type SetupMessage = {
   type: 'path' | 'alias' | 'info' | 'error'
 }
 
-export function getPlatform(): string {
-  // Use env.platform which already handles platform detection and defaults to 'linux'
-  const os = env.platform
-
-  const arch =
-    process.arch === 'x64' ? 'x64' : process.arch === 'arm64' ? 'arm64' : null
-
-  if (!arch) {
-    const error = new Error(`Unsupported architecture: ${process.arch}`)
-    logForDebugging(
-      `Native installer does not support architecture: ${process.arch}`,
-      { level: 'error' },
-    )
-    throw error
-  }
-
-  // Check for musl on Linux and adjust platform accordingly
-  if (os === 'linux' && envDynamic.isMuslEnvironment()) {
-    return `linux-${arch}-musl`
-  }
-
-  return `${os}-${arch}`
-}
-
-export function getBinaryName(platform: string): string {
-  return platform.startsWith('win32') ? 'claude.exe' : 'claude'
-}
+export { getBinaryName, getPlatform } from './platform.js'
+import { getBinaryName, getPlatform } from './platform.js'
 
 function getBaseDirectories() {
   const platform = getPlatform()
