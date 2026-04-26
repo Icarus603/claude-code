@@ -6,6 +6,7 @@ import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/st
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '@anthropic/ink'
+import { useIsInsideModal } from '@anthropic/ink'
 import { applyColor, Box, Text, useInput, useTerminalFocus, useTheme, type Color, Byline, Divider, KeyboardShortcutHint } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { logEvent } from '@claude-code/local-observability'
@@ -182,6 +183,7 @@ export function LogSelector({
   onToggleAllProjects,
   onAgenticSearch,
 }: LogSelectorProps): React.ReactNode {
+  const insideModal = useIsInsideModal()
   const terminalSize = useTerminalSize()
   const columns = forceWidth === undefined ? terminalSize.columns : forceWidth
   const exitState = useExitOnCtrlCDWithKeybindings(onCancel)
@@ -1034,13 +1036,17 @@ export function LogSelector({
   }
 
   return (
-    <Box flexDirection="column" height={maxHeight - 1}>
-      <Box flexShrink={0}>
-        <Divider color="suggestion" />
-      </Box>
-      <Box flexShrink={0}>
-        <Text> </Text>
-      </Box>
+    <Box flexDirection="column" height={insideModal ? maxHeight : maxHeight - 1}>
+      {!insideModal && (
+        <>
+          <Box flexShrink={0}>
+            <Divider color="suggestion" />
+          </Box>
+          <Box flexShrink={0}>
+            <Text> </Text>
+          </Box>
+        </>
+      )}
 
       {hasTags ? (
         <TagTabs
