@@ -4,7 +4,7 @@ import type { Message } from '../messageShapes'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { AggregatedHookResult } from '../hooks.js'
 import type { HookCommand } from '@claude-code/config/types'
-import { isHookEqual } from '@claude-code/repl/hooksSettings.js'
+import { isHookEqual } from '@claude-code/repl/isHookEqual.js'
 
 type OnHookSuccess = (
   hook: HookCommand | FunctionHook,

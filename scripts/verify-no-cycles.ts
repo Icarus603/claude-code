@@ -146,7 +146,7 @@ for (const v of graph.keys()) {
 // storage/findGitRoot+parseGitRemote, permission/permissionRequestTypes
 // AND fixing the multi-line type-import strip in stripComments (3
 // phantom cycles eliminated). The remaining 9 are real runtime cycles.
-const BUDGET = 9
+const BUDGET = 8
 
 // Diagnostic mode: print cycles to stdout when --list flag is passed
 if (process.argv.includes('--list')) {
