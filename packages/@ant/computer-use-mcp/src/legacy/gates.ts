@@ -2,7 +2,7 @@ import type { CoordinateMode, CuSubGates } from '@ant/computer-use-mcp/types'
 
 import { getDynamicConfig_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getSubscriptionType } from '@claude-code/provider/authAlias.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 type ChicagoConfig = CuSubGates & {
   enabled: boolean

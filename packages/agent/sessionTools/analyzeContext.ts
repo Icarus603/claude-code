@@ -51,7 +51,7 @@ import { filterInjectedMemoryFiles, getMemoryFiles } from '@claude-code/storage/
 import { getContextWindowForModel } from '@claude-code/agent/context.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { normalizeMessagesForAPI } from '@claude-code/agent/messages.js'

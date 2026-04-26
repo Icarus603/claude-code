@@ -7,7 +7,7 @@ import { getRelativeMemoryPath } from '@claude-code/repl/components/memory/Memor
 import { Box, Link, Text } from '@anthropic/ink'
 import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'
 import { clearMemoryFileCaches, getMemoryFiles } from '@claude-code/storage/claudemd.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { editFileInEditor } from '@claude-code/repl/promptEditor.js'

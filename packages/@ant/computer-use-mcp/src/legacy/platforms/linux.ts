@@ -11,7 +11,7 @@
  * so we pipe through ImageMagick `convert` to produce JPEG.
  */
 
-import type { Platform } from 'src/utils/computerUse/platforms/index.js'
+import type { Platform } from '@ant/computer-use-mcp/legacy/platforms/index.js'
 import type {
   InputPlatform,
   ScreenshotPlatform,
@@ -22,7 +22,7 @@ import type {
   DisplayInfo,
   InstalledApp,
   FrontmostAppInfo,
-} from 'src/utils/computerUse/platforms/types.js'
+} from '@ant/computer-use-mcp/legacy/platforms/types.js'
 
 // ---------------------------------------------------------------------------
 // Shell helpers

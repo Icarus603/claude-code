@@ -12,7 +12,7 @@
  * to keep token count low (~200-500 tokens for typical windows).
  */
 
-import { validateHwnd, ps } from 'src/utils/computerUse/win32/shared.js'
+import { validateHwnd, ps } from '@ant/computer-use-mcp/legacy/win32/shared.js'
 
 export interface AccessibilityNode {
   role: string // Button, Edit, MenuItem, Link, Text, CheckBox, etc.

@@ -9,9 +9,9 @@ import { homedir } from 'os'
 import { enableConfigs } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { shutdownEventLoggers } from '@claude-code/local-observability/compat'
-import { filterAppsForDescription } from 'src/utils/computerUse/appNames.js'
-import { getChicagoCoordinateMode } from 'src/utils/computerUse/gates.js'
-import { getComputerUseHostAdapter } from 'src/utils/computerUse/hostAdapter.js'
+import { filterAppsForDescription } from '@ant/computer-use-mcp/legacy/appNames.js'
+import { getChicagoCoordinateMode } from '@ant/computer-use-mcp/legacy/gates.js'
+import { getComputerUseHostAdapter } from '@ant/computer-use-mcp/legacy/hostAdapter.js'
 
 const APP_ENUM_TIMEOUT_MS = 1000
 

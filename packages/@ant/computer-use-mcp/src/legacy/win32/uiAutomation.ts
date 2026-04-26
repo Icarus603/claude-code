@@ -5,7 +5,7 @@
  * value setting, and hit-testing via PowerShell + System.Windows.Automation.
  */
 
-import { ps } from 'src/utils/computerUse/win32/shared.js'
+import { ps } from '@ant/computer-use-mcp/legacy/win32/shared.js'
 
 export interface UIElement {
   name: string

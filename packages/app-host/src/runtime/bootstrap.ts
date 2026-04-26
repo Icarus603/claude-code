@@ -6,6 +6,17 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getGlobalClaudeFile } from '@claude-code/config/env/paths'
 import { findCanonicalGitRoot } from '@claude-code/storage/git.js'
+import { setCwdFn, setDjb2HashFn } from '@claude-code/storage/cache-paths'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { djb2Hash } from '@claude-code/config/hash'
+
+// Wire storage cache-paths to host-aware cwd + hash before any consumer touches
+// CACHE_PATHS. Previously lived in src/utils/cachePaths.ts (deleted in #136
+// follow-up); moved here so the side-effect runs on every host bootstrap.
+// eslint-disable-next-line custom-rules/no-top-level-side-effects
+setCwdFn(() => getFsImplementation().cwd())
+// eslint-disable-next-line custom-rules/no-top-level-side-effects
+setDjb2HashFn(djb2Hash)
 import {
   buildAgentHostExtraBindings,
   buildMemoryHostExtraBindings,

@@ -1,5 +1,5 @@
 import type { Command } from '@claude-code/command-runtime/runtime'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { readEnv } from '@claude-code/config/env/utils'
 
 const compact = {

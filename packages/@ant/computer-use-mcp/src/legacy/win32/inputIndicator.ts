@@ -15,7 +15,7 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import { validateHwnd, getTmpDir } from 'src/utils/computerUse/win32/shared.js'
+import { validateHwnd, getTmpDir } from '@ant/computer-use-mcp/legacy/win32/shared.js'
 
 const INDICATOR_WIDTH = 350
 const INDICATOR_HEIGHT = 28

@@ -564,7 +564,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     cleanupComputerUseAfterTurn: (toolUseContext: unknown) => {
       try {
-        return require('src/utils/computerUse/cleanup.js').cleanupComputerUseAfterTurn(toolUseContext)
+        return require('@ant/computer-use-mcp/legacy/cleanup.js').cleanupComputerUseAfterTurn(toolUseContext)
       } catch {
         return Promise.resolve()
       }
@@ -598,7 +598,7 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     getOriginalCwd: () => { try { return require('src/services/bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
     getSessionId: () => { try { return require('src/services/bootstrap/state.js').getSessionId() } catch { return 'unknown' } },
     getCwd: () => { try { return require('@claude-code/app-host/bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
-    getConfigHomeDir: () => { try { return require('src/utils/envUtils.js').getClaudeConfigHomeDir() } catch { return '' } },
+    getConfigHomeDir: () => { try { return require('@claude-code/config/env/utils').getClaudeConfigHomeDir() } catch { return '' } },
     getFsImplementation: () => { try { return require('@claude-code/storage/fsOperations.js').getFsImplementation() } catch { return require('node:fs') } },
     getPathsForPermissionCheck: (...a: unknown[]) => { try { return require('@claude-code/storage/fsOperations.js').getPathsForPermissionCheck(...a) } catch { return [] } },
     containsPathTraversal: (p: string) => { try { return require('@claude-code/storage/path.js').containsPathTraversal(p) } catch { return false } },
@@ -629,7 +629,7 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     sanitizeToolNameForAnalytics: (name: string) => { try { return require('src/services/services/eventMetadata.js').sanitizeToolNameForAnalytics(name) } catch { return name } },
     clearClassifierChecking: () => { try { require('@claude-code/permission/classifierApprovals.js').clearClassifierChecking() } catch {} },
     setClassifierChecking: (v: boolean) => { try { require('@claude-code/permission/classifierApprovals.js').setClassifierChecking(v) } catch {} },
-    isInProtectedNamespace: () => { try { return require('src/utils/envUtils.js').isInProtectedNamespace() } catch { return false } },
+    isInProtectedNamespace: () => { try { return require('@claude-code/config/env/utils').isInProtectedNamespace() } catch { return false } },
     executePermissionRequestHooks: (...a: unknown[]) => { try { return require('@claude-code/agent/hooks.js').executePermissionRequestHooks(...a) } catch { return Promise.resolve(null) } },
     buildClassifierUnavailableMessage: () => { try { return require('@claude-code/agent/messages.js').buildClassifierUnavailableMessage() } catch { return '' } },
     buildYoloRejectionMessage: (...a: unknown[]) => { try { return require('@claude-code/agent/messages.js').buildYoloRejectionMessage(...a) } catch { return '' } },

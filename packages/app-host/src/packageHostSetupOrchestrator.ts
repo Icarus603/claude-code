@@ -93,7 +93,7 @@ export function installPackageHostBindings(
         sanitizeToolNameForAnalytics: (name: string) => { try { return require('@claude-code/agent/eventMetadata.js').sanitizeToolNameForAnalytics(name) } catch { return name } },
         clearClassifierChecking: () => { try { require('@claude-code/permission/classifierApprovals.js').clearClassifierChecking() } catch {} },
         setClassifierChecking: (v: boolean) => { try { require('@claude-code/permission/classifierApprovals.js').setClassifierChecking(v) } catch {} },
-        isInProtectedNamespace: () => { try { return require('src/utils/envUtils.js').isInProtectedNamespace() } catch { return false } },
+        isInProtectedNamespace: () => { try { return require('@claude-code/config/env/utils').isInProtectedNamespace() } catch { return false } },
         executePermissionRequestHooks: (...a: unknown[]) => { try { return require('@claude-code/agent/hooks.js').executePermissionRequestHooks(...a) } catch { return Promise.resolve(null) } },
         buildClassifierUnavailableMessage: () => { try { return require('@claude-code/agent/messages.js').buildClassifierUnavailableMessage() } catch { return '' } },
         buildYoloRejectionMessage: (...a: unknown[]) => { try { return require('@claude-code/agent/messages.js').buildYoloRejectionMessage(...a) } catch { return '' } },
@@ -737,7 +737,7 @@ export function installPackageHostBindings(
         },
         cleanupComputerUseAfterTurn: (toolUseContext: unknown) => {
           try {
-            return require('src/utils/computerUse/cleanup.js').cleanupComputerUseAfterTurn(toolUseContext)
+            return require('@ant/computer-use-mcp/legacy/cleanup.js').cleanupComputerUseAfterTurn(toolUseContext)
           } catch {
             return Promise.resolve()
           }

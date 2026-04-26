@@ -1,7 +1,7 @@
 import { mock, describe, expect, test } from "bun:test";
 
 // Mock commands.ts to cut the heavy shell/prefix.ts → analytics → api chain
-mock.module("src/utils/bash/commands.ts", () => ({
+mock.module("@claude-code/shell/bash/commands.js", () => ({
   splitCommand_DEPRECATED: (cmd: string) =>
     cmd.split(/\s*(?:[|;&]+)\s*/).filter(Boolean),
   quote: (args: string[]) => args.join(" "),

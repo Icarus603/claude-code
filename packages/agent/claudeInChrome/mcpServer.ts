@@ -18,7 +18,7 @@ import {
 import { getClaudeAIOAuthTokens } from '@claude-code/provider/authAlias.js'
 import { enableConfigs, getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { sideQuery } from '@claude-code/agent/sideQuery.js'
 import { getAllSocketPaths, getSecureSocketPath } from '@claude-code/agent/claudeInChrome/common.js'
 import { readEnv } from '@claude-code/config/env/utils'

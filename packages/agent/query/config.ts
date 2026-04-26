@@ -2,7 +2,7 @@ import { readEnv } from '@claude-code/config/env/utils'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { SessionId } from '@claude-code/repl/replTypes/ids.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 
 // -- config
 

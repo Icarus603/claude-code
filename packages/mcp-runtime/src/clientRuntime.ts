@@ -267,12 +267,12 @@ const claudeInChromeToolRendering =
 // (@ant/computer-use-input + @ant/computer-use-swift). Runtime-gated by
 // GrowthBook tengu_malort_pedway (see gates.ts).
 const computerUseWrapper = feature('CHICAGO_MCP')
-  ? (): typeof import('src/utils/computerUse/wrapper.js') =>
-      require('src/utils/computerUse/wrapper.js')
+  ? (): typeof import('@ant/computer-use-mcp/legacy/wrapper.js') =>
+      require('@ant/computer-use-mcp/legacy/wrapper.js')
   : undefined
 const isComputerUseMCPServer = feature('CHICAGO_MCP')
   ? (
-      require('src/utils/computerUse/common.js') as typeof import('src/utils/computerUse/common.js')
+      require('@ant/computer-use-mcp/legacy/common.js') as typeof import('@ant/computer-use-mcp/legacy/common.js')
     ).isComputerUseMCPServer
   : undefined
 
@@ -656,7 +656,7 @@ export const connectToServer = memoize(
         // Chrome above. The package's CallTool handler is a stub; real
         // dispatch goes through wrapper.tsx's .call() override.
         const { createComputerUseMcpServerForCli } = await import(
-          'src/utils/computerUse/mcpServer.js'
+          '@ant/computer-use-mcp/legacy/mcpServer.js'
         )
         const { createLinkedTransportPair } = await import(
           './InProcessTransport.js'

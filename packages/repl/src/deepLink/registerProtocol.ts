@@ -23,7 +23,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { getInitialSettings } from '@claude-code/config/settings'

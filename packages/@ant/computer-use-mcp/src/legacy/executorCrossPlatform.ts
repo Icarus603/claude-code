@@ -36,10 +36,10 @@ import type {
 
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { sleep } from '@claude-code/config/sleep'
-import { CLI_CU_CAPABILITIES, CLI_HOST_BUNDLE_ID } from 'src/utils/computerUse/common.js'
-import { validateHwnd } from 'src/utils/computerUse/win32/shared.js'
-import { loadPlatform } from 'src/utils/computerUse/platforms/index.js'
-import type { Platform } from 'src/utils/computerUse/platforms/index.js'
+import { CLI_CU_CAPABILITIES, CLI_HOST_BUNDLE_ID } from '@ant/computer-use-mcp/legacy/common.js'
+import { validateHwnd } from '@ant/computer-use-mcp/legacy/win32/shared.js'
+import { loadPlatform } from '@ant/computer-use-mcp/legacy/platforms/index.js'
+import type { Platform } from '@ant/computer-use-mcp/legacy/platforms/index.js'
 
 // ---------------------------------------------------------------------------
 // Helpers for HWND-bound mode
@@ -50,7 +50,7 @@ function getBoundHwndStr(): string | null {
   if (process.platform !== 'win32') return null
   try {
     const { getBoundHwnd } =
-      require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+      require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
     return getBoundHwnd()
   } catch {
     return null
@@ -71,7 +71,7 @@ function getNonClientOffset(): { dx: number; dy: number } {
   if (process.platform !== 'win32') return { dx: 0, dy: 0 }
   try {
     const { getBoundHwnd } =
-      require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+      require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
     const hwnd = getBoundHwnd()
     if (!hwnd) return { dx: 0, dy: 0 }
 
@@ -127,7 +127,7 @@ function getCachedNcOffset(): { dx: number; dy: number } {
   if (process.platform !== 'win32') return { dx: 0, dy: 0 }
   try {
     const { getBoundHwnd } =
-      require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+      require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
     const hwnd = getBoundHwnd()
     if (!hwnd) return { dx: 0, dy: 0 }
     if (_ncOffset && _ncOffsetHwnd === hwnd) return _ncOffset
@@ -147,11 +147,11 @@ function getAccessibilityText(): string | undefined {
   if (process.platform !== 'win32' || !isBound()) return undefined
   try {
     const { getBoundHwnd } =
-      require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+      require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
     const hwnd = getBoundHwnd()
     if (!hwnd) return undefined
     const { captureAccessibilitySnapshot } =
-      require('src/utils/computerUse/win32/accessibilitySnapshot.js') as typeof import('src/utils/computerUse/win32/accessibilitySnapshot.js')
+      require('@ant/computer-use-mcp/legacy/win32/accessibilitySnapshot.js') as typeof import('@ant/computer-use-mcp/legacy/win32/accessibilitySnapshot.js')
     const snap = captureAccessibilitySnapshot(hwnd)
     if (!snap || !snap.text) return undefined
     return snap.text
@@ -390,11 +390,11 @@ export function createCrossPlatformExecutor(opts: {
     async mouseDown(): Promise<void> {
       if (isBound() && process.platform === 'win32') {
         const { getBoundHwnd } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
         const hwnd = getBoundHwnd()
         if (hwnd) {
           const { sendMouseDown } =
-            require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+            require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
           const pos = await platform.input.mouseLocation()
           sendMouseDown(hwnd, pos.x, pos.y)
           return
@@ -424,11 +424,11 @@ $i = New-Object MDown+INPUT; $i.type=0; $i.mi.dwFlags=0x0002; [MDown]::SendInput
     async mouseUp(): Promise<void> {
       if (isBound() && process.platform === 'win32') {
         const { getBoundHwnd } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
         const hwnd = getBoundHwnd()
         if (hwnd) {
           const { sendMouseUp } =
-            require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+            require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
           const pos = await platform.input.mouseLocation()
           sendMouseUp(hwnd, pos.x, pos.y)
           return
@@ -465,11 +465,11 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
     ): Promise<void> {
       if (isBound() && process.platform === 'win32') {
         const { getBoundHwnd } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
         const hwnd = getBoundHwnd()
         if (hwnd) {
           const { sendMouseDown, sendMouseMove, sendMouseUp } =
-            require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+            require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
           const nc = getCachedNcOffset()
           if (from) {
             const fx = Math.round(from.x) - nc.dx
@@ -580,9 +580,9 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
       if (process.platform !== 'win32') return null
       try {
         const { listWindows: enumWindows } =
-          require('src/utils/computerUse/win32/windowEnum.js') as typeof import('src/utils/computerUse/win32/windowEnum.js')
+          require('@ant/computer-use-mcp/legacy/win32/windowEnum.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowEnum.js')
         const { bindWindow } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
 
         const agentCmd: Record<string, string> = {
           claude: 'claude',
@@ -651,9 +651,9 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
     async bindToWindow(query: { hwnd?: string; title?: string; pid?: number }) {
       if (process.platform !== 'win32') return null
       const { bindWindow } =
-        require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+        require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
       const { listWindows: enumWindows } =
-        require('src/utils/computerUse/win32/windowEnum.js') as typeof import('src/utils/computerUse/win32/windowEnum.js')
+        require('@ant/computer-use-mcp/legacy/win32/windowEnum.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowEnum.js')
       const windows = enumWindows()
 
       let target: { hwnd: string; pid: number; title: string } | undefined
@@ -676,7 +676,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
     async unbindFromWindow() {
       if (process.platform !== 'win32') return
       const { unbindWindow } =
-        require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+        require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
       unbindWindow()
       _ncOffset = null
       _ncOffsetHwnd = null
@@ -689,11 +689,11 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
     async getBindingStatus() {
       if (process.platform !== 'win32') return null
       const { getBoundHwnd } =
-        require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+        require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
       const hwnd = getBoundHwnd()
       if (!hwnd) return { bound: false }
       const { listWindows: enumWindows } =
-        require('src/utils/computerUse/win32/windowEnum.js') as typeof import('src/utils/computerUse/win32/windowEnum.js')
+        require('@ant/computer-use-mcp/legacy/win32/windowEnum.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowEnum.js')
       const windows = enumWindows()
       const win = windows.find(w => w.hwnd === hwnd)
       const rect = platform.windowManagement?.getWindowRect() ?? undefined
@@ -709,7 +709,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
     async listVisibleWindows() {
       if (process.platform !== 'win32') return []
       const { listWindows: enumWindows } =
-        require('src/utils/computerUse/win32/windowEnum.js') as typeof import('src/utils/computerUse/win32/windowEnum.js')
+        require('@ant/computer-use-mcp/legacy/win32/windowEnum.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowEnum.js')
       return enumWindows()
     },
 
@@ -721,7 +721,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
       if (process.platform !== 'win32') return { active: false }
       try {
         const ind =
-          require('src/utils/computerUse/win32/inputIndicator.js') as typeof import('src/utils/computerUse/win32/inputIndicator.js')
+          require('@ant/computer-use-mcp/legacy/win32/inputIndicator.js') as typeof import('@ant/computer-use-mcp/legacy/win32/inputIndicator.js')
         if (action === 'show' && message) {
           ind.updateIndicator(message)
           return { active: true, message }
@@ -752,9 +752,9 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
         const hwnd = getBoundHwndStr()
         if (!hwnd) return false
         const wm =
-          require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+          require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
         const { VK_MAP } =
-          require('src/utils/computerUse/win32/shared.js') as typeof import('src/utils/computerUse/win32/shared.js')
+          require('@ant/computer-use-mcp/legacy/win32/shared.js') as typeof import('@ant/computer-use-mcp/legacy/win32/shared.js')
         const repeat = opts.repeat ?? 1
 
         for (let r = 0; r < repeat; r++) {
@@ -843,9 +843,9 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
         const hwnd = getBoundHwndStr()
         if (!hwnd) return false
         const wm =
-          require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+          require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
         const vc =
-          require('src/utils/computerUse/win32/virtualCursor.js') as typeof import('src/utils/computerUse/win32/virtualCursor.js')
+          require('@ant/computer-use-mcp/legacy/win32/virtualCursor.js') as typeof import('@ant/computer-use-mcp/legacy/win32/virtualCursor.js')
         const x = Math.round(opts.x)
         const y = Math.round(opts.y)
 
@@ -909,7 +909,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
         // Try Python Bridge first (via bridgeClient directly)
         try {
           const bridge =
-            require('src/utils/computerUse/win32/bridgeClient.js') as typeof import('src/utils/computerUse/win32/bridgeClient.js')
+            require('@ant/computer-use-mcp/legacy/win32/bridgeClient.js') as typeof import('@ant/computer-use-mcp/legacy/win32/bridgeClient.js')
           const result = bridge.callSync<boolean>('send_mouse_wheel', {
             hwnd,
             x: Math.round(x),
@@ -921,7 +921,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
         } catch {}
         // Fallback: windowMessage.ts (PowerShell)
         const { sendMouseWheel } =
-          require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+          require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
         return sendMouseWheel(
           hwnd,
           Math.round(x),
@@ -939,7 +939,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
       if (process.platform !== 'win32' || !isBound()) return false
       try {
         const { getBoundHwnd } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
         const hwnd = getBoundHwnd()
         if (!hwnd) return false
         // Focus: restore if minimized, bring to foreground
@@ -948,7 +948,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
         }
         // Click to ensure keyboard focus inside the window
         const { sendClick } =
-          require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+          require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
         if (clickX !== undefined && clickY !== undefined) {
           sendClick(hwnd, clickX, clickY, 'left')
         } else {
@@ -976,11 +976,11 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
       if (process.platform !== 'win32' || !isBound()) return false
       try {
         const { getBoundHwnd } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
         const hwnd = getBoundHwnd()
         if (!hwnd) return false
         const wm =
-          require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+          require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
 
         const VK_RETURN = 0x0d
         const VK_ESCAPE = 0x1b
@@ -1046,11 +1046,11 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
       if (process.platform !== 'win32' || !isBound()) return false
       try {
         const { getBoundHwnd } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
         const hwnd = getBoundHwnd()
         if (!hwnd) return false
         const { captureAccessibilitySnapshot, findNodeInSnapshot } =
-          require('src/utils/computerUse/win32/accessibilitySnapshot.js') as typeof import('src/utils/computerUse/win32/accessibilitySnapshot.js')
+          require('@ant/computer-use-mcp/legacy/win32/accessibilitySnapshot.js') as typeof import('@ant/computer-use-mcp/legacy/win32/accessibilitySnapshot.js')
         const snap = captureAccessibilitySnapshot(hwnd)
         if (!snap) return false
         const node = findNodeInSnapshot(snap.nodes, query)
@@ -1058,9 +1058,9 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
 
         // Try InvokePattern first (Button, MenuItem, Link)
         const { clickElement: uiaClick } =
-          require('src/utils/computerUse/win32/uiAutomation.js') as typeof import('src/utils/computerUse/win32/uiAutomation.js')
+          require('@ant/computer-use-mcp/legacy/win32/uiAutomation.js') as typeof import('@ant/computer-use-mcp/legacy/win32/uiAutomation.js')
         // Get window title for UIA lookup
-        const windows = require('src/utils/computerUse/win32/windowEnum.js').listWindows() as {
+        const windows = require('@ant/computer-use-mcp/legacy/win32/windowEnum.js').listWindows() as {
           hwnd: string
           title: string
         }[]
@@ -1075,8 +1075,8 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
         // Convert screen coords to client coords
         const nc = getCachedNcOffset()
         const { sendClick } =
-          require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
-        const editHwnd = require('src/utils/computerUse/win32/windowMessage.js').findEditChild(hwnd)
+          require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
+        const editHwnd = require('@ant/computer-use-mcp/legacy/win32/windowMessage.js').findEditChild(hwnd)
         sendClick(editHwnd ?? hwnd, cx - nc.dx, cy - nc.dy, 'left')
         return true
       } catch {
@@ -1091,19 +1091,19 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
       if (process.platform !== 'win32' || !isBound()) return false
       try {
         const { getBoundHwnd } =
-          require('src/utils/computerUse/platforms/win32.js') as typeof import('src/utils/computerUse/platforms/win32.js')
+          require('@ant/computer-use-mcp/legacy/platforms/win32.js') as typeof import('@ant/computer-use-mcp/legacy/platforms/win32.js')
         const hwnd = getBoundHwnd()
         if (!hwnd) return false
 
         // Try UIA ValuePattern directly
-        const windows = require('src/utils/computerUse/win32/windowEnum.js').listWindows() as {
+        const windows = require('@ant/computer-use-mcp/legacy/win32/windowEnum.js').listWindows() as {
           hwnd: string
           title: string
         }[]
         const win = windows.find((w: any) => w.hwnd === hwnd)
         if (win) {
           const { setValue, findElement } =
-            require('src/utils/computerUse/win32/uiAutomation.js') as typeof import('src/utils/computerUse/win32/uiAutomation.js')
+            require('@ant/computer-use-mcp/legacy/win32/uiAutomation.js') as typeof import('@ant/computer-use-mcp/legacy/win32/uiAutomation.js')
           // Try by automationId first, then by name+role
           if (query.automationId) {
             if (setValue(win.title, query.automationId, text)) return true
@@ -1118,7 +1118,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
 
         // Fallback: find the element, click it, then sendText
         const { captureAccessibilitySnapshot, findNodeInSnapshot } =
-          require('src/utils/computerUse/win32/accessibilitySnapshot.js') as typeof import('src/utils/computerUse/win32/accessibilitySnapshot.js')
+          require('@ant/computer-use-mcp/legacy/win32/accessibilitySnapshot.js') as typeof import('@ant/computer-use-mcp/legacy/win32/accessibilitySnapshot.js')
         const snap = captureAccessibilitySnapshot(hwnd)
         if (!snap) return false
         const node = findNodeInSnapshot(snap.nodes, query)
@@ -1129,7 +1129,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
         const cx = node.bounds.x + Math.round(node.bounds.w / 2) - nc.dx
         const cy = node.bounds.y + Math.round(node.bounds.h / 2) - nc.dy
         const { sendClick, sendText } =
-          require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js')
+          require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js')
         sendClick(hwnd, cx, cy, 'left')
         await sleep(50)
         return sendText(hwnd, text)

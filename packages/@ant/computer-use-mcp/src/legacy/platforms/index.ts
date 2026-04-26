@@ -5,7 +5,7 @@
  * Each backend implements the same unified interface.
  */
 
-import type { InputPlatform, ScreenshotPlatform, DisplayPlatform, AppsPlatform, WindowManagementPlatform } from 'src/utils/computerUse/platforms/types.js'
+import type { InputPlatform, ScreenshotPlatform, DisplayPlatform, AppsPlatform, WindowManagementPlatform } from '@ant/computer-use-mcp/legacy/platforms/types.js'
 
 export interface Platform {
   input: InputPlatform
@@ -22,13 +22,13 @@ export function loadPlatform(): Platform {
 
   switch (process.platform) {
     case 'darwin':
-      cached = require('src/utils/computerUse/platforms/darwin.js').platform
+      cached = require('@ant/computer-use-mcp/legacy/platforms/darwin.js').platform
       break
     case 'win32':
-      cached = require('src/utils/computerUse/platforms/win32.js').platform
+      cached = require('@ant/computer-use-mcp/legacy/platforms/win32.js').platform
       break
     case 'linux':
-      cached = require('src/utils/computerUse/platforms/linux.js').platform
+      cached = require('@ant/computer-use-mcp/legacy/platforms/linux.js').platform
       break
     default:
       throw new Error(`Computer Use not supported on ${process.platform}`)
@@ -37,5 +37,5 @@ export function loadPlatform(): Platform {
   return cached!
 }
 
-export type { InputPlatform, ScreenshotPlatform, DisplayPlatform, AppsPlatform, WindowManagementPlatform } from 'src/utils/computerUse/platforms/types.js'
-export type { WindowHandle, ScreenshotResult, DisplayInfo, InstalledApp, FrontmostAppInfo, WindowAction } from 'src/utils/computerUse/platforms/types.js'
+export type { InputPlatform, ScreenshotPlatform, DisplayPlatform, AppsPlatform, WindowManagementPlatform } from '@ant/computer-use-mcp/legacy/platforms/types.js'
+export type { WindowHandle, ScreenshotResult, DisplayInfo, InstalledApp, FrontmostAppInfo, WindowAction } from '@ant/computer-use-mcp/legacy/platforms/types.js'

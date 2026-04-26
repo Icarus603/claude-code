@@ -11,7 +11,7 @@
  * No overlays, no polling, no separate processes, no z-order issues.
  */
 
-import { validateHwnd, ps } from 'src/utils/computerUse/win32/shared.js'
+import { validateHwnd, ps } from '@ant/computer-use-mcp/legacy/win32/shared.js'
 
 /**
  * Set green border on bound window via DWM.
