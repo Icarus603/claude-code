@@ -2,7 +2,7 @@ import { readFile } from 'fs/promises'
 import { getCommandRegistryHostBindings } from '@claude-code/command-runtime'
 import { getMcpRuntimeHostBindings } from '@claude-code/mcp-runtime'
 import '@claude-code/app-host/runtime/bootstrap.js'
-import '../src/commands.js'
+import '@claude-code/command-runtime/runtime'
 import '../src/services/mcp/client.js'
 
 async function main(): Promise<void> {

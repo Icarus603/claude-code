@@ -5,7 +5,7 @@ import {
   formatImageRef,
   parseReferences,
   expandPastedTextRefs,
-} from 'src/history'
+} from '@claude-code/repl/history.js'
 
 describe('getPastedTextRefNumLines', () => {
   test('returns 0 for single line (no newline)', () => {

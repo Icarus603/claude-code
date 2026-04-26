@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { useCallback, useEffect, useRef } from 'react'
 import { useInterval } from 'usehooks-ts'
-import 'src/tools.js'
+import '@claude-code/tool-registry/runtime'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
 import { TEAMMATE_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { useTerminalNotification } from '@anthropic/ink'

@@ -16,7 +16,7 @@ async function main(): Promise<void> {
     builtInCommandNames: builtInCommandNamesFromSrc,
     findCommand: findCommandFromSrc,
     getCommands: getCommandsFromSrc,
-  } = await import('../src/commands.js')
+  } = await import('@claude-code/command-runtime/runtime')
 
   const cwd = process.cwd()
   const [packageCommands, srcCommands] = await Promise.all([
