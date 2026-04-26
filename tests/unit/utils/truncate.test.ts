@@ -6,7 +6,7 @@ import {
   truncateToWidthNoEllipsis,
   truncate,
   wrapText,
-} from 'src/utils/truncate';
+} from '@claude-code/output/formatters/truncate.js';
 
 // ─── truncateToWidth ────────────────────────────────────────────────────
 

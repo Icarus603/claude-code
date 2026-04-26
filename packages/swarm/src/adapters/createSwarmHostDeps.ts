@@ -8,7 +8,7 @@ import {
 } from 'node:fs/promises'
 import type { ToolUseContext } from '../adapters/appRuntime.js'
 import {
-  CLAUDE_OPUS_4_6_CONFIG,
+  CLAUDE_OPUS_4_7_CONFIG,
   claimTask,
   getAgentName,
   getMainLoopModelOverride,
@@ -106,7 +106,7 @@ export function createSwarmHostDeps(
         return (
           context?.options?.mainLoopModel ??
           getMainLoopModelOverride() ??
-          CLAUDE_OPUS_4_6_CONFIG.name
+          CLAUDE_OPUS_4_7_CONFIG.name
         )
       },
       ...options.api,

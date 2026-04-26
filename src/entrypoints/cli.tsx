@@ -185,7 +185,7 @@ async function main(): Promise<void> {
     profileCheckpoint('cli_daemon_path')
     const { enableConfigs } = await import('@claude-code/config')
     enableConfigs()
-    const { initSinks } = await import('../utils/sinks.js')
+    const { initSinks } = await import('@claude-code/local-observability/sinks.js')
     initSinks()
     const { daemonMain } = await import('@claude-code/daemon/main.js')
     await daemonMain(args.slice(1))

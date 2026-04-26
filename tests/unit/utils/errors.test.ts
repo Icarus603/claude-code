@@ -16,7 +16,7 @@ import {
   shortErrorStack,
   isFsInaccessible,
   classifyAxiosError,
-} from 'src/utils/errors';
+} from '@claude-code/local-observability/errorHelpers.js';
 
 // ─── Error classes ──────────────────────────────────────────────────────
 

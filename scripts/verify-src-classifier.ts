@@ -70,10 +70,10 @@ for await (const f of new Glob('src/**/*.{ts,tsx}').scan('.')) {
 const BUDGETS: Record<Class, number> = {
   entrypoint: 3,
   facade: 35,
-  shim: 470,
+  shim: 465,
   test: 0,
   generated: 4,
-  other: 30,
+  other: 15,
 }
 
 const violations: string[] = []

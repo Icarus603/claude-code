@@ -69,7 +69,7 @@ export function runPostCompactCleanup(querySource?: QuerySource): void {
   // cacheUtils resets. See compactConversation() for full rationale.
   clearBetaTracingState()
   if (feature('COMMIT_ATTRIBUTION')) {
-    void import('src/utils/attributionHooks.js').then(m =>
+    void import('@claude-code/agent/hooks/attributionHooks.js').then(m =>
       m.sweepFileContentCache(),
     )
   }

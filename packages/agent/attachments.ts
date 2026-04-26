@@ -193,7 +193,7 @@ import {
   getUserMessageText,
   isThinkingMessage,
 } from '@claude-code/agent/messages.js'
-import { isHumanTurn } from 'src/utils/messagePredicates.js'
+import { isHumanTurn } from '@claude-code/agent/messagePredicates.js'
 import { isEnvTruthy, getClaudeConfigHomeDir,
   readEnv,
 } from '@claude-code/config/env/utils'

@@ -78,7 +78,7 @@ export let AGENT_COLORS: string[] = [
   'pink',
   'cyan',
 ]
-export let CLAUDE_OPUS_4_6_CONFIG: { name: string } = { name: '' }
+export let CLAUDE_OPUS_4_7_CONFIG: { name: string } = { name: '' }
 export let env: any = {}
 
 export let getSystemPrompt = missingBinding('getSystemPrompt') as any
@@ -298,7 +298,7 @@ export function installSwarmAppRuntime(bindings: RuntimeBindingMap): void {
   )
   STOPPED_DISPLAY_MS = bindValue('STOPPED_DISPLAY_MS')
   AGENT_COLORS = bindValue('AGENT_COLORS')
-  CLAUDE_OPUS_4_6_CONFIG = bindValue('CLAUDE_OPUS_4_6_CONFIG')
+  CLAUDE_OPUS_4_7_CONFIG = bindValue('CLAUDE_OPUS_4_7_CONFIG')
   env = bindValue('env')
 
   getSystemPrompt = bindFunction('getSystemPrompt')

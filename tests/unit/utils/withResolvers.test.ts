@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { withResolvers } from 'src/utils/withResolvers';
+import { withResolvers } from '@claude-code/local-observability/utils/withResolvers.js';
 
 describe("withResolvers", () => {
   test("returns object with promise, resolve, reject", () => {

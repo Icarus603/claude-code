@@ -39,6 +39,7 @@
     "./jobs/classifier.js": "./jobs/classifier.ts",
     "./proactive/index.js": "./proactive/index.ts",
     "./proactive/useProactive.js": "./proactive/useProactive.ts",
+    "./hooks/attributionHooks.js": "./hooks/attributionHooks.ts",
     "./messageShapes": "./messageShapes.ts",
     "./messageShapes.js": "./messageShapes.ts",
     "./idTypes": "./idTypes.ts",

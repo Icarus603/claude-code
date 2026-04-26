@@ -160,7 +160,7 @@ import {
   getRelativeSettingsFilePathForSource,
 } from '@claude-code/config/settings/core/settings.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { CLAUDE_OPUS_4_6_CONFIG } from '@claude-code/provider/model/configs.js'
+import { CLAUDE_OPUS_4_7_CONFIG } from '@claude-code/provider/model/configs.js'
 import { getAPIProvider } from '@claude-code/provider/model/providers.js'
 
 let installed = false
@@ -298,7 +298,7 @@ export function installSwarmHost(): void {
     getRelativeSettingsFilePathForSource,
     getCwd,
     saveCurrentProjectConfig,
-    CLAUDE_OPUS_4_6_CONFIG,
+    CLAUDE_OPUS_4_7_CONFIG,
     getAPIProvider,
   })
 

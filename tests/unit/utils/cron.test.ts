@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseCronExpression, computeNextCronRun, cronToHuman } from 'src/utils/cron';
+import { parseCronExpression, computeNextCronRun, cronToHuman } from '@claude-code/agent/scheduler';
 
 describe("parseCronExpression", () => {
   describe("valid expressions", () => {
