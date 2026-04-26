@@ -2,7 +2,7 @@ import * as React from 'react'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { Text } from '@anthropic/ink'
 import { truncateToWidth } from '@claude-code/output/formatters'
-import type { MCPToolResult } from 'src/utils/mcpValidation.js'
+import type { MCPToolResult } from '@claude-code/mcp-runtime/mcpValidation.js'
 
 type CuToolInput = Record<string, unknown> & {
   coordinate?: [number, number]
