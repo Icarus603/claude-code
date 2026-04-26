@@ -3,22 +3,15 @@ import { readFile } from 'fs/promises'
 const PROVIDER_APP_COMPAT_BUDGET = 70
 
 async function main(): Promise<void> {
-  const [claudeLegacyFacade, providerHostSetupRoot, providerHostSetupPkg, providerLegacy] =
+  // Root facade src/services/api/claudeLegacy.ts deleted in #137 (zero
+  // remaining consumers). The app-compat coupling budget is enforced
+  // directly against packages/provider/claudeLegacy.ts.
+  const [providerHostSetupRoot, providerHostSetupPkg, providerLegacy] =
     await Promise.all([
-      readFile('src/services/api/claudeLegacy.ts', 'utf8'),
       readFile('packages/app-host/src/providerHostSetup.ts', 'utf8'),
       readFile('packages/provider/src/providerHostSetup.ts', 'utf8'),
       readFile('packages/provider/src/claudeLegacy.ts', 'utf8'),
     ])
-
-  if (
-    claudeLegacyFacade.trim() !==
-    "export * from '@claude-code/provider/claudeLegacy'"
-  ) {
-    throw new Error(
-      'src/services/api/claudeLegacy.ts is no longer a pure provider facade',
-    )
-  }
 
   if (!providerHostSetupRoot.includes('installProviderRuntimeBindings(bindings)')) {
     throw new Error(

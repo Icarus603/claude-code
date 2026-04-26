@@ -6,7 +6,7 @@ import { getToolRegistryHostBindings } from '@claude-code/tool-registry'
 import '@claude-code/app-host/runtime/bootstrap.js'
 import '@claude-code/app-host/providerHostSetup.js'
 import '@claude-code/command-runtime/runtime'
-import '../src/services/mcp/client.js'
+import '@claude-code/mcp-runtime/clientRuntime.js'
 import { createRuntimeHandles } from '@claude-code/app-host/runtime/runtimeHandles.js'
 import { createInteractiveHost } from '@claude-code/app-host'
 

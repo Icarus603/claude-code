@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import {
   anthropicToolChoiceToGemini,
   anthropicToolsToGemini,
-} from 'src/services/api/gemini/convertTools.js'
+} from '@claude-code/provider/gemini/convertTools.js'
 
 describe('anthropicToolsToGemini', () => {
   test('converts basic tool to parametersJsonSchema', () => {
