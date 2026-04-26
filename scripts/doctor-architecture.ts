@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'package-readme',
+    layer: 'Cross-Cutting',
+    subsystem: 'documentation',
+    script: 'scripts/verify-package-readme.ts',
+    doc: 'V7 §3.2 — every package describes its responsibility in README.md',
+  },
+  {
     id: 'package-private-src',
     layer: 'Cross-Cutting',
     subsystem: 'encapsulation',
