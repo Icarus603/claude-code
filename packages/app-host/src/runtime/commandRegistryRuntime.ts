@@ -46,10 +46,9 @@ import status from '@claude-code/command-runtime/commands/status/index.js'
 import tasks from '@claude-code/agent/commands/tasks/index.js'
 import teleport from '@claude-code/command-runtime/stubs/stubCommand.js'
 /* eslint-disable @typescript-eslint/no-require-imports */
-const agentsPlatform =
-  process.env.USER_TYPE === 'ant'
-    ? require('src/commands/agents-platform/index.js').default
-    : null
+// agents-platform was an ant-internal command not present in this build; the
+// shim was deleted with the rest of src/commands/. Treat as absent.
+const agentsPlatform = null
 /* eslint-enable @typescript-eslint/no-require-imports */
 import securityReview from '@claude-code/agent/commands/security-review.js'
 import bughunter from '@claude-code/command-runtime/stubs/stubCommand.js'
@@ -60,10 +59,8 @@ import vim from '@claude-code/repl/commands/vim/index.js'
 import { feature } from 'bun:bundle'
 // Dead code elimination: conditional imports
 /* eslint-disable @typescript-eslint/no-require-imports */
-const proactive =
-  feature('PROACTIVE') || feature('KAIROS')
-    ? require('src/commands/proactive.js').default
-    : null
+// proactive command shim deleted — feature gates default false in this build.
+const proactive = null
 const briefCommand =
   feature('KAIROS') || feature('KAIROS_BRIEF')
     ? require('@claude-code/agent/commands/brief.js').default
@@ -81,9 +78,8 @@ const remoteControlServerCommand =
 const voiceCommand = feature('VOICE_MODE')
   ? require('@claude-code/command-runtime/commands/voice/index.js').default
   : null
-const forceSnip = feature('HISTORY_SNIP')
-  ? require('src/commands/force-snip.js').default
-  : null
+// force-snip shim deleted — HISTORY_SNIP feature absent in this build.
+const forceSnip = null
 const workflowsCmd = feature('WORKFLOW_SCRIPTS')
   ? (
       require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
@@ -99,13 +95,13 @@ const clearSkillIndexCache = feature('EXPERIMENTAL_SKILL_SEARCH')
       require('@claude-code/agent/skillSearch/localSearch.js') as typeof import('@claude-code/agent/skillSearch/localSearch.js')
     ).clearSkillIndexCache
   : null
-const subscribePr = feature('KAIROS_GITHUB_WEBHOOKS')
-  ? require('src/commands/subscribe-pr.js').default
-  : null
+// subscribe-pr shim deleted — KAIROS_GITHUB_WEBHOOKS feature absent.
+const subscribePr = null
 const ultraplan = feature('ULTRAPLAN')
   ? require('@claude-code/repl/ultraplan.js').default
   : null
-const torch = feature('TORCH') ? require('src/commands/torch.js').default : null
+// torch shim deleted — TORCH feature absent.
+const torch = null
 const peersCmd = feature('UDS_INBOX')
   ? (
       require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
