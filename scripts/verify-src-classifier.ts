@@ -73,7 +73,7 @@ const BUDGETS: Record<Class, number> = {
   shim: 465,
   test: 0,
   generated: 4,
-  other: 15,
+  other: 7,
 }
 
 const violations: string[] = []

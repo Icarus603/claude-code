@@ -2900,7 +2900,7 @@ export async function runModeDispatch(
 						m.startBackgroundHousekeeping(),
 					);
 					if (process.env.USER_TYPE === "ant") {
-						void import("src/utils/sdkHeapDumpMonitor.js").then((m) =>
+						void import("@claude-code/local-observability/sdkHeapDumpMonitor.js").then((m) =>
 							m.startSdkMemoryMonitor(),
 						);
 					}
@@ -3154,7 +3154,7 @@ export async function runModeDispatch(
 			// Import is dynamic + async to avoid adding startup latency.
 			const sessionUploaderPromise =
 				process.env.USER_TYPE === "ant"
-					? import("src/utils/sessionDataUploader.js")
+					? import("@claude-code/local-observability/sessionDataUploader.js")
 					: null;
 
 			// Defer session uploader resolution to the onTurnComplete callback to avoid

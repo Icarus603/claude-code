@@ -571,14 +571,14 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     shouldGenerateTaskSummary: () => {
       try {
-        return require('src/utils/taskSummary.js').shouldGenerateTaskSummary()
+        return require('@claude-code/agent/taskSummary.js').shouldGenerateTaskSummary()
       } catch {
         return false
       }
     },
     maybeGenerateTaskSummary: (params: unknown) => {
       try {
-        require('src/utils/taskSummary.js').maybeGenerateTaskSummary(params)
+        require('@claude-code/agent/taskSummary.js').maybeGenerateTaskSummary(params)
       } catch {}
     },
   }

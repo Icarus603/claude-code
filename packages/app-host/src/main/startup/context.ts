@@ -67,7 +67,7 @@ export function startDeferredPrefetches(): void {
 		void skillChangeDetector.initialize();
 	}
 	if (process.env.USER_TYPE === "ant") {
-		void import("src/utils/eventLoopStallDetector.js").then((m) =>
+		void import("@claude-code/local-observability/eventLoopStallDetector.js").then((m) =>
 			m.startEventLoopStallDetector(),
 		);
 	}

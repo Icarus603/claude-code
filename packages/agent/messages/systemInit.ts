@@ -88,7 +88,7 @@ export function buildSystemInitMessage(inputs: SystemInitInputs): SDKMessage {
   if (feature('UDS_INBOX')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     ;(initMessage as Record<string, unknown>).messaging_socket_path =
-      require('src/utils/udsMessaging.js').getUdsMessagingSocketPath()
+      require('@claude-code/local-observability/uds/udsMessaging.js').getUdsMessagingSocketPath()
     /* eslint-enable @typescript-eslint/no-require-imports */
   }
   initMessage.fast_mode_state = getFastModeState(inputs.model, inputs.fastMode)

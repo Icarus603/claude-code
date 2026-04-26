@@ -779,7 +779,7 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
         if (addr.scheme === 'uds') {
           /* eslint-disable @typescript-eslint/no-require-imports */
           const { sendToUdsSocket } =
-            require('src/utils/udsClient.js') as typeof import('src/utils/udsClient.js')
+            require('@claude-code/local-observability/uds/udsClient.js') as typeof import('@claude-code/local-observability/uds/udsClient.js')
           /* eslint-enable @typescript-eslint/no-require-imports */
           try {
             await sendToUdsSocket(addr.target, input.message)
