@@ -302,6 +302,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §3.2 / §8 — distinct cross-package deps per package may not grow',
   },
   {
+    id: 'schema-validation-mismatch',
+    layer: 'Cross-Cutting',
+    subsystem: 'tool contract safety',
+    script: 'scripts/verify-schema-validation-mismatch.ts',
+    doc: 'Tool fields marked .optional() in schema must not be rejected as required by validateInput',
+  },
+  {
     id: 'deps-setter-audit',
     layer: 'Cross-Cutting',
     subsystem: 'setter shim safety',
