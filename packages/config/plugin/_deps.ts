@@ -1009,7 +1009,16 @@ const [_getUnzipFile, setUnzipFileFn_] = makeSetter(async (_zipPath: string, _de
 export function extractDescriptionFromMarkdown(text: string): string { return _getExtractDescriptionFromMarkdown()(text) }
 export function expandTilde(p: string): string { return _getExpandTilde()(p) }
 export function expandEnvVarsInString(s: string): ExpandEnvVarsResult { return _getExpandEnvVarsInString()(s) }
-export function executeShellCommandsInPrompt(prompt: string): Promise<string> { return _getExecuteShellCommandsInPrompt()(prompt) }
+export function executeShellCommandsInPrompt(
+  prompt: string,
+  ...rest: unknown[]
+): Promise<string> {
+  // Forward ALL args — caller in loadPluginCommands.ts passes
+  // (prompt, context, slashCommandName, shell). Dropping rest meant
+  // context arrived undefined at canonical impl, then BashTool.call
+  // destructured undefined.abortController → user-facing crash.
+  return _getExecuteShellCommandsInPrompt()(prompt, ...rest)
+}
 export function ripGrep(...args: unknown[]): Promise<string> { return _getRipGrep()(...args) }
 export function unzipFile(zipPath: string, destDir: string): Promise<void> { return _getUnzipFile()(zipPath, destDir) }
 export const setExtractDescriptionFromMarkdownFn = setExtractDescriptionFromMarkdownFn_
