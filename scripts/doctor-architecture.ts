@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'tsc-errors',
+    layer: 'Cross-Cutting',
+    subsystem: 'type safety ratchet',
+    script: 'scripts/verify-tsc-errors.ts',
+    doc: 'V7 §19.2 — tsc error count may shrink but not grow',
+  },
+  {
     id: 'facade-budget',
     layer: 'Cross-Cutting',
     subsystem: 'src/ facade ratchet',
