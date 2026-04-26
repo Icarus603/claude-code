@@ -41,6 +41,7 @@
   "scripts": {
     "build": "bun run build.ts",
     "build:standalone": "bun build --compile --target=bun --outfile=dist/ccb packages/cli/src/entry/cli.tsx",
+    "build:platforms": "bun run scripts/build-platforms.ts",
     "dev": "bun run scripts/dev.ts",
     "dev:inspect": "bun run scripts/dev-debug.ts",
     "prepublishOnly": "bun run build",
