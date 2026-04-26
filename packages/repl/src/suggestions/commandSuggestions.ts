@@ -1,8 +1,8 @@
 import Fuse from 'fuse.js'
 import {
   type Command,
+  findCommand,
   formatDescriptionWithSource,
-  getCommand,
   getCommandName,
 } from '@claude-code/command-runtime/runtime'
 import type { SuggestionItem } from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
@@ -517,12 +517,16 @@ export function applyCommandSuggestion(
   setCursorOffset: (offset: number) => void,
   onSubmit: (value: string, isSubmittingSlashCommand?: boolean) => void,
 ): void {
-  // Extract command name and object from string or SuggestionItem metadata
+  // Extract command name and object from string or SuggestionItem metadata.
+  // Use findCommand (returns undefined) instead of getCommand (throws) — a
+  // throw inside this keystroke handler propagates up through React event
+  // dispatch and silently aborts the submit AFTER onInputChange has run, so
+  // the input box shows /status but Enter never fires (#138 user report).
   let commandName: string
   let commandObj: Command | undefined
   if (typeof suggestion === 'string') {
     commandName = suggestion
-    commandObj = shouldExecute ? getCommand(commandName, commands) : undefined
+    commandObj = shouldExecute ? findCommand(commandName, commands) : undefined
   } else {
     if (!isCommandMetadata(suggestion.metadata)) {
       return // Invalid suggestion, nothing to apply
@@ -536,9 +540,14 @@ export function applyCommandSuggestion(
   onInputChange(newInput)
   setCursorOffset(newInput.length)
 
-  // Execute command if requested and it takes no arguments
-  if (shouldExecute && commandObj) {
+  // Execute command if requested and it takes no arguments. If the command
+  // wasn't found in the registry (commandObj undefined), still submit — the
+  // downstream slash-command pipeline (processSlashCommand) does its own
+  // resolution and surfaces a proper "Unknown skill" error rather than
+  // silently dropping the input.
+  if (shouldExecute) {
     if (
+      !commandObj ||
       commandObj.type !== 'prompt' ||
       (commandObj.argNames ?? []).length === 0
     ) {

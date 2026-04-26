@@ -816,7 +816,29 @@ async function getMessagesForSlashCommand(
             .load()
             .then(mod => mod.call(onDone, { ...context, canUseTool }, args))
             .then(jsx => {
-              if (jsx == null) return
+              // Hang guard: if the command returned null/undefined AND never
+              // called onDone, this Promise would stay pending forever. The
+              // outer queue processor would sit in 'dispatching' with no JSX
+              // to render — exactly the "Enter pressed, only spinner, no
+              // page" symptom. Resolve with a no-op so the queue moves on
+              // and the input is unblocked.
+              if (jsx == null) {
+                if (!doneWasCalled) {
+                  doneWasCalled = true
+                  logError(
+                    new Error(
+                      `Slash command "${command.name}" returned null JSX without calling onDone — resolving to unblock the queue.`,
+                    ),
+                  )
+                  setToolJSX({
+                    jsx: null,
+                    shouldHidePromptInput: false,
+                    clearLocalJSX: true,
+                  })
+                  void resolve({ messages: [], shouldQuery: false, command })
+                }
+                return
+              }
               if (context.options.isNonInteractiveSession) {
                 void resolve({
                   messages: [],
