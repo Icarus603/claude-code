@@ -1,4 +1,4 @@
-import { exec } from '../src/utils/Shell.js'
+import { exec } from '@claude-code/shell/Shell.js'
 
 // Install minimal host bindings so exec() doesn't throw. The verifier runs
 // outside the full app bootstrap.

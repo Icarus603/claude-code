@@ -6,7 +6,7 @@
 //    key) in parallel — isRemoteManagedSettingsEligible() otherwise reads them
 //    sequentially via sync spawn inside applySafeConfigEnvironmentVariables()
 //    (~65ms on every macOS startup)
-import { profileCheckpoint } from "./utils/startupProfiler.js";
+import { profileCheckpoint } from "@claude-code/app-host/startup/startupProfiler.js";
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 profileCheckpoint("main_tsx_entry");

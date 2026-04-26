@@ -18,15 +18,15 @@ import {
 } from '@claude-code/tool-registry/Tool.js'
 import { getTools } from '@claude-code/tool-registry'
 import { createAbortController } from '@claude-code/agent/abortController.js'
-import { createFileStateCacheWithSizeLimit } from '../utils/fileStateCache.js'
-import { logError } from '../utils/log.js'
-import { createAssistantMessage } from '../utils/messages.js'
+import { createFileStateCacheWithSizeLimit } from '@claude-code/tool-registry/fileStateCache'
+import { logError } from '@claude-code/local-observability/log.js'
+import { createAssistantMessage } from '@claude-code/agent/messages.js'
 import { getMainLoopModel } from '../utils/model/model.js'
 import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'
-import { setCwd } from '../utils/Shell.js'
-import { jsonStringify } from '../utils/slowOperations.js'
-import { getErrorParts } from '../utils/toolErrors.js'
-import { zodToJsonSchema } from '../utils/zodToJsonSchema.js'
+import { setCwd } from '@claude-code/shell/Shell.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
+import { getErrorParts } from '@claude-code/tool-registry/toolErrors.js'
+import { zodToJsonSchema } from '@claude-code/agent/zodSchema/zodToJsonSchema.js'
 
 type ToolInput = Tool['inputSchema']
 type ToolOutput = Tool['outputSchema']

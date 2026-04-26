@@ -8,7 +8,7 @@ import {
   formatRelativeTime,
   formatRelativeTimeAgo,
   formatLogMetadata,
-} from 'src/utils/format';
+} from '@claude-code/output/formatters';
 
 describe("formatFileSize", () => {
   test("formats bytes", () => {
