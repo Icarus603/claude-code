@@ -1,98 +1,145 @@
-# Claude Code V5 by Icarus603
+# Claude Code Best
 
 [English](./README.md) | [簡體中文](./README.zh-CN.md)
 
-[![GitHub Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
-[![GitHub Contributors](https://img.shields.io/github/contributors/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/graphs/contributors)
-[![GitHub Issues](https://img.shields.io/github/issues/Icarus603/claude-code?style=flat-square&color=orange)](https://github.com/Icarus603/claude-code/issues)
-[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=blue)](https://github.com/Icarus603/claude-code/commits/main)
-[![Bun](https://img.shields.io/badge/runtime-Bun-black?style=flat-square&logo=bun)](https://bun.sh/)
+終端編程智慧體。單一 binary,命令為 `ccb`。Claude Code 的社群維護衍生版。
 
-> Which Claude do you like? The one we can actually maintain.
+與 Anthropic 無關。如需官方工具請見 <https://docs.anthropic.com/en/docs/claude-code/overview>。
 
-這個專案目前由 **Icarus603** 獨立維護，定位為一條可持續演進的 Claude Code 衍生主線。
+---
 
-它最初來自公開的 Claude Code 社群分支演化，我們保留必要的來源說明與授權資訊，但後續 roadmap、重構方向與品質標準將以本倉庫為準。
-
-- ✅ V4：測試補強、Auto Mode、Feature Flags
-- ✅ V5：Sentry / GrowthBook、自訂登入、OpenAI 相容、Web Search、Computer Use、Voice Mode、Bridge Mode
-- 🔮 V6：全面分包重構、模組邊界重整、建立獨立維護主線
-
-## 快速開始
-
-### 環境需求
-
-- [Bun](https://bun.sh/) >= 1.3.11
-- 可用的 Claude / Anthropic 相容 API 供應商設定
-
-### 安裝
+## 安裝
 
 ```bash
-bun install
+curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash
 ```
 
-### 執行
+裝在 `~/.local/share/ccb/versions/<version>`,並在 `~/.local/bin/ccb` 建立 symlink。不需要 Node、不需要 Bun、不需要任何套件管理器。
 
-```bash
-bun run dev
-bun run build
-```
-
-建置採用 code splitting（[`build.ts`](build.ts)），產物輸出到 `dist/`，入口為 `dist/cli.js`。
-
-### 首次登入設定
-
-首次執行後，在 REPL 中輸入 `/login` 進入設定畫面。選擇 **Anthropic Compatible** 可接上第三方 Anthropic API 相容服務，不需要 Anthropic 官方帳號。
-
-常見欄位如下：
-
-| 欄位 | 說明 | 範例 |
+| 變數 | 預設 | 用途 |
 |------|------|------|
-| Base URL | API 服務位址 | `https://api.example.com/v1` |
-| API Key | 驗證金鑰 | `sk-xxx` |
-| Haiku Model | 快速模型 ID | `claude-haiku-4-5-20251001` |
-| Sonnet Model | 平衡模型 ID | `claude-sonnet-4-6` |
-| Opus Model | 高效能模型 ID | `claude-opus-4-6` |
+| `CCB_VERSION` | `latest` | 鎖定特定 tag,例如 `v1.carus.000` |
+| `CCB_PREFIX`  | `~/.local` | 安裝根目錄(`/usr/local` 為系統範圍) |
 
-## Feature Flags
+升級：重跑同一個 `curl ... | bash`。解除安裝：`rm -rf ~/.local/share/ccb ~/.local/bin/ccb`。
 
-所有功能旗標皆可透過 `FEATURE_<FLAG_NAME>=1` 環境變數啟用，例如：
+---
+
+## 使用
 
 ```bash
-FEATURE_FORK_SUBAGENT=1 FEATURE_TEMPLATES=1 bun run dev
+ccb              # 互動式 REPL
+ccb --version
+ccb --help
 ```
 
-更完整的功能說明可參考 [`docs/features/`](docs/features/)。
+第一次執行會提示 `/login`。功能參考見 [`docs/`](docs/)。
 
-## VS Code 偵錯
+### Provider 配置
 
-TUI（REPL）模式需要真實終端，因此無法直接用一般 launch config 啟動；建議使用 attach 模式：
+```bash
+# OpenAI 相容(DeepSeek、Ollama、vLLM、...)
+export CLAUDE_CODE_USE_OPENAI=1
+export OPENAI_API_KEY=...
+export OPENAI_BASE_URL=...
+export OPENAI_DEFAULT_SONNET_MODEL=...
 
-1. 在終端啟動 inspect：
-   ```bash
-   bun run dev:inspect
-   ```
-2. 在 VS Code 中附加 debugger：
-   - 在 `src/` 設定中斷點
-   - 按 `F5`
-   - 選擇 **Attach to Bun (TUI debug)**
+# Google Gemini
+export CLAUDE_CODE_USE_GEMINI=1
+export GEMINI_API_KEY=...
+export GEMINI_DEFAULT_SONNET_MODEL=...
+```
 
-## 文件
+| 變數 | 用途 |
+|------|------|
+| `ANTHROPIC_API_KEY`、`ANTHROPIC_BASE_URL` | Anthropic 認證 + 端點 |
+| `CLAUDE_CODE_USE_OPENAI=1` | OpenAI 相容 provider |
+| `CLAUDE_CODE_USE_GEMINI=1` | Gemini provider |
+| `FEATURE_<FLAG>=1` | runtime 啟用 build-time feature flag |
 
-- [`docs/`](docs/) 內包含架構、功能、安全模型與測試規劃文件
-- 英文首頁請見 [`README.md`](./README.md)
-- 簡體中文版請見 [`README.zh-CN.md`](./README.zh-CN.md)
+---
 
-## 專案狀態
+## 從原始碼建構
 
-目前這個 repo 的方向是：
+唯一需求是 [Bun](https://bun.sh) ≥ 1.3.0。
 
-- 建立 Icarus603 自主維護的主線
-- 逐步把對外文案與中文文件整理成清楚的多語版本
-- 為 V6 的分包式重構預先整理邊界與治理方式
+```bash
+git clone https://github.com/Icarus603/claude-code.git
+cd claude-code
+bun install
 
-## 授權與來源
+bun run dev               # hot-reload,沒有 build 步驟
+bun run build:standalone  # → dist/ccb(當前平臺)
+bun run build:platforms   # → dist/binaries/ccb-{darwin,linux,windows}-{arm64,x64}[.exe]
+bun test
+bun run doctor:arch       # 架構不變式 — 必須通過
+```
 
-本專案保留必要的來源脈絡與 attribution。它已演化為 **Icarus603** 維護的獨立主線，但並非從零開始的新作。
+`bun build --compile --target=bun-<os>-<arch>` cross-compile 每個平臺約 0.4 秒。Release workflow([`.github/workflows/release.yml`](.github/workflows/release.yml))在 tag push 時跑。
 
-本倉庫目前沒有單獨宣告的開源授權檔案。若要再散布、再發布或下游轉用，請先自行確認來源權利與授權風險。
+### 結構
+
+```
+packages/                 ← 所有原始碼(沒有 src/)
+├── agent/                  agent loop、hooks、messages、tools dispatch
+├── app-host/               runtime 組裝 + bootstrap
+├── cli/src/entry/          binary 入口
+├── command-runtime/        slash 命令 + skills
+├── config/                 settings、env、feature flags、plugin loader
+├── headless-sdk/           公開 TypeScript SDK 介面
+├── permission/             工具權限 UX + 分類器
+├── provider/               Anthropic / OpenAI 相容 / Gemini / Grok 適配器
+├── repl/                   Ink-based TUI
+├── shell/                  bash/powershell parser + sandbox
+├── storage/                JSONL session 檔案、檔案快取
+├── tool-registry/          工具定義
+└── ...                     mcp-runtime、voice、swarm、bridge、daemon、...
+
+scripts/
+└── doctor-architecture.ts  CI 通過與否的真實依據
+```
+
+---
+
+## 貢獻
+
+歡迎 PR。
+
+- `bun run doctor:arch` 必須通過。不准 `--no-verify`。
+- `bun test` 必須通過。為新行為加測試。
+- `tsc-errors` ratchet 只允許數字下降。
+- Commit message 解釋 *為什麼*;diff 已經顯示 *做了什麼*。
+- 不要把 npm 發布加回來。本專案設計就是 binary-only。
+
+```bash
+gh repo fork Icarus603/claude-code
+git checkout -b feat/your-thing
+# ...
+bun run doctor:arch && bun test
+gh pr create
+```
+
+架構慣例見 [`docs/lazy-require-pattern.md`](docs/lazy-require-pattern.md) 與 [`scripts/`](scripts/) 下的 doctor 腳本。
+
+---
+
+## 發版
+
+只給維護者。
+
+```bash
+git tag v1.carus.001
+git push --tags
+```
+
+GitHub Actions 會建構 5 個 binary 並上傳到 Releases。
+
+---
+
+## 沿革
+
+`ccb` 衍生自公開的 Claude Code 社群 fork。見 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。本專案未附獨立授權檔 — 重新發布前請審核 provenance。
+
+---
+
+[Issues](https://github.com/Icarus603/claude-code/issues) · [`docs/`](docs/) · [Anthropic 官方 Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
