@@ -19,7 +19,7 @@ export { asSystemPrompt, type SystemPrompt } from './systemPromptType.js'
 // eslint-disable-next-line no-restricted-imports
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
-    ? (require('src/proactive/index.js') as typeof import('src/proactive/index.js'))
+    ? (require('@claude-code/agent/proactive/index.js') as typeof import('@claude-code/agent/proactive/index.js'))
     : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 

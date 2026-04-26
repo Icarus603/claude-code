@@ -10,7 +10,7 @@ import { isQueuedCommandEditable } from '@claude-code/agent/messageQueueManager.
 /* eslint-disable @typescript-eslint/no-require-imports */
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
-    ? require('src/proactive/index.js')
+    ? require('@claude-code/agent/proactive/index.js')
     : null
 
 type Props = {

@@ -11,7 +11,7 @@ export function maybeActivateProactive(options: unknown): void {
 			isEnvTruthy(process.env.CLAUDE_CODE_PROACTIVE))
 	) {
 		// eslint-disable-next-line @typescript-eslint/no-require-imports
-		const proactiveModule = require("src/proactive/index.js");
+		const proactiveModule = require("@claude-code/agent/proactive/index.js");
 		if (!proactiveModule.isProactiveActive()) {
 			proactiveModule.activateProactive("command");
 		}

@@ -56,7 +56,7 @@ import { PrBadge } from '../PrBadge.js'
 /* eslint-disable @typescript-eslint/no-require-imports */
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
-    ? require('src/proactive/index.js')
+    ? require('@claude-code/agent/proactive/index.js')
     : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 const NO_OP_SUBSCRIBE = (_cb: () => void) => () => {}
