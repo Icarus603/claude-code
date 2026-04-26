@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { stripHtmlComments, isMemoryFilePath, getLargeMemoryFiles } from "../../src/utils/claudemd";
-import { buildEffectiveSystemPrompt } from "../../src/utils/systemPrompt";
+import { stripHtmlComments, isMemoryFilePath, getLargeMemoryFiles } from "@claude-code/storage/claudemd.js";
+import { buildEffectiveSystemPrompt } from "@claude-code/provider/systemPrompt.js";
 import { createTempDir, cleanupTempDir, writeTempFile } from "../mocks/file-system";
 
 // ─── CLAUDE.md Integration with System Prompt ─────────────────────────

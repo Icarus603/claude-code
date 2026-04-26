@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { getAllBaseTools, parseToolPreset, getTools } from "../../src/tools.ts";
+import { getAllBaseTools, parseToolPreset, getTools } from "@claude-code/tool-registry/runtime";
 import {
   findToolByName,
   getEmptyToolPermissionContext,
