@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { count, intersperse, uniq } from 'src/utils/array';
+import { count, intersperse, uniq } from '@claude-code/tool-registry/utils/array.js';
 
 describe("intersperse", () => {
 	test("inserts separator between elements", () => {

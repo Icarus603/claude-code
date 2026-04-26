@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { sanitizeBetaHeaders } from 'src/utils/betas.js'
+import { sanitizeBetaHeaders } from '@claude-code/provider/betas.js'
 
 describe('sanitizeBetaHeaders', () => {
   test('strips empty beta values and whitespace', () => {

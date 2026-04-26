@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { validateUuid, createAgentId } from 'src/utils/uuid';
+import { validateUuid, createAgentId } from '@claude-code/agent/uuid.js';
 
 describe("validateUuid", () => {
   test("validates correct UUID", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createHyperlink, OSC8_START, OSC8_END } from 'src/utils/hyperlink';
+import { createHyperlink, OSC8_START, OSC8_END } from '@claude-code/output/hyperlink.js';
 
 // ─── OSC8 constants ────────────────────────────────────────────────────
 

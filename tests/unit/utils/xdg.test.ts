@@ -4,7 +4,7 @@ import {
   getXDGCacheHome,
   getXDGDataHome,
   getUserBinDir,
-} from 'src/utils/xdg';
+} from '@claude-code/storage/xdg.js';
 
 describe("getXDGStateHome", () => {
   test("returns ~/.local/state by default", () => {

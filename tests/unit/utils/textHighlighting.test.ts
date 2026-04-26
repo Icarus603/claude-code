@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { segmentTextByHighlights, type TextHighlight } from 'src/utils/textHighlighting';
+import { segmentTextByHighlights, type TextHighlight } from '@claude-code/output/textHighlighting.js';
 
 describe("segmentTextByHighlights", () => {
   // Basic

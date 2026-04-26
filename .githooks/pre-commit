@@ -36,7 +36,8 @@ for check in \
   scripts/verify-no-holding-pens.ts \
   scripts/verify-package-readme.ts \
   scripts/verify-feature-canonical.ts \
-  scripts/verify-facade-budget.ts; do
+  scripts/verify-facade-budget.ts \
+  scripts/verify-build-resolves.ts; do
   bun run "$check" >/dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo ""

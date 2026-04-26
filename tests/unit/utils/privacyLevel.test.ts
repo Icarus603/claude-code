@@ -4,7 +4,7 @@ import {
   isEssentialTrafficOnly,
   isTelemetryDisabled,
   getEssentialTrafficOnlyReason,
-} from 'src/utils/privacyLevel';
+} from '@claude-code/config/env/privacy-level';
 
 describe("getPrivacyLevel", () => {
   const originalDisableNonessential = process.env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC;

@@ -14,7 +14,7 @@
 import { readdirSync, statSync, readFileSync } from 'fs'
 import { join } from 'path'
 
-const BUDGET = 2715 // post-#77 (168 dead shims deleted) baseline
+const BUDGET = 2518 // post-#91 — 63 more dead shims eliminated after consumer rewrite
 const EXCLUDE_PREFIXES = ['src/entrypoints/', 'src/main.tsx']
 
 function walk(dir: string, files: string[]): void {

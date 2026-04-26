@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { formatBriefTimestamp } from 'src/utils/formatBriefTimestamp';
+import { formatBriefTimestamp } from '@claude-code/output/formatters';
 
 describe("formatBriefTimestamp", () => {
   // Fixed "now" for deterministic tests: 2026-04-02T14:00:00Z (Thursday)

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { insertBlockAfterToolResults } from 'src/utils/contentArray';
+import { insertBlockAfterToolResults } from '@claude-code/agent/contentArray.js';
 
 describe("insertBlockAfterToolResults", () => {
   test("inserts after last tool_result", () => {

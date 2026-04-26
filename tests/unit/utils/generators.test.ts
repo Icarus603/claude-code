@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { lastX, returnValue, all, toArray, fromArray } from 'src/utils/generators';
+import { lastX, returnValue, all, toArray, fromArray } from '@claude-code/config/generators';
 
 async function* range(n: number): AsyncGenerator<number, void> {
   for (let i = 0; i < n; i++) {

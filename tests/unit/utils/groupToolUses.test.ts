@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { applyGrouping } from 'src/utils/groupToolUses';
+import { applyGrouping } from '@claude-code/repl/uiHelpers/groupToolUses.js';
 
 // Helper: build minimal tool-use assistant message
 function makeToolUseMsg(

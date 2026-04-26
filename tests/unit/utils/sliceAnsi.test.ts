@@ -23,7 +23,7 @@ mock.module("src/ink/stringWidth.js", () => ({
   },
 }));
 
-const sliceAnsi = (await import('src/utils/sliceAnsi')).default;
+const sliceAnsi = (await import('@claude-code/output/utils/sliceAnsi.js')).default;
 
 describe("sliceAnsi", () => {
   test("plain text slice identical to String.slice", () => {

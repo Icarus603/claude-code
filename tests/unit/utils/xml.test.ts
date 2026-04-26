@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { escapeXml, escapeXmlAttr } from 'src/utils/xml';
+import { escapeXml, escapeXmlAttr } from '@claude-code/output/xml';
 
 describe("escapeXml", () => {
   test("escapes ampersand", () => {

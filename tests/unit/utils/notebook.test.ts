@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseCellId, mapNotebookCellsToToolResult } from 'src/utils/notebook';
+import { parseCellId, mapNotebookCellsToToolResult } from '@claude-code/tool-registry/notebook.js';
 
 // ─── parseCellId ───────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { CircularBuffer } from 'src/utils/CircularBuffer';
+import { CircularBuffer } from '@claude-code/output/buffers';
 
 describe("CircularBuffer", () => {
   test("starts empty", () => {

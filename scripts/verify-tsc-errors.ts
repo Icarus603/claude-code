@@ -13,7 +13,7 @@
 
 import { spawnSync } from 'child_process'
 
-const BUDGET = 3481 // post-#77 baseline
+const BUDGET = 3478 // post-#91 — 4 errors disappeared as canonical-path resolution improved types
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

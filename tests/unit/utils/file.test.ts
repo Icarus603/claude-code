@@ -5,7 +5,7 @@ import {
   stripLineNumberPrefix,
   pathsEqual,
   normalizePathForComparison,
-} from 'src/utils/file';
+} from '@claude-code/storage/file.js';
 
 describe("convertLeadingTabsToSpaces", () => {
   test("converts leading tabs to 2 spaces each", () => {

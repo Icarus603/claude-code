@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { gt, gte, lt, lte, satisfies, order } from 'src/utils/semver';
+import { gt, gte, lt, lte, satisfies, order } from '@claude-code/config/semver';
 
 describe("gt", () => {
   test("returns true when a > b", () => {

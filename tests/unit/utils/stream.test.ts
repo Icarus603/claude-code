@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { Stream } from 'src/utils/stream';
+import { Stream } from '@claude-code/config/stream';
 
 describe("Stream", () => {
   test("enqueue then read resolves with the value", async () => {

@@ -1,6 +1,6 @@
 import { mock, describe, expect, test } from "bun:test";
 
-mock.module("src/utils/slowOperations.js", () => ({
+mock.module("@claude-code/local-observability/slowOperations.js", () => ({
   jsonStringify: (v: unknown) => JSON.stringify(v),
 }));
 mock.module("@claude-code/config/feature-flags", () => ({

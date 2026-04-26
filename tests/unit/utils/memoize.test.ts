@@ -19,7 +19,7 @@ mock.module("src/utils/slowOperations.ts", () => ({
 }));
 
 const { memoizeWithTTL, memoizeWithTTLAsync, memoizeWithLRU } = await import(
-  'src/utils/memoize'
+  '@claude-code/config/memoize.js'
 );
 
 // ─── memoizeWithTTL ────────────────────────────────────────────────────

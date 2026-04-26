@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { objectGroupBy } from 'src/utils/objectGroupBy';
+import { objectGroupBy } from '@claude-code/tool-registry/utils/objectGroupBy.js';
 
 describe("objectGroupBy", () => {
   test("groups items by key", () => {

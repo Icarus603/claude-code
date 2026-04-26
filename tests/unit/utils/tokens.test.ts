@@ -50,7 +50,7 @@ const {
   getCurrentUsage,
   doesMostRecentAssistantMessageExceed200k,
   getAssistantMessageContentLength,
-} = await import('src/utils/tokens');
+} = await import('@claude-code/agent/tokens.js');
 
 // ─── Helpers ────────────────────────────────────────────────────────────
 

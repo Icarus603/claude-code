@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "zod/v4";
-import { semanticBoolean } from 'src/utils/semanticBoolean';
+import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js';
 
 describe("semanticBoolean", () => {
   test("parses boolean true to true", () => {

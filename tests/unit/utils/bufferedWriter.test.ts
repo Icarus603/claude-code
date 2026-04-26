@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createBufferedWriter } from 'src/utils/bufferedWriter';
+import { createBufferedWriter } from '@claude-code/output/buffers';
 
 describe("createBufferedWriter", () => {
   test("immediateMode calls writeFn directly", () => {

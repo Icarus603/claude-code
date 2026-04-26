@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import z from "zod/v4";
-import { zodToJsonSchema } from 'src/utils/zodToJsonSchema';
+import { zodToJsonSchema } from '@claude-code/agent/zodSchema/zodToJsonSchema.js';
 
 describe("zodToJsonSchema", () => {
   test("converts string schema", () => {

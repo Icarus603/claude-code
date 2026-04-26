@@ -3,7 +3,7 @@ import {
   stripDisplayTags,
   stripDisplayTagsAllowEmpty,
   stripIdeContextTags,
-} from 'src/utils/displayTags';
+} from '@claude-code/output/utils/displayTags.js';
 
 describe("stripDisplayTags", () => {
   test("strips a single system tag and returns remaining text", () => {

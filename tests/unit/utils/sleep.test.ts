@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { sleep, withTimeout } from 'src/utils/sleep';
-import { sequential } from 'src/utils/sequential';
+import { sleep, withTimeout } from '@claude-code/config/sleep';
+import { sequential } from '@claude-code/config/sequential';
 
 // ─── sleep ─────────────────────────────────────────────────────────────
 
