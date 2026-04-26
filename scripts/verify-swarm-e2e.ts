@@ -7,7 +7,7 @@ import {
   lockSync,
   unlock,
   check,
-} from '../src/utils/lockfile.ts'
+} from '../packages/storage/src/lockfile.ts'
 import { installSwarmAppRuntime } from '../packages/swarm/src/adapters/appRuntime.ts'
 import { installSwarmAppUi } from '../packages/swarm/src/adapters/appUi.ts'
 import { TEAM_LEAD_NAME } from '../packages/swarm/src/core/constants.ts'
