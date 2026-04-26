@@ -38,6 +38,7 @@
     "./tasks/LocalWorkflowTask/LocalWorkflowTask.js": "./tasks/LocalWorkflowTask/LocalWorkflowTask.ts",
     "./jobs/classifier.js": "./jobs/classifier.ts",
     "./proactive/index.js": "./proactive/index.ts",
+    "./proactive/useProactive.js": "./proactive/useProactive.ts",
     "./messageShapes": "./messageShapes.ts",
     "./messageShapes.js": "./messageShapes.ts",
     "./idTypes": "./idTypes.ts",

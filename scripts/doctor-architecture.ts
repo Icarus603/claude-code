@@ -302,6 +302,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §3.2 / §8 — distinct cross-package deps per package may not grow',
   },
   {
+    id: 'src-classifier',
+    layer: 'Cross-Cutting',
+    subsystem: 'src/ classification',
+    script: 'scripts/verify-src-classifier.ts',
+    doc: 'V7 §3.2 — per-class budgets on src/ (entrypoint, facade, shim, test, generated, other)',
+  },
+  {
     id: 'package-readme',
     layer: 'Cross-Cutting',
     subsystem: 'documentation',
