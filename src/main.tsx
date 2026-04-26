@@ -11,12 +11,12 @@ import { profileCheckpoint } from "@claude-code/app-host/startup/startupProfiler
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 profileCheckpoint("main_tsx_entry");
 
-import { startMdmRawRead } from "./utils/settings/mdm/rawRead.js";
+import { startMdmRawRead } from "@claude-code/config/settings/mdm/rawRead";
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 startMdmRawRead();
 
-import { startKeychainPrefetch } from "./utils/secureStorage/keychainPrefetch.js";
+import { startKeychainPrefetch } from "@claude-code/cli/secureStorage/keychainPrefetch.js";
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 startKeychainPrefetch();
