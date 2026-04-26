@@ -1,22 +1,50 @@
 #!/bin/sh
-# pre-commit hook: run Biome checks on staged files
-# Only check .ts/.tsx/.js/.jsx files under src/
+# pre-commit hook:
+#   1. Biome lint on staged src/ files (existing)
+#   2. Fast doctor:arch check — only the rules that matter for staged
+#      changes and complete in <2s. Full 46-rule run lives in CI.
+#
+# Skip with PRE_COMMIT_SKIP=1 when you really need to commit something
+# the hook doesn't understand (rare; prefer fixing the underlying issue).
 
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^src/.*\.(ts|tsx|js|jsx)$')
-
-if [ -z "$STAGED_FILES" ]; then
+if [ "$PRE_COMMIT_SKIP" = "1" ]; then
+  echo "PRE_COMMIT_SKIP=1: bypassing pre-commit checks"
   exit 0
 fi
 
-echo "Running Biome lint on staged files..."
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^src/.*\.(ts|tsx|js|jsx)$')
 
-# Run biome lint on staged files only (no formatting, no auto-fix)
-echo "$STAGED_FILES" | xargs bunx biome lint --no-errors-on-unmatched
-
-if [ $? -ne 0 ]; then
-  echo ""
-  echo "Biome lint failed. Fix errors or use --no-verify to bypass."
-  exit 1
+if [ -n "$STAGED_FILES" ]; then
+  echo "Running Biome lint on staged files..."
+  echo "$STAGED_FILES" | xargs bunx biome lint --no-errors-on-unmatched
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "Biome lint failed. Fix errors or use PRE_COMMIT_SKIP=1 to bypass."
+    exit 1
+  fi
 fi
+
+# Fast doctor checks: ratchet-style rules that catch the most common
+# regressions (LOC growth, missing exports, broken imports, naming
+# violations). Each verifier runs in <500ms.
+echo "Running fast doctor:arch checks..."
+for check in \
+  scripts/verify-replview-shrinks.ts \
+  scripts/verify-src-shrinks.ts \
+  scripts/verify-package-exports.ts \
+  scripts/verify-package-private-src.ts \
+  scripts/verify-no-holding-pens.ts \
+  scripts/verify-package-readme.ts \
+  scripts/verify-feature-canonical.ts \
+  scripts/verify-facade-budget.ts; do
+  bun run "$check" >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "doctor check failed: $check"
+    echo "Run 'bun run scripts/doctor-architecture.ts' for details."
+    echo "Bypass with PRE_COMMIT_SKIP=1 only if absolutely necessary."
+    exit 1
+  fi
+done
 
 exit 0
