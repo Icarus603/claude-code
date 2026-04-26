@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parsePluginArgs } from "../parseArgs";
+import { parsePluginArgs } from "@claude-code/command-runtime/commands/plugin/parseArgs.js";
 
 describe("parsePluginArgs", () => {
   // No args

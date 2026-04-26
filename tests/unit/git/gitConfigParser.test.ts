@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseConfigString } from "../gitConfigParser";
+import { parseConfigString } from "@claude-code/config/git/gitConfigParser.js";
 
 describe("parseConfigString", () => {
   test("parses simple remote url", () => {
