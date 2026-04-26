@@ -20,7 +20,7 @@ import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify, writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
-import { getBinaryName, getPlatform } from './installer.js'
+import { getBinaryName, getPlatform } from './platform.js'
 
 const GCS_BUCKET_URL =
   'https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases'
