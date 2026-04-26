@@ -77,7 +77,7 @@ const inputSchema = lazySchema(() =>
       .string()
       .optional()
       .describe(
-        'A 5-10 word summary shown as a preview in the UI (required when message is a string)',
+        'A 5-10 word summary shown as a preview in the UI. For string messages, omitting this auto-derives a summary from the message; provide explicitly for better preview.',
       ),
     message: z.union([
       z.string().describe('Plain text message content'),
@@ -666,11 +666,15 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
       }
       if (typeof input.message === 'string') {
         if (!input.summary || input.summary.trim().length === 0) {
-          return {
-            result: false,
-            message: 'summary is required when message is a string',
-            errorCode: 9,
-          }
+          // Auto-derive summary from message: take first ~10 words, max 60
+          // chars, strip newlines. Avoids hard-failing the tool call when the
+          // model forgets summary on a self-explanatory string message — the
+          // schema marks summary `.optional()` so this matches caller
+          // expectation. UI shows the derived summary as a preview; full
+          // message still goes through normal rendering.
+          const trimmed = input.message.trim().replace(/\s+/g, ' ')
+          const derived = trimmed.split(' ').slice(0, 10).join(' ').slice(0, 60)
+          input.summary = derived || 'message'
         }
         return { result: true }
       }

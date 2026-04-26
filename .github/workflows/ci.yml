@@ -25,3 +25,6 @@ jobs:
 
       - name: Build
         run: bun run build
+
+      - name: doctor:arch (47 architectural rules)
+        run: bun run scripts/doctor-architecture.ts
