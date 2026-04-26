@@ -79,7 +79,7 @@ async function main(): Promise<void> {
     profileCheckpoint('cli_dump_system_prompt_path')
     const { enableConfigs } = await import('@claude-code/config')
     enableConfigs()
-    const { getMainLoopModel } = await import('../utils/model/model.js')
+    const { getMainLoopModel } = await import('@claude-code/provider/model.js')
     const modelIdx = args.indexOf('--model')
     const model = (modelIdx !== -1 && args[modelIdx + 1]) || getMainLoopModel()
     const { getSystemPrompt } = await import('@claude-code/agent/constants/prompts.js')
@@ -91,14 +91,14 @@ async function main(): Promise<void> {
   if (process.argv[2] === '--claude-in-chrome-mcp') {
     profileCheckpoint('cli_claude_in_chrome_mcp_path')
     const { runClaudeInChromeMcpServer } = await import(
-      '../utils/claudeInChrome/mcpServer.js'
+      '@claude-code/agent/claudeInChrome/mcpServer.js'
     )
     await runClaudeInChromeMcpServer()
     return
   } else if (process.argv[2] === '--chrome-native-host') {
     profileCheckpoint('cli_chrome_native_host_path')
     const { runChromeNativeHost } = await import(
-      '../utils/claudeInChrome/chromeNativeHost.js'
+      '@claude-code/agent/claudeInChrome/chromeNativeHost.js'
     )
     await runChromeNativeHost()
     return
@@ -108,7 +108,7 @@ async function main(): Promise<void> {
   ) {
     profileCheckpoint('cli_computer_use_mcp_path')
     const { runComputerUseMcpServer } = await import(
-      '../utils/computerUse/mcpServer.js'
+      '@ant/computer-use-mcp/legacy/mcpServer.js'
     )
     await runComputerUseMcpServer()
     return
