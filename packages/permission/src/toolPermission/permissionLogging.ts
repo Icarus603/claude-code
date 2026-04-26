@@ -15,7 +15,7 @@ import { logOTelEvent } from '@claude-code/local-observability/telemetryEvents.j
 import type {
   PermissionApprovalSource,
   PermissionRejectionSource,
-} from './PermissionContext.js'
+} from './permissionSourceTypes.js'
 
 type PermissionLogContext = {
   tool: ToolType
