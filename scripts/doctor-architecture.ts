@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'no-cycles',
+    layer: 'Cross-Cutting',
+    subsystem: 'import graph cycles',
+    script: 'scripts/verify-no-cycles.ts',
+    doc: 'V7 §11.2 — cyclic import chains in packages/ may shrink but not grow',
+  },
+  {
     id: 'tsc-errors',
     layer: 'Cross-Cutting',
     subsystem: 'type safety ratchet',
