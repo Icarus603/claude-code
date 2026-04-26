@@ -273,6 +273,7 @@ async function main() {
     getPlatform: () => process.platform,
     getGlobalConfig: () => ({}),
     saveGlobalConfig: async () => {},
+    CLAUDE_OPUS_4_7_CONFIG: { name: 'claude-opus-4-7' },
     env: {},
     execFileNoThrow: async () => ({ code: 0, stdout: '', stderr: '' }),
     execFileNoThrowWithCwd: async () => ({ code: 0, stdout: '', stderr: '' }),
