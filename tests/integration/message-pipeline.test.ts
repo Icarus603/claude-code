@@ -4,7 +4,7 @@ import {
   createAssistantMessage,
   normalizeMessages,
   extractTag,
-} from "../../src/utils/messages";
+} from "@claude-code/agent/messages.js";
 
 // ─── Message Structure ────────────────────────────────────────────────
 
