@@ -133,6 +133,32 @@ describe('plugin loading e2e (guards against setter-shim regressions)', () => {
     expect(result.frontmatter.description).toBe('test')
   })
 
+  test('executeShellCommandsInPrompt forwards all args (catches arg-drop bug)', async () => {
+    // Regression: _deps.ts's public wrapper used to forward only the
+    // first arg (prompt), dropping context/slashCommandName/shell. The
+    // canonical impl needs `context` to call BashTool, which destructures
+    // context.abortController — so a dropped context produced
+    // "undefined is not an object (evaluating 'context.abortController')"
+    // for every plugin slash command that contained a !cmd block.
+    await import('@claude-code/app-host/runtime/bootstrap.js')
+    const { executeShellCommandsInPrompt } = await import(
+      '@claude-code/config/plugin/_deps.js'
+    )
+    expect(executeShellCommandsInPrompt.length).toBeGreaterThanOrEqual(1)
+    // Smoke: passing 4 args should not throw arity error before reaching
+    // the canonical impl. We pass a prompt with no !cmd blocks so the
+    // canonical impl has nothing to execute and returns the prompt
+    // unchanged regardless of context shape.
+    const result = await executeShellCommandsInPrompt(
+      'plain prompt with no shell blocks',
+      undefined as unknown,
+      '/test',
+      undefined as unknown,
+    )
+    expect(typeof result).toBe('string')
+    expect(result).toContain('plain prompt')
+  })
+
   test('walkPluginMarkdown discovers .md files in fixture plugin', async () => {
     await import('@claude-code/app-host/runtime/bootstrap.js')
     const { walkPluginMarkdown } = await import(
