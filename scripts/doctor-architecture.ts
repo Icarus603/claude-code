@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'cross-package-coupling',
+    layer: 'Cross-Cutting',
+    subsystem: 'coupling',
+    script: 'scripts/verify-cross-package-coupling.ts',
+    doc: 'V7 §3.2 / §8 — distinct cross-package deps per package may not grow',
+  },
+  {
     id: 'package-readme',
     layer: 'Cross-Cutting',
     subsystem: 'documentation',
