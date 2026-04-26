@@ -230,6 +230,13 @@ export GEMINI_DEFAULT_OPUS_MODEL="gemini-2.5-pro"
 - **Mock 模式**: 對重依賴模塊使用 `mock.module()` + `await import()` 解鎖（必須內聯在測試文件中，不能從共享 helper 導入）
 - **當前狀態**: ~1623 tests / 114 files (110 unit + 4 integration) / 0 fail（詳見 `docs/testing-spec.md`）
 
+## Architecture Doctor
+
+- **Run**: `bun run scripts/doctor-architecture.ts` — 46 rules covering owner-over-shim, encapsulation, ratchets, and feature flag boundaries. All must pass before merging.
+- **Pre-commit**: `.githooks/pre-commit` runs the fast subset (~8 rules, <2s). Set up via `bun install` (the `prepare` script wires `core.hooksPath`).
+- **Bypass**: `PRE_COMMIT_SKIP=1 git commit ...` only when you truly understand why the rule mis-flags your change.
+- **Ratchets**: many rules count something (LOC, tsc errors, cycles, coupling) and lock the current value. They can shrink but not grow. To bump downward: do the work, run the verifier, update the constant.
+
 ## Working with This Codebase
 
 - **Don't try to fix all tsc errors** — they're from decompilation and don't affect runtime.
