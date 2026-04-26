@@ -10,7 +10,7 @@ import {
 import '@claude-code/tool-registry/runtime'
 import { getDefaultAppState } from '@claude-code/app-host/state/AppStateStore.js'
 import review from '@claude-code/command-runtime/commands/review/review.js'
-import type { Command } from '../commands.js'
+import type { Command } from '@claude-code/command-runtime/runtime'
 import {
   findToolByName,
   getEmptyToolPermissionContext,

@@ -166,7 +166,7 @@ describe("toRelativePath", () => {
   });
 
   test("returns a string for any absolute path", () => {
-    const abs = resolve(process.cwd(), "src");
+    const abs = resolve(process.cwd(), "packages");
     const result = toRelativePath(abs);
     expect(typeof result).toBe("string");
   });
@@ -176,8 +176,8 @@ describe("toRelativePath", () => {
 
 describe("getDirectoryForPath", () => {
   test("returns the path itself when given an existing directory", () => {
-    // The src directory is guaranteed to exist in this repo
-    const dir = resolve(process.cwd(), "src");
+    // The packages directory is guaranteed to exist in this repo
+    const dir = resolve(process.cwd(), "packages");
     const result = getDirectoryForPath(dir);
     expect(result).toBe(dir);
   });

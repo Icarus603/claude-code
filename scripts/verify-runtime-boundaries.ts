@@ -100,7 +100,7 @@ async function collectFiles(root: string): Promise<string[]> {
 async function verifyEntryBootstrapSeams(): Promise<string[]> {
   const violations: string[] = []
   const [main, print, bootstrap] = await Promise.all([
-    readFile('src/main.tsx', 'utf8'),
+    readFile('packages/cli/src/entry/main.tsx', 'utf8'),
     readFile('packages/cli/src/print.ts', 'utf8'),
     readFile('packages/app-host/src/runtime/bootstrap.ts', 'utf8'),
   ])

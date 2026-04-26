@@ -205,26 +205,12 @@ async function main(): Promise<void> {
       args.includes('--background'))
   ) {
     profileCheckpoint('cli_bg_path')
-    const { enableConfigs } = await import('@claude-code/config')
-    enableConfigs()
-    const bg = await import('../cli/bg.js')
-    switch (args[0]) {
-      case 'ps':
-        await bg.psHandler(args.slice(1))
-        break
-      case 'logs':
-        await bg.logsHandler(args[1])
-        break
-      case 'attach':
-        await bg.attachHandler(args[1])
-        break
-      case 'kill':
-        await bg.killHandler(args[1])
-        break
-      default:
-        await bg.handleBgFlag(args)
-    }
-    return
+    // BG_SESSIONS feature is off in this build and the canonical bg.ts
+    // module was never replicated outside the original src/ tree. The
+    // `feature('BG_SESSIONS') && ...` guard above already gates the entire
+    // branch — code path is unreachable.
+    console.error('Background sessions are not enabled in this build.')
+    process.exit(2)
   }
 
   // Fast-path for template job commands.
@@ -244,24 +230,21 @@ async function main(): Promise<void> {
   // Fast-path for `claude environment-runner`: headless BYOC runner.
   // feature() must stay inline for build-time dead code elimination.
   if (feature('BYOC_ENVIRONMENT_RUNNER') && args[0] === 'environment-runner') {
-    profileCheckpoint('cli_environment_runner_path')
-    const { environmentRunnerMain } = await import(
-      '../environment-runner/main.js'
-    )
-    await environmentRunnerMain(args.slice(1))
-    return
+    // BYOC_ENVIRONMENT_RUNNER feature is off and the canonical
+    // environment-runner module was deleted in #129 — feature gate above
+    // guards this whole branch.
+    console.error('environment-runner is not enabled in this build.')
+    process.exit(2)
   }
 
   // Fast-path for `claude self-hosted-runner`: headless self-hosted-runner
   // targeting the SelfHostedRunnerWorkerService API (register + poll; poll IS
   // heartbeat). feature() must stay inline for build-time dead code elimination.
   if (feature('SELF_HOSTED_RUNNER') && args[0] === 'self-hosted-runner') {
-    profileCheckpoint('cli_self_hosted_runner_path')
-    const { selfHostedRunnerMain } = await import(
-      '../self-hosted-runner/main.js'
-    )
-    await selfHostedRunnerMain(args.slice(1))
-    return
+    // SELF_HOSTED_RUNNER feature is off and the canonical module was
+    // deleted in #129 — feature gate above guards this whole branch.
+    console.error('self-hosted-runner is not enabled in this build.')
+    process.exit(2)
   }
 
   // Fast-path for --worktree --tmux: exec into tmux before loading full CLI
@@ -310,7 +293,7 @@ async function main(): Promise<void> {
   const { startCapturingEarlyInput } = await import('@claude-code/repl/earlyInput.js')
   startCapturingEarlyInput()
   profileCheckpoint('cli_before_main_import')
-  const { main: cliMain } = await import('../main.jsx')
+  const { main: cliMain } = await import('./main.jsx')
   profileCheckpoint('cli_after_main_import')
   await cliMain()
   profileCheckpoint('cli_after_main_complete')

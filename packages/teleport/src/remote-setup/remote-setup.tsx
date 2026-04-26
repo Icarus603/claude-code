@@ -7,9 +7,9 @@ import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS as SafeString,
 } from '@claude-code/local-observability'
-import type { LocalJSXCommandOnDone } from '../../types/command.js'
-import { openBrowser } from '../../utils/browser.js'
-import { getGhAuthStatus } from '../../utils/github/ghAuthStatus.js'
+import type { LocalJSXCommandOnDone } from '@claude-code/command-runtime/types'
+import { openBrowser } from '@claude-code/storage/browser.js'
+import { getGhAuthStatus } from '@claude-code/app-host/startup/ghAuthStatus.js'
 import {
   createDefaultEnvironment,
   getCodeWebUrl,

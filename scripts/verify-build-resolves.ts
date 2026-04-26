@@ -21,7 +21,7 @@ import { spawnSync } from 'child_process'
 // landing on main (caught only by external CI / manual full build).
 const result = spawnSync('bun', [
   'build',
-  'src/entrypoints/cli.tsx',
+  'packages/cli/src/entry/cli.tsx',
   '--target=bun',
   '--outdir=/tmp/verify-build-resolves-out',
 ], { encoding: 'utf8' })

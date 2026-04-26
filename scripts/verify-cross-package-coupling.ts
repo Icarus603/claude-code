@@ -23,7 +23,7 @@ const BUDGET: Record<string, number> = {
   'agent': 19,
   'app-host': 22,
   'bridge': 14,
-  'cli': 21,
+  'cli': 22,  // +1: src/{main,entrypoints/cli,entrypoints/mcp} moved into packages/cli/src/entry/, all their imports now count as cli's deps
   'command-runtime': 20,
   'config': 14,  // +1: mcp-runtime lazy-required by plugin/_deps to fix MCP schema null bug
   'daemon': 3,
