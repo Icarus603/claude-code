@@ -13,7 +13,7 @@
 
 import { spawnSync } from 'child_process'
 
-const BUDGET = 3478 // post-#91 — 4 errors disappeared as canonical-path resolution improved types
+const BUDGET = 3472 // post-#90 — fixed 6 broken cross-package import paths (TS2307)
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

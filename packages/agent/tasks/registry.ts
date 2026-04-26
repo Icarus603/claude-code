@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import type { Task, TaskType } from 'src/Task.js'
+import type { Task, TaskType } from '@claude-code/tool-registry/Task.js'
 import { DreamTask } from '@claude-code/agent/tasks/DreamTask/DreamTask.js'
 import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
 import { LocalShellTask } from '@claude-code/agent/tasks/LocalShellTask.js'
