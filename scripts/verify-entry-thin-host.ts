@@ -3,7 +3,7 @@ import { getCommandRegistryHostBindings } from '@claude-code/command-runtime'
 import { getMcpRuntimeHostBindings } from '@claude-code/mcp-runtime'
 import '@claude-code/app-host/runtime/bootstrap.js'
 import '@claude-code/command-runtime/runtime'
-import '../src/services/mcp/client.js'
+import '@claude-code/mcp-runtime/clientRuntime.js'
 
 async function main(): Promise<void> {
   const [mainContent, replContent, printContent, modeDispatchContent] = await Promise.all([

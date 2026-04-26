@@ -155,19 +155,11 @@ async function verifyEntryBootstrapSeams(): Promise<string[]> {
 async function verifyRootFacadesStayThin(): Promise<string[]> {
   const violations: string[] = []
 
-  // Root-level src/tools.ts, src/commands.ts, src/QueryEngine.ts, src/query.ts
-  // were thin facades; deleted in #129 follow-up after rewiring all consumers
-  // to package aliases. The remaining service-layer facades are verified below.
-  const facadeFiles = [
-    {
-      path: 'src/services/mcp/client.ts',
-      exportLine: "export * from '@claude-code/mcp-runtime/clientRuntime.js'",
-    },
-    {
-      path: 'src/services/api/claudeLegacy.ts',
-      exportLine: "export * from '@claude-code/provider/claudeLegacy'",
-    },
-  ]
+  // Root-level facades src/{tools,commands,QueryEngine,query}.ts and
+  // src/services/{mcp/client,api/claudeLegacy}.ts were all thin facades;
+  // every one deleted in #129/#136/#137 follow-ups after rewiring all
+  // consumers to package aliases. No remaining src/ facades to enforce.
+  const facadeFiles: { path: string; exportLine: string }[] = []
 
   for (const facade of facadeFiles) {
     const raw = await readFile(facade.path, 'utf8')

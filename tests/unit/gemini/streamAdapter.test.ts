@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { adaptGeminiStreamToAnthropic } from '@claude-code/provider'
-import type { GeminiStreamChunk } from 'src/services/api/gemini/types.js'
+import type { GeminiStreamChunk } from '@claude-code/provider/gemini/types.js'
 
 function mockStream(
   chunks: GeminiStreamChunk[],
