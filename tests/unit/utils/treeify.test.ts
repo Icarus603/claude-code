@@ -12,7 +12,7 @@ mock.module("src/ink.js", () => ({
   color: (colorKey: string, themeName: string) => (text: string) => text,
 }));
 
-const { treeify } = await import('src/utils/treeify');
+const { treeify } = await import('@claude-code/repl/uiHelpers/treeify.js');
 
 describe("treeify", () => {
   test("renders flat tree with two keys", () => {

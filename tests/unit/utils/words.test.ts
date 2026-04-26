@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { generateWordSlug, generateShortWordSlug } from 'src/utils/words';
+import { generateWordSlug, generateShortWordSlug } from '@claude-code/tool-registry/words.js';
 
 describe("generateWordSlug", () => {
   test("returns three-part hyphenated slug", () => {

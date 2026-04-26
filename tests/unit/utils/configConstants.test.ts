@@ -3,7 +3,7 @@ import {
   NOTIFICATION_CHANNELS,
   EDITOR_MODES,
   TEAMMATE_MODES,
-} from 'src/utils/configConstants';
+} from '@claude-code/config/configConstants.js';
 
 describe("NOTIFICATION_CHANNELS", () => {
   test("contains expected channels", () => {

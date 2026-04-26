@@ -92,7 +92,7 @@ mock.module("src/tasks/LocalAgentTask/LocalAgentTask.js", () => ({
   LocalAgentTask: {},
 }));
 
-mock.module("src/utils/debug.js", () => ({
+mock.module("@claude-code/local-observability/debug.js", () => ({
   getMinDebugLogLevel: () => "warn",
   isDebugMode: () => false,
   enableDebugLogging: () => false,
@@ -138,7 +138,7 @@ mock.module("src/utils/task/sdkProgress.js", () => ({
   emitTaskProgress: noop,
 }));
 
-mock.module("src/utils/tokens.js", () => ({
+mock.module("@claude-code/agent/tokens.js", () => ({
   getTokenCountFromUsage: () => 0,
 }));
 

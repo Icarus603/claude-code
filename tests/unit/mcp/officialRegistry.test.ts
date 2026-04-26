@@ -3,7 +3,7 @@ import { mock, describe, expect, test, afterEach } from "bun:test";
 mock.module("axios", () => ({
   default: { get: async () => ({ data: { servers: [] } }) },
 }));
-mock.module("src/utils/debug.js", () => ({
+mock.module("@claude-code/local-observability/debug.js", () => ({
   logForDebugging: () => {},
 }));
 mock.module("src/utils/errors.js", () => ({

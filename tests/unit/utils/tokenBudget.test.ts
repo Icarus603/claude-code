@@ -3,7 +3,7 @@ import {
   parseTokenBudget,
   findTokenBudgetPositions,
   getBudgetContinuationMessage,
-} from 'src/utils/tokenBudget';
+} from '@claude-code/agent/tokenBudget';
 
 describe("parseTokenBudget", () => {
   // --- shorthand at start ---

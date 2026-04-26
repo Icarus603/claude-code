@@ -15,11 +15,15 @@
 
 import { spawnSync } from 'child_process'
 
+// Full bundle (NOT --no-bundle) — only the full bundler walks dynamic
+// `await import('...')` calls. --no-bundle resolved static imports OK
+// during V7 but missed dynamic ones, leading to a broken `bun run build`
+// landing on main (caught only by external CI / manual full build).
 const result = spawnSync('bun', [
   'build',
   'src/entrypoints/cli.tsx',
   '--target=bun',
-  '--no-bundle',
+  '--outdir=/tmp/verify-build-resolves-out',
 ], { encoding: 'utf8' })
 
 if (result.status !== 0) {

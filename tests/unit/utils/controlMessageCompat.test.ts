@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeControlMessageKeys } from 'src/utils/controlMessageCompat';
+import { normalizeControlMessageKeys } from '@claude-code/headless-sdk/controlMessageCompat';
 
 describe("normalizeControlMessageKeys", () => {
   // --- basic camelCase to snake_case ---

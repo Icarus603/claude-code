@@ -6,7 +6,7 @@ import {
   normalizePathForConfigKey,
   toRelativePath,
   getDirectoryForPath,
-} from 'src/utils/path';
+} from '@claude-code/storage/path.js';
 
 // ─── containsPathTraversal ──────────────────────────────────────────────
 

@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   windowsPathToPosixPath,
   posixPathToWindowsPath,
-} from 'src/utils/windowsPaths';
+} from '@claude-code/storage/windowsPaths.js';
 
 // ─── windowsPathToPosixPath ────────────────────────────────────────────
 

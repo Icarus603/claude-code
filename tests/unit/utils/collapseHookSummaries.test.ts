@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { collapseHookSummaries } from 'src/utils/collapseHookSummaries';
+import { collapseHookSummaries } from '@claude-code/repl/collapseHookSummaries.js';
 
 function makeHookSummary(overrides: Partial<{
   hookLabel: string;

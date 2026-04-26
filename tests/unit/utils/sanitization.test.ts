@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   partiallySanitizeUnicode,
   recursivelySanitizeUnicode,
-} from 'src/utils/sanitization';
+} from '@claude-code/mcp-runtime/sanitization.js';
 
 // ─── partiallySanitizeUnicode ───────────────────────────────────────────
 

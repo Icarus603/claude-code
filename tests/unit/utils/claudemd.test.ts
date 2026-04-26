@@ -5,7 +5,7 @@ import {
   getLargeMemoryFiles,
   MAX_MEMORY_CHARACTER_COUNT,
   type MemoryFileInfo,
-} from 'src/utils/claudemd';
+} from '@claude-code/storage/claudemd.js';
 
 function mockMemoryFile(overrides: Partial<MemoryFileInfo> = {}): MemoryFileInfo {
   return {

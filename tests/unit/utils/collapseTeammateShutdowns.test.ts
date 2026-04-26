@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { collapseTeammateShutdowns } from 'src/utils/collapseTeammateShutdowns';
+import { collapseTeammateShutdowns } from '@claude-code/repl/collapseTeammateShutdowns.js';
 
 function makeShutdownMsg(uuid = "1"): any {
   return {

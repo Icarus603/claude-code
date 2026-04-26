@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { calculateHorizontalScrollWindow } from 'src/utils/horizontalScroll';
+import { calculateHorizontalScrollWindow } from '@claude-code/repl/uiHelpers/horizontalScroll.js';
 
 describe("calculateHorizontalScrollWindow", () => {
   // Basic scenarios

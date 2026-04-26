@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { extractGlobBaseDirectory } from 'src/utils/glob';
+import { extractGlobBaseDirectory } from '@claude-code/storage/glob.js';
 
 describe("extractGlobBaseDirectory", () => {
   test("extracts base dir from glob with *", () => {

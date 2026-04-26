@@ -9,7 +9,7 @@ mock.module("src/utils/log.ts", () => ({
 }));
 
 const { safeParseJSON, safeParseJSONC, parseJSONL, addItemToJSONCArray } =
-  await import('src/utils/json');
+  await import('@claude-code/storage/json.js');
 
 // ─── safeParseJSON ──────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { padAligned } from 'src/utils/markdown';
+import { padAligned } from '@claude-code/output/markdown.js';
 
 describe("padAligned", () => {
   test("left-aligns: pads with spaces on right", () => {

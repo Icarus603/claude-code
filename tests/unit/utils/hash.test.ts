@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { djb2Hash, hashContent, hashPair } from 'src/utils/hash';
+import { djb2Hash, hashContent, hashPair } from '@claude-code/config/hash';
 
 describe("djb2Hash", () => {
   test("returns a number", () => {

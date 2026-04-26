@@ -16,7 +16,7 @@ mock.module("src/utils/debug.ts", () => ({
   logAntError: () => {},
 }));
 
-const { validateBoundedIntEnvVar } = await import('src/utils/envValidation');
+const { validateBoundedIntEnvVar } = await import('@claude-code/config/env/validation');
 
 describe("validateBoundedIntEnvVar", () => {
   test("returns default when value is undefined", () => {

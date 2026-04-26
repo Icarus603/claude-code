@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { lazySchema } from 'src/utils/lazySchema';
+import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js';
 
 describe("lazySchema", () => {
   test("returns a function", () => {

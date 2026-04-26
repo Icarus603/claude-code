@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "zod/v4";
-import { semanticNumber } from 'src/utils/semanticNumber';
+import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js';
 
 describe("semanticNumber", () => {
   test("parses number 42", () => {

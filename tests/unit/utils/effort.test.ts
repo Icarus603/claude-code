@@ -1,13 +1,13 @@
 import { describe, expect, test, beforeEach, afterEach, mock } from "bun:test";
 
 // Mock heavy dependencies to avoid import chain issues
-mock.module("src/utils/thinking.js", () => ({
+mock.module("@claude-code/provider/thinking.js", () => ({
   isUltrathinkEnabled: () => false,
 }));
 mock.module("src/utils/settings/settings.js", () => ({
   getInitialSettings: () => ({}),
 }));
-mock.module("src/utils/auth.js", () => ({
+mock.module("@claude-code/provider/authAlias.js", () => ({
   isProSubscriber: () => false,
   isMaxSubscriber: () => false,
   isTeamSubscriber: () => false,
@@ -27,7 +27,7 @@ const {
   getEffortLevelDescription,
   resolvePickerEffortPersistence,
   EFFORT_LEVELS,
-} = await import("src/utils/effort.js");
+} = await import("@claude-code/agent/effort.js");
 
 // ─── EFFORT_LEVELS constant ────────────────────────────────────────────
 

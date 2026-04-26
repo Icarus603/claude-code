@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { sequential } from 'src/utils/sequential';
+import { sequential } from '@claude-code/config/sequential';
 
 describe("sequential", () => {
   test("wraps async function, returns same result", async () => {

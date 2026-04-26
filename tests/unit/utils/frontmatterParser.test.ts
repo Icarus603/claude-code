@@ -5,7 +5,7 @@ import {
   parsePositiveIntFromFrontmatter,
   parseBooleanFrontmatter,
   parseShellFrontmatter,
-} from 'src/utils/frontmatterParser';
+} from '@claude-code/agent/frontmatterParser.js';
 
 describe("parseFrontmatter", () => {
   test("parses valid frontmatter", () => {

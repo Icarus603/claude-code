@@ -10,7 +10,7 @@ import {
   safeJoinLines,
   EndTruncatingAccumulator,
   truncateToLines,
-} from 'src/utils/stringUtils';
+} from '@claude-code/output/utils/stringUtils.js';
 
 describe("escapeRegExp", () => {
   test("escapes special regex chars", () => {

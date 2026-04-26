@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseGitNumstat, parseGitDiff, parseShortstat } from 'src/utils/gitDiff';
+import { parseGitNumstat, parseGitDiff, parseShortstat } from '@claude-code/tool-registry/gitDiff.js';
 
 describe("parseGitNumstat", () => {
   test("parses single file", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { adjustHunkLineNumbers, getPatchFromContents } from 'src/utils/diff';
+import { adjustHunkLineNumbers, getPatchFromContents } from '@claude-code/agent/diff.js';
 
 describe("adjustHunkLineNumbers", () => {
   test("shifts hunk line numbers by offset", () => {

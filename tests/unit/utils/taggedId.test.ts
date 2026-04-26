@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { toTaggedId } from 'src/utils/taggedId';
+import { toTaggedId } from '@claude-code/agent/taggedId.js';
 
 const BASE_58_CHARS =
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";

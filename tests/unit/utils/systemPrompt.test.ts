@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { buildEffectiveSystemPrompt } from 'src/utils/systemPrompt';
+import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js';
 
 const defaultPrompt = ["You are a helpful assistant.", "Follow instructions."];
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { difference, every, intersects, union } from 'src/utils/set';
+import { difference, every, intersects, union } from '@claude-code/output/setUtils.js';
 
 describe("difference", () => {
 	test("returns elements in a but not in b", () => {

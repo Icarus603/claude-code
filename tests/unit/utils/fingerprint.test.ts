@@ -3,7 +3,7 @@ import {
   FINGERPRINT_SALT,
   extractFirstMessageText,
   computeFingerprint,
-} from 'src/utils/fingerprint';
+} from '@claude-code/provider/fingerprint.js';
 
 describe("FINGERPRINT_SALT", () => {
   test("has expected value '59cf53e54c78'", () => {

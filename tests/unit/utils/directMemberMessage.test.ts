@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseDirectMemberMessage, sendDirectMemberMessage } from 'src/utils/directMemberMessage';
+import { parseDirectMemberMessage, sendDirectMemberMessage } from '@claude-code/agent/misc/directMemberMessage.js';
 
 describe("parseDirectMemberMessage", () => {
   test("parses '@agent-name hello world'", () => {

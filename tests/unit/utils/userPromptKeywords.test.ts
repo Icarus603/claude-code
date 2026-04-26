@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   matchesNegativeKeyword,
   matchesKeepGoingKeyword,
-} from 'src/utils/userPromptKeywords';
+} from '@claude-code/agent/userPromptKeywords/userPromptKeywords.js';
 
 describe("matchesNegativeKeyword", () => {
   test("matches 'wtf'", () => {
