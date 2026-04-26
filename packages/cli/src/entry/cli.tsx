@@ -5,7 +5,7 @@ import { feature } from 'bun:bundle'
 // This happens when running cli.tsx directly (not via `bun run dev` or built dist/).
 if (typeof globalThis.MACRO === 'undefined') {
   ;(globalThis as any).MACRO = {
-    VERSION: process.env.CLAUDE_CODE_VERSION || '2.1.888',
+    VERSION: process.env.CLAUDE_CODE_VERSION || '1.carus.000',
     BUILD_TIME: new Date().toISOString(),
     FEEDBACK_CHANNEL: '',
     ISSUES_EXPLAINER: '',

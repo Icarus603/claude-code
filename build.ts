@@ -120,18 +120,5 @@ try {
   // Optional artifact; postinstall/download-ripgrep handles missing binaries.
 }
 
-// Step 5: Bundle download-ripgrep script as standalone JS for postinstall
-const rgScript = await Bun.build({
-  entrypoints: ['scripts/download-ripgrep.ts'],
-  outdir,
-  target: 'node',
-})
-if (!rgScript.success) {
-  console.error('Failed to bundle download-ripgrep script:')
-  for (const log of rgScript.logs) {
-    console.error(log)
-  }
-  // Non-fatal — postinstall fallback to bun run scripts/download-ripgrep.ts
-} else {
-  console.log(`Bundled download-ripgrep script to ${outdir}/`)
-}
+// (npm-postinstall download-ripgrep step removed — distribution is now
+// standalone binaries via install.sh; ripgrep is copied at build time.)
