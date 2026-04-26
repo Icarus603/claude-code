@@ -302,6 +302,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §3.2 / §8 — distinct cross-package deps per package may not grow',
   },
   {
+    id: 'deps-setter-audit',
+    layer: 'Cross-Cutting',
+    subsystem: 'setter shim safety',
+    script: 'scripts/verify-deps-setter-audit.ts',
+    doc: 'V7 §3.2 — packages/<X>/_deps.ts setters with dangerous defaults must be wired at boot',
+  },
+  {
     id: 'src-classifier',
     layer: 'Cross-Cutting',
     subsystem: 'src/ classification',
