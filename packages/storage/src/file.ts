@@ -97,25 +97,12 @@ export function writeTextContent(
   writeFileSyncAndFlush_DEPRECATED(filePath, toWrite, { encoding })
 }
 
-export function detectFileEncoding(filePath: string): BufferEncoding {
-  try {
-    const fs = getFsImplementation()
-    const { resolvedPath } = safeResolvePath(fs, filePath)
-    return detectEncodingForResolvedPath(resolvedPath)
-  } catch (error) {
-    if (isFsInaccessible(error)) {
-      logForDebugging(
-        `detectFileEncoding failed for expected reason: ${error.code}`,
-        {
-          level: 'debug',
-        },
-      )
-    } else {
-      logError(error)
-    }
-    return 'utf8'
-  }
-}
+// Re-export from fileEncoding.ts to preserve the import surface.
+// The implementation moved there to break a file.ts ↔ fileReadCache.ts
+// cycle: fileReadCache needs detectFileEncoding (originally lived
+// here) and file.ts needs fileReadCache. Both can now depend on the
+// neutral fileEncoding leaf without forming a cycle.
+export { detectFileEncoding } from './fileEncoding.js'
 
 export function detectLineEndings(
   filePath: string,

@@ -1,4 +1,4 @@
-import { detectFileEncoding } from '@claude-code/storage/file.js'
+import { detectFileEncoding } from '@claude-code/storage/fileEncoding.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 
 type CachedFileData = {

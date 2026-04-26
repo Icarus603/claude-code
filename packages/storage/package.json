@@ -31,6 +31,7 @@
     "./secureStorage/macOsKeychainStorage.js": "./src/secureStorage/macOsKeychainStorage.ts",
     "./toolResultStorage.js": "./src/toolResultStorage.ts",
     "./fileRead.js": "./src/fileRead.ts",
+    "./fileEncoding.js": "./src/fileEncoding.ts",
     "./browser.js": "./src/browser.ts",
     "./git.js": "./src/git.ts",
     "./claudemd.js": "./src/claudemd.ts",
