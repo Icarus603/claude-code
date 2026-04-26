@@ -165,6 +165,7 @@ import { useFeedbackSurveyAutoIssue } from '@claude-code/repl/screens/repl/useFe
 import { useAutoRunIssueHandlers } from '@claude-code/repl/screens/repl/useAutoRunIssueHandlers.js';
 import { useHandleExit } from '@claude-code/repl/screens/repl/useHandleExit.js';
 import { useSurveyAndRateLimitHandlers } from '@claude-code/repl/screens/repl/useSurveyAndRateLimitHandlers.js';
+import { useQueuedCommandOnCancel } from '@claude-code/repl/screens/repl/useQueuedCommandOnCancel.js';
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js';
 import { CancelRequestHandler } from '@claude-code/repl/hooks/useCancelRequest.js';
 import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgroundTaskNavigation.js';
@@ -2176,23 +2177,9 @@ export function REPL({
   }
 
   // Function to handle queued command when canceling a permission request
-  const handleQueuedCommandOnCancel = useCallback(() => {
-    const result = popAllEditable(inputValue, 0);
-    if (!result) return;
-    setInputValue(result.text);
-    setInputMode('prompt');
-
-    // Restore images from queued commands to pastedContents
-    if (result.images.length > 0) {
-      setPastedContents(prev => {
-        const newContents = { ...prev };
-        for (const image of result.images) {
-          newContents[image.id] = image;
-        }
-        return newContents;
-      });
-    }
-  }, [setInputValue, setInputMode, inputValue, setPastedContents]);
+  const handleQueuedCommandOnCancel = useQueuedCommandOnCancel(
+    inputValue, setInputValue, setInputMode, setPastedContents,
+  );
 
   // CancelRequestHandler props - rendered inside KeybindingSetup
   const cancelRequestProps = {

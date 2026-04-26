@@ -620,6 +620,7 @@
     "./screens/repl/useAutoRunIssueHandlers.js": "./src/screens/repl/useAutoRunIssueHandlers.ts",
     "./screens/repl/useHandleExit.js": "./src/screens/repl/useHandleExit.tsx",
     "./screens/repl/useSurveyAndRateLimitHandlers.js": "./src/screens/repl/useSurveyAndRateLimitHandlers.ts",
+    "./screens/repl/useQueuedCommandOnCancel.js": "./src/screens/repl/useQueuedCommandOnCancel.ts",
     "./commands/assistant/index.js": "./src/commands/assistant/index.ts"
   }
 }
