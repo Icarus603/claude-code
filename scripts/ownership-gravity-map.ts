@@ -443,8 +443,8 @@ export const SUBSYSTEM_MIRRORS: SubsystemMirror[] = [
     subsystem: 'headless-sdk',
     ownerPackage: 'packages/headless-sdk',
     srcMirrors: [
-      'src/entrypoints/agentSdkTypes.ts',
-      'src/entrypoints/sandboxTypes.ts',
+
+      // src/entrypoints/* SDK shims removed — canonical owners are in packages/headless-sdk/
     ],
     wave: 6,
     v7Ref: '§8.25 / §10.2 runHeadless / §10.3 sdkMessageAdapter',
