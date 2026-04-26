@@ -302,6 +302,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §3.2 / §8 — distinct cross-package deps per package may not grow',
   },
   {
+    id: 'deps-arity',
+    layer: 'Cross-Cutting',
+    subsystem: 'forwarder arity safety',
+    script: 'scripts/verify-deps-arity.ts',
+    doc: 'V7 §3.2 — _deps.ts public exports must forward all params to setter (catches arg-drop bugs)',
+  },
+  {
     id: 'schema-validation-mismatch',
     layer: 'Cross-Cutting',
     subsystem: 'tool contract safety',
