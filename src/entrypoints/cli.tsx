@@ -69,7 +69,7 @@ async function main(): Promise<void> {
   }
 
   // For all other paths, load the startup profiler
-  const { profileCheckpoint } = await import('../utils/startupProfiler.js')
+  const { profileCheckpoint } = await import('@claude-code/app-host/startup/startupProfiler.js')
   profileCheckpoint('cli_entry')
 
   // Fast-path for --dump-system-prompt: output the rendered system prompt and exit.
@@ -146,13 +146,13 @@ async function main(): Promise<void> {
     )
     const { BRIDGE_LOGIN_ERROR } = await import('@claude-code/bridge/types.js')
     const { bridgeMain } = await import('@claude-code/bridge/bridgeMain.js')
-    const { exitWithError } = await import('../utils/process.js')
+    const { exitWithError } = await import('@claude-code/shell/process.js')
 
     // Auth check must come before the GrowthBook gate check — without auth,
     // GrowthBook has no user context and would return a stale/default false.
     // getBridgeDisabledReason awaits GB init, so the returned value is fresh
     // (not the stale disk cache), but init still needs auth headers to work.
-    const { getClaudeAIOAuthTokens } = await import('../utils/auth.js')
+    const { getClaudeAIOAuthTokens } = await import('@claude-code/provider/authAlias.js')
     if (!getClaudeAIOAuthTokens()?.accessToken) {
       exitWithError(BRIDGE_LOGIN_ERROR)
     }
@@ -276,7 +276,7 @@ async function main(): Promise<void> {
     const { enableConfigs } = await import('@claude-code/config')
     enableConfigs()
     const { isWorktreeModeEnabled } = await import(
-      '../utils/worktreeModeEnabled.js'
+      '@claude-code/agent/worktreeModeEnabled.js'
     )
     if (isWorktreeModeEnabled()) {
       const { execIntoTmuxWorktree } = await import('@claude-code/swarm')
@@ -286,7 +286,7 @@ async function main(): Promise<void> {
       }
       // If not handled (e.g., error), fall through to normal CLI
       if (result.error) {
-        const { exitWithError } = await import('../utils/process.js')
+        const { exitWithError } = await import('@claude-code/shell/process.js')
         exitWithError(result.error)
       }
     }
@@ -307,7 +307,7 @@ async function main(): Promise<void> {
   }
 
   // No special flags detected, load and run the full CLI
-  const { startCapturingEarlyInput } = await import('../utils/earlyInput.js')
+  const { startCapturingEarlyInput } = await import('@claude-code/repl/earlyInput.js')
   startCapturingEarlyInput()
   profileCheckpoint('cli_before_main_import')
   const { main: cliMain } = await import('../main.jsx')

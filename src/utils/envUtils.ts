@@ -1,22 +1,8 @@
-/**
- * V7 §10.3 facade — moved to `@claude-code/config/env/utils`.
- *
- * Also wires the ant-only `checkProtectedNamespace` probe into the package's
- * setter. USER_TYPE !== 'ant' short-circuits the probe inside the package so
- * external builds never hit the require().
- */
-
-import { setCheckProtectedNamespaceFn } from '@claude-code/config/env/utils'
-
-if (process.env.USER_TYPE === 'ant') {
-  setCheckProtectedNamespaceFn(() => {
-    /* eslint-disable @typescript-eslint/no-require-imports */
-    return (
-      require('./protectedNamespace.js') as typeof import('./protectedNamespace.js')
-    ).checkProtectedNamespace()
-    /* eslint-enable @typescript-eslint/no-require-imports */
-  })
-}
+// Forward shim — canonical owner is @claude-code/config/env/utils.
+// The ant-only checkProtectedNamespace wiring previously here referenced
+// a deleted protectedNamespace.ts stub (export {}); it was a no-op in
+// external builds and broken in any build that imported envUtils, so
+// the setter dance is dropped. The package default `() => false` stands.
 
 export {
   getAWSRegion,

@@ -10,8 +10,8 @@ import {
   setCwdFn,
   setDjb2HashFn,
 } from '@claude-code/storage/cache-paths'
-import { getFsImplementation } from './fsOperations.js'
-import { djb2Hash } from './hash.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { djb2Hash } from '@claude-code/config/hash'
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 setCwdFn(() => getFsImplementation().cwd())
