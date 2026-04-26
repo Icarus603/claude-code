@@ -13,7 +13,7 @@
 
 import { spawnSync } from 'child_process'
 
-const BUDGET = 3417 // post-#108 batch 1 — narrowed appState in computer-use-mcp/legacy (-55 TS2339)
+const BUDGET = 3127 // post-#124 — AppState `unknown` → `Record<string, any>` (-290 errors)
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
