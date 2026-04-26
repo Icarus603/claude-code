@@ -25,7 +25,7 @@ const BUDGET: Record<string, number> = {
   'bridge': 14,
   'cli': 21,
   'command-runtime': 20,
-  'config': 13,
+  'config': 14,  // +1: mcp-runtime lazy-required by plugin/_deps to fix MCP schema null bug
   'daemon': 3,
   'headless-sdk': 2,
   'ide': 10,

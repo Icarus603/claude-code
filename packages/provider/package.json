@@ -106,6 +106,8 @@
     "./gemini/types.js": "./src/gemini/types.ts",
     "./gemini/index.js": "./src/gemini/index.ts",
     "./gemini/convertTools.js": "./src/gemini/convertTools.ts",
+    "./grok/client.js": "./src/grok/client.ts",
+    "./grok/modelMapping.js": "./src/grok/modelMapping.ts",
     "./model/aliases.js": "./src/model/aliases.ts",
     "./model/model.js": "./src/model/model.ts",
     "./model/providers.js": "./src/model/providers.ts",

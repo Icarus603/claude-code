@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { firstPartyNameToCanonical } from "../model";
+import { firstPartyNameToCanonical } from "@claude-code/provider/model/model.js";
 
 describe("firstPartyNameToCanonical", () => {
   test("maps opus-4-6 full name to canonical", () => {

@@ -132,7 +132,12 @@ export function installPluginBindings(): void {
     mkdirSync: (p, o) => getFsImplementation().mkdirSync(p, o),
     writeFileSync: (p, d) => getFsImplementation().writeFileSync(p, d),
     readFileSync: (p, e) => getFsImplementation().readFileSync(p, e) as string,
-    readdirSync: p => getFsImplementation().readdirSync(p) as string[],
+    readdirSync: p =>
+      nodeFs.readdirSync(p, { withFileTypes: true }) as Array<{
+        name: string
+        isFile(): boolean
+        isDirectory(): boolean
+      }>,
     statSync: p => getFsImplementation().statSync(p) as any,
     rmSync: (p, o) => getFsImplementation().rmSync(p, o as any),
     rmdirSync: p => nodeFs.rmdirSync(p),
@@ -147,7 +152,12 @@ export function installPluginBindings(): void {
     mkdir: async (p, o) => {
       await nodeFsp.mkdir(p, { recursive: true, ...(o ?? {}) })
     },
-    readdir: async p => (await nodeFsp.readdir(p)) as string[],
+    readdir: async p =>
+      (await nodeFsp.readdir(p, { withFileTypes: true })) as Array<{
+        name: string
+        isFile(): boolean
+        isDirectory(): boolean
+      }>,
     stat: async p => (await nodeFsp.stat(p)) as any,
     rm: async (p, o) => nodeFsp.rm(p, o),
     rename: async (o, n) => nodeFsp.rename(o, n),

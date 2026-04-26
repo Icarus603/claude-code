@@ -711,28 +711,6 @@ export function ManageMarketplaces({
           </Text>
         </Box>
 
-        {/* Installed plugins section */}
-        {selectedMarketplace.installedPlugins &&
-          selectedMarketplace.installedPlugins.length > 0 && (
-            <Box flexDirection="column" marginTop={1}>
-              <Text bold>
-                Installed plugins ({selectedMarketplace.installedPlugins.length}
-                ):
-              </Text>
-              <Box flexDirection="column" marginLeft={1}>
-                {selectedMarketplace.installedPlugins.map(plugin => (
-                  <Box key={plugin.name} flexDirection="row" gap={1}>
-                    <Text>{figures.bullet}</Text>
-                    <Box flexDirection="column">
-                      <Text>{plugin.name}</Text>
-                      <Text dimColor>{plugin.manifest.description}</Text>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          )}
-
         {/* Processing indicator */}
         {isUpdating && (
           <Box marginTop={1} flexDirection="column">
@@ -755,7 +733,10 @@ export function ManageMarketplaces({
           </Box>
         )}
 
-        {/* Menu options */}
+        {/* Menu options — kept above the installed plugins list so they
+            stay visible even when the marketplace has many installed
+            plugins (claude-plugins-official has 19+) that would otherwise
+            push the menu off-screen. */}
         {!isUpdating && (
           <Box flexDirection="column" marginTop={1}>
             {menuOptions.map((option, idx) => {
@@ -774,6 +755,30 @@ export function ManageMarketplaces({
             })}
           </Box>
         )}
+
+        {/* Installed plugins section — shown below the menu so the
+            actionable controls remain on-screen for marketplaces with
+            long install lists. */}
+        {selectedMarketplace.installedPlugins &&
+          selectedMarketplace.installedPlugins.length > 0 && (
+            <Box flexDirection="column" marginTop={1}>
+              <Text bold>
+                Installed plugins ({selectedMarketplace.installedPlugins.length}
+                ):
+              </Text>
+              <Box flexDirection="column" marginLeft={1}>
+                {selectedMarketplace.installedPlugins.map(plugin => (
+                  <Box key={plugin.name} flexDirection="row" gap={1}>
+                    <Text>{figures.bullet}</Text>
+                    <Box flexDirection="column">
+                      <Text>{plugin.name}</Text>
+                      <Text dimColor>{plugin.manifest.description}</Text>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
 
         {/* Show explanatory text at the bottom when auto-update is enabled */}
         {!isUpdating &&

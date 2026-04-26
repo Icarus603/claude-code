@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isModelAlias, isModelFamilyAlias } from "../aliases";
+import { isModelAlias, isModelFamilyAlias } from "@claude-code/provider/model/aliases.js";
 
 describe("isModelAlias", () => {
   test('returns true for "sonnet"', () => {
