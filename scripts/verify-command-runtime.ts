@@ -2,6 +2,11 @@ import { enableConfigs } from '@claude-code/config'
 import { installConfigHostBindings } from '../packages/config/host.js'
 
 async function main(): Promise<void> {
+  // Dummy creds — getAnthropicApiKeyWithSource() throws on a fresh CI
+  // runner with no env vars and no OAuth token. Set before bootstrap so
+  // any downstream provider init sees a value.
+  process.env.ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || 'provider-test'
+
   // Install minimal host bindings so enableConfigs() doesn't throw.
   installConfigHostBindings({})
   enableConfigs()

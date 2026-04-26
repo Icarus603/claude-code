@@ -12,6 +12,7 @@
     "./testing": "./testing/index.ts",
     "./autoUpdater.js": "./src/autoUpdater.ts",
     "./binaryCheck.js": "./src/binaryCheck.ts",
+    "./githubReleases.js": "./src/githubReleases.ts",
     "./update.js": "./src/update.ts",
     "./nativeInstaller/index.js": "./src/nativeInstaller/index.ts",
     "./nativeInstaller/packageManagers.js": "./src/nativeInstaller/packageManagers.ts",

@@ -112,15 +112,15 @@ export async function getLatestVersionFromBinaryRepo(
 export async function getLatestVersion(
   channelOrVersion: string,
 ): Promise<string> {
-  // Direct version - match internal format too (e.g. 1.0.30-dev.shaf4937ce)
-  if (/^v?\d+\.\d+\.\d+(-\S+)?$/.test(channelOrVersion)) {
+  // Direct version: ccb's "v1.carus.NNN" format OR upstream "1.0.30" semver.
+  // Both are accepted as direct overrides — useful for `ccb install <version>`.
+  if (
+    /^v?\d+\.[a-z0-9]+\.\w+(-\S+)?$/i.test(channelOrVersion) ||
+    /^v?\d+\.\d+\.\d+(-\S+)?$/.test(channelOrVersion)
+  ) {
     const normalized = channelOrVersion.startsWith('v')
       ? channelOrVersion.slice(1)
       : channelOrVersion
-    // 99.99.x is reserved for CI smoke-test fixtures on real GCS.
-    // feature() is false in all shipped builds — DCE collapses this to an
-    // unconditional throw. Only `bun --feature=ALLOW_TEST_VERSIONS` (the
-    // smoke test's source-level invocation) bypasses.
     if (/^99\.99\./.test(normalized) && !feature('ALLOW_TEST_VERSIONS')) {
       throw new Error(
         `Version ${normalized} is not available for installation. Use 'stable' or 'latest'.`,
@@ -137,15 +137,20 @@ export async function getLatestVersion(
     )
   }
 
-  // Route to appropriate source
+  // Ant-internal users still hit Artifactory.
   if (process.env.USER_TYPE === 'ant') {
-    // Use Artifactory for ant users
     const npmTag = channel === 'stable' ? 'stable' : 'latest'
     return getLatestVersionFromArtifactory(npmTag)
   }
 
-  // Use GCS for external users
-  return getLatestVersionFromBinaryRepo(channel, GCS_BUCKET_URL)
+  // ccb default: GitHub Releases. The "stable" channel currently maps to
+  // "latest" too — distinguishing requires a tag-naming convention we
+  // haven't established.
+  const { fetchLatestReleaseTag } = await import('@claude-code/updater/githubReleases.js')
+  const tag = await fetchLatestReleaseTag()
+  // Strip leading "v" so version comparisons against MACRO.VERSION work
+  // (MACRO.VERSION is "1.carus.000", not "v1.carus.000").
+  return tag.startsWith('v') ? tag.slice(1) : tag
 }
 
 export async function downloadVersionFromArtifactory(
@@ -295,6 +300,7 @@ async function downloadAndVerifyBinary(
   expectedChecksum: string,
   binaryPath: string,
   requestConfig: Record<string, unknown> = {},
+  skipChecksum: boolean = false,
 ) {
   let lastError: Error | undefined
 
@@ -331,15 +337,18 @@ async function downloadAndVerifyBinary(
 
       clearStallTimer()
 
-      // Verify checksum
-      const hash = createHash('sha256')
-      hash.update(response.data)
-      const actualChecksum = hash.digest('hex')
+      // Verify checksum (skipped when caller couldn't fetch a sibling
+      // .sha256 — TLS still protected the wire, but content isn't pinned).
+      if (!skipChecksum) {
+        const hash = createHash('sha256')
+        hash.update(response.data)
+        const actualChecksum = hash.digest('hex')
 
-      if (actualChecksum !== expectedChecksum) {
-        throw new Error(
-          `Checksum mismatch: expected ${expectedChecksum}, got ${actualChecksum}`,
-        )
+        if (actualChecksum !== expectedChecksum) {
+          throw new Error(
+            `Checksum mismatch: expected ${expectedChecksum}, got ${actualChecksum}`,
+          )
+        }
       }
 
       // Write binary to disk
@@ -490,8 +499,7 @@ export async function downloadVersion(
 ): Promise<'npm' | 'binary'> {
   // Test-fixture versions route to the private sentinel bucket. DCE'd in all
   // shipped builds — the string 'claude-code-ci-sentinel' and the gcloud call
-  // never exist in compiled binaries. Same gcloud-token pattern as
-  // remoteSkillLoader.ts:175-195.
+  // never exist in compiled binaries.
   if (feature('ALLOW_TEST_VERSIONS') && /^99\.99\./.test(version)) {
     const { stdout } = await execFileNoThrowWithCwd('gcloud', [
       'auth',
@@ -507,14 +515,82 @@ export async function downloadVersion(
   }
 
   if (process.env.USER_TYPE === 'ant') {
-    // Use Artifactory for ant users
     await downloadVersionFromArtifactory(version, stagingPath)
     return 'npm'
   }
 
-  // Use GCS for external users
-  await downloadVersionFromBinaryRepo(version, stagingPath, GCS_BUCKET_URL)
+  // ccb default: download platform-specific binary from GitHub Releases.
+  await downloadVersionFromGithubReleases(version, stagingPath)
   return 'binary'
+}
+
+/**
+ * GitHub Releases adapter for ccb. Different from upstream's
+ * downloadVersionFromBinaryRepo (which expects a manifest.json with
+ * per-platform checksums) — GitHub Releases stores each platform binary
+ * as a flat asset, with optional sibling .sha256 files for verification.
+ */
+async function downloadVersionFromGithubReleases(
+  version: string,
+  stagingPath: string,
+): Promise<void> {
+  const fs = getFsImplementation()
+  await fs.rm(stagingPath, { recursive: true, force: true })
+
+  const platform = getPlatform()
+  const startTime = Date.now()
+  logEvent('tengu_binary_download_attempt', {})
+
+  const { fetchAssetSha256, getAssetDownloadUrl, getAssetNameForPlatform } =
+    await import('@claude-code/updater/githubReleases.js')
+
+  // Tag form on GitHub is "v<version>"; we accept both forms in
+  // download.ts callers, so always re-prepend v if missing.
+  const tag = version.startsWith('v') ? version : `v${version}`
+  const assetName = getAssetNameForPlatform(platform)
+  const binaryUrl = getAssetDownloadUrl(tag, assetName)
+
+  // Optional .sha256 sibling — null if not published yet.
+  const expectedChecksum = await fetchAssetSha256(tag, assetName)
+
+  // Local layout matches Anthropic upstream: `staging/<version>/<binaryName>`.
+  // installer.ts then atomic-moves the binary to `versions/<version>` (a
+  // file, not a dir — getVersionPaths flattens before publish).
+  const binaryName = getBinaryName(platform)
+  await fs.mkdir(stagingPath)
+  const binaryPath = join(stagingPath, binaryName)
+
+  try {
+    await downloadAndVerifyBinary(
+      binaryUrl,
+      expectedChecksum ?? '',
+      binaryPath,
+      {},
+      // skipChecksum when the .sha256 sibling wasn't published — TLS still
+      // protects the wire, we just can't pin the content. Future releases
+      // should always emit .sha256 (release.yml does this).
+      expectedChecksum === null,
+    )
+    const latencyMs = Date.now() - startTime
+    logEvent('tengu_binary_download_success', { latency_ms: latencyMs })
+  } catch (error) {
+    const latencyMs = Date.now() - startTime
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    let httpStatus: number | undefined
+    if (axios.isAxiosError(error) && error.response) {
+      httpStatus = error.response.status
+    }
+    logEvent('tengu_binary_download_failure', {
+      latency_ms: latencyMs,
+      http_status: httpStatus,
+      is_timeout: errorMessage.includes('timeout'),
+      is_checksum_mismatch: errorMessage.includes('Checksum mismatch'),
+    })
+    logError(
+      new Error(`Failed to download ${binaryUrl}: ${errorMessage}`),
+    )
+    throw error
+  }
 }
 
 // Exported for testing
