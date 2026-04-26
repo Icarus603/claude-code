@@ -10,7 +10,7 @@ import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { getMaxVersion, getMaxVersionMessage } from '@claude-code/updater/autoUpdater.js'
 import { isAutoUpdaterDisabled } from '@claude-code/config'
 import { installLatest } from '@claude-code/updater/nativeInstaller/index.js'
-import { gt } from '@claude-code/config/semver'
+import { isVersionNewer } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 
 /**
@@ -105,7 +105,7 @@ export function NativeAutoUpdater({
     try {
       // Check if current version is above the max allowed version
       const maxVersion = await getMaxVersion()
-      if (maxVersion && gt(MACRO.VERSION, maxVersion)) {
+      if (maxVersion && isVersionNewer(MACRO.VERSION, maxVersion)) {
         const msg = await getMaxVersionMessage()
         setMaxVersionIssue(msg ?? 'affects your version')
       }

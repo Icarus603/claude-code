@@ -30,6 +30,34 @@ export function gte(a: string, b: string): boolean {
   return getNpmSemver().gte(a, b, { loose: true })
 }
 
+/**
+ * Compare two version strings using semver when both are valid semver,
+ * else fall back to lexicographic comparison. Designed for ccb's
+ * "1.carus.000" tag format — Bun.semver.order throws on non-semver,
+ * so update.ts and the native installer go through this wrapper
+ * instead of calling gt/gte directly.
+ *
+ * Returns true iff `latest` represents a NEWER version than `current`.
+ * For monotonic numeric suffix tags ("1.carus.000" → "1.carus.001"),
+ * lex compare gives the right answer.
+ */
+export function isVersionNewer(latest: string, current: string): boolean {
+  if (typeof Bun !== 'undefined') {
+    try {
+      return Bun.semver.order(latest, current) === 1
+    } catch {
+      /* fall through */
+    }
+  } else {
+    try {
+      return getNpmSemver().gt(latest, current, { loose: true })
+    } catch {
+      /* fall through */
+    }
+  }
+  return latest > current
+}
+
 export function lt(a: string, b: string): boolean {
   if (typeof Bun !== 'undefined') {
     return Bun.semver.order(a, b) === -1

@@ -318,6 +318,23 @@ export async function checkGlobalInstallPermissions(): Promise<{
 export async function getLatestVersion(
   channel: ReleaseChannel,
 ): Promise<string | null> {
+  // ccb default: GitHub Releases. The npm path below is kept for
+  // ant-internal users only; MACRO.PACKAGE_URL is empty in this build
+  // so the npm call would fail anyway.
+  if (process.env.USER_TYPE !== 'ant') {
+    try {
+      const { fetchLatestReleaseTag } = await import(
+        '@claude-code/updater/githubReleases.js'
+      )
+      const tag = await fetchLatestReleaseTag()
+      // Strip leading "v" — MACRO.VERSION is "1.carus.000", not "v1.carus.000".
+      return tag.startsWith('v') ? tag.slice(1) : tag
+    } catch (error) {
+      logForDebugging(`getLatestVersion: GitHub fetch failed: ${error}`)
+      return null
+    }
+  }
+
   const npmTag = channel === 'stable' ? 'stable' : 'latest'
 
   // Run from home directory to avoid reading project-level .npmrc

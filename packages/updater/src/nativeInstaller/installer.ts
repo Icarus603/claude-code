@@ -47,7 +47,7 @@ import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'
 import { getShellType } from '@claude-code/repl/localInstaller.js'
 import * as lockfile from '@claude-code/storage/lockfile.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { gt, gte } from '@claude-code/config/semver'
+import { isVersionNewer } from '@claude-code/config/semver'
 import {
   filterClaudeAliases,
   getShellConfigPaths,
@@ -481,12 +481,12 @@ async function updateLatest(
   // Check if max version is set (server-side kill switch for auto-updates)
   if (!forceReinstall) {
     const maxVersion = await getMaxVersion()
-    if (maxVersion && gt(version, maxVersion)) {
+    if (maxVersion && isVersionNewer(version, maxVersion)) {
       logForDebugging(
         `Native installer: maxVersion ${maxVersion} is set, capping update from ${version} to ${maxVersion}`,
       )
       // If we're already at or above maxVersion, skip the update entirely
-      if (gte(MACRO.VERSION, maxVersion)) {
+      if (!isVersionNewer(maxVersion, MACRO.VERSION)) {
         logForDebugging(
           `Native installer: current version ${MACRO.VERSION} is already at or above maxVersion ${maxVersion}, skipping update`,
         )
