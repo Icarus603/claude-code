@@ -621,6 +621,7 @@
     "./screens/repl/useHandleExit.js": "./src/screens/repl/useHandleExit.tsx",
     "./screens/repl/useSurveyAndRateLimitHandlers.js": "./src/screens/repl/useSurveyAndRateLimitHandlers.ts",
     "./screens/repl/useQueuedCommandOnCancel.js": "./src/screens/repl/useQueuedCommandOnCancel.ts",
+    "./screens/repl/useStartupCallouts.js": "./src/screens/repl/useStartupCallouts.ts",
     "./commands/assistant/index.js": "./src/commands/assistant/index.ts"
   }
 }

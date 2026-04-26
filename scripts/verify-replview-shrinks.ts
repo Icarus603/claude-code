@@ -13,7 +13,7 @@
 
 import { readFile } from 'fs/promises'
 
-const BUDGET = 5645 // post #88 iter 1 — useQueuedCommandOnCancel extraction
+const BUDGET = 5642 // post #88 iter 2 — useStartupCallouts extraction
 
 async function main() {
   const content = await readFile('packages/repl/src/screens/REPLView.tsx', 'utf8')
