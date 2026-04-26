@@ -6,18 +6,18 @@ async function main(): Promise<void> {
   installConfigHostBindings({})
   enableConfigs()
 
-  const { getDefaultAppState } = await import('../src/state/AppStateStore.js')
-  const { selectMcp } = await import('../src/state/mcpSelectors.js')
+  const { getDefaultAppState } = await import('@claude-code/app-host/state/AppStateStore.js')
+  const { selectMcp } = await import('@claude-code/app-host/state/mcpSelectors.js')
   const { selectToolPermissionContext } = await import(
-    '../src/state/permissionSelectors.js'
+    '@claude-code/app-host/state/permissionSelectors.js'
   )
-  const { selectPlugins } = await import('../src/state/pluginSelectors.js')
+  const { selectPlugins } = await import('@claude-code/app-host/state/pluginSelectors.js')
   const { selectInitialMessage } = await import(
-    '../src/state/sessionSelectors.js'
+    '@claude-code/app-host/state/sessionSelectors.js'
   )
-  const { selectTasks } = await import('../src/state/taskSelectors.js')
-  const { selectTeamContext } = await import('../src/state/teamSelectors.js')
-  const { selectShowExpandedTodos } = await import('../src/state/uiSelectors.js')
+  const { selectTasks } = await import('@claude-code/app-host/state/taskSelectors.js')
+  const { selectTeamContext } = await import('@claude-code/app-host/state/teamSelectors.js')
+  const { selectShowExpandedTodos } = await import('@claude-code/app-host/state/uiSelectors.js')
 
   const state = getDefaultAppState()
 

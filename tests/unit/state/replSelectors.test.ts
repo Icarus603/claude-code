@@ -5,15 +5,15 @@ beforeAll(() => {
   try { installConfigHostBindings({} as any) } catch { /* already installed */ }
 });
 
-import { getDefaultAppState } from 'src/state/AppStateStore.js';
-import { selectElicitation, selectMcp } from 'src/state/mcpSelectors.js';
+import { getDefaultAppState } from '@claude-code/app-host/state/AppStateStore.js';
+import { selectElicitation, selectMcp } from '@claude-code/app-host/state/mcpSelectors.js';
 import {
   selectPendingSandboxRequest,
   selectPendingWorkerRequest,
   selectToolPermissionContext,
   selectWorkerSandboxPermissions,
-} from 'src/state/permissionSelectors.js';
-import { selectAgentDefinitions, selectPlugins } from 'src/state/pluginSelectors.js';
+} from '@claude-code/app-host/state/permissionSelectors.js';
+import { selectAgentDefinitions, selectPlugins } from '@claude-code/app-host/state/pluginSelectors.js';
 import {
   selectInitialMessage,
   selectIsBriefOnly,
@@ -21,14 +21,14 @@ import {
   selectShowRemoteCallout,
   selectSpinnerTip,
   selectVerbose,
-} from 'src/state/sessionSelectors.js';
-import { selectFileHistory, selectTasks, selectViewingAgentTaskId } from 'src/state/taskSelectors.js';
-import { selectTeamContext } from 'src/state/teamSelectors.js';
+} from '@claude-code/app-host/state/sessionSelectors.js';
+import { selectFileHistory, selectTasks, selectViewingAgentTaskId } from '@claude-code/app-host/state/taskSelectors.js';
+import { selectTeamContext } from '@claude-code/app-host/state/teamSelectors.js';
 import {
   selectShowExpandedTodos,
   selectUltraplanLaunchPending,
   selectUltraplanPendingChoice,
-} from 'src/state/uiSelectors.js';
+} from '@claude-code/app-host/state/uiSelectors.js';
 
 describe('REPL selectors', () => {
   test('return stable values for the same AppState snapshot', () => {

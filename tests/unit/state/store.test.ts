@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createStore } from 'src/state/store';
+import { createStore } from '@claude-code/app-host/state/store.js';
 
 describe("createStore", () => {
   test("returns object with getState, setState, subscribe", () => {
