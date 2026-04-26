@@ -210,7 +210,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     getCoordinatorUserContext: (mcpClients: ReadonlyArray<{ name: string }>, scratchpadDir?: string) => {
       try {
-        return require('src/services/coordinator/coordinatorMode.js').getCoordinatorUserContext(mcpClients, scratchpadDir)
+        return require('@claude-code/agent/coordinatorMode.js').getCoordinatorUserContext(mcpClients, scratchpadDir)
       } catch {
         return {}
       }

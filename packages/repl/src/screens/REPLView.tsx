@@ -131,7 +131,7 @@ import { useAssistantHistory } from '@claude-code/repl/hooks/useAssistantHistory
 import type { SSHSession } from '@claude-code/cli/ssh/createSSHSession.js';
 import { SkillImprovementSurvey } from '@claude-code/repl/components/SkillImprovementSurvey.js';
 import { useSkillImprovementSurvey } from '@claude-code/repl/hooks/useSkillImprovementSurvey.js';
-import { useMoreRight } from 'src/moreright/useMoreRight.js';
+import { useMoreRight } from '@claude-code/repl/moreright/useMoreRight.js';
 import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '@claude-code/repl/components/Spinner.js';
 import { getSystemPrompt } from '@claude-code/agent/prompts.js';
 import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js';
@@ -344,12 +344,12 @@ import { getInteractiveMcpClients } from './repl/integrations.js';
 import { parseImmediateCommandInput } from './repl/submission.js';
 // Dead code elimination: conditional import for loop mode
 /* eslint-disable @typescript-eslint/no-require-imports */
-const proactiveModule = feature('PROACTIVE') || feature('KAIROS') ? require('src/proactive/index.js') : null;
+const proactiveModule = feature('PROACTIVE') || feature('KAIROS') ? require('@claude-code/agent/proactive/index.js') : null;
 const PROACTIVE_NO_OP_SUBSCRIBE = (_cb: () => void) => () => {};
 const PROACTIVE_FALSE = () => false;
 const SUGGEST_BG_PR_NOOP = (_p: string, _n: string): boolean => false;
 const useProactive =
-  feature('PROACTIVE') || feature('KAIROS') ? require('src/proactive/useProactive.js').useProactive : null;
+  feature('PROACTIVE') || feature('KAIROS') ? require('@claude-code/agent/proactive/useProactive.js').useProactive : null;
 const useScheduledTasks = feature('AGENT_TRIGGERS') ? require('@claude-code/repl/hooks/useScheduledTasks.js').useScheduledTasks : null;
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js';

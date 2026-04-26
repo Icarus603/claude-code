@@ -112,7 +112,7 @@ export async function clearConversation({
   // Clear context-blocked flag so proactive ticks resume after /clear
   if (feature('PROACTIVE') || feature('KAIROS')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
-    const { setContextBlocked } = require('src/proactive/index.js')
+    const { setContextBlocked } = require('@claude-code/agent/proactive/index.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     setContextBlocked(false)
   }

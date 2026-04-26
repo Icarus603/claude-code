@@ -99,7 +99,7 @@ const LogoHeader = React.memo(function LogoHeader({
 /* eslint-disable @typescript-eslint/no-require-imports */
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
-    ? require('src/proactive/index.js')
+    ? require('@claude-code/agent/proactive/index.js')
     : null
 const BRIEF_TOOL_NAME: string | null =
   feature('KAIROS') || feature('KAIROS_BRIEF')

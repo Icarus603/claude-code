@@ -352,7 +352,7 @@ const coordinatorModeModule = feature('COORDINATOR_MODE')
   : null
 const proactiveModule =
   feature('PROACTIVE') || feature('KAIROS')
-    ? (require('src/proactive/index.js') as typeof import('src/proactive/index.js'))
+    ? (require('@claude-code/agent/proactive/index.js') as typeof import('@claude-code/agent/proactive/index.js'))
     : null
 const cronSchedulerModule = require('@claude-code/agent/scheduler') as typeof import('@claude-code/agent/scheduler')
 const cronJitterConfigModule = require('@claude-code/agent/misc/cronJitterConfig.js') as typeof import('@claude-code/agent/misc/cronJitterConfig.js')
