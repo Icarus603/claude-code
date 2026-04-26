@@ -9,7 +9,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import '@claude-code/tool-registry/runtime'
 import { getDefaultAppState } from '@claude-code/app-host/state/AppStateStore.js'
-import review from '../commands/review.js'
+import review from '@claude-code/command-runtime/commands/review/review.js'
 import type { Command } from '../commands.js'
 import {
   findToolByName,
