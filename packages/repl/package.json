@@ -463,6 +463,7 @@
     "./notifier.js": "./src/notifier.ts",
     "./selectors.js": "./src/selectors.ts",
     "./hooksSettings.js": "./src/hooksSettings.ts",
+    "./isHookEqual.js": "./src/isHookEqual.ts",
     "./textInputTypes.js": "./src/textInputTypes.ts",
     "./tasksTypes.js": "./src/tasksTypes.ts",
     "./localShellTaskGuards.js": "./src/localShellTaskGuards.ts",
