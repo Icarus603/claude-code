@@ -7,7 +7,7 @@ Date: 2026-04-10
 External behavior that must remain unchanged during V6 refactor:
 
 - CLI flags / command semantics / exit behavior
-- SDK type surface (`src/entrypoints/agentSdkTypes.ts` + `src/entrypoints/sdk/*`)
+- SDK type surface (`packages/headless-sdk/src/agentSdkTypes.ts` + `packages/headless-sdk/src/*`)
 - session / transcript / metadata / config file formats
 - permission flow semantics (allow/deny/ask + mode behavior)
 - MCP config surface and runtime behavior
@@ -20,14 +20,12 @@ d08c6ea72c10a269752687d4ccfe1dca9bfa0a13d0670c86c7a005cb2c49f4ae  packages/app-h
 3baea7b978df3f30f8391b11810edcd750ff5f36008f2b70a45ef1377863dbc9  src/entrypoints/mcp.ts
 e15167a170952be204091d6808b0ee9ed7ccc114e34e9396eb060789aac33f4b  packages/headless-sdk/src/sandboxTypes.ts
 7898a3ae61119fa7a7cb45da99d5de86c45aaec8a568752d1cca8d3b59237e2b  packages/headless-sdk/src/controlSchemas.ts
-34c7de450996dc379ff434f0034aa057c1b90dd73e740dd2ef9bbd185ae6b8b1  src/entrypoints/sdk/controlTypes.ts
+d3918b6119e629f2a17967bc217d730b16fe5a9dd9f1673341364dbfe2c2a774  packages/headless-sdk/src/controlTypes.ts
 c30aa9298d7ef8ccd66d2e38e6f42e5a658b55681bc890753535d468a2d641ac  packages/headless-sdk/src/coreSchemas.ts
-cf3324215ef656a763042cf0bd77e911d6ad5f66040d3665c8098a186561d3e6  src/entrypoints/sdk/coreTypes.generated.ts
-28fc17b5a06daf4fe996312e0cbe2b37fd558a8e137a258e12a5e1f7798de9e4  src/entrypoints/sdk/coreTypes.ts
-995677acf16256c3844da39768c8d0851df42a9be403f650d86191161cef1803  src/entrypoints/sdk/runtimeTypes.ts
-15b2e94fa97ca2774d343364c6d4abefbee878060fa1d2ca7634c9f2d1b0c7b8  src/entrypoints/sdk/sdkUtilityTypes.ts
-33bdde446aa849a498ea1bd5d2d0ffc2e20a0a01de68cd05eac67e658c3bac05  src/entrypoints/sdk/settingsTypes.generated.ts
-5f7d2b6c417cadc74830535fef54959a00f08aa58afc8b2edf7872f0791bdaa8  src/entrypoints/sdk/toolTypes.ts
+d1afba954ae23ab625fdbf1ca08c541e504513edfeff2b36290338b3b1a0558a  packages/headless-sdk/src/coreTypes.generated.ts
+0b4222d6b16025cd55bef8ecb81e10d53ef941822caee9fd3b67cc46e4905447  packages/headless-sdk/src/coreTypes.ts
+3f23909dc25dab32bf1661c659e91ad43471d1dce6002a4b1072ea65b64c1272  packages/headless-sdk/src/runtimeTypes.ts
+19e48ec29a8af5feedcef36df153f9c5334b80f8c15094e44d4c82f8373b4dfe  packages/headless-sdk/src/sdkUtilityTypes.ts
 ```
 
 ## CLI Surface Snapshot
