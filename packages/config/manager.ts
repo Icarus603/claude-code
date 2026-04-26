@@ -23,7 +23,7 @@ import {
   type SettingSource,
   getEnabledSettingSources,
 } from './settings/constants.js'
-import { subscribeToSettingsChanges } from './index.js'
+import { subscribe as subscribeToSettingsChanges } from './settings/changeDetector.js'
 
 /** Unsubscribe function returned by watch() */
 type Unsubscribe = () => void

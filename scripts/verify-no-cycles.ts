@@ -26,6 +26,21 @@ const allFiles = new Set<string>()
 
 const SPEC_RE = /(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g
 
+// Strip JS comments before scanning for imports — without this, prose like
+// "previously importing from '@claude-code/X'" inside `// ...` comments
+// adds a false edge to the import graph and produces phantom cycles.
+//
+// Also strip TypeScript `import type { ... } from '...'` and
+// `export type { ... } from '...'` lines — type-only imports are erased
+// at compile time and cannot form a runtime cycle.
+function stripComments(src: string): string {
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, '') // /* block */
+    .replace(/(^|\s)\/\/[^\n]*/g, '$1') // // line
+    .replace(/^\s*import\s+type\s[^\n]*/gm, '')
+    .replace(/^\s*export\s+type\s[^\n]*/gm, '')
+}
+
 for await (const f of new Glob('packages/**/*.{ts,tsx}').scan('.')) {
   if (f.includes('node_modules/') || f.includes('__tests__/') || f.endsWith('.test.ts') || f.endsWith('.test.tsx')) continue
   allFiles.add(f)
@@ -67,7 +82,7 @@ async function resolveSpec(fromFile: string, spec: string): Promise<string | nul
 
 for (const f of allFiles) {
   graph.set(f, new Set())
-  const content = await readFile(f, 'utf8')
+  const content = stripComments(await readFile(f, 'utf8'))
   let m: RegExpExecArray | null
   SPEC_RE.lastIndex = 0
   while ((m = SPEC_RE.exec(content))) {
@@ -116,10 +131,19 @@ for (const v of graph.keys()) {
   if (!indices.has(v)) strongconnect(v)
 }
 
-// Ratchet: 44 known cycles in decompiled code. Lock the count so any
-// new cycle introduced by a refactor will fail; existing ones are
-// tracked for incremental cleanup (#92 successor work).
-const BUDGET = 44
+// Ratchet: count tightened from 44 → 20 after fixing detector false
+// positives (comment-stripping + type-only-import filtering). The
+// remaining 20 are real runtime cycles to be broken incrementally.
+const BUDGET = 20
+
+// Diagnostic mode: print cycles to stdout when --list flag is passed
+if (process.argv.includes('--list')) {
+  for (const scc of sccs) {
+    console.log(`cycle (${scc.length} files):`)
+    for (const f of scc) console.log(`  ${f}`)
+  }
+  process.exit(0)
+}
 
 if (sccs.length > BUDGET) {
   console.error(`✗ no-cycles: ${sccs.length} cycles (budget ${BUDGET}). New cycle(s) introduced:`)
