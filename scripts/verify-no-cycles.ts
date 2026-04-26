@@ -37,6 +37,13 @@ function stripComments(src: string): string {
   return src
     .replace(/\/\*[\s\S]*?\*\//g, '') // /* block */
     .replace(/(^|\s)\/\/[^\n]*/g, '$1') // // line
+    // Multi-line type-only imports/exports — `[\s\S]*?` lets the pattern
+    // span newlines so `import type {\n  Foo,\n} from '...'` is stripped
+    // entirely instead of only the first line (which would leave the
+    // `from '...'` clause as a phantom edge).
+    .replace(/^\s*import\s+type\s[\s\S]*?from\s+['"][^'"]+['"][^\n]*/gm, '')
+    .replace(/^\s*export\s+type\s[\s\S]*?from\s+['"][^'"]+['"][^\n]*/gm, '')
+    // Single-line type forms without `from` (e.g. `export type X = ...`)
     .replace(/^\s*import\s+type\s[^\n]*/gm, '')
     .replace(/^\s*export\s+type\s[^\n]*/gm, '')
 }
@@ -135,8 +142,11 @@ for (const v of graph.keys()) {
 // positives (comment-stripping + type-only-import filtering); then to
 // 15 by extracting leaf modules (storage/fileEncoding,
 // memory/memoryEntrypoint, permission/permissionSourceTypes,
-// updater/platform). The remaining 15 are real runtime cycles.
-const BUDGET = 15
+// updater/platform); then to 9 after extracting local-observability/core,
+// storage/findGitRoot+parseGitRemote, permission/permissionRequestTypes
+// AND fixing the multi-line type-import strip in stripComments (3
+// phantom cycles eliminated). The remaining 9 are real runtime cycles.
+const BUDGET = 9
 
 // Diagnostic mode: print cycles to stdout when --list flag is passed
 if (process.argv.includes('--list')) {

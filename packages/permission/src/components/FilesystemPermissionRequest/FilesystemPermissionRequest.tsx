@@ -6,7 +6,7 @@ import type { ToolInput } from '../FilePermissionDialog/useFilePermissionDialog.
 import type {
   PermissionRequestProps,
   ToolUseConfirm,
-} from '../PermissionRequest.js'
+} from '../permissionRequestTypes.js'
 
 function pathFromToolUse(toolUseConfirm: ToolUseConfirm): string | null {
   const tool = toolUseConfirm.tool
