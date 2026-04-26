@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { anthropicMessagesToOpenAI } from '@claude-code/provider'
-import type { UserMessage, AssistantMessage } from 'src/types/message.js'
+import type { UserMessage, AssistantMessage } from '@claude-code/repl/replTypes/message.js'
 
 // Helpers to create internal-format messages
 function makeUserMsg(content: string | any[]): UserMessage {

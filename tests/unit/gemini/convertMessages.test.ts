@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import type {
   AssistantMessage,
   UserMessage,
-} from 'src/types/message.js'
+} from '@claude-code/repl/replTypes/message.js'
 import { anthropicMessagesToGemini } from '@claude-code/provider'
 
 function makeUserMsg(content: string | any[]): UserMessage {

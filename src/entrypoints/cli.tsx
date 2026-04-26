@@ -82,7 +82,7 @@ async function main(): Promise<void> {
     const { getMainLoopModel } = await import('../utils/model/model.js')
     const modelIdx = args.indexOf('--model')
     const model = (modelIdx !== -1 && args[modelIdx + 1]) || getMainLoopModel()
-    const { getSystemPrompt } = await import('../constants/prompts.js')
+    const { getSystemPrompt } = await import('@claude-code/agent/constants/prompts.js')
     const prompt = await getSystemPrompt([], model)
     console.log(prompt.join('\n'))
     return
