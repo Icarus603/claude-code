@@ -5,8 +5,8 @@ import type { DreamTaskState } from '@claude-code/agent/tasks/DreamTask/DreamTas
 import type { InProcessTeammateTaskState } from './InProcessTeammateTask/types.js'
 import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'
-import type { LocalWorkflowTaskState } from 'src/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
-import type { MonitorMcpTaskState } from 'src/tasks/MonitorMcpTask/MonitorMcpTask.js'
+import type { LocalWorkflowTaskState } from '@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
+import type { MonitorMcpTaskState } from '@claude-code/agent/tasks/MonitorMcpTask/MonitorMcpTask.js'
 import type { RemoteAgentTaskState } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
 
 export type TaskState =
