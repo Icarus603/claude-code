@@ -85,6 +85,7 @@
     "./plugin/lspRecommendation": "./plugin/lspRecommendation.ts",
     "./plugin/loadPluginAgents": "./plugin/loadPluginAgents.ts",
     "./plugin/loadPluginCommands": "./plugin/loadPluginCommands.ts",
+    "./plugin/loadPluginCommands.js": "./plugin/loadPluginCommands.ts",
     "./plugin/loadPluginHooks": "./plugin/loadPluginHooks.ts",
     "./plugin/loadPluginOutputStyles": "./plugin/loadPluginOutputStyles.ts",
     "./plugin/headlessPluginInstall": "./plugin/headlessPluginInstall.ts",
