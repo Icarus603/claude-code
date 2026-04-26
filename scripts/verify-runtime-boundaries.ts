@@ -155,12 +155,10 @@ async function verifyEntryBootstrapSeams(): Promise<string[]> {
 async function verifyRootFacadesStayThin(): Promise<string[]> {
   const violations: string[] = []
 
+  // Root-level src/tools.ts, src/commands.ts, src/QueryEngine.ts, src/query.ts
+  // were thin facades; deleted in #129 follow-up after rewiring all consumers
+  // to package aliases. The remaining service-layer facades are verified below.
   const facadeFiles = [
-    { path: 'src/tools.ts', exportLine: "export * from '@claude-code/tool-registry/runtime'" },
-    {
-      path: 'src/commands.ts',
-      exportLine: "export * from '@claude-code/command-runtime/runtime'",
-    },
     {
       path: 'src/services/mcp/client.ts',
       exportLine: "export * from '@claude-code/mcp-runtime/clientRuntime.js'",

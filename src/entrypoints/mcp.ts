@@ -7,7 +7,7 @@ import {
   type ListToolsResult,
   type Tool,
 } from '@modelcontextprotocol/sdk/types.js'
-import 'src/tools.js'
+import '@claude-code/tool-registry/runtime'
 import { getDefaultAppState } from '@claude-code/app-host/state/AppStateStore.js'
 import review from '../commands/review.js'
 import type { Command } from '../commands.js'
