@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'package-exports',
+    layer: 'Cross-Cutting',
+    subsystem: 'export map coverage',
+    script: 'scripts/verify-package-exports.ts',
+    doc: 'V7 §11.2 — cross-package imports must resolve through package.json exports',
+  },
+  {
     id: 'duplicate-canonicals',
     layer: 'Cross-Cutting',
     subsystem: 'fork detection',

@@ -35,6 +35,7 @@
     "./abortController": "./abortController.ts",
     "./tasks.js": "./tasks.ts",
     "./messageShapes": "./messageShapes.ts",
+    "./messageShapes.js": "./messageShapes.ts",
     "./idTypes": "./idTypes.ts",
     "./messageQueueTypes": "./messageQueueTypes.ts",
     "./querySource": "./querySource.ts",

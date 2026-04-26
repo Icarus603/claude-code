@@ -50,6 +50,7 @@
     "./tools/TungstenTool/TungstenTool.js": "./src/tools/TungstenTool/TungstenTool.js",
     "./tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js": "./src/tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js",
     "./tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js": "./src/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js",
+    "./fileStateCache.js": "./src/fileStateCache.ts",
     "./tools/*.js": "./src/tools/*.ts",
     "./tools/*": "./src/tools/*.ts",
     "./services/*.js": "./src/services/*.ts",

@@ -23,6 +23,7 @@
     "./sandbox.js": "./src/sandbox.ts",
     "./powershell/parser.js": "./src/powershell/parser.ts",
     "./execFileNoThrow.js": "./src/execFileNoThrow.ts",
+    "./execFileNoThrowPortable.js": "./src/execFileNoThrowPortable.ts",
     "./Shell.js": "./src/Shell.ts",
     "./bash/ast-alias.js": "./src/bash/ast-alias.ts",
     "./subprocessEnv.js": "./src/subprocessEnv.ts",
