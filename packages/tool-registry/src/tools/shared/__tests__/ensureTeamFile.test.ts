@@ -22,7 +22,7 @@ const REQUIRED_BINDING_KEYS = [
   'TASK_LIST_TOOL_NAME', 'TASK_UPDATE_TOOL_NAME', 'TEAM_CREATE_TOOL_NAME',
   'TEAM_DELETE_TOOL_NAME', 'TURN_COMPLETION_VERBS', 'SUBAGENT_REJECT_MESSAGE',
   'SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX', 'STOPPED_DISPLAY_MS',
-  'AGENT_COLORS', 'CLAUDE_OPUS_4_6_CONFIG', 'env', 'getSystemPrompt',
+  'AGENT_COLORS', 'CLAUDE_OPUS_4_7_CONFIG', 'env', 'getSystemPrompt',
   'processMailboxPermissionResponse', 'registerPermissionCallback',
   'unregisterPermissionCallback', 'logEvent', 'getAutoCompactThreshold',
   'buildPostCompactMessages', 'compactConversation', 'resetMicrocompactState',
@@ -86,7 +86,7 @@ beforeAll(async () => {
     SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX: '',
     STOPPED_DISPLAY_MS: 0,
     AGENT_COLORS: ['red', 'blue'],
-    CLAUDE_OPUS_4_6_CONFIG: { name: 'test-model' },
+    CLAUDE_OPUS_4_7_CONFIG: { name: 'test-model' },
     env: {},
     // File helpers that readTeamFileAsync / writeTeamFileAsync actually call
     getTeamsDir: () => teamsDir,

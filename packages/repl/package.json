@@ -623,6 +623,7 @@
     "./screens/repl/useQueuedCommandOnCancel.js": "./src/screens/repl/useQueuedCommandOnCancel.ts",
     "./screens/repl/useStartupCallouts.js": "./src/screens/repl/useStartupCallouts.ts",
     "./commands/assistant/index.js": "./src/commands/assistant/index.ts",
-    "./moreright/useMoreRight.js": "./src/moreright/useMoreRight.tsx"
+    "./moreright/useMoreRight.js": "./src/moreright/useMoreRight.tsx",
+    "./uiHelpers/statusNoticeHelpers.js": "./src/uiHelpers/statusNoticeHelpers.ts"
   }
 }

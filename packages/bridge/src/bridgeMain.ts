@@ -2048,7 +2048,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   // Initialize analytics and error reporting sinks. The bridge bypasses the
   // setup() init flow, so we call initSinks() directly to attach sinks here.
-  const { initSinks } = await import('src/utils/sinks.js')
+  const { initSinks } = await import('@claude-code/local-observability/sinks.js')
   initSinks()
 
   // Gate-aware validation: --spawn / --capacity / --create-session-in-dir require
@@ -2816,7 +2816,7 @@ export async function runBridgeHeadless(
     '@claude-code/config'
   )
   enableConfigs()
-  const { initSinks } = await import('src/utils/sinks.js')
+  const { initSinks } = await import('@claude-code/local-observability/sinks.js')
   initSinks()
 
   if (!checkHasTrustDialogAccepted()) {

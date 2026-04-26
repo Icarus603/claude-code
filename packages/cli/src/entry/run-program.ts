@@ -70,7 +70,7 @@ function attachPreActionHook(program: CommanderCommand): void {
     // a sink attaches. setup() attaches sinks for the default command, but
     // subcommands (doctor, mcp, plugin, auth) never call setup() and would
     // silently drop events on process.exit(). Both inits are idempotent.
-    const { initSinks } = await import('src/utils/sinks.js')
+    const { initSinks } = await import('@claude-code/local-observability/sinks.js')
     initSinks()
     profileCheckpoint('preAction_after_sinks')
 

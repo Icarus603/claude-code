@@ -3923,7 +3923,7 @@ export async function runModeDispatch(
 					) {
 						// Check for ccshare URL (e.g. https://go/ccshare/boris-20260311-211036)
 						const { parseCcshareId, loadCcshare } =
-							await import("src/utils/ccshareResume.js");
+							await import("@claude-code/cli/ccshareResume.js");
 						const ccshareId = parseCcshareId(options.resume);
 						if (ccshareId) {
 							try {

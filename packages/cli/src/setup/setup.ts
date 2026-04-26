@@ -9,7 +9,7 @@ import {
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { checkForReleaseNotes } from '@claude-code/repl/releaseNotes.js'
 import { setCwd } from '@claude-code/shell/Shell.js'
-import { initSinks } from 'src/utils/sinks.js'
+import { initSinks } from '@claude-code/local-observability/sinks.js'
 import {
   getIsNonInteractiveSession,
   getProjectRoot,
@@ -348,7 +348,7 @@ export async function setup(
       // Defer to next tick so the git subprocess spawn runs after first render
       // rather than during the setup() microtask window.
       setImmediate(() => {
-        void import('src/utils/attributionHooks.js').then(
+        void import('@claude-code/agent/hooks/attributionHooks.js').then(
           ({ registerAttributionHooks }) => {
             registerAttributionHooks() // Register attribution tracking hooks (ant-only feature)
           },

@@ -33,6 +33,7 @@
     "./commands/version.js": "./src/commands/version.ts",
     "./setup/setup.js": "./src/setup/setup.ts",
     "./ssh/createSSHSession.js": "./src/ssh/createSSHSession.ts",
-    "./ssh/SSHSessionManager.js": "./src/ssh/SSHSessionManager.ts"
+    "./ssh/SSHSessionManager.js": "./src/ssh/SSHSessionManager.ts",
+    "./ccshareResume.js": "./src/ccshareResume.ts"
   }
 }

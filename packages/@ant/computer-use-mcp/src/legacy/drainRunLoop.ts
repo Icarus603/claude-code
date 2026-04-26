@@ -1,5 +1,5 @@
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { withResolvers } from 'src/utils/withResolvers.js'
+import { withResolvers } from '@claude-code/local-observability/utils/withResolvers.js'
 import { requireComputerUseSwift } from 'src/utils/computerUse/swiftLoader.js'
 
 /**

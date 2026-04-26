@@ -2,7 +2,7 @@ import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { withResolvers } from 'src/utils/withResolvers.js'
+import { withResolvers } from '@claude-code/local-observability/utils/withResolvers.js'
 import { isLockHeldLocally, releaseComputerUseLock } from 'src/utils/computerUse/computerUseLock.js'
 import { unregisterEscHotkey } from 'src/utils/computerUse/escHotkey.js'
 

@@ -118,7 +118,7 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
     return supported3P
   }
   const canonical = getCanonicalName(model)
-  if (canonical.includes('opus-4-6') || canonical.includes('sonnet-4-6')) {
+  if (canonical.includes('opus-4-7') || canonical.includes('opus-4-6') || canonical.includes('sonnet-4-6')) {
     return true
   }
   if (

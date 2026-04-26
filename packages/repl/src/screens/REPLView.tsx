@@ -173,7 +173,7 @@ import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgrou
 import { useSwarmInitialization } from '@claude-code/repl/hooks/useSwarmInitialization.js';
 import { useTeammateViewAutoExit } from '@claude-code/repl/hooks/useTeammateViewAutoExit.js';
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js';
-import { isHumanTurn } from 'src/utils/messagePredicates.js';
+import { isHumanTurn } from '@claude-code/agent/messagePredicates.js';
 import { logError } from '@claude-code/local-observability/logging';
 // Dead code elimination: conditional imports
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
