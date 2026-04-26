@@ -8,7 +8,7 @@ import {
   WebSocketTransport,
 } from '@claude-code/cli'
 import { enableConfigs } from '@claude-code/config'
-import { getDefaultAppState } from '../src/state/AppStateStore.js'
+import { getDefaultAppState } from '@claude-code/app-host/state/AppStateStore.js'
 import type { Command } from '../src/commands.js'
 
 async function main(): Promise<void> {
