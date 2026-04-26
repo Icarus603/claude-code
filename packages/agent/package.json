@@ -40,6 +40,8 @@
     "./proactive/index.js": "./proactive/index.ts",
     "./proactive/useProactive.js": "./proactive/useProactive.ts",
     "./hooks/attributionHooks.js": "./hooks/attributionHooks.ts",
+    "./attributionTrailer.js": "./attributionTrailer.ts",
+    "./taskSummary.js": "./taskSummary.ts",
     "./messageShapes": "./messageShapes.ts",
     "./messageShapes.js": "./messageShapes.ts",
     "./idTypes": "./idTypes.ts",
