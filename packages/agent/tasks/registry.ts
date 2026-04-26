@@ -7,10 +7,10 @@ import { RemoteAgentTask } from '@claude-code/tool-registry/tasks/RemoteAgentTas
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const LocalWorkflowTask: Task | null = feature('WORKFLOW_SCRIPTS')
-  ? require('src/tasks/LocalWorkflowTask/LocalWorkflowTask.js').LocalWorkflowTask
+  ? require('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js').LocalWorkflowTask
   : null
 const MonitorMcpTask: Task | null = feature('MONITOR_TOOL')
-  ? require('src/tasks/MonitorMcpTask/MonitorMcpTask.js').MonitorMcpTask
+  ? require('@claude-code/agent/tasks/MonitorMcpTask/MonitorMcpTask.js').MonitorMcpTask
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 

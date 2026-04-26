@@ -34,6 +34,8 @@
     "./toolUseSummaryGenerator.js": "./toolUseSummaryGenerator.ts",
     "./abortController": "./abortController.ts",
     "./tasks.js": "./tasks.ts",
+    "./tasks/MonitorMcpTask/MonitorMcpTask.js": "./tasks/MonitorMcpTask/MonitorMcpTask.ts",
+    "./tasks/LocalWorkflowTask/LocalWorkflowTask.js": "./tasks/LocalWorkflowTask/LocalWorkflowTask.ts",
     "./messageShapes": "./messageShapes.ts",
     "./messageShapes.js": "./messageShapes.ts",
     "./idTypes": "./idTypes.ts",

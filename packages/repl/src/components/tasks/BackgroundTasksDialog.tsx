@@ -30,8 +30,8 @@ import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'
 import { LocalShellTask } from '@claude-code/agent/tasks/LocalShellTask.js'
 // Type import is erased at build time — safe even though module is ant-gated.
-import type { LocalWorkflowTaskState } from 'src/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
-import type { MonitorMcpTaskState } from 'src/tasks/MonitorMcpTask/MonitorMcpTask.js'
+import type { LocalWorkflowTaskState } from '@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
+import type { MonitorMcpTaskState } from '@claude-code/agent/tasks/MonitorMcpTask/MonitorMcpTask.js'
 import {
   RemoteAgentTask,
   type RemoteAgentTaskState,
@@ -137,7 +137,7 @@ const WorkflowDetailDialog = feature('WORKFLOW_SCRIPTS')
     ).WorkflowDetailDialog
   : null
 const workflowTaskModule = feature('WORKFLOW_SCRIPTS')
-  ? (require('src/tasks/LocalWorkflowTask/LocalWorkflowTask.js') as typeof import('src/tasks/LocalWorkflowTask/LocalWorkflowTask.js'))
+  ? (require('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js') as typeof import('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'))
   : null
 const killWorkflowTask = workflowTaskModule?.killWorkflowTask ?? null
 const skipWorkflowAgent = workflowTaskModule?.skipWorkflowAgent ?? null
@@ -146,7 +146,7 @@ const retryWorkflowAgent = workflowTaskModule?.retryWorkflowAgent ?? null
 // resolve + eliminate `./` requires, but path-mapped strings stay opaque
 // and survive as dead literals in the bundle. Matches tasks.ts pattern.
 const monitorMcpModule = feature('MONITOR_TOOL')
-  ? (require('src/tasks/MonitorMcpTask/MonitorMcpTask.js') as typeof import('src/tasks/MonitorMcpTask/MonitorMcpTask.js'))
+  ? (require('@claude-code/agent/tasks/MonitorMcpTask/MonitorMcpTask.js') as typeof import('@claude-code/agent/tasks/MonitorMcpTask/MonitorMcpTask.js'))
   : null
 const killMonitorMcp = monitorMcpModule?.killMonitorMcp ?? null
 const MonitorMcpDetailDialog = feature('MONITOR_TOOL')
