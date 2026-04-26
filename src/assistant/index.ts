@@ -1,8 +1,3 @@
-// Auto-generated stub — replace with real implementation
-export {};
-export const isAssistantMode: () => boolean = () => false;
-export const initializeAssistantTeam: () => Promise<void> = async () => {};
-export const markAssistantForced: () => void = () => {};
-export const isAssistantForced: () => boolean = () => false;
-export const getAssistantSystemPromptAddendum: () => string = () => '';
-export const getAssistantActivationPath: () => string | undefined = () => undefined;
+// Forward shim — canonical owner is packages/agent/assistant/index.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/assistant/index.js'

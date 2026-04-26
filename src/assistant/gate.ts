@@ -1,3 +1,3 @@
-// Auto-generated stub — replace with real implementation
-export {};
-export const isKairosEnabled: () => Promise<boolean> = () => Promise.resolve(false);
+// Forward shim — canonical owner is packages/agent/assistant/gate.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/assistant/gate.js'

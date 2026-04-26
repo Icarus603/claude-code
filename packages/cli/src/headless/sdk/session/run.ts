@@ -38,7 +38,7 @@ import {
   headlessProfilerStartTurn,
   headlessProfilerCheckpoint,
   logHeadlessProfilerTurn,
-} from '@claude-code/local-observability/legacy/headlessProfiler.js'
+} from '@claude-code/local-observability/aggregates/headlessProfiler.js'
 import {
   isQualifiedForGrove,
   checkGroveForNonInteractive,

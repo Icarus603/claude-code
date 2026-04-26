@@ -20,8 +20,8 @@ import {
   convertSDKMessage,
   isSessionEndMessage,
 } from '@claude-code/server/remote/sdkMessageAdapter.js'
-import type { SSHSession } from 'src/ssh/createSSHSession.js'
-import type { SSHSessionManager, SSHPermissionRequest } from 'src/ssh/SSHSessionManager.js'
+import type { SSHSession } from '@claude-code/cli/ssh/createSSHSession.js'
+import type { SSHSessionManager, SSHPermissionRequest } from '@claude-code/cli/ssh/SSHSessionManager.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { Message as MessageType } from '@claude-code/agent/messageShapes'

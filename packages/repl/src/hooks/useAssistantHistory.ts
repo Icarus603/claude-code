@@ -12,7 +12,7 @@ import {
   fetchOlderEvents,
   type HistoryAuthCtx,
   type HistoryPage,
-} from 'src/assistant/sessionHistory.js'
+} from '@claude-code/agent/assistant/sessionHistory.js'
 import type { ScrollBoxHandle } from '@anthropic/ink'
 import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
 import { convertSDKMessage } from '@claude-code/server/remote/sdkMessageAdapter.js'

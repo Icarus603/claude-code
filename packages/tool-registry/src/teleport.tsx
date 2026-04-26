@@ -15,7 +15,7 @@ import {
   TeleportError,
   type TeleportLocalErrorType,
 } from '@claude-code/repl/components/TeleportError.js'
-import { getOauthConfig } from '@claude-code/agent/constants_v7/oauth.js'
+import { getOauthConfig } from '@claude-code/agent/constants/oauth.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { Root } from '@anthropic/ink'
 import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
@@ -26,8 +26,8 @@ import {
 } from '@claude-code/provider/sessionIngress.js'
 import { getOrganizationUUID } from '@claude-code/provider/oauth/client.js'
 import { AppStateProvider } from '@claude-code/app-host/state/AppState.js'
-import type { Message, SystemMessage } from '@claude-code/repl/types_v7/message.js'
-import type { PermissionMode } from '@claude-code/repl/types_v7/permissions.js'
+import type { Message, SystemMessage } from '@claude-code/repl/replTypes/message.js'
+import type { PermissionMode } from '@claude-code/repl/replTypes/permissions.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,

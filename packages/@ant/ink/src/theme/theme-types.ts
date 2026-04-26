@@ -495,8 +495,8 @@ const darkTheme: Theme = {
   bashMessageBackgroundColor: 'rgb(65, 60, 65)',
 
   memoryBackgroundColor: 'rgb(55, 65, 70)',
-  rate_limit_fill: 'rgb(131,210,238)', // Light blue-purple
-  rate_limit_empty: 'rgb(80,83,112)', // Medium blue-purple
+  rate_limit_fill: 'rgb(131,210,238)', // Light blue
+  rate_limit_empty: 'rgb(45,65,100)', // Dark blue
   fastMode: 'rgb(255,120,20)', // Electric orange for dark bg
   fastModeShimmer: 'rgb(255,165,70)', // Lighter orange for shimmer
   briefLabelYou: 'rgb(122,180,232)', // Light blue

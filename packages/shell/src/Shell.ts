@@ -37,7 +37,7 @@ import { getSessionEnvironmentScript } from '@claude-code/storage/sessionEnviron
 import { getSessionEnvVars } from '@claude-code/storage/sessionEnvVars.js'
 import { getTaskOutputDir } from '@claude-code/storage/task/diskOutput.js'
 import { TaskOutput } from '@claude-code/tool-registry/task/TaskOutput.js'
-import { ensureSocketInitialized, getClaudeTmuxEnv, hasTmuxToolBeenUsed } from '@claude-code/shell/legacy_v7/tmuxSocket.js'
+import { ensureSocketInitialized, getClaudeTmuxEnv, hasTmuxToolBeenUsed } from '@claude-code/shell/terminal/tmuxSocket.js'
 import { which } from '@claude-code/shell/which.js'
 import {
   posixPathToWindowsPath,

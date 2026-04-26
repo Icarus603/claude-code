@@ -246,6 +246,27 @@ const CHECKS: Check[] = [
     doc: 'V7 §3.3 — REPLView.tsx LOC must decrease monotonically',
   },
   {
+    id: 'no-holding-pens',
+    layer: 'Cross-Cutting',
+    subsystem: 'naming hygiene',
+    script: 'scripts/verify-no-holding-pens.ts',
+    doc: 'V7 §3.1 — packages/* must not have transient holding-pen dir names',
+  },
+  {
+    id: 'src-shrinks',
+    layer: 'Cross-Cutting',
+    subsystem: 'src evacuation',
+    script: 'scripts/verify-src-shrinks.ts',
+    doc: 'V7 §3.1 — non-entrypoint src/ LOC must monotonically decrease toward 0',
+  },
+  {
+    id: 'build-resolves',
+    layer: 'Cross-Cutting',
+    subsystem: 'import graph integrity',
+    script: 'scripts/verify-build-resolves.ts',
+    doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
+  },
+  {
     id: 'duplicate-canonicals',
     layer: 'Cross-Cutting',
     subsystem: 'fork detection',

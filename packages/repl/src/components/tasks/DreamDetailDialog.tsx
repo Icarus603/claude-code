@@ -3,7 +3,7 @@ import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { useElapsedTime } from '@claude-code/repl/hooks/useElapsedTime.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import type { DreamTaskState } from 'src/tasks/DreamTask/DreamTask.js'
+import type { DreamTaskState } from '@claude-code/agent/tasks/DreamTask/DreamTask.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 

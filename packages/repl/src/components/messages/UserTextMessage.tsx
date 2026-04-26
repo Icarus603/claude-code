@@ -1,7 +1,7 @@
 import { feature } from 'bun:bundle'
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import * as React from 'react'
-import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants_v7/messages.js'
+import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants/messages.js'
 import {
   COMMAND_MESSAGE_TAG,
   LOCAL_COMMAND_CAVEAT_TAG,

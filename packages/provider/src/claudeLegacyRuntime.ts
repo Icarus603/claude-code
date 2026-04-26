@@ -29,7 +29,7 @@ import {
 import {
   getAttributionHeader,
   getCLISyspromptPrefix,
-} from '@claude-code/agent/constants_v7/system.js'
+} from '@claude-code/agent/constants/system.js'
 import {
   getEmptyToolPermissionContext,
   type QueryChainTracking,
@@ -43,7 +43,7 @@ import {
   type ConnectorTextBlock,
   type ConnectorTextDelta,
   isConnectorTextBlock,
-} from '@claude-code/repl/types_v7/connectorText.js'
+} from '@claude-code/repl/replTypes/connectorText.js'
 import type {
   AssistantMessage,
   Message,
@@ -51,7 +51,7 @@ import type {
   StreamEvent,
   SystemAPIErrorMessage,
   UserMessage,
-} from '@claude-code/repl/types_v7/message.js'
+} from '@claude-code/repl/replTypes/message.js'
 import {
   type CacheScope,
   logAPIPrefix,
@@ -144,12 +144,12 @@ import {
   REDACT_THINKING_BETA_HEADER,
   STRUCTURED_OUTPUTS_BETA_HEADER,
   TASK_BUDGETS_BETA_HEADER,
-} from '@claude-code/agent/constants_v7/betas.js'
-import type { QuerySource } from '@claude-code/agent/constants_v7/querySource.js'
-import type { Notification } from '@claude-code/app-host/context_v7/notifications.js'
+} from '@claude-code/agent/constants/betas.js'
+import type { QuerySource } from '@claude-code/agent/constants/querySource.js'
+import type { Notification } from '@claude-code/app-host/context/notifications.js'
 import { addToTotalSessionCost } from '@claude-code/provider/costTracker.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { AgentId } from '@claude-code/repl/types_v7/ids.js'
+import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
 import {
   ADVISOR_TOOL_INSTRUCTIONS,
   getExperimentAdvisorModels,
@@ -178,10 +178,10 @@ import {
   isFastModeSupportedByModel,
 } from '@claude-code/provider/fastMode.js'
 import { returnValue } from '@claude-code/config/generators'
-import { headlessProfilerCheckpoint } from '@claude-code/local-observability/legacy/headlessProfiler.js'
+import { headlessProfilerCheckpoint } from '@claude-code/local-observability/aggregates/headlessProfiler.js'
 import { isMcpInstructionsDeltaEnabled } from '@claude-code/mcp-runtime/mcpInstructionsDelta.js'
 import { calculateUSDCost } from '@claude-code/provider/modelCost.js'
-import { endQueryProfile, queryCheckpoint } from '@claude-code/local-observability/legacy/queryProfiler.js'
+import { endQueryProfile, queryCheckpoint } from '@claude-code/local-observability/aggregates/queryProfiler.js'
 import {
   modelSupportsAdaptiveThinking,
   modelSupportsThinking,
@@ -192,8 +192,8 @@ import {
   isDeferredToolsDeltaEnabled,
   isToolSearchEnabled,
 } from '@claude-code/agent/toolSearch.js'
-import { API_MAX_MEDIA_PER_REQUEST } from '@claude-code/agent/constants_v7/apiLimits.js'
-import { ADVISOR_BETA_HEADER } from '@claude-code/agent/constants_v7/betas.js'
+import { API_MAX_MEDIA_PER_REQUEST } from '@claude-code/agent/constants/apiLimits.js'
+import { ADVISOR_BETA_HEADER } from '@claude-code/agent/constants/betas.js'
 import {
   formatDeferredToolLine,
   isDeferredTool,
@@ -1209,7 +1209,7 @@ async function* queryModel(
       isModelSupportedForCacheEditing,
     } = await import('@claude-code/agent/compaction/cachedMicrocompact.js')
     const { getCachedMCConfig } = await import('@claude-code/agent/compaction/cachedMCConfig.js')
-    const betas = await import('@claude-code/agent/constants_v7/betas.js')
+    const betas = await import('@claude-code/agent/constants/betas.js')
     cacheEditingBetaHeader = betas.CACHE_EDITING_BETA_HEADER.trim()
     const config = getCachedMCConfig({
       getEnv: key => process.env[key], // V7-EXEMPT: dynamic env key access

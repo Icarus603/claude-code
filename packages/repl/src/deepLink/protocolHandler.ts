@@ -17,7 +17,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   filterExistingPaths,
   getKnownPathsForRepo,
-} from '@claude-code/repl/legacy/github/githubRepoPathMapping.js'
+} from '@claude-code/repl/github/githubRepoPathMapping.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { readLastFetchTime } from '@claude-code/repl/deepLink/banner.js'
 

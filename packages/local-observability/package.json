@@ -29,11 +29,11 @@
     "./telemetry/pluginTelemetry.js": "./src/telemetry/pluginTelemetry.ts",
     "./telemetry/perfettoTracing.js": "./src/telemetry/perfettoTracing.ts",
     "./telemetry/betaSessionTracing.js": "./src/telemetry/betaSessionTracing.ts",
-    "./legacy/cleanup.js": "./src/legacy/cleanup.ts",
-    "./legacy/headlessProfiler.js": "./src/legacy/headlessProfiler.ts",
-    "./legacy/heatmap.js": "./src/legacy/heatmap.ts",
-    "./legacy/queryProfiler.js": "./src/legacy/queryProfiler.ts",
-    "./legacy/stats.js": "./src/legacy/stats.ts",
-    "./legacy/statsCache.js": "./src/legacy/statsCache.ts"
+    "./aggregates/cleanup.js": "./src/aggregates/cleanup.ts",
+    "./aggregates/headlessProfiler.js": "./src/aggregates/headlessProfiler.ts",
+    "./aggregates/heatmap.js": "./src/aggregates/heatmap.ts",
+    "./aggregates/queryProfiler.js": "./src/aggregates/queryProfiler.ts",
+    "./aggregates/stats.js": "./src/aggregates/stats.ts",
+    "./aggregates/statsCache.js": "./src/aggregates/statsCache.ts"
   }
 }

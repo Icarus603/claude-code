@@ -9,7 +9,7 @@ import { logEvent } from '@claude-code/local-observability'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { openFileInExternalEditor } from '@claude-code/storage/editor.js'
 import { truncatePathMiddle, truncateToWidth } from '@claude-code/output/formatters/truncate.js'
-import { highlightMatch } from 'src/utils/highlightMatch.js'
+import { highlightMatch } from '@claude-code/repl/highlight/highlightMatch.js'
 import { readFileInRange } from '@claude-code/repl/readFileInRange.js'
 import { FuzzyPicker, LoadingState } from '@anthropic/ink'
 

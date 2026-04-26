@@ -1,3 +1,3 @@
 // Forward shim — canonical owner is packages/repl/src/types_v7/react-compiler-runtime.d.ts.
 // V7 batch move via scripts/move-to-package.ts.
-export * from '@claude-code/repl/types_v7/react-compiler-runtime.d.js'
+export * from '@claude-code/repl/replTypes/react-compiler-runtime.d.js'

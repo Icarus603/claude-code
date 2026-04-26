@@ -16,7 +16,7 @@ import {
 } from '@claude-code/local-observability'
 import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
-import { getTerminalPanel } from '@claude-code/shell/legacy_v7/terminalPanel.js'
+import { getTerminalPanel } from '@claude-code/shell/terminal/terminalPanel.js'
 
 type Props = {
   screen: Screen

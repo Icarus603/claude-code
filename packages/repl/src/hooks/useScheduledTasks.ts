@@ -8,7 +8,7 @@ import {
 import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { createCronScheduler, removeCronTasks } from '@claude-code/agent/scheduler'
-import { getCronJitterConfig } from '@claude-code/agent/legacy_misc/cronJitterConfig.js'
+import { getCronJitterConfig } from '@claude-code/agent/misc/cronJitterConfig.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
 import { createScheduledTaskFireMessage } from '@claude-code/agent/messages.js'

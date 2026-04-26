@@ -9,7 +9,7 @@ import {
   type DebugFilter,
   parseDebugFilter,
   shouldShowDebugMessage,
-} from '@claude-code/repl/legacy/diagnostics/debugFilter.js'
+} from '@claude-code/repl/diagnostics/debugFilter.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { writeToStderr } from '@claude-code/shell/process.js'

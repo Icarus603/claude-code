@@ -20,7 +20,7 @@ import {
   ensureSocketInitialized,
   getClaudeTmuxEnv,
   hasTmuxToolBeenUsed,
-} from '@claude-code/shell/legacy_v7/tmuxSocket.js'
+} from '@claude-code/shell/terminal/tmuxSocket.js'
 import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
 import type { ShellProvider } from './shellProvider.js'
 

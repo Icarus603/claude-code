@@ -1,5 +1,5 @@
 import React from 'react'
-import { GITHUB_ACTION_SETUP_DOCS_URL } from '@claude-code/agent/constants_v7/github-app.js'
+import { GITHUB_ACTION_SETUP_DOCS_URL } from '@claude-code/agent/constants/github-app.js'
 import { Box, Text } from '@anthropic/ink'
 
 interface ErrorStepProps {

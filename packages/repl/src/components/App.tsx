@@ -1,6 +1,6 @@
 import React from 'react'
-import { FpsMetricsProvider } from '@claude-code/app-host/context_v7/fpsMetrics.js'
-import { StatsProvider, type StatsStore } from '@claude-code/app-host/context_v7/stats.js'
+import { FpsMetricsProvider } from '@claude-code/app-host/context/fpsMetrics.js'
+import { StatsProvider, type StatsStore } from '@claude-code/app-host/context/stats.js'
 import {
   type AppState,
   type AppStateStore,

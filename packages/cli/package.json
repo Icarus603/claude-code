@@ -30,6 +30,9 @@
     "./secureStorage/keychainPrefetch.js": "./src/secureStorage/keychainPrefetch.ts",
     "./commands/mcp/addCommand.js": "./src/commands/mcp/addCommand.ts",
     "./commands/mcp/xaaIdpCommand.js": "./src/commands/mcp/xaaIdpCommand.ts",
-    "./commands/version.js": "./src/commands/version.ts"
+    "./commands/version.js": "./src/commands/version.ts",
+    "./setup/setup.js": "./src/setup/setup.ts",
+    "./ssh/createSSHSession.js": "./src/ssh/createSSHSession.ts",
+    "./ssh/SSHSessionManager.js": "./src/ssh/SSHSessionManager.ts"
   }
 }

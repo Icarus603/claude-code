@@ -18,7 +18,7 @@
     "./commands/agents/index.js": "./commands/agents/index.ts",
     "./commands/branch/branch.js": "./commands/branch/branch.ts",
     "./commands/branch/index.js": "./commands/branch/index.ts",
-    "./swarm_v7/installSwarmHost.js": "./src/swarm_v7/installSwarmHost.ts"
+    "./install/installSwarmHost.js": "./src/install/installSwarmHost.ts"
   },
   "dependencies": {
     "@claude-code/agent": "workspace:*",

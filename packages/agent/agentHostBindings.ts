@@ -132,7 +132,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     loadAllPluginsCacheOnly: () => {
       try {
-        return require('@claude-code/config/plugin/v7/pluginLoader.js').loadAllPluginsCacheOnly()
+        return require('@claude-code/config/plugin/core/pluginLoader.js').loadAllPluginsCacheOnly()
       } catch {
         return Promise.resolve({ enabled: [] })
       }
@@ -168,14 +168,14 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     buildSystemInitMessage: (params: unknown) => {
       try {
-        return require('@claude-code/agent/messagesDir/systemInit.js').buildSystemInitMessage(params)
+        return require('@claude-code/agent/messages/systemInit.js').buildSystemInitMessage(params)
       } catch {
         return undefined
       }
     },
     sdkCompatToolName: (toolName: string) => {
       try {
-        return require('@claude-code/agent/messagesDir/systemInit.js').sdkCompatToolName(toolName)
+        return require('@claude-code/agent/messages/systemInit.js').sdkCompatToolName(toolName)
       } catch {
         return toolName
       }
@@ -231,12 +231,12 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     headlessProfilerCheckpoint: (name: string) => {
       try {
-        require('@claude-code/local-observability/legacy/headlessProfiler.js').headlessProfilerCheckpoint(name)
+        require('@claude-code/local-observability/aggregates/headlessProfiler.js').headlessProfilerCheckpoint(name)
       } catch {}
     },
     queryCheckpoint: (name: string) => {
       try {
-        require('@claude-code/local-observability/legacy/queryProfiler.js').queryCheckpoint(name)
+        require('@claude-code/local-observability/aggregates/queryProfiler.js').queryCheckpoint(name)
       } catch {}
     },
     notifyCommandLifecycle: (uuid: string, state: 'started' | 'completed') => {
@@ -634,8 +634,8 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     buildClassifierUnavailableMessage: () => { try { return require('@claude-code/agent/messages.js').buildClassifierUnavailableMessage() } catch { return '' } },
     buildYoloRejectionMessage: (...a: unknown[]) => { try { return require('@claude-code/agent/messages.js').buildYoloRejectionMessage(...a) } catch { return '' } },
     calculateCostFromTokens: (...a: unknown[]) => { try { return require('@claude-code/provider/modelCost.js').calculateCostFromTokens(...a) } catch { return 0 } },
-    isSandboxingEnabled: () => { try { return require('@claude-code/shell/sandboxDir/sandbox-adapter.js').SandboxManager.isSandboxingEnabled() } catch { return false } },
-    isAutoAllowBashIfSandboxedEnabled: () => { try { return require('@claude-code/shell/sandboxDir/sandbox-adapter.js').SandboxManager.isAutoAllowBashIfSandboxedEnabled() } catch { return false } },
+    isSandboxingEnabled: () => { try { return require('@claude-code/shell/sandbox/sandbox-adapter.js').SandboxManager.isSandboxingEnabled() } catch { return false } },
+    isAutoAllowBashIfSandboxedEnabled: () => { try { return require('@claude-code/shell/sandbox/sandbox-adapter.js').SandboxManager.isAutoAllowBashIfSandboxedEnabled() } catch { return false } },
     classifyYoloAction: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').classifyYoloAction(...a) } catch { return null } },
     formatActionForClassifier: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').formatActionForClassifier(...a) } catch { return '' } },
     getToolsForDefaultPreset: () => { try { return require('src/services/tools.js').getToolsForDefaultPreset() } catch { return [] } },

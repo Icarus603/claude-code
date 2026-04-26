@@ -6,4 +6,4 @@ export {
   type Notification,
   useNotifications,
   getNext,
-} from '@claude-code/app-host/context_v7/notifications.js'
+} from '@claude-code/app-host/context/notifications.js'

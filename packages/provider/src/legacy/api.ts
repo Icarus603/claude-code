@@ -6,7 +6,7 @@ import type {
 import { createHash } from 'crypto'
 import { SYSTEM_PROMPT_DYNAMIC_BOUNDARY } from '@claude-code/agent/prompts.js'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
-import { isAnalyticsDisabled } from '@claude-code/agent/services_topdir/privacyConfig.js'
+import { isAnalyticsDisabled } from '@claude-code/agent/services/privacyConfig.js'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
@@ -25,7 +25,7 @@ import {
 } from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
 import { getTools } from '@claude-code/tool-registry/runtime'
-import type { AgentId } from '@claude-code/repl/types_v7/ids.js'
+import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
 import type { z } from 'zod/v4'
 import { CLI_SYSPROMPT_PREFIXES } from '@claude-code/provider/systemConstants.js'
 import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
@@ -34,7 +34,7 @@ import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/cons
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
 import { TASK_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskOutputTool/constants.js'
-import type { Message } from '@claude-code/repl/types_v7/message.js'
+import type { Message } from '@claude-code/repl/replTypes/message.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   modelSupportsStructuredOutputs,
@@ -63,7 +63,7 @@ import { jsonStringify } from '@claude-code/local-observability/slowOperations.j
 import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getToolSchemaCache } from '@claude-code/tool-registry/toolSchemaCache.js'
 import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
-import { zodToJsonSchema } from 'src/utils/zodToJsonSchema.js'
+import { zodToJsonSchema } from '@claude-code/agent/zodSchema/zodToJsonSchema.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 // Extended BetaTool type with strict mode and defer_loading support

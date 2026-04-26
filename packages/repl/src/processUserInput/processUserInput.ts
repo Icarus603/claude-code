@@ -52,12 +52,12 @@ import {
   createSystemMessage,
   createUserMessage,
 } from '@claude-code/agent/messages.js'
-import { queryCheckpoint } from '@claude-code/local-observability/legacy/queryProfiler.js'
+import { queryCheckpoint } from '@claude-code/local-observability/aggregates/queryProfiler.js'
 import { parseSlashCommand } from '@claude-code/command-runtime/slashCommandParsing.js'
 import {
   hasUltraplanKeyword,
   replaceUltraplanKeyword,
-} from '@claude-code/repl/ultraplan_dir/keyword.js'
+} from '@claude-code/repl/ultraplan/keyword.js'
 import { processTextPrompt } from '@claude-code/repl/processUserInput/processTextPrompt.js'
 export type ProcessUserInputContext = ToolUseContext & LocalJSXCommandContext
 

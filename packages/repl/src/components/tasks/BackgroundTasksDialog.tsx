@@ -24,7 +24,7 @@ import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import {
   DreamTask,
   type DreamTaskState,
-} from 'src/tasks/DreamTask/DreamTask.js'
+} from '@claude-code/agent/tasks/DreamTask/DreamTask.js'
 import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'

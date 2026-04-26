@@ -31,7 +31,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { enqueue } from '@claude-code/agent/messageQueueManager.js'
-import { buildSystemInitMessage } from '@claude-code/agent/messagesDir/systemInit.js'
+import { buildSystemInitMessage } from '@claude-code/agent/messages/systemInit.js'
 import {
   createBridgeStatusMessage,
   createSystemMessage,
@@ -202,7 +202,7 @@ export function useReplBridge(
           // (crash-recovery only).
           let perpetual = false
           if (feature('KAIROS')) {
-            const { isAssistantMode } = await import('src/assistant/index.js')
+            const { isAssistantMode } = await import('@claude-code/agent/assistant/index.js')
             perpetual = isAssistantMode()
           }
 

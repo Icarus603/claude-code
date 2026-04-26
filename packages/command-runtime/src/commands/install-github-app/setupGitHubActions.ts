@@ -8,7 +8,7 @@ import {
   PR_BODY,
   PR_TITLE,
   WORKFLOW_CONTENT,
-} from '@claude-code/agent/constants_v7/github-app.js'
+} from '@claude-code/agent/constants/github-app.js'
 import { openBrowser } from '@claude-code/storage/browser.js'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { logError } from '@claude-code/local-observability/log.js'

@@ -355,7 +355,7 @@ const proactiveModule =
     ? (require('src/proactive/index.js') as typeof import('src/proactive/index.js'))
     : null
 const cronSchedulerModule = require('@claude-code/agent/scheduler') as typeof import('@claude-code/agent/scheduler')
-const cronJitterConfigModule = require('@claude-code/agent/legacy_misc/cronJitterConfig.js') as typeof import('@claude-code/agent/legacy_misc/cronJitterConfig.js')
+const cronJitterConfigModule = require('@claude-code/agent/misc/cronJitterConfig.js') as typeof import('@claude-code/agent/misc/cronJitterConfig.js')
 const cronGate = require('@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js')
 const extractMemoriesModule = feature('EXTRACT_MEMORIES')
   ? (require('@claude-code/memory/extractMemories') as typeof import('@claude-code/memory/extractMemories'))

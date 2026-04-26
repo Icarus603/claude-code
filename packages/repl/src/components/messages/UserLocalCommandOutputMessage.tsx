@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { DIAMOND_FILLED, DIAMOND_OPEN } from '@claude-code/output/constants/figures.js'
-import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants_v7/messages.js'
+import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants/messages.js'
 import { Box, Text } from '@anthropic/ink'
 import { extractTag } from '@claude-code/agent/messages.js'
 import { Markdown } from '../Markdown.js'

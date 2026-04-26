@@ -1,3 +1,3 @@
-// Auto-generated stub — replace with real implementation
-export type AssistantSession = { id: string; [key: string]: unknown };
-export const discoverAssistantSessions: () => Promise<AssistantSession[]> = () => Promise.resolve([]);
+// Forward shim — canonical owner is packages/agent/assistant/sessionDiscovery.ts.
+// V7 batch move via scripts/move-to-package.ts.
+export * from '@claude-code/agent/assistant/sessionDiscovery.js'

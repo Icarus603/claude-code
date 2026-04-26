@@ -122,7 +122,7 @@ export function installPackageHostBindings(
             const context = toolUseContext as ToolUseContext
             const setAppState =
               context.setAppStateForTasks ?? context.setAppState
-            return require('src/tasks/DreamTask/DreamTask.js').registerDreamTask(
+            return require('@claude-code/agent/tasks/DreamTask/DreamTask.js').registerDreamTask(
               setAppState,
               params,
             )
@@ -140,7 +140,7 @@ export function installPackageHostBindings(
             const context = toolUseContext as ToolUseContext
             const setAppState =
               context.setAppStateForTasks ?? context.setAppState
-            require('src/tasks/DreamTask/DreamTask.js').addDreamTurn(
+            require('@claude-code/agent/tasks/DreamTask/DreamTask.js').addDreamTurn(
               taskId,
               turn,
               paths,
@@ -153,7 +153,7 @@ export function installPackageHostBindings(
             const context = toolUseContext as ToolUseContext
             const setAppState =
               context.setAppStateForTasks ?? context.setAppState
-            require('src/tasks/DreamTask/DreamTask.js').completeDreamTask(
+            require('@claude-code/agent/tasks/DreamTask/DreamTask.js').completeDreamTask(
               taskId,
               setAppState,
             )
@@ -164,7 +164,7 @@ export function installPackageHostBindings(
             const context = toolUseContext as ToolUseContext
             const setAppState =
               context.setAppStateForTasks ?? context.setAppState
-            require('src/tasks/DreamTask/DreamTask.js').failDreamTask(
+            require('@claude-code/agent/tasks/DreamTask/DreamTask.js').failDreamTask(
               taskId,
               setAppState,
             )
@@ -180,7 +180,7 @@ export function installPackageHostBindings(
         },
         isDreamTask: (state: unknown) => {
           try {
-            return require('src/tasks/DreamTask/DreamTask.js').isDreamTask(state)
+            return require('@claude-code/agent/tasks/DreamTask/DreamTask.js').isDreamTask(state)
           } catch {
             return false
           }
@@ -341,14 +341,14 @@ export function installPackageHostBindings(
         },
         buildSystemInitMessage: (params: unknown) => {
           try {
-            return require('@claude-code/agent/messagesDir/systemInit.js').buildSystemInitMessage(params)
+            return require('@claude-code/agent/messages/systemInit.js').buildSystemInitMessage(params)
           } catch {
             return undefined
           }
         },
         sdkCompatToolName: (toolName: string) => {
           try {
-            return require('@claude-code/agent/messagesDir/systemInit.js').sdkCompatToolName(toolName)
+            return require('@claude-code/agent/messages/systemInit.js').sdkCompatToolName(toolName)
           } catch {
             return toolName
           }
@@ -404,12 +404,12 @@ export function installPackageHostBindings(
         },
         headlessProfilerCheckpoint: (name: string) => {
           try {
-            require('@claude-code/local-observability/legacy/headlessProfiler.js').headlessProfilerCheckpoint(name)
+            require('@claude-code/local-observability/aggregates/headlessProfiler.js').headlessProfilerCheckpoint(name)
           } catch {}
         },
         queryCheckpoint: (name: string) => {
           try {
-            require('@claude-code/local-observability/legacy/queryProfiler.js').queryCheckpoint(name)
+            require('@claude-code/local-observability/aggregates/queryProfiler.js').queryCheckpoint(name)
           } catch {}
         },
         notifyCommandLifecycle: (uuid: string, state: 'started' | 'completed') => {

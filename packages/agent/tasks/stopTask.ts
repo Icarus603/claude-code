@@ -3,7 +3,7 @@
 
 import type { AppState } from '@claude-code/app-host/state/AppState.js'
 import type { TaskStateBase } from '@claude-code/tool-registry/Task.js'
-import { getTaskByType } from 'src/tasks.js'
+import { getTaskByType } from '@claude-code/agent/tasks/registry.js'
 import { emitTaskTerminatedSdk } from '@claude-code/agent/sdkEventQueue.js'
 import { isLocalShellTask } from '@claude-code/repl/localShellTaskGuards.js'
 

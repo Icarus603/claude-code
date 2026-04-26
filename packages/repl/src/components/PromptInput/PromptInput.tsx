@@ -117,7 +117,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   parseDirectMemberMessage,
   sendDirectMemberMessage,
-} from '@claude-code/agent/legacy_misc/directMemberMessage.js'
+} from '@claude-code/agent/misc/directMemberMessage.js'
 import type { EffortLevel } from '@claude-code/agent/effort.js'
 import { env } from '@claude-code/config/env/paths'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
@@ -181,7 +181,7 @@ import { findTokenBudgetPositions } from '@claude-code/agent/tokenBudget'
 import {
   findUltraplanTriggerPositions,
   findUltrareviewTriggerPositions,
-} from '@claude-code/repl/ultraplan_dir/keyword.js'
+} from '@claude-code/repl/ultraplan/keyword.js'
 import { AutoModeOptInDialog } from '../AutoModeOptInDialog.js'
 import { BridgeDialog } from '../BridgeDialog.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

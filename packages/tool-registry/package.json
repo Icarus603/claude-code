@@ -97,7 +97,6 @@
     "./codeIndexing.js": "./src/codeIndexing.ts",
     "./generatedFiles.js": "./src/generatedFiles.ts",
     "./toolPool.js": "./src/toolPool.ts",
-    "./skillsDir/skillChangeDetector.js": "./src/skillsDir/skillChangeDetector.ts",
     "./todo/types.js": "./src/todo/types.ts"
   }
 }

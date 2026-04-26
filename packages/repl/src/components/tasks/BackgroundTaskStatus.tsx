@@ -15,7 +15,7 @@ import {
   isBackgroundTask,
   type TaskState,
 } from '@claude-code/repl/tasksTypes.js'
-import { calculateHorizontalScrollWindow } from '@claude-code/repl/legacy/uiHelpers/horizontalScroll.js'
+import { calculateHorizontalScrollWindow } from '@claude-code/repl/uiHelpers/horizontalScroll.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
