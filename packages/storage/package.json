@@ -39,6 +39,7 @@
     "./sessionStoragePredicates.js": "./src/sessionStoragePredicates.ts",
     "./sessionPaths.js": "./src/sessionPaths.ts",
     "./agentMetadata.js": "./src/agentMetadata.ts",
+    "./conversationChain.js": "./src/conversationChain.ts",
     "./claudemd.js": "./src/claudemd.ts",
     "./editor.js": "./src/editor.ts",
     "./imageResizer.js": "./src/imageResizer.ts",
