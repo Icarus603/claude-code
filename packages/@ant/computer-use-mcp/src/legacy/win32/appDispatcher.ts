@@ -87,7 +87,7 @@ export async function openWithController(
     case 'excel': {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { createExcel, openExcel } =
-        require('src/utils/computerUse/win32/comExcel.js') as typeof import('src/utils/computerUse/win32/comExcel.js')
+        require('@ant/computer-use-mcp/legacy/win32/comExcel.js') as typeof import('@ant/computer-use-mcp/legacy/win32/comExcel.js')
       const isExisting = nameOrPath.match(/\.(xlsx|xls|csv|xlsm|xlsb)$/i)
       if (isExisting) {
         // Open existing file — just verify it's readable
@@ -107,7 +107,7 @@ export async function openWithController(
     case 'word': {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { createWord, openWord } =
-        require('src/utils/computerUse/win32/comWord.js') as typeof import('src/utils/computerUse/win32/comWord.js')
+        require('@ant/computer-use-mcp/legacy/win32/comWord.js') as typeof import('@ant/computer-use-mcp/legacy/win32/comWord.js')
       const isExisting = nameOrPath.match(/\.(docx|doc|rtf)$/i)
       if (isExisting) {
         try {

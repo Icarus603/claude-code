@@ -44,7 +44,7 @@ import {
   saveGlobalConfig,
 } from '@claude-code/config'
 import { updateDeepLinkTerminalPreference } from '@claude-code/repl/deepLink/terminalPreference.js'
-import { isEnvTruthy, isRunningOnHomespace } from 'src/utils/envUtils.js'
+import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { type FpsMetrics, FpsTracker } from '@claude-code/output/fpsTracker.js'
 import { updateGithubRepoPathMapping } from '@claude-code/repl/github/githubRepoPathMapping.js'
 import { applyConfigEnvironmentVariables } from '@claude-code/config/managedEnv.js'

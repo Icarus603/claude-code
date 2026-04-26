@@ -130,7 +130,7 @@ import {
   execFileNoThrow,
   execFileNoThrowWithCwd,
 } from '@claude-code/shell/execFileNoThrow.js'
-import { getTeamsDir } from 'src/utils/envUtils.js'
+import { getTeamsDir } from '@claude-code/config/env/utils'
 import { errorMessage, getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { check, lock, lockSync, unlock } from '@claude-code/storage/lockfile.js'

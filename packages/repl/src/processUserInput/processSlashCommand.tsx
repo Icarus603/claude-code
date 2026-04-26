@@ -47,7 +47,7 @@ import {
   getAttachmentMessages,
 } from '@claude-code/agent/attachments.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { AbortError, MalformedCommandError } from '@claude-code/local-observability/errorHelpers.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import {

@@ -4,9 +4,9 @@ import type {
 } from '@ant/computer-use-mcp/types'
 import { format } from 'util'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { COMPUTER_USE_MCP_SERVER_NAME } from 'src/utils/computerUse/common.js'
-import { createCliExecutor } from 'src/utils/computerUse/executor.js'
-import { getChicagoEnabled, getChicagoSubGates } from 'src/utils/computerUse/gates.js'
+import { COMPUTER_USE_MCP_SERVER_NAME } from '@ant/computer-use-mcp/legacy/common.js'
+import { createCliExecutor } from '@ant/computer-use-mcp/legacy/executor.js'
+import { getChicagoEnabled, getChicagoSubGates } from '@ant/computer-use-mcp/legacy/gates.js'
 
 class DebugLogger implements Logger {
   silly(message: string, ...args: unknown[]): void {

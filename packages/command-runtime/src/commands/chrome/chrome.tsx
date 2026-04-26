@@ -15,7 +15,7 @@ import {
 import { isChromeExtensionInstalled } from '@claude-code/agent/claudeInChrome/setup.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { env } from '@claude-code/config/env/paths'
-import { isRunningOnHomespace } from 'src/utils/envUtils.js'
+import { isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { readEnv } from '@claude-code/config/env/utils'
 
 const CHROME_EXTENSION_URL = 'https://claude.ai/chrome'

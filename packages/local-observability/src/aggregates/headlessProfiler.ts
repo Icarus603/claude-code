@@ -18,7 +18,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getPerformance } from '@claude-code/app-host/startup/profilerBase.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

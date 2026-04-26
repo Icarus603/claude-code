@@ -3,7 +3,7 @@ import { join } from 'path'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { getClaudeConfigHomeDir } from 'src/utils/envUtils.js'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 

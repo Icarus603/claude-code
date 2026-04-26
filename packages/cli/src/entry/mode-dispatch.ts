@@ -1103,7 +1103,7 @@ export async function runModeDispatch(
 						const {
 							isComputerUseMCPServer,
 							COMPUTER_USE_MCP_SERVER_NAME,
-						} = await import("src/utils/computerUse/common.js");
+						} = await import("@ant/computer-use-mcp/legacy/common.js");
 						if (nonSdkConfigNames.some(isComputerUseMCPServer)) {
 							reservedNameError = `Invalid MCP configuration: "${COMPUTER_USE_MCP_SERVER_NAME}" is a reserved MCP name.`;
 						}
@@ -1265,10 +1265,10 @@ export async function runModeDispatch(
 			) {
 				try {
 					const { getChicagoEnabled } =
-						await import("src/utils/computerUse/gates.js");
+						await import("@ant/computer-use-mcp/legacy/gates.js");
 					if (getChicagoEnabled()) {
 						const { setupComputerUseMCP } =
-							await import("src/utils/computerUse/setup.js");
+							await import("@ant/computer-use-mcp/legacy/setup.js");
 						const { mcpConfig, allowedTools: cuTools } =
 							setupComputerUseMCP();
 						dynamicMcpConfig = {

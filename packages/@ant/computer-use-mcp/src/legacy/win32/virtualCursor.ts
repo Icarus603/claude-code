@@ -15,7 +15,7 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import { validateHwnd, getTmpDir } from 'src/utils/computerUse/win32/shared.js'
+import { validateHwnd, getTmpDir } from '@ant/computer-use-mcp/legacy/win32/shared.js'
 
 const CURSOR_SIZE = 20
 const CURSOR_COLOR_R = 255

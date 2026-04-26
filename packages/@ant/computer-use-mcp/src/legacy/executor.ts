@@ -46,11 +46,11 @@ import {
   CLI_CU_CAPABILITIES,
   CLI_HOST_BUNDLE_ID,
   getTerminalBundleId,
-} from 'src/utils/computerUse/common.js'
-import { drainRunLoop } from 'src/utils/computerUse/drainRunLoop.js'
-import { notifyExpectedEscape } from 'src/utils/computerUse/escHotkey.js'
-import { requireComputerUseInput } from 'src/utils/computerUse/inputLoader.js'
-import { requireComputerUseSwift } from 'src/utils/computerUse/swiftLoader.js'
+} from '@ant/computer-use-mcp/legacy/common.js'
+import { drainRunLoop } from '@ant/computer-use-mcp/legacy/drainRunLoop.js'
+import { notifyExpectedEscape } from '@ant/computer-use-mcp/legacy/escHotkey.js'
+import { requireComputerUseInput } from '@ant/computer-use-mcp/legacy/inputLoader.js'
+import { requireComputerUseSwift } from '@ant/computer-use-mcp/legacy/swiftLoader.js'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -301,7 +301,7 @@ export function createCliExecutor(opts: {
   // No macOS code paths, no drainRunLoop, no @ant packages.
   if (process.platform !== 'darwin') {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { createCrossPlatformExecutor } = require('src/utils/computerUse/executorCrossPlatform.js') as typeof import('src/utils/computerUse/executorCrossPlatform.js')
+    const { createCrossPlatformExecutor } = require('@ant/computer-use-mcp/legacy/executorCrossPlatform.js') as typeof import('@ant/computer-use-mcp/legacy/executorCrossPlatform.js')
     return createCrossPlatformExecutor(opts)
   }
 

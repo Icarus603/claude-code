@@ -34,11 +34,11 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   checkComputerUseLock,
   tryAcquireComputerUseLock,
-} from 'src/utils/computerUse/computerUseLock.js'
-import { registerEscHotkey } from 'src/utils/computerUse/escHotkey.js'
-import { getChicagoCoordinateMode } from 'src/utils/computerUse/gates.js'
-import { getComputerUseHostAdapter } from 'src/utils/computerUse/hostAdapter.js'
-import { getComputerUseMCPRenderingOverrides } from 'src/utils/computerUse/toolRendering.js'
+} from '@ant/computer-use-mcp/legacy/computerUseLock.js'
+import { registerEscHotkey } from '@ant/computer-use-mcp/legacy/escHotkey.js'
+import { getChicagoCoordinateMode } from '@ant/computer-use-mcp/legacy/gates.js'
+import { getComputerUseHostAdapter } from '@ant/computer-use-mcp/legacy/hostAdapter.js'
+import { getComputerUseMCPRenderingOverrides } from '@ant/computer-use-mcp/legacy/toolRendering.js'
 
 type CallOverride = Pick<Tool, 'call'>['call']
 

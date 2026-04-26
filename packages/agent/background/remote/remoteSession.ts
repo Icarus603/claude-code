@@ -3,7 +3,7 @@ import { readEnv } from '@claude-code/config/env/utils'
 import { checkGate_CACHED_OR_BLOCKING } from '@claude-code/config/feature-flags'
 import { isPolicyAllowed } from '@claude-code/provider/policyLimits/index.js'
 import { detectCurrentRepositoryWithHost } from '@claude-code/storage/detectRepository.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import type { TodoList } from '@claude-code/tool-registry/todo/types.js'
 import {
   checkGithubAppInstalled,

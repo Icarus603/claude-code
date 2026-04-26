@@ -12,7 +12,7 @@
  * CRITICAL: All screenshots output JPEG (ImageFormat::Jpeg), not PNG.
  */
 
-import type { Platform } from 'src/utils/computerUse/platforms/index.js'
+import type { Platform } from '@ant/computer-use-mcp/legacy/platforms/index.js'
 import type {
   InputPlatform,
   ScreenshotPlatform,
@@ -23,39 +23,39 @@ import type {
   DisplayInfo,
   InstalledApp,
   FrontmostAppInfo,
-} from 'src/utils/computerUse/platforms/types.js'
-import { listWindows } from 'src/utils/computerUse/win32/windowEnum.js'
-import { detectAppType, openWithController } from 'src/utils/computerUse/win32/appDispatcher.js'
+} from '@ant/computer-use-mcp/legacy/platforms/types.js'
+import { listWindows } from '@ant/computer-use-mcp/legacy/win32/windowEnum.js'
+import { detectAppType, openWithController } from '@ant/computer-use-mcp/legacy/win32/appDispatcher.js'
 import {
   markBound,
   unmarkBound,
   cleanupAllBorders,
-} from 'src/utils/computerUse/win32/windowBorder.js'
+} from '@ant/computer-use-mcp/legacy/win32/windowBorder.js'
 import {
   showVirtualCursor,
   hideVirtualCursor,
   moveVirtualCursor,
-} from 'src/utils/computerUse/win32/virtualCursor.js'
-import { showIndicator, hideIndicator } from 'src/utils/computerUse/win32/inputIndicator.js'
+} from '@ant/computer-use-mcp/legacy/win32/virtualCursor.js'
+import { showIndicator, hideIndicator } from '@ant/computer-use-mcp/legacy/win32/inputIndicator.js'
 import {
   ps,
   psAsync,
   validateHwnd,
   VK_MAP,
   MODIFIER_KEYS,
-} from 'src/utils/computerUse/win32/shared.js'
+} from '@ant/computer-use-mcp/legacy/win32/shared.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 
 // ---------------------------------------------------------------------------
 // Python Bridge (lazy-loaded, preferred over PowerShell for screenshots)
 // ---------------------------------------------------------------------------
 
-let _bridge: typeof import('src/utils/computerUse/win32/bridgeClient.js') | undefined
+let _bridge: typeof import('@ant/computer-use-mcp/legacy/win32/bridgeClient.js') | undefined
 function getBridge() {
   if (!_bridge) {
     try {
       _bridge =
-        require('src/utils/computerUse/win32/bridgeClient.js') as typeof import('src/utils/computerUse/win32/bridgeClient.js')
+        require('@ant/computer-use-mcp/legacy/win32/bridgeClient.js') as typeof import('@ant/computer-use-mcp/legacy/win32/bridgeClient.js')
     } catch {}
   }
   return _bridge
@@ -75,7 +75,7 @@ function bridgeCallSync<T>(
   }
 }
 
-// validateHwnd, ps, psAsync, VK_MAP, MODIFIER_KEYS imported from 'src/utils/computerUse/win32/shared.js'
+// validateHwnd, ps, psAsync, VK_MAP, MODIFIER_KEYS imported from '@ant/computer-use-mcp/legacy/win32/shared.js'
 
 // ---------------------------------------------------------------------------
 // Win32 P/Invoke types (compiled once per PS session)
@@ -132,7 +132,7 @@ public class CuWin32 {
 '@
 `
 
-// VK_MAP and MODIFIER_KEYS imported from 'src/utils/computerUse/win32/shared.js'
+// VK_MAP and MODIFIER_KEYS imported from '@ant/computer-use-mcp/legacy/win32/shared.js'
 
 // ---------------------------------------------------------------------------
 // Session-level HWND binding — all operations target this handle
@@ -140,7 +140,7 @@ public class CuWin32 {
 
 let boundHwnd: string | null = null
 let boundPid: number | null = null
-let boundAppType: import('src/utils/computerUse/win32/appDispatcher.js').AppType | null = null
+let boundAppType: import('@ant/computer-use-mcp/legacy/win32/appDispatcher.js').AppType | null = null
 let boundFilePath: string | null = null
 
 /** Get the bound HWND, or null if not bound */
@@ -201,7 +201,7 @@ if ($prev -ne [IntPtr]::Zero -and $prev -ne $target) {
 /** Bind to a COM-controlled file (Excel/Word — no window needed) */
 export function bindFile(
   filePath: string,
-  appType: import('src/utils/computerUse/win32/appDispatcher.js').AppType,
+  appType: import('@ant/computer-use-mcp/legacy/win32/appDispatcher.js').AppType,
 ): void {
   boundHwnd = null
   boundPid = null
@@ -226,11 +226,11 @@ export function unbindWindow(): void {
 // Window Message module (lazy loaded)
 // ---------------------------------------------------------------------------
 
-let _wm: typeof import('src/utils/computerUse/win32/windowMessage.js') | undefined
+let _wm: typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js') | undefined
 function getWm() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return (_wm ??=
-    require('src/utils/computerUse/win32/windowMessage.js') as typeof import('src/utils/computerUse/win32/windowMessage.js'))
+    require('@ant/computer-use-mcp/legacy/win32/windowMessage.js') as typeof import('@ant/computer-use-mcp/legacy/win32/windowMessage.js'))
 }
 
 // ---------------------------------------------------------------------------
@@ -295,7 +295,7 @@ const input: InputPlatform = {
     if (boundAppType === 'word' && boundFilePath) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { appendText } =
-        require('src/utils/computerUse/win32/comWord.js') as typeof import('src/utils/computerUse/win32/comWord.js')
+        require('@ant/computer-use-mcp/legacy/win32/comWord.js') as typeof import('@ant/computer-use-mcp/legacy/win32/comWord.js')
       appendText(boundFilePath, text)
       return
     }
@@ -840,7 +840,7 @@ public class CuWinMgmt {
 '@
 `
 
-import type { WindowManagementPlatform, WindowAction } from 'src/utils/computerUse/platforms/types.js'
+import type { WindowManagementPlatform, WindowAction } from '@ant/computer-use-mcp/legacy/platforms/types.js'
 
 const windowManagement: WindowManagementPlatform = {
   manageWindow(action: WindowAction, opts?): boolean {

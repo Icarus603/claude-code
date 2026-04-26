@@ -28,7 +28,7 @@
  */
 
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatMs, formatTimelineLine, getPerformance } from '@claude-code/app-host/startup/profilerBase.js'
 
 // Module-level state - initialized once when the module loads

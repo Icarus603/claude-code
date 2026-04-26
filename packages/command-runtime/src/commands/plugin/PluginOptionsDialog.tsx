@@ -7,7 +7,7 @@ import {
   useKeybinding,
   useKeybindings,
 } from '@anthropic/ink/keybindings'
-import { isEnvTruthy } from 'src/utils/envUtils.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
 import type {
   PluginOptionSchema,
   PluginOptionValues,
