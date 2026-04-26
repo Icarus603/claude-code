@@ -166,6 +166,7 @@ import { useAutoRunIssueHandlers } from '@claude-code/repl/screens/repl/useAutoR
 import { useHandleExit } from '@claude-code/repl/screens/repl/useHandleExit.js';
 import { useSurveyAndRateLimitHandlers } from '@claude-code/repl/screens/repl/useSurveyAndRateLimitHandlers.js';
 import { useQueuedCommandOnCancel } from '@claude-code/repl/screens/repl/useQueuedCommandOnCancel.js';
+import { useStartupCallouts } from '@claude-code/repl/screens/repl/useStartupCallouts.js';
 import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js';
 import { CancelRequestHandler } from '@claude-code/repl/hooks/useCancelRequest.js';
 import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgroundTaskNavigation.js';
@@ -734,15 +735,11 @@ export function REPL({
   const [ideToInstallExtension, setIDEToInstallExtension] = useState<IdeType | null>(null);
   const [ideInstallationStatus, setIDEInstallationStatus] = useState<IDEExtensionInstallationStatus | null>(null);
   const [showIdeOnboarding, setShowIdeOnboarding] = useState(false);
-  // Dead code elimination: model switch callout state (ant-only)
-  const [showModelSwitchCallout, setShowModelSwitchCallout] = useState(() => {
-    if (process.env.USER_TYPE === 'ant') {
-      return shouldShowAntModelSwitch();
-    }
-    return false;
-  });
-  const [showEffortCallout, setShowEffortCallout] = useState(() => shouldShowEffortCallout(mainLoopModel));
-  const [showDesktopUpsellStartup, setShowDesktopUpsellStartup] = useState(() => shouldShowDesktopUpsellStartup());
+  const {
+    showModelSwitchCallout, setShowModelSwitchCallout,
+    showEffortCallout, setShowEffortCallout,
+    showDesktopUpsellStartup, setShowDesktopUpsellStartup,
+  } = useStartupCallouts(mainLoopModel);
   const tasksV2 = useTasksV2WithCollapseEffect();
   const {
     agentDefinitions,
