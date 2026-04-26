@@ -24,6 +24,8 @@
     "./sentry.js": "./src/sentry.ts",
     "./betaSessionTracing.js": "./src/betaSessionTracing.ts",
     "./errorIds.js": "./src/errorIds.ts",
+    "./errorIds": "./src/errorIds.ts",
+    "./errorIds": "./src/errorIds.ts",
     "./telemetry/sessionTracing.js": "./src/telemetry/sessionTracing.ts",
     "./telemetry/bigqueryExporter.js": "./src/telemetry/bigqueryExporter.ts",
     "./telemetry/pluginTelemetry.js": "./src/telemetry/pluginTelemetry.ts",
