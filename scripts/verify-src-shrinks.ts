@@ -14,7 +14,7 @@
 import { readdirSync, statSync, readFileSync } from 'fs'
 import { join } from 'path'
 
-const BUDGET = 3342 // iter 6 baseline (excluding entrypoints + main.tsx)
+const BUDGET = 2715 // post-#77 (168 dead shims deleted) baseline
 const EXCLUDE_PREFIXES = ['src/entrypoints/', 'src/main.tsx']
 
 function walk(dir: string, files: string[]): void {
