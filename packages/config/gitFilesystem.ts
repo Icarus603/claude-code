@@ -18,7 +18,7 @@ import { join, resolve } from 'path'
 import { waitForScrollIdle } from '@claude-code/app-host/bootstrap/state.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { findGitRoot } from '@claude-code/storage/git.js'
+import { findGitRoot } from '@claude-code/storage/findGitRoot.js'
 import { parseGitConfigValue } from '@claude-code/config/git/gitConfigParser.js'
 
 // ---------------------------------------------------------------------------
