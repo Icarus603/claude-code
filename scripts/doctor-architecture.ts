@@ -267,6 +267,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — bundler resolves all imports (catches stale @claude-code/X paths)',
   },
   {
+    id: 'package-private-src',
+    layer: 'Cross-Cutting',
+    subsystem: 'encapsulation',
+    script: 'scripts/verify-package-private-src.ts',
+    doc: 'V7 §3.2 — packages/<A> must not import @claude-code/<B>/src/... (src/ is private)',
+  },
+  {
     id: 'package-exports',
     layer: 'Cross-Cutting',
     subsystem: 'export map coverage',
