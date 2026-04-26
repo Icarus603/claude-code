@@ -36,6 +36,8 @@
     "./git.js": "./src/git.ts",
     "./findGitRoot.js": "./src/findGitRoot.ts",
     "./parseGitRemote.js": "./src/parseGitRemote.ts",
+    "./sessionStoragePredicates.js": "./src/sessionStoragePredicates.ts",
+    "./sessionPaths.js": "./src/sessionPaths.ts",
     "./claudemd.js": "./src/claudemd.ts",
     "./editor.js": "./src/editor.ts",
     "./imageResizer.js": "./src/imageResizer.ts",
