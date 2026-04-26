@@ -521,10 +521,21 @@ async function main() {
     process.exit(2)
   }
 
-  const results: CheckResult[] = []
-  for (const check of selected) {
-    results.push(await runCheck(check, args.verbose))
-  }
+  // Run checks concurrently with a small worker pool. Each check is an
+  // independent subprocess; a pool of 8 keeps wall time low without
+  // thrashing CPU/file-cache (M-series hits ~3s vs ~22s sequential).
+  const POOL_SIZE = args.verbose ? 1 : 8
+  const results: CheckResult[] = new Array(selected.length)
+  let nextIdx = 0
+  await Promise.all(
+    Array.from({ length: Math.min(POOL_SIZE, selected.length) }, async () => {
+      while (true) {
+        const idx = nextIdx++
+        if (idx >= selected.length) return
+        results[idx] = await runCheck(selected[idx]!, args.verbose)
+      }
+    }),
+  )
 
   if (args.json) {
     console.log(
