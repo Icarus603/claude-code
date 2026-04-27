@@ -28,9 +28,14 @@ export function getAPIProvider(): APIProvider {
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GEMINI'))) return 'gemini'
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GROK'))) return 'grok'
 
-  // Connection-based routing: check if any codex connection is enabled
-  if (getEnabledConnections().some(c => c.protocol === 'codex')) return 'codex'
-
+  // DO NOT add per-protocol checks here (e.g. "if any codex connection →
+  // return 'codex'"). getAPIProvider() is the GLOBAL FALLBACK that is used
+  // when no connection matches a specific model. Per-model routing is done
+  // by getProviderForModel() / resolveConnectionForModel() which searches
+  // the connection registry. Returning 'codex' globally here made every
+  // Claude model request (Sonnet 4.6, Opus 4.7, …) route to the Codex
+  // endpoint when a Codex connection existed alongside a Claude Account —
+  // causing 401s with an OpenAI "no API key" message.
   return 'firstParty'
 }
 
