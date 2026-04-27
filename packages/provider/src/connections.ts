@@ -47,21 +47,62 @@ export function getDefaultModelsForProtocol(
         },
       ]
     case 'codex':
+      // Mirror of what `https://chatgpt.com/backend-api/codex/models` returns
+      // for ChatGPT-account auth as of 2026-04-27. We do not call /models
+      // at runtime: that endpoint requires us to impersonate the openai/codex
+      // Rust CLI's own `client_version` (the only accepted version space is
+      // sub-1.0.0, the codex CLI's), and the tier-filter behavior varies
+      // unpredictably across versions — it dropped `gpt-5.5` against
+      // `client_version=0.125.0` (the latest codex-rs release tag) but
+      // returned it for an older value. Static-list-as-mirror is the
+      // pragmatic answer: when OpenAI ships a new model we add the entry
+      // here, same way openai/codex used to maintain its preset list.
+      //
+      // Sync source: /models response on a Plus account, hand-verified.
+      // openai/codex itself removed its hardcoded ModelPreset registry
+      // in favor of this same dynamic endpoint, so there's no upstream
+      // table to mirror more directly.
+      //
+      // If the user's plan tier doesn't include one of these models the
+      // /responses call returns a clear `model not available` error.
       return [
         {
-          id: 'gpt-5.2-codex',
-          label: 'GPT-5.2 Codex',
-          description: 'Frontier agentic coding model',
+          id: 'gpt-5.5',
+          label: 'GPT-5.5',
+          description:
+            'Frontier model for complex coding, research, and real-world work.',
+          supportedEfforts: ['low', 'medium', 'high', 'xhigh'],
+          defaultEffort: 'medium',
         },
         {
-          id: 'gpt-5.1-codex-max',
-          label: 'GPT-5.1 Codex Max',
-          description: 'Max Codex model',
+          id: 'gpt-5.4',
+          label: 'GPT-5.4',
+          description: 'Strong model for everyday coding.',
+          supportedEfforts: ['low', 'medium', 'high', 'xhigh'],
+          defaultEffort: 'medium',
         },
         {
-          id: 'gpt-5.1-codex-mini',
-          label: 'GPT-5.1 Codex Mini',
-          description: 'Fast Codex model',
+          id: 'gpt-5.4-mini',
+          label: 'GPT-5.4 Mini',
+          description:
+            'Small, fast, and cost-efficient model for simpler coding tasks.',
+          supportedEfforts: ['low', 'medium', 'high', 'xhigh'],
+          defaultEffort: 'medium',
+        },
+        {
+          id: 'gpt-5.3-codex',
+          label: 'GPT-5.3 Codex',
+          description: 'Coding-optimized model.',
+          supportedEfforts: ['low', 'medium', 'high', 'xhigh'],
+          defaultEffort: 'medium',
+        },
+        {
+          id: 'gpt-5.2',
+          label: 'GPT-5.2',
+          description:
+            'Optimized for professional work and long-running agents.',
+          supportedEfforts: ['low', 'medium', 'high', 'xhigh'],
+          defaultEffort: 'medium',
         },
       ]
     case 'openai':
@@ -499,6 +540,35 @@ export function migrateLegacyEnvToConnections(
       }
     } catch {
       // Migration is best-effort; never block boot.
+    }
+
+    // Earlier Codex login flows wrote `CLAUDE_CODE_USE_OPENAI=1` into
+    // `globalConfig.env` to force the OpenAI dispatch branch. With
+    // per-connection routing that flag is now actively harmful: it makes
+    // Claude models on a coexisting Claude Account connection 401 against
+    // api.openai.com. When a Codex connection exists, scrub the
+    // legacy flag from the persisted config so subsequent boots route by
+    // model id only.
+    const hasCodex = getConnections().some(c => c.protocol === 'codex')
+    if (hasCodex) {
+      try {
+        saveGlobalConfig(current => {
+          const env = current.env ?? {}
+          if (env.CLAUDE_CODE_USE_OPENAI !== '1') return current
+          const { CLAUDE_CODE_USE_OPENAI: _drop, ...rest } = env
+          void _drop
+          return { ...current, env: rest }
+        })
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { readEnv, deleteEnv } = require(
+          '@claude-code/config/env/utils',
+        ) as typeof import('@claude-code/config/env/utils')
+        if (readEnv('CLAUDE_CODE_USE_OPENAI') === '1') {
+          deleteEnv('CLAUDE_CODE_USE_OPENAI')
+        }
+      } catch {
+        // Best-effort; never block boot.
+      }
     }
   }
 

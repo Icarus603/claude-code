@@ -12,7 +12,6 @@ import { sendNotification } from '@claude-code/repl/notifier.js'
 import { OAuthService, runCodexOAuthFlow, saveCodexOAuthTokens } from '@claude-code/provider/oauth/index.js'
 import { getOauthAccountInfo, validateForceLoginOrg } from '@claude-code/provider/authAlias.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getSettings_DEPRECATED, updateSettingsForSource } from '@claude-code/config/settings'
 import {
   getConnections,
@@ -129,10 +128,20 @@ export function ConsoleOAuthFlow({
   // Name for new API key connections
   const [connectionName, setConnectionName] = useState('')
 
-  // Helper: save a connection record
+  // Helper: save a connection record. `models` overrides the hardcoded
+  // default — used by the Codex flow to persist the live `/models` list
+  // returned by the backend (the hardcoded list is wrong for the
+  // ChatGPT-account tier).
   const upsertProtocolConnection = useCallback(
-    (protocol: 'anthropic' | 'codex', name: string, endpoint: string) => {
-      const existing = getConnections().find(c => c.protocol === protocol && c.auth.type === 'oauth')
+    (
+      protocol: 'anthropic' | 'codex',
+      name: string,
+      endpoint: string,
+      models?: ConnectionModelRecord[],
+    ) => {
+      const existing = getConnections().find(
+        c => c.protocol === protocol && c.auth.type === 'oauth',
+      )
       const conn: ConnectionRecord = {
         id: existing?.id ?? generateConnectionId(),
         name,
@@ -140,7 +149,10 @@ export function ConsoleOAuthFlow({
         endpoint,
         auth: { type: 'oauth', source: protocol === 'codex' ? 'codex' : 'claude-ai' },
         enabled: true,
-        models: getDefaultModelsForProtocol(protocol),
+        models:
+          models && models.length > 0
+            ? models
+            : getDefaultModelsForProtocol(protocol),
         createdAt: existing?.createdAt ?? Date.now(),
       }
       saveConnection(conn)
@@ -363,16 +375,23 @@ export function ConsoleOAuthFlow({
       })
       // Save directly via saveCodexOAuthTokens (bypasses installOAuthTokens Anthropic path)
       saveCodexOAuthTokens(codexTokens)
-      saveGlobalConfig(current => ({
-        ...current,
-        env: {
-          ...(current.env ?? {}),
-          CLAUDE_CODE_USE_OPENAI: '1',
-        },
-      }))
-      process.env.CLAUDE_CODE_USE_OPENAI = '1'
-      // Save connection for Codex
-      upsertProtocolConnection('codex', 'ChatGPT Codex', 'https://chatgpt.com/backend-api/codex/responses')
+      // Codex models come from the static mirror in
+      // getDefaultModelsForProtocol('codex'). We tried dynamic /models
+      // discovery; it requires impersonating the openai/codex Rust CLI's
+      // version space and returned a tier-filtered list that varied
+      // unpredictably with `client_version`. Static-list-as-mirror is
+      // both more correct and less fragile.
+      //
+      // Routing happens per-model via the connection record; do NOT set
+      // CLAUDE_CODE_USE_OPENAI here — that env var globally forces every
+      // request (including Claude models on a coexisting Claude Account
+      // connection) into the OpenAI adapter, which then 401s against
+      // api.openai.com.
+      upsertProtocolConnection(
+        'codex',
+        'ChatGPT Codex',
+        'https://chatgpt.com/backend-api/codex/responses',
+      )
       logEvent('tengu_oauth_codex_success', {})
       setOAuthStatus({ state: 'success' })
       void sendNotification({ message: 'Codex login successful', notificationType: 'auth_success' }, terminal)

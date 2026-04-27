@@ -5086,6 +5086,88 @@ export function filterOrphanedThinkingOnlyMessages(
 }
 
 /**
+ * Strip thinking/redacted_thinking blocks from any assistant message
+ * whose originating connection differs from `currentConnectionId`. The
+ * Anthropic API binds thinking-block signatures to the auth context
+ * (API key + organization) that produced them — switching to a
+ * different connection (Claude Account ↔ Anthropic Compatible proxy ↔
+ * any other provider) means the persisted signatures no longer match
+ * and the API rejects with `messages.N.content.K: Invalid signature in
+ * thinking block`.
+ *
+ * `currentConnectionId === undefined` means env-driven path (no
+ * connections); in that case any thinking block from a prior
+ * connection-tagged turn is suspect → strip.
+ *
+ * Run this BEFORE `stripInvalidThinkingBlocks` so the cheaper
+ * malformed-shape check operates on the trimmed-down list.
+ */
+export function stripCrossConnectionThinkingBlocks(
+  messages: Message[],
+  currentConnectionId: string | undefined,
+): Message[] {
+  let changed = false
+  // Local lazy require to avoid a static agent → provider cycle.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { resolveConnectionForModel } = require(
+    '@claude-code/provider/providers.js',
+  ) as typeof import('@claude-code/provider/providers.js')
+  const result = messages.map(msg => {
+    if (msg.type !== 'assistant') return msg
+    const content = msg.message.content
+    if (!Array.isArray(content)) return msg
+    const messageModel = msg.message.model as string | undefined
+    if (!messageModel) return msg
+    const messageConn = resolveConnectionForModel(messageModel)?.id
+    // Same connection → thinking signatures still apply.
+    if (messageConn === currentConnectionId) return msg
+    // Different (or unknown vs known) connection → strip thinking.
+    const filtered = content.filter(block => !isThinkingBlock(block))
+    if (filtered.length === content.length) return msg
+    changed = true
+    return {
+      ...msg,
+      message: { ...msg.message, content: filtered },
+    } as typeof msg
+  })
+  return changed ? result : messages
+}
+
+/**
+ * Strip thinking/redacted_thinking blocks that the Anthropic API will
+ * reject for shape reasons — empty `thinking` text, or missing
+ * `signature`. Belt-and-suspenders next to
+ * `stripCrossConnectionThinkingBlocks`: catches blocks from same-
+ * connection turns that got malformed somehow (provider bugs,
+ * partial streams, …).
+ */
+export function stripInvalidThinkingBlocks(messages: Message[]): Message[] {
+  let changed = false
+  const result = messages.map(msg => {
+    if (msg.type !== 'assistant') return msg
+    const content = msg.message.content
+    if (!Array.isArray(content)) return msg
+    const filtered = content.filter(block => {
+      if (!isThinkingBlock(block)) return true
+      const b = block as { thinking?: unknown; signature?: unknown; data?: unknown }
+      if (block.type === 'redacted_thinking') {
+        return typeof b.data === 'string' && b.data.length > 0
+      }
+      const hasText = typeof b.thinking === 'string' && b.thinking.length > 0
+      const hasSig = typeof b.signature === 'string' && b.signature.length > 0
+      return hasText && hasSig
+    })
+    if (filtered.length === content.length) return msg
+    changed = true
+    return {
+      ...msg,
+      message: { ...msg.message, content: filtered },
+    } as typeof msg
+  })
+  return changed ? result : messages
+}
+
+/**
  * Strip signature-bearing blocks (thinking, redacted_thinking, connector_text)
  * from all assistant messages. Their signatures are bound to the API key that
  * generated them; after a credential change (e.g. /login) they're invalid and

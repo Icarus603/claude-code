@@ -85,6 +85,8 @@ import {
 } from '@claude-code/provider/model.js'
 import { getModelStrings } from '@claude-code/provider/modelStrings.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { resolveConnectionForModel } from '@claude-code/provider/providers.js'
+import { unpackModelId } from '@claude-code/provider/connections.js'
 import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import {
   API_PDF_MAX_PAGES,
@@ -955,14 +957,20 @@ export function getAssistantMessageFromError(
 
   // 404 Not Found — usually means the selected model doesn't exist or isn't
   // available. Guide the user to /model so they can pick a valid one.
-  // For 3P users, suggest a specific fallback model they can try.
+  // For 3P deployments that lag firstParty, suggest one version back.
   if (error instanceof APIError && error.status === 404) {
     const switchCmd = getIsNonInteractiveSession() ? '--model' : '/model'
+    const { connectionId, modelId: bareModelId } = unpackModelId(model)
+    const conn = resolveConnectionForModel(model)
+    const where = conn
+      ? `the ${conn.name} connection`
+      : `your ${getAPIProvider()} deployment`
     const fallbackSuggestion = get3PModelFallbackSuggestion(model)
+    void connectionId
     return createAssistantAPIErrorMessage({
       content: fallbackSuggestion
-        ? `The model ${model} is not available on your ${getAPIProvider()} deployment. Try ${switchCmd} to switch to ${fallbackSuggestion}, or ask your admin to enable this model.`
-        : `There's an issue with the selected model (${model}). It may not exist or you may not have access to it. Run ${switchCmd} to pick a different model.`,
+        ? `The model ${bareModelId} is not available on ${where}. Try ${switchCmd} to switch to ${fallbackSuggestion}, or ask your admin to enable this model.`
+        : `There's an issue with the selected model (${bareModelId}). It may not exist or you may not have access to it. Run ${switchCmd} to pick a different model.`,
       error: 'invalid_request',
     })
   }
@@ -988,28 +996,59 @@ export function getAssistantMessageFromError(
 }
 
 /**
- * For 3P users, suggest a fallback model when the selected model is unavailable.
- * Returns a model name suggestion, or undefined if no suggestion is applicable.
+ * For 3P deployments that lag firstParty Anthropic availability, suggest
+ * one version back as a possible fallback. Returns undefined when:
+ *
+ *   - the model is on a firstParty Anthropic OAuth connection (no lag) or
+ *     api.anthropic.com api_key (also firstParty);
+ *   - the model is on a non-Anthropic protocol (codex/openai/gemini —
+ *     the Anthropic version chain is meaningless for those);
+ *   - we're env-driven on plain firstParty Anthropic (no Bedrock/Vertex/
+ *     Foundry override).
+ *
+ * V7 §11.6 — this MUST consult the connection record rather than the
+ * global getAPIProvider(). When a Codex / OpenAI legacy env flag is
+ * stale (or even legitimately set for one connection), the global flag
+ * lies about the protocol of any specific Claude model, producing
+ * "downgrade to opus-4-6" suggestions on a Claude Account where
+ * opus-4-7 is fully available.
  */
 function get3PModelFallbackSuggestion(model: string): string | undefined {
-  if (getAPIProvider() === 'firstParty') {
-    return undefined
+  const conn = resolveConnectionForModel(model)
+  if (conn) {
+    if (conn.protocol !== 'anthropic') return undefined
+    // Anthropic-protocol connection. firstParty doesn't lag, only 3P
+    // proxies do.
+    const isFirstPartyOAuth =
+      conn.auth.type === 'oauth' && conn.auth.source === 'claude-ai'
+    if (isFirstPartyOAuth) return undefined
+    if (conn.auth.type === 'api_key') {
+      try {
+        if (new URL(conn.endpoint).host === 'api.anthropic.com') return undefined
+      } catch {
+        // Malformed endpoint — fall through and let the suggestion run.
+      }
+    }
+  } else {
+    // No connection matched — env-driven path. Only Bedrock / Vertex /
+    // Foundry lag firstParty.
+    const provider = getAPIProvider()
+    if (provider !== 'bedrock' && provider !== 'vertex' && provider !== 'foundry') {
+      return undefined
+    }
   }
-  // @[MODEL LAUNCH]: Add a fallback suggestion chain for the new model → previous version for 3P
-  const m = model.toLowerCase()
-  // If the failing model looks like an Opus 4.7 variant, suggest Opus 4.6
+  // @[MODEL LAUNCH]: Add a fallback suggestion chain for the new model → previous version
+  const { modelId: bareModelId } = unpackModelId(model)
+  const m = bareModelId.toLowerCase()
   if (m.includes('opus-4-7') || m.includes('opus_4_7')) {
     return getModelStrings().opus46
   }
-  // If the failing model looks like an Opus 4.6 variant, suggest the default Opus (4.1 for 3P)
   if (m.includes('opus-4-6') || m.includes('opus_4_6')) {
     return getModelStrings().opus41
   }
-  // If the failing model looks like a Sonnet 4.6 variant, suggest Sonnet 4.5
   if (m.includes('sonnet-4-6') || m.includes('sonnet_4_6')) {
     return getModelStrings().sonnet45
   }
-  // If the failing model looks like a Sonnet 4.5 variant, suggest Sonnet 4
   if (m.includes('sonnet-4-5') || m.includes('sonnet_4_5')) {
     return getModelStrings().sonnet40
   }

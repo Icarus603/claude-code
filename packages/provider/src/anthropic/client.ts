@@ -300,6 +300,44 @@ export async function getAnthropicClient({
     '@claude-code/provider/providers.js',
   ) as typeof import('@claude-code/provider/providers.js')
   const conn = model ? resolveConnectionForModel(model) : undefined
+
+  // V7 §11.6 — Codex routing seam.
+  //
+  // When the active connection is Codex (ChatGPT-account auth against
+  // chatgpt.com/backend-api/codex/responses), we install a custom
+  // `fetch` on the Anthropic SDK client that intercepts `/v1/messages`
+  // calls, translates the Anthropic-shape body to Codex's `/responses`
+  // shape, and translates the SSE stream back to Anthropic events.
+  //
+  // This is the SAME architectural pattern openai/codex's TUI uses for
+  // its provider impedance match, and it solves the problems our prior
+  // queryStream-level codex branch hit:
+  //   • The SDK already normalized everything (system, tools,
+  //     output_config.effort, BetaMessageParam[]) — fetch sees the
+  //     final wire body, not the upstream `Message[]` wrapper.
+  //   • Errors come back as Response objects → SDK converts to
+  //     `APIError` automatically; no need to wrap thrown Errors as
+  //     `SystemAPIErrorMessage`.
+  //   • All Anthropic-side preprocessing (cache_control hints, beta
+  //     headers, etc.) flows through unchanged; codex backend ignores
+  //     what doesn't apply.
+  if (conn?.protocol === 'codex' && conn.auth.type === 'oauth') {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { createCodexFetch } = require(
+      '@claude-code/provider/codex/fetchAdapter.js',
+    ) as typeof import('@claude-code/provider/codex/fetchAdapter.js')
+    const codexClientConfig: ConstructorParameters<typeof Anthropic>[0] = {
+      // The SDK requires `apiKey` to be a non-empty string — our fetch
+      // adapter handles real auth via the codex Bearer token, so this
+      // value is never sent on the wire.
+      apiKey: 'codex-via-fetch-adapter',
+      ...ARGS,
+      fetch: createCodexFetch(),
+      ...(anthropic.isDebugToStdErr() && { logger: createStderrLogger() }),
+    }
+    return new Anthropic(codexClientConfig)
+  }
+
   const useCompatibleConn =
     conn?.protocol === 'anthropic' && conn.auth.type === 'api_key'
 

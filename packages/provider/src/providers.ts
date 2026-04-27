@@ -15,6 +15,40 @@ export type APIProvider =
   | 'codex'
 
 export function getAPIProvider(): APIProvider {
+  // V7 §11.6 — when ANY connection is configured, the connection
+  // registry is the source of truth. Per-model routing happens via
+  // `getProviderForModel()` / `resolveConnectionForModel()`; this
+  // function is only the GLOBAL FALLBACK for code paths without a
+  // model in hand (error formatting, beta header default, …).
+  //
+  // In that fallback role the legacy `CLAUDE_CODE_USE_OPENAI=1` /
+  // `settings.modelType='openai'` flags are actively wrong: a stale
+  // residue from a prior Codex/OpenAI session tags every fallback as
+  // 'openai' even on a Claude Account, leaking the wrong provider
+  // name into 404 messages and corrupting model defaults. Ignore
+  // those flags whenever connections exist — routing has already
+  // been decided per model. Cloud-deployment env vars
+  // (Bedrock/Vertex/Foundry) ARE still honored because those
+  // deployments aren't connection-aware yet.
+  //
+  // Pure env-only setups (no connections) keep the legacy precedence
+  // untouched, including `modelType` taking priority over Bedrock
+  // env, since callers there have nothing else to disambiguate
+  // intent.
+  const hasConnections = (() => {
+    try {
+      return (getGlobalConfig().connections ?? []).some(c => c.enabled)
+    } catch {
+      return false
+    }
+  })()
+  if (hasConnections) {
+    if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) return 'bedrock'
+    if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'
+    if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY'))) return 'foundry'
+    return 'firstParty'
+  }
+
   const modelType = getInitialSettings().modelType
   if (modelType === 'openai') return 'openai'
   if (modelType === 'gemini') return 'gemini'
@@ -28,14 +62,6 @@ export function getAPIProvider(): APIProvider {
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GEMINI'))) return 'gemini'
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GROK'))) return 'grok'
 
-  // DO NOT add per-protocol checks here (e.g. "if any codex connection →
-  // return 'codex'"). getAPIProvider() is the GLOBAL FALLBACK that is used
-  // when no connection matches a specific model. Per-model routing is done
-  // by getProviderForModel() / resolveConnectionForModel() which searches
-  // the connection registry. Returning 'codex' globally here made every
-  // Claude model request (Sonnet 4.6, Opus 4.7, …) route to the Codex
-  // endpoint when a Codex connection existed alongside a Claude Account —
-  // causing 401s with an OpenAI "no API key" message.
   return 'firstParty'
 }
 

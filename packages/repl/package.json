@@ -182,6 +182,7 @@
     "./components/KeybindingWarnings.js": "./src/components/KeybindingWarnings.tsx",
     "./components/LanguagePicker.js": "./src/components/LanguagePicker.tsx",
     "./components/LogSelector.js": "./src/components/LogSelector.tsx",
+    "./components/LogoutPicker.js": "./src/components/LogoutPicker.tsx",
     "./components/LogoV2/AnimatedAsterisk.js": "./src/components/LogoV2/AnimatedAsterisk.tsx",
     "./components/LogoV2/AnimatedClawd.js": "./src/components/LogoV2/AnimatedClawd.tsx",
     "./components/LogoV2/ChannelsNotice.js": "./src/components/LogoV2/ChannelsNotice.tsx",

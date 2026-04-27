@@ -5,11 +5,11 @@ import { readEnv } from '@claude-code/config/env'
 export default {
   type: 'local-jsx',
   name: 'logout',
-  // With connection-based multi-provider, /logout opens the connection
-  // manager so the user can disconnect specific providers. The old "nuke
-  // everything" behavior has been removed — there is no more single
-  // global logout when multiple providers coexist.
-  description: 'Manage connections — sign out from a specific provider',
+  // With multi-provider connections coexisting, /logout disconnects a
+  // specific connection: directly when there is only one, via a
+  // disconnect-only picker when there are several. /login owns the
+  // "manage connections" surface (add / enable / disable).
+  description: 'Sign out of a connection',
   isEnabled: () => !isEnvTruthy(readEnv('DISABLE_LOGOUT_COMMAND')),
   load: () => import('./logout.js'),
 } satisfies Command

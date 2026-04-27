@@ -221,10 +221,32 @@ export type AccountInfo = {
 
 export type AuthProtocol = 'anthropic' | 'openai' | 'codex' | 'gemini'
 
+/**
+ * Reasoning effort levels surfaced in Claude Code's /effort picker.
+ *
+ * Mirrored here (not imported from @claude-code/agent/effort) because
+ * config types must not depend on agent — the import direction is
+ * agent → config. Keep in sync with EFFORT_LEVELS in
+ * packages/agent/effort.ts. Codex /models returns its own
+ * ReasoningEffort enum (none / minimal / low / medium / high / xhigh);
+ * none / minimal are mapped out before persisting since /effort doesn't
+ * surface them.
+ */
+export type ConnectionModelEffort = 'low' | 'medium' | 'high' | 'xhigh' | 'max'
+
 export type ConnectionModelRecord = {
   id: string
   label: string
   description?: string
+  /**
+   * Reasoning levels this specific model supports (server-supplied for
+   * Codex, derived/empty otherwise). When present, /effort uses this
+   * list instead of the hardcoded family-name allowlists in
+   * agent/effort.ts.
+   */
+  supportedEfforts?: ConnectionModelEffort[]
+  /** Server-supplied default reasoning level. */
+  defaultEffort?: ConnectionModelEffort
 }
 
 export type ConnectionRecord = {
