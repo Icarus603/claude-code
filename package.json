@@ -1,6 +1,6 @@
 {
   "name": "ccb",
-  "version": "1.carus.000",
+  "version": "0.0.0-source",
   "description": "ccb — Claude Code by Icarus. Distributed as a standalone binary, not via npm. Run `curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash`.",
   "private": true,
   "type": "module",
@@ -48,7 +48,8 @@
     "verify:runtime-boundaries": "bun run scripts/verify-runtime-boundaries.ts",
     "verify:app-host-composition": "bun run scripts/verify-app-host-composition.ts",
     "verify:output-targets": "bun run scripts/verify-output-targets.ts",
-    "verify:storage-contracts": "bun run scripts/verify-storage-contracts.ts"
+    "verify:storage-contracts": "bun run scripts/verify-storage-contracts.ts",
+    "release": "bun run scripts/release.ts"
   },
   "dependencies": {},
   "devDependencies": {
