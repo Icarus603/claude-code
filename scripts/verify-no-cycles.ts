@@ -140,13 +140,16 @@ for (const v of graph.keys()) {
 
 // Ratchet: count tightened from 44 → 20 after fixing detector false
 // positives (comment-stripping + type-only-import filtering); then to
-// 15 by extracting leaf modules (storage/fileEncoding,
-// memory/memoryEntrypoint, permission/permissionSourceTypes,
-// updater/platform); then to 9 after extracting local-observability/core,
-// storage/findGitRoot+parseGitRemote, permission/permissionRequestTypes
-// AND fixing the multi-line type-import strip in stripComments (3
-// phantom cycles eliminated). The remaining 9 are real runtime cycles.
-const BUDGET = 8
+// 15 by extracting leaf modules; then to 9 after extracting more leaves
+// AND fixing the multi-line type-import strip; then to 8 after
+// shrinking same-package SCCs; then to 5 (2026-04-27 Ralph loop) by
+// extracting messageStaticness, slowLoggingTag, formatSkillLoadingMetadata
+// to leaves; redirecting provider→repl back-edges through canonicals;
+// dropping the duplicate cli host-bindings registration. Remaining 5
+// SCCs: 153-file mega (cross-cutting tool-registry/repl/provider/agent),
+// 14-file ink theme (same-package), 11-file swarm (same-package),
+// 5-file cli entry (same-package), 2-file AgentTool internal.
+const BUDGET = 5
 
 // Diagnostic mode: print cycles to stdout when --list flag is passed
 if (process.argv.includes('--list')) {
