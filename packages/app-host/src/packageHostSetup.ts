@@ -1,5 +1,10 @@
 import { installAgentHostBindings } from '@claude-code/agent'
-import { installCliHostBindings } from '@claude-code/cli'
+// cli bindings are wired by packages/app-host/src/runtime/installCliBindings.ts
+// (auto-run on import). Importing installCliHostBindings here closed a 7-file
+// app-host ↔ cli SCC; the explicit call below was also harmful — it
+// destructively overwrote cliHostBindings with only `{ logDebug }`, losing
+// the proper bindings (createHeadlessStore, runHeadless, getStructuredIO)
+// installed by installCliBindings.ts whenever this ran second.
 import { installConfigHostBindings } from '@claude-code/config'
 import { installMemoryHostBindings } from '@claude-code/memory'
 import { installPermissionHostBindings } from '@claude-code/permission'
@@ -83,9 +88,7 @@ export function installCorePackageHostBindings(
     ...resolvers.extraAgentBindings,
   } as any)
 
-  installCliHostBindings({
-    logDebug: resolvers.logDebug,
-  })
+  // installCliHostBindings: removed — see comment at top of file.
 
   installInteractiveSessionHostBindings({
     createInteractiveStore: resolvers.createInteractiveStore,
