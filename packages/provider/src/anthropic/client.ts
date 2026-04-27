@@ -288,13 +288,48 @@ export async function getAnthropicClient({
     return new AnthropicVertex(vertexArgs) as unknown as Anthropic
   }
 
+  // V7 §11.6 — when an Anthropic Compatible connection matches the
+  // requested model, override apiKey + baseURL with the connection's
+  // values. This keeps Claude Account OAuth (api.anthropic.com + OAuth
+  // token) and Anthropic Compatible (user-supplied URL + api_key) from
+  // colliding through global ANTHROPIC_BASE_URL / ANTHROPIC_AUTH_TOKEN.
+  // Resolution is per-call: each query consults the connection registry
+  // for the active model; no shared global state.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { resolveConnectionForModel } = require(
+    '@claude-code/provider/providers.js',
+  ) as typeof import('@claude-code/provider/providers.js')
+  const conn = model ? resolveConnectionForModel(model) : undefined
+  const useCompatibleConn =
+    conn?.protocol === 'anthropic' && conn.auth.type === 'api_key'
+
   // Determine authentication method based on available tokens
   const clientConfig: ConstructorParameters<typeof Anthropic>[0] = {
-    apiKey: authCredentials.apiKey,
-    authToken: authCredentials.authToken ?? undefined,
-    ...(authCredentials.baseURL ? { baseURL: authCredentials.baseURL } : {}),
+    apiKey: useCompatibleConn
+      ? conn?.auth.type === 'api_key'
+        ? conn.auth.key
+        : null
+      : authCredentials.apiKey,
+    authToken: useCompatibleConn ? undefined : authCredentials.authToken ?? undefined,
+    ...(useCompatibleConn
+      ? conn?.endpoint
+        ? { baseURL: conn.endpoint }
+        : {}
+      : authCredentials.baseURL
+        ? { baseURL: authCredentials.baseURL }
+        : {}),
     ...ARGS,
     ...(anthropic.isDebugToStdErr() && { logger: createStderrLogger() }),
+  }
+
+  // For compatible-api connections, also set the Authorization header
+  // explicitly — the SDK's apiKey behavior assumes Anthropic Console;
+  // proxies that follow the Anthropic protocol expect the same shape.
+  if (useCompatibleConn && conn?.auth.type === 'api_key' && conn.auth.key) {
+    // Override the OAuth Authorization header from earlier; api_key path
+    // uses x-api-key (set by the SDK from `apiKey:` above). Drop any
+    // OAuth Bearer header so the proxy doesn't see two auth methods.
+    delete clientConfig.defaultHeaders?.['Authorization']
   }
 
   return new Anthropic(clientConfig)

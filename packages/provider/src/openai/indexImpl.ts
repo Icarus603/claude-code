@@ -127,6 +127,10 @@ export async function* queryModelOpenAI(
       maxRetries: 0,
       fetchOverride: options.fetchOverride as any,
       source: options.querySource,
+      // V7 §11.6 — pass model so the client resolves the connection
+      // record's endpoint/key, not the global env vars. Multiple
+      // OpenAI Compatible connections coexist this way.
+      model: options.model,
     })
 
     logForDebugging(

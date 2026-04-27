@@ -21,6 +21,8 @@ import {
   toggleConnection,
   getDefaultModelsForProtocol,
   generateConnectionId,
+  upsertCompatibleConnection,
+  disconnectConnection,
   type ConnectionRecord,
   type ConnectionModelRecord,
 } from '@claude-code/provider/connections.js'
@@ -39,6 +41,7 @@ type Props = {
 type OAuthStatus =
   | { state: 'idle' } // Initial state, waiting to select login method
   | { state: 'select_connection' } // Connection manager list view
+  | { state: 'connection_action'; id: string } // Per-connection actions (toggle / disconnect)
   | { state: 'platform_setup' } // Show platform setup info (Bedrock/Vertex/Foundry)
   | {
       state: 'custom_platform'
@@ -313,11 +316,15 @@ export function ConsoleOAuthFlow({
         if (!orgResult.valid) {
           throw new Error(orgResult.message)
         }
-        // Reset modelType to anthropic when using OAuth login
-        updateSettingsForSource('userSettings', { modelType: 'anthropic' } as any)
-
-        // Save connection for Claude Account
-        upsertProtocolConnection('anthropic', 'Claude Account', 'https://api.anthropic.com')
+        // V7 §11.6 — connection records are the single source of truth.
+        // Don't write `settings.modelType`; routing is now per-connection
+        // via getProviderForModel(). Writing global modelType from one
+        // login flow used to clobber other configured providers.
+        upsertProtocolConnection(
+          'anthropic',
+          'Claude Account',
+          'https://api.anthropic.com',
+        )
 
         setOAuthStatus({ state: 'success' })
         void sendNotification(
@@ -477,6 +484,8 @@ export function ConsoleOAuthFlow({
           setLoginWithClaudeAi={setLoginWithClaudeAi}
           setLoginWithCodex={setLoginWithCodex}
           onDone={onDone}
+          connectionName={connectionName}
+          setConnectionName={setConnectionName}
         />
       </Box>
     </Box>
@@ -499,6 +508,9 @@ type OAuthStatusMessageProps = {
   setOAuthStatus: (status: OAuthStatus) => void
   setLoginWithClaudeAi: (value: boolean) => void
   setLoginWithCodex: (value: boolean) => void
+  /** Display name for newly-created compatible-provider connections. */
+  connectionName: string
+  setConnectionName: (value: string) => void
 }
 
 function OAuthStatusMessage({
@@ -517,30 +529,48 @@ function OAuthStatusMessage({
   setLoginWithClaudeAi,
   setLoginWithCodex,
   onDone,
+  connectionName,
+  setConnectionName,
 }: OAuthStatusMessageProps): React.ReactNode {
   switch (oauthStatus.state) {
     case 'select_connection': {
       const connections = getConnections()
-      const connOptions = connections.map(c => ({
-        label: (
-          <Text>
-            {c.enabled ? '✓ ' : '  '}
-            {c.name}
-            {'\n'}
-            <Text dimColor>
-              {c.protocol} · {c.models.map(m => m.label).join(' · ')}
+      const protocolLabel: Record<ConnectionRecord['protocol'], string> = {
+        anthropic: 'anthropic',
+        openai: 'openai',
+        codex: 'codex',
+        gemini: 'gemini',
+      }
+      const connOptions = connections.map(c => {
+        const authBadge =
+          c.auth.type === 'oauth' ? `OAuth · ${c.auth.source}` : 'API key'
+        return {
+          label: (
+            <Text>
+              {c.enabled ? '✓ ' : '⊘ '}
+              <Text bold>{c.name}</Text>
+              {'\n'}
+              <Text dimColor>
+                {protocolLabel[c.protocol]} · {authBadge} · {c.endpoint}
+                {'\n'}
+                {c.models.length > 0
+                  ? `${c.models.length} model${c.models.length === 1 ? '' : 's'}: ${c.models
+                      .map(m => m.label)
+                      .join(', ')}`
+                  : 'no models'}
+              </Text>
             </Text>
-          </Text>
-        ),
-        value: c.id,
-      }))
+          ),
+          value: c.id,
+        }
+      })
 
       connOptions.push({
         label: (
           <Text>
             ─────────────────────
             {'\n'}
-            <Text bold>+ Add Connection</Text>
+            <Text bold>+ Add new connection</Text>
             {'\n'}
           </Text>
         ),
@@ -550,7 +580,10 @@ function OAuthStatusMessage({
       return (
         <Box flexDirection="column" gap={1} marginTop={1}>
           <Text bold>Connections</Text>
-          <Text dimColor>Manage your API connections. Select one to enable/disable or remove.</Text>
+          <Text dimColor>
+            Each row is an independent provider. Multiple OpenAI Compatible /
+            Anthropic Compatible connections can coexist.
+          </Text>
 
           <Box>
             <Select
@@ -559,13 +592,7 @@ function OAuthStatusMessage({
                 if (value === '__add__') {
                   setOAuthStatus({ state: 'idle' })
                 } else {
-                  const conn = connections.find(c => c.id === value)
-                  if (conn) {
-                    // Toggle enabled state
-                    toggleConnection(value)
-                    // Re-render by going back to select_connection
-                    setOAuthStatus({ state: 'select_connection' })
-                  }
+                  setOAuthStatus({ state: 'connection_action', id: value })
                 }
               }}
             />
@@ -573,9 +600,65 @@ function OAuthStatusMessage({
 
           <Box marginTop={1}>
             <Text dimColor>
-              Press <Text bold>Enter</Text> on a connection to toggle · Press{' '}
-              <Text bold>Delete</Text> to remove · <Text bold>Esc</Text> to go back
+              <Text bold>Enter</Text> manage · <Text bold>Esc</Text> back
             </Text>
+          </Box>
+        </Box>
+      )
+    }
+    case 'connection_action': {
+      const conn = getConnections().find(c => c.id === oauthStatus.id)
+      if (!conn) {
+        // Connection vanished underneath us (race) — bounce back to list.
+        setOAuthStatus({ state: 'select_connection' })
+        return null
+      }
+      const actions = [
+        {
+          label: (
+            <Text>
+              {conn.enabled ? '⊘ Disable' : '✓ Enable'}{' '}
+              <Text dimColor>(keep credentials, stop routing to it)</Text>
+            </Text>
+          ),
+          value: 'toggle',
+        },
+        {
+          label: (
+            <Text color="error">
+              ✗ Disconnect{' '}
+              <Text dimColor>
+                (delete this connection
+                {conn.auth.type === 'oauth' ? ' + clear OAuth tokens' : ''})
+              </Text>
+            </Text>
+          ),
+          value: 'disconnect',
+        },
+        {
+          label: <Text dimColor>← Cancel</Text>,
+          value: 'cancel',
+        },
+      ]
+      return (
+        <Box flexDirection="column" gap={1} marginTop={1}>
+          <Text bold>{conn.name}</Text>
+          <Text dimColor>
+            {conn.protocol} ·{' '}
+            {conn.auth.type === 'oauth' ? 'OAuth' : 'API key'} · {conn.endpoint}
+          </Text>
+          <Box marginTop={1}>
+            <Select
+              options={actions}
+              onChange={async value => {
+                if (value === 'toggle') {
+                  toggleConnection(conn.id)
+                } else if (value === 'disconnect') {
+                  await disconnectConnection(conn.id)
+                }
+                setOAuthStatus({ state: 'select_connection' })
+              }}
+            />
           </Box>
         </Box>
       )
@@ -803,43 +886,11 @@ function OAuthStatusMessage({
 
         const doSave = useCallback(() => {
           const finalVals = { ...displayValues, [activeField]: inputValue }
-          const env: Record<string, string> = {}
 
-          // Validate base_url if provided
-          if (finalVals.base_url) {
-            try {
-              new URL(finalVals.base_url)
-            } catch {
-              setOAuthStatus({
-                state: 'error',
-                message: 'Invalid base URL: please enter a full URL including protocol (e.g., https://api.example.com)',
-                toRetry: {
-                  state: 'custom_platform',
-                  baseUrl: '',
-                  apiKey: '',
-                  haikuModel: '',
-                  sonnetModel: '',
-                  opusModel: '',
-                  activeField: 'base_url',
-                },
-              })
-              return
-            }
-            env.ANTHROPIC_BASE_URL = finalVals.base_url
-          }
-
-          if (finalVals.api_key) env.ANTHROPIC_AUTH_TOKEN = finalVals.api_key
-          if (finalVals.haiku_model) env.ANTHROPIC_DEFAULT_HAIKU_MODEL = finalVals.haiku_model
-          if (finalVals.sonnet_model) env.ANTHROPIC_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
-          if (finalVals.opus_model) env.ANTHROPIC_DEFAULT_OPUS_MODEL = finalVals.opus_model
-          const { error } = updateSettingsForSource('userSettings', {
-            modelType: 'anthropic' as any,
-            env,
-          } as any)
-          if (error) {
+          if (!finalVals.base_url) {
             setOAuthStatus({
               state: 'error',
-              message: 'Failed to save settings. Please try again.',
+              message: 'Base URL is required for Anthropic Compatible.',
               toRetry: {
                 state: 'custom_platform',
                 baseUrl: finalVals.base_url ?? '',
@@ -850,12 +901,95 @@ function OAuthStatusMessage({
                 activeField: 'base_url',
               },
             })
-          } else {
-            for (const [k, v] of Object.entries(env)) process.env[k] = v
-            setOAuthStatus({ state: 'success' })
-            void onDone()
+            return
           }
-        }, [activeField, inputValue, displayValues, setOAuthStatus, onDone])
+          try {
+            new URL(finalVals.base_url)
+          } catch {
+            setOAuthStatus({
+              state: 'error',
+              message:
+                'Invalid base URL: please enter a full URL including protocol (e.g., https://api.example.com)',
+              toRetry: {
+                state: 'custom_platform',
+                baseUrl: '',
+                apiKey: '',
+                haikuModel: '',
+                sonnetModel: '',
+                opusModel: '',
+                activeField: 'base_url',
+              },
+            })
+            return
+          }
+
+          // Build the model list. User's overrides win over defaults; if they
+          // didn't supply any, fall back to the protocol default list so the
+          // model picker has something to show.
+          const models: ConnectionModelRecord[] = []
+          if (finalVals.opus_model) {
+            models.push({
+              id: finalVals.opus_model,
+              label: `Opus (${finalVals.opus_model})`,
+              description: 'Opus tier',
+            })
+          }
+          if (finalVals.sonnet_model) {
+            models.push({
+              id: finalVals.sonnet_model,
+              label: `Sonnet (${finalVals.sonnet_model})`,
+              description: 'Sonnet tier',
+            })
+          }
+          if (finalVals.haiku_model) {
+            models.push({
+              id: finalVals.haiku_model,
+              label: `Haiku (${finalVals.haiku_model})`,
+              description: 'Haiku tier',
+            })
+          }
+
+          // Connection name: use user-provided if available; default to the
+          // host portion of the URL so multiple custom proxies are
+          // distinguishable in the picker.
+          const url = new URL(finalVals.base_url)
+          const name = connectionName.trim() || url.host
+
+          try {
+            upsertCompatibleConnection({
+              protocol: 'anthropic',
+              name,
+              endpoint: finalVals.base_url,
+              apiKey: finalVals.api_key ?? '',
+              models: models.length > 0 ? models : undefined,
+            })
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e)
+            setOAuthStatus({
+              state: 'error',
+              message: msg,
+              toRetry: {
+                state: 'custom_platform',
+                baseUrl: finalVals.base_url ?? '',
+                apiKey: finalVals.api_key ?? '',
+                haikuModel: finalVals.haiku_model ?? '',
+                sonnetModel: finalVals.sonnet_model ?? '',
+                opusModel: finalVals.opus_model ?? '',
+                activeField: 'base_url',
+              },
+            })
+            return
+          }
+          setOAuthStatus({ state: 'success' })
+          void onDone()
+        }, [
+          activeField,
+          inputValue,
+          displayValues,
+          connectionName,
+          setOAuthStatus,
+          onDone,
+        ])
 
         const handleEnter = useCallback(() => {
           const idx = FIELDS.indexOf(activeField)
@@ -1022,44 +1156,15 @@ function OAuthStatusMessage({
         )
 
         const doOpenAISave = useCallback(() => {
-          const finalVals = { ...openaiDisplayValues, [activeField]: openaiInputValue }
-          const env: Record<string, string> = {}
-
-          // Validate base_url if provided
-          if (finalVals.base_url) {
-            try {
-              new URL(finalVals.base_url)
-            } catch {
-              setOAuthStatus({
-                state: 'error',
-                message: 'Invalid base URL: please enter a full URL including protocol (e.g., https://api.example.com)',
-                toRetry: {
-                  state: 'openai_chat_api',
-                  baseUrl: '',
-                  apiKey: '',
-                  haikuModel: '',
-                  sonnetModel: '',
-                  opusModel: '',
-                  activeField: 'base_url',
-                },
-              })
-              return
-            }
-            env.OPENAI_BASE_URL = finalVals.base_url
+          const finalVals = {
+            ...openaiDisplayValues,
+            [activeField]: openaiInputValue,
           }
 
-          if (finalVals.api_key) env.OPENAI_API_KEY = finalVals.api_key
-          if (finalVals.haiku_model) env.OPENAI_DEFAULT_HAIKU_MODEL = finalVals.haiku_model
-          if (finalVals.sonnet_model) env.OPENAI_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
-          if (finalVals.opus_model) env.OPENAI_DEFAULT_OPUS_MODEL = finalVals.opus_model
-          const { error } = updateSettingsForSource('userSettings', {
-            modelType: 'openai' as any,
-            env,
-          } as any)
-          if (error) {
+          if (!finalVals.base_url) {
             setOAuthStatus({
               state: 'error',
-              message: 'Failed to save settings. Please try again.',
+              message: 'Base URL is required for OpenAI Compatible.',
               toRetry: {
                 state: 'openai_chat_api',
                 baseUrl: finalVals.base_url ?? '',
@@ -1070,12 +1175,89 @@ function OAuthStatusMessage({
                 activeField: 'base_url',
               },
             })
-          } else {
-            for (const [k, v] of Object.entries(env)) process.env[k] = v
-            setOAuthStatus({ state: 'success' })
-            void onDone()
+            return
           }
-        }, [activeField, openaiInputValue, openaiDisplayValues, setOAuthStatus, onDone])
+          try {
+            new URL(finalVals.base_url)
+          } catch {
+            setOAuthStatus({
+              state: 'error',
+              message:
+                'Invalid base URL: please enter a full URL including protocol (e.g., https://api.example.com)',
+              toRetry: {
+                state: 'openai_chat_api',
+                baseUrl: '',
+                apiKey: '',
+                haikuModel: '',
+                sonnetModel: '',
+                opusModel: '',
+                activeField: 'base_url',
+              },
+            })
+            return
+          }
+
+          const models: ConnectionModelRecord[] = []
+          if (finalVals.opus_model) {
+            models.push({
+              id: finalVals.opus_model,
+              label: finalVals.opus_model,
+              description: 'Opus tier',
+            })
+          }
+          if (finalVals.sonnet_model) {
+            models.push({
+              id: finalVals.sonnet_model,
+              label: finalVals.sonnet_model,
+              description: 'Sonnet tier',
+            })
+          }
+          if (finalVals.haiku_model) {
+            models.push({
+              id: finalVals.haiku_model,
+              label: finalVals.haiku_model,
+              description: 'Haiku tier',
+            })
+          }
+
+          const url = new URL(finalVals.base_url)
+          const name = connectionName.trim() || url.host
+
+          try {
+            upsertCompatibleConnection({
+              protocol: 'openai',
+              name,
+              endpoint: finalVals.base_url,
+              apiKey: finalVals.api_key ?? '',
+              models: models.length > 0 ? models : undefined,
+            })
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e)
+            setOAuthStatus({
+              state: 'error',
+              message: msg,
+              toRetry: {
+                state: 'openai_chat_api',
+                baseUrl: finalVals.base_url ?? '',
+                apiKey: finalVals.api_key ?? '',
+                haikuModel: finalVals.haiku_model ?? '',
+                sonnetModel: finalVals.sonnet_model ?? '',
+                opusModel: finalVals.opus_model ?? '',
+                activeField: 'base_url',
+              },
+            })
+            return
+          }
+          setOAuthStatus({ state: 'success' })
+          void onDone()
+        }, [
+          activeField,
+          openaiInputValue,
+          openaiDisplayValues,
+          connectionName,
+          setOAuthStatus,
+          onDone,
+        ])
 
         const handleOpenAIEnter = useCallback(() => {
           const idx = OPENAI_FIELDS.indexOf(activeField)
@@ -1261,8 +1443,15 @@ function OAuthStatusMessage({
         )
 
         const doGeminiSave = useCallback(() => {
-          const finalVals = { ...geminiDisplayValues, [activeField]: geminiInputValue }
-          if (!finalVals.haiku_model || !finalVals.sonnet_model || !finalVals.opus_model) {
+          const finalVals = {
+            ...geminiDisplayValues,
+            [activeField]: geminiInputValue,
+          }
+          if (
+            !finalVals.haiku_model ||
+            !finalVals.sonnet_model ||
+            !finalVals.opus_model
+          ) {
             setOAuthStatus({
               state: 'error',
               message: 'Gemini setup requires Haiku, Sonnet, and Opus model names.',
@@ -1279,36 +1468,72 @@ function OAuthStatusMessage({
             return
           }
 
-          const env: Record<string, string> = {}
-          if (finalVals.base_url) env.GEMINI_BASE_URL = finalVals.base_url
-          if (finalVals.api_key) env.GEMINI_API_KEY = finalVals.api_key
-          if (finalVals.haiku_model) env.GEMINI_DEFAULT_HAIKU_MODEL = finalVals.haiku_model
-          if (finalVals.sonnet_model) env.GEMINI_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
-          if (finalVals.opus_model) env.GEMINI_DEFAULT_OPUS_MODEL = finalVals.opus_model
-          const { error } = updateSettingsForSource('userSettings', {
-            modelType: 'gemini' as any,
-            env,
-          } as any)
-          if (error) {
+          const models: ConnectionModelRecord[] = [
+            {
+              id: finalVals.opus_model,
+              label: finalVals.opus_model,
+              description: 'Opus tier',
+            },
+            {
+              id: finalVals.sonnet_model,
+              label: finalVals.sonnet_model,
+              description: 'Sonnet tier',
+            },
+            {
+              id: finalVals.haiku_model,
+              label: finalVals.haiku_model,
+              description: 'Haiku tier',
+            },
+          ]
+
+          const endpoint =
+            finalVals.base_url ||
+            'https://generativelanguage.googleapis.com/v1beta'
+          const url = (() => {
+            try {
+              return new URL(endpoint)
+            } catch {
+              return null
+            }
+          })()
+          const name =
+            connectionName.trim() || (url ? url.host : 'Gemini API')
+
+          try {
+            upsertCompatibleConnection({
+              protocol: 'gemini',
+              name,
+              endpoint,
+              apiKey: finalVals.api_key ?? '',
+              models,
+            })
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e)
             setOAuthStatus({
               state: 'error',
-              message: `Failed to save: ${error.message}`,
+              message: msg,
               toRetry: {
                 state: 'gemini_api',
-                baseUrl: '',
-                apiKey: '',
-                haikuModel: '',
-                sonnetModel: '',
-                opusModel: '',
+                baseUrl: finalVals.base_url ?? '',
+                apiKey: finalVals.api_key ?? '',
+                haikuModel: finalVals.haiku_model ?? '',
+                sonnetModel: finalVals.sonnet_model ?? '',
+                opusModel: finalVals.opus_model ?? '',
                 activeField: 'base_url',
               },
             })
-          } else {
-            for (const [k, v] of Object.entries(env)) process.env[k] = v
-            setOAuthStatus({ state: 'success' })
-            void onDone()
+            return
           }
-        }, [activeField, geminiInputValue, geminiDisplayValues, onDone, setOAuthStatus])
+          setOAuthStatus({ state: 'success' })
+          void onDone()
+        }, [
+          activeField,
+          geminiInputValue,
+          geminiDisplayValues,
+          connectionName,
+          onDone,
+          setOAuthStatus,
+        ])
 
         const handleGeminiEnter = useCallback(() => {
           const idx = GEMINI_FIELDS.indexOf(activeField)
