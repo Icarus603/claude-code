@@ -28,8 +28,10 @@ import { getProviderAdapter } from '@claude-code/provider'
 import { randomUUID } from 'crypto'
 import {
   getAPIProvider,
+  getProviderForModel,
   isFirstPartyAnthropicBaseUrl,
 } from '@claude-code/provider/model/providers.js'
+import { unpackModelId } from '@claude-code/provider/connections.js'
 import {
   getAttributionHeader,
   getCLISyspromptPrefix,
@@ -88,6 +90,8 @@ import {
   normalizeMessagesForAPI,
   stripAdvisorBlocks,
   stripCallerFieldFromAssistantMessage,
+  stripCrossConnectionThinkingBlocks,
+  stripInvalidThinkingBlocks,
   stripToolReferenceBlocksFromUserMessage,
 } from '@claude-code/agent/messages.js'
 import {
@@ -1043,6 +1047,27 @@ async function* queryModel(
   StreamEvent | AssistantMessage | SystemAPIErrorMessage,
   void
 > {
+  // V7 §11.6 — multi-provider routing in two halves.
+  //
+  // (1) Pick the provider on the COMPOSITE model id (`<connId>:<modelId>`)
+  //     so a connection with a name shared with another connection still
+  //     routes to the right one.
+  // (2) Strip the prefix from `options.model` so every downstream consumer
+  //     (Anthropic request body, betas, validation, error formatting,
+  //     model defaults) sees the bare id. Skipping this sends the prefixed
+  //     id upstream verbatim → 404, with the error message formatted using
+  //     the *global* provider name (looks like an "openai deployment"
+  //     error even though the request hit Anthropic).
+  const routedProvider = options.model
+    ? getProviderForModel(options.model)
+    : getAPIProvider()
+  if (options.model) {
+    const { connectionId, modelId: bareModelId } = unpackModelId(options.model)
+    if (connectionId) {
+      options = { ...options, model: bareModelId }
+    }
+  }
+
   // Check cheap conditions first — the off-switch await blocks on GrowthBook
   // init (~10ms). For non-Opus models (haiku, sonnet) this skips the await
   // entirely. Subscribers don't hit this path at all.
@@ -1330,6 +1355,37 @@ async function* queryModel(
     messagesForAPI = stripAdvisorBlocks(messagesForAPI)
   }
 
+  // Cross-connection thinking-block scrub. Two layers:
+  //
+  // (1) Strip thinking blocks whose originating connection differs
+  //     from the current one — Anthropic binds thinking signatures to
+  //     the auth context, so a Claude Account turn's signed thinking
+  //     becomes invalid the moment we send it to an Anthropic
+  //     Compatible proxy (different api_key) or any other connection,
+  //     and Anthropic rejects with "Invalid signature in thinking
+  //     block".
+  // (2) Strip thinking blocks that are structurally invalid (empty
+  //     `thinking` text, missing `signature`, empty
+  //     `redacted_thinking.data`). Catches cases (1) misses —
+  //     same-connection turns that came through malformed.
+  //
+  // Order: (1) first, (2) second — (1) is selective so (2) only
+  // operates on the smaller surviving set.
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveConnectionForModel } = require(
+      '@claude-code/provider/providers.js',
+    ) as typeof import('@claude-code/provider/providers.js')
+    const currentConnId = options.model
+      ? resolveConnectionForModel(options.model)?.id
+      : undefined
+    messagesForAPI = stripCrossConnectionThinkingBlocks(
+      messagesForAPI,
+      currentConnId,
+    )
+  }
+  messagesForAPI = stripInvalidThinkingBlocks(messagesForAPI)
+
   // Strip excess media items before making the API call.
   // The API rejects requests with >100 media items but returns a confusing error.
   // Rather than erroring (which is hard to recover from in Cowork/CCD), we
@@ -1339,16 +1395,23 @@ async function* queryModel(
     API_MAX_MEDIA_PER_REQUEST,
   )
 
-  // OpenAI-compatible provider: delegate to the OpenAI adapter layer
-  // after shared preprocessing (message normalization, tool filtering,
-  // media stripping) but before Anthropic-specific logic (betas, thinking, caching).
-  const selectedProvider = getAPIProvider()
+  // Non-Anthropic provider that still needs its own queryStream
+  // adapter (response shape is too different from Anthropic for a
+  // fetch-level translator to be worth the complexity).
+  //
+  // Codex is intentionally NOT in this list — for codex models the
+  // Anthropic SDK path runs all the way through with a custom `fetch`
+  // installed at client-construction time (see `anthropic/client.ts`).
+  // That seam translates at the wire boundary, after the SDK has
+  // normalized the request body, which avoids the Message[]-vs-
+  // BetaMessageParam[] impedance issues we hit with a queryStream-level
+  // codex branch.
   if (
-    selectedProvider === 'openai' ||
-    selectedProvider === 'gemini' ||
-    selectedProvider === 'grok'
+    routedProvider === 'openai' ||
+    routedProvider === 'gemini' ||
+    routedProvider === 'grok'
   ) {
-    const adapter = getProviderAdapter(selectedProvider)
+    const adapter = getProviderAdapter(routedProvider)
     yield* adapter.queryStream({
       messages: messagesForAPI,
       systemPrompt,

@@ -7,6 +7,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
+  type CodexUtilization,
   type ExtraUsage,
   fetchUtilization,
   type RateLimit,
@@ -237,6 +238,13 @@ export function Usage(): React.ReactNode {
         />
       )}
 
+      {utilization.codex && (
+        <CodexUsageSection
+          codex={utilization.codex}
+          maxWidth={maxWidth}
+        />
+      )}
+
       {isEligibleForOverageCreditGrant() && (
         <OverageCreditUpsell maxWidth={maxWidth} />
       )}
@@ -249,6 +257,44 @@ export function Usage(): React.ReactNode {
           description="cancel"
         />
       </Text>
+    </Box>
+  )
+}
+
+type CodexUsageSectionProps = {
+  codex: CodexUtilization
+  maxWidth: number
+}
+
+function CodexUsageSection({
+  codex,
+  maxWidth,
+}: CodexUsageSectionProps): React.ReactNode {
+  const limits = [
+    { title: 'Codex 5h limit', limit: codex.primary },
+    { title: 'Codex weekly limit', limit: codex.secondary },
+  ].filter((entry): entry is { title: string; limit: RateLimit } =>
+    entry.limit != null,
+  )
+  if (limits.length === 0 && !codex.plan_type && !codex.credits_balance) {
+    return null
+  }
+  return (
+    <Box flexDirection="column" gap={1}>
+      <Text bold>
+        ChatGPT Codex{codex.plan_type ? ` · ${codex.plan_type}` : ''}
+      </Text>
+      {limits.map(({ title, limit }) => (
+        <LimitBar
+          key={title}
+          title={title}
+          limit={limit}
+          maxWidth={maxWidth}
+        />
+      ))}
+      {codex.credits_balance && (
+        <Text dimColor>Credits balance: {codex.credits_balance}</Text>
+      )}
     </Box>
   )
 }

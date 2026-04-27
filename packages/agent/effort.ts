@@ -9,9 +9,12 @@ import {
 } from '@claude-code/provider/authAlias.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { resolveConnectionForModel } from '@claude-code/provider/providers.js'
+import { unpackModelId } from '@claude-code/provider/connections.js'
 import { get3PModelCapabilityOverride } from '@claude-code/provider/model/modelSupportOverrides.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import type { EffortLevel } from '@claude-code/headless-sdk/runtimeTypes.js'
+import type { ConnectionModelRecord } from '@claude-code/config'
 import {
   resolveAntModel,
   getAntModelOverrideConfig,
@@ -29,16 +32,46 @@ export const EFFORT_LEVELS = [
 
 export type EffortValue = EffortLevel | number
 
+/**
+ * Look up the connection-record entry that owns a given model id and
+ * return the per-model effort metadata the backend reported for it.
+ * Returns undefined when the model isn't covered by a connection (env
+ * driven path or unknown model).
+ *
+ * Codex's `/models` endpoint tells us per-model `supported_reasoning_levels`
+ * and `default_reasoning_level`, which is the right source of truth for
+ * /effort on gpt-* models — far better than hardcoded family-name
+ * allowlists tuned for Anthropic.
+ */
+function getConnectionModelEntry(
+  model: string,
+): Pick<ConnectionModelRecord, 'supportedEfforts' | 'defaultEffort'> | undefined {
+  const conn = resolveConnectionForModel(model)
+  if (!conn) return undefined
+  const { modelId } = unpackModelId(model)
+  const entry = conn.models.find(m => m.id === modelId)
+  if (!entry) return undefined
+  if (!entry.supportedEfforts && !entry.defaultEffort) return undefined
+  return entry
+}
+
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports the effort parameter.
 export function modelSupportsEffort(model: string): boolean {
-  const m = model.toLowerCase()
   if (isEnvTruthy(readEnv('CLAUDE_CODE_ALWAYS_ENABLE_EFFORT'))) {
     return true
+  }
+  // V7 §11.6 — connection-record metadata wins over hardcoded family
+  // allowlists. Codex /models reports per-model supported reasoning
+  // levels for the user's actual tier; trust that.
+  const fromConnection = getConnectionModelEntry(model)?.supportedEfforts
+  if (fromConnection !== undefined) {
+    return fromConnection.length > 0
   }
   const supported3P = get3PModelCapabilityOverride(model, 'effort')
   if (supported3P !== undefined) {
     return supported3P
   }
+  const m = model.toLowerCase()
   if (m.includes('opus-4-7') || m.includes('opus-4-6') || m.includes('sonnet-4-6')) {
     return true
   }
@@ -55,7 +88,14 @@ export function modelSupportsEffort(model: string): boolean {
 
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports 'max' effort.
 // Per API docs, 'max' is on Mythos / Opus 4.7 / Opus 4.6 / Sonnet 4.6.
+// 'max' is Anthropic-specific; gpt-* models reported via the connection
+// record max out at xhigh, so the connection check below returns false
+// for them and the request never carries an unsupported value.
 export function modelSupportsMaxEffort(model: string): boolean {
+  const fromConnection = getConnectionModelEntry(model)?.supportedEfforts
+  if (fromConnection !== undefined) {
+    return fromConnection.includes('max')
+  }
   const supported3P = get3PModelCapabilityOverride(model, 'max_effort')
   if (supported3P !== undefined) {
     return supported3P
@@ -77,8 +117,14 @@ export function modelSupportsMaxEffort(model: string): boolean {
 
 // @[MODEL LAUNCH]: Add the new model if it supports 'xhigh' effort.
 // Per Anthropic docs (platform.claude.com/docs/en/build-with-claude/effort),
-// xhigh is **Opus 4.7 only** — "Extended capability for long-horizon work".
+// xhigh is **Opus 4.7 only** on Anthropic — but Codex's gpt-* models
+// also expose `xhigh` natively in their ReasoningEffort enum, surfaced
+// via the connection record's supportedEfforts.
 export function modelSupportsXhighEffort(model: string): boolean {
+  const fromConnection = getConnectionModelEntry(model)?.supportedEfforts
+  if (fromConnection !== undefined) {
+    return fromConnection.includes('xhigh')
+  }
   const supported3P = get3PModelCapabilityOverride(model, 'xhigh_effort')
   if (supported3P !== undefined) {
     return supported3P
@@ -322,6 +368,15 @@ export function getOpusDefaultEffortConfig(): OpusDefaultEffortConfig {
 export function getDefaultEffortForModel(
   model: string,
 ): EffortValue | undefined {
+  // V7 §11.6 — connection record's `defaultEffort` wins over the
+  // hardcoded Anthropic-only defaults below. Codex /models reports a
+  // per-model default via `default_reasoning_level`; mirroring it here
+  // means /effort auto on a codex model surfaces the server-side
+  // recommendation (medium for current gpt-5.x) instead of falling
+  // through to undefined and silently using whatever the backend picks.
+  const connDefault = getConnectionModelEntry(model)?.defaultEffort
+  if (connDefault !== undefined) return connDefault
+
   if (process.env.USER_TYPE === 'ant') {
     const config = getAntModelOverrideConfig()
     const isDefaultModel =

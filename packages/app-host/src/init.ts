@@ -159,6 +159,39 @@ export const init = memoize(async (): Promise<void> => {
       )
     }
 
+    // Heal any stale Codex connection models that survive from older
+    // builds. Pre-discovery code wrote the API-key-tier slugs
+    // (`gpt-5.2-codex`, `gpt-5.1-codex-max`, `gpt-5.1-codex-mini`) into
+    // the connection record; the ChatGPT-account backend rejects those
+    // with HTTP 400. Snap any such record back to the hardcoded
+    // tier-correct list in `getDefaultModelsForProtocol('codex')`. This
+    // is idempotent and only writes when the persisted list is wrong.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getConnections, saveConnection, getDefaultModelsForProtocol } =
+        require(
+          '@claude-code/provider/connections.js',
+        ) as typeof import('@claude-code/provider/connections.js')
+      const STALE_API_KEY_TIER_SLUGS = new Set([
+        'gpt-5.2-codex',
+        'gpt-5.1-codex-max',
+        'gpt-5.1-codex-mini',
+      ])
+      for (const c of getConnections()) {
+        if (c.protocol !== 'codex') continue
+        const hasStaleSlug = c.models.some(m => STALE_API_KEY_TIER_SLUGS.has(m.id))
+        if (!hasStaleSlug) continue
+        saveConnection({ ...c, models: getDefaultModelsForProtocol('codex') })
+        logForDebugging(
+          `[connections] codex models healed: replaced API-key-tier slugs on connection ${c.id}`,
+        )
+      }
+    } catch (e) {
+      logForDebugging(
+        `[connections] codex models heal failed: ${e instanceof Error ? e.message : String(e)}`,
+      )
+    }
+
     // Configure global mTLS settings
     const mtlsStart = Date.now()
     logForDebugging('[init] configureGlobalMTLS starting')

@@ -102,43 +102,13 @@ export const grokAuthProvider = createEnvAuthProvider(
   'GROK_API_KEY or XAI_API_KEY is not configured.',
 )
 
-/**
- * Codex auth provider — reads from GlobalConfig.codexOAuth (set by the
- * /login → OpenAI Codex flow). Unlike OpenAI/Gemini/Grok which check env
- * vars, Codex stores OAuth tokens in config because the JWT carries an
- * accountId that env vars can't represent. Available iff
- * `getCodexOAuthTokens()` returns a non-null record.
- */
-export const codexAuthProvider: AuthProvider<{ accessToken: string | null }> = {
-  id: 'codex',
-  async refresh(): Promise<void> {
-    // Lazy-import to avoid loading codex/oauth code in non-codex sessions.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { checkAndRefreshCodexTokenIfNeeded } = require(
-      '@claude-code/provider/oauth/codex-auth.js',
-    ) as typeof import('@claude-code/provider/oauth/codex-auth.js')
-    await checkAndRefreshCodexTokenIfNeeded()
-  },
-  async getCredentials(): Promise<{ accessToken: string | null }> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { checkAndRefreshCodexTokenIfNeeded } = require(
-      '@claude-code/provider/oauth/codex-auth.js',
-    ) as typeof import('@claude-code/provider/oauth/codex-auth.js')
-    return { accessToken: (await checkAndRefreshCodexTokenIfNeeded()) ?? null }
-  },
-  async isAvailable(): Promise<ProviderAvailability> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getCodexOAuthTokens } = require(
-      '@claude-code/provider/oauth/codex-auth.js',
-    ) as typeof import('@claude-code/provider/oauth/codex-auth.js')
-    return getCodexOAuthTokens()
-      ? { available: true }
-      : {
-          available: false,
-          reason: 'No Codex OAuth token. Run /login → OpenAI Codex account.',
-        }
-  },
-}
+// Codex doesn't have a standalone AuthProvider here. Codex requests
+// flow through the Anthropic SDK with a custom `fetch` installed in
+// `getAnthropicClient`; auth is plumbed inside that fetch via
+// `checkAndRefreshCodexTokenIfNeeded()` directly. Adding an extra
+// AuthProvider entry would only encourage someone to wire a parallel
+// queryStream-level codex branch again — exactly what the rip-and-
+// replace removed.
 
 export function getAnthropicAuthProvider(): AuthProvider<AnthropicCredentials> {
   return anthropicAuthProvider

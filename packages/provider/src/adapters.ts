@@ -10,7 +10,6 @@ import { getProviderContextPipeline } from './contextPipeline.js'
 import { getProviderNetworkLayer } from './network.js'
 import {
   anthropicAuthProvider,
-  codexAuthProvider,
   geminiAuthProvider,
   grokAuthProvider,
   openAIAuthProvider,
@@ -20,7 +19,6 @@ import { HostBindingsError, StreamError } from './errors.js'
 import { queryModelOpenAI } from './openai/indexImpl.js'
 import { queryModelGemini } from './gemini/indexImpl.js'
 import { queryModelGrok } from './grok/indexImpl.js'
-import { queryCodex } from './codex/client.js'
 import { getProviderForModel } from './providers.js'
 import { unpackModelId } from './connections.js'
 
@@ -128,33 +126,14 @@ export function getProviderAdapter(
     if (!connectionId) return args
     return { ...args, options: { ...opts, model: modelId } }
   }
+  // Codex requests intentionally are NOT routed here — they flow
+  // through the Anthropic SDK path with a `fetch` override installed
+  // in `getAnthropicClient` (`anthropic/client.ts`). The override sees
+  // the final wire body and translates at that seam, which is much less
+  // fragile than translating Claude Code's internal Message[] shape.
+  // Keeping a parallel adapter here would create two ways to hit Codex
+  // and two impedance-match seams to maintain.
   switch (provider) {
-    case 'codex':
-      return createAdapter('codex', {
-        authProvider: codexAuthProvider,
-        queryStream: rawArgs => {
-          const args = stripModelPrefix(rawArgs)
-          // ProviderRequestOptions only standardizes a subset; legacy fields
-          // (outputConfig, speed) ride on `args.options` at runtime.
-          const opts = args.options as ProviderRequestOptions & {
-            outputConfig?: { effort?: string }
-            speed?: string
-          }
-          // Cast at the seam: queryCodex returns BetaRawMessageStreamEvent
-          // (Anthropic shape) via streamAdapter, which is exactly the
-          // ProviderAdapter contract.
-          return queryCodex({
-            messages: args.messages as never,
-            system: args.systemPrompt as never,
-            model: opts.model,
-            tools: args.tools as never,
-            maxTokens: opts.maxOutputTokensOverride,
-            temperature: opts.temperatureOverride,
-            outputConfig: opts.outputConfig,
-            speed: opts.speed,
-          }) as never
-        },
-      })
     case 'openai':
       return createAdapter('openai', {
         authProvider: openAIAuthProvider,

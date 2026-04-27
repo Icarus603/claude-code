@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { clearTrustedDeviceTokenCache } from '@claude-code/bridge/trustedDevice.js'
-import { Text } from '@anthropic/ink'
 import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-flags'
 import {
   getGroveNoticeConfig,
@@ -77,20 +76,17 @@ export async function clearAuthRelatedCaches(): Promise<void> {
 export async function call(
   onDone: import('@claude-code/agent/command.js').LocalJSXCommandOnDone,
 ): Promise<React.ReactNode> {
-  // V7 §11.6 — with connection-based multi-provider auth, "logout" is no
-  // longer a single global action. Opening the connection manager lets the
-  // user pick exactly which provider(s) to disconnect. The old "nuke
-  // everything" path is still available via performLogout() for callers
-  // that need it (e.g. the CLI `ccb logout` subcommand, disaster recovery).
-  const { Settings } = await import('@claude-code/repl/components/Settings/Settings.js')
-  // Redirect to the /config Status tab which will navigate to connections.
-  // Simpler: just open /login which already shows the connection manager
-  // when connections exist (state: 'select_connection').
-  const { ConsoleOAuthFlow } = await import(
-    '@claude-code/repl/components/ConsoleOAuthFlow.js'
+  // V7 §11.6 — with connection-based multi-provider auth, "logout" is a
+  // per-connection disconnect, not a global nuke. The picker shortcuts
+  // to direct disconnect when there is exactly one connection, otherwise
+  // it shows a disconnect-only list (no "+ Add new" entry — that's what
+  // /login is for). The "nuke everything" path is still available via
+  // performLogout() for the `ccb logout` CLI subcommand and disaster
+  // recovery.
+  const { LogoutPicker } = await import(
+    '@claude-code/repl/components/LogoutPicker.js'
   )
-  return React.createElement(ConsoleOAuthFlow, {
-    onDone: () => onDone(''),
-    startingMessage: 'Select a provider to disconnect, or add a new one.',
+  return React.createElement(LogoutPicker, {
+    onDone: (message: string) => onDone(message),
   })
 }
