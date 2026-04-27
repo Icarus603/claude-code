@@ -4,7 +4,7 @@ import { execa } from 'execa'
 import { mkdir, stat } from 'fs/promises'
 import memoize from 'lodash-es/memoize.js'
 import { join } from 'path'
-import { CLAUDE_AI_PROFILE_SCOPE } from '@claude-code/agent/constants/oauth.js'
+import { CLAUDE_AI_PROFILE_SCOPE } from '@claude-code/provider/oauthConstants'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -39,7 +39,7 @@ import {
   clearAwsIniCache,
   isValidAwsStsOutput,
 } from '@claude-code/provider/aws.js'
-import { AwsAuthStatusManager } from '@claude-code/repl/awsAuthStatusManager.js'
+import { AwsAuthStatusManager } from '@claude-code/provider/awsAuthStatusManager.js'
 import { clearBetasCaches } from '@claude-code/provider/betas.js'
 import {
   type AccountInfo,

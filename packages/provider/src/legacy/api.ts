@@ -25,7 +25,7 @@ import {
 } from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
 import { getTools } from '@claude-code/tool-registry/runtime'
-import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
+import type { AgentId } from '@claude-code/agent/idTypes'
 import type { z } from 'zod/v4'
 import { CLI_SYSPROMPT_PREFIXES } from '@claude-code/provider/systemConstants.js'
 import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
@@ -34,7 +34,7 @@ import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/cons
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
 import { TASK_OUTPUT_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskOutputTool/constants.js'
-import type { Message } from '@claude-code/repl/replTypes/message.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   modelSupportsStructuredOutputs,

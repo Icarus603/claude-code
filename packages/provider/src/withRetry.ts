@@ -30,7 +30,7 @@ import {
   isFastModeCooldown,
   isFastModeEnabled,
   triggerFastModeCooldown,
-} from '@claude-code/repl/fastMode.js'
+} from '@claude-code/provider/fastMode.js'
 import { isNonCustomOpusModel } from '@claude-code/provider/model.js'
 import { disableKeepAlive } from '@claude-code/provider/proxy.js'
 import { sleep } from '@claude-code/config/sleep'

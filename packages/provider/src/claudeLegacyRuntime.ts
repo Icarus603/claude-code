@@ -47,7 +47,7 @@ import {
   type ConnectorTextBlock,
   type ConnectorTextDelta,
   isConnectorTextBlock,
-} from '@claude-code/repl/replTypes/connectorText.js'
+} from '@claude-code/provider/connectorTextTypes'
 import type {
   AssistantMessage,
   Message,
@@ -55,7 +55,7 @@ import type {
   StreamEvent,
   SystemAPIErrorMessage,
   UserMessage,
-} from '@claude-code/repl/replTypes/message.js'
+} from '@claude-code/agent/messageShapes'
 import {
   type CacheScope,
   logAPIPrefix,
@@ -153,7 +153,7 @@ import type { QuerySource } from '@claude-code/agent/constants/querySource.js'
 import type { Notification } from '@claude-code/app-host/context/notifications.js'
 import { addToTotalSessionCost } from '@claude-code/provider/costTracker.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
+import type { AgentId } from '@claude-code/agent/idTypes'
 import {
   ADVISOR_TOOL_INSTRUCTIONS,
   getExperimentAdvisorModels,

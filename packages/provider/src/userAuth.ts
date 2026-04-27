@@ -40,7 +40,7 @@ import {
   clearAwsIniCache,
   isValidAwsStsOutput,
 } from '@claude-code/provider/aws.js'
-import { AwsAuthStatusManager } from '@claude-code/repl/awsAuthStatusManager.js'
+import { AwsAuthStatusManager } from '@claude-code/provider/awsAuthStatusManager.js'
 import { clearBetasCaches } from '@claude-code/provider/betas.js'
 import {
   type AccountInfo,
