@@ -128,10 +128,16 @@ export function getDefaultOpusModel(): ModelName {
   if (readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL')) {
     return readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL')
   }
-  // 3P providers (Bedrock, Vertex, Foundry) — kept as a separate branch
-  // even when values match, since 3P availability lags firstParty and
-  // these will diverge again at the next model launch.
-  if (provider !== 'firstParty') {
+  // 3P providers (Bedrock, Vertex, Foundry) lag firstParty availability.
+  // Only these specific env-var-driven 3P modes get opus46; anything else
+  // — including connection-based routing where getAPIProvider() legitimately
+  // returns 'firstParty' — should get opus47.
+  // V7 §11.6: getAPIProvider() returns 'firstParty' as the fallback for all
+  // connection-based sessions. The old `provider !== 'firstParty'` check
+  // was returning opus46 whenever the model strings were initialized with a
+  // stale provider (e.g. 'openai' from a previous Codex/OpenAI session),
+  // causing the header to show "Opus 4.6" for a Claude Account subscriber.
+  if (provider === 'bedrock' || provider === 'vertex' || provider === 'foundry') {
     return getModelStrings().opus46
   }
   return getModelStrings().opus47
