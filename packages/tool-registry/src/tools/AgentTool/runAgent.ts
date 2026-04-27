@@ -614,9 +614,11 @@ export async function* runAgent({
       validSkills.push({ skillName, skill })
     }
 
-    // Load all skill contents concurrently and add to initial messages
+    // Load all skill contents concurrently and add to initial messages.
+    // formatSkillLoadingMetadata lives in command-runtime/xml — pulling it
+    // from processSlashCommand was a 4-file cycle (V7 §11.2).
     const { formatSkillLoadingMetadata } = await import(
-      '@claude-code/repl/processUserInput/processSlashCommand.js'
+      '@claude-code/command-runtime/xml.js'
     )
     const loaded = await Promise.all(
       validSkills.map(async ({ skillName, skill }) => ({
