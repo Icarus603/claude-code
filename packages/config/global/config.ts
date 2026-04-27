@@ -219,6 +219,25 @@ export type AccountInfo = {
   subscriptionCreatedAt?: string
 }
 
+export type AuthProtocol = 'anthropic' | 'openai' | 'codex' | 'gemini'
+
+export type ConnectionModelRecord = {
+  id: string
+  label: string
+  description?: string
+}
+
+export type ConnectionRecord = {
+  id: string
+  name: string
+  protocol: AuthProtocol
+  endpoint: string
+  auth: { type: 'oauth'; source: string } | { type: 'api_key'; key?: string }
+  enabled: boolean
+  models: ConnectionModelRecord[]
+  createdAt: number
+}
+
 // TODO: 'emacs' is kept for backward compatibility - remove after a few releases
 export type EditorMode = 'emacs' | (typeof EDITOR_MODES)[number]
 
@@ -280,6 +299,12 @@ export type GlobalConfig = {
     expiresAt: number
     accountId: string
   }
+  /**
+   * Connection-based multi-provider authentication.
+   * Each connection is an independent auth source (OAuth account, API key endpoint, etc.).
+   * Connections are independent: logging in/out of one does not affect any other.
+   */
+  connections?: ConnectionRecord[]
   iterm2KeyBindingInstalled?: boolean // Legacy - keeping for backward compatibility
   editorMode?: EditorMode
   bypassPermissionsModeAccepted?: boolean
