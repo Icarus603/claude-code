@@ -7,6 +7,7 @@ import {
 import { useAppState, useSetAppState } from '@claude-code/app-host/state/AppState.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import {
+  type EffortLevel,
   type EffortValue,
   getDisplayedEffortLevel,
   getEffortEnvOverride,
@@ -16,6 +17,7 @@ import {
 } from '@claude-code/agent/effort.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 import { readEnv } from '@claude-code/config/env/utils'
+import { EffortPicker } from '@claude-code/repl/components/EffortPicker.js'
 
 const COMMON_HELP_ARGS = ['help', '-h', '--help']
 
@@ -121,7 +123,7 @@ export function executeEffort(args: string): EffortCommandResult {
 
   if (!isEffortLevel(normalized)) {
     return {
-      message: `Invalid argument: ${args}. Valid options are: low, medium, high, max, auto`,
+      message: `Invalid argument: ${args}. Valid options are: low, medium, high, xhigh, max, auto`,
     }
   }
 
@@ -138,6 +140,53 @@ function ShowCurrentEffort({
   const { message } = showCurrentEffort(effortValue, model)
   onDone(message)
   return null
+}
+
+/**
+ * Interactive picker shown when /effort is invoked with no args. Uses
+ * the visual Speed/Intelligence axis component (xhigh shimmers, max
+ * rainbow-cycles). On confirm, applies the chosen level via the same
+ * `setEffortValue` path that `/effort <level>` already takes — single
+ * source of truth for both UI and CLI persistence semantics.
+ */
+function EffortPickerCommand({
+  onDone,
+}: {
+  onDone: (result: string) => void
+}): React.ReactNode {
+  const setAppState = useSetAppState()
+  const appStateEffort = useAppState(s => s.effortValue)
+  const model = useMainLoopModel()
+  // Initial focus = the level the API would actually use right now.
+  const [committed, setCommitted] = React.useState(false)
+  const initialLevel = React.useMemo<EffortLevel>(() => {
+    return getDisplayedEffortLevel(model, appStateEffort)
+  }, [model, appStateEffort])
+
+  if (committed) {
+    return null
+  }
+  return (
+    <EffortPicker
+      current={initialLevel}
+      model={model}
+      onConfirm={level => {
+        setCommitted(true)
+        const result = setEffortValue(level)
+        if (result.effortUpdate) {
+          setAppState(prev => ({
+            ...prev,
+            effortValue: result.effortUpdate!.value,
+          }))
+        }
+        onDone(result.message)
+      }}
+      onCancel={() => {
+        setCommitted(true)
+        onDone('Effort unchanged')
+      }}
+    />
+  )
 }
 
 function ApplyEffortAndClose({
@@ -170,13 +219,31 @@ export async function call(
 
   if (COMMON_HELP_ARGS.includes(args)) {
     onDone(
-      'Usage: /effort [low|medium|high|max|auto]\n\nEffort levels:\n- low: Quick, straightforward implementation\n- medium: Balanced approach with standard testing\n- high: Comprehensive implementation with extensive testing\n- max: Maximum capability with deepest reasoning (Opus 4.7 only)\n- auto: Use the default effort level for your model',
+      [
+        'Usage: /effort [low|medium|high|xhigh|max|auto|status]',
+        '',
+        'Run with no argument to open the interactive picker.',
+        '',
+        'Effort levels (Anthropic docs: platform.claude.com/docs/en/build-with-claude/effort):',
+        '- low:    Most efficient — significant token savings, best for simple tasks',
+        '- medium: Balanced — moderate token savings with solid performance',
+        '- high:   High capability — equivalent to not setting the parameter (default)',
+        '- xhigh:  Extended capability for long-horizon work (Opus 4.7 only)',
+        '- max:    Absolute maximum capability with no constraints on token spending',
+        '- auto:   Use the default effort level for your model',
+      ].join('\n'),
     )
     return
   }
 
-  if (!args || args === 'current' || args === 'status') {
+  if (args === 'current' || args === 'status') {
     return <ShowCurrentEffort onDone={onDone} />
+  }
+
+  // No argument → open the visual picker (Speed/Intelligence axis with
+  // shimmer on xhigh and rainbow on max).
+  if (!args) {
+    return <EffortPickerCommand onDone={onDone} />
   }
 
   const result = executeEffort(args)

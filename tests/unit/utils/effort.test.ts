@@ -32,8 +32,10 @@ const {
 // ─── EFFORT_LEVELS constant ────────────────────────────────────────────
 
 describe("EFFORT_LEVELS", () => {
-  test("contains the four canonical levels", () => {
-    expect(EFFORT_LEVELS).toEqual(["low", "medium", "high", "max"]);
+  test("contains the five canonical levels in ascending order", () => {
+    // Order matters: ascending Speed→Intelligence, used by EffortPicker.
+    // 'xhigh' added 2026-04-27 per Anthropic docs (Opus 4.7 only).
+    expect(EFFORT_LEVELS).toEqual(["low", "medium", "high", "xhigh", "max"]);
   });
 });
 
@@ -189,9 +191,15 @@ describe("convertEffortValueToLevel", () => {
       expect(convertEffortValueToLevel(85)).toBe("medium");
     });
 
-    test("value 86-100 maps to 'high'", () => {
+    test("value 86-95 maps to 'high'", () => {
       expect(convertEffortValueToLevel(86)).toBe("high");
-      expect(convertEffortValueToLevel(100)).toBe("high");
+      expect(convertEffortValueToLevel(95)).toBe("high");
+    });
+
+    test("value 96-100 maps to 'xhigh'", () => {
+      // 'xhigh' slot inserted between high and max (2026-04-27).
+      expect(convertEffortValueToLevel(96)).toBe("xhigh");
+      expect(convertEffortValueToLevel(100)).toBe("xhigh");
     });
 
     test("value > 100 maps to 'max'", () => {
@@ -204,9 +212,11 @@ describe("convertEffortValueToLevel", () => {
 // ─── getEffortLevelDescription ─────────────────────────────────────────
 
 describe("getEffortLevelDescription", () => {
+  // Wording aligned with Anthropic docs at
+  // platform.claude.com/docs/en/build-with-claude/effort
   test("returns description for 'low'", () => {
     const desc = getEffortLevelDescription("low");
-    expect(desc).toContain("Quick");
+    expect(desc).toContain("efficient");
   });
 
   test("returns description for 'medium'", () => {
@@ -216,12 +226,18 @@ describe("getEffortLevelDescription", () => {
 
   test("returns description for 'high'", () => {
     const desc = getEffortLevelDescription("high");
-    expect(desc).toContain("Comprehensive");
+    expect(desc).toContain("default");
+  });
+
+  test("returns description for 'xhigh'", () => {
+    const desc = getEffortLevelDescription("xhigh");
+    expect(desc).toContain("long-horizon");
+    expect(desc).toContain("Opus 4.7");
   });
 
   test("returns description for 'max'", () => {
     const desc = getEffortLevelDescription("max");
-    expect(desc).toContain("Maximum");
+    expect(desc).toContain("maximum");
   });
 });
 

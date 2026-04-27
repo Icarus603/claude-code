@@ -217,6 +217,7 @@
     "./components/MessageTimestamp.js": "./src/components/MessageTimestamp.tsx",
     "./components/Messages.js": "./src/components/Messages.tsx",
     "./components/ModelPicker.js": "./src/components/ModelPicker.tsx",
+    "./components/EffortPicker.js": "./src/components/EffortPicker.tsx",
     "./components/NativeAutoUpdater.js": "./src/components/NativeAutoUpdater.tsx",
     "./components/NotebookEditToolUseRejectedMessage.js": "./src/components/NotebookEditToolUseRejectedMessage.tsx",
     "./components/OffscreenFreeze.js": "./src/components/OffscreenFreeze.tsx",

@@ -324,6 +324,16 @@ export const DEFAULT_BINDINGS: KeybindingBlock[] = [
       right: 'modelPicker:increaseEffort',
     },
   },
+  // /effort interactive picker — Speed/Intelligence axis with ←/→
+  {
+    context: 'EffortPicker',
+    bindings: {
+      left: 'effortPicker:decrease',
+      right: 'effortPicker:increase',
+      return: 'effortPicker:confirm',
+      escape: 'effortPicker:cancel',
+    },
+  },
   // Select component navigation (used by /model, /resume, permission prompts, etc.)
   {
     context: 'Select',

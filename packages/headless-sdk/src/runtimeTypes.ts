@@ -60,4 +60,9 @@ export interface Query {
 export interface InternalQuery extends Query {
   [key: string]: unknown
 }
-export type EffortLevel = 'low' | 'medium' | 'high' | 'max'
+// Anthropic effort levels (https://platform.claude.com/docs/en/build-with-claude/effort)
+//   low / medium / high — supported on all effort-capable models
+//   xhigh                — Opus 4.7 only ("Extended capability for long-horizon work")
+//   max                  — Mythos / Opus 4.7 / Opus 4.6 / Sonnet 4.6
+// Order matters: ascending intelligence, used by the picker UI.
+export type EffortLevel = 'low' | 'medium' | 'high' | 'xhigh' | 'max'
