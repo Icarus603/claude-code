@@ -14,6 +14,16 @@ import { getOauthAccountInfo, validateForceLoginOrg } from '@claude-code/provide
 import { logError } from '@claude-code/local-observability/logging'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getSettings_DEPRECATED, updateSettingsForSource } from '@claude-code/config/settings'
+import {
+  getConnections,
+  saveConnection,
+  removeConnection,
+  toggleConnection,
+  getDefaultModelsForProtocol,
+  generateConnectionId,
+  type ConnectionRecord,
+  type ConnectionModelRecord,
+} from '@claude-code/provider/connections.js'
 import { Select } from './CustomSelect/select.js'
 import { Spinner } from './Spinner.js'
 import TextInput from './TextInput.js'
@@ -28,6 +38,7 @@ type Props = {
 
 type OAuthStatus =
   | { state: 'idle' } // Initial state, waiting to select login method
+  | { state: 'select_connection' } // Connection manager list view
   | { state: 'platform_setup' } // Show platform setup info (Bedrock/Vertex/Foundry)
   | {
       state: 'custom_platform'
@@ -93,6 +104,10 @@ export function ConsoleOAuthFlow({
     if (forceLoginMethod === 'claudeai' || forceLoginMethod === 'console') {
       return { state: 'ready_to_start' }
     }
+    // Show connection manager if connections exist
+    if (getConnections().length > 0) {
+      return { state: 'select_connection' }
+    }
     return { state: 'idle' }
   })
 
@@ -104,6 +119,31 @@ export function ConsoleOAuthFlow({
     return mode === 'setup-token' || forceLoginMethod === 'claudeai'
   })
   const [loginWithCodex, setLoginWithCodex] = useState(false)
+  // Track which protocol the user is creating a connection for (API key forms)
+  const [connectionProtocol, setConnectionProtocol] = useState<
+    'anthropic' | 'openai' | 'codex' | 'gemini' | null
+  >(null)
+  // Name for new API key connections
+  const [connectionName, setConnectionName] = useState('')
+
+  // Helper: save a connection record
+  const upsertProtocolConnection = useCallback(
+    (protocol: 'anthropic' | 'codex', name: string, endpoint: string) => {
+      const existing = getConnections().find(c => c.protocol === protocol && c.auth.type === 'oauth')
+      const conn: ConnectionRecord = {
+        id: existing?.id ?? generateConnectionId(),
+        name,
+        protocol,
+        endpoint,
+        auth: { type: 'oauth', source: protocol === 'codex' ? 'codex' : 'claude-ai' },
+        enabled: true,
+        models: getDefaultModelsForProtocol(protocol),
+        createdAt: existing?.createdAt ?? Date.now(),
+      }
+      saveConnection(conn)
+    },
+    [],
+  )
   // After a few seconds we suggest the user to copy/paste url if the
   // browser did not open automatically. In this flow we expect the user to
   // copy the code from the browser and paste it in the terminal
@@ -276,6 +316,9 @@ export function ConsoleOAuthFlow({
         // Reset modelType to anthropic when using OAuth login
         updateSettingsForSource('userSettings', { modelType: 'anthropic' } as any)
 
+        // Save connection for Claude Account
+        upsertProtocolConnection('anthropic', 'Claude Account', 'https://api.anthropic.com')
+
         setOAuthStatus({ state: 'success' })
         void sendNotification(
           {
@@ -321,6 +364,8 @@ export function ConsoleOAuthFlow({
         },
       }))
       process.env.CLAUDE_CODE_USE_OPENAI = '1'
+      // Save connection for Codex
+      upsertProtocolConnection('codex', 'ChatGPT Codex', 'https://chatgpt.com/backend-api/codex/responses')
       logEvent('tengu_oauth_codex_success', {})
       setOAuthStatus({ state: 'success' })
       void sendNotification({ message: 'Codex login successful', notificationType: 'auth_success' }, terminal)
@@ -474,6 +519,67 @@ function OAuthStatusMessage({
   onDone,
 }: OAuthStatusMessageProps): React.ReactNode {
   switch (oauthStatus.state) {
+    case 'select_connection': {
+      const connections = getConnections()
+      const connOptions = connections.map(c => ({
+        label: (
+          <Text>
+            {c.enabled ? '✓ ' : '  '}
+            {c.name}
+            {'\n'}
+            <Text dimColor>
+              {c.protocol} · {c.models.map(m => m.label).join(' · ')}
+            </Text>
+          </Text>
+        ),
+        value: c.id,
+      }))
+
+      connOptions.push({
+        label: (
+          <Text>
+            ─────────────────────
+            {'\n'}
+            <Text bold>+ Add Connection</Text>
+            {'\n'}
+          </Text>
+        ),
+        value: '__add__',
+      })
+
+      return (
+        <Box flexDirection="column" gap={1} marginTop={1}>
+          <Text bold>Connections</Text>
+          <Text dimColor>Manage your API connections. Select one to enable/disable or remove.</Text>
+
+          <Box>
+            <Select
+              options={connOptions}
+              onChange={value => {
+                if (value === '__add__') {
+                  setOAuthStatus({ state: 'idle' })
+                } else {
+                  const conn = connections.find(c => c.id === value)
+                  if (conn) {
+                    // Toggle enabled state
+                    toggleConnection(value)
+                    // Re-render by going back to select_connection
+                    setOAuthStatus({ state: 'select_connection' })
+                  }
+                }
+              }}
+            />
+          </Box>
+
+          <Box marginTop={1}>
+            <Text dimColor>
+              Press <Text bold>Enter</Text> on a connection to toggle · Press{' '}
+              <Text bold>Delete</Text> to remove · <Text bold>Esc</Text> to go back
+            </Text>
+          </Box>
+        </Box>
+      )
+    }
     case 'idle':
       return (
         <Box flexDirection="column" gap={1} marginTop={1}>

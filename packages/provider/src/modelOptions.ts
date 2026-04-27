@@ -34,6 +34,7 @@ import {
 import { has1mContext } from '@claude-code/agent/context.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { readEnv } from '@claude-code/config/env/utils'
+import { getEnabledConnections } from '@claude-code/provider/providers.js'
 
 // @[MODEL LAUNCH]: Update all the available and default model option strings below.
 
@@ -514,7 +515,54 @@ function getKnownModelOption(model: string): ModelOption | null {
   }
 }
 
+/**
+ * Build model options from all enabled connections.
+ * Each model is prefixed with the connection name for disambiguation.
+ */
+function getConnectionModelOptions(): ModelOption[] {
+  const connections = getEnabledConnections()
+  if (connections.length === 0) return []
+
+  const options: ModelOption[] = []
+  for (const conn of connections) {
+    for (const model of conn.models) {
+      const prefixedLabel = `[${conn.name}] ${model.label}`
+      options.push({
+        value: model.id,
+        label: prefixedLabel,
+        description:
+          model.description ??
+          `${conn.name} · ${conn.protocol}`,
+        descriptionForModel: `${conn.name} · ${model.id}`,
+      })
+    }
+  }
+  return options
+}
+
 export function getModelOptions(fastMode = false): ModelOption[] {
+  // If connections are configured, use connection-based model list
+  const connectionOptions = getConnectionModelOptions()
+  if (connectionOptions.length > 0) {
+    // Add default option from the first enabled connection
+    const defaultConn = getEnabledConnections()[0]
+    if (defaultConn) {
+      const defaultModel = defaultConn.models[0]
+      const defaultLabel = defaultModel
+        ? `[${defaultConn.name}] ${defaultModel.label}`
+        : 'Default'
+      connectionOptions.unshift({
+        value: null,
+        label: `Default (${defaultLabel})`,
+        description:
+          defaultModel?.description ??
+          `Use the default model from ${defaultConn.name}`,
+      })
+    }
+    return filterModelOptionsByAllowlist(connectionOptions)
+  }
+
+  // Legacy path: no connections configured, use old provider-based options
   const options = getModelOptionsBase(fastMode)
 
   // Add the custom model from the ANTHROPIC_CUSTOM_MODEL_OPTION env var
