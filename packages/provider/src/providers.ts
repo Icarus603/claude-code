@@ -44,8 +44,13 @@ export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS
  * Get all enabled connections from config.
  */
 export function getEnabledConnections(): ConnectionRecord[] {
-  const config = getGlobalConfig()
-  return (config.connections ?? []).filter(c => c.enabled)
+  try {
+    const config = getGlobalConfig()
+    return (config.connections ?? []).filter(c => c.enabled)
+  } catch {
+    // Config not available yet during early bootstrap — return empty
+    return []
+  }
 }
 
 /**
