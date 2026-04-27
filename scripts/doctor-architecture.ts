@@ -358,6 +358,13 @@ const CHECKS: Check[] = [
     doc: 'package.json#exports must monotonically shrink — dead entries cannot creep back',
   },
   {
+    id: 'file-size',
+    layer: 'Cross-Cutting',
+    subsystem: 'file LOC ratchet',
+    script: 'scripts/verify-file-size.ts',
+    doc: 'New files ≤ 800 LOC; grandfathered large files may only shrink',
+  },
+  {
     id: 'duplicate-canonicals',
     layer: 'Cross-Cutting',
     subsystem: 'fork detection',
