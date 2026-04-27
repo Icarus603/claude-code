@@ -10,7 +10,7 @@
  * marketplace filtering is hardcoded for v1.
  */
 
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../feature-flags.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
@@ -21,7 +21,7 @@ import {
   hasShownHintThisSession,
   setPendingHint,
 } from './_deps.js'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+import { getGlobalConfig, saveGlobalConfig } from '../index.js'
 import { logForDebugging } from './_deps.js'
 import { isPluginInstalled } from './installedPluginsManager.js'
 import { getPluginById } from './marketplaceManager.js'

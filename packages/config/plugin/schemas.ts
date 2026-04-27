@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
-import { HooksSchema } from '@claude-code/config/settings/schemas/hooks'
+import { HooksSchema } from '../settings/schemas/hooks.js'
 import { McpServerConfigSchema } from './_deps.js'
-import { lazySchema } from '@claude-code/config/lazySchema'
+import { lazySchema } from '../internal/lazySchema.js'
 
 /**
  * First-layer defense against official marketplace impersonation.

@@ -2,11 +2,11 @@ import {
   getMainLoopModelOverride,
   setMainLoopModelOverride,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+import { getGlobalConfig, saveGlobalConfig } from '../index.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 
 /**
  * Migrate users who had "sonnet[1m]" saved to the explicit "sonnet-4-5-20250929[1m]".

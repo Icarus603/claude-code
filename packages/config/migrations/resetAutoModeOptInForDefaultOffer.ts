@@ -1,12 +1,12 @@
 import { feature } from 'bun:bundle'
 import { logEvent } from '@claude-code/local-observability'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+import { getGlobalConfig, saveGlobalConfig } from '../index.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { getAutoModeEnabledState } from '@claude-code/permission/permissionSetup'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 
 /**
  * One-shot migration: clear skipAutoPermissionPrompt for users who accepted

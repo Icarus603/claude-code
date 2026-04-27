@@ -1,12 +1,12 @@
-import { performBackgroundPluginInstallations } from '@claude-code/config/plugin/PluginInstallationManager'
+import { performBackgroundPluginInstallations } from '../PluginInstallationManager.js'
 import type { AppState } from '@claude-code/app-host/state/AppState.js'
-import { checkHasTrustDialogAccepted } from '@claude-code/config'
+import { checkHasTrustDialogAccepted } from '../../index.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   clearMarketplacesCache,
   registerSeedMarketplaces,
-} from '@claude-code/config/plugin/core/marketplaceManager.js'
-import { clearPluginCache } from '@claude-code/config/plugin/core/pluginLoader.js'
+} from './marketplaceManager.js'
+import { clearPluginCache } from './pluginLoader.js'
 
 type SetAppState = (f: (prevState: AppState) => AppState) => void
 

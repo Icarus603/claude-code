@@ -1,10 +1,10 @@
 import { feature } from 'bun:bundle'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import { redownloadUserSettings } from '@claude-code/config/sync'
+import { redownloadUserSettings } from '../../../sync/index.js'
 import type { LocalCommandCall } from '@claude-code/agent/command.js'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { refreshActivePlugins } from '@claude-code/config/plugin/refresh'
-import { settingsChangeDetector } from '@claude-code/config/changeDetector'
+import { isEnvTruthy } from '../../../env/utils.js'
+import { refreshActivePlugins } from '../../refresh.js'
+import { settingsChangeDetector } from '../../../settings/changeDetector.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 
 export const call: LocalCommandCall = async (_args, context) => {

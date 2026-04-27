@@ -16,7 +16,7 @@
 import type { Command } from './_deps.js'
 import type { BundledSkillDefinition } from './_deps.js'
 import type { BuiltinPluginDefinition, LoadedPlugin } from './types.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings_DEPRECATED } from '../settings/settings.js'
 
 const BUILTIN_PLUGINS: Map<string, BuiltinPluginDefinition> = new Map()
 

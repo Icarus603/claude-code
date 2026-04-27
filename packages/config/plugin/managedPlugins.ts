@@ -1,4 +1,4 @@
-import { getSettingsForSource } from '@claude-code/config/settings'
+import { getSettingsForSource } from '../settings/settings.js'
 
 /**
  * Plugin names locked by org policy (policySettings.enabledPlugins).

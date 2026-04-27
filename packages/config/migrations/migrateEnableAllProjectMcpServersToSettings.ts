@@ -2,12 +2,12 @@ import { logEvent } from '@claude-code/local-observability'
 import {
   getCurrentProjectConfig,
   saveCurrentProjectConfig,
-} from '@claude-code/config'
+} from '../index.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 
 /**
  * Migration: Move MCP server approval fields from project config to local settings

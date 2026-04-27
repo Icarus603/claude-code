@@ -11,7 +11,7 @@
  */
 
 import { updatePluginOp } from './_deps.js'
-import { shouldSkipPluginAutoupdate } from '@claude-code/config'
+import { shouldSkipPluginAutoupdate } from '../index.js'
 import { logForDebugging } from './_deps.js'
 import { errorMessage } from './_deps.js'
 import { logError } from './_deps.js'

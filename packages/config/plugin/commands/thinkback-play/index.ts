@@ -1,5 +1,5 @@
 import type { Command } from '@claude-code/command-runtime/runtime'
-import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '../../../feature-flags.js'
 
 // Hidden command that just plays the animation
 // Called by the thinkback skill after generation is complete

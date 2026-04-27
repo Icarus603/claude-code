@@ -1,4 +1,4 @@
 /**
  * V7 §10.3 facade — moved to `@claude-code/config/plugin/pluginDirectories`.
  */
-export * from '@claude-code/config/plugin/pluginDirectories'
+export * from '../pluginDirectories.js'

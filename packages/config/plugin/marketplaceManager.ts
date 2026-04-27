@@ -23,9 +23,9 @@ import { writeFile } from 'fs/promises'
 import isEqual from 'lodash-es/isEqual.js'
 import memoize from 'lodash-es/memoize.js'
 import { basename, dirname, isAbsolute, join, resolve, sep } from 'path'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../feature-flags.js'
 import { logForDebugging } from './_deps.js'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEnvTruthy } from '../env/utils.js'
 import {
   ConfigParseError,
   errorMessage,
@@ -41,8 +41,8 @@ import {
   getInitialSettings,
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
-import type { SettingsJson } from '@claude-code/config/types'
+} from '../settings/settings.js'
+import type { SettingsJson } from '../settings/types.js'
 import {
   jsonParse,
   jsonStringify,

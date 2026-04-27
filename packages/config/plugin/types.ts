@@ -10,7 +10,7 @@ import type {
   PluginAuthor,
   PluginManifest,
 } from './schemas.js'
-import type { HooksSettings } from '@claude-code/config/types'
+import type { HooksSettings } from '../settings/types.js'
 
 export type { PluginAuthor, PluginManifest, CommandMetadata }
 

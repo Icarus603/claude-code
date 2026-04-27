@@ -12,7 +12,7 @@
 
 import { extname } from 'path'
 import { isBinaryInstalled } from './_deps.js'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+import { getGlobalConfig, saveGlobalConfig } from '../index.js'
 import { logForDebugging } from './_deps.js'
 import { isPluginInstalled } from './installedPluginsManager.js'
 import {

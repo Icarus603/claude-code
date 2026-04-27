@@ -19,7 +19,7 @@ import { getMemoryPath } from '../global/config.js'
 import { markInternalWrite } from '../settings/internalWrites.js'
 import { getSettingsFilePathForSource } from '../settings/settings.js'
 import { resetSettingsCache } from '../settings/settingsCache.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../feature-flags.js'
 
 // V7 §11.4 — inlined utilities (same as remote/index.ts)
 function errorMessage(e: unknown): string { return e instanceof Error ? e.message : String(e) }

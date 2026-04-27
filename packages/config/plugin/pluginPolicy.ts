@@ -6,7 +6,7 @@
  * reaches most of the plugin subsystem.
  */
 
-import { getSettingsForSource } from '@claude-code/config/settings'
+import { getSettingsForSource } from '../settings/settings.js'
 
 /**
  * Check if a plugin is force-disabled by org policy (managed-settings.json).

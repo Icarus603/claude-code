@@ -59,7 +59,7 @@ import type {
   PluginManifest,
 } from './types.js'
 import { logForDebugging } from './_deps.js'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEnvTruthy } from '../env/utils.js'
 import {
   errorMessage,
   getErrnoPath,
@@ -71,17 +71,17 @@ import { execFileNoThrow, execFileNoThrowWithCwd } from './_deps.js'
 import { pathExists } from './_deps.js'
 import { getFsImplementation } from './_deps.js'
 import { gitExe } from './_deps.js'
-import { lazySchema } from '@claude-code/config/lazySchema'
+import { lazySchema } from '../internal/lazySchema.js'
 import { logError } from './_deps.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings_DEPRECATED } from '../settings/settings.js'
 import {
   clearPluginSettingsBase,
   getPluginSettingsBase,
   resetSettingsCache,
   setPluginSettingsBase,
-} from '@claude-code/config/settings/settingsCache'
-import type { HooksSettings } from '@claude-code/config/types'
-import { SettingsSchema } from '@claude-code/config/types'
+} from '../settings/settingsCache.js'
+import type { HooksSettings } from '../settings/types.js'
+import { SettingsSchema } from '../settings/types.js'
 import { jsonParse, jsonStringify } from './_deps.js'
 import { getAddDirEnabledPlugins } from './addDirPluginSettings.js'
 import { verifyAndDemote } from './dependencyResolver.js'

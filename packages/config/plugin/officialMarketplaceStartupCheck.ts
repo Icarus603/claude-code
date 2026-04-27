@@ -9,11 +9,11 @@
  */
 
 import { join } from 'path'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '../feature-flags.js'
 import { logEvent } from '@claude-code/local-observability'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+import { getGlobalConfig, saveGlobalConfig } from '../index.js'
 import { logForDebugging } from './_deps.js'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEnvTruthy } from '../env/utils.js'
 import { toError } from './_deps.js'
 import { logError } from './_deps.js'
 import { checkGitAvailable, markGitUnavailable } from './gitAvailability.js'
