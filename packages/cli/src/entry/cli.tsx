@@ -219,7 +219,7 @@ async function main(): Promise<void> {
     (args[0] === 'new' || args[0] === 'list' || args[0] === 'reply')
   ) {
     profileCheckpoint('cli_templates_path')
-    const { templatesMain } = await import('@claude-code/cli/handlers/templateJobs.js')
+    const { templatesMain } = await import('../handlers/templateJobs.js')
     await templatesMain(args)
     // process.exit (not return) — mountFleetView's Ink TUI can leave event
     // loop handles that prevent natural exit.

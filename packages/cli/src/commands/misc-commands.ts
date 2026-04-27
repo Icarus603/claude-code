@@ -42,7 +42,7 @@ export function registerMiscCommands(program: Command): void {
         console?: boolean
         claudeai?: boolean
       }) => {
-        const { authLogin } = await import('@claude-code/cli/handlers/auth.js')
+        const { authLogin } = await import('../handlers/auth.js')
         await authLogin({ email, sso, console: useConsole, claudeai })
       },
     )
@@ -53,7 +53,7 @@ export function registerMiscCommands(program: Command): void {
     .option('--json', 'Output as JSON (default)')
     .option('--text', 'Output as human-readable text')
     .action(async (opts: { json?: boolean; text?: boolean }) => {
-      const { authStatus } = await import('@claude-code/cli/handlers/auth.js')
+      const { authStatus } = await import('../handlers/auth.js')
       await authStatus(opts)
     })
 
@@ -61,7 +61,7 @@ export function registerMiscCommands(program: Command): void {
     .command('logout')
     .description('Log out from your Anthropic account')
     .action(async () => {
-      const { authLogout } = await import('@claude-code/cli/handlers/auth.js')
+      const { authLogout } = await import('../handlers/auth.js')
       await authLogout()
     })
 
@@ -80,7 +80,7 @@ export function registerMiscCommands(program: Command): void {
     .description('Validate a plugin or marketplace manifest')
     .addOption(coworkOption())
     .action(async (manifestPath: string, options: { cowork?: boolean }) => {
-      const { pluginValidateHandler } = await import('@claude-code/cli/handlers/plugins.js')
+      const { pluginValidateHandler } = await import('../handlers/plugins.js')
       await pluginValidateHandler(manifestPath, options)
     })
 
@@ -96,7 +96,7 @@ export function registerMiscCommands(program: Command): void {
         available?: boolean
         cowork?: boolean
       }) => {
-        const { pluginListHandler } = await import('@claude-code/cli/handlers/plugins.js')
+        const { pluginListHandler } = await import('../handlers/plugins.js')
         await pluginListHandler(options)
       },
     )
@@ -128,7 +128,7 @@ export function registerMiscCommands(program: Command): void {
           scope?: string
         },
       ) => {
-        const { marketplaceAddHandler } = await import('@claude-code/cli/handlers/plugins.js')
+        const { marketplaceAddHandler } = await import('../handlers/plugins.js')
         await marketplaceAddHandler(source, options)
       },
     )
@@ -139,7 +139,7 @@ export function registerMiscCommands(program: Command): void {
     .option('--json', 'Output as JSON')
     .addOption(coworkOption())
     .action(async (options: { json?: boolean; cowork?: boolean }) => {
-      const { marketplaceListHandler } = await import('@claude-code/cli/handlers/plugins.js')
+      const { marketplaceListHandler } = await import('../handlers/plugins.js')
       await marketplaceListHandler(options)
     })
 
@@ -149,7 +149,7 @@ export function registerMiscCommands(program: Command): void {
     .description('Remove a configured marketplace')
     .addOption(coworkOption())
     .action(async (name: string, options: { cowork?: boolean }) => {
-      const { marketplaceRemoveHandler } = await import('@claude-code/cli/handlers/plugins.js')
+      const { marketplaceRemoveHandler } = await import('../handlers/plugins.js')
       await marketplaceRemoveHandler(name, options)
     })
 
@@ -158,7 +158,7 @@ export function registerMiscCommands(program: Command): void {
     .description('Update marketplace(s) from their source - updates all if no name specified')
     .addOption(coworkOption())
     .action(async (name: string | undefined, options: { cowork?: boolean }) => {
-      const { marketplaceUpdateHandler } = await import('@claude-code/cli/handlers/plugins.js')
+      const { marketplaceUpdateHandler } = await import('../handlers/plugins.js')
       await marketplaceUpdateHandler(name, options)
     })
 
@@ -171,7 +171,7 @@ export function registerMiscCommands(program: Command): void {
     .option('-s, --scope <scope>', 'Installation scope: user, project, or local', 'user')
     .addOption(coworkOption())
     .action(async (plugin: string, options: { scope?: string; cowork?: boolean }) => {
-      const { pluginInstallHandler } = await import('@claude-code/cli/handlers/plugins.js')
+      const { pluginInstallHandler } = await import('../handlers/plugins.js')
       await pluginInstallHandler(plugin, options)
     })
 
@@ -195,7 +195,7 @@ export function registerMiscCommands(program: Command): void {
           keepData?: boolean
         },
       ) => {
-        const { pluginUninstallHandler } = await import('@claude-code/cli/handlers/plugins.js')
+        const { pluginUninstallHandler } = await import('../handlers/plugins.js')
         await pluginUninstallHandler(plugin, options)
       },
     )
@@ -209,7 +209,7 @@ export function registerMiscCommands(program: Command): void {
     )
     .addOption(coworkOption())
     .action(async (plugin: string, options: { scope?: string; cowork?: boolean }) => {
-      const { pluginEnableHandler } = await import('@claude-code/cli/handlers/plugins.js')
+      const { pluginEnableHandler } = await import('../handlers/plugins.js')
       await pluginEnableHandler(plugin, options)
     })
 
@@ -227,7 +227,7 @@ export function registerMiscCommands(program: Command): void {
         plugin: string | undefined,
         options: { scope?: string; cowork?: boolean; all?: boolean },
       ) => {
-        const { pluginDisableHandler } = await import('@claude-code/cli/handlers/plugins.js')
+        const { pluginDisableHandler } = await import('../handlers/plugins.js')
         await pluginDisableHandler(plugin, options)
       },
     )
@@ -241,7 +241,7 @@ export function registerMiscCommands(program: Command): void {
     )
     .addOption(coworkOption())
     .action(async (plugin: string, options: { scope?: string; cowork?: boolean }) => {
-      const { pluginUpdateHandler } = await import('@claude-code/cli/handlers/plugins.js')
+      const { pluginUpdateHandler } = await import('../handlers/plugins.js')
       await pluginUpdateHandler(plugin, options)
     })
 
@@ -251,7 +251,7 @@ export function registerMiscCommands(program: Command): void {
     .description('Set up a long-lived authentication token (requires Claude subscription)')
     .action(async () => {
       const [{ setupTokenHandler }, { createRoot }] = await Promise.all([
-        import('@claude-code/cli/handlers/util.js'),
+        import('../handlers/util.js'),
         import('@anthropic/ink'),
       ])
       const root = await createRoot(getBaseRenderOptions(false))
@@ -267,7 +267,7 @@ export function registerMiscCommands(program: Command): void {
       'Comma-separated list of setting sources to load (user, project, local).',
     )
     .action(async () => {
-      const { agentsHandler } = await import('@claude-code/cli/handlers/agents.js')
+      const { agentsHandler } = await import('../handlers/agents.js')
       await agentsHandler()
       process.exit(0)
     })
@@ -285,7 +285,7 @@ export function registerMiscCommands(program: Command): void {
         .description('Print the default auto mode environment, allow, and deny rules as JSON')
         .action(async () => {
           const { autoModeDefaultsHandler } = await import(
-            '@claude-code/cli/handlers/autoMode.js'
+            '../handlers/autoMode.js'
           )
           autoModeDefaultsHandler()
           process.exit(0)
@@ -298,7 +298,7 @@ export function registerMiscCommands(program: Command): void {
         )
         .action(async () => {
           const { autoModeConfigHandler } = await import(
-            '@claude-code/cli/handlers/autoMode.js'
+            '../handlers/autoMode.js'
           )
           autoModeConfigHandler()
           process.exit(0)
@@ -310,7 +310,7 @@ export function registerMiscCommands(program: Command): void {
         .option('--model <model>', 'Override which model is used')
         .action(async (options) => {
           const { autoModeCritiqueHandler } = await import(
-            '@claude-code/cli/handlers/autoMode.js'
+            '../handlers/autoMode.js'
           )
           await autoModeCritiqueHandler(options)
           process.exit()
@@ -358,7 +358,7 @@ export function registerMiscCommands(program: Command): void {
     )
     .action(async () => {
       const [{ doctorHandler }, { createRoot }] = await Promise.all([
-        import('@claude-code/cli/handlers/util.js'),
+        import('../handlers/util.js'),
         import('@anthropic/ink'),
       ])
       const root = await createRoot(getBaseRenderOptions(false))
@@ -373,7 +373,7 @@ export function registerMiscCommands(program: Command): void {
         '[ANT-ONLY] Initialize or upgrade the local dev environment using the "# claude up" section of the nearest CLAUDE.md',
       )
       .action(async () => {
-        const { up } = await import('@claude-code/cli/up.js')
+        const { up } = await import('../up.js')
         await up()
       })
   }
@@ -400,7 +400,7 @@ export function registerMiscCommands(program: Command): void {
             safe?: boolean
           },
         ) => {
-          const { rollback } = await import('@claude-code/cli/rollback.js')
+          const { rollback } = await import('../rollback.js')
           await rollback(target, options)
         },
       )
@@ -414,7 +414,7 @@ export function registerMiscCommands(program: Command): void {
     )
     .option('--force', 'Force installation even if already installed')
     .action(async (target: string | undefined, options: { force?: boolean }) => {
-      const { installHandler } = await import('@claude-code/cli/handlers/util.js')
+      const { installHandler } = await import('../handlers/util.js')
       await installHandler(target, options)
     })
 
@@ -435,7 +435,7 @@ export function registerMiscCommands(program: Command): void {
         validateLogId,
       )
       .action(async (logId: string | number | undefined) => {
-        const { logHandler } = await import('@claude-code/cli/handlers/ant.js')
+        const { logHandler } = await import('../handlers/ant.js')
         await logHandler(logId)
       })
 
@@ -446,7 +446,7 @@ export function registerMiscCommands(program: Command): void {
       )
       .argument('[number]', 'A number (0, 1, 2, etc.) to display a specific log', parseInt)
       .action(async (number: number | undefined) => {
-        const { errorHandler } = await import('@claude-code/cli/handlers/ant.js')
+        const { errorHandler } = await import('../handlers/ant.js')
         await errorHandler(number)
       })
 
@@ -469,7 +469,7 @@ Examples:
   $ claude export <uuid>.jsonl output.txt           Render JSONL session file to text`,
       )
       .action(async (source: string, outputFile: string) => {
-        const { exportHandler } = await import('@claude-code/cli/handlers/ant.js')
+        const { exportHandler } = await import('../handlers/ant.js')
         await exportHandler(source, outputFile)
       })
 
@@ -485,7 +485,7 @@ Examples:
         .option('-l, --list <id>', 'Task list ID (defaults to "tasklist")')
         .action(
           async (subject: string, opts: { description?: string; list?: string }) => {
-            const { taskCreateHandler } = await import('@claude-code/cli/handlers/ant.js')
+            const { taskCreateHandler } = await import('../handlers/ant.js')
             await taskCreateHandler(subject, opts)
           },
         )
@@ -502,7 +502,7 @@ Examples:
             pending?: boolean
             json?: boolean
           }) => {
-            const { taskListHandler } = await import('@claude-code/cli/handlers/ant.js')
+            const { taskListHandler } = await import('../handlers/ant.js')
             await taskListHandler(opts)
           },
         )
@@ -512,7 +512,7 @@ Examples:
         .description('Get details of a task')
         .option('-l, --list <id>', 'Task list ID (defaults to "tasklist")')
         .action(async (id: string, opts: { list?: string }) => {
-          const { taskGetHandler } = await import('@claude-code/cli/handlers/ant.js')
+          const { taskGetHandler } = await import('../handlers/ant.js')
           await taskGetHandler(id, opts)
         })
 
@@ -537,7 +537,7 @@ Examples:
               clearOwner?: boolean
             },
           ) => {
-            const { taskUpdateHandler } = await import('@claude-code/cli/handlers/ant.js')
+            const { taskUpdateHandler } = await import('../handlers/ant.js')
             await taskUpdateHandler(id, opts)
           },
         )
@@ -547,7 +547,7 @@ Examples:
         .description('Show the tasks directory path')
         .option('-l, --list <id>', 'Task list ID (defaults to "tasklist")')
         .action(async (opts: { list?: string }) => {
-          const { taskDirHandler } = await import('@claude-code/cli/handlers/ant.js')
+          const { taskDirHandler } = await import('../handlers/ant.js')
           await taskDirHandler(opts)
         })
     }
@@ -557,7 +557,7 @@ Examples:
       .description('Generate shell completion script (bash, zsh, or fish)')
       .option('--output <file>', 'Write completion script directly to a file instead of stdout')
       .action(async (shell: string, opts: { output?: string }) => {
-        const { completionHandler } = await import('@claude-code/cli/handlers/ant.js')
+        const { completionHandler } = await import('../handlers/ant.js')
         await completionHandler(shell, opts, program)
       })
   }

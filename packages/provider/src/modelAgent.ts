@@ -1,16 +1,16 @@
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { capitalize } from '@claude-code/output/utils/stringUtils.js'
-import { MODEL_ALIASES, type ModelAlias } from '@claude-code/provider/modelAliases.js'
+import { MODEL_ALIASES, type ModelAlias } from './modelAliases.js'
 import {
   applyBedrockRegionPrefix,
   getBedrockRegionPrefix,
-} from '@claude-code/provider/model/bedrock.js'
+} from './model/bedrock.js'
 import {
   getCanonicalName,
   getRuntimeMainLoopModel,
   parseUserSpecifiedModel,
-} from '@claude-code/provider/model.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+} from './model.js'
+import { getAPIProvider } from './providers.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 export const AGENT_MODEL_OPTIONS = [...MODEL_ALIASES, 'inherit'] as const

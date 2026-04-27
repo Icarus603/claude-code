@@ -1,6 +1,6 @@
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { withResolvers } from '@claude-code/local-observability/utils/withResolvers.js'
-import { requireComputerUseSwift } from '@ant/computer-use-mcp/legacy/swiftLoader.js'
+import { requireComputerUseSwift } from './swiftLoader.js'
 
 /**
  * Shared CFRunLoop pump. Swift's four `@MainActor` async methods

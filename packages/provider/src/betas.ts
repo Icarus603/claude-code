@@ -22,14 +22,14 @@ import {
   TOOL_SEARCH_BETA_HEADER_1P,
   TOOL_SEARCH_BETA_HEADER_3P,
   WEB_SEARCH_BETA_HEADER,
-} from '@claude-code/provider/betasConstants.js'
-import { OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
-import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
+} from './betasConstants.js'
+import { OAUTH_BETA_HEADER } from './oauthConstants.js'
+import { isClaudeAISubscriber } from './authAlias.js'
 import { has1mContext } from '@claude-code/agent/context.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
-import { getCanonicalName } from '@claude-code/provider/model.js'
-import { get3PModelCapabilityOverride } from '@claude-code/provider/model/modelSupportOverrides.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getCanonicalName } from './model.js'
+import { get3PModelCapabilityOverride } from './model/modelSupportOverrides.js'
+import { getAPIProvider } from './providers.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { readEnv } from '@claude-code/config/env/utils'
 

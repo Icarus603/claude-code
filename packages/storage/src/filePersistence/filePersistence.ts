@@ -26,7 +26,7 @@ import {
   findModifiedFiles,
   getEnvironmentKind,
   logDebug,
-} from '@claude-code/storage/filePersistence/outputsScanner.js'
+} from './outputsScanner.js'
 import {
   DEFAULT_UPLOAD_CONCURRENCY,
   type FailedPersistence,
@@ -35,7 +35,7 @@ import {
   OUTPUTS_SUBDIR,
   type PersistedFile,
   type TurnStartTime,
-} from '@claude-code/storage/filePersistence/types.js'
+} from './types.js'
 
 /**
  * Execute file persistence for modified files in the outputs directory.

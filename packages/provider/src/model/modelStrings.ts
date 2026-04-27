@@ -5,14 +5,14 @@ import {
 import { logError } from '@claude-code/local-observability/logging'
 import { sequential } from '@claude-code/config/sequential'
 import { getInitialSettings } from '@claude-code/config/settings'
-import { findFirstMatch, getBedrockInferenceProfiles } from '@claude-code/provider/model/bedrock.js'
+import { findFirstMatch, getBedrockInferenceProfiles } from './bedrock.js'
 import {
   ALL_MODEL_CONFIGS,
   CANONICAL_ID_TO_KEY,
   type CanonicalModelId,
   type ModelKey,
-} from '@claude-code/provider/model/configs.js'
-import { type APIProvider, getAPIProvider } from '@claude-code/provider/providers.js'
+} from './configs.js'
+import { type APIProvider, getAPIProvider } from '../providers.js'
 
 /**
  * Maps each model version to its provider-specific model ID string.

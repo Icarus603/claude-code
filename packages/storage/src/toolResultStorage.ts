@@ -20,7 +20,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getErrnoCode, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { logError } from '@claude-code/local-observability/logging'
-import { getProjectDir } from '@claude-code/storage/sessionStorage.js'
+import { getProjectDir } from './sessionStorage.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 // Subdirectory name for tool results within a session

@@ -22,10 +22,10 @@ import {
   detectLineEndingsForString,
   type LineEndingType,
 } from './fileRead.js'
-import { fileReadCache } from '@claude-code/storage/fileReadCache.js'
-import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
+import { fileReadCache } from './fileReadCache.js'
+import { getFsImplementation, safeResolvePath } from './fsOperations.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { expandPath } from '@claude-code/storage/path.js'
+import { expandPath } from './path.js'
 import { getPlatform } from '@claude-code/config/platform'
 
 export type File = {

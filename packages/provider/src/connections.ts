@@ -345,8 +345,8 @@ export async function disconnectConnection(id: string): Promise<void> {
     if (conn.auth.source === 'codex') {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { saveCodexOAuthTokens } = require(
-        '@claude-code/provider/oauth/codex-auth.js',
-      ) as typeof import('@claude-code/provider/oauth/codex-auth.js')
+        './oauth/codex-auth.js',
+      ) as typeof import('./oauth/codex-auth.js')
       // No "delete" API; replace the slot with null/empty by saving
       // empty tokens and then letting removeConnection drop the record.
       // Better: clear the config field directly.

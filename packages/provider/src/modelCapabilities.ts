@@ -4,9 +4,9 @@ import isEqual from 'lodash-es/isEqual.js'
 import memoize from 'lodash-es/memoize.js'
 import { join } from 'path'
 import { z } from 'zod/v4'
-import { OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
-import { getAnthropicClient } from '@claude-code/provider'
-import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
+import { OAUTH_BETA_HEADER } from './oauthConstants.js'
+import { getAnthropicClient } from './index.js'
+import { isClaudeAISubscriber } from './authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { safeParseJSON } from '@claude-code/storage/json.js'
@@ -16,7 +16,7 @@ import { jsonStringify } from '@claude-code/local-observability/slowOperations.j
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from '@claude-code/provider/providers.js'
+} from './providers.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 // .strip() — don't persist internal-only fields (mycro_deployments etc.) to disk

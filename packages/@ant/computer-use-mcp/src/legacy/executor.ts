@@ -35,9 +35,9 @@ import type {
   ResolvePrepareCaptureResult,
   RunningApp,
   ScreenshotResult,
-} from '@ant/computer-use-mcp'
+} from '../index.js'
 
-import { API_RESIZE_PARAMS, targetImageSize } from '@ant/computer-use-mcp'
+import { API_RESIZE_PARAMS, targetImageSize } from '../index.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
@@ -46,11 +46,11 @@ import {
   CLI_CU_CAPABILITIES,
   CLI_HOST_BUNDLE_ID,
   getTerminalBundleId,
-} from '@ant/computer-use-mcp/legacy/common.js'
-import { drainRunLoop } from '@ant/computer-use-mcp/legacy/drainRunLoop.js'
-import { notifyExpectedEscape } from '@ant/computer-use-mcp/legacy/escHotkey.js'
-import { requireComputerUseInput } from '@ant/computer-use-mcp/legacy/inputLoader.js'
-import { requireComputerUseSwift } from '@ant/computer-use-mcp/legacy/swiftLoader.js'
+} from './common.js'
+import { drainRunLoop } from './drainRunLoop.js'
+import { notifyExpectedEscape } from './escHotkey.js'
+import { requireComputerUseInput } from './inputLoader.js'
+import { requireComputerUseSwift } from './swiftLoader.js'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -301,7 +301,7 @@ export function createCliExecutor(opts: {
   // No macOS code paths, no drainRunLoop, no @ant packages.
   if (process.platform !== 'darwin') {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { createCrossPlatformExecutor } = require('@ant/computer-use-mcp/legacy/executorCrossPlatform.js') as typeof import('@ant/computer-use-mcp/legacy/executorCrossPlatform.js')
+    const { createCrossPlatformExecutor } = require('./executorCrossPlatform.js') as typeof import('./executorCrossPlatform.js')
     return createCrossPlatformExecutor(opts)
   }
 

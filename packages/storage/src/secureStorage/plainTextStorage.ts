@@ -2,7 +2,7 @@ import { chmodSync } from 'fs'
 import { join } from 'path'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
-import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { getFsImplementation } from '../fsOperations.js'
 import {
   jsonParse,
   jsonStringify,

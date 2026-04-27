@@ -58,14 +58,14 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
-import { normalizePathForComparison } from '@claude-code/storage/file.js'
+import { normalizePathForComparison } from './file.js'
 import { cacheKeys, type FileStateCache } from '@claude-code/tool-registry/fileStateCache'
 import {
   parseFrontmatter,
   splitPathInFrontmatter,
 } from '@claude-code/agent/frontmatterParser.js'
-import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
-import { findCanonicalGitRoot, findGitRoot } from '@claude-code/storage/git.js'
+import { getFsImplementation, safeResolvePath } from './fsOperations.js'
+import { findCanonicalGitRoot, findGitRoot } from './git.js'
 import {
   executeInstructionsLoadedHooks,
   hasInstructionsLoadedHook,
@@ -73,7 +73,7 @@ import {
   type InstructionsMemoryType,
 } from '@claude-code/agent/hooks.js'
 import type { MemoryType } from '@claude-code/memory/memorySourceTypes'
-import { expandPath } from '@claude-code/storage/path.js'
+import { expandPath } from './path.js'
 import { pathInWorkingPath } from '@claude-code/permission/filesystem'
 import { isSettingSourceEnabled } from '@claude-code/config/constants'
 import { getInitialSettings } from '@claude-code/config/settings'

@@ -10,7 +10,7 @@ import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy } from '@claude-code/config/env/utils'
 import { clearMcpAuthCache } from './client.js'
-import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'
+import { normalizeNameForMCP } from './normalization.js'
 import type { ScopedMcpServerConfig } from './types.js'
 
 type ClaudeAIMcpServer = {

@@ -1,17 +1,17 @@
 import axios from 'axios'
-import { getOauthConfig } from '@claude-code/provider/oauthConstants'
+import { getOauthConfig } from './oauthConstants.js'
 import {
   getClaudeAIOAuthTokens,
   hasProfileScope,
   isClaudeAISubscriber,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import {
   checkAndRefreshCodexTokenIfNeeded,
   getCodexOAuthTokens,
-} from '@claude-code/provider/oauth/codex-auth.js'
-import { getAuthHeaders } from '@claude-code/provider/http.js'
-import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
-import { isOAuthTokenExpired } from '@claude-code/provider/oauth/client.js'
+} from './oauth/codex-auth.js'
+import { getAuthHeaders } from './http.js'
+import { getClaudeCodeUserAgent } from './userAgent.js'
+import { isOAuthTokenExpired } from './oauth/client.js'
 
 export type RateLimit = {
   utilization: number | null // a percentage from 0 to 100

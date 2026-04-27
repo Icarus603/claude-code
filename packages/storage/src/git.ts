@@ -8,7 +8,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
-import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { getFsImplementation } from './fsOperations.js'
 import {
   getCachedBranch,
   getCachedDefaultBranch,

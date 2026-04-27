@@ -2,11 +2,11 @@
 import type { Theme } from '@anthropic/ink'
 import { feature } from 'bun:bundle'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { getCanonicalName } from '@claude-code/provider/model.js'
-import { get3PModelCapabilityOverride } from '@claude-code/provider/model/modelSupportOverrides.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getCanonicalName } from './model.js'
+import { get3PModelCapabilityOverride } from './model/modelSupportOverrides.js'
+import { getAPIProvider } from './providers.js'
 import { getSettingsWithErrors } from '@claude-code/config/settings'
-import { resolveAntModel } from '@claude-code/provider/antModels.js'
+import { resolveAntModel } from './antModels.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 export type ThinkingConfig =

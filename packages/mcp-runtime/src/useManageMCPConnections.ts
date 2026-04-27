@@ -81,7 +81,7 @@ import {
   fetchClaudeAIMcpConfigsIfEligible,
 } from './claudeai.js'
 import { registerElicitationHandler } from './elicitationHandler.js'
-import { getMcpPrefix } from '@claude-code/mcp-runtime/mcpStringUtils.js'
+import { getMcpPrefix } from './mcpStringUtils.js'
 import { commandBelongsToServer, excludeStalePluginClients } from './utils.js'
 
 // Constants for reconnection with exponential backoff

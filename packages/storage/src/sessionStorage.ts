@@ -73,14 +73,14 @@ import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/uti
 import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { formatFileSize } from '@claude-code/output/formatters'
-import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { getWorktreePaths } from '@claude-code/storage/getWorktreePaths.js'
-import { getBranch } from '@claude-code/storage/git.js'
+import { getFsImplementation } from './fsOperations.js'
+import { getWorktreePaths } from './getWorktreePaths.js'
+import { getBranch } from './git.js'
 import { gracefulShutdownSync, isShuttingDown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
-import { parseJSONL } from '@claude-code/storage/json.js'
+import { parseJSONL } from './json.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { extractTag, isCompactBoundaryMessage } from '@claude-code/agent/messages.js'
-import { sanitizePath } from '@claude-code/storage/path.js'
+import { sanitizePath } from './path.js'
 import {
   extractJsonStringField,
   extractLastJsonStringField,
@@ -88,10 +88,10 @@ import {
   readHeadAndTail,
   readTranscriptForLoad,
   SKIP_PRECOMPACT_THRESHOLD,
-} from '@claude-code/storage/sessionStoragePortable.js'
+} from './sessionStoragePortable.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'
+import type { ContentReplacementRecord } from './toolResultStorage.js'
 import { validateUuid } from '@claude-code/agent/uuid.js'
 import { readEnv } from '@claude-code/config/env'
 

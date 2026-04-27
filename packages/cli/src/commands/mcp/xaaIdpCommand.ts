@@ -6,7 +6,7 @@
  * keyed by issuer (secret). Separate trust domain from per-server AS secrets.
  */
 import type { Command } from '@commander-js/extra-typings'
-import { cliError, cliOk } from '@claude-code/cli/exit.js'
+import { cliError, cliOk } from '../../exit.js'
 import {
   acquireIdpIdToken,
   clearIdpClientSecret,

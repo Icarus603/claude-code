@@ -3,7 +3,7 @@
  * Captures a screen region or window, then runs WinRT OCR to extract text.
  */
 
-import { ps as runPs } from '@ant/computer-use-mcp/legacy/win32/shared.js'
+import { ps as runPs } from './shared.js'
 
 export interface OcrLine {
   text: string

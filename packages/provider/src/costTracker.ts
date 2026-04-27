@@ -32,7 +32,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getAdvisorUsage } from '@claude-code/provider/advisor.js'
+import { getAdvisorUsage } from './advisor.js'
 import {
   getCurrentProjectConfig,
   saveCurrentProjectConfig,
@@ -41,11 +41,11 @@ import {
   getContextWindowForModel,
   getModelMaxOutputTokens,
 } from '@claude-code/agent/context.js'
-import { isFastModeEnabled } from '@claude-code/provider/fastMode.js'
+import { isFastModeEnabled } from './fastMode.js'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import type { FpsMetrics } from '@claude-code/output/fpsTracker.js'
-import { getCanonicalName } from '@claude-code/provider/model.js'
-import { calculateUSDCost } from '@claude-code/provider/modelCost.js'
+import { getCanonicalName } from './model.js'
+import { calculateUSDCost } from './modelCost.js'
 export {
   getTotalCostUSD as getTotalCost,
   getTotalDuration,

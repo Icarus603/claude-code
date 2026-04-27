@@ -110,8 +110,8 @@ export function resolveConnectionForModel(
 ): ConnectionRecord | undefined {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { unpackModelId } = require(
-    '@claude-code/provider/connections.js',
-  ) as typeof import('@claude-code/provider/connections.js')
+    './connections.js',
+  ) as typeof import('./connections.js')
   const { connectionId, modelId: bareModelId } = unpackModelId(modelId)
 
   if (connectionId) {

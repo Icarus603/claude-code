@@ -1,2 +1,2 @@
 // Canonical owner is @claude-code/provider/providers.
-export * from '@claude-code/provider/providers.js'
+export * from '../providers.js'

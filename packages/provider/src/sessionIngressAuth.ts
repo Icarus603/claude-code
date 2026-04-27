@@ -6,7 +6,7 @@ import {
   CCR_SESSION_INGRESS_TOKEN_PATH,
   maybePersistTokenForSubprocesses,
   readTokenFromWellKnownFile,
-} from '@claude-code/provider/authFileDescriptor.js'
+} from './authFileDescriptor.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'

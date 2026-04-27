@@ -4,8 +4,8 @@ import { feature } from 'bun:bundle'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy } from '@claude-code/config/env/utils'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { getWorkload } from '@claude-code/provider/workloadContext.js'
+import { getAPIProvider } from './providers.js'
+import { getWorkload } from './workloadContext.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 declare const MACRO: { VERSION: string }

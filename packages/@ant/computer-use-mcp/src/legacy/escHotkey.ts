@@ -1,6 +1,6 @@
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { releasePump, retainPump } from '@ant/computer-use-mcp/legacy/drainRunLoop.js'
-import { requireComputerUseSwift } from '@ant/computer-use-mcp/legacy/swiftLoader.js'
+import { releasePump, retainPump } from './drainRunLoop.js'
+import { requireComputerUseSwift } from './swiftLoader.js'
 
 /**
  * Global Escape → abort. Mirrors Cowork's `escAbort.ts` but without Electron:

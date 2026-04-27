@@ -10,7 +10,7 @@ import {
 import { join } from 'path'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
-import { readFileRange, tailFile } from '@claude-code/storage/fsOperations.js'
+import { readFileRange, tailFile } from '../fsOperations.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getProjectTempDir } from '@claude-code/permission/filesystem'
 

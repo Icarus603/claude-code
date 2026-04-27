@@ -14,7 +14,7 @@ import {
   getSessionProjectDir,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
-import { sanitizePath } from '@claude-code/storage/path.js'
+import { sanitizePath } from './path.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
 
 export function getProjectsDir(): string {

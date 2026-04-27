@@ -21,12 +21,12 @@ import {
   CLAUDE_AI_INFERENCE_SCOPE,
   getOauthConfig,
   OAUTH_BETA_HEADER,
-} from '@claude-code/provider/oauthConstants'
+} from '../oauthConstants.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getAnthropicApiKeyWithSource,
   getClaudeAIOAuthTokens,
-} from '@claude-code/provider/authAlias.js'
+} from '../authAlias.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
@@ -35,12 +35,12 @@ import { safeParseJSON } from '@claude-code/storage/json.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from '@claude-code/provider/providers.js'
+} from '../providers.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
-import { getRetryDelay } from '@claude-code/provider/withRetry.js'
+import { getClaudeCodeUserAgent } from '../userAgent.js'
+import { getRetryDelay } from '../withRetry.js'
 import {
   type PolicyLimitsFetchResult,
   type PolicyLimitsResponse,

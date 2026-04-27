@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { getOauthConfig } from '@claude-code/provider/oauthConstants'
-import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
+import { getOauthConfig } from './oauthConstants.js'
+import { getOauthAccountInfo } from './authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logError } from '@claude-code/local-observability/logging'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'

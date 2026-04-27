@@ -1,5 +1,5 @@
-import type { ModelName } from '@claude-code/provider/model.js'
-import type { APIProvider } from '@claude-code/provider/providers.js'
+import type { ModelName } from '../model.js'
+import type { APIProvider } from '../providers.js'
 
 export type ModelConfig = Record<APIProvider, ModelName>
 

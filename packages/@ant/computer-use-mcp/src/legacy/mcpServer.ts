@@ -1,7 +1,7 @@
 import {
   buildComputerUseTools,
   createComputerUseMcpServer,
-} from '@ant/computer-use-mcp'
+} from '../index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import { homedir } from 'os'
@@ -9,9 +9,9 @@ import { homedir } from 'os'
 import { enableConfigs } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { shutdownEventLoggers } from '@claude-code/local-observability/compat'
-import { filterAppsForDescription } from '@ant/computer-use-mcp/legacy/appNames.js'
-import { getChicagoCoordinateMode } from '@ant/computer-use-mcp/legacy/gates.js'
-import { getComputerUseHostAdapter } from '@ant/computer-use-mcp/legacy/hostAdapter.js'
+import { filterAppsForDescription } from './appNames.js'
+import { getChicagoCoordinateMode } from './gates.js'
+import { getComputerUseHostAdapter } from './hostAdapter.js'
 
 const APP_ENUM_TIMEOUT_MS = 1000
 

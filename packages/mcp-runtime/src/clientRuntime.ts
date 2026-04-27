@@ -73,14 +73,14 @@ import {
   getFormatDescription,
   getLargeOutputInstructions,
   persistBinaryContent,
-} from '@claude-code/mcp-runtime/mcpOutputStorage.js'
+} from './mcpOutputStorage.js'
 import {
   getContentSizeEstimate,
   type MCPToolResult,
   mcpContentNeedsTruncation,
   truncateMcpContentIfNeeded,
-} from '@claude-code/mcp-runtime/mcpValidation.js'
-import { WebSocketTransport } from '@claude-code/mcp-runtime/mcpWebSocketTransport.js'
+} from './mcpValidation.js'
+import { WebSocketTransport } from './mcpWebSocketTransport.js'
 import { memoizeWithLRU } from '@claude-code/config/memoize.js'
 import { getWebSocketTLSOptions } from '@claude-code/provider/mtls.js'
 import {
@@ -88,7 +88,7 @@ import {
   getWebSocketProxyAgent,
   getWebSocketProxyUrl,
 } from '@claude-code/provider/proxy.js'
-import { recursivelySanitizeUnicode } from '@claude-code/mcp-runtime/sanitization.js'
+import { recursivelySanitizeUnicode } from './sanitization.js'
 import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { subprocessEnv } from '@claude-code/shell/subprocessEnv.js'
 import {
@@ -103,20 +103,20 @@ import {
   runElicitationHooks,
   runElicitationResultHooks,
 } from './elicitationHandler.js'
-import { buildMcpToolName } from '@claude-code/mcp-runtime/mcpStringUtils.js'
-import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js'
+import { buildMcpToolName } from './mcpStringUtils.js'
+import { normalizeNameForMCP } from './normalization.js'
 import {
   clearMcpAuthCache,
   getMcpAuthCache,
   getMcpAuthCachePath,
   isMcpAuthCached,
   setMcpAuthCacheEntry,
-} from '@claude-code/mcp-runtime/client/authCache.js'
+} from './client/authCache.js'
 import {
   createClaudeAiProxyFetch,
   handleRemoteAuthFailure,
   mcpBaseUrlAnalytics,
-} from '@claude-code/mcp-runtime/client/auth.js'
+} from './client/auth.js'
 import {
   createNodeWsClient,
   getConnectionTimeoutMs,
@@ -125,12 +125,12 @@ import {
   getRemoteMcpServerConnectionBatchSize,
   type WsClientLike,
   wrapFetchWithTimeout,
-} from '@claude-code/mcp-runtime/client/transport.js'
+} from './client/transport.js'
 import {
   addServerNameToResources,
   buildMcpPromptCommandName,
   supportsMcpResources,
-} from '@claude-code/mcp-runtime/client/discovery.js'
+} from './client/discovery.js'
 
 export {
   clearMcpAuthCache,
@@ -150,7 +150,7 @@ import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { classifyMcpToolForCollapse } from '@claude-code/tool-registry/tools/MCPTool/classifyForCollapse.js'
-import { clearKeychainCache } from '@claude-code/mcp-runtime/macOsKeychainHelpers.js'
+import { clearKeychainCache } from './macOsKeychainHelpers.js'
 import { sleep } from '@claude-code/config/sleep'
 import {
   ClaudeAuthProvider,

@@ -4,17 +4,17 @@ import { refreshGrowthBookAfterAuthChange } from '@claude-code/config/feature-fl
 import {
   getGroveNoticeConfig,
   getGroveSettings,
-} from '@claude-code/provider/grove.js'
-import { clearPolicyLimitsCache } from '@claude-code/provider/policyLimits/index.js'
+} from '../../grove.js'
+import { clearPolicyLimitsCache } from '../../policyLimits/index.js'
 // flushTelemetry is loaded lazily to avoid pulling in ~1.1MB of OpenTelemetry at startup
 import { clearRemoteManagedSettingsCache } from '@claude-code/config/remote'
-import { getClaudeAIOAuthTokens, removeApiKey } from '@claude-code/provider/authAlias.js'
-import { clearBetasCaches } from '@claude-code/provider/betas.js'
+import { getClaudeAIOAuthTokens, removeApiKey } from '../../authAlias.js'
+import { clearBetasCaches } from '../../betas.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { getSecureStorage } from '@claude-code/storage/secureStorage.js'
 import { clearToolSchemaCache } from '@claude-code/tool-registry/toolSchemaCache.js'
-import { resetUserCache } from '@claude-code/provider/user.js'
+import { resetUserCache } from '../../user.js'
 
 export async function performLogout({
   clearOnboarding = false,

@@ -24,7 +24,7 @@ import {
   type CuPermissionResponse,
   DEFAULT_GRANT_FLAGS,
   type ScreenshotDims,
-} from '@ant/computer-use-mcp'
+} from '../index.js'
 import * as React from 'react'
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { ComputerUseApproval } from '@claude-code/permission/components/ComputerUseApproval/ComputerUseApproval.js'
@@ -34,11 +34,11 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   checkComputerUseLock,
   tryAcquireComputerUseLock,
-} from '@ant/computer-use-mcp/legacy/computerUseLock.js'
-import { registerEscHotkey } from '@ant/computer-use-mcp/legacy/escHotkey.js'
-import { getChicagoCoordinateMode } from '@ant/computer-use-mcp/legacy/gates.js'
-import { getComputerUseHostAdapter } from '@ant/computer-use-mcp/legacy/hostAdapter.js'
-import { getComputerUseMCPRenderingOverrides } from '@ant/computer-use-mcp/legacy/toolRendering.js'
+} from './computerUseLock.js'
+import { registerEscHotkey } from './escHotkey.js'
+import { getChicagoCoordinateMode } from './gates.js'
+import { getComputerUseHostAdapter } from './hostAdapter.js'
+import { getComputerUseMCPRenderingOverrides } from './toolRendering.js'
 
 type CallOverride = Pick<Tool, 'call'>['call']
 
