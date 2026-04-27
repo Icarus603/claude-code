@@ -237,6 +237,30 @@ export GEMINI_DEFAULT_OPUS_MODEL="gemini-2.5-pro"
 - **Bypass**: `PRE_COMMIT_SKIP=1 git commit ...` only when you truly understand why the rule mis-flags your change.
 - **Ratchets**: many rules count something (LOC, tsc errors, cycles, coupling) and lock the current value. They can shrink but not grow. To bump downward: do the work, run the verifier, update the constant.
 
+## Versioning & Releases
+
+**Tag scheme**: `v<年>.<月>.<月內第N次>` (CalVer)。例:
+```
+v26.4.1   ← 2026 年 4 月第 1 次發版
+v26.4.2   ← 同一天再發也用這個格式
+v26.5.1   ← 進入 5 月,計數歸零
+```
+
+**為什麼這樣設計**:
+- 嚴格 3-segment 純數字 → semver 工具 (`isVersionNewer`、npm `semver`、GitHub release 排序) 全部原生支援,零改動
+- `26.4.99 < 26.5.1` 自然成立,不會發生比較反轉
+- 一個月最多幾十次發版,patch 段不會爆位
+- 跟 ant 官方的 `v2.1.NNN` 視覺/語義都明確區隔
+- **不要再把 "carus" 之類的識別字串塞進版本號** —— 那破壞排序,而且印記應該放在 `--version` 輸出 / banner / README 裡,版本號本質是給機器排序用的
+
+**歷史版本**: `v1.carus.NNN` 系列 (001 ~ 009) 是舊命名,保留不刪當作歷史。`26.x.x > 1.x.x` 數值上成立,auto-update 會自然把使用者升上去。
+
+**發版流程**:
+```bash
+bun run release v26.4.1   # 自動 tag + push;CI 跑 release.yml 構建 + 上傳 binary
+```
+詳見 `scripts/release.ts`。`MACRO.VERSION` 從 git tag 推出來 (`scripts/defines.ts`),沒有任何版本號要手動同步。
+
 ## Working with This Codebase
 
 - **Don't try to fix all tsc errors** — they're from decompilation and don't affect runtime.
