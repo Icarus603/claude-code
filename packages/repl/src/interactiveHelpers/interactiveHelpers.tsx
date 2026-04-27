@@ -348,7 +348,7 @@ export async function showSetupScreens(
     if (devChannels && devChannels.length > 0) {
       const [{ isChannelsEnabled }, { getClaudeAIOAuthTokens }] =
         await Promise.all([
-          import('src/services/mcp/channelAllowlist.js'),
+          import('@claude-code/mcp-runtime/channelAllowlist.js'),
           import('@claude-code/provider/authAlias.js'),
         ])
       // Skip the dialog when channels are blocked (tengu_harbor off or no

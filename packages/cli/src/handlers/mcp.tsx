@@ -94,7 +94,7 @@ export async function mcpServeHandler({
   try {
     const { setup } = await import('@claude-code/cli/setup/setup.js')
     await setup(providedCwd, 'default', false, false, undefined, false)
-    const { startMCPServer } = await import('src/entrypoints/mcp.js')
+    const { startMCPServer } = await import('@claude-code/cli/entry/mcp.js')
     await startMCPServer(providedCwd, debug ?? false, verbose ?? false)
   } catch (error) {
     cliError(`Error: Failed to start MCP server: ${error}`)

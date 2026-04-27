@@ -11,7 +11,7 @@ import {
 } from '@claude-code/ide/ide.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { useIdeConnectionStatus } from '@claude-code/ide/hooks/useIdeConnectionStatus.js'
-import type { IDESelection } from 'src/useIdeSelection.js'
+import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
 
 const MAX_IDE_HINT_SHOW_COUNT = 5
 

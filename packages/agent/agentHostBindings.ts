@@ -16,61 +16,61 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
   return {
     getCwdState: () => {
       try {
-        return require('src/services/bootstrap/state.js').getCwdState()
+        return require('@claude-code/app-host/bootstrap/state.js').getCwdState()
       } catch {
         return process.cwd()
       }
     },
     setCwdState: (cwd: string) => {
       try {
-        require('src/services/bootstrap/state.js').setCwdState(cwd)
+        require('@claude-code/app-host/bootstrap/state.js').setCwdState(cwd)
       } catch {}
     },
     getSdkBetas: () => {
       try {
-        return require('src/services/bootstrap/state.js').getSdkBetas()
+        return require('@claude-code/app-host/bootstrap/state.js').getSdkBetas()
       } catch {
         return []
       }
     },
     getSessionId: () => {
       try {
-        return require('src/services/bootstrap/state.js').getSessionId()
+        return require('@claude-code/app-host/bootstrap/state.js').getSessionId()
       } catch {
         return 'unknown'
       }
     },
     getOriginalCwd: () => {
       try {
-        return require('src/services/bootstrap/state.js').getOriginalCwd()
+        return require('@claude-code/app-host/bootstrap/state.js').getOriginalCwd()
       } catch {
         return process.cwd()
       }
     },
     isSessionPersistenceDisabled: () => {
       try {
-        return require('src/services/bootstrap/state.js').isSessionPersistenceDisabled()
+        return require('@claude-code/app-host/bootstrap/state.js').isSessionPersistenceDisabled()
       } catch {
         return false
       }
     },
     getTotalAPIDuration: () => {
       try {
-        return require('src/services/cost-tracker.js').getTotalAPIDuration()
+        return require('@claude-code/app-host/bootstrap/state.js').getTotalAPIDuration()
       } catch {
         return 0
       }
     },
     getTotalCost: () => {
       try {
-        return require('src/services/cost-tracker.js').getTotalCost()
+        return require('@claude-code/app-host/bootstrap/state.js').getTotalCost()
       } catch {
         return 0
       }
     },
     getModelUsage: () => {
       try {
-        return require('src/services/cost-tracker.js').getModelUsage()
+        return require('@claude-code/app-host/bootstrap/state.js').getModelUsage()
       } catch {
         return {}
       }
@@ -91,7 +91,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     categorizeRetryableAPIError: (error: unknown) => {
       try {
-        return require('src/services/services/api/errors.js').categorizeRetryableAPIError(error)
+        return require('@claude-code/provider/errors.js').categorizeRetryableAPIError(error)
       } catch {
         return error
       }
@@ -203,7 +203,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     selectableUserMessagesFilter: (message: unknown) => {
       try {
-        return require('src/services/components/MessageSelector.js').selectableUserMessagesFilter(message)
+        return require('@claude-code/repl/components/MessageSelector.js').selectableUserMessagesFilter(message)
       } catch {
         return true
       }
@@ -241,7 +241,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     notifyCommandLifecycle: (uuid: string, state: 'started' | 'completed') => {
       try {
-        require('src/utils/commandLifecycle.js').notifyCommandLifecycle(uuid, state)
+        require('@claude-code/shell/commandLifecycle.js').notifyCommandLifecycle(uuid, state)
       } catch {}
     },
     getCommandsByMaxPriority: (maxPriority: 'now' | 'next' | 'later') => {
@@ -293,7 +293,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     createDumpPromptsFetch: (agentIdOrSessionId: string) => {
       try {
-        return require('src/services/services/api/dumpPrompts.js').createDumpPromptsFetch(agentIdOrSessionId)
+        return require('@claude-code/provider/dumpPrompts.js').createDumpPromptsFetch(agentIdOrSessionId)
       } catch {
         return (input: RequestInfo | URL, init?: RequestInit) =>
           globalThis.fetch(input, init)
@@ -301,7 +301,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     fallbackTriggeredErrorCtor: () => {
       try {
-        return require('src/services/services/api/withRetry.js').FallbackTriggeredError
+        return require('@claude-code/provider/withRetry.js').FallbackTriggeredError
       } catch {
         return undefined
       }
@@ -322,14 +322,14 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     promptTooLongErrorMessage: (() => {
       try {
-        return require('src/services/services/api/errors.js').PROMPT_TOO_LONG_ERROR_MESSAGE
+        return require('@claude-code/provider/errors.js').PROMPT_TOO_LONG_ERROR_MESSAGE
       } catch {
         return ''
       }
     })(),
     isPromptTooLongMessage: (message: unknown) => {
       try {
-        return require('src/services/services/api/errors.js').isPromptTooLongMessage(message)
+        return require('@claude-code/provider/errors.js').isPromptTooLongMessage(message)
       } catch {
         return false
       }
@@ -406,14 +406,14 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     },
     startSkillDiscoveryPrefetch: (...args: unknown[]) => {
       try {
-        return require('src/services/services/skillSearch/prefetch.js').startSkillDiscoveryPrefetch(...args)
+        return require('@claude-code/agent/skillSearch/prefetch.js').startSkillDiscoveryPrefetch(...args)
       } catch {
         return undefined
       }
     },
     collectSkillDiscoveryPrefetch: (...args: unknown[]) => {
       try {
-        return require('src/services/services/skillSearch/prefetch.js').collectSkillDiscoveryPrefetch(...args)
+        return require('@claude-code/agent/skillSearch/prefetch.js').collectSkillDiscoveryPrefetch(...args)
       } catch {
         return Promise.resolve([])
       }
@@ -528,7 +528,7 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
     isWithheldContextCollapsePromptTooLong: (message: unknown, querySource: unknown) => {
       try {
         const { isWithheldPromptTooLong } = require('@claude-code/agent/contextCollapse/index.js')
-        const { isPromptTooLongMessage } = require('src/services/services/api/errors.js')
+        const { isPromptTooLongMessage } = require('@claude-code/provider/errors.js')
         return isWithheldPromptTooLong(message, isPromptTooLongMessage, querySource)
       } catch {
         return false
@@ -595,8 +595,8 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     hasAutoMemPathOverride: () => { try { return require('@claude-code/memory/paths').hasAutoMemPathOverride() } catch { return false } },
     isAutoMemPath: (p: string) => { try { return require('@claude-code/memory/paths').isAutoMemPath(p) } catch { return false } },
     isAgentMemoryPath: (p: string) => { try { return require('@claude-code/memory/agentMemory').isAgentMemoryPath(p) } catch { return false } },
-    getOriginalCwd: () => { try { return require('src/services/bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
-    getSessionId: () => { try { return require('src/services/bootstrap/state.js').getSessionId() } catch { return 'unknown' } },
+    getOriginalCwd: () => { try { return require('@claude-code/app-host/bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
+    getSessionId: () => { try { return require('@claude-code/app-host/bootstrap/state.js').getSessionId() } catch { return 'unknown' } },
     getCwd: () => { try { return require('@claude-code/app-host/bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
     getConfigHomeDir: () => { try { return require('@claude-code/config/env/utils').getClaudeConfigHomeDir() } catch { return '' } },
     getFsImplementation: () => { try { return require('@claude-code/storage/fsOperations.js').getFsImplementation() } catch { return require('node:fs') } },
@@ -620,13 +620,13 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     setAutoMode: (v: unknown) => { try { require('@claude-code/permission/autoModeState.js').setAutoMode(v) } catch {} },
     setDirtyAutoMode: () => { try { require('@claude-code/permission/autoModeState.js').setDirtyAutoMode() } catch {} },
     clearDirtyAutoMode: () => { try { require('@claude-code/permission/autoModeState.js').clearDirtyAutoMode() } catch {} },
-    addToTurnClassifierDuration: (ms: number) => { try { require('src/services/bootstrap/state.js').addToTurnClassifierDuration(ms) } catch {} },
-    getTotalInputTokens: () => { try { return require('src/services/bootstrap/state.js').getTotalInputTokens() } catch { return 0 } },
-    getTotalOutputTokens: () => { try { return require('src/services/bootstrap/state.js').getTotalOutputTokens() } catch { return 0 } },
-    getTotalCacheCreationInputTokens: () => { try { return require('src/services/bootstrap/state.js').getTotalCacheCreationInputTokens() } catch { return 0 } },
-    getTotalCacheReadInputTokens: () => { try { return require('src/services/bootstrap/state.js').getTotalCacheReadInputTokens() } catch { return 0 } },
+    addToTurnClassifierDuration: (ms: number) => { try { require('@claude-code/app-host/bootstrap/state.js').addToTurnClassifierDuration(ms) } catch {} },
+    getTotalInputTokens: () => { try { return require('@claude-code/app-host/bootstrap/state.js').getTotalInputTokens() } catch { return 0 } },
+    getTotalOutputTokens: () => { try { return require('@claude-code/app-host/bootstrap/state.js').getTotalOutputTokens() } catch { return 0 } },
+    getTotalCacheCreationInputTokens: () => { try { return require('@claude-code/app-host/bootstrap/state.js').getTotalCacheCreationInputTokens() } catch { return 0 } },
+    getTotalCacheReadInputTokens: () => { try { return require('@claude-code/app-host/bootstrap/state.js').getTotalCacheReadInputTokens() } catch { return 0 } },
     logEvent: (event: string, metadata?: Record<string, unknown>) => { try { (require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')).logEvent(event, metadata) } catch {} },
-    sanitizeToolNameForAnalytics: (name: string) => { try { return require('src/services/services/eventMetadata.js').sanitizeToolNameForAnalytics(name) } catch { return name } },
+    sanitizeToolNameForAnalytics: (name: string) => { try { return require('@claude-code/agent/eventMetadata.js').sanitizeToolNameForAnalytics(name) } catch { return name } },
     clearClassifierChecking: () => { try { require('@claude-code/permission/classifierApprovals.js').clearClassifierChecking() } catch {} },
     setClassifierChecking: (v: boolean) => { try { require('@claude-code/permission/classifierApprovals.js').setClassifierChecking(v) } catch {} },
     isInProtectedNamespace: () => { try { return require('@claude-code/config/env/utils').isInProtectedNamespace() } catch { return false } },
@@ -638,15 +638,15 @@ export function buildPermissionHostExtraBindings(): Record<string, unknown> {
     isAutoAllowBashIfSandboxedEnabled: () => { try { return require('@claude-code/shell/sandbox/sandbox-adapter.js').SandboxManager.isAutoAllowBashIfSandboxedEnabled() } catch { return false } },
     classifyYoloAction: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').classifyYoloAction(...a) } catch { return null } },
     formatActionForClassifier: (...a: unknown[]) => { try { return require('@claude-code/permission/yoloClassifier.js').formatActionForClassifier(...a) } catch { return '' } },
-    getToolsForDefaultPreset: () => { try { return require('src/services/tools.js').getToolsForDefaultPreset() } catch { return [] } },
-    handleAutoModeTransition: (mode: unknown) => { try { require('src/services/bootstrap/state.js').handleAutoModeTransition(mode) } catch {} },
-    handlePlanModeTransition: (mode: unknown) => { try { require('src/services/bootstrap/state.js').handlePlanModeTransition(mode) } catch {} },
-    setHasExitedPlanMode: (v: unknown) => { try { require('src/services/bootstrap/state.js').setHasExitedPlanMode(v) } catch {} },
-    setNeedsAutoModeExitAttachment: (v: unknown) => { try { require('src/services/bootstrap/state.js').setNeedsAutoModeExitAttachment(v) } catch {} },
+    getToolsForDefaultPreset: () => { try { return require('@claude-code/tool-registry/runtime').getToolsForDefaultPreset() } catch { return [] } },
+    handleAutoModeTransition: (mode: unknown) => { try { require('@claude-code/app-host/bootstrap/state.js').handleAutoModeTransition(mode) } catch {} },
+    handlePlanModeTransition: (mode: unknown) => { try { require('@claude-code/app-host/bootstrap/state.js').handlePlanModeTransition(mode) } catch {} },
+    setHasExitedPlanMode: (v: unknown) => { try { require('@claude-code/app-host/bootstrap/state.js').setHasExitedPlanMode(v) } catch {} },
+    setNeedsAutoModeExitAttachment: (v: unknown) => { try { require('@claude-code/app-host/bootstrap/state.js').setNeedsAutoModeExitAttachment(v) } catch {} },
     loadAllPermissionRulesFromDisk: () => { try { return require('@claude-code/permission/permissionsLoader.js').loadAllPermissionRulesFromDisk() } catch { return [] } },
-    addDirHelpMessage: () => { try { return require('src/services/commands/add-dir/validation.js').addDirHelpMessage() } catch { return '' } },
-    validateDirectoryForWorkspace: (dir: unknown, cwd: unknown) => { try { return require('src/services/commands/add-dir/validation.js').validateDirectoryForWorkspace(dir, cwd) } catch { return { valid: true } } },
-    parseToolPreset: (preset: unknown) => { try { return require('src/services/tools.js').parseToolPreset(preset) } catch { return [] } },
+    addDirHelpMessage: () => { try { return require('@claude-code/permission/commands/add-dir/validation.js').addDirHelpMessage() } catch { return '' } },
+    validateDirectoryForWorkspace: (dir: unknown, cwd: unknown) => { try { return require('@claude-code/permission/commands/add-dir/validation.js').validateDirectoryForWorkspace(dir, cwd) } catch { return { valid: true } } },
+    parseToolPreset: (preset: unknown) => { try { return require('@claude-code/tool-registry/runtime').parseToolPreset(preset) } catch { return [] } },
     safeResolvePath: (fs: unknown, p: unknown) => { try { return require('@claude-code/storage/fsOperations.js').safeResolvePath(fs, p) } catch { return { resolvedPath: p } } },
     modelSupportsAutoMode: (model: unknown) => { try { return require('@claude-code/provider/betas.js').modelSupportsAutoMode(model) } catch { return false } },
     gracefulShutdown: (code: unknown) => { try { return require('@claude-code/app-host/bootstrap/gracefulShutdown.js').gracefulShutdown(code) } catch { return Promise.reject(new Error('gracefulShutdown unavailable')) } },
@@ -668,7 +668,7 @@ export function buildMemoryHostExtraBindings(): Record<string, unknown> {
   return {
     registerDreamTask: (toolUseContext: unknown, params: unknown) => {
       try {
-        return require('src/services/tasks/DreamTask/DreamTask.js').registerDreamTask(setter(toolUseContext), params)
+        return require('@claude-code/agent/tasks/DreamTask/DreamTask.js').registerDreamTask(setter(toolUseContext), params)
       } catch {
         return ''
       }
@@ -680,17 +680,17 @@ export function buildMemoryHostExtraBindings(): Record<string, unknown> {
       toolUseContext: unknown,
     ) => {
       try {
-        require('src/services/tasks/DreamTask/DreamTask.js').addDreamTurn(taskId, turn, paths, setter(toolUseContext))
+        require('@claude-code/agent/tasks/DreamTask/DreamTask.js').addDreamTurn(taskId, turn, paths, setter(toolUseContext))
       } catch {}
     },
     completeDreamTask: (taskId: string, toolUseContext: unknown) => {
       try {
-        require('src/services/tasks/DreamTask/DreamTask.js').completeDreamTask(taskId, setter(toolUseContext))
+        require('@claude-code/agent/tasks/DreamTask/DreamTask.js').completeDreamTask(taskId, setter(toolUseContext))
       } catch {}
     },
     failDreamTask: (taskId: string, toolUseContext: unknown) => {
       try {
-        require('src/services/tasks/DreamTask/DreamTask.js').failDreamTask(taskId, setter(toolUseContext))
+        require('@claude-code/agent/tasks/DreamTask/DreamTask.js').failDreamTask(taskId, setter(toolUseContext))
       } catch {}
     },
     getDreamTaskState: (taskId: string, toolUseContext: unknown) => {
@@ -702,7 +702,7 @@ export function buildMemoryHostExtraBindings(): Record<string, unknown> {
     },
     isDreamTask: (state: unknown) => {
       try {
-        return require('src/services/tasks/DreamTask/DreamTask.js').isDreamTask(state)
+        return require('@claude-code/agent/tasks/DreamTask/DreamTask.js').isDreamTask(state)
       } catch {
         return false
       }

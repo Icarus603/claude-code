@@ -301,7 +301,7 @@ export function installPluginBindings(): void {
   setGetMcpTypesFn(() => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require('src/services/mcp/types.js')
+      return require('@claude-code/mcp-runtime/types.js')
     } catch {
       return undefined
     }
