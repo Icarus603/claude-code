@@ -9,7 +9,10 @@ import { Box, Text } from '@anthropic/ink'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
 import { getMaxVersion, getMaxVersionMessage } from '@claude-code/updater/autoUpdater.js'
 import { isAutoUpdaterDisabled } from '@claude-code/config'
-import { installLatest } from '@claude-code/updater/nativeInstaller/index.js'
+import {
+  getLatestVersion,
+  installLatest,
+} from '@claude-code/updater/nativeInstaller/index.js'
 import { isVersionNewer } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 
@@ -67,6 +70,10 @@ export function NativeAutoUpdater({
     latest?: string | null
   }>({})
   const [maxVersionIssue, setMaxVersionIssue] = useState<string | null>(null)
+  // 'checking' = querying GitHub for the latest tag.
+  // 'downloading' = a newer version was found and the binary is being fetched.
+  // null = idle (initial, between checks, or after success/failure).
+  const [phase, setPhase] = useState<'checking' | 'downloading' | null>(null)
   const updateSemver = useUpdateNotification(autoUpdaterResult?.version)
   const channel = getInitialSettings()?.autoUpdatesChannel ?? 'latest'
 
@@ -97,6 +104,7 @@ export function NativeAutoUpdater({
     }
 
     onChangeIsUpdating(true)
+    setPhase('checking')
     const startTime = Date.now()
 
     // Log the start of an auto-update check for funnel analysis
@@ -108,6 +116,21 @@ export function NativeAutoUpdater({
       if (maxVersion && isVersionNewer(MACRO.VERSION, maxVersion)) {
         const msg = await getMaxVersionMessage()
         setMaxVersionIssue(msg ?? 'affects your version')
+      }
+
+      // Peek at the latest tag before kicking off installLatest so we can
+      // distinguish "checking" from "downloading" in the footer. installLatest
+      // will fetch this again internally — that's a tiny JSON request and the
+      // in-flight dedup means no double-download. If the peek fails for any
+      // reason we just fall through; installLatest's own error handling takes
+      // over.
+      try {
+        const latest = await getLatestVersion(channel)
+        if (latest && isVersionNewer(latest, MACRO.VERSION)) {
+          setPhase('downloading')
+        }
+      } catch {
+        // Swallow — installLatest will surface the real error
       }
 
       const result = await installLatest(channel)
@@ -164,6 +187,7 @@ export function NativeAutoUpdater({
       })
     } finally {
       onChangeIsUpdating(false)
+      setPhase(null)
     }
     // isUpdating intentionally omitted from deps; we read isUpdatingRef
     // instead so the guard is always current without changing callback
@@ -180,13 +204,14 @@ export function NativeAutoUpdater({
   useInterval(checkForUpdates, 30 * 60 * 1000)
 
   const hasUpdateResult = !!autoUpdaterResult?.version
-  const hasVersionInfo = !!versions.current && !!versions.latest
   // Show the component when:
   // - warning banner needed (above max version), or
   // - there's an update result to display (success/error), or
-  // - actively checking and we have version info to show
-  const shouldRender =
-    !!maxVersionIssue || hasUpdateResult || (isUpdating && hasVersionInfo)
+  // - actively checking (we don't gate on versions info — setVersions only
+  //   fires after installLatest resolves, so requiring it would suppress the
+  //   progress text for the entire download window, which is exactly when the
+  //   user wants to see something).
+  const shouldRender = !!maxVersionIssue || hasUpdateResult || isUpdating
 
   if (!shouldRender) {
     return null
@@ -202,7 +227,7 @@ export function NativeAutoUpdater({
       {isUpdating ? (
         <Box>
           <Text dimColor wrap="truncate">
-            Checking for updates
+            {phase === 'downloading' ? 'Auto-updating…' : 'Checking for updates'}
           </Text>
         </Box>
       ) : (
