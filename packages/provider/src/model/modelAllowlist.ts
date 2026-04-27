@@ -1,7 +1,7 @@
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
-import { isModelAlias, isModelFamilyAlias } from '@claude-code/provider/modelAliases.js'
-import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
-import { resolveOverriddenModel } from '@claude-code/provider/model/modelStrings.js'
+import { isModelAlias, isModelFamilyAlias } from '../modelAliases.js'
+import { parseUserSpecifiedModel } from '../model.js'
+import { resolveOverriddenModel } from './modelStrings.js'
 
 /**
  * Check if a model belongs to a given family by checking if its name

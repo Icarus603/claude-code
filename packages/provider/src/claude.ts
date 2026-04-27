@@ -1,4 +1,4 @@
-import { getProviderAdapter } from '@claude-code/provider'
+import { getProviderAdapter } from './index.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type {
   AssistantMessage,
@@ -6,12 +6,12 @@ import type {
   StreamEvent,
   SystemAPIErrorMessage,
 } from '@claude-code/agent/messageShapes'
-import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
-import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
+import type { SystemPrompt } from './systemPromptType.js'
+import type { ThinkingConfig } from './thinking.js'
 import './providerHostSetup.js'
-import type { Options } from '@claude-code/provider/claudeLegacy'
+import type { Options } from './claudeLegacy.js'
 
-export * from '@claude-code/provider/claudeLegacy'
+export * from './claudeLegacy.js'
 
 export async function queryModelWithoutStreaming({
   messages,

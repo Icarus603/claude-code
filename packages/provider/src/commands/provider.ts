@@ -1,6 +1,6 @@
 import type { Command } from '@claude-code/command-runtime/runtime'
 import type { LocalCommandCall } from '@claude-code/agent/command.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getAPIProvider } from '../providers.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import { applyConfigEnvironmentVariables } from '@claude-code/config/managedEnv.js'

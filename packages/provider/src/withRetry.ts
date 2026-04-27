@@ -7,11 +7,11 @@ import {
 } from '@anthropic-ai/sdk'
 import type { QuerySource } from '@claude-code/agent/querySource'
 import type { SystemAPIErrorMessage } from '@claude-code/agent/messageShapes'
-import { isAwsCredentialsProviderError } from '@claude-code/provider/aws.js'
+import { isAwsCredentialsProviderError } from './aws.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { createSystemAPIErrorMessage } from '@claude-code/agent/messages.js'
-import { getAPIProviderForStatsig } from '@claude-code/provider/providers.js'
+import { getAPIProviderForStatsig } from './providers.js'
 import {
   clearApiKeyHelperCache,
   clearAwsCredentialsCache,
@@ -20,7 +20,7 @@ import {
   handleOAuth401Error,
   isClaudeAISubscriber,
   isEnterpriseSubscriber,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
@@ -30,20 +30,20 @@ import {
   isFastModeCooldown,
   isFastModeEnabled,
   triggerFastModeCooldown,
-} from '@claude-code/provider/fastMode.js'
-import { isNonCustomOpusModel } from '@claude-code/provider/model.js'
-import { disableKeepAlive } from '@claude-code/provider/proxy.js'
+} from './fastMode.js'
+import { isNonCustomOpusModel } from './model.js'
+import { disableKeepAlive } from './proxy.js'
 import { sleep } from '@claude-code/config/sleep'
-import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
+import type { ThinkingConfig } from './thinking.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   checkMockRateLimitError,
   isMockRateLimitError,
-} from '@claude-code/provider/rateLimitMocking.js'
-import { REPEATED_529_ERROR_MESSAGE } from '@claude-code/provider/errors.js'
-import { extractConnectionErrorDetails } from '@claude-code/provider/errorUtils.js'
+} from './rateLimitMocking.js'
+import { REPEATED_529_ERROR_MESSAGE } from './errors.js'
+import { extractConnectionErrorDetails } from './errorUtils.js'
 import { readEnv } from '@claude-code/config/env'
 
 const abortError = () => new APIUserAbortError()

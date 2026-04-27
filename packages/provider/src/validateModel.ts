@@ -1,7 +1,7 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import { MODEL_ALIASES } from '@claude-code/provider/modelAliases.js'
-import { isModelAllowed } from '@claude-code/provider/model/modelAllowlist.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { MODEL_ALIASES } from './modelAliases.js'
+import { isModelAllowed } from './model/modelAllowlist.js'
+import { getAPIProvider } from './providers.js'
 import { sideQuery } from '@claude-code/agent/sideQuery.js'
 import {
   NotFoundError,
@@ -9,7 +9,7 @@ import {
   APIConnectionError,
   AuthenticationError,
 } from '@anthropic-ai/sdk'
-import { getModelStrings } from '@claude-code/provider/model/modelStrings.js'
+import { getModelStrings } from './model/modelStrings.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 // Cache valid models to avoid repeated API calls

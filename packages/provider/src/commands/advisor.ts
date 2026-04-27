@@ -4,13 +4,13 @@ import {
   canUserConfigureAdvisor,
   isValidAdvisorModel,
   modelSupportsAdvisor,
-} from '@claude-code/provider/advisor.js'
+} from '../advisor.js'
 import {
   getDefaultMainLoopModelSetting,
   normalizeModelStringForAPI,
   parseUserSpecifiedModel,
-} from '@claude-code/provider/model.js'
-import { validateModel } from '@claude-code/provider/validateModel.js'
+} from '../model.js'
+import { validateModel } from '../validateModel.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
 
 const call: LocalCommandCall = async (args, context) => {

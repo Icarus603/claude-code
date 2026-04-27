@@ -4,17 +4,17 @@ import {
   getAnthropicApiKey,
   getClaudeAIOAuthTokens,
   hasProfileScope,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import { z } from 'zod'
-import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
+import { getOauthConfig, OAUTH_BETA_HEADER } from './oauthConstants.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { withOAuth401Retry } from '@claude-code/provider/http.js'
+import { withOAuth401Retry } from './http.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getAPIProvider } from './providers.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
-import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
+import { getClaudeCodeUserAgent } from './userAgent.js'
 
 const bootstrapResponseSchema = lazySchema(() =>
   z.object({

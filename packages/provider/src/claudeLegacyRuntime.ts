@@ -19,7 +19,7 @@ import type {
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { Stream } from '@anthropic-ai/sdk/streaming.mjs'
-import { getProviderAdapter } from '@claude-code/provider'
+import { getProviderAdapter } from './index.js'
 // V7 §11.2: app-host/providerHostSetup imports THIS module to register
 // legacy bindings with the host. The reverse side-effect import we used
 // to do here closed a 2-file cycle. Callers reaching legacy runtime go
@@ -30,8 +30,8 @@ import {
   getAPIProvider,
   getProviderForModel,
   isFirstPartyAnthropicBaseUrl,
-} from '@claude-code/provider/model/providers.js'
-import { unpackModelId } from '@claude-code/provider/connections.js'
+} from './model/providers.js'
+import { unpackModelId } from './connections.js'
 import {
   getAttributionHeader,
   getCLISyspromptPrefix,
@@ -49,7 +49,7 @@ import {
   type ConnectorTextBlock,
   type ConnectorTextDelta,
   isConnectorTextBlock,
-} from '@claude-code/provider/connectorTextTypes'
+} from './connectorTextTypes.js'
 import type {
   AssistantMessage,
   Message,
@@ -63,14 +63,14 @@ import {
   logAPIPrefix,
   splitSysPromptPrefix,
   toolToAPISchema,
-} from '@claude-code/provider/legacy/api.js'
-import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
+} from './legacy/api.js'
+import { getOauthAccountInfo } from './authAlias.js'
 import {
   getBedrockExtraBodyParamsBetas,
   getMergedBetas,
   getModelBetas,
   sanitizeBetaHeaders,
-} from '@claude-code/provider/betas.js'
+} from './betas.js'
 import { getOrCreateUserID } from '@claude-code/config'
 import {
   CAPPED_DEFAULT_MAX_TOKENS,
@@ -80,7 +80,7 @@ import {
 import { resolveAppliedEffort } from '@claude-code/agent/effort.js'
 import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { computeFingerprintFromMessages } from '@claude-code/provider/fingerprint.js'
+import { computeFingerprintFromMessages } from './fingerprint.js'
 import { captureAPIRequest, logError } from '@claude-code/local-observability/log.js'
 import {
   createAssistantAPIErrorMessage,
@@ -99,18 +99,18 @@ import {
   getDefaultSonnetModel,
   getSmallFastModel,
   isNonCustomOpusModel,
-} from '@claude-code/provider/model/model.js'
+} from './model/model.js'
 import {
   asSystemPrompt,
   type SystemPrompt,
-} from '@claude-code/provider/systemPromptType.js'
+} from './systemPromptType.js'
 import { tokenCountFromLastAPIResponse } from '@claude-code/agent/tokens.js'
 import { getDynamicConfig_BLOCKS_ON_INIT } from '@claude-code/config/feature-flags'
 import {
   currentLimits,
   extractQuotaStatusFromError,
   extractQuotaStatusFromHeaders,
-} from '@claude-code/provider/claudeAiLimits.js'
+} from './claudeAiLimits.js'
 import { getAPIContextManagement } from '@claude-code/agent/compaction/apiMicrocompact.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -155,7 +155,7 @@ import {
 } from '@claude-code/agent/constants/betas.js'
 import type { QuerySource } from '@claude-code/agent/constants/querySource.js'
 import type { Notification } from '@claude-code/app-host/context/notifications.js'
-import { addToTotalSessionCost } from '@claude-code/provider/costTracker.js'
+import { addToTotalSessionCost } from './costTracker.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { AgentId } from '@claude-code/agent/idTypes'
 import {
@@ -164,15 +164,15 @@ import {
   isAdvisorEnabled,
   isValidAdvisorModel,
   modelSupportsAdvisor,
-} from '@claude-code/provider/advisor.js'
+} from './advisor.js'
 import { getAgentContext } from '@claude-code/agent/agentContext.js'
-import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
+import { isClaudeAISubscriber } from './authAlias.js'
 import {
   getToolSearchBetaHeader,
   modelSupportsStructuredOutputs,
   shouldIncludeFirstPartyOnlyBetas,
   shouldUseGlobalCacheScope,
-} from '@claude-code/provider/betas.js'
+} from './betas.js'
 import { CLAUDE_IN_CHROME_MCP_SERVER_NAME } from '@claude-code/agent/claudeInChrome/common.js'
 import { CHROME_TOOL_SEARCH_INSTRUCTIONS } from '@claude-code/agent/claudeInChrome/prompt.js'
 import { getMaxThinkingTokensForModel } from '@claude-code/agent/context.js'
@@ -184,17 +184,17 @@ import {
   isFastModeCooldown,
   isFastModeEnabled,
   isFastModeSupportedByModel,
-} from '@claude-code/provider/fastMode.js'
+} from './fastMode.js'
 import { returnValue } from '@claude-code/config/generators'
 import { headlessProfilerCheckpoint } from '@claude-code/local-observability/aggregates/headlessProfiler.js'
 import { isMcpInstructionsDeltaEnabled } from '@claude-code/mcp-runtime/mcpInstructionsDelta.js'
-import { calculateUSDCost } from '@claude-code/provider/modelCost.js'
+import { calculateUSDCost } from './modelCost.js'
 import { endQueryProfile, queryCheckpoint } from '@claude-code/local-observability/aggregates/queryProfiler.js'
 import {
   modelSupportsAdaptiveThinking,
   modelSupportsThinking,
   type ThinkingConfig,
-} from '@claude-code/provider/thinking.js'
+} from './thinking.js'
 import {
   extractDiscoveredToolNames,
   isDeferredToolsDeltaEnabled,
@@ -211,11 +211,11 @@ import { count } from '@claude-code/tool-registry/utils/array.js'
 import { insertBlockAfterToolResults } from '@claude-code/agent/contentArray.js'
 import { validateBoundedIntEnvVar } from '@claude-code/config/env/validation'
 import { safeParseJSON } from '@claude-code/storage/json.js'
-import { getInferenceProfileBackingModel } from '@claude-code/provider/model/bedrock.js'
+import { getInferenceProfileBackingModel } from './model/bedrock.js'
 import {
   normalizeModelStringForAPI,
   parseUserSpecifiedModel,
-} from '@claude-code/provider/model/model.js'
+} from './model/model.js'
 import {
   startSessionActivity,
   stopSessionActivity,
@@ -237,14 +237,14 @@ import {
 } from '@claude-code/agent/compaction/microCompact.js'
 import { getInitializationStatus } from '@claude-code/ide/lsp/manager.js'
 import { isToolFromMcpServer } from '@claude-code/mcp-runtime/utils.js'
-import { withStreamingVCR, withVCR } from '@claude-code/provider/vcr.js'
-import { CLIENT_REQUEST_ID_HEADER, getAnthropicClient } from '@claude-code/provider'
+import { withStreamingVCR, withVCR } from './vcr.js'
+import { CLIENT_REQUEST_ID_HEADER, getAnthropicClient } from './index.js'
 import {
   API_ERROR_MESSAGE_PREFIX,
   CUSTOM_OFF_SWITCH_MESSAGE,
   getAssistantMessageFromError,
   getErrorMessageIfRefusal,
-} from '@claude-code/provider/errors.js'
+} from './errors.js'
 import {
   EMPTY_USAGE,
   type GlobalCacheStrategy,
@@ -252,19 +252,19 @@ import {
   logAPIQuery,
   logAPISuccessAndDuration,
   type NonNullableUsage,
-} from '@claude-code/provider/logging.js'
+} from './logging.js'
 import {
   CACHE_TTL_1HOUR_MS,
   checkResponseForCacheBreak,
   recordPromptState,
-} from '@claude-code/provider/promptCacheBreakDetection.js'
+} from './promptCacheBreakDetection.js'
 import {
   CannotRetryError,
   FallbackTriggeredError,
   is529Error,
   type RetryContext,
   withRetry,
-} from '@claude-code/provider/withRetry.js'
+} from './withRetry.js'
 
 // Define a type that represents valid JSON values
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray
@@ -1374,8 +1374,8 @@ async function* queryModel(
   {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { resolveConnectionForModel } = require(
-      '@claude-code/provider/providers.js',
-    ) as typeof import('@claude-code/provider/providers.js')
+      './providers.js',
+    ) as typeof import('./providers.js')
     const currentConnId = options.model
       ? resolveConnectionForModel(options.model)?.id
       : undefined

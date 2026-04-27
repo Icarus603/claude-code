@@ -1,7 +1,7 @@
 import {
   installMcpRuntimeHostBindings,
   type McpRuntimeHostBindings,
-} from '@claude-code/mcp-runtime'
+} from './index.js'
 import {
   handleMcpSetServers,
   reconcileMcpServers,
@@ -34,7 +34,7 @@ import {
   runElicitationHooks,
   runElicitationResultHooks,
 } from './elicitationHandler.js'
-import { setupVscodeSdkMcp } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
+import { setupVscodeSdkMcp } from './vscodeSdkMcp.js'
 
 let installed = false
 

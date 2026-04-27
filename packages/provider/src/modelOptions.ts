@@ -4,19 +4,19 @@ import {
   isClaudeAISubscriber,
   isMaxSubscriber,
   isTeamPremiumSubscriber,
-} from '@claude-code/provider/authAlias.js'
-import { getModelStrings } from '@claude-code/provider/model/modelStrings.js'
-import { getAntModels } from '@claude-code/provider/antModels.js'
+} from './authAlias.js'
+import { getModelStrings } from './model/modelStrings.js'
+import { getAntModels } from './antModels.js'
 import {
   COST_TIER_3_15,
   COST_HAIKU_35,
   COST_HAIKU_45,
   formatModelPricing,
-} from '@claude-code/provider/modelCost.js'
+} from './modelCost.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
-import { checkOpus1mAccess, checkSonnet1mAccess } from '@claude-code/provider/model/check1mAccess.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { isModelAllowed } from '@claude-code/provider/model/modelAllowlist.js'
+import { checkOpus1mAccess, checkSonnet1mAccess } from './model/check1mAccess.js'
+import { getAPIProvider } from './providers.js'
+import { isModelAllowed } from './model/modelAllowlist.js'
 import {
   getCanonicalName,
   getClaudeAiUserDefaultModelDescription,
@@ -30,15 +30,15 @@ import {
   getOpus46PricingSuffix,
   renderDefaultModelSetting,
   type ModelSetting,
-} from '@claude-code/provider/model.js'
+} from './model.js'
 import { has1mContext } from '@claude-code/agent/context.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { readEnv } from '@claude-code/config/env/utils'
-import { getEnabledConnections } from '@claude-code/provider/providers.js'
+import { getEnabledConnections } from './providers.js'
 import {
   composeModelId,
   prettyModelLabel,
-} from '@claude-code/provider/connections.js'
+} from './connections.js'
 
 // @[MODEL LAUNCH]: Update all the available and default model option strings below.
 

@@ -1,4 +1,4 @@
-import { normalizeNameForMCP } from '@claude-code/mcp-runtime/normalization.js';
+import { normalizeNameForMCP } from '../normalization.js';
 
 export function supportsMcpResources(capabilities: { resources?: unknown } | undefined): boolean {
   return !!capabilities?.resources;

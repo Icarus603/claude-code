@@ -5,7 +5,7 @@ import type {
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { createHash } from 'crypto'
 import { SYSTEM_PROMPT_DYNAMIC_BOUNDARY } from '@claude-code/agent/prompts.js'
-import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
+import { getSystemContext, getUserContext } from '../context.js'
 import { isAnalyticsDisabled } from '@claude-code/agent/services/privacyConfig.js'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
@@ -27,7 +27,7 @@ import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/Fi
 import { getTools } from '@claude-code/tool-registry/runtime'
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { z } from 'zod/v4'
-import { CLI_SYSPROMPT_PREFIXES } from '@claude-code/provider/systemConstants.js'
+import { CLI_SYSPROMPT_PREFIXES } from '../systemConstants.js'
 import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
 import type { Tool, ToolPermissionContext, Tools } from '@claude-code/tool-registry/Tool.js'
 import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
@@ -39,7 +39,7 @@ import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   modelSupportsStructuredOutputs,
   shouldUseGlobalCacheScope,
-} from '@claude-code/provider/betas.js'
+} from '../betas.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
@@ -47,7 +47,7 @@ import { createUserMessage } from '@claude-code/agent/messages.js'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
-} from '@claude-code/provider/model/providers.js'
+} from '../model/providers.js'
 import {
   getFileReadIgnorePatterns,
   normalizePatternsToPath,
@@ -60,7 +60,7 @@ import {
 import { getPlatform } from '@claude-code/config/platform'
 import { countFilesRoundedRg } from '@claude-code/tool-registry/ripgrep.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
+import type { SystemPrompt } from '../systemPromptType.js'
 import { getToolSchemaCache } from '@claude-code/tool-registry/toolSchemaCache.js'
 import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
 import { zodToJsonSchema } from '@claude-code/agent/zodSchema/zodToJsonSchema.js'

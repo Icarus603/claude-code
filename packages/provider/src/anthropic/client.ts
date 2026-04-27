@@ -297,8 +297,8 @@ export async function getAnthropicClient({
   // for the active model; no shared global state.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { resolveConnectionForModel } = require(
-    '@claude-code/provider/providers.js',
-  ) as typeof import('@claude-code/provider/providers.js')
+    '../providers.js',
+  ) as typeof import('../providers.js')
   const conn = model ? resolveConnectionForModel(model) : undefined
 
   // V7 §11.6 — Codex routing seam.
@@ -324,8 +324,8 @@ export async function getAnthropicClient({
   if (conn?.protocol === 'codex' && conn.auth.type === 'oauth') {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { createCodexFetch } = require(
-      '@claude-code/provider/codex/fetchAdapter.js',
-    ) as typeof import('@claude-code/provider/codex/fetchAdapter.js')
+      '../codex/fetchAdapter.js',
+    ) as typeof import('../codex/fetchAdapter.js')
     const codexClientConfig: ConstructorParameters<typeof Anthropic>[0] = {
       // The SDK requires `apiKey` to be a non-empty string — our fetch
       // adapter handles real auth via the codex Bearer token, so this

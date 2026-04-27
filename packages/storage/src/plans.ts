@@ -16,8 +16,8 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
-import { getEnvironmentKind } from '@claude-code/storage/filePersistence/outputsScanner.js'
-import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { getEnvironmentKind } from './filePersistence/outputsScanner.js'
+import { getFsImplementation } from './fsOperations.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { generateWordSlug } from '@claude-code/tool-registry/words.js'
@@ -389,7 +389,7 @@ export async function persistFileSnapshotIfRemote(): Promise<void> {
       snapshotFiles,
     }
 
-    const { recordTranscript } = await import('@claude-code/storage/sessionStorage.js')
+    const { recordTranscript } = await import('./sessionStorage.js')
     await recordTranscript([message])
   } catch (error) {
     logError(error)

@@ -1,5 +1,5 @@
 import memoize from 'lodash-es/memoize.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getAPIProvider } from '../providers.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 export type ModelCapabilityOverride =

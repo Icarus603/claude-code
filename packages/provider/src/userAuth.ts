@@ -5,13 +5,13 @@ import { mkdir, stat } from 'fs/promises'
 import memoize from 'lodash-es/memoize.js'
 import { join } from 'path'
 import { readEnv } from '@claude-code/config/env/utils'
-import { CLAUDE_AI_PROFILE_SCOPE } from '@claude-code/provider/oauthConstants'
+import { CLAUDE_AI_PROFILE_SCOPE } from './oauthConstants.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getModelStrings } from '@claude-code/provider/model/modelStrings.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getModelStrings } from './model/modelStrings.js'
+import { getAPIProvider } from './providers.js'
 import {
   getIsNonInteractiveSession,
   preferThirdPartyAuthentication,
@@ -19,29 +19,29 @@ import {
 import {
   getMockSubscriptionType,
   shouldUseMockSubscription,
-} from '@claude-code/provider/mockRateLimits.js'
+} from './mockRateLimits.js'
 import {
   isOAuthTokenExpired,
   refreshOAuthToken,
   shouldUseClaudeAIAuth,
-} from '@claude-code/provider/oauth/client.js'
-import { getOauthProfileFromOauthToken } from '@claude-code/provider/oauth/getOauthProfile.js'
-import type { OAuthTokens, SubscriptionType } from '@claude-code/provider/oauth/types.js'
+} from './oauth/client.js'
+import { getOauthProfileFromOauthToken } from './oauth/getOauthProfile.js'
+import type { OAuthTokens, SubscriptionType } from './oauth/types.js'
 import {
   getApiKeyFromFileDescriptor,
   getOAuthTokenFromFileDescriptor,
-} from '@claude-code/provider/authFileDescriptor.js'
+} from './authFileDescriptor.js'
 import {
   maybeRemoveApiKeyFromMacOSKeychainThrows,
   normalizeApiKeyForConfig,
-} from '@claude-code/provider/authPortable.js'
+} from './authPortable.js'
 import {
   checkStsCallerIdentity,
   clearAwsIniCache,
   isValidAwsStsOutput,
-} from '@claude-code/provider/aws.js'
-import { AwsAuthStatusManager } from '@claude-code/provider/awsAuthStatusManager.js'
-import { clearBetasCaches } from '@claude-code/provider/betas.js'
+} from './aws.js'
+import { AwsAuthStatusManager } from './awsAuthStatusManager.js'
+import { clearBetasCaches } from './betas.js'
 import {
   type AccountInfo,
   checkHasTrustDialogAccepted,

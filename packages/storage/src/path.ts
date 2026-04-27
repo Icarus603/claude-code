@@ -1,9 +1,9 @@
 import { homedir } from 'os'
 import { dirname, isAbsolute, join, normalize, relative, resolve } from 'path'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { getFsImplementation } from './fsOperations.js'
 import { getPlatform } from '@claude-code/config/platform'
-import { posixPathToWindowsPath } from '@claude-code/storage/windowsPaths.js'
+import { posixPathToWindowsPath } from './windowsPaths.js'
 
 /**
  * Expands a path that may contain tilde notation (~) to an absolute path.

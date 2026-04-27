@@ -62,7 +62,7 @@ import type {
   BetaMessage,
   BetaStopReason,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
-import { AFK_MODE_BETA_HEADER } from '@claude-code/provider/betasConstants.js'
+import { AFK_MODE_BETA_HEADER } from './betasConstants.js'
 import type { SDKAssistantMessageError } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type {
   AssistantMessage,
@@ -74,7 +74,7 @@ import {
   getClaudeAIOAuthTokens,
   getOauthAccountInfo,
   isClaudeAISubscriber,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import {
   createAssistantAPIErrorMessage,
   NO_RESPONSE_REQUESTED,
@@ -82,16 +82,16 @@ import {
 import {
   getDefaultMainLoopModelSetting,
   isNonCustomOpusModel,
-} from '@claude-code/provider/model.js'
-import { getModelStrings } from '@claude-code/provider/modelStrings.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { resolveConnectionForModel } from '@claude-code/provider/providers.js'
-import { unpackModelId } from '@claude-code/provider/connections.js'
+} from './model.js'
+import { getModelStrings } from './modelStrings.js'
+import { getAPIProvider } from './providers.js'
+import { resolveConnectionForModel } from './providers.js'
+import { unpackModelId } from './connections.js'
 import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import {
   API_PDF_MAX_PAGES,
   PDF_TARGET_RAW_SIZE,
-} from '@claude-code/provider/apiLimits.js'
+} from './apiLimits.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatFileSize } from '@claude-code/output/formatters'
 import { ImageResizeError } from '@claude-code/storage/imageResizer.js'
@@ -102,9 +102,9 @@ import {
   type ClaudeAILimits,
   getRateLimitErrorMessage,
   type OverageDisabledReason,
-} from '@claude-code/provider/claudeAiLimits.js'
-import { shouldProcessRateLimits } from '@claude-code/provider/rateLimitMocking.js' // Used for /mock-limits command
-import { extractConnectionErrorDetails, formatAPIError } from '@claude-code/provider/errorUtils.js'
+} from './claudeAiLimits.js'
+import { shouldProcessRateLimits } from './rateLimitMocking.js' // Used for /mock-limits command
+import { extractConnectionErrorDetails, formatAPIError } from './errorUtils.js'
 import { readEnv } from '@claude-code/config/env'
 
 export const API_ERROR_MESSAGE_PREFIX = 'API Error'

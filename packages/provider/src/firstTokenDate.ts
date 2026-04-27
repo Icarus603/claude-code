@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { getOauthConfig } from '@claude-code/provider/oauthConstants'
+import { getOauthConfig } from './oauthConstants.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { getAuthHeaders } from '@claude-code/provider/http.js'
+import { getAuthHeaders } from './http.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
+import { getClaudeCodeUserAgent } from './userAgent.js'
 
 /**
  * Fetch the user's first Claude Code token date and store in config.

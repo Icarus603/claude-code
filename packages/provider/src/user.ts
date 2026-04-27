@@ -5,7 +5,7 @@ import {
   getOauthAccountInfo,
   getRateLimitTier,
   getSubscriptionType,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import { getGlobalConfig, getOrCreateUserID } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { type env, getHostPlatformForAnalytics } from '@claude-code/config/env/paths'

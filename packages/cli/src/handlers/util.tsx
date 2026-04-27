@@ -106,7 +106,7 @@ export async function installHandler(
   target: string | undefined,
   options: { force?: boolean },
 ): Promise<void> {
-  const { setup } = await import('@claude-code/cli/setup/setup.js')
+  const { setup } = await import('../setup/setup.js')
   await setup(cwd(), 'default', false, false, undefined, false)
   const { install } = await import('@claude-code/command-runtime/commands/install/install.js')
   await new Promise<void>(resolve => {

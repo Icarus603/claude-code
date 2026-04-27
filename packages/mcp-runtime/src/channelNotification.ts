@@ -32,7 +32,7 @@ import {
   type ChannelAllowlistEntry,
   getChannelAllowlist,
   isChannelsEnabled,
-} from '@claude-code/mcp-runtime/channelAllowlist.js'
+} from './channelAllowlist.js'
 
 export const ChannelMessageNotificationSchema = lazySchema(() =>
   z.object({

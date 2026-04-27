@@ -27,7 +27,7 @@ import { getPlatform } from '@claude-code/config/platform'
 import { getSecureStorage } from '@claude-code/storage/secureStorage.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
-import { buildRedirectUri, findAvailablePort } from '@claude-code/mcp-runtime/oauthPort.js'
+import { buildRedirectUri, findAvailablePort } from './oauthPort.js'
 
 export function isXaaEnabled(): boolean {
   return isEnvTruthy(process.env.CLAUDE_CODE_ENABLE_XAA)

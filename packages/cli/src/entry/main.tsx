@@ -16,7 +16,7 @@ import { startMdmRawRead } from "@claude-code/config/settings/mdm/rawRead";
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 startMdmRawRead();
 
-import { startKeychainPrefetch } from "@claude-code/cli/secureStorage/keychainPrefetch.js";
+import { startKeychainPrefetch } from "../secureStorage/keychainPrefetch.js";
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 startKeychainPrefetch();

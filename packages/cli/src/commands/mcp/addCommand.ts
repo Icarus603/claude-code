@@ -4,7 +4,7 @@
  * Extracted from main.tsx to enable direct testing.
  */
 import { type Command, Option } from '@commander-js/extra-typings'
-import { cliError, cliOk } from '@claude-code/cli/exit.js'
+import { cliError, cliOk } from '../../exit.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

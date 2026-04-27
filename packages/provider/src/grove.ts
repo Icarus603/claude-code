@@ -4,20 +4,20 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getOauthAccountInfo, isConsumerSubscriber } from '@claude-code/provider/authAlias.js'
+import { getOauthAccountInfo, isConsumerSubscriber } from './authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import { writeToStderr } from '@claude-code/shell/process.js'
-import { getOauthConfig } from '@claude-code/provider/oauthConstants'
+import { getOauthConfig } from './oauthConstants.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import {
   getAuthHeaders,
   getUserAgent,
   withOAuth401Retry,
-} from '@claude-code/provider/http.js'
+} from './http.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getClaudeCodeUserAgent } from '@claude-code/provider/userAgent.js'
+import { getClaudeCodeUserAgent } from './userAgent.js'
 
 // Cache expiration: 24 hours
 const GROVE_CACHE_EXPIRATION_MS = 24 * 60 * 60 * 1000

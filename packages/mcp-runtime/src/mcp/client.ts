@@ -1,1 +1,1 @@
-export * from '@claude-code/mcp-runtime/clientRuntime.js'
+export * from '../clientRuntime.js'

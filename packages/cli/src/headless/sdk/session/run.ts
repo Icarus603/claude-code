@@ -48,7 +48,7 @@ import {
   gracefulShutdownSync,
 } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { validateUuid } from '@claude-code/agent/uuid.js'
-import { installStreamJsonStdoutGuard } from '@claude-code/cli/headless/sdk/session/utils/streamJsonStdoutGuard.js'
+import { installStreamJsonStdoutGuard } from './utils/streamJsonStdoutGuard.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { registerHookEventHandler } from '@claude-code/repl/hookEvents.js'
@@ -68,7 +68,7 @@ import {
   writeToStdout,
 } from '@claude-code/shell/process.js'
 import { ensureModelStringsInitialized } from '@claude-code/provider/modelStrings.js'
-import { createStreamlinedTransformer } from '@claude-code/cli/headless/sdk/session/utils/streamlinedTransform.js'
+import { createStreamlinedTransformer } from './utils/streamlinedTransform.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {

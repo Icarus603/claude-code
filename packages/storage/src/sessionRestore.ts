@@ -29,7 +29,7 @@ import type {
 } from '@claude-code/agent/logsTypes.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { renameRecordingForSession } from '@claude-code/output/capture'
-import { clearMemoryFileCaches } from '@claude-code/storage/claudemd.js'
+import { clearMemoryFileCaches } from './claudemd.js'
 import {
   type AttributionState,
   attributionRestoreStateFromLog,
@@ -42,7 +42,7 @@ import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
 import { fileHistoryRestoreStateFromLog } from '@claude-code/agent/file-history'
 import { createSystemMessage } from '@claude-code/agent/messages.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
-import { getPlansDirectory } from '@claude-code/storage/plans.js'
+import { getPlansDirectory } from './plans.js'
 import { setCwd } from '@claude-code/shell/Shell.js'
 import {
   adoptResumedSessionFile,
@@ -51,11 +51,11 @@ import {
   restoreSessionMetadata,
   saveMode,
   saveWorktreeState,
-} from '@claude-code/storage/sessionStorage.js'
+} from './sessionStorage.js'
 import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
 import type { TodoList } from '@claude-code/tool-registry/todoTypes.js'
 import { TodoListSchema } from '@claude-code/tool-registry/todoTypes.js'
-import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'
+import type { ContentReplacementRecord } from './toolResultStorage.js'
 import {
   getCurrentWorktreeSession,
   restoreWorktreeSession,

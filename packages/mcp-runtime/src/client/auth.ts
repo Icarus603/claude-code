@@ -5,11 +5,11 @@ import {
 	handleOAuth401Error,
 } from "@claude-code/provider/authAlias.js";
 import { logMCPDebug } from "@claude-code/local-observability/logging";
-import { getLoggingSafeMcpBaseUrl } from "@claude-code/mcp-runtime/utils.js";
+import { getLoggingSafeMcpBaseUrl } from "../utils.js";
 import type { MCPServerConnection, ScopedMcpServerConfig } from "../types.js";
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
-import { setMcpAuthCacheEntry } from "@claude-code/mcp-runtime/client/authCache.js";
+import { setMcpAuthCacheEntry } from "./authCache.js";
 
 export function mcpBaseUrlAnalytics(serverRef: ScopedMcpServerConfig): {
 	mcpServerBaseUrl?: AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS;

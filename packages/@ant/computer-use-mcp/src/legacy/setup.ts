@@ -1,12 +1,12 @@
-import { buildComputerUseTools } from '@ant/computer-use-mcp'
+import { buildComputerUseTools } from '../index.js'
 import { join } from 'path'
 import { fileURLToPath } from 'url'
 import { buildMcpToolName } from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js'
 
 import { isInBundledMode } from '@claude-code/config/bundledMode'
-import { CLI_CU_CAPABILITIES, COMPUTER_USE_MCP_SERVER_NAME } from '@ant/computer-use-mcp/legacy/common.js'
-import { getChicagoCoordinateMode } from '@ant/computer-use-mcp/legacy/gates.js'
+import { CLI_CU_CAPABILITIES, COMPUTER_USE_MCP_SERVER_NAME } from './common.js'
+import { getChicagoCoordinateMode } from './gates.js'
 
 /**
  * Build the dynamic MCP config + allowed tool names. Mirror of

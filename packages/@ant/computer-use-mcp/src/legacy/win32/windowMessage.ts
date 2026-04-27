@@ -10,7 +10,7 @@
  * Both paths support full Unicode (Chinese, emoji, etc.) without IME involvement.
  */
 
-import { validateHwnd, runPs, VK_MAP, MODIFIER_KEYS } from '@ant/computer-use-mcp/legacy/win32/shared.js'
+import { validateHwnd, runPs, VK_MAP, MODIFIER_KEYS } from './shared.js'
 
 /** Character count above which we switch to clipboard paste */
 const CLIPBOARD_THRESHOLD = 32

@@ -9,14 +9,14 @@ import {
   CLAUDE_AI_INFERENCE_SCOPE,
   CLAUDE_AI_OAUTH_SCOPES,
   getOauthConfig,
-} from '@claude-code/provider/oauthConstants'
+} from '../oauthConstants.js'
 import {
   checkAndRefreshOAuthTokenIfNeeded,
   getClaudeAIOAuthTokens,
   hasProfileScope,
   isClaudeAISubscriber,
   saveApiKey,
-} from '@claude-code/provider/authAlias.js'
+} from '../authAlias.js'
 import type { AccountInfo } from '@claude-code/config'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

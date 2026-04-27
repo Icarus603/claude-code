@@ -8,7 +8,7 @@
  * uses global input via CoreGraphics events.
  */
 
-import type { Platform } from '@ant/computer-use-mcp/legacy/platforms/index.js'
+import type { Platform } from './index.js'
 import type {
   InputPlatform,
   ScreenshotPlatform,
@@ -16,9 +16,9 @@ import type {
   AppsPlatform,
   WindowHandle,
   FrontmostAppInfo,
-} from '@ant/computer-use-mcp/legacy/platforms/types.js'
-import { requireComputerUseInput } from '@ant/computer-use-mcp/legacy/inputLoader.js'
-import { requireComputerUseSwift } from '@ant/computer-use-mcp/legacy/swiftLoader.js'
+} from './types.js'
+import { requireComputerUseInput } from '../inputLoader.js'
+import { requireComputerUseSwift } from '../swiftLoader.js'
 
 // ---------------------------------------------------------------------------
 // Input — delegate to @ant/computer-use-input darwin backend

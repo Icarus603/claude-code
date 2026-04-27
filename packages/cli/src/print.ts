@@ -6,4 +6,4 @@
 //     bootstrap import below so headless flow always triggers runtime wiring.
 import '@claude-code/app-host/runtime/bootstrap.js'
 
-export { runHeadless, runHeadlessStreaming, handleRewindFiles } from '@claude-code/cli'
+export { runHeadless, runHeadlessStreaming, handleRewindFiles } from './index.js'

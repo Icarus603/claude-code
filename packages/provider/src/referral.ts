@@ -1,10 +1,10 @@
 import axios from 'axios'
-import { getOauthConfig } from '@claude-code/provider/oauthConstants'
+import { getOauthConfig } from './oauthConstants.js'
 import {
   getOauthAccountInfo,
   getSubscriptionType,
   isClaudeAISubscriber,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/logging'
@@ -15,7 +15,7 @@ import type {
   ReferralEligibilityResponse,
   ReferralRedemptionsResponse,
   ReferrerRewardInfo,
-} from '@claude-code/provider/oauth/types.js'
+} from './oauth/types.js'
 
 // Cache expiration time: 24 hours (eligibility changes only on subscription/experiment changes)
 const CACHE_EXPIRATION_MS = 24 * 60 * 60 * 1000

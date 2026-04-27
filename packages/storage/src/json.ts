@@ -4,7 +4,7 @@ import {
   modify,
   parse as parseJsonc,
 } from 'jsonc-parser/lib/esm/main.js'
-import { stripBOM } from '@claude-code/storage/jsonRead.js'
+import { stripBOM } from './jsonRead.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { memoizeWithLRU } from '@claude-code/config/memoize.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'

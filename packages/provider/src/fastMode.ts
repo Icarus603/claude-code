@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getOauthConfig, OAUTH_BETA_HEADER } from '@claude-code/provider/oauthConstants'
+import { getOauthConfig, OAUTH_BETA_HEADER } from './oauthConstants.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   getIsNonInteractiveSession,
@@ -15,7 +15,7 @@ import {
   getClaudeAIOAuthTokens,
   handleOAuth401Error,
   hasProfileScope,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import { isInBundledMode } from '@claude-code/config/bundledMode'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
@@ -25,8 +25,8 @@ import {
   isOpus1mMergeEnabled,
   type ModelSetting,
   parseUserSpecifiedModel,
-} from '@claude-code/provider/model.js'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+} from './model.js'
+import { getAPIProvider } from './providers.js'
 import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
 import {
   getInitialSettings,

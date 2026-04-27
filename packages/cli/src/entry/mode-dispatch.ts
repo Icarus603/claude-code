@@ -39,7 +39,7 @@ import { getSystemContext, getUserContext } from '@claude-code/provider/context.
 import { init, initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { addToHistory } from '@claude-code/repl/history.js'
 import type { Root } from '@anthropic/ink'
-// Direct relative paths instead of '@claude-code/cli' (the index barrel)
+// Direct relative paths instead of '../index.js' (the index barrel)
 // to avoid same-package circular re-export (V7 §11.2 cli-internal SCC).
 import { createHeadlessSession } from '../headless.js'
 import { getTeammateModeSnapshot, logManagedSettings } from './bootstrap-utils.js'
@@ -96,7 +96,7 @@ import {
 import {
   loadRemoteManagedSettings,
   refreshRemoteManagedSettings,
-} from '@claude-code/cli/remoteManagedSettings.js'
+} from '../remoteManagedSettings.js'
 import type { ToolInputJSONSchema } from '@claude-code/tool-registry/Tool.js'
 import {
   createSyntheticOutputTool,
@@ -365,7 +365,7 @@ import {
 import {
   clearPluginCache,
   loadAllPluginsCacheOnly,
-} from '@claude-code/cli/pluginLoader.js'
+} from '../pluginLoader.js'
 import { migrateChangelogFromConfig } from '@claude-code/repl/releaseNotes.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { fetchSession, prepareApiRequest } from '@claude-code/teleport/api.js'
@@ -1671,7 +1671,7 @@ export async function runModeDispatch(
 			profileCheckpoint("action_before_setup");
 			logForDebugging("[STARTUP] Running setup()...");
 			const setupStart = Date.now();
-			const { setup } = await import('@claude-code/cli/setup/setup.js');
+			const { setup } = await import('../setup/setup.js');
 			const messagingSocketPath = feature("UDS_INBOX")
 				? (options as { messagingSocketPath?: string })
 						.messagingSocketPath
@@ -3376,7 +3376,7 @@ export async function runModeDispatch(
 					createSSHSession,
 					createLocalSSHSession,
 					SSHSessionError,
-				} = await import('@claude-code/cli/ssh/createSSHSession.js');
+				} = await import('../ssh/createSSHSession.js');
 				let sshSession;
 				try {
 					if (_pendingSSH.local) {
@@ -3925,7 +3925,7 @@ export async function runModeDispatch(
 					) {
 						// Check for ccshare URL (e.g. https://go/ccshare/boris-20260311-211036)
 						const { parseCcshareId, loadCcshare } =
-							await import("@claude-code/cli/ccshareResume.js");
+							await import("../ccshareResume.js");
 						const ccshareId = parseCcshareId(options.resume);
 						if (ccshareId) {
 							try {

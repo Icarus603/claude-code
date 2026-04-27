@@ -6,28 +6,28 @@
  * during dead code elimination
  */
 import { getMainLoopModelOverride } from '@claude-code/app-host/bootstrap/state.js'
-import { resolveAntModel, getAntModelOverrideConfig } from '@claude-code/provider/antModels.js'
+import { resolveAntModel, getAntModelOverrideConfig } from './antModels.js'
 import {
   getSubscriptionType,
   isClaudeAISubscriber,
   isMaxSubscriber,
   isProSubscriber,
   isTeamPremiumSubscriber,
-} from '@claude-code/provider/authAlias.js'
+} from './authAlias.js'
 import {
   has1mContext,
   is1mContextDisabled,
   modelSupports1M,
 } from '@claude-code/agent/context.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { getModelStrings, resolveOverriddenModel } from '@claude-code/provider/model/modelStrings.js'
-import { formatModelPricing, getOpus46CostTier } from '@claude-code/provider/modelCost.js'
+import { getModelStrings, resolveOverriddenModel } from './model/modelStrings.js'
+import { formatModelPricing, getOpus46CostTier } from './modelCost.js'
 import { getSettings_DEPRECATED } from '@claude-code/config/settings'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { getAPIProvider } from '@claude-code/provider/providers.js'
+import { getAPIProvider } from './providers.js'
 import { LIGHTNING_BOLT } from '@claude-code/output/constants/figures.js'
-import { isModelAllowed } from '@claude-code/provider/model/modelAllowlist.js'
-import { type ModelAlias, isModelAlias } from '@claude-code/provider/modelAliases.js'
+import { isModelAllowed } from './model/modelAllowlist.js'
+import { type ModelAlias, isModelAlias } from './modelAliases.js'
 import { capitalize } from '@claude-code/output/utils/stringUtils.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
@@ -398,8 +398,8 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
   // if the connection record is missing (stale prefix after disconnect).
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { unpackModelId, getConnections, prettyModelLabel } = require(
-    '@claude-code/provider/connections.js',
-  ) as typeof import('@claude-code/provider/connections.js')
+    './connections.js',
+  ) as typeof import('./connections.js')
   const { connectionId, modelId } = unpackModelId(setting)
   if (connectionId) {
     const conn = getConnections().find(c => c.id === connectionId)
@@ -425,8 +425,8 @@ export function getPublicModelDisplayName(model: ModelName): string | null {
   // render `Claude Opus 4.7` not `Claude (conn_xxx:claude-opus-4-7)`.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { unpackModelId } = require(
-    '@claude-code/provider/connections.js',
-  ) as typeof import('@claude-code/provider/connections.js')
+    './connections.js',
+  ) as typeof import('./connections.js')
   const { modelId } = unpackModelId(model)
   if (modelId !== model) {
     model = modelId as ModelName
@@ -656,8 +656,8 @@ export function modelDisplayString(model: ModelSetting): string {
   // surfacing the raw "conn_xxx:claude-opus-4-7" string in /config etc.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { unpackModelId } = require(
-    '@claude-code/provider/connections.js',
-  ) as typeof import('@claude-code/provider/connections.js')
+    './connections.js',
+  ) as typeof import('./connections.js')
   if (unpackModelId(model).connectionId) {
     return renderModelSetting(model as ModelName)
   }

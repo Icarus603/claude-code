@@ -3,7 +3,7 @@
 // Putting detectFileEncoding in its own leaf module lets both depend on
 // the same module without forming a cycle.
 
-import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
+import { getFsImplementation, safeResolvePath } from './fsOperations.js'
 import { detectEncodingForResolvedPath } from './fileRead.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'

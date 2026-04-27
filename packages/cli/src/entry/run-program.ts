@@ -18,13 +18,13 @@ import type { RuntimeHandles } from '@claude-code/app-host'
 
 import { init } from '@claude-code/app-host/init.js'
 import { loadPolicyLimits } from '@claude-code/provider/policyLimits/index.js'
-import { loadRemoteManagedSettings } from '@claude-code/cli/remoteManagedSettings.js'
+import { loadRemoteManagedSettings } from '../remoteManagedSettings.js'
 import { setInlinePlugins } from '@claude-code/app-host/bootstrap/state.js'
-import { clearPluginCache } from '@claude-code/cli/pluginLoader.js'
+import { clearPluginCache } from '../pluginLoader.js'
 import { runMigrations } from '@claude-code/app-host/main/startup/settings.js'
 import { canUserConfigureAdvisor } from '@claude-code/provider/advisor.js'
 import { ensureMdmSettingsLoaded } from '@claude-code/config/settings/mdm/settings'
-import { ensureKeychainPrefetchCompleted } from '@claude-code/cli/secureStorage/keychainPrefetch.js'
+import { ensureKeychainPrefetchCompleted } from '../secureStorage/keychainPrefetch.js'
 import {
   profileCheckpoint,
   profileReport,

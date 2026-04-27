@@ -27,7 +27,7 @@ import type { ClientOptions } from '@anthropic-ai/sdk'
 import {
   checkAndRefreshCodexTokenIfNeeded,
   getCodexOAuthTokens,
-} from '@claude-code/provider/oauth/codex-auth.js'
+} from '../oauth/codex-auth.js'
 
 const CODEX_BASE_URL = 'https://chatgpt.com/backend-api/codex/responses'
 

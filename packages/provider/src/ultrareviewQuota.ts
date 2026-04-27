@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { getOauthConfig } from '@claude-code/provider/oauthConstants'
-import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
+import { getOauthConfig } from './oauthConstants.js'
+import { isClaudeAISubscriber } from './authAlias.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'
 

@@ -20,7 +20,7 @@ import {
   downloadUserSettings,
   redownloadUserSettings,
 } from '@claude-code/config/sync'
-import { waitForRemoteManagedSettingsToLoad } from '@claude-code/cli/remoteManagedSettings.js'
+import { waitForRemoteManagedSettingsToLoad } from '../../../remoteManagedSettings.js'
 import { StructuredIO } from '../../../structuredIO.js'
 import { RemoteIO } from '../../../remoteIO.js'
 import {
@@ -322,7 +322,7 @@ import {
 } from '@claude-code/config/env/utils'
 import { installPluginsForHeadless } from '@claude-code/config/plugin/headlessPluginInstall'
 import { refreshActivePlugins } from '@claude-code/config/plugin/refresh'
-import { loadAllPluginsCacheOnly } from '@claude-code/cli/pluginLoader.js'
+import { loadAllPluginsCacheOnly } from '../../../pluginLoader.js'
 import {
   isTeamLead,
   hasActiveInProcessTeammates,
