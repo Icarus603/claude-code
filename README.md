@@ -47,7 +47,9 @@ No Node, no Bun, no package manager required for either.
 | `CCB_VERSION` | `latest` | Pin a specific tag, e.g. `v1.carus.000` |
 | `CCB_PREFIX`  | `~/.local` / `%LOCALAPPDATA%\Programs\ccb` | Install root |
 
-Upgrade: re-run the same one-liner. Uninstall:
+**Upgrade**: nothing to do. `ccb` checks GitHub Releases on every REPL startup (and every 30 min while running) and installs new versions in the background — you'll see `✓ Update installed · Restart to update` in the footer when one lands. Re-running the install one-liner still works if you want to force a specific version via `CCB_VERSION=…`.
+
+Uninstall:
 - macOS / Linux: `rm -rf ~/.local/share/ccb ~/.local/bin/ccb`
 - Windows: `Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"`
 

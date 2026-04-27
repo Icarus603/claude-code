@@ -71,6 +71,10 @@ import {
   withLock,
 } from './pidLock.js'
 
+// Total binaries (protected + eligible) to keep on disk after cleanup.
+// install.sh / install.ps1 use the same number, so manual + native flows
+// agree on disk footprint. With 2: active running version + one prior for
+// rollback.
 export const VERSION_RETENTION_COUNT = 2
 
 // 7 days in milliseconds - used for mtime-based lock stale timeout.
@@ -1353,7 +1357,18 @@ export async function cleanupOldVersions(): Promise<void> {
       .filter(v => !protectedVersions.has(v.resolvedPath))
       .sort((a, b) => b.mtime.getTime() - a.mtime.getTime())
 
-    const versionsToDelete = eligibleVersions.slice(VERSION_RETENTION_COUNT)
+    // Keep at most VERSION_RETENTION_COUNT total binaries (protected +
+    // eligible). Protected versions always stay; eligible fill the
+    // remaining slots, oldest beyond that get deleted. Without subtracting
+    // the protected count an install where both the previous-running
+    // binary AND the just-installed binary are protected would still
+    // reserve 2 *more* slots for eligible versions, so the disk footprint
+    // grew unboundedly.
+    const slotsForEligible = Math.max(
+      0,
+      VERSION_RETENTION_COUNT - protectedVersions.size,
+    )
+    const versionsToDelete = eligibleVersions.slice(slotsForEligible)
 
     if (versionsToDelete.length === 0) {
       logEvent('tengu_native_version_cleanup', {
