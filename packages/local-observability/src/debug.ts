@@ -13,7 +13,9 @@ import {
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { writeToStderr } from '@claude-code/shell/process.js'
-import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
+// Plain JSON.stringify — debug only uses it for newline-escape on single
+// strings. Importing slowOperations.jsonStringify would close a 3-file
+// cycle (slowOperations ↔ debug ↔ fsOperations ↔ slowOperations).
 
 export type DebugLogLevel = 'verbose' | 'debug' | 'info' | 'warn' | 'error'
 
@@ -215,7 +217,7 @@ export function logForDebugging(
 
   // Multiline messages break the jsonl output format, so make any multiline messages JSON.
   if (hasFormattedOutput && message.includes('\n')) {
-    message = jsonStringify(message)
+    message = JSON.stringify(message)
   }
   const timestamp = new Date().toISOString()
   const output = `${timestamp} [${level.toUpperCase()}] ${message.trim()}\n`

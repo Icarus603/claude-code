@@ -17,6 +17,7 @@
     "./logging/error-log-sink.js": "./src/logging/error-log-sink.ts",
     "./telemetry": "./src/telemetry/index.ts",
     "./slowOperations.js": "./src/slowOperations.ts",
+    "./slowLoggingTag.js": "./src/slowLoggingTag.ts",
     "./errorHelpers.js": "./src/errorHelpers.ts",
     "./fileOperationAnalytics": "./src/fileOperationAnalytics.ts",
     "./debug.js": "./src/debug.ts",

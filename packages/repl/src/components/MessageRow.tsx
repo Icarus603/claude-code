@@ -19,7 +19,7 @@ import {
 } from '@claude-code/agent/messages.js'
 import { hasThinkingContent, Message } from './Message.js'
 import { MessageModel } from './MessageModel.js'
-import { shouldRenderStatically } from './Messages.js'
+import { shouldRenderStatically } from './messageStaticness.js'
 import { MessageTimestamp } from './MessageTimestamp.js'
 import { OffscreenFreeze } from './OffscreenFreeze.js'
 

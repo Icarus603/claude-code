@@ -20,7 +20,11 @@ import type {
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { Stream } from '@anthropic-ai/sdk/streaming.mjs'
 import { getProviderAdapter } from '@claude-code/provider'
-import '@claude-code/app-host/providerHostSetup.js'
+// V7 §11.2: app-host/providerHostSetup imports THIS module to register
+// legacy bindings with the host. The reverse side-effect import we used
+// to do here closed a 2-file cycle. Callers reaching legacy runtime go
+// through the host (which is loaded by the entrypoint), so the host is
+// always set up by the time these functions run.
 import { randomUUID } from 'crypto'
 import {
   getAPIProvider,

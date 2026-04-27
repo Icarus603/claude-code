@@ -13,7 +13,7 @@ import {
 import { homedir } from 'os'
 import * as nodePath from 'path'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
-import { slowLogging } from '@claude-code/local-observability/slowOperations.js'
+import { slowLogging } from '@claude-code/local-observability/slowLoggingTag.js'
 
 /**
  * Simplified filesystem operations interface based on Node.js fs module.
