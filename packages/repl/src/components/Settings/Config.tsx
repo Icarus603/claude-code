@@ -937,7 +937,14 @@ export function Config({
     {
       id: 'model',
       label: 'Model',
-      value: mainLoopModel === null ? 'Default (recommended)' : mainLoopModel,
+      // Use modelDisplayString for non-null so composite `<connId>:<modelId>`
+      // renders as "Opus 4.7" instead of "conn_xxx:claude-opus-4-7". Mirrors
+      // onChangeMainModelConfig (line 315). Keep the original 'Default
+      // (recommended)' string for null to preserve the null-state UX.
+      value:
+        mainLoopModel === null
+          ? 'Default (recommended)'
+          : modelDisplayString(mainLoopModel),
       type: 'managedEnum' as const,
       onChange: onChangeMainModelConfig,
     },
