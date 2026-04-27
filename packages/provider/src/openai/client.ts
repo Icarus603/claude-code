@@ -1,28 +1,52 @@
 import { getProviderNetworkLayer } from '../network.js'
 import OpenAI from 'openai'
 import { readEnv } from '@claude-code/config/env'
+import { resolveConnectionForModel } from '../providers.js'
 
 /**
- * Environment variables:
+ * Connection registry is the source of truth for endpoint+key. When a
+ * connection record matches the requested model, its endpoint/key win
+ * over env vars — that's how multiple OpenAI Compatible providers can
+ * coexist (Ollama + DeepSeek + vLLM each have their own connection).
  *
- * OPENAI_API_KEY: Required. API key for the OpenAI-compatible endpoint.
- * OPENAI_BASE_URL: Recommended. Base URL for the endpoint (e.g. http://localhost:11434/v1).
- * OPENAI_ORG_ID: Optional. Organization ID.
- * OPENAI_PROJECT_ID: Optional. Project ID.
+ * Env-var fallback (legacy single-provider mode):
+ *   OPENAI_API_KEY      Required. API key.
+ *   OPENAI_BASE_URL     Recommended. Base URL.
+ *   OPENAI_ORG_ID       Optional.
+ *   OPENAI_PROJECT_ID   Optional.
  */
 
-let cachedClient: OpenAI | null = null
+// Cache by connection id (or env-fallback key) so multiple connections
+// don't clobber a single shared client. Switching models triggers a new
+// lookup; the old client is GC'd if nothing references it.
+const clientCache = new Map<string, OpenAI>()
 
 export function getOpenAIClient(options?: {
   maxRetries?: number
   fetchOverride?: any
   source?: string
+  /** Model id — used to resolve connection-specific endpoint/key. */
+  model?: string
 }): OpenAI {
-  if (cachedClient) return cachedClient
   const networkLayer = getProviderNetworkLayer()
 
-  const apiKey = readEnv('OPENAI_API_KEY') || ''
-  const baseURL = readEnv('OPENAI_BASE_URL')
+  const conn = options?.model
+    ? resolveConnectionForModel(options.model)
+    : undefined
+  const usingConn = conn?.protocol === 'openai' && conn.auth.type === 'api_key'
+
+  const apiKey = usingConn
+    ? (conn.auth.type === 'api_key' ? conn.auth.key : '')
+    : readEnv('OPENAI_API_KEY') || ''
+  const baseURL = usingConn ? conn.endpoint : readEnv('OPENAI_BASE_URL')
+
+  // Cache key: 'conn:<id>' for per-connection clients, 'env' for fallback.
+  // fetchOverride disables caching (test seam).
+  const cacheKey = usingConn && conn ? `conn:${conn.id}` : 'env'
+  if (!options?.fetchOverride) {
+    const cached = clientCache.get(cacheKey)
+    if (cached) return cached
+  }
 
   const client = new OpenAI({
     apiKey,
@@ -39,13 +63,13 @@ export function getOpenAIClient(options?: {
   })
 
   if (!options?.fetchOverride) {
-    cachedClient = client
+    clientCache.set(cacheKey, client)
   }
 
   return client
 }
 
-/** Clear the cached client (useful when env vars change). */
+/** Clear the cached clients (useful when connections change at runtime). */
 export function clearOpenAIClientCache(): void {
-  cachedClient = null
+  clientCache.clear()
 }

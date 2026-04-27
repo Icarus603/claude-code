@@ -7,17 +7,31 @@ import type {
   GeminiStreamChunk,
 } from './types.js'
 import { readEnv } from '@claude-code/config/env'
+import { resolveConnectionForModel } from '../providers.js'
 
 const DEFAULT_GEMINI_BASE_URL =
   'https://generativelanguage.googleapis.com/v1beta'
 
 const STREAM_DECODE_OPTS: TextDecodeOptions = { stream: true }
 
-function getGeminiBaseUrl(): string {
-  return (readEnv('GEMINI_BASE_URL') || DEFAULT_GEMINI_BASE_URL).replace(
-    /\/+$/,
-    '',
-  )
+/**
+ * Per-model resolution: prefer the matching Gemini connection's
+ * endpoint+key over env vars. Falls back to env vars (legacy single-
+ * provider mode) when no connection matches.
+ */
+function getGeminiAuth(model: string): { baseUrl: string; apiKey: string } {
+  const conn = resolveConnectionForModel(model)
+  const usingConn = conn?.protocol === 'gemini' && conn.auth.type === 'api_key'
+  return {
+    baseUrl: (
+      usingConn ? conn.endpoint : readEnv('GEMINI_BASE_URL') || DEFAULT_GEMINI_BASE_URL
+    ).replace(/\/+$/, ''),
+    apiKey: usingConn
+      ? conn.auth.type === 'api_key'
+        ? conn.auth.key
+        : ''
+      : readEnv('GEMINI_API_KEY') || '',
+  }
 }
 
 function getGeminiModelPath(model: string): string {
@@ -33,13 +47,14 @@ export async function* streamGeminiGenerateContent(params: {
 }): AsyncGenerator<GeminiStreamChunk, void> {
   const networkLayer = getProviderNetworkLayer()
   const fetchImpl = params.fetchOverride ?? fetch
-  const url = `${getGeminiBaseUrl()}/${getGeminiModelPath(params.model)}:streamGenerateContent?alt=sse`
+  const { baseUrl, apiKey } = getGeminiAuth(params.model)
+  const url = `${baseUrl}/${getGeminiModelPath(params.model)}:streamGenerateContent?alt=sse`
 
   const response = await fetchImpl(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-goog-api-key': readEnv('GEMINI_API_KEY') || '',
+      'x-goog-api-key': apiKey,
     },
     body: JSON.stringify(params.body),
     signal: params.signal,

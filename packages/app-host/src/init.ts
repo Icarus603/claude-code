@@ -116,6 +116,43 @@ export const init = memoize(async (): Promise<void> => {
     // Record the first start time
     recordFirstStartTime()
 
+    // Migrate any legacy env-driven provider config into connection records.
+    // Idempotent — no-op if connections already exist for those values.
+    // V7 §11.6 — connection registry is the new source of truth; env is
+    // fallback only.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { migrateLegacyEnvToConnections } = require(
+        '@claude-code/provider/connections.js',
+      ) as typeof import('@claude-code/provider/connections.js')
+      // Read from settings.env first (persistent), fallback to process.env.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getSettings_DEPRECATED } = require(
+        '@claude-code/config/settings',
+      ) as typeof import('@claude-code/config/settings')
+      const settings = getSettings_DEPRECATED() ?? {}
+      const settingsEnv = (settings.env ?? {}) as Record<string, string>
+      const merged: Record<string, string> = {
+        ...Object.fromEntries(
+          Object.entries(process.env).filter(
+            ([, v]): v is string => typeof v === 'string',
+          ),
+        ),
+        ...settingsEnv,
+      }
+      const { migrated } = migrateLegacyEnvToConnections(merged)
+      if (migrated.length > 0) {
+        logForDebugging(
+          `[connections] migrated legacy env to connections: ${migrated.join(', ')}`,
+        )
+      }
+    } catch (e) {
+      // Migration failure must not block boot — fallback paths still work.
+      logForDebugging(
+        `[connections] migration skipped: ${e instanceof Error ? e.message : String(e)}`,
+      )
+    }
+
     // Configure global mTLS settings
     const mtlsStart = Date.now()
     logForDebugging('[init] configureGlobalMTLS starting')
