@@ -1,7 +1,7 @@
 import React from 'react'
 import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
-import { Login } from '@claude-code/provider/commands/login/login.js'
+import { Login } from '@claude-code/command-runtime/commands/login/login.js'
 import { runExtraUsage } from '@claude-code/command-runtime/commands/extra-usage/extra-usage-core.js'
 
 export async function call(

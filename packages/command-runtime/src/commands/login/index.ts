@@ -1,0 +1,15 @@
+import type { Command } from '@claude-code/command-runtime/runtime'
+import { hasAnthropicApiKeyAuth } from '@claude-code/provider/authAlias.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { readEnv } from '@claude-code/config/env'
+
+export default () =>
+  ({
+    type: 'local-jsx',
+    name: 'login',
+    description: hasAnthropicApiKeyAuth()
+      ? 'Switch Anthropic accounts'
+      : 'Sign in with your Anthropic account',
+    isEnabled: () => !isEnvTruthy(readEnv('DISABLE_LOGIN_COMMAND')),
+    load: () => import('./login.js'),
+  }) satisfies Command
