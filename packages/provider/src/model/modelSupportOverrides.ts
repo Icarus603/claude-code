@@ -5,6 +5,7 @@ import { readEnv } from '@claude-code/config/env/utils'
 export type ModelCapabilityOverride =
   | 'effort'
   | 'max_effort'
+  | 'xhigh_effort'
   | 'thinking'
   | 'adaptive_thinking'
   | 'interleaved_thinking'

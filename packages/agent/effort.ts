@@ -23,6 +23,7 @@ export const EFFORT_LEVELS = [
   'low',
   'medium',
   'high',
+  'xhigh',
   'max',
 ] as const satisfies readonly EffortLevel[]
 
@@ -53,13 +54,37 @@ export function modelSupportsEffort(model: string): boolean {
 }
 
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports 'max' effort.
-// Per API docs, 'max' is Opus 4.7/4.6 only for public models — other models return an error.
+// Per API docs, 'max' is on Mythos / Opus 4.7 / Opus 4.6 / Sonnet 4.6.
 export function modelSupportsMaxEffort(model: string): boolean {
   const supported3P = get3PModelCapabilityOverride(model, 'max_effort')
   if (supported3P !== undefined) {
     return supported3P
   }
-  if (model.toLowerCase().includes('opus-4-7') || model.toLowerCase().includes('opus-4-6')) {
+  const m = model.toLowerCase()
+  if (
+    m.includes('opus-4-7') ||
+    m.includes('opus-4-6') ||
+    m.includes('sonnet-4-6') ||
+    m.includes('mythos')
+  ) {
+    return true
+  }
+  if (process.env.USER_TYPE === 'ant' && resolveAntModel(model)) {
+    return true
+  }
+  return false
+}
+
+// @[MODEL LAUNCH]: Add the new model if it supports 'xhigh' effort.
+// Per Anthropic docs (platform.claude.com/docs/en/build-with-claude/effort),
+// xhigh is **Opus 4.7 only** — "Extended capability for long-horizon work".
+export function modelSupportsXhighEffort(model: string): boolean {
+  const supported3P = get3PModelCapabilityOverride(model, 'xhigh_effort')
+  if (supported3P !== undefined) {
+    return supported3P
+  }
+  const m = model.toLowerCase()
+  if (m.includes('opus-4-7') || m.includes('mythos')) {
     return true
   }
   if (process.env.USER_TYPE === 'ant' && resolveAntModel(model)) {
@@ -92,17 +117,22 @@ export function parseEffortValue(value: unknown): EffortValue | undefined {
 
 /**
  * Numeric values are model-default only and not persisted.
- * 'max' is session-scoped for external users (ants can persist it).
+ * String levels (low/medium/high/xhigh/max) are persistable. Persistence
+ * is the user's choice; the runtime (resolveAppliedEffort) clamps to
+ * `high` when the active model doesn't support xhigh / max.
  * Write sites call this before saving to settings so the Zod schema
  * (which only accepts string levels) never rejects a write.
  */
 export function toPersistableEffort(
   value: EffortValue | undefined,
 ): EffortLevel | undefined {
-  if (value === 'low' || value === 'medium' || value === 'high') {
-    return value
-  }
-  if (value === 'max' && process.env.USER_TYPE === 'ant') {
+  if (
+    value === 'low' ||
+    value === 'medium' ||
+    value === 'high' ||
+    value === 'xhigh' ||
+    value === 'max'
+  ) {
     return value
   }
   return undefined
@@ -161,7 +191,13 @@ export function resolveAppliedEffort(
   }
   const resolved =
     envOverride ?? appStateEffortValue ?? getDefaultEffortForModel(model)
+  // Clamp unsupported levels down. xhigh requires Opus 4.7; max requires
+  // Opus 4.7/4.6/Sonnet 4.6. Anything below tier falls to 'high', which
+  // is the same value the API uses when no effort param is sent.
   if (resolved === 'max' && !modelSupportsMaxEffort(model)) {
+    return 'high'
+  }
+  if (resolved === 'xhigh' && !modelSupportsXhighEffort(model)) {
     return 'high'
   }
   return resolved
@@ -212,9 +248,13 @@ export function convertEffortValueToLevel(value: EffortValue): EffortLevel {
     return isEffortLevel(value) ? value : 'high'
   }
   if (process.env.USER_TYPE === 'ant' && typeof value === 'number') {
+    // ant numeric range now spans 5 levels — keep low/medium/high
+    // breakpoints unchanged to avoid disturbing existing tooling, slot
+    // xhigh between high and max at the upper end.
     if (value <= 50) return 'low'
     if (value <= 85) return 'medium'
-    if (value <= 100) return 'high'
+    if (value <= 95) return 'high'
+    if (value <= 100) return 'xhigh'
     return 'max'
   }
   return 'high'
@@ -224,15 +264,19 @@ export function convertEffortValueToLevel(value: EffortValue): EffortLevel {
  * Get user-facing description for effort levels
  */
 export function getEffortLevelDescription(level: EffortLevel): string {
+  // Wording matches Anthropic's official docs at
+  // platform.claude.com/docs/en/build-with-claude/effort
   switch (level) {
     case 'low':
-      return 'Quick, straightforward implementation with minimal overhead'
+      return 'Most efficient — significant token savings, best for simple tasks'
     case 'medium':
-      return 'Balanced approach with standard implementation and testing'
+      return 'Balanced — moderate token savings with solid performance'
     case 'high':
-      return 'Comprehensive implementation with extensive testing and documentation'
+      return 'High capability — equivalent to not setting the parameter (default)'
+    case 'xhigh':
+      return 'Extended capability for long-horizon work (Opus 4.7 only)'
     case 'max':
-      return 'Maximum capability with deepest reasoning (Opus 4.7 only)'
+      return 'Absolute maximum capability with no constraints on token spending'
   }
 }
 
@@ -302,7 +346,23 @@ export function getDefaultEffortForModel(
   // the model launch DRI and research. Default effort is a sensitive setting
   // that can greatly affect model quality and bashing.
 
-  if (model.toLowerCase().includes('opus-4-7') || model.toLowerCase().includes('opus-4-6')) {
+  // Opus 4.7: Anthropic recommends starting at xhigh for coding/agentic
+  // workflows in Claude Code (per docs.claude.com effort guide). Pro
+  // subscribers stay at medium since their rate limits don't tolerate
+  // xhigh's higher token spend by default.
+  const m = model.toLowerCase()
+  if (m.includes('opus-4-7')) {
+    if (isProSubscriber()) {
+      return 'medium'
+    }
+    if (
+      getOpusDefaultEffortConfig().enabled &&
+      (isMaxSubscriber() || isTeamSubscriber())
+    ) {
+      return 'xhigh'
+    }
+  }
+  if (m.includes('opus-4-6')) {
     if (isProSubscriber()) {
       return 'medium'
     }
