@@ -92,9 +92,12 @@ const PERMISSION_MODE_CONFIG: Partial<
 export function isExternalPermissionMode(
   mode: PermissionMode,
 ): mode is ExternalPermissionMode {
-  if (process.env.USER_TYPE !== 'ant') {
-    return true
-  }
+  // 'auto' and 'bubble' are internal modes — they ARE user-addressable
+  // (settable via /config picker, --permission-mode flag, defaultMode in
+  // settings) but they don't round-trip through the EXTERNAL set used for
+  // SDK/IDE protocol surfaces. Returning true here would make Config.tsx
+  // onChange map 'auto' → toExternal → 'default' before save, silently
+  // dropping the user's selection.
   return mode !== 'auto' && mode !== 'bubble'
 }
 
