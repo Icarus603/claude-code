@@ -264,7 +264,7 @@ export function installPackageHostBindings(
         },
         categorizeRetryableAPIError: (error: unknown) => {
           try {
-            return require('src/services/api/errors.js').categorizeRetryableAPIError(error)
+            return require('@claude-code/provider/errors.js').categorizeRetryableAPIError(error)
           } catch {
             return error
           }
@@ -495,14 +495,14 @@ export function installPackageHostBindings(
         },
         promptTooLongErrorMessage: (() => {
           try {
-            return require('src/services/api/errors.js').PROMPT_TOO_LONG_ERROR_MESSAGE
+            return require('@claude-code/provider/errors.js').PROMPT_TOO_LONG_ERROR_MESSAGE
           } catch {
             return ''
           }
         })(),
         isPromptTooLongMessage: (message: unknown) => {
           try {
-            return require('src/services/api/errors.js').isPromptTooLongMessage(message)
+            return require('@claude-code/provider/errors.js').isPromptTooLongMessage(message)
           } catch {
             return false
           }
@@ -701,7 +701,7 @@ export function installPackageHostBindings(
         isWithheldContextCollapsePromptTooLong: (message: unknown, querySource: unknown) => {
           try {
             const { isWithheldPromptTooLong } = require('@claude-code/agent/contextCollapse/index.js')
-            const { isPromptTooLongMessage } = require('src/services/api/errors.js')
+            const { isPromptTooLongMessage } = require('@claude-code/provider/errors.js')
             return isWithheldPromptTooLong(message, isPromptTooLongMessage, querySource)
           } catch {
             return false

@@ -16,6 +16,7 @@
     "./remoteManagedSettings.js": "./src/remoteManagedSettings.ts",
     "./remoteIO.js": "./src/remoteIO.ts",
     "./mcpServersHandlers.js": "./src/mcpServersHandlers.ts",
+    "./entry/mcp.js": "./src/entry/mcp.ts",
     "./structuredIO.js": "./src/structuredIO.ts",
     "./structuredIOHelper.js": "./src/structuredIOHelper.ts",
     "./transports/*.js": "./src/transports/*.ts",

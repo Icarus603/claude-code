@@ -1,8 +1,25 @@
 {
 	"$schema": "https://unpkg.com/knip@6/schema.json",
-	"entry": ["src/entrypoints/cli.tsx"],
-	"project": ["src/**/*.{ts,tsx}"],
-	"ignore": ["src/types/**", "src/**/*.d.ts"],
+	"entry": [
+		"packages/cli/src/entry/cli.tsx",
+		"packages/cli/src/entry/main.tsx",
+		"packages/cli/src/entry/mcp.ts",
+		"build.ts",
+		"scripts/build-platforms.ts",
+		"scripts/dev.ts",
+		"scripts/dev-debug.ts",
+		"scripts/health-check.ts",
+		"scripts/doctor-architecture.ts",
+		"scripts/check-transition-stubs.ts",
+		"scripts/verify-*.ts"
+	],
+	"project": ["packages/**/*.{ts,tsx}"],
+	"ignore": [
+		"packages/cli/src/types/**",
+		"**/*.d.ts",
+		"**/__tests__/**",
+		"**/testing/**"
+	],
 	"ignoreDependencies": [
 		"@ant/*",
 		"react-compiler-runtime",
@@ -11,10 +28,6 @@
 	],
 	"ignoreBinaries": ["bun"],
 	"workspaces": {
-		"packages/*": {
-			"entry": ["src/index.ts"],
-			"project": ["src/**/*.ts"]
-		},
 		"packages/@ant/*": {
 			"ignore": ["**"]
 		}
