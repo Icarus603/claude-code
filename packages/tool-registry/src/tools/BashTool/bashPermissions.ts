@@ -6,9 +6,9 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { ToolPermissionContext, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
+import type { ToolPermissionContext, ToolUseContext } from '../../Tool.js'
 import type { PendingClassifierCheck } from '@claude-code/permission/permissionTypes'
-import { count } from '@claude-code/tool-registry/utils/array.js'
+import { count } from '../../utils/array.js'
 import {
   checkSemantics,
   nodeTypeId,

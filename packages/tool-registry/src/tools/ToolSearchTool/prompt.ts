@@ -1,20 +1,20 @@
 import { feature } from 'bun:bundle'
 import { isReplBridgeActive } from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import type { Tool } from '@claude-code/tool-registry/Tool.js'
-import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
+import type { Tool } from '../../Tool.js'
+import { AGENT_TOOL_NAME } from '../AgentTool/constants.js'
 
 // Dead code elimination: Brief tool name only needed when KAIROS or KAIROS_BRIEF is on
 /* eslint-disable @typescript-eslint/no-require-imports */
 const BRIEF_TOOL_NAME: string | null =
   feature('KAIROS') || feature('KAIROS_BRIEF')
     ? (
-        require('@claude-code/tool-registry/tools/BriefTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/BriefTool/prompt.js')
+        require('../BriefTool/prompt.js') as typeof import('../BriefTool/prompt.js')
       ).BRIEF_TOOL_NAME
     : null
 const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS')
   ? (
-      require('@claude-code/tool-registry/tools/SendUserFileTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/SendUserFileTool/prompt.js')
+      require('../SendUserFileTool/prompt.js') as typeof import('../SendUserFileTool/prompt.js')
     ).SEND_USER_FILE_TOOL_NAME
   : null
 
@@ -74,9 +74,9 @@ export function isDeferredTool(tool: Tool): boolean {
   // Lazy require: static import of forkSubagent → coordinatorMode creates a cycle
   // through constants/tools.ts at module init.
   if (feature('FORK_SUBAGENT') && tool.name === AGENT_TOOL_NAME) {
-    type ForkMod = typeof import('@claude-code/tool-registry/tools/AgentTool/forkSubagent.js')
+    type ForkMod = typeof import('../AgentTool/forkSubagent.js')
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const m = require('@claude-code/tool-registry/tools/AgentTool/forkSubagent.js') as ForkMod
+    const m = require('../AgentTool/forkSubagent.js') as ForkMod
     if (m.isForkSubagentEnabled()) return false
   }
 

@@ -18,11 +18,11 @@ import type {
   PermissionRule,
   PermissionRuleSource,
   PermissionRuleValue,
-} from '@claude-code/permission/PermissionRule'
+} from './PermissionRule.js'
 import {
   permissionRuleValueFromString,
   permissionRuleValueToString,
-} from '@claude-code/permission/permissionRuleParser'
+} from './permissionRuleParser.js'
 
 /**
  * Returns true if allowManagedPermissionRulesOnly is enabled in managed settings (policySettings).

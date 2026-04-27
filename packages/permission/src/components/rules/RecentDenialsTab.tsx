@@ -5,7 +5,7 @@ import { Box, Text, useInput, useTabHeaderFocus } from '@anthropic/ink'
 import {
   type AutoModeDenial,
   getAutoModeDenials,
-} from '@claude-code/permission/autoModeDenials.js'
+} from '../../autoModeDenials.js'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { StatusIcon } from '@anthropic/ink'
 

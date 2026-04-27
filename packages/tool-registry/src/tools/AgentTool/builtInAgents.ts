@@ -36,7 +36,7 @@ export function getBuiltInAgents(): AgentDefinition[] {
     if (isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE)) {
       /* eslint-disable @typescript-eslint/no-require-imports */
       const { getCoordinatorAgents } =
-        require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js') as typeof import('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
+        require('./loadAgentsDir.js') as typeof import('./loadAgentsDir.js')
       /* eslint-enable @typescript-eslint/no-require-imports */
       return getCoordinatorAgents()
     }

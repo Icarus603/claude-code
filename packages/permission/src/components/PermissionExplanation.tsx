@@ -8,7 +8,7 @@ import {
   isPermissionExplainerEnabled,
   type PermissionExplanation as PermissionExplanationType,
   type RiskLevel,
-} from '@claude-code/permission/permissionExplainer.js'
+} from '../permissionExplainer.js'
 import { ShimmerChar } from '@claude-code/repl/components/Spinner/ShimmerChar.js'
 import { useShimmerAnimation } from '@claude-code/repl/components/Spinner/useShimmerAnimation.js'
 

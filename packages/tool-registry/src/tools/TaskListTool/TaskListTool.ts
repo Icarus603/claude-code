@@ -1,6 +1,6 @@
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import {
   getTaskListId,
   isTodoV2Enabled,

@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
-import '@claude-code/tool-registry/runtime'
-import { getAllBaseTools } from '@claude-code/tool-registry'
+import '../runtime.js'
+import { getAllBaseTools } from '../index.js'
 import type {
   ContentBlockParam,
   ToolResultBlockParam,
@@ -36,20 +36,20 @@ import {
   type ToolProgress,
   type ToolProgressData,
   type ToolUseContext,
-} from '@claude-code/tool-registry/Tool.js'
-import type { BashToolInput } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
-import { startSpeculativeClassifierCheck } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
-import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
-import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/prompt.js'
-import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/NotebookEditTool/constants.js'
-import { POWERSHELL_TOOL_NAME } from '@claude-code/tool-registry/tools/PowerShellTool/toolName.js'
-import { parseGitCommitId } from '@claude-code/tool-registry/tools/shared/gitOperationTracking.js'
+} from '../Tool.js'
+import type { BashToolInput } from '../tools/BashTool/BashTool.js'
+import { startSpeculativeClassifierCheck } from '../tools/BashTool/bashPermissions.js'
+import { BASH_TOOL_NAME } from '../tools/BashTool/toolName.js'
+import { FILE_EDIT_TOOL_NAME } from '../tools/FileEditTool/constants.js'
+import { FILE_READ_TOOL_NAME } from '../tools/FileReadTool/prompt.js'
+import { FILE_WRITE_TOOL_NAME } from '../tools/FileWriteTool/prompt.js'
+import { NOTEBOOK_EDIT_TOOL_NAME } from '../tools/NotebookEditTool/constants.js'
+import { POWERSHELL_TOOL_NAME } from '../tools/PowerShellTool/toolName.js'
+import { parseGitCommitId } from '../tools/shared/gitOperationTracking.js'
 import {
   isDeferredTool,
   TOOL_SEARCH_TOOL_NAME,
-} from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
+} from '../tools/ToolSearchTool/prompt.js'
 import type { HookProgress } from '@claude-code/agent/types/hooks.js'
 import type {
   AssistantMessage,
@@ -58,7 +58,7 @@ import type {
   ProgressMessage,
   StopHookInfo,
 } from '@claude-code/agent/messageShapes'
-import { count } from '@claude-code/tool-registry/utils/array.js'
+import { count } from '../utils/array.js'
 import { createAttachmentMessage } from '@claude-code/agent/attachments.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
@@ -102,7 +102,7 @@ import {
 import {
   formatError,
   formatZodValidationError,
-} from '@claude-code/tool-registry/toolErrors.js'
+} from '../toolErrors.js'
 import {
   processPreMappedToolResultBlock,
   processToolResultBlock,

@@ -30,7 +30,7 @@ const {
   getModeColor,
   PERMISSION_MODES,
   EXTERNAL_PERMISSION_MODES,
-} = await import("@claude-code/permission/PermissionMode");
+} = await import("../PermissionMode.js");
 
 // ─── PERMISSION_MODES / EXTERNAL_PERMISSION_MODES ──────────────────────
 

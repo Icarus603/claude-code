@@ -5,7 +5,7 @@ import {
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import type z from 'zod/v4'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import type { AnyObject, Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
+import type { AnyObject, Tool, ToolUseContext } from '../Tool.js'
 import type { HookProgress } from '@claude-code/agent/types/hooks.js'
 import type {
   AssistantMessage,
@@ -28,7 +28,7 @@ import {
   type PermissionResult,
 } from '@claude-code/permission/PermissionResult'
 import { checkRuleBasedPermissions } from '@claude-code/permission/permissions'
-import { formatError } from '@claude-code/tool-registry/toolErrors.js'
+import { formatError } from '../toolErrors.js'
 import { isMcpTool } from '@claude-code/mcp-runtime/utils.js'
 import type { McpServerType, MessageUpdateLazy } from './toolExecution.js'
 

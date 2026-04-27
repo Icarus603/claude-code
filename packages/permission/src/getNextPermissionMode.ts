@@ -1,12 +1,12 @@
 import { feature } from 'bun:bundle'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import type { PermissionMode } from '@claude-code/permission/PermissionMode'
+import type { PermissionMode } from './PermissionMode.js'
 import {
   getAutoModeUnavailableReason,
   isAutoModeGateEnabled,
   transitionPermissionMode,
-} from '@claude-code/permission/permissionSetup'
+} from './permissionSetup.js'
 import { readEnv } from '@claude-code/config/env'
 
 // Checks both the cached isAutoModeAvailable (set at startup by

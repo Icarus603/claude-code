@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import {
   type GlobalConfig,
   getGlobalConfig,
@@ -12,7 +12,7 @@ import {
   saveGlobalConfig,
 } from '@claude-code/config'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   getInitialSettings,

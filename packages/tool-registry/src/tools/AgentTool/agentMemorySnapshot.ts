@@ -3,7 +3,7 @@ import { join } from 'path'
 import { z } from 'zod/v4'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { type AgentMemoryScope, getAgentMemoryDir } from '@claude-code/memory/agentMemory'
 

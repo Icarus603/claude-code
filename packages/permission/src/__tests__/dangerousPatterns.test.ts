@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   CROSS_PLATFORM_CODE_EXEC,
   DANGEROUS_BASH_PATTERNS,
-} from "@claude-code/permission/dangerousPatterns";
+} from "../dangerousPatterns.js";
 
 describe("CROSS_PLATFORM_CODE_EXEC", () => {
   test("is a non-empty readonly array of strings", () => {

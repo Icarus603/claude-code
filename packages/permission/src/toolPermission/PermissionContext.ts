@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
+import type { ToolUseConfirm } from '../components/PermissionRequest.js'
 import type {
   ToolPermissionContext,
   Tool as ToolType,
@@ -19,8 +19,8 @@ import type {
   PermissionAllowDecision,
   PermissionDecisionReason,
   PermissionDenyDecision,
-} from '@claude-code/permission/permissionTypes'
-import { setClassifierApproval } from '@claude-code/permission/classifierApprovals.js'
+} from '../permissionTypes.js'
+import { setClassifierApproval } from '../classifierApprovals.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { executePermissionRequestHooks } from '@claude-code/agent/hooks.js'
 import {
@@ -30,13 +30,13 @@ import {
   SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX,
   withMemoryCorrectionHint,
 } from '@claude-code/agent/messages.js'
-import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
+import type { PermissionDecision } from '../PermissionResult.js'
 import {
   applyPermissionUpdates,
   persistPermissionUpdates,
   supportsPersistence,
-} from '@claude-code/permission/PermissionUpdate'
-import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
+} from '../PermissionUpdate.js'
+import type { PermissionUpdate } from '../PermissionUpdateSchema.js'
 import {
   logPermissionDecision,
   type PermissionDecisionArgs,

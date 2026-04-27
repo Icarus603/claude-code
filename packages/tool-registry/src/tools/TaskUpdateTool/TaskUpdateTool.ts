@@ -1,13 +1,13 @@
 import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   executeTaskCompletedHooks,
   getTaskCompletedHookMessage,
 } from '@claude-code/agent/hooks.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import {
   blockTask,
   deleteTask,
@@ -26,7 +26,7 @@ import {
   getTeamName,
 } from '@claude-code/swarm/teammateState.js'
 import { writeToMailbox } from '@claude-code/swarm'
-import { VERIFICATION_AGENT_TYPE } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
+import { VERIFICATION_AGENT_TYPE } from '../AgentTool/constants.js'
 import { TASK_UPDATE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
 

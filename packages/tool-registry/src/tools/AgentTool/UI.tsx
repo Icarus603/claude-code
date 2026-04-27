@@ -19,14 +19,14 @@ import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js
 import { ToolUseLoader } from '@claude-code/repl/components/ToolUseLoader.js'
 import { Box, Text } from '@anthropic/ink'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
-import { findToolByName, type Tools } from '@claude-code/tool-registry/Tool.js'
+import { findToolByName, type Tools } from '../../Tool.js'
 import type { Message, ProgressMessage } from '@claude-code/agent/messageShapes'
-import type { AgentToolProgress } from '@claude-code/tool-registry/progressTypes'
-import { count } from '@claude-code/tool-registry/utils/array.js'
+import type { AgentToolProgress } from '../../progressTypes.js'
+import { count } from '../../utils/array.js'
 import {
   getSearchOrReadFromContent,
   getSearchReadSummaryText,
-} from '@claude-code/tool-registry/collapseReadSearch.js'
+} from '../../collapseReadSearch.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import {

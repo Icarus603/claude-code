@@ -7,8 +7,8 @@ import { useAppState } from '../appStateHooks.js'
 import type {
   PermissionDecision,
   PermissionDecisionReason,
-} from '@claude-code/permission/PermissionResult'
-import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
+} from '../PermissionResult.js'
+import { permissionRuleValueToString } from '../permissionRuleParser.js'
 import type { Theme } from '@anthropic/ink'
 
 export type PermissionRuleExplanationProps = {

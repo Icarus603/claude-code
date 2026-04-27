@@ -1,12 +1,12 @@
 import { z } from 'zod/v4'
-import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { ValidationResult } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import {
   getCronFilePath,
   listAllCronTasks,
   removeCronTasks,
 } from '@claude-code/agent/scheduler'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'
 import {
   buildCronDeletePrompt,

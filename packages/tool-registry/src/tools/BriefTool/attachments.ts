@@ -8,7 +8,7 @@
 import { feature } from 'bun:bundle'
 import { stat } from 'fs/promises'
 
-import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
+import type { ValidationResult } from '../../Tool.js'
 
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'

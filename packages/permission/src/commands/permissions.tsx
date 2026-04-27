@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { PermissionRuleList } from '@claude-code/permission/components/rules/PermissionRuleList.js'
+import { PermissionRuleList } from '../components/rules/PermissionRuleList.js'
 import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'
 import { createPermissionRetryMessage } from '@claude-code/agent/messages.js'
 

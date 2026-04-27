@@ -31,7 +31,7 @@ import { maybeResizeAndDownsampleImageBlock } from '@claude-code/storage/imageRe
 import { cacheImagePath, storeImage } from '@claude-code/tool-registry/imageStore.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { applyMarkdown } from '@claude-code/output/markdown.js'
-import { isPlanModeInterviewPhaseEnabled } from '@claude-code/permission/planModeV2.js'
+import { isPlanModeInterviewPhaseEnabled } from '../../planModeV2.js'
 import { getPlanFilePath } from '@claude-code/storage/plans.js'
 import type { PermissionRequestProps } from '../PermissionRequest.js'
 import { QuestionView } from './QuestionView.js'

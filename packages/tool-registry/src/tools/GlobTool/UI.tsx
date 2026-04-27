@@ -3,11 +3,11 @@ import React from 'react'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { extractTag } from '@claude-code/agent/messages.js'
 import { FallbackToolUseErrorMessage } from '@claude-code/repl/components/FallbackToolUseErrorMessage.js'
-import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
+import { TOOL_SUMMARY_MAX_LENGTH } from '../../toolLimits.js'
 import { Text } from '@anthropic/ink'
 import { FILE_NOT_FOUND_CWD_NOTE, getDisplayPath } from '@claude-code/storage/file.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'
+import { GrepTool } from '../GrepTool/GrepTool.js'
 
 export function userFacingName(): string {
   return 'Search'

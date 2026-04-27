@@ -6,7 +6,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
-import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
+import type { PermissionUpdate } from '../../PermissionUpdateSchema.js'
 import type { CompletionType } from '@claude-code/local-observability/logging'
 import type { ToolUseConfirm } from '../PermissionRequest.js'
 import {

@@ -11,7 +11,7 @@ import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
 import { z } from 'zod/v4'
 import { getKairosActive } from '@claude-code/app-host/bootstrap/state.js'
-import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
+import { TOOL_SUMMARY_MAX_LENGTH } from '../../toolLimits.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -22,8 +22,8 @@ import type {
   ToolCallProgress,
   ToolUseContext,
   ValidationResult,
-} from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+} from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import {
   backgroundExistingForegroundTask,
   markTaskNotified,
@@ -38,8 +38,8 @@ import {
   splitCommand_DEPRECATED,
   splitCommandWithOperators,
 } from '@claude-code/shell/bash/commands.js'
-import { extractClaudeCodeHints } from '@claude-code/tool-registry/claudeCodeHints.js'
-import { detectCodeIndexingFromCommand } from '@claude-code/tool-registry/codeIndexing.js'
+import { extractClaudeCodeHints } from '../../claudeCodeHints.js'
+import { detectCodeIndexingFromCommand } from '../../codeIndexing.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT, ShellError } from '@claude-code/local-observability/errorHelpers.js'
 import {
@@ -54,18 +54,18 @@ import {
 } from '@claude-code/agent/file-history'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { expandPath } from '@claude-code/storage/path.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { maybeRecordPluginHint } from '@claude-code/config/plugin/hintRecommendation'
 import { exec } from '@claude-code/shell/Shell.js'
 import type { ExecResult } from '@claude-code/shell/shellCommand.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
-import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
-import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js'
+import { semanticBoolean } from '../../utils/semanticBoolean.js'
+import { semanticNumber } from '../../utils/semanticNumber.js'
 import { EndTruncatingAccumulator } from '@claude-code/output/utils/stringUtils.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
-import { TaskOutput } from '@claude-code/tool-registry/taskOutput.js'
+import { TaskOutput } from '../../taskOutput.js'
 import { isOutputLineTruncated } from '@claude-code/output/terminal.js'
 import {
   buildLargeToolResultMessage,
@@ -74,8 +74,8 @@ import {
   getToolResultPath,
   PREVIEW_SIZE_BYTES,
 } from '@claude-code/storage/toolResultStorage.js'
-import { userFacingName as fileEditUserFacingName } from '@claude-code/tool-registry/tools/FileEditTool/UI.js'
-import { trackGitOperations } from '@claude-code/tool-registry/tools/shared/gitOperationTracking.js'
+import { userFacingName as fileEditUserFacingName } from '../FileEditTool/UI.js'
+import { trackGitOperations } from '../shared/gitOperationTracking.js'
 import {
   bashToolHasPermission,
   commandHasAnyCd,
@@ -506,9 +506,9 @@ type OutputSchema = ReturnType<typeof outputSchema>
 export type Out = z.infer<OutputSchema>
 
 // Re-export BashProgress from centralized types to break import cycles
-export type { BashProgress } from '@claude-code/tool-registry/progressTypes'
+export type { BashProgress } from '../../progressTypes.js'
 
-import type { BashProgress } from '@claude-code/tool-registry/progressTypes'
+import type { BashProgress } from '../../progressTypes.js'
 
 /**
  * Checks if a command is allowed to be automatically backgrounded

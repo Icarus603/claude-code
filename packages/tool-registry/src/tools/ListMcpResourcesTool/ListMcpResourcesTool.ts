@@ -3,9 +3,9 @@ import {
   ensureConnectedClient,
   fetchResourcesForClient,
 } from '@claude-code/mcp-runtime/clientRuntime.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { logMCPError } from '@claude-code/local-observability/logging'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { isOutputLineTruncated } from '@claude-code/output/terminal.js'

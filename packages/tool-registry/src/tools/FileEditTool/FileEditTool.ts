@@ -1,7 +1,7 @@
 import { dirname, isAbsolute, sep } from 'path'
 import { logEvent } from '@claude-code/local-observability'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking.js'
+import { diagnosticTracker } from '../../diagnosticTracking.js'
 import { clearDeliveredDiagnosticsForFile } from '@claude-code/ide/lsp/LSPDiagnosticRegistry.js'
 import { getLspServerManager } from '@claude-code/ide/lsp/manager.js'
 import { notifyVscodeFileUpdated } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
@@ -11,8 +11,8 @@ import {
   addSkillDirectories,
   discoverSkillDirsForPaths,
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
-import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { ToolUseContext } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { countLinesChanged } from '@claude-code/agent/diff.js'
@@ -39,7 +39,7 @@ import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,
-} from '@claude-code/tool-registry/gitDiff.js'
+} from '../../gitDiff.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from '@claude-code/storage/path.js'
 import {
@@ -48,8 +48,8 @@ import {
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
-import { validateInputForSettingsFileEdit } from '@claude-code/tool-registry/validateEditTool.js'
-import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/NotebookEditTool/constants.js'
+import { validateInputForSettingsFileEdit } from '../../validateEditTool.js'
+import { NOTEBOOK_EDIT_TOOL_NAME } from '../NotebookEditTool/constants.js'
 import {
   FILE_EDIT_TOOL_NAME,
   FILE_UNEXPECTEDLY_MODIFIED_ERROR,

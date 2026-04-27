@@ -1,6 +1,6 @@
 import { z } from 'zod/v4'
-import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { ValidationResult } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
@@ -9,7 +9,7 @@ import {
 } from '@claude-code/storage/file.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { glob } from '@claude-code/storage/glob.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { expandPath, toRelativePath } from '@claude-code/storage/path.js'
 import { checkReadPermissionForTool } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'

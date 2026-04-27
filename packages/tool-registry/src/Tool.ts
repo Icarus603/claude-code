@@ -28,7 +28,7 @@ import type {
 import type {
   AgentDefinition,
   AgentDefinitionsResult,
-} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
+} from './tools/AgentTool/loadAgentsDir.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
@@ -55,8 +55,8 @@ import type {
   TaskOutputProgress,
   ToolProgressData,
   WebSearchProgress,
-} from '@claude-code/tool-registry/progressTypes'
-import type { FileStateCache } from '@claude-code/tool-registry/fileStateCache'
+} from './progressTypes.js'
+import type { FileStateCache } from './fileStateCache.js'
 import type { DenialTrackingState } from '@claude-code/permission/denialTracking'
 import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import type { ContentReplacementState } from '@claude-code/storage/toolResultStorage.js'
@@ -82,7 +82,7 @@ import type {
   PromptResponse,
 } from '@claude-code/agent/types/hooks.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
-import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
+import type { DeepImmutable } from './genericTypeUtils.js'
 import type { AttributionState } from '@claude-code/agent/commitAttribution.js'
 import type { FileHistoryState } from '@claude-code/agent/file-history'
 import type { Theme, ThemeName } from '@anthropic/ink'

@@ -2,7 +2,7 @@ import { dirname, sep } from 'path'
 import { logEvent } from '@claude-code/local-observability'
 import { z } from 'zod/v4'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking.js'
+import { diagnosticTracker } from '../../diagnosticTracking.js'
 import { clearDeliveredDiagnosticsForFile } from '@claude-code/ide/lsp/LSPDiagnosticRegistry.js'
 import { getLspServerManager } from '@claude-code/ide/lsp/manager.js'
 import { notifyVscodeFileUpdated } from '@claude-code/mcp-runtime/vscodeSdkMcp.js'
@@ -12,8 +12,8 @@ import {
   addSkillDirectories,
   discoverSkillDirsForPaths,
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
-import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { ToolUseContext } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { countLinesChanged, getPatchForDisplay } from '@claude-code/agent/diff.js'
@@ -30,8 +30,8 @@ import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   fetchSingleFileGitDiff,
   type ToolUseDiff,
-} from '@claude-code/tool-registry/gitDiff.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+} from '../../gitDiff.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { expandPath } from '@claude-code/storage/path.js'
 import {
@@ -40,8 +40,8 @@ import {
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
-import { FILE_UNEXPECTEDLY_MODIFIED_ERROR } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
-import { gitDiffSchema, hunkSchema } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
+import { FILE_UNEXPECTEDLY_MODIFIED_ERROR } from '../FileEditTool/constants.js'
+import { gitDiffSchema, hunkSchema } from '../FileEditTool/types.js'
 import { FILE_WRITE_TOOL_NAME, getWriteToolDescription } from './prompt.js'
 import {
   getToolUseSummary,

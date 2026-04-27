@@ -25,8 +25,8 @@ import {
   addSkillDirectories,
   discoverSkillDirsForPaths,
 } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
-import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { ToolUseContext } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import { getErrnoCode, isENOENT } from '@claude-code/local-observability/errorHelpers.js'
@@ -48,7 +48,7 @@ import {
   ImageResizeError,
   maybeResizeAndDownsampleImageBuffer,
 } from '@claude-code/storage/imageResizer.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { isAutoMemFile } from '@claude-code/memory/memoryFileDetection'
 import { createUserMessage } from '@claude-code/agent/messages.js'
@@ -56,9 +56,9 @@ import { getCanonicalName, getMainLoopModel } from '@claude-code/provider/model.
 import {
   mapNotebookCellsToToolResult,
   readNotebook,
-} from '@claude-code/tool-registry/notebook.js'
+} from '../../notebook.js'
 import { expandPath } from '@claude-code/storage/path.js'
-import { extractPDFPages, getPDFPageCount, readPDF } from '@claude-code/tool-registry/pdf.js'
+import { extractPDFPages, getPDFPageCount, readPDF } from '../../pdf.js'
 import {
   isPDFExtension,
   isPDFSupported,
@@ -71,9 +71,9 @@ import {
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
 import { readFileInRange } from '@claude-code/repl/readFileInRange.js'
-import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js'
+import { semanticNumber } from '../../utils/semanticNumber.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
+import { BASH_TOOL_NAME } from '../BashTool/toolName.js'
 import { getDefaultFileReadingLimits } from './limits.js'
 import {
   DESCRIPTION,

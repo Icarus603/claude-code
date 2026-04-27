@@ -5,26 +5,26 @@ import { FallbackToolUseRejectedMessage } from '@claude-code/repl/components/Fal
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
 import { Box, Text } from '@anthropic/ink'
 import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
-import type { TaskType } from '@claude-code/tool-registry/Task.js'
-import type { Tool } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { TaskType } from '../../Task.js'
+import type { Tool } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'
-import type { RemoteAgentTaskState } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
+import type { RemoteAgentTaskState } from '../../tasks/RemoteAgentTask.js'
 import type { TaskState } from '@claude-code/repl/tasksTypes.js'
 import { AbortError } from '@claude-code/local-observability/errorHelpers.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { extractTextContent } from '@claude-code/agent/messages.js'
-import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
+import { semanticBoolean } from '../../utils/semanticBoolean.js'
 import { sleep } from '@claude-code/config/sleep'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import { getTaskOutput } from '@claude-code/storage/task/diskOutput.js'
 import { updateTaskState } from '@claude-code/agent/taskFramework.js'
-import { formatTaskOutput } from '@claude-code/tool-registry/task/outputFormatting.js'
+import { formatTaskOutput } from '../../task/outputFormatting.js'
 import type { ThemeName } from '@anthropic/ink'
-import { AgentPromptDisplay, AgentResponseDisplay } from '@claude-code/tool-registry/tools/AgentTool/UI.js'
-import BashToolResultMessage from '@claude-code/tool-registry/tools/BashTool/BashToolResultMessage.js'
+import { AgentPromptDisplay, AgentResponseDisplay } from '../AgentTool/UI.js'
+import BashToolResultMessage from '../BashTool/BashToolResultMessage.js'
 import { TASK_OUTPUT_TOOL_NAME } from './constants.js'
 
 const inputSchema = lazySchema(() =>
@@ -65,7 +65,7 @@ type TaskOutputToolOutput = {
 }
 
 // Re-export Progress from centralized types to break import cycles
-export type { TaskOutputProgress as Progress } from '@claude-code/tool-registry/progressTypes'
+export type { TaskOutputProgress as Progress } from '../../progressTypes.js'
 
 // Get output for any task type
 async function getTaskOutputData(task: TaskState): Promise<TaskOutput> {

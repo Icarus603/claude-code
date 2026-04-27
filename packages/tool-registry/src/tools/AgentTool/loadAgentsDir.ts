@@ -12,7 +12,7 @@ import {
   type McpServerConfig,
   McpServerConfigSchema,
 } from '@claude-code/mcp-runtime/types.js'
-import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
+import type { ToolUseContext } from '../../Tool.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   EFFORT_LEVELS,
@@ -21,13 +21,13 @@ import {
 } from '@claude-code/agent/effort.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { parsePositiveIntFromFrontmatter } from '@claude-code/agent/frontmatterParser.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   loadMarkdownFilesForSubdir,
   parseAgentToolsFromFrontmatter,
   parseSlashCommandToolsFromFrontmatter,
-} from '@claude-code/tool-registry/markdownConfigLoader.js'
+} from '../../markdownConfigLoader.js'
 import {
   PERMISSION_MODES,
   type PermissionMode,
@@ -38,9 +38,9 @@ import {
 } from '@claude-code/config/plugin/loadPluginAgentsAlias.js'
 import { HooksSchema, type HooksSettings } from '@claude-code/config/types'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
-import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/constants.js'
-import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/constants.js'
+import { FILE_EDIT_TOOL_NAME } from '../FileEditTool/constants.js'
+import { FILE_READ_TOOL_NAME } from '../FileReadTool/constants.js'
+import { FILE_WRITE_TOOL_NAME } from '../FileWriteTool/constants.js'
 import {
   AGENT_COLORS,
   type AgentColorName,

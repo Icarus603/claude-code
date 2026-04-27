@@ -11,7 +11,7 @@ import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
 import { z } from 'zod/v4'
 import { getKairosActive } from '@claude-code/app-host/bootstrap/state.js'
-import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
+import { TOOL_SUMMARY_MAX_LENGTH } from '../../toolLimits.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -21,8 +21,8 @@ import type {
   Tool,
   ToolCallProgress,
   ValidationResult,
-} from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+} from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import {
   backgroundExistingForegroundTask,
   markTaskNotified,
@@ -32,14 +32,14 @@ import {
 } from '@claude-code/agent/tasks/LocalShellTask.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
-import { extractClaudeCodeHints } from '@claude-code/tool-registry/claudeCodeHints.js'
+import { extractClaudeCodeHints } from '../../claudeCodeHints.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
   errorMessage as getErrorMessage,
   ShellError,
 } from '@claude-code/local-observability/errorHelpers.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { getPlatform } from '@claude-code/config/platform'
@@ -47,12 +47,12 @@ import { maybeRecordPluginHint } from '@claude-code/config/plugin/hintRecommenda
 import { exec } from '@claude-code/shell/Shell.js'
 import type { ExecResult } from '@claude-code/shell/shellCommand.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
-import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
-import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js'
+import { semanticBoolean } from '../../utils/semanticBoolean.js'
+import { semanticNumber } from '../../utils/semanticNumber.js'
 import { getCachedPowerShellPath } from '@claude-code/shell/legacy/powershellDetection.js'
 import { EndTruncatingAccumulator } from '@claude-code/output/utils/stringUtils.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
-import { TaskOutput } from '@claude-code/tool-registry/taskOutput.js'
+import { TaskOutput } from '../../taskOutput.js'
 import { isOutputLineTruncated } from '@claude-code/output/terminal.js'
 import {
   buildLargeToolResultMessage,
@@ -61,8 +61,8 @@ import {
   getToolResultPath,
   PREVIEW_SIZE_BYTES,
 } from '@claude-code/storage/toolResultStorage.js'
-import { shouldUseSandbox } from '@claude-code/tool-registry/tools/BashTool/shouldUseSandbox.js'
-import { BackgroundHint } from '@claude-code/tool-registry/tools/BashTool/UI.js'
+import { shouldUseSandbox } from '../BashTool/shouldUseSandbox.js'
+import { BackgroundHint } from '../BashTool/UI.js'
 import {
   buildImageToolResult,
   isImageOutput,
@@ -70,8 +70,8 @@ import {
   resizeShellImageOutput,
   stdErrAppendShellResetMessage,
   stripEmptyLines,
-} from '@claude-code/tool-registry/tools/BashTool/utils.js'
-import { trackGitOperations } from '@claude-code/tool-registry/tools/shared/gitOperationTracking.js'
+} from '../BashTool/utils.js'
+import { trackGitOperations } from '../shared/gitOperationTracking.js'
 import { interpretCommandResult } from './commandSemantics.js'
 import { powershellToolHasPermission } from './powershellPermissions.js'
 import { getDefaultTimeoutMs, getMaxTimeoutMs, getPrompt } from './prompt.js'
@@ -353,9 +353,9 @@ const outputSchema = lazySchema(() =>
 type OutputSchema = ReturnType<typeof outputSchema>
 export type Out = z.infer<OutputSchema>
 
-import type { PowerShellProgress } from '@claude-code/tool-registry/progressTypes'
+import type { PowerShellProgress } from '../../progressTypes.js'
 
-export type { PowerShellProgress } from '@claude-code/tool-registry/progressTypes'
+export type { PowerShellProgress } from '../../progressTypes.js'
 
 const COMMON_BACKGROUND_COMMANDS = [
   'npm',

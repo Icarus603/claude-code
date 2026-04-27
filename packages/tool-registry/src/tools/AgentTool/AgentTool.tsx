@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import { buildTool, type ToolDef, toolMatchesName } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef, toolMatchesName } from '../../Tool.js'
 import type {
   Message as MessageType,
   NormalizedUserMessage,
@@ -44,8 +44,8 @@ import {
   formatPreconditionError,
   getRemoteTaskSessionUrl,
   registerRemoteAgentTask,
-} from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
-import { assembleToolPool } from '@claude-code/tool-registry/runtime'
+} from '../../tasks/RemoteAgentTask.js'
+import { assembleToolPool } from '../../runtime.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
 import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
@@ -54,7 +54,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { AbortError, errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import type { CacheSafeParams } from '@claude-code/agent/forkedAgent.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import {
   createUserMessage,
   extractTextContent,
@@ -76,7 +76,7 @@ import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 import { getParentSessionId, isTeammate } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
-import { teleportToRemote } from '@claude-code/tool-registry/teleport.js'
+import { teleportToRemote } from '../../teleport.js'
 import { getAssistantMessageContentLength } from '@claude-code/agent/tokens.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'
 import {
@@ -84,10 +84,10 @@ import {
   hasWorktreeChanges,
   removeAgentWorktree,
 } from '@claude-code/swarm'
-import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import { BackgroundHint } from '@claude-code/tool-registry/tools/BashTool/UI.js'
-import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
-import { spawnTeammate } from '@claude-code/tool-registry/tools/shared/spawnMultiAgent.js'
+import { BASH_TOOL_NAME } from '../BashTool/toolName.js'
+import { BackgroundHint } from '../BashTool/UI.js'
+import { FILE_READ_TOOL_NAME } from '../FileReadTool/prompt.js'
+import { spawnTeammate } from '../shared/spawnMultiAgent.js'
 import { setAgentColor } from './agentColorManager.js'
 import {
   agentToolResultSchema,
@@ -330,7 +330,7 @@ export type RemoteLaunchedOutput = {
 
 type InternalOutput = Output | TeammateSpawnedOutput | RemoteLaunchedOutput
 
-import type { AgentToolProgress, ShellProgress } from '@claude-code/tool-registry/progressTypes'
+import type { AgentToolProgress, ShellProgress } from '../../progressTypes.js'
 // AgentTool forwards both its own progress events and shell progress
 // events from the sub-agent so the SDK receives tool_progress updates during bash/powershell runs.
 export type Progress = AgentToolProgress | ShellProgress

@@ -25,7 +25,7 @@ import type {
   MCPServerConnection,
   ScopedMcpServerConfig,
 } from '@claude-code/mcp-runtime/types.js'
-import type { Tool, Tools, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
+import type { Tool, Tools, ToolUseContext } from '../../Tool.js'
 import { killShellTasksForAgent } from '@claude-code/agent/tasks/LocalShellTask/killShellTasks.js'
 import type { Command } from '@claude-code/agent/command.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
@@ -47,7 +47,7 @@ import {
   cloneFileStateCache,
   createFileStateCacheWithSizeLimit,
   READ_FILE_STATE_CACHE_SIZE,
-} from '@claude-code/tool-registry/fileStateCache'
+} from '../../fileStateCache.js'
 import {
   type CacheSafeParams,
   createSubagentContext,

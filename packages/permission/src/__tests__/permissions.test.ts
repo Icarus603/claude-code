@@ -35,7 +35,7 @@ const {
   getAskRuleForTool,
   getDenyRuleForAgent,
   filterDeniedAgents,
-} = await import("@claude-code/permission/permissions");
+} = await import("../permissions.js");
 
 import { getEmptyToolPermissionContext } from "@claude-code/tool-registry/Tool.js";
 

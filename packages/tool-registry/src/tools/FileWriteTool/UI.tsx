@@ -14,14 +14,14 @@ import { HighlightedCode } from '@claude-code/repl/components/HighlightedCode.js
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'
 import { FilePathLink } from '@claude-code/repl/components/FilePathLink.js'
-import type { ToolProgressData } from '@claude-code/tool-registry/Tool.js'
+import type { ToolProgressData } from '../../Tool.js'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getPatchForDisplay } from '@claude-code/agent/diff.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getPlansDirectory } from '@claude-code/storage/plans.js'
-import { openForScan, readCapped } from '@claude-code/tool-registry/readEditContext.js'
+import { openForScan, readCapped } from '../../readEditContext.js'
 import type { Output } from './FileWriteTool.js'
 
 const MAX_LINES_TO_RENDER = 10

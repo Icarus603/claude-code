@@ -23,11 +23,11 @@ import {
   setClassifierApproval,
   setClassifierChecking,
   setYoloClassifierApproval,
-} from '@claude-code/permission/classifierApprovals.js'
+} from '../../classifierApprovals.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
-import { hasPermissionsToUseTool } from '@claude-code/permission/permissions'
+import type { PermissionDecision } from '../../PermissionResult.js'
+import type { PermissionUpdate } from '../../PermissionUpdateSchema.js'
+import { hasPermissionsToUseTool } from '../../permissions.js'
 import type { PermissionContext } from '../PermissionContext.js'
 import { createResolveOnce } from '../PermissionContext.js'
 

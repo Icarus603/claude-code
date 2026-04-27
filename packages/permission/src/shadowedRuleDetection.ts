@@ -1,12 +1,12 @@
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import type { PermissionRule, PermissionRuleSource } from '@claude-code/permission/PermissionRule'
+import type { PermissionRule, PermissionRuleSource } from './PermissionRule.js'
 import {
   getAllowRules,
   getAskRules,
   getDenyRules,
   permissionRuleSourceDisplayString,
-} from '@claude-code/permission/permissions'
+} from './permissions.js'
 
 /**
  * Type of shadowing that makes a rule unreachable

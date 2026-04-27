@@ -5,7 +5,7 @@ import { useDebounceCallback } from 'usehooks-ts'
 import {
   addDirHelpMessage,
   validateDirectoryForWorkspace,
-} from '@claude-code/permission/commands/add-dir/validation.js'
+} from '../../commands/add-dir/validation.js'
 import TextInput from '@claude-code/repl/components/TextInput.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'

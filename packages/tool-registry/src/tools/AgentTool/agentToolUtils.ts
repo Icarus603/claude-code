@@ -6,7 +6,7 @@ import {
   ASYNC_AGENT_ALLOWED_TOOLS,
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   IN_PROCESS_TEAMMATE_ALLOWED_TOOLS,
-} from '@claude-code/tool-registry/toolConstants'
+} from '../../toolConstants.js'
 import { startAgentSummarization } from '@claude-code/agent/AgentSummary/agentSummary.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -19,8 +19,8 @@ import type {
   ToolPermissionContext,
   Tools,
   ToolUseContext,
-} from '@claude-code/tool-registry/Tool.js'
-import { toolMatchesName } from '@claude-code/tool-registry/Tool.js'
+} from '../../Tool.js'
+import { toolMatchesName } from '../../Tool.js'
 import {
   completeAgentTask as completeAsyncAgent,
   createActivityDescriptionResolver,
@@ -42,7 +42,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isInProtectedNamespace } from '@claude-code/config/env/utils'
 import { AbortError, errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import type { CacheSafeParams } from '@claude-code/agent/forkedAgent.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import {
   extractTextContent,
   getLastAssistantMessage,
@@ -56,7 +56,7 @@ import {
 import { emitTaskProgress as emitTaskProgressEvent } from '@claude-code/agent/sdkProgress.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContext.js'
 import { getTokenCountFromUsage } from '@claude-code/agent/tokens.js'
-import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code/tool-registry/tools/ExitPlanModeTool/constants.js'
+import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '../ExitPlanModeTool/constants.js'
 import { AGENT_TOOL_NAME, LEGACY_AGENT_TOOL_NAME } from './constants.js'
 import type { AgentDefinition } from './loadAgentsDir.js'
 export type ResolvedAgentTools = {
