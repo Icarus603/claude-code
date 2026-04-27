@@ -47,7 +47,9 @@ irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | i
 | `CCB_VERSION` | `latest` | 锁定特定 tag,例如 `v1.carus.000` |
 | `CCB_PREFIX`  | `~/.local` / `%LOCALAPPDATA%\Programs\ccb` | 安装根目录 |
 
-升级:重跑同一条命令。卸载:
+**升级**:不用动手。`ccb` 每次启动 REPL(以及运行中每 30 分钟)会去 GitHub Releases 检查,有新版就在后台下载安装 —— 完成时 footer 会显示 `✓ Update installed · Restart to update`。如果要锁特定版本,重跑那条 install 命令并通过 `CCB_VERSION=…` 指定即可。
+
+卸载:
 - macOS / Linux:`rm -rf ~/.local/share/ccb ~/.local/bin/ccb`
 - Windows:`Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"`
 
