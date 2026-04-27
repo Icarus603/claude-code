@@ -18,11 +18,11 @@ import { applySettingsChange } from '@claude-code/config/applySettingsChange'
 import { settingsChangeDetector } from '@claude-code/config/changeDetector'
 import { filterToolsByDenyRules } from '@claude-code/tool-registry'
 import { isExtractModeActive } from '@claude-code/memory/paths'
-import {
-  getStructuredIO,
-  getCanUseToolFn,
-  loadInitialMessages,
-} from '../../../index.js'
+// Direct paths instead of '../../../index.js' (cli barrel) to avoid
+// same-package circular re-export (V7 §11.2 cli-internal SCC).
+import { getStructuredIO } from '../../../transport.js'
+import { getCanUseToolFn } from '../control/permission-helpers.js'
+import { loadInitialMessages } from './load.js'
 import {
   downloadUserSettings,
 } from '@claude-code/config/sync'

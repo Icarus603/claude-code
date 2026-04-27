@@ -39,8 +39,10 @@ import { getSystemContext, getUserContext } from '@claude-code/provider/context.
 import { init, initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { addToHistory } from '@claude-code/repl/history.js'
 import type { Root } from '@anthropic/ink'
-import { createHeadlessSession } from '@claude-code/cli'
-import { getTeammateModeSnapshot, logManagedSettings } from '@claude-code/cli'
+// Direct relative paths instead of '@claude-code/cli' (the index barrel)
+// to avoid same-package circular re-export (V7 §11.2 cli-internal SCC).
+import { createHeadlessSession } from '../headless.js'
+import { getTeammateModeSnapshot, logManagedSettings } from './bootstrap-utils.js'
 import {
   areMcpConfigsAllowedWithEnterpriseMcpConfig,
   clearServerCache,

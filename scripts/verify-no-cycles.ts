@@ -149,7 +149,7 @@ for (const v of graph.keys()) {
 // SCCs: 153-file mega (cross-cutting tool-registry/repl/provider/agent),
 // 14-file ink theme (same-package), 11-file swarm (same-package),
 // 5-file cli entry (same-package), 2-file AgentTool internal.
-const BUDGET = 5
+const BUDGET = 4
 
 // Diagnostic mode: print cycles to stdout when --list flag is passed
 if (process.argv.includes('--list')) {
