@@ -17,7 +17,7 @@ import { getSecureStorage } from './_deps.js'
 import {
   getSettings_DEPRECATED,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 import { jsonParse, jsonStringify } from './_deps.js'
 import { getSystemDirectories } from './_deps.js'
 import { classifyFetchError, logPluginFetch } from './fetchTelemetry.js'

@@ -20,7 +20,7 @@ import { logError } from './_deps.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 import { buildPluginTelemetryFields } from './_deps.js'
 import { clearAllCaches } from './cacheUtils.js'
 import {

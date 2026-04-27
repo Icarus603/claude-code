@@ -43,11 +43,11 @@ export type PersistableScope = Exclude<PluginScope, never> // All scopes are per
 import { getOriginalCwd } from './_deps.js'
 import { getCwd } from './_deps.js'
 import { getHeadForDir } from './_deps.js'
-import type { EditableSettingSource } from '@claude-code/config/constants'
+import type { EditableSettingSource } from '../settings/constants.js'
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 import { getPluginById } from './marketplaceManager.js'
 import {
   parsePluginIdentifier,

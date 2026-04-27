@@ -8,24 +8,24 @@ import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 import { Spinner } from '@claude-code/repl/components/Spinner.js'
 import { Box, Text, instances } from '@anthropic/ink'
-import { enablePluginOp } from '@claude-code/config/plugin/pluginOperations'
+import { enablePluginOp } from '../../pluginOperations.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isENOENT, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { pathExists } from '@claude-code/storage/file.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { getPlatform } from '@claude-code/config/platform.js'
-import { clearAllCaches } from '@claude-code/config/plugin/cacheUtils'
-import { isPluginInstalled } from '@claude-code/config/plugin/installedPluginsManager'
+import { getPlatform } from '../../../platform.js'
+import { clearAllCaches } from '../../cacheUtils.js'
+import { isPluginInstalled } from '../../installedPluginsManager.js'
 import {
   addMarketplaceSource,
   clearMarketplacesCache,
   loadKnownMarketplacesConfig,
   refreshMarketplace,
-} from '@claude-code/config/plugin/marketplaceManager'
-import { OFFICIAL_MARKETPLACE_NAME } from '@claude-code/config/plugin/officialMarketplace'
-import { loadAllPlugins } from '@claude-code/config/plugin/pluginLoader'
-import { installSelectedPlugins } from '@claude-code/config/plugin/pluginStartupCheck'
+} from '../../marketplaceManager.js'
+import { OFFICIAL_MARKETPLACE_NAME } from '../../officialMarketplace.js'
+import { loadAllPlugins } from '../../pluginLoader.js'
+import { installSelectedPlugins } from '../../pluginStartupCheck.js'
 
 // Marketplace and plugin identifiers - varies by user type
 const INTERNAL_MARKETPLACE_NAME = 'claude-code-marketplace'

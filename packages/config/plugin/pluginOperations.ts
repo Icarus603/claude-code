@@ -65,7 +65,7 @@ import type {
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 import { plural } from './_deps.js'
 
 /** Valid installable scopes (excludes 'managed' which can only be installed from managed-settings.json) */

@@ -1,8 +1,8 @@
 import { join } from 'path'
 import type { LocalCommandResult } from '@claude-code/command-runtime/runtime'
-import { loadInstalledPluginsV2 } from '@claude-code/config/plugin/installedPluginsManager'
-import { OFFICIAL_MARKETPLACE_NAME } from '@claude-code/config/plugin/officialMarketplace'
-import { playAnimation } from '@claude-code/config/plugin/commands/thinkback/thinkback.js'
+import { loadInstalledPluginsV2 } from '../../installedPluginsManager.js'
+import { OFFICIAL_MARKETPLACE_NAME } from '../../officialMarketplace.js'
+import { playAnimation } from '../thinkback/thinkback.js'
 
 const INTERNAL_MARKETPLACE_NAME = 'claude-code-marketplace'
 const SKILL_NAME = 'thinkback'

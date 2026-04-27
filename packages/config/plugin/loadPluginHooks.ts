@@ -7,12 +7,12 @@ import {
 } from './_deps.js'
 import type { LoadedPlugin } from './types.js'
 import { logForDebugging } from './_deps.js'
-import { settingsChangeDetector } from '@claude-code/config/changeDetector'
+import { settingsChangeDetector } from '../settings/changeDetector.js'
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,
-} from '@claude-code/config/settings'
-import type { PluginHookMatcher } from '@claude-code/config/types'
+} from '../settings/settings.js'
+import type { PluginHookMatcher } from '../settings/types.js'
 import { jsonStringify } from './_deps.js'
 import { clearPluginCache, loadAllPluginsCacheOnly } from './pluginLoader.js'
 

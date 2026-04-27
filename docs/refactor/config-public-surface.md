@@ -1,0 +1,208 @@
+# @claude-code/config — exports audit
+
+**Total**: 196  |  Public: 112  |  Internal-only: 0  |  Dead: 84
+
+## Truly dead
+
+- `./contracts` -> `./contracts.ts`
+- `./errors` -> `./errors.ts`
+- `./settings/internalWrites` -> `./settings/internalWrites.ts`
+- `./settings/permissionValidation` -> `./settings/permissionValidation.ts`
+- `./settings/schemaOutput` -> `./settings/schemaOutput.ts`
+- `./settings/toolValidationConfig` -> `./settings/toolValidationConfig.ts`
+- `./settings/validationTips` -> `./settings/validationTips.ts`
+- `./settings/mdm/constants` -> `./settings/mdm/constants.ts`
+- `./settings/schemas/marketplace` -> `./settings/schemas/marketplace.ts`
+- `./settings/schemas/sandbox` -> `./settings/schemas/sandbox.ts`
+- `./settings/schemas/hooks` -> `./settings/schemas/hooks.ts`
+- `./sync/types` -> `./sync/types.ts`
+- `./remote/syncCache` -> `./remote/syncCache.ts`
+- `./remote/syncCacheState` -> `./remote/syncCacheState.ts`
+- `./remote/types` -> `./remote/types.ts`
+- `./remote/securityCheck` -> `./remote/securityCheck.tsx`
+- `./global/config` -> `./global/config.ts`
+- `./global/constants` -> `./global/constants.ts`
+- `./manager` -> `./manager.ts`
+- `./plugin` -> `./plugin/index.ts`
+- `./plugin/pluginVersioning` -> `./plugin/pluginVersioning.ts`
+- `./plugin/officialMarketplaceGcs` -> `./plugin/officialMarketplaceGcs.ts`
+- `./plugin/loadPluginAgents` -> `./plugin/loadPluginAgents.ts`
+- `./plugin/loadPluginOutputStyles` -> `./plugin/loadPluginOutputStyles.ts`
+- `./plugin/dependencyResolver` -> `./plugin/dependencyResolver.ts`
+- `./plugin/reconciler` -> `./plugin/reconciler.ts`
+- `./plugin/fetchTelemetry` -> `./plugin/fetchTelemetry.ts`
+- `./plugin/gitAvailability` -> `./plugin/gitAvailability.ts`
+- `./plugin/addDirPluginSettings` -> `./plugin/addDirPluginSettings.ts`
+- `./plugin/zipCache` -> `./plugin/zipCache.ts`
+- `./plugin/zipCacheAdapters` -> `./plugin/zipCacheAdapters.ts`
+- `./plugin/PluginInstallationManager` -> `./plugin/PluginInstallationManager.ts`
+- `./plugin/commands/reload-plugins/reload-plugins.js` -> `./plugin/commands/reload-plugins/reload-plugins.ts`
+- `./plugin/commands/thinkback/thinkback.js` -> `./plugin/commands/thinkback/thinkback.tsx`
+- `./plugin/commands/thinkback-play/thinkback-play.js` -> `./plugin/commands/thinkback-play/thinkback-play.ts`
+- `./plugin/core/pluginPolicy.js` -> `./plugin/core/pluginPolicy.ts`
+- `./plugin/core/orphanedPluginFilter.js` -> `./plugin/core/orphanedPluginFilter.ts`
+- `./plugin/core/installedPluginsManager.js` -> `./plugin/core/installedPluginsManager.ts`
+- `./plugin/core/validatePlugin.js` -> `./plugin/core/validatePlugin.ts`
+- `./plugin/core/walkPluginMarkdown.js` -> `./plugin/core/walkPluginMarkdown.ts`
+- `./plugin/core/lspPluginIntegration.js` -> `./plugin/core/lspPluginIntegration.ts`
+- `./plugin/core/parseMarketplaceInput.js` -> `./plugin/core/parseMarketplaceInput.ts`
+- `./plugin/core/addDirPluginSettings.js` -> `./plugin/core/addDirPluginSettings.ts`
+- `./plugin/core/refresh.js` -> `./plugin/core/refresh.ts`
+- `./plugin/core/headlessPluginInstall.js` -> `./plugin/core/headlessPluginInstall.ts`
+- `./plugin/core/installCounts.js` -> `./plugin/core/installCounts.ts`
+- `./plugin/core/officialMarketplace.js` -> `./plugin/core/officialMarketplace.ts`
+- `./plugin/core/officialMarketplaceStartupCheck.js` -> `./plugin/core/officialMarketplaceStartupCheck.ts`
+- `./plugin/core/hintRecommendation.js` -> `./plugin/core/hintRecommendation.ts`
+- `./plugin/core/dependencyResolver.js` -> `./plugin/core/dependencyResolver.ts`
+- `./plugin/core/fetchTelemetry.js` -> `./plugin/core/fetchTelemetry.ts`
+- `./plugin/core/pluginVersioning.js` -> `./plugin/core/pluginVersioning.ts`
+- `./plugin/core/gitAvailability.js` -> `./plugin/core/gitAvailability.ts`
+- `./plugin/core/zipCache.js` -> `./plugin/core/zipCache.ts`
+- `./plugin/core/pluginBlocklist.js` -> `./plugin/core/pluginBlocklist.ts`
+- `./plugin/core/lspRecommendation.js` -> `./plugin/core/lspRecommendation.ts`
+- `./plugin/core/zipCacheAdapters.js` -> `./plugin/core/zipCacheAdapters.ts`
+- `./plugin/core/loadPluginOutputStyles.js` -> `./plugin/core/loadPluginOutputStyles.ts`
+- `./plugin/core/managedPlugins.js` -> `./plugin/core/managedPlugins.ts`
+- `./plugin/core/mcpPluginIntegration.js` -> `./plugin/core/mcpPluginIntegration.ts`
+- `./plugin/core/marketplaceManager.js` -> `./plugin/core/marketplaceManager.ts`
+- `./plugin/core/pluginIdentifier.js` -> `./plugin/core/pluginIdentifier.ts`
+- `./plugin/core/officialMarketplaceGcs.js` -> `./plugin/core/officialMarketplaceGcs.ts`
+- `./plugin/core/pluginInstallationHelpers.js` -> `./plugin/core/pluginInstallationHelpers.ts`
+- `./plugin/core/marketplaceHelpers.js` -> `./plugin/core/marketplaceHelpers.ts`
+- `./plugin/core/reconciler.js` -> `./plugin/core/reconciler.ts`
+- `./plugin/core/pluginFlagging.js` -> `./plugin/core/pluginFlagging.ts`
+- `./plugin/core/mcpbHandler.js` -> `./plugin/core/mcpbHandler.ts`
+- `./plugin/core/pluginStartupCheck.js` -> `./plugin/core/pluginStartupCheck.ts`
+- `./plugin/core/loadPluginAgents.js` -> `./plugin/core/loadPluginAgents.ts`
+- `./plugin/core/loadPluginCommands.js` -> `./plugin/core/loadPluginCommands.ts`
+- `./plugin/core/cacheUtils.js` -> `./plugin/core/cacheUtils.ts`
+- `./settings/core/validateEditTool.js` -> `./settings/core/validateEditTool.ts`
+- `./settings/core/internalWrites.js` -> `./settings/core/internalWrites.ts`
+- `./settings/core/settingsCache.js` -> `./settings/core/settingsCache.ts`
+- `./settings/core/validationTips.js` -> `./settings/core/validationTips.ts`
+- `./settings/core/applySettingsChange.js` -> `./settings/core/applySettingsChange.ts`
+- `./settings/core/toolValidationConfig.js` -> `./settings/core/toolValidationConfig.ts`
+- `./settings/core/managedPath.js` -> `./settings/core/managedPath.ts`
+- `./settings/core/pluginOnlyPolicy.js` -> `./settings/core/pluginOnlyPolicy.ts`
+- `./settings/core/permissionValidation.js` -> `./settings/core/permissionValidation.ts`
+- `./settings/core/schemaOutput.js` -> `./settings/core/schemaOutput.ts`
+- `./dxt/helpers.js` -> `./dxt/helpers.ts`
+- `./dxt/zip.js` -> `./dxt/zip.ts`
+
+## Internal-only
+
+
+## Public surface
+
+- `./env/utils` (ext=239, int=0) -> `./env/utils.ts`
+- `.` (ext=173, int=0) -> `./index.ts`
+- `./feature-flags` (ext=120, int=0) -> `./feature-flags.ts`
+- `./settings` (ext=108, int=0) -> `./settings/settings.ts`
+- `./env` (ext=60, int=0) -> `./env/index.ts`
+- `./platform` (ext=54, int=0) -> `./platform.ts`
+- `./platform.js` (ext=54, int=0) -> `./platform.ts`
+- `./constants` (ext=33, int=0) -> `./settings/constants.ts`
+- `./sleep` (ext=33, int=0) -> `./sleep.ts`
+- `./env/paths` (ext=30, int=0) -> `./env/paths.ts`
+- `./types` (ext=26, int=0) -> `./settings/types.ts`
+- `./plugin/types` (ext=19, int=0) -> `./plugin/types.ts`
+- `./env/privacy-level` (ext=16, int=0) -> `./env/privacy-level.ts`
+- `./signal` (ext=15, int=0) -> `./signal.ts`
+- `./bundledMode` (ext=14, int=0) -> `./bundledMode.ts`
+- `./semver` (ext=14, int=0) -> `./semver.ts`
+- `./memoize.js` (ext=11, int=0) -> `./memoize.ts`
+- `./plugin/pluginLoader` (ext=10, int=0) -> `./plugin/pluginLoader.ts`
+- `./plugin/marketplaceManager` (ext=9, int=0) -> `./plugin/marketplaceManager.ts`
+- `./product` (ext=9, int=0) -> `./product.ts`
+- `./plugin/pluginIdentifier` (ext=8, int=0) -> `./plugin/pluginIdentifier.ts`
+- `./plugin/cacheUtils` (ext=8, int=0) -> `./plugin/cacheUtils.ts`
+- `./embeddedTools.js` (ext=8, int=0) -> `./embeddedTools.ts`
+- `./outputStyles.js` (ext=8, int=0) -> `./outputStyles.ts`
+- `./validation` (ext=7, int=0) -> `./settings/validation.ts`
+- `./env/dynamic` (ext=7, int=0) -> `./env/dynamic.ts`
+- `./plugin/installedPluginsManager` (ext=7, int=0) -> `./plugin/installedPluginsManager.ts`
+- `./sequential` (ext=7, int=0) -> `./sequential.ts`
+- `./generators` (ext=7, int=0) -> `./generators.ts`
+- `./changeDetector` (ext=6, int=0) -> `./settings/changeDetector.ts`
+- `./managedPath` (ext=6, int=0) -> `./settings/managedPath.ts`
+- `./pluginOnlyPolicy` (ext=6, int=0) -> `./settings/pluginOnlyPolicy.ts`
+- `./plugin/marketplaceHelpers` (ext=6, int=0) -> `./plugin/marketplaceHelpers.ts`
+- `./hash` (ext=6, int=0) -> `./hash.ts`
+- `./gitFilesystem.js` (ext=6, int=0) -> `./gitFilesystem.ts`
+- `./env/privacy` (ext=5, int=0) -> `./env/privacy.ts`
+- `./stream` (ext=5, int=0) -> `./stream.ts`
+- `./commonConstants.js` (ext=5, int=0) -> `./commonConstants.ts`
+- `./managedEnv.js` (ext=5, int=0) -> `./managedEnv.ts`
+- `./settings/core/settings.js` (ext=5, int=0) -> `./settings/core/settings.ts`
+- `./settings/settingsCache` (ext=4, int=0) -> `./settings/settingsCache.ts`
+- `./remote` (ext=4, int=0) -> `./remote/index.ts`
+- `./env/validation` (ext=4, int=0) -> `./env/validation.ts`
+- `./plugin/pluginInstallationHelpers` (ext=4, int=0) -> `./plugin/pluginInstallationHelpers.ts`
+- `./plugin/mcpPluginIntegration` (ext=4, int=0) -> `./plugin/mcpPluginIntegration.ts`
+- `./applySettingsChange` (ext=3, int=0) -> `./settings/applySettingsChange.ts`
+- `./sync` (ext=3, int=0) -> `./sync/index.ts`
+- `./plugin/schemas` (ext=3, int=0) -> `./plugin/schemas.ts`
+- `./plugin/pluginDirectories` (ext=3, int=0) -> `./plugin/pluginDirectories.ts`
+- `./plugin/pluginPolicy` (ext=3, int=0) -> `./plugin/pluginPolicy.ts`
+- `./plugin/pluginOptionsStorage` (ext=3, int=0) -> `./plugin/pluginOptionsStorage.ts`
+- `./plugin/pluginStartupCheck` (ext=3, int=0) -> `./plugin/pluginStartupCheck.ts`
+- `./plugin/officialMarketplace` (ext=3, int=0) -> `./plugin/officialMarketplace.ts`
+- `./plugin/loadPluginCommands` (ext=3, int=0) -> `./plugin/loadPluginCommands.ts`
+- `./plugin/loadPluginCommands.js` (ext=3, int=0) -> `./plugin/loadPluginCommands.ts`
+- `./plugin/loadPluginHooks` (ext=3, int=0) -> `./plugin/loadPluginHooks.ts`
+- `./plugin/hintRecommendation` (ext=3, int=0) -> `./plugin/hintRecommendation.ts`
+- `./plugin/installCounts` (ext=3, int=0) -> `./plugin/installCounts.ts`
+- `./plugin/builtin` (ext=3, int=0) -> `./plugin/builtin.ts`
+- `./settings/core/allErrors.js` (ext=3, int=0) -> `./settings/core/allErrors.ts`
+- `./settings/mdm/settings` (ext=2, int=0) -> `./settings/mdm/settings.ts`
+- `./env/git-settings` (ext=2, int=0) -> `./env/git-settings.ts`
+- `./env/managed-constants` (ext=2, int=0) -> `./env/managed-constants.ts`
+- `./plugin/_deps` (ext=2, int=0) -> `./plugin/_deps.ts`
+- `./plugin/_deps.js` (ext=2, int=0) -> `./plugin/_deps.ts`
+- `./plugin/pluginFlagging` (ext=2, int=0) -> `./plugin/pluginFlagging.ts`
+- `./plugin/pluginAutoupdate` (ext=2, int=0) -> `./plugin/pluginAutoupdate.ts`
+- `./plugin/managedPlugins` (ext=2, int=0) -> `./plugin/managedPlugins.ts`
+- `./plugin/orphanedPluginFilter` (ext=2, int=0) -> `./plugin/orphanedPluginFilter.ts`
+- `./plugin/mcpbHandler` (ext=2, int=0) -> `./plugin/mcpbHandler.ts`
+- `./plugin/lspPluginIntegration` (ext=2, int=0) -> `./plugin/lspPluginIntegration.ts`
+- `./plugin/parseMarketplaceInput` (ext=2, int=0) -> `./plugin/parseMarketplaceInput.ts`
+- `./plugin/validatePlugin` (ext=2, int=0) -> `./plugin/validatePlugin.ts`
+- `./lazySchema` (ext=2, int=0) -> `./internal/lazySchema.ts`
+- `./lazySchema.js` (ext=2, int=0) -> `./internal/lazySchema.ts`
+- `./plugin/pluginOperations` (ext=2, int=0) -> `./plugin/pluginOperations.ts`
+- `./plugin/pluginCliCommands` (ext=2, int=0) -> `./plugin/pluginCliCommands.ts`
+- `./timeouts` (ext=2, int=0) -> `./timeouts.ts`
+- `./configConstants.js` (ext=2, int=0) -> `./configConstants.ts`
+- `./plugin/loadPluginAgentsAlias.js` (ext=2, int=0) -> `./plugin/loadPluginAgentsAlias.ts`
+- `./git/gitConfigParser.js` (ext=2, int=0) -> `./git/gitConfigParser.ts`
+- `./settings/core/constants.js` (ext=2, int=0) -> `./settings/core/constants.ts`
+- `./allowedSourcesState` (ext=1, int=0) -> `./internal/allowedSourcesState.ts`
+- `./testing` (ext=1, int=0) -> `./testing/index.ts`
+- `./settings/allErrors` (ext=1, int=0) -> `./settings/allErrors.ts`
+- `./settings/validateEditTool` (ext=1, int=0) -> `./settings/validateEditTool.ts`
+- `./settings/mdm/rawRead` (ext=1, int=0) -> `./settings/mdm/rawRead.ts`
+- `./env/_deps` (ext=1, int=0) -> `./env/_deps.ts`
+- `./migrations/*.js` (ext=1, int=0) -> `./migrations/*.ts`
+- `./plugin/pluginBlocklist` (ext=1, int=0) -> `./plugin/pluginBlocklist.ts`
+- `./plugin/officialMarketplaceStartupCheck` (ext=1, int=0) -> `./plugin/officialMarketplaceStartupCheck.ts`
+- `./plugin/lspRecommendation` (ext=1, int=0) -> `./plugin/lspRecommendation.ts`
+- `./plugin/headlessPluginInstall` (ext=1, int=0) -> `./plugin/headlessPluginInstall.ts`
+- `./plugin/refresh` (ext=1, int=0) -> `./plugin/refresh.ts`
+- `./plugin/walkPluginMarkdown` (ext=1, int=0) -> `./plugin/walkPluginMarkdown.ts`
+- `./plugin/walkPluginMarkdown.js` (ext=1, int=0) -> `./plugin/walkPluginMarkdown.ts`
+- `./plugin/bundled-init` (ext=1, int=0) -> `./plugin/bundled-init.ts`
+- `./crypto.js` (ext=1, int=0) -> `./crypto.ts`
+- `./crypto` (ext=1, int=0) -> `./crypto.ts`
+- `./plugin/commands/reload-plugins/index.js` (ext=1, int=0) -> `./plugin/commands/reload-plugins/index.ts`
+- `./plugin/commands/thinkback/index.js` (ext=1, int=0) -> `./plugin/commands/thinkback/index.ts`
+- `./plugin/commands/thinkback-play/index.js` (ext=1, int=0) -> `./plugin/commands/thinkback-play/index.ts`
+- `./plugin/core/loadPluginHooks.js` (ext=1, int=0) -> `./plugin/core/loadPluginHooks.ts`
+- `./plugin/core/performStartupChecks.js` (ext=1, int=0) -> `./plugin/core/performStartupChecks.tsx`
+- `./plugin/core/schemas.js` (ext=1, int=0) -> `./plugin/core/schemas.ts`
+- `./plugin/core/pluginLoader.js` (ext=1, int=0) -> `./plugin/core/pluginLoader.ts`
+- `./plugin/core/pluginDirectories.js` (ext=1, int=0) -> `./plugin/core/pluginDirectories.ts`
+- `./plugin/core/pluginOptionsStorage.js` (ext=1, int=0) -> `./plugin/core/pluginOptionsStorage.ts`
+- `./plugin/core/pluginAutoupdate.js` (ext=1, int=0) -> `./plugin/core/pluginAutoupdate.ts`
+- `./settings/core/validation.js` (ext=1, int=0) -> `./settings/core/validation.ts`
+- `./settings/core/types.js` (ext=1, int=0) -> `./settings/core/types.ts`
+- `./settings/core/changeDetector.js` (ext=1, int=0) -> `./settings/core/changeDetector.ts`

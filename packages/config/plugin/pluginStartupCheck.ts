@@ -2,12 +2,12 @@ import { join } from 'path'
 import { getCwd } from './_deps.js'
 import { logForDebugging } from './_deps.js'
 import { logError } from './_deps.js'
-import type { SettingSource } from '@claude-code/config/constants'
+import type { SettingSource } from '../settings/constants.js'
 import {
   getInitialSettings,
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 import { getAddDirEnabledPlugins } from './addDirPluginSettings.js'
 import {
   getInMemoryInstalledPlugins,

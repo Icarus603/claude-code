@@ -20,7 +20,7 @@ import { getSecureStorage } from './_deps.js'
 import {
   getSettings_DEPRECATED,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 import {
   type UserConfigSchema,
   type UserConfigValues,

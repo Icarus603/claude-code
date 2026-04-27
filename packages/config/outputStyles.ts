@@ -1,7 +1,7 @@
 import figures from 'figures'
 import memoize from 'lodash-es/memoize.js'
 import { basename } from 'path'
-import type { OutputStyle } from '@claude-code/config'
+import type { OutputStyle } from './index.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { coerceDescriptionToString } from '@claude-code/agent/frontmatterParser.js'
@@ -13,9 +13,9 @@ import {
 import {
   clearPluginOutputStyleCache,
   loadPluginOutputStyles,
-} from '@claude-code/config/plugin/loadPluginOutputStyles'
-import type { SettingSource } from '@claude-code/config/constants'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+} from './plugin/loadPluginOutputStyles.js'
+import type { SettingSource } from './settings/constants.js'
+import { getSettings_DEPRECATED } from './settings/settings.js'
 
 export type OutputStyleConfig = {
   name: string

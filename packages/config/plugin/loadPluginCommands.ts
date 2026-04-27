@@ -9,7 +9,7 @@ import {
 } from './_deps.js'
 import { logForDebugging } from './_deps.js'
 import { EFFORT_LEVELS, parseEffortValue } from './_deps.js'
-import { isBareMode } from '@claude-code/config/env/utils'
+import { isBareMode } from '../env/utils.js'
 import { isENOENT } from './_deps.js'
 import {
   coerceDescriptionToString,

@@ -1,7 +1,7 @@
 import type {
   EditableSettingSource,
   SettingSource,
-} from '@claude-code/config/constants'
+} from '../settings/constants.js'
 import {
   ALLOWED_OFFICIAL_MARKETPLACE_NAMES,
   type PluginScope,

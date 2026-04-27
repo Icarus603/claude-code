@@ -7,12 +7,12 @@ import {
   isProSubscriber,
   isTeamPremiumSubscriber,
 } from '@claude-code/provider/authAlias.js'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+import { getGlobalConfig, saveGlobalConfig } from '../index.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 
 /**
  * Migrate Pro/Max/Team Premium first-party users off explicit Sonnet 4.5

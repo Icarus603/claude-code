@@ -1,14 +1,14 @@
-import { isRemoteManagedSettingsEligible } from '@claude-code/config/remote/syncCache'
+import { isRemoteManagedSettingsEligible } from './remote/syncCache.js'
 import { clearCACertsCache } from '@claude-code/provider/caCerts.js'
-import { getGlobalConfig } from '@claude-code/config'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { getGlobalConfig } from './index.js'
+import { isEnvTruthy } from './env/utils.js'
 import {
   isProviderManagedEnvVar,
   SAFE_ENV_VARS,
-} from '@claude-code/config/env/managed-constants'
+} from './env/managed-constants.js'
 import { clearMTLSCache } from '@claude-code/provider/mtls.js'
 import { clearProxyCache, configureGlobalAgents } from '@claude-code/provider/proxy.js'
-import { isSettingSourceEnabled } from '@claude-code/config/constants'
+import { isSettingSourceEnabled } from './settings/constants.js'
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,

@@ -9,11 +9,11 @@
 import { join } from 'path'
 import type { z } from 'zod/v4'
 import { getAdditionalDirectoriesForClaudeMd } from './_deps.js'
-import { parseSettingsFile } from '@claude-code/config/settings'
+import { parseSettingsFile } from '../settings/settings.js'
 import type {
   ExtraKnownMarketplaceSchema,
   SettingsJson,
-} from '@claude-code/config/types'
+} from '../settings/types.js'
 
 type ExtraKnownMarketplace = z.infer<
   ReturnType<typeof ExtraKnownMarketplaceSchema>

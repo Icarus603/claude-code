@@ -1,7 +1,7 @@
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 
 /**
  * Migrate users on removed fennec model aliases to their new Opus 4.6 aliases.

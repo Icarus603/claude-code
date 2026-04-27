@@ -7,7 +7,7 @@ import {
 import {
   getSettingsForSource,
   updateSettingsForSource,
-} from '@claude-code/config/settings'
+} from '../settings/settings.js'
 
 /**
  * Migrate users with 'opus' pinned in their settings to 'opus[1m]' when they

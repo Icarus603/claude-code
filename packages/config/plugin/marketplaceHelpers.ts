@@ -1,7 +1,7 @@
 import isEqual from 'lodash-es/isEqual.js'
 import { toError } from './_deps.js'
 import { logError } from './_deps.js'
-import { getSettingsForSource } from '@claude-code/config/settings'
+import { getSettingsForSource } from '../settings/settings.js'
 import { plural } from './_deps.js'
 import { checkGitAvailable } from './gitAvailability.js'
 import { getMarketplace } from './marketplaceManager.js'
