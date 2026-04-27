@@ -153,31 +153,28 @@ export function modelSupportsStructuredOutputs(model: string): boolean {
 }
 
 // @[MODEL LAUNCH]: Add the new model if it supports auto mode.
+// ccb: relaxed for fork — auto mode is gated only on (a) the build flag and
+// (b) excluding legacy Claude models that lack the tool-use behavior the
+// classifier relies on. All providers (firstParty, bedrock, vertex, openai,
+// gemini, etc.) are allowed; users who pick a 3P provider accept that
+// classifier quality may vary.
 export function modelSupportsAutoMode(model: string): boolean {
-  if (feature('TRANSCRIPT_CLASSIFIER')) {
-    const m = getCanonicalName(model)
-    if (process.env.USER_TYPE !== 'ant' && getAPIProvider() !== 'firstParty') {
-      return false
-    }
-    const config = getFeatureValue_CACHED_MAY_BE_STALE<{
-      allowModels?: string[]
-    }>('tengu_auto_mode_config', {})
-    const rawLower = model.toLowerCase()
-    if (
-      config?.allowModels?.some(
-        am => am.toLowerCase() === rawLower || am.toLowerCase() === m,
-      )
-    ) {
-      return true
-    }
-    if (process.env.USER_TYPE === 'ant') {
-      if (m.includes('claude-3-')) return false
-      if (/claude-(opus|sonnet|haiku)-4(?!-[6-9])/.test(m)) return false
-      return true
-    }
-    return /^claude-(opus|sonnet)-4-[67]/.test(m)
+  if (!feature('TRANSCRIPT_CLASSIFIER')) return false
+  const m = getCanonicalName(model)
+  const config = getFeatureValue_CACHED_MAY_BE_STALE<{
+    allowModels?: string[]
+  }>('tengu_auto_mode_config', {})
+  const rawLower = model.toLowerCase()
+  if (
+    config?.allowModels?.some(
+      am => am.toLowerCase() === rawLower || am.toLowerCase() === m,
+    )
+  ) {
+    return true
   }
-  return false
+  if (m.includes('claude-3-')) return false
+  if (/claude-(opus|sonnet|haiku)-4(?!-[6-9])/.test(m)) return false
+  return true
 }
 
 /**
