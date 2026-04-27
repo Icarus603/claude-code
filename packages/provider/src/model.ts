@@ -397,7 +397,7 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
   // "conn_w4ibsphq:claude-opus-4-7". Falls through to bare-id rendering
   // if the connection record is missing (stale prefix after disconnect).
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { unpackModelId, getConnections } = require(
+  const { unpackModelId, getConnections, prettyModelLabel } = require(
     '@claude-code/provider/connections.js',
   ) as typeof import('@claude-code/provider/connections.js')
   const { connectionId, modelId } = unpackModelId(setting)
@@ -405,7 +405,7 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
     const conn = getConnections().find(c => c.id === connectionId)
     if (conn) {
       const m = conn.models.find(mm => mm.id === modelId)
-      if (m) return m.label
+      if (m) return prettyModelLabel(m)
       // No matching model record — fall back to bare model id rendering.
       return renderModelName(modelId as ModelName)
     }

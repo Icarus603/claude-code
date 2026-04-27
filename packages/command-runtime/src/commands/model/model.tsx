@@ -336,7 +336,7 @@ function renderModelLabel(model: string | null): string {
   // which is right for storage but wrong for display.
   if (model !== null) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { unpackModelId, getConnections } = require(
+    const { unpackModelId, getConnections, prettyModelLabel } = require(
       '@claude-code/provider/connections.js',
     ) as typeof import('@claude-code/provider/connections.js')
     const { connectionId, modelId } = unpackModelId(model)
@@ -344,7 +344,7 @@ function renderModelLabel(model: string | null): string {
       const conn = getConnections().find(c => c.id === connectionId)
       if (conn) {
         const m = conn.models.find(mm => mm.id === modelId)
-        const label = m ? m.label : modelId
+        const label = m ? prettyModelLabel(m) : modelId
         return `[${conn.name}] ${label}`
       }
     }
@@ -354,13 +354,13 @@ function renderModelLabel(model: string | null): string {
   // not "Opus 4.6" when their Claude account is the active connection.
   if (model === null) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getEnabledConnections } = require(
+    const { getEnabledConnections, prettyModelLabel } = require(
       '@claude-code/provider/connections.js',
     ) as typeof import('@claude-code/provider/connections.js')
     const conn = getEnabledConnections()[0]
     const m = conn?.models[0]
     if (conn && m) {
-      return `[${conn.name}] ${m.label} (default)`
+      return `[${conn.name}] ${prettyModelLabel(m)} (default)`
     }
   }
   const rendered = renderDefaultModelSetting(

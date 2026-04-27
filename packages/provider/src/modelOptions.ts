@@ -35,7 +35,10 @@ import { has1mContext } from '@claude-code/agent/context.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { readEnv } from '@claude-code/config/env/utils'
 import { getEnabledConnections } from '@claude-code/provider/providers.js'
-import { composeModelId } from '@claude-code/provider/connections.js'
+import {
+  composeModelId,
+  prettyModelLabel,
+} from '@claude-code/provider/connections.js'
 
 // @[MODEL LAUNCH]: Update all the available and default model option strings below.
 
@@ -534,15 +537,48 @@ function getConnectionModelOptions(): ModelOption[] {
 
   const options: ModelOption[] = []
   for (const conn of connections) {
+    // Dedupe by wire id within each connection. Migration writes one
+    // record per ANTHROPIC_DEFAULT_*_MODEL env var, so multiple aliases
+    // pointing at the same proxy model produce duplicate `id`s. The
+    // CustomSelect state machine keys on `value` and collapses
+    // duplicates via Map semantics — duplicate values were what caused
+    // both rows to appear focused, ↑ to bounce, and ↓ past the cluster
+    // to stick. Wire-level there's no difference between "Opus → X"
+    // and "Sonnet → X" once routing has resolved; one row per id is
+    // the honest representation.
+    //
+    // Description collects every distinct description from records
+    // sharing the id (typically "Opus tier" / "Sonnet tier" from
+    // migration), joined with " / " so the user sees which aliases
+    // route here even though the row is collapsed.
+    const byId = new Map<
+      string,
+      { first: typeof conn.models[number]; descriptions: string[] }
+    >()
     for (const model of conn.models) {
-      const prefixedLabel = `[${conn.name}] ${model.label}`
+      const existing = byId.get(model.id)
+      const desc = model.description?.trim()
+      if (existing) {
+        if (desc && !existing.descriptions.includes(desc)) {
+          existing.descriptions.push(desc)
+        }
+        continue
+      }
+      byId.set(model.id, {
+        first: model,
+        descriptions: desc ? [desc] : [],
+      })
+    }
+    for (const { first, descriptions } of byId.values()) {
+      const joinedDescription =
+        descriptions.length > 0
+          ? descriptions.join(' / ')
+          : `${conn.name} · ${conn.protocol}`
       options.push({
-        value: composeModelId(conn.id, model.id),
-        label: prefixedLabel,
-        description:
-          model.description ??
-          `${conn.name} · ${conn.protocol}`,
-        descriptionForModel: `${conn.name} · ${model.id}`,
+        value: composeModelId(conn.id, first.id),
+        label: `[${conn.name}] ${prettyModelLabel(first)}`,
+        description: joinedDescription,
+        descriptionForModel: `${conn.name} · ${first.id}`,
       })
     }
   }
