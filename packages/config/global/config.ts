@@ -1777,10 +1777,8 @@ export function getAutoUpdaterDisabledReason(): AutoUpdaterDisabledReason | null
   if (process.env.NODE_ENV === 'development') {
     return { type: 'development' }
   }
-  // Auto-updates stay disabled by default in this fork; opt in with ENABLE_AUTOUPDATER=1.
-  if (!isEnvTruthy(process.env.ENABLE_AUTOUPDATER)) {
-    return { type: 'config' }
-  }
+  // Auto-updates are on by default in release builds; opt out via
+  // DISABLE_AUTOUPDATER=1 or `autoUpdates: false` in settings.
   if (isEnvTruthy(process.env.DISABLE_AUTOUPDATER)) {
     return { type: 'env', envVar: 'DISABLE_AUTOUPDATER' }
   }
