@@ -74,16 +74,23 @@ export async function clearAuthRelatedCaches(): Promise<void> {
   await clearPolicyLimitsCache()
 }
 
-export async function call(): Promise<React.ReactNode> {
-  await performLogout({ clearOnboarding: true })
-
-  const message = (
-    <Text>Successfully logged out from your Anthropic account.</Text>
+export async function call(
+  onDone: import('@claude-code/agent/command.js').LocalJSXCommandOnDone,
+): Promise<React.ReactNode> {
+  // V7 §11.6 — with connection-based multi-provider auth, "logout" is no
+  // longer a single global action. Opening the connection manager lets the
+  // user pick exactly which provider(s) to disconnect. The old "nuke
+  // everything" path is still available via performLogout() for callers
+  // that need it (e.g. the CLI `ccb logout` subcommand, disaster recovery).
+  const { Settings } = await import('@claude-code/repl/components/Settings/Settings.js')
+  // Redirect to the /config Status tab which will navigate to connections.
+  // Simpler: just open /login which already shows the connection manager
+  // when connections exist (state: 'select_connection').
+  const { ConsoleOAuthFlow } = await import(
+    '@claude-code/repl/components/ConsoleOAuthFlow.js'
   )
-
-  setTimeout(() => {
-    gracefulShutdownSync(0, 'logout')
-  }, 200)
-
-  return message
+  return React.createElement(ConsoleOAuthFlow, {
+    onDone: () => onDone(''),
+    startingMessage: 'Select a provider to disconnect, or add a new one.',
+  })
 }
