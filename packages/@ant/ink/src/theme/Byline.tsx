@@ -1,5 +1,5 @@
 import React, { Children, isValidElement } from 'react'
-import { Text } from '../index.js'
+import { default as Text } from './ThemedText.js'
 
 type Props = {
   /** The items to join with a middot separator */

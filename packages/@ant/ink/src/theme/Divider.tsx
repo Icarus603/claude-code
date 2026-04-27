@@ -1,7 +1,8 @@
 import React from 'react'
 import { useTerminalSize } from '../hooks/useTerminalSize.js'
 import { stringWidth } from '../core/stringWidth.js'
-import { Ansi, Text } from '../index.js'
+import { Ansi } from '../core/Ansi.js'
+import { default as Text } from './ThemedText.js'
 import type { Theme } from './theme-types.js'
 
 type DividerProps = {
