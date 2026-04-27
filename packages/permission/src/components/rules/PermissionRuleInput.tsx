@@ -11,11 +11,11 @@ import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebF
 import type {
   PermissionBehavior,
   PermissionRuleValue,
-} from '@claude-code/permission/PermissionRule'
+} from '../../PermissionRule.js'
 import {
   permissionRuleValueFromString,
   permissionRuleValueToString,
-} from '@claude-code/permission/permissionRuleParser'
+} from '../../permissionRuleParser.js'
 
 export type PermissionRuleInputProps = {
   onCancel: () => void

@@ -21,9 +21,9 @@ import type {
   Task,
   TaskContext,
   TaskStateBase,
-} from '@claude-code/tool-registry/Task.js'
-import { createTaskStateBase, generateTaskId } from '@claude-code/tool-registry/Task.js'
-import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/TodoWriteTool.js'
+} from '../Task.js'
+import { createTaskStateBase, generateTaskId } from '../Task.js'
+import { TodoWriteTool } from '../tools/TodoWriteTool/TodoWriteTool.js'
 import {
   type BackgroundRemoteSessionPrecondition,
   checkBackgroundRemoteSessionEligibility,
@@ -51,8 +51,8 @@ import { fetchSession } from '@claude-code/teleport/api.js'
 import {
   archiveRemoteSession,
   pollRemoteSessionEvents,
-} from '@claude-code/tool-registry/teleport.js'
-import type { TodoList } from '@claude-code/tool-registry/todo/types.js'
+} from '../teleport.js'
+import type { TodoList } from '../todo/types.js'
 import type { UltraplanPhase } from '@claude-code/repl/ultraplan/ccrSession.js'
 
 export type RemoteAgentTaskState = TaskStateBase & {

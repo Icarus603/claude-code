@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import { applyPermissionUpdate } from '@claude-code/permission/PermissionUpdate'
+import { applyPermissionUpdate } from '../../PermissionUpdate.js'
 import { Dialog } from '@anthropic/ink'
 
 type Props = {

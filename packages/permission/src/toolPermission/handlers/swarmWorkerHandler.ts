@@ -1,11 +1,11 @@
 import { feature } from 'bun:bundle'
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs'
-import type { PendingClassifierCheck } from '@claude-code/permission/permissionTypes'
+import type { PendingClassifierCheck } from '../../permissionTypes.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
-import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
+import type { PermissionDecision } from '../../PermissionResult.js'
+import type { PermissionUpdate } from '../../PermissionUpdateSchema.js'
 import {
   createPermissionRequest,
   isSwarmWorker,

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Box, Text, useTheme } from '@anthropic/ink'
 import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js'
-import { shouldShowAlwaysAllowOptions } from '@claude-code/permission/permissionsLoader.js'
+import { shouldShowAlwaysAllowOptions } from '../../permissionsLoader.js'
 import {
   type OptionWithDescription,
   Select,

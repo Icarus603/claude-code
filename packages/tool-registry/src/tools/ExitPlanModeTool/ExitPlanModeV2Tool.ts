@@ -15,7 +15,7 @@ import {
   type Tool,
   type ToolDef,
   toolMatchesName,
-} from '@claude-code/tool-registry/Tool.js'
+} from '../../Tool.js'
 import { formatAgentId, generateRequestId } from '@claude-code/agent/agentIdUtils'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
@@ -23,7 +23,7 @@ import {
   findInProcessTeammateTaskId,
   setAwaitingPlanApproval,
 } from '@claude-code/agent/inProcessTeammateHelpers.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   getPlan,
@@ -38,8 +38,8 @@ import {
   isTeammate,
 } from '@claude-code/swarm/teammateState.js'
 import { writeToMailbox } from '@claude-code/swarm'
-import { AGENT_TOOL_NAME } from '@claude-code/tool-registry/tools/AgentTool/constants.js'
-import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCreateTool/constants.js'
+import { AGENT_TOOL_NAME } from '../AgentTool/constants.js'
+import { TEAM_CREATE_TOOL_NAME } from '../TeamCreateTool/constants.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from './constants.js'
 import { EXIT_PLAN_MODE_V2_TOOL_PROMPT } from './prompt.js'
 import {

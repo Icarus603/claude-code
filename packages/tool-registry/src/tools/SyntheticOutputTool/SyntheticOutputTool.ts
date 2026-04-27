@@ -1,9 +1,9 @@
 import { Ajv } from 'ajv'
 import { z } from 'zod/v4'
-import type { Tool, ToolInputJSONSchema } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { Tool, ToolInputJSONSchema } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/errorHelpers.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

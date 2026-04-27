@@ -6,7 +6,7 @@
  * Follows the same patterns as BashTool/modeValidation.ts.
  */
 
-import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
+import type { ToolPermissionContext } from '../../Tool.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import type { ParsedPowerShellCommand } from '@claude-code/shell/powershell/parser.js'
 import {

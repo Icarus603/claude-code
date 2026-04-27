@@ -6,8 +6,8 @@ import { useAppState, useSetAppState } from '../../appStateHooks.js'
 import {
   applyPermissionUpdate,
   persistPermissionUpdate,
-} from '@claude-code/permission/PermissionUpdate'
-import type { PermissionUpdateDestination } from '@claude-code/permission/PermissionUpdateSchema'
+} from '../../PermissionUpdate.js'
+import type { PermissionUpdateDestination } from '../../PermissionUpdateSchema.js'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
@@ -17,21 +17,21 @@ import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
   type AutoModeDenial,
   getAutoModeDenials,
-} from '@claude-code/permission/autoModeDenials.js'
+} from '../../autoModeDenials.js'
 import type {
   PermissionBehavior,
   PermissionRule,
   PermissionRuleValue,
-} from '@claude-code/permission/PermissionRule'
-import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
+} from '../../PermissionRule.js'
+import { permissionRuleValueToString } from '../../permissionRuleParser.js'
 import {
   deletePermissionRule,
   getAllowRules,
   getAskRules,
   getDenyRules,
   permissionRuleSourceDisplayString,
-} from '@claude-code/permission/permissions'
-import type { UnreachableRule } from '@claude-code/permission/shadowedRuleDetection.js'
+} from '../../permissions.js'
+import type { UnreachableRule } from '../../shadowedRuleDetection.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { Pane, Tab, Tabs, useTabHeaderFocus, useTabsWidth } from '@anthropic/ink'
 import { SearchBox } from '@anthropic/ink'

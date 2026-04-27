@@ -1,10 +1,10 @@
 import { z } from 'zod/v4'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
-import type { Tool } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { Tool } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import {

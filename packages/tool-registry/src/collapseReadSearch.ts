@@ -1,19 +1,19 @@
 import { feature } from 'bun:bundle'
 import type { UUID } from 'crypto'
-import { findToolByName, type Tools } from '@claude-code/tool-registry/Tool.js'
-import { extractBashCommentLabel } from '@claude-code/tool-registry/tools/BashTool/commentLabel.js'
-import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
-import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
-import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/prompt.js'
-import { REPL_TOOL_NAME } from '@claude-code/tool-registry/tools/REPLTool/constants.js'
-import { getReplPrimitiveTools } from '@claude-code/tool-registry/tools/REPLTool/primitiveTools.js'
+import { findToolByName, type Tools } from './Tool.js'
+import { extractBashCommentLabel } from './tools/BashTool/commentLabel.js'
+import { BASH_TOOL_NAME } from './tools/BashTool/toolName.js'
+import { FILE_EDIT_TOOL_NAME } from './tools/FileEditTool/constants.js'
+import { FILE_WRITE_TOOL_NAME } from './tools/FileWriteTool/prompt.js'
+import { REPL_TOOL_NAME } from './tools/REPLTool/constants.js'
+import { getReplPrimitiveTools } from './tools/REPLTool/primitiveTools.js'
 import {
   type BranchAction,
   type CommitKind,
   detectGitOperation,
   type PrAction,
-} from '@claude-code/tool-registry/tools/shared/gitOperationTracking.js'
-import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
+} from './tools/shared/gitOperationTracking.js'
+import { TOOL_SEARCH_TOOL_NAME } from './tools/ToolSearchTool/prompt.js'
 import type {
   CollapsedReadSearchGroup,
   CollapsibleMessage,
@@ -56,7 +56,7 @@ const teamMemOps = feature('TEAMMEM')
   : null
 const SNIP_TOOL_NAME = feature('HISTORY_SNIP')
   ? (
-      require('@claude-code/tool-registry/tools/SnipTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/SnipTool/prompt.js')
+      require('./tools/SnipTool/prompt.js') as typeof import('./tools/SnipTool/prompt.js')
     ).SNIP_TOOL_NAME
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */

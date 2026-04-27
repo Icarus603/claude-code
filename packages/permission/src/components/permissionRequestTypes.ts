@@ -8,8 +8,8 @@ import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs
 import type * as React from 'react'
 import type { AnyObject, Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
-import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
-import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
+import type { PermissionDecision } from '../PermissionResult.js'
+import type { PermissionUpdate } from '../PermissionUpdateSchema.js'
 import type { WorkerBadgeProps } from './WorkerBadge.js'
 import type { z } from 'zod'
 

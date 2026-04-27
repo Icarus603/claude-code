@@ -1,6 +1,6 @@
 import { z } from 'zod/v4'
-import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { ValidationResult } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
 import {
@@ -8,7 +8,7 @@ import {
   suggestPathUnderCwd,
 } from '@claude-code/storage/file.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { expandPath, toRelativePath } from '@claude-code/storage/path.js'
 import {
   checkReadPermissionForTool,
@@ -17,10 +17,10 @@ import {
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
-import { getGlobExclusionsForPluginCache } from '@claude-code/tool-registry/orphanedPluginFilter.js'
-import { ripGrep } from '@claude-code/tool-registry/ripgrep.js'
-import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
-import { semanticNumber } from '@claude-code/tool-registry/utils/semanticNumber.js'
+import { getGlobExclusionsForPluginCache } from '../../orphanedPluginFilter.js'
+import { ripGrep } from '../../ripgrep.js'
+import { semanticBoolean } from '../../utils/semanticBoolean.js'
+import { semanticNumber } from '../../utils/semanticNumber.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { GREP_TOOL_NAME, getDescription } from './prompt.js'
 import {

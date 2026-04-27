@@ -1,10 +1,10 @@
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import {
   executeTaskCreatedHooks,
   getTaskCreatedHookMessage,
 } from '@claude-code/agent/hooks.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import {
   createTask,
   deleteTask,

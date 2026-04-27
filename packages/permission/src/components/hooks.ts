@@ -10,12 +10,12 @@ import { splitCommand_DEPRECATED } from '@claude-code/shell/bash/commands.js'
 import type {
   PermissionDecisionReason,
   PermissionResult,
-} from '@claude-code/permission/PermissionResult'
+} from '../PermissionResult.js'
 import {
   extractRules,
   hasRules,
-} from '@claude-code/permission/PermissionUpdate'
-import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
+} from '../PermissionUpdate.js'
+import { permissionRuleValueToString } from '../permissionRuleParser.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import type { ToolUseConfirm } from './PermissionRequest.js'
 import { useSetAppState } from '../appStateHooks.js'

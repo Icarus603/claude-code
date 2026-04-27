@@ -15,8 +15,8 @@ import type {
   ToolResult,
   ToolUseContext,
   ValidationResult,
-} from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+} from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import type { Command } from '@claude-code/agent/command.js'
 import type {
   AssistantMessage,
@@ -32,7 +32,7 @@ import {
   isOfficialMarketplaceName,
   parsePluginIdentifier,
 } from '@claude-code/config/plugin/pluginIdentifier'
-import { buildPluginCommandTelemetryFields } from '@claude-code/tool-registry/telemetry/pluginTelemetry.js'
+import { buildPluginCommandTelemetryFields } from '../../telemetry/pluginTelemetry.js'
 import { z } from 'zod/v4'
 import {
   addInvokedSkill,
@@ -53,17 +53,17 @@ import {
   prepareForkedCommandContext,
 } from '@claude-code/agent/forkedAgent.js'
 import { parseFrontmatter } from '@claude-code/agent/frontmatterParser.js'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../../utils/lazySchema.js'
 import { createUserMessage, normalizeMessages } from '@claude-code/agent/messages.js'
 import type { ModelAlias } from '@claude-code/provider/modelAliases.js'
 import { resolveSkillModelOverride } from '@claude-code/provider/model.js'
-import { recordSkillUsage } from '@claude-code/tool-registry/suggestions/skillUsageTracking.js'
+import { recordSkillUsage } from '../../suggestions/skillUsageTracking.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'
-import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
+import { runAgent } from '../AgentTool/runAgent.js'
 import {
   getToolUseIDFromParentMessage,
   tagMessagesWithToolUseID,
-} from '@claude-code/tool-registry/tools/utils.js'
+} from '../utils.js'
 import { SKILL_TOOL_NAME } from './constants.js'
 import { getPrompt } from './prompt.js'
 import {
@@ -94,9 +94,9 @@ async function getAllCommands(context: ToolUseContext): Promise<Command[]> {
 }
 
 // Re-export Progress from centralized types to break import cycles
-export type { SkillToolProgress as Progress } from '@claude-code/tool-registry/progressTypes'
+export type { SkillToolProgress as Progress } from '../../progressTypes.js'
 
-import type { SkillToolProgress as Progress } from '@claude-code/tool-registry/progressTypes'
+import type { SkillToolProgress as Progress } from '../../progressTypes.js'
 
 // Conditional require for remote skill modules — static imports here would
 // pull in akiBackend.ts (via remoteSkillLoader → akiBackend), which has

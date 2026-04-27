@@ -4,16 +4,16 @@ import figures from 'figures'
 import React, { useMemo } from 'react'
 import { Ansi, Box, color, Text, useTheme } from '@anthropic/ink'
 import { useAppState } from '../appStateHooks.js'
-import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { permissionModeTitle } from '@claude-code/permission/PermissionMode'
+import type { PermissionMode } from '../PermissionMode.js'
+import { permissionModeTitle } from '../PermissionMode.js'
 import type {
   PermissionDecision,
   PermissionDecisionReason,
-} from '@claude-code/permission/PermissionResult'
-import { extractRules } from '@claude-code/permission/PermissionUpdate'
-import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
-import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
-import { detectUnreachableRules } from '@claude-code/permission/shadowedRuleDetection.js'
+} from '../PermissionResult.js'
+import { extractRules } from '../PermissionUpdate.js'
+import type { PermissionUpdate } from '../PermissionUpdateSchema.js'
+import { permissionRuleValueToString } from '../permissionRuleParser.js'
+import { detectUnreachableRules } from '../shadowedRuleDetection.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { getSettingSourceDisplayNameLowercase } from '@claude-code/config/constants'
 

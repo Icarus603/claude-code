@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
+import { lazySchema } from '../utils/lazySchema.js'
 
 const TodoStatusSchema = lazySchema(() =>
   z.enum(['pending', 'in_progress', 'completed']),

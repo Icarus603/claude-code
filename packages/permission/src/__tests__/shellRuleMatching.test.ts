@@ -6,7 +6,7 @@ import {
   parsePermissionRule,
   suggestionForExactCommand,
   suggestionForPrefix,
-} from "@claude-code/permission/shellRuleMatching";
+} from "../shellRuleMatching.js";
 
 // ─── permissionRuleExtractPrefix ────────────────────────────────────────
 

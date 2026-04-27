@@ -17,7 +17,7 @@ import type { FrontmatterData } from '@claude-code/agent/frontmatterParser.js'
 import { parseFrontmatter } from '@claude-code/agent/frontmatterParser.js'
 import { findCanonicalGitRoot, findGitRoot } from '@claude-code/storage/git.js'
 import { parseToolListFromCLI } from '@claude-code/permission/permissionSetup'
-import { ripGrep } from '@claude-code/tool-registry/ripgrep.js'
+import { ripGrep } from './ripgrep.js'
 import {
   isSettingSourceEnabled,
   type SettingSource,

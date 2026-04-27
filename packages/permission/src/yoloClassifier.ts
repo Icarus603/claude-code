@@ -21,7 +21,7 @@ import type { Message } from '@claude-code/agent/messageShapes'
 import type {
   ClassifierUsage,
   YoloClassifierResult,
-} from '@claude-code/permission/permissionTypes'
+} from './permissionTypes.js'
 import { isDebugMode, logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
@@ -36,12 +36,12 @@ import { tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
 import {
   getBashPromptAllowDescriptions,
   getBashPromptDenyDescriptions,
-} from '@claude-code/permission/bashClassifier.js'
+} from './bashClassifier.js'
 import {
   extractToolUseBlock,
   parseClassifierResponse,
-} from '@claude-code/permission/classifierShared.js'
-import { getClaudeTempDir } from '@claude-code/permission/filesystem'
+} from './classifierShared.js'
+import { getClaudeTempDir } from './filesystem.js'
 import { readEnv } from '@claude-code/config/env'
 
 // Dead code elimination: conditional imports for auto mode classifier prompts.

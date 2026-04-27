@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 import { setScheduledTasksEnabled } from '@claude-code/app-host/bootstrap/state.js'
-import type { ValidationResult } from '@claude-code/tool-registry/Tool.js'
-import { buildTool, type ToolDef } from '@claude-code/tool-registry/Tool.js'
+import type { ValidationResult } from '../../Tool.js'
+import { buildTool, type ToolDef } from '../../Tool.js'
 import { cronToHuman, parseCronExpression } from '@claude-code/agent/scheduler'
 import {
   addCronTask,
@@ -9,8 +9,8 @@ import {
   listAllCronTasks,
   nextCronRunMs,
 } from '@claude-code/agent/scheduler'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
-import { semanticBoolean } from '@claude-code/tool-registry/utils/semanticBoolean.js'
+import { lazySchema } from '../../utils/lazySchema.js'
+import { semanticBoolean } from '../../utils/semanticBoolean.js'
 import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'
 import {
   buildCronCreateDescription,

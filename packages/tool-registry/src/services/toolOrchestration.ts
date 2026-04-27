@@ -1,6 +1,6 @@
 import type { ToolUseBlock } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import { findToolByName, type ToolUseContext } from '@claude-code/tool-registry/Tool.js'
+import { findToolByName, type ToolUseContext } from '../Tool.js'
 import type { AssistantMessage, Message } from '@claude-code/agent/messageShapes'
 import { all } from '@claude-code/config/generators'
 import { type MessageUpdateLazy, runToolUse } from './toolExecution.js'

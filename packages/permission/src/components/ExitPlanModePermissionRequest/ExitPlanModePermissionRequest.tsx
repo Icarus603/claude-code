@@ -27,7 +27,7 @@ import {
   setNeedsAutoModeExitAttachment,
   setNeedsPlanModeExitAttachment,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { generateSessionName } from '@claude-code/permission/commands/rename/generateSessionName.js'
+import { generateSessionName } from '../../commands/rename/generateSessionName.js'
 import { launchUltraplan } from '@claude-code/repl/ultraplan.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 type AppState = Record<string, unknown>
@@ -54,21 +54,21 @@ import {
   createPromptRuleContent,
   isClassifierPermissionsEnabled,
   PROMPT_PREFIX,
-} from '@claude-code/permission/bashClassifier.js'
+} from '../../bashClassifier.js'
 import {
   type PermissionMode,
   toExternalPermissionMode,
-} from '@claude-code/permission/PermissionMode'
-import type { PermissionUpdate } from '@claude-code/permission/PermissionUpdateSchema'
+} from '../../PermissionMode.js'
+import type { PermissionUpdate } from '../../PermissionUpdateSchema.js'
 import {
   isAutoModeGateEnabled,
   restoreDangerousPermissions,
   stripDangerousPermissionsForAutoMode,
-} from '@claude-code/permission/permissionSetup'
+} from '../../permissionSetup.js'
 import {
   getPewterLedgerVariant,
   isPlanModeInterviewPhaseEnabled,
-} from '@claude-code/permission/planModeV2.js'
+} from '../../planModeV2.js'
 import { getPlan, getPlanFilePath } from '@claude-code/storage/plans.js'
 import {
   editFileInEditor,
@@ -89,7 +89,7 @@ import { PermissionRuleExplanation } from '../PermissionRuleExplanation.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
-  ? (require('@claude-code/permission/autoModeState.js') as typeof import('../../autoModeState.js'))
+  ? (require('../../autoModeState.js') as typeof import('../../autoModeState.js'))
   : null
 
 import type {

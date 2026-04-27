@@ -1,6 +1,6 @@
 import React from 'react'
 import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
-import { TOOL_SUMMARY_MAX_LENGTH } from '@claude-code/tool-registry/toolLimits'
+import { TOOL_SUMMARY_MAX_LENGTH } from '../../toolLimits.js'
 import { Box, Text } from '@anthropic/ink'
 import type { ProgressMessage } from '@claude-code/agent/messageShapes'
 import { truncate } from '@claude-code/output/formatters/truncate.js'

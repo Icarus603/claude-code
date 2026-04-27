@@ -37,7 +37,7 @@ mock.module("src/services/api/dumpPrompts.js", () => ({
   clearDumpState: noop,
 }));
 
-mock.module("@claude-code/tool-registry/Tool.js", () => ({
+mock.module("../../../Tool.js", () => ({
   toolMatchesName: () => false,
   findToolByName: noop,
 }));

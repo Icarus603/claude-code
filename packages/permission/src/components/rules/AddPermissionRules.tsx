@@ -7,16 +7,16 @@ import type {
   PermissionBehavior,
   PermissionRule,
   PermissionRuleValue,
-} from '@claude-code/permission/PermissionRule'
+} from '../../PermissionRule.js'
 import {
   applyPermissionUpdate,
   persistPermissionUpdate,
-} from '@claude-code/permission/PermissionUpdate'
-import { permissionRuleValueToString } from '@claude-code/permission/permissionRuleParser'
+} from '../../PermissionUpdate.js'
+import { permissionRuleValueToString } from '../../permissionRuleParser.js'
 import {
   detectUnreachableRules,
   type UnreachableRule,
-} from '@claude-code/permission/shadowedRuleDetection.js'
+} from '../../shadowedRuleDetection.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import {
   type EditableSettingSource,

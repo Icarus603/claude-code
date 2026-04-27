@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import type { Tool, Tools } from '@claude-code/tool-registry/Tool.js'
+import type { Tool, Tools } from '../../../Tool.js'
 import { hasEmbeddedSearchTools } from '@claude-code/config/embeddedTools.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isPowerShellToolEnabled } from '@claude-code/shell/legacy/shellToolUtils.js'
@@ -10,48 +10,48 @@ import { isToolSearchEnabledOptimistic } from '@claude-code/agent/toolSearch.js'
 import type { ToolProvider } from '../types.js'
 
 // Static imports — always loaded
-import { AgentTool } from '@claude-code/tool-registry/tools/AgentTool/AgentTool.js'
-import { TaskOutputTool } from '@claude-code/tool-registry/tools/TaskOutputTool/TaskOutputTool.js'
-import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
-import { GlobTool } from '@claude-code/tool-registry/tools/GlobTool/GlobTool.js'
-import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'
-import { ExitPlanModeV2Tool } from '@claude-code/tool-registry/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js'
-import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
-import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'
-import { FileWriteTool } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
-import { NotebookEditTool } from '@claude-code/tool-registry/tools/NotebookEditTool/NotebookEditTool.js'
-import { WebFetchTool } from '@claude-code/tool-registry/tools/WebFetchTool/WebFetchTool.js'
-import { TodoWriteTool } from '@claude-code/tool-registry/tools/TodoWriteTool/TodoWriteTool.js'
-import { WebSearchTool } from '@claude-code/tool-registry/tools/WebSearchTool/WebSearchTool.js'
-import { TaskStopTool } from '@claude-code/tool-registry/tools/TaskStopTool/TaskStopTool.js'
-import { AskUserQuestionTool } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
-import { SkillTool } from '@claude-code/tool-registry/tools/SkillTool/SkillTool.js'
-import { EnterPlanModeTool } from '@claude-code/tool-registry/tools/EnterPlanModeTool/EnterPlanModeTool.js'
-import { SendMessageTool } from '@claude-code/tool-registry/tools/SendMessageTool/SendMessageTool.js'
-import { TaskCreateTool } from '@claude-code/tool-registry/tools/TaskCreateTool/TaskCreateTool.js'
-import { TaskGetTool } from '@claude-code/tool-registry/tools/TaskGetTool/TaskGetTool.js'
-import { TaskUpdateTool } from '@claude-code/tool-registry/tools/TaskUpdateTool/TaskUpdateTool.js'
-import { TaskListTool } from '@claude-code/tool-registry/tools/TaskListTool/TaskListTool.js'
-import { ListMcpResourcesTool } from '@claude-code/tool-registry/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
-import { ReadMcpResourceTool } from '@claude-code/tool-registry/tools/ReadMcpResourceTool/ReadMcpResourceTool.js'
-import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
-import { ConfigTool } from '@claude-code/tool-registry/tools/ConfigTool/ConfigTool.js'
-import { TungstenTool } from '@claude-code/tool-registry/tools/TungstenTool/TungstenTool.js'
-import { BriefTool } from '@claude-code/tool-registry/tools/BriefTool/BriefTool.js'
-import { TestingPermissionTool } from '@claude-code/tool-registry/tools/testing/TestingPermissionTool.js'
-import { EnterWorktreeTool } from '@claude-code/tool-registry/tools/EnterWorktreeTool/EnterWorktreeTool.js'
-import { ExitWorktreeTool } from '@claude-code/tool-registry/tools/ExitWorktreeTool/ExitWorktreeTool.js'
+import { AgentTool } from '../../AgentTool/AgentTool.js'
+import { TaskOutputTool } from '../../TaskOutputTool/TaskOutputTool.js'
+import { BashTool } from '../../BashTool/BashTool.js'
+import { GlobTool } from '../../GlobTool/GlobTool.js'
+import { GrepTool } from '../../GrepTool/GrepTool.js'
+import { ExitPlanModeV2Tool } from '../../ExitPlanModeTool/ExitPlanModeV2Tool.js'
+import { FileReadTool } from '../../FileReadTool/FileReadTool.js'
+import { FileEditTool } from '../../FileEditTool/FileEditTool.js'
+import { FileWriteTool } from '../../FileWriteTool/FileWriteTool.js'
+import { NotebookEditTool } from '../../NotebookEditTool/NotebookEditTool.js'
+import { WebFetchTool } from '../../WebFetchTool/WebFetchTool.js'
+import { TodoWriteTool } from '../../TodoWriteTool/TodoWriteTool.js'
+import { WebSearchTool } from '../../WebSearchTool/WebSearchTool.js'
+import { TaskStopTool } from '../../TaskStopTool/TaskStopTool.js'
+import { AskUserQuestionTool } from '../../AskUserQuestionTool/AskUserQuestionTool.js'
+import { SkillTool } from '../../SkillTool/SkillTool.js'
+import { EnterPlanModeTool } from '../../EnterPlanModeTool/EnterPlanModeTool.js'
+import { SendMessageTool } from '../../SendMessageTool/SendMessageTool.js'
+import { TaskCreateTool } from '../../TaskCreateTool/TaskCreateTool.js'
+import { TaskGetTool } from '../../TaskGetTool/TaskGetTool.js'
+import { TaskUpdateTool } from '../../TaskUpdateTool/TaskUpdateTool.js'
+import { TaskListTool } from '../../TaskListTool/TaskListTool.js'
+import { ListMcpResourcesTool } from '../../ListMcpResourcesTool/ListMcpResourcesTool.js'
+import { ReadMcpResourceTool } from '../../ReadMcpResourceTool/ReadMcpResourceTool.js'
+import { ToolSearchTool } from '../../ToolSearchTool/ToolSearchTool.js'
+import { ConfigTool } from '../../ConfigTool/ConfigTool.js'
+import { TungstenTool } from '../../TungstenTool/TungstenTool.js'
+import { BriefTool } from '../../BriefTool/BriefTool.js'
+import { TestingPermissionTool } from '../../testing/TestingPermissionTool.js'
+import { EnterWorktreeTool } from '../../EnterWorktreeTool/EnterWorktreeTool.js'
+import { ExitWorktreeTool } from '../../ExitWorktreeTool/ExitWorktreeTool.js'
 
 // Lazy requires — conditional / feature-gated (preserving dead code elimination)
 /* eslint-disable @typescript-eslint/no-require-imports */
 const getREPLTool = () =>
   process.env.USER_TYPE === 'ant'
-    ? require('@claude-code/tool-registry/tools/REPLTool/REPLTool.js').REPLTool as Tool
+    ? require('../../REPLTool/REPLTool.js').REPLTool as Tool
     : null
 
 const getSuggestBackgroundPRTool = () =>
   process.env.USER_TYPE === 'ant'
-    ? require('@claude-code/tool-registry/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js').SuggestBackgroundPRTool as Tool
+    ? require('../../SuggestBackgroundPRTool/SuggestBackgroundPRTool.js').SuggestBackgroundPRTool as Tool
     : null
 
 const getSleepTool = () =>
@@ -60,19 +60,19 @@ const getSleepTool = () =>
     : null
 
 const getCronTools = (): Tool[] => [
-  require('@claude-code/tool-registry/tools/ScheduleCronTool/CronCreateTool.js').CronCreateTool,
-  require('@claude-code/tool-registry/tools/ScheduleCronTool/CronDeleteTool.js').CronDeleteTool,
-  require('@claude-code/tool-registry/tools/ScheduleCronTool/CronListTool.js').CronListTool,
+  require('../../ScheduleCronTool/CronCreateTool.js').CronCreateTool,
+  require('../../ScheduleCronTool/CronDeleteTool.js').CronDeleteTool,
+  require('../../ScheduleCronTool/CronListTool.js').CronListTool,
 ]
 
 const getRemoteTriggerTool = () =>
   feature('AGENT_TRIGGERS_REMOTE')
-    ? require('@claude-code/tool-registry/tools/RemoteTriggerTool/RemoteTriggerTool.js').RemoteTriggerTool as Tool
+    ? require('../../RemoteTriggerTool/RemoteTriggerTool.js').RemoteTriggerTool as Tool
     : null
 
 const getMonitorTool = () =>
   feature('MONITOR_TOOL')
-    ? require('@claude-code/tool-registry/tools/MonitorTool/MonitorTool.js').MonitorTool as Tool
+    ? require('../../MonitorTool/MonitorTool.js').MonitorTool as Tool
     : null
 
 const getSendUserFileTool = () =>
@@ -89,12 +89,12 @@ const getSubscribePRTool = () => null
 
 const getVerifyPlanExecutionTool = () =>
   process.env.CLAUDE_CODE_VERIFY_PLAN === 'true'
-    ? require('@claude-code/tool-registry/tools/VerifyPlanExecutionTool/VerifyPlanExecutionTool.js').VerifyPlanExecutionTool as Tool
+    ? require('../../VerifyPlanExecutionTool/VerifyPlanExecutionTool.js').VerifyPlanExecutionTool as Tool
     : null
 
 const getOverflowTestTool = () =>
   feature('OVERFLOW_TEST_TOOL')
-    ? require('@claude-code/tool-registry/tools/OverflowTestTool/OverflowTestTool.js').OverflowTestTool as Tool
+    ? require('../../OverflowTestTool/OverflowTestTool.js').OverflowTestTool as Tool
     : null
 
 // CtxInspectTool: src/ shim never replaced with canonical package. Feature
@@ -124,24 +124,24 @@ const getWorkflowTool = () =>
   feature('WORKFLOW_SCRIPTS')
     ? (() => {
         require('@claude-code/tool-registry/tools/WorkflowTool/bundled/index.js').initBundledWorkflows()
-        return require('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
+        return require('../../WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
       })()
     : null
 
 const getTeamCreateTool = () =>
-  require('@claude-code/tool-registry/tools/TeamCreateTool/TeamCreateTool.js').TeamCreateTool as Tool
+  require('../../TeamCreateTool/TeamCreateTool.js').TeamCreateTool as Tool
 
 const getTeamDeleteTool = () =>
-  require('@claude-code/tool-registry/tools/TeamDeleteTool/TeamDeleteTool.js').TeamDeleteTool as Tool
+  require('../../TeamDeleteTool/TeamDeleteTool.js').TeamDeleteTool as Tool
 
 const getLSPTool = () =>
   isEnvTruthy(process.env.ENABLE_LSP_TOOL)
-    ? require('@claude-code/tool-registry/tools/LSPTool/LSPTool.js').LSPTool as Tool
+    ? require('../../LSPTool/LSPTool.js').LSPTool as Tool
     : null
 
 const getPowerShellTool = () =>
   isPowerShellToolEnabled()
-    ? (require('@claude-code/tool-registry/tools/PowerShellTool/PowerShellTool.js') as typeof import('@claude-code/tool-registry/tools/PowerShellTool/PowerShellTool.js')).PowerShellTool
+    ? (require('../../PowerShellTool/PowerShellTool.js') as typeof import('../../PowerShellTool/PowerShellTool.js')).PowerShellTool
     : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 
