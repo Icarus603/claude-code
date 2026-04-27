@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Text } from '../index.js'
+import { default as Text } from './ThemedText.js'
 
 const FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
 

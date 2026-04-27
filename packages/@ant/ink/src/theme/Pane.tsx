@@ -1,6 +1,6 @@
 import React from 'react'
 import { useIsInsideModal } from './modalContext.js'
-import { Box } from '../index.js'
+import { default as Box } from './ThemedBox.js'
 import type { Theme } from './theme-types.js'
 import { Divider } from './Divider.js'
 

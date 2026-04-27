@@ -1,7 +1,9 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { useTerminalSize } from '../hooks/useTerminalSize.js'
 import { useTerminalViewport } from '../hooks/use-terminal-viewport.js'
-import { Box, type DOMElement, measureElement } from '../index.js'
+import { default as Box } from './ThemedBox.js'
+import type { DOMElement } from '../core/dom.js'
+import { default as measureElement } from '../core/measure-element.js'
 
 type Props = {
   children: React.ReactNode

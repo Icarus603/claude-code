@@ -1,6 +1,6 @@
 import figures from 'figures'
 import React from 'react'
-import { Text } from '../index.js'
+import { default as Text } from './ThemedText.js'
 
 type Status = 'success' | 'error' | 'warning' | 'info' | 'pending' | 'loading'
 

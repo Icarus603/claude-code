@@ -1,5 +1,6 @@
 import React from 'react'
-import { Box, Text } from '../index.js'
+import { default as Box } from './ThemedBox.js'
+import { default as Text } from './ThemedText.js'
 import { Spinner } from './Spinner.js'
 
 type LoadingStateProps = {

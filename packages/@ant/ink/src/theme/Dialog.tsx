@@ -3,7 +3,8 @@ import {
   type ExitState,
   useExitOnCtrlCDWithKeybindings,
 } from '../hooks/useExitOnCtrlCD.js'
-import { Box, Text } from '../index.js'
+import { default as Box } from './ThemedBox.js'
+import { default as Text } from './ThemedText.js'
 import { useKeybinding } from '../keybindings/useKeybinding.js'
 import type { Theme } from './theme-types.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'

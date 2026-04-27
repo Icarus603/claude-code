@@ -2,7 +2,8 @@ import figures from 'figures'
 import type { ReactNode } from 'react'
 import React from 'react'
 import { useDeclaredCursor } from '../hooks/use-declared-cursor.js'
-import { Box, Text } from '../index.js'
+import { default as Box } from './ThemedBox.js'
+import { default as Text } from './ThemedText.js'
 
 type ListItemProps = {
   /**
