@@ -117,11 +117,10 @@ gh pr create
 只给维护者。
 
 ```bash
-git tag v1.carus.001
-git push --tags
+bun run release v1.carus.001
 ```
 
-GitHub Actions 会构建 5 个 binary 并上传到 Releases。
+完事。Script 自己校验 tag、创建、push。剩下交给 GitHub Actions 跑 — `MACRO.VERSION` 从 tag 推出来,没有任何版本号要手动同步。
 
 ---
 

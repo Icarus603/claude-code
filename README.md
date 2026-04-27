@@ -117,11 +117,10 @@ Architectural conventions live in [`docs/lazy-require-pattern.md`](docs/lazy-req
 Maintainer only.
 
 ```bash
-git tag v1.carus.001
-git push --tags
+bun run release v1.carus.001
 ```
 
-GitHub Actions builds 5 binaries and uploads them to Releases.
+That's it. The script validates the tag, creates it, pushes it. GitHub Actions then builds 5 binaries (with `MACRO.VERSION` derived from the tag itself — no version strings to bump anywhere) and uploads them to Releases.
 
 ---
 
