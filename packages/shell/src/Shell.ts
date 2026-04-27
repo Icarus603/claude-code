@@ -18,7 +18,7 @@ import {
   type ShellProvider,
   type ShellType,
   type TaskOutputPort,
-} from '@claude-code/shell'
+} from './index.js'
 import memoize from 'lodash-es/memoize.js'
 import { isAbsolute, resolve } from 'path'
 import { getOriginalCwd, getSessionId, setCwdState } from '@claude-code/app-host/bootstrap/state.js'
@@ -31,14 +31,14 @@ import { onCwdChangedForHooks } from '@claude-code/agent/fileChangedWatcher.js'
 import { getClaudeTempDirName } from '@claude-code/permission/filesystem'
 import { getPlatform } from '@claude-code/config/platform'
 import { logEvent } from '@claude-code/local-observability'
-import { SandboxManager } from '@claude-code/shell/sandbox/sandbox-adapter.js'
+import { SandboxManager } from './sandbox/sandbox-adapter.js'
 import { invalidateSessionEnvCache } from '@claude-code/storage/sessionEnvironment.js'
 import { getSessionEnvironmentScript } from '@claude-code/storage/sessionEnvironment.js'
 import { getSessionEnvVars } from '@claude-code/storage/sessionEnvVars.js'
 import { getTaskOutputDir } from '@claude-code/storage/task/diskOutput.js'
 import { TaskOutput } from '@claude-code/tool-registry/task/TaskOutput.js'
-import { ensureSocketInitialized, getClaudeTmuxEnv, hasTmuxToolBeenUsed } from '@claude-code/shell/terminal/tmuxSocket.js'
-import { which } from '@claude-code/shell/which.js'
+import { ensureSocketInitialized, getClaudeTmuxEnv, hasTmuxToolBeenUsed } from './terminal/tmuxSocket.js'
+import { which } from './which.js'
 import {
   posixPathToWindowsPath,
   windowsPathToPosixPath,

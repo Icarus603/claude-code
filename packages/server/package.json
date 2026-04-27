@@ -11,7 +11,6 @@
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
     "./*.js": "./src/*.ts",
-    "./upstreamproxy/upstreamproxy.js": "./src/upstreamproxy/upstreamproxy.ts",
-    "./upstreamproxy/relay.js": "./src/upstreamproxy/relay.ts"
+    "./upstreamproxy/upstreamproxy.js": "./src/upstreamproxy/upstreamproxy.ts"
   }
 }

@@ -581,6 +581,267 @@ export function buildAgentHostExtraBindings(): Record<string, unknown> {
         require('./taskSummary.js').maybeGenerateTaskSummary(params)
       } catch {}
     },
+
+    // ── Stop / Subagent / Teammate / Task hooks ──────────────────────────────
+    // executeStopHooks is the linchpin of the plugin Stop hook protocol
+    // (decision:block + reason → blockingError → next user message). Without it
+    // wired, ralph-loop and any other plugin Stop hook silently never fire.
+    executeStopHooks: (...args: unknown[]) => {
+      try {
+        return (require('./hooks.js').executeStopHooks as (...a: unknown[]) => AsyncGenerator<unknown>)(...args)
+      } catch {
+        return (async function* () {})()
+      }
+    },
+    executeTaskCompletedHooks: (...args: unknown[]) => {
+      try {
+        return (require('./hooks.js').executeTaskCompletedHooks as (...a: unknown[]) => AsyncGenerator<unknown>)(...args)
+      } catch {
+        return (async function* () {})()
+      }
+    },
+    executeTeammateIdleHooks: (...args: unknown[]) => {
+      try {
+        return (require('./hooks.js').executeTeammateIdleHooks as (...a: unknown[]) => AsyncGenerator<unknown>)(...args)
+      } catch {
+        return (async function* () {})()
+      }
+    },
+    executeStopFailureHooks: (...args: unknown[]) => {
+      try {
+        require('./hooks.js').executeStopFailureHooks(...args)
+      } catch {}
+    },
+    getStopHookMessage: (blockingError: unknown) => {
+      try {
+        return require('./hooks.js').getStopHookMessage(blockingError)
+      } catch {
+        return ''
+      }
+    },
+    getTaskCompletedHookMessage: (blockingError: unknown) => {
+      try {
+        return require('./hooks.js').getTaskCompletedHookMessage(blockingError)
+      } catch {
+        return ''
+      }
+    },
+    getTeammateIdleHookMessage: (blockingError: unknown) => {
+      try {
+        return require('./hooks.js').getTeammateIdleHookMessage(blockingError)
+      } catch {
+        return ''
+      }
+    },
+
+    // ── Message factories ────────────────────────────────────────────────────
+    // stopHooksCore.ts feeds the hook's `reason` back into the loop by
+    // wrapping it in a user message; without these, `decision:block` produces
+    // a no-op (createUserMessage?.() === undefined → push undefined → filter).
+    createUserMessage: (opts: unknown) => {
+      try {
+        return require('./messages.js').createUserMessage(opts)
+      } catch {
+        return undefined
+      }
+    },
+    createUserInterruptionMessage: (opts: unknown) => {
+      try {
+        return require('./messages.js').createUserInterruptionMessage(opts)
+      } catch {
+        return undefined
+      }
+    },
+    createSystemMessage: (content: string, level?: string) => {
+      try {
+        return require('./messages.js').createSystemMessage(content, level)
+      } catch {
+        return undefined
+      }
+    },
+    createStopHookSummaryMessage: (...args: unknown[]) => {
+      try {
+        return require('./messages.js').createStopHookSummaryMessage(...args)
+      } catch {
+        return undefined
+      }
+    },
+
+    // ── Cache-safe params (post-turn forks: /btw, prompt suggestion) ─────────
+    createCacheSafeParams: (ctx: unknown) => {
+      try {
+        return require('./forkedAgent.js').createCacheSafeParams(ctx)
+      } catch {
+        return undefined
+      }
+    },
+    saveCacheSafeParams: (params: unknown) => {
+      try {
+        require('./forkedAgent.js').saveCacheSafeParams(params)
+      } catch {}
+    },
+
+    // ── Teammate / swarm context ────────────────────────────────────────────
+    // Stop hook + TeammateIdle/TaskCompleted post-stop chain reads these.
+    isTeammate: () => {
+      try {
+        return require('@claude-code/swarm/teammateState.js').isTeammate()
+      } catch {
+        return false
+      }
+    },
+    getAgentName: () => {
+      try {
+        return require('@claude-code/swarm/teammateState.js').getAgentName()
+      } catch {
+        return undefined
+      }
+    },
+    getTeamName: () => {
+      try {
+        return require('@claude-code/swarm/teammateState.js').getTeamName()
+      } catch {
+        return undefined
+      }
+    },
+
+    // ── Tasks ────────────────────────────────────────────────────────────────
+    getTaskListId: () => {
+      try {
+        return require('./tasks.js').getTaskListId()
+      } catch {
+        return undefined
+      }
+    },
+    listTasks: (taskListId: unknown) => {
+      try {
+        return require('./tasks.js').listTasks(taskListId)
+      } catch {
+        return Promise.resolve([])
+      }
+    },
+
+    // ── UI / shortcuts ──────────────────────────────────────────────────────
+    getShortcutDisplay: (action: string, context: string, fallback: string) => {
+      try {
+        return require('@claude-code/repl/keybindings/shortcutFormat.js').getShortcutDisplay(action, context, fallback)
+      } catch {
+        return fallback
+      }
+    },
+
+    // ── Token budget (per-turn counters) ────────────────────────────────────
+    // query.ts reads these to decide whether to continue the turn — fallback
+    // values must be conservative so the loop doesn't spin.
+    getTurnOutputTokens: () => {
+      try {
+        return require('@claude-code/app-host/bootstrap/state.js').getTurnOutputTokens()
+      } catch {
+        return 0
+      }
+    },
+    getCurrentTurnTokenBudget: () => {
+      try {
+        return require('@claude-code/app-host/bootstrap/state.js').getCurrentTurnTokenBudget()
+      } catch {
+        return null
+      }
+    },
+    incrementBudgetContinuationCount: () => {
+      try {
+        require('@claude-code/app-host/bootstrap/state.js').incrementBudgetContinuationCount()
+      } catch {}
+    },
+
+    // ── Session cron tasks ──────────────────────────────────────────────────
+    getScheduledTasksEnabled: () => {
+      try {
+        return require('@claude-code/app-host/bootstrap/state.js').getScheduledTasksEnabled()
+      } catch {
+        return false
+      }
+    },
+    setScheduledTasksEnabled: (enabled: boolean) => {
+      try {
+        require('@claude-code/app-host/bootstrap/state.js').setScheduledTasksEnabled(enabled)
+      } catch {}
+    },
+    getSessionCronTasks: () => {
+      try {
+        return require('@claude-code/app-host/bootstrap/state.js').getSessionCronTasks()
+      } catch {
+        return []
+      }
+    },
+    addSessionCronTask: (task: unknown) => {
+      try {
+        require('@claude-code/app-host/bootstrap/state.js').addSessionCronTask(task)
+      } catch {}
+    },
+    removeSessionCronTasks: (ids: readonly string[]) => {
+      try {
+        return require('@claude-code/app-host/bootstrap/state.js').removeSessionCronTasks(ids)
+      } catch {
+        return 0
+      }
+    },
+
+    // ── Misc state lookups ──────────────────────────────────────────────────
+    getProjectRoot: () => {
+      try {
+        return require('@claude-code/app-host/bootstrap/state.js').getProjectRoot()
+      } catch {
+        return process.cwd()
+      }
+    },
+    getIsNonInteractiveSession: () => {
+      try {
+        return require('@claude-code/app-host/bootstrap/state.js').getIsNonInteractiveSession()
+      } catch {
+        return false
+      }
+    },
+
+    // ── Process / VSCode / Storage ──────────────────────────────────────────
+    isProcessRunning: (pid: number) => {
+      try {
+        return require('@claude-code/shell/genericProcessUtils.js').isProcessRunning(pid)
+      } catch {
+        return false
+      }
+    },
+    notifyVscodeFileUpdated: (filePath: string, oldContent: unknown, newContent: unknown) => {
+      try {
+        require('@claude-code/mcp-runtime/vscodeSdkMcp.js').notifyVscodeFileUpdated(filePath, oldContent, newContent)
+      } catch {}
+    },
+    recordFileHistorySnapshot: (messageId: string, snapshot: unknown, isSnapshotUpdate: boolean) => {
+      try {
+        return require('@claude-code/storage/sessionStorage.js').recordFileHistorySnapshot(messageId, snapshot, isSnapshotUpdate)
+      } catch {
+        return Promise.resolve()
+      }
+    },
+    registerCleanup: (fn: () => Promise<void>) => {
+      try {
+        return require('@claude-code/app-host/bootstrap/cleanupRegistry.js').registerCleanup(fn)
+      } catch {
+        return () => {}
+      }
+    },
+
+    // ── Logging fallbacks ───────────────────────────────────────────────────
+    // logDebug + logEvent are wired by core resolvers; these two aren't.
+    logError: (err: unknown) => {
+      try {
+        require('@claude-code/local-observability/log.js').logError(err)
+      } catch {}
+    },
+    logAntError: (context: string, err: unknown) => {
+      try {
+        require('@claude-code/local-observability/debug.js').logAntError(context, err)
+      } catch {}
+    },
   }
 }
 

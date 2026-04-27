@@ -146,7 +146,7 @@ export async function getLatestVersion(
   // ccb default: GitHub Releases. The "stable" channel currently maps to
   // "latest" too — distinguishing requires a tag-naming convention we
   // haven't established.
-  const { fetchLatestReleaseTag } = await import('@claude-code/updater/githubReleases.js')
+  const { fetchLatestReleaseTag } = await import('../githubReleases.js')
   const tag = await fetchLatestReleaseTag()
   // Strip leading "v" so version comparisons against MACRO.VERSION work
   // (MACRO.VERSION is "1.carus.000", not "v1.carus.000").
@@ -542,7 +542,7 @@ async function downloadVersionFromGithubReleases(
   logEvent('tengu_binary_download_attempt', {})
 
   const { fetchAssetSha256, getAssetDownloadUrl, getAssetNameForPlatform } =
-    await import('@claude-code/updater/githubReleases.js')
+    await import('../githubReleases.js')
 
   // Tag form on GitHub is "v<version>"; we accept both forms in
   // download.ts callers, so always re-prepend v if missing.

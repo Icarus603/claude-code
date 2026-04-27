@@ -18,9 +18,9 @@
  * argv[0] against permission rules and flag allowlists. If no, ask the user.
  */
 
-import { SHELL_KEYWORDS } from '@claude-code/shell/bash/bashParser.js'
-import type { Node } from '@claude-code/shell/bash/parser.js'
-import { PARSE_ABORTED, parseCommandRaw } from '@claude-code/shell/bash/parser.js'
+import { SHELL_KEYWORDS } from './bashParser.js'
+import type { Node } from './parser.js'
+import { PARSE_ABORTED, parseCommandRaw } from './parser.js'
 
 export type Redirect = {
   op: '>' | '>>' | '<' | '<<' | '>&' | '>|' | '<&' | '&>' | '&>>' | '<<<'

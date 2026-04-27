@@ -12,15 +12,15 @@
  * edits it down if needed.
  */
 
-import { getCommandSpec } from '@claude-code/shell/bash/registry.js'
-import { buildPrefix, DEPTH_RULES } from '@claude-code/shell/legacy/specPrefix.js'
+import { getCommandSpec } from '../bash/registry.js'
+import { buildPrefix, DEPTH_RULES } from '../legacy/specPrefix.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
-import { NEVER_SUGGEST } from '@claude-code/shell/powershell/dangerousCmdlets.js'
+import { NEVER_SUGGEST } from './dangerousCmdlets.js'
 import {
   getAllCommands,
   type ParsedCommandElement,
   parsePowerShellCommand,
-} from '@claude-code/shell/powershell/parser.js'
+} from './parser.js'
 
 /**
  * Extract a static prefix from a single parsed command element.

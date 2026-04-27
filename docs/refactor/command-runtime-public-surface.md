@@ -1,12 +1,9 @@
 # @claude-code/command-runtime — exports audit
 
-**Total**: 123  |  Public: 58  |  Internal-only: 0  |  Dead: 65
+**Total**: 123  |  Public: 58  |  Internal-only: 0  |  Dead: 62  |  Protected: 6
 
-## Truly dead
+## Truly dead (safe to remove)
 
-- `./contracts` -> `./src/contracts.ts`
-- `./errors` -> `./src/errors.ts`
-- `./testing` -> `./src/testing/index.ts`
 - `./commands/skills/skills.js` -> `./src/commands/skills/skills.tsx`
 - `./commands/plugin/PluginOptionsDialog.js` -> `./src/commands/plugin/PluginOptionsDialog.tsx`
 - `./commands/plugin/DiscoverPlugins.js` -> `./src/commands/plugin/DiscoverPlugins.tsx`
@@ -70,8 +67,17 @@
 - `./commands/remoteControlServer/remoteControlServer.js` -> `./src/commands/remoteControlServer/remoteControlServer.tsx`
 - `./commands/extra-usage/extra-usage-core.js` -> `./src/commands/extra-usage/extra-usage-core.ts`
 
-## Internal-only
+## Internal-only (safe to remove after relativization)
 
+
+## Protected entries (kept regardless of usage — V7 §9.11 / API contract)
+
+- `.` (ext=1, int=0) -> `./src/index.ts`
+- `./contracts` (ext=0, int=0) -> `./src/contracts.ts`
+- `./types` (ext=3, int=0) -> `./src/types.ts`
+- `./errors` (ext=0, int=0) -> `./src/errors.ts`
+- `./runtime` (ext=130, int=0) -> `./src/runtime.ts`
+- `./testing` (ext=0, int=0) -> `./src/testing/index.ts`
 
 ## Public surface
 

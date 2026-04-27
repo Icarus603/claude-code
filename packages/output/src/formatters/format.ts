@@ -301,5 +301,5 @@ export function formatResetText(
 // Truncate helpers still live in src/utils/truncate.ts (they depend on
 // ink/stringWidth which pulls the whole Ink fork into this package's
 // dependency graph — out of scope for the output Wave-2 migration).
-// Callers previously importing from '@claude-code/output/formatters' get
+// Callers previously importing from './index.js' get
 // the truncate surface via the src/ facade (src/utils/format.ts).

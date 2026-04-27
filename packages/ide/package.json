@@ -11,10 +11,8 @@
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
     "./ide.js": "./src/ide.ts",
-    "./idePathConversion.js": "./src/idePathConversion.ts",
     "./lsp/*.js": "./src/lsp/*.ts",
     "./hooks/*.js": "./src/hooks/*.ts",
-    "./hooks/*.js.tsx": "./src/hooks/*.tsx",
     "./hooks/useIDEIntegration.js": "./src/hooks/useIDEIntegration.tsx"
   }
 }

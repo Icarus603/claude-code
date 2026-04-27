@@ -1,4 +1,4 @@
-import { installBridgeHostBindings } from '@claude-code/bridge'
+import { installBridgeHostBindings } from './index.js'
 import { bridgeMain } from './bridgeMain.js'
 import { buildBridgeConnectUrl } from './bridgeStatusUtil.js'
 import {

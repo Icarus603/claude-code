@@ -86,7 +86,7 @@ import { PermissionModeSchema } from '@claude-code/headless-sdk/coreSchemas.js'
 import {
   createTeammateContext,
   runWithTeammateContext,
-} from '@claude-code/swarm/teammateContextAlias.js'
+} from '../teammateContextAlias.js'
 import {
   getAgentId,
   getAgentName,
@@ -94,7 +94,7 @@ import {
   getTeamName,
   getTeammateColor,
   isTeammate,
-} from '@claude-code/swarm/teammateState.js'
+} from '../teammateState.js'
 import {
   isPerfettoTracingEnabled,
   registerAgent,

@@ -12,7 +12,6 @@
     "./testing": "./testing/index.ts",
     "./voiceModeEnabled.js": "./src/voiceModeEnabled.ts",
     "./voice.js": "./src/voice.ts",
-    "./voiceKeyterms.js": "./src/voiceKeyterms.ts",
     "./voiceStreamSTT.js": "./src/voiceStreamSTT.ts",
     "./hooks/useVoice.js": "./src/hooks/useVoice.ts",
     "./hooks/useVoiceEnabled.js": "./src/hooks/useVoiceEnabled.ts",

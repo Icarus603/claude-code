@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { logEvent } from '@claude-code/local-observability'
 import { z } from 'zod/v4'
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
-import { getConnectedIdeClient } from '@claude-code/ide/ide.js'
+import { getConnectedIdeClient } from '../ide.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
 const LogEventSchema = lazySchema(() =>

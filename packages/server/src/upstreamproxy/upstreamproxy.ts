@@ -26,7 +26,7 @@ import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isENOENT } from '@claude-code/local-observability/errorHelpers.js'
-import { startUpstreamProxyRelay } from '@claude-code/server/upstreamproxy/relay.js'
+import { startUpstreamProxyRelay } from './relay.js'
 
 export const SESSION_TOKEN_PATH = '/run/ccr/session_token'
 const SYSTEM_CA_BUNDLE = '/etc/ssl/certs/ca-certificates.crt'

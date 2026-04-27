@@ -4,8 +4,8 @@ import {
   getLatestVersion,
   type InstallStatus,
   installGlobalPackage,
-} from '@claude-code/updater/autoUpdater.js'
-import { regenerateCompletionCache } from '@claude-code/updater/completionCache.js'
+} from './autoUpdater.js'
+import { regenerateCompletionCache } from './completionCache.js'
 import {
   getGlobalConfig,
   type InstallMethod,
@@ -21,8 +21,8 @@ import {
 import {
   installLatest as installLatestNative,
   removeInstalledSymlink,
-} from '@claude-code/updater/nativeInstaller/index.js'
-import { getPackageManager } from '@claude-code/updater/nativeInstaller/packageManagers.js'
+} from './nativeInstaller/index.js'
+import { getPackageManager } from './nativeInstaller/packageManagers.js'
 import { writeToStdout } from '@claude-code/shell/process.js'
 import { isVersionNewer } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
