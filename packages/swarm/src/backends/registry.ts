@@ -8,7 +8,10 @@ import {
   isIt2CliAvailable,
   isTmuxAvailable,
 } from './detection.js'
-import { createInProcessBackend } from './InProcessBackend.js'
+// InProcessBackend imported dynamically inside getInProcessBackend() to
+// break the swarm internal SCC: registry → InProcessBackend → spawnInProcess
+// → teamHelpers → (dynamic-import registry) closed an 11-file cycle.
+// V7 §3.2 lazy-binding pattern.
 import { getPreferTmuxOverIterm2 } from './it2Setup.js'
 import { createPaneBackendExecutor } from './PaneBackendExecutor.js'
 import { getTeammateModeFromSnapshot } from './teammateModeSnapshot.js'
@@ -399,10 +402,13 @@ export function getResolvedTeammateMode(): 'in-process' | 'tmux' {
 
 /**
  * Gets the InProcessBackend instance.
- * Creates and caches the instance on first call.
+ * Creates and caches the instance on first call. Async because the
+ * InProcessBackend module is loaded dynamically (V7 §3.2 lazy import to
+ * break the swarm internal SCC).
  */
-export function getInProcessBackend(): TeammateExecutor {
+export async function getInProcessBackend(): Promise<TeammateExecutor> {
   if (!cachedInProcessBackend) {
+    const { createInProcessBackend } = await import('./InProcessBackend.js')
     cachedInProcessBackend = createInProcessBackend()
   }
   return cachedInProcessBackend
@@ -427,7 +433,7 @@ export async function getTeammateExecutor(
 ): Promise<TeammateExecutor> {
   if (preferInProcess && isInProcessEnabled()) {
     logForDebugging('[BackendRegistry] Using in-process executor')
-    return getInProcessBackend()
+    return await getInProcessBackend()
   }
 
   // Return pane backend executor

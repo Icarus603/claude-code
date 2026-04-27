@@ -11,7 +11,7 @@ import {
   buildInheritedEnvVars,
   getTeammateCommand,
 } from '../runtime/spawnUtils.js'
-import { assignTeammateColor } from '../core/teammateLayoutManager.js'
+import { assignTeammateColor } from '../core/teammateColors.js'
 import { isInsideTmux } from './detection.js'
 import type {
   BackendType,

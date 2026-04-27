@@ -1,11 +1,16 @@
 import type { AgentColorName } from '../adapters/appRuntime.js'
-import { AGENT_COLORS } from '../adapters/appRuntime.js'
 import { detectAndGetBackend } from '../backends/registry.js'
 import type { PaneBackend } from '../backends/types.js'
 
-// Track color assignments for teammates (persisted per session)
-const teammateColorAssignments = new Map<string, AgentColorName>()
-let colorIndex = 0
+// Color assignment moved to ./teammateColors.ts (V7 §11.2 — broke the
+// 3-file PaneBackendExecutor → teammateLayoutManager → registry cycle).
+// Re-export for backwards compat: external code still imports these
+// helpers from teammateLayoutManager.
+export {
+  assignTeammateColor,
+  getTeammateColor,
+  clearTeammateColors,
+} from './teammateColors.js'
 
 /**
  * Gets the appropriate backend for the current environment.
@@ -13,41 +18,6 @@ let colorIndex = 0
  */
 async function getBackend(): Promise<PaneBackend> {
   return (await detectAndGetBackend()).backend
-}
-
-/**
- * Assigns a unique color to a teammate from the available palette.
- * Colors are assigned in round-robin order.
- */
-export function assignTeammateColor(teammateId: string): AgentColorName {
-  const existing = teammateColorAssignments.get(teammateId)
-  if (existing) {
-    return existing
-  }
-
-  const color = AGENT_COLORS[colorIndex % AGENT_COLORS.length]!
-  teammateColorAssignments.set(teammateId, color)
-  colorIndex++
-
-  return color
-}
-
-/**
- * Gets the assigned color for a teammate, if any.
- */
-export function getTeammateColor(
-  teammateId: string,
-): AgentColorName | undefined {
-  return teammateColorAssignments.get(teammateId)
-}
-
-/**
- * Clears all teammate color assignments.
- * Called during team cleanup to reset state for potential new teams.
- */
-export function clearTeammateColors(): void {
-  teammateColorAssignments.clear()
-  colorIndex = 0
 }
 
 /**

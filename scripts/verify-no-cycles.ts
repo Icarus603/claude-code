@@ -24,7 +24,13 @@ const repoRoot = resolve('.')
 const graph = new Map<string, Set<string>>()
 const allFiles = new Set<string>()
 
-const SPEC_RE = /(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g
+// Three forms count as static graph edges:
+//   - `from '...'`              ESM static import/export
+//   - `require('...')`          CJS sync require
+// `import('...')` (dynamic ESM import) does NOT — it's a runtime
+// boundary (V7 §3.2). Static analysis treating it as an edge would
+// disqualify the very pattern V7 documents for breaking cycles.
+const SPEC_RE = /(?:\bfrom\s+['"]([^'"]+)['"]|\brequire\s*\(\s*['"]([^'"]+)['"])/g
 
 // Strip JS comments before scanning for imports — without this, prose like
 // "previously importing from '@claude-code/X'" inside `// ...` comments
@@ -93,7 +99,10 @@ for (const f of allFiles) {
   let m: RegExpExecArray | null
   SPEC_RE.lastIndex = 0
   while ((m = SPEC_RE.exec(content))) {
-    const target = await resolveSpec(f, m[1])
+    // m[1] = `from '...'` capture, m[2] = `require('...')` capture
+    const spec = m[1] ?? m[2]
+    if (!spec) continue
+    const target = await resolveSpec(f, spec)
     if (target && target !== f) graph.get(f)!.add(target)
   }
 }
@@ -149,7 +158,7 @@ for (const v of graph.keys()) {
 // SCCs: 153-file mega (cross-cutting tool-registry/repl/provider/agent),
 // 14-file ink theme (same-package), 11-file swarm (same-package),
 // 5-file cli entry (same-package), 2-file AgentTool internal.
-const BUDGET = 3
+const BUDGET = 2
 
 // Diagnostic mode: print cycles to stdout when --list flag is passed
 if (process.argv.includes('--list')) {
