@@ -1,6 +1,6 @@
 # Claude Code Best
 
-[English](./README.md) | [簡體中文](./README.zh-CN.md)
+[English](./README.md) | [简体中文](./README.zh-CN.md)
 
 [![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat-square&color=blue&label=release)](https://github.com/Icarus603/claude-code/releases)
 [![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
