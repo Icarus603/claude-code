@@ -8,6 +8,6 @@ export {
   getTeammateContext,
   isInProcessTeammate,
   runWithTeammateContext,
-} from '@claude-code/swarm/teammateContextAlias.js'
+} from './teammateContextAlias.js'
 // eslint-disable-next-line no-restricted-imports
-export type { TeammateContext } from '@claude-code/swarm/teammateContextAlias.js'
+export type { TeammateContext } from './teammateContextAlias.js'

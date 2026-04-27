@@ -2,7 +2,7 @@ import { stat } from 'fs/promises'
 import { homedir } from 'os'
 import { join } from 'path'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
+import { execFileNoThrow } from '../execFileNoThrow.js'
 import { logError } from '@claude-code/local-observability/log.js'
 export function markTerminalSetupInProgress(backupPath: string): void {
   saveGlobalConfig(current => ({

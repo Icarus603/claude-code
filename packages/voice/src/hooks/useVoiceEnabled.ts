@@ -3,7 +3,7 @@ import { useAppState } from '../appStateHooks.js'
 import {
   hasVoiceAuth,
   isVoiceGrowthBookEnabled,
-} from '@claude-code/voice/voiceModeEnabled.js'
+} from '../voiceModeEnabled.js'
 
 /**
  * Combines user intent (settings.voiceEnabled) with auth + GB kill-switch.

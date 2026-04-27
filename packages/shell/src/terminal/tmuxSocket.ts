@@ -27,7 +27,7 @@ import { posix } from 'path'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
-import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
+import { execFileNoThrow } from '../execFileNoThrow.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { getPlatform } from '@claude-code/config/platform'
 

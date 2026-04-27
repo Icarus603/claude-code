@@ -23,7 +23,6 @@
     "./sandbox.js": "./src/sandbox.ts",
     "./powershell/parser.js": "./src/powershell/parser.ts",
     "./execFileNoThrow.js": "./src/execFileNoThrow.ts",
-    "./execFileNoThrowPortable.js": "./src/execFileNoThrowPortable.ts",
     "./Shell.js": "./src/Shell.ts",
     "./bash/ast-alias.js": "./src/bash/ast-alias.ts",
     "./subprocessEnv.js": "./src/subprocessEnv.ts",
@@ -36,9 +35,7 @@
     "./terminal/ShellCommand.js": "./src/terminal/ShellCommand.ts",
     "./terminal/appleTerminalBackup.js": "./src/terminal/appleTerminalBackup.ts",
     "./terminal/iTermBackup.js": "./src/terminal/iTermBackup.ts",
-    "./terminal/terminalPanel.js": "./src/terminal/terminalPanel.ts",
-    "./terminal/tmuxSocket.js": "./src/terminal/tmuxSocket.ts",
-    "./sandbox/sandbox-ui-utils.js": "./src/sandbox/sandbox-ui-utils.ts"
+    "./terminal/terminalPanel.js": "./src/terminal/terminalPanel.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",

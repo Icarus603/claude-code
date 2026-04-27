@@ -9,8 +9,7 @@
     ".": "./src/index.ts",
     "./keybindings": "./src/keybindings/index.ts",
     "./search": "./src/search/index.ts",
-    "./vim": "./src/vim/index.ts",
-    "./theme/systemThemeWatcher.js": "./src/theme/systemThemeWatcher.ts"
+    "./vim": "./src/vim/index.ts"
   },
   "dependencies": {
     "auto-bind": "^5.0.1",

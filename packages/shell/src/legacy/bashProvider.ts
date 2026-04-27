@@ -3,15 +3,15 @@ import { access } from 'fs/promises'
 import { tmpdir as osTmpdir } from 'os'
 import { join as nativeJoin } from 'path'
 import { join as posixJoin } from 'path/posix'
-import { rearrangePipeCommand } from '@claude-code/shell/bash/bashPipeCommand.js'
-import { createAndSaveSnapshot } from '@claude-code/shell/bash/ShellSnapshot.js'
-import { formatShellPrefixCommand } from '@claude-code/shell/bash/shellPrefix.js'
-import { quote } from '@claude-code/shell/bash/shellQuote.js'
+import { rearrangePipeCommand } from '../bash/bashPipeCommand.js'
+import { createAndSaveSnapshot } from '../bash/ShellSnapshot.js'
+import { formatShellPrefixCommand } from '../bash/shellPrefix.js'
+import { quote } from '../bash/shellQuote.js'
 import {
   quoteShellCommand,
   rewriteWindowsNullRedirect,
   shouldAddStdinRedirect,
-} from '@claude-code/shell/bash/shellQuoting.js'
+} from '../bash/shellQuoting.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getPlatform } from '@claude-code/config/platform'
 import { getSessionEnvironmentScript } from '@claude-code/storage/sessionEnvironment.js'
@@ -20,7 +20,7 @@ import {
   ensureSocketInitialized,
   getClaudeTmuxEnv,
   hasTmuxToolBeenUsed,
-} from '@claude-code/shell/terminal/tmuxSocket.js'
+} from '../terminal/tmuxSocket.js'
 import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
 import type { ShellProvider } from './shellProvider.js'
 

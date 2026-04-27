@@ -14,7 +14,6 @@
     "./buffers": "./src/buffers/index.ts",
     "./formatters": "./src/formatters/index.ts",
     "./capture": "./src/capture/index.ts",
-    "./capture/asciicast": "./src/capture/asciicast.ts",
     "./render-options": "./src/render-options.ts",
     "./render": "./src/render/index.ts",
     "./utils/intl.js": "./src/utils/intl.ts",

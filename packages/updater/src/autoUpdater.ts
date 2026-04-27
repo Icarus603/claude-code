@@ -324,7 +324,7 @@ export async function getLatestVersion(
   if (process.env.USER_TYPE !== 'ant') {
     try {
       const { fetchLatestReleaseTag } = await import(
-        '@claude-code/updater/githubReleases.js'
+        './githubReleases.js'
       )
       const tag = await fetchLatestReleaseTag()
       // Strip leading "v" — MACRO.VERSION is "1.carus.000", not "v1.carus.000".

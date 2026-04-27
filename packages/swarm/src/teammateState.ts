@@ -20,11 +20,11 @@ export {
   isInProcessTeammate,
   runWithTeammateContext,
   type TeammateContext,
-} from '@claude-code/swarm/teammateContextAlias.js'
+} from './teammateContextAlias.js'
 
 type AppState = { tasks: Record<string, unknown> }
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { getTeammateContext } from '@claude-code/swarm/teammateContextAlias.js'
+import { getTeammateContext } from './teammateContextAlias.js'
 
 /**
  * Returns the parent session ID for this teammate.

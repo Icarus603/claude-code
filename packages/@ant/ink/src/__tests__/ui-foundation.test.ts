@@ -3,13 +3,13 @@ import {
   getBindingDisplayText,
   parseBindings,
   type ParsedBinding,
-} from '@anthropic/ink/keybindings'
-import { useSearchInput } from '@anthropic/ink/search'
+} from '../keybindings/index.js'
+import { useSearchInput } from '../search/index.js'
 import {
   createInitialPersistentState,
   createInitialVimState,
   transition,
-} from '@anthropic/ink/vim'
+} from '../vim/index.js'
 import { Cursor } from '@claude-code/repl/Cursor.js'
 
 describe('@anthropic/ink Phase 1 public API', () => {
