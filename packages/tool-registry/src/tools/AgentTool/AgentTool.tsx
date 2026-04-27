@@ -45,7 +45,7 @@ import {
   getRemoteTaskSessionUrl,
   registerRemoteAgentTask,
 } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
-import { assembleToolPool } from '@claude-code/tool-registry/toolsList.js'
+import { assembleToolPool } from '@claude-code/tool-registry/runtime'
 import { asAgentId } from '@claude-code/agent/idTypes'
 import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
