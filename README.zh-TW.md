@@ -23,18 +23,34 @@
 
 ## 📦 安裝
 
+**macOS / Linux**(Windows 的 Git Bash / WSL 也適用):
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash
 ```
 
-裝在 `~/.local/share/ccb/versions/<version>`,並在 `~/.local/bin/ccb` 建立 symlink。不需要 Node、不需要 Bun、不需要任何套件管理器。
+裝在 `~/.local/share/ccb/versions/<version>`,並在 `~/.local/bin/ccb` 建立 symlink。
 
-| 變數 | 預設 | 用途 |
+**Windows**(PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | iex
+```
+
+裝在 `%LOCALAPPDATA%\Programs\ccb\versions\<version>.exe`,並在 `%LOCALAPPDATA%\Programs\ccb\bin\ccb.exe` 放一份副本,同時自動把 bin 目錄加進 user `PATH`。不需要管理員權限。
+
+兩種方式都不需要 Node、Bun 或任何套件管理器。
+
+| 變數 | 預設(sh / ps1) | 用途 |
 |------|------|------|
 | `CCB_VERSION` | `latest` | 鎖定特定 tag,例如 `v1.carus.000` |
-| `CCB_PREFIX`  | `~/.local` | 安裝根目錄(`/usr/local` 為系統範圍) |
+| `CCB_PREFIX`  | `~/.local` / `%LOCALAPPDATA%\Programs\ccb` | 安裝根目錄 |
 
-升級：重跑同一個 `curl ... | bash`。解除安裝：`rm -rf ~/.local/share/ccb ~/.local/bin/ccb`。
+升級:重跑同一條指令。解除安裝:
+- macOS / Linux:`rm -rf ~/.local/share/ccb ~/.local/bin/ccb`
+- Windows:`Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"`
+
+> 不支援 Windows ARM64(Bun 沒有 `windows-arm64` compile target)。請在 x64 模擬下使用 x64 binary,或改走 WSL。
 
 ---
 

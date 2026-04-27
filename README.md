@@ -23,18 +23,34 @@ Not affiliated with Anthropic. For the official tool, see <https://docs.anthropi
 
 ## 📦 Install
 
+**macOS / Linux** (also Git Bash / WSL on Windows):
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash
 ```
 
-Installs to `~/.local/share/ccb/versions/<version>` with a symlink at `~/.local/bin/ccb`. No Node, no Bun, no package manager required.
+Installs to `~/.local/share/ccb/versions/<version>` with a symlink at `~/.local/bin/ccb`.
 
-| Variable | Default | Effect |
+**Windows** (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | iex
+```
+
+Installs to `%LOCALAPPDATA%\Programs\ccb\versions\<version>.exe` with a shim at `%LOCALAPPDATA%\Programs\ccb\bin\ccb.exe`, and adds the bin directory to your user `PATH` automatically. No admin rights required.
+
+No Node, no Bun, no package manager required for either.
+
+| Variable | Default (sh / ps1) | Effect |
 |----------|---------|--------|
 | `CCB_VERSION` | `latest` | Pin a specific tag, e.g. `v1.carus.000` |
-| `CCB_PREFIX`  | `~/.local` | Install root (`/usr/local` for system-wide) |
+| `CCB_PREFIX`  | `~/.local` / `%LOCALAPPDATA%\Programs\ccb` | Install root |
 
-Upgrade: re-run the same `curl ... | bash`. Uninstall: `rm -rf ~/.local/share/ccb ~/.local/bin/ccb`.
+Upgrade: re-run the same one-liner. Uninstall:
+- macOS / Linux: `rm -rf ~/.local/share/ccb ~/.local/bin/ccb`
+- Windows: `Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"`
+
+> Windows ARM64 is not supported (Bun has no `windows-arm64` compile target). Use the x64 binary under x64 emulation, or run via WSL.
 
 ---
 

@@ -1,16 +1,6 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
-import { shouldInferenceConfigCommandBeImmediate } from '@claude-code/shell/immediateCommand.js'
-import { getMainLoopModel, renderModelName } from '@claude-code/provider/model.js'
-
-export default {
-  type: 'local-jsx',
-  name: 'model',
-  get description() {
-    return `Set the AI model for Claude Code (currently ${renderModelName(getMainLoopModel())})`
-  },
-  argumentHint: '[model]',
-  get immediate() {
-    return shouldInferenceConfigCommandBeImmediate()
-  },
-  load: () => import('./model.js'),
-} satisfies Command
+// Canonical owner is @claude-code/command-runtime/commands/model.
+// Moved 2026-04-27 to break the provider→repl back-edge in the 151-file
+// SCC: model.tsx imports repl/components/ModelPicker for UI, putting
+// provider above repl in the dep graph (wrong direction).
+import command from '@claude-code/command-runtime/commands/model/index.js'
+export default command

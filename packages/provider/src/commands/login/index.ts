@@ -1,15 +1,6 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
-import { hasAnthropicApiKeyAuth } from '@claude-code/provider/authAlias.js'
-import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { readEnv } from '@claude-code/config/env'
-
-export default () =>
-  ({
-    type: 'local-jsx',
-    name: 'login',
-    description: hasAnthropicApiKeyAuth()
-      ? 'Switch Anthropic accounts'
-      : 'Sign in with your Anthropic account',
-    isEnabled: () => !isEnvTruthy(readEnv('DISABLE_LOGIN_COMMAND')),
-    load: () => import('./login.js'),
-  }) satisfies Command
+// Canonical owner is @claude-code/command-runtime/commands/login.
+// Moved 2026-04-27 to break the provider→repl back-edge in the 151-file
+// SCC: provider was importing repl components (ConsoleOAuthFlow,
+// useMainLoopModel, ConfigurableShortcutHint) for this command's UI,
+// putting provider above repl in the dep graph (wrong direction).
+export { default } from '@claude-code/command-runtime/commands/login/index.js'
