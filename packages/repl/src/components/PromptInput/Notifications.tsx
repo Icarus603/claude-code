@@ -115,12 +115,11 @@ export function Notifications({
     (ideSelection?.filePath ||
       (ideSelection?.text && ideSelection.lineCount > 0))
 
-  // Always render the wrapper. NativeAutoUpdater self-gates via shouldRender
-  // (returns null when there's nothing to show), so an outer hide-on-IDE-
-  // selection gate does no useful work — it just suppresses the
-  // "✓ Update installed · Restart to update" notification for anyone with an
-  // IDE plugin attached, which made auto-update look like it never fired.
-  const shouldShowAutoUpdater = true
+  // Hide update installed message when showing IDE selection
+  const shouldShowAutoUpdater =
+    !shouldShowIdeSelection ||
+    isAutoUpdating ||
+    autoUpdaterResult?.status !== 'success'
 
   // Check if we're in overage mode for UI indicators
   const isInOverageMode = claudeAiLimits.isUsingOverage
