@@ -22,6 +22,7 @@ import { queryModelGemini } from './gemini/indexImpl.js'
 import { queryModelGrok } from './grok/indexImpl.js'
 import { queryCodex } from './codex/client.js'
 import { getProviderForModel } from './providers.js'
+import { unpackModelId } from './connections.js'
 
 // Centralized so `getProviderAdapter` can disambiguate "you passed me a
 // provider id" from "you passed me a model id". Adding a new APIProvider
@@ -112,11 +113,27 @@ export function getProviderAdapter(
     }
     return getProviderForModel(providerOrModel)
   })()
+
+  // Strip the connection-id prefix from `options.model` before passing to
+  // upstream APIs. The picker emits "<connId>:<modelId>" so multiple
+  // connections sharing a model name disambiguate. Adapters / SDKs only
+  // see the bare model id. resolveConnectionForModel did the routing
+  // above; the prefix is no longer needed.
+  const stripModelPrefix = (
+    args: ProviderQueryArgs,
+  ): ProviderQueryArgs => {
+    const opts = args.options
+    if (!opts.model) return args
+    const { connectionId, modelId } = unpackModelId(opts.model)
+    if (!connectionId) return args
+    return { ...args, options: { ...opts, model: modelId } }
+  }
   switch (provider) {
     case 'codex':
       return createAdapter('codex', {
         authProvider: codexAuthProvider,
-        queryStream: args => {
+        queryStream: rawArgs => {
+          const args = stripModelPrefix(rawArgs)
           // ProviderRequestOptions only standardizes a subset; legacy fields
           // (outputConfig, speed) ride on `args.options` at runtime.
           const opts = args.options as ProviderRequestOptions & {
@@ -141,39 +158,45 @@ export function getProviderAdapter(
     case 'openai':
       return createAdapter('openai', {
         authProvider: openAIAuthProvider,
-        queryStream: args =>
-          queryModelOpenAI(
+        queryStream: rawArgs => {
+          const args = stripModelPrefix(rawArgs)
+          return queryModelOpenAI(
             args.messages,
             args.systemPrompt,
             args.tools,
             args.signal,
             args.options,
-          ),
+          )
+        },
       })
     case 'gemini':
       return createAdapter('gemini', {
         authProvider: geminiAuthProvider,
-        queryStream: args =>
-          queryModelGemini(
+        queryStream: rawArgs => {
+          const args = stripModelPrefix(rawArgs)
+          return queryModelGemini(
             args.messages,
             args.systemPrompt,
             args.tools,
             args.signal,
             args.options,
             args.thinkingConfig,
-          ),
+          )
+        },
       })
     case 'grok':
       return createAdapter('grok', {
         authProvider: grokAuthProvider,
-        queryStream: args =>
-          queryModelGrok(
+        queryStream: rawArgs => {
+          const args = stripModelPrefix(rawArgs)
+          return queryModelGrok(
             args.messages,
             args.systemPrompt,
             args.tools,
             args.signal,
             args.options,
-          ),
+          )
+        },
       })
     case 'bedrock':
     case 'vertex':
@@ -185,12 +208,15 @@ export function getProviderAdapter(
           `Provider ${provider} requires an Anthropic query stream implementation.`,
         )
       }
+      // Anthropic queryStream already accepts ProviderQueryArgs; wrap it
+      // to strip the prefix at the same seam as the other adapters.
+      const anthropicQueryStream =
+        overrides.anthropicQueryStream ??
+        (hostBindings.anthropic.queryStream as ProviderAdapter['queryStream'])
       return createAdapter(provider, {
         authProvider: anthropicAuthProvider,
         query: overrides.anthropicQuery ?? hostBindings.anthropic.query,
-        queryStream:
-          overrides.anthropicQueryStream ??
-          (hostBindings.anthropic.queryStream as ProviderAdapter['queryStream']),
+        queryStream: rawArgs => anthropicQueryStream(stripModelPrefix(rawArgs)),
       })
   }
 }

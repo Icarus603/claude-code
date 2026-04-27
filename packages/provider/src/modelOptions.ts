@@ -35,6 +35,7 @@ import { has1mContext } from '@claude-code/agent/context.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { readEnv } from '@claude-code/config/env/utils'
 import { getEnabledConnections } from '@claude-code/provider/providers.js'
+import { composeModelId } from '@claude-code/provider/connections.js'
 
 // @[MODEL LAUNCH]: Update all the available and default model option strings below.
 
@@ -517,7 +518,15 @@ function getKnownModelOption(model: string): ModelOption | null {
 
 /**
  * Build model options from all enabled connections.
- * Each model is prefixed with the connection name for disambiguation.
+ *
+ * Two pieces of disambiguation:
+ *
+ *  1. The visible label is `[<connection name>] <model label>` so users
+ *     can tell "[Claude Account] Opus 4.7" from "[MyProxy] Opus 4.7".
+ *  2. The stored value is `<connectionId>:<modelId>`. When two
+ *     connections expose the same `modelId`, only the prefix lets the
+ *     query path pick the right connection. SDK seams strip the prefix
+ *     via `unpackModelId()` at the API boundary.
  */
 function getConnectionModelOptions(): ModelOption[] {
   const connections = getEnabledConnections()
@@ -528,7 +537,7 @@ function getConnectionModelOptions(): ModelOption[] {
     for (const model of conn.models) {
       const prefixedLabel = `[${conn.name}] ${model.label}`
       options.push({
-        value: model.id,
+        value: composeModelId(conn.id, model.id),
         label: prefixedLabel,
         description:
           model.description ??

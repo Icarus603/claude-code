@@ -386,6 +386,26 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
   if (isModelAlias(setting)) {
     return capitalize(setting)
   }
+  // V7 §11.6 — composite `<connId>:<modelId>` resolves to the connection's
+  // own model label so the welcome header reads "Opus 4.7" not
+  // "conn_w4ibsphq:claude-opus-4-7". Falls through to bare-id rendering
+  // if the connection record is missing (stale prefix after disconnect).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { unpackModelId, getConnections } = require(
+    '@claude-code/provider/connections.js',
+  ) as typeof import('@claude-code/provider/connections.js')
+  const { connectionId, modelId } = unpackModelId(setting)
+  if (connectionId) {
+    const conn = getConnections().find(c => c.id === connectionId)
+    if (conn) {
+      const m = conn.models.find(mm => mm.id === modelId)
+      if (m) return m.label
+      // No matching model record — fall back to bare model id rendering.
+      return renderModelName(modelId as ModelName)
+    }
+    // Connection deleted but settings still has stale prefix — render bare.
+    return renderModelName(modelId as ModelName)
+  }
   return renderModelName(setting)
 }
 
@@ -395,6 +415,16 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
  * if the model is not recognized as a public model.
  */
 export function getPublicModelDisplayName(model: ModelName): string | null {
+  // Strip composite `<connId>:<modelId>` so attribution / commit trailers
+  // render `Claude Opus 4.7` not `Claude (conn_xxx:claude-opus-4-7)`.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { unpackModelId } = require(
+    '@claude-code/provider/connections.js',
+  ) as typeof import('@claude-code/provider/connections.js')
+  const { modelId } = unpackModelId(model)
+  if (modelId !== model) {
+    model = modelId as ModelName
+  }
   switch (model) {
     case getModelStrings().opus47:
       return 'Opus 4.7'

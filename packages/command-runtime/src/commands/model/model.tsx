@@ -330,6 +330,39 @@ export const call: LocalJSXCommandCall = async (onDone, _context, args) => {
 }
 
 function renderModelLabel(model: string | null): string {
+  // V7 §11.6 — when the model id is a composite `<connId>:<modelId>`,
+  // resolve it back to a readable `[ConnectionName] ModelLabel`. The
+  // raw composite leaks an internal id into the UI ("conn_w4ibsphq:..."),
+  // which is right for storage but wrong for display.
+  if (model !== null) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { unpackModelId, getConnections } = require(
+      '@claude-code/provider/connections.js',
+    ) as typeof import('@claude-code/provider/connections.js')
+    const { connectionId, modelId } = unpackModelId(model)
+    if (connectionId) {
+      const conn = getConnections().find(c => c.id === connectionId)
+      if (conn) {
+        const m = conn.models.find(mm => mm.id === modelId)
+        const label = m ? m.label : modelId
+        return `[${conn.name}] ${label}`
+      }
+    }
+  }
+  // Default-selection path: prefer the first model of the first enabled
+  // connection over the global setting, so subscribers see "Opus 4.7"
+  // not "Opus 4.6" when their Claude account is the active connection.
+  if (model === null) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getEnabledConnections } = require(
+      '@claude-code/provider/connections.js',
+    ) as typeof import('@claude-code/provider/connections.js')
+    const conn = getEnabledConnections()[0]
+    const m = conn?.models[0]
+    if (conn && m) {
+      return `[${conn.name}] ${m.label} (default)`
+    }
+  }
   const rendered = renderDefaultModelSetting(
     model ?? getDefaultMainLoopModelSetting(),
   )

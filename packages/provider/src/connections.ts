@@ -101,6 +101,48 @@ export const CODEX_CONNECTION_ID = 'chatgpt-codex'
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
+// ── Composite model ids (connection-aware routing) ────────────────────
+//
+// When multiple connections expose the same model name (e.g., Claude
+// Account and an Anthropic Compatible proxy both have
+// `claude-opus-4-7`), the model picker emits `<connectionId>:<modelId>`
+// so settings.mainLoopModel disambiguates which connection to use.
+//
+// Adapters call `unpackModelId(model)` at the API seam to strip the
+// prefix before sending the bare model name upstream.
+
+const MODEL_ID_SEPARATOR = ':'
+
+/**
+ * Build a composite id from a connection id + bare model id.
+ * Returns the bare model id if no connection (legacy path).
+ */
+export function composeModelId(
+  connectionId: string | undefined,
+  modelId: string,
+): string {
+  if (!connectionId) return modelId
+  return `${connectionId}${MODEL_ID_SEPARATOR}${modelId}`
+}
+
+/**
+ * Split a composite model id into its parts. Returns the bare model id
+ * unchanged when no separator is present (legacy / env-only path).
+ */
+export function unpackModelId(value: string): {
+  connectionId: string | undefined
+  modelId: string
+} {
+  const idx = value.indexOf(MODEL_ID_SEPARATOR)
+  if (idx <= 0) return { connectionId: undefined, modelId: value }
+  const head = value.slice(0, idx)
+  // Connection ids are alphanumeric (`conn_xxxxxxxx` or well-known
+  // ids like `claude-account`); reject if the head contains a slash or
+  // dot (those are model paths like `models/gemini-2.5-pro`).
+  if (/[/.]/.test(head)) return { connectionId: undefined, modelId: value }
+  return { connectionId: head, modelId: value.slice(idx + 1) }
+}
+
 /** Generate a short unique ID for new connections. */
 export function generateConnectionId(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
@@ -407,10 +449,38 @@ function migrateLegacyGemini(env: Record<string, string>): boolean {
  */
 export function migrateLegacyEnvToConnections(
   envSource: Record<string, string>,
-): { migrated: string[] } {
+): { migrated: string[]; clearedModelType: boolean } {
   const migrated: string[] = []
   if (migrateLegacyAnthropicCompat(envSource)) migrated.push('anthropic')
   if (migrateLegacyOpenAICompat(envSource)) migrated.push('openai')
   if (migrateLegacyGemini(envSource)) migrated.push('gemini')
-  return { migrated }
+
+  // V7 §11.6 — `settings.modelType` was the legacy global routing knob
+  // (`anthropic` / `openai` / `gemini`). It used to be written by every
+  // /login flow, which clobbered other configured providers. Routing is
+  // now per-connection; modelType is dead weight that still poisons
+  // `getDefaultOpusModel()` etc. by making `getAPIProvider()` return a
+  // wrong global provider. When the connection registry has ≥1 entry,
+  // clear the legacy modelType so default-model resolution sees
+  // `firstParty` and picks the right Opus tier.
+  let clearedModelType = false
+  if (getConnections().length > 0) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getSettings_DEPRECATED, updateSettingsForSource } = require(
+        '@claude-code/config/settings',
+      ) as typeof import('@claude-code/config/settings')
+      const userSettings = getSettings_DEPRECATED()
+      if (userSettings && (userSettings as { modelType?: unknown }).modelType) {
+        updateSettingsForSource('userSettings', {
+          modelType: undefined,
+        } as never)
+        clearedModelType = true
+      }
+    } catch {
+      // Migration is best-effort; never block boot.
+    }
+  }
+
+  return { migrated, clearedModelType }
 }
