@@ -26,13 +26,13 @@ import {
   logMCPDebug,
   logMCPError,
   type ErrorLogSink,
-} from '@claude-code/local-observability/logging'
+} from './logging/index.js'
 
 import { TICK_TAG } from '@claude-code/command-runtime/xml.js'
 import { type LogOption, type SerializedMessage, sortLogs } from '@claude-code/agent/logsTypes.js'
 import { CACHE_PATHS } from '@claude-code/storage/cache-paths'
 import { stripDisplayTags, stripDisplayTagsAllowEmpty } from '@claude-code/output/utils/displayTags.js'
-import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
+import { jsonParse } from './slowOperations.js'
 
 // ---------------------------------------------------------------------------
 // Re-exports of the owner-package API — preserves every external call site

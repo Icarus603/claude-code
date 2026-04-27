@@ -7,7 +7,7 @@ import { generateTempFilePath } from "@claude-code/storage/tempfile.js";
 import { getFsImplementation, safeResolvePath } from "@claude-code/storage/fsOperations.js";
 import { errorMessage, isENOENT } from "@claude-code/local-observability/errorHelpers.js";
 import { resetSettingsCache } from "@claude-code/config/settings/settingsCache";
-import { eagerParseCliFlag } from "@claude-code/app-host/cliArgs.js";
+import { eagerParseCliFlag } from "../../cliArgs.js";
 import { parseSettingSourcesFlag } from "@claude-code/config/constants";
 import {
 	setAllowedSettingSources,
@@ -27,7 +27,7 @@ import { resetAutoModeOptInForDefaultOffer } from "@claude-code/config/migration
 import { migrateFennecToOpus } from "@claude-code/config/migrations/migrateFennecToOpus.js";
 import { migrateChangelogFromConfig } from "@claude-code/repl/releaseNotes.js";
 import { getGlobalConfig, saveGlobalConfig } from "@claude-code/config";
-import { profileCheckpoint } from "@claude-code/app-host/startup/startupProfiler.js";
+import { profileCheckpoint } from "../../startup/startupProfiler.js";
 import { isEnvTruthy } from "@claude-code/config/env/utils";
 
 const CURRENT_MIGRATION_VERSION = 11;

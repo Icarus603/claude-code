@@ -9,7 +9,7 @@ import {
   getLastMainRequestId,
   getSessionId,
   isSessionPersistenceDisabled,
-} from '@claude-code/app-host/bootstrap/state.js'
+} from './state.js'
 import { DISABLE_KITTY_KEYBOARD, DISABLE_MODIFY_OTHER_KEYS, DBP, DFE, DISABLE_MOUSE_TRACKING, EXIT_ALT_SCREEN, SHOW_CURSOR, CLEAR_ITERM2_PROGRESS, CLEAR_TAB_STATUS, CLEAR_TERMINAL_TITLE, instances, supportsTabStatus, wrapForMultiplexer } from '@anthropic/ink'
 import {
   logEvent,
@@ -19,14 +19,14 @@ import {
   shutdownEventLoggers,
 } from '@claude-code/local-observability/compat'
 type AppState = unknown
-import { runCleanupFunctions } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
+import { runCleanupFunctions } from './cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getCurrentSessionTitle, sessionIdExists } from '@claude-code/storage/sessionStorage.js'
 import { sleep } from '@claude-code/config/sleep'
 import { closeSentry } from '@claude-code/local-observability/sentry.js'
-import { profileReport } from '@claude-code/app-host/startup/startupProfiler.js'
+import { profileReport } from '../startup/startupProfiler.js'
 
 /**
  * Clean up terminal modes synchronously before process exit.

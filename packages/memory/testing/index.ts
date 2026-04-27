@@ -8,7 +8,7 @@ import type {
   MemFsImplementation,
   MemoryFileHeader,
   MemoryHostBindings,
-} from '@claude-code/memory'
+} from '../src/index.js'
 
 type DirEntry = {
   name: string

@@ -30,7 +30,7 @@ import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getRelativeTimeFormat, getTimeZone } from '@claude-code/output/utils/intl.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
+import { registerCleanup } from '../bootstrap/cleanupRegistry.js'
 import { sanitizePath } from '@claude-code/storage/path.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 

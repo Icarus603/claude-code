@@ -1,6 +1,6 @@
 import { createHash } from 'crypto'
-import { logEvent } from '@claude-code/local-observability'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
+import { logEvent } from './index.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from './compat.js'
 
 /**
  * Creates a truncated SHA256 hash (16 chars) for file paths

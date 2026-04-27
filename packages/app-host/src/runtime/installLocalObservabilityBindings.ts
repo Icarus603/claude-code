@@ -40,7 +40,7 @@ import {
 } from '../bootstrap/state.js'
 import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
 import { CACHE_PATHS } from '@claude-code/storage/cache-paths'
-import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
+import { registerCleanup } from '../bootstrap/cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { envDynamic } from '@claude-code/config/env/dynamic'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'

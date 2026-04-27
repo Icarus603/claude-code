@@ -1,11 +1,11 @@
 import {
   installPackageHostBindings as installPackageHostBindingsFromAppHost,
   type PackageHostBindingInstallers,
-} from '@claude-code/app-host/packageHostSetup'
+} from './packageHostSetup.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { findCanonicalGitRoot } from '@claude-code/storage/git.js'
-import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
+import { getCwd } from './bootstrap/cwd.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 
 export function installPackageHostBindings(
@@ -60,7 +60,7 @@ export function installPackageHostBindings(
         isAgentMemoryPath: (p: string) => { try { return require('@claude-code/memory/agentMemory').isAgentMemoryPath(p) } catch { return false } },
         getOriginalCwd: () => { try { return require('./bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
         getSessionId: () => { try { return require('./bootstrap/state.js').getSessionId() } catch { return 'unknown' } },
-        getCwd: () => { try { return require('@claude-code/app-host/bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
+        getCwd: () => { try { return require('./bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
         getConfigHomeDir: () => getClaudeConfigHomeDir(),
         getFsImplementation: () => { try { return require('@claude-code/storage/fsOperations.js').getFsImplementation() } catch { return require('node:fs') } },
         getPathsForPermissionCheck: (...a: unknown[]) => { try { return require('@claude-code/storage/fsOperations.js').getPathsForPermissionCheck(...a) } catch { return [] } },
@@ -113,7 +113,7 @@ export function installPackageHostBindings(
         parseToolPreset: (preset) => { try { return require('@claude-code/tool-registry/runtime').parseToolPreset(preset) } catch { return [] } },
         safeResolvePath: (fs, p) => { try { return require('@claude-code/storage/fsOperations.js').safeResolvePath(fs, p) } catch { return { resolvedPath: p } } },
         modelSupportsAutoMode: (model) => { try { return require('@claude-code/provider/betas.js').modelSupportsAutoMode(model) } catch { return false } },
-        gracefulShutdown: (code) => { try { return require('@claude-code/app-host/bootstrap/gracefulShutdown.js').gracefulShutdown(code) } catch { return Promise.reject() } },
+        gracefulShutdown: (code) => { try { return require('./bootstrap/gracefulShutdown.js').gracefulShutdown(code) } catch { return Promise.reject() } },
         getMainLoopModel: () => { try { return require('@claude-code/provider/model.js').getMainLoopModel() } catch { return '' } },
       },
       extraMemoryBindings: {
@@ -756,7 +756,7 @@ export function installPackageHostBindings(
         },
       },
       // V7 §7 — bootstrap state + session accessors for config
-      getCwd: () => { try { return require('@claude-code/app-host/bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
+      getCwd: () => { try { return require('./bootstrap/cwd.js').getCwd() } catch { return process.cwd() } },
       getOriginalCwd: () => { try { return require('./bootstrap/state.js').getOriginalCwd() } catch { return process.cwd() } },
       getSessionTrustAccepted: () => { try { return require('./bootstrap/state.js').getSessionTrustAccepted() } catch { return false } },
       getFlagSettingsPath: () => { try { return require('./bootstrap/state.js').getFlagSettingsPath() } catch { return undefined } },
@@ -782,7 +782,7 @@ export function installPackageHostBindings(
       profileCheckpoint: (name: string) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { profileCheckpoint } = require('@claude-code/app-host/startup/startupProfiler.js') as typeof import('@claude-code/app-host/startup/startupProfiler.js')
+          const { profileCheckpoint } = require('./startup/startupProfiler.js') as typeof import('./startup/startupProfiler.js')
           profileCheckpoint(name)
         } catch { /* profiling is optional */ }
       },
@@ -803,7 +803,7 @@ export function installPackageHostBindings(
           const { ManagedSettingsSecurityDialog } = require('@claude-code/repl/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js')
           const { render } = require('src/ink.js')
           const { KeybindingSetup } = require('@claude-code/repl/keybindings/KeybindingProviderSetup.js')
-          const { AppStateProvider } = require('@claude-code/app-host/state/AppState.js')
+          const { AppStateProvider } = require('./state/AppState.js')
           const { getBaseRenderOptions } = require('@claude-code/output/render-options')
           return new Promise<'approved' | 'rejected' | 'no_check_needed'>(resolve => {
             void (async () => {
@@ -827,7 +827,7 @@ export function installPackageHostBindings(
         if (result === 'rejected') {
           try {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const { gracefulShutdownSync } = require('@claude-code/app-host/bootstrap/gracefulShutdown.js') as typeof import('@claude-code/app-host/bootstrap/gracefulShutdown.js')
+            const { gracefulShutdownSync } = require('./bootstrap/gracefulShutdown.js') as typeof import('./bootstrap/gracefulShutdown.js')
             gracefulShutdownSync(1)
           } catch { process.exit(1) }
           return false
@@ -844,7 +844,7 @@ export function installPackageHostBindings(
       },
       registerCleanup: (fn: () => Promise<void>) => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { registerCleanup } = require('@claude-code/app-host/bootstrap/cleanupRegistry.js') as typeof import('@claude-code/app-host/bootstrap/cleanupRegistry.js')
+        const { registerCleanup } = require('./bootstrap/cleanupRegistry.js') as typeof import('./bootstrap/cleanupRegistry.js')
         return registerCleanup(fn)
       },
       executeConfigChangeHooks: async (source: string) => {
@@ -963,25 +963,25 @@ export function installPackageHostBindings(
         installers.installProviderBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('@claude-code/app-host/runtime/installProviderBindings.js')
+          require('./runtime/installProviderBindings.js')
         }),
       installToolRegistryBindings:
         installers.installToolRegistryBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('@claude-code/app-host/runtime/installToolRegistryBindings.js')
+          require('./runtime/installToolRegistryBindings.js')
         }),
       installCommandRuntimeBindings:
         installers.installCommandRuntimeBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('@claude-code/app-host/runtime/installCommandRuntimeBindings.js')
+          require('./runtime/installCommandRuntimeBindings.js')
         }),
       installMcpRuntimeBindings:
         installers.installMcpRuntimeBindings ??
         (() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('@claude-code/app-host/runtime/installMcpRuntimeBindings.js')
+          require('./runtime/installMcpRuntimeBindings.js')
         }),
     },
   )

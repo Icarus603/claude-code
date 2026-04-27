@@ -3,7 +3,7 @@
  * `@claude-code/local-observability/telemetry`.
  */
 
-export type { LLMRequestNewContext } from '@claude-code/local-observability/telemetry'
+export type { LLMRequestNewContext } from './index.js'
 export {
   addBetaInteractionAttributes,
   addBetaLLMRequestAttributes,
@@ -13,4 +13,4 @@ export {
   clearBetaTracingState,
   isBetaTracingEnabled,
   truncateContent,
-} from '@claude-code/local-observability/telemetry'
+} from './index.js'

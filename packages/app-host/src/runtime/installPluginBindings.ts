@@ -66,8 +66,8 @@ import {
   getSessionId,
 } from '../bootstrap/state.js'
 import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
-import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
-import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
+import { registerCleanup } from '../bootstrap/cleanupRegistry.js'
+import { getCwd } from '../bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import {
@@ -231,7 +231,7 @@ export function installPluginBindings(): void {
   // --- app state
   setGetAppStateFn(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('@claude-code/app-host/state/AppState.js') as {
+    const mod = require('../state/AppState.js') as {
       getAppState: () => unknown
     }
     return mod.getAppState?.() ?? {}

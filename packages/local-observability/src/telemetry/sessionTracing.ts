@@ -1,1 +1,1 @@
-export * from '@claude-code/local-observability/spans'
+export * from '../spans.js'

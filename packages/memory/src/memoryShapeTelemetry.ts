@@ -2,7 +2,7 @@
 // memories the recall algorithm considered vs selected, and shape of
 // memory-writing calls. Kept as a stub so feature-flagged callers compile.
 
-import type { MemoryScope } from '@claude-code/memory/memoryFileDetection'
+import type { MemoryScope } from './memoryFileDetection.js'
 
 type MemoryHeaderLike = {
   filename: string

@@ -7,7 +7,7 @@ import type {
   PluginRuntimeHandle,
   PluginRuntimeSnapshot,
   RuntimeHandles,
-} from '@claude-code/app-host'
+} from '../index.js'
 import type { HeadlessStoreParams } from '@claude-code/cli'
 import {
   applyPermissionUpdates,

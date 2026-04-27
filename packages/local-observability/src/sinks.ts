@@ -1,5 +1,5 @@
 
-import { initializeErrorLogSink } from '@claude-code/local-observability/logging/error-log-sink.js'
+import { initializeErrorLogSink } from './logging/error-log-sink.js'
 
 /**
  * Attach process-local sinks that do not forward telemetry externally.

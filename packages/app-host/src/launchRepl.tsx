@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Root } from '@anthropic/ink'
-import type { InteractiveHostSession } from '@claude-code/app-host'
+import type { InteractiveHostSession } from './index.js'
 import type { Props as REPLProps } from '@claude-code/repl/screens/REPL.js'
 
 export type AppWrapperProps<TState, TStats, TFpsMetrics> = {

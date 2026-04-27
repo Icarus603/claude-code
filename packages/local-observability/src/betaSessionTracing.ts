@@ -1,5 +1,5 @@
 // Canonical owner is @claude-code/local-observability/telemetry.
-export type { LLMRequestNewContext } from '@claude-code/local-observability/telemetry'
+export type { LLMRequestNewContext } from './telemetry/index.js'
 export {
   addBetaInteractionAttributes,
   addBetaLLMRequestAttributes,
@@ -9,4 +9,4 @@ export {
   clearBetaTracingState,
   isBetaTracingEnabled,
   truncateContent,
-} from '@claude-code/local-observability/telemetry'
+} from './telemetry/index.js'

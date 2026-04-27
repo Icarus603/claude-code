@@ -3,13 +3,13 @@ import { randomBytes } from 'crypto'
 import { open } from 'fs/promises'
 import { join } from 'path'
 import type { ModelUsage } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { logForDebugging } from '../debug.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
-import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
+import { errorMessage } from '../errorHelpers.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { logError } from '@claude-code/local-observability/log.js'
-import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import type { DailyActivity, DailyModelTokens, SessionStats } from '@claude-code/local-observability/aggregates/stats.js'
+import { logError } from '../log.js'
+import { jsonParse, jsonStringify } from '../slowOperations.js'
+import type { DailyActivity, DailyModelTokens, SessionStats } from './stats.js'
 
 export const STATS_CACHE_VERSION = 3
 const MIN_MIGRATABLE_VERSION = 1
