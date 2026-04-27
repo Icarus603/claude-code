@@ -84,6 +84,13 @@ export function NativeAutoUpdater({
   const isUpdatingRef = useRef(isUpdating)
   isUpdatingRef.current = isUpdating
 
+  // The 30-minute interval re-runs checkForUpdates indefinitely; we only want
+  // to flash "Checking for updates" on the first mount-time check so the
+  // background polling doesn't keep nagging the footer. Subsequent runs go
+  // straight to either silent (no new version) or 'downloading' (new version
+  // found).
+  const isFirstCheckRef = useRef(true)
+
   const checkForUpdates = React.useCallback(async () => {
     if (isUpdatingRef.current) {
       return
@@ -104,7 +111,9 @@ export function NativeAutoUpdater({
     }
 
     onChangeIsUpdating(true)
-    setPhase('checking')
+    if (isFirstCheckRef.current) {
+      setPhase('checking')
+    }
     const startTime = Date.now()
 
     // Log the start of an auto-update check for funnel analysis
@@ -188,6 +197,7 @@ export function NativeAutoUpdater({
     } finally {
       onChangeIsUpdating(false)
       setPhase(null)
+      isFirstCheckRef.current = false
     }
     // isUpdating intentionally omitted from deps; we read isUpdatingRef
     // instead so the guard is always current without changing callback
@@ -207,11 +217,10 @@ export function NativeAutoUpdater({
   // Show the component when:
   // - warning banner needed (above max version), or
   // - there's an update result to display (success/error), or
-  // - actively checking (we don't gate on versions info — setVersions only
-  //   fires after installLatest resolves, so requiring it would suppress the
-  //   progress text for the entire download window, which is exactly when the
-  //   user wants to see something).
-  const shouldRender = !!maxVersionIssue || hasUpdateResult || isUpdating
+  // - we have a phase to surface ('checking' on first mount, 'downloading'
+  //   whenever a real update is in flight). Background interval checks with
+  //   no update available leave phase=null and stay silent.
+  const shouldRender = !!maxVersionIssue || hasUpdateResult || phase !== null
 
   if (!shouldRender) {
     return null
@@ -224,7 +233,7 @@ export function NativeAutoUpdater({
           current: {versions.current} &middot; {channel}: {versions.latest}
         </Text>
       )}
-      {isUpdating ? (
+      {phase !== null ? (
         <Box>
           <Text dimColor wrap="truncate">
             {phase === 'downloading' ? 'Auto-updating…' : 'Checking for updates'}
