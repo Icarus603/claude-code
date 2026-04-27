@@ -46,7 +46,11 @@ import type {
   Progress,
   RemoteLaunchedOutput,
 } from './AgentTool.js'
-import { inputSchema } from './AgentTool.js'
+// inputSchema not imported here — that closed a 2-file SCC with AgentTool.tsx.
+// Instead, renderGroupedAgentToolUse looks the schema up via the tool registry
+// (`findToolByName(tools, AGENT_TOOL_NAME)?.inputSchema`), using the tools
+// parameter the caller already passes for other lookups.
+import { AGENT_TOOL_NAME } from './constants.js'
 import { getAgentColor } from './agentColorManager.js'
 import { GENERAL_PURPOSE_AGENT } from './built-in/generalPurposeAgent.js'
 
@@ -838,13 +842,16 @@ export function renderGroupedAgentToolUse(
   },
 ): React.ReactNode | null {
   const { shouldAnimate, tools } = options
+  const agentTool = findToolByName(tools, AGENT_TOOL_NAME)
 
   // Calculate stats for each agent
   const agentStats = toolUses.map(
     ({ param, isResolved, isError, progressMessages, result }) => {
       const stats = calculateAgentStats(progressMessages)
       const lastToolInfo = extractLastToolInfo(progressMessages, tools)
-      const parsedInput = inputSchema().safeParse(param.input)
+      const parsedInput = agentTool
+        ? agentTool.inputSchema.safeParse(param.input)
+        : ({ success: false } as const)
 
       // teammate_spawned is not part of the exported Output type (cast through unknown
       // for dead code elimination), so check via string comparison on the raw value
