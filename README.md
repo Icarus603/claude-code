@@ -2,13 +2,26 @@
 
 [繁體中文](./README.zh-TW.md) | [簡體中文](./README.zh-CN.md)
 
+[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat-square&color=blue&label=release)](https://github.com/Icarus603/claude-code/releases)
+[![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
+[![Issues](https://img.shields.io/github/issues/Icarus603/claude-code?style=flat-square&color=orange)](https://github.com/Icarus603/claude-code/issues)
+
+[![Bun](https://img.shields.io/badge/runtime-Bun%20%E2%89%A51.3-black?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
+[![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/TUI-React%20%2B%20Ink-61DAFB?style=flat-square&logo=react&logoColor=white)](https://github.com/vadimdemedes/ink)
+[![Anthropic](https://img.shields.io/badge/Anthropic-CC785C?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)](https://platform.openai.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-1F6FEB?style=flat-square&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
+
 Terminal coding agent. Single binary, installed as `ccb`. Community-maintained derivative of Claude Code.
 
 Not affiliated with Anthropic. For the official tool, see <https://docs.anthropic.com/en/docs/claude-code/overview>.
 
 ---
 
-## Install
+## 📦 Install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash
@@ -25,7 +38,7 @@ Upgrade: re-run the same `curl ... | bash`. Uninstall: `rm -rf ~/.local/share/cc
 
 ---
 
-## Usage
+## 🚀 Usage
 
 ```bash
 ccb              # interactive REPL
@@ -44,7 +57,7 @@ You paste base URL + API key + model IDs inside the dialog; nothing to set in yo
 
 See [`docs/`](docs/) for per-feature deep dives.
 
-### Headless / scripted use
+### 🤖 Headless / scripted use
 
 For CI or `--print` mode where there's no REPL to drive `/login`, env vars work too:
 
@@ -57,7 +70,7 @@ For CI or `--print` mode where there's no REPL to drive `/login`, env vars work 
 
 ---
 
-## Build from source
+## 🛠️ Build from source
 
 [Bun](https://bun.sh) ≥ 1.3.0 is the only requirement.
 
@@ -75,31 +88,9 @@ bun run doctor:arch       # architectural invariants — must pass
 
 `bun build --compile --target=bun-<os>-<arch>` cross-compiles in ~0.4s per platform. The release workflow ([`.github/workflows/release.yml`](.github/workflows/release.yml)) does this on tag push.
 
-### Layout
-
-```
-packages/                 ← all source (there is no src/)
-├── agent/                  agent loop, hooks, messages, tools dispatch
-├── app-host/               runtime composition + bootstrap
-├── cli/src/entry/          binary entry points
-├── command-runtime/        slash commands + skills
-├── config/                 settings, env, feature flags, plugin loader
-├── headless-sdk/           public TypeScript SDK surface
-├── permission/             tool-permission UX + classifier
-├── provider/               Anthropic / OpenAI-compat / Gemini / Grok adapters
-├── repl/                   Ink-based TUI
-├── shell/                  bash/powershell parser + sandbox
-├── storage/                JSONL session files, file cache
-├── tool-registry/          tool definitions
-└── ...                     mcp-runtime, voice, swarm, bridge, daemon, ...
-
-scripts/
-└── doctor-architecture.ts  source of truth for what passes CI
-```
-
 ---
 
-## Contributing
+## 🤝 Contributing
 
 PRs welcome.
 
@@ -121,7 +112,7 @@ Architectural conventions live in [`docs/lazy-require-pattern.md`](docs/lazy-req
 
 ---
 
-## Releasing
+## 🏷️ Releasing
 
 Maintainer only.
 
@@ -134,7 +125,7 @@ GitHub Actions builds 5 binaries and uploads them to Releases.
 
 ---
 
-## Lineage
+## 🧬 Lineage
 
 `ccb` derives from a public Claude Code community fork. See [`ATTRIBUTION.md`](./ATTRIBUTION.md). No standalone license file is shipped — review provenance before redistribution.
 

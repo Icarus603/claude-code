@@ -2,13 +2,26 @@
 
 [English](./README.md) | [繁體中文](./README.zh-TW.md)
 
+[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat-square&color=blue&label=release)](https://github.com/Icarus603/claude-code/releases)
+[![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
+[![Issues](https://img.shields.io/github/issues/Icarus603/claude-code?style=flat-square&color=orange)](https://github.com/Icarus603/claude-code/issues)
+
+[![Bun](https://img.shields.io/badge/runtime-Bun%20%E2%89%A51.3-black?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
+[![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/TUI-React%20%2B%20Ink-61DAFB?style=flat-square&logo=react&logoColor=white)](https://github.com/vadimdemedes/ink)
+[![Anthropic](https://img.shields.io/badge/Anthropic-CC785C?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)](https://platform.openai.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-1F6FEB?style=flat-square&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
+
 终端编程智能体。单一 binary,命令为 `ccb`。Claude Code 的社区维护衍生版。
 
 与 Anthropic 无关。如需官方工具请见 <https://docs.anthropic.com/en/docs/claude-code/overview>。
 
 ---
 
-## 安装
+## 📦 安装
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash
@@ -25,7 +38,7 @@ curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.
 
 ---
 
-## 使用
+## 🚀 使用
 
 ```bash
 ccb              # 交互式 REPL
@@ -44,7 +57,7 @@ Base URL、API key、模型 ID 都在对话框里填,shell 不用 export。要�
 
 各功能深入文档见 [`docs/`](docs/)。
 
-### Headless / 脚本用法
+### 🤖 Headless / 脚本用法
 
 CI 或 `--print` 模式下没 REPL 可以开 `/login`,env vars 也支持:
 
@@ -57,7 +70,7 @@ CI 或 `--print` 模式下没 REPL 可以开 `/login`,env vars 也支持:
 
 ---
 
-## 从源码构建
+## 🛠️ 从源码构建
 
 唯一需求是 [Bun](https://bun.sh) ≥ 1.3.0。
 
@@ -75,31 +88,9 @@ bun run doctor:arch       # 架构不变式 — 必须通过
 
 `bun build --compile --target=bun-<os>-<arch>` cross-compile 每个平台约 0.4 秒。Release workflow([`.github/workflows/release.yml`](.github/workflows/release.yml))在 tag push 时跑。
 
-### 结构
-
-```
-packages/                 ← 所有源码(没有 src/)
-├── agent/                  agent loop、hooks、messages、tools dispatch
-├── app-host/               runtime 装配 + bootstrap
-├── cli/src/entry/          binary 入口
-├── command-runtime/        slash 命令 + skills
-├── config/                 settings、env、feature flags、plugin loader
-├── headless-sdk/           公开 TypeScript SDK 接口
-├── permission/             工具权限 UX + 分类器
-├── provider/               Anthropic / OpenAI 兼容 / Gemini / Grok 适配器
-├── repl/                   Ink-based TUI
-├── shell/                  bash/powershell parser + sandbox
-├── storage/                JSONL session 文件、文件缓存
-├── tool-registry/          工具定义
-└── ...                     mcp-runtime、voice、swarm、bridge、daemon、...
-
-scripts/
-└── doctor-architecture.ts  CI 通过与否的真实依据
-```
-
 ---
 
-## 贡献
+## 🤝 贡献
 
 欢迎 PR。
 
@@ -121,7 +112,7 @@ gh pr create
 
 ---
 
-## 发版
+## 🏷️ 发版
 
 只给维护者。
 
@@ -134,7 +125,7 @@ GitHub Actions 会构建 5 个 binary 并上传到 Releases。
 
 ---
 
-## 沿革
+## 🧬 沿革
 
 `ccb` 衍生自公开的 Claude Code 社区 fork。见 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。本项目未附独立许可证文件 — 重新发布前请审核 provenance。
 
