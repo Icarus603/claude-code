@@ -12,7 +12,7 @@ import { getMacroDefines } from "./defines.ts";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, "..");
-const cliPath = join(projectRoot, "src/entrypoints/cli.tsx");
+const cliPath = join(projectRoot, "packages/cli/src/entry/cli.tsx");
 
 const defines = getMacroDefines();
 

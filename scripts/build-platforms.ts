@@ -1,26 +1,63 @@
 #!/usr/bin/env bun
 /**
  * Build standalone executable binaries for all supported platforms via
- * `bun build --compile --target=bun-<os>-<arch>`. Each binary is fully
+ * `Bun.build({ compile: { target, outfile } })`. Each binary is fully
  * self-contained: includes the Bun runtime + all bundled JS, so users
  * don't need Node, Bun, or npm to run `ccb`.
  *
- * Output: dist/binaries/ccb-<os>-<arch>[.exe]
+ * IMPORTANT: this MUST go through the programmatic Bun.build API, not the
+ * `bun build --compile` CLI — the CLI does not accept --define or
+ * --features, so binaries built via `bun build --compile` ship with empty
+ * MACRO.* placeholders and `feature(...)` returning false everywhere
+ * (which silently disables auto mode, plan mode, voice, etc.).
  *
- * Usage:
- *   bun run scripts/build-platforms.ts             # all 5 platforms
- *   bun run scripts/build-platforms.ts darwin-arm64  # one platform
+ * Output: dist/binaries/ccb-<os>-<arch>[.exe]
  */
 
 import { mkdir, stat } from 'fs/promises'
 import { join, basename } from 'path'
-import { spawn } from 'child_process'
+import { getMacroDefines } from './defines.ts'
 
 const OUT_DIR = 'dist/binaries'
 const ENTRY = 'packages/cli/src/entry/cli.tsx'
 
+// Keep in sync with build.ts DEFAULT_BUILD_FEATURES.
+const DEFAULT_BUILD_FEATURES = [
+  'AGENT_TRIGGERS_REMOTE',
+  'CHICAGO_MCP',
+  'VOICE_MODE',
+  'SHOT_STATS',
+  'PROMPT_CACHE_BREAK_DETECTION',
+  'TOKEN_BUDGET',
+  'NATIVE_CLIPBOARD_IMAGE',
+  'BRIDGE_MODE',
+  'MCP_SKILLS',
+  'TEMPLATES',
+  'COORDINATOR_MODE',
+  'TRANSCRIPT_CLASSIFIER',
+  'MCP_RICH_OUTPUT',
+  'MESSAGE_ACTIONS',
+  'HISTORY_PICKER',
+  'QUICK_SEARCH',
+  'CACHED_MICROCOMPACT',
+  'REACTIVE_COMPACT',
+  'FILE_PERSISTENCE',
+  'DUMP_SYSTEM_PROMPT',
+  'BREAK_CACHE_COMMAND',
+  'AGENT_TRIGGERS',
+  'ULTRATHINK',
+  'BUILTIN_EXPLORE_PLAN_AGENTS',
+  'LODESTONE',
+  'EXTRACT_MEMORIES',
+  'VERIFICATION_AGENT',
+  'KAIROS_BRIEF',
+  'AWAY_SUMMARY',
+  'ULTRAPLAN',
+  'DAEMON',
+]
+
 type Target = {
-  bunTarget: string
+  bunTarget: `bun-${string}`
   outName: string
 }
 
@@ -32,62 +69,63 @@ const ALL_TARGETS: Target[] = [
   { bunTarget: 'bun-windows-x64', outName: 'ccb-windows-x64.exe' },
 ]
 
-function buildOne(target: Target): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const outPath = join(OUT_DIR, target.outName)
-    console.log(`[${target.outName}] building...`)
-    const start = Date.now()
-    const child = spawn(
-      'bun',
-      [
-        'build',
-        '--compile',
-        '--minify',
-        `--target=${target.bunTarget}`,
-        `--outfile=${outPath}`,
-        ENTRY,
-      ],
-      { stdio: ['ignore', 'pipe', 'inherit'] },
-    )
-    child.stdout.on('data', () => {})
-    child.on('exit', code => {
-      if (code !== 0) {
-        reject(new Error(`bun build exited ${code} for ${target.outName}`))
-        return
-      }
-      const elapsed = ((Date.now() - start) / 1000).toFixed(1)
-      stat(outPath)
-        .then(s => {
-          const mb = (s.size / 1024 / 1024).toFixed(1)
-          console.log(`[${target.outName}] ${mb} MB · ${elapsed}s`)
-          resolve()
-        })
-        .catch(reject)
-    })
+const envFeatures = Object.keys(process.env)
+  .filter(k => k.startsWith('FEATURE_'))
+  .map(k => k.replace('FEATURE_', ''))
+const features = [...new Set([...DEFAULT_BUILD_FEATURES, ...envFeatures])]
+
+async function buildOne(target: Target): Promise<void> {
+  const outPath = join(OUT_DIR, target.outName)
+  console.log(`[${target.outName}] building...`)
+  const start = Date.now()
+  // Bun.build's `compile` option accepts the target triple + output path.
+  // Programmatic API is required because `bun build --compile` CLI has no
+  // flags for --define or --features.
+  const result = await Bun.build({
+    entrypoints: [ENTRY],
+    // @ts-expect-error -- compile is a valid option in Bun >=1.2 but the
+    // shipped @types/bun in this project doesn't include it yet.
+    compile: { target: target.bunTarget, outfile: outPath },
+    define: getMacroDefines(),
+    features,
+    minify: true,
   })
+  if (!result.success) {
+    for (const log of result.logs) console.error(log)
+    throw new Error(`Bun.build failed for ${target.outName}`)
+  }
+  const elapsed = ((Date.now() - start) / 1000).toFixed(1)
+  const s = await stat(outPath)
+  const mb = (s.size / 1024 / 1024).toFixed(1)
+  console.log(`[${target.outName}] ${mb} MB · ${elapsed}s`)
 }
 
 async function main(): Promise<void> {
   await mkdir(OUT_DIR, { recursive: true })
-
-  // Filter to a specific platform if passed as argv
   const filter = process.argv[2]
-  const targets = filter
-    ? ALL_TARGETS.filter(t => t.outName.includes(filter))
-    : ALL_TARGETS
-
+  let targets: Target[]
+  if (filter === '--current') {
+    const arch = process.arch === 'arm64' ? 'arm64' : 'x64'
+    const os =
+      process.platform === 'darwin'
+        ? 'darwin'
+        : process.platform === 'win32'
+          ? 'windows'
+          : 'linux'
+    targets = ALL_TARGETS.filter(t => t.outName.includes(`${os}-${arch}`))
+  } else if (filter) {
+    targets = ALL_TARGETS.filter(t => t.outName.includes(filter))
+  } else {
+    targets = ALL_TARGETS
+  }
   if (targets.length === 0) {
     console.error(`No matching platform for "${filter}". Known:`)
     for (const t of ALL_TARGETS) console.error(`  ${basename(t.outName, '.exe')}`)
     process.exit(1)
   }
-
-  // Bun build is single-threaded per invocation but cheap enough that
-  // sequential builds finish in ~10s total. Parallel would race on stdout.
   for (const t of targets) {
     await buildOne(t)
   }
-
   console.log(`\nBuilt ${targets.length} binaries → ${OUT_DIR}/`)
 }
 
