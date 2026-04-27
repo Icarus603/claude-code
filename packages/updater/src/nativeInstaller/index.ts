@@ -13,3 +13,5 @@ export {
   removeInstalledSymlink,
   type SetupMessage,
 } from './installer.js'
+
+export { getLatestVersion } from './download.js'
