@@ -9,9 +9,10 @@ import { setClipboard, useTerminalNotification, Box, Link, Text, KeyboardShortcu
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getSSLErrorHint } from '@claude-code/provider/errorUtils.js'
 import { sendNotification } from '@claude-code/repl/notifier.js'
-import { OAuthService } from '@claude-code/provider/oauth/index.js'
+import { OAuthService, runCodexOAuthFlow, saveCodexOAuthTokens } from '@claude-code/provider/oauth/index.js'
 import { getOauthAccountInfo, validateForceLoginOrg } from '@claude-code/provider/authAlias.js'
 import { logError } from '@claude-code/local-observability/logging'
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { getSettings_DEPRECATED, updateSettingsForSource } from '@claude-code/config/settings'
 import { Select } from './CustomSelect/select.js'
 import { Spinner } from './Spinner.js'
@@ -102,6 +103,7 @@ export function ConsoleOAuthFlow({
     // Use Claude AI auth for setup-token mode to support user:inference scope
     return mode === 'setup-token' || forceLoginMethod === 'claudeai'
   })
+  const [loginWithCodex, setLoginWithCodex] = useState(false)
   // After a few seconds we suggest the user to copy/paste url if the
   // browser did not open automatically. In this flow we expect the user to
   // copy the code from the browser and paste it in the terminal
@@ -301,6 +303,36 @@ export function ConsoleOAuthFlow({
     }
   }, [oauthService, setShowPastePrompt, loginWithClaudeAi, mode, orgUUID])
 
+  // Codex-specific OAuth flow — completely separate from the Anthropic OAuthService
+  const startCodexOAuth = useCallback(async () => {
+    try {
+      logEvent('tengu_oauth_codex_flow_start', {})
+      const codexTokens = await runCodexOAuthFlow(async (url) => {
+        setOAuthStatus({ state: 'waiting_for_login', url })
+        setTimeout(setShowPastePrompt, 3000, true)
+      })
+      // Save directly via saveCodexOAuthTokens (bypasses installOAuthTokens Anthropic path)
+      saveCodexOAuthTokens(codexTokens)
+      saveGlobalConfig(current => ({
+        ...current,
+        env: {
+          ...(current.env ?? {}),
+          CLAUDE_CODE_USE_OPENAI: '1',
+        },
+      }))
+      process.env.CLAUDE_CODE_USE_OPENAI = '1'
+      logEvent('tengu_oauth_codex_success', {})
+      setOAuthStatus({ state: 'success' })
+      void sendNotification({ message: 'Codex login successful', notificationType: 'auth_success' }, terminal)
+    } catch (err) {
+      const msg = (err as Error).message
+      logEvent('tengu_oauth_codex_error', {
+        error: msg as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
+      setOAuthStatus({ state: 'error', message: msg, toRetry: { state: 'idle' } })
+    }
+  }, [setShowPastePrompt, terminal])
+
   const pendingOAuthStartRef = useRef(false)
 
   useEffect(() => {
@@ -309,12 +341,12 @@ export function ConsoleOAuthFlow({
       !pendingOAuthStartRef.current
     ) {
       pendingOAuthStartRef.current = true
-      // Start OAuth flow and reset the pending flag when complete
-      void startOAuth().finally(() => {
+      const flow = loginWithCodex ? startCodexOAuth() : startOAuth()
+      void flow.finally(() => {
         pendingOAuthStartRef.current = false
       })
     }
-  }, [oauthStatus.state, startOAuth])
+  }, [oauthStatus.state, startOAuth, startCodexOAuth, loginWithCodex])
 
   // Auto-exit for setup-token mode
   useEffect(() => {
@@ -398,6 +430,7 @@ export function ConsoleOAuthFlow({
           handleSubmitCode={handleSubmitCode}
           setOAuthStatus={setOAuthStatus}
           setLoginWithClaudeAi={setLoginWithClaudeAi}
+          setLoginWithCodex={setLoginWithCodex}
           onDone={onDone}
         />
       </Box>
@@ -420,6 +453,7 @@ type OAuthStatusMessageProps = {
   handleSubmitCode: (value: string, url: string) => void
   setOAuthStatus: (status: OAuthStatus) => void
   setLoginWithClaudeAi: (value: boolean) => void
+  setLoginWithCodex: (value: boolean) => void
 }
 
 function OAuthStatusMessage({
@@ -436,6 +470,7 @@ function OAuthStatusMessage({
   handleSubmitCode,
   setOAuthStatus,
   setLoginWithClaudeAi,
+  setLoginWithCodex,
   onDone,
 }: OAuthStatusMessageProps): React.ReactNode {
   switch (oauthStatus.state) {
@@ -453,6 +488,59 @@ function OAuthStatusMessage({
           <Box>
             <Select
               options={[
+                {
+                  label: (
+                    <Text>
+                      Claude account with subscription ·{' '}
+                      <Text dimColor>Pro, Max, Team, or Enterprise</Text>
+                      {process.env.USER_TYPE === 'ant' && (
+                        <Text>
+                          {'\n'}
+                          <Text color="warning">[ANT-ONLY]</Text>{' '}
+                          <Text dimColor>
+                            Please use this option unless you need to login to a
+                            special org for accessing sensitive data (e.g.
+                            customer data, HIPI data) with the Console option
+                          </Text>
+                        </Text>
+                      )}
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'claudeai',
+                },
+                {
+                  label: (
+                    <Text>
+                      OpenAI Codex account ·{' '}
+                      <Text dimColor>ChatGPT Plus/Pro subscription</Text>
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'codex',
+                },
+                {
+                  label: (
+                    <Text>
+                      Anthropic Console account ·{' '}
+                      <Text dimColor>API usage billing</Text>
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'console',
+                },
+                {
+                  label: (
+                    <Text>
+                      3rd-party platform ·{' '}
+                      <Text dimColor>
+                        Amazon Bedrock, Microsoft Foundry, or Vertex AI
+                      </Text>
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'platform',
+                },
                 {
                   label: (
                     <Text>
@@ -485,52 +573,14 @@ function OAuthStatusMessage({
                   ),
                   value: 'gemini_api',
                 },
-                {
-                  label: (
-                    <Text>
-                      Claude account with subscription ·{' '}
-                      <Text dimColor>Pro, Max, Team, or Enterprise</Text>
-                      {process.env.USER_TYPE === 'ant' && (
-                        <Text>
-                          {'\n'}
-                          <Text color="warning">[ANT-ONLY]</Text>{' '}
-                          <Text dimColor>
-                            Please use this option unless you need to login to a
-                            special org for accessing sensitive data (e.g.
-                            customer data, HIPI data) with the Console option
-                          </Text>
-                        </Text>
-                      )}
-                      {'\n'}
-                    </Text>
-                  ),
-                  value: 'claudeai',
-                },
-                {
-                  label: (
-                    <Text>
-                      Anthropic Console account ·{' '}
-                      <Text dimColor>API usage billing</Text>
-                      {'\n'}
-                    </Text>
-                  ),
-                  value: 'console',
-                },
-                {
-                  label: (
-                    <Text>
-                      3rd-party platform ·{' '}
-                      <Text dimColor>
-                        Amazon Bedrock, Microsoft Foundry, or Vertex AI
-                      </Text>
-                      {'\n'}
-                    </Text>
-                  ),
-                  value: 'platform',
-                },
               ]}
               onChange={value => {
-                if (value === 'custom_platform') {
+                if (value === 'codex') {
+                  logEvent('tengu_oauth_codex_selected', {})
+                  setLoginWithCodex(true)
+                  setLoginWithClaudeAi(false)
+                  setOAuthStatus({ state: 'ready_to_start' })
+                } else if (value === 'custom_platform') {
                   logEvent('tengu_custom_platform_selected', {})
                   setOAuthStatus({
                     state: 'custom_platform',
