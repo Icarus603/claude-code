@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { shouldInferenceConfigCommandBeImmediate } from '@claude-code/shell/immediateCommand.js'
 import { getMainLoopModel, renderModelName } from '@claude-code/provider/model.js'
 

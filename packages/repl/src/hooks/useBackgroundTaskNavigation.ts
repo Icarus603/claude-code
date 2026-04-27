@@ -5,11 +5,11 @@ import {
   type AppState,
   useAppState,
   useSetAppState,
-} from '@claude-code/repl/appStateHooks.js'
+} from '../appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,
-} from '@claude-code/repl/teammateViewHelpers.js'
+} from '../teammateViewHelpers.js'
 import {
   getRunningTeammatesSorted,
   InProcessTeammateTask,
@@ -18,7 +18,7 @@ import {
   type InProcessTeammateTaskState,
   isInProcessTeammateTask,
 } from '@claude-code/swarm'
-import { isBackgroundTask } from '@claude-code/repl/tasksTypes.js'
+import { isBackgroundTask } from '../tasksTypes.js'
 
 // Step teammate selection by delta, wrapping across leader(-1)..teammates(0..n-1)..hide(n).
 // First step from a collapsed tree expands it and parks on leader.

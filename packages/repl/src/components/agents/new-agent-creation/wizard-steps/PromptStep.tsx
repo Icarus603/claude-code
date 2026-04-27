@@ -1,7 +1,7 @@
 import React, { type ReactNode, useCallback, useState } from 'react'
 import { Box, Byline, KeyboardShortcutHint, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { editPromptInEditor } from '@claude-code/repl/promptEditor.js'
+import { editPromptInEditor } from '../../../../promptEditor.js'
 import { ConfigurableShortcutHint } from '../../../ConfigurableShortcutHint.js'
 import TextInput from '../../../TextInput.js'
 import { useWizard } from '../../../wizard/index.js'

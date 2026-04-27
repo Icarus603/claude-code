@@ -5,7 +5,7 @@ import {
   clearTrustedDeviceToken,
   enrollTrustedDevice,
 } from '@claude-code/bridge/trustedDevice.js'
-import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
+import type { LocalJSXCommandContext } from '../../runtime.js'
 import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
 import { ConsoleOAuthFlow } from '@claude-code/repl/components/ConsoleOAuthFlow.js'
 import { Dialog } from '@anthropic/ink'

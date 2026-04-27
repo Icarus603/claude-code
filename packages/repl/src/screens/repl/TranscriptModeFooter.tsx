@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
 import figures from 'figures'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
 
 /**
  * Small component to display transcript mode footer with dynamic keybinding.

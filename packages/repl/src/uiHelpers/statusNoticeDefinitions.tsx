@@ -21,7 +21,7 @@ import type { AgentDefinitionsResult } from '@claude-code/tool-registry/tools/Ag
 import {
   getAgentDescriptionsTotalTokens,
   AGENT_DESCRIPTIONS_THRESHOLD,
-} from '@claude-code/repl/uiHelpers/statusNoticeHelpers.js'
+} from './statusNoticeHelpers.js'
 import {
   isSupportedJetBrainsTerminal,
   toIDEDisplayName,

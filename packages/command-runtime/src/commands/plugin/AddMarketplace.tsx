@@ -17,7 +17,7 @@ import {
   saveMarketplaceToSettings,
 } from '@claude-code/config/plugin/marketplaceManager'
 import { parseMarketplaceInput } from '@claude-code/config/plugin/parseMarketplaceInput'
-import type { ViewState } from '@claude-code/command-runtime/commands/plugin/types.js'
+import type { ViewState } from './types.js'
 
 type Props = {
   inputValue: string

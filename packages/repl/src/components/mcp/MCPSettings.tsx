@@ -11,7 +11,7 @@ import {
   extractAgentMcpServers,
   filterToolsByServer,
 } from '@claude-code/mcp-runtime/utils.js'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
 import { MCPAgentServerMenu } from './MCPAgentServerMenu.js'
 import { MCPListPanel } from './MCPListPanel.js'

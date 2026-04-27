@@ -1,12 +1,12 @@
 import { useCallback, useEffect } from 'react'
 import type { Command } from '@claude-code/command-runtime/runtime'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../notifications.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
 import { reinitializeLspServerManager } from '@claude-code/ide/lsp/manager.js'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../appStateHooks.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

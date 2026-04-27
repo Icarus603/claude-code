@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { env } from '@claude-code/config/env/paths'
 
 // Terminals that natively support CSI u / Kitty keyboard protocol

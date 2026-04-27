@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { HooksConfigMenu } from '@claude-code/repl/components/hooks/HooksConfigMenu.js'
+import { HooksConfigMenu } from '../../components/hooks/HooksConfigMenu.js'
 import { logEvent } from '@claude-code/local-observability'
 import { getTools } from '@claude-code/tool-registry/runtime'
 import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'

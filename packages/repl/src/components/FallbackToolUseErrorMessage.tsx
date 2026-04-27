@@ -4,7 +4,7 @@ import { stripUnderlineAnsi } from './shell/OutputLine.js'
 import { extractTag } from '@claude-code/agent/messages.js'
 import { removeSandboxViolationTags } from '@claude-code/shell/sandboxUiUtils.js'
 import { Box, Text } from '@anthropic/ink'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import { MessageResponse } from './MessageResponse.js'
 

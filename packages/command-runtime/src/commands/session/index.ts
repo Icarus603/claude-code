@@ -1,5 +1,5 @@
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const session = {
   type: 'local-jsx',
@@ -10,7 +10,7 @@ const session = {
   get isHidden() {
     return !getIsRemoteMode()
   },
-  load: () => import('@claude-code/command-runtime/commands/session/session.js'),
+  load: () => import('./session.js'),
 } satisfies Command
 
 export default session

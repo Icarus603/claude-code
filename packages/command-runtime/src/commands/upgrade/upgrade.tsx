@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
+import type { LocalJSXCommandContext } from '../../runtime.js'
 import { getOauthProfileFromOauthToken } from '@claude-code/provider/oauth/getOauthProfile.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import {
@@ -8,7 +8,7 @@ import {
 } from '@claude-code/provider/authAlias.js'
 import { openBrowser } from '@claude-code/storage/browser.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { Login } from '@claude-code/command-runtime/commands/login/login.js'
+import { Login } from '../login/login.js'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,

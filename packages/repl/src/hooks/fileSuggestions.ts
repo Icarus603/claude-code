@@ -5,14 +5,14 @@ import {
   CLAUDE_CONFIG_DIRECTORIES,
   loadMarkdownFilesForSubdir,
 } from '@claude-code/tool-registry/markdownConfigLoader.js'
-import type { SuggestionItem } from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
+import type { SuggestionItem } from '../components/PromptInput/PromptInputFooterSuggestions.js'
 import {
   CHUNK_MS,
   FileIndex,
   yieldToEventLoop,
-} from '@claude-code/repl/fileIndex/index.js'
+} from '../fileIndex/index.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { FileSuggestionCommandInput } from '@claude-code/repl/replTypes/fileSuggestion.js'
+import type { FileSuggestionCommandInput } from '../replTypes/fileSuggestion.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

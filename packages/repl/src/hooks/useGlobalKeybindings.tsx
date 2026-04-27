@@ -8,13 +8,13 @@ import { feature } from 'bun:bundle'
 import { useCallback } from 'react'
 import { instances } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { Screen } from '@claude-code/repl/screens/REPL.js'
+import type { Screen } from '../screens/REPL.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../appStateHooks.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { getTerminalPanel } from '@claude-code/shell/terminal/terminalPanel.js'
 

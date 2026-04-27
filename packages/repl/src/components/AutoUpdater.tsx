@@ -5,7 +5,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useInterval } from 'usehooks-ts'
-import { useUpdateNotification } from '@claude-code/repl/hooks/useUpdateNotification.js'
+import { useUpdateNotification } from '../hooks/useUpdateNotification.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   type AutoUpdaterResult,
@@ -17,11 +17,11 @@ import {
 } from '@claude-code/updater/autoUpdater.js'
 import { getGlobalConfig, isAutoUpdaterDisabled } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { getCurrentInstallationType } from '@claude-code/repl/doctorDiagnostic.js'
+import { getCurrentInstallationType } from '../doctorDiagnostic.js'
 import {
   installOrUpdateClaudePackage,
   localInstallationExists,
-} from '@claude-code/repl/localInstaller.js'
+} from '../localInstaller.js'
 import { removeInstalledSymlink } from '@claude-code/updater/nativeInstaller/index.js'
 import { gt, gte } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'

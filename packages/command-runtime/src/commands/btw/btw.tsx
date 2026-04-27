@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { useInterval } from 'usehooks-ts'
-import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
+import type { CommandResultDisplay } from '../../runtime.js'
 import { Markdown } from '@claude-code/repl/components/Markdown.js'
 import { SpinnerGlyph } from '@claude-code/repl/components/Spinner/SpinnerGlyph.js'
 import { DOWN_ARROW, UP_ARROW } from '@claude-code/output/constants/figures.js'

@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const plugin = {
   type: 'local-jsx',
@@ -6,7 +6,7 @@ const plugin = {
   aliases: ['plugins', 'marketplace'],
   description: 'Manage Claude Code plugins',
   immediate: true,
-  load: () => import('@claude-code/command-runtime/commands/plugin/plugin.js'),
+  load: () => import('./plugin.js'),
 } satisfies Command
 
 export default plugin

@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'fs/promises'
 import * as React from 'react'
-import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
+import type { CommandResultDisplay } from '../../runtime.js'
 import { Dialog } from '@anthropic/ink'
 import { MemoryFileSelector } from '@claude-code/repl/components/memory/MemoryFileSelector.js'
 import { getRelativeMemoryPath } from '@claude-code/repl/components/memory/MemoryUpdateNotification.js'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
+import type { LocalJSXCommandContext } from '../../runtime.js'
 import { SkillsMenu } from '@claude-code/repl/components/skills/SkillsMenu.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 

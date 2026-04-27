@@ -2,7 +2,7 @@
  * Cost command - minimal metadata only.
  * Implementation is lazy-loaded from cost.ts to reduce startup time.
  */
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
@@ -18,7 +18,7 @@ const cost = {
     return isClaudeAISubscriber()
   },
   supportsNonInteractive: true,
-  load: () => import('@claude-code/command-runtime/commands/cost/cost.js'),
+  load: () => import('./cost.js'),
 } satisfies Command
 
 export default cost

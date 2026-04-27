@@ -1,5 +1,5 @@
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.js'
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from './runtime.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 
 type Options = {

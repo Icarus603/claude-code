@@ -1,7 +1,7 @@
 import figures from 'figures'
 import React, { useState } from 'react'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
-import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, color, Text, useTheme } from '@anthropic/ink'
 import { getMcpConfigByName } from '@claude-code/mcp-runtime/config.js'
 import {
@@ -12,7 +12,7 @@ import {
   describeMcpConfigFilePath,
   filterMcpPromptsByServer,
 } from '@claude-code/mcp-runtime/utils.js'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { capitalize } from '@claude-code/output/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

@@ -2,7 +2,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../appStateHooks.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 import {
   AGENT_COLOR_TO_THEME_COLOR,

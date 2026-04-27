@@ -159,7 +159,10 @@
     "./standalone/standaloneAgent.js": "./standalone/standaloneAgent.ts",
     "./zodSchema/zodToJsonSchema.js": "./zodSchema/zodToJsonSchema.ts",
     "./userPromptKeywords/userPromptKeywords.js": "./userPromptKeywords/userPromptKeywords.ts",
-    "./messages/systemInit.js": "./messages/systemInit.ts"
+    "./messages/systemInit.js": "./messages/systemInit.ts",
+    "./contracts": "./contracts.ts",
+    "./errors": "./errors.ts",
+    "./testing": "./testing/index.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

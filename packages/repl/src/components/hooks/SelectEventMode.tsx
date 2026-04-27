@@ -10,7 +10,7 @@
 import figures from 'figures'
 import * as React from 'react'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { HookEventMetadata } from '@claude-code/repl/hooksConfigManager.js'
+import type { HookEventMetadata } from '../../hooksConfigManager.js'
 import { Box, Link, Text } from '@anthropic/ink'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { Select } from '../CustomSelect/select.js'

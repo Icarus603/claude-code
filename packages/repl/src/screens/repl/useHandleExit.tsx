@@ -3,8 +3,8 @@ import { spawnSync } from 'child_process'
 import { feature } from 'bun:bundle'
 import { isBgSession } from '@claude-code/agent/concurrentSessions.js'
 import { getCurrentWorktreeSession } from '@claude-code/swarm'
-import { ExitFlow } from '@claude-code/repl/components/ExitFlow.js'
-import exit from '@claude-code/repl/commands/exit/index.js'
+import { ExitFlow } from '../../components/ExitFlow.js'
+import exit from '../../commands/exit/index.js'
 
 /**
  * Builds the REPL's exit handler — handles three exit paths:

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useEffect, type RefObject } from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { useSearchInput } from '@anthropic/ink/search'
-import type { JumpHandle } from '@claude-code/repl/components/VirtualMessageList.js'
+import type { JumpHandle } from '../../components/VirtualMessageList.js'
 
 /** less-style / bar. 1-row, same border-top styling as TranscriptModeFooter
  *  so swapping them in the bottom slot doesn't shift ScrollBox height.

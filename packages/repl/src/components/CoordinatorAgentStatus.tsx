@@ -15,11 +15,11 @@ import {
   type AppState,
   useAppState,
   useSetAppState,
-} from '@claude-code/repl/appStateHooks.js'
+} from '../appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,
-} from '@claude-code/repl/teammateViewHelpers.js'
+} from '../teammateViewHelpers.js'
 import {
   isPanelAgentTask,
   type LocalAgentTaskState,

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../../notifications.js'
 import { Text } from '@anthropic/ink'
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'

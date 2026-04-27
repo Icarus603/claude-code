@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
+import { useRegisterOverlay } from '../overlayContext.js'
 import {
   getTimestampedHistory,
   type TimestampedHistoryEntry,
-} from '@claude-code/repl/history.js'
+} from '../history.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth, wrapAnsi } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'

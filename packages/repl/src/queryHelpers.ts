@@ -5,7 +5,7 @@ import {
   isSessionPersistenceDisabled,
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from './hooks/useCanUseTool.js'
 import { runTools } from '@claude-code/tool-registry/services/toolOrchestration.js'
 import { findToolByName, type Tool, type Tools } from '@claude-code/tool-registry/Tool.js'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
@@ -17,7 +17,7 @@ import {
 } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/prompt.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type { OrphanedPermission } from '@claude-code/repl/textInputTypes.js'
+import type { OrphanedPermission } from './textInputTypes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
@@ -33,7 +33,7 @@ import type {
   inputSchema as permissionToolInputSchema,
   outputSchema as permissionToolOutputSchema,
 } from '@claude-code/permission/PermissionPromptToolResultSchema'
-import type { ProcessUserInputContext } from '@claude-code/repl/processUserInput/processUserInput.js'
+import type { ProcessUserInputContext } from './processUserInput/processUserInput.js'
 import { recordTranscript } from '@claude-code/storage/sessionStorage.js'
 
 export type PermissionPromptTool = Tool<

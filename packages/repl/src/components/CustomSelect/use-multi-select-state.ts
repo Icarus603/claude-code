@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { isDeepStrictEqual } from 'util'
-import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
+import { useRegisterOverlay } from '../../overlayContext.js'
 import { type InputEvent, useInput } from '@anthropic/ink'
 import {
   normalizeFullWidthDigits,

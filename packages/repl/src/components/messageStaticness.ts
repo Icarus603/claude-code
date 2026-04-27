@@ -13,7 +13,7 @@ import {
   hasUnresolvedHooksFromLookup,
 } from '@claude-code/agent/messages.js'
 import type { RenderableMessage } from '@claude-code/agent/messageShapes'
-import type { Screen } from '@claude-code/repl/screens/REPL.js'
+import type { Screen } from '../screens/REPL.js'
 
 export function shouldRenderStatically(
   message: RenderableMessage,

@@ -1,7 +1,7 @@
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources'
 import { randomUUID } from 'crypto'
 import * as React from 'react'
-import { BashModeProgress } from '@claude-code/repl/components/BashModeProgress.js'
+import { BashModeProgress } from '../components/BashModeProgress.js'
 import type { SetToolJSXFn } from '@claude-code/tool-registry/Tool.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import type {
@@ -22,7 +22,7 @@ import { resolveDefaultShell } from '@claude-code/shell/legacy/resolveDefaultShe
 import { isPowerShellToolEnabled } from '@claude-code/shell/legacy/shellToolUtils.js'
 import { processToolResultBlock } from '@claude-code/storage/toolResultStorage.js'
 import { escapeXml } from '@claude-code/output/xml'
-import type { ProcessUserInputContext } from '@claude-code/repl/processUserInput/processUserInput.js'
+import type { ProcessUserInputContext } from './processUserInput.js'
 
 export async function processBashCommand(
   inputString: string,

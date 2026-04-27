@@ -5,7 +5,7 @@ import {
   getMcpDisplayName,
 } from '@claude-code/mcp-runtime/mcpStringUtils.js'
 import { filterToolsByServer } from '@claude-code/mcp-runtime/utils.js'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

@@ -2,12 +2,12 @@
 import * as React from 'react'
 import { Suspense, useState } from 'react'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useTerminalSize } from '@anthropic/ink'
 import {
   useIsInsideModal,
   useModalOrTerminalSize,
-} from '@claude-code/repl/modalContext.js'
+} from '../../modalContext.js'
 import { Pane, Tab, Tabs } from '@anthropic/ink'
 import { Status, buildDiagnostics } from './Status.js'
 import { Config } from './Config.js'

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useDynamicConfig } from '@claude-code/repl/hooks/useDynamicConfig.js'
+import { useDynamicConfig } from '../../hooks/useDynamicConfig.js'
 import { isFeedbackSurveyDisabled } from '@claude-code/config/env/privacy'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

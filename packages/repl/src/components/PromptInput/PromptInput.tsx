@@ -10,8 +10,8 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
-import { useNotifications } from '@claude-code/repl/notifications.js'
-import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
+import { useNotifications } from '../../notifications.js'
+import { useCommandQueue } from '../../hooks/useCommandQueue.js'
 import {
   type IDEAtMentioned,
   useIdeAtMentioned,
@@ -25,8 +25,8 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from '@claude-code/repl/appStateHooks.js'
-import type { FooterItem } from '@claude-code/repl/appStateHooks.js'
+} from '../../appStateHooks.js'
+import type { FooterItem } from '../../appStateHooks.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
   isQueuedCommandEditable,
@@ -35,32 +35,32 @@ import {
 import stripAnsi from 'strip-ansi'
 import { FastModePicker } from '@claude-code/command-runtime/commands/fast/fast.js'
 import { isUltrareviewEnabled } from '@claude-code/command-runtime/commands/review/ultrareviewEnabled.js'
-import { getNativeCSIuTerminalDisplayName } from '@claude-code/repl/terminalSetup.js'
+import { getNativeCSIuTerminalDisplayName } from '../../terminalSetup.js'
 import { type Command, hasCommand } from '@claude-code/command-runtime/runtime'
-import { useIsModalOverlayActive } from '@claude-code/repl/overlayContext.js'
-import { useSetPromptOverlayDialog } from '@claude-code/repl/promptOverlayContext.js'
+import { useIsModalOverlayActive } from '../../overlayContext.js'
+import { useSetPromptOverlayDialog } from '../../promptOverlayContext.js'
 import {
   formatImageRef,
   formatPastedTextRef,
   getPastedTextRefNumLines,
   parseReferences,
-} from '@claude-code/repl/history.js'
-import type { VerificationStatus } from '@claude-code/repl/hooks/useApiKeyVerification.js'
+} from '../../history.js'
+import type { VerificationStatus } from '../../hooks/useApiKeyVerification.js'
 import {
   type HistoryMode,
   useArrowKeyHistory,
-} from '@claude-code/repl/hooks/useArrowKeyHistory.js'
+} from '../../hooks/useArrowKeyHistory.js'
 import { useDoublePress } from '@anthropic/ink'
-import { useHistorySearch } from '@claude-code/repl/hooks/useHistorySearch.js'
+import { useHistorySearch } from '../../hooks/useHistorySearch.js'
 import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
-import { useInputBuffer } from '@claude-code/repl/hooks/useInputBuffer.js'
-import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
-import { usePromptSuggestion } from '@claude-code/repl/hooks/usePromptSuggestion.js'
+import { useInputBuffer } from '../../hooks/useInputBuffer.js'
+import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
+import { usePromptSuggestion } from '../../hooks/usePromptSuggestion.js'
 import { useTerminalSize } from '@anthropic/ink'
-import { useTypeahead } from '@claude-code/repl/hooks/useTypeahead.js'
+import { useTypeahead } from '../../hooks/useTypeahead.js'
 import { Box, type BorderTextOptions, type ClickEvent, type Key, stringWidth, Text, useInput } from '@anthropic/ink'
 import { useOptionalKeybindingContext } from '@anthropic/ink/keybindings'
-import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
+import { getShortcutDisplay } from '../../keybindings/shortcutFormat.js'
 import {
   useKeybinding,
   useKeybindings,
@@ -69,20 +69,20 @@ import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import {
   abortPromptSuggestion,
   logSuggestionSuppressed,
-} from '@claude-code/repl/promptSuggestion.js'
+} from '../../promptSuggestion.js'
 import {
   type ActiveSpeculationState,
   abortSpeculation,
-} from '@claude-code/repl/promptSuggestionSpeculation.js'
+} from '../../promptSuggestionSpeculation.js'
 import {
   getActiveAgentForInput,
   getViewedTeammateTask,
-} from '@claude-code/repl/selectors.js'
+} from '../../selectors.js'
 import {
   enterTeammateView,
   exitTeammateView,
   stopOrDismissAgent,
-} from '@claude-code/repl/teammateViewHelpers.js'
+} from '../../teammateViewHelpers.js'
 import type { ToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { getRunningTeammatesSorted } from '@claude-code/swarm'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
@@ -90,7 +90,7 @@ import {
   isPanelAgentTask,
   type LocalAgentTaskState,
 } from '@claude-code/agent/localAgentTask.js'
-import { isBackgroundTask } from '@claude-code/repl/tasksTypes.js'
+import { isBackgroundTask } from '../../tasksTypes.js'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
   AGENT_COLORS,
@@ -103,11 +103,11 @@ import type {
   BaseTextInputProps,
   PromptInputMode,
   VimMode,
-} from '@claude-code/repl/textInputTypes.js'
+} from '../../textInputTypes.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
-import { Cursor } from '@claude-code/repl/Cursor.js'
+import { Cursor } from '../../Cursor.js'
 import {
   getGlobalConfig,
   type PastedContent,
@@ -128,19 +128,19 @@ import {
   isFastModeCooldown,
   isFastModeEnabled,
   isFastModeSupportedByModel,
-} from '@claude-code/repl/fastMode.js'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
-import type { PromptInputHelpers } from '@claude-code/repl/handlePromptSubmit.js'
+} from '../../fastMode.js'
+import { isFullscreenEnvEnabled } from '../../fullscreen.js'
+import type { PromptInputHelpers } from '../../handlePromptSubmit.js'
 import {
   getImageFromClipboard,
   PASTE_THRESHOLD,
-} from '@claude-code/repl/imagePaste.js'
+} from '../../imagePaste.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { cacheImagePath, storeImage } from '@claude-code/tool-registry/imageStore.js'
 import {
   isMacosOptionChar,
   MACOS_OPTION_SPECIAL_CHARS,
-} from '@claude-code/repl/keyboardShortcuts.js'
+} from '../../keyboardShortcuts.js'
 import { logError } from '@claude-code/local-observability/logging'
 import {
   isOpus1mMergeEnabled,
@@ -153,17 +153,17 @@ import {
 } from '@claude-code/permission/getNextPermissionMode.js'
 import { transitionPermissionMode } from '@claude-code/permission/permissionSetup'
 import { getPlatform } from '@claude-code/config/platform'
-import type { ProcessUserInputContext } from '@claude-code/repl/processUserInput/processUserInput.js'
-import { editPromptInEditor } from '@claude-code/repl/promptEditor.js'
+import type { ProcessUserInputContext } from '../../processUserInput/processUserInput.js'
+import { editPromptInEditor } from '../../promptEditor.js'
 import { hasAutoModeOptIn } from '@claude-code/config/settings'
 import { findBtwTriggerPositions } from '@claude-code/agent/sideQuestion.js'
-import { findSlashCommandPositions } from '@claude-code/repl/suggestions/commandSuggestions.js'
+import { findSlashCommandPositions } from '../../suggestions/commandSuggestions.js'
 import {
   findSlackChannelPositions,
   getKnownChannelsVersion,
   hasSlackMcpServer,
   subscribeKnownChannels,
-} from '@claude-code/repl/suggestions/slackChannelSuggestions.js'
+} from '../../suggestions/slackChannelSuggestions.js'
 import { isInProcessEnabled } from '@claude-code/swarm'
 import { syncTeammateMode } from '@claude-code/swarm'
 import type { TeamSummary } from '@claude-code/swarm/teamDiscovery.js'
@@ -181,7 +181,7 @@ import { findTokenBudgetPositions } from '@claude-code/agent/tokenBudget'
 import {
   findUltraplanTriggerPositions,
   findUltrareviewTriggerPositions,
-} from '@claude-code/repl/ultraplan/keyword.js'
+} from '../../ultraplan/keyword.js'
 import { AutoModeOptInDialog } from '../AutoModeOptInDialog.js'
 import { BridgeDialog } from '../BridgeDialog.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'

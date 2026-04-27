@@ -12,7 +12,7 @@ import {
 import { openBrowser } from '@claude-code/storage/browser.js'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import type { Workflow } from '@claude-code/command-runtime/commands/install-github-app/types.js'
+import type { Workflow } from './types.js'
 
 async function createWorkflowFile(
   repoName: string,

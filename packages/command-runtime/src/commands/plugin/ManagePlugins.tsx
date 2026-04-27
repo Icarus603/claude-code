@@ -89,13 +89,13 @@ import {
 } from '@claude-code/config/settings'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
-import { formatErrorMessage, getErrorGuidance } from '@claude-code/command-runtime/commands/plugin/PluginErrors.js'
-import { PluginOptionsDialog } from '@claude-code/command-runtime/commands/plugin/PluginOptionsDialog.js'
-import { PluginOptionsFlow } from '@claude-code/command-runtime/commands/plugin/PluginOptionsFlow.js'
-import type { ViewState as ParentViewState } from '@claude-code/command-runtime/commands/plugin/types.js'
-import { UnifiedInstalledCell } from '@claude-code/command-runtime/commands/plugin/UnifiedInstalledCell.js'
-import type { UnifiedInstalledItem } from '@claude-code/command-runtime/commands/plugin/unifiedTypes.js'
-import { usePagination } from '@claude-code/command-runtime/commands/plugin/usePagination.js'
+import { formatErrorMessage, getErrorGuidance } from './PluginErrors.js'
+import { PluginOptionsDialog } from './PluginOptionsDialog.js'
+import { PluginOptionsFlow } from './PluginOptionsFlow.js'
+import type { ViewState as ParentViewState } from './types.js'
+import { UnifiedInstalledCell } from './UnifiedInstalledCell.js'
+import type { UnifiedInstalledItem } from './unifiedTypes.js'
+import { usePagination } from './usePagination.js'
 
 type Props = {
   setViewState: (state: ParentViewState) => void

@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react'
 import { onGrowthBookRefresh } from '@claude-code/config/feature-flags'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../appStateHooks.js'
 import {
   getDefaultMainLoopModelSetting,
   type ModelName,

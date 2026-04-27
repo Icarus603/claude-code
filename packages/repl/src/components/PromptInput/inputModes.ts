@@ -1,5 +1,5 @@
-import type { HistoryMode } from '@claude-code/repl/hooks/useArrowKeyHistory.js'
-import type { PromptInputMode } from '@claude-code/repl/textInputTypes.js'
+import type { HistoryMode } from '../../hooks/useArrowKeyHistory.js'
+import type { PromptInputMode } from '../../textInputTypes.js'
 
 export function prependModeCharacterToInput(
   input: string,

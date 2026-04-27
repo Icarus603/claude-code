@@ -6,7 +6,7 @@ import {
 } from '@claude-code/local-observability'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
-import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { setClipboard } from '@anthropic/ink'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow menu navigation
@@ -29,7 +29,7 @@ import {
   excludeToolsByServer,
   filterMcpPromptsByServer,
 } from '@claude-code/mcp-runtime/utils.js'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../../appStateHooks.js'
 import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
 import { openBrowser } from '@claude-code/storage/browser.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'

@@ -13,11 +13,11 @@ import {
   BRIDGE_FAILED_INDICATOR,
   BRIDGE_READY_INDICATOR,
 } from '@claude-code/output/constants/figures.js'
-import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
+import { useRegisterOverlay } from '../overlayContext.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw 'd' key for disconnect, not a configurable keybinding action
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../appStateHooks.js'
 import { saveGlobalConfig } from '@claude-code/config'
 import { getBranch } from '@claude-code/storage/git.js'
 import { Dialog } from '@anthropic/ink'

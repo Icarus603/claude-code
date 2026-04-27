@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Passes } from '@claude-code/repl/components/Passes/Passes.js'
+import { Passes } from '../../components/Passes/Passes.js'
 import { logEvent } from '@claude-code/local-observability'
 import { getCachedRemainingPasses } from '@claude-code/provider/referral.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'

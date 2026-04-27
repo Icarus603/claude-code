@@ -1,5 +1,5 @@
 import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const command: Command = {
   name: 'chrome',
@@ -7,7 +7,7 @@ const command: Command = {
   availability: [],
   isEnabled: () => !getIsNonInteractiveSession(),
   type: 'local-jsx',
-  load: () => import('@claude-code/command-runtime/commands/chrome/chrome.js'),
+  load: () => import('./chrome.js'),
 }
 
 export default command

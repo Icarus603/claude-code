@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useNotifications } from '@claude-code/repl/notifications.js'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useNotifications } from '../../notifications.js'
+import { useAppState, useSetAppState } from '../../appStateHooks.js'
 import {
   type CooldownReason,
   isFastModeEnabled,
@@ -8,7 +8,7 @@ import {
   onCooldownTriggered,
   onFastModeOverageRejection,
   onOrgFastModeChanged,
-} from '@claude-code/repl/fastMode.js'
+} from '../../fastMode.js'
 import { formatDuration } from '@claude-code/output/formatters'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 

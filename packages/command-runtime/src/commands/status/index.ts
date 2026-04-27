@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const status = {
   type: 'local-jsx',
@@ -6,7 +6,7 @@ const status = {
   description:
     'Show Claude Code status including version, model, account, API connectivity, and tool statuses',
   immediate: true,
-  load: () => import('@claude-code/command-runtime/commands/status/status.js'),
+  load: () => import('./status.js'),
 } satisfies Command
 
 export default status

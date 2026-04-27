@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
+import { useSettings } from '../../hooks/useSettings.js'
 import { Box, Text, useAnimationFrame } from '@anthropic/ink'
 import { interpolateColor, toRGBColor } from '../Spinner/utils.js'
 

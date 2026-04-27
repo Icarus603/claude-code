@@ -5,8 +5,8 @@ import {
   type AppState,
   type AppStateStore,
   AppStateProvider,
-} from '@claude-code/repl/appStateHooks.js'
-import { onChangeAppState } from '@claude-code/repl/onChangeAppState.js'
+} from '../appStateHooks.js'
+import { onChangeAppState } from '../onChangeAppState.js'
 import type { FpsMetrics } from '@claude-code/output/fpsTracker.js'
 
 type Props = {

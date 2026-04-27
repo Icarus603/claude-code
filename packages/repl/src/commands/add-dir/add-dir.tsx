@@ -6,7 +6,7 @@ import {
   setAdditionalDirectoriesForClaudeMd,
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
-import { MessageResponse } from '@claude-code/repl/components/MessageResponse.js'
+import { MessageResponse } from '../../components/MessageResponse.js'
 import { AddWorkspaceDirectory } from '@claude-code/permission/components/rules/AddWorkspaceDirectory.js'
 import { Box, Text } from '@anthropic/ink'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'

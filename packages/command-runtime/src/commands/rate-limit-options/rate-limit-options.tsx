@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
-} from '@claude-code/command-runtime/runtime'
+} from '../../runtime.js'
 import {
   type OptionWithDescription,
   Select,
@@ -19,10 +19,10 @@ import {
   getSubscriptionType,
 } from '@claude-code/provider/authAlias.js'
 import { hasClaudeAiBillingAccess } from '@claude-code/provider/billing.js'
-import { call as extraUsageCall } from '@claude-code/command-runtime/commands/extra-usage/extra-usage.js'
+import { call as extraUsageCall } from '../extra-usage/extra-usage.js'
 import { extraUsage } from '@claude-code/repl/extraUsage.js'
-import upgrade from '@claude-code/command-runtime/commands/upgrade/index.js'
-import { call as upgradeCall } from '@claude-code/command-runtime/commands/upgrade/upgrade.js'
+import upgrade from '../upgrade/index.js'
+import { call as upgradeCall } from '../upgrade/upgrade.js'
 
 type RateLimitOptionsMenuOptionType = 'upgrade' | 'extra-usage' | 'cancel'
 

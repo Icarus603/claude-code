@@ -3,10 +3,10 @@ import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
 import type { SettingSource } from '@claude-code/config/constants'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
-import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
-import { useMergedTools } from '@claude-code/repl/hooks/useMergedTools.js'
+import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useMergedTools } from '../../hooks/useMergedTools.js'
 import { Box, Text } from '@anthropic/ink'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../../appStateHooks.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import {
   type ResolvedAgent,

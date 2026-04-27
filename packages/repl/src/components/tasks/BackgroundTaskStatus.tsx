@@ -3,19 +3,19 @@ import * as React from 'react'
 import { useMemo, useState } from 'react'
 import { useTerminalSize } from '@anthropic/ink'
 import { stringWidth } from '@anthropic/ink'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../../appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,
-} from '@claude-code/repl/teammateViewHelpers.js'
+} from '../../teammateViewHelpers.js'
 import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
 import { getPillLabel, pillNeedsCta } from '@claude-code/agent/tasks/pillLabel.js'
 import {
   type BackgroundTaskState,
   isBackgroundTask,
   type TaskState,
-} from '@claude-code/repl/tasksTypes.js'
-import { calculateHorizontalScrollWindow } from '@claude-code/repl/uiHelpers/horizontalScroll.js'
+} from '../../tasksTypes.js'
+import { calculateHorizontalScrollWindow } from '../../uiHelpers/horizontalScroll.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   AGENT_COLOR_TO_THEME_COLOR,

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import React from 'react'
 import { Text } from '@anthropic/ink'
 import type { TaskStatus } from '@claude-code/tool-registry/Task.js'
-import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'
+import type { LocalShellTaskState } from '../../localShellTaskGuards.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 
 type TaskStatusTextProps = {

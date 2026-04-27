@@ -10,18 +10,18 @@ import React from 'react'
 import type { AssistantSession } from '@claude-code/agent/assistant/sessionDiscovery.js'
 import type { StatsStore } from '@claude-code/app-host/context/stats.js'
 import type { Root } from '@anthropic/ink'
-import { renderAndRun, showSetupDialog } from '@claude-code/repl/interactiveHelpers/interactiveHelpers.js'
-import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
+import { renderAndRun, showSetupDialog } from '../interactiveHelpers/interactiveHelpers.js'
+import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js'
 import type { AppState } from '@claude-code/app-host/state/AppStateStore.js'
 import type { AgentMemoryScope } from '@claude-code/memory/agentMemory'
-import type { TeleportRemoteResponse } from '@claude-code/repl/conversationRecovery.js'
+import type { TeleportRemoteResponse } from '../conversationRecovery.js'
 import type { FpsMetrics } from '@claude-code/output/fpsTracker.js'
 import type { ValidationError } from '@claude-code/config/settings/core/validation.js'
 
 // Type-only access to ResumeConversation's Props via the module type.
 // No runtime cost - erased at compile time.
 type ResumeConversationProps = React.ComponentProps<
-  typeof import('@claude-code/repl/screens/ResumeConversation.js').ResumeConversation
+  typeof import('../screens/ResumeConversation.js').ResumeConversation
 >
 
 /**
@@ -37,7 +37,7 @@ export async function launchSnapshotUpdateDialog(
   },
 ): Promise<'merge' | 'keep' | 'replace'> {
   const { SnapshotUpdateDialog } = await import(
-    '@claude-code/repl/components/agents/SnapshotUpdateDialog.js'
+    '../components/agents/SnapshotUpdateDialog.js'
   )
   return showSetupDialog<'merge' | 'keep' | 'replace'>(root, done => (
     <SnapshotUpdateDialog
@@ -62,7 +62,7 @@ export async function launchInvalidSettingsDialog(
   },
 ): Promise<void> {
   const { InvalidSettingsDialog } = await import(
-    '@claude-code/repl/components/InvalidSettingsDialog.js'
+    '../components/InvalidSettingsDialog.js'
   )
   return showSetupDialog(root, done => (
     <InvalidSettingsDialog
@@ -103,7 +103,7 @@ export async function launchAssistantInstallWizard(
   root: Root,
 ): Promise<string | null> {
   const { NewInstallWizard, computeDefaultInstallDir } = await import(
-    '@claude-code/repl/commands/assistant/assistant.js'
+    '../commands/assistant/assistant.js'
   )
   const defaultDir = await computeDefaultInstallDir()
   let rejectWithError: (reason: Error) => void
@@ -131,7 +131,7 @@ export async function launchTeleportResumeWrapper(
   root: Root,
 ): Promise<TeleportRemoteResponse | null> {
   const { TeleportResumeWrapper } = await import(
-    '@claude-code/repl/components/TeleportResumeWrapper.js'
+    '../components/TeleportResumeWrapper.js'
   )
   return showSetupDialog<TeleportRemoteResponse | null>(root, done => (
     <TeleportResumeWrapper
@@ -154,7 +154,7 @@ export async function launchTeleportRepoMismatchDialog(
   },
 ): Promise<string | null> {
   const { TeleportRepoMismatchDialog } = await import(
-    '@claude-code/repl/components/TeleportRepoMismatchDialog.js'
+    '../components/TeleportRepoMismatchDialog.js'
   )
   return showSetupDialog<string | null>(root, done => (
     <TeleportRepoMismatchDialog
@@ -183,8 +183,8 @@ export async function launchResumeChooser(
 ): Promise<void> {
   const [worktreePaths, { ResumeConversation }, { App }] = await Promise.all([
     worktreePathsPromise,
-    import('@claude-code/repl/screens/ResumeConversation.js'),
-    import('@claude-code/repl/components/App.js'),
+    import('../screens/ResumeConversation.js'),
+    import('../components/App.js'),
   ])
   await renderAndRun(
     root,

@@ -38,7 +38,7 @@ import {
   updateSettingsForSource,
 } from '@claude-code/config/settings'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
-import type { ViewState } from '@claude-code/command-runtime/commands/plugin/types.js'
+import type { ViewState } from './types.js'
 
 type Props = {
   setViewState: (state: ViewState) => void

@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 
 const rateLimitOptions = {
@@ -13,7 +13,7 @@ const rateLimitOptions = {
     return true
   },
   isHidden: true, // Hidden from help - only used internally
-  load: () => import('@claude-code/command-runtime/commands/rate-limit-options/rate-limit-options.js'),
+  load: () => import('./rate-limit-options.js'),
 } satisfies Command
 
 export default rateLimitOptions

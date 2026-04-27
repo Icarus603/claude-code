@@ -48,7 +48,7 @@ import {
   useAppState,
   useSetAppState,
   useAppStateStore,
-} from '@claude-code/repl/appStateHooks.js'
+} from '../../appStateHooks.js'
 import { ModelPicker } from '../ModelPicker.js'
 import {
   modelDisplayString,
@@ -71,7 +71,7 @@ import {
 } from '@claude-code/storage/claudemd.js'
 import { Byline, KeyboardShortcutHint, useTabHeaderFocus } from '@anthropic/ink'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
-import { useIsInsideModal } from '@claude-code/repl/modalContext.js'
+import { useIsInsideModal } from '../../modalContext.js'
 import { SearchBox } from '@anthropic/ink'
 import {
   isSupportedTerminal,
@@ -105,8 +105,8 @@ import {
   isFastModeEnabled,
   getFastModeModel,
   isFastModeSupportedByModel,
-} from '@claude-code/repl/fastMode.js'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+} from '../../fastMode.js'
+import { isFullscreenEnvEnabled } from '../../fullscreen.js'
 
 type Props = {
   onClose: (

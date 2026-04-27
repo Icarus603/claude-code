@@ -6,11 +6,11 @@ import {
   getSettings_DEPRECATED,
   getSettingsForSource,
 } from '@claude-code/config/settings'
-import { shouldOfferTerminalSetup } from '@claude-code/repl/terminalSetup.js'
-import { getDesktopUpsellConfig } from '@claude-code/repl/components/DesktopUpsell/DesktopUpsellStartup.js'
+import { shouldOfferTerminalSetup } from '../terminalSetup.js'
+import { getDesktopUpsellConfig } from '../components/DesktopUpsell/DesktopUpsellStartup.js'
 import { color } from '@anthropic/ink'
-import { shouldShowOverageCreditUpsell } from '@claude-code/repl/components/LogoV2/OverageCreditUpsell.js'
-import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
+import { shouldShowOverageCreditUpsell } from '../components/LogoV2/OverageCreditUpsell.js'
+import { getShortcutDisplay } from '../keybindings/shortcutFormat.js'
 import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
 import { is1PApiCustomer } from '@claude-code/provider/authAlias.js'
 import { countConcurrentSessions } from '@claude-code/agent/concurrentSessions.js'

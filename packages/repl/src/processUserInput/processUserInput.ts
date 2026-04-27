@@ -14,7 +14,7 @@ import {
   isBridgeSafeCommand,
   type LocalJSXCommandContext,
 } from '@claude-code/command-runtime/runtime'
-import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
 import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
 import type { SetToolJSXFn, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type {
@@ -29,7 +29,7 @@ import type { PermissionMode } from '@claude-code/permission/permissionTypes'
 import {
   isValidImagePaste,
   type PromptInputMode,
-} from '@claude-code/repl/textInputTypes.js'
+} from '../textInputTypes.js'
 import {
   type AgentMentionAttachment,
   createAttachmentMessage,
@@ -57,8 +57,8 @@ import { parseSlashCommand } from '@claude-code/command-runtime/slashCommandPars
 import {
   hasUltraplanKeyword,
   replaceUltraplanKeyword,
-} from '@claude-code/repl/ultraplan/keyword.js'
-import { processTextPrompt } from '@claude-code/repl/processUserInput/processTextPrompt.js'
+} from '../ultraplan/keyword.js'
+import { processTextPrompt } from './processTextPrompt.js'
 export type ProcessUserInputContext = ToolUseContext & LocalJSXCommandContext
 
 export type ProcessUserInputBaseResult = {
@@ -477,7 +477,7 @@ async function processUserInputBase(
   ) {
     logEvent('tengu_ultraplan_keyword', {})
     const rewritten = replaceUltraplanKeyword(inputString).trim()
-    const { processSlashCommand } = await import('@claude-code/repl/processUserInput/processSlashCommand.js')
+    const { processSlashCommand } = await import('./processSlashCommand.js')
     const slashResult = await processSlashCommand(
       `/ultraplan ${rewritten}`,
       precedingInputBlocks,
@@ -515,7 +515,7 @@ async function processUserInputBase(
 
   // Bash commands
   if (inputString !== null && mode === 'bash') {
-    const { processBashCommand } = await import('@claude-code/repl/processUserInput/processBashCommand.js')
+    const { processBashCommand } = await import('./processBashCommand.js')
     return addImageMetadataMessage(
       await processBashCommand(
         inputString,
@@ -535,7 +535,7 @@ async function processUserInputBase(
     !effectiveSkipSlash &&
     inputString.startsWith('/')
   ) {
-    const { processSlashCommand } = await import('@claude-code/repl/processUserInput/processSlashCommand.js')
+    const { processSlashCommand } = await import('./processSlashCommand.js')
     const slashResult = await processSlashCommand(
       inputString,
       precedingInputBlocks,

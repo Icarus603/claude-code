@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { memo, useCallback, useEffect, useRef } from 'react'
 import { logEvent } from '@claude-code/local-observability'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../appStateHooks.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import {
   getIsRemoteMode,
@@ -13,7 +13,7 @@ import {
   getSessionId,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { DEFAULT_OUTPUT_STYLE_NAME } from '@claude-code/config/outputStyles.js'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../notifications.js'
 import {
   getTotalAPIDuration,
   getTotalCost,
@@ -23,13 +23,13 @@ import {
   getTotalLinesRemoved,
   getTotalOutputTokens,
 } from '@claude-code/provider/costTracker.js'
-import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
-import { type ReadonlySettings, useSettings } from '@claude-code/repl/hooks/useSettings.js'
+import { useMainLoopModel } from '../hooks/useMainLoopModel.js'
+import { type ReadonlySettings, useSettings } from '../hooks/useSettings.js'
 import { Ansi, Box, Text } from '@anthropic/ink'
 import { getRawUtilization } from '@claude-code/provider/claudeAiLimits.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type { StatusLineCommandInput } from '@claude-code/repl/replTypes/statusLine.js'
-import type { VimMode } from '@claude-code/repl/textInputTypes.js'
+import type { StatusLineCommandInput } from '../replTypes/statusLine.js'
+import type { VimMode } from '../textInputTypes.js'
 import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import {
   calculateContextPercentages,
@@ -37,7 +37,7 @@ import {
 } from '@claude-code/agent/context.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+import { isFullscreenEnvEnabled } from '../fullscreen.js'
 import {
   createBaseHookInput,
   executeStatusLineCommand,

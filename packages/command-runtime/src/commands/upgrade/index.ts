@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { getSubscriptionType } from '@claude-code/provider/authAlias.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { readEnv } from '@claude-code/config/env/utils'
@@ -11,7 +11,7 @@ const upgrade = {
   isEnabled: () =>
     !isEnvTruthy(readEnv('DISABLE_UPGRADE_COMMAND')) &&
     getSubscriptionType() !== 'enterprise',
-  load: () => import('@claude-code/command-runtime/commands/upgrade/upgrade.js'),
+  load: () => import('./upgrade.js'),
 } satisfies Command
 
 export default upgrade

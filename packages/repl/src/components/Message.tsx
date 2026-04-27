@@ -26,7 +26,7 @@ import type {
   SystemMessage,
 } from '@claude-code/agent/messageShapes'
 import { type AdvisorBlock, isAdvisorBlock } from '@claude-code/provider/advisor.js'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+import { isFullscreenEnvEnabled } from '../fullscreen.js'
 import { logError } from '@claude-code/local-observability/logging'
 import type { buildMessageLookups } from '@claude-code/agent/messages.js'
 import { CompactSummary } from './CompactSummary.js'

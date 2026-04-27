@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Settings } from '@claude-code/repl/components/Settings/Settings.js'
+import { Settings } from '../../components/Settings/Settings.js'
 import type { LocalJSXCommandCall } from '@claude-code/agent/command.js'
 
 export const call: LocalJSXCommandCall = async (onDone, context) => {

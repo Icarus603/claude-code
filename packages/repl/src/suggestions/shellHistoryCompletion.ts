@@ -1,4 +1,4 @@
-import { getHistory } from '@claude-code/repl/history.js'
+import { getHistory } from '../history.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 
 /**

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../../notifications.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { getSettingsWithAllErrors } from '@claude-code/config/settings/allErrors'
 import type { ValidationError } from '@claude-code/config/validation'

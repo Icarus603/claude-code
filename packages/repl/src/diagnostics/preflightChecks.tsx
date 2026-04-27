@@ -1,7 +1,7 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { logEvent } from '@claude-code/local-observability'
-import { Spinner } from '@claude-code/repl/components/Spinner.js'
+import { Spinner } from '../components/Spinner.js'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { useTimeout } from '@anthropic/ink'
 import { Box, Text } from '@anthropic/ink'

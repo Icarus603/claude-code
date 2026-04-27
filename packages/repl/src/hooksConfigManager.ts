@@ -6,7 +6,7 @@ import {
   getAllHooks,
   type IndividualHookConfig,
   sortMatchersByPriority,
-} from '@claude-code/repl/hooksSettings.js'
+} from './hooksSettings.js'
 
 export type MatcherMetadata = {
   fieldToMatch: string

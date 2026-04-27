@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useAppStateStore, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppStateStore, useSetAppState } from '../appStateHooks.js'
 import { isTerminalTaskStatus } from '@claude-code/tool-registry/Task.js'
 import {
   findTeammateTaskByAgentId,

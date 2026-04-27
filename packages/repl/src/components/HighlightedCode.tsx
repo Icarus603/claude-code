@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
+import { useSettings } from '../hooks/useSettings.js'
 import { Ansi, Box, type DOMElement, measureElement, NoSelect, Text, useTheme } from '@anthropic/ink'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+import { isFullscreenEnvEnabled } from '../fullscreen.js'
 import sliceAnsi from '@claude-code/output/utils/sliceAnsi.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import { HighlightedCodeFallback } from './HighlightedCode/Fallback.js'
 import { expectColorFile } from './StructuredDiff/colorDiff.js'
-import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
+import { useSettings } from '../hooks/useSettings.js'
 
 type Props = {
   code: string

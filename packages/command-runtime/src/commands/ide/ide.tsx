@@ -5,7 +5,7 @@ import { logEvent } from '@claude-code/local-observability'
 import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
-} from '@claude-code/command-runtime/runtime'
+} from '../../runtime.js'
 import { Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import { Dialog } from '@anthropic/ink'
 import {

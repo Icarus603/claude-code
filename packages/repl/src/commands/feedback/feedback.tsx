@@ -3,7 +3,7 @@ import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
 } from '@claude-code/command-runtime/runtime'
-import { Feedback } from '@claude-code/repl/components/Feedback.js'
+import { Feedback } from '../../components/Feedback.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 

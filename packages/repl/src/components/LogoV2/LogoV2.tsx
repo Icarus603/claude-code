@@ -11,7 +11,7 @@ import {
   getRecentActivitySync,
   getRecentReleaseNotesSync,
   getLogoDisplayData,
-} from '@claude-code/repl/uiHelpers/logoV2Utils.js'
+} from '../../uiHelpers/logoV2Utils.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
 import { Clawd } from './Clawd.js'
@@ -23,7 +23,7 @@ import {
   createGuestPassesFeed,
 } from './feedConfigs.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
-import { resolveThemeSetting } from '@claude-code/repl/systemTheme.js'
+import { resolveThemeSetting } from '../../systemTheme.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import {
   isDebugMode,
@@ -35,10 +35,10 @@ import {
   getSteps,
   shouldShowProjectOnboarding,
   incrementProjectOnboardingSeenCount,
-} from '@claude-code/repl/projectOnboardingState.js'
+} from '../../projectOnboardingState.js'
 import { CondensedLogo } from './CondensedLogo.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
-import { checkForReleaseNotesSync } from '@claude-code/repl/releaseNotes.js'
+import { checkForReleaseNotesSync } from '../../releaseNotes.js'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
@@ -74,9 +74,9 @@ import {
   createOverageCreditFeed,
 } from './OverageCreditUpsell.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import { getEffortSuffix } from '@claude-code/agent/effort.js'
-import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
+import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { renderModelSetting } from '@claude-code/provider/model.js'
 
 const LEFT_PANEL_MAX_WIDTH = 50

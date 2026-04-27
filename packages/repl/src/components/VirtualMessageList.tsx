@@ -9,7 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
-import { useVirtualScroll } from '@claude-code/repl/hooks/useVirtualScroll.js'
+import { useVirtualScroll } from '../hooks/useVirtualScroll.js'
 import { Box, type DOMElement, type ScrollBoxHandle, type MatchPosition } from '@anthropic/ink'
 import { TextHoverColorContext } from '@anthropic/ink'
 import { ScrollChromeContext } from './FullscreenLayout.js'

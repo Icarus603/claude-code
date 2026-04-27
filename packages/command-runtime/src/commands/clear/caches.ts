@@ -7,7 +7,7 @@ import {
   clearInvokedSkills,
   setLastEmittedDate,
 } from '@claude-code/app-host/bootstrap/state.js'
-import { clearCommandsCache } from '@claude-code/command-runtime/runtime'
+import { clearCommandsCache } from '../../runtime.js'
 import { getSessionStartDate } from '@claude-code/config/commonConstants.js'
 import {
   getGitStatus,
@@ -23,7 +23,7 @@ import { clearAllSessions } from '@claude-code/provider/sessionIngress.js'
 import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js'
 import { resetAllLSPDiagnosticState } from '@claude-code/ide/lsp/LSPDiagnosticRegistry.js'
 import { clearTrackedMagicDocs } from '@claude-code/agent/MagicDocs/magicDocs.js'
-import { clearDynamicSkills } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
+import { clearDynamicSkills } from '../../skills/loadSkillsDir.js'
 import { resetSentSkillNames } from '@claude-code/agent/attachments.js'
 import { clearCommandPrefixCaches } from '@claude-code/shell/bash/commands.js'
 import { resetGetMemoryFilesCache } from '@claude-code/storage/claudemd.js'

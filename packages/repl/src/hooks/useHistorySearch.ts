@@ -3,12 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   getModeFromInput,
   getValueFromInput,
-} from '@claude-code/repl/components/PromptInput/inputModes.js'
-import { makeHistoryReader } from '@claude-code/repl/history.js'
+} from '../components/PromptInput/inputModes.js'
+import { makeHistoryReader } from '../history.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until consumers wire handleKeyDown to <Box onKeyDown>
 import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'
-import type { PromptInputMode } from '@claude-code/repl/textInputTypes.js'
+import type { PromptInputMode } from '../textInputTypes.js'
 import type { HistoryEntry } from '@claude-code/config'
 
 export function useHistorySearch(

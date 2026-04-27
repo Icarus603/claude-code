@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { shouldShowEffortCallout } from '@claude-code/repl/components/EffortCallout.js'
-import { shouldShowDesktopUpsellStartup } from '@claude-code/repl/components/DesktopUpsell/DesktopUpsellStartup.js'
+import { shouldShowEffortCallout } from '../../components/EffortCallout.js'
+import { shouldShowDesktopUpsellStartup } from '../../components/DesktopUpsell/DesktopUpsellStartup.js'
 
 const shouldShowAntModelSwitch: () => boolean =
   process.env.USER_TYPE === 'ant'
-    ? require('@claude-code/repl/components/AntModelSwitchCallout.js').shouldShowModelSwitchCallout
+    ? require('../../components/AntModelSwitchCallout.js').shouldShowModelSwitchCallout
     : () => false
 
 /**

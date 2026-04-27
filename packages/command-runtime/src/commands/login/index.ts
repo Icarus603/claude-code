@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { hasAnthropicApiKeyAuth } from '@claude-code/provider/authAlias.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { readEnv } from '@claude-code/config/env'

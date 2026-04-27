@@ -1,7 +1,7 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import React, { useEffect, useState } from 'react'
-import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
+import type { CommandResultDisplay } from '../../runtime.js'
 import { logEvent } from '@claude-code/local-observability'
 import { StatusIcon } from '@anthropic/ink'
 import { Box, wrappedRender as render, Text } from '@anthropic/ink'

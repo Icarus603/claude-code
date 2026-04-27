@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { useAppState, useAppStateStore } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useAppStateStore } from '../../appStateHooks.js'
 import {
   getActiveAgentForInput,
   getViewedTeammateTask,
-} from '@claude-code/repl/selectors.js'
+} from '../../selectors.js'
 import {
   AGENT_COLOR_TO_THEME_COLOR,
   AGENT_COLORS,

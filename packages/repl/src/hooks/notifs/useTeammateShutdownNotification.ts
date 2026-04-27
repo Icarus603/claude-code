@@ -3,8 +3,8 @@ import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import {
   type Notification,
   useNotifications,
-} from '@claude-code/repl/notifications.js'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+} from '../../notifications.js'
+import { useAppState } from '../../appStateHooks.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 
 function parseCount(notif: Notification): number {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
-import { PluginSettings } from '@claude-code/command-runtime/commands/plugin/PluginSettings.js'
+import { PluginSettings } from './PluginSettings.js'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,

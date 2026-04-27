@@ -1,9 +1,9 @@
 import React, { type RefObject, useEffect, useRef } from 'react'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../notifications.js'
 import {
   useCopyOnSelect,
   useSelectionBgColor,
-} from '@claude-code/repl/hooks/useCopyOnSelect.js'
+} from '../hooks/useCopyOnSelect.js'
 import type { ScrollBoxHandle, FocusMove, SelectionState } from '@anthropic/ink'
 import { useSelection, type Key, useInput, isXtermJs, getClipboardPath } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'

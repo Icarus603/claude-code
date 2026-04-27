@@ -1,4 +1,4 @@
-import { type AppState, useAppState } from '@claude-code/repl/appStateHooks.js'
+import { type AppState, useAppState } from '../appStateHooks.js'
 
 /**
  * Settings type as stored in AppState (DeepImmutable wrapped).

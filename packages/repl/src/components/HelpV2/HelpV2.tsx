@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
+import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
 import {
   builtInCommandNames,
   type Command,
   type CommandResultDisplay,
   INTERNAL_ONLY_COMMANDS,
 } from '@claude-code/command-runtime/runtime'
-import { useIsInsideModal } from '@claude-code/repl/modalContext.js'
+import { useIsInsideModal } from '../../modalContext.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Link, Text, Tab, Tabs, Pane } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'

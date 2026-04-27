@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { type ReactNode, useEffect } from 'react'
-import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
+import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, Text, stringWidth } from '@anthropic/ink'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import { getEffortSuffix } from '@claude-code/agent/effort.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+import { isFullscreenEnvEnabled } from '../../fullscreen.js'
 import {
   formatModelAndBilling,
   getLogoDisplayData,
   truncatePath,
-} from '@claude-code/repl/uiHelpers/logoV2Utils.js'
+} from '../../uiHelpers/logoV2Utils.js'
 import { renderModelSetting } from '@claude-code/provider/model.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
 import { AnimatedClawd } from './AnimatedClawd.js'

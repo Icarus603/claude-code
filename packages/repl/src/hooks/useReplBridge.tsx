@@ -13,7 +13,7 @@ import { setReplBridgeHandle } from '@claude-code/bridge/replBridgeHandle.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { getSlashCommandToolSkills, isBridgeSafeCommand } from '@claude-code/command-runtime/runtime'
 import { getRemoteSessionUrl } from '@claude-code/config/product'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../notifications.js'
 import type {
   PermissionMode,
   SDKMessage,
@@ -25,7 +25,7 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from '@claude-code/repl/appStateHooks.js'
+} from '../appStateHooks.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

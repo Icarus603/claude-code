@@ -35,8 +35,8 @@ import { formatDuration, formatNumber, formatSecondsShort } from '@claude-code/o
 import { getGlobalConfig } from '@claude-code/config'
 import { Text as ThemedText } from '@anthropic/ink'
 import { CtrlOToExpand } from '../CtrlOToExpand.js'
-import { useAppStateStore } from '@claude-code/repl/appStateHooks.js'
-import { isBackgroundTask, type TaskState } from '@claude-code/repl/tasksTypes.js'
+import { useAppStateStore } from '../../appStateHooks.js'
+import { isBackgroundTask, type TaskState } from '../../tasksTypes.js'
 import { getPillLabel } from '@claude-code/agent/tasks/pillLabel.js'
 import { useSelectedMessageBg } from '../messageActions.js'
 

@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
+import type { LocalJSXCommandContext } from '../../runtime.js'
 import { ContextVisualization } from '@claude-code/repl/components/ContextVisualization.js'
 import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'

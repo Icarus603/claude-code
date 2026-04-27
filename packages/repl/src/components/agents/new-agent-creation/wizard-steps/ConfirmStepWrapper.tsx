@@ -4,11 +4,11 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useSetAppState } from '../../../../appStateHooks.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { getActiveAgentsFromList } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { editFileInEditor } from '@claude-code/repl/promptEditor.js'
+import { editFileInEditor } from '../../../../promptEditor.js'
 import { useWizard } from '../../../wizard/index.js'
 import { getNewAgentFilePath, saveAgentToFile } from '../../agentFileUtils.js'
 import type { AgentWizardData } from '../types.js'

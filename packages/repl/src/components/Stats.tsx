@@ -20,14 +20,14 @@ import { getGlobalConfig } from '@claude-code/config'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import { generateHeatmap } from '@claude-code/local-observability/aggregates/heatmap.js'
 import { renderModelName } from '@claude-code/provider/model.js'
-import { copyAnsiToClipboard } from '@claude-code/repl/clipboard/screenshotClipboard.js'
+import { copyAnsiToClipboard } from '../clipboard/screenshotClipboard.js'
 import {
   aggregateClaudeCodeStatsForRange,
   type ClaudeCodeStats,
   type DailyModelTokens,
   type StatsDateRange,
 } from '@claude-code/local-observability/aggregates/stats.js'
-import { resolveThemeSetting } from '@claude-code/repl/systemTheme.js'
+import { resolveThemeSetting } from '../systemTheme.js'
 import { getTheme, themeColorToAnsi } from '@anthropic/ink'
 import { Spinner } from './Spinner.js'
 

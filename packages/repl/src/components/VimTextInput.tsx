@@ -1,9 +1,9 @@
 import chalk from 'chalk'
 import React from 'react'
-import { useClipboardImageHint } from '@claude-code/repl/hooks/useClipboardImageHint.js'
-import { useVimInput } from '@claude-code/repl/hooks/useVimInput.js'
+import { useClipboardImageHint } from '../hooks/useClipboardImageHint.js'
+import { useVimInput } from '../hooks/useVimInput.js'
 import { Box, color, useTerminalFocus, useTheme } from '@anthropic/ink'
-import type { VimTextInputProps } from '@claude-code/repl/textInputTypes.js'
+import type { VimTextInputProps } from '../textInputTypes.js'
 import type { TextHighlight } from '@claude-code/output/textHighlighting.js'
 import { BaseTextInput } from './BaseTextInput.js'
 

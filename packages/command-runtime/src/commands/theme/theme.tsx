@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
+import type { CommandResultDisplay } from '../../runtime.js'
 import { Pane } from '@anthropic/ink'
 import { ThemePicker } from '@claude-code/repl/components/ThemePicker.js'
 import { useTheme } from '@anthropic/ink'
