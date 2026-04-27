@@ -650,6 +650,17 @@ export function modelDisplayString(model: ModelSetting): string {
     }
     return `Default (${getDefaultMainLoopModel()})`
   }
+  // Composite `<connId>:<modelId>` settings (model picker output for users
+  // with multiple connections) — defer to renderModelSetting which resolves
+  // connection metadata to a pretty label like "Opus 4.7" instead of
+  // surfacing the raw "conn_xxx:claude-opus-4-7" string in /config etc.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { unpackModelId } = require(
+    '@claude-code/provider/connections.js',
+  ) as typeof import('@claude-code/provider/connections.js')
+  if (unpackModelId(model).connectionId) {
+    return renderModelSetting(model as ModelName)
+  }
   const resolvedModel = parseUserSpecifiedModel(model)
   return model === resolvedModel ? resolvedModel : `${model} (${resolvedModel})`
 }
