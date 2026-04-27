@@ -10,7 +10,7 @@ import {
 	prefetchGcpCredentialsIfSafe,
 } from '@claude-code/provider/authAlias.js';
 import { countFilesRoundedRg } from "@claude-code/tool-registry/ripgrep.js";
-import { getCwd } from "@claude-code/app-host/bootstrap/cwd.js";
+import { getCwd } from "../../bootstrap/cwd.js";
 import { prefetchOfficialMcpUrls } from '@claude-code/mcp-runtime/officialRegistry.js';
 import { refreshModelCapabilities } from '@claude-code/provider/modelCapabilities.js';
 import { settingsChangeDetector } from "@claude-code/config/changeDetector";

@@ -16,11 +16,11 @@ import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/stat
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
-} from '@claude-code/local-observability'
-import { logForDebugging } from '@claude-code/local-observability/debug.js'
+} from '../index.js'
+import { logForDebugging } from '../debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getPerformance } from '@claude-code/app-host/startup/profilerBase.js'
-import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
+import { jsonStringify } from '../slowOperations.js'
 
 // Detailed profiling mode - same env var as startupProfiler
 // eslint-disable-next-line custom-rules/no-process-env-top-level

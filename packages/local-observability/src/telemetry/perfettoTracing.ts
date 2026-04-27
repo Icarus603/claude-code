@@ -6,7 +6,7 @@
 export type {
   TraceEvent,
   TraceEventPhase,
-} from '@claude-code/local-observability/telemetry'
+} from './index.js'
 export {
   MAX_EVENTS_FOR_TESTING,
   emitPerfettoCounter,
@@ -28,4 +28,4 @@ export {
   startUserInputPerfettoSpan,
   triggerPeriodicWriteForTesting,
   unregisterAgent,
-} from '@claude-code/local-observability/telemetry'
+} from './index.js'

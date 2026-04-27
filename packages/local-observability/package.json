@@ -14,7 +14,6 @@
     "./spans": "./src/spans.ts",
     "./_deps": "./src/_deps.ts",
     "./logging": "./src/logging/index.ts",
-    "./logging/error-log-sink.js": "./src/logging/error-log-sink.ts",
     "./telemetry": "./src/telemetry/index.ts",
     "./slowOperations.js": "./src/slowOperations.ts",
     "./slowLoggingTag.js": "./src/slowLoggingTag.ts",
@@ -34,16 +33,11 @@
     "./uds/udsClient.js": "./src/uds/udsClient.ts",
     "./sdkHeapDumpMonitor.js": "./src/sdkHeapDumpMonitor.ts",
     "./sessionDataUploader.js": "./src/sessionDataUploader.ts",
-    "./telemetry/sessionTracing.js": "./src/telemetry/sessionTracing.ts",
-    "./telemetry/bigqueryExporter.js": "./src/telemetry/bigqueryExporter.ts",
-    "./telemetry/pluginTelemetry.js": "./src/telemetry/pluginTelemetry.ts",
     "./telemetry/perfettoTracing.js": "./src/telemetry/perfettoTracing.ts",
-    "./telemetry/betaSessionTracing.js": "./src/telemetry/betaSessionTracing.ts",
     "./aggregates/cleanup.js": "./src/aggregates/cleanup.ts",
     "./aggregates/headlessProfiler.js": "./src/aggregates/headlessProfiler.ts",
     "./aggregates/heatmap.js": "./src/aggregates/heatmap.ts",
     "./aggregates/queryProfiler.js": "./src/aggregates/queryProfiler.ts",
-    "./aggregates/stats.js": "./src/aggregates/stats.ts",
-    "./aggregates/statsCache.js": "./src/aggregates/statsCache.ts"
+    "./aggregates/stats.js": "./src/aggregates/stats.ts"
   }
 }

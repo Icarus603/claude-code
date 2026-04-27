@@ -3,7 +3,7 @@ import { getInitialSettings } from '@claude-code/config/settings'
 import type { SettingsJson } from '@claude-code/config/types'
 import type { DenialTrackingState } from '@claude-code/permission/denialTracking'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import type { Notification } from '@claude-code/app-host/context/notifications.js'
+import type { Notification } from '../context/notifications.js'
 import type { TodoList } from '@claude-code/tool-registry/todo/types.js'
 import type { BridgePermissionCallbacks } from '@claude-code/bridge/bridgePermissionCallbacks.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
@@ -37,7 +37,7 @@ import type { REPLHookContext } from '@claude-code/agent/postSamplingHooks.js'
 import type { SessionHooksState } from '@claude-code/agent/hooks/sessionHooks.js'
 import type { ModelSetting } from '@claude-code/provider/model.js'
 import { shouldEnableThinkingByDefault } from '@claude-code/provider/thinking.js'
-import type { Store } from '@claude-code/app-host/state/store.js'
+import type { Store } from './store.js'
 
 export type CompletionBoundary =
   | { type: 'complete'; completedAt: number; outputTokens: number }

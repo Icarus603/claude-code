@@ -12,7 +12,7 @@ import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const teamMemPaths = feature('TEAMMEM')
-  ? (require('@claude-code/memory/teamMemPaths') as typeof import('@claude-code/memory/teamMemPaths'))
+  ? (require('./teamMemPaths.js') as typeof import('./teamMemPaths.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 

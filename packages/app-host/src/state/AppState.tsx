@@ -12,10 +12,10 @@ import {
   createDisabledBypassPermissionsContext,
   isBypassPermissionsModeDisabled,
 } from '@claude-code/permission/permissionSetup'
-import { MailboxProvider } from '@claude-code/app-host/context/mailbox.js'
+import { MailboxProvider } from '../context/mailbox.js'
 import { useSettingsChange } from '@claude-code/repl/hooks/useSettingsChange.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { createStore } from '@claude-code/app-host/state/store.js'
+import { createStore } from './store.js'
 
 // DCE: voice context is ant-only. External builds get a passthrough.
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -29,7 +29,7 @@ import {
   type AppState,
   type AppStateStore,
   getDefaultAppState,
-} from '@claude-code/app-host/state/AppStateStore.js'
+} from './AppStateStore.js'
 
 // TODO: Remove these re-exports once all callers import directly from
 // ./AppStateStore.js. Kept for back-compat during migration so .ts callers
@@ -42,7 +42,7 @@ export {
   IDLE_SPECULATION_STATE,
   type SpeculationResult,
   type SpeculationState,
-} from '@claude-code/app-host/state/AppStateStore.js'
+} from './AppStateStore.js'
 
 export const AppStoreContext = React.createContext<AppStateStore | null>(null)
 

@@ -1,4 +1,4 @@
-import type { AppState } from '@claude-code/app-host/state/AppStateStore.js';
+import type { AppState } from './AppStateStore.js';
 
 export const selectShowExpandedTodos = (state: AppState) => state.expandedView === 'tasks';
 export const selectUltraplanPendingChoice = (state: AppState) => state.ultraplanPendingChoice;

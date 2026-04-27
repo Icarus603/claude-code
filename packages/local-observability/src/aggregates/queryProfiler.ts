@@ -27,7 +27,7 @@
  * - query_end: End of query
  */
 
-import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { logForDebugging } from '../debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { formatMs, formatTimelineLine, getPerformance } from '@claude-code/app-host/startup/profilerBase.js'
 

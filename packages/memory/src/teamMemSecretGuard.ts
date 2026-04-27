@@ -19,7 +19,7 @@ export function checkTeamMemSecrets(
   if (feature('TEAMMEM')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { isTeamMemPath } =
-      require('@claude-code/memory/teamMemPaths') as typeof import('@claude-code/memory/teamMemPaths')
+      require('./teamMemPaths.js') as typeof import('./teamMemPaths.js')
     const { scanForSecrets } =
       require('./teamMemSecretScanner.js') as typeof import('./teamMemSecretScanner.js')
     /* eslint-enable @typescript-eslint/no-require-imports */

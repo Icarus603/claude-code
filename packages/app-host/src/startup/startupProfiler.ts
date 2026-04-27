@@ -10,7 +10,7 @@
  */
 
 import { dirname, join } from 'path'
-import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import { getSessionId } from '../bootstrap/state.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -18,7 +18,7 @@ import {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { formatMs, formatTimelineLine, getPerformance } from '@claude-code/app-host/startup/profilerBase.js'
+import { formatMs, formatTimelineLine, getPerformance } from './profilerBase.js'
 import { writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
 
 // Module-level state - decided once at module load

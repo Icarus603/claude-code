@@ -8,8 +8,8 @@ export type {
   FooterItem,
   SpeculationResult,
   SpeculationState,
-} from '@claude-code/app-host/state/AppStateCompat.js'
+} from './AppStateCompat.js'
 export {
   getDefaultAppState,
   IDLE_SPECULATION_STATE,
-} from '@claude-code/app-host/state/AppStateCompat.js'
+} from './AppStateCompat.js'

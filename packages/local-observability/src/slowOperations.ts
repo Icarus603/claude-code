@@ -7,13 +7,13 @@ import {
 } from 'fs'
 import lodashCloneDeep from 'lodash-es/cloneDeep.js'
 import { addSlowOperation } from '@claude-code/app-host/bootstrap/state.js'
-import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { logForDebugging } from './debug.js'
 import {
   SLOW_OPERATION_THRESHOLD_MS,
   _setSlowOpReporter,
   callerFrame,
   slowLogging,
-} from '@claude-code/local-observability/slowLoggingTag.js'
+} from './slowLoggingTag.js'
 
 // Wire the reporter — slowLoggingTag holds the timing primitive but the
 // log sinks (debug log + AppState ring buffer) live here. This split

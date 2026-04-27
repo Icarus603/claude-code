@@ -1,4 +1,4 @@
-import type { AppState } from '@claude-code/app-host/state/AppStateCompat.js'
+import type { AppState } from './AppStateCompat.js'
 
 export type HostSessionState = Omit<
   AppState,

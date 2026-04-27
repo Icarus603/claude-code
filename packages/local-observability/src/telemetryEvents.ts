@@ -2,4 +2,4 @@
 export {
   logOTelEvent,
   redactIfDisabled,
-} from '@claude-code/local-observability/telemetry'
+} from './telemetry/index.js'

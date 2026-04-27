@@ -1,6 +1,6 @@
 // Auto-generated stub — replace with real implementation
-import type { MemoryHeader } from '@claude-code/memory/memdir/memoryScan.js';
-import type { MemoryScope } from '@claude-code/memory/memoryFileDetection';
+import type { MemoryHeader } from './memoryScan.js';
+import type { MemoryScope } from '../memoryFileDetection.js';
 
 export {};
 export const logMemoryRecallShape: (memories: MemoryHeader[], selected: MemoryHeader[]) => void = (() => {});

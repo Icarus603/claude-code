@@ -1,6 +1,6 @@
 import chalk from 'chalk'
-import type { DailyActivity } from '@claude-code/local-observability/aggregates/stats.js'
-import { toDateString } from '@claude-code/local-observability/aggregates/statsCache.js'
+import type { DailyActivity } from './stats.js'
+import { toDateString } from './statsCache.js'
 
 export type HeatmapOptions = {
   terminalWidth?: number // Terminal width in characters
