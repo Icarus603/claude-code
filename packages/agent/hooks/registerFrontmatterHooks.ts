@@ -2,7 +2,7 @@ import { HOOK_EVENTS, type HookEvent } from '@claude-code/headless-sdk/agentSdkT
 import type { AppState } from '@claude-code/app-host/state/AppState.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { HooksSettings } from '@claude-code/config/types'
-import { addSessionHook } from '@claude-code/agent/hooks/sessionHooks.js'
+import { addSessionHook } from './sessionHooks.js'
 
 /**
  * Register hooks from frontmatter (agent or skill) into session-scoped hooks.

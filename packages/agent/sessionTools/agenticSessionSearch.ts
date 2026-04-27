@@ -4,7 +4,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getLogDisplayTitle, logError } from '@claude-code/local-observability/log.js'
 import { getSmallFastModel } from '@claude-code/provider/model/model.js'
 import { isLiteLog, loadFullLog } from '@claude-code/storage/sessionStorage.js'
-import { sideQuery } from '@claude-code/agent/sideQuery.js'
+import { sideQuery } from '../sideQuery.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 
 // Limits for transcript extraction

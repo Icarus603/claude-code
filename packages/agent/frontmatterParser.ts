@@ -5,7 +5,7 @@
 
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { HooksSettings } from '@claude-code/config/types'
-import { parseYaml } from '@claude-code/agent/yaml.js'
+import { parseYaml } from './yaml.js'
 
 export type FrontmatterData = {
   // YAML can return null for keys with no value (e.g., "key:" with nothing after)

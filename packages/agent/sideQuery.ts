@@ -5,13 +5,13 @@ import {
   setLastApiCompletionTimestamp,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { STRUCTURED_OUTPUTS_BETA_HEADER } from '@claude-code/provider/betasConstants.js'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from './querySource.js'
 import {
   getAttributionHeader,
   getCLISyspromptPrefix,
 } from '@claude-code/provider/systemConstants.js'
 import { logEvent } from '@claude-code/local-observability'
-import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from './eventMetadata.js'
 import { getAPIMetadata } from '@claude-code/provider/claude.js'
 import { getAnthropicClient } from '@claude-code/provider'
 import {

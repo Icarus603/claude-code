@@ -6,7 +6,7 @@
 import { rollbackConsolidationLock } from '@claude-code/memory/consolidationLock'
 import type { SetAppState, Task, TaskStateBase } from '@claude-code/tool-registry/Task.js'
 import { createTaskStateBase, generateTaskId } from '@claude-code/tool-registry/Task.js'
-import { registerTask, updateTaskState } from '@claude-code/agent/task/framework.js'
+import { registerTask, updateTaskState } from '../../task/framework.js'
 
 // Keep only the N most recent turns for live display.
 const MAX_TURNS = 30

@@ -1,4 +1,4 @@
-import { getBudgetContinuationMessage } from '@claude-code/agent/tokenBudget'
+import { getBudgetContinuationMessage } from '../tokenBudget.js'
 
 const COMPLETION_THRESHOLD = 0.9
 const DIMINISHING_THRESHOLD = 500

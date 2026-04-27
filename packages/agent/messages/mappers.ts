@@ -19,10 +19,10 @@ import type {
   CompactMetadata,
   Message,
   MessageContent,
-} from '@claude-code/agent/messageShapes'
+} from '../messageShapes.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import stripAnsi from 'strip-ansi'
-import { createAssistantMessage } from '@claude-code/agent/messages.js'
+import { createAssistantMessage } from '../messages.js'
 import { getPlan } from '@claude-code/storage/plans.js'
 
 export function toInternalMessages(

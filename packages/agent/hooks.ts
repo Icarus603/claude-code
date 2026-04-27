@@ -41,7 +41,7 @@ import {
   getHooksConfigFromSnapshot,
   shouldAllowManagedHooksOnly,
   shouldDisableAllHooksIncludingManaged,
-} from '@claude-code/agent/hooks/hooksConfigSnapshot.js'
+} from './hooks/hooksConfigSnapshot.js'
 import {
   getTranscriptPathForSession,
   getAgentTranscriptPath,
@@ -129,27 +129,27 @@ import {
 } from '@claude-code/permission/permissionRuleParser'
 import { logError } from '@claude-code/local-observability/log.js'
 import { SandboxManager } from '@claude-code/shell/sandbox/sandbox-adapter.js'
-import { createCombinedAbortSignal } from '@claude-code/agent/combinedAbortSignal.js'
+import { createCombinedAbortSignal } from './combinedAbortSignal.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
-import { registerPendingAsyncHook } from '@claude-code/agent/hooks/AsyncHookRegistry.js'
-import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
+import { registerPendingAsyncHook } from './hooks/AsyncHookRegistry.js'
+import { enqueuePendingNotification } from './messageQueueManager.js'
 import {
   extractTextContent,
   getLastAssistantMessage,
   wrapInSystemReminder,
-} from '@claude-code/agent/messages.js'
+} from './messages.js'
 import {
   emitHookStarted,
   emitHookResponse,
   startHookProgressInterval,
-} from '@claude-code/agent/hooks/hookEvents.js'
-import { createAttachmentMessage } from '@claude-code/agent/attachments.js'
+} from './hooks/hookEvents.js'
+import { createAttachmentMessage } from './attachments.js'
 import { all } from '@claude-code/config/generators'
 import { findToolByName, type Tools, type ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import { execPromptHook } from '@claude-code/agent/hooks/execPromptHook.js'
+import { execPromptHook } from './hooks/execPromptHook.js'
 import type { Message, AssistantMessage } from '@claude-code/repl/replTypes/message.js'
-import { execAgentHook } from '@claude-code/agent/hooks/execAgentHook.js'
-import { execHttpHook } from '@claude-code/agent/hooks/execHttpHook.js'
+import { execAgentHook } from './hooks/execAgentHook.js'
+import { execHttpHook } from './hooks/execHttpHook.js'
 import type { ShellCommand } from '@claude-code/shell/terminal/ShellCommand.js'
 import {
   getSessionHooks,
@@ -158,7 +158,7 @@ import {
   clearSessionHooks,
   type SessionDerivedHookMatcher,
   type FunctionHook,
-} from '@claude-code/agent/hooks/sessionHooks.js'
+} from './hooks/sessionHooks.js'
 import type { AppState } from '@claude-code/app-host/state/AppState.js'
 import { jsonStringify, jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { isEnvTruthy,

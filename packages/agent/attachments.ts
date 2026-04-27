@@ -33,7 +33,7 @@ import {
   listTasks,
   getTaskListId,
   isTodoV2Enabled,
-} from '@claude-code/agent/tasks.js'
+} from './tasks.js'
 import { getPlanFilePath, getPlan } from '@claude-code/storage/plans.js'
 import { getConnectedIdeName } from '@claude-code/ide/ide.js'
 import {
@@ -50,8 +50,8 @@ import { getViewedTeammateTask } from '@claude-code/app-host/state/selectors.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { logAntError } from '@claude-code/local-observability/debug.js'
 import { isENOENT, toError } from '@claude-code/local-observability/errorHelpers.js'
-import type { DiagnosticFile } from '@claude-code/agent/services/diagnosticTracking.js'
-import { diagnosticTracker } from '@claude-code/agent/services/diagnosticTracking.js'
+import type { DiagnosticFile } from './services/diagnosticTracking.js'
+import { diagnosticTracker } from './services/diagnosticTracking.js'
 import type {
   AttachmentMessage,
   Message,
@@ -84,8 +84,8 @@ import type { Command } from '@claude-code/repl/replTypes/command.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { getProjectRoot } from '@claude-code/app-host/bootstrap/state.js'
 import { formatCommandsWithinBudget } from '@claude-code/tool-registry/tools/SkillTool/prompt.js'
-import { getContextWindowForModel } from '@claude-code/agent/context.js'
-import type { DiscoverySignal } from '@claude-code/agent/skillSearch/signals.js'
+import { getContextWindowForModel } from './context.js'
+import type { DiscoverySignal } from './skillSearch/signals.js'
 // Conditional require for DCE. All skill-search string literals that would
 // otherwise leak into external builds live inside these modules. The only
 // surfaces in THIS file are: the maybe() call (gated via spread below) and
@@ -97,7 +97,7 @@ const skillSearchModules = feature('EXPERIMENTAL_SKILL_SEARCH')
       featureCheck:
         require('@claude-code/command-runtime/skills/featureCheck.js') as typeof import('@claude-code/command-runtime/skills/featureCheck'),
       prefetch:
-        require('../services/skillSearch/prefetch.js') as typeof import('@claude-code/agent/skillSearch/prefetch.js'),
+        require('../services/skillSearch/prefetch.js') as typeof import('./skillSearch/prefetch.js'),
     }
   : null
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')
@@ -113,7 +113,7 @@ import { cacheKeys, type FileStateCache } from '@claude-code/tool-registry/fileS
 import {
   createAbortController,
   createChildAbortController,
-} from '@claude-code/agent/abortController.js'
+} from './abortController.js'
 import { isAbortError } from '@claude-code/local-observability/errorHelpers.js'
 import {
   getFileModificationTimeAsync,
@@ -136,9 +136,9 @@ import {
 import {
   generateTaskAttachments,
   applyTaskOffsetsAndEvictions,
-} from '@claude-code/agent/task/framework.js'
+} from './task/framework.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
-import { drainPendingMessages } from '@claude-code/agent/localAgentTask.js'
+import { drainPendingMessages } from './localAgentTask.js'
 import type { TaskType, TaskStatus } from '@claude-code/tool-registry/Task.js'
 import {
   getOriginalCwd,
@@ -158,7 +158,7 @@ import {
   setLastEmittedDate,
   getKairosActive,
 } from '@claude-code/app-host/bootstrap/state.js'
-import type { QuerySource } from '@claude-code/agent/constants/querySource.js'
+import type { QuerySource } from './constants/querySource.js'
 import {
   getDeferredToolsDelta,
   isDeferredToolsDeltaEnabled,
@@ -166,14 +166,14 @@ import {
   isToolSearchToolAvailable,
   modelSupportsToolReference,
   type DeferredToolsDeltaScanContext,
-} from '@claude-code/agent/toolSearch.js'
+} from './toolSearch.js'
 import {
   getMcpInstructionsDelta,
   isMcpInstructionsDeltaEnabled,
   type ClientSideInstruction,
 } from '@claude-code/mcp-runtime/mcpInstructionsDelta.js'
-import { CLAUDE_IN_CHROME_MCP_SERVER_NAME } from '@claude-code/agent/claudeInChrome/common.js'
-import { CHROME_TOOL_SEARCH_INSTRUCTIONS } from '@claude-code/agent/claudeInChrome/prompt.js'
+import { CLAUDE_IN_CHROME_MCP_SERVER_NAME } from './claudeInChrome/common.js'
+import { CHROME_TOOL_SEARCH_INSTRUCTIONS } from './claudeInChrome/prompt.js'
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js'
 import type {
   HookEvent,
@@ -182,7 +182,7 @@ import type {
 import {
   checkForAsyncHookResponses,
   removeDeliveredAsyncHooks,
-} from '@claude-code/agent/hooks/AsyncHookRegistry.js'
+} from './hooks/AsyncHookRegistry.js'
 import {
   checkForLSPDiagnostics,
   clearAllLSPDiagnostics,
@@ -192,8 +192,8 @@ import {
   extractTextContent,
   getUserMessageText,
   isThinkingMessage,
-} from '@claude-code/agent/messages.js'
-import { isHumanTurn } from '@claude-code/agent/messagePredicates.js'
+} from './messages.js'
+import { isHumanTurn } from './messagePredicates.js'
 import { isEnvTruthy, getClaudeConfigHomeDir,
   readEnv,
 } from '@claude-code/config/env/utils'
@@ -206,18 +206,18 @@ const BRIEF_TOOL_NAME: string | null =
       ).BRIEF_TOOL_NAME
     : null
 const sessionTranscriptModule = feature('KAIROS')
-  ? (require('@claude-code/agent/sessionTranscript/sessionTranscript.js') as typeof import('@claude-code/agent/sessionTranscript/sessionTranscript.js'))
+  ? (require('./sessionTranscript/sessionTranscript.js') as typeof import('./sessionTranscript/sessionTranscript.js'))
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { hasUltrathinkKeyword, isUltrathinkEnabled } from '@claude-code/provider/thinking.js'
 import {
   tokenCountFromLastAPIResponse,
   tokenCountWithEstimation,
-} from '@claude-code/agent/tokens.js'
+} from './tokens.js'
 import {
   getEffectiveContextWindowSize,
   isAutoCompactEnabled,
-} from '@claude-code/agent/compaction/autoCompact.js'
+} from './compaction/autoCompact.js'
 import {
   findRelevantMemories,
   getAutoMemPath,
@@ -232,13 +232,13 @@ import {
   executeInstructionsLoadedHooks,
   type HookBlockingError,
   type InstructionsMemoryType,
-} from '@claude-code/agent/hooks.js'
+} from './hooks.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { isPDFExtension } from '@claude-code/storage/pdfUtils.js'
-import { getLocalISODate } from '@claude-code/agent/constants/common.js'
+import { getLocalISODate } from './constants/common.js'
 import { getPDFPageCount } from '@claude-code/tool-registry/pdf.js'
-import { PDF_AT_MENTION_INLINE_THRESHOLD } from '@claude-code/agent/constants/apiLimits.js'
-import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
+import { PDF_AT_MENTION_INLINE_THRESHOLD } from './constants/apiLimits.js'
+import { isAgentSwarmsEnabled } from './agentSwarmsEnabled.js'
 import {
   readUnreadMessages,
   markMessagesAsReadByPredicate,
@@ -254,7 +254,7 @@ import {
   isTeamLead,
 } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContextAlias.js'
-import { unassignTeammateTasks } from '@claude-code/agent/tasks.js'
+import { unassignTeammateTasks } from './tasks.js'
 
 export const TODO_REMINDER_CONFIG = {
   TURNS_SINCE_WRITE: 10,
@@ -3964,7 +3964,7 @@ export function getContextEfficiencyAttachment(
   // isn't in the tool list. Lazy require keeps this file snip-string-free.
   const { isSnipRuntimeEnabled, shouldNudgeForSnips } =
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/agent/compaction/snipCompact.js') as typeof import('@claude-code/agent/compaction/snipCompact.js')
+    require('./compaction/snipCompact.js') as typeof import('./compaction/snipCompact.js')
   if (!isSnipRuntimeEnabled()) {
     return []
   }

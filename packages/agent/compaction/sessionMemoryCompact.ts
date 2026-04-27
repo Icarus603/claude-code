@@ -2,8 +2,8 @@
  * EXPERIMENT: Session memory compaction
  */
 
-import type { AgentId } from '@claude-code/agent/idTypes'
-import type { HookResultMessage, Message } from '@claude-code/agent/messageShapes'
+import type { AgentId } from '../idTypes.js'
+import type { HookResultMessage, Message } from '../messageShapes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
@@ -11,13 +11,13 @@ import {
   createCompactBoundaryMessage,
   createUserMessage,
   isCompactBoundaryMessage,
-} from '@claude-code/agent/messages.js'
+} from '../messages.js'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getSessionMemoryPath } from '@claude-code/permission/filesystem'
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
-import { tokenCountFromLastAPIResponse } from '@claude-code/agent/tokens.js'
-import { extractDiscoveredToolNames } from '@claude-code/agent/toolSearch.js'
+import { tokenCountFromLastAPIResponse } from '../tokens.js'
+import { extractDiscoveredToolNames } from '../toolSearch.js'
 import {
   getDynamicConfig_BLOCKS_ON_INIT,
   getFeatureValue_CACHED_MAY_BE_STALE,
@@ -26,12 +26,12 @@ import { logEvent } from '@claude-code/local-observability'
 import {
   isSessionMemoryEmpty,
   truncateSessionMemoryForCompact,
-} from '@claude-code/agent/SessionMemory/prompts.js'
+} from '../SessionMemory/prompts.js'
 import {
   getLastSummarizedMessageId,
   getSessionMemoryContent,
   waitForSessionMemoryExtraction,
-} from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
+} from '../SessionMemory/sessionMemoryUtils.js'
 import {
   annotateBoundaryWithPreservedSegment,
   buildPostCompactMessages,

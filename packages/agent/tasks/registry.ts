@@ -1,16 +1,16 @@
 import { feature } from 'bun:bundle'
 import type { Task, TaskType } from '@claude-code/tool-registry/Task.js'
-import { DreamTask } from '@claude-code/agent/tasks/DreamTask/DreamTask.js'
-import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
-import { LocalShellTask } from '@claude-code/agent/tasks/LocalShellTask.js'
+import { DreamTask } from './DreamTask/DreamTask.js'
+import { LocalAgentTask } from '../localAgentTask.js'
+import { LocalShellTask } from './LocalShellTask.js'
 import { RemoteAgentTask } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const LocalWorkflowTask: Task | null = feature('WORKFLOW_SCRIPTS')
-  ? require('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js').LocalWorkflowTask
+  ? require('./LocalWorkflowTask/LocalWorkflowTask.js').LocalWorkflowTask
   : null
 const MonitorMcpTask: Task | null = feature('MONITOR_TOOL')
-  ? require('@claude-code/agent/tasks/MonitorMcpTask/MonitorMcpTask.js').MonitorMcpTask
+  ? require('./MonitorMcpTask/MonitorMcpTask.js').MonitorMcpTask
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 

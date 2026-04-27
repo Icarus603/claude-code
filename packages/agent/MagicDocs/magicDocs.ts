@@ -20,13 +20,13 @@ import { cloneFileStateCache } from '@claude-code/tool-registry/fileStateCache'
 import {
   type REPLHookContext,
   registerPostSamplingHook,
-} from '@claude-code/agent/hooks/postSamplingHooks.js'
+} from '../hooks/postSamplingHooks.js'
 import {
   createUserMessage,
   hasToolCallsInLastAssistantTurn,
-} from '@claude-code/agent/messages.js'
+} from '../messages.js'
 import { sequential } from '@claude-code/config/sequential'
-import { buildMagicDocsUpdatePrompt } from '@claude-code/agent/MagicDocs/prompts.js'
+import { buildMagicDocsUpdatePrompt } from './prompts.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 // Magic Doc header pattern: # MAGIC DOC: [title]

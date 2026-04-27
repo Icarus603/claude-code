@@ -11,16 +11,16 @@
  */
 
 import type { TaskContext } from '@claude-code/tool-registry/Task.js'
-import { updateAgentSummary } from '@claude-code/agent/localAgentTask.js'
+import { updateAgentSummary } from '../localAgentTask.js'
 import { filterIncompleteToolCalls } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
-import type { AgentId } from '@claude-code/agent/idTypes'
+import type { AgentId } from '../idTypes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   type CacheSafeParams,
   runForkedAgent,
-} from '@claude-code/agent/forkedAgent.js'
+} from '../forkedAgent.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { createUserMessage } from '@claude-code/agent/messages.js'
+import { createUserMessage } from '../messages.js'
 import { getAgentTranscript } from '@claude-code/storage/sessionStorage.js'
 
 const SUMMARY_INTERVAL_MS = 30_000

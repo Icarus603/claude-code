@@ -3,13 +3,13 @@ import type {
   ContentBlock,
   ContentBlockParam,
 } from '@anthropic-ai/sdk/resources/index.mjs'
-import { roughTokenCountEstimation as countTokens } from '@claude-code/agent/tokenEstimation.js'
+import { roughTokenCountEstimation as countTokens } from './tokenEstimation.js'
 import type {
   AssistantMessage,
   Message,
   UserMessage,
-} from '@claude-code/agent/messageShapes'
-import { normalizeMessagesForAPI } from '@claude-code/agent/messages.js'
+} from './messageShapes.js'
+import { normalizeMessagesForAPI } from './messages.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 
 type TokenStats = {

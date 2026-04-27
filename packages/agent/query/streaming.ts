@@ -2,7 +2,7 @@ import type { ToolUseBlock } from "@anthropic-ai/sdk/resources/index.mjs";
 import {
 	createUserMessage,
 	createAssistantAPIErrorMessage,
-} from '@claude-code/agent/messages.js';
+} from '../messages.js';
 import type {
 	AssistantMessage,
 	Message,
@@ -12,7 +12,7 @@ import type {
 	RequestStartEvent,
 	UserMessage,
 } from '@claude-code/repl/replTypes/message.js';
-import type { Terminal } from '@claude-code/agent/query/transitions.js';
+import type { Terminal } from './transitions.js';
 
 export function* yieldMissingToolResultBlocks(
 	assistantMessages: AssistantMessage[],

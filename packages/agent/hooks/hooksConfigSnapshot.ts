@@ -1,2 +1,2 @@
 // Canonical owner is @claude-code/agent/hooksConfigSnapshot.
-export * from '@claude-code/agent/hooksConfigSnapshot.js'
+export * from '../hooksConfigSnapshot.js'

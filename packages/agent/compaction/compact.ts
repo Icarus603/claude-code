@@ -4,23 +4,23 @@ import uniqBy from 'lodash-es/uniqBy.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const sessionTranscriptModule = feature('KAIROS')
-  ? (require('@claude-code/agent/sessionTranscript/sessionTranscript.js') as typeof import('@claude-code/agent/sessionTranscript/sessionTranscript.js'))
+  ? (require('../sessionTranscript/sessionTranscript.js') as typeof import('../sessionTranscript/sessionTranscript.js'))
   : null
 
 import { APIUserAbortError } from '@anthropic-ai/sdk'
 import { markPostCompaction } from '@claude-code/app-host/bootstrap/state.js'
 import { getInvokedSkillsForAgent } from '@claude-code/app-host/bootstrap/state.js'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from '../querySource.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
+import type { LocalAgentTaskState } from '../localAgentTask.js'
 import { FileReadTool } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
 import {
   FILE_READ_TOOL_NAME,
   FILE_UNCHANGED_STUB,
 } from '@claude-code/tool-registry/tools/FileReadTool/prompt.js'
 import { ToolSearchTool } from '@claude-code/tool-registry/tools/ToolSearchTool/ToolSearchTool.js'
-import type { AgentId } from '@claude-code/agent/idTypes'
+import type { AgentId } from '../idTypes.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
@@ -32,33 +32,33 @@ import type {
   SystemCompactBoundaryMessage,
   SystemMessage,
   UserMessage,
-} from '@claude-code/agent/messageShapes'
+} from '../messageShapes.js'
 import {
   createAttachmentMessage,
   generateFileAttachment,
   getAgentListingDeltaAttachment,
   getDeferredToolsDeltaAttachment,
   getMcpInstructionsDeltaAttachment,
-} from '@claude-code/agent/attachments.js'
+} from '../attachments.js'
 import { getMemoryPath } from '@claude-code/config'
-import { COMPACT_MAX_OUTPUT_TOKENS } from '@claude-code/agent/context.js'
+import { COMPACT_MAX_OUTPUT_TOKENS } from '../context.js'
 import {
   analyzeContext,
   tokenStatsToStatsigMetrics,
-} from '@claude-code/agent/contextAnalysis.js'
+} from '../contextAnalysis.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { hasExactErrorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { cacheToObject } from '@claude-code/tool-registry/fileStateCache'
 import {
   type CacheSafeParams,
   runForkedAgent,
-} from '@claude-code/agent/forkedAgent.js'
+} from '../forkedAgent.js'
 import {
   executePostCompactHooks,
   executePreCompactHooks,
-} from '@claude-code/agent/hooks.js'
+} from '../hooks.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { MEMORY_TYPE_VALUES } from '@claude-code/agent/memory/types.js'
+import { MEMORY_TYPE_VALUES } from '../memory/types.js'
 import {
   createCompactBoundaryMessage,
   createUserMessage,
@@ -67,7 +67,7 @@ import {
   getMessagesAfterCompactBoundary,
   isCompactBoundaryMessage,
   normalizeMessagesForAPI,
-} from '@claude-code/agent/messages.js'
+} from '../messages.js'
 import { expandPath } from '@claude-code/storage/path.js'
 import { getPlan, getPlanFilePath } from '@claude-code/storage/plans.js'
 import {
@@ -88,11 +88,11 @@ import {
   getTokenUsage,
   tokenCountFromLastAPIResponse,
   tokenCountWithEstimation,
-} from '@claude-code/agent/tokens.js'
+} from '../tokens.js'
 import {
   extractDiscoveredToolNames,
   isToolSearchEnabled,
-} from '@claude-code/agent/toolSearch.js'
+} from '../toolSearch.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
@@ -107,12 +107,12 @@ import {
 } from '@claude-code/provider/errors.js'
 import { notifyCompaction } from '@claude-code/provider/promptCacheBreakDetection.js'
 import { getRetryDelay } from '@claude-code/provider/withRetry.js'
-import { logPermissionContextForAnts } from '@claude-code/agent/internalLogging.js'
+import { logPermissionContextForAnts } from '../internalLogging.js'
 import {
   roughTokenCountEstimation,
   roughTokenCountEstimationForMessages,
-} from '@claude-code/agent/tokenEstimation.js'
-import { groupMessagesByApiRound } from '@claude-code/agent/compaction'
+} from '../tokenEstimation.js'
+import { groupMessagesByApiRound } from './index.js'
 import {
   getCompactPrompt,
   getCompactUserSummaryMessage,

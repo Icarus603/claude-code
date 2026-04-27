@@ -10,7 +10,7 @@ import {
   checkHasRemoteEnvironment,
   checkIsInGitRepo,
   checkNeedsClaudeAiLogin,
-} from '@claude-code/agent/background/preconditions.js'
+} from '../preconditions.js'
 
 /**
  * Background remote session type for managing teleport sessions

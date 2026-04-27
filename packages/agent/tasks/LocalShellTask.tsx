@@ -22,25 +22,25 @@ import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { tailFile } from '@claude-code/storage/fsOperations.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
+import { enqueuePendingNotification } from '../messageQueueManager.js'
 import type { ShellCommand } from '@claude-code/shell/terminal/ShellCommand.js'
 import {
   evictTaskOutput,
   getTaskOutputPath,
 } from '@claude-code/storage/task/diskOutput.js'
-import { registerTask, updateTaskState } from '@claude-code/agent/task/framework.js'
+import { registerTask, updateTaskState } from '../task/framework.js'
 import { escapeXml } from '@claude-code/output/xml'
 import {
   backgroundAgentTask,
   isLocalAgentTask,
-} from '@claude-code/agent/localAgentTask.js'
-import { isMainSessionTask } from '@claude-code/agent/tasks/LocalMainSessionTask.js'
+} from '../localAgentTask.js'
+import { isMainSessionTask } from './LocalMainSessionTask.js'
 import {
   type BashTaskKind,
   isLocalShellTask,
   type LocalShellTaskState,
 } from '@claude-code/repl/localShellTaskGuards.js'
-import { killTask } from '@claude-code/agent/tasks/LocalShellTask/killShellTasks.js'
+import { killTask } from './LocalShellTask/killShellTasks.js'
 
 /** Prefix that identifies a LocalShellTask summary to the UI collapse transform. */
 export const BACKGROUND_BASH_SUMMARY_PREFIX = 'Background command '

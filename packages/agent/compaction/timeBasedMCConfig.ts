@@ -2,7 +2,7 @@
  *
  */
 
-import type { TimeBasedMCConfig } from '@claude-code/agent/types/compaction.js'
+import type { TimeBasedMCConfig } from '../types/compaction.js'
 
 
 export interface TimeBasedMCConfigDeps {

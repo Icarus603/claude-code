@@ -11,9 +11,9 @@
 import type { UUID } from 'crypto'
 import { randomUUID } from 'crypto'
 import type { PromptCommand } from '@claude-code/command-runtime/runtime'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from './querySource.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import { query } from '@claude-code/agent/query'
+import { query } from './query.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -22,17 +22,17 @@ import { accumulateUsage, updateUsage } from '@claude-code/provider/claude.js'
 import { EMPTY_USAGE, type NonNullableUsage } from '@claude-code/provider/logging.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import type { AgentId } from '@claude-code/agent/idTypes'
-import type { Message } from '@claude-code/agent/messageShapes'
-import { createChildAbortController } from '@claude-code/agent/abortController.js'
+import type { AgentId } from './idTypes.js'
+import type { Message } from './messageShapes.js'
+import { createChildAbortController } from './abortController.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { cloneFileStateCache } from '@claude-code/tool-registry/fileStateCache'
-import type { REPLHookContext } from '@claude-code/agent/postSamplingHooks.js'
+import type { REPLHookContext } from './postSamplingHooks.js'
 import {
   createUserMessage,
   extractTextContent,
   getLastAssistantMessage,
-} from '@claude-code/agent/messages.js'
+} from './messages.js'
 import { createDenialTrackingState } from '@claude-code/permission/denialTracking'
 import { parseToolListFromCLI } from '@claude-code/permission/permissionSetup'
 import { recordSidechainTranscript } from '@claude-code/storage/sessionStorage.js'
@@ -41,7 +41,7 @@ import {
   type ContentReplacementState,
   cloneContentReplacementState,
 } from '@claude-code/storage/toolResultStorage.js'
-import { createAgentId } from '@claude-code/agent/uuid.js'
+import { createAgentId } from './uuid.js'
 
 /**
  * Parameters that must be identical between the fork and parent API requests

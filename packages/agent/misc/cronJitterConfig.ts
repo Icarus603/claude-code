@@ -13,7 +13,7 @@ import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature
 import {
   type CronJitterConfig,
   DEFAULT_CRON_JITTER_CONFIG,
-} from '@claude-code/agent/scheduler'
+} from '../scheduler.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
 // How often to re-fetch tengu_kairos_cron_config from GrowthBook. Short because

@@ -7,7 +7,7 @@
 import { writeFile } from 'fs/promises'
 import memoize from 'lodash-es/memoize.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import { getSystemPrompt } from '@claude-code/agent/prompts.js'
+import { getSystemPrompt } from '../prompts.js'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
 import type { Tool, ToolUseContext } from '@claude-code/tool-registry/Tool.js'
@@ -16,31 +16,31 @@ import {
   FileReadTool,
   type Output as FileReadToolOutput,
 } from '@claude-code/tool-registry/tools/FileReadTool/FileReadTool.js'
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { Message } from '../messageShapes.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import {
   createCacheSafeParams,
   createSubagentContext,
   runForkedAgent,
-} from '@claude-code/agent/forkedAgent.js'
+} from '../forkedAgent.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   type REPLHookContext,
   registerPostSamplingHook,
-} from '@claude-code/agent/postSamplingHooks.js'
+} from '../postSamplingHooks.js'
 import {
   createUserMessage,
   hasToolCallsInLastAssistantTurn,
-} from '@claude-code/agent/messages.js'
+} from '../messages.js'
 import {
   getSessionMemoryDir,
   getSessionMemoryPath,
 } from '@claude-code/permission/filesystem'
 import { sequential } from '@claude-code/config/sequential'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
-import { getTokenUsage, tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
+import { getTokenUsage, tokenCountWithEstimation } from '../tokens.js'
 import { logEvent } from '@claude-code/local-observability'
-import { isAutoCompactEnabled } from '@claude-code/agent/compaction/autoCompact.js'
+import { isAutoCompactEnabled } from '../compaction/autoCompact.js'
 import {
   buildSessionMemoryUpdatePrompt,
   loadSessionMemoryTemplate,
