@@ -142,39 +142,10 @@ const RATCHETS: Ratchet[] = [
         isTsTsx,
       ),
   },
-  {
-    id: 'src_components_files',
-    description: 'Files in src/components/ (should split per §8.24)',
-    doc: 'V7 §8.24',
-    measure: () =>
-      countFilesMatchingExt(join(REPO_ROOT, 'src', 'components'), /\.(ts|tsx)$/),
-  },
-  {
-    id: 'src_commands_subdirs',
-    description: 'Subdirs in src/commands/ (each should migrate per §10.1)',
-    doc: 'V7 §10.1',
-    measure: () => countSubdirs(join(REPO_ROOT, 'src', 'commands')),
-  },
-  {
-    id: 'src_services_api_files',
-    description: 'Files in src/services/api/ (provider is final owner)',
-    doc: 'V7 §10.3',
-    measure: () =>
-      countFilesMatchingExt(join(REPO_ROOT, 'src', 'services', 'api'), /\.ts$/),
-  },
-  {
-    id: 'src_services_mcp_files',
-    description: 'Files in src/services/mcp/ (mcp-runtime is final owner)',
-    doc: 'V7 §10.3',
-    measure: () =>
-      countFilesMatchingExt(join(REPO_ROOT, 'src', 'services', 'mcp'), /\.ts$/),
-  },
-  {
-    id: 'src_tools_subdirs',
-    description: 'Tool subdirs in src/tools/ (tool-registry is final owner)',
-    doc: 'V7 §8.7',
-    measure: () => countSubdirs(join(REPO_ROOT, 'src', 'tools')),
-  },
+  // 6 src_* ratchets removed — src/ has been completely evacuated and these
+  // metrics measured a path that no longer exists, so they would forever
+  // return 0 (the catch fallback) regardless of regression. Removing them
+  // is a hygiene fix, not a relaxation: an empty src/ already satisfied them.
   {
     id: 'cc_app_imports',
     description: 'Total @cc-app/ + @claude-code/app-compat/ references',
@@ -188,26 +159,16 @@ const RATCHETS: Ratchet[] = [
   },
   {
     id: 'host_string_error_cmp',
-    description: '`err.message.includes()` style in src/ (target: 0)',
+    description: '`err.message.includes()` style across packages/ (V7 §14.5 target: 0)',
     doc: 'V7 §14.5',
     measure: () =>
       countMatches(
-        [join(REPO_ROOT, 'src')],
+        [join(REPO_ROOT, 'packages')],
         /\b(err|error|e|ex|exc|cause|reason)\.message\.(includes|match|indexOf|startsWith|endsWith)\s*\(/g,
         isTsTsx,
       ),
   },
-  {
-    id: 'src_agent_depimpls',
-    description: 'DepImpl files in src/agent/ (should dissolve into app-host)',
-    doc: 'V7 §10.3 createDeps→app-host+agent/compat',
-    measure: async () => {
-      try {
-        const files = await readdir(join(REPO_ROOT, 'src', 'agent'))
-        return files.filter(f => f.endsWith('DepImpl.ts')).length
-      } catch { return 0 }
-    },
-  },
+  // src_agent_depimpls removed — measured src/agent/ which no longer exists.
   {
     id: 'empty_shell_packages',
     description: 'Packages with < 200 non-skeleton owner LOC (§3.1 shims)',
