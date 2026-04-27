@@ -335,6 +335,16 @@ function NotificationContent({
       {!isBriefOnly && (
         <TokenWarning tokenUsage={tokenUsage} model={mainLoopModel} />
       )}
+      {shouldShowAutoUpdater && (
+        <AutoUpdaterWrapper
+          isUpdating={isAutoUpdating}
+          onChangeIsUpdating={onChangeIsUpdating}
+          autoUpdaterResult={autoUpdaterResult}
+          onAutoUpdaterResult={onAutoUpdaterResult}
+          showSuccessMessage={!isShowingCompactMessage}
+          verbose={verbose}
+        />
+      )}
       {feature('VOICE_MODE')
         ? voiceEnabled &&
           voiceError && (
