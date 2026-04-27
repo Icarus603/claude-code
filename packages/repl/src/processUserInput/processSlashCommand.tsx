@@ -1049,21 +1049,9 @@ function formatCommandInput(command: CommandBase, args: string): string {
   return formatCommandInputTags(getCommandName(command), args)
 }
 
-/**
- * Formats the metadata for a skill loading message.
- * Used by the Skill tool and for subagent skill preloading.
- */
-export function formatSkillLoadingMetadata(
-  skillName: string,
-  _progressMessage: string = 'loading',
-): string {
-  // Use skill name only - UserCommandMessage renders as "Skill(name)"
-  return [
-    `<${COMMAND_MESSAGE_TAG}>${skillName}</${COMMAND_MESSAGE_TAG}>`,
-    `<${COMMAND_NAME_TAG}>${skillName}</${COMMAND_NAME_TAG}>`,
-    `<skill-format>true</skill-format>`,
-  ].join('\n')
-}
+// formatSkillLoadingMetadata moved to @claude-code/command-runtime/xml
+// (V7 §11.2) — re-exported here for backwards compatibility.
+export { formatSkillLoadingMetadata } from '@claude-code/command-runtime/xml.js'
 
 /**
  * Formats the metadata for a slash command loading message.
@@ -1103,7 +1091,7 @@ function formatCommandLoadingMetadata(
     command.loadedFrom === 'plugin' ||
     command.loadedFrom === 'mcp'
   ) {
-    return formatSkillLoadingMetadata(command.name, command.progressMessage)
+    return formatSkillLoadingMetadata(command.name)
   }
   return formatSlashCommandLoadingMetadata(command.name, args)
 }

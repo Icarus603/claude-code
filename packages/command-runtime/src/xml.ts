@@ -84,3 +84,18 @@ export const COMMON_INFO_ARGS = [
   'status',
   '?',
 ]
+
+/**
+ * Builds command-message metadata for a skill being loaded.
+ * Lives here (alongside the COMMAND_*_TAG constants) so that callers
+ * across packages can use it without taking on the rest of
+ * processSlashCommand.tsx's surface — that's what closed the
+ * AgentTool/runAgent ↔ processSlashCommand 4-file SCC.
+ */
+export function formatSkillLoadingMetadata(skillName: string): string {
+  return [
+    `<${COMMAND_MESSAGE_TAG}>${skillName}</${COMMAND_MESSAGE_TAG}>`,
+    `<${COMMAND_NAME_TAG}>${skillName}</${COMMAND_NAME_TAG}>`,
+    `<skill-format>true</skill-format>`,
+  ].join('\n')
+}
