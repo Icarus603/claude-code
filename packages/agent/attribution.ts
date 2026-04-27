@@ -9,14 +9,14 @@ import {
 import { TERMINAL_OUTPUT_TAGS } from '@claude-code/command-runtime/xml.js'
 // AppState type borrowed via ambient shape to avoid src/ boundary violation
 type AppState = Record<string, unknown>
-import type { Entry } from '@claude-code/agent/logsTypes.js'
+import type { Entry } from './logsTypes.js'
 import {
   type AttributionData,
   calculateCommitAttribution,
   isInternalModelRepo,
   isInternalModelRepoCached,
   sanitizeModelName,
-} from '@claude-code/agent/commitAttribution.js'
+} from './commitAttribution.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { parseJSONL } from '@claude-code/storage/json.js'
 import { logError } from '@claude-code/local-observability/logging'
@@ -26,7 +26,7 @@ import {
   getPublicModelDisplayName,
   getPublicModelName,
 } from '@claude-code/provider/model.js'
-import { isMemoryFileAccess } from '@claude-code/agent/sessionFileAccessHooks.js'
+import { isMemoryFileAccess } from './sessionFileAccessHooks.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { readTranscriptForLoad } from '@claude-code/storage/sessionStoragePortable.js'
 import { getInitialSettings } from '@claude-code/config/settings'

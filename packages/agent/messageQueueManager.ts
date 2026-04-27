@@ -6,7 +6,7 @@ type AppState = unknown
 import type {
   QueueOperation,
   QueueOperationMessage,
-} from '@claude-code/agent/messageQueueTypes'
+} from './messageQueueTypes.js'
 import type {
   EditablePromptInputMode,
   PromptInputMode,
@@ -14,7 +14,7 @@ import type {
   QueuePriority,
 } from '@claude-code/repl/textInputTypes.js'
 import type { PastedContent } from '@claude-code/config'
-import { extractTextContent } from '@claude-code/agent/messages.js'
+import { extractTextContent } from './messages.js'
 import { objectGroupBy } from '@claude-code/tool-registry/utils/objectGroupBy.js'
 import { recordQueueOperation } from '@claude-code/storage/sessionStorage.js'
 import { createSignal } from '@claude-code/config/signal'

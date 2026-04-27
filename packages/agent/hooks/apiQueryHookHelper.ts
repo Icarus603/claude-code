@@ -1,13 +1,13 @@
 import { randomUUID } from 'crypto'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from '../querySource.js'
 import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'
-import type { Message } from '@claude-code/agent/messageShapes'
-import { createAbortController } from '@claude-code/agent/abortController.js'
+import type { Message } from '../messageShapes.js'
+import { createAbortController } from '../abortController.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
-import { extractTextContent } from '@claude-code/agent/messages.js'
+import { extractTextContent } from '../messages.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
-import type { REPLHookContext } from '@claude-code/agent/hooks/postSamplingHooks.js'
+import type { REPLHookContext } from './postSamplingHooks.js'
 
 export type ApiQueryHookContext = REPLHookContext & {
   queryMessageCount?: number

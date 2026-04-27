@@ -1,7 +1,7 @@
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { UUID } from 'crypto'
 import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
-import type { CompactionResult } from '@claude-code/agent/compaction/compact.js'
+import type { CompactionResult } from './compaction/compact.js'
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { EffortLevel } from '@claude-code/headless-sdk/runtimeTypes.js'
@@ -10,8 +10,8 @@ import type { IDEExtensionInstallationStatus, IdeType } from '@claude-code/ide/i
 import type { SettingSource } from '@claude-code/config/constants'
 import type { HooksSettings } from '@claude-code/config/types'
 import type { ThemeName } from '@anthropic/ink'
-import type { LogOption } from '@claude-code/agent/logsTypes.js'
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { LogOption } from './logsTypes.js'
+import type { Message } from './messageShapes.js'
 import type { PluginManifest } from '@claude-code/config/plugin/types'
 
 export type LocalCommandResult =

@@ -1,6 +1,6 @@
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from './querySource.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { Message } from './messageShapes.js'
 import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/logging'
 import type { SystemPrompt } from '@claude-code/provider/systemPromptType.js'

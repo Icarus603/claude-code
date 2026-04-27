@@ -21,7 +21,7 @@ import { join } from 'path'
 import { z } from 'zod'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { getSecureSocketPath, getSocketDir } from '@claude-code/agent/claudeInChrome/common.js'
+import { getSecureSocketPath, getSocketDir } from './common.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 const VERSION = '1.0.0'

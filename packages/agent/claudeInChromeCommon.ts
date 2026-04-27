@@ -13,10 +13,10 @@ import { readEnv } from '@claude-code/config/env/utils'
 export const CLAUDE_IN_CHROME_MCP_SERVER_NAME = 'claude-in-chrome'
 
 // Re-export ChromiumBrowser type for setup.ts
-export type { ChromiumBrowser } from '@claude-code/agent/claudeInChromeSetupPortable.js'
+export type { ChromiumBrowser } from './claudeInChromeSetupPortable.js'
 
 // Import for local use
-import type { ChromiumBrowser } from '@claude-code/agent/claudeInChromeSetupPortable.js'
+import type { ChromiumBrowser } from './claudeInChromeSetupPortable.js'
 
 type BrowserConfig = {
   name: string

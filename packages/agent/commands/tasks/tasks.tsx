@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { LocalJSXCommandContext } from '@claude-code/command-runtime/runtime'
 import { BackgroundTasksDialog } from '@claude-code/repl/components/tasks/BackgroundTasksDialog.js'
-import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
+import type { LocalJSXCommandOnDone } from '../../command.js'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,

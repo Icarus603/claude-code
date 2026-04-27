@@ -7,7 +7,7 @@ import { createStore, type Store } from '@claude-code/app-host/state/store.js'
 import {
   parseEffortValue,
   toPersistableEffort,
-} from '@claude-code/agent/effort.js'
+} from './effort.js'
 import {
   getFastModeUnavailableReason,
   isFastModeEnabled,

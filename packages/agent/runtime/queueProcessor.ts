@@ -4,7 +4,7 @@ import {
   dequeueAllMatching,
   hasCommandsInQueue,
   peek,
-} from '@claude-code/agent/messageQueueManager.js'
+} from '../messageQueueManager.js'
 
 type ProcessQueueParams = {
   executeInput: (commands: QueuedCommand[]) => Promise<void>

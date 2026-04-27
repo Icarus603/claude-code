@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from '../querySource.js'
 import { clearSystemPromptSections } from '@claude-code/provider/systemPromptSections'
 import { getUserContext } from '@claude-code/provider/context.js'
 import { clearSpeculativeChecks } from '@claude-code/tool-registry/tools/BashTool/bashPermissions.js'
@@ -43,7 +43,7 @@ export function runPostCompactCleanup(querySource?: QuerySource): void {
     if (isMainThreadCompact) {
       /* eslint-disable @typescript-eslint/no-require-imports */
       ;(
-        require('@claude-code/agent/contextCollapse/index.js') as typeof import('@claude-code/agent/contextCollapse/index.js')
+        require('../contextCollapse/index.js') as typeof import('../contextCollapse/index.js')
       ).resetContextCollapse()
       /* eslint-enable @typescript-eslint/no-require-imports */
     }
@@ -69,7 +69,7 @@ export function runPostCompactCleanup(querySource?: QuerySource): void {
   // cacheUtils resets. See compactConversation() for full rationale.
   clearBetaTracingState()
   if (feature('COMMIT_ATTRIBUTION')) {
-    void import('@claude-code/agent/hooks/attributionHooks.js').then(m =>
+    void import('../hooks/attributionHooks.js').then(m =>
       m.sweepFileContentCache(),
     )
   }

@@ -1,4 +1,4 @@
-import { parseFrontmatter } from '@claude-code/agent/frontmatterParser.js'
+import { parseFrontmatter } from '../frontmatterParser.js'
 import { parseSlashCommandToolsFromFrontmatter } from '@claude-code/tool-registry/markdownConfigLoader.js'
 import { executeShellCommandsInPrompt } from '@claude-code/command-runtime/promptShellExecution.js'
 import { createMovedToPluginCommand } from '@claude-code/command-runtime/createMovedToPluginCommand.js'

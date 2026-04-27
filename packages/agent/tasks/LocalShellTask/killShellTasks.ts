@@ -6,9 +6,9 @@ import type { AppState } from '@claude-code/app-host/state/AppState.js'
 import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { dequeueAllMatching } from '@claude-code/agent/messageQueueManager.js'
+import { dequeueAllMatching } from '../../messageQueueManager.js'
 import { evictTaskOutput } from '@claude-code/storage/task/diskOutput.js'
-import { updateTaskState } from '@claude-code/agent/task/framework.js'
+import { updateTaskState } from '../../task/framework.js'
 import { isLocalShellTask } from '@claude-code/repl/localShellTaskGuards.js'
 
 type SetAppStateFn = (updater: (prev: AppState) => AppState) => void

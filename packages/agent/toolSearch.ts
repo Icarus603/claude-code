@@ -28,10 +28,10 @@ import type { Message } from '@claude-code/repl/replTypes/message.js'
 import {
   countToolDefinitionTokens,
   TOOL_TOKEN_COUNT_OVERHEAD,
-} from '@claude-code/agent/sessionTools/analyzeContext.js'
+} from './sessionTools/analyzeContext.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { getMergedBetas } from '@claude-code/provider/betas.js'
-import { getContextWindowForModel } from '@claude-code/agent/context.js'
+import { getContextWindowForModel } from './context.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy , readEnv } from '@claude-code/config/env/utils'  // V7-EXEMPT temp
 import {
@@ -39,7 +39,7 @@ import {
   isFirstPartyAnthropicBaseUrl,
 } from '@claude-code/provider/model/providers.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { zodToJsonSchema } from '@claude-code/agent/zodSchema/zodToJsonSchema.js'
+import { zodToJsonSchema } from './zodSchema/zodToJsonSchema.js'
 
 /**
  * Default percentage of context window at which to auto-enable tool search.

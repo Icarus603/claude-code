@@ -1,0 +1,259 @@
+# packages/agent — exports audit (Wave A)
+
+**Total exports**: 211  |  External-used: 154  |  Internal-only: 23  |  Dead: 34
+
+Counts include static `from`, dynamic `import()`, `require()`, and `typeof import()` patterns.
+
+## Truly dead (safe to remove from exports map)
+
+- `./contracts` -> `./contracts.ts`
+- `./errors` -> `./errors.ts`
+- `./tee` -> `./tee.ts`
+- `./testing` -> `./testing/index.ts`
+- `./extractMemories/*.js` -> `./extractMemories/*.ts`
+- `./tokenEstimation/*.js` -> `./tokenEstimation/*.ts`
+- `./jobs/classifier.js` -> `./jobs/classifier.ts`
+- `./attributionTrailer.js` -> `./attributionTrailer.ts`
+- `./toolInputNormalization.js` -> `./toolInputNormalization.ts`
+- `./skillDiscoverySignals.js` -> `./skillDiscoverySignals.ts`
+- `./skillPrefetch.js` -> `./skillPrefetch.ts`
+- `./commands/tasks/tasks.js` -> `./commands/tasks/tasks.tsx`
+- `./constants/figures.js` -> `./constants/figures.ts`
+- `./constants/errorIds.js` -> `./constants/errorIds.ts`
+- `./constants/keys.js` -> `./constants/keys.ts`
+- `./constants/toolLimits.js` -> `./constants/toolLimits.ts`
+- `./constants/tools.js` -> `./constants/tools.ts`
+- `./constants/files.js` -> `./constants/files.ts`
+- `./constants/cyberRiskInstruction.js` -> `./constants/cyberRiskInstruction.ts`
+- `./sessionTools/listSessionsImpl.js` -> `./sessionTools/listSessionsImpl.ts`
+- `./misc/systemDirectories.js` -> `./misc/systemDirectories.ts`
+- `./git/gitignore.js` -> `./git/gitignore.ts`
+- `./claudeInChrome/setupPortable.js` -> `./claudeInChrome/setupPortable.ts`
+- `./hooks/ssrfGuard.js` -> `./hooks/ssrfGuard.ts`
+- `./hooks/index.js` -> `./hooks/index.ts`
+- `./query/state.js` -> `./query/state.ts`
+- `./query/streaming.js` -> `./query/streaming.ts`
+- `./query/tokenBudget.js` -> `./query/tokenBudget.ts`
+- `./query/config.js` -> `./query/config.ts`
+- `./query/deps.js` -> `./query/deps.ts`
+- `./types/generated/google/protobuf/timestamp.js` -> `./types/generated/google/protobuf/timestamp.ts`
+- `./types/generated/events_mono/growthbook/v1/growthbook_experiment_event.js` -> `./types/generated/events_mono/growthbook/v1/growthbook_experiment_event.ts`
+- `./types/generated/events_mono/claude_code/v1/claude_code_internal_event.js` -> `./types/generated/events_mono/claude_code/v1/claude_code_internal_event.ts`
+- `./types/generated/events_mono/common/v1/auth.js` -> `./types/generated/events_mono/common/v1/auth.ts`
+
+## Internal-only (consumed only inside packages/agent — convert callers to relative imports, then drop entry)
+
+- `./compaction` (1 internal uses) -> `./compaction/index.ts`
+  - packages/agent/compaction/compact.ts
+- `./sessionTranscript/*.js` (2 internal uses) -> `./sessionTranscript/*.ts`
+  - packages/agent/compaction/compact.ts
+  - packages/agent/attachments.ts
+- `./toolUseSummaryGenerator.js` (1 internal uses) -> `./toolUseSummaryGenerator.ts`
+  - packages/agent/agentHostBindings.ts
+- `./types/compaction.js` (7 internal uses) -> `./types/compaction.ts`
+  - packages/agent/compaction/timeBasedMCConfig.ts
+  - packages/agent/compaction/sessionMemoryCalc.ts
+  - packages/agent/compaction/cachedMicrocompact.ts
+  - packages/agent/compaction/cachedMCConfig.ts
+  - packages/agent/compaction/apiMicrocompact.ts
+- `./types/messages.js` (1 internal uses) -> `./types/messages.ts`
+  - packages/agent/compaction/snipProjection.ts
+- `./messagesConstants.js` (1 internal uses) -> `./messagesConstants.ts`
+  - packages/agent/messages.ts
+- `./yaml.js` (1 internal uses) -> `./yaml.ts`
+  - packages/agent/frontmatterParser.ts
+- `./claudeInChromeSetupPortable.js` (3 internal uses) -> `./claudeInChromeSetupPortable.ts`
+  - packages/agent/claudeInChromeCommon.ts
+  - packages/agent/claudeInChrome/setupPortable.ts
+  - packages/agent/claudeInChromeSetup.ts
+- `./compactionDeps.js` (1 internal uses) -> `./compactionDeps.ts`
+  - packages/agent/compaction/index.ts
+- `./contextAnalysis.js` (1 internal uses) -> `./contextAnalysis.ts`
+  - packages/agent/compaction/compact.ts
+- `./memory/types.js` (1 internal uses) -> `./memory/types.ts`
+  - packages/agent/compaction/compact.ts
+- `./constants/common.js` (1 internal uses) -> `./constants/common.ts`
+  - packages/agent/attachments.ts
+- `./constants/outputStyles.js` (1 internal uses) -> `./constants/outputStyles.ts`
+  - packages/agent/messages.ts
+- `./MagicDocs/prompts.js` (1 internal uses) -> `./MagicDocs/prompts.ts`
+  - packages/agent/MagicDocs/magicDocs.ts
+- `./skillSearch/signals.js` (1 internal uses) -> `./skillSearch/signals.ts`
+  - packages/agent/attachments.ts
+- `./services/diagnosticTracking.js` (2 internal uses) -> `./services/diagnosticTracking.ts`
+  - packages/agent/messages.ts
+  - packages/agent/attachments.ts
+- `./hooks/postSamplingHooks.js` (3 internal uses) -> `./hooks/postSamplingHooks.ts`
+  - packages/agent/agentHostBindings.ts
+  - packages/agent/hooks/apiQueryHookHelper.ts
+  - packages/agent/MagicDocs/magicDocs.ts
+- `./hooks/execAgentHook.js` (1 internal uses) -> `./hooks/execAgentHook.ts`
+  - packages/agent/hooks.ts
+- `./hooks/hookEvents.js` (1 internal uses) -> `./hooks/hookEvents.ts`
+  - packages/agent/hooks.ts
+- `./hooks/execHttpHook.js` (1 internal uses) -> `./hooks/execHttpHook.ts`
+  - packages/agent/hooks.ts
+- `./hooks/execPromptHook.js` (1 internal uses) -> `./hooks/execPromptHook.ts`
+  - packages/agent/hooks.ts
+- `./query/transitions.js` (2 internal uses) -> `./query/transitions.ts`
+  - packages/agent/query/state.ts
+  - packages/agent/query/streaming.ts
+- `./tasks/registry.js` (1 internal uses) -> `./tasks/registry.ts`
+  - packages/agent/tasks/stopTask.ts
+
+## True public surface (keep, sorted by external usage)
+
+- `./messageShapes` (ext=147, int=23) -> `./messageShapes.ts`
+- `./messageShapes.js` (ext=147, int=23) -> `./messageShapes.ts`
+- `./messages.js` (ext=116, int=20) -> `./messages.ts`
+- `./command.js` (ext=71, int=1) -> `./command.ts`
+- `./idTypes` (ext=29, int=7) -> `./idTypes.ts`
+- `./agentSwarmsEnabled.js` (ext=27, int=2) -> `./agentSwarmsEnabled.ts`
+- `./hooks` (ext=24, int=4) -> `./hooks/index.ts`
+- `./eventMetadata.js` (ext=24, int=4) -> `./eventMetadata.ts`
+- `./hooks.js` (ext=24, int=4) -> `./hooks.ts`
+- `./effort.js` (ext=24, int=1) -> `./effort.ts`
+- `./messageQueueManager.js` (ext=23, int=8) -> `./messageQueueManager.ts`
+- `./tasks.js` (ext=19, int=3) -> `./tasks.ts`
+- `./logsTypes.js` (ext=19, int=3) -> `./logsTypes.ts`
+- `./localAgentTask.js` (ext=18, int=6) -> `./localAgentTask.tsx`
+- `./file-history` (ext=16, int=1) -> `./fileHistory.ts`
+- `./coordinatorMode.js` (ext=16, int=1) -> `./coordinatorMode.ts`
+- `./compaction/*.js` (ext=14, int=10) -> `./compaction/*.ts`
+- `./abortController.js` (ext=14, int=7) -> `./abortController.ts`
+- `./abortController` (ext=14, int=7) -> `./abortController.ts`
+- `./attachments.js` (ext=14, int=6) -> `./attachments.ts`
+- `./context.js` (ext=13, int=6) -> `./context.ts`
+- `./uuid.js` (ext=12, int=1) -> `./uuid.ts`
+- `./frontmatterParser.js` (ext=12, int=1) -> `./frontmatterParser.ts`
+- `./proactive/index.js` (ext=10, int=0) -> `./proactive/index.ts`
+- `./concurrentSessions.js` (ext=10, int=0) -> `./concurrentSessions.ts`
+- `./diff.js` (ext=10, int=0) -> `./diff.ts`
+- `./tokens.js` (ext=10, int=7) -> `./tokens.ts`
+- `./types/hooks.js` (ext=10, int=1) -> `./types/hooks.ts`
+- `./contextCollapse/*.js` (ext=9, int=4) -> `./contextCollapse/*.ts`
+- `./forkedAgent.js` (ext=9, int=6) -> `./forkedAgent.ts`
+- `./commitAttribution.js` (ext=9, int=2) -> `./commitAttribution.ts`
+- `./prompts.js` (ext=8, int=4) -> `./prompts.ts`
+- `./scheduler` (ext=7, int=1) -> `./scheduler.ts`
+- `./querySource` (ext=7, int=10) -> `./querySource.ts`
+- `./agentContext.js` (ext=7, int=2) -> `./agentContext.ts`
+- `./tokenEstimation.js` (ext=6, int=6) -> `./tokenEstimation.ts`
+- `./sdkEventQueue.js` (ext=6, int=3) -> `./sdkEventQueue.ts`
+- `./tasks/LocalShellTask.js` (ext=6, int=1) -> `./tasks/LocalShellTask.tsx`
+- `./agentIdUtils` (ext=5, int=0) -> `./agentIdUtils.ts`
+- `./postSamplingHooks.js` (ext=5, int=3) -> `./postSamplingHooks.ts`
+- `./sessionTitle.js` (ext=5, int=0) -> `./sessionTitle.ts`
+- `./claudeInChromeSetup.js` (ext=5, int=1) -> `./claudeInChromeSetup.ts`
+- `./constants/github-app.js` (ext=5, int=0) -> `./constants/github-app.ts`
+- `./sideQuery.js` (ext=4, int=2) -> `./sideQuery.ts`
+- `./toolSearch.js` (ext=4, int=6) -> `./toolSearch.ts`
+- `./task/framework.js` (ext=4, int=7) -> `./task/framework.ts`
+- `./taskFramework.js` (ext=4, int=0) -> `./taskFramework.ts`
+- `./claudeInChromeCommon.js` (ext=4, int=2) -> `./claudeInChromeCommon.ts`
+- `./sessionTools/analyzeContext.js` (ext=4, int=2) -> `./sessionTools/analyzeContext.ts`
+- `./hooks/sessionHooks.js` (ext=4, int=3) -> `./hooks/sessionHooks.ts`
+- `./assistant/index.js` (ext=4, int=0) -> `./assistant/index.ts`
+- `./tasks/DreamTask/DreamTask.js` (ext=4, int=2) -> `./tasks/DreamTask/DreamTask.ts`
+- `.` (ext=3, int=0) -> `./index.ts`
+- `./SessionMemory/*.js` (ext=3, int=3) -> `./SessionMemory/*.ts`
+- `./tasks/MonitorMcpTask/MonitorMcpTask.js` (ext=3, int=1) -> `./tasks/MonitorMcpTask/MonitorMcpTask.ts`
+- `./tokenBudget` (ext=3, int=1) -> `./tokenBudget.ts`
+- `./sideQuestion.js` (ext=3, int=0) -> `./sideQuestion.ts`
+- `./sessionStores.js` (ext=3, int=0) -> `./sessionStores.ts`
+- `./promptCategory.js` (ext=3, int=0) -> `./promptCategory.ts`
+- `./worktreeModeEnabled.js` (ext=3, int=0) -> `./worktreeModeEnabled.ts`
+- `./messagesMappers.js` (ext=3, int=0) -> `./messagesMappers.ts`
+- `./fileChangedWatcher.js` (ext=3, int=1) -> `./fileChangedWatcher.ts`
+- `./claudeInChrome/prompt.js` (ext=3, int=2) -> `./claudeInChrome/prompt.ts`
+- `./background/preconditions.js` (ext=3, int=1) -> `./background/preconditions.ts`
+- `./constants/messages.js` (ext=3, int=1) -> `./constants/messages.ts`
+- `./constants/spinnerVerbs.js` (ext=3, int=0) -> `./constants/spinnerVerbs.ts`
+- `./constants/turnCompletionVerbs.js` (ext=3, int=0) -> `./constants/turnCompletionVerbs.ts`
+- `./runtime/QueryGuard.js` (ext=3, int=0) -> `./runtime/QueryGuard.ts`
+- `./zodSchema/zodToJsonSchema.js` (ext=3, int=1) -> `./zodSchema/zodToJsonSchema.ts`
+- `./query` (ext=2, int=2) -> `./query.ts`
+- `./AgentSummary/*.js` (ext=2, int=0) -> `./AgentSummary/*.ts`
+- `./tasks/LocalWorkflowTask/LocalWorkflowTask.js` (ext=2, int=1) -> `./tasks/LocalWorkflowTask/LocalWorkflowTask.ts`
+- `./hooks/attributionHooks.js` (ext=2, int=1) -> `./hooks/attributionHooks.ts`
+- `./messageQueueTypes` (ext=2, int=2) -> `./messageQueueTypes.ts`
+- `./queryContext.js` (ext=2, int=1) -> `./queryContext.ts`
+- `./taggedId.js` (ext=2, int=0) -> `./taggedId.ts`
+- `./jetbrains.js` (ext=2, int=0) -> `./jetbrains.ts`
+- `./hooksConfigSnapshot.js` (ext=2, int=2) -> `./hooksConfigSnapshot.ts`
+- `./statusAlias.js` (ext=2, int=0) -> `./statusAlias.tsx`
+- `./inProcessTeammateHelpers.js` (ext=2, int=0) -> `./inProcessTeammateHelpers.ts`
+- `./tasks/stopTask.js` (ext=2, int=0) -> `./tasks/stopTask.ts`
+- `./tasks/LocalMainSessionTask.js` (ext=2, int=1) -> `./tasks/LocalMainSessionTask.tsx`
+- `./contentArray.js` (ext=2, int=0) -> `./contentArray.ts`
+- `./sessionUrl.js` (ext=2, int=0) -> `./sessionUrl.ts`
+- `./constants/prompts.js` (ext=2, int=0) -> `./constants/prompts.ts`
+- `./sessionTools/crossProjectResume.js` (ext=2, int=0) -> `./sessionTools/crossProjectResume.ts`
+- `./sessionTools/agenticSessionSearch.js` (ext=2, int=0) -> `./sessionTools/agenticSessionSearch.ts`
+- `./sessionTools/transcriptSearch.js` (ext=2, int=0) -> `./sessionTools/transcriptSearch.ts`
+- `./sessionTools/contextSuggestions.js` (ext=2, int=0) -> `./sessionTools/contextSuggestions.ts`
+- `./misc/cronJitterConfig.js` (ext=2, int=0) -> `./misc/cronJitterConfig.ts`
+- `./misc/directMemberMessage.js` (ext=2, int=0) -> `./misc/directMemberMessage.ts`
+- `./runtime/backgroundHousekeeping.js` (ext=2, int=0) -> `./runtime/backgroundHousekeeping.ts`
+- `./git/gitFilesystem.js` (ext=2, int=0) -> `./git/gitFilesystem.ts`
+- `./skillSearch/localSearch.js` (ext=2, int=0) -> `./skillSearch/localSearch.ts`
+- `./services/privacyConfig.js` (ext=2, int=0) -> `./services/privacyConfig.ts`
+- `./claudeInChrome/mcpServer.js` (ext=2, int=0) -> `./claudeInChrome/mcpServer.ts`
+- `./claudeInChrome/common.js` (ext=2, int=4) -> `./claudeInChrome/common.ts`
+- `./tasks/pillLabel.js` (ext=2, int=0) -> `./tasks/pillLabel.ts`
+- `./assistant/sessionDiscovery.js` (ext=2, int=0) -> `./assistant/sessionDiscovery.ts`
+- `./userPromptKeywords/userPromptKeywords.js` (ext=2, int=0) -> `./userPromptKeywords/userPromptKeywords.ts`
+- `./messages/systemInit.js` (ext=2, int=1) -> `./messages/systemInit.ts`
+- `./query-engine` (ext=1, int=0) -> `./QueryEngine.ts`
+- `./agentHostBindings.js` (ext=1, int=0) -> `./agentHostBindings.ts`
+- `./internalLogging.js` (ext=1, int=1) -> `./internalLogging.ts`
+- `./awaySummary.js` (ext=1, int=0) -> `./awaySummary.ts`
+- `./attribution.js` (ext=1, int=2) -> `./attribution.ts`
+- `./proactive/useProactive.js` (ext=1, int=0) -> `./proactive/useProactive.ts`
+- `./taskSummary.js` (ext=1, int=1) -> `./taskSummary.ts`
+- `./messagePredicates.js` (ext=1, int=1) -> `./messagePredicates.ts`
+- `./hooks/AsyncHookRegistry.js` (ext=1, int=2) -> `./hooks/AsyncHookRegistry.ts`
+- `./messages/mappers.js` (ext=1, int=0) -> `./messages/mappers.ts`
+- `./sdkProgress.js` (ext=1, int=1) -> `./sdkProgress.ts`
+- `./sessionFileAccessHooks.js` (ext=1, int=1) -> `./sessionFileAccessHooks.ts`
+- `./sdkControlSchemas.js` (ext=1, int=0) -> `./sdkControlSchemas.ts`
+- `./combinedAbortSignal.js` (ext=1, int=1) -> `./combinedAbortSignal.ts`
+- `./idleTimeout.js` (ext=1, int=0) -> `./idleTimeout.ts`
+- `./commands/security-review.js` (ext=1, int=0) -> `./commands/security-review.ts`
+- `./commands/commit.js` (ext=1, int=0) -> `./commands/commit.ts`
+- `./commands/brief.js` (ext=1, int=0) -> `./commands/brief.ts`
+- `./commands/commit-push-pr.js` (ext=1, int=0) -> `./commands/commit-push-pr.ts`
+- `./commands/pr_comments/index.js` (ext=1, int=0) -> `./commands/pr_comments/index.ts`
+- `./commands/tasks/index.js` (ext=1, int=0) -> `./commands/tasks/index.ts`
+- `./constants/querySource.js` (ext=1, int=1) -> `./constants/querySource.ts`
+- `./constants/oauth.js` (ext=1, int=1) -> `./constants/oauth.ts`
+- `./constants/systemPromptSections.js` (ext=1, int=0) -> `./constants/systemPromptSections.ts`
+- `./constants/product.js` (ext=1, int=0) -> `./constants/product.ts`
+- `./constants/betas.js` (ext=1, int=0) -> `./constants/betas.ts`
+- `./constants/apiLimits.js` (ext=1, int=1) -> `./constants/apiLimits.ts`
+- `./constants/system.js` (ext=1, int=0) -> `./constants/system.ts`
+- `./runtime/mailbox.js` (ext=1, int=0) -> `./runtime/mailbox.ts`
+- `./runtime/queueProcessor.js` (ext=1, int=0) -> `./runtime/queueProcessor.ts`
+- `./git/gitConfigParser.js` (ext=1, int=0) -> `./git/gitConfigParser.ts`
+- `./MagicDocs/magicDocs.js` (ext=1, int=1) -> `./MagicDocs/magicDocs.ts`
+- `./skillSearch/remoteSkillState.js` (ext=1, int=0) -> `./skillSearch/remoteSkillState.ts`
+- `./skillSearch/prefetch.js` (ext=1, int=2) -> `./skillSearch/prefetch.ts`
+- `./skillSearch/remoteSkillLoader.js` (ext=1, int=0) -> `./skillSearch/remoteSkillLoader.ts`
+- `./skillSearch/telemetry.js` (ext=1, int=0) -> `./skillSearch/telemetry.ts`
+- `./services/preventSleep.js` (ext=1, int=0) -> `./services/preventSleep.ts`
+- `./services/mcpServerApproval.js` (ext=1, int=0) -> `./services/mcpServerApproval.tsx`
+- `./claudeInChrome/chromeNativeHost.js` (ext=1, int=0) -> `./claudeInChrome/chromeNativeHost.ts`
+- `./claudeInChrome/setup.js` (ext=1, int=0) -> `./claudeInChrome/setup.ts`
+- `./claudeInChrome/toolRendering.js` (ext=1, int=0) -> `./claudeInChrome/toolRendering.tsx`
+- `./hooks/fileChangedWatcher.js` (ext=1, int=0) -> `./hooks/fileChangedWatcher.ts`
+- `./hooks/registerSkillHooks.js` (ext=1, int=0) -> `./hooks/registerSkillHooks.ts`
+- `./hooks/apiQueryHookHelper.js` (ext=1, int=0) -> `./hooks/apiQueryHookHelper.ts`
+- `./hooks/registerFrontmatterHooks.js` (ext=1, int=0) -> `./hooks/registerFrontmatterHooks.ts`
+- `./hooks/hooksConfigSnapshot.js` (ext=1, int=1) -> `./hooks/hooksConfigSnapshot.ts`
+- `./hooks/hookHelpers.js` (ext=1, int=1) -> `./hooks/hookHelpers.ts`
+- `./assistant/gate.js` (ext=1, int=0) -> `./assistant/gate.ts`
+- `./assistant/sessionHistory.js` (ext=1, int=0) -> `./assistant/sessionHistory.ts`
+- `./assistant/AssistantSessionChooser.js` (ext=1, int=0) -> `./assistant/AssistantSessionChooser.ts`
+- `./background/remote/remoteSession.js` (ext=1, int=0) -> `./background/remote/remoteSession.ts`
+- `./tasks/LocalShellTask/killShellTasks.js` (ext=1, int=1) -> `./tasks/LocalShellTask/killShellTasks.ts`
+- `./standalone/standaloneAgent.js` (ext=1, int=0) -> `./standalone/standaloneAgent.ts`

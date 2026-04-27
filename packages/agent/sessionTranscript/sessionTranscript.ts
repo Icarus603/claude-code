@@ -1,5 +1,5 @@
 // Auto-generated stub — replace with real implementation
-import type { Message } from '@claude-code/agent/messageShapes';
+import type { Message } from '../messageShapes.js';
 
 export {};
 export const writeSessionTranscriptSegment: (messages: Message[]) => void = (() => {});

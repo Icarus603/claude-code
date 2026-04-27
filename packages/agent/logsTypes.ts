@@ -1,9 +1,9 @@
 import type { UUID } from 'crypto'
-import type { FileHistorySnapshot } from '@claude-code/agent/file-history'
+import type { FileHistorySnapshot } from './fileHistory.js'
 import type { ContentReplacementRecord } from '@claude-code/storage/toolResultStorage.js'
-import type { AgentId } from '@claude-code/agent/idTypes'
-import type { Message } from '@claude-code/agent/messageShapes'
-import type { QueueOperationMessage } from '@claude-code/agent/messageQueueTypes'
+import type { AgentId } from './idTypes.js'
+import type { Message } from './messageShapes.js'
+import type { QueueOperationMessage } from './messageQueueTypes.js'
 
 export type SerializedMessage = Message & {
   cwd: string

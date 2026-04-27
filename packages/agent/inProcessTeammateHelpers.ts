@@ -17,7 +17,7 @@ import {
   isSandboxPermissionResponse,
   type PlanApprovalResponseMessage,
 } from '@claude-code/swarm'
-import { updateTaskState } from '@claude-code/agent/task/framework.js'
+import { updateTaskState } from './task/framework.js'
 
 type SetAppState = (updater: (prev: AppState) => AppState) => void
 

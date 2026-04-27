@@ -20,10 +20,10 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
+import { sanitizeToolNameForAnalytics } from './eventMetadata.js'
 import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
-import { NO_CONTENT_MESSAGE } from '@claude-code/agent/constants/messages.js'
-import { OUTPUT_STYLE_CONFIG } from '@claude-code/agent/constants/outputStyles.js'
+import { NO_CONTENT_MESSAGE } from './constants/messages.js'
+import { OUTPUT_STYLE_CONFIG } from './constants/outputStyles.js'
 import { isAutoMemoryEnabled } from '@claude-code/memory'
 import {
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
@@ -73,14 +73,14 @@ import type {
   UserMessage,
 } from '@claude-code/repl/replTypes/message.js'
 import { isAdvisorBlock } from '@claude-code/provider/advisor.js'
-import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
+import { isAgentSwarmsEnabled } from './agentSwarmsEnabled.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import {
   type Attachment,
   type HookAttachment,
   type HookPermissionDecisionAttachment,
   memoryHeader,
-} from '@claude-code/agent/attachments.js'
+} from './attachments.js'
 import { quote } from '@claude-code/shell/bash/shellQuote.js'
 import { formatNumber, formatTokens } from '@claude-code/output/formatters'
 import { getPewterLedgerVariant } from '@claude-code/permission/planModeV2.js'
@@ -88,7 +88,7 @@ import { jsonStringify } from '@claude-code/local-observability/slowOperations.j
 import {
   SYNTHETIC_MESSAGES,
   SYNTHETIC_MODEL,
-} from '@claude-code/agent/messagesConstants.js'
+} from './messagesConstants.js'
 
 // Hook attachments that have a hookName field (excludes HookPermissionDecisionAttachment)
 type HookAttachmentWithName = Exclude<
@@ -133,7 +133,7 @@ import {
   LOCAL_COMMAND_CAVEAT_TAG,
   LOCAL_COMMAND_STDOUT_TAG,
 } from '@claude-code/command-runtime/xml.js'
-import { DiagnosticTrackingService } from '@claude-code/agent/services/diagnosticTracking.js'
+import { DiagnosticTrackingService } from './services/diagnosticTracking.js'
 import {
   findToolByName,
   type Tool,
@@ -165,7 +165,7 @@ import {
   isPlanModeInterviewPhaseEnabled,
 } from '@claude-code/permission/planModeV2.js'
 import { escapeRegExp } from '@claude-code/output/utils/stringUtils.js'
-import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
+import { isTodoV2Enabled } from './tasks.js'
 
 // Lazy import to avoid circular dependency while keeping swarm ownership in the package.
 function getTeammateMailbox(): typeof import('@claude-code/swarm') {
@@ -176,7 +176,7 @@ function getTeammateMailbox(): typeof import('@claude-code/swarm') {
 import {
   isToolReferenceBlock,
   isToolSearchEnabledOptimistic,
-} from '@claude-code/agent/toolSearch.js'
+} from './toolSearch.js'
 
 const MEMORY_CORRECTION_HINT =
   "\n\nNote: The user's next message may contain a correction or preference. Pay close attention — if they explain what went wrong or how they'd prefer you to work, consider saving that to memory for future sessions."
@@ -302,7 +302,7 @@ export function buildClassifierUnavailableMessage(
   )
 }
 
-export { SYNTHETIC_MESSAGES, SYNTHETIC_MODEL } from '@claude-code/agent/messagesConstants.js'
+export { SYNTHETIC_MESSAGES, SYNTHETIC_MODEL } from './messagesConstants.js'
 
 export function isSyntheticMessage(message: Message): boolean {
   return (
@@ -2369,7 +2369,7 @@ export function normalizeMessagesForAPI(
   if (feature('HISTORY_SNIP') && readEnv('NODE_ENV') !== 'test') {
     const { isSnipRuntimeEnabled } =
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require('@claude-code/agent/compaction/snipCompact.js') as typeof import('@claude-code/agent/compaction/snipCompact.js')
+      require('./compaction/snipCompact.js') as typeof import('./compaction/snipCompact.js')
     if (isSnipRuntimeEnabled()) {
       for (let i = 0; i < sanitized.length; i++) {
         if (sanitized[i]!.type === 'user') {
@@ -2442,7 +2442,7 @@ export function mergeUserMessages(a: UserMessage, b: UserMessage): UserMessage {
     // for all ants.
     const { isSnipRuntimeEnabled } =
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require('@claude-code/agent/compaction/snipCompact.js') as typeof import('@claude-code/agent/compaction/snipCompact.js')
+      require('./compaction/snipCompact.js') as typeof import('./compaction/snipCompact.js')
     if (isSnipRuntimeEnabled()) {
       return {
         ...a,
@@ -4184,7 +4184,7 @@ You have exited auto mode. The user may now want to interact more directly. You 
       if (feature('HISTORY_SNIP')) {
         const { SNIP_NUDGE_TEXT } =
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require('@claude-code/agent/compaction/snipCompact.js') as typeof import('@claude-code/agent/compaction/snipCompact.js')
+          require('./compaction/snipCompact.js') as typeof import('./compaction/snipCompact.js')
         return wrapMessagesInSystemReminder([
           createUserMessage({
             content: SNIP_NUDGE_TEXT,
@@ -4675,7 +4675,7 @@ export function getMessagesAfterCompactBoundary<
   if (!options?.includeSnipped && feature('HISTORY_SNIP')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { projectSnippedView } =
-      require('@claude-code/agent/compaction/snipProjection.js') as typeof import('@claude-code/agent/compaction/snipProjection.js')
+      require('./compaction/snipProjection.js') as typeof import('./compaction/snipProjection.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     return projectSnippedView(sliced as Message[]) as T[]
   }

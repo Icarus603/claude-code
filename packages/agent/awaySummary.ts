@@ -1,15 +1,15 @@
 import { APIUserAbortError } from '@anthropic-ai/sdk'
 import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { Message } from './messageShapes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   createUserMessage,
   getAssistantMessageText,
-} from '@claude-code/agent/messages.js'
+} from './messages.js'
 import { getSmallFastModel } from '@claude-code/provider/model.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import { queryModelWithoutStreaming } from '@claude-code/provider/claude.js'
-import { getSessionMemoryContent } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
+import { getSessionMemoryContent } from './SessionMemory/sessionMemoryUtils.js'
 
 // Recap only needs recent context — truncate to avoid "prompt too long" on
 // large sessions. 30 messages ≈ ~15 exchanges, plenty for "where we left off."

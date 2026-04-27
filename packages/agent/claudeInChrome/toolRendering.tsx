@@ -5,7 +5,7 @@ import { Link, Text } from '@anthropic/ink'
 import { renderToolResultMessage as renderDefaultMCPToolResultMessage } from '@claude-code/tool-registry/tools/MCPTool/UI.js'
 import type { MCPToolResult } from '@claude-code/mcp-runtime/mcpValidation.js'
 import { truncateToWidth } from '@claude-code/output/formatters'
-import { trackClaudeInChromeTabId } from '@claude-code/agent/claudeInChrome/common.js'
+import { trackClaudeInChromeTabId } from './common.js'
 
 export type { Tool } from '@modelcontextprotocol/sdk/types.js'
 

@@ -8,7 +8,7 @@ import {
   persistFileSnapshotIfRemote,
 } from '@claude-code/storage/plans.js'
 import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
-import type { AgentId } from '@claude-code/agent/idTypes'
+import type { AgentId } from './idTypes.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
 import { FileEditTool } from '@claude-code/tool-registry/tools/FileEditTool/FileEditTool.js'

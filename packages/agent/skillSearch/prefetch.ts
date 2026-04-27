@@ -1,5 +1,5 @@
 // Auto-generated stub — replace with real implementation
-import type { Attachment } from '@claude-code/agent/attachments.js'
+import type { Attachment } from '../attachments.js'
 import type { Message } from '@claude-code/repl/replTypes/message.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 

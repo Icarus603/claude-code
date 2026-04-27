@@ -5,7 +5,7 @@ import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/st
 import type {
   AttributionSnapshotMessage,
   FileAttributionState,
-} from '@claude-code/agent/logsTypes.js'
+} from './logsTypes.js'
 import { readEnv } from '@claude-code/config/env/utils'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

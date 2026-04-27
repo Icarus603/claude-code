@@ -8,9 +8,9 @@
 
 import { formatAPIError } from '@claude-code/provider/errorUtils.js'
 import type { NonNullableUsage } from '@claude-code/provider/logging.js'
-import type { Message, SystemAPIErrorMessage } from '@claude-code/agent/messageShapes'
-import { type CacheSafeParams, runForkedAgent } from '@claude-code/agent/forkedAgent.js'
-import { createUserMessage, extractTextContent } from '@claude-code/agent/messages.js'
+import type { Message, SystemAPIErrorMessage } from './messageShapes.js'
+import { type CacheSafeParams, runForkedAgent } from './forkedAgent.js'
+import { createUserMessage, extractTextContent } from './messages.js'
 
 // Pattern to detect "/btw" at start of input (case-insensitive, word boundary)
 const BTW_PATTERN = /^\/btw\b/gi

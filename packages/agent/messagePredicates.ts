@@ -1,4 +1,4 @@
-import type { Message, UserMessage } from '@claude-code/agent/messageShapes'
+import type { Message, UserMessage } from './messageShapes.js'
 
 // tool_result messages share type:'user' with human turns; the discriminant is
 // the optional toolUseResult field.

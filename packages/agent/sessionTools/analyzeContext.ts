@@ -3,8 +3,8 @@ import type { Anthropic } from '@anthropic-ai/sdk'
 import {
   getSystemPrompt,
   SYSTEM_PROMPT_DYNAMIC_BOUNDARY,
-} from '@claude-code/agent/prompts.js'
-import { microcompactMessages } from '@claude-code/agent/compaction/microCompact.js'
+} from '../prompts.js'
+import { microcompactMessages } from '../compaction/microCompact.js'
 import { getSdkBetas } from '@claude-code/app-host/bootstrap/state.js'
 import { getCommandName } from '@claude-code/command-runtime/runtime'
 import { getSystemContext } from '@claude-code/provider/context.js'
@@ -14,12 +14,12 @@ import {
   getEffectiveContextWindowSize,
   isAutoCompactEnabled,
   MANUAL_COMPACT_BUFFER_TOKENS,
-} from '@claude-code/agent/compaction/autoCompact.js'
+} from '../compaction/autoCompact.js'
 import {
   countMessagesTokensWithAPI,
   countTokensViaHaikuFallback,
   roughTokenCountEstimation,
-} from '@claude-code/agent/tokenEstimation.js'
+} from '../tokenEstimation.js'
 import { estimateSkillFrontmatterTokens } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
 import {
   findToolByName,
@@ -48,19 +48,19 @@ import type {
 } from '@claude-code/repl/replTypes/message.js'
 import { toolToAPISchema } from '@claude-code/provider/legacy/api.js'
 import { filterInjectedMemoryFiles, getMemoryFiles } from '@claude-code/storage/claudemd.js'
-import { getContextWindowForModel } from '@claude-code/agent/context.js'
+import { getContextWindowForModel } from '../context.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { normalizeMessagesForAPI } from '@claude-code/agent/messages.js'
+import { normalizeMessagesForAPI } from '../messages.js'
 import { getRuntimeMainLoopModel } from '@claude-code/provider/model/model.js'
 import type { SettingSource } from '@claude-code/config/settings/core/constants.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js'
 import type { Theme } from '@anthropic/ink'
-import { getCurrentUsage } from '@claude-code/agent/tokens.js'
+import { getCurrentUsage } from '../tokens.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 const RESERVED_CATEGORY_NAME = 'Autocompact buffer'
@@ -384,7 +384,7 @@ async function countBuiltInToolTokens(
   }
 
   // Check if tool search is enabled
-  const { isToolSearchEnabled } = await import('@claude-code/agent/toolSearch.js')
+  const { isToolSearchEnabled } = await import('../toolSearch.js')
   const { isDeferredTool } = await import('@claude-code/tool-registry/tools/ToolSearchTool/prompt.js')
   const isDeferred = await isToolSearchEnabled(
     model ?? '',
@@ -668,7 +668,7 @@ export async function countMcpToolTokens(
 
   // Check if tool search is enabled - if so, MCP tools are deferred
   // isToolSearchEnabled handles threshold calculation internally for TstAuto mode
-  const { isToolSearchEnabled } = await import('@claude-code/agent/toolSearch.js')
+  const { isToolSearchEnabled } = await import('../toolSearch.js')
   const { isDeferredTool } = await import('@claude-code/tool-registry/tools/ToolSearchTool/prompt.js')
 
   const isDeferred = await isToolSearchEnabled(
@@ -1123,7 +1123,7 @@ export async function analyzeContextUsage(
   if (feature('CONTEXT_COLLAPSE')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { isContextCollapseEnabled } =
-      require('@claude-code/agent/contextCollapse/index.js') as typeof import('@claude-code/agent/contextCollapse/index.js')
+      require('../contextCollapse/index.js') as typeof import('../contextCollapse/index.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     if (isContextCollapseEnabled()) {
       skipReservedBuffer = true

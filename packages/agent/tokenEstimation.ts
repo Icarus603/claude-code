@@ -5,11 +5,11 @@ import type { BetaMessageParam as MessageParam } from '@anthropic-ai/sdk/resourc
 import type { CountTokensCommandInput } from '@aws-sdk/client-bedrock-runtime'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
 import { VERTEX_COUNT_TOKENS_ALLOWED_BETAS } from '@claude-code/provider/betasConstants.js'
-import type { Attachment } from '@claude-code/agent/attachments.js'
+import type { Attachment } from './attachments.js'
 import { getModelBetas } from '@claude-code/provider/betas.js'
 import { getVertexRegionForModel, isEnvTruthy } from '@claude-code/config/env/utils'
 import { logError } from '@claude-code/local-observability/logging'
-import { normalizeAttachmentForAPI } from '@claude-code/agent/messages.js'
+import { normalizeAttachmentForAPI } from './messages.js'
 import {
   createBedrockRuntimeClient,
   getInferenceProfileBackingModel,
@@ -22,7 +22,7 @@ import {
   normalizeModelStringForAPI,
 } from '@claude-code/provider/model.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { isToolReferenceBlock } from '@claude-code/agent/toolSearch.js'
+import { isToolReferenceBlock } from './toolSearch.js'
 import { getAPIMetadata, getExtraBodyParams } from '@claude-code/provider/claude.js'
 import { getAnthropicClient } from '@claude-code/provider'
 // Production noop of withTokenCountVCR — the src/ version gates on

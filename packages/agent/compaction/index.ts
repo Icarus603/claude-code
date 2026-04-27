@@ -13,7 +13,7 @@ export type {
   PostCompactCleanupActions,
   ToolNameConstants,
   SessionMemoryCompactConfig,
-} from '@claude-code/agent/types/compaction.js'
+} from '../types/compaction.js'
 
 export type {
   CompactionDeps,
@@ -36,7 +36,7 @@ export type {
   ActivityDep,
   TranscriptDep,
   ContextCleanupDep,
-} from '@claude-code/agent/compactionDeps.js'
+} from '../compactionDeps.js'
 
 export { groupMessagesByApiRound } from './grouping.js'
 export { isSnipBoundaryMessage, projectSnippedView } from './snipProjection.js'

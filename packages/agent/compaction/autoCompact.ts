@@ -1,22 +1,22 @@
 import { feature } from 'bun:bundle'
 import { markPostCompaction } from '@claude-code/app-host/bootstrap/state.js'
 import { getSdkBetas } from '@claude-code/app-host/bootstrap/state.js'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from '../querySource.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { Message } from '../messageShapes.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { getInitialSettings } from '@claude-code/config/settings'
-import { getContextWindowForModel } from '@claude-code/agent/context.js'
+import { getContextWindowForModel } from '../context.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { hasExactErrorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import type { CacheSafeParams } from '@claude-code/agent/forkedAgent.js'
+import type { CacheSafeParams } from '../forkedAgent.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
+import { tokenCountWithEstimation } from '../tokens.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getMaxOutputTokensForModel } from '@claude-code/provider/claude.js'
 import { notifyCompaction } from '@claude-code/provider/promptCacheBreakDetection.js'
-import { setLastSummarizedMessageId } from '@claude-code/agent/SessionMemory/sessionMemoryUtils.js'
+import { setLastSummarizedMessageId } from '../SessionMemory/sessionMemoryUtils.js'
 import {
   type CompactionResult,
   compactConversation,
@@ -217,7 +217,7 @@ export async function shouldAutoCompact(
   if (feature('CONTEXT_COLLAPSE')) {
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { isContextCollapseEnabled } =
-      require('@claude-code/agent/contextCollapse/index.js') as typeof import('@claude-code/agent/contextCollapse/index.js')
+      require('../contextCollapse/index.js') as typeof import('../contextCollapse/index.js')
     /* eslint-enable @typescript-eslint/no-require-imports */
     if (isContextCollapseEnabled()) {
       return false

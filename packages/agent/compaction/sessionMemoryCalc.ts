@@ -2,7 +2,7 @@
  *
  */
 
-import type { SessionMemoryCompactConfig } from '@claude-code/agent/types/compaction.js'
+import type { SessionMemoryCompactConfig } from '../types/compaction.js'
 
 
 /**

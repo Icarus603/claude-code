@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { initAutoDream, initExtractMemories } from '@claude-code/memory'
-import { initMagicDocs } from '@claude-code/agent/MagicDocs/magicDocs.js'
+import { initMagicDocs } from '../MagicDocs/magicDocs.js'
 import { initSkillImprovement } from '@claude-code/repl/skillImprovement.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */

@@ -24,10 +24,10 @@ import type { Message } from '@claude-code/repl/replTypes/message.js'
 import {
   createAbortController,
   createChildAbortController,
-} from '@claude-code/agent/abortController.js'
+} from './abortController.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { getToolSearchOrReadInfo } from '@claude-code/tool-registry/collapseReadSearch.js'
-import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
+import { enqueuePendingNotification } from './messageQueueManager.js'
 import { getAgentTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import {
   evictTaskOutput,
@@ -38,8 +38,8 @@ import {
   PANEL_GRACE_MS,
   registerTask,
   updateTaskState,
-} from '@claude-code/agent/task/framework.js'
-import { emitTaskProgress } from '@claude-code/agent/sdkProgress.js'
+} from './task/framework.js'
+import { emitTaskProgress } from './sdkProgress.js'
 import type { TaskState } from '@claude-code/repl/tasksTypes.js'
 
 export type ToolActivity = {

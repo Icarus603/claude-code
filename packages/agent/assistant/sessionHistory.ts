@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getOauthConfig } from '@claude-code/agent/constants/oauth.js'
+import { getOauthConfig } from '../constants/oauth.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getOAuthHeaders, prepareApiRequest } from '@claude-code/teleport/api.js'

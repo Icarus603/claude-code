@@ -19,8 +19,8 @@ import {
   TASK_NOTIFICATION_TAG,
   TOOL_USE_ID_TAG,
 } from '@claude-code/command-runtime/xml.js'
-import { type QueryParams, query } from '@claude-code/agent/query'
-import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
+import { type QueryParams, query } from '../query.js'
+import { roughTokenCountEstimation } from '../tokenEstimation.js'
 import type { SetAppState } from '@claude-code/tool-registry/Task.js'
 import { createTaskStateBase } from '@claude-code/tool-registry/Task.js'
 import type {
@@ -29,16 +29,16 @@ import type {
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { asAgentId } from '@claude-code/repl/replTypes/ids.js'
 import type { Message } from '@claude-code/repl/replTypes/message.js'
-import { createAbortController } from '@claude-code/agent/abortController.js'
+import { createAbortController } from '../abortController.js'
 import {
   runWithAgentContext,
   type SubagentContext,
-} from '@claude-code/agent/agentContext.js'
+} from '../agentContext.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
-import { emitTaskTerminatedSdk } from '@claude-code/agent/sdkEventQueue.js'
+import { enqueuePendingNotification } from '../messageQueueManager.js'
+import { emitTaskTerminatedSdk } from '../sdkEventQueue.js'
 import {
   getAgentTranscriptPath,
   recordSidechainTranscript,
@@ -48,8 +48,8 @@ import {
   getTaskOutputPath,
   initTaskOutputAsSymlink,
 } from '@claude-code/storage/task/diskOutput.js'
-import { registerTask, updateTaskState } from '@claude-code/agent/task/framework.js'
-import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
+import { registerTask, updateTaskState } from '../task/framework.js'
+import type { LocalAgentTaskState } from '../localAgentTask.js'
 
 // Main session tasks use LocalAgentTaskState with agentType='main-session'
 export type LocalMainSessionTaskState = LocalAgentTaskState & {

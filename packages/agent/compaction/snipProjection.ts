@@ -1,6 +1,6 @@
 /**
  */
-import type { CoreMessage } from '@claude-code/agent/types/messages.js'
+import type { CoreMessage } from '../types/messages.js'
 
 const SNIP_BOUNDARY_SUBTYPE = 'snip_boundary'
 

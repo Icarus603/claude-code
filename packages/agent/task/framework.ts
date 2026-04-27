@@ -14,8 +14,8 @@ import {
   type TaskType,
 } from '@claude-code/tool-registry/Task.js'
 type TaskState = { id: string; type: string; status: string; [key: string]: unknown }
-import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
-import { enqueueSdkEvent } from '@claude-code/agent/sdkEventQueue.js'
+import { enqueuePendingNotification } from '../messageQueueManager.js'
+import { enqueueSdkEvent } from '../sdkEventQueue.js'
 import { getTaskOutputDelta, getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
 
 // Standard polling interval for all tasks

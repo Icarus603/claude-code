@@ -20,7 +20,7 @@ import { GlobTool } from '@claude-code/tool-registry/tools/GlobTool/GlobTool.js'
 import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt.js'
 import { GrepTool } from '@claude-code/tool-registry/tools/GrepTool/GrepTool.js'
 import { GREP_TOOL_NAME } from '@claude-code/tool-registry/tools/GrepTool/prompt.js'
-import type { HookCallback } from '@claude-code/agent/types/hooks.js'
+import type { HookCallback } from './types/hooks.js'
 import {
   detectSessionFileType,
   detectSessionPatternType,
@@ -40,7 +40,7 @@ const memoryShapeTelemetry = feature('MEMORY_SHAPE_TELEMETRY')
   : null
 
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { getSubagentLogName } from '@claude-code/agent/agentContext.js'
+import { getSubagentLogName } from './agentContext.js'
 
 /**
  * Extract the file path from a tool input for memdir detection.

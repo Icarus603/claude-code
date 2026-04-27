@@ -1,7 +1,7 @@
 // Auto-generated stub — replace with real implementation
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { Message } from '../messageShapes.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from '../querySource.js'
 
 export interface ContextCollapseHealth {
   totalSpawns: number

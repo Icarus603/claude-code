@@ -12,12 +12,12 @@ import type {
   AsyncHookJSONOutput,
   SyncHookJSONOutput,
 } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { Message } from '../messageShapes.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { permissionBehaviorSchema } from '@claude-code/permission/PermissionRule'
 import { permissionUpdateSchema } from '@claude-code/permission/PermissionUpdateSchema'
 type AppState = unknown
-import type { AttributionState } from '@claude-code/agent/commitAttribution.js'
+import type { AttributionState } from '../commitAttribution.js'
 
 export function isHookEvent(value: string): value is HookEvent {
   return HOOK_EVENTS.includes(value as HookEvent)

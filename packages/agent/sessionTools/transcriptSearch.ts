@@ -2,7 +2,7 @@ import type { RenderableMessage } from '@claude-code/repl/replTypes/message.js'
 import {
   INTERRUPT_MESSAGE,
   INTERRUPT_MESSAGE_FOR_TOOL_USE,
-} from '@claude-code/agent/messages.js'
+} from '../messages.js'
 
 const SYSTEM_REMINDER_CLOSE = '</system-reminder>'
 

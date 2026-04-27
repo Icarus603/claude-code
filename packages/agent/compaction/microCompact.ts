@@ -1,16 +1,16 @@
 import { feature } from 'bun:bundle'
 import { readEnv } from '@claude-code/config/env'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
-import type { QuerySource } from '@claude-code/agent/querySource'
+import type { QuerySource } from '../querySource.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
-import type { Message } from '@claude-code/agent/messageShapes'
+import type { Message } from '../messageShapes.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { notifyCacheDeletion } from '@claude-code/provider/promptCacheBreakDetection.js'
-import { roughTokenCountEstimation } from '@claude-code/agent/tokenEstimation.js'
+import { roughTokenCountEstimation } from '../tokenEstimation.js'
 import {
   clearCompactWarningSuppression,
   suppressCompactWarning,
@@ -273,7 +273,7 @@ export async function microcompactMessages(
     const model = toolUseContext?.options.mainLoopModel ?? getMainLoopModel()
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const featureFlags = require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')
-    const cachedMCConfig = (await import('@claude-code/agent/compaction/cachedMCConfig.js')).getCachedMCConfig({
+    const cachedMCConfig = (await import('./cachedMCConfig.js')).getCachedMCConfig({
       getEnv: key => readEnv(key),
       getFeatureValue: featureFlags.getFeatureValue_CACHED_MAY_BE_STALE,
     })
@@ -311,7 +311,7 @@ async function cachedMicrocompactPath(
   const state = ensureCachedMCState()
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const featureFlags = require('@claude-code/config/feature-flags') as typeof import('@claude-code/config/feature-flags')
-  const config = (await import('@claude-code/agent/compaction/cachedMCConfig.js')).getCachedMCConfig({
+  const config = (await import('./cachedMCConfig.js')).getCachedMCConfig({
     getEnv: key => readEnv(key),
     getFeatureValue: featureFlags.getFeatureValue_CACHED_MAY_BE_STALE,
   })
