@@ -2,15 +2,15 @@ import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { useMemo } from 'react'
 import { Box } from '@anthropic/ink'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import {
   STATUS_TAG,
   SUMMARY_TAG,
   TASK_NOTIFICATION_TAG,
 } from '@claude-code/command-runtime/xml.js'
 import { QueuedMessageProvider } from '@claude-code/app-host/context/QueuedMessageContext.js'
-import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js'
-import type { QueuedCommand } from '@claude-code/repl/textInputTypes.js'
+import { useCommandQueue } from '../../hooks/useCommandQueue.js'
+import type { QueuedCommand } from '../../textInputTypes.js'
 import { isQueuedCommandVisible } from '@claude-code/agent/messageQueueManager.js'
 import {
   createUserMessage,

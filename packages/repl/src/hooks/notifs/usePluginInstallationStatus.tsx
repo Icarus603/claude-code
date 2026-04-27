@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useEffect, useMemo } from 'react'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../../notifications.js'
 import { Text } from '@anthropic/ink'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 

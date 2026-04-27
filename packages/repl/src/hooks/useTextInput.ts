@@ -1,13 +1,13 @@
-import { isInputModeCharacter } from '@claude-code/repl/components/PromptInput/inputModes.js'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { isInputModeCharacter } from '../components/PromptInput/inputModes.js'
+import { useNotifications } from '../notifications.js'
 import stripAnsi from 'strip-ansi'
-import { markBackslashReturnUsed } from '@claude-code/repl/terminalSetup.js'
-import { addToHistory } from '@claude-code/repl/history.js'
+import { markBackslashReturnUsed } from '../terminalSetup.js'
+import { addToHistory } from '../history.js'
 import type { Key } from '@anthropic/ink'
 import type {
   InlineGhostText,
   TextInputState,
-} from '@claude-code/repl/textInputTypes.js'
+} from '../textInputTypes.js'
 import {
   Cursor,
   getLastKill,
@@ -17,9 +17,9 @@ import {
   resetYankState,
   updateYankLength,
   yankPop,
-} from '@claude-code/repl/Cursor.js'
+} from '../Cursor.js'
 import { env } from '@claude-code/config/env/paths'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+import { isFullscreenEnvEnabled } from '../fullscreen.js'
 import type { ImageDimensions } from '@claude-code/storage/imageResizer.js'
 import { isModifierPressed, prewarmModifiers } from '@claude-code/output/modifiers.js'
 import { useDoublePress } from '@anthropic/ink'

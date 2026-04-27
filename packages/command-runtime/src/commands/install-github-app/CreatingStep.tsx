@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Text } from '@anthropic/ink'
-import type { Workflow } from '@claude-code/command-runtime/commands/install-github-app/types.js'
+import type { Workflow } from './types.js'
 
 interface CreatingStepProps {
   currentWorkflowInstallStep: number

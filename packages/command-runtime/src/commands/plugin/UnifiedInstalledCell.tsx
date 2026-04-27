@@ -2,7 +2,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { Box, color, Text, useTheme } from '@anthropic/ink'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
-import type { UnifiedInstalledItem } from '@claude-code/command-runtime/commands/plugin/unifiedTypes.js'
+import type { UnifiedInstalledItem } from './unifiedTypes.js'
 
 type Props = {
   item: UnifiedInstalledItem

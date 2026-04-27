@@ -9,7 +9,7 @@ import { Box, Text } from '@anthropic/ink'
 import {
   hookSourceDescriptionDisplayString,
   type IndividualHookConfig,
-} from '@claude-code/repl/hooksSettings.js'
+} from '../../hooksSettings.js'
 import { Dialog } from '@anthropic/ink'
 
 type Props = {

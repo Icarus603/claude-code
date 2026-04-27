@@ -44,7 +44,7 @@ import {
   initTaskOutputAsSymlink,
 } from '@claude-code/storage/task/diskOutput.js'
 import { getCurrentWorktreeSession } from '@claude-code/swarm'
-import { clearSessionCaches } from '@claude-code/command-runtime/commands/clear/caches.js'
+import { clearSessionCaches } from './caches.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 export async function clearConversation({

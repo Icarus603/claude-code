@@ -3,12 +3,12 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { TeleportRemoteResponse } from '@claude-code/repl/conversationRecovery.js'
+import type { TeleportRemoteResponse } from '../conversationRecovery.js'
 import type { CodeSession } from '@claude-code/teleport/api.js'
 import {
   type TeleportSource,
   useTeleportResume,
-} from '@claude-code/repl/hooks/useTeleportResume.js'
+} from '../hooks/useTeleportResume.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { ResumeTask } from './ResumeTask.js'

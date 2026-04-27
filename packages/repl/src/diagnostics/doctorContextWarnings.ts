@@ -14,7 +14,7 @@ import { SandboxManager } from '@claude-code/shell/sandbox/sandbox-adapter.js'
 import {
   AGENT_DESCRIPTIONS_THRESHOLD,
   getAgentDescriptionsTotalTokens,
-} from '@claude-code/repl/uiHelpers/statusNoticeHelpers.js'
+} from '../uiHelpers/statusNoticeHelpers.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 
 // Thresholds (matching status notices and existing patterns)

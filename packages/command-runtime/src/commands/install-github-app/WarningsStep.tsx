@@ -3,7 +3,7 @@ import React from 'react'
 import { GITHUB_ACTION_SETUP_DOCS_URL } from '@claude-code/agent/constants/github-app.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { Warning } from '@claude-code/command-runtime/commands/install-github-app/types.js'
+import type { Warning } from './types.js'
 
 interface WarningsStepProps {
   warnings: Warning[]

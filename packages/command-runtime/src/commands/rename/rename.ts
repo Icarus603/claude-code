@@ -16,7 +16,7 @@ import {
   saveCustomTitle,
 } from '@claude-code/storage/sessionStorage.js'
 import { isTeammate } from '@claude-code/swarm/teammateState.js'
-import { generateSessionName } from '@claude-code/command-runtime/commands/rename/generateSessionName.js'
+import { generateSessionName } from './generateSessionName.js'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,

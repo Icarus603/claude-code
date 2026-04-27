@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const mcp = {
   type: 'local-jsx',
@@ -6,7 +6,7 @@ const mcp = {
   description: 'Manage MCP servers',
   immediate: true,
   argumentHint: '[enable|disable [server-name]]',
-  load: () => import('@claude-code/command-runtime/commands/mcp/mcp.js'),
+  load: () => import('./mcp.js'),
 } satisfies Command
 
 export default mcp

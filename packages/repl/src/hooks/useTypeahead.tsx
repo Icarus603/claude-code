@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../notifications.js'
 import { Text } from '@anthropic/ink'
 import { logEvent } from '@claude-code/local-observability'
 import { useDebounceCallback } from 'usehooks-ts'
@@ -8,15 +8,15 @@ import { type Command, getCommandName } from '@claude-code/command-runtime/runti
 import {
   getModeFromInput,
   getValueFromInput,
-} from '@claude-code/repl/components/PromptInput/inputModes.js'
+} from '../components/PromptInput/inputModes.js'
 import type {
   SuggestionItem,
   SuggestionType,
-} from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
+} from '../components/PromptInput/PromptInputFooterSuggestions.js'
 import {
   useIsModalOverlayActive,
   useRegisterOverlay,
-} from '@claude-code/repl/overlayContext.js'
+} from '../overlayContext.js'
 import { KeyboardEvent, useInput } from '@anthropic/ink'
 // backward-compat bridge until consumers wire handleKeyDown to <Box onKeyDown>
 import {
@@ -24,13 +24,13 @@ import {
   useRegisterKeybindingContext,
 } from '@anthropic/ink/keybindings'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
-import { useAppState, useAppStateStore } from '@claude-code/repl/appStateHooks.js'
+import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
+import { useAppState, useAppStateStore } from '../appStateHooks.js'
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type {
   InlineGhostText,
   PromptInputMode,
-} from '@claude-code/repl/textInputTypes.js'
+} from '../textInputTypes.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
   generateProgressiveArgumentHint,
@@ -51,17 +51,17 @@ import {
   generateCommandSuggestions,
   getBestCommandMatch,
   isCommandInput,
-} from '@claude-code/repl/suggestions/commandSuggestions.js'
+} from '../suggestions/commandSuggestions.js'
 import {
   getDirectoryCompletions,
   getPathCompletions,
   isPathLikeToken,
-} from '@claude-code/repl/utils/suggestions/directoryCompletion.js'
-import { getShellHistoryCompletion } from '@claude-code/repl/suggestions/shellHistoryCompletion.js'
+} from '../utils/suggestions/directoryCompletion.js'
+import { getShellHistoryCompletion } from '../suggestions/shellHistoryCompletion.js'
 import {
   getSlackChannelSuggestions,
   hasSlackMcpServer,
-} from '@claude-code/repl/suggestions/slackChannelSuggestions.js'
+} from '../suggestions/slackChannelSuggestions.js'
 import { TEAM_LEAD_NAME } from '@claude-code/swarm'
 import {
   applyFileSuggestion,

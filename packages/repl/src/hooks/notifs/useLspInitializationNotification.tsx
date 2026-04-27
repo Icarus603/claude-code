@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useInterval } from 'usehooks-ts'
 import { getIsRemoteMode, getIsScrollDraining } from '@claude-code/app-host/bootstrap/state.js'
-import { useNotifications } from '@claude-code/repl/notifications.js'
+import { useNotifications } from '../../notifications.js'
 import { Text } from '@anthropic/ink'
 import {
   getInitializationStatus,
   getLspServerManager,
 } from '@claude-code/ide/lsp/manager.js'
-import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useSetAppState } from '../../appStateHooks.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 

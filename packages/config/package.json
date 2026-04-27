@@ -117,6 +117,8 @@
     "./settings/core/settings.js": "./settings/core/settings.ts",
     "./settings/core/types.js": "./settings/core/types.ts",
     "./settings/core/changeDetector.js": "./settings/core/changeDetector.ts",
-    "./settings/core/constants.js": "./settings/core/constants.ts"
+    "./settings/core/constants.js": "./settings/core/constants.ts",
+    "./contracts": "./contracts.ts",
+    "./errors": "./errors.ts"
   }
 }

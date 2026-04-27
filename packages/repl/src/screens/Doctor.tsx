@@ -8,22 +8,22 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { KeybindingWarnings } from '@claude-code/repl/components/KeybindingWarnings.js'
-import { McpParsingWarnings } from '@claude-code/repl/components/mcp/McpParsingWarnings.js'
+import { KeybindingWarnings } from '../components/KeybindingWarnings.js'
+import { McpParsingWarnings } from '../components/mcp/McpParsingWarnings.js'
 import { getModelMaxOutputTokens } from '@claude-code/agent/context.js'
 import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import type { SettingSource } from '@claude-code/config/constants'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
 import { Pane } from '@anthropic/ink'
-import { PressEnterToContinue } from '@claude-code/repl/components/PressEnterToContinue.js'
-import { SandboxDoctorSection } from '@claude-code/repl/components/sandbox/SandboxDoctorSection.js'
-import { ValidationErrorsList } from '@claude-code/repl/components/ValidationErrorsList.js'
-import { useSettingsErrors } from '@claude-code/repl/hooks/notifs/useSettingsErrors.js'
-import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { PressEnterToContinue } from '../components/PressEnterToContinue.js'
+import { SandboxDoctorSection } from '../components/sandbox/SandboxDoctorSection.js'
+import { ValidationErrorsList } from '../components/ValidationErrorsList.js'
+import { useSettingsErrors } from '../hooks/notifs/useSettingsErrors.js'
+import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../appStateHooks.js'
 import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
 import {
   getGcsDistTags,
@@ -33,11 +33,11 @@ import {
 import {
   type ContextWarnings,
   checkContextWarnings,
-} from '@claude-code/repl/diagnostics/doctorContextWarnings.js'
+} from '../diagnostics/doctorContextWarnings.js'
 import {
   type DiagnosticInfo,
   getDoctorDiagnostic,
-} from '@claude-code/repl/doctorDiagnostic.js'
+} from '../doctorDiagnostic.js'
 import { validateBoundedIntEnvVar } from '@claude-code/config/env/validation'
 import { pathExists } from '@claude-code/storage/file.js'
 import {

@@ -4,7 +4,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import type { TeleportRemoteResponse } from '@claude-code/repl/conversationRecovery.js'
+import type { TeleportRemoteResponse } from '../conversationRecovery.js'
 import type { CodeSession } from '@claude-code/teleport/api.js'
 import { errorMessage, TeleportOperationError } from '@claude-code/local-observability/errorHelpers.js'
 import { teleportResumeCodeSession } from '@claude-code/tool-registry/teleport.js'

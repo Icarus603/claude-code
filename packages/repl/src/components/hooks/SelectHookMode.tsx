@@ -7,13 +7,13 @@
  */
 import * as React from 'react'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import type { HookEventMetadata } from '@claude-code/repl/hooksConfigManager.js'
+import type { HookEventMetadata } from '../../hooksConfigManager.js'
 import { Box, Text } from '@anthropic/ink'
 import {
   getHookDisplayText,
   hookSourceHeaderDisplayString,
   type IndividualHookConfig,
-} from '@claude-code/repl/hooksSettings.js'
+} from '../../hooksSettings.js'
 import { Select } from '../CustomSelect/select.js'
 import { Dialog } from '@anthropic/ink'
 

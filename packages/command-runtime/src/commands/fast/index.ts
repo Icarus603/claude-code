@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import {
   FAST_MODE_MODEL_DISPLAY,
   isFastModeEnabled,
@@ -20,7 +20,7 @@ const fast = {
   get immediate() {
     return shouldInferenceConfigCommandBeImmediate()
   },
-  load: () => import('@claude-code/command-runtime/commands/fast/fast.js'),
+  load: () => import('./fast.js'),
 } satisfies Command
 
 export default fast

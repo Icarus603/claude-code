@@ -4,14 +4,14 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   type Notification,
   useNotifications,
-} from '@claude-code/repl/notifications.js'
+} from '../../notifications.js'
 import { logEvent } from '@claude-code/local-observability'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../../appStateHooks.js'
 import { useVoiceState } from '@claude-code/voice/voiceContext.js'
-import type { VerificationStatus } from '@claude-code/repl/hooks/useApiKeyVerification.js'
+import type { VerificationStatus } from '../../hooks/useApiKeyVerification.js'
 import { useIdeConnectionStatus } from '@claude-code/ide/hooks/useIdeConnectionStatus.js'
 import type { IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js'
-import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js'
+import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { useVoiceEnabled } from '@claude-code/voice/hooks/useVoiceEnabled.js'
 import { Box, Text } from '@anthropic/ink'
 import { useClaudeAiLimits } from '@claude-code/provider/claudeAiLimitsHook.js'

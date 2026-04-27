@@ -1,6 +1,6 @@
 import { type FSWatcher, watch } from 'fs'
 import { useEffect, useSyncExternalStore } from 'react'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../appStateHooks.js'
 import { createSignal } from '@claude-code/config/signal'
 import type { Task } from '@claude-code/agent/tasks.js'
 import {

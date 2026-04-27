@@ -1,4 +1,4 @@
-import { useAppState, useAppStateStore, useSetAppState } from "@claude-code/repl/appStateHooks.js";
+import { useAppState, useAppStateStore, useSetAppState } from "../../appStateHooks.js";
 import { selectElicitation, selectMcp } from '@claude-code/app-host/state/mcpSelectors.js';
 import {
 	selectPendingSandboxRequest,

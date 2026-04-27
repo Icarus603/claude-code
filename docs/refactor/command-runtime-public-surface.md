@@ -1,0 +1,135 @@
+# @claude-code/command-runtime — exports audit
+
+**Total**: 123  |  Public: 58  |  Internal-only: 0  |  Dead: 65
+
+## Truly dead
+
+- `./contracts` -> `./src/contracts.ts`
+- `./errors` -> `./src/errors.ts`
+- `./testing` -> `./src/testing/index.ts`
+- `./commands/skills/skills.js` -> `./src/commands/skills/skills.tsx`
+- `./commands/plugin/PluginOptionsDialog.js` -> `./src/commands/plugin/PluginOptionsDialog.tsx`
+- `./commands/plugin/DiscoverPlugins.js` -> `./src/commands/plugin/DiscoverPlugins.tsx`
+- `./commands/plugin/PluginOptionsFlow.js` -> `./src/commands/plugin/PluginOptionsFlow.tsx`
+- `./commands/plugin/PluginSettings.js` -> `./src/commands/plugin/PluginSettings.tsx`
+- `./commands/plugin/ManagePlugins.js` -> `./src/commands/plugin/ManagePlugins.tsx`
+- `./commands/plugin/ValidatePlugin.js` -> `./src/commands/plugin/ValidatePlugin.tsx`
+- `./commands/plugin/PluginErrors.js` -> `./src/commands/plugin/PluginErrors.tsx`
+- `./commands/plugin/plugin.js` -> `./src/commands/plugin/plugin.tsx`
+- `./commands/plugin/types.js` -> `./src/commands/plugin/types.ts`
+- `./commands/plugin/pluginDetailsHelpers.js` -> `./src/commands/plugin/pluginDetailsHelpers.tsx`
+- `./commands/plugin/ManageMarketplaces.js` -> `./src/commands/plugin/ManageMarketplaces.tsx`
+- `./commands/plugin/UnifiedInstalledCell.js` -> `./src/commands/plugin/UnifiedInstalledCell.tsx`
+- `./commands/plugin/AddMarketplace.js` -> `./src/commands/plugin/AddMarketplace.tsx`
+- `./commands/plugin/PluginTrustWarning.js` -> `./src/commands/plugin/PluginTrustWarning.tsx`
+- `./commands/plugin/BrowseMarketplace.js` -> `./src/commands/plugin/BrowseMarketplace.tsx`
+- `./commands/plugin/unifiedTypes.js` -> `./src/commands/plugin/unifiedTypes.ts`
+- `./commands/plugin/usePagination.js` -> `./src/commands/plugin/usePagination.ts`
+- `./commands/install-github-app/CheckExistingSecretStep.js` -> `./src/commands/install-github-app/CheckExistingSecretStep.tsx`
+- `./commands/install-github-app/CreatingStep.js` -> `./src/commands/install-github-app/CreatingStep.tsx`
+- `./commands/install-github-app/ErrorStep.js` -> `./src/commands/install-github-app/ErrorStep.tsx`
+- `./commands/install-github-app/ExistingWorkflowStep.js` -> `./src/commands/install-github-app/ExistingWorkflowStep.tsx`
+- `./commands/install-github-app/OAuthFlowStep.js` -> `./src/commands/install-github-app/OAuthFlowStep.tsx`
+- `./commands/install-github-app/ChooseRepoStep.js` -> `./src/commands/install-github-app/ChooseRepoStep.tsx`
+- `./commands/install-github-app/InstallAppStep.js` -> `./src/commands/install-github-app/InstallAppStep.tsx`
+- `./commands/install-github-app/ApiKeyStep.js` -> `./src/commands/install-github-app/ApiKeyStep.tsx`
+- `./commands/install-github-app/CheckGitHubStep.js` -> `./src/commands/install-github-app/CheckGitHubStep.tsx`
+- `./commands/install-github-app/setupGitHubActions.js` -> `./src/commands/install-github-app/setupGitHubActions.ts`
+- `./commands/install-github-app/SuccessStep.js` -> `./src/commands/install-github-app/SuccessStep.tsx`
+- `./commands/install-github-app/install-github-app.js` -> `./src/commands/install-github-app/install-github-app.tsx`
+- `./commands/install-github-app/WarningsStep.js` -> `./src/commands/install-github-app/WarningsStep.tsx`
+- `./commands/review/UltrareviewOverageDialog.js` -> `./src/commands/review/UltrareviewOverageDialog.tsx`
+- `./commands/review/ultrareviewCommand.js` -> `./src/commands/review/ultrareviewCommand.tsx`
+- `./commands/review/reviewRemote.js` -> `./src/commands/review/reviewRemote.ts`
+- `./commands/clear/clear.js` -> `./src/commands/clear/clear.ts`
+- `./commands/btw/btw.js` -> `./src/commands/btw/btw.tsx`
+- `./commands/compact/compact.js` -> `./src/commands/compact/compact.ts`
+- `./commands/context/context.js` -> `./src/commands/context/context.tsx`
+- `./commands/copy/copy.js` -> `./src/commands/copy/copy.tsx`
+- `./commands/cost/cost.js` -> `./src/commands/cost/cost.ts`
+- `./commands/effort/effort.js` -> `./src/commands/effort/effort.tsx`
+- `./commands/ide/ide.js` -> `./src/commands/ide/ide.tsx`
+- `./commands/mcp/xaaIdpCommand.js` -> `./src/commands/mcp/xaaIdpCommand.ts`
+- `./commands/mcp/mcp.js` -> `./src/commands/mcp/mcp.tsx`
+- `./commands/mcp/addCommand.js` -> `./src/commands/mcp/addCommand.ts`
+- `./commands/memory/memory.js` -> `./src/commands/memory/memory.tsx`
+- `./commands/rename/rename.js` -> `./src/commands/rename/rename.ts`
+- `./commands/rename/generateSessionName.js` -> `./src/commands/rename/generateSessionName.ts`
+- `./commands/resume/resume.js` -> `./src/commands/resume/resume.tsx`
+- `./commands/session/session.js` -> `./src/commands/session/session.tsx`
+- `./commands/status/status.js` -> `./src/commands/status/status.tsx`
+- `./commands/theme/theme.js` -> `./src/commands/theme/theme.tsx`
+- `./commands/upgrade/upgrade.js` -> `./src/commands/upgrade/upgrade.tsx`
+- `./commands/voice/voice.js` -> `./src/commands/voice/voice.ts`
+- `./commands/chrome/chrome.js` -> `./src/commands/chrome/chrome.tsx`
+- `./commands/bridge/bridge.js` -> `./src/commands/bridge/bridge.tsx`
+- `./commands/bridge/index.js` -> `./src/commands/bridge/index.ts`
+- `./commands/privacy-settings/privacy-settings.js` -> `./src/commands/privacy-settings/privacy-settings.tsx`
+- `./commands/rate-limit-options/rate-limit-options.js` -> `./src/commands/rate-limit-options/rate-limit-options.tsx`
+- `./commands/remote-env/remote-env.js` -> `./src/commands/remote-env/remote-env.tsx`
+- `./commands/remoteControlServer/remoteControlServer.js` -> `./src/commands/remoteControlServer/remoteControlServer.tsx`
+- `./commands/extra-usage/extra-usage-core.js` -> `./src/commands/extra-usage/extra-usage-core.ts`
+
+## Internal-only
+
+
+## Public surface
+
+- `./runtime` (ext=130, int=0) -> `./src/runtime.ts`
+- `./xml.js` (ext=30, int=0) -> `./src/xml.ts`
+- `./skills/*.js` (ext=13, int=0) -> `./src/skills/*.ts`
+- `./promptShellExecution.js` (ext=4, int=0) -> `./src/promptShellExecution.ts`
+- `./types` (ext=3, int=0) -> `./src/types.ts`
+- `./skills/featureCheck` (ext=3, int=0) -> `./src/skills/featureCheck.ts`
+- `./argumentSubstitution.js` (ext=3, int=0) -> `./src/argumentSubstitution.ts`
+- `./slashCommandParsing.js` (ext=2, int=0) -> `./src/slashCommandParsing.ts`
+- `./exampleCommands.js` (ext=2, int=0) -> `./src/exampleCommands.ts`
+- `./gitignore.js` (ext=2, int=0) -> `./src/gitignore.ts`
+- `./createMovedToPluginCommand.js` (ext=2, int=0) -> `./src/createMovedToPluginCommand.ts`
+- `./commands/login/index.js` (ext=2, int=0) -> `./src/commands/login/index.ts`
+- `./commands/model/index.js` (ext=2, int=0) -> `./src/commands/model/index.ts`
+- `./commands/review/review.js` (ext=2, int=0) -> `./src/commands/review/review.ts`
+- `./commands/clear/conversation.js` (ext=2, int=0) -> `./src/commands/clear/conversation.ts`
+- `.` (ext=1, int=0) -> `./src/index.ts`
+- `./stubs/stubCommand.js` (ext=1, int=0) -> `./src/stubs/stubCommand.ts`
+- `./commands/skills/index.js` (ext=1, int=0) -> `./src/commands/skills/index.ts`
+- `./commands/login/login.js` (ext=1, int=0) -> `./src/commands/login/login.tsx`
+- `./commands/model/model.js` (ext=1, int=0) -> `./src/commands/model/model.tsx`
+- `./stubs/emptyCommandStub.js` (ext=1, int=0) -> `./src/stubs/emptyCommandStub.ts`
+- `./stubs/resetLimitsStub.js` (ext=1, int=0) -> `./src/stubs/resetLimitsStub.ts`
+- `./commands/plugin/index.js` (ext=1, int=0) -> `./src/commands/plugin/index.tsx`
+- `./commands/plugin/parseArgs.js` (ext=1, int=0) -> `./src/commands/plugin/parseArgs.ts`
+- `./commands/install-github-app/types.js` (ext=1, int=0) -> `./src/commands/install-github-app/types.ts`
+- `./commands/install-github-app/index.js` (ext=1, int=0) -> `./src/commands/install-github-app/index.ts`
+- `./commands/insights/insights.js` (ext=1, int=0) -> `./src/commands/insights/insights.ts`
+- `./commands/install/install.js` (ext=1, int=0) -> `./src/commands/install/install.tsx`
+- `./commands/review/ultrareviewEnabled.js` (ext=1, int=0) -> `./src/commands/review/ultrareviewEnabled.ts`
+- `./commands/clear/index.js` (ext=1, int=0) -> `./src/commands/clear/index.ts`
+- `./commands/clear/caches.js` (ext=1, int=0) -> `./src/commands/clear/caches.ts`
+- `./commands/btw/index.js` (ext=1, int=0) -> `./src/commands/btw/index.ts`
+- `./commands/compact/index.js` (ext=1, int=0) -> `./src/commands/compact/index.ts`
+- `./commands/context/index.js` (ext=1, int=0) -> `./src/commands/context/index.ts`
+- `./commands/context/context-noninteractive.js` (ext=1, int=0) -> `./src/commands/context/context-noninteractive.ts`
+- `./commands/copy/index.js` (ext=1, int=0) -> `./src/commands/copy/index.ts`
+- `./commands/cost/index.js` (ext=1, int=0) -> `./src/commands/cost/index.ts`
+- `./commands/effort/index.js` (ext=1, int=0) -> `./src/commands/effort/index.ts`
+- `./commands/fast/index.js` (ext=1, int=0) -> `./src/commands/fast/index.ts`
+- `./commands/fast/fast.js` (ext=1, int=0) -> `./src/commands/fast/fast.tsx`
+- `./commands/ide/index.js` (ext=1, int=0) -> `./src/commands/ide/index.ts`
+- `./commands/mcp/index.js` (ext=1, int=0) -> `./src/commands/mcp/index.ts`
+- `./commands/memory/index.js` (ext=1, int=0) -> `./src/commands/memory/index.ts`
+- `./commands/rename/index.js` (ext=1, int=0) -> `./src/commands/rename/index.ts`
+- `./commands/resume/index.js` (ext=1, int=0) -> `./src/commands/resume/index.ts`
+- `./commands/session/index.js` (ext=1, int=0) -> `./src/commands/session/index.ts`
+- `./commands/status/index.js` (ext=1, int=0) -> `./src/commands/status/index.ts`
+- `./commands/theme/index.js` (ext=1, int=0) -> `./src/commands/theme/index.ts`
+- `./commands/upgrade/index.js` (ext=1, int=0) -> `./src/commands/upgrade/index.ts`
+- `./commands/voice/index.js` (ext=1, int=0) -> `./src/commands/voice/index.ts`
+- `./commands/chrome/index.js` (ext=1, int=0) -> `./src/commands/chrome/index.ts`
+- `./commands/privacy-settings/index.js` (ext=1, int=0) -> `./src/commands/privacy-settings/index.ts`
+- `./commands/rate-limit-options/index.js` (ext=1, int=0) -> `./src/commands/rate-limit-options/index.ts`
+- `./commands/remote-env/index.js` (ext=1, int=0) -> `./src/commands/remote-env/index.ts`
+- `./commands/remoteControlServer/index.js` (ext=1, int=0) -> `./src/commands/remoteControlServer/index.ts`
+- `./commands/terminalSetup/index.js` (ext=1, int=0) -> `./src/commands/terminalSetup/index.ts`
+- `./commands/extra-usage/extra-usage.js` (ext=1, int=0) -> `./src/commands/extra-usage/extra-usage.tsx`
+- `./commands/extra-usage/extra-usage-noninteractive.js` (ext=1, int=0) -> `./src/commands/extra-usage/extra-usage-noninteractive.ts`

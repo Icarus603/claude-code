@@ -24,15 +24,15 @@ import {
   getSettingsForSource,
   updateSettingsForSource,
 } from '@claude-code/config/settings'
-import { AddMarketplace } from '@claude-code/command-runtime/commands/plugin/AddMarketplace.js'
-import { BrowseMarketplace } from '@claude-code/command-runtime/commands/plugin/BrowseMarketplace.js'
-import { DiscoverPlugins } from '@claude-code/command-runtime/commands/plugin/DiscoverPlugins.js'
-import { ManageMarketplaces } from '@claude-code/command-runtime/commands/plugin/ManageMarketplaces.js'
-import { ManagePlugins } from '@claude-code/command-runtime/commands/plugin/ManagePlugins.js'
-import { formatErrorMessage, getErrorGuidance } from '@claude-code/command-runtime/commands/plugin/PluginErrors.js'
-import { type ParsedCommand, parsePluginArgs } from '@claude-code/command-runtime/commands/plugin/parseArgs.js'
-import type { PluginSettingsProps, ViewState } from '@claude-code/command-runtime/commands/plugin/types.js'
-import { ValidatePlugin } from '@claude-code/command-runtime/commands/plugin/ValidatePlugin.js'
+import { AddMarketplace } from './AddMarketplace.js'
+import { BrowseMarketplace } from './BrowseMarketplace.js'
+import { DiscoverPlugins } from './DiscoverPlugins.js'
+import { ManageMarketplaces } from './ManageMarketplaces.js'
+import { ManagePlugins } from './ManagePlugins.js'
+import { formatErrorMessage, getErrorGuidance } from './PluginErrors.js'
+import { type ParsedCommand, parsePluginArgs } from './parseArgs.js'
+import type { PluginSettingsProps, ViewState } from './types.js'
+import { ValidatePlugin } from './ValidatePlugin.js'
 
 type TabId = 'discover' | 'installed' | 'marketplaces' | 'errors'
 

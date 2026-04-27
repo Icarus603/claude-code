@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js'
 import { basename } from 'path'
-import type { SuggestionItem } from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
+import type { SuggestionItem } from '../components/PromptInput/PromptInputFooterSuggestions.js'
 import { generateFileSuggestions } from './fileSuggestions.js'
 import type { ServerResource } from '@claude-code/mcp-runtime/types.js'
 import { getAgentColor } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'

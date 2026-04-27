@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import { isBridgeEnabled } from '@claude-code/bridge/bridgeEnabled.js'
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 function isEnabled(): boolean {
   if (!feature('BRIDGE_MODE')) {
@@ -20,7 +20,7 @@ const bridge = {
     return !isEnabled()
   },
   immediate: true,
-  load: () => import('@claude-code/command-runtime/commands/bridge/bridge.js'),
+  load: () => import('./bridge.js'),
 } satisfies Command
 
 export default bridge

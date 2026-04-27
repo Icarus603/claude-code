@@ -5,13 +5,13 @@ import '@claude-code/tool-registry/runtime'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
 import { TEAMMATE_MESSAGE_TAG } from '@claude-code/command-runtime/xml.js'
 import { useTerminalNotification } from '@anthropic/ink'
-import { sendNotification } from '@claude-code/repl/notifier.js'
+import { sendNotification } from '../notifier.js'
 import {
   type AppState,
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from '@claude-code/repl/appStateHooks.js'
+} from '../appStateHooks.js'
 import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
 import { getAllBaseTools } from '@claude-code/tool-registry'

@@ -12,17 +12,17 @@ import React, {
   useSyncExternalStore,
 } from 'react'
 import { fileURLToPath } from 'url'
-import { ModalContext } from '@claude-code/repl/modalContext.js'
+import { ModalContext } from '../modalContext.js'
 import {
   PromptOverlayProvider,
   usePromptOverlay,
   usePromptOverlayDialog,
-} from '@claude-code/repl/promptOverlayContext.js'
+} from '../promptOverlayContext.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { Box, ScrollBox, type ScrollBoxHandle, Text, instances } from '@anthropic/ink'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { openBrowser, openPath } from '@claude-code/storage/browser.js'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+import { isFullscreenEnvEnabled } from '../fullscreen.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { isNullRenderingAttachment } from './messages/nullRenderingAttachments.js'
 import PromptInputFooterSuggestions from './PromptInput/PromptInputFooterSuggestions.js'

@@ -3,10 +3,10 @@ import { dirname } from 'path'
 import {
   getKeybindingsPath,
   isKeybindingCustomizationEnabled,
-} from '@claude-code/repl/keybindings/loadUserBindings.js'
-import { generateKeybindingsTemplate } from '@claude-code/repl/keybindings/template.js'
+} from '../../keybindings/loadUserBindings.js'
+import { generateKeybindingsTemplate } from '../../keybindings/template.js'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
-import { editFileInEditor } from '@claude-code/repl/promptEditor.js'
+import { editFileInEditor } from '../../promptEditor.js'
 
 export async function call(): Promise<{ type: 'text'; value: string }> {
   if (!isKeybindingCustomizationEnabled()) {

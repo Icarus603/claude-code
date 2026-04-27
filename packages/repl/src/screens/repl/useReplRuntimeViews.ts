@@ -1,9 +1,9 @@
 import type { RuntimeGraph } from '@claude-code/app-host'
 import { useEffect, useMemo, useSyncExternalStore } from 'react'
 import type { Command } from '@claude-code/command-runtime/runtime'
-import { useMergedClients } from '@claude-code/repl/hooks/useMergedClients.js'
-import { useMergedCommands } from '@claude-code/repl/hooks/useMergedCommands.js'
-import { useMergedTools } from '@claude-code/repl/hooks/useMergedTools.js'
+import { useMergedClients } from '../../hooks/useMergedClients.js'
+import { useMergedCommands } from '../../hooks/useMergedCommands.js'
+import { useMergedTools } from '../../hooks/useMergedTools.js'
 import type {
   MCPServerConnection,
   ServerResource,

@@ -15,11 +15,11 @@ import React, {
 } from 'react'
 import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
 import { useTerminalSize } from '@anthropic/ink'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../../appStateHooks.js'
 import {
   enterTeammateView,
   exitTeammateView,
-} from '@claude-code/repl/teammateViewHelpers.js'
+} from '../../teammateViewHelpers.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import {
   DreamTask,
@@ -27,7 +27,7 @@ import {
 } from '@claude-code/agent/tasks/DreamTask/DreamTask.js'
 import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import { LocalAgentTask } from '@claude-code/agent/localAgentTask.js'
-import type { LocalShellTaskState } from '@claude-code/repl/localShellTaskGuards.js'
+import type { LocalShellTaskState } from '../../localShellTaskGuards.js'
 import { LocalShellTask } from '@claude-code/agent/tasks/LocalShellTask.js'
 // Type import is erased at build time — safe even though module is ant-gated.
 import type { LocalWorkflowTaskState } from '@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
@@ -40,16 +40,16 @@ import {
   type BackgroundTaskState,
   isBackgroundTask,
   type TaskState,
-} from '@claude-code/repl/tasksTypes.js'
+} from '../../tasksTypes.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { intersperse } from '@claude-code/tool-registry/utils/array.js'
-import { stopUltraplan } from '@claude-code/repl/ultraplan.js'
+import { stopUltraplan } from '../../ultraplan.js'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
-import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
-import type { ExitState } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useRegisterOverlay } from '../../overlayContext.js'
+import type { ExitState } from '../../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { AsyncAgentDetailDialog } from './AsyncAgentDetailDialog.js'

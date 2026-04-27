@@ -2,7 +2,7 @@ import {
   expandPastedTextRefs,
   formatPastedTextRef,
   getPastedTextRefNumLines,
-} from '@claude-code/repl/history.js'
+} from './history.js'
 import { instances } from '@anthropic/ink'
 import type { PastedContent } from '@claude-code/config'
 import { classifyGuiEditor, getExternalEditor } from '@claude-code/storage/editor.js'

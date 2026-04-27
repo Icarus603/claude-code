@@ -3,7 +3,7 @@ import type {
   KeybindingAction,
   KeybindingContextName,
 } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import { KeyboardShortcutHint } from '@anthropic/ink'
 
 type Props = {

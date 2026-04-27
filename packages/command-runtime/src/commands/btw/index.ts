@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const btw = {
   type: 'local-jsx',
@@ -7,7 +7,7 @@ const btw = {
     'Ask a quick side question without interrupting the main conversation',
   immediate: true,
   argumentHint: '<question>',
-  load: () => import('@claude-code/command-runtime/commands/btw/btw.js'),
+  load: () => import('./btw.js'),
 } satisfies Command
 
 export default btw

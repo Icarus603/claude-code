@@ -11,22 +11,22 @@ import {
   useAppState,
   useAppStateStore,
   useSetAppState,
-} from '@claude-code/repl/appStateHooks.js'
-import { isVimModeEnabled } from '@claude-code/repl/components/PromptInput/utils.js'
+} from '../appStateHooks.js'
+import { isVimModeEnabled } from '../components/PromptInput/utils.js'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
-import type { SpinnerMode } from '@claude-code/repl/components/Spinner/types.js'
-import { useNotifications } from '@claude-code/repl/notifications.js'
-import { useIsOverlayActive } from '@claude-code/repl/overlayContext.js'
+import type { SpinnerMode } from '../components/Spinner/types.js'
+import { useNotifications } from '../notifications.js'
+import { useIsOverlayActive } from '../overlayContext.js'
 import { useCommandQueue } from './useCommandQueue.js'
-import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js'
+import { getShortcutDisplay } from '../keybindings/shortcutFormat.js'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import type { Screen } from '@claude-code/repl/screens/REPL.js'
-import { exitTeammateView } from '@claude-code/repl/teammateViewHelpers.js'
+import type { Screen } from '../screens/REPL.js'
+import { exitTeammateView } from '../teammateViewHelpers.js'
 import {
   killAllRunningAgentTasks,
   markAgentsNotified,
 } from '@claude-code/agent/localAgentTask.js'
-import type { PromptInputMode, VimMode } from '@claude-code/repl/textInputTypes.js'
+import type { PromptInputMode, VimMode } from '../textInputTypes.js'
 import {
   clearCommandQueue,
   enqueuePendingNotification,

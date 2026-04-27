@@ -3,7 +3,7 @@ import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import {
   type Notification,
   useNotifications,
-} from '@claude-code/repl/notifications.js'
+} from '../../notifications.js'
 import { logError } from '@claude-code/local-observability/logging'
 
 type Result = Notification | Notification[] | null | any

@@ -40,7 +40,7 @@ import {
   INTERRUPT_MESSAGE_FOR_TOOL_USE,
 } from '@claude-code/agent/messages.js'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
-import { extractReadFilesFromMessages } from '@claude-code/repl/queryHelpers.js'
+import { extractReadFilesFromMessages } from './queryHelpers.js'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
@@ -51,7 +51,7 @@ import {
   getSuggestionSuppressReason,
   logSuggestionSuppressed,
   shouldFilterSuggestion,
-} from '@claude-code/repl/promptSuggestion.js'
+} from './promptSuggestion.js'
 
 const MAX_SPECULATION_TURNS = 20
 const MAX_SPECULATION_MESSAGES = 100

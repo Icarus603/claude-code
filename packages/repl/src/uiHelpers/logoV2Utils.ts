@@ -1,6 +1,6 @@
 import { getDirectConnectServerUrl, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { stringWidth } from '@anthropic/ink'
-import type { LogOption } from '@claude-code/repl/replTypes/logs.js'
+import type { LogOption } from '../replTypes/logs.js'
 import { getSubscriptionName, isClaudeAISubscriber } from '@claude-code/provider/authAlias.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
@@ -9,7 +9,7 @@ import {
   truncateToWidth,
   truncateToWidthNoEllipsis,
 } from '@claude-code/output/formatters'
-import { getStoredChangelogFromMemory, parseChangelog } from '@claude-code/repl/releaseNotes.js'
+import { getStoredChangelogFromMemory, parseChangelog } from '../releaseNotes.js'
 import { gt } from '@claude-code/config/semver'
 import { loadMessageLogs } from '@claude-code/storage/sessionStorage.js'
 import { getInitialSettings } from '@claude-code/config/settings/core/settings.js'

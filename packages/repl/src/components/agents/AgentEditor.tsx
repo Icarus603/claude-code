@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import figures from 'figures'
 import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
-import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useSetAppState } from '../../appStateHooks.js'
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
@@ -16,7 +16,7 @@ import {
   isCustomAgent,
   isPluginAgent,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
-import { editFileInEditor } from '@claude-code/repl/promptEditor.js'
+import { editFileInEditor } from '../../promptEditor.js'
 import { getActualAgentFilePath, updateAgentFile } from './agentFileUtils.js'
 import { ColorPicker } from './ColorPicker.js'
 import { ModelSelector } from './ModelSelector.js'

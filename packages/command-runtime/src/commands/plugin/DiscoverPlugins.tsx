@@ -40,15 +40,15 @@ import { truncateToWidth } from '@claude-code/output/formatters/truncate.js'
 import {
   findPluginOptionsTarget,
   PluginOptionsFlow,
-} from '@claude-code/command-runtime/commands/plugin/PluginOptionsFlow.js'
-import { PluginTrustWarning } from '@claude-code/command-runtime/commands/plugin/PluginTrustWarning.js'
+} from './PluginOptionsFlow.js'
+import { PluginTrustWarning } from './PluginTrustWarning.js'
 import {
   buildPluginDetailsMenuOptions,
   extractGitHubRepo,
   type InstallablePlugin,
-} from '@claude-code/command-runtime/commands/plugin/pluginDetailsHelpers.js'
-import type { ViewState as ParentViewState } from '@claude-code/command-runtime/commands/plugin/types.js'
-import { usePagination } from '@claude-code/command-runtime/commands/plugin/usePagination.js'
+} from './pluginDetailsHelpers.js'
+import type { ViewState as ParentViewState } from './types.js'
+import { usePagination } from './usePagination.js'
 
 type Props = {
   error: string | null

@@ -8,8 +8,8 @@ import {
   checkOverageGate,
   confirmOverage,
   launchRemoteReview,
-} from '@claude-code/command-runtime/commands/review/reviewRemote.js'
-import { UltrareviewOverageDialog } from '@claude-code/command-runtime/commands/review/UltrareviewOverageDialog.js'
+} from './reviewRemote.js'
+import { UltrareviewOverageDialog } from './UltrareviewOverageDialog.js'
 
 function contentBlocksToString(blocks: ContentBlockParam[]): string {
   return blocks

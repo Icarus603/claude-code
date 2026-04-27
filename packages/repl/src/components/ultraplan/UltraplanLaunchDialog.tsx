@@ -2,9 +2,9 @@ import * as React from 'react';
 import { Box, Text, Link } from '@anthropic/ink';
 import { Select } from '../CustomSelect/select.js';
 import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js';
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js';
+import { useAppState, useSetAppState } from '../../appStateHooks.js';
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config';
-import { CCR_TERMS_URL } from '@claude-code/repl/ultraplan.js';
+import { CCR_TERMS_URL } from '../../ultraplan.js';
 
 // ---------------------------------------------------------------------------
 // Types

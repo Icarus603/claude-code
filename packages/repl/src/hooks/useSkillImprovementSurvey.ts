@@ -1,14 +1,14 @@
 import { useCallback, useRef, useState } from 'react'
-import type { FeedbackSurveyResponse } from '@claude-code/repl/components/FeedbackSurvey/utils.js'
+import type { FeedbackSurveyResponse } from '../components/FeedbackSurvey/utils.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useSetAppState } from '../appStateHooks.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type { SkillUpdate } from '@claude-code/repl/skillImprovement.js'
-import { applySkillImprovement } from '@claude-code/repl/skillImprovement.js'
+import type { SkillUpdate } from '../skillImprovement.js'
+import { applySkillImprovement } from '../skillImprovement.js'
 import { createSystemMessage } from '@claude-code/agent/messages.js'
 
 type SkillImprovementSuggestion = {

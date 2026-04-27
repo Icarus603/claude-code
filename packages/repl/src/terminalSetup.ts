@@ -7,7 +7,7 @@ import type { ThemeName } from '@anthropic/ink'
 import { pathToFileURL } from 'url'
 import { supportsHyperlinks } from '@anthropic/ink'
 import { color } from '@anthropic/ink'
-import { maybeMarkProjectOnboardingComplete } from '@claude-code/repl/projectOnboardingState.js'
+import { maybeMarkProjectOnboardingComplete } from './projectOnboardingState.js'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type {
   LocalJSXCommandContext,

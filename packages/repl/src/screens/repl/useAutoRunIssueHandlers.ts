@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import {
   getAutoRunCommand,
   type AutoRunIssueReason,
-} from '@claude-code/repl/diagnostics/autoRunIssue.js'
+} from '../../diagnostics/autoRunIssue.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 

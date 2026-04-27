@@ -22,7 +22,7 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import { currentLimits } from '@claude-code/provider/claudeAiLimits.js'
-import { isSpeculationEnabled, startSpeculation } from '@claude-code/repl/promptSuggestionSpeculation.js'
+import { isSpeculationEnabled, startSpeculation } from './promptSuggestionSpeculation.js'
 
 let currentAbortController: AbortController | null = null
 

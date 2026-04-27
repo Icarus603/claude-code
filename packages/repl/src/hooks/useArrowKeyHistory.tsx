@@ -1,11 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react'
-import { getModeFromInput } from '@claude-code/repl/components/PromptInput/inputModes.js'
-import { useNotifications } from '@claude-code/repl/notifications.js'
-import { ConfigurableShortcutHint } from '@claude-code/repl/components/ConfigurableShortcutHint.js'
-import { FOOTER_TEMPORARY_STATUS_TIMEOUT } from '@claude-code/repl/components/PromptInput/Notifications.js'
-import { getHistory } from '@claude-code/repl/history.js'
+import { getModeFromInput } from '../components/PromptInput/inputModes.js'
+import { useNotifications } from '../notifications.js'
+import { ConfigurableShortcutHint } from '../components/ConfigurableShortcutHint.js'
+import { FOOTER_TEMPORARY_STATUS_TIMEOUT } from '../components/PromptInput/Notifications.js'
+import { getHistory } from '../history.js'
 import { Text } from '@anthropic/ink'
-import type { PromptInputMode } from '@claude-code/repl/textInputTypes.js'
+import type { PromptInputMode } from '../textInputTypes.js'
 import type { HistoryEntry, PastedContent } from '@claude-code/config'
 
 export type HistoryMode = PromptInputMode

@@ -11,18 +11,18 @@
  * directly — there is no terminal attached.
  */
 
-import { parseDeepLink } from '@claude-code/repl/deepLink/parseDeepLink.js'
+import { parseDeepLink } from './parseDeepLink.js'
 import { homedir } from 'os'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   filterExistingPaths,
   getKnownPathsForRepo,
-} from '@claude-code/repl/github/githubRepoPathMapping.js'
+} from '../github/githubRepoPathMapping.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
-import { readLastFetchTime } from '@claude-code/repl/deepLink/banner.js'
+import { readLastFetchTime } from './banner.js'
 
-import { MACOS_BUNDLE_ID } from '@claude-code/repl/deepLink/registerProtocol.js'
-import { launchInTerminal } from '@claude-code/repl/deepLink/terminalLauncher.js'
+import { MACOS_BUNDLE_ID } from './registerProtocol.js'
+import { launchInTerminal } from './terminalLauncher.js'
 
 /**
  * Handle an incoming deep link URI.

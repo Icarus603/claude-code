@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const rename = {
   type: 'local-jsx',
@@ -6,7 +6,7 @@ const rename = {
   description: 'Rename the current conversation',
   immediate: true,
   argumentHint: '[name]',
-  load: () => import('@claude-code/command-runtime/commands/rename/rename.js'),
+  load: () => import('./rename.js'),
 } satisfies Command
 
 export default rename

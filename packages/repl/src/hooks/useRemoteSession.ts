@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { BoundedUUIDSet } from '@claude-code/bridge/bridgeMessaging.js'
 import type { ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js'
-import type { SpinnerMode } from '@claude-code/repl/components/Spinner/types.js'
+import type { SpinnerMode } from '../components/Spinner/types.js'
 import {
   type RemotePermissionResponse,
   type RemoteSessionConfig,
@@ -15,8 +15,8 @@ import {
   convertSDKMessage,
   isSessionEndMessage,
 } from '@claude-code/server/remote/sdkMessageAdapter.js'
-import { useSetAppState } from '@claude-code/repl/appStateHooks.js'
-import type { AppState } from '@claude-code/repl/appStateHooks.js'
+import { useSetAppState } from '../appStateHooks.js'
+import type { AppState } from '../appStateHooks.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 import { findToolByName } from '@claude-code/tool-registry/Tool.js'
 import type { Message as MessageType } from '@claude-code/agent/messageShapes'

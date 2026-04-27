@@ -3,16 +3,16 @@ import figures from 'figures'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useInterval } from 'usehooks-ts'
-import { useRegisterOverlay } from '@claude-code/repl/overlayContext.js'
+import { useRegisterOverlay } from '../../overlayContext.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow dialog navigation
 import { Box, Text, useInput, stringWidth } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js'
 import {
   type AppState,
   useAppState,
   useSetAppState,
-} from '@claude-code/repl/appStateHooks.js'
+} from '../../appStateHooks.js'
 import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 import { AGENT_COLOR_TO_THEME_COLOR } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'

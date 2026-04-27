@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { shouldInferenceConfigCommandBeImmediate } from '@claude-code/shell/immediateCommand.js'
 
 export default {
@@ -9,5 +9,5 @@ export default {
   get immediate() {
     return shouldInferenceConfigCommandBeImmediate()
   },
-  load: () => import('@claude-code/command-runtime/commands/effort/effort.js'),
+  load: () => import('./effort.js'),
 } satisfies Command

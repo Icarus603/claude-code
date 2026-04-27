@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import {
   isVoiceGrowthBookEnabled,
   isVoiceModeEnabled,
@@ -14,7 +14,7 @@ const voice = {
     return !isVoiceModeEnabled()
   },
   supportsNonInteractive: false,
-  load: () => import('@claude-code/command-runtime/commands/voice/voice.js'),
+  load: () => import('./voice.js'),
 } satisfies Command
 
 export default voice

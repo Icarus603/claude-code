@@ -10,7 +10,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../appStateHooks.js'
 import {
   type DiffStats,
   fileHistoryCanRestore,
@@ -18,7 +18,7 @@ import {
   fileHistoryGetDiffStats,
 } from '@claude-code/agent/file-history'
 import { logError } from '@claude-code/local-observability/logging'
-import { useExitOnCtrlCDWithKeybindings } from '@claude-code/repl/hooks/useExitOnCtrlCDWithKeybindings.js'
+import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
 import { Box, Text, Divider } from '@anthropic/ink'
 import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'
 import type {

@@ -26,7 +26,7 @@ import {
   type PluginOptionValues,
   savePluginOptions,
 } from '@claude-code/config/plugin/pluginOptionsStorage'
-import { PluginOptionsDialog } from '@claude-code/command-runtime/commands/plugin/PluginOptionsDialog.js'
+import { PluginOptionsDialog } from './PluginOptionsDialog.js'
 
 /**
  * Post-install lookup: return the LoadedPlugin for the just-installed

@@ -13,9 +13,9 @@
 import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
 import type { HookEvent } from '@claude-code/headless-sdk/agentSdkTypes.js'
-import { useAppState, useAppStateStore } from '@claude-code/repl/appStateHooks.js'
+import { useAppState, useAppStateStore } from '../../appStateHooks.js'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
-import { useSettingsChange } from '@claude-code/repl/hooks/useSettingsChange.js'
+import { useSettingsChange } from '../../hooks/useSettingsChange.js'
 import { Box, Text } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import {
@@ -24,8 +24,8 @@ import {
   getMatcherMetadata,
   getSortedMatchersForEvent,
   groupHooksByEventAndMatcher,
-} from '@claude-code/repl/hooksConfigManager.js'
-import type { IndividualHookConfig } from '@claude-code/repl/hooksSettings.js'
+} from '../../hooksConfigManager.js'
+import type { IndividualHookConfig } from '../../hooksSettings.js'
 import {
   getSettings_DEPRECATED,
   getSettingsForSource,

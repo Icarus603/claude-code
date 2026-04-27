@@ -1,0 +1,628 @@
+# @claude-code/repl — exports audit
+
+**Total**: 616  |  Public: 179  |  Internal-only: 0  |  Dead: 437
+
+## Truly dead
+
+- `.` -> `./src/index.ts`
+- `./contracts` -> `./src/contracts.ts`
+- `./testing` -> `./testing/index.ts`
+- `./hooks/renderPlaceholder.js` -> `./src/hooks/renderPlaceholder.ts`
+- `./hooks/useBackgroundTaskNavigation.js` -> `./src/hooks/useBackgroundTaskNavigation.ts`
+- `./hooks/useFileHistorySnapshotInit.js` -> `./src/hooks/useFileHistorySnapshotInit.ts`
+- `./hooks/useSwarmInitialization.js` -> `./src/hooks/useSwarmInitialization.ts`
+- `./hooks/usePrStatus.js` -> `./src/hooks/usePrStatus.ts`
+- `./hooks/useCopyOnSelect.js` -> `./src/hooks/useCopyOnSelect.ts`
+- `./hooks/useSessionBackgrounding.js` -> `./src/hooks/useSessionBackgrounding.ts`
+- `./hooks/useTasksV2.js` -> `./src/hooks/useTasksV2.ts`
+- `./hooks/useTeleportResume.js` -> `./src/hooks/useTeleportResume.tsx`
+- `./hooks/useHistorySearch.js` -> `./src/hooks/useHistorySearch.ts`
+- `./hooks/useTypeahead.js` -> `./src/hooks/useTypeahead.tsx`
+- `./hooks/useTaskListWatcher.js` -> `./src/hooks/useTaskListWatcher.ts`
+- `./hooks/useQueueProcessor.js` -> `./src/hooks/useQueueProcessor.ts`
+- `./hooks/useSSHSession.js` -> `./src/hooks/useSSHSession.ts`
+- `./hooks/useTeammateViewAutoExit.js` -> `./src/hooks/useTeammateViewAutoExit.ts`
+- `./hooks/useLspPluginRecommendation.js` -> `./src/hooks/useLspPluginRecommendation.tsx`
+- `./hooks/useDirectConnect.js` -> `./src/hooks/useDirectConnect.ts`
+- `./hooks/useElapsedTime.js` -> `./src/hooks/useElapsedTime.ts`
+- `./hooks/usePromptsFromClaudeInChrome.js` -> `./src/hooks/usePromptsFromClaudeInChrome.tsx`
+- `./hooks/useUpdateNotification.js` -> `./src/hooks/useUpdateNotification.ts`
+- `./hooks/unifiedSuggestions.js` -> `./src/hooks/unifiedSuggestions.ts`
+- `./hooks/useTextInput.js` -> `./src/hooks/useTextInput.ts`
+- `./hooks/useGlobalKeybindings.js` -> `./src/hooks/useGlobalKeybindings.tsx`
+- `./hooks/useExitOnCtrlCD.js` -> `./src/hooks/useExitOnCtrlCD.ts`
+- `./hooks/useLogMessages.js` -> `./src/hooks/useLogMessages.ts`
+- `./hooks/useDeferredHookMessages.js` -> `./src/hooks/useDeferredHookMessages.ts`
+- `./hooks/useRemoteSession.js` -> `./src/hooks/useRemoteSession.ts`
+- `./hooks/usePluginRecommendationBase.js` -> `./src/hooks/usePluginRecommendationBase.tsx`
+- `./hooks/useReplBridge.js` -> `./src/hooks/useReplBridge.tsx`
+- `./hooks/usePromptSuggestion.js` -> `./src/hooks/usePromptSuggestion.ts`
+- `./hooks/useChromeExtensionNotification.js` -> `./src/hooks/useChromeExtensionNotification.tsx`
+- `./hooks/useSkillImprovementSurvey.js` -> `./src/hooks/useSkillImprovementSurvey.ts`
+- `./hooks/useAfterFirstRender.js` -> `./src/hooks/useAfterFirstRender.ts`
+- `./hooks/useMergedTools.js` -> `./src/hooks/useMergedTools.ts`
+- `./hooks/useArrowKeyHistory.js` -> `./src/hooks/useArrowKeyHistory.tsx`
+- `./hooks/useVimInput.js` -> `./src/hooks/useVimInput.ts`
+- `./hooks/useIssueFlagBanner.js` -> `./src/hooks/useIssueFlagBanner.ts`
+- `./hooks/useClaudeCodeHintRecommendation.js` -> `./src/hooks/useClaudeCodeHintRecommendation.tsx`
+- `./hooks/useMergedCommands.js` -> `./src/hooks/useMergedCommands.ts`
+- `./hooks/useCommandQueue.js` -> `./src/hooks/useCommandQueue.ts`
+- `./hooks/useMergedClients.js` -> `./src/hooks/useMergedClients.ts`
+- `./hooks/useInputBuffer.js` -> `./src/hooks/useInputBuffer.ts`
+- `./hooks/useTurnDiffs.js` -> `./src/hooks/useTurnDiffs.ts`
+- `./hooks/useMemoryUsage.js` -> `./src/hooks/useMemoryUsage.ts`
+- `./hooks/useSkillsChange.js` -> `./src/hooks/useSkillsChange.ts`
+- `./hooks/useVirtualScroll.js` -> `./src/hooks/useVirtualScroll.ts`
+- `./hooks/useOfficialMarketplaceNotification.js` -> `./src/hooks/useOfficialMarketplaceNotification.tsx`
+- `./hooks/useBlink.js` -> `./src/hooks/useBlink.ts`
+- `./hooks/useDynamicConfig.js` -> `./src/hooks/useDynamicConfig.ts`
+- `./hooks/useAssistantHistory.js` -> `./src/hooks/useAssistantHistory.ts`
+- `./hooks/useClipboardImageHint.js` -> `./src/hooks/useClipboardImageHint.ts`
+- `./hooks/usePasteHandler.js` -> `./src/hooks/usePasteHandler.ts`
+- `./hooks/useDiffData.js` -> `./src/hooks/useDiffData.ts`
+- `./hooks/useInboxPoller.js` -> `./src/hooks/useInboxPoller.ts`
+- `./hooks/useMailboxBridge.js` -> `./src/hooks/useMailboxBridge.ts`
+- `./hooks/useApiKeyVerification.js` -> `./src/hooks/useApiKeyVerification.ts`
+- `./hooks/useScheduledTasks.js` -> `./src/hooks/useScheduledTasks.ts`
+- `./hooks/useCommandKeybindings.js` -> `./src/hooks/useCommandKeybindings.tsx`
+- `./hooks/useCancelRequest.js` -> `./src/hooks/useCancelRequest.ts`
+- `./hooks/useAwaySummary.js` -> `./src/hooks/useAwaySummary.ts`
+- `./hooks/notifs/useSettingsErrors.js` -> `./src/hooks/notifs/useSettingsErrors.tsx`
+- `./hooks/notifs/useLspInitializationNotification.js` -> `./src/hooks/notifs/useLspInitializationNotification.tsx`
+- `./hooks/notifs/useTeammateShutdownNotification.js` -> `./src/hooks/notifs/useTeammateShutdownNotification.ts`
+- `./hooks/notifs/useFastModeNotification.js` -> `./src/hooks/notifs/useFastModeNotification.tsx`
+- `./hooks/notifs/useAntOrgWarningNotification.js` -> `./src/hooks/notifs/useAntOrgWarningNotification.ts`
+- `./hooks/notifs/useIDEStatusIndicator.js` -> `./src/hooks/notifs/useIDEStatusIndicator.tsx`
+- `./hooks/notifs/useAutoModeUnavailableNotification.js` -> `./src/hooks/notifs/useAutoModeUnavailableNotification.ts`
+- `./hooks/notifs/useMcpConnectivityStatus.js` -> `./src/hooks/notifs/useMcpConnectivityStatus.tsx`
+- `./hooks/notifs/useRateLimitWarningNotification.js` -> `./src/hooks/notifs/useRateLimitWarningNotification.tsx`
+- `./hooks/notifs/useDeprecationWarningNotification.js` -> `./src/hooks/notifs/useDeprecationWarningNotification.tsx`
+- `./hooks/notifs/useCanSwitchToExistingSubscription.js` -> `./src/hooks/notifs/useCanSwitchToExistingSubscription.tsx`
+- `./hooks/notifs/usePluginAutoupdateNotification.js` -> `./src/hooks/notifs/usePluginAutoupdateNotification.tsx`
+- `./hooks/notifs/useNpmDeprecationNotification.js` -> `./src/hooks/notifs/useNpmDeprecationNotification.tsx`
+- `./hooks/notifs/useInstallMessages.js` -> `./src/hooks/notifs/useInstallMessages.tsx`
+- `./hooks/notifs/useStartupNotification.js` -> `./src/hooks/notifs/useStartupNotification.ts`
+- `./hooks/notifs/usePluginInstallationStatus.js` -> `./src/hooks/notifs/usePluginInstallationStatus.tsx`
+- `./hooks/notifs/useModelMigrationNotifications.js` -> `./src/hooks/notifs/useModelMigrationNotifications.tsx`
+- `./components/AntModelSwitchCallout.js` -> `./src/components/AntModelSwitchCallout.tsx`
+- `./components/ApproveApiKey.js` -> `./src/components/ApproveApiKey.tsx`
+- `./components/AutoModeOptInDialog.js` -> `./src/components/AutoModeOptInDialog.tsx`
+- `./components/AutoUpdater.js` -> `./src/components/AutoUpdater.tsx`
+- `./components/AutoUpdaterWrapper.js` -> `./src/components/AutoUpdaterWrapper.tsx`
+- `./components/AwsAuthStatusBox.js` -> `./src/components/AwsAuthStatusBox.tsx`
+- `./components/BaseTextInput.js` -> `./src/components/BaseTextInput.tsx`
+- `./components/BashModeProgress.js` -> `./src/components/BashModeProgress.tsx`
+- `./components/BridgeDialog.js` -> `./src/components/BridgeDialog.tsx`
+- `./components/BuiltinStatusLine.js` -> `./src/components/BuiltinStatusLine.tsx`
+- `./components/BypassPermissionsModeDialog.js` -> `./src/components/BypassPermissionsModeDialog.tsx`
+- `./components/ChannelDowngradeDialog.js` -> `./src/components/ChannelDowngradeDialog.tsx`
+- `./components/ClaudeCodeHint/PluginHintMenu.js` -> `./src/components/ClaudeCodeHint/PluginHintMenu.tsx`
+- `./components/ClaudeInChromeOnboarding.js` -> `./src/components/ClaudeInChromeOnboarding.tsx`
+- `./components/ClaudeMdExternalIncludesDialog.js` -> `./src/components/ClaudeMdExternalIncludesDialog.tsx`
+- `./components/ClickableImageRef.js` -> `./src/components/ClickableImageRef.tsx`
+- `./components/CompactSummary.js` -> `./src/components/CompactSummary.tsx`
+- `./components/ContextSuggestions.js` -> `./src/components/ContextSuggestions.tsx`
+- `./components/CoordinatorAgentStatus.js` -> `./src/components/CoordinatorAgentStatus.tsx`
+- `./components/CostThresholdDialog.js` -> `./src/components/CostThresholdDialog.tsx`
+- `./components/CustomSelect/SelectMulti.js` -> `./src/components/CustomSelect/SelectMulti.tsx`
+- `./components/CustomSelect/option-map.js` -> `./src/components/CustomSelect/option-map.ts`
+- `./components/CustomSelect/select-input-option.js` -> `./src/components/CustomSelect/select-input-option.tsx`
+- `./components/CustomSelect/select-option.js` -> `./src/components/CustomSelect/select-option.tsx`
+- `./components/CustomSelect/use-multi-select-state.js` -> `./src/components/CustomSelect/use-multi-select-state.ts`
+- `./components/CustomSelect/use-select-input.js` -> `./src/components/CustomSelect/use-select-input.ts`
+- `./components/CustomSelect/use-select-navigation.js` -> `./src/components/CustomSelect/use-select-navigation.ts`
+- `./components/CustomSelect/use-select-state.js` -> `./src/components/CustomSelect/use-select-state.ts`
+- `./components/DesktopHandoff.js` -> `./src/components/DesktopHandoff.tsx`
+- `./components/DesktopUpsell/DesktopUpsellStartup.js` -> `./src/components/DesktopUpsell/DesktopUpsellStartup.tsx`
+- `./components/DevBar.js` -> `./src/components/DevBar.tsx`
+- `./components/DevChannelsDialog.js` -> `./src/components/DevChannelsDialog.tsx`
+- `./components/DiagnosticsDisplay.js` -> `./src/components/DiagnosticsDisplay.tsx`
+- `./components/EffortCallout.js` -> `./src/components/EffortCallout.tsx`
+- `./components/EffortIndicator.js` -> `./src/components/EffortIndicator.ts`
+- `./components/ExitFlow.js` -> `./src/components/ExitFlow.tsx`
+- `./components/ExportDialog.js` -> `./src/components/ExportDialog.tsx`
+- `./components/Feedback.js` -> `./src/components/Feedback.tsx`
+- `./components/FeedbackSurvey/FeedbackSurvey.js` -> `./src/components/FeedbackSurvey/FeedbackSurvey.tsx`
+- `./components/FeedbackSurvey/FeedbackSurveyView.js` -> `./src/components/FeedbackSurvey/FeedbackSurveyView.tsx`
+- `./components/FeedbackSurvey/TranscriptSharePrompt.js` -> `./src/components/FeedbackSurvey/TranscriptSharePrompt.tsx`
+- `./components/FeedbackSurvey/submitTranscriptShare.js` -> `./src/components/FeedbackSurvey/submitTranscriptShare.ts`
+- `./components/FeedbackSurvey/useDebouncedDigitInput.js` -> `./src/components/FeedbackSurvey/useDebouncedDigitInput.ts`
+- `./components/FeedbackSurvey/useFeedbackSurvey.js` -> `./src/components/FeedbackSurvey/useFeedbackSurvey.tsx`
+- `./components/FeedbackSurvey/useFrustrationDetection.js` -> `./src/components/FeedbackSurvey/useFrustrationDetection.ts`
+- `./components/FeedbackSurvey/useMemorySurvey.js` -> `./src/components/FeedbackSurvey/useMemorySurvey.tsx`
+- `./components/FeedbackSurvey/usePostCompactSurvey.js` -> `./src/components/FeedbackSurvey/usePostCompactSurvey.tsx`
+- `./components/FeedbackSurvey/useSurveyState.js` -> `./src/components/FeedbackSurvey/useSurveyState.tsx`
+- `./components/FeedbackSurvey/utils.js` -> `./src/components/FeedbackSurvey/utils.ts`
+- `./components/FullscreenLayout.js` -> `./src/components/FullscreenLayout.tsx`
+- `./components/GlobalSearchDialog.js` -> `./src/components/GlobalSearchDialog.tsx`
+- `./components/HelpV2/Commands.js` -> `./src/components/HelpV2/Commands.tsx`
+- `./components/HelpV2/General.js` -> `./src/components/HelpV2/General.tsx`
+- `./components/HelpV2/HelpV2.js` -> `./src/components/HelpV2/HelpV2.tsx`
+- `./components/HighlightedCode/Fallback.js` -> `./src/components/HighlightedCode/Fallback.tsx`
+- `./components/HistorySearchDialog.js` -> `./src/components/HistorySearchDialog.tsx`
+- `./components/IdeStatusIndicator.js` -> `./src/components/IdeStatusIndicator.tsx`
+- `./components/IdleReturnDialog.js` -> `./src/components/IdleReturnDialog.tsx`
+- `./components/InterruptedByUser.js` -> `./src/components/InterruptedByUser.tsx`
+- `./components/InvalidSettingsDialog.js` -> `./src/components/InvalidSettingsDialog.tsx`
+- `./components/KeybindingWarnings.js` -> `./src/components/KeybindingWarnings.tsx`
+- `./components/LanguagePicker.js` -> `./src/components/LanguagePicker.tsx`
+- `./components/LogoV2/AnimatedAsterisk.js` -> `./src/components/LogoV2/AnimatedAsterisk.tsx`
+- `./components/LogoV2/AnimatedClawd.js` -> `./src/components/LogoV2/AnimatedClawd.tsx`
+- `./components/LogoV2/ChannelsNotice.js` -> `./src/components/LogoV2/ChannelsNotice.tsx`
+- `./components/LogoV2/Clawd.js` -> `./src/components/LogoV2/Clawd.tsx`
+- `./components/LogoV2/CondensedLogo.js` -> `./src/components/LogoV2/CondensedLogo.tsx`
+- `./components/LogoV2/EmergencyTip.js` -> `./src/components/LogoV2/EmergencyTip.tsx`
+- `./components/LogoV2/ExperimentEnrollmentNotice.js` -> `./src/components/LogoV2/ExperimentEnrollmentNotice.tsx`
+- `./components/LogoV2/Feed.js` -> `./src/components/LogoV2/Feed.tsx`
+- `./components/LogoV2/FeedColumn.js` -> `./src/components/LogoV2/FeedColumn.tsx`
+- `./components/LogoV2/GateOverridesWarning.js` -> `./src/components/LogoV2/GateOverridesWarning.tsx`
+- `./components/LogoV2/GuestPassesUpsell.js` -> `./src/components/LogoV2/GuestPassesUpsell.tsx`
+- `./components/LogoV2/LogoV2.js` -> `./src/components/LogoV2/LogoV2.tsx`
+- `./components/LogoV2/Opus1mMergeNotice.js` -> `./src/components/LogoV2/Opus1mMergeNotice.tsx`
+- `./components/LogoV2/OverageCreditUpsell.js` -> `./src/components/LogoV2/OverageCreditUpsell.tsx`
+- `./components/LogoV2/VoiceModeNotice.js` -> `./src/components/LogoV2/VoiceModeNotice.tsx`
+- `./components/LogoV2/feedConfigs.js` -> `./src/components/LogoV2/feedConfigs.tsx`
+- `./components/LspRecommendation/LspRecommendationMenu.js` -> `./src/components/LspRecommendation/LspRecommendationMenu.tsx`
+- `./components/MCPServerDialogCopy.js` -> `./src/components/MCPServerDialogCopy.tsx`
+- `./components/MarkdownTable.js` -> `./src/components/MarkdownTable.tsx`
+- `./components/MemoryUsageIndicator.js` -> `./src/components/MemoryUsageIndicator.tsx`
+- `./components/MessageModel.js` -> `./src/components/MessageModel.tsx`
+- `./components/MessageRow.js` -> `./src/components/MessageRow.tsx`
+- `./components/MessageTimestamp.js` -> `./src/components/MessageTimestamp.tsx`
+- `./components/NativeAutoUpdater.js` -> `./src/components/NativeAutoUpdater.tsx`
+- `./components/OffscreenFreeze.js` -> `./src/components/OffscreenFreeze.tsx`
+- `./components/Onboarding.js` -> `./src/components/Onboarding.tsx`
+- `./components/OutputStylePicker.js` -> `./src/components/OutputStylePicker.tsx`
+- `./components/PackageManagerAutoUpdater.js` -> `./src/components/PackageManagerAutoUpdater.tsx`
+- `./components/Passes/Passes.js` -> `./src/components/Passes/Passes.tsx`
+- `./components/PrBadge.js` -> `./src/components/PrBadge.tsx`
+- `./components/PressEnterToContinue.js` -> `./src/components/PressEnterToContinue.tsx`
+- `./components/PromptInput/HistorySearchInput.js` -> `./src/components/PromptInput/HistorySearchInput.tsx`
+- `./components/PromptInput/IssueFlagBanner.js` -> `./src/components/PromptInput/IssueFlagBanner.tsx`
+- `./components/PromptInput/Notifications.js` -> `./src/components/PromptInput/Notifications.tsx`
+- `./components/PromptInput/PromptInput.js` -> `./src/components/PromptInput/PromptInput.tsx`
+- `./components/PromptInput/PromptInputFooter.js` -> `./src/components/PromptInput/PromptInputFooter.tsx`
+- `./components/PromptInput/PromptInputFooterLeftSide.js` -> `./src/components/PromptInput/PromptInputFooterLeftSide.tsx`
+- `./components/PromptInput/PromptInputHelpMenu.js` -> `./src/components/PromptInput/PromptInputHelpMenu.tsx`
+- `./components/PromptInput/PromptInputModeIndicator.js` -> `./src/components/PromptInput/PromptInputModeIndicator.tsx`
+- `./components/PromptInput/PromptInputQueuedCommands.js` -> `./src/components/PromptInput/PromptInputQueuedCommands.tsx`
+- `./components/PromptInput/PromptInputStashNotice.js` -> `./src/components/PromptInput/PromptInputStashNotice.tsx`
+- `./components/PromptInput/SandboxPromptFooterHint.js` -> `./src/components/PromptInput/SandboxPromptFooterHint.tsx`
+- `./components/PromptInput/ShimmeredInput.js` -> `./src/components/PromptInput/ShimmeredInput.tsx`
+- `./components/PromptInput/VoiceIndicator.js` -> `./src/components/PromptInput/VoiceIndicator.tsx`
+- `./components/PromptInput/inputModes.js` -> `./src/components/PromptInput/inputModes.ts`
+- `./components/PromptInput/inputPaste.js` -> `./src/components/PromptInput/inputPaste.ts`
+- `./components/PromptInput/useMaybeTruncateInput.js` -> `./src/components/PromptInput/useMaybeTruncateInput.ts`
+- `./components/PromptInput/usePromptInputPlaceholder.js` -> `./src/components/PromptInput/usePromptInputPlaceholder.ts`
+- `./components/PromptInput/useShowFastIconHint.js` -> `./src/components/PromptInput/useShowFastIconHint.ts`
+- `./components/PromptInput/useSwarmBanner.js` -> `./src/components/PromptInput/useSwarmBanner.ts`
+- `./components/PromptInput/utils.js` -> `./src/components/PromptInput/utils.ts`
+- `./components/QuickOpenDialog.js` -> `./src/components/QuickOpenDialog.tsx`
+- `./components/ResumeTask.js` -> `./src/components/ResumeTask.tsx`
+- `./components/SandboxViolationExpandedView.js` -> `./src/components/SandboxViolationExpandedView.tsx`
+- `./components/ScrollKeybindingHandler.js` -> `./src/components/ScrollKeybindingHandler.tsx`
+- `./components/SentryErrorBoundary.js` -> `./src/components/SentryErrorBoundary.ts`
+- `./components/SessionBackgroundHint.js` -> `./src/components/SessionBackgroundHint.tsx`
+- `./components/SessionPreview.js` -> `./src/components/SessionPreview.tsx`
+- `./components/Settings/Config.js` -> `./src/components/Settings/Config.tsx`
+- `./components/Settings/Status.js` -> `./src/components/Settings/Status.tsx`
+- `./components/Settings/Usage.js` -> `./src/components/Settings/Usage.tsx`
+- `./components/SkillImprovementSurvey.js` -> `./src/components/SkillImprovementSurvey.tsx`
+- `./components/Spinner/FlashingChar.js` -> `./src/components/Spinner/FlashingChar.tsx`
+- `./components/Spinner/GlimmerMessage.js` -> `./src/components/Spinner/GlimmerMessage.tsx`
+- `./components/Spinner/SpinnerAnimationRow.js` -> `./src/components/Spinner/SpinnerAnimationRow.tsx`
+- `./components/Spinner/TeammateSpinnerLine.js` -> `./src/components/Spinner/TeammateSpinnerLine.tsx`
+- `./components/Spinner/TeammateSpinnerTree.js` -> `./src/components/Spinner/TeammateSpinnerTree.tsx`
+- `./components/Spinner/index.js` -> `./src/components/Spinner/index.ts`
+- `./components/Spinner/teammateSelectHint.js` -> `./src/components/Spinner/teammateSelectHint.ts`
+- `./components/Spinner/types.js` -> `./src/components/Spinner/types.ts`
+- `./components/Spinner/useStalledAnimation.js` -> `./src/components/Spinner/useStalledAnimation.ts`
+- `./components/Spinner/utils.js` -> `./src/components/Spinner/utils.ts`
+- `./components/Stats.js` -> `./src/components/Stats.tsx`
+- `./components/StatusLine.js` -> `./src/components/StatusLine.tsx`
+- `./components/StatusNotices.js` -> `./src/components/StatusNotices.tsx`
+- `./components/StructuredDiff/Fallback.js` -> `./src/components/StructuredDiff/Fallback.tsx`
+- `./components/StructuredDiff/colorDiff.js` -> `./src/components/StructuredDiff/colorDiff.ts`
+- `./components/StructuredDiffList.js` -> `./src/components/StructuredDiffList.tsx`
+- `./components/TagTabs.js` -> `./src/components/TagTabs.tsx`
+- `./components/TaskListV2.js` -> `./src/components/TaskListV2.tsx`
+- `./components/TeammateViewHeader.js` -> `./src/components/TeammateViewHeader.tsx`
+- `./components/TeleportRepoMismatchDialog.js` -> `./src/components/TeleportRepoMismatchDialog.tsx`
+- `./components/TeleportResumeWrapper.js` -> `./src/components/TeleportResumeWrapper.tsx`
+- `./components/TeleportStash.js` -> `./src/components/TeleportStash.tsx`
+- `./components/ThinkingToggle.js` -> `./src/components/ThinkingToggle.tsx`
+- `./components/TokenWarning.js` -> `./src/components/TokenWarning.tsx`
+- `./components/TrustDialog/TrustDialog.js` -> `./src/components/TrustDialog/TrustDialog.tsx`
+- `./components/TrustDialog/utils.js` -> `./src/components/TrustDialog/utils.ts`
+- `./components/UndercoverAutoCallout.js` -> `./src/components/UndercoverAutoCallout.tsx`
+- `./components/ValidationErrorsList.js` -> `./src/components/ValidationErrorsList.tsx`
+- `./components/VimTextInput.js` -> `./src/components/VimTextInput.tsx`
+- `./components/VirtualMessageList.js` -> `./src/components/VirtualMessageList.tsx`
+- `./components/WorktreeExitDialog.js` -> `./src/components/WorktreeExitDialog.tsx`
+- `./components/agents/AgentDetail.js` -> `./src/components/agents/AgentDetail.tsx`
+- `./components/agents/AgentEditor.js` -> `./src/components/agents/AgentEditor.tsx`
+- `./components/agents/AgentNavigationFooter.js` -> `./src/components/agents/AgentNavigationFooter.tsx`
+- `./components/agents/AgentsList.js` -> `./src/components/agents/AgentsList.tsx`
+- `./components/agents/ColorPicker.js` -> `./src/components/agents/ColorPicker.tsx`
+- `./components/agents/ModelSelector.js` -> `./src/components/agents/ModelSelector.tsx`
+- `./components/agents/ToolSelector.js` -> `./src/components/agents/ToolSelector.tsx`
+- `./components/agents/agentFileUtils.js` -> `./src/components/agents/agentFileUtils.ts`
+- `./components/agents/generateAgent.js` -> `./src/components/agents/generateAgent.ts`
+- `./components/agents/new-agent-creation/CreateAgentWizard.js` -> `./src/components/agents/new-agent-creation/CreateAgentWizard.tsx`
+- `./components/agents/new-agent-creation/types.js` -> `./src/components/agents/new-agent-creation/types.ts`
+- `./components/agents/new-agent-creation/wizard-steps/ColorStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/ColorStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/ConfirmStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/ConfirmStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/ConfirmStepWrapper.js` -> `./src/components/agents/new-agent-creation/wizard-steps/ConfirmStepWrapper.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/DescriptionStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/DescriptionStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/GenerateStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/GenerateStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/LocationStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/LocationStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/MemoryStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/MemoryStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/MethodStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/MethodStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/ModelStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/ModelStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/PromptStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/PromptStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/ToolsStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/ToolsStep.tsx`
+- `./components/agents/new-agent-creation/wizard-steps/TypeStep.js` -> `./src/components/agents/new-agent-creation/wizard-steps/TypeStep.tsx`
+- `./components/agents/types.js` -> `./src/components/agents/types.ts`
+- `./components/agents/utils.js` -> `./src/components/agents/utils.ts`
+- `./components/agents/validateAgent.js` -> `./src/components/agents/validateAgent.ts`
+- `./components/design-system/color.js` -> `./src/components/design-system/color.ts`
+- `./components/diff/DiffDetailView.js` -> `./src/components/diff/DiffDetailView.tsx`
+- `./components/diff/DiffDialog.js` -> `./src/components/diff/DiffDialog.tsx`
+- `./components/diff/DiffFileList.js` -> `./src/components/diff/DiffFileList.tsx`
+- `./components/hooks/HooksConfigMenu.js` -> `./src/components/hooks/HooksConfigMenu.tsx`
+- `./components/hooks/PromptDialog.js` -> `./src/components/hooks/PromptDialog.tsx`
+- `./components/hooks/SelectEventMode.js` -> `./src/components/hooks/SelectEventMode.tsx`
+- `./components/hooks/SelectHookMode.js` -> `./src/components/hooks/SelectHookMode.tsx`
+- `./components/hooks/SelectMatcherMode.js` -> `./src/components/hooks/SelectMatcherMode.tsx`
+- `./components/hooks/ViewHookMode.js` -> `./src/components/hooks/ViewHookMode.tsx`
+- `./components/mcp/CapabilitiesSection.js` -> `./src/components/mcp/CapabilitiesSection.tsx`
+- `./components/mcp/ElicitationDialog.js` -> `./src/components/mcp/ElicitationDialog.tsx`
+- `./components/mcp/MCPAgentServerMenu.js` -> `./src/components/mcp/MCPAgentServerMenu.tsx`
+- `./components/mcp/MCPListPanel.js` -> `./src/components/mcp/MCPListPanel.tsx`
+- `./components/mcp/MCPSettings.js` -> `./src/components/mcp/MCPSettings.tsx`
+- `./components/mcp/McpParsingWarnings.js` -> `./src/components/mcp/McpParsingWarnings.tsx`
+- `./components/mcp/utils/reconnectHelpers.js` -> `./src/components/mcp/utils/reconnectHelpers.tsx`
+- `./components/messageActions.js` -> `./src/components/messageActions.tsx`
+- `./components/messages/AdvisorMessage.js` -> `./src/components/messages/AdvisorMessage.tsx`
+- `./components/messages/AssistantRedactedThinkingMessage.js` -> `./src/components/messages/AssistantRedactedThinkingMessage.tsx`
+- `./components/messages/AssistantTextMessage.js` -> `./src/components/messages/AssistantTextMessage.tsx`
+- `./components/messages/AssistantThinkingMessage.js` -> `./src/components/messages/AssistantThinkingMessage.tsx`
+- `./components/messages/AssistantToolUseMessage.js` -> `./src/components/messages/AssistantToolUseMessage.tsx`
+- `./components/messages/AttachmentMessage.js` -> `./src/components/messages/AttachmentMessage.tsx`
+- `./components/messages/CollapsedReadSearchContent.js` -> `./src/components/messages/CollapsedReadSearchContent.tsx`
+- `./components/messages/CompactBoundaryMessage.js` -> `./src/components/messages/CompactBoundaryMessage.tsx`
+- `./components/messages/GroupedToolUseContent.js` -> `./src/components/messages/GroupedToolUseContent.tsx`
+- `./components/messages/HighlightedThinkingText.js` -> `./src/components/messages/HighlightedThinkingText.tsx`
+- `./components/messages/HookProgressMessage.js` -> `./src/components/messages/HookProgressMessage.tsx`
+- `./components/messages/PlanApprovalMessage.js` -> `./src/components/messages/PlanApprovalMessage.tsx`
+- `./components/messages/RateLimitMessage.js` -> `./src/components/messages/RateLimitMessage.tsx`
+- `./components/messages/ShutdownMessage.js` -> `./src/components/messages/ShutdownMessage.tsx`
+- `./components/messages/SnipBoundaryMessage.js` -> `./src/components/messages/SnipBoundaryMessage.ts`
+- `./components/messages/SystemAPIErrorMessage.js` -> `./src/components/messages/SystemAPIErrorMessage.tsx`
+- `./components/messages/SystemTextMessage.js` -> `./src/components/messages/SystemTextMessage.tsx`
+- `./components/messages/TaskAssignmentMessage.js` -> `./src/components/messages/TaskAssignmentMessage.tsx`
+- `./components/messages/UserAgentNotificationMessage.js` -> `./src/components/messages/UserAgentNotificationMessage.tsx`
+- `./components/messages/UserBashInputMessage.js` -> `./src/components/messages/UserBashInputMessage.tsx`
+- `./components/messages/UserBashOutputMessage.js` -> `./src/components/messages/UserBashOutputMessage.tsx`
+- `./components/messages/UserChannelMessage.js` -> `./src/components/messages/UserChannelMessage.tsx`
+- `./components/messages/UserCommandMessage.js` -> `./src/components/messages/UserCommandMessage.tsx`
+- `./components/messages/UserCrossSessionMessage.js` -> `./src/components/messages/UserCrossSessionMessage.ts`
+- `./components/messages/UserForkBoilerplateMessage.js` -> `./src/components/messages/UserForkBoilerplateMessage.ts`
+- `./components/messages/UserGitHubWebhookMessage.js` -> `./src/components/messages/UserGitHubWebhookMessage.ts`
+- `./components/messages/UserImageMessage.js` -> `./src/components/messages/UserImageMessage.tsx`
+- `./components/messages/UserLocalCommandOutputMessage.js` -> `./src/components/messages/UserLocalCommandOutputMessage.tsx`
+- `./components/messages/UserMemoryInputMessage.js` -> `./src/components/messages/UserMemoryInputMessage.tsx`
+- `./components/messages/UserPlanMessage.js` -> `./src/components/messages/UserPlanMessage.tsx`
+- `./components/messages/UserPromptMessage.js` -> `./src/components/messages/UserPromptMessage.tsx`
+- `./components/messages/UserResourceUpdateMessage.js` -> `./src/components/messages/UserResourceUpdateMessage.tsx`
+- `./components/messages/UserTeammateMessage.js` -> `./src/components/messages/UserTeammateMessage.tsx`
+- `./components/messages/UserTextMessage.js` -> `./src/components/messages/UserTextMessage.tsx`
+- `./components/messages/UserToolResultMessage/RejectedToolUseMessage.js` -> `./src/components/messages/UserToolResultMessage/RejectedToolUseMessage.tsx`
+- `./components/messages/UserToolResultMessage/UserToolCanceledMessage.js` -> `./src/components/messages/UserToolResultMessage/UserToolCanceledMessage.tsx`
+- `./components/messages/UserToolResultMessage/UserToolErrorMessage.js` -> `./src/components/messages/UserToolResultMessage/UserToolErrorMessage.tsx`
+- `./components/messages/UserToolResultMessage/UserToolRejectMessage.js` -> `./src/components/messages/UserToolResultMessage/UserToolRejectMessage.tsx`
+- `./components/messages/UserToolResultMessage/UserToolResultMessage.js` -> `./src/components/messages/UserToolResultMessage/UserToolResultMessage.tsx`
+- `./components/messages/UserToolResultMessage/UserToolSuccessMessage.js` -> `./src/components/messages/UserToolResultMessage/UserToolSuccessMessage.tsx`
+- `./components/messages/UserToolResultMessage/utils.js` -> `./src/components/messages/UserToolResultMessage/utils.tsx`
+- `./components/messages/nullRenderingAttachments.js` -> `./src/components/messages/nullRenderingAttachments.ts`
+- `./components/messages/teamMemCollapsed.js` -> `./src/components/messages/teamMemCollapsed.tsx`
+- `./components/messages/teamMemSaved.js` -> `./src/components/messages/teamMemSaved.ts`
+- `./components/sandbox/SandboxConfigTab.js` -> `./src/components/sandbox/SandboxConfigTab.tsx`
+- `./components/sandbox/SandboxDependenciesTab.js` -> `./src/components/sandbox/SandboxDependenciesTab.tsx`
+- `./components/sandbox/SandboxDoctorSection.js` -> `./src/components/sandbox/SandboxDoctorSection.tsx`
+- `./components/sandbox/SandboxOverridesTab.js` -> `./src/components/sandbox/SandboxOverridesTab.tsx`
+- `./components/sandbox/SandboxSettings.js` -> `./src/components/sandbox/SandboxSettings.tsx`
+- `./components/shell/ExpandShellOutputContext.js` -> `./src/components/shell/ExpandShellOutputContext.tsx`
+- `./components/tasks/AsyncAgentDetailDialog.js` -> `./src/components/tasks/AsyncAgentDetailDialog.tsx`
+- `./components/tasks/BackgroundTask.js` -> `./src/components/tasks/BackgroundTask.tsx`
+- `./components/tasks/BackgroundTaskStatus.js` -> `./src/components/tasks/BackgroundTaskStatus.tsx`
+- `./components/tasks/DreamDetailDialog.js` -> `./src/components/tasks/DreamDetailDialog.tsx`
+- `./components/tasks/InProcessTeammateDetailDialog.js` -> `./src/components/tasks/InProcessTeammateDetailDialog.tsx`
+- `./components/tasks/MonitorMcpDetailDialog.js` -> `./src/components/tasks/MonitorMcpDetailDialog.ts`
+- `./components/tasks/RemoteSessionDetailDialog.js` -> `./src/components/tasks/RemoteSessionDetailDialog.tsx`
+- `./components/tasks/RemoteSessionProgress.js` -> `./src/components/tasks/RemoteSessionProgress.tsx`
+- `./components/tasks/ShellDetailDialog.js` -> `./src/components/tasks/ShellDetailDialog.tsx`
+- `./components/tasks/ShellProgress.js` -> `./src/components/tasks/ShellProgress.tsx`
+- `./components/tasks/WorkflowDetailDialog.js` -> `./src/components/tasks/WorkflowDetailDialog.ts`
+- `./components/tasks/renderToolActivity.js` -> `./src/components/tasks/renderToolActivity.tsx`
+- `./components/tasks/taskStatusUtils.js` -> `./src/components/tasks/taskStatusUtils.tsx`
+- `./components/teams/TeamStatus.js` -> `./src/components/teams/TeamStatus.tsx`
+- `./components/teams/TeamsDialog.js` -> `./src/components/teams/TeamsDialog.tsx`
+- `./components/ui/OrderedList.js` -> `./src/components/ui/OrderedList.tsx`
+- `./components/ui/OrderedListItem.js` -> `./src/components/ui/OrderedListItem.tsx`
+- `./components/ui/TreeSelect.js` -> `./src/components/ui/TreeSelect.tsx`
+- `./components/ultraplan/UltraplanChoiceDialog.js` -> `./src/components/ultraplan/UltraplanChoiceDialog.tsx`
+- `./components/ultraplan/UltraplanLaunchDialog.js` -> `./src/components/ultraplan/UltraplanLaunchDialog.tsx`
+- `./components/wizard/WizardDialogLayout.js` -> `./src/components/wizard/WizardDialogLayout.tsx`
+- `./components/wizard/WizardNavigationFooter.js` -> `./src/components/wizard/WizardNavigationFooter.tsx`
+- `./components/wizard/WizardProvider.js` -> `./src/components/wizard/WizardProvider.tsx`
+- `./components/wizard/index.js` -> `./src/components/wizard/index.ts`
+- `./components/wizard/types.js` -> `./src/components/wizard/types.ts`
+- `./components/wizard/useWizard.js` -> `./src/components/wizard/useWizard.ts`
+- `./appStateHooks.js` -> `./src/appStateHooks.ts`
+- `./systemTheme.js` -> `./src/systemTheme.ts`
+- `./notifier.js` -> `./src/notifier.ts`
+- `./hooksConfigManager.js` -> `./src/hooksConfigManager.ts`
+- `./handlePromptSubmit.js` -> `./src/handlePromptSubmit.tsx`
+- `./awsAuthStatusManager.js` -> `./src/awsAuthStatusManager.ts`
+- `./keyboardShortcuts.js` -> `./src/keyboardShortcuts.ts`
+- `./fileIndex/index.js` -> `./src/fileIndex/index.ts`
+- `./commands/color/color.js` -> `./src/commands/color/color.ts`
+- `./commands/diff/diff.js` -> `./src/commands/diff/diff.tsx`
+- `./commands/usage/usage.js` -> `./src/commands/usage/usage.tsx`
+- `./commands/stats/stats.js` -> `./src/commands/stats/stats.tsx`
+- `./commands/config/config.js` -> `./src/commands/config/config.tsx`
+- `./commands/doctor/doctor.js` -> `./src/commands/doctor/doctor.tsx`
+- `./commands/export/export.js` -> `./src/commands/export/export.tsx`
+- `./commands/assistant/assistant.js` -> `./src/commands/assistant/assistant.ts`
+- `./commands/desktop/desktop.js` -> `./src/commands/desktop/desktop.tsx`
+- `./commands/help/help.js` -> `./src/commands/help/help.tsx`
+- `./commands/mobile/mobile.js` -> `./src/commands/mobile/mobile.tsx`
+- `./commands/output-style/output-style.js` -> `./src/commands/output-style/output-style.tsx`
+- `./commands/passes/passes.js` -> `./src/commands/passes/passes.tsx`
+- `./commands/vim/vim.js` -> `./src/commands/vim/vim.ts`
+- `./commands/rewind/rewind.js` -> `./src/commands/rewind/rewind.ts`
+- `./commands/install-slack-app/install-slack-app.js` -> `./src/commands/install-slack-app/install-slack-app.ts`
+- `./commands/stickers/stickers.js` -> `./src/commands/stickers/stickers.ts`
+- `./commands/release-notes/release-notes.js` -> `./src/commands/release-notes/release-notes.ts`
+- `./commands/files/files.js` -> `./src/commands/files/files.ts`
+- `./commands/tag/tag.js` -> `./src/commands/tag/tag.tsx`
+- `./commands/hooks/hooks.js` -> `./src/commands/hooks/hooks.tsx`
+- `./commands/keybindings/keybindings.js` -> `./src/commands/keybindings/keybindings.ts`
+- `./commands/exit/exit.js` -> `./src/commands/exit/exit.tsx`
+- `./commands/feedback/feedback.js` -> `./src/commands/feedback/feedback.tsx`
+- `./commands/plan/plan.js` -> `./src/commands/plan/plan.tsx`
+- `./commands/heapdump/heapdump.js` -> `./src/commands/heapdump/heapdump.ts`
+- `./tips/tipHistory.js` -> `./src/tips/tipHistory.ts`
+- `./tips/tipScheduler.js` -> `./src/tips/tipScheduler.ts`
+- `./tips/types.js` -> `./src/tips/types.ts`
+- `./commands/add-dir/validation.js` -> `./src/commands/add-dir/validation.ts`
+- `./commands/add-dir/add-dir.js` -> `./src/commands/add-dir/add-dir.tsx`
+- `./commands/sandbox-toggle/sandbox-toggle.js` -> `./src/commands/sandbox-toggle/sandbox-toggle.tsx`
+- `./processUserInput/processTextPrompt.js` -> `./src/processUserInput/processTextPrompt.ts`
+- `./processUserInput/processBashCommand.js` -> `./src/processUserInput/processBashCommand.tsx`
+- `./deepLink/terminalPreference.js` -> `./src/deepLink/terminalPreference.ts`
+- `./deepLink/terminalLauncher.js` -> `./src/deepLink/terminalLauncher.ts`
+- `./deepLink/parseDeepLink.js` -> `./src/deepLink/parseDeepLink.ts`
+- `./suggestions/skillUsageTracking.js` -> `./src/suggestions/skillUsageTracking.ts`
+- `./suggestions/slackChannelSuggestions.js` -> `./src/suggestions/slackChannelSuggestions.ts`
+- `./suggestions/directoryCompletion.js` -> `./src/suggestions/directoryCompletion.ts`
+- `./suggestions/shellHistoryCompletion.js` -> `./src/suggestions/shellHistoryCompletion.ts`
+- `./suggestions/commandSuggestions.js` -> `./src/suggestions/commandSuggestions.ts`
+- `./ultraplan/keyword.js` -> `./src/ultraplan/keyword.ts`
+- `./replTypes/notebook.js` -> `./src/replTypes/notebook.ts`
+- `./replTypes/plugin.js` -> `./src/replTypes/plugin.ts`
+- `./replTypes/tools.js` -> `./src/replTypes/tools.ts`
+- `./replTypes/messageQueueTypes.js` -> `./src/replTypes/messageQueueTypes.ts`
+- `./diagnostics/autoRunIssue.js` -> `./src/diagnostics/autoRunIssue.tsx`
+- `./diagnostics/desktopDeepLink.js` -> `./src/diagnostics/desktopDeepLink.ts`
+- `./diagnostics/doctorContextWarnings.js` -> `./src/diagnostics/doctorContextWarnings.ts`
+- `./diagnostics/preflightChecks.js` -> `./src/diagnostics/preflightChecks.tsx`
+- `./github/ghPrStatus.js` -> `./src/github/ghPrStatus.ts`
+- `./uiHelpers/statusNoticeDefinitions.js` -> `./src/uiHelpers/statusNoticeDefinitions.tsx`
+- `./clipboard/screenshotClipboard.js` -> `./src/clipboard/screenshotClipboard.ts`
+- `./screens/repl/TranscriptModeFooter.js` -> `./src/screens/repl/TranscriptModeFooter.tsx`
+- `./screens/repl/TranscriptSearchBar.js` -> `./src/screens/repl/TranscriptSearchBar.tsx`
+- `./screens/repl/AnimatedTerminalTitle.js` -> `./src/screens/repl/AnimatedTerminalTitle.tsx`
+- `./screens/repl/median.js` -> `./src/screens/repl/median.ts`
+- `./screens/repl/findRawIndex.js` -> `./src/screens/repl/findRawIndex.ts`
+- `./screens/repl/useReplEnvFlags.js` -> `./src/screens/repl/useReplEnvFlags.ts`
+- `./screens/repl/onlySleepToolActive.js` -> `./src/screens/repl/onlySleepToolActive.ts`
+- `./screens/repl/stopHookSpinnerSuffix.js` -> `./src/screens/repl/stopHookSpinnerSuffix.ts`
+- `./screens/repl/useSuspendResumeHandlers.js` -> `./src/screens/repl/useSuspendResumeHandlers.ts`
+- `./costHook/costHook.js` -> `./src/costHook/costHook.ts`
+- `./highlight/highlightMatch.js` -> `./src/highlight/highlightMatch.tsx`
+- `./screens/repl/useTranscriptFreeze.js` -> `./src/screens/repl/useTranscriptFreeze.ts`
+- `./screens/repl/useFeedbackSurveyAutoIssue.js` -> `./src/screens/repl/useFeedbackSurveyAutoIssue.ts`
+- `./screens/repl/useAutoRunIssueHandlers.js` -> `./src/screens/repl/useAutoRunIssueHandlers.ts`
+- `./screens/repl/useHandleExit.js` -> `./src/screens/repl/useHandleExit.tsx`
+- `./screens/repl/useSurveyAndRateLimitHandlers.js` -> `./src/screens/repl/useSurveyAndRateLimitHandlers.ts`
+- `./screens/repl/useQueuedCommandOnCancel.js` -> `./src/screens/repl/useQueuedCommandOnCancel.ts`
+- `./screens/repl/useStartupCallouts.js` -> `./src/screens/repl/useStartupCallouts.ts`
+- `./moreright/useMoreRight.js` -> `./src/moreright/useMoreRight.tsx`
+- `./uiHelpers/statusNoticeHelpers.js` -> `./src/uiHelpers/statusNoticeHelpers.ts`
+
+## Internal-only
+
+
+## Public surface
+
+- `./components/MessageResponse.js` (ext=28, int=0) -> `./src/components/MessageResponse.tsx`
+- `./components/CustomSelect/select.js` (ext=20, int=0) -> `./src/components/CustomSelect/select.tsx`
+- `./hooks/useCanUseTool.js` (ext=17, int=0) -> `./src/hooks/useCanUseTool.tsx`
+- `./replTypes/message.js` (ext=15, int=0) -> `./src/replTypes/message.ts`
+- `./keybindings/*.js` (ext=12, int=0) -> `./src/keybindings/*.ts`
+- `./keybindings/*` (ext=12, int=0) -> `./src/keybindings/*`
+- `./components/FallbackToolUseErrorMessage.js` (ext=12, int=0) -> `./src/components/FallbackToolUseErrorMessage.tsx`
+- `./components/ConfigurableShortcutHint.js` (ext=10, int=0) -> `./src/components/ConfigurableShortcutHint.tsx`
+- `./components/CustomSelect/index.js` (ext=9, int=0) -> `./src/components/CustomSelect/index.ts`
+- `./components/Spinner.js` (ext=8, int=0) -> `./src/components/Spinner.tsx`
+- `./components/TextInput.js` (ext=8, int=0) -> `./src/components/TextInput.tsx`
+- `./replTypes/ids.js` (ext=8, int=0) -> `./src/replTypes/ids.ts`
+- `./components/CtrlOToExpand.js` (ext=6, int=0) -> `./src/components/CtrlOToExpand.tsx`
+- `./keybindings/KeybindingProviderSetup.js` (ext=5, int=0) -> `./src/keybindings/KeybindingProviderSetup.tsx`
+- `./hooks/useExitOnCtrlCDWithKeybindings.js` (ext=5, int=0) -> `./src/hooks/useExitOnCtrlCDWithKeybindings.ts`
+- `./components/FilePathLink.js` (ext=5, int=0) -> `./src/components/FilePathLink.tsx`
+- `./components/Markdown.js` (ext=5, int=0) -> `./src/components/Markdown.tsx`
+- `./components/shell/OutputLine.js` (ext=5, int=0) -> `./src/components/shell/OutputLine.tsx`
+- `./Cursor.js` (ext=5, int=0) -> `./src/Cursor.ts`
+- `./textInputTypes.js` (ext=5, int=0) -> `./src/textInputTypes.ts`
+- `./tasksTypes.js` (ext=5, int=0) -> `./src/tasksTypes.ts`
+- `./localShellTaskGuards.js` (ext=5, int=0) -> `./src/localShellTaskGuards.ts`
+- `./hookEvents.js` (ext=5, int=0) -> `./src/hookEvents.ts`
+- `./components/HighlightedCode.js` (ext=4, int=0) -> `./src/components/HighlightedCode.tsx`
+- `./notifications.js` (ext=4, int=0) -> `./src/notifications.ts`
+- `./promptEditor.js` (ext=4, int=0) -> `./src/promptEditor.ts`
+- `./fastMode.js` (ext=4, int=0) -> `./src/fastMode.ts`
+- `./conversationRecovery.js` (ext=4, int=0) -> `./src/conversationRecovery.tsx`
+- `./localInstaller.js` (ext=4, int=0) -> `./src/localInstaller.ts`
+- `./overlayContext.js` (ext=4, int=0) -> `./src/overlayContext.tsx`
+- `./queryHelpers.js` (ext=4, int=0) -> `./src/queryHelpers.ts`
+- `./onChangeAppState.js` (ext=4, int=0) -> `./src/onChangeAppState.ts`
+- `./replTypes/logs.js` (ext=4, int=0) -> `./src/replTypes/logs.ts`
+- `./hooks/useSwarmPermissionPoller.js` (ext=3, int=0) -> `./src/hooks/useSwarmPermissionPoller.ts`
+- `./components/FallbackToolUseRejectedMessage.js` (ext=3, int=0) -> `./src/components/FallbackToolUseRejectedMessage.tsx`
+- `./fullscreen.js` (ext=3, int=0) -> `./src/fullscreen.ts`
+- `./doctorDiagnostic.js` (ext=3, int=0) -> `./src/doctorDiagnostic.ts`
+- `./stateStore.js` (ext=3, int=0) -> `./src/stateStore.ts`
+- `./modalContext.js` (ext=3, int=0) -> `./src/modalContext.ts`
+- `./readFileInRange.js` (ext=3, int=0) -> `./src/readFileInRange.ts`
+- `./earlyInput.js` (ext=3, int=0) -> `./src/earlyInput.ts`
+- `./promptSuggestion.js` (ext=3, int=0) -> `./src/promptSuggestion.tsx`
+- `./releaseNotes.js` (ext=3, int=0) -> `./src/releaseNotes.ts`
+- `./processUserInput/processUserInput.js` (ext=3, int=0) -> `./src/processUserInput/processUserInput.ts`
+- `./replTypes/permissions.js` (ext=3, int=0) -> `./src/replTypes/permissions.ts`
+- `./screens/*.js` (ext=2, int=0) -> `./src/screens/*.tsx`
+- `./screens/*` (ext=2, int=0) -> `./src/screens/*`
+- `./hooks/useMainLoopModel.js` (ext=2, int=0) -> `./src/hooks/useMainLoopModel.ts`
+- `./hooks/useSettings.js` (ext=2, int=0) -> `./src/hooks/useSettings.ts`
+- `./components/ConsoleOAuthFlow.js` (ext=2, int=0) -> `./src/components/ConsoleOAuthFlow.tsx`
+- `./components/FileEditToolDiff.js` (ext=2, int=0) -> `./src/components/FileEditToolDiff.tsx`
+- `./components/FileEditToolUpdatedMessage.js` (ext=2, int=0) -> `./src/components/FileEditToolUpdatedMessage.tsx`
+- `./components/FileEditToolUseRejectedMessage.js` (ext=2, int=0) -> `./src/components/FileEditToolUseRejectedMessage.tsx`
+- `./components/Message.js` (ext=2, int=0) -> `./src/components/Message.tsx`
+- `./components/MessageSelector.js` (ext=2, int=0) -> `./src/components/MessageSelector.tsx`
+- `./components/PromptInput/PromptInputFooterSuggestions.js` (ext=2, int=0) -> `./src/components/PromptInput/PromptInputFooterSuggestions.tsx`
+- `./components/Spinner/ShimmerChar.js` (ext=2, int=0) -> `./src/components/Spinner/ShimmerChar.tsx`
+- `./components/Spinner/useShimmerAnimation.js` (ext=2, int=0) -> `./src/components/Spinner/useShimmerAnimation.ts`
+- `./components/StructuredDiff.js` (ext=2, int=0) -> `./src/components/StructuredDiff.tsx`
+- `./components/mcp/types.js` (ext=2, int=0) -> `./src/components/mcp/types.ts`
+- `./components/shell/ShellProgressMessage.js` (ext=2, int=0) -> `./src/components/shell/ShellProgressMessage.tsx`
+- `./components/shell/ShellTimeDisplay.js` (ext=2, int=0) -> `./src/components/shell/ShellTimeDisplay.tsx`
+- `./history.js` (ext=2, int=0) -> `./src/history.ts`
+- `./ultraplan.js` (ext=2, int=0) -> `./src/ultraplan.ts`
+- `./promptSuggestionSpeculation.js` (ext=2, int=0) -> `./src/promptSuggestionSpeculation.tsx`
+- `./extraUsage.js` (ext=2, int=0) -> `./src/extraUsage.ts`
+- `./tips/tipRegistry.js` (ext=2, int=0) -> `./src/tips/tipRegistry.ts`
+- `./keybindings/useShortcutDisplay.js` (ext=2, int=0) -> `./src/keybindings/useShortcutDisplay.ts`
+- `./hooks/useNotifyAfterTimeout.js` (ext=1, int=0) -> `./src/hooks/useNotifyAfterTimeout.ts`
+- `./hooks/useManagePlugins.js` (ext=1, int=0) -> `./src/hooks/useManagePlugins.ts`
+- `./hooks/fileSuggestions.js` (ext=1, int=0) -> `./src/hooks/fileSuggestions.ts`
+- `./hooks/useSettingsChange.js` (ext=1, int=0) -> `./src/hooks/useSettingsChange.ts`
+- `./components/AgentProgressLine.js` (ext=1, int=0) -> `./src/components/AgentProgressLine.tsx`
+- `./components/App.js` (ext=1, int=0) -> `./src/components/App.tsx`
+- `./components/ContextVisualization.js` (ext=1, int=0) -> `./src/components/ContextVisualization.tsx`
+- `./components/FastIcon.js` (ext=1, int=0) -> `./src/components/FastIcon.tsx`
+- `./components/IdeAutoConnectDialog.js` (ext=1, int=0) -> `./src/components/IdeAutoConnectDialog.tsx`
+- `./components/IdeOnboardingDialog.js` (ext=1, int=0) -> `./src/components/IdeOnboardingDialog.tsx`
+- `./components/InvalidConfigDialog.js` (ext=1, int=0) -> `./src/components/InvalidConfigDialog.tsx`
+- `./components/LogSelector.js` (ext=1, int=0) -> `./src/components/LogSelector.tsx`
+- `./components/LogoutPicker.js` (ext=1, int=0) -> `./src/components/LogoutPicker.tsx`
+- `./components/LogoV2/WelcomeV2.js` (ext=1, int=0) -> `./src/components/LogoV2/WelcomeV2.tsx`
+- `./components/MCPServerApprovalDialog.js` (ext=1, int=0) -> `./src/components/MCPServerApprovalDialog.tsx`
+- `./components/MCPServerDesktopImportDialog.js` (ext=1, int=0) -> `./src/components/MCPServerDesktopImportDialog.tsx`
+- `./components/MCPServerMultiselectDialog.js` (ext=1, int=0) -> `./src/components/MCPServerMultiselectDialog.tsx`
+- `./components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.js` (ext=1, int=0) -> `./src/components/ManagedSettingsSecurityDialog/ManagedSettingsSecurityDialog.tsx`
+- `./components/ManagedSettingsSecurityDialog/utils.js` (ext=1, int=0) -> `./src/components/ManagedSettingsSecurityDialog/utils.ts`
+- `./components/Messages.js` (ext=1, int=0) -> `./src/components/Messages.tsx`
+- `./components/ModelPicker.js` (ext=1, int=0) -> `./src/components/ModelPicker.tsx`
+- `./components/EffortPicker.js` (ext=1, int=0) -> `./src/components/EffortPicker.tsx`
+- `./components/NotebookEditToolUseRejectedMessage.js` (ext=1, int=0) -> `./src/components/NotebookEditToolUseRejectedMessage.tsx`
+- `./utils/suggestions/directoryCompletion.js` (ext=1, int=0) -> `./src/utils/suggestions/directoryCompletion.ts`
+- `./components/RemoteCallout.js` (ext=1, int=0) -> `./src/components/RemoteCallout.tsx`
+- `./components/RemoteEnvironmentDialog.js` (ext=1, int=0) -> `./src/components/RemoteEnvironmentDialog.tsx`
+- `./components/Settings/Settings.js` (ext=1, int=0) -> `./src/components/Settings/Settings.tsx`
+- `./components/ShowInIDEPrompt.js` (ext=1, int=0) -> `./src/components/ShowInIDEPrompt.tsx`
+- `./components/Spinner/SpinnerGlyph.js` (ext=1, int=0) -> `./src/components/Spinner/SpinnerGlyph.tsx`
+- `./components/TeleportError.js` (ext=1, int=0) -> `./src/components/TeleportError.tsx`
+- `./components/TeleportProgress.js` (ext=1, int=0) -> `./src/components/TeleportProgress.tsx`
+- `./components/ThemePicker.js` (ext=1, int=0) -> `./src/components/ThemePicker.tsx`
+- `./components/ToolUseLoader.js` (ext=1, int=0) -> `./src/components/ToolUseLoader.tsx`
+- `./components/WorkflowMultiselectDialog.js` (ext=1, int=0) -> `./src/components/WorkflowMultiselectDialog.tsx`
+- `./components/agents/AgentsMenu.js` (ext=1, int=0) -> `./src/components/agents/AgentsMenu.tsx`
+- `./components/agents/SnapshotUpdateDialog.js` (ext=1, int=0) -> `./src/components/agents/SnapshotUpdateDialog.ts`
+- `./components/grove/Grove.js` (ext=1, int=0) -> `./src/components/grove/Grove.tsx`
+- `./components/mcp/MCPReconnect.js` (ext=1, int=0) -> `./src/components/mcp/MCPReconnect.tsx`
+- `./components/mcp/MCPRemoteServerMenu.js` (ext=1, int=0) -> `./src/components/mcp/MCPRemoteServerMenu.tsx`
+- `./components/mcp/MCPStdioServerMenu.js` (ext=1, int=0) -> `./src/components/mcp/MCPStdioServerMenu.tsx`
+- `./components/mcp/MCPToolDetailView.js` (ext=1, int=0) -> `./src/components/mcp/MCPToolDetailView.tsx`
+- `./components/mcp/MCPToolListView.js` (ext=1, int=0) -> `./src/components/mcp/MCPToolListView.tsx`
+- `./components/mcp/index.js` (ext=1, int=0) -> `./src/components/mcp/index.ts`
+- `./components/memory/MemoryFileSelector.js` (ext=1, int=0) -> `./src/components/memory/MemoryFileSelector.tsx`
+- `./components/memory/MemoryUpdateNotification.js` (ext=1, int=0) -> `./src/components/memory/MemoryUpdateNotification.tsx`
+- `./components/messages/UserToolResultMessage/RejectedPlanMessage.js` (ext=1, int=0) -> `./src/components/messages/UserToolResultMessage/RejectedPlanMessage.tsx`
+- `./components/skills/SkillsMenu.js` (ext=1, int=0) -> `./src/components/skills/SkillsMenu.tsx`
+- `./components/tasks/BackgroundTasksDialog.js` (ext=1, int=0) -> `./src/components/tasks/BackgroundTasksDialog.tsx`
+- `./components/ui/option.js` (ext=1, int=0) -> `./src/components/ui/option.ts`
+- `./imagePaste.js` (ext=1, int=0) -> `./src/imagePaste.ts`
+- `./teammateViewHelpers.js` (ext=1, int=0) -> `./src/teammateViewHelpers.ts`
+- `./selectors.js` (ext=1, int=0) -> `./src/selectors.ts`
+- `./hooksSettings.js` (ext=1, int=0) -> `./src/hooksSettings.ts`
+- `./isHookEqual.js` (ext=1, int=0) -> `./src/isHookEqual.ts`
+- `./toolPool.js` (ext=1, int=0) -> `./src/toolPool.ts`
+- `./skillImprovement.js` (ext=1, int=0) -> `./src/skillImprovement.ts`
+- `./terminalSetup.js` (ext=1, int=0) -> `./src/terminalSetup.ts`
+- `./projectOnboardingState.js` (ext=1, int=0) -> `./src/projectOnboardingState.ts`
+- `./promptOverlayContext.js` (ext=1, int=0) -> `./src/promptOverlayContext.tsx`
+- `./collapseTeammateShutdowns.js` (ext=1, int=0) -> `./src/collapseTeammateShutdowns.ts`
+- `./collapseHookSummaries.js` (ext=1, int=0) -> `./src/collapseHookSummaries.ts`
+- `./commands/color/index.js` (ext=1, int=0) -> `./src/commands/color/index.ts`
+- `./commands/statusline.js` (ext=1, int=0) -> `./src/commands/statusline.tsx`
+- `./commands/diff/index.js` (ext=1, int=0) -> `./src/commands/diff/index.ts`
+- `./commands/usage/index.js` (ext=1, int=0) -> `./src/commands/usage/index.ts`
+- `./commands/stats/index.js` (ext=1, int=0) -> `./src/commands/stats/index.ts`
+- `./commands/config/index.js` (ext=1, int=0) -> `./src/commands/config/index.ts`
+- `./commands/doctor/index.js` (ext=1, int=0) -> `./src/commands/doctor/index.ts`
+- `./commands/export/index.js` (ext=1, int=0) -> `./src/commands/export/index.ts`
+- `./commands/desktop/index.js` (ext=1, int=0) -> `./src/commands/desktop/index.ts`
+- `./commands/help/index.js` (ext=1, int=0) -> `./src/commands/help/index.ts`
+- `./commands/mobile/index.js` (ext=1, int=0) -> `./src/commands/mobile/index.ts`
+- `./commands/output-style/index.js` (ext=1, int=0) -> `./src/commands/output-style/index.ts`
+- `./commands/passes/index.js` (ext=1, int=0) -> `./src/commands/passes/index.ts`
+- `./commands/vim/index.js` (ext=1, int=0) -> `./src/commands/vim/index.ts`
+- `./commands/rewind/index.js` (ext=1, int=0) -> `./src/commands/rewind/index.ts`
+- `./commands/install-slack-app/index.js` (ext=1, int=0) -> `./src/commands/install-slack-app/index.ts`
+- `./commands/stickers/index.js` (ext=1, int=0) -> `./src/commands/stickers/index.ts`
+- `./commands/release-notes/index.js` (ext=1, int=0) -> `./src/commands/release-notes/index.ts`
+- `./commands/files/index.js` (ext=1, int=0) -> `./src/commands/files/index.ts`
+- `./commands/tag/index.js` (ext=1, int=0) -> `./src/commands/tag/index.ts`
+- `./commands/hooks/index.js` (ext=1, int=0) -> `./src/commands/hooks/index.ts`
+- `./commands/keybindings/index.js` (ext=1, int=0) -> `./src/commands/keybindings/index.ts`
+- `./commands/exit/index.js` (ext=1, int=0) -> `./src/commands/exit/index.ts`
+- `./commands/feedback/index.js` (ext=1, int=0) -> `./src/commands/feedback/index.ts`
+- `./commands/plan/index.js` (ext=1, int=0) -> `./src/commands/plan/index.ts`
+- `./commands/heapdump/index.js` (ext=1, int=0) -> `./src/commands/heapdump/index.ts`
+- `./commands/add-dir/index.js` (ext=1, int=0) -> `./src/commands/add-dir/index.ts`
+- `./commands/sandbox-toggle/index.js` (ext=1, int=0) -> `./src/commands/sandbox-toggle/index.ts`
+- `./processUserInput/processSlashCommand.js` (ext=1, int=0) -> `./src/processUserInput/processSlashCommand.tsx`
+- `./deepLink/banner.js` (ext=1, int=0) -> `./src/deepLink/banner.ts`
+- `./deepLink/registerProtocol.js` (ext=1, int=0) -> `./src/deepLink/registerProtocol.ts`
+- `./deepLink/protocolHandler.js` (ext=1, int=0) -> `./src/deepLink/protocolHandler.ts`
+- `./ultraplan/ccrSession.js` (ext=1, int=0) -> `./src/ultraplan/ccrSession.ts`
+- `./replTypes/utils.js` (ext=1, int=0) -> `./src/replTypes/utils.ts`
+- `./replTypes/connectorText.js` (ext=1, int=0) -> `./src/replTypes/connectorText.ts`
+- `./replTypes/fileSuggestion.js` (ext=1, int=0) -> `./src/replTypes/fileSuggestion.ts`
+- `./replTypes/statusLine.js` (ext=1, int=0) -> `./src/replTypes/statusLine.ts`
+- `./replTypes/command.js` (ext=1, int=0) -> `./src/replTypes/command.ts`
+- `./replTypes/hooks.js` (ext=1, int=0) -> `./src/replTypes/hooks.ts`
+- `./diagnostics/claudeDesktop.js` (ext=1, int=0) -> `./src/diagnostics/claudeDesktop.ts`
+- `./diagnostics/debugFilter.js` (ext=1, int=0) -> `./src/diagnostics/debugFilter.ts`
+- `./github/githubRepoPathMapping.js` (ext=1, int=0) -> `./src/github/githubRepoPathMapping.ts`
+- `./uiHelpers/groupToolUses.js` (ext=1, int=0) -> `./src/uiHelpers/groupToolUses.ts`
+- `./uiHelpers/horizontalScroll.js` (ext=1, int=0) -> `./src/uiHelpers/horizontalScroll.ts`
+- `./uiHelpers/logoV2Utils.js` (ext=1, int=0) -> `./src/uiHelpers/logoV2Utils.ts`
+- `./uiHelpers/treeify.js` (ext=1, int=0) -> `./src/uiHelpers/treeify.ts`
+- `./clipboard/pasteStore.js` (ext=1, int=0) -> `./src/clipboard/pasteStore.ts`
+- `./interactiveHelpers/interactiveHelpers.js` (ext=1, int=0) -> `./src/interactiveHelpers/interactiveHelpers.tsx`
+- `./dialogLaunchers/dialogLaunchers.js` (ext=1, int=0) -> `./src/dialogLaunchers/dialogLaunchers.tsx`
+- `./commands/assistant/index.js` (ext=1, int=0) -> `./src/commands/assistant/index.ts`

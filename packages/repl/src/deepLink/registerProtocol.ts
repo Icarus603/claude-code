@@ -13,7 +13,7 @@
  *   Windows — Writes registry keys under HKEY_CURRENT_USER\Software\Classes
  */
 
-import { DEEP_LINK_PROTOCOL } from '@claude-code/repl/deepLink/parseDeepLink.js'
+import { DEEP_LINK_PROTOCOL } from './parseDeepLink.js'
 import { promises as fs } from 'fs'
 import * as os from 'os'
 import * as path from 'path'

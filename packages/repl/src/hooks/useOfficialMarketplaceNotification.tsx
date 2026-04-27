@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { Notification } from '@claude-code/repl/notifications.js'
+import type { Notification } from '../notifications.js'
 import { Text } from '@anthropic/ink'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { checkAndInstallOfficialMarketplace } from '@claude-code/config/plugin/officialMarketplaceStartupCheck'

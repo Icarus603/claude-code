@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const resume: Command = {
   type: 'local-jsx',
@@ -6,7 +6,7 @@ const resume: Command = {
   description: 'Resume a previous conversation',
   aliases: ['continue'],
   argumentHint: '[conversation id or search term]',
-  load: () => import('@claude-code/command-runtime/commands/resume/resume.js'),
+  load: () => import('./resume.js'),
 }
 
 export default resume

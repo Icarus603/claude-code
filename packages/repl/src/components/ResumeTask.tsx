@@ -7,7 +7,7 @@ import {
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow list navigation
 import { Box, Text, useInput } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js'
+import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { detectCurrentRepository } from '@claude-code/storage/detectRepository.js'
 import { formatRelativeTime } from '@claude-code/output/formatters'

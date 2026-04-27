@@ -27,7 +27,7 @@ import type {
 } from '@claude-code/agent/messageShapes'
 import { addInvokedSkill, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG } from '@claude-code/command-runtime/xml.js'
-import type { CanUseToolFn } from '@claude-code/repl/hooks/useCanUseTool.js'
+import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
@@ -55,7 +55,7 @@ import {
   prepareForkedCommandContext,
 } from '@claude-code/agent/forkedAgent.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
-import { isFullscreenEnvEnabled } from '@claude-code/repl/fullscreen.js'
+import { isFullscreenEnvEnabled } from '../fullscreen.js'
 import { toArray } from '@claude-code/config/generators'
 import { registerSkillHooks } from '@claude-code/agent/hooks/registerSkillHooks.js'
 import { logError } from '@claude-code/local-observability/log.js'
@@ -94,7 +94,7 @@ import { getWorkload } from '@claude-code/provider/workloadContext.js'
 import type {
   ProcessUserInputBaseResult,
   ProcessUserInputContext,
-} from '@claude-code/repl/processUserInput/processUserInput.js'
+} from './processUserInput.js'
 
 type SlashCommandResult = ProcessUserInputBaseResult & {
   command: Command

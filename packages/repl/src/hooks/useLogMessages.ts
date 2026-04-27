@@ -1,6 +1,6 @@
 import type { UUID } from 'crypto'
 import { useEffect, useRef } from 'react'
-import { useAppState } from '@claude-code/repl/appStateHooks.js'
+import { useAppState } from '../appStateHooks.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {

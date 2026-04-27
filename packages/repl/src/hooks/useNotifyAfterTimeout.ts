@@ -4,7 +4,7 @@ import {
   updateLastInteractionTime,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { useTerminalNotification } from '@anthropic/ink'
-import { sendNotification } from '@claude-code/repl/notifier.js'
+import { sendNotification } from '../notifier.js'
 // The time threshold in milliseconds for considering an interaction "recent" (6 seconds)
 export const DEFAULT_INTERACTION_THRESHOLD_MS = 6000
 

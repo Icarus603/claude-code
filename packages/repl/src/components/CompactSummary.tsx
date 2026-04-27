@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { Box, Text } from '@anthropic/ink'
-import type { Screen } from '@claude-code/repl/screens/REPL.js'
+import type { Screen } from '../screens/REPL.js'
 import type { NormalizedUserMessage } from '@claude-code/agent/messageShapes'
 import { getUserMessageText } from '@claude-code/agent/messages.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'

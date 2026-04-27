@@ -1,6 +1,6 @@
 import { LRUCache } from 'lru-cache'
 import { basename, dirname, join, sep } from 'path'
-import type { SuggestionItem } from '@claude-code/repl/components/PromptInput/PromptInputFooterSuggestions.js'
+import type { SuggestionItem } from '../../components/PromptInput/PromptInputFooterSuggestions.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { logError } from '@claude-code/local-observability/logging'

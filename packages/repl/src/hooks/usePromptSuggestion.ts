@@ -4,8 +4,8 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { abortSpeculation } from '@claude-code/repl/promptSuggestionSpeculation.js'
-import { useAppState, useSetAppState } from '@claude-code/repl/appStateHooks.js'
+import { abortSpeculation } from '../promptSuggestionSpeculation.js'
+import { useAppState, useSetAppState } from '../appStateHooks.js'
 
 type Props = {
   inputValue: string

@@ -5,7 +5,7 @@ import type { ThemeName } from '@anthropic/ink'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { Box, Text, stringWidth, useTheme } from '@anthropic/ink'
-import { useAppStateMaybeOutsideOfProvider } from '@claude-code/repl/appStateHooks.js'
+import { useAppStateMaybeOutsideOfProvider } from '../../appStateHooks.js'
 import {
   findToolByName,
   type Tool,

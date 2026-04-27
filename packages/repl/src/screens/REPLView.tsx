@@ -19,13 +19,13 @@ import { useInput } from '@anthropic/ink'
 import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '@anthropic/ink'
 import { useSearchHighlight } from '@anthropic/ink'
-import type { JumpHandle } from '@claude-code/repl/components/VirtualMessageList.js'
+import type { JumpHandle } from '../components/VirtualMessageList.js'
 import { renderMessagesToPlainText } from '@claude-code/output/render/exportRenderer.js'
 import { openFileInExternalEditor } from '@claude-code/storage/editor.js'
 import { writeFile } from 'fs/promises'
 import { type TabStatusKind, Box, Text, useStdin, useTheme, useTerminalFocus, useTerminalTitle, useTabStatus } from '@anthropic/ink'
-import { CostThresholdDialog } from '@claude-code/repl/components/CostThresholdDialog.js'
-import { IdleReturnDialog } from '@claude-code/repl/components/IdleReturnDialog.js'
+import { CostThresholdDialog } from '../components/CostThresholdDialog.js'
+import { IdleReturnDialog } from '../components/IdleReturnDialog.js'
 import * as React from 'react'
 import {
   useEffect,
@@ -37,8 +37,8 @@ import {
   useLayoutEffect,
   type RefObject,
 } from 'react'
-import { useNotifications } from '@claude-code/repl/notifications.js'
-import { sendNotification } from '@claude-code/repl/notifier.js'
+import { useNotifications } from '../notifications.js'
+import { sendNotification } from '../notifier.js'
 import {
   startPreventSleep,
   stopPreventSleep,
@@ -73,7 +73,7 @@ import { QueryGuard } from '@claude-code/agent/runtime/QueryGuard.js';
 import { isEnvTruthy } from '@claude-code/config/env/utils';
 import { formatTokens } from '@claude-code/output/formatters'
 import { truncateToWidth } from '@claude-code/output/formatters/truncate.js';
-import { consumeEarlyInput } from '@claude-code/repl/earlyInput.js';
+import { consumeEarlyInput } from '../earlyInput.js';
 
 import { setMemberActive } from '@claude-code/swarm';
 import {
@@ -82,7 +82,7 @@ import {
   sendSandboxPermissionRequestViaMailbox,
   sendSandboxPermissionResponseViaMailbox,
 } from '@claude-code/swarm';
-import { registerSandboxPermissionCallback } from '@claude-code/repl/hooks/useSwarmPermissionPoller.js';
+import { registerSandboxPermissionCallback } from '../hooks/useSwarmPermissionPoller.js';
 import { getTeamName, getAgentName } from '@claude-code/swarm/teammateState.js';
 import { WorkerPendingPermission } from '@claude-code/permission/components/WorkerPendingPermission.js';
 import {
@@ -102,8 +102,8 @@ import {
   unregisterLeaderSetToolPermissionContext,
 } from '@claude-code/swarm';
 import { endInteractionSpan } from '@claude-code/local-observability/spans';
-import { useLogMessages } from '@claude-code/repl/hooks/useLogMessages.js';
-import { useReplBridge } from '@claude-code/repl/hooks/useReplBridge.js';
+import { useLogMessages } from '../hooks/useLogMessages.js';
+import { useReplBridge } from '../hooks/useReplBridge.js';
 import {
   type Command,
   type CommandResultDisplay,
@@ -111,67 +111,67 @@ import {
   getCommandName,
   isCommandEnabled,
 } from '@claude-code/command-runtime/runtime';
-import type { PromptInputMode, QueuedCommand, VimMode } from '@claude-code/repl/textInputTypes.js';
+import type { PromptInputMode, QueuedCommand, VimMode } from '../textInputTypes.js';
 import {
   MessageSelector,
   selectableUserMessagesFilter,
   messagesAfterAreOnlySynthetic,
-} from '@claude-code/repl/components/MessageSelector.js';
+} from '../components/MessageSelector.js';
 import { PermissionRequest, type ToolUseConfirm } from '@claude-code/permission/components/PermissionRequest.js';
-import { ElicitationDialog } from '@claude-code/repl/components/mcp/ElicitationDialog.js';
-import { PromptDialog } from '@claude-code/repl/components/hooks/PromptDialog.js';
+import { ElicitationDialog } from '../components/mcp/ElicitationDialog.js';
+import { PromptDialog } from '../components/hooks/PromptDialog.js';
 import type { PromptRequest, PromptResponse } from '@claude-code/agent/types/hooks.js';
-import PromptInput from '@claude-code/repl/components/PromptInput/PromptInput.js';
-import { PromptInputQueuedCommands } from '@claude-code/repl/components/PromptInput/PromptInputQueuedCommands.js';
-import { useRemoteSession } from '@claude-code/repl/hooks/useRemoteSession.js';
-import { useDirectConnect } from '@claude-code/repl/hooks/useDirectConnect.js';
+import PromptInput from '../components/PromptInput/PromptInput.js';
+import { PromptInputQueuedCommands } from '../components/PromptInput/PromptInputQueuedCommands.js';
+import { useRemoteSession } from '../hooks/useRemoteSession.js';
+import { useDirectConnect } from '../hooks/useDirectConnect.js';
 import type { DirectConnectConfig } from '@claude-code/server/directConnectManager.js';
-import { useSSHSession } from '@claude-code/repl/hooks/useSSHSession.js';
-import { useAssistantHistory } from '@claude-code/repl/hooks/useAssistantHistory.js';
+import { useSSHSession } from '../hooks/useSSHSession.js';
+import { useAssistantHistory } from '../hooks/useAssistantHistory.js';
 import type { SSHSession } from '@claude-code/cli/ssh/createSSHSession.js';
-import { SkillImprovementSurvey } from '@claude-code/repl/components/SkillImprovementSurvey.js';
-import { useSkillImprovementSurvey } from '@claude-code/repl/hooks/useSkillImprovementSurvey.js';
-import { useMoreRight } from '@claude-code/repl/moreright/useMoreRight.js';
-import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '@claude-code/repl/components/Spinner.js';
+import { SkillImprovementSurvey } from '../components/SkillImprovementSurvey.js';
+import { useSkillImprovementSurvey } from '../hooks/useSkillImprovementSurvey.js';
+import { useMoreRight } from '../moreright/useMoreRight.js';
+import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '../components/Spinner.js';
 import { getSystemPrompt } from '@claude-code/agent/prompts.js';
 import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js';
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js';
 import { getMemoryFiles } from '@claude-code/storage/claudemd.js';
 import { startBackgroundHousekeeping } from '@claude-code/agent/runtime/backgroundHousekeeping.js';
 import { getTotalCost, saveCurrentSessionCosts, resetCostState, getStoredSessionCosts } from '@claude-code/provider/costTracker.js';
-import { useCostSummary } from '@claude-code/repl/costHook/costHook.js';
+import { useCostSummary } from '../costHook/costHook.js';
 import { useFpsMetrics } from '@claude-code/app-host/context/fpsMetrics.js';
-import { useAfterFirstRender } from '@claude-code/repl/hooks/useAfterFirstRender.js';
-import { useDeferredHookMessages } from '@claude-code/repl/hooks/useDeferredHookMessages.js';
-import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from '@claude-code/repl/history.js';
-import { prependModeCharacterToInput } from '@claude-code/repl/components/PromptInput/inputModes.js';
-import { prependToShellHistoryCache } from '@claude-code/repl/suggestions/shellHistoryCompletion.js';
-import { useApiKeyVerification } from '@claude-code/repl/hooks/useApiKeyVerification.js';
-import { GlobalKeybindingHandlers } from '@claude-code/repl/hooks/useGlobalKeybindings.js';
-import { CommandKeybindingHandlers } from '@claude-code/repl/hooks/useCommandKeybindings.js';
-import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js';
-import { useShortcutDisplay } from '@claude-code/repl/keybindings/useShortcutDisplay.js';
-import { TranscriptModeFooter } from '@claude-code/repl/screens/repl/TranscriptModeFooter.js';
-import { TranscriptSearchBar } from '@claude-code/repl/screens/repl/TranscriptSearchBar.js';
-import { AnimatedTerminalTitle } from '@claude-code/repl/screens/repl/AnimatedTerminalTitle.js';
-import { median } from '@claude-code/repl/screens/repl/median.js';
-import { findRawIndex } from '@claude-code/repl/screens/repl/findRawIndex.js';
-import { useReplEnvFlags } from '@claude-code/repl/screens/repl/useReplEnvFlags.js';
-import { isOnlySleepToolActive } from '@claude-code/repl/screens/repl/onlySleepToolActive.js';
-import { deriveStopHookSpinnerSuffix } from '@claude-code/repl/screens/repl/stopHookSpinnerSuffix.js';
-import { useSuspendResumeHandlers } from '@claude-code/repl/screens/repl/useSuspendResumeHandlers.js';
-import { useTranscriptFreeze } from '@claude-code/repl/screens/repl/useTranscriptFreeze.js';
-import { useFeedbackSurveyAutoIssue } from '@claude-code/repl/screens/repl/useFeedbackSurveyAutoIssue.js';
-import { useAutoRunIssueHandlers } from '@claude-code/repl/screens/repl/useAutoRunIssueHandlers.js';
-import { useHandleExit } from '@claude-code/repl/screens/repl/useHandleExit.js';
-import { useSurveyAndRateLimitHandlers } from '@claude-code/repl/screens/repl/useSurveyAndRateLimitHandlers.js';
-import { useQueuedCommandOnCancel } from '@claude-code/repl/screens/repl/useQueuedCommandOnCancel.js';
-import { useStartupCallouts } from '@claude-code/repl/screens/repl/useStartupCallouts.js';
-import { getShortcutDisplay } from '@claude-code/repl/keybindings/shortcutFormat.js';
-import { CancelRequestHandler } from '@claude-code/repl/hooks/useCancelRequest.js';
-import { useBackgroundTaskNavigation } from '@claude-code/repl/hooks/useBackgroundTaskNavigation.js';
-import { useSwarmInitialization } from '@claude-code/repl/hooks/useSwarmInitialization.js';
-import { useTeammateViewAutoExit } from '@claude-code/repl/hooks/useTeammateViewAutoExit.js';
+import { useAfterFirstRender } from '../hooks/useAfterFirstRender.js';
+import { useDeferredHookMessages } from '../hooks/useDeferredHookMessages.js';
+import { addToHistory, removeLastFromHistory, expandPastedTextRefs, parseReferences } from '../history.js';
+import { prependModeCharacterToInput } from '../components/PromptInput/inputModes.js';
+import { prependToShellHistoryCache } from '../suggestions/shellHistoryCompletion.js';
+import { useApiKeyVerification } from '../hooks/useApiKeyVerification.js';
+import { GlobalKeybindingHandlers } from '../hooks/useGlobalKeybindings.js';
+import { CommandKeybindingHandlers } from '../hooks/useCommandKeybindings.js';
+import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js';
+import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js';
+import { TranscriptModeFooter } from './repl/TranscriptModeFooter.js';
+import { TranscriptSearchBar } from './repl/TranscriptSearchBar.js';
+import { AnimatedTerminalTitle } from './repl/AnimatedTerminalTitle.js';
+import { median } from './repl/median.js';
+import { findRawIndex } from './repl/findRawIndex.js';
+import { useReplEnvFlags } from './repl/useReplEnvFlags.js';
+import { isOnlySleepToolActive } from './repl/onlySleepToolActive.js';
+import { deriveStopHookSpinnerSuffix } from './repl/stopHookSpinnerSuffix.js';
+import { useSuspendResumeHandlers } from './repl/useSuspendResumeHandlers.js';
+import { useTranscriptFreeze } from './repl/useTranscriptFreeze.js';
+import { useFeedbackSurveyAutoIssue } from './repl/useFeedbackSurveyAutoIssue.js';
+import { useAutoRunIssueHandlers } from './repl/useAutoRunIssueHandlers.js';
+import { useHandleExit } from './repl/useHandleExit.js';
+import { useSurveyAndRateLimitHandlers } from './repl/useSurveyAndRateLimitHandlers.js';
+import { useQueuedCommandOnCancel } from './repl/useQueuedCommandOnCancel.js';
+import { useStartupCallouts } from './repl/useStartupCallouts.js';
+import { getShortcutDisplay } from '../keybindings/shortcutFormat.js';
+import { CancelRequestHandler } from '../hooks/useCancelRequest.js';
+import { useBackgroundTaskNavigation } from '../hooks/useBackgroundTaskNavigation.js';
+import { useSwarmInitialization } from '../hooks/useSwarmInitialization.js';
+import { useTeammateViewAutoExit } from '../hooks/useTeammateViewAutoExit.js';
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js';
 import { isHumanTurn } from '@claude-code/agent/messagePredicates.js';
 import { logError } from '@claude-code/local-observability/logging';
@@ -192,15 +192,15 @@ const VoiceKeybindingHandler: typeof import('@claude-code/voice/hooks/useVoiceIn
 // Frustration detection is ant-only (dogfooding). Conditional require so external
 // builds eliminate the module entirely (including its two O(n) useMemos that run
 // on every messages change, plus the GrowthBook fetch).
-const useFrustrationDetection: typeof import('@claude-code/repl/components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection =
+const useFrustrationDetection: typeof import('../components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection =
   process.env.USER_TYPE === 'ant'
-    ? require('@claude-code/repl/components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection
+    ? require('../components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection
     : () => ({ state: 'closed', handleTranscriptSelect: () => {} });
 // Ant-only org warning. Conditional require so the org UUID list is
 // eliminated from external builds (one UUID is on excluded-strings).
-const useAntOrgWarningNotification: typeof import('@claude-code/repl/hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification =
+const useAntOrgWarningNotification: typeof import('../hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification =
   process.env.USER_TYPE === 'ant'
-    ? require('@claude-code/repl/hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification
+    ? require('../hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification
     : () => {};
 // Dead code elimination: conditional import for coordinator mode
 const getCoordinatorUserContext: (
@@ -210,7 +210,7 @@ const getCoordinatorUserContext: (
   ? require('@claude-code/agent/coordinatorMode.js').getCoordinatorUserContext
   : () => ({});
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-import useCanUseTool from '@claude-code/repl/hooks/useCanUseTool.js';
+import useCanUseTool from '../hooks/useCanUseTool.js';
 import type { ToolPermissionContext, Tool } from '@claude-code/tool-registry/Tool.js';
 import {
   applyPermissionUpdate,
@@ -253,9 +253,9 @@ import { BASH_INPUT_TAG, COMMAND_MESSAGE_TAG, COMMAND_NAME_TAG, LOCAL_COMMAND_ST
 import { escapeXml } from '@claude-code/output/xml';
 import type { ThinkingConfig } from '@claude-code/provider/thinking.js';
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js';
-import { handlePromptSubmit, type PromptInputHelpers } from '@claude-code/repl/handlePromptSubmit.js';
-import { useQueueProcessor } from '@claude-code/repl/hooks/useQueueProcessor.js';
-import { useMailboxBridge } from '@claude-code/repl/hooks/useMailboxBridge.js';
+import { handlePromptSubmit, type PromptInputHelpers } from '../handlePromptSubmit.js';
+import { useQueueProcessor } from '../hooks/useQueueProcessor.js';
+import { useMailboxBridge } from '../hooks/useMailboxBridge.js';
 import { queryCheckpoint, logQueryProfileReport } from '@claude-code/local-observability/aggregates/queryProfiler.js';
 import type {
   Message as MessageType,
@@ -265,15 +265,15 @@ import type {
   PartialCompactDirection,
 } from '@claude-code/agent/messageShapes';
 import { query } from '@claude-code/agent/query';
-import { mergeClients } from '@claude-code/repl/hooks/useMergedClients.js';
+import { mergeClients } from '../hooks/useMergedClients.js';
 import { getQuerySourceForREPL } from '@claude-code/agent/promptCategory.js';
-import { mergeAndFilterTools } from '@claude-code/repl/toolPool.js';
-import { useSkillsChange } from '@claude-code/repl/hooks/useSkillsChange.js';
-import { Messages } from '@claude-code/repl/components/Messages.js';
-import { TaskListV2 } from '@claude-code/repl/components/TaskListV2.js';
-import { TeammateViewHeader } from '@claude-code/repl/components/TeammateViewHeader.js';
-import { useTasksV2WithCollapseEffect } from '@claude-code/repl/hooks/useTasksV2.js';
-import { maybeMarkProjectOnboardingComplete } from '@claude-code/repl/projectOnboardingState.js';
+import { mergeAndFilterTools } from '../toolPool.js';
+import { useSkillsChange } from '../hooks/useSkillsChange.js';
+import { Messages } from '../components/Messages.js';
+import { TaskListV2 } from '../components/TaskListV2.js';
+import { TeammateViewHeader } from '../components/TeammateViewHeader.js';
+import { useTasksV2WithCollapseEffect } from '../hooks/useTasksV2.js';
+import { maybeMarkProjectOnboardingComplete } from '../projectOnboardingState.js';
 import type { MCPServerConnection } from '@claude-code/mcp-runtime/types.js';
 import type { ScopedMcpServerConfig } from '@claude-code/mcp-runtime/types.js';
 import { randomUUID, type UUID } from 'crypto';
@@ -284,13 +284,13 @@ import { assembleToolPool } from '@claude-code/tool-registry/toolsList.js';
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js';
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js';
 import { resumeAgentBackground } from '@claude-code/tool-registry/tools/AgentTool/resumeAgent.js';
-import { useMainLoopModel } from '@claude-code/repl/hooks/useMainLoopModel.js';
-import { useAppState } from '@claude-code/repl/appStateHooks.js';
+import { useMainLoopModel } from '../hooks/useMainLoopModel.js';
+import { useAppState } from '../appStateHooks.js';
 import { useReplActions } from './repl/useReplActions.js';
 import { useReplAppState } from './repl/useReplAppState.js';
 import { useReplRuntimeViews } from './repl/useReplRuntimeViews.js';
 import type { ContentBlockParam, ImageBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs';
-import type { ProcessUserInputContext } from '@claude-code/repl/processUserInput/processUserInput.js';
+import type { ProcessUserInputContext } from '../processUserInput/processUserInput.js';
 import type { PastedContent } from '@claude-code/config';
 import { copyPlanForFork, copyPlanForResume, getPlanSlug, setPlanSlug } from '@claude-code/storage/plans.js';
 import {
@@ -305,8 +305,8 @@ import {
   saveWorktreeState,
   getAgentTranscript,
 } from '@claude-code/storage/sessionStorage.js';
-import { deserializeMessages } from '@claude-code/repl/conversationRecovery.js';
-import { extractReadFilesFromMessages, extractBashToolsFromMessages } from '@claude-code/repl/queryHelpers.js';
+import { deserializeMessages } from '../conversationRecovery.js';
+import { extractReadFilesFromMessages, extractBashToolsFromMessages } from '../queryHelpers.js';
 import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js';
 import { runPostCompactCleanup } from '@claude-code/agent/compaction/postCompactCleanup.js';
 import {
@@ -338,7 +338,7 @@ import {
 import { isBgSession, updateSessionName, updateSessionActivity } from '@claude-code/agent/concurrentSessions.js';
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
 import { restoreRemoteAgentTasks } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js';
-import { useInboxPoller } from '@claude-code/repl/hooks/useInboxPoller.js';
+import { useInboxPoller } from '../hooks/useInboxPoller.js';
 import { getViewedLocalAgentTask } from './repl/backgrounding.js';
 import { getInteractiveMcpClients } from './repl/integrations.js';
 import { parseImmediateCommandInput } from './repl/submission.js';
@@ -350,10 +350,10 @@ const PROACTIVE_FALSE = () => false;
 const SUGGEST_BG_PR_NOOP = (_p: string, _n: string): boolean => false;
 const useProactive =
   feature('PROACTIVE') || feature('KAIROS') ? require('@claude-code/agent/proactive/useProactive.js').useProactive : null;
-const useScheduledTasks = feature('AGENT_TRIGGERS') ? require('@claude-code/repl/hooks/useScheduledTasks.js').useScheduledTasks : null;
+const useScheduledTasks = feature('AGENT_TRIGGERS') ? require('../hooks/useScheduledTasks.js').useScheduledTasks : null;
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js';
-import { useTaskListWatcher } from '@claude-code/repl/hooks/useTaskListWatcher.js';
+import { useTaskListWatcher } from '../hooks/useTaskListWatcher.js';
 import type { SandboxAskCallback, NetworkHostPattern } from '@claude-code/shell/sandbox.js';
 
 import {
@@ -363,8 +363,8 @@ import {
   type IdeType,
 } from '@claude-code/ide/ide.js';
 import { useIDEIntegration } from '@claude-code/ide/hooks/useIDEIntegration.js';
-import exit from '@claude-code/repl/commands/exit/index.js';
-import { ExitFlow } from '@claude-code/repl/components/ExitFlow.js';
+import exit from '../commands/exit/index.js';
+import { ExitFlow } from '../components/ExitFlow.js';
 import { getCurrentWorktreeSession } from '@claude-code/swarm';
 import {
   popAllEditable,
@@ -374,38 +374,38 @@ import {
   getCommandQueueLength,
   removeByFilter,
 } from '@claude-code/agent/messageQueueManager.js';
-import { useCommandQueue } from '@claude-code/repl/hooks/useCommandQueue.js';
-import { SessionBackgroundHint } from '@claude-code/repl/components/SessionBackgroundHint.js';
+import { useCommandQueue } from '../hooks/useCommandQueue.js';
+import { SessionBackgroundHint } from '../components/SessionBackgroundHint.js';
 import { startBackgroundSession } from '@claude-code/agent/tasks/LocalMainSessionTask.js';
-import { useSessionBackgrounding } from '@claude-code/repl/hooks/useSessionBackgrounding.js';
+import { useSessionBackgrounding } from '../hooks/useSessionBackgrounding.js';
 import { diagnosticTracker } from '@claude-code/tool-registry/diagnosticTracking.js';
-import { handleSpeculationAccept, type ActiveSpeculationState } from '@claude-code/repl/promptSuggestionSpeculation.js';
-import { IdeOnboardingDialog } from '@claude-code/repl/components/IdeOnboardingDialog.js';
-import { EffortCallout, shouldShowEffortCallout } from '@claude-code/repl/components/EffortCallout.js';
+import { handleSpeculationAccept, type ActiveSpeculationState } from '../promptSuggestionSpeculation.js';
+import { IdeOnboardingDialog } from '../components/IdeOnboardingDialog.js';
+import { EffortCallout, shouldShowEffortCallout } from '../components/EffortCallout.js';
 import type { EffortValue } from '@claude-code/agent/effort.js';
-import { RemoteCallout } from '@claude-code/repl/components/RemoteCallout.js';
+import { RemoteCallout } from '../components/RemoteCallout.js';
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const AntModelSwitchCallout =
-  process.env.USER_TYPE === 'ant' ? require('@claude-code/repl/components/AntModelSwitchCallout.js').AntModelSwitchCallout : null;
+  process.env.USER_TYPE === 'ant' ? require('../components/AntModelSwitchCallout.js').AntModelSwitchCallout : null;
 const shouldShowAntModelSwitch =
   process.env.USER_TYPE === 'ant'
-    ? require('@claude-code/repl/components/AntModelSwitchCallout.js').shouldShowModelSwitchCallout
+    ? require('../components/AntModelSwitchCallout.js').shouldShowModelSwitchCallout
     : (): boolean => false;
 const UndercoverAutoCallout =
-  process.env.USER_TYPE === 'ant' ? require('@claude-code/repl/components/UndercoverAutoCallout.js').UndercoverAutoCallout : null;
+  process.env.USER_TYPE === 'ant' ? require('../components/UndercoverAutoCallout.js').UndercoverAutoCallout : null;
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 import { activityManager } from '@claude-code/app-host/activityManager.js';
 import { createAbortController } from '@claude-code/agent/abortController.js';
 import { MCPConnectionManager } from '@claude-code/mcp-runtime/MCPConnectionManager.js';
-import { useFeedbackSurvey } from '@claude-code/repl/components/FeedbackSurvey/useFeedbackSurvey.js';
-import { useMemorySurvey } from '@claude-code/repl/components/FeedbackSurvey/useMemorySurvey.js';
-import { usePostCompactSurvey } from '@claude-code/repl/components/FeedbackSurvey/usePostCompactSurvey.js';
-import { FeedbackSurvey } from '@claude-code/repl/components/FeedbackSurvey/FeedbackSurvey.js';
-import { useInstallMessages } from '@claude-code/repl/hooks/notifs/useInstallMessages.js';
-import { useAwaySummary } from '@claude-code/repl/hooks/useAwaySummary.js';
-import { useChromeExtensionNotification } from '@claude-code/repl/hooks/useChromeExtensionNotification.js';
-import { useOfficialMarketplaceNotification } from '@claude-code/repl/hooks/useOfficialMarketplaceNotification.js';
-import { getTipToShowOnSpinner, recordShownTip } from '@claude-code/repl/tips/tipScheduler.js';
+import { useFeedbackSurvey } from '../components/FeedbackSurvey/useFeedbackSurvey.js';
+import { useMemorySurvey } from '../components/FeedbackSurvey/useMemorySurvey.js';
+import { usePostCompactSurvey } from '../components/FeedbackSurvey/usePostCompactSurvey.js';
+import { FeedbackSurvey } from '../components/FeedbackSurvey/FeedbackSurvey.js';
+import { useInstallMessages } from '../hooks/notifs/useInstallMessages.js';
+import { useAwaySummary } from '../hooks/useAwaySummary.js';
+import { useChromeExtensionNotification } from '../hooks/useChromeExtensionNotification.js';
+import { useOfficialMarketplaceNotification } from '../hooks/useOfficialMarketplaceNotification.js';
+import { getTipToShowOnSpinner, recordShownTip } from '../tips/tipScheduler.js';
 import type { Theme } from '@anthropic/ink';
 import {
   checkAndDisableBypassPermissionsIfNeeded,
@@ -415,41 +415,41 @@ import {
 } from '@claude-code/permission/bypassPermissionsKillswitch.js';
 import { SandboxManager } from '@claude-code/shell/sandbox.js';
 import { SANDBOX_NETWORK_ACCESS_TOOL_NAME } from '@claude-code/cli/structuredIO.js';
-import { useFileHistorySnapshotInit } from '@claude-code/repl/hooks/useFileHistorySnapshotInit.js';
+import { useFileHistorySnapshotInit } from '../hooks/useFileHistorySnapshotInit.js';
 import { SandboxPermissionRequest } from '@claude-code/permission/components/SandboxPermissionRequest.js';
-import { SandboxViolationExpandedView } from '@claude-code/repl/components/SandboxViolationExpandedView.js';
-import { useSettingsErrors } from '@claude-code/repl/hooks/notifs/useSettingsErrors.js';
-import { useMcpConnectivityStatus } from '@claude-code/repl/hooks/notifs/useMcpConnectivityStatus.js';
-import { useAutoModeUnavailableNotification } from '@claude-code/repl/hooks/notifs/useAutoModeUnavailableNotification.js';
-import { AUTO_MODE_DESCRIPTION } from '@claude-code/repl/components/AutoModeOptInDialog.js';
-import { useLspInitializationNotification } from '@claude-code/repl/hooks/notifs/useLspInitializationNotification.js';
-import { useLspPluginRecommendation } from '@claude-code/repl/hooks/useLspPluginRecommendation.js';
-import { LspRecommendationMenu } from '@claude-code/repl/components/LspRecommendation/LspRecommendationMenu.js';
-import { useClaudeCodeHintRecommendation } from '@claude-code/repl/hooks/useClaudeCodeHintRecommendation.js';
-import { PluginHintMenu } from '@claude-code/repl/components/ClaudeCodeHint/PluginHintMenu.js';
+import { SandboxViolationExpandedView } from '../components/SandboxViolationExpandedView.js';
+import { useSettingsErrors } from '../hooks/notifs/useSettingsErrors.js';
+import { useMcpConnectivityStatus } from '../hooks/notifs/useMcpConnectivityStatus.js';
+import { useAutoModeUnavailableNotification } from '../hooks/notifs/useAutoModeUnavailableNotification.js';
+import { AUTO_MODE_DESCRIPTION } from '../components/AutoModeOptInDialog.js';
+import { useLspInitializationNotification } from '../hooks/notifs/useLspInitializationNotification.js';
+import { useLspPluginRecommendation } from '../hooks/useLspPluginRecommendation.js';
+import { LspRecommendationMenu } from '../components/LspRecommendation/LspRecommendationMenu.js';
+import { useClaudeCodeHintRecommendation } from '../hooks/useClaudeCodeHintRecommendation.js';
+import { PluginHintMenu } from '../components/ClaudeCodeHint/PluginHintMenu.js';
 import {
   DesktopUpsellStartup,
   shouldShowDesktopUpsellStartup,
-} from '@claude-code/repl/components/DesktopUpsell/DesktopUpsellStartup.js';
-import { usePluginInstallationStatus } from '@claude-code/repl/hooks/notifs/usePluginInstallationStatus.js';
-import { usePluginAutoupdateNotification } from '@claude-code/repl/hooks/notifs/usePluginAutoupdateNotification.js';
-import { UserTextMessage } from '@claude-code/repl/components/messages/UserTextMessage.js';
-import { AwsAuthStatusBox } from '@claude-code/repl/components/AwsAuthStatusBox.js';
-import { useRateLimitWarningNotification } from '@claude-code/repl/hooks/notifs/useRateLimitWarningNotification.js';
-import { useDeprecationWarningNotification } from '@claude-code/repl/hooks/notifs/useDeprecationWarningNotification.js';
-import { useNpmDeprecationNotification } from '@claude-code/repl/hooks/notifs/useNpmDeprecationNotification.js';
-import { useIDEStatusIndicator } from '@claude-code/repl/hooks/notifs/useIDEStatusIndicator.js';
-import { useModelMigrationNotifications } from '@claude-code/repl/hooks/notifs/useModelMigrationNotifications.js';
-import { useCanSwitchToExistingSubscription } from '@claude-code/repl/hooks/notifs/useCanSwitchToExistingSubscription.js';
-import { useTeammateLifecycleNotification } from '@claude-code/repl/hooks/notifs/useTeammateShutdownNotification.js';
-import { useFastModeNotification } from '@claude-code/repl/hooks/notifs/useFastModeNotification.js';
+} from '../components/DesktopUpsell/DesktopUpsellStartup.js';
+import { usePluginInstallationStatus } from '../hooks/notifs/usePluginInstallationStatus.js';
+import { usePluginAutoupdateNotification } from '../hooks/notifs/usePluginAutoupdateNotification.js';
+import { UserTextMessage } from '../components/messages/UserTextMessage.js';
+import { AwsAuthStatusBox } from '../components/AwsAuthStatusBox.js';
+import { useRateLimitWarningNotification } from '../hooks/notifs/useRateLimitWarningNotification.js';
+import { useDeprecationWarningNotification } from '../hooks/notifs/useDeprecationWarningNotification.js';
+import { useNpmDeprecationNotification } from '../hooks/notifs/useNpmDeprecationNotification.js';
+import { useIDEStatusIndicator } from '../hooks/notifs/useIDEStatusIndicator.js';
+import { useModelMigrationNotifications } from '../hooks/notifs/useModelMigrationNotifications.js';
+import { useCanSwitchToExistingSubscription } from '../hooks/notifs/useCanSwitchToExistingSubscription.js';
+import { useTeammateLifecycleNotification } from '../hooks/notifs/useTeammateShutdownNotification.js';
+import { useFastModeNotification } from '../hooks/notifs/useFastModeNotification.js';
 import {
   AutoRunIssueNotification,
   shouldAutoRunIssue,
   getAutoRunIssueReasonText,
   getAutoRunCommand,
   type AutoRunIssueReason,
-} from '@claude-code/repl/diagnostics/autoRunIssue.js';
+} from '../diagnostics/autoRunIssue.js';
 import type { HookProgress } from '@claude-code/agent/types/hooks.js';
 import { TungstenLiveMonitor } from '@claude-code/tool-registry/tools/TungstenTool/TungstenLiveMonitor.js';
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -457,12 +457,12 @@ const WebBrowserPanelModule = feature('WEB_BROWSER_TOOL')
   ? (require('@claude-code/tool-registry/tools/WebBrowserTool/WebBrowserPanel.js') as typeof import('@claude-code/tool-registry/tools/WebBrowserTool/WebBrowserPanel.js'))
   : null;
 /* eslint-enable @typescript-eslint/no-require-imports */
-import { IssueFlagBanner } from '@claude-code/repl/components/PromptInput/IssueFlagBanner.js';
-import { useIssueFlagBanner } from '@claude-code/repl/hooks/useIssueFlagBanner.js';
-import { DevBar } from '@claude-code/repl/components/DevBar.js';
-import { UltraplanChoiceDialog } from '@claude-code/repl/components/ultraplan/UltraplanChoiceDialog.js';
-import { UltraplanLaunchDialog } from '@claude-code/repl/components/ultraplan/UltraplanLaunchDialog.js';
-import { launchUltraplan } from '@claude-code/repl/ultraplan.js';
+import { IssueFlagBanner } from '../components/PromptInput/IssueFlagBanner.js';
+import { useIssueFlagBanner } from '../hooks/useIssueFlagBanner.js';
+import { DevBar } from '../components/DevBar.js';
+import { UltraplanChoiceDialog } from '../components/ultraplan/UltraplanChoiceDialog.js';
+import { UltraplanLaunchDialog } from '../components/ultraplan/UltraplanLaunchDialog.js';
+import { launchUltraplan } from '../ultraplan.js';
 import { getFocusedInputDialog } from './repl/dialogs.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '@claude-code/server/remote/RemoteSessionManager.js'
@@ -472,14 +472,14 @@ import {
   FullscreenLayout,
   useUnseenDivider,
   computeUnseenDivider,
-} from '@claude-code/repl/components/FullscreenLayout.js'
+} from '../components/FullscreenLayout.js'
 import {
   isFullscreenEnvEnabled,
   maybeGetTmuxMouseHint,
   isMouseTrackingEnabled,
-} from '@claude-code/repl/fullscreen.js'
+} from '../fullscreen.js'
 import { AlternateScreen } from '@anthropic/ink'
-import { ScrollKeybindingHandler } from '@claude-code/repl/components/ScrollKeybindingHandler.js'
+import { ScrollKeybindingHandler } from '../components/ScrollKeybindingHandler.js'
 import {
   useMessageActions,
   MessageActionsKeybindings,
@@ -487,7 +487,7 @@ import {
   type MessageActionsState,
   type MessageActionsNav,
   type MessageActionCaps,
-} from '@claude-code/repl/components/messageActions.js'
+} from '../components/messageActions.js'
 import { setClipboard } from '@anthropic/ink'
 import type { ScrollBoxHandle } from '@anthropic/ink'
 import {

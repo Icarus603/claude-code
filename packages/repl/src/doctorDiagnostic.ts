@@ -18,7 +18,7 @@ import {
   getShellType,
   isRunningFromLocalInstallation,
   localInstallationExists,
-} from '@claude-code/repl/localInstaller.js'
+} from './localInstaller.js'
 import {
   detectApk,
   detectAsdf,

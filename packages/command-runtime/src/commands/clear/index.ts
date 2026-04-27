@@ -5,7 +5,7 @@
  * - clearSessionCaches: import from 'src/commands/clear/clear/caches.js'
  * - clearConversation: import from 'src/commands/clear/clear/conversation.js'
  */
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 
 const clear = {
   type: 'local',
@@ -13,7 +13,7 @@ const clear = {
   description: 'Clear conversation history and free up context',
   aliases: ['reset', 'new'],
   supportsNonInteractive: false, // Should just create a new session
-  load: () => import('@claude-code/command-runtime/commands/clear/clear.js'),
+  load: () => import('./clear.js'),
 } satisfies Command
 
 export default clear

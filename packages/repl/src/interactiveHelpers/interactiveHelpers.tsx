@@ -20,7 +20,7 @@ import { getSystemContext } from '@claude-code/provider/context.js'
 import { initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { isSynchronizedOutputSupported } from '@anthropic/ink'
 import type { RenderOptions, Root, TextProps } from '@anthropic/ink'
-import { KeybindingSetup } from '@claude-code/repl/keybindings/KeybindingProviderSetup.js'
+import { KeybindingSetup } from '../keybindings/KeybindingProviderSetup.js'
 import { startDeferredPrefetches } from '@claude-code/app-host/main/startup/context.js'
 import {
   checkGate_CACHED_OR_BLOCKING,
@@ -30,7 +30,7 @@ import {
 import { isQualifiedForGrove } from '@claude-code/provider/grove.js'
 import { handleMcpjsonServerApprovals } from '@claude-code/agent/services/mcpServerApproval.js'
 import { AppStateProvider } from '@claude-code/app-host/state/AppState.js'
-import { onChangeAppState } from '@claude-code/repl/onChangeAppState.js'
+import { onChangeAppState } from '../onChangeAppState.js'
 import { normalizeApiKeyForConfig } from '@claude-code/provider/authPortable.js'
 import {
   getExternalClaudeMdIncludes,
@@ -43,10 +43,10 @@ import {
   getGlobalConfig,
   saveGlobalConfig,
 } from '@claude-code/config'
-import { updateDeepLinkTerminalPreference } from '@claude-code/repl/deepLink/terminalPreference.js'
+import { updateDeepLinkTerminalPreference } from '../deepLink/terminalPreference.js'
 import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { type FpsMetrics, FpsTracker } from '@claude-code/output/fpsTracker.js'
-import { updateGithubRepoPathMapping } from '@claude-code/repl/github/githubRepoPathMapping.js'
+import { updateGithubRepoPathMapping } from '../github/githubRepoPathMapping.js'
 import { applyConfigEnvironmentVariables } from '@claude-code/config/managedEnv.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { getBaseRenderOptions } from '@claude-code/output/render-options'
@@ -167,7 +167,7 @@ export async function showSetupScreens(
     !config.hasCompletedOnboarding // always show onboarding at least once
   ) {
     onboardingShown = true
-    const { Onboarding } = await import('@claude-code/repl/components/Onboarding.js')
+    const { Onboarding } = await import('../components/Onboarding.js')
     await showSetupDialog(
       root,
       done => (
@@ -194,7 +194,7 @@ export async function showSetupScreens(
     // security features, so we can skip the dynamic import and render cycle.
     if (!checkHasTrustDialogAccepted()) {
       const { TrustDialog } = await import(
-        '@claude-code/repl/components/TrustDialog/TrustDialog.js'
+        '../components/TrustDialog/TrustDialog.js'
       )
       await showSetupDialog(root, done => (
         <TrustDialog commands={commands} onDone={done} />
@@ -226,7 +226,7 @@ export async function showSetupScreens(
         await getMemoryFiles(true),
       )
       const { ClaudeMdExternalIncludesDialog } = await import(
-        '@claude-code/repl/components/ClaudeMdExternalIncludesDialog.js'
+        '../components/ClaudeMdExternalIncludesDialog.js'
       )
       await showSetupDialog(root, done => (
         <ClaudeMdExternalIncludesDialog
@@ -258,7 +258,7 @@ export async function showSetupScreens(
   setImmediate(() => initializeTelemetryAfterTrust())
 
   if (await isQualifiedForGrove()) {
-    const { GroveDialog } = await import('@claude-code/repl/components/grove/Grove.js')
+    const { GroveDialog } = await import('../components/grove/Grove.js')
     const decision = await showSetupDialog<string>(root, done => (
       <GroveDialog
         showIfAlreadyViewed={false}
@@ -282,7 +282,7 @@ export async function showSetupScreens(
     )
     const keyStatus = getCustomApiKeyStatus(customApiKeyTruncated)
     if (keyStatus === 'new') {
-      const { ApproveApiKey } = await import('@claude-code/repl/components/ApproveApiKey.js')
+      const { ApproveApiKey } = await import('../components/ApproveApiKey.js')
       await showSetupDialog<boolean>(
         root,
         done => (
@@ -302,7 +302,7 @@ export async function showSetupScreens(
     !hasSkipDangerousModePermissionPrompt()
   ) {
     const { BypassPermissionsModeDialog } = await import(
-      '@claude-code/repl/components/BypassPermissionsModeDialog.js'
+      '../components/BypassPermissionsModeDialog.js'
     )
     await showSetupDialog(root, done => (
       <BypassPermissionsModeDialog onAccept={done} />
@@ -316,7 +316,7 @@ export async function showSetupScreens(
     // verifyAutoModeGateAccess notification will explain why instead.
     if (permissionMode === 'auto' && !hasAutoModeOptIn()) {
       const { AutoModeOptInDialog } = await import(
-        '@claude-code/repl/components/AutoModeOptInDialog.js'
+        '../components/AutoModeOptInDialog.js'
       )
       await showSetupDialog(root, done => (
         <AutoModeOptInDialog
@@ -366,7 +366,7 @@ export async function showSetupScreens(
         setHasDevChannels(true)
       } else {
         const { DevChannelsDialog } = await import(
-          '@claude-code/repl/components/DevChannelsDialog.js'
+          '../components/DevChannelsDialog.js'
         )
         await showSetupDialog(root, done => (
           <DevChannelsDialog
@@ -393,7 +393,7 @@ export async function showSetupScreens(
     !getGlobalConfig().hasCompletedClaudeInChromeOnboarding
   ) {
     const { ClaudeInChromeOnboarding } = await import(
-      '@claude-code/repl/components/ClaudeInChromeOnboarding.js'
+      '../components/ClaudeInChromeOnboarding.js'
     )
     await showSetupDialog(root, done => (
       <ClaudeInChromeOnboarding onDone={done} />

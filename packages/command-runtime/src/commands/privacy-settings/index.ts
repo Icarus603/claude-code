@@ -1,4 +1,4 @@
-import type { Command } from '@claude-code/command-runtime/runtime'
+import type { Command } from '../../runtime.js'
 import { isConsumerSubscriber } from '@claude-code/provider/authAlias.js'
 
 const privacySettings = {
@@ -8,7 +8,7 @@ const privacySettings = {
   isEnabled: () => {
     return isConsumerSubscriber()
   },
-  load: () => import('@claude-code/command-runtime/commands/privacy-settings/privacy-settings.js'),
+  load: () => import('./privacy-settings.js'),
 } satisfies Command
 
 export default privacySettings

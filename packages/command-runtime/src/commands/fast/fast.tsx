@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type {
   CommandResultDisplay,
   LocalJSXCommandContext,
-} from '@claude-code/command-runtime/runtime'
+} from '../../runtime.js'
 import { Dialog } from '@anthropic/ink'
 import { FastIcon, getFastIconString } from '@claude-code/repl/components/FastIcon.js'
 import { Box, Link, Text } from '@anthropic/ink'

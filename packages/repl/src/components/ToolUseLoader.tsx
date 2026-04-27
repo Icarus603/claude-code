@@ -2,7 +2,7 @@ import React from 'react'
 import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 
 import { Box, Text } from '@anthropic/ink'
-import { useBlink } from '@claude-code/repl/hooks/useBlink.js'
+import { useBlink } from '../hooks/useBlink.js'
 
 type Props = {
   isError: boolean

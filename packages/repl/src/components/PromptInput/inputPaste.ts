@@ -1,4 +1,4 @@
-import { getPastedTextRefNumLines } from '@claude-code/repl/history.js'
+import { getPastedTextRefNumLines } from '../../history.js'
 import type { PastedContent } from '@claude-code/config'
 
 const TRUNCATION_THRESHOLD = 10000 // Characters before we truncate
