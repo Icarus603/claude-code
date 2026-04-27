@@ -57,8 +57,17 @@ export function getContextWindowForModel(
     }
   }
 
-  // [1m] suffix — explicit client-side opt-in
+  // [1m] suffix — explicit client-side opt-in (legacy Sonnet 4.0 era)
   if (has1mContext(model)) {
+    return 1_000_000
+  }
+
+  // 1M context is GA default for Opus 4.7 / Opus 4.6 / Sonnet 4.x — no beta
+  // header / opt-in needed. Without this branch ccb falls through to the
+  // 200K default and triggers compaction ~5× too early. modelSupports1M
+  // already short-circuits to false when CLAUDE_CODE_DISABLE_1M_CONTEXT=1
+  // (HIPAA path), and excludes Haiku 4.5 (which is genuinely 200K).
+  if (modelSupports1M(model)) {
     return 1_000_000
   }
 
