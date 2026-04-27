@@ -76,7 +76,6 @@ class ProviderDepImpl implements AgentDeps['provider'] {
 
   async *stream(params: ProviderStreamParams): AsyncGenerator<ProviderEvent> {
     const ctx = this.toolUseContext
-    const adapter = getProviderAdapter()
     const systemPrompt = ctx.renderedSystemPrompt ?? params.systemPrompt
     const appState = ctx.getAppState?.()
     const options: Record<string, unknown> = {
@@ -87,6 +86,9 @@ class ProviderDepImpl implements AgentDeps['provider'] {
         (ctx.options.querySource as string | undefined) ??
         'repl_main_thread',
     }
+    // Per-model routing (V7 §11.6 Stage 2): pass model so connections[]
+    // can route to the right protocol (codex / openai / gemini / anthropic).
+    const adapter = getProviderAdapter(options.model as string)
 
     if (!options.getToolPermissionContext && appState) {
       options.getToolPermissionContext = async () => appState.toolPermissionContext

@@ -14,6 +14,7 @@ export type ProviderAPIProvider =
   | 'openai'
   | 'gemini'
   | 'grok'
+  | 'codex'
 
 export type ProviderModelOption = {
   value: string | null
