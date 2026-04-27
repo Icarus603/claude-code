@@ -13,7 +13,7 @@
   "packages/@ant/ink/src/core/yoga-layout/index.ts": 2579,
   "packages/agent/QueryEngine.ts": 1492,
   "packages/agent/agentHostBindings.ts": 973,
-  "packages/agent/attachments.ts": 3992,
+  "packages/agent/attachments.ts": 3722,
   "packages/agent/commitAttribution.ts": 964,
   "packages/agent/compaction/compact.ts": 1705,
   "packages/agent/hooks.ts": 5179,
