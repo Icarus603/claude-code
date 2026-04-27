@@ -28,7 +28,10 @@ export async function queryModelWithoutStreaming({
   signal: AbortSignal
   options: Options
 }): Promise<AssistantMessage> {
-  const adapter = getProviderAdapter()
+  // Per-model routing (V7 §11.6 Stage 2): when the user has connections[]
+  // configured, this picks the right protocol for the chosen model.
+  // Falls through to global `getAPIProvider()` when no connection matches.
+  const adapter = getProviderAdapter(options.model)
   return (await adapter.query({
     messages,
     systemPrompt,
@@ -57,7 +60,10 @@ export async function* queryModelWithStreaming({
   StreamEvent | AssistantMessage | SystemAPIErrorMessage,
   void
 > {
-  const adapter = getProviderAdapter()
+  // Per-model routing (V7 §11.6 Stage 2): when the user has connections[]
+  // configured, this picks the right protocol for the chosen model.
+  // Falls through to global `getAPIProvider()` when no connection matches.
+  const adapter = getProviderAdapter(options.model)
   yield* adapter.queryStream({
     messages,
     systemPrompt,
