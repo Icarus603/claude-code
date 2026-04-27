@@ -351,6 +351,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §11.2 — cross-package imports must resolve through package.json exports',
   },
   {
+    id: 'exports-budget',
+    layer: 'Cross-Cutting',
+    subsystem: 'export surface ratchet',
+    script: 'scripts/verify-exports-budget.ts',
+    doc: 'package.json#exports must monotonically shrink — dead entries cannot creep back',
+  },
+  {
     id: 'duplicate-canonicals',
     layer: 'Cross-Cutting',
     subsystem: 'fork detection',
