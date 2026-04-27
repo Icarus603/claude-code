@@ -220,7 +220,7 @@ import { getAccountInformation } from '@claude-code/provider/authAlias.js'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'
 import { installOAuthTokens } from '../../../handlers/auth.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { AwsAuthStatusManager } from '@claude-code/repl/awsAuthStatusManager.js'
+import { AwsAuthStatusManager } from '@claude-code/provider/awsAuthStatusManager.js'
 import {
   getInitJsonSchema,
   setSdkAgentProgressSummariesEnabled,

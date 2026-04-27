@@ -24,6 +24,7 @@
     "./model/modelSupportOverrides.js": "./src/model/modelSupportOverrides.ts",
     "./systemConstants.js": "./src/systemConstants.ts",
     "./fastMode.js": "./src/fastMode.ts",
+    "./awsAuthStatusManager.js": "./src/awsAuthStatusManager.ts",
     "./modelCost.js": "./src/modelCost.ts",
     "./cyberRiskInstruction.js": "./src/cyberRiskInstruction.ts",
     "./claudeAiLimits.js": "./src/claudeAiLimits.ts",

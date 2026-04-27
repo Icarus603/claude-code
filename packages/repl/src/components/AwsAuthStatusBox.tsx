@@ -3,7 +3,7 @@ import { Box, Link, Text } from '@anthropic/ink'
 import {
   type AwsAuthStatus,
   AwsAuthStatusManager,
-} from '@claude-code/repl/awsAuthStatusManager.js'
+} from '@claude-code/provider/awsAuthStatusManager.js'
 
 const URL_RE = /https?:\/\/\S+/
 

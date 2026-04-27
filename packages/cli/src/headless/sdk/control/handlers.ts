@@ -60,7 +60,7 @@ import {
   isFastModeAvailable,
   getFastModeState,
 } from '@claude-code/repl/fastMode.js'
-import { AwsAuthStatusManager } from '@claude-code/repl/awsAuthStatusManager.js'
+import { AwsAuthStatusManager } from '@claude-code/provider/awsAuthStatusManager.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
 import { logMCPDebug } from '@claude-code/local-observability/log.js'
 import { logEvent } from '@claude-code/local-observability'
