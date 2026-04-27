@@ -13,15 +13,24 @@ async function main(): Promise<void> {
   // After cut-E, the action handler body lives in mode-dispatch.ts.
   const combinedMainContent = mainContent + modeDispatchContent
 
-  const requiredMainSeams = [
-    "createHeadlessHost",
-    "import { createHeadlessSession } from '@claude-code/cli'",
+  // Some seams have multiple acceptable shapes — string = exact match,
+  // string[] = any-of (at least one substring must be present).
+  const requiredMainSeams: (string | string[])[] = [
+    'createHeadlessHost',
+    // Accept either the public barrel path or the direct relative path —
+    // the latter is preferred to keep cli's same-package SCC clean
+    // (V7 §11.2). Both resolve to the same export.
+    [
+      "import { createHeadlessSession } from '@claude-code/cli'",
+      "import { createHeadlessSession } from '../headless.js'",
+    ],
     'const headlessHost = createHeadlessHost',
   ]
 
   for (const seam of requiredMainSeams) {
-    if (!combinedMainContent.includes(seam)) {
-      throw new Error(`main.tsx missing headless host seam: ${seam}`)
+    const accepted = Array.isArray(seam) ? seam : [seam]
+    if (!accepted.some(s => combinedMainContent.includes(s))) {
+      throw new Error(`main.tsx missing headless host seam: ${accepted[0]}`)
     }
   }
 
