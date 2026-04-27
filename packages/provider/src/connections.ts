@@ -184,6 +184,29 @@ export function unpackModelId(value: string): {
   return { connectionId: head, modelId: value.slice(idx + 1) }
 }
 
+/**
+ * User-facing display label for a connection model.
+ *
+ * Migration code (`migrateLegacyAnthropicCompat`) stores labels as
+ * `Alias (wire-id)` — e.g. "Opus (deepseek-v4-pro[1m])". That alias
+ * prefix is meaningless once the row exists (the wire route is the id;
+ * the alias is just the env var that pointed at it), and worse it
+ * becomes noisy when the user maps multiple aliases at the same id
+ * (collapse-by-id leaves the prefix arbitrary).
+ *
+ * Strip the alias and show the wire id directly when we detect that
+ * format. Native records (Claude Account "Opus 4.7", Codex "GPT-5.5")
+ * have no parens and pass through verbatim.
+ *
+ * Single source of truth — picker, /model picker confirmation, and the
+ * header banner all call this so the displayed name is consistent.
+ */
+export function prettyModelLabel(model: ConnectionModelRecord): string {
+  const m = /^(.*?)\s*\((.+)\)\s*$/.exec(model.label.trim())
+  if (m && m[2]!.trim() === model.id) return model.id
+  return model.label
+}
+
 /** Generate a short unique ID for new connections. */
 export function generateConnectionId(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
