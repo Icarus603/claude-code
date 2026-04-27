@@ -11,6 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/TUI-React%20%2B%20Ink-61DAFB?style=flat-square&logo=react&logoColor=white)](https://github.com/vadimdemedes/ink)
 [![Anthropic](https://img.shields.io/badge/Anthropic-CC785C?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
+[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-10A37F?style=flat-square&logo=openai&logoColor=white)](https://chatgpt.com/codex)
 [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)](https://platform.openai.com/)
 [![Gemini](https://img.shields.io/badge/Gemini-1F6FEB?style=flat-square&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
@@ -64,12 +65,15 @@ ccb --help
 
 First run prompts `/login`. The dialog lets you pick a provider:
 
+- **Anthropic Console account** — OAuth flow for claude.ai (Pro / Max / Team / Enterprise)
+- **ChatGPT Codex** — OAuth flow for ChatGPT (Plus / Pro / Business / Edu / Enterprise); uses your ChatGPT plan quota, not API key billing. Models served from `chatgpt.com/backend-api/codex/responses` (gpt-5.5 / 5.4 / 5.4-mini / 5.3-codex / 5.2 with `low|medium|high|xhigh` reasoning effort)
 - **Anthropic Compatible** — any Anthropic-format endpoint (Anthropic itself, third-party proxies, self-hosted)
 - **OpenAI Compatible** — OpenAI itself plus anything that speaks the protocol (DeepSeek, Ollama, vLLM, …)
 - **Gemini API** — Google Gemini native REST/SSE
-- **Anthropic Console account** — OAuth flow for claude.ai
 
-You paste base URL + API key + model IDs inside the dialog; nothing to set in your shell. Switch providers anytime with `/login` again.
+Multiple connections coexist in the same session — log into Claude Account *and* ChatGPT Codex, then switch between them per-request via `/model`. Each row in the picker is one connection × one model. `/effort` honors each model's tier-correct level set; `/status` shows usage for every connected provider.
+
+You paste base URL + API key + model IDs inside the dialog (where applicable); nothing to set in your shell. Switch providers anytime with `/login` again.
 
 See [`docs/`](docs/) for per-feature deep dives.
 

@@ -11,6 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/TUI-React%20%2B%20Ink-61DAFB?style=flat-square&logo=react&logoColor=white)](https://github.com/vadimdemedes/ink)
 [![Anthropic](https://img.shields.io/badge/Anthropic-CC785C?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
+[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-10A37F?style=flat-square&logo=openai&logoColor=white)](https://chatgpt.com/codex)
 [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)](https://platform.openai.com/)
 [![Gemini](https://img.shields.io/badge/Gemini-1F6FEB?style=flat-square&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
@@ -64,12 +65,15 @@ ccb --help
 
 第一次執行會提示 `/login`。對話框讓你選 provider:
 
+- **Anthropic Console account** — claude.ai 的 OAuth 登入(Pro / Max / Team / Enterprise)
+- **ChatGPT Codex** — ChatGPT 的 OAuth 登入(Plus / Pro / Business / Edu / Enterprise);走你 ChatGPT 訂閱額度,不是 API key 計費。模型來自 `chatgpt.com/backend-api/codex/responses`(gpt-5.5 / 5.4 / 5.4-mini / 5.3-codex / 5.2,支援 `low|medium|high|xhigh` reasoning effort)
 - **Anthropic Compatible** — 任何 Anthropic 格式端點(Anthropic 本身、第三方 proxy、自架)
 - **OpenAI Compatible** — OpenAI 本身 + 所有相容 protocol(DeepSeek、Ollama、vLLM、...)
 - **Gemini API** — Google Gemini 原生 REST/SSE
-- **Anthropic Console account** — claude.ai 的 OAuth 登入
 
-Base URL、API key、模型 ID 都在對話框裡填,shell 不用 export。要換 provider 再敲 `/login`。
+多個 connection 可以同時存在 —— 同時登入 Claude Account 和 ChatGPT Codex,然後用 `/model` 在每個請求之間切換。Picker 每行對應一個 connection × 一個模型。`/effort` 會給每個模型帶他自己 tier 真實支援的 effort 階梯;`/status` 同時顯示每個已連線 provider 的用量。
+
+Base URL、API key、模型 ID 都在對話框裡填(用得到的話),shell 不用 export。要換 provider 再敲 `/login`。
 
 各功能深入文檔見 [`docs/`](docs/)。
 
