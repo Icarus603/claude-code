@@ -15,6 +15,10 @@ src/utils/vendor/
 .codex/
 .omx/
 
+# Plugin-local state (e.g. ralph-loop session file).
+# Runtime artifacts plugins regenerate — never check them in.
+.claude/*.local.md
+
 # Binary / screenshot files (root only)
 /*.png
 *.bmp
