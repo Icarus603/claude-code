@@ -273,6 +273,13 @@ export type GlobalConfig = {
   hasSeenUltraplanTerms?: boolean // ant-only: whether the one-time CCR terms notice has been shown in the ultraplan launch dialog
   hasResetAutoModeOptInForDefaultOffer?: boolean // ant-only: one-shot migration guard, re-prompts churned auto-mode users
   oauthAccount?: AccountInfo
+  /** Codex OAuth tokens stored in config (not keychain). Separate from Anthropic's auth. */
+  codexOAuth?: {
+    accessToken: string
+    refreshToken: string
+    expiresAt: number
+    accountId: string
+  }
   iterm2KeyBindingInstalled?: boolean // Legacy - keeping for backward compatibility
   editorMode?: EditorMode
   bypassPermissionsModeAccepted?: boolean

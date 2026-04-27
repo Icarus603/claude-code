@@ -11,6 +11,12 @@ import type {
   SubscriptionType,
 } from './types.js'
 
+// Codex OAuth — standalone module, no Anthropic dependency
+export { runCodexOAuthFlow, refreshCodexToken, exchangeCodexCode, buildCodexAuthUrl, extractCodexAccountId } from './codex-client.js'
+export type { CodexTokens } from './codex-client.js'
+export { saveCodexOAuthTokens, getCodexOAuthTokens, checkAndRefreshCodexTokenIfNeeded } from './codex-auth.js'
+export * from './codex-constants.js'
+
 /**
  * OAuth service that handles the OAuth 2.0 authorization code flow with PKCE.
  *
