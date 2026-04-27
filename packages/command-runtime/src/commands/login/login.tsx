@@ -68,6 +68,43 @@ export async function call(
               appState.fastMode,
             )
           }
+          // Clear stale mainLoopModel if it's a bare model id that doesn't
+          // belong to any current connection. Without this, the header shows
+          // a leftover model from a previous session (e.g. "Sonnet 4.5")
+          // even though the user is now on a fresh Claude Account login.
+          // This runs after connections are saved so the check is accurate.
+          try {
+            const { updateSettingsForSource, getSettingsForSource } =
+              await import('@claude-code/config/settings')
+            const { getEnabledConnections, unpackModelId } = await import(
+              '@claude-code/provider/connections.js'
+            )
+            const mlm = (getSettingsForSource('userSettings') as {
+              mainLoopModel?: string
+            })?.mainLoopModel
+            if (mlm && typeof mlm === 'string') {
+              const { connectionId, modelId } = unpackModelId(mlm)
+              // Bare id with no connection prefix — check if it matches any
+              // current connection model. If not, it's stale.
+              if (!connectionId) {
+                const allIds = getEnabledConnections().flatMap(c =>
+                  c.models.map(m => m.id),
+                )
+                if (!allIds.includes(modelId)) {
+                  updateSettingsForSource('userSettings', {
+                    mainLoopModel: undefined,
+                  } as never)
+                  // Also clear from AppState so the header re-renders immediately.
+                  context.setAppState(prev => ({
+                    ...prev,
+                    mainLoopModel: null,
+                  }))
+                }
+              }
+            }
+          } catch {
+            // Best-effort; never block login completion.
+          }
           // Increment authVersion to trigger re-fetching of auth-dependent data in hooks (e.g., MCP servers)
           context.setAppState(prev => ({
             ...prev,

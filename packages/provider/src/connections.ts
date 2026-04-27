@@ -455,14 +455,18 @@ export function migrateLegacyEnvToConnections(
   if (migrateLegacyOpenAICompat(envSource)) migrated.push('openai')
   if (migrateLegacyGemini(envSource)) migrated.push('gemini')
 
-  // V7 §11.6 — `settings.modelType` was the legacy global routing knob
-  // (`anthropic` / `openai` / `gemini`). It used to be written by every
-  // /login flow, which clobbered other configured providers. Routing is
-  // now per-connection; modelType is dead weight that still poisons
-  // `getDefaultOpusModel()` etc. by making `getAPIProvider()` return a
-  // wrong global provider. When the connection registry has ≥1 entry,
-  // clear the legacy modelType so default-model resolution sees
-  // `firstParty` and picks the right Opus tier.
+  // V7 §11.6 — clear stale legacy settings when connections are present.
+  //
+  // `settings.modelType` was the legacy global routing knob ('anthropic' /
+  // 'openai' / 'gemini'). Routing is now per-connection — keeping this
+  // field makes getAPIProvider() return the wrong global provider, causing
+  // getDefaultOpusModel() to fall into the 3P branch and return opus46.
+  //
+  // `settings.mainLoopModel` may contain a bare model id (e.g.
+  // 'claude-sonnet-4-5') that doesn't match any connection's model list.
+  // The header then renders it as the stale bare name ("Sonnet 4.5")
+  // instead of going through the connection resolver. Clearing it here
+  // lets the system fall back to the connection default on next load.
   let clearedModelType = false
   if (getConnections().length > 0) {
     try {
@@ -470,12 +474,28 @@ export function migrateLegacyEnvToConnections(
       const { getSettings_DEPRECATED, updateSettingsForSource } = require(
         '@claude-code/config/settings',
       ) as typeof import('@claude-code/config/settings')
-      const userSettings = getSettings_DEPRECATED()
-      if (userSettings && (userSettings as { modelType?: unknown }).modelType) {
-        updateSettingsForSource('userSettings', {
-          modelType: undefined,
-        } as never)
-        clearedModelType = true
+      const userSettings = getSettings_DEPRECATED() as {
+        modelType?: unknown
+        mainLoopModel?: unknown
+      } | undefined
+      const clearPayload: Record<string, undefined> = {}
+      if (userSettings?.modelType) clearPayload.modelType = undefined
+      // Clear mainLoopModel only when it holds a bare model id that isn't
+      // prefixed with a connection id (i.e. from the pre-connection era).
+      // Prefixed ids ('conn_xxx:claude-opus-4-7') are fine to keep.
+      const mlm = userSettings?.mainLoopModel
+      if (typeof mlm === 'string' && !mlm.includes(':')) {
+        // Check if this bare id belongs to any enabled connection's model
+        // list. If not, it's stale and should be cleared so the connection
+        // default takes over.
+        const allModelIds = getConnections().flatMap(c => c.models.map(m => m.id))
+        if (!allModelIds.includes(mlm)) {
+          clearPayload.mainLoopModel = undefined
+        }
+      }
+      if (Object.keys(clearPayload).length > 0) {
+        updateSettingsForSource('userSettings', clearPayload as never)
+        clearedModelType = 'modelType' in clearPayload
       }
     } catch {
       // Migration is best-effort; never block boot.

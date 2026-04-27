@@ -550,24 +550,14 @@ function getConnectionModelOptions(): ModelOption[] {
 }
 
 export function getModelOptions(fastMode = false): ModelOption[] {
-  // If connections are configured, use connection-based model list
+  // If connections are configured, use connection-based model list.
+  // No separate "Default (…)" entry is added — each connection's first
+  // model is already in the list, and the picker marks the current model
+  // with ✓. A null-value "Default" item broke effort display (the picker
+  // couldn't resolve which model to check, so it showed "Effort not
+  // supported") and created a visual duplicate of the first model.
   const connectionOptions = getConnectionModelOptions()
   if (connectionOptions.length > 0) {
-    // Add default option from the first enabled connection
-    const defaultConn = getEnabledConnections()[0]
-    if (defaultConn) {
-      const defaultModel = defaultConn.models[0]
-      const defaultLabel = defaultModel
-        ? `[${defaultConn.name}] ${defaultModel.label}`
-        : 'Default'
-      connectionOptions.unshift({
-        value: null,
-        label: `Default (${defaultLabel})`,
-        description:
-          defaultModel?.description ??
-          `Use the default model from ${defaultConn.name}`,
-      })
-    }
     return filterModelOptionsByAllowlist(connectionOptions)
   }
 
