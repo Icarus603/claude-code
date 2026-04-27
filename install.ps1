@@ -160,6 +160,43 @@ function Add-ToUserPath {
   return $true
 }
 
+# Keep at most this many binaries under VersionsDir after install.
+# Matches in-app `VERSION_RETENTION_COUNT` (packages/updater/src/
+# nativeInstaller/installer.ts:74). Two = current + one prior for
+# rollback.
+$Script:KeepVersions = 2
+
+# Delete older binaries from VersionsDir, retaining the just-installed
+# one plus enough prior entries to total $KeepVersions. Sort newest
+# first by LastWriteTime; skip $KeepVersions files, remove the rest.
+# The just-installed path is always protected via -KeepPath.
+function Invoke-PruneOldVersions {
+  param([Parameter(Mandatory=$true)][string]$KeepPath)
+
+  $dir = Split-Path -Parent $KeepPath
+  if (-not (Test-Path -LiteralPath $dir)) { return }
+
+  $entries = Get-ChildItem -LiteralPath $dir -File -ErrorAction SilentlyContinue |
+    Sort-Object LastWriteTime -Descending
+  if (-not $entries) { return }
+
+  $kept = 0
+  foreach ($entry in $entries) {
+    if ($entry.FullName -ieq $KeepPath) {
+      $kept++
+      continue
+    }
+    if ($kept -lt $Script:KeepVersions) {
+      $kept++
+      continue
+    }
+    try {
+      Remove-Item -LiteralPath $entry.FullName -Force -ErrorAction Stop
+      Write-Host "  pruned    -> $($entry.Name)" -ForegroundColor DarkGray
+    } catch { }
+  }
+}
+
 # ----- main ------------------------------------------------------------------
 
 function Main {
@@ -207,6 +244,12 @@ function Main {
 
   Write-Ok "Installed: $shimPath"
   try { & $shimPath --version } catch { }
+
+  # Mirror in-app `cleanupOldVersions` retention (VERSION_RETENTION_COUNT
+  # = 2 in packages/updater/src/nativeInstaller/installer.ts): keep the
+  # two newest binaries (this install + one prior for rollback), delete
+  # the rest. The just-installed path is always protected.
+  Invoke-PruneOldVersions -KeepPath $versionedPath
 
   $pathAdded = Add-ToUserPath $BinDir
   if ($pathAdded) {

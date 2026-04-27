@@ -133,6 +133,47 @@ check_path() {
   printf '%s' "$C_RESET"
 }
 
+## Keep at most this many binaries under VERSIONS_DIR after install.
+## Matches in-app `VERSION_RETENTION_COUNT` (packages/updater/src/
+## nativeInstaller/installer.ts:74). Two = current + one prior for
+## rollback.
+readonly KEEP_VERSIONS=2
+
+# Delete older binaries from VERSIONS_DIR, retaining the just-installed
+# one plus enough prior entries to total $KEEP_VERSIONS. Sort newest
+# first by mtime; skip $KEEP_VERSIONS files, unlink the rest. The
+# just-installed path is always protected via $1 even if mtime races
+# would otherwise drop it.
+prune_old_versions() {
+  local keep_path="$1"
+  local dir
+  dir="$(dirname "$keep_path")"
+  [ -d "$dir" ] || return 0
+
+  # Build a newest-first list of regular files in the versions dir.
+  # Use -t for mtime sort (BSD `ls -t` and GNU `ls -t` both honor mtime).
+  local entries=()
+  while IFS= read -r line; do
+    entries+=("$line")
+  done < <(ls -1t "$dir" 2>/dev/null)
+
+  local kept=0 entry full_path
+  for entry in "${entries[@]}"; do
+    full_path="$dir/$entry"
+    [ -f "$full_path" ] || continue
+    # Always protect the version we just installed.
+    if [ "$full_path" = "$keep_path" ]; then
+      kept=$((kept + 1))
+      continue
+    fi
+    if [ "$kept" -lt "$KEEP_VERSIONS" ]; then
+      kept=$((kept + 1))
+      continue
+    fi
+    rm -f "$full_path" && log "  pruned    → $entry"
+  done
+}
+
 main() {
   local platform version url ext bin_name versioned_path symlink_path
 
@@ -189,6 +230,14 @@ main() {
 
   ok "Installed: $symlink_path"
   "$symlink_path" --version 2>/dev/null || true
+
+  # Clean up older binaries to keep disk usage bounded. Mirrors the
+  # in-app `cleanupOldVersions` policy (`VERSION_RETENTION_COUNT = 2`):
+  # keep the two most recent binaries (this install + one prior for
+  # rollback), delete the rest. The symlink target is included in the
+  # "keep" set explicitly so it can never be removed even if mtime
+  # ordering would otherwise drop it.
+  prune_old_versions "$versioned_path"
 
   check_path
 
