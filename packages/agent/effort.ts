@@ -191,7 +191,14 @@ export function getEffortSuffix(
   effortValue: EffortValue | undefined,
 ): string {
   if (effortValue === undefined) return ''
-  const resolved = resolveAppliedEffort(model, effortValue)
+  // Strip connection-id prefix (`<connId>:<modelId>`) before resolving
+  // model capabilities — resolveAppliedEffort matches against bare model ids.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { unpackModelId } = require(
+    '@claude-code/provider/connections.js',
+  ) as typeof import('@claude-code/provider/connections.js')
+  const { modelId } = unpackModelId(model)
+  const resolved = resolveAppliedEffort(modelId, effortValue)
   if (resolved === undefined) return ''
   return ` with ${convertEffortValueToLevel(resolved)} effort`
 }

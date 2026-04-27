@@ -140,10 +140,16 @@ export const init = memoize(async (): Promise<void> => {
         ),
         ...settingsEnv,
       }
-      const { migrated } = migrateLegacyEnvToConnections(merged)
+      const { migrated, clearedModelType } =
+        migrateLegacyEnvToConnections(merged)
       if (migrated.length > 0) {
         logForDebugging(
           `[connections] migrated legacy env to connections: ${migrated.join(', ')}`,
+        )
+      }
+      if (clearedModelType) {
+        logForDebugging(
+          '[connections] cleared legacy settings.modelType — routing is per-connection now',
         )
       }
     } catch (e) {
