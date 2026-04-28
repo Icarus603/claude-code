@@ -162,7 +162,9 @@
     "./messages/systemInit.js": "./messages/systemInit.ts",
     "./contracts": "./contracts.ts",
     "./errors": "./errors.ts",
-    "./testing": "./testing/index.ts"
+    "./testing": "./testing/index.ts",
+    "./misc/systemDirectories.js": "./misc/systemDirectories.ts",
+    "./yaml.js": "./yaml.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"

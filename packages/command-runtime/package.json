@@ -66,6 +66,7 @@
     "./commands/remoteControlServer/index.js": "./src/commands/remoteControlServer/index.ts",
     "./commands/terminalSetup/index.js": "./src/commands/terminalSetup/index.ts",
     "./commands/extra-usage/extra-usage.js": "./src/commands/extra-usage/extra-usage.tsx",
-    "./commands/extra-usage/extra-usage-noninteractive.js": "./src/commands/extra-usage/extra-usage-noninteractive.ts"
+    "./commands/extra-usage/extra-usage-noninteractive.js": "./src/commands/extra-usage/extra-usage-noninteractive.ts",
+    "./api.js": "./src/api.ts"
   }
 }
