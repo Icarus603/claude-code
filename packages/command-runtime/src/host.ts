@@ -1,3 +1,9 @@
+/**
+ * command-runtime host. The `as unknown as` cast on bindings install
+ * widens TCommand to CommandLike for storage; the runtime-binding
+ * pattern stores the generic-erased base; reads happen through the
+ * generic getter which casts back. Type-safe in practice.
+ */
 import type { CommandLike, CommandRegistryHostBindings } from './contracts.js'
 import { HostBindingsError } from './errors.js'
 
