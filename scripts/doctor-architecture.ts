@@ -365,6 +365,13 @@ const CHECKS: Check[] = [
     doc: 'New files ≤ 800 LOC; grandfathered large files may only shrink',
   },
   {
+    id: 'deps-setters-wired',
+    layer: 'Cross-Cutting',
+    subsystem: 'silent-failure prevention',
+    script: 'scripts/verify-deps-setters-wired.ts',
+    doc: 'Every _deps.ts setter slot must have a caller (or allow-unwired comment)',
+  },
+  {
     id: 'duplicate-canonicals',
     layer: 'Cross-Cutting',
     subsystem: 'fork detection',
