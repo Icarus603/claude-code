@@ -138,6 +138,6 @@
   "packages/tool-registry/src/tools/SkillTool/SkillTool.ts": 1110,
   "packages/tool-registry/src/tools/shared/spawnMultiAgent.ts": 1140,
   "packages/tool-registry/src/words.ts": 801,
-  "packages/updater/src/nativeInstaller/installer.ts": 1695,
+  "packages/updater/src/nativeInstaller/installer.ts": 1708,
   "packages/voice/src/hooks/useVoice.ts": 1145
 }

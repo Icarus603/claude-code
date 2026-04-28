@@ -43,6 +43,12 @@ import {
   getGlobalConfig,
   saveGlobalConfig,
 } from '@claude-code/config'
+import { getEnabledConnections } from '@claude-code/provider/connections.js'
+import {
+  getAnthropicApiKeyWithSource,
+  getClaudeAIOAuthTokens,
+} from '@claude-code/provider/authAlias.js'
+import { getCodexOAuthTokens } from '@claude-code/provider/oauth/codex-auth.js'
 import { updateDeepLinkTerminalPreference } from '../deepLink/terminalPreference.js'
 import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { type FpsMetrics, FpsTracker } from '@claude-code/output/fpsTracker.js'
@@ -162,9 +168,40 @@ export async function showSetupScreens(
 
   const config = getGlobalConfig()
   let onboardingShown = false
+  // "Has any usable credentials" gate. `hasCompletedOnboarding` records that
+  // the user finished the wizard once, but it persists across full logout —
+  // so without this auth check, a freshly-logged-out user would land in the
+  // REPL with no provider attached. Mirrors the multi-provider semantics of
+  // `useApiKeyVerification.hasAnyAuthenticatedConnection()`: any enabled
+  // connection with usable credentials, or a legacy env-var Anthropic key,
+  // counts as authenticated.
+  const hasAuth = (() => {
+    for (const conn of getEnabledConnections()) {
+      if (conn.auth.type === 'api_key') {
+        if (conn.auth.key && conn.auth.key.length > 0) return true
+      } else if (conn.auth.type === 'oauth') {
+        if (conn.auth.source === 'codex') {
+          if (getCodexOAuthTokens()) return true
+        } else if (conn.auth.source === 'claude-ai') {
+          if (getClaudeAIOAuthTokens()) return true
+        } else {
+          // Unknown OAuth source — connection record's existence is good
+          // enough; the actual API call surfaces auth errors otherwise.
+          return true
+        }
+      }
+    }
+    const { key, source } = getAnthropicApiKeyWithSource({
+      skipRetrievingKeyFromApiKeyHelper: true,
+    })
+    if (key) return true
+    if (source === 'apiKeyHelper') return true
+    return false
+  })()
   if (
     !config.theme ||
-    !config.hasCompletedOnboarding // always show onboarding at least once
+    !config.hasCompletedOnboarding || // always show onboarding at least once
+    !hasAuth // re-onboard if all providers were logged out
   ) {
     onboardingShown = true
     const { Onboarding } = await import('../components/Onboarding.js')
