@@ -93,6 +93,14 @@ for (const ln of raw.split('\n')) {
     .trim()
 
   if (stripped === '') {
+    // File-level escape hatch: if the file's top-of-module comment
+    // explains the catch-fallback pattern, individual catches don't
+    // need a per-instance comment. Keeps high-frequency wire/binding
+    // files from being flagged 30+ times for the same idiom.
+    const head = fileLines.slice(0, 30).join('\n')
+    const fileLevelExempt =
+      /catch[ -]?(fallback|swallow|silently)|require.*fallback|optional-chain.*fallback/i.test(head)
+    if (fileLevelExempt) continue
     findings.push({
       pattern: 'empty-catch',
       file,

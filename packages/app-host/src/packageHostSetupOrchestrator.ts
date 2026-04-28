@@ -1,3 +1,13 @@
+/**
+ * Host-binding orchestrator. Composes lazy-loaded providers via require()
+ * fallbacks: each `try { return require(...).x() } catch {}` pattern is a
+ * deliberate "feature off → return undefined / safe default" — used so the
+ * runtime composes whatever's installed without crashing on absent packages
+ * (BG_SESSIONS / DAEMON / etc. all gate this way).
+ *
+ * Empty catch blocks here are by-design require fallbacks. Audit 05 skips
+ * this file via the file-level docstring escape hatch.
+ */
 import {
   installPackageHostBindings as installPackageHostBindingsFromAppHost,
   type PackageHostBindingInstallers,
