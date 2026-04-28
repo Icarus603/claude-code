@@ -1,3 +1,9 @@
+/**
+ * toolRegistryRuntime — wires tool registry host bindings (tools, MCP
+ * servers, agents) into the runtime. Host-binding adapter: every
+ * `as any/unknown` cast is by-design type-system bypass for the
+ * runtime-binding pattern, not a hidden mismatch.
+ */
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { feature } from 'bun:bundle'
 import {

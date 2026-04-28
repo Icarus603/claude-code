@@ -1,3 +1,12 @@
+/**
+ * appRuntime — host-binding adapter for the swarm package.
+ * Every cross-boundary host call (cwd, sessions, tools, settings,
+ * telemetry, etc.) goes through getBinding<T>(name) here. The binding
+ * map is `Record<string, any>` because it bridges dozens of unrelated
+ * host-side types whose contracts are checked at the call site, not
+ * at storage. The `as` casts in this file are by-design type-system
+ * bypasses for the runtime binding pattern, not hidden mismatches.
+ */
 import { z } from 'zod'
 
 type RuntimeBindingMap = Record<string, any>

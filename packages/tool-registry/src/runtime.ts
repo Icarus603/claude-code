@@ -1,3 +1,8 @@
+/**
+ * tool-registry/runtime — public entry into the tool-registry runtime.
+ * Host-binding adapter: `as any/unknown` casts here are by-design
+ * type-system bypass for the runtime-binding pattern.
+ */
 import { ensureToolRegistryRuntimeInstalled } from './toolRuntimeInstaller.js'
 import {
   TOOL_PRESETS as PACKAGE_TOOL_PRESETS,

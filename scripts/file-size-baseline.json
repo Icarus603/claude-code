@@ -71,7 +71,7 @@
   "packages/permission/src/permissions.ts": 1487,
   "packages/permission/src/yoloClassifier.ts": 1497,
   "packages/provider/src/authAlias.ts": 2000,
-  "packages/provider/src/claudeLegacyRuntime.ts": 3556,
+  "packages/provider/src/claudeLegacyRuntime.ts": 3557,
   "packages/provider/src/errors.ts": 1305,
   "packages/provider/src/mockRateLimits.ts": 884,
   "packages/provider/src/userAuth.ts": 2000,

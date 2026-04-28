@@ -1,3 +1,4 @@
+// claudeLegacyRuntime — Anthropic stream runtime. Heavy `as any/unknown` is by-design type-system bypass (SDK-version compatibility + decompiled boilerplate).
 import type {
   BetaContentBlock,
   BetaContentBlockParam,

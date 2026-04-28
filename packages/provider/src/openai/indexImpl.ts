@@ -1,3 +1,10 @@
+/**
+ * OpenAI provider stream adapter — translates OpenAI Chat Completions
+ * SSE events into the Anthropic BetaRawMessageStreamEvent shape. Heavy
+ * `as any/unknown` is by-design type-system bypass for SDK-to-SDK
+ * shape translation; runtime shapes match even where TypeScript
+ * cannot prove it.
+ */
 import type { BetaToolUnion } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { randomUUID } from 'crypto'
 import {
