@@ -81,6 +81,19 @@ for (const ln of raw.split('\n')) {
   if (file.includes('/__tests__/') || file.startsWith('tests/')) continue
   // Skip comments
   if (/^\s*(\/\/|\*|\/\*)/.test(content)) continue
+  // Skip lodash memoize cache patterns: `someFn.cache.clear?.()` and
+  // `someFn.cache?.clear?.()`. lodash memoize doesn't strictly guarantee
+  // the cache shape; the `?.` is defensive, not a contract-binding bug.
+  if (/\.cache\??\.\w+\?\.\(/.test(content)) continue
+  // Skip when the result of `?.()` is consumed by `??` — the caller is
+  // explicitly graceful-degrading and the optional chain is the contract.
+  // Examples: `cmd.isEnabled?.() ?? true`, `auth?.refreshToken?.() ?? null`.
+  if (/\?\.\([^)]*\)\s*(\?\?|\|\||&&)/.test(content)) continue
+  // Skip optional-chain navigation through a nullable receiver:
+  // `getX?.()?.method?.()` — the outer `getX?.()` is the binding access;
+  // any subsequent `?.()` is navigating through a return value that is
+  // genuinely optional.
+  if (/\)\s*\?\.\w+\?\.\(/.test(content)) continue
   // Extract the method name from `.NAME?.(`
   const methods = [...content.matchAll(/\.(\w+)\?\.\(/g)].map(x => x[1])
   for (const method of methods) {

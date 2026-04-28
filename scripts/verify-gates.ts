@@ -45,7 +45,10 @@ const gates: GateCheck[] = [
   { name: 'Fine-grained tools', gate: 'tengu_fgts', expected: true, category: 'P0' },
 
   // P1: API-dependent
-  { name: 'Session memory', gate: 'tengu_session_memory', expected: true, category: 'P1' },
+  // Session memory matches ant's default (false). When forced true the
+  // post-turn forked agent burned ~47K token-equiv/turn — see comment on
+  // the LOCAL_GATE_DEFAULTS removal in packages/config/feature-flags.ts.
+  { name: 'Session memory', gate: 'tengu_session_memory', expected: false, category: 'P1' },
   { name: 'Auto memory extract', gate: 'tengu_passport_quail', expected: true, category: 'P1', compileFlag: 'EXTRACT_MEMORIES' },
   { name: 'Memory skip index', gate: 'tengu_moth_copse', expected: true, category: 'P1' },
   { name: 'Memory search section', gate: 'tengu_coral_fern', expected: true, category: 'P1' },
