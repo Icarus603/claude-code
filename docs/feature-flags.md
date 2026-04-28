@@ -1,7 +1,7 @@
 # Feature flag registry
 
 All `feature('<NAME>')` gates used by the codebase. The `feature()` function
-is provided by `bun:bundle` (see `src/types/internal-modules.d.ts`); at build
+is provided by `bun:bundle` (see `packages/cli/src/types/internal-modules.d.ts`); at build
 time the feature flag is statically resolved if listed in
 `scripts/default-features.ts:STABLE_FEATURES`, otherwise it stays
 runtime-configurable via `FEATURE_<NAME>=1` env vars.
@@ -14,7 +14,7 @@ from there. To make a flag default-on, add it to that array.
 invocation. Use this for flags that aren't yet stable enough to ship by
 default but you want to exercise locally.
 
-## On by default (32)
+## On by default (31)
 
 These are the production-ready features baked into every release binary
 and `bun run dev` invocation.
@@ -53,7 +53,7 @@ and `bun run dev` invocation.
 | `VERIFICATION_AGENT` | Agent | Spawn `verification` subagent after non-trivial work |
 | `VOICE_MODE` | Voice | Push-to-talk speech-to-text input |
 
-## Available, off by default (52)
+## Available, off by default (53)
 
 These exist as `feature('<NAME>')` gates but aren't in the stable list.
 Enable per-run with `FEATURE_<NAME>=1`.
@@ -147,4 +147,4 @@ the target binary's libc, not the runtime). Always false in JS dev / Node:
 - `scripts/audit-silent-failures/08-always-false-feature-flags.ts` —
   Detects flags that are gated but never enabled in any default config
   (helps spot dead branches)
-- `src/types/internal-modules.d.ts` — Declaration of `feature()` from `bun:bundle`
+- `packages/cli/src/types/internal-modules.d.ts` — Declaration of `feature()` from `bun:bundle`

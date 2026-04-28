@@ -77,7 +77,7 @@ ccb --help
 
 Base URL、API key、模型 ID 都在对话框里填(用得到的话),shell 不用 export。要换 provider 再敲 `/login`。
 
-各功能深入文档见 [`docs/`](docs/)。
+架构总览见 [`CLAUDE.md`](CLAUDE.md),feature flag 清单见 [`docs/feature-flags.md`](docs/feature-flags.md)。
 
 ### 🤖 Headless / 脚本用法
 

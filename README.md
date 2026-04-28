@@ -77,7 +77,7 @@ Multiple connections coexist in the same session — log into Claude Account *an
 
 You paste base URL + API key + model IDs inside the dialog (where applicable); nothing to set in your shell. Switch providers anytime with `/login` again.
 
-See [`docs/`](docs/) for per-feature deep dives.
+See [`CLAUDE.md`](CLAUDE.md) for the architecture overview, [`docs/feature-flags.md`](docs/feature-flags.md) for the flag registry.
 
 ### 🤖 Headless / scripted use
 
