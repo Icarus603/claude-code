@@ -463,7 +463,6 @@ let _getLspManager: () => unknown = () => undefined
 let _getMcpTypes: () => unknown = () => undefined
 let _expandMcpEnv: (env: Record<string, string>) => Record<string, string> = e =>
   e
-let _getMcpServerConfigSchema: () => unknown = () => undefined
 
 export function getLspManager(): unknown {
   return _getLspManager()
@@ -476,9 +475,6 @@ export function expandMcpEnv(
 ): Record<string, string> {
   return _expandMcpEnv(env)
 }
-export function getMcpServerConfigSchema(): unknown {
-  return _getMcpServerConfigSchema()
-}
 export function setGetLspManagerFn(fn: typeof _getLspManager): void {
   _getLspManager = fn
 }
@@ -487,11 +483,6 @@ export function setGetMcpTypesFn(fn: typeof _getMcpTypes): void {
 }
 export function setExpandMcpEnvFn(fn: typeof _expandMcpEnv): void {
   _expandMcpEnv = fn
-}
-export function setGetMcpServerConfigSchemaFn(
-  fn: typeof _getMcpServerConfigSchema,
-): void {
-  _getMcpServerConfigSchema = fn
 }
 
 // ---------------------------------------------------------------------------
@@ -553,18 +544,6 @@ export function setSkillToolPromptFn(v: unknown): void {
 // Commands registry (plugin-loaded commands flow through this)
 // ---------------------------------------------------------------------------
 
-let _registerCommands: (commands: unknown[]) => void = () => {}
-let _getCommandsType: () => unknown = () => undefined
-export function registerCommands(commands: unknown[]): void {
-  _registerCommands(commands)
-}
-export function setRegisterCommandsFn(fn: typeof _registerCommands): void {
-  _registerCommands = fn
-}
-export function setGetCommandsTypeFn(fn: typeof _getCommandsType): void {
-  _getCommandsType = fn
-}
-
 // ---------------------------------------------------------------------------
 // Plugin operations — services/plugins/pluginOperations re-injected for
 // the utils → services back-dependency that existed before the move.
@@ -583,7 +562,6 @@ export function setPluginOperationsFn(v: unknown): void {
 // ---------------------------------------------------------------------------
 
 let _rgPath: () => string | null = () => null
-let _getOutputStyleDirSuffix: () => string = () => ''
 let _secureStorageRead: (key: string) => Promise<string | null> = async () =>
   null
 let _secureStorageWrite: (key: string, value: string) => Promise<void> =
@@ -591,9 +569,6 @@ let _secureStorageWrite: (key: string, value: string) => Promise<void> =
 
 export function rgPath(): string | null {
   return _rgPath()
-}
-export function getOutputStyleDirSuffix(): string {
-  return _getOutputStyleDirSuffix()
 }
 export function secureStorageRead(key: string): Promise<string | null> {
   return _secureStorageRead(key)
@@ -603,11 +578,6 @@ export function secureStorageWrite(key: string, value: string): Promise<void> {
 }
 export function setRgPathFn(fn: typeof _rgPath): void {
   _rgPath = fn
-}
-export function setGetOutputStyleDirSuffixFn(
-  fn: typeof _getOutputStyleDirSuffix,
-): void {
-  _getOutputStyleDirSuffix = fn
 }
 export function setSecureStorageReadFn(fn: typeof _secureStorageRead): void {
   _secureStorageRead = fn
@@ -694,24 +664,9 @@ export function setWalkMarkdownFilesFn(fn: typeof _walkMarkdownFiles): void {
 // ---------------------------------------------------------------------------
 
 let _builtinPlugins: unknown = {}
-let _claudeCodeHints: unknown = {}
-let _argumentSubstitution: unknown = {}
 
 export function getBuiltinPlugins(): unknown {
   return _builtinPlugins
-}
-export function getClaudeCodeHints(): unknown {
-  return _claudeCodeHints
-}
-export function getArgumentSubstitution(): unknown {
-  return _argumentSubstitution
-}
-
-export function setClaudeCodeHintsFn(v: unknown): void {
-  _claudeCodeHints = v
-}
-export function setArgumentSubstitutionFn(v: unknown): void {
-  _argumentSubstitution = v
 }
 
 // Setter-based exports — callers that previously imported direct functions
@@ -800,12 +755,6 @@ export function setGetBuiltinPluginDefinitionFn(
 ): void {
   _getBuiltinPluginDefinitionFn = fn
 }
-// Backward compat — some call sites setter-named variants
-export const setBuiltinPluginsFn = setGetBuiltinPluginsFn as unknown as (
-  fn: () => BuiltinPluginResult,
-) => void
-export const setBuiltinPluginIdsListFn = (): void => {}
-
 let _applyArgumentSubstitutionsFn: (s: string, ...args: unknown[]) => string = s => s
 export function applyArgumentSubstitutions(s: string, ...args: unknown[]): string {
   return _applyArgumentSubstitutionsFn(s, ...args)
@@ -1174,13 +1123,10 @@ export const setPluralFn = setPluralFn_
 // -- hint + hint state
 const [_getHasShownHintThisSession, setHasShownHintThisSessionFn_] = makeSetter((_id: string): boolean => false)
 const [_getSetPendingHint, setSetPendingHintFn_] = makeSetter((_hint: ClaudeCodeHint | null): void => {})
-const [_getResetHintRecommendationForTesting, setResetHintRecommendationForTestingFn_] = makeSetter((): void => {})
 export function hasShownHintThisSession(id: string): boolean { return _getHasShownHintThisSession()(id) }
 export function setPendingHint(hint: ClaudeCodeHint | null): void { _getSetPendingHint()(hint) }
-export function _resetHintRecommendationForTesting(): void { _getResetHintRecommendationForTesting()() }
 export const setHasShownHintThisSessionFn = setHasShownHintThisSessionFn_
 export const setSetPendingHintFn = setSetPendingHintFn_
-export const setResetHintRecommendationForTestingFn = setResetHintRecommendationForTestingFn_
 
 // -- system directories + git + misc
 const [_getGetSystemDirectories, setGetSystemDirectoriesFn_] = makeSetter((): string[] => [])
