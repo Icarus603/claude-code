@@ -10,14 +10,14 @@
 
 import type { Attributes } from '@opentelemetry/api'
 
-import {
-  getOauthAccountInfo,
-  getOrCreateUserID,
-  getSessionId,
-  getTerminalType,
-  isEnvTruthy,
-  toTaggedId,
-} from '../_deps.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import { getOrCreateUserID } from '@claude-code/config'
+import { envDynamic } from '@claude-code/config/env/dynamic'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { toTaggedId } from '@claude-code/agent/taggedId.js'
+import { getOauthAccountInfo } from '@claude-code/provider/authAlias.js'
+
+const getTerminalType = (): string | undefined => envDynamic.terminal
 
 const METRICS_CARDINALITY_DEFAULTS = {
   OTEL_METRICS_INCLUDE_SESSION_ID: true,

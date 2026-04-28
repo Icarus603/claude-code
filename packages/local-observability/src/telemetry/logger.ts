@@ -7,7 +7,7 @@
 
 import type { DiagLogger } from '@opentelemetry/api'
 
-import { logForDebugging } from '../_deps.js'
+import { logForDebugging } from '../debug.js'
 import { logError } from '../logging/error-log.js'
 
 export class ClaudeCodeDiagLogger implements DiagLogger {

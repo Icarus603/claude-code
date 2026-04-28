@@ -10,7 +10,7 @@ import memoize from 'lodash-es/memoize.js'
 
 import { logEvent } from '../index.js'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../compat.js'
-import { jsonStringify } from '../_deps.js'
+import { jsonStringify } from '../slowOperations.js'
 
 /**
  * Get the current Kubernetes namespace:

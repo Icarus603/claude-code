@@ -8,7 +8,8 @@
 
 import { dirname } from 'path'
 
-import { getFsImplementation, jsonStringify } from '../_deps.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { jsonStringify } from '../slowOperations.js'
 
 type DiagnosticLogLevel = 'debug' | 'info' | 'warn' | 'error'
 

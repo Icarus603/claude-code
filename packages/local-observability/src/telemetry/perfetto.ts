@@ -27,20 +27,23 @@ import { mkdirSync, writeFileSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import {
-  djb2Hash,
-  errorMessage,
-  getAgentId,
-  getAgentName,
   getClaudeConfigHomeDir,
-  getParentSessionId,
-  getSessionId,
   isEnvDefinedFalsy,
   isEnvTruthy,
-  jsonStringify,
-  logForDebugging,
-  registerCleanup,
-} from '../_deps.js'
+} from '@claude-code/config/env/utils'
+import { djb2Hash } from '@claude-code/config/hash'
+import {
+  getAgentId,
+  getAgentName,
+  getParentSessionId,
+} from '@claude-code/swarm/teammateState.js'
+
+import { errorMessage } from '../errorHelpers.js'
+import { logForDebugging } from '../debug.js'
+import { jsonStringify } from '../slowOperations.js'
 
 /**
  * Chrome Trace Event format types
