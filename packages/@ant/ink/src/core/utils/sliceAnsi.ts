@@ -83,7 +83,8 @@ export default function sliceAnsi(
       }
 
       if (include) {
-        result += (token as any).value
+        // ansi-tokenize: non-ansi token carries `value: string`
+        result += (token as { value: string }).value
       }
 
       position += width

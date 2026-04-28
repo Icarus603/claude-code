@@ -98,7 +98,7 @@ export class AgentLoop {
         const stream = this.deps.provider.stream(streamParams)
 
         for await (const event of stream) {
-          const eventType = (event as any).type
+          const eventType = event.type
           if (eventType === 'assistant') {
             assistantMessage = event as unknown as CoreAssistantMessage
             yield { type: 'message', message: assistantMessage }
@@ -107,7 +107,8 @@ export class AgentLoop {
           } else {
             yield { type: 'stream', event }
             const rawEvent = eventType === 'stream_event'
-              ? (event as any).event
+              ? ((event as ProviderEvent & { event?: ProviderEvent }).event ??
+                event)
               : event
             this.processStreamEvent(rawEvent, turnState)
           }

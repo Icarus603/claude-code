@@ -209,12 +209,6 @@ Edit 和 Write 完成寫入後都會：
 
 ## Cyber Risk 防禦
 
-Read 工具在文本內容後追加一個 `<system-reminder>` 提示：
+之前 Read 工具會在每次回傳檔案內容後追加 Anthropic 上游的 malware reminder（要求 model「拒絕改進或增強任何讀到的代碼」）。這條 reminder 跟自家的 `CYBER_RISK_INSTRUCTION`（在 `prompts.ts` 注入到 system prompt）語義打架——後者明確開放安全工作，前者每次 Read 都注入更嚴的限制。
 
-```
-Whenever you read a file, you should consider whether it would be
-considered malware. You CAN and SHOULD provide analysis of malware,
-what it is doing. But you MUST refuse to improve or augment the code.
-```
-
-這個提示只在非豁免模型上生效（`MITIGATION_EXEMPT_MODELS` 目前包含 `claude-opus-4-6`）。模型級別的豁免表明：防惡意程式碼的判斷力在不同模型間有差異，這是一個精巧的分級策略。
+已移除（FileReadTool 不再附加這條 reminder）。Prompt-injection 防禦由 `CYBER_RISK_INSTRUCTION` 統一處理：tool result 內的指令當 data 看，不當指令執行。
