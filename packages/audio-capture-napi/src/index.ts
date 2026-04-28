@@ -27,48 +27,57 @@ function loadModule(): AudioCaptureNapi | null {
   }
   loadAttempted = true
 
-  // Supported platforms: macOS (darwin), Linux, Windows (win32)
-  const platform = process.platform
-  if (platform !== 'darwin' && platform !== 'linux' && platform !== 'win32') {
-    return null
+  // CRITICAL: each per-platform `require(<plain-string-literal>)` MUST be
+  // a literal expression, NOT a variable, NOT a template literal, NOT
+  // forwarded through a helper. Bun's bundler analyses static require()
+  // calls and embeds the corresponding files in /$bunfs/root/ of the
+  // standalone binary. See packages/image-processor-napi/src/index.ts
+  // for the mirror pattern that documents this requirement.
+  //
+  // The .node files MUST live under packages/audio-capture-napi/vendor/
+  // so `../vendor/...` from this file (packages/audio-capture-napi/src/)
+  // resolves correctly during bundling.
+  let mod: unknown
+  try {
+    if (process.platform === 'darwin' && process.arch === 'arm64') {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      mod = require('../vendor/arm64-darwin/audio-capture.node')
+    } else if (process.platform === 'darwin' && process.arch === 'x64') {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      mod = require('../vendor/x64-darwin/audio-capture.node')
+    } else if (process.platform === 'linux' && process.arch === 'arm64') {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      mod = require('../vendor/arm64-linux/audio-capture.node')
+    } else if (process.platform === 'linux' && process.arch === 'x64') {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      mod = require('../vendor/x64-linux/audio-capture.node')
+    } else if (process.platform === 'win32' && process.arch === 'x64') {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      mod = require('../vendor/x64-win32/audio-capture.node')
+    }
+  } catch {
+    // platform-specific module not loadable
   }
 
-  // Candidate 1: native-embed path (bun compile). AUDIO_CAPTURE_NODE_PATH is
-  // defined at build time in build-with-plugins.ts for native builds only — the
-  // define resolves it to the static literal "../../audio-capture.node" so bun
-  // compile can rewrite it to /$bunfs/root/audio-capture.node. MUST stay a
-  // direct require(env var) — bun cannot analyze require(variable) from a loop.
-  if (process.env.AUDIO_CAPTURE_NODE_PATH) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      cachedModule = require(
-        process.env.AUDIO_CAPTURE_NODE_PATH,
-      ) as AudioCaptureNapi
-      return cachedModule
-    } catch {
-      // fall through to runtime fallbacks below
-    }
+  if (mod && typeof (mod as AudioCaptureNapi).startRecording === 'function') {
+    cachedModule = mod as AudioCaptureNapi
+    return cachedModule
   }
 
-  // Candidates 2-4: npm-install, dev/source, and workspace layouts.
-  // In bundled output, require() resolves relative to cli.js at the package root.
-  // In dev, it resolves relative to this file. When loaded from a workspace
-  // package (packages/audio-capture-napi/src/), we need an absolute path fallback.
-  const platformDir = `${process.arch}-${platform}`
-  const fallbacks = [
-    `./vendor/audio-capture/${platformDir}/audio-capture.node`,
-    `../audio-capture/${platformDir}/audio-capture.node`,
-    `${process.cwd()}/vendor/audio-capture/${platformDir}/audio-capture.node`,
-  ]
-  for (const p of fallbacks) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      cachedModule = require(p) as AudioCaptureNapi
+  // Dev-mode fallback: cwd-relative path in case running outside dist.
+  const platformDir = `${process.arch}-${process.platform}`
+  const cwdPath = `${process.cwd()}/packages/audio-capture-napi/vendor/${platformDir}/audio-capture.node`
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const cwdMod = require(cwdPath) as AudioCaptureNapi
+    if (cwdMod && typeof cwdMod.startRecording === 'function') {
+      cachedModule = cwdMod
       return cachedModule
-    } catch {
-      // try next
     }
+  } catch {
+    // not found at cwd
   }
+
   return null
 }
 

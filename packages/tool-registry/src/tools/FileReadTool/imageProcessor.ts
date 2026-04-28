@@ -39,23 +39,32 @@ export async function getImageProcessor(): Promise<SharpFunction> {
     return imageProcessorModule.default
   }
 
-  if (isInBundledMode()) {
-    // Try to load the native image processor first
-    try {
-      // Use the native image processor module
-      const imageProcessor = await import('image-processor-napi')
-      const sharpFn = (imageProcessor.sharp ?? imageProcessor.default) as SharpFunction
+  // Always try the native image-processor first regardless of bundled mode.
+  // npm `sharp` fails to load both in `bun dist/cli.js` (no platform binary
+  // resolution) and in `bun build --compile` standalone bundles (binary not
+  // embedded). The native .node from vendor/image-processor/ works in both
+  // cases. See packages/image-processor-napi/src/index.ts for the resolver.
+  // The `isInBundledMode()` import is kept for callers that may still want
+  // it elsewhere, but the gate is removed here.
+  void isInBundledMode  // referenced to retain import; gate is intentionally not used
+  try {
+    const imageProcessor = await import('image-processor-napi')
+    const sharpFn = (imageProcessor.sharp ?? imageProcessor.default) as SharpFunction
+    if (typeof sharpFn === 'function') {
       imageProcessorModule = { default: sharpFn }
       return sharpFn
-    } catch {
-      // Fall back to sharp if native module is not available
-      console.warn(
-        'Native image processor not available, falling back to sharp',
-      )
     }
+  } catch {
+    // image-processor-napi failed (no native .node for this platform AND
+    // npm sharp also failed). Fall through to direct sharp import.
+    console.warn(
+      'Native image processor not available, falling back to sharp',
+    )
   }
 
-  // Use sharp for non-bundled builds or as fallback.
+  // Last-resort direct sharp import. Same caveat — sharp's platform binary
+  // may not be available in all runtime configurations, in which case the
+  // resizer's catch block falls through to the original buffer pass-through.
   // Single structural cast: our SharpFunction is a subset of sharp's actual type surface.
   const imported = (await import(
     'sharp'

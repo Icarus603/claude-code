@@ -64,10 +64,20 @@ console.log(
   `Bundled ${result.outputs.length} files to ${outdir}/ (patched ${patched} for Node.js compat)`,
 )
 
-// Step 4: Copy native .node addon files (audio-capture)
-const vendorDir = join(outdir, 'vendor', 'audio-capture')
-await cp('vendor/audio-capture', vendorDir, { recursive: true })
-console.log(`Copied vendor/audio-capture/ → ${vendorDir}/`)
+// Step 4: Native .node addon files.
+//
+// Bun's bundler auto-emits these as hash-named files into `dist/` whenever
+// it sees a static `require('<literal-path>.node')` call — see the
+// hardcoded require literals in:
+//   - packages/audio-capture-napi/src/index.ts
+//   - packages/image-processor-napi/src/index.ts
+//
+// Both dev-mode (`bun dist/cli.js`) and standalone binaries
+// (`build-platforms.ts`) get the .node files automatically — no manual
+// copy needed. The cli.js bundle references them by hash filename
+// alongside itself, so they must stay in dist/ root.
+//
+// Source of truth: `packages/<pkg>/vendor/`. See NOTICE.md in each.
 
 // Step 4.1: Copy pre-downloaded ripgrep binary into dist when available.
 // This keeps Glob/Grep working in local dist runs without requiring a separate
