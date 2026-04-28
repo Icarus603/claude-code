@@ -14,6 +14,7 @@ import {
   type ConnectionRecord,
   type ConnectionModelRecord,
 } from '@claude-code/config'
+import { performLogout } from './commands/logout/logout.js'
 
 // Re-export types from config for convenience
 export type { ConnectionRecord, ConnectionModelRecord }
@@ -336,6 +337,14 @@ export function upsertCompatibleConnection(input: {
  * global slot — disconnecting wipes that slot. Future work: move OAuth
  * tokens onto `connection.auth.tokens` so multiple OAuth connections of
  * the same source can coexist (e.g., two Claude Accounts).
+ *
+ * If this disconnect leaves zero connections (i.e. user logged out of
+ * the last provider), fall through to `performLogout()` for full
+ * global cleanup: secure storage wipe, keychain Anthropic key removal,
+ * caches reset (betas/policy/grove/oauth), `oauthAccount` clear. Without
+ * this fall-through, partial state would linger across the
+ * "all-providers-logged-out" boundary — semantically the user is
+ * logged out, but the indicator/auth code would still see stale traces.
  */
 export async function disconnectConnection(id: string): Promise<void> {
   const conn = getConnection(id)
@@ -366,6 +375,14 @@ export async function disconnectConnection(id: string): Promise<void> {
   }
 
   removeConnection(id)
+
+  // Last-connection global cleanup: when the user disconnects the last
+  // remaining connection, semantically they're fully logged out — wipe
+  // secure storage, keychain Anthropic key, oauthAccount, and all auth
+  // caches (betas/policy/grove/oauth-tokens) so no stale state lingers.
+  if (getConnections().length === 0) {
+    await performLogout({ clearOnboarding: false })
+  }
 }
 
 // ── Legacy-config migration ────────────────────────────────────────────
