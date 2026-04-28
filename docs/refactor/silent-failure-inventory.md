@@ -23,14 +23,14 @@ Findings are graded:
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
 | 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
 | 5 | empty-catch | 45 | 0 | 0 | 0 | 45 |
-| 6 | nullish-coalesce-critical-path | 168 | 0 | 0 | 17 | 151 |
+| 6 | nullish-coalesce-critical-path | 86 | 0 | 0 | 0 | 86 |
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
 | 10 | type-cast-trap | 341 | 0 | 0 | 174 | 167 |
 | 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **1075** | **0** | **0** | **191** | **884** |
+| **TOTAL** | | **993** | **0** | **0** | **174** | **819** |
 
 ## Patterns in detail
 
@@ -144,51 +144,10 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1192; **findings**: 168
+**Total scanned**: 1192; **findings**: 86
 
-#### MEDIUM (17)
+#### LOW (86)
 
-- `packages/config/plugin/mcpPluginIntegration.ts:307` — const saved = loadMcpServerUserConfig(pluginId, channel.server) ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/marketplaceManager.ts:234` — const existing = getSettingsForSource(settingSource) ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/mcpbHandler.ts:247` — const existing = storage.read() ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/pluginOptionsStorage.ts:130` — const existing = storage.read() ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:1445` — const reducedMotion = useAppState(s => s.settings.prefersReducedMotion) ?? false;
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/model/bedrock.ts:48` — return profiles.find(p => p.includes(substring)) ?? null
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/user.ts:88` — subscriptionType = getSubscriptionType() ?? undefined
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/user.ts:89` — rateLimitTier = getRateLimitTier() ?? undefined
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/auth.ts:77` — return { apiKey: getToken() ?? null }
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/claudeLegacyRuntime.ts:1667` — ...((extraBodyParams.output_config as BetaOutputConfig) ?? {}),
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/agent/messages.ts:2816` — ? ((message.toolUseID as string) ?? null)
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/agent/internal/queryRuntime.ts:317` — ) ?? null
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/agent/attachments.ts:2777` — const regularMatchArray: string[] = content.match(regularAtMentionRegex) ?? []
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/app-host/src/init.ts:133` — const settings = getSettings_DEPRECATED() ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/permission/src/yoloClassifier.ts:925` — thinking: parseXmlThinking(stage2Text) ?? undefined,
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/permission/src/yoloClassifier.ts:966` — })) ?? undefined
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/permission/src/yoloClassifier.ts:1285` — })) ?? undefined
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-
-#### LOW (151)
-
-- `packages/config/plugin/installedPluginsManager.ts:764` — for (const entry of data.plugins[pluginId] ?? []) {
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/installedPluginsManager.ts:1004` — return sha ?? undefined
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/builtin.ts:138` — allowedTools: definition.allowedTools ?? [],
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/builtin.ts:142` — disableModelInvocation: definition.disableModelInvocation ?? false,
@@ -197,27 +156,15 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/dependencyResolver.ts:202` — for (const rawDep of p.manifest.dependencies ?? []) {
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/dependencyResolver.ts:254` — (p.manifest.dependencies ?? []).some(d => {
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/pluginBlocklist.ts:91` — const installations = installedPlugins.plugins[pluginId] ?? []
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/lspRecommendation.ts:245` — const neverPlugins = config.lspRecommendationNeverPlugins ?? []
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/lspRecommendation.ts:318` — const current = currentConfig.lspRecommendationNeverPlugins ?? []
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/lspRecommendation.ts:336` — const newCount = (currentConfig.lspRecommendationIgnoredCount ?? 0) + 1
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/lspRecommendation.ts:355` — (config.lspRecommendationIgnoredCount ?? 0) >= MAX_IGNORED_COUNT
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/lspRecommendation.ts:364` — const currentCount = currentConfig.lspRecommendationIgnoredCount ?? 0
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/pluginLoader.ts:1995` — allowedSources: (strictAllowlist ?? []).map(s =>
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/marketplaceManager.ts:169` — ...(getInitialSettings().enabledPlugins ?? {}),
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/marketplaceManager.ts:190` — ...(getInitialSettings().extraKnownMarketplaces ?? {}),
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/pluginFlagging.ts:143` — return cache ?? {}
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/mcpbHandler.ts:767` — manifest.user_config ?? {},
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
@@ -227,13 +174,7 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/repl/src/screens/ResumeConversation.tsx:322` — result.contextCollapseCommits ?? [],
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:653` — const live = t.messages ?? [];
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:1151` — const showStatusInTerminalTab = tabStatusGateEnabled && (getGlobalConfig().showStatusInTerminalTab ?? false);
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/repl/src/screens/REPLView.tsx:1160` — const [messages, rawSetMessages] = useState<MessageType[]>(initialMessages ?? []);
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:1618` — const count = config.autoPermissionsNotificationCount ?? 0;
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/repl/src/screens/REPLView.tsx:1624` — const prevCount = prev.autoPermissionsNotificationCount ?? 0;
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
@@ -245,7 +186,29 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/repl/src/screens/REPLView.tsx:5573` — const kept = result.messagesToKeep ?? [];
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- ...121 more (run audit with no flags for full JSON)
+- `packages/provider/src/oauth/auth-code-listener.ts:46` — this.localServer.listen(port ?? 0, 'localhost', () => {
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/oauth/client.ts:506` — profile.organization.has_extra_usage_enabled ?? false,
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/oauth/client.ts:507` — billingType: profile.organization.billing_type ?? undefined,
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/oauth/client.ts:510` — profile.organization.subscription_created_at ?? undefined,
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/gemini/streamAdapter.ts:26` — (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0)
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/codex/fetchAdapter.ts:180` — arguments: JSON.stringify(block.input ?? {}),
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/codex/fetchAdapter.ts:194` — const anthropicMessages = (anthropicBody.messages ?? []) as AnthropicMessage[]
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/codex/fetchAdapter.ts:200` — const anthropicTools = (anthropicBody.tools ?? []) as AnthropicTool[]
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/dumpPrompts.ts:103` — const messages = (req.messages ?? []) as Array<{ role?: string }>
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/connections.ts:254` — connections: (current.connections ?? []).filter(c => c.id !== id),
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/provider/src/connections.ts:262` — connections: (current.connections ?? []).map(c =>
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- ...56 more (run audit with no flags for full JSON)
 
 ### 7. `stub-return-only`
 

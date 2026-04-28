@@ -1,38 +1,41 @@
-node_modules
-.DS_Store
-dist
-coverage
-.env
-*.log
-.idea
-.vscode
-*.suo
-*.lock
-src/utils/vendor/
+# Dependencies & build output
+node_modules/
+dist/
+coverage/
 
-# AI tool runtime directories
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+.idea/
+# .vscode/ has tracked launch.json + tasks.json (shared debug config).
+# Ignore only the per-user files commonly written by VS Code.
+.vscode/settings.json
+.vscode/*.code-workspace
+.history/
+
+# Secrets — all dotenv variants. If you ever add an .env.example template,
+# add `!.env.example` below to allow-list it.
+.env
+.env.*
+
+# AI tool / agent runtime state — regenerated, never tracked
 .agents/
 .codex/
-.omx/
+.swarm/
 
-# Plugin-local state (e.g. ralph-loop session file).
-# Runtime artifacts plugins regenerate — never check them in.
+# Plugin-local state (e.g. ralph-loop session files)
 .claude/*.local.md
 
-# Binary / screenshot files (root only)
+# Python bytecode (some tooling under .agents/ shells out to python)
+__pycache__/
+*.pyc
+
+# Root-only screenshots — subdirectory PNGs may be tracked assets
 /*.png
 *.bmp
 
-# Agent / tool state dirs
-.swarm/
-.agents/__pycache__/
-
-# Python bytecode
-__pycache__/
-*.pyc
-logs
-
-.bun-demincer/bun-demincer/
-
-# bun-demincer (decompiler tool — separate checkout)
+# bun-demincer (decompiler tool — separate checkout, not part of build)
 bun-demincer/
