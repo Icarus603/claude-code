@@ -113,7 +113,7 @@
   "packages/storage/src/toolResultStorage.ts": 1041,
   "packages/swarm/src/mailbox/index.ts": 1188,
   "packages/swarm/src/permissions/index.ts": 929,
-  "packages/swarm/src/runtime/inProcessRunner.ts": 1553,
+  "packages/swarm/src/runtime/inProcessRunner.ts": 1555,
   "packages/swarm/src/worktree/index.ts": 1520,
   "packages/tool-registry/src/collapseReadSearch.ts": 1136,
   "packages/tool-registry/src/services/toolExecution.ts": 1747,

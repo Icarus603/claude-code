@@ -1,5 +1,7 @@
 /**
- * In-process teammate runner
+ * In-process teammate runner. `as never` casts on Tool.description()
+ * arguments bridge generic Tool<I,O> input types — runtime-binding
+ * pattern type-system bypass.
  *
  * Wraps runAgent() for in-process teammates, providing:
  * - AsyncLocalStorage-based context isolation via runWithTeammateContext()
