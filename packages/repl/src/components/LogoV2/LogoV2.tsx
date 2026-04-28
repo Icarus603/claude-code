@@ -9,7 +9,6 @@ import {
   formatWelcomeMessage,
   truncatePath,
   getRecentActivitySync,
-  getRecentReleaseNotesSync,
   getLogoDisplayData,
 } from '../../uiHelpers/logoV2Utils.js'
 import { truncate } from '@claude-code/output/formatters/truncate.js'
@@ -18,11 +17,10 @@ import { Clawd } from './Clawd.js'
 import { FeedColumn } from './FeedColumn.js'
 import {
   createRecentActivityFeed,
-  createWhatsNewFeed,
   createProjectOnboardingFeed,
   createGuestPassesFeed,
 } from './feedConfigs.js'
-import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
+import { getGlobalConfig } from '@claude-code/config'
 import { resolveThemeSetting } from '../../systemTheme.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import {
@@ -38,7 +36,6 @@ import {
 } from '../../projectOnboardingState.js'
 import { CondensedLogo } from './CondensedLogo.js'
 import { OffscreenFreeze } from '../OffscreenFreeze.js'
-import { checkForReleaseNotesSync } from '../../releaseNotes.js'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import {
@@ -95,13 +92,6 @@ export function LogoV2(): React.ReactNode {
 
   const config = getGlobalConfig()
 
-  let changelog: string[]
-  try {
-    changelog = getRecentReleaseNotesSync(3)
-  } catch {
-    changelog = []
-  }
-
   // Get company announcements and select one:
   // - First startup (numStartups === 1): show first announcement
   // - All other startups: randomly select from announcements
@@ -112,29 +102,19 @@ export function LogoV2(): React.ReactNode {
       ? announcements[0]
       : announcements[Math.floor(Math.random() * announcements.length)]
   })
-  const { hasReleaseNotes } = checkForReleaseNotesSync(
-    config.lastReleaseNotesSeen,
-  )
 
   useEffect(() => {
-    const currentConfig = getGlobalConfig()
-    if (currentConfig.lastReleaseNotesSeen === MACRO.VERSION) {
-      return
-    }
-    saveGlobalConfig(current => {
-      if (current.lastReleaseNotesSeen === MACRO.VERSION) return current
-      return { ...current, lastReleaseNotesSeen: MACRO.VERSION }
-    })
     if (showOnboarding) {
       incrementProjectOnboardingSeenCount()
     }
-  }, [config, showOnboarding])
+  }, [showOnboarding])
 
   // In condensed mode (early-return below renders <CondensedLogo/>),
   // CondensedLogo's own useEffect handles the impression count. Skipping
   // here avoids double-counting since hooks fire before the early return.
+  // ccb removed the changelog/release-notes feed (Anthropic-only feature),
+  // so this is now equivalent to "condensed unless onboarding or forced".
   const isCondensedMode =
-    !hasReleaseNotes &&
     !showOnboarding &&
     !isEnvTruthy(process.env.CLAUDE_CODE_FORCE_FULL_LOGO)
 
@@ -177,12 +157,9 @@ export function LogoV2(): React.ReactNode {
     LEFT_PANEL_MAX_WIDTH - 20,
   )
 
-  // Show condensed logo if no new changelog and not showing onboarding and not forcing full logo
-  if (
-    !hasReleaseNotes &&
-    !showOnboarding &&
-    !isEnvTruthy(process.env.CLAUDE_CODE_FORCE_FULL_LOGO)
-  ) {
+  // Render condensed logo unless we're showing project onboarding or
+  // CLAUDE_CODE_FORCE_FULL_LOGO is set (matches `isCondensedMode` above).
+  if (isCondensedMode) {
     return (
       <>
         <CondensedLogo />
