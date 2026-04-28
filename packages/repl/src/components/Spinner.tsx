@@ -379,6 +379,7 @@ function SpinnerWithVerbInner({
         foregroundedTeammate={foregroundedTeammate}
         leaderIsIdle={leaderIsIdle}
         thinkingStatus={thinkingStatus}
+        thinkingStartRef={thinkingStartRef}
         effortSuffix={effortSuffix}
       />
       {showSpinnerTree && hasRunningTeammates ? (

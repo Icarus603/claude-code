@@ -58,6 +58,13 @@ export type SpinnerAnimationRowProps = {
 
   // Thinking (state owned by parent, mode-dependent)
   thinkingStatus: 'thinking' | number | null
+  /**
+   * Wall-clock ms when thinking started, or null when not thinking.
+   * Read by the 50ms animation loop to compute elapsed-thinking and pick
+   * the 5-stage label ("thinking" → "still thinking" → ... → "almost done
+   * thinking"). Mirrors ant 3505.js `eJ5(elapsedMs)`.
+   */
+  thinkingStartRef: { current: number | null }
   effortSuffix: string
 
 }
@@ -92,6 +99,7 @@ export function SpinnerAnimationRow({
   foregroundedTeammate,
   leaderIsIdle = false,
   thinkingStatus,
+  thinkingStartRef,
   effortSuffix,
 }: SpinnerAnimationRowProps): React.ReactNode {
   const [viewportRef, time] = useAnimationFrame(reducedMotion ? null : 50)
@@ -194,12 +202,26 @@ export function SpinnerAnimationRow({
   const tokensWidth = stringWidth(tokensText)
 
   // === Thinking text (may shrink to fit) ===
-  let thinkingText =
-    thinkingStatus === 'thinking'
-      ? `thinking${effortSuffix}`
-      : typeof thinkingStatus === 'number'
-        ? `thought for ${Math.max(1, Math.round(thinkingStatus / 1000))}s`
-        : null
+  // 5-stage label mirrors ant 2.1.121 `eJ5` (3505.js): the longer the model
+  // thinks, the more "anxious" the label becomes. Thresholds are fixed —
+  // they signal *elapsed time*, not *progress*, so don't try to scale.
+  const thinkingLabel = (elapsedMs: number): string => {
+    if (elapsedMs >= 60_000) return 'almost done thinking'
+    if (elapsedMs >= 45_000) return 'thinking some more'
+    if (elapsedMs >= 30_000) return 'thinking more'
+    if (elapsedMs >= 15_000) return 'still thinking'
+    return 'thinking'
+  }
+  let thinkingText: string | null
+  if (thinkingStatus === 'thinking') {
+    const start = thinkingStartRef.current
+    const elapsed = start !== null ? now - start : 0
+    thinkingText = `${thinkingLabel(elapsed)}${effortSuffix}`
+  } else if (typeof thinkingStatus === 'number') {
+    thinkingText = `thought for ${Math.max(1, Math.round(thinkingStatus / 1000))}s`
+  } else {
+    thinkingText = null
+  }
   let thinkingWidthValue = thinkingText ? stringWidth(thinkingText) : 0
 
   // === Progressive width gating ===
@@ -217,13 +239,13 @@ export function SpinnerAnimationRow({
     !showThinking &&
     wantsThinking &&
     thinkingStatus === 'thinking' &&
-    effortSuffix
+    availableSpace > THINKING_BARE_WIDTH
   ) {
-    if (availableSpace > THINKING_BARE_WIDTH) {
-      thinkingText = 'thinking'
-      thinkingWidthValue = THINKING_BARE_WIDTH
-      showThinking = true
-    }
+    // Fall back to bare "thinking" — works for all 5 stages, also drops
+    // effortSuffix when the room runs out.
+    thinkingText = 'thinking'
+    thinkingWidthValue = THINKING_BARE_WIDTH
+    showThinking = true
   }
   const usedAfterThinking = showThinking ? thinkingWidthValue + sep : 0
 

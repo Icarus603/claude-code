@@ -192,8 +192,11 @@ import { isMcpInstructionsDeltaEnabled } from '@claude-code/mcp-runtime/mcpInstr
 import { calculateUSDCost } from './modelCost.js'
 import { endQueryProfile, queryCheckpoint } from '@claude-code/local-observability/aggregates/queryProfiler.js'
 import {
+  getDefaultThinkingDisplay,
+  getThinkingTypeOverride,
   modelSupportsAdaptiveThinking,
   modelSupportsThinking,
+  mustUseAdaptiveThinking,
   type ThinkingConfig,
 } from './thinking.js'
 import {
@@ -1704,14 +1707,24 @@ async function* queryModel(
     // without notifying the model launch DRI and research. This is a sensitive
     // setting that can greatly affect model quality and bashing.
     if (hasThinking && modelSupportsThinking(options.model)) {
-      if (
-        !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING')) &&
-        modelSupportsAdaptiveThinking(options.model)
-      ) {
+      // Mirrors ant 4682.js: env var only honoured for deprecation-window
+      // models (4.6 / Sonnet 4.6). Newer models (Opus 4.7+) MUST use adaptive.
+      const disableAdaptive =
+        isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING')) &&
+        !mustUseAdaptiveThinking(options.model)
+      const typeOverride = getThinkingTypeOverride(options.model)
+      // hasThinking already gates type !== 'disabled'.
+      const display = thinkingConfig.display ?? getDefaultThinkingDisplay()
+      const useAdaptive =
+        typeOverride !== undefined
+          ? typeOverride === 'adaptive'
+          : modelSupportsAdaptiveThinking(options.model) && !disableAdaptive
+      if (useAdaptive) {
         // For models that support adaptive thinking, always use adaptive
         // thinking without a budget.
         thinking = {
           type: 'adaptive',
+          ...(display !== undefined && { display }),
         } satisfies BetaMessageStreamParams['thinking']
       } else {
         // For models that do not support adaptive thinking, use the default
@@ -1727,6 +1740,7 @@ async function* queryModel(
         thinking = {
           budget_tokens: thinkingBudget,
           type: 'enabled',
+          ...(display !== undefined && { display }),
         } satisfies BetaMessageStreamParams['thinking']
       }
     }
