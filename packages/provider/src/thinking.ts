@@ -9,10 +9,44 @@ import { getSettingsWithErrors } from '@claude-code/config/settings'
 import { resolveAntModel } from './antModels.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
+/**
+ * Mirrors ant 2.1.121's 2833.js schema: thinking config carries an
+ * optional `display` flag controlling how server emits thinking content
+ * in the response stream.
+ *
+ *   - 'summarized' = server emits a short summary in place of full reasoning.
+ *     Massively reduces tokens-in-history on subsequent turns (each
+ *     thinking block previously round-tripped at full size). Recommended
+ *     default for interactive sessions.
+ *   - 'omitted' = server emits no thinking content at all. Maximum
+ *     savings, but loses transparency — user can't see why the model
+ *     chose what it did. Useful for headless/-p where reasoning is noise.
+ *   - undefined = legacy behavior, full reasoning emitted.
+ *
+ * Adaptive and enabled (fixed-budget) both accept it; disabled does not.
+ */
+export type ThinkingDisplay = 'summarized' | 'omitted'
+
 export type ThinkingConfig =
-  | { type: 'adaptive' }
-  | { type: 'enabled'; budgetTokens: number }
+  | { type: 'adaptive'; display?: ThinkingDisplay }
+  | { type: 'enabled'; budgetTokens: number; display?: ThinkingDisplay }
   | { type: 'disabled' }
+
+/**
+ * Default thinking display mode. Read from CCB_THINKING_DISPLAY (override)
+ * or fall back to 'summarized' for ccb's interactive default — saves
+ * substantial token round-trip on long sessions while keeping a visible
+ * summary for transparency. Set to 'omitted' for hardest savings.
+ * Set to 'full' (or anything not in the enum) to emit nothing here and
+ * let the server's default behavior emit full reasoning.
+ */
+export function getDefaultThinkingDisplay(): ThinkingDisplay | undefined {
+  const override = readEnv('CCB_THINKING_DISPLAY')?.toLowerCase()
+  if (override === 'summarized') return 'summarized'
+  if (override === 'omitted') return 'omitted'
+  if (override === 'full' || override === 'none') return undefined
+  return 'summarized'
+}
 
 /**
  * Build-time gate (feature) + runtime gate (GrowthBook). The build flag
@@ -141,6 +175,42 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
   // for their model strings.
   const provider = getAPIProvider()
   return provider === 'firstParty' || provider === 'foundry'
+}
+
+/**
+ * Some models REQUIRE adaptive thinking — they don't accept the legacy
+ * `budget_tokens` enabled mode. Opus 4.7 dropped budget_tokens entirely
+ * (sending it returns 400). Mirrors ant 4682.js disable-adaptive guard:
+ * `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING` is honoured ONLY for the
+ * deprecation-window models (4.6 / Sonnet 4.6) — for newer models the
+ * env var is ignored to avoid wedging API requests.
+ */
+export function mustUseAdaptiveThinking(model: string): boolean {
+  const canonical = getCanonicalName(model)
+  return canonical.includes('opus-4-7')
+}
+
+/**
+ * Per-model runtime override for thinking type. Mirrors ant's
+ * `g_.thinkingTypeOverrides` (0126.js xP6/uP6) — lets specific code
+ * paths force a model into 'adaptive' or 'enabled' mode regardless of
+ * the default policy. Empty by default; populated only when explicitly
+ * set by callers (e.g. an experiment, a per-request flag).
+ *
+ * Read-then-act, never store the override permanently across sessions.
+ */
+const thinkingTypeOverrides = new Map<string, 'adaptive' | 'enabled'>()
+export function getThinkingTypeOverride(
+  model: string,
+): 'adaptive' | 'enabled' | undefined {
+  return thinkingTypeOverrides.get(model)
+}
+export function setThinkingTypeOverride(
+  model: string,
+  override: 'adaptive' | 'enabled' | undefined,
+): void {
+  if (override === undefined) thinkingTypeOverrides.delete(model)
+  else thinkingTypeOverrides.set(model, override)
 }
 
 export function shouldEnableThinkingByDefault(): boolean {
