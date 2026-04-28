@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
-# doctor:arch runs every V7 architectural rule before any push.
+# doctor:arch + smoke run before any push.
+# - doctor:arch: every V7 architectural rule + 7 silent-failure verifiers
+# - smoke: end-to-end checks for plugin hook chain (incl. live-fire spawn)
 # If it fails, fix the rule or the code before pushing — do not bypass.
 # Override (emergency only): git push --no-verify
 set -e
 
 echo "→ Running doctor:arch before push..."
 bun run doctor:arch
+
+echo "→ Running smoke suite before push..."
+bun run smoke

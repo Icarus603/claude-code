@@ -26,5 +26,8 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: doctor:arch (47 architectural rules)
+      - name: doctor:arch (architectural + silent-failure rules)
         run: bun run scripts/doctor-architecture.ts
+
+      - name: smoke (boot + plugin dispatch + live-fire hook spawn)
+        run: bun run smoke
