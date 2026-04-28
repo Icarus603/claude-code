@@ -1,6 +1,6 @@
 {
   "packages/@ant/claude-for-chrome-mcp/src/bridgeClient.ts": 1127,
-  "packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts": 1151,
+  "packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts": 1154,
   "packages/@ant/computer-use-mcp/src/legacy/platforms/win32.ts": 980,
   "packages/@ant/computer-use-mcp/src/toolCalls.ts": 4209,
   "packages/@ant/computer-use-mcp/src/tools.ts": 1054,

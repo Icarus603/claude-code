@@ -119,7 +119,10 @@ export async function call<T = unknown>(
     pendingRequests.set(id, {
       resolve: v => {
         clearTimeout(timer)
-        ;(origResolve as any)(v)
+        // origResolve is `(value: T | PromiseLike<T>) => void` but the
+        // map's signature is `(v: unknown) => void`. Cast through the
+        // unknown variant.
+        ;(origResolve as (v: unknown) => void)(v)
       },
       reject: e => {
         clearTimeout(timer)
