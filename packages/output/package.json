@@ -10,7 +10,6 @@
     "./contracts": "./src/contracts.ts",
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
-    "./_deps": "./src/_deps.ts",
     "./buffers": "./src/buffers/index.ts",
     "./formatters": "./src/formatters/index.ts",
     "./capture": "./src/capture/index.ts",

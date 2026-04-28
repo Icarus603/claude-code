@@ -32,7 +32,7 @@ const BUDGET: Record<string, number> = {
   'local-observability': 13,
   'mcp-runtime': 13,
   'memory': 5,
-  'output': 5,
+  'output': 7,
   'permission': 15,
   'provider': 17,
   'repl': 22,

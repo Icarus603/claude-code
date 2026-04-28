@@ -1,18 +1,15 @@
 import { appendFile, rename } from 'fs/promises'
 import { basename, dirname, join } from 'path'
 
+import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
+import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+import { sanitizePath } from '@claude-code/storage/path.js'
+
 import { createBufferedWriter } from '../buffers/index.js'
-import {
-  getClaudeConfigHomeDir,
-  getFsImplementation,
-  getOriginalCwd,
-  getSessionId,
-  isEnvTruthy,
-  jsonStringify,
-  logForDebugging,
-  registerCleanup,
-  sanitizePath,
-} from '../_deps.js'
 
 // Mutable recording state — filePath is updated when session ID changes (e.g., --resume)
 const recordingState: { filePath: string | null; timestamp: number } = {

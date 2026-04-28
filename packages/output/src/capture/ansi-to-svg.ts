@@ -3,7 +3,7 @@
  * Supports basic ANSI color codes (foreground colors)
  */
 
-import { escapeXml } from '../_deps.js'
+import { escapeXml } from '../xml.js'
 
 export type AnsiColor = {
   r: number
