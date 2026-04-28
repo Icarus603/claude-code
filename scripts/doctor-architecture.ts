@@ -414,6 +414,13 @@ const CHECKS: Check[] = [
     doc: '6 audit-pattern counts that cannot realistically be 0 today are baseline-locked; counts may shrink, never grow',
   },
   {
+    id: 'host-binding-completeness',
+    layer: 'Cross-Cutting',
+    subsystem: 'silent-failure prevention',
+    script: 'scripts/verify-host-binding-completeness.ts',
+    doc: 'Every required field on a `XxxHostBindings` contract must have a wire in install*Bindings.ts / packageHostSetup.ts / runtimeHostSetup.ts / *Runtime.ts',
+  },
+  {
     id: 'duplicate-canonicals',
     layer: 'Cross-Cutting',
     subsystem: 'fork detection',
