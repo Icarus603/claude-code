@@ -8,8 +8,12 @@
 import { execSync } from 'child_process'
 import { readSafe, findFiles } from './lib.js'
 
-// True latent bugs from 01b
+// True latent bugs from 01b. Some have since been fixed (deleted or
+// wired); we keep the entries for historical traceability so the
+// "0 -> 0" line is a positive proof that the bug class is gone.
 const TRUE_BUGS = [
+  // Deleted in commit 5774d3ef (was a useState false-positive; the
+  // _deps slot had 289 reader-matches, all React useState's setAppState).
   ['setSetAppStateFn', 'setAppState'],
   ['setClearAgentDefinitionsCacheFn', 'clearAgentDefinitionsCache'],
   ['setClearAllOutputStylesCacheFn', 'clearAllOutputStylesCache'],

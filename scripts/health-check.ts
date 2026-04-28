@@ -43,13 +43,21 @@ function icon(status: Metric["status"]): string {
 // 1. Code size
 // ---------------------------------------------------------------------------
 async function checkCodeSize() {
-	const tsFiles = await $`find src -name '*.ts' -o -name '*.tsx' | grep -v node_modules`.text();
+	// V7 moved code from src/ to packages/. Cover both so dev branches
+	// pre/post-migration both report correctly.
+	const tsFiles =
+		await $`find src packages -name '*.ts' -o -name '*.tsx' 2>/dev/null | grep -v node_modules`
+			.nothrow()
+			.text();
 	const fileCount = tsFiles.trim().split("\n").filter(Boolean).length;
 	add("TypeScript files", fileCount, "info");
 
-	const loc = await $`find src -name '*.ts' -o -name '*.tsx' | grep -v node_modules | xargs wc -l | tail -1`.text();
+	const loc =
+		await $`find src packages -name '*.ts' -o -name '*.tsx' 2>/dev/null | grep -v node_modules | xargs wc -l | tail -1`
+			.nothrow()
+			.text();
 	const totalLines = loc.trim().split(/\s+/)[0] ?? "?";
-	add("Total LOC (src/)", totalLines, "info");
+	add("Total LOC (src/+packages/)", totalLines, "info");
 }
 
 // ---------------------------------------------------------------------------
@@ -57,7 +65,7 @@ async function checkCodeSize() {
 // ---------------------------------------------------------------------------
 async function checkLint() {
 	try {
-		const result = await $`bunx biome check src/ 2>&1`.quiet().nothrow().text();
+		const result = await $`bunx biome check . 2>&1`.quiet().nothrow().text();
 		const errorMatch = result.match(/Found (\d+) errors?/);
 		const warnMatch = result.match(/Found (\d+) warnings?/);
 		const errors = errorMatch ? Number.parseInt(errorMatch[1]) : 0;
