@@ -95,19 +95,13 @@ const findings: Finding[] = []
 for (const [name, _] of generatorNames) {
   const sites = findAwaitCallsites(name)
   for (const s of sites) {
-    if (hasLocalShadow(name, s.file)) {
-      // Same-file non-generator definition wins via local scope.
-      // Real verification needs symbol resolution; flag as MEDIUM.
-      findings.push({
-        pattern: 'await-generator-misuse',
-        file: s.file,
-        line: s.line,
-        snippet: s.content.trim().slice(0, 120),
-        severity: 'MEDIUM',
-        note: `\`await ${name}(...)\` matches a generator name elsewhere in repo, but the same file defines a local non-generator ${name}. Likely a false positive (local scope wins). Verify which one is bound.`,
-      })
-      continue
-    }
+    // Hard exclusion: when the caller's file defines a local non-generator
+    // function with the same name, JS scoping rules guarantee the local
+    // wins. Without symbol-precise resolution we can't distinguish, so we
+    // exclude rather than warn (user already verified all current
+    // instances are bridge-local async withRetry, not provider's async
+    // generator).
+    if (hasLocalShadow(name, s.file)) continue
     findings.push({
       pattern: 'await-generator-misuse',
       file: s.file,

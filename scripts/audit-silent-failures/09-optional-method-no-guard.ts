@@ -53,6 +53,14 @@ for (const ln of raw.split('\n')) {
   const varName = decl[1]
   const lineNum = parseInt(lineStr, 10)
 
+  // If the declaration line itself has a `?? default`, the variable is
+  // never undefined at use sites — fallback completes the chain. This
+  // mirrors the Wave B calibration in audit 03.
+  // Examples that are SAFE:
+  //   const x = obj?.method?.() ?? []
+  //   const x = obj?.method?.() ?? defaultValue
+  if (/\?\.\([^)]*\)\s*\?\?/.test(content)) continue
+
   // Look ahead 5 lines for `varName.X(` (method call) or `varName.X` (deref)
   // without `?` or `if (varName)` guard.
   const fileLines = getLines(file)
