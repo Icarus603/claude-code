@@ -1,3 +1,8 @@
+/**
+ * Anthropic SDK client. Provider stream adapter — `as any` casts
+ * (googleAuth bridging Vertex auth into the SDK, etc.) are by-design
+ * type-system bypass for SDK-version compatibility shims.
+ */
 import Anthropic, { type ClientOptions } from '@anthropic-ai/sdk'
 import { getAnthropicAuthProvider } from '../auth.js'
 import { getProviderHostBindings } from '../host.js'

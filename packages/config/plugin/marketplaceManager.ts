@@ -182,13 +182,13 @@ export function getDeclaredMarketplaces(): Record<string, DeclaredMarketplace> {
   }
 
   // Lowest precedence: implicit < --add-dir < merged settings.
-  // An explicit extraKnownMarketplaces entry for claude-plugins-official
-  // in --add-dir or settings wins.
+  // ExtraKnownMarketplace + DeclaredMarketplace share `source` but have
+  // different discriminants; reconciler reads the shared shape.
   return {
     ...implicit,
     ...getAddDirExtraMarketplaces(),
     ...(getInitialSettings().extraKnownMarketplaces ?? {}),
-  } as any
+  } as unknown as Record<string, DeclaredMarketplace>
 }
 
 /**

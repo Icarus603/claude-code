@@ -45,7 +45,7 @@ export function validateInputForSettingsFileEdit(
   if (!afterValidation.isValid) {
     return {
       result: false,
-      message: `Claude Code settings.json validation failed after edit:\n${(afterValidation as any).error}\n\nFull schema:\n${(afterValidation as any).fullSchema}\nIMPORTANT: Do not update the env unless explicitly instructed to do so.`,
+      message: `Claude Code settings.json validation failed after edit:\n${afterValidation.error}\n\nFull schema:\n${afterValidation.fullSchema}\nIMPORTANT: Do not update the env unless explicitly instructed to do so.`,
       errorCode: 10,
     }
   }

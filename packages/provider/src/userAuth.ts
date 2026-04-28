@@ -118,8 +118,8 @@ export function isAnthropicAuthEnabled(): boolean {
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK')) ||
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX')) ||
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY')) ||
-    (settings as any).modelType === 'openai' ||
-    (settings as any).modelType === 'gemini' ||
+    settings.modelType === 'openai' ||
+    settings.modelType === 'gemini' ||
     !!readEnv('OPENAI_BASE_URL') ||
     !!readEnv('GEMINI_BASE_URL')
   const apiKeyHelper = settings.apiKeyHelper

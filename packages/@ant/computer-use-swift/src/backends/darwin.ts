@@ -94,8 +94,8 @@ export const display: DisplayAPI = {
       return (JSON.parse(raw) as DisplayGeometry[]).map(d => ({
         width: Number(d.width), height: Number(d.height),
         scaleFactor: Number(d.scaleFactor), displayId: Number(d.displayId),
-        originX: Number((d as any).originX ?? 0),
-        originY: Number((d as any).originY ?? 0),
+        originX: Number(d.originX ?? 0),
+        originY: Number(d.originY ?? 0),
       }))
     } catch {
       try {
@@ -123,8 +123,8 @@ export const display: DisplayAPI = {
         return (JSON.parse(raw) as DisplayGeometry[]).map(d => ({
           width: Number(d.width), height: Number(d.height),
           scaleFactor: Number(d.scaleFactor), displayId: Number(d.displayId),
-          originX: Number((d as any).originX ?? 0),
-          originY: Number((d as any).originY ?? 0),
+          originX: Number(d.originX ?? 0),
+          originY: Number(d.originY ?? 0),
         }))
       } catch {
         return [{ width: 1920, height: 1080, scaleFactor: 2, displayId: 1 }]

@@ -38,7 +38,7 @@ type TranscriptEntry = TranscriptMessage & {
 export function deriveFirstPrompt(
   firstUserMessage: Extract<SerializedMessage, { type: 'user' }> | undefined,
 ): string {
-  const content = (firstUserMessage as any)?.message?.content
+  const content = firstUserMessage?.message?.content
   if (!content) return 'Branched conversation'
   const raw =
     typeof content === 'string'

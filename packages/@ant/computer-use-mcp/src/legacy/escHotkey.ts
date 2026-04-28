@@ -3,7 +3,12 @@ import { releasePump, retainPump } from './drainRunLoop.js'
 import { requireComputerUseSwift } from './swiftLoader.js'
 
 /**
- * Global Escape → abort. Mirrors Cowork's `escAbort.ts` but without Electron:
+ * Global Escape → abort. Native-module wrapper — `as any` casts to
+ * reach the swift module's optional `hotkey` namespace are by-design
+ * type-system bypass for FFI/native-module cross-talk; the binary may
+ * or may not expose `hotkey` depending on build version.
+ *
+ * Mirrors Cowork's `escAbort.ts` but without Electron:
  * CGEventTap via `@ant/computer-use-swift`. While registered, Escape is
  * consumed system-wide (PI defense — a prompt-injected action can't dismiss
  * a dialog with Escape).

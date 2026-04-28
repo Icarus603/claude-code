@@ -66,7 +66,14 @@ export function execSyncWithDefaults_DEPRECATED(
   abortSignal?.throwIfAborted()
   using _ = slowLogging`exec: ${command.slice(0, 200)}`
   try {
-    const result = (execaSync as any)(command, {
+    // execa's overloads don't model `shell: true` + single command-line
+    // string; we pass the full command string and let execa shell-parse.
+    // This cast bridges the overload mismatch.
+    const result = (execaSync as (cmd: string, options: ExecaOptions) => {
+      stdout: string | Buffer
+      stderr: string | Buffer
+      exitCode?: number
+    })(command, {
       env: process.env,
       maxBuffer: 1_000_000,
       timeout: finalTimeout,
