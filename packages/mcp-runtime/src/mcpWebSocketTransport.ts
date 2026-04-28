@@ -1,3 +1,10 @@
+/**
+ * MCP WebSocket transport — Bun-vs-Node WebSocket bridge. The class
+ * stores `ws: WebSocketLike` (a union covering both Bun's native
+ * WebSocket and Node's `ws` package WebSocket) and dispatches at
+ * runtime via `this.isBun`. The `as unknown as` casts narrow to one
+ * or the other concrete type per branch — runtime-binding pattern.
+ */
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
 import {
   type JSONRPCMessage,

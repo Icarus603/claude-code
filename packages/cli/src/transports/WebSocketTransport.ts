@@ -1,3 +1,9 @@
+/**
+ * Headless WebSocket transport — Bun-vs-Node bridge. Stores
+ * `WebSocketLike` and dispatches at runtime; `as unknown as` casts
+ * narrow per branch to either Bun's native WebSocket or Node's `ws`
+ * package WebSocket. Runtime-binding pattern.
+ */
 import type { StdoutMessage } from '@claude-code/headless-sdk/controlTypes.js'
 import type WsWebSocket from 'ws'
 import { logEvent } from '@claude-code/local-observability'

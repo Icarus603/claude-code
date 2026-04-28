@@ -1,3 +1,9 @@
+/**
+ * Gemini convertMessages — provider stream adapter. `as unknown as`
+ * casts on content blocks bridge between the provider's generic
+ * ContentBlock union and the SDK's specific Beta* shapes for tool
+ * use / tool result. SDK-to-SDK shape translation pattern.
+ */
 import type {
   BetaToolResultBlockParam,
   BetaToolUseBlock,
