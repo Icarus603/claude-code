@@ -25,7 +25,14 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
   tengu_auto_background_agents: true,
   tengu_fgts: true,
   // P1: API-dependent but default on
-  tengu_session_memory: true,
+  // tengu_session_memory: ant defaults to false (verified in 2.1.121 deobf
+  // 5110.js: `Z_("tengu_session_memory", false)`). Forcing it true here ran
+  // a forked agent on every repl_main_thread turn that read ~166K cached
+  // tokens + wrote ~13K + emitted ~3K output to summary.md — measured
+  // ~47K token-equivalent per turn, accounting for the 5-10× extra burn
+  // users were seeing vs official. Falls through to the caller's `false`
+  // default; the feature is still wired and can be re-enabled per-user via
+  // GrowthBook or CLAUDE_CODE_FEATURE_OVERRIDES.
   tengu_passport_quail: true,
   tengu_moth_copse: true,
   tengu_coral_fern: true,

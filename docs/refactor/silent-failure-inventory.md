@@ -18,19 +18,19 @@ Findings are graded:
 
 | # | Pattern | Total findings | CRITICAL | HIGH | MEDIUM | LOW |
 |---|---------|---------------:|---------:|-----:|-------:|----:|
-| 1 | unwired-setter-slot | 48 | 46 | 0 | 0 | 2 |
+| 1 | unwired-setter-slot | 4 | 2 | 0 | 0 | 2 |
 | 2 | await-generator-misuse | 4 | 0 | 0 | 4 | 0 |
-| 3 | optional-chain-on-required-binding | 97 | 0 | 97 | 0 | 0 |
+| 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
 | 4 | dual-storage-divergence | 36 | 0 | 0 | 36 | 0 |
 | 5 | empty-catch | 99 | 0 | 0 | 0 | 99 |
-| 6 | nullish-coalesce-critical-path | 343 | 0 | 0 | 110 | 233 |
+| 6 | nullish-coalesce-critical-path | 345 | 0 | 0 | 112 | 233 |
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
 | 9 | optional-method-no-guard | 1 | 0 | 1 | 0 | 0 |
 | 10 | type-cast-trap | 563 | 0 | 0 | 364 | 199 |
 | 11 | require-fallback-to-stub | 272 | 0 | 0 | 272 | 0 |
-| 12 | module-level-null-state | 4 | 0 | 0 | 4 | 0 |
-| **TOTAL** | | **1988** | **46** | **98** | **790** | **1054** |
+| 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
+| **TOTAL** | | **1845** | **2** | **1** | **788** | **1054** |
 
 ## Patterns in detail
 
@@ -40,71 +40,14 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/01-unwired-setter-slots.ts`
 
-**Total scanned**: 138; **findings**: 48
+**Total scanned**: 138; **findings**: 4
 
-#### CRITICAL (46)
+#### CRITICAL (2)
 
 - `packages/config/plugin/_deps.ts:272` — export ... setSetAppStateFn (paired getter: setAppState, 289 readers)
   - Slot has 289 reader(s) of setAppState() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
 - `packages/config/plugin/_deps.ts:747` — export ... setGetBuiltinPluginsFn (paired getter: getBuiltinPlugins, 5 readers)
   - Slot has 5 reader(s) of getBuiltinPlugins() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:750` — export ... setIsBuiltinPluginIdFn (paired getter: isBuiltinPluginId, 2 readers)
-  - Slot has 2 reader(s) of isBuiltinPluginId() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:753` — export ... setGetBuiltinPluginDefinitionFn (paired getter: getBuiltinPluginDefinition, 2 readers)
-  - Slot has 2 reader(s) of getBuiltinPluginDefinition() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:843` — export ... setClearAgentDefinitionsCacheFn (paired getter: clearAgentDefinitionsCache, 3 readers)
-  - Slot has 3 reader(s) of clearAgentDefinitionsCache() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:844` — export ... setClearAllOutputStylesCacheFn (paired getter: clearAllOutputStylesCache, 2 readers)
-  - Slot has 2 reader(s) of clearAllOutputStylesCache() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:845` — export ... setClearCommandsCacheFn (paired getter: clearCommandsCache, 11 readers)
-  - Slot has 11 reader(s) of clearCommandsCache() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:846` — export ... setClearPromptCacheFn (paired getter: clearPromptCache, 3 readers)
-  - Slot has 3 reader(s) of clearPromptCache() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:978` — export ... setExtractDescriptionFromMarkdownFn (paired getter: extractDescriptionFromMarkdown, 5 readers)
-  - Slot has 5 reader(s) of extractDescriptionFromMarkdown() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:979` — export ... setExpandTildeFn (paired getter: expandTilde, 9 readers)
-  - Slot has 9 reader(s) of expandTilde() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:980` — export ... setExpandEnvVarsInStringFn (paired getter: expandEnvVarsInString, 4 readers)
-  - Slot has 4 reader(s) of expandEnvVarsInString() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:981` — export ... setExecuteShellCommandsInPromptFn (paired getter: executeShellCommandsInPrompt, 6 readers)
-  - Slot has 6 reader(s) of executeShellCommandsInPrompt() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:982` — export ... setRipGrepFn (paired getter: ripGrep, 8 readers)
-  - Slot has 8 reader(s) of ripGrep() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:983` — export ... setUnzipFileFn (paired getter: unzipFile, 6 readers)
-  - Slot has 6 reader(s) of unzipFile() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1080` — export ... setParseFrontmatterFn (paired getter: parseFrontmatter, 15 readers)
-  - Slot has 15 reader(s) of parseFrontmatter() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1081` — export ... setParseAgentToolsFromFrontmatterFn (paired getter: parseAgentToolsFromFrontmatter, 7 readers)
-  - Slot has 7 reader(s) of parseAgentToolsFromFrontmatter() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1082` — export ... setParseSlashCommandToolsFromFrontmatterFn (paired getter: parseSlashCommandToolsFromFrontmatter, 6 readers)
-  - Slot has 6 reader(s) of parseSlashCommandToolsFromFrontmatter() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1083` — export ... setParseShellFrontmatterFn (paired getter: parseShellFrontmatter, 4 readers)
-  - Slot has 4 reader(s) of parseShellFrontmatter() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1084` — export ... setParseBooleanFrontmatterFn (paired getter: parseBooleanFrontmatter, 5 readers)
-  - Slot has 5 reader(s) of parseBooleanFrontmatter() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1085` — export ... setParsePositiveIntFromFrontmatterFn (paired getter: parsePositiveIntFromFrontmatter, 3 readers)
-  - Slot has 3 reader(s) of parsePositiveIntFromFrontmatter() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1086` — export ... setParseEffortValueFn (paired getter: parseEffortValue, 8 readers)
-  - Slot has 8 reader(s) of parseEffortValue() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1087` — export ... setParseYamlFn (paired getter: parseYaml, 4 readers)
-  - Slot has 4 reader(s) of parseYaml() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1088` — export ... setParseArgumentNamesFn (paired getter: parseArgumentNames, 8 readers)
-  - Slot has 8 reader(s) of parseArgumentNames() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1089` — export ... setParseUserSpecifiedModelFn (paired getter: parseUserSpecifiedModel, 40 readers)
-  - Slot has 40 reader(s) of parseUserSpecifiedModel() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1090` — export ... setParseZipModesFn (paired getter: parseZipModes, 4 readers)
-  - Slot has 4 reader(s) of parseZipModes() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1091` — export ... setSubstituteArgumentsFn (paired getter: substituteArguments, 14 readers)
-  - Slot has 14 reader(s) of substituteArguments() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1092` — export ... setParseAndValidateManifestFromBytesFn (paired getter: parseAndValidateManifestFromBytes, 3 readers)
-  - Slot has 3 reader(s) of parseAndValidateManifestFromBytes() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1103` — export ... setGetAgentDefinitionsWithOverridesFn (paired getter: getAgentDefinitionsWithOverrides, 10 readers)
-  - Slot has 10 reader(s) of getAgentDefinitionsWithOverrides() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1114` — export ... setIsFsInaccessibleFn (paired getter: isFsInaccessible, 30 readers)
-  - Slot has 30 reader(s) of isFsInaccessible() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:1121` — export ... setPluralFn (paired getter: plural, 92 readers)
-  - Slot has 92 reader(s) of plural() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- ...16 more (run audit with no flags for full JSON)
 
 #### LOW (2)
 
@@ -138,71 +81,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/03-optional-chain-on-required-binding.ts`
 
-**Total scanned**: 92; **findings**: 97
-
-#### HIGH (97)
-
-- `packages/tool-registry/src/tools/AgentTool/loadAgentsDir.ts:396` — getAgentDefinitionsWithOverrides.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/tool-registry/src/tools/ToolSearchTool/ToolSearchTool.ts:97` — getToolDescriptionMemoized.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/tool-registry/src/tools/ToolSearchTool/ToolSearchTool.ts:103` — getToolDescriptionMemoized.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/tool-registry/src/tools/ExitWorktreeTool/ExitWorktreeTool.ts:145` — getPlansDirectory.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/tool-registry/src/tools/SkillTool/prompt.ts:218` — getPrompt.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/tool-registry/src/tools/EnterWorktreeTool/EnterWorktreeTool.ts:102` — getPlansDirectory.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/loadPluginHooks.ts:166` — loadPluginHooks.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/gitAvailability.ts:68` — checkGitAvailable.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/pluginLoader.ts:3231` — loadAllPlugins.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/pluginLoader.ts:3232` — loadAllPluginsCacheOnly.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/loadPluginOutputStyles.ts:177` — loadPluginOutputStyles.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/marketplaceManager.ts:123` — getMarketplace.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/marketplaceManager.ts:2380` — getMarketplace.cache?.delete?.(name)
-  - `?.()` on `delete` — at least one contract declares it as required (no `?:`). If this caller's binding source has `delete` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/loadPluginAgents.ts:347` — loadPluginAgents.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/loadPluginCommands.ts:680` — getPluginCommands.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/loadPluginCommands.ts:945` — getPluginSkills.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/plugin/pluginOptionsStorage.ts:80` — loadPluginOptions.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/sync/index.ts:237` — await getConfigHostBindings().getSettingsSyncAuth?.()?.refreshToken?.()
-  - `?.()` on `refreshToken` — at least one contract declares it as required (no `?:`). If this caller's binding source has `refreshToken` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/sync/index.ts:339` — await getConfigHostBindings().getSettingsSyncAuth?.()?.refreshToken?.()
-  - `?.()` on `refreshToken` — at least one contract declares it as required (no `?:`). If this caller's binding source has `refreshToken` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/outputStyles.ts:223` — getOutputStyleDirStyles.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/outputStyles.ts:224` — loadMarkdownFilesForSubdir.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/outputStyles.ts:268` — getAllOutputStyles.cache?.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/config/remote/index.ts:252` — await getConfigHostBindings().getSettingsSyncAuth?.()?.refreshToken?.()
-  - `?.()` on `refreshToken` — at least one contract declares it as required (no `?:`). If this caller's binding source has `refreshToken` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/command-runtime/src/types.ts:145` — return cmd.isEnabled?.() ?? true
-  - `?.()` on `isEnabled` — at least one contract declares it as required (no `?:`). If this caller's binding source has `isEnabled` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/command-runtime/src/commands/compact/compact.ts:63` — getUserContext.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/command-runtime/src/commands/compact/compact.ts:117` — getUserContext.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/command-runtime/src/commands/compact/compact.ts:203` — getUserContext.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/command-runtime/src/commands/clear/caches.ts:53` — getUserContext.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/command-runtime/src/commands/clear/caches.ts:54` — getSystemContext.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- `packages/command-runtime/src/commands/clear/caches.ts:55` — getGitStatus.cache.clear?.()
-  - `?.()` on `clear` — at least one contract declares it as required (no `?:`). If this caller's binding source has `clear` non-optional, the `?.` silently swallows "binding not installed" failures. Triage by tracing which contract this caller's binding implements.
-- ...67 more (run audit with no flags for full JSON)
+**Total scanned**: 92; **findings**: 0
 
 ### 4. `dual-storage-divergence`
 
@@ -296,7 +175,7 @@ Findings are graded:
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
 - `packages/tool-registry/src/diagnosticTracking.ts:179` — } catch (_error) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/feature-flags.ts:73` — } catch {
+- `packages/config/feature-flags.ts:80` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
 - `packages/config/migrations/migrateEnableAllProjectMcpServersToSettings.ts:113` — } catch (e: unknown) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
@@ -354,9 +233,9 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1192; **findings**: 343
+**Total scanned**: 1194; **findings**: 345
 
-#### MEDIUM (110)
+#### MEDIUM (112)
 
 - `packages/config/plugin/refresh.ts:169` — s + (matchers?.reduce((h: number, m: { hooks: { length: number } }) => h + m.hooks.length, 0) ?? 0),
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
@@ -418,7 +297,7 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/provider/src/userAuth.ts:1579` — getClaudeAIOAuthTokens()?.scopes?.includes(CLAUDE_AI_PROFILE_SCOPE) ?? false
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- ...80 more (run audit with no flags for full JSON)
+- ...82 more (run audit with no flags for full JSON)
 
 #### LOW (233)
 
@@ -508,7 +387,7 @@ Findings are graded:
   - Function hasRequiredSubscription body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/memory/src/autoDream.ts:82` — isForced() { return false }
   - Function isForced body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/config/feature-flags.ts:86` — initializeGrowthBook() { return null }
+- `packages/config/feature-flags.ts:93` — initializeGrowthBook() { return null }
   - Function initializeGrowthBook body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/local-observability/src/spans.ts:19` — isBetaTracingEnabled() { return false }
   - Function isBetaTracingEnabled body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
@@ -774,7 +653,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 825; **findings**: 272
+**Total scanned**: 871; **findings**: 272
 
 #### MEDIUM (272)
 
@@ -846,16 +725,5 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/12-module-level-null-state.ts`
 
-**Total scanned**: 182; **findings**: 4
-
-#### MEDIUM (4)
-
-- `packages/tool-registry/src/tools/WebSearchTool/adapters/index.ts:13` — let cachedAdapter: WebSearchAdapter | null = null
-  - Module-level let cachedAdapter initialized to null with no write site in this file. Consumers of cachedAdapter will see null forever unless an external setter (likely via host bindings) is called. Verify the writer side actually runs at startup.
-- `packages/memory/src/teamMemSecretScanner.ts:315` — let redactRules: RegExp[] | null = null
-  - Module-level let redactRules initialized to null with no write site in this file. Consumers of redactRules will see null forever unless an external setter (likely via host bindings) is called. Verify the writer side actually runs at startup.
-- `packages/repl/src/hooks/useTasksV2.ts:201` — let _store: TasksV2Store | null = null
-  - Module-level let _store initialized to null with no write site in this file. Consumers of _store will see null forever unless an external setter (likely via host bindings) is called. Verify the writer side actually runs at startup.
-- `packages/voice/src/voice.ts:22` — let audioNapiPromise: Promise<AudioNapi> | null = null
-  - Module-level let audioNapiPromise initialized to null with no write site in this file. Consumers of audioNapiPromise will see null forever unless an external setter (likely via host bindings) is called. Verify the writer side actually runs at startup.
+**Total scanned**: 181; **findings**: 0
 

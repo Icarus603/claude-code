@@ -31,3 +31,6 @@ src/utils/vendor/
 __pycache__/
 *.pyc
 logs
+
+# bun-demincer
+.bun-demincer/
