@@ -1,3 +1,9 @@
+/**
+ * providerHostSetup (app-host side) — wires provider package's host
+ * bindings to the host's real implementations. Host-binding adapter:
+ * every `as any/unknown` cast is by-design type-system bypass for the
+ * runtime-binding pattern, not a hidden mismatch.
+ */
 import {
   installProviderRuntimeBindings,
   type ProviderHostBindings,
