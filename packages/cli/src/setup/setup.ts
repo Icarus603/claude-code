@@ -7,7 +7,6 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { checkForReleaseNotes } from '@claude-code/repl/releaseNotes.js'
 import { setCwd } from '@claude-code/shell/Shell.js'
 import { initSinks } from '@claude-code/local-observability/sinks.js'
 import {
@@ -25,7 +24,7 @@ import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { checkAndRestoreTerminalBackup } from '@claude-code/shell/terminal/appleTerminalBackup.js'
 import { prefetchApiKeyFromApiKeyHelperIfSafe } from '@claude-code/provider/authAlias.js'
 import { clearMemoryFileCaches } from '@claude-code/storage/claudemd.js'
-import { getCurrentProjectConfig, getGlobalConfig } from '@claude-code/config'
+import { getCurrentProjectConfig } from '@claude-code/config'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { env } from '@claude-code/config/env/paths'
 import { envDynamic } from '@claude-code/config/env/dynamic'
@@ -368,24 +367,18 @@ export async function setup(
 
   // Session-success-rate denominator. Emit immediately after the analytics
   // sink is attached — before any parsing, fetching, or I/O that could throw.
-  // inc-3694 (P0 CHANGELOG crash) threw at checkForReleaseNotes below; every
-  // event after this point was dead. This beacon is the earliest reliable
-  // "process started" signal for release health monitoring.
+  // This beacon is the earliest reliable "process started" signal for release
+  // health monitoring.
   logEvent('tengu_started', {})
 
   void prefetchApiKeyFromApiKeyHelperIfSafe(getIsNonInteractiveSession()) // Prefetch safely - only executes if trust already confirmed
   profileCheckpoint('setup_after_prefetch')
 
-  // Pre-fetch data for Logo v2 - await to ensure it's ready before logo renders.
-  // --bare / SIMPLE: skip — release notes are interactive-UI display data,
-  // and getRecentActivity() reads up to 10 session JSONL files.
+  // Pre-fetch recent-activity data for Logo v2.
+  // --bare / SIMPLE: skip — getRecentActivity() reads up to 10 session JSONL
+  // files, pure interactive-UI display data, wasted in scripted runs.
   if (!isBareMode()) {
-    const { hasReleaseNotes } = await checkForReleaseNotes(
-      getGlobalConfig().lastReleaseNotesSeen,
-    )
-    if (hasReleaseNotes) {
-      await getRecentActivity()
-    }
+    await getRecentActivity()
   }
 
   // If permission mode is set to bypass, verify we're in a safe environment

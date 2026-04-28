@@ -366,7 +366,6 @@ import {
   clearPluginCache,
   loadAllPluginsCacheOnly,
 } from '../pluginLoader.js'
-import { migrateChangelogFromConfig } from '@claude-code/repl/releaseNotes.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
 import { fetchSession, prepareApiRequest } from '@claude-code/teleport/api.js'
 import {

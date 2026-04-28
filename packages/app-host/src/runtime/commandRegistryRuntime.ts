@@ -35,7 +35,6 @@ import mcp from '@claude-code/command-runtime/commands/mcp/index.js'
 import mobile from '@claude-code/repl/commands/mobile/index.js'
 import onboarding from '@claude-code/command-runtime/stubs/stubCommand.js'
 import pr_comments from '@claude-code/agent/commands/pr_comments/index.js'
-import releaseNotes from '@claude-code/repl/commands/release-notes/index.js'
 import rename from '@claude-code/command-runtime/commands/rename/index.js'
 import resume from '@claude-code/command-runtime/commands/resume/index.js'
 import review, { ultrareview } from '@claude-code/command-runtime/commands/review/review.js'
@@ -285,7 +284,6 @@ const COMMANDS = memoize((): Command[] => [
   remoteEnv,
   plugin,
   pr_comments,
-  releaseNotes,
   reloadPlugins,
   rename,
   resume,
@@ -647,7 +645,6 @@ export const BRIDGE_SAFE_COMMANDS: Set<Command> = new Set(
     clear, // Wipe transcript
     cost, // Show session cost
     summary, // Summarize conversation
-    releaseNotes, // Show changelog
     files, // List tracked files
   ].filter((c): c is Command => c !== null),
 )
