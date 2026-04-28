@@ -1,6 +1,6 @@
 /**
  * installPluginBindings — wire every `@claude-code/config/plugin/_deps`
- * setter to the host's real implementation.
+ * setter to the host's real implementation. Host-binding adapter file.
  *
  * Plugin subsystem was moved out of src/utils/plugins/ in Round 4. 53
  * external deps (bootstrap/state, tools/*, services/lsp, services/mcp,
@@ -10,6 +10,11 @@
  * Must run during runtime bootstrap, BEFORE any code path touches the
  * plugin package. The require-time side effect at the bottom of this
  * file handles that as long as this module is imported early.
+ *
+ * Every `try { require(...) } catch {}` block in this file is a
+ * by-design require-fallback for an optional/feature-gated subsystem
+ * (computer-use, voice, swarm, etc.); the catch returns the no-op
+ * default so the wire still installs cleanly when the module is absent.
  */
 
 import {

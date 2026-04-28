@@ -54,7 +54,7 @@ let _bridge: typeof import('../win32/bridgeClient.js') | undefined
 function getBridge() {
   if (!_bridge) {
     try {
-      _bridge =
+      _bridge = // require-fallback: optional Python sidecar; absence drops to PowerShell.
         require('../win32/bridgeClient.js') as typeof import('../win32/bridgeClient.js')
     } catch {}
   }

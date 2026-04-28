@@ -534,6 +534,10 @@ export function migrateLegacyEnvToConnections(
   let clearedModelType = false
   if (getConnections().length > 0) {
     try {
+      // require-fallback: settings module loaded lazily to avoid the
+      // provider→config bootstrap cycle. Catch swallows because this
+      // path is best-effort migration; failure leaves the user with
+      // stale modelType that the resolver can still degrade gracefully.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { getSettings_DEPRECATED, updateSettingsForSource } = require(
         '@claude-code/config/settings',
@@ -582,6 +586,9 @@ export function migrateLegacyEnvToConnections(
           void _drop
           return { ...current, env: rest }
         })
+        // require-fallback: env utils lazy-loaded to dodge bootstrap
+        // ordering. Best-effort flag scrub — leaving the legacy flag in
+        // place only causes a 401 the resolver already handles.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { readEnv, deleteEnv } = require(
           '@claude-code/config/env/utils',

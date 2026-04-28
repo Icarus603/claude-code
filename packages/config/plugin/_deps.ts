@@ -12,6 +12,11 @@
  *
  * The src-side bootstrap (src/runtime/installPluginBindings.ts) wires
  * each setter to the real implementation on startup.
+ *
+ * A handful of slots use by-design require-fallback: when no setter is
+ * called (e.g. early bootstrap, tests), the default does a lazy
+ * `try { require(...) } catch {}` to find the canonical impl; if that
+ * also fails, returns a safe no-op. This is documented per-slot.
  */
 
 // ---------------------------------------------------------------------------

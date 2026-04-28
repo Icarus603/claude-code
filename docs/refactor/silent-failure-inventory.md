@@ -18,19 +18,19 @@ Findings are graded:
 
 | # | Pattern | Total findings | CRITICAL | HIGH | MEDIUM | LOW |
 |---|---------|---------------:|---------:|-----:|-------:|----:|
-| 1 | unwired-setter-slot | 4 | 2 | 0 | 0 | 2 |
+| 1 | unwired-setter-slot | 0 | 0 | 0 | 0 | 0 |
 | 2 | await-generator-misuse | 0 | 0 | 0 | 0 | 0 |
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
 | 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
-| 5 | empty-catch | 48 | 0 | 0 | 0 | 48 |
-| 6 | nullish-coalesce-critical-path | 345 | 0 | 0 | 112 | 233 |
+| 5 | empty-catch | 45 | 0 | 0 | 0 | 45 |
+| 6 | nullish-coalesce-critical-path | 168 | 0 | 0 | 17 | 151 |
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
 | 10 | type-cast-trap | 562 | 0 | 0 | 363 | 199 |
-| 11 | require-fallback-to-stub | 272 | 0 | 0 | 272 | 0 |
+| 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **1752** | **2** | **0** | **747** | **1003** |
+| **TOTAL** | | **1296** | **0** | **0** | **380** | **916** |
 
 ## Patterns in detail
 
@@ -40,21 +40,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/01-unwired-setter-slots.ts`
 
-**Total scanned**: 115; **findings**: 4
-
-#### CRITICAL (2)
-
-- `packages/config/plugin/_deps.ts:276` — export ... setSetAppStateFn (paired getter: setAppState, 289 readers)
-  - Slot has 289 reader(s) of setAppState() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:751` — export ... setGetBuiltinPluginsFn (paired getter: getBuiltinPlugins, 5 readers)
-  - Slot has 5 reader(s) of getBuiltinPlugins() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-
-#### LOW (2)
-
-- `packages/config/plugin/_deps.ts:766` — export ... setApplyArgumentSubstitutionsFn
-  - Slot has no writer AND no reader. Pure dead code; delete the slot, the default state, the getter, and the setter export.
-- `packages/config/plugin/_deps.ts:776` — export ... setGetHintsProviderFn
-  - Slot has no writer AND no reader. Pure dead code; delete the slot, the default state, the getter, and the setter export.
+**Total scanned**: 113; **findings**: 0
 
 ### 2. `await-generator-misuse`
 
@@ -78,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9345; **findings**: 0
+**Total scanned**: 9341; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -86,9 +72,9 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2462; **findings**: 48
+**Total scanned**: 2464; **findings**: 45
 
-#### LOW (48)
+#### LOW (45)
 
 - `packages/ide/src/ide.ts:578` — } catch (error) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
@@ -150,7 +136,7 @@ Findings are graded:
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
 - `packages/agent/internal/fileHistoryCore.ts:272` — } catch (error) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- ...18 more (run audit with no flags for full JSON)
+- ...15 more (run audit with no flags for full JSON)
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -158,78 +144,47 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1193; **findings**: 345
+**Total scanned**: 1192; **findings**: 168
 
-#### MEDIUM (112)
+#### MEDIUM (17)
 
-- `packages/config/plugin/refresh.ts:169` — s + (matchers?.reduce((h: number, m: { hooks: { length: number } }) => h + m.hooks.length, 0) ?? 0),
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/dependencyResolver.ts:193` — enabledByName.set(n, (enabledByName.get(n) ?? 0) + 1)
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/dependencyResolver.ts:207` — ? (enabledByName.get(dep) ?? 0) > 0
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/dependencyResolver.ts:211` — const count = enabledByName.get(p.name) ?? 0
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/mcpPluginIntegration.ts:307` — const saved = loadMcpServerUserConfig(pluginId, channel.server) ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/mcpPluginIntegration.ts:334` — return loadMcpServerUserConfig(plugin.repository, serverName) ?? undefined
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/marketplaceManager.ts:234` — const existing = getSettingsForSource(settingSource) ?? {}
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/pluginInstallationHelpers.ts:396` — : undefined) ?? [],
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/mcpbHandler.ts:247` — const existing = storage.read() ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/loadPluginCommands.ts:142` — const dirFiles = filesByDir.get(dir) ?? []
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/pluginOptionsStorage.ts:130` — const existing = storage.read() ?? {}
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/repl/src/screens/REPLView.tsx:1445` — const reducedMotion = useAppState(s => s.settings.prefersReducedMotion) ?? false;
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:2316` — const existing = sandboxBridgeCleanupRef.current.get(hostPattern.host) ?? [];
+- `packages/provider/src/model/bedrock.ts:48` — return profiles.find(p => p.includes(substring)) ?? null
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/oauth/auth-code-listener.ts:146` — const authCode = parsedUrl.searchParams.get('code') ?? undefined
+- `packages/provider/src/user.ts:88` — subscriptionType = getSubscriptionType() ?? undefined
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/oauth/auth-code-listener.ts:147` — const state = parsedUrl.searchParams.get('state') ?? undefined
+- `packages/provider/src/user.ts:89` — rateLimitTier = getRateLimitTier() ?? undefined
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/oauth/client.ts:44` — return scopeString?.split(' ').filter(Boolean) ?? []
+- `packages/provider/src/auth.ts:77` — return { apiKey: getToken() ?? null }
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/oauth/codex-client.ts:322` — return { code: url.searchParams.get('code') ?? undefined }
+- `packages/provider/src/claudeLegacyRuntime.ts:1661` — ...((extraBodyParams.output_config as BetaOutputConfig) ?? {}),
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/oauth/codex-client.ts:329` — return { code: params.get('code') ?? undefined }
+- `packages/agent/messages.ts:2816` — ? ((message.toolUseID as string) ?? null)
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/oauth/index.ts:95` — const isAutomaticFlow = this.authCodeListener?.hasPendingResponse() ?? false
+- `packages/agent/internal/queryRuntime.ts:317` — ) ?? null
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/systemPromptSections.ts:51` — return cache.get(s.name) ?? null
+- `packages/agent/attachments.ts:2777` — const regularMatchArray: string[] = content.match(regularAtMentionRegex) ?? []
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/contracts.ts:115` — return tool.name === name || (tool.aliases?.includes(name) ?? false)
+- `packages/app-host/src/init.ts:133` — const settings = getSettings_DEPRECATED() ?? {}
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/systemPrompt.ts:27` — return proactiveModule?.isProactiveActive() ?? false
+- `packages/permission/src/yoloClassifier.ts:925` — thinking: parseXmlThinking(stage2Text) ?? undefined,
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/authAlias.ts:1163` — config.customApiKeyResponses?.approved?.includes(normalizedKey) ?? false
+- `packages/permission/src/yoloClassifier.ts:966` — })) ?? undefined
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/authAlias.ts:1579` — getClaudeAIOAuthTokens()?.scopes?.includes(CLAUDE_AI_PROFILE_SCOPE) ?? false
+- `packages/permission/src/yoloClassifier.ts:1285` — })) ?? undefined
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/withRetry.ts:605` — (error.message?.includes('Fast mode is not enabled') ?? false)
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/withRetry.ts:618` — (error.message?.includes('"type":"overloaded_error"') ?? false)
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/withRetry.ts:626` — (error.message?.includes('OAuth token has been revoked') ?? false)
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/claudeAiLimits.ts:443` — headers.get('anthropic-ratelimit-unified-overage-disabled-reason') ?? null
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/userAuth.ts:1163` — config.customApiKeyResponses?.approved?.includes(normalizedKey) ?? false
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/userAuth.ts:1579` — getClaudeAIOAuthTokens()?.scopes?.includes(CLAUDE_AI_PROFILE_SCOPE) ?? false
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- ...82 more (run audit with no flags for full JSON)
 
-#### LOW (233)
+#### LOW (151)
 
-- `packages/config/plugin/_deps.ts:91` — mkdirSync: (p, o) => fs.mkdirSync(p, { recursive: true, ...(o ?? {}) }),
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/_deps.ts:117` — await fsp.mkdir(p, { recursive: true, ...(o ?? {}) })
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/installedPluginsManager.ts:764` — for (const entry of data.plugins[pluginId] ?? []) {
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/installedPluginsManager.ts:1004` — return sha ?? undefined
@@ -238,23 +193,11 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/builtin.ts:142` — disableModelInvocation: definition.disableModelInvocation ?? false,
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/loadPluginHooks.ts:244` — strictKnownMarketplaces: policy?.strictKnownMarketplaces ?? [],
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/loadPluginHooks.ts:245` — blockedMarketplaces: policy?.blockedMarketplaces ?? [],
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/hintRecommendation.ts:72` — const shown = state?.plugin ?? []
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/hintRecommendation.ts:143` — const existing = current.claudeCodeHints?.plugin ?? []
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/pluginOperations.ts:451` — Object.keys(settings?.enabledPlugins ?? {}).find(
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/dependencyResolver.ts:145` — for (const rawDep of entry.dependencies ?? []) {
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/dependencyResolver.ts:202` — for (const rawDep of p.manifest.dependencies ?? []) {
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/dependencyResolver.ts:254` — (p.manifest.dependencies ?? []).some(d => {
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/dependencyResolver.ts:279` — Object.entries(getSettingsForSource(settingSource)?.enabledPlugins ?? {})
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/pluginBlocklist.ts:91` — const installations = installedPlugins.plugins[pluginId] ?? []
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
@@ -274,19 +217,35 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/marketplaceManager.ts:190` — ...(getInitialSettings().extraKnownMarketplaces ?? {}),
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/marketplaceManager.ts:783` — return match?.[1] ?? null
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/pluginInstallationHelpers.ts:405` — return info?.entry ?? null
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/pluginFlagging.ts:143` — return cache ?? {}
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/mcpbHandler.ts:233` — storage.read()?.pluginSecrets?.[k] ?? undefined
-  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/config/plugin/mcpbHandler.ts:291` — settings.pluginConfigs?.[pluginId]?.mcpServers?.[serverName] ?? {}
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/config/plugin/mcpbHandler.ts:767` — manifest.user_config ?? {},
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- ...203 more (run audit with no flags for full JSON)
+- `packages/config/plugin/mcpbHandler.ts:912` — manifest.user_config ?? {},
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/repl/REPLController.tsx:12` — clients: props.mcpClients ?? [],
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/ResumeConversation.tsx:322` — result.contextCollapseCommits ?? [],
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:653` — const live = t.messages ?? [];
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:1151` — const showStatusInTerminalTab = tabStatusGateEnabled && (getGlobalConfig().showStatusInTerminalTab ?? false);
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:1160` — const [messages, rawSetMessages] = useState<MessageType[]>(initialMessages ?? []);
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:1618` — const count = config.autoPermissionsNotificationCount ?? 0;
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:1624` — const prevCount = prev.autoPermissionsNotificationCount ?? 0;
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:1944` — log.contentReplacements ?? [],
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:4074` — promptQueueUseCount: (current.promptQueueUseCount ?? 0) + 1,
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:4780` — ? (viewedAgentTask.messages ?? [])
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- `packages/repl/src/screens/REPLView.tsx:5573` — const kept = result.messagesToKeep ?? [];
+  - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
+- ...121 more (run audit with no flags for full JSON)
 
 ### 7. `stub-return-only`
 
@@ -573,71 +532,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 866; **findings**: 272
-
-#### MEDIUM (272)
-
-- `packages/@ant/computer-use-swift/src/index.ts:24` — return require('./backends/darwin.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-swift/src/index.ts:26` — return require('./backends/win32.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-swift/src/index.ts:28` — return require('./backends/linux.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-input/src/index.ts:27` — return require('./backends/darwin.js') as InputBackend
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-input/src/index.ts:29` — return require('./backends/win32.js') as InputBackend
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-input/src/index.ts:31` — return require('./backends/linux.js') as InputBackend
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/platforms/win32.ts:58` — require('../win32/bridgeClient.js') as typeof import('../win32/bridgeClient.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/hostAdapter.ts:52` — const ffi = require('bun:ffi') as typeof import('bun:ffi')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:53` — require('./platforms/win32.js') as typeof import('./platforms/win32.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:130` — require('./platforms/win32.js') as typeof import('./platforms/win32.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:150` — require('./platforms/win32.js') as typeof import('./platforms/win32.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:154` — require('./win32/accessibilitySnapshot.js') as typeof import('./win32/accessibilitySnapshot.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:724` — require('./win32/inputIndicator.js') as typeof import('./win32/inputIndicator.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:912` — require('./win32/bridgeClient.js') as typeof import('./win32/bridgeClient.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:942` — require('./platforms/win32.js') as typeof import('./platforms/win32.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:1053` — require('./win32/accessibilitySnapshot.js') as typeof import('./win32/accessibilitySnapshot.js')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:870` — const mod = require('@claude-code/tool-registry/markdownConfigLoader.js') as {
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:892` — const mod = require('@claude-code/permission/pathValidation.js') as {
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:916` — const mod = require('@claude-code/mcp-runtime/envExpansion.js') as {
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:943` — const mod = require('@claude-code/command-runtime/promptShellExecution.js') as {
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:1002` — const mod = require('@claude-code/agent/frontmatterParser.js') as {
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:1044` — const mod = require('@claude-code/command-runtime/argumentSubstitution.js') as {
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/shell/src/exec.ts:369` — const { realpathSync } = require('fs') as typeof import('fs')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/provider/src/connections.ts:538` — const { getSettings_DEPRECATED, updateSettingsForSource } = require(
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/provider/src/connections.ts:586` — const { readEnv, deleteEnv } = require(
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/output/src/modifiers.ts:17` — const { prewarm } = require('modifiers-napi') as { prewarm: () => void }
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/server/src/upstreamproxy/upstreamproxy.ts:229` — const ffi = require('bun:ffi') as typeof import('bun:ffi')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/agent/agentHostBindings.ts:19` — return require('@claude-code/app-host/bootstrap/state.js').getCwdState()
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/agent/agentHostBindings.ts:26` — require('@claude-code/app-host/bootstrap/state.js').setCwdState(cwd)
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/agent/agentHostBindings.ts:31` — return require('@claude-code/app-host/bootstrap/state.js').getSdkBetas()
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- ...242 more (run audit with no flags for full JSON)
+**Total scanned**: 867; **findings**: 0
 
 ### 12. `module-level-null-state`
 
