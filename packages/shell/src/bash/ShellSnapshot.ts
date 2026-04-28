@@ -420,6 +420,7 @@ export const createAndSaveSnapshot = async (
 
   ctx.logForDebugging(`Creating shell snapshot for ${shellType} (${binShell})`)
 
+  // biome-ignore lint/suspicious/noAsyncPromiseExecutor: legacy multi-stage flow with multiple resolve() points; refactoring to async/await would change semantics around early-resolve on shell errors
   return new Promise(async resolve => {
     try {
       const configFile = getConfigFile(binShell)

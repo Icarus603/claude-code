@@ -300,7 +300,6 @@ export function registerMcpCommands(
             setDirectConnectServerUrl(serverUrl)
             connectConfig = session.config
           } catch (err) {
-            // biome-ignore lint/suspicious/noConsole: intentional error output
             console.error(err instanceof DirectConnectError ? err.message : String(err))
             process.exit(1)
           }

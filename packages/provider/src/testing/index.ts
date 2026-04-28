@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/correctness/useYield: test stubs intentionally throw before yielding */
 /**
  * V7 testing seams for @claude-code/provider.
  *

@@ -119,7 +119,6 @@ const wrappedRender = async (
   await Promise.resolve()
   const instance = renderSync(withTheme(node), options)
   if (process.env.CLAUDE_CODE_DEBUG_REPAINTS === '1') {
-    // biome-ignore lint/suspicious/noConsole: debug instrumentation
     console.warn(
       `[render] first ink render: ${Math.round(process.uptime() * 1000)}ms since process start`,
     )
