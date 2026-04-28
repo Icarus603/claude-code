@@ -58,5 +58,4 @@ For everything else, find or create the right package under
 `packages/`, expose the public surface via its `package.json` exports,
 and `import` from there.
 
-See [`docs/v7-completion.md`](../docs/v7-completion.md) for the full
-architecture overview.
+See the root `CLAUDE.md` for the full architecture overview.
