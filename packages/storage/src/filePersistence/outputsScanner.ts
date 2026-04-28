@@ -63,13 +63,16 @@ export async function findModifiedFiles(
   turnStartTime: TurnStartTime,
   outputsDir: string,
 ): Promise<string[]> {
-  // Use recursive flag to get all entries in one call
-  let entries: Awaited<ReturnType<typeof fs.readdir>> | any[]
+  // Use recursive flag to get all entries in one call.
+  // The withFileTypes+recursive overload returns Dirent[] but TS's
+  // overload resolution sometimes pins to the string[] one; cast
+  // through unknown to the precise return shape.
+  let entries: import('fs').Dirent[]
   try {
-    entries = await fs.readdir(outputsDir, {
+    entries = (await fs.readdir(outputsDir, {
       withFileTypes: true,
       recursive: true,
-    }) as any[]
+    })) as unknown as import('fs').Dirent[]
   } catch {
     // Directory doesn't exist or is not accessible
     return []
@@ -110,10 +113,14 @@ export async function findModifiedFiles(
     }),
   )
 
-  // Filter to files modified since turn start
+  // Filter to files modified since turn start.
+  // BUG-FIX: previous code did `result.mtimeMs >= (turnStartTime as any as number)`
+  // — `turnStartTime` is `TurnStartTime = { turnStartTime: number }` (an object),
+  // which when coerced to number gives NaN, so the comparison was ALWAYS false
+  // and the function silently returned no modified files.
   const modifiedFiles: string[] = []
   for (const result of statResults) {
-    if (result && result.mtimeMs >= (turnStartTime as any as number)) {
+    if (result && result.mtimeMs >= turnStartTime.turnStartTime) {
       modifiedFiles.push(result.filePath)
     }
   }
