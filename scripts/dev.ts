@@ -7,6 +7,7 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getMacroDefines } from "./defines.ts";
+import { getEnabledFeatures } from "./default-features.ts";
 
 // Resolve project root from this script's location
 const __filename = fileURLToPath(import.meta.url);
@@ -22,34 +23,10 @@ const defineArgs = Object.entries(defines).flatMap(([k, v]) => [
 ]);
 
 // Bun --feature flags: enable feature() gates at runtime.
-// Default features enabled in dev mode.
-const DEFAULT_FEATURES = [
-  "TRANSCRIPT_CLASSIFIER", "BRIDGE_MODE", "AGENT_TRIGGERS_REMOTE",
-  "CHICAGO_MCP", "VOICE_MODE", "SHOT_STATS", "PROMPT_CACHE_BREAK_DETECTION",
-  "TOKEN_BUDGET", "NATIVE_CLIPBOARD_IMAGE", "MCP_SKILLS", "TEMPLATES",
-  "COORDINATOR_MODE", "MCP_RICH_OUTPUT", "MESSAGE_ACTIONS", "HISTORY_PICKER",
-  "QUICK_SEARCH", "CACHED_MICROCOMPACT", "REACTIVE_COMPACT", "FILE_PERSISTENCE",
-  "DUMP_SYSTEM_PROMPT", "BREAK_CACHE_COMMAND",
-  // P0: local features (upstream)
-  "AGENT_TRIGGERS",
-  "ULTRATHINK",
-  "BUILTIN_EXPLORE_PLAN_AGENTS",
-  "LODESTONE",
-  // P1: API-dependent features (upstream)
-  "EXTRACT_MEMORIES", "VERIFICATION_AGENT",
-  "KAIROS_BRIEF", "AWAY_SUMMARY", "ULTRAPLAN",
-  // P2: daemon + remote control server
-  "DAEMON",
-];
-
-// Any env var matching FEATURE_<NAME>=1 will also enable that feature.
+// Default features come from scripts/default-features.ts (shared with
+// build.ts). Add per-run flags via FEATURE_<NAME>=1 env vars,
 // e.g. FEATURE_PROACTIVE=1 bun run dev
-const envFeatures = Object.entries(process.env)
-    .filter(([k]) => k.startsWith("FEATURE_"))
-    .map(([k]) => k.replace("FEATURE_", ""));
-
-const allFeatures = [...new Set([...DEFAULT_FEATURES, ...envFeatures])];
-const featureArgs = allFeatures.flatMap((name) => ["--feature", name]);
+const featureArgs = getEnabledFeatures().flatMap((name) => ["--feature", name]);
 
 // If BUN_INSPECT is set, pass --inspect-wait to the child process
 const inspectArgs = process.env.BUN_INSPECT

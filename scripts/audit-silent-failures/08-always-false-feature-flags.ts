@@ -20,14 +20,22 @@ import { execSync } from 'child_process'
 function listEnabledFeatures(): { dev: Set<string>; build: Set<string> } {
   const dev = new Set<string>()
   const build = new Set<string>()
-  const devText = readSafe('scripts/dev.ts')
-  const buildText = readSafe('build.ts')
-  // Match `"FEATURE_NAME"` inside DEFAULT_FEATURES = [...] arrays.
-  for (const m of devText.matchAll(/["']([A-Z_][A-Z0-9_]+)["']/g)) {
-    dev.add(m[1])
-  }
-  for (const m of buildText.matchAll(/["']([A-Z_][A-Z0-9_]+)["']/g)) {
-    build.add(m[1])
+  // Single source of truth: scripts/default-features.ts:STABLE_FEATURES.
+  // Both dev (scripts/dev.ts) and release builds (build.ts) import from
+  // there, so we parse the canonical list here. Fall back to dev.ts /
+  // build.ts for older revisions that still inline the array.
+  const sources = [
+    'scripts/default-features.ts',
+    'scripts/dev.ts',
+    'build.ts',
+  ]
+  for (const src of sources) {
+    const text = readSafe(src)
+    if (!text) continue
+    for (const m of text.matchAll(/["']([A-Z_][A-Z0-9_]+)["']/g)) {
+      dev.add(m[1])
+      build.add(m[1])
+    }
   }
   return { dev, build }
 }
