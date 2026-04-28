@@ -117,12 +117,16 @@ export async function probeRuntime(): Promise<RuntimeProbeReport> {
     report.agentHostBindings.methods = Object.keys(bindings).filter(k => {
       try { return typeof (bindings as Record<string, unknown>)[k] === 'function' } catch { return false }
     })
-    // Methods we EXPECT to be wired (subset of contracts.ts AgentHostBindings)
+    // Methods we EXPECT to be wired (subset of agentHostBindings.ts).
+    // executePreCompactHooks is NOT in this list — it's imported directly
+    // from `@claude-code/agent/hooks.js` by intra-package callers (see
+    // command-runtime/commands/compact/compact.ts) and doesn't require a
+    // host binding. Only hooks consumed across package boundaries via
+    // internal/stopHooksCore.ts go through the host binding indirection.
     const expected = [
       'executeStopHooks',
       'executeTaskCompletedHooks',
       'executeTeammateIdleHooks',
-      'executePreCompactHooks',
       'createUserMessage',
       'createAttachmentMessage',
       'getStopHookMessage',
