@@ -1,6 +1,7 @@
 import { readdir, readFile, writeFile, cp } from 'fs/promises'
 import { join } from 'path'
 import { getMacroDefines } from './scripts/defines.ts'
+import { getEnabledFeatures } from './scripts/default-features.ts'
 
 const outdir = 'dist'
 
@@ -8,50 +9,10 @@ const outdir = 'dist'
 const { rmSync } = await import('fs')
 rmSync(outdir, { recursive: true, force: true })
 
-// Default features that match the official CLI build.
+// Default features come from scripts/default-features.ts (shared with
+// scripts/dev.ts so the dev/build feature sets can't drift).
 // Additional features can be enabled via FEATURE_<NAME>=1 env vars.
-const DEFAULT_BUILD_FEATURES = [
-  'AGENT_TRIGGERS_REMOTE',
-  'CHICAGO_MCP',
-  'VOICE_MODE',
-  'SHOT_STATS',
-  'PROMPT_CACHE_BREAK_DETECTION',
-  'TOKEN_BUDGET',
-  'NATIVE_CLIPBOARD_IMAGE',
-  'BRIDGE_MODE',
-  'MCP_SKILLS',
-  'TEMPLATES',
-  'COORDINATOR_MODE',
-  'TRANSCRIPT_CLASSIFIER',
-  'MCP_RICH_OUTPUT',
-  'MESSAGE_ACTIONS',
-  'HISTORY_PICKER',
-  'QUICK_SEARCH',
-  'CACHED_MICROCOMPACT',
-  'REACTIVE_COMPACT',
-  'FILE_PERSISTENCE',
-  'DUMP_SYSTEM_PROMPT',
-  'BREAK_CACHE_COMMAND',
-  // P0: local features (upstream)
-  'AGENT_TRIGGERS',
-  'ULTRATHINK',
-  'BUILTIN_EXPLORE_PLAN_AGENTS',
-  'LODESTONE',
-  // P1: API-dependent features (upstream)
-  'EXTRACT_MEMORIES',
-  'VERIFICATION_AGENT',
-  'KAIROS_BRIEF',
-  'AWAY_SUMMARY',
-  'ULTRAPLAN',
-  // P2: daemon + remote control server
-  'DAEMON',
-]
-
-// Collect FEATURE_* env vars → Bun.build features
-const envFeatures = Object.keys(process.env)
-  .filter(k => k.startsWith('FEATURE_'))
-  .map(k => k.replace('FEATURE_', ''))
-const features = [...new Set([...DEFAULT_BUILD_FEATURES, ...envFeatures])]
+const features = getEnabledFeatures()
 
 // Step 2: Bundle as a single file. We previously used `splitting: true` which
 // fanned 510+ chunk-*.js files into dist/ — that was useful for lazy loading
