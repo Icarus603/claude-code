@@ -4516,6 +4516,7 @@ function extractFirstPromptFromChunk(chunk: string): string {
         return result
       }
     } catch {
+      // Best-effort first-message extraction; falls back to commandFallback / synthetic
     }
   }
   // Session started with a slash command but had no subsequent real message —

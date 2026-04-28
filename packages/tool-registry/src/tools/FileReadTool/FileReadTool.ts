@@ -1147,10 +1147,10 @@ export async function readImageWithTokenBudget(
           await sips.exited
           if (sips.exitCode === 0) {
             const buf = readFileSync(tmpOut)
-            try { unlinkSync(tmpOut) } catch {}
+            try { unlinkSync(tmpOut) } catch {} // best-effort temp cleanup
             result = createImageResponse(buf, 'jpeg', originalSize)
           } else {
-            try { unlinkSync(tmpOut) } catch {}
+            try { unlinkSync(tmpOut) } catch {} // best-effort temp cleanup
             result = createImageResponse(imageBuffer, detectedFormat, originalSize)
           }
         } catch {
@@ -1221,11 +1221,13 @@ export async function readImageWithTokenBudget(
             await sips.exited
             if (sips.exitCode === 0) {
               const buf = readFileSync(tmpOut)
-              try { unlinkSync(tmpOut) } catch {}
+              try { unlinkSync(tmpOut) } catch {} // best-effort temp cleanup
               return createImageResponse(buf, 'jpeg', originalSize)
             }
-            try { unlinkSync(tmpOut) } catch {}
-          } catch {}
+            try { unlinkSync(tmpOut) } catch {} // best-effort temp cleanup
+          } catch {
+            // sips spawn or readFile failed; fall through to original buffer
+          }
         }
         return createImageResponse(imageBuffer, detectedFormat, originalSize)
       }

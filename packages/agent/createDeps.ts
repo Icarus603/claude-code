@@ -389,7 +389,12 @@ class SessionDepImpl implements AgentDeps['session'] {
   async recordTranscript(messages: CoreMessage[]): Promise<void> {
     try {
       await recordTranscript(messages as AgentMessage[])
-    } catch {}
+    } catch (e) {
+      // Transcript record failure (disk full, perm, race with rotation) must
+      // not crash the agent loop, but it shouldn't be invisible — losing
+      // transcripts breaks resume/replay.
+      logError(e)
+    }
   }
 }
 

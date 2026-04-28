@@ -122,6 +122,8 @@ async function detectPluginDirectories(ideName: string): Promise<string[]> {
         }
       }
     } catch {
+      // Outer readdir failure (parent dir doesn't exist on this platform);
+      // best-effort — not all JetBrains config dir layouts are present.
     }
   }
 

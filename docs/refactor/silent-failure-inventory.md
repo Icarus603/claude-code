@@ -22,15 +22,15 @@ Findings are graded:
 | 2 | await-generator-misuse | 0 | 0 | 0 | 0 | 0 |
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
 | 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
-| 5 | empty-catch | 240 | 0 | 0 | 0 | 240 |
+| 5 | empty-catch | 0 | 0 | 0 | 0 | 0 |
 | 6 | nullish-coalesce-critical-path | 86 | 0 | 0 | 0 | 86 |
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
-| 10 | type-cast-trap | 284 | 0 | 0 | 118 | 166 |
+| 10 | type-cast-trap | 237 | 0 | 0 | 74 | 163 |
 | 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **1131** | **0** | **0** | **118** | **1013** |
+| **TOTAL** | | **844** | **0** | **0** | **74** | **770** |
 
 ## Patterns in detail
 
@@ -72,71 +72,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2464; **findings**: 240
-
-#### LOW (240)
-
-- `packages/ide/src/ide.ts:869` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/ide/src/ide.ts:1024` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/ide/src/ide.ts:1275` — } catch (_) {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/ide/src/ide.ts:1382` — } catch (_) {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/ide/src/ide.ts:1482` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/swarm/src/worktree/index.ts:548` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tasks/RemoteAgentTask.tsx:825` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tasks/RemoteAgentTask.tsx:1023` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/WebFetchTool/WebFetchTool.ts:119` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/WebSearchTool/adapters/bingAdapter.ts:194` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/WebSearchTool/adapters/apiAdapter.ts:128` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/AgentTool/agentMemorySnapshot.ts:120` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/AgentTool/agentMemorySnapshot.ts:181` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/PowerShellTool/PowerShellTool.tsx:801` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/LSPTool/LSPTool.ts:546` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:571` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1150` — try { unlinkSync(tmpOut) } catch {}
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1153` — try { unlinkSync(tmpOut) } catch {}
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1224` — try { unlinkSync(tmpOut) } catch {}
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1227` — try { unlinkSync(tmpOut) } catch {}
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1228` — } catch {}
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/BashTool/BashTool.tsx:1009` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/tools/BashTool/shouldUseSandbox.ts:45` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/task/TaskOutput.ts:376` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/skills/skillChangeDetector.ts:181` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/skills/skillChangeDetector.ts:192` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/skills/skillChangeDetector.ts:205` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/skills/skillChangeDetector.ts:218` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/skills/skillChangeDetector.ts:229` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/imageStore.ts:151` — } catch {
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- ...210 more (run audit with no flags for full JSON)
+**Total scanned**: 2464; **findings**: 0
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -216,7 +152,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5905; **findings**: 26
+**Total scanned**: 5906; **findings**: 26
 
 #### LOW (26)
 
@@ -325,7 +261,7 @@ Findings are graded:
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/AgentTool/AgentTool.tsx:821` — const assistantForceAsync = feature('KAIROS')
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:851` — if (feature('MONITOR_TOOL')) {
+- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:842` — if (feature('MONITOR_TOOL')) {
   - `feature('MONITOR_TOOL')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_MONITOR_TOOL=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/AgentTool/loadAgentsDir.ts:348` — if (feature('AGENT_MEMORY_SNAPSHOT') && isAutoMemoryEnabled()) {
   - `feature('AGENT_MEMORY_SNAPSHOT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_AGENT_MEMORY_SNAPSHOT=1. Verify whether this branch is ever exercised; if not, delete it.
@@ -359,53 +295,19 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 602; **findings**: 284
+**Total scanned**: 575; **findings**: 237
 
-#### MEDIUM (118)
+#### MEDIUM (74)
 
-- `packages/swarm/commands/branch/branch.ts:41` — const content = (firstUserMessage as any)?.message?.content
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/worktree/index.ts:1296` — `Created worktree: ${worktreeDir} (based on ${(result as any).baseBranch})`,
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:765` — (message as any).event.type === 'message_start' &&
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:766` — (message as any).ttftMs != null
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:768` — toolUseContext.pushApiMetricsEntry?.((message as any).ttftMs)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:775` — if ((message as any).attachment.type === 'max_turns_reached') {
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:784` — (message as any).attachment.maxTurns
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:904` — throw new Error((extractResult as any).error.message)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:908` — pageCount: (extractResult as any).data.file.count,
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:975` — available: (extractResult as any).error.reason !== 'unavailable',
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:991` — throw new Error((readResult as any).error.message)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1198` — const fallbackBuffer = await (sharp as any)(imageBuffer)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/api.ts:53` — return getToolRegistry().filterByDenyRules(tools, permissionContext as any)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/ink/src/core/utils/sliceAnsi.ts:86` — result += (token as any).value
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/ink/src/components/App.tsx:329` — stdin.removeListener('readable', listener as any)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-swift/src/backends/darwin.ts:97` — originX: Number((d as any).originX ?? 0),
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-swift/src/backends/darwin.ts:98` — originY: Number((d as any).originY ?? 0),
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-swift/src/backends/darwin.ts:126` — originX: Number((d as any).originX ?? 0),
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-swift/src/backends/darwin.ts:127` — originY: Number((d as any).originY ?? 0),
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/computer-use-mcp/src/legacy/common.ts:57` — : 'none') as any,
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/computer-use-mcp/src/legacy/common.ts:62` — : 'darwin') as any,
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-mcp/src/legacy/drainRunLoop.ts:21` — ;(cu as any)?._drainMainRunLoop?.()
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:494` — await (this as any).mouseDown()
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -413,19 +315,53 @@ Findings are graded:
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:556` — const result = platform.windowManagement.manageWindow(action as any, opts)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-mcp/src/legacy/escHotkey.ts:29` — if (!(cu as any).hotkey?.registerEscape?.(onEscape)) {
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-mcp/src/legacy/escHotkey.ts:44` — (requireComputerUseSwift() as any).hotkey?.unregister?.()
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/computer-use-mcp/src/legacy/escHotkey.ts:54` — (requireComputerUseSwift() as any).hotkey?.notifyExpectedEscape?.()
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/computer-use-mcp/src/legacy/win32/bridgeClient.ts:122` — ;(origResolve as any)(v)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/settings/validateEditTool.ts:48` — message: `Claude Code settings.json validation failed after edit:\n${(afterValidation as any).error}\n\nFull schema:\n${(afterValidation as 
+- `packages/provider/src/vcr.ts:272` — .filter(Boolean) as any,
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...88 more (run audit with no flags for full JSON)
+- `packages/provider/src/claude.ts:42` — } as any)) as unknown as AssistantMessage
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/provider/src/claude.ts:74` — } as any) as AsyncGenerator<
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/provider/src/openai/streamAdapter.ts:61` — const details = (chunk.usage as any).prompt_tokens_details
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/provider/src/openai/streamAdapter.ts:95` — const reasoningContent = (delta as any).reasoning_content
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/output/src/utils/sliceAnsi.ts:80` — result += (token as any).value
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/output/src/textHighlighting.ts:131` — const charsAvailable = (token as any).value.length - this.charIdx
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/output/src/textHighlighting.ts:138` — if (this.charIdx >= (token as any).value.length) {
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/mcp-runtime/testing/index.ts:111` — runtime.discover(configs as Record<string, TConfig>) as any,
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/mcp-runtime/testing/index.ts:113` — prefetchResources: configs => runtime.prefetchResources(configs) as any,
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/mcp-runtime/src/useManageMCPConnections.ts:528` — origin: { kind: 'channel', server: client.name } as any,
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/mcp-runtime/src/api.ts:108` — resources[(result.client as any)?.name ?? `server-${clients.length}`] =
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/mcp-runtime/src/mcpInstructionsDelta.ts:68` — for (const n of (msg.attachment as any).addedNames) announced.add(n)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/mcp-runtime/src/mcpInstructionsDelta.ts:69` — for (const n of (msg.attachment as any).removedNames) announced.delete(n)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/server/src/upstreamproxy/relay.ts:384` — ws.send(encodeChunk(new Uint8Array(Buffer.from(head, 'utf8'))) as any)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/server/src/upstreamproxy/relay.ts:432` — ws.send(encodeChunk(new Uint8Array(0)) as any)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/server/src/upstreamproxy/relay.ts:440` — ws.send(encodeChunk(slice) as any)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/agent/tasks/LocalShellTask/killShellTasks.ts:18` — if ((task as any).status !== 'running' || !isLocalShellTask(task)) {
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/agent/tokenEstimation.ts:472` — return roughTokenCountEstimationForContent(block.content as any)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/agent/core/AgentLoop.ts:101` — const eventType = (event as any).type
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/agent/core/AgentLoop.ts:110` — ? (event as any).event
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- ...44 more (run audit with no flags for full JSON)
 
-#### LOW (166)
+#### LOW (163)
 
 - `packages/swarm/testing/index.ts:20` — } as unknown as SwarmHostDeps
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -485,9 +421,9 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/plugin/installCounts.ts:67` — const parsed = jsonParse(content) as unknown
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/plugin/pluginFlagging.ts:41` — const parsed = jsonParse(content) as unknown
+- `packages/config/plugin/marketplaceManager.ts:191` — } as unknown as Record<string, DeclaredMarketplace>
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...136 more (run audit with no flags for full JSON)
+- ...133 more (run audit with no flags for full JSON)
 
 ### 11. `require-fallback-to-stub`
 

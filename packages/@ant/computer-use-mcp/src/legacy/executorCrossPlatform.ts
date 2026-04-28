@@ -918,7 +918,7 @@ $i = New-Object MUp+INPUT; $i.type=0; $i.mi.dwFlags=0x0004; [MUp]::SendInput(1, 
             horizontal: horizontal ?? false,
           })
           if (result !== null) return true
-        } catch {}
+        } catch {} // bridge unavailable; fall through to PowerShell path
         // Fallback: windowMessage.ts (PowerShell)
         const { sendMouseWheel } =
           require('./win32/windowMessage.js') as typeof import('./win32/windowMessage.js')
