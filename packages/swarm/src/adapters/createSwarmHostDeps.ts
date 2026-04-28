@@ -1,3 +1,9 @@
+/**
+ * createSwarmHostDeps — host-binding adapter for the swarm package.
+ * `as never` casts on Tool method invocations bridge generic Tool<I,O>
+ * argument types from the swarm side to the host's concrete tool
+ * registry. Runtime-binding pattern type-system bypass.
+ */
 /* biome-ignore-all lint/correctness/useYield: notImplemented stubs intentionally throw without yielding */
 import { existsSync } from 'node:fs'
 import {
