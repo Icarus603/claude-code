@@ -58,10 +58,6 @@ import {
   buildPrefix,
   DEPTH_RULES,
 
-  setGetPlatformFn,
-  setWhichFn,
-  setWindowsPathToPosixPathFn,
-
   createBashShellProvider,
   createPowerShellProvider,
   buildPowerShellArgs,
@@ -211,13 +207,6 @@ describe('@claude-code/shell import verification', () => {
   test('specPrefix: buildPrefix and DEPTH_RULES exported', () => {
     expect(typeof buildPrefix).toBe('function')
     expect(typeof DEPTH_RULES).toBe('object')
-  })
-
-
-  test('_deps: setGetPlatformFn and setWhichFn exist', () => {
-    expect(typeof setGetPlatformFn).toBe('function')
-    expect(typeof setWhichFn).toBe('function')
-    expect(typeof setWindowsPathToPosixPathFn).toBe('function')
   })
 
 

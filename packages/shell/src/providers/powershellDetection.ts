@@ -1,5 +1,6 @@
 import { realpath, stat } from 'fs/promises'
-import { getPlatform, which } from '../_deps.js'
+import { getPlatform } from '@claude-code/config/platform'
+import { which } from '../which.js'
 
 async function probePath(p: string): Promise<string | null> {
   try {

@@ -1,4 +1,5 @@
-import { getPlatform, isEnvDefinedFalsy, isEnvTruthy } from '../_deps.js'
+import { getPlatform } from '@claude-code/config/platform'
+import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 
 const BASH_TOOL_NAME = 'Bash'
 const POWERSHELL_TOOL_NAME = 'PowerShell'

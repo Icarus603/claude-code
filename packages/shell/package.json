@@ -35,8 +35,7 @@
     "./terminal/ShellCommand.js": "./src/terminal/ShellCommand.ts",
     "./terminal/appleTerminalBackup.js": "./src/terminal/appleTerminalBackup.ts",
     "./terminal/iTermBackup.js": "./src/terminal/iTermBackup.ts",
-    "./terminal/terminalPanel.js": "./src/terminal/terminalPanel.ts",
-    "./_deps.js": "./src/_deps.ts"
+    "./terminal/terminalPanel.js": "./src/terminal/terminalPanel.ts"
   },
   "dependencies": {
     "execa": "^9.6.1",
