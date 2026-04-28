@@ -1,5 +1,10 @@
 /**
- * CLI `ComputerExecutor` implementation. Wraps two native modules:
+ * CLI `ComputerExecutor` implementation. Native module wrapper —
+ * `as any/unknown` casts are by-design type-system bypass for
+ * FFI/native-module cross-talk where the .node binary's runtime
+ * shapes don't have full TypeScript declarations.
+ *
+ * Wraps two native modules:
  *   - `@ant/computer-use-input` (Rust/enigo) — mouse, keyboard, frontmost app
  *   - `@ant/computer-use-swift` — SCContentFilter screenshots, NSWorkspace apps, TCC
  *

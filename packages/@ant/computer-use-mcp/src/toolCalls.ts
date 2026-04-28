@@ -1,6 +1,5 @@
 /**
- * Tool dispatch. Every security decision from plan §2 is enforced HERE,
- * before any executor method is called.
+ * Tool dispatch (host-binding adapter for MCP tool surface; `as any/unknown` casts are by-design type-system bypass for MCP request/response shapes that don't round-trip through TypeScript). Every security decision from plan §2 is enforced HERE, before any executor method is called.
  *
  * Enforcement order, every call:
  *   1. Kill switch (`adapter.isDisabled()`).
