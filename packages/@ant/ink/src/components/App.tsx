@@ -326,7 +326,7 @@ export default class App extends PureComponent<Props, State> {
         const existingListeners = stdin.listeners('readable')
         for (const listener of existingListeners) {
           if (listener !== this.handleReadable) {
-            stdin.removeListener('readable', listener as any)
+            stdin.removeListener('readable', listener as (...args: unknown[]) => void)
           }
         }
 

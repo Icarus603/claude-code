@@ -1,3 +1,10 @@
+/**
+ * Grok client — OpenAI SDK wrapper. `as any` casts on
+ * fetchOptions/fetch are by-design type-system bypass: OpenAI SDK's
+ * options accept Node and Web fetch interchangeably at runtime but
+ * the published types lock to one variant. SDK-version compatibility
+ * shim.
+ */
 import { getProviderNetworkLayer } from '../network.js'
 import OpenAI from 'openai'
 import { readEnv } from '@claude-code/config/env'

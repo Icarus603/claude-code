@@ -3,7 +3,11 @@ import { withResolvers } from '@claude-code/local-observability/utils/withResolv
 import { requireComputerUseSwift } from './swiftLoader.js'
 
 /**
- * Shared CFRunLoop pump. Swift's four `@MainActor` async methods
+ * Shared CFRunLoop pump. Native-module wrapper — `(cu as any)._drainMainRunLoop`
+ * is by-design FFI/native-module cross-talk; the swift binary's
+ * `_drainMainRunLoop` symbol isn't in the declared TypeScript surface.
+ *
+ * Swift's four `@MainActor` async methods
  * (captureExcluding, captureRegion, apps.listInstalled, resolvePrepareCapture)
  * and `@ant/computer-use-input`'s key()/keys() all dispatch to
  * DispatchQueue.main. Under libuv (Node/bun) that queue never drains — the

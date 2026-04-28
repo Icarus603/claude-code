@@ -90,15 +90,20 @@ export function UltraplanChoiceDialog({
   const isScrollable = wrappedLines.length > visibleHeight;
 
   // ── Scroll input handler ───────────────────────────────────────────
-  useInput((input, key) => {
+  useInput((input, rawKey) => {
     if (!isScrollable) return;
     const halfPage = Math.max(1, Math.floor(visibleHeight / 2));
 
-    if ((key.ctrl && input === 'd') || (key as any).wheelDown) {
-      const step = (key as any).wheelDown ? 3 : halfPage;
+    // Forked Ink adds wheelDown/wheelUp to the Key payload (vendored at
+    // packages/@ant/ink); declare here since the public Key type ships
+    // without them.
+    const key = rawKey as typeof rawKey & { wheelDown?: boolean; wheelUp?: boolean };
+
+    if ((key.ctrl && input === 'd') || key.wheelDown) {
+      const step = key.wheelDown ? 3 : halfPage;
       setScrollOffset(prev => Math.min(prev + step, maxScroll));
-    } else if ((key.ctrl && input === 'u') || (key as any).wheelUp) {
-      const step = (key as any).wheelUp ? 3 : halfPage;
+    } else if ((key.ctrl && input === 'u') || key.wheelUp) {
+      const step = key.wheelUp ? 3 : halfPage;
       setScrollOffset(prev => Math.max(prev - step, 0));
     }
   });

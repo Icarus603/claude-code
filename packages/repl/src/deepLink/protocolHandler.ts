@@ -92,11 +92,14 @@ export async function handleUrlSchemeLaunch(): Promise<number | null> {
 
   try {
     const { waitForUrlEvent } = await import('url-handler-napi')
-    const url = (waitForUrlEvent as any)(5000)
+    // FFI/native-module: `url-handler-napi` ships without TS types; the
+    // call returns Promise<string> | null (timeout). `as any` bypasses
+    // the missing surface; runtime shape verified below.
+    const url = (waitForUrlEvent as (timeoutMs: number) => Promise<string> | null)(5000)
     if (!url) {
       return null
     }
-    return await handleDeepLinkUri(await url as string)
+    return await handleDeepLinkUri(await url)
   } catch {
     // NAPI module not available, or handleDeepLinkUri rejected — not a URL launch
     return null

@@ -22,7 +22,7 @@ Findings are graded:
 | 2 | await-generator-misuse | 0 | 0 | 0 | 0 | 0 |
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
 | 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
-| 5 | empty-catch | 45 | 0 | 0 | 0 | 45 |
+| 5 | empty-catch | 240 | 0 | 0 | 0 | 240 |
 | 6 | nullish-coalesce-critical-path | 86 | 0 | 0 | 0 | 86 |
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
@@ -30,7 +30,7 @@ Findings are graded:
 | 10 | type-cast-trap | 284 | 0 | 0 | 118 | 166 |
 | 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **936** | **0** | **0** | **118** | **818** |
+| **TOTAL** | | **1131** | **0** | **0** | **118** | **1013** |
 
 ## Patterns in detail
 
@@ -72,71 +72,71 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2464; **findings**: 45
+**Total scanned**: 2464; **findings**: 240
 
-#### LOW (45)
+#### LOW (240)
 
-- `packages/ide/src/ide.ts:578` — } catch (error) {
+- `packages/ide/src/ide.ts:869` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/ide/src/ide.ts:610` — } catch (error) {
+- `packages/ide/src/ide.ts:1024` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/ide/src/lsp/LSPServerInstance.ts:254` — } catch (error) {
+- `packages/ide/src/ide.ts:1275` — } catch (_) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/teleport.tsx:1476` — } catch (error) {
+- `packages/ide/src/ide.ts:1382` — } catch (_) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/tool-registry/src/diagnosticTracking.ts:179` — } catch (_error) {
+- `packages/ide/src/ide.ts:1482` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/feature-flags.ts:95` — } catch {
+- `packages/swarm/src/worktree/index.ts:548` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/migrations/migrateEnableAllProjectMcpServersToSettings.ts:113` — } catch (e: unknown) {
+- `packages/tool-registry/src/tasks/RemoteAgentTask.tsx:825` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/plugin/zipCacheAdapters.ts:50` — } catch {
+- `packages/tool-registry/src/tasks/RemoteAgentTask.tsx:1023` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/plugin/marketplaceManager.ts:312` — } catch {
+- `packages/tool-registry/src/tools/WebFetchTool/WebFetchTool.ts:119` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/plugin/reconciler.ts:125` — } catch (e) {
+- `packages/tool-registry/src/tools/WebSearchTool/adapters/bingAdapter.ts:194` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/plugin/pluginFlagging.ts:81` — } catch {
+- `packages/tool-registry/src/tools/WebSearchTool/adapters/apiAdapter.ts:128` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/sync/index.ts:193` — } catch {
+- `packages/tool-registry/src/tools/AgentTool/agentMemorySnapshot.ts:120` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/command-runtime/src/commands/clear/conversation.ts:163` — } catch (error) {
+- `packages/tool-registry/src/tools/AgentTool/agentMemorySnapshot.ts:181` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/repl/src/releaseNotes.ts:135` — } catch {
+- `packages/tool-registry/src/tools/PowerShellTool/PowerShellTool.tsx:801` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/repl/src/releaseNotes.ts:192` — } catch (error) {
+- `packages/tool-registry/src/tools/LSPTool/LSPTool.ts:546` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/repl/src/components/agents/new-agent-creation/wizard-steps/GenerateStep.tsx:113` — } catch (err) {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:571` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/repl/src/hooks/useTypeahead.tsx:306` — } catch {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1150` — try { unlinkSync(tmpOut) } catch {}
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/repl/src/diagnostics/claudeDesktop.ts:148` — } catch (error) {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1153` — try { unlinkSync(tmpOut) } catch {}
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/provider/src/usage.ts:122` — } catch {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1224` — try { unlinkSync(tmpOut) } catch {}
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/provider/src/oauth/codex-client.ts:281` — } catch {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1227` — try { unlinkSync(tmpOut) } catch {}
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/provider/src/oauth/codex-client.ts:391` — } catch (err) {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1228` — } catch {}
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/provider/src/authAlias.ts:1185` — } catch (e) {
+- `packages/tool-registry/src/tools/BashTool/BashTool.tsx:1009` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/provider/src/codex/fetchAdapter.ts:504` — } catch {
+- `packages/tool-registry/src/tools/BashTool/shouldUseSandbox.ts:45` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/provider/src/userAuth.ts:1185` — } catch (e) {
+- `packages/tool-registry/src/task/TaskOutput.ts:376` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/mcp-runtime/src/xaaIdpLogin.ts:260` — } catch {
+- `packages/tool-registry/src/skills/skillChangeDetector.ts:181` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/mcp-runtime/src/claudeai.ts:129` — } catch {
+- `packages/tool-registry/src/skills/skillChangeDetector.ts:192` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/updater/src/autoUpdater.ts:133` — } catch (error) {
+- `packages/tool-registry/src/skills/skillChangeDetector.ts:205` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/agent/internal/fileHistoryCore.ts:120` — } catch (error) {
+- `packages/tool-registry/src/skills/skillChangeDetector.ts:218` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/agent/internal/fileHistoryCore.ts:183` — } catch (error) {
+- `packages/tool-registry/src/skills/skillChangeDetector.ts:229` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/agent/internal/fileHistoryCore.ts:272` — } catch (error) {
+- `packages/tool-registry/src/imageStore.ts:151` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- ...15 more (run audit with no flags for full JSON)
+- ...210 more (run audit with no flags for full JSON)
 
 ### 6. `nullish-coalesce-critical-path`
 

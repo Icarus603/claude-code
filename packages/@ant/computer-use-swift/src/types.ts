@@ -3,6 +3,10 @@ export interface DisplayGeometry {
   height: number
   scaleFactor: number
   displayId: number
+  /** Display origin X (multi-display layout). 0 for primary or single-display. */
+  originX?: number
+  /** Display origin Y (multi-display layout). 0 for primary or single-display. */
+  originY?: number
 }
 
 export interface PrepareDisplayResult {

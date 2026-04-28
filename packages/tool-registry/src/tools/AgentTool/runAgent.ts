@@ -760,30 +760,21 @@ export async function* runAgent({
       onQueryProgress?.()
       // Forward subagent API request starts to parent's metrics display
       // so TTFT/OTPS update during subagent execution.
-      if (
-        message.type === 'stream_event' &&
-        (message as any).event.type === 'message_start' &&
-        (message as any).ttftMs != null
-      ) {
-        toolUseContext.pushApiMetricsEntry?.((message as any).ttftMs)
-        continue
+      if (message.type === 'stream_event') {
+        const streamMsg = message as Message & { event?: { type: string }; ttftMs?: number }
+        if (streamMsg.event?.type === 'message_start' && streamMsg.ttftMs != null) {
+          toolUseContext.pushApiMetricsEntry?.(streamMsg.ttftMs)
+          continue
+        }
       }
 
       // Yield attachment messages (e.g., structured_output) without recording them
       if (message.type === 'attachment') {
         // Handle max turns reached signal from query.ts
-        if ((message as any).attachment.type === 'max_turns_reached') {
+        const attachment = (message as Message & { attachment: { type: string; maxTurns?: number } }).attachment
+        if (attachment.type === 'max_turns_reached') {
           logForDebugging(
-            `[Agent
-: $
-{
-  agentDefinition.agentType
-}
-] Reached max turns limit ($
-{
-  (message as any).attachment.maxTurns
-}
-)`,
+            `[Agent: ${agentDefinition.agentType}] Reached max turns limit (${attachment.maxTurns})`,
           )
           break
         }
