@@ -102,7 +102,12 @@ export async function generateSessionTitle(
       },
     })
 
-    const text = extractTextContent(result.message.content as any)
+    // result.message.content can be string | ContentBlock[]; only the array
+    // shape is meaningful for extractTextContent. Cast through unknown to
+    // bridge the SDK-derived type to the bare {type: string}[] contract.
+    const text = extractTextContent(
+      result.message.content as unknown as { type: string }[],
+    )
 
     const parsed = titleSchema().safeParse(safeParseJSON(text))
     const title = parsed.success ? parsed.data.title.trim() || null : null

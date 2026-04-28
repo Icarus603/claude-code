@@ -555,13 +555,15 @@ export async function runForkedAgent({
       skipCacheWrite,
     })) {
       // Extract real usage from message_delta stream events (final usage per API call)
-      if (message.type === 'stream_event') {
+      if (message.type === 'stream_event' && 'event' in message) {
+        const streamMsg = message as typeof message & {
+          event?: { type?: string; usage?: unknown }
+        }
         if (
-          'event' in message &&
-          (message as any).event?.type === 'message_delta' &&
-          (message as any).event.usage
+          streamMsg.event?.type === 'message_delta' &&
+          streamMsg.event.usage
         ) {
-          const turnUsage = updateUsage({ ...EMPTY_USAGE }, (message as any).event.usage)
+          const turnUsage = updateUsage({ ...EMPTY_USAGE }, streamMsg.event.usage)
           totalUsage = accumulateUsage(totalUsage, turnUsage)
         }
         continue
