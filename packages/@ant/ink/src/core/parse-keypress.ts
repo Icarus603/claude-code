@@ -196,7 +196,10 @@ export const INITIAL_STATE: KeyParseState = {
 function inputToString(input: Buffer | string): string {
   if (Buffer.isBuffer(input)) {
     if (input[0]! > 127 && input[1] === undefined) {
-      ;(input[0] as unknown as number) -= 128
+      // Buffer is mutable; clear bit 7 in place. Direct subtract-assign
+      // through the index isn't typed (input[i] is `number | undefined`),
+      // so reassign explicitly.
+      input[0] = input[0]! - 128
       return '\x1b' + String(input)
     } else {
       return String(input)
