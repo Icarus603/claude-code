@@ -1,41 +1,17 @@
 /**
- * Search adapter factory — selects the appropriate backend by checking
- * whether the API base URL points to Anthropic's official endpoint.
+ * Search adapter factory — currently always returns the Bing adapter.
+ *
+ * Earlier code conditionally cached an ApiSearchAdapter for first-party
+ * Anthropic URLs, but the API path was disabled and the cache became
+ * commented-out dead code. Adapter is stateless so a fresh instance per
+ * call is fine.
  */
 
-import { isFirstPartyAnthropicBaseUrl } from '@claude-code/provider/providers.js'
-import { ApiSearchAdapter } from './apiAdapter.js'
 import { BingSearchAdapter } from './bingAdapter.js'
 import type { WebSearchAdapter } from './types.js'
 
 export type { SearchResult, SearchOptions, SearchProgress, WebSearchAdapter } from './types.js'
 
-let cachedAdapter: WebSearchAdapter | null = null
-
 export function createAdapter(): WebSearchAdapter {
-	// Use the Bing adapter directly and skip API adapter selection
   return new BingSearchAdapter()
-//   // Adapter is stateless — safe to reuse across calls within a session
-//   if (cachedAdapter) return cachedAdapter
-
-//   // Env override: WEB_SEARCH_ADAPTER=api|bing forces specific backend
-//   const envAdapter = process.env.WEB_SEARCH_ADAPTER
-//   if (envAdapter === 'api') {
-//     cachedAdapter = new ApiSearchAdapter()
-//     return cachedAdapter
-//   }
-//   if (envAdapter === 'bing') {
-//     cachedAdapter = new BingSearchAdapter()
-//     return cachedAdapter
-//   }
-
-//   // Anthropic official URL → API server-side search
-//   if (isFirstPartyAnthropicBaseUrl()) {
-//     cachedAdapter = new ApiSearchAdapter()
-//     return cachedAdapter
-//   }
-
-//   // Third-party proxies / non-Anthropic endpoints → Bing fallback
-//   cachedAdapter = new BingSearchAdapter()
-//   return cachedAdapter
 }
