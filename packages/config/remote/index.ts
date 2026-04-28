@@ -49,7 +49,7 @@ function getRetryDelay(attempt: number, retryAfterHeader?: string | null, maxDel
     const seconds = parseInt(retryAfterHeader, 10)
     if (!isNaN(seconds)) return seconds * 1000
   }
-  const baseDelay = Math.min(BASE_RETRY_DELAY_MS * Math.pow(2, attempt - 1), maxDelayMs)
+  const baseDelay = Math.min(BASE_RETRY_DELAY_MS * 2 ** (attempt - 1), maxDelayMs)
   return baseDelay + Math.random() * 0.25 * baseDelay
 }
 function getClaudeCodeUserAgent(): string {

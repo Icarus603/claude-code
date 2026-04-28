@@ -15,7 +15,15 @@ import { probeRuntime } from './lib/runtime-probe.js'
 describe('smoke:plugin dispatch path', () => {
   test('dispatch probe ran for every queried event', async () => {
     const r = await probeRuntime()
-    const queried = ['Stop', 'SubagentStop', 'SessionStart', 'PreToolUse', 'UserPromptSubmit', 'PreCompact', 'Notification']
+    const queried = [
+      'Stop',
+      'SubagentStop',
+      'SessionStart',
+      'PreToolUse',
+      'UserPromptSubmit',
+      'PreCompact',
+      'Notification',
+    ]
     for (const e of queried) {
       expect(r.dispatch[e]).toBeDefined()
       expect(r.dispatch[e]!.matched).toBeGreaterThanOrEqual(0)

@@ -40,7 +40,9 @@ beforeAll(async () => {
 
 afterEach(() => {
   if (markerDir) {
-    try { rmSync(markerDir, { recursive: true, force: true }) } catch {}
+    try {
+      rmSync(markerDir, { recursive: true, force: true })
+    } catch {}
   }
 })
 

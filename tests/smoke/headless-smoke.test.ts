@@ -23,7 +23,10 @@ interface SpawnResult {
   exitCode: number | null
 }
 
-async function runCli(args: string[], timeoutMs = 30_000): Promise<SpawnResult> {
+async function runCli(
+  args: string[],
+  timeoutMs = 30_000,
+): Promise<SpawnResult> {
   return new Promise((resolve, reject) => {
     const proc = spawn(
       'bun',
@@ -34,12 +37,21 @@ async function runCli(args: string[], timeoutMs = 30_000): Promise<SpawnResult> 
         stdio: ['ignore', 'pipe', 'pipe'],
       },
     )
-    let stdout = '', stderr = ''
-    proc.stdout?.on('data', d => { stdout += d.toString() })
-    proc.stderr?.on('data', d => { stderr += d.toString() })
+    let stdout = '',
+      stderr = ''
+    proc.stdout?.on('data', d => {
+      stdout += d.toString()
+    })
+    proc.stderr?.on('data', d => {
+      stderr += d.toString()
+    })
     const timer = setTimeout(() => {
       proc.kill('SIGKILL')
-      reject(new Error(`runCli ${args.join(' ')} timed out after ${timeoutMs}ms\nstdout: ${stdout}\nstderr: ${stderr}`))
+      reject(
+        new Error(
+          `runCli ${args.join(' ')} timed out after ${timeoutMs}ms\nstdout: ${stdout}\nstderr: ${stderr}`,
+        ),
+      )
     }, timeoutMs)
     proc.once('exit', code => {
       clearTimeout(timer)

@@ -25,7 +25,7 @@ export type ProviderHostBindings = {
   getAPIProvider: () => ProviderAPIProvider
   getModelOptions: (fastMode?: boolean) => ProviderModelOption[]
   auth: {
-    checkAndRefreshOAuthTokenIfNeeded: () => Promise<void | boolean>
+    checkAndRefreshOAuthTokenIfNeeded: () => Promise<undefined | boolean>
     getAnthropicApiKey: () => string | null | undefined
     getApiKeyFromApiKeyHelper: (
       isNonInteractiveSession: boolean,
@@ -39,7 +39,7 @@ export type ProviderHostBindings = {
     refreshAndGetAwsCredentials: ProviderCachedAsyncFn<
       ProviderAwsCredentials | null | undefined
     >
-    refreshGcpCredentialsIfNeeded: ProviderCachedAsyncFn<void | boolean>
+    refreshGcpCredentialsIfNeeded: ProviderCachedAsyncFn<undefined | boolean>
     getUserAgent: () => string
     getSmallFastModel: () => string
     isFirstPartyAnthropicBaseUrl: () => boolean

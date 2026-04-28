@@ -18,8 +18,8 @@ export interface RuntimeProbeReport {
   }
   agentHostBindings: {
     installed: boolean
-    methods: string[]  // names of methods present
-    missingExpected: string[]  // expected methods that are undefined
+    methods: string[] // names of methods present
+    missingExpected: string[] // expected methods that are undefined
   }
   /**
    * Per hook event, what dispatchable hooks does the runtime see?
@@ -55,7 +55,9 @@ export async function probeRuntime(): Promise<RuntimeProbeReport> {
     )
     installRuntimeSkeletonBindings()
   } catch (e) {
-    errors.push(`installRuntimeSkeletonBindings failed: ${(e as Error).message}`)
+    errors.push(
+      `installRuntimeSkeletonBindings failed: ${(e as Error).message}`,
+    )
   }
 
   // enableConfigs (config/plugin code paths require this).
@@ -115,7 +117,11 @@ export async function probeRuntime(): Promise<RuntimeProbeReport> {
     const bindings = getAgentHostBindings() as Record<string, unknown>
     report.agentHostBindings.installed = true
     report.agentHostBindings.methods = Object.keys(bindings).filter(k => {
-      try { return typeof (bindings as Record<string, unknown>)[k] === 'function' } catch { return false }
+      try {
+        return typeof (bindings as Record<string, unknown>)[k] === 'function'
+      } catch {
+        return false
+      }
     })
     // Methods we EXPECT to be wired (subset of agentHostBindings.ts).
     // executePreCompactHooks is NOT in this list — it's imported directly
@@ -161,10 +167,7 @@ export async function probeRuntime(): Promise<RuntimeProbeReport> {
           agent_transcript_path: '',
         },
       ],
-      [
-        'SessionStart',
-        { hook_event_name: 'SessionStart', source: 'startup' },
-      ],
+      ['SessionStart', { hook_event_name: 'SessionStart', source: 'startup' }],
       [
         'PreToolUse',
         {
@@ -178,10 +181,7 @@ export async function probeRuntime(): Promise<RuntimeProbeReport> {
         'UserPromptSubmit',
         { hook_event_name: 'UserPromptSubmit', prompt: 'probe' },
       ],
-      [
-        'PreCompact',
-        { hook_event_name: 'PreCompact', trigger: 'auto' },
-      ],
+      ['PreCompact', { hook_event_name: 'PreCompact', trigger: 'auto' }],
       [
         'Notification',
         { hook_event_name: 'Notification', notification_type: 'probe' },
@@ -205,9 +205,7 @@ export async function probeRuntime(): Promise<RuntimeProbeReport> {
         }
       } catch (e) {
         report.dispatch[event] = { matched: -1, pluginNames: [] }
-        errors.push(
-          `getMatchingHooks(${event}) threw: ${(e as Error).message}`,
-        )
+        errors.push(`getMatchingHooks(${event}) threw: ${(e as Error).message}`)
       }
     }
   } catch (e) {

@@ -80,10 +80,10 @@ export function getAPIContextManagement(
 
   if (useClearToolResults) {
     const triggerThreshold = deps.getEnv('API_MAX_INPUT_TOKENS')
-      ? parseInt(deps.getEnv('API_MAX_INPUT_TOKENS')!)
+      ? parseInt(deps.getEnv('API_MAX_INPUT_TOKENS')!, 10)
       : DEFAULT_MAX_INPUT_TOKENS
     const keepTarget = deps.getEnv('API_TARGET_INPUT_TOKENS')
-      ? parseInt(deps.getEnv('API_TARGET_INPUT_TOKENS')!)
+      ? parseInt(deps.getEnv('API_TARGET_INPUT_TOKENS')!, 10)
       : DEFAULT_TARGET_INPUT_TOKENS
 
     strategies.push({
@@ -96,10 +96,10 @@ export function getAPIContextManagement(
 
   if (useClearToolUses) {
     const triggerThreshold = deps.getEnv('API_MAX_INPUT_TOKENS')
-      ? parseInt(deps.getEnv('API_MAX_INPUT_TOKENS')!)
+      ? parseInt(deps.getEnv('API_MAX_INPUT_TOKENS')!, 10)
       : DEFAULT_MAX_INPUT_TOKENS
     const keepTarget = deps.getEnv('API_TARGET_INPUT_TOKENS')
-      ? parseInt(deps.getEnv('API_TARGET_INPUT_TOKENS')!)
+      ? parseInt(deps.getEnv('API_TARGET_INPUT_TOKENS')!, 10)
       : DEFAULT_TARGET_INPUT_TOKENS
 
     strategies.push({

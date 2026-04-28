@@ -116,7 +116,7 @@ export function jsonParse<T = unknown>(text: string): T {
 const BASE_DELAY_MS = 1000
 
 export function getRetryDelay(attempt: number, maxDelayMs = 32000): number {
-  return Math.min(BASE_DELAY_MS * Math.pow(2, attempt - 1), maxDelayMs)
+  return Math.min(BASE_DELAY_MS * 2 ** (attempt - 1), maxDelayMs)
 }
 
 // ── Axios error classifier ────────────────────────────────────────────────────

@@ -26,7 +26,9 @@ beforeAll(() => {
 
 afterAll(() => {
   process.chdir(originalCwd)
-  try { rmSync(tempProjectDir, { recursive: true, force: true }) } catch {}
+  try {
+    rmSync(tempProjectDir, { recursive: true, force: true })
+  } catch {}
 })
 
 describe('smoke:resume session persistence', () => {
@@ -69,7 +71,10 @@ describe('smoke:resume session persistence', () => {
       // Empty messages is the boundary case. If it throws, the issue is
       // in the function itself; that's a real silent-failure surface.
       const msg = (e as Error).message
-      if (msg.includes('null is not an object') || msg.includes('undefined is not')) {
+      if (
+        msg.includes('null is not an object') ||
+        msg.includes('undefined is not')
+      ) {
         throw new Error(
           `recordTranscript([]) crashed with null-deref: ${msg}. ` +
             `This is the silent-failure class — likely an unwired binding.`,

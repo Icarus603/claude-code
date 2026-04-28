@@ -40,7 +40,6 @@ const BUDGET: Record<string, number> = {
   'packages/mcp-runtime': 8,
   'packages/bridge': 4,
   'packages/provider': 2,
-  'packages/command-runtime': 3,
   'packages/permission': 3,
   'packages/output': 1,
   'packages/voice': 1,
