@@ -884,13 +884,14 @@ async function callInner(
         parsedRange ?? undefined,
       )
       if (!extractResult.success) {
-        // PDFResult<T> is a discriminated union but TS doesn't narrow it
-        // here in the decompiled codebase context — bypass with `as any`.
-        throw new Error((extractResult as any).error.message)
+        // PDFResult<T> narrowing: in some build configs TS doesn't narrow
+        // through the negated `if`, so cast to the error variant explicitly.
+        const err = (extractResult as Extract<typeof extractResult, { success: false }>).error
+        throw new Error(err.message)
       }
       logEvent('tengu_pdf_page_extraction', {
         success: true,
-        pageCount: (extractResult as any).data.file.count,
+        pageCount: extractResult.data.file.count,
         fileSize: extractResult.data.file.originalSize,
         hasPageRange: true,
       })
@@ -955,10 +956,10 @@ async function callInner(
           fileSize: extractResult.data.file.originalSize,
         })
       } else {
+        const err = (extractResult as Extract<typeof extractResult, { success: false }>).error
         logEvent('tengu_pdf_page_extraction', {
           success: false,
-          // PDFResult<T> narrowing fails in decompiled codebase context
-          available: (extractResult as any).error.reason !== 'unavailable',
+          available: err.reason !== 'unavailable',
           fileSize: stats.size,
         })
       }
@@ -974,8 +975,8 @@ async function callInner(
 
     const readResult = await readPDF(resolvedFilePath)
     if (!readResult.success) {
-      // PDFResult<T> narrowing fails in decompiled codebase context
-      throw new Error((readResult as any).error.message)
+      const err = (readResult as Extract<typeof readResult, { success: false }>).error
+      throw new Error(err.message)
     }
     const pdfData = readResult.data
     logFileOperation({
