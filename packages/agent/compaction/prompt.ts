@@ -2,6 +2,8 @@
  *
  */
 
+import { getInitialSettings } from '@claude-code/config/settings'
+
 export type CompactDirection = 'from' | 'up_to'
 
 // Aggressive no-tools preamble. The cache-sharing fork path inherits the
@@ -360,8 +362,24 @@ Continue the conversation from where it left off without asking the user any fur
 You are running in autonomous/proactive mode. This is NOT a first wake-up — you were already working autonomously before compaction. Continue your work loop: pick up where you left off based on the summary above. Do not greet the user or ask what to work on.`
     }
 
-    return continuation
+    return appendLanguageReminder(continuation)
   }
 
-  return baseSummary
+  return appendLanguageReminder(baseSummary)
+}
+
+/**
+ * Append a language-preference reminder to compaction summary messages.
+ * The summary structure is hardcoded English (section headers, framing
+ * sentences) and dominates recency in the post-compact context, which can
+ * pull the model away from the user's configured response language. This
+ * reminder runs after the summary so it sits closest to the next response.
+ * No-op when no language preference is set.
+ */
+function appendLanguageReminder(message: string): string {
+  const language = getInitialSettings().language
+  if (!language) return message
+  return `${message}
+
+(The summary above is structured in English for technical fidelity. Continue responding to the user in ${language}, as configured.)`
 }
