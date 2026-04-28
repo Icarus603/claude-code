@@ -33,6 +33,21 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
   // users were seeing vs official. Falls through to the caller's `false`
   // default; the feature is still wired and can be re-enabled per-user via
   // GrowthBook or CLAUDE_CODE_FEATURE_OVERRIDES.
+
+  // 1h prompt-cache TTL allowlist. ant 2.1.121 deobf 4682.js JqH() ships
+  // this exact list as the inline default to its GrowthBook lookup, so
+  // when GrowthBook is offline (always for ccb) interactive REPL still
+  // gets 1h TTL — saves writing a fresh cache every time the user spends
+  // >5min between turns. Caller-side `userEligible` check still gates on
+  // claude.ai subscription + non-overage so 3P API users are unaffected.
+  tengu_prompt_cache_1h_config: {
+    allowlist: [
+      'repl_main_thread*',
+      'sdk',
+      'auto_mode',
+      'memdir_relevance',
+    ],
+  },
   tengu_passport_quail: true,
   tengu_moth_copse: true,
   tengu_coral_fern: true,
