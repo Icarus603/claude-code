@@ -7,8 +7,9 @@
  * from ./error-log.ts which must stay dep-free so log calls before startup
  * can be safely queued.
  *
- * Bridge-injected deps arrive via ../_deps.ts setters: fs impl, cache paths,
- * session id, cleanup registry, debug logger, sentry captureException.
+ * Cross-package deps (direct imports): fs from storage/fsOperations,
+ * cache paths from storage/cache-paths, session id + cleanup registry
+ * from app-host/bootstrap, debug logger + sentry from this package.
  */
 
 import axios from 'axios'
@@ -23,7 +24,8 @@ import { captureException } from '../sentry.js'
 import { logForDebugging } from '../debug.js'
 import { jsonStringify } from '../slowOperations.js'
 
-// Local shim mapping former _deps shape to the storage package's CACHE_PATHS.
+// Local shim wrapping CACHE_PATHS into the lazy-call shape this module
+// expects (callers do `getCachePaths().errors()` not `CACHE_PATHS.errors()`).
 const getCachePaths = (): { errors(): string; mcpLogs(serverName: string): string } => ({
   errors: () => CACHE_PATHS.errors(),
   mcpLogs: (serverName: string) => CACHE_PATHS.mcpLogs(serverName),

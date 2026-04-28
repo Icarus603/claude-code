@@ -9,8 +9,9 @@
  * attachment mechanism. It has NO heavy deps — events queue until
  * `attachErrorLogSink()` connects a real sink (see ./error-log-sink.ts).
  *
- * Cross-boundary state (sessionId, lastAPIRequest, privacy flag) comes
- * through setters on `../_deps.ts`.
+ * Cross-boundary state (sessionId, lastAPIRequest, privacy flag) is
+ * imported directly from app-host/state and config/env (function-level
+ * access only — ESM resolves the cycle at call time).
  */
 
 import { feature } from 'bun:bundle'
