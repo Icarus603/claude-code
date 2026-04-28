@@ -29,7 +29,10 @@ export function extractConversationText(messages: Message[]): string {
   for (const msg of messages) {
     if (msg.type !== 'user' && msg.type !== 'assistant') continue
     if ('isMeta' in msg && msg.isMeta) continue
-    if ('origin' in msg && (msg as any).origin && (msg as any).origin.kind !== 'human') continue
+    // `origin` is an optional metadata field added by some message
+    // sources (channels, agents); narrow once instead of twice.
+    const origin = (msg as Message & { origin?: { kind: string } }).origin
+    if (origin && origin.kind !== 'human') continue
     const content = msg.message.content
     if (typeof content === 'string') {
       parts.push(content)

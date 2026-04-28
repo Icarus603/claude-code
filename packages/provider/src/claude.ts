@@ -1,3 +1,9 @@
+/**
+ * claude — top-level provider router. `as any` casts bridge between the
+ * router's input shape (Message[], SystemPrompt) and each provider
+ * adapter's variant; by-design type-system bypass for SDK-to-SDK shape
+ * translation across the multi-provider router seam.
+ */
 import { getProviderAdapter } from './index.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type {

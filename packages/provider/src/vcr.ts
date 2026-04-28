@@ -1,3 +1,8 @@
+/**
+ * VCR — record/replay tape format. `as any` casts handle
+ * SDK-to-SDK shape translation when fixtures cross SDK versions
+ * (BetaContentBlock variants vary). By-design type-system bypass.
+ */
 import type { BetaContentBlock, BetaUsage } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { createHash, randomUUID, type UUID } from 'crypto'
 import { mkdir, readFile, writeFile } from 'fs/promises'

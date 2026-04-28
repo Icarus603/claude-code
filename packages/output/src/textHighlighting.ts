@@ -127,15 +127,18 @@ class HighlightSegmenter {
         this.stringPos += token.code.length
         this.tokenIdx++
       } else {
+        // ansi-tokenize's non-ansi token has `value: string` but the
+        // exported union doesn't narrow on `type !== 'ansi'`.
+        const value = (token as { value: string }).value
         const charsNeeded = targetVisiblePos - this.visiblePos
-        const charsAvailable = (token as any).value.length - this.charIdx
+        const charsAvailable = value.length - this.charIdx
         const charsToTake = Math.min(charsNeeded, charsAvailable)
 
         this.stringPos += charsToTake
         this.visiblePos += charsToTake
         this.charIdx += charsToTake
 
-        if (this.charIdx >= (token as any).value.length) {
+        if (this.charIdx >= value.length) {
           this.tokenIdx++
           this.charIdx = 0
         }

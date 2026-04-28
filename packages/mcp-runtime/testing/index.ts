@@ -1,3 +1,10 @@
+/**
+ * In-memory MCP runtime for testing. Test-helper file — `as any/unknown`
+ * casts adapt the in-memory runtime's concrete types to the generic
+ * test-side types (TConfig/TTool/TCommand/TConnection). By-design
+ * runtime-binding-pattern bypass; the casts are at the seam between
+ * concrete and generic test surfaces.
+ */
 import type { McpRuntimeHostBindings } from '../src/contracts.js'
 
 export class InMemoryMcpRuntime<

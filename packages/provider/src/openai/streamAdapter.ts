@@ -1,3 +1,9 @@
+/**
+ * OpenAI stream adapter — SDK-to-SDK shape translation. Heavy `as any`
+ * usage is by-design type-system bypass: OpenAI extensions like
+ * `prompt_tokens_details` and `reasoning_content` are runtime fields
+ * not in the published `ChatCompletionChunk` types.
+ */
 import type { BetaRawMessageStreamEvent } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions/completions.mjs'
 import { randomUUID } from 'crypto'

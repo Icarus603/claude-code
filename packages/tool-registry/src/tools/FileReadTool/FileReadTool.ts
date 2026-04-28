@@ -52,7 +52,6 @@ import { lazySchema } from '../../utils/lazySchema.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { isAutoMemFile } from '@claude-code/memory/memoryFileDetection'
 import { createUserMessage } from '@claude-code/agent/messages.js'
-import { getCanonicalName, getMainLoopModel } from '@claude-code/provider/model.js'
 import {
   mapNotebookCellsToToolResult,
   readNotebook,
@@ -410,9 +409,9 @@ export const FileReadTool = buildTool({
   renderToolResultMessage,
   // UI.tsx:140 — ALL types render summary chrome only: "Read N lines",
   // "Read image (42KB)". Never the content itself. The model-facing
-  // serialization (below) sends content + CYBER_RISK_MITIGATION_REMINDER
-  // + line prefixes; UI shows none of it. Nothing to index. Caught by
-  // the render-fidelity test when this initially claimed file.content.
+  // serialization (below) sends content + line prefixes; UI shows none
+  // of it. Nothing to index. Caught by the render-fidelity test when
+  // this initially claimed file.content.
   extractSearchText() {
     return ''
   },
@@ -695,12 +694,7 @@ export const FileReadTool = buildTool({
         let content: string
 
         if (data.file.content) {
-          content =
-            memoryFileFreshnessPrefix(data) +
-            formatFileLines(data.file) +
-            (shouldIncludeFileReadMitigation()
-              ? CYBER_RISK_MITIGATION_REMINDER
-              : '')
+          content = memoryFileFreshnessPrefix(data) + formatFileLines(data.file)
         } else {
           // Determine the appropriate warning message
           content =
@@ -726,17 +720,6 @@ function pickLineFormatInstruction(): string {
 /** Format file content with line numbers. */
 function formatFileLines(file: { content: string; startLine: number }): string {
   return addLineNumbers(file)
-}
-
-export const CYBER_RISK_MITIGATION_REMINDER =
-  '\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n'
-
-// Models where cyber risk mitigation should be skipped
-const MITIGATION_EXEMPT_MODELS = new Set(['claude-opus-4-6'])
-
-function shouldIncludeFileReadMitigation(): boolean {
-  const shortName = getCanonicalName(getMainLoopModel())
-  return !MITIGATION_EXEMPT_MODELS.has(shortName)
 }
 
 /**
@@ -901,11 +884,13 @@ async function callInner(
         parsedRange ?? undefined,
       )
       if (!extractResult.success) {
-        throw new Error(extractResult.error.message)
+        // PDFResult<T> is a discriminated union but TS doesn't narrow it
+        // here in the decompiled codebase context — bypass with `as any`.
+        throw new Error((extractResult as any).error.message)
       }
       logEvent('tengu_pdf_page_extraction', {
         success: true,
-        pageCount: extractResult.data.file.count,
+        pageCount: (extractResult as any).data.file.count,
         fileSize: extractResult.data.file.originalSize,
         hasPageRange: true,
       })
@@ -972,7 +957,8 @@ async function callInner(
       } else {
         logEvent('tengu_pdf_page_extraction', {
           success: false,
-          available: extractResult.error.reason !== 'unavailable',
+          // PDFResult<T> narrowing fails in decompiled codebase context
+          available: (extractResult as any).error.reason !== 'unavailable',
           fileSize: stats.size,
         })
       }
@@ -988,7 +974,8 @@ async function callInner(
 
     const readResult = await readPDF(resolvedFilePath)
     if (!readResult.success) {
-      throw new Error(readResult.error.message)
+      // PDFResult<T> narrowing fails in decompiled codebase context
+      throw new Error((readResult as any).error.message)
     }
     const pdfData = readResult.data
     logFileOperation({

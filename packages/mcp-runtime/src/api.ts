@@ -105,8 +105,13 @@ export async function discover<
     tools.push(...result.tools)
     commands.push(...result.commands)
     if (result.resources) {
-      resources[(result.client as any)?.name ?? `server-${clients.length}`] =
-        result.resources
+      // TMcpConnection is generic and doesn't expose `.name` on its
+      // base contract; concrete connections do. Falls back to a
+      // synthetic key when the impl omits it.
+      resources[
+        (result.client as { name?: string } | null)?.name ??
+          `server-${clients.length}`
+      ] = result.resources
     }
   }, configs)
 

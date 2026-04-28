@@ -1,5 +1,10 @@
 /* eslint-disable eslint-plugin-n/no-unsupported-features/node-builtins */
 /**
+ * CONNECT-over-WebSocket relay. WebSocket binary types differ across
+ * Node/Bun/ws — `ws.send(... as any)` is by-design type-system bypass
+ * for WebSocket-API compatibility (Buffer vs ArrayBufferLike vs
+ * Uint8Array all work at runtime).
+ *
  * CONNECT-over-WebSocket relay for CCR upstreamproxy.
  *
  * Listens on localhost TCP, accepts HTTP CONNECT from curl/gh/kubectl/etc,
