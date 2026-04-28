@@ -52,13 +52,22 @@ packages/command-registry app-compat=0 src-import=0
 packages/mcp-runtime app-compat=58 src-import=0
 ```
 
-## Host Monolith Snapshot
+## Mega-file Snapshot (post-V7)
+
+V7 migrated all source under `packages/`. The src/ tree no longer
+exists. Monolithic files surviving the migration are tracked in
+`scripts/file-size-baseline.json` (one-way ratchet — files may shrink
+but never grow). Top 5 by line count:
 
 ```text
-src/main.tsx: 6583 lines
-src/screens/REPL.tsx: 6142 lines
-src/cli/print.ts: 5600 lines
+packages/repl/src/screens/REPLView.tsx: 5641 lines
+packages/agent/messages.ts: 5626 lines
+packages/agent/hooks.ts: 5178 lines
+packages/storage/src/sessionStorage.ts: 4721 lines
+packages/cli/src/entry/mode-dispatch.ts: 4376 lines
 ```
+
+Decomposition of these (P7.2-P7.7) is tracked in TaskList.
 
 ## Verification Lock
 
