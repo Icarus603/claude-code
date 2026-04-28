@@ -98,6 +98,17 @@ for (const fn of allFns) {
     if (seen.has(key)) continue
     seen.add(key)
 
+    // Skip well-known V7 §11.2 host-binding names — these are designed
+    // cross-package contracts (reader pkg consumes via host binding,
+    // writer pkg owns the impl + writes shared STATE). Not a divergence.
+    const HOST_BINDING_NAMES = new Set([
+      'Cwd', 'OriginalCwd', 'FsImplementation', 'InlinePlugins',
+      'AdditionalDirectoriesForClaudeMd', 'UseCoworkPlugins', 'Value',
+      'SessionId', 'ProjectRoot', 'GlobalClaudeFile', 'ConfigHomeDir',
+      'CwdState', 'ModelStrings', 'SdkBetas', 'PlanSlug',
+    ])
+    if (HOST_BINDING_NAMES.has(noun)) continue
+
     // Pair every reader with every writer to detect cross-package writes.
     for (const r of readerSites) {
       for (const w of writerSites) {
