@@ -1,5 +1,8 @@
 /**
  * Cross-platform (Windows/Linux) ComputerExecutor implementation.
+ * Native-module wrapper — `as any` casts (`this`, mouse-state helpers,
+ * platform.windowManagement action types) are by-design type-system
+ * bypass for the FFI/native-module cross-talk pattern.
  *
  * Unlike the macOS executor which uses @ant native modules + drainRunLoop +
  * CGEventTap, this executor delegates everything to src/utils/computerUse/platforms/.

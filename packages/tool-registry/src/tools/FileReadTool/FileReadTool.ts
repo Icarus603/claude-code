@@ -1183,6 +1183,10 @@ export async function readImageWithTokenBudget(
             } & typeof sharpModule
           ).default || sharpModule
 
+        // sharp's exported type is the namespace; the call form
+        // `sharp(buffer)` is also valid at runtime but TS only sees
+        // the namespace. SDK-version compatibility cast.
+        // biome-ignore lint/suspicious/noExplicitAny: sharp's type bridges runtime call form
         const fallbackBuffer = await (sharp as any)(imageBuffer)
           .resize(400, 400, {
             fit: 'inside',

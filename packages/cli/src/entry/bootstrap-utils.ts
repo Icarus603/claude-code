@@ -68,9 +68,12 @@ export function isBeingDebugged() {
 
   // Check if inspector is available and active (indicates debugging)
   try {
-    // Dynamic import would be better but is async - use global object instead
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const inspector = (global as any).require('inspector')
+    // Dynamic import would be better but is async — use the runtime's
+    // synchronous require off the global. Available under both Bun and
+    // CommonJS-mode Node; absent under ESM-only Node (caught below).
+    const globalRequire = (global as unknown as { require?: NodeRequire }).require
+    if (!globalRequire) throw new Error('synchronous require unavailable')
+    const inspector = globalRequire('inspector') as { url(): string | undefined }
     const hasInspectorUrl = !!inspector.url()
     return hasInspectorUrl || hasInspectArg || hasInspectEnv
   } catch {

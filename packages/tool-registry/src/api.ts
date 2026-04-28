@@ -50,7 +50,15 @@ export function getAllBaseTools(): ToolLike[] {
 export function filterToolsByDenyRules<
   T extends { name: string; mcpInfo?: { serverName: string; toolName: string } },
 >(tools: readonly T[], permissionContext: ToolPermissionContextLike): T[] {
-  return getToolRegistry().filterByDenyRules(tools, permissionContext as any)
+  // ToolPermissionContextLike vs ToolPermissionContext: structurally
+  // identical surface, two parallel declarations across packages.
+  // Runtime-binding pattern — same shape, cross-pkg type bridge.
+  return getToolRegistry().filterByDenyRules(
+    tools,
+    permissionContext as Parameters<
+      ReturnType<typeof getToolRegistry>['filterByDenyRules']
+    >[1],
+  )
 }
 
 export function getTools(permissionContext: ToolPermissionContextLike): ToolLike[] {
