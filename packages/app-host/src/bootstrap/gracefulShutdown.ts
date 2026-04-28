@@ -1,3 +1,9 @@
+/**
+ * gracefulShutdown — process-exit handler. Empty `catch {}` blocks
+ * here are by-design fire-and-forget cleanup: during shutdown each
+ * cleanup callback must attempt its work; one throwing must not stop
+ * others. Errors are swallowed because we're already on the exit path.
+ */
 import chalk from 'chalk'
 import { writeSync } from 'fs'
 import memoize from 'lodash-es/memoize.js'

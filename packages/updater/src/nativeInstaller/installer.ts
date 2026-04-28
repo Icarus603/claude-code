@@ -1,13 +1,12 @@
 /**
- * Native Installer Implementation
+ * Native Installer — file-based installer (docs/native-installer.md):
+ * directory+symlink layout, version activation, multi-process locking,
+ * mtime fallback, JS/native build support.
  *
- * This module implements the file-based native installer system described in
- * docs/native-installer.md. It provides:
- * - Directory structure management with symlinks
- * - Version installation and activation
- * - Multi-process safety with locking
- * - Simple fallback mechanism using modification time
- * - Support for both JS and native builds
+ * Empty `catch {}` blocks are best-effort filesystem ops: stat probes,
+ * stale-temp cleanup, opportunistic gc. Lock + mtime fallback
+ * guarantees safe re-attempt on next run; none of these errors block
+ * install correctness, so we silently swallow.
  */
 
 import { constants as fsConstants, type Stats } from 'fs'
