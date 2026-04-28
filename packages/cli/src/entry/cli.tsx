@@ -3,8 +3,19 @@ import { feature } from 'bun:bundle'
 
 // Runtime fallback for MACRO.* when not injected by build/dev defines.
 // This happens when running cli.tsx directly (not via `bun run dev` or built dist/).
-if (typeof globalThis.MACRO === 'undefined') {
-  ;(globalThis as any).MACRO = {
+type MacroShape = Record<
+  | 'VERSION'
+  | 'BUILD_TIME'
+  | 'FEEDBACK_CHANNEL'
+  | 'ISSUES_EXPLAINER'
+  | 'NATIVE_PACKAGE_URL'
+  | 'PACKAGE_URL'
+  | 'VERSION_CHANGELOG',
+  string
+>
+const macroSlot = globalThis as typeof globalThis & { MACRO?: MacroShape }
+if (typeof macroSlot.MACRO === 'undefined') {
+  macroSlot.MACRO = {
     VERSION: process.env.CLAUDE_CODE_VERSION || '1.carus.000',
     BUILD_TIME: new Date().toISOString(),
     FEEDBACK_CHANNEL: '',

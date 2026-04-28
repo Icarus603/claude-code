@@ -1692,8 +1692,8 @@ export function runHeadlessStreaming(
                 output.enqueue({
                   type: 'system' as const,
                   subtype: 'files_persisted' as const,
-                  files: (result as any).persistedFiles,
-                  failed: (result as any).failedFiles,
+                  files: result.files,
+                  failed: result.failed,
                   processed_at: new Date().toISOString(),
                   uuid: randomUUID(),
                   session_id: getSessionId(),

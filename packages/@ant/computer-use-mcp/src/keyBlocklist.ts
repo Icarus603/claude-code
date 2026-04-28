@@ -123,8 +123,9 @@ export function normalizeKeySequence(seq: string): string {
  */
 export function isSystemKeyCombo(
   seq: string,
-  platform: "darwin" | "win32",
+  platform: "darwin" | "win32" | "linux",
 ): boolean {
+  // Linux falls back to the win32 blocklist (no native dedicated list).
   const blocklist = platform === "darwin" ? BLOCKED_DARWIN : BLOCKED_WIN32;
   const { mods, keys } = partitionKeys(seq);
   const prefix = mods.length > 0 ? mods.join("+") + "+" : "";
