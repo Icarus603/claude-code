@@ -398,7 +398,7 @@ export class CCRClient {
         if (!result.ok) {
           throw new RetryableError(
             'internal event POST failed',
-            (result as any).retryAfterMs,
+            result.retryAfterMs,
           )
         }
       },

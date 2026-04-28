@@ -78,7 +78,12 @@ function extractTodosFromTranscript(messages: Message[]): TodoList {
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i]
     if (msg?.type !== 'assistant') continue
-    const toolUse = (msg.message.content as any[]).find(
+    const content = msg.message.content as Array<{
+      type: string
+      name?: string
+      input?: unknown
+    }>
+    const toolUse = content.find(
       block => block.type === 'tool_use' && block.name === TODO_WRITE_TOOL_NAME,
     )
     if (!toolUse || toolUse.type !== 'tool_use') continue
