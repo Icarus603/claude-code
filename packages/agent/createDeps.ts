@@ -252,7 +252,11 @@ class OutputDepImpl implements AgentDeps['output'] {
 }
 
 class HookDepImpl implements AgentDeps['hooks'] {
-  constructor(private readonly toolUseContext: RuntimeToolUseContext) {}
+  constructor(
+    private readonly toolUseContext: RuntimeToolUseContext,
+    private readonly querySource: string,
+    private readonly contextOverrides: CreateDepsParams['contextOverrides'],
+  ) {}
 
   async onTurnStart(): Promise<void> {}
 
@@ -260,17 +264,70 @@ class HookDepImpl implements AgentDeps['hooks'] {
 
   async onStop(
     messages: CoreMessage[],
-    context: StopHookContext,
+    _context: StopHookContext,
   ): Promise<StopHookResult> {
+    // handleStopHooks is an AsyncGenerator with a StopHookResult return value.
+    // Iterating drives the body to completion; the return value lives on the
+    // final iterator result (`done: true`). The previous `await handleStopHooks(...)`
+    // bug never iterated, so the body never ran and `result?.blockingErrors`
+    // was always undefined — plugin Stop hooks silently no-op'd in headless.
     try {
-      const result = await handleStopHooks(
-        messages as AgentMessage[],
-        this.toolUseContext,
+      const systemPrompt =
+        (this.contextOverrides?.systemPrompt ?? []) as never[]
+      const userContext = this.contextOverrides?.userContext ?? {}
+      const systemContext = this.contextOverrides?.systemContext ?? {}
+
+      // Split incoming messages into the (history, assistant-tail) shape
+      // handleStopHooks expects. The tail is everything after the last
+      // user/system message, i.e. assistant turns only — matching what
+      // query.ts passes (`messagesForQuery`, `assistantMessages`).
+      const lastNonAssistant = (messages as AgentMessage[]).findLastIndex(
+        m => m.type !== 'assistant',
       )
-      return {
-        blockingErrors: result?.blockingErrors ?? [],
-        preventContinuation: result?.preventContinuation ?? false,
+      const messagesForQuery =
+        lastNonAssistant >= 0
+          ? (messages.slice(0, lastNonAssistant + 1) as AgentMessage[])
+          : []
+      const assistantMessages =
+        lastNonAssistant >= 0
+          ? (messages.slice(lastNonAssistant + 1) as AgentAssistantMessage[])
+          : (messages as AgentAssistantMessage[])
+
+      const generator = handleStopHooks(
+        messagesForQuery,
+        assistantMessages,
+        systemPrompt,
+        userContext as Record<string, string>,
+        systemContext as Record<string, string>,
+        this.toolUseContext,
+        this.querySource as never,
+      )
+
+      // Drain the generator. Yielded items are progress messages destined
+      // for the REPL transcript; in the headless path we just discard them
+      // (the SDK driver doesn't have a transcript stream to surface them on).
+      // The final return value carries the result — `for await` skips it,
+      // so we step the iterator manually.
+      let lastResult: StopHookResult = {
+        blockingErrors: [],
+        preventContinuation: false,
       }
+      let next = await generator.next()
+      while (!next.done) {
+        next = await generator.next()
+      }
+      if (next.value) {
+        lastResult = {
+          blockingErrors:
+            (next.value as { blockingErrors?: unknown[] })?.blockingErrors?.map(
+              String,
+            ) ?? [],
+          preventContinuation:
+            (next.value as { preventContinuation?: boolean })
+              ?.preventContinuation ?? false,
+        }
+      }
+      return lastResult
     } catch {
       return { blockingErrors: [], preventContinuation: false }
     }
@@ -345,7 +402,11 @@ export function createProductionDeps(params: CreateDepsParams): AgentDeps {
     tools: new ToolDepImpl(tools, toolUseContext),
     permission: new PermissionDepImpl(canUseTool, toolUseContext, tools),
     output: new OutputDepImpl(emitFn),
-    hooks: new HookDepImpl(toolUseContext),
+    hooks: new HookDepImpl(
+      toolUseContext,
+      querySource ?? 'sdk',
+      contextOverrides,
+    ),
     compaction: {
       maybeCompact: async messages => ({
         compacted: false,

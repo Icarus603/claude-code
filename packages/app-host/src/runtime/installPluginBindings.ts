@@ -58,12 +58,19 @@ import {
   setGetMcpTypesFn,
   setParseMarkdownFrontmatterFn,
   setWalkMarkdownFilesFn,
+  setGetRegisteredHooksFn,
+  setRegisterHookCallbacksFn,
+  setClearRegisteredPluginHooksFn,
+  setGetSecureStorageFn,
 } from '@claude-code/config/plugin/_deps'
 
 import {
+  clearRegisteredPluginHooks,
   getInlinePlugins,
   getOriginalCwd,
+  getRegisteredHooks,
   getSessionId,
+  registerHookCallbacks,
 } from '../bootstrap/state.js'
 import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
 import { registerCleanup } from '../bootstrap/cleanupRegistry.js'
@@ -108,6 +115,25 @@ export function installPluginBindings(): void {
   setLogForDiagnosticsNoPIIFn((level, event, data) =>
     logForDiagnosticsNoPII(level, event, data),
   )
+
+  // --- registered hooks (THE root cause of plugin Stop hooks not firing
+  // post-V7: loadPluginHooks() writes to _deps.ts placeholders, agent/hooks.ts
+  // reads from app-host STATE. Without these three wires the halves diverge
+  // and every plugin hook silently lands in a no-op slot.)
+  setGetRegisteredHooksFn(() => getRegisteredHooks() as never)
+  setRegisterHookCallbacksFn(hooks => registerHookCallbacks(hooks as never))
+  setClearRegisteredPluginHooksFn(() => clearRegisteredPluginHooks())
+
+  // --- secureStorage (sister wire of registered hooks: same V7 setter slot
+  // pattern, also never connected. loadPluginOptions reads `storage.read()`
+  // and crashes on null when the placeholder default fires — surfaces as
+  // "null is not an object (evaluating storage.read())" inside every hook
+  // command spawn.)
+  setGetSecureStorageFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('@claude-code/storage/secureStorage.js')
+    return mod.getSecureStorage?.() ?? null
+  })
 
   // --- session / cwd
   setGetSessionIdFn(() => getSessionId())
