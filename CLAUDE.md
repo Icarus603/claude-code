@@ -51,8 +51,8 @@ bun run docs:dev
 ### Runtime & Build
 
 - **Runtime**: Bun (not Node.js). All imports, builds, and execution use Bun APIs.
-- **Build**: `build.ts` 執行 `Bun.build()` with `splitting: true`，入口 `src/entrypoints/cli.tsx`，輸出 `dist/cli.js` + chunk files。默認啓用 `AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE` feature。構建後自動替換 `import.meta.require` 爲 Node.js 兼容版本（產物 bun/node 都可運行）。
-- **Dev mode**: `scripts/dev.ts` 通過 Bun `-d` flag 注入 `MACRO.*` defines，運行 `src/entrypoints/cli.tsx`。默認啓用 `TRANSCRIPT_CLASSIFIER`、`BRIDGE_MODE`、`AGENT_TRIGGERS_REMOTE`、`CHICAGO_MCP`、`VOICE_MODE` 等 feature。
+- **Build**: `build.ts` 執行 `Bun.build()` with `splitting: false`，入口 `packages/cli/src/entry/cli.tsx`，輸出 `dist/cli.js`（單一檔案，無 chunk）。Default features 統一從 `scripts/default-features.ts:STABLE_FEATURES` 讀（dev.ts 也共用同一份）。`target: 'bun'` —— 產物用 Bun runtime 執行（含 `globalThis.Bun.$`、`Bun.embeddedFiles` 等 Bun-only API）。`__require` 仍會後處理成 Node 兼容形式，但 `node dist/cli.js` 整體已不可運行。
+- **Dev mode**: `scripts/dev.ts` 通過 Bun `-d` flag 注入 `MACRO.*` defines，運行 `packages/cli/src/entry/cli.tsx`。Default features 同 build（從 `scripts/default-features.ts` 讀）。額外 `FEATURE_<NAME>=1` env var 可加掛單次運行的 feature。
 - **Module system**: ESM (`"type": "module"`), TSX with `react-jsx` transform.
 - **Monorepo**: Bun workspaces — internal packages live in `packages/` resolved via `workspace:*`.
 - **Lint/Format**: Biome (`biome.json`)。`bun run lint` / `bun run lint:fix` / `bun run format`。
@@ -269,5 +269,5 @@ bun run release v26.4.1   # 自動 tag + push;CI 跑 release.yml 構建 + 上傳
 - **`bun:bundle` import** — `import { feature } from 'bun:bundle'` 是 Bun 內置模塊，由運行時/構建器解析。不要用自定義函數替代它。
 - **`src/` path alias** — tsconfig maps `src/*` to `./src/*`. Imports like `import { ... } from 'src/utils/...'` are valid.
 - **MACRO defines** — 集中管理在 `scripts/defines.ts`。Dev mode 通過 `bun -d` 注入，build 通過 `Bun.build({ define })` 注入。修改版本號等常量只改這個文件。
-- **構建產物兼容 Node.js** — `build.ts` 會自動後處理 `import.meta.require`，產物可直接用 `node dist/cli.js` 運行。
+- **構建產物只兼容 Bun** — `build.ts` 用 `target: 'bun'`。產物含 `globalThis.Bun.$`、`Bun.embeddedFiles` 等 Bun-only API。`__require` 雖經後處理保留 Node-fallback，但整體 `node dist/cli.js` 不可執行。用 `bun dist/cli.js` 或 release binary。
 - **Biome 配置** — 大量 lint 規則被關閉（decompiled 代碼不適合嚴格 lint）。`.tsx` 文件用 120 行寬 + 強制分號；其他文件 80 行寬 + 按需分號。
