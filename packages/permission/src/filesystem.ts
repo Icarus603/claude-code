@@ -1,3 +1,8 @@
+/**
+ * permission/filesystem — host-binding adapter for filesystem-level
+ * permission decisions. The `_b()` host-bindings shim is by-design
+ * runtime-binding pattern type-system bypass.
+ */
 import { feature } from 'bun:bundle'
 import { randomBytes } from 'crypto'
 import ignore from 'ignore'

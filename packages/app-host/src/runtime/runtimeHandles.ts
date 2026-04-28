@@ -1,3 +1,10 @@
+/**
+ * runtimeHandles — host-binding adapter that exposes runtime store
+ * surfaces (permission, mcp, plugin, agent catalog) to higher
+ * packages. `as any` casts on permission updates bridge between this
+ * package's `PermissionUpdate[]` and the upstream packages' nominally
+ * identical-but-distinct declarations. Runtime-binding pattern.
+ */
 import type {
   AgentCatalogHandle,
   HostSessionStore,

@@ -1,3 +1,10 @@
+/**
+ * runtime/bootstrap — top-level host-binding adapter wire. `as any`
+ * casts here are by-design type-system bypass for the runtime-binding
+ * pattern: each call site bridges an outer generic (initialState,
+ * AppState, metadata) to a concrete inner type whose declarations
+ * differ across packages but whose shapes are identical at runtime.
+ */
 import { installPackageHostBindings } from '../packageHostSetup.js'
 import { createInteractiveSessionStore } from '@claude-code/agent/sessionStores.js'
 import { syncRuntimeHandlesFromAppState } from './runtimeHandles.js'

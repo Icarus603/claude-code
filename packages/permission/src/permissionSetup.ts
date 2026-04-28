@@ -1,8 +1,15 @@
+/**
+ * permissionSetup — host-binding adapter calls. The `_b()` shim bypass
+ * is by-design type-system bypass for the runtime-binding pattern;
+ * each method is treated as optional at runtime via `?.()` so a
+ * missing host binding silently no-ops rather than crashing.
+ */
 import { feature } from 'bun:bundle'
 import { relative } from 'path'
 import { getPermissionHostBindings } from './host.js'
 import { ContextError } from './errors.js'
 const _b = () => getPermissionHostBindings() as any
+
 function getOriginalCwd(): string { return _b().getOriginalCwd?.() ?? process.cwd() }
 function handleAutoModeTransition(mode: unknown): void { _b().handleAutoModeTransition?.(mode) }
 function handlePlanModeTransition(mode: unknown): void { _b().handlePlanModeTransition?.(mode) }

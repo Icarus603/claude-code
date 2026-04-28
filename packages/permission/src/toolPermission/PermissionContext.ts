@@ -1,3 +1,10 @@
+/**
+ * PermissionContext — interactive permission prompt flow.
+ * `suggestions as any` and `decision.updatedPermissions as any` casts
+ * bridge structurally-identical types between this package and the
+ * upstream PermissionUpdate / PermissionSuggestion shapes.
+ * Runtime-binding pattern.
+ */
 import { feature } from 'bun:bundle'
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.mjs'
 import {
