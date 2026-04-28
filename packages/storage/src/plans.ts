@@ -362,19 +362,23 @@ export async function persistFileSnapshotIfRemote(): Promise<void> {
     return
   }
   try {
-    const snapshotFiles: SystemFileSnapshotMessage['snapshotFiles'] = []
+    const snapshotFiles: Array<{
+      key: string
+      path: string
+      content: string
+    }> = []
 
     // Snapshot plan file
     const plan = getPlan()
     if (plan) {
-      (snapshotFiles as any[]).push({
+      snapshotFiles.push({
         key: 'plan',
         path: getPlanFilePath(),
         content: plan,
       })
     }
 
-    if ((snapshotFiles as any[]).length === 0) {
+    if (snapshotFiles.length === 0) {
       return
     }
 

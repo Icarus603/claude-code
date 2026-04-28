@@ -3,6 +3,6 @@
   "nullish-coalesce-critical-path": 86,
   "stub-return-only": 26,
   "always-false-feature-flag": 495,
-  "type-cast-trap": 193,
+  "type-cast-trap": 184,
   "require-fallback-to-stub": 0
 }
