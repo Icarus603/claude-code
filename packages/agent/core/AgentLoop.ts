@@ -134,8 +134,16 @@ export class AgentLoop {
       }
 
       turnCount++
-      const rawAsst = assistantMessage as any
-      const stopReason: string | null | undefined = rawAsst?.stop_reason ?? rawAsst?.message?.stop_reason ?? turnState.stopReason ?? null
+      // assistantMessage's stop_reason can live at the top level (provider
+      // SDK shape) or under .message (legacy/Anthropic API beta shape).
+      const rawAsst = assistantMessage as
+        | (CoreAssistantMessage & {
+            stop_reason?: string | null
+            message?: { stop_reason?: string | null }
+          })
+        | null
+      const stopReason: string | null | undefined =
+        rawAsst?.stop_reason ?? rawAsst?.message?.stop_reason ?? turnState.stopReason ?? null
       if (stopReason !== 'tool_use') {
         const budgetDecision = checkTokenBudget(
           budgetTracker,
@@ -361,8 +369,8 @@ export class AgentLoop {
         turnState.currentThinkingBlockIndex = turnState.thinkingBlocks.length - 1
       }
     }
-    if (event.type === 'content_block_delta') {
-      const delta = (event as any).delta as { type?: string; text?: string; thinking?: string; partial_json?: string }
+    if (event.type === 'content_block_delta' && 'delta' in event) {
+      const delta = event.delta as { type?: string; text?: string; thinking?: string; partial_json?: string }
       if (delta?.type === 'text_delta' && delta.text != null && turnState.currentTextBlockIndex >= 0) {
         turnState.textBlocks[turnState.currentTextBlockIndex].text += delta.text
       } else if (delta?.type === 'thinking_delta' && delta.thinking != null && turnState.currentThinkingBlockIndex >= 0) {
@@ -415,7 +423,12 @@ export class AgentLoop {
     message: CoreAssistantMessage | null,
   ): Array<{ id: string; name: string; input: unknown }> {
     if (!message) return []
-    const raw = message as any
+    // CoreAssistantMessage's content can live at the top level (provider SDK
+    // shape) or nested under .message (legacy/Anthropic API beta shape).
+    const raw = message as CoreAssistantMessage & {
+      content?: unknown
+      message?: { content?: unknown }
+    }
     const content = Array.isArray(raw.content)
       ? raw.content
       : Array.isArray(raw.message?.content)
