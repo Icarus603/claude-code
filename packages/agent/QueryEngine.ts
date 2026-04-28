@@ -1,3 +1,9 @@
+/**
+ * QueryEngine — top-level conversation loop orchestrator.
+ * `as unknown as SDK*Message` casts bridge the internal Message shape
+ * to the SDK's discriminated union variants for replay / compact
+ * boundary / event extraction. SDK-to-SDK shape translation pattern.
+ */
 import { feature } from 'bun:bundle'
 import { AgentCore } from './core/AgentCore.js'
 import './internal/macroFallback.js'
