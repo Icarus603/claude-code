@@ -255,29 +255,6 @@ export function setIsSettingSourceEnabledFn(
 }
 
 // ---------------------------------------------------------------------------
-// AppState (transitional — V7 goal is to eliminate AppState)
-// ---------------------------------------------------------------------------
-
-let _getAppState: () => unknown = () => ({})
-let _setAppState: (updater: (state: unknown) => unknown) => void = () => {}
-export function getAppState<T = unknown>(): T {
-  return _getAppState() as T
-}
-export function setAppState<T>(updater: (state: T) => T): void {
-  _setAppState(updater as (state: unknown) => unknown)
-}
-export function setGetAppStateFn(fn: typeof _getAppState): void {
-  _getAppState = fn
-}
-// verify-deps-setters-wired: allow-unwired (the paired `setAppState` getter
-// has zero readers — every same-name occurrence in this repo is React
-// useState's setAppState, not the host binding. Slot survives only as a
-// historical placeholder; safe to delete after a wider audit confirms.)
-export function setSetAppStateFn(fn: typeof _setAppState): void {
-  _setAppState = fn
-}
-
-// ---------------------------------------------------------------------------
 // Git helpers
 // ---------------------------------------------------------------------------
 
