@@ -1,3 +1,9 @@
+/**
+ * PermissionUpdate — apply/persist permission rule updates. Inline
+ * `(getPermissionHostBindings() as any)` casts on optional host
+ * methods are runtime-binding pattern bypass; the methods are spread
+ * with `?.()` so missing host methods silently no-op.
+ */
 import { posix } from 'path'
 import {
   type EditableSettingSource,

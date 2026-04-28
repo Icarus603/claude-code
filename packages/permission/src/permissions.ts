@@ -1,3 +1,11 @@
+/**
+ * permissions — top-level permission decision flow. `as any` casts on
+ * decision.updatedPermissions / suggestions arrays bridge between this
+ * package's PermissionUpdate / PermissionSuggestion types and the
+ * structurally-identical declarations in app-host. Runtime-binding
+ * pattern; `_b()` host-bindings shim is the same idiom used in
+ * permissionSetup.ts.
+ */
 import { feature } from 'bun:bundle'
 import { APIUserAbortError } from '@anthropic-ai/sdk'
 import { SETTING_SOURCES, getSettingSourceDisplayNameLowercase } from '@claude-code/config'
