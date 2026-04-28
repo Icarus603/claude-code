@@ -28,6 +28,9 @@ fi
 # regressions (LOC growth, missing exports, broken imports, naming
 # violations). Each verifier runs in <500ms.
 echo "Running fast doctor:arch checks..."
+# Only fast verifiers (<500ms each) here; the slower full-grep ones
+# (deps-setters-wired, await-generator-misuse, dual-storage-divergence,
+# silent-failure-ratchet) run in pre-push instead.
 for check in \
   scripts/verify-replview-shrinks.ts \
   scripts/verify-src-shrinks.ts \
@@ -37,7 +40,8 @@ for check in \
   scripts/verify-package-readme.ts \
   scripts/verify-feature-canonical.ts \
   scripts/verify-facade-budget.ts \
-  scripts/verify-build-resolves.ts; do
+  scripts/verify-build-resolves.ts \
+  scripts/verify-host-binding-completeness.ts; do
   bun run "$check" >/dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo ""
