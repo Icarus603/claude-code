@@ -60,29 +60,44 @@ function extractSlots(file: string): Slot[] {
     } else if ((m = ln.match(/^export function (set\w+Fn)\b/))) {
       // ok
     } else continue
-    const allowed =
-      i > 0 &&
-      /verify-deps-setters-wired:\s*allow-unwired/.test(lines[i - 1])
+    // Look at up to 6 lines preceding the export for the allowlist comment.
+    // (multi-line jsdoc / comment blocks are common.)
+    let allowed = false
+    for (let j = i - 1; j >= Math.max(0, i - 6); j--) {
+      if (/verify-deps-setters-wired:\s*allow-unwired/.test(lines[j])) {
+        allowed = true; break
+      }
+      // Stop searching backward at the previous export/declaration
+      if (/^export\s/.test(lines[j])) break
+    }
     slots.push({ name: m[1], file, line: i + 1, allowed })
   }
   return slots
 }
 
 function countCallers(slot: Slot): number {
-  // grep packages/ for `slotName(` — must be a call, not a re-export.
-  // Exclude the slot's own _deps.ts file.
-  // This is the same heuristic used in the audit that surfaced the bug.
+  // Direct call: `slotName(`
   let raw = ''
   try {
     raw = execSync(
       `grep -rE '\\b${slot.name}\\s*\\(' packages --include='*.ts' --include='*.tsx' --exclude-dir=node_modules`,
       { encoding: 'utf8' },
     )
-  } catch {
-    return 0
-  }
-  const lines = raw.split('\n').filter(l => l && !l.startsWith(slot.file + ':'))
-  return lines.length
+  } catch {}
+  const direct = raw.split('\n').filter(l => l && !l.startsWith(slot.file + ':')).length
+  if (direct > 0) return direct
+
+  // Dynamic alias: `const { setXxxFn: _alias } = require('@claude-code/config/plugin/_deps')`
+  // Used in installPluginBindings.ts when conditionally wiring optional
+  // subsystems (builtin plugins, argumentSubstitution, hints provider).
+  let aliasRaw = ''
+  try {
+    aliasRaw = execSync(
+      `grep -rE '\\b${slot.name}\\s*:\\s*\\w+' packages --include='*.ts' --include='*.tsx' --exclude-dir=node_modules`,
+      { encoding: 'utf8' },
+    )
+  } catch {}
+  return aliasRaw.split('\n').filter(l => l && !l.startsWith(slot.file + ':')).length
 }
 
 async function main(): Promise<void> {

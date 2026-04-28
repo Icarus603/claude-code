@@ -269,6 +269,10 @@ export function setAppState<T>(updater: (state: T) => T): void {
 export function setGetAppStateFn(fn: typeof _getAppState): void {
   _getAppState = fn
 }
+// verify-deps-setters-wired: allow-unwired (the paired `setAppState` getter
+// has zero readers — every same-name occurrence in this repo is React
+// useState's setAppState, not the host binding. Slot survives only as a
+// historical placeholder; safe to delete after a wider audit confirms.)
 export function setSetAppStateFn(fn: typeof _setAppState): void {
   _setAppState = fn
 }
