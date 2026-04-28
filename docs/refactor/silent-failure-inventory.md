@@ -19,18 +19,18 @@ Findings are graded:
 | # | Pattern | Total findings | CRITICAL | HIGH | MEDIUM | LOW |
 |---|---------|---------------:|---------:|-----:|-------:|----:|
 | 1 | unwired-setter-slot | 4 | 2 | 0 | 0 | 2 |
-| 2 | await-generator-misuse | 4 | 0 | 0 | 4 | 0 |
+| 2 | await-generator-misuse | 0 | 0 | 0 | 0 | 0 |
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
-| 4 | dual-storage-divergence | 2 | 0 | 0 | 2 | 0 |
-| 5 | empty-catch | 99 | 0 | 0 | 0 | 99 |
+| 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
+| 5 | empty-catch | 48 | 0 | 0 | 0 | 48 |
 | 6 | nullish-coalesce-critical-path | 345 | 0 | 0 | 112 | 233 |
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
-| 9 | optional-method-no-guard | 1 | 0 | 1 | 0 | 0 |
-| 10 | type-cast-trap | 563 | 0 | 0 | 364 | 199 |
+| 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
+| 10 | type-cast-trap | 562 | 0 | 0 | 363 | 199 |
 | 11 | require-fallback-to-stub | 272 | 0 | 0 | 272 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **1811** | **2** | **1** | **754** | **1054** |
+| **TOTAL** | | **1752** | **2** | **0** | **747** | **1003** |
 
 ## Patterns in detail
 
@@ -40,20 +40,20 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/01-unwired-setter-slots.ts`
 
-**Total scanned**: 138; **findings**: 4
+**Total scanned**: 115; **findings**: 4
 
 #### CRITICAL (2)
 
-- `packages/config/plugin/_deps.ts:272` — export ... setSetAppStateFn (paired getter: setAppState, 289 readers)
+- `packages/config/plugin/_deps.ts:276` — export ... setSetAppStateFn (paired getter: setAppState, 289 readers)
   - Slot has 289 reader(s) of setAppState() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
-- `packages/config/plugin/_deps.ts:747` — export ... setGetBuiltinPluginsFn (paired getter: getBuiltinPlugins, 5 readers)
+- `packages/config/plugin/_deps.ts:751` — export ... setGetBuiltinPluginsFn (paired getter: getBuiltinPlugins, 5 readers)
   - Slot has 5 reader(s) of getBuiltinPlugins() but ZERO writers. Default impl will fire silently — exact ralph-loop bug class. Either (a) inline-import the real impl in the reader, or (b) wire it in app-host/runtime/install*Bindings.ts.
 
 #### LOW (2)
 
-- `packages/config/plugin/_deps.ts:762` — export ... setApplyArgumentSubstitutionsFn
+- `packages/config/plugin/_deps.ts:766` — export ... setApplyArgumentSubstitutionsFn
   - Slot has no writer AND no reader. Pure dead code; delete the slot, the default state, the getter, and the setter export.
-- `packages/config/plugin/_deps.ts:772` — export ... setGetHintsProviderFn
+- `packages/config/plugin/_deps.ts:776` — export ... setGetHintsProviderFn
   - Slot has no writer AND no reader. Pure dead code; delete the slot, the default state, the getter, and the setter export.
 
 ### 2. `await-generator-misuse`
@@ -62,18 +62,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/02-await-generator-misuse.ts`
 
-**Total scanned**: 50; **findings**: 4
-
-#### MEDIUM (4)
-
-- `packages/bridge/src/remoteBridgeCore.ts:173` — const createdSessionId = await withRetry(
-  - `await withRetry(...)` matches a generator name elsewhere in repo, but the same file defines a local non-generator withRetry. Likely a false positive (local scope wins). Verify which one is bound.
-- `packages/bridge/src/remoteBridgeCore.ts:189` — const credentials = await withRetry(
-  - `await withRetry(...)` matches a generator name elsewhere in repo, but the same file defines a local non-generator withRetry. Likely a false positive (local scope wins). Verify which one is bound.
-- `packages/bridge/src/remoteBridgeCore.ts:342` — const fresh = await withRetry(
-  - `await withRetry(...)` matches a generator name elsewhere in repo, but the same file defines a local non-generator withRetry. Likely a false positive (local scope wins). Verify which one is bound.
-- `packages/bridge/src/remoteBridgeCore.ts:553` — const fresh = await withRetry(
-  - `await withRetry(...)` matches a generator name elsewhere in repo, but the same file defines a local non-generator withRetry. Likely a false positive (local scope wins). Verify which one is bound.
+**Total scanned**: 50; **findings**: 0
 
 ### 3. `optional-chain-on-required-binding`
 
@@ -89,14 +78,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9404; **findings**: 2
-
-#### MEDIUM (2)
-
-- `packages/agent/concurrentSessions.ts:0` — registerSession ← agent; clearSession → provider/src
-  - Reader registerSession lives in agent (packages/agent/concurrentSessions.ts); writer clearSession lives in provider/src (packages/provider/src/sessionIngress.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/agent/tasks.ts:0` — getTask ← agent; registerTask → agent/task
-  - Reader getTask lives in agent (packages/agent/tasks.ts); writer registerTask lives in agent/task (packages/agent/task/framework.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
+**Total scanned**: 9345; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -104,9 +86,9 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2462; **findings**: 99
+**Total scanned**: 2462; **findings**: 48
 
-#### LOW (99)
+#### LOW (48)
 
 - `packages/ide/src/ide.ts:578` — } catch (error) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
@@ -168,7 +150,7 @@ Findings are graded:
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
 - `packages/agent/internal/fileHistoryCore.ts:272` — } catch (error) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- ...69 more (run audit with no flags for full JSON)
+- ...18 more (run audit with no flags for full JSON)
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -176,7 +158,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1194; **findings**: 345
+**Total scanned**: 1193; **findings**: 345
 
 #### MEDIUM (112)
 
@@ -312,7 +294,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5906; **findings**: 26
+**Total scanned**: 5904; **findings**: 26
 
 #### LOW (26)
 
@@ -447,12 +429,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/09-optional-method-no-guard.ts`
 
-**Total scanned**: 11; **findings**: 1
-
-#### HIGH (1)
-
-- `packages/repl/src/components/VirtualMessageList.tsx:542` — const positions = scanElement?.(el) ?? [] → logForDebugging(`seek(i=${idx} t=${tries}): ${positions.length} positions`)
-  - positions comes from `?.()` but is dereferenced without null-check on the next line(s). If the optional method is missing, this throws "Cannot read properties of undefined" — silent until that path triggers.
+**Total scanned**: 11; **findings**: 0
 
 ### 10. `type-cast-trap`
 
@@ -460,9 +437,9 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 590; **findings**: 563
+**Total scanned**: 589; **findings**: 562
 
-#### MEDIUM (364)
+#### MEDIUM (363)
 
 - `packages/swarm/commands/branch/branch.ts:41` — const content = (firstUserMessage as any)?.message?.content
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -524,7 +501,7 @@ Findings are graded:
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/swarm/src/adapters/appRuntime.ts:139` — export let runWithAgentContext = missingBinding('runWithAgentContext') as any
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...334 more (run audit with no flags for full JSON)
+- ...333 more (run audit with no flags for full JSON)
 
 #### LOW (199)
 
@@ -596,7 +573,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 871; **findings**: 272
+**Total scanned**: 866; **findings**: 272
 
 #### MEDIUM (272)
 
@@ -632,19 +609,19 @@ Findings are graded:
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
 - `packages/@ant/computer-use-mcp/src/legacy/executorCrossPlatform.ts:1053` — require('./win32/accessibilitySnapshot.js') as typeof import('./win32/accessibilitySnapshot.js')
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:866` — const mod = require('@claude-code/tool-registry/markdownConfigLoader.js') as {
+- `packages/config/plugin/_deps.ts:870` — const mod = require('@claude-code/tool-registry/markdownConfigLoader.js') as {
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:888` — const mod = require('@claude-code/permission/pathValidation.js') as {
+- `packages/config/plugin/_deps.ts:892` — const mod = require('@claude-code/permission/pathValidation.js') as {
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:912` — const mod = require('@claude-code/mcp-runtime/envExpansion.js') as {
+- `packages/config/plugin/_deps.ts:916` — const mod = require('@claude-code/mcp-runtime/envExpansion.js') as {
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:939` — const mod = require('@claude-code/command-runtime/promptShellExecution.js') as {
+- `packages/config/plugin/_deps.ts:943` — const mod = require('@claude-code/command-runtime/promptShellExecution.js') as {
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:998` — const mod = require('@claude-code/agent/frontmatterParser.js') as {
+- `packages/config/plugin/_deps.ts:1002` — const mod = require('@claude-code/agent/frontmatterParser.js') as {
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/config/plugin/_deps.ts:1040` — const mod = require('@claude-code/command-runtime/argumentSubstitution.js') as {
+- `packages/config/plugin/_deps.ts:1044` — const mod = require('@claude-code/command-runtime/argumentSubstitution.js') as {
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/shell/src/exec.ts:372` — const { realpathSync } = require('fs') as typeof import('fs')
+- `packages/shell/src/exec.ts:369` — const { realpathSync } = require('fs') as typeof import('fs')
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
 - `packages/provider/src/connections.ts:538` — const { getSettings_DEPRECATED, updateSettingsForSource } = require(
   - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
@@ -668,5 +645,5 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/12-module-level-null-state.ts`
 
-**Total scanned**: 181; **findings**: 0
+**Total scanned**: 180; **findings**: 0
 

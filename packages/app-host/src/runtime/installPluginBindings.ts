@@ -23,7 +23,6 @@ import {
   setFileReadPromptFn,
   setFileWritePromptFn,
   setFsImplementationFn,
-  setGetAppStateFn,
   setGetCharBudgetFn,
   setGetCwdFn,
   setGetHeadForDirFn,
@@ -524,15 +523,6 @@ export function installPluginBindings(): void {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mod = require('@claude-code/tool-registry/tools/SkillTool/prompt.js')
     return mod.getCharBudget?.() ?? 10000
-  })
-
-  // --- app state
-  setGetAppStateFn(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('../state/AppState.js') as {
-      getAppState: () => unknown
-    }
-    return mod.getAppState?.() ?? {}
   })
 
   // --- services/plugins/pluginOperations (cyclic with plugin utils)

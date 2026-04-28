@@ -34,8 +34,7 @@ function listSlots(file: string): Slot[] {
 }
 
 function countCallers(name: string, ownFile: string): number {
-  // Direct calls: `name(`. Includes alias: `const _x = name; _x()` won't
-  // be caught — that's fine, it's rare and already-wired slots don't use it.
+  // Direct calls: `name(`.
   let raw = ''
   try {
     raw = execSync(
@@ -43,7 +42,20 @@ function countCallers(name: string, ownFile: string): number {
       { encoding: 'utf8' },
     )
   } catch {}
-  return raw.split('\n').filter(l => l && !l.startsWith(ownFile + ':')).length
+  const direct = raw.split('\n').filter(l => l && !l.startsWith(ownFile + ':')).length
+  if (direct > 0) return direct
+
+  // Dynamic alias: `const { setXxxFn: _alias } = require(...)` then `_alias(...)`.
+  // Used in installPluginBindings.ts when conditionally wiring optional subsystems.
+  // Mirrors the logic in scripts/verify-deps-setters-wired.ts.
+  let aliasRaw = ''
+  try {
+    aliasRaw = execSync(
+      `grep -rE '\\b${name}\\s*:\\s*\\w+' packages --include='*.ts' --include='*.tsx' --exclude-dir=node_modules`,
+      { encoding: 'utf8' },
+    )
+  } catch {}
+  return aliasRaw.split('\n').filter(l => l && !l.startsWith(ownFile + ':')).length
 }
 
 function pairedGetterName(setter: string): string | null {
