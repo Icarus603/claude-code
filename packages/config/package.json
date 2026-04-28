@@ -34,7 +34,6 @@
     "./env/managed-constants": "./env/managed-constants.ts",
     "./env/paths": "./env/paths.ts",
     "./env/dynamic": "./env/dynamic.ts",
-    "./env/_deps": "./env/_deps.ts",
     "./migrations/*.js": "./migrations/*.ts",
     "./plugin/_deps": "./plugin/_deps.ts",
     "./plugin/_deps.js": "./plugin/_deps.ts",
