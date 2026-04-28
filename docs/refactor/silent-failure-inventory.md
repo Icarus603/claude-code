@@ -21,7 +21,7 @@ Findings are graded:
 | 1 | unwired-setter-slot | 4 | 2 | 0 | 0 | 2 |
 | 2 | await-generator-misuse | 4 | 0 | 0 | 4 | 0 |
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
-| 4 | dual-storage-divergence | 36 | 0 | 0 | 36 | 0 |
+| 4 | dual-storage-divergence | 2 | 0 | 0 | 2 | 0 |
 | 5 | empty-catch | 99 | 0 | 0 | 0 | 99 |
 | 6 | nullish-coalesce-critical-path | 345 | 0 | 0 | 112 | 233 |
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
@@ -30,7 +30,7 @@ Findings are graded:
 | 10 | type-cast-trap | 563 | 0 | 0 | 364 | 199 |
 | 11 | require-fallback-to-stub | 272 | 0 | 0 | 272 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **1845** | **2** | **1** | **788** | **1054** |
+| **TOTAL** | | **1811** | **2** | **1** | **754** | **1054** |
 
 ## Patterns in detail
 
@@ -89,71 +89,14 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9404; **findings**: 36
+**Total scanned**: 9404; **findings**: 2
 
-#### MEDIUM (36)
+#### MEDIUM (2)
 
-- `packages/tool-registry/src/tools/ConfigTool/ConfigTool.ts:0` — getValue ← tool-registry/src; setValue → @ant/computer-use-mcp
-  - Reader getValue lives in tool-registry/src (packages/tool-registry/src/tools/ConfigTool/ConfigTool.ts); writer setValue lives in @ant/computer-use-mcp (packages/@ant/computer-use-mcp/src/legacy/win32/uiAutomation.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/memory/src/sessionMemoryUtils.ts:0` — getFsImplementation ← memory/src; setFsImplementation → storage/src
-  - Reader getFsImplementation lives in memory/src (packages/memory/src/sessionMemoryUtils.ts); writer setFsImplementation lives in storage/src (packages/storage/src/fsOperations.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getFsImplementation ← config/plugin; setFsImplementation → storage/src
-  - Reader getFsImplementation lives in config/plugin (packages/config/plugin/_deps.ts); writer setFsImplementation lives in storage/src (packages/storage/src/fsOperations.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/local-observability/src/_deps.ts:0` — getFsImplementation ← local-observability/src; setFsImplementation → storage/src
-  - Reader getFsImplementation lives in local-observability/src (packages/local-observability/src/_deps.ts); writer setFsImplementation lives in storage/src (packages/storage/src/fsOperations.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/output/src/_deps.ts:0` — getFsImplementation ← output/src; setFsImplementation → storage/src
-  - Reader getFsImplementation lives in output/src (packages/output/src/_deps.ts); writer setFsImplementation lives in storage/src (packages/storage/src/fsOperations.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/permissionSetup.ts:0` — getFsImplementation ← permission/src; setFsImplementation → storage/src
-  - Reader getFsImplementation lives in permission/src (packages/permission/src/permissionSetup.ts); writer setFsImplementation lives in storage/src (packages/storage/src/fsOperations.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/filesystem.ts:0` — getFsImplementation ← permission/src; setFsImplementation → storage/src
-  - Reader getFsImplementation lives in permission/src (packages/permission/src/filesystem.ts); writer setFsImplementation lives in storage/src (packages/storage/src/fsOperations.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getOriginalCwd ← config/plugin; setOriginalCwd → app-host/src
-  - Reader getOriginalCwd lives in config/plugin (packages/config/plugin/_deps.ts); writer setOriginalCwd lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/output/src/_deps.ts:0` — getOriginalCwd ← output/src; setOriginalCwd → app-host/src
-  - Reader getOriginalCwd lives in output/src (packages/output/src/_deps.ts); writer setOriginalCwd lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/agent/internal/sessionRuntime.ts:0` — getOriginalCwd ← agent/internal; setOriginalCwd → app-host/src
-  - Reader getOriginalCwd lives in agent/internal (packages/agent/internal/sessionRuntime.ts); writer setOriginalCwd lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/permissionSetup.ts:0` — getOriginalCwd ← permission/src; setOriginalCwd → app-host/src
-  - Reader getOriginalCwd lives in permission/src (packages/permission/src/permissionSetup.ts); writer setOriginalCwd lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/filesystem.ts:0` — getOriginalCwd ← permission/src; setOriginalCwd → app-host/src
-  - Reader getOriginalCwd lives in permission/src (packages/permission/src/filesystem.ts); writer setOriginalCwd lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getCwd ← config/plugin; setCwd → shell/src
-  - Reader getCwd lives in config/plugin (packages/config/plugin/_deps.ts); writer setCwd lives in shell/src (packages/shell/src/Shell.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getCwd ← config/plugin; setCwd → shell/src
-  - Reader getCwd lives in config/plugin (packages/config/plugin/_deps.ts); writer setCwd lives in shell/src (packages/shell/src/exec.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getCwd ← config/plugin; setCwd → agent
-  - Reader getCwd lives in config/plugin (packages/config/plugin/_deps.ts); writer setCwd lives in agent (packages/agent/QueryEngine.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/agent/QueryEngine.ts:0` — getCwd ← agent; setCwd → shell/src
-  - Reader getCwd lives in agent (packages/agent/QueryEngine.ts); writer setCwd lives in shell/src (packages/shell/src/Shell.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/agent/QueryEngine.ts:0` — getCwd ← agent; setCwd → shell/src
-  - Reader getCwd lives in agent (packages/agent/QueryEngine.ts); writer setCwd lives in shell/src (packages/shell/src/exec.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/app-host/src/bootstrap/cwd.ts:0` — getCwd ← app-host/src; setCwd → shell/src
-  - Reader getCwd lives in app-host/src (packages/app-host/src/bootstrap/cwd.ts); writer setCwd lives in shell/src (packages/shell/src/Shell.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/app-host/src/bootstrap/cwd.ts:0` — getCwd ← app-host/src; setCwd → shell/src
-  - Reader getCwd lives in app-host/src (packages/app-host/src/bootstrap/cwd.ts); writer setCwd lives in shell/src (packages/shell/src/exec.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/app-host/src/bootstrap/cwd.ts:0` — getCwd ← app-host/src; setCwd → agent
-  - Reader getCwd lives in app-host/src (packages/app-host/src/bootstrap/cwd.ts); writer setCwd lives in agent (packages/agent/QueryEngine.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/permissionSetup.ts:0` — getCwd ← permission/src; setCwd → shell/src
-  - Reader getCwd lives in permission/src (packages/permission/src/permissionSetup.ts); writer setCwd lives in shell/src (packages/shell/src/Shell.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/permissionSetup.ts:0` — getCwd ← permission/src; setCwd → shell/src
-  - Reader getCwd lives in permission/src (packages/permission/src/permissionSetup.ts); writer setCwd lives in shell/src (packages/shell/src/exec.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/permissionSetup.ts:0` — getCwd ← permission/src; setCwd → agent
-  - Reader getCwd lives in permission/src (packages/permission/src/permissionSetup.ts); writer setCwd lives in agent (packages/agent/QueryEngine.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/filesystem.ts:0` — getCwd ← permission/src; setCwd → shell/src
-  - Reader getCwd lives in permission/src (packages/permission/src/filesystem.ts); writer setCwd lives in shell/src (packages/shell/src/Shell.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/filesystem.ts:0` — getCwd ← permission/src; setCwd → shell/src
-  - Reader getCwd lives in permission/src (packages/permission/src/filesystem.ts); writer setCwd lives in shell/src (packages/shell/src/exec.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/permission/src/filesystem.ts:0` — getCwd ← permission/src; setCwd → agent
-  - Reader getCwd lives in permission/src (packages/permission/src/filesystem.ts); writer setCwd lives in agent (packages/agent/QueryEngine.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getInlinePlugins ← config/plugin; setInlinePlugins → app-host/src
-  - Reader getInlinePlugins lives in config/plugin (packages/config/plugin/_deps.ts); writer setInlinePlugins lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getAdditionalDirectoriesForClaudeMd ← config/plugin; setAdditionalDirectoriesForClaudeMd → app-host/src
-  - Reader getAdditionalDirectoriesForClaudeMd lives in config/plugin (packages/config/plugin/_deps.ts); writer setAdditionalDirectoriesForClaudeMd lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- `packages/config/plugin/_deps.ts:0` — getUseCoworkPlugins ← config/plugin; setUseCoworkPlugins → app-host/src
-  - Reader getUseCoworkPlugins lives in config/plugin (packages/config/plugin/_deps.ts); writer setUseCoworkPlugins lives in app-host/src (packages/app-host/src/bootstrap/state.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
 - `packages/agent/concurrentSessions.ts:0` — registerSession ← agent; clearSession → provider/src
   - Reader registerSession lives in agent (packages/agent/concurrentSessions.ts); writer clearSession lives in provider/src (packages/provider/src/sessionIngress.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
-- ...6 more (run audit with no flags for full JSON)
+- `packages/agent/tasks.ts:0` — getTask ← agent; registerTask → agent/task
+  - Reader getTask lives in agent (packages/agent/tasks.ts); writer registerTask lives in agent/task (packages/agent/task/framework.ts). Verify they share the same backing store. The ralph-loop bug was exactly this pattern: registerHookCallbacks wrote to _deps.ts placeholder, getRegisteredHooks read from app-host STATE.
 
 ### 5. `empty-catch`
 
@@ -175,7 +118,7 @@ Findings are graded:
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
 - `packages/tool-registry/src/diagnosticTracking.ts:179` — } catch (_error) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/config/feature-flags.ts:80` — } catch {
+- `packages/config/feature-flags.ts:95` — } catch {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
 - `packages/config/migrations/migrateEnableAllProjectMcpServersToSettings.ts:113` — } catch (e: unknown) {
   - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
@@ -387,7 +330,7 @@ Findings are graded:
   - Function hasRequiredSubscription body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/memory/src/autoDream.ts:82` — isForced() { return false }
   - Function isForced body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/config/feature-flags.ts:93` — initializeGrowthBook() { return null }
+- `packages/config/feature-flags.ts:108` — initializeGrowthBook() { return null }
   - Function initializeGrowthBook body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/local-observability/src/spans.ts:19` — isBetaTracingEnabled() { return false }
   - Function isBetaTracingEnabled body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
