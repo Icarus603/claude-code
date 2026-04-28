@@ -49,6 +49,15 @@ const gates: GateCheck[] = [
   // post-turn forked agent burned ~47K token-equiv/turn — see comment on
   // the LOCAL_GATE_DEFAULTS removal in packages/config/feature-flags.ts.
   { name: 'Session memory', gate: 'tengu_session_memory', expected: false, category: 'P1' },
+  // 1h prompt-cache allowlist mirrors ant's inline default (4682.js JqH).
+  // Saves a full cache rewrite every time interactive REPL pauses >5min
+  // between turns; non-eligible users (3P API, overage) gated separately.
+  {
+    name: '1h prompt cache allowlist',
+    gate: 'tengu_prompt_cache_1h_config',
+    expected: { allowlist: ['repl_main_thread*', 'sdk', 'auto_mode', 'memdir_relevance'] },
+    category: 'P1',
+  },
   { name: 'Auto memory extract', gate: 'tengu_passport_quail', expected: true, category: 'P1', compileFlag: 'EXTRACT_MEMORIES' },
   { name: 'Memory skip index', gate: 'tengu_moth_copse', expected: true, category: 'P1' },
   { name: 'Memory search section', gate: 'tengu_coral_fern', expected: true, category: 'P1' },
