@@ -1,10 +1,15 @@
 #!/usr/bin/env bun
 
-import { readdirSync, readFileSync } from "fs";
+import { existsSync, readdirSync, readFileSync } from "fs";
 import { join, relative, sep } from "path";
 
 const ROOT = new URL("../", import.meta.url).pathname;
-const SRC_ROOT = join(ROOT, "src");
+// V7 migrated code from src/ → packages/. The "transition stub" guard now
+// scans both: any leftover src/ from before migration, and packages/* for
+// nested */src directories or type-any stubs left behind during the move.
+const SCAN_ROOTS = ["src", "packages"]
+	.map((p) => join(ROOT, p))
+	.filter((p) => existsSync(p));
 const TYPE_ANY_PATTERN = /export type [A-Za-z0-9_$]+ = any;?/m;
 
 function walkDirectories(root: string, results: string[]) {
@@ -19,10 +24,13 @@ function walkDirectories(root: string, results: string[]) {
 
 function collectNestedSrcStubDirs(): string[] {
 	const directories: string[] = [];
-	walkDirectories(SRC_ROOT, directories);
+	for (const root of SCAN_ROOTS) walkDirectories(root, directories);
 	return directories
 		.filter((dir) => dir.endsWith(`${sep}src`))
 		.map((dir) => relative(ROOT, dir).replaceAll(sep, "/"))
+		// Each package legitimately has a top-level src/ — only flag when
+		// nested 2+ levels under a parent that already contains a src/.
+		.filter((p) => p.split("/").filter((s) => s === "src").length >= 2)
 		.sort();
 }
 
@@ -47,7 +55,11 @@ function collectTypeAnyStubFiles(scanRoot: string): string[] {
 }
 
 const discoveredStubDirs = collectNestedSrcStubDirs();
-const typeAnyStubFiles = collectTypeAnyStubFiles(ROOT);
+const typeAnyStubFiles: string[] = [];
+for (const root of SCAN_ROOTS) {
+	typeAnyStubFiles.push(...collectTypeAnyStubFiles(root));
+}
+typeAnyStubFiles.sort();
 
 console.log("Transition stub directories:", discoveredStubDirs.length);
 console.log("Type-any transition stubs:", typeAnyStubFiles.length);
