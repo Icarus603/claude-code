@@ -4,6 +4,7 @@ import type { LogOption } from '@claude-code/repl/replTypes/logs.js'
 import { quote } from '@claude-code/shell/bash/shellQuote.js'
 import { getSessionIdFromLog } from '@claude-code/storage/sessionStorage.js'
 import { readEnv } from '@claude-code/config/env/utils'
+import { getInvokedBinaryName } from '@claude-code/config'
 
 export type CrossProjectResumeResult =
   | {
@@ -42,7 +43,7 @@ export function checkCrossProjectResume(
   // Gate worktree detection to ants only for staged rollout
   if (readEnv('USER_TYPE') !== 'ant') {
     const sessionId = getSessionIdFromLog(log)
-    const command = `cd ${quote([log.projectPath])} && claude --resume ${sessionId}`
+    const command = `cd ${quote([log.projectPath])} && ${getInvokedBinaryName()} --resume ${sessionId}`
     return {
       isCrossProject: true,
       isSameRepoWorktree: false,
@@ -66,7 +67,7 @@ export function checkCrossProjectResume(
 
   // Different repo - generate cd command
   const sessionId = getSessionIdFromLog(log)
-  const command = `cd ${quote([log.projectPath])} && claude --resume ${sessionId}`
+  const command = `cd ${quote([log.projectPath])} && ${getInvokedBinaryName()} --resume ${sessionId}`
   return {
     isCrossProject: true,
     isSameRepoWorktree: false,

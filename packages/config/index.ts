@@ -94,6 +94,7 @@ export {
   NOTIFICATION_CHANNELS,
   EDITOR_MODES,
   TEAMMATE_MODES,
+  getInvokedBinaryName,
 } from './global/constants.js'
 
 // --- Settings types ---

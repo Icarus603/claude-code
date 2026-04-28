@@ -13,6 +13,7 @@ import { shouldShowOverageCreditUpsell } from '../components/LogoV2/OverageCredi
 import { getShortcutDisplay } from '../keybindings/shortcutFormat.js'
 import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
 import { is1PApiCustomer } from '@claude-code/provider/authAlias.js'
+import { getInvokedBinaryName } from '@claude-code/config'
 import { countConcurrentSessions } from '@claude-code/agent/concurrentSessions.js'
 import { getGlobalConfig } from '@claude-code/config'
 import {
@@ -375,8 +376,10 @@ const externalTips: Tip[] = [
   },
   {
     id: 'continue',
-    content: async () =>
-      'Run claude --continue or claude --resume to resume a conversation',
+    content: async () => {
+      const name = getInvokedBinaryName()
+      return `Run ${name} --continue or ${name} --resume to resume a conversation`
+    },
     cooldownSessions: 10,
     isRelevant: async () => true,
   },

@@ -5,6 +5,7 @@ import figures from 'figures';
 import { Box, Text, useInput, wrapText } from '@anthropic/ink';
 import { useTerminalSize } from '@anthropic/ink';
 import { Select } from '../CustomSelect/select.js';
+import { getInvokedBinaryName } from '@claude-code/config';
 import { PermissionDialog } from '@claude-code/permission/components/PermissionDialog.js';
 import { useSetAppState } from '../../appStateHooks.js';
 import type { AppState } from '../../appStateHooks.js';
@@ -149,7 +150,7 @@ export function UltraplanChoiceDialog({
           if (transcriptSaved) {
             setMessages(prev => [
               ...prev,
-              createCommandInputMessage(`Previous session saved · resume with: claude --resume ${previousSessionId}`),
+              createCommandInputMessage(`Previous session saved · resume with: ${getInvokedBinaryName()} --resume ${previousSessionId}`),
             ]);
           }
 

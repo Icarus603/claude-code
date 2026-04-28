@@ -29,6 +29,7 @@ import { runCleanupFunctions } from './cleanupRegistry.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { getInvokedBinaryName } from '@claude-code/config'
 import { getCurrentSessionTitle, sessionIdExists } from '@claude-code/storage/sessionStorage.js'
 import { sleep } from '@claude-code/config/sleep'
 import { closeSentry } from '@claude-code/local-observability/sentry.js'
@@ -163,7 +164,7 @@ function printResumeHint(): void {
       writeSync(
         1,
         chalk.dim(
-          `\nResume this session with:\nclaude --resume ${resumeArg}\n`,
+          `\nResume this session with:\n${getInvokedBinaryName()} --resume ${resumeArg}\n`,
         ),
       )
       resumeHintPrinted = true
