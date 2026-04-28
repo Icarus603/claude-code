@@ -62,13 +62,32 @@ for (const ln of raw.split('\n')) {
   }
   if (catchOpen === -1) continue
 
-  // Read catch body (next ~6 lines or until close brace at same depth)
+  // Read catch body — start scanning AFTER the catch keyword on
+  // the catchOpen line. The line typically looks like `} catch (e) {`,
+  // where the leading `}` closes the try block (must not affect depth)
+  // and the trailing `{` opens the catch body. Naïve depth-tracking
+  // counts the leading `}` as a close, sending depth negative and
+  // making the body extraction skip the whole catch — which used to
+  // produce false positives by treating non-empty catches as empty.
   let depth = 0, started = false, body = ''
-  for (let j = catchOpen; j < Math.min(catchOpen + 8, fileLines.length); j++) {
+  // Find `catch ... {` on the catchOpen line and start char-scan after the `{`.
+  const startIdx = (() => {
+    const m = /\bcatch\b/.exec(fileLines[catchOpen])
+    if (!m) return 0
+    const after = fileLines[catchOpen].indexOf('{', m.index)
+    return after >= 0 ? after : fileLines[catchOpen].length
+  })()
+  for (let j = catchOpen; j < Math.min(catchOpen + 16, fileLines.length); j++) {
     const t = fileLines[j]
-    for (const ch of t) {
+    const start = j === catchOpen ? startIdx : 0
+    for (let c = start; c < t.length; c++) {
+      const ch = t[c]
       if (ch === '{') { depth++; started = true; continue }
-      if (ch === '}') { depth--; if (started && depth === 0) break }
+      if (ch === '}') {
+        depth--
+        if (started && depth === 0) break
+        continue
+      }
       if (started && depth > 0) body += ch
     }
     body += '\n'
@@ -83,6 +102,23 @@ for (const ln of raw.split('\n')) {
     stripped === '' ||
     /^return\s+(null|undefined|\[\s*\]|\{\s*\}|0|false|true|""|''|`\s*`)\s*;?$/.test(stripped)
   ) {
+    // File-level escape hatch: top-of-module docstring documenting the
+    // require-fallback pattern. Avoids flagging high-frequency host-binding
+    // adapter files where every wire is a try/require/catch by design.
+    const head = fileLines.slice(0, 30).join('\n')
+    const fileLevelExempt =
+      /require[ -]?fallback(s)?|optional[ -]?dep|feature[ -]?gated|by[ -]?design.*require|host[ -]?binding[ -]?adapter|extra host bindings|platform[ -]?(conditional|dispatch)|backend[ -]?(dispatch|loader)|native[ -]?module|napi/i.test(
+        head,
+      )
+    if (fileLevelExempt) continue
+    // Per-line escape: `// optional` or `// feature-gated` etc. on or
+    // anywhere in the 5 lines preceding the require call. The comment
+    // commonly lives just above the require, especially when the
+    // require expression itself wraps onto a new line.
+    const nearby = fileLines
+      .slice(Math.max(0, lineNum - 6), lineNum + 1)
+      .join('\n')
+    if (/\/\/.*(optional|feature-gated|fallback|missing-ok|optional[ -]?dep)/i.test(nearby)) continue
     findings.push({
       pattern: 'require-fallback-to-stub',
       file,

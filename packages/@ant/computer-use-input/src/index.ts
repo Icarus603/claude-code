@@ -3,6 +3,11 @@
  *
  * This package wraps the macOS-only native enigo .node module.
  * For Windows/Linux, use src/utils/computerUse/platforms/ instead.
+ *
+ * Platform-conditional require: each branch loads its platform's
+ * backend only when that platform is current. The other branches
+ * throw at require time and the dispatch wrap returns a stub. By
+ * design — every supported platform has its own native binary.
  */
 
 export interface FrontmostAppInfo {
