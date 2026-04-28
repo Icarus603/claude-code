@@ -9,7 +9,7 @@
  * - outputLimits are in outputLimits.ts
  */
 
-import { getPlatform } from '../_deps.js'
+import { getPlatform } from '@claude-code/config/platform'
 
 // ---------------------------------------------------------------------------
 // Types

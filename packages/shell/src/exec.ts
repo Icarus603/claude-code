@@ -6,15 +6,12 @@ import { type FileHandle, mkdir, open, realpath } from 'fs/promises'
 import { isAbsolute, resolve } from 'path'
 import { join as posixJoin } from 'path/posix'
 import type { ShellExecContext } from '@claude-code/provider/context.js'
-import {
-  errorMessage,
-  generateTaskId,
-  getPlatform,
-  isENOENT,
-  logForDebugging,
-  logEvent,
-  posixPathToWindowsPath,
-} from './_deps.js'
+import { errorMessage, isENOENT } from '@claude-code/local-observability/errorHelpers.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { logEvent } from '@claude-code/local-observability'
+import { getPlatform } from '@claude-code/config/platform'
+import { generateTaskId } from '@claude-code/tool-registry/Task.js'
+import { posixPathToWindowsPath } from '@claude-code/storage/windowsPaths.js'
 import { subprocessEnv } from './subprocessEnv.js'
 import type { ExecOptions, ShellProvider, ShellType } from './types.js'
 import type { TaskOutputPort } from './taskOutputPort.js'

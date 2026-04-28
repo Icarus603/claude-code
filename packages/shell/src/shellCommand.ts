@@ -7,7 +7,7 @@ import type { Readable } from 'stream'
 import treeKill from 'tree-kill'
 import type { ExecResult, ShellCommand } from './types.js'
 import type { TaskOutputPort } from './taskOutputPort.js'
-import { generateTaskId } from './_deps.js'
+import { generateTaskId } from '@claude-code/tool-registry/Task.js'
 
 export type { ExecResult, ShellCommand } from './types.js'
 

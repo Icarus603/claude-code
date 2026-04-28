@@ -407,15 +407,6 @@ export function installPluginBindings(): void {
     return gracefulShutdown(code)
   })
 
-  // --- shell/_deps.ts wires (separate _deps file, same disease)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const shellDeps = require('@claude-code/shell/_deps.js')
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const taskMod = require('@claude-code/tool-registry/Task.js')
-  if (shellDeps.setGenerateTaskIdFn && taskMod.generateTaskId) {
-    shellDeps.setGenerateTaskIdFn((prefix: string) => taskMod.generateTaskId(prefix))
-  }
-
   // --- session / cwd
   setGetSessionIdFn(() => getSessionId())
   setGetOriginalCwdFn(() => getOriginalCwd())

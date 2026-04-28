@@ -86,13 +86,6 @@ export { getMaxOutputLength, BASH_MAX_OUTPUT_UPPER_LIMIT, BASH_MAX_OUTPUT_DEFAUL
 export { resolveDefaultShell, setGetSettingsFn } from './providers/resolveDefaultShell.js'
 export { isPowerShellToolEnabled, SHELL_TOOL_NAMES } from './providers/shellToolUtils.js'
 
-export {
-  setGetPlatformFn,
-  setPosixPathToWindowsPathFn,
-  setWhichFn,
-  setWindowsPathToPosixPathFn,
-} from './_deps.js'
-
 export { buildPrefix, DEPTH_RULES } from './prefix/specPrefix.js'
 
 export {

@@ -5,11 +5,7 @@ import {
   findSuitableShell as findSuitableShellWithPackage,
   MAX_TASK_OUTPUT_BYTES,
   setCreateTaskOutputFn,
-  setGetPlatformFn,
   setGetSandboxTmpDirNameFn,
-  setPosixPathToWindowsPathFn,
-  setWhichFn,
-  setWindowsPathToPosixPathFn,
   type ExecOptions,
   type ExecResult,
   type ShellCommand,
@@ -57,10 +53,6 @@ setCreateTaskOutputFn(
     ),
 )
 setGetSandboxTmpDirNameFn(getClaudeTempDirName)
-setGetPlatformFn(getPlatform)
-setWhichFn(which)
-setWindowsPathToPosixPathFn(windowsPathToPosixPath)
-setPosixPathToWindowsPathFn(posixPathToWindowsPath)
 
 function createShellExecContext(): ShellExecContext {
   return {
