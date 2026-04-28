@@ -131,6 +131,7 @@ export function setCwd(path: string, relativeTo?: string): void {
     try {
       logEvent('tengu_shell_set_cwd', { success: true })
     } catch {
+      // Telemetry failure must not block setCwd; log sink might be uninstalled
     }
   }
 }

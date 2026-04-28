@@ -194,6 +194,7 @@ export function extractFirstPromptFromHead(head: string): string {
         return result
       }
     } catch {
+      // Best-effort first-message extraction; fall back to commandFallback below
     }
   }
   if (commandFallback) return commandFallback

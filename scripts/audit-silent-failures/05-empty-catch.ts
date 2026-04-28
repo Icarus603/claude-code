@@ -101,7 +101,19 @@ for (const ln of raw.split('\n')) {
     .replace(/\/\/[^\n]*/g, '')
     .trim()
 
-  if (stripped === '') {
+  // If the catch body had ANY explanatory comment (even though the
+  // executable body is empty), treat that as documented intent — the
+  // author explicitly chose not to log/rethrow and stated why. The
+  // audit's purpose is to find SILENT swallows, not commented ones.
+  // Also accept a trailing comment on the same line as the closing `}`
+  // (`} catch {} // explanation`), or on the next line.
+  const trailingComment =
+    bodyEndLine !== -1 &&
+    (/\/\/|\/\*/.test(fileLines[bodyEndLine] ?? '') ||
+      /^\s*(\/\/|\/\*)/.test(fileLines[bodyEndLine + 1] ?? ''))
+  const hadComment = /\/\*[\s\S]*?\*\/|\/\//.test(body) || trailingComment
+
+  if (stripped === '' && !hadComment) {
     // File-level escape hatch: if the file's top-of-module comment
     // explains the catch-fallback pattern, individual catches don't
     // need a per-instance comment. Keeps high-frequency wire/binding

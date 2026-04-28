@@ -57,6 +57,7 @@ export async function findAvailablePort(): Promise<number> {
       })
       return port
     } catch {
+      // Port already in use; try the next random pick / fallback below
     }
   }
 

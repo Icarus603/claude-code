@@ -880,6 +880,7 @@ function computeDiffStatsBetweenMessages(
         }
       }
     } catch {
+      // Best-effort diff stat extraction; missing/malformed tool result is OK
     }
   }
 
