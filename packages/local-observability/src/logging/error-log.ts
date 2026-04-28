@@ -18,12 +18,12 @@ import type { BetaMessageStreamParams } from '@anthropic-ai/sdk/resources/beta/m
 import memoize from 'lodash-es/memoize.js'
 
 import {
-  callSetLastAPIRequest,
-  callSetLastAPIRequestMessages,
-  isEnvTruthy,
-  isEssentialTrafficOnly,
-  toError,
-} from '../_deps.js'
+  setLastAPIRequest as callSetLastAPIRequest,
+  setLastAPIRequestMessages as callSetLastAPIRequestMessages,
+} from '@claude-code/app-host/bootstrap/state.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { isEssentialTrafficOnly } from '@claude-code/config/env/privacy-level'
+import { toError } from '../errorHelpers.js'
 
 // ---------------------------------------------------------------------------
 // Shared types

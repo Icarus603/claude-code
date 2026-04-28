@@ -59,7 +59,7 @@
   "packages/headless-sdk/src/coreSchemas.ts": 1890,
   "packages/ide/src/ide.ts": 1495,
   "packages/local-observability/src/aggregates/stats.ts": 1062,
-  "packages/local-observability/src/telemetry/perfetto.ts": 1124,
+  "packages/local-observability/src/telemetry/perfetto.ts": 1127,
   "packages/mcp-runtime/src/auth.ts": 2466,
   "packages/mcp-runtime/src/clientRuntime.ts": 3162,
   "packages/mcp-runtime/src/config.ts": 1591,

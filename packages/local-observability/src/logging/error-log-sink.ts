@@ -14,15 +14,20 @@
 import axios from 'axios'
 import { dirname, join } from 'path'
 
-import {
-  captureException,
-  getCachePaths,
-  getFsImplementation,
-  getSessionId,
-  jsonStringify,
-  logForDebugging,
-  registerCleanup,
-} from '../_deps.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
+import { CACHE_PATHS } from '@claude-code/storage/cache-paths'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
+
+import { captureException } from '../sentry.js'
+import { logForDebugging } from '../debug.js'
+import { jsonStringify } from '../slowOperations.js'
+
+// Local shim mapping former _deps shape to the storage package's CACHE_PATHS.
+const getCachePaths = (): { errors(): string; mcpLogs(serverName: string): string } => ({
+  errors: () => CACHE_PATHS.errors(),
+  mcpLogs: (serverName: string) => CACHE_PATHS.mcpLogs(serverName),
+})
 import { attachErrorLogSink, dateToFilename } from './error-log.js'
 
 const DATE = dateToFilename(new Date())
