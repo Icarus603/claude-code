@@ -181,11 +181,17 @@ main() {
   version="$(resolve_version)"
   url="$(download_url "$version" "$platform")"
 
+  # On-disk slot name is bare (no leading 'v') to match the binary's
+  # self-reported MACRO.VERSION and the auto-updater's bareVersion()
+  # convention. Mixing 'v26.4.X' and '26.4.X' as sibling slots breaks
+  # the rollback list and confuses the active-symlink target.
+  bare_version="${version#v}"
+
   ext=""
   [[ "$platform" == windows-* ]] && ext=".exe"
   bin_name="ccb${ext}"
 
-  versioned_path="$VERSIONS_DIR/$version$ext"
+  versioned_path="$VERSIONS_DIR/$bare_version$ext"
   symlink_path="$BIN_DIR/$bin_name"
 
   log "Installing ccb $version for $platform"

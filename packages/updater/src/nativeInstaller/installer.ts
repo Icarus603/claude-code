@@ -124,6 +124,19 @@ async function isPossibleClaudeBinary(filePath: string): Promise<boolean> {
   }
 }
 
+/**
+ * Strip a leading 'v' from a version string. GitHub release tags carry
+ * the 'v' (e.g. 'v26.4.19'); on-disk binary slot names do NOT — bare
+ * '26.4.19' matches install.sh's layout AND the binary's self-reported
+ * version (`MACRO.VERSION` is bare). Without this, the auto-updater
+ * writes 'versions/v26.4.19' while install.sh writes 'versions/26.4.19',
+ * and the symlink target hops between the two namespaces every install
+ * pass. Idempotent — bare versions pass through unchanged.
+ */
+function bareVersion(version: string): string {
+  return version.replace(/^v/, '')
+}
+
 async function getVersionPaths(version: string) {
   const dirs = getBaseDirectories()
 
@@ -135,7 +148,8 @@ async function getVersionPaths(version: string) {
   const executableParentDir = dirname(dirs.executable)
   await mkdir(executableParentDir, { recursive: true })
 
-  const installPath = join(dirs.versions, version)
+  const slot = bareVersion(version)
+  const installPath = join(dirs.versions, slot)
 
   // Create an empty file if it doesn't exist
   try {
@@ -145,7 +159,7 @@ async function getVersionPaths(version: string) {
   }
 
   return {
-    stagingPath: join(dirs.staging, version),
+    stagingPath: join(dirs.staging, slot),
     installPath,
   }
 }
