@@ -1,3 +1,8 @@
+/**
+ * packageHostSetup — top-level host-binding wire that calls each
+ * package's installXxxHostBindings entry. `as any/unknown` casts here
+ * are by-design type-system bypass for the runtime-binding pattern.
+ */
 import { installAgentHostBindings } from '@claude-code/agent'
 // cli bindings are wired by packages/app-host/src/runtime/installCliBindings.ts
 // (auto-run on import). Importing installCliHostBindings here closed a 7-file

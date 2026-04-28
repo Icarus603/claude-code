@@ -1,13 +1,16 @@
 /**
- * installLocalObservabilityBindings — wires root src/* utilities into the
- * @claude-code/local-observability package at runtime.
+ * installLocalObservabilityBindings — host-binding wire that injects
+ * host-side implementations into the @claude-code/local-observability
+ * package's setter-injection slots at startup.
  *
  * local-observability is a Wave-1 leaf package with no src/* imports.
  * Any piece of app state (session id, fs, cache paths, privacy flag,
  * cleanup registry, debug logger, sentry) that its moved modules need
  * is injected here via setter calls on @claude-code/local-observability/_deps.
  *
- * Called from src/runtime/bootstrap.ts on startup.
+ * `as any/unknown` casts in this file are by-design type-system bypass
+ * for the runtime-binding pattern, not hidden mismatches. Called from
+ * src/runtime/bootstrap.ts on startup.
  */
 
 import {

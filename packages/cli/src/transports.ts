@@ -1,3 +1,9 @@
+/**
+ * Transport — host-binding adapter that lazy-loads optional transport
+ * impls (SSE, WebSocket, MCP). `as any/unknown` casts here are
+ * by-design type-system bypass for the runtime-binding pattern across
+ * transports with structurally-different but interchangeable surfaces.
+ */
 type TransportConstructor<T = unknown> = new (...args: any[]) => T
 
 export type Transport = {

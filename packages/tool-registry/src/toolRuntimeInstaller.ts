@@ -1,3 +1,8 @@
+/**
+ * toolRuntimeInstaller — host-binding wire for the tool-registry
+ * runtime. `as any/unknown` casts are by-design type-system bypass
+ * for the runtime-binding pattern, not hidden mismatches.
+ */
 import {
   hasToolRegistryHostBindings,
   installToolRegistryHostBindings,
