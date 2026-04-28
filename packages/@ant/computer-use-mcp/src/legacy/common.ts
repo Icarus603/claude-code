@@ -52,14 +52,14 @@ export function getTerminalBundleId(): string | null {
  * takes this shape (no `hostBundleId`, no `teachMode`).
  */
 export const CLI_CU_CAPABILITIES = {
-  screenshotFiltering: (process.platform === 'darwin'
-    ? 'native'
-    : 'none') as any,
-  platform: (process.platform === 'win32'
-    ? 'win32'
-    : process.platform === 'linux'
-      ? 'linux'
-      : 'darwin') as any,
+  screenshotFiltering:
+    process.platform === 'darwin' ? ('native' as const) : ('none' as const),
+  platform:
+    process.platform === 'win32'
+      ? ('win32' as const)
+      : process.platform === 'linux'
+        ? ('linux' as const)
+        : ('darwin' as const),
 }
 
 export function isComputerUseMCPServer(name: string): boolean {

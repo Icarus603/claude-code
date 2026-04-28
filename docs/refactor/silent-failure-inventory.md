@@ -27,10 +27,10 @@ Findings are graded:
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
-| 10 | type-cast-trap | 211 | 0 | 0 | 52 | 159 |
+| 10 | type-cast-trap | 196 | 0 | 0 | 36 | 160 |
 | 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **818** | **0** | **0** | **52** | **766** |
+| **TOTAL** | | **803** | **0** | **0** | **36** | **767** |
 
 ## Patterns in detail
 
@@ -295,19 +295,11 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 566; **findings**: 211
+**Total scanned**: 550; **findings**: 196
 
-#### MEDIUM (52)
+#### MEDIUM (36)
 
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:889` — throw new Error((extractResult as any).error.message)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:893` — pageCount: (extractResult as any).data.file.count,
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:961` — available: (extractResult as any).error.reason !== 'unavailable',
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:978` — throw new Error((readResult as any).error.message)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1185` — const fallbackBuffer = await (sharp as any)(imageBuffer)
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1186` — const fallbackBuffer = await (sharp as any)(imageBuffer)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/api.ts:53` — return getToolRegistry().filterByDenyRules(tools, permissionContext as any)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -325,30 +317,6 @@ Findings are graded:
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/mcp-runtime/src/useManageMCPConnections.ts:528` — origin: { kind: 'channel', server: client.name } as any,
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/core/AgentLoop.ts:137` — const rawAsst = assistantMessage as any
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/core/AgentLoop.ts:365` — const delta = (event as any).delta as { type?: string; text?: string; thinking?: string; partial_json?: string }
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/core/AgentLoop.ts:418` — const raw = message as any
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/toolSearch.ts:554` — const carried = (msg as any).compactMetadata?.preCompactDiscoveredTools as string[] | undefined
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/sideQuestion.ts:139` — const toolName = 'name' in toolUse ? (toolUse as any).name : 'a tool'
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/sideQuestion.ts:151` — return `(API error: ${formatAPIError(apiErr.error as any)})`
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/sessionTitle.ts:105` — const text = extractTextContent(result.message.content as any)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/hooks/execAgentHook.ts:214` — (message as any).attachment.type === 'structured_output'
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/hooks/execAgentHook.ts:216` — const parsed = hookResponseSchema().safeParse((message as any).attachment.data)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/forkedAgent.ts:561` — (message as any).event?.type === 'message_delta' &&
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/forkedAgent.ts:562` — (message as any).event.usage
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/agent/forkedAgent.ts:564` — const turnUsage = updateUsage({ ...EMPTY_USAGE }, (message as any).event.usage)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/agent/sessionTools/transcriptSearch.ts:99` — : (p as any[]).flatMap(b => (b.type === 'text' ? [b.text] : [])).join('\n')
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/cli/src/entry/cli.tsx:7` — ;(globalThis as any).MACRO = {
@@ -359,9 +327,41 @@ Findings are graded:
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/cli/src/transports/ccrClient.ts:378` — (result as any).retryAfterMs,
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...22 more (run audit with no flags for full JSON)
+- `packages/cli/src/transports/ccrClient.ts:401` — (result as any).retryAfterMs,
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/cli/src/transports/ccrClient.ts:430` — throw new RetryableError('delivery POST failed', (result as any).retryAfterMs)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/cli/src/headless/sdk/session/run-streaming.ts:1695` — files: (result as any).persistedFiles,
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/cli/src/headless/sdk/session/run-streaming.ts:1696` — failed: (result as any).failedFiles,
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/storage/src/plans.ts:370` — (snapshotFiles as any[]).push({
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/storage/src/plans.ts:377` — if ((snapshotFiles as any[]).length === 0) {
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/storage/src/filePersistence/outputsScanner.ts:72` — }) as any[]
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/storage/src/filePersistence/outputsScanner.ts:116` — if (result && result.mtimeMs >= (turnStartTime as any as number)) {
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/storage/src/sessionRestore.ts:81` — const toolUse = (msg.message.content as any[]).find(
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/app-host/src/runtime/runtimeHandles.ts:118` — nextContext = applyPermissionUpdates(nextContext as any, updates)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/app-host/src/runtime/runtimeHandles.ts:123` — persistPermissionUpdates(updates as any)
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/app-host/src/runtime/bootstrap.ts:35` — createInteractiveSessionStore(initialState as any),
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/app-host/src/runtime/bootstrap.ts:39` — logDebug: (message, metadata) => logForDebugging(message, metadata as any),
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/app-host/src/runtime/bootstrap.ts:42` — syncRuntimeHandlesFromAppState(handles, state as any),
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/permission/src/permissionSetup.ts:5` — const _b = () => getPermissionHostBindings() as any
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/permission/src/permissions.ts:27` — const _b = () => getPermissionHostBindings() as any
+  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- ...6 more (run audit with no flags for full JSON)
 
-#### LOW (159)
+#### LOW (160)
 
 - `packages/swarm/testing/index.ts:20` — } as unknown as SwarmHostDeps
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -393,7 +393,7 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/ExitWorktreeTool/prompt.ts:9` — - The directory you're in if EnterWorktree was never called
   - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1180` — sharpModule as unknown as {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1181` — sharpModule as unknown as {
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/FileReadTool/imageProcessor.ts:62` — )) as unknown as MaybeDefault<SharpFunction>
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -423,7 +423,7 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/plugin/marketplaceManager.ts:191` — } as unknown as Record<string, DeclaredMarketplace>
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...129 more (run audit with no flags for full JSON)
+- ...130 more (run audit with no flags for full JSON)
 
 ### 11. `require-fallback-to-stub`
 
