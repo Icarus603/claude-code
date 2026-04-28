@@ -119,6 +119,9 @@
     "./settings/core/changeDetector.js": "./settings/core/changeDetector.ts",
     "./settings/core/constants.js": "./settings/core/constants.ts",
     "./contracts": "./contracts.ts",
-    "./errors": "./errors.ts"
+    "./errors": "./errors.ts",
+    "./plugin/pluginOperations.js": "./plugin/pluginOperations.ts",
+    "./dxt/zip.js": "./dxt/zip.ts",
+    "./dxt/helpers.js": "./dxt/helpers.ts"
   }
 }

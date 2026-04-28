@@ -62,6 +62,29 @@ import {
   setRegisterHookCallbacksFn,
   setClearRegisteredPluginHooksFn,
   setGetSecureStorageFn,
+  // -- Wave A teardown: 20 silent-no-op slots whose paired getters had
+  //    real readers but no host wire. Each silently returned the safe
+  //    default — exact same bug class as the ralph-loop hook regression.
+  setRipGrepFn,
+  setUnzipFileFn,
+  setParseZipModesFn,
+  setIsFsInaccessibleFn,
+  setFindCanonicalGitRootFn,
+  setGetSystemDirectoriesFn,
+  setGetAdditionalDirectoriesForClaudeMdFn,
+  setGetUseCoworkPluginsFn,
+  setResetSentSkillNamesFn,
+  setUninstallPluginOpFn,
+  setUpdatePluginOpFn,
+  setClearAgentDefinitionsCacheFn,
+  setClearAllOutputStylesCacheFn,
+  setClearCommandsCacheFn,
+  setClearPromptCacheFn,
+  setParseEffortValueFn,
+  setParseYamlFn,
+  setParseUserSpecifiedModelFn,
+  setParseAndValidateManifestFromBytesFn,
+  setGetAgentDefinitionsWithOverridesFn,
 } from '@claude-code/config/plugin/_deps'
 
 import {
@@ -133,6 +156,114 @@ export function installPluginBindings(): void {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mod = require('@claude-code/storage/secureStorage.js')
     return mod.getSecureStorage?.() ?? null
+  })
+
+  // --- Wave A teardown: 20 silent-no-op slots whose paired getters had
+  //     real readers but no host wire. Each was identical in shape to the
+  //     ralph-loop bug (slot declared, default no-op, reader silently
+  //     gets the no-op). Every wire below maps the slot to its canonical
+  //     V7 implementation. Where a require() is used instead of a static
+  //     import, it's to avoid load-order issues when the impl module
+  //     also touches host state during its own init.
+  setRipGrepFn(async (...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { ripGrep } = require('@claude-code/tool-registry/ripgrep.js')
+    return ripGrep(...args)
+  })
+  setUnzipFileFn((zipPath, destDir) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { unzipFile } = require('@claude-code/config/dxt/zip.js')
+    return unzipFile(zipPath, destDir)
+  })
+  setParseZipModesFn((data: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseZipModes } = require('@claude-code/config/dxt/zip.js')
+    return parseZipModes(data)
+  })
+  setIsFsInaccessibleFn((err: unknown): boolean => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isFsInaccessible } = require('@claude-code/local-observability/errorHelpers.js')
+    return isFsInaccessible(err)
+  })
+  setFindCanonicalGitRootFn((p: string): string => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findCanonicalGitRoot } = require('@claude-code/storage/git.js')
+    return findCanonicalGitRoot(p)
+  })
+  setGetSystemDirectoriesFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getSystemDirectories } = require('@claude-code/agent/misc/systemDirectories.js')
+    return getSystemDirectories()
+  })
+  setGetAdditionalDirectoriesForClaudeMdFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../bootstrap/state.js')
+    return mod.getAdditionalDirectoriesForClaudeMd?.() ?? []
+  })
+  setGetUseCoworkPluginsFn((): boolean => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../bootstrap/state.js')
+    return mod.getUseCoworkPlugins?.() ?? false
+  })
+  setResetSentSkillNamesFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resetSentSkillNames } = require('@claude-code/agent/attachments.js')
+    resetSentSkillNames()
+  })
+  setUninstallPluginOpFn(async (...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { uninstallPluginOp } = require('@claude-code/config/plugin/pluginOperations.js')
+    return uninstallPluginOp(...args)
+  })
+  setUpdatePluginOpFn(async (...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { updatePluginOp } = require('@claude-code/config/plugin/pluginOperations.js')
+    return updatePluginOp(...args)
+  })
+  setClearAgentDefinitionsCacheFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { clearAgentDefinitionsCache } = require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
+    clearAgentDefinitionsCache()
+  })
+  setClearAllOutputStylesCacheFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { clearAllOutputStylesCache } = require('@claude-code/config/outputStyles.js')
+    clearAllOutputStylesCache()
+  })
+  setClearCommandsCacheFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { clearCommandsCache } = require('@claude-code/command-runtime/api.js')
+    clearCommandsCache()
+  })
+  setClearPromptCacheFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { clearPromptCache } = require('@claude-code/tool-registry/tools/SkillTool/prompt.js')
+    clearPromptCache()
+  })
+  setParseEffortValueFn((v: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseEffortValue } = require('@claude-code/agent/effort.js')
+    return parseEffortValue(v)
+  })
+  setParseYamlFn((input: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseYaml } = require('@claude-code/agent/yaml.js')
+    return parseYaml(input)
+  })
+  setParseUserSpecifiedModelFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseUserSpecifiedModel } = require('@claude-code/provider/model.js')
+    return parseUserSpecifiedModel(...args)
+  })
+  setParseAndValidateManifestFromBytesFn(async (...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseAndValidateManifestFromBytes } = require('@claude-code/config/dxt/helpers.js')
+    return parseAndValidateManifestFromBytes(...args)
+  })
+  setGetAgentDefinitionsWithOverridesFn(async (...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getAgentDefinitionsWithOverrides } = require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
+    return getAgentDefinitionsWithOverrides(...args)
   })
 
   // --- session / cwd
@@ -266,7 +397,7 @@ export function installPluginBindings(): void {
   // --- services/plugins/pluginOperations (cyclic with plugin utils)
   setPluginOperationsFn(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/config/plugin/pluginOperations'),
+    require('@claude-code/config/plugin/pluginOperations.js'),
   )
 
   // --- misc helpers
