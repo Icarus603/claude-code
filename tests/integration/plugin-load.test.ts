@@ -95,6 +95,7 @@ describe('plugin loading e2e (guards against setter-shim regressions)', () => {
     const { expandEnvVarsInString } = await import(
       '@claude-code/config/plugin/_deps.js'
     )
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: test input intentionally uses ${HOME} as the shell-expansion syntax we're testing
     const result = expandEnvVarsInString('hello ${HOME}') as {
       expanded: string
       missingVars: string[]

@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/suspicious/noControlCharactersInRegex: \x1b is the ANSI escape; this whole module is about ANSI color codes */
 import { describe, expect, test } from "bun:test";
 import { __test } from "../index";
 

@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/correctness/useYield: notImplemented stubs intentionally throw without yielding */
 import { existsSync } from 'node:fs'
 import {
   mkdir,

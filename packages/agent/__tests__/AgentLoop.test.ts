@@ -1,4 +1,5 @@
 
+/* biome-ignore-all lint/correctness/useYield: test fixtures intentionally throw or return early before yielding */
 import { describe, test, expect, mock, beforeEach } from 'bun:test'
 import { AgentLoop } from '../core/AgentLoop.js'
 import { createMockDeps, END_TURN_EVENTS, createToolUseStreamEvents, createMockStream } from './fixtures/mockDeps.js'

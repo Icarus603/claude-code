@@ -251,6 +251,7 @@ const BRACE_EXPANSION_RE = /\{[^{}\s]*(,|\.\.)[^{}\s]*\}/
  * word boundaries.
  */
 // eslint-disable-next-line no-control-regex
+// biome-ignore lint/suspicious/noControlCharactersInRegex: this regex's purpose IS to find control chars
 const CONTROL_CHAR_RE = /[\x00-\x08\x0B-\x1F\x7F]/
 
 /**
@@ -1897,6 +1898,7 @@ function walkVariableAssignment(
     ) {
       return {
         kind: 'too-complex',
+        // biome-ignore lint/suspicious/noTemplateCurlyInString: ${VAR} is bash syntax described in this user-facing string, not a JS template literal
         reason:
           'PS4 value outside safe charset — only ${VAR} refs and [A-Za-z0-9 _+:.=/[]-] allowed',
         nodeType: 'variable_assignment',

@@ -496,7 +496,6 @@ export async function runModeDispatch(
 			// Ignore "code" as a prompt - treat it the same as no prompt
 			if (prompt === "code") {
 				logEvent("tengu_code_prompt_ignored", {});
-				// biome-ignore lint/suspicious/noConsole:: intentional console output
 				console.warn(
 					chalk.yellow(
 						"Tip: You can launch Claude Code with just `claude`",
@@ -562,7 +561,6 @@ export async function runModeDispatch(
 				kairosGate
 			) {
 				if (!checkHasTrustDialogAccepted()) {
-					// biome-ignore lint/suspicious/noConsole:: intentional console output
 					console.warn(
 						chalk.yellow(
 							"Assistant mode disabled: directory is not trusted. Accept the trust dialog and restart.",
@@ -1186,7 +1184,6 @@ export async function runModeDispatch(
 					});
 					logForDebugging(`[Claude in Chrome] Error: ${error}`);
 					logError(error);
-					// biome-ignore lint/suspicious/noConsole:: intentional console output
 					console.error(
 						`Error: Failed to run with Claude in Chrome.`,
 					);
@@ -1473,7 +1470,6 @@ export async function runModeDispatch(
 
 			// Print any warnings from initialization
 			warnings.forEach((warning) => {
-				// biome-ignore lint/suspicious/noConsole:: intentional console output
 				console.error(warning);
 			});
 
@@ -1535,7 +1531,6 @@ export async function runModeDispatch(
 				inputFormat !== "text" &&
 				inputFormat !== "stream-json"
 			) {
-				// biome-ignore lint/suspicious/noConsole:: intentional console output
 				console.error(`Error: Invalid input format "${inputFormat}".`);
 				process.exit(1);
 			}
@@ -1543,7 +1538,6 @@ export async function runModeDispatch(
 				inputFormat === "stream-json" &&
 				outputFormat !== "stream-json"
 			) {
-				// biome-ignore lint/suspicious/noConsole:: intentional console output
 				console.error(
 					`Error: --input-format=stream-json requires output-format=stream-json.`,
 				);
@@ -1556,7 +1550,6 @@ export async function runModeDispatch(
 					inputFormat !== "stream-json" ||
 					outputFormat !== "stream-json"
 				) {
-					// biome-ignore lint/suspicious/noConsole:: intentional console output
 					console.error(
 						`Error: --sdk-url requires both --input-format=stream-json and --output-format=stream-json.`,
 					);
@@ -1570,7 +1563,6 @@ export async function runModeDispatch(
 					inputFormat !== "stream-json" ||
 					outputFormat !== "stream-json"
 				) {
-					// biome-ignore lint/suspicious/noConsole:: intentional console output
 					console.error(
 						`Error: --replay-user-messages requires both --input-format=stream-json and --output-format=stream-json.`,
 					);

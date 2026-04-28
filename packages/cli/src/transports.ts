@@ -3,7 +3,12 @@
  * impls (SSE, WebSocket, MCP). `as any/unknown` casts here are
  * by-design type-system bypass for the runtime-binding pattern across
  * transports with structurally-different but interchangeable surfaces.
+ *
+ * The constructor proxies (`return new RealCtor(...)`) intentionally
+ * replace `this` with the lazy-loaded class instance — biome's
+ * `noConstructorReturn` flags this; we explicitly want it.
  */
+/* biome-ignore-all lint/correctness/noConstructorReturn: constructor proxies for lazy-loaded transports */
 type TransportConstructor<T = unknown> = new (...args: any[]) => T
 
 export type Transport = {
