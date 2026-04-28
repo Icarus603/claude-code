@@ -42,11 +42,15 @@ for (const file of allFiles) {
     total++
     const varName = m[1]
 
-    // Look for setters: `NAME = ` lines in same file (excluding the decl)
+    // Look for setters: `NAME = ` or `NAME ??= ` or `NAME += ` etc. lines
+    // in same file (excluding the decl). Lazy-init via `??=` is a common
+    // pattern that's NOT a silent-failure (the lazy initializer fires on
+    // first read).
     let writeSites = 0
     for (let j = 0; j < lines.length; j++) {
       if (j === i) continue
-      const re = new RegExp(`^\\s*${varName}\\s*=\\s*[^=]`)
+      // Match any assignment to this var: `=`, `??=`, `||=`, `+=`, etc.
+      const re = new RegExp(`(?:^|\\W)${varName}\\s*(=[^=]|\\?\\?=|\\|\\|=|&&=|\\+=)`)
       if (re.test(lines[j])) writeSites++
     }
     if (writeSites > 0) continue  // someone writes it; OK
