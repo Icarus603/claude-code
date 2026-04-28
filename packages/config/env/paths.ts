@@ -2,13 +2,11 @@ import memoize from 'lodash-es/memoize.js'
 import { homedir } from 'os'
 import { join } from 'path'
 
-import {
-  fileSuffixForOauthConfig,
-  findExecutable,
-  getEnvFsImplementation,
-  isRunningWithBun,
-  which,
-} from './_deps.js'
+import { isRunningWithBun } from '@claude-code/config/bundledMode'
+import { fileSuffixForOauthConfig } from '@claude-code/provider/oauthConstants'
+import { findExecutable } from '@claude-code/shell/findExecutable.js'
+import { which } from '@claude-code/shell/which.js'
+import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from './utils.js'
 
 type Platform = 'win32' | 'darwin' | 'linux'
@@ -17,7 +15,7 @@ type Platform = 'win32' | 'darwin' | 'linux'
 export const getGlobalClaudeFile = memoize((): string => {
   // Legacy fallback for backwards compatibility
   if (
-    getEnvFsImplementation().existsSync(
+    getFsImplementation().existsSync(
       join(getClaudeConfigHomeDir(), '.config.json'),
     )
   ) {
@@ -76,7 +74,7 @@ const detectRuntimes = memoize(async (): Promise<string[]> => {
 const isWslEnvironment = memoize((): boolean => {
   try {
     // Check for WSLInterop file which is a reliable indicator of WSL
-    return getEnvFsImplementation().existsSync(
+    return getFsImplementation().existsSync(
       '/proc/sys/fs/binfmt_misc/WSLInterop',
     )
   } catch (_error) {
@@ -266,7 +264,7 @@ export const detectDeploymentEnvironment = memoize((): string => {
   if (process.env.AWS_EXECUTION_ENV === 'AWS_ECS_EC2') return 'aws-ecs'
   // Check for EC2 via hypervisor UUID
   try {
-    const uuid = getEnvFsImplementation()
+    const uuid = getFsImplementation()
       .readFileSync('/sys/hypervisor/uuid', { encoding: 'utf8' })
       .trim()
       .toLowerCase()
@@ -294,7 +292,7 @@ export const detectDeploymentEnvironment = memoize((): string => {
   // Container orchestration
   if (process.env.KUBERNETES_SERVICE_HOST) return 'kubernetes'
   try {
-    if (getEnvFsImplementation().existsSync('/.dockerenv')) return 'docker'
+    if (getFsImplementation().existsSync('/.dockerenv')) return 'docker'
   } catch {
     // Ignore errors checking for Docker
   }
