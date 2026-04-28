@@ -1,5 +1,6 @@
 import { getProviderAdapter, getProviderContextPipeline } from '@claude-code/provider'
 import '@claude-code/provider/providerHostSetup'
+import { logError } from '@claude-code/local-observability/logging'
 import { findToolByName } from '@claude-code/tool-registry'
 import { handleStopHooks } from './hooks/index.js'
 import type {
@@ -358,7 +359,11 @@ class ContextDepImpl implements AgentDeps['context'] {
     }
     try {
       return await this.contextPipeline.getUserContext()
-    } catch {
+    } catch (e) {
+      // Context build failure must not crash the agent loop, but it
+      // shouldn't be invisible either — a missing CLAUDE.md or git
+      // failure here can flip prompt behavior silently.
+      logError(e)
       return {}
     }
   }
@@ -369,7 +374,8 @@ class ContextDepImpl implements AgentDeps['context'] {
     }
     try {
       return await this.contextPipeline.getSystemContext()
-    } catch {
+    } catch (e) {
+      logError(e)
       return {}
     }
   }
