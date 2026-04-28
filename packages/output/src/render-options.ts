@@ -2,7 +2,8 @@ import { openSync } from 'fs'
 import { ReadStream } from 'tty'
 import type { RenderOptions } from '@anthropic/ink'
 
-import { isEnvTruthy, logError } from './_deps.js'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { logError } from '@claude-code/local-observability/logging'
 
 // Cached stdin override - computed once per process
 let cachedStdinOverride: ReadStream | undefined | null = null

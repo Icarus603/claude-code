@@ -1,7 +1,7 @@
 // Pure display formatters — leaf-safe (no Ink). Width-aware truncation
 // still lives in src/utils/truncate.ts pending its own migration.
 
-import { getRelativeTimeFormat, getTimeZone } from '../_deps.js'
+import { getRelativeTimeFormat, getTimeZone } from '../utils/intl.js'
 
 /**
  * Formats a byte count to a human-readable string (KB, MB, GB).

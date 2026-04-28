@@ -75,9 +75,6 @@ export function installRuntimeSkeletonBindings(): void {
   // because app-host itself depends on local-observability.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('./installLocalObservabilityBindings.js')
-  // output (Wave-2 leaf) — wire setters used by formatters/capture/asciicast.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('./installOutputBindings.js')
   // config/plugin (Wave-1 subtree) — wire the 50+ setters for the plugin
   // subsystem that was migrated out of src/utils/plugins/ in Round 4.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
