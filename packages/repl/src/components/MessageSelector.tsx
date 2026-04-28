@@ -396,7 +396,15 @@ export function MessageSelector({
       if (!isFileHistoryEnabled) {
         return
       }
-      // Load file snapshot metadata
+      // Picker label = per-turn delta (this turn's edits), matching ant's
+      // 4739.js DJ3 logic. The label answers "what did this turn touch?"
+      // — chat-only turns show "No code changes". Confirmation dialog
+      // separately shows the *cumulative* restore impact via
+      // `fileHistoryGetDiffStats` so the user sees the full undo scope
+      // before pressing Enter. Both views are correct for different
+      // questions; the bug was users skimming past the confirmation
+      // dialog. Don't merge the two metrics — losing per-turn info hides
+      // chat-only turns that are useful rewind anchors.
       void Promise.all(
         messageOptions.map(async (userMessage, itemIndex) => {
           if (userMessage.uuid !== currentUUID) {
@@ -830,6 +838,9 @@ function UserMessageOption({
 
 /**
  * Computes the diff stats for all the file edits in-between two messages.
+ * Used by the rewind picker to label each row with PER-TURN edit impact
+ * (matches ant's DJ3 in 4739.js). The confirmation dialog separately
+ * shows cumulative restore impact via `fileHistoryGetDiffStats`.
  */
 function computeDiffStatsBetweenMessages(
   messages: Message[],
