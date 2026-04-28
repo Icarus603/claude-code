@@ -372,6 +372,20 @@ const CHECKS: Check[] = [
     doc: 'Every _deps.ts setter slot must have a caller (or allow-unwired comment)',
   },
   {
+    id: 'await-generator-misuse',
+    layer: 'Cross-Cutting',
+    subsystem: 'silent-failure prevention',
+    script: 'scripts/verify-await-generator-misuse.ts',
+    doc: '`await asyncFunctionStar()` is forbidden — body never runs; use `for await` / `.next()` (HookDepImpl.onStop bug class)',
+  },
+  {
+    id: 'dual-storage-divergence',
+    layer: 'Cross-Cutting',
+    subsystem: 'silent-failure prevention',
+    script: 'scripts/verify-dual-storage-divergence.ts',
+    doc: 'reader & writer of same logical store must share a backing — ralph-loop bug class (write to A, read from B)',
+  },
+  {
     id: 'duplicate-canonicals',
     layer: 'Cross-Cutting',
     subsystem: 'fork detection',

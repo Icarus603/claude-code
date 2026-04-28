@@ -106,6 +106,11 @@ for (const fn of allFns) {
       'AdditionalDirectoriesForClaudeMd', 'UseCoworkPlugins', 'Value',
       'SessionId', 'ProjectRoot', 'GlobalClaudeFile', 'ConfigHomeDir',
       'CwdState', 'ModelStrings', 'SdkBetas', 'PlanSlug',
+      // Common-noun ambiguities — `Session` / `Task` exist in multiple
+      // independent subsystems with different concepts (concurrency
+      // counter vs ingress lifecycle vs file-system task vs in-memory
+      // React-state task). Cross-package occurrences are intentional.
+      'Session', 'Task',
     ])
     if (HOST_BINDING_NAMES.has(noun)) continue
 
