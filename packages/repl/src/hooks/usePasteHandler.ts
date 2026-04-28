@@ -123,10 +123,17 @@ export function usePasteHandler({
             // - Unix: space followed by `/` (e.g., `/Users/...`)
             // - Windows: space followed by drive letter and `:\` (e.g., `C:\Users\...`)
             // This works because spaces within paths are escaped (e.g., `file\ name.png`)
+            // Trim each split line to match the gating check at L248
+            // (`isImageFilePath(line.trim())`). Without trimming here, a path
+            // pasted with terminal-injected leading/trailing whitespace would
+            // gate-pass at L248 (trims) but fail detection here (no trim),
+            // causing `imagePaths.length === 0` and the path string to fall
+            // through to onPaste() — exactly the bug we're fixing.
             const lines = pastedText
               .split(/ (?=\/|[A-Za-z]:\\)/)
               .flatMap(part => part.split('\n'))
-              .filter(line => line.trim())
+              .map(line => line.trim())
+              .filter(line => line)
             const imagePaths = lines.filter(line => isImageFilePath(line))
 
             if (onImagePaste && imagePaths.length > 0) {
