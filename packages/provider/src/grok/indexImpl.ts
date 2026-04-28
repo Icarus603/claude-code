@@ -112,7 +112,7 @@ export async function* queryModelGrok(
 
     const adaptedStream = adaptOpenAIStreamToAnthropic(stream, grokModel)
     const contentBlocks: Record<number, any> = {}
-    let partialMessage: any = undefined
+    let partialMessage: any 
     let usage = {
       input_tokens: 0,
       output_tokens: 0,

@@ -54,7 +54,7 @@ for (const [setter, getter] of TRUE_BUGS) {
   let raw = ''
   try {
     raw = execSync(
-      `grep -rlE "import\\s*\\{[^}]*\\b${getter}\\b[^}]*\\}\\s*from\\s*['\\\"][^'\\\"]*_deps[^'\\\"]*['\\\"]" packages --include='*.ts' --include='*.tsx' --exclude-dir=node_modules`,
+      `grep -rlE "import\\s*\\{[^}]*\\b${getter}\\b[^}]*\\}\\s*from\\s*['\\"][^'\\"]*_deps[^'\\"]*['\\"]" packages --include='*.ts' --include='*.tsx' --exclude-dir=node_modules`,
       { encoding: 'utf8' },
     )
   } catch {}

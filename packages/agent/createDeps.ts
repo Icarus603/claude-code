@@ -12,6 +12,18 @@ import { getAgentHostBindings } from './host.js'
 import { recordTranscript } from './internal/runtimeBridges.js'
 import type { AgentDeps, CoreMessage, ProviderEvent, ProviderStreamParams, StopHookContext, StopHookResult, SystemPrompt } from './index.js'
 
+// Biome 2.x's parser doesn't accept `implements AgentDeps['provider']`
+// (indexed access on the implements list — valid TS, but the parser
+// rejects it). Extract aliases so the implements clauses are simple
+// identifiers.
+type ProviderDep = AgentDeps['provider']
+type ToolDep = AgentDeps['tools']
+type PermissionDep = AgentDeps['permission']
+type OutputDep = AgentDeps['output']
+type HookDep = AgentDeps['hooks']
+type ContextDep = AgentDeps['context']
+type SessionDep = AgentDeps['session']
+
 type RuntimeTool = {
   name: string
   aliases?: string[]
@@ -69,7 +81,7 @@ export interface CreateDepsParams {
   }
 }
 
-class ProviderDepImpl implements AgentDeps['provider'] {
+class ProviderDepImpl implements ProviderDep {
   constructor(
     private readonly toolUseContext: RuntimeToolUseContext,
     private readonly querySource?: string,
@@ -128,7 +140,7 @@ class ProviderDepImpl implements AgentDeps['provider'] {
   }
 }
 
-class ToolDepImpl implements AgentDeps['tools'] {
+class ToolDepImpl implements ToolDep {
   constructor(
     private readonly tools: RuntimeTool[],
     private readonly toolUseContext: RuntimeToolUseContext,
@@ -198,7 +210,7 @@ class ToolDepImpl implements AgentDeps['tools'] {
   }
 }
 
-class PermissionDepImpl implements AgentDeps['permission'] {
+class PermissionDepImpl implements PermissionDep {
   constructor(
     private readonly canUseToolFn: CanUseToolFn,
     private readonly toolUseContext: RuntimeToolUseContext,
@@ -244,7 +256,7 @@ class PermissionDepImpl implements AgentDeps['permission'] {
   }
 }
 
-class OutputDepImpl implements AgentDeps['output'] {
+class OutputDepImpl implements OutputDep {
   constructor(private readonly emitFn?: (event: unknown) => void) {}
 
   emit(event: unknown): void {
@@ -252,7 +264,7 @@ class OutputDepImpl implements AgentDeps['output'] {
   }
 }
 
-class HookDepImpl implements AgentDeps['hooks'] {
+class HookDepImpl implements HookDep {
   constructor(
     private readonly toolUseContext: RuntimeToolUseContext,
     private readonly querySource: string,
@@ -335,7 +347,7 @@ class HookDepImpl implements AgentDeps['hooks'] {
   }
 }
 
-class ContextDepImpl implements AgentDeps['context'] {
+class ContextDepImpl implements ContextDep {
   private readonly contextPipeline = getProviderContextPipeline()
 
   constructor(
@@ -381,7 +393,7 @@ class ContextDepImpl implements AgentDeps['context'] {
   }
 }
 
-class SessionDepImpl implements AgentDeps['session'] {
+class SessionDepImpl implements SessionDep {
   getSessionId(): string {
     return getAgentHostBindings().getSessionId?.() ?? 'unknown'
   }

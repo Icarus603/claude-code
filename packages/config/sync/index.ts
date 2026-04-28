@@ -36,7 +36,7 @@ function sleep(ms: number): Promise<void> { return new Promise(r => setTimeout(r
 const BASE_RETRY_DELAY_MS = 500
 function getRetryDelay(attempt: number, retryAfterHeader?: string | null, maxDelayMs = 32000): number {
   if (retryAfterHeader) { const s = parseInt(retryAfterHeader, 10); if (!isNaN(s)) return s * 1000 }
-  const base = Math.min(BASE_RETRY_DELAY_MS * Math.pow(2, attempt - 1), maxDelayMs)
+  const base = Math.min(BASE_RETRY_DELAY_MS * 2 ** (attempt - 1), maxDelayMs)
   return base + Math.random() * 0.25 * base
 }
 function getClaudeCodeUserAgent(): string { return `claude-code/${MACRO.VERSION}` }

@@ -1,5 +1,8 @@
 import { describe, expect, test, beforeEach, afterEach } from 'bun:test'
-import { getGrokClient, clearGrokClientCache } from '@claude-code/provider/grok/client.js'
+import {
+  getGrokClient,
+  clearGrokClientCache,
+} from '@claude-code/provider/grok/client.js'
 
 describe('getGrokClient', () => {
   const originalEnv = { ...process.env }

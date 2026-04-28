@@ -66,8 +66,12 @@ export async function spawnCli(opts: SpawnOptions = {}): Promise<SpawnResult> {
 
   let stdout = ''
   let stderr = ''
-  proc.stdout?.on('data', d => { stdout += d.toString() })
-  proc.stderr?.on('data', d => { stderr += d.toString() })
+  proc.stdout?.on('data', d => {
+    stdout += d.toString()
+  })
+  proc.stderr?.on('data', d => {
+    stderr += d.toString()
+  })
 
   if (opts.stdin !== undefined) {
     proc.stdin?.write(opts.stdin)

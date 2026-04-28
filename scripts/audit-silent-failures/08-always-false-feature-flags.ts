@@ -45,7 +45,7 @@ const { dev, build } = listEnabledFeatures()
 let raw = ''
 try {
   raw = execSync(
-    `grep -rEn "feature\\(['\\\"][A-Z_][A-Z0-9_]*['\\\"]\\)" packages --include='*.ts' --include='*.tsx' --exclude-dir=node_modules`,
+    `grep -rEn "feature\\(['\\"][A-Z_][A-Z0-9_]*['\\"]\\)" packages --include='*.ts' --include='*.tsx' --exclude-dir=node_modules`,
     { encoding: 'utf8', maxBuffer: 100 * 1024 * 1024 },
   )
 } catch {}

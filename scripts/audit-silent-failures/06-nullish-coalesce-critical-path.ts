@@ -123,7 +123,7 @@ for (const ln of raw.split('\n')) {
   // Type-asserted property access: `(x.y as Foo) ?? default` —
   // author's `as` declares the asserted shape; `??` only kicks in if
   // the property was actually undefined. Idiomatic.
-  if (/\(\s*[^()]+\s+as\s+\w[\w.<>|&\[\] ]*\s*\)\s*\?\?/.test(content)) continue
+  if (/\(\s*[^()]+\s+as\s+\w[\w.<>|&[\] ]*\s*\)\s*\?\?/.test(content)) continue
 
   // Highlight specifically the kind likely to mask failure: `await fn() ?? []`
   // or `fn() ?? null` where fn() can throw / return null on real error.

@@ -124,9 +124,10 @@ describe('plugin loading e2e (guards against setter-shim regressions)', () => {
     const { parseFrontmatter } = await import(
       '@claude-code/config/plugin/_deps.js'
     )
-    const result = parseFrontmatter(
-      '---\ndescription: test\n---\nbody',
-    ) as { frontmatter: Record<string, unknown>; content: string }
+    const result = parseFrontmatter('---\ndescription: test\n---\nbody') as {
+      frontmatter: Record<string, unknown>
+      content: string
+    }
     expect(result).toBeObject()
     expect(result.frontmatter).toBeObject()
     expect(typeof result.content).toBe('string')

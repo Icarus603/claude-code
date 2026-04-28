@@ -68,8 +68,8 @@ async function checkLint() {
 		const result = await $`bunx biome check . 2>&1`.quiet().nothrow().text();
 		const errorMatch = result.match(/Found (\d+) errors?/);
 		const warnMatch = result.match(/Found (\d+) warnings?/);
-		const errors = errorMatch ? Number.parseInt(errorMatch[1]) : 0;
-		const warnings = warnMatch ? Number.parseInt(warnMatch[1]) : 0;
+		const errors = errorMatch ? Number.parseInt(errorMatch[1], 10) : 0;
+		const warnings = warnMatch ? Number.parseInt(warnMatch[1], 10) : 0;
 		add("Lint errors", errors, errors === 0 ? "ok" : errors < 100 ? "warn" : "info");
 		add("Lint warnings", warnings, warnings === 0 ? "ok" : "info");
 	} catch {
@@ -85,8 +85,8 @@ async function checkTests() {
 		const result = await $`bun test 2>&1`.quiet().nothrow().text();
 		const passMatch = result.match(/(\d+) pass/);
 		const failMatch = result.match(/(\d+) fail/);
-		const pass = passMatch ? Number.parseInt(passMatch[1]) : 0;
-		const fail = failMatch ? Number.parseInt(failMatch[1]) : 0;
+		const pass = passMatch ? Number.parseInt(passMatch[1], 10) : 0;
+		const fail = failMatch ? Number.parseInt(failMatch[1], 10) : 0;
 		add("Tests passed", pass, pass > 0 ? "ok" : "warn");
 		add("Tests failed", fail, fail === 0 ? "ok" : "error");
 	} catch {

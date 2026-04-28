@@ -14,7 +14,7 @@ export function tee<T>(source: AsyncIterable<T>, count = 2): AsyncIterable<T>[] 
     () => [],
   )
   let sourceDone = false
-  let sourceError: unknown = undefined
+  let sourceError: unknown 
 
   function deliver(i: number, item: T): void {
     if (resolvers[i].length > 0) {

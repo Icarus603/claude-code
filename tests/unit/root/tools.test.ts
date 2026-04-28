@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { parseToolPreset, filterToolsByDenyRules } from '@claude-code/tool-registry/runtime'
+import {
+  parseToolPreset,
+  filterToolsByDenyRules,
+} from '@claude-code/tool-registry/runtime'
 import { getEmptyToolPermissionContext } from '@claude-code/tool-registry/Tool.js'
 
 describe('parseToolPreset', () => {

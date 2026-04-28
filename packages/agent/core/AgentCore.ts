@@ -14,8 +14,7 @@ export class AgentCore {
   private _sessionId: string
   private _interrupted: boolean
 
-  constructor(
-    private deps: AgentDeps,
+  constructor(deps: AgentDeps,
     initialState?: Partial<AgentState>,
   ) {
     this._messages = initialState?.messages ? [...initialState.messages] : []
