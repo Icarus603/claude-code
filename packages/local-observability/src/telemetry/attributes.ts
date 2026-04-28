@@ -4,8 +4,10 @@
  * Moved from src/utils/telemetryAttributes.ts. Builds the OpenTelemetry
  * attribute bag for metrics emissions.
  *
- * Host-injected deps (via ../_deps.ts): getSessionId, getOauthAccountInfo,
- * getOrCreateUserID, getTerminalType, toTaggedId.
+ * Cross-package deps (direct imports): getSessionId from app-host/state,
+ * getOauthAccountInfo from provider/authAlias, getOrCreateUserID from
+ * config, toTaggedId from agent/taggedId, getTerminalType from
+ * config/env/dynamic.
  */
 
 import type { Attributes } from '@opentelemetry/api'
