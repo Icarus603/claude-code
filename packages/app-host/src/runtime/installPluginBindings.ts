@@ -85,6 +85,30 @@ import {
   setParseUserSpecifiedModelFn,
   setParseAndValidateManifestFromBytesFn,
   setGetAgentDefinitionsWithOverridesFn,
+  // -- Wave A2: remaining 13 unwired slots with real readers
+  setIsBuiltinPluginIdFn,
+  setGetBuiltinPluginDefinitionFn,
+  setExtractDescriptionFromMarkdownFn,
+  setExpandTildeFn,
+  setExpandEnvVarsInStringFn,
+  setExecuteShellCommandsInPromptFn,
+  setParseFrontmatterFn,
+  setParseAgentToolsFromFrontmatterFn,
+  setParseSlashCommandToolsFromFrontmatterFn,
+  setParseShellFrontmatterFn,
+  setParseBooleanFrontmatterFn,
+  setParsePositiveIntFromFrontmatterFn,
+  setParseArgumentNamesFn,
+  setSubstituteArgumentsFn,
+  setPluralFn,
+  setHasShownHintThisSessionFn,
+  setSetPendingHintFn,
+  setReinitializeLspServerManagerFn,
+  setWaitForScrollIdleFn,
+  setWithDiagnosticsTimingFn,
+  setWriteFileSync_DEPRECATEDFn,
+  setWriteToStdoutFn,
+  setGracefulShutdownFn,
 } from '@claude-code/config/plugin/_deps'
 
 import {
@@ -265,6 +289,132 @@ export function installPluginBindings(): void {
     const { getAgentDefinitionsWithOverrides } = require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
     return getAgentDefinitionsWithOverrides(...args)
   })
+
+  // --- Wave A2: 13 remaining wires
+  setIsBuiltinPluginIdFn((id: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isBuiltinPluginId } = require('@claude-code/config/plugin/builtin')
+    return isBuiltinPluginId(id)
+  })
+  setGetBuiltinPluginDefinitionFn((id: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getBuiltinPluginDefinition } = require('@claude-code/config/plugin/builtin')
+    return getBuiltinPluginDefinition(id)
+  })
+  setExtractDescriptionFromMarkdownFn((text: string, def: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { extractDescriptionFromMarkdown } = require('@claude-code/tool-registry/markdownConfigLoader.js')
+    return extractDescriptionFromMarkdown(text, def)
+  })
+  setExpandTildeFn((p: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { expandTilde } = require('@claude-code/permission/pathValidation.js')
+    return expandTilde(p)
+  })
+  setExpandEnvVarsInStringFn((s: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { expandEnvVarsInString } = require('@claude-code/mcp-runtime/envExpansion.js')
+    return expandEnvVarsInString(s)
+  })
+  setExecuteShellCommandsInPromptFn(async (prompt: string, ...rest: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { executeShellCommandsInPrompt } = require('@claude-code/command-runtime/promptShellExecution.js')
+    return executeShellCommandsInPrompt(prompt, ...rest)
+  })
+  setParseFrontmatterFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseFrontmatter } = require('@claude-code/agent/frontmatterParser.js')
+    return parseFrontmatter(...args)
+  })
+  setParseAgentToolsFromFrontmatterFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseAgentToolsFromFrontmatter } = require('@claude-code/tool-registry/markdownConfigLoader.js')
+    return parseAgentToolsFromFrontmatter(...args)
+  })
+  setParseSlashCommandToolsFromFrontmatterFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseSlashCommandToolsFromFrontmatter } = require('@claude-code/tool-registry/markdownConfigLoader.js')
+    return parseSlashCommandToolsFromFrontmatter(...args)
+  })
+  setParseShellFrontmatterFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseShellFrontmatter } = require('@claude-code/agent/frontmatterParser.js')
+    return parseShellFrontmatter(...args)
+  })
+  setParseBooleanFrontmatterFn((v: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseBooleanFrontmatter } = require('@claude-code/agent/frontmatterParser.js')
+    return parseBooleanFrontmatter(v)
+  })
+  setParsePositiveIntFromFrontmatterFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parsePositiveIntFromFrontmatter } = require('@claude-code/agent/frontmatterParser.js')
+    return parsePositiveIntFromFrontmatter(...args)
+  })
+  setParseArgumentNamesFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseArgumentNames } = require('@claude-code/command-runtime/argumentSubstitution.js')
+    return parseArgumentNames(...args)
+  })
+  setSubstituteArgumentsFn((...args: unknown[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { substituteArguments } = require('@claude-code/command-runtime/argumentSubstitution.js')
+    return substituteArguments(...args)
+  })
+  setPluralFn((n: number, singular: string, plural?: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('@claude-code/output/utils/stringUtils.js')
+    return mod.plural(n, singular, plural)
+  })
+  setHasShownHintThisSessionFn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { hasShownHintThisSession } = require('@claude-code/tool-registry/claudeCodeHints.js')
+    return hasShownHintThisSession()
+  })
+  setSetPendingHintFn((hint: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { setPendingHint } = require('@claude-code/tool-registry/claudeCodeHints.js')
+    setPendingHint(hint)
+  })
+  setReinitializeLspServerManagerFn(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { reinitializeLspServerManager } = require('@claude-code/ide/lsp/manager.js')
+    return reinitializeLspServerManager()
+  })
+  setWaitForScrollIdleFn(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { waitForScrollIdle } = require('../bootstrap/state.js')
+    return waitForScrollIdle?.()
+  })
+  setWithDiagnosticsTimingFn(async <T>(event: string, fn: () => Promise<T>): Promise<T> => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { withDiagnosticsTiming } = require('@claude-code/local-observability/logging')
+    return withDiagnosticsTiming(event, fn) as Promise<T>
+  })
+  setWriteFileSync_DEPRECATEDFn((path: string, data: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { writeFileSync_DEPRECATED } = require('@claude-code/local-observability/slowOperations.js')
+    writeFileSync_DEPRECATED(path, data)
+  })
+  setWriteToStdoutFn((data: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { writeToStdout } = require('@claude-code/shell/process.js')
+    writeToStdout(data)
+  })
+  setGracefulShutdownFn(async (code?: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { gracefulShutdown } = require('../bootstrap/gracefulShutdown.js')
+    return gracefulShutdown(code)
+  })
+
+  // --- shell/_deps.ts wires (separate _deps file, same disease)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const shellDeps = require('@claude-code/shell/_deps.js')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const taskMod = require('@claude-code/tool-registry/Task.js')
+  if (shellDeps.setGenerateTaskIdFn && taskMod.generateTaskId) {
+    shellDeps.setGenerateTaskIdFn((prefix: string) => taskMod.generateTaskId(prefix))
+  }
 
   // --- session / cwd
   setGetSessionIdFn(() => getSessionId())

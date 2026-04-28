@@ -5,7 +5,7 @@
   "@claude-code/memory": 21,
   "@claude-code/config": 117,
   "@claude-code/command-runtime": 62,
-  "@claude-code/shell": 30,
+  "@claude-code/shell": 31,
   "@claude-code/bridge": 6,
   "@claude-code/local-observability": 33,
   "@claude-code/repl": 182,
