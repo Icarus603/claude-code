@@ -481,7 +481,7 @@ ${CYBER_RISK_INSTRUCTION}`,
           systemPromptSection(
             'token_budget',
             () =>
-              'When the user specifies a token target (e.g., "+500k", "spend 2M tokens", "use 1B tokens"), your output token count will be shown each turn. Keep working until you approach the target \u2014 plan your work to fill it productively. The target is a hard minimum, not a suggestion. If you stop early, the system will automatically continue you.',
+              'When the user specifies a token target (e.g., "+500k", "spend 2M tokens", "use 1B tokens"), your output token count will be shown each turn. Keep working until you approach the target — fill it with substantive *work* (deeper investigation, more files read, more tools called, more iterations refining the result), not with verbose prose. The conciseness rules above still apply to your text output: prose stays terse, tool calls and code do the work. If you stop early, the system will automatically continue you. The target is a hard minimum on total session activity, not a license to pad explanations.',
           ),
         ]
       : []),
