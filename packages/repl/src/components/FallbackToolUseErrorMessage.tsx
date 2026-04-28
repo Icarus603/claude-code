@@ -35,6 +35,19 @@ export function FallbackToolUseErrorMessage({
     // Strip <error> tags but keep their content (tags are for the model, not the UI)
     const withoutErrorTags = withoutSandboxViolations.replace(/<\/?error>/g, '')
     const trimmed = withoutErrorTags.trim()
+    // Deferred-tool first-call schema miss is infrastructure, not user error.
+    // The model auto-recovers via ToolSearch on the next turn (which itself
+    // renders nothing — userFacingName: '' + renderToolUseMessage: null).
+    // Show a dim "Loading tool…" line instead of the red Zod error so the
+    // failure-then-recover side reads as background work. Full error text
+    // remains visible in transcript mode (Ctrl+O) for debugging.
+    if (!verbose && trimmed.includes('schema was not sent to the API')) {
+      return (
+        <MessageResponse height={1}>
+          <Text dimColor>↻ Loading tool…</Text>
+        </MessageResponse>
+      )
+    }
     if (!verbose && trimmed.includes('InputValidationError: ')) {
       error = 'Invalid tool parameters'
     } else if (
