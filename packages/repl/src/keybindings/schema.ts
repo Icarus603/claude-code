@@ -29,6 +29,13 @@ export const KEYBINDING_CONTEXTS = [
   'ModelPicker',
   'Select',
   'Plugin',
+  // Used by DEFAULT_BINDINGS but were missing from the schema, so a user
+  // who copied the template into ~/.claude/keybindings.json got their file
+  // rejected at validation. Found via the keybindingsTemplate.test
+  // round-trip sanity check (2026-04-29).
+  'FormField',
+  'Scroll',
+  'EffortPicker',
 ] as const
 
 /**
@@ -56,6 +63,9 @@ export const KEYBINDING_CONTEXT_DESCRIPTIONS: Record<
   ModelPicker: 'When the model picker is open',
   Select: 'When a select/list component is focused',
   Plugin: 'When the plugin dialog is open',
+  FormField: 'When a form field (text input, etc.) is focused',
+  Scroll: 'When a scrollable region is focused',
+  EffortPicker: 'When the effort/reasoning-budget picker is open',
 }
 
 /**
@@ -174,6 +184,16 @@ export const KEYBINDING_ACTIONS = [
   'settings:close',
   // Voice actions
   'voice:pushToTalk',
+  // Scroll context (defaults bind these but the schema was missing them —
+  // 2026-04-29 round-trip audit caught this).
+  'scroll:pageUp',
+  'scroll:pageDown',
+  'scroll:lineUp',
+  'scroll:lineDown',
+  'scroll:top',
+  'scroll:bottom',
+  // Selection actions
+  'selection:copy',
 ] as const
 
 /**
