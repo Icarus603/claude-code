@@ -68,20 +68,99 @@ function Get-Platform {
 function Resolve-Version {
   if ($RequestedVersion -ne 'latest') { return $RequestedVersion }
 
-  # Hit GitHub's latest-release redirect; the Location header carries the tag.
-  # Invoke-WebRequest follows redirects by default, so RequestUri ends at the
-  # resolved release page like .../releases/tag/v26.4.24.
+  # Hit GitHub's latest-release redirect; the resolved tag lives at the end of
+  # the redirect chain (.../releases/tag/v26.4.24). The "final URI" lives in
+  # different places depending on the runtime, so we try multiple sources.
+  #
+  # Multi-path fallback (in order):
+  #   1. RequestMessage.RequestUri  — PowerShell 7+ / .NET Core. Available
+  #      after Invoke-WebRequest follows redirects.
+  #   2. BaseResponse.ResponseUri   — PowerShell 5.1 / .NET Framework. The
+  #      legacy property; RequestMessage may be $null on Win PowerShell.
+  #   3. Headers.Location           — when redirect is NOT followed
+  #      (-MaximumRedirection 0). Single hop; if GitHub adds another
+  #      302 in the chain, this needs a manual second request.
+  #
+  # The previous single-source code (RequestMessage only) silently failed on
+  # Windows PowerShell 5.1 because RequestMessage is null there — the whole
+  # install fell over with a vague .AbsoluteUri-of-null exception.
+  function Get-FinalUriFromResponse {
+    param($response)
+    # Path 1: PS 7+ / .NET Core
+    try {
+      $u = $response.BaseResponse.RequestMessage.RequestUri.AbsoluteUri
+      if ($u) { return $u }
+    } catch { }
+    # Path 2: PS 5.1 / .NET Framework legacy
+    try {
+      $u = $response.BaseResponse.ResponseUri.AbsoluteUri
+      if ($u) { return $u }
+    } catch { }
+    return $null
+  }
+
+  $url = "https://github.com/$Repo/releases/latest"
+
+  # First try: follow redirects normally and grab the resolved URI.
   try {
-    $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -UseBasicParsing -MaximumRedirection 5
+    $resp = Invoke-WebRequest -Uri $url -UseBasicParsing -MaximumRedirection 5
+    $finalUri = Get-FinalUriFromResponse $resp
+    if ($finalUri) {
+      $tag = ($finalUri -split '/')[-1]
+      if ($tag -and $tag -ne 'latest') { return $tag }
+    }
   } catch {
-    Write-Fatal "Could not resolve latest version: $($_.Exception.Message). Try: `$env:CCB_VERSION='vX.Y.Z'"
+    # Some configurations (corp proxies, restrictive .NET TLS) fail the
+    # redirect-follow path. Fall through to the manual Location-header
+    # path below before giving up.
   }
-  $finalUri = $resp.BaseResponse.RequestMessage.RequestUri.AbsoluteUri
-  $tag = ($finalUri -split '/')[-1]
-  if (-not $tag) {
-    Write-Fatal "Could not parse latest version tag from $finalUri"
+
+  # Second try: don't follow redirects; read the 302 Location header directly.
+  # This works even when redirect-following fails, as long as the first hop
+  # is reachable.
+  try {
+    $resp = Invoke-WebRequest -Uri $url -UseBasicParsing -MaximumRedirection 0 -ErrorAction Stop
+  } catch {
+    # Invoke-WebRequest with -MaximumRedirection 0 throws on a 3xx response.
+    # The response is attached to the exception.
+    $resp = $_.Exception.Response
   }
-  return $tag
+  if ($resp) {
+    # Header access shape depends on the runtime / response type:
+    #   PS 7 HttpResponseMessage:  Headers.Location is a Uri property
+    #   PS 5.1 HttpWebResponse:    Headers["Location"] indexer returns string
+    #   Invoke-WebRequest result:  Headers["Location"] returns string[]
+    # Try each shape in order, take whatever resolves first.
+    $location = $null
+
+    # Path A: HttpResponseMessage.Headers.Location (PS 7 exception path)
+    try {
+      $loc = $resp.Headers.Location
+      if ($loc) {
+        if ($loc -is [System.Uri]) { $location = $loc.AbsoluteUri }
+        else { $location = $loc.ToString() }
+      }
+    } catch { }
+
+    # Path B: indexer access — works for WebHeaderCollection (PS 5.1) and
+    # IDictionary<string,string[]> (Invoke-WebRequest .Headers in PS 7).
+    if (-not $location) {
+      try {
+        $loc = $resp.Headers['Location']
+        if ($loc) {
+          if ($loc -is [array]) { $loc = $loc[0] }
+          $location = "$loc"
+        }
+      } catch { }
+    }
+
+    if ($location) {
+      $tag = ($location -split '/')[-1]
+      if ($tag -and $tag -ne 'latest') { return $tag }
+    }
+  }
+
+  Write-Fatal "Could not resolve latest version. Try: `$env:CCB_VERSION='vX.Y.Z'"
 }
 
 # ----- download helpers ------------------------------------------------------
