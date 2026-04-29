@@ -193,6 +193,45 @@ export const INITIAL_STATE: KeyParseState = {
   pasteBuffer: '',
 }
 
+/**
+ * Detect SGR mouse-event garbage that escaped upstream defenses.
+ *
+ * The full event is `\x1b[<btn;col;rowM/m`. When chunked-read race drops
+ * the ESC anchor (tokenizer flush in heavy-render), continuation pieces
+ * arrive as plain text. Possible shapes after fragmentation:
+ *   - Full tail with `[`:  `[<65;67;38M`  (caught by anchored regex above)
+ *   - Mid-event chunk:     `5;67;38M`, `67;38M`, `9M`, `6M9M`, `[[<6`, ...
+ *   - Concatenated soup:   `[<65;67;38M[<66;67;38M`
+ *
+ * Heuristic:
+ *   1. All chars are in the SGR mouse alphabet `[<;0-9Mm]`
+ *   2. At least one mouse-distinctive char (`<`, `M`, or `m`)
+ *   3. NOT a pure terminator like `M` / `m` alone (would false-flag the
+ *      letter `M` user typed)
+ *   4. If length is very short (≤2), require the trailing M/m terminator
+ *      pattern `<digit>M` — protects words that happen to end in M.
+ *
+ * Trade-off: very short typed strings like `5M`, `9m` get dropped. These
+ * are extremely rare in real input (no English word, no common code
+ * pattern) and the user can re-type. The alternative — let garbage scroll
+ * the prompt off-screen on every wheel tick — is far worse.
+ */
+function isSgrMouseFragment(s: string): boolean {
+  if (!s) return false
+  // Alphabet check: only SGR-mouse-event chars.
+  if (!/^[\[<;\dMm]+$/.test(s)) return false
+  // Must contain at least one mouse-distinctive marker.
+  if (!/[<Mm]/.test(s)) return false
+  // For length≥3: any combination in the alphabet with a marker is garbage.
+  // (Real text needing 3+ chars from this restricted set is essentially
+  // impossible — no English word, no shell command, no code identifier.)
+  if (s.length >= 3) return true
+  // For length 1-2: require the `<digits>M/m` shape — the SGR terminator
+  // pattern. Catches `9M`, `6m` etc. but lets bare `M`, `m`, `<<`, `;;`,
+  // `12`, etc. through.
+  return /^\d+[Mm]$/.test(s)
+}
+
 function inputToString(input: Buffer | string): string {
   if (Buffer.isBuffer(input)) {
     if (input[0]! > 127 && input[1] === undefined) {
@@ -280,6 +319,21 @@ export function parseMultipleKeypresses(
         const resynthesized = '\x1b' + token.value
         const mouse = parseMouseEvent(resynthesized)
         keys.push(mouse ?? parseKeypress(resynthesized))
+      } else if (isSgrMouseFragment(token.value)) {
+        // SGR mouse fragment soup. When sustained scrolling (sticky-mode
+        // follow on streaming output) generates wheel events faster than
+        // React can render, multiple mouse sequences chunk-split AND queue
+        // up. After the upstream tokenizer drops partial CSI buffers on
+        // forced flush, the continuation chunks arrive as plain text — but
+        // they may carry several events worth of fragments concatenated:
+        //   "[<6" + "5;67;38M" + "[<66" + ";67;38M" + "[<65;" + "67;38M"
+        //   → "[<65;67;38M[<66;67;38M[<65;67;38M"  (well-formed leftovers)
+        // OR mid-event splits like "5;67;38M67;38M[<66;" — neither matches
+        // the single-event tail regex above. Their character set is strictly
+        // [<;0-9Mm] (SGR mouse alphabet). See isSgrMouseFragment for the
+        // exact heuristic and false-positive trade-offs.
+        // No-op: the SGR mouse events the chunks represent are already lost
+        // upstream (drop-on-flush). We just stop them from leaking as text.
       } else {
         keys.push(parseKeypress(token.value))
       }
