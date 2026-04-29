@@ -233,7 +233,11 @@ export function normalizeGitRemoteUrl(url: string): string | null {
       return `github.com/${proxyPath}`.toLowerCase()
     }
 
-    return `${host}/${path}`.toLowerCase()
+    // Strip ports on non-localhost so SCP-form `git@github.com:owner/repo`
+    // and `ssh://git@github.com:22/owner/repo` hash identically. Keep
+    // localhost ports — different ports are different proxy daemons.
+    const h = isLocalHost(host) ? host : host.split(':')[0]!
+    return `${h}/${path}`.toLowerCase()
   }
 
   return null
