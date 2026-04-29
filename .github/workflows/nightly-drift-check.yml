@@ -1,0 +1,83 @@
+name: Nightly Drift Check
+
+# Closes the pre-commit fast-subset gap. The pre-commit hook only runs ~8
+# fast verifiers; the slow set (tsc-errors, silent-failure-ratchet,
+# knip-headroom, deps-setters-wired, await-generator-misuse) only fires
+# on pre-push. Drift can accumulate between full-suite runs.
+#
+# This workflow runs the FULL doctor:arch + smoke on origin/main daily.
+# On failure, posts a sticky issue (one issue, updated each run) with the
+# failing verifier output so the developer sees it next session.
+#
+# See feedback_pre_commit_fast_subset_gap.md.
+
+on:
+  schedule:
+    # 00:00 UTC every day (= 08:00 HKT). Most pushes for the day are done.
+    - cron: '0 0 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  drift-check:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install ripgrep
+        run: brew install ripgrep
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: doctor:arch (full)
+        id: doctor
+        run: bun run doctor:arch
+        continue-on-error: true
+
+      - name: smoke
+        id: smoke
+        run: bun run smoke
+        continue-on-error: true
+
+      - name: tests
+        id: tests
+        run: bun test
+        continue-on-error: true
+
+      - name: Detect drift
+        id: drift
+        if: steps.doctor.outcome == 'failure' || steps.smoke.outcome == 'failure' || steps.tests.outcome == 'failure'
+        run: |
+          {
+            echo "## Drift detected on origin/main"
+            echo ""
+            echo "Nightly check at $(date -u +%Y-%m-%dT%H:%M:%SZ) UTC failed:"
+            echo ""
+            echo "- doctor:arch outcome: ${{ steps.doctor.outcome }}"
+            echo "- smoke outcome: ${{ steps.smoke.outcome }}"
+            echo "- tests outcome: ${{ steps.tests.outcome }}"
+            echo ""
+            echo "See the workflow run for full output:"
+            echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo ""
+            echo "Per feedback_pre_commit_fast_subset_gap.md: drift can"
+            echo "accumulate between developer pushes when the slow verifier"
+            echo "set isn't run. Investigate which verifier dropped, decide"
+            echo "whether to fix-or-bump-baseline, then commit on main."
+          } > /tmp/drift-body.md
+          echo "drift_body=/tmp/drift-body.md" >> $GITHUB_OUTPUT
+
+      - name: Open or update issue
+        if: steps.doctor.outcome == 'failure' || steps.smoke.outcome == 'failure' || steps.tests.outcome == 'failure'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 'Nightly drift detected on origin/main'
+          content-filepath: /tmp/drift-body.md
+          labels: 'drift,automated'
