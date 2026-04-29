@@ -897,7 +897,7 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
           }
           return handleShutdownRejection(
             input.message.request_id,
-            input.message.reason!,
+            input.message.reason ?? '(no reason given)',
           )
         case 'plan_approval_response':
           if (input.message.approve) {
