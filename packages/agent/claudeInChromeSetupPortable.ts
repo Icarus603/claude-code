@@ -4,8 +4,6 @@ import { join } from 'path'
 import { isFsInaccessible } from '@claude-code/local-observability/errorHelpers.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
-export const CHROME_EXTENSION_URL = 'https://claude.ai/chrome'
-
 // Production extension ID
 const PROD_EXTENSION_ID = 'fcoeoabgfenejglbffodgkkbkcdhcgfn'
 // Dev extension IDs (for internal use)
@@ -95,7 +93,7 @@ const CHROMIUM_BROWSERS: Record<ChromiumBrowser, BrowserDataConfig> = {
  * Get all browser data paths to check for extension installation.
  * Portable version that uses process.platform directly.
  */
-export function getAllBrowserDataPathsPortable(): BrowserPath[] {
+function getAllBrowserDataPathsPortable(): BrowserPath[] {
   const home = homedir()
   const paths: BrowserPath[] = []
 
@@ -145,7 +143,7 @@ export function getAllBrowserDataPathsPortable(): BrowserPath[] {
  * @param log - Optional logging callback for debug messages
  * @returns Object with isInstalled boolean and the browser where the extension was found
  */
-export async function detectExtensionInstallationPortable(
+async function detectExtensionInstallationPortable(
   browserPaths: BrowserPath[],
   log?: Logger,
 ): Promise<{
@@ -224,11 +222,3 @@ export async function isChromeExtensionInstalledPortable(
   return result.isInstalled
 }
 
-/**
- * Convenience function that gets browser paths automatically.
- * Use this when you don't need to provide custom browser paths.
- */
-export function isChromeExtensionInstalled(log?: Logger): Promise<boolean> {
-  const browserPaths = getAllBrowserDataPathsPortable()
-  return isChromeExtensionInstalledPortable(browserPaths, log)
-}

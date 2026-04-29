@@ -1,14 +1,7 @@
 import { getMcpRuntimeHostBindings } from './host.js'
 import { HostBindingsError } from './errors.js'
 
-export {
-  connectAll,
-  discover,
-  executeTool,
-  getMcpToolsCommandsAndResources,
-  prefetchResources,
-  prefetchAllMcpResources,
-} from './api.js'
+export { getMcpToolsCommandsAndResources } from './api.js'
 
 export type MCPResultType = 'toolResult' | 'structuredContent' | 'contentArray'
 export type McpDiscoverySnapshot = {
