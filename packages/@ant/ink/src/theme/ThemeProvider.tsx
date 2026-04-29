@@ -92,7 +92,7 @@ export function ThemeProvider({
       if (activeSetting !== 'auto' || !internal_querier) return
       let cleanup: (() => void) | undefined
       let cancelled = false
-      void import('../../utils/systemThemeWatcher.js').then(
+      void import('./systemThemeWatcher.js').then(
         ({ watchSystemTheme }) => {
           if (cancelled) return
           cleanup = watchSystemTheme(internal_querier, setSystemTheme)

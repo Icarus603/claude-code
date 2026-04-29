@@ -101,7 +101,7 @@ const skillSearchModules = feature('EXPERIMENTAL_SKILL_SEARCH')
       featureCheck:
         require('@claude-code/command-runtime/skills/featureCheck.js') as typeof import('@claude-code/command-runtime/skills/featureCheck'),
       prefetch:
-        require('../services/skillSearch/prefetch.js') as typeof import('./skillSearch/prefetch.js'),
+        require('./skillSearch/prefetch.js') as typeof import('./skillSearch/prefetch.js'),
     }
   : null
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')

@@ -309,6 +309,13 @@ const CHECKS: Check[] = [
     doc: 'feedback_knip_unused_can_hide_lazy_import_bugs.md — every Command load() must resolve to a module that exports `call`. Catches typos like `../../tasks.js` that resolve to a wrong file (TypeScript-valid but `call` missing → runtime error only when slash command invoked).',
   },
   {
+    id: 'dynamic-import-targets',
+    layer: 'Cross-Cutting',
+    subsystem: 'dynamic-import correctness',
+    script: 'scripts/verify-dynamic-import-targets.ts',
+    doc: 'broader version of command-load-targets — every `await import(X)` and `require(X) as typeof import(X)` in packages/ must resolve, AND each `{name}` destructured from the result must actually be exported. Catches feature-flag-gated typos that never crash CI because the gate is off in tests. Discovery audit found 2 real bugs (ThemeProvider auto-theme watcher, attachments EXPERIMENTAL_SKILL_SEARCH prefetch) — both fixed 2026-04-29.',
+  },
+  {
     id: 'no-bare-host-loggers',
     layer: 'Cross-Cutting',
     subsystem: 'host-binding migration completeness',
