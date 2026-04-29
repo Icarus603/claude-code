@@ -33,6 +33,30 @@ bun run check:unused         # knip — find unused exports
 bun run release v26.4.N      # tag + push; CI builds + publishes via release.yml
 ```
 
+### `ccb` vs `ccbdev` vs `claude` — three CLIs, three roles
+
+The user's `~/.local/bin/` contains three look-alike binaries. Knowing which
+is which matters when debugging — testing the wrong one wastes a session.
+
+| Command  | Symlink target                                  | Purpose                                                       |
+|----------|-------------------------------------------------|---------------------------------------------------------------|
+| `ccb`    | `~/.local/share/ccb/versions/<vX.Y.Z>` binary   | Released ccb — frozen at last `bun run release`. Auto-updates from GitHub Releases. **Stable** snapshot, no local edits visible. |
+| `ccbdev` | `→ <repo>/dist/cli.js` (live symlink)           | Local-build ccb — runs whatever `bun run build` last produced. **Reflects every code change** the moment build finishes. |
+| `claude` | Anthropic's official CLI (separate npm install) | Upstream Claude Code from Anthropic. Used as reference / sanity comparison; unrelated to this repo. |
+
+**Verifying a code change**: always use `ccbdev` after `bun run build`. `ccb`
+will show stale behaviour because it's pinned to the last released version.
+
+**Restart matters**: `ccbdev` reads `dist/cli.js` at process start. A running
+session keeps the OLD bytecode in memory — rebuild + restart, not just
+rebuild. (The 2026-04-29 bash-mode-debugging session lost ~30min to a
+stale ccbdev process making one fix look like it didn't take.)
+
+**`which`/symlink check** (paste this if you forget):
+```bash
+ls -la ~/.local/bin/ccb ~/.local/bin/ccbdev ~/.local/bin/claude
+```
+
 ## Architecture
 
 ### Runtime & Build
