@@ -55,6 +55,7 @@ export async function createDirectConnectSession({
           dangerously_skip_permissions: true,
         }),
       }),
+      signal: AbortSignal.timeout(30_000),
     })
   } catch (err) {
     throw new DirectConnectError(

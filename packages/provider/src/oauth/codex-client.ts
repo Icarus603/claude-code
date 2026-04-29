@@ -128,6 +128,7 @@ async function postToTokenUrl(body: URLSearchParams): Promise<TokenResult> {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
+      signal: AbortSignal.timeout(30_000),
     })
     if (!response.ok) {
       const text = await response.text().catch(() => '')

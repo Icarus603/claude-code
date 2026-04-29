@@ -534,6 +534,9 @@ export function createCodexFetch(): ClientOptions['fetch'] {
         'OpenAI-Beta': 'responses=experimental',
       },
       body: JSON.stringify(codexBody),
+      // Forward the SDK's AbortSignal so query cancellation / timeouts propagate.
+      // Without this, the upstream cannot cancel an in-flight Codex request.
+      signal: init?.signal ?? null,
     })
 
     if (!codexResponse.ok) {
