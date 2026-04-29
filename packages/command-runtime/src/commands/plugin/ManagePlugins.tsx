@@ -1331,11 +1331,18 @@ export function ManagePlugins({
       // 'enable'`: install enables on install, so the menu shows "Disable"
       // first. PluginOptionsFlow itself checks getUnconfiguredOptions — if
       // nothing needs filling, it calls onDone('skipped') immediately.
+      //
+      // Skip this branch for uninstall: after uninstallPluginOp removes the
+      // entry from enabledPlugins, `settingsAfter?.enabledPlugins?.[id]` is
+      // undefined, and `undefined !== false` is TRUE — which would falsely
+      // route through the "show config + display 'Enabled'" path and report
+      // `✓ Enabled X` for what was actually an uninstall. The check is only
+      // meaningful for enable/disable/update.
       const pluginIdNow = `${selectedPlugin.plugin.name}@${selectedPlugin.marketplace}`
       const settingsAfter = getSettings_DEPRECATED()
       const enabledAfter =
         settingsAfter?.enabledPlugins?.[pluginIdNow] !== false
-      if (enabledAfter) {
+      if (operation !== 'uninstall' && enabledAfter) {
         setIsProcessing(false)
         setViewState({ type: 'plugin-options' })
         return
