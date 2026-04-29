@@ -103,3 +103,56 @@ These paths look like they belong to a feature flag subsystem. Per `feedback_nev
 - `packages/agent/claudeInChrome/setupPortable.ts`
 - `packages/agent/extractMemories/prompts.ts`
 - `packages/agent/types/generated/events_mono/growthbook/v1/growthbook_experiment_event.ts`
+
+## 2026-04-29 deeper audit — bug hunt pass
+
+After the `/tasks` and `/ide` slash-command bugs (knip flagged the
+implementation as "unused" while the load() target in a sibling was
+actually a typo), I ran a four-way classifier on the remaining 71
+flagged files looking for the same shape of bug.
+
+### Real bug found and fixed
+
+**`/remote-control` slash command was silently disabled in every
+released build.** `commandRegistryRuntime` registered the BRIDGE_MODE
+command via:
+
+```ts
+const bridge = feature('BRIDGE_MODE')
+  ? require('@claude-code/bridge/index.js').default
+  : null
+```
+
+But `@claude-code/bridge/index.js` resolves to `packages/bridge/src/index.ts`
+which has NO default export — it exports `bridgeMain`,
+`buildBridgeConnectUrl`, etc as named. `require(...).default` returned
+`undefined`, the `bridge ? [bridge] : []` check skipped registration,
+and `/remote-control` and `/rc` aliases were never reachable.
+
+The intended target was `@claude-code/command-runtime/commands/bridge/
+index.js` (proper Command with `name: 'remote-control'`). Fix lands
+in commit `a76bd6dc` along with the missing package.json#exports key
+and the exports-budget bump.
+
+### Remaining categories after rescan
+
+- 9 forward-shim orphans in `provider/commands/{login,model}` and
+  `agent/extractMemories/prompts.ts` — V7 §11.6 back-edge breaks
+  left the shim files behind once consumers migrated. Real dead
+  code; deletion deferred to avoid surface-area churn.
+- ~50 `config/plugin/core/*` and `config/settings/core/*` are knip
+  false positives (consumed via `export * from` in index.ts that knip
+  doesn't trace through wildcard exports).
+- 1 self-marked auto-generated stub (`agent/query/transitions.ts`).
+- Generated proto code (`agent/types/generated/...`).
+
+### Verifier coverage
+
+The new `verify-dynamic-import-targets` (added 2026-04-29) catches
+this bug class going forward by validating that every dynamic import
+resolves to a real file AND the destructured `{name}` exists.
+Combined with `verify-command-load-targets` (which checks
+`load: () => import(X)` slash-command patterns specifically), the
+class of "wrong load target, silent runtime failure" should be
+caught at CI time before any future regression.
+
