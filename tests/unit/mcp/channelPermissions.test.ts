@@ -1,9 +1,17 @@
 import { mock, describe, expect, test } from 'bun:test'
 
+// Spread real exports + override only what's needed. bun:test mocks
+// apply globally to the whole test-process; an incomplete mock that
+// only exports `jsonStringify` (without the rest) silently shadows the
+// real slowOperations module for every other test in the same suite.
+// See feedback_bun_test_feature_flags_off.md for the broader pattern.
+const realSlowOps = await import('@claude-code/local-observability/slowOperations.js')
+const realFeatureFlags = await import('@claude-code/config/feature-flags')
 mock.module('@claude-code/local-observability/slowOperations.js', () => ({
-  jsonStringify: (v: unknown) => JSON.stringify(v),
+  ...realSlowOps,
 }))
 mock.module('@claude-code/config/feature-flags', () => ({
+  ...realFeatureFlags,
   getFeatureValue_CACHED_MAY_BE_STALE: () => false,
 }))
 
