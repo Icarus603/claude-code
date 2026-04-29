@@ -33,7 +33,13 @@ import { spawnSync } from 'child_process'
 // mask via its union contribution. The errors aren't new bugs in the
 // deletion; they're decompilation type-rot now visible without the
 // masking member.
-const BUDGET = 3306
+//
+// 2026-04-29: ratcheted 3306 → 3269 after V8 cleanup (provider/userAuth
+// duplicate removal, packageHostSetupOrchestrator/listSessionsImpl
+// orphan deletes, sessionStorage write-queue extraction, and several
+// shim removals). Errors that were attributable to those decompiled
+// modules are gone. New floor freezes the gain.
+const BUDGET = 3269
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
