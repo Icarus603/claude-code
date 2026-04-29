@@ -330,6 +330,13 @@ const CHECKS: Check[] = [
     doc: 'TODO/FIXME/XXX/HACK comments accumulate quietly. Without a ratchet they grow forever and become noise nobody reads. Baseline locked; new TODOs require either resolving the issue immediately, OR linking a tracking issue in the comment + --tighten with justification.',
   },
   {
+    id: 'no-sync-fs-in-render',
+    layer: 'Cross-Cutting',
+    subsystem: 'render-context perf',
+    script: 'scripts/verify-no-sync-fs-in-render.ts',
+    doc: 'Sync fs primitives (readFileSync/statSync/etc.) inside .tsx files block the event loop. In a React render function this freezes the terminal until disk I/O completes — fatal on slow disks (NFS, HDD). Baseline locked at current count of legitimate sync uses (FilePermissionDialog diff preview, ExportDialog write). New occurrences require --tighten + justification or use async fs/promises alternative.',
+  },
+  {
     id: 'command-load-targets',
     layer: 'Cross-Cutting',
     subsystem: 'slash-command import correctness',
