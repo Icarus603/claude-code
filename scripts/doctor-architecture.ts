@@ -302,6 +302,13 @@ const CHECKS: Check[] = [
     doc: 'feedback_bun_mock_module_global_scope.md — every mock.module("@claude-code/*", ...) must spread the real exports first or include MOCK_FULL_REPLACE: justification. Prevents the silent global-shadow bug class.',
   },
   {
+    id: 'error-codes-unique',
+    layer: 'Cross-Cutting',
+    subsystem: 'cross-package error contract',
+    script: 'scripts/verify-error-codes-unique.ts',
+    doc: 'Error code strings (passed to BaseError super() constructor) must be globally unique across packages. Codes surface to host telemetry / log alerts; a duplicate silently mis-routes events between subsystems. No individual package test catches this — only a global scan does.',
+  },
+  {
     id: 'command-load-targets',
     layer: 'Cross-Cutting',
     subsystem: 'slash-command import correctness',
