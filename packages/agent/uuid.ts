@@ -1,6 +1,12 @@
 import { randomBytes, type UUID } from 'crypto'
 import type { AgentId } from './idTypes.js'
 
+// Re-export for callers that consume UUID through this module (e.g.
+// repl/components/ultraplan/UltraplanChoiceDialog.tsx). The branded
+// node:crypto type was previously declared locally without an export,
+// breaking those imports.
+export type { UUID }
+
 const uuidRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

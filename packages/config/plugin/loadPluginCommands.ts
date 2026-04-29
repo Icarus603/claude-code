@@ -1,7 +1,7 @@
 import memoize from 'lodash-es/memoize.js'
 import { basename, dirname, join } from 'path'
 import { getInlinePlugins, getSessionId } from './_deps.js'
-import type { Command } from './types.js'
+import type { Command } from './_deps.js'
 import { getPluginErrorMessage } from './types.js'
 import {
   parseArgumentNames,

@@ -1050,8 +1050,11 @@ function formatCommandInput(command: CommandBase, args: string): string {
 }
 
 // formatSkillLoadingMetadata moved to @claude-code/command-runtime/xml
-// (V7 §11.2) — re-exported here for backwards compatibility.
-export { formatSkillLoadingMetadata } from '@claude-code/command-runtime/xml.js'
+// (V7 §11.2) — re-exported here for backwards compatibility. Note: must
+// be imported separately from the re-export so it's also visible to local
+// callers within this file.
+import { formatSkillLoadingMetadata } from '@claude-code/command-runtime/xml.js'
+export { formatSkillLoadingMetadata }
 
 /**
  * Formats the metadata for a slash command loading message.

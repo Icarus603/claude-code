@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { useMemo } from 'react'
 import { type Command, formatDescriptionWithSource } from '@claude-code/command-runtime/runtime'
-import { Box, Text } from '@anthropic/ink'
+import { Box, Text, useTabHeaderFocus } from '@anthropic/ink'
+import { truncate } from '@claude-code/output/formatters/truncate.js'
+import { Select } from '../CustomSelect/index.js'
 
 type Props = {
   commands: Command[]

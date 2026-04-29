@@ -20,6 +20,7 @@ const HEADROOM = 3
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { sleep } from '@claude-code/config/sleep'
 import { renderableSearchText } from '@claude-code/agent/sessionTools/transcriptSearch.js'
+import type { RenderableMessage } from '@claude-code/agent/messageShapes.js'
 import {
   isNavigableMessage,
   type MessageActionsNav,

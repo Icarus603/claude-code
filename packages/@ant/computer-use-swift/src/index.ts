@@ -14,9 +14,9 @@ export type {
   ScreenshotResult,
   ResolvePrepareCaptureResult,
   WindowDisplayInfo,
-} from './backends/darwin.js'
+} from './types.js'
 
-import type { ResolvePrepareCaptureResult } from './backends/darwin.js'
+import type { ResolvePrepareCaptureResult } from './types.js'
 
 function loadBackend() {
   try {

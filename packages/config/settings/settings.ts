@@ -52,6 +52,11 @@ import {
   setSessionSettingsCache,
 } from './settingsCache.js'
 import { type SettingsJson, SettingsSchema } from './types.js'
+
+// Re-export so consumers can import SettingsJson via this orchestrator
+// module rather than reaching into ./types.js. Some downstream callers
+// (config/manager.ts) already do this — it was missing before.
+export type { SettingsJson }
 import {
   filterInvalidPermissionRules,
   formatZodError,

@@ -52,7 +52,24 @@ import { spawnSync } from 'child_process'
 // duplicate identifiers/functions: planModeV2.ts (readEnv x2),
 // HighlightedCode.tsx (useSettings x2), _deps.ts (getBuiltinPlugins
 // x2 + dead `_builtinPlugins: unknown` slot).
-const BUDGET = 3257
+//
+// 2026-04-29 (later 4): tightened 3257 → 3223 after fixing
+// missing-imports / unexported re-exports across 9 files:
+//   - VirtualMessageList.tsx: `import type RenderableMessage` was
+//     missing entirely (13 TS2304)
+//   - HelpV2/Commands.tsx: missing `useTabHeaderFocus`, `truncate`,
+//     `Select` imports (3 TS2304)
+//   - processSlashCommand.tsx: re-export was visible to consumers but
+//     not to the local file's references (1 TS2304)
+//   - agent/contracts.ts: missing `AgentQuerySource` import (2 TS2304)
+//   - computer-use-swift/index.ts: was importing types from
+//     `./backends/darwin.js` instead of `./types.js` (8 TS2305+TS2459)
+//   - provider/providerHostSetup.ts, agent/uuid.ts,
+//     config/settings/settings.ts: locally-imported types were not
+//     re-exported, so consumers got TS2459
+//   - config/plugin/loadPluginCommands.ts: `Command` was imported
+//     from `./types.js` but lives in `./_deps.ts`
+const BUDGET = 3223
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
