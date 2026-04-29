@@ -3,178 +3,67 @@ import type {
   Resource,
   ServerCapabilities,
 } from '@modelcontextprotocol/sdk/types.js'
-import { z } from 'zod/v4'
-import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
-// Configuration schemas and types
-export const ConfigScopeSchema = lazySchema(() =>
-  z.enum([
-    'local',
-    'user',
-    'project',
-    'dynamic',
-    'enterprise',
-    'claudeai',
-    'managed',
-  ]),
-)
-export type ConfigScope = z.infer<ReturnType<typeof ConfigScopeSchema>>
+// MCP server *config-shape* schemas + types live in @claude-code/config
+// (one layer down). Hosting them here forced a config → mcp-runtime cycle
+// for callers like config/plugin/_deps.ts. After the move, they're
+// re-exported from this file so existing callers (which import from
+// @claude-code/mcp-runtime/types) keep working without churn.
+import {
+  ConfigScopeSchema,
+  type ConfigScope,
+  TransportSchema,
+  type Transport,
+  McpStdioServerConfigSchema,
+  McpSSEServerConfigSchema,
+  McpSSEIDEServerConfigSchema,
+  McpWebSocketIDEServerConfigSchema,
+  McpHTTPServerConfigSchema,
+  McpWebSocketServerConfigSchema,
+  McpSdkServerConfigSchema,
+  McpClaudeAIProxyServerConfigSchema,
+  McpServerConfigSchema,
+  type McpStdioServerConfig,
+  type McpSSEServerConfig,
+  type McpSSEIDEServerConfig,
+  type McpWebSocketIDEServerConfig,
+  type McpHTTPServerConfig,
+  type McpWebSocketServerConfig,
+  type McpSdkServerConfig,
+  type McpClaudeAIProxyServerConfig,
+  type McpServerConfig,
+  type ScopedMcpServerConfig,
+  McpJsonConfigSchema,
+  type McpJsonConfig,
+} from '@claude-code/config/mcpConfigSchema.js'
 
-export const TransportSchema = lazySchema(() =>
-  z.enum(['stdio', 'sse', 'sse-ide', 'http', 'ws', 'sdk']),
-)
-export type Transport = z.infer<ReturnType<typeof TransportSchema>>
-
-export const McpStdioServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('stdio').optional(), // Optional for backwards compatibility
-    command: z.string().min(1, 'Command cannot be empty'),
-    args: z.array(z.string()).default([]),
-    env: z.record(z.string(), z.string()).optional(),
-  }),
-)
-
-// Cross-App Access (XAA / SEP-990): just a per-server flag. IdP connection
-// details (issuer, clientId, callbackPort) come from settings.xaaIdp — configured
-// once, shared across all XAA-enabled servers. clientId/clientSecret (parent
-// oauth config + keychain slot) are for the MCP server's AS.
-const McpXaaConfigSchema = lazySchema(() => z.boolean())
-
-const McpOAuthConfigSchema = lazySchema(() =>
-  z.object({
-    clientId: z.string().optional(),
-    callbackPort: z.number().int().positive().optional(),
-    authServerMetadataUrl: z
-      .string()
-      .url()
-      .startsWith('https://', {
-        message: 'authServerMetadataUrl must use https://',
-      })
-      .optional(),
-    xaa: McpXaaConfigSchema().optional(),
-  }),
-)
-
-export const McpSSEServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('sse'),
-    url: z.string(),
-    headers: z.record(z.string(), z.string()).optional(),
-    headersHelper: z.string().optional(),
-    oauth: McpOAuthConfigSchema().optional(),
-  }),
-)
-
-// Internal-only server type for IDE extensions
-export const McpSSEIDEServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('sse-ide'),
-    url: z.string(),
-    ideName: z.string(),
-    ideRunningInWindows: z.boolean().optional(),
-  }),
-)
-
-// Internal-only server type for IDE extensions
-export const McpWebSocketIDEServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('ws-ide'),
-    url: z.string(),
-    ideName: z.string(),
-    authToken: z.string().optional(),
-    ideRunningInWindows: z.boolean().optional(),
-  }),
-)
-
-export const McpHTTPServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('http'),
-    url: z.string(),
-    headers: z.record(z.string(), z.string()).optional(),
-    headersHelper: z.string().optional(),
-    oauth: McpOAuthConfigSchema().optional(),
-  }),
-)
-
-export const McpWebSocketServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('ws'),
-    url: z.string(),
-    headers: z.record(z.string(), z.string()).optional(),
-    headersHelper: z.string().optional(),
-  }),
-)
-
-export const McpSdkServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('sdk'),
-    name: z.string(),
-  }),
-)
-
-// Config type for Claude.ai proxy servers
-export const McpClaudeAIProxyServerConfigSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('claudeai-proxy'),
-    url: z.string(),
-    id: z.string(),
-  }),
-)
-
-export const McpServerConfigSchema = lazySchema(() =>
-  z.union([
-    McpStdioServerConfigSchema(),
-    McpSSEServerConfigSchema(),
-    McpSSEIDEServerConfigSchema(),
-    McpWebSocketIDEServerConfigSchema(),
-    McpHTTPServerConfigSchema(),
-    McpWebSocketServerConfigSchema(),
-    McpSdkServerConfigSchema(),
-    McpClaudeAIProxyServerConfigSchema(),
-  ]),
-)
-
-export type McpStdioServerConfig = z.infer<
-  ReturnType<typeof McpStdioServerConfigSchema>
->
-export type McpSSEServerConfig = z.infer<
-  ReturnType<typeof McpSSEServerConfigSchema>
->
-export type McpSSEIDEServerConfig = z.infer<
-  ReturnType<typeof McpSSEIDEServerConfigSchema>
->
-export type McpWebSocketIDEServerConfig = z.infer<
-  ReturnType<typeof McpWebSocketIDEServerConfigSchema>
->
-export type McpHTTPServerConfig = z.infer<
-  ReturnType<typeof McpHTTPServerConfigSchema>
->
-export type McpWebSocketServerConfig = z.infer<
-  ReturnType<typeof McpWebSocketServerConfigSchema>
->
-export type McpSdkServerConfig = z.infer<
-  ReturnType<typeof McpSdkServerConfigSchema>
->
-export type McpClaudeAIProxyServerConfig = z.infer<
-  ReturnType<typeof McpClaudeAIProxyServerConfigSchema>
->
-export type McpServerConfig = z.infer<ReturnType<typeof McpServerConfigSchema>>
-
-export type ScopedMcpServerConfig = McpServerConfig & {
-  scope: ConfigScope
-  // For plugin-provided servers: the providing plugin's LoadedPlugin.source
-  // (e.g. 'slack@anthropic'). Stashed at config-build time so the channel
-  // gate doesn't have to race AppState.plugins.enabled hydration.
-  pluginSource?: string
+export {
+  ConfigScopeSchema,
+  type ConfigScope,
+  TransportSchema,
+  type Transport,
+  McpStdioServerConfigSchema,
+  McpSSEServerConfigSchema,
+  McpSSEIDEServerConfigSchema,
+  McpWebSocketIDEServerConfigSchema,
+  McpHTTPServerConfigSchema,
+  McpWebSocketServerConfigSchema,
+  McpSdkServerConfigSchema,
+  McpClaudeAIProxyServerConfigSchema,
+  McpServerConfigSchema,
+  type McpStdioServerConfig,
+  type McpSSEServerConfig,
+  type McpSSEIDEServerConfig,
+  type McpWebSocketIDEServerConfig,
+  type McpHTTPServerConfig,
+  type McpWebSocketServerConfig,
+  type McpSdkServerConfig,
+  type McpClaudeAIProxyServerConfig,
+  type McpServerConfig,
+  type ScopedMcpServerConfig,
+  McpJsonConfigSchema,
+  type McpJsonConfig,
 }
-
-export const McpJsonConfigSchema = lazySchema(() =>
-  z.object({
-    mcpServers: z.record(z.string(), McpServerConfigSchema()),
-  }),
-)
-
-export type McpJsonConfig = z.infer<ReturnType<typeof McpJsonConfigSchema>>
 
 // Server connection types
 export type ConnectedMCPServer = {

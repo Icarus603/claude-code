@@ -125,6 +125,8 @@
     "./frontmatterParser.js": "./frontmatterParser.ts",
     "./yaml.js": "./yaml.ts",
     "./frontmatterParser": "./frontmatterParser.ts",
-    "./yaml": "./yaml.ts"
+    "./yaml": "./yaml.ts",
+    "./mcpConfigSchema.js": "./mcpConfigSchema.ts",
+    "./mcpConfigSchema": "./mcpConfigSchema.ts"
   }
 }

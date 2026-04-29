@@ -23,6 +23,7 @@
 // layer (no cycle risk). Anything from a higher layer must use the
 // setter-injection pattern below or lazy-require.
 import { parseFrontmatter as _canonicalParseFrontmatter } from '../frontmatterParser.js'
+import { McpServerConfigSchema as _canonicalMcpServerConfigSchema } from '../mcpConfigSchema.js'
 
 // ---------------------------------------------------------------------------
 // Logging / diagnostics (re-injected — avoid cyclic imports)
@@ -791,26 +792,10 @@ export class ConfigParseError extends Error {
 }
 export type FrontmatterData = Record<string, unknown>
 export type ScopedMcpServerConfig = unknown
-// V7 §3.2 — McpServerConfigSchema lazy-resolved from mcp-runtime to avoid
-// the static config → mcp-runtime cycle (mcp-runtime already imports from
-// config). We require() at first call, cache, and re-throw with diagnostic
-// context if mcp-runtime is missing.
-let _cachedMcpServerConfigSchema: (() => unknown) | null = null
-export const McpServerConfigSchema: () => unknown = () => {
-  if (_cachedMcpServerConfigSchema == null) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('@claude-code/mcp-runtime/types.js') as {
-      McpServerConfigSchema?: () => unknown
-    }
-    if (typeof mod.McpServerConfigSchema !== 'function') {
-      throw new Error(
-        'McpServerConfigSchema lazy-load failed: @claude-code/mcp-runtime/types.js did not export it as a function',
-      )
-    }
-    _cachedMcpServerConfigSchema = mod.McpServerConfigSchema
-  }
-  return _cachedMcpServerConfigSchema()
-}
+// McpServerConfigSchema lives in @claude-code/config/mcpConfigSchema —
+// moved out of mcp-runtime to break the config → mcp-runtime cycle.
+// Direct re-export so the existing _deps.ts public surface is unchanged.
+export const McpServerConfigSchema = _canonicalMcpServerConfigSchema
 
 // Setter-based functions — default implementations are no-ops or conservative
 // fallbacks. Host wires the real impl in installPluginBindings.
