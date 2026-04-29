@@ -50,8 +50,6 @@ const STABLE_FEATURES = [
   'DAEMON',
 ] as const
 
-export type StableFeature = (typeof STABLE_FEATURES)[number]
-
 /**
  * Helper: collect FEATURE_* env vars and merge with the stable list.
  * Returns the deduplicated set.

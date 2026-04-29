@@ -53,7 +53,7 @@ interface DiffLine {
 }
 
 // Line object type for internal functions
-export interface LineObject {
+interface LineObject {
   code: string
   i: number
   type: 'add' | 'remove' | 'nochange'

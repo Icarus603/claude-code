@@ -15,7 +15,7 @@
  * at 1.0) so non-test files rank slightly higher.
  */
 
-export type SearchResult = {
+type SearchResult = {
   path: string
   score: number
 }

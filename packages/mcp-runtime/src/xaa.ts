@@ -164,7 +164,7 @@ async function discoverProtectedResource(
   }
 }
 
-export type AuthorizationServerMetadata = {
+type AuthorizationServerMetadata = {
   issuer: string
   token_endpoint: string
   grant_types_supported?: string[]

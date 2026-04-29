@@ -10,7 +10,7 @@
  * dump the relevant STATE so tests can assert on it.
  */
 
-export interface RuntimeProbeReport {
+interface RuntimeProbeReport {
   pluginHooks: {
     pluginsLoaded: number
     hooksByEvent: Record<string, number>

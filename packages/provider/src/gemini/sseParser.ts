@@ -3,7 +3,7 @@
  * Avoids a cross-package dependency on the CLI package.
  */
 
-export type SSEFrame = {
+type SSEFrame = {
   event?: string
   id?: string
   data?: string

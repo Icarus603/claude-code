@@ -14,7 +14,7 @@
 import type { ThemeName, ThemeSetting } from '@anthropic/ink'
 import { readEnv } from '@claude-code/config/env/utils'
 
-export type SystemTheme = 'dark' | 'light'
+type SystemTheme = 'dark' | 'light'
 
 let cachedSystemTheme: SystemTheme | undefined
 

@@ -1,8 +1,6 @@
 import { getCliHostBindings } from './host.js'
 import type { StructuredIOOptions } from './contracts.js'
 
-export type { StructuredIOOptions }
-
 /**
  * Returns a StructuredIO or RemoteIO for a headless session. The concrete
  * implementation lives in the root (src/cli/structuredIOHelper.ts) and is

@@ -25,8 +25,6 @@ import {
 import { createProviderResolver } from './shellDiscovery.js'
 import { ExecError } from './errors.js'
 
-export type { ExecResult } from './types.js'
-export type { ExecOptions } from './types.js'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1000 // 30 minutes
 

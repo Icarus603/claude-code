@@ -56,7 +56,7 @@ const TeamMemoryTooManyEntriesSchema = lazySchema(() =>
   }),
 )
 
-export type TeamMemoryData = z.infer<ReturnType<typeof TeamMemoryDataSchema>>
+type TeamMemoryData = z.infer<ReturnType<typeof TeamMemoryDataSchema>>
 
 /**
  * A file skipped during push because it contains a detected secret.

@@ -18,7 +18,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { which } from '@claude-code/shell/which.js'
 
-export type TerminalInfo = {
+type TerminalInfo = {
   name: string
   command: string
 }

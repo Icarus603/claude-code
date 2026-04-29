@@ -27,7 +27,7 @@ export function getToolRegistry(): ToolRegistry<
 }
 
 export const TOOL_PRESETS = ['default'] as const
-export type ToolPreset = (typeof TOOL_PRESETS)[number]
+type ToolPreset = (typeof TOOL_PRESETS)[number]
 
 export function parseToolPreset(preset: string): ToolPreset | null {
   const normalized = preset.toLowerCase()

@@ -1,7 +1,7 @@
 import type { AgentMessage } from '../internalTypes.js'
 import { getAgentHostBindings } from '../host.js'
 
-export type QueuedCommand = {
+type QueuedCommand = {
   priority?: 'now' | 'next' | 'later'
   mode: string
   agentId?: string

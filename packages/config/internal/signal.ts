@@ -2,7 +2,7 @@
  * V7 §11.4 — minimal event signal for config's change notification.
  * Duplicated from src/utils/signal.ts (15 lines) to avoid pulling src/ deps.
  */
-export type Signal<Args extends unknown[] = []> = {
+type Signal<Args extends unknown[] = []> = {
   subscribe(listener: (...args: Args) => void): () => void
   emit(...args: Args): void
   clear(): void

@@ -38,7 +38,7 @@ export type StatusNoticeContext = {
   memoryFiles: MemoryFileInfo[]
 }
 
-export type StatusNoticeDefinition = {
+type StatusNoticeDefinition = {
   id: string
   type: StatusNoticeType
   isActive: (context: StatusNoticeContext) => boolean
