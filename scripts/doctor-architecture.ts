@@ -309,6 +309,13 @@ const CHECKS: Check[] = [
     doc: 'Error code strings (passed to BaseError super() constructor) must be globally unique across packages. Codes surface to host telemetry / log alerts; a duplicate silently mis-routes events between subsystems. No individual package test catches this — only a global scan does.',
   },
   {
+    id: 'as-never-ratchet',
+    layer: 'Cross-Cutting',
+    subsystem: 'unsafe-cast accumulation',
+    script: 'scripts/verify-as-never-ratchet.ts',
+    doc: '`as never` is the bottom type — disables type checking entirely AND makes the value assignable to anything. Strictly worse than `as any` because consumption sites stop flagging. Baseline locked to current count; new occurrences must come with --tighten and a documented reason (host-binding shim, branded-type construction, exhaustiveness assertion).',
+  },
+  {
     id: 'command-load-targets',
     layer: 'Cross-Cutting',
     subsystem: 'slash-command import correctness',
