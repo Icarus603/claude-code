@@ -114,6 +114,125 @@ describe('deriveUUID — deterministic key derivation', () => {
   })
 })
 
+describe('isToolUseRequestMessage / isToolUseResultMessage — type guards', () => {
+  let isToolUseRequestMessage: typeof import('../messages.js').isToolUseRequestMessage
+  let isToolUseResultMessage: typeof import('../messages.js').isToolUseResultMessage
+  beforeAll(async () => {
+    ;({ isToolUseRequestMessage, isToolUseResultMessage } = await import(
+      '../messages.js'
+    ))
+  })
+
+  test('assistant with tool_use block → request', () => {
+    expect(
+      isToolUseRequestMessage({
+        type: 'assistant',
+        uuid: 'u1' as never,
+        message: {
+          content: [{ type: 'tool_use', id: 't1', name: 'X', input: {} }],
+        },
+      } as never),
+    ).toBe(true)
+  })
+
+  test('assistant with text only → NOT request', () => {
+    expect(
+      isToolUseRequestMessage({
+        type: 'assistant',
+        uuid: 'u1' as never,
+        message: { content: [{ type: 'text', text: 'hi' }] },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('assistant with non-array content → NOT request', () => {
+    expect(
+      isToolUseRequestMessage({
+        type: 'assistant',
+        uuid: 'u1' as never,
+        message: { content: 'plain' },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with tool_use → NOT request (only assistants)', () => {
+    expect(
+      isToolUseRequestMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: {
+          content: [{ type: 'tool_use', id: 't1', name: 'X', input: {} }],
+        },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with tool_result block (first) → result', () => {
+    expect(
+      isToolUseResultMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: {
+          content: [
+            { type: 'tool_result', tool_use_id: 'tu', content: 'ok' },
+          ],
+        },
+      } as never),
+    ).toBe(true)
+  })
+
+  test('user with toolUseResult field → result (alternate shape)', () => {
+    // The function accepts EITHER content[0]=tool_result OR
+    // .toolUseResult being truthy. Locks both paths.
+    expect(
+      isToolUseResultMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: { content: 'plain' },
+        toolUseResult: { stdout: 'output' },
+      } as never),
+    ).toBe(true)
+  })
+
+  test('user with text only and no toolUseResult → NOT result', () => {
+    expect(
+      isToolUseResultMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: { content: [{ type: 'text', text: 'hi' }] },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('assistant message → NOT result', () => {
+    expect(
+      isToolUseResultMessage({
+        type: 'assistant',
+        uuid: 'u1' as never,
+        message: { content: 'reply' },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with tool_result NOT at index 0 → NOT result (only first checked)', () => {
+    // Documented behavior: content[0]?.type === 'tool_result' — only
+    // the first block matters for the type guard. Lock so a refactor
+    // that scans all blocks doesn't change classification.
+    expect(
+      isToolUseResultMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: {
+          content: [
+            { type: 'text', text: 'before' },
+            { type: 'tool_result', tool_use_id: 'tu', content: 'ok' },
+          ],
+        },
+      } as never),
+    ).toBe(false)
+  })
+})
+
 describe('extractTag — XML/HTML tag content extraction', () => {
   test('simple tag extraction', () => {
     expect(extractTag('<foo>hello</foo>', 'foo')).toBe('hello')
