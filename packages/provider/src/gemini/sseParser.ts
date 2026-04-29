@@ -12,11 +12,23 @@ export type SSEFrame = {
 /**
  * Incrementally parse SSE frames from a text buffer.
  * Returns parsed frames and the remaining (incomplete) buffer.
+ *
+ * Per WHATWG SSE spec, lines may end with CRLF, LF, or CR. We normalize
+ * any CR or CRLF to LF before scanning so all three line endings produce
+ * the same `\n\n` frame boundary. Without this, a server emitting CRLF
+ * (Gemini observed in some proxy configurations) would never produce a
+ * parsed frame and the stream would hang.
  */
 export function parseSSEFrames(buffer: string): {
   frames: SSEFrame[]
   remaining: string
 } {
+  // Normalize line endings: CRLF → LF, then standalone CR → LF.
+  // Order matters — CRLF must be replaced first so each pair becomes one LF.
+  if (buffer.includes('\r')) {
+    buffer = buffer.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  }
+
   const frames: SSEFrame[] = []
   let pos = 0
 

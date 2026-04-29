@@ -53,12 +53,19 @@ type SSEFrame = {
  * Incrementally parse SSE frames from a text buffer.
  * Returns parsed frames and the remaining (incomplete) buffer.
  *
+ * Per WHATWG SSE spec, lines may end with CRLF, LF, or CR. Normalize first
+ * so CRLF and CR-only servers parse correctly.
+ *
  * @internal exported for testing
  */
 export function parseSSEFrames(buffer: string): {
   frames: SSEFrame[]
   remaining: string
 } {
+  if (buffer.includes('\r')) {
+    buffer = buffer.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  }
+
   const frames: SSEFrame[] = []
   let pos = 0
 
