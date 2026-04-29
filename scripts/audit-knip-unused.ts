@@ -91,13 +91,22 @@ function hasRelativeCallers(file: string): number {
   if (!pj) return 0
   const pkgRoot = dirname(pj)
   const base = basenameNoExt(file)
-  // Search for `from '../..' or './' paths that end with the basename.
+  // Search for `from '../..' or './' paths that end with the basename
+  // (static imports). Plus `import('./X.js')` (dynamic imports) — knip
+  // doesn't trace those, but command-loader patterns rely on them
+  // heavily (load: () => import('./X.js')). Combine both into one count.
   try {
-    const out = execSync(
+    const staticOut = execSync(
       `grep -rE "from\\s+['\\\"]\\.{1,2}/(.*/)?\\b${base}(\\.js)?['\\\"]" ${pkgRoot} --include='*.ts' --include='*.tsx' 2>/dev/null || true`,
       { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 },
     )
-    return out.trim() ? out.trim().split('\n').length : 0
+    const dynamicOut = execSync(
+      `grep -rE "import\\(\\s*['\\\"]\\.{1,2}/(.*/)?\\b${base}(\\.js)?['\\\"]\\s*\\)" ${pkgRoot} --include='*.ts' --include='*.tsx' 2>/dev/null || true`,
+      { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 },
+    )
+    const total = (staticOut.trim() ? staticOut.trim().split('\n').length : 0) +
+      (dynamicOut.trim() ? dynamicOut.trim().split('\n').length : 0)
+    return total
   } catch {
     return 0
   }
