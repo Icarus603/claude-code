@@ -174,6 +174,73 @@ describe('normalizeGitRemoteUrl — case sensitivity invariant', () => {
   })
 })
 
+describe('normalizeGitRemoteUrl — IPv6 host literals', () => {
+  test('IPv6 ssh://[::1]:22/owner/repo → [::1]/owner/repo', () => {
+    expect(normalizeGitRemoteUrl('ssh://git@[::1]:22/owner/repo')).toBe(
+      '[::1]/owner/repo',
+    )
+  })
+
+  test('IPv6 routable host with port → port stripped', () => {
+    expect(
+      normalizeGitRemoteUrl('http://[2001:db8::1]:8443/owner/repo'),
+    ).toBe('[2001:db8::1]/owner/repo')
+  })
+
+  test('IPv6 with and without port are equivalent (same hash)', () => {
+    expect(
+      normalizeGitRemoteUrl('http://[2001:db8::1]:8443/owner/repo'),
+    ).toBe(normalizeGitRemoteUrl('http://[2001:db8::1]/owner/repo'))
+  })
+
+  test('IPv6 brackets preserved in normalized output', () => {
+    // Without bracket-aware splitting, host.split(':')[0] would strip the
+    // closing bracket and produce "[" as the host. The fix uses ']:' as
+    // the separator.
+    const r = normalizeGitRemoteUrl('http://[2001:db8::1]/owner/repo')
+    expect(r).toMatch(/^\[2001:db8::1\]\//)
+  })
+})
+
+describe('normalizeGitRemoteUrl — URL suffix stripping', () => {
+  test('trailing slash is stripped', () => {
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo/')).toBe(
+      'github.com/owner/repo',
+    )
+  })
+
+  test('multiple trailing slashes are stripped', () => {
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo///')).toBe(
+      'github.com/owner/repo',
+    )
+  })
+
+  test('?query suffix is stripped', () => {
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo?ref=main'))
+      .toBe('github.com/owner/repo')
+  })
+
+  test('#hash suffix is stripped', () => {
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo#branch'))
+      .toBe('github.com/owner/repo')
+  })
+
+  test('combination of suffixes is fully stripped', () => {
+    expect(
+      normalizeGitRemoteUrl('https://github.com/owner/repo.git/?ref=main#x'),
+    ).toBe('github.com/owner/repo')
+  })
+
+  test('all suffix forms hash identically to canonical', () => {
+    const canonical = 'github.com/owner/repo'
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo')).toBe(canonical)
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo/')).toBe(canonical)
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo?x=y')).toBe(canonical)
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo#x')).toBe(canonical)
+    expect(normalizeGitRemoteUrl('https://github.com/owner/repo.git/')).toBe(canonical)
+  })
+})
+
 describe('normalizeGitRemoteUrl — port-stripping (regression)', () => {
   test('explicit port on non-localhost host is stripped (SSH 22)', () => {
     // Real-world bug: git@github.com:owner/repo and

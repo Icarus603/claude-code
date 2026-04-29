@@ -209,8 +209,12 @@ export function normalizeGitRemoteUrl(url: string): string | null {
     return `${sshMatch[1]}/${sshMatch[2]}`.toLowerCase()
   }
 
+  // Strip query/fragment before parsing — `?ref=main`, `#branch`, and a
+  // trailing `/` are URL suffixes that don't affect repo identity.
+  const sanitised = trimmed.replace(/[?#].*$/, '').replace(/\/+$/, '')
+
   // Handle HTTPS/SSH URL format: https://host/owner/repo.git or ssh://git@host/owner/repo
-  const urlMatch = trimmed.match(
+  const urlMatch = sanitised.match(
     /^(?:https?|ssh):\/\/(?:[^@]+@)?([^/]+)\/(.+?)(?:\.git)?$/,
   )
   if (urlMatch && urlMatch[1] && urlMatch[2]) {
@@ -233,10 +237,13 @@ export function normalizeGitRemoteUrl(url: string): string | null {
       return `github.com/${proxyPath}`.toLowerCase()
     }
 
-    // Strip ports on non-localhost so SCP-form `git@github.com:owner/repo`
-    // and `ssh://git@github.com:22/owner/repo` hash identically. Keep
-    // localhost ports — different ports are different proxy daemons.
-    const h = isLocalHost(host) ? host : host.split(':')[0]!
+    // Strip ports on non-localhost so all URL forms of the same repo
+    // hash identically. IPv6 `[::1]:port` puts the port AFTER `]` —
+    // `host.replace(/(]|^[^[]*?):\d+$/, '$1')` keeps the bracketed
+    // address intact and trims only a trailing `:port`.
+    const h = isLocalHost(host)
+      ? host
+      : host.replace(/(\]|^[^[]*?):\d+$/, '$1')
     return `${h}/${path}`.toLowerCase()
   }
 

@@ -104,7 +104,7 @@
   "packages/shell/src/providers/readOnlyCommandValidation.ts": 1894,
   "packages/shell/src/sandbox/sandbox-adapter.ts": 986,
   "packages/storage/src/claudemd.ts": 1480,
-  "packages/storage/src/git.ts": 850,
+  "packages/storage/src/git.ts": 857,
   "packages/storage/src/imageResizer.ts": 881,
   "packages/storage/src/sessionStorage.ts": 4595,
   "packages/storage/src/toolResultStorage.ts": 1041,
