@@ -121,6 +121,10 @@
     "./errors": "./errors.ts",
     "./plugin/pluginOperations.js": "./plugin/pluginOperations.ts",
     "./dxt/zip.js": "./dxt/zip.ts",
-    "./dxt/helpers.js": "./dxt/helpers.ts"
+    "./dxt/helpers.js": "./dxt/helpers.ts",
+    "./frontmatterParser.js": "./frontmatterParser.ts",
+    "./yaml.js": "./yaml.ts",
+    "./frontmatterParser": "./frontmatterParser.ts",
+    "./yaml": "./yaml.ts"
   }
 }

@@ -19,6 +19,11 @@
  * also fails, returns a safe no-op. This is documented per-slot.
  */
 
+// Static imports — only allowed when the target lives in the same wave-1
+// layer (no cycle risk). Anything from a higher layer must use the
+// setter-injection pattern below or lazy-require.
+import { parseFrontmatter as _canonicalParseFrontmatter } from '../frontmatterParser.js'
+
 // ---------------------------------------------------------------------------
 // Logging / diagnostics (re-injected — avoid cyclic imports)
 // ---------------------------------------------------------------------------
@@ -969,32 +974,15 @@ export const setRipGrepFn = setRipGrepFn_
 export const setUnzipFileFn = setUnzipFileFn_
 
 // -- frontmatter parsers
-// V7 §3.2 — parseFrontmatter lazy-resolved from agent/frontmatterParser.
-// Canonical signature is (markdown, sourcePath?) => { frontmatter, content };
-// the previous default returned just FrontmatterData, so destructuring
-// callers got `{ frontmatter, content } = {}` → `frontmatter` undefined →
-// "frontmatter.description" TypeError on every plugin command load.
+// parseFrontmatter lives in @claude-code/config/frontmatterParser. Direct
+// static import via the top-of-file `_canonicalParseFrontmatter` — used
+// to be lazy-require'd against agent because frontmatterParser was hosted
+// there and config → agent would form a cycle. After moving the parser
+// into config (same wave-1 layer), the cycle is gone.
 type ParsedMarkdown = { frontmatter: FrontmatterData; content: string }
-let _cachedParseFrontmatter: ((md: string, src?: string) => ParsedMarkdown) | null = null
 const [_getParseFrontmatter, setParseFrontmatterFn_] = makeSetter(
-  (md: string, src?: string): ParsedMarkdown => {
-    if (_cachedParseFrontmatter == null) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const mod = require('@claude-code/agent/frontmatterParser.js') as {
-          parseFrontmatter?: (md: string, src?: string) => ParsedMarkdown
-        }
-        if (typeof mod.parseFrontmatter === 'function') {
-          _cachedParseFrontmatter = mod.parseFrontmatter
-        }
-      } catch {
-        // agent not loadable — fall back to no-frontmatter
-      }
-    }
-    return _cachedParseFrontmatter
-      ? _cachedParseFrontmatter(md, src)
-      : { frontmatter: {}, content: md }
-  },
+  (md: string, src?: string): ParsedMarkdown =>
+    _canonicalParseFrontmatter(md, src) as ParsedMarkdown,
 )
 const [_getParseAgentToolsFromFrontmatter, setParseAgentToolsFromFrontmatterFn_] = makeSetter((_v: unknown): string[] => [])
 const [_getParseSlashCommandToolsFromFrontmatter, setParseSlashCommandToolsFromFrontmatterFn_] = makeSetter((_v: unknown): string[] => [])
