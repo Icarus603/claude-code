@@ -64,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9291; **findings**: 0
+**Total scanned**: 9222; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -72,7 +72,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2457; **findings**: 0
+**Total scanned**: 2441; **findings**: 0
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -80,7 +80,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1191; **findings**: 86
+**Total scanned**: 1182; **findings**: 86
 
 #### LOW (86)
 
@@ -152,7 +152,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5905; **findings**: 26
+**Total scanned**: 5845; **findings**: 26
 
 #### LOW (26)
 
@@ -215,7 +215,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/08-always-false-feature-flags.ts`
 
-**Total scanned**: 812; **findings**: 495
+**Total scanned**: 813; **findings**: 495
 
 #### LOW (495)
 
@@ -380,5 +380,5 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/12-module-level-null-state.ts`
 
-**Total scanned**: 177; **findings**: 0
+**Total scanned**: 174; **findings**: 0
 
