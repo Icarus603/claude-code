@@ -288,6 +288,13 @@ const CHECKS: Check[] = [
     doc: 'V7 §3.2 — lazy-require count + unknown-typed setter slot count in config/plugin/_deps.ts. Both are monotonic-shrink ratchets. Tighten with --tighten after a real reduction.',
   },
   {
+    id: 'knip-headroom',
+    layer: 'Cross-Cutting',
+    subsystem: 'dead-code ratchet',
+    script: 'scripts/verify-knip-headroom.ts',
+    doc: 'docs/refactor/knip-unused-classification.md — knip unused-file (packages/-scoped) and unused-export counts. Both monotonic-shrink. Tighten with --tighten after deleting dead shims.',
+  },
+  {
     id: 'no-bare-host-loggers',
     layer: 'Cross-Cutting',
     subsystem: 'host-binding migration completeness',
