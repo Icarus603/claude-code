@@ -781,7 +781,7 @@ async function createBackup(
   // Preserve file permissions on the backup.
   await chmod(backupPath, srcStats.mode)
 
-  logEvent('tengu_file_history_backup_file_created', {
+  getAgentHostBindings().logEvent?.('tengu_file_history_backup_file_created', {
     version: version,
     fileSize: srcStats.size,
   })
