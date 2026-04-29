@@ -74,7 +74,6 @@
   "packages/provider/src/claudeLegacyRuntime.ts": 3571,
   "packages/provider/src/errors.ts": 1305,
   "packages/provider/src/mockRateLimits.ts": 884,
-  "packages/provider/src/userAuth.ts": 2000,
   "packages/provider/src/withRetry.ts": 822,
   "packages/repl/src/Cursor.ts": 1530,
   "packages/repl/src/components/ConsoleOAuthFlow.tsx": 1816,
