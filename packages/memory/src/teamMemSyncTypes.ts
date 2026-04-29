@@ -13,7 +13,7 @@ import { lazySchema } from '@claude-code/config/lazySchema'
  * Keys are file paths relative to the team memory directory (e.g. "MEMORY.md", "patterns.md").
  * Values are UTF-8 string content (typically Markdown).
  */
-export const TeamMemoryContentSchema = lazySchema(() =>
+const TeamMemoryContentSchema = lazySchema(() =>
   z.object({
     entries: z.record(z.string(), z.string()),
     // Per-key SHA-256 of entry content (`sha256:<hex>`). Added in

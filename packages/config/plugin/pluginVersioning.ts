@@ -124,7 +124,7 @@ export function getGitCommitSha(dirPath: string): Promise<string | null> {
  * @param installPath - Full path to plugin installation
  * @returns Version string from path, or null if not a versioned path
  */
-export function getVersionFromPath(installPath: string): string | null {
+function getVersionFromPath(installPath: string): string | null {
   // Versioned paths have format: .../plugins/cache/marketplace/plugin/version/
   const parts = installPath.split('/').filter(Boolean)
 
@@ -152,6 +152,6 @@ export function getVersionFromPath(installPath: string): string | null {
  * @param path - Path to check
  * @returns True if path follows versioned structure
  */
-export function isVersionedPath(path: string): boolean {
+function isVersionedPath(path: string): boolean {
   return getVersionFromPath(path) !== null
 }

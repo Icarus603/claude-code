@@ -106,7 +106,7 @@ export class SdkControlClientTransport implements Transport {
  *
  * Note: Query handles all request/response correlation and async flow.
  */
-export class SdkControlServerTransport implements Transport {
+class SdkControlServerTransport implements Transport {
   private isClosed = false
 
   constructor(private sendMcpMessage: (message: JSONRPCMessage) => void) {}

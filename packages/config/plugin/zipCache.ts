@@ -83,7 +83,7 @@ export function getZipCacheKnownMarketplacesPath(): string {
 /**
  * Get the path to installed_plugins.json in the zip cache.
  */
-export function getZipCacheInstalledPluginsPath(): string {
+function getZipCacheInstalledPluginsPath(): string {
   const cachePath = getPluginZipCachePath()
   if (!cachePath) {
     throw new Error('Plugin zip cache is not enabled')
@@ -163,7 +163,7 @@ export async function cleanupSessionPluginCache(): Promise<void> {
 /**
  * Reset the session plugin cache path (for testing).
  */
-export function resetSessionPluginCache(): void {
+function resetSessionPluginCache(): void {
   sessionPluginCachePath = null
   sessionPluginCachePromise = null
 }
@@ -213,7 +213,7 @@ type ZipEntry = [Uint8Array, { os: number; attrs: number }]
  * @param sourceDir - Directory to zip
  * @returns ZIP file as Uint8Array
  */
-export async function createZipFromDirectory(
+async function createZipFromDirectory(
   sourceDir: string,
 ): Promise<Uint8Array> {
   const files: Record<string, ZipEntry> = {}

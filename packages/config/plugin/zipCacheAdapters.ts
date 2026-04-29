@@ -35,7 +35,7 @@ import {
  * Returns empty object if file doesn't exist, can't be parsed, or fails schema
  * validation (data comes from a shared mounted volume — other containers may write).
  */
-export async function readZipCacheKnownMarketplaces(): Promise<KnownMarketplacesFile> {
+async function readZipCacheKnownMarketplaces(): Promise<KnownMarketplacesFile> {
   try {
     const content = await readFile(getZipCacheKnownMarketplacesPath(), 'utf-8')
     const parsed = KnownMarketplacesFileSchema().safeParse(jsonParse(content))
@@ -55,7 +55,7 @@ export async function readZipCacheKnownMarketplaces(): Promise<KnownMarketplaces
 /**
  * Write known_marketplaces.json to the zip cache atomically.
  */
-export async function writeZipCacheKnownMarketplaces(
+async function writeZipCacheKnownMarketplaces(
   data: KnownMarketplacesFile,
 ): Promise<void> {
   await atomicWriteToZipCache(
@@ -69,7 +69,7 @@ export async function writeZipCacheKnownMarketplaces(
 /**
  * Read a marketplace JSON file from the zip cache.
  */
-export async function readMarketplaceJson(
+async function readMarketplaceJson(
   marketplaceName: string,
 ): Promise<PluginMarketplace | null> {
   const zipCachePath = getPluginZipCachePath()
@@ -97,7 +97,7 @@ export async function readMarketplaceJson(
 /**
  * Save a marketplace JSON to the zip cache from its install location.
  */
-export async function saveMarketplaceJsonToZipCache(
+async function saveMarketplaceJsonToZipCache(
   marketplaceName: string,
   installLocation: string,
 ): Promise<void> {

@@ -64,6 +64,6 @@ export function markGitUnavailable(): void {
  * Clear the git availability cache.
  * Used for testing purposes.
  */
-export function clearGitAvailabilityCache(): void {
+function clearGitAvailabilityCache(): void {
   checkGitAvailable.cache?.clear?.()
 }

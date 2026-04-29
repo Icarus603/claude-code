@@ -5,7 +5,7 @@
 import { z } from 'zod/v4'
 import { lazySchema } from '../../internal/lazySchema.js'
 
-export const SandboxNetworkConfigSchema = lazySchema(() =>
+const SandboxNetworkConfigSchema = lazySchema(() =>
   z
     .object({
       allowedDomains: z.array(z.string()).optional(),
@@ -35,7 +35,7 @@ export const SandboxNetworkConfigSchema = lazySchema(() =>
     .optional(),
 )
 
-export const SandboxFilesystemConfigSchema = lazySchema(() =>
+const SandboxFilesystemConfigSchema = lazySchema(() =>
   z
     .object({
       allowWrite: z.array(z.string()).optional().describe('Additional paths to allow writing within the sandbox.'),

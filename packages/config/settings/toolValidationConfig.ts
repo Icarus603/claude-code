@@ -23,7 +23,7 @@ export type ToolValidationConfig = {
   }
 }
 
-export const TOOL_VALIDATION_CONFIG: ToolValidationConfig = {
+const TOOL_VALIDATION_CONFIG: ToolValidationConfig = {
   // File pattern tools (accept *.ts, src/**, etc.)
   filePatternTools: [
     'Read',

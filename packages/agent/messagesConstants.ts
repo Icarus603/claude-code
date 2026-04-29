@@ -1,4 +1,3 @@
-export const NO_CONTENT_MESSAGE = '(no content)'
 export const SYNTHETIC_MODEL = '<synthetic>'
 
 export const SYNTHETIC_MESSAGES = new Set([

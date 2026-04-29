@@ -98,7 +98,7 @@ type ExceededLimit = {
 let exceededLimits: ExceededLimit[] = []
 
 // New approach: Toggle individual headers
-export function setMockHeader(
+function setMockHeader(
   key: MockHeaderKey,
   value: string | undefined,
 ): void {
@@ -247,7 +247,7 @@ function updateRepresentativeClaim(): void {
 }
 
 // Add function to add exceeded limit with custom reset time
-export function addExceededLimit(
+function addExceededLimit(
   type: 'five_hour' | 'seven_day' | 'seven_day_opus' | 'seven_day_sonnet',
   hoursFromNow: number,
 ): void {
@@ -274,7 +274,7 @@ export function addExceededLimit(
 // claimAbbrev: '5h' or '7d'
 // utilization: 0-1 (e.g., 0.92 for 92% used)
 // hoursFromNow: hours until reset (default: 4 for 5h, 120 for 7d)
-export function setMockEarlyWarning(
+function setMockEarlyWarning(
   claimAbbrev: '5h' | '7d' | 'overage',
   utilization: number,
   hoursFromNow?: number,
@@ -310,7 +310,7 @@ export function setMockEarlyWarning(
 }
 
 // Clear mock early warning headers
-export function clearMockEarlyWarning(): void {
+function clearMockEarlyWarning(): void {
   delete mockHeaders['anthropic-ratelimit-unified-5h-utilization']
   delete mockHeaders['anthropic-ratelimit-unified-5h-reset']
   delete mockHeaders['anthropic-ratelimit-unified-5h-surpassed-threshold']
@@ -319,7 +319,7 @@ export function clearMockEarlyWarning(): void {
   delete mockHeaders['anthropic-ratelimit-unified-7d-surpassed-threshold']
 }
 
-export function setMockRateLimitScenario(scenario: MockScenario): void {
+function setMockRateLimitScenario(scenario: MockScenario): void {
   if (process.env.USER_TYPE !== 'ant') {
     return
   }
@@ -625,7 +625,7 @@ export function getMockHeaders(): MockHeaders | null {
   return mockHeaders
 }
 
-export function getMockStatus(): string {
+function getMockStatus(): string {
   if (
     !mockEnabled ||
     (Object.keys(mockHeaders).length === 0 && !mockSubscriptionType)
@@ -676,7 +676,7 @@ export function getMockStatus(): string {
   return lines.join('\n')
 }
 
-export function clearMockHeaders(): void {
+function clearMockHeaders(): void {
   mockHeaders = {}
   exceededLimits = []
   mockSubscriptionType = null
@@ -718,7 +718,7 @@ export function shouldProcessMockLimits(): boolean {
   return mockEnabled || Boolean(readEnv('CLAUDE_MOCK_HEADERLESS_429'))
 }
 
-export function getCurrentMockScenario(): MockScenario | null {
+function getCurrentMockScenario(): MockScenario | null {
   if (!mockEnabled) {
     return null
   }
@@ -756,7 +756,7 @@ export function getCurrentMockScenario(): MockScenario | null {
   return null
 }
 
-export function getScenarioDescription(scenario: MockScenario): string {
+function getScenarioDescription(scenario: MockScenario): string {
   switch (scenario) {
     case 'normal':
       return 'Normal usage, no limits'
@@ -804,7 +804,7 @@ export function getScenarioDescription(scenario: MockScenario): string {
 }
 
 // Mock subscription type management
-export function setMockSubscriptionType(
+function setMockSubscriptionType(
   subscriptionType: SubscriptionType | null,
 ): void {
   if (process.env.USER_TYPE !== 'ant') {
@@ -832,7 +832,7 @@ export function shouldUseMockSubscription(): boolean {
 }
 
 // Mock billing access (admin vs non-admin)
-export function setMockBillingAccess(hasAccess: boolean | null): void {
+function setMockBillingAccess(hasAccess: boolean | null): void {
   if (process.env.USER_TYPE !== 'ant') {
     return
   }

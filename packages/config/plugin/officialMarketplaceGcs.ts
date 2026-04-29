@@ -193,7 +193,7 @@ const KNOWN_FS_CODES = new Set([
  * failures are fixable (wrong staging dir, cross-device rename) or inherent
  * (disk full, permission denied) before flipping the git-fallback kill switch.
  */
-export function classifyGcsError(e: unknown): string {
+function classifyGcsError(e: unknown): string {
   if (axios.isAxiosError(e)) {
     if (e.code === 'ECONNABORTED') return 'timeout'
     if (e.response) return `http_${e.response.status}`

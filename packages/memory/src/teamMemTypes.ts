@@ -13,7 +13,7 @@ function lazySchema<T>(factory: () => T): () => T {
   return () => (cached ??= factory())
 }
 
-export const TeamMemoryContentSchema = lazySchema(() =>
+const TeamMemoryContentSchema = lazySchema(() =>
   z.object({
     entries: z.record(z.string(), z.string()),
     entryChecksums: z.record(z.string(), z.string()).optional(),

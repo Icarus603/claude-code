@@ -384,7 +384,7 @@ export async function* withStreamingVCR(
   yield* buffer
 }
 
-export async function withTokenCountVCR(
+async function withTokenCountVCR(
   messages: unknown[],
   tools: unknown[],
   f: () => Promise<number | null>,

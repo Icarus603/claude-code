@@ -188,7 +188,7 @@ function translateMessages(
 
 // ── Anthropic body → Codex body ─────────────────────────────────────
 
-export function translateToCodexBody(
+function translateToCodexBody(
   anthropicBody: Record<string, unknown>,
 ): { codexBody: Record<string, unknown>; codexModel: string } {
   const anthropicMessages = (anthropicBody.messages ?? []) as AnthropicMessage[]
