@@ -1,11 +1,8 @@
-export {
-  TEAM_LEAD_NAME,
-  MAILBOX_POLL_INTERVAL_MS,
-  PERMISSION_POLL_INTERVAL_MS,
-  TEAMMATE_MESSAGES_UI_CAP,
-  LOCK_OPTIONS,
-  ENV,
-} from '../types/constants.js'
+// Only TEAM_LEAD_NAME is consumed via this barrel; the other 5 exports
+// from '../types/constants.js' had no callers and were dropped 2026-04-29.
+// Importers that want the dropped constants should reach into
+// '../types/constants.js' directly.
+export { TEAM_LEAD_NAME } from '../types/constants.js'
 
 export const SWARM_SESSION_NAME = 'claude-swarm'
 export const SWARM_VIEW_WINDOW_NAME = 'swarm-view'

@@ -111,7 +111,7 @@ const WHEEL_DECAY_IDLE_MS = 500
  * Bare arrows DO clear (user's cursor moves, native deselects). Wheel is
  * excluded — scroll:lineUp/Down already clears via the keybinding path.
  */
-export function shouldClearSelectionOnKey(key: Key): boolean {
+function shouldClearSelectionOnKey(key: Key): boolean {
   if (key.wheelUp || key.wheelDown) return false
   const isNav =
     key.leftArrow ||
@@ -136,7 +136,7 @@ export function shouldClearSelectionOnKey(key: Key): boolean {
  * yet implemented — falls through to shouldClearSelectionOnKey which
  * preserves (modified nav). Returns null for non-extend keys.
  */
-export function selectionFocusMoveForKey(key: Key): FocusMove | null {
+function selectionFocusMoveForKey(key: Key): FocusMove | null {
   if (!key.shift || key.meta) return null
   if (key.leftArrow) return 'left'
   if (key.rightArrow) return 'right'
@@ -181,7 +181,7 @@ export type WheelAccelState = {
  *  a direction flip is deferred for bounce detection — call sites no-op on
  *  step=0 (scrollBy(0) is a no-op, onScroll(false) is idempotent). Exported
  *  for tests. */
-export function computeWheelStep(
+function computeWheelStep(
   state: WheelAccelState,
   dir: 1 | -1,
   now: number,
@@ -316,7 +316,7 @@ export function computeWheelStep(
  *  set CLAUDE_CODE_SCROLL_SPEED=3 to match vim/nvim/opencode. We can't
  *  detect which kind of terminal we're in, hence the knob. Called lazily
  *  from initAndLogWheelAccel so globalSettings.env has loaded. */
-export function readScrollSpeedBase(): number {
+function readScrollSpeedBase(): number {
   const raw = process.env.CLAUDE_CODE_SCROLL_SPEED
   if (!raw) return 1
   const n = parseFloat(raw)
@@ -325,7 +325,7 @@ export function readScrollSpeedBase(): number {
 
 /** Initial wheel accel state. xtermJs=true selects the decay curve.
  *  base is the native-path baseline rows/event (default 1). */
-export function initWheelAccel(xtermJs = false, base = 1): WheelAccelState {
+function initWheelAccel(xtermJs = false, base = 1): WheelAccelState {
   return {
     time: 0,
     mult: base,
@@ -857,7 +857,7 @@ function useDragToScroll(
  * returns 0 to stop — reversing without clearing scrolledOffAbove/Below
  * would duplicate captured rows when they scroll back on-screen.
  */
-export function dragScrollDirection(
+function dragScrollDirection(
   sel: SelectionState | null,
   top: number,
   bottom: number,
@@ -886,7 +886,7 @@ export function dragScrollDirection(
 // wheel smoothness, wrong for PgUp/ctrl+u where the user expects a snap.
 // Target is relative to scrollTop+pendingDelta so a jump mid-wheel-burst
 // lands where the wheel was heading.
-export function jumpBy(s: ScrollBoxHandle, delta: number): boolean {
+function jumpBy(s: ScrollBoxHandle, delta: number): boolean {
   const max = Math.max(0, s.getScrollHeight() - s.getViewportHeight())
   const target = s.getScrollTop() + s.getPendingDelta() + delta
   if (target >= max) {
@@ -925,7 +925,7 @@ function scrollDown(s: ScrollBoxHandle, amount: number): boolean {
 // useVirtualScroll's [effLo, effHi] span grows past what MAX_MOUNTED_ITEMS
 // can cover and intermediate drain frames render at scrollTops with no
 // mounted children — blank viewport.
-export function scrollUp(s: ScrollBoxHandle, amount: number): void {
+function scrollUp(s: ScrollBoxHandle, amount: number): void {
   // Include pendingDelta: scrollBy accumulates without updating scrollTop,
   // so getScrollTop() alone is stale within a batch of wheel events.
   const effectiveTop = s.getScrollTop() + s.getPendingDelta()
@@ -961,7 +961,7 @@ export type ModalPagerAction =
  * count is irrelevant (consuming the batch just prevents it from leaking
  * to the selection-clear-on-printable handler).
  */
-export function modalPagerAction(
+function modalPagerAction(
   input: string,
   key: Pick<
     Key,
@@ -1036,7 +1036,7 @@ export function modalPagerAction(
  * translate the text selection by the scroll delta (capture outgoing rows,
  * shift anchor+focus) instead of clearing it. Exported for testing.
  */
-export function applyModalPagerAction(
+function applyModalPagerAction(
   s: ScrollBoxHandle,
   act: ModalPagerAction | null,
   onBeforeJump: (delta: number) => void,
