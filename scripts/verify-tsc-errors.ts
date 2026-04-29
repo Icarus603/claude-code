@@ -43,7 +43,11 @@ import { spawnSync } from 'child_process'
 // 2026-04-29 (later): tightened 3269 → 3268 after collapsing
 // permission/types/permissions.ts duplicate into a re-export of
 // permissionTypes.ts.
-const BUDGET = 3268
+//
+// 2026-04-29 (later 2): tightened 3268 → 3266 after removing duplicate
+// `import { readEnv } from '@claude-code/config/env'` line in
+// agent/internalUtils.ts (TS2300).
+const BUDGET = 3266
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

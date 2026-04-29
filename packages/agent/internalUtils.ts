@@ -75,7 +75,6 @@ export function isBareMode(): boolean {
 
 import { stat } from 'fs/promises'
 import { readEnv } from '@claude-code/config/env'
-import { readEnv } from '@claude-code/config/env'
 
 /** Check if a path exists (async, swallows errors). */
 export async function pathExists(path: string): Promise<boolean> {
