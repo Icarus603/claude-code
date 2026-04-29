@@ -50,7 +50,11 @@ export function isImageOutput(content: string): boolean {
   return /^data:image\/[a-z0-9.+_-]+;base64,/i.test(content)
 }
 
-const DATA_URI_RE = /^data:([^;]+);base64,(.+)$/
+// SECURITY: data segment must be valid base64 chars only (RFC 4648 alphabet
+// plus '=' padding). Without this, Buffer.from(_, 'base64') silently skips
+// invalid bytes and produces garbage, causing image corruption to surface
+// downstream as opaque API errors.
+const DATA_URI_RE = /^data:([^;]+);base64,([A-Za-z0-9+/]+={0,2})$/
 
 /**
  * Parse a data-URI string into its media type and base64 payload.
