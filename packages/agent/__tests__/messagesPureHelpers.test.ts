@@ -114,6 +114,44 @@ describe('deriveUUID — deterministic key derivation', () => {
   })
 })
 
+describe('AUTO_REJECT_MESSAGE / DONT_ASK_REJECT_MESSAGE — formatters', () => {
+  let AUTO_REJECT_MESSAGE: typeof import('../messages.js').AUTO_REJECT_MESSAGE
+  let DONT_ASK_REJECT_MESSAGE: typeof import('../messages.js').DONT_ASK_REJECT_MESSAGE
+  beforeAll(async () => {
+    ;({ AUTO_REJECT_MESSAGE, DONT_ASK_REJECT_MESSAGE } = await import(
+      '../messages.js'
+    ))
+  })
+
+  test('AUTO_REJECT_MESSAGE includes tool name', () => {
+    expect(AUTO_REJECT_MESSAGE('Bash')).toContain('Bash')
+    expect(AUTO_REJECT_MESSAGE('Bash')).toContain('denied')
+  })
+
+  test('AUTO_REJECT_MESSAGE includes denial workaround guidance', () => {
+    // The shared DENIAL_WORKAROUND_GUIDANCE is appended.
+    const msg = AUTO_REJECT_MESSAGE('FileEdit')
+    expect(msg.length).toBeGreaterThan(50)
+  })
+
+  test('DONT_ASK_REJECT_MESSAGE has different text from AUTO_REJECT_MESSAGE', () => {
+    // Distinct messages — model gets different context for each path.
+    const a = AUTO_REJECT_MESSAGE('X')
+    const b = DONT_ASK_REJECT_MESSAGE('X')
+    expect(a).not.toBe(b)
+  })
+
+  test("DONT_ASK_REJECT_MESSAGE mentions \"don't ask mode\"", () => {
+    expect(DONT_ASK_REJECT_MESSAGE('Edit')).toContain("don't ask mode")
+  })
+
+  test('Both messages include the tool name verbatim', () => {
+    const tool = 'CustomTool'
+    expect(AUTO_REJECT_MESSAGE(tool)).toContain(tool)
+    expect(DONT_ASK_REJECT_MESSAGE(tool)).toContain(tool)
+  })
+})
+
 describe('isClassifierDenial — UI summary detection', () => {
   let isClassifierDenial: typeof import('../messages.js').isClassifierDenial
   beforeAll(async () => {
