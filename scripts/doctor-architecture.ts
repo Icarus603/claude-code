@@ -295,6 +295,13 @@ const CHECKS: Check[] = [
     doc: 'docs/refactor/knip-unused-classification.md — knip unused-file (packages/-scoped) and unused-export counts. Both monotonic-shrink. Tighten with --tighten after deleting dead shims.',
   },
   {
+    id: 'mock-module-spread',
+    layer: 'Cross-Cutting',
+    subsystem: 'test isolation',
+    script: 'scripts/verify-mock-module-spread.ts',
+    doc: 'feedback_bun_mock_module_global_scope.md — every mock.module("@claude-code/*", ...) must spread the real exports first or include MOCK_FULL_REPLACE: justification. Prevents the silent global-shadow bug class.',
+  },
+  {
     id: 'no-bare-host-loggers',
     layer: 'Cross-Cutting',
     subsystem: 'host-binding migration completeness',
