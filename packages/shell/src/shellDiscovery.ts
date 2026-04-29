@@ -4,7 +4,7 @@
 import { execFileSync } from 'child_process'
 import { constants as fsConstants, accessSync } from 'fs'
 import memoize from 'lodash-es/memoize.js'
-import type { ShellExecContext } from '@claude-code/provider/context.js'
+import type { ShellExecContext } from './context.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { createBashShellProvider } from './providers/bashProvider.js'
 import { getCachedPowerShellPath } from './providers/powershellDetection.js'

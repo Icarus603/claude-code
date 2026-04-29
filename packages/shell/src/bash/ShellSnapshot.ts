@@ -5,7 +5,7 @@ import { execa } from 'execa'
 import { mkdir, stat } from 'fs/promises'
 import * as os from 'os'
 import { join } from 'path'
-import type { SnapshotContext } from '@claude-code/provider/context.js'
+import type { SnapshotContext } from '../context.js'
 import { quote } from './shellQuote.js'
 
 const LITERAL_BACKSLASH = '\\'

@@ -69,7 +69,15 @@ import { spawnSync } from 'child_process'
 //     re-exported, so consumers got TS2459
 //   - config/plugin/loadPluginCommands.ts: `Command` was imported
 //     from `./types.js` but lives in `./_deps.ts`
-const BUDGET = 3223
+//
+// 2026-04-29 (later 5): tightened 3223 → 3217 after fixing 6 shell
+// files importing ShellExecContext / SnapshotContext from the wrong
+// path: was `@claude-code/provider/context.js` (which doesn't export
+// those types — that module only re-exports getSystemContext etc.);
+// canonical home is `packages/shell/src/context.ts`. Affected:
+// providers/{bash,powershell}Provider.ts, bash/ShellSnapshot.ts,
+// shellDiscovery.ts, exec.ts, index.ts.
+const BUDGET = 3217
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

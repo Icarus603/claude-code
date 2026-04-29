@@ -4,7 +4,7 @@
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { join as posixJoin } from 'path/posix'
-import type { ShellExecContext } from '@claude-code/provider/context.js'
+import type { ShellExecContext } from '../context.js'
 import type { ShellProvider } from './shellProvider.js'
 
 /**
