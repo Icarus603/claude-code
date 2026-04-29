@@ -14,7 +14,7 @@
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash
-#   curl -fsSL .../install.sh | CCB_VERSION=v1.carus.000 bash    # pin version
+#   curl -fsSL .../install.sh | CCB_VERSION=v26.4.24 bash        # pin version
 #   curl -fsSL .../install.sh | CCB_PREFIX=/usr/local bash       # system-wide
 
 set -euo pipefail
@@ -161,6 +161,14 @@ prune_old_versions() {
   for entry in "${entries[@]}"; do
     full_path="$dir/$entry"
     [ -f "$full_path" ] || continue
+    # Skip transient install artifacts (.partial download, .sha256 sidecar)
+    # — they shouldn't count as kept slots and shouldn't be deleted as
+    # "old versions". Prior install crashes can leave these behind; if we
+    # let them rank into the keep window they'd protect themselves AND
+    # push real versioned binaries past KEEP_VERSIONS into the prune list.
+    case "$entry" in
+      *.partial|*.sha256) continue ;;
+    esac
     # Always protect the version we just installed.
     if [ "$full_path" = "$keep_path" ]; then
       kept=$((kept + 1))
