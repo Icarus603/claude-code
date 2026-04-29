@@ -3,7 +3,7 @@
   "@claude-code/swarm": 11,
   "@claude-code/tool-registry": 60,
   "@claude-code/memory": 21,
-  "@claude-code/config": 122,
+  "@claude-code/config": 130,
   "@claude-code/command-runtime": 62,
   "@claude-code/shell": 30,
   "@claude-code/bridge": 6,

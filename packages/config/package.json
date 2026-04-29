@@ -127,6 +127,14 @@
     "./frontmatterParser": "./frontmatterParser.ts",
     "./yaml": "./yaml.ts",
     "./mcpConfigSchema.js": "./mcpConfigSchema.ts",
-    "./mcpConfigSchema": "./mcpConfigSchema.ts"
+    "./mcpConfigSchema": "./mcpConfigSchema.ts",
+    "./utils/expandTilde.js": "./utils/expandTilde.ts",
+    "./utils/expandTilde": "./utils/expandTilde.ts",
+    "./utils/markdownDescription.js": "./utils/markdownDescription.ts",
+    "./utils/markdownDescription": "./utils/markdownDescription.ts",
+    "./utils/envExpansion.js": "./utils/envExpansion.ts",
+    "./utils/envExpansion": "./utils/envExpansion.ts",
+    "./utils/argumentSubstitution.js": "./utils/argumentSubstitution.ts",
+    "./utils/argumentSubstitution": "./utils/argumentSubstitution.ts"
   }
 }

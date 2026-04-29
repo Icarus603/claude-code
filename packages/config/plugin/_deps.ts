@@ -24,6 +24,10 @@
 // setter-injection pattern below or lazy-require.
 import { parseFrontmatter as _canonicalParseFrontmatter } from '../frontmatterParser.js'
 import { McpServerConfigSchema as _canonicalMcpServerConfigSchema } from '../mcpConfigSchema.js'
+import { expandTilde as _canonicalExpandTilde } from '../utils/expandTilde.js'
+import { extractDescriptionFromMarkdown as _canonicalExtractDescriptionFromMarkdown } from '../utils/markdownDescription.js'
+import { expandEnvVarsInString as _canonicalExpandEnvVarsInString } from '../utils/envExpansion.js'
+import { substituteArguments as _canonicalSubstituteArguments } from '../utils/argumentSubstitution.js'
 
 // ---------------------------------------------------------------------------
 // Logging / diagnostics (re-injected — avoid cyclic imports)
@@ -828,77 +832,22 @@ export function coerceDescriptionToString(v: unknown): string {
   if (v == null) return ''
   return String(v)
 }
-// V7 §3.2 — extractDescriptionFromMarkdown lazy-resolved from
-// tool-registry/markdownConfigLoader. Default `() => ''` would silently
-// truncate every plugin command description loaded by getPluginCommands.
-let _cachedExtractDescriptionFromMarkdown:
-  | ((text: string, label?: string) => string)
-  | null = null
+// extractDescriptionFromMarkdown lives in @claude-code/config/utils/markdownDescription
+// — moved out of tool-registry to break the config → tool-registry cycle.
 const [_getExtractDescriptionFromMarkdown, setExtractDescriptionFromMarkdownFn_] =
-  makeSetter((text: string, label?: string): string => {
-    if (_cachedExtractDescriptionFromMarkdown == null) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const mod = require('@claude-code/tool-registry/markdownConfigLoader.js') as {
-          extractDescriptionFromMarkdown?: (text: string, label?: string) => string
-        }
-        if (typeof mod.extractDescriptionFromMarkdown === 'function') {
-          _cachedExtractDescriptionFromMarkdown = mod.extractDescriptionFromMarkdown
-        }
-      } catch {
-        /* tool-registry not loadable — fall back */
-      }
-    }
-    return _cachedExtractDescriptionFromMarkdown
-      ? _cachedExtractDescriptionFromMarkdown(text, label)
-      : ''
-  })
+  makeSetter(_canonicalExtractDescriptionFromMarkdown)
 
-// V7 §3.2 — expandTilde lazy-resolved from permission/pathValidation.
-// Default returns input unchanged; canonical actually resolves ~/foo.
-let _cachedExpandTilde: ((p: string) => string) | null = null
-const [_getExpandTilde, setExpandTildeFn_] = makeSetter((p: string): string => {
-  if (_cachedExpandTilde == null) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('@claude-code/permission/pathValidation.js') as {
-        expandTilde?: (p: string) => string
-      }
-      if (typeof mod.expandTilde === 'function') {
-        _cachedExpandTilde = mod.expandTilde
-      }
-    } catch {
-      /* permission not loadable — fall back to identity */
-    }
-  }
-  return _cachedExpandTilde ? _cachedExpandTilde(p) : p
-})
+// expandTilde lives in @claude-code/config/utils/expandTilde — moved out
+// of permission/pathValidation to break the config → permission cycle.
+const [_getExpandTilde, setExpandTildeFn_] = makeSetter(_canonicalExpandTilde)
 // V7 §3.2 — expandEnvVarsInString lazy-resolved from mcp-runtime to avoid
 // the static config → mcp-runtime cycle. The canonical impl returns
 // `{ expanded, missingVars }`; the previous default returned a bare string,
-// which made destructuring callers crash with "Spread syntax requires
-// ...iterable not be null or undefined" (missingVars was undefined).
+// expandEnvVarsInString moved to @claude-code/config/utils/envExpansion —
+// out of mcp-runtime to break the config → mcp-runtime cycle.
 type ExpandEnvVarsResult = { expanded: string; missingVars: string[] }
-let _cachedExpandEnvVarsInString: ((s: string) => ExpandEnvVarsResult) | null = null
 const [_getExpandEnvVarsInString, setExpandEnvVarsInStringFn_] = makeSetter(
-  (s: string): ExpandEnvVarsResult => {
-    if (_cachedExpandEnvVarsInString == null) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const mod = require('@claude-code/mcp-runtime/envExpansion.js') as {
-          expandEnvVarsInString?: (s: string) => ExpandEnvVarsResult
-        }
-        if (typeof mod.expandEnvVarsInString === 'function') {
-          _cachedExpandEnvVarsInString = mod.expandEnvVarsInString
-        }
-      } catch {
-        // mcp-runtime not loadable — fall back to no-op
-      }
-    }
-    return _cachedExpandEnvVarsInString
-      ? _cachedExpandEnvVarsInString(s)
-      : { expanded: s, missingVars: [] }
-  },
+  _canonicalExpandEnvVarsInString,
 )
 // V7 §3.2 — executeShellCommandsInPrompt lazy-resolved from
 // command-runtime/promptShellExecution. Default returns empty string,
@@ -979,37 +928,16 @@ const [_getParseYaml, setParseYamlFn_] = makeSetter((_s: string): unknown => nul
 const [_getParseArgumentNames, setParseArgumentNamesFn_] = makeSetter((_s: string): string[] => [])
 const [_getParseUserSpecifiedModel, setParseUserSpecifiedModelFn_] = makeSetter((_v: unknown): string | undefined => undefined)
 const [_getParseZipModes, setParseZipModesFn_] = makeSetter((_v: unknown): unknown => null)
-// V7 §3.2 — substituteArguments lazy-resolved from
-// command-runtime/argumentSubstitution. Default `(s, _) => s` was an
-// identity passthrough; every plugin slash command's $ARGUMENTS
-// placeholder was preserved literally, so shell scripts saw `$ARGUMENTS`
-// as a literal and rejected "No prompt provided".
+// substituteArguments moved to @claude-code/config/utils/argumentSubstitution
+// — out of command-runtime to break the config → command-runtime cycle.
 type SubstituteArgumentsFn = (
   content: string,
   args: string | undefined,
   appendIfNoPlaceholder?: boolean,
   argumentNames?: string[],
 ) => string
-let _cachedSubstituteArguments: SubstituteArgumentsFn | null = null
 const [_getSubstituteArguments, setSubstituteArgumentsFn_] = makeSetter(
-  ((content, args, appendIfNoPlaceholder, argumentNames) => {
-    if (_cachedSubstituteArguments == null) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const mod = require('@claude-code/command-runtime/argumentSubstitution.js') as {
-          substituteArguments?: SubstituteArgumentsFn
-        }
-        if (typeof mod.substituteArguments === 'function') {
-          _cachedSubstituteArguments = mod.substituteArguments
-        }
-      } catch {
-        /* command-runtime not loadable — fall back to identity */
-      }
-    }
-    return _cachedSubstituteArguments
-      ? _cachedSubstituteArguments(content, args, appendIfNoPlaceholder, argumentNames)
-      : content
-  }) as SubstituteArgumentsFn,
+  _canonicalSubstituteArguments as SubstituteArgumentsFn,
 )
 const [_getParseAndValidateManifestFromBytes, setParseAndValidateManifestFromBytesFn_] = makeSetter(async (_bytes: Uint8Array): Promise<unknown> => null)
 export function parseFrontmatter(t: string, src?: string): ParsedMarkdown { return _getParseFrontmatter()(t, src) }
