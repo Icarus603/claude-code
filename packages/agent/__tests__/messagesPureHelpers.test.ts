@@ -114,6 +114,52 @@ describe('deriveUUID — deterministic key derivation', () => {
   })
 })
 
+describe('formatCommandInputTags — slash command breadcrumb', () => {
+  let formatCommandInputTags: typeof import('../messages.js').formatCommandInputTags
+  beforeAll(async () => {
+    ;({ formatCommandInputTags } = await import('../messages.js'))
+  })
+
+  test('output contains all three tags', () => {
+    const result = formatCommandInputTags('review', 'fix tests')
+    expect(result).toContain('<command-name>')
+    expect(result).toContain('</command-name>')
+    expect(result).toContain('<command-message>')
+    expect(result).toContain('<command-args>')
+  })
+
+  test('command name has leading slash in command-name tag', () => {
+    // Documented format: command-name has the slash, command-message
+    // doesn't. The slash distinguishes user-typed commands from
+    // unrelated text — see SKIP_FIRST_PROMPT_PATTERN's usage of this.
+    const result = formatCommandInputTags('review', 'x')
+    expect(result).toContain('<command-name>/review</command-name>')
+  })
+
+  test('command-message has the bare name (no slash)', () => {
+    const result = formatCommandInputTags('review', 'x')
+    expect(result).toContain('<command-message>review</command-message>')
+  })
+
+  test('args appear inside command-args tag', () => {
+    const result = formatCommandInputTags('greet', 'hello world')
+    expect(result).toContain('<command-args>hello world</command-args>')
+  })
+
+  test('empty args produce empty command-args content', () => {
+    const result = formatCommandInputTags('clear', '')
+    expect(result).toContain('<command-args></command-args>')
+  })
+
+  test('special chars in args NOT escaped (documented)', () => {
+    // The function does NOT HTML-escape — args flow through verbatim.
+    // Locks behavior so a future "we should escape" patch is
+    // intentional (consumers downstream may rely on raw passthrough).
+    const result = formatCommandInputTags('cmd', 'a<b>c & d')
+    expect(result).toContain('a<b>c & d')
+  })
+})
+
 describe('AUTO_REJECT_MESSAGE / DONT_ASK_REJECT_MESSAGE — formatters', () => {
   let AUTO_REJECT_MESSAGE: typeof import('../messages.js').AUTO_REJECT_MESSAGE
   let DONT_ASK_REJECT_MESSAGE: typeof import('../messages.js').DONT_ASK_REJECT_MESSAGE
