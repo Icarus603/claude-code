@@ -659,12 +659,6 @@ export function setWalkMarkdownFilesFn(fn: typeof _walkMarkdownFiles): void {
 // hints engine, CLI argument substitution).
 // ---------------------------------------------------------------------------
 
-let _builtinPlugins: unknown = {}
-
-export function getBuiltinPlugins(): unknown {
-  return _builtinPlugins
-}
-
 // Setter-based exports — callers that previously imported direct functions
 // from src/plugins/builtinPlugins.ts now receive dynamic references. Host-side
 // installPluginBindings wires real implementations at startup; defaults

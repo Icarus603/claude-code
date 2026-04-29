@@ -7,7 +7,6 @@ import sliceAnsi from '@claude-code/output/utils/sliceAnsi.js'
 import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
 import { HighlightedCodeFallback } from './HighlightedCode/Fallback.js'
 import { expectColorFile } from './StructuredDiff/colorDiff.js'
-import { useSettings } from '../hooks/useSettings.js'
 
 type Props = {
   code: string

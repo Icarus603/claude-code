@@ -47,7 +47,12 @@ import { spawnSync } from 'child_process'
 // 2026-04-29 (later 2): tightened 3268 → 3266 after removing duplicate
 // `import { readEnv } from '@claude-code/config/env'` line in
 // agent/internalUtils.ts (TS2300).
-const BUDGET = 3266
+//
+// 2026-04-29 (later 3): tightened 3266 → 3257 after removing more
+// duplicate identifiers/functions: planModeV2.ts (readEnv x2),
+// HighlightedCode.tsx (useSettings x2), _deps.ts (getBuiltinPlugins
+// x2 + dead `_builtinPlugins: unknown` slot).
+const BUDGET = 3257
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
