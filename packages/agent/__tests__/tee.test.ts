@@ -48,30 +48,27 @@ describe('tee', () => {
     expect(slowVals).toEqual([0, 1, 2, 3])
   })
 
-  test('source error after yields: pending consumers get done:true (race-with-close behavior)', async () => {
+  test('source error after yields: pending consumers see error AFTER buffered values', async () => {
     async function* failing(): AsyncIterable<number> {
       yield 0
       yield 1
       throw new Error('source-failed')
     }
     const [a, b] = tee(failing())
-    // Documenting behavior: close() runs in finally and resolves pending
-    // resolvers with done:true BEFORE the next() check sees sourceError.
-    // This means consumers that for-await-of see clean termination, not rejection.
-    const [valsA, valsB] = await Promise.all([collect(a!), collect(b!)])
-    expect(valsA).toEqual([0, 1])
-    expect(valsB).toEqual([0, 1])
+    // Both consumers receive the buffered values 0,1, then the error.
+    // Bug-fix 2026-04-29: previously close() resolved pending resolvers with
+    // done:true and the error was silently swallowed.
+    await expect(collect(a!)).rejects.toThrow('source-failed')
+    await expect(collect(b!)).rejects.toThrow('source-failed')
   })
 
-  test('post-close next() rejects with sourceError if buffered call seen after close', async () => {
+  test('source throws immediately: each consumer rejects with the error', async () => {
     async function* failing(): AsyncIterable<number> {
       throw new Error('source-failed-immediately')
     }
-    const [a] = tee(failing())
-    // Call next() after a tick to ensure drain has finalized
-    await new Promise<void>(r => setTimeout(r, 10))
-    const iter = a![Symbol.asyncIterator]()
-    await expect(iter.next()).rejects.toThrow('source-failed-immediately')
+    const [a, b] = tee(failing())
+    await expect(collect(a!)).rejects.toThrow('source-failed-immediately')
+    await expect(collect(b!)).rejects.toThrow('source-failed-immediately')
   })
 
   test('count=1 yields exactly one consumer', async () => {

@@ -9,26 +9,30 @@
  */
 export function tee<T>(source: AsyncIterable<T>, count = 2): AsyncIterable<T>[] {
   const queues: T[][] = Array.from({ length: count }, () => [])
-  const resolvers: ((value: IteratorResult<T, undefined>) => void)[][] = Array.from(
-    { length: count },
-    () => [],
-  )
+  type Pending = {
+    resolve: (value: IteratorResult<T, undefined>) => void
+    reject: (reason: unknown) => void
+  }
+  const pendings: Pending[][] = Array.from({ length: count }, () => [])
   let sourceDone = false
-  let sourceError: unknown 
+  let sourceError: unknown
 
   function deliver(i: number, item: T): void {
-    if (resolvers[i].length > 0) {
-      resolvers[i].shift()!({ value: item, done: false })
+    if (pendings[i].length > 0) {
+      pendings[i].shift()!.resolve({ value: item, done: false })
     } else {
       queues[i].push(item)
     }
   }
 
   function close(i: number): void {
-    for (const resolve of resolvers[i]) {
-      resolve({ value: undefined, done: true })
+    // If the source threw, propagate the error to pending consumers
+    // (fixes a race where pending next() got done:true and lost the error).
+    for (const p of pendings[i]) {
+      if (sourceError !== undefined) p.reject(sourceError)
+      else p.resolve({ value: undefined, done: true })
     }
-    resolvers[i] = []
+    pendings[i] = []
   }
 
   async function drain(): Promise<void> {
@@ -61,8 +65,8 @@ export function tee<T>(source: AsyncIterable<T>, count = 2): AsyncIterable<T>[] 
             if (sourceError !== undefined) return Promise.reject(sourceError)
             return Promise.resolve({ value: undefined, done: true })
           }
-          return new Promise<IteratorResult<T, undefined>>(resolve => {
-            resolvers[i].push(resolve)
+          return new Promise<IteratorResult<T, undefined>>((resolve, reject) => {
+            pendings[i].push({ resolve, reject })
           })
         },
       }
