@@ -6,7 +6,7 @@ import type { ConfigParseError } from '@claude-code/local-observability/errorHel
 import { getBaseRenderOptions } from '@claude-code/output/render-options'
 import {
   jsonStringify,
-  writeFileSync_DEPRECATED,
+  writeFileSync,
 } from '@claude-code/local-observability/slowOperations.js'
 import type { ThemeName } from '@anthropic/ink'
 import { Select } from './CustomSelect/index.js'
@@ -97,7 +97,7 @@ export async function showInvalidConfigDialog({
               process.exit(1)
             }}
             onReset={() => {
-              writeFileSync_DEPRECATED(
+              writeFileSync(
                 error.filePath,
                 jsonStringify(error.defaultConfig, null, 2),
                 { flush: false, encoding: 'utf8' },

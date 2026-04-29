@@ -22,7 +22,7 @@ import {
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getModelStrings, resolveOverriddenModel } from './model/modelStrings.js'
 import { formatModelPricing, getOpus46CostTier } from './modelCost.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { getAPIProvider } from './providers.js'
 import { LIGHTNING_BOLT } from '@claude-code/output/constants/figures.js'
@@ -77,7 +77,7 @@ export function getUserSpecifiedModelSetting(): ModelSetting | undefined {
   if (modelOverride !== undefined) {
     specifiedModel = modelOverride
   } else {
-    const settings = getSettings_DEPRECATED() || {}
+    const settings = getSettings() || {}
     specifiedModel = readEnv('ANTHROPIC_MODEL') || settings.model || undefined
   }
 

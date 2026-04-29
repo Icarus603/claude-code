@@ -4,7 +4,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   updateSettingsForSource,
 } from '@claude-code/config/settings'
 import { Select } from './CustomSelect/index.js'
@@ -30,7 +30,7 @@ export function MCPServerApprovalDialog({
       case 'yes':
       case 'yes_all': {
         // Get current enabled servers from settings
-        const currentSettings = getSettings_DEPRECATED() || {}
+        const currentSettings = getSettings() || {}
         const enabledServers = currentSettings.enabledMcpjsonServers || []
 
         // Add server if not already enabled
@@ -50,7 +50,7 @@ export function MCPServerApprovalDialog({
       }
       case 'no': {
         // Get current disabled servers from settings
-        const currentSettings = getSettings_DEPRECATED() || {}
+        const currentSettings = getSettings() || {}
         const disabledServers = currentSettings.disabledMcpjsonServers || []
 
         // Add server if not already disabled

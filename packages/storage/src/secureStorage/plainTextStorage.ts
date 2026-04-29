@@ -6,7 +6,7 @@ import { getFsImplementation } from '../fsOperations.js'
 import {
   jsonParse,
   jsonStringify,
-  writeFileSync_DEPRECATED,
+  writeFileSync,
 } from '@claude-code/local-observability/slowOperations.js'
 import type {
   SecureStorage,
@@ -55,7 +55,7 @@ export const plainTextStorage = {
         }
       }
 
-      writeFileSync_DEPRECATED(storagePath, jsonStringify(data), {
+      writeFileSync(storagePath, jsonStringify(data), {
         encoding: 'utf8',
         flush: false,
       })

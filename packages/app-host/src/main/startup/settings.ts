@@ -2,7 +2,7 @@ import { feature } from "bun:bundle";
 import chalk from "chalk";
 import { readFileSync } from "fs";
 import { safeParseJSON } from "@claude-code/storage/json.js";
-import { writeFileSync_DEPRECATED } from "@claude-code/local-observability/slowOperations.js";
+import { writeFileSync } from "@claude-code/local-observability/slowOperations.js";
 import { generateTempFilePath } from "@claude-code/storage/tempfile.js";
 import { getFsImplementation, safeResolvePath } from "@claude-code/storage/fsOperations.js";
 import { errorMessage, isENOENT } from "@claude-code/local-observability/errorHelpers.js";
@@ -71,7 +71,7 @@ export function loadSettingsFromFlag(settingsFile: string): void {
 			settingsPath = generateTempFilePath("claude-settings", ".json", {
 				contentHash: trimmedSettings,
 			});
-			writeFileSync_DEPRECATED(settingsPath, trimmedSettings, "utf8");
+			writeFileSync(settingsPath, trimmedSettings, "utf8");
 		} else {
 			const { resolvedPath: resolvedSettingsPath } = safeResolvePath(
 				getFsImplementation(),

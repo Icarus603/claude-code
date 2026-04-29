@@ -21,7 +21,7 @@ import { logError } from './_deps.js'
 import {
   jsonParse,
   jsonStringify,
-  writeFileSync_DEPRECATED,
+  writeFileSync,
 } from './_deps.js'
 import { getPluginsDirectory } from './pluginDirectories.js'
 import {
@@ -45,7 +45,7 @@ import { getCwd } from './_deps.js'
 import { getHeadForDir } from './_deps.js'
 import type { EditableSettingSource } from '../settings/constants.js'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsForSource,
 } from '../settings/settings.js'
 import { getPluginById } from './marketplaceManager.js'
@@ -156,7 +156,7 @@ export function migrateToSinglePluginFile(): void {
       const v1Data = InstalledPluginsFileSchemaV1().parse(mainData)
       const v2Data = migrateV1ToV2(v1Data)
 
-      writeFileSync_DEPRECATED(mainFilePath, jsonStringify(v2Data, null, 2), {
+      writeFileSync(mainFilePath, jsonStringify(v2Data, null, 2), {
         encoding: 'utf-8',
         flush: true,
       })
@@ -375,7 +375,7 @@ function saveInstalledPluginsV2(data: InstalledPluginsFileV2): void {
     fs.mkdirSync(getPluginsDirectory())
 
     const jsonContent = jsonStringify(data, null, 2)
-    writeFileSync_DEPRECATED(filePath, jsonContent, {
+    writeFileSync(filePath, jsonContent, {
       encoding: 'utf-8',
       flush: true,
     })
@@ -567,7 +567,7 @@ export function updateInstallationPathOnDisk(
     const filePath = getInstalledPluginsFilePath()
 
     // Write to single file (V2 format with version=2)
-    writeFileSync_DEPRECATED(filePath, jsonStringify(diskData, null, 2), {
+    writeFileSync(filePath, jsonStringify(diskData, null, 2), {
       encoding: 'utf-8',
       flush: true,
     })
@@ -827,7 +827,7 @@ export function isPluginInstalled(pluginId: string): boolean {
   // Plugins are loaded from settings.enabledPlugins
   // If settings.enabledPlugins and installed_plugins.json diverge
   // (via settings.json clobber), return false
-  return getSettings_DEPRECATED().enabledPlugins?.[pluginId] !== undefined
+  return getSettings().enabledPlugins?.[pluginId] !== undefined
 }
 
 /**
@@ -858,7 +858,7 @@ export function isPluginGloballyInstalled(pluginId: string): boolean {
   if (!hasGlobalEntry) return false
   // Same settings divergence guard as isPluginInstalled — if enabledPlugins
   // was clobbered, treat as not-installed so the user can re-enable.
-  return getSettings_DEPRECATED().enabledPlugins?.[pluginId] !== undefined
+  return getSettings().enabledPlugins?.[pluginId] !== undefined
 }
 
 /**
@@ -1047,7 +1047,7 @@ function getPluginVersionFromManifest(
  */
 export async function migrateFromEnabledPlugins(): Promise<void> {
   // Use merged settings for shouldSkipSync check
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const enabledPlugins = settings.enabledPlugins || {}
 
   // No plugins in settings = nothing to sync

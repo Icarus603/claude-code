@@ -13,7 +13,7 @@ import {
   COST_HAIKU_45,
   formatModelPricing,
 } from './modelCost.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import { checkOpus1mAccess, checkSonnet1mAccess } from './model/check1mAccess.js'
 import { getAPIProvider } from './providers.js'
 import { isModelAllowed } from './model/modelAllowlist.js'
@@ -668,7 +668,7 @@ export function getModelOptions(fastMode = false): ModelOption[] {
  * Always preserves the "Default" option (value: null).
  */
 function filterModelOptionsByAllowlist(options: ModelOption[]): ModelOption[] {
-  const settings = getSettings_DEPRECATED() || {}
+  const settings = getSettings() || {}
   if (!settings.availableModels) {
     return options // No restrictions
   }

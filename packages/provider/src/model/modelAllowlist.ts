@@ -1,4 +1,4 @@
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import { isModelAlias, isModelFamilyAlias } from '../modelAliases.js'
 import { parseUserSpecifiedModel } from '../model.js'
 import { resolveOverriddenModel } from './modelStrings.js'
@@ -98,7 +98,7 @@ function familyHasSpecificEntries(
  * 3. Full model IDs ("claude-opus-4-5-20251101") — exact match only
  */
 export function isModelAllowed(model: string): boolean {
-  const settings = getSettings_DEPRECATED() || {}
+  const settings = getSettings() || {}
   const { availableModels } = settings
   if (!availableModels) {
     return true // No restrictions

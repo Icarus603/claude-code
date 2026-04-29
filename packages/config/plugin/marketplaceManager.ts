@@ -46,7 +46,7 @@ import type { SettingsJson } from '../settings/types.js'
 import {
   jsonParse,
   jsonStringify,
-  writeFileSync_DEPRECATED,
+  writeFileSync,
 } from './_deps.js'
 import {
   getAddDirEnabledPlugins,
@@ -343,7 +343,7 @@ export async function saveKnownMarketplacesConfig(
   // Get directory from config file path to ensure consistency
   const dir = join(configFile, '..')
   await fs.mkdir(dir)
-  writeFileSync_DEPRECATED(configFile, jsonStringify(parsed.data, null, 2), {
+  writeFileSync(configFile, jsonStringify(parsed.data, null, 2), {
     encoding: 'utf-8',
     flush: true,
   })
@@ -1343,7 +1343,7 @@ async function cacheMarketplaceFromUrl(
   await fs.mkdir(cacheDir)
 
   // Write the validated marketplace file
-  writeFileSync_DEPRECATED(cachePath, jsonStringify(result.data, null, 2), {
+  writeFileSync(cachePath, jsonStringify(result.data, null, 2), {
     encoding: 'utf-8',
     flush: true,
   })

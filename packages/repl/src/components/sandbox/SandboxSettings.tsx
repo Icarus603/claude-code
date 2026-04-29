@@ -4,7 +4,7 @@ import { useKeybindings } from '@anthropic/ink/keybindings'
 import type { CommandResultDisplay } from '@claude-code/agent/command.js'
 import type { SandboxDependencyCheck } from '@claude-code/shell/sandbox.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import { Select } from '../CustomSelect/select.js'
 import { SandboxConfigTab } from './SandboxConfigTab.js'
 import { SandboxDependenciesTab } from './SandboxDependenciesTab.js'
@@ -28,7 +28,7 @@ export function SandboxSettings({
   const currentEnabled = SandboxManager.isSandboxingEnabled()
   const currentAutoAllow = SandboxManager.isAutoAllowBashIfSandboxedEnabled()
   const hasWarnings = depCheck.warnings.length > 0
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const allowAllUnixSockets = settings.sandbox?.network?.allowAllUnixSockets
   // Show warning if seccomp missing AND user hasn't allowed all unix sockets
   const showSocketWarning = hasWarnings && !allowAllUnixSockets

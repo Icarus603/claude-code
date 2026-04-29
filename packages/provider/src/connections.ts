@@ -556,10 +556,10 @@ export function migrateLegacyEnvToConnections(
       // path is best-effort migration; failure leaves the user with
       // stale modelType that the resolver can still degrade gracefully.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { getSettings_DEPRECATED, updateSettingsForSource } = require(
+      const { getSettings, updateSettingsForSource } = require(
         '@claude-code/config/settings',
       ) as typeof import('@claude-code/config/settings')
-      const userSettings = getSettings_DEPRECATED() as {
+      const userSettings = getSettings() as {
         modelType?: unknown
         mainLoopModel?: unknown
       } | undefined

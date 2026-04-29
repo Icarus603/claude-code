@@ -6,10 +6,10 @@ import {
 import { instances } from '@anthropic/ink'
 import type { PastedContent } from '@claude-code/config'
 import { classifyGuiEditor, getExternalEditor } from '@claude-code/storage/editor.js'
-import { execSync_DEPRECATED } from '@claude-code/shell/execSyncWrapper.js'
+import { execSync } from '@claude-code/shell/execSyncWrapper.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { toIDEDisplayName } from '@claude-code/ide/ide.js'
-import { writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
+import { writeFileSync } from '@claude-code/local-observability/slowOperations.js'
 import { generateTempFilePath } from '@claude-code/storage/tempfile.js'
 
 // Map of editor command overrides (e.g., to add wait flags)
@@ -66,7 +66,7 @@ export function editFileInEditor(filePath: string): EditorResult {
   try {
     // Use override command if available, otherwise use the editor as-is
     const editorCommand = EDITOR_OVERRIDES[editor] ?? editor
-    execSync_DEPRECATED(`${editorCommand} "${filePath}"`, {
+    execSync(`${editorCommand} "${filePath}"`, {
       stdio: 'inherit',
     })
 
@@ -149,7 +149,7 @@ export function editPromptInEditor(
       : currentPrompt
 
     // Write expanded prompt to temp file
-    writeFileSync_DEPRECATED(tempFile, expandedPrompt, {
+    writeFileSync(tempFile, expandedPrompt, {
       encoding: 'utf-8',
       flush: true,
     })

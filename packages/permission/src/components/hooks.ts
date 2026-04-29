@@ -6,7 +6,7 @@ import {
 } from '@claude-code/local-observability'
 import { sanitizeToolNameForAnalytics } from '@claude-code/agent/eventMetadata.js'
 import { BashTool } from '@claude-code/tool-registry/tools/BashTool/BashTool.js'
-import { splitCommand_DEPRECATED } from '@claude-code/shell/bash/commands.js'
+import { splitCommand } from '@claude-code/shell/bash/commands.js'
 import type {
   PermissionDecisionReason,
   PermissionResult,
@@ -177,7 +177,7 @@ export function usePermissionRequestLogging(
         // Note: All metadata fields in this event contain code/filepaths
         let split = [parsedInput.data.command]
         try {
-          split = splitCommand_DEPRECATED(parsedInput.data.command)
+          split = splitCommand(parsedInput.data.command)
         } catch {
           // Ignore parse errors here - just log the full command
         }

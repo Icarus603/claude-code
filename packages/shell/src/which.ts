@@ -1,5 +1,5 @@
 import { execa } from 'execa'
-import { execSync_DEPRECATED } from './execSyncWrapper.js'
+import { execSync } from './execSyncWrapper.js'
 
 async function whichNodeAsync(command: string): Promise<string | null> {
   if (process.platform === 'win32') {
@@ -33,7 +33,7 @@ async function whichNodeAsync(command: string): Promise<string | null> {
 function whichNodeSync(command: string): string | null {
   if (process.platform === 'win32') {
     try {
-      const result = execSync_DEPRECATED(`where.exe ${command}`, {
+      const result = execSync(`where.exe ${command}`, {
         encoding: 'utf-8',
         stdio: ['ignore', 'pipe', 'ignore'],
       })
@@ -45,7 +45,7 @@ function whichNodeSync(command: string): string | null {
   }
 
   try {
-    const result = execSync_DEPRECATED(`which ${command}`, {
+    const result = execSync(`which ${command}`, {
       encoding: 'utf-8',
       stdio: ['ignore', 'pipe', 'ignore'],
     })

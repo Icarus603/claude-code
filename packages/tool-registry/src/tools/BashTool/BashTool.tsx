@@ -35,7 +35,7 @@ import type { AgentId } from '@claude-code/agent/idTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { parseForSecurity } from '@claude-code/shell/bash/ast-alias.js'
 import {
-  splitCommand_DEPRECATED,
+  splitCommand,
   splitCommandWithOperators,
 } from '@claude-code/shell/bash/commands.js'
 import { extractClaudeCodeHints } from '../../claudeCodeHints.js'
@@ -417,7 +417,7 @@ const COMMON_BACKGROUND_COMMANDS = [
 function getCommandTypeForLogging(
   command: string,
 ): AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS {
-  const parts = splitCommand_DEPRECATED(command)
+  const parts = splitCommand(command)
   if (parts.length === 0)
     return 'other' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
 
@@ -516,7 +516,7 @@ import type { BashProgress } from '../../progressTypes.js'
  * @returns false for commands that should not be auto-backgrounded (like sleep)
  */
 function isAutobackgroundingAllowed(command: string): boolean {
-  const parts = splitCommand_DEPRECATED(command)
+  const parts = splitCommand(command)
   if (parts.length === 0) return true
 
   // Get the first part which should be the base command
@@ -532,7 +532,7 @@ function isAutobackgroundingAllowed(command: string): boolean {
  * not sleep inside pipelines, subshells, or scripts (those are fine).
  */
 export function detectBlockedSleepPattern(command: string): string | null {
-  const parts = splitCommand_DEPRECATED(command)
+  const parts = splitCommand(command)
   if (parts.length === 0) return null
 
   const first = parts[0]?.trim() ?? ''
@@ -708,7 +708,7 @@ export const BashTool = buildTool({
         })
       }
     }
-    // Env var FIRST: shouldUseSandbox → splitCommand_DEPRECATED → shell-quote's
+    // Env var FIRST: shouldUseSandbox → splitCommand → shell-quote's
     // `new RegExp` per call. userFacingName runs per-render for every bash
     // message in history; with ~50 msgs + one slow-to-tokenize command, this
     // exceeds the shimmer tick → transition abort → infinite retry (#21605).

@@ -1104,7 +1104,7 @@ function lookupAllowlist(name: string): CommandConfig | undefined {
  * Sync regex-based check for security-concerning patterns in a PowerShell command.
  * Used by isReadOnly (which must be sync) as a fast pre-filter before the
  * cmdlet allowlist check. This mirrors BashTool's checkReadOnlyConstraints
- * which checks bashCommandIsSafe_DEPRECATED before evaluating read-only status.
+ * which checks bashCommandIsSafe before evaluating read-only status.
  *
  * Returns true if the command contains patterns that indicate it should NOT
  * be considered read-only, even if the cmdlet is in the allowlist.

@@ -250,7 +250,7 @@ export const FileWriteTool = buildTool({
     // Must stay OUTSIDE the critical section below (a yield between the staleness
     // check and writeTextContent lets concurrent edits interleave), and BEFORE the
     // write (lazy-mkdir-on-ENOENT would fire a spurious tengu_atomic_write_error
-    // inside writeFileSyncAndFlush_DEPRECATED before ENOENT propagates back).
+    // inside writeFileSyncAndFlush before ENOENT propagates back).
     await getFsImplementation().mkdir(dir)
     if (fileHistoryEnabled()) {
       // Backup captures pre-edit content — safe to call before the staleness

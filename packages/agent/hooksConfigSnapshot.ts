@@ -40,7 +40,7 @@ function getHooksFromAllowedSources(): HooksSettings {
     return policySettings?.hooks ?? {}
   }
 
-  const mergedSettings = settingsModule.getSettings_DEPRECATED()
+  const mergedSettings = settingsModule.getSettings()
 
   // If disableAllHooks is set in non-managed settings, only managed hooks still run
   // (non-managed settings cannot override managed hooks)
@@ -67,7 +67,7 @@ export function shouldAllowManagedHooksOnly(): boolean {
   // If disableAllHooks is set but NOT from managed settings,
   // treat as managed-only (non-managed hooks disabled, managed hooks still run)
   if (
-    settingsModule.getSettings_DEPRECATED().disableAllHooks === true &&
+    settingsModule.getSettings().disableAllHooks === true &&
     policySettings?.disableAllHooks !== true
   ) {
     return true

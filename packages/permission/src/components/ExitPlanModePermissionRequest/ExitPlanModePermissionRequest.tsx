@@ -80,7 +80,7 @@ import {
   saveAgentName,
   saveCustomTitle,
 } from '@claude-code/storage/sessionStorage.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import { type OptionWithDescription, Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import { Markdown } from '@claude-code/repl/components/Markdown.js'
 import { PermissionDialog } from '../PermissionDialog.js'
@@ -160,7 +160,7 @@ export function autoNameSessionFromPlan(
 ): void {
   if (
     isSessionPersistenceDisabled() ||
-    getSettings_DEPRECATED()?.cleanupPeriodDays === 0
+    getSettings()?.cleanupPeriodDays === 0
   ) {
     return
   }

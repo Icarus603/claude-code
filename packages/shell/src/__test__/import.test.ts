@@ -21,11 +21,11 @@ import {
   parseCommandRaw,
   PARSE_ABORTED,
 
-  splitCommand_DEPRECATED,
+  splitCommand,
   splitCommandWithOperators,
   filterControlOperators,
   isHelpCommand,
-  isUnsafeCompoundCommand_DEPRECATED,
+  isUnsafeCompoundCommand,
   extractOutputRedirections,
   clearCommandPrefixCaches,
 
@@ -139,12 +139,12 @@ describe('@claude-code/shell import verification', () => {
   })
 
 
-  test('commands: splitCommand_DEPRECATED and helpers exist', () => {
-    expect(typeof splitCommand_DEPRECATED).toBe('function')
+  test('commands: splitCommand and helpers exist', () => {
+    expect(typeof splitCommand).toBe('function')
     expect(typeof splitCommandWithOperators).toBe('function')
     expect(typeof filterControlOperators).toBe('function')
     expect(typeof isHelpCommand).toBe('function')
-    expect(typeof isUnsafeCompoundCommand_DEPRECATED).toBe('function')
+    expect(typeof isUnsafeCompoundCommand).toBe('function')
     expect(typeof extractOutputRedirections).toBe('function')
     expect(typeof clearCommandPrefixCaches).toBe('function')
   })
@@ -253,8 +253,8 @@ describe('@claude-code/shell import verification', () => {
     expect(typeof result).toBe('string')
   })
 
-  test('splitCommand_DEPRECATED: splits simple command', () => {
-    const parts = splitCommand_DEPRECATED('echo hello world')
+  test('splitCommand: splits simple command', () => {
+    const parts = splitCommand('echo hello world')
     expect(parts.length).toBeGreaterThan(0)
   })
 

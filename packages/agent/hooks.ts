@@ -48,7 +48,7 @@ import {
 } from '@claude-code/storage/sessionStorage.js'
 import type { AgentId } from '@claude-code/repl/replTypes/ids.js'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsForSource,
 } from '@claude-code/config/settings'
 import {
@@ -4763,7 +4763,7 @@ export async function executeStatusLineCommand(
   if (shouldAllowManagedHooksOnly()) {
     statusLine = getSettingsForSource('policySettings')?.statusLine
   } else {
-    statusLine = getSettings_DEPRECATED()?.statusLine
+    statusLine = getSettings()?.statusLine
   }
 
   if (!statusLine || statusLine.type !== 'command') {
@@ -4853,7 +4853,7 @@ export async function executeFileSuggestionCommand(
   if (shouldAllowManagedHooksOnly()) {
     fileSuggestion = getSettingsForSource('policySettings')?.fileSuggestion
   } else {
-    fileSuggestion = getSettings_DEPRECATED()?.fileSuggestion
+    fileSuggestion = getSettings()?.fileSuggestion
   }
 
   if (!fileSuggestion || fileSuggestion.type !== 'command') {

@@ -35,7 +35,7 @@ import {
   setGetOriginalCwdFn,
   setGetSessionIdFn,
   setGetSettingsForSourceFn,
-  setGetSettings_DEPRECATEDFn,
+  setGetSettingsFn,
   setGitExeFn,
   setIsSettingSourceEnabledFn,
   setJsonParseFn,
@@ -110,7 +110,7 @@ import {
   setReinitializeLspServerManagerFn,
   setWaitForScrollIdleFn,
   setWithDiagnosticsTimingFn,
-  setWriteFileSync_DEPRECATEDFn,
+  setWriteFileSyncFn,
   setWriteToStdoutFn,
   setGracefulShutdownFn,
 } from '@claude-code/config/plugin/_deps'
@@ -135,7 +135,7 @@ import {
   execFileNoThrow,
   execFileNoThrowWithCwd,
 } from '@claude-code/shell/execFileNoThrow.js'
-import { pathExists, writeFileSyncAndFlush_DEPRECATED } from '@claude-code/storage/file.js'
+import { pathExists, writeFileSyncAndFlush } from '@claude-code/storage/file.js'
 import { getFsImplementation, safeResolvePath } from '@claude-code/storage/fsOperations.js'
 import { gitExe } from '@claude-code/storage/git.js'
 import { getHeadForDir } from '@claude-code/config/gitFilesystem.js'
@@ -144,7 +144,7 @@ import { clone, jsonParse, jsonStringify } from '@claude-code/local-observabilit
 import { which } from '@claude-code/shell/which.js'
 import {
   getSettingsForSource,
-  getSettings_DEPRECATED,
+  getSettings,
 } from '@claude-code/config/settings'
 import { isSettingSourceEnabled } from '@claude-code/config/constants'
 import {
@@ -395,10 +395,10 @@ export function installPluginBindings(): void {
     const { withDiagnosticsTiming } = require('@claude-code/local-observability/logging')
     return withDiagnosticsTiming(event, fn) as Promise<T>
   })
-  setWriteFileSync_DEPRECATEDFn((path: string, data: string) => {
+  setWriteFileSyncFn((path: string, data: string) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { writeFileSync_DEPRECATED } = require('@claude-code/local-observability/slowOperations.js')
-    writeFileSync_DEPRECATED(path, data)
+    const { writeFileSync } = require('@claude-code/local-observability/slowOperations.js')
+    writeFileSync(path, data)
   })
   setWriteToStdoutFn((data: string) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -420,7 +420,7 @@ export function installPluginBindings(): void {
   )
 
   // --- settings
-  setGetSettings_DEPRECATEDFn(() => getSettings_DEPRECATED() as any)
+  setGetSettingsFn(() => getSettings() as any)
   setGetSettingsForSourceFn(source => getSettingsForSource(source as any) as any)
   setIsSettingSourceEnabledFn(source => isSettingSourceEnabled(source as any))
 
@@ -466,7 +466,7 @@ export function installPluginBindings(): void {
   })
   setPathExistsFn(p => pathExists(p))
   setSafeResolvePathFn((base, rel) => safeResolvePath(base, rel) ?? null)
-  setWriteFileSyncAndFlushFn((p, d) => writeFileSyncAndFlush_DEPRECATED(p, d))
+  setWriteFileSyncAndFlushFn((p, d) => writeFileSyncAndFlush(p, d))
   setSanitizePathFn(p => p) // no-op; plugin files have own sanitizePath
   setRegisterCleanupFn(fn => registerCleanup(fn))
 

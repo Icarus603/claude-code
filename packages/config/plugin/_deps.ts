@@ -226,14 +226,14 @@ type SettingsJsonLike = Record<string, unknown> & {
   env?: Record<string, string>
 }
 
-let _getSettings_DEPRECATED: () => SettingsJsonLike | undefined = () =>
+let _getSettings: () => SettingsJsonLike | undefined = () =>
   undefined
 let _getSettingsForSource: (source: string) => SettingsJsonLike | undefined = () =>
   undefined
 let _isSettingSourceEnabled: (source: string) => boolean = () => true
 
-export function getSettings_DEPRECATED(): SettingsJsonLike | undefined {
-  return _getSettings_DEPRECATED()
+export function getSettings(): SettingsJsonLike | undefined {
+  return _getSettings()
 }
 export function getSettingsForSource(
   source: string,
@@ -243,10 +243,10 @@ export function getSettingsForSource(
 export function isSettingSourceEnabled(source: string): boolean {
   return _isSettingSourceEnabled(source)
 }
-export function setGetSettings_DEPRECATEDFn(
-  fn: typeof _getSettings_DEPRECATED,
+export function setGetSettingsFn(
+  fn: typeof _getSettings,
 ): void {
-  _getSettings_DEPRECATED = fn
+  _getSettings = fn
 }
 export function setGetSettingsForSourceFn(
   fn: typeof _getSettingsForSource,
@@ -1126,7 +1126,7 @@ const [_getWithDiagnosticsTiming, setWithDiagnosticsTimingFn_] = makeSetter(asyn
 const [_getGetSecureStorage, setGetSecureStorageFn_] = makeSetter((): unknown => null)
 const [_getUninstallPluginOp, setUninstallPluginOpFn_] = makeSetter(async (..._args: unknown[]): Promise<unknown> => null)
 const [_getUpdatePluginOp, setUpdatePluginOpFn_] = makeSetter(async (..._args: unknown[]): Promise<unknown> => null)
-const [_getWriteFileSync_DEPRECATED, setWriteFileSync_DEPRECATEDFn_] = makeSetter((p: string, d: string): void => getFsImplementation().writeFileSync(p, d))
+const [_getWriteFileSync, setWriteFileSyncFn_] = makeSetter((p: string, d: string): void => getFsImplementation().writeFileSync(p, d))
 export function getSystemDirectories(): string[] { return _getGetSystemDirectories()() }
 export function findCanonicalGitRoot(cwd: string): string | null { return _getFindCanonicalGitRoot()(cwd) }
 export function getAdditionalDirectoriesForClaudeMd(): string[] { return _getGetAdditionalDirectoriesForClaudeMd()() }
@@ -1138,7 +1138,7 @@ export function withDiagnosticsTiming<T>(event: string, fn: () => Promise<T>): P
 export function getSecureStorage(): unknown { return _getGetSecureStorage()() }
 export function uninstallPluginOp(...args: unknown[]): Promise<unknown> { return _getUninstallPluginOp()(...args) }
 export function updatePluginOp(...args: unknown[]): Promise<unknown> { return _getUpdatePluginOp()(...args) }
-export function writeFileSync_DEPRECATED(p: string, d: string): void { _getWriteFileSync_DEPRECATED()(p, d) }
+export function writeFileSync(p: string, d: string): void { _getWriteFileSync()(p, d) }
 export const setGetSystemDirectoriesFn = setGetSystemDirectoriesFn_
 export const setFindCanonicalGitRootFn = setFindCanonicalGitRootFn_
 export const setGetAdditionalDirectoriesForClaudeMdFn = setGetAdditionalDirectoriesForClaudeMdFn_
@@ -1150,7 +1150,7 @@ export const setWithDiagnosticsTimingFn = setWithDiagnosticsTimingFn_
 export const setGetSecureStorageFn = setGetSecureStorageFn_
 export const setUninstallPluginOpFn = setUninstallPluginOpFn_
 export const setUpdatePluginOpFn = setUpdatePluginOpFn_
-export const setWriteFileSync_DEPRECATEDFn = setWriteFileSync_DEPRECATEDFn_
+export const setWriteFileSyncFn = setWriteFileSyncFn_
 
 // ---------------------------------------------------------------------------
 // Round-4-extended additions (for services/plugins files): process helpers

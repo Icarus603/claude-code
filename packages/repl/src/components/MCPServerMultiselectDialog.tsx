@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { logEvent } from '@claude-code/local-observability'
 import { Box, Text } from '@anthropic/ink'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   updateSettingsForSource,
 } from '@claude-code/config/settings'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
@@ -21,7 +21,7 @@ export function MCPServerMultiselectDialog({
   onDone,
 }: Props): React.ReactNode {
   function onSubmit(selectedServers: string[]) {
-    const currentSettings = getSettings_DEPRECATED() || {}
+    const currentSettings = getSettings() || {}
     const enabledServers = currentSettings.enabledMcpjsonServers || []
     const disabledServers = currentSettings.disabledMcpjsonServers || []
 
@@ -60,7 +60,7 @@ export function MCPServerMultiselectDialog({
 
   // Handle ESC to reject all servers
   const handleEscRejectAll = useCallback(() => {
-    const currentSettings = getSettings_DEPRECATED() || {}
+    const currentSettings = getSettings() || {}
     const disabledServers = currentSettings.disabledMcpjsonServers || []
 
     const newDisabledServers = [

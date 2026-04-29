@@ -54,7 +54,7 @@ import { logError } from '@claude-code/local-observability/log.js'
 import { createSystemMessage, createUserMessage } from '@claude-code/agent/messages.js'
 import { getMainLoopModel } from '@claude-code/provider/model/model.js'
 import { isTranscriptMessage } from '@claude-code/storage/sessionStorage.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 import {
@@ -1325,7 +1325,7 @@ export async function teleportToRemote(options: {
     // Prefer anthropic_cloud environments over byoc: anthropic_cloud environments (e.g. "Default")
     // are the standard compute environments with full repo access, whereas byoc environments
     // (e.g. "monorepo") are user-owned compute that may not support the current repository.
-    const settings = getSettings_DEPRECATED()
+    const settings = getSettings()
     const defaultEnvironmentId = options.useDefaultEnvironment
       ? undefined
       : settings?.remote?.defaultEnvironmentId

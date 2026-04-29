@@ -262,7 +262,7 @@ export function filterControlOperators(
  *
  * Splits a command string into individual commands based on shell operators
  */
-export function splitCommand_DEPRECATED(command: string): string[] {
+export function splitCommand(command: string): string[] {
   const parts: (string | undefined)[] = splitCommandWithOperators(command)
   // Handle standard input/output/error redirection
   for (let i = 0; i < parts.length; i++) {
@@ -509,7 +509,7 @@ const getCommandPrefix = createCommandPrefixExtractor({
 
 export const getCommandSubcommandPrefix = createSubcommandPrefixExtractor(
   getCommandPrefix,
-  splitCommand_DEPRECATED,
+  splitCommand,
 )
 
 /**
@@ -602,11 +602,8 @@ function isCommandList(command: string): boolean {
   return true
 }
 
-/**
- * @deprecated Legacy regex/shell-quote path. Only used when tree-sitter is
- * unavailable. The primary gate is parseForSecurity (ast.ts).
- */
-export function isUnsafeCompoundCommand_DEPRECATED(command: string): boolean {
+/** Regex fallback for unsafe compound detection. Tree-sitter path: ast.ts. */
+export function isUnsafeCompoundCommand(command: string): boolean {
   // Defense-in-depth: if shell-quote can't parse the command at all,
   // treat it as unsafe so it always prompts the user. Even though bash
   // would likely also reject malformed syntax, we don't want to rely
@@ -620,7 +617,7 @@ export function isUnsafeCompoundCommand_DEPRECATED(command: string): boolean {
     return true
   }
 
-  return splitCommand_DEPRECATED(command).length > 1 && !isCommandList(command)
+  return splitCommand(command).length > 1 && !isCommandList(command)
 }
 
 /**

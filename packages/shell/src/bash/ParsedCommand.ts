@@ -32,14 +32,14 @@ export interface IParsedCommand {
 }
 
 /**
- * @deprecated Legacy regex/shell-quote path. Only used when tree-sitter is
- * unavailable. The primary gate is parseForSecurity (ast.ts).
+ * Regex/shell-quote based parsed command. Used when tree-sitter is not
+ * available — TREE_SITTER_BASH is feature-gated, so this path is the
+ * default in production builds.
  *
- * Regex-based fallback implementation using shell-quote parser.
- * Used when tree-sitter is not available.
- * Exported for testing purposes.
+ * The tree-sitter path (`parseForSecurity` in ast.ts) is preferred when
+ * enabled; this regex implementation is the fallback.
  */
-export class RegexParsedCommand_DEPRECATED implements IParsedCommand {
+export class RegexParsedCommand implements IParsedCommand {
   readonly originalCommand: string
 
   constructor(command: string) {
@@ -286,7 +286,7 @@ async function doParse(command: string): Promise<IParsedCommand | null> {
   }
 
   // Fallback to regex implementation
-  return new RegexParsedCommand_DEPRECATED(command)
+  return new RegexParsedCommand(command)
 }
 
 // Single-entry cache: legacy callers (bashCommandIsSafeAsync,

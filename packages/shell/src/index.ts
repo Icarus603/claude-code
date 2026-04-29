@@ -28,11 +28,11 @@ export { parseCommand, parseCommandRaw, ensureInitialized, extractCommandArgumen
 export { SHELL_KEYWORDS } from './bash/bashParser.js'
 
 export {
-  splitCommand_DEPRECATED,
+  splitCommand,
   splitCommandWithOperators,
   filterControlOperators,
   isHelpCommand,
-  isUnsafeCompoundCommand_DEPRECATED,
+  isUnsafeCompoundCommand,
   extractOutputRedirections,
   getCommandSubcommandPrefix,
   clearCommandPrefixCaches,

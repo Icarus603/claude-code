@@ -1,7 +1,7 @@
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
-import { splitCommand_DEPRECATED } from '@claude-code/shell/bash/commands.js'
+import { splitCommand } from '@claude-code/shell/bash/commands.js'
 import { SandboxManager } from '@claude-code/shell/sandbox.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import {
   BINARY_HIJACK_VARS,
   bashPermissionRule,
@@ -35,7 +35,7 @@ function containsExcludedCommand(command: string): boolean {
 
     // Check if command starts with any disabled commands
     try {
-      const commandParts = splitCommand_DEPRECATED(command)
+      const commandParts = splitCommand(command)
       for (const part of commandParts) {
         const baseCommand = part.trim().split(' ')[0]
         if (baseCommand && disabledCommands.commands.includes(baseCommand)) {
@@ -50,7 +50,7 @@ function containsExcludedCommand(command: string): boolean {
   }
 
   // Check user-configured excluded commands from settings
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const userExcludedCommands = settings.sandbox?.excludedCommands ?? []
 
   if (userExcludedCommands.length === 0) {
@@ -63,7 +63,7 @@ function containsExcludedCommand(command: string): boolean {
   // matches an excluded pattern.
   let subcommands: string[]
   try {
-    subcommands = splitCommand_DEPRECATED(command)
+    subcommands = splitCommand(command)
   } catch {
     subcommands = [command]
   }

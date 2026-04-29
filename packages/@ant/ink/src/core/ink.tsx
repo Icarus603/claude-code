@@ -1724,7 +1724,7 @@ export default class Ink {
 
     // Non-TTY environments don't handle erasing ansi escapes well, so it's better to
     // only render last frame of non-static output
-    const diff = this.log.renderPreviousOutput_DEPRECATED(this.frontFrame)
+    const diff = this.log.renderPreviousOutput(this.frontFrame)
     writeDiffToTerminal(this.terminal, optimize(diff))
 
     // Clean up terminal modes synchronously before process exit.

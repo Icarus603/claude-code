@@ -27,7 +27,7 @@ import {
 } from '../../hooksConfigManager.js'
 import type { IndividualHookConfig } from '../../hooksSettings.js'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsForSource,
 } from '@claude-code/config/settings'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
@@ -60,7 +60,7 @@ export function HooksConfigMenu({ toolNames, onExit }: Props): React.ReactNode {
   // so we compute it once on mount and only re-compute when policy settings change.
   // Short-circuit evaluation ensures we skip the expensive check when hooks aren't disabled.
   const [disabledByPolicy, setDisabledByPolicy] = useState(() => {
-    const settings = getSettings_DEPRECATED()
+    const settings = getSettings()
     const hooksDisabled = settings?.disableAllHooks === true
     return (
       hooksDisabled &&
@@ -78,7 +78,7 @@ export function HooksConfigMenu({ toolNames, onExit }: Props): React.ReactNode {
   // Update cached values when policy settings change
   useSettingsChange(source => {
     if (source === 'policySettings') {
-      const settings = getSettings_DEPRECATED()
+      const settings = getSettings()
       const hooksDisabled = settings?.disableAllHooks === true
       setDisabledByPolicy(
         hooksDisabled &&
@@ -188,7 +188,7 @@ export function HooksConfigMenu({ toolNames, onExit }: Props): React.ReactNode {
   const hookEventMetadata = getHookEventMetadata(combinedToolNames)
 
   // Check if hooks are disabled
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const hooksDisabled = settings?.disableAllHooks === true
 
   // Count hooks per event for the event-selection view, and the total.

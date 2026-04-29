@@ -3,7 +3,7 @@ import * as path from 'path'
 import * as pathWin32 from 'path/win32'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { execSync_DEPRECATED } from '@claude-code/shell/execSyncWrapper.js'
+import { execSync } from '@claude-code/shell/execSyncWrapper.js'
 import { memoizeWithLRU } from '@claude-code/config/memoize.js'
 import { getPlatform } from '@claude-code/config/platform'
 
@@ -14,7 +14,7 @@ import { getPlatform } from '@claude-code/config/platform'
  */
 function checkPathExists(path: string): boolean {
   try {
-    execSync_DEPRECATED(`dir "${path}"`, { stdio: 'pipe' })
+    execSync(`dir "${path}"`, { stdio: 'pipe' })
     return true
   } catch {
     return false
@@ -46,7 +46,7 @@ function findExecutable(executable: string): string | null {
 
   // Fall back to where.exe
   try {
-    const result = execSync_DEPRECATED(`where.exe ${executable}`, {
+    const result = execSync(`where.exe ${executable}`, {
       stdio: 'pipe',
       encoding: 'utf8',
     }).trim()

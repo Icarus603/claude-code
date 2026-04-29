@@ -2,7 +2,7 @@ import type { Command } from '@claude-code/command-runtime/runtime'
 import type { LocalCommandCall } from '@claude-code/agent/command.js'
 import { getAPIProvider } from '../providers.js'
 import { updateSettingsForSource } from '@claude-code/config/settings'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import { applyConfigEnvironmentVariables } from '@claude-code/config/managedEnv.js'
 import { deleteEnv, getAllEnv, readEnv, setEnv } from '@claude-code/config/env'
 
@@ -25,7 +25,7 @@ function getEnvVarForProvider(provider: string): string {
 
 // Get merged env: process.env + settings.env (from userSettings)
 function getMergedEnv(): Record<string, string> {
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const merged = getAllEnv()
   if (settings?.env) {
     Object.assign(merged, settings.env)

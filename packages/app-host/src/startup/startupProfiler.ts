@@ -19,7 +19,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { formatMs, formatTimelineLine, getPerformance } from './profilerBase.js'
-import { writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
+import { writeFileSync } from '@claude-code/local-observability/slowOperations.js'
 
 // Module-level state - decided once at module load
 // eslint-disable-next-line custom-rules/no-process-env-top-level
@@ -134,7 +134,7 @@ export function profileReport(): void {
     const dir = dirname(path)
     const fs = getFsImplementation()
     fs.mkdirSync(dir)
-    writeFileSync_DEPRECATED(path, getReport(), {
+    writeFileSync(path, getReport(), {
       encoding: 'utf8',
       flush: true,
     })

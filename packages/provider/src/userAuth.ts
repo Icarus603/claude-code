@@ -56,7 +56,7 @@ import {
   isRunningOnHomespace,
 } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
-import { execSyncWithDefaults_DEPRECATED } from '@claude-code/shell/execFileNoThrow.js'
+import { execSyncWithDefaults } from '@claude-code/shell/execFileNoThrow.js'
 import * as lockfile from '@claude-code/storage/lockfile.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { memoizeWithTTLAsync } from '@claude-code/config/memoize.js'
@@ -71,7 +71,7 @@ import {
   getUsername,
 } from '@claude-code/mcp-runtime/macOsKeychainHelpers.js'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsForSource,
 } from '@claude-code/config/settings'
 import { sleep } from '@claude-code/config/sleep'
@@ -113,7 +113,7 @@ export function isAnthropicAuthEnabled(): boolean {
     return !!readEnv('CLAUDE_CODE_OAUTH_TOKEN')
   }
 
-  const settings = getSettings_DEPRECATED() || {}
+  const settings = getSettings() || {}
   const is3P =
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK')) ||
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX')) ||
@@ -358,7 +358,7 @@ export function getConfiguredApiKeyHelper(): string | undefined {
   if (isBareMode()) {
     return getSettingsForSource('flagSettings')?.apiKeyHelper
   }
-  const mergedSettings = getSettings_DEPRECATED() || {}
+  const mergedSettings = getSettings() || {}
   return mergedSettings.apiKeyHelper
 }
 
@@ -383,7 +383,7 @@ function isApiKeyHelperFromProjectOrLocalSettings(): boolean {
  * Get the configured awsAuthRefresh from settings
  */
 function getConfiguredAwsAuthRefresh(): string | undefined {
-  const mergedSettings = getSettings_DEPRECATED() || {}
+  const mergedSettings = getSettings() || {}
   return mergedSettings.awsAuthRefresh
 }
 
@@ -408,7 +408,7 @@ export function isAwsAuthRefreshFromProjectSettings(): boolean {
  * Get the configured awsCredentialExport from settings
  */
 function getConfiguredAwsCredentialExport(): string | undefined {
-  const mergedSettings = getSettings_DEPRECATED() || {}
+  const mergedSettings = getSettings() || {}
   return mergedSettings.awsCredentialExport
 }
 
@@ -812,7 +812,7 @@ export function clearAwsCredentialsCache(): void {
  * Get the configured gcpAuthRefresh from settings
  */
 function getConfiguredGcpAuthRefresh(): string | undefined {
-  const mergedSettings = getSettings_DEPRECATED() || {}
+  const mergedSettings = getSettings() || {}
   return mergedSettings.gcpAuthRefresh
 }
 
@@ -1062,7 +1062,7 @@ export const getApiKeyFromConfigOrMacOSKeychain = memoize(
       } else {
         const storageServiceName = getMacOsKeychainStorageServiceName()
         try {
-          const result = execSyncWithDefaults_DEPRECATED(
+          const result = execSyncWithDefaults(
             `security find-generic-password -a $USER -w -s "${storageServiceName}"`,
           )
           if (result) {
@@ -1738,7 +1738,7 @@ export function isUsing3PServices(): boolean {
  * Get the configured otelHeadersHelper from settings
  */
 function getConfiguredOtelHeadersHelper(): string | undefined {
-  const mergedSettings = getSettings_DEPRECATED() || {}
+  const mergedSettings = getSettings() || {}
   return mergedSettings.otelHeadersHelper
 }
 
@@ -1792,7 +1792,7 @@ export function getOtelHeadersFromHelper(): Record<string, string> {
   }
 
   try {
-    const result = execSyncWithDefaults_DEPRECATED(otelHeadersHelper, {
+    const result = execSyncWithDefaults(otelHeadersHelper, {
       timeout: 30000, // 30 seconds - allows for auth service latency
     })
       ?.toString()

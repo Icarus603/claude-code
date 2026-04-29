@@ -5,7 +5,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { setClipboard, Box, Text, Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
+import { writeFileSync } from '@claude-code/local-observability/slowOperations.js'
 import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Select } from './CustomSelect/select.js'
 import TextInput from './TextInput.js'
@@ -56,7 +56,7 @@ export function ExportDialog({
     const filepath = join(getCwd(), finalFilename)
 
     try {
-      writeFileSync_DEPRECATED(filepath, content, {
+      writeFileSync(filepath, content, {
         encoding: 'utf-8',
         flush: true,
       })

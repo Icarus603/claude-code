@@ -2,7 +2,7 @@ import type { z } from 'zod/v4'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import {
   extractOutputRedirections,
-  splitCommand_DEPRECATED,
+  splitCommand,
 } from '@claude-code/shell/bash/commands.js'
 import { tryParseShellCommand } from '@claude-code/shell/bash/shellQuote.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
@@ -23,7 +23,7 @@ import {
 } from '@claude-code/shell/legacy/readOnlyCommandValidation.js'
 import type { BashTool } from './BashTool.js'
 import { isNormalizedGitCommand } from './bashPermissions.js'
-import { bashCommandIsSafe_DEPRECATED } from './bashSecurity.js'
+import { bashCommandIsSafe } from './bashSecurity.js'
 import {
   COMMAND_OPERATION_TYPE,
   PATH_EXTRACTORS,
@@ -1758,7 +1758,7 @@ function isCommandReadOnly(command: string): boolean {
  * @returns true if any subcommand is a git command
  */
 function commandHasAnyGit(command: string): boolean {
-  return splitCommand_DEPRECATED(command).some(subcmd =>
+  return splitCommand(command).some(subcmd =>
     isNormalizedGitCommand(subcmd.trim()),
   )
 }
@@ -1838,7 +1838,7 @@ function extractWritePathsFromSubcommand(subcommand: string): string[] {
  * @returns true if any subcommand writes to git-internal paths
  */
 function commandWritesToGitInternalPaths(command: string): boolean {
-  const subcommands = splitCommand_DEPRECATED(command)
+  const subcommands = splitCommand(command)
 
   for (const subcmd of subcommands) {
     const trimmed = subcmd.trim()
@@ -1889,9 +1889,9 @@ export function checkReadOnlyConstraints(
   }
 
   // Check the original command for safety before splitting
-  // This is important because splitCommand_DEPRECATED may transform the command
+  // This is important because splitCommand may transform the command
   // (e.g., ${VAR} becomes $VAR)
-  if (bashCommandIsSafe_DEPRECATED(command).behavior !== 'passthrough') {
+  if (bashCommandIsSafe(command).behavior !== 'passthrough') {
     return {
       behavior: 'passthrough',
       message: 'Command is not read-only, requires further permission checks',
@@ -1899,7 +1899,7 @@ export function checkReadOnlyConstraints(
   }
 
   // Check for Windows UNC paths in the original command before transformation
-  // This must be done before splitCommand_DEPRECATED because splitCommand_DEPRECATED may transform backslashes
+  // This must be done before splitCommand because splitCommand may transform backslashes
   if (containsVulnerableUncPath(command)) {
     return {
       behavior: 'ask',
@@ -1966,9 +1966,9 @@ export function checkReadOnlyConstraints(
   }
 
   // Check if all subcommands are read-only
-  const allSubcommandsReadOnly = splitCommand_DEPRECATED(command).every(
+  const allSubcommandsReadOnly = splitCommand(command).every(
     subcmd => {
-      if (bashCommandIsSafe_DEPRECATED(subcmd).behavior !== 'passthrough') {
+      if (bashCommandIsSafe(subcmd).behavior !== 'passthrough') {
         return false
       }
       return isCommandReadOnly(subcmd)

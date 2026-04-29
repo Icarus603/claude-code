@@ -6,7 +6,7 @@ import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { renderMessagesToPlainText } from '@claude-code/output/render/exportRenderer.js'
-import { writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
+import { writeFileSync } from '@claude-code/local-observability/slowOperations.js'
 
 function formatTimestamp(date: Date): string {
   const year = date.getFullYear()
@@ -80,7 +80,7 @@ export async function call(
     const filepath = join(getCwd(), finalFilename)
 
     try {
-      writeFileSync_DEPRECATED(filepath, content, {
+      writeFileSync(filepath, content, {
         encoding: 'utf-8',
         flush: true,
       })

@@ -7,7 +7,7 @@ import {
   transitionPermissionMode,
 } from '@claude-code/permission'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
 } from '@claude-code/config/settings'
 import {
   ChannelMessageNotificationSchema,
@@ -163,7 +163,7 @@ export async function handleInitializeRequest(
     }
   }
 
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const outputStyle = settings?.outputStyle || DEFAULT_OUTPUT_STYLE_NAME
   const availableOutputStyles = await getAllOutputStyles(getCwd())
 

@@ -12,7 +12,7 @@ import { sendNotification } from '../notifier.js'
 import { OAuthService, runCodexOAuthFlow, saveCodexOAuthTokens } from '@claude-code/provider/oauth/index.js'
 import { getOauthAccountInfo, validateForceLoginOrg } from '@claude-code/provider/authAlias.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { getSettings_DEPRECATED, updateSettingsForSource } from '@claude-code/config/settings'
+import { getSettings, updateSettingsForSource } from '@claude-code/config/settings'
 import {
   getConnections,
   saveConnection,
@@ -87,7 +87,7 @@ export function ConsoleOAuthFlow({
   mode = 'login',
   forceLoginMethod: forceLoginMethodProp,
 }: Props): React.ReactNode {
-  const settings = getSettings_DEPRECATED() || {}
+  const settings = getSettings() || {}
   const forceLoginMethod = forceLoginMethodProp ?? settings.forceLoginMethod
   const orgUUID = settings.forceLoginOrgUUID
   const forcedMethodMessage =

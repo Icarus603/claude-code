@@ -14,7 +14,7 @@ import {
 import { getAnthropicApiKeyWithSource } from '@claude-code/provider/authAlias.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getFastModeState } from '@claude-code/provider/fastMode.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings/core/settings.js'
+import { getSettings } from '@claude-code/config/settings/core/settings.js'
 
 // TODO(next-minor): remove this translation once SDK consumers have migrated
 // to the 'Agent' tool name. The wire name was renamed Task → Agent in #19647,
@@ -51,7 +51,7 @@ export type SystemInitInputs = {
  *     QueryEngine SDKMessage layer
  */
 export function buildSystemInitMessage(inputs: SystemInitInputs): SDKMessage {
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const outputStyle = settings?.outputStyle ?? DEFAULT_OUTPUT_STYLE_NAME
 
   const initMessage: SDKMessage = {

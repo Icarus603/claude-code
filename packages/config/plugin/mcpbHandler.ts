@@ -15,7 +15,7 @@ import { getFsImplementation } from './_deps.js'
 import { logError } from './_deps.js'
 import { getSecureStorage } from './_deps.js'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   updateSettingsForSource,
 } from '../settings/settings.js'
 import { jsonParse, jsonStringify } from './_deps.js'
@@ -143,7 +143,7 @@ export function loadMcpServerUserConfig(
   serverName: string,
 ): UserConfigValues | null {
   try {
-    const settings = getSettings_DEPRECATED()
+    const settings = getSettings()
     const nonSensitive =
       settings.pluginConfigs?.[pluginId]?.mcpServers?.[serverName]
 
@@ -286,7 +286,7 @@ export function saveMcpServerUserConfig(
     // sensitive keys doesn't scrub them, the disk copy merges back in. Instead:
     // set each sensitive key to explicit `undefined` — mergeWith (with the
     // customizer at settings.ts:349) treats explicit undefined as a delete.
-    const settings = getSettings_DEPRECATED()
+    const settings = getSettings()
     const existingInSettings =
       settings.pluginConfigs?.[pluginId]?.mcpServers?.[serverName] ?? {}
     const keysToScrubFromSettings = Object.keys(existingInSettings).filter(k =>

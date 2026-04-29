@@ -3,7 +3,7 @@ import {
   DEFAULT_OUTPUT_STYLE_NAME,
   OUTPUT_STYLE_CONFIG,
 } from '@claude-code/config/outputStyles.js'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 
 /**
  * Determines the prompt category for agent usage.
@@ -26,7 +26,7 @@ export function getQuerySourceForAgent(
  * Determines the prompt category based on output style settings.
  */
 export function getQuerySourceForREPL(): QuerySource {
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const style = settings?.outputStyle ?? DEFAULT_OUTPUT_STYLE_NAME
 
   if (style === DEFAULT_OUTPUT_STYLE_NAME) {

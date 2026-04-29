@@ -83,7 +83,7 @@ import {
 import { isPluginBlockedByPolicy } from '@claude-code/config/plugin/pluginPolicy'
 import { getPluginEditableScopes } from '@claude-code/config/plugin/pluginStartupCheck'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsForSource,
   updateSettingsForSource,
 } from '@claude-code/config/settings'
@@ -708,7 +708,7 @@ export function ManagePlugins({
 
   // Derive unified items from plugins and MCP servers
   const unifiedItems = useMemo(() => {
-    const mergedSettings = getSettings_DEPRECATED()
+    const mergedSettings = getSettings()
 
     // Build map of plugin name -> child MCPs
     // Plugin MCPs have names like "plugin:pluginName:serverName"
@@ -1103,7 +1103,7 @@ export function ManagePlugins({
       setLoading(true)
       try {
         const { enabled, disabled } = await loadAllPlugins()
-        const mergedSettings = getSettings_DEPRECATED() // Use merged settings to respect all layers
+        const mergedSettings = getSettings() // Use merged settings to respect all layers
 
         const allPlugins = filterManagedDisabledPlugins([
           ...enabled,
@@ -1381,7 +1381,7 @@ export function ManagePlugins({
       // `✓ Enabled X` for what was actually an uninstall. The check is only
       // meaningful for enable/disable/update.
       const pluginIdNow = `${selectedPlugin.plugin.name}@${selectedPlugin.marketplace}`
-      const settingsAfter = getSettings_DEPRECATED()
+      const settingsAfter = getSettings()
       const enabledAfter =
         settingsAfter?.enabledPlugins?.[pluginIdNow] !== false
       if (operation !== 'uninstall' && enabledAfter) {
@@ -1448,7 +1448,7 @@ export function ManagePlugins({
     if (item?.type === 'flagged-plugin') return
     if (item?.type === 'plugin') {
       const pluginId = `${item.plugin.name}@${item.marketplace}`
-      const mergedSettings = getSettings_DEPRECATED()
+      const mergedSettings = getSettings()
       const currentPending = pendingToggles.get(pluginId)
       const isEnabled = mergedSettings?.enabledPlugins?.[pluginId] !== false
       const pluginScope = item.scope
@@ -1599,7 +1599,7 @@ export function ManagePlugins({
   const detailsMenuItems = React.useMemo(() => {
     if (viewState !== 'plugin-details' || !selectedPlugin) return []
 
-    const mergedSettings = getSettings_DEPRECATED()
+    const mergedSettings = getSettings()
     const pluginId = `${selectedPlugin.plugin.name}@${selectedPlugin.marketplace}`
     const isEnabled = mergedSettings?.enabledPlugins?.[pluginId] !== false
     const isBuiltin = selectedPlugin.marketplace === 'builtin'
@@ -2302,7 +2302,7 @@ export function ManagePlugins({
 
   // Plugin details view
   if (viewState === 'plugin-details' && selectedPlugin) {
-    const mergedSettings = getSettings_DEPRECATED() // Use merged settings to respect all layers
+    const mergedSettings = getSettings() // Use merged settings to respect all layers
     const pluginId = `${selectedPlugin.plugin.name}@${selectedPlugin.marketplace}`
     const isEnabled = mergedSettings?.enabledPlugins?.[pluginId] !== false
 

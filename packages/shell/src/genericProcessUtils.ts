@@ -1,6 +1,6 @@
 import {
   execFileNoThrowWithCwd,
-  execSyncWithDefaults_DEPRECATED,
+  execSyncWithDefaults,
 } from './execFileNoThrow.js'
 
 // This file contains platform-agnostic implementations of common `ps` type commands.
@@ -99,7 +99,7 @@ export function getProcessCommand(pid: string | number): string | null {
         ? `powershell.exe -NoProfile -Command "(Get-CimInstance Win32_Process -Filter \\"ProcessId=${pidStr}\\").CommandLine"`
         : `ps -o command= -p ${pidStr}`
 
-    const result = execSyncWithDefaults_DEPRECATED(command, { timeout: 1000 })
+    const result = execSyncWithDefaults(command, { timeout: 1000 })
     return result ? result.trim() : null
   } catch {
     return null
@@ -168,7 +168,7 @@ export function getChildPids(pid: string | number): number[] {
         ? `powershell.exe -NoProfile -Command "(Get-CimInstance Win32_Process -Filter \\"ParentProcessId=${pidStr}\\").ProcessId"`
         : `pgrep -P ${pidStr}`
 
-    const result = execSyncWithDefaults_DEPRECATED(command, { timeout: 1000 })
+    const result = execSyncWithDefaults(command, { timeout: 1000 })
     if (!result) {
       return []
     }

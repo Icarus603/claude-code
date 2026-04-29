@@ -20,7 +20,7 @@ import { logError } from '@claude-code/local-observability/log.js'
 import {
   jsonParse,
   jsonStringify,
-  writeFileSync_DEPRECATED,
+  writeFileSync,
 } from '@claude-code/local-observability/slowOperations.js'
 
 /**
@@ -215,7 +215,7 @@ function writeLockFile(
   const tempPath = `${lockFilePath}.tmp.${process.pid}.${Date.now()}`
 
   try {
-    writeFileSync_DEPRECATED(tempPath, jsonStringify(content, null, 2), {
+    writeFileSync(tempPath, jsonStringify(content, null, 2), {
       encoding: 'utf8',
       flush: true,
     })

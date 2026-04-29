@@ -21,7 +21,7 @@ import {
   type CommandPrefixResult,
   extractOutputRedirections,
   getCommandSubcommandPrefix,
-  splitCommand_DEPRECATED,
+  splitCommand,
 } from '@claude-code/shell/bash/commands.js'
 import { parseCommandRaw } from '@claude-code/shell/bash/parser.js'
 import { tryParseShellCommand } from '@claude-code/shell/bash/shellQuote.js'
@@ -70,7 +70,7 @@ import { windowsPathToPosixPath } from '@claude-code/storage/windowsPaths.js'
 import { BashTool } from './BashTool.js'
 import { checkCommandOperatorPermissions } from './bashCommandHelpers.js'
 import {
-  bashCommandIsSafeAsync_DEPRECATED,
+  bashCommandIsSafeAsync,
   stripSafeHeredocSubstitutions,
 } from './bashSecurity.js'
 import { checkPermissionMode } from './modeValidation.js'
@@ -78,21 +78,11 @@ import { checkPathConstraints } from './pathValidation.js'
 import { checkSedConstraints } from './sedValidation.js'
 import { shouldUseSandbox } from './shouldUseSandbox.js'
 
-// DCE cliff: Bun's feature() evaluator has a per-function complexity budget.
-// bashToolHasPermission is right at the limit. `import { X as Y }` aliases
-// inside the import block count toward this budget; when they push it over
-// the threshold Bun can no longer prove feature('BASH_CLASSIFIER') is a
-// constant and silently evaluates the ternaries to `false`, dropping every
-// pendingClassifierCheck spread. Keep aliases as top-level const rebindings
-// instead. (See also the comment on checkSemanticsDeny below.)
-const bashCommandIsSafeAsync = bashCommandIsSafeAsync_DEPRECATED
-const splitCommand = splitCommand_DEPRECATED
-
 // Env-var assignment prefix (VAR=value). Shared across three while-loops that
 // skip safe env vars before extracting the command name.
 const ENV_VAR_ASSIGN_RE = /^[A-Za-z_]\w*=/
 
-// CC-643: On complex compound commands, splitCommand_DEPRECATED can produce a
+// CC-643: On complex compound commands, splitCommand can produce a
 // very large subcommands array (possible exponential growth; #21405's ReDoS fix
 // may have been incomplete). Each subcommand then runs tree-sitter parse +
 // ~20 validators + logEvent (bashSecurity.ts), and with memoized metadata the

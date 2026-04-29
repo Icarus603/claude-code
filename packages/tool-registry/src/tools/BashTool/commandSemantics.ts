@@ -5,7 +5,7 @@
  * For example, grep returns 1 when no matches are found, which is not an error condition.
  */
 
-import { splitCommand_DEPRECATED } from '@claude-code/shell/bash/commands.js'
+import { splitCommand } from '@claude-code/shell/bash/commands.js'
 
 export type CommandSemantic = (
   exitCode: number,
@@ -110,7 +110,7 @@ function extractBaseCommand(command: string): string {
  * May get it super wrong - don't depend on this for security
  */
 function heuristicallyExtractBaseCommand(command: string): string {
-  const segments = splitCommand_DEPRECATED(command)
+  const segments = splitCommand(command)
 
   // Take the last command as that's what determines the exit code
   const lastCommand = segments[segments.length - 1] || command

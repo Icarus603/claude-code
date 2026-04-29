@@ -3,7 +3,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { fileHistoryEnabled } from '@claude-code/agent/file-history'
 import {
   getInitialSettings,
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsForSource,
 } from '@claude-code/config/settings'
 import { shouldOfferTerminalSetup } from '../terminalSetup.js'
@@ -127,7 +127,7 @@ const externalTips: Tip[] = [
     isRelevant: async () => {
       try {
         const config = getGlobalConfig()
-        const settings = getSettings_DEPRECATED()
+        const settings = getSettings()
         // Show if they've used plan mode but haven't set a default
         const hasUsedPlanMode = Boolean(config.lastPlanModeUse)
         const hasDefaultMode = Boolean(settings?.permissions?.defaultMode)
@@ -251,7 +251,7 @@ const externalTips: Tip[] = [
     content: async () =>
       'Use /statusline to set up a custom status line that will display beneath the input box',
     cooldownSessions: 25,
-    isRelevant: async () => getSettings_DEPRECATED().statusLine === undefined,
+    isRelevant: async () => getSettings().statusLine === undefined,
   },
   {
     id: 'prompt-queue',

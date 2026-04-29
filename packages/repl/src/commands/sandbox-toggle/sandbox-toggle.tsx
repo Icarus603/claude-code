@@ -9,7 +9,7 @@ import {
   SandboxManager,
 } from '@claude-code/shell/sandbox/sandbox-adapter.js'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsFilePathForSource,
 } from '@claude-code/config/settings'
 import type { ThemeName } from '@anthropic/ink'
@@ -19,7 +19,7 @@ export async function call(
   _context: unknown,
   args?: string,
 ): Promise<React.ReactNode | null> {
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const themeName: ThemeName = (settings.theme as ThemeName) || 'light'
 
   const platform = getPlatform()

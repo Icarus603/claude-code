@@ -67,7 +67,7 @@ import {
   isValidImagePaste,
 } from '@claude-code/repl/textInputTypes.js'
 import { randomUUID, type UUID } from 'crypto'
-import { getSettings_DEPRECATED } from '@claude-code/config/settings'
+import { getSettings } from '@claude-code/config/settings'
 import { getSnippetForTwoFileDiff } from '@claude-code/tool-registry/tools/FileEditTool/utils.js'
 import type {
   ContentBlockParam,
@@ -1593,7 +1593,7 @@ function getCriticalSystemReminderAttachment(
 }
 
 function getOutputStyleAttachment(): Attachment[] {
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const outputStyle = settings?.outputStyle || 'default'
 
   // Only show for non-default styles

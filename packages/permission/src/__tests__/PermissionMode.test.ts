@@ -10,7 +10,7 @@ mock.module("src/utils/slowOperations.ts", () => ({
   cloneDeep: (v: any) => structuredClone(v),
   callerFrame: () => "",
   SLOW_OPERATION_THRESHOLD_MS: 100,
-  writeFileSync_DEPRECATED: () => {},
+  writeFileSync: () => {},
 }));
 mock.module("src/utils/log.ts", () => ({
   logError: () => {},

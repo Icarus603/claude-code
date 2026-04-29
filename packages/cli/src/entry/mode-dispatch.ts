@@ -150,7 +150,7 @@ import {
 import { createSystemMessage, createUserMessage } from '@claude-code/agent/messages.js'
 import { getPlatform } from '@claude-code/config/platform'
 import { getSessionIngressAuthToken } from '@claude-code/provider/sessionIngressAuth.js'
-import { jsonParse, writeFileSync_DEPRECATED } from '@claude-code/local-observability/slowOperations.js'
+import { jsonParse, writeFileSync } from '@claude-code/local-observability/slowOperations.js'
 import { computeInitialTeamContext } from '@claude-code/swarm'
 import { isWorktreeModeEnabled } from '@claude-code/agent/worktreeModeEnabled.js'
 import { relative, resolve } from 'path'
@@ -1737,7 +1737,7 @@ export async function runModeDispatch(
 				// interceptor) and picks up any plugin-contributed env after plugin
 				// init. Project settings are already loaded here:
 				// applySafeConfigEnvironmentVariables in init() called
-				// getSettings_DEPRECATED at managedEnv.ts:86 which merges all enabled
+				// getSettings at managedEnv.ts:86 which merges all enabled
 				// sources including projectSettings/localSettings.
 				applyConfigEnvironmentVariables();
 

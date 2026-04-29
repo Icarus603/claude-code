@@ -14,7 +14,7 @@ import { cleanupOldPastes } from '@claude-code/repl/clipboard/pasteStore.js'
 import { getProjectsDir } from '@claude-code/storage/sessionStorage.js'
 import { getSettingsWithAllErrors } from '@claude-code/config/settings/core/allErrors.js'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   rawSettingsContainsKey,
 } from '@claude-code/config/settings/core/settings.js'
 import { TOOL_RESULTS_SUBDIR } from '@claude-code/storage/toolResultStorage.js'
@@ -23,7 +23,7 @@ import { cleanupStaleAgentWorktrees } from '@claude-code/swarm'
 const DEFAULT_CLEANUP_PERIOD_DAYS = 30
 
 function getCutoffDate(): Date {
-  const settings = getSettings_DEPRECATED() || {}
+  const settings = getSettings() || {}
   const cleanupPeriodDays =
     settings.cleanupPeriodDays ?? DEFAULT_CLEANUP_PERIOD_DAYS
   const cleanupPeriodMs = cleanupPeriodDays * 24 * 60 * 60 * 1000

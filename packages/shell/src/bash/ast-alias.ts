@@ -1314,7 +1314,7 @@ function walkCommand(
   }
 
   // .text is the raw source span. Downstream (bashToolCheckPermission →
-  // splitCommand_DEPRECATED) re-tokenizes it via shell-quote. Normally .text
+  // splitCommand) re-tokenizes it via shell-quote. Normally .text
   // is used unchanged — but if we resolved a $VAR into argv, .text diverges
   // (has raw `$VAR`) and downstream RULE MATCHING would miss deny rules.
   //
@@ -1413,7 +1413,7 @@ function walkArgument(
       // EVAL_LIKE_BUILTINS, `\zmodload` must match ZSH_DANGEROUS_BUILTINS.
       // Also makes argv accurate: `find -exec {} \;` → argv has `;` not
       // `\;`. (Deny-rule matching on .text already worked via downstream
-      // splitCommand_DEPRECATED unescaping — see walkCommand comment.) `\<whitespace>`
+      // splitCommand unescaping — see walkCommand comment.) `\<whitespace>`
       // is already rejected by BACKSLASH_WHITESPACE_RE.
       if (BRACE_EXPANSION_RE.test(node.text)) {
         return {

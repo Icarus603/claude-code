@@ -4,7 +4,7 @@ import '@claude-code/app-host/runtime/bootstrap.js'
 import { applySettingsChange } from '@claude-code/config/applySettingsChange'
 import { settingsChangeDetector } from '@claude-code/config/changeDetector'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   getSettingsWithSources,
 } from '@claude-code/config/settings'
 import {

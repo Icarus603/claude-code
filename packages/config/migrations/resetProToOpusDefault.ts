@@ -2,7 +2,7 @@ import { logEvent } from '@claude-code/local-observability'
 import { isProSubscriber } from '@claude-code/provider/authAlias.js'
 import { getGlobalConfig, saveGlobalConfig } from '../index.js'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { getSettings_DEPRECATED } from '../settings/settings.js'
+import { getSettings } from '../settings/settings.js'
 
 export function resetProToOpusDefault(): void {
   const config = getGlobalConfig()
@@ -23,7 +23,7 @@ export function resetProToOpusDefault(): void {
     return
   }
 
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
 
   // Only show notification if user was on default (no custom model setting)
   if (settings?.model === undefined) {

@@ -146,7 +146,7 @@ export function matchWildcardPattern(
 
   // Create regex that matches the entire string.
   // The 's' (dotAll) flag makes '.' match newlines, so wildcards match
-  // commands containing embedded newlines (e.g. heredoc content after splitCommand_DEPRECATED).
+  // commands containing embedded newlines (e.g. heredoc content after splitCommand).
   const flags = 's' + (caseInsensitive ? 'i' : '')
   const regex = new RegExp(`^${regexPattern}$`, flags)
 

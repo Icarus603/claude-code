@@ -16,7 +16,7 @@
 import type { Command } from './_deps.js'
 import type { BundledSkillDefinition } from './_deps.js'
 import type { BuiltinPluginDefinition, LoadedPlugin } from './types.js'
-import { getSettings_DEPRECATED } from '../settings/settings.js'
+import { getSettings } from '../settings/settings.js'
 
 const BUILTIN_PLUGINS: Map<string, BuiltinPluginDefinition> = new Map()
 
@@ -58,7 +58,7 @@ export function getBuiltinPlugins(): {
   enabled: LoadedPlugin[]
   disabled: LoadedPlugin[]
 } {
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const enabled: LoadedPlugin[] = []
   const disabled: LoadedPlugin[] = []
 

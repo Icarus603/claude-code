@@ -207,9 +207,9 @@ export type PermissionAskDecision<
   blockedPath?: string
   metadata?: PermissionMetadata
   /**
-   * If true, this ask decision was triggered by a bashCommandIsSafe_DEPRECATED security check
-   * for patterns that splitCommand_DEPRECATED could misparse (e.g. line continuations, shell-quote
-   * transformations). Used by bashToolHasPermission to block early before splitCommand_DEPRECATED
+   * If true, this ask decision was triggered by a bashCommandIsSafe security check
+   * for patterns that splitCommand could misparse (e.g. line continuations, shell-quote
+   * transformations). Used by bashToolHasPermission to block early before splitCommand
    * transforms the command. Not set for simple newline compound commands.
    */
   isBashSecurityCheckForMisparsing?: boolean

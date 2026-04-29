@@ -127,10 +127,10 @@ export const init = memoize(async (): Promise<void> => {
       ) as typeof import('@claude-code/provider/connections.js')
       // Read from settings.env first (persistent), fallback to process.env.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { getSettings_DEPRECATED } = require(
+      const { getSettings } = require(
         '@claude-code/config/settings',
       ) as typeof import('@claude-code/config/settings')
-      const settings = getSettings_DEPRECATED() ?? {}
+      const settings = getSettings() ?? {}
       const settingsEnv = (settings.env ?? {}) as Record<string, string>
       const merged: Record<string, string> = {
         ...Object.fromEntries(

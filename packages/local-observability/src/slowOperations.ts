@@ -121,7 +121,7 @@ export function cloneDeep<T>(value: T): T {
  * @deprecated Use `fs.promises.writeFile` instead for non-blocking writes.
  * Sync file writes block the event loop and cause performance issues.
  */
-export function writeFileSync_DEPRECATED(
+export function writeFileSync(
   filePath: string,
   data: string | NodeJS.ArrayBufferView,
   options?: WriteFileOptionsWithFlush,

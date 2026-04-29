@@ -13,32 +13,32 @@ type ExecSyncOptions = {
 }
 
 /**
- * @deprecated Use `execa` directly with `{ shell: true, reject: false }` for non-blocking execution.
- * Sync exec calls block the event loop and cause performance issues.
+ * @todo Migrate callers to `execa` directly with `{ shell: true, reject: false }`
+ * for non-blocking execution. Sync exec blocks the event loop.
  */
-export function execSyncWithDefaults_DEPRECATED(command: string): string | null
+export function execSyncWithDefaults(command: string): string | null
 /**
- * @deprecated Use `execa` directly with `{ shell: true, reject: false }` for non-blocking execution.
- * Sync exec calls block the event loop and cause performance issues.
+ * @todo Migrate callers to `execa` directly with `{ shell: true, reject: false }`
+ * for non-blocking execution. Sync exec blocks the event loop.
  */
-export function execSyncWithDefaults_DEPRECATED(
+export function execSyncWithDefaults(
   command: string,
   options: ExecSyncOptions,
 ): string | null
 /**
- * @deprecated Use `execa` directly with `{ shell: true, reject: false }` for non-blocking execution.
- * Sync exec calls block the event loop and cause performance issues.
+ * @todo Migrate callers to `execa` directly with `{ shell: true, reject: false }`
+ * for non-blocking execution. Sync exec blocks the event loop.
  */
-export function execSyncWithDefaults_DEPRECATED(
+export function execSyncWithDefaults(
   command: string,
   abortSignal: AbortSignal,
   timeout?: number,
 ): string | null
 /**
- * @deprecated Use `execa` directly with `{ shell: true, reject: false }` for non-blocking execution.
- * Sync exec calls block the event loop and cause performance issues.
+ * @todo Migrate callers to `execa` directly with `{ shell: true, reject: false }`
+ * for non-blocking execution. Sync exec blocks the event loop.
  */
-export function execSyncWithDefaults_DEPRECATED(
+export function execSyncWithDefaults(
   command: string,
   optionsOrAbortSignal?: ExecSyncOptions | AbortSignal,
   timeout = 10 * SECONDS_IN_MINUTE * MS_IN_SECOND,
