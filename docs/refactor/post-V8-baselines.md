@@ -13,9 +13,9 @@ context compaction.
 
 | Metric                              | V8 final | Now        | Δ         |
 |-------------------------------------|---------:|-----------:|----------:|
-| Tests passing                       |     3078 |       5307 | +2229     |
-| Test files                          |     ~110 |        210 | +100      |
-| `doctor:arch` checks                |       66 |         71 | +5        |
+| Tests passing                       |     3078 |       5479 | +2401     |
+| Test files                          |     ~110 |        214 | +104      |
+| `doctor:arch` checks                |       66 |         72 | +6        |
 | `_DEPRECATED` exports in packages/  |        0 |          0 | locked    |
 | `_deps.ts` cross-package lazy-requires |       1 |          1 | locked    |
 | `_deps.ts` unknown-typed slots      |        7 |          6 | -1 (V8.1) |
@@ -24,11 +24,15 @@ context compaction.
 | tsc-errors budget                   |     3269 |       3217 | -52       |
 | Silent-failure findings (total)     |      740 |        740 | locked    |
 | Silent-failure CRITICAL/HIGH        |      0/0 |        0/0 | locked    |
-| Real bugs found                     |        4 |          5 | +1        |
+| `as never` cast count               |      n/a |         42 | new ratchet |
+| Real bugs found                     |        4 |          7 | +3        |
 
-The +1 real bug is `gitConfigParser` quoted-trailing-whitespace handling
-(found 2026-04-30 while writing tests for the parser). See commit
-history.
+The +3 real bugs (all parser state-machine ordering errors found via
+test-writing on parsers — see `feedback_test_writing_bug_discovery_rate.md`):
+
+1. `gitConfigParser` quoted-trailing-whitespace strip (2026-04-30)
+2. `extractLastJsonStringField` pattern-ordering bug (2026-04-30)
+3. `parseSSEFrames` CRLF line-ending non-recognition per WHATWG spec (2026-04-30)
 
 ## What changed since V8 final
 
