@@ -23,6 +23,8 @@
     "./createMovedToPluginCommand.js": "./src/createMovedToPluginCommand.ts",
     "./stubs/stubCommand.js": "./src/stubs/stubCommand.ts",
     "./commands/skills/index.js": "./src/commands/skills/index.ts",
+    "./commands/bridge/index.js": "./src/commands/bridge/index.ts",
+    "./commands/bridge/bridge.js": "./src/commands/bridge/bridge.tsx",
     "./commands/login/index.js": "./src/commands/login/index.ts",
     "./commands/login/login.js": "./src/commands/login/login.tsx",
     "./commands/model/index.js": "./src/commands/model/index.ts",
