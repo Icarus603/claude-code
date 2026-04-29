@@ -13,8 +13,8 @@ context compaction.
 
 | Metric                              | V8 final | Now        | Δ         |
 |-------------------------------------|---------:|-----------:|----------:|
-| Tests passing                       |     3078 |       5160 | +2082     |
-| Test files                          |     ~110 |        201 | +91       |
+| Tests passing                       |     3078 |       5307 | +2229     |
+| Test files                          |     ~110 |        210 | +100      |
 | `doctor:arch` checks                |       66 |         71 | +5        |
 | `_DEPRECATED` exports in packages/  |        0 |          0 | locked    |
 | `_deps.ts` cross-package lazy-requires |       1 |          1 | locked    |
