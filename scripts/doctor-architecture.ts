@@ -281,6 +281,13 @@ const CHECKS: Check[] = [
     doc: 'docs/refactor/deprecated-suffix-audit.md — every _DEPRECATED-suffixed export must have a non-suffixed canonical sibling. Locks zero-baseline at 0 (post-2026-04-29 rename).',
   },
   {
+    id: 'deps-quality',
+    layer: 'Cross-Cutting',
+    subsystem: '_deps.ts ratchet',
+    script: 'scripts/verify-deps-quality.ts',
+    doc: 'V7 §3.2 — lazy-require count + unknown-typed setter slot count in config/plugin/_deps.ts. Both are monotonic-shrink ratchets. Tighten with --tighten after a real reduction.',
+  },
+  {
     id: 'no-bare-host-loggers',
     layer: 'Cross-Cutting',
     subsystem: 'host-binding migration completeness',
