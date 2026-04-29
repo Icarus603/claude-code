@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { getFeatureValue_DEPRECATED } from '@claude-code/config/feature-flags'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { lt } from '@claude-code/config/semver'
 import { isEnvLessBridgeEnabled } from './bridgeEnabled.js'
@@ -121,14 +121,12 @@ const envLessBridgeConfigSchema = lazySchema(() =>
  * initEnvLessBridgeCore call — config is fixed for the lifetime of a bridge
  * session.
  *
- * Uses the blocking getter (not _CACHED_MAY_BE_STALE) because /remote-control
- * runs well after GrowthBook init — initializeGrowthBook() resolves instantly,
- * so there's no startup penalty, and we get the fresh in-memory remoteEval
- * value instead of the stale-on-first-read disk cache. The _DEPRECATED suffix
- * warns against startup-path usage, which this isn't.
+ * GrowthBook is stubbed out in this build; the cached getter falls back to
+ * `defaultValue` (the env-less bridge default config) when no override is
+ * set. Kept async to preserve the function's existing signature for callers.
  */
 export async function getEnvLessBridgeConfig(): Promise<EnvLessBridgeConfig> {
-  const raw = await getFeatureValue_DEPRECATED<unknown>(
+  const raw = getFeatureValue_CACHED_MAY_BE_STALE<unknown>(
     'tengu_bridge_repl_v2_config',
     DEFAULT_ENV_LESS_BRIDGE_CONFIG,
   )

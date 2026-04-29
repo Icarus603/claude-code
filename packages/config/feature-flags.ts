@@ -109,13 +109,6 @@ export async function initializeGrowthBook(): Promise<null> {
   return null
 }
 
-export async function getFeatureValue_DEPRECATED<T>(
-  feature: string,
-  defaultValue: T,
-): Promise<T> {
-  return getFeatureValue_CACHED_MAY_BE_STALE(feature, defaultValue)
-}
-
 export function getFeatureValue_CACHED_MAY_BE_STALE<T>(
   feature: string,
   defaultValue?: T,

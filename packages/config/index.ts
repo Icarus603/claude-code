@@ -20,7 +20,6 @@ export { SettingsManager } from './manager.js'
 export {
   FeatureFlagProvider,
   initializeGrowthBook,
-  getFeatureValue_DEPRECATED,
   getFeatureValue_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_WITH_REFRESH,
   checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
@@ -121,7 +120,7 @@ export {
   getUseAutoModeDuringPlan,
   getAutoModeConfig,
   rawSettingsContainsKey,
-  getSettings_DEPRECATED,
+  getSettings,
   getPolicySettingsOrigin,
 } from './settings/settings.js'
 
