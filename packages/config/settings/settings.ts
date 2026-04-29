@@ -819,7 +819,7 @@ export function getInitialSettings(): SettingsJson {
 /**
  * @deprecated Use getInitialSettings() instead. This alias exists for backwards compatibility.
  */
-export const getSettings_DEPRECATED = getInitialSettings
+export const getSettings = getInitialSettings
 
 export type SettingsWithSources = {
   effective: SettingsJson

@@ -9,7 +9,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { getGlobalClaudeFile } from '@claude-code/config/env/paths'
 import { isSettingSourceEnabled } from '@claude-code/config/constants'
 import {
-  getSettings_DEPRECATED,
+  getSettings,
   hasSkipDangerousModePermissionPrompt,
 } from '@claude-code/config/settings'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
@@ -351,7 +351,7 @@ export function parseHeaders(headerArray: string[]): Record<string, string> {
 export function getProjectMcpServerStatus(
   serverName: string,
 ): 'approved' | 'rejected' | 'pending' {
-  const settings = getSettings_DEPRECATED()
+  const settings = getSettings()
   const normalizedName = normalizeNameForMCP(serverName)
 
   // TODO: This fails an e2e test if the ?. is not present. This is likely a bug in the e2e test.
