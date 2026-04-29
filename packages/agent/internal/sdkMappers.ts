@@ -1,4 +1,5 @@
 import stripAnsi from 'strip-ansi'
+import { NO_CONTENT_MESSAGE } from '../constants/messages.js'
 
 const SYNTHETIC_MODEL = '<synthetic>'
 
@@ -83,7 +84,7 @@ export function localCommandOutputToSDKAssistantMessage(
   const content = [
     {
       type: 'text' as const,
-      text: cleanContent === '' ? '[No content]' : cleanContent,
+      text: cleanContent === '' ? NO_CONTENT_MESSAGE : cleanContent,
     },
   ]
 

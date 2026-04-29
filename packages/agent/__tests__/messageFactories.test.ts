@@ -42,7 +42,7 @@ describe('createUserMessage', () => {
     // Per inc-4586: zero-length tool/user content leads to
     // turn-boundary bugs in some models. Replace with sentinel.
     const m = createUserMessage({ content: '' })
-    expect(m.message.content).toBe('[No content]')
+    expect(m.message.content).toBe('(no content)')
   })
 
   test('array content (tool_result blocks) is preserved as-is', () => {
@@ -145,7 +145,7 @@ describe('createAssistantAPIErrorMessage', () => {
   test('content empty string falls back to [No content]', () => {
     const m = createAssistantAPIErrorMessage({ content: '' })
     const block = (m.message.content as Array<{ text: string }>)[0]
-    expect(block?.text).toBe('[No content]')
+    expect(block?.text).toBe('(no content)')
   })
 
   test('non-empty content is preserved', () => {

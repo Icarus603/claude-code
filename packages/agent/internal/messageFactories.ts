@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
+import { NO_CONTENT_MESSAGE } from '../constants/messages.js'
 import { logForDebugging } from './logging.js'
 
-const NO_CONTENT_MESSAGE = '[No content]'
 const INTERRUPT_MESSAGE = '[Request interrupted by user]'
 const INTERRUPT_MESSAGE_FOR_TOOL_USE =
   '[Request interrupted by user for tool use]'

@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+import { beforeAll, describe, expect, test } from 'bun:test'
 import type { UUID } from 'crypto'
 import {
   deriveShortMessageId,
@@ -191,5 +191,185 @@ describe('extractTag — XML/HTML tag content extraction', () => {
     // <foo/> has no content. The function looks for <foo>...</foo>, so
     // a self-closing tag doesn't match the pattern at all.
     expect(extractTag('<foo/>', 'foo')).toBeNull()
+  })
+})
+
+describe('isNotEmptyMessage — content emptiness check', () => {
+  // Re-import inside the describe so we don't disturb the existing
+  // test file's import block. The helper must agree with the canonical
+  // NO_CONTENT_MESSAGE constant — a divergence in 2026-04-29 caused
+  // factory-empty messages to be treated as non-empty.
+  let isNotEmptyMessage: typeof import('../messages.js').isNotEmptyMessage
+  let NO_CONTENT_MESSAGE: string
+  beforeAll(async () => {
+    ;({ isNotEmptyMessage } = await import('../messages.js'))
+    ;({ NO_CONTENT_MESSAGE } = await import('../constants/messages.js'))
+  })
+
+  test('progress / attachment / system messages always considered non-empty', () => {
+    expect(
+      isNotEmptyMessage({ type: 'progress', uuid: 'u1' as never } as never),
+    ).toBe(true)
+    expect(
+      isNotEmptyMessage({ type: 'attachment', uuid: 'u1' as never } as never),
+    ).toBe(true)
+    expect(
+      isNotEmptyMessage({ type: 'system', uuid: 'u1' as never } as never),
+    ).toBe(true)
+  })
+
+  test('user with non-empty string content is non-empty', () => {
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: { content: 'hello' },
+      } as never),
+    ).toBe(true)
+  })
+
+  test('user with empty string content is empty', () => {
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: { content: '' },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with whitespace-only content is empty', () => {
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: { content: '   \n\t  ' },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with empty content array is empty', () => {
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: { content: [] },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with single text block matching NO_CONTENT_MESSAGE is empty', () => {
+    // CRITICAL: this locks the agreement between the canonical constant
+    // and the comparison. Drift caused factory-set "[No content]" to be
+    // treated as non-empty (2026-04-29 finding).
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: {
+          content: [{ type: 'text', text: NO_CONTENT_MESSAGE }],
+        },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with single empty text block is empty', () => {
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: { content: [{ type: 'text', text: '' }] },
+      } as never),
+    ).toBe(false)
+  })
+
+  test('user with single non-text block (image/tool_result) is non-empty', () => {
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: {
+          content: [{ type: 'image', source: {} }],
+        },
+      } as never),
+    ).toBe(true)
+  })
+
+  test('user with multiple blocks is non-empty (skip-multi-block guard)', () => {
+    // Documented: the function explicitly skips multi-block content.
+    // Two text blocks both empty → still considered non-empty.
+    expect(
+      isNotEmptyMessage({
+        type: 'user',
+        uuid: 'u1' as never,
+        message: {
+          content: [
+            { type: 'text', text: '' },
+            { type: 'text', text: '' },
+          ],
+        },
+      } as never),
+    ).toBe(true)
+  })
+})
+
+describe('extractTag — documented LIMITATIONS (not bugs, just contract)', () => {
+  // These cases lock the function's known limitations so a future
+  // refactor doesn't accidentally CHANGE behaviour without anyone
+  // noticing. They're not bugs because:
+  //   1. extractTag is used to extract user-controlled tags like
+  //      <bash-input>, <command-name> — the inputs we feed it never
+  //      contain attribute values with raw `>` or `</`.
+  //   2. Nested same-name tags don't appear in our use cases (no
+  //      `<command-name>foo<command-name>bar</command-name></command-name>`).
+  // Document the limitation so anyone hitting one of these in a new
+  // use case sees the constraint immediately.
+
+  test('same-name nested tags: returns content up to FIRST closing tag', () => {
+    // <a>outer<a>inner</a>more</a> — the outer's "true" content is
+    // "outer<a>inner</a>more". Non-greedy regex captures up to the
+    // first `</a>` instead. Limitation: same-name nesting not handled.
+    expect(extractTag('<a>outer<a>inner</a>more</a>', 'a')).toBe(
+      'outer<a>inner',
+    )
+  })
+
+  test('deep same-name nesting collapses to first close', () => {
+    // <a><a><a>deep</a></a></a> — captures up to first </a>.
+    expect(extractTag('<a><a><a>deep</a></a></a>', 'a')).toBe('<a><a>deep')
+  })
+
+  test('attribute value containing raw > breaks parser', () => {
+    // <a foo="x>y">content</a> — the `>` inside the attribute closes
+    // the opening tag prematurely. Pre-existing limitation — none of
+    // our callers feed strings with this shape.
+    const r = extractTag('<a foo="x>y">content</a>', 'a')
+    expect(r).not.toBe('content') // wrong result, but documented
+  })
+
+  test('attribute value containing </tag> breaks parser', () => {
+    // <a foo="</a>">content</a> — the embedded "</a>" inside the
+    // quoted attribute matches the closing pattern. Pre-existing
+    // limitation; user-controlled `<bash-input>` / `<command-name>`
+    // never contain attributes.
+    const r = extractTag('<a foo="</a>">content</a>', 'a')
+    expect(r).not.toBe('content')
+  })
+
+  test('disjoint sibling tags: returns FIRST occurrence', () => {
+    // Documented elsewhere ("returns FIRST match"); locked here as
+    // contract for the no-nesting case so a "fix nested" patch
+    // doesn't accidentally pick the wrong tag.
+    expect(extractTag('<x><a>1</a></x><x><a>2</a></x>', 'x')).toBe(
+      '<a>1</a>',
+    )
+  })
+
+  test('unclosed tag → null (no greedy fallback)', () => {
+    // <a>never closes — the regex requires a matching close tag.
+    // Without one, no match. Important: prevents extractTag from
+    // returning everything-after-the-open-tag, which would be a
+    // security issue if user input can contain a stray `<bash-input>`.
+    expect(extractTag('<a>never closes', 'a')).toBeNull()
   })
 })
