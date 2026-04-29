@@ -1,9 +1,16 @@
 import { mock, describe, expect, test, afterEach } from 'bun:test'
 
+// Spread real exports + override only what this test needs.
+// mock.module() applies globally to the whole bun test process; an
+// incomplete mock silently shadows the real module for unrelated tests.
+// See feedback_bun_mock_module_global_scope.md.
+const realDebug = await import('@claude-code/local-observability/debug.js')
+
 mock.module('axios', () => ({
   default: { get: async () => ({ data: { servers: [] } }) },
 }))
 mock.module('@claude-code/local-observability/debug.js', () => ({
+  ...realDebug,
   logForDebugging: () => {},
 }))
 mock.module('src/utils/errors.js', () => ({

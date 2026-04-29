@@ -1,6 +1,12 @@
 import { mock, describe, expect, test } from "bun:test";
 
+// Spread real exports + override only what this test needs.
+// See feedback_bun_mock_module_global_scope.md.
+const realDebug = await import("@claude-code/local-observability/debug.js");
+const realStringUtils = await import("@claude-code/output/utils/stringUtils.js");
+
 mock.module("@claude-code/local-observability/debug.js", () => ({
+  ...realDebug,
   logForDebugging: () => {},
   isDebugMode: () => false,
 }));
@@ -10,6 +16,7 @@ mock.module("src/utils/errors.js", () => ({
 }));
 
 mock.module("@claude-code/output/utils/stringUtils.js", () => ({
+  ...realStringUtils,
   plural: (n: number, singular: string, plural?: string) =>
     n === 1 ? singular : (plural ?? singular + "s"),
 }));

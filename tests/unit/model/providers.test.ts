@@ -3,7 +3,13 @@ import { mock } from 'bun:test'
 
 let mockedModelType: 'gemini' | undefined
 
+// Spread real exports + override only getInitialSettings — mock.module()
+// applies globally to the whole bun test process; partial mocks silently
+// shadow real exports for unrelated tests.
+// See feedback_bun_mock_module_global_scope.md.
+const realSettings = await import('@claude-code/config/settings')
 mock.module('@claude-code/config/settings', () => ({
+  ...realSettings,
   getInitialSettings: () =>
     mockedModelType ? { modelType: mockedModelType } : {},
 }))

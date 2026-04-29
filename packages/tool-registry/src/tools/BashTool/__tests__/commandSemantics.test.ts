@@ -1,10 +1,17 @@
 import { mock, describe, expect, test } from "bun:test";
 
-// Mock commands.ts to cut the heavy shell/prefix.ts → analytics → api chain
+// Spread real exports + override only what commandSemantics calls. The
+// commands.ts module has 10+ exports (splitCommand, splitCommandWithOperators,
+// isHelpCommand, isUnsafeCompoundCommand, etc.) that other test files
+// (e.g., packages/shell/src/__test__/commands.test.ts) load directly. An
+// incomplete mock here previously shadowed the real exports for the entire
+// test process. See feedback_bun_mock_module_global_scope.md.
+const realCommands = await import("@claude-code/shell/bash/commands.js");
+
 mock.module("@claude-code/shell/bash/commands.js", () => ({
+  ...realCommands,
   splitCommand: (cmd: string) =>
     cmd.split(/\s*(?:[|;&]+)\s*/).filter(Boolean),
-  quote: (args: string[]) => args.join(" "),
 }));
 
 const { interpretCommandResult } = await import("../commandSemantics");

@@ -1,18 +1,28 @@
 import { describe, expect, test, beforeEach, afterEach, mock } from 'bun:test'
 
-// Mock heavy dependencies to avoid import chain issues
+// Spread real exports + override only what this test needs.
+// mock.module() applies globally to the whole bun test process; an
+// incomplete mock silently shadows the real module for unrelated tests.
+// See feedback_bun_mock_module_global_scope.md.
+const realThinking = await import('@claude-code/provider/thinking.js')
+const realAuthAlias = await import('@claude-code/provider/authAlias.js')
+const realFeatureFlags = await import('@claude-code/config/feature-flags')
+
 mock.module('@claude-code/provider/thinking.js', () => ({
+  ...realThinking,
   isUltrathinkEnabled: () => false,
 }))
 mock.module('src/utils/settings/settings.js', () => ({
   getInitialSettings: () => ({}),
 }))
 mock.module('@claude-code/provider/authAlias.js', () => ({
+  ...realAuthAlias,
   isProSubscriber: () => false,
   isMaxSubscriber: () => false,
   isTeamSubscriber: () => false,
 }))
 mock.module('@claude-code/config/feature-flags', () => ({
+  ...realFeatureFlags,
   getFeatureValue_CACHED_MAY_BE_STALE: () => null,
 }))
 mock.module('src/utils/model/modelSupportOverrides.js', () => ({

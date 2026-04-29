@@ -4,6 +4,16 @@ import { mock, describe, expect, test } from "bun:test";
 // Only mock modules that are truly unavailable or cause side effects.
 // Do NOT mock common/shared modules (zod/v4, bootstrap/state, etc.) to avoid
 // corrupting the module cache for other test files in the same Bun process.
+//
+// For modules that we DO need to override partially, spread the real
+// exports first — bun:test mocks apply globally, so a partial mock would
+// silently shadow the real module for every other test in the suite.
+// See feedback_bun_mock_module_global_scope.md.
+const realLocalObs = await import("@claude-code/local-observability");
+const realLocalObsCompat = await import("@claude-code/local-observability/compat");
+const realDebug = await import("@claude-code/local-observability/debug.js");
+const realYoloClassifier = await import("@claude-code/permission/yoloClassifier.js");
+const realTokens = await import("@claude-code/agent/tokens.js");
 
 const noop = () => {};
 
@@ -21,12 +31,14 @@ mock.module("src/services/AgentSummary/agentSummary.js", () => ({
 }));
 
 mock.module("@claude-code/local-observability", () => ({
+  ...realLocalObs,
   logEvent: noop,
   logEventAsync: async () => {},
   shutdownLocalObservability: async () => {},
 }));
 
 mock.module("@claude-code/local-observability/compat", () => ({
+  ...realLocalObsCompat,
   stripProtoFields: (v: any) => v,
   attachAnalyticsSink: noop,
   _resetForTesting: noop,
@@ -93,17 +105,9 @@ mock.module("src/tasks/LocalAgentTask/LocalAgentTask.js", () => ({
 }));
 
 mock.module("@claude-code/local-observability/debug.js", () => ({
-  getMinDebugLogLevel: () => "warn",
-  isDebugMode: () => false,
-  enableDebugLogging: () => false,
-  getDebugFilter: () => null,
-  isDebugToStdErr: () => false,
-  getDebugFilePath: () => null,
-  setHasFormattedOutput: noop,
-  getHasFormattedOutput: () => false,
-  flushDebugLogs: async () => {},
+  ...realDebug,
+  // No-op overrides for the test boundary; real impls preserved otherwise.
   logForDebugging: noop,
-  getDebugLogPath: () => "",
   logAntError: noop,
 }));
 
@@ -130,6 +134,7 @@ mock.module("src/utils/errors.js", () => ({
 mock.module("src/utils/forkedAgent.js", () => ({}));
 
 mock.module("@claude-code/permission/yoloClassifier.js", () => ({
+  ...realYoloClassifier,
   buildTranscriptForClassifier: () => "",
   classifyYoloAction: () => null,
 }));
@@ -139,6 +144,7 @@ mock.module("src/utils/task/sdkProgress.js", () => ({
 }));
 
 mock.module("@claude-code/agent/tokens.js", () => ({
+  ...realTokens,
   getTokenCountFromUsage: () => 0,
 }));
 
