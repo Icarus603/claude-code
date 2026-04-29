@@ -43,17 +43,13 @@ describe('expandEnvVarsInString', () => {
     expect(r.expanded).toBe('real')
   })
 
-  test('current behavior: default value containing :- gets truncated at first :-', () => {
-    // The impl uses `split(':-', 2)` which discards the rest after the
-    // 2nd element — `'A:-B:-C'.split(':-', 2)` returns `['A', 'B']`, NOT
-    // `['A', 'B:-C']`. So defaults containing `:-` lose everything after
-    // the second separator. The comment in envExpansion.ts says "limit to
-    // 2 parts to preserve :- in defaults" but that's a misunderstanding of
-    // how `split(sep, limit)` works in JavaScript. Documenting actual
-    // behavior here so a future fixer can flip the test when the bug is
-    // resolved (probably with `varContent.indexOf(':-')` + slice instead).
+  test('default value can contain :- (only the first :- is the separator)', () => {
+    // Regression: previously `split(':-', 2)` truncated the default at the
+    // second :-, so `${MISSING:-foo:-bar}` returned just 'foo'. Fixed by
+    // using indexOf + slice so the default keeps everything after the
+    // first :- verbatim.
     const r = expandEnvVarsInString('${MISSING:-foo:-bar}')
-    expect(r.expanded).toBe('foo')
+    expect(r.expanded).toBe('foo:-bar')
   })
 
   test('missing var without default tracked + left literal', () => {

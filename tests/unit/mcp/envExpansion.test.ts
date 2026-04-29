@@ -98,14 +98,13 @@ describe('expandEnvVarsInString', () => {
   })
 
   test('handles default value containing colons', () => {
-    // split(':-', 2) means only the first :- is the delimiter
+    // Only the FIRST `:-` is the separator; everything after stays in the
+    // default verbatim. (Pre-2026-04-29 the impl used split(':-', 2) which
+    // truncated — that's now fixed via indexOf + slice.)
     delete process.env.TEST_X
     // biome-ignore lint/suspicious/noTemplateCurlyInString: testing env var expansion patterns
     const result = expandEnvVarsInString('${TEST_X:-value:-with:-colons}')
-    // The default is "value" because split(':-', 2) gives ["TEST_X", "value"]
-    // Wait -- actually split(':-', 2) on "TEST_X:-value:-with:-colons" gives:
-    //   ["TEST_X", "value"] because limit=2 stops at 2 pieces
-    expect(result.expanded).toBe('value')
+    expect(result.expanded).toBe('value:-with:-colons')
     expect(result.missingVars).toEqual([])
   })
 
