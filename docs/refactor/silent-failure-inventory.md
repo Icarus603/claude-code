@@ -27,10 +27,10 @@ Findings are graded:
 | 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
 | 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
-| 10 | type-cast-trap | 163 | 0 | 0 | 1 | 162 |
+| 10 | type-cast-trap | 133 | 0 | 0 | 1 | 132 |
 | 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **770** | **0** | **0** | **1** | **769** |
+| **TOTAL** | | **740** | **0** | **0** | **1** | **739** |
 
 ## Patterns in detail
 
@@ -64,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9296; **findings**: 0
+**Total scanned**: 9291; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -72,7 +72,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2462; **findings**: 0
+**Total scanned**: 2457; **findings**: 0
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -140,9 +140,9 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/provider/src/dumpPrompts.ts:103` — const messages = (req.messages ?? []) as Array<{ role?: string }>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:254` — connections: (current.connections ?? []).filter(c => c.id !== id),
+- `packages/provider/src/connections.ts:255` — connections: (current.connections ?? []).filter(c => c.id !== id),
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:262` — connections: (current.connections ?? []).map(c =>
+- `packages/provider/src/connections.ts:263` — connections: (current.connections ?? []).map(c =>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - ...56 more (run audit with no flags for full JSON)
 
@@ -152,7 +152,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5904; **findings**: 26
+**Total scanned**: 5905; **findings**: 26
 
 #### LOW (26)
 
@@ -215,13 +215,13 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/08-always-false-feature-flags.ts`
 
-**Total scanned**: 813; **findings**: 495
+**Total scanned**: 812; **findings**: 495
 
 #### LOW (495)
 
 - `packages/swarm/commands/branch/index.ts:8` — aliases: feature('FORK_SUBAGENT') ? [] : ['fork'],
   - `feature('FORK_SUBAGENT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_FORK_SUBAGENT=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/swarm/src/runtime/inProcessRunner.ts:160` — feature('BASH_CLASSIFIER') &&
+- `packages/swarm/src/runtime/inProcessRunner.ts:162` — feature('BASH_CLASSIFIER') &&
   - `feature('BASH_CLASSIFIER')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_BASH_CLASSIFIER=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/swarm/src/worktree/index.ts:603` — if (feature('COMMIT_ATTRIBUTION')) {
   - `feature('COMMIT_ATTRIBUTION')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_COMMIT_ATTRIBUTION=1. Verify whether this branch is ever exercised; if not, delete it.
@@ -295,33 +295,19 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 540; **findings**: 163
+**Total scanned**: 547; **findings**: 133
 
 #### MEDIUM (1)
 
 - `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1190` — const fallbackBuffer = await (sharp as any)(imageBuffer)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 
-#### LOW (162)
+#### LOW (132)
 
 - `packages/swarm/testing/index.ts:20` — } as unknown as SwarmHostDeps
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/swarm/src/mailbox/index.ts:1164` — const b = block as unknown as { type: string; name?: string; input?: Record<string, unknown>; [key: string]: unknown }
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/runtime/inProcessRunner.ts:185` — const description = await (tool as Tool).description(input as never, {
-  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/adapters/createSwarmHostDeps.ts:161` — input as never,
-  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/adapters/createSwarmHostDeps.ts:163` — canUseTool as never,
-  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/adapters/createSwarmHostDeps.ts:164` — parentMessage as never,
-  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/adapters/createSwarmHostDeps.ts:169` — } as never
-  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/adapters/createSwarmHostDeps.ts:259` — await updateTask(listId, taskId, updates as never)
-  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/adapters/createSwarmHostDeps.ts:269` — updateTaskState(taskId, setAppState, task => updater(task) as never)
-  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/TungstenTool/TungstenTool.ts:4` — export const TungstenTool: Tool = (() => {}) as unknown as Tool;
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/WebFetchTool/utils.ts:94` — const Turndown = (m as unknown as { default: TurndownCtor }).default
@@ -336,17 +322,15 @@ Findings are graded:
   - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1181` — sharpModule as unknown as {
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/imageProcessor.ts:62` — )) as unknown as MaybeDefault<SharpFunction>
+- `packages/tool-registry/src/tools/FileReadTool/imageProcessor.ts:71` — )) as unknown as MaybeDefault<SharpFunction>
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/imageProcessor.ts:80` — )) as unknown as MaybeDefault<SharpCreator>
+- `packages/tool-registry/src/tools/FileReadTool/imageProcessor.ts:89` — )) as unknown as MaybeDefault<SharpCreator>
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/utils/semanticNumber.ts:27` — inner: T = z.number() as unknown as T,
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/utils/semanticBoolean.ts:23` — inner: T = z.boolean() as unknown as T,
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/ripgrep.ts:574` — (proc.stdout as unknown as Blob).text(),
-  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/@ant/ink/src/core/parse-keypress.ts:199` — ;(input[0] as unknown as number) -= 128
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/ink/src/core/reconciler.ts:482` — } as never,
   - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -356,15 +340,31 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/settings/settings.ts:427` — (source as unknown) === 'flagSettings'
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/plugin/_deps.ts:725` — return (snap as unknown as Record<string | symbol, unknown>)[key]
+- `packages/config/plugin/_deps.ts:735` — return (snap as unknown as Record<string | symbol, unknown>)[key]
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/plugin/_deps.ts:731` — }) as unknown as string[]
+- `packages/config/plugin/_deps.ts:741` — }) as unknown as string[]
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/plugin/installCounts.ts:67` — const parsed = jsonParse(content) as unknown
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/plugin/marketplaceManager.ts:191` — } as unknown as Record<string, DeclaredMarketplace>
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...132 more (run audit with no flags for full JSON)
+- `packages/config/plugin/pluginFlagging.ts:41` — const parsed = jsonParse(content) as unknown
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/config/testing/index.ts:56` — projectRoot: options.projectRoot ?? undefined as unknown as string,
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/command-runtime/src/commands/login/login.tsx:96` — } as never)
+  - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/shell/src/execFileNoThrow.ts:130` — result as unknown as ExecaResultWithError,
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/bridge/src/replBridge.ts:2032` — err.status as unknown as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/bridge/src/bridgeMain.ts:228` — err.status as unknown as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/bridge/src/inboundMessages.ts:59` — const src = block.source as unknown as Record<string, unknown>
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/bridge/src/inboundMessages.ts:79` — return !(block.source as unknown as Record<string, unknown>).media_type
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- ...102 more (run audit with no flags for full JSON)
 
 ### 11. `require-fallback-to-stub`
 
@@ -372,7 +372,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 864; **findings**: 0
+**Total scanned**: 873; **findings**: 0
 
 ### 12. `module-level-null-state`
 
@@ -380,5 +380,5 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/12-module-level-null-state.ts`
 
-**Total scanned**: 179; **findings**: 0
+**Total scanned**: 177; **findings**: 0
 
