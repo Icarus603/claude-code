@@ -822,8 +822,8 @@ export function installPackageHostBindings(
                   React.createElement(KeybindingSetup, null,
                     React.createElement(ManagedSettingsSecurityDialog, {
                       settings: newSettings,
-                      onAccept: () => { logEvent('tengu_managed_settings_security_dialog_accepted', {}); unmount(); resolve('approved') },
-                      onReject: () => { logEvent('tengu_managed_settings_security_dialog_rejected', {}); unmount(); resolve('rejected') },
+                      onAccept: () => { try { (require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')).logEvent('tengu_managed_settings_security_dialog_accepted', {}) } catch {}; unmount(); resolve('approved') },
+                      onReject: () => { try { (require('@claude-code/local-observability') as typeof import('@claude-code/local-observability')).logEvent('tengu_managed_settings_security_dialog_rejected', {}) } catch {}; unmount(); resolve('rejected') },
                     })
                   )
                 ),

@@ -274,6 +274,13 @@ const CHECKS: Check[] = [
     doc: 'CLAUDE.md §Feature Flag System — feature() must come from bun:bundle',
   },
   {
+    id: 'no-bare-host-loggers',
+    layer: 'Cross-Cutting',
+    subsystem: 'host-binding migration completeness',
+    script: 'scripts/verify-no-bare-host-loggers.ts',
+    doc: 'host-binding loggers (logEvent, logError, logDebug, logForDebugging, logAntError) must not be called bare without import or local declaration — bare calls throw ReferenceError that gets swallowed in catch handlers (see fileHistoryCore.ts:786 incident, fixed in 94d6c10d)',
+  },
+  {
     id: 'no-cycles',
     layer: 'Cross-Cutting',
     subsystem: 'import graph cycles',
