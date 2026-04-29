@@ -13,6 +13,8 @@ import { describe, expect, test } from 'bun:test'
 import {
   isDangerousBashPermission,
   isDangerousPowerShellPermission,
+  isOverlyBroadBashAllowRule,
+  isOverlyBroadPowerShellAllowRule,
 } from '../permissionSetup.js'
 
 describe('isDangerousBashPermission — tool-level allow', () => {
@@ -172,6 +174,73 @@ describe('isDangerousPowerShellPermission — safe patterns', () => {
   test('specific command with args → not dangerous', () => {
     expect(
       isDangerousPowerShellPermission('PowerShell', 'Get-Process -Name pwsh'),
+    ).toBe(false)
+  })
+})
+
+describe('isOverlyBroadBashAllowRule — tool-level Bash allow detection', () => {
+  test('Bash with no ruleContent → overly broad', () => {
+    expect(
+      isOverlyBroadBashAllowRule({ toolName: 'Bash' } as never),
+    ).toBe(true)
+  })
+
+  test('Bash with ruleContent: undefined → overly broad', () => {
+    expect(
+      isOverlyBroadBashAllowRule({
+        toolName: 'Bash',
+        ruleContent: undefined,
+      } as never),
+    ).toBe(true)
+  })
+
+  test('Bash with specific command → NOT overly broad', () => {
+    expect(
+      isOverlyBroadBashAllowRule({
+        toolName: 'Bash',
+        ruleContent: 'ls -la',
+      } as never),
+    ).toBe(false)
+  })
+
+  test('Bash with empty string ruleContent → NOT overly broad (only undefined counts)', () => {
+    // Documented strict-undefined check: '' fails the === undefined
+    // test. This means a rule "Bash()" parsed to ruleContent: '' is
+    // treated differently from "Bash" parsed to ruleContent: undefined.
+    expect(
+      isOverlyBroadBashAllowRule({
+        toolName: 'Bash',
+        ruleContent: '',
+      } as never),
+    ).toBe(false)
+  })
+
+  test('different tool → false', () => {
+    expect(
+      isOverlyBroadBashAllowRule({ toolName: 'FileRead' } as never),
+    ).toBe(false)
+  })
+})
+
+describe('isOverlyBroadPowerShellAllowRule', () => {
+  test('PowerShell with no ruleContent → overly broad', () => {
+    expect(
+      isOverlyBroadPowerShellAllowRule({ toolName: 'PowerShell' } as never),
+    ).toBe(true)
+  })
+
+  test('PowerShell with specific command → NOT overly broad', () => {
+    expect(
+      isOverlyBroadPowerShellAllowRule({
+        toolName: 'PowerShell',
+        ruleContent: 'Get-Process',
+      } as never),
+    ).toBe(false)
+  })
+
+  test('Bash → false (different tool)', () => {
+    expect(
+      isOverlyBroadPowerShellAllowRule({ toolName: 'Bash' } as never),
     ).toBe(false)
   })
 })
