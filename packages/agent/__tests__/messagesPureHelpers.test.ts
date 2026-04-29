@@ -114,6 +114,90 @@ describe('deriveUUID — deterministic key derivation', () => {
   })
 })
 
+describe('isClassifierDenial — UI summary detection', () => {
+  let isClassifierDenial: typeof import('../messages.js').isClassifierDenial
+  beforeAll(async () => {
+    ;({ isClassifierDenial } = await import('../messages.js'))
+  })
+
+  test('content starting with auto-mode rejection prefix → true', () => {
+    expect(
+      isClassifierDenial(
+        'Permission for this action has been denied. Reason: not safe',
+      ),
+    ).toBe(true)
+  })
+
+  test('plain rejection text → false', () => {
+    expect(
+      isClassifierDenial('Permission to use Bash has been denied.'),
+    ).toBe(false)
+  })
+
+  test('empty string → false', () => {
+    expect(isClassifierDenial('')).toBe(false)
+  })
+
+  test('whitespace before prefix → false (strict startsWith)', () => {
+    expect(
+      isClassifierDenial(
+        ' Permission for this action has been denied. Reason: x',
+      ),
+    ).toBe(false)
+  })
+
+  test('case mismatch → false', () => {
+    expect(
+      isClassifierDenial('PERMISSION FOR THIS ACTION HAS BEEN DENIED.'),
+    ).toBe(false)
+  })
+})
+
+describe('buildYoloRejectionMessage — formatting', () => {
+  let buildYoloRejectionMessage: typeof import('../messages.js').buildYoloRejectionMessage
+  let isClassifierDenial: typeof import('../messages.js').isClassifierDenial
+  beforeAll(async () => {
+    ;({ buildYoloRejectionMessage, isClassifierDenial } = await import(
+      '../messages.js'
+    ))
+  })
+
+  test('output starts with the auto-mode rejection prefix', () => {
+    const msg = buildYoloRejectionMessage('command modifies system')
+    // CRITICAL: isClassifierDenial(buildYoloRejectionMessage(...)) must
+    // round-trip to true.
+    expect(isClassifierDenial(msg)).toBe(true)
+  })
+
+  test('reason is included verbatim', () => {
+    const msg = buildYoloRejectionMessage('writes outside workspace')
+    expect(msg).toContain('writes outside workspace')
+  })
+
+  test('mentions permission-rule guidance', () => {
+    const msg = buildYoloRejectionMessage('test')
+    expect(msg.toLowerCase()).toMatch(/permission rule|bash/i)
+  })
+})
+
+describe('buildClassifierUnavailableMessage', () => {
+  let buildClassifierUnavailableMessage: typeof import('../messages.js').buildClassifierUnavailableMessage
+  beforeAll(async () => {
+    ;({ buildClassifierUnavailableMessage } = await import('../messages.js'))
+  })
+
+  test('mentions both tool name and classifier model', () => {
+    const msg = buildClassifierUnavailableMessage('Bash', 'haiku-4-5')
+    expect(msg).toContain('Bash')
+    expect(msg).toContain('haiku-4-5')
+  })
+
+  test('mentions read-only operations as still available', () => {
+    const msg = buildClassifierUnavailableMessage('Bash', 'haiku-4-5')
+    expect(msg).toMatch(/read-only|reading files|search/i)
+  })
+})
+
 describe('isToolUseRequestMessage / isToolUseResultMessage — type guards', () => {
   let isToolUseRequestMessage: typeof import('../messages.js').isToolUseRequestMessage
   let isToolUseResultMessage: typeof import('../messages.js').isToolUseResultMessage
