@@ -11,7 +11,7 @@ import type {
 import { permissionRuleValueToString } from '../permissionRuleParser.js'
 import type { Theme } from '@anthropic/ink'
 
-export type PermissionRuleExplanationProps = {
+type PermissionRuleExplanationProps = {
   permissionResult: PermissionDecision
   toolType: 'tool' | 'command' | 'edit' | 'read'
 }

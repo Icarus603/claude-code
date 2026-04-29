@@ -46,7 +46,7 @@ type Props = {
 // Lighter than tool.renderToolUseMessage (no registry lookup / schema parse).
 // Collapses whitespace so multi-line inputs (e.g. Bash command text)
 // render on one line.
-export function formatToolUseSummary(name: string, input: unknown): string {
+function formatToolUseSummary(name: string, input: unknown): string {
   // plan_ready phase is only reached via ExitPlanMode tool
   if (name === EXIT_PLAN_MODE_V2_TOOL_NAME) {
     return 'Review the plan in Claude Code on the web'

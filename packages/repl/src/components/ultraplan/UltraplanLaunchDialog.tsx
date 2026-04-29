@@ -150,4 +150,3 @@ export function UltraplanLaunchDialog({ onChoice }: UltraplanLaunchDialogProps):
   );
 }
 
-export default UltraplanLaunchDialog;

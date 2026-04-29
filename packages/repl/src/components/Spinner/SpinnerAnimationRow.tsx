@@ -26,7 +26,7 @@ const THINKING_INACTIVE_SHIMMER = { r: 185, g: 185, b: 185 }
 const THINKING_DELAY_MS = 3000
 const THINKING_GLOW_PERIOD_S = 2
 
-export type SpinnerAnimationRowProps = {
+type SpinnerAnimationRowProps = {
   // Animation inputs
   mode: SpinnerMode
   reducedMotion: boolean

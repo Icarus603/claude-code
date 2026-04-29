@@ -40,7 +40,7 @@ export function confirmOverage(): void {
   sessionOverageConfirmed = true
 }
 
-export type OverageGate =
+type OverageGate =
   | { kind: 'proceed'; billingNote: string }
   | { kind: 'not-enabled' }
   | { kind: 'low-balance'; available: number }

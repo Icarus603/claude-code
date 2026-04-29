@@ -180,7 +180,7 @@ async function detectWindowsTerminal(): Promise<TerminalInfo> {
 /**
  * Detect the user's preferred terminal emulator.
  */
-export async function detectTerminal(): Promise<TerminalInfo | null> {
+async function detectTerminal(): Promise<TerminalInfo | null> {
   switch (process.platform) {
     case 'darwin':
       return detectMacosTerminal()

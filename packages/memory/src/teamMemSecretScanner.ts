@@ -34,7 +34,7 @@ type SecretRule = {
   flags?: string
 }
 
-export type SecretMatch = {
+type SecretMatch = {
   /** Gitleaks rule ID that matched (e.g., "github-pat", "aws-access-token") */
   ruleId: string
   /** Human-readable label derived from the rule ID */

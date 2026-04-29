@@ -10,7 +10,7 @@ export type PrReviewState =
   | 'merged'
   | 'closed'
 
-export type PrStatus = {
+type PrStatus = {
   number: number
   url: string
   reviewState: PrReviewState
@@ -23,7 +23,7 @@ const GH_TIMEOUT_MS = 5000
  * Draft PRs always show as 'draft' regardless of reviewDecision.
  * reviewDecision can be: APPROVED, CHANGES_REQUESTED, REVIEW_REQUIRED, or empty string.
  */
-export function deriveReviewState(
+function deriveReviewState(
   isDraft: boolean,
   reviewDecision: string,
 ): PrReviewState {

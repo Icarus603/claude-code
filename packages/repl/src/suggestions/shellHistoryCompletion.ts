@@ -4,7 +4,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 /**
  * Result of shell history completion lookup
  */
-export type ShellHistoryMatch = {
+type ShellHistoryMatch = {
   /** The full command from history */
   fullCommand: string
   /** The suffix to display as ghost text (the part after user's input) */
@@ -54,14 +54,6 @@ async function getShellHistoryCommands(): Promise<string[]> {
   shellHistoryCache = commands
   shellHistoryCacheTimestamp = now
   return commands
-}
-
-/**
- * Clear the shell history cache (useful when history is updated)
- */
-export function clearShellHistoryCache(): void {
-  shellHistoryCache = null
-  shellHistoryCacheTimestamp = 0
 }
 
 /**

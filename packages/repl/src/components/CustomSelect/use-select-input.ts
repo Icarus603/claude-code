@@ -9,7 +9,7 @@ import {
 import type { OptionWithDescription } from './select.js'
 import type { SelectState } from './use-select-state.js'
 
-export type UseSelectProps<T> = {
+type UseSelectProps<T> = {
   /**
    * When disabled, user input is ignored.
    *

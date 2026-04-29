@@ -74,7 +74,7 @@ import {
 // install.sh / install.ps1 use the same number, so manual + native flows
 // agree on disk footprint. With 2: active running version + one prior for
 // rollback.
-export const VERSION_RETENTION_COUNT = 2
+const VERSION_RETENTION_COUNT = 2
 
 // 7 days in milliseconds - used for mtime-based lock stale timeout.
 // This is long enough to survive laptop sleep durations while still
@@ -87,7 +87,6 @@ export type SetupMessage = {
   type: 'path' | 'alias' | 'info' | 'error'
 }
 
-export { getBinaryName, getPlatform } from './platform.js'
 import { getBinaryName, getPlatform } from './platform.js'
 
 function getBaseDirectories() {
@@ -608,7 +607,7 @@ async function updateLatest(
 }
 
 // Exported for testing
-export async function removeDirectoryIfEmpty(path: string): Promise<void> {
+async function removeDirectoryIfEmpty(path: string): Promise<void> {
   // rmdir alone handles all cases: ENOTDIR if path is a file, ENOTEMPTY if
   // directory is non-empty, ENOENT if missing. No need to stat+readdir first.
   try {

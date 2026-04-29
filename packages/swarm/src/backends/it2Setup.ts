@@ -16,7 +16,7 @@ export type PythonPackageManager = 'uvx' | 'pipx' | 'pip'
 /**
  * Result of attempting to install it2.
  */
-export type It2InstallResult = {
+type It2InstallResult = {
   success: boolean
   error?: string
   packageManager?: PythonPackageManager
@@ -25,7 +25,7 @@ export type It2InstallResult = {
 /**
  * Result of verifying it2 setup.
  */
-export type It2VerifyResult = {
+type It2VerifyResult = {
   success: boolean
   error?: string
   needsPythonApiEnabled?: boolean
@@ -76,7 +76,7 @@ export async function detectPythonPackageManager(): Promise<PythonPackageManager
  *
  * @returns true if it2 is available
  */
-export async function isIt2CliAvailable(): Promise<boolean> {
+async function isIt2CliAvailable(): Promise<boolean> {
   const result = await execFileNoThrow('which', ['it2'])
   return result.code === 0
 }

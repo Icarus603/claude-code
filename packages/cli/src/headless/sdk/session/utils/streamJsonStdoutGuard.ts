@@ -5,7 +5,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
  * Sentinel written to stderr ahead of any diverted non-JSON line, so that
  * log scrapers and tests can grep for guard activity.
  */
-export const STDOUT_GUARD_MARKER = '[stdout-guard]'
+const STDOUT_GUARD_MARKER = '[stdout-guard]'
 
 let installed = false
 let buffer = ''
@@ -109,15 +109,3 @@ export function installStreamJsonStdoutGuard(): void {
   })
 }
 
-/**
- * Testing-only reset. Restores the real stdout.write and clears the line
- * buffer so subsequent tests start from a clean slate.
- */
-export function _resetStreamJsonStdoutGuardForTesting(): void {
-  if (originalWrite) {
-    process.stdout.write = originalWrite
-    originalWrite = null
-  }
-  buffer = ''
-  installed = false
-}

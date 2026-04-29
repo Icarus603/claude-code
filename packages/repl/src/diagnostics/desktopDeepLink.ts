@@ -126,7 +126,7 @@ async function getDesktopVersion(): Promise<string | null> {
   return null
 }
 
-export type DesktopInstallStatus =
+type DesktopInstallStatus =
   | { status: 'not-installed' }
   | { status: 'version-too-old'; version: string }
   | { status: 'ready'; version: string }

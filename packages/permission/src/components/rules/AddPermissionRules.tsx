@@ -27,7 +27,7 @@ import { plural } from '@claude-code/output/utils/stringUtils.js'
 import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 import { PermissionRuleDescription } from './PermissionRuleDescription.js'
 
-export function optionForPermissionSaveDestination(
+function optionForPermissionSaveDestination(
   saveDestination: EditableSettingSource,
 ): OptionWithDescription {
   switch (saveDestination) {

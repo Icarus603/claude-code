@@ -3,14 +3,14 @@ import { HostBindingsError } from './errors.js'
 
 export { getMcpToolsCommandsAndResources } from './api.js'
 
-export type MCPResultType = 'toolResult' | 'structuredContent' | 'contentArray'
-export type McpDiscoverySnapshot = {
+type MCPResultType = 'toolResult' | 'structuredContent' | 'contentArray'
+type McpDiscoverySnapshot = {
   clients: unknown[]
   tools: unknown[]
   commands: unknown[]
   resources?: Record<string, unknown[]>
 }
-export type TransformedMCPResult = Record<string, unknown>
+type TransformedMCPResult = Record<string, unknown>
 
 type McpLegacyRuntime = {
   McpAuthError: new (...args: any[]) => Error

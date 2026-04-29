@@ -49,7 +49,7 @@ export function shouldShowOverageCreditUpsell(): boolean {
  * Kick off a background fetch if the cache is empty. Safe to call
  * unconditionally on mount — it no-ops if cache is fresh.
  */
-export function maybeRefreshOverageCreditCache(): void {
+function maybeRefreshOverageCreditCache(): void {
   if (getCachedOverageCreditGrant() !== null) return
   void refreshOverageCreditGrantCache()
 }

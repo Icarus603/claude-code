@@ -3,7 +3,7 @@ import { logError } from '@claude-code/local-observability/logging'
 import { extractTextContent } from '@claude-code/agent/messages.js'
 import { asSystemPrompt } from '@claude-code/provider/systemPromptType.js'
 
-export type DateTimeParseResult =
+type DateTimeParseResult =
   | { success: true; value: string }
   | { success: false; error: string }
 

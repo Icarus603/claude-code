@@ -5,7 +5,7 @@ import type {
 } from '@claude-code/mcp-runtime/types.js'
 import type { Tool } from '@claude-code/tool-registry/Tool.js'
 
-export interface ReconnectResult {
+interface ReconnectResult {
   message: string
   success: boolean
 }

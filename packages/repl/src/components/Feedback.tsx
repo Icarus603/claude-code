@@ -490,7 +490,7 @@ export function Feedback({
   )
 }
 
-export function createGitHubIssueUrl(
+function createGitHubIssueUrl(
   feedbackId: string,
   title: string,
   description: string,

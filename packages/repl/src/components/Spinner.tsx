@@ -23,7 +23,8 @@ import { useTasksV2 } from '../hooks/useTasksV2.js'
 import type { Task } from '@claude-code/agent/tasks.js'
 import { useAppState } from '../appStateHooks.js'
 import { useTerminalSize } from '@anthropic/ink'
-import { getDefaultCharacters, type SpinnerMode } from './Spinner/index.js'
+import { getDefaultCharacters } from './Spinner/utils.js'
+import type { SpinnerMode } from './Spinner/types.js'
 import { SpinnerAnimationRow } from './Spinner/SpinnerAnimationRow.js'
 import { useSettings } from '../hooks/useSettings.js'
 import { isInProcessTeammateTask } from '@claude-code/swarm'
@@ -42,7 +43,7 @@ import {
 import { TeammateSpinnerTree } from './Spinner/TeammateSpinnerTree.js'
 import { useAnimationFrame } from '@anthropic/ink'
 import { getGlobalConfig } from '@claude-code/config'
-export type { SpinnerMode } from './Spinner/index.js'
+export type { SpinnerMode } from './Spinner/types.js'
 
 const DEFAULT_CHARACTERS = getDefaultCharacters()
 

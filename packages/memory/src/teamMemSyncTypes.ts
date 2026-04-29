@@ -26,7 +26,7 @@ const TeamMemoryContentSchema = lazySchema(() =>
 /**
  * Full response from GET /api/claude_code/team_memory
  */
-export const TeamMemoryDataSchema = lazySchema(() =>
+const TeamMemoryDataSchema = lazySchema(() =>
   z.object({
     organizationId: z.string(),
     repo: z.string(),
@@ -44,7 +44,7 @@ export const TeamMemoryDataSchema = lazySchema(() =>
  * too-many-entries case; entry-too-large is handled via MAX_FILE_SIZE_BYTES
  * pre-check on the client side and would need a separate schema.
  */
-export const TeamMemoryTooManyEntriesSchema = lazySchema(() =>
+const TeamMemoryTooManyEntriesSchema = lazySchema(() =>
   z.object({
     error: z.object({
       details: z.object({
@@ -74,7 +74,7 @@ export type SkippedSecretFile = {
 /**
  * Result from fetching team memory
  */
-export type TeamMemorySyncFetchResult = {
+type TeamMemorySyncFetchResult = {
   success: boolean
   data?: TeamMemoryData
   isEmpty?: boolean // true if 404 (no data exists)
@@ -91,7 +91,7 @@ export type TeamMemorySyncFetchResult = {
  * Contains per-key checksums without entry bodies. Used to refresh
  * serverChecksums cheaply during 412 conflict resolution.
  */
-export type TeamMemoryHashesResult = {
+type TeamMemoryHashesResult = {
   success: boolean
   version?: number
   checksum?: string
@@ -126,7 +126,7 @@ export type TeamMemorySyncPushResult = {
 /**
  * Result from uploading team memory
  */
-export type TeamMemorySyncUploadResult = {
+type TeamMemorySyncUploadResult = {
   success: boolean
   checksum?: string
   lastModified?: string

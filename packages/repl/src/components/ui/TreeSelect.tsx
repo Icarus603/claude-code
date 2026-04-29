@@ -20,7 +20,7 @@ type FlattenedNode<T> = {
   parentId?: string | number
 }
 
-export type TreeSelectProps<T> = {
+type TreeSelectProps<T> = {
   /**
    * Tree nodes to display.
    */

@@ -252,7 +252,7 @@ function MessageRowImpl({
  * Checks if a message is "streaming" - i.e., its content may still be changing.
  * Exported for testing.
  */
-export function isMessageStreaming(
+function isMessageStreaming(
   msg: RenderableMessage,
   streamingToolUseIDs: Set<string>,
 ): boolean {
@@ -274,7 +274,7 @@ export function isMessageStreaming(
  * Checks if all tools in a message are resolved.
  * Exported for testing.
  */
-export function allToolsResolved(
+function allToolsResolved(
   msg: RenderableMessage,
   resolvedToolUseIDs: Set<string>,
 ): boolean {
@@ -304,7 +304,7 @@ export function allToolsResolved(
  *
  * Exported for testing.
  */
-export function areMessageRowPropsEqual(prev: Props, next: Props): boolean {
+function areMessageRowPropsEqual(prev: Props, next: Props): boolean {
   // Different message reference = content may have changed, must re-render
   if (prev.message !== next.message) return false
 

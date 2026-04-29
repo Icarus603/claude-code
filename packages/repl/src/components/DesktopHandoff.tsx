@@ -11,7 +11,7 @@ import { flushSessionStorage } from '@claude-code/storage/sessionStorage.js'
 
 const DESKTOP_DOCS_URL = 'https://clau.de/desktop'
 
-export function getDownloadUrl(): string {
+function getDownloadUrl(): string {
   switch (process.platform) {
     case 'win32':
       return 'https://claude.ai/api/desktop/win32/x64/exe/latest/redirect'

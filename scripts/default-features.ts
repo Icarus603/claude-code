@@ -13,7 +13,7 @@
  * Features ON by default in dev (`bun run dev`) AND release builds.
  * Stable / shipped functionality.
  */
-export const STABLE_FEATURES = [
+const STABLE_FEATURES = [
   'AGENT_TRIGGERS_REMOTE',
   'CHICAGO_MCP',
   'VOICE_MODE',

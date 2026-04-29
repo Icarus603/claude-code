@@ -8,7 +8,7 @@ import type { OptionWithDescription } from '@claude-code/repl/components/CustomS
 import { generateShellSuggestionsLabel } from '../shellPermissionHelpers.js'
 import { readEnv } from '@claude-code/config/env'
 
-export type BashToolUseOption =
+type BashToolUseOption =
   | 'yes'
   | 'yes-apply-suggestions'
   | 'yes-prefix-edited'

@@ -92,7 +92,7 @@ export type PromptInputHelpers = {
   resetHistory: () => void
 }
 
-export type HandlePromptSubmitParams = BaseExecutionParams & {
+type HandlePromptSubmitParams = BaseExecutionParams & {
   // Direct user input path (set when called from onSubmit, absent for queue processor)
   input?: string
   mode?: PromptInputMode

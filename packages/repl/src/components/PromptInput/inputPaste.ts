@@ -17,7 +17,7 @@ type TruncatedMessage = {
  * @param nextPasteId The reference id to use
  * @returns The new text to display and separate placeholder content if applicable.
  */
-export function maybeTruncateMessageForInput(
+function maybeTruncateMessageForInput(
   text: string,
   nextPasteId: number,
 ): TruncatedMessage {

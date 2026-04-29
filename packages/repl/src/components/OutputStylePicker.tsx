@@ -25,7 +25,7 @@ function mapConfigsToOptions(styles: {
   }))
 }
 
-export type OutputStylePickerProps = {
+type OutputStylePickerProps = {
   initialStyle: OutputStyle
   onComplete: (style: OutputStyle) => void
   onCancel: () => void

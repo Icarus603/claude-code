@@ -593,7 +593,7 @@ async function applySnapshot(
  *
  * Exported for testing.
  */
-export async function checkOriginFileChanged(
+async function checkOriginFileChanged(
   originalFile: string,
   backupFileName: string,
   originalStatsHint?: Stats,

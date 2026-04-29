@@ -21,7 +21,7 @@ type PlanApprovalRequestProps = {
  * Renders a plan approval request with a planMode-colored border,
  * showing the plan content and instructions for approving/rejecting.
  */
-export function PlanApprovalRequestDisplay({
+function PlanApprovalRequestDisplay({
   request,
 }: PlanApprovalRequestProps): React.ReactNode {
   return (
@@ -62,7 +62,7 @@ type PlanApprovalResponseProps = {
 /**
  * Renders a plan approval response with a success (green) or error (red) border.
  */
-export function PlanApprovalResponseDisplay({
+function PlanApprovalResponseDisplay({
   response,
   senderName,
 }: PlanApprovalResponseProps): React.ReactNode {

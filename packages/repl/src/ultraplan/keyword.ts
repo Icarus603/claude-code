@@ -108,10 +108,6 @@ export function hasUltraplanKeyword(text: string): boolean {
   return findUltraplanTriggerPositions(text).length > 0
 }
 
-export function hasUltrareviewKeyword(text: string): boolean {
-  return findUltrareviewTriggerPositions(text).length > 0
-}
-
 /**
  * Replace the first triggerable "ultraplan" with "plan" so the forwarded
  * prompt stays grammatical ("please ultraplan this" → "please plan this").

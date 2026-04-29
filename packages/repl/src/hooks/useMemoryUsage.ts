@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useInterval } from 'usehooks-ts'
 
-export type MemoryUsageStatus = 'normal' | 'high' | 'critical'
+type MemoryUsageStatus = 'normal' | 'high' | 'critical'
 
-export type MemoryUsageInfo = {
+type MemoryUsageInfo = {
   heapUsed: number
   status: MemoryUsageStatus
 }

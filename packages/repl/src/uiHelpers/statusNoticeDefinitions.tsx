@@ -30,7 +30,7 @@ import {
 import { isJetBrainsPluginInstalledCachedSync } from '@claude-code/agent/jetbrains.js'
 
 // Types
-export type StatusNoticeType = 'warning' | 'info'
+type StatusNoticeType = 'warning' | 'info'
 
 export type StatusNoticeContext = {
   config: ReturnType<typeof getGlobalConfig>
@@ -248,7 +248,7 @@ const jetbrainsPluginNotice: StatusNoticeDefinition = {
 
 
 // All notice definitions
-export const statusNoticeDefinitions: StatusNoticeDefinition[] = [
+const statusNoticeDefinitions: StatusNoticeDefinition[] = [
   largeMemoryFilesNotice,
   largeAgentDescriptionsNotice,
   claudeAiSubscriberExternalTokenNotice,

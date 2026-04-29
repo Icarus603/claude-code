@@ -178,7 +178,7 @@ type UseTypeaheadResult = {
  * @param completionToken The completion token
  * @returns The search token with @ and quotes removed
  */
-export function extractSearchToken(completionToken: {
+function extractSearchToken(completionToken: {
   token: string
   isQuoted?: boolean
 }): string {
@@ -203,7 +203,7 @@ export function extractSearchToken(completionToken: {
  * @param options.isComplete Whether this is a complete suggestion (adds trailing space)
  * @returns The formatted replacement value
  */
-export function formatReplacementValue(options: {
+function formatReplacementValue(options: {
   displayText: string
   mode: string
   hasAtPrefix: boolean
@@ -232,7 +232,7 @@ export function formatReplacementValue(options: {
 /**
  * Apply a shell completion suggestion by replacing the current word
  */
-export function applyShellSuggestion(
+function applyShellSuggestion(
   suggestion: SuggestionItem,
   input: string,
   cursorOffset: number,
@@ -321,7 +321,7 @@ async function generateBashSuggestions(
  * @param isDirectory Whether the suggestion is a directory (adds / suffix) or file (adds space)
  * @returns Object with the new input text and cursor position
  */
-export function applyDirectorySuggestion(
+function applyDirectorySuggestion(
   input: string,
   suggestionId: string,
   tokenStartPos: number,
@@ -349,7 +349,7 @@ export function applyDirectorySuggestion(
  * @param includeAtSymbol Whether to consider @ symbol as part of the token
  * @returns The completable token and its start position, or null if not found
  */
-export function extractCompletionToken(
+function extractCompletionToken(
   text: string,
   cursorPos: number,
   includeAtSymbol = false,

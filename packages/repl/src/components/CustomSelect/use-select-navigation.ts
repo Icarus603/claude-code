@@ -329,7 +329,7 @@ const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
   }
 }
 
-export type UseSelectNavigationProps<T> = {
+type UseSelectNavigationProps<T> = {
   /**
    * Number of items to display.
    *
@@ -358,7 +358,7 @@ export type UseSelectNavigationProps<T> = {
   focusValue?: T
 }
 
-export type SelectNavigation<T> = {
+type SelectNavigation<T> = {
   /**
    * Value of the currently focused option.
    */

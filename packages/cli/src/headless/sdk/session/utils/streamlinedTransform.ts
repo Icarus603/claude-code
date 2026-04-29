@@ -197,11 +197,3 @@ export function createStreamlinedTransformer(): (
     }
   }
 }
-
-/**
- * Check if a message should be included in streamlined output.
- * Useful for filtering before transformation.
- */
-export function shouldIncludeInStreamlined(message: StdoutMessage): boolean {
-  return message.type === 'assistant' || message.type === 'result'
-}

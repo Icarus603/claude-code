@@ -20,7 +20,7 @@ type UpsellParams = {
   hasBillingAccess: boolean
 }
 
-export function getUpsellMessage({
+function getUpsellMessage({
   shouldShowUpsell,
   isMax20x,
   isExtraUsageCommandEnabled,

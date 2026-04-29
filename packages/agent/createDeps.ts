@@ -68,7 +68,7 @@ type CanUseToolFn = (
   toolUseId: string,
 ) => Promise<{ behavior: 'allow' | 'deny' | 'ask'; updatedInput?: unknown }>
 
-export interface CreateDepsParams {
+interface CreateDepsParams {
   tools: RuntimeTool[]
   toolUseContext: RuntimeToolUseContext
   canUseTool: CanUseToolFn

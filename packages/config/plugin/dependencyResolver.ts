@@ -50,7 +50,7 @@ function qualifyDependency(
  * narrow means the resolver stays testable without constructing full
  * PluginMarketplaceEntry objects.
  */
-export type DependencyLookupResult = {
+type DependencyLookupResult = {
   // Entries may be bare names; qualifyDependency normalizes them.
   dependencies?: string[]
 }

@@ -20,7 +20,7 @@ export type ModeState =
   | ({ mode: 'edit-agent' } & WithAgent & WithPreviousMode)
   | ({ mode: 'delete-confirm' } & WithAgent & WithPreviousMode)
 
-export type AgentValidationResult = {
+type AgentValidationResult = {
   isValid: boolean
   warnings: string[]
   errors: string[]

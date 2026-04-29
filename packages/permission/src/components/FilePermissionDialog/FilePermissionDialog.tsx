@@ -27,7 +27,7 @@ import {
   useFilePermissionDialog,
 } from './useFilePermissionDialog.js'
 
-export type FilePermissionDialogProps<T extends ToolInput = ToolInput> = {
+type FilePermissionDialogProps<T extends ToolInput = ToolInput> = {
   // Required props from PermissionRequestProps
   toolUseConfirm: ToolUseConfirm
   toolUseContext: ToolUseContext

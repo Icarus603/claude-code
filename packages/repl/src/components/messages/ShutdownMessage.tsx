@@ -15,7 +15,7 @@ type ShutdownRequestProps = {
 /**
  * Renders a shutdown request with a warning-colored border.
  */
-export function ShutdownRequestDisplay({
+function ShutdownRequestDisplay({
   request,
 }: ShutdownRequestProps): React.ReactNode {
   return (
@@ -49,7 +49,7 @@ type ShutdownRejectedProps = {
 /**
  * Renders a shutdown rejected message with a subtle (grey) border.
  */
-export function ShutdownRejectedDisplay({
+function ShutdownRejectedDisplay({
   response,
 }: ShutdownRejectedProps): React.ReactNode {
   return (

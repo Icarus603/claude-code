@@ -24,10 +24,10 @@ import { getBinaryName, getPlatform } from './platform.js'
 
 const GCS_BUCKET_URL =
   'https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases'
-export const ARTIFACTORY_REGISTRY_URL =
+const ARTIFACTORY_REGISTRY_URL =
   'https://artifactory.infra.ant.dev/artifactory/api/npm/npm-all/'
 
-export async function getLatestVersionFromArtifactory(
+async function getLatestVersionFromArtifactory(
   tag: string = 'latest',
 ): Promise<string> {
   const startTime = Date.now()
@@ -69,44 +69,6 @@ export async function getLatestVersionFromArtifactory(
   )
   const latestVersion = stdout.trim()
   return latestVersion
-}
-
-export async function getLatestVersionFromBinaryRepo(
-  channel: ReleaseChannel = 'latest',
-  baseUrl: string,
-  authConfig?: { auth: { username: string; password: string } },
-): Promise<string> {
-  const startTime = Date.now()
-  try {
-    const response = await axios.get(`${baseUrl}/${channel}`, {
-      timeout: 30000,
-      responseType: 'text',
-      ...authConfig,
-    })
-    const latencyMs = Date.now() - startTime
-    logEvent('tengu_version_check_success', {
-      latency_ms: latencyMs,
-    })
-    return response.data.trim()
-  } catch (error) {
-    const latencyMs = Date.now() - startTime
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    let httpStatus: number | undefined
-    if (axios.isAxiosError(error) && error.response) {
-      httpStatus = error.response.status
-    }
-
-    logEvent('tengu_version_check_failure', {
-      latency_ms: latencyMs,
-      http_status: httpStatus,
-      is_timeout: errorMessage.includes('timeout'),
-    })
-    const fetchError = new Error(
-      `Failed to fetch version from ${baseUrl}/${channel}: ${errorMessage}`,
-    )
-    logError(fetchError)
-    throw fetchError
-  }
 }
 
 export async function getLatestVersion(
@@ -153,7 +115,7 @@ export async function getLatestVersion(
   return tag.startsWith('v') ? tag.slice(1) : tag
 }
 
-export async function downloadVersionFromArtifactory(
+async function downloadVersionFromArtifactory(
   version: string,
   stagingPath: string,
 ) {
@@ -388,7 +350,7 @@ async function downloadAndVerifyBinary(
   throw lastError ?? new Error('Download failed after all retries')
 }
 
-export async function downloadVersionFromBinaryRepo(
+async function downloadVersionFromBinaryRepo(
   version: string,
   stagingPath: string,
   baseUrl: string,
@@ -593,7 +555,3 @@ async function downloadVersionFromGithubReleases(
   }
 }
 
-// Exported for testing
-export { StallTimeoutError, MAX_DOWNLOAD_RETRIES }
-export const STALL_TIMEOUT_MS = DEFAULT_STALL_TIMEOUT_MS
-export const _downloadAndVerifyBinaryForTesting = downloadAndVerifyBinary

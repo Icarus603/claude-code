@@ -4,7 +4,7 @@ import { shouldShowAlwaysAllowOptions } from '../../permissionsLoader.js'
 import type { OptionWithDescription } from '@claude-code/repl/components/CustomSelect/select.js'
 import { generateShellSuggestionsLabel } from '../shellPermissionHelpers.js'
 
-export type PowerShellToolUseOption =
+type PowerShellToolUseOption =
   | 'yes'
   | 'yes-apply-suggestions'
   | 'yes-prefix-edited'

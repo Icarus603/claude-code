@@ -27,7 +27,7 @@ import {
   type MarketplaceSource,
 } from './schemas.js'
 
-export type MarketplaceDiff = {
+type MarketplaceDiff = {
   /** Declared in settings, absent from known_marketplaces.json */
   missing: string[]
   /** Present in both, but settings source ≠ JSON source (settings wins) */
@@ -82,13 +82,13 @@ export function diffMarketplaces(
   return { missing, sourceChanged, upToDate }
 }
 
-export type ReconcileOptions = {
+type ReconcileOptions = {
   /** Skip a declared marketplace. Used by zip-cache mode for unsupported source types. */
   skip?: (name: string, source: MarketplaceSource) => boolean
   onProgress?: (event: ReconcileProgressEvent) => void
 }
 
-export type ReconcileProgressEvent =
+type ReconcileProgressEvent =
   | {
       type: 'installing'
       name: string
@@ -99,7 +99,7 @@ export type ReconcileProgressEvent =
   | { type: 'installed'; name: string; alreadyMaterialized: boolean }
   | { type: 'failed'; name: string; error: string }
 
-export type ReconcileResult = {
+type ReconcileResult = {
   installed: string[]
   updated: string[]
   failed: Array<{ name: string; error: string }>

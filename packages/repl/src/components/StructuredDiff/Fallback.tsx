@@ -99,7 +99,7 @@ export function StructuredDiffFallback({
 }
 
 // Transform lines to line objects with type information
-export function transformLinesToObjects(lines: string[]): LineObject[] {
+function transformLinesToObjects(lines: string[]): LineObject[] {
   return lines.map(code => {
     if (code.startsWith('+')) {
       return {
@@ -127,7 +127,7 @@ export function transformLinesToObjects(lines: string[]): LineObject[] {
 }
 
 // Group adjacent add/remove lines for word-level diffing
-export function processAdjacentLines(lineObjects: LineObject[]): LineObject[] {
+function processAdjacentLines(lineObjects: LineObject[]): LineObject[] {
   const processedLines: LineObject[] = []
   let i = 0
 
@@ -205,7 +205,7 @@ export function processAdjacentLines(lineObjects: LineObject[]): LineObject[] {
 }
 
 // Calculate word-level diffs between two text strings
-export function calculateWordDiffs(
+function calculateWordDiffs(
   oldText: string,
   newText: string,
 ): DiffPart[] {
@@ -475,7 +475,7 @@ function formatDiff(
   })
 }
 
-export function numberDiffLines(
+function numberDiffLines(
   diff: LineObject[],
   startLine: number,
 ): DiffLine[] {

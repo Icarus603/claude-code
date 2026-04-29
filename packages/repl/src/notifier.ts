@@ -7,7 +7,7 @@ import { logError } from '@claude-code/local-observability/log.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 
-export type NotificationOptions = {
+type NotificationOptions = {
   message: string
   title?: string
   notificationType: string

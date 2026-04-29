@@ -9,7 +9,7 @@ import { getSSLErrorHint } from '@claude-code/provider/errorUtils.js'
 import { getUserAgent } from '@claude-code/provider/http.js'
 import { logError } from '@claude-code/local-observability/log.js'
 
-export interface PreflightCheckResult {
+interface PreflightCheckResult {
   success: boolean
   error?: string
   sslHint?: string

@@ -18,7 +18,7 @@ import {
 } from '@claude-code/local-observability'
 import { OFFICIAL_MARKETPLACE_NAME } from './officialMarketplace.js'
 
-export type PluginFetchSource =
+type PluginFetchSource =
   | 'install_counts'
   | 'marketplace_clone'
   | 'marketplace_pull'
@@ -26,7 +26,7 @@ export type PluginFetchSource =
   | 'plugin_clone'
   | 'mcpb'
 
-export type PluginFetchOutcome = 'success' | 'failure' | 'cache_hit'
+type PluginFetchOutcome = 'success' | 'failure' | 'cache_hit'
 
 // Allowlist of public hosts we report by name. Anything else (enterprise
 // git, self-hosted, internal) is bucketed as 'other' — we don't want

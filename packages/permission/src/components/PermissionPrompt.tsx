@@ -26,7 +26,7 @@ export type ToolAnalyticsContext = {
   isMcp: boolean
 }
 
-export type PermissionPromptProps<T extends string> = {
+type PermissionPromptProps<T extends string> = {
   options: PermissionPromptOption<T>[]
   onSelect: (value: T, feedback?: string) => void
   onCancel?: () => void

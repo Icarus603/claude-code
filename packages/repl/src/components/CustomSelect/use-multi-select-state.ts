@@ -9,7 +9,7 @@ import {
 import type { OptionWithDescription } from './select.js'
 import { useSelectNavigation } from './use-select-navigation.js'
 
-export type UseMultiSelectStateProps<T> = {
+type UseMultiSelectStateProps<T> = {
   /**
    * When disabled, user input is ignored.
    *
@@ -91,7 +91,7 @@ export type UseMultiSelectStateProps<T> = {
   hideIndexes?: boolean
 }
 
-export type MultiSelectState<T> = {
+type MultiSelectState<T> = {
   /**
    * Value of the currently focused option.
    */

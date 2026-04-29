@@ -123,7 +123,7 @@ const JwtBearerResponseSchema = lazySchema(() =>
 
 // ─── Layer 2: Discovery ─────────────────────────────────────────────────────
 
-export type ProtectedResourceMetadata = {
+type ProtectedResourceMetadata = {
   resource: string
   authorization_servers: string[]
 }
@@ -211,7 +211,7 @@ async function discoverAuthorizationServer(
 
 // ─── Layer 2: Exchange ──────────────────────────────────────────────────────
 
-export type JwtAuthGrantResult = {
+type JwtAuthGrantResult = {
   /** The ID-JAG (Identity Assertion Authorization Grant) */
   jwtAuthGrant: string
   expiresIn?: number
@@ -309,7 +309,7 @@ async function requestJwtAuthorizationGrant(opts: {
   }
 }
 
-export type XaaTokenResult = {
+type XaaTokenResult = {
   access_token: string
   token_type: string
   expires_in?: number
@@ -317,7 +317,7 @@ export type XaaTokenResult = {
   refresh_token?: string
 }
 
-export type XaaResult = XaaTokenResult & {
+type XaaResult = XaaTokenResult & {
   /**
    * The AS issuer URL discovered via PRM. Callers must persist this as
    * `discoveryState.authorizationServerUrl` so that refresh (auth.ts _doRefresh)
@@ -399,7 +399,7 @@ async function exchangeJwtAuthGrant(opts: {
  * Config needed to run the full XAA orchestrator.
  * Mirrors the conformance test context shape (see ClientConformanceContextSchema).
  */
-export type XaaConfig = {
+type XaaConfig = {
   /** Client ID registered at the MCP server's authorization server */
   clientId: string
   /** Client secret for the MCP server's authorization server */

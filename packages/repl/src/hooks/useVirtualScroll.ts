@@ -57,7 +57,7 @@ const SLIDE_STEP = 25
 
 const NOOP_UNSUB = () => {}
 
-export type VirtualScrollResult = {
+type VirtualScrollResult = {
   /** [startIndex, endIndex) half-open slice of items to render. */
   range: readonly [number, number]
   /** Height (rows) of spacer before the first rendered item. */

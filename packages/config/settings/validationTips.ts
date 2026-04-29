@@ -3,12 +3,12 @@ import type { ZodIssueCode } from 'zod/v4'
 // v4 ZodIssueCode is a value, not a type - use typeof to get the type
 type ZodIssueCodeType = (typeof ZodIssueCode)[keyof typeof ZodIssueCode]
 
-export type ValidationTip = {
+type ValidationTip = {
   suggestion?: string
   docLink?: string
 }
 
-export type TipContext = {
+type TipContext = {
   path: string
   code: ZodIssueCodeType | string
   expected?: string

@@ -10,14 +10,14 @@ import { markMessageAsReadByIndex, readMailbox, writeToMailbox } from '../mailbo
 import { readTeamFileAsync } from '../core/teamHelpers.js'
 import type { SwarmHostDeps } from '../types/deps.js'
 
-export type SwarmAgentIdentity = {
+type SwarmAgentIdentity = {
   teammateId: string
   name: string
   teamId: string
   role: 'worker' | 'leader'
 }
 
-export type BuildSwarmAgentDepsOptions = {
+type BuildSwarmAgentDepsOptions = {
   host: SwarmHostDeps
   identity: SwarmAgentIdentity
 }

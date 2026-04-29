@@ -280,7 +280,7 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
   )
 }
 
-export function SkippableStep({
+function SkippableStep({
   skip,
   onSkip,
   children,

@@ -6,7 +6,7 @@ import type {
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { getAgentSourceDisplayName } from './utils.js'
 
-export type AgentValidationResult = {
+type AgentValidationResult = {
   isValid: boolean
   errors: string[]
   warnings: string[]

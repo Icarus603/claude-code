@@ -6,7 +6,7 @@ const POLL_INTERVAL_MS = 60_000
 const SLOW_GH_THRESHOLD_MS = 4_000
 const IDLE_STOP_MS = 60 * 60_000 // stop polling after 60 min idle
 
-export type PrStatusState = {
+type PrStatusState = {
   number: number | null
   url: string | null
   reviewState: PrReviewState | null

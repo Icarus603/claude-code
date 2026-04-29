@@ -5,7 +5,7 @@
 
 import { execFileSync } from 'child_process'
 
-export interface IDEPathConverter {
+interface IDEPathConverter {
   /**
    * Convert path from IDE format to Claude's local format
    * Used when reading workspace folders from IDE lockfile

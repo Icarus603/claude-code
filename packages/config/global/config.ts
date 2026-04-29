@@ -107,11 +107,6 @@ export type PastedContent = {
   sourcePath?: string // Original file path for images dragged onto the terminal
 }
 
-export interface SerializedStructuredHistoryEntry {
-  display: string
-  pastedContents?: Record<number, PastedContent>
-  pastedText?: string
-}
 export interface HistoryEntry {
   display: string
   pastedContents: Record<number, PastedContent>
@@ -755,7 +750,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'remoteDialogSeen',
 ] as const
 
-export type GlobalConfigKey = (typeof GLOBAL_CONFIG_KEYS)[number]
+type GlobalConfigKey = (typeof GLOBAL_CONFIG_KEYS)[number]
 
 export function isGlobalConfigKey(key: string): key is GlobalConfigKey {
   return GLOBAL_CONFIG_KEYS.includes(key as GlobalConfigKey)
@@ -767,7 +762,7 @@ export const PROJECT_CONFIG_KEYS = [
   'hasCompletedProjectOnboarding',
 ] as const
 
-export type ProjectConfigKey = (typeof PROJECT_CONFIG_KEYS)[number]
+type ProjectConfigKey = (typeof PROJECT_CONFIG_KEYS)[number]
 
 /**
  * Check if the user has already accepted the trust dialog for the cwd.
@@ -1803,7 +1798,7 @@ export function shouldSkipPluginAutoupdate(): boolean {
   )
 }
 
-export type AutoUpdaterDisabledReason =
+type AutoUpdaterDisabledReason =
   | { type: 'development' }
   | { type: 'env'; envVar: string }
   | { type: 'config' }

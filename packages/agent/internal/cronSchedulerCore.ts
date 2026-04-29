@@ -41,7 +41,7 @@ const LOCK_PROBE_INTERVAL_MS = 5000
  * Extracted for testability — the scheduler's check() is buried under
  * setInterval/chokidar/lock machinery.
  */
-export function isRecurringTaskAged(
+function isRecurringTaskAged(
   t: CronTask,
   nowMs: number,
   maxAgeMs: number,
@@ -524,7 +524,7 @@ export function createCronScheduler(
  * confirmation, and tasks are already deleted from JSON before the model
  * sees this notification.
  */
-export function buildMissedTaskNotification(missed: CronTask[]): string {
+function buildMissedTaskNotification(missed: CronTask[]): string {
   const plural = missed.length > 1
   const header =
     `The following one-shot scheduled task${plural ? 's were' : ' was'} missed while Claude was not running. ` +

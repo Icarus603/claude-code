@@ -12,7 +12,7 @@ type Props = {
 /**
  * Renders a task assignment with a cyan border (team-related color).
  */
-export function TaskAssignmentDisplay({ assignment }: Props): React.ReactNode {
+function TaskAssignmentDisplay({ assignment }: Props): React.ReactNode {
   return (
     <Box flexDirection="column" marginY={1}>
       <Box

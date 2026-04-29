@@ -82,7 +82,7 @@ type AttachmentListProps = {
   attachments: Output['attachments']
 }
 
-export function AttachmentList({
+function AttachmentList({
   attachments,
 }: AttachmentListProps): React.ReactNode {
   if (!attachments || attachments.length === 0) {

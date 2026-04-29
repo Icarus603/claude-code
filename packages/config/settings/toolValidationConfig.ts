@@ -5,7 +5,7 @@
  * Only add your tool here if it has special pattern requirements.
  */
 
-export type ToolValidationConfig = {
+type ToolValidationConfig = {
   /** Tools that accept file glob patterns (e.g., *.ts, src/**) */
   filePatternTools: string[]
 

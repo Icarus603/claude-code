@@ -5,7 +5,7 @@ import { getClaudeConfigHomeDir } from "@claude-code/config/env/utils";
 
 const MCP_AUTH_CACHE_TTL_MS = 15 * 60 * 1000;
 
-export type McpAuthCacheData = Record<string, { timestamp: number }>;
+type McpAuthCacheData = Record<string, { timestamp: number }>;
 
 export function getMcpAuthCachePath(): string {
 	return `${getClaudeConfigHomeDir()}/mcp-needs-auth-cache.json`;

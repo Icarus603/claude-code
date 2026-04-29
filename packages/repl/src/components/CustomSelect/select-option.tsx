@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react'
 import { ListItem } from '@anthropic/ink'
 
-export type SelectOptionProps = {
+type SelectOptionProps = {
   /**
    * Determines if option is focused.
    */

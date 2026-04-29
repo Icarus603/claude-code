@@ -42,7 +42,7 @@ const FRICTION_PATTERNS = [
   /\b(undo|revert) (that|this|it|what you)\b/i,
 ]
 
-export function isSessionContainerCompatible(messages: Message[]): boolean {
+function isSessionContainerCompatible(messages: Message[]): boolean {
   for (const msg of messages) {
     if (msg.type !== 'assistant') {
       continue
@@ -71,7 +71,7 @@ export function isSessionContainerCompatible(messages: Message[]): boolean {
   return true
 }
 
-export function hasFrictionSignal(messages: Message[]): boolean {
+function hasFrictionSignal(messages: Message[]): boolean {
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i]!
     if (msg.type !== 'user') {

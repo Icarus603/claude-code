@@ -124,24 +124,3 @@ export function createHeadlessSession(params: HeadlessSessionParams) {
   }
 }
 
-export async function runHeadless(
-  inputPrompt: string | AsyncIterable<string>,
-  getAppState: HeadlessStateStore['getState'],
-  setAppState: HeadlessStateStore['setState'],
-  commands: Command[],
-  tools: Tools,
-  sdkMcpConfigs: Record<string, McpSdkServerConfig>,
-  agents: AgentDefinition[],
-  options: HeadlessRunOptions,
-): Promise<void> {
-  return getRequiredCliBindings().runHeadless(
-    inputPrompt,
-    getAppState,
-    setAppState,
-    commands,
-    tools,
-    sdkMcpConfigs,
-    agents,
-    options,
-  )
-}

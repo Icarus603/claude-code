@@ -22,7 +22,7 @@ export type InstallablePlugin = {
 /**
  * Menu option for plugin details view
  */
-export type PluginDetailsMenuOption = {
+type PluginDetailsMenuOption = {
   label: string
   action: string
 }

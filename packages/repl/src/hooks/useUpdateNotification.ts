@@ -1,16 +1,8 @@
 import { useRef } from 'react'
 import { major, minor, patch } from 'semver'
 
-export function getSemverPart(version: string): string {
+function getSemverPart(version: string): string {
   return `${major(version, { loose: true })}.${minor(version, { loose: true })}.${patch(version, { loose: true })}`
-}
-
-export function shouldShowUpdateNotification(
-  updatedVersion: string,
-  lastNotifiedSemver: string | null,
-): boolean {
-  const updatedSemver = getSemverPart(updatedVersion)
-  return updatedSemver !== lastNotifiedSemver
 }
 
 // The dedup memory must live in a ref, not useState. Calling setState during

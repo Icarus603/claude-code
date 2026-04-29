@@ -403,5 +403,3 @@ function computeTopLevelEntries(
   return sorted.slice(0, limit).map(path => ({ path, score: 0.0 }))
 }
 
-export default FileIndex
-export type { FileIndex as FileIndexType }

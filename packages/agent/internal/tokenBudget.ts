@@ -2,7 +2,7 @@
 const COMPLETION_THRESHOLD = 0.9
 const DIMINISHING_THRESHOLD = 500
 
-export type BudgetTracker = {
+type BudgetTracker = {
   continuationCount: number
   lastDeltaTokens: number
   lastGlobalTurnTokens: number
@@ -39,7 +39,7 @@ type StopDecision = {
   } | null
 }
 
-export type TokenBudgetDecision = ContinueDecision | StopDecision
+type TokenBudgetDecision = ContinueDecision | StopDecision
 
 function getBudgetContinuationMessage(
   pct: number,

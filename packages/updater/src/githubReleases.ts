@@ -16,7 +16,7 @@ function getRepo(): string {
   return process.env.CCB_RELEASES_REPO || DEFAULT_REPO
 }
 
-export function getReleasesApiUrl(): string {
+function getReleasesApiUrl(): string {
   return `https://api.github.com/repos/${getRepo()}/releases`
 }
 

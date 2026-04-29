@@ -74,7 +74,7 @@ export type PersistedStatsCache = {
   shotDistribution?: { [shotCount: number]: number }
 }
 
-export function getStatsCachePath(): string {
+function getStatsCachePath(): string {
   return join(getClaudeConfigHomeDir(), STATS_CACHE_FILENAME)
 }
 

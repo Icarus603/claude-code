@@ -6,7 +6,7 @@ import {
 } from 'color-diff-napi'
 import { isEnvDefinedFalsy } from '@claude-code/config/env/utils'
 
-export type ColorModuleUnavailableReason = 'env'
+type ColorModuleUnavailableReason = 'env'
 
 /**
  * Returns a static reason why the color-diff module is unavailable, or null if available.

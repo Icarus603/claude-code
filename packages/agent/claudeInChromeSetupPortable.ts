@@ -26,7 +26,7 @@ export type ChromiumBrowser =
   | 'vivaldi'
   | 'opera'
 
-export type BrowserPath = {
+type BrowserPath = {
   browser: ChromiumBrowser
   path: string
 }

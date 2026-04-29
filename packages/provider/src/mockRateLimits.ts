@@ -41,7 +41,7 @@ type MockHeaders = {
   'anthropic-ratelimit-unified-overage-surpassed-threshold'?: string
 }
 
-export type MockHeaderKey =
+type MockHeaderKey =
   | 'status'
   | 'reset'
   | 'claim'
@@ -58,7 +58,7 @@ export type MockHeaderKey =
   | '7d-reset'
   | '7d-surpassed-threshold'
 
-export type MockScenario =
+type MockScenario =
   | 'normal'
   | 'session-limit-reached'
   | 'approaching-weekly-limit'

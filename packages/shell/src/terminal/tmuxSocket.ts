@@ -88,7 +88,7 @@ let tmuxToolUsed = false
  * Gets the socket name for Claude's isolated tmux session.
  * Format: claude-<PID>
  */
-export function getClaudeSocketName(): string {
+function getClaudeSocketName(): string {
   if (!socketName) {
     socketName = `${CLAUDE_SOCKET_PREFIX}-${process.pid}`
   }
@@ -96,18 +96,10 @@ export function getClaudeSocketName(): string {
 }
 
 /**
- * Gets the socket path if the socket has been initialized.
- * Returns null if not yet initialized.
- */
-export function getClaudeSocketPath(): string | null {
-  return socketPath
-}
-
-/**
  * Sets socket info after initialization.
  * Called after the tmux session is created.
  */
-export function setClaudeSocketInfo(path: string, pid: number): void {
+function setClaudeSocketInfo(path: string, pid: number): void {
   socketPath = path
   serverPid = pid
 }
@@ -115,7 +107,7 @@ export function setClaudeSocketInfo(path: string, pid: number): void {
 /**
  * Returns whether the socket has been initialized.
  */
-export function isSocketInitialized(): boolean {
+function isSocketInitialized(): boolean {
   return socketPath !== null && serverPid !== null
 }
 
@@ -148,7 +140,7 @@ export function getClaudeTmuxEnv(): string | null {
  * - TeammateTool will not work (it uses tmux for pane management)
  * - Bash commands will run without tmux isolation
  */
-export async function checkTmuxAvailable(): Promise<boolean> {
+async function checkTmuxAvailable(): Promise<boolean> {
   if (!tmuxAvailabilityChecked) {
     const result =
       getPlatform() === 'windows'
@@ -168,24 +160,6 @@ export async function checkTmuxAvailable(): Promise<boolean> {
     tmuxAvailabilityChecked = true
   }
   return tmuxAvailable
-}
-
-/**
- * Returns the cached tmux availability status.
- * Returns false if availability hasn't been checked yet.
- * Use checkTmuxAvailable() to perform the check.
- */
-export function isTmuxAvailable(): boolean {
-  return tmuxAvailabilityChecked && tmuxAvailable
-}
-
-/**
- * Marks that the Tmux tool has been used at least once.
- * Called by TungstenTool before initialization.
- * After this is called, Shell.ts will initialize the socket for subsequent Bash commands.
- */
-export function markTmuxToolUsed(): void {
-  tmuxToolUsed = true
 }
 
 /**
@@ -414,14 +388,3 @@ async function doInitialize(): Promise<void> {
   )
 }
 
-// For testing purposes
-export function resetSocketState(): void {
-  socketName = null
-  socketPath = null
-  serverPid = null
-  isInitializing = false
-  initPromise = null
-  tmuxAvailabilityChecked = false
-  tmuxAvailable = false
-  tmuxToolUsed = false
-}

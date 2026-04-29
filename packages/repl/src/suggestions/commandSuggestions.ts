@@ -96,7 +96,7 @@ function isCommandMetadata(metadata: unknown): metadata is Command {
 /**
  * Represents a slash command found mid-input (not at the start)
  */
-export type MidInputSlashCommand = {
+type MidInputSlashCommand = {
   token: string // e.g., "/com"
   startPos: number // Position of "/"
   partialCommand: string // e.g., "com"
@@ -205,7 +205,7 @@ export function isCommandInput(input: string): boolean {
  * Checks if a command input has arguments
  * A command with just a trailing space is considered to have no arguments
  */
-export function hasCommandArgs(input: string): boolean {
+function hasCommandArgs(input: string): boolean {
   if (!isCommandInput(input)) return false
 
   if (!input.includes(' ')) return false
@@ -218,7 +218,7 @@ export function hasCommandArgs(input: string): boolean {
 /**
  * Formats a command with proper notation
  */
-export function formatCommand(command: string): string {
+function formatCommand(command: string): string {
   return `/${command} `
 }
 

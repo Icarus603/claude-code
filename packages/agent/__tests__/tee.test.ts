@@ -63,6 +63,7 @@ describe('tee', () => {
   })
 
   test('source throws immediately: each consumer rejects with the error', async () => {
+    // biome-ignore lint/correctness/useYield: source must throw synchronously before any yield to simulate immediate failure
     async function* failing(): AsyncIterable<number> {
       throw new Error('source-failed-immediately')
     }

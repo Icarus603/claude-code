@@ -47,7 +47,7 @@ import type {
   SwarmHostDeps,
 } from '../types/deps.js'
 
-export type CreateSwarmHostDepsOptions = {
+type CreateSwarmHostDepsOptions = {
   context?: Partial<ToolUseContext>
   api?: Partial<HostApiProvider>
   tools?: Partial<HostToolRegistry>

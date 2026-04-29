@@ -17,7 +17,7 @@ import {
   permissionRuleValueToString,
 } from '../../permissionRuleParser.js'
 
-export type PermissionRuleInputProps = {
+type PermissionRuleInputProps = {
   onCancel: () => void
   onSubmit: (
     ruleValue: PermissionRuleValue,

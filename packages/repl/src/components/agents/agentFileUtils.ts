@@ -17,7 +17,7 @@ import { AGENT_PATHS } from './types.js'
 /**
  * Formats agent data as markdown file content
  */
-export function formatAgentAsMarkdown(
+function formatAgentAsMarkdown(
   agentType: string,
   whenToUse: string,
   tools: string[] | undefined,

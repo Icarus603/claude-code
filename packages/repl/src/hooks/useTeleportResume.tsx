@@ -9,7 +9,7 @@ import type { CodeSession } from '@claude-code/teleport/api.js'
 import { errorMessage, TeleportOperationError } from '@claude-code/local-observability/errorHelpers.js'
 import { teleportResumeCodeSession } from '@claude-code/tool-registry/teleport.js'
 
-export type TeleportResumeError = {
+type TeleportResumeError = {
   message: string
   formattedMessage?: string
   isOperationError: boolean

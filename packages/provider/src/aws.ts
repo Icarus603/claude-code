@@ -1,7 +1,7 @@
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 
 /** AWS short-term credentials format. */
-export type AwsCredentials = {
+type AwsCredentials = {
   AccessKeyId: string
   SecretAccessKey: string
   SessionToken: string
@@ -9,7 +9,7 @@ export type AwsCredentials = {
 }
 
 /** Output from `aws sts get-session-token` or `aws sts assume-role`. */
-export type AwsStsOutput = {
+type AwsStsOutput = {
   Credentials: AwsCredentials
 }
 

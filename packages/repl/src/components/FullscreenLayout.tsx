@@ -219,7 +219,7 @@ export function useUnseenDivider(messageCount: number): {
  * carry text — tool-use-only entries are skipped (like progress messages)
  * so "⏺ Searched for 13 patterns, read 6 files" doesn't tick the pill.
  */
-export function countUnseenAssistantTurns(
+function countUnseenAssistantTurns(
   messages: readonly Message[],
   dividerIndex: number,
 ): number {

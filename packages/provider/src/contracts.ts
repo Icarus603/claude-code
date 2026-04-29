@@ -1,8 +1,5 @@
 import type { ClientOptions } from '@anthropic-ai/sdk'
-import type {
-  BetaToolUnion,
-  BetaUsage,
-} from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
+import type { BetaUsage } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type { ContentBlock, ContentBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { UUID } from 'crypto'
 
@@ -143,11 +140,6 @@ export type ProviderToolSchemaOptions = {
   }
 }
 
-export type ProviderDebugOptions = {
-  level?: string
-  [key: string]: unknown
-}
-
 export type ProviderOAuthTokens = {
   accessToken?: string | null
   [key: string]: unknown
@@ -165,24 +157,10 @@ export type ProviderAwsCredentials = {
   [key: string]: unknown
 }
 
-export type ProviderSafeParseJSONFn = ((
-  json: string,
-  shouldLogError?: boolean,
-) => unknown) & {
-  cache: {
-    clear(): void
-    size?(): number
-    delete?(key: string): boolean
-    get?(key: string): unknown
-    has?(key: string): boolean
-  }
-}
-
 export type ProviderCachedAsyncFn<T> = (() => Promise<T>) & {
   cache: {
     clear(): void
   }
 }
 
-export type ProviderClientFetch = ClientOptions['fetch']
-export type ProviderToolSchema = BetaToolUnion
+type ProviderClientFetch = ClientOptions['fetch']

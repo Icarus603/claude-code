@@ -7,7 +7,7 @@ type DynamicAgentBindings = ReturnType<typeof getAgentHostBindings> &
 
 type ErrorConstructor<T extends Error> = abstract new (...args: never[]) => T
 
-export type FallbackTriggeredErrorLike = Error & {
+type FallbackTriggeredErrorLike = Error & {
   originalModel: string
   fallbackModel: string
 }
@@ -24,7 +24,7 @@ export type StreamingToolExecutorLike = {
   getRemainingResults: () => AsyncGenerator<StreamingToolExecutorResult>
 }
 
-export type MemoryPrefetchHandle = Disposable & {
+type MemoryPrefetchHandle = Disposable & {
   settledAt: number | null
   consumedOnIteration: number
   promise: Promise<Array<{ type: string; [key: string]: unknown }>>

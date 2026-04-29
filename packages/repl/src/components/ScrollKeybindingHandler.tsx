@@ -147,7 +147,7 @@ function selectionFocusMoveForKey(key: Key): FocusMove | null {
   return null
 }
 
-export type WheelAccelState = {
+type WheelAccelState = {
   time: number
   mult: number
   dir: 0 | 1 | -1
@@ -936,7 +936,7 @@ function scrollUp(s: ScrollBoxHandle, amount: number): void {
   s.scrollBy(-amount)
 }
 
-export type ModalPagerAction =
+type ModalPagerAction =
   | 'lineUp'
   | 'lineDown'
   | 'halfPageUp'

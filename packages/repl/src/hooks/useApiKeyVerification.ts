@@ -16,7 +16,7 @@ export type VerificationStatus =
   | 'missing'
   | 'error'
 
-export type ApiKeyVerificationResult = {
+type ApiKeyVerificationResult = {
   status: VerificationStatus
   reverify: () => Promise<void>
   error: Error | null

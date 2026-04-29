@@ -46,7 +46,7 @@ import {
 import { getLeaderToolUseConfirmQueue } from '@claude-code/swarm'
 
 /** How long after a failure before replBridgeEnabled is auto-cleared (stops retries). */
-export const BRIDGE_FAILURE_DISMISS_MS = 10_000
+const BRIDGE_FAILURE_DISMISS_MS = 10_000
 
 /**
  * Max consecutive initReplBridge failures before the hook stops re-attempting

@@ -20,7 +20,7 @@ const NAVIGABLE_TYPES = [
 ] as const
 export type NavigableType = (typeof NAVIGABLE_TYPES)[number]
 
-export type NavigableOf<T extends NavigableType> = Extract<
+type NavigableOf<T extends NavigableType> = Extract<
   RenderableMessage,
   { type: T }
 >
@@ -136,7 +136,7 @@ function action<const T extends NavigableType, const K extends string>(a: {
   return a
 }
 
-export const MESSAGE_ACTIONS = [
+const MESSAGE_ACTIONS = [
   action({
     key: 'enter',
     label: s => (s.expanded ? 'collapse' : 'expand'),
@@ -343,7 +343,7 @@ export function stripSystemReminders(text: string): string {
   return t
 }
 
-export function copyTextOf(msg: NavigableMessage): string {
+function copyTextOf(msg: NavigableMessage): string {
   switch (msg.type) {
     case 'user': {
       const b = msg.message.content[0]

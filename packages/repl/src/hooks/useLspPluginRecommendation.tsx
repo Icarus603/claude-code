@@ -40,7 +40,7 @@ import {
 // Menu auto-dismisses at 30s, so anything over 28s is likely timeout
 const TIMEOUT_THRESHOLD_MS = 28_000
 
-export type LspRecommendationState = {
+type LspRecommendationState = {
   pluginId: string
   pluginName: string
   pluginDescription?: string

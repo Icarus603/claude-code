@@ -42,7 +42,7 @@ import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js'
 /**
  * Callback function to send an MCP message and get the response
  */
-export type SendMcpMessageCallback = (
+type SendMcpMessageCallback = (
   serverName: string,
   message: JSONRPCMessage,
 ) => Promise<JSONRPCMessage>

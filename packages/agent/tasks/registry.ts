@@ -19,7 +19,7 @@ const MonitorMcpTask: Task | null = feature('MONITOR_TOOL')
  * Mirrors the pattern from tools.ts
  * Note: Returns array inline to avoid circular dependency issues with top-level const
  */
-export function getAllTasks(): Task[] {
+function getAllTasks(): Task[] {
   const tasks: Task[] = [
     LocalShellTask,
     LocalAgentTask,

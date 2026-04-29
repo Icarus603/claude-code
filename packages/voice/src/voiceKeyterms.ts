@@ -37,7 +37,7 @@ const GLOBAL_KEYTERMS: readonly string[] = [
  * path segments) into individual words.  Fragments of 2 chars or fewer are
  * discarded to avoid noise.
  */
-export function splitIdentifier(name: string): string[] {
+function splitIdentifier(name: string): string[] {
   return name
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .split(/[-_./\s]+/)

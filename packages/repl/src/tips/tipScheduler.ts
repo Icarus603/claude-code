@@ -5,7 +5,7 @@ import { getSessionsSinceLastShown, recordTipShown } from './tipHistory.js'
 import { getRelevantTips } from './tipRegistry.js'
 import type { Tip, TipContext } from './types.js'
 
-export function selectTipWithLongestTimeSinceShown(
+function selectTipWithLongestTimeSinceShown(
   availableTips: Tip[],
 ): Tip | undefined {
   if (availableTips.length === 0) {

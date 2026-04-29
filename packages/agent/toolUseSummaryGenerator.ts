@@ -29,7 +29,7 @@ type ToolInfo = {
   output: unknown
 }
 
-export type GenerateToolUseSummaryParams = {
+type GenerateToolUseSummaryParams = {
   tools: ToolInfo[]
   signal: AbortSignal
   isNonInteractiveSession: boolean
