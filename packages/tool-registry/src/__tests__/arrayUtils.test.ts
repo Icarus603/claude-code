@@ -3,6 +3,7 @@
  */
 import { describe, expect, test } from 'bun:test'
 import { count, intersperse, uniq } from '../utils/array.js'
+import { lazySchema } from '../utils/lazySchema.js'
 
 describe('intersperse', () => {
   test('empty array → empty', () => {
@@ -116,5 +117,97 @@ describe('uniq', () => {
   test('NaN considered same in Set (only one kept)', () => {
     // ECMAScript spec: NaN has Same-Value-Zero equality with itself in Set.
     expect(uniq([NaN, NaN, 1])).toHaveLength(2)
+  })
+})
+
+describe('lazySchema — memoized factory', () => {
+  test('first call invokes factory', () => {
+    let calls = 0
+    const lazy = lazySchema(() => {
+      calls++
+      return { id: 'instance' }
+    })
+    expect(calls).toBe(0)
+    const result = lazy()
+    expect(calls).toBe(1)
+    expect(result).toEqual({ id: 'instance' })
+  })
+
+  test('subsequent calls return cached value (factory NOT re-invoked)', () => {
+    let calls = 0
+    const lazy = lazySchema(() => {
+      calls++
+      return { value: Math.random() }
+    })
+    const a = lazy()
+    const b = lazy()
+    const c = lazy()
+    expect(calls).toBe(1)
+    // Same reference each time — caching is reference-based.
+    expect(a).toBe(b)
+    expect(b).toBe(c)
+  })
+
+  test('factory throwing on first call: error propagates AND retries on next call', () => {
+    // The implementation uses `??=` which only assigns when the value
+    // is null/undefined. If factory throws, no value is cached, so
+    // the next call re-invokes. Lock this retry-on-error behavior.
+    let calls = 0
+    const lazy = lazySchema(() => {
+      calls++
+      if (calls < 2) throw new Error('first call fails')
+      return 'success'
+    })
+    expect(() => lazy()).toThrow('first call fails')
+    // Second call: factory re-invoked, succeeds.
+    expect(lazy()).toBe('success')
+    expect(calls).toBe(2)
+  })
+
+  test('factory returning falsy value (0, "", false) IS cached', () => {
+    // ??= only treats null/undefined as "not assigned", so 0 / "" / false
+    // are all valid cached values. Lock this.
+    let zeroCalls = 0
+    const lazyZero = lazySchema(() => {
+      zeroCalls++
+      return 0
+    })
+    expect(lazyZero()).toBe(0)
+    expect(lazyZero()).toBe(0)
+    expect(zeroCalls).toBe(1)
+
+    let emptyCalls = 0
+    const lazyEmpty = lazySchema(() => {
+      emptyCalls++
+      return ''
+    })
+    expect(lazyEmpty()).toBe('')
+    expect(lazyEmpty()).toBe('')
+    expect(emptyCalls).toBe(1)
+  })
+
+  test('factory returning null IS NOT cached (??= bug-or-feature)', () => {
+    // Documented limitation: ??= treats null as "unassigned", so a
+    // null-returning factory gets re-invoked every call. Most callers
+    // (Zod schemas) never return null, but lock the behavior so a
+    // future user knows the constraint.
+    let calls = 0
+    const lazyNull = lazySchema(() => {
+      calls++
+      return null
+    })
+    lazyNull()
+    lazyNull()
+    expect(calls).toBe(2)
+  })
+
+  test('two independent lazy() invocations have separate caches', () => {
+    const a = lazySchema(() => ({ id: 'a' }))
+    const b = lazySchema(() => ({ id: 'b' }))
+    expect(a().id).toBe('a')
+    expect(b().id).toBe('b')
+    // Different factory invocations get different objects.
+    expect(a()).toBe(a())
+    expect(a()).not.toBe(b())
   })
 })
