@@ -442,7 +442,7 @@ const lightDaltonizedTheme: Theme = {
  */
 const darkTheme: Theme = {
   autoAccept: 'rgb(175,135,255)', // Electric violet
-  bashBorder: 'rgb(253,93,177)', // Bright pink
+  bashBorder: 'rgb(64,180,255)', // Cool blue, matches dark bash background
   claude: BRAND_COLOR, // Brand color
   claudeShimmer: BRAND_COLOR_LIGHT, // Lighter brand color for shimmer
   claudeBlue_FOR_SYSTEM_SPINNER: 'rgb(131,210,238)', // Blue for system spinner
@@ -492,7 +492,7 @@ const darkTheme: Theme = {
   userMessageBackgroundHover: 'rgb(25, 25, 25)',
   messageActionsBackground: 'rgb(44, 50, 62)', // cool gray, slight blue
   selectionBg: 'rgb(38, 79, 120)', // classic dark-mode selection blue (VS Code dark default); light fgs stay readable
-  bashMessageBackgroundColor: 'rgb(65, 60, 65)',
+  bashMessageBackgroundColor: 'rgb(12, 14, 22)',
 
   memoryBackgroundColor: 'rgb(55, 65, 70)',
   rate_limit_fill: 'rgb(131,210,238)', // Light blue
@@ -573,7 +573,7 @@ const darkDaltonizedTheme: Theme = {
   userMessageBackgroundHover: 'rgb(70, 70, 70)',
   messageActionsBackground: 'rgb(44, 50, 62)', // cool gray, slight blue
   selectionBg: 'rgb(38, 79, 120)', // classic dark-mode selection blue (VS Code dark default); light fgs stay readable
-  bashMessageBackgroundColor: 'rgb(65, 60, 65)',
+  bashMessageBackgroundColor: 'rgb(12, 14, 22)',
 
   memoryBackgroundColor: 'rgb(55, 65, 70)',
   rate_limit_fill: 'rgb(153,204,255)', // Light blue
