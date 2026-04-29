@@ -242,6 +242,7 @@ function PluginComponentsDisplay({
     skills?: string | string[] | Record<string, unknown> | null
     hooks?: unknown
     mcpServers?: unknown
+    lspServers?: unknown
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -267,6 +268,7 @@ function PluginComponentsDisplay({
               skills: skillNames.length > 0 ? skillNames : null,
               hooks: hookEvents.length > 0 ? hookEvents : null,
               mcpServers: mcpServerNames.length > 0 ? mcpServerNames : null,
+              lspServers: null,
             })
           } else {
             setError(`Built-in plugin ${plugin.name} not found`)
@@ -357,12 +359,21 @@ function PluginComponentsDisplay({
             mcpServersList.push(pluginEntry.mcpServers)
           }
 
+          // LSP servers — populated by loadPluginLspServers and cached on
+          // plugin.lspServers. Marketplace entries don't carry this directly,
+          // but we still expose it so users see what their LSP plugins ship.
+          const lspServersList = []
+          if (plugin.lspServers) {
+            lspServersList.push(Object.keys(plugin.lspServers))
+          }
+
           setComponents({
             commands: commandList.length > 0 ? commandList : null,
             agents: agentList.length > 0 ? agentList : null,
             skills: skillList.length > 0 ? skillList : null,
             hooks: hooksList.length > 0 ? hooksList : null,
             mcpServers: mcpServersList.length > 0 ? mcpServersList : null,
+            lspServers: lspServersList.length > 0 ? lspServersList : null,
           })
         } else {
           setError(`Plugin ${plugin.name} not found in marketplace`)
@@ -411,10 +422,28 @@ function PluginComponentsDisplay({
     components.agents ||
     components.skills ||
     components.hooks ||
-    components.mcpServers
+    components.mcpServers ||
+    components.lspServers
 
+  // Empty-shell plugin: it's installed and "enabled" but provides nothing.
+  // Common with Anthropic's official *-lsp marketplace placeholders, which
+  // ship as README+LICENSE only — `/reload-plugins` correctly reports 0
+  // servers, but the plugin list still showed them as enabled with no hint
+  // that they're inert. Surface a visible warning instead of rendering nothing.
   if (!hasComponents) {
-    return null // No components defined
+    return (
+      <Box flexDirection="column" marginBottom={1}>
+        <Text bold>Components:</Text>
+        <Text color="warning">
+          ⚠ This plugin provides no components (no commands, agents, skills,
+          hooks, MCP servers, or LSP servers).
+        </Text>
+        <Text dimColor>
+          It's installed and enabled but inert — the marketplace entry may be
+          a placeholder.
+        </Text>
+      </Box>
+    )
   }
 
   return (
@@ -474,6 +503,19 @@ function PluginComponentsDisplay({
                   components.mcpServers !== null
                 ? Object.keys(components.mcpServers).join(', ')
                 : String(components.mcpServers)}
+        </Text>
+      ) : null}
+      {components.lspServers ? (
+        <Text dimColor>
+          • LSP Servers:{' '}
+          {typeof components.lspServers === 'string'
+            ? components.lspServers
+            : Array.isArray(components.lspServers)
+              ? components.lspServers.map(String).join(', ')
+              : typeof components.lspServers === 'object' &&
+                  components.lspServers !== null
+                ? Object.keys(components.lspServers).join(', ')
+                : String(components.lspServers)}
         </Text>
       ) : null}
     </Box>
