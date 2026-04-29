@@ -302,6 +302,13 @@ const CHECKS: Check[] = [
     doc: 'feedback_bun_mock_module_global_scope.md — every mock.module("@claude-code/*", ...) must spread the real exports first or include MOCK_FULL_REPLACE: justification. Prevents the silent global-shadow bug class.',
   },
   {
+    id: 'command-load-targets',
+    layer: 'Cross-Cutting',
+    subsystem: 'slash-command import correctness',
+    script: 'scripts/verify-command-load-targets.ts',
+    doc: 'feedback_knip_unused_can_hide_lazy_import_bugs.md — every Command load() must resolve to a module that exports `call`. Catches typos like `../../tasks.js` that resolve to a wrong file (TypeScript-valid but `call` missing → runtime error only when slash command invoked).',
+  },
+  {
     id: 'no-bare-host-loggers',
     layer: 'Cross-Cutting',
     subsystem: 'host-binding migration completeness',
