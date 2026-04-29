@@ -1,7 +1,8 @@
 # V8 Cleanup Pass — Overview
 
-> 25 commits across 3 iterations on 2026-04-29. ~5800 LOC removed, +297
-> tests, 4 new ratchets. 1 real bug found and fixed.
+> 32 commits across 7 iterations on 2026-04-29. ~5800 LOC removed, +581
+> tests (2317 → 3078), 5 new ratchets, 1 new doctor:arch verifier
+> (verify-command-load-targets). 4 real bugs found and fixed.
 
 After the V7 monorepo refactor declared "done", several debt categories
 remained in `packages/`: misleadingly-named `_DEPRECATED` suffixes, a
@@ -183,16 +184,17 @@ read on future sessions:
 
 | Metric | Before V8 | After V8 |
 |--------|----------:|---------:|
-| Tests | 2317 | 2514 (+197) |
-| `doctor:arch` checks | 60 | 64 |
+| Tests | 2317 | 3078 (+761) |
+| `doctor:arch` checks | 60 | 66 |
 | `_DEPRECATED` exports in packages/ | 12 | 0 |
 | `_deps.ts` cross-package lazy-requires | 9 | 1 |
 | `_deps.ts` unknown-typed slots | ~10 | 7 |
-| Knip unused-files (packages/-scoped) | ~110 | 72 |
-| Knip unused-exports | 203+ | 188 |
+| Knip unused-files (packages/-scoped) | ~110 | 71 |
+| Knip unused-exports | 203+ | 185 |
+| tsc-errors budget | 3306 | 3269 |
 | `sessionStorage.ts` LOC | 4722 | 4595 |
 | Total LOC removed | — | ~5800 |
-| Real bugs found and fixed | 0 | 1 (envExpansion `:-`) |
+| Real bugs found and fixed | 0 | 4 (envExpansion `:-`, /tasks load, /ide load, keybindings schema) |
 
 ## How to keep it clean
 
