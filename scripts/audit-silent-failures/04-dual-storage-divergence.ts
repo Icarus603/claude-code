@@ -111,6 +111,12 @@ for (const fn of allFns) {
       // counter vs ingress lifecycle vs file-system task vs in-memory
       // React-state task). Cross-package occurrences are intentional.
       'Session', 'Task',
+      // fs-operation pairs — readFileSync/writeFileSync (and async
+      // counterparts readFile/writeFile) are intentional host bindings
+      // exposed via _deps.ts and storage/file.ts. Cross-package usage
+      // IS the design — this is the same fs surface multiple packages
+      // funnel through.
+      'FileSync', 'File',
     ])
     if (HOST_BINDING_NAMES.has(noun)) continue
 
