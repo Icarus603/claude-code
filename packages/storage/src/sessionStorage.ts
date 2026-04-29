@@ -6,7 +6,6 @@ import type { Dirent } from 'fs'
 // with the async-suffixed names.
 import { closeSync, fstatSync, openSync, readSync } from 'fs'
 import {
-  appendFile as fsAppendFile,
   open as fsOpen,
   mkdir,
   readdir,
@@ -78,6 +77,7 @@ import { getWorktreePaths } from './getWorktreePaths.js'
 import { getBranch } from './git.js'
 import { gracefulShutdownSync, isShuttingDown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { parseJSONL } from './json.js'
+import { SessionWriteQueue } from './sessionWriteQueue.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { extractTag, isCompactBoundaryMessage } from '@claude-code/agent/messages.js'
 import { sanitizePath } from './path.js'
@@ -341,135 +341,26 @@ class Project {
   private internalEventWriter: InternalEventWriter | null = null
   private internalEventReader: InternalEventReader | null = null
   private internalSubagentEventReader: InternalEventReader | null = null
-  private pendingWriteCount: number = 0
-  private flushResolvers: Array<() => void> = []
-  // Per-file write queues. Each entry carries a resolve callback so
-  // callers of enqueueWrite can optionally await their specific write.
-  private writeQueues = new Map<
-    string,
-    Array<{ entry: Entry; resolve: () => void }>
-  >()
-  private flushTimer: ReturnType<typeof setTimeout> | null = null
-  private activeDrain: Promise<void> | null = null
-  private FLUSH_INTERVAL_MS = 100
-  private readonly MAX_CHUNK_BYTES = 100 * 1024 * 1024
+
+  // Per-file batched-append queue + tracking for non-queue writes
+  // (positional writes done by removeMessageByUuid). Extracted to
+  // SessionWriteQueue 2026-04-29 — see ./sessionWriteQueue.ts for
+  // implementation details.
+  private writeQueue: SessionWriteQueue = new SessionWriteQueue()
 
   constructor() {}
 
   /** @internal Reset flush/queue state for testing. */
   _resetFlushState(): void {
-    this.pendingWriteCount = 0
-    this.flushResolvers = []
-    if (this.flushTimer) clearTimeout(this.flushTimer)
-    this.flushTimer = null
-    this.activeDrain = null
-    this.writeQueues = new Map()
+    this.writeQueue.resetForTesting()
   }
 
-  private incrementPendingWrites(): void {
-    this.pendingWriteCount++
-  }
-
-  private decrementPendingWrites(): void {
-    this.pendingWriteCount--
-    if (this.pendingWriteCount === 0) {
-      // Resolve all waiting flush promises
-      for (const resolve of this.flushResolvers) {
-        resolve()
-      }
-      this.flushResolvers = []
-    }
-  }
-
-  private async trackWrite<T>(fn: () => Promise<T>): Promise<T> {
-    this.incrementPendingWrites()
-    try {
-      return await fn()
-    } finally {
-      this.decrementPendingWrites()
-    }
+  private trackWrite<T>(fn: () => Promise<T>): Promise<T> {
+    return this.writeQueue.trackWrite(fn)
   }
 
   private enqueueWrite(filePath: string, entry: Entry): Promise<void> {
-    return new Promise<void>(resolve => {
-      let queue = this.writeQueues.get(filePath)
-      if (!queue) {
-        queue = []
-        this.writeQueues.set(filePath, queue)
-      }
-      queue.push({ entry, resolve })
-      this.scheduleDrain()
-    })
-  }
-
-  private scheduleDrain(): void {
-    if (this.flushTimer) {
-      return
-    }
-    this.flushTimer = setTimeout(async () => {
-      this.flushTimer = null
-      this.activeDrain = this.drainWriteQueue()
-      await this.activeDrain
-      this.activeDrain = null
-      // If more items arrived during drain, schedule again
-      if (this.writeQueues.size > 0) {
-        this.scheduleDrain()
-      }
-    }, this.FLUSH_INTERVAL_MS)
-  }
-
-  private async appendToFile(filePath: string, data: string): Promise<void> {
-    try {
-      await fsAppendFile(filePath, data, { mode: 0o600 })
-    } catch {
-      // Directory may not exist — some NFS-like filesystems return
-      // unexpected error codes, so don't discriminate on code.
-      await mkdir(dirname(filePath), { recursive: true, mode: 0o700 })
-      await fsAppendFile(filePath, data, { mode: 0o600 })
-    }
-  }
-
-  private async drainWriteQueue(): Promise<void> {
-    for (const [filePath, queue] of this.writeQueues) {
-      if (queue.length === 0) {
-        continue
-      }
-      const batch = queue.splice(0)
-
-      let content = ''
-      const resolvers: Array<() => void> = []
-
-      for (const { entry, resolve } of batch) {
-        const line = jsonStringify(entry) + '\n'
-
-        if (content.length + line.length >= this.MAX_CHUNK_BYTES) {
-          // Flush chunk and resolve its entries before starting a new one
-          await this.appendToFile(filePath, content)
-          for (const r of resolvers) {
-            r()
-          }
-          resolvers.length = 0
-          content = ''
-        }
-
-        content += line
-        resolvers.push(resolve)
-      }
-
-      if (content.length > 0) {
-        await this.appendToFile(filePath, content)
-        for (const r of resolvers) {
-          r()
-        }
-      }
-    }
-
-    // Clean up empty queues
-    for (const [filePath, queue] of this.writeQueues) {
-      if (queue.length === 0) {
-        this.writeQueues.delete(filePath)
-      }
-    }
+    return this.writeQueue.enqueue(filePath, entry)
   }
 
   resetSessionFile(): void {
@@ -625,26 +516,8 @@ class Project {
     }
   }
 
-  async flush(): Promise<void> {
-    // Cancel pending timer
-    if (this.flushTimer) {
-      clearTimeout(this.flushTimer)
-      this.flushTimer = null
-    }
-    // Wait for any in-flight drain to finish
-    if (this.activeDrain) {
-      await this.activeDrain
-    }
-    // Drain anything remaining in the queues
-    await this.drainWriteQueue()
-
-    // Wait for non-queue tracked operations (e.g. removeMessageByUuid)
-    if (this.pendingWriteCount === 0) {
-      return
-    }
-    return new Promise<void>(resolve => {
-      this.flushResolvers.push(resolve)
-    })
+  flush(): Promise<void> {
+    return this.writeQueue.flush()
   }
 
   /**
@@ -1135,7 +1008,7 @@ class Project {
     logForDebugging(`Remote persistence enabled with URL: ${url}`)
     if (url) {
       // If using CCR, don't delay messages by any more than 10ms.
-      this.FLUSH_INTERVAL_MS = REMOTE_FLUSH_INTERVAL_MS
+      this.writeQueue.setFlushIntervalMs(REMOTE_FLUSH_INTERVAL_MS)
     }
   }
 
@@ -1145,7 +1018,7 @@ class Project {
       'CCR v2 internal event writer registered for transcript persistence',
     )
     // Use fast flush interval for CCR v2
-    this.FLUSH_INTERVAL_MS = REMOTE_FLUSH_INTERVAL_MS
+    this.writeQueue.setFlushIntervalMs(REMOTE_FLUSH_INTERVAL_MS)
   }
 
   setInternalEventReader(reader: InternalEventReader): void {
