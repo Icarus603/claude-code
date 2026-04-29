@@ -44,27 +44,62 @@ export async function processBashCommand(
 
   logEvent('tengu_input_bash', { powershell: usePowerShell })
 
-  const userMessage = createUserMessage({
-    content: prepareUserContent({
-      inputString: `<bash-input>${inputString}</bash-input>`,
-      precedingInputBlocks,
-    }),
-  })
+  // ─── BASH-MODE TIMING WORKAROUND ────────────────────────────────────────
+  // These two try/catch wrappers look like dead no-ops (catch+rethrow with no
+  // logging) but are LOAD-BEARING. Without them, bash-mode submissions
+  // silently lose every command — onSubmit fires, processBashCommand runs to
+  // here, then the function exits without invoking the shell tool, the prompt
+  // clears, and no message ever appears in the transcript.
+  //
+  // No exception is actually caught at runtime (verified with logging
+  // appendFileSync inside the catch — log stays empty across many repros).
+  // The fix is the EXISTENCE of the try/catch frame, not the recovery code.
+  //
+  // Best hypothesis: ink's `processKeysInBatch` wraps key dispatch in
+  // `reconciler.discreteUpdates`. The synchronous setToolJSX call here
+  // triggers a React state update inside that batch. Without an exception
+  // handler on this stack frame, Bun's JIT inlines the setState through a
+  // fast-path that races with React's batch-flush — the rest of this async
+  // function gets dropped on the floor (no throw, no rejection, just lost).
+  // Adding try/catch forces V8/Bun to emit a different IL with an exception
+  // handler frame, which prevents the inline and breaks the race.
+  //
+  // Reproducer: remove either try/catch, rebuild, restart ccbdev, type `!ls`
+  // → no output. Restore the try/catch → instant fix. 100% deterministic.
+  //
+  // Don't remove these. If you find the real root cause and ship a proper
+  // fix (probably in ink's reconciler bridge or store.subscribe wiring),
+  // delete this comment AND prove the symptom doesn't recur with bash-mode
+  // smoke tests under both warm and cold JIT conditions.
+  let userMessage
+  try {
+    userMessage = createUserMessage({
+      content: prepareUserContent({
+        inputString: `<bash-input>${inputString}</bash-input>`,
+        precedingInputBlocks,
+      }),
+    })
+  } catch (e) {
+    throw e
+  }
 
   // ctrl+b to background indicator
   let jsx: React.ReactNode
 
-  // Just show initial UI
-  setToolJSX({
-    jsx: (
-      <BashModeProgress
-        input={inputString}
-        progress={null}
-        verbose={context.options.verbose}
-      />
-    ),
-    shouldHidePromptInput: false,
-  })
+  try {
+    setToolJSX({
+      jsx: (
+        <BashModeProgress
+          input={inputString}
+          progress={null}
+          verbose={context.options.verbose}
+        />
+      ),
+      shouldHidePromptInput: false,
+    })
+  } catch (e) {
+    throw e
+  }
 
   try {
     const bashModeContext: ProcessUserInputContext = {
