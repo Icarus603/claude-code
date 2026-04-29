@@ -316,6 +316,13 @@ const CHECKS: Check[] = [
     doc: 'broader version of command-load-targets — every `await import(X)` and `require(X) as typeof import(X)` in packages/ must resolve, AND each `{name}` destructured from the result must actually be exported. Catches feature-flag-gated typos that never crash CI because the gate is off in tests. Discovery audit found 2 real bugs (ThemeProvider auto-theme watcher, attachments EXPERIMENTAL_SKILL_SEARCH prefetch) — both fixed 2026-04-29.',
   },
   {
+    id: 'shared-enum-consistency',
+    layer: 'Cross-Cutting',
+    subsystem: 'duplicated-enum drift detection',
+    script: 'scripts/verify-shared-enum-consistency.ts',
+    doc: 'when an enum is duplicated across packages for boundary reasons (e.g., HOOK_EVENTS in headless-sdk + config/settings/schemas/hooks.ts to avoid Wave-1 cross-package dep), assert byte identity. Otherwise one path emits an event the other path silently rejects.',
+  },
+  {
     id: 'no-bare-host-loggers',
     layer: 'Cross-Cutting',
     subsystem: 'host-binding migration completeness',

@@ -39,7 +39,11 @@ import { spawnSync } from 'child_process'
 // orphan deletes, sessionStorage write-queue extraction, and several
 // shim removals). Errors that were attributable to those decompiled
 // modules are gone. New floor freezes the gain.
-const BUDGET = 3269
+//
+// 2026-04-29 (later): tightened 3269 → 3268 after collapsing
+// permission/types/permissions.ts duplicate into a re-export of
+// permissionTypes.ts.
+const BUDGET = 3268
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
