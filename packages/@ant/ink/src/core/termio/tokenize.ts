@@ -306,9 +306,34 @@ function tokenize(
   if (result.state === 'ground') {
     flushText()
   } else if (flush) {
-    // Force output incomplete sequence
-    const remaining = data.slice(seqStart)
-    if (remaining) tokens.push({ type: 'sequence', value: remaining })
+    // Forced flush of an incomplete sequence. The semantics depend on
+    // which DEC state machine sub-state the buffer is parked in:
+    //
+    // - 'escape' (lone ESC, possibly ESC+printable like ESC+a for Alt+a):
+    //   Emit. A real Escape keypress sits here for App's NORMAL_TIMEOUT
+    //   (50ms) before being flushed; suppressing it would silently eat
+    //   the user's Escape key. ESC+letter is also a valid 2-char meta
+    //   sequence (modifyOtherKeys / iTerm "send ESC for meta").
+    //
+    // - 'csi' / 'ss3' / 'osc' / 'dcs' / 'apc' / 'escapeIntermediate':
+    //   Drop. Multi-byte sequences in these states are exclusively
+    //   machine-generated (mouse events, terminal responses, paste
+    //   markers). Real terminals emit them atomically in one syscall;
+    //   the only reason a partial sits here at flush time is that a
+    //   heavy React commit blocked the event loop past App's 50ms
+    //   timer between the chunks of a single multi-chunk read.
+    //
+    //   Emitting the partial leaks visible garbage into the prompt
+    //   (`[<6` / `5;67;38M` from a chopped SGR mouse wheel event) —
+    //   downstream parse-keypress + input-event have ESC-anchored
+    //   regex defenses but they only catch the "ESC dropped, tail
+    //   complete" sub-case, not "CSI body chopped mid-stream".
+    //   Worst real cost of dropping: one missed wheel tick or one
+    //   missed terminal-response (response system has retry/timeout).
+    if (result.state === 'escape') {
+      const remaining = data.slice(seqStart)
+      if (remaining) tokens.push({ type: 'sequence', value: remaining })
+    }
     result.state = 'ground'
   } else {
     // Buffer incomplete sequence for next call
