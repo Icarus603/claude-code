@@ -316,6 +316,13 @@ const CHECKS: Check[] = [
     doc: '`as never` is the bottom type — disables type checking entirely AND makes the value assignable to anything. Strictly worse than `as any` because consumption sites stop flagging. Baseline locked to current count; new occurrences must come with --tighten and a documented reason (host-binding shim, branded-type construction, exhaustiveness assertion).',
   },
   {
+    id: 'console-log-leak',
+    layer: 'Cross-Cutting',
+    subsystem: 'structured logging discipline',
+    script: 'scripts/verify-console-log-leak.ts',
+    doc: 'Raw console.log/warn/error/debug/info calls bypass structured logging (logForDebugging, logError) and pollute SDK consumer stdout streams (--output-format=stream-json). streamJsonStdoutGuard exists ONLY because raw console.log slips through. Baseline locked; new occurrences require --tighten with a justified UX/setup reason — otherwise use logForDebugging or process.stdout/stderr.write directly.',
+  },
+  {
     id: 'command-load-targets',
     layer: 'Cross-Cutting',
     subsystem: 'slash-command import correctness',

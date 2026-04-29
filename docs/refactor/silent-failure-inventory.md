@@ -64,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9207; **findings**: 0
+**Total scanned**: 9215; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -72,7 +72,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2262; **findings**: 0
+**Total scanned**: 2264; **findings**: 0
 
 ### 6. `nullish-coalesce-critical-path`
 
