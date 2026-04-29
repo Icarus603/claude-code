@@ -23,9 +23,8 @@ import type {
  * a value for it, OMIT the key entirely. savePluginOptions only writes keys
  * it receives, so omitting = keep existing.
  *
- * Exported for unit testing.
  */
-export function buildFinalValues(
+function buildFinalValues(
   fields: string[],
   collected: Record<string, string>,
   configSchema: PluginOptionSchema,

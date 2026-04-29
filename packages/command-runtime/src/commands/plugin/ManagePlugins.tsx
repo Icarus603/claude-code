@@ -546,7 +546,7 @@ async function checkIfLocalPlugin(
  * Checks policySettings directly rather than installation scope, since managed
  * settings don't create installation records with scope 'managed'.
  */
-export function filterManagedDisabledPlugins(
+function filterManagedDisabledPlugins(
   plugins: LoadedPlugin[],
 ): LoadedPlugin[] {
   return plugins.filter(plugin => {

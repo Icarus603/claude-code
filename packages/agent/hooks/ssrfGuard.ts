@@ -39,7 +39,7 @@ import { isIP } from 'net'
  *   ::1              loopback
  *   everything else
  */
-export function isBlockedAddress(address: string): boolean {
+function isBlockedAddress(address: string): boolean {
   const v = isIP(address)
   if (v === 4) {
     return isBlockedV4(address)

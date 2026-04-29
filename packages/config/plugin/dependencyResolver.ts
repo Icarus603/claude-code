@@ -35,7 +35,7 @@ const INLINE_MARKETPLACE = 'inline'
  * real marketplace — fabricating "dep@inline" would never match anything.
  * verifyAndDemote handles bare deps via name-only matching.
  */
-export function qualifyDependency(
+function qualifyDependency(
   dep: string,
   declaringPluginId: string,
 ): string {

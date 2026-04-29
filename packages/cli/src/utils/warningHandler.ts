@@ -8,7 +8,7 @@ import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { getPlatform } from '@claude-code/config/platform'
 
 // Track warnings to avoid spam — bounded to prevent unbounded memory growth
-export const MAX_WARNING_KEYS = 1000
+const MAX_WARNING_KEYS = 1000
 const warningCounts = new Map<string, number>()
 
 // Check if running from a build directory (development mode)
@@ -47,15 +47,6 @@ function isInternalWarning(warning: Error): boolean {
 
 // Store reference to our warning handler so we can detect if it's already installed
 let warningHandler: ((warning: Error) => void) | null = null
-
-// For testing only - allows resetting the warning handler state
-export function resetWarningHandler(): void {
-  if (warningHandler) {
-    process.removeListener('warning', warningHandler)
-  }
-  warningHandler = null
-  warningCounts.clear()
-}
 
 export function initializeWarningHandler(): void {
   // Only set up handler once - check if our handler is already installed
