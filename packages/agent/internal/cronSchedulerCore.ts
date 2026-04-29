@@ -320,7 +320,7 @@ export function createCronScheduler(
         inFlight.add(t.id)
         void removeCronTasks([t.id], dir)
           .catch(e =>
-            logForDebugging(
+            getAgentHostBindings().logDebug?.(
               `[ScheduledTasks] failed to remove task ${t.id}: ${e}`,
             ),
           )
@@ -344,7 +344,7 @@ export function createCronScheduler(
         for (const id of firedFileRecurring) inFlight.add(id)
         void markCronTasksFired(firedFileRecurring, now, dir)
           .catch(e =>
-            logForDebugging(
+            getAgentHostBindings().logDebug?.(
               `[ScheduledTasks] failed to persist lastFiredAt: ${e}`,
             ),
           )
