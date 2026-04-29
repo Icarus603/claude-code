@@ -76,7 +76,7 @@ export function extractJsonStringField(
 }
 
 /**
- * Like extractJsonStringField but finds the LAST occurrence.
+ * Like extractJsonStringField but finds the LAST occurrence (by offset, not by pattern order).
  * Useful for fields that are appended (customTitle, tag, etc.).
  */
 export function extractLastJsonStringField(
@@ -85,6 +85,7 @@ export function extractLastJsonStringField(
 ): string | undefined {
   const patterns = [`"${key}":"`, `"${key}": "`]
   let lastValue: string | undefined
+  let lastIdx = -1
   for (const pattern of patterns) {
     let searchFrom = 0
     while (true) {
@@ -99,7 +100,10 @@ export function extractLastJsonStringField(
           continue
         }
         if (text[i] === '"') {
-          lastValue = unescapeJsonString(text.slice(valueStart, i))
+          if (idx > lastIdx) {
+            lastIdx = idx
+            lastValue = unescapeJsonString(text.slice(valueStart, i))
+          }
           break
         }
         i++
