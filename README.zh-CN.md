@@ -6,19 +6,10 @@
 [![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
 [![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
 [![Issues](https://img.shields.io/github/issues/Icarus603/claude-code?style=flat-square&color=orange)](https://github.com/Icarus603/claude-code/issues)
-
 [![Bun](https://img.shields.io/badge/runtime-Bun%20%E2%89%A51.3-black?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
-[![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/TUI-React%20%2B%20Ink-61DAFB?style=flat-square&logo=react&logoColor=white)](https://github.com/vadimdemedes/ink)
-[![Anthropic](https://img.shields.io/badge/Anthropic-CC785C?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
-[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-10A37F?style=flat-square&logo=openai&logoColor=white)](https://chatgpt.com/codex)
-[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)](https://platform.openai.com/)
-[![Gemini](https://img.shields.io/badge/Gemini-1F6FEB?style=flat-square&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
 
-终端编程智能体。单一 binary,命令为 `ccb`。Claude Code 的社区维护衍生版。
-
-与 Anthropic 无关。如需官方工具请见 <https://docs.anthropic.com/en/docs/claude-code/overview>。
+终端编程智能体。单一 binary,命令为 `ccb`。Claude Code 的社区维护衍生版 — 详见 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。与 Anthropic 无关;如需官方工具请见 <https://docs.anthropic.com/en/docs/claude-code/overview>。本 repo 不附独立 LICENSE 档 — 二次散布前请先确认来源。
 
 ---
 
@@ -44,7 +35,7 @@ irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | i
 
 | 变量 | 默认(sh / ps1) | 用途 |
 |------|------|------|
-| `CCB_VERSION` | `latest` | 锁定特定 tag,例如 `v1.carus.000` |
+| `CCB_VERSION` | `latest` | 锁定特定 tag,例如 `v26.4.24` |
 | `CCB_PREFIX`  | `~/.local` / `%LOCALAPPDATA%\Programs\ccb` | 安装根目录 |
 
 **升级**:不用动手。`ccb` 每次启动 REPL(以及运行中每 30 分钟)会去 GitHub Releases 检查,有新版就在后台下载安装 —— 完成时 footer 会显示 `✓ Update installed · Restart to update`。如果要锁特定版本,重跑那条 install 命令并通过 `CCB_VERSION=…` 指定即可。
@@ -139,16 +130,10 @@ gh pr create
 只给维护者。
 
 ```bash
-bun run release v1.carus.001
+bun run release v26.4.25
 ```
 
 完事。Script 自己校验 tag、创建、push。剩下交给 GitHub Actions 跑 — `MACRO.VERSION` 从 tag 推出来,没有任何版本号要手动同步。
-
----
-
-## 🧬 沿革
-
-`ccb` 衍生自公开的 Claude Code 社区 fork。见 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。本项目未附独立许可证文件 — 重新发布前请审核 provenance。
 
 ---
 

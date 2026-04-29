@@ -6,19 +6,10 @@
 [![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
 [![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
 [![Issues](https://img.shields.io/github/issues/Icarus603/claude-code?style=flat-square&color=orange)](https://github.com/Icarus603/claude-code/issues)
-
 [![Bun](https://img.shields.io/badge/runtime-Bun%20%E2%89%A51.3-black?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
-[![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/TUI-React%20%2B%20Ink-61DAFB?style=flat-square&logo=react&logoColor=white)](https://github.com/vadimdemedes/ink)
-[![Anthropic](https://img.shields.io/badge/Anthropic-CC785C?style=flat-square&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
-[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-10A37F?style=flat-square&logo=openai&logoColor=white)](https://chatgpt.com/codex)
-[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)](https://platform.openai.com/)
-[![Gemini](https://img.shields.io/badge/Gemini-1F6FEB?style=flat-square&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
 
-Terminal coding agent. Single binary, installed as `ccb`. Community-maintained derivative of Claude Code.
-
-Not affiliated with Anthropic. For the official tool, see <https://docs.anthropic.com/en/docs/claude-code/overview>.
+Terminal coding agent. Single binary, installed as `ccb`. Community-maintained derivative of Claude Code — see [`ATTRIBUTION.md`](./ATTRIBUTION.md). Not affiliated with Anthropic; for the official tool, see <https://docs.anthropic.com/en/docs/claude-code/overview>. No standalone license file is shipped — review provenance before redistribution.
 
 ---
 
@@ -44,7 +35,7 @@ No Node, no Bun, no package manager required for either.
 
 | Variable | Default (sh / ps1) | Effect |
 |----------|---------|--------|
-| `CCB_VERSION` | `latest` | Pin a specific tag, e.g. `v1.carus.000` |
+| `CCB_VERSION` | `latest` | Pin a specific tag, e.g. `v26.4.24` |
 | `CCB_PREFIX`  | `~/.local` / `%LOCALAPPDATA%\Programs\ccb` | Install root |
 
 **Upgrade**: nothing to do. `ccb` checks GitHub Releases on every REPL startup (and every 30 min while running) and installs new versions in the background — you'll see `✓ Update installed · Restart to update` in the footer when one lands. Re-running the install one-liner still works if you want to force a specific version via `CCB_VERSION=…`.
@@ -139,16 +130,10 @@ Architectural conventions live in [`docs/lazy-require-pattern.md`](docs/lazy-req
 Maintainer only.
 
 ```bash
-bun run release v1.carus.001
+bun run release v26.4.25
 ```
 
 That's it. The script validates the tag, creates it, pushes it. GitHub Actions then builds 5 binaries (with `MACRO.VERSION` derived from the tag itself — no version strings to bump anywhere) and uploads them to Releases.
-
----
-
-## 🧬 Lineage
-
-`ccb` derives from a public Claude Code community fork. See [`ATTRIBUTION.md`](./ATTRIBUTION.md). No standalone license file is shipped — review provenance before redistribution.
 
 ---
 
