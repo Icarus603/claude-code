@@ -108,7 +108,7 @@
   "packages/storage/src/imageResizer.ts": 881,
   "packages/storage/src/sessionStorage.ts": 4595,
   "packages/storage/src/toolResultStorage.ts": 1041,
-  "packages/swarm/src/mailbox/index.ts": 1188,
+  "packages/swarm/src/mailbox/index.ts": 1189,
   "packages/swarm/src/permissions/index.ts": 929,
   "packages/swarm/src/runtime/inProcessRunner.ts": 1555,
   "packages/swarm/src/worktree/index.ts": 1517,

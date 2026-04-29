@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs'
-import { mkdir, readFile, rm, writeFile } from 'fs/promises'
+import { mkdir, readFile, rm } from 'fs/promises'
+import { atomicWriteFile } from '@claude-code/storage/file.js'
 import { join } from 'path'
 import { z } from 'zod/v4'
 import { getSessionCreatedTeams } from '../adapters/appRuntime.js'
@@ -178,7 +179,7 @@ export async function writeTeamFileAsync(
 ): Promise<void> {
   const teamDir = getTeamDir(teamName)
   await mkdir(teamDir, { recursive: true })
-  await writeFile(getTeamFilePath(teamName), jsonStringify(teamFile, null, 2))
+  await atomicWriteFile(getTeamFilePath(teamName), jsonStringify(teamFile, null, 2))
 }
 
 /**

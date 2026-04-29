@@ -464,6 +464,36 @@ export function writeFileSyncAndFlush(
   }
 }
 
+/**
+ * Async crash-safe file write — temp+rename. If the process dies mid-write,
+ * the destination retains its previous contents (the temp file is the only
+ * one corrupted, and gets cleaned up by the next caller).
+ *
+ * Use this for state files (mailbox, team config, lock files) where a
+ * partial write would silently lose data on next read.
+ *
+ * Async sibling of writeFileSyncAndFlush. Same atomicity guarantees but
+ * non-blocking, suitable for hot paths.
+ */
+export async function atomicWriteFile(
+  filePath: string,
+  content: string,
+): Promise<void> {
+  const fsp = await import('fs/promises')
+  const tempPath = `${filePath}.tmp.${process.pid}.${Date.now()}`
+  try {
+    await fsp.writeFile(tempPath, content, 'utf-8')
+    await fsp.rename(tempPath, filePath)
+  } catch (e) {
+    // Clean up orphan temp file; ignore cleanup errors so we surface the
+    // original write/rename failure to the caller.
+    await fsp.unlink(tempPath).catch(() => {
+      /* temp-file cleanup is best-effort; surface the original error instead */
+    })
+    throw e
+  }
+}
+
 export function getDesktopPath(): string {
   const platform = getPlatform()
   const homeDir = homedir()

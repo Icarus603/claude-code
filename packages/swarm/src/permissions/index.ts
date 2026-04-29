@@ -19,6 +19,7 @@
  */
 
 import { mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises'
+import { atomicWriteFile } from '@claude-code/storage/file.js'
 import { join } from 'path'
 import { z } from 'zod/v4'
 import { logForDebugging } from '../adapters/appRuntime.js'
@@ -229,7 +230,7 @@ export async function writePermissionRequest(
     release = await lockfile.lock(lockFilePath)
 
     // Write the request file
-    await writeFile(pendingPath, jsonStringify(request, null, 2), 'utf-8')
+    await atomicWriteFile(pendingPath, jsonStringify(request, null, 2))
 
     logForDebugging(
       `[PermissionSync] Wrote pending request ${request.id} from ${request.workerName} for ${request.toolName}`,
@@ -417,11 +418,7 @@ export async function resolvePermission(
     }
 
     // Write to resolved directory
-    await writeFile(
-      resolvedPath,
-      jsonStringify(resolvedRequest, null, 2),
-      'utf-8',
-    )
+    await atomicWriteFile(resolvedPath, jsonStringify(resolvedRequest, null, 2))
 
     // Remove from pending directory
     await unlink(pendingPath)

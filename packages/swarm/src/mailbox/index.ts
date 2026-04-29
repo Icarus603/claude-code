@@ -8,6 +8,7 @@
  */
 
 import { mkdir, readFile, writeFile } from 'fs/promises'
+import { atomicWriteFile } from '@claude-code/storage/file.js'
 import { join } from 'path'
 import { z } from 'zod/v4'
 import { TEAMMATE_MESSAGE_TAG } from '../adapters/appRuntime.js'
@@ -177,7 +178,7 @@ export async function writeToMailbox(
 
     messages.push(newMessage)
 
-    await writeFile(inboxPath, jsonStringify(messages, null, 2), 'utf-8')
+    await atomicWriteFile(inboxPath, jsonStringify(messages, null, 2))
     logForDebugging(
       `[TeammateMailbox] Wrote message to ${recipientName}'s inbox from ${message.from}`,
     )
@@ -244,7 +245,7 @@ export async function markMessageAsReadByIndex(
 
     messages[messageIndex] = { ...message, read: true }
 
-    await writeFile(inboxPath, jsonStringify(messages, null, 2), 'utf-8')
+    await atomicWriteFile(inboxPath, jsonStringify(messages, null, 2))
     logForDebugging(
       `[TeammateMailbox] markMessageAsReadByIndex: marked message at index ${messageIndex} as read`,
     )
@@ -317,7 +318,7 @@ export async function markMessagesAsRead(
     // messages comes from jsonParse — fresh, unshared objects safe to mutate
     for (const m of messages) m.read = true
 
-    await writeFile(inboxPath, jsonStringify(messages, null, 2), 'utf-8')
+    await atomicWriteFile(inboxPath, jsonStringify(messages, null, 2))
     logForDebugging(
       `[TeammateMailbox] markMessagesAsRead: WROTE ${unreadCount} message(s) as read to ${inboxPath}`,
     )
@@ -1123,7 +1124,7 @@ export async function markMessagesAsReadByPredicate(
       !m.read && predicate(m) ? { ...m, read: true } : m,
     )
 
-    await writeFile(inboxPath, jsonStringify(updatedMessages, null, 2), 'utf-8')
+    await atomicWriteFile(inboxPath, jsonStringify(updatedMessages, null, 2))
   } catch (error) {
     const code = getErrnoCode(error)
     if (code === 'ENOENT') {
