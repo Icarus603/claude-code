@@ -18,7 +18,7 @@
 #   irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | iex
 #
 #   # Pin a version:
-#   $env:CCB_VERSION='v1.carus.000'; irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | iex
+#   $env:CCB_VERSION='v26.4.24'; irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | iex
 #
 #   # Custom install root:
 #   $env:CCB_PREFIX='C:\Tools\ccb'; irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | iex
@@ -70,7 +70,7 @@ function Resolve-Version {
 
   # Hit GitHub's latest-release redirect; the Location header carries the tag.
   # Invoke-WebRequest follows redirects by default, so RequestUri ends at the
-  # resolved release page like .../releases/tag/v1.carus.000.
+  # resolved release page like .../releases/tag/v26.4.24.
   try {
     $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -UseBasicParsing -MaximumRedirection 5
   } catch {
@@ -182,6 +182,12 @@ function Invoke-PruneOldVersions {
 
   $kept = 0
   foreach ($entry in $entries) {
+    # Skip transient install artifacts (.partial download, .sha256 sidecar)
+    # — they shouldn't count as kept slots and shouldn't be deleted as
+    # "old versions". Mirrors install.sh prune_old_versions logic.
+    if ($entry.Name -like '*.partial' -or $entry.Name -like '*.sha256') {
+      continue
+    }
     if ($entry.FullName -ieq $KeepPath) {
       $kept++
       continue
