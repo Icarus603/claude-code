@@ -112,9 +112,21 @@ function parseKeyValue(line: string): { key: string; value: string } | null {
  * Handles quoted strings, escape sequences, and inline comments.
  */
 function parseValue(line: string, start: number): string {
-  let result = ''
+  // Build the result alongside a parallel `protected` flag array so that
+  // trailing-whitespace trim only removes UNQUOTED trailing whitespace.
+  // Without this parallel tracking, a value like `"Alice   "` had its
+  // trailing spaces silently stripped because at end-of-line `inQuote`
+  // is false (quote already closed) — which made the trim apply to
+  // *everything*, including chars that were inside quotes.
+  const chars: string[] = []
+  const protectedFlags: boolean[] = []
   let inQuote = false
   let i = start
+
+  function append(ch: string, fromQuote: boolean): void {
+    chars.push(ch)
+    protectedFlags.push(fromQuote)
+  }
 
   while (i < line.length) {
     const ch = line[i]!
@@ -136,23 +148,23 @@ function parseValue(line: string, start: number): string {
         // Inside quotes: recognize escape sequences
         switch (next) {
           case 'n':
-            result += '\n'
+            append('\n', true)
             break
           case 't':
-            result += '\t'
+            append('\t', true)
             break
           case 'b':
-            result += '\b'
+            append('\b', true)
             break
           case '"':
-            result += '"'
+            append('"', true)
             break
           case '\\':
-            result += '\\'
+            append('\\', true)
             break
           default:
             // Git silently drops the backslash for unknown escapes
-            result += next
+            append(next, true)
             break
         }
         i += 2
@@ -161,34 +173,28 @@ function parseValue(line: string, start: number): string {
       // Outside quotes: backslash at end of line = continuation (we don't
       // handle multi-line since we split on \n, but handle \\ and others)
       if (next === '\\') {
-        result += '\\'
+        append('\\', false)
         i += 2
         continue
       }
       // Fallthrough — treat backslash literally outside quotes
     }
 
-    result += ch
+    append(ch, inQuote)
     i++
   }
 
-  // Trim trailing whitespace from unquoted portions.
-  // Git trims trailing whitespace that isn't inside quotes, but since we
-  // process char-by-char and quotes toggle, the simplest correct approach
-  // for single-line values is to trim the result when not ending in a quote.
-  if (!inQuote) {
-    result = trimTrailingWhitespace(result)
-  }
-
-  return result
-}
-
-function trimTrailingWhitespace(s: string): string {
-  let end = s.length
-  while (end > 0 && (s[end - 1] === ' ' || s[end - 1] === '\t')) {
+  // Trim only trailing UNQUOTED whitespace. Quoted whitespace is preserved
+  // — matches `git config --get` behavior.
+  let end = chars.length
+  while (
+    end > 0 &&
+    !protectedFlags[end - 1] &&
+    (chars[end - 1] === ' ' || chars[end - 1] === '\t')
+  ) {
     end--
   }
-  return s.slice(0, end)
+  return chars.slice(0, end).join('')
 }
 
 /**
