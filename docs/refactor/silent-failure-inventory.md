@@ -48,7 +48,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/02-await-generator-misuse.ts`
 
-**Total scanned**: 50; **findings**: 0
+**Total scanned**: 52; **findings**: 0
 
 ### 3. `optional-chain-on-required-binding`
 
@@ -64,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9222; **findings**: 0
+**Total scanned**: 9207; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -72,7 +72,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2441; **findings**: 0
+**Total scanned**: 2262; **findings**: 0
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -80,7 +80,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1182; **findings**: 86
+**Total scanned**: 1168; **findings**: 86
 
 #### LOW (86)
 
@@ -152,7 +152,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5845; **findings**: 26
+**Total scanned**: 5828; **findings**: 26
 
 #### LOW (26)
 
@@ -215,7 +215,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/08-always-false-feature-flags.ts`
 
-**Total scanned**: 813; **findings**: 495
+**Total scanned**: 812; **findings**: 495
 
 #### LOW (495)
 
@@ -295,7 +295,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 547; **findings**: 133
+**Total scanned**: 535; **findings**: 133
 
 #### MEDIUM (1)
 
@@ -306,7 +306,7 @@ Findings are graded:
 
 - `packages/swarm/testing/index.ts:20` — } as unknown as SwarmHostDeps
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/mailbox/index.ts:1164` — const b = block as unknown as { type: string; name?: string; input?: Record<string, unknown>; [key: string]: unknown }
+- `packages/swarm/src/mailbox/index.ts:1165` — const b = block as unknown as { type: string; name?: string; input?: Record<string, unknown>; [key: string]: unknown }
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/TungstenTool/TungstenTool.ts:4` — export const TungstenTool: Tool = (() => {}) as unknown as Tool;
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -336,13 +336,13 @@ Findings are graded:
   - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/memory/src/sessionMemoryUtils.ts:33` — readFile: (p: string, opts: { encoding: string }) => fsp.readFile(p, opts.encoding as BufferEncoding) as unknown as Promise<string>,
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/settings/settings.ts:426` — (source as unknown) === 'policySettings' ||
+- `packages/config/settings/settings.ts:431` — (source as unknown) === 'policySettings' ||
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/settings/settings.ts:427` — (source as unknown) === 'flagSettings'
+- `packages/config/settings/settings.ts:432` — (source as unknown) === 'flagSettings'
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/plugin/_deps.ts:735` — return (snap as unknown as Record<string | symbol, unknown>)[key]
+- `packages/config/plugin/_deps.ts:729` — return (snap as unknown as Record<string | symbol, unknown>)[key]
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/plugin/_deps.ts:741` — }) as unknown as string[]
+- `packages/config/plugin/_deps.ts:735` — }) as unknown as string[]
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/plugin/installCounts.ts:67` — const parsed = jsonParse(content) as unknown
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -372,7 +372,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 873; **findings**: 0
+**Total scanned**: 676; **findings**: 0
 
 ### 12. `module-level-null-state`
 
