@@ -323,6 +323,13 @@ const CHECKS: Check[] = [
     doc: 'Raw console.log/warn/error/debug/info calls bypass structured logging (logForDebugging, logError) and pollute SDK consumer stdout streams (--output-format=stream-json). streamJsonStdoutGuard exists ONLY because raw console.log slips through. Baseline locked; new occurrences require --tighten with a justified UX/setup reason — otherwise use logForDebugging or process.stdout/stderr.write directly.',
   },
   {
+    id: 'stale-todo-comments',
+    layer: 'Cross-Cutting',
+    subsystem: 'TODO debt accumulation',
+    script: 'scripts/verify-stale-todo-comments.ts',
+    doc: 'TODO/FIXME/XXX/HACK comments accumulate quietly. Without a ratchet they grow forever and become noise nobody reads. Baseline locked; new TODOs require either resolving the issue immediately, OR linking a tracking issue in the comment + --tighten with justification.',
+  },
+  {
     id: 'command-load-targets',
     layer: 'Cross-Cutting',
     subsystem: 'slash-command import correctness',
