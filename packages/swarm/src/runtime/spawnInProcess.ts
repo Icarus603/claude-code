@@ -300,7 +300,7 @@ export function killInProcessTeammate(
 
   // Remove from team file (outside state updater to avoid file I/O in callback)
   if (teamName && agentId) {
-    removeMemberByAgentId(teamName, agentId)
+    void removeMemberByAgentId(teamName, agentId)
   }
 
   if (killed) {

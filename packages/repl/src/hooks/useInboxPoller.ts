@@ -592,7 +592,7 @@ export function useInboxPoller({
         const teamName = currentAppState.teamContext?.teamName
         const agentName = getAgentName()
         if (teamName && agentName) {
-          setMemberMode(teamName, agentName, targetMode)
+          void setMemberMode(teamName, agentName, targetMode)
         }
       }
     }
@@ -725,7 +725,7 @@ export function useInboxPoller({
             // Remove from team file (leader owns team file mutations)
             const teamName = currentAppState.teamContext?.teamName
             if (teamName) {
-              removeTeammateFromTeamFile(teamName, {
+              await removeTeammateFromTeamFile(teamName, {
                 agentId: teammateId,
                 name: teammateToRemove,
               })

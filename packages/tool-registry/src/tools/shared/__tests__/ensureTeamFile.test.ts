@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
-import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { lock as realLock } from '@claude-code/storage/lockfile.js'
 import {
   _test_resetSwarmAppRuntime,
   installSwarmAppRuntime,
@@ -9,6 +10,7 @@ import {
 import {
   readTeamFileAsync,
   type TeamFile,
+  updateTeamFileAsync,
   writeTeamFileAsync,
 } from '@claude-code/swarm'
 import { ensureTeamFile } from '../spawnMultiAgent.js'
@@ -99,6 +101,7 @@ beforeAll(async () => {
     jsonStringify: JSON.stringify,
     getErrnoCode: (e: unknown) => (e as NodeJS.ErrnoException | null)?.code,
     errorMessage: (e: unknown) => (e instanceof Error ? e.message : String(e)),
+    lock: realLock,
     // Note: spawnMultiAgent.ts imports getSessionId directly from
     // bootstrap/state.js (not via the swarm runtime binding), so the stub
     // here is never reached — real session UUID is used instead.
@@ -118,9 +121,7 @@ afterAll(async () => {
 // Each test starts from an empty teams dir so state doesn't leak across cases.
 beforeEach(async () => {
   await rm(teamsDir, { recursive: true, force: true })
-  await mkdtemp(teamsDir).catch(() => {})
-  // mkdtemp(existingPath) fails; just recreate by letting writeTeamFileAsync
-  // mkdir on demand. The dir doesn't need to exist beforehand.
+  await mkdir(teamsDir, { recursive: true })
 })
 
 function makeAppStateWithTeam(
@@ -238,5 +239,38 @@ describe('ensureTeamFile', () => {
     await expect(ensureTeamFile('orphan', appState)).rejects.toThrow(
       /Team "orphan" does not exist/,
     )
+  })
+
+  test('serializes concurrent team file member updates', async () => {
+    const teamName = 'parallel-join'
+    await writeTeamFileAsync(teamName, {
+      name: teamName,
+      createdAt: 1,
+      leadAgentId: `team-lead@${teamName}`,
+      members: [],
+    })
+
+    await Promise.all(
+      Array.from({ length: 32 }, (_, i) => `worker-${i}`).map(name =>
+        updateTeamFileAsync(teamName, teamFile => ({
+          ...teamFile!,
+          members: [
+            ...teamFile!.members,
+            {
+              agentId: `${name}@${teamName}`,
+              name,
+              joinedAt: Date.now(),
+              tmuxPaneId: 'in-process',
+              cwd: '/work',
+              subscriptions: [],
+            },
+          ],
+        })),
+      ),
+    )
+
+    const teamFile = await readTeamFileAsync(teamName)
+    expect(teamFile?.members).toHaveLength(32)
+    expect(new Set(teamFile?.members.map(m => m.name)).size).toBe(32)
   })
 })

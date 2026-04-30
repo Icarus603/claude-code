@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto'
 import { chmodSync, writeFileSync as fsWriteFileSync } from 'fs'
 import { realpath, stat } from 'fs/promises'
 import { homedir } from 'os'
@@ -480,7 +481,7 @@ export async function atomicWriteFile(
   content: string,
 ): Promise<void> {
   const fsp = await import('fs/promises')
-  const tempPath = `${filePath}.tmp.${process.pid}.${Date.now()}`
+  const tempPath = `${filePath}.tmp.${process.pid}.${Date.now()}.${randomUUID()}`
   try {
     await fsp.writeFile(tempPath, content, 'utf-8')
     await fsp.rename(tempPath, filePath)

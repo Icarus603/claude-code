@@ -55,7 +55,7 @@ import {
   sanitizeAgentName,
   sanitizeName,
   type TeamFile,
-  writeTeamFileAsync,
+  updateTeamFileAsync,
 } from '@claude-code/swarm'
 import {
   assignTeammateColor,
@@ -319,6 +319,22 @@ export async function ensureTeamFile(
   const existing = await readTeamFileAsync(teamName)
   if (existing) return existing
 
+  const ensured = await updateTeamFileAsync(
+    teamName,
+    current => current ?? rebuildTeamFileFromAppState(teamName, appState),
+  )
+  if (!ensured) {
+    throw new Error(
+      `Team "${teamName}" does not exist. Call TeamCreate first to create the team.`,
+    )
+  }
+  return ensured
+}
+
+function rebuildTeamFileFromAppState(
+  teamName: string,
+  appState: AppState,
+): TeamFile {
   const ctx = appState.teamContext
   if (!ctx || ctx.teamName !== teamName || !ctx.leadAgentId) {
     throw new Error(
@@ -342,16 +358,28 @@ export async function ensureTeamFile(
     }),
   )
 
-  const rebuilt: TeamFile = {
+  return {
     name: teamName,
     createdAt: Date.now(),
     leadAgentId: ctx.leadAgentId,
     leadSessionId: getSessionId(),
     members,
   }
+}
 
-  await writeTeamFileAsync(teamName, rebuilt)
-  return rebuilt
+async function registerTeammateInTeamFile(
+  teamName: string,
+  appState: AppState,
+  member: TeamFile['members'][number],
+): Promise<void> {
+  await updateTeamFileAsync(teamName, teamFile => {
+    const current = teamFile ?? rebuildTeamFileFromAppState(teamName, appState)
+    const members = current.members.filter(m => m.agentId !== member.agentId)
+    return {
+      ...current,
+      members: [...members, member],
+    }
+  })
 }
 
 // ============================================================================
@@ -547,8 +575,7 @@ async function handleSpawnSplitPane(
   })
 
   // Register agent in the team file
-  const teamFile = await ensureTeamFile(teamName, appState)
-  teamFile.members.push({
+  await registerTeammateInTeamFile(teamName, appState, {
     agentId: teammateId,
     name: sanitizedName,
     agentType: agent_type,
@@ -562,7 +589,6 @@ async function handleSpawnSplitPane(
     subscriptions: [],
     backendType: detectionResult.backend.type,
   })
-  await writeTeamFileAsync(teamName, teamFile)
 
   // Send initial instructions to teammate via mailbox
   // The teammate's inbox poller will pick this up and submit it as their first turn
@@ -756,8 +782,7 @@ async function handleSpawnSeparateWindow(
   })
 
   // Register agent in the team file
-  const teamFile = await ensureTeamFile(teamName, appState)
-  teamFile.members.push({
+  await registerTeammateInTeamFile(teamName, appState, {
     agentId: teammateId,
     name: sanitizedName,
     agentType: agent_type,
@@ -771,7 +796,6 @@ async function handleSpawnSeparateWindow(
     subscriptions: [],
     backendType: 'tmux', // This handler always uses tmux directly
   })
-  await writeTeamFileAsync(teamName, teamFile)
 
   // Send initial instructions to teammate via mailbox
   // The teammate's inbox poller will pick this up and submit it as their first turn
@@ -1037,8 +1061,7 @@ async function handleSpawnInProcess(
   })
 
   // Register agent in the team file
-  const teamFile = await ensureTeamFile(teamName, appState)
-  teamFile.members.push({
+  await registerTeammateInTeamFile(teamName, appState, {
     agentId: teammateId,
     name: sanitizedName,
     agentType: agent_type,
@@ -1052,7 +1075,6 @@ async function handleSpawnInProcess(
     subscriptions: [],
     backendType: 'in-process',
   })
-  await writeTeamFileAsync(teamName, teamFile)
 
   // Note: Do NOT send the prompt via mailbox for in-process teammates.
   // In-process teammates receive the prompt directly via startInProcessTeammate().

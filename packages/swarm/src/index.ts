@@ -67,6 +67,7 @@ export {
   readTeamFile,
   readTeamFileAsync,
   writeTeamFileAsync,
+  updateTeamFileAsync,
   removeTeammateFromTeamFile,
   addHiddenPaneId,
   removeHiddenPaneId,

@@ -612,7 +612,7 @@ async function killTeammate(
     )
   }
   // Remove from team config file
-  removeMemberFromTeam(teamName, paneId)
+  await removeMemberFromTeam(teamName, paneId)
 
   // Unassign tasks and build notification message
   const { notificationMessage } = await unassignTeammateTasks(
@@ -716,7 +716,7 @@ function sendModeChangeToTeammate(
   targetMode: PermissionMode,
 ): void {
   // Update config.json directly so UI shows the change immediately
-  setMemberMode(teamName, teammateName, targetMode)
+  void setMemberMode(teamName, teammateName, targetMode)
 
   // Also send message so teammate updates their local permission context
   const message = createModeSetRequestMessage({
@@ -789,7 +789,7 @@ function cycleAllTeammateModes(
     memberName: t.name,
     mode: targetMode,
   }))
-  setMultipleMemberModes(teamName, modeUpdates)
+  void setMultipleMemberModes(teamName, modeUpdates)
 
   // Send mailbox messages to each teammate
   for (const teammate of teammates) {
