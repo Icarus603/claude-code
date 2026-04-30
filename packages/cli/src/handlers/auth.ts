@@ -32,6 +32,11 @@ import {
   validateForceLoginOrg,
 } from '@claude-code/provider/authAlias.js'
 import { saveGlobalConfig } from '@claude-code/config'
+import {
+  CLAUDE_AI_CONNECTION_ID,
+  getDefaultModelsForProtocol,
+  saveConnection,
+} from '@claude-code/provider/connections.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isRunningOnHomespace } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
@@ -48,6 +53,25 @@ import {
  * Shared post-token-acquisition logic. Saves tokens, fetches profile/roles,
  * and sets up the local auth state.
  */
+function completeHeadlessClaudeAccountLogin(): void {
+  saveConnection({
+    id: CLAUDE_AI_CONNECTION_ID,
+    name: 'Claude Account',
+    protocol: 'anthropic',
+    endpoint: 'https://api.anthropic.com',
+    auth: { type: 'oauth', source: 'claude-ai' },
+    enabled: true,
+    models: getDefaultModelsForProtocol('anthropic'),
+    createdAt: Date.now(),
+  })
+
+  saveGlobalConfig(current => ({
+    ...current,
+    hasCompletedOnboarding: true,
+    lastOnboardingVersion: MACRO.VERSION,
+  }))
+}
+
 async function readManualAuthCode(): Promise<string | null> {
   if (!process.stdin.isTTY) return null
 
@@ -182,12 +206,9 @@ export async function authLogin({
         process.exit(1)
       }
 
-      // Mark onboarding complete — interactive paths handle this via
-      // the Onboarding component, but the env var path skips it.
-      saveGlobalConfig(current => {
-        if (current.hasCompletedOnboarding) return current
-        return { ...current, hasCompletedOnboarding: true }
-      })
+      // Interactive paths handle this via the Onboarding component, but the
+      // headless env-var path skips it.
+      completeHeadlessClaudeAccountLogin()
 
       logEvent('tengu_oauth_success', {
         loginWithClaudeAi: shouldUseClaudeAIAuth(tokens.scopes),
@@ -241,6 +262,7 @@ export async function authLogin({
     )
 
     await installOAuthTokens(result)
+    completeHeadlessClaudeAccountLogin()
 
     const orgResult = await validateForceLoginOrg()
     if (!orgResult.valid) {
