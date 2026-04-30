@@ -78,6 +78,18 @@ const outputSchema = lazySchema(() =>
       })
       .optional(),
     verificationNudgeNeeded: z.boolean().optional(),
+    // When status transitions to 'completed' and cascade-unblock
+    // freed dependent tasks, surface the freed IDs + how many idle
+    // owners were notified. Reflects this back to the leader (the
+    // caller) since task_unblocked mailbox messages are intentionally
+    // delivered only to workers — leader is the sender, it sees this
+    // result instead of an attachment.
+    cascadeUnblock: z
+      .object({
+        unblockedTaskIds: z.array(z.string()),
+        notifiedOwners: z.array(z.string()),
+      })
+      .optional(),
   }),
 )
 type OutputSchema = ReturnType<typeof outputSchema>
@@ -357,6 +369,9 @@ export const TaskUpdateTool = buildTool({
     // Wake-up: idle teammates that just became fully unblocked get a
     // task_unblocked mailbox message so they re-check the task list
     // without waiting for the next 500ms poll.
+    let cascadeUnblock:
+      | { unblockedTaskIds: string[]; notifiedOwners: string[] }
+      | undefined
     if (updates.status === 'completed' && isAgentSwarmsEnabled()) {
       const senderName = getAgentName() || 'team-lead'
       const senderColor = getTeammateColor()
@@ -413,6 +428,14 @@ export const TaskUpdateTool = buildTool({
             ),
           )
         }
+        // Reflect cascade outcome back to the caller (typically the
+        // leader). task_unblocked mailbox messages go ONLY to idle
+        // workers; the leader is the sender of the completion and
+        // would otherwise have no visible signal that cascade fired.
+        cascadeUnblock = {
+          unblockedTaskIds: newlyUnblockedIds,
+          notifiedOwners: Array.from(idleOwners),
+        }
       }
     }
 
@@ -451,6 +474,7 @@ export const TaskUpdateTool = buildTool({
             ? { from: existingTask.status, to: updates.status }
             : undefined,
         verificationNudgeNeeded,
+        cascadeUnblock,
       },
     }
   },
@@ -462,6 +486,7 @@ export const TaskUpdateTool = buildTool({
       error,
       statusChange,
       verificationNudgeNeeded,
+      cascadeUnblock,
     } = content as Output
     if (!success) {
       // Return as non-error so it doesn't trigger sibling tool cancellation
@@ -484,6 +509,20 @@ export const TaskUpdateTool = buildTool({
     ) {
       resultContent +=
         '\n\nTask completed. Call TaskList now to find your next available task or see if your work unblocked others.'
+    }
+
+    // Cascade-unblock visibility: leader (sender) sees the freed
+    // task IDs + notified owners here. Workers got task_unblocked
+    // mailbox messages directly; the leader gets this synchronous
+    // summary because echoing a mailbox message back to its sender
+    // would be redundant noise.
+    if (cascadeUnblock && cascadeUnblock.unblockedTaskIds.length > 0) {
+      const ids = cascadeUnblock.unblockedTaskIds.map(id => `#${id}`).join(', ')
+      const ownersPart =
+        cascadeUnblock.notifiedOwners.length > 0
+          ? ` Notified ${cascadeUnblock.notifiedOwners.length} idle owner(s) (${cascadeUnblock.notifiedOwners.join(', ')}) via task_unblocked mailbox message — they will re-check the task list on their next poll.`
+          : ' No idle owners to notify; the unblocked task(s) sit pending until someone claims them.'
+      resultContent += `\n\nCascade unblock: completing this task freed ${cascadeUnblock.unblockedTaskIds.length} dependent task(s): ${ids}.${ownersPart}`
     }
 
     if (verificationNudgeNeeded) {

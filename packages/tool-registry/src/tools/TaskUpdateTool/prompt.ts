@@ -43,6 +43,14 @@ Status progresses: \`pending\` → \`in_progress\` → \`completed\`
 
 Use \`deleted\` to permanently remove a task.
 
+## Cascade unblock on completion
+
+When you transition a task to \`completed\`, every other task whose \`blockedBy\` referenced it has that ID scrubbed automatically. Tasks that become fully unblocked (empty \`blockedBy\`) trigger a \`task_unblocked\` mailbox message to every idle teammate who owns an open task, so they wake up and re-check the task list.
+
+The cascade outcome is reflected in the tool result you (the caller) see synchronously — \`Cascade unblock: ... freed N dependent task(s): #X, #Y. Notified M idle owner(s) (...)\`. You will NOT receive a \`task_unblocked\` attachment for cascades you triggered yourself; the result string is the signal. Workers (idle teammates) get the mailbox message because they are the ones who need to wake up.
+
+If \`Notified 0 idle owner(s)\`, the unblocked tasks sit pending until someone claims them — typical when there are no live workers, or all current workers are busy with other tasks.
+
 ## Staleness
 
 Make sure to read a task's latest state using \`TaskGet\` before updating it.
