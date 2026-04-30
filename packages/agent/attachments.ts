@@ -258,7 +258,7 @@ import {
   isTeamLead,
 } from '@claude-code/swarm/teammateState.js'
 import { isInProcessTeammate } from '@claude-code/swarm/teammateContextAlias.js'
-import { unassignTeammateTasks } from './tasks.js'
+import { unassignTeammateTasks } from './teamTasks.js'
 
 export const TODO_REMINDER_CONFIG = {
   TURNS_SINCE_WRITE: 10,

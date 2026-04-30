@@ -108,7 +108,13 @@ import { spawnSync } from 'child_process'
 // framework's narrow TaskState already satisfies — closes the two
 // run-streaming.ts assignability errors and one further mailbox.ts
 // drift error, all without changing runtime behavior.
-const BUDGET = 3223
+// 2026-04-30 (Phase P3): bumped 3223 → 3209 after extracting
+// waitForNextPromptOrShutdown into pollForPromptOrShutdown.ts and
+// adding local Task / AppState narrowing types in the new file —
+// closes 14 TS2339 errors that had been hiding behind `as never`
+// casts at the original site without addressing them. Net delta is
+// −14 (ratchet down). Same runtime, more honest type surface.
+const BUDGET = 3209
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

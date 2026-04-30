@@ -461,437 +461,66 @@ export function formatTeammateMessages(
 /**
  * Structured message sent when a teammate becomes idle (via Stop hook)
  */
-export type IdleNotificationMessage = {
-  type: 'idle_notification'
-  from: string
-  timestamp: string
-  /** Why the agent went idle */
-  idleReason?: 'available' | 'interrupted' | 'failed'
-  /** Brief summary of the last DM sent this turn (if any) */
-  summary?: string
-  completedTaskId?: string
-  completedStatus?: 'resolved' | 'blocked' | 'failed'
-  failureReason?: string
-}
+// Protocol message types/factories/checkers live in
+// protocolMessages.ts — see that file for adding new protocol types.
+// We re-export everything from this file so existing imports of
+// `@claude-code/swarm/mailbox/index` keep working.
+export {
+  createIdleNotification,
+  createModeSetRequestMessage,
+  createPermissionRequestMessage,
+  createPermissionResponseMessage,
+  createSandboxPermissionRequestMessage,
+  createSandboxPermissionResponseMessage,
+  createShutdownApprovedMessage,
+  createShutdownRejectedMessage,
+  createShutdownRequestMessage,
+  isIdleNotification,
+  isModeSetRequest,
+  isPermissionRequest,
+  isPermissionResponse,
+  isPlanApprovalRequest,
+  isPlanApprovalResponse,
+  isSandboxPermissionRequest,
+  isSandboxPermissionResponse,
+  isShutdownApproved,
+  isShutdownRejected,
+  isShutdownRequest,
+  isStructuredProtocolMessage,
+  isTaskAssignment,
+  isTeamPermissionUpdate,
+  ModeSetRequestMessageSchema,
+  PlanApprovalRequestMessageSchema,
+  PlanApprovalResponseMessageSchema,
+  ShutdownApprovedMessageSchema,
+  ShutdownRejectedMessageSchema,
+  ShutdownRequestMessageSchema,
+} from './protocolMessages.js'
+export type {
+  IdleNotificationMessage,
+  ModeSetRequestMessage,
+  PermissionRequestMessage,
+  PermissionResponseMessage,
+  PlanApprovalRequestMessage,
+  PlanApprovalResponseMessage,
+  SandboxPermissionRequestMessage,
+  SandboxPermissionResponseMessage,
+  ShutdownApprovedMessage,
+  ShutdownRejectedMessage,
+  ShutdownRequestMessage,
+  TaskAssignmentMessage,
+  TeamPermissionUpdateMessage,
+} from './protocolMessages.js'
 
-/**
- * Creates an idle notification message to send to the team leader
- */
-export function createIdleNotification(
-  agentId: string,
-  options?: {
-    idleReason?: IdleNotificationMessage['idleReason']
-    summary?: string
-    completedTaskId?: string
-    completedStatus?: 'resolved' | 'blocked' | 'failed'
-    failureReason?: string
-  },
-): IdleNotificationMessage {
-  return {
-    type: 'idle_notification',
-    from: agentId,
-    timestamp: new Date().toISOString(),
-    idleReason: options?.idleReason,
-    summary: options?.summary,
-    completedTaskId: options?.completedTaskId,
-    completedStatus: options?.completedStatus,
-    failureReason: options?.failureReason,
-  }
-}
-
-/**
- * Checks if a message text contains an idle notification
- */
-export function isIdleNotification(
-  messageText: string,
-): IdleNotificationMessage | null {
-  try {
-    const parsed = jsonParse(messageText)
-    if (parsed && parsed.type === 'idle_notification') {
-      return parsed as IdleNotificationMessage
-    }
-  } catch {
-    // Not JSON or not a valid idle notification
-  }
-  return null
-}
-
-/**
- * Permission request message sent from worker to leader via mailbox.
- * Field names align with SDK `can_use_tool` (snake_case).
- */
-export type PermissionRequestMessage = {
-  type: 'permission_request'
-  request_id: string
-  agent_id: string
-  tool_name: string
-  tool_use_id: string
-  description: string
-  input: Record<string, unknown>
-  permission_suggestions: unknown[]
-}
-
-/**
- * Permission response message sent from leader to worker via mailbox.
- * Shape mirrors SDK ControlResponseSchema / ControlErrorResponseSchema.
- */
-export type PermissionResponseMessage =
-  | {
-      type: 'permission_response'
-      request_id: string
-      subtype: 'success'
-      response?: {
-        updated_input?: Record<string, unknown>
-        permission_updates?: unknown[]
-      }
-    }
-  | {
-      type: 'permission_response'
-      request_id: string
-      subtype: 'error'
-      error: string
-    }
-
-/**
- * Creates a permission request message to send to the team leader
- */
-export function createPermissionRequestMessage(params: {
-  request_id: string
-  agent_id: string
-  tool_name: string
-  tool_use_id: string
-  description: string
-  input: Record<string, unknown>
-  permission_suggestions?: unknown[]
-}): PermissionRequestMessage {
-  return {
-    type: 'permission_request',
-    request_id: params.request_id,
-    agent_id: params.agent_id,
-    tool_name: params.tool_name,
-    tool_use_id: params.tool_use_id,
-    description: params.description,
-    input: params.input,
-    permission_suggestions: params.permission_suggestions || [],
-  }
-}
-
-/**
- * Creates a permission response message to send back to a worker
- */
-export function createPermissionResponseMessage(params: {
-  request_id: string
-  subtype: 'success' | 'error'
-  error?: string
-  updated_input?: Record<string, unknown>
-  permission_updates?: unknown[]
-}): PermissionResponseMessage {
-  if (params.subtype === 'error') {
-    return {
-      type: 'permission_response',
-      request_id: params.request_id,
-      subtype: 'error',
-      error: params.error || 'Permission denied',
-    }
-  }
-  return {
-    type: 'permission_response',
-    request_id: params.request_id,
-    subtype: 'success',
-    response: {
-      updated_input: params.updated_input,
-      permission_updates: params.permission_updates,
-    },
-  }
-}
-
-/**
- * Checks if a message text contains a permission request
- */
-export function isPermissionRequest(
-  messageText: string,
-): PermissionRequestMessage | null {
-  try {
-    const parsed = jsonParse(messageText)
-    if (parsed && parsed.type === 'permission_request') {
-      return parsed as PermissionRequestMessage
-    }
-  } catch {
-    // Not JSON or not a valid permission request
-  }
-  return null
-}
-
-/**
- * Checks if a message text contains a permission response
- */
-export function isPermissionResponse(
-  messageText: string,
-): PermissionResponseMessage | null {
-  try {
-    const parsed = jsonParse(messageText)
-    if (parsed && parsed.type === 'permission_response') {
-      return parsed as PermissionResponseMessage
-    }
-  } catch {
-    // Not JSON or not a valid permission response
-  }
-  return null
-}
-
-/**
- * Sandbox permission request message sent from worker to leader via mailbox
- * This is triggered when sandbox runtime detects a network access to a non-allowed host
- */
-export type SandboxPermissionRequestMessage = {
-  type: 'sandbox_permission_request'
-  /** Unique identifier for this request */
-  requestId: string
-  /** Worker's CLAUDE_CODE_AGENT_ID */
-  workerId: string
-  /** Worker's CLAUDE_CODE_AGENT_NAME */
-  workerName: string
-  /** Worker's CLAUDE_CODE_AGENT_COLOR */
-  workerColor?: string
-  /** The host pattern requesting network access */
-  hostPattern: {
-    host: string
-  }
-  /** Timestamp when request was created */
-  createdAt: number
-}
-
-/**
- * Sandbox permission response message sent from leader to worker via mailbox
- */
-export type SandboxPermissionResponseMessage = {
-  type: 'sandbox_permission_response'
-  /** ID of the request this responds to */
-  requestId: string
-  /** The host that was approved/denied */
-  host: string
-  /** Whether the connection is allowed */
-  allow: boolean
-  /** Timestamp when response was created */
-  timestamp: string
-}
-
-/**
- * Creates a sandbox permission request message to send to the team leader
- */
-export function createSandboxPermissionRequestMessage(params: {
-  requestId: string
-  workerId: string
-  workerName: string
-  workerColor?: string
-  host: string
-}): SandboxPermissionRequestMessage {
-  return {
-    type: 'sandbox_permission_request',
-    requestId: params.requestId,
-    workerId: params.workerId,
-    workerName: params.workerName,
-    workerColor: params.workerColor,
-    hostPattern: { host: params.host },
-    createdAt: Date.now(),
-  }
-}
-
-/**
- * Creates a sandbox permission response message to send back to a worker
- */
-export function createSandboxPermissionResponseMessage(params: {
-  requestId: string
-  host: string
-  allow: boolean
-}): SandboxPermissionResponseMessage {
-  return {
-    type: 'sandbox_permission_response',
-    requestId: params.requestId,
-    host: params.host,
-    allow: params.allow,
-    timestamp: new Date().toISOString(),
-  }
-}
-
-/**
- * Checks if a message text contains a sandbox permission request
- */
-export function isSandboxPermissionRequest(
-  messageText: string,
-): SandboxPermissionRequestMessage | null {
-  try {
-    const parsed = jsonParse(messageText)
-    if (parsed && parsed.type === 'sandbox_permission_request') {
-      return parsed as SandboxPermissionRequestMessage
-    }
-  } catch {
-    // Not JSON or not a valid sandbox permission request
-  }
-  return null
-}
-
-/**
- * Checks if a message text contains a sandbox permission response
- */
-export function isSandboxPermissionResponse(
-  messageText: string,
-): SandboxPermissionResponseMessage | null {
-  try {
-    const parsed = jsonParse(messageText)
-    if (parsed && parsed.type === 'sandbox_permission_response') {
-      return parsed as SandboxPermissionResponseMessage
-    }
-  } catch {
-    // Not JSON or not a valid sandbox permission response
-  }
-  return null
-}
-
-/**
- * Message sent when a teammate requests plan approval from the team leader
- */
-export const PlanApprovalRequestMessageSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('plan_approval_request'),
-    from: z.string(),
-    timestamp: z.string(),
-    planFilePath: z.string(),
-    planContent: z.string(),
-    requestId: z.string(),
-  }),
-)
-
-export type PlanApprovalRequestMessage = z.infer<
-  ReturnType<typeof PlanApprovalRequestMessageSchema>
->
-
-/**
- * Message sent by the team leader in response to a plan approval request
- */
-export const PlanApprovalResponseMessageSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('plan_approval_response'),
-    requestId: z.string(),
-    approved: z.boolean(),
-    feedback: z.string().optional(),
-    timestamp: z.string(),
-    permissionMode: PermissionModeSchema().optional(),
-  }),
-)
-
-export type PlanApprovalResponseMessage = z.infer<
-  ReturnType<typeof PlanApprovalResponseMessageSchema>
->
-
-/**
- * Shutdown request message sent from leader to teammate via mailbox
- */
-export const ShutdownRequestMessageSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('shutdown_request'),
-    requestId: z.string(),
-    from: z.string(),
-    reason: z.string().optional(),
-    timestamp: z.string(),
-  }),
-)
-
-export type ShutdownRequestMessage = z.infer<
-  ReturnType<typeof ShutdownRequestMessageSchema>
->
-
-/**
- * Shutdown approved message sent from teammate to leader via mailbox
- */
-export const ShutdownApprovedMessageSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('shutdown_approved'),
-    requestId: z.string(),
-    from: z.string(),
-    timestamp: z.string(),
-    paneId: z.string().optional(),
-    backendType: z.string().optional(),
-  }),
-)
-
-export type ShutdownApprovedMessage = z.infer<
-  ReturnType<typeof ShutdownApprovedMessageSchema>
->
-
-/**
- * Shutdown rejected message sent from teammate to leader via mailbox
- */
-export const ShutdownRejectedMessageSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('shutdown_rejected'),
-    requestId: z.string(),
-    from: z.string(),
-    reason: z.string(),
-    timestamp: z.string(),
-  }),
-)
-
-export type ShutdownRejectedMessage = z.infer<
-  ReturnType<typeof ShutdownRejectedMessageSchema>
->
-
-/**
- * Creates a shutdown request message to send to a teammate
- */
-export function createShutdownRequestMessage(params: {
-  requestId: string
-  from: string
-  reason?: string
-}): ShutdownRequestMessage {
-  return {
-    type: 'shutdown_request',
-    requestId: params.requestId,
-    from: params.from,
-    reason: params.reason,
-    timestamp: new Date().toISOString(),
-  }
-}
-
-/**
- * Creates a shutdown approved message to send to the team leader
- */
-export function createShutdownApprovedMessage(params: {
-  requestId: string
-  from: string
-  paneId?: string
-  backendType?: BackendType
-}): ShutdownApprovedMessage {
-  return {
-    type: 'shutdown_approved',
-    requestId: params.requestId,
-    from: params.from,
-    timestamp: new Date().toISOString(),
-    paneId: params.paneId,
-    backendType: params.backendType,
-  }
-}
-
-/**
- * Creates a shutdown rejected message to send to the team leader
- */
-export function createShutdownRejectedMessage(params: {
-  requestId: string
-  from: string
-  reason: string
-}): ShutdownRejectedMessage {
-  return {
-    type: 'shutdown_rejected',
-    requestId: params.requestId,
-    from: params.from,
-    reason: params.reason,
-    timestamp: new Date().toISOString(),
-  }
-}
+import { createShutdownRequestMessage } from './protocolMessages.js'
 
 /**
  * Sends a shutdown request to a teammate's mailbox.
- * This is the core logic extracted for reuse by both the tool and UI components.
+ * Convenience wrapper around `writeToMailbox` + the protocol factory.
+ *
+ * Lives in this file (not protocolMessages.ts) because it touches
+ * IO + identity bindings (getTeamName, getAgentName, getTeammateColor,
+ * generateRequestId) that are runtime concerns, not protocol shape.
  *
  * @param targetName - Name of the teammate to send shutdown request to
  * @param teamName - Optional team name (defaults to CLAUDE_CODE_TEAM_NAME env var)
@@ -930,238 +559,6 @@ export async function sendShutdownRequestToMailbox(
   )
 
   return { requestId, target: targetName }
-}
-
-/**
- * Checks if a message text contains a shutdown request
- */
-export function isShutdownRequest(
-  messageText: string,
-): ShutdownRequestMessage | null {
-  try {
-    const result = ShutdownRequestMessageSchema().safeParse(
-      jsonParse(messageText),
-    )
-    if (result.success) return result.data
-  } catch {
-    // Not JSON
-  }
-  return null
-}
-
-/**
- * Checks if a message text contains a plan approval request
- */
-export function isPlanApprovalRequest(
-  messageText: string,
-): PlanApprovalRequestMessage | null {
-  try {
-    const result = PlanApprovalRequestMessageSchema().safeParse(
-      jsonParse(messageText),
-    )
-    if (result.success) return result.data
-  } catch {
-    // Not JSON
-  }
-  return null
-}
-
-/**
- * Checks if a message text contains a shutdown approved message
- */
-export function isShutdownApproved(
-  messageText: string,
-): ShutdownApprovedMessage | null {
-  try {
-    const result = ShutdownApprovedMessageSchema().safeParse(
-      jsonParse(messageText),
-    )
-    if (result.success) return result.data
-  } catch {
-    // Not JSON
-  }
-  return null
-}
-
-/**
- * Checks if a message text contains a shutdown rejected message
- */
-export function isShutdownRejected(
-  messageText: string,
-): ShutdownRejectedMessage | null {
-  try {
-    const result = ShutdownRejectedMessageSchema().safeParse(
-      jsonParse(messageText),
-    )
-    if (result.success) return result.data
-  } catch {
-    // Not JSON
-  }
-  return null
-}
-
-/**
- * Checks if a message text contains a plan approval response
- */
-export function isPlanApprovalResponse(
-  messageText: string,
-): PlanApprovalResponseMessage | null {
-  try {
-    const result = PlanApprovalResponseMessageSchema().safeParse(
-      jsonParse(messageText),
-    )
-    if (result.success) return result.data
-  } catch {
-    // Not JSON
-  }
-  return null
-}
-
-/**
- * Task assignment message sent when a task is assigned to a teammate
- */
-export type TaskAssignmentMessage = {
-  type: 'task_assignment'
-  taskId: string
-  subject: string
-  description: string
-  assignedBy: string
-  timestamp: string
-}
-
-/**
- * Checks if a message text contains a task assignment
- */
-export function isTaskAssignment(
-  messageText: string,
-): TaskAssignmentMessage | null {
-  try {
-    const parsed = jsonParse(messageText)
-    if (parsed && parsed.type === 'task_assignment') {
-      return parsed as TaskAssignmentMessage
-    }
-  } catch {
-    // Not JSON or not a valid task assignment
-  }
-  return null
-}
-
-/**
- * Team permission update message sent from leader to teammates via mailbox
- * Broadcasts a permission update that applies to all teammates
- */
-export type TeamPermissionUpdateMessage = {
-  type: 'team_permission_update'
-  /** The permission update to apply */
-  permissionUpdate: {
-    type: 'addRules'
-    rules: Array<{ toolName: string; ruleContent?: string }>
-    behavior: 'allow' | 'deny' | 'ask'
-    destination: 'session'
-  }
-  /** The directory path that was allowed */
-  directoryPath: string
-  /** The tool name this applies to */
-  toolName: string
-}
-
-/**
- * Checks if a message text contains a team permission update
- */
-export function isTeamPermissionUpdate(
-  messageText: string,
-): TeamPermissionUpdateMessage | null {
-  try {
-    const parsed = jsonParse(messageText)
-    if (parsed && parsed.type === 'team_permission_update') {
-      return parsed as TeamPermissionUpdateMessage
-    }
-  } catch {
-    // Not JSON or not a valid team permission update
-  }
-  return null
-}
-
-/**
- * Mode set request message sent from leader to teammate via mailbox
- * Uses SDK PermissionModeSchema for validated mode values
- */
-export const ModeSetRequestMessageSchema = lazySchema(() =>
-  z.object({
-    type: z.literal('mode_set_request'),
-    mode: PermissionModeSchema(),
-    from: z.string(),
-  }),
-)
-
-export type ModeSetRequestMessage = z.infer<
-  ReturnType<typeof ModeSetRequestMessageSchema>
->
-
-/**
- * Creates a mode set request message to send to a teammate
- */
-export function createModeSetRequestMessage(params: {
-  mode: string
-  from: string
-}): ModeSetRequestMessage {
-  return {
-    type: 'mode_set_request',
-    mode: params.mode as ModeSetRequestMessage['mode'],
-    from: params.from,
-  }
-}
-
-/**
- * Checks if a message text contains a mode set request
- */
-export function isModeSetRequest(
-  messageText: string,
-): ModeSetRequestMessage | null {
-  try {
-    const parsed = ModeSetRequestMessageSchema().safeParse(
-      jsonParse(messageText),
-    )
-    if (parsed.success) {
-      return parsed.data
-    }
-  } catch {
-    // Not JSON or not a valid mode set request
-  }
-  return null
-}
-
-/**
- * Checks if a message text is a structured protocol message that should be
- * routed by useInboxPoller rather than consumed as raw LLM context.
- *
- * These message types have specific handlers in useInboxPoller that route them
- * to the correct queues (workerPermissions, workerSandboxPermissions, etc.).
- * If getTeammateMailboxAttachments consumes them first, they get bundled as
- * raw text in attachments and never reach their intended handlers.
- */
-export function isStructuredProtocolMessage(messageText: string): boolean {
-  try {
-    const parsed = jsonParse(messageText)
-    if (!parsed || typeof parsed !== 'object' || !('type' in parsed)) {
-      return false
-    }
-    const type = (parsed as { type: unknown }).type
-    return (
-      type === 'permission_request' ||
-      type === 'permission_response' ||
-      type === 'sandbox_permission_request' ||
-      type === 'sandbox_permission_response' ||
-      type === 'shutdown_request' ||
-      type === 'shutdown_approved' ||
-      type === 'team_permission_update' ||
-      type === 'mode_set_request' ||
-      type === 'plan_approval_request' ||
-      type === 'plan_approval_response'
-    )
-  } catch {
-    return false
-  }
 }
 
 /**

@@ -33,7 +33,7 @@ import {
 } from '@claude-code/swarm/teammateState.js'
 
 import { isAgentSwarmsEnabled } from '../agentSwarmsEnabled.js'
-import { unassignTeammateTasks } from '../tasks.js'
+import { unassignTeammateTasks } from '../teamTasks.js'
 import type { Attachment } from '../attachments.js'
 
 /**

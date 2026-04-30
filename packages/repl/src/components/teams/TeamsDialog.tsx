@@ -47,11 +47,8 @@ import {
   setMemberMode,
   setMultipleMemberModes,
 } from '@claude-code/swarm'
-import {
-  listTasks,
-  type Task,
-  unassignTeammateTasks,
-} from '@claude-code/agent/tasks.js'
+import { listTasks, type Task } from '@claude-code/agent/tasks.js'
+import { unassignTeammateTasks } from '@claude-code/agent/teamTasks.js'
 import {
   getTeammateStatuses,
   type TeammateStatus,

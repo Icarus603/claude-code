@@ -25,6 +25,7 @@
     "./abortController.js": "./abortController.ts",
     "./abortController": "./abortController.ts",
     "./tasks.js": "./tasks.ts",
+    "./teamTasks.js": "./teamTasks.ts",
     "./tasks/MonitorMcpTask/MonitorMcpTask.js": "./tasks/MonitorMcpTask/MonitorMcpTask.ts",
     "./tasks/LocalWorkflowTask/LocalWorkflowTask.js": "./tasks/LocalWorkflowTask/LocalWorkflowTask.ts",
     "./proactive/index.js": "./proactive/index.ts",

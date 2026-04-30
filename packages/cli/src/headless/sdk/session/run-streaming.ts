@@ -335,7 +335,7 @@ import {
   isShutdownApproved,
 } from '@claude-code/swarm'
 import { removeTeammateFromTeamFile } from '@claude-code/swarm'
-import { unassignTeammateTasks } from '@claude-code/agent/tasks.js'
+import { unassignTeammateTasks } from '@claude-code/agent/teamTasks.js'
 import { getRunningTasks } from '@claude-code/agent/task/framework.js'
 import { isBackgroundTask } from '@claude-code/repl/tasksTypes.js'
 import { stopTask } from '@claude-code/agent/tasks/stopTask.js'
