@@ -129,11 +129,16 @@ const TEAMMATE_ENV_VARS = [
 
 /**
  * Builds the `env KEY=VALUE ...` string for teammate spawn commands.
- * Always includes CLAUDECODE=1 and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1,
- * plus any provider/config env vars that are set in the current process.
+ * Always includes CLAUDECODE=1, plus any provider/config env vars
+ * that are set in the current process.
+ *
+ * Historical: also injected CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+ * so spawned teammates would pass the swarm gate. The gate is now
+ * default-true (Phase W1), so the env var is no longer needed and
+ * has been removed to keep the spawned environment minimal.
  */
 export function buildInheritedEnvVars(): string {
-  const envVars = ['CLAUDECODE=1', 'CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1']
+  const envVars = ['CLAUDECODE=1']
 
   for (const key of TEAMMATE_ENV_VARS) {
     const value = process.env[key]

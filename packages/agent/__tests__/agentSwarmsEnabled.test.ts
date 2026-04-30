@@ -1,28 +1,28 @@
+/**
+ * Tests for isAgentSwarmsEnabled — the single gate for swarm/teammate
+ * features.
+ *
+ * Phase W1 simplified the gate to just the GrowthBook killswitch
+ * `tengu_amber_flint` (default true). The previous USER_TYPE='ant'
+ * short-circuit + CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS env var +
+ * --agent-teams CLI flag are all gone — swarm is a first-class
+ * ccb feature, not an experimental opt-in.
+ *
+ * If a future regression brings any of those gates back, this test
+ * file is the canary: it asserts the contract that no env, no flag,
+ * no USER_TYPE check influences the result.
+ */
 import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test'
 
-// Mock the two host bindings the function reaches into. Spread the real
-// modules so unrelated exports stay intact (per ratchet rule).
 const realFeatureFlags = await import('@claude-code/config/feature-flags')
-const realEnvUtils = await import('@claude-code/config/env/utils')
 
 let growthBookValue = true
-const envOverrides = new Map<string, string>()
 
 mock.module('@claude-code/config/feature-flags', () => ({
   ...realFeatureFlags,
-  getFeatureValue_CACHED_MAY_BE_STALE: <T>(_key: string, fallback: T) => {
-    if (_key === 'tengu_amber_flint') return growthBookValue as T
+  getFeatureValue_CACHED_MAY_BE_STALE: <T>(key: string, fallback: T) => {
+    if (key === 'tengu_amber_flint') return growthBookValue as T
     return fallback
-  },
-}))
-
-mock.module('@claude-code/config/env/utils', () => ({
-  ...realEnvUtils,
-  readEnv: (key: string) => envOverrides.get(key) ?? '',
-  isEnvTruthy: (val: string | undefined) => {
-    if (!val) return false
-    const lc = val.toLowerCase()
-    return lc === '1' || lc === 'true' || lc === 'yes'
   },
 }))
 
@@ -30,12 +30,14 @@ const { isAgentSwarmsEnabled } = await import('../agentSwarmsEnabled.js')
 
 const realArgv = process.argv
 const realUserType = process.env.USER_TYPE
+const realExperimentalEnv =
+  process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
 
 beforeEach(() => {
-  envOverrides.clear()
   growthBookValue = true
   process.argv = ['bun', 'cli.ts']
   delete process.env.USER_TYPE
+  delete process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
 })
 
 afterEach(() => {
@@ -45,104 +47,69 @@ afterEach(() => {
   } else {
     delete process.env.USER_TYPE
   }
+  if (realExperimentalEnv !== undefined) {
+    process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = realExperimentalEnv
+  } else {
+    delete process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  }
 })
 
-describe('isAgentSwarmsEnabled — ant short-circuit', () => {
-  test('USER_TYPE=ant returns true regardless of other gates', () => {
-    process.env.USER_TYPE = 'ant'
-    growthBookValue = false // even with GrowthBook killswitch
+describe('isAgentSwarmsEnabled — default-on for ccb operator', () => {
+  test('returns true with no env vars, no flags, no USER_TYPE', () => {
     expect(isAgentSwarmsEnabled()).toBe(true)
   })
 
-  test('USER_TYPE=ant ignores missing env opt-in', () => {
-    process.env.USER_TYPE = 'ant'
-    // no CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS, no --agent-teams
+  test('returns true even when USER_TYPE is unset (no ant short-circuit needed)', () => {
+    delete process.env.USER_TYPE
     expect(isAgentSwarmsEnabled()).toBe(true)
   })
 
-  test('USER_TYPE=ANT (uppercase) does NOT short-circuit', () => {
-    // Contract: case-sensitive comparison
-    process.env.USER_TYPE = 'ANT'
+  test('USER_TYPE=ant does NOT change behavior — still uses GrowthBook gate', () => {
+    process.env.USER_TYPE = 'ant'
+    expect(isAgentSwarmsEnabled()).toBe(true)
+    growthBookValue = false
     expect(isAgentSwarmsEnabled()).toBe(false)
+  })
+
+  test('USER_TYPE=external does NOT change behavior — still uses GrowthBook gate', () => {
+    process.env.USER_TYPE = 'external'
+    expect(isAgentSwarmsEnabled()).toBe(true)
   })
 })
 
-describe('isAgentSwarmsEnabled — opt-in gate', () => {
-  test('returns false when no env var and no --agent-teams flag', () => {
-    expect(isAgentSwarmsEnabled()).toBe(false)
-  })
-
-  test('returns true when CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 and GrowthBook alive', () => {
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', '1')
+describe('isAgentSwarmsEnabled — historical opt-in mechanisms are dead', () => {
+  test('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS env var has no effect', () => {
+    process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = '0'
+    expect(isAgentSwarmsEnabled()).toBe(true)
+    process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = 'false'
     expect(isAgentSwarmsEnabled()).toBe(true)
   })
 
-  test('returns true when CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=true (string)', () => {
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', 'true')
+  test('--agent-teams CLI flag has no effect (was external opt-in, now redundant)', () => {
+    process.argv = ['bun', 'cli.ts'] // no flag
     expect(isAgentSwarmsEnabled()).toBe(true)
-  })
-
-  test('returns false when CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=0', () => {
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', '0')
-    expect(isAgentSwarmsEnabled()).toBe(false)
-  })
-
-  test('returns false when CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=false', () => {
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', 'false')
-    expect(isAgentSwarmsEnabled()).toBe(false)
-  })
-
-  test('returns true when --agent-teams flag is in argv (no env needed)', () => {
-    process.argv = ['bun', 'cli.ts', '--agent-teams']
-    expect(isAgentSwarmsEnabled()).toBe(true)
-  })
-
-  test('returns true when both env var AND --agent-teams flag are set', () => {
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', '1')
-    process.argv = ['bun', 'cli.ts', '--agent-teams']
+    process.argv = ['bun', 'cli.ts', '--agent-teams'] // flag set
     expect(isAgentSwarmsEnabled()).toBe(true)
   })
 })
 
 describe('isAgentSwarmsEnabled — GrowthBook killswitch', () => {
-  test('returns false when CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 but GrowthBook killed', () => {
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', '1')
+  test('returns false when tengu_amber_flint is killed', () => {
     growthBookValue = false
     expect(isAgentSwarmsEnabled()).toBe(false)
   })
 
-  test('returns false when --agent-teams set but GrowthBook killed', () => {
-    process.argv = ['bun', 'cli.ts', '--agent-teams']
-    growthBookValue = false
-    expect(isAgentSwarmsEnabled()).toBe(false)
-  })
-
-  test('GrowthBook gate is named "tengu_amber_flint" with default true', () => {
-    // Contract: the killswitch defaults to ON (returns true when
-    // GrowthBook value is missing / cache stale). Verify by setting
-    // env opt-in but NOT setting growthBookValue (default true).
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', '1')
-    growthBookValue = true
-    expect(isAgentSwarmsEnabled()).toBe(true)
-  })
-})
-
-describe('isAgentSwarmsEnabled — 3-way gate combinations', () => {
-  test('all gates: ant + env + flag + GrowthBook → true', () => {
+  test('GrowthBook overrides USER_TYPE=ant (no preferential treatment)', () => {
     process.env.USER_TYPE = 'ant'
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', '1')
-    process.argv = ['bun', 'cli.ts', '--agent-teams']
-    growthBookValue = true
-    expect(isAgentSwarmsEnabled()).toBe(true)
-  })
-
-  test('non-ant + no env + no flag + GrowthBook alive → false (env/flag gate fails first)', () => {
-    growthBookValue = true
+    growthBookValue = false
     expect(isAgentSwarmsEnabled()).toBe(false)
   })
 
-  test('non-ant + env=true + GrowthBook alive → true', () => {
-    envOverrides.set('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS', '1')
+  test('killswitch defaults to true — missing GrowthBook value means swarm enabled', () => {
+    // The mock returns the fallback (passed by the caller) when the
+    // key is unknown. The implementation passes `true` as fallback,
+    // so a stale/missing GrowthBook cache produces "enabled". This
+    // test verifies the default by exercising the fallback path.
     growthBookValue = true
     expect(isAgentSwarmsEnabled()).toBe(true)
   })

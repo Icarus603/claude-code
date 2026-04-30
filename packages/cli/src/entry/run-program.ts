@@ -174,11 +174,9 @@ function attachSecondaryOptions(program: CommanderCommand): void {
         .argParser(String)
         .hideHelp(),
     )
-    program.option(
-      '--agent-teams',
-      '[ANT-ONLY] Force Claude to use multi-agent mode for solving problems',
-      () => true,
-    )
+    // --agent-teams flag was removed in Phase W1: swarm is now
+    // a default-on first-class feature (see agentSwarmsEnabled.ts),
+    // there is nothing to "force" anymore.
   }
 
   if (feature('TRANSCRIPT_CLASSIFIER')) {
