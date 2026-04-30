@@ -282,6 +282,77 @@ function Invoke-PruneOldVersions {
   }
 }
 
+# ----- shim install (Windows file-lock-aware) --------------------------------
+
+# Copy $source over $shim. If $shim is already in use by a running ccb.exe,
+# rename it out of the way first (Windows allows renaming a running PE; it
+# only blocks delete/overwrite). On copy failure, roll back so the user is
+# never left without a working executable.
+#
+# Also opportunistically prunes leftover *.old.* files from previous installs.
+# Those linger when the running ccb.exe holds them open at copy-time; once
+# the process exits they become deletable, so we clean them on the next run.
+function Install-Shim {
+  param(
+    [Parameter(Mandatory=$true)][string]$Source,
+    [Parameter(Mandatory=$true)][string]$Shim
+  )
+
+  # Clean up any stale .old.* leftovers from previous installs first.
+  # Safe to ignore failures — a still-running ccb keeps its own .old.* file
+  # locked, but we'll catch it next time.
+  $shimDir = Split-Path -Parent $Shim
+  $shimBase = Split-Path -Leaf $Shim
+  Get-ChildItem -LiteralPath $shimDir -Filter "$shimBase.old.*" -ErrorAction SilentlyContinue |
+    ForEach-Object {
+      try { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction Stop }
+      catch { }  # still in use — try again on the next install
+    }
+
+  if (-not (Test-Path -LiteralPath $Shim)) {
+    # Fresh install: nothing to rename, just copy.
+    Copy-Item -Force -Path $Source -Destination $Shim
+    return
+  }
+
+  # Same content? Skip the copy entirely.
+  try {
+    $srcLen = (Get-Item -LiteralPath $Source).Length
+    $dstLen = (Get-Item -LiteralPath $Shim).Length
+    if ($srcLen -eq $dstLen) {
+      $srcHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Source).Hash
+      $dstHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Shim).Hash
+      if ($srcHash -eq $dstHash) {
+        return
+      }
+    }
+  } catch {
+    # If hashing fails for any reason, fall through to the rename-and-copy path.
+  }
+
+  # Rename existing shim out of the way (works even when it's running).
+  $stamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+  $oldShim = "$Shim.old.$stamp"
+  Rename-Item -LiteralPath $Shim -NewName (Split-Path -Leaf $oldShim) -ErrorAction Stop
+
+  try {
+    Copy-Item -Force -Path $Source -Destination $Shim -ErrorAction Stop
+  } catch {
+    # Copy failed — restore the old shim so the user still has a working ccb.
+    $copyError = $_
+    try {
+      Rename-Item -LiteralPath $oldShim -NewName (Split-Path -Leaf $Shim) -ErrorAction Stop
+    } catch {
+      Write-Fatal "Failed to install shim AND failed to restore previous shim: copy: $copyError ; restore: $_"
+    }
+    throw $copyError
+  }
+
+  # Best-effort cleanup of the just-renamed file. If a running ccb holds it
+  # open, the next install will pick it up via the prune block above.
+  try { Remove-Item -LiteralPath $oldShim -Force -ErrorAction Stop } catch { }
+}
+
 # ----- main ------------------------------------------------------------------
 
 function Main {
@@ -322,10 +393,19 @@ function Main {
 
   Move-Item -Force -Path $tmp -Destination $versionedPath
 
-  # Copy to shim location. We use Copy-Item (not symlink) because Windows
-  # symlinks require admin or Developer Mode. A plain copy works for everyone
-  # and re-running the installer just overwrites it.
-  Copy-Item -Force -Path $versionedPath -Destination $shimPath
+  # Copy to shim location. We use a copy (not a symlink) because Windows
+  # symlinks require admin or Developer Mode.
+  #
+  # The naive `Copy-Item -Force` fails when ccb.exe is currently running
+  # (`正由另一进程使用，因此该进程无法访问此文件` / "The process cannot access
+  # the file because it is being used by another process"). Windows lets you
+  # *rename* a running .exe but not delete or overwrite it.
+  #
+  # So: if the shim already exists, rename it out of the way first, then
+  # copy. If the copy fails, roll back by renaming the old file back.
+  # Mirrors packages/updater/src/nativeInstaller/installer.ts updateSymlink
+  # Windows branch (lines ~658-700).
+  Install-Shim $versionedPath $shimPath
 
   Write-Ok "Installed: $shimPath"
   try { & $shimPath --version } catch { }
