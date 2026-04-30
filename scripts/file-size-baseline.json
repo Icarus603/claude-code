@@ -74,7 +74,7 @@
   "packages/provider/src/mockRateLimits.ts": 884,
   "packages/provider/src/withRetry.ts": 822,
   "packages/repl/src/Cursor.ts": 1530,
-  "packages/repl/src/components/ConsoleOAuthFlow.tsx": 1834,
+  "packages/repl/src/components/ConsoleOAuthFlow.tsx": 1867,
   "packages/repl/src/components/CustomSelect/select.tsx": 932,
   "packages/repl/src/components/LogSelector.tsx": 1449,
   "packages/repl/src/components/MessageSelector.tsx": 996,

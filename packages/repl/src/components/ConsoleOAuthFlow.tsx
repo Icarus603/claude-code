@@ -164,6 +164,8 @@ export function ConsoleOAuthFlow({
   // copy the code from the browser and paste it in the terminal
   const [showPastePrompt, setShowPastePrompt] = useState(false)
   const [urlCopied, setUrlCopied] = useState(false)
+  const [pastePromptExitHint, setPastePromptExitHint] = useState(false)
+  const pastePromptExitTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const codexManualInputResolverRef = useRef<((value: string) => void) | null>(
     null,
   )
@@ -454,10 +456,29 @@ export function ConsoleOAuthFlow({
     }
   }, [mode, oauthStatus, loginWithClaudeAi, onDone])
 
+  function handlePastePromptExit() {
+    if (pastePromptExitHint) {
+      onDone()
+      return
+    }
+    setPastePromptExitHint(true)
+    if (pastePromptExitTimeoutRef.current) {
+      clearTimeout(pastePromptExitTimeoutRef.current)
+    }
+    pastePromptExitTimeoutRef.current = setTimeout(
+      setPastePromptExitHint,
+      800,
+      false,
+    )
+  }
+
   // Cleanup OAuth service when component unmounts
   useEffect(() => {
     return () => {
       codexManualInputResolverRef.current = null
+      if (pastePromptExitTimeoutRef.current) {
+        clearTimeout(pastePromptExitTimeoutRef.current)
+      }
       oauthService.cleanup()
     }
   }, [oauthService])
@@ -516,6 +537,8 @@ export function ConsoleOAuthFlow({
           cursorOffset={cursorOffset}
           setCursorOffset={setCursorOffset}
           textInputColumns={textInputColumns}
+          pastePromptExitHint={pastePromptExitHint}
+          handlePastePromptExit={handlePastePromptExit}
           handleSubmitCode={handleSubmitCode}
           setOAuthStatus={setOAuthStatus}
           setLoginWithClaudeAi={setLoginWithClaudeAi}
@@ -541,6 +564,8 @@ type OAuthStatusMessageProps = {
   onDone: () => void
   setCursorOffset: (offset: number) => void
   textInputColumns: number
+  pastePromptExitHint: boolean
+  handlePastePromptExit: () => void
   handleSubmitCode: (value: string, url: string) => void
   setOAuthStatus: (status: OAuthStatus) => void
   setLoginWithClaudeAi: (value: boolean) => void
@@ -561,6 +586,8 @@ function OAuthStatusMessage({
   cursorOffset,
   setCursorOffset,
   textInputColumns,
+  pastePromptExitHint,
+  handlePastePromptExit,
   handleSubmitCode,
   setOAuthStatus,
   setLoginWithClaudeAi,
@@ -1770,8 +1797,14 @@ function OAuthStatusMessage({
                 onChangeCursorOffset={setCursorOffset}
                 columns={textInputColumns}
                 mask="*"
+                onExit={handlePastePromptExit}
+                onExitMessage={setPastePromptExitHint}
               />
             </Box>
+          )}
+
+          {showPastePrompt && pastePromptExitHint && (
+            <Text dimColor>Press Ctrl-C again to exit</Text>
           )}
         </Box>
       )
