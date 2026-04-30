@@ -15,7 +15,7 @@ import {
   formatWarnings,
   validateUserConfig,
 } from '../keybindings/validate.js'
-import type { KeybindingBlock } from '../keybindings/types.js'
+import type { KeybindingBlock } from '@anthropic/ink'
 
 describe('validateUserConfig — top-level shape', () => {
   test('non-array → parse_error warning', () => {
