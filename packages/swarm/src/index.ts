@@ -84,6 +84,13 @@ export {
   inputSchema,
 } from './core/teamHelpers.js'
 
+export {
+  ensureTeamFileFromSnapshot,
+  registerTeammateInTeamFile,
+} from './core/teamFileRegistration.js'
+
+export type { TeamContextSnapshot } from './core/teamFileRegistration.js'
+
 export type {
   SpawnTeamOutput,
   CleanupOutput,
