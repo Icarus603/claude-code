@@ -31,7 +31,7 @@ Send a message to another agent.
 | \`to\` | |
 |---|---|
 | \`"researcher"\` | Teammate by name |
-| \`"*"\` | Broadcast to all teammates — expensive (linear in team size), use only when everyone genuinely needs it |${udsRow}
+| \`"*"\` | Broadcast to all teammates, **plain-text only**. Structured protocol messages (\`shutdown_request\`, \`plan_approval_request\`) are rejected — they carry a per-recipient \`requestId\` for response tracking, which a single broadcast cannot demultiplex. Fan out: call SendMessage once per teammate name. |${udsRow}
 
 Your plain text output is NOT visible to other agents — to communicate, you MUST call this tool. Messages from teammates are delivered automatically; you don't check an inbox. Refer to teammates by name, never by UUID. When relaying, don't quote the original — it's already rendered to the user.${udsSection}
 
@@ -45,5 +45,7 @@ If you receive a JSON message with \`type: "shutdown_request"\` or \`type: "plan
 \`\`\`
 
 Approving shutdown terminates your process. Rejecting plan sends the teammate back to revise. Don't originate \`shutdown_request\` unless asked. Don't send structured JSON status messages — use TaskUpdate.
+
+To send the same protocol message to N teammates (e.g. shut down a whole team), call SendMessage N times — once per teammate name, each in the same model turn so they fan out in parallel. Do NOT use \`to: "*"\` for protocol messages; the tool rejects it with an explanation.
 `.trim()
 }

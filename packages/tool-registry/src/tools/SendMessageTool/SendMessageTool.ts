@@ -447,7 +447,8 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
       if (input.to === '*') {
         return {
           result: false,
-          message: 'structured messages cannot be broadcast (to: "*")',
+          message:
+            'structured messages must be sent individually (to: "<name>") — broadcast (to: "*") is for plain-text DMs only. Each protocol message carries a requestId for independent response tracking, which a single broadcast cannot demultiplex. To send shutdown_request to all teammates, call SendMessage once per teammate name.',
           errorCode: 9,
         }
       }
@@ -650,7 +651,14 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
       }
 
       if (input.to === '*') {
-        throw new Error('structured messages cannot be broadcast')
+        // Defensive — the canUseTool gate at line 447 should have
+        // already short-circuited this with a friendly error. If we
+        // reach here, the guard was bypassed; surface the same
+        // teaching message instead of a terse throw so the operator
+        // sees what to do.
+        throw new Error(
+          'structured messages must be sent individually (to: "<name>") — broadcast (to: "*") is for plain-text DMs only. To send a protocol message (shutdown_request, plan_approval_request) to multiple teammates, call SendMessage once per teammate name; each call gets an independent requestId.',
+        )
       }
 
       switch (input.message.type) {
