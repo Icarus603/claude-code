@@ -1,5 +1,6 @@
 /* eslint-disable custom-rules/no-process-exit -- CLI subcommand handler intentionally exits */
 
+import { createInterface } from 'node:readline/promises'
 import {
   clearAuthRelatedCaches,
   performLogout,
@@ -47,6 +48,24 @@ import {
  * Shared post-token-acquisition logic. Saves tokens, fetches profile/roles,
  * and sets up the local auth state.
  */
+async function readManualAuthCode(): Promise<string | null> {
+  if (!process.stdin.isTTY) return null
+
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+
+  try {
+    const value = await rl.question(
+      'Paste code here if prompted (AUTHORIZATION_CODE#STATE): ',
+    )
+    return value.trim() || null
+  } finally {
+    rl.close()
+  }
+}
+
 export async function installOAuthTokens(tokens: OAuthTokens): Promise<void> {
   // Clear old state before saving new credentials
   await performLogout({ clearOnboarding: false })
@@ -196,6 +215,22 @@ export async function authLogin({
       async url => {
         process.stdout.write('Opening browser to sign in…\n')
         process.stdout.write(`If the browser didn't open, visit: ${url}\n`)
+        void readManualAuthCode().then(manualCode => {
+          if (!manualCode) return
+
+          const [authorizationCode, state] = manualCode.split('#')
+          if (!authorizationCode || !state) {
+            process.stderr.write(
+              'Invalid code. Paste the full code in AUTHORIZATION_CODE#STATE format.\n',
+            )
+            return
+          }
+
+          oauthService.handleManualAuthCodeInput({
+            authorizationCode,
+            state,
+          })
+        })
       },
       {
         loginWithClaudeAi,
