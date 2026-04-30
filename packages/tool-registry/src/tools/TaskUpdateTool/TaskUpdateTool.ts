@@ -10,6 +10,7 @@ import {
 import { lazySchema } from '../../utils/lazySchema.js'
 import {
   blockTask,
+  cascadeUnblockOnCompletion,
   deleteTask,
   getTask,
   getTaskListId,
@@ -25,7 +26,7 @@ import {
   getTeammateColor,
   getTeamName,
 } from '@claude-code/swarm/teammateState.js'
-import { writeToMailbox } from '@claude-code/swarm'
+import { readTeamFileAsync, writeToMailbox } from '@claude-code/swarm'
 import { VERIFICATION_AGENT_TYPE } from '../AgentTool/constants.js'
 import { TASK_UPDATE_TOOL_NAME } from './constants.js'
 import { DESCRIPTION, PROMPT } from './prompt.js'
@@ -47,14 +48,12 @@ const inputSchema = lazySchema(() => {
     status: TaskUpdateStatusSchema.optional().describe(
       'New status for the task',
     ),
-    addBlocks: z
-      .array(z.string())
-      .optional()
-      .describe('Task IDs that this task blocks'),
     addBlockedBy: z
       .array(z.string())
       .optional()
-      .describe('Task IDs that block this task'),
+      .describe(
+        'Task IDs that block this task — i.e. each listed task must complete before this one can start. To express the inverse ("this task blocks B"), call TaskUpdate on B with addBlockedBy: [thisTaskId]; one direction is enough because the dependency graph is bipartite.',
+      ),
     owner: z.string().optional().describe('New owner for the task'),
     metadata: z
       .record(z.string(), z.unknown())
@@ -128,7 +127,6 @@ export const TaskUpdateTool = buildTool({
       activeForm,
       status,
       owner,
-      addBlocks,
       addBlockedBy,
       metadata,
     },
@@ -295,31 +293,126 @@ export const TaskUpdateTool = buildTool({
         },
         taskListId,
       )
+
+      // Symmetry: when an explicit owner change replaces a previous
+      // owner, tell the OLD owner they've been unassigned. Without this
+      // they keep believing they're on the hook and may continue working
+      // or argue against re-claiming when they shouldn't. Skipped if the
+      // task had no owner before (nothing to notify).
+      if (existingTask.owner && existingTask.owner !== updates.owner) {
+        const unassignmentMessage = JSON.stringify({
+          type: 'task_unassignment',
+          taskId,
+          subject: existingTask.subject,
+          unassignedBy: senderName,
+          newOwner: updates.owner,
+          timestamp: new Date().toISOString(),
+        })
+        await writeToMailbox(
+          existingTask.owner,
+          {
+            from: senderName,
+            text: unassignmentMessage,
+            timestamp: new Date().toISOString(),
+            color: senderColor,
+          },
+          taskListId,
+        )
+      }
     }
 
-    // Add blocks if provided and not already present
-    if (addBlocks && addBlocks.length > 0) {
-      const newBlocks = addBlocks.filter(
-        id => !existingTask.blocks.includes(id),
-      )
-      for (const blockId of newBlocks) {
-        await blockTask(taskListId, taskId, blockId)
-      }
-      if (newBlocks.length > 0) {
-        updatedFields.push('blocks')
-      }
-    }
-
-    // Add blockedBy if provided and not already present (reverse: the blocker blocks this task)
+    // Add blockedBy if provided and not already present. blockTask
+    // throws TaskCycleError on cycles — surface that as a tool error
+    // instead of letting it crash the turn (the caller can adjust).
     if (addBlockedBy && addBlockedBy.length > 0) {
       const newBlockedBy = addBlockedBy.filter(
         id => !existingTask.blockedBy.includes(id),
       )
-      for (const blockerId of newBlockedBy) {
-        await blockTask(taskListId, blockerId, taskId)
+      try {
+        for (const blockerId of newBlockedBy) {
+          await blockTask(taskListId, blockerId, taskId)
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name === 'TaskCycleError') {
+          return {
+            data: {
+              success: false,
+              taskId,
+              updatedFields,
+              error: err.message,
+            },
+          }
+        }
+        throw err
       }
       if (newBlockedBy.length > 0) {
         updatedFields.push('blockedBy')
+      }
+    }
+
+    // Cascade-unblock: when a task transitions to completed, scrub its
+    // ID from every other task's blockedBy. Without this, completed
+    // task IDs accumulate forever (read-side filters in claimTask paper
+    // over the symptom but TaskGet output keeps showing ghost deps).
+    // Wake-up: idle teammates that just became fully unblocked get a
+    // task_unblocked mailbox message so they re-check the task list
+    // without waiting for the next 500ms poll.
+    if (updates.status === 'completed' && isAgentSwarmsEnabled()) {
+      const senderName = getAgentName() || 'team-lead'
+      const senderColor = getTeammateColor()
+      const { newlyUnblockedIds } = await cascadeUnblockOnCompletion(
+        taskListId,
+        taskId,
+      )
+      if (newlyUnblockedIds.length > 0) {
+        const allTasks = await listTasks(taskListId)
+        // Candidate set: every owner of an open task. We then narrow
+        // to "actually-active teammates" by intersecting with the
+        // team file's member roster — a teammate that has since
+        // shut down is removed from team config (see
+        // removeTeammateFromTeamFile in core/teamHelpers.ts), so the
+        // intersection is the live set. Without this, we'd send
+        // task_unblocked into dead inboxes that no one drains.
+        const candidateOwners = new Set<string>()
+        for (const t of allTasks) {
+          if (t.owner && t.status !== 'completed') {
+            candidateOwners.add(t.owner)
+          }
+        }
+        let idleOwners: Set<string> = candidateOwners
+        const currentTeamName = getTeamName()
+        if (currentTeamName && candidateOwners.size > 0) {
+          const teamFile = await readTeamFileAsync(currentTeamName)
+          if (teamFile) {
+            const liveMemberNames = new Set(teamFile.members.map(m => m.name))
+            idleOwners = new Set(
+              Array.from(candidateOwners).filter(o => liveMemberNames.has(o)),
+            )
+          }
+        }
+        if (idleOwners.size > 0) {
+          const unblockMessage = JSON.stringify({
+            type: 'task_unblocked',
+            unblockedTaskIds: newlyUnblockedIds,
+            byCompletingTaskId: taskId,
+            from: senderName,
+            timestamp: new Date().toISOString(),
+          })
+          await Promise.all(
+            Array.from(idleOwners).map(owner =>
+              writeToMailbox(
+                owner,
+                {
+                  from: senderName,
+                  text: unblockMessage,
+                  timestamp: new Date().toISOString(),
+                  color: senderColor,
+                },
+                taskListId,
+              ),
+            ),
+          )
+        }
       }
     }
 

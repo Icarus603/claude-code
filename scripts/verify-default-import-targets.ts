@@ -110,7 +110,7 @@ let totalChecked = 0
 // Sub-check 1: `import Name from '@claude-code/X'`
 {
   const raw = execSync(
-    `rg -n "^\\s*import\\s+[a-zA-Z_$][a-zA-Z0-9_$]*\\s+from\\s+['\\\"]@claude-code/[^'\\\"]+['\\\"]" packages/ -g '*.ts' -g '*.tsx'`,
+    `rg -n "^\\s*import\\s+[a-zA-Z_$][a-zA-Z0-9_$]*\\s+from\\s+['\\"]@claude-code/[^'\\"]+['\\"]" packages/ -g '*.ts' -g '*.tsx'`,
     { encoding: 'utf8', cwd: REPO_ROOT, maxBuffer: 50 * 1024 * 1024 },
   )
   for (const line of raw.split('\n')) {
@@ -134,7 +134,7 @@ let totalChecked = 0
 // Sub-check 2: `require('X').default` and `import('X').then(m => m.default)`
 {
   const requireRaw = execSync(
-    `rg -n "require\\(['\\\"][^'\\\"]+['\\\"]\\)\\.default" packages/ -g '*.ts' -g '*.tsx'`,
+    `rg -n "require\\(['\\"][^'\\"]+['\\"]\\)\\.default" packages/ -g '*.ts' -g '*.tsx'`,
     { encoding: 'utf8', cwd: REPO_ROOT, maxBuffer: 50 * 1024 * 1024 },
   )
   for (const line of requireRaw.split('\n')) {
@@ -163,7 +163,7 @@ let totalChecked = 0
 // Sub-check 3: `require(A) as typeof import(B)` — A and B must match
 {
   const raw = execSync(
-    `rg -n "require\\(['\\\"][^'\\\"]+['\\\"]\\)\\s*as\\s+typeof\\s+import\\(['\\\"][^'\\\"]+['\\\"]\\)" packages/ -g '*.ts' -g '*.tsx'`,
+    `rg -n "require\\(['\\"][^'\\"]+['\\"]\\)\\s*as\\s+typeof\\s+import\\(['\\"][^'\\"]+['\\"]\\)" packages/ -g '*.ts' -g '*.tsx'`,
     { encoding: 'utf8', cwd: REPO_ROOT, maxBuffer: 50 * 1024 * 1024 },
   )
   for (const line of raw.split('\n')) {

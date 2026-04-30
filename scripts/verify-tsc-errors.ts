@@ -93,7 +93,22 @@ import { spawnSync } from 'child_process'
 // previous baseline. Non-functional impact in the build (Bun runtime
 // ignores tsc-only errors). Surfaced when releasing v26.4.69 — the
 // Windows installer fix is unrelated to this drift.
-const BUDGET = 3225
+// 2026-04-30 (Task System / Swarm refactor): bumped 3225 → 3226 after
+// the InProcessTeammateTaskState re-export migration in
+// packages/repl/src/tasksTypes.ts surfaced two TaskState assignability
+// mismatches in packages/cli/src/headless/sdk/session/run-streaming.ts
+// (lines 468, 1660). The new errors are at structural identity
+// boundaries between the repl-side TaskState union and the
+// cli-headless TaskState union — both arrive at the same runtime
+// shape (the shipping bundle works), but tsc cannot prove
+// equivalence. Net delta is +1 (we also closed -1 at
+// mailbox.ts:62→67 line drift, which the diff treats as a move).
+// 2026-04-30 (Phase O): bumped 3226 → 3223 after loosening
+// `isBackgroundTask` input to the structural shape that the agent
+// framework's narrow TaskState already satisfies — closes the two
+// run-streaming.ts assignability errors and one further mailbox.ts
+// drift error, all without changing runtime behavior.
+const BUDGET = 3223
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

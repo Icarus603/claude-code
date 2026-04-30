@@ -44,13 +44,14 @@ NOTE that you should not use this tool if there is only one trivial task to do. 
 - **subject**: A brief, actionable title in imperative form (e.g., "Fix authentication bug in login flow")
 - **description**: What needs to be done
 - **activeForm** (optional): Present continuous form shown in the spinner when the task is in_progress (e.g., "Fixing authentication bug"). If omitted, the spinner shows the subject instead.
+- **blockedBy** (optional): Task IDs that must complete before this one can start. Wires up the dependency graph in one step (e.g. \`blockedBy: [1, 2, 3]\` for a verifier task that runs after 1, 2, 3 finish). Cycles are rejected.
 
 All tasks are created with status \`pending\`.
 
 ## Tips
 
 - Create tasks with clear, specific subjects that describe the outcome
-- After creating tasks, use TaskUpdate to set up dependencies (blocks/blockedBy) if needed
+- Use \`blockedBy\` at create-time to express ordering — the dependency graph is bipartite, so one direction is enough (express "B is blocked by A" as \`blockedBy: ["A"]\` on B, never both sides). cascade-unblock fires automatically when a blocker completes.
 ${teammateTips}- Check TaskList first to avoid creating duplicate tasks
 `
 }

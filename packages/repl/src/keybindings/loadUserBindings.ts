@@ -23,7 +23,7 @@ import { createSignal } from '@claude-code/config/signal'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { DEFAULT_BINDINGS } from './defaultBindings.js'
 import { parseBindings } from './parser.js'
-import type { KeybindingBlock, ParsedBinding } from './types.js'
+import type { KeybindingBlock, ParsedBinding } from '@anthropic/ink'
 import {
   checkDuplicateKeysInJson,
   type KeybindingWarning,

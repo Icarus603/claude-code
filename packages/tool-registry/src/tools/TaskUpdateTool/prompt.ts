@@ -35,8 +35,7 @@ export const PROMPT = `Use this tool to update a task in the task list.
 - **activeForm**: Present continuous form shown in spinner when in_progress (e.g., "Running tests")
 - **owner**: Change the task owner (agent name)
 - **metadata**: Merge metadata keys into the task (set a key to null to delete it)
-- **addBlocks**: Mark tasks that cannot start until this one completes
-- **addBlockedBy**: Mark tasks that must complete before this one can start
+- **addBlockedBy**: Mark tasks that must complete before this one can start. The dependency graph is bipartite — to express the inverse ("this task blocks B"), call TaskUpdate on B with \`addBlockedBy: [thisTaskId]\`. Adding a cycle (A → B → A, or self-loop) is rejected with TaskCycleError.
 
 ## Status Workflow
 

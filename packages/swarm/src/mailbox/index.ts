@@ -132,6 +132,40 @@ export async function readUnreadMessages(
  * @param message - The message to write
  * @param teamName - Optional team name
  */
+/**
+ * Extracts a `(type, requestId)` pair from a message text payload IF it
+ * is a structured protocol message that carries a requestId. Used by
+ * writeToMailbox to dedup repeated protocol requests.
+ *
+ * Pure-text and protocol messages without requestId both return null —
+ * those are appended unconditionally (they're idempotent or genuinely
+ * meant to be repeated).
+ */
+export function extractDedupKey(
+  text: string,
+): { type: string; requestId: string } | null {
+  // We use the built-in JSON.parse here rather than the swarm runtime
+  // binding's `jsonParse` — this helper runs on the hot mailbox-write
+  // path and the dedup decision is a pure string→object check that
+  // doesn't need the host's lazy / instrumented variant. Using
+  // JSON.parse directly also keeps this function callable from tests
+  // without installing the swarm runtime bindings.
+  if (!text || text[0] !== '{') return null
+  try {
+    const parsed = JSON.parse(text) as unknown
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null
+    }
+    const obj = parsed as Record<string, unknown>
+    const type = typeof obj.type === 'string' ? obj.type : null
+    const requestId = typeof obj.requestId === 'string' ? obj.requestId : null
+    if (!type || !requestId) return null
+    return { type, requestId }
+  } catch {
+    return null
+  }
+}
+
 export async function writeToMailbox(
   recipientName: string,
   message: Omit<TeammateMessage, 'read'>,
@@ -170,6 +204,30 @@ export async function writeToMailbox(
 
     // Re-read messages after acquiring lock to get the latest state
     const messages = await readMailbox(recipientName, teamName)
+
+    // Idempotency for structured protocol messages: if this message
+    // carries (type, requestId) and the inbox already has an entry with
+    // the same pair, drop the new write. This prevents pathological
+    // states like "4 shutdown_requests with the same requestId stacking
+    // up because the caller retried" — where the recipient processes
+    // one, marks it read, and the remaining duplicates become invisible
+    // (they're !read=false but identical to one that already ran).
+    //
+    // Plain-text messages have no key and append every time (the caller
+    // is the one deciding whether retries are safe).
+    const newKey = extractDedupKey(message.text)
+    if (newKey) {
+      const existing = messages.find(m => {
+        const k = extractDedupKey(m.text)
+        return k && k.type === newKey.type && k.requestId === newKey.requestId
+      })
+      if (existing) {
+        logForDebugging(
+          `[TeammateMailbox] writeToMailbox: deduped ${newKey.type}#${newKey.requestId} for ${recipientName} (already in mailbox)`,
+        )
+        return
+      }
+    }
 
     const newMessage: TeammateMessage = {
       ...message,
@@ -236,9 +294,20 @@ export async function markMessageAsReadByIndex(
     }
 
     const message = messages[messageIndex]
-    if (!message || message.read) {
+    if (!message) {
       logForDebugging(
-        `[TeammateMailbox] markMessageAsReadByIndex: message already read or missing`,
+        `[TeammateMailbox] markMessageAsReadByIndex: message at index ${messageIndex} is missing`,
+      )
+      return
+    }
+    if (message.read) {
+      // Idempotent path. We log at WARNING level (not the usual debug
+      // breadcrumb) because hitting this branch means two callers raced
+      // to mark the same message — usually a sign of a flaky poll loop,
+      // not a benign repeat. The body returns successfully, but the log
+      // gives operators a fingerprint to chase if they care.
+      logForDebugging(
+        `[TeammateMailbox] WARN markMessageAsReadByIndex: message at index ${messageIndex} for ${agentName} (team=${teamName ?? 'default'}) was already read — possible poll/processing race`,
       )
       return
     }

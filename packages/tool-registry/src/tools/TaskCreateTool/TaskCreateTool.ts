@@ -6,6 +6,7 @@ import {
 } from '@claude-code/agent/hooks.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 import {
+  blockTask,
   createTask,
   deleteTask,
   getTaskListId,
@@ -29,6 +30,12 @@ const inputSchema = lazySchema(() =>
       .record(z.string(), z.unknown())
       .optional()
       .describe('Arbitrary metadata to attach to the task'),
+    blockedBy: z
+      .array(z.string())
+      .optional()
+      .describe(
+        'Task IDs that must complete before this task can start. Lets you build a dependency graph in one step (e.g. a "verifier" task with blockedBy: [1,2,3] auto-becomes claimable when 1+2+3 finish). Cycles are rejected with TaskCycleError.',
+      ),
   }),
 )
 type InputSchema = ReturnType<typeof inputSchema>
@@ -77,8 +84,12 @@ export const TaskCreateTool = buildTool({
   renderToolUseMessage() {
     return null
   },
-  async call({ subject, description, activeForm, metadata }, context) {
-    const taskId = await createTask(getTaskListId(), {
+  async call(
+    { subject, description, activeForm, metadata, blockedBy },
+    context,
+  ) {
+    const taskListId = getTaskListId()
+    const taskId = await createTask(taskListId, {
       subject,
       description,
       activeForm,
@@ -88,6 +99,25 @@ export const TaskCreateTool = buildTool({
       blockedBy: [],
       metadata,
     })
+
+    // Wire up blockedBy edges in the same call. blockTask is the
+    // single source of truth for cycle detection + bipartite invariant
+    // — using the same path as TaskUpdate keeps semantics in one place.
+    // On cycle (or any other blockTask failure) we roll the new task
+    // back so the caller doesn't see a half-attached node.
+    if (blockedBy && blockedBy.length > 0) {
+      try {
+        for (const blockerId of blockedBy) {
+          await blockTask(taskListId, blockerId, taskId)
+        }
+      } catch (err) {
+        await deleteTask(taskListId, taskId)
+        if (err instanceof Error && err.name === 'TaskCycleError') {
+          throw err
+        }
+        throw err
+      }
+    }
 
     const blockingErrors: string[] = []
     const generator = executeTaskCreatedHooks(
@@ -108,7 +138,7 @@ export const TaskCreateTool = buildTool({
     }
 
     if (blockingErrors.length > 0) {
-      await deleteTask(getTaskListId(), taskId)
+      await deleteTask(taskListId, taskId)
       throw new Error(blockingErrors.join('\n'))
     }
 

@@ -355,8 +355,22 @@ async function handleShutdownApproval(
       const task = findTeammateTaskByAgentId(agentId, appState.tasks)
       if (task?.abortController) {
         task.abortController.abort()
+        // Verify abort took effect before returning. Without this we
+        // had a race where the model-thread call returned, the
+        // teammate's poll loop got into its next 500ms tick, and
+        // because `signal.aborted` hadn't been observed yet the loop
+        // continued — locking us into a "shutdown approved but
+        // teammate still alive" state until something else happened.
+        // signal.aborted flips synchronously inside .abort() per the
+        // Node spec; we read it back just to be defensive against
+        // shimmed AbortController implementations.
+        if (!task.abortController.signal.aborted) {
+          throw new Error(
+            `[SendMessageTool] handleShutdownApproval: abortController.abort() did not flip signal.aborted=true for ${agentName} — refusing to claim shutdown success`,
+          )
+        }
         logForDebugging(
-          `[SendMessageTool] Aborted controller for in-process teammate ${agentName}`,
+          `[SendMessageTool] Aborted controller for in-process teammate ${agentName} (signal.aborted confirmed)`,
         )
       } else {
         logForDebugging(
@@ -373,6 +387,11 @@ async function handleShutdownApproval(
           `[SendMessageTool] Fallback: Found in-process task for ${agentName} via AppState, aborting`,
         )
         task.abortController.abort()
+        if (!task.abortController.signal.aborted) {
+          throw new Error(
+            `[SendMessageTool] handleShutdownApproval: fallback abortController.abort() did not flip signal.aborted=true for ${agentName}`,
+          )
+        }
 
         return {
           data: {

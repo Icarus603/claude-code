@@ -8,7 +8,7 @@ import type {
   KeybindingBlock,
   KeybindingContextName,
   ParsedBinding,
-} from './types.js'
+} from '@anthropic/ink'
 
 /**
  * Types of validation issues that can occur with keybindings.

@@ -14,6 +14,7 @@ import { createSignal } from '@claude-code/config/signal'
 import { jsonParse, jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { getTeamName } from '@claude-code/swarm/teammateState.js'
 import { getTeammateContext } from '@claude-code/swarm/teammateContext.js'
+import { TaskCycleError } from './errors.js'
 
 // Listeners for task list updates (used for immediate UI refresh in same process)
 const tasksUpdated = createSignal()
@@ -392,14 +393,27 @@ export async function updateTask(
   }
 }
 
+/**
+ * Deletes a task and removes references to it from other tasks' edges.
+ *
+ * Whole operation runs under the task-list lock so a concurrent
+ * createTask cannot reuse this taskId mid-cascade and end up with the
+ * blocks/blockedBy entries we were about to scrub. Cascade writes use
+ * updateTaskUnsafe (the list lock already serializes them; nesting
+ * per-task locks here would deadlock against blockTask/claimTaskWithBusyCheck).
+ */
 export async function deleteTask(
   taskListId: string,
   taskId: string,
 ): Promise<boolean> {
   const path = getTaskPath(taskListId, taskId)
+  const lockPath = await ensureTaskListLockFile(taskListId)
 
+  let release: (() => Promise<void>) | undefined
   try {
-    // Update high water mark before deleting to prevent ID reuse
+    release = await lockfile.lock(lockPath, LOCK_OPTIONS)
+
+    // Update high water mark before deleting to prevent ID reuse.
     const numericId = parseInt(taskId, 10)
     if (!isNaN(numericId)) {
       const currentMark = await readHighWaterMark(taskListId)
@@ -408,7 +422,7 @@ export async function deleteTask(
       }
     }
 
-    // Delete the task file
+    // Delete the task file.
     try {
       await unlink(path)
     } catch (e) {
@@ -419,7 +433,10 @@ export async function deleteTask(
       throw e
     }
 
-    // Remove references to this task from other tasks
+    // Cascade: remove references to this task from every other task's
+    // blocks/blockedBy. Reads + writes happen under the same lock so
+    // there's no window where a graph operation can see the deleted
+    // task as still referenced.
     const allTasks = await listTasks(taskListId)
     for (const task of allTasks) {
       const newBlocks = task.blocks.filter(id => id !== taskId)
@@ -428,7 +445,7 @@ export async function deleteTask(
         newBlocks.length !== task.blocks.length ||
         newBlockedBy.length !== task.blockedBy.length
       ) {
-        await updateTask(taskListId, task.id, {
+        await updateTaskUnsafe(taskListId, task.id, {
           blocks: newBlocks,
           blockedBy: newBlockedBy,
         })
@@ -437,8 +454,15 @@ export async function deleteTask(
 
     notifyTasksUpdated()
     return true
-  } catch {
+  } catch (error) {
+    logForDebugging(
+      `[Tasks] Failed to delete task ${taskId}: ${errorMessage(error)}`,
+    )
     return false
+  } finally {
+    if (release) {
+      await release()
+    }
   }
 }
 
@@ -457,34 +481,170 @@ export async function listTasks(taskListId: string): Promise<Task[]> {
   return results.filter((t): t is Task => t !== null)
 }
 
+/**
+ * Records that `fromTaskId` blocks `toTaskId` — i.e. `from` must complete
+ * before `to` can be claimed. Maintains the bipartite invariant
+ * `from.blocks ∋ to ⟺ to.blockedBy ∋ from` atomically and rejects edges
+ * that would create a cycle in the dependency graph.
+ *
+ * Atomicity: both writes happen under the task-list lock so a concurrent
+ * blockTask() can't see one half of the edge and overwrite it.
+ *
+ * Cycle detection: walks `.blocks` from `to` looking for `from`. If found,
+ * adding the edge would form `from → to → ... → from`, which deadlocks
+ * claimTask (every task in the cycle is blockedBy an unresolved task in
+ * the cycle). Throws `TaskCycleError` with the offending path.
+ *
+ * Self-cycle (`from === to`) is the degenerate case and rejected eagerly.
+ *
+ * Returns `false` only when one of the tasks is missing. Cycle attempts
+ * throw — they are programmer errors, not "cannot reach this state".
+ */
 export async function blockTask(
   taskListId: string,
   fromTaskId: string,
   toTaskId: string,
 ): Promise<boolean> {
-  const [fromTask, toTask] = await Promise.all([
-    getTask(taskListId, fromTaskId),
-    getTask(taskListId, toTaskId),
-  ])
-  if (!fromTask || !toTask) {
-    return false
+  if (fromTaskId === toTaskId) {
+    throw new TaskCycleError([fromTaskId, toTaskId])
   }
 
-  // Update source task: A blocks B
-  if (!fromTask.blocks.includes(toTaskId)) {
-    await updateTask(taskListId, fromTaskId, {
-      blocks: [...fromTask.blocks, toTaskId],
-    })
-  }
+  const lockPath = await ensureTaskListLockFile(taskListId)
+  let release: (() => Promise<void>) | undefined
+  try {
+    release = await lockfile.lock(lockPath, LOCK_OPTIONS)
 
-  // Update target task: B is blockedBy A
-  if (!toTask.blockedBy.includes(fromTaskId)) {
-    await updateTask(taskListId, toTaskId, {
-      blockedBy: [...toTask.blockedBy, fromTaskId],
-    })
-  }
+    // Re-read inside the lock — concurrent createTask/updateTask may have
+    // changed the graph between our caller's view and now.
+    const allTasks = await listTasks(taskListId)
+    const byId = new Map(allTasks.map(t => [t.id, t]))
+    const fromTask = byId.get(fromTaskId)
+    const toTask = byId.get(toTaskId)
+    if (!fromTask || !toTask) {
+      return false
+    }
 
-  return true
+    // Edge already present: idempotent no-op (still verify the reverse
+    // direction below; if only one side is recorded that's a stale graph
+    // we want to repair).
+    const hasForward = fromTask.blocks.includes(toTaskId)
+    const hasReverse = toTask.blockedBy.includes(fromTaskId)
+    if (hasForward && hasReverse) {
+      return true
+    }
+
+    // Cycle detection: from `toTaskId`, walk every task it blocks (and
+    // tasks they block, transitively). If we ever reach `fromTaskId`,
+    // adding the new edge would close the loop.
+    const visited = new Set<string>()
+    const walk = (start: string): string[] | null => {
+      const stack: Array<{ id: string; path: string[] }> = [
+        { id: start, path: [start] },
+      ]
+      while (stack.length > 0) {
+        const { id, path } = stack.pop()!
+        if (id === fromTaskId) {
+          return [fromTaskId, ...path]
+        }
+        if (visited.has(id)) continue
+        visited.add(id)
+        const node = byId.get(id)
+        if (!node) continue
+        for (const next of node.blocks) {
+          stack.push({ id: next, path: [...path, next] })
+        }
+      }
+      return null
+    }
+    const cyclePath = walk(toTaskId)
+    if (cyclePath) {
+      throw new TaskCycleError(cyclePath)
+    }
+
+    // Atomic dual write while still holding the list lock. We use
+    // updateTaskUnsafe because the caller already serialized via the
+    // list-level lock; nesting per-task locks here would deadlock against
+    // any caller (claimTaskWithBusyCheck, deleteTask cascade) that takes
+    // them in a different order.
+    if (!hasForward) {
+      await updateTaskUnsafe(taskListId, fromTaskId, {
+        blocks: [...fromTask.blocks, toTaskId],
+      })
+    }
+    if (!hasReverse) {
+      await updateTaskUnsafe(taskListId, toTaskId, {
+        blockedBy: [...toTask.blockedBy, fromTaskId],
+      })
+    }
+    return true
+  } finally {
+    if (release) {
+      await release()
+    }
+  }
+}
+
+/**
+ * Cascades a task-completion event through the dependency graph.
+ *
+ * Removes `completedTaskId` from every other task's `blockedBy` array,
+ * keeping the bipartite invariant honest at write-time. Returns the IDs
+ * of tasks whose `blockedBy` became empty as a direct result — callers
+ * (TaskUpdateTool) can use this to wake up idle teammates with a
+ * `task_unblocked` mailbox message.
+ *
+ * Without this cascade, completed task IDs accumulate in other tasks'
+ * `blockedBy` arrays forever; the read-side filter in claimTask papers
+ * over the symptom but TaskGet output keeps showing ghost dependencies.
+ *
+ * Runs under the task-list lock so two concurrent completions can't
+ * read the same `blockedBy` and clobber each other's removal.
+ */
+export async function cascadeUnblockOnCompletion(
+  taskListId: string,
+  completedTaskId: string,
+): Promise<{ newlyUnblockedIds: string[] }> {
+  const lockPath = await ensureTaskListLockFile(taskListId)
+
+  let release: (() => Promise<void>) | undefined
+  try {
+    release = await lockfile.lock(lockPath, LOCK_OPTIONS)
+    const allTasks = await listTasks(taskListId)
+
+    // Tasks that were waiting on `completedTaskId`. We only check
+    // .blockedBy: the bipartite invariant guarantees that anything
+    // present here also has the symmetric .blocks edge from the
+    // completed task — but if blockTask was buggy in the past, scrub
+    // both sides to be safe.
+    const newlyUnblockedIds: string[] = []
+    for (const task of allTasks) {
+      const idx = task.blockedBy.indexOf(completedTaskId)
+      if (idx === -1) continue
+
+      const newBlockedBy = task.blockedBy.filter(id => id !== completedTaskId)
+      await updateTaskUnsafe(taskListId, task.id, {
+        blockedBy: newBlockedBy,
+      })
+      // Track tasks that just became fully unblocked (no other open deps).
+      if (newBlockedBy.length === 0 && task.status !== 'completed') {
+        newlyUnblockedIds.push(task.id)
+      }
+    }
+
+    // Also scrub the completed task's own .blocks list (these IDs are
+    // now stale references — the cascade just removed the symmetric
+    // entries from the other side).
+    const completed = allTasks.find(t => t.id === completedTaskId)
+    if (completed && completed.blocks.length > 0) {
+      await updateTaskUnsafe(taskListId, completedTaskId, { blocks: [] })
+    }
+
+    return { newlyUnblockedIds }
+  } finally {
+    if (release) {
+      await release()
+    }
+  }
 }
 
 export type ClaimTaskResult = {
@@ -675,8 +835,12 @@ async function claimTaskWithBusyCheck(
       }
     }
 
-    // Claim the task
-    const updated = await updateTask(taskListId, taskId, {
+    // Claim the task. Use updateTaskUnsafe since we already hold the
+    // task-list lock — calling updateTask here would attempt to acquire
+    // the per-task lock under the list lock, which deadlocks against any
+    // caller (e.g. claimTask, deleteTask cascade) holding them in the
+    // opposite order. Same pattern as the non-busyCheck branch above.
+    const updated = await updateTaskUnsafe(taskListId, taskId, {
       owner: claimantAgentId,
     })
     return { success: true, task: updated! }

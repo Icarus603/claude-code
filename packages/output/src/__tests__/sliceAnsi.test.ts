@@ -92,6 +92,7 @@ describe('sliceAnsi — ANSI codes', () => {
     expect(result).toContain('r')
     expect(result).toContain('\u001b[31m')
     // Something that closes the color
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape match is intentional
     expect(result).toMatch(/\u001b\[(0|39|m)/)
   })
 

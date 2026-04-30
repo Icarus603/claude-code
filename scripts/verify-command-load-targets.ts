@@ -41,7 +41,7 @@ function findLoadCalls(): LoadCall[] {
   let raw: string
   try {
     raw = execSync(
-      `rg --no-heading -n -g '*.ts' -g '*.tsx' "load:\\s*(?:async\\s*)?\\(\\)\\s*=>\\s*import\\(['\\\"]([^'\\\"]+)['\\\"]" packages/`,
+      `rg --no-heading -n -g '*.ts' -g '*.tsx' "load:\\s*(?:async\\s*)?\\(\\)\\s*=>\\s*import\\(['\\"]([^'\\"]+)['\\"]" packages/`,
       { encoding: 'utf8', cwd: REPO_ROOT, maxBuffer: 10 * 1024 * 1024 },
     )
   } catch {

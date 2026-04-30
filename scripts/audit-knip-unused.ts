@@ -97,11 +97,11 @@ function hasRelativeCallers(file: string): number {
   // heavily (load: () => import('./X.js')). Combine both into one count.
   try {
     const staticOut = execSync(
-      `grep -rE "from\\s+['\\\"]\\.{1,2}/(.*/)?\\b${base}(\\.js)?['\\\"]" ${pkgRoot} --include='*.ts' --include='*.tsx' 2>/dev/null || true`,
+      `grep -rE "from\\s+['\\"]\\.{1,2}/(.*/)?\\b${base}(\\.js)?['\\"]" ${pkgRoot} --include='*.ts' --include='*.tsx' 2>/dev/null || true`,
       { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 },
     )
     const dynamicOut = execSync(
-      `grep -rE "import\\(\\s*['\\\"]\\.{1,2}/(.*/)?\\b${base}(\\.js)?['\\\"]\\s*\\)" ${pkgRoot} --include='*.ts' --include='*.tsx' 2>/dev/null || true`,
+      `grep -rE "import\\(\\s*['\\"]\\.{1,2}/(.*/)?\\b${base}(\\.js)?['\\"]\\s*\\)" ${pkgRoot} --include='*.ts' --include='*.tsx' 2>/dev/null || true`,
       { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 },
     )
     const total = (staticOut.trim() ? staticOut.trim().split('\n').length : 0) +

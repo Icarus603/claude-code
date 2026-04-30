@@ -14,7 +14,7 @@ import type { UUID } from 'crypto'
 import type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '@claude-code/repl/replTypes/message.js'
 import { getViewedTeammateTask } from '@claude-code/app-host/state/selectors.js'
-import { getClaudeConfigHomeDir, readEnv } from '@claude-code/config/env/utils'
+import { getClaudeConfigHomeDir } from '@claude-code/config/env/utils'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   isIdleNotification,
@@ -36,15 +36,105 @@ import { isAgentSwarmsEnabled } from '../agentSwarmsEnabled.js'
 import { unassignTeammateTasks } from '../tasks.js'
 import type { Attachment } from '../attachments.js'
 
+/**
+ * Shape of a teammate-mailbox message after we've stripped the
+ * `read` flag and any inbox metadata. Exported so tests can build
+ * fixtures without inline-reimplementing the type.
+ */
+export type RawMessage = {
+  from: string
+  text: string
+  timestamp: string
+  color?: string
+  summary?: string
+}
+
+/**
+ * Build the (sender, idleReason, summary, completedTaskId,
+ * completedStatus, failureReason) identity key used to decide whether
+ * an idle notification is a true duplicate of the previous one from
+ * the same sender. Anything that varies — even a different summary,
+ * even reason `available → interrupted` — produces a new key and
+ * the message is preserved.
+ */
+function makeIdleKey(idle: {
+  from: string
+  idleReason?: string
+  summary?: string
+  completedTaskId?: string
+  completedStatus?: string
+  failureReason?: string
+}): string {
+  return [
+    idle.from,
+    idle.idleReason ?? '',
+    idle.summary ?? '',
+    idle.completedTaskId ?? '',
+    idle.completedStatus ?? '',
+    idle.failureReason ?? '',
+  ].join('|')
+}
+
+/**
+ * Drop idle notifications that are byte-for-byte identical to the
+ * immediately-previous idle from the same sender. The first idle in
+ * each run survives so the leader sees when a state started, not
+ * just that it's still ongoing. A non-idle message between two
+ * idles resets the per-sender state — a teammate talking to us
+ * means a fresh stretch begins.
+ *
+ * Exported so tests can verify the algorithm directly without
+ * inline-reimplementing it; not part of any public contract.
+ */
+export function collapseConsecutiveIdleDuplicates(
+  messages: RawMessage[],
+): RawMessage[] {
+  if (messages.length <= 1) return messages
+
+  const lastIdleKeyByAgent = new Map<string, string>()
+  const survivors: RawMessage[] = []
+  let collapsedCount = 0
+
+  for (const m of messages) {
+    const idle = isIdleNotification(m.text)
+    if (!idle) {
+      // Non-idle message resets the sender's run — explicitly clear
+      // it so the next idle from the same sender always survives.
+      lastIdleKeyByAgent.delete(m.from)
+      survivors.push(m)
+      continue
+    }
+    const key = makeIdleKey(idle)
+    if (lastIdleKeyByAgent.get(idle.from) === key) {
+      collapsedCount++
+      continue
+    }
+    lastIdleKeyByAgent.set(idle.from, key)
+    survivors.push(m)
+  }
+
+  if (collapsedCount > 0) {
+    logForDebugging(
+      `[SwarmMailbox] Collapsed ${collapsedCount} consecutive-duplicate idle notification(s)`,
+    )
+  }
+  return survivors
+}
+
 export async function getTeammateMailboxAttachments(
   toolUseContext: ToolUseContext,
 ): Promise<Attachment[]> {
   if (!isAgentSwarmsEnabled()) {
     return []
   }
-  if (readEnv('USER_TYPE') !== 'ant') {
-    return []
-  }
+  // Historical: this also gated on USER_TYPE === 'ant'. Removed because
+  // ccb is single-operator self-hosted — the swarm is a first-class
+  // ccb feature, and the leader needs the same teammate-mailbox
+  // attachment that ant builds get; otherwise the leader spawns
+  // teammates and goes blind to their progress, which is exactly the
+  // failure mode the operator hit when probing this in 2026-04-30.
+  // The remaining isAgentSwarmsEnabled() gate is the single source of
+  // truth for "is the swarm machinery on at all".
 
   // Get AppState early to check for team lead status
   const appState = toolUseContext.getAppState()
@@ -126,13 +216,7 @@ export async function getTeammateMailboxAttachments(
   // 3. getTeammateMailboxAttachments reads AppState -> finds M again
   // We deduplicate using from+timestamp+text prefix as the key
   const seen = new Set<string>()
-  let allMessages: Array<{
-    from: string
-    text: string
-    timestamp: string
-    color?: string
-    summary?: string
-  }> = []
+  let allMessages: RawMessage[] = []
 
   for (const m of [...unreadMessages, ...pendingInboxMessages]) {
     const key = `${m.from}|${m.timestamp}|${m.text.slice(0, 100)}`
@@ -148,28 +232,13 @@ export async function getTeammateMailboxAttachments(
     }
   }
 
-  // Collapse multiple idle notifications per agent — keep only the latest.
-  // Single pass to parse, then filter without re-parsing.
-  const idleAgentByIndex = new Map<number, string>()
-  const latestIdleByAgent = new Map<string, number>()
-  for (let i = 0; i < allMessages.length; i++) {
-    const idle = isIdleNotification(allMessages[i]!.text)
-    if (idle) {
-      idleAgentByIndex.set(i, idle.from)
-      latestIdleByAgent.set(idle.from, i)
-    }
-  }
-  if (idleAgentByIndex.size > latestIdleByAgent.size) {
-    const beforeCount = allMessages.length
-    allMessages = allMessages.filter((_m, i) => {
-      const agent = idleAgentByIndex.get(i)
-      if (agent === undefined) return true
-      return latestIdleByAgent.get(agent) === i
-    })
-    logForDebugging(
-      `[SwarmMailbox] Collapsed ${beforeCount - allMessages.length} duplicate idle notification(s)`,
-    )
-  }
+  // Collapse only consecutive *identical* idle notifications per
+  // sender. The previous policy ("keep only the latest per sender")
+  // discarded mid-turn transitions like `available → interrupted →
+  // available`, peer-DM summaries that changed between turns, and
+  // task-completion idles — leaving the leader blind to teammate
+  // progress they actually need to see.
+  allMessages = collapseConsecutiveIdleDuplicates(allMessages)
 
   if (allMessages.length === 0) {
     logForDebugging(`[SwarmMailbox] No messages to deliver, returning empty`)

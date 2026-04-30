@@ -393,6 +393,20 @@ const CHECKS: Check[] = [
     doc: 'V7 §19.2 — tsc error count may shrink but not grow',
   },
   {
+    id: 'task-blocks-internal-only',
+    layer: 'Cross-Cutting',
+    subsystem: 'dependency graph invariant',
+    script: 'scripts/verify-task-blocks-internal-only.ts',
+    doc: 'Phase N (reactive-honking-dusk) — Task.blocks may only be written by blockTask/cascadeUnblockOnCompletion in packages/agent/tasks.ts; external writes break the bipartite invariant.',
+  },
+  {
+    id: 'mailbox-dedup-required',
+    layer: 'Cross-Cutting',
+    subsystem: 'mailbox protocol idempotency',
+    script: 'scripts/verify-mailbox-dedup-required.ts',
+    doc: 'Phase U1 (reactive-honking-dusk) — every inbox write must go through writeToMailbox so (type, requestId) protocol messages dedup. Direct writeFile/atomicWriteFile to inbox paths reintroduces the retried-shutdown_request deadlock.',
+  },
+  {
     id: 'facade-budget',
     layer: 'Cross-Cutting',
     subsystem: 'src/ facade ratchet',

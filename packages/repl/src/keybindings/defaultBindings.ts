@@ -2,7 +2,7 @@ import { feature } from 'bun:bundle'
 import { satisfies } from '@claude-code/config/semver'
 import { isRunningWithBun } from '@claude-code/config/bundledMode'
 import { getPlatform } from '@claude-code/config/platform'
-import type { KeybindingBlock } from './types.js'
+import type { KeybindingBlock } from '@anthropic/ink'
 
 /**
  * Default keybindings that match current Claude Code behavior.

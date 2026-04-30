@@ -64,7 +64,7 @@ for await (const file of new Glob('packages/**/*.{ts,tsx}').scan('.')) {
     if (hasImport || hasFnDecl || hasVarDecl || hasDestructure) continue
 
     // Find bare calls — `fn(` not preceded by .|\w|"|'
-    const callRe = new RegExp(`(?:^|[^\\w.'\"])${fn}\\s*\\(`, 'gm')
+    const callRe = new RegExp(`(?:^|[^\\w.'"])${fn}\\s*\\(`, 'gm')
     let m: RegExpExecArray | null
     while ((m = callRe.exec(src)) !== null) {
       const lineStart = src.lastIndexOf('\n', m.index) + 1

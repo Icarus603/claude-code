@@ -687,6 +687,15 @@ type WaitResult =
  *
  * This keeps the teammate alive in 'idle' state instead of terminating.
  * Does NOT auto-approve shutdown - the model should make that decision.
+ *
+ * `processedRequestIds` is the runner's in-memory ledger of shutdown
+ * requestIds it has already handed to the model. Combined with the
+ * mailbox-level requestId dedup in writeToMailbox, this guarantees that
+ * a single shutdown_request is delivered to the model exactly once even
+ * when (a) the caller retries the request multiple times, or (b) the
+ * mailbox `read` flag is mis-stamped by a racing reader. The set is
+ * scoped to a single teammate process — once shutdown is approved the
+ * process exits and the set goes with it.
  */
 async function waitForNextPromptOrShutdown(
   identity: TeammateIdentity,
@@ -695,6 +704,7 @@ async function waitForNextPromptOrShutdown(
   getAppState: () => AppState,
   setAppState: SetAppStateFn,
   taskListId: string,
+  processedRequestIds: Set<string>,
 ): Promise<WaitResult> {
   const POLL_INTERVAL_MS = 500
 
@@ -767,20 +777,26 @@ async function waitForNextPromptOrShutdown(
         identity.teamName,
       )
 
-      // Scan all unread messages for shutdown requests (highest priority).
-      // readMailbox() already reads all messages from disk, so this scan
-      // adds only ~1-2ms of JSON parsing overhead.
+      // Scan all messages for shutdown requests (highest priority).
+      // We do NOT filter on `m.read` — the read flag is a UI/file-side
+      // detail that can be racily-flipped by other readers, and was the
+      // root of the "fixer-agent stuck after 4 shutdown_requests" bug
+      // (each request marked read by attachment generator, runner never
+      // saw any). The authoritative "did this runner already process
+      // this requestId?" signal is `processedRequestIds` (in-memory,
+      // owned by this runner). Combined with the mailbox-level
+      // (type,requestId) dedup in writeToMailbox, a shutdown request is
+      // delivered to the model exactly once per runner instance.
       let shutdownIndex = -1
       let shutdownParsed: ReturnType<typeof isShutdownRequest> = null
       for (let i = 0; i < allMessages.length; i++) {
         const m = allMessages[i]
-        if (m && !m.read) {
-          const parsed = isShutdownRequest(m.text)
-          if (parsed) {
-            shutdownIndex = i
-            shutdownParsed = parsed
-            break
-          }
+        if (!m) continue
+        const parsed = isShutdownRequest(m.text)
+        if (parsed && !processedRequestIds.has(parsed.requestId)) {
+          shutdownIndex = i
+          shutdownParsed = parsed
+          break
         }
       }
 
@@ -793,6 +809,12 @@ async function waitForNextPromptOrShutdown(
         logForDebugging(
           `[inProcessRunner] ${identity.agentName} received shutdown request from ${shutdownParsed?.from} (prioritized over ${skippedUnread} unread messages)`,
         )
+        // Record before delivery so a crash mid-delivery doesn't cause
+        // re-delivery on the next poll (we'd rather drop a request than
+        // silently approve shutdown twice).
+        if (shutdownParsed?.requestId) {
+          processedRequestIds.add(shutdownParsed.requestId)
+        }
         await markMessageAsReadByIndex(
           identity.agentName,
           identity.teamName,
@@ -1045,6 +1067,14 @@ export async function runInProcessTeammate(
     let teammateReplacementState = toolUseContext.contentReplacementState
       ? createContentReplacementState()
       : undefined
+
+    // Per-teammate ledger of shutdown requestIds we've already delivered
+    // to the model. Combined with mailbox-side dedup (writeToMailbox
+    // skips duplicate (type,requestId) pairs), this enforces
+    // exactly-once delivery of a given shutdown_request even if the
+    // sender retries, the mailbox `read` flag is mis-stamped, or the
+    // poll loop wakes spuriously. Lives until the process exits.
+    const processedShutdownRequestIds = new Set<string>()
 
     // Main teammate loop - runs until abort or shutdown approved
     while (!abortController.signal.aborted && !shouldExit) {
@@ -1360,6 +1390,7 @@ export async function runInProcessTeammate(
         toolUseContext.getAppState,
         setAppState,
         identity.parentSessionId,
+        processedShutdownRequestIds,
       )
 
       switch (waitResult.type) {

@@ -287,6 +287,159 @@ export let saveCurrentProjectConfig = missingBinding(
 ) as any
 export let getAPIProvider = missingBinding('getAPIProvider') as any
 
+/**
+ * Test-only seam: reset all swarm runtime exports back to the
+ * `missingBinding` sentinel state, as if installSwarmAppRuntime() had
+ * never been called. Use in `afterAll` of any test that calls
+ * `installSwarmAppRuntime()` so its mutations don't leak across
+ * test files (bun:test shares module state per process).
+ *
+ * NOT for production use — every let-binding below is set to a
+ * function that throws on access. Calling any swarm API after
+ * `_test_resetSwarmAppRuntime` without re-installing will fail.
+ */
+export function _test_resetSwarmAppRuntime(): void {
+  runtimeBindings = null
+  TEAMMATE_MESSAGE_TAG = missingBinding('TEAMMATE_MESSAGE_TAG') as any
+  ERROR_MESSAGE_USER_ABORT = missingBinding('ERROR_MESSAGE_USER_ABORT') as any
+  BASH_TOOL_NAME = missingBinding('BASH_TOOL_NAME') as any
+  SEND_MESSAGE_TOOL_NAME = missingBinding('SEND_MESSAGE_TOOL_NAME') as any
+  TASK_CREATE_TOOL_NAME = missingBinding('TASK_CREATE_TOOL_NAME') as any
+  TASK_GET_TOOL_NAME = missingBinding('TASK_GET_TOOL_NAME') as any
+  TASK_LIST_TOOL_NAME = missingBinding('TASK_LIST_TOOL_NAME') as any
+  TASK_UPDATE_TOOL_NAME = missingBinding('TASK_UPDATE_TOOL_NAME') as any
+  TEAM_CREATE_TOOL_NAME = missingBinding('TEAM_CREATE_TOOL_NAME') as any
+  TEAM_DELETE_TOOL_NAME = missingBinding('TEAM_DELETE_TOOL_NAME') as any
+  TURN_COMPLETION_VERBS = missingBinding('TURN_COMPLETION_VERBS') as any
+  SUBAGENT_REJECT_MESSAGE = missingBinding('SUBAGENT_REJECT_MESSAGE') as any
+  SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX = missingBinding(
+    'SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX',
+  ) as any
+  STOPPED_DISPLAY_MS = missingBinding('STOPPED_DISPLAY_MS') as any
+  AGENT_COLORS = missingBinding('AGENT_COLORS') as any
+  CLAUDE_OPUS_4_7_CONFIG = missingBinding('CLAUDE_OPUS_4_7_CONFIG') as any
+  env = missingBinding('env') as any
+  getSystemPrompt = missingBinding('getSystemPrompt') as any
+  processMailboxPermissionResponse = missingBinding(
+    'processMailboxPermissionResponse',
+  ) as any
+  registerPermissionCallback = missingBinding('registerPermissionCallback') as any
+  unregisterPermissionCallback = missingBinding('unregisterPermissionCallback') as any
+  logEvent = missingBinding('logEvent') as any
+  getAutoCompactThreshold = missingBinding('getAutoCompactThreshold') as any
+  buildPostCompactMessages = missingBinding('buildPostCompactMessages') as any
+  compactConversation = missingBinding('compactConversation') as any
+  resetMicrocompactState = missingBinding('resetMicrocompactState') as any
+  createTaskStateBase = missingBinding('createTaskStateBase') as any
+  generateTaskId = missingBinding('generateTaskId') as any
+  isTerminalTaskStatus = missingBinding('isTerminalTaskStatus') as any
+  createActivityDescriptionResolver = missingBinding(
+    'createActivityDescriptionResolver',
+  ) as any
+  createProgressTracker = missingBinding('createProgressTracker') as any
+  getProgressUpdate = missingBinding('getProgressUpdate') as any
+  updateProgressFromMessage = missingBinding('updateProgressFromMessage') as any
+  runAgent = missingBinding('runAgent') as any
+  awaitClassifierAutoApproval = missingBinding('awaitClassifierAutoApproval') as any
+  getSpinnerVerbs = missingBinding('getSpinnerVerbs') as any
+  createAssistantAPIErrorMessage = missingBinding(
+    'createAssistantAPIErrorMessage',
+  ) as any
+  createUserMessage = missingBinding('createUserMessage') as any
+  evictTaskOutput = missingBinding('evictTaskOutput') as any
+  evictTerminalTask = missingBinding('evictTerminalTask') as any
+  registerTask = missingBinding('registerTask') as any
+  updateTaskState = missingBinding('updateTaskState') as any
+  tokenCountWithEstimation = missingBinding('tokenCountWithEstimation') as any
+  createAbortController = missingBinding('createAbortController') as any
+  runWithAgentContext = missingBinding('runWithAgentContext') as any
+  count = missingBinding('count') as any
+  logForDebugging = missingBinding('logForDebugging') as any
+  logError = missingBinding('logError') as any
+  cloneFileStateCache = missingBinding('cloneFileStateCache') as any
+  applyPermissionUpdates = missingBinding('applyPermissionUpdates') as any
+  persistPermissionUpdates = missingBinding('persistPermissionUpdates') as any
+  applyPermissionUpdate = missingBinding('applyPermissionUpdate') as any
+  hasPermissionsToUseTool = missingBinding('hasPermissionsToUseTool') as any
+  emitTaskTerminatedSdk = missingBinding('emitTaskTerminatedSdk') as any
+  sleep = missingBinding('sleep') as any
+  jsonParse = missingBinding('jsonParse') as any
+  jsonStringify = missingBinding('jsonStringify') as any
+  asSystemPrompt = missingBinding('asSystemPrompt') as any
+  claimTask = missingBinding('claimTask') as any
+  listTasks = missingBinding('listTasks') as any
+  updateTask = missingBinding('updateTask') as any
+  sanitizePathComponent = missingBinding('sanitizePathComponent') as any
+  getTasksDir = missingBinding('getTasksDir') as any
+  notifyTasksUpdated = missingBinding('notifyTasksUpdated') as any
+  createTeammateContext = missingBinding('createTeammateContext') as any
+  runWithTeammateContext = missingBinding('runWithTeammateContext') as any
+  getAgentId = missingBinding('getAgentId') as any
+  getAgentName = missingBinding('getAgentName') as any
+  getDynamicTeamContext = missingBinding('getDynamicTeamContext') as any
+  getTeamName = missingBinding('getTeamName') as any
+  getTeammateColor = missingBinding('getTeammateColor') as any
+  isTeammate = missingBinding('isTeammate') as any
+  registerPerfettoAgent = missingBinding('registerPerfettoAgent') as any
+  unregisterPerfettoAgent = missingBinding('unregisterPerfettoAgent') as any
+  isPerfettoTracingEnabled = missingBinding('isPerfettoTracingEnabled') as any
+  registerAgent = missingBinding('registerAgent') as any
+  unregisterAgent = missingBinding('unregisterAgent') as any
+  createContentReplacementState = missingBinding(
+    'createContentReplacementState',
+  ) as any
+  formatAgentId = missingBinding('formatAgentId') as any
+  generateRequestId = missingBinding('generateRequestId') as any
+  parseAgentId = missingBinding('parseAgentId') as any
+  registerCleanup = missingBinding('registerCleanup') as any
+  getSessionId = missingBinding('getSessionId') as any
+  getIsNonInteractiveSession = missingBinding('getIsNonInteractiveSession') as any
+  getChromeFlagOverride = missingBinding('getChromeFlagOverride') as any
+  getFlagSettingsPath = missingBinding('getFlagSettingsPath') as any
+  getInlinePlugins = missingBinding('getInlinePlugins') as any
+  getMainLoopModelOverride = missingBinding('getMainLoopModelOverride') as any
+  getSessionBypassPermissionsMode = missingBinding(
+    'getSessionBypassPermissionsMode',
+  ) as any
+  getSessionCreatedTeams = missingBinding('getSessionCreatedTeams') as any
+  quote = missingBinding('quote') as any
+  isInBundledMode = missingBinding('isInBundledMode') as any
+  getPlatform = missingBinding('getPlatform') as any
+  getGlobalConfig = missingBinding('getGlobalConfig') as any
+  saveGlobalConfig = missingBinding('saveGlobalConfig') as any
+  execFileNoThrow = missingBinding('execFileNoThrow') as any
+  execFileNoThrowWithCwd = missingBinding('execFileNoThrowWithCwd') as any
+  getTeamsDir = missingBinding('getTeamsDir') as any
+  errorMessage = missingBinding('errorMessage') as any
+  getErrnoCode = missingBinding('getErrnoCode') as any
+  lock = missingBinding('lock') as any
+  lockSync = missingBinding('lockSync') as any
+  unlock = missingBinding('unlock') as any
+  check = missingBinding('check') as any
+  gitExe = missingBinding('gitExe') as any
+  parseGitConfigValue = missingBinding('parseGitConfigValue') as any
+  getCommonDir = missingBinding('getCommonDir') as any
+  readWorktreeHeadSha = missingBinding('readWorktreeHeadSha') as any
+  resolveGitDir = missingBinding('resolveGitDir') as any
+  resolveRef = missingBinding('resolveRef') as any
+  findCanonicalGitRoot = missingBinding('findCanonicalGitRoot') as any
+  findGitRoot = missingBinding('findGitRoot') as any
+  getBranch = missingBinding('getBranch') as any
+  getDefaultBranch = missingBinding('getDefaultBranch') as any
+  executeWorktreeCreateHook = missingBinding('executeWorktreeCreateHook') as any
+  executeWorktreeRemoveHook = missingBinding('executeWorktreeRemoveHook') as any
+  hasWorktreeCreateHook = missingBinding('hasWorktreeCreateHook') as any
+  addFunctionHook = missingBinding('addFunctionHook') as any
+  containsPathTraversal = missingBinding('containsPathTraversal') as any
+  getInitialSettings = missingBinding('getInitialSettings') as any
+  getRelativeSettingsFilePathForSource = missingBinding(
+    'getRelativeSettingsFilePathForSource',
+  ) as any
+  getCwd = missingBinding('getCwd') as any
+  saveCurrentProjectConfig = missingBinding('saveCurrentProjectConfig') as any
+  getAPIProvider = missingBinding('getAPIProvider') as any
+}
+
 export function installSwarmAppRuntime(bindings: RuntimeBindingMap): void {
   runtimeBindings = bindings
 

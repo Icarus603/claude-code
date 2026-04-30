@@ -9,7 +9,7 @@ import {
   NON_REBINDABLE,
   normalizeKeyForComparison,
 } from './reservedShortcuts.js'
-import type { KeybindingBlock } from './types.js'
+import type { KeybindingBlock } from '@anthropic/ink'
 
 /**
  * Filter out reserved shortcuts that cannot be rebound.

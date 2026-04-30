@@ -11,6 +11,7 @@ import { describe, expect, test } from 'bun:test'
 import { treeify, type TreeNode } from '../uiHelpers/treeify.js'
 
 // Strip ANSI escape codes so we can compare structure without color codes.
+// biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape match is intentional
 const STRIP_ANSI = /\x1B\[[0-?]*[ -/]*[@-~]/g
 const stripAnsi = (s: string) => s.replace(STRIP_ANSI, '')
 

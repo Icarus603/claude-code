@@ -72,6 +72,7 @@ export async function processBashCommand(
   // delete this comment AND prove the symptom doesn't recur with bash-mode
   // smoke tests under both warm and cold JIT conditions.
   let userMessage
+  // biome-ignore lint/complexity/noUselessCatch: intentional — see comment above; the try/catch frame itself fixes a Bun JIT/ink race
   try {
     userMessage = createUserMessage({
       content: prepareUserContent({
@@ -86,6 +87,7 @@ export async function processBashCommand(
   // ctrl+b to background indicator
   let jsx: React.ReactNode
 
+  // biome-ignore lint/complexity/noUselessCatch: intentional — see comment above; the try/catch frame itself fixes a Bun JIT/ink race
   try {
     setToolJSX({
       jsx: (

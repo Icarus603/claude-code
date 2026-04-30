@@ -134,7 +134,7 @@ describe('extractHeredocs — security: position checks', () => {
 
 describe('extractHeredocs — quotedOnly mode', () => {
   test('quotedOnly skips unquoted <<EOF but tracks its body range', () => {
-    const cmd = `cat <<EOF\n\$(rm -rf /)\nEOF`
+    const cmd = `cat <<EOF\n$(rm -rf /)\nEOF`
     const r = extractHeredocs(cmd, { quotedOnly: true })
     // Unquoted skipped → heredoc map empty.
     expect(r.heredocs.size).toBe(0)

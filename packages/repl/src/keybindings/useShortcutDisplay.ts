@@ -4,7 +4,7 @@ import {
   logEvent,
 } from '@claude-code/local-observability'
 import { useOptionalKeybindingContext } from './KeybindingContext.js'
-import type { KeybindingContextName } from './types.js'
+import type { KeybindingContextName } from '@anthropic/ink'
 
 // TODO(keybindings-migration): Remove fallback parameter after migration is complete
 // and we've confirmed no 'keybinding_fallback_used' events are being logged.

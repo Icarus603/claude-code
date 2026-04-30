@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/suspicious/noTemplateCurlyInString: this file tests literal ${VAR} string expansion — placeholders must NOT be template literals */
+
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { expandEnvVarsInString } from '../utils/envExpansion.js'
 

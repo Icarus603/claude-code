@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, mock, test } from 'bun:test'
 
 // Mock the feature flag accessor before importing SUT.
 const realFf = await import('@claude-code/config/feature-flags')
-let featureValue: unknown = undefined
+let featureValue: unknown 
 
 mock.module('@claude-code/config/feature-flags', () => ({
   ...realFf,

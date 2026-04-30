@@ -38,7 +38,7 @@ interface ImportCall {
 
 function findDynamicImports(): ImportCall[] {
   const raw = execSync(
-    `rg -n "import\\(['\\\"][@./]" packages/ -g '*.ts' -g '*.tsx'`,
+    `rg -n "import\\(['\\"][@./]" packages/ -g '*.ts' -g '*.tsx'`,
     { encoding: 'utf8', cwd: REPO_ROOT, maxBuffer: 100 * 1024 * 1024 },
   )
   const calls: ImportCall[] = []

@@ -2,7 +2,7 @@
 // Use this for components that need to work with any task type
 
 import type { DreamTaskState } from '@claude-code/agent/tasks/DreamTask/DreamTask.js'
-import type { InProcessTeammateTaskState } from './InProcessTeammateTask/types.js'
+import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import type { LocalAgentTaskState } from '@claude-code/agent/localAgentTask.js'
 import type { LocalShellTaskState } from './localShellTaskGuards.js'
 import type { LocalWorkflowTaskState } from '@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
@@ -33,8 +33,18 @@ export type BackgroundTaskState =
  * A task is considered a background task if:
  * 1. It is running or pending
  * 2. It has been explicitly backgrounded (not a foreground task)
+ *
+ * Input is loosened to a structural shape so callers from
+ * @claude-code/agent/task/framework (which uses a narrow base
+ * TaskState `{id, type, status, [key]: unknown}` to avoid a circular
+ * import of the full union) can pass directly without an assertion.
+ * The narrowing intent is preserved via the type predicate — at the
+ * call site the variable is still narrowed to BackgroundTaskState
+ * inside the truthy branch.
  */
-export function isBackgroundTask(task: TaskState): task is BackgroundTaskState {
+export function isBackgroundTask(
+  task: { status: string; type?: string; isBackgrounded?: boolean; [k: string]: unknown },
+): task is BackgroundTaskState {
   if (task.status !== 'running' && task.status !== 'pending') {
     return false
   }

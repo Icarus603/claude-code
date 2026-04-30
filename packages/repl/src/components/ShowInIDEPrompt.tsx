@@ -7,7 +7,7 @@ import { Select } from './CustomSelect/index.js'
 import type {
   PermissionOption,
   PermissionOptionWithLabel,
-} from './permissions/FilePermissionDialog/permissionOptions.js'
+} from '@claude-code/permission/components/FilePermissionDialog/permissionOptions.js'
 
 type Props<A> = {
   filePath: string

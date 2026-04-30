@@ -2,7 +2,10 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:tes
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { installSwarmAppRuntime } from '@claude-code/swarm/adapters/appRuntime.js'
+import {
+  _test_resetSwarmAppRuntime,
+  installSwarmAppRuntime,
+} from '@claude-code/swarm/adapters/appRuntime.js'
 import {
   readTeamFileAsync,
   type TeamFile,
@@ -109,6 +112,7 @@ afterAll(async () => {
   if (teamsDir) {
     await rm(teamsDir, { recursive: true, force: true })
   }
+  _test_resetSwarmAppRuntime()
 })
 
 // Each test starts from an empty teams dir so state doesn't leak across cases.

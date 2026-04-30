@@ -19,4 +19,3 @@ export async function writeTempFile(
   await writeFile(path, content, 'utf-8')
   return path
 }
-
