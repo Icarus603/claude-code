@@ -14,7 +14,7 @@ import type {
   AgentDefinitionsResult,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import type { LoadedPlugin, PluginError } from '@claude-code/config/plugin/types'
-import { getTools } from '@claude-code/tool-registry/toolsList.js'
+import { getTools } from '@claude-code/tool-registry/runtime'
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js'
 import { getInteractiveMcpClients } from './integrations.js'
 

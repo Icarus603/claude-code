@@ -280,7 +280,7 @@ import { randomUUID, type UUID } from 'crypto';
 import { processSessionStartHooks } from '@claude-code/storage/sessionStart.js';
 import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from '@claude-code/agent/hooks.js';
 import { type IDESelection } from '@claude-code/ide/hooks/useIdeSelection.js';
-import { assembleToolPool } from '@claude-code/tool-registry/toolsList.js';
+import { assembleToolPool } from '@claude-code/tool-registry/runtime';
 import type { AgentDefinition } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js';
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js';
 import { resumeAgentBackground } from '@claude-code/tool-registry/tools/AgentTool/resumeAgent.js';

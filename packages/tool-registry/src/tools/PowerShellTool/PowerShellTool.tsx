@@ -52,7 +52,7 @@ import { semanticNumber } from '../../utils/semanticNumber.js'
 import { getCachedPowerShellPath } from '@claude-code/shell/legacy/powershellDetection.js'
 import { EndTruncatingAccumulator } from '@claude-code/output/utils/stringUtils.js'
 import { getTaskOutputPath } from '@claude-code/storage/task/diskOutput.js'
-import { TaskOutput } from '../../taskOutput.js'
+import { TaskOutput } from '../../task/TaskOutput.js'
 import { isOutputLineTruncated } from '@claude-code/output/terminal.js'
 import {
   buildLargeToolResultMessage,

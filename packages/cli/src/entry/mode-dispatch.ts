@@ -247,7 +247,7 @@ import {
 import { cleanupOrphanedPluginVersionsInBackground } from '@claude-code/config/plugin/cacheUtils'
 import { initializeVersionedPlugins } from '@claude-code/config/plugin/installedPluginsManager'
 import { getManagedPluginNames } from '@claude-code/config/plugin/managedPlugins'
-import { getGlobExclusionsForPluginCache } from '@claude-code/tool-registry/orphanedPluginFilter.js'
+import { getGlobExclusionsForPluginCache } from '@claude-code/config/plugin/orphanedPluginFilter'
 import { getPluginSeedDirs } from '@claude-code/config/plugin/pluginDirectories'
 import { countFilesRoundedRg } from '@claude-code/tool-registry/ripgrep.js'
 import {

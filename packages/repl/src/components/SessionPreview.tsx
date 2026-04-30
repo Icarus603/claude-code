@@ -2,7 +2,7 @@ import type { UUID } from 'crypto'
 import React, { useCallback } from 'react'
 import { Box, Text, Byline, KeyboardShortcutHint, LoadingState } from '@anthropic/ink'
 import { useKeybinding } from '@anthropic/ink/keybindings'
-import { getAllBaseTools } from '@claude-code/tool-registry/toolsList.js'
+import { getAllBaseTools } from '@claude-code/tool-registry/runtime'
 import type { LogOption } from '@claude-code/agent/logsTypes.js'
 import { formatRelativeTimeAgo } from '@claude-code/output/formatters'
 import {

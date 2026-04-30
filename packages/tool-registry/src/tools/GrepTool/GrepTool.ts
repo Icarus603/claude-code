@@ -17,7 +17,7 @@ import {
 } from '@claude-code/permission/filesystem'
 import type { PermissionDecision } from '@claude-code/permission/PermissionResult'
 import { matchWildcardPattern } from '@claude-code/permission/shellRuleMatching.js'
-import { getGlobExclusionsForPluginCache } from '../../orphanedPluginFilter.js'
+import { getGlobExclusionsForPluginCache } from '@claude-code/config/plugin/orphanedPluginFilter'
 import { ripGrep } from '../../ripgrep.js'
 import { semanticBoolean } from '../../utils/semanticBoolean.js'
 import { semanticNumber } from '../../utils/semanticNumber.js'

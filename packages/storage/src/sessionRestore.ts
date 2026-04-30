@@ -53,8 +53,8 @@ import {
   saveWorktreeState,
 } from './sessionStorage.js'
 import { isTodoV2Enabled } from '@claude-code/agent/tasks.js'
-import type { TodoList } from '@claude-code/tool-registry/todoTypes.js'
-import { TodoListSchema } from '@claude-code/tool-registry/todoTypes.js'
+import type { TodoList } from '@claude-code/tool-registry/todo/types.js'
+import { TodoListSchema } from '@claude-code/tool-registry/todo/types.js'
 import type { ContentReplacementRecord } from './toolResultStorage.js'
 import {
   getCurrentWorktreeSession,
