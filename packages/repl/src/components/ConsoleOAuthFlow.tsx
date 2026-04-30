@@ -164,6 +164,9 @@ export function ConsoleOAuthFlow({
   // copy the code from the browser and paste it in the terminal
   const [showPastePrompt, setShowPastePrompt] = useState(false)
   const [urlCopied, setUrlCopied] = useState(false)
+  const codexManualInputResolverRef = useRef<((value: string) => void) | null>(
+    null,
+  )
 
   const textInputColumns = useTerminalSize().columns - PASTE_HERE_MSG.length - 1
 
@@ -245,6 +248,14 @@ export function ConsoleOAuthFlow({
 
   async function handleSubmitCode(value: string, url: string) {
     try {
+      if (codexManualInputResolverRef.current) {
+        logEvent('tengu_oauth_codex_manual_entry', {})
+        codexManualInputResolverRef.current(value)
+        codexManualInputResolverRef.current = null
+        setPastedCode('')
+        return
+      }
+
       // Expecting format "authorizationCode#state" from the authorization callback URL
       const [authorizationCode, state] = value.split('#')
 
@@ -369,10 +380,16 @@ export function ConsoleOAuthFlow({
   const startCodexOAuth = useCallback(async () => {
     try {
       logEvent('tengu_oauth_codex_flow_start', {})
-      const codexTokens = await runCodexOAuthFlow(async (url) => {
-        setOAuthStatus({ state: 'waiting_for_login', url })
-        setTimeout(setShowPastePrompt, 3000, true)
-      })
+      const codexTokens = await runCodexOAuthFlow(
+        async url => {
+          setOAuthStatus({ state: 'waiting_for_login', url })
+          setTimeout(setShowPastePrompt, 3000, true)
+        },
+        () =>
+          new Promise<string>(resolve => {
+            codexManualInputResolverRef.current = resolve
+          }),
+      )
       // Save directly via saveCodexOAuthTokens (bypasses installOAuthTokens Anthropic path)
       saveCodexOAuthTokens(codexTokens)
       // Codex models come from the static mirror in
@@ -440,6 +457,7 @@ export function ConsoleOAuthFlow({
   // Cleanup OAuth service when component unmounts
   useEffect(() => {
     return () => {
+      codexManualInputResolverRef.current = null
       oauthService.cleanup()
     }
   }, [oauthService])
