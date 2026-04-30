@@ -561,4 +561,3 @@ function TaskOutputResultDisplay({
   )
 }
 
-export default TaskOutputTool

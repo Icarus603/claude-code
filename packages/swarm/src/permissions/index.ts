@@ -631,12 +631,6 @@ export async function deleteResolvedPermission(
   }
 }
 
-/**
- * Submit a permission request (alias for writePermissionRequest)
- * Provided for backward compatibility with worker integration code
- */
-export const submitPermissionRequest = writePermissionRequest
-
 // ============================================================================
 // Mailbox-Based Permission System
 // ============================================================================
