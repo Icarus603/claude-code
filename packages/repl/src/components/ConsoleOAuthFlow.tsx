@@ -539,6 +539,7 @@ export function ConsoleOAuthFlow({
           textInputColumns={textInputColumns}
           pastePromptExitHint={pastePromptExitHint}
           handlePastePromptExit={handlePastePromptExit}
+          setPastePromptExitHint={setPastePromptExitHint}
           handleSubmitCode={handleSubmitCode}
           setOAuthStatus={setOAuthStatus}
           setLoginWithClaudeAi={setLoginWithClaudeAi}
@@ -566,6 +567,7 @@ type OAuthStatusMessageProps = {
   textInputColumns: number
   pastePromptExitHint: boolean
   handlePastePromptExit: () => void
+  setPastePromptExitHint: (value: boolean) => void
   handleSubmitCode: (value: string, url: string) => void
   setOAuthStatus: (status: OAuthStatus) => void
   setLoginWithClaudeAi: (value: boolean) => void
@@ -588,6 +590,7 @@ function OAuthStatusMessage({
   textInputColumns,
   pastePromptExitHint,
   handlePastePromptExit,
+  setPastePromptExitHint,
   handleSubmitCode,
   setOAuthStatus,
   setLoginWithClaudeAi,
