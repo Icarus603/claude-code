@@ -121,10 +121,12 @@ export function resolveConnectionForModel(
     // search using the bare model id.
   }
 
-  const normalized = bareModelId.trim().toLowerCase()
+  const normalizeForMatch = (id: string) =>
+    id.trim().toLowerCase().replace(/\[(1|2)m\]$/i, '')
+  const normalized = normalizeForMatch(bareModelId)
   for (const conn of getEnabledConnections()) {
     for (const m of conn.models) {
-      if (m.id.trim().toLowerCase() === normalized) {
+      if (normalizeForMatch(m.id) === normalized) {
         return conn
       }
     }
