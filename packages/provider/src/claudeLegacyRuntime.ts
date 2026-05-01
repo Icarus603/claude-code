@@ -195,6 +195,7 @@ import {
   getDefaultThinkingDisplay,
   getThinkingTypeOverride,
   modelSupportsAdaptiveThinking,
+  shouldRequireThinkingSignatureForModel,
   modelSupportsThinking,
   mustUseAdaptiveThinking,
   type ThinkingConfig,
@@ -1383,7 +1384,9 @@ async function* queryModel(
       currentConnId,
     )
   }
-  messagesForAPI = stripInvalidThinkingBlocks(messagesForAPI)
+  messagesForAPI = stripInvalidThinkingBlocks(messagesForAPI, {
+    requireSignature: shouldRequireThinkingSignatureForModel(requestedModel),
+  })
 
   // Strip excess media items before making the API call.
   // The API rejects requests with >100 media items but returns a confusing error.
