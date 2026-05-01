@@ -18,11 +18,9 @@ mock.module('@claude-code/config/env/utils', () => ({
   readEnv: (key: string) => envMap.get(key) ?? '',
 }))
 
-const {
-  modelSupportsAdaptiveThinking,
-  modelSupportsThinking,
-  shouldRequireThinkingSignatureForModel,
-} = await import('../thinking.js')
+const { modelSupportsAdaptiveThinking, modelSupportsThinking } = await import(
+  '../thinking.js'
+)
 
 beforeEach(() => {
   config.connections = []
@@ -54,7 +52,6 @@ describe('connection-aware thinking support', () => {
 
     expect(modelSupportsThinking(model)).toBe(false)
     expect(modelSupportsAdaptiveThinking(model)).toBe(false)
-    expect(shouldRequireThinkingSignatureForModel(model)).toBe(false)
   })
 
   test('honors explicit capability overrides for compatible endpoints', () => {
@@ -85,15 +82,6 @@ describe('connection-aware thinking support', () => {
 
     expect(modelSupportsThinking(model)).toBe(true)
     expect(modelSupportsAdaptiveThinking(model)).toBe(true)
-    expect(shouldRequireThinkingSignatureForModel(model)).toBe(false)
-  })
-
-  test('does not require signatures for env-only compatible base URLs', () => {
-    envMap.set('ANTHROPIC_BASE_URL', 'https://api.deepseek.com/anthropic')
-
-    expect(shouldRequireThinkingSignatureForModel('deepseek-v4-pro[1m]')).toBe(
-      false,
-    )
   })
 
   test('keeps Anthropic thinking defaults for official Anthropic endpoints', () => {
@@ -119,6 +107,5 @@ describe('connection-aware thinking support', () => {
 
     expect(modelSupportsThinking(model)).toBe(true)
     expect(modelSupportsAdaptiveThinking(model)).toBe(true)
-    expect(shouldRequireThinkingSignatureForModel(model)).toBe(true)
   })
 })

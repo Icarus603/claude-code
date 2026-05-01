@@ -5141,10 +5141,7 @@ export function stripCrossConnectionThinkingBlocks(
  * connection turns that got malformed somehow (provider bugs,
  * partial streams, …).
  */
-export function stripInvalidThinkingBlocks(
-  messages: Message[],
-  { requireSignature = true }: { requireSignature?: boolean } = {},
-): Message[] {
+export function stripInvalidThinkingBlocks(messages: Message[]): Message[] {
   let changed = false
   const result = messages.map(msg => {
     if (msg.type !== 'assistant') return msg
@@ -5158,7 +5155,7 @@ export function stripInvalidThinkingBlocks(
       }
       const hasText = typeof b.thinking === 'string' && b.thinking.length > 0
       const hasSig = typeof b.signature === 'string' && b.signature.length > 0
-      return hasText && (!requireSignature || hasSig)
+      return hasText && hasSig
     })
     if (filtered.length === content.length) return msg
     changed = true

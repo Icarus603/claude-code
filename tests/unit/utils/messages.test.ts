@@ -23,7 +23,6 @@ import {
   deriveUUID,
   normalizeMessages,
   normalizeMessagesForAPI,
-  stripInvalidThinkingBlocks,
   isClassifierDenial,
   buildYoloRejectionMessage,
   buildClassifierUnavailableMessage,
@@ -496,34 +495,6 @@ describe('normalizeMessages', () => {
     const msg = makeAssistantMsg([{ type: 'text', text: 'hello' }])
     const normalized = normalizeMessages([msg])
     expect(normalized.length).toBe(1)
-  })
-})
-
-describe('stripInvalidThinkingBlocks', () => {
-  test('drops unsigned thinking blocks by default', () => {
-    const assistant = makeAssistantMsg([
-      { type: 'thinking', thinking: 'reasoning', signature: '' },
-      { type: 'text', text: 'answer' },
-    ])
-
-    const stripped = stripInvalidThinkingBlocks([assistant])
-    const content = (stripped[0] as AssistantMessage).message.content as any[]
-
-    expect(content.map(block => block.type)).toEqual(['text'])
-  })
-
-  test('preserves unsigned thinking blocks when signature is not required', () => {
-    const assistant = makeAssistantMsg([
-      { type: 'thinking', thinking: 'reasoning', signature: '' },
-      { type: 'text', text: 'answer' },
-    ])
-
-    const stripped = stripInvalidThinkingBlocks([assistant], {
-      requireSignature: false,
-    })
-    const content = (stripped[0] as AssistantMessage).message.content as any[]
-
-    expect(content.map(block => block.type)).toEqual(['thinking', 'text'])
   })
 })
 

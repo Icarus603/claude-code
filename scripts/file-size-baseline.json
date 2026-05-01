@@ -19,7 +19,7 @@
   "packages/agent/hooks.ts": 5179,
   "packages/agent/internal/fileHistoryCore.ts": 1111,
   "packages/agent/localAgentTask.tsx": 805,
-  "packages/agent/messages.ts": 5630,
+  "packages/agent/messages.ts": 5627,
   "packages/agent/prompts.ts": 863,
   "packages/agent/query.ts": 1794,
   "packages/agent/sessionTools/analyzeContext.ts": 1387,

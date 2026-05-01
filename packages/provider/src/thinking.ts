@@ -4,11 +4,7 @@ import { feature } from 'bun:bundle'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getCanonicalName } from './model.js'
 import { get3PModelCapabilityOverride } from './model/modelSupportOverrides.js'
-import {
-  getAPIProvider,
-  isFirstPartyAnthropicBaseUrl,
-  resolveConnectionForModel,
-} from './providers.js'
+import { getAPIProvider, resolveConnectionForModel } from './providers.js'
 import { getSettingsWithErrors } from '@claude-code/config/settings'
 import { resolveAntModel } from './antModels.js'
 import { readEnv } from '@claude-code/config/env/utils'
@@ -126,26 +122,16 @@ export function getRainbowColor(
   return colors[charIndex % colors.length]!
 }
 
-function isFirstPartyAnthropicEndpoint(endpoint: string | undefined): boolean {
-  if (!endpoint) return true
+function isFirstPartyAnthropicConnection(
+  conn: ConnectionRecord | undefined,
+): boolean {
+  if (!conn || conn.protocol !== 'anthropic') return false
   try {
-    const host = new URL(endpoint).host
+    const host = new URL(conn.endpoint).host
     return host === 'api.anthropic.com' || host === 'api-staging.anthropic.com'
   } catch {
     return false
   }
-}
-
-export function isFirstPartyAnthropicConnection(
-  conn: ConnectionRecord | undefined,
-): boolean {
-  return conn?.protocol === 'anthropic' && isFirstPartyAnthropicEndpoint(conn.endpoint)
-}
-
-export function shouldRequireThinkingSignatureForModel(model: string): boolean {
-  const conn = resolveConnectionForModel(model)
-  if (conn) return isFirstPartyAnthropicConnection(conn)
-  return isFirstPartyAnthropicBaseUrl()
 }
 
 function getAnthropicConnectionThinkingDefault(
