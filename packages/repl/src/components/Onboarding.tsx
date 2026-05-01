@@ -74,6 +74,8 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
     goToNextStep()
   }
 
+  const exitState = useExitOnCtrlCDWithKeybindings(() => process.exit(0))
+
   const apiKeyNeedingApproval = useMemo(() => {
     // Add API key step if needed
     // On homespace, ANTHROPIC_API_KEY is preserved in process.env for child
@@ -90,27 +92,6 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
   }, [])
 
   const shouldShowTerminalSetup = shouldOfferTerminalSetup()
-  const onboardingStepIds: StepId[] = []
-  if (oauthEnabled) {
-    onboardingStepIds.push('preflight')
-  }
-  onboardingStepIds.push('theme')
-  if (apiKeyNeedingApproval) {
-    onboardingStepIds.push('api-key')
-  }
-  if (oauthEnabled) {
-    onboardingStepIds.push('oauth')
-  }
-  onboardingStepIds.push('security')
-  if (shouldShowTerminalSetup) {
-    onboardingStepIds.push('terminal-setup')
-  }
-
-  const exitState = useExitOnCtrlCDWithKeybindings(
-    undefined,
-    undefined,
-    onboardingStepIds[currentStepIndex] !== 'oauth',
-  )
 
   // Define all onboarding steps
   const themeStep = (
