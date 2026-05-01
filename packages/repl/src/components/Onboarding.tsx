@@ -74,7 +74,43 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
     goToNextStep()
   }
 
-  const exitState = useExitOnCtrlCDWithKeybindings()
+  const apiKeyNeedingApproval = useMemo(() => {
+    // Add API key step if needed
+    // On homespace, ANTHROPIC_API_KEY is preserved in process.env for child
+    // processes but ignored by Claude Code itself (see auth.ts).
+    if (!process.env.ANTHROPIC_API_KEY || isRunningOnHomespace()) {
+      return ''
+    }
+    const customApiKeyTruncated = normalizeApiKeyForConfig(
+      process.env.ANTHROPIC_API_KEY,
+    )
+    if (getCustomApiKeyStatus(customApiKeyTruncated) === 'new') {
+      return customApiKeyTruncated
+    }
+  }, [])
+
+  const shouldShowTerminalSetup = shouldOfferTerminalSetup()
+  const onboardingStepIds: StepId[] = []
+  if (oauthEnabled) {
+    onboardingStepIds.push('preflight')
+  }
+  onboardingStepIds.push('theme')
+  if (apiKeyNeedingApproval) {
+    onboardingStepIds.push('api-key')
+  }
+  if (oauthEnabled) {
+    onboardingStepIds.push('oauth')
+  }
+  onboardingStepIds.push('security')
+  if (shouldShowTerminalSetup) {
+    onboardingStepIds.push('terminal-setup')
+  }
+
+  const exitState = useExitOnCtrlCDWithKeybindings(
+    undefined,
+    undefined,
+    onboardingStepIds[currentStepIndex] !== 'oauth',
+  )
 
   // Define all onboarding steps
   const themeStep = (
@@ -124,21 +160,6 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
   )
 
   const preflightStep = <PreflightStep onSuccess={goToNextStep} />
-  // Create the steps array - determine which steps to include based on reAuth and oauthEnabled
-  const apiKeyNeedingApproval = useMemo(() => {
-    // Add API key step if needed
-    // On homespace, ANTHROPIC_API_KEY is preserved in process.env for child
-    // processes but ignored by Claude Code itself (see auth.ts).
-    if (!process.env.ANTHROPIC_API_KEY || isRunningOnHomespace()) {
-      return ''
-    }
-    const customApiKeyTruncated = normalizeApiKeyForConfig(
-      process.env.ANTHROPIC_API_KEY,
-    )
-    if (getCustomApiKeyStatus(customApiKeyTruncated) === 'new') {
-      return customApiKeyTruncated
-    }
-  }, [])
 
   function handleApiKeyDone(approved: boolean) {
     if (approved) {
@@ -178,7 +199,7 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
 
   steps.push({ id: 'security', component: securityStep })
 
-  if (shouldOfferTerminalSetup()) {
+  if (shouldShowTerminalSetup) {
     steps.push({
       id: 'terminal-setup',
       component: (
