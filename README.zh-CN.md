@@ -5,136 +5,78 @@
 [![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat-square&color=blue&label=release)](https://github.com/Icarus603/claude-code/releases)
 [![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
 [![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
-[![Issues](https://img.shields.io/github/issues/Icarus603/claude-code?style=flat-square&color=orange)](https://github.com/Icarus603/claude-code/issues)
-[![Bun](https://img.shields.io/badge/runtime-Bun%20%E2%89%A51.3-black?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
 
-终端编程智能体。单一 binary,命令为 `ccb`。Claude Code 的社区维护衍生版 — 详见 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。与 Anthropic 无关;如需官方工具请见 <https://docs.anthropic.com/en/docs/claude-code/overview>。本 repo 不附独立 LICENSE 档 — 二次散布前请先确认来源。
+终端编程智能体。单一 binary，命令为 `ccb`。Claude Code 的社区维护衍生版 — 详见 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。与 Anthropic 无关。
 
 ---
 
-## 📦 安装
+## 安装
 
-**macOS / Linux**(Windows 的 Git Bash / WSL 也适用):
+**macOS / Linux**（Windows 的 Git Bash / WSL 也适用）：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Icarus603/claude-code/main/install.sh | bash
 ```
 
-装在 `~/.local/share/ccb/versions/<version>`,并在 `~/.local/bin/ccb` 建立 symlink。
-
-**Windows**(PowerShell):
+**Windows**（PowerShell）：
 
 ```powershell
 irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | iex
 ```
 
-装在 `%LOCALAPPDATA%\Programs\ccb\versions\<version>.exe`,并在 `%LOCALAPPDATA%\Programs\ccb\bin\ccb.exe` 放一份副本,同时自动把 bin 目录加进 user `PATH`。无需管理员权限。
+无需 Node、Bun 或任何包管理器。每次启动自动检查更新。
 
-两种方式都不需要 Node、Bun 或任何包管理器。
-
-| 变量 | 默认(sh / ps1) | 用途 |
-|------|------|------|
-| `CCB_VERSION` | `latest` | 锁定特定 tag,例如 `v26.4.24` |
-| `CCB_PREFIX`  | `~/.local` / `%LOCALAPPDATA%\Programs\ccb` | 安装根目录 |
-
-**升级**:不用动手。`ccb` 每次启动 REPL(以及运行中每 30 分钟)会去 GitHub Releases 检查,有新版就在后台下载安装 —— 完成时 footer 会显示 `✓ Update installed · Restart to update`。如果要锁特定版本,重跑那条 install 命令并通过 `CCB_VERSION=…` 指定即可。
-
-卸载:
-- macOS / Linux:`rm -rf ~/.local/share/ccb ~/.local/bin/ccb`
-- Windows:`Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"`
-
-> 不支持 Windows ARM64(Bun 没有 `windows-arm64` compile target)。请在 x64 模拟下使用 x64 binary,或改走 WSL。
-
----
-
-## 🚀 使用
+**卸载：**
 
 ```bash
-ccb              # 交互式 REPL
-ccb --version
-ccb --help
+# macOS / Linux
+rm -rf ~/.local/share/ccb ~/.local/bin/ccb
+
+# Windows (PowerShell)
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"
 ```
 
-第一次执行会提示 `/login`。对话框让你选 provider:
-
-- **Anthropic Console account** — claude.ai 的 OAuth 登录(Pro / Max / Team / Enterprise)
-- **ChatGPT Codex** — ChatGPT 的 OAuth 登录(Plus / Pro / Business / Edu / Enterprise);走你 ChatGPT 订阅额度,不是 API key 计费。模型来自 `chatgpt.com/backend-api/codex/responses`(gpt-5.5 / 5.4 / 5.4-mini / 5.3-codex / 5.2,支持 `low|medium|high|xhigh` reasoning effort)
-- **Anthropic Compatible** — 任何 Anthropic 格式端点(Anthropic 本身、第三方 proxy、自架)
-- **OpenAI Compatible** — OpenAI 本身 + 所有兼容 protocol(DeepSeek、Ollama、vLLM、...)
-- **Gemini API** — Google Gemini 原生 REST/SSE
-
-多个 connection 可以同时存在 —— 同时登录 Claude Account 和 ChatGPT Codex,然后用 `/model` 在每个请求之间切换。Picker 每行对应一个 connection × 一个模型。`/effort` 会给每个模型带他自己 tier 真实支持的 effort 阶梯;`/status` 同时显示每个已连线 provider 的用量。
-
-Base URL、API key、模型 ID 都在对话框里填(用得到的话),shell 不用 export。要换 provider 再敲 `/login`。
-
-架构总览见 [`CLAUDE.md`](CLAUDE.md),feature flag 清单见 [`docs/feature-flags.md`](docs/feature-flags.md)。
-
-### 🤖 Headless / 脚本用法
-
-CI 或 `--print` 模式下没 REPL 可以开 `/login`,env vars 也支持:
-
-| 变量 | 用途 |
-|------|------|
-| `ANTHROPIC_API_KEY`、`ANTHROPIC_BASE_URL` | Anthropic 认证 + 端点 |
-| `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_DEFAULT_*_MODEL` | OpenAI 兼容端点 |
-| `GEMINI_API_KEY`、`GEMINI_BASE_URL`、`GEMINI_DEFAULT_*_MODEL` | Gemini 端点 |
-| `FEATURE_<FLAG>=1` | runtime 启用 build-time feature flag |
+> 不支持 Windows ARM64，请在 x64 模拟下运行，或改走 WSL。
 
 ---
 
-## 🛠️ 从源码构建
+## 贡献
 
-唯一需求是 [Bun](https://bun.sh) ≥ 1.3.0。
+需要 [Bun](https://bun.sh) ≥ 1.3。
 
 ```bash
 git clone https://github.com/Icarus603/claude-code.git
 cd claude-code
 bun install
-
-bun run dev               # hot-reload,无 build 步骤
-bun run build:standalone  # → dist/ccb(当前平台)
-bun run build:platforms   # → dist/binaries/ccb-{darwin,linux,windows}-{arm64,x64}[.exe]
+bun run dev        # hot-reload REPL
 bun test
-bun run doctor:arch       # 架构不变式 — 必须通过
+bun run doctor:arch
 ```
 
-`bun build --compile --target=bun-<os>-<arch>` cross-compile 每个平台约 0.4 秒。Release workflow([`.github/workflows/release.yml`](.github/workflows/release.yml))在 tag push 时跑。
-
----
-
-## 🤝 贡献
-
-欢迎 PR。
-
-- `bun run doctor:arch` 必须通过。不准 `--no-verify`。
-- `bun test` 必须通过。为新行为加测试。
-- `tsc-errors` ratchet 只允许数字下降。
-- Commit message 解释 *为什么*;diff 已经显示 *做了什么*。
-- 不要把 npm 发布加回来。本项目设计就是 binary-only。
+- `doctor:arch` 和 `bun test` 必须通过。不准 `--no-verify`。
+- Commit message 解释 *为什么*。
+- 不要把 npm 发布加回来 — 本项目 binary-only。
 
 ```bash
 gh repo fork Icarus603/claude-code
 git checkout -b feat/your-thing
-# ...
 bun run doctor:arch && bun test
 gh pr create
 ```
 
-架构惯例见 [`docs/lazy-require-pattern.md`](docs/lazy-require-pattern.md) 与 [`scripts/`](scripts/) 下的 doctor 脚本。
-
 ---
 
-## 🏷️ 发版
+## 发版
 
-只给维护者。
+只给维护者：
 
 ```bash
-bun run release v26.4.25
+bun run release v26.5.N
 ```
 
-完事。Script 自己校验 tag、创建、push。剩下交给 GitHub Actions 跑 — `MACRO.VERSION` 从 tag 推出来,没有任何版本号要手动同步。
+校验、打 tag、push。GitHub Actions 自动构建全平台 binary。
 
 ---
 
-[Issues](https://github.com/Icarus603/claude-code/issues) · [`docs/`](docs/) · [Anthropic 官方 Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
+[Issues](https://github.com/Icarus603/claude-code/issues) · [Anthropic 官方 Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
