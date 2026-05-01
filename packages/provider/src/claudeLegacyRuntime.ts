@@ -1063,15 +1063,9 @@ async function* queryModel(
   //     the *global* provider name (looks like an "openai deployment"
   //     error even though the request hit Anthropic).
   const requestedModel = options.model
-  const routedProvider = requestedModel
-    ? getProviderForModel(requestedModel)
-    : getAPIProvider()
-  if (requestedModel) {
-    const { connectionId, modelId: bareModelId } = unpackModelId(requestedModel)
-    if (connectionId) {
-      options = { ...options, model: bareModelId }
-    }
-  }
+  const routedProvider = getProviderForModel(requestedModel)
+  const { connectionId, modelId: bareModelId } = unpackModelId(requestedModel)
+  if (connectionId) options = { ...options, model: bareModelId }
 
   // Check cheap conditions first — the off-switch await blocks on GrowthBook
   // init (~10ms). For non-Opus models (haiku, sonnet) this skips the await
