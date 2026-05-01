@@ -4,10 +4,11 @@ import { feature } from 'bun:bundle'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getCanonicalName } from './model.js'
 import { get3PModelCapabilityOverride } from './model/modelSupportOverrides.js'
-import { getAPIProvider } from './providers.js'
+import { getAPIProvider, resolveConnectionForModel } from './providers.js'
 import { getSettingsWithErrors } from '@claude-code/config/settings'
 import { resolveAntModel } from './antModels.js'
 import { readEnv } from '@claude-code/config/env/utils'
+import type { ConnectionRecord } from '@claude-code/config'
 
 /**
  * Mirrors ant 2.1.121's 2833.js schema: thinking config carries an
@@ -121,6 +122,32 @@ export function getRainbowColor(
   return colors[charIndex % colors.length]!
 }
 
+function isFirstPartyAnthropicConnection(
+  conn: ConnectionRecord | undefined,
+): boolean {
+  if (!conn || conn.protocol !== 'anthropic') return false
+  try {
+    const host = new URL(conn.endpoint).host
+    return host === 'api.anthropic.com' || host === 'api-staging.anthropic.com'
+  } catch {
+    return false
+  }
+}
+
+function getAnthropicConnectionThinkingDefault(
+  model: string,
+): boolean | undefined {
+  const conn = resolveConnectionForModel(model)
+  if (!conn || conn.protocol !== 'anthropic') return undefined
+  return isFirstPartyAnthropicConnection(conn)
+}
+
+function shouldUseFirstPartyThinkingDefaults(model: string): boolean {
+  const connDefault = getAnthropicConnectionThinkingDefault(model)
+  if (connDefault !== undefined) return connDefault
+  return getAPIProvider() === 'firstParty'
+}
+
 // TODO(inigo): add support for probing unknown models via API error detection
 // Provider-aware thinking support detection (aligns with modelSupportsISP in betas.ts)
 export function modelSupportsThinking(model: string): boolean {
@@ -136,6 +163,10 @@ export function modelSupportsThinking(model: string): boolean {
   // IMPORTANT: Do not change thinking support without notifying the model
   // launch DRI and research. This can greatly affect model quality and bashing.
   const canonical = getCanonicalName(model)
+  const connDefault = getAnthropicConnectionThinkingDefault(model)
+  if (connDefault !== undefined) {
+    return connDefault && !canonical.includes('claude-3-')
+  }
   const provider = getAPIProvider()
   // 1P and Foundry: all Claude 4+ models (including Haiku 4.5)
   if (provider === 'foundry' || provider === 'firstParty') {
@@ -152,8 +183,12 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
     return supported3P
   }
   const canonical = getCanonicalName(model)
+  const connDefault = getAnthropicConnectionThinkingDefault(model)
+  if (connDefault === false) {
+    return false
+  }
   if (canonical.includes('opus-4-7') || canonical.includes('opus-4-6') || canonical.includes('sonnet-4-6')) {
-    return true
+    return shouldUseFirstPartyThinkingDefaults(model)
   }
   if (
     canonical.includes('opus') ||
@@ -174,7 +209,7 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
   // is a proxy). Do not default to true for other 3P as they have different formats
   // for their model strings.
   const provider = getAPIProvider()
-  return provider === 'firstParty' || provider === 'foundry'
+  return provider === 'foundry' || shouldUseFirstPartyThinkingDefaults(model)
 }
 
 /**
