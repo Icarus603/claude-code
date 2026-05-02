@@ -72,7 +72,7 @@ gh pr create
 Maintainer only:
 
 ```bash
-bun run release v26.5.N
+bun run release v26.M.N
 ```
 
 Validates, tags, pushes. GitHub Actions builds binaries for all platforms.

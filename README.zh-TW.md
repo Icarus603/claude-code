@@ -72,7 +72,7 @@ gh pr create
 只給維護者：
 
 ```bash
-bun run release v26.5.N
+bun run release v26.M.N
 ```
 
 驗證、打 tag、push。GitHub Actions 自動建構全平台 binary。
