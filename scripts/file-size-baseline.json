@@ -63,7 +63,7 @@
   "packages/mcp-runtime/src/config.ts": 1591,
   "packages/mcp-runtime/src/useManageMCPConnections.ts": 1142,
   "packages/memory/src/teamMemorySync.ts": 1016,
-  "packages/permission/src/components/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.tsx": 1043,
+  "packages/permission/src/components/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.tsx": 1048,
   "packages/permission/src/filesystem.ts": 1786,
   "packages/permission/src/permissionSetup.ts": 1542,
   "packages/permission/src/permissions.ts": 1495,
