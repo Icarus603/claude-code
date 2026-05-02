@@ -35,7 +35,7 @@ describe('smoke:plugin dispatch path', () => {
     if (r.pluginHooks.pluginNames.includes('ralph-loop')) {
       const stop = r.dispatch.Stop
       expect(stop?.matched).toBeGreaterThan(0)
-      expect(stop?.pluginNames).toContain('ralph-loop')
+      expect(stop?.pluginNames).toContain('plugin:ralph-loop')
     }
   })
 

@@ -196,11 +196,11 @@ export async function probeRuntime(): Promise<RuntimeProbeReport> {
           input as never,
           undefined,
         )
-        const arr = (matched as Array<{ pluginName?: string }>) ?? []
+        const arr = (matched as Array<{ hookSource?: string }>) ?? []
         report.dispatch[event] = {
           matched: arr.length,
           pluginNames: Array.from(
-            new Set(arr.map(m => m.pluginName ?? '<no-plugin>')),
+            new Set(arr.map(m => m.hookSource ?? '<no-plugin>')),
           ),
         }
       } catch (e) {
