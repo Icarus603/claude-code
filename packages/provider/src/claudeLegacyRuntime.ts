@@ -1062,8 +1062,9 @@ async function* queryModel(
   //     id upstream verbatim → 404, with the error message formatted using
   //     the *global* provider name (looks like an "openai deployment"
   //     error even though the request hit Anthropic).
-  const routedProvider = getProviderForModel(options.model)
-  const { connectionId, modelId: bareModelId } = unpackModelId(options.model)
+  const requestedModel = options.model
+  const routedProvider = getProviderForModel(requestedModel)
+  const { connectionId, modelId: bareModelId } = unpackModelId(requestedModel)
   if (connectionId) options = { ...options, model: bareModelId }
 
   // Check cheap conditions first — the off-switch await blocks on GrowthBook
@@ -1374,8 +1375,8 @@ async function* queryModel(
     const { resolveConnectionForModel } = require(
       './providers.js',
     ) as typeof import('./providers.js')
-    const currentConnId = options.model
-      ? resolveConnectionForModel(options.model)?.id
+    const currentConnId = requestedModel
+      ? resolveConnectionForModel(requestedModel)?.id
       : undefined
     messagesForAPI = stripCrossConnectionThinkingBlocks(
       messagesForAPI,
@@ -1700,19 +1701,21 @@ async function* queryModel(
     // IMPORTANT: Do not change the adaptive-vs-budget thinking selection below
     // without notifying the model launch DRI and research. This is a sensitive
     // setting that can greatly affect model quality and bashing.
-    if (hasThinking && modelSupportsThinking(options.model)) {
+    const modelForThinkingSupport =
+      retryContext.model === options.model ? requestedModel : retryContext.model
+    if (hasThinking && modelSupportsThinking(modelForThinkingSupport)) {
       // Mirrors ant 4682.js: env var only honoured for deprecation-window
       // models (4.6 / Sonnet 4.6). Newer models (Opus 4.7+) MUST use adaptive.
       const disableAdaptive =
         isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING')) &&
-        !mustUseAdaptiveThinking(options.model)
-      const typeOverride = getThinkingTypeOverride(options.model)
+        !mustUseAdaptiveThinking(modelForThinkingSupport)
+      const typeOverride = getThinkingTypeOverride(modelForThinkingSupport)
       // hasThinking already gates type !== 'disabled'.
       const display = thinkingConfig.display ?? getDefaultThinkingDisplay()
       const useAdaptive =
         typeOverride !== undefined
           ? typeOverride === 'adaptive'
-          : modelSupportsAdaptiveThinking(options.model) && !disableAdaptive
+          : modelSupportsAdaptiveThinking(modelForThinkingSupport) && !disableAdaptive
       if (useAdaptive) {
         // For models that support adaptive thinking, always use adaptive
         // thinking without a budget.
@@ -1925,7 +1928,7 @@ async function* queryModel(
       () =>
         getAnthropicClient({
           maxRetries: 0, // Disabled auto-retry in favor of manual implementation
-          model: options.model,
+          model: requestedModel,
           fetchOverride: options.fetchOverride,
           source: options.querySource,
         }),
