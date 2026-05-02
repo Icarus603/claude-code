@@ -61,6 +61,7 @@ import {
 } from '../../PermissionMode.js'
 import type { PermissionUpdate } from '../../PermissionUpdateSchema.js'
 import {
+  hasAutoModeOptInAnySource,
   isAutoModeGateEnabled,
   restoreDangerousPermissions,
   stripDangerousPermissionsForAutoMode,
@@ -80,7 +81,7 @@ import {
   saveAgentName,
   saveCustomTitle,
 } from '@claude-code/storage/sessionStorage.js'
-import { getSettings } from '@claude-code/config/settings'
+import { getSettings, getUseAutoModeDuringPlan } from '@claude-code/config/settings'
 import { type OptionWithDescription, Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import { Markdown } from '@claude-code/repl/components/Markdown.js'
 import { PermissionDialog } from '../PermissionDialog.js'
@@ -229,6 +230,10 @@ export function ExitPlanModePermissionRequest({
   const usage = toolUseConfirm.assistantMessage.message.usage
   const { mode, isAutoModeAvailable, isBypassPermissionsModeAvailable } =
     toolPermissionContext
+  const autoModeAvailableAndOptedIn =
+    isAutoModeAvailable &&
+    hasAutoModeOptInAnySource() &&
+    getUseAutoModeDuringPlan()
   const options = useMemo(
     () =>
       buildPlanApprovalOptions({
@@ -237,7 +242,7 @@ export function ExitPlanModePermissionRequest({
         usedPercent: showClearContext
           ? getContextUsedPercent(usage, mode)
           : null,
-        isAutoModeAvailable,
+        isAutoModeAvailable: autoModeAvailableAndOptedIn,
         isBypassPermissionsModeAvailable,
         onFeedbackChange: setPlanFeedback,
       }),
@@ -246,7 +251,7 @@ export function ExitPlanModePermissionRequest({
       showUltraplan,
       usage,
       mode,
-      isAutoModeAvailable,
+      autoModeAvailableAndOptedIn,
       isBypassPermissionsModeAvailable,
     ],
   )
