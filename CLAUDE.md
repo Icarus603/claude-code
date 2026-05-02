@@ -4,7 +4,7 @@ Guidance for Claude Code working in this repository.
 
 ## Project Overview
 
-**ccb** — a personal, self-hosted reverse-engineered Claude Code CLI (originally decompiled from Anthropic's official build, now reorganised into a packages-based monorepo). Single-user — no public API, no public npm package.
+**ccb** — a personal, self-hosted Claude Code CLI, originating from the Anthropic npm sourcemap leak (v2.1.88, 2026-03-31) and subsequently reorganised into a packages-based monorepo. Single-user — no public API, no public npm package.
 
 The repo is post-V7 refactor: monolithic `src/` is gone, all code lives in `packages/*` and `packages/@ant/*` workspaces. ~2317 unit tests + 20 smoke tests, 0 fail.
 
