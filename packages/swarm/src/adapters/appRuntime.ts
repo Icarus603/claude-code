@@ -54,11 +54,15 @@ export type ModelAlias = string
 export type PermissionUpdate = unknown;
 export type PermissionMode = string
 export type Task = unknown;
-export type TaskStateBase = {
-  id: string
-  status: string
-  [key: string]: unknown
-}
+// Re-export the real TaskStateBase from tool-registry rather than holding
+// a 3-field minimum subset here. The minimum subset was a V7 §7.2 type-side
+// shim that hid the real shape from swarm consumers, producing dozens of
+// TS2339s when accessing description / startTime / outputFile / etc. The
+// runtime always had the full 11-field shape (createTaskStateBase in
+// tool-registry returns it; swarm's appRuntime wires that exact function
+// at line 114 below). swarm already imports from tool-registry in 5+
+// places, so the layer rule allows it. (V9-3, 2026-05-04.)
+export type { TaskStateBase } from '@claude-code/tool-registry/Task.js'
 export type SetAppState = (updater: (prev: AppState) => AppState) => void
 export type TeammateContext = unknown;
 export type AgentColorName = string

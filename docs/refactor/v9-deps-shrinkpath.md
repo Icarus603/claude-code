@@ -36,18 +36,22 @@ stays unchanged.
 | V9-2.6 | §2 | Fix broken `isDuplicatePath` stub (was `(a, b) => a === b`, callers passed 3 args — plugin-loader path-dedup silently never fired). Replace with real symlink-resolving impl. | Medium (real bug fix) | **✅ landed 2026-05-04** — caller arity fixed in 6 sites, regression test added |
 | V9-2.7 | §2 | Delete 4 dead exports (`safeParseJSON`, `BUILTIN_PLUGIN_IDS`, `checkBinaryExists` chain) + dead `storage/fsOperations.ts:isDuplicatePath` (post-V9-2.6 stale). Caller `lspRecommendation.ts` switched to direct `@claude-code/updater/binaryCheck.js` import. **Discovered second broken-stub bug**: `coerceDescriptionToString` 1-arg local stub returned `''` instead of `null`, breaking the `??` fallback chain in 5 plugin-loader callsites. Fixed by re-exporting the real 3-arg impl from `frontmatterParser.ts`. | Medium (1 real bug + dead code) | **✅ landed 2026-05-04** — 7-case regression test added, ~80 LOC removed |
 | V9-2.8 | §2 | Shadow-stub scan found a P0 bug: **`BUILTIN_MARKETPLACE_NAME = 'anthropics'`** in `_deps.ts` shadowed the real `'builtin'` in `builtin.ts`. `pluginLoader.ts:1913` used the bad copy to filter built-in plugins; the filter never matched (real plugin ids are `name@builtin`, not `name@anthropics`), so built-in plugins fell through into the marketplace-loading branch. Plus `FRONTMATTER_REGEX` had a stricter copy than the real impl. Fix: replace 6 hand-typed constants in `_deps.ts` with `export { X } from <canonical>` re-exports — single source of truth. | High (P0 bug — production logic silently wrong for built-in plugins) | **✅ landed 2026-05-04** — 3-case regression test added; 6 shadow constants collapsed |
+| V9-3 | §3 | Replace `swarm/adapters/appRuntime.ts:57` 3-field minimum-subset `TaskStateBase` shim with `export type { TaskStateBase } from '@claude-code/tool-registry/Task.js'`. The runtime always returned the full 11-field shape via `createTaskStateBase`; the type-side shim was a V7 §7.2 holdover hiding it from swarm TS. | Low (single type re-export; runtime unaffected) | **✅ landed 2026-05-04** — `tsc-errors` 3179 → 3156 (−23 total: −10 prior-V9 headroom that had accumulated under V9-2.6/2.7/2.8 without baseline tightening, plus −13 directly from V9-3). The −13 from V9-3 break down as: 5 TS2322 (string assignability at `task.toolUseId`/`description` writes), 4 TS2363, 2 TS2345, 1 TS2365, 1 TS2362, scattered across `repl/components/tasks/{InProcessTeammateDetailDialog, BackgroundTasksDialog}`, `repl/components/Spinner{,/TeammateSpinnerLine}.tsx`, `repl/hooks/useScheduledTasks.ts`, `swarm/runtime/inProcessRunner.ts:923,1169,1220`, `swarm/runtime/spawnInProcess.ts:252,253`, `tool-registry/tools/TaskOutputTool.tsx:91`. **Counter-intuitive observation**: zero swarm-internal TS2339s were eliminated (65 → 65); the 65 are unrelated `Partial<unknown>` / `'CoreTool'` / `'unknown'` patterns in createSwarmHostDeps and InProcessBackend that come from OTHER V7 §7.2 type-side shims still in `swarm/adapters/appRuntime.ts`. Future iterations of §4 may chip at those. |
+
+### Remaining V9 phases (not yet executed)
+
+| Phase | Section | Scope | Risk | Estimated effect |
+|-------|---------|-------|------|------------------|
 | V9-2b | §4 | `tool-registry/progressTypes.ts` 11 slots → `import type` | Low | ~20 TS2339 |
-| V9-2c | §4 | `swarm/adapters/appRuntime.ts` 13 slots → `import type` | Medium | ~30 TS2339 + some TS2345 |
+| V9-2c | §4 | `swarm/adapters/appRuntime.ts` 13 remaining slots → `import type` (after V9-3, TaskStateBase already done; remaining: PermissionMode/Task/AgentDefinition/Message/CustomAgentDefinition/AgentToolResult/AgentProgress/PermissionDecision/AgentContext/PermissionUpdate/TeammateContext/AppState shims). Each must be evaluated separately for whether the canonical home is import-safe. | Medium | ~30 TS2339 + some TS2345 |
 | V9-2d | §4 | `cli/src/headless.ts` 5 slots → `import type` | Low | ~15 TS2339 |
-| V9-3 | §3 | Audit and unify `TaskState` double-union | Medium-High | ~100+ TS2322 |
 | V9-4 | §4 | Remaining ~60 misc slots, case-by-case | Medium | ~50 TS2339 |
 | V9-5 | §1+§2 result | Final ratchet tighten + retire `_deps.ts` lazy-require infra | Low | 0 (cleanup) |
 
-After V9 completes, the expected end state:
-- `_deps.ts`: 0 lazy-requires, 0 unknown slots
-- tsc-errors: ~2900 (down ~280 from 3179)
-- 95 `= unknown` aliases reduced to <20 (those genuinely opaque at
-  the runtime adapter boundary)
+After all V9 phases complete, the expected end state:
+- `_deps.ts`: 0 lazy-requires, 0 unknown slots (✅ already achieved at V9-2.5)
+- tsc-errors: target ~2900 (currently 3156 after V9-3; remaining −256 to budget across V9-2b/c/d, V9-4)
+- 95 `= unknown` aliases reduced to <20 (those genuinely opaque at the runtime adapter boundary)
 
 ## Non-goals (Linus discipline)
 

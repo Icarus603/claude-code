@@ -123,7 +123,20 @@ import { spawnSync } from 'child_process'
 // `bun x tsc --noEmit | grep -E " error TS\d+: " | wc -l`) — both
 // returned 3179 deterministically. Floor freezes the gain so any
 // future regression must explain itself.
-const BUDGET = 3179
+//
+// 2026-05-04 (V9-3): ratcheted 3179 → 3156 (-23). Of the -23, ten
+// errors had silently accumulated as headroom under V9-2.6/2.7/2.8
+// without baseline tightening (post-V9-2.8 measured count was 3169).
+// The remaining -13 came from replacing the 3-field
+// `TaskStateBase` minimum-subset shim at
+// `swarm/adapters/appRuntime.ts:57` with a `re-export type` from
+// `tool-registry/Task.ts`. The runtime had always returned the full
+// 11-field shape via `createTaskStateBase`; the swarm-side type-side
+// shim had been hiding it from TS at `task.description`/`startTime`/
+// `outputFile`/etc. consumer sites. The re-export resolves them in
+// one type change with zero runtime effect. Floor locks both the
+// V9-2.x headroom gain and the V9-3 type-narrow gain together.
+const BUDGET = 3156
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
