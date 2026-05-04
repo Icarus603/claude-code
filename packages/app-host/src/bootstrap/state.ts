@@ -775,6 +775,38 @@ export function getLastInteractionTime(): number {
   return STATE.lastInteractionTime
 }
 
+/**
+ * Threshold for "user is still active in this terminal" — used by
+ * PushNotificationTool to suppress notifications when the user can
+ * obviously already see the screen. Mirrors upstream `VW_ = 60000`.
+ */
+export const NOTIF_ACTIVE_THRESHOLD_MS = 60_000
+
+// Terminal focus state: undefined when DECSET 1004 (focus event mode)
+// hasn't reported yet, true when the terminal has focus, false when not.
+// Updated by the focus reporting handler in the REPL.
+let terminalFocus: boolean | undefined
+
+export function getTerminalFocus(): boolean | undefined {
+  return terminalFocus
+}
+
+export function setTerminalFocusForState(value: boolean | undefined): void {
+  terminalFocus = value
+}
+
+/**
+ * "Is the user obviously here right now?" — true if the terminal reports
+ * focus, OR if there was any keystroke within NOTIF_ACTIVE_THRESHOLD_MS.
+ * Falls through to the keystroke heuristic when focus is unknown
+ * (terminals that don't implement DECSET 1004).
+ */
+export function isUserActiveForNotifications(): boolean {
+  const focus = terminalFocus
+  if (focus !== undefined) return focus
+  return Date.now() - STATE.lastInteractionTime < NOTIF_ACTIVE_THRESHOLD_MS
+}
+
 // Scroll drain suspension — background intervals check this before doing work
 // so they don't compete with scroll frames for the event loop. Set by
 // ScrollBox scrollBy/scrollTo, cleared SCROLL_DRAIN_IDLE_MS after the last

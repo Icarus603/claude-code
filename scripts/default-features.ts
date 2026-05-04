@@ -45,6 +45,7 @@ const STABLE_FEATURES = [
   'VERIFICATION_AGENT',
   'KAIROS_BRIEF',
   'KAIROS_DREAM',
+  'KAIROS_PUSH',
   'AWAY_SUMMARY',
   'ULTRAPLAN',
   // P2: daemon + remote control server

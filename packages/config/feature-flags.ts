@@ -55,6 +55,7 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
   tengu_hive_evidence: true,
   tengu_kairos_brief: true,
   tengu_kairos_dream: true,
+  tengu_kairos_push_notifications: true,
   tengu_sedge_lantern: true,
   tengu_willow_mode: 'dialog',
   // Kill switches (default on)

@@ -80,11 +80,15 @@ const getSendUserFileTool = () =>
     ? require('@claude-code/tool-registry/tools/SendUserFileTool/SendUserFileTool.js').SendUserFileTool as Tool
     : null
 
-// PushNotificationTool, SubscribePRTool: ant-internal tools not present in
-// this build. Their src/ shims were never replaced with canonical packages,
-// so the require() targets don't exist. Feature gates default false →
-// returning null is correct behavior.
-const getPushNotificationTool = () => null
+// PushNotificationTool: ported from upstream v2.1.123 (resplit/3871.js).
+// ccb runs it local-only — no mobile-push transport. The tool itself
+// gates on `tengu_kairos_push_notifications` (pinned true via
+// LOCAL_GATE_DEFAULTS) and via the KAIROS_PUSH build flag.
+const getPushNotificationTool = () =>
+  feature('KAIROS_PUSH')
+    ? (require('../../PushNotificationTool/PushNotificationTool.js').PushNotificationTool as Tool)
+    : null
+// SubscribePRTool: ant-internal, no public impl available.
 const getSubscribePRTool = () => null
 
 const getVerifyPlanExecutionTool = () =>
