@@ -4080,7 +4080,14 @@ export function REPL({
     }
   }, [submitCount]);
 
-  // Show notification when Claude is done responding and user is idle
+  // Show notification when Claude is done responding and user is idle.
+  // KAIROS input-needed push gate (subsystem 3 of the KAIROS port): the
+  // existing idle-prompt watcher mirrors upstream resplit/5031.js, with
+  // an added gate matching upstream's PTH() composite (push-notifs
+  // feature on AND user has agentPushNotifEnabled), plus the
+  // input-needed-specific tengu_kairos_input_needed_push +
+  // inputNeededNotifEnabled. Without the gate, notifications fire for
+  // users who have explicitly disabled them in /config.
   useEffect(() => {
     // Don't set up notification if Claude is busy
     if (isLoading) return;
@@ -4090,6 +4097,20 @@ export function REPL({
 
     // No query has completed yet
     if (lastQueryCompletionTime === 0) return;
+
+    // KAIROS gates — read at effect mount; minor staleness if user toggles
+    // mid-session is tolerable (next query completion re-runs this effect).
+    const pushEnabled = getFeatureValue_CACHED_MAY_BE_STALE(
+      'tengu_kairos_push_notifications',
+      false,
+    );
+    const inputNeededGate = getFeatureValue_CACHED_MAY_BE_STALE(
+      'tengu_kairos_input_needed_push',
+      false,
+    );
+    const cfg = getGlobalConfig();
+    if (!pushEnabled || !cfg.agentPushNotifEnabled) return;
+    if (!inputNeededGate || !cfg.inputNeededNotifEnabled) return;
 
     // Set timeout to check idle state
     const timer = setTimeout(
