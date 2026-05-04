@@ -1128,12 +1128,12 @@ async function execCommandHook(
         { level: 'verbose' },
       )
     } catch (sandboxError) {
-      // If sandbox wrapping fails, log and continue without sandbox.
-      // This preserves backwards compatibility — hooks that ran before
-      // sandbox support was added will still work.
-      logForDebugging(
-        `Failed to sandbox hook command, running unsandboxed: ${errorMessage(sandboxError)}`,
-        { level: 'warn' },
+      // FAIL-CLOSED: outer guard saw isSandboxingEnabled()=true, so user
+      // opted in but wrap failed. Unsandboxed fallback re-opens the
+      // data-exfil threat the SECURITY block mitigates. Matches exec.ts:190.
+      throw new Error(
+        `Refusing to run hook "${hook.command}": sandbox wrap failed ` +
+          `(${errorMessage(sandboxError)}). Fix sandbox config or disable.`,
       )
     }
   }
