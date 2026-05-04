@@ -1,17 +1,17 @@
-# Tag-driven release pipeline — DON'T add quality gates here.
+# Tag-driven release pipeline.
 #
-# This file is byte-equal to v26.5.17 and shipped 17 releases cleanly.
-# ci.yml + .githooks/pre-push gate every merge to main on macos. Tags
-# are cut from main HEAD, so main is already gated. Adding test/
-# doctor:arch/smoke here = first-time exposure to ubuntu-latest, which
-# surfaces latent platform-specific bugs that block release for no
-# benefit. See `feedback_release_pipeline_chase_root_causes.md` and
-# the v26.5.18 series for the cautionary tale (~3h chasing a GHA-
-# runner-specific Bun spawn race + cumulative stale-draft drift after
-# 6 retags).
-#
-# If you think you need a quality gate here, the answer is: put it in
-# ci.yml or pre-push. release.yml stays minimal.
+# Two design choices that look weird but aren't:
+#   1. runs-on: macos-latest. ubuntu-latest hit Bun-on-GHA spawn races
+#      and got hit harder by the 2026-05-04 GHA outage; macos-latest
+#      run on fb1ee05b (2026-05-04T14:34Z) shipped 10 assets cleanly.
+#      `build:platforms` cross-compiles all 5 platforms regardless of
+#      runner OS, so user-facing binaries are unaffected by runner choice.
+#   2. No test/doctor:arch/smoke here. ci.yml + pre-push hook already
+#      gate every merge to main on macos. Tags are cut from main HEAD.
+#      Adding gates here = duplicate work + new platform exposure that
+#      blocks releases without benefit.
+# See `feedback_release_pipeline_chase_root_causes.md` for the v26.5.18
+# series cautionary tale.
 
 name: Release
 
@@ -30,7 +30,21 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # macos-latest aligns with ci.yml. ubuntu-latest had two separate
+    # confirmed failure modes during the v26.5.18 series:
+    #   1. Bun's child_process.spawn(cmd, [], {shell:true}) hit
+    #      intermittent `ENOENT posix_spawn '/bin/sh'` on GHA shared
+    #      ubuntu runners. Reproduced 5x; sister sync probes succeeded
+    #      with identical env. Local + Docker oven/bun:latest x64 never
+    #      hit it. Bun-on-GHA-runner-specific race.
+    #   2. GHA cache/policy update endpoint failures during the
+    #      2026-05-04 site-wide incident affected ubuntu pool more
+    #      severely than macos.
+    # macos-latest run on commit fb1ee05b (2026-05-04T14:34Z) shipped
+    # all 10 assets cleanly. Cross-platform binaries are produced by
+    # `bun run build:platforms` regardless of runner OS — runner choice
+    # only affects publish pipeline reliability, not user-facing binary.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
