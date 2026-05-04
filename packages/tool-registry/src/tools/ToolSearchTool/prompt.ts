@@ -1,6 +1,5 @@
 import { feature } from 'bun:bundle'
 import { isReplBridgeActive } from '@claude-code/app-host/bootstrap/state.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { Tool } from '../../Tool.js'
 import { AGENT_TOOL_NAME } from '../AgentTool/constants.js'
 
@@ -28,17 +27,11 @@ const PROMPT_HEAD = `Fetches full schema definitions for deferred tools so they 
 
 `
 
-// Matches isDeferredToolsDeltaEnabled in toolSearch.ts (not imported —
-// toolSearch.ts imports from this file). When enabled: tools announced
-// via system-reminder attachments. When disabled: prepended
-// <available-deferred-tools> block (pre-gate behavior).
+// isDeferredToolsDeltaEnabled in toolSearch.ts is pinned true for
+// self-hosted, so deferred tools are always announced via system-reminder
+// attachments (the legacy <available-deferred-tools> header path is dead).
 function getToolLocationHint(): string {
-  const deltaEnabled =
-    process.env.USER_TYPE === 'ant' ||
-    getFeatureValue_CACHED_MAY_BE_STALE('tengu_glacier_2xr', false)
-  return deltaEnabled
-    ? 'Deferred tools appear by name in <system-reminder> messages.'
-    : 'Deferred tools appear by name in <available-deferred-tools> messages.'
+  return 'Deferred tools appear by name in <system-reminder> messages.'
 }
 
 const PROMPT_TAIL = ` Until fetched, only the name is known — there is no parameter schema, so the tool cannot be invoked. This tool takes a query, matches it against the deferred tool list, and returns the matched tools' complete JSONSchema definitions inside a <functions> block. Once a tool's schema appears in that result, it is callable exactly like any tool defined at the top of the prompt.

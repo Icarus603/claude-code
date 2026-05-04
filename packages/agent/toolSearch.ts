@@ -626,15 +626,18 @@ export type DeferredToolsDeltaScanContext = {
 }
 
 /**
- * True → announce deferred tools via persisted delta attachments.
- * False → claude.ts keeps its per-call <available-deferred-tools>
- * header prepend (the attachment does not fire).
+ * Self-hosted: always announce deferred tools via persisted delta
+ * attachments. The delta path emits a system-reminder that warns the
+ * model "schemas are NOT loaded — calling them directly will fail with
+ * InputValidationError. Use ToolSearch with select:<name> first." The
+ * legacy <available-deferred-tools> header lacked that warning, so the
+ * model would routinely try to call deferred tools blind and hit the
+ * validator. Upstream prod gates this on USER_TYPE=ant or the
+ * tengu_glacier_2xr GrowthBook flag — both inert here, so we pin true.
  */
+const DEFERRED_TOOLS_DELTA_ENABLED = true
 export function isDeferredToolsDeltaEnabled(): boolean {
-  return (
-    readEnv('USER_TYPE') === 'ant' ||
-    getFeatureValue_CACHED_MAY_BE_STALE('tengu_glacier_2xr', false)
-  )
+  return DEFERRED_TOOLS_DELTA_ENABLED
 }
 
 /**
