@@ -24,11 +24,7 @@ import {
   setCloneFn,
   setExecFileNoThrowFn,
   setExecFileNoThrowWithCwdFn,
-  setFileEditConstantsFn,
-  setFileReadPromptFn,
-  setFileWritePromptFn,
   setFsImplementationFn,
-  setGetCharBudgetFn,
   setGetCwdFn,
   setGetHeadForDirFn,
   setGetInlinePluginsFn,
@@ -40,26 +36,19 @@ import {
   setIsSettingSourceEnabledFn,
   setJsonParseFn,
   setJsonStringifyFn,
-  setLoadAgentsDirFn,
   setLogErrorFn,
   setLogForDebuggingFn,
   setLogForDiagnosticsNoPIIFn,
   setLoadMarkdownConfigFn,
   setPathExistsFn,
-  setPluginOperationsFn,
   setRegisterCleanupFn,
   setSafeResolvePathFn,
   setSanitizePathFn,
-  setSkillToolPromptFn,
   setWhichFn,
   setWriteFileSyncAndFlushFn,
-  setAgentColorManagerFn,
   setRgPathFn,
   setSecureStorageReadFn,
   setSecureStorageWriteFn,
-  setExpandMcpEnvFn,
-  setGetLspManagerFn,
-  setGetMcpTypesFn,
   setParseMarkdownFrontmatterFn,
   setWalkMarkdownFilesFn,
   setGetRegisteredHooksFn,
@@ -497,45 +486,6 @@ export function installPluginBindings(): void {
     classifyPluginCommandError(error) as any,
   )
 
-  // --- lazy-resolved integrations (Ant-internal or heavy modules)
-  // These are `() => require(...).X` so they don't cause module eagerness.
-  setLoadAgentsDirFn(async (...args: unknown[]) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js')
-    return mod.loadAgentsDir(...(args as any)) as Promise<unknown[]>
-  })
-  setAgentColorManagerFn(
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'),
-  )
-  setFileEditConstantsFn(
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/tool-registry/tools/FileEditTool/constants.js'),
-  )
-  setFileReadPromptFn(
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/tool-registry/tools/FileReadTool/prompt.js'),
-  )
-  setFileWritePromptFn(
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/tool-registry/tools/FileWriteTool/prompt.js'),
-  )
-  setSkillToolPromptFn(
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/tool-registry/tools/SkillTool/prompt.js'),
-  )
-  setGetCharBudgetFn(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('@claude-code/tool-registry/tools/SkillTool/prompt.js')
-    return mod.getCharBudget?.() ?? 10000
-  })
-
-  // --- services/plugins/pluginOperations (cyclic with plugin utils)
-  setPluginOperationsFn(
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('@claude-code/config/plugin/pluginOperations.js'),
-  )
-
   // --- misc helpers
   setRgPathFn(() => {
     try {
@@ -583,32 +533,6 @@ export function installPluginBindings(): void {
     const mod = require('@claude-code/tool-registry/markdownConfigLoader.js')
     return mod.loadMarkdownConfig ? mod.loadMarkdownConfig(path) : null
   })
-  setGetLspManagerFn(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require('@claude-code/ide/lsp/manager.js')
-    } catch {
-      return undefined
-    }
-  })
-  setGetMcpTypesFn(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require('@claude-code/mcp-runtime/types.js')
-    } catch {
-      return undefined
-    }
-  })
-  setExpandMcpEnvFn(env => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('src/services/mcp/envExpansion.js')
-      return mod.expandMcpEnv ? mod.expandMcpEnv(env) : env
-    } catch {
-      return env
-    }
-  })
-
   // --- builtin plugins (setter-based since originals are const arrays)
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports

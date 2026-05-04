@@ -31,7 +31,8 @@ stays unchanged.
 | Phase | Section | Scope | Risk | Status |
 |-------|---------|-------|------|--------|
 | V9-1 | §1 | Delete dead defensive `require()` fallback in `_deps.ts` (was over-engineered to "host binding" plan; reality was simpler) | Low | **✅ landed 2026-05-04** — `lazyRequires` 1 → 0 |
-| V9-2a | §2 | Type-narrow 6 `_deps.ts` `unknown` setter slots via `import type` | Low (compile-time only) | ~50–100 TS2339 at consumer sites |
+| V9-2 | §2 | Delete 6 dead unknown setter slots in `_deps.ts` (revised plan: turned out to be dead code, not import-type rewrite candidates) | Low | **✅ landed 2026-05-04** — `unknownSlots` 6 → 0 |
+| V9-2.5 | §2 | Delete 3 additional dead LSP/MCP getter pairs (`_getLspManager`, `_getMcpTypes`, `_expandMcpEnv` — verify-deps-quality blind spot since their slot type is `() => unknown` not bare `unknown`) | Low | **✅ landed 2026-05-04** — 3 more dead pairs gone, 75 LOC + 1 require to non-existent `src/` path |
 | V9-2b | §4 | `tool-registry/progressTypes.ts` 11 slots → `import type` | Low | ~20 TS2339 |
 | V9-2c | §4 | `swarm/adapters/appRuntime.ts` 13 slots → `import type` | Medium | ~30 TS2339 + some TS2345 |
 | V9-2d | §4 | `cli/src/headless.ts` 5 slots → `import type` | Low | ~15 TS2339 |
@@ -234,14 +235,16 @@ subsequent slots in V9-2d / V9-3 — always read first.
 
 ## §2. `_deps.ts` 6 unknown-typed setter slots
 
-> **2026-05-04 follow-up discovery**: post-V9-1 grep revealed that
-> all 6 `getXxx()` accessor functions have **zero callers** in the
-> entire repo. The slots are wired but never read.
-> The fix is therefore not "rewrite as `import type`" but
-> "**delete entirely**" — both the slot vars, the get/set
-> functions, and the corresponding setter calls in
-> `installPluginBindings.ts:507-537`.
-> See "Dead-on-arrival realisation" section below.
+> **✅ V9-2 + V9-2.5 LANDED 2026-05-04** — `verify-deps-quality`
+> ratchet now reports `unknownSlots=0`. Total 11 dead slot pairs
+> deleted (8 bare unknown + 3 `() => unknown` survivors). See
+> "Realised V9-2 + V9-2.5 deletion" section below.
+>
+> Earlier sections of this §2 (Inventory table with 6 rows, "Why
+> these are unknown today", "Dead-on-arrival realisation") are
+> retained for historical context. The "Original `import type`
+> plan" at the bottom of §2 is the OBSOLETE version — kept to show
+> the plan's evolution but **NOT** to be executed.
 
 ### Inventory (lines 490-548 of `packages/config/plugin/_deps.ts`)
 
@@ -284,18 +287,45 @@ shim survived. Knip didn't catch it because the setters ARE used
 (in `installPluginBindings.ts`) — knip only flags fully-unused
 exports.
 
-### Revised V9-2 plan
+### Revised V9-2 plan — ✅ LANDED 2026-05-04
 
-Skip the `import type` rewrite. **Just delete:**
+Skipped the `import type` rewrite — pure deletion turned out correct.
 
-1. `_deps.ts` lines 488-554: the 6 slot vars, their `getXxx()`
-   accessors, and their `setXxxFn()` setter exports (keep
-   `_getCharBudget`/`setGetCharBudgetFn` and `_loadAgentsDir`/
-   `setLoadAgentsDirFn` — those have real callers via `getCharBudget()`
-   and `loadAgentsDir(...)`).
-2. `installPluginBindings.ts` lines 27-56 (imports) and 502-537
-   (setter calls).
-3. `verify-deps-quality.ts --tighten`: `unknownSlots: 6 → 0`.
+**Final V9-2 + V9-2.5 deletion**:
+
+1. `_deps.ts`: deleted 11 dead slot+getter+setter triples
+   (8 unknown bare slots + 3 `() => unknown` LSP/MCP getter pairs).
+   Net: ~95 LOC removed.
+2. `installPluginBindings.ts`: deleted 11 imports + 11 setter wire
+   calls. Removed 7 cross-package `require()` calls plus 1 require
+   pointing at the long-gone `src/services/mcp/envExpansion.js`
+   (V7 era). Net: ~75 LOC removed.
+3. `verify-deps-quality` baseline tightened: `lazyRequires=0`,
+   `unknownSlots=0`. Both rachets fully discharged for the bare
+   unknown pattern.
+
+**Important correction during execution**: Earlier this section
+claimed only 6 unknown slots. Real grep showed 8 — `_getCharBudget`
+and `_loadAgentsDir` ALSO had zero callers despite their typed
+default callbacks. The forwarder functions `getCharBudget()` and
+`loadAgentsDir(...)` are public from `_deps.ts` but no one outside
+imports them; consumers reach into `tool-registry/.../loadAgentsDir.js`
+and `tool-registry/.../SkillTool/prompt.ts` directly.
+
+**Bonus dead code (V9-2.5)**: After deleting the 8 slots, a follow-up
+grep on remaining `() => unknown` patterns surfaced 3 more dead
+LSP/MCP getter pairs that the verifier's regex (`^let _<name>: unknown\b`)
+didn't catch because their type was `() => unknown`. All deleted
+in the same iteration.
+
+**Verification**:
+- `bun run scripts/verify-deps-quality.ts`: lazy-requires=0
+  (baseline 0), unknown-slots=0 (baseline 0)
+- `bun run doctor:arch`: 77 passed / 0 failed / 0 missing
+- `bun test`: 8217 pass / 0 fail
+- `bun run build`: dist/cli.js 13578720 bytes (down ~3KB from
+  V9-1's 13581598; pure dead-code-elimination win)
+- `bun dist/cli.js --version`: 26.5.17 (Claude Code)
 
 ### Why this is safe
 

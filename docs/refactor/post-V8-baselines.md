@@ -24,7 +24,7 @@ context compaction.
 | `doctor:arch` checks                |       66 |      72 |         77 | +11        |
 | `_DEPRECATED` exports in packages/  |        0 |       0 |          0 | locked     |
 | `_deps.ts` cross-package lazy-requires |    1 |       1 |          0 | -1 (V9-1)  |
-| `_deps.ts` unknown-typed slots      |        7 |       6 |          6 | locked     |
+| `_deps.ts` unknown-typed slots      |        7 |       6 |          0 | -6 (V9-2)  |
 | Knip unused-files (packages/-scoped) |      71 |      69 |          9 | -62        |
 | Knip unused-exports                 |      185 |     184 |         33 | -152       |
 | tsc-errors budget                   |     3269 |    3217 |       3179 | -90        |
@@ -195,7 +195,7 @@ Current baselines (locked, monotonic-shrink-only) — measured 2026-05-04:
 
 ```
 verify-tsc-errors                = 3179
-verify-deps-quality              = lazy-requires=0, unknown-slots=6 (V9-1 ratchet 2026-05-04)
+verify-deps-quality              = lazy-requires=0, unknown-slots=0 (V9-1+V9-2 ratchet 2026-05-04)
 verify-knip-headroom             = unused-files=9, unused-exports=33
 verify-silent-failure-ratchet    = 737 (CRITICAL=0, HIGH=0)
                                    sub-buckets: empty-catch=0,
