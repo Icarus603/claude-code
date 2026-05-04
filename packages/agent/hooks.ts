@@ -1155,9 +1155,9 @@ async function execCommandHook(
       windowsHide: true,
     }) as ChildProcessWithoutNullStreams
   } else {
-    // On Windows, use Git Bash explicitly (cmd.exe can't run bash syntax).
-    // On other platforms, shell: true uses /bin/sh.
-    const shell = isWindows ? findGitBashPath() : true
+    // Windows: explicit Git Bash. Other platforms: hard-code '/bin/sh' —
+    // Bun's posix_spawn shell:true raced with ENOENT on GHA Linux runners.
+    const shell = isWindows ? findGitBashPath() : '/bin/sh'
     child = spawn(sandboxedCommand, [], {
       env: envVars,
       cwd: safeCwd,
