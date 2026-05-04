@@ -17,44 +17,10 @@
 import { mkdir, stat } from 'fs/promises'
 import { join, basename } from 'path'
 import { getMacroDefines } from './defines.ts'
+import { getEnabledFeatures } from './default-features.ts'
 
 const OUT_DIR = 'dist/binaries'
 const ENTRY = 'packages/cli/src/entry/cli.tsx'
-
-// Keep in sync with build.ts DEFAULT_BUILD_FEATURES.
-const DEFAULT_BUILD_FEATURES = [
-  'AGENT_TRIGGERS_REMOTE',
-  'CHICAGO_MCP',
-  'VOICE_MODE',
-  'SHOT_STATS',
-  'PROMPT_CACHE_BREAK_DETECTION',
-  'TOKEN_BUDGET',
-  'NATIVE_CLIPBOARD_IMAGE',
-  'BRIDGE_MODE',
-  'MCP_SKILLS',
-  'TEMPLATES',
-  'COORDINATOR_MODE',
-  'TRANSCRIPT_CLASSIFIER',
-  'MCP_RICH_OUTPUT',
-  'MESSAGE_ACTIONS',
-  'HISTORY_PICKER',
-  'QUICK_SEARCH',
-  'CACHED_MICROCOMPACT',
-  'REACTIVE_COMPACT',
-  'FILE_PERSISTENCE',
-  'DUMP_SYSTEM_PROMPT',
-  'BREAK_CACHE_COMMAND',
-  'AGENT_TRIGGERS',
-  'ULTRATHINK',
-  'BUILTIN_EXPLORE_PLAN_AGENTS',
-  'LODESTONE',
-  'EXTRACT_MEMORIES',
-  'VERIFICATION_AGENT',
-  'KAIROS_BRIEF',
-  'AWAY_SUMMARY',
-  'ULTRAPLAN',
-  'DAEMON',
-]
 
 type Target = {
   bunTarget: `bun-${string}`
@@ -69,10 +35,13 @@ const ALL_TARGETS: Target[] = [
   { bunTarget: 'bun-windows-x64', outName: 'ccb-windows-x64.exe' },
 ]
 
-const envFeatures = Object.keys(process.env)
-  .filter(k => k.startsWith('FEATURE_'))
-  .map(k => k.replace('FEATURE_', ''))
-const features = [...new Set([...DEFAULT_BUILD_FEATURES, ...envFeatures])]
+// Single source of truth via scripts/default-features.ts — also used by
+// scripts/dev.ts and build.ts. A previous local DEFAULT_BUILD_FEATURES
+// drifted out of sync (KAIROS_DREAM/PUSH/LOOP_DYNAMIC missing), shipping
+// release binaries with those subsystems silently disabled despite STABLE
+// status; CLAUDE.md flagged the SSOT but build-platforms.ts hadn't yet
+// been migrated. Don't reintroduce a local list.
+const features = getEnabledFeatures()
 
 async function buildOne(target: Target): Promise<void> {
   const outPath = join(OUT_DIR, target.outName)
