@@ -1,8 +1,8 @@
 /**
  * Tests for message-history query helpers in messages.ts.
  *
- * getLastAssistantMessage is called on every REPL render (via
- * useFeedbackSurvey) — using findLast vs filter+last matters at scale.
+ * getLastAssistantMessage is called on every REPL render — using findLast
+ * vs filter+last matters at scale.
  *
  * hasToolCallsInLastAssistantTurn decides whether the loop continues
  * (auto-tool-use) or stops. A wrong answer there either:

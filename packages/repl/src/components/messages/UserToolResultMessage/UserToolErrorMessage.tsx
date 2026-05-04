@@ -72,10 +72,7 @@ export function UserToolErrorMessage({
   ) {
     return (
       <MessageResponse height={1}>
-        <Text dimColor>
-          Denied by auto mode classifier {BULLET_OPERATOR} /feedback if
-          incorrect
-        </Text>
+        <Text dimColor>Denied by auto mode classifier</Text>
       </MessageResponse>
     )
   }

@@ -3089,9 +3089,6 @@ export async function runModeDispatch(
 				},
 				speculation: getIdleSpeculationState(),
 				speculationSessionTimeSavedMs: 0,
-				skillImprovement: {
-					suggestion: null,
-				},
 				workerSandboxPermissions: {
 					queue: [],
 					selectedIndex: 0,

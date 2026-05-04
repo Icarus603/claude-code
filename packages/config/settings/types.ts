@@ -675,14 +675,6 @@ export const SettingsSchema = lazySchema(() =>
           'Skip the WebFetch blocklist check for enterprise environments with restrictive security policies',
         ),
       sandbox: SandboxSettingsSchema().optional(),
-      feedbackSurveyRate: z
-        .number()
-        .min(0)
-        .max(1)
-        .optional()
-        .describe(
-          'Probability (0–1) that the session quality survey appears when eligible. 0.05 is a reasonable starting point.',
-        ),
       spinnerTipsEnabled: z
         .boolean()
         .optional()

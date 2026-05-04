@@ -13,7 +13,4 @@ import { isTelemetryDisabled } from '@claude-code/config/env/privacy-level'
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 setIsTelemetryDisabledFn(() => isTelemetryDisabled())
 
-export {
-  isAnalyticsDisabled,
-  isFeedbackSurveyDisabled,
-} from '@claude-code/config/env/privacy'
+export { isAnalyticsDisabled } from '@claude-code/config/env/privacy'

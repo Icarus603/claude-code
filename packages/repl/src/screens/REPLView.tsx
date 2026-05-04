@@ -129,8 +129,6 @@ import type { DirectConnectConfig } from '@claude-code/server/directConnectManag
 import { useSSHSession } from '../hooks/useSSHSession.js';
 import { useAssistantHistory } from '../hooks/useAssistantHistory.js';
 import type { SSHSession } from '@claude-code/cli/ssh/createSSHSession.js';
-import { SkillImprovementSurvey } from '../components/SkillImprovementSurvey.js';
-import { useSkillImprovementSurvey } from '../hooks/useSkillImprovementSurvey.js';
 import { useMoreRight } from '../moreright/useMoreRight.js';
 import { SpinnerWithVerb, BriefIdleStatus, type SpinnerMode } from '../components/Spinner.js';
 import { getSystemPrompt } from '@claude-code/agent/prompts.js';
@@ -161,10 +159,8 @@ import { isOnlySleepToolActive } from './repl/onlySleepToolActive.js';
 import { deriveStopHookSpinnerSuffix } from './repl/stopHookSpinnerSuffix.js';
 import { useSuspendResumeHandlers } from './repl/useSuspendResumeHandlers.js';
 import { useTranscriptFreeze } from './repl/useTranscriptFreeze.js';
-import { useFeedbackSurveyAutoIssue } from './repl/useFeedbackSurveyAutoIssue.js';
-import { useAutoRunIssueHandlers } from './repl/useAutoRunIssueHandlers.js';
 import { useHandleExit } from './repl/useHandleExit.js';
-import { useSurveyAndRateLimitHandlers } from './repl/useSurveyAndRateLimitHandlers.js';
+import { useRateLimitHandlers } from './repl/useRateLimitHandlers.js';
 import { useQueuedCommandOnCancel } from './repl/useQueuedCommandOnCancel.js';
 import { useStartupCallouts } from './repl/useStartupCallouts.js';
 import { getShortcutDisplay } from '../keybindings/shortcutFormat.js';
@@ -189,13 +185,6 @@ const VoiceKeybindingHandler: typeof import('@claude-code/voice/hooks/useVoiceIn
 )
   ? require('@claude-code/voice/hooks/useVoiceIntegration.js').VoiceKeybindingHandler
   : () => null;
-// Frustration detection is ant-only (dogfooding). Conditional require so external
-// builds eliminate the module entirely (including its two O(n) useMemos that run
-// on every messages change, plus the GrowthBook fetch).
-const useFrustrationDetection: typeof import('../components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection =
-  process.env.USER_TYPE === 'ant'
-    ? require('../components/FeedbackSurvey/useFrustrationDetection.js').useFrustrationDetection
-    : () => ({ state: 'closed', handleTranscriptSelect: () => {} });
 // Ant-only org warning. Conditional require so the org UUID list is
 // eliminated from external builds (one UUID is on excluded-strings).
 const useAntOrgWarningNotification: typeof import('../hooks/notifs/useAntOrgWarningNotification.js').useAntOrgWarningNotification =
@@ -397,10 +386,6 @@ const UndercoverAutoCallout =
 import { activityManager } from '@claude-code/app-host/activityManager.js';
 import { createAbortController } from '@claude-code/agent/abortController.js';
 import { MCPConnectionManager } from '@claude-code/mcp-runtime/MCPConnectionManager.js';
-import { useFeedbackSurvey } from '../components/FeedbackSurvey/useFeedbackSurvey.js';
-import { useMemorySurvey } from '../components/FeedbackSurvey/useMemorySurvey.js';
-import { usePostCompactSurvey } from '../components/FeedbackSurvey/usePostCompactSurvey.js';
-import { FeedbackSurvey } from '../components/FeedbackSurvey/FeedbackSurvey.js';
 import { useInstallMessages } from '../hooks/notifs/useInstallMessages.js';
 import { useAwaySummary } from '../hooks/useAwaySummary.js';
 import { useChromeExtensionNotification } from '../hooks/useChromeExtensionNotification.js';
@@ -443,13 +428,6 @@ import { useModelMigrationNotifications } from '../hooks/notifs/useModelMigratio
 import { useCanSwitchToExistingSubscription } from '../hooks/notifs/useCanSwitchToExistingSubscription.js';
 import { useTeammateLifecycleNotification } from '../hooks/notifs/useTeammateShutdownNotification.js';
 import { useFastModeNotification } from '../hooks/notifs/useFastModeNotification.js';
-import {
-  AutoRunIssueNotification,
-  shouldAutoRunIssue,
-  getAutoRunIssueReasonText,
-  getAutoRunCommand,
-  type AutoRunIssueReason,
-} from '../diagnostics/autoRunIssue.js';
 import type { HookProgress } from '@claude-code/agent/types/hooks.js';
 import { TungstenLiveMonitor } from '@claude-code/tool-registry/tools/TungstenTool/TungstenLiveMonitor.js';
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -1705,38 +1683,7 @@ export function REPL({
     elicitation.queue.length > 0 ||
     workerSandboxPermissions.queue.length > 0;
 
-  const feedbackSurveyOriginal = useFeedbackSurvey(messages, isLoading, submitCount, 'session', hasActivePrompt);
-
-  const skillImprovementSurvey = useSkillImprovementSurvey(setMessages);
-
   const showIssueFlagBanner = useIssueFlagBanner(messages, submitCount);
-
-  // Wrap feedback survey handler to trigger auto-run /issue
-  const feedbackSurvey = useFeedbackSurveyAutoIssue(feedbackSurveyOriginal, {
-    resetMarker: () => { didAutoRunIssueRef.current = false; },
-    shouldAutoRun: shouldAutoRunIssue,
-    triggerAutoRun: (reason) => {
-      setAutoRunIssueReason(reason as AutoRunIssueReason);
-      didAutoRunIssueRef.current = true;
-    },
-  });
-
-  // Post-compact survey: shown after compaction if feature gate is enabled
-  const postCompactSurvey = usePostCompactSurvey(messages, isLoading, hasActivePrompt, { enabled: !isRemoteSession });
-
-  // Memory survey: shown when the assistant mentions memory and a memory file
-  // was read this conversation
-  const memorySurvey = useMemorySurvey(messages, isLoading, hasActivePrompt, {
-    enabled: !isRemoteSession,
-  });
-
-  // Frustration detection: show transcript sharing prompt after detecting frustrated messages
-  const frustrationDetection = useFrustrationDetection(
-    messages,
-    isLoading,
-    hasActivePrompt,
-    feedbackSurvey.state !== 'closed' || postCompactSurvey.state !== 'closed' || memorySurvey.state !== 'closed',
-  );
 
   // Initialize IDE integration
   useIDEIntegration({
@@ -2017,13 +1964,6 @@ export function REPL({
   }, []);
 
   const { status: apiKeyStatus, reverify } = useApiKeyVerification();
-
-  // Auto-run /issue state
-  const [autoRunIssueReason, setAutoRunIssueReason] = useState<AutoRunIssueReason | null>(null);
-  // Ref to track if autoRunIssue was triggered this survey cycle,
-  // so we can suppress the [1] follow-up prompt even after
-  // autoRunIssueReason is cleared.
-  const didAutoRunIssueRef = useRef(false);
 
   // State for exit feedback flow
   const [exitFlow, setExitFlow] = useState<React.ReactNode>(null);
@@ -3792,7 +3732,7 @@ export function REPL({
       // keep onSubmit stable across message updates (see L2384/L2400/L2662).
       // Without this, each setMessages call (~30× per turn) recreates
       // onSubmit, pinning the REPL render scope (1776B) + that render's
-      // messages array in downstream closures (PromptInput, handleAutoRunIssue).
+      // messages array in downstream closures (PromptInput).
       // Heap analysis showed ~9 REPL scopes and ~15 messages array versions
       // accumulating after #20174/#20175, all traced to this dep.
       mainLoopModel,
@@ -3846,12 +3786,7 @@ export function REPL({
     [setAppState, setInputValue, getToolUseContext, canUseTool, mainLoopModel, addNotification],
   );
 
-  const { handleAutoRunIssue, handleCancelAutoRunIssue } = useAutoRunIssueHandlers(
-    onSubmit, autoRunIssueReason, setAutoRunIssueReason,
-  );
-
-  const { handleSurveyRequestFeedback, handleOpenRateLimitOptions } =
-    useSurveyAndRateLimitHandlers(onSubmit);
+  const { handleOpenRateLimitOptions } = useRateLimitHandlers(onSubmit);
 
   const handleExit = useHandleExit(setIsExiting, setExitFlow);
 
@@ -5382,68 +5317,7 @@ export function REPL({
 
                 {!toolJSX?.shouldHidePromptInput && !focusedInputDialog && !isExiting && !disabled && !cursor && (
                   <>
-                    {autoRunIssueReason && (
-                      <AutoRunIssueNotification
-                        onRun={handleAutoRunIssue}
-                        onCancel={handleCancelAutoRunIssue}
-                        reason={getAutoRunIssueReasonText(autoRunIssueReason)}
-                      />
-                    )}
-                    {postCompactSurvey.state !== 'closed' ? (
-                      <FeedbackSurvey
-                        state={postCompactSurvey.state}
-                        lastResponse={postCompactSurvey.lastResponse}
-                        handleSelect={postCompactSurvey.handleSelect}
-                        inputValue={inputValue}
-                        setInputValue={setInputValue}
-                        onRequestFeedback={handleSurveyRequestFeedback}
-                      />
-                    ) : memorySurvey.state !== 'closed' ? (
-                      <FeedbackSurvey
-                        state={memorySurvey.state}
-                        lastResponse={memorySurvey.lastResponse}
-                        handleSelect={memorySurvey.handleSelect}
-                        handleTranscriptSelect={memorySurvey.handleTranscriptSelect}
-                        inputValue={inputValue}
-                        setInputValue={setInputValue}
-                        onRequestFeedback={handleSurveyRequestFeedback}
-                        message="How well did Claude use its memory? (optional)"
-                      />
-                    ) : (
-                      <FeedbackSurvey
-                        state={feedbackSurvey.state}
-                        lastResponse={feedbackSurvey.lastResponse}
-                        handleSelect={feedbackSurvey.handleSelect}
-                        handleTranscriptSelect={feedbackSurvey.handleTranscriptSelect}
-                        inputValue={inputValue}
-                        setInputValue={setInputValue}
-                        onRequestFeedback={didAutoRunIssueRef.current ? undefined : handleSurveyRequestFeedback}
-                      />
-                    )}
-                    {/* Frustration-triggered transcript sharing prompt */}
-                    {frustrationDetection.state !== 'closed' && (
-                      <FeedbackSurvey
-                        state={frustrationDetection.state}
-                        lastResponse={null}
-                        handleSelect={() => {}}
-                        handleTranscriptSelect={frustrationDetection.handleTranscriptSelect}
-                        inputValue={inputValue}
-                        setInputValue={setInputValue}
-                      />
-                    )}
-                    {/* Skill improvement survey - appears when improvements detected (ant-only) */}
-                    {process.env.USER_TYPE === 'ant' && skillImprovementSurvey.suggestion && (
-                      <SkillImprovementSurvey
-                        isOpen={skillImprovementSurvey.isOpen}
-                        skillName={skillImprovementSurvey.suggestion.skillName}
-                        updates={skillImprovementSurvey.suggestion.updates}
-                        handleSelect={skillImprovementSurvey.handleSelect}
-                        inputValue={inputValue}
-                        setInputValue={setInputValue}
-                      />
-                    )}
                     {showIssueFlagBanner && <IssueFlagBanner />}
-                    {}
                     <PromptInput
                       debug={debug}
                       ideSelection={ideSelection}

@@ -35,7 +35,3 @@ export function isAnalyticsDisabled(): boolean {
     _isTelemetryDisabled()
   )
 }
-
-export function isFeedbackSurveyDisabled(): boolean {
-  return process.env.NODE_ENV === 'test' || _isTelemetryDisabled()
-}

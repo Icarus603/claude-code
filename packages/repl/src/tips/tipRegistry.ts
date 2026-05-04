@@ -622,18 +622,6 @@ const externalTips: Tip[] = [
     cooldownSessions: 3,
     isRelevant: async () => shouldShowOverageCreditUpsell(),
   },
-  {
-    id: 'feedback-command',
-    content: async () => 'Use /feedback to help us improve!',
-    cooldownSessions: 15,
-    async isRelevant() {
-      if (process.env.USER_TYPE === 'ant') {
-        return false
-      }
-      const config = getGlobalConfig()
-      return config.numStartups > 5
-    },
-  },
 ]
 const internalOnlyTips: Tip[] =
   process.env.USER_TYPE === 'ant'

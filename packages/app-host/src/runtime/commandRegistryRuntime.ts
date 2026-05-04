@@ -6,7 +6,6 @@ import backfillSessions from '@claude-code/command-runtime/stubs/stubCommand.js'
 import btw from '@claude-code/command-runtime/commands/btw/index.js'
 import goodClaude from '@claude-code/command-runtime/stubs/stubCommand.js'
 import issue from '@claude-code/command-runtime/stubs/stubCommand.js'
-import feedback from '@claude-code/repl/commands/feedback/index.js'
 import clear from '@claude-code/command-runtime/commands/clear/index.js'
 import color from '@claude-code/repl/commands/color/index.js'
 import commit from '@claude-code/agent/commands/commit.js'
@@ -295,7 +294,6 @@ const COMMANDS = memoize((): Command[] => [
   stickers,
   tag,
   theme,
-  feedback,
   review,
   ultrareview,
   rewind,
@@ -619,7 +617,6 @@ export const REMOTE_SAFE_COMMANDS: Set<Command> = new Set([
   usage, // Show usage info
   copy, // Copy last message
   btw, // Quick note
-  feedback, // Send feedback
   plan, // Plan mode toggle
   keybindings, // Keybinding management
   statusline, // Status line toggle
