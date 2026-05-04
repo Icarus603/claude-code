@@ -25,6 +25,13 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Lint
+        # Biome config lives at biome.json. Pre-commit hook lints staged
+        # files only; CI lints the whole tree to catch anything that
+        # slipped through PRE_COMMIT_SKIP=1 or was committed pre-V7
+        # when the hook's src/ glob was silently dead.
+        run: bun run lint
+
       - name: Test
         run: bun test
 

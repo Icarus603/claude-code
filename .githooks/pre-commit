@@ -1,8 +1,9 @@
 #!/bin/sh
 # pre-commit hook:
-#   1. Biome lint on staged src/ files (existing)
-#   2. Fast doctor:arch check — only the rules that matter for staged
-#      changes and complete in <2s. Full 46-rule run lives in CI.
+#   1. Biome lint on staged packages/ + scripts/ files
+#   2. Fast doctor:arch subset — rules that matter for staged
+#      changes and complete in <2s. Full doctor:arch suite (78
+#      rules as of 2026-05-04) runs in pre-push and CI.
 #
 # Skip with PRE_COMMIT_SKIP=1 when you really need to commit something
 # the hook doesn't understand (rare; prefer fixing the underlying issue).
@@ -12,7 +13,12 @@ if [ "$PRE_COMMIT_SKIP" = "1" ]; then
   exit 0
 fi
 
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^src/.*\.(ts|tsx|js|jsx)$')
+# V7 §11.2: source lives under packages/ (no src/ since the V7
+# refactor). The glob accepts both packages/ and scripts/ (verifier
+# tooling). Pre-V7 versions of this hook used `^src/.*` which never
+# matched anything after V7 — silently disabling staged-file lint
+# for the entire post-V7 lifetime, until 2026-05-04.
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(packages|scripts)/.*\.(ts|tsx)$')
 
 if [ -n "$STAGED_FILES" ]; then
   echo "Running Biome lint on staged files..."

@@ -26,6 +26,28 @@ jobs:
       - name: Install deps
         run: bun install --frozen-lockfile
 
+      # Quality gate: tag-driven releases must NOT bypass the doctor:arch /
+      # test gate. CI runs the same checks on every push, but release tags
+      # can be cut manually via workflow_dispatch (or pushed without going
+      # through CI), so we re-run them here as the last line of defence
+      # before publishing a binary that auto-update will push to every
+      # `ccb` user. ~30s wall time, single platform — the build:platforms
+      # step below is the long pole anyway.
+      - name: Install ripgrep
+        run: |
+          if [ "$(uname)" = "Darwin" ]; then brew install ripgrep
+          else sudo apt-get update && sudo apt-get install -y ripgrep
+          fi
+
+      - name: Test
+        run: bun test
+
+      - name: doctor:arch (full)
+        run: bun run scripts/doctor-architecture.ts
+
+      - name: smoke
+        run: bun run smoke
+
       - name: Build all platform binaries
         run: bun run build:platforms
 
