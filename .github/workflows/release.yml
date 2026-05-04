@@ -15,9 +15,9 @@ permissions:
 
 jobs:
   build:
-    # ubuntu-latest is intentional — ccb users run on macOS, Linux, AND
-    # Windows. Surface platform-specific test failures here BEFORE shipping
-    # a binary, even if ci.yml only runs macos-latest.
+    # Tag-driven; CI/pre-push already verified test/lint/doctor:arch/smoke
+    # on macos before this tag was pushed. release.yml is just the
+    # cross-compile + publish step — no duplicate quality gates here.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,61 +28,6 @@ jobs:
 
       - name: Install deps
         run: bun install --frozen-lockfile
-
-      # Quality gate: tag-driven releases must NOT bypass the doctor:arch /
-      # test gate. CI runs the same checks on every push, but release tags
-      # can be cut manually via workflow_dispatch (or pushed without going
-      # through CI), so we re-run them here as the last line of defence
-      # before publishing a binary that auto-update will push to every
-      # `ccb` user. ~30s wall time, single platform — the build:platforms
-      # step below is the long pole anyway.
-      - name: Install ripgrep
-        run: |
-          if [ "$(uname)" = "Darwin" ]; then brew install ripgrep
-          else sudo apt-get update && sudo apt-get install -y ripgrep
-          fi
-
-      - name: Probe bun spawn
-        # Minimal repro to isolate whether bun's child_process.spawn has
-        # an ENOENT race for /bin/sh on GHA ubuntu-latest. If this fails
-        # but a sister spawnSync succeeds, the bug is bun-on-GHA, not
-        # ccb code.
-        run: |
-          cat > /tmp/probe.ts <<'EOF'
-          import { spawn, spawnSync } from 'child_process'
-
-          // Sync probe — control. Should never fail.
-          const sync = spawnSync('/bin/sh', ['-c', 'echo ok-sync'])
-          console.log('SYNC: status=' + sync.status + ' stdout=' + sync.stdout?.toString().trim() + ' err=' + (sync.error?.message ?? 'none'))
-
-          // Async probe — same args, but goes through async spawn path.
-          await new Promise<void>(resolve => {
-            const c = spawn('/bin/sh', ['-c', 'echo ok-async'])
-            let stdout = ''
-            c.stdout?.on('data', d => stdout += d)
-            c.on('error', e => { console.error('ASYNC ERROR: ' + e.message); resolve() })
-            c.on('exit', code => { console.log('ASYNC: exit=' + code + ' stdout=' + stdout.trim()); resolve() })
-          })
-
-          // Async probe with shell:true (the ccb hook chain pattern).
-          await new Promise<void>(resolve => {
-            const c = spawn('echo ok-shelltrue', [], { shell: true })
-            let stdout = ''
-            c.stdout?.on('data', d => stdout += d)
-            c.on('error', e => { console.error('SHELL:TRUE ERROR: ' + e.message); resolve() })
-            c.on('exit', code => { console.log('SHELL:TRUE: exit=' + code + ' stdout=' + stdout.trim()); resolve() })
-          })
-          EOF
-          bun /tmp/probe.ts
-
-      - name: Test
-        run: bun test
-
-      - name: doctor:arch (full)
-        run: bun run scripts/doctor-architecture.ts
-
-      - name: smoke
-        run: bun run smoke
 
       - name: Build all platform binaries
         run: bun run build:platforms

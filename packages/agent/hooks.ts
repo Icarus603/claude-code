@@ -1154,25 +1154,16 @@ async function execCommandHook(
       // Prevent visible console window on Windows (no-op on other platforms)
       windowsHide: true,
     }) as ChildProcessWithoutNullStreams
-  } else if (isWindows) {
-    // Windows: explicit Git Bash (cmd.exe can't run bash syntax).
+  } else {
+    // On Windows, use Git Bash explicitly (cmd.exe can't run bash syntax).
+    // On other platforms, shell: true uses /bin/sh.
+    const shell = isWindows ? findGitBashPath() : true
     child = spawn(sandboxedCommand, [], {
       env: envVars,
       cwd: safeCwd,
-      shell: findGitBashPath(),
+      shell,
+      // Prevent visible console window on Windows (no-op on other platforms)
       windowsHide: true,
-    }) as ChildProcessWithoutNullStreams
-  } else {
-    // Posix: invoke /bin/sh explicitly via argv instead of shell:true.
-    // child_process.spawn(cmd, [], {shell:true}) intermittently failed
-    // with `ENOENT: posix_spawn '/bin/sh'` on GitHub Actions ubuntu-
-    // latest, even though /bin/sh, PATH, SHELL were all present and a
-    // sister spawnSync with identical args succeeded — the async spawn
-    // path appears to race on shell discovery. Mirrors exec.ts:209
-    // which already uses explicit binary + argv for the BashTool path.
-    child = spawn('/bin/sh', ['-c', sandboxedCommand], {
-      env: envVars,
-      cwd: safeCwd,
     }) as ChildProcessWithoutNullStreams
   }
 
