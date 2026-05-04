@@ -8,6 +8,7 @@ import {
 import { isKairosCronEnabled } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import { createCronScheduler, removeCronTasks } from '@claude-code/agent/scheduler'
+import { resolveLoopDefaultFire } from '@claude-code/agent/scheduler'
 import { getCronJitterConfig } from '@claude-code/agent/misc/cronJitterConfig.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { enqueuePendingNotification } from '@claude-code/agent/messageQueueManager.js'
@@ -69,7 +70,10 @@ export function useScheduledTasks({
     // primary use case for scheduled tasks.
     const enqueueForLead = (prompt: string) =>
       enqueuePendingNotification({
-        value: prompt,
+        // Sentinel resolution: turn `<<autonomous-loop>>` and
+        // `<<loop.md*>>` placeholders into the rich loop-tick prompts
+        // before queuing. Plain prompts pass through unchanged.
+        value: resolveLoopDefaultFire(prompt),
         mode: 'prompt',
         priority: 'later',
         isMeta: true,
@@ -94,7 +98,11 @@ export function useScheduledTasks({
             store.getState().tasks,
           )
           if (teammate && !isTerminalTaskStatus(teammate.status)) {
-            injectUserMessageToTeammate(teammate.id, task.prompt, setAppState)
+            injectUserMessageToTeammate(
+              teammate.id,
+              resolveLoopDefaultFire(task.prompt),
+              setAppState,
+            )
             return
           }
           // Teammate is gone — clean up the orphaned cron so it doesn't keep

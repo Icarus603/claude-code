@@ -341,6 +341,13 @@ export type CronJitterConfig = {
    * `0` = unlimited (tasks never auto-expire).
    */
   recurringMaxAgeMs: number
+  /**
+   * LoopDynamic cache-lead window. When set, ScheduleWakeup pulls wakeups
+   * back from the 5-minute prompt-cache TTL boundary by this much so the
+   * resumed turn lands while the cache is still warm. Set to 0 to fire
+   * exactly at the user-requested delay. Upstream default 60_000.
+   */
+  cacheLeadMs: number
 }
 
 export const DEFAULT_CRON_JITTER_CONFIG: CronJitterConfig = {
@@ -350,6 +357,7 @@ export const DEFAULT_CRON_JITTER_CONFIG: CronJitterConfig = {
   oneShotFloorMs: 0,
   oneShotMinuteMod: 30,
   recurringMaxAgeMs: 7 * 24 * 60 * 60 * 1000,
+  cacheLeadMs: 60_000,
 }
 
 /**

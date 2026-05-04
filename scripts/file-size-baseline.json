@@ -24,7 +24,7 @@
   "packages/agent/query.ts": 1794,
   "packages/agent/sessionTools/analyzeContext.ts": 1387,
   "packages/agent/tasks.ts": 851,
-  "packages/app-host/src/bootstrap/state.ts": 1785,
+  "packages/app-host/src/bootstrap/state.ts": 1827,
   "packages/bridge/src/bridgeMain.ts": 2991,
   "packages/bridge/src/remoteBridgeCore.ts": 1009,
   "packages/bridge/src/replBridge.ts": 2407,

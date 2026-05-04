@@ -4,6 +4,11 @@ import {
   DEFAULT_MAX_AGE_DAYS,
   isKairosCronEnabled,
 } from '@claude-code/tool-registry/tools/ScheduleCronTool/prompt.js'
+import { isLoopDynamicEnabled } from '@claude-code/agent/scheduler'
+import {
+  AUTONOMOUS_LOOP_DYNAMIC_SENTINEL,
+  SCHEDULE_WAKEUP_TOOL_NAME,
+} from '@claude-code/tool-registry/tools/ScheduleWakeupTool/prompt.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 
 const DEFAULT_INTERVAL = '10m'
@@ -71,6 +76,29 @@ Supported suffixes: \`s\` (seconds, rounded up to nearest minute, min 1), \`m\` 
 ${args}`
 }
 
+// Dynamic-pacing autonomous loop: invoked as bare `/loop` when KAIROS
+// LoopDynamic is on. The model picks the cadence per-tick via
+// ScheduleWakeup; the runtime resolves the sentinel back into the
+// autonomous-loop preamble + tick prompts at fire time.
+function buildAutonomousDynamicPrompt(): string {
+  return `# /loop — autonomous loop with dynamic pacing
+
+The user invoked /loop without an interval or prompt. Treat this as an autonomous loop in dynamic-pacing mode: at the end of each turn, decide whether to keep the loop alive and at what cadence.
+
+## How to keep the loop alive
+
+Call ${SCHEDULE_WAKEUP_TOOL_NAME} with:
+  - \`prompt\`: the literal sentinel \`${AUTONOMOUS_LOOP_DYNAMIC_SENTINEL}\`
+  - \`delaySeconds\`: how long to wait before the next tick (60–3600). The runtime clamps and aligns to whole minutes; consult ${SCHEDULE_WAKEUP_TOOL_NAME}'s prompt for guidance on cache-window-aware delays.
+  - \`reason\`: one short sentence on what you chose and why.
+
+Omit the call to end the loop.
+
+## What to do this tick
+
+This is the first tick. Re-read the conversation transcript above for context the user already established, then act on whatever advances their work — see the autonomous-loop guidance the runtime delivers when the sentinel resolves on subsequent ticks. If there's nothing actionable yet, decide on a sensible delay (1200–1800s for idle ticks) and call ${SCHEDULE_WAKEUP_TOOL_NAME} so we wake up later to check again.`
+}
+
 export function registerLoopSkill(): void {
   registerBundledSkill({
     name: 'loop',
@@ -84,6 +112,11 @@ export function registerLoopSkill(): void {
     async getPromptForCommand(args) {
       const trimmed = args.trim()
       if (!trimmed) {
+        // /loop with no args: dynamic-pacing autonomous loop when the
+        // KAIROS feature is on, traditional usage hint otherwise.
+        if (isLoopDynamicEnabled()) {
+          return [{ type: 'text', text: buildAutonomousDynamicPrompt() }]
+        }
         return [{ type: 'text', text: USAGE_MESSAGE }]
       }
       return [{ type: 'text', text: buildPrompt(trimmed) }]

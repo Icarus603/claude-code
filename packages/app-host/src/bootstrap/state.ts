@@ -139,6 +139,13 @@ type State = {
   // SessionCronTask below (not importing from cronTasks.ts keeps
   // bootstrap a leaf of the import DAG).
   sessionCronTasks: SessionCronTask[]
+  /**
+   * LoopDynamic chain tracking, keyed by ScheduleWakeup `prompt` argument.
+   * Entry is created on the first wakeup, updated on each subsequent
+   * wakeup, deleted when the loop ends (model omits ScheduleWakeup) or
+   * is cancelled. Plain object (not Map) so test fixtures can spread it.
+   */
+  loopChainStartedAt: Record<string, LoopChainEntry>
   // Teams created this session via TeamCreate. cleanupSessionTeams()
   // removes these on gracefulShutdown so subagent-created teams don't
   // persist on disk forever (gh-32730). TeamDelete removes entries to
@@ -349,6 +356,7 @@ function getInitialState(): State {
     // Scheduled tasks disabled until flag or dialog enables them
     scheduledTasksEnabled: false,
     sessionCronTasks: [],
+    loopChainStartedAt: Object.create(null),
     sessionCreatedTeams: new Set(),
     // Session-only trust flag (not persisted to disk)
     sessionTrustAccepted: false,
@@ -1315,6 +1323,40 @@ export type SessionCronTask = {
    * instead of the main REPL command queue. Session-only — never written to disk.
    */
   agentId?: string
+  /**
+   * Kind tag used by LoopDynamic (subsystem 4 of KAIROS port). 'loop' marks
+   * a session-only cron created by ScheduleWakeup; the abort-path uses this
+   * to scrub all loop-dynamic crons in one pass.
+   */
+  kind?: 'loop'
+}
+
+/**
+ * Per-prompt tracking for LoopDynamic chains. `startedAt` is when the loop
+ * first scheduled itself; `lastScheduledFor` is when the most-recent wakeup
+ * was set to fire. `agedOut` flips true once the loop crosses the
+ * recurringMaxAgeMs threshold so subsequent ScheduleWakeup calls bail out
+ * cleanly.
+ */
+export type LoopChainEntry = {
+  startedAt: number
+  lastScheduledFor: number
+  agedOut?: boolean
+}
+
+export function getLoopChainStartedAt(prompt: string): LoopChainEntry | undefined {
+  return STATE.loopChainStartedAt[prompt]
+}
+
+export function setLoopChainStartedAt(
+  prompt: string,
+  entry: LoopChainEntry,
+): void {
+  STATE.loopChainStartedAt[prompt] = entry
+}
+
+export function deleteLoopChainStartedAt(prompt: string): void {
+  delete STATE.loopChainStartedAt[prompt]
 }
 
 export function getSessionCronTasks(): SessionCronTask[] {

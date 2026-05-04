@@ -40,6 +40,7 @@ describe('getCronJitterConfig — defaults', () => {
       oneShotFloorMs: 0,
       oneShotMinuteMod: 30,
       recurringMaxAgeMs: 7 * 24 * 60 * 60 * 1000,
+      cacheLeadMs: 60_000,
     })
   })
 })
@@ -53,27 +54,29 @@ describe('getCronJitterConfig — valid GB payload', () => {
       oneShotFloorMs: 5_000,
       oneShotMinuteMod: 15,
       recurringMaxAgeMs: 24 * 60 * 60 * 1000,
+      cacheLeadMs: 30_000,
     }
     featureValue = valid
     expect(getCronJitterConfig()).toEqual(valid)
   })
 
   test('partial config WITHOUT recurringMaxAgeMs gets default for that field', () => {
-    // recurringMaxAgeMs has a `.default(DEFAULT.recurringMaxAgeMs)` so
-    // configs from before this field was added don't get rejected.
-    // Other fields don't have defaults; a missing field rejects the whole.
+    // recurringMaxAgeMs and cacheLeadMs have `.default(...)` so configs
+    // from before those fields were added don't get rejected. Other
+    // fields don't have defaults; a missing field rejects the whole.
     const partial = {
       recurringFrac: 0.5,
       recurringCapMs: 60_000,
       oneShotMaxMs: 30_000,
       oneShotFloorMs: 0,
       oneShotMinuteMod: 30,
-      // no recurringMaxAgeMs
+      // no recurringMaxAgeMs, no cacheLeadMs
     }
     featureValue = partial
     expect(getCronJitterConfig()).toEqual({
       ...partial,
       recurringMaxAgeMs: DEFAULT_CRON_JITTER_CONFIG.recurringMaxAgeMs,
+      cacheLeadMs: DEFAULT_CRON_JITTER_CONFIG.cacheLeadMs,
     })
   })
 })
@@ -189,6 +192,7 @@ describe('getCronJitterConfig — invalid GB payload falls back to defaults', ()
       oneShotFloorMs: 5_000, // floor == max
       oneShotMinuteMod: 30,
       recurringMaxAgeMs: 60_000,
+      cacheLeadMs: 30_000,
     }
     featureValue = valid
     expect(getCronJitterConfig()).toEqual(valid)

@@ -91,6 +91,15 @@ const getPushNotificationTool = () =>
 // SubscribePRTool: ant-internal, no public impl available.
 const getSubscribePRTool = () => null
 
+// ScheduleWakeupTool — port of upstream v2.1.123 (resplit/3863.js). Lets
+// the model schedule its own next wakeup in /loop dynamic mode. Gated on
+// the KAIROS_LOOP_DYNAMIC build flag and the runtime
+// `tengu_kairos_loop_dynamic` (pinned true via LOCAL_GATE_DEFAULTS).
+const getScheduleWakeupTool = () =>
+  feature('KAIROS_LOOP_DYNAMIC')
+    ? (require('../../ScheduleWakeupTool/ScheduleWakeupTool.js').ScheduleWakeupTool as Tool)
+    : null
+
 const getVerifyPlanExecutionTool = () =>
   process.env.CLAUDE_CODE_VERIFY_PLAN === 'true'
     ? require('../../VerifyPlanExecutionTool/VerifyPlanExecutionTool.js').VerifyPlanExecutionTool as Tool
@@ -270,6 +279,9 @@ export const BuiltInToolsProvider: ToolProvider = {
 
     const subscribePR = getSubscribePRTool()
     if (subscribePR) tools.push(subscribePR)
+
+    const scheduleWakeup = getScheduleWakeupTool()
+    if (scheduleWakeup) tools.push(scheduleWakeup)
 
     // PowerShell
     const powerShell = getPowerShellTool()

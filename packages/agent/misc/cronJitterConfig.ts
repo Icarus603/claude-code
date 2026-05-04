@@ -13,7 +13,7 @@ import { getFeatureValue_CACHED_WITH_REFRESH } from '@claude-code/config/feature
 import {
   type CronJitterConfig,
   DEFAULT_CRON_JITTER_CONFIG,
-} from '../scheduler.js'
+} from '../internal/cronTasksCore.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 
 // How often to re-fetch tengu_kairos_cron_config from GrowthBook. Short because
@@ -48,6 +48,12 @@ const cronJitterConfigSchema = lazySchema(() =>
         .min(0)
         .max(THIRTY_DAYS_MS)
         .default(DEFAULT_CRON_JITTER_CONFIG.recurringMaxAgeMs),
+      cacheLeadMs: z
+        .number()
+        .int()
+        .min(0)
+        .max(60_000)
+        .default(DEFAULT_CRON_JITTER_CONFIG.cacheLeadMs),
     })
     .refine(c => c.oneShotFloorMs <= c.oneShotMaxMs),
 )
