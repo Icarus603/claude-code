@@ -150,6 +150,7 @@
     "./commands/exit/index.js": "./src/commands/exit/index.ts",
     "./commands/plan/index.js": "./src/commands/plan/index.ts",
     "./commands/heapdump/index.js": "./src/commands/heapdump/index.ts",
+    "./commands/tui/index.js": "./src/commands/tui/index.ts",
     "./tips/tipRegistry.js": "./src/tips/tipRegistry.ts",
     "./commands/add-dir/index.js": "./src/commands/add-dir/index.ts",
     "./commands/sandbox-toggle/index.js": "./src/commands/sandbox-toggle/index.ts",

@@ -707,6 +707,12 @@ export const SettingsSchema = lazySchema(() =>
         .describe(
           'Whether /rename updates the terminal tab title (defaults to true). Set to false to keep auto-generated topic titles.',
         ),
+      tui: z
+        .enum(['default', 'fullscreen'])
+        .optional()
+        .describe(
+          'Terminal UI renderer. "fullscreen" uses the alt-screen buffer (like vim) — input box pinned, no scrollback, precise redraws. "default" prints inline so the conversation stays in the terminal scrollback. Equivalent to setting CLAUDE_CODE_NO_FLICKER, but persistent across sessions.',
+        ),
       alwaysThinkingEnabled: z
         .boolean()
         .optional()

@@ -47,7 +47,7 @@ import { profileReport } from '../startup/startupProfiler.js'
  * 3. Failing to disable leaves the terminal in a broken state
  */
 /* eslint-disable custom-rules/no-sync-fs -- must be sync to flush before process.exit */
-function cleanupTerminalModes(): void {
+export function cleanupTerminalModes(): void {
   if (!process.stdout.isTTY) {
     return
   }

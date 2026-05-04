@@ -126,6 +126,7 @@ import plugin from '@claude-code/command-runtime/commands/plugin/index.js'
 import reloadPlugins from '@claude-code/config/plugin/commands/reload-plugins/index.js'
 import rewind from '@claude-code/repl/commands/rewind/index.js'
 import heapDump from '@claude-code/repl/commands/heapdump/index.js'
+import tui from '@claude-code/repl/commands/tui/index.js'
 import mockLimits from '@claude-code/command-runtime/stubs/stubCommand.js'
 import bridgeKick from '@claude-code/bridge/commands/bridge-kick.js'
 import version from '@claude-code/cli/commands/version.js'
@@ -269,6 +270,7 @@ const COMMANDS = memoize((): Command[] => [
   fast,
   files,
   heapDump,
+  tui,
   help,
   ide,
   init,

@@ -2,6 +2,7 @@ import { spawnSync } from 'child_process'
 import { getIsInteractive } from '@claude-code/app-host/bootstrap/state.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
+import { getInitialSettings } from '@claude-code/config/settings'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 
 let loggedTmuxCcDisable = false
@@ -105,15 +106,22 @@ export function _resetTmuxControlModeProbeForTesting(): void {
 }
 
 /**
- * Runtime env-var check only. Ants default to on (CLAUDE_CODE_NO_FLICKER=0
- * to opt out); external users default to off (CLAUDE_CODE_NO_FLICKER=1 to
- * opt in).
+ * Resolution order:
+ *   1. CLAUDE_CODE_NO_FLICKER env (explicit) — always wins, escape hatch
+ *      for testing / debugging without writing to settings.json.
+ *   2. settings.tui ('fullscreen' = on, 'default' = off) — set via /tui.
+ *   3. Auto-detection: disabled under tmux -CC (mouse-wheel dead there).
+ *   4. Default: on for ants, off for everyone else.
  */
 export function isFullscreenEnvEnabled(): boolean {
   // Explicit user opt-out always wins.
   if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_NO_FLICKER)) return false
   // Explicit opt-in overrides auto-detection (escape hatch).
   if (isEnvTruthy(process.env.CLAUDE_CODE_NO_FLICKER)) return true
+  // Persistent user choice via /tui — read settings before auto-detect.
+  const tuiSetting = getInitialSettings().tui
+  if (tuiSetting === 'fullscreen') return true
+  if (tuiSetting === 'default') return false
   // Auto-disable under tmux -CC: alt-screen + mouse tracking corrupts
   // terminal state on double-click and mouse wheel is dead.
   if (isTmuxControlMode()) {
