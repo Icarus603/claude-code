@@ -114,7 +114,16 @@ import { spawnSync } from 'child_process'
 // closes 14 TS2339 errors that had been hiding behind `as never`
 // casts at the original site without addressing them. Net delta is
 // −14 (ratchet down). Same runtime, more honest type surface.
-const BUDGET = 3209
+//
+// 2026-05-04: ratcheted 3209 → 3179 to lock in 30-error headroom that
+// accumulated since Phase P3. The drop comes from incremental shim
+// removals, deps_setter migrations, and feature-flag wiring that
+// each shaved 1–3 errors without bumping the budget. Re-verified
+// twice (`bun run scripts/verify-tsc-errors.ts` and direct
+// `bun x tsc --noEmit | grep -E " error TS\d+: " | wc -l`) — both
+// returned 3179 deterministically. Floor freezes the gain so any
+// future regression must explain itself.
+const BUDGET = 3179
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
