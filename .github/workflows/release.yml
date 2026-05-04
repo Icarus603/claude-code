@@ -15,9 +15,6 @@ permissions:
 
 jobs:
   build:
-    # Tag-driven; CI/pre-push already verified test/lint/doctor:arch/smoke
-    # on macos before this tag was pushed. release.yml is just the
-    # cross-compile + publish step — no duplicate quality gates here.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,55 +49,19 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        # `gh release create` is atomic: builds the release object AND
-        # uploads all assets in one call. softprops/action-gh-release@v2
-        # had two independent failure modes in this repo's v26.5.18
-        # series — duplicate-draft cleanup races (502) and partial asset
-        # uploads when GHA OIDC policy creation glitched mid-run, leaving
-        # the release in draft + missing one binary. `gh release create`
-        # avoids both: no draft window, all-or-nothing publish.
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          TAG='${{ steps.tag.outputs.tag }}'
-          # Re-tightening invariant: every binary must have a sibling .sha256
-          # before publish. Auto-updater rejects v26+ releases lacking it.
-          cd dist/binaries
-          for bin in ccb-darwin-arm64 ccb-darwin-x64 ccb-linux-arm64 ccb-linux-x64 ccb-windows-x64.exe; do
-            test -f "$bin" || { echo "missing $bin"; exit 1; }
-            test -f "$bin.sha256" || { echo "missing $bin.sha256"; exit 1; }
-          done
-          # Retry on transient GitHub API 5xx (saw HTTP 502 once mid-create).
-          # 3 attempts, exponential backoff. `gh release create` is idempotent
-          # per-tag — if the release object got created on a partial run, the
-          # second attempt fails with "already exists" and we fall through
-          # to upload-only mode.
-          for attempt in 1 2 3; do
-            if gh release create "$TAG" \
-              --title "$TAG" \
-              --generate-notes \
-              ccb-darwin-arm64 ccb-darwin-arm64.sha256 \
-              ccb-darwin-x64 ccb-darwin-x64.sha256 \
-              ccb-linux-arm64 ccb-linux-arm64.sha256 \
-              ccb-linux-x64 ccb-linux-x64.sha256 \
-              ccb-windows-x64.exe ccb-windows-x64.exe.sha256 2>/tmp/gh-err; then
-              echo "✓ Released $TAG with 10 assets (attempt $attempt)"
-              exit 0
-            fi
-            if grep -q "already exists" /tmp/gh-err; then
-              echo "release already created on prior attempt; switching to upload"
-              gh release upload "$TAG" --clobber \
-                ccb-darwin-arm64 ccb-darwin-arm64.sha256 \
-                ccb-darwin-x64 ccb-darwin-x64.sha256 \
-                ccb-linux-arm64 ccb-linux-arm64.sha256 \
-                ccb-linux-x64 ccb-linux-x64.sha256 \
-                ccb-windows-x64.exe ccb-windows-x64.exe.sha256
-              echo "✓ Uploaded 10 assets to existing $TAG"
-              exit 0
-            fi
-            cat /tmp/gh-err
-            sleep $((attempt * 5))
-          done
-          echo "✗ failed after 3 attempts"
-          exit 1
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          files: |
+            dist/binaries/ccb-darwin-arm64
+            dist/binaries/ccb-darwin-arm64.sha256
+            dist/binaries/ccb-darwin-x64
+            dist/binaries/ccb-darwin-x64.sha256
+            dist/binaries/ccb-linux-arm64
+            dist/binaries/ccb-linux-arm64.sha256
+            dist/binaries/ccb-linux-x64
+            dist/binaries/ccb-linux-x64.sha256
+            dist/binaries/ccb-windows-x64.exe
+            dist/binaries/ccb-windows-x64.exe.sha256
