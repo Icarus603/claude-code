@@ -1,3 +1,18 @@
+# Tag-driven release pipeline — DON'T add quality gates here.
+#
+# This file is byte-equal to v26.5.17 and shipped 17 releases cleanly.
+# ci.yml + .githooks/pre-push gate every merge to main on macos. Tags
+# are cut from main HEAD, so main is already gated. Adding test/
+# doctor:arch/smoke here = first-time exposure to ubuntu-latest, which
+# surfaces latent platform-specific bugs that block release for no
+# benefit. See `feedback_release_pipeline_chase_root_causes.md` and
+# the v26.5.18 series for the cautionary tale (~3h chasing a GHA-
+# runner-specific Bun spawn race + cumulative stale-draft drift after
+# 6 retags).
+#
+# If you think you need a quality gate here, the answer is: put it in
+# ci.yml or pre-push. release.yml stays minimal.
+
 name: Release
 
 on:
