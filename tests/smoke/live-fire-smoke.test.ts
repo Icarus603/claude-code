@@ -58,6 +58,9 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
       '@claude-code/app-host/bootstrap/state.js'
     )
     clearRegisteredPluginHooks()
+    // Pass markerDir explicitly via the command line — don't rely on
+    // env var inheritance through subprocessEnv() / spawn-shell, which
+    // diagnostic on a 2026-05-04 CI run showed was failing to propagate.
     registerHookCallbacks({
       Stop: [
         {
@@ -65,7 +68,7 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
           hooks: [
             {
               type: 'command',
-              command: `bash "${HOOK_FILE}" Stop`,
+              command: `SMOKE_MARKER_DIR="${markerDir}" bash "${HOOK_FILE}" Stop`,
             },
           ],
           pluginRoot: FIXTURE_ROOT,
