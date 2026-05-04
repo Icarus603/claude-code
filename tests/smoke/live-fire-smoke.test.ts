@@ -58,9 +58,6 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
       '@claude-code/app-host/bootstrap/state.js'
     )
     clearRegisteredPluginHooks()
-    // Pass markerDir explicitly via the command line — don't rely on
-    // env var inheritance through subprocessEnv() / spawn-shell, which
-    // diagnostic on a 2026-05-04 CI run showed was failing to propagate.
     registerHookCallbacks({
       Stop: [
         {
@@ -68,7 +65,7 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
           hooks: [
             {
               type: 'command',
-              command: `SMOKE_MARKER_DIR="${markerDir}" bash "${HOOK_FILE}" Stop`,
+              command: `bash "${HOOK_FILE}" Stop`,
             },
           ],
           pluginRoot: FIXTURE_ROOT,
@@ -112,10 +109,8 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
       'main',
     )
     let stepCount = 0
-    const yields: unknown[] = []
-    for await (const item of gen) {
+    for await (const _ of gen) {
       stepCount++
-      if (yields.length < 10) yields.push(item)
       if (stepCount > 100) break
     }
 
@@ -130,69 +125,15 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
     }
 
     if (!existsSync(markerPath)) {
-      // Diagnostic: dump fixture state + try a direct spawn to isolate
-      // whether the failure is in the hook chain or in spawning bash.
+      // Diagnostic: dump fixture state so a future failure is debuggable.
       const fixtureExists = existsSync(HOOK_FILE)
       const fixtureMode = fixtureExists ? readdirSync(FIXTURE_ROOT).join(',') : 'missing'
       const markerDirContents = readdirSync(markerDir).join(',') || '(empty)'
-      // Common fallback: marker.sh writes to /tmp/cc-smoke-marker if
-      // SMOKE_MARKER_DIR env var was lost in the spawn chain.
-      const fallbackDir = '/tmp/cc-smoke-marker'
-      let fallbackContents = '(missing)'
-      try {
-        fallbackContents = existsSync(fallbackDir)
-          ? readdirSync(fallbackDir).join(',') || '(empty)'
-          : '(missing)'
-      } catch {}
-      // Direct spawn check: did bash + the hook script work at all?
-      let directSpawnResult: string
-      try {
-        const { spawnSync } = await import('child_process')
-        const proc = spawnSync('bash', [HOOK_FILE, 'DirectTest'], {
-          env: { ...process.env, SMOKE_MARKER_DIR: markerDir },
-          encoding: 'utf-8',
-        })
-        directSpawnResult = `status=${proc.status} stdout=${proc.stdout?.slice(0, 200)} stderr=${proc.stderr?.slice(0, 200)}`
-      } catch (e) {
-        directSpawnResult = `exception=${e instanceof Error ? e.message : String(e)}`
-      }
-      const directMarkerContents = readdirSync(markerDir).join(',') || '(still empty)'
-      // Reproduce the EXACT shell wrapping the hook chain uses:
-      // spawn(commandString, [], { shell: true }) → /bin/sh -c "<cmd>".
-      // Use subprocessEnv() (same env hook chain passes to the child).
-      let shellSpawnResult: string
-      let subprocessEnvKeys = '(unimported)'
-      try {
-        const { spawnSync } = await import('child_process')
-        const subprocessEnvMod = await import(
-          '@claude-code/shell/subprocessEnv.js'
-        )
-        const childEnv = subprocessEnvMod.subprocessEnv()
-        subprocessEnvKeys = `PATH=${childEnv.PATH ? 'present' : 'MISSING'} HOME=${childEnv.HOME ? 'present' : 'MISSING'} SHELL=${childEnv.SHELL ?? 'unset'} keyCount=${Object.keys(childEnv).length}`
-        const cmdString = `SMOKE_MARKER_DIR="${markerDir}" bash "${HOOK_FILE}" Stop`
-        const proc = spawnSync(cmdString, [], {
-          env: childEnv,
-          shell: true,
-          encoding: 'utf-8',
-        })
-        shellSpawnResult = `status=${proc.status} stdout=${proc.stdout?.slice(0, 200)} stderr=${proc.stderr?.slice(0, 200)} error=${proc.error?.message ?? 'none'}`
-      } catch (e) {
-        shellSpawnResult = `exception=${e instanceof Error ? e.message : String(e)}`
-      }
-      const finalMarkerDir = readdirSync(markerDir).join(',') || '(empty)'
       throw new Error(
-        `Stop.fired marker not observed after 5s.\n` +
-          `  markerDir=${markerDir} contents=${markerDirContents}\n` +
-          `  fallbackDir=${fallbackDir} contents=${fallbackContents}\n` +
-          `  hookFile=${HOOK_FILE} exists=${fixtureExists} fixtureRoot=${fixtureMode}\n` +
-          `  stepCount=${stepCount}\n` +
-          `  yields[0..2]=${JSON.stringify(yields.slice(0, 3))}\n` +
-          `  process.env.SMOKE_MARKER_DIR=${process.env.SMOKE_MARKER_DIR}\n` +
-          `  direct spawn (argv): ${directSpawnResult}\n` +
-          `  marker dir after direct spawn: ${directMarkerContents}\n` +
-          `  shell spawn (shell:true via subprocessEnv): ${shellSpawnResult}\n` +
-          `  subprocessEnv keys: ${subprocessEnvKeys}\n` +
-          `  marker dir after shell spawn: ${finalMarkerDir}`,
+        `Stop.fired marker not observed after 5s. ` +
+          `markerDir=${markerDir} contents=${markerDirContents} ` +
+          `hookFile=${HOOK_FILE} exists=${fixtureExists} fixtureRoot=${fixtureMode} ` +
+          `stepCount=${stepCount}`,
       )
     }
     expect(existsSync(markerPath)).toBe(true)
