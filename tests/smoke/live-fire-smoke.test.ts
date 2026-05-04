@@ -112,8 +112,10 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
       'main',
     )
     let stepCount = 0
-    for await (const _ of gen) {
+    const yields: unknown[] = []
+    for await (const item of gen) {
       stepCount++
+      if (yields.length < 10) yields.push(item)
       if (stepCount > 100) break
     }
 
@@ -155,15 +157,34 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
         directSpawnResult = `exception=${e instanceof Error ? e.message : String(e)}`
       }
       const directMarkerContents = readdirSync(markerDir).join(',') || '(still empty)'
+      // Reproduce the EXACT shell wrapping the hook chain uses:
+      // spawn(commandString, [], { shell: true }) → /bin/sh -c "<cmd>".
+      let shellSpawnResult: string
+      try {
+        const { spawnSync } = await import('child_process')
+        const cmdString = `SMOKE_MARKER_DIR="${markerDir}" bash "${HOOK_FILE}" Stop`
+        const proc = spawnSync(cmdString, [], {
+          env: process.env,
+          shell: true,
+          encoding: 'utf-8',
+        })
+        shellSpawnResult = `status=${proc.status} stdout=${proc.stdout?.slice(0, 200)} stderr=${proc.stderr?.slice(0, 200)}`
+      } catch (e) {
+        shellSpawnResult = `exception=${e instanceof Error ? e.message : String(e)}`
+      }
+      const finalMarkerDir = readdirSync(markerDir).join(',') || '(empty)'
       throw new Error(
         `Stop.fired marker not observed after 5s.\n` +
           `  markerDir=${markerDir} contents=${markerDirContents}\n` +
           `  fallbackDir=${fallbackDir} contents=${fallbackContents}\n` +
           `  hookFile=${HOOK_FILE} exists=${fixtureExists} fixtureRoot=${fixtureMode}\n` +
           `  stepCount=${stepCount}\n` +
+          `  yields[0..2]=${JSON.stringify(yields.slice(0, 3))}\n` +
           `  process.env.SMOKE_MARKER_DIR=${process.env.SMOKE_MARKER_DIR}\n` +
-          `  direct spawn: ${directSpawnResult}\n` +
-          `  marker dir after direct spawn: ${directMarkerContents}`,
+          `  direct spawn (argv): ${directSpawnResult}\n` +
+          `  marker dir after direct spawn: ${directMarkerContents}\n` +
+          `  shell spawn (shell:true matching hook chain): ${shellSpawnResult}\n` +
+          `  marker dir after shell spawn: ${finalMarkerDir}`,
       )
     }
     expect(existsSync(markerPath)).toBe(true)
