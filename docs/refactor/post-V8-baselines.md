@@ -27,7 +27,7 @@ context compaction.
 | `_deps.ts` unknown-typed slots      |        7 |       6 |          0 | -6 (V9-2)  |
 | Knip unused-files (packages/-scoped) |      71 |      69 |          9 | -62        |
 | Knip unused-exports                 |      185 |     184 |         33 | -152       |
-| tsc-errors budget                   |     3269 |    3217 |       3123 | -146       |
+| tsc-errors budget                   |     3269 |    3217 |       3103 | -166       |
 | Silent-failure findings (total)     |      740 |     740 |        737 | -3         |
 | Silent-failure CRITICAL/HIGH        |      0/0 |     0/0 |        0/0 | locked     |
 | `as never` cast count               |      n/a |      42 |         42 | locked     |
@@ -194,7 +194,7 @@ to bypass URL deduplication, intentional commit-template whitespace).
 Current baselines (locked, monotonic-shrink-only) — measured 2026-05-04:
 
 ```
-verify-tsc-errors                = 3123 (V9-2c ratchet 2026-05-04)
+verify-tsc-errors                = 3103 (V9-2b real ratchet 2026-05-04)
 verify-deps-quality              = lazy-requires=0, unknown-slots=0 (V9-1+V9-2 ratchet 2026-05-04)
 verify-knip-headroom             = unused-files=9, unused-exports=33
 verify-silent-failure-ratchet    = 737 (CRITICAL=0, HIGH=0)

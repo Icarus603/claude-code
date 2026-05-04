@@ -154,7 +154,33 @@ import { spawnSync } from 'child_process'
 //   AgentContext/TeammateContext/Task shims tested → 0 yield
 //   (reverted, all construction-shaped).
 //   ToolUseContext/Message tested → +24/+9 yield (kept, access-shaped).
-const BUDGET = 3123
+//
+// 2026-05-04 (V9-2b real): ratcheted 3123 → 3103 (-20) after
+// retracting iter-18's "NOT FEASIBLE" verdict on progressTypes.ts
+// and instead BUILDING the canonical shape from each tool's
+// onProgress() construction site. 4 progress types narrowed:
+//   - BashProgress: { type: 'bash_progress', output, fullOutput,
+//     elapsedTimeSeconds, totalLines, totalBytes, taskId?, timeoutMs? }
+//     extracted from BashTool.tsx:900.
+//   - PowerShellProgress: same shape, type: 'powershell_progress'.
+//     extracted from PowerShellTool.tsx:637.
+//   - ShellProgress = BashProgress | PowerShellProgress union.
+//     The 4 TS2339 in BashModeProgress.tsx accessing .fullOutput/
+//     .output/.elapsedTimeSeconds/.totalLines collapsed; total
+//     downstream effect was -20.
+//   - MCPProgress: { type: 'mcp_progress', status, serverName,
+//     toolName, progress?, total?, progressMessage? } from
+//     mcp-runtime/clientRuntime.ts:2917. Net 0 yield but no cost.
+// Tested-and-reverted (CONSTRUCTION pattern + cascading scope):
+//   AgentToolProgress, SkillToolProgress with `message: unknown` —
+//   net +1 because UI.tsx accesses `progress.data.message.type`,
+//   narrowing message itself cascades into NormalizedMessage union.
+//   Out of V9 scope.
+// Lesson: V9-2b's "no canonical home" verdict was wrong — the
+// canonical shape lived at the construction site all along, just
+// not behind a re-exportable name. Building it from the construction
+// site is a valid third strategy alongside re-export and dead-deletion.
+const BUDGET = 3103
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
