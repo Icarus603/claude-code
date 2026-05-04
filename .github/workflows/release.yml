@@ -15,7 +15,12 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # macos-latest aligns with ci.yml. ubuntu-latest had 4 pre-existing
+    # platform-specific test fails (toRelativePath cwd handling, subprocessEnv,
+    # smoke live-fire hook spawn) that release.yml's previous "no test step"
+    # masked. v26.5.18 was the first release to surface them — when commit
+    # 45bae510 added the Test gate without auditing platform differences.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -34,10 +39,9 @@ jobs:
       # `ccb` user. ~30s wall time, single platform — the build:platforms
       # step below is the long pole anyway.
       - name: Install ripgrep
-        run: |
-          if [ "$(uname)" = "Darwin" ]; then brew install ripgrep
-          else sudo apt-get update && sudo apt-get install -y ripgrep
-          fi
+        # macOS runner image dropped pre-installed rg; verify-dynamic-import-
+        # targets / verify-default-import-targets shell out to it.
+        run: brew install ripgrep
 
       - name: Test
         run: bun test
