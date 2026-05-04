@@ -159,16 +159,23 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
       const directMarkerContents = readdirSync(markerDir).join(',') || '(still empty)'
       // Reproduce the EXACT shell wrapping the hook chain uses:
       // spawn(commandString, [], { shell: true }) → /bin/sh -c "<cmd>".
+      // Use subprocessEnv() (same env hook chain passes to the child).
       let shellSpawnResult: string
+      let subprocessEnvKeys = '(unimported)'
       try {
         const { spawnSync } = await import('child_process')
+        const subprocessEnvMod = await import(
+          '@claude-code/shell/subprocessEnv.js'
+        )
+        const childEnv = subprocessEnvMod.subprocessEnv()
+        subprocessEnvKeys = `PATH=${childEnv.PATH ? 'present' : 'MISSING'} HOME=${childEnv.HOME ? 'present' : 'MISSING'} SHELL=${childEnv.SHELL ?? 'unset'} keyCount=${Object.keys(childEnv).length}`
         const cmdString = `SMOKE_MARKER_DIR="${markerDir}" bash "${HOOK_FILE}" Stop`
         const proc = spawnSync(cmdString, [], {
-          env: process.env,
+          env: childEnv,
           shell: true,
           encoding: 'utf-8',
         })
-        shellSpawnResult = `status=${proc.status} stdout=${proc.stdout?.slice(0, 200)} stderr=${proc.stderr?.slice(0, 200)}`
+        shellSpawnResult = `status=${proc.status} stdout=${proc.stdout?.slice(0, 200)} stderr=${proc.stderr?.slice(0, 200)} error=${proc.error?.message ?? 'none'}`
       } catch (e) {
         shellSpawnResult = `exception=${e instanceof Error ? e.message : String(e)}`
       }
@@ -183,7 +190,8 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
           `  process.env.SMOKE_MARKER_DIR=${process.env.SMOKE_MARKER_DIR}\n` +
           `  direct spawn (argv): ${directSpawnResult}\n` +
           `  marker dir after direct spawn: ${directMarkerContents}\n` +
-          `  shell spawn (shell:true matching hook chain): ${shellSpawnResult}\n` +
+          `  shell spawn (shell:true via subprocessEnv): ${shellSpawnResult}\n` +
+          `  subprocessEnv keys: ${subprocessEnvKeys}\n` +
           `  marker dir after shell spawn: ${finalMarkerDir}`,
       )
     }
