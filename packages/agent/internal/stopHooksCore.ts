@@ -1,6 +1,5 @@
 import { feature } from 'bun:bundle'
 import {
-  executeAutoDream,
   executeExtractMemories,
   isExtractModeActive,
 } from '@claude-code/memory'
@@ -117,9 +116,6 @@ export async function* handleStopHooks(
         stopHookContext,
         toolUseContext.appendSystemMessage,
       )
-    }
-    if (!toolUseContext.agentId) {
-      void executeAutoDream(stopHookContext, toolUseContext.appendSystemMessage)
     }
   }
 

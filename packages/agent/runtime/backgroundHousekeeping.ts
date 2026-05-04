@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle'
-import { initAutoDream, initExtractMemories } from '@claude-code/memory'
+import { initExtractMemories } from '@claude-code/memory'
 import { initMagicDocs } from '../MagicDocs/magicDocs.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -30,7 +30,6 @@ export function startBackgroundHousekeeping(): void {
   if (feature('EXTRACT_MEMORIES')) {
     initExtractMemories()
   }
-  initAutoDream()
   void autoUpdateMarketplacesAndPluginsInBackground()
   if (feature('LODESTONE') && getIsInteractive()) {
     void registerProtocolModule!.ensureDeepLinkProtocolRegistered()

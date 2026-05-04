@@ -13,7 +13,6 @@ import {
   getAgentMemoryDir,
   isAutoDreamEnabled,
   isAutoMemoryEnabled,
-  readLastConsolidatedAt,
 } from '@claude-code/memory'
 import * as teamMemPaths from '@claude-code/memory/teamMemPaths'
 import { logEvent } from '@claude-code/local-observability'
@@ -208,26 +207,17 @@ export function MemoryFileSelector({
   // if the user toggles auto-memory off.
   const [showDreamRow] = useState(isAutoMemoryEnabled)
 
-  // Dream status: prefer live task state (this session fired it), fall back
-  // to the cross-process lock mtime.
+  // Dream status: live task state if currently running, otherwise empty —
+  // the cross-process consolidation lock was removed when ccb switched
+  // from stop-hook autoDream to cron-scheduled `/dream consolidate`.
+  // Last-fire time now lives in `.claude/scheduled_tasks.json` per task,
+  // which is captured below with a simpler "/dream nightly to schedule" hint.
   const isDreamRunning = useAppState(s =>
     Object.values(s.tasks).some(
       t => t.type === 'dream' && t.status === 'running',
     ),
   )
-  const [lastDreamAt, setLastDreamAt] = useState<number | null>(null)
-  useEffect(() => {
-    if (!showDreamRow) return
-    void readLastConsolidatedAt().then(setLastDreamAt)
-  }, [showDreamRow, isDreamRunning])
-
-  const dreamStatus = isDreamRunning
-    ? 'running'
-    : lastDreamAt === null
-      ? '' // stat in flight
-      : lastDreamAt === 0
-        ? 'never'
-        : `last ran ${formatRelativeTimeAgo(new Date(lastDreamAt))}`
+  const dreamStatus = isDreamRunning ? 'running' : ''
 
   // null = Select has focus, 0 = auto-memory, 1 = auto-dream (if showDreamRow)
   const [focusedToggle, setFocusedToggle] = useState<number | null>(null)
@@ -289,7 +279,10 @@ export function MemoryFileSelector({
               Auto-dream: {autoDreamOn ? 'on' : 'off'}
               {dreamStatus && <Text dimColor> · {dreamStatus}</Text>}
               {!isDreamRunning && autoDreamOn && (
-                <Text dimColor> · /dream to run</Text>
+                <Text dimColor>
+                  {' '}
+                  · /dream nightly to schedule, /dream to run now
+                </Text>
               )}
             </Text>
           </ListItem>

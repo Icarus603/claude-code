@@ -1,9 +1,8 @@
-// Background task entry for auto-dream (memory consolidation subagent).
-// Makes the otherwise-invisible forked agent visible in the footer pill and
-// Shift+Down dialog. The dream agent itself is unchanged — this is pure UI
-// surfacing via the existing task registry.
+// Background task entry for cron-fired /dream consolidate (memory
+// consolidation subagent). Makes the otherwise-invisible agent visible in
+// the footer pill and Shift+Down dialog. The dream agent itself is
+// unchanged — this is pure UI surfacing via the existing task registry.
 
-import { rollbackConsolidationLock } from '@claude-code/memory/consolidationLock'
 import type { SetAppState, Task, TaskStateBase } from '@claude-code/tool-registry/Task.js'
 import { createTaskStateBase, generateTaskId } from '@claude-code/tool-registry/Task.js'
 import { registerTask, updateTaskState } from '../../task/framework.js'
@@ -36,7 +35,11 @@ export type DreamTaskState = TaskStateBase & {
   /** Assistant text responses, tool uses collapsed. Prompt is NOT included. */
   turns: DreamTurn[]
   abortController?: AbortController
-  /** Stashed so kill can rewind the lock mtime (same path as fork-failure). */
+  /**
+   * Legacy field from the stop-hook autoDream era — preserved on the type
+   * to keep callers' opts shape stable across the cron-driven rewrite.
+   * No longer read; will be removed in a follow-up cleanup.
+   */
   priorMtime: number
 }
 
@@ -134,11 +137,9 @@ export const DreamTask: Task = {
   type: 'dream',
 
   async kill(taskId, setAppState) {
-    let priorMtime: number | undefined
     updateTaskState<DreamTaskState>(taskId, setAppState, task => {
       if (task.status !== 'running') return task
       task.abortController?.abort()
-      priorMtime = task.priorMtime
       return {
         ...task,
         status: 'killed',
@@ -147,11 +148,8 @@ export const DreamTask: Task = {
         abortController: undefined,
       }
     })
-    // Rewind the lock mtime so the next session can retry. Same path as the
-    // fork-failure catch in autoDream.ts. If updateTaskState was a no-op
-    // (already terminal), priorMtime stays undefined and we skip.
-    if (priorMtime !== undefined) {
-      await rollbackConsolidationLock(priorMtime)
-    }
+    // No lock rollback needed in the cron-driven model: aborting a
+    // mid-flight consolidation just means the cron tick failed; the next
+    // tick will fire normally.
   },
 }
