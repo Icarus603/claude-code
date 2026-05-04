@@ -39,20 +39,30 @@ stays unchanged.
 | V9-3 | §3 | Replace `swarm/adapters/appRuntime.ts:57` 3-field minimum-subset `TaskStateBase` shim with `export type { TaskStateBase } from '@claude-code/tool-registry/Task.js'`. The runtime always returned the full 11-field shape via `createTaskStateBase`; the type-side shim was a V7 §7.2 holdover hiding it from swarm TS. | Low (single type re-export; runtime unaffected) | **✅ landed 2026-05-04** — `tsc-errors` 3179 → 3156 (−23 total: −10 prior-V9 headroom that had accumulated under V9-2.6/2.7/2.8 without baseline tightening, plus −13 directly from V9-3). The −13 from V9-3 break down as: 5 TS2322 (string assignability at `task.toolUseId`/`description` writes), 4 TS2363, 2 TS2345, 1 TS2365, 1 TS2362, scattered across `repl/components/tasks/{InProcessTeammateDetailDialog, BackgroundTasksDialog}`, `repl/components/Spinner{,/TeammateSpinnerLine}.tsx`, `repl/hooks/useScheduledTasks.ts`, `swarm/runtime/inProcessRunner.ts:923,1169,1220`, `swarm/runtime/spawnInProcess.ts:252,253`, `tool-registry/tools/TaskOutputTool.tsx:91`. **Counter-intuitive observation**: zero swarm-internal TS2339s were eliminated (65 → 65); the 65 are unrelated `Partial<unknown>` / `'CoreTool'` / `'unknown'` patterns in createSwarmHostDeps and InProcessBackend that come from OTHER V7 §7.2 type-side shims still in `swarm/adapters/appRuntime.ts`. Future iterations of §4 may chip at those. |
 | V9-2c | §4 | Triaged remaining 11 unknown shims in `swarm/adapters/appRuntime.ts` by ACCESS-vs-CONSTRUCTION pattern. **Two narrowed**: `ToolUseContext` ← `tool-registry/Tool.ts:158` (−24 errors), `Message` ← `agent/messageShapes.ts:34` (−9 errors). Three tested-and-reverted (CONSTRUCTION pattern, zero yield): `AgentContext`, `TeammateContext`, `Task`. Six others still pending pattern-triage. | Low (per-shim type-only re-exports) | **✅ landed 2026-05-04** — `tsc-errors` 3156 → 3123 (−33). New rule discovered: only ACCESS-pattern unknown shims yield TS error elimination via narrowing; CONSTRUCTION-pattern produces zero yield because `unknown` already accepts every literal. Memory: `feedback_only_access_pattern_unknown_shims_yield.md`. |
 
-### Remaining V9 phases (not yet executed)
+### Remaining V9 phases (triaged 2026-05-04 iter-18)
 
-| Phase | Section | Scope | Risk | Estimated effect |
-|-------|---------|-------|------|------------------|
-| V9-2b | §4 | `tool-registry/progressTypes.ts` 11 slots → `import type` | Low | ~20 TS2339 |
-| V9-2c | §4 | `swarm/adapters/appRuntime.ts` 13 remaining slots → `import type` (after V9-3, TaskStateBase already done; remaining: PermissionMode/Task/AgentDefinition/Message/CustomAgentDefinition/AgentToolResult/AgentProgress/PermissionDecision/AgentContext/PermissionUpdate/TeammateContext/AppState shims). Each must be evaluated separately for whether the canonical home is import-safe. | Medium | ~30 TS2339 + some TS2345 |
-| V9-2d | §4 | `cli/src/headless.ts` 5 slots → `import type` | Low | ~15 TS2339 |
-| V9-4 | §4 | Remaining ~60 misc slots, case-by-case | Medium | ~50 TS2339 |
-| V9-5 | §1+§2 result | Final ratchet tighten + retire `_deps.ts` lazy-require infra | Low | 0 (cleanup) |
+| Phase | Section | Status | Notes |
+|-------|---------|--------|-------|
+| V9-2b | §4 | **❌ NOT FEASIBLE** | `tool-registry/progressTypes.ts` 11 slots have NO canonical home anywhere — they are decompilation placeholders, the `unknown` IS the only definition. Nothing to re-export to. |
+| V9-2c | §4 | **✅ partial: 3/12 done** | `TaskStateBase` (V9-3, −13) + `ToolUseContext` (V9-2c, −24) + `Message` (V9-2c, −9) narrowed. Remaining 9 shims triaged: 4 CONSTRUCTION-pattern (zero yield, tested-and-reverted: AgentContext, TeammateContext, Task, AppState), 4 type-annotation-only in swarm (zero access = zero yield: AgentDefinition, AgentToolResult, AgentProgress, PermissionUpdate), 1 generic-complex skipped (Tool). Closing this section. |
+| V9-2d | §4 | **❌ NOT FEASIBLE** | `cli/src/headless.ts` 5 slots have **zero internal callers**. Every `MCPServerConnection` / `AgentDefinition` / `McpSdkServerConfig` / `ThinkingConfig` callsite in cli already imports from the real home (mcp-runtime, agent, headless-sdk). The 5 cli/headless.ts shims are "dead exports with placeholder type"; narrowing changes nothing — empirically tested with MCPServerConnection: tsc 3123 → 3123 (revert). The 139 TS2339 in `run-streaming.ts` are `client.cleanup()` / `connection.tools` / etc on the real 5-state union without caller-side type narrowing — that's a caller-side concern (each callsite needs `if (client.type === 'connected')` guard before access), not a shim-narrowing concern. Out of V9 scope. |
+| V9-4 | §4 | **DEFERRED — likely not productive** | Remaining ~60 misc slots scattered across packages. Based on V9-2c/2d triage learnings, expect most to fall into CONSTRUCTION-pattern or type-annotation-only categories (zero yield) or to require caller-side type narrowing (out of V9 scope). High effort with low expected per-shim yield. Defer indefinitely unless a specific shim is identified as ACCESS-pattern with concrete yield estimate. |
+| V9-5 | §1+§2 result | **✅ already done** | `_deps.ts` lazy-requires=0, unknown-slots=0 locked since V9-2.5. No `_deps.ts` cleanup remains. |
 
-After all V9 phases complete, the expected end state:
-- `_deps.ts`: 0 lazy-requires, 0 unknown slots (✅ already achieved at V9-2.5)
-- tsc-errors: target ~2900 (currently 3156 after V9-3; remaining −256 to budget across V9-2b/c/d, V9-4)
-- 95 `= unknown` aliases reduced to <20 (those genuinely opaque at the runtime adapter boundary)
+### V9 series end state (achieved 2026-05-04)
+
+- `_deps.ts`: 0 lazy-requires, 0 unknown slots ✅
+- tsc-errors: 3209 → 3123 (**−86 total**, of which 33 from V9-3+V9-2c shim narrows; remainder from V9-2.x cleanup/headroom)
+- 4 P0 production bugs fixed with regression tests (isDuplicatePath, coerceDescriptionToString, BUILTIN_MARKETPLACE_NAME, EFFORT_LEVELS / FRONTMATTER_REGEX cluster)
+- 6 hand-typed shadow constants collapsed to single source of truth
+- 3 swarm shims narrowed via `import type` re-export (TaskStateBase, ToolUseContext, Message)
+
+The original V9 ambition was "tsc-errors → ~2900". That estimate assumed all V9-2b/c/d phases would land. After triage, V9-2b is infeasible (no canonical home), V9-2d is infeasible (dead shims), and V9-2c is mostly mined out. Remaining 3123 errors are dominated by:
+- caller-side narrowing needs on real union types (e.g. MCPServerConnection 5-state) — not shim concerns
+- generic helpers (`Tool<...>`) where re-exporting requires careful type-param plumbing
+- decompilation noise that's already grandfathered (`unknown` widening at internal React state)
+
+**Recommendation**: V9 series achieved ~33% of original tsc-errors target (−86 of −280) with 9 commits. Diminishing returns clear; further work needs different methods (caller-side type guards, generic re-exports), not the same shim-narrowing pattern. Stop V9, move to other priorities.
 
 ## Non-goals (Linus discipline)
 
