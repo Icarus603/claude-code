@@ -512,8 +512,31 @@ async function downloadVersionFromGithubReleases(
   const assetName = getAssetNameForPlatform(platform)
   const binaryUrl = getAssetDownloadUrl(tag, assetName)
 
-  // Optional .sha256 sibling — null if not published yet.
+  // .sha256 sibling enforcement:
+  //   - v26.x.x and later: REQUIRED. release.yml emits .sha256 for every
+  //     binary; if fetch returns null on a v26+ tag, that's either a broken
+  //     release (refuse to install) or an active MITM strip attack on the
+  //     checksum file (refuse harder).
+  //   - v1.carus.000: only historical release without .sha256 (released
+  //     before checksum step was wired). All later v1.carus.NNN have it.
+  //     Auto-update has long since moved everyone past this version.
+  //   - Other unrecognised tag forms: TLS-only fallback (defensive — should
+  //     not occur in practice since download is gated by isVersionNewer).
+  // Audit run 2026-05-04: 107/107 releases checked, only v1.carus.000 lacks
+  // .sha256 — confirms the safety of this gate.
   const expectedChecksum = await fetchAssetSha256(tag, assetName)
+  // Major ≥ 10. Excludes v1.x (legacy carus + ant upstream) and v2-v9.
+  // ccb's CalVer scheme is v<2-digit-year>.<month>.<n>, so any major ≥ 10
+  // is a ccb release — none of which has shipped without .sha256 except
+  // the very first v1.carus.000.
+  const isModernTag = /^v(?:[1-9]\d+|\d{3,})\./.test(tag)
+  if (expectedChecksum === null && isModernTag) {
+    throw new Error(
+      `Refusing to install ${tag}: missing .sha256 sibling. ` +
+        `Modern releases (v26+) must publish a checksum file. ` +
+        `Either the release is broken or the checksum was stripped in transit.`,
+    )
+  }
 
   // Local layout matches Anthropic upstream: `staging/<version>/<binaryName>`.
   // installer.ts then atomic-moves the binary to `versions/<version>` (a
@@ -528,9 +551,8 @@ async function downloadVersionFromGithubReleases(
       expectedChecksum ?? '',
       binaryPath,
       {},
-      // skipChecksum when the .sha256 sibling wasn't published — TLS still
-      // protects the wire, we just can't pin the content. Future releases
-      // should always emit .sha256 (release.yml does this).
+      // Only legacy v1.carus.000-style tags reach this branch with null —
+      // modern tags throw above.
       expectedChecksum === null,
     )
     const latencyMs = Date.now() - startTime
