@@ -125,15 +125,42 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
     }
 
     if (!existsSync(markerPath)) {
-      // Diagnostic: dump fixture state so a future failure is debuggable.
+      // Diagnostic: dump fixture state + try a direct spawn to isolate
+      // whether the failure is in the hook chain or in spawning bash.
       const fixtureExists = existsSync(HOOK_FILE)
       const fixtureMode = fixtureExists ? readdirSync(FIXTURE_ROOT).join(',') : 'missing'
       const markerDirContents = readdirSync(markerDir).join(',') || '(empty)'
+      // Common fallback: marker.sh writes to /tmp/cc-smoke-marker if
+      // SMOKE_MARKER_DIR env var was lost in the spawn chain.
+      const fallbackDir = '/tmp/cc-smoke-marker'
+      let fallbackContents = '(missing)'
+      try {
+        fallbackContents = existsSync(fallbackDir)
+          ? readdirSync(fallbackDir).join(',') || '(empty)'
+          : '(missing)'
+      } catch {}
+      // Direct spawn check: did bash + the hook script work at all?
+      let directSpawnResult: string
+      try {
+        const { spawnSync } = await import('child_process')
+        const proc = spawnSync('bash', [HOOK_FILE, 'DirectTest'], {
+          env: { ...process.env, SMOKE_MARKER_DIR: markerDir },
+          encoding: 'utf-8',
+        })
+        directSpawnResult = `status=${proc.status} stdout=${proc.stdout?.slice(0, 200)} stderr=${proc.stderr?.slice(0, 200)}`
+      } catch (e) {
+        directSpawnResult = `exception=${e instanceof Error ? e.message : String(e)}`
+      }
+      const directMarkerContents = readdirSync(markerDir).join(',') || '(still empty)'
       throw new Error(
-        `Stop.fired marker not observed after 5s. ` +
-          `markerDir=${markerDir} contents=${markerDirContents} ` +
-          `hookFile=${HOOK_FILE} exists=${fixtureExists} fixtureRoot=${fixtureMode} ` +
-          `stepCount=${stepCount}`,
+        `Stop.fired marker not observed after 5s.\n` +
+          `  markerDir=${markerDir} contents=${markerDirContents}\n` +
+          `  fallbackDir=${fallbackDir} contents=${fallbackContents}\n` +
+          `  hookFile=${HOOK_FILE} exists=${fixtureExists} fixtureRoot=${fixtureMode}\n` +
+          `  stepCount=${stepCount}\n` +
+          `  process.env.SMOKE_MARKER_DIR=${process.env.SMOKE_MARKER_DIR}\n` +
+          `  direct spawn: ${directSpawnResult}\n` +
+          `  marker dir after direct spawn: ${directMarkerContents}`,
       )
     }
     expect(existsSync(markerPath)).toBe(true)
