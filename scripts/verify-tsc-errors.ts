@@ -136,7 +136,25 @@ import { spawnSync } from 'child_process'
 // `outputFile`/etc. consumer sites. The re-export resolves them in
 // one type change with zero runtime effect. Floor locks both the
 // V9-2.x headroom gain and the V9-3 type-narrow gain together.
-const BUDGET = 3156
+//
+// 2026-05-04 (V9-2c steps 3-4): ratcheted 3156 → 3123 (-33) after
+// replacing two ACCESS-pattern unknown shims at
+// `swarm/adapters/appRuntime.ts` with re-exports:
+//   - step 3: `ToolUseContext` ← `tool-registry/Tool.ts:158` (-24)
+//     Callers (InProcessBackend.ts:205, PaneBackendExecutor.ts,
+//     inProcessRunner.ts) access context.getAppState/setAppState/
+//     options/abortController/etc — `unknown` shim was producing
+//     TS2339 at every field-access site.
+//   - step 4: `Message` ← `agent/messageShapes.ts:34` (-9)
+//     Same pattern: 7 access-shaped callers, mostly in swarm runtime.
+// Triage method: ACCESS pattern (caller does `x.field` or `x.method()`)
+// yields TS2339 elimination via narrowing. CONSTRUCTION pattern
+// (caller does `: T = { ... }`) yields ZERO because `: unknown`
+// already accepts every literal. Verified empirically:
+//   AgentContext/TeammateContext/Task shims tested → 0 yield
+//   (reverted, all construction-shaped).
+//   ToolUseContext/Message tested → +24/+9 yield (kept, access-shaped).
+const BUDGET = 3123
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

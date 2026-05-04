@@ -42,12 +42,20 @@ export type CanUseToolFn = (...args: any[]) => Promise<any>
 export type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS = string
 export type AppState = unknown;
 export type Tool = unknown;
-export type ToolUseContext = unknown;
+// Re-export the real ToolUseContext from tool-registry. swarm callers
+// access context.getAppState/setAppState/options/abortController etc.,
+// not just construct it — the local `unknown` shim was causing TS2339
+// at every field-access site (InProcessBackend.ts, PaneBackendExecutor.ts,
+// inProcessRunner.ts). Layer rule already permits swarm → tool-registry.
+// (V9-2c step 3, 2026-05-04.)
+export type { ToolUseContext } from '@claude-code/tool-registry/Tool.js'
 export type AgentProgress = unknown;
 export type CustomAgentDefinition = unknown;
 export type AgentDefinition = unknown;
 export type AgentToolResult = unknown;
-export type Message = unknown;
+// Re-export Message from agent/messageShapes (V9-2c step 4, 2026-05-04).
+// 7 access-pattern callers in swarm; same V9-3 / step-3 logic.
+export type { Message } from '@claude-code/agent/messageShapes.js'
 export type PermissionDecision = unknown;
 export type AgentContext = unknown;
 export type ModelAlias = string
