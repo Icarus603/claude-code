@@ -1,3 +1,56 @@
+/**
+ * messages.ts — message-shape constructors, transformations, and
+ * boundary-crossing serializers for the agent turn loop. Largest
+ * non-UI file in the repo (~5600 LOC). Kept single-file because the
+ * shape transformations form an interlocking algebra that loses
+ * compile-time invariants when split across files.
+ *
+ * **What this file owns**:
+ *  - Message constructors: `createAssistantMessage`,
+ *    `createUserMessage`, `createAssistantAPIErrorMessage`,
+ *    `prepareUserContent`. These are the ONLY supported ways to mint
+ *    a Message object — direct literal `{type: 'assistant', ...}`
+ *    skips invariants like `withMemoryCorrectionHint` injection,
+ *    timestamp normalization, and id derivation.
+ *  - Sentinel strings (INTERRUPT_MESSAGE, REJECT_MESSAGE etc.) used
+ *    by classifier / permission / cancellation paths. Adding a new
+ *    sentinel requires adding the matching `is*Message` predicate
+ *    so downstream filtering doesn't accidentally render it.
+ *  - Compaction / thinking-block / cross-connection-stripping
+ *    transforms (`stripCrossConnectionThinkingBlocks`,
+ *    `stripInvalidThinkingBlocks`). Each preserves Message[] length
+ *    OR documents the drop reason in a returned diagnostic.
+ *  - Provider-shape mapping helpers — Anthropic ↔ OpenAI ↔ Gemini ↔
+ *    Grok message coercion. Provider adapters call these; do NOT
+ *    add provider-specific shape logic outside this file.
+ *
+ * **Invariants**:
+ *  1. **Construction is total**. Constructors must return a valid
+ *     Message even on degenerate input (empty content, missing
+ *     required fields → fall back to placeholder). Failing
+ *     construction is a P0 — it strands the turn loop with a half-
+ *     formed message and breaks transcript persistence.
+ *  2. **Transforms are pure**. The transform fns here MUST NOT
+ *     mutate input arrays. The compaction code in
+ *     `compaction/compact.ts` relies on this for its replay
+ *     semantics.
+ *  3. **No `messages.ts` import from `compaction/`, `attachments.ts`,
+ *     or `query.ts`**. Those modules import from here, not vice
+ *     versa. Reverse imports introduced cycles in V7 that took two
+ *     iterations to unwind.
+ *  4. Real production bugs found by V8/post-V8 audits in this file
+ *     (parser-state-machine ordering errors) — see
+ *     `feedback_test_writing_bug_discovery_rate.md`. When editing
+ *     parser-shaped helpers here, **probe with edge inputs** before
+ *     committing.
+ *
+ * **Why not decomposed**:
+ *  Attempted in V8. Sentinel strings, predicates, and constructors
+ *  cross-reference 30+ symbols within the file. Splitting forces
+ *  either a circular import or an artificial third file holding
+ *  shared sentinel constants — both worse than the LOC count.
+ *  See post-V8-baselines.md for the decision.
+ */
 import { readEnv } from '@claude-code/config/env/utils'
 import { feature } from 'bun:bundle'
 import type { BetaUsage as Usage } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'

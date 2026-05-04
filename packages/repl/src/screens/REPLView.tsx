@@ -1,3 +1,48 @@
+/**
+ * REPLView — the interactive Ink/React screen rendered when the user runs
+ * `ccb` without `--print`. This is the largest single file in the repo
+ * (~5600 LOC) and was kept intentionally so per `docs/refactor/post-V8-baselines.md`
+ * (decomposition attempted, found cosmetic-only).
+ *
+ * **What this file owns**:
+ *  - The top-level React component (`REPL`, exported below at line ~544) that
+ *    composes <Messages>, <PromptInput>, transcript modal, permission dialogs,
+ *    plugin pickers, slash-command menus, MCP UIs, etc.
+ *  - The keyboard event router for terminal-level shortcuts (search, scroll,
+ *    fork, shutdown, mode toggles). Tool/message-level handlers live in
+ *    PromptInput / VirtualMessageList.
+ *  - Local state for: current screen ('prompt' | 'transcript'), search state,
+ *    in-flight permission/elicitation queue UI, focus management, virtual
+ *    scrolling state. AppState reads/writes go through `useAppState` selectors.
+ *  - The bridge from REPL UI events into the agent turn loop (`useREPLTurn`
+ *    and friends).
+ *
+ * **Invariants**:
+ *  1. The single `REPL` function MUST be the only React component that owns
+ *     the agent turn-loop kickoff. Sub-components react to its state but do
+ *     not invoke `query()` directly.
+ *  2. Every `useEffect` here is documented with the trigger condition. Adding
+ *     an effect that depends on AppState mutation MUST go through
+ *     `useAppState` selectors, not raw `getAppState()` reads (the latter
+ *     skips React re-renders).
+ *  3. Keybindings registered here are local to the prompt screen. Transcript
+ *     modal owns its own keybindings inside <Transcript>. Don't add a
+ *     "global" handler here that fires while transcript is open.
+ *
+ * **Why not decomposed**:
+ *  V8 attempted to extract sub-components and ran into the
+ *  `feedback_no_repl_loc_decomposition.md` realization: the 5600 LOC reflect
+ *  ~50 React effects all sharing UI state (focus, screen mode, in-flight
+ *  permission, scroll position, search state). Extraction shifts the
+ *  state-sharing burden to props-drilling without reducing total complexity.
+ *  Don't re-attempt without first proving via prototype that the resulting
+ *  prop surface is smaller than the current closure.
+ *
+ * **What goes in PromptInput vs here**:
+ *  PromptInput owns text editing, paste handling, command suggestions,
+ *  argument templates, vim mode. Anything tied to the active turn (in-flight
+ *  permission UI, scroll behaviors during streaming) lives here.
+ */
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import type { RuntimeGraph } from '@claude-code/app-host'
 import { feature } from 'bun:bundle';

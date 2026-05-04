@@ -1,3 +1,51 @@
+/**
+ * sessionStorage.ts — session persistence layer. ~4600 LOC after V8
+ * extracted SessionWriteQueue (186 LOC removed). The remaining
+ * `Project` god-class accumulates 5 internal concerns; further
+ * decomposition was attempted and rejected in V8 as cosmetic.
+ *
+ * **What this file owns**:
+ *  - `Project` class — per-cwd container for sessions, file-history
+ *    snapshots, message replay logs. Owns the on-disk layout under
+ *    `~/.claude/projects/<encoded-cwd>/`.
+ *  - Session lifecycle: create, append, resume, fork, archive.
+ *    Append is the hot path (every assistant turn writes); other
+ *    paths run at most once per session.
+ *  - File-history snapshots: per-edit point-in-time copies for
+ *    `/rewind`. Lives alongside session files in the project dir.
+ *  - `readFileTailSync` — sync sliding-window reader for transcript
+ *    streaming. Separate sync fs imports (line 7) are intentional;
+ *    do not move to `fs/promises` (the streaming UX needs sync).
+ *  - Filename-canonicalization for symlink-safe dedup. Cooperates
+ *    with `fsOperations.isDuplicatePath` indirectly via realpath.
+ *
+ * **Invariants**:
+ *  1. **Append-only on the hot path**. Sessions are append-only JSONL.
+ *     The `SessionWriteQueue` (extracted in V8 to `sessionWriteQueue.ts`)
+ *     batches appends; this file delegates to it. Direct `writeFile`
+ *     to a session JSONL bypasses replay correctness.
+ *  2. **No partial reads visible to consumers**. Streaming reads use
+ *     `readFileTailSync` with explicit byte boundaries; partial JSON
+ *     lines never escape. Test fixture in `__tests__/sessionStorage*.test.ts`
+ *     covers this.
+ *  3. **Project dir layout is a stable contract**. External tools
+ *     (`/resume`, sidecar viewers) inspect the on-disk format.
+ *     `verify-session-format-compat` ratchets this. Changing layout
+ *     is a major version bump territory.
+ *  4. **Atomic writes via temp-then-rename**. The `writeQueue` flushes
+ *     by writing a temp file and renaming. Crash mid-write leaves a
+ *     stale temp, never a torn session.
+ *
+ * **Why not decomposed further** (post-V8 decision, see
+ *  `feedback_no_repl_loc_decomposition.md`):
+ *  Project class concerns are: (1) directory layout, (2) session
+ *  CRUD, (3) file-history CRUD, (4) replay state, (5) symlink/cwd
+ *  canonicalization. Each interlocks via shared paths and mutex
+ *  state. Splitting requires either passing Project around to every
+ *  helper (returns the prop-drilling burden) or making the helpers
+ *  static and re-creating the cwd-lookup logic at every call site
+ *  (duplicates symlink edge cases). Both worse than 4600 LOC.
+ */
 import { feature } from 'bun:bundle'
 import type { UUID } from 'crypto'
 import type { Dirent } from 'fs'

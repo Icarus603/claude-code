@@ -1,7 +1,55 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 /**
- * Hooks are user-defined shell commands that can be executed at various points
- * in Claude Code's lifecycle.
+ * hooks.ts — user-defined shell commands executed at lifecycle events.
+ * ~5200 LOC. The size reflects 18 distinct hook events × {pre, post,
+ * notification} variations × {exec, race-with-timeout, mailbox-route,
+ * structured-IO, sandbox-gate} concerns. Splitting attempted in V8 and
+ * reverted — see `feedback_no_repl_loc_decomposition.md`.
+ *
+ * **Architecture summary**:
+ *
+ *  Hook source           → Storage                 → Dispatch path
+ *  ────────────────────────────────────────────────────────────────
+ *  settings.json         → STATE.registeredHooks   → executeXxxHooks()
+ *  plugin manifest       → STATE.registeredHooks   → executeXxxHooks()
+ *  in-memory (frontmatter) → registerSkillHooks    → executeXxxHooks()
+ *
+ *  All three sources merge into the same STATE.registeredHooks slot
+ *  in app-host. `hasHookForEvent` / `getRegisteredHooks` are the only
+ *  reads; everything else writes via host bindings.
+ *
+ * **Invariants**:
+ *  1. **Single dispatch point per event**: each lifecycle event
+ *     (PreToolUse, PostToolUse, SessionStart, etc.) has ONE
+ *     `executeXxxHooks` function in this file. Adding a new event
+ *     means adding (a) the schema entry, (b) the dispatch fn, (c) the
+ *     event-firing site in the appropriate runtime module.
+ *  2. **Host-binding wires execute*Hooks**: `agentHostBindings.ts`
+ *     wires every `executeXxxHooks` from this file. Adding a new
+ *     event without wiring breaks silently — `verify-host-binding-
+ *     completeness` catches this.
+ *  3. **Stop hooks block but never deadlock**: timeout enforcement
+ *     in `executeStopHooks` is non-negotiable. The agent loop holds
+ *     a turn-level abort signal; stop hooks join it via
+ *     `combinedAbortSignal`.
+ *  4. **Stdout discipline**: hooks write to disk via TaskOutput, not
+ *     to stdout. The REPL captures stdout for the assistant
+ *     stream — a hook polluting it would corrupt the wire.
+ *  5. **No hooks fire from inside other hooks**: re-entrancy guards
+ *     in this file prevent infinite cascades. Don't remove without
+ *     understanding the abort-signal interaction.
+ *
+ * **Common lookup paths** (CLAUDE.md "Where to Look" calls these out):
+ *  - "Stop hook didn't fire" → executeStopHooks → hasHookForEvent →
+ *    getRegisteredHooks (`packages/app-host/.../state/registeredHooks`).
+ *  - "Plugin hooks not loading" → loadPluginHooks.ts (config/plugin)
+ *    writes _deps.ts placeholders → installPluginBindings wires
+ *    through to STATE.registeredHooks.
+ *
+ * **Memory of past bugs**:
+ *  - V8 b78ffd16 envExpansion `:-` truncation surfaced via this file
+ *    (hook env interpolation). Lesson: env-expansion regex changes
+ *    here need parser-edge-input tests.
  */
 import { basename } from 'path'
 import { spawn, type ChildProcessWithoutNullStreams } from 'child_process'

@@ -1,4 +1,49 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
+/**
+ * attachments.ts — system reminder / attachment injection layer
+ * between user input and the model. ~3700 LOC. Each "attachment"
+ * is a structured block prepended/appended to the user message
+ * envelope before it reaches the model.
+ *
+ * **Attachment categories owned here**:
+ *  - **Todo-list reminder**: `TODO_REMINDER_CONFIG`-driven nudge
+ *    that injects "you have N pending todos" when turns since last
+ *    write/reminder cross thresholds.
+ *  - **Mailbox attachments** (delegated to ./attachments/mailbox.js):
+ *    teammate-message envelopes, team-context updates, swarm
+ *    notifications.
+ *  - **Plan-mode banner / boilerplate**: when in plan mode, the
+ *    user message is wrapped with `<plan-mode>` framing telling
+ *    the model not to execute.
+ *  - **Cross-session forks / GitHub-webhook envelopes**: rare
+ *    paths used by `/fork`, `/resume-elsewhere`, GH integration.
+ *  - **System-reminder gates**: every reminder has a turn-counter
+ *    based suppression so models don't see the same nag every
+ *    turn.
+ *
+ * **Invariants**:
+ *  1. **Attachments never mutate user content**. They wrap or
+ *     prepend; the original `<user>` block is preserved verbatim
+ *     so transcript replay reproduces the model's input exactly.
+ *  2. **`TODO_REMINDER_CONFIG` turn counters are monotonic**.
+ *     `turnsSinceLastReminder` and `turnsSinceLastTaskManagement`
+ *     advance once per turn. Resetting them out-of-band breaks the
+ *     suppression heuristic.
+ *  3. **Reminders are single-source-of-truth**. The classifier
+ *     `isClassifierDenial` in `messages.ts` and the reminder gates
+ *     here both look at the same `STATE.lastReminderTurn`. Don't
+ *     fork into per-feature counters.
+ *  4. **`createAttachments` is the only public entry**. Sub-helpers
+ *     are unexported and are NOT to be called from outside this
+ *     file — the wire ordering matters and is enforced here.
+ *
+ * **Why a single big file**:
+ *  Each attachment kind reads several adjacent slices of AppState
+ *  (turn count, last-reminder timestamp, todo state, plan mode,
+ *  team context). Extracting each kind to its own file would
+ *  duplicate the AppState read logic 8+ times or force a shared
+ *  context-object that ends up just being this file again.
+ */
 import {
   getTeammateMailboxAttachments,
   getTeamContextAttachment,

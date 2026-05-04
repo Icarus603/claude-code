@@ -1,9 +1,57 @@
 /**
- * Mode dispatch handler extracted from src/main.tsx.
- * Contains the main run() .action() handler body.
+ * mode-dispatch.ts — the run() entry handler that decides at boot
+ * whether ccb starts as REPL, headless `--print`, setup wizard,
+ * `--continue`, `--resume`, MCP server, or one of ~12 other modes.
+ * ~4400 LOC. Originally extracted wholesale from `src/main.tsx`
+ * (V7 Phase 4 cut-E) without logic change.
  *
- * Structural move only — no logic changed.
- * Moved from src/main.tsx per V7 Phase 4 cut-E.
+ * **What this file owns** (in roughly sequential order):
+ *  1. Argv preprocessing: `preprocessCliArgv` interaction, env-var
+ *     validation, sandbox flag resolution.
+ *  2. `processSessionStartHooks` — runs user hooks BEFORE config
+ *     load, because hooks can mutate env that subsequent loads
+ *     observe.
+ *  3. `loadPluginHooks` — populates STATE.registeredHooks. Plugin
+ *     loaders see this state during the next phase.
+ *  4. MCP prefetch — connects MCP servers in parallel with config
+ *     load to overlap network IO.
+ *  5. Mode branch: REPL vs `--print` vs `--continue` vs `--resume`
+ *     vs `--setup` vs `--mcp` etc. Each branch builds its own
+ *     runtime graph from the same primitives.
+ *
+ * **Invariants** (these are why the file is one 4400-LOC function):
+ *  1. **Phase ordering is load-bearing**. Hooks before config before
+ *     plugins before MCP before mode branch. Reordering breaks
+ *     observed hook env semantics. The single-function shape
+ *     enforces this; splitting risks accidental re-ordering by
+ *     future refactor.
+ *  2. **No early returns past plugin load**. Once plugins are
+ *     loaded, cleanup must run on exit (sigterm handlers,
+ *     auto-update poll, telemetry flush). The function uses
+ *     try/finally to wire this; don't add `process.exit` mid-flow.
+ *  3. **Each mode branch is self-contained**. The `--print` branch
+ *     doesn't fall through to REPL; the REPL branch doesn't
+ *     fall through to `--print`. Mode misclassification is a P0
+ *     UX bug.
+ *  4. **Setup mode is special**. It runs a different React tree
+ *     (no AppState provider, no agent loop). Don't share components
+ *     between setup and REPL without confirming both contexts work.
+ *
+ * **Why not decomposed**:
+ *  V8 considered splitting per-mode handlers into separate files
+ *  but found the shared phase-ordering preamble (steps 1-4 above)
+ *  doesn't have a natural extraction shape. Each mode wants a
+ *  slightly different subset of the prefetched state. Split forces
+ *  either passing 20+ args through or making the prefetch result a
+ *  god-object. Both worse than the current shape.
+ *
+ * **Common edits** that should NOT touch this file:
+ *  - New tool: edit `tool-registry/src/tools/`, not this.
+ *  - New slash command: edit `command-runtime/src/commands/`.
+ *  - New feature flag: edit `scripts/default-features.ts` +
+ *    `internal-modules.d.ts`.
+ *  - Mode-dispatch logic only: when adding a new top-level CLI
+ *    flag that gates a separate startup sequence (rare).
  */
 
 import { feature } from 'bun:bundle'
