@@ -316,6 +316,13 @@ const CHECKS: Check[] = [
     doc: '`as never` is the bottom type — disables type checking entirely AND makes the value assignable to anything. Strictly worse than `as any` because consumption sites stop flagging. Baseline locked to current count; new occurrences must come with --tighten and a documented reason (host-binding shim, branded-type construction, exhaustiveness assertion).',
   },
   {
+    id: 'as-any-ratchet',
+    layer: 'Cross-Cutting',
+    subsystem: 'unsafe-cast accumulation',
+    script: 'scripts/verify-as-any-ratchet.ts',
+    doc: '`as any` opts out of type-checking on downstream uses. The repo has 420 of them as of V9 series end (mostly V7 §7.2 host-binding `missingBinding(name) as any` placeholder pattern, plus provider-adapter dynamic-typing boundaries). Counter-companion to `as-never-ratchet`. Baseline locked to current count; new casts must come with --tighten or by reducing usage elsewhere.',
+  },
+  {
     id: 'console-log-leak',
     layer: 'Cross-Cutting',
     subsystem: 'structured logging discipline',
