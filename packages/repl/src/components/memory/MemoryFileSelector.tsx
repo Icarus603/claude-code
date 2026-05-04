@@ -13,6 +13,7 @@ import {
   getAgentMemoryDir,
   isAutoDreamEnabled,
   isAutoMemoryEnabled,
+  readLastConsolidatedAt,
 } from '@claude-code/memory'
 import * as teamMemPaths from '@claude-code/memory/teamMemPaths'
 import { logEvent } from '@claude-code/local-observability'
@@ -207,17 +208,27 @@ export function MemoryFileSelector({
   // if the user toggles auto-memory off.
   const [showDreamRow] = useState(isAutoMemoryEnabled)
 
-  // Dream status: live task state if currently running, otherwise empty —
-  // the cross-process consolidation lock was removed when ccb switched
-  // from stop-hook autoDream to cron-scheduled `/dream consolidate`.
-  // Last-fire time now lives in `.claude/scheduled_tasks.json` per task,
-  // which is captured below with a simpler "/dream nightly to schedule" hint.
+  // Dream status: live task state if running > "last ran X ago" (read from
+  // `.consolidate-lock` mtime, written by `/dream` and `/dream consolidate`)
+  // > "never" if the lock file doesn't exist > empty during the initial
+  // async read. Mirrors upstream v2.1.123's MemoryFileSelector.
   const isDreamRunning = useAppState(s =>
     Object.values(s.tasks).some(
       t => t.type === 'dream' && t.status === 'running',
     ),
   )
-  const dreamStatus = isDreamRunning ? 'running' : ''
+  const [lastDreamAt, setLastDreamAt] = useState<number | null>(null)
+  useEffect(() => {
+    if (!showDreamRow) return
+    void readLastConsolidatedAt().then(setLastDreamAt)
+  }, [showDreamRow, isDreamRunning])
+  const dreamStatus = isDreamRunning
+    ? 'running'
+    : lastDreamAt === null
+      ? ''
+      : lastDreamAt === 0
+        ? 'never'
+        : `last ran ${formatRelativeTimeAgo(new Date(lastDreamAt))}`
 
   // null = Select has focus, 0 = auto-memory, 1 = auto-dream (if showDreamRow)
   const [focusedToggle, setFocusedToggle] = useState<number | null>(null)
@@ -278,7 +289,7 @@ export function MemoryFileSelector({
             <Text color={focusedToggle === 1 ? 'suggestion' : undefined}>
               Auto-dream: {autoDreamOn ? 'on' : 'off'}
               {dreamStatus && <Text dimColor> · {dreamStatus}</Text>}
-              {!isDreamRunning && autoDreamOn && (
+              {!isDreamRunning && autoDreamOn && lastDreamAt === 0 && (
                 <Text dimColor>
                   {' '}
                   · /dream nightly to schedule, /dream to run now

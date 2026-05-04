@@ -14,6 +14,7 @@ import { feature } from 'bun:bundle'
 import { isAutoMemoryEnabled } from '@claude-code/memory'
 import { buildConsolidationPrompt, getAutoMemPath } from '@claude-code/memory'
 import { isTeamMemoryEnabled } from '@claude-code/memory'
+import { recordConsolidation } from '@claude-code/memory'
 import { getOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import { getProjectDir } from '@claude-code/storage/sessionStorage.js'
@@ -163,7 +164,9 @@ export function registerDreamSkill(): void {
       }
 
       // /dream consolidate [extra] — bare consolidation prompt, no preface.
+      // Stamp the last-ran tracker so /memory's "last ran X ago" line refreshes.
       if (consolidateOnly || (trimmed.startsWith(`${CONSOLIDATE_KEYWORD} `))) {
+        void recordConsolidation()
         return [
           {
             type: 'text',
@@ -177,7 +180,9 @@ export function registerDreamSkill(): void {
         ]
       }
 
-      // /dream [extra] — manual run with prefix.
+      // /dream [extra] — manual run with prefix. Same last-ran stamp as the
+      // cron path: this is a real consolidation, not just a schedule.
+      void recordConsolidation()
       const basePrompt = buildConsolidationPrompt(
         memoryRoot,
         transcriptDir,

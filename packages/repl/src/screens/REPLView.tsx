@@ -2,6 +2,7 @@
 import type { RuntimeGraph } from '@claude-code/app-host'
 import { feature } from 'bun:bundle';
 import { spawnSync } from 'child_process';
+import { cancelAllPendingLoopSessionCrons } from '@claude-code/agent/scheduler';
 import {
   snapshotOutputTokensForTurn,
   getCurrentTurnTokenBudget,
@@ -66,6 +67,7 @@ import {
   getTurnClassifierDurationMs,
   getTurnClassifierCount,
   resetTurnClassifierDuration,
+  isUserActiveForNotifications,
 } from '@claude-code/app-host/bootstrap/state.js';
 import { asSessionId, asAgentId } from '@claude-code/agent/idTypes';
 import { logForDebugging } from '@claude-code/local-observability/debug.js';
@@ -2064,6 +2066,18 @@ export function REPL({
     // It will resume when they submit their next input (see onSubmit).
     if (feature('PROACTIVE') || feature('KAIROS')) {
       proactiveModule?.pauseProactive();
+    }
+
+    // KAIROS LoopDynamic: drop any pending self-paced loop wakeups so an
+    // interrupted loop doesn't keep firing after the user presses Esc.
+    // Mirrors upstream SS1 (resplit/2551.js).
+    if (feature('KAIROS_LOOP_DYNAMIC')) {
+      const cancelled = cancelAllPendingLoopSessionCrons();
+      if (cancelled > 0) {
+        logForDebugging(
+          `[onCancel] cancelled ${cancelled} pending loop wakeup(s)`,
+        );
+      }
     }
 
     queryGuard.forceEnd();
@@ -4120,6 +4134,17 @@ export function REPL({
 
         if (lastUserInteraction > lastQueryCompletionTime) {
           // User has interacted since Claude finished - they're not idle, don't notify
+          return;
+        }
+
+        // ccb refinement (over upstream resplit/5031.js): suppress when the
+        // user is obviously still here. Upstream pings on `messageIdleNotifThresholdMs`
+        // alone, so a user reading a long LLM response without typing gets
+        // notified at their own desk. PushNotificationTool already short-circuits
+        // on `isUserActiveForNotifications()` (terminal focus + recent
+        // keystrokes); applying the same gate here aligns the two idle paths
+        // and avoids the surprising "I'm right here" notification.
+        if (isUserActiveForNotifications()) {
           return;
         }
 

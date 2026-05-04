@@ -754,7 +754,7 @@ export function Config({
     {
       id: 'notifChannel',
       label:
-        feature('KAIROS') || feature('KAIROS_PUSH_NOTIFICATION')
+        feature('KAIROS') || feature('KAIROS_PUSH')
           ? 'Local notifications'
           : 'Notifications',
       value: globalConfig.preferredNotifChannel,
@@ -779,7 +779,7 @@ export function Config({
         })
       },
     },
-    ...(feature('KAIROS') || feature('KAIROS_PUSH_NOTIFICATION')
+    ...(feature('KAIROS') || feature('KAIROS_PUSH')
       ? [
           {
             id: 'taskCompleteNotifEnabled',
@@ -799,7 +799,7 @@ export function Config({
           },
           {
             id: 'inputNeededNotifEnabled',
-            label: 'Push when input needed',
+            label: 'Push when actions required',
             value: globalConfig.inputNeededNotifEnabled ?? false,
             type: 'boolean' as const,
             onChange(inputNeededNotifEnabled: boolean) {

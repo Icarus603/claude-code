@@ -29,6 +29,13 @@ logs/
 # Plugin-local state (e.g. ralph-loop session files)
 .claude/*.local.md
 
+# KAIROS runtime artifacts — per-machine state, never tracked.
+# Note: auto-mem lives under ~/.claude/projects/<encoded-cwd>/memory/ (outside
+# the repo), so .consolidate-lock doesn't need a rule here.
+.claude/scheduled_tasks.json
+.claude/scheduled_tasks.lock
+.claude/loop.md
+
 # Python bytecode (some tooling under .agents/ shells out to python)
 __pycache__/
 *.pyc
