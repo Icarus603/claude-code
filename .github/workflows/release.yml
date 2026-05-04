@@ -71,12 +71,36 @@ jobs:
             test -f "$bin" || { echo "missing $bin"; exit 1; }
             test -f "$bin.sha256" || { echo "missing $bin.sha256"; exit 1; }
           done
-          gh release create "$TAG" \
-            --title "$TAG" \
-            --generate-notes \
-            ccb-darwin-arm64 ccb-darwin-arm64.sha256 \
-            ccb-darwin-x64 ccb-darwin-x64.sha256 \
-            ccb-linux-arm64 ccb-linux-arm64.sha256 \
-            ccb-linux-x64 ccb-linux-x64.sha256 \
-            ccb-windows-x64.exe ccb-windows-x64.exe.sha256
-          echo "✓ Released $TAG with 10 assets"
+          # Retry on transient GitHub API 5xx (saw HTTP 502 once mid-create).
+          # 3 attempts, exponential backoff. `gh release create` is idempotent
+          # per-tag — if the release object got created on a partial run, the
+          # second attempt fails with "already exists" and we fall through
+          # to upload-only mode.
+          for attempt in 1 2 3; do
+            if gh release create "$TAG" \
+              --title "$TAG" \
+              --generate-notes \
+              ccb-darwin-arm64 ccb-darwin-arm64.sha256 \
+              ccb-darwin-x64 ccb-darwin-x64.sha256 \
+              ccb-linux-arm64 ccb-linux-arm64.sha256 \
+              ccb-linux-x64 ccb-linux-x64.sha256 \
+              ccb-windows-x64.exe ccb-windows-x64.exe.sha256 2>/tmp/gh-err; then
+              echo "✓ Released $TAG with 10 assets (attempt $attempt)"
+              exit 0
+            fi
+            if grep -q "already exists" /tmp/gh-err; then
+              echo "release already created on prior attempt; switching to upload"
+              gh release upload "$TAG" --clobber \
+                ccb-darwin-arm64 ccb-darwin-arm64.sha256 \
+                ccb-darwin-x64 ccb-darwin-x64.sha256 \
+                ccb-linux-arm64 ccb-linux-arm64.sha256 \
+                ccb-linux-x64 ccb-linux-x64.sha256 \
+                ccb-windows-x64.exe ccb-windows-x64.exe.sha256
+              echo "✓ Uploaded 10 assets to existing $TAG"
+              exit 0
+            fi
+            cat /tmp/gh-err
+            sleep $((attempt * 5))
+          done
+          echo "✗ failed after 3 attempts"
+          exit 1
