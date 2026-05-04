@@ -34,6 +34,7 @@ stays unchanged.
 | V9-2 | §2 | Delete 6 dead unknown setter slots in `_deps.ts` (revised plan: turned out to be dead code, not import-type rewrite candidates) | Low | **✅ landed 2026-05-04** — `unknownSlots` 6 → 0 |
 | V9-2.5 | §2 | Delete 3 additional dead LSP/MCP getter pairs (`_getLspManager`, `_getMcpTypes`, `_expandMcpEnv` — verify-deps-quality blind spot since their slot type is `() => unknown` not bare `unknown`) | Low | **✅ landed 2026-05-04** — 3 more dead pairs gone, 75 LOC + 1 require to non-existent `src/` path |
 | V9-2.6 | §2 | Fix broken `isDuplicatePath` stub (was `(a, b) => a === b`, callers passed 3 args — plugin-loader path-dedup silently never fired). Replace with real symlink-resolving impl. | Medium (real bug fix) | **✅ landed 2026-05-04** — caller arity fixed in 6 sites, regression test added |
+| V9-2.7 | §2 | Delete 4 dead exports (`safeParseJSON`, `BUILTIN_PLUGIN_IDS`, `checkBinaryExists` chain) + dead `storage/fsOperations.ts:isDuplicatePath` (post-V9-2.6 stale). Caller `lspRecommendation.ts` switched to direct `@claude-code/updater/binaryCheck.js` import. **Discovered second broken-stub bug**: `coerceDescriptionToString` 1-arg local stub returned `''` instead of `null`, breaking the `??` fallback chain in 5 plugin-loader callsites. Fixed by re-exporting the real 3-arg impl from `frontmatterParser.ts`. | Medium (1 real bug + dead code) | **✅ landed 2026-05-04** — 7-case regression test added, ~80 LOC removed |
 | V9-2b | §4 | `tool-registry/progressTypes.ts` 11 slots → `import type` | Low | ~20 TS2339 |
 | V9-2c | §4 | `swarm/adapters/appRuntime.ts` 13 slots → `import type` | Medium | ~30 TS2339 + some TS2345 |
 | V9-2d | §4 | `cli/src/headless.ts` 5 slots → `import type` | Low | ~15 TS2339 |
@@ -236,7 +237,7 @@ subsequent slots in V9-2d / V9-3 — always read first.
 
 ## §2. `_deps.ts` 6 unknown-typed setter slots
 
-> **✅ V9-2 + V9-2.5 + V9-2.6 LANDED 2026-05-04**
+> **✅ V9-2 + V9-2.5 + V9-2.6 + V9-2.7 LANDED 2026-05-04**
 >
 > - V9-2 + V9-2.5: 11 dead slot pairs deleted (8 bare unknown +
 >   3 `() => unknown` survivors). `verify-deps-quality` ratchet
@@ -245,6 +246,12 @@ subsequent slots in V9-2d / V9-3 — always read first.
 >   while every caller passed 3 args. Plugin-loader symlink-aware
 >   path-dedup silently never fired. Fixed: real impl + test.
 >   See "V9-2.6: caller-counting found a real bug" section below.
+> - V9-2.7: 4 more dead exports + a SECOND broken-stub bug
+>   (`coerceDescriptionToString` 1-arg returning `''` instead of
+>   the real 3-arg impl returning `null`, breaking the `??`
+>   fallback chain at 5 plugin-loader callsites). Fix: re-export
+>   the real impl. Test added. See "V9-2.7: delete-and-discover"
+>   section below.
 >
 > Earlier sections of this §2 (Inventory table with 6 rows, "Why
 > these are unknown today", "Dead-on-arrival realisation") are
@@ -460,6 +467,97 @@ caller-vs-forwarder arity. Future work could:
   invariant against future drift, but the current state is already
   clean. Decide based on whether more `_deps.ts`-style files exist
   (they don't, per `find packages -name "_deps.ts"`).
+
+### V9-2.7: delete-and-discover — same caller-counting found a SECOND broken stub
+
+V9-2.7's plan was clean dead-code deletion: 4 exports flagged by
+caller-counting (`safeParseJSON`, `BUILTIN_PLUGIN_IDS`,
+`checkBinaryExists`-chain, plus the post-V9-2.6 stale
+`storage/fsOperations.ts:isDuplicatePath`). Same plan as V9-2 — no
+correctness change expected, just `~80 LOC` of dead removed.
+
+I also flagged `coerceDescriptionToString` as dead (0 callers per
+the import-path-filtered grep). On running `verify-build-resolves`
+post-deletion: **build broke**. Five callers in
+`config/plugin/loadPlugin{Agents,OutputStyles,Commands}.ts` had
+been importing from `_deps.js` — my caller-count was wrong.
+
+But the fix wasn't to put the dead stub back. Reading the local
+stub at `_deps.ts:722`:
+
+```ts
+export function coerceDescriptionToString(v: unknown): string {
+  if (typeof v === 'string') return v
+  if (v == null) return ''
+  return String(v)
+}
+```
+
+vs the REAL impl at `config/frontmatterParser.ts:304`:
+
+```ts
+export function coerceDescriptionToString(
+  value: unknown,
+  componentName?: string,
+  pluginName?: string,
+): string | null {
+  if (value == null) return null
+  if (typeof value === 'string') return value.trim() || null
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  // Non-scalar — log and return null
+  ...
+}
+```
+
+**Different signature. Different return type. Different semantics.**
+Caller at `loadPluginAgents.ts:94`:
+
+```ts
+coerceDescriptionToString(frontmatter.description, agentType) ??
+  extractDescriptionFromMarkdown(...)
+```
+
+Caller's intent: invalid description → coerce returns `null` →
+`??` fallback fires → `extractDescriptionFromMarkdown` provides
+default. With the broken local stub: invalid description → returns
+`''` → `'' ?? x` is `''` (`??` only triggers on `null/undefined`)
+→ fallback NEVER fires → plugins ship with empty descriptions.
+
+**Same bug class as V9-2.6 isDuplicatePath**: a local stub silently
+shadowing a real impl, with arity AND return-type mismatch, breaking
+caller logic without any test or type error.
+
+Fix: replace the local stub with `export {
+coerceDescriptionToString } from '../frontmatterParser.js'`. Caller
+imports stay unchanged (still from `./_deps.js`); now they get the
+real 3-arg impl that returns `string | null`. Regression test added
+at `packages/config/plugin/__tests__/coerceDescriptionToString.test.ts`
+(7 cases), notably:
+
+- `null` input → `null` (NOT `''`)
+- empty/whitespace string → `null` (NOT `''`)
+- objects/arrays → `null` (NOT `[object Object]`)
+
+**Validation**:
+- `bun test`: 8222 → 8229 (1 new file, 7 cases)
+- `doctor:arch`: 77/77
+- `verify-deps-quality`: lazy=0, unknown=0 (unchanged)
+- `bun run build`: dist/cli.js -1840 bytes (real DCE)
+
+**Lesson**:
+1. The "delete dead code" plan can surface live bugs when the
+   "dead" code is actually a stub shadowing the real impl. **Always
+   run build-resolves after each deletion**, not just at the end.
+2. Caller-counting via grep CAN miss callers when filter logic
+   is too aggressive (here: I filtered out `_deps.js` callers when
+   I should have filtered out non-`_deps.js` callers). When in
+   doubt, run with NO filter and inspect each line.
+3. Same broken-stub pattern hit twice (V9-2.6 + V9-2.7) — strongly
+   suggests `_deps.ts` was hand-typed at V7 from incomplete
+   memory of the real impls. Worth a pass to look for more
+   broken stubs whose return values would silently miscompare:
+   any local impl where signature doesn't match every caller's
+   call shape is suspect.
 
 ---
 

@@ -337,23 +337,16 @@ export function setExecFileNoThrowWithCwdFn(
 }
 
 // ---------------------------------------------------------------------------
-// `which` + `binaryCheck`
+// `which`
 // ---------------------------------------------------------------------------
 
 let _which: (cmd: string) => Promise<string | null> = async () => null
-let _checkBinaryExists: (cmd: string) => Promise<boolean> = async () => false
 
 export function which(cmd: string): Promise<string | null> {
   return _which(cmd)
 }
-export function checkBinaryExists(cmd: string): Promise<boolean> {
-  return _checkBinaryExists(cmd)
-}
 export function setWhichFn(fn: typeof _which): void {
   _which = fn
-}
-export function setCheckBinaryExistsFn(fn: typeof _checkBinaryExists): void {
-  _checkBinaryExists = fn
 }
 
 // ---------------------------------------------------------------------------
@@ -427,16 +420,6 @@ export function setJsonParseFn(fn: typeof _jsonParse): void {
 }
 export function setCloneFn(fn: typeof _clone): void {
   _clone = fn
-}
-
-/** safe JSON.parse — returns null on error */
-export function safeParseJSON(json: string | null | undefined): unknown {
-  if (!json) return null
-  try {
-    return JSON.parse(json)
-  } catch {
-    return null
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -586,51 +569,31 @@ export function getBuiltinPluginDefinition(id: string): unknown {
   return _getBuiltinPluginDefinitionFn(id)
 }
 
-// Constant-lookalike collections kept as getter-backed proxies so existing
-// callers that iterate them (e.g., `for (const id of BUILTIN_PLUGIN_IDS)`)
-// see the wired contents.
-function getBuiltinSnapshot(): {
-  idList: string[]
-  map: Record<string, unknown>
-} {
+// Constant-lookalike collection kept as getter-backed proxy so existing
+// callers that iterate it see the wired contents. (BUILTIN_PLUGIN_IDS
+// removed in V9-2.7 as 0-caller dead code.)
+function getBuiltinPluginsMap(): Record<string, unknown> {
   const result = _getBuiltinPluginsFn()
   const all = [...result.enabled, ...result.disabled]
   const map: Record<string, unknown> = {}
-  const idList: string[] = []
   for (const plugin of all) {
     const pid = (plugin as { id?: string; name?: string })?.id ??
       (plugin as { name?: string })?.name
-    if (pid) {
-      map[pid] = plugin
-      idList.push(pid)
-    }
+    if (pid) map[pid] = plugin
   }
-  return { idList, map }
+  return map
 }
 
 export const BUILTIN_PLUGINS: Record<string, unknown> = new Proxy(
   {} as Record<string, unknown>,
   {
-    ownKeys: () => Object.keys(getBuiltinSnapshot().map),
+    ownKeys: () => Object.keys(getBuiltinPluginsMap()),
     getOwnPropertyDescriptor: (_t, key) =>
-      Object.getOwnPropertyDescriptor(getBuiltinSnapshot().map, key),
-    has: (_t, key) => key in getBuiltinSnapshot().map,
-    get: (_t, key) => getBuiltinSnapshot().map[key as string],
+      Object.getOwnPropertyDescriptor(getBuiltinPluginsMap(), key),
+    has: (_t, key) => key in getBuiltinPluginsMap(),
+    get: (_t, key) => getBuiltinPluginsMap()[key as string],
   },
 )
-
-export const BUILTIN_PLUGIN_IDS: string[] = new Proxy([] as string[], {
-  get: (_t, key) => {
-    const snap = getBuiltinSnapshot().idList
-    if (key === 'length') return snap.length
-    if (typeof key === 'string' && /^\d+$/.test(key)) return snap[Number(key)]
-    return (snap as unknown as Record<string | symbol, unknown>)[key]
-  },
-  has: (_t, key) => key in getBuiltinSnapshot().idList,
-  ownKeys: () => Object.keys(getBuiltinSnapshot().idList),
-  getOwnPropertyDescriptor: (_t, key) =>
-    Object.getOwnPropertyDescriptor(getBuiltinSnapshot().idList, key),
-}) as unknown as string[]
 
 export function setGetBuiltinPluginsFn(fn: () => BuiltinPluginResult): void {
   _getBuiltinPluginsFn = fn
@@ -718,12 +681,13 @@ export const setClearCommandsCacheFn = setClearCommandsCacheFn_
 export const setClearPromptCacheFn = setClearPromptCacheFn_
 export const setClearRegisteredPluginHooksFn = setClearRegisteredPluginHooksFn_
 
-// -- string / parse helpers
-export function coerceDescriptionToString(v: unknown): string {
-  if (typeof v === 'string') return v
-  if (v == null) return ''
-  return String(v)
-}
+// coerceDescriptionToString — re-export the real impl. (V9-2.7: removed a
+// broken local stub that took 1 arg and returned '' instead of null,
+// silently disabling the `?? extractDescriptionFromMarkdown(...)` fallback
+// at every plugin-loader callsite. Same bug class as the V9-2.6
+// isDuplicatePath stub.)
+export { coerceDescriptionToString } from '../frontmatterParser.js'
+
 // extractDescriptionFromMarkdown lives in @claude-code/config/utils/markdownDescription
 // — moved out of tool-registry to break the config → tool-registry cycle.
 const [_getExtractDescriptionFromMarkdown, setExtractDescriptionFromMarkdownFn_] =
@@ -871,7 +835,6 @@ export function getErrnoPath(e: unknown): string | undefined {
   if (e && typeof e === 'object' && 'path' in e) return (e as { path?: string }).path
   return undefined
 }
-export function isBinaryInstalled(_cmd: string): Promise<boolean> { return checkBinaryExists(_cmd) }
 /**
  * Returns true if `filePath` (after symlink resolution) is already in
  * `loadedPaths`. If not, adds the resolved path to `loadedPaths` and

@@ -19,7 +19,6 @@
 
 import {
   setBuildPluginTelemetryFieldsFn,
-  setCheckBinaryExistsFn,
   setClassifyPluginCommandErrorFn,
   setCloneFn,
   setExecFileNoThrowFn,
@@ -112,7 +111,6 @@ import {
   getSessionId,
   registerHookCallbacks,
 } from '../bootstrap/state.js'
-import { isBinaryInstalled } from '@claude-code/updater/binaryCheck.js'
 import { registerCleanup } from '../bootstrap/cleanupRegistry.js'
 import { getCwd } from '../bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
@@ -471,7 +469,6 @@ export function installPluginBindings(): void {
     execFileNoThrowWithCwd(cmd, args, cwd, options) as any,
   )
   setWhichFn(cmd => which(cmd))
-  setCheckBinaryExistsFn(cmd => isBinaryInstalled(cmd))
 
   // --- slow ops
   setJsonStringifyFn(v => jsonStringify(v))

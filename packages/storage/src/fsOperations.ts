@@ -178,26 +178,6 @@ export function safeResolvePath(
 }
 
 /**
- * Check if a file path is a duplicate and should be skipped.
- * Resolves symlinks to detect duplicates pointing to the same file.
- * If not a duplicate, adds the resolved path to loadedPaths.
- *
- * @returns true if the file should be skipped (is duplicate)
- */
-export function isDuplicatePath(
-  fs: FsOperations,
-  filePath: string,
-  loadedPaths: Set<string>,
-): boolean {
-  const { resolvedPath } = safeResolvePath(fs, filePath)
-  if (loadedPaths.has(resolvedPath)) {
-    return true
-  }
-  loadedPaths.add(resolvedPath)
-  return false
-}
-
-/**
  * Resolve the deepest existing ancestor of a path via realpathSync, walking
  * up until it succeeds. Detects dangling symlinks (link entry exists, target
  * doesn't) via lstat and resolves them via readlink.
