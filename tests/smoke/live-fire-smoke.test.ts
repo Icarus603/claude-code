@@ -114,8 +114,28 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
       if (stepCount > 100) break
     }
 
-    // The marker file is the proof. If hooks never fired, this is missing.
+    // Generator drain returns when the hook process is launched but spawn
+    // I/O may finalize on the next tick — poll briefly for the marker
+    // before asserting. Linux CI runners have shown 26-37ms-fast fails
+    // under v26.5.18 release runs even when the spawn succeeded.
     const markerPath = join(markerDir, 'Stop.fired')
+    const deadline = Date.now() + 5000
+    while (!existsSync(markerPath) && Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, 50))
+    }
+
+    if (!existsSync(markerPath)) {
+      // Diagnostic: dump fixture state so a future failure is debuggable.
+      const fixtureExists = existsSync(HOOK_FILE)
+      const fixtureMode = fixtureExists ? readdirSync(FIXTURE_ROOT).join(',') : 'missing'
+      const markerDirContents = readdirSync(markerDir).join(',') || '(empty)'
+      throw new Error(
+        `Stop.fired marker not observed after 5s. ` +
+          `markerDir=${markerDir} contents=${markerDirContents} ` +
+          `hookFile=${HOOK_FILE} exists=${fixtureExists} fixtureRoot=${fixtureMode} ` +
+          `stepCount=${stepCount}`,
+      )
+    }
     expect(existsSync(markerPath)).toBe(true)
   }, 30_000)
 })
