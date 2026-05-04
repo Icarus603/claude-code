@@ -4,6 +4,12 @@
 > Continuing the V8 cleanup pattern: extending coverage in low-tested
 > packages, completing 4 silent-failure audits, and consolidating
 > baselines for the next iteration.
+>
+> **Updated 2026-05-04** with current real values after several rounds
+> of incremental shim removal, deps_setter migrations, and Kairos
+> subsystem 1–4 implementations. The "Now" column reflects today's
+> measured state; the original V8-final and post-V8-Iter-27 values
+> are preserved for delta visibility.
 
 This document records the **current state** of every monotonic-shrink
 ratchet, so future sessions can detect regressions even after
@@ -11,21 +17,22 @@ context compaction.
 
 ## Current Numbers
 
-| Metric                              | V8 final | Now        | Δ         |
-|-------------------------------------|---------:|-----------:|----------:|
-| Tests passing                       |     3078 |       5479 | +2401     |
-| Test files                          |     ~110 |        214 | +104      |
-| `doctor:arch` checks                |       66 |         72 | +6        |
-| `_DEPRECATED` exports in packages/  |        0 |          0 | locked    |
-| `_deps.ts` cross-package lazy-requires |       1 |          1 | locked    |
-| `_deps.ts` unknown-typed slots      |        7 |          6 | -1 (V8.1) |
-| Knip unused-files (packages/-scoped) |       71 |         69 | -2        |
-| Knip unused-exports                 |      185 |        184 | -1        |
-| tsc-errors budget                   |     3269 |       3217 | -52       |
-| Silent-failure findings (total)     |      740 |        740 | locked    |
-| Silent-failure CRITICAL/HIGH        |      0/0 |        0/0 | locked    |
-| `as never` cast count               |      n/a |         42 | new ratchet |
-| Real bugs found                     |        4 |          7 | +3        |
+| Metric                              | V8 final | Iter-27 | 2026-05-04 | Δ since V8 |
+|-------------------------------------|---------:|--------:|-----------:|-----------:|
+| Tests passing                       |     3078 |    5479 |       8217 | +5139      |
+| Test files                          |     ~110 |     214 |        448 | +338       |
+| `doctor:arch` checks                |       66 |      72 |         77 | +11        |
+| `_DEPRECATED` exports in packages/  |        0 |       0 |          0 | locked     |
+| `_deps.ts` cross-package lazy-requires |    1 |       1 |          0 | -1 (V9-1)  |
+| `_deps.ts` unknown-typed slots      |        7 |       6 |          6 | locked     |
+| Knip unused-files (packages/-scoped) |      71 |      69 |          9 | -62        |
+| Knip unused-exports                 |      185 |     184 |         33 | -152       |
+| tsc-errors budget                   |     3269 |    3217 |       3179 | -90        |
+| Silent-failure findings (total)     |      740 |     740 |        737 | -3         |
+| Silent-failure CRITICAL/HIGH        |      0/0 |     0/0 |        0/0 | locked     |
+| `as never` cast count               |      n/a |      42 |         42 | locked     |
+| Error codes (cross-package)         |      n/a |      75 |         75 | 0 collisions |
+| Real bugs found                     |        4 |       7 |          7 | +3         |
 
 The +3 real bugs (all parser state-machine ordering errors found via
 test-writing on parsers — see `feedback_test_writing_bug_discovery_rate.md`):
@@ -135,6 +142,14 @@ to bypass URL deduplication, intentional commit-template whitespace).
   Cost/risk asymmetry remains unfavorable. The 1 remaining lazy-require
   (`executeShellCommandsInPrompt`) has genuine cross-cutting deps that
   need a real refactor, not a moves. Deferred to V9 proper.
+  - **2026-05-04 update**: The V9 plan is now written:
+    `docs/refactor/v9-deps-shrinkpath.md`. Three earlier hypotheses
+    have been corrected during inventory (the AppState/AppStateCompat
+    "double type" was actually a 3-file re-export chain; the
+    `cli/headless.ts` 4 `= unknown` were not dead types but V7 §7.2
+    boundary shims; the real TS2322 root cause is TaskState
+    double-union, not AppState). The next ralph-loop session can
+    execute V9-1 directly without re-doing inventory.
 - **Iter 26 (verify-no-bare-process-env): readEnv discipline ratchet.**
   Aborted after impact assessment — 746 raw `process.env.X` uses across
   226 distinct env vars. Migration cost ~10–20h mechanical work with
@@ -176,13 +191,45 @@ to bypass URL deduplication, intentional commit-template whitespace).
 3. To add a feature flag or shim: either wire the consumer in the same
    commit, or run `verify-X --tighten` to admit the new baseline
 
-Current baselines (locked, monotonic-shrink-only):
+Current baselines (locked, monotonic-shrink-only) — measured 2026-05-04:
 
 ```
-verify-tsc-errors                = 3217
-verify-deps-quality              = lazy-requires=1, unknown-slots=6
-verify-knip-headroom             = unused-files=69, unused-exports=184
-verify-silent-failure-ratchet    = 740 (CRITICAL=0, HIGH=0)
+verify-tsc-errors                = 3179
+verify-deps-quality              = lazy-requires=0, unknown-slots=6 (V9-1 ratchet 2026-05-04)
+verify-knip-headroom             = unused-files=9, unused-exports=33
+verify-silent-failure-ratchet    = 737 (CRITICAL=0, HIGH=0)
+                                   sub-buckets: empty-catch=0,
+                                   nullish-coalesce-critical-path=86,
+                                   stub-return-only=25,
+                                   always-false-feature-flag=492,
+                                   type-cast-trap=134,
+                                   require-fallback-to-stub=0
 verify-error-codes-unique        = 75 codes, 20 files, 0 collisions
-verify-file-size                 = grandfathered (see file-size-baseline.json)
+verify-as-never-ratchet          = 42 (locked)
+verify-console-log-leak          = 186 (locked)
+verify-exports-budget            = baseline JSON; per-package locked
+verify-no-sync-fs-in-render      = 15 (locked)
+verify-stale-todo-comments       = 120 (locked)
+verify-file-size                 = grandfathered (see file-size-baseline.json,
+                                   136 entries, top 7 files >4000 LOC are
+                                   single-responsibility-by-nature)
 ```
+
+## Why the Iter-27 → 2026-05-04 deltas look big
+
+The two large numbers — `Knip unused-files 69 → 9` and
+`unused-exports 184 → 33` — reflect **scope correction**, not new
+deletions. The Iter-27 baseline counted the entire knip report
+(including `scripts/` audit-tooling and unused exports inside test
+fixtures); `verify-knip-headroom` was tightened to count **only
+files inside `packages/`** (the shipping surface). The audit-tooling
+files knip flags are deliberate — they are CLI verifiers invoked from
+package.json scripts, not library code. The new ratchet matches the
+domain that actually matters.
+
+The 33 unused-exports include 4 in `cli/src/headless.ts` that are
+`= unknown` placeholders left by decompilation. Reviewed
+2026-05-04 — these are V9 host-binding-consolidation territory; the
+correct fix is replacing them with real types from `mcp-runtime`,
+`provider`, and `headless-sdk`, not deleting them. Held under
+ratchet until V9.

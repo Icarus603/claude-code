@@ -843,35 +843,20 @@ type ExpandEnvVarsResult = { expanded: string; missingVars: string[] }
 const [_getExpandEnvVarsInString, setExpandEnvVarsInStringFn_] = makeSetter(
   _canonicalExpandEnvVarsInString,
 )
-// V7 §3.2 — executeShellCommandsInPrompt lazy-resolved from
-// command-runtime/promptShellExecution. Default returns empty string,
-// which would silently strip all `!cmd` shell-substitution markers
-// from plugin command bodies.
-let _cachedExecuteShellCommandsInPrompt:
-  | ((prompt: string, ...rest: unknown[]) => Promise<string>)
-  | null = null
+// executeShellCommandsInPrompt is wired by installPluginBindings.ts at
+// composition time (deferred-require pattern, like every other setter
+// here). Default is passthrough — if a caller reaches this without
+// host setup having run, the prompt is returned unchanged. (The
+// previous fallback used require() to self-resolve command-runtime,
+// but it never actually saved any caller: command-runtime needs
+// BashTool, hasPermissionsToUseTool, processToolResultBlock and 13
+// other cross-package deps which all fail without host setup. The
+// require()-fallback was defensive-looking dead code; passthrough is
+// the truthful default. V9-1, 2026-05-04.)
 const [_getExecuteShellCommandsInPrompt, setExecuteShellCommandsInPromptFn_] =
-  makeSetter(async (prompt: string, ...rest: unknown[]): Promise<string> => {
-    if (_cachedExecuteShellCommandsInPrompt == null) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const mod = require('@claude-code/command-runtime/promptShellExecution.js') as {
-          executeShellCommandsInPrompt?: (
-            prompt: string,
-            ...rest: unknown[]
-          ) => Promise<string>
-        }
-        if (typeof mod.executeShellCommandsInPrompt === 'function') {
-          _cachedExecuteShellCommandsInPrompt = mod.executeShellCommandsInPrompt
-        }
-      } catch {
-        /* command-runtime not loadable — fall back to passthrough */
-      }
-    }
-    return _cachedExecuteShellCommandsInPrompt
-      ? _cachedExecuteShellCommandsInPrompt(prompt, ...rest)
-      : prompt
-  })
+  makeSetter(
+    async (prompt: string, ..._rest: unknown[]): Promise<string> => prompt,
+  )
 const [_getRipGrep, setRipGrepFn_] = makeSetter(async (..._args: unknown[]): Promise<string> => '')
 const [_getUnzipFile, setUnzipFileFn_] = makeSetter(async (_zipPath: string, _destDir: string): Promise<void> => {})
 export function extractDescriptionFromMarkdown(text: string, defaultDescription?: string): string {

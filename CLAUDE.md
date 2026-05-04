@@ -254,3 +254,4 @@ bun run release v26.4.14
 - **Plugin not loaded**: `packages/config/plugin/pluginLoader.ts:loadAllPluginsCacheOnly`, `loadPluginHooks.ts`.
 - **CLAUDE.md not picked up**: `packages/storage/src/claudemd.ts`.
 - **Feature flag not taking effect**: check `scripts/default-features.ts:STABLE_FEATURES` (build/dev) and `FEATURE_X=1` env var (per-run).
+- **V9 territory** (next major refactor pass — type narrowing through `import type`): `docs/refactor/v9-deps-shrinkpath.md` is the launch blueprint. Five sections cover §1 the last `_deps.ts` lazy-require (✅ V9-1 landed 2026-05-04), §2 6 unknown setter slots, §3 TaskState double-union, §4+§5 the 95-slot `= unknown` boundary-shim ecosystem. Each phase has an atomic-rollback assessment.
