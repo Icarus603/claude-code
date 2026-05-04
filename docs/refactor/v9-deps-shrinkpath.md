@@ -33,6 +33,7 @@ stays unchanged.
 | V9-1 | §1 | Delete dead defensive `require()` fallback in `_deps.ts` (was over-engineered to "host binding" plan; reality was simpler) | Low | **✅ landed 2026-05-04** — `lazyRequires` 1 → 0 |
 | V9-2 | §2 | Delete 6 dead unknown setter slots in `_deps.ts` (revised plan: turned out to be dead code, not import-type rewrite candidates) | Low | **✅ landed 2026-05-04** — `unknownSlots` 6 → 0 |
 | V9-2.5 | §2 | Delete 3 additional dead LSP/MCP getter pairs (`_getLspManager`, `_getMcpTypes`, `_expandMcpEnv` — verify-deps-quality blind spot since their slot type is `() => unknown` not bare `unknown`) | Low | **✅ landed 2026-05-04** — 3 more dead pairs gone, 75 LOC + 1 require to non-existent `src/` path |
+| V9-2.6 | §2 | Fix broken `isDuplicatePath` stub (was `(a, b) => a === b`, callers passed 3 args — plugin-loader path-dedup silently never fired). Replace with real symlink-resolving impl. | Medium (real bug fix) | **✅ landed 2026-05-04** — caller arity fixed in 6 sites, regression test added |
 | V9-2b | §4 | `tool-registry/progressTypes.ts` 11 slots → `import type` | Low | ~20 TS2339 |
 | V9-2c | §4 | `swarm/adapters/appRuntime.ts` 13 slots → `import type` | Medium | ~30 TS2339 + some TS2345 |
 | V9-2d | §4 | `cli/src/headless.ts` 5 slots → `import type` | Low | ~15 TS2339 |
@@ -235,10 +236,15 @@ subsequent slots in V9-2d / V9-3 — always read first.
 
 ## §2. `_deps.ts` 6 unknown-typed setter slots
 
-> **✅ V9-2 + V9-2.5 LANDED 2026-05-04** — `verify-deps-quality`
-> ratchet now reports `unknownSlots=0`. Total 11 dead slot pairs
-> deleted (8 bare unknown + 3 `() => unknown` survivors). See
-> "Realised V9-2 + V9-2.5 deletion" section below.
+> **✅ V9-2 + V9-2.5 + V9-2.6 LANDED 2026-05-04**
+>
+> - V9-2 + V9-2.5: 11 dead slot pairs deleted (8 bare unknown +
+>   3 `() => unknown` survivors). `verify-deps-quality` ratchet
+>   now reports `unknownSlots=0`.
+> - V9-2.6: a real bug — `isDuplicatePath` was `(a, b) => a === b`
+>   while every caller passed 3 args. Plugin-loader symlink-aware
+>   path-dedup silently never fired. Fixed: real impl + test.
+>   See "V9-2.6: caller-counting found a real bug" section below.
 >
 > Earlier sections of this §2 (Inventory table with 6 rows, "Why
 > these are unknown today", "Dead-on-arrival realisation") are
@@ -394,6 +400,66 @@ ratchet (`unknownSlots: 6 → 0`) without depending on the larger
 host-binding work. Recommend doing this **before** the AppState
 unification in §3 because the AppState work depends on a clean
 binding-typing story.
+
+### V9-2.6: caller-counting found a real bug, not just dead code
+
+The same caller-counting grep that surfaced V9-2's 11 dead
+getter/setter pairs also surfaced a pure stub at `_deps.ts:875`:
+
+```ts
+// Before — broken
+export function isDuplicatePath(a: string, b: string): boolean {
+  return a === b
+}
+
+// Caller (loadPluginCommands.ts, loadPluginAgents.ts, loadPluginOutputStyles.ts):
+const fs = getFsImplementation()
+if (isDuplicatePath(fs, filePath, loadedPaths)) return  // 3 args!
+```
+
+The forwarder declared `(a, b)` but every caller passed `(fs, filePath,
+loadedPaths)`. JavaScript silently drops extra args; the body
+compared `fs === filePath` (always false because object ≠ string).
+**Result: the symlink-aware path-dedup logic in plugin loaders never
+fired**. Two different plugin paths pointing at the same physical
+markdown file via symlink would each load the file as a separate
+plugin entity. The actual symlink-resolving implementation lived in
+`storage/fsOperations.ts:isDuplicatePath`, but `config/plugin/_deps`
+can't import it directly without a layer-rule violation.
+
+**Fix landed**:
+- `_deps.ts:isDuplicatePath` rewritten with the real
+  `realpathSync`-based logic, signature `(filePath, loadedPaths)` (2
+  args).
+- `node:fs.realpathSync` invoked directly via `require()` rather
+  than through the wired `PluginFsImpl`. realpath is a pure
+  syscall (name resolution, not state I/O) so the sandbox/virtual-fs
+  abstraction adds no value here, AND going direct sidesteps a
+  test-isolation hazard with module-level `_fs` slots.
+- All 6 callsites in `loadPluginAgents.ts`,
+  `loadPluginOutputStyles.ts`, `loadPluginCommands.ts` updated to
+  drop the now-unused `fs` argument.
+- Regression test added: `packages/config/plugin/__tests__/isDuplicatePath.test.ts`
+  with 5 cases including symlink dedup and dangling-path fallback.
+
+**Validation**:
+- `bun test`: 8221 → 8222 (1 new test file with 5 cases).
+- `bun run doctor:arch`: 77/77 unchanged.
+- `bun run build`: dist/cli.js +66 bytes (real impl + try/catch
+  + comment; the bytes are correctness, not bloat).
+
+**Lesson**: caller-counting grep is more productive than verifier
+detectors for finding bugs disguised as forwarders. The
+verify-deps-quality ratchet looks at slot type shape, not at
+caller-vs-forwarder arity. Future work could:
+- Build an arity-mismatch verifier (scripts/verify-forwarder-arity.ts)
+  that flags `_deps.ts` exports whose declared arity is less than
+  the maximum caller arity.
+- BUT: the V9-1 + V9-2 + V9-2.5 + V9-2.6 cleanup pass has likely
+  exhausted the high-yield findings. The detector would lock the
+  invariant against future drift, but the current state is already
+  clean. Decide based on whether more `_deps.ts`-style files exist
+  (they don't, per `find packages -name "_deps.ts"`).
 
 ---
 

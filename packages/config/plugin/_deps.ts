@@ -872,7 +872,38 @@ export function getErrnoPath(e: unknown): string | undefined {
   return undefined
 }
 export function isBinaryInstalled(_cmd: string): Promise<boolean> { return checkBinaryExists(_cmd) }
-export function isDuplicatePath(a: string, b: string): boolean { return a === b }
+/**
+ * Returns true if `filePath` (after symlink resolution) is already in
+ * `loadedPaths`. If not, adds the resolved path to `loadedPaths` and
+ * returns false.
+ *
+ * NOTE: This used to be `(a, b) => a === b` — a broken stub that
+ * compared a fs object to a string. The actual symlink-resolving logic
+ * lives in storage/fsOperations.ts, but its signature takes
+ * `FsOperations` not `PluginFsImpl`, so we cannot delegate directly
+ * across the layer boundary. Inlined here.
+ *
+ * Uses `node:fs.realpathSync` directly rather than the wired
+ * PluginFsImpl: realpathSync is a pure-syscall operation with no
+ * sandbox/virtual-fs concern (it's not a write op, it's a name
+ * resolution). Going direct avoids module-level wire state being a
+ * test-isolation hazard.
+ */
+export function isDuplicatePath(filePath: string, loadedPaths: Set<string>): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const nodeFs = require('node:fs') as typeof import('node:fs')
+  let resolved: string
+  try {
+    resolved = nodeFs.realpathSync(filePath)
+  } catch {
+    // realpath fails on dangling symlinks / non-existent paths; fall back
+    // to the literal path so the caller can still de-dupe identical inputs.
+    resolved = filePath
+  }
+  if (loadedPaths.has(resolved)) return true
+  loadedPaths.add(resolved)
+  return false
+}
 const [_getIsFsInaccessible, setIsFsInaccessibleFn_] = makeSetter((_err: unknown): boolean => false)
 export function isFsInaccessible(err: unknown): boolean { return _getIsFsInaccessible()(err) }
 export const setIsFsInaccessibleFn = setIsFsInaccessibleFn_

@@ -39,7 +39,7 @@ async function loadOutputStyleFromFile(
   loadedPaths: Set<string>,
 ): Promise<OutputStyleConfig | null> {
   const fs = getFsImplementation()
-  if (isDuplicatePath(fs, filePath, loadedPaths)) {
+  if (isDuplicatePath(filePath, loadedPaths)) {
     return null
   }
   try {

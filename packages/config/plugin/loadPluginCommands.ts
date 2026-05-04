@@ -110,7 +110,7 @@ async function collectMarkdownFiles(
   await walkPluginMarkdown(
     dirPath,
     async fullPath => {
-      if (isDuplicatePath(fs, fullPath, loadedPaths)) return
+      if (isDuplicatePath(fullPath, loadedPaths)) return
       const content = await fs.readFile(fullPath, { encoding: 'utf-8' })
       const { frontmatter, content: markdownContent } = parseFrontmatter(
         content,
@@ -502,7 +502,7 @@ export const getPluginCommands = memoize(async (): Promise<Command[]> => {
                 }
                 return commands
               } else if (stats.isFile() && commandPath.endsWith('.md')) {
-                if (isDuplicatePath(fs, commandPath, loadedPaths)) {
+                if (isDuplicatePath(commandPath, loadedPaths)) {
                   return []
                 }
 
@@ -714,7 +714,7 @@ async function loadSkillsFromDirectory(
 
   if (directSkillContent !== null) {
     // This is a direct skill directory, load the skill from here
-    if (isDuplicatePath(fs, directSkillPath, loadedPaths)) {
+    if (isDuplicatePath(directSkillPath, loadedPaths)) {
       return skills
     }
     try {
@@ -793,7 +793,7 @@ async function loadSkillsFromDirectory(
         return
       }
 
-      if (isDuplicatePath(fs, skillFilePath, loadedPaths)) {
+      if (isDuplicatePath(skillFilePath, loadedPaths)) {
         return
       }
 

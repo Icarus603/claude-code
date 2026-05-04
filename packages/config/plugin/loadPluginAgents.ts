@@ -72,7 +72,7 @@ async function loadAgentFromFile(
   loadedPaths: Set<string>,
 ): Promise<AgentDefinition | null> {
   const fs = getFsImplementation()
-  if (isDuplicatePath(fs, filePath, loadedPaths)) {
+  if (isDuplicatePath(filePath, loadedPaths)) {
     return null
   }
   try {
