@@ -1,17 +1,15 @@
-import { beforeEach, describe, expect, mock, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
-const realEnvUtils = await import('@claude-code/config/env/utils')
-const envOverrides = new Map<string, string>()
-
-mock.module('@claude-code/config/env/utils', () => ({
-  ...realEnvUtils,
-  readEnv: (key: string) => envOverrides.get(key) ?? '',
-}))
+// Use real env via process.env + setEnv/deleteEnv. No mock.module — that
+// pollutes the process and leaks into sibling tests. See
+// `feedback_self_audit_before_declaring_done.md` and the v26.5.18 release
+// fail caused by subprocessEnv.test.ts's mock.module of the same module.
+const ENV_KEY = 'COLORFGBG'
+let savedEnv: string | undefined
 
 // Cache busts on module load. Re-import each test to reset the
 // module-level cachedSystemTheme.
 async function freshResolveThemeSetting() {
-  // Use cache-busting query string so Bun re-imports.
   const mod = await import(
     '../internal/systemTheme.js?bust=' + Math.random()
   )
@@ -19,7 +17,13 @@ async function freshResolveThemeSetting() {
 }
 
 beforeEach(() => {
-  envOverrides.clear()
+  savedEnv = process.env[ENV_KEY]
+  delete process.env[ENV_KEY]
+})
+
+afterEach(() => {
+  if (savedEnv === undefined) delete process.env[ENV_KEY]
+  else process.env[ENV_KEY] = savedEnv
 })
 
 describe('resolveThemeSetting — explicit settings', () => {
@@ -55,25 +59,24 @@ describe('resolveThemeSetting — explicit settings', () => {
 
 describe('resolveThemeSetting — auto detection', () => {
   test('auto + no COLORFGBG → defaults to "dark"', async () => {
-    envOverrides.clear()
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG bg=0 (black) → "dark"', async () => {
-    envOverrides.set('COLORFGBG', '15;0')
+    process.env[ENV_KEY] = '15;0'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG bg=6 (cyan, low) → "dark" (≤6 = dark)', async () => {
-    envOverrides.set('COLORFGBG', '15;6')
+    process.env[ENV_KEY] = '15;6'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG bg=7 (light gray) → "light" (>6 except 8)', async () => {
-    envOverrides.set('COLORFGBG', '0;7')
+    process.env[ENV_KEY] = '0;7'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('light')
   })
@@ -81,19 +84,19 @@ describe('resolveThemeSetting — auto detection', () => {
   test('auto + COLORFGBG bg=8 (dark gray) → "dark" (special-cased)', async () => {
     // Critical contract: 8 is "bright black" / "dark gray", which
     // visually IS a dark background. The rule is "≤6 OR ==8 → dark".
-    envOverrides.set('COLORFGBG', '15;8')
+    process.env[ENV_KEY] = '15;8'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG bg=15 (white) → "light"', async () => {
-    envOverrides.set('COLORFGBG', '0;15')
+    process.env[ENV_KEY] = '0;15'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('light')
   })
 
   test('auto + COLORFGBG bg=9 (bright red) → "light" (9-14 are bright fg colors)', async () => {
-    envOverrides.set('COLORFGBG', '0;9')
+    process.env[ENV_KEY] = '0;9'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('light')
   })
@@ -101,31 +104,31 @@ describe('resolveThemeSetting — auto detection', () => {
   test('auto + COLORFGBG with 3 parts uses LAST as bg', async () => {
     // Some terminals emit "fg;mid;bg". The function uses
     // parts[parts.length - 1] which handles this correctly.
-    envOverrides.set('COLORFGBG', '15;default;0')
+    process.env[ENV_KEY] = '15;default;0'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG empty string → defaults to "dark"', async () => {
-    envOverrides.set('COLORFGBG', '')
+    process.env[ENV_KEY] = ''
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG bg=non-integer → defaults to "dark"', async () => {
-    envOverrides.set('COLORFGBG', '15;default')
+    process.env[ENV_KEY] = '15;default'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG bg=-1 → defaults to "dark" (out of range)', async () => {
-    envOverrides.set('COLORFGBG', '15;-1')
+    process.env[ENV_KEY] = '15;-1'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
 
   test('auto + COLORFGBG bg=16 → defaults to "dark" (out of range)', async () => {
-    envOverrides.set('COLORFGBG', '0;16')
+    process.env[ENV_KEY] = '0;16'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
   })
@@ -133,11 +136,11 @@ describe('resolveThemeSetting — auto detection', () => {
 
 describe('resolveThemeSetting — caching', () => {
   test('detection result is cached within a single module instance', async () => {
-    envOverrides.set('COLORFGBG', '15;0')
+    process.env[ENV_KEY] = '15;0'
     const fn = await freshResolveThemeSetting()
     expect(fn('auto')).toBe('dark')
     // Even if env changes after first call, cached value persists.
-    envOverrides.set('COLORFGBG', '0;15')
+    process.env[ENV_KEY] = '0;15'
     expect(fn('auto')).toBe('dark') // still cached as dark
   })
 })

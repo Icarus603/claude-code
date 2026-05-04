@@ -41,18 +41,29 @@ export function registerUpstreamProxyEnvFn(
   _getUpstreamProxyEnv = fn
 }
 
-export function subprocessEnv(): NodeJS.ProcessEnv {
+/**
+ * Build subprocess env. Pass an explicit `env` to bypass real process.env
+ * (used in tests — eliminates the need for mock.module on env utils, which
+ * is process-wide in bun-test and pollutes other test files). Production
+ * callers omit the param and the function reads from getAllEnv()/readEnv()
+ * directly.
+ */
+export function subprocessEnv(
+  env?: Record<string, string | undefined>,
+): NodeJS.ProcessEnv {
+  const baseEnv = env ?? getAllEnv()
+  const scrubFlag = env ? env.CLAUDE_CODE_SUBPROCESS_ENV_SCRUB : readEnv('CLAUDE_CODE_SUBPROCESS_ENV_SCRUB')
   const proxyEnv = _getUpstreamProxyEnv?.() ?? {}
 
-  if (!isEnvTruthy(readEnv('CLAUDE_CODE_SUBPROCESS_ENV_SCRUB'))) {
+  if (!isEnvTruthy(scrubFlag)) {
     return Object.keys(proxyEnv).length > 0
-      ? { ...getAllEnv(), ...proxyEnv }
-      : (getAllEnv() as NodeJS.ProcessEnv)
+      ? { ...baseEnv, ...proxyEnv }
+      : (baseEnv as NodeJS.ProcessEnv)
   }
-  const env = { ...getAllEnv(), ...proxyEnv }
+  const merged = { ...baseEnv, ...proxyEnv }
   for (const k of GHA_SUBPROCESS_SCRUB) {
-    delete env[k]
-    delete env[`INPUT_${k}`]
+    delete merged[k]
+    delete merged[`INPUT_${k}`]
   }
-  return env as NodeJS.ProcessEnv
+  return merged as NodeJS.ProcessEnv
 }

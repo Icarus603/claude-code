@@ -7,6 +7,15 @@ import {
   toRelativePath,
   getDirectoryForPath,
 } from '@claude-code/storage/path.js'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
+
+// toRelativePath uses getCwd() (agent state, realpathSync-resolved at init)
+// as reference, NOT process.cwd(). On Linux runners (e.g. GitHub Actions
+// /home/runner/work/...) realpathSync resolves to a different inode than
+// process.cwd() reports, so tests that built absolute paths with
+// process.cwd() got "outside cwd" verdicts. Anchor on getCwd() so the
+// test exercises toRelativePath's actual contract on every platform.
+const TEST_CWD = getCwd()
 
 // ─── containsPathTraversal ──────────────────────────────────────────────
 
@@ -140,7 +149,7 @@ describe('toRelativePath', () => {
     // Build a path that is inside the current working directory.
     // resolve() returns an absolute path, and toRelativePath should give
     // back just the final segment (or relative form without ..).
-    const abs = resolve(process.cwd(), 'package.json')
+    const abs = resolve(TEST_CWD, 'package.json')
     const result = toRelativePath(abs)
     expect(result).toBe('package.json')
     expect(result).not.toContain('..')
@@ -149,24 +158,22 @@ describe('toRelativePath', () => {
   test('returns absolute path when target is outside cwd', () => {
     // A well-known absolute path that is always outside any typical cwd
     // (any absolute path that doesn't start with process.cwd() will work)
-    const cwd = process.cwd()
     // Build a path guaranteed to be outside cwd by going to the root's parent
     // of cwd, then a sibling directory with an unlikely name
-    const outsidePath = resolve(cwd, '../../__unlikely_dir_xyz__')
+    const outsidePath = resolve(TEST_CWD, '../../__unlikely_dir_xyz__')
     const result = toRelativePath(outsidePath)
     // relative(cwd, outsidePath) will start with '../..' so function returns absolute
     expect(result).toBe(outsidePath)
   })
 
   test('returns empty string for cwd itself', () => {
-    const cwd = process.cwd()
-    const result = toRelativePath(cwd)
+    const result = toRelativePath(TEST_CWD)
     // relative(cwd, cwd) === '' which does not start with '..'
     expect(result).toBe('')
   })
 
   test('returns a string for any absolute path', () => {
-    const abs = resolve(process.cwd(), 'packages')
+    const abs = resolve(TEST_CWD, 'packages')
     const result = toRelativePath(abs)
     expect(typeof result).toBe('string')
   })

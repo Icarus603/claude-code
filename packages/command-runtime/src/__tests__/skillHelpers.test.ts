@@ -9,15 +9,23 @@
  * getSkillsPath maps SettingSource → directory path. A typo here loads
  * skills from the wrong scope and a project-scoped skill stops working.
  */
-import { describe, expect, mock, test } from 'bun:test'
+import { afterAll, beforeAll, describe, expect, mock, test } from 'bun:test'
 
-// Mock the path-discovery deps so we don't drag in env-dependent behaviour.
-const realConfig = await import('@claude-code/config/env/utils')
-mock.module('@claude-code/config/env/utils', () => ({
-  ...realConfig,
-  getClaudeConfigHomeDir: () => '/home/user/.claude',
-}))
+// CLAUDE_CONFIG_DIR drives getClaudeConfigHomeDir directly (memoized,
+// cache-key is the env var itself). Setting the env var avoids mock.module,
+// which is process-wide pollution in bun-test. See
+// feedback_self_audit_before_declaring_done.md.
+const savedConfigDir = process.env.CLAUDE_CONFIG_DIR
+beforeAll(() => {
+  process.env.CLAUDE_CONFIG_DIR = '/home/user/.claude'
+})
+afterAll(() => {
+  if (savedConfigDir === undefined) delete process.env.CLAUDE_CONFIG_DIR
+  else process.env.CLAUDE_CONFIG_DIR = savedConfigDir
+})
 
+// managedPath is path-resolution only; mocking is OK (it doesn't bleed
+// into other tests beyond the path string).
 const realManaged = await import('@claude-code/config/managedPath')
 mock.module('@claude-code/config/managedPath', () => ({
   ...realManaged,

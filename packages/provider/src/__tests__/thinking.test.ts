@@ -1,31 +1,47 @@
-import { beforeEach, describe, expect, mock, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test'
 import type { ConnectionRecord } from '@claude-code/config'
 
+// getGlobalConfig is still mocked because the test needs to feed in
+// arbitrary connection lists; replicating that via writable settings would
+// be heavier than the mock. envMap was previously another mock.module —
+// migrated to setEnv/restore below to remove process-wide env-utils
+// pollution (see feedback_self_audit_before_declaring_done.md).
 const realConfigModule = await import('@claude-code/config')
-const realEnvUtilsModule = await import('@claude-code/config/env/utils')
 const config = {
   connections: [] as ConnectionRecord[],
 }
-const envMap = new Map<string, string>()
 
 mock.module('@claude-code/config', () => ({
   ...realConfigModule,
   getGlobalConfig: () => config,
 }))
 
-mock.module('@claude-code/config/env/utils', () => ({
-  ...realEnvUtilsModule,
-  readEnv: (key: string) => envMap.get(key) ?? '',
-}))
-
 const { modelSupportsAdaptiveThinking, modelSupportsThinking } = await import(
   '../thinking.js'
 )
 
+const TRACKED_KEYS = [
+  'ANTHROPIC_DEFAULT_OPUS_MODEL',
+  'ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES',
+  'USER_TYPE',
+] as const
+const savedEnv = new Map<string, string | undefined>()
+
 beforeEach(() => {
   config.connections = []
-  envMap.clear()
-  delete process.env.USER_TYPE
+  for (const k of TRACKED_KEYS) {
+    savedEnv.set(k, process.env[k])
+    delete process.env[k]
+  }
+})
+
+afterEach(() => {
+  for (const k of TRACKED_KEYS) {
+    const v = savedEnv.get(k)
+    if (v === undefined) delete process.env[k]
+    else process.env[k] = v
+  }
+  savedEnv.clear()
 })
 
 describe('connection-aware thinking support', () => {
@@ -72,11 +88,9 @@ describe('connection-aware thinking support', () => {
         createdAt: 0,
       },
     ]
-    envMap.set('ANTHROPIC_DEFAULT_OPUS_MODEL', 'deepseek-reasoner')
-    envMap.set(
-      'ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES',
-      'thinking,adaptive_thinking',
-    )
+    process.env.ANTHROPIC_DEFAULT_OPUS_MODEL = 'deepseek-reasoner'
+    process.env.ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES =
+      'thinking,adaptive_thinking'
 
     const model = 'deepseek-anthropic-override:deepseek-reasoner'
 

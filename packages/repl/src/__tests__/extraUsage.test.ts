@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, mock, test } from 'bun:test'
 
-// Mock the deps the module uses so tests don't need to set up real
-// app-host state or provider auth. Spread the real exports + override
-// only the specific symbols this test cares about, so other consumers
-// of these modules (loaded into the same test process) keep working.
+// Mock app-host and authAlias so tests don't need real state. The
+// previous mock.module on env/utils was REMOVED — the real isEnvTruthy
+// already accepts '1'/'true' (case-insensitive, plus 'yes'). The mock
+// duplicated real behavior, and any mock.module is process-wide pollution
+// in bun-test. See feedback_self_audit_before_declaring_done.md.
 const realState = await import('@claude-code/app-host/bootstrap/state.js')
 const realAuthAlias = await import('@claude-code/provider/authAlias.js')
-const realEnvUtils = await import('@claude-code/config/env/utils')
 mock.module('@claude-code/app-host/bootstrap/state.js', () => ({
   ...realState,
   getIsNonInteractiveSession: () => false,
@@ -14,10 +14,6 @@ mock.module('@claude-code/app-host/bootstrap/state.js', () => ({
 mock.module('@claude-code/provider/authAlias.js', () => ({
   ...realAuthAlias,
   isOverageProvisioningAllowed: () => true,
-}))
-mock.module('@claude-code/config/env/utils', () => ({
-  ...realEnvUtils,
-  isEnvTruthy: (v: string | undefined) => v === '1' || v === 'true',
 }))
 
 const { extraUsage, extraUsageNonInteractive } = await import('../extraUsage.js')
