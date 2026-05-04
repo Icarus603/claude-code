@@ -35,6 +35,7 @@ stays unchanged.
 | V9-2.5 | §2 | Delete 3 additional dead LSP/MCP getter pairs (`_getLspManager`, `_getMcpTypes`, `_expandMcpEnv` — verify-deps-quality blind spot since their slot type is `() => unknown` not bare `unknown`) | Low | **✅ landed 2026-05-04** — 3 more dead pairs gone, 75 LOC + 1 require to non-existent `src/` path |
 | V9-2.6 | §2 | Fix broken `isDuplicatePath` stub (was `(a, b) => a === b`, callers passed 3 args — plugin-loader path-dedup silently never fired). Replace with real symlink-resolving impl. | Medium (real bug fix) | **✅ landed 2026-05-04** — caller arity fixed in 6 sites, regression test added |
 | V9-2.7 | §2 | Delete 4 dead exports (`safeParseJSON`, `BUILTIN_PLUGIN_IDS`, `checkBinaryExists` chain) + dead `storage/fsOperations.ts:isDuplicatePath` (post-V9-2.6 stale). Caller `lspRecommendation.ts` switched to direct `@claude-code/updater/binaryCheck.js` import. **Discovered second broken-stub bug**: `coerceDescriptionToString` 1-arg local stub returned `''` instead of `null`, breaking the `??` fallback chain in 5 plugin-loader callsites. Fixed by re-exporting the real 3-arg impl from `frontmatterParser.ts`. | Medium (1 real bug + dead code) | **✅ landed 2026-05-04** — 7-case regression test added, ~80 LOC removed |
+| V9-2.8 | §2 | Shadow-stub scan found a P0 bug: **`BUILTIN_MARKETPLACE_NAME = 'anthropics'`** in `_deps.ts` shadowed the real `'builtin'` in `builtin.ts`. `pluginLoader.ts:1913` used the bad copy to filter built-in plugins; the filter never matched (real plugin ids are `name@builtin`, not `name@anthropics`), so built-in plugins fell through into the marketplace-loading branch. Plus `FRONTMATTER_REGEX` had a stricter copy than the real impl. Fix: replace 6 hand-typed constants in `_deps.ts` with `export { X } from <canonical>` re-exports — single source of truth. | High (P0 bug — production logic silently wrong for built-in plugins) | **✅ landed 2026-05-04** — 3-case regression test added; 6 shadow constants collapsed |
 | V9-2b | §4 | `tool-registry/progressTypes.ts` 11 slots → `import type` | Low | ~20 TS2339 |
 | V9-2c | §4 | `swarm/adapters/appRuntime.ts` 13 slots → `import type` | Medium | ~30 TS2339 + some TS2345 |
 | V9-2d | §4 | `cli/src/headless.ts` 5 slots → `import type` | Low | ~15 TS2339 |
@@ -237,7 +238,7 @@ subsequent slots in V9-2d / V9-3 — always read first.
 
 ## §2. `_deps.ts` 6 unknown-typed setter slots
 
-> **✅ V9-2 + V9-2.5 + V9-2.6 + V9-2.7 LANDED 2026-05-04**
+> **✅ V9-2 + V9-2.5 + V9-2.6 + V9-2.7 + V9-2.8 LANDED 2026-05-04**
 >
 > - V9-2 + V9-2.5: 11 dead slot pairs deleted (8 bare unknown +
 >   3 `() => unknown` survivors). `verify-deps-quality` ratchet

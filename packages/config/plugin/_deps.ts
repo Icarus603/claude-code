@@ -630,14 +630,24 @@ export function setGetHintsProviderFn(fn: () => unknown): void {
 // installPluginBindings wires real implementations.
 // ---------------------------------------------------------------------------
 
-// Constants (hard-coded so can't be overridden at runtime — acceptable because
-// these are stable identifiers that rarely change).
-export const BUILTIN_MARKETPLACE_NAME = 'anthropics'
-export const FILE_EDIT_TOOL_NAME = 'Edit'
-export const FILE_READ_TOOL_NAME = 'Read'
-export const FILE_WRITE_TOOL_NAME = 'Write'
-export const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---\n?/
-export const EFFORT_LEVELS = ['low', 'medium', 'high'] as const
+// Constants — re-exported from their canonical homes to keep a single
+// source of truth. Earlier this section had hand-typed copies that drifted
+// from the real values:
+//   - BUILTIN_MARKETPLACE_NAME was 'anthropics' here but 'builtin' in
+//     builtin.ts. pluginLoader.ts:1913 used the wrong copy to filter out
+//     built-in plugins, so the filter `marketplace !== BUILTIN_MARKETPLACE_NAME`
+//     never matched for `name@builtin` plugin IDs and built-in plugins were
+//     processed as if they were marketplace plugins. (V9-2.8, 2026-05-04.)
+//   - FRONTMATTER_REGEX was stricter here than the real impl in
+//     frontmatterParser.ts (no `\s*` tolerance for trailing whitespace
+//     after `---` lines), causing legitimate plugin frontmatter to fail
+//     parsing in some hand-edited or platform-specific newline cases.
+export { BUILTIN_MARKETPLACE_NAME } from './builtin.js'
+export { FRONTMATTER_REGEX } from '../frontmatterParser.js'
+export { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
+export { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTool/constants.js'
+export { FILE_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/FileWriteTool/constants.js'
+export { EFFORT_LEVELS } from '@claude-code/agent/effort.js'
 
 // Types (structural passthroughs)
 export type ClaudeCodeHint = { id: string; message: string; cta?: string }
