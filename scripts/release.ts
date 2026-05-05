@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * One-command release: tag the current HEAD and push the tag.
+ * One-command release: push the branch, tag the current HEAD, and push the tag.
  * GitHub Actions release.yml takes it from there (builds 5 binaries,
  * generates SHA256 sidecars, publishes to Releases).
  *
@@ -11,6 +11,11 @@
  *   - working tree must be clean (no uncommitted changes)
  *   - tag must match v* and not already exist locally or on origin
  *   - current branch must be main (override with --force-branch)
+ *   - current branch must have an upstream (set once with `git push -u origin <branch>`)
+ *
+ * Order matters: branch first, then tag. If we tagged before pushing the branch,
+ * a tag-push success with a branch-push failure would leave the tag pointing at
+ * a SHA that GHA's actions/checkout can't fetch.
  */
 
 import { spawnSync } from 'node:child_process'
@@ -53,9 +58,21 @@ function main(): void {
   const remoteTag = run('git', ['ls-remote', '--tags', 'origin', tag]).out
   if (remoteTag) fatal(`tag ${tag} already exists on origin`)
 
-  const head = run('git', ['rev-parse', '--short', 'HEAD']).out
-  console.log(`→ tagging ${tag} at ${branch}@${head}`)
+  const upstream = run('git', ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`])
+  if (upstream.code !== 0) {
+    fatal(
+      `branch "${branch}" has no upstream. Set one once:\n  git push -u origin ${branch}`,
+    )
+  }
 
+  const head = run('git', ['rev-parse', '--short', 'HEAD']).out
+  console.log(`→ pushing ${branch} to origin (so the tag points at a fetchable SHA)`)
+  const branchPush = run('git', ['push', 'origin', branch])
+  if (branchPush.code !== 0) {
+    fatal(`git push ${branch} failed (no tag created): ${branchPush.err}`)
+  }
+
+  console.log(`→ tagging ${tag} at ${branch}@${head}`)
   const tagResult = run('git', ['tag', '-a', tag, '-m', `Release ${tag}`])
   if (tagResult.code !== 0) fatal(`git tag failed: ${tagResult.err}`)
 
@@ -63,7 +80,7 @@ function main(): void {
   const push = run('git', ['push', 'origin', tag])
   if (push.code !== 0) {
     run('git', ['tag', '-d', tag])
-    fatal(`git push failed (tag rolled back): ${push.err}`)
+    fatal(`git push tag failed (tag rolled back; branch already on origin): ${push.err}`)
   }
 
   console.log(`✓ tag ${tag} pushed. Track build:`)
