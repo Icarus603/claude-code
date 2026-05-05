@@ -505,6 +505,13 @@ const CHECKS: Check[] = [
     doc: '`await asyncFunctionStar()` is forbidden — body never runs; use `for await` / `.next()` (HookDepImpl.onStop bug class)',
   },
   {
+    id: 'type-import-runtime-use',
+    layer: 'Cross-Cutting',
+    subsystem: 'silent-failure prevention',
+    script: 'scripts/verify-type-import-runtime-use.ts',
+    doc: '`import type { X }` + `new X()` / `extends X` throws ReferenceError silently swallowed by event listener try/catch (FuzzyPicker freeze bug class)',
+  },
+  {
     id: 'dual-storage-divergence',
     layer: 'Cross-Cutting',
     subsystem: 'silent-failure prevention',
