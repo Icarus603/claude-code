@@ -1,0 +1,39 @@
+# In-process ripgrep, exposed to Bun via napi-rs.
+#
+# Versions of the grep-* / ignore / globset crates are pinned to ripgrep
+# 14.1.1's own Cargo.toml on purpose: behavior parity with the rg binary
+# we already ship for the sandbox path. Bumping ripgrep means bumping all
+# six in lockstep — see vendor/NOTICE.md.
+
+[package]
+name = "ripgrep-napi"
+version = "1.0.0"
+edition = "2021"
+publish = false
+license = "MIT OR Unlicense"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "3", default-features = false, features = ["napi4", "async"] }
+napi-derive = "3"
+
+# ripgrep 14.1.1 lockstep
+grep-searcher = "=0.1.14"
+grep-regex    = "=0.1.13"
+grep-matcher  = "=0.1.7"
+grep-printer  = "=0.2.2"
+ignore        = "=0.4.23"
+globset       = "=0.4.15"
+
+[build-dependencies]
+napi-build = "2"
+
+# Smaller .node files. We ship 5 platforms × ~5 MB = ~25 MB into git;
+# this trims each by ~30%.
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = 3

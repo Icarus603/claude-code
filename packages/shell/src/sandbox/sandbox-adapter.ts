@@ -56,7 +56,7 @@ import { WEB_FETCH_TOOL_NAME } from '@claude-code/tool-registry/tools/WebFetchTo
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { getClaudeTempDir } from '@claude-code/permission/filesystem'
 import type { PermissionRuleValue } from '@claude-code/permission/PermissionRule'
-import { ripgrepCommand } from '@claude-code/tool-registry/ripgrep.js'
+import { getSandboxRipgrep } from './sandboxRipgrepResolver.js'
 
 // Local copies to avoid circular dependency
 // (permissions.ts imports SandboxManager, bashPermissions.ts imports permissions.ts)
@@ -347,13 +347,14 @@ export function convertToSandboxRuntimeConfig(
       }
     }
   }
-  // Ripgrep config for sandbox. User settings take priority; otherwise pass our rg.
-  // In embedded mode (argv0='rg' dispatch), sandbox-runtime spawns with argv0 set.
-  const { rgPath, rgArgs, argv0 } = ripgrepCommand()
+  // Ripgrep config for sandbox. ccb's main ripgrep usage is in-process
+  // via NAPI now, but @anthropic-ai/sandbox-runtime spawns rg as an
+  // external helper to compute deny paths on Linux. Provide a path it
+  // can spawn; user settings override.
+  const { rgPath, rgArgs } = getSandboxRipgrep()
   const ripgrepConfig = settings.sandbox?.ripgrep ?? {
     command: rgPath,
     args: rgArgs,
-    argv0,
   }
 
   return {
@@ -449,7 +450,7 @@ async function detectWorktreeMainRepoPath(cwd: string): Promise<string | null> {
  * Returns { errors, warnings } - errors mean sandbox cannot run
  */
 const checkDependencies = memoize((): SandboxDependencyCheck => {
-  const { rgPath, rgArgs } = ripgrepCommand()
+  const { rgPath, rgArgs } = getSandboxRipgrep()
   return BaseSandboxManager.checkDependencies({
     command: rgPath,
     args: rgArgs,

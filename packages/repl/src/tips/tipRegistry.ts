@@ -21,7 +21,7 @@ import {
   modelSupportsEffort,
 } from '@claude-code/agent/effort.js'
 import { env } from '@claude-code/config/env/paths'
-import { cacheKeys } from '@claude-code/tool-registry/fileStateCache.js'
+import { cacheKeys } from '@claude-code/tool-registry/fileStateCache'
 import { getWorktreeCount } from '@claude-code/storage/git.js'
 import {
   detectRunningIDEsCached,

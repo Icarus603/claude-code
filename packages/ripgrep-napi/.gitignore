@@ -1,0 +1,4 @@
+# Cargo build artifacts — the rust source in native/ is the source of
+# truth, the .node binaries in vendor/<plat>/ are the reproducible
+# outputs. Everything in target/ is intermediate and machine-local.
+native/target/

@@ -1,6 +1,7 @@
 {
   "@claude-code/ide": 8,
   "@claude-code/swarm": 11,
+  "ripgrep-napi": 1,
   "@claude-code/tool-registry": 57,
   "@claude-code/memory": 21,
   "@claude-code/config": 130,

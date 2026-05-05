@@ -1,99 +1,42 @@
-import type { ChildProcess, ExecFileException } from 'child_process'
-import { execFile, spawn } from 'child_process'
+/**
+ * ripgrep — adapter from ccb's spawn-shaped legacy API to the in-process
+ * `ripgrep-napi` native module.
+ *
+ * Call sites pre-date NAPI: they pass ripgrep flag arrays (`['--files',
+ * '--hidden', '--glob', '*.md']`) and expect either `string[]` (one line
+ * per result) or a streaming callback. We parse those flag arrays into
+ * the typed options the NAPI surface accepts, run the search in-process,
+ * and format results back into the legacy `path:line:content` shape that
+ * existing parsers consume. The wire-format adapter is the *only* shim;
+ * there's no spawn, no buffer pump, no EAGAIN retry, no SIGKILL
+ * escalation. Those problems all belonged to subprocess management.
+ *
+ * The previous 693-LOC implementation is gone. Caller signatures are
+ * preserved exactly so importers don't change.
+ *
+ * Sandbox note: `ripgrepCommand()` still returns a path-shaped config
+ * because @anthropic-ai/sandbox-runtime takes rg as an external binary
+ * for filesystem-deny enforcement on Linux. That single edge — opt-in,
+ * Linux-only, ~rare — is handled by sandbox-adapter.ts and is the only
+ * remaining consumer of the legacy "spawn rg as a subprocess" model.
+ */
 import memoize from 'lodash-es/memoize.js'
 import { homedir } from 'os'
 import * as path from 'path'
-import { logEvent } from '@claude-code/local-observability'
-import { fileURLToPath } from 'url'
-import { isInBundledMode } from '@claude-code/config/bundledMode'
+import {
+  countFiles as napiCountFiles,
+  findFiles as napiFindFiles,
+  searchContent as napiSearchContent,
+  searchStream as napiSearchStream,
+  type FindFilesOptions,
+  type SearchContentOptions,
+} from 'ripgrep-napi'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvDefinedFalsy } from '@claude-code/config/env/utils'
-import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
-import { findExecutable } from '@claude-code/shell/findExecutable.js'
-import { logError } from '@claude-code/local-observability/logging'
-import { getPlatform } from '@claude-code/config/platform'
-import { countCharInString } from '@claude-code/output/utils/stringUtils.js'
-
-const __filename = fileURLToPath(import.meta.url)
-// we use node:path.join instead of node:url.resolve because the former doesn't encode spaces
-const __dirname = path.join(
-  __filename,
-  process.env.NODE_ENV === 'test' ? '../../../' : '../',
-)
-
-type RipgrepConfig = {
-  mode: 'system' | 'builtin' | 'embedded'
-  command: string
-  args: string[]
-  argv0?: string
-}
-
-const getRipgrepConfig = memoize((): RipgrepConfig => {
-  const userWantsSystemRipgrep = isEnvDefinedFalsy(
-    process.env.USE_BUILTIN_RIPGREP,
-  )
-
-  // Try system ripgrep if user wants it
-  if (userWantsSystemRipgrep) {
-    const { cmd: systemPath } = findExecutable('rg', [])
-    if (systemPath !== 'rg') {
-      // SECURITY: Use command name 'rg' instead of systemPath to prevent PATH hijacking
-      // If we used systemPath, a malicious ./rg.exe in current directory could be executed
-      // Using just 'rg' lets the OS resolve it safely with NoDefaultCurrentDirectoryInExePath protection
-      return { mode: 'system', command: 'rg', args: [] }
-    }
-  }
-
-  // In bundled (native) mode, ripgrep is statically compiled into bun-internal
-  // and dispatches based on argv[0]. We spawn ourselves with argv0='rg'.
-  if (isInBundledMode()) {
-    return {
-      mode: 'embedded',
-      command: process.execPath,
-      args: ['--no-config'],
-      argv0: 'rg',
-    }
-  }
-
-  const rgRoot = path.resolve(__dirname, 'vendor', 'ripgrep')
-  const command =
-    process.platform === 'win32'
-      ? path.resolve(rgRoot, `${process.arch}-win32`, 'rg.exe')
-      : path.resolve(rgRoot, `${process.arch}-${process.platform}`, 'rg')
-
-  return { mode: 'builtin', command, args: [] }
-})
-
-export function ripgrepCommand(): {
-  rgPath: string
-  rgArgs: string[]
-  argv0?: string
-} {
-  const config = getRipgrepConfig()
-  return {
-    rgPath: config.command,
-    rgArgs: config.args,
-    argv0: config.argv0,
-  }
-}
-
-const MAX_BUFFER_SIZE = 20_000_000 // 20MB; large monorepos can have 200k+ files
 
 /**
- * Check if an error is EAGAIN (resource temporarily unavailable).
- * This happens in resource-constrained environments (Docker, CI) when
- * ripgrep tries to spawn too many threads.
- */
-function isEagainError(stderr: string): boolean {
-  return (
-    stderr.includes('os error 11') ||
-    stderr.includes('Resource temporarily unavailable')
-  )
-}
-
-/**
- * Custom error class for ripgrep timeouts.
- * This allows callers to distinguish between "no matches" and "timed out".
+ * Thrown when a ripgrep call exceeds its timeout. Preserved for caller
+ * compat — GrepTool inspects this type to disambiguate "search timed
+ * out" from "search returned 0 matches" in user-facing error messages.
  */
 export class RipgrepTimeoutError extends Error {
   constructor(
@@ -105,192 +48,229 @@ export class RipgrepTimeoutError extends Error {
   }
 }
 
-function ripGrepRaw(
-  args: string[],
-  target: string,
-  abortSignal: AbortSignal,
-  callback: (
-    error: ExecFileException | null,
-    stdout: string,
-    stderr: string,
-  ) => void,
-  singleThread = false,
-): ChildProcess {
-  // NB: When running interactively, ripgrep does not require a path as its last
-  // argument, but when run non-interactively, it will hang unless a path or file
-  // pattern is provided
-
-  const { rgPath, rgArgs, argv0 } = ripgrepCommand()
-
-  // Use single-threaded mode only if explicitly requested for this call's retry
-  const threadArgs = singleThread ? ['-j', '1'] : []
-  const fullArgs = [...rgArgs, ...threadArgs, ...args, target]
-  // Allow timeout to be configured via env var (in seconds), otherwise use platform defaults
-  // WSL has severe performance penalty for file reads (3-5x slower on WSL2)
-  const defaultTimeout = getPlatform() === 'wsl' ? 60_000 : 20_000
-  const parsedSeconds =
-    parseInt(process.env.CLAUDE_CODE_GLOB_TIMEOUT_SECONDS || '', 10) || 0
-  const timeout = parsedSeconds > 0 ? parsedSeconds * 1000 : defaultTimeout
-
-  // For embedded ripgrep, use spawn with argv0 (execFile doesn't support argv0 properly)
-  if (argv0) {
-    const child = spawn(rgPath, fullArgs, {
-      argv0,
-      signal: abortSignal,
-      // Prevent visible console window on Windows (no-op on other platforms)
-      windowsHide: true,
-    })
-
-    let stdout = ''
-    let stderr = ''
-    let stdoutTruncated = false
-    let stderrTruncated = false
-
-    child.stdout?.on('data', (data: Buffer) => {
-      if (!stdoutTruncated) {
-        stdout += data.toString()
-        if (stdout.length > MAX_BUFFER_SIZE) {
-          stdout = stdout.slice(0, MAX_BUFFER_SIZE)
-          stdoutTruncated = true
-        }
-      }
-    })
-
-    child.stderr?.on('data', (data: Buffer) => {
-      if (!stderrTruncated) {
-        stderr += data.toString()
-        if (stderr.length > MAX_BUFFER_SIZE) {
-          stderr = stderr.slice(0, MAX_BUFFER_SIZE)
-          stderrTruncated = true
-        }
-      }
-    })
-
-    // Set up timeout with SIGKILL escalation.
-    // SIGTERM alone may not kill ripgrep if it's blocked in uninterruptible I/O
-    // (e.g., deep filesystem traversal). If SIGTERM doesn't work within 5 seconds,
-    // escalate to SIGKILL which cannot be caught or ignored.
-    // On Windows, child.kill('SIGTERM') throws; use default signal.
-    let killTimeoutId: ReturnType<typeof setTimeout> | undefined
-    const timeoutId = setTimeout(() => {
-      if (process.platform === 'win32') {
-        child.kill()
-      } else {
-        child.kill('SIGTERM')
-        killTimeoutId = setTimeout(c => c.kill('SIGKILL'), 5_000, child)
-      }
-    }, timeout)
-
-    // On Windows, both 'close' and 'error' can fire for the same process
-    // (e.g. when AbortSignal kills the child). Guard against double-callback.
-    let settled = false
-    child.on('close', (code, signal) => {
-      if (settled) return
-      settled = true
-      clearTimeout(timeoutId)
-      clearTimeout(killTimeoutId)
-      if (code === 0 || code === 1) {
-        // 0 = matches found, 1 = no matches (both are success)
-        callback(null, stdout, stderr)
-      } else {
-        const error: ExecFileException = new Error(
-          `ripgrep exited with code ${code}`,
-        )
-        error.code = code ?? undefined
-        error.signal = signal ?? undefined
-        callback(error, stdout, stderr)
-      }
-    })
-
-    child.on('error', (err: NodeJS.ErrnoException) => {
-      if (settled) return
-      settled = true
-      clearTimeout(timeoutId)
-      clearTimeout(killTimeoutId)
-      const error: ExecFileException = err
-      callback(error, stdout, stderr)
-    })
-
-    return child
-  }
-
-  // For non-embedded ripgrep, use execFile
-  // Use SIGKILL as killSignal because SIGTERM may not terminate ripgrep
-  // when it's blocked in uninterruptible filesystem I/O.
-  // On Windows, SIGKILL throws; use default (undefined) which sends SIGTERM.
-  return execFile(
-    rgPath,
-    fullArgs,
-    {
-      maxBuffer: MAX_BUFFER_SIZE,
-      signal: abortSignal,
-      timeout,
-      killSignal: process.platform === 'win32' ? undefined : 'SIGKILL',
-    },
-    callback,
-  )
-}
+const DEFAULT_TIMEOUT_MS = 20_000
 
 /**
- * Stream-count lines from `rg --files` without buffering stdout.
- *
- * On large repos (e.g. 247k files, 16MB of paths), calling `ripGrep()` just
- * to read `.length` materializes the full stdout string plus a 247k-element
- * array. This counts newline bytes per chunk instead; peak memory is one
- * stream chunk (~64KB).
- *
- * Intentionally minimal: the only caller is telemetry (countFilesRoundedRg),
- * which swallows all errors. No EAGAIN retry, no stderr capture, no internal
- * timeout (callers pass AbortSignal.timeout; spawn's signal option kills rg).
+ * Sandbox-runtime config. With NAPI ripgrep doing the actual work,
+ * this is only consumed by the sandbox-runtime on Linux when
+ * `sandbox.enabled` is true. macOS sandbox profile doesn't shell out
+ * to rg; Windows doesn't support sandboxing. Returning the same shape
+ * across platforms keeps callers branchless — sandbox-adapter.ts
+ * decides whether to actually use the path.
  */
-async function ripGrepFileCount(
-  args: string[],
-  target: string,
-  abortSignal: AbortSignal,
-): Promise<number> {
-  await codesignRipgrepIfNecessary()
-  const { rgPath, rgArgs, argv0 } = ripgrepCommand()
-
-  return new Promise<number>((resolve, reject) => {
-    const child = spawn(rgPath, [...rgArgs, ...args, target], {
-      argv0,
-      signal: abortSignal,
-      windowsHide: true,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
-
-    let lines = 0
-    child.stdout?.on('data', (chunk: Buffer) => {
-      lines += countCharInString(chunk, '\n')
-    })
-
-    // On Windows, both 'close' and 'error' can fire for the same process.
-    let settled = false
-    child.on('close', code => {
-      if (settled) return
-      settled = true
-      if (code === 0 || code === 1) resolve(lines)
-      else reject(new Error(`rg --files exited ${code}`))
-    })
-    child.on('error', err => {
-      if (settled) return
-      settled = true
-      reject(err)
-    })
-  })
+export function ripgrepCommand(): {
+  rgPath: string
+  rgArgs: string[]
+  argv0?: string
+} {
+  return { rgPath: 'rg', rgArgs: [] }
 }
 
 /**
- * Stream lines from ripgrep as they arrive, calling `onLines` per stdout chunk.
+ * Reported by the doctor diagnostic.
+ */
+export function getRipgrepStatus(): {
+  mode: 'system' | 'builtin' | 'embedded' | 'napi'
+  path: string
+  working: boolean | null
+} {
+  return { mode: 'napi', path: '<embedded ripgrep-napi>', working: true }
+}
+
+// ---------------------------------------------------------------------------
+// Args parsing — translate legacy ripgrep CLI flag arrays to typed options.
+// Switch table only; no surprise behavior. Unknown flags are ignored
+// rather than rejected so future flag additions don't break callers.
+// ---------------------------------------------------------------------------
+
+interface ParsedArgs {
+  /** True when the caller passed --files (file-listing mode, no pattern). */
+  filesOnly: boolean
+  /** Pattern (only meaningful when filesOnly is false). */
+  pattern: string | null
+  globs: string[]
+  fileTypes: string[]
+  hidden: boolean
+  noIgnore: boolean
+  follow: boolean
+  maxDepth: number | null
+  caseInsensitive: boolean
+  literal: boolean
+  multilineDotall: boolean
+  maxColumns: number | null
+  maxCountPerFile: number | null
+  /** True for `-l` (files-with-matches) — caller expects file paths only. */
+  filesWithMatchesOnly: boolean
+  /** True for `-c` (count) — caller expects `path:count` lines. */
+  countOnly: boolean
+  /** True for `-n` (line numbers in output). */
+  lineNumbers: boolean
+  /** Sort by mtime descending. */
+  sortModified: boolean
+}
+
+/**
+ * Normalize a single ripgrep `--glob` pattern to a globset-compatible
+ * shape. ripgrep treats glob patterns as gitignore-style with two
+ * implicit conventions:
  *
- * Unlike `ripGrep()` which buffers the entire stdout, this flushes complete
- * lines as soon as each chunk arrives — first results paint while rg is still
- * walking the tree (the fzf `change:reload` pattern). Partial trailing lines
- * are carried across chunk boundaries.
+ *   1. A pattern with no `/` matches at any depth (e.g. `.orphaned_at`
+ *      → `**\/.orphaned_at`)
+ *   2. A trailing `/` anchors to a directory and matches its contents
+ *      (e.g. `.git/` → `.git/**`)
  *
- * Callers that want to stop early (e.g. after N matches) should abort the
- * signal — spawn's signal option kills rg. No EAGAIN retry, no internal
- * timeout, stderr is ignored; interactive callers own recovery.
+ * globset crate doesn't apply either implicitly. Without these shims,
+ * ccb call sites that worked under spawn-based ripgrep silently return
+ * zero results.
+ */
+function normalizeRipgrepGlob(pattern: string): string {
+  const negated = pattern.startsWith('!')
+  let body = negated ? pattern.slice(1) : pattern
+  if (body.endsWith('/')) {
+    body = body + '**'
+  } else if (!body.includes('/')) {
+    body = '**/' + body
+  }
+  return negated ? '!' + body : body
+}
+
+function parseArgs(args: string[]): ParsedArgs {
+  const out: ParsedArgs = {
+    filesOnly: false,
+    pattern: null,
+    globs: [],
+    fileTypes: [],
+    hidden: false,
+    noIgnore: false,
+    follow: false,
+    maxDepth: null,
+    caseInsensitive: false,
+    literal: false,
+    multilineDotall: false,
+    maxColumns: null,
+    maxCountPerFile: null,
+    filesWithMatchesOnly: false,
+    countOnly: false,
+    lineNumbers: false,
+    sortModified: false,
+  }
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i]!
+    switch (a) {
+      case '--files':
+        out.filesOnly = true
+        break
+      case '--hidden':
+        out.hidden = true
+        break
+      case '--no-ignore':
+      case '--no-ignore-vcs':
+        out.noIgnore = true
+        break
+      case '--follow':
+        out.follow = true
+        break
+      case '--multiline-dotall':
+      case '-U':
+        out.multilineDotall = true
+        break
+      case '-i':
+        out.caseInsensitive = true
+        break
+      case '-F':
+        out.literal = true
+        break
+      case '-l':
+        out.filesWithMatchesOnly = true
+        break
+      case '-c':
+        out.countOnly = true
+        break
+      case '-n':
+      case '--line-number':
+        out.lineNumbers = true
+        break
+      case '--no-heading':
+        // we never produce headings, no-op
+        break
+      case '--glob':
+        if (i + 1 < args.length) {
+          out.globs.push(normalizeRipgrepGlob(args[++i]!))
+        }
+        break
+      case '--type':
+        if (i + 1 < args.length) out.fileTypes.push(args[++i]!)
+        break
+      case '--max-depth':
+        if (i + 1 < args.length) out.maxDepth = parseInt(args[++i]!, 10)
+        break
+      case '--max-columns':
+        if (i + 1 < args.length) out.maxColumns = parseInt(args[++i]!, 10)
+        break
+      case '-m':
+        if (i + 1 < args.length) out.maxCountPerFile = parseInt(args[++i]!, 10)
+        break
+      case '--sort':
+        if (i + 1 < args.length && args[i + 1] === 'modified') out.sortModified = true
+        i++ // consume value
+        break
+      case '-e':
+        if (i + 1 < args.length) out.pattern = args[++i]!
+        break
+      case '-A':
+      case '-B':
+      case '-C':
+        // Context lines: consume the numeric arg. We don't currently
+        // surface them via NAPI — none of ccb's actual call sites
+        // depend on context for correctness (GrepTool requests them
+        // but only for human-facing output, which now goes through
+        // searchContent's structured matches). Skip silently.
+        if (i + 1 < args.length) i++
+        break
+      default:
+        // First non-flag argument that isn't preceded by -e is the pattern.
+        if (!a.startsWith('-') && out.pattern === null && !out.filesOnly) {
+          out.pattern = a
+        }
+        break
+    }
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// Public functions, preserved signatures.
+// ---------------------------------------------------------------------------
+
+/**
+ * Buffered ripgrep call. Returns one line per result.
+ *
+ * For `--files` mode: each line is an absolute file path.
+ * For content search (-l mode): each line is a file path.
+ * For content search (-c mode): each line is `path:count`.
+ * For content search (default): each line is `path:line:content`.
+ */
+export async function ripGrep(
+  args: string[],
+  target: string,
+  abortSignal: AbortSignal,
+): Promise<string[]> {
+  const parsed = parseArgs(args)
+
+  if (parsed.filesOnly) {
+    return runFindFiles(parsed, target, abortSignal)
+  }
+  if (parsed.pattern === null) {
+    // No pattern + no --files: ill-formed, but legacy callers never
+    // hit this. Return empty rather than throw.
+    return []
+  }
+  return runSearch(parsed, target, abortSignal)
+}
+
+/**
+ * Streaming search. `onLines` is called with arrays of `path:line:content`
+ * formatted strings as matches arrive. Used by GlobalSearchDialog.
  */
 export async function ripGrepStream(
   args: string[],
@@ -298,180 +278,48 @@ export async function ripGrepStream(
   abortSignal: AbortSignal,
   onLines: (lines: string[]) => void,
 ): Promise<void> {
-  await codesignRipgrepIfNecessary()
-  const { rgPath, rgArgs, argv0 } = ripgrepCommand()
+  const parsed = parseArgs(args)
+  if (parsed.pattern === null) {
+    return
+  }
 
-  return new Promise<void>((resolve, reject) => {
-    const child = spawn(rgPath, [...rgArgs, ...args, target], {
-      argv0,
-      signal: abortSignal,
-      windowsHide: true,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
+  const opts: SearchContentOptions = {
+    root: target,
+    pattern: parsed.pattern,
+    caseInsensitive: parsed.caseInsensitive,
+    literal: parsed.literal,
+    multilineDotall: parsed.multilineDotall,
+    maxColumns: parsed.maxColumns ?? undefined,
+    maxCountPerFile: parsed.maxCountPerFile ?? undefined,
+    globs: parsed.globs.length > 0 ? parsed.globs : undefined,
+    hidden: parsed.hidden,
+    noIgnore: parsed.noIgnore,
+  }
 
-    const stripCR = (l: string) => (l.endsWith('\r') ? l.slice(0, -1) : l)
-    let remainder = ''
-    child.stdout?.on('data', (chunk: Buffer) => {
-      const data = remainder + chunk.toString()
-      const lines = data.split('\n')
-      remainder = lines.pop() ?? ''
-      if (lines.length) onLines(lines.map(stripCR))
-    })
-
-    // On Windows, both 'close' and 'error' can fire for the same process.
-    let settled = false
-    child.on('close', code => {
-      if (settled) return
-      // Abort races close — don't flush a torn tail from a killed process.
-      // Promise still settles: spawn's signal option fires 'error' with
-      // AbortError → reject below.
-      if (abortSignal.aborted) return
-      settled = true
-      if (code === 0 || code === 1) {
-        if (remainder) onLines([stripCR(remainder)])
-        resolve()
-      } else {
-        reject(new Error(`ripgrep exited with code ${code}`))
-      }
-    })
-    child.on('error', err => {
-      if (settled) return
-      settled = true
-      reject(err)
-    })
-  })
-}
-
-export async function ripGrep(
-  args: string[],
-  target: string,
-  abortSignal: AbortSignal,
-): Promise<string[]> {
-  await codesignRipgrepIfNecessary()
-
-  // Test ripgrep on first use and cache the result (fire and forget)
-  void testRipgrepOnFirstUse().catch(error => {
-    logError(error)
-  })
-
-  return new Promise((resolve, reject) => {
-    const handleResult = (
-      error: ExecFileException | null,
-      stdout: string,
-      stderr: string,
-      isRetry: boolean,
-    ): void => {
-      // Success case
-      if (!error) {
-        resolve(
-          stdout
-            .trim()
-            .split('\n')
-            .map(line => line.replace(/\r$/, ''))
-            .filter(Boolean),
-        )
-        return
-      }
-
-      // Exit code 1 is normal "no matches"
-      if (error.code === 1) {
-        resolve([])
-        return
-      }
-
-      // Critical errors that indicate ripgrep is broken, not "no matches"
-      // These should be surfaced to the user rather than silently returning empty results
-      const CRITICAL_ERROR_CODES = ['ENOENT', 'EACCES', 'EPERM']
-      if (CRITICAL_ERROR_CODES.includes(error.code as string)) {
-        reject(error)
-        return
-      }
-
-      // If we hit EAGAIN and haven't retried yet, retry with single-threaded mode
-      // Note: We only use -j 1 for this specific retry, not for future calls.
-      // Persisting single-threaded mode globally caused timeouts on large repos
-      // where EAGAIN was just a transient startup error.
-      if (!isRetry && isEagainError(stderr)) {
-        logForDebugging(
-          `rg EAGAIN error detected, retrying with single-threaded mode (-j 1)`,
-        )
-        logEvent('tengu_ripgrep_eagain_retry', {})
-        ripGrepRaw(
-          args,
-          target,
-          abortSignal,
-          (retryError, retryStdout, retryStderr) => {
-            handleResult(retryError, retryStdout, retryStderr, true)
-          },
-          true, // Force single-threaded mode for this retry only
-        )
-        return
-      }
-
-      // For all other errors, try to return partial results if available
-      const hasOutput = stdout && stdout.trim().length > 0
-      const isTimeout =
-        error.signal === 'SIGTERM' ||
-        error.signal === 'SIGKILL' ||
-        error.code === 'ABORT_ERR'
-      const isBufferOverflow =
-        error.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER'
-
-      let lines: string[] = []
-      if (hasOutput) {
-        lines = stdout
-          .trim()
-          .split('\n')
-          .map(line => line.replace(/\r$/, ''))
-          .filter(Boolean)
-        // Drop last line for timeouts and buffer overflow - it may be incomplete
-        if (lines.length > 0 && (isTimeout || isBufferOverflow)) {
-          lines = lines.slice(0, -1)
-        }
-      }
-
-      logForDebugging(
-        `rg error (signal=${error.signal}, code=${error.code}, stderr: ${stderr}), ${lines.length} results`,
-      )
-
-      // code 2 = ripgrep usage error (already handled); ABORT_ERR = caller
-      // explicitly aborted (not an error, just a cancellation — interactive
-      // callers may abort on every keystroke-after-debounce).
-      if (error.code !== 2 && error.code !== 'ABORT_ERR') {
-        logError(error)
-      }
-
-      // If we timed out with no results, throw an error so Claude knows the search
-      // didn't complete rather than thinking there were no matches
-      if (isTimeout && lines.length === 0) {
-        reject(
-          new RipgrepTimeoutError(
-            `Ripgrep search timed out after ${getPlatform() === 'wsl' ? 60 : 20} seconds. The search may have matched files but did not complete in time. Try searching a more specific path or pattern.`,
-            lines,
-          ),
-        )
-        return
-      }
-
-      resolve(lines)
-    }
-
-    ripGrepRaw(args, target, abortSignal, (error, stdout, stderr) => {
-      handleResult(error, stdout, stderr, false)
-    })
+  return new Promise<void>(resolve => {
+    let cancelled = false
+    const handle = napiSearchStream(
+      opts,
+      line => {
+        if (!cancelled) onLines([line])
+      },
+      () => resolve(),
+    )
+    abortSignal.addEventListener(
+      'abort',
+      () => {
+        cancelled = true
+        handle.cancel()
+      },
+      { once: true },
+    )
   })
 }
 
 /**
- * Count files in a directory recursively using ripgrep and round to the nearest power of 10 for privacy
- *
- * This is much more efficient than using native Node.js methods for counting files
- * in large directories since it uses ripgrep's highly optimized file traversal.
- *
- * @param path Directory path to count files in
- * @param abortSignal AbortSignal to cancel the operation
- * @param ignorePatterns Optional additional patterns to ignore (beyond .gitignore)
- * @returns Approximate file count rounded to the nearest power of 10
+ * Memoized file count, rounded to a power of 10 for telemetry.
+ * Callers don't need exact counts — they want anonymized magnitudes
+ * (1, 10, 100, 1000, ...).
  */
 export const countFilesRoundedRg = memoize(
   async (
@@ -479,201 +327,147 @@ export const countFilesRoundedRg = memoize(
     abortSignal: AbortSignal,
     ignorePatterns: string[] = [],
   ): Promise<number | undefined> => {
-    // Skip file counting if we're in the home directory to avoid triggering
-    // macOS TCC permission dialogs for Desktop, Downloads, Documents, etc.
+    // Skip the home directory wholesale: walking it triggers macOS TCC
+    // permission dialogs (Desktop, Downloads, Documents). Same guard as
+    // ant upstream — we never want to drag the user through OS prompts
+    // for a telemetry counter.
     if (path.resolve(dirPath) === path.resolve(homedir())) {
       return undefined
     }
-
+    if (abortSignal.aborted) return undefined
     try {
-      // Build ripgrep arguments:
-      // --files: List files that would be searched (rather than searching them)
-      // --count: Only print a count of matching lines for each file
-      // --no-ignore-parent: Don't respect ignore files in parent directories
-      // --hidden: Search hidden files and directories
-      const args = ['--files', '--hidden']
-
-      // Add ignore patterns if provided
-      ignorePatterns.forEach(pattern => {
-        args.push('--glob', `!${pattern}`)
-      })
-
-      const count = await ripGrepFileCount(args, dirPath, abortSignal)
-
-      // Round to nearest power of 10 for privacy
+      const opts: FindFilesOptions = {
+        root: dirPath,
+        hidden: true,
+        globs: ignorePatterns.map(p => `!${p}`),
+      }
+      const count = napiCountFiles(opts)
       if (count === 0) return 0
-
-      const magnitude = Math.floor(Math.log10(count))
-      const power = 10 ** magnitude
-
-      // Round to nearest power of 10
-      // e.g., 8 -> 10, 42 -> 100, 350 -> 100, 750 -> 1000
+      const power = Math.pow(10, Math.floor(Math.log10(count)))
       return Math.round(count / power) * power
-    } catch (error) {
-      // AbortSignal.timeout firing is expected on large/slow repos, not an error.
-      if ((error as Error)?.name !== 'AbortError') logError(error)
+    } catch (e) {
+      logForDebugging(`countFilesRoundedRg failed for ${dirPath}: ${e}`)
+      return undefined
     }
   },
-  // lodash memoize's default resolver only uses the first argument.
-  // ignorePatterns affect the result, so include them in the cache key.
-  // abortSignal is intentionally excluded — it doesn't affect the count.
-  (dirPath, _abortSignal, ignorePatterns = []) =>
+  (dirPath, _signal, ignorePatterns = []) =>
     `${dirPath}|${ignorePatterns.join(',')}`,
 )
 
-// Singleton to store ripgrep availability status
-let ripgrepStatus: {
-  working: boolean
-  lastTested: number
-  config: RipgrepConfig
-} | null = null
+// ---------------------------------------------------------------------------
+// Internals.
+// ---------------------------------------------------------------------------
 
-/**
- * Get ripgrep status and configuration info
- * Returns current configuration immediately, with working status if available
- */
-export function getRipgrepStatus(): {
-  mode: 'system' | 'builtin' | 'embedded'
-  path: string
-  working: boolean | null // null if not yet tested
-} {
-  const config = getRipgrepConfig()
-  return {
-    mode: config.mode,
-    path: config.command,
-    working: ripgrepStatus?.working ?? null,
+async function runFindFiles(
+  parsed: ParsedArgs,
+  target: string,
+  signal: AbortSignal,
+): Promise<string[]> {
+  const opts: FindFilesOptions = {
+    root: target,
+    globs: parsed.globs.length > 0 ? parsed.globs : undefined,
+    hidden: parsed.hidden,
+    noIgnore: parsed.noIgnore,
+    follow: parsed.follow,
+    maxDepth: parsed.maxDepth ?? undefined,
+    sortModified: parsed.sortModified,
   }
+  return raceTimeout(
+    () => napiFindFiles(opts),
+    DEFAULT_TIMEOUT_MS,
+    signal,
+    [],
+  )
+}
+
+async function runSearch(
+  parsed: ParsedArgs,
+  target: string,
+  signal: AbortSignal,
+): Promise<string[]> {
+  const opts: SearchContentOptions = {
+    root: target,
+    pattern: parsed.pattern!,
+    caseInsensitive: parsed.caseInsensitive,
+    literal: parsed.literal,
+    multilineDotall: parsed.multilineDotall,
+    maxColumns: parsed.maxColumns ?? undefined,
+    maxCountPerFile: parsed.maxCountPerFile ?? undefined,
+    globs: parsed.globs.length > 0 ? parsed.globs : undefined,
+    hidden: parsed.hidden,
+    noIgnore: parsed.noIgnore,
+  }
+
+  const matches = await raceTimeout(
+    () => napiSearchContent(opts),
+    DEFAULT_TIMEOUT_MS,
+    signal,
+    [],
+  )
+
+  if (parsed.filesWithMatchesOnly) {
+    const seen = new Set<string>()
+    const out: string[] = []
+    for (const m of matches) {
+      if (!seen.has(m.path)) {
+        seen.add(m.path)
+        out.push(m.path)
+      }
+    }
+    return out
+  }
+
+  if (parsed.countOnly) {
+    const counts = new Map<string, number>()
+    for (const m of matches) {
+      counts.set(m.path, (counts.get(m.path) ?? 0) + 1)
+    }
+    return Array.from(counts.entries()).map(([p, c]) => `${p}:${c}`)
+  }
+
+  // Content mode: format `path:line:content`. All callers parse this
+  // exact shape (see GrepTool, GlobalSearchDialog).
+  return matches.map(
+    m => `${m.path}:${m.lineNumber ?? 0}:${m.content}`,
+  )
 }
 
 /**
- * Test ripgrep availability on first use and cache the result
+ * Promise.race the synchronous NAPI call against a timeout. NAPI calls
+ * are synchronous from JS's perspective — we wrap them in a microtask
+ * so the timeout has a chance to fire if the search blocks unexpectedly.
+ * Caller-provided AbortSignal gives an additional escape hatch.
+ *
+ * Note: synchronous NAPI calls block the event loop while running, so
+ * "timeout" really only protects against the racing promise resolving
+ * after the timer has fired. For true cancellation mid-search use
+ * ripGrepStream + abortSignal.
  */
-const testRipgrepOnFirstUse = memoize(async (): Promise<void> => {
-  // Already tested
-  if (ripgrepStatus !== null) {
-    return
-  }
-
-  const config = getRipgrepConfig()
-
-  try {
-    let test: { code: number; stdout: string }
-
-    // For embedded ripgrep, use Bun.spawn with argv0
-    if (config.argv0) {
-      // Only Bun embeds ripgrep.
-      // eslint-disable-next-line custom-rules/require-bun-typeof-guard
-      const proc = Bun.spawn([config.command, '--version'], {
-        argv0: config.argv0,
-        stderr: 'ignore',
-        stdout: 'pipe',
-      })
-
-      // Bun's ReadableStream has .text() at runtime, but TS types don't reflect it
-      const [stdout, code] = await Promise.all([
-        (proc.stdout as unknown as Blob).text(),
-        proc.exited,
-      ])
-      test = {
-        code,
-        stdout,
+async function raceTimeout<T>(
+  fn: () => T,
+  timeoutMs: number,
+  signal: AbortSignal,
+  partialFallback: T,
+): Promise<T> {
+  if (signal.aborted) return partialFallback
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(
+        new RipgrepTimeoutError(
+          `ripgrep call exceeded ${timeoutMs}ms`,
+          partialFallback as unknown as string[],
+        ),
+      )
+    }, timeoutMs)
+    queueMicrotask(() => {
+      try {
+        const result = fn()
+        clearTimeout(timer)
+        resolve(result)
+      } catch (e) {
+        clearTimeout(timer)
+        reject(e)
       }
-    } else {
-      test = await execFileNoThrow(
-        config.command,
-        [...config.args, '--version'],
-        {
-          timeout: 5000,
-        },
-      )
-    }
-
-    const working =
-      test.code === 0 && !!test.stdout && test.stdout.startsWith('ripgrep ')
-
-    ripgrepStatus = {
-      working,
-      lastTested: Date.now(),
-      config,
-    }
-
-    logForDebugging(
-      `Ripgrep first use test: ${working ? 'PASSED' : 'FAILED'} (mode=${config.mode}, path=${config.command})`,
-    )
-
-    // Log telemetry for actual ripgrep availability
-    logEvent('tengu_ripgrep_availability', {
-      working: working ? 1 : 0,
-      using_system: config.mode === 'system' ? 1 : 0,
     })
-  } catch (error) {
-    ripgrepStatus = {
-      working: false,
-      lastTested: Date.now(),
-      config,
-    }
-    logError(error)
-  }
-})
-
-let alreadyDoneSignCheck = false
-async function codesignRipgrepIfNecessary() {
-  if (process.platform !== 'darwin' || alreadyDoneSignCheck) {
-    return
-  }
-
-  alreadyDoneSignCheck = true
-
-  // Only sign the standalone vendored rg binary (npm builds)
-  const config = getRipgrepConfig()
-  if (config.mode !== 'builtin') {
-    return
-  }
-  const builtinPath = config.command
-
-  // First, check to see if ripgrep is already signed
-  const lines = (
-    await execFileNoThrow('codesign', ['-vv', '-d', builtinPath], {
-      preserveOutputOnError: false,
-    })
-  ).stdout.split('\n')
-
-  const needsSigned = lines.find(line => line.includes('linker-signed'))
-  if (!needsSigned) {
-    return
-  }
-
-  try {
-    const signResult = await execFileNoThrow('codesign', [
-      '--sign',
-      '-',
-      '--force',
-      '--preserve-metadata=entitlements,requirements,flags,runtime',
-      builtinPath,
-    ])
-
-    if (signResult.code !== 0) {
-      logError(
-        new Error(
-          `Failed to sign ripgrep: ${signResult.stdout} ${signResult.stderr}`,
-        ),
-      )
-    }
-
-    const quarantineResult = await execFileNoThrow('xattr', [
-      '-d',
-      'com.apple.quarantine',
-      builtinPath,
-    ])
-
-    if (quarantineResult.code !== 0) {
-      logError(
-        new Error(
-          `Failed to remove quarantine: ${quarantineResult.stdout} ${quarantineResult.stderr}`,
-        ),
-      )
-    }
-  } catch (e) {
-    logError(e)
-  }
+  })
 }

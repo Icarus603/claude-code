@@ -1,0 +1,9 @@
+# Cargo build artifacts go under the ccb repo's top-level /target so
+# packages/ stays clean (verify-empty-folders.ts walks packages/ and
+# trips on the transient empty subdirs cargo creates during compile).
+#
+# Path is resolved relative to the manifest dir
+# (packages/ripgrep-napi/native/), so 3 ".." segments land at
+# repo-root, then we anchor at <repo-root>/target/ripgrep-napi.
+[build]
+target-dir = "../../target/ripgrep-napi"

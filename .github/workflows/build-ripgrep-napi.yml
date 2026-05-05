@@ -1,0 +1,167 @@
+# Cross-compile ripgrep-napi (.node files) for all 5 platforms whenever
+# packages/ripgrep-napi/native/ source changes. Outputs are uploaded as
+# artifacts and committed by a follow-up job to vendor/<arch>-<plat>/.
+#
+# Why a separate workflow (not part of release.yml): the .node binaries
+# are committed to the repo so they ship with `bun run build:platforms`
+# without a build step on the user's machine. Cross-compiling rust on
+# every release is too slow; we cache the artifacts in git instead.
+# Triggered manually via workflow_dispatch (no auto-commit on PR — the
+# vendored binaries should be human-reviewed).
+
+name: Build ripgrep-napi
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'packages/ripgrep-napi/native/**'
+      - '.github/workflows/build-ripgrep-napi.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            vendor-dir: arm64-darwin
+            artifact-name: ripgrep-napi-arm64-darwin
+            node-name: ripgrep.node
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            vendor-dir: x64-darwin
+            artifact-name: ripgrep-napi-x64-darwin
+            node-name: ripgrep.node
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            vendor-dir: arm64-linux
+            artifact-name: ripgrep-napi-arm64-linux
+            node-name: ripgrep.node
+            cross: true
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            vendor-dir: x64-linux
+            artifact-name: ripgrep-napi-x64-linux
+            node-name: ripgrep.node
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            vendor-dir: x64-win32
+            artifact-name: ripgrep-napi-x64-win32
+            node-name: ripgrep.node
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache cargo registry + index
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ matrix.target }}-${{ hashFiles('packages/ripgrep-napi/native/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.target }}-
+
+      - name: Install cross-compile linker (Linux arm64)
+        if: matrix.cross == true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          mkdir -p ~/.cargo
+          cat >> ~/.cargo/config.toml <<EOF
+          [target.aarch64-unknown-linux-gnu]
+          linker = "aarch64-linux-gnu-gcc"
+          EOF
+
+      - name: Build ripgrep-napi
+        working-directory: packages/ripgrep-napi/native
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Stage .node artifact (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          # cargo writes to <repo>/target/ripgrep-napi/<target>/release/.
+          # Source filename varies by platform:
+          #   darwin: libripgrep_napi.dylib
+          #   linux:  libripgrep_napi.so
+          src=""
+          for cand in \
+            target/ripgrep-napi/${{ matrix.target }}/release/libripgrep_napi.dylib \
+            target/ripgrep-napi/${{ matrix.target }}/release/libripgrep_napi.so; do
+            if [ -f "$cand" ]; then src="$cand"; break; fi
+          done
+          if [ -z "$src" ]; then
+            echo "::error::no built artifact found"
+            exit 1
+          fi
+          mkdir -p staged
+          cp "$src" "staged/${{ matrix.node-name }}"
+
+      - name: Stage .node artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $src = "target/ripgrep-napi/${{ matrix.target }}/release/ripgrep_napi.dll"
+          if (-not (Test-Path $src)) {
+            Write-Error "no built artifact found at $src"
+            exit 1
+          }
+          New-Item -ItemType Directory -Force -Path staged | Out-Null
+          Copy-Item $src "staged/${{ matrix.node-name }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: staged/${{ matrix.node-name }}
+          if-no-files-found: error
+
+  commit:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Move artifacts into vendor/
+        run: |
+          for dir in arm64-darwin x64-darwin arm64-linux x64-linux x64-win32; do
+            artifact_name="ripgrep-napi-${dir}"
+            src="artifacts/${artifact_name}/ripgrep.node"
+            dst="packages/ripgrep-napi/vendor/${dir}/ripgrep.node"
+            if [ -f "$src" ]; then
+              mkdir -p "$(dirname "$dst")"
+              cp "$src" "$dst"
+              echo "staged $dst ($(stat -c%s "$dst") bytes)"
+            else
+              echo "::warning::missing $src — skipping"
+            fi
+          done
+
+      - name: Commit + push if changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet packages/ripgrep-napi/vendor/; then
+            echo "no changes — skipping commit"
+            exit 0
+          fi
+          git add packages/ripgrep-napi/vendor/
+          msg="ripgrep-napi: refresh vendored .node binaries (CI run ${{ github.run_number }} from ${{ github.sha }})"
+          git commit -m "$msg" -m "Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          git push
