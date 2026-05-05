@@ -304,7 +304,7 @@ import { query } from '@claude-code/agent/query';
 import { mergeClients } from '../hooks/useMergedClients.js';
 import { getQuerySourceForREPL } from '@claude-code/agent/promptCategory.js';
 import { mergeAndFilterTools } from '../toolPool.js';
-import { useSkillsChange } from '../hooks/useSkillsChange.js';
+import { useCommandReload } from '../hooks/useCommandReload.js';
 import { Messages } from '../components/Messages.js';
 import { TaskListV2 } from '../components/TaskListV2.js';
 import { TeammateViewHeader } from '../components/TeammateViewHeader.js';
@@ -700,11 +700,9 @@ export function REPL({
   // ResumeConversation.tsx (via setAppState before rendering REPL) to avoid
   // useEffect-based state initialization on mount (per CLAUDE.md guidelines)
 
-  // Local state for commands (hot-reloadable when skill files change)
+  // Local state for commands (hot-reloadable; see useCommandReload triggers)
   const [localCommands, setLocalCommands] = useState(initialCommands);
-
-  // Watch for skill file changes and reload all commands
-  useSkillsChange(isRemoteSession ? undefined : getProjectRoot(), setLocalCommands);
+  useCommandReload(isRemoteSession ? undefined : getProjectRoot(), appPlugins.commands, setLocalCommands);
 
   // Track proactive mode for tools dependency - SleepTool filters by proactive state
   const proactiveActive = React.useSyncExternalStore(
