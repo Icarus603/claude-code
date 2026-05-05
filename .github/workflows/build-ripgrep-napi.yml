@@ -14,6 +14,11 @@ name: Build ripgrep-napi
 on:
   workflow_dispatch:
   push:
+    # Restrict to branches — tag pushes (release.yml triggers) check out a
+    # detached HEAD, which makes the auto-commit job try to `git push`
+    # without a branch ref and fail. Branches-only avoids that false red.
+    branches:
+      - main
     paths:
       - 'packages/ripgrep-napi/native/**'
       - '.github/workflows/build-ripgrep-napi.yml'
