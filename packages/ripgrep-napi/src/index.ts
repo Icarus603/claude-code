@@ -10,14 +10,21 @@
  * defeat the bundler's static analysis and the .node won't ship.
  *
  * Three primitives:
- *   findFiles(opts)    → string[]      file enumeration (no content read)
- *   searchContent(opts) → ContentMatch[]  buffered regex search
+ *   findFiles(opts)    → Promise<string[]>      file enumeration
+ *   searchContent(opts) → Promise<ContentMatch[]> buffered regex search
  *   searchStream(opts, onMatch, onDone) → CancelHandle   streaming search
  *
- * Plus countFiles(opts) → number, a thin convenience over findFiles().
+ * Plus countFiles(opts) → Promise<number>, a thin convenience over findFiles().
  *
- * Cancellation is uniform: every entry point either returns or accepts a
- * CancelHandle. Wire up to AbortSignal on the JS side.
+ * The buffered primitives are async because the underlying `ignore::Walk`
+ * is blocking I/O — a sync NAPI call would freeze Bun's event loop for
+ * the entire walk (~2.5s on a 1.7M-file home directory). The Rust side
+ * uses `napi::tokio_runtime::spawn_blocking` so the work runs on the
+ * blocking pool, leaving the JS main thread free to render Ink frames
+ * and process keystrokes.
+ *
+ * `searchStream` already runs on its own `std::thread` and reports back
+ * via `ThreadsafeFunction`, so it stays on the same shape.
  */
 
 interface CancelHandle {
@@ -54,9 +61,9 @@ interface ContentMatch {
 }
 
 interface NativeBinding {
-  findFiles(opts: FindFilesOptions): string[]
-  countFiles(opts: FindFilesOptions): number
-  searchContent(opts: SearchContentOptions): ContentMatch[]
+  findFiles(opts: FindFilesOptions): Promise<string[]>
+  countFiles(opts: FindFilesOptions): Promise<number>
+  searchContent(opts: SearchContentOptions): Promise<ContentMatch[]>
   searchStream(
     opts: SearchContentOptions,
     onMatch: (err: Error | null, line: string) => void,
@@ -104,15 +111,17 @@ function load(): NativeBinding {
   return cached
 }
 
-export function findFiles(opts: FindFilesOptions): string[] {
+export function findFiles(opts: FindFilesOptions): Promise<string[]> {
   return load().findFiles(opts)
 }
 
-export function countFiles(opts: FindFilesOptions): number {
+export function countFiles(opts: FindFilesOptions): Promise<number> {
   return load().countFiles(opts)
 }
 
-export function searchContent(opts: SearchContentOptions): ContentMatch[] {
+export function searchContent(
+  opts: SearchContentOptions,
+): Promise<ContentMatch[]> {
   return load().searchContent(opts)
 }
 

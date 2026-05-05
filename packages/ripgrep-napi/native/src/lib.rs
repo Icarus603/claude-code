@@ -2,22 +2,41 @@
 //!
 //! Three public surfaces, called from JS via napi-rs:
 //!
-//!   findFiles(opts)       -> string[]      (file enumeration; no content read)
-//!   searchContent(opts)   -> Match[]       (buffered regex search)
-//!   searchStream(opts, cb) -> CancelHandle (streaming regex search)
+//!   findFiles(opts)       -> Promise<string[]>      (file enumeration)
+//!   searchContent(opts)   -> Promise<Match[]>       (buffered regex search)
+//!   searchStream(opts, cb) -> CancelHandle          (streaming regex search)
 //!
 //! Everything else (count helpers, etc.) is JS-side syntactic sugar over
-//! these three. Cancellation is uniform: every entry point that walks the
-//! filesystem returns a CancelHandle (or a synchronous Result for buffered
-//! calls that take an injected handle); flipping the flag aborts at the
-//! next walker step or sink callback. There is no abort-via-timeout —
-//! the JS wrapper races a setTimeout against the cancel handle.
+//! these three.
 //!
-//! No "spawn" mode, no "embedded" mode, no path-mode dispatch: this is
-//! just a function call. Sandbox-on-Linux still needs an rg binary path
-//! because @anthropic-ai/sandbox-runtime invokes rg as an external
-//! enforcement helper — that path lives in ccb's sandbox-adapter, not
-//! here.
+//! ## Threading model
+//!
+//! `findFiles`, `countFiles`, and `searchContent` are `async fn` that
+//! offload the blocking `ignore::Walk` (and per-file `grep_searcher`
+//! reads) onto napi-rs's tokio blocking pool via `spawn_blocking`. This
+//! is critical: the walker hits `readdir`/`stat`/`open` for every entry
+//! and on a 1.7M-file home directory takes ~2.5s wall time. Running it
+//! on the JS main thread froze Bun's event loop for that entire window
+//! — Ink stopped rendering, keystrokes piled up unprocessed.
+//!
+//! `searchStream` already runs on a dedicated `std::thread` and emits
+//! results via `ThreadsafeFunction`, so it stays unchanged.
+//!
+//! ## Cancellation
+//!
+//! `searchStream` returns a `CancelHandle`; flipping the flag aborts at
+//! the next walker step or sink callback. The buffered (`async`) calls
+//! don't currently expose a cancel handle — the JS wrapper races a
+//! `setTimeout` + `AbortSignal` against the returned `Promise`, which
+//! lets the caller stop waiting (the walker keeps running to completion
+//! on the blocking-pool thread, which is fine because the work is bounded
+//! and we don't pay the cost again — napi's blocking pool reuses threads).
+//!
+//! ## Sandbox edge
+//!
+//! Sandbox-on-Linux still needs an rg binary path because
+//! @anthropic-ai/sandbox-runtime invokes rg as an external enforcement
+//! helper — that path lives in ccb's sandbox-adapter, not here.
 
 #![deny(clippy::unwrap_used, clippy::expect_used)]
 
@@ -82,16 +101,26 @@ pub struct FindFilesOptions {
   pub sort_modified: Option<bool>,
 }
 
-#[napi(catch_unwind)]
-pub fn find_files(opts: FindFilesOptions) -> Result<Vec<String>> {
-  let (results, _cancelled) = walk(&opts, None)?;
-  Ok(results)
+// `async fn` here makes napi-rs return a JS `Promise<T>`, scheduled on
+// the tokio blocking pool. The closure is `Send + 'static` (FindFilesOptions
+// owns `String`/`Vec<String>`), so moving it across thread boundaries is
+// safe. We only flatten the JoinHandle's join error into a napi `Error`
+// — panics inside `walk` already propagate as Result errors.
+//
+// `spawn_blocking` is re-exported through `napi::bindgen_prelude::*`
+// (gated on the `tokio_rt` feature, which `napi`'s `async` feature pulls in).
+#[napi]
+pub async fn find_files(opts: FindFilesOptions) -> Result<Vec<String>> {
+  spawn_blocking(move || walk(&opts, None).map(|(out, _)| out))
+    .await
+    .map_err(|e| Error::from_reason(format!("find_files join error: {e}")))?
 }
 
-#[napi(catch_unwind)]
-pub fn count_files(opts: FindFilesOptions) -> Result<u32> {
-  let (results, _cancelled) = walk(&opts, None)?;
-  Ok(results.len() as u32)
+#[napi]
+pub async fn count_files(opts: FindFilesOptions) -> Result<u32> {
+  spawn_blocking(move || walk(&opts, None).map(|(out, _)| out.len() as u32))
+    .await
+    .map_err(|e| Error::from_reason(format!("count_files join error: {e}")))?
 }
 
 /// Internal: shared walker for find/count. Optional cancel flag for the
@@ -279,8 +308,15 @@ pub struct ContentMatch {
   pub content: String,
 }
 
-#[napi(catch_unwind)]
-pub fn search_content(opts: SearchContentOptions) -> Result<Vec<ContentMatch>> {
+#[napi]
+pub async fn search_content(opts: SearchContentOptions) -> Result<Vec<ContentMatch>> {
+  // Walk + grep_searcher I/O both block — keep them off the JS thread.
+  spawn_blocking(move || search_content_inner(opts))
+    .await
+    .map_err(|e| Error::from_reason(format!("search_content join error: {e}")))?
+}
+
+fn search_content_inner(opts: SearchContentOptions) -> Result<Vec<ContentMatch>> {
   let (matcher, mut searcher) = build_search(&opts)?;
   let walk_opts = walk_opts_from_search(&opts);
   let (paths, _cancelled) = walk(&walk_opts, None)?;

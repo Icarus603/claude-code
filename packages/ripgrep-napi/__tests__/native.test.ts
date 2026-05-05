@@ -27,14 +27,14 @@ function makeTempTree(layout: Record<string, string>): string {
 }
 
 describe('findFiles', () => {
-  test('lists files at the root, hidden ignored by default', () => {
+  test('lists files at the root, hidden ignored by default', async () => {
     const root = makeTempTree({
       'a.ts': '',
       'b.md': '',
       '.hidden': '',
     })
     try {
-      const files = findFiles({ root, noIgnore: true }).sort()
+      const files = (await findFiles({ root, noIgnore: true })).sort()
       expect(files).toHaveLength(2)
       expect(files.some(f => f.endsWith('a.ts'))).toBe(true)
       expect(files.some(f => f.endsWith('b.md'))).toBe(true)
@@ -43,24 +43,26 @@ describe('findFiles', () => {
     }
   })
 
-  test('hidden:true includes dotfiles', () => {
+  test('hidden:true includes dotfiles', async () => {
     const root = makeTempTree({ 'a.ts': '', '.dot': '' })
     try {
-      const files = findFiles({ root, hidden: true, noIgnore: true })
+      const files = await findFiles({ root, hidden: true, noIgnore: true })
       expect(files).toHaveLength(2)
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
   })
 
-  test('globs filter by pattern', () => {
+  test('globs filter by pattern', async () => {
     const root = makeTempTree({
       'a.ts': '',
       'b.md': '',
       'sub/c.md': '',
     })
     try {
-      const md = findFiles({ root, globs: ['*.md'], noIgnore: true }).sort()
+      const md = (
+        await findFiles({ root, globs: ['*.md'], noIgnore: true })
+      ).sort()
       expect(md).toHaveLength(2)
       expect(md.every(f => f.endsWith('.md'))).toBe(true)
     } finally {
@@ -68,14 +70,14 @@ describe('findFiles', () => {
     }
   })
 
-  test('negation glob excludes', () => {
+  test('negation glob excludes', async () => {
     const root = makeTempTree({
       'a.ts': '',
       'sub/b.ts': '',
       'sub/c.ts': '',
     })
     try {
-      const files = findFiles({
+      const files = await findFiles({
         root,
         globs: ['!sub/**'],
         noIgnore: true,
@@ -87,14 +89,14 @@ describe('findFiles', () => {
     }
   })
 
-  test('maxDepth limits recursion', () => {
+  test('maxDepth limits recursion', async () => {
     const root = makeTempTree({
       'a.ts': '',
       'sub/b.ts': '',
       'sub/sub2/c.ts': '',
     })
     try {
-      const shallow = findFiles({ root, maxDepth: 1, noIgnore: true })
+      const shallow = await findFiles({ root, maxDepth: 1, noIgnore: true })
       expect(shallow).toHaveLength(1)
       expect(shallow[0]).toMatch(/a\.ts$/)
     } finally {
@@ -102,16 +104,35 @@ describe('findFiles', () => {
     }
   })
 
-  test('missing root returns empty array (not throw)', () => {
-    expect(findFiles({ root: '/nonexistent/path/here' })).toEqual([])
+  test('missing root returns empty array (not throw)', async () => {
+    expect(await findFiles({ root: '/nonexistent/path/here' })).toEqual([])
+  })
+
+  test('returns a Promise (does not block the JS event loop)', async () => {
+    // Regression: when `find_files` was a synchronous NAPI call, the
+    // walker ran on the JS main thread and froze Bun's event loop for
+    // the duration of the walk (~2.5s on a 1.7M-file home directory).
+    // The fix is `async fn` on the Rust side + spawn_blocking onto
+    // tokio's blocking pool. Verifying the JS-visible shape (a thenable)
+    // pins the contract regardless of how fast the walk happens to be
+    // for the fixture under test.
+    const root = makeTempTree({ 'a.ts': '' })
+    try {
+      const result = findFiles({ root, noIgnore: true })
+      expect(typeof (result as Promise<string[]>).then).toBe('function')
+      const files = await result
+      expect(files).toHaveLength(1)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 })
 
 describe('countFiles', () => {
-  test('counts files matching options', () => {
+  test('counts files matching options', async () => {
     const root = makeTempTree({ 'a.ts': '', 'b.ts': '', 'c.ts': '' })
     try {
-      expect(countFiles({ root, noIgnore: true })).toBe(3)
+      expect(await countFiles({ root, noIgnore: true })).toBe(3)
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
@@ -119,13 +140,13 @@ describe('countFiles', () => {
 })
 
 describe('searchContent', () => {
-  test('finds regex matches across files', () => {
+  test('finds regex matches across files', async () => {
     const root = makeTempTree({
       'a.ts': 'export function alpha() {}\nfn helper() {}',
       'b.ts': 'export function beta() {}',
     })
     try {
-      const matches = searchContent({
+      const matches = await searchContent({
         root,
         pattern: 'export function',
         noIgnore: true,
@@ -138,10 +159,10 @@ describe('searchContent', () => {
     }
   })
 
-  test('case insensitive', () => {
+  test('case insensitive', async () => {
     const root = makeTempTree({ 'a.ts': 'HELLO world\nhello again' })
     try {
-      const matches = searchContent({
+      const matches = await searchContent({
         root,
         pattern: 'hello',
         caseInsensitive: true,
@@ -153,10 +174,10 @@ describe('searchContent', () => {
     }
   })
 
-  test('literal flag treats regex chars as text', () => {
+  test('literal flag treats regex chars as text', async () => {
     const root = makeTempTree({ 'a.ts': 'foo.bar\nfoozbar' })
     try {
-      const matches = searchContent({
+      const matches = await searchContent({
         root,
         pattern: 'foo.bar',
         literal: true,
@@ -169,12 +190,12 @@ describe('searchContent', () => {
     }
   })
 
-  test('maxCountPerFile caps results per file', () => {
+  test('maxCountPerFile caps results per file', async () => {
     const root = makeTempTree({
       'a.ts': 'hello\nhello\nhello\nhello',
     })
     try {
-      const matches = searchContent({
+      const matches = await searchContent({
         root,
         pattern: 'hello',
         maxCountPerFile: 2,
@@ -186,10 +207,10 @@ describe('searchContent', () => {
     }
   })
 
-  test('no matches returns empty array', () => {
+  test('no matches returns empty array', async () => {
     const root = makeTempTree({ 'a.ts': 'foo' })
     try {
-      const matches = searchContent({
+      const matches = await searchContent({
         root,
         pattern: 'will-not-match',
         noIgnore: true,

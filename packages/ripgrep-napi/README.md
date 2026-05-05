@@ -46,23 +46,25 @@ CI cross-compiles all 5 platforms via
 ```ts
 import { findFiles, searchContent, searchStream } from 'ripgrep-napi'
 
-// File enumeration
-const paths: string[] = findFiles({
+// File enumeration (async — runs on tokio's blocking pool, so the JS
+// event loop stays free during the walk).
+const paths: string[] = await findFiles({
   root: '/some/dir',
   globs: ['*.md', '!.git/**'],
   hidden: true,
   noIgnore: true,
 })
 
-// Buffered regex search
-const matches = searchContent({
+// Buffered regex search (also async).
+const matches = await searchContent({
   root: '/some/dir',
   pattern: 'export function',
   caseInsensitive: true,
 })
 // matches: { path, lineNumber, content }[]
 
-// Streaming with cancel handle
+// Streaming with cancel handle (already runs on its own thread; emits
+// matches via ThreadsafeFunction).
 const handle = searchStream(
   { root: '/some/dir', pattern: 'TODO' },
   line => console.log(line),  // path:line:content
@@ -70,6 +72,12 @@ const handle = searchStream(
 )
 handle.cancel()  // safe at any time
 ```
+
+The buffered primitives (`findFiles`, `countFiles`, `searchContent`) used
+to be synchronous, which froze Bun's event loop during long walks (e.g.
+~2.5s on a 1.7M-file home directory). They are now `async` and offload
+the blocking I/O onto napi-rs's tokio blocking pool — Ink keeps rendering
+and keystrokes keep flowing while a walk is in progress.
 
 ## Sandbox note
 

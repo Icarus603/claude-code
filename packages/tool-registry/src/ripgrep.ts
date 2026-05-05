@@ -341,7 +341,7 @@ export const countFilesRoundedRg = memoize(
         hidden: true,
         globs: ignorePatterns.map(p => `!${p}`),
       }
-      const count = napiCountFiles(opts)
+      const count = await napiCountFiles(opts)
       if (count === 0) return 0
       const power = Math.pow(10, Math.floor(Math.log10(count)))
       return Math.round(count / power) * power
@@ -372,12 +372,7 @@ async function runFindFiles(
     maxDepth: parsed.maxDepth ?? undefined,
     sortModified: parsed.sortModified,
   }
-  return raceTimeout(
-    () => napiFindFiles(opts),
-    DEFAULT_TIMEOUT_MS,
-    signal,
-    [],
-  )
+  return raceTimeout(napiFindFiles(opts), DEFAULT_TIMEOUT_MS, signal, [])
 }
 
 async function runSearch(
@@ -399,7 +394,7 @@ async function runSearch(
   }
 
   const matches = await raceTimeout(
-    () => napiSearchContent(opts),
+    napiSearchContent(opts),
     DEFAULT_TIMEOUT_MS,
     signal,
     [],
@@ -433,41 +428,52 @@ async function runSearch(
 }
 
 /**
- * Promise.race the synchronous NAPI call against a timeout. NAPI calls
- * are synchronous from JS's perspective — we wrap them in a microtask
- * so the timeout has a chance to fire if the search blocks unexpectedly.
- * Caller-provided AbortSignal gives an additional escape hatch.
+ * Race a NAPI call's promise against a timeout and an AbortSignal.
  *
- * Note: synchronous NAPI calls block the event loop while running, so
- * "timeout" really only protects against the racing promise resolving
- * after the timer has fired. For true cancellation mid-search use
- * ripGrepStream + abortSignal.
+ * The Rust side runs every buffered call on tokio's blocking pool, so the
+ * promise settles asynchronously and the JS event loop stays free during
+ * the walk. The timeout / abort here only stops the *caller* from waiting
+ * on the result — they don't actually cancel the underlying walker. That
+ * is acceptable because (a) the walk is bounded by the filesystem,
+ * (b) blocking-pool threads are reused, and (c) the only caller that
+ * needs mid-walk cancellation is GlobalSearchDialog, which already uses
+ * `ripGrepStream` + `CancelHandle`.
  */
 async function raceTimeout<T>(
-  fn: () => T,
+  pending: Promise<T>,
   timeoutMs: number,
   signal: AbortSignal,
   partialFallback: T,
 ): Promise<T> {
   if (signal.aborted) return partialFallback
   return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(
-        new RipgrepTimeoutError(
-          `ripgrep call exceeded ${timeoutMs}ms`,
-          partialFallback as unknown as string[],
+    let settled = false
+    const finishOk = (v: T) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      signal.removeEventListener('abort', onAbort)
+      resolve(v)
+    }
+    const finishErr = (e: unknown) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      signal.removeEventListener('abort', onAbort)
+      reject(e)
+    }
+    const onAbort = () => finishOk(partialFallback)
+    signal.addEventListener('abort', onAbort, { once: true })
+    const timer = setTimeout(
+      () =>
+        finishErr(
+          new RipgrepTimeoutError(
+            `ripgrep call exceeded ${timeoutMs}ms`,
+            partialFallback as unknown as string[],
+          ),
         ),
-      )
-    }, timeoutMs)
-    queueMicrotask(() => {
-      try {
-        const result = fn()
-        clearTimeout(timer)
-        resolve(result)
-      } catch (e) {
-        clearTimeout(timer)
-        reject(e)
-      }
-    })
+      timeoutMs,
+    )
+    pending.then(finishOk, finishErr)
   })
 }
