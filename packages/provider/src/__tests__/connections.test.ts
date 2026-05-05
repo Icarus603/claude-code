@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import type { ConnectionRecord } from '@claude-code/config'
 import {
   CLAUDE_AI_CONNECTION_ID,
   CODEX_CONNECTION_ID,
@@ -6,6 +7,7 @@ import {
   composeModelId,
   generateConnectionId,
   getDefaultModelsForProtocol,
+  isFirstPartyAnthropicConnection,
   isWellKnownConnection,
   prettyModelLabel,
   unpackModelId,
@@ -175,5 +177,74 @@ describe('getDefaultModelsForProtocol', () => {
     const ids = getDefaultModelsForProtocol('gemini').map(m => m.id)
     expect(ids).toContain('gemini-2.5-pro')
     expect(ids).toContain('gemini-2.5-flash')
+  })
+})
+
+describe('isFirstPartyAnthropicConnection', () => {
+  const baseConn = {
+    id: 'x',
+    name: 'X',
+    auth: { type: 'api_key' as const, key: 'k' },
+    enabled: true,
+    models: [],
+    createdAt: 0,
+  }
+
+  test('returns false for undefined', () => {
+    expect(isFirstPartyAnthropicConnection(undefined)).toBe(false)
+  })
+
+  test('returns false for non-anthropic protocol', () => {
+    const conn: ConnectionRecord = {
+      ...baseConn,
+      protocol: 'openai',
+      endpoint: 'https://api.anthropic.com',
+    }
+    expect(isFirstPartyAnthropicConnection(conn)).toBe(false)
+  })
+
+  test('returns true for api.anthropic.com', () => {
+    const conn: ConnectionRecord = {
+      ...baseConn,
+      protocol: 'anthropic',
+      endpoint: 'https://api.anthropic.com',
+    }
+    expect(isFirstPartyAnthropicConnection(conn)).toBe(true)
+  })
+
+  test('returns true for api.anthropic.com with path', () => {
+    const conn: ConnectionRecord = {
+      ...baseConn,
+      protocol: 'anthropic',
+      endpoint: 'https://api.anthropic.com/v1',
+    }
+    expect(isFirstPartyAnthropicConnection(conn)).toBe(true)
+  })
+
+  test('returns true for api-staging.anthropic.com', () => {
+    const conn: ConnectionRecord = {
+      ...baseConn,
+      protocol: 'anthropic',
+      endpoint: 'https://api-staging.anthropic.com',
+    }
+    expect(isFirstPartyAnthropicConnection(conn)).toBe(true)
+  })
+
+  test('returns false for self-hosted proxy', () => {
+    const conn: ConnectionRecord = {
+      ...baseConn,
+      protocol: 'anthropic',
+      endpoint: 'https://my-litellm.example.com/anthropic',
+    }
+    expect(isFirstPartyAnthropicConnection(conn)).toBe(false)
+  })
+
+  test('returns false for malformed endpoint', () => {
+    const conn: ConnectionRecord = {
+      ...baseConn,
+      protocol: 'anthropic',
+      endpoint: 'not a url',
+    }
+    expect(isFirstPartyAnthropicConnection(conn)).toBe(false)
   })
 })

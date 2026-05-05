@@ -22,6 +22,33 @@ export type AuthProtocol = ConnectionRecord['protocol']
 
 export type OAuthSource = 'claude-ai' | 'console' | 'codex'
 
+// ── Endpoint discrimination ─────────────────────────────────────────────
+
+/**
+ * Is this connection actively talking to Anthropic's first-party endpoint?
+ *
+ * `protocol: 'anthropic'` covers three deployment shapes that look the
+ * same at the wire-protocol level but differ in capability:
+ *   - Pro/Max OAuth on api.anthropic.com  → server tools, FGTS, policy limits all available
+ *   - Console API key on api.anthropic.com → same
+ *   - Self-hosted compat proxy (LiteLLM, Helicone, …) on any other host
+ *     → speaks Anthropic protocol but doesn't necessarily forward
+ *       server tools / FGTS / etc. — must NOT receive native-only fields.
+ *
+ * This predicate distinguishes the first two from the third by host check.
+ */
+export function isFirstPartyAnthropicConnection(
+  conn: ConnectionRecord | undefined,
+): boolean {
+  if (!conn || conn.protocol !== 'anthropic') return false
+  try {
+    const host = new URL(conn.endpoint).host
+    return host === 'api.anthropic.com' || host === 'api-staging.anthropic.com'
+  } catch {
+    return false
+  }
+}
+
 // ── Default models per protocol ─────────────────────────────────────────
 
 /** Default model lists when a connection doesn't specify custom models. */
@@ -401,7 +428,9 @@ function migrateLegacyAnthropicCompat(env: Record<string, string>): boolean {
   if (!baseUrl) return false
   // Heuristic: if a Claude Account OAuth connection already exists at
   // api.anthropic.com, that's the OAuth slot — only migrate when this
-  // base URL is a different host.
+  // base URL is a different host. Same host check as
+  // `isFirstPartyAnthropicConnection` but on a raw URL string (we don't
+  // yet have a ConnectionRecord at migration time).
   try {
     const host = new URL(baseUrl).host
     if (host === 'api.anthropic.com') return false

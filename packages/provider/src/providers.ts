@@ -3,6 +3,7 @@ import { getInitialSettings } from '@claude-code/config/settings'
 import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import { getGlobalConfig } from '@claude-code/config'
 import type { ConnectionRecord } from '@claude-code/config'
+import { isFirstPartyAnthropicConnection } from './connections.js'
 
 export type APIProvider =
   | 'firstParty'
@@ -149,13 +150,61 @@ export function resolveConnectionForModel(
 /**
  * Get the APIProvider to use for a specific model.
  * Prefers connection-based routing over the global provider.
+ *
+ * `AuthProtocol` (`'anthropic' | 'openai' | 'codex' | 'gemini'`) and
+ * `APIProvider` (firstParty/bedrock/vertex/foundry/openai/gemini/grok/codex)
+ * are different vocabularies — only the last three values overlap. The
+ * old code did `conn.protocol as APIProvider`, which silently leaked the
+ * string `'anthropic'` (a valid AuthProtocol but not a valid APIProvider)
+ * into downstream callers. Most callers default-Anthropic on unknown
+ * values so the leak was invisible, but `isAnthropicServerWebSearchCapable`
+ * has a `default: false` switch that broke connection-routed Anthropic
+ * users on the v26.5.25 WebSearch routing change.
+ *
+ * The right translation: `protocol === 'anthropic'` connections are
+ * "Anthropic-protocol on some endpoint" — at this layer we don't
+ * distinguish native vs proxy because the APIProvider enum doesn't model
+ * that axis. We translate to `'firstParty'`. Callers that genuinely need
+ * the proxy/native distinction (e.g. FGTS gating) call
+ * `isFirstPartyAnthropicEndpoint(modelId)` separately.
  */
 export function getProviderForModel(modelId: string): APIProvider {
   const conn = resolveConnectionForModel(modelId)
-  if (conn) {
-    return conn.protocol === 'codex' ? 'codex' : conn.protocol as APIProvider
+  if (!conn) return getAPIProvider()
+  switch (conn.protocol) {
+    case 'anthropic':
+      return 'firstParty'
+    case 'openai':
+      return 'openai'
+    case 'gemini':
+      return 'gemini'
+    case 'codex':
+      return 'codex'
   }
-  return getAPIProvider()
+}
+
+/**
+ * Is the request for `modelId` going to land on an api.anthropic.com
+ * endpoint right now?
+ *
+ * This is the "deployment is genuinely first-party Anthropic" check that
+ * gates native-only request body fields like `eager_input_streaming`
+ * (FGTS) — proxies (LiteLLM, Helicone, etc.) speak the Anthropic
+ * protocol but reject these fields with 400.
+ *
+ * Resolution order:
+ *   1. If `modelId` resolves to a configured connection, check that
+ *      connection's endpoint host.
+ *   2. Otherwise (env-only path or no model in hand), fall back to the
+ *      global provider + `ANTHROPIC_BASE_URL` host check.
+ */
+export function isFirstPartyAnthropicEndpoint(modelId?: string): boolean {
+  if (modelId) {
+    const conn = resolveConnectionForModel(modelId)
+    if (conn) return isFirstPartyAnthropicConnection(conn)
+    // No connection match — fall through to global path below.
+  }
+  return getAPIProvider() === 'firstParty' && isFirstPartyAnthropicBaseUrl()
 }
 
 /**

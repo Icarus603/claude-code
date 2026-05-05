@@ -86,7 +86,10 @@ import {
 import { getModelStrings } from './modelStrings.js'
 import { getAPIProvider } from './providers.js'
 import { resolveConnectionForModel } from './providers.js'
-import { unpackModelId } from './connections.js'
+import {
+  isFirstPartyAnthropicConnection,
+  unpackModelId,
+} from './connections.js'
 import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import {
   API_PDF_MAX_PAGES,
@@ -1017,18 +1020,10 @@ function get3PModelFallbackSuggestion(model: string): string | undefined {
   const conn = resolveConnectionForModel(model)
   if (conn) {
     if (conn.protocol !== 'anthropic') return undefined
-    // Anthropic-protocol connection. firstParty doesn't lag, only 3P
-    // proxies do.
-    const isFirstPartyOAuth =
-      conn.auth.type === 'oauth' && conn.auth.source === 'claude-ai'
-    if (isFirstPartyOAuth) return undefined
-    if (conn.auth.type === 'api_key') {
-      try {
-        if (new URL(conn.endpoint).host === 'api.anthropic.com') return undefined
-      } catch {
-        // Malformed endpoint — fall through and let the suggestion run.
-      }
-    }
+    // Anthropic-protocol connection. firstParty (Pro/Max OAuth on
+    // api.anthropic.com OR Console api_key on api.anthropic.com) doesn't
+    // lag — only third-party proxies (LiteLLM, Helicone, …) do.
+    if (isFirstPartyAnthropicConnection(conn)) return undefined
   } else {
     // No connection matched — env-driven path. Only Bedrock / Vertex /
     // Foundry lag firstParty.

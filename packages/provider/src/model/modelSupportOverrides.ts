@@ -1,5 +1,8 @@
 import memoize from 'lodash-es/memoize.js'
-import { getProviderForModel } from '../providers.js'
+import {
+  getProviderForModel,
+  isFirstPartyAnthropicEndpoint,
+} from '../providers.js'
 import { readEnv } from '@claude-code/config/env/utils'
 import { unpackModelId } from '../connections.js'
 
@@ -48,11 +51,23 @@ const OPENAI_TIERS = [
 export const get3PModelCapabilityOverride = memoize(
   (model: string, capability: ModelCapabilityOverride): boolean | undefined => {
     const provider = getProviderForModel(model)
-    if (provider === 'firstParty') {
+    // Skip override lookup only when this model lands on a true api.anthropic.com
+    // endpoint — OAuth (Pro/Max), Console api_key, or env-only `firstParty`.
+    // Anthropic-protocol *proxy* connections (LiteLLM etc.) need 3P overrides
+    // because their models lie outside the first-party defaults pattern;
+    // before the v26.5.26 fix this branch only matched env-only `firstParty`
+    // (the cast leaked `'anthropic'` for connection-routed cases) and the
+    // override path worked for proxies by accident. Now that
+    // `getProviderForModel` translates `protocol='anthropic'` → `'firstParty'`,
+    // we must distinguish native vs proxy endpoint here explicitly.
+    if (provider === 'firstParty' && isFirstPartyAnthropicEndpoint(model)) {
       return undefined
     }
     const m = model.toLowerCase()
     const bareModel = unpackModelId(model).modelId.toLowerCase()
+    // For proxy connections (provider==='firstParty' but endpoint != native),
+    // use ANTHROPIC_TIERS — they speak Anthropic protocol and any pinned env
+    // override applies the same way.
     const tiers = provider === 'openai' ? OPENAI_TIERS : ANTHROPIC_TIERS
     for (const tier of tiers) {
       const pinned = readEnv(tier.modelEnvVar)

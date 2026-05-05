@@ -44,10 +44,7 @@ import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { createUserMessage } from '@claude-code/agent/messages.js'
-import {
-  getAPIProvider,
-  isFirstPartyAnthropicBaseUrl,
-} from '../model/providers.js'
+import { isFirstPartyAnthropicEndpoint } from '../model/providers.js'
 import {
   getFileReadIgnorePatterns,
   normalizePatternsToPath,
@@ -197,9 +194,16 @@ export async function toolToAPISchema(
     // input_json_delta events, causing multi-minute hangs on large tool inputs.
     // Gated to direct api.anthropic.com: proxies (LiteLLM etc.) and Bedrock/Vertex
     // with Claude 4.5 reject this field with 400. See GH#32742, PR #21729.
+    //
+    // The model-aware `isFirstPartyAnthropicEndpoint(options.model)` check is
+    // load-bearing: connection-routed Anthropic-compat proxies leave
+    // `ANTHROPIC_BASE_URL` unset and `getAPIProvider()` returns `'firstParty'`
+    // when any connection exists, so the env-only gate `getAPIProvider() ===
+    // 'firstParty' && isFirstPartyAnthropicBaseUrl()` returns true and silently
+    // sends `eager_input_streaming` to the proxy, which 400s. Resolving the
+    // connection's actual endpoint host fixes this.
     if (
-      getAPIProvider() === 'firstParty' &&
-      isFirstPartyAnthropicBaseUrl() &&
+      isFirstPartyAnthropicEndpoint(options.model) &&
       (getFeatureValue_CACHED_MAY_BE_STALE('tengu_fgts', false) ||
         isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING')))
     ) {

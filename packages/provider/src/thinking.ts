@@ -5,10 +5,10 @@ import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature
 import { getCanonicalName } from './model.js'
 import { get3PModelCapabilityOverride } from './model/modelSupportOverrides.js'
 import { getAPIProvider, resolveConnectionForModel } from './providers.js'
+import { isFirstPartyAnthropicConnection } from './connections.js'
 import { getSettingsWithErrors } from '@claude-code/config/settings'
 import { resolveAntModel } from './antModels.js'
 import { readEnv } from '@claude-code/config/env/utils'
-import type { ConnectionRecord } from '@claude-code/config'
 
 /**
  * Mirrors ant 2.1.121's 2833.js schema: thinking config carries an
@@ -120,18 +120,6 @@ export function getRainbowColor(
 ): keyof Theme {
   const colors = shimmer ? RAINBOW_SHIMMER_COLORS : RAINBOW_COLORS
   return colors[charIndex % colors.length]!
-}
-
-function isFirstPartyAnthropicConnection(
-  conn: ConnectionRecord | undefined,
-): boolean {
-  if (!conn || conn.protocol !== 'anthropic') return false
-  try {
-    const host = new URL(conn.endpoint).host
-    return host === 'api.anthropic.com' || host === 'api-staging.anthropic.com'
-  } catch {
-    return false
-  }
 }
 
 function getAnthropicConnectionThinkingDefault(
