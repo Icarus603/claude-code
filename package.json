@@ -151,6 +151,7 @@
     "https-proxy-agent": "^8.0.0",
     "ignore": "^7.0.5",
     "image-processor-napi": "workspace:*",
+    "ripgrep-napi": "workspace:*",
     "indent-string": "^5.0.0",
     "jsonc-parser": "^3.3.1",
     "knip": "^6.1.1",
