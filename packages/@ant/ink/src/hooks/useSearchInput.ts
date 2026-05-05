@@ -7,7 +7,7 @@
  */
 
 import { useCallback, useState } from 'react'
-import type { KeyboardEvent } from '../core/events/keyboard-event.js'
+import { KeyboardEvent } from '../core/events/keyboard-event.js'
 import useInput from './use-input.js'
 import { useTerminalSize } from '../hooks/useTerminalSize.js'
 
@@ -212,7 +212,7 @@ export function useSearchInput({
 
   // Bridge: subscribe via useInput and adapt to KeyboardEvent
   useInput(
-    (_input: string, _key: unknown, event: { keypress: string }) => {
+    (_input, _key, event) => {
       handleKeyDown(new KeyboardEvent(event.keypress))
     },
     { isActive },
