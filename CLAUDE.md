@@ -162,7 +162,9 @@ The codebase uses a **ports-and-adapters** pattern. Inner packages declare contr
 | Plugins / Marketplace | Restored | `packages/config/plugin/`, `packages/repl/src/components/plugin/` |
 | MCP OAuth | Working | `packages/mcp-runtime/src/auth.ts` |
 | audio-capture-napi, image-processor-napi, color-diff-napi | Implemented | `packages/*-napi/` |
-| url-handler-napi, modifiers-napi | Stubs | `packages/*-napi/` |
+| ripgrep-napi | Implemented (rust + napi-rs, in-process ripgrep) | `packages/ripgrep-napi/` |
+| modifiers-napi | Working — `bun:ffi` Carbon shim, not real NAPI (name is historical) | `packages/modifiers-napi/` |
+| url-handler-napi | Stub | `packages/url-handler-napi/` |
 | Analytics / GrowthBook / Sentry | Empty implementations | various |
 | LSP Server (host side) | Removed | — |
 
