@@ -65,9 +65,12 @@ const outputSchema = lazySchema(() =>
 type OutputSchema = ReturnType<typeof outputSchema>
 type Output = z.infer<OutputSchema>
 
+/** @dynamicRequire */
 export const _sdkInputSchema = inputSchema
+/** @dynamicRequire */
 export const _sdkOutputSchema = outputSchema
 
+/** @dynamicRequire */
 export const PushNotificationTool: Tool<InputSchema, Output> = buildTool({
   name: PUSH_NOTIFICATION_TOOL_NAME,
   searchHint:

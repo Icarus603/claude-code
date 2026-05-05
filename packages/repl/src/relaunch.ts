@@ -29,7 +29,7 @@ import { flushTelemetry } from '@claude-code/local-observability/telemetry'
 import { shutdownLocalObservability } from '@claude-code/local-observability'
 import { getTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 
-export type Launcher = {
+type Launcher = {
   cmd: string
   prefixArgs: string[]
 }
@@ -88,7 +88,7 @@ export function getDefaultLauncher(
   return { cmd: process.execPath, prefixArgs: [argv1] }
 }
 
-export type RelaunchOptions = {
+type RelaunchOptions = {
   /**
    * Override the default arg list. Default behaviour: `--resume <sessionId>`,
    * or `[]` when `freshIfNoTranscript` is true and no transcript exists.

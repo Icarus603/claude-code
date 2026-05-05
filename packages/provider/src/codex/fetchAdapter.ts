@@ -480,6 +480,8 @@ async function translateCodexStreamToAnthropic(
  * Codex SSE response back to Anthropic SSE. All other URLs pass through
  * to the global fetch unchanged so SDK-internal traffic (OAuth refresh,
  * etc.) isn't affected.
+ *
+ * @dynamicRequire
  */
 export function createCodexFetch(): ClientOptions['fetch'] {
   return async (input, init) => {

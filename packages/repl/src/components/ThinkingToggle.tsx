@@ -7,7 +7,7 @@ import { ConfigurableShortcutHint } from './ConfigurableShortcutHint.js'
 import { Select } from './CustomSelect/index.js'
 import { Byline, KeyboardShortcutHint, Pane } from '@anthropic/ink'
 
-export type Props = {
+type Props = {
   currentValue: boolean
   onSelect: (enabled: boolean) => void
   onCancel?: () => void

@@ -8,11 +8,23 @@ import type {
   Tools,
 } from '@claude-code/tool-registry/runtime'
 
+/**
+ * V7 §7.2 SDK boundary placeholder types. Internal headless flow uses
+ * them as `unknown`-shaped containers; external SDK consumers may
+ * narrow against them. V9-2d marked NOT FEASIBLE to migrate.
+ *
+ * @public
+ */
 export type SDKStatus = 'active' | 'idle' | 'error' | string
+/** @public */
 export type MCPServerConnection = unknown
+/** @public */
 export type McpCommand = unknown
+/** @public */
 export type McpSdkServerConfig = unknown
+/** @public */
 export type AgentDefinition = unknown
+/** @public */
 export type ThinkingConfig = unknown
 
 export type HeadlessStoreParams = {

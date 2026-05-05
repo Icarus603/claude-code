@@ -18,7 +18,8 @@
 		"packages/cli/src/types/**",
 		"**/*.d.ts",
 		"**/__tests__/**",
-		"**/testing/**"
+		"**/testing/**",
+		"packages/headless-sdk/src/sandboxTypes.ts"
 	],
 	"ignoreDependencies": [
 		"@ant/*",
@@ -27,6 +28,7 @@
 		"@anthropic-ai/sandbox-runtime"
 	],
 	"ignoreBinaries": ["bun"],
+	"tags": ["-@dynamicRequire"],
 	"workspaces": {
 		"packages/@ant/*": {
 			"ignore": ["**"]

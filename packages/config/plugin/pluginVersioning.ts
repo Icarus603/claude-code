@@ -110,6 +110,8 @@ export async function calculatePluginVersion(
  *
  * @param dirPath - Path to directory (should be a git repository)
  * @returns Full commit SHA or null if not a git repo
+ *
+ * @dynamicRequire
  */
 export function getGitCommitSha(dirPath: string): Promise<string | null> {
   return getHeadForDir(dirPath)

@@ -27,6 +27,7 @@ function displayServerName(name: string): string {
 
 const TRUNCATE_AT = 60
 
+/** @dynamicRequire */
 export function UserChannelMessage({
   addMargin,
   param: { text },

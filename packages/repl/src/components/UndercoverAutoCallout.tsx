@@ -1,6 +1,7 @@
 // Stub — ant-only component, not available in decompiled build
 import React, { useEffect } from 'react';
 
+/** @dynamicRequire */
 export function UndercoverAutoCallout({ onDone }: { onDone: () => void }): React.ReactElement | null {
   useEffect(() => {
     onDone();

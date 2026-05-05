@@ -41,6 +41,8 @@ type GenerateToolUseSummaryParams = {
  *
  * @param params - Parameters including tools executed and their results
  * @returns A brief summary string, or null if generation fails
+ *
+ * @dynamicRequire
  */
 export async function generateToolUseSummary({
   tools,

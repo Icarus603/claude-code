@@ -63,7 +63,7 @@ type SetAppStateFn = (updater: (prev: AppState) => AppState) => void
 /**
  * Result of waiting for messages.
  */
-export type WaitResult =
+type WaitResult =
   | {
       type: 'shutdown_request'
       request: ReturnType<typeof isShutdownRequest>

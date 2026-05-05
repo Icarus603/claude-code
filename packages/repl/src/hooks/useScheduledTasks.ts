@@ -36,6 +36,8 @@ type Props = {
  *
  * Scheduler core (timer, file watcher, fire logic) lives in cronScheduler.ts
  * so SDK/-p mode can share it — see print.ts for the headless wiring.
+ *
+ * @dynamicRequire
  */
 export function useScheduledTasks({
   isLoading,

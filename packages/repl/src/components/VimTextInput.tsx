@@ -7,7 +7,7 @@ import type { VimTextInputProps } from '../textInputTypes.js'
 import type { TextHighlight } from '@claude-code/output/textHighlighting.js'
 import { BaseTextInput } from './BaseTextInput.js'
 
-export type Props = VimTextInputProps & {
+type Props = VimTextInputProps & {
   highlights?: TextHighlight[]
 }
 

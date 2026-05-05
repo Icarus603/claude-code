@@ -23,7 +23,7 @@ import { shouldRenderStatically } from './messageStaticness.js'
 import { MessageTimestamp } from './MessageTimestamp.js'
 import { OffscreenFreeze } from './OffscreenFreeze.js'
 
-export type Props = {
+type Props = {
   message: RenderableMessage
   /** Whether the previous message in renderableMessages is also a user message. */
   isUserContinuation: boolean

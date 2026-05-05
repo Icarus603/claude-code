@@ -6,6 +6,8 @@ import type { SystemMemorySavedMessage } from '@claude-code/agent/messageShapes'
  * Plain function (not a React component) so the React Compiler won't hoist
  * the teamCount property access for memoization. This module is only loaded
  * when feature('TEAMMEM') is true.
+ *
+ * @dynamicRequire
  */
 export function teamMemSavedPart(
   message: SystemMemorySavedMessage,

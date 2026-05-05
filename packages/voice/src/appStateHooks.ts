@@ -1,6 +1,7 @@
 // V7 §7.2 — lazy require() shim so voice package does not import
 // src/state/AppState directly at top level.
 
+/** @dynamicRequire */
 export type AppState = unknown
 
 export function useAppState<T>(selector: (state: unknown) => T): T {

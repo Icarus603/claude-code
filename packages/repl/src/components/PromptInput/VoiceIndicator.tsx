@@ -14,6 +14,7 @@ const PROCESSING_BRIGHT = { r: 185, g: 185, b: 185 }
 
 const PULSE_PERIOD_S = 2 // 2 second period for all pulsing animations
 
+/** @dynamicRequire */
 export function VoiceIndicator(props: Props): React.ReactNode {
   if (!feature('VOICE_MODE')) return null
   return <VoiceIndicatorImpl {...props} />

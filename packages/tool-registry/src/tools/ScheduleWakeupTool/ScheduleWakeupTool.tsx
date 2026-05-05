@@ -48,9 +48,12 @@ const outputSchema = lazySchema(() =>
 type OutputSchema = ReturnType<typeof outputSchema>
 type Output = z.infer<OutputSchema>
 
+/** @dynamicRequire */
 export const _sdkInputSchema = inputSchema
+/** @dynamicRequire */
 export const _sdkOutputSchema = outputSchema
 
+/** @dynamicRequire */
 export const ScheduleWakeupTool: Tool<InputSchema, Output> = buildTool({
   name: SCHEDULE_WAKEUP_TOOL_NAME,
   searchHint:

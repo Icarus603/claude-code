@@ -22,6 +22,7 @@ import {
 import { loadInstalledPluginsV2 } from '@claude-code/config/plugin/installedPluginsManager'
 import { getSettingsForSource } from '@claude-code/config/settings'
 
+/** @dynamicRequire */
 export function ChannelsNotice(): React.ReactNode {
   // Snapshot all reads at mount. This notice enters scrollback immediately
   // after the logo; any re-render past that point forces a full terminal
