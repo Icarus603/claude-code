@@ -64,6 +64,13 @@ export class ApiSearchAdapter implements WebSearchAdapter {
         hasAppendSystemPrompt: false,
         extraToolSchemas: [toolSchema],
         querySource: 'web_search_tool' as const,
+        // Sub-query is short-lived and result-discarded after extracting
+        // {title, url} — opting out of caching keeps this throwaway request
+        // from overwriting the main loop's cache_control slot. Aligns with
+        // ant 2.1.126 (decoded/3844.js:146 in the leak set). Without this,
+        // every WebSearch invalidates ~45K of cached system+messages and
+        // the next main-loop turn pays the full cache_creation cost again.
+        enablePromptCaching: false,
         agents: [],
         mcpTools: [],
         agentId: undefined,

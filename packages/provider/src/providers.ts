@@ -159,6 +159,46 @@ export function getProviderForModel(modelId: string): APIProvider {
 }
 
 /**
+ * Pure-logic predicate: does (provider, model) support Anthropic's
+ * server-side `web_search_20250305` tool?
+ *
+ * Mirrors ant's WebSearchTool.isEnabled() gating: firstParty / Bedrock
+ * / Foundry always; Vertex only on Claude 4-series models (older
+ * Claude 3.x deployments on Vertex don't expose the tool yet).
+ *
+ * Exported separately so callers without a stable resolver (tests,
+ * dependency-injected paths) can ask the question directly.
+ */
+export function isAnthropicServerWebSearchCapable(
+  provider: APIProvider,
+  modelId?: string,
+): boolean {
+  switch (provider) {
+    case 'firstParty':
+    case 'bedrock':
+    case 'foundry':
+      return true
+    case 'vertex':
+      // Older Claude 3.x deployments on Vertex don't expose the
+      // server tool — same restriction ant ships.
+      if (!modelId) return false
+      return /claude-(opus|sonnet|haiku)-4/i.test(modelId)
+    default:
+      return false
+  }
+}
+
+/**
+ * Whether the active provider supports Anthropic's server-side
+ * `web_search_20250305` tool — used by WebSearchTool to pick between
+ * the API-driven adapter and the Bing scraper fallback.
+ */
+export function supportsAnthropicServerWebSearch(modelId?: string): boolean {
+  const provider = modelId ? getProviderForModel(modelId) : getAPIProvider()
+  return isAnthropicServerWebSearchCapable(provider, modelId)
+}
+
+/**
  * Check if ANTHROPIC_BASE_URL is a first-party Anthropic API URL.
  * Returns true if not set (default API) or points to api.anthropic.com
  * (or api-staging.anthropic.com for ant users).
