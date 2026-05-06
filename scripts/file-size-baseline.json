@@ -10,7 +10,7 @@
   "packages/@ant/ink/src/core/render-node-to-output.ts": 1463,
   "packages/@ant/ink/src/core/screen.ts": 1487,
   "packages/@ant/ink/src/core/selection.ts": 918,
-  "packages/@ant/ink/src/core/yoga-layout/index.ts": 2579,
+  "packages/@ant/ink/src/core/yoga-layout/index.ts": 2590,
   "packages/agent/QueryEngine.ts": 1498,
   "packages/agent/agentHostBindings.ts": 973,
   "packages/agent/attachments.ts": 3767,

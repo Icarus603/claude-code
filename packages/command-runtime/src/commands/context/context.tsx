@@ -61,8 +61,14 @@ export async function call(
     apiView, // Original messages for API usage extraction
   )
 
-  // Render to ANSI string to preserve colors and pass to onDone like local commands do
-  const output = await renderToAnsiString(<ContextVisualization data={data} />)
+  // Render to ANSI string to preserve colors and pass to onDone like local commands do.
+  // Pass terminal width so layout matches the user's actual terminal — without it,
+  // renderToAnsiString falls back to 80 and long category lines wrap visibly even
+  // on wide terminals.
+  const output = await renderToAnsiString(
+    <ContextVisualization data={data} />,
+    terminalWidth,
+  )
   onDone(output)
   return null
 }

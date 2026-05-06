@@ -262,7 +262,7 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
             {(() => {
               const loaded = mcpTools.filter(t => t.isLoaded)
               return loaded.length > 0 ? (
-                <Box flexDirection="column">
+                <Box flexDirection="column" marginTop={1}>
                   <Text dimColor>Loaded</Text>
                   <Tree variant="tree">
                     {loaded.map((tool, i) => (
@@ -284,7 +284,7 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
             {hasDeferredMcpTools && (() => {
               const available = mcpTools.filter(t => !t.isLoaded)
               return available.length > 0 ? (
-                <Box flexDirection="column">
+                <Box flexDirection="column" marginTop={1}>
                   <Text dimColor>Available</Text>
                   <Tree variant="tree">
                     {available.map((tool, i) => (
@@ -329,7 +329,7 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
                 const defLoaded = deferredBuiltinTools.filter(t => t.isLoaded)
                 const total = sysLoaded.length + defLoaded.length
                 return total > 0 ? (
-                  <Box flexDirection="column">
+                  <Box flexDirection="column" marginTop={1}>
                     <Text dimColor>Loaded</Text>
                     <Tree variant="tree">
                       {sysLoaded.map((tool, i) => (
@@ -362,7 +362,7 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               {hasDeferredBuiltinTools && (() => {
                 const available = deferredBuiltinTools.filter(t => !t.isLoaded)
                 return available.length > 0 ? (
-                  <Box flexDirection="column">
+                  <Box flexDirection="column" marginTop={1}>
                     <Text dimColor>Available</Text>
                     <Tree variant="tree">
                       {available.map((tool, i) => (
@@ -404,7 +404,7 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
             </Box>
             {Array.from(groupBySource(agents).entries()).map(
               ([sourceDisplay, sourceAgents]) => (
-                <Box key={sourceDisplay} flexDirection="column">
+                <Box key={sourceDisplay} flexDirection="column" marginTop={1}>
                   <Text dimColor>{sourceDisplay}</Text>
                   <Tree variant="tree">
                     {sourceAgents.map((agent, i) => (
@@ -455,7 +455,7 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
             </Box>
             {Array.from(groupBySource(skills.skillFrontmatter).entries()).map(
               ([sourceDisplay, sourceSkills]) => (
-                <Box key={sourceDisplay} flexDirection="column">
+                <Box key={sourceDisplay} flexDirection="column" marginTop={1}>
                   <Text dimColor>{sourceDisplay}</Text>
                   <Tree variant="tree">
                     {sourceSkills.map((skill, i) => (

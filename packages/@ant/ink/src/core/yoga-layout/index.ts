@@ -2125,7 +2125,18 @@ function computeFlexBasis(
     ? MeasureMode.Exactly
     : MeasureMode.Undefined
   if (!isDefined(crossConstraint) && isDefined(availableCross)) {
-    crossConstraint = availableCross
+    // Subtract the child's own cross-axis margin so a negative margin (e.g.
+    // marginLeft=-1 on a row inside a column container) doesn't leak the
+    // outer offset into the child's available content size. Without this,
+    // the basis pass measures the child at parent.innerCross instead of
+    // (parent.innerCross + |negativeMargin|), forcing text leaves to wrap
+    // at a width 1 cell too narrow and inflating the cross size.
+    const childCrossMargin = childMarginForAxis(
+      child,
+      crossAxis(mainAxis),
+      ownerWidth,
+    )
+    crossConstraint = Math.max(0, availableCross - childCrossMargin)
     crossConstraintMode =
       crossMode === MeasureMode.Exactly && isStretchAlign(child)
         ? MeasureMode.Exactly
