@@ -105,9 +105,14 @@ const peersCmd = feature('UDS_INBOX')
       require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
     ).default
   : null
+// `/fork <directive>` — spawn an in-process background agent that inherits
+// the full conversation context. Mirrors ant v2.1.131 4659.js / 4657.js /
+// 4656.js (gJK / BJK / mJK). Gated behind FORK_SUBAGENT so the rest of the
+// fork-subagent infra (forkSubagent.ts FORK_AGENT, AgentTool's isForkPath
+// branch, isInForkChild guard) only ships when the slash command is wired.
 const forkCmd = feature('FORK_SUBAGENT')
   ? (
-      require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
+      require('@claude-code/command-runtime/commands/fork/index.js') as typeof import('@claude-code/command-runtime/commands/fork/index.js')
     ).default
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */

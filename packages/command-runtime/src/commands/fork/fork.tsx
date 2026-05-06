@@ -1,0 +1,263 @@
+/**
+ * `/fork <directive>` execute body.
+ *
+ * Mirrors ant v2.1.131 4657.js (Zf3) + 4656.js (mJK):
+ *   1. Resolve parent's renderedSystemPrompt (or rebuild if missing).
+ *   2. Generate a stable agentId + a short slug from the directive.
+ *   3. Register the fork in AppState.tasks via `registerAsyncAgent` so the
+ *      tasks panel / swarm dashboard sees it.
+ *   4. Wrap the spawn in `runWithAgentContext` for analytics attribution.
+ *   5. Fire-and-forget: hand off to `runAsyncAgentLifecycle` which drives
+ *      the agent loop, persists messages, and enqueues a task-notification
+ *      message back to the parent REPL when the fork terminates.
+ *
+ * Same primitives as AgentTool's fork-subagent path (subagent_type omitted
+ * with `FORK_SUBAGENT` on); the slash-command form is just a thin wrapper
+ * that always uses FORK_AGENT and never blocks the caller.
+ */
+
+import { feature } from 'bun:bundle'
+import type { Message as MessageType } from '@claude-code/agent/messageShapes'
+import { createUserMessage } from '@claude-code/agent/messages.js'
+import { asAgentId } from '@claude-code/agent/idTypes'
+import { createAgentId } from '@claude-code/agent/uuid.js'
+import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
+import { registerAsyncAgent } from '@claude-code/agent/localAgentTask.js'
+import { getSystemPrompt } from '@claude-code/agent/prompts.js'
+import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js'
+import { runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import {
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  logEvent,
+} from '@claude-code/local-observability'
+import {
+  FORK_AGENT,
+  buildChildMessage,
+  isInForkChild,
+} from '@claude-code/tool-registry/tools/AgentTool/forkSubagent.js'
+import { runAsyncAgentLifecycle } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js'
+import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
+import { getParentSessionId } from '@claude-code/swarm/teammateState.js'
+import {
+  type LocalJSXCommandCall,
+  type LocalJSXCommandContext,
+} from '../../types.js'
+
+const FORK_DIRECTIVE_MAX_LENGTH = 50
+
+/**
+ * Mirror of ant 4656.js Gf3 — slug from first 3 words of directive.
+ * Stable, kebab-case, lowercase, max 24 chars, fallback "fork".
+ */
+function deriveForkSlug(directive: string): string {
+  return (
+    directive
+      .trim()
+      .split(/\s+/)
+      .slice(0, 3)
+      .join('-')
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 24) || 'fork'
+  )
+}
+
+/**
+ * Slash commands receive a LocalJSXCommandContext that carries the
+ * parent's toolUseContext + canUseTool fn through the [key:string]:unknown
+ * escape hatch (see LocalJSXCommandContext type def). Pull them out with
+ * a structurally-typed helper — ToolUseContext lives in tool-registry and
+ * static-importing it here is fine (cmd-runtime already depends on
+ * tool-registry through promptShellExecution and insights).
+ */
+type ForkCommandContext = LocalJSXCommandContext & {
+  toolUseContext: Parameters<typeof runAgent>[0]['toolUseContext']
+  canUseTool?: Parameters<typeof runAgent>[0]['canUseTool']
+}
+
+export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
+  const directive = args.trim()
+  if (!directive) {
+    onDone('Usage: /fork <directive>', { display: 'system' })
+    return null
+  }
+
+  if (!feature('FORK_SUBAGENT')) {
+    onDone('Fork subagent is not enabled in this build.', { display: 'system' })
+    return null
+  }
+
+  const context = rawContext as ForkCommandContext
+  const toolUseContext = context.toolUseContext
+  if (!toolUseContext) {
+    onDone(
+      'Fork is not available — this command must run inside an active REPL session.',
+      { display: 'system' },
+    )
+    return null
+  }
+
+  // Recursive fork guard — same check as AgentTool fork path.
+  if (
+    toolUseContext.options.querySource === `agent:builtin:${FORK_AGENT.agentType}` ||
+    isInForkChild(toolUseContext.messages as MessageType[])
+  ) {
+    onDone(
+      'Fork is not available inside a forked worker. Complete your task directly using your tools.',
+      { display: 'system' },
+    )
+    return null
+  }
+
+  // Need at least one prior conversation turn for the fork to inherit
+  // meaningful context; ant 4657.js returns null with the same wording.
+  if (toolUseContext.messages.length === 0) {
+    onDone('Cannot fork before the first conversation turn', {
+      display: 'system',
+    })
+    return null
+  }
+
+  const slug = deriveForkSlug(directive)
+  const description =
+    directive.length > FORK_DIRECTIVE_MAX_LENGTH
+      ? directive.slice(0, FORK_DIRECTIVE_MAX_LENGTH - 1) + '…'
+      : directive
+
+  const agentId = createAgentId(slug)
+  const setAppState = toolUseContext.setAppState
+
+  // Resolve parent's rendered system prompt (byte-identical for cache hits)
+  // or rebuild via buildEffectiveSystemPrompt as a fallback. Mirrors
+  // AgentTool's isForkPath branch.
+  const renderedSystemPrompt = (
+    toolUseContext as { renderedSystemPrompt?: ReturnType<typeof buildEffectiveSystemPrompt> }
+  ).renderedSystemPrompt
+  const appState = toolUseContext.getAppState()
+  let forkParentSystemPrompt: ReturnType<typeof buildEffectiveSystemPrompt>
+  if (renderedSystemPrompt) {
+    forkParentSystemPrompt = renderedSystemPrompt
+  } else {
+    // appState comes back as the V7 §7.2 partial shim
+    // (`Record<string, any>`), so the typed-Map.keys() iterator collapses
+    // to IterableIterator<unknown>. Re-narrow at the read site to match
+    // getSystemPrompt's `string[]` parameter.
+    const awdMap = (appState as {
+      toolPermissionContext: {
+        additionalWorkingDirectories: ReadonlyMap<string, unknown>
+      }
+    }).toolPermissionContext.additionalWorkingDirectories
+    const additionalWorkingDirectories = Array.from(awdMap.keys())
+    const defaultSystemPrompt = await getSystemPrompt(
+      toolUseContext.options.tools,
+      toolUseContext.options.mainLoopModel,
+      additionalWorkingDirectories,
+      toolUseContext.options.mcpClients,
+    )
+    forkParentSystemPrompt = buildEffectiveSystemPrompt({
+      mainThreadAgentDefinition: undefined,
+      toolUseContext,
+      customSystemPrompt: toolUseContext.options.customSystemPrompt,
+      defaultSystemPrompt,
+      appendSystemPrompt: toolUseContext.options.appendSystemPrompt,
+    })
+  }
+
+  // Slash-command-form fork: a single user message with the buildChildMessage
+  // boilerplate + directive. AgentTool's fork uses buildForkedMessages which
+  // clones the parent's last assistant turn for prompt-cache hit alignment;
+  // that's only useful when the spawn happens mid-turn (i.e. via Agent tool
+  // with subagent_type omitted). From a slash command there is no parent
+  // assistant turn to mirror — the child agent's context comes purely from
+  // forkContextMessages.
+  const promptMessages: MessageType[] = [
+    createUserMessage({
+      content: buildChildMessage(directive),
+    }),
+  ]
+
+  const canUseTool = context.canUseTool
+
+  const agentBackgroundTask = registerAsyncAgent({
+    agentId,
+    description,
+    prompt: directive,
+    selectedAgent: FORK_AGENT,
+    setAppState,
+    toolUseId: undefined,
+  })
+
+  const asyncAgentContext = {
+    agentId,
+    parentSessionId: getParentSessionId(),
+    agentType: 'subagent' as const,
+    subagentName: FORK_AGENT.agentType,
+    isBuiltIn: true,
+    invocationKind: 'spawn' as const,
+    invocationEmitted: false,
+  }
+
+  const metadata = {
+    prompt: directive,
+    resolvedAgentModel: toolUseContext.options.mainLoopModel,
+    isBuiltInAgent: true,
+    startTime: Date.now(),
+    agentType: FORK_AGENT.agentType,
+    isAsync: true,
+  }
+
+  // Fire-and-forget. runWithAgentContext threads the analytics context,
+  // runWithCwdOverride preserves cwd if the parent had one. Errors during
+  // the lifecycle are surfaced inside the lifecycle (task notification
+  // with status=failed) — we don't await the promise.
+  void runWithAgentContext(asyncAgentContext, () =>
+    runWithCwdOverride(undefined, () =>
+      runAsyncAgentLifecycle({
+        taskId: agentBackgroundTask.agentId,
+        abortController: agentBackgroundTask.abortController!,
+        makeStream: onCacheSafeParams =>
+          runAgent({
+            agentDefinition: FORK_AGENT,
+            promptMessages,
+            toolUseContext,
+            canUseTool: canUseTool!,
+            isAsync: true,
+            forkContextMessages: toolUseContext.messages as MessageType[],
+            querySource: `agent:builtin:${FORK_AGENT.agentType}`,
+            override: {
+              systemPrompt: forkParentSystemPrompt,
+              agentId: asAgentId(agentBackgroundTask.agentId),
+              abortController: agentBackgroundTask.abortController!,
+            },
+            availableTools: toolUseContext.options.tools,
+            useExactTools: true,
+            onCacheSafeParams,
+            description,
+          }),
+        metadata,
+        description,
+        toolUseContext,
+        rootSetAppState: setAppState,
+        agentIdForCleanup: agentBackgroundTask.agentId,
+        enableSummarization: true,
+        getWorktreeResult: async () => ({}),
+      }),
+    ),
+  ).catch((error: unknown) => {
+    logForDebugging(`[fork] runAsyncAgentLifecycle failed: ${String(error)}`)
+  })
+
+  logEvent('tengu_subagent_launch', {
+    source: 'slash-fork' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    agent_type: FORK_AGENT.agentType as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  })
+
+  onDone(
+    `🍴 forked ${slug} (${agentBackgroundTask.agentId.slice(-4)})`,
+    { display: 'system' },
+  )
+  return null
+}

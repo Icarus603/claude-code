@@ -41,6 +41,12 @@ const STABLE_FEATURES = [
   'BUILTIN_EXPLORE_PLAN_AGENTS',
   'LODESTONE',
   'NEW_INIT',
+  // /fork slash command + Agent-tool fork path (ant v2.1.131 4659.js).
+  // The flag turns on FORK_AGENT, the buildForkedMessages helper, the
+  // /fork slash command, and the recursive-fork guard. Additional runtime
+  // gates inside isForkSubagentEnabled() exclude coordinator mode and -p
+  // non-interactive sessions.
+  'FORK_SUBAGENT',
   // P1: API-dependent features (upstream)
   'EXTRACT_MEMORIES',
   'VERIFICATION_AGENT',
