@@ -24,7 +24,6 @@ logs/
 # AI tool / agent runtime state — regenerated, never tracked
 .agents/
 .codex/
-.swarm/
 
 # Plugin-local state (e.g. ralph-loop session files)
 .claude/*.local.md
@@ -46,5 +45,9 @@ __pycache__/
 
 # bun-demincer (decompiler tool — separate checkout, not part of build)
 bun-demincer/
-/target/
 
+# Rust / cargo build artifacts
+# packages/ripgrep-napi/.cargo/config.toml redirects target-dir here so
+# packages/ stays clean (verify-empty-folders trips on cargo's transient
+# empty subdirs).
+/target/
