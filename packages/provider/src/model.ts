@@ -86,6 +86,21 @@ export function getUserSpecifiedModelSetting(): ModelSetting | undefined {
     return undefined
   }
 
+  // Boundary inflate: settings.json / ANTHROPIC_MODEL store bare wire ids
+  // for ant CLI compatibility; ccb's internal world (AppState, ModelPicker,
+  // route, display) keys on packed `<connId>:<modelId>`. Strip happens at
+  // /model save time (commit c2352cd6); inflate happens here so a bare
+  // value never round-trips through ccb internals. Lazy require avoids
+  // a static provider/model → provider/connections cycle.
+  if (typeof specifiedModel === 'string') {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { inflateModelSetting } = require(
+      './connections.js',
+    ) as typeof import('./connections.js')
+    const inflated = inflateModelSetting(specifiedModel)
+    if (typeof inflated === 'string') return inflated
+  }
+
   return specifiedModel
 }
 
@@ -255,7 +270,26 @@ export function getDefaultMainLoopModelSetting(): ModelName | ModelAlias {
  * (bypassing any user-specified values).
  */
 export function getDefaultMainLoopModel(): ModelName {
-  return parseUserSpecifiedModel(getDefaultMainLoopModelSetting())
+  // Internal-world entry point — return value flows into AppState /
+  // SDK / mode-dispatch's resolvedInitialModel / display fallbacks.
+  // All those callers key on the packed `<connId>:<modelId>` form when
+  // connections are enabled (so AppState.mainLoopModel === the model
+  // picker option's value, route resolution skips the bare-id family
+  // search, etc.). Inflate here so every external caller of this fn
+  // gets the canonical packed form without each having to remember to
+  // wrap with inflateModelSetting.
+  //
+  // Display callers (modelDisplayString, statusline, header) already go
+  // through renderModelSetting which unpacks composite ids back to a
+  // pretty label — so inflating here doesn't leak `conn_xxx:` strings
+  // into the UI.
+  const bare = parseUserSpecifiedModel(getDefaultMainLoopModelSetting())
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { inflateModelSetting } = require(
+    './connections.js',
+  ) as typeof import('./connections.js')
+  const inflated = inflateModelSetting(bare)
+  return typeof inflated === 'string' ? inflated : bare
 }
 
 // @[MODEL LAUNCH]: Add a canonical name mapping for the new model below.
@@ -648,7 +682,12 @@ export function modelDisplayString(model: ModelSetting): string {
     } else if (isClaudeAISubscriber()) {
       return `Default (${getClaudeAiUserDefaultModelDescription()})`
     }
-    return `Default (${getDefaultMainLoopModel()})`
+    // getDefaultMainLoopModel() returns the inflated `<connId>:<modelId>`
+    // form when connections are enabled (so AppState.mainLoopModel ===
+    // the picker option's value); renderModelSetting unpacks it back to
+    // a pretty label for the user. Without this delegation, the raw
+    // composite leaked into the "Default (...)" display string.
+    return `Default (${renderModelSetting(getDefaultMainLoopModel())})`
   }
   // Composite `<connId>:<modelId>` settings (model picker output for users
   // with multiple connections) — defer to renderModelSetting which resolves

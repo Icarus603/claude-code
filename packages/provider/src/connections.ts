@@ -213,6 +213,93 @@ export function unpackModelId(value: string): {
 }
 
 /**
+ * Inflate a settings.json-shaped model value to ccb's internal packed form
+ * (`<connId>:<modelId>`).
+ *
+ * Boundary translation, mirror of the strip step at `/model save` time.
+ *
+ * The settings.json schema is shared with the official Claude Code CLI,
+ * which only understands bare wire ids — ccb stores `model: 'claude-opus-4-7'`
+ * to keep the file compatible across both binaries. Internally ccb runs
+ * a multi-connection model registry where the same bare id can come from
+ * different connections (Claude Account, an Anthropic-Compatible proxy,
+ * etc.), so AppState / ModelPicker / display / route all key on the
+ * packed form. Without this inflate at the load boundary, a bare value
+ * round-trips into AppState and breaks every read site that expected
+ * `<connId>:<modelId>` (most visibly the model picker, which appended a
+ * synthetic "Current model" entry below the real one).
+ *
+ * Resolution rules — in order:
+ *  1. value is already packed (`<connId>:<modelId>`) and the connId is
+ *     enabled → return as-is.
+ *  2. value is packed but its connId is stale (deleted / disabled) → fall
+ *     through to bare-search using the unpacked modelId (so a stale prefix
+ *     doesn't trap users on a deleted connection).
+ *  3. value is bare wire id and matches some enabled connection's
+ *     models[].id → pack against the FIRST such connection. The first-wins
+ *     rule mirrors `resolveConnectionForModel` (providers.ts) and the
+ *     model picker's option order so all three agree on disambiguation.
+ *  4. value is bare wire id with `[1m]` / `[2m]` context-size suffix →
+ *     match by stripped form (DeepSeek and similar proxies write the
+ *     suffix in their model id but the API echoes it back without —
+ *     `resolveConnectionForModel` already does this normalization).
+ *  5. value is an alias (`opus` / `sonnet` / `haiku` / `opusplan`) →
+ *     return unchanged. Aliases route through getDefault*Model() at
+ *     resolve time and shouldn't be packed.
+ *  6. value doesn't match any connection (orphan / typo / no connections
+ *     configured) → return unchanged. Lets legacy/env-driven flows keep
+ *     working and lets the picker's "Current model" fallback display
+ *     orphan ids verbatim.
+ *
+ * Always called on the read side; the write side (`/model save`,
+ * Settings → Model) strips back to bare via `unpackModelId().modelId`.
+ */
+export function inflateModelSetting(
+  value: string | null | undefined,
+): string | null | undefined {
+  if (value === null || value === undefined || value === '') return value
+
+  const enabled = getEnabledConnections()
+  if (enabled.length === 0) return value
+
+  const { connectionId, modelId } = unpackModelId(value)
+
+  if (connectionId !== undefined) {
+    if (enabled.some(c => c.id === connectionId)) return value
+    // Stale prefix; fall through to bare search using the inner modelId.
+  }
+
+  // Aliases never pack — providers.ts and the picker resolve them via
+  // getDefaultOpusModel/getDefaultSonnetModel/getDefaultHaikuModel.
+  if (
+    modelId === 'opus' ||
+    modelId === 'sonnet' ||
+    modelId === 'haiku' ||
+    modelId === 'opusplan' ||
+    modelId === 'sonnet[1m]' ||
+    modelId === 'opus[1m]'
+  ) {
+    return value
+  }
+
+  const stripContextSuffix = (id: string) =>
+    id.trim().toLowerCase().replace(/\[(1|2)m\]$/i, '')
+  const target = stripContextSuffix(modelId)
+
+  for (const conn of enabled) {
+    for (const m of conn.models) {
+      if (stripContextSuffix(m.id) === target) {
+        return composeModelId(conn.id, modelId)
+      }
+    }
+  }
+
+  // Orphan id (deleted connection, manual edit, env-driven legacy path).
+  // Leave unchanged so downstream "Current model" fallback can render it.
+  return value
+}
+
+/**
  * User-facing display label for a connection model.
  *
  * Migration code (`migrateLegacyAnthropicCompat`) stores labels as
