@@ -49,3 +49,12 @@ export const VERTEX_COUNT_TOKENS_ALLOWED_BETAS = new Set([
   CONTEXT_MANAGEMENT_BETA_HEADER,
 ])
 export const CACHE_EDITING_BETA_HEADER: string = ''
+
+// ant 1387.js aEH — opt-in cache diagnostics. When the server returns
+// per-cache-block diagnostics, the legacy runtime can surface why a cache
+// hit didn't land (cache_creation_input_tokens vs cache_read_input_tokens
+// mismatch, cache key drift, 1h vs 5m TTL split, etc.). Self-host gate:
+// CLAUDE_CODE_CACHE_DIAGNOSIS=1. ant additionally gates on the
+// `tengu_prompt_cache_diagnostics` statsig flag; ccb's GrowthBook stub
+// always returns false so the env var is the only effective trigger.
+export const CACHE_DIAGNOSIS_BETA_HEADER = 'cache-diagnosis-2026-04-07'

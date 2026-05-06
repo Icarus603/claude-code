@@ -128,6 +128,7 @@ import {
 } from '@anthropic-ai/sdk/error'
 import {
   getAfkModeHeaderLatched,
+  getCacheDiagnosisHeaderLatched,
   getCacheEditingHeaderLatched,
   getFastModeHeaderLatched,
   getLastApiCompletionTimestamp,
@@ -136,6 +137,7 @@ import {
   getSessionId,
   getThinkingClearLatched,
   setAfkModeHeaderLatched,
+  setCacheDiagnosisHeaderLatched,
   setCacheEditingHeaderLatched,
   setFastModeHeaderLatched,
   setLastMainRequestId,
@@ -145,6 +147,7 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js'
 import {
   AFK_MODE_BETA_HEADER,
+  CACHE_DIAGNOSIS_BETA_HEADER,
   CONTEXT_1M_BETA_HEADER,
   CONTEXT_MANAGEMENT_BETA_HEADER,
   EFFORT_BETA_HEADER,
@@ -1547,6 +1550,21 @@ async function* queryModel(
     }
   }
 
+  // ant 4698.js n23() — cache-diagnosis beta. Self-host gate:
+  // CLAUDE_CODE_CACHE_DIAGNOSIS=1. Latched session-stable so the cache
+  // key doesn't flip mid-turn. Drops on 422 / `retry:cache-diagnosis-beta`
+  // (handled in retry path below). Restricted to 1P firstParty to avoid
+  // sending an unknown header to Bedrock/Vertex.
+  let cacheDiagnosisHeaderLatched = getCacheDiagnosisHeaderLatched() === true
+  if (
+    !cacheDiagnosisHeaderLatched &&
+    isEnvTruthy(readEnv('CLAUDE_CODE_CACHE_DIAGNOSIS')) &&
+    shouldIncludeFirstPartyOnlyBetas()
+  ) {
+    cacheDiagnosisHeaderLatched = true
+    setCacheDiagnosisHeaderLatched(true)
+  }
+
   // Only latch from agentic queries so a classifier call doesn't flip the
   // main thread's context_management mid-turn.
   let thinkingClearLatched = getThinkingClearLatched() === true
@@ -1816,6 +1834,23 @@ async function* queryModel(
       ) {
         betasParams.push(AFK_MODE_BETA_HEADER)
       }
+    }
+
+    // ant 4698.js — cache-diagnosis beta header injection. Latched in
+    // the outer scope; per-call we only need to mirror the latch into the
+    // betas array (idempotent — withRetry can re-enter this block on
+    // retries). ant additionally drops the latch on a 422 response with
+    // `retry:cache-diagnosis-beta`; ccb skips that fallback because (a)
+    // this is an opt-in debug header behind CLAUDE_CODE_CACHE_DIAGNOSIS=1
+    // — operators see and control the latch via that env var, and (b)
+    // a persistent 422 is an obvious operator-facing signal to drop the
+    // env var rather than something to silently swallow inside retry.
+    if (
+      cacheDiagnosisHeaderLatched &&
+      shouldIncludeFirstPartyOnlyBetas() &&
+      !betasParams.includes(CACHE_DIAGNOSIS_BETA_HEADER)
+    ) {
+      betasParams.push(CACHE_DIAGNOSIS_BETA_HEADER)
     }
 
     // Cache editing beta: header is latched session-stable; useCachedMC

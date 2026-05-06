@@ -240,6 +240,11 @@ type State = {
   // microcompact is first enabled, keep sending the header so mid-session
   // GrowthBook/settings toggles don't bust the prompt cache.
   cacheEditingHeaderLatched: boolean | null
+  // Sticky-on latch for the cache-diagnosis beta header
+  // (CLAUDE_CODE_CACHE_DIAGNOSIS=1). Latched on first eligible request and
+  // dropped when the server rejects with 422 / `retry:cache-diagnosis-beta`
+  // (ant 4698.js). Stable cache key in between.
+  cacheDiagnosisHeaderLatched: boolean | null
   // Sticky-on latch for clearing thinking from prior tool loops. Triggered
   // when >1h since last API call (confirmed cache miss — no cache-hit
   // benefit to keeping thinking). Once latched, stays on so the newly-warmed
@@ -413,6 +418,7 @@ function getInitialState(): State {
     afkModeHeaderLatched: null,
     fastModeHeaderLatched: null,
     cacheEditingHeaderLatched: null,
+    cacheDiagnosisHeaderLatched: null,
     thinkingClearLatched: null,
     // Current prompt ID
     promptId: null,
@@ -1797,6 +1803,14 @@ export function setCacheEditingHeaderLatched(v: boolean): void {
   STATE.cacheEditingHeaderLatched = v
 }
 
+export function getCacheDiagnosisHeaderLatched(): boolean | null {
+  return STATE.cacheDiagnosisHeaderLatched
+}
+
+export function setCacheDiagnosisHeaderLatched(v: boolean): void {
+  STATE.cacheDiagnosisHeaderLatched = v
+}
+
 export function getThinkingClearLatched(): boolean | null {
   return STATE.thinkingClearLatched
 }
@@ -1813,6 +1827,7 @@ export function clearBetaHeaderLatches(): void {
   STATE.afkModeHeaderLatched = null
   STATE.fastModeHeaderLatched = null
   STATE.cacheEditingHeaderLatched = null
+  STATE.cacheDiagnosisHeaderLatched = null
   STATE.thinkingClearLatched = null
 }
 
