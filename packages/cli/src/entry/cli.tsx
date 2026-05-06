@@ -216,6 +216,7 @@ async function main(): Promise<void> {
       args[0] === 'stop' ||
       args[0] === 'kill' ||
       args[0] === 'rm' ||
+      args[0] === 'respawn' ||
       args.includes('--bg') ||
       args.includes('--background'))
   ) {
@@ -236,6 +237,7 @@ async function main(): Promise<void> {
     if (sub === 'stop') return await bg.stopHandler(args.slice(1))
     if (sub === 'kill') return await bg.killHandler(args.slice(1))
     if (sub === 'rm') return await bg.rmHandler(args.slice(1))
+    if (sub === 'respawn') return await bg.respawnHandler(args.slice(1))
     return await bg.handleBgFlag(args)
   }
 

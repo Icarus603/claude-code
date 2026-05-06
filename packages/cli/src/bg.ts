@@ -63,6 +63,7 @@ import {
   hasSkipDangerousModePermissionPrompt,
 } from '@claude-code/config/settings'
 import { splitBgArgs } from './bg/argParse.js'
+import { extractRespawnArgs } from './bg/respawnArgs.js'
 import { tailFile } from './bg/tailFile.js'
 
 interface JobMeta {
@@ -353,6 +354,22 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
 
+  await spawnBgJob({ flags: forwardedFlags, directive, cwd: process.cwd() })
+}
+
+/**
+ * Spawn a single backgrounded ccb child + write its meta.json. Shared
+ * between `--bg` (fresh spawn from user argv) and `respawn` (re-spawn
+ * an existing job from its stored meta.cmd). Returns the new short id.
+ *
+ * Writes the success message to stdout. On spawn failure exits the
+ * process with the OS-level reason included.
+ */
+async function spawnBgJob(opts: {
+  flags: readonly string[]
+  directive: string
+  cwd: string
+}): Promise<string> {
   const short = generateShortId()
   const jobDir = getJobDir(short)
   mkdirSync(jobDir, { recursive: true })
@@ -365,7 +382,7 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   // already the right thing to spawn. Forward the user's flags through
   // (--model, --permission-mode, etc) so `ccb --bg --model X "task"`
   // doesn't lose model selection.
-  const childArgs = [...forwardedFlags, '-p', directive]
+  const childArgs = [...opts.flags, '-p', opts.directive]
   // Two cases: when launched via `bun dist/cli.js`, argv0='bun' and
   // argv[1]='/.../dist/cli.js' — we need to invoke bun with cli.js as
   // the first arg so the child boots through bun. When launched via
@@ -386,14 +403,14 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
     CLAUDE_CODE_BG_JOB_SHORT: short,
   }
 
-  const opts: SpawnOptions = {
-    cwd: process.cwd(),
+  const spawnOpts: SpawnOptions = {
+    cwd: opts.cwd,
     env,
     detached: true,
     stdio: ['ignore', stdoutFd, stderrFd],
   }
 
-  const child = spawn(cmd, nodeArgs, opts)
+  const child = spawn(cmd, nodeArgs, spawnOpts)
   child.unref()
 
   // Spawn failure (child.pid === undefined) means the kernel rejected
@@ -402,9 +419,6 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   // an orphaned `unknown`-status entry that ps will keep showing.
   if (child.pid === undefined) {
     rmSync(getJobDir(short), { recursive: true, force: true })
-    // Wait one tick for the async 'error' event so we can include the
-    // OS-level reason in the message; if it doesn't fire, we still
-    // exit with a generic message.
     const reason = await new Promise<string>(resolve => {
       const timer = setTimeout(() => resolve('spawn failed (no error event)'), 200)
       child.once('error', (err: Error) => {
@@ -422,7 +436,7 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
     short,
     pid: child.pid,
     cmd: fullCmd,
-    cwd: process.cwd(),
+    cwd: opts.cwd,
     startedAt: Date.now(),
     status: 'running',
   }
@@ -439,7 +453,9 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
       '',
     ].join('\n'),
   )
+  return short
 }
+
 
 /** @dynamicRequire */
 export async function psHandler(_args: readonly string[]): Promise<void> {
@@ -690,6 +706,91 @@ export async function attachHandler(args: readonly string[]): Promise<void> {
   await logsHandler([job.short, '--follow', '--tail', '200'])
 }
 
+/**
+ * `ccb respawn <short>|--all` — restart a bg job (or all live ones)
+ * using the SAME directive + flags that originally launched it. Useful
+ * after a `ccb update` has installed a new binary and the user wants
+ * existing bg work to pick up the new code.
+ *
+ * Mirrors ant 4649.js sM3, but daemon-less: we stop+rm the old job and
+ * spawnBgJob a fresh one. The new job gets a new short id; the old
+ * meta.json is removed. ant preserves the id by going through the
+ * daemon supervisor — that's not feasible here without a daemon.
+ *
+ * Exit semantics match ant: 0 if all targeted respawns succeeded, 1
+ * if any failed (partial success is reported per-line on stderr).
+ *
+ * @dynamicRequire
+ */
+export async function respawnHandler(args: readonly string[]): Promise<void> {
+  const positional = args.filter(a => !a.startsWith('-'))
+  const arg = args[0]
+  if (arg === '--help' || arg === '-h') {
+    process.stdout.write(
+      `Usage: ccb respawn <short>|--all\n\n  Restart a background session (or all live ones) using the original directive + flags.\n  Issued a new short id; the old job dir is removed.\n`,
+    )
+    return
+  }
+
+  if (args.includes('--all')) {
+    const targets = listJobs().filter(j => j.status === 'running')
+    if (targets.length === 0) {
+      process.stdout.write('no live jobs to respawn\n')
+      return
+    }
+    let okCount = 0
+    for (const j of targets) {
+      const restarted = await respawnSingle(j)
+      if (restarted) okCount++
+    }
+    if (okCount < targets.length) process.exit(1)
+    return
+  }
+
+  const short = positional[0]
+  if (!short) {
+    process.stderr.write('Usage: ccb respawn <short>|--all\n')
+    process.exit(1)
+  }
+  const job = resolveJobOrExit(short)
+  const ok = await respawnSingle(job)
+  if (!ok) process.exit(1)
+}
+
+async function respawnSingle(job: JobMeta): Promise<boolean> {
+  const args = extractRespawnArgs(job.cmd)
+  if (!args) {
+    process.stderr.write(
+      `${job.short}: cannot reconstruct directive from stored cmd (legacy or corrupt meta.json)\n`,
+    )
+    return false
+  }
+  // Stop the old worker if it's still running, then drop its dir so
+  // the new short doesn't collide. The respawn writes a new short.
+  if (job.status === 'running' && isProcessRunning(job.pid)) {
+    try {
+      process.kill(job.pid, 'SIGTERM')
+    } catch {
+      // Already gone is fine.
+    }
+  }
+  rmSync(getJobDir(job.short), { recursive: true, force: true })
+  try {
+    const newShort = await spawnBgJob({
+      flags: args.flags,
+      directive: args.directive,
+      cwd: job.cwd,
+    })
+    if (newShort !== job.short) {
+      process.stdout.write(`(was ${job.short}, now ${newShort})\n`)
+    }
+    return true
+  } catch (e) {
+    process.stderr.write(`${job.short}: ${(e as Error).message}\n`)
+    return false
+  }
+}
+
 // Re-export pure helpers extracted into ./bg/ subdir, for the
 // __tests__/bg.test.ts import path (it imports from `../bg.js`).
-export { splitBgArgs, tailFile }
+export { extractRespawnArgs, splitBgArgs, tailFile }

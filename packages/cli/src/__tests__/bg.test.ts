@@ -2,7 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { resolveJobShort, splitBgArgs, tailFile } from '../bg.js'
+import {
+  extractRespawnArgs,
+  resolveJobShort,
+  splitBgArgs,
+  tailFile,
+} from '../bg.js'
 
 const mkJob = (short: string, status: 'running' | 'exited' = 'exited') => ({
   short,
@@ -230,5 +235,77 @@ describe('resolveJobShort', () => {
 
   test('handles empty job list', () => {
     expect(resolveJobShort('abc', [])).toEqual({ error: 'none' })
+  })
+})
+
+describe('extractRespawnArgs', () => {
+  test('bun-launched cmd with flags + directive', () => {
+    expect(
+      extractRespawnArgs([
+        'bun',
+        '/path/to/cli.js',
+        '--model',
+        'claude-haiku-4-5',
+        '-p',
+        'do the thing',
+      ]),
+    ).toEqual({
+      flags: ['--model', 'claude-haiku-4-5'],
+      directive: 'do the thing',
+    })
+  })
+
+  test('compiled-binary cmd (no bun prefix)', () => {
+    expect(
+      extractRespawnArgs(['/usr/local/bin/ccb', '--debug', '-p', 'task']),
+    ).toEqual({
+      flags: ['--debug'],
+      directive: 'task',
+    })
+  })
+
+  test('legacy meta with no flags (just `-p directive`)', () => {
+    expect(
+      extractRespawnArgs(['bun', '/path/to/cli.js', '-p', 'just a task']),
+    ).toEqual({
+      flags: [],
+      directive: 'just a task',
+    })
+  })
+
+  test('directive containing multiple words rejoined with spaces', () => {
+    expect(
+      extractRespawnArgs(['bun', '/cli.js', '-p', 'word1 word2 word3']),
+    ).toEqual({
+      flags: [],
+      directive: 'word1 word2 word3',
+    })
+  })
+
+  test('returns null when -p marker is missing', () => {
+    expect(extractRespawnArgs(['bun', '/cli.js', '--debug'])).toBeNull()
+  })
+
+  test('returns null when -p is the last element (no directive)', () => {
+    expect(extractRespawnArgs(['bun', '/cli.js', '-p'])).toBeNull()
+  })
+
+  test('uses lastIndexOf so a `-p` inside flags does not confuse parsing', () => {
+    // Hypothetical: a flag with `-p` as its value (highly unlikely with
+    // BG_FLAGS_WITH_VALUE consumption in splitBgArgs, but extract from
+    // raw cmd should still pick the LAST -p as the directive marker).
+    expect(
+      extractRespawnArgs([
+        'bun',
+        '/cli.js',
+        '--some-flag',
+        '-p',
+        '-p',
+        'real directive',
+      ]),
+    ).toEqual({
+      flags: ['--some-flag', '-p'],
+      directive: 'real directive',
+    })
   })
 })
