@@ -23,7 +23,6 @@ logs/
 
 # AI tool / agent runtime state — regenerated, never tracked
 .agents/
-.codex/
 
 # Plugin-local state (e.g. ralph-loop session files)
 .claude/*.local.md
