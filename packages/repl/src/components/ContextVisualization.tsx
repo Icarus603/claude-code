@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle'
 import * as React from 'react'
-import { Box, Text } from '@anthropic/ink'
+import { Box, Text, Tree } from '@anthropic/ink'
 import type { ContextData } from '@claude-code/agent/sessionTools/analyzeContext.js'
 import { generateContextSuggestions } from '@claude-code/agent/sessionTools/contextSuggestions.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
@@ -13,11 +13,6 @@ import { plural } from '@claude-code/output/utils/stringUtils.js'
 import { ContextSuggestions } from './ContextSuggestions.js'
 
 const RESERVED_CATEGORY_NAME = 'Autocompact buffer'
-
-/** Tree branch glyph: `├` for middle items, `└` for the last one. */
-function branch(index: number, total: number): string {
-  return index === total - 1 ? '└' : '├'
-}
 
 /**
  * One-liner for the legend header showing what context-collapse has done.
@@ -269,12 +264,19 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               return loaded.length > 0 ? (
                 <Box flexDirection="column">
                   <Text dimColor>Loaded</Text>
-                  {loaded.map((tool, i) => (
-                    <Box key={i}>
-                      <Text>{branch(i, loaded.length)} {tool.name}: </Text>
-                      <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
-                    </Box>
-                  ))}
+                  <Tree variant="tree">
+                    {loaded.map((tool, i) => (
+                      <Tree.Node
+                        key={i}
+                        label={
+                          <Box>
+                            <Text>{tool.name}: </Text>
+                            <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
+                          </Box>
+                        }
+                      />
+                    ))}
+                  </Tree>
                 </Box>
               ) : null
             })()}
@@ -284,22 +286,30 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               return available.length > 0 ? (
                 <Box flexDirection="column">
                   <Text dimColor>Available</Text>
-                  {available.map((tool, i) => (
-                    <Box key={i}>
-                      <Text dimColor>{branch(i, available.length)} {tool.name}</Text>
-                    </Box>
-                  ))}
+                  <Tree variant="tree">
+                    {available.map((tool, i) => (
+                      <Tree.Node key={i} dimColor label={tool.name} />
+                    ))}
+                  </Tree>
                 </Box>
               ) : null
             })()}
             {/* Show all tools normally when not deferred */}
-            {!hasDeferredMcpTools &&
-              mcpTools.map((tool, i) => (
-                <Box key={i}>
-                  <Text>{branch(i, mcpTools.length)} {tool.name}: </Text>
-                  <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
-                </Box>
-              ))}
+            {!hasDeferredMcpTools && (
+              <Tree variant="tree">
+                {mcpTools.map((tool, i) => (
+                  <Tree.Node
+                    key={i}
+                    label={
+                      <Box>
+                        <Text>{tool.name}: </Text>
+                        <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
+                      </Box>
+                    }
+                  />
+                ))}
+              </Tree>
+            )}
           </Box>
         )}
 
@@ -321,18 +331,30 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
                 return total > 0 ? (
                   <Box flexDirection="column">
                     <Text dimColor>Loaded</Text>
-                    {sysLoaded.map((tool, i) => (
-                      <Box key={`sys-${i}`}>
-                        <Text>{branch(i, total)} {tool.name}: </Text>
-                        <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
-                      </Box>
-                    ))}
-                    {defLoaded.map((tool, i) => (
-                      <Box key={`def-${i}`}>
-                        <Text>{branch(sysLoaded.length + i, total)} {tool.name}: </Text>
-                        <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
-                      </Box>
-                    ))}
+                    <Tree variant="tree">
+                      {sysLoaded.map((tool, i) => (
+                        <Tree.Node
+                          key={`sys-${i}`}
+                          label={
+                            <Box>
+                              <Text>{tool.name}: </Text>
+                              <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
+                            </Box>
+                          }
+                        />
+                      ))}
+                      {defLoaded.map((tool, i) => (
+                        <Tree.Node
+                          key={`def-${i}`}
+                          label={
+                            <Box>
+                              <Text>{tool.name}: </Text>
+                              <Text dimColor>{formatTokens(tool.tokens)} tokens</Text>
+                            </Box>
+                          }
+                        />
+                      ))}
+                    </Tree>
                   </Box>
                 ) : null
               })()}
@@ -342,11 +364,11 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
                 return available.length > 0 ? (
                   <Box flexDirection="column">
                     <Text dimColor>Available</Text>
-                    {available.map((tool, i) => (
-                      <Box key={i}>
-                        <Text dimColor>{branch(i, available.length)} {tool.name}</Text>
-                      </Box>
-                    ))}
+                    <Tree variant="tree">
+                      {available.map((tool, i) => (
+                        <Tree.Node key={i} dimColor label={tool.name} />
+                      ))}
+                    </Tree>
                   </Box>
                 ) : null
               })()}
@@ -358,12 +380,19 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
           process.env.USER_TYPE === 'ant' && (
             <Box flexDirection="column" marginTop={1}>
               <Text bold>[ANT-ONLY] System prompt sections</Text>
-              {systemPromptSections.map((section, i) => (
-                <Box key={i}>
-                  <Text>{branch(i, systemPromptSections.length)} {section.name}: </Text>
-                  <Text dimColor>{formatTokens(section.tokens)} tokens</Text>
-                </Box>
-              ))}
+              <Tree variant="tree">
+                {systemPromptSections.map((section, i) => (
+                  <Tree.Node
+                    key={i}
+                    label={
+                      <Box>
+                        <Text>{section.name}: </Text>
+                        <Text dimColor>{formatTokens(section.tokens)} tokens</Text>
+                      </Box>
+                    }
+                  />
+                ))}
+              </Tree>
             </Box>
           )}
 
@@ -377,12 +406,19 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               ([sourceDisplay, sourceAgents]) => (
                 <Box key={sourceDisplay} flexDirection="column">
                   <Text dimColor>{sourceDisplay}</Text>
-                  {sourceAgents.map((agent, i) => (
-                    <Box key={i}>
-                      <Text>{branch(i, sourceAgents.length)} {agent.agentType}: </Text>
-                      <Text dimColor>{formatTokens(agent.tokens)} tokens</Text>
-                    </Box>
-                  ))}
+                  <Tree variant="tree">
+                    {sourceAgents.map((agent, i) => (
+                      <Tree.Node
+                        key={i}
+                        label={
+                          <Box>
+                            <Text>{agent.agentType}: </Text>
+                            <Text dimColor>{formatTokens(agent.tokens)} tokens</Text>
+                          </Box>
+                        }
+                      />
+                    ))}
+                  </Tree>
                 </Box>
               ),
             )}
@@ -395,12 +431,19 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               <Text bold>Memory files</Text>
               <Text dimColor> · /memory</Text>
             </Box>
-            {memoryFiles.map((file, i) => (
-              <Box key={i}>
-                <Text>{branch(i, memoryFiles.length)} {getDisplayPath(file.path)}: </Text>
-                <Text dimColor>{formatTokens(file.tokens)} tokens</Text>
-              </Box>
-            ))}
+            <Tree variant="tree">
+              {memoryFiles.map((file, i) => (
+                <Tree.Node
+                  key={i}
+                  label={
+                    <Box>
+                      <Text>{getDisplayPath(file.path)}: </Text>
+                      <Text dimColor>{formatTokens(file.tokens)} tokens</Text>
+                    </Box>
+                  }
+                />
+              ))}
+            </Tree>
           </Box>
         )}
 
@@ -414,12 +457,19 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               ([sourceDisplay, sourceSkills]) => (
                 <Box key={sourceDisplay} flexDirection="column">
                   <Text dimColor>{sourceDisplay}</Text>
-                  {sourceSkills.map((skill, i) => (
-                    <Box key={i}>
-                      <Text>{branch(i, sourceSkills.length)} {skill.name}: </Text>
-                      <Text dimColor>{formatTokens(skill.tokens)} tokens</Text>
-                    </Box>
-                  ))}
+                  <Tree variant="tree">
+                    {sourceSkills.map((skill, i) => (
+                      <Tree.Node
+                        key={i}
+                        label={
+                          <Box>
+                            <Text>{skill.name}: </Text>
+                            <Text dimColor>{formatTokens(skill.tokens)} tokens</Text>
+                          </Box>
+                        }
+                      />
+                    ))}
+                  </Tree>
                 </Box>
               ),
             )}
@@ -472,15 +522,24 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               return (
                 <Box flexDirection="column" marginTop={1}>
                   <Text bold>[ANT-ONLY] Top tools</Text>
-                  {tools.map((tool, i) => (
-                    <Box key={i} marginLeft={1}>
-                      <Text>{branch(i, tools.length)} {tool.name}: </Text>
-                      <Text dimColor>
-                        calls {formatTokens(tool.callTokens)}, results{' '}
-                        {formatTokens(tool.resultTokens)}
-                      </Text>
-                    </Box>
-                  ))}
+                  <Box marginLeft={1}>
+                    <Tree variant="tree">
+                      {tools.map((tool, i) => (
+                        <Tree.Node
+                          key={i}
+                          label={
+                            <Box>
+                              <Text>{tool.name}: </Text>
+                              <Text dimColor>
+                                calls {formatTokens(tool.callTokens)}, results{' '}
+                                {formatTokens(tool.resultTokens)}
+                              </Text>
+                            </Box>
+                          }
+                        />
+                      ))}
+                    </Tree>
+                  </Box>
                 </Box>
               )
             })()}
@@ -490,14 +549,23 @@ export function ContextVisualization({ data }: Props): React.ReactNode {
               return (
                 <Box flexDirection="column" marginTop={1}>
                   <Text bold>[ANT-ONLY] Top attachments</Text>
-                  {items.map((attachment, i) => (
-                    <Box key={i} marginLeft={1}>
-                      <Text>{branch(i, items.length)} {attachment.name}: </Text>
-                      <Text dimColor>
-                        {formatTokens(attachment.tokens)} tokens
-                      </Text>
-                    </Box>
-                  ))}
+                  <Box marginLeft={1}>
+                    <Tree variant="tree">
+                      {items.map((attachment, i) => (
+                        <Tree.Node
+                          key={i}
+                          label={
+                            <Box>
+                              <Text>{attachment.name}: </Text>
+                              <Text dimColor>
+                                {formatTokens(attachment.tokens)} tokens
+                              </Text>
+                            </Box>
+                          }
+                        />
+                      ))}
+                    </Tree>
+                  </Box>
                 </Box>
               )
             })()}
