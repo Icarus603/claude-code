@@ -20,6 +20,7 @@
 
 import { spawn, type SpawnOptions } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
+import chalk from 'chalk'
 import {
   closeSync,
   existsSync,
@@ -422,14 +423,16 @@ async function spawnBgJob(opts: {
   }
   writeJobMeta(meta)
 
+  // Pretty hint output: cyan short, dim hints (ant 4649.js tw6).
+  const d = (l: string, r: string) => chalk.dim(`  ${l.padEnd(26)}${r}`)
   process.stdout.write(
     [
-      `backgrounded · ${short}`,
-      `  ccb ps                list sessions`,
-      `  ccb logs ${short}     show recent output`,
-      `  ccb logs ${short} -f  follow output live`,
-      `  ccb stop ${short}     stop this session (SIGTERM)`,
-      `  ccb rm   ${short}     remove the job directory`,
+      `backgrounded · ${chalk.cyan(short)}`,
+      d('ccb ps', 'list sessions'),
+      d(`ccb logs ${short}`, 'show recent output'),
+      d(`ccb logs ${short} -f`, 'follow output live'),
+      d(`ccb stop ${short}`, 'stop this session (SIGTERM)'),
+      d(`ccb rm   ${short}`, 'remove the job directory'),
       '',
     ].join('\n'),
   )
@@ -792,6 +795,5 @@ async function respawnSingle(job: JobMeta): Promise<boolean> {
   }
 }
 
-// Re-export pure helpers extracted into ./bg/ subdir, for the
-// __tests__/bg.test.ts import path (it imports from `../bg.js`).
+// Re-export pure helpers from ./bg/ subdir for __tests__/bg.test.ts.
 export { extractRespawnArgs, splitBgArgs, tailFile }
