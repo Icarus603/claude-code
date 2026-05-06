@@ -77,7 +77,7 @@
   "packages/repl/src/components/ConsoleOAuthFlow.tsx": 1870,
   "packages/repl/src/components/CustomSelect/select.tsx": 932,
   "packages/repl/src/components/LogSelector.tsx": 1449,
-  "packages/repl/src/components/MessageSelector.tsx": 996,
+  "packages/repl/src/components/MessageSelector.tsx": 1042,
   "packages/repl/src/components/Messages.tsx": 1099,
   "packages/repl/src/components/PromptInput/PromptInput.tsx": 3138,
   "packages/repl/src/components/ScrollKeybindingHandler.tsx": 1082,

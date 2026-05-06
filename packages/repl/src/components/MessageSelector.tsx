@@ -43,6 +43,7 @@ function isTextBlock(block: ContentBlockParam): block is TextBlockParam {
 
 import * as path from 'path'
 import { useTerminalSize } from '@anthropic/ink'
+import { isFullscreenEnvEnabled } from '../fullscreen.js'
 import type { FileEditOutput } from '@claude-code/tool-registry/tools/FileEditTool/types.js'
 import type { Output as FileWriteToolOutput } from '@claude-code/tool-registry/tools/FileWriteTool/FileWriteTool.js'
 import {
@@ -88,7 +89,10 @@ type Props = {
   preselectedMessage?: UserMessage
 }
 
-const MAX_VISIBLE_MESSAGES = 7
+// Selector chrome reserve: header (Rewind label, "Restore the code…" prompt,
+// dividers, footer hints) takes ~12 rows above and below the entry list. This
+// matches v2.1.128's hardcoded `M=12` in 4755.js's `f` formula.
+const SELECTOR_CHROME_RESERVE = 12
 
 export function MessageSelector({
   messages,
@@ -119,12 +123,36 @@ export function MessageSelector({
   )
   const [selectedIndex, setSelectedIndex] = useState(messageOptions.length - 1)
 
+  // Visible-count formula matching v2.1.128 4755.js: dynamically size the
+  // entry list to fit the available terminal area instead of a fixed 7. With
+  // a hardcoded count, when entries × entry-height (typically 7×3=21 rows)
+  // exceeds the FullscreenLayout selector-wrapper's maxHeight={50%} budget,
+  // yoga's flex-shrink kicks in on the entry rows (Box default flexShrink=1)
+  // and squeezes them below their declared height={3}, which produces the
+  // "ragged spacing" symptom users report. Sizing to actual available rows
+  // keeps every entry at its full height.
+  //
+  // The selector lives inside FullscreenLayout's bottom slot which is
+  // capped at maxHeight=50%, so the entry list only sees ~half the terminal.
+  // Halve in fullscreen mode too because the layout reserves space for the
+  // transcript above. This matches `J=sq()?Math.floor(j/2):j` behavior in
+  // 4755.js — same formula, same floor-divide, same chrome reserve M=12.
+  const { rows: terminalRows } = useTerminalSize()
+  const effectiveRows = isFullscreenEnvEnabled()
+    ? Math.floor(terminalRows / 2)
+    : terminalRows
+  const entryHeight = isFileHistoryEnabled ? 3 : 2
+  const maxVisibleMessages = Math.max(
+    2,
+    Math.floor((effectiveRows - SELECTOR_CHROME_RESERVE) / entryHeight),
+  )
+
   // Orient the selected message as the middle of the visible options
   const firstVisibleIndex = Math.max(
     0,
     Math.min(
-      selectedIndex - Math.floor(MAX_VISIBLE_MESSAGES / 2),
-      messageOptions.length - MAX_VISIBLE_MESSAGES,
+      selectedIndex - Math.floor(maxVisibleMessages / 2),
+      messageOptions.length - maxVisibleMessages,
     ),
   )
 
@@ -542,11 +570,18 @@ export function MessageSelector({
                 Restore and fork the conversation to the point before…
               </Text>
             )}
+            {firstVisibleIndex > 0 && (
+              <Box paddingLeft={1}>
+                <Text dimColor>
+                  {figures.arrowUp} {firstVisibleIndex} more above
+                </Text>
+              </Box>
+            )}
             <Box width="100%" flexDirection="column">
               {messageOptions
                 .slice(
                   firstVisibleIndex,
-                  firstVisibleIndex + MAX_VISIBLE_MESSAGES,
+                  firstVisibleIndex + maxVisibleMessages,
                 )
                 .map((msg, visibleOptionIndex) => {
                   const optionIndex = firstVisibleIndex + visibleOptionIndex
@@ -614,6 +649,17 @@ export function MessageSelector({
                   )
                 })}
             </Box>
+            {firstVisibleIndex + maxVisibleMessages < messageOptions.length && (
+              <Box paddingLeft={1}>
+                <Text dimColor>
+                  {figures.arrowDown}{' '}
+                  {messageOptions.length -
+                    firstVisibleIndex -
+                    maxVisibleMessages}{' '}
+                  more below
+                </Text>
+              </Box>
+            )}
           </>
         )}
         {!messageToRestore && (
