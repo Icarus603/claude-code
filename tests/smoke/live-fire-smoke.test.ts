@@ -127,7 +127,9 @@ describe('smoke:live-fire — plugin hook command actually spawns', () => {
     if (!existsSync(markerPath)) {
       // Diagnostic: dump fixture state so a future failure is debuggable.
       const fixtureExists = existsSync(HOOK_FILE)
-      const fixtureMode = fixtureExists ? readdirSync(FIXTURE_ROOT).join(',') : 'missing'
+      const fixtureMode = fixtureExists
+        ? readdirSync(FIXTURE_ROOT).join(',')
+        : 'missing'
       const markerDirContents = readdirSync(markerDir).join(',') || '(empty)'
       throw new Error(
         `Stop.fired marker not observed after 5s. ` +

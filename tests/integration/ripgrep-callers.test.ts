@@ -106,8 +106,12 @@ describe('ripgrep callers (post-NAPI)', () => {
           return [l.substring(0, idx), parseInt(l.substring(idx + 1))]
         }),
       )
-      const aCount = [...counts.entries()].find(([p]) => p.endsWith('a.ts'))?.[1]
-      const bCount = [...counts.entries()].find(([p]) => p.endsWith('b.ts'))?.[1]
+      const aCount = [...counts.entries()].find(([p]) =>
+        p.endsWith('a.ts'),
+      )?.[1]
+      const bCount = [...counts.entries()].find(([p]) =>
+        p.endsWith('b.ts'),
+      )?.[1]
       expect(aCount).toBe(3)
       expect(bCount).toBe(1)
     } finally {
@@ -151,7 +155,9 @@ describe('ripgrep callers (post-NAPI)', () => {
       ]
       const files = await ripGrep(args, root, new AbortController().signal)
       expect(files.length).toBeGreaterThanOrEqual(2)
-      expect(files.every(f => !f.includes('/.git/') && !f.includes('/.svn/'))).toBe(true)
+      expect(
+        files.every(f => !f.includes('/.git/') && !f.includes('/.svn/')),
+      ).toBe(true)
     } finally {
       rmSync(root, { recursive: true, force: true })
     }

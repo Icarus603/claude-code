@@ -18,9 +18,14 @@ import {
   fileHistoryGetDiffStats,
 } from '@claude-code/agent/file-history'
 import { logError } from '@claude-code/local-observability/logging'
-import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
-import { Box, Text, Divider } from '@anthropic/ink'
-import { useKeybinding, useKeybindings } from '@anthropic/ink/keybindings'
+import {
+  Box,
+  Text,
+  Dialog,
+  Byline,
+  KeyboardShortcutHint,
+} from '@anthropic/ink'
+import { useKeybindings } from '@anthropic/ink/keybindings'
 import type {
   Message,
   PartialCompactDirection,
@@ -360,8 +365,6 @@ export function MessageSelector({
     }
   }
 
-  const exitState = useExitOnCtrlCDWithKeybindings()
-
   const handleEscape = useCallback(() => {
     if (messageToRestore && !preselectedMessage) {
       // Go back to message list instead of closing entirely
@@ -393,13 +396,10 @@ export function MessageSelector({
     }
   }, [messageOptions, selectedIndex, handleSelect])
 
-  // Escape to close - uses Confirmation context where escape is bound
-  useKeybinding('confirm:no', handleEscape, {
-    context: 'Confirmation',
-    isActive: !messageToRestore,
-  })
-
-  // Message selector navigation keybindings
+  // Message selector navigation keybindings.
+  // Esc/Ctrl+C handling is delegated to the Dialog wrapper at the bottom
+  // of this component — it wires `onCancel={handleEscape}` and gates
+  // confirm:no via `isCancelActive`. See Dialog.tsx:46-59.
   useKeybindings(
     {
       'messageSelector:up': moveUp,
@@ -478,14 +478,33 @@ export function MessageSelector({
     !error && !messageToRestore && !preselectedMessage && hasMessagesToSelect
 
   return (
-    <Box flexDirection="column" width="100%">
-      <Divider color="suggestion" />
-      <Box flexDirection="column" marginX={1} gap={1}>
-        <Text bold color="suggestion">
-          Rewind
-        </Text>
-
-        {error && (
+    <Dialog
+      title="Rewind"
+      color="suggestion"
+      onCancel={handleEscape}
+      // Picker main view: Dialog handles Esc → handleEscape → onClose.
+      // Confirm-restore sub-view (messageToRestore !== undefined): disable
+      // Dialog's Esc handling so the Select's own onCancel returns to the
+      // picker via setMessageToRestore(undefined) instead of closing.
+      isCancelActive={!messageToRestore}
+      hideInputGuide={!!messageToRestore}
+      // Match v2.1.131 4757.js eb8 wording: "Enter to continue · Esc to
+      // exit" instead of Dialog's default "Enter to confirm · Esc to
+      // cancel" — picker semantics are continue/exit, not confirm/cancel.
+      inputGuide={exitState =>
+        exitState.pending ? (
+          <>Press {exitState.keyName} again to exit</>
+        ) : (
+          <Byline>
+            {!error && hasMessagesToSelect && (
+              <KeyboardShortcutHint shortcut="Enter" action="continue" />
+            )}
+            <KeyboardShortcutHint shortcut="Esc" action="exit" />
+          </Byline>
+        )
+      }
+    >
+      {error && (
           <>
             <Text color="error">Error: {error}</Text>
           </>
@@ -662,20 +681,7 @@ export function MessageSelector({
             )}
           </>
         )}
-        {!messageToRestore && (
-          <Text dimColor italic>
-            {exitState.pending ? (
-              <>Press {exitState.keyName} again to exit</>
-            ) : (
-              <>
-                {!error && hasMessagesToSelect && 'Enter to continue · '}Esc to
-                exit
-              </>
-            )}
-          </Text>
-        )}
-      </Box>
-    </Box>
+    </Dialog>
   )
 }
 
