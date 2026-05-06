@@ -4137,14 +4137,14 @@ export function REPL({
     }
   }, [submitCount]);
 
-  // Show notification when Claude is done responding and user is idle.
-  // KAIROS input-needed push gate (subsystem 3 of the KAIROS port): the
-  // existing idle-prompt watcher mirrors upstream resplit/5031.js, with
-  // an added gate matching upstream's PTH() composite (push-notifs
-  // feature on AND user has agentPushNotifEnabled), plus the
-  // input-needed-specific tengu_kairos_input_needed_push +
-  // inputNeededNotifEnabled. Without the gate, notifications fire for
-  // users who have explicitly disabled them in /config.
+  // Idle-prompt watcher: fire "Claude is waiting for your input" after
+  // messageIdleNotifThresholdMs of inactivity following a query completion.
+  // Banner-policy gate (KAIROS push toggles, channel selection) lives in
+  // notifier.ts:sendNotification → shouldFireBanner('idle_prompt') — the
+  // timer can run unconditionally here because the actual fire is gated
+  // centrally. Keeping the timer scheduling unconditional matches upstream
+  // resplit/5031.js and avoids missing the fire window if a user toggles
+  // settings between query-end and idle-threshold.
   useEffect(() => {
     // Don't set up notification if Claude is busy
     if (isLoading) return;
@@ -4154,20 +4154,6 @@ export function REPL({
 
     // No query has completed yet
     if (lastQueryCompletionTime === 0) return;
-
-    // KAIROS gates — read at effect mount; minor staleness if user toggles
-    // mid-session is tolerable (next query completion re-runs this effect).
-    const pushEnabled = getFeatureValue_CACHED_MAY_BE_STALE(
-      'tengu_kairos_push_notifications',
-      false,
-    );
-    const inputNeededGate = getFeatureValue_CACHED_MAY_BE_STALE(
-      'tengu_kairos_input_needed_push',
-      false,
-    );
-    const cfg = getGlobalConfig();
-    if (!pushEnabled || !cfg.agentPushNotifEnabled) return;
-    if (!inputNeededGate || !cfg.inputNeededNotifEnabled) return;
 
     // Set timeout to check idle state
     const timer = setTimeout(

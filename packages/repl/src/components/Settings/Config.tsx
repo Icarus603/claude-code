@@ -781,24 +781,8 @@ export function Config({
     ...(feature('KAIROS') || feature('KAIROS_PUSH')
       ? [
           {
-            id: 'taskCompleteNotifEnabled',
-            label: 'Push when idle',
-            value: globalConfig.taskCompleteNotifEnabled ?? false,
-            type: 'boolean' as const,
-            onChange(taskCompleteNotifEnabled: boolean) {
-              saveGlobalConfig(current => ({
-                ...current,
-                taskCompleteNotifEnabled,
-              }))
-              setGlobalConfig({
-                ...getGlobalConfig(),
-                taskCompleteNotifEnabled,
-              })
-            },
-          },
-          {
             id: 'inputNeededNotifEnabled',
-            label: 'Push when actions required',
+            label: 'Notify on action required',
             value: globalConfig.inputNeededNotifEnabled ?? false,
             type: 'boolean' as const,
             onChange(inputNeededNotifEnabled: boolean) {
@@ -814,7 +798,7 @@ export function Config({
           },
           {
             id: 'agentPushNotifEnabled',
-            label: 'Push when Claude decides',
+            label: 'Notify when Claude decides',
             value: globalConfig.agentPushNotifEnabled ?? false,
             type: 'boolean' as const,
             onChange(agentPushNotifEnabled: boolean) {
@@ -1342,6 +1326,22 @@ export function Config({
     ) {
       formattedChanges.push(
         `Set notifications to ${chalk.bold(globalConfig.preferredNotifChannel)}`,
+      )
+    }
+    if (
+      globalConfig.inputNeededNotifEnabled !==
+      initialConfig.current.inputNeededNotifEnabled
+    ) {
+      formattedChanges.push(
+        `${globalConfig.inputNeededNotifEnabled ? 'Enabled' : 'Disabled'} action-required notifications`,
+      )
+    }
+    if (
+      globalConfig.agentPushNotifEnabled !==
+      initialConfig.current.agentPushNotifEnabled
+    ) {
+      formattedChanges.push(
+        `${globalConfig.agentPushNotifEnabled ? 'Enabled' : 'Disabled'} Claude-decision notifications`,
       )
     }
     if (currentOutputStyle !== initialOutputStyle.current) {

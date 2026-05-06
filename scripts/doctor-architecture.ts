@@ -337,6 +337,13 @@ const CHECKS: Check[] = [
     doc: 'TODO/FIXME/XXX/HACK comments accumulate quietly. Without a ratchet they grow forever and become noise nobody reads. Baseline locked; new TODOs require either resolving the issue immediately, OR linking a tracking issue in the comment + --tighten with justification.',
   },
   {
+    id: 'notification-gates',
+    layer: 'Cross-Cutting',
+    subsystem: 'notification policy choke-point',
+    script: 'scripts/verify-notification-gates.ts',
+    doc: 'OS-banner gating is centralized in packages/repl/src/notifier.ts via notificationPolicy.shouldFireBanner. Direct terminal.notify* calls outside the dispatcher bypass the gate and re-introduce the 2026-05-06 bug class where /config push toggles silently lied. Exact-match rule (not a ratchet) — escape via "// notification:ungated reason=…" within 5 lines above.',
+  },
+  {
     id: 'no-sync-fs-in-render',
     layer: 'Cross-Cutting',
     subsystem: 'render-context perf',

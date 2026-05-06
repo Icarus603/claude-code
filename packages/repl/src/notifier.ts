@@ -6,6 +6,7 @@ import { executeNotificationHooks } from '@claude-code/agent/hooks.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
+import { shouldFireBanner } from './notificationPolicy.js'
 
 type NotificationOptions = {
   message: string
@@ -17,6 +18,13 @@ export async function sendNotification(
   notif: NotificationOptions,
   terminal: TerminalNotification,
 ): Promise<void> {
+  // Single policy decision point for the entire banner system. Mute = full
+  // silence: hooks do not fire either. See notificationPolicy.ts for the
+  // category mapping; channel='notifications_disabled' kills everything,
+  // category-toggles kill their bucket. auth_success and unknown types
+  // fall through.
+  if (!shouldFireBanner(notif.notificationType)) return
+
   const config = getGlobalConfig()
   const channel = config.preferredNotifChannel
 

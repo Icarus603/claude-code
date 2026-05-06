@@ -352,13 +352,8 @@ export function ConsoleOAuthFlow({
         )
 
         setOAuthStatus({ state: 'success' })
-        void sendNotification(
-          {
-            message: 'Claude Code login successful',
-            notificationType: 'auth_success',
-          },
-          terminal,
-        )
+        // notification:ungated reason=user just authenticated, this is the success ack
+        void sendNotification({ message: 'Claude Code login successful', notificationType: 'auth_success' }, terminal)
       }
     } catch (err) {
       const errorMessage = (err as Error).message
@@ -413,6 +408,7 @@ export function ConsoleOAuthFlow({
       )
       logEvent('tengu_oauth_codex_success', {})
       setOAuthStatus({ state: 'success' })
+      // notification:ungated reason=user just authenticated, this is the success ack
       void sendNotification({ message: 'Codex login successful', notificationType: 'auth_success' }, terminal)
     } catch (err) {
       const msg = (err as Error).message

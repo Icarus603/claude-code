@@ -465,8 +465,8 @@ export type GlobalConfig = {
   // from the title (the dot makes it redundant).
   showStatusInTerminalTab?: boolean
 
-  // Push-notification toggles (set via /config). Default off — explicit opt-in required.
-  taskCompleteNotifEnabled?: boolean
+  // Local-banner mute toggles (set via /config). Default off — explicit opt-in
+  // required. See packages/repl/src/notificationPolicy.ts for the category map.
   inputNeededNotifEnabled?: boolean
   agentPushNotifEnabled?: boolean
 
@@ -725,7 +725,6 @@ export const GLOBAL_CONFIG_KEYS = [
   'fileCheckpointingEnabled',
   'terminalProgressBarEnabled',
   'showStatusInTerminalTab',
-  'taskCompleteNotifEnabled',
   'inputNeededNotifEnabled',
   'agentPushNotifEnabled',
   'respectGitignore',
