@@ -109,14 +109,48 @@ export const CLAUDE_CODE_DOCS_MAP_URL =
 export const SYSTEM_PROMPT_DYNAMIC_BOUNDARY =
   '__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__'
 
-// @[MODEL LAUNCH]: Update the latest frontier model.
-const FRONTIER_MODEL_NAME = 'Claude Opus 4.7'
-
 // @[MODEL LAUNCH]: Update the model family IDs below to the latest in each tier.
 const CLAUDE_4_5_OR_4_6_MODEL_IDS = {
   opus: 'claude-opus-4-7',
   sonnet: 'claude-sonnet-4-6',
   haiku: 'claude-haiku-4-5-20251001',
+}
+
+// Mirrors ant 1387.js BV() — fast mode currently runs on Opus 4.6 unless
+// the operator opts into the Opus 4.7 fast variant.
+function getFastModelName(): string {
+  return isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE'))
+    ? 'Opus 4.7'
+    : 'Opus 4.6'
+}
+
+// ant 4692.js:550 — w23. Env-gated reproduce/verify workflow guidance.
+const REPRODUCE_VERIFY_WORKFLOW_PROMPT = `Work step by step:
+
+1. Reproduce the issue and observe the actual symptom before editing (hit the URL, read the rendered page, inspect the built file).
+2. Edit the source to resolve the issue.
+3. Re-observe the symptom to verify the fix. Rebuild, reload, or regenerate as needed. Don't stop until the symptom is gone.`
+
+// ant 4692.js:559 — Z23. Focus-mode guidance.
+const FOCUS_MODE_PROMPT = `# Focus mode
+The user has focus mode enabled. In focus mode, the user only sees your final text message in each response. They do not see tool calls, tool results, or any text you emit between tool calls. This overrides earlier guidance about giving short updates between tool calls — skip those updates and put everything the user needs to know in your final message. Do not assume they saw earlier progress updates.`
+
+// ant 4692.js:539 — L23. Investigate-before-asking guidance, opus-4-7 only.
+const INVESTIGATE_FIRST_PROMPT =
+  'Asking the user a clarifying question has a cost: it interrupts them, and often they could have answered it themselves with a grep. Before asking, spend up to a minute on read-only investigation (grep the codebase, check docs, search memory) so your question is specific. "I found tunnels X and Y in the config — which one?" beats "what tunnel?"'
+
+// ant 4692.js:528 — uI8(). Returns "off" | "additive" | "compact". The mode
+// is also embedded in the section's cache key so cross-session prompt cache
+// stays partitioned. ccb's GrowthBook stub always returns the default; the
+// env var is the only effective gate.
+function getInvestigateFirstMode(
+  model: string,
+): 'off' | 'additive' | 'compact' {
+  if (!getCanonicalName(model).includes('claude-opus-4-7')) return 'off'
+  const env = readEnv('CLAUDE_CODE_INVESTIGATE_FIRST')
+  if (env === 'additive' || env === 'compact') return env
+  if (isEnvTruthy(env)) return 'additive'
+  return 'off'
 }
 
 function getHooksSection(): string {
@@ -497,6 +531,22 @@ ${CYBER_RISK_INSTRUCTION}`,
       'summarize_tool_results',
       () => SUMMARIZE_TOOL_RESULTS_SECTION,
     ),
+    // ant 4692.js:296 — env-gated reproduce → fix → verify workflow.
+    // Skip GrowthBook tengu_sparrow_ledger since ccb's GB stub returns default.
+    systemPromptSection('reproduce_verify_workflow', () =>
+      isEnvTruthy(readEnv('CLAUDE_CODE_VERIFY_PROMPT'))
+        ? REPRODUCE_VERIFY_WORKFLOW_PROMPT
+        : null,
+    ),
+    // ant 4692.js:280 — opus-4-7 only, env-gated.
+    // cache-key includes mode so cross-session prompt cache stays clean.
+    systemPromptSection(
+      `investigate_first:${getInvestigateFirstMode(model)}`,
+      () =>
+        getInvestigateFirstMode(model) !== 'off'
+          ? INVESTIGATE_FIRST_PROMPT
+          : null,
+    ),
     ...(feature('TOKEN_BUDGET')
       ? [
           // Cached unconditionally — the "When the user specifies..." phrasing
@@ -514,6 +564,16 @@ ${CYBER_RISK_INSTRUCTION}`,
     ...(feature('KAIROS') || feature('KAIROS_BRIEF')
       ? [systemPromptSection('brief', () => getBriefSection())]
       : []),
+    // ant 4692.js:295 — focus_mode. Suppresses tool calls and intermediate
+    // text from the user's view; the model must put everything in the final
+    // message. ant's R23() guard skips this when proactive is active —
+    // proactive already steers the model toward terse final messages.
+    systemPromptSection('focus_mode', () => {
+      if (proactiveModule?.isProactiveActive()) return null
+      return getInitialSettings().viewMode === 'focus'
+        ? FOCUS_MODE_PROMPT
+        : null
+    }),
   ]
 
   const resolvedDynamicSections =
@@ -678,13 +738,13 @@ export async function computeSimpleEnvInfo(
     knowledgeCutoffMessage,
     process.env.USER_TYPE === 'ant' && isUndercover()
       ? null
-      : `The most recent Claude model family is Claude 4.5/4.6/4.7. Model IDs — Opus 4.7: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.opus}', Sonnet 4.6: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.sonnet}', Haiku 4.5: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.haiku}'. When building AI applications, default to the latest and most capable Claude models.`,
+      : `The most recent Claude model family is Claude 4.X. Model IDs — Opus 4.7: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.opus}', Sonnet 4.6: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.sonnet}', Haiku 4.5: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.haiku}'. When building AI applications, default to the latest and most capable Claude models.`,
     process.env.USER_TYPE === 'ant' && isUndercover()
       ? null
       : `Claude Code is available as a CLI in the terminal, desktop app (Mac/Windows), web app (claude.ai/code), and IDE extensions (VS Code, JetBrains).`,
     process.env.USER_TYPE === 'ant' && isUndercover()
       ? null
-      : `Fast mode for Claude Code uses the same ${FRONTIER_MODEL_NAME} model with faster output. It does NOT switch to a different model. It can be toggled with /fast.`,
+      : `Fast mode for Claude Code uses Claude ${getFastModelName()} with faster output (it does not downgrade to a smaller model). It can be toggled with /fast and is only available on ${getFastModelName()}.`,
   ].filter(item => item !== null)
 
   return [

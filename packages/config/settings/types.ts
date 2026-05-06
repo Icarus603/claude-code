@@ -662,6 +662,12 @@ export const SettingsSchema = lazySchema(() =>
         .string()
         .optional()
         .describe('Controls the output style for assistant responses'),
+      viewMode: z
+        .enum(['focus'])
+        .optional()
+        .describe(
+          'When set to "focus", suppresses tool calls and intermediate text in the REPL — Claude knows to put everything the user needs in the final message. ant 4692.js:295',
+        ),
       language: z
         .string()
         .optional()
