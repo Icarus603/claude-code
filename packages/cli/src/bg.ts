@@ -194,6 +194,55 @@ function truncate(s: string, n: number): string {
 // ─── handlers ───────────────────────────────────────────────────────
 
 /**
+ * Mirror of ant 4649.js fC8 — 1 MiB cap on piped-stdin payload that gets
+ * embedded into the background directive. Anything past this is silently
+ * truncated with a stderr warning, same as ant.
+ */
+const BG_STDIN_BYTE_CAP = 1024 * 1024
+
+/**
+ * Read piped stdin (non-TTY) up to BG_STDIN_BYTE_CAP. Returns '' if
+ * stdin is a TTY or no data arrives within the timeout. Mirrors ant's
+ * `ZJK` — used by `--bg` to let `cat task.md | ccb --bg "summarize"`
+ * embed the file content into the directive.
+ */
+async function readBgStdin(timeoutMs = 3000): Promise<string> {
+  if (process.stdin.isTTY) return ''
+  process.stdin.setEncoding('utf8')
+  let buf = ''
+  let truncated = false
+  const onData = (chunk: string): void => {
+    if (truncated) return
+    if (buf.length + chunk.length > BG_STDIN_BYTE_CAP) {
+      buf += chunk.slice(0, BG_STDIN_BYTE_CAP - buf.length)
+      truncated = true
+      return
+    }
+    buf += chunk
+  }
+  process.stdin.on('data', onData)
+  const timedOut = await new Promise<boolean>(resolve => {
+    const timer = setTimeout(() => resolve(true), timeoutMs)
+    process.stdin.once('end', () => {
+      clearTimeout(timer)
+      resolve(false)
+    })
+    process.stdin.once('error', () => {
+      clearTimeout(timer)
+      resolve(false)
+    })
+  })
+  process.stdin.off('data', onData)
+  if (timedOut) return ''
+  if (truncated) {
+    process.stderr.write(
+      `warning: piped stdin exceeds ${BG_STDIN_BYTE_CAP} bytes, truncated\n`,
+    )
+  }
+  return buf.replace(/\r?\n$/, '')
+}
+
+/**
  * Spawn a backgrounded `ccb -p "<directive>"` and return immediately.
  * Strips `--bg` / `--background` from argv before respawning so the
  * child doesn't recurse.
@@ -208,7 +257,16 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   // Reconstruct the prompt by joining everything after `--` (or all
   // non-flag positionals if there's no `--` separator). This mirrors how
   // the user-typed argv would look.
-  const directive = filtered.join(' ').trim()
+  let directive = filtered.join(' ').trim()
+
+  // Piped stdin support — `cat plan.md | ccb --bg "review this"` should
+  // embed the file content alongside the argv directive. Mirrors ant
+  // 4649.js iM3 → ZJK + RJK.
+  const piped = await readBgStdin()
+  if (piped) {
+    directive = directive ? `${directive}\n${piped}` : piped
+  }
+
   if (!directive) {
     process.stderr.write(
       'Usage: ccb --bg "<directive>"  (the prompt becomes the background task)\n',
