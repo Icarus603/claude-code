@@ -19,7 +19,7 @@
 import { feature } from 'bun:bundle'
 import type { Message as MessageType } from '@claude-code/agent/messageShapes'
 import { createUserMessage } from '@claude-code/agent/messages.js'
-import { asAgentId } from '@claude-code/agent/idTypes'
+import { asAgentId, type AgentId } from '@claude-code/agent/idTypes'
 import { createAgentId } from '@claude-code/agent/uuid.js'
 import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
 import { registerAsyncAgent } from '@claude-code/agent/localAgentTask.js'
@@ -219,7 +219,7 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
   // by its slug (e.g. "find-bug" → 8a3b...). Mirrors AgentTool's
   // registration path (AgentTool.tsx:972-978) and ant 4656.js mJK
   // line 53 (`agentLifecycle.registerName(T, QT(z))`).
-  setAppState((prev: { agentNameRegistry?: Map<string, unknown> }) => {
+  setAppState((prev: { agentNameRegistry?: Map<string, AgentId> }) => {
     const existing = prev.agentNameRegistry
     if (!(existing instanceof Map)) return prev
     const next = new Map(existing)
