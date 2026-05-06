@@ -55,6 +55,8 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs'
+import { splitBgArgs } from './bg/argParse.js'
+import { tailFile } from './bg/tailFile.js'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { randomBytes } from 'node:crypto'
@@ -246,84 +248,6 @@ function truncate(s: string, n: number): string {
 const BG_STDIN_BYTE_CAP = 1024 * 1024
 
 /**
- * Flags that take a separate value argument: `--flag value` form.
- * Approximation of ant 4649.js RC8. We don't need to enumerate every
- * single ccb flag — we just need enough coverage that the directive
- * extractor doesn't accidentally consume `<value>` as a positional.
- * If we miss one, the worst-case is the user gets a confusing error,
- * not a silent corruption.
- */
-const BG_FLAGS_WITH_VALUE = new Set([
-  '--model',
-  '--permission-mode',
-  '--session-id',
-  '--add-dir',
-  '-r',
-  '--resume',
-  '--max-turns',
-  '--cwd',
-  '--debug-file',
-  '--mcp-config',
-  '--append-system-prompt',
-  '--strict-mcp-config',
-  '--include-partial-messages',
-])
-
-/**
- * Split argv into (flags-to-forward, directive). The directive is the
- * last positional (or stdin if no positional), with everything after a
- * `--` separator joined into the same positional. Flags before/after
- * the directive are forwarded to the spawned child unchanged so users
- * can do `ccb --bg --model claude-haiku-4-5 "summarize this"`.
- *
- * Mirrors ant 4649.js Kf3 (lastPositional) + VJK (flagsWithoutPositional)
- * + RJK (stdin embed) collapsed into one pass.
- *
- * Exported for unit-test coverage.
- *
- * @dynamicRequire
- */
-export function splitBgArgs(args: readonly string[]): {
-  flags: string[]
-  directive: string
-} {
-  // Honor `--`: anything after it is treated as positional content, even
-  // if it looks like a flag.
-  const dashDashIdx = args.indexOf('--')
-  const beforeDashDash = dashDashIdx >= 0 ? args.slice(0, dashDashIdx) : args
-  const afterDashDash = dashDashIdx >= 0 ? args.slice(dashDashIdx + 1) : []
-
-  const flags: string[] = []
-  const positionals: string[] = []
-  for (let i = 0; i < beforeDashDash.length; i++) {
-    const a = beforeDashDash[i]!
-    if (a === '--bg' || a === '--background' || a === '-bg') {
-      continue
-    }
-    if (a.startsWith('-')) {
-      flags.push(a)
-      // `--flag=value` form is self-contained; `--flag value` form
-      // requires consuming the next arg if it's in our known list.
-      if (a.includes('=')) continue
-      const next = beforeDashDash[i + 1]
-      if (
-        next !== undefined &&
-        !next.startsWith('-') &&
-        BG_FLAGS_WITH_VALUE.has(a)
-      ) {
-        flags.push(next)
-        i++
-      }
-      continue
-    }
-    positionals.push(a)
-  }
-
-  const directive = [...positionals, ...afterDashDash].join(' ').trim()
-  return { flags, directive }
-}
-
-/**
  * Read piped stdin (non-TTY) up to BG_STDIN_BYTE_CAP. Returns '' if
  * stdin is a TTY or no data arrives within the timeout. Mirrors ant's
  * `ZJK` — used by `--bg` to let `cat task.md | ccb --bg "summarize"`
@@ -472,13 +396,35 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   const child = spawn(cmd, nodeArgs, opts)
   child.unref()
 
+  // Spawn failure (child.pid === undefined) means the kernel rejected
+  // the exec — bad binary path, missing dir, etc. Clean up the half-
+  // written job dir + print the underlying error rather than leaving
+  // an orphaned `unknown`-status entry that ps will keep showing.
+  if (child.pid === undefined) {
+    rmSync(getJobDir(short), { recursive: true, force: true })
+    // Wait one tick for the async 'error' event so we can include the
+    // OS-level reason in the message; if it doesn't fire, we still
+    // exit with a generic message.
+    const reason = await new Promise<string>(resolve => {
+      const timer = setTimeout(() => resolve('spawn failed (no error event)'), 200)
+      child.once('error', (err: Error) => {
+        clearTimeout(timer)
+        resolve(err.message)
+      })
+    })
+    process.stderr.write(
+      `Failed to background ccb child: ${reason}\n  cmd: ${fullCmd.join(' ')}\n`,
+    )
+    process.exit(1)
+  }
+
   const meta: JobMeta = {
     short,
-    pid: child.pid ?? -1,
+    pid: child.pid,
     cmd: fullCmd,
     cwd: process.cwd(),
     startedAt: Date.now(),
-    status: child.pid !== undefined ? 'running' : 'unknown',
+    status: 'running',
   }
   writeJobMeta(meta)
 
@@ -519,54 +465,6 @@ export async function psHandler(_args: readonly string[]): Promise<void> {
       ].join('  ') + '\n',
     )
   }
-}
-
-/**
- * Read the last N lines of a (potentially huge) log file without slurping
- * the whole thing into memory. Reads back in 64 KB chunks until the
- * requested newline count is reached. Used by `ccb logs --tail N`.
- *
- * Exported for test coverage — the trailing-newline + chunk-boundary
- * arithmetic is subtle enough to warrant a regression suite.
- */
-export function tailFile(path: string, lines: number): string {
-  if (!existsSync(path) || lines <= 0) return ''
-  const stat = statSync(path)
-  if (stat.size === 0) return ''
-  const CHUNK = 64 * 1024
-  const fd = openSync(path, 'r')
-  let collected = Buffer.alloc(0)
-  let pos = stat.size
-  // Read backwards from EOF until we've collected enough newlines to
-  // guarantee the slice below has the requested tail count, or we hit
-  // BOF. We need (lines + 1) newlines so the slice can drop the partial
-  // leading line — hitting BOF means we've already got the whole file.
-  let newlines = 0
-  try {
-    while (pos > 0 && newlines <= lines) {
-      const readSize = Math.min(CHUNK, pos)
-      pos -= readSize
-      const chunk = Buffer.alloc(readSize)
-      readSync(fd, chunk, 0, readSize, pos)
-      collected = Buffer.concat([chunk, collected])
-      newlines = 0
-      for (let i = 0; i < collected.length; i++) {
-        if (collected[i] === 0x0a) newlines++
-      }
-    }
-  } finally {
-    closeSync(fd)
-  }
-  const text = collected.toString('utf8')
-  // Split on `\n`. A file ending in `\n` produces a trailing empty
-  // element which counts as one "line"; keep the math consistent by
-  // dropping it before slicing, then re-add the terminator if needed.
-  const hadTrailingNewline = text.endsWith('\n')
-  const body = hadTrailingNewline ? text.slice(0, -1) : text
-  const arr = body.split('\n')
-  if (arr.length <= lines) return text
-  const tail = arr.slice(arr.length - lines).join('\n')
-  return hadTrailingNewline ? tail + '\n' : tail
 }
 
 /** @dynamicRequire */
@@ -792,3 +690,6 @@ export async function attachHandler(args: readonly string[]): Promise<void> {
   await logsHandler([job.short, '--follow', '--tail', '200'])
 }
 
+// Re-export pure helpers extracted into ./bg/ subdir, for the
+// __tests__/bg.test.ts import path (it imports from `../bg.js`).
+export { splitBgArgs, tailFile }
