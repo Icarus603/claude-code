@@ -26,29 +26,31 @@
  * job dir schema is forward-compatible: a future daemon adds a socket
  * file alongside meta.json and the existing ps/logs/kill keep working.
  *
- * Subcommand surface:
+ * Subcommand surface (verb names mirror ant 4649.js for muscle-memory
+ * parity — `stop` is graceful, `kill` is the same path with SIGKILL):
  *   ccb --bg "<directive>"   spawn a backgrounded -p run
  *   ccb ps                   list active + recent sessions
- *   ccb logs <short>         tail stdout/stderr (or follow)
- *   ccb kill <short>         SIGTERM the process
+ *   ccb logs <short>         tail stdout/stderr (-f follow, --tail N)
+ *   ccb stop <short>         SIGTERM (graceful); `--force` upgrades to SIGKILL
+ *   ccb kill <short>         alias for `stop --force`
+ *   ccb attach <short>       alias for `logs --follow` (no PTY in this build)
  *   ccb rm <short>           remove the job dir (only when stopped)
  *
- * `attach` is intentionally not implemented yet (no PTY layer); it'd
- * print "not implemented in this build, see Phase C".
+ * Daemon-managed PTY-attach (true reconnect) stays out of scope for
+ * Phase B. The job dir layout is forward-compatible — Phase C grafts
+ * a daemon supervisor in front of `~/.claude/jobs/<short>/` without
+ * breaking existing ps/logs/stop callsites.
  */
 
+import { spawn, type SpawnOptions } from 'node:child_process'
 import {
-  spawn,
-  spawnSync,
-  type SpawnOptions,
-} from 'node:child_process'
-import {
-  appendFileSync,
+  closeSync,
   existsSync,
   mkdirSync,
   openSync,
   readdirSync,
   readFileSync,
+  readSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -68,9 +70,12 @@ interface JobMeta {
    * live PID list. The on-disk value is authoritative when the process
    * isn't running anymore (running → exited transition is recorded
    * lazily — there's no daemon watching).
+   *
+   * `stopped` = graceful SIGTERM via `ccb stop`. `killed` = SIGKILL via
+   * `ccb stop --force` / `ccb kill`. `exited` = natural termination.
    */
-  status: 'running' | 'exited' | 'killed' | 'unknown'
-  /** Set when `ccb kill <short>` runs. Distinct from natural exit. */
+  status: 'running' | 'exited' | 'stopped' | 'killed' | 'unknown'
+  /** Set when `ccb stop`/`ccb kill` runs. Distinct from natural exit. */
   killedAt?: number
   /** Set the first time ps reconciles `running → exited`. */
   exitedAt?: number
@@ -261,10 +266,11 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   process.stdout.write(
     [
       `backgrounded · ${short}`,
-      `  ccb ps               list sessions`,
-      `  ccb logs ${short}    show recent output`,
-      `  ccb kill ${short}    stop this session`,
-      `  ccb rm   ${short}    remove the job directory`,
+      `  ccb ps                list sessions`,
+      `  ccb logs ${short}     show recent output`,
+      `  ccb logs ${short} -f  follow output live`,
+      `  ccb stop ${short}     stop this session (SIGTERM)`,
+      `  ccb rm   ${short}     remove the job directory`,
       '',
     ].join('\n'),
   )
@@ -295,10 +301,49 @@ export async function psHandler(_args: readonly string[]): Promise<void> {
   }
 }
 
+/**
+ * Read the last N lines of a (potentially huge) log file without slurping
+ * the whole thing into memory. Reads back in 64 KB chunks until the
+ * requested newline count is reached. Used by `ccb logs --tail N`.
+ */
+function tailFile(path: string, lines: number): string {
+  if (!existsSync(path) || lines <= 0) return ''
+  const stat = statSync(path)
+  if (stat.size === 0) return ''
+  const CHUNK = 64 * 1024
+  const fd = openSync(path, 'r')
+  let collected = Buffer.alloc(0)
+  let pos = stat.size
+  let newlines = 0
+  try {
+    while (pos > 0 && newlines <= lines) {
+      const readSize = Math.min(CHUNK, pos)
+      pos -= readSize
+      const chunk = Buffer.alloc(readSize)
+      readSync(fd, chunk, 0, readSize, pos)
+      collected = Buffer.concat([chunk, collected])
+      newlines = 0
+      for (let i = 0; i < collected.length; i++) {
+        if (collected[i] === 0x0a) newlines++
+      }
+    }
+  } finally {
+    closeSync(fd)
+  }
+  const text = collected.toString('utf8')
+  if (newlines <= lines) return text
+  // Strip leading lines beyond the tail count.
+  const arr = text.split('\n')
+  return arr.slice(arr.length - lines - 1).join('\n')
+}
+
 export async function logsHandler(args: readonly string[]): Promise<void> {
-  const short = args[0]
+  const positional = args.filter(a => !a.startsWith('-'))
+  const short = positional[0]
   if (!short) {
-    process.stderr.write('Usage: ccb logs <short>\n')
+    process.stderr.write(
+      'Usage: ccb logs <short> [-f|--follow] [--tail N]\n',
+    )
     process.exit(1)
   }
   const job = findJobByPrefix(short)
@@ -309,6 +354,24 @@ export async function logsHandler(args: readonly string[]): Promise<void> {
   const stdoutPath = join(getJobDir(job.short), 'stdout.log')
   const stderrPath = join(getJobDir(job.short), 'stderr.log')
   const follow = args.includes('-f') || args.includes('--follow')
+
+  // --tail N: print only the last N lines and exit (or seed the follow
+  // stream so a long-running job doesn't dump megabytes of backlog).
+  let tailLines: number | undefined
+  const tailIdx = args.findIndex(a => a === '--tail' || a === '-n')
+  if (tailIdx >= 0) {
+    const v = args[tailIdx + 1]
+    if (!v) {
+      process.stderr.write('--tail requires a numeric argument (e.g. --tail 200)\n')
+      process.exit(1)
+    }
+    const parsed = Number.parseInt(v, 10)
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      process.stderr.write(`--tail value "${v}" is not a positive integer\n`)
+      process.exit(1)
+    }
+    tailLines = parsed
+  }
 
   if (follow) {
     // Simple polling tail. Bun's spawn isn't quite the right primitive
@@ -322,10 +385,6 @@ export async function logsHandler(args: readonly string[]): Promise<void> {
         if (stat.size <= lastPos) return lastPos
         const fd = openSync(path, 'r')
         const buf = Buffer.alloc(stat.size - lastPos)
-        // node:fs read is sync read; use readSync via require to avoid
-        // pulling node:fs/promises here.
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { readSync, closeSync } = require('node:fs') as typeof import('node:fs')
         readSync(fd, buf, 0, buf.length, lastPos)
         closeSync(fd)
         sink.write(buf.toString('utf8'))
@@ -334,9 +393,20 @@ export async function logsHandler(args: readonly string[]): Promise<void> {
         return lastPos
       }
     }
-    // Initial dump of any existing content.
-    if (existsSync(stdoutPath)) stdoutPos = writeNew(stdoutPath, 0, process.stdout)
-    if (existsSync(stderrPath)) stderrPos = writeNew(stderrPath, 0, process.stderr)
+    // Initial seed: --tail N caps the backlog; otherwise dump everything.
+    if (tailLines !== undefined) {
+      if (existsSync(stdoutPath)) {
+        process.stdout.write(tailFile(stdoutPath, tailLines))
+        stdoutPos = statSync(stdoutPath).size
+      }
+      if (existsSync(stderrPath)) {
+        process.stderr.write(tailFile(stderrPath, tailLines))
+        stderrPos = statSync(stderrPath).size
+      }
+    } else {
+      if (existsSync(stdoutPath)) stdoutPos = writeNew(stdoutPath, 0, process.stdout)
+      if (existsSync(stderrPath)) stderrPos = writeNew(stderrPath, 0, process.stderr)
+    }
 
     const tick = (): void => {
       if (existsSync(stdoutPath)) stdoutPos = writeNew(stdoutPath, stdoutPos, process.stdout)
@@ -353,22 +423,74 @@ export async function logsHandler(args: readonly string[]): Promise<void> {
     return
   }
 
-  // Non-follow: dump both streams in their entirety.
-  if (existsSync(stdoutPath)) {
-    process.stdout.write(readFileSync(stdoutPath, 'utf8'))
-  }
-  if (existsSync(stderrPath)) {
-    const errBytes = readFileSync(stderrPath)
-    if (errBytes.byteLength > 0) {
-      process.stderr.write(errBytes)
+  // Non-follow: dump (or tail) both streams.
+  if (tailLines !== undefined) {
+    if (existsSync(stdoutPath)) {
+      process.stdout.write(tailFile(stdoutPath, tailLines))
+    }
+    if (existsSync(stderrPath)) {
+      const tail = tailFile(stderrPath, tailLines)
+      if (tail.length > 0) process.stderr.write(tail)
+    }
+  } else {
+    if (existsSync(stdoutPath)) {
+      process.stdout.write(readFileSync(stdoutPath, 'utf8'))
+    }
+    if (existsSync(stderrPath)) {
+      const errBytes = readFileSync(stderrPath)
+      if (errBytes.byteLength > 0) {
+        process.stderr.write(errBytes)
+      }
     }
   }
 }
 
-export async function killHandler(args: readonly string[]): Promise<void> {
-  const short = args[0]
+/**
+ * Shared termination worker — owns the SIGTERM/SIGKILL escalation and
+ * meta-bookkeeping. Both `stopHandler` (SIGTERM) and `killHandler`
+ * (SIGKILL via the `--force` shortcut) funnel through here so the
+ * exit-code accounting and "already gone" reconciliation only live in
+ * one place.
+ */
+function stopJob(
+  job: JobMeta,
+  opts: { force: boolean; verbLabel: string; finalStatus: 'stopped' | 'killed' },
+): void {
+  if (job.status !== 'running') {
+    process.stderr.write(
+      `Job ${job.short} is not running (status=${job.status}).\n`,
+    )
+    process.exit(0)
+  }
+  const signal: NodeJS.Signals = opts.force ? 'SIGKILL' : 'SIGTERM'
+  try {
+    process.kill(job.pid, signal)
+    writeJobMeta({
+      ...job,
+      status: opts.finalStatus,
+      killedAt: Date.now(),
+    })
+    process.stdout.write(
+      `${opts.verbLabel} ${job.short} (pid ${job.pid}, ${signal}).\n`,
+    )
+  } catch (e) {
+    const err = e as NodeJS.ErrnoException
+    if (err.code === 'ESRCH') {
+      writeJobMeta({ ...job, status: 'exited', exitedAt: Date.now() })
+      process.stdout.write(`Job ${job.short} was already exited.\n`)
+    } else {
+      process.stderr.write(`Failed to ${opts.verbLabel.toLowerCase()} ${job.short}: ${err.message}\n`)
+      process.exit(1)
+    }
+  }
+}
+
+export async function stopHandler(args: readonly string[]): Promise<void> {
+  const positional = args.filter(a => !a.startsWith('-'))
+  const short = positional[0]
+  const force = args.includes('--force') || args.includes('-9')
   if (!short) {
-    process.stderr.write('Usage: ccb kill <short>\n')
+    process.stderr.write('Usage: ccb stop <short> [--force]\n')
     process.exit(1)
   }
   const job = findJobByPrefix(short)
@@ -376,29 +498,31 @@ export async function killHandler(args: readonly string[]): Promise<void> {
     process.stderr.write(`No job matching "${short}".\n`)
     process.exit(1)
   }
-  if (job.status !== 'running') {
-    process.stderr.write(`Job ${job.short} is not running (status=${job.status}).\n`)
-    process.exit(0)
+  stopJob(job, {
+    force,
+    verbLabel: force ? 'Killed' : 'Stopped',
+    finalStatus: force ? 'killed' : 'stopped',
+  })
+}
+
+/**
+ * Alias for `stop --force`. ant 4649.js exposes `stop` only — `kill` is
+ * a ccb-side affordance kept undocumented in --help but live in argv
+ * dispatch so muscle memory from `kill <pid>` works.
+ */
+export async function killHandler(args: readonly string[]): Promise<void> {
+  const positional = args.filter(a => !a.startsWith('-'))
+  const short = positional[0]
+  if (!short) {
+    process.stderr.write('Usage: ccb kill <short>   (alias of `ccb stop --force`)\n')
+    process.exit(1)
   }
-  try {
-    process.kill(job.pid, 'SIGTERM')
-    writeJobMeta({
-      ...job,
-      status: 'killed',
-      killedAt: Date.now(),
-    })
-    process.stdout.write(`Killed ${job.short} (pid ${job.pid}).\n`)
-  } catch (e) {
-    const err = e as NodeJS.ErrnoException
-    if (err.code === 'ESRCH') {
-      // Process already gone — reconcile and report.
-      writeJobMeta({ ...job, status: 'exited', exitedAt: Date.now() })
-      process.stdout.write(`Job ${job.short} was already exited.\n`)
-    } else {
-      process.stderr.write(`Failed to kill ${job.short}: ${err.message}\n`)
-      process.exit(1)
-    }
+  const job = findJobByPrefix(short)
+  if (!job) {
+    process.stderr.write(`No job matching "${short}".\n`)
+    process.exit(1)
   }
+  stopJob(job, { force: true, verbLabel: 'Killed', finalStatus: 'killed' })
 }
 
 export async function rmHandler(args: readonly string[]): Promise<void> {
@@ -422,16 +546,32 @@ export async function rmHandler(args: readonly string[]): Promise<void> {
   process.stdout.write(`Removed ${job.short}.\n`)
 }
 
-export async function attachHandler(_args: readonly string[]): Promise<void> {
+/**
+ * `attach` without a daemon-managed PTY is fundamentally read-only —
+ * we can stream output but can't deliver keystrokes back to a child
+ * whose stdin was wired to /dev/null at spawn. The honest behavior is
+ * to forward to `logs --follow`: same UX, same exit semantics, and a
+ * one-line note so users know why they can't type into the session.
+ *
+ * When Phase C grafts in the daemon supervisor with a real PTY, this
+ * can grow real bidirectional reconnect; the call surface stays the
+ * same so any existing scripts keep working.
+ */
+export async function attachHandler(args: readonly string[]): Promise<void> {
+  const positional = args.filter(a => !a.startsWith('-'))
+  if (!positional[0]) {
+    process.stderr.write('Usage: ccb attach <short>\n')
+    process.exit(1)
+  }
+  const job = findJobByPrefix(positional[0])
+  if (!job) {
+    process.stderr.write(`No job matching "${positional[0]}".\n`)
+    process.exit(1)
+  }
   process.stderr.write(
-    'attach is not implemented in this build (Phase C requires PTY supervisor).\n' +
-      'Use "ccb logs <short>" to read output, or "ccb logs <short> --follow" to tail.\n',
+    `attach: this build streams output read-only (no PTY supervisor yet).\n` +
+      `        showing live tail; the session keeps running if you Ctrl+C here.\n`,
   )
-  process.exit(1)
+  await logsHandler([job.short, '--follow', '--tail', '200'])
 }
 
-// `appendFileSync` import preserved so a future daemon-attached path
-// can append status lines to a session log. Touch a const here to keep
-// the import alive until then without a verifier flag.
-void appendFileSync
-void spawnSync

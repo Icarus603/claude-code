@@ -213,6 +213,7 @@ async function main(): Promise<void> {
     (args[0] === 'ps' ||
       args[0] === 'logs' ||
       args[0] === 'attach' ||
+      args[0] === 'stop' ||
       args[0] === 'kill' ||
       args[0] === 'rm' ||
       args.includes('--bg') ||
@@ -224,6 +225,7 @@ async function main(): Promise<void> {
     if (sub === 'ps') return await bg.psHandler(args.slice(1))
     if (sub === 'logs') return await bg.logsHandler(args.slice(1))
     if (sub === 'attach') return await bg.attachHandler(args.slice(1))
+    if (sub === 'stop') return await bg.stopHandler(args.slice(1))
     if (sub === 'kill') return await bg.killHandler(args.slice(1))
     if (sub === 'rm') return await bg.rmHandler(args.slice(1))
     return await bg.handleBgFlag(args)
