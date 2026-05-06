@@ -2,7 +2,7 @@
   "empty-catch": 0,
   "nullish-coalesce-critical-path": 86,
   "stub-return-only": 25,
-  "always-false-feature-flag": 492,
-  "type-cast-trap": 134,
+  "always-false-feature-flag": 489,
+  "type-cast-trap": 131,
   "require-fallback-to-stub": 0
 }

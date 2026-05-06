@@ -24,13 +24,13 @@ Findings are graded:
 | 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
 | 5 | empty-catch | 0 | 0 | 0 | 0 | 0 |
 | 6 | nullish-coalesce-critical-path | 86 | 0 | 0 | 0 | 86 |
-| 7 | stub-return-only | 26 | 0 | 0 | 0 | 26 |
-| 8 | always-false-feature-flag | 495 | 0 | 0 | 0 | 495 |
+| 7 | stub-return-only | 25 | 0 | 0 | 0 | 25 |
+| 8 | always-false-feature-flag | 489 | 0 | 0 | 0 | 489 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
-| 10 | type-cast-trap | 133 | 0 | 0 | 1 | 132 |
+| 10 | type-cast-trap | 131 | 0 | 0 | 1 | 130 |
 | 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **740** | **0** | **0** | **1** | **739** |
+| **TOTAL** | | **731** | **0** | **0** | **1** | **730** |
 
 ## Patterns in detail
 
@@ -40,7 +40,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/01-unwired-setter-slots.ts`
 
-**Total scanned**: 94; **findings**: 0
+**Total scanned**: 82; **findings**: 0
 
 ### 2. `await-generator-misuse`
 
@@ -48,7 +48,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/02-await-generator-misuse.ts`
 
-**Total scanned**: 52; **findings**: 0
+**Total scanned**: 54; **findings**: 0
 
 ### 3. `optional-chain-on-required-binding`
 
@@ -64,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9215; **findings**: 0
+**Total scanned**: 9222; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -72,7 +72,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2264; **findings**: 0
+**Total scanned**: 2253; **findings**: 0
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -80,7 +80,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1168; **findings**: 86
+**Total scanned**: 1175; **findings**: 86
 
 #### LOW (86)
 
@@ -110,17 +110,17 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/repl/src/screens/ResumeConversation.tsx:322` — result.contextCollapseCommits ?? [],
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:1160` — const [messages, rawSetMessages] = useState<MessageType[]>(initialMessages ?? []);
+- `packages/repl/src/screens/REPLView.tsx:1183` — const [messages, rawSetMessages] = useState<MessageType[]>(initialMessages ?? []);
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:1624` — const prevCount = prev.autoPermissionsNotificationCount ?? 0;
+- `packages/repl/src/screens/REPLView.tsx:1647` — const prevCount = prev.autoPermissionsNotificationCount ?? 0;
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:1944` — log.contentReplacements ?? [],
+- `packages/repl/src/screens/REPLView.tsx:1936` — log.contentReplacements ?? [],
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:4074` — promptQueueUseCount: (current.promptQueueUseCount ?? 0) + 1,
+- `packages/repl/src/screens/REPLView.tsx:4066` — promptQueueUseCount: (current.promptQueueUseCount ?? 0) + 1,
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:4780` — ? (viewedAgentTask.messages ?? [])
+- `packages/repl/src/screens/REPLView.tsx:4790` — ? (viewedAgentTask.messages ?? [])
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:5573` — const kept = result.messagesToKeep ?? [];
+- `packages/repl/src/screens/REPLView.tsx:5522` — const kept = result.messagesToKeep ?? [];
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/provider/src/oauth/auth-code-listener.ts:46` — this.localServer.listen(port ?? 0, 'localhost', () => {
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
@@ -140,9 +140,9 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/provider/src/dumpPrompts.ts:103` — const messages = (req.messages ?? []) as Array<{ role?: string }>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:255` — connections: (current.connections ?? []).filter(c => c.id !== id),
+- `packages/provider/src/connections.ts:282` — connections: (current.connections ?? []).filter(c => c.id !== id),
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:263` — connections: (current.connections ?? []).map(c =>
+- `packages/provider/src/connections.ts:290` — connections: (current.connections ?? []).map(c =>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - ...56 more (run audit with no flags for full JSON)
 
@@ -152,9 +152,9 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5828; **findings**: 26
+**Total scanned**: 5840; **findings**: 25
 
-#### LOW (26)
+#### LOW (25)
 
 - `packages/tool-registry/src/tools/ExitPlanModeTool/UI.tsx:15` — renderToolUseMessage() { return null }
   - Function renderToolUseMessage body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
@@ -168,9 +168,7 @@ Findings are graded:
   - Function renderToolUseMessage body is just `return ''`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/@ant/computer-use-mcp/src/legacy/gates.ts:39` — hasRequiredSubscription() { return true }
   - Function hasRequiredSubscription body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/memory/src/autoDream.ts:82` — isForced() { return false }
-  - Function isForced body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/config/feature-flags.ts:108` — initializeGrowthBook() { return null }
+- `packages/config/feature-flags.ts:128` — initializeGrowthBook() { return null }
   - Function initializeGrowthBook body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/local-observability/src/spans.ts:19` — isBetaTracingEnabled() { return false }
   - Function isBetaTracingEnabled body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
@@ -180,7 +178,7 @@ Findings are graded:
   - Function isBetaTracingEnabled body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/local-observability/src/telemetry/instrumentation.ts:10` — initializeTelemetry() { return null }
   - Function initializeTelemetry body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/repl/src/components/AntModelSwitchCallout.tsx:10` — shouldShowModelSwitchCallout() { return false; }
+- `packages/repl/src/components/AntModelSwitchCallout.tsx:12` — shouldShowModelSwitchCallout() { return false; }
   - Function shouldShowModelSwitchCallout body is just `return false;`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/repl/src/components/LogoV2/GateOverridesWarning.tsx:8` — GateOverridesWarning() { return null }
   - Function GateOverridesWarning body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
@@ -196,7 +194,7 @@ Findings are graded:
   - Function alwaysValidStatus body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/cli/src/transports/SSETransport.ts:38` — alwaysValidStatus() { return true }
   - Function alwaysValidStatus body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/storage/src/sessionStorage.ts:223` — isCustomTitleEnabled() { return true }
+- `packages/storage/src/sessionStorage.ts:271` — isCustomTitleEnabled() { return true }
   - Function isCustomTitleEnabled body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/url-handler-napi/src/index.ts:1` — waitForUrlEvent() { return null }
   - Function waitForUrlEvent body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
@@ -215,13 +213,13 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/08-always-false-feature-flags.ts`
 
-**Total scanned**: 812; **findings**: 495
+**Total scanned**: 815; **findings**: 489
 
-#### LOW (495)
+#### LOW (489)
 
 - `packages/swarm/commands/branch/index.ts:8` — aliases: feature('FORK_SUBAGENT') ? [] : ['fork'],
   - `feature('FORK_SUBAGENT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_FORK_SUBAGENT=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/swarm/src/runtime/inProcessRunner.ts:162` — feature('BASH_CLASSIFIER') &&
+- `packages/swarm/src/runtime/inProcessRunner.ts:166` — feature('BASH_CLASSIFIER') &&
   - `feature('BASH_CLASSIFIER')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_BASH_CLASSIFIER=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/swarm/src/worktree/index.ts:603` — if (feature('COMMIT_ATTRIBUTION')) {
   - `feature('COMMIT_ATTRIBUTION')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_COMMIT_ATTRIBUTION=1. Verify whether this branch is ever exercised; if not, delete it.
@@ -237,17 +235,17 @@ Findings are graded:
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/EnterPlanModeTool/EnterPlanModeTool.ts:61` — (feature('KAIROS') || feature('KAIROS_CHANNELS')) &&
   - `feature('KAIROS_CHANNELS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS_CHANNELS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:72` — feature('UDS_INBOX')
+- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:66` — feature('UDS_INBOX')
   - `feature('UDS_INBOX')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_UDS_INBOX=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:586` — if (feature('UDS_INBOX') && parseAddress(input.to).scheme === 'bridge') {
+- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:351` — if (feature('UDS_INBOX') && parseAddress(input.to).scheme === 'bridge') {
   - `feature('UDS_INBOX')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_UDS_INBOX=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:631` — if (feature('UDS_INBOX') && parseAddress(input.to).scheme === 'bridge') {
+- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:396` — if (feature('UDS_INBOX') && parseAddress(input.to).scheme === 'bridge') {
   - `feature('UDS_INBOX')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_UDS_INBOX=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:658` — feature('UDS_INBOX') &&
+- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:423` — feature('UDS_INBOX') &&
   - `feature('UDS_INBOX')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_UDS_INBOX=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:689` — if (feature('UDS_INBOX') && parseAddress(input.to).scheme !== 'other') {
+- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:455` — if (feature('UDS_INBOX') && parseAddress(input.to).scheme !== 'other') {
   - `feature('UDS_INBOX')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_UDS_INBOX=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:746` — if (feature('UDS_INBOX') && typeof input.message === 'string') {
+- `packages/tool-registry/src/tools/SendMessageTool/SendMessageTool.ts:512` — if (feature('UDS_INBOX') && typeof input.message === 'string') {
   - `feature('UDS_INBOX')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_UDS_INBOX=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/SendMessageTool/prompt.ts:6` — const udsRow = feature('UDS_INBOX')
   - `feature('UDS_INBOX')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_UDS_INBOX=1. Verify whether this branch is ever exercised; if not, delete it.
@@ -267,19 +265,19 @@ Findings are graded:
   - `feature('AGENT_MEMORY_SNAPSHOT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_AGENT_MEMORY_SNAPSHOT=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/AgentTool/forkSubagent.ts:33` — if (feature('FORK_SUBAGENT')) {
   - `feature('FORK_SUBAGENT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_FORK_SUBAGENT=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:10` — feature('KAIROS') || feature('KAIROS_BRIEF')
+- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:9` — feature('KAIROS') || feature('KAIROS_BRIEF')
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:15` — const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS')
+- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:14` — const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS')
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:76` — if (feature('FORK_SUBAGENT') && tool.name === AGENT_TOOL_NAME) {
+- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:69` — if (feature('FORK_SUBAGENT') && tool.name === AGENT_TOOL_NAME) {
   - `feature('FORK_SUBAGENT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_FORK_SUBAGENT=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:89` — (feature('KAIROS') || feature('KAIROS_BRIEF')) &&
+- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:82` — (feature('KAIROS') || feature('KAIROS_BRIEF')) &&
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:99` — feature('KAIROS') &&
+- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:92` — feature('KAIROS') &&
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/registry/providers/BuiltInToolsProvider.ts:58` — feature('PROACTIVE') || feature('KAIROS')
   - `feature('PROACTIVE')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_PROACTIVE=1. Verify whether this branch is ever exercised; if not, delete it.
-- ...465 more (run audit with no flags for full JSON)
+- ...459 more (run audit with no flags for full JSON)
 
 ### 9. `optional-method-no-guard`
 
@@ -295,18 +293,20 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 535; **findings**: 133
+**Total scanned**: 659; **findings**: 131
 
 #### MEDIUM (1)
 
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1190` — const fallbackBuffer = await (sharp as any)(imageBuffer)
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1189` — const fallbackBuffer = await (sharp as any)(imageBuffer)
   - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 
-#### LOW (132)
+#### LOW (130)
 
 - `packages/swarm/testing/index.ts:20` — } as unknown as SwarmHostDeps
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/swarm/src/mailbox/index.ts:1165` — const b = block as unknown as { type: string; name?: string; input?: Record<string, unknown>; [key: string]: unknown }
+- `packages/swarm/src/mailbox/index.ts:155` — const parsed = JSON.parse(text) as unknown
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/swarm/src/mailbox/index.ts:631` — const b = block as unknown as { type: string; name?: string; input?: Record<string, unknown>; [key: string]: unknown }
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/TungstenTool/TungstenTool.ts:4` — export const TungstenTool: Tool = (() => {}) as unknown as Tool;
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -330,7 +330,7 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/utils/semanticBoolean.ts:23` — inner: T = z.boolean() as unknown as T,
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/ripgrep.ts:574` — (proc.stdout as unknown as Blob).text(),
+- `packages/tool-registry/src/ripgrep.ts:472` — partialFallback as unknown as string[],
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/@ant/ink/src/core/reconciler.ts:482` — } as never,
   - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -339,10 +339,6 @@ Findings are graded:
 - `packages/config/settings/settings.ts:431` — (source as unknown) === 'policySettings' ||
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/settings/settings.ts:432` — (source as unknown) === 'flagSettings'
-  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/plugin/_deps.ts:729` — return (snap as unknown as Record<string | symbol, unknown>)[key]
-  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/config/plugin/_deps.ts:735` — }) as unknown as string[]
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/plugin/installCounts.ts:67` — const parsed = jsonParse(content) as unknown
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -364,7 +360,9 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/bridge/src/inboundMessages.ts:79` — return !(block.source as unknown as Record<string, unknown>).media_type
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...102 more (run audit with no flags for full JSON)
+- `packages/local-observability/src/slowLoggingTag.ts:73` — result += `Array[${(v as unknown[]).length}]`
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- ...100 more (run audit with no flags for full JSON)
 
 ### 11. `require-fallback-to-stub`
 
@@ -372,7 +370,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 676; **findings**: 0
+**Total scanned**: 673; **findings**: 0
 
 ### 12. `module-level-null-state`
 
@@ -380,5 +378,5 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/12-module-level-null-state.ts`
 
-**Total scanned**: 174; **findings**: 0
+**Total scanned**: 177; **findings**: 0
 

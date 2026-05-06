@@ -180,7 +180,22 @@ import { spawnSync } from 'child_process'
 // canonical shape lived at the construction site all along, just
 // not behind a re-exportable name. Building it from the construction
 // site is a valid third strategy alongside re-export and dead-deletion.
-const BUDGET = 3103
+//
+// 2026-05-06 (P1+P2 v2.1.131 alignment side-effect): ratcheted
+// 3103 → 3097 (-6). Narrowed `hasHookForEvent`'s second parameter
+// from `appState: AppState | undefined` to
+// `sessionHooks: SessionHooksState | undefined` in
+// packages/agent/hooks.ts. The fn only ever read
+// `appState.sessionHooks` anyway; widening the call sites to pass
+// the projection eliminated 7 long-standing AppState-shim mismatches
+// at the dispatcher seams (PreToolUse / PostToolUseFailure /
+// PermissionDenied / StopFailure / UserPromptSubmit / generic
+// hookEvent dispatch / executeStopHooks). The two new dispatchers
+// added in the same series (executePostToolBatchHooks /
+// executeUserPromptExpansionHooks) reuse the narrowed signature so
+// their call sites don't add new mismatches. Net -6 even after
+// adding two new dispatchers.
+const BUDGET = 3097
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
