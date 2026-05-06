@@ -12,7 +12,7 @@
 
 import { getGlobalConfig } from '@claude-code/config'
 
-export const NOTIFICATION_TYPES = [
+const NOTIFICATION_TYPES = [
   'push_notification', // PushNotificationTool — LLM-initiated
   'idle_prompt', // REPLView idle watcher — "Claude is waiting"
   'permission_prompt', // PermissionRequest 6 s timeout banner
@@ -22,7 +22,7 @@ export const NOTIFICATION_TYPES = [
   'auth_success', // OAuth login success — never gated by category
 ] as const
 
-export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
+type NotificationType = (typeof NOTIFICATION_TYPES)[number]
 
 const ACTION_REQUIRED: ReadonlySet<string> = new Set<NotificationType>([
   'idle_prompt',
