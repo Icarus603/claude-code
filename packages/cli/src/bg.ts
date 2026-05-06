@@ -246,6 +246,8 @@ async function readBgStdin(timeoutMs = 3000): Promise<string> {
  * Spawn a backgrounded `ccb -p "<directive>"` and return immediately.
  * Strips `--bg` / `--background` from argv before respawning so the
  * child doesn't recurse.
+ *
+ * @dynamicRequire
  */
 export async function handleBgFlag(args: readonly string[]): Promise<void> {
   ensureJobsRoot()
@@ -334,6 +336,7 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   )
 }
 
+/** @dynamicRequire */
 export async function psHandler(_args: readonly string[]): Promise<void> {
   const jobs = listJobs()
   if (jobs.length === 0) {
@@ -363,8 +366,11 @@ export async function psHandler(_args: readonly string[]): Promise<void> {
  * Read the last N lines of a (potentially huge) log file without slurping
  * the whole thing into memory. Reads back in 64 KB chunks until the
  * requested newline count is reached. Used by `ccb logs --tail N`.
+ *
+ * Exported for test coverage — the trailing-newline + chunk-boundary
+ * arithmetic is subtle enough to warrant a regression suite.
  */
-function tailFile(path: string, lines: number): string {
+export function tailFile(path: string, lines: number): string {
   if (!existsSync(path) || lines <= 0) return ''
   const stat = statSync(path)
   if (stat.size === 0) return ''
@@ -372,6 +378,10 @@ function tailFile(path: string, lines: number): string {
   const fd = openSync(path, 'r')
   let collected = Buffer.alloc(0)
   let pos = stat.size
+  // Read backwards from EOF until we've collected enough newlines to
+  // guarantee the slice below has the requested tail count, or we hit
+  // BOF. We need (lines + 1) newlines so the slice can drop the partial
+  // leading line — hitting BOF means we've already got the whole file.
   let newlines = 0
   try {
     while (pos > 0 && newlines <= lines) {
@@ -389,12 +399,18 @@ function tailFile(path: string, lines: number): string {
     closeSync(fd)
   }
   const text = collected.toString('utf8')
-  if (newlines <= lines) return text
-  // Strip leading lines beyond the tail count.
-  const arr = text.split('\n')
-  return arr.slice(arr.length - lines - 1).join('\n')
+  // Split on `\n`. A file ending in `\n` produces a trailing empty
+  // element which counts as one "line"; keep the math consistent by
+  // dropping it before slicing, then re-add the terminator if needed.
+  const hadTrailingNewline = text.endsWith('\n')
+  const body = hadTrailingNewline ? text.slice(0, -1) : text
+  const arr = body.split('\n')
+  if (arr.length <= lines) return text
+  const tail = arr.slice(arr.length - lines).join('\n')
+  return hadTrailingNewline ? tail + '\n' : tail
 }
 
+/** @dynamicRequire */
 export async function logsHandler(args: readonly string[]): Promise<void> {
   const positional = args.filter(a => !a.startsWith('-'))
   const short = positional[0]
@@ -543,6 +559,7 @@ function stopJob(
   }
 }
 
+/** @dynamicRequire */
 export async function stopHandler(args: readonly string[]): Promise<void> {
   const positional = args.filter(a => !a.startsWith('-'))
   const short = positional[0]
@@ -568,6 +585,7 @@ export async function stopHandler(args: readonly string[]): Promise<void> {
  * a ccb-side affordance kept undocumented in --help but live in argv
  * dispatch so muscle memory from `kill <pid>` works.
  */
+/** @dynamicRequire */
 export async function killHandler(args: readonly string[]): Promise<void> {
   const positional = args.filter(a => !a.startsWith('-'))
   const short = positional[0]
@@ -583,6 +601,7 @@ export async function killHandler(args: readonly string[]): Promise<void> {
   stopJob(job, { force: true, verbLabel: 'Killed', finalStatus: 'killed' })
 }
 
+/** @dynamicRequire */
 export async function rmHandler(args: readonly string[]): Promise<void> {
   const short = args[0]
   if (!short) {
@@ -615,6 +634,7 @@ export async function rmHandler(args: readonly string[]): Promise<void> {
  * can grow real bidirectional reconnect; the call surface stays the
  * same so any existing scripts keep working.
  */
+/** @dynamicRequire */
 export async function attachHandler(args: readonly string[]): Promise<void> {
   const positional = args.filter(a => !a.startsWith('-'))
   if (!positional[0]) {
