@@ -20,6 +20,14 @@ import {
   calculateTokenWarningState as calculateTokenWarningStateCore,
 } from './compaction/index.js'
 import { handleStopHooks } from './hooks/index.js'
+import { executePostToolBatchHooks } from './hooks.js'
+// query.ts aliases AgentToolUseContext (the agent package's V7 §8 partial
+// shape) as ToolUseContext locally. PostToolBatch dispatch lives in
+// hooks.ts and uses the canonical tool-registry ToolUseContext, which
+// extends the partial with extra method slots (readFileState etc) that
+// query.ts doesn't model. The cast bridges the two views — runtime is the
+// same toolUseContext object either way.
+import type { ToolUseContext as CanonicalToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { productionDeps, type QueryDeps } from './internal/queryDeps.js'
 import { feature } from 'bun:bundle'
 import {
@@ -148,6 +156,9 @@ type AutoCompactTrackingState = {
   turnCounter: number
   turnId: string
   consecutiveFailures?: number
+  // Mirrors the field in compaction/autoCompact.ts. Kept structurally
+  // compatible (not re-exported) to avoid a circular import.
+  consecutiveRapidRefills?: number
 }
 
 function buildQueryConfig(): QueryConfig {
@@ -526,7 +537,12 @@ async function* queryLoop(
     )
 
     queryCheckpoint('query_autocompact_start')
-    const { compactionResult, consecutiveFailures } = await deps.autocompact(
+    const {
+      compactionResult,
+      consecutiveFailures,
+      consecutiveRapidRefills,
+      rapidRefillBreakerTripped,
+    } = await deps.autocompact(
       messagesForQuery,
       toolUseContext,
       {
@@ -541,6 +557,15 @@ async function* queryLoop(
       snipTokensFreed,
     )
     queryCheckpoint('query_autocompact_end')
+
+    // Rapid-refill breaker fired — surface as a terminal reason and stop.
+    // The compactor already logged + emitted telemetry; we don't yield a
+    // synthetic message because there's no actionable hint for the user
+    // beyond "your context is irrecoverably tight, start fresh". ant
+    // 3928.js exits the same way.
+    if (rapidRefillBreakerTripped) {
+      return { reason: 'rapid_refill_breaker' }
+    }
 
     if (compactionResult) {
       const {
@@ -593,11 +618,15 @@ async function* queryLoop(
       // compact. recompactionInfo (autoCompact.ts:190) already captured the
       // old values for turnsSincePreviousCompact/previousCompactTurnId before
       // the call, so this reset doesn't lose those.
+      // consecutiveRapidRefills threads forward (computed inside autocompact)
+      // so the breaker fires on the Nth fast refill, not just N within one
+      // hop.
       tracking = {
         compacted: true,
         turnId: deps.uuid(),
         turnCounter: 0,
         consecutiveFailures: 0,
+        consecutiveRapidRefills,
       }
 
       const postCompactMessages = buildPostCompactMessages(compactionResult)
@@ -1474,6 +1503,79 @@ async function* queryLoop(
       }
     }
     queryCheckpoint('query_tool_execution_end')
+
+    // ant 4690.js — fire PostToolBatch once after every tool call in this
+    // parallel batch resolves, before the next model request. PostToolUse
+    // is per-tool and may run concurrently; PostToolBatch is the single
+    // rollup point hooks need for batch-level bookkeeping. Skipped on
+    // empty batches and when aborted (the next model request never happens
+    // anyway in the abort path).
+    if (
+      toolUseBlocks.length > 0 &&
+      !toolUseContext.abortController.signal.aborted
+    ) {
+      const batchToolCalls = toolUseBlocks.map(block => {
+        const toolResult = toolResults.find(result => {
+          if (result.type !== 'user') return false
+          const content = result.message.content
+          if (!Array.isArray(content)) return false
+          return (content as ToolResultBlockParam[]).some(
+            c => c.type === 'tool_result' && c.tool_use_id === block.id,
+          )
+        })
+        const messageContent =
+          toolResult?.type === 'user' ? toolResult.message.content : undefined
+        const resultContent = Array.isArray(messageContent)
+          ? (messageContent as ToolResultBlockParam[]).find(
+              (c): c is ToolResultBlockParam =>
+                c.type === 'tool_result' && c.tool_use_id === block.id,
+            )
+          : undefined
+        return {
+          tool_name: block.name,
+          tool_input: block.input,
+          tool_use_id: block.id,
+          tool_response:
+            resultContent && 'content' in resultContent
+              ? resultContent.content
+              : undefined,
+        }
+      })
+      try {
+        for await (const result of executePostToolBatchHooks(
+          batchToolCalls,
+          toolUseContext as unknown as CanonicalToolUseContext,
+          toolUseContext.getAppState().toolPermissionContext.mode,
+          toolUseContext.abortController.signal,
+        )) {
+          // additionalContexts surface the same way as PostToolUse: each
+          // becomes a hook_additional_context attachment for the next turn.
+          if (result.additionalContexts && result.additionalContexts.length > 0) {
+            const attachment = createAttachmentMessage({
+              type: 'hook_additional_context',
+              content: result.additionalContexts,
+              hookName: 'PostToolBatch',
+              // PostToolBatch is batch-level — no single owning tool. Use a
+              // synthetic UUID so the attachment shape matches the per-tool
+              // PostToolUse path; transcripts/replay won't dedupe it.
+              toolUseID: deps.uuid(),
+              hookEvent: 'PostToolBatch',
+            })
+            yield attachment
+            toolResults.push(
+              ...normalizeMessagesForAPI(
+                [attachment],
+                toolUseContext.options.tools,
+              ).filter(_ => _.type === 'user'),
+            )
+          }
+        }
+      } catch (e) {
+        // PostToolBatch hooks are advisory — a failure here must not break
+        // the turn. Log and continue.
+        logForDebugging(`PostToolBatch hook execution failed: ${e}`)
+      }
+    }
 
     // Generate tool use summary after tool batch completes — passed to next recursive call
     let nextPendingToolUseSummary:

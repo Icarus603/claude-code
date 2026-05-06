@@ -8,6 +8,7 @@ import { getGlobalConfig } from '@claude-code/config'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { getContextWindowForModel } from '../context.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { logEvent } from '@claude-code/local-observability'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { hasExactErrorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import type { CacheSafeParams } from '../forkedAgent.js'
@@ -59,6 +60,32 @@ export type AutoCompactTrackingState = {
   // Used as a circuit breaker to stop retrying when the context is
   // irrecoverably over the limit (e.g., prompt_too_long).
   consecutiveFailures?: number
+  // Consecutive autocompacts that fired within {@link RAPID_REFILL_TURN_WINDOW}
+  // turns of the previous one. ant 3970.js v08(). Trips the breaker at
+  // {@link RAPID_REFILL_BREAKER_THRESHOLD} to stop infinite compact loops
+  // when the preserved tail alone already overflows the autocompact window.
+  consecutiveRapidRefills?: number
+}
+
+// ant 3970.js qZ8 — turns since previous compact below this counts as
+// "rapid". Three turns is short enough to mean the new content alone
+// overflowed the tail; user prompts in normal flow take longer.
+export const RAPID_REFILL_TURN_WINDOW = 3
+
+// ant 3970.js f36 — third consecutive rapid refill trips the breaker.
+// One can be a coincidence (long tool result), two could be a sustained
+// large file, three means the tail itself can't fit and we'd loop forever.
+export const RAPID_REFILL_BREAKER_THRESHOLD = 3
+
+// ant 3970.js v08() — pure helper. Counts a "rapid refill" when the last
+// compact left fewer than RAPID_REFILL_TURN_WINDOW turns before this fire.
+// Otherwise resets to 0.
+export function computeRapidRefillCount(
+  prev?: AutoCompactTrackingState,
+): number {
+  return prev?.compacted === true && prev.turnCounter < RAPID_REFILL_TURN_WINDOW
+    ? (prev.consecutiveRapidRefills ?? 0) + 1
+    : 0
 }
 
 export const AUTOCOMPACT_BUFFER_TOKENS = 13_000
@@ -251,6 +278,13 @@ export async function autoCompactIfNeeded(
   wasCompacted: boolean
   compactionResult?: CompactionResult
   consecutiveFailures?: number
+  // Set when {@link RAPID_REFILL_BREAKER_THRESHOLD} consecutive rapid
+  // autocompacts have fired. Caller exits the query loop with reason
+  // "rapid_refill_breaker"; without this guardrail the loop would burn
+  // API quota indefinitely on a session whose preserved tail itself
+  // exceeds the autocompact threshold. ant 3970.js gp7().
+  rapidRefillBreakerTripped?: boolean
+  consecutiveRapidRefills?: number
 }> {
   if (isEnvTruthy(readEnv('DISABLE_COMPACT'))) {
     return { wasCompacted: false }
@@ -276,6 +310,29 @@ export async function autoCompactIfNeeded(
 
   if (!shouldCompact) {
     return { wasCompacted: false }
+  }
+
+  // ant 3970.js gp7() — rapid-refill breaker. Computed BEFORE the actual
+  // compaction call so the API isn't hit when we already know the result
+  // will trip an infinite loop. Threading consecutiveRapidRefills back to
+  // the caller (and on through to the next compact's tracking) keeps the
+  // counter monotonic across the chain — only a fire that lands ≥
+  // RAPID_REFILL_TURN_WINDOW turns after the previous one resets it.
+  const rapidRefillCount = computeRapidRefillCount(tracking)
+  if (rapidRefillCount >= RAPID_REFILL_BREAKER_THRESHOLD) {
+    logForDebugging(
+      `autocompact: rapid-refill breaker tripped — ${rapidRefillCount} consecutive refills within <${RAPID_REFILL_TURN_WINDOW} turns each (last was ${tracking?.turnCounter} turns)`,
+      { level: 'warn' },
+    )
+    logEvent('tengu_auto_compact_rapid_refill_breaker', {
+      consecutiveRapidRefills: rapidRefillCount,
+      turnCounter: tracking?.turnCounter ?? -1,
+    })
+    return {
+      wasCompacted: false,
+      rapidRefillBreakerTripped: true,
+      consecutiveRapidRefills: rapidRefillCount,
+    }
   }
 
   const recompactionInfo: RecompactionInfo = {
@@ -334,6 +391,10 @@ export async function autoCompactIfNeeded(
       compactionResult,
       // Reset failure count on success
       consecutiveFailures: 0,
+      // Carry forward the rapid-refill count so the breaker fires on the
+      // Nth consecutive fast refill rather than restarting from zero each
+      // success.
+      consecutiveRapidRefills: rapidRefillCount,
     }
   } catch (error) {
     if (!hasExactErrorMessage(error, ERROR_MESSAGE_USER_ABORT)) {

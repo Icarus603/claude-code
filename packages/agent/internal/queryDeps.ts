@@ -25,6 +25,11 @@ export type QueryDeps = {
     wasCompacted: boolean
     compactionResult?: unknown
     consecutiveFailures?: number
+    // ant 3970.js — set when autocompact bails because the rapid-refill
+    // breaker tripped. Caller exits the query loop with reason
+    // "rapid_refill_breaker" instead of looping into more compaction.
+    rapidRefillBreakerTripped?: boolean
+    consecutiveRapidRefills?: number
   }>
   uuid: () => string
 }
