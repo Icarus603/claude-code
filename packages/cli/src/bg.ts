@@ -217,11 +217,7 @@ function truncate(s: string, n: number): string {
 
 // ─── handlers ───────────────────────────────────────────────────────
 
-/**
- * Mirror of ant 4649.js fC8 — 1 MiB cap on piped-stdin payload that gets
- * embedded into the background directive. Anything past this is silently
- * truncated with a stderr warning, same as ant.
- */
+/** Cap on piped-stdin embedded into the bg directive (ant 4649.js fC8). */
 const BG_STDIN_BYTE_CAP = 1024 * 1024
 
 /**
@@ -335,11 +331,9 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
 
 /**
  * Spawn a single backgrounded ccb child + write its meta.json. Shared
- * between `--bg` (fresh spawn from user argv) and `respawn` (re-spawn
- * an existing job from its stored meta.cmd). Returns the new short id.
- *
- * Writes the success message to stdout. On spawn failure exits the
- * process with the OS-level reason included.
+ * between `--bg` (fresh) and `respawn` (re-launch from stored cmd).
+ * Returns the new short id; on spawn failure exits with the OS-level
+ * reason included.
  */
 async function spawnBgJob(opts: {
   flags: readonly string[]
@@ -371,12 +365,22 @@ async function spawnBgJob(opts: {
     : childArgs
   const fullCmd = [cmd, ...nodeArgs]
 
+  // Marker env (parity with ant 4706.js xXK):
+  // - CLAUDE_CODE_SESSION_KIND/CLAUDE_CODE_BG_JOB_SHORT: read by
+  //   concurrentSessions.isBgSession() and by ps reconciliation.
+  // - FORCE_COLOR/COLORTERM/BROWSER: child stdio is wired to a file fd
+  //   (non-TTY), so chalk would strip colors and any "open in browser"
+  //   path would try to spawn a browser. Force colors on, browser off.
+  // - CLAUDE_JOB_DIR: ant compat marker recording the job's on-disk
+  //   directory so future tooling can find it without re-deriving.
   const env: NodeJS.ProcessEnv = {
     ...process.env,
-    // Mark the child so it knows it's backgrounded (parity with ant
-    // CLAUDE_CODE_SESSION_KIND=bg). Read back by concurrentSessions.ts.
     CLAUDE_CODE_SESSION_KIND: 'bg',
     CLAUDE_CODE_BG_JOB_SHORT: short,
+    FORCE_COLOR: '3',
+    COLORTERM: 'truecolor',
+    BROWSER: 'true',
+    CLAUDE_JOB_DIR: jobDir,
   }
 
   const spawnOpts: SpawnOptions = {
@@ -639,12 +643,7 @@ export async function stopHandler(args: readonly string[]): Promise<void> {
   })
 }
 
-/**
- * Alias for `stop --force`. ant 4649.js exposes `stop` only — `kill` is
- * a ccb-side affordance kept undocumented in --help but live in argv
- * dispatch so muscle memory from `kill <pid>` works.
- */
-/** @dynamicRequire */
+/** Alias for `stop --force`. @dynamicRequire */
 export async function killHandler(args: readonly string[]): Promise<void> {
   if (args.includes('--help') || args.includes('-h')) {
     process.stdout.write(

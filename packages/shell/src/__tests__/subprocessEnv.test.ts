@@ -233,6 +233,28 @@ describe('subprocessEnv — process-control marker scrub (always)', () => {
     ).toBeUndefined()
   })
 
+  test('strips CLAUDE_JOB_DIR (internal bg-job-dir pointer)', () => {
+    expect(
+      subprocessEnv({
+        CLAUDE_JOB_DIR: '/home/user/.claude/jobs/abc12345',
+      }).CLAUDE_JOB_DIR,
+    ).toBeUndefined()
+  })
+
+  test('preserves FORCE_COLOR / COLORTERM / BROWSER (terminal hints)', () => {
+    // These are color/capability hints set by the bg spawn for the
+    // child's benefit; they're legitimate to propagate further into
+    // BashTool subshells (`git log --color` should work).
+    const env = subprocessEnv({
+      FORCE_COLOR: '3',
+      COLORTERM: 'truecolor',
+      BROWSER: 'true',
+    })
+    expect(env.FORCE_COLOR).toBe('3')
+    expect(env.COLORTERM).toBe('truecolor')
+    expect(env.BROWSER).toBe('true')
+  })
+
   test('preserves user env that is not in ALWAYS_SCRUB', () => {
     const env = subprocessEnv({
       PATH: '/usr/bin',

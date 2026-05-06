@@ -49,6 +49,7 @@ const ALWAYS_SCRUB = [
   'CLAUDE_CODE_SESSION_NAME',
   'CLAUDE_CODE_BG_JOB_SHORT',
   'CLAUDE_CODE_RESUME_INTERRUPTED_TURN',
+  'CLAUDE_JOB_DIR',
 ] as const
 
 // Registered by init.ts after the upstreamproxy module is dynamically imported
