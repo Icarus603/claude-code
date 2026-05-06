@@ -145,12 +145,25 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
     // (`Record<string, any>`), so the typed-Map.keys() iterator collapses
     // to IterableIterator<unknown>. Re-narrow at the read site to match
     // getSystemPrompt's `string[]` parameter.
-    const awdMap = (appState as {
+    const narrowedAppState = appState as {
+      agent?: string
       toolPermissionContext: {
         additionalWorkingDirectories: ReadonlyMap<string, unknown>
       }
-    }).toolPermissionContext.additionalWorkingDirectories
+    }
+    const awdMap =
+      narrowedAppState.toolPermissionContext.additionalWorkingDirectories
     const additionalWorkingDirectories = Array.from(awdMap.keys())
+    // If the user is in a custom-agent context (e.g. /agent helper),
+    // resolve the matching definition so the fork inherits the agent's
+    // system prompt rather than falling back to the default Claude Code
+    // prompt. Mirrors ant 4656.js Wf3.
+    const activeAgentName = narrowedAppState.agent
+    const mainThreadAgentDefinition = activeAgentName
+      ? toolUseContext.options.agentDefinitions?.activeAgents.find(
+          a => a.agentType === activeAgentName,
+        )
+      : undefined
     const defaultSystemPrompt = await getSystemPrompt(
       toolUseContext.options.tools,
       toolUseContext.options.mainLoopModel,
@@ -158,7 +171,7 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
       toolUseContext.options.mcpClients,
     )
     forkParentSystemPrompt = buildEffectiveSystemPrompt({
-      mainThreadAgentDefinition: undefined,
+      mainThreadAgentDefinition,
       toolUseContext,
       customSystemPrompt: toolUseContext.options.customSystemPrompt,
       defaultSystemPrompt,
