@@ -195,7 +195,6 @@ describe("isExternalPermissionMode", () => {
   });
 
   describe("when USER_TYPE is 'ant'", () => {
-    // V7-EXEMPT(id=test-env-save-user-type-permission, reason="test helper saves USER_TYPE to restore after ant-mode assertion block", expires=2026-05-05, owner=@Icarus603)
     const savedUserType = process.env.USER_TYPE;
 
     beforeEach(() => {
@@ -206,7 +205,6 @@ describe("isExternalPermissionMode", () => {
       if (savedUserType !== undefined) {
         process.env.USER_TYPE = savedUserType;
       } else {
-        // V7-EXEMPT(id=test-env-delete-user-type-permission, reason="test teardown clears USER_TYPE when it was unset before the block", expires=2026-05-05, owner=@Icarus603)
         delete process.env.USER_TYPE;
       }
     });
