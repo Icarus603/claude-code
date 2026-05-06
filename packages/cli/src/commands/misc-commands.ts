@@ -13,6 +13,44 @@ import { validateUuid } from '@claude-code/agent/uuid.js'
 import { TASK_STATUSES } from '@claude-code/agent/tasks.js'
 
 export function registerMiscCommands(program: Command): void {
+  // Background session subcommands. The actual handlers run in the
+  // cli.tsx fast-path BEFORE Commander parses argv (skips loading
+  // commander + main.tsx for the perf-sensitive `ps` / `logs` etc).
+  // These Commander stubs exist so `ccb --help` lists them and so
+  // typo'd subcommands (`ccb pss`) don't fall through into the prompt
+  // path. The .action() handler is a fallback that should never fire
+  // in practice — it just delegates to the same handlers via dynamic
+  // import.
+  if (feature('BG_SESSIONS')) {
+    const bgVerbs: Array<{
+      name: string
+      description: string
+      handler: keyof typeof import('../bg.js')
+    }> = [
+      { name: 'ps', description: 'List background sessions', handler: 'psHandler' },
+      { name: 'logs <short>', description: 'Print or follow a background session\'s output', handler: 'logsHandler' },
+      { name: 'attach <short>', description: 'Stream a background session live (read-only)', handler: 'attachHandler' },
+      { name: 'stop <short>', description: 'Stop a background session (SIGTERM; --force for SIGKILL)', handler: 'stopHandler' },
+      { name: 'kill <short>', description: 'Alias for `stop --force`', handler: 'killHandler' },
+      { name: 'rm <short>', description: 'Remove a stopped background session\'s job dir', handler: 'rmHandler' },
+      { name: 'respawn <short>|--all', description: 'Restart a backgrounded session with the same directive', handler: 'respawnHandler' },
+    ]
+    for (const verb of bgVerbs) {
+      program
+        .command(verb.name)
+        .description(verb.description)
+        .allowUnknownOption(true)
+        .helpOption(false)
+        .action(async () => {
+          // Reached only if the fast-path didn't fire (shouldn't happen).
+          const bg = await import('../bg.js')
+          const args = process.argv.slice(3)
+          await (bg[verb.handler] as (a: readonly string[]) => Promise<void>)(args)
+          process.exit(0)
+        })
+    }
+  }
+
   // claude auth
 
   const auth = program

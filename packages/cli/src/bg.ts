@@ -1,45 +1,21 @@
 /**
- * `--bg` / `ccb ps` / `ccb logs` / `ccb stop` / `ccb attach` / `ccb rm`
- * — OS-level background sessions.
+ * OS-level background sessions for ccb. Mirrors the user-facing surface
+ * of ant v2.1.131 4649.js (NJK) — daemon-less Phase B implementation.
  *
- * Mirrors the user-facing surface of ant v2.1.131 4649.js (NJK) — but
- * the implementation is intentionally daemon-less. ant runs a long-
- * lived daemon at `~/.local/share/ccb/daemon.sock` that supervises
- * jobs, owns the PTY, and routes attach/logs/stop over a Unix socket.
+ * ant runs a long-lived daemon supervising jobs over a Unix socket;
+ * ccb instead uses `spawn(detached:true) + unref() + stdio→file`, and
+ * the verb commands (ps/logs/stop/etc.) read `~/.claude/jobs/<short>/`
+ * directly. Daemon-managed PTY-attach is Phase C — the on-disk layout
+ * here is forward-compatible.
  *
- * That architecture is the right answer for the full ant feature set
- * (interactive `attach` reconnect, multi-client streams, cross-cwd
- * roster, respawn on crash) but it carries a lot of moving parts
- * (daemon lifecycle, socket protocol, PTY plumbing). For ccb the user
- * need is narrower: "spawn a task, close the terminal, come back
- * later and read its output". That's solvable without a daemon:
- *
- *   spawn ccb -p "<directive>" with detached:true + stdio→file
- *     + unref() → parent exits immediately, child outlives terminal
- *
- *   `~/.claude/jobs/<short>/{meta.json, stdout.log, stderr.log}`
- *     → ps/logs/kill operate on this directory directly
- *
- * The daemon-managed PTY-attach path stays out of scope for Phase B.
- * If/when a user wants live `attach`, that becomes Phase C and we
- * graft a daemon supervisor in front of the same on-disk layout. The
- * job dir schema is forward-compatible: a future daemon adds a socket
- * file alongside meta.json and the existing ps/logs/kill keep working.
- *
- * Subcommand surface (verb names mirror ant 4649.js for muscle-memory
- * parity — `stop` is graceful, `kill` is the same path with SIGKILL):
- *   ccb --bg "<directive>"   spawn a backgrounded -p run
- *   ccb ps                   list active + recent sessions
- *   ccb logs <short>         tail stdout/stderr (-f follow, --tail N)
- *   ccb stop <short>         SIGTERM (graceful); `--force` upgrades to SIGKILL
- *   ccb kill <short>         alias for `stop --force`
- *   ccb attach <short>       alias for `logs --follow` (no PTY in this build)
- *   ccb rm <short>           remove the job dir (only when stopped)
- *
- * Daemon-managed PTY-attach (true reconnect) stays out of scope for
- * Phase B. The job dir layout is forward-compatible — Phase C grafts
- * a daemon supervisor in front of `~/.claude/jobs/<short>/` without
- * breaking existing ps/logs/stop callsites.
+ * Subcommand surface (verb names mirror ant for muscle memory):
+ *   --bg "<directive>"        spawn a backgrounded -p run
+ *   ps                        list active + recent sessions
+ *   logs <short>              tail stdout/stderr (-f follow, --tail N)
+ *   stop <short>              SIGTERM; --force / kill aliases SIGKILL
+ *   attach <short>            alias for `logs --follow` (no PTY)
+ *   rm <short>                remove a stopped job's dir
+ *   respawn <short>|--all     re-launch with same directive + flags
  */
 
 import { spawn, type SpawnOptions } from 'node:child_process'
@@ -458,7 +434,13 @@ async function spawnBgJob(opts: {
 
 
 /** @dynamicRequire */
-export async function psHandler(_args: readonly string[]): Promise<void> {
+export async function psHandler(args: readonly string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    process.stdout.write(
+      `Usage: ccb ps\n\n  List active and recently-exited background sessions from ~/.claude/jobs/.\n  Reconciles status against live PIDs on each invocation.\n`,
+    )
+    return
+  }
   const jobs = listJobs()
   if (jobs.length === 0) {
     process.stdout.write('No background jobs.\n')
@@ -485,6 +467,12 @@ export async function psHandler(_args: readonly string[]): Promise<void> {
 
 /** @dynamicRequire */
 export async function logsHandler(args: readonly string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    process.stdout.write(
+      `Usage: ccb logs <short> [-f|--follow] [--tail N|-n N]\n\n  Print the background session's stdout and stderr from ~/.claude/jobs/.\n  -f / --follow   Stream new output as it appears (200ms poll).\n  --tail N        Limit to the last N lines (caps follow-mode backlog seed).\n`,
+    )
+    return
+  }
   const positional = args.filter(a => !a.startsWith('-'))
   const short = positional[0]
   if (!short) {
@@ -630,6 +618,12 @@ function stopJob(
 
 /** @dynamicRequire */
 export async function stopHandler(args: readonly string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    process.stdout.write(
+      `Usage: ccb stop <short> [--force]\n\n  Stop a running background session. By default sends SIGTERM (graceful);\n  --force / -9 escalates to SIGKILL.\n`,
+    )
+    return
+  }
   const positional = args.filter(a => !a.startsWith('-'))
   const short = positional[0]
   const force = args.includes('--force') || args.includes('-9')
@@ -652,6 +646,12 @@ export async function stopHandler(args: readonly string[]): Promise<void> {
  */
 /** @dynamicRequire */
 export async function killHandler(args: readonly string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    process.stdout.write(
+      `Usage: ccb kill <short>\n\n  Alias for \`ccb stop --force\` — sends SIGKILL immediately.\n`,
+    )
+    return
+  }
   const positional = args.filter(a => !a.startsWith('-'))
   const short = positional[0]
   if (!short) {
@@ -664,6 +664,12 @@ export async function killHandler(args: readonly string[]): Promise<void> {
 
 /** @dynamicRequire */
 export async function rmHandler(args: readonly string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    process.stdout.write(
+      `Usage: ccb rm <short>\n\n  Remove a stopped background session's job directory (meta.json + log files).\n  Refuses to act on a still-running job — \`ccb stop\` it first.\n`,
+    )
+    return
+  }
   const short = args[0]
   if (!short) {
     process.stderr.write('Usage: ccb rm <short>\n')
@@ -681,18 +687,21 @@ export async function rmHandler(args: readonly string[]): Promise<void> {
 }
 
 /**
- * `attach` without a daemon-managed PTY is fundamentally read-only —
- * we can stream output but can't deliver keystrokes back to a child
- * whose stdin was wired to /dev/null at spawn. The honest behavior is
- * to forward to `logs --follow`: same UX, same exit semantics, and a
- * one-line note so users know why they can't type into the session.
+ * `attach` is read-only without a daemon PTY — child stdin was wired
+ * to /dev/null at spawn, so keystrokes can't be delivered back. We
+ * forward to `logs --follow` (same exit semantics) and tell the user
+ * why. Phase C will grow real bidirectional reconnect; the call
+ * surface stays the same for forward compat.
  *
- * When Phase C grafts in the daemon supervisor with a real PTY, this
- * can grow real bidirectional reconnect; the call surface stays the
- * same so any existing scripts keep working.
+ * @dynamicRequire
  */
-/** @dynamicRequire */
 export async function attachHandler(args: readonly string[]): Promise<void> {
+  if (args.includes('--help') || args.includes('-h')) {
+    process.stdout.write(
+      `Usage: ccb attach <short>\n\n  Stream a background session's output live (read-only — no PTY supervisor\n  in this build, so keystrokes can't be delivered to the child). Equivalent\n  to \`ccb logs <short> --follow --tail 200\`.\n`,
+    )
+    return
+  }
   const positional = args.filter(a => !a.startsWith('-'))
   if (!positional[0]) {
     process.stderr.write('Usage: ccb attach <short>\n')
@@ -708,17 +717,10 @@ export async function attachHandler(args: readonly string[]): Promise<void> {
 
 /**
  * `ccb respawn <short>|--all` — restart a bg job (or all live ones)
- * using the SAME directive + flags that originally launched it. Useful
- * after a `ccb update` has installed a new binary and the user wants
- * existing bg work to pick up the new code.
- *
- * Mirrors ant 4649.js sM3, but daemon-less: we stop+rm the old job and
- * spawnBgJob a fresh one. The new job gets a new short id; the old
- * meta.json is removed. ant preserves the id by going through the
- * daemon supervisor — that's not feasible here without a daemon.
- *
- * Exit semantics match ant: 0 if all targeted respawns succeeded, 1
- * if any failed (partial success is reported per-line on stderr).
+ * using the same directive + flags. Mirrors ant 4649.js sM3, daemon-
+ * less: stop+rm the old job and spawn fresh. New short id is issued
+ * (ant preserves the id via daemon — not feasible without one). Exit
+ * 0 if all respawns succeeded, 1 if any failed.
  *
  * @dynamicRequire
  */
