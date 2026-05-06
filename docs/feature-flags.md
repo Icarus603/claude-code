@@ -63,7 +63,7 @@ Enable per-run with `FEATURE_<NAME>=1`.
 - `AGENT_MEMORY_SNAPSHOT` — Snapshot agent state for time-travel debugging
 - `COMPACTION_REMINDERS` — Inject compaction-aware reminders during turns
 - `CONTEXT_COLLAPSE` — Aggressive context summarization
-- `FORK_SUBAGENT` — Spawn a subagent fork for parallel turn evaluation
+- `FORK_SUBAGENT` — `/fork <directive>` slash command + Agent-tool fork path. Inherits parent conversation as `forkContextMessages`; runs fire-and-forget via `runAsyncAgentLifecycle` so the parent REPL keeps accepting input. Recursion guard via `isInForkChild`. Excluded under coordinator mode and `-p` non-interactive sessions (see `isForkSubagentEnabled`).
 - `HARD_FAIL` — Crash on first uncaught error (vs swallow + log)
 - `HISTORY_SNIP` — Trim history mid-session
 - `HOOK_PROMPTS` — Inject prompt fragments via hooks
@@ -78,7 +78,7 @@ Enable per-run with `FEATURE_<NAME>=1`.
 - `UNATTENDED_RETRY` — Auto-retry on transient errors without user prompt
 
 ### Bridge / Daemon / Server
-- `BG_SESSIONS` — Background session orchestration
+- `BG_SESSIONS` — OS-level background sessions: `ccb --bg "<directive>"` spawns a detached `-p` child that survives terminal close, plus `ccb ps`/`logs`/`stop`/`kill`/`attach`/`rm`/`respawn` verbs operating on `~/.claude/jobs/<short>/`. Daemon-less Phase B implementation; daemon-managed PTY-attach is Phase C (deferred).
 - `CCR_AUTO_CONNECT` — Auto-connect to Claude Code Remote on startup
 - `CCR_MIRROR` — Mirror sessions to CCR for review
 - `CCR_REMOTE_SETUP` — Remote setup wizard for CCR

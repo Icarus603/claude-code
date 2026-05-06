@@ -371,7 +371,7 @@ import {
   restoreWorktreeForResume,
   exitRestoredWorktree,
 } from '@claude-code/storage/sessionRestore.js';
-import { isBgSession, updateSessionName, updateSessionActivity } from '@claude-code/agent/concurrentSessions.js';
+import { updateSessionName, updateSessionActivity } from '@claude-code/agent/concurrentSessions.js';
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
 import { restoreRemoteAgentTasks } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js';
 import { useInboxPoller } from '../hooks/useInboxPoller.js';
