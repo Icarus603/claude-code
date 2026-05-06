@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { tailFile } from '../bg.js'
+import { splitBgArgs, tailFile } from '../bg.js'
 
 let workDir: string
 
@@ -76,5 +76,109 @@ describe('tailFile', () => {
   test('handles tail-count exactly matching line count', () => {
     const p = writeLog('exact.log', 'a\nb\nc\n')
     expect(tailFile(p, 3)).toBe('a\nb\nc\n')
+  })
+})
+
+describe('splitBgArgs', () => {
+  test('strips --bg, treats single positional as directive', () => {
+    expect(splitBgArgs(['--bg', 'task'])).toEqual({
+      flags: [],
+      directive: 'task',
+    })
+  })
+
+  test('multiple positionals join with spaces', () => {
+    expect(splitBgArgs(['--bg', 'do', 'the', 'thing'])).toEqual({
+      flags: [],
+      directive: 'do the thing',
+    })
+  })
+
+  test('preserves unknown flags as forwarded flags', () => {
+    expect(splitBgArgs(['--bg', '--debug', 'task'])).toEqual({
+      flags: ['--debug'],
+      directive: 'task',
+    })
+  })
+
+  test('flag-with-value pulls the value into flags array', () => {
+    expect(
+      splitBgArgs(['--bg', '--model', 'claude-haiku-4-5', 'task']),
+    ).toEqual({
+      flags: ['--model', 'claude-haiku-4-5'],
+      directive: 'task',
+    })
+  })
+
+  test('flag=value form is self-contained', () => {
+    expect(splitBgArgs(['--bg', '--model=claude-haiku-4-5', 'task'])).toEqual({
+      flags: ['--model=claude-haiku-4-5'],
+      directive: 'task',
+    })
+  })
+
+  test('--permission-mode auto with --bg recognised as flag-with-value', () => {
+    expect(
+      splitBgArgs(['--bg', '--permission-mode', 'auto', 'task']),
+    ).toEqual({
+      flags: ['--permission-mode', 'auto'],
+      directive: 'task',
+    })
+  })
+
+  test('content after `--` is positional even if it starts with -', () => {
+    expect(
+      splitBgArgs(['--bg', '--model', 'opus', '--', '--literal-text']),
+    ).toEqual({
+      flags: ['--model', 'opus'],
+      directive: '--literal-text',
+    })
+  })
+
+  test('--bg with no directive returns empty directive', () => {
+    expect(splitBgArgs(['--bg', '--debug'])).toEqual({
+      flags: ['--debug'],
+      directive: '',
+    })
+  })
+
+  test('-bg variant also stripped', () => {
+    expect(splitBgArgs(['-bg', 'task'])).toEqual({
+      flags: [],
+      directive: 'task',
+    })
+  })
+
+  test('--background variant also stripped', () => {
+    expect(splitBgArgs(['--background', 'task'])).toEqual({
+      flags: [],
+      directive: 'task',
+    })
+  })
+
+  test('mixed flags and positionals — flag value not eaten as positional', () => {
+    // `--model claude-haiku` consumes `claude-haiku` as the model value;
+    // remaining `task` is the directive.
+    expect(
+      splitBgArgs([
+        '--bg',
+        '--model',
+        'claude-haiku-4-5',
+        '--debug',
+        'task',
+      ]),
+    ).toEqual({
+      flags: ['--model', 'claude-haiku-4-5', '--debug'],
+      directive: 'task',
+    })
+  })
+
+  test('unknown flag with positional next — positional NOT consumed', () => {
+    // `--unknown-flag` isn't in BG_FLAGS_WITH_VALUE, so the next arg
+    // stays in positionals.
+    expect(splitBgArgs(['--bg', '--unknown-flag', 'task'])).toEqual({
+      flags: ['--unknown-flag'],
+      directive: 'task',
+    })
   })
 })
