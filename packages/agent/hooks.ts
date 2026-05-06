@@ -128,6 +128,8 @@ import type {
   NotificationHookInput,
   PostToolUseHookInput,
   PostToolUseFailureHookInput,
+  PostToolBatchHookInput,
+  UserPromptExpansionHookInput,
   PermissionDeniedHookInput,
   PreCompactHookInput,
   PostCompactHookInput,
@@ -206,6 +208,7 @@ import {
   clearSessionHooks,
   type SessionDerivedHookMatcher,
   type FunctionHook,
+  type SessionHooksState,
 } from './hooks/sessionHooks.js'
 import type { AppState } from '@claude-code/app-host/state/AppState.js'
 import { jsonStringify, jsonParse } from '@claude-code/local-observability/slowOperations.js'
@@ -393,7 +396,7 @@ export interface HookResult {
   outcome: 'success' | 'blocking' | 'non_blocking_error' | 'cancelled'
   preventContinuation?: boolean
   stopReason?: string
-  permissionBehavior?: 'ask' | 'deny' | 'allow' | 'passthrough'
+  permissionBehavior?: 'ask' | 'deny' | 'allow' | 'passthrough' | 'defer'
   hookPermissionDecisionReason?: string
   additionalContext?: string
   initialUserMessage?: string
@@ -414,7 +417,7 @@ export type AggregatedHookResult = {
   stopReason?: string
   hookPermissionDecisionReason?: string
   hookSource?: string
-  permissionBehavior?: PermissionResult['behavior']
+  permissionBehavior?: HookResult['permissionBehavior']
   additionalContexts?: string[]
   initialUserMessage?: string
   updatedInput?: Record<string, unknown>
@@ -476,7 +479,8 @@ function parseHookOutput(stdout: string): {
         hookSpecificOutput: {
           'for PreToolUse': {
             hookEventName: '"PreToolUse"',
-            permissionDecision: '"allow" | "deny" | "ask" (optional)',
+            permissionDecision:
+              '"allow" | "deny" | "ask" | "defer" (optional). "defer" is print-mode only and is ignored unless this is a solo tool call.',
             permissionDecisionReason: 'string (optional)',
             updatedInput: 'object (optional) - Modified tool input to use',
           },
@@ -487,6 +491,16 @@ function parseHookOutput(stdout: string): {
           'for PostToolUse': {
             hookEventName: '"PostToolUse"',
             additionalContext: 'string (optional)',
+          },
+          'for PostToolBatch': {
+            hookEventName: '"PostToolBatch"',
+            additionalContext:
+              'string (optional). Fires once after every tool call in a parallel batch resolves, before the next model request.',
+          },
+          'for UserPromptExpansion': {
+            hookEventName: '"UserPromptExpansion"',
+            additionalContext:
+              'string (optional). Fires when a slash command or MCP prompt expands; receives the final prompt.',
           },
         },
       },
@@ -548,7 +562,12 @@ interface TypedSyncHookOutput {
   hookSpecificOutput?:
     | {
         hookEventName: 'PreToolUse'
-        permissionDecision?: 'ask' | 'deny' | 'allow' | 'passthrough'
+        permissionDecision?:
+          | 'ask'
+          | 'deny'
+          | 'allow'
+          | 'passthrough'
+          | 'defer'
         permissionDecisionReason?: string
         updatedInput?: Record<string, unknown>
         additionalContext?: string
@@ -578,6 +597,21 @@ interface TypedSyncHookOutput {
       }
     | {
         hookEventName: 'PostToolUseFailure'
+        additionalContext?: string
+      }
+    | {
+        // ant 2842.js Va1() / 4690.js:260. Fired once after every tool call
+        // in a parallel batch has resolved, before the next model request.
+        // PostToolUse is per-tool and may run concurrently; PostToolBatch
+        // gives hooks a single rollup point with `tool_calls[]`.
+        hookEventName: 'PostToolBatch'
+        additionalContext?: string
+      }
+    | {
+        // ant 2842.js ha1(). Fired when a slash command or MCP prompt
+        // expansion produces its final prompt, before the prompt enters
+        // the conversation.
+        hookEventName: 'UserPromptExpansion'
         additionalContext?: string
       }
     | {
@@ -699,10 +733,17 @@ function processHookJSONOutput({
       case 'ask':
         result.permissionBehavior = 'ask'
         break
+      case 'defer':
+        // Deferred decisions are evaluated by the tool dispatcher: only honored
+        // in non-interactive (-p / --print) mode for solo tool calls. ant
+        // 3906.js. We still record the behavior; suppression happens at the
+        // call site so we can warn instead of silently dropping.
+        result.permissionBehavior = 'defer'
+        break
       default:
         // Handle unknown decision types as errors
         throw new Error(
-          `Unknown hook permissionDecision type: ${json.hookSpecificOutput.permissionDecision}. Valid types are: allow, deny, ask`,
+          `Unknown hook permissionDecision type: ${json.hookSpecificOutput.permissionDecision}. Valid types are: allow, deny, ask, defer`,
         )
     }
   }
@@ -743,6 +784,9 @@ function processHookJSONOutput({
             case 'ask':
               result.permissionBehavior = 'ask'
               break
+            case 'defer':
+              result.permissionBehavior = 'defer'
+              break
           }
         }
         result.hookPermissionDecisionReason =
@@ -782,6 +826,12 @@ function processHookJSONOutput({
         }
         break
       case 'PostToolUseFailure':
+        result.additionalContext = json.hookSpecificOutput.additionalContext
+        break
+      case 'PostToolBatch':
+        result.additionalContext = json.hookSpecificOutput.additionalContext
+        break
+      case 'UserPromptExpansion':
         result.additionalContext = json.hookSpecificOutput.additionalContext
         break
       case 'PermissionDenied':
@@ -1768,14 +1818,14 @@ function getHooksConfig(
  */
 function hasHookForEvent(
   hookEvent: HookEvent,
-  appState: AppState | undefined,
+  sessionHooks: SessionHooksState | undefined,
   sessionId: string,
 ): boolean {
   const snap = getHooksConfigFromSnapshot()?.[hookEvent]
   if (snap && snap.length > 0) return true
   const reg = getRegisteredHooks()?.[hookEvent]
   if (reg && reg.length > 0) return true
-  if (appState?.sessionHooks.get(sessionId)?.hooks[hookEvent]) return true
+  if (sessionHooks?.get(sessionId)?.hooks[hookEvent]) return true
   return false
 }
 
@@ -2926,7 +2976,11 @@ async function* executeHooks({
     cancelled: 0,
   }
 
-  let permissionBehavior: PermissionResult['behavior'] | undefined
+  // The aggregator union must include 'defer' (HookResult-specific value)
+  // even though PermissionResult itself doesn't model defer — defer is a
+  // hook-level decision that the dispatcher converts into either an exit
+  // (print mode + solo) or a fall-through to ask (interactive / batch).
+  let permissionBehavior: HookResult['permissionBehavior'] | undefined
 
   // Run all hooks in parallel and wait for all to complete
   for await (const result of all(hookPromises)) {
@@ -3016,9 +3070,19 @@ async function* executeHooks({
           // deny always takes precedence
           permissionBehavior = 'deny'
           break
-        case 'ask':
-          // ask takes precedence over allow but not deny
+        case 'defer':
+          // defer is honored unless a deny is in the same batch — a deny is
+          // unrecoverable so deferring would just delay the same outcome.
           if (permissionBehavior !== 'deny') {
+            permissionBehavior = 'defer'
+          }
+          break
+        case 'ask':
+          // ask takes precedence over allow but not deny/defer
+          if (
+            permissionBehavior !== 'deny' &&
+            permissionBehavior !== 'defer'
+          ) {
             permissionBehavior = 'ask'
           }
           break
@@ -3598,7 +3662,7 @@ export async function* executePreToolHooks<ToolInput>(
 ): AsyncGenerator<AggregatedHookResult> {
   const appState = toolUseContext.getAppState()
   const sessionId = toolUseContext.agentId ?? getSessionId()
-  if (!hasHookForEvent('PreToolUse', appState, sessionId)) {
+  if (!hasHookForEvent('PreToolUse', appState?.sessionHooks, sessionId)) {
     return
   }
 
@@ -3693,7 +3757,7 @@ export async function* executePostToolUseFailureHooks<ToolInput>(
 ): AsyncGenerator<AggregatedHookResult> {
   const appState = toolUseContext.getAppState()
   const sessionId = toolUseContext.agentId ?? getSessionId()
-  if (!hasHookForEvent('PostToolUseFailure', appState, sessionId)) {
+  if (!hasHookForEvent('PostToolUseFailure', appState?.sessionHooks, sessionId)) {
     return
   }
 
@@ -3717,6 +3781,99 @@ export async function* executePostToolUseFailureHooks<ToolInput>(
   })
 }
 
+/**
+ * Execute PostToolBatch hooks if configured. Mirrors ant 4690.js — fires
+ * once after every tool call in a parallel batch resolves, before the
+ * next model request. Per-tool PostToolUse hooks may run concurrently;
+ * PostToolBatch gives hooks a single rollup point with the full batch.
+ *
+ * additionalContext from output is merged the same way as PostToolUse:
+ * the caller surfaces it as a hook_additional_context attachment for the
+ * next turn.
+ */
+export async function* executePostToolBatchHooks(
+  toolCalls: Array<{
+    tool_name: string
+    tool_input: unknown
+    tool_use_id: string
+    tool_response?: unknown
+  }>,
+  toolUseContext: ToolUseContext,
+  permissionMode?: string,
+  signal?: AbortSignal,
+  timeoutMs: number = TOOL_HOOK_EXECUTION_TIMEOUT_MS,
+): AsyncGenerator<AggregatedHookResult> {
+  const appState = toolUseContext.getAppState()
+  const sessionId = toolUseContext.agentId ?? getSessionId()
+  if (!hasHookForEvent('PostToolBatch', appState?.sessionHooks, sessionId)) {
+    return
+  }
+
+  const hookInput: PostToolBatchHookInput = {
+    ...createBaseHookInput(permissionMode, undefined, toolUseContext),
+    hook_event_name: 'PostToolBatch',
+    tool_calls: toolCalls,
+  }
+
+  // No `tool_name` matchQuery — PostToolBatch fires once per batch and the
+  // batch may span multiple tools. Hooks that want to filter inspect
+  // tool_calls themselves. toolUseID is synthetic (no single owning tool).
+  yield* executeHooks({
+    hookInput,
+    toolUseID: randomUUID(),
+    signal,
+    timeoutMs,
+    toolUseContext,
+  })
+}
+
+/**
+ * Execute UserPromptExpansion hooks if configured. Mirrors ant 3695.js
+ * cw_(). Fires when a slash command or MCP prompt expands into its final
+ * prompt body, before that body enters the conversation. Hooks can return
+ * additionalContext to enrich the prompt or block the expansion via
+ * blockingError / preventContinuation.
+ */
+export async function* executeUserPromptExpansionHooks(
+  expansionType: 'slash_command' | 'mcp_prompt',
+  commandName: string,
+  commandArgs: string,
+  commandSource: string | undefined,
+  prompt: string,
+  toolUseContext: ToolUseContext,
+  permissionMode?: string,
+  signal?: AbortSignal,
+  timeoutMs: number = TOOL_HOOK_EXECUTION_TIMEOUT_MS,
+): AsyncGenerator<AggregatedHookResult> {
+  const appState = toolUseContext.getAppState()
+  const sessionId = toolUseContext.agentId ?? getSessionId()
+  if (!hasHookForEvent('UserPromptExpansion', appState?.sessionHooks, sessionId)) {
+    return
+  }
+
+  const hookInput: UserPromptExpansionHookInput = {
+    ...createBaseHookInput(permissionMode, undefined, toolUseContext),
+    hook_event_name: 'UserPromptExpansion',
+    expansion_type: expansionType,
+    command_name: commandName,
+    command_args: commandArgs,
+    command_source: commandSource,
+    prompt,
+  }
+
+  // matchQuery on command_name so users can filter hooks per command in
+  // settings.json (mirrors ant 4452.js matcherMetadata.fieldToMatch).
+  // toolUseID is synthetic — UserPromptExpansion is not bound to any tool.
+  yield* executeHooks({
+    hookInput,
+    toolUseID: randomUUID(),
+    matchQuery: commandName,
+    signal,
+    timeoutMs,
+    toolUseContext,
+  })
+}
+
 export async function* executePermissionDeniedHooks<ToolInput>(
   toolName: string,
   toolUseID: string,
@@ -3729,7 +3886,7 @@ export async function* executePermissionDeniedHooks<ToolInput>(
 ): AsyncGenerator<AggregatedHookResult> {
   const appState = toolUseContext.getAppState()
   const sessionId = toolUseContext.agentId ?? getSessionId()
-  if (!hasHookForEvent('PermissionDenied', appState, sessionId)) {
+  if (!hasHookForEvent('PermissionDenied', appState?.sessionHooks, sessionId)) {
     return
   }
 
@@ -3792,7 +3949,7 @@ export async function executeStopFailureHooks(
   // hooks (registerFrontmatterHooks) key by agentId; gating with agentId here
   // would pass the gate but fail execution. Align gate with execution.
   const sessionId = getSessionId()
-  if (!hasHookForEvent('StopFailure', appState, sessionId)) return
+  if (!hasHookForEvent('StopFailure', appState?.sessionHooks, sessionId)) return
 
   const rawContent = lastMessage.message?.content
   const lastAssistantText =
@@ -3849,7 +4006,7 @@ export async function* executeStopHooks(
   const hookEvent = subagentId ? 'SubagentStop' : 'Stop'
   const appState = toolUseContext?.getAppState()
   const sessionId = toolUseContext?.agentId ?? getSessionId()
-  if (!hasHookForEvent(hookEvent, appState, sessionId)) {
+  if (!hasHookForEvent(hookEvent, appState?.sessionHooks, sessionId)) {
     return
   }
 
@@ -4034,7 +4191,7 @@ export async function* executeUserPromptSubmitHooks(
 ): AsyncGenerator<AggregatedHookResult> {
   const appState = toolUseContext.getAppState()
   const sessionId = toolUseContext.agentId ?? getSessionId()
-  if (!hasHookForEvent('UserPromptSubmit', appState, sessionId)) {
+  if (!hasHookForEvent('UserPromptSubmit', appState?.sessionHooks, sessionId)) {
     return
   }
 

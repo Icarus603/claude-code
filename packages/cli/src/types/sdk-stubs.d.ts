@@ -66,6 +66,21 @@ declare module "*/sdk/coreTypes.generated.js" {
   export type PreToolUseHookInput = HookInput & { tool_name: string }
   export type PostToolUseHookInput = HookInput & { tool_name: string }
   export type PostToolUseFailureHookInput = HookInput & { tool_name: string }
+  export type PostToolBatchHookInput = HookInput & {
+    tool_calls: Array<{
+      tool_name: string
+      tool_input: unknown
+      tool_use_id: string
+      tool_response?: unknown
+    }>
+  }
+  export type UserPromptExpansionHookInput = HookInput & {
+    expansion_type: 'slash_command' | 'mcp_prompt'
+    command_name: string
+    command_args: string
+    command_source?: string
+    prompt: string
+  }
   export type PermissionRequestHookInput = HookInput & { tool_name: string }
   export type PermissionDeniedHookInput = HookInput
   export type NotificationHookInput = HookInput & { message: string }

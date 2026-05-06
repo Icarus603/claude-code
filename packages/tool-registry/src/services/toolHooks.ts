@@ -511,6 +511,82 @@ export async function* runPreToolUseHooks(
           logForDebugging(
             `Hook result has permissionBehavior=${result.permissionBehavior}`,
           )
+          // ant 3906.js — `defer` is print-mode-only and solo-only. The
+          // print-mode + solo guards keep batches intact (otherwise sibling
+          // tool calls in the same assistant turn would be orphaned mid-batch
+          // when defer pulls the rug). ccb runs primarily as an interactive
+          // REPL and only honors defer in -p mode for solo calls; everything
+          // else falls through to `ask` so the user still gets a prompt
+          // rather than a silent skip. Solo-only batch detection is approximate
+          // (we count assistant tool_use blocks) — close enough for the warning.
+          if (result.permissionBehavior === 'defer') {
+            const isPrintMode =
+              toolUseContext.options.isNonInteractiveSession === true
+            // Count tool_use blocks in the latest assistant message — the
+            // batch the dispatcher is about to execute. ant uses the same
+            // shape (3906.js T.message.content). Default to 1 if the shape
+            // is unfamiliar (string content / undefined / etc.) so a hook's
+            // defer in a degraded format still has a chance to be honored.
+            const lastAssistant = [...toolUseContext.messages]
+              .reverse()
+              .find(m => m.type === 'assistant') as
+              | { message?: { content?: unknown } }
+              | undefined
+            const assistantBlocks = Array.isArray(
+              lastAssistant?.message?.content,
+            )
+              ? (
+                  lastAssistant.message.content as Array<{ type: string }>
+                ).filter(b => b.type === 'tool_use').length
+              : 1
+            if (!isPrintMode) {
+              logForDebugging(
+                `Hook PreToolUse:${tool.name} returned permissionDecision=defer in interactive mode; falling through to ask (defer is print-mode only)`,
+                { level: 'warn' },
+              )
+            } else if (assistantBlocks > 1) {
+              logForDebugging(
+                `Hook PreToolUse:${tool.name} returned permissionDecision=defer but ${assistantBlocks} tool calls are in this batch; falling through to ask (defer is solo-only — siblings would be orphaned on resume)`,
+                { level: 'warn' },
+              )
+            } else {
+              // Solo + print mode: emit a stop with a reason the print-mode
+              // controller picks up. ant uses a `hook_deferred_tool` attachment
+              // + `tool_deferred` exit reason; ccb's print-mode controller
+              // doesn't yet recognize that exit reason, so the stop path is
+              // the closest available primitive. The reason string is
+              // surfaced verbatim in the tool result, so a daemon-like
+              // controller can pattern-match on it.
+              yield {
+                type: 'stopReason',
+                stopReason: `Deferred by hook PreToolUse:${tool.name}${
+                  result.hookPermissionDecisionReason
+                    ? ` (${result.hookPermissionDecisionReason})`
+                    : ''
+                }`,
+              }
+              yield { type: 'stop' }
+              return
+            }
+            // Fall through to ask path with the hook's reason as the message.
+            yield {
+              type: 'hookPermissionResult',
+              hookPermissionResult: {
+                behavior: 'ask',
+                updatedInput: result.updatedInput,
+                message:
+                  result.hookPermissionDecisionReason ||
+                  `Hook PreToolUse:${tool.name} deferred this tool (downgraded from defer to ask in interactive/batch mode)`,
+                decisionReason: {
+                  type: 'hook',
+                  hookName: `PreToolUse:${tool.name}`,
+                  hookSource: result.hookSource,
+                  reason: result.hookPermissionDecisionReason,
+                },
+              },
+            }
+            continue
+          }
           const decisionReason: PermissionDecisionReason = {
             type: 'hook',
             hookName: `PreToolUse:${tool.name}`,
@@ -538,12 +614,14 @@ export async function* runPreToolUseHooks(
                 decisionReason,
               },
             }
-          } else {
-            // deny - updatedInput is irrelevant since tool won't run
+          } else if (result.permissionBehavior === 'deny') {
+            // deny - updatedInput is irrelevant since tool won't run.
+            // 'defer' is handled earlier and returns; 'passthrough' falls
+            // through to the updatedInput-only path below.
             yield {
               type: 'hookPermissionResult',
               hookPermissionResult: {
-                behavior: result.permissionBehavior,
+                behavior: 'deny',
                 message:
                   result.hookPermissionDecisionReason ||
                   `Hook PreToolUse:${tool.name} ${getRuleBehaviorDescription(result.permissionBehavior)} this tool`,

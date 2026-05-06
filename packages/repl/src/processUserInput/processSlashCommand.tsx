@@ -35,6 +35,7 @@ import {
 } from '@claude-code/local-observability'
 import { getDumpPromptsPath } from '@claude-code/provider/dumpPrompts.js'
 import { buildPostCompactMessages } from '@claude-code/agent/compaction/compact.js'
+import { executeUserPromptExpansionHooks } from '@claude-code/agent/hooks.js'
 import { resetMicrocompactState } from '@claude-code/agent/compaction/microCompact.js'
 import type { Progress as AgentProgress } from '@claude-code/tool-registry/tools/AgentTool/AgentTool.js'
 import { runAgent } from '@claude-code/tool-registry/tools/AgentTool/runAgent.js'
@@ -1181,6 +1182,45 @@ async function getMessagesForPromptSlashCommand(
   }
 
   const result = await command.getPromptForCommand(args, context)
+
+  // ant 3695.js cw_() — fire UserPromptExpansion now that the slash
+  // command (or MCP prompt) has produced its final body. Hooks see
+  // expansion_type, command_name/args/source, and the fully-expanded
+  // prompt as a single string. Failures are advisory; we never block
+  // expansion on a hook error here (the model run will still proceed).
+  try {
+    const expandedPrompt = result
+      .filter((b): b is TextBlockParam => b.type === 'text')
+      .map(b => b.text)
+      .join('\n\n')
+    const expansionType =
+      command.source === 'mcp' ? 'mcp_prompt' : 'slash_command'
+    for await (const hookResult of executeUserPromptExpansionHooks(
+      expansionType,
+      command.name,
+      args,
+      command.source,
+      expandedPrompt,
+      context,
+      context.getAppState().toolPermissionContext.mode,
+    )) {
+      // additionalContext from a hook is appended to the expansion as
+      // extra text blocks. blockingError surfaces in the next turn but
+      // doesn't tear down expansion mid-flight (parity with ant 3706.js
+      // sk7 behavior, less the print-mode `blocked` early-return which
+      // would require a deeper refactor of slash command return shape).
+      if (
+        hookResult.additionalContexts &&
+        hookResult.additionalContexts.length > 0
+      ) {
+        for (const ctx of hookResult.additionalContexts) {
+          result.push({ type: 'text', text: ctx })
+        }
+      }
+    }
+  } catch (e) {
+    logForDebugging(`UserPromptExpansion hook execution failed: ${e}`)
+  }
 
   // Register skill hooks if defined. Under ["hooks"]-only (skills not locked),
   // user skills still load and reach this point — block hook REGISTRATION here
