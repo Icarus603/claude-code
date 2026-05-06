@@ -76,7 +76,7 @@ jobs:
 
       - name: Open or update issue
         if: steps.doctor.outcome == 'failure' || steps.smoke.outcome == 'failure' || steps.tests.outcome == 'failure'
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: 'Nightly drift detected on origin/main'
           content-filepath: /tmp/drift-body.md
