@@ -58,6 +58,10 @@ import {
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { randomBytes } from 'node:crypto'
+import {
+  hasAutoModeOptIn,
+  hasSkipDangerousModePermissionPrompt,
+} from '@claude-code/config/settings'
 
 interface JobMeta {
   short: string
@@ -243,6 +247,36 @@ async function readBgStdin(timeoutMs = 3000): Promise<string> {
 }
 
 /**
+ * Pre-flight check: disallow `--bg` with bypass-permissions or auto
+ * mode unless the user has previously accepted the corresponding
+ * disclaimer in an interactive session. Mirrors ant 4649.js qf3.
+ *
+ * Returns null if OK, an error message if blocked. The check protects
+ * against a fresh-install user typing `ccb --bg --dangerously-skip-permissions
+ * "..."` without ever seeing the warning interactively — `--bg`
+ * detaches before any TUI dialog could surface.
+ */
+function checkBgPermissionGate(args: readonly string[]): string | null {
+  const beforeDoubleDash = (() => {
+    const i = args.indexOf('--')
+    return i >= 0 ? args.slice(0, i) : args
+  })()
+  const permModeIdx = beforeDoubleDash.indexOf('--permission-mode')
+  const permMode = permModeIdx >= 0 ? beforeDoubleDash[permModeIdx + 1] : undefined
+  const wantsBypass =
+    permMode === 'bypassPermissions' ||
+    beforeDoubleDash.includes('--dangerously-skip-permissions') ||
+    beforeDoubleDash.includes('--allow-dangerously-skip-permissions')
+  if (wantsBypass && !hasSkipDangerousModePermissionPrompt()) {
+    return '--bg with bypassPermissions requires accepting the disclaimer first. Run `ccb --dangerously-skip-permissions` once interactively.'
+  }
+  if (permMode === 'auto' && !hasAutoModeOptIn()) {
+    return '--bg with auto mode requires opting in first. Run `ccb --permission-mode auto` once interactively.'
+  }
+  return null
+}
+
+/**
  * Spawn a backgrounded `ccb -p "<directive>"` and return immediately.
  * Strips `--bg` / `--background` from argv before respawning so the
  * child doesn't recurse.
@@ -250,6 +284,12 @@ async function readBgStdin(timeoutMs = 3000): Promise<string> {
  * @dynamicRequire
  */
 export async function handleBgFlag(args: readonly string[]): Promise<void> {
+  const gateError = checkBgPermissionGate(args)
+  if (gateError) {
+    process.stderr.write(`${gateError}\n`)
+    process.exit(1)
+  }
+
   ensureJobsRoot()
 
   const filtered = args.filter(

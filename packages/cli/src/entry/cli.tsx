@@ -220,6 +220,14 @@ async function main(): Promise<void> {
       args.includes('--background'))
   ) {
     profileCheckpoint('cli_bg_path')
+    // The handlers read settings (`hasSkipDangerousModePermissionPrompt`)
+    // for the --bg permission gate; settings reads before enableConfigs()
+    // print a warning + return null. Importing the runtime bootstrap
+    // installs host bindings as a side effect; then enableConfigs() can
+    // run.
+    await import('@claude-code/app-host/runtime/bootstrap.js')
+    const { enableConfigs } = await import('@claude-code/config')
+    enableConfigs()
     const bg = await import('../bg.js')
     const sub = args[0]
     if (sub === 'ps') return await bg.psHandler(args.slice(1))
