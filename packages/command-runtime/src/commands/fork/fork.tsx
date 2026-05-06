@@ -49,8 +49,12 @@ const FORK_DIRECTIVE_MAX_LENGTH = 50
 /**
  * Mirror of ant 4656.js Gf3 — slug from first 3 words of directive.
  * Stable, kebab-case, lowercase, max 24 chars, fallback "fork".
+ *
+ * Exported for unit-test coverage.
+ *
+ * @dynamicRequire
  */
-function deriveForkSlug(directive: string): string {
+export function deriveForkSlug(directive: string): string {
   return (
     directive
       .trim()
