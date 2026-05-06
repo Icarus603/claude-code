@@ -82,6 +82,7 @@ import {
   getSettingsForSource,
   updateSettingsForSource,
 } from '@claude-code/config/settings'
+import { unpackModelId } from '@claude-code/provider/connections.js'
 import { getUserMsgOptIn, setUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { DEFAULT_OUTPUT_STYLE_NAME } from '@claude-code/config/outputStyles.js'
 import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
@@ -305,11 +306,9 @@ export function Config({
       to_model:
         value as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
-    setAppState(prev => ({
-      ...prev,
-      mainLoopModel: value,
-      mainLoopModelForSession: null,
-    }))
+    setAppState(prev => ({ ...prev, mainLoopModel: value, mainLoopModelForSession: null }))
+    // Strip `<connId>:` so settings.json stays compatible with official CLI.
+    updateSettingsForSource('userSettings', { model: value != null ? unpackModelId(value).modelId : undefined })
     setChanges(prev => {
       const valStr =
         modelDisplayString(value) +
@@ -1825,6 +1824,7 @@ export function Config({
         <>
           <ModelPicker
             initial={mainLoopModel}
+            persistToSettings
             onSelect={(model, _effort) => {
               isDirty.current = true
               onChangeMainModelConfig(model)
@@ -1859,7 +1859,6 @@ export function Config({
         <>
           <ModelPicker
             initial={globalConfig.teammateDefaultModel ?? null}
-            skipSettingsWrite
             headerText="Default model for newly spawned teammates. The leader can override via the tool call's model parameter."
             onSelect={(model, _effort) => {
               setShowSubmenu(null)

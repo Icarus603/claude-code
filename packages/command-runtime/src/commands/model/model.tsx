@@ -29,6 +29,8 @@ import {
 } from '@claude-code/provider/model.js'
 import { isModelAllowed } from '@claude-code/provider/model/modelAllowlist.js'
 import { validateModel } from '@claude-code/provider/validateModel.js'
+import { updateSettingsForSource } from '@claude-code/config/settings'
+import { unpackModelId } from '@claude-code/provider/connections.js'
 
 function ModelPickerWrapper({
   onDone,
@@ -113,6 +115,7 @@ function ModelPickerWrapper({
       message += ` · Fast mode OFF`
     }
 
+    message += ' · session only — run /model save to persist'
     onDone(message)
   }
 
@@ -245,6 +248,7 @@ function SetModelAndClose({
         message += ` · Fast mode OFF`
       }
 
+      message += ' · session only — run /model save to persist'
       onDone(message)
     }
 
@@ -280,6 +284,50 @@ function isSonnet1mUnavailable(model: string): boolean {
   )
 }
 
+function SaveModelAndClose({
+  onDone,
+}: {
+  onDone: (
+    result?: string,
+    options?: { display?: CommandResultDisplay },
+  ) => void
+}): React.ReactNode {
+  const mainLoopModel = useAppState(s => s.mainLoopModel)
+
+  React.useEffect(() => {
+    logEvent('tengu_model_command_save', {
+      model:
+        (mainLoopModel ?? 'default') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+    // Strip the `<connId>:` prefix before writing — settings.json is shared
+    // with the official Claude Code CLI, which only understands bare model
+    // names. The connection routing is recovered on next read by picking the
+    // first enabled connection that exposes this model.
+    const bareModelId =
+      mainLoopModel != null ? unpackModelId(mainLoopModel).modelId : undefined
+    const result = updateSettingsForSource('userSettings', {
+      model: bareModelId,
+    })
+    if (result.error) {
+      onDone(`Failed to save model: ${result.error.message}`, {
+        display: 'system',
+      })
+      return
+    }
+    if (mainLoopModel === null) {
+      onDone(
+        'Cleared default model (current session uses built-in default)',
+      )
+      return
+    }
+    onDone(
+      `Saved current model (${chalk.bold(renderModelLabel(mainLoopModel))}) as default`,
+    )
+  }, [mainLoopModel, onDone])
+
+  return null
+}
+
 function ShowModelAndClose({
   onDone,
 }: {
@@ -313,10 +361,20 @@ export const call: LocalJSXCommandCall = async (onDone, _context, args) => {
   }
   if (COMMON_HELP_ARGS.includes(args)) {
     onDone(
-      'Run /model to open the model selection menu, or /model [modelName] to set the model.',
+      [
+        'Run /model to open the model selection menu, or /model [modelName] to set the model.',
+        '',
+        'Slash command changes affect the current session only — they do not',
+        'modify settings.json. Run /model save to persist the current session',
+        "model as the default for new sessions.",
+      ].join('\n'),
       { display: 'system' },
     )
     return
+  }
+
+  if (args.toLowerCase() === 'save') {
+    return <SaveModelAndClose onDone={onDone} />
   }
 
   if (args) {

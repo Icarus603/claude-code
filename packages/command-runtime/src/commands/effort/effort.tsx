@@ -27,17 +27,6 @@ type EffortCommandResult = {
 }
 
 function setEffortValue(effortValue: EffortValue): EffortCommandResult {
-  const persistable = toPersistableEffort(effortValue)
-  if (persistable !== undefined) {
-    const result = updateSettingsForSource('userSettings', {
-      effortLevel: persistable,
-    })
-    if (result.error) {
-      return {
-        message: `Failed to set effort level: ${result.error.message}`,
-      }
-    }
-  }
   logEvent('tengu_effort_command', {
     effort:
       effortValue as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -49,12 +38,6 @@ function setEffortValue(effortValue: EffortValue): EffortCommandResult {
   const envOverride = getEffortEnvOverride()
   if (envOverride !== undefined && envOverride !== effortValue) {
     const envRaw = readEnv('CLAUDE_CODE_EFFORT_LEVEL')
-    if (persistable === undefined) {
-      return {
-        message: `Not applied: CLAUDE_CODE_EFFORT_LEVEL=${envRaw} overrides effort this session, and ${effortValue} is session-only (nothing saved)`,
-        effortUpdate: { value: effortValue },
-      }
-    }
     return {
       message: `CLAUDE_CODE_EFFORT_LEVEL=${envRaw} overrides this session — clear it and ${effortValue} takes over`,
       effortUpdate: { value: effortValue },
@@ -62,10 +45,33 @@ function setEffortValue(effortValue: EffortValue): EffortCommandResult {
   }
 
   const description = getEffortValueDescription(effortValue)
-  const suffix = persistable !== undefined ? '' : ' (this session only)'
   return {
-    message: `Set effort level to ${effortValue}${suffix}: ${description}`,
+    message: `Set effort level to ${effortValue} (session only — run /effort save to persist): ${description}`,
     effortUpdate: { value: effortValue },
+  }
+}
+
+function saveCurrentEffort(
+  appStateEffort: EffortValue | undefined,
+): EffortCommandResult {
+  const persistable = toPersistableEffort(appStateEffort)
+  const result = updateSettingsForSource('userSettings', {
+    effortLevel: persistable,
+  })
+  if (result.error) {
+    return { message: `Failed to save effort level: ${result.error.message}` }
+  }
+  logEvent('tengu_effort_command', {
+    effort:
+      ((persistable ?? 'auto') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS),
+  })
+  if (persistable === undefined) {
+    return {
+      message: 'Cleared default effort (current session is auto)',
+    }
+  }
+  return {
+    message: `Saved current effort level (${persistable}) as default`,
   }
 }
 
@@ -87,14 +93,6 @@ export function showCurrentEffort(
 }
 
 function unsetEffortLevel(): EffortCommandResult {
-  const result = updateSettingsForSource('userSettings', {
-    effortLevel: undefined,
-  })
-  if (result.error) {
-    return {
-      message: `Failed to set effort level: ${result.error.message}`,
-    }
-  }
   logEvent('tengu_effort_command', {
     effort:
       'auto' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -105,25 +103,33 @@ function unsetEffortLevel(): EffortCommandResult {
   if (envOverride !== undefined && envOverride !== null) {
     const envRaw = readEnv('CLAUDE_CODE_EFFORT_LEVEL')
     return {
-      message: `Cleared effort from settings, but CLAUDE_CODE_EFFORT_LEVEL=${envRaw} still controls this session`,
+      message: `Cleared session effort, but CLAUDE_CODE_EFFORT_LEVEL=${envRaw} still controls this session`,
       effortUpdate: { value: undefined },
     }
   }
   return {
-    message: 'Effort level set to auto',
+    message: 'Effort level set to auto (session only — run /effort save to persist)',
     effortUpdate: { value: undefined },
   }
 }
 
-export function executeEffort(args: string): EffortCommandResult {
+export function executeEffort(
+  args: string,
+  appStateEffort: EffortValue | undefined,
+): EffortCommandResult {
   const normalized = args.toLowerCase()
+
+  if (normalized === 'save') {
+    return saveCurrentEffort(appStateEffort)
+  }
+
   if (normalized === 'auto' || normalized === 'unset') {
     return unsetEffortLevel()
   }
 
   if (!isEffortLevel(normalized)) {
     return {
-      message: `Invalid argument: ${args}. Valid options are: low, medium, high, xhigh, max, auto`,
+      message: `Invalid argument: ${args}. Valid options are: low, medium, high, xhigh, max, auto, save`,
     }
   }
 
@@ -173,12 +179,10 @@ function EffortPickerCommand({
       onConfirm={level => {
         setCommitted(true)
         const result = setEffortValue(level)
-        if (result.effortUpdate) {
-          setAppState(prev => ({
-            ...prev,
-            effortValue: result.effortUpdate!.value,
-          }))
-        }
+        setAppState(prev => ({
+          ...prev,
+          effortValue: level,
+        }))
         onDone(result.message)
       }}
       onCancel={() => {
@@ -190,23 +194,29 @@ function EffortPickerCommand({
 }
 
 function ApplyEffortAndClose({
-  result,
+  args,
   onDone,
 }: {
-  result: EffortCommandResult
+  args: string
   onDone: (result: string) => void
 }): React.ReactNode {
   const setAppState = useSetAppState()
-  const { effortUpdate, message } = result
+  const appStateEffort = useAppState(s => s.effortValue)
+  // Resolve the command once at mount (React effect) so we read the latest
+  // AppState — needed for `/effort save`, which persists whatever the
+  // current session value happens to be.
+  const [resolved] = React.useState<EffortCommandResult>(() =>
+    executeEffort(args, appStateEffort),
+  )
   React.useEffect(() => {
-    if (effortUpdate) {
+    if (resolved.effortUpdate) {
       setAppState(prev => ({
         ...prev,
-        effortValue: effortUpdate.value,
+        effortValue: resolved.effortUpdate!.value,
       }))
     }
-    onDone(message)
-  }, [setAppState, effortUpdate, message, onDone])
+    onDone(resolved.message)
+  }, [setAppState, resolved, onDone])
   return null
 }
 
@@ -220,9 +230,12 @@ export async function call(
   if (COMMON_HELP_ARGS.includes(args)) {
     onDone(
       [
-        'Usage: /effort [low|medium|high|xhigh|max|auto|status]',
+        'Usage: /effort [low|medium|high|xhigh|max|auto|save|status]',
         '',
         'Run with no argument to open the interactive picker.',
+        'Slash command changes affect the current session only — they do not',
+        'modify settings.json. Run /effort save to persist the current value',
+        'as the default for new sessions.',
         '',
         'Effort levels (Anthropic docs: platform.claude.com/docs/en/build-with-claude/effort):',
         '- low:    Most efficient — significant token savings, best for simple tasks',
@@ -231,6 +244,7 @@ export async function call(
         '- xhigh:  Extended capability for long-horizon work (Opus 4.7 only)',
         '- max:    Absolute maximum capability with no constraints on token spending',
         '- auto:   Use the default effort level for your model',
+        '- save:   Persist the current session effort as the default in settings.json',
       ].join('\n'),
     )
     return
@@ -246,6 +260,5 @@ export async function call(
     return <EffortPickerCommand onDone={onDone} />
   }
 
-  const result = executeEffort(args)
-  return <ApplyEffortAndClose result={result} onDone={onDone} />
+  return <ApplyEffortAndClose args={args} onDone={onDone} />
 }

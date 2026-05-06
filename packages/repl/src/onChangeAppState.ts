@@ -17,7 +17,6 @@ import {
   notifySessionMetadataChanged,
   type SessionExternalMetadata,
 } from '@claude-code/storage/sessionState.js'
-import { updateSettingsForSource } from '@claude-code/config/settings'
 import type { AppState } from '@claude-code/app-host/state/AppStateStore.js'
 
 // Inverse of the push below — restore on worker restart.
@@ -91,24 +90,14 @@ export function onChangeAppState({
     notifyPermissionModeChanged(newMode)
   }
 
-  // mainLoopModel: remove it from settings?
-  if (
-    newState.mainLoopModel !== oldState.mainLoopModel &&
-    newState.mainLoopModel === null
-  ) {
-    // Remove from settings
-    updateSettingsForSource('userSettings', { model: undefined })
-    setMainLoopModelOverride(null)
-  }
-
-  // mainLoopModel: add it to settings?
-  if (
-    newState.mainLoopModel !== oldState.mainLoopModel &&
-    newState.mainLoopModel !== null
-  ) {
-    // Save to settings
-    updateSettingsForSource('userSettings', { model: newState.mainLoopModel })
-    setMainLoopModelOverride(newState.mainLoopModel)
+  // mainLoopModel: keep the provider override in sync with AppState.
+  //
+  // Disk persistence is the explicit /model save command's job — auto-writing
+  // here would silently leak every session-level switch into the user's
+  // long-term preference (and into every other running session via the
+  // settings watcher). Keep the in-memory override; do not touch settings.json.
+  if (newState.mainLoopModel !== oldState.mainLoopModel) {
+    setMainLoopModelOverride(newState.mainLoopModel ?? null)
   }
 
   // expandedView → persist as showExpandedTodos + showSpinnerTree for backwards compat

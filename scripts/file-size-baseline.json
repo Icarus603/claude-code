@@ -81,7 +81,7 @@
   "packages/repl/src/components/Messages.tsx": 1099,
   "packages/repl/src/components/PromptInput/PromptInput.tsx": 3138,
   "packages/repl/src/components/ScrollKeybindingHandler.tsx": 1082,
-  "packages/repl/src/components/Settings/Config.tsx": 2354,
+  "packages/repl/src/components/Settings/Config.tsx": 2353,
   "packages/repl/src/components/Stats.tsx": 1180,
   "packages/repl/src/components/VirtualMessageList.tsx": 1058,
   "packages/repl/src/components/mcp/ElicitationDialog.tsx": 1545,

@@ -51,12 +51,12 @@ export type Props = {
   /** Overrides the dim header line below "Select model". */
   headerText?: string
   /**
-   * When true, skip writing effortLevel to userSettings on selection.
-   * Used by the assistant installer wizard where the model choice is
-   * project-scoped (written to the assistant's .claude/settings.json via
-   * install.ts) and should not leak to the user's global ~/.claude/settings.
+   * When true, persist the effortLevel to userSettings on selection. Default
+   * is false — the picker is session-only by default, matching the contract
+   * for `/model` and `/effort` slash commands. Settings → Model and similar
+   * "set my long-term default" entry points opt in by passing this flag.
    */
-  skipSettingsWrite?: boolean
+  persistToSettings?: boolean
 }
 
 const NO_PREFERENCE = '__NO_PREFERENCE__'
@@ -69,7 +69,7 @@ export function ModelPicker({
   isStandaloneCommand,
   showFastModeNotice,
   headerText,
-  skipSettingsWrite,
+  persistToSettings,
 }: Props): React.ReactNode {
   const setAppState = useSetAppState()
   const exitState = useExitOnCtrlCDWithKeybindings()
@@ -203,7 +203,7 @@ export function ModelPicker({
       effort:
         effort as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
-    if (!skipSettingsWrite) {
+    if (persistToSettings) {
       // Prior comes from userSettings on disk — NOT merged settings (which
       // includes project/policy layers that must not leak into the user's
       // global ~/.claude/settings.json), and NOT AppState.effortValue (which
@@ -219,6 +219,15 @@ export function ModelPicker({
       if (persistable !== undefined) {
         updateSettingsForSource('userSettings', { effortLevel: persistable })
       }
+      setAppState(prev => ({ ...prev, effortValue: effortLevel }))
+    } else {
+      // Session-only: still update AppState so the active session reflects
+      // the picker's selection, but never touch settings.json.
+      const effortLevel = hasToggledEffort
+        ? effort
+        : (effortValue !== undefined
+            ? convertEffortValueToLevel(effortValue)
+            : undefined)
       setAppState(prev => ({ ...prev, effortValue: effortLevel }))
     }
 
