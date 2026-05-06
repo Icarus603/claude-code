@@ -210,6 +210,19 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
     toolUseId: undefined,
   })
 
+  // Register slug → agentId in the name registry so the tasks panel /
+  // CoordinatorAgentStatus / SendMessage routing can address this fork
+  // by its slug (e.g. "find-bug" → 8a3b...). Mirrors AgentTool's
+  // registration path (AgentTool.tsx:972-978) and ant 4656.js mJK
+  // line 53 (`agentLifecycle.registerName(T, QT(z))`).
+  setAppState((prev: { agentNameRegistry?: Map<string, unknown> }) => {
+    const existing = prev.agentNameRegistry
+    if (!(existing instanceof Map)) return prev
+    const next = new Map(existing)
+    next.set(slug, asAgentId(agentBackgroundTask.agentId))
+    return { ...prev, agentNameRegistry: next }
+  })
+
   const asyncAgentContext = {
     agentId,
     parentSessionId: getParentSessionId(),
