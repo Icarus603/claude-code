@@ -401,14 +401,17 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   // (--model, --permission-mode, etc) so `ccb --bg --model X "task"`
   // doesn't lose model selection.
   const childArgs = [...forwardedFlags, '-p', directive]
-  const nodeArgs = process.argv0.endsWith('bun')
+  // Two cases: when launched via `bun dist/cli.js`, argv0='bun' and
+  // argv[1]='/.../dist/cli.js' — we need to invoke bun with cli.js as
+  // the first arg so the child boots through bun. When launched via
+  // the compiled standalone binary, argv0 IS the binary path and
+  // argv[1] is the first user flag — invoke argv[0] directly.
+  const isBun = process.argv0.endsWith('bun')
+  const cmd = isBun ? process.argv0 : process.argv[0]!
+  const nodeArgs = isBun
     ? [process.argv[1] ?? '', ...childArgs]
     : childArgs
-  const cmd = process.argv0.endsWith('bun') ? process.argv0 : process.argv[0]!
-  const fullCmd =
-    process.argv0.endsWith('bun')
-      ? [cmd, ...nodeArgs]
-      : [cmd, ...nodeArgs]
+  const fullCmd = [cmd, ...nodeArgs]
 
   const env: NodeJS.ProcessEnv = {
     ...process.env,
