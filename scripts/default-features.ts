@@ -40,6 +40,7 @@ const STABLE_FEATURES = [
   'ULTRATHINK',
   'BUILTIN_EXPLORE_PLAN_AGENTS',
   'LODESTONE',
+  'NEW_INIT',
   // P1: API-dependent features (upstream)
   'EXTRACT_MEMORIES',
   'VERIFICATION_AGENT',
