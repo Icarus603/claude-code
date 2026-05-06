@@ -47,6 +47,11 @@ const STABLE_FEATURES = [
   // gates inside isForkSubagentEnabled() exclude coordinator mode and -p
   // non-interactive sessions.
   'FORK_SUBAGENT',
+  // OS-level background sessions: `ccb --bg "<task>"` + ccb ps/logs/kill/rm
+  // (ant v2.1.131 5173.js dispatch). Detached spawn into
+  // ~/.claude/jobs/<short>/; child outlives terminal close. Phase B MVP —
+  // attach (PTY reconnect) is Phase C and not yet wired.
+  'BG_SESSIONS',
   // P1: API-dependent features (upstream)
   'EXTRACT_MEMORIES',
   'VERIFICATION_AGENT',

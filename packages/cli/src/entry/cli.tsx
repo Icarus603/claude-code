@@ -203,25 +203,30 @@ async function main(): Promise<void> {
     return
   }
 
-  // Fast-path for `claude ps|logs|attach|kill` and `--bg`/`--background`.
-  // Session management against the ~/.claude/sessions/ registry. Flag
-  // literals are inlined so bg.js only loads when actually dispatching.
+  // Fast-path for `claude ps|logs|attach|kill|rm` and `--bg`/`--background`.
+  // OS-level background sessions backed by `~/.claude/jobs/<short>/`.
+  // Detached spawn — child outlives the parent terminal closing.
+  // Daemon-managed `attach` (PTY reconnect) is Phase C, not yet wired;
+  // the handler prints "not implemented" + a logs-as-fallback hint.
   if (
     feature('BG_SESSIONS') &&
     (args[0] === 'ps' ||
       args[0] === 'logs' ||
       args[0] === 'attach' ||
       args[0] === 'kill' ||
+      args[0] === 'rm' ||
       args.includes('--bg') ||
       args.includes('--background'))
   ) {
     profileCheckpoint('cli_bg_path')
-    // BG_SESSIONS feature is off in this build and the canonical bg.ts
-    // module was never replicated outside the original src/ tree. The
-    // `feature('BG_SESSIONS') && ...` guard above already gates the entire
-    // branch — code path is unreachable.
-    console.error('Background sessions are not enabled in this build.')
-    process.exit(2)
+    const bg = await import('../bg.js')
+    const sub = args[0]
+    if (sub === 'ps') return await bg.psHandler(args.slice(1))
+    if (sub === 'logs') return await bg.logsHandler(args.slice(1))
+    if (sub === 'attach') return await bg.attachHandler(args.slice(1))
+    if (sub === 'kill') return await bg.killHandler(args.slice(1))
+    if (sub === 'rm') return await bg.rmHandler(args.slice(1))
+    return await bg.handleBgFlag(args)
   }
 
   // Fast-path for template job commands.
