@@ -180,6 +180,13 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
   ]
 
   const canUseTool = context.canUseTool
+  if (!canUseTool) {
+    onDone(
+      'Fork is not available — REPL host did not provide a canUseTool binding. This is a bug in the slash-command dispatch wiring.',
+      { display: 'system' },
+    )
+    return null
+  }
 
   const agentBackgroundTask = registerAsyncAgent({
     agentId,
@@ -223,7 +230,7 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
             agentDefinition: FORK_AGENT,
             promptMessages,
             toolUseContext,
-            canUseTool: canUseTool!,
+            canUseTool,
             isAsync: true,
             forkContextMessages: toolUseContext.messages as MessageType[],
             querySource: `agent:builtin:${FORK_AGENT.agentType}`,
