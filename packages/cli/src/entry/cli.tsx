@@ -229,6 +229,15 @@ async function main(): Promise<void> {
     await import('@claude-code/app-host/runtime/bootstrap.js')
     const { enableConfigs } = await import('@claude-code/config')
     enableConfigs()
+    // Apply settings.json env vars (ANTHROPIC_BASE_URL, OTEL_*, etc.)
+    // into process.env BEFORE spawning the bg child, so the detached
+    // process inherits the same env the foreground REPL would have.
+    // Mirrors ant 5173.js: applySafeConfigEnvironmentVariables() runs
+    // before the bg dispatch.
+    const { applySafeConfigEnvironmentVariables } = await import(
+      '@claude-code/config/managedEnv.js'
+    )
+    applySafeConfigEnvironmentVariables()
     const bg = await import('../bg.js')
     const sub = args[0]
     if (sub === 'ps') return await bg.psHandler(args.slice(1))
