@@ -56,6 +56,10 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
   // better with the index visible from turn 1 than with 5-shot
   // prefetch that might miss the right file).
   tengu_moth_copse: false,
+  // Use the compact "Executing actions with care" prompt (~80 chars)
+  // instead of the long examples list. The operator already knows what
+  // counts as destructive — saves ~150 tokens per session.
+  tengu_loud_sugary_rock: true,
   tengu_coral_fern: true,
   tengu_chomp_inflection: true,
   tengu_hive_evidence: true,
