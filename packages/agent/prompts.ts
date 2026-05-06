@@ -3,7 +3,6 @@ import { type as osType, version as osVersion, release as osRelease } from 'os'
 import { env } from '@claude-code/config/env'
 import { getIsGit } from '@claude-code/storage/git.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
-import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import { getCurrentWorktreeSession } from '@claude-code/swarm'
 import { getSessionStartDate } from '@claude-code/config/commonConstants.js'
 import { getInitialSettings } from '@claude-code/config/settings'
@@ -13,8 +12,6 @@ import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTo
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
 import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCreateTool/constants.js'
-import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCreateTool/constants.js'
-import { getSwarmGuidance } from './sessionGuidance.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Command } from '@claude-code/command-runtime/types'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
@@ -23,7 +20,6 @@ import {
   getMarketingNameForModel,
 } from '@claude-code/provider/model.js'
 import { getSkillToolCommands } from '@claude-code/command-runtime/runtime'
-import { SKILL_TOOL_NAME } from '@claude-code/tool-registry/tools/SkillTool/constants.js'
 import { getOutputStyleConfig } from '@claude-code/config/outputStyles.js'
 import type {
   MCPServerConnection,
@@ -32,12 +28,6 @@ import type {
 import { GLOB_TOOL_NAME } from '@claude-code/tool-registry/tools/GlobTool/prompt.js'
 import { GREP_TOOL_NAME } from '@claude-code/tool-registry/tools/GrepTool/prompt.js'
 import { hasEmbeddedSearchTools } from '@claude-code/config/embeddedTools.js'
-import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
-import {
-  EXPLORE_AGENT,
-  EXPLORE_AGENT_MIN_QUERIES,
-} from '@claude-code/tool-registry/tools/AgentTool/built-in/exploreAgent.js'
-import { areExplorePlanAgentsEnabled } from '@claude-code/tool-registry/tools/AgentTool/builtInAgents.js'
 import {
   isScratchpadEnabled,
   getScratchpadDir,
@@ -131,6 +121,57 @@ const CLAUDE_4_5_OR_4_6_MODEL_IDS = {
 
 function getHooksSection(): string {
   return `Users may configure 'hooks', shell commands that execute in response to events like tool calls, in settings. Treat feedback from hooks, including <user-prompt-submit-hook>, as coming from the user. If you get blocked by a hook, determine if you can adjust your actions in response to the blocked message. If not, ask the user to check their hooks configuration.`
+}
+
+/**
+ * Compact harness mode — env var > feature flag. When enabled, the
+ * system prompt collapses to getHarnessSection() + CYBER_RISK + a few
+ * ccb-only bullets, dropping the full Doing tasks / Executing actions /
+ * Using your tools / System sections. Saves ~6-7k tokens per session
+ * for power users who don't need the long-form guidance every turn.
+ *
+ * Mirrors upstream v2.1.128's g$() gate (env var, then GrowthBook). The
+ * model-must-be-opus-4-7 prerequisite from upstream is dropped — ccb's
+ * single operator runs whatever model they want, the operator picks
+ * compact mode based on their familiarity with Claude Code, not model
+ * capability.
+ */
+function isCompactHarnessEnabled(): boolean {
+  const env = readEnv('CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT')
+  if (env !== undefined) {
+    return isEnvTruthy(env)
+  }
+  return getFeatureValue_CACHED_MAY_BE_STALE('tengu_vellum_lantern', false)
+}
+
+/**
+ * 6-bullet "# Harness" section that replaces the full prompt scaffold
+ * when compact mode is active. Wording mirrors upstream v2.1.128 cP3()
+ * verbatim — same machine-readable contract about how the harness
+ * operates. ccb-specific layering (CYBER_RISK, anti-avoidance bullets)
+ * is appended outside this function in the main prompt builder.
+ */
+function getHarnessSection(): string {
+  return `# Harness
+ - Text you output outside of tool use is displayed to the user as Github-flavored markdown in a terminal.
+ - Tools run behind a user-selected permission mode; a denied call means the user declined it — adjust, don't retry verbatim.
+ - \`<system-reminder>\` tags in messages and tool results are injected by the harness, not the user. Hooks may intercept tool calls; treat hook output as user feedback.
+ - If the conversation grows long, automatic context compaction will be triggered.
+ - Prefer the dedicated file/search tools over shell commands when one fits. Independent tool calls can run in parallel in one response.
+ - Reference code as \`file_path:line_number\` — it's clickable.`
+}
+
+/**
+ * Anti-avoidance bullets (ccb-flavored). When compact mode is on, these
+ * still get injected because they treat a real LLM regression mode that
+ * the upstream prompt doesn't address. See user-level CLAUDE.md for the
+ * "I'm not over-confident, you're under-confident" feedback that drove
+ * these in.
+ */
+function getAntiAvoidanceBullets(): string {
+  return `# Doing tasks
+ - IMPORTANT — never use human time-frames to reason about your own work. You operate at machine speed, thousands of times faster than a human developer; an "hour of work" for a human is not a meaningful unit for you. Do NOT estimate how long a task will take in human time, do NOT say things like "this would take more than an hour", "this is too big for one session", "this is too complex to finish here", "let's pick this up next time", or otherwise reason as if you have a finite work-day. Phasing the execution, splitting work across multiple PRs, or breaking the task into stages is fine — those are execution strategies and you can absolutely use them when they help. What is NOT fine is using "it's complex / it's a lot / it would take a while" as a reason to defer, downscope, or hand the rest back to the user. When given a large task, the default is to complete it in full: execute every step without stopping, and only pause for the user when you genuinely cannot proceed (missing information, irreversible action, contradictory requirements). If a task has 50 steps, do all 50. A 5,000-line refactor and a 5-line refactor are the same kind of work — quantity is not a reason to give up.
+ - IMPORTANT — when a task is hard, refactor-heavy, or touches many files, do NOT take the avoidance route. Avoidance looks like: proposing a smaller scope than the user asked for, declaring the "core" done while leaving the gnarly parts as TODOs, fixing the symptom instead of the root cause, wrapping a bug in a try/catch instead of finding it, adding a workaround that the user did not request, or reframing the request as "let's just do part of this for now". If the user asks for a big refactor, do the big refactor — touching every file the change requires, not only the easy ones. The right response to difficulty is to dig in deeper, read more code, and execute more thoroughly — not to shrink the task to fit a comfort zone. If you genuinely believe the scope should be reduced, surface that to the user as an explicit recommendation with reasoning, do not silently downsize.`
 }
 
 function getSystemRemindersSection(): string {
@@ -328,49 +369,19 @@ function getDiscoverSkillsGuidance(): string | null {
  */
 export function getSessionSpecificGuidanceSection(
   enabledTools: Set<string>,
-  skillToolCommands: Command[],
+  _skillToolCommands: Command[],
 ): string | null {
-  const hasAskUserQuestionTool = enabledTools.has(ASK_USER_QUESTION_TOOL_NAME)
-  const hasSkills =
-    skillToolCommands.length > 0 && enabledTools.has(SKILL_TOOL_NAME)
   const hasAgentTool = enabledTools.has(AGENT_TOOL_NAME)
-  const searchTools = hasEmbeddedSearchTools()
-    ? `\`find\` or \`grep\` via the ${BASH_TOOL_NAME} tool`
-    : `the ${GLOB_TOOL_NAME} or ${GREP_TOOL_NAME}`
 
-  const items = [
-    hasAskUserQuestionTool
-      ? `If you do not understand why the user has denied a tool call, use the ${ASK_USER_QUESTION_TOOL_NAME} to ask them.`
-      : null,
-    getIsNonInteractiveSession()
-      ? null
-      : `If you need the user to run a shell command themselves (e.g., an interactive login like \`gcloud auth login\`), suggest they type \`! <command>\` in the prompt — the \`!\` prefix runs the command in this session so its output lands directly in the conversation.`,
-    // isForkSubagentEnabled() reads getIsNonInteractiveSession() — must be
-    // post-boundary or it fragments the static prefix on session type.
-    hasAgentTool ? getAgentToolSection() : null,
-    ...(hasAgentTool &&
-    areExplorePlanAgentsEnabled() &&
-    !isForkSubagentEnabled()
-      ? [
-          `For simple, directed codebase searches (e.g. for a specific file/class/function) use ${searchTools} directly.`,
-          `For broader codebase exploration and deep research, use the ${AGENT_TOOL_NAME} tool with subagent_type=${EXPLORE_AGENT.agentType}. This is slower than using ${searchTools} directly, so use this only when a simple, directed search proves to be insufficient or when your task will clearly require more than ${EXPLORE_AGENT_MIN_QUERIES} queries.`,
-        ]
-      : []),
-    hasSkills
-      ? `/<skill-name> (e.g., /commit) is shorthand for users to invoke a user-invocable skill. When executed, the skill gets expanded to a full prompt. Use the ${SKILL_TOOL_NAME} tool to execute them. IMPORTANT: Only use ${SKILL_TOOL_NAME} for skills listed in its user-invocable skills section - do not guess or use built-in CLI commands.`
-      : null,
-    DISCOVER_SKILLS_TOOL_NAME !== null &&
-    hasSkills &&
-    enabledTools.has(DISCOVER_SKILLS_TOOL_NAME)
-      ? getDiscoverSkillsGuidance()
-      : null,
-    // Verification agent guidance removed — model can pick up the verifier
-    // from agent-list inspection alone, the contract bullet was redundant.
-    // Swarm guidance — only when TEAM_CREATE_TOOL_NAME is actually
-    // enabled in this session, so external builds without swarm tools
-    // don't pay a prompt-cache fragment for an unreachable workflow.
-    enabledTools.has(TEAM_CREATE_TOOL_NAME) ? getSwarmGuidance() : null,
-  ].filter(item => item !== null)
+  // All other turn-1 bullets the fork used to add (AskUserQuestion denial,
+  // `! <command>` shell hint, /<skill-name> shorthand, Glob/Grep vs Explore,
+  // Swarm 7-step workflow, Verification contract) are redundant: the model
+  // sees those tools in the deferred-tool surface or in the Agent tool's
+  // own subagent_type list, and each tool's own description carries its
+  // workflow guidance. Upstream v2.1.128 carries none of these bullets.
+  const items = [hasAgentTool ? getAgentToolSection() : null].filter(
+    item => item !== null,
+  )
 
   if (items.length === 0) return null
   return ['# Session-specific guidance', ...prependBullets(items)].join('\n')
@@ -395,7 +406,7 @@ function getSimpleToneAndStyleSection(): string {
   const items = [
     `Your responses should be short and concise.`,
     `Only use emojis if the user explicitly requests it. Avoid using emojis in all communication unless asked.`,
-    `When referencing code include the pattern file_path:line_number to allow easy navigation.`,
+    `When referencing specific functions or pieces of code include the pattern file_path:line_number to allow the user to easily navigate to the source code location.`,
     `When referencing GitHub issues or pull requests, use the owner/repo#123 format so they render as clickable links.`,
     `Do not use a colon before tool calls. Your tool calls may not be shown directly in the output, so text like "Let me read the file:" followed by a read tool call should just be "Let me read the file." with a period.`,
   ]
@@ -507,6 +518,28 @@ ${CYBER_RISK_INSTRUCTION}`,
 
   const resolvedDynamicSections =
     await resolveSystemPromptSections(dynamicSections)
+
+  // Compact harness mode — drop the long-form Doing tasks / Executing
+  // actions / Using your tools / System / Tone sections, keep the
+  // Intro+CYBER_RISK and the 6-bullet "# Harness" scaffolding from
+  // upstream, plus ccb-only anti-avoidance bullets. Output efficiency
+  // collapses to a one-liner. Saves ~6-7k tokens per session.
+  if (isCompactHarnessEnabled()) {
+    logForDebugging(`[SystemPrompt] path=compact-harness`)
+    return [
+      // --- Static content (cacheable) ---
+      getSimpleIntroSection(outputStyleConfig),
+      getHarnessSection(),
+      outputStyleConfig === null ||
+      outputStyleConfig.keepCodingInstructions === true
+        ? getAntiAvoidanceBullets()
+        : null,
+      // === BOUNDARY MARKER - DO NOT MOVE OR REMOVE ===
+      ...(shouldUseGlobalCacheScope() ? [SYSTEM_PROMPT_DYNAMIC_BOUNDARY] : []),
+      // --- Dynamic content (registry-managed) ---
+      ...resolvedDynamicSections,
+    ].filter(s => s !== null)
+  }
 
   return [
     // --- Static content (cacheable) ---

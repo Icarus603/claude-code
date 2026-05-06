@@ -60,6 +60,11 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
   // instead of the long examples list. The operator already knows what
   // counts as destructive — saves ~150 tokens per session.
   tengu_loud_sugary_rock: true,
+  // Compact harness mode — when on, system prompt collapses to a 6-bullet
+  // "# Harness" section + CYBER_RISK + anti-avoidance bullets, dropping
+  // the full Doing tasks / Executing actions / Using your tools sections.
+  // Default off; toggle per-run via CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT=1.
+  tengu_vellum_lantern: false,
   tengu_coral_fern: true,
   tengu_chomp_inflection: true,
   tengu_hive_evidence: true,
