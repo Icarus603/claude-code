@@ -181,3 +181,89 @@ describe('subprocessEnv — upstream proxy injection', () => {
     expect(subprocessEnv({ FOO: 'bar' }).FOO).toBe('bar')
   })
 })
+
+describe('subprocessEnv — process-control marker scrub (always)', () => {
+  // ALWAYS_SCRUB applies regardless of CLAUDE_CODE_SUBPROCESS_ENV_SCRUB.
+  // Process-control markers (CLAUDE_CODE_SESSION_KIND, CLAUDE_BG_*,
+  // CLAUDE_CODE_SESSION_NAME, CLAUDE_CODE_BG_JOB_SHORT,
+  // CLAUDE_CODE_RESUME_INTERRUPTED_TURN) must not leak from a parent
+  // ccb session into a recursive `ccb` invocation made via BashTool.
+
+  test('strips CLAUDE_CODE_SESSION_KIND even when scrub flag unset', () => {
+    expect(
+      subprocessEnv({
+        FOO: 'bar',
+        CLAUDE_CODE_SESSION_KIND: 'bg',
+      }).CLAUDE_CODE_SESSION_KIND,
+    ).toBeUndefined()
+  })
+
+  test('strips CLAUDE_BG_SOURCE/ISOLATION/BACKEND', () => {
+    const env = subprocessEnv({
+      CLAUDE_BG_SOURCE: 'cli',
+      CLAUDE_BG_ISOLATION: 'worktree',
+      CLAUDE_BG_BACKEND: 'detached',
+    })
+    expect(env.CLAUDE_BG_SOURCE).toBeUndefined()
+    expect(env.CLAUDE_BG_ISOLATION).toBeUndefined()
+    expect(env.CLAUDE_BG_BACKEND).toBeUndefined()
+  })
+
+  test('strips CLAUDE_CODE_BG_JOB_SHORT (set by handleBgFlag)', () => {
+    expect(
+      subprocessEnv({
+        CLAUDE_CODE_BG_JOB_SHORT: 'abc12345',
+      }).CLAUDE_CODE_BG_JOB_SHORT,
+    ).toBeUndefined()
+  })
+
+  test('strips CLAUDE_CODE_SESSION_NAME', () => {
+    expect(
+      subprocessEnv({
+        CLAUDE_CODE_SESSION_NAME: 'my-task',
+      }).CLAUDE_CODE_SESSION_NAME,
+    ).toBeUndefined()
+  })
+
+  test('strips CLAUDE_CODE_RESUME_INTERRUPTED_TURN', () => {
+    expect(
+      subprocessEnv({
+        CLAUDE_CODE_RESUME_INTERRUPTED_TURN: '1',
+      }).CLAUDE_CODE_RESUME_INTERRUPTED_TURN,
+    ).toBeUndefined()
+  })
+
+  test('preserves user env that is not in ALWAYS_SCRUB', () => {
+    const env = subprocessEnv({
+      PATH: '/usr/bin',
+      HOME: '/home/user',
+      USER: 'liu',
+      CLAUDE_CODE_SESSION_KIND: 'bg',
+    })
+    expect(env.PATH).toBe('/usr/bin')
+    expect(env.HOME).toBe('/home/user')
+    expect(env.USER).toBe('liu')
+  })
+
+  test('combines with GHA scrub when both apply', () => {
+    const env = subprocessEnv({
+      CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: '1',
+      CLAUDE_CODE_SESSION_KIND: 'bg',
+      ANTHROPIC_API_KEY: 'sk-secret',
+      FOO: 'preserved',
+    })
+    // Both gates strip their respective sets:
+    expect(env.CLAUDE_CODE_SESSION_KIND).toBeUndefined()
+    expect(env.ANTHROPIC_API_KEY).toBeUndefined()
+    expect(env.FOO).toBe('preserved')
+  })
+
+  test('hot path: returns baseEnv unchanged when nothing to strip', () => {
+    // No ALWAYS_SCRUB hits, no proxy, no GHA scrub — should not even
+    // construct a new merged object.
+    const baseEnv = { FOO: 'bar', PATH: '/usr/bin' }
+    const env = subprocessEnv(baseEnv)
+    expect(env.FOO).toBe('bar')
+    expect(env.PATH).toBe('/usr/bin')
+  })
+})

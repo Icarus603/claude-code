@@ -31,6 +31,26 @@ const GHA_SUBPROCESS_SCRUB = [
   'SSH_SIGNING_KEY',
 ] as const
 
+/**
+ * Process-control markers ccb sets on its own child for internal
+ * coordination (bg session kind, resume hints, etc.). These should NOT
+ * leak into nested subprocesses spawned by BashTool — if a hook script
+ * happens to invoke `ccb` recursively, the inner ccb must not be
+ * mis-tagged as a bg session or pick up a stale resume marker.
+ *
+ * Mirrors ant 2482.js iy() — always scrubbed regardless of
+ * CLAUDE_CODE_SUBPROCESS_ENV_SCRUB. Cheap (~5 deletes per spawn).
+ */
+const ALWAYS_SCRUB = [
+  'CLAUDE_CODE_SESSION_KIND',
+  'CLAUDE_BG_SOURCE',
+  'CLAUDE_BG_ISOLATION',
+  'CLAUDE_BG_BACKEND',
+  'CLAUDE_CODE_SESSION_NAME',
+  'CLAUDE_CODE_BG_JOB_SHORT',
+  'CLAUDE_CODE_RESUME_INTERRUPTED_TURN',
+] as const
+
 // Registered by init.ts after the upstreamproxy module is dynamically imported
 // in CCR sessions.
 let _getUpstreamProxyEnv: (() => Record<string, string>) | undefined
@@ -55,15 +75,27 @@ export function subprocessEnv(
   const scrubFlag = env ? env.CLAUDE_CODE_SUBPROCESS_ENV_SCRUB : readEnv('CLAUDE_CODE_SUBPROCESS_ENV_SCRUB')
   const proxyEnv = _getUpstreamProxyEnv?.() ?? {}
 
-  if (!isEnvTruthy(scrubFlag)) {
-    return Object.keys(proxyEnv).length > 0
-      ? { ...baseEnv, ...proxyEnv }
-      : (baseEnv as NodeJS.ProcessEnv)
+  // ALWAYS_SCRUB applies regardless of the GHA flag — process-control
+  // markers must not leak into nested subprocesses. Build a fresh
+  // object only if there's actually something to strip; otherwise
+  // return baseEnv unchanged for the hot path.
+  const needsAlwaysScrub = ALWAYS_SCRUB.some(k => k in baseEnv)
+  const needsProxy = Object.keys(proxyEnv).length > 0
+  const needsGhaScrub = isEnvTruthy(scrubFlag)
+
+  if (!needsAlwaysScrub && !needsProxy && !needsGhaScrub) {
+    return baseEnv as NodeJS.ProcessEnv
   }
-  const merged = { ...baseEnv, ...proxyEnv }
-  for (const k of GHA_SUBPROCESS_SCRUB) {
+
+  const merged: NodeJS.ProcessEnv = { ...baseEnv, ...proxyEnv }
+  for (const k of ALWAYS_SCRUB) {
     delete merged[k]
-    delete merged[`INPUT_${k}`]
   }
-  return merged as NodeJS.ProcessEnv
+  if (needsGhaScrub) {
+    for (const k of GHA_SUBPROCESS_SCRUB) {
+      delete merged[k]
+      delete merged[`INPUT_${k}`]
+    }
+  }
+  return merged
 }
