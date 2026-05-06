@@ -1,6 +1,6 @@
 /**
- * `--bg` / `claude bg` / `claude ps` / `claude logs` / `claude kill` /
- * `claude rm` — OS-level background sessions.
+ * `--bg` / `ccb ps` / `ccb logs` / `ccb stop` / `ccb attach` / `ccb rm`
+ * — OS-level background sessions.
  *
  * Mirrors the user-facing surface of ant v2.1.131 4649.js (NJK) — but
  * the implementation is intentionally daemon-less. ant runs a long-
@@ -43,6 +43,7 @@
  */
 
 import { spawn, type SpawnOptions } from 'node:child_process'
+import { randomBytes } from 'node:crypto'
 import {
   closeSync,
   existsSync,
@@ -55,15 +56,14 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs'
-import { splitBgArgs } from './bg/argParse.js'
-import { tailFile } from './bg/tailFile.js'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { randomBytes } from 'node:crypto'
 import {
   hasAutoModeOptIn,
   hasSkipDangerousModePermissionPrompt,
 } from '@claude-code/config/settings'
+import { splitBgArgs } from './bg/argParse.js'
+import { tailFile } from './bg/tailFile.js'
 
 interface JobMeta {
   short: string
