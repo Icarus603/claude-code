@@ -49,7 +49,13 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
     ],
   },
   tengu_passport_quail: true,
-  tengu_moth_copse: true,
+  // Skip MEMORY.md index injection in system prompt + run per-turn
+  // findRelevantMemories prefetch instead. Disabled in ccb so the
+  // memory index loads up-front (matches the "Grep your memory dir"
+  // workflow taught in the user-level memory prompt — works much
+  // better with the index visible from turn 1 than with 5-shot
+  // prefetch that might miss the right file).
+  tengu_moth_copse: false,
   tengu_coral_fern: true,
   tengu_chomp_inflection: true,
   tengu_hive_evidence: true,
