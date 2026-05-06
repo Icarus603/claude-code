@@ -2,7 +2,16 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { splitBgArgs, tailFile } from '../bg.js'
+import { resolveJobShort, splitBgArgs, tailFile } from '../bg.js'
+
+const mkJob = (short: string, status: 'running' | 'exited' = 'exited') => ({
+  short,
+  pid: 1,
+  cmd: ['x'] as const,
+  cwd: '/',
+  startedAt: 1,
+  status,
+})
 
 let workDir: string
 
@@ -180,5 +189,46 @@ describe('splitBgArgs', () => {
       flags: ['--unknown-flag'],
       directive: 'task',
     })
+  })
+})
+
+describe('resolveJobShort', () => {
+  test('empty prefix returns "none"', () => {
+    expect(resolveJobShort('', [mkJob('aaa')])).toEqual({ error: 'none' })
+  })
+
+  test('exact match wins over a prefix match', () => {
+    const exactJob = mkJob('abc')
+    const prefixJob = mkJob('abcdef')
+    const result = resolveJobShort('abc', [exactJob, prefixJob])
+    expect(result).toEqual({ job: exactJob })
+  })
+
+  test('unique prefix returns the single job', () => {
+    const job = mkJob('xyz123')
+    expect(resolveJobShort('xyz', [job])).toEqual({ job })
+  })
+
+  test('no match returns "none"', () => {
+    expect(resolveJobShort('zzz', [mkJob('aaa'), mkJob('bbb')])).toEqual({
+      error: 'none',
+    })
+  })
+
+  test('ambiguous prefix returns "ambiguous" with all matches', () => {
+    const a = mkJob('abc111')
+    const b = mkJob('abc222')
+    const result = resolveJobShort('abc', [a, b])
+    expect(result).toEqual({ error: 'ambiguous', matches: [a, b] })
+  })
+
+  test('exact match disambiguates even when prefix would match more', () => {
+    const exact = mkJob('abc')
+    const longer = mkJob('abcdef')
+    expect(resolveJobShort('abc', [exact, longer])).toEqual({ job: exact })
+  })
+
+  test('handles empty job list', () => {
+    expect(resolveJobShort('abc', [])).toEqual({ error: 'none' })
   })
 })

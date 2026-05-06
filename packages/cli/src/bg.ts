@@ -169,14 +169,55 @@ function listJobs(): JobMeta[] {
   return result
 }
 
-function findJobByPrefix(prefix: string): JobMeta | undefined {
-  if (!prefix) return undefined
-  const all = listJobs()
-  // Exact short match wins; then prefix match (allow short autocomplete).
-  return (
-    all.find(j => j.short === prefix) ??
-    all.find(j => j.short.startsWith(prefix))
+export type JobLookupResult =
+  | { job: JobMeta }
+  | { error: 'none' }
+  | { error: 'ambiguous'; matches: JobMeta[] }
+
+/**
+ * Resolve a user-typed short id (or unique prefix) to exactly one job.
+ * Ambiguous prefixes are an error — silently picking the first match
+ * lets `ccb stop a` kill the wrong job when multiple jobs share that
+ * prefix. Mirrors ant 4649.js ZC8 (which errors on >1 match).
+ *
+ * Pure helper over an explicit `jobs` list so tests don't need a
+ * filesystem fixture; production callers should pass `listJobs()`.
+ *
+ * @dynamicRequire
+ */
+export function resolveJobShort(
+  prefix: string,
+  jobs: readonly JobMeta[],
+): JobLookupResult {
+  if (!prefix) return { error: 'none' }
+  const exact = jobs.find(j => j.short === prefix)
+  if (exact) return { job: exact }
+  const prefixMatches = jobs.filter(j => j.short.startsWith(prefix))
+  if (prefixMatches.length === 0) return { error: 'none' }
+  if (prefixMatches.length === 1) return { job: prefixMatches[0]! }
+  return { error: 'ambiguous', matches: [...prefixMatches] }
+}
+
+function findJobByPrefix(prefix: string): JobLookupResult {
+  return resolveJobShort(prefix, listJobs())
+}
+
+/**
+ * Helper for handlers that need a job-or-exit path. Prints the
+ * appropriate error to stderr and exits with code 1, or returns the
+ * matched job.
+ */
+function resolveJobOrExit(short: string): JobMeta {
+  const result = findJobByPrefix(short)
+  if ('job' in result) return result.job
+  if (result.error === 'none') {
+    process.stderr.write(`No job matching "${short}".\n`)
+    process.exit(1)
+  }
+  process.stderr.write(
+    `Ambiguous prefix "${short}", matches: ${result.matches.map(j => j.short).join(', ')}\n`,
   )
+  process.exit(1)
 }
 
 function formatRelativeTime(ms: number): string {
@@ -538,11 +579,7 @@ export async function logsHandler(args: readonly string[]): Promise<void> {
     )
     process.exit(1)
   }
-  const job = findJobByPrefix(short)
-  if (!job) {
-    process.stderr.write(`No job matching "${short}".\n`)
-    process.exit(1)
-  }
+  const job = resolveJobOrExit(short)
   const stdoutPath = join(getJobDir(job.short), 'stdout.log')
   const stderrPath = join(getJobDir(job.short), 'stderr.log')
   const follow = args.includes('-f') || args.includes('--follow')
@@ -686,11 +723,7 @@ export async function stopHandler(args: readonly string[]): Promise<void> {
     process.stderr.write('Usage: ccb stop <short> [--force]\n')
     process.exit(1)
   }
-  const job = findJobByPrefix(short)
-  if (!job) {
-    process.stderr.write(`No job matching "${short}".\n`)
-    process.exit(1)
-  }
+  const job = resolveJobOrExit(short)
   stopJob(job, {
     force,
     verbLabel: force ? 'Killed' : 'Stopped',
@@ -711,11 +744,7 @@ export async function killHandler(args: readonly string[]): Promise<void> {
     process.stderr.write('Usage: ccb kill <short>   (alias of `ccb stop --force`)\n')
     process.exit(1)
   }
-  const job = findJobByPrefix(short)
-  if (!job) {
-    process.stderr.write(`No job matching "${short}".\n`)
-    process.exit(1)
-  }
+  const job = resolveJobOrExit(short)
   stopJob(job, { force: true, verbLabel: 'Killed', finalStatus: 'killed' })
 }
 
@@ -726,11 +755,7 @@ export async function rmHandler(args: readonly string[]): Promise<void> {
     process.stderr.write('Usage: ccb rm <short>\n')
     process.exit(1)
   }
-  const job = findJobByPrefix(short)
-  if (!job) {
-    process.stderr.write(`No job matching "${short}".\n`)
-    process.exit(1)
-  }
+  const job = resolveJobOrExit(short)
   if (job.status === 'running') {
     process.stderr.write(
       `Job ${job.short} is still running. Run "ccb kill ${job.short}" first.\n`,
@@ -759,11 +784,7 @@ export async function attachHandler(args: readonly string[]): Promise<void> {
     process.stderr.write('Usage: ccb attach <short>\n')
     process.exit(1)
   }
-  const job = findJobByPrefix(positional[0])
-  if (!job) {
-    process.stderr.write(`No job matching "${positional[0]}".\n`)
-    process.exit(1)
-  }
+  const job = resolveJobOrExit(positional[0]!)
   process.stderr.write(
     `attach: this build streams output read-only (no PTY supervisor yet).\n` +
       `        showing live tail; the session keeps running if you Ctrl+C here.\n`,
