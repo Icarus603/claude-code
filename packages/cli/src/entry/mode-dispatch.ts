@@ -495,8 +495,8 @@ async function getInputPrompt(
 ): Promise<string | AsyncIterable<string>> {
   if (
     !process.stdin.isTTY &&
-    // Input hijacking breaks MCP.
-    !process.argv.includes('mcp')
+    !process.argv.includes('mcp') && // hijack breaks MCP
+    process.env.CLAUDE_CODE_SESSION_KIND !== 'bg' // bg child stdio[0]='ignore'
   ) {
     if (inputFormat === 'stream-json') {
       return process.stdin
