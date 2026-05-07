@@ -20,13 +20,75 @@ import { logEvent } from '@claude-code/local-observability'
 
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import { isBgSession } from '@claude-code/agent/concurrentSessions.js'
+import type { Message } from '@claude-code/agent/messageShapes'
 import { gracefulShutdown } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
+
+/**
+ * Derive an intent + assistant-detail snippet from the parent's
+ * conversation. Mirrors ant 4650.js Hj6 — walk messages newest-first,
+ * capture the last user prompt as `intent`, the last assistant text as
+ * `detail` (compressed to a single line, capped at 120 chars). Used as
+ * a fallback when /background is invoked with no directive.
+ *
+ * Returns null when there's no user message in history yet — the
+ * caller surfaces "Nothing to background yet" matching ant Tf3:264.
+ */
+function deriveBackgroundSeed(
+  messages: ReadonlyArray<Message>,
+  fallbackIntent: string,
+): { intent: string; detail?: string } | null {
+  let intent: string | undefined = fallbackIntent || undefined
+  let detail: string | undefined
+  let sawUser = false
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i]
+    if (!m) continue
+    if (m.type === 'assistant' && detail === undefined) {
+      const content = (m as { message?: { content?: unknown } }).message?.content
+      const text = extractTextFromContent(content)
+      if (text)
+        detail = text.replace(/\s+/g, ' ').trim().slice(0, 120) || undefined
+    }
+    if (m.type === 'user' && !(m as { isMeta?: boolean }).isMeta) {
+      const userText = extractTextFromContent(
+        (m as { message?: { content?: unknown } }).message?.content,
+      )?.trim()
+      sawUser = true
+      if (!intent && userText) intent = userText
+    }
+    if (sawUser && intent && detail !== undefined) break
+  }
+  if (!sawUser) return null
+  return {
+    intent: (intent || '(backgrounded)').slice(0, 200),
+    ...(detail ? { detail } : {}),
+  }
+}
+
+function extractTextFromContent(content: unknown): string | undefined {
+  if (typeof content === 'string') return content
+  if (!Array.isArray(content)) return undefined
+  for (const block of content) {
+    if (
+      block &&
+      typeof block === 'object' &&
+      (block as { type?: unknown }).type === 'text'
+    ) {
+      const t = (block as { text?: unknown }).text
+      if (typeof t === 'string') return t
+    }
+  }
+  return undefined
+}
 
 export async function call(
   onDone: LocalJSXCommandOnDone,
-  _context: unknown,
+  rawContext: unknown,
   args: string,
 ): Promise<React.ReactNode> {
+  const context = rawContext as {
+    toolUseContext?: { messages?: ReadonlyArray<Message> }
+  }
   // Already in a bg session — ant Tf3:254 short-circuit.
   if (isBgSession()) {
     logEvent('tengu_bg_agent_action', {
@@ -38,7 +100,20 @@ export async function call(
     return null
   }
 
-  const directive = (args ?? '').trim() || 'continue'
+  // ant 4650.js Tf3:262-265 + Hj6 — derive intent + detail from
+  // parent messages when no explicit directive is given. Without a
+  // user message in history, ant short-circuits with "Nothing to
+  // background yet — send a message first."
+  const explicit = (args ?? '').trim()
+  const messages = context?.toolUseContext?.messages ?? []
+  const seed = deriveBackgroundSeed(messages, explicit)
+  if (seed === null) {
+    onDone('Nothing to background yet — send a message first.', {
+      display: 'system',
+    })
+    return null
+  }
+  const directive = seed.intent
 
   // ant 4650.js ew6 inherits parent context via --resume <session-id>
   // --fork-session. Without these flags, the bg job starts blank and
@@ -108,7 +183,7 @@ export async function call(
   logEvent('tengu_background_fork', {
     confirmed: 'true',
     inflight_count: '0',
-    had_prompt: directive !== 'continue' ? 'true' : 'false',
+    had_prompt: explicit ? 'true' : 'false',
     had_worktree: String(hadWorktree),
     worktree_handed_off: String(handedOff),
   })
