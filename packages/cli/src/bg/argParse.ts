@@ -62,7 +62,8 @@ export function splitBgArgs(args: readonly string[]): {
       a === '--background' ||
       a === '-bg' ||
       a === '--bg-pty' ||
-      a === '--bg-interactive'
+      a === '--bg-interactive' ||
+      a === '--bg-detached'
     ) {
       continue
     }

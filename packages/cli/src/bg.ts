@@ -339,8 +339,18 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
 
-  // --bg-pty: Phase C PTY-host spawn instead of detached -p.
-  if (args.includes('--bg-pty') || args.includes('--bg-interactive')) {
+  // ant v2.1.131 `--bg` defaults to PTY mode (bidirectional attach
+  // available out of the box). ccb mirrors: `--bg-pty` and
+  // `--bg-interactive` are still supported as legacy aliases; the new
+  // `--bg-detached` opt-out routes the old detached `-p` path for
+  // cases where a true headless run is preferred (e.g. CI, log-only
+  // pipelines that don't need attach).
+  const explicitDetached = args.includes('--bg-detached')
+  const explicitPty =
+    args.includes('--bg-pty') || args.includes('--bg-interactive')
+  const usePty = explicitPty || !explicitDetached
+
+  if (usePty) {
     const { spawnPtyHost } = await import('./bg/spawnPty.js')
     const short = generateShortId()
     const r = spawnPtyHost({ short, jobDir: getJobDir(short), flags: forwardedFlags, directive, cwd: process.cwd() })

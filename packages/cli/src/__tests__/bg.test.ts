@@ -170,6 +170,21 @@ describe('splitBgArgs', () => {
     })
   })
 
+  test('--bg-pty / --bg-interactive / --bg-detached are stripped (not forwarded)', () => {
+    expect(splitBgArgs(['--bg-pty', 'task'])).toEqual({
+      flags: [],
+      directive: 'task',
+    })
+    expect(splitBgArgs(['--bg-interactive', 'task'])).toEqual({
+      flags: [],
+      directive: 'task',
+    })
+    expect(splitBgArgs(['--bg-detached', 'task'])).toEqual({
+      flags: [],
+      directive: 'task',
+    })
+  })
+
   test('mixed flags and positionals — flag value not eaten as positional', () => {
     // `--model claude-haiku` consumes `claude-haiku` as the model value;
     // remaining `task` is the directive.
