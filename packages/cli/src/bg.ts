@@ -509,8 +509,20 @@ export async function logsHandler(args: readonly string[]): Promise<void> {
   }
 
   if (follow) {
-    // Simple polling tail. Bun's spawn isn't quite the right primitive
-    // here (no `tail -F` upstream); a 200ms poll keeps the
+    // pty-mode + daemon alive → subscribe to live ring stream.
+    if (job.mode === 'pty' && job.status === 'running') {
+      const { isDaemonAlive } = await import('./bg/daemonAdapter.js')
+      if (await isDaemonAlive()) {
+        const { followLogsViaDaemon } = await import('./bg/logsSubscribe.js')
+        followLogsViaDaemon({
+          short: job.short,
+          pollStatus: () => reconcileMeta(readJobMeta(job.short) ?? job).status,
+        })
+        return
+      }
+    }
+    // Simple polling tail (fallback). Bun's spawn isn't quite the right
+    // primitive here (no `tail -F` upstream); a 200ms poll keeps the
     // implementation self-contained and platform-portable.
     let stdoutPos = 0
     let stderrPos = 0

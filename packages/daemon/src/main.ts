@@ -46,7 +46,7 @@ export async function daemonMain(args: string[]): Promise<void> {
       await runSupervisor(args.slice(1))
       break
     case 'bg': {
-      // ccb daemon bg [run|status|stop]  — bg-job supervisor.
+      // ccb daemon bg [run|status|stop|install|uninstall|start|restart] — bg supervisor.
       const sub = args[1] || 'run'
       if (sub === 'run') {
         const { bgDaemonMain } = await import('./bgDaemon.js')
@@ -56,6 +56,16 @@ export async function daemonMain(args: string[]): Promise<void> {
         await bgDaemonStatus()
       } else if (sub === 'stop') {
         await bgDaemonStop()
+      } else if (
+        sub === 'install' ||
+        sub === 'uninstall' ||
+        sub === 'enable' ||
+        sub === 'disable' ||
+        sub === 'restart' ||
+        sub === 'is-stale' ||
+        sub === 'is-active'
+      ) {
+        await daemonLaunchAgentVerb(sub)
       } else {
         console.error(`Unknown daemon bg subcommand: ${sub}`)
         process.exitCode = 1
@@ -105,6 +115,43 @@ async function bgDaemonStatus(): Promise<void> {
       console.log('  (no workers)')
     }
   }
+}
+
+async function daemonLaunchAgentVerb(
+  verb: 'install' | 'uninstall' | 'enable' | 'disable' | 'restart' | 'is-stale' | 'is-active',
+): Promise<void> {
+  const { homedir } = await import('node:os')
+  const { join } = await import('node:path')
+  const la = await import('./launchAgent.js')
+  const ccbDir = join(homedir(), '.claude', 'daemon')
+  const opts = {
+    jsonPath: join(ccbDir, 'state.json'),
+    logPath: join(ccbDir, 'daemon.log'),
+  }
+  if (verb === 'is-stale') {
+    const stale = await la.isLaunchAgentStale()
+    console.log(stale ? 'stale' : 'fresh')
+    process.exitCode = stale ? 1 : 0
+    return
+  }
+  if (verb === 'is-active') {
+    const active = await la.isLaunchAgentRunning()
+    console.log(active ? 'active' : 'inactive')
+    process.exitCode = active ? 0 : 1
+    return
+  }
+  let r: { ok: boolean; error?: string; servicePath?: string }
+  if (verb === 'install') r = await la.installLaunchAgent(opts)
+  else if (verb === 'uninstall') r = await la.uninstallLaunchAgent()
+  else if (verb === 'enable') r = await la.startLaunchAgent()
+  else if (verb === 'disable') r = await la.stopLaunchAgent()
+  else r = await la.restartLaunchAgent()
+  if (!r.ok) {
+    console.error(`bg daemon ${verb}: ${r.error}`)
+    process.exitCode = 1
+    return
+  }
+  console.log(`bg daemon ${verb}: ok${r.servicePath ? ` (${r.servicePath})` : ''}`)
 }
 
 async function bgDaemonStop(): Promise<void> {

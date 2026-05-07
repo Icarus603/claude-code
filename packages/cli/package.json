@@ -22,6 +22,7 @@
     "./ssh/SSHSessionManager.js": "./src/ssh/SSHSessionManager.ts",
     "./bg/daemonAdapter.js": "./src/bg/daemonAdapter.ts",
     "./bg/resumeShortResolver.js": "./src/bg/resumeShortResolver.ts",
-    "./bg/stopJob.js": "./src/bg/stopJob.ts"
+    "./bg/stopJob.js": "./src/bg/stopJob.ts",
+    "./bg/logsSubscribe.js": "./src/bg/logsSubscribe.ts"
   }
 }
