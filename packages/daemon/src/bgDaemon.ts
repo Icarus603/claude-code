@@ -15,6 +15,7 @@ import { existsSync as existsSyncFn } from 'node:fs'
 import { logEvent as logEventFn } from '@claude-code/local-observability'
 import {
   type WorkerRecord,
+  isPidAlive as isPidAliveSync,
   readAllWorkerRecords,
   writeWorkerRecord,
 } from './bgWorkerRegistry.js'
@@ -101,6 +102,17 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       if (record.status !== 'running') continue
       if (record.mode !== 'pty') continue
       if (state.workers.has(record.short)) continue
+      // ant orphan_reap: pid is gone but meta still says 'running' →
+      // mark exited so list/stop don't show ghosts.
+      if (!isPidAliveSync(record.pid)) {
+        logEventFn('tengu_bg_orphan_reap', { short: record.short, pid: String(record.pid) })
+        try {
+          writeWorkerRecord({ ...record, status: 'exited', exitedAt: Date.now() })
+        } catch {
+          // best-effort
+        }
+        continue
+      }
       // ant 4639.js — sock_unlinked detection: ptySocket file gone means
       // the worker is unreachable for attach even if pid is alive.
       const ptySocket = record.ptySocket ?? ''

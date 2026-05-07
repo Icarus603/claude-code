@@ -15,6 +15,7 @@
 
 import { spawn } from 'node:child_process'
 import { EventEmitter } from 'node:events'
+import { existsSync } from 'node:fs'
 
 import { logEvent } from '@claude-code/local-observability'
 import {
@@ -167,6 +168,12 @@ export class WorkerVm extends EventEmitter {
     const [cmd, ...args] = this.config.cmd
     if (!cmd) {
       logEvent('tengu_bg_pty_unavailable', { short: this.config.short, reason: 'empty_cmd' })
+      this.settle('crashed')
+      return
+    }
+    // ant spawn_cwd_gone — cwd deleted between meta write and respawn.
+    if (!existsSync(this.config.cwd)) {
+      logEvent('tengu_bg_spawn_cwd_gone', { short: this.config.short, cwd: this.config.cwd })
       this.settle('crashed')
       return
     }
