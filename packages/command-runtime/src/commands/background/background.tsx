@@ -87,7 +87,10 @@ export async function call(
   args: string,
 ): Promise<React.ReactNode> {
   const context = rawContext as {
-    toolUseContext?: { messages?: ReadonlyArray<Message> }
+    toolUseContext?: {
+      messages?: ReadonlyArray<Message>
+      getAppState?: () => { tasks?: Record<string, { status?: string }> }
+    }
   }
   // Already in a bg session — ant Tf3:254 short-circuit.
   if (isBgSession()) {
@@ -104,7 +107,10 @@ export async function call(
   // parent messages when no explicit directive is given. Without a
   // user message in history, ant short-circuits with "Nothing to
   // background yet — send a message first."
-  const explicit = (args ?? '').trim()
+  const explicitRaw = (args ?? '').trim()
+  const force =
+    explicitRaw === '--force' || explicitRaw.startsWith('--force ')
+  const explicit = force ? explicitRaw.replace(/^--force\s*/, '') : explicitRaw
   const messages = context?.toolUseContext?.messages ?? []
   const seed = deriveBackgroundSeed(messages, explicit)
   if (seed === null) {
@@ -114,6 +120,34 @@ export async function call(
     return null
   }
   const directive = seed.intent
+
+  // ant 4650.js zf3 — if running tasks would be abandoned by going to
+  // bg, confirm before proceeding. zf3 shows a full Ink dialog with
+  // "Background anyway (tasks will be abandoned)" / "Stay" buttons.
+  // ccb's slash command path doesn't get to render arbitrary Ink — use
+  // a `--force` flag form instead: warn + require re-invocation. Same
+  // user-protection contract, simpler infrastructure.
+  if (!force) {
+    try {
+      const appState = context?.toolUseContext?.getAppState?.()
+      const runningCount = Object.values(appState?.tasks ?? {}).filter(
+        t => t?.status === 'running',
+      ).length
+      if (runningCount > 0) {
+        logEvent('tengu_background_declined', {
+          inflight_count: String(runningCount),
+        })
+        onDone(
+          `${runningCount} background task${runningCount === 1 ? ' is' : 's are'} running — these won't carry over and live processes will be abandoned. Re-run \`/background --force\` to background anyway, or wait for them to finish.`,
+          { display: 'system' },
+        )
+        return null
+      }
+    } catch {
+      // best-effort — if we can't read tasks state, fall through and
+      // background without the confirm step rather than blocking the user.
+    }
+  }
 
   // ant 4650.js ew6 inherits parent context via --resume <session-id>
   // --fork-session. Without these flags, the bg job starts blank and
