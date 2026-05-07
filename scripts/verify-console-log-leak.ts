@@ -95,13 +95,16 @@ async function main(): Promise<void> {
 
   const tighten = process.argv.includes('--tighten')
   if (tighten) {
+    // One-way down: never raise the baseline. See verify-as-any-ratchet.ts
+    // for rationale; meta-check in verify-tighten-monotonic.ts.
+    const next = Math.min(allEntries.length, BASELINE.count)
     const fs = await import('node:fs/promises')
     await fs.writeFile(
       BASELINE_PATH,
-      JSON.stringify({ count: allEntries.length }, null, 2) + '\n',
+      JSON.stringify({ count: next }, null, 2) + '\n',
     )
     console.log(
-      `verify-console-log-leak: tightened baseline ${BASELINE.count} → ${allEntries.length}`,
+      `verify-console-log-leak: tightened baseline ${BASELINE.count} → ${next}`,
     )
     return
   }

@@ -70,8 +70,17 @@ const tighten = args.includes('--tighten')
 const current = getKnipCounts()
 
 if (tighten) {
-  writeFileSync(BASELINE_FILE, JSON.stringify(current, null, 2) + '\n')
-  console.log(`baseline tightened: ${JSON.stringify(current)}`)
+  // One-way down: never raise the baseline. min(current, prior) per
+  // field — if a field grew past the prior baseline, blindly snapshotting
+  // current would launder the regression. See verify-file-size.ts (commit
+  // 739c83e1); meta-check in verify-tighten-monotonic.ts.
+  const prior = loadBaseline()
+  const next: Baseline = {
+    unusedFiles: Math.min(current.unusedFiles, prior.unusedFiles),
+    unusedExports: Math.min(current.unusedExports, prior.unusedExports),
+  }
+  writeFileSync(BASELINE_FILE, JSON.stringify(next, null, 2) + '\n')
+  console.log(`baseline tightened: ${JSON.stringify(next)} (was ${JSON.stringify(prior)})`)
   process.exit(0)
 }
 

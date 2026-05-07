@@ -104,13 +104,20 @@ async function main(): Promise<void> {
 
   const tighten = process.argv.includes('--tighten')
   if (tighten) {
+    // One-way down: never raise the baseline. If the current count grew
+    // past the prior baseline, blindly snapshotting current would launder
+    // the regression. Keep the lower of the two so --tighten always
+    // shrinks (or is a no-op). See verify-file-size.ts (commit 739c83e1)
+    // for the canonical shape, and verify-tighten-monotonic.ts for the
+    // meta-check that would otherwise flag this as a violation.
+    const next = Math.min(allEntries.length, BASELINE.count)
     const fs = await import('node:fs/promises')
     await fs.writeFile(
       BASELINE_PATH,
-      JSON.stringify({ count: allEntries.length }, null, 2) + '\n',
+      JSON.stringify({ count: next }, null, 2) + '\n',
     )
     console.log(
-      `verify-as-any-ratchet: tightened baseline ${BASELINE.count} → ${allEntries.length}`,
+      `verify-as-any-ratchet: tightened baseline ${BASELINE.count} → ${next}`,
     )
     return
   }

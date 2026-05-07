@@ -84,9 +84,16 @@ const lazyRequires = countLazyRequires(content)
 const unknownSlots = countUnknownSlots(content)
 
 if (tighten) {
-  const next: Baseline = { lazyRequires, unknownSlots }
+  // One-way down: never raise the baseline. min(current, prior) per
+  // field. See verify-file-size.ts (commit 739c83e1); meta-check in
+  // verify-tighten-monotonic.ts.
+  const prior = loadBaseline()
+  const next: Baseline = {
+    lazyRequires: Math.min(lazyRequires, prior.lazyRequires),
+    unknownSlots: Math.min(unknownSlots, prior.unknownSlots),
+  }
   writeFileSync(BASELINE_FILE, JSON.stringify(next, null, 2) + '\n')
-  console.log(`baseline tightened: ${JSON.stringify(next)}`)
+  console.log(`baseline tightened: ${JSON.stringify(next)} (was ${JSON.stringify(prior)})`)
   process.exit(0)
 }
 

@@ -609,6 +609,13 @@ const CHECKS: Check[] = [
     script: 'scripts/verify-event-spine.ts',
     doc: 'V7 §9.10 (AgentEvent must carry turnId + ts)',
   },
+  {
+    id: 'tighten-monotonic',
+    layer: 'Cross-Cutting',
+    subsystem: 'meta-verifier',
+    script: 'scripts/verify-tighten-monotonic.ts',
+    doc: 'meta-check: every ratchet\'s --tighten path must be one-way down. A ratchet that blindly snapshots `current` launders regressions (caught yoloClassifier 1497→1509 in commit 739c83e1, and 6 sibling verifiers post-sweep). Simulates a stricter prior baseline → runs --tighten → asserts post ≤ stricter at every leaf.',
+  },
 ]
 
 type CheckResult = {
