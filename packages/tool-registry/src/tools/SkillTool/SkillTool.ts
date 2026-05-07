@@ -597,7 +597,7 @@ export const SkillTool: Tool<InputSchema, Output, Progress> = buildTool({
 
     // Remove leading slash if present (for compatibility)
     const commandName = trimmed.startsWith('/') ? trimmed.substring(1) : trimmed
-
+    context.options.activeSkill = commandName // ant 3708.js:199
     // Remote canonical skill execution (ant-only experimental). Intercepts
     // `_canonical_<slug>` before local command lookup — loads SKILL.md from
     // AKI/GCS (with local cache), injects content directly as a user message.
