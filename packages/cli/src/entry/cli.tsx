@@ -209,6 +209,8 @@ async function main(): Promise<void> {
   // Fast-path for `claude daemon [subcommand]`: long-running supervisor.
   if (feature('DAEMON') && args[0] === 'daemon') {
     profileCheckpoint('cli_daemon_path')
+    // Install host bindings before settings/config reads (mirrors bg path).
+    await import('@claude-code/app-host/runtime/bootstrap.js')
     const { enableConfigs } = await import('@claude-code/config')
     enableConfigs()
     const { initSinks } = await import('@claude-code/local-observability/sinks.js')

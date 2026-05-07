@@ -11,6 +11,13 @@
     "./errors": "./src/errors.ts",
     "./testing": "./testing/index.ts",
     "./main.js": "./src/main.ts",
-    "./workerRegistry.js": "./src/workerRegistry.ts"
+    "./workerRegistry.js": "./src/workerRegistry.ts",
+    "./socketProto.js": "./src/socketProto.ts",
+    "./socketPaths.js": "./src/socketPaths.ts",
+    "./daemonClient.js": "./src/daemonClient.ts",
+    "./socketServer.js": "./src/socketServer.ts",
+    "./bgWorkerRegistry.js": "./src/bgWorkerRegistry.ts",
+    "./workerVm.js": "./src/workerVm.ts",
+    "./bgDaemon.js": "./src/bgDaemon.ts"
   }
 }

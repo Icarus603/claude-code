@@ -22,7 +22,7 @@
   "image-processor-napi": 1,
   "url-handler-napi": 1,
   "@claude-code/app-host": 31,
-  "@claude-code/daemon": 6,
+  "@claude-code/daemon": 13,
   "@claude-code/voice": 11,
   "@claude-code/headless-sdk": 11,
   "modifiers-napi": 1,

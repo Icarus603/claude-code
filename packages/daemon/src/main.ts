@@ -45,6 +45,23 @@ export async function daemonMain(args: string[]): Promise<void> {
     case 'start':
       await runSupervisor(args.slice(1))
       break
+    case 'bg': {
+      // ccb daemon bg [run|status|stop]  — bg-job supervisor.
+      const sub = args[1] || 'run'
+      if (sub === 'run') {
+        const { bgDaemonMain } = await import('./bgDaemon.js')
+        const code = await bgDaemonMain(args.slice(2))
+        process.exitCode = code
+      } else if (sub === 'status') {
+        await bgDaemonStatus()
+      } else if (sub === 'stop') {
+        await bgDaemonStop()
+      } else {
+        console.error(`Unknown daemon bg subcommand: ${sub}`)
+        process.exitCode = 1
+      }
+      break
+    }
     case 'status':
       console.log('daemon status: not yet implemented (requires IPC)')
       break
@@ -60,6 +77,45 @@ export async function daemonMain(args: string[]): Promise<void> {
       printHelp()
       process.exitCode = 1
   }
+}
+
+async function bgDaemonStatus(): Promise<void> {
+  const { daemonRequest } = await import('./daemonClient.js')
+  const r = await daemonRequest('ping', {}, { timeoutMs: 1000 })
+  if (!r.ok) {
+    console.log(`bg daemon: not running (${r.code})`)
+    process.exitCode = 1
+    return
+  }
+  console.log(
+    `bg daemon: running (uptime ${(r as Record<string, unknown>).uptime ?? 'unknown'}ms)`,
+  )
+  const list = await daemonRequest('list', {}, { timeoutMs: 2000 })
+  if (list.ok) {
+    const jobs = (list as Record<string, unknown>).jobs as
+      | Array<Record<string, unknown>>
+      | undefined
+    if (jobs?.length) {
+      for (const j of jobs) {
+        console.log(
+          `  ${j.short}  ${j.status}  pid=${j.pid}  attachers=${j.attachers}`,
+        )
+      }
+    } else {
+      console.log('  (no workers)')
+    }
+  }
+}
+
+async function bgDaemonStop(): Promise<void> {
+  const { daemonRequest } = await import('./daemonClient.js')
+  const r = await daemonRequest('shutdown', {}, { timeoutMs: 2000 })
+  if (!r.ok) {
+    console.log(`bg daemon: not running (${r.code})`)
+    process.exitCode = 1
+    return
+  }
+  console.log('bg daemon: shutdown signal accepted')
 }
 
 function printHelp(): void {
