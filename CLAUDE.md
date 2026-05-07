@@ -4,7 +4,7 @@ Guidance for Claude Code working in this repository.
 
 ## Project Overview
 
-**ccb** — a personal, self-hosted Claude Code CLI, originating from the Anthropic npm sourcemap leak (v2.1.88, 2026-03-31) and subsequently reorganised into a packages-based monorepo. Single-user — no public API, no public npm package.
+**ccb** — a public, solo-maintained Claude Code derivative, originating from the Anthropic npm sourcemap leak (v2.1.88, 2026-03-31) and subsequently reorganised into a packages-based monorepo. Repo is public on GitHub; binaries are distributed via GitHub Releases (`install.sh` / `install.ps1`). "Solo-maintained" means one maintainer (`Icarus603`) — not "private repo". Each install runs locally for its operator (no server-side multi-tenant), and there is no public npm package.
 
 The repo is post-V7 refactor: monolithic `src/` is gone, all code lives in `packages/*` and `packages/@ant/*` workspaces. Test count drifts week-to-week (see `bun test` output for the current number); the invariant is **0 fail**.
 
@@ -264,7 +264,7 @@ Two GH Actions pipelines, two roles:
 - **Biome config** — many lint rules disabled (decompiled code isn't strict-lint-friendly). `.tsx` files: 120-col width + required semicolons; everything else: 80-col + as-needed.
 - **No `src/` directory** — V7 refactor is complete. All code is under `packages/<pkg>/`. Inter-package imports use the `@claude-code/<pkg>` path; intra-package imports stay relative.
 - **Plugin hooks** — `loadPluginHooks()` writes to `packages/config/plugin/_deps.ts` placeholders, which `installPluginBindings.ts` wires through to `app-host` STATE. Plugin hooks and registered callbacks live in the same `STATE.registeredHooks` slot. See `docs/feature-flags.md` and `packages/agent/hooks.ts`.
-- **Personal self-hosted instance** — `CYBER_RISK_INSTRUCTION` (`packages/provider/src/cyberRiskInstruction.ts`) authorizes full security work for the operator. The repo is single-user; don't add gatekeeping for hypothetical multi-user concerns.
+- **Solo-maintained, operator-trusted** — `CYBER_RISK_INSTRUCTION` (`packages/provider/src/cyberRiskInstruction.ts`) authorizes full security work for the operator. The binary runs locally for whoever installed it; don't add gatekeeping for hypothetical multi-tenant / hosted-service concerns. The repo is public, but solo-maintained — design decisions belong to the maintainer, not imagined downstream users (see `feedback_no_imagined_users.md`).
 
 ### V9 series learnings (2026-05-04)
 
