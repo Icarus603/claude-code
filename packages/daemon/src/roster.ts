@@ -32,13 +32,7 @@
  * @dynamicRequire
  */
 
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  renameSync,
-  writeFileSync,
-} from 'node:fs'
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 
 import { logEvent } from '@claude-code/local-observability'
@@ -163,13 +157,13 @@ function validateRoster(v: unknown): Roster | null {
 }
 
 /**
- * Quarantine a corrupt roster.json — rename to .corrupt.<ts>. Best
- * effort; failures are logged but don't propagate.
+ * Quarantine a corrupt roster.json — rename to .corrupt.<ts>. ant
+ * 4139.js Ms7. Best effort; failures are logged but don't propagate.
  */
-export function quarantineCorruptRoster(): void {
+export async function quarantineCorruptRoster(): Promise<void> {
   const p = getRosterPath()
   try {
-    renameSync(p, `${p}.corrupt.${Date.now()}`)
+    await rename(p, `${p}.corrupt.${Date.now()}`)
   } catch (e) {
     logEvent('tengu_bg_roster_quarantine_failed', {
       errno: (e as NodeJS.ErrnoException).code ?? 'unknown',
@@ -178,7 +172,7 @@ export function quarantineCorruptRoster(): void {
 }
 
 /**
- * Read roster.json from disk. ant `wm`. Returns:
+ * Read roster.json from disk. ant 4139.js `wm`. Returns:
  *   - empty roster on missing file (ENOENT)
  *   - empty + parseFailed:true on JSON parse error (with quarantine)
  *   - empty + parseFailed:true on schema mismatch (with quarantine)
@@ -186,12 +180,11 @@ export function quarantineCorruptRoster(): void {
  * `silent` skips the quarantine + telemetry — used by tools that just
  * want to peek at the roster without mutating it (`ccb doctor`).
  */
-export function readRoster(opts?: { silent?: boolean }): Roster {
+export async function readRoster(opts?: { silent?: boolean }): Promise<Roster> {
   const p = getRosterPath()
-  if (!existsSync(p)) return emptyRoster()
   let raw: string
   try {
-    raw = readFileSync(p, 'utf8')
+    raw = await readFile(p, 'utf8')
   } catch (e) {
     if ((e as NodeJS.ErrnoException).code === 'ENOENT') return emptyRoster()
     if (!opts?.silent) {
@@ -200,7 +193,7 @@ export function readRoster(opts?: { silent?: boolean }): Roster {
         quarantined: '1',
         errCode: (e as NodeJS.ErrnoException).code ?? 'unknown',
       })
-      quarantineCorruptRoster()
+      await quarantineCorruptRoster()
     }
     return { ...emptyRoster(), parseFailed: true }
   }
@@ -215,7 +208,7 @@ export function readRoster(opts?: { silent?: boolean }): Roster {
         quarantined: '1',
         errCode: (e as Error).name,
       })
-      quarantineCorruptRoster()
+      await quarantineCorruptRoster()
     }
     return { ...emptyRoster(), parseFailed: true }
   }
@@ -228,7 +221,7 @@ export function readRoster(opts?: { silent?: boolean }): Roster {
       quarantined: '1',
       errCode: 'schema-mismatch',
     })
-    quarantineCorruptRoster()
+    await quarantineCorruptRoster()
   }
   return { ...emptyRoster(), parseFailed: true }
 }
@@ -252,15 +245,15 @@ function countWorkersInRawJson(raw: string): number {
 }
 
 /**
- * Atomically write roster.json. ant d_3. Creates the daemon dir with
- * mode 0700 if missing; writes file mode 0600.
+ * Atomically write roster.json. ant 4139.js d_3. Creates the daemon dir
+ * with mode 0700 if missing; writes file mode 0600.
  */
-export function writeRoster(roster: Roster): void {
+export async function writeRoster(roster: Roster): Promise<void> {
   const p = getRosterPath()
-  mkdirSync(dirname(p), { recursive: true, mode: 0o700 })
+  await mkdir(dirname(p), { recursive: true, mode: 0o700 })
   const tmp = `${p}.tmp.${process.pid}`
-  writeFileSync(tmp, JSON.stringify(roster, null, 2), { mode: 0o600 })
-  renameSync(tmp, p)
+  await writeFile(tmp, JSON.stringify(roster, null, 2), { mode: 0o600 })
+  await rename(tmp, p)
 }
 
 /**
@@ -276,12 +269,12 @@ export function updateRoster(
   mutator: (current: Roster) => Roster | undefined | void,
 ): Promise<Roster> {
   const p: Promise<Roster> = writeQueue.then(async () => {
-    const current = readRoster()
+    const current = await readRoster()
     const mutated = mutator(current) as Roster | undefined
     const next: Roster = mutated ?? current
     next.supervisorPid = process.pid
     next.updatedAt = Date.now()
-    writeRoster(next)
+    await writeRoster(next)
     return next
   })
   writeQueue = p.catch(() => {})

@@ -31,8 +31,10 @@ import { WorkerVm } from './workerVm.js'
  * see. On parseFailed roster, we skip — the file has been quarantined
  * and we'll fall through to jobs/ scan + write a fresh empty roster.
  */
-export function adoptFromRoster(workers: Map<string, WorkerVm>): void {
-  const roster = readRoster()
+export async function adoptFromRoster(
+  workers: Map<string, WorkerVm>,
+): Promise<void> {
+  const roster = await readRoster()
   if (roster.parseFailed) return
   let adopted = 0
   let dead = 0

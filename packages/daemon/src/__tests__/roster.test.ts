@@ -62,13 +62,13 @@ describe('emptyRoster', () => {
 })
 
 describe('readRoster', () => {
-  test('missing file → emptyRoster', () => {
-    const r = readRoster()
+  test('missing file → emptyRoster', async () => {
+    const r = await readRoster()
     expect(r.workers).toEqual({})
     expect(r.parseFailed).toBeUndefined()
   })
 
-  test('valid roster round-trips through readRoster', () => {
+  test('valid roster round-trips through readRoster', async () => {
     const original = emptyRoster()
     original.workers['abc12345'] = {
       pid: 1234,
@@ -77,16 +77,16 @@ describe('readRoster', () => {
       cwd: '/tmp',
       ptySock: '/tmp/foo.sock',
     }
-    writeRoster(original)
-    const loaded = readRoster()
+    await writeRoster(original)
+    const loaded = await readRoster()
     expect(loaded.workers['abc12345']?.pid).toBe(1234)
     expect(loaded.workers['abc12345']?.cwd).toBe('/tmp')
     expect(loaded.parseFailed).toBeUndefined()
   })
 
-  test('corrupt JSON quarantines + returns parseFailed', () => {
+  test('corrupt JSON quarantines + returns parseFailed', async () => {
     writeFileSync(getRosterPath(), '{not json')
-    const r = readRoster()
+    const r = await readRoster()
     expect(r.parseFailed).toBe(true)
     expect(existsSync(getRosterPath())).toBe(false)
     const corrupt = readdirSync(DAEMON_DIR).filter(f =>
@@ -95,19 +95,19 @@ describe('readRoster', () => {
     expect(corrupt.length).toBeGreaterThan(0)
   })
 
-  test('schema mismatch quarantines + returns parseFailed', () => {
+  test('schema mismatch quarantines + returns parseFailed', async () => {
     writeFileSync(
       getRosterPath(),
       JSON.stringify({ proto: 1, supervisorPid: 'not-a-number', workers: {} }),
     )
-    const r = readRoster()
+    const r = await readRoster()
     expect(r.parseFailed).toBe(true)
     expect(existsSync(getRosterPath())).toBe(false)
   })
 
-  test('silent:true skips quarantine on parse error', () => {
+  test('silent:true skips quarantine on parse error', async () => {
     writeFileSync(getRosterPath(), '{not json')
-    const r = readRoster({ silent: true })
+    const r = await readRoster({ silent: true })
     expect(r.parseFailed).toBe(true)
     expect(existsSync(getRosterPath())).toBe(true)
   })
@@ -137,7 +137,7 @@ describe('updateRoster', () => {
       updatedAt: 0,
       workers: { y: { pid: 1, startedAt: 1, attempt: 0, cwd: '/y' } },
     }))
-    const loaded = readRoster()
+    const loaded = await readRoster()
     expect(loaded.workers['y']?.pid).toBe(1)
   })
 
@@ -156,7 +156,7 @@ describe('updateRoster', () => {
       )
     }
     await Promise.all(ops)
-    const loaded = readRoster()
+    const loaded = await readRoster()
     for (let i = 0; i < 10; i++) {
       expect(loaded.workers[`w${i}`]?.pid).toBe(i)
     }

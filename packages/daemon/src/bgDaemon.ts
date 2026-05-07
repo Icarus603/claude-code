@@ -162,7 +162,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   // Two source-of-truth: (1) jobs/<short>/meta.json (always authoritative
   // for status), (2) ~/.claude/daemon/roster.json (cross-cwd index of live
   // supervisors — survives daemon restart). Adopt from both then unify.
-  adoptFromRoster(state.workers)
+  await adoptFromRoster(state.workers)
   adoptRunningPtyRecords(state.workers)
   // After boot adopt, snapshot the current workers map back to roster.json
   // so a parallel observer (ccb doctor) sees the new supervisor's view.
