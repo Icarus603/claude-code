@@ -278,6 +278,8 @@ export type GlobalConfig = {
   userID?: string
   theme: ThemeSetting
   hasCompletedOnboarding?: boolean
+  /** /powerup lesson ids the user has marked done. Undefined = never opened /powerup. */
+  powerupsUnlocked?: string[]
   // Tracks the last version that reset onboarding, used with MIN_VERSION_REQUIRING_ONBOARDING_RESET
   lastOnboardingVersion?: string
   mcpServers?: Record<string, McpServerConfig>
