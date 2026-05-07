@@ -101,7 +101,13 @@ export async function handleUrlSchemeLaunch(): Promise<number | null> {
     }
     return await handleDeepLinkUri(await url)
   } catch {
-    // NAPI module not available, or handleDeepLinkUri rejected — not a URL launch
+    // Two reasons we land here, both treated as "not a URL launch":
+    //   1. NAPI module is the ccb stub (throws "native module not
+    //      built"). ccb doesn't ship the URL-handler native binary;
+    //      this is the common path on every macOS ccb run.
+    //   2. handleDeepLinkUri rejected on a malformed URI.
+    // The fallthrough `return null` lets the host carry on with the
+    // normal REPL boot in either case.
     return null
   }
 }
