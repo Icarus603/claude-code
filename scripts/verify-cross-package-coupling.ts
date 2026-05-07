@@ -26,7 +26,7 @@ const BUDGET: Record<string, number> = {
   'cli': 22,  // +1: src/{main,entrypoints/cli,entrypoints/mcp} moved into packages/cli/src/entry/, all their imports now count as cli's deps
   'command-runtime': 20,
   'config': 14,  // +1: mcp-runtime lazy-required by plugin/_deps to fix MCP schema null bug
-  'daemon': 6, // bg classifier (agent/provider/tool-registry/local-observability) + spare claim (cli/ptyFrame)
+  'daemon': 7, // bg classifier (agent/provider/tool-registry/local-observability) + spare claim (cli/ptyFrame) + canonical isPidAlive (shell)
   'headless-sdk': 2,
   'ide': 10,
   'local-observability': 13,

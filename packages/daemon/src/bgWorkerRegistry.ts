@@ -15,6 +15,9 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 
+import { isPidAlive } from '@claude-code/shell/genericProcessUtils.js'
+export { isPidAlive }
+
 /**
  * Worker state machine. Mirrors ant RW3 transitions (4706.js:70-83):
  *
@@ -120,18 +123,10 @@ export function readAllWorkerRecords(): WorkerRecord[] {
   return out
 }
 
-/**
- * Probe whether a pid is still live. ESRCH = dead, EPERM = exists but
- * we can't signal (counts as live).
- */
-export function isPidAlive(pid: number): boolean {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch (err) {
-    return (err as NodeJS.ErrnoException).code === 'EPERM'
-  }
-}
+// (canonical impl lives in @claude-code/shell/genericProcessUtils — the
+// import + re-export at the top of this file pulls it in for both
+// internal use here AND for callers who import isPidAlive from
+// bgWorkerRegistry.)
 
 /**
  * Read /proc/<pid>/stat field 22 (starttime) on Linux. Falls back to

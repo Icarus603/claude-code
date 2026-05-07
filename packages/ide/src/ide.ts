@@ -46,14 +46,9 @@ import {
 import { sleep } from '@claude-code/config/sleep'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 
-function isProcessRunning(pid: number): boolean {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch {
-    return false
-  }
-}
+// ide previously had its own copy. Use shell's canonical probe — same
+// semantics (EPERM → false, conservative for lock-file recovery).
+import { isProcessRunning } from '@claude-code/shell/genericProcessUtils.js'
 
 // Returns a function that lazily fetches our process's ancestor PID chain,
 // caching within the closure's lifetime. Callers should scope this to a

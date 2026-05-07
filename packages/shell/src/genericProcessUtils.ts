@@ -16,6 +16,10 @@ import {
  * Note: `process.kill(pid, 0)` throws EPERM when the process exists but is
  * owned by another user. This reports such processes as NOT running, which
  * is conservative for lock recovery (we won't steal a live lock).
+ *
+ * Use `isPidAlive` instead when you need the opposite semantics — e.g. for
+ * "is this bg worker still around to receive a signal" probes where EPERM
+ * means "yes, process exists, just not ours to kill".
  */
 export function isProcessRunning(pid: number): boolean {
   if (pid <= 1) return false
@@ -24,6 +28,26 @@ export function isProcessRunning(pid: number): boolean {
     return true
   } catch {
     return false
+  }
+}
+
+/**
+ * Liveness probe — like `isProcessRunning` but treats EPERM as alive.
+ *
+ * Use this when you only care whether SOMETHING is at the pid (e.g. bg
+ * worker supervision, daemon adoption). The other-user case still
+ * counts as live because we just want to know "is the pid still
+ * holding"; we're not trying to take over a lock.
+ *
+ * PID ≤ 1 returns false (0 is current process group, 1 is init).
+ */
+export function isPidAlive(pid: number): boolean {
+  if (pid <= 1) return false
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch (e) {
+    return (e as NodeJS.ErrnoException).code === 'EPERM'
   }
 }
 

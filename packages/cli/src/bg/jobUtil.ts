@@ -3,20 +3,12 @@
  * the host file under the 800-LOC budget.
  */
 
-/**
- * `ps` aux–style probe: send signal 0 (no-op kill) and check whether
- * the kernel reports the process is running. ESRCH = dead, EPERM =
- * exists but we can't signal it (counts as running).
- */
-export function isProcessRunning(pid: number): boolean {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch (e) {
-    const err = e as NodeJS.ErrnoException
-    return err.code === 'EPERM'
-  }
-}
+// Re-export the canonical liveness probe from shell so callers don't
+// have to know which package it lives in. The bg path historically
+// named this `isProcessRunning` but its semantics match `isPidAlive`
+// (EPERM → still alive). Re-export under both names so callers don't
+// have to migrate their import sites en-masse.
+export { isPidAlive as isProcessRunning } from '@claude-code/shell/genericProcessUtils.js'
 
 /** Format ms-timestamp delta as a humane "Xs/m/h/d ago" string. */
 export function formatRelativeTime(ms: number): string {
