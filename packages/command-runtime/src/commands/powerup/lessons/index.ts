@@ -7,6 +7,7 @@ import { lesson as memory } from './memory.js'
 import { lesson as mcp } from './mcp.js'
 import { lesson as automate } from './automate.js'
 import { lesson as fork } from './fork.js'
+import { lesson as modelDial } from './model-dial.js'
 
 /**
  * All lessons in display order. Each lesson lives in its own file under
@@ -17,7 +18,7 @@ import { lesson as fork } from './fork.js'
  *
  * The final 10-lesson set is documented in
  * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3. Currently
- * 8 of 10 are implemented (steps 1–8 of the §11 plan).
+ * 9 of 10 are implemented (steps 1–9 of the §11 plan).
  */
 export const ALL_LESSONS: Lesson[] = [
   atMentions,
@@ -28,4 +29,5 @@ export const ALL_LESSONS: Lesson[] = [
   mcp,
   automate,
   fork,
+  modelDial,
 ]
