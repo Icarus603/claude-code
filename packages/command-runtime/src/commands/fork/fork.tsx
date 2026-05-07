@@ -292,6 +292,8 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
             spawnedBySkill:
               toolUseContext.options.spawnedBySkill ??
               toolUseContext.options.activeSkill,
+            // ant 4656.js:105 / 3930.js:313 — symbolic agent name.
+            name: slug,
           }),
         metadata,
         description,

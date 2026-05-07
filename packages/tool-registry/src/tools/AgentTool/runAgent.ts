@@ -269,6 +269,7 @@ export async function* runAgent({
   transcriptSubdir,
   onQueryProgress,
   spawnedBySkill,
+  name,
 }: {
   agentDefinition: AgentDefinition
   promptMessages: Message[]
@@ -302,6 +303,7 @@ export async function* runAgent({
   transcriptSubdir?: string
   onQueryProgress?: () => void
   spawnedBySkill?: string
+  name?: string
 }): AsyncGenerator<Message, void> {
   // Track subagent usage for feature discovery
 
@@ -723,6 +725,7 @@ export async function* runAgent({
     agentType: agentDefinition.agentType,
     ...(worktreePath && { worktreePath }),
     ...(description && { description }),
+    ...(name && { name }),
   }).catch(_err => logForDebugging(`Failed to write agent metadata: ${_err}`))
 
   // Track the last recorded message UUID for parent chain continuity

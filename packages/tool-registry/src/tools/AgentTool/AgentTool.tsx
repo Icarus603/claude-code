@@ -909,6 +909,7 @@ export const AgentTool = buildTool({
       worktreePath: worktreeInfo?.worktreePath,
       description,
       spawnedBySkill: toolUseContext.options.spawnedBySkill ?? toolUseContext.options.activeSkill,
+      ...(name && { name }),
     }
 
     // Helper to wrap execution with a cwd override: explicit cwd arg (KAIROS)

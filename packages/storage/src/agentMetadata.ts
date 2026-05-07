@@ -32,6 +32,10 @@ export type AgentMetadata = {
    * resumed agent's notification can show the original description instead
    * of a placeholder. Optional — older metadata files lack this field. */
   description?: string
+  /** Slug name (e.g. "find-bug") so the resumed agent can be addressed by
+   * its symbolic name. ant 4656.js:103 / 3930.js:313 register this in the
+   * sidecar; ccb fork.tsx + AgentTool.tsx populate it via runAgent({name}). */
+  name?: string
 }
 
 /**
