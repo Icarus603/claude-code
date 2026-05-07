@@ -6,7 +6,7 @@ Guidance for Claude Code working in this repository.
 
 **ccb** — a personal, self-hosted Claude Code CLI, originating from the Anthropic npm sourcemap leak (v2.1.88, 2026-03-31) and subsequently reorganised into a packages-based monorepo. Single-user — no public API, no public npm package.
 
-The repo is post-V7 refactor: monolithic `src/` is gone, all code lives in `packages/*` and `packages/@ant/*` workspaces. ~2317 unit tests + 20 smoke tests, 0 fail.
+The repo is post-V7 refactor: monolithic `src/` is gone, all code lives in `packages/*` and `packages/@ant/*` workspaces. Test count drifts week-to-week (see `bun test` output for the current number); the invariant is **0 fail**.
 
 ## Commands
 
@@ -27,10 +27,10 @@ bun run lint:fix             # biome lint --fix .
 bun run format               # biome format --write .
 
 bun run health               # one-shot: lint + tests + build + verifier subset
-bun run doctor:arch          # full architecture verifier suite (60 rules)
+bun run doctor:arch          # full architecture verifier suite (~80 rules)
 bun run check:unused         # knip — find unused exports
 
-bun run release v26.4.N      # tag + push; CI builds + publishes via release.yml
+bun run release v26.5.N      # tag + push; release.yml builds + publishes binaries
 ```
 
 ### `ccb` vs `ccbdev` vs `claude` — three CLIs, three roles
@@ -186,11 +186,11 @@ The codebase uses a **ports-and-adapters** pattern. Inner packages declare contr
 - **Layout**: tests live in `packages/<pkg>/src/**/__tests__/<name>.test.ts` (in-tree) or `tests/{integration,smoke,unit}/`.
 - **Smoke**: `bun run smoke` — runtime probe + live-fire plugin hooks (validates host bindings, hook dispatch, real binary boot).
 - **Mock pattern**: `mock.module()` + `await import()` — must be inlined per test file (cannot be hoisted to a shared helper).
-- **Current state**: ~2317 pass / 0 fail across 148 files (39 in `packages/`, 109 elsewhere — see `scripts/health-check.ts`).
+- **Current state**: 0 fail invariant — see `scripts/health-check.ts` for the file split (`packages/` vs `tests/`). Total counts drift; don't pin them in docs.
 
 ## Architecture Doctor
 
-- **Run**: `bun run doctor:arch` — 60 rules covering owner-over-shim, encapsulation, ratchets, host-binding completeness, silent-failure detection, feature-flag boundaries, file-size LOC budgets, etc.
+- **Run**: `bun run doctor:arch` — ~80 rules covering owner-over-shim, encapsulation, ratchets, host-binding completeness, silent-failure detection, feature-flag boundaries, file-size LOC budgets, model-id boundary, etc.
 - **Pre-commit hook**: `.githooks/pre-commit` runs the fast subset (~8 rules, <2s). Wired by `bun install` (the `prepare` script sets `core.hooksPath`).
 - **Pre-push hook**: full `doctor:arch` + smoke tests. See `.githooks/pre-push`.
 - **Bypass**: `PRE_COMMIT_SKIP=1 git commit ...` only when you're certain the rule mis-flags. Don't use `--no-verify`.
@@ -204,6 +204,8 @@ The codebase uses a **ports-and-adapters** pattern. Inner packages declare contr
 - **`verify-file-size`** — grandfathered LOC ratchet (`scripts/file-size-baseline.json`); new files ≤ 800 LOC.
 - **`verify-tsc-errors`** — decompilation tsc-error budget (current ~3300, ratchet down only).
 - **`verify-feature-canonical`** — `feature()` calls must come from `bun:bundle` import, not redefined.
+- **`verify-no-packed-modelid-leak`** — packed `<connId>:<modelId>` must be unpacked at user-facing boundaries (system prompt, /context, /config, error messages). Vouch tags `// modelid:bare-by-construction|already-unpacked|alias-only|debug-only` for the rare exception. History: 69f3c7c8 fixed two /config leaks but did NOT sweep — same-class leaks resurfaced in prompts.ts and analyzeContext.ts a week later (254615e2).
+- **`verify-tighten-monotonic`** — meta-verifier: every ratchet's `--tighten` is one-way down. Caught yoloClassifier 1497→1509 regression in 739c83e1; fixed 7 ratchets in one sweep.
 
 ## Versioning & Releases
 
@@ -222,14 +224,32 @@ v26.5.1   ← May 2026, counter resets
 - **Don't put identifier strings (`carus`, etc.) in version numbers** — breaks sort. Identifiers go in `--version` output / banner / README.
 - **Historical `v1.carus.NNN`** (001 ~ 009) retained as history. `v26.x.x > v1.x.x` numerically, so auto-update naturally moves users forward.
 
-**Release flow**:
+**Release flow** — strict order matters. release.ts v2 only tags ci.yml-verified SHAs:
+
 ```bash
-bun run release v26.4.14
+# 1. commit (pre-commit hook: lint + fast doctor:arch ~8 rules)
+git commit -m "..."
+
+# 2. push (pre-push hook: full doctor:arch + smoke tests)
+git push origin main
+
+# 3. wait for ci.yml on the new SHA (release.ts requires HEAD === origin/main, but
+#    won't gate on ci.yml status — be a good citizen and verify it's green first)
+gh run watch <run-id> --exit-status
+
+# 4. tag — release.ts pre-flight refuses if HEAD ≠ origin/main
+bun run release v26.5.34
 ```
-- Creates the tag at HEAD, pushes it.
-- GitHub Actions (`release.yml`) builds binaries for darwin-{arm64,x64} / linux-{arm64,x64} / win-x64, generates SHA256 sidecars, publishes to Releases.
+
+What `bun run release` does (see `scripts/release.ts`):
+- Pre-flight: clean working tree, valid CalVer tag, branch=main (`--force-branch` to override), HEAD === origin/main, no stale draft releases.
+- Warns if the previous `release.yml` run failed or is still in-progress.
+- Creates an annotated tag at HEAD, pushes it. `release.yml` then builds binaries for darwin-{arm64,x64} / linux-{arm64,x64} / win-x64, generates SHA256 sidecars, publishes to GitHub Releases.
 - `MACRO.VERSION` is derived from the tag (`scripts/defines.ts`) — no manual version bump anywhere.
-- Pre-flight in `scripts/release.ts`: clean working tree, valid tag, branch=main (override `--force-branch`).
+
+Two GH Actions pipelines, two roles:
+- **`ci.yml`** — fires on every `push` to `main`. Runs lint / build / tests / doctor:arch / smoke. Gates whether a SHA is releasable.
+- **`release.yml`** — fires on tag push (`v*.*.*`). Builds + publishes platform binaries. Doesn't re-run tests.
 
 **Auto-update**: built into the binary (`packages/updater/src/`). Polls GitHub Releases, downloads new platform binary, atomically swaps the version symlink.
 
