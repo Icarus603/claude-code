@@ -64,7 +64,7 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
   // "# Harness" section + CYBER_RISK + anti-avoidance bullets, dropping
   // the full Doing tasks / Executing actions / Using your tools sections.
   // Default off; toggle per-run via CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT=1.
-  tengu_vellum_lantern: false,
+  tengu_vellum_lantern: true,
   tengu_coral_fern: true,
   tengu_chomp_inflection: true,
   tengu_hive_evidence: true,

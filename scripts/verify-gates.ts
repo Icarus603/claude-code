@@ -61,7 +61,7 @@ const gates: GateCheck[] = [
   { name: 'Auto memory extract', gate: 'tengu_passport_quail', expected: true, category: 'P1', compileFlag: 'EXTRACT_MEMORIES' },
   { name: 'Memory skip index', gate: 'tengu_moth_copse', expected: false, category: 'P1' },
   { name: 'Compact actions prompt', gate: 'tengu_loud_sugary_rock', expected: true, category: 'P1' },
-  { name: 'Compact harness mode', gate: 'tengu_vellum_lantern', expected: false, category: 'P1' },
+  { name: 'Compact harness mode', gate: 'tengu_vellum_lantern', expected: true, category: 'P1' },
   { name: 'Memory search section', gate: 'tengu_coral_fern', expected: true, category: 'P1' },
   { name: 'Prompt suggestions', gate: 'tengu_chomp_inflection', expected: true, category: 'P1' },
   { name: 'Verification agent', gate: 'tengu_hive_evidence', expected: true, category: 'P1', compileFlag: 'VERIFICATION_AGENT' },
