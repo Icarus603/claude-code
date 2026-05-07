@@ -2768,7 +2768,7 @@ export function REPL({
       shouldQuery: boolean,
       additionalAllowedTools: string[],
       mainLoopModelParam: string,
-      effort?: EffortValue,
+      effort?: EffortValue, activeSkill?: string,
     ) => {
       // Prepare IDE integration for new prompt. Read mcpClients fresh from
       // store — useManageMCPConnections may have populated it since the
@@ -2868,12 +2868,8 @@ export function REPL({
         return;
       }
 
-      const toolUseContext = getToolUseContext(
-        messagesIncludingNewMessages,
-        newMessages,
-        abortController,
-        mainLoopModelParam,
-      );
+      const toolUseContext = getToolUseContext(messagesIncludingNewMessages, newMessages, abortController, mainLoopModelParam);
+      if (activeSkill) toolUseContext.options.activeSkill = activeSkill;
       // getToolUseContext reads tools/mcpClients fresh from store.getState()
       // (via computeTools/mergeClients). Use those rather than the closure-
       // captured `tools`/`mcpClients` — useManageMCPConnections may have
@@ -3025,7 +3021,7 @@ export function REPL({
       mainLoopModelParam: string,
       onBeforeQueryCallback?: (input: string, newMessages: MessageType[]) => Promise<boolean>,
       input?: string,
-      effort?: EffortValue,
+      effort?: EffortValue, activeSkill?: string,
     ): Promise<void> => {
       // If this is a teammate, mark them as active when starting a turn
       if (isAgentSwarmsEnabled()) {
@@ -3100,7 +3096,7 @@ export function REPL({
           shouldQuery,
           additionalAllowedTools,
           mainLoopModelParam,
-          effort,
+          effort, activeSkill,
         );
       } finally {
         // queryGuard.end() atomically checks generation and transitions

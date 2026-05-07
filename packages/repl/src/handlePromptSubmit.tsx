@@ -72,6 +72,7 @@ type BaseExecutionParams = {
     onBeforeQuery?: (input: string, newMessages: Message[]) => Promise<boolean>,
     input?: string,
     effort?: EffortValue,
+    activeSkill?: string,
   ) => Promise<void>
   setAppState: (updater: (prev: AppState) => AppState) => void
   onBeforeQuery?: (input: string, newMessages: Message[]) => Promise<boolean>
@@ -447,6 +448,7 @@ async function executeUserInput(params: ExecuteUserInputParams): Promise<void> {
     let effort: EffortValue | undefined
     let nextInput: string | undefined
     let submitNextInput: boolean | undefined
+    let activeSkill: string | undefined
 
     // Iterate all commands uniformly. First command gets attachments +
     // ideSelection + pastedContents, rest skip attachments to avoid
@@ -521,6 +523,7 @@ async function executeUserInput(params: ExecuteUserInputParams): Promise<void> {
           effort = result.effort
           nextInput = result.nextInput
           submitNextInput = result.submitNextInput
+          activeSkill = result.activeSkill
         }
       }
 
@@ -571,6 +574,7 @@ async function executeUserInput(params: ExecuteUserInputParams): Promise<void> {
           shouldCallBeforeQuery ? onBeforeQuery : undefined,
           primaryInput,
           effort,
+          activeSkill,
         )
       } else {
         // Local slash commands that skip messages (e.g., /model, /theme).

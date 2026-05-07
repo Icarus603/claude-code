@@ -1305,11 +1305,11 @@ async function getMessagesForPromptSlashCommand(
   ]
 
   return {
-    messages,
-    shouldQuery: true,
+    messages, shouldQuery: true,
     allowedTools: additionalAllowedTools,
     model: command.model,
     effort: command.effort,
     command,
+    ...(command.type === 'prompt' && { activeSkill: command.name }), // ant 5045.js:1623
   }
 }

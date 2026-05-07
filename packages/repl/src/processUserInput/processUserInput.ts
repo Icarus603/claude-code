@@ -80,6 +80,8 @@ export type ProcessUserInputBaseResult = {
   // Used by /discover to chain into the selected feature's command
   nextInput?: string
   submitNextInput?: boolean
+  /** ant 5045.js:1623 — slash-command name (no leading /) when this turn is a skill invocation. */
+  activeSkill?: string
 }
 
 export async function processUserInput({
