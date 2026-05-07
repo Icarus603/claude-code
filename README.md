@@ -30,6 +30,48 @@ irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | i
 
 No Node, no Bun, no package manager required. Auto-updates on every startup.
 
+---
+
+## Quick Start
+
+Open a terminal — on **macOS** press `⌘ Space`, type `Terminal`, hit Enter. On **Linux** press `Ctrl Alt T`. On **Windows** open **PowerShell** from the Start menu.
+
+Then run:
+
+```bash
+ccb
+```
+
+That drops you into an interactive REPL. Type any task in plain English and press `Enter`:
+
+```
+> refactor the auth module to use async/await
+> explain what this codebase does
+> write tests for src/utils/parser.ts
+```
+
+**One-shot mode** (no REPL, prints and exits):
+
+```bash
+ccb -p "what does package.json do?"
+```
+
+**Continue the last conversation:**
+
+```bash
+ccb --continue
+```
+
+**Inside the REPL:**
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Send message |
+| `Shift+Enter` | New line |
+| `Escape` | Cancel current response |
+| `/help` | Show all slash commands |
+| `Ctrl+C` | Exit |
+
 **Uninstall:**
 
 ```bash

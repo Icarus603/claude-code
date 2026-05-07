@@ -30,6 +30,48 @@ irm https://raw.githubusercontent.com/Icarus603/claude-code/main/install.ps1 | i
 
 不需要 Node、Bun 或任何套件管理器。每次啟動自動檢查更新。
 
+---
+
+## 快速上手
+
+開啟終端機 — **macOS** 按 `⌘ Space`，輸入 `Terminal`，按 Enter。**Linux** 按 `Ctrl Alt T`。**Windows** 從開始功能表開啟 **PowerShell**。
+
+接著執行：
+
+```bash
+ccb
+```
+
+這會進入互動式 REPL。用中文或英文輸入任務，按 `Enter` 送出：
+
+```
+> 把 auth 模組重構成 async/await
+> 解釋這個專案在做什麼
+> 幫 src/utils/parser.ts 寫測試
+```
+
+**一次性模式**（不進 REPL，直接輸出結果）：
+
+```bash
+ccb -p "package.json 是在做什麼？"
+```
+
+**繼續上一次的對話：**
+
+```bash
+ccb --continue
+```
+
+**REPL 內快捷鍵：**
+
+| 按鍵 | 動作 |
+|------|------|
+| `Enter` | 送出訊息 |
+| `Shift+Enter` | 換行 |
+| `Escape` | 中止目前回應 |
+| `/help` | 顯示所有指令 |
+| `Ctrl+C` | 離開 |
+
 **解除安裝：**
 
 ```bash
