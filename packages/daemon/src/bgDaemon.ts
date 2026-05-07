@@ -246,13 +246,24 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       state.workers.set(short, vm)
       const pending: PendingDispatch = { nonce, acked: false, startedAt: Date.now() }
       state.pending.set(short, pending)
-      vm.on('settled', () => {
+      vm.on('settled', (outcome: string) => {
+        // ant respawn_unconfirmed_bail: if dispatch settled before ack
+        // budget elapsed, mark failed so await-ack returns the real
+        // error instead of timing out.
+        if (!pending.acked) {
+          pending.failed = { code: 'ECRASHED', error: `worker ${short} settled before ack: ${outcome}` }
+          logEventFn('tengu_bg_respawn_unconfirmed_bail', { short, outcome, ms: String(Date.now() - pending.startedAt) })
+        }
         setTimeout(() => { state.workers.delete(short); state.pending.delete(short) }, 100).unref()
       })
       vm.spawn()
       setTimeout(() => {
-        if (pending.acked) return
-        if (state.workers.get(short) === vm) { pending.pid = vm.getRecord().pid; pending.acked = true }
+        if (pending.acked || pending.failed) return
+        if (state.workers.get(short) === vm) {
+          pending.pid = vm.getRecord().pid
+          pending.acked = true
+          logEventFn('tengu_bg_dispatch_rescued', { short, ms: String(Date.now() - pending.startedAt) })
+        }
       }, 5000).unref()
       return ok({ op: 'dispatch', short, nonce, pid: vm.getRecord().pid, via: 'socket' })
     },
@@ -284,11 +295,17 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       if (!short) return err('EBADREQ', 'respawn: missing short')
       const vm = state.workers.get(short)
       if (!vm) return err('ENOJOB', `no worker for short ${short}`)
+      const oldPid = vm.getRecord().pid
       // Force-kill old, then re-spawn with same short id.
       vm.kill('reap')
       // Wait briefly for the old to settle, then spawn fresh.
       await new Promise(r => setTimeout(r, 100))
       const oldRecord = vm.getRecord()
+      // ant respawn_stale: oldPid changed between kill schedule and now
+      // means another writer reaped + respawned in parallel.
+      if (oldRecord.pid !== oldPid) {
+        logEventFn('tengu_bg_respawn_stale', { short, expected_pid: String(oldPid), actual_pid: String(oldRecord.pid) })
+      }
       const fresh = new WorkerVm({
         short: oldRecord.short,
         cwd: oldRecord.cwd,
