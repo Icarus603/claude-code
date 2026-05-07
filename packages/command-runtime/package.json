@@ -40,6 +40,7 @@
     "./commands/powerup/lessons/undo.js": "./src/commands/powerup/lessons/undo.tsx",
     "./commands/powerup/lessons/background.js": "./src/commands/powerup/lessons/background.tsx",
     "./commands/powerup/lessons/memory.js": "./src/commands/powerup/lessons/memory.tsx",
+    "./commands/powerup/lessons/mcp.js": "./src/commands/powerup/lessons/mcp.tsx",
     "./commands/plugin/index.js": "./src/commands/plugin/index.tsx",
     "./commands/plugin/parseArgs.js": "./src/commands/plugin/parseArgs.ts",
     "./commands/install-github-app/types.js": "./src/commands/install-github-app/types.ts",
