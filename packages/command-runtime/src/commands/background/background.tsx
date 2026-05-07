@@ -54,13 +54,43 @@ export async function call(
     // best-effort — fall through to a blank session if state lookup fails.
   }
 
+  // ant 4650.js ew6:96-104 — worktree handoff. If the original REPL
+  // is running inside a swarm worktree session, propagate the worktree
+  // path so the bg child enters the same worktree (matches ant
+  // `worktree: { path, branch, hookBased, originCwd }` envelope).
+  // The bg child sees these via --add-dir + the swarm hooks restore
+  // the rest from session metadata.
+  let cwd = process.cwd()
+  let hadWorktree = false
+  let handedOff = false
+  try {
+    const { getCurrentWorktreeSession } = await import('@claude-code/swarm')
+    const wt = getCurrentWorktreeSession()
+    if (wt) {
+      hadWorktree = true
+      // ant `enteredExisting` distinction: if the user resumed into an
+      // existing worktree (creationDurationMs unset), the supervisor
+      // hands the same worktree off rather than letting the bg child
+      // re-create it.
+      handedOff = wt.creationDurationMs === undefined
+      cwd = wt.worktreePath
+      // --add-dir grants access; the worktree itself is already on
+      // disk so we don't need to re-run create_worktree machinery.
+      flags.push('--add-dir', wt.worktreePath)
+    }
+  } catch {
+    // worktree package is optional / could be feature-gated. Fall
+    // through with the original cwd — the bg job still works, just
+    // without worktree continuity.
+  }
+
   let short: string | undefined
   try {
     const { spawnBgJob } = await import('@claude-code/cli/bg.js')
     short = await spawnBgJob({
       flags,
       directive,
-      cwd: process.cwd(),
+      cwd,
     })
   } catch (e) {
     onDone(`Couldn't background — ${(e as Error).message}`, {
@@ -73,8 +103,20 @@ export async function call(
     action: 'spawn',
     source: 'background_command',
   })
+  // ant 4650.js Tf3:172 — extra telemetry mirror for the slash-command
+  // path (vs the --bg flag path). Tracks worktree handoff behavior.
+  logEvent('tengu_background_fork', {
+    confirmed: 'true',
+    inflight_count: '0',
+    had_prompt: directive !== 'continue' ? 'true' : 'false',
+    had_worktree: String(hadWorktree),
+    worktree_handed_off: String(handedOff),
+  })
 
-  onDone(`Backgrounded as ${short}. The original session is exiting.`)
+  const handoffMsg = handedOff ? ' (worktree handed off)' : ''
+  onDone(
+    `Backgrounded as ${short}${handoffMsg}. The original session is exiting.`,
+  )
   await gracefulShutdown(0, 'prompt_input_exit')
   return null
 }
