@@ -1175,18 +1175,19 @@ export async function readImageWithTokenBudget(
       logError(e)
       // Fallback: heavily compressed version from the SAME buffer
       try {
-        const sharpModule = await import('sharp')
-        const sharp =
-          (
-            sharpModule as unknown as {
-              default?: typeof sharpModule
-            } & typeof sharpModule
-          ).default || sharpModule
-
-        // sharp's exported type is the namespace; the call form
-        // `sharp(buffer)` is also valid at runtime but TS only sees
-        // the namespace. SDK-version compatibility cast.
-        const fallbackBuffer = await (sharp as any)(imageBuffer)
+        // sharp 0.34+ ships as `declare function sharp(...) & declare
+        // namespace sharp` (CJS callable + namespace). ESM interop
+        // here may yield either the function directly or the
+        // namespace with `.default` containing it. Resolve at runtime
+        // and type-narrow to the call signature.
+        type SharpFn = (
+          input?: Buffer | Uint8Array | string,
+        ) => import('sharp').Sharp
+        const sharpModule = (await import('sharp')) as unknown as {
+          default?: SharpFn
+        } & SharpFn
+        const sharp: SharpFn = sharpModule.default ?? sharpModule
+        const fallbackBuffer = await sharp(imageBuffer)
           .resize(400, 400, {
             fit: 'inside',
             withoutEnlargement: true,
