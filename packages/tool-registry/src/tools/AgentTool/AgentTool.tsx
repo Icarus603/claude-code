@@ -47,7 +47,7 @@ import {
 } from '../../tasks/RemoteAgentTask.js'
 import { assembleToolPool } from '../../runtime.js'
 import { asAgentId } from '@claude-code/agent/idTypes'
-import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
+import { getAgentContext, runWithAgentContext } from '@claude-code/agent/agentContext.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { getCwd, runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
@@ -908,6 +908,7 @@ export const AgentTool = buildTool({
       ...(isForkPath && { useExactTools: true }),
       worktreePath: worktreeInfo?.worktreePath,
       description,
+      spawnedBySkill: toolUseContext.options.spawnedBySkill ?? toolUseContext.options.activeSkill,
     }
 
     // Helper to wrap execution with a cwd override: explicit cwd arg (KAIROS)
@@ -980,9 +981,8 @@ export const AgentTool = buildTool({
       // Wrap async agent execution in agent context for analytics attribution
       const asyncAgentContext = {
         agentId: asyncAgentId,
-        // For subagents from teammates: use team lead's session
-        // For subagents from main REPL: undefined (no parent session)
         parentSessionId: getParentSessionId(),
+        parentAgentId: getAgentContext()?.agentId,
         agentType: 'subagent' as const,
         subagentName: selectedAgent.agentType,
         isBuiltIn: isBuiltInAgent(selectedAgent),
@@ -1048,9 +1048,8 @@ export const AgentTool = buildTool({
       // Set up agent context for sync execution (for analytics attribution)
       const syncAgentContext = {
         agentId: syncAgentId,
-        // For subagents from teammates: use team lead's session
-        // For subagents from main REPL: undefined (no parent session)
         parentSessionId: getParentSessionId(),
+        parentAgentId: getAgentContext()?.agentId,
         agentType: 'subagent' as const,
         subagentName: selectedAgent.agentType,
         isBuiltIn: isBuiltInAgent(selectedAgent),

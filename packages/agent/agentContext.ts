@@ -34,6 +34,11 @@ export type SubagentContext = {
   agentId: string
   /** The team lead's session ID (from CLAUDE_CODE_PARENT_SESSION_ID env var), undefined for main REPL subagents */
   parentSessionId?: string
+  /** Immediate parent agent's id, if this subagent was spawned by another
+   * subagent (nested fork chain). Undefined for top-level subagents
+   * spawned from the main REPL. Mirrors ant 4656.js mJK line 71:
+   * `parentAgentId: yP()?.agentId`. */
+  parentAgentId?: string
   /** Agent type - 'subagent' for Agent tool agents */
   agentType: 'subagent'
   /** The subagent's type name (e.g., "Explore", "Bash", "code-reviewer") */

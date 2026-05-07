@@ -178,6 +178,10 @@ export type ToolUseContext = {
     querySource?: QuerySource
     /** Optional callback to get the latest tools (e.g., after MCP servers connect mid-query) */
     refreshTools?: () => Tools
+    /** ant 4656.js:92 — skill that spawned this query (if any). */
+    spawnedBySkill?: string
+    /** Parent's currently-active skill (fallback when spawnedBySkill unset). */
+    activeSkill?: string
   }
   abortController: AbortController
   readFileState: FileStateCache

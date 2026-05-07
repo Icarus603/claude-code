@@ -580,48 +580,15 @@ export async function logsHandler(args: readonly string[]): Promise<void> {
   }
 }
 
-/**
- * Shared termination worker — owns the SIGTERM/SIGKILL escalation and
- * meta-bookkeeping. Both `stopHandler` (SIGTERM) and `killHandler`
- * (SIGKILL via the `--force` shortcut) funnel through here so the
- * exit-code accounting and "already gone" reconciliation only live in
- * one place.
- */
-function stopJob(
+/** Thin delegating wrapper to bg/stopJob.ts (extracted for LOC budget). */
+async function stopJob(
   job: JobMeta,
   opts: { force: boolean; verbLabel: string; finalStatus: 'stopped' | 'killed' },
-): void {
-  if (job.status !== 'running') {
-    process.stderr.write(
-      `Job ${job.short} is not running (status=${job.status}).\n`,
-    )
-    process.exit(0)
-  }
-  const signal: NodeJS.Signals = opts.force ? 'SIGKILL' : 'SIGTERM'
-  try {
-    // pty mode: kill the process group so both host + inner ccb die.
-    // detached mode: single pid kill is correct (no pgroup involvement).
-    if (job.mode === 'pty') {
-      try { process.kill(-job.pid, signal) } catch {
-        process.kill(job.pid, signal) // fallback if pgroup not available
-      }
-    } else {
-      process.kill(job.pid, signal)
-    }
-    writeJobMeta({ ...job, status: opts.finalStatus, killedAt: Date.now() })
-    process.stdout.write(
-      `${opts.verbLabel} ${job.short} (pid ${job.pid}, ${signal}).\n`,
-    )
-  } catch (e) {
-    const err = e as NodeJS.ErrnoException
-    if (err.code === 'ESRCH') {
-      writeJobMeta({ ...job, status: 'exited', exitedAt: Date.now() })
-      process.stdout.write(`Job ${job.short} was already exited.\n`)
-    } else {
-      process.stderr.write(`Failed to ${opts.verbLabel.toLowerCase()} ${job.short}: ${err.message}\n`)
-      process.exit(1)
-    }
-  }
+): Promise<void> {
+  const { stopJob: doStopJob } = await import('./bg/stopJob.js')
+  await doStopJob(job, opts, patch =>
+    writeJobMeta({ ...job, ...patch } as JobMeta),
+  )
 }
 
 /** @dynamicRequire */
@@ -640,7 +607,7 @@ export async function stopHandler(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
   const job = resolveJobOrExit(short)
-  stopJob(job, {
+  await stopJob(job, {
     force,
     verbLabel: force ? 'Killed' : 'Stopped',
     finalStatus: force ? 'killed' : 'stopped',
@@ -662,7 +629,7 @@ export async function killHandler(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
   const job = resolveJobOrExit(short)
-  stopJob(job, { force: true, verbLabel: 'Killed', finalStatus: 'killed' })
+  await stopJob(job, { force: true, verbLabel: 'Killed', finalStatus: 'killed' })
 }
 
 /** @dynamicRequire */
@@ -759,6 +726,21 @@ export async function respawnHandler(args: readonly string[]): Promise<void> {
 }
 
 async function respawnSingle(job: JobMeta): Promise<boolean> {
+  // pty-mode + daemon alive → daemon respawn (preserves short id).
+  if (job.mode === 'pty') {
+    const { isDaemonAlive, daemonRespawn } = await import('./bg/daemonAdapter.js')
+    if (await isDaemonAlive()) {
+      const r = await daemonRespawn(job.short)
+      if (r.ok) {
+        process.stdout.write(`respawned ${job.short} (same short id)\n`)
+        return true
+      }
+      process.stderr.write(
+        `daemon respawn failed (${r.code}); falling back to short-id-changing respawn\n`,
+      )
+    }
+  }
+
   const args = extractRespawnArgs(job.cmd)
   if (!args) {
     process.stderr.write(`${job.short}: cannot reconstruct directive\n`)

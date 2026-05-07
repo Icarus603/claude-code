@@ -213,9 +213,15 @@ export async function resumeAgentBackground({
     isAsync: true,
   }
 
+  // ant 4656.js:71 — preserve parent agent id across resume.
+  const { getAgentContext: _getCtx } = await import(
+    '@claude-code/agent/agentContext.js'
+  )
+  const parentAgentId = _getCtx()?.agentId
   const asyncAgentContext = {
     agentId,
     parentSessionId: getParentSessionId(),
+    parentAgentId,
     agentType: 'subagent' as const,
     subagentName: selectedAgent.agentType,
     isBuiltIn: isBuiltInAgent(selectedAgent),

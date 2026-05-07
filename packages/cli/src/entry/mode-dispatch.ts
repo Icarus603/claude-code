@@ -3645,7 +3645,7 @@ export async function runModeDispatch(
 
 				let messages: MessageType[] | null = null;
 				let processedResume: ProcessedResume | undefined;
-
+				const { resolveBgShortToSessionId: rB } = await import("@claude-code/cli/bg/resumeShortResolver.js"); const bg = await rB(options.resume); if (bg) options.resume = bg;
 				let maybeSessionId = validateUuid(options.resume);
 				let searchTerm: string | undefined;
 				// Store full LogOption when found by custom title (for cross-worktree resume)

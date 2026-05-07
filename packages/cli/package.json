@@ -19,6 +19,9 @@
     "./commands/mcp/xaaIdpCommand.js": "./src/commands/mcp/xaaIdpCommand.ts",
     "./commands/version.js": "./src/commands/version.ts",
     "./ssh/createSSHSession.js": "./src/ssh/createSSHSession.ts",
-    "./ssh/SSHSessionManager.js": "./src/ssh/SSHSessionManager.ts"
+    "./ssh/SSHSessionManager.js": "./src/ssh/SSHSessionManager.ts",
+    "./bg/daemonAdapter.js": "./src/bg/daemonAdapter.ts",
+    "./bg/resumeShortResolver.js": "./src/bg/resumeShortResolver.ts",
+    "./bg/stopJob.js": "./src/bg/stopJob.ts"
   }
 }

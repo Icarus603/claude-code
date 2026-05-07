@@ -22,6 +22,8 @@ import {
   createLineDecoder,
   encodeFrame,
 } from './socketProto.js'
+
+export type { Response, ProtoOp } from './socketProto.js'
 import { getControlSocketPath } from './socketPaths.js'
 
 const DEFAULT_TIMEOUT_MS = 5000

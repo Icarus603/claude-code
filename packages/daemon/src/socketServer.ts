@@ -36,7 +36,7 @@ import { getControlSocketPath } from './socketPaths.js'
 export type OpHandler = (
   msg: Record<string, unknown>,
   socket: Socket,
-) => Promise<Response | void>
+) => Promise<Response | undefined>
 
 export interface DaemonServer {
   /** Number of currently-connected clients (incl. lease holders). */

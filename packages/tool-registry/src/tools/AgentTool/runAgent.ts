@@ -3,6 +3,7 @@ import type { UUID } from 'crypto'
 import { randomUUID } from 'crypto'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { emitReplHydrationTelemetry, emitSpawnedBySkillTelemetry } from './runAgentTelemetry.js'
 import { getProjectRoot, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getCommand, getSkillToolCommands, hasCommand } from '@claude-code/command-runtime/runtime'
 import {
@@ -267,6 +268,7 @@ export async function* runAgent({
   description,
   transcriptSubdir,
   onQueryProgress,
+  spawnedBySkill,
 }: {
   agentDefinition: AgentDefinition
   promptMessages: Message[]
@@ -284,48 +286,22 @@ export async function* runAgent({
     systemPrompt?: SystemPrompt
     abortController?: AbortController
     agentId?: AgentId
+    replHydration?: import('@claude-code/agent/replHydration.js').ReplHydration
   }
   model?: ModelAlias
   maxTurns?: number
   /** Preserve toolUseResult on messages for subagents with viewable transcripts */
   preserveToolUseResults?: boolean
-  /** Precomputed tool pool for the worker agent. Computed by the caller
-   * (AgentTool.tsx) to avoid a circular dependency between runAgent and tools.ts.
-   * Always contains the full tool pool assembled with the worker's own permission
-   * mode, independent of the parent's tool restrictions. */
   availableTools: Tools
-  /** Tool permission rules to add to the agent's session allow rules.
-   * When provided, replaces ALL allow rules so the agent only has what's
-   * explicitly listed (parent approvals don't leak through). */
   allowedTools?: string[]
-  /** Optional callback invoked with CacheSafeParams after constructing the agent's
-   * system prompt, context, and tools. Used by background summarization to fork
-   * the agent's conversation for periodic progress summaries. */
   onCacheSafeParams?: (params: CacheSafeParams) => void
-  /** Replacement state reconstructed from a resumed sidechain transcript so
-   * the same tool results are re-replaced (prompt cache stability). When
-   * omitted, createSubagentContext clones the parent's state. */
   contentReplacementState?: ContentReplacementState
-  /** When true, use availableTools directly without filtering through
-   * resolveAgentTools(). Also inherits the parent's thinkingConfig and
-   * isNonInteractiveSession instead of overriding them. Used by the fork
-   * subagent path to produce byte-identical API request prefixes for
-   * prompt cache hits. */
   useExactTools?: boolean
-  /** Worktree path if the agent was spawned with isolation: "worktree".
-   * Persisted to metadata so resume can restore the correct cwd. */
   worktreePath?: string
-  /** Original task description from AgentTool input. Persisted to metadata
-   * so a resumed agent's notification can show the original description. */
   description?: string
-  /** Optional subdirectory under subagents/ to group this agent's transcript
-   * with related ones (e.g. workflows/<runId> for workflow subagents). */
   transcriptSubdir?: string
-  /** Optional callback fired on every message yielded by query() — including
-   * stream_event deltas that runAgent otherwise drops. Use to detect liveness
-   * during long single-block streams (e.g. thinking) where no assistant
-   * message is yielded for >60s. */
   onQueryProgress?: () => void
+  spawnedBySkill?: string
 }): AsyncGenerator<Message, void> {
   // Track subagent usage for feature discovery
 
@@ -351,6 +327,8 @@ export async function* runAgent({
   if (transcriptSubdir) {
     setAgentTranscriptSubdir(agentId, transcriptSubdir)
   }
+
+  if (override?.replHydration) emitReplHydrationTelemetry(override.replHydration, agentId, agentDefinition.agentType)
 
   // Register agent in Perfetto trace for hierarchy visualization
   if (isPerfettoTracingEnabled()) {
@@ -694,7 +672,11 @@ export async function* runAgent({
     // reads undefined and only the message-scan fallback fires — which
     // autocompact defeats by replacing the fork-boilerplate message.
     ...(useExactTools && { querySource }),
+    ...(spawnedBySkill !== undefined && { spawnedBySkill }),
+    activeSkill: toolUseContext.options.activeSkill,
   }
+
+  if (spawnedBySkill !== undefined) emitSpawnedBySkillTelemetry(spawnedBySkill, agentDefinition.agentType, isBuiltInAgent(agentDefinition))
 
   // Create subagent context using shared helper
   // - Sync agents share setAppState, setResponseLength, abortController with parent

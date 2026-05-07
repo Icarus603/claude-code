@@ -34,7 +34,7 @@ const RING_BUFFER_BYTES = 1024 * 1024
 
 /** Minimal sink interface; subscribers can be sockets or in-test stubs. */
 export interface AttacherSink {
-  write(chunk: Buffer | string): boolean | void
+  write(chunk: Buffer | string): boolean | undefined
   end?(): void
 }
 
@@ -68,7 +68,6 @@ export class WorkerVm extends EventEmitter {
   private attempt = 0
   private backoffTimer: NodeJS.Timeout | null = null
   private heartbeatTimer: NodeJS.Timeout | null = null
-  private lastHeartbeat = Date.now()
   private settled: SettleOutcome | null = null
 
   constructor(config: WorkerSpawnConfig, initialRecord?: WorkerRecord) {
@@ -189,7 +188,6 @@ export class WorkerVm extends EventEmitter {
     }
     writeWorkerRecord(this.record)
     this.phase = { kind: 'running' }
-    this.lastHeartbeat = Date.now()
     this.startHeartbeatPoll()
     this.emit('spawned', child.pid)
   }
@@ -205,7 +203,6 @@ export class WorkerVm extends EventEmitter {
       return
     }
     this.phase = { kind: 'running' }
-    this.lastHeartbeat = Date.now()
     this.startHeartbeatPoll()
   }
 
@@ -227,7 +224,8 @@ export class WorkerVm extends EventEmitter {
 
   /** Tag for incoming heartbeat from the worker (resets stall timer). */
   noteHeartbeat(): void {
-    this.lastHeartbeat = Date.now()
+    // Currently a no-op until ring-streaming wiring lands. Caller is
+    // worker → daemon RPC; reserved for that path in #17.
   }
 
   /**

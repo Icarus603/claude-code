@@ -227,9 +227,13 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
     return { ...prev, agentNameRegistry: next }
   })
 
+  // ant 4656.js:71 — capture parent agent id (nested-fork chain).
+  const { getAgentContext } = await import('@claude-code/agent/agentContext.js')
+  const parentAgentId = getAgentContext()?.agentId
   const asyncAgentContext = {
     agentId,
     parentSessionId: getParentSessionId(),
+    parentAgentId,
     agentType: 'subagent' as const,
     subagentName: FORK_AGENT.agentType,
     isBuiltIn: true,
@@ -245,6 +249,13 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
     agentType: FORK_AGENT.agentType,
     isAsync: true,
   }
+
+  // ant 4656.js mJK lines 29-37 — pre-compute replHydration log so
+  // it's available synchronously when runAgent is invoked.
+  const { reconstructLog } = await import(
+    '@claude-code/agent/replHydration.js'
+  )
+  const forkReplLog = reconstructLog(toolUseContext.messages as MessageType[])
 
   // Fire-and-forget. runWithAgentContext threads the analytics context,
   // runWithCwdOverride preserves cwd if the parent had one. Errors during
@@ -268,11 +279,19 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
               systemPrompt: forkParentSystemPrompt,
               agentId: asAgentId(agentBackgroundTask.agentId),
               abortController: agentBackgroundTask.abortController!,
+              replHydration: {
+                kind: 'fork' as const,
+                log: forkReplLog,
+              },
             },
             availableTools: toolUseContext.options.tools,
             useExactTools: true,
             onCacheSafeParams,
             description,
+            // ant 4656.js:92 — propagate skill attribution.
+            spawnedBySkill:
+              toolUseContext.options.spawnedBySkill ??
+              toolUseContext.options.activeSkill,
           }),
         metadata,
         description,
