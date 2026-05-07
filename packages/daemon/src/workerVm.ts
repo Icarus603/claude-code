@@ -209,6 +209,7 @@ export class WorkerVm extends EventEmitter {
     writeWorkerRecord(this.record)
     this.phase = { kind: 'running' }
     this.startHeartbeatPoll()
+    this.startHeartbeatStream()
     logEvent('tengu_bg_worker_spawn', {
       short: this.config.short,
       pid: String(child.pid),
@@ -229,6 +230,7 @@ export class WorkerVm extends EventEmitter {
     }
     this.phase = { kind: 'running' }
     this.startHeartbeatPoll()
+    this.startHeartbeatStream()
   }
 
   /**
@@ -264,10 +266,51 @@ export class WorkerVm extends EventEmitter {
     this.heartbeatTimer.unref()
   }
 
-  /** Tag for incoming heartbeat from the worker (resets stall timer). */
+  /**
+   * Tag for incoming heartbeat ctrl-frame from ptyHost. Updates
+   * lastActivityAt + resets stalledFiredAt so the stall watchdog
+   * (STALLED_THRESHOLD_MS) treats the worker as live regardless of
+   * ring write activity. Wired via ptyHost broadcast every 5s — see
+   * adoptHeartbeatStream() below.
+   */
   noteHeartbeat(): void {
-    // Currently a no-op until ring-streaming wiring lands. Caller is
-    // worker → daemon RPC; reserved for that path in #17.
+    this.lastActivityAt = Date.now()
+    this.stalledFiredAt = 0
+  }
+
+  /**
+   * Open a daemon-side ptyAdopter against this worker's own PTY socket
+   * + subscribe to heartbeat ctrl-frames. Called by adopt() and
+   * post-spawn so the daemon listens on the worker's PTY for liveness
+   * signals separately from the ring buffer.
+   */
+  private heartbeatAdopterDispose: (() => void) | null = null
+  private startHeartbeatStream(): void {
+    if (this.heartbeatAdopterDispose) return
+    if (!this.config.ptySocket) return
+    void (async () => {
+      try {
+        const { createPtyAdopter } = await import('@claude-code/cli/bg/ptyAdopter.js')
+        const adopter = createPtyAdopter(this.config.ptySocket)
+        const sub = adopter.onHeartbeat(() => this.noteHeartbeat())
+        // Also note PTY data writes — they're proof of life too.
+        const dataSub = adopter.onData(() => this.noteHeartbeat())
+        this.heartbeatAdopterDispose = () => {
+          sub.dispose()
+          dataSub.dispose()
+          adopter.dispose()
+        }
+      } catch {
+        // best-effort — if PTY socket isn't bindable yet, the periodic
+        // pidAlive poll still catches stalls via fallback path.
+      }
+    })()
+  }
+  private stopHeartbeatStream(): void {
+    if (this.heartbeatAdopterDispose) {
+      this.heartbeatAdopterDispose()
+      this.heartbeatAdopterDispose = null
+    }
   }
 
   /**
@@ -389,6 +432,7 @@ export class WorkerVm extends EventEmitter {
     }
     this.settled = outcome
     this.phase = { kind: 'retired', outcome }
+    this.stopHeartbeatStream()
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer)
       this.heartbeatTimer = null

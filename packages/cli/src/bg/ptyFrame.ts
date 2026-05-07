@@ -43,6 +43,7 @@ export type CtrlFrame =
   | { t: 'kill'; sig: 'SIGKILL' | 'SIGTERM' }
   | { t: 'claim'; intent: string; cwd?: string; sessionId?: string }
   | { t: 'reply'; text: string }
+  | { t: 'heartbeat'; ts: number; state?: string }
 
 export type DecodedFrame =
   | { kind: typeof DATA_TAG; payload: Buffer }

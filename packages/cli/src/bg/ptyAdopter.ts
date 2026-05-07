@@ -56,6 +56,8 @@ export interface PtyAdopter {
   onExit(
     cb: (info: { exitCode: number; signal?: string }) => void,
   ): { dispose: () => void }
+  /** Subscribe to host heartbeat ctrl-frames (every 5s while alive). */
+  onHeartbeat(cb: (info: { ts: number; state?: string }) => void): { dispose: () => void }
 }
 
 interface AdopterEvent<T> {
@@ -84,6 +86,7 @@ function makeEvent<T>(): AdopterEvent<T> {
 export function createPtyAdopter(socketPath: string): PtyAdopter {
   const onDataEvent = makeEvent<Buffer>()
   const onExitEvent = makeEvent<{ exitCode: number; signal?: string }>()
+  const onHeartbeatEvent = makeEvent<{ ts: number; state?: string }>()
 
   let socket: Socket | undefined
   let pendingFrames: Buffer[] = []
@@ -174,6 +177,8 @@ export function createPtyAdopter(socketPath: string): PtyAdopter {
         // No-op; live just signals that ring buffer replay is done.
       } else if (c.t === 'exit') {
         notifyExit(c.code, c.signal)
+      } else if (c.t === 'heartbeat') {
+        onHeartbeatEvent.emit({ ts: c.ts, state: c.state })
       }
     }
   }
@@ -288,6 +293,10 @@ export function createPtyAdopter(socketPath: string): PtyAdopter {
     },
     onExit(cb): { dispose: () => void } {
       const off = onExitEvent.subscribe(cb)
+      return { dispose: off }
+    },
+    onHeartbeat(cb): { dispose: () => void } {
+      const off = onHeartbeatEvent.subscribe(cb)
       return { dispose: off }
     },
   }

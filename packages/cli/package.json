@@ -25,6 +25,7 @@
     "./bg/stopJob.js": "./src/bg/stopJob.ts",
     "./bg/logsSubscribe.js": "./src/bg/logsSubscribe.ts",
     "./bg/ptyFrame.js": "./src/bg/ptyFrame.ts",
-    "./bg/spawnPty.js": "./src/bg/spawnPty.ts"
+    "./bg/spawnPty.js": "./src/bg/spawnPty.ts",
+    "./bg/ptyAdopter.js": "./src/bg/ptyAdopter.ts"
   }
 }

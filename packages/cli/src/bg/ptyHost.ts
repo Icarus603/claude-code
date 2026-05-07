@@ -296,6 +296,18 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
   server.listen(sock)
   server.unref()
 
+  // ant heartbeat — broadcast a 'heartbeat' ctrl-frame every 5s while
+  // child is alive. Daemon-side adopter routes this to WorkerVm.noteHeartbeat
+  // so the stalled-watchdog (STALLED_THRESHOLD_MS) doesn't false-positive
+  // on long-running but legitimate workers (e.g. waiting for big test
+  // suite output where ring is silent).
+  const heartbeatTimer = setInterval(() => {
+    if (exited) return
+    if (clients.size === 0) return // no listeners
+    broadcast(encodeCtrlFrame({ t: 'heartbeat', ts: Date.now() }))
+  }, 5000)
+  heartbeatTimer.unref()
+
   // Forward signals from the wrapping shell to the child.
   for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP'] as const) {
     process.on(sig, () => {
@@ -311,6 +323,7 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
   exitCode = await child.exited
   exitSignal = child.signalCode ?? undefined
   exited = true
+  clearInterval(heartbeatTimer)
   terminal.close()
   broadcast(
     encodeCtrlFrame({ t: 'exit', code: exitCode, signal: exitSignal }),
