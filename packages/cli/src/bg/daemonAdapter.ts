@@ -240,8 +240,18 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
     'No background daemon is running.\nInstalling it as a service keeps the daemon up across reboot so background sessions stay available.\n',
   )
   logEvent('tengu_bg_daemon_cold_start_ask', {})
+  // ant 5170 also emits the un-prefixed cold_start_prompt for the
+  // daemon-namespace telemetry. Same payload, different sink.
+  logEvent('tengu_daemon_cold_start_prompt', {})
   const answer = await promptYesNoOnceNever('Install as a service now? [y/N/never, or "once" just for now] ')
   logEvent('tengu_bg_daemon_cold_start_ask_answer', {
+    answer_yes: String(answer === 'yes'),
+    answer_once: String(answer === 'once'),
+    answer_never: String(answer === 'never'),
+  })
+  // ant tengu_daemon_install_prompt_answer — daemon-namespace mirror
+  // of the bg cold-start answer telemetry.
+  logEvent('tengu_daemon_install_prompt_answer', {
     answer_yes: String(answer === 'yes'),
     answer_once: String(answer === 'once'),
     answer_never: String(answer === 'never'),

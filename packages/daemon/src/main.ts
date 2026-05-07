@@ -1,6 +1,7 @@
 import { spawn, type ChildProcess } from 'child_process'
 import { resolve } from 'path'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
+import { logEvent } from '@claude-code/local-observability'
 
 /**
  * Exit code used by workers for permanent (non-retryable) failures.
@@ -43,14 +44,33 @@ export async function daemonMain(args: string[]): Promise<void> {
 
   switch (subcommand) {
     case 'start':
-      await runSupervisor(args.slice(1))
+      try {
+        await runSupervisor(args.slice(1))
+      } catch (e) {
+        // ant 5170 — startup_crash: supervisor failed to bring itself
+        // online. Report so admins notice; rethrow to preserve exit
+        // code semantics.
+        logEvent('tengu_daemon_startup_crash', {
+          error: errorMessage(e).slice(0, 200),
+        })
+        throw e
+      }
       break
     case 'bg': {
       // ccb daemon bg [run|status|stop|install|uninstall|start|restart] — bg supervisor.
       const sub = args[1] || 'run'
       if (sub === 'run') {
         const { bgDaemonMain } = await import('./bgDaemon.js')
-        const code = await bgDaemonMain(args.slice(2))
+        let code = 1
+        try {
+          code = await bgDaemonMain(args.slice(2))
+        } catch (e) {
+          logEvent('tengu_daemon_startup_crash', {
+            error: errorMessage(e).slice(0, 200),
+            sub: 'bg',
+          })
+          throw e
+        }
         process.exitCode = code
       } else if (sub === 'status' || sub === 'list') {
         await bgDaemonStatus(args.includes('--json'))
@@ -406,12 +426,29 @@ function spawnWorker(
     }
 
     if (code === EXIT_CODE_PERMANENT) {
+      // ant 5170 — permanent_exit: worker signaled it should never be
+      // respawned (e.g. unrecoverable config error). Park, don't retry.
+      logEvent('tengu_daemon_worker_permanent_exit', {
+        worker_kind: worker.kind,
+        exit_code: String(code),
+        signal: sig ? String(sig) : '',
+      })
       console.error(
         `[daemon] worker '${worker.kind}' exited with permanent error — parking`,
       )
       worker.parked = true
       return
     }
+
+    // ant 5170 — worker_crash: every non-zero non-permanent exit fires
+    // this. Includes the streak so consumers see the crash-loop trend.
+    logEvent('tengu_daemon_worker_crash', {
+      worker_kind: worker.kind,
+      exit_code: String(code ?? -1),
+      signal: sig ? String(sig) : '',
+      streak: String(worker.failureCount + 1),
+      uptime_ms: String(Date.now() - worker.lastStartTime),
+    })
 
     // Check for rapid failure (crashed within 10s of starting)
     const runDuration = Date.now() - worker.lastStartTime

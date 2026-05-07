@@ -718,6 +718,14 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   const onSignal = (): void => state.abort.abort()
   process.on('SIGINT', onSignal)
   process.on('SIGTERM', onSignal)
+  // ant 5170 — SIGHUP triggers config reload. ccb has no daemon.json
+  // today, so we fire the telemetry + log a notice so users can hook
+  // the signal for their own purposes (and so the event namespace
+  // matches ant for any tooling that watches the wire).
+  const onSighup = (): void => {
+    logEventFn('tengu_daemon_config_reload', { source: 'SIGHUP' })
+  }
+  process.on('SIGHUP', onSighup)
 
   await new Promise<void>(resolve => {
     if (state.abort.signal.aborted) {
@@ -731,6 +739,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
 
   process.off('SIGINT', onSignal)
   process.off('SIGTERM', onSignal)
+  process.off('SIGHUP', onSighup)
   // Dispose idle-exit + upgrade watchdog timers so they don't keep
   // the event loop alive after abort.
   clearInterval(idleProbeTimer)
