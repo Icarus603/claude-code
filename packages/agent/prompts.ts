@@ -19,6 +19,7 @@ import {
   getCanonicalName,
   getMarketingNameForModel,
 } from '@claude-code/provider/model.js'
+import { unpackModelId } from '@claude-code/provider/connections.js'
 import { getSkillToolCommands } from '@claude-code/command-runtime/runtime'
 import { getOutputStyleConfig } from '@claude-code/config/outputStyles.js'
 import type {
@@ -653,6 +654,8 @@ export async function computeEnvInfo(
   additionalWorkingDirectories?: string[],
 ): Promise<string> {
   const [isGit, unameSR] = await Promise.all([getIsGit(), getUnameSR()])
+  // Strip `<connId>:` — internal-only routing prefix, never user-visible.
+  modelId = unpackModelId(modelId).modelId
 
   // Undercover: keep ALL model names/IDs out of the system prompt so nothing
   // internal can leak into public commits/PRs. This includes the public
@@ -698,6 +701,8 @@ export async function computeSimpleEnvInfo(
   additionalWorkingDirectories?: string[],
 ): Promise<string> {
   const [isGit, unameSR] = await Promise.all([getIsGit(), getUnameSR()])
+  // Strip `<connId>:` — see computeEnvInfo.
+  modelId = unpackModelId(modelId).modelId
 
   // Undercover: strip all model name/ID references. See computeEnvInfo.
   // DCE: inline the USER_TYPE check at each site — do NOT hoist to a const.

@@ -226,6 +226,7 @@ async function dumpErrorPrompts(
   try {
     const path = getAutoModeClassifierErrorDumpPath()
     await mkdir(dirname(path), { recursive: true })
+    // modelid:debug-only — local error-dump file, not shown to user
     const content =
       `=== ERROR ===\n${errorMessage(error)}\n\n` +
       `=== CONTEXT COMPARISON ===\n` +

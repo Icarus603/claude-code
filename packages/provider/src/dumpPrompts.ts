@@ -85,6 +85,9 @@ function initFingerprint(req: Record<string, unknown>): string {
           )
         : 0
   const toolNames = tools?.map(t => t.name ?? '').join(',') ?? ''
+  // modelid:debug-only
+  // Fingerprint key for the prompt-dump dedup; ant-only debug aid. Packed
+  // form is fine — it's never displayed to a user.
   return `${req.model}|${toolNames}|${sysLen}`
 }
 

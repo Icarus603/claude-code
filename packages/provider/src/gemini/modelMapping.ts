@@ -1,5 +1,6 @@
 import { ConfigurationError } from '../errors.js'
 import { readEnv } from '@claude-code/config/env'
+import { unpackModelId } from '../connections.js'
 
 function getModelFamily(model: string): 'haiku' | 'sonnet' | 'opus' | null {
   if (/haiku/i.test(model)) return 'haiku'
@@ -13,7 +14,12 @@ export function resolveGeminiModel(anthropicModel: string): string {
     return readEnv('GEMINI_MODEL')
   }
 
-  const cleanModel = anthropicModel.replace(/\[1m\]$/i, '')
+  // Strip the connection-routing prefix before any further mapping. The
+  // packed `<connId>:<modelId>` form is ccb-internal; the Gemini API URL
+  // can't carry that prefix or it 404s. Same boundary the Anthropic adapter
+  // uses (claudeLegacyRuntime.ts:1070).
+  const bareModel = unpackModelId(anthropicModel).modelId
+  const cleanModel = bareModel.replace(/\[1m\]$/i, '')
   const family = getModelFamily(cleanModel)
 
   if (!family) {

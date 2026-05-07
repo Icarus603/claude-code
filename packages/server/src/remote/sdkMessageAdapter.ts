@@ -18,6 +18,7 @@ import type {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { fromSDKCompactMetadata } from '@claude-code/agent/messagesMappers.js'
 import { createUserMessage } from '@claude-code/agent/messages.js'
+import { unpackModelId } from '@claude-code/provider/connections.js'
 
 /**
  * Converts SDKMessage from CCR to REPL Message types.
@@ -73,10 +74,13 @@ function convertResultMessage(msg: SDKResultMessage): SystemMessage {
  * Convert an SDKSystemMessage (init) to a SystemMessage
  */
 function convertInitMessage(msg: SDKSystemMessage): SystemMessage {
+  // Strip the connection-routing prefix — this string is shown verbatim
+  // in the REPL system message panel; user shouldn't see ccb internals.
+  const bareModel = unpackModelId(msg.model).modelId
   return {
     type: 'system',
     subtype: 'informational',
-    content: `Remote session initialized (model: ${msg.model})`,
+    content: `Remote session initialized (model: ${bareModel})`,
     level: 'info',
     uuid: msg.uuid,
     timestamp: new Date().toISOString(),

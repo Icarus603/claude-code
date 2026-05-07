@@ -330,6 +330,13 @@ const CHECKS: Check[] = [
     doc: 'Raw console.log/warn/error/debug/info calls bypass structured logging (logForDebugging, logError) and pollute SDK consumer stdout streams (--output-format=stream-json). streamJsonStdoutGuard exists ONLY because raw console.log slips through. Baseline locked; new occurrences require --tighten with a justified UX/setup reason — otherwise use logForDebugging or process.stdout/stderr.write directly.',
   },
   {
+    id: 'packed-modelid-leak',
+    layer: 'Cross-Cutting',
+    subsystem: 'model id boundary discipline',
+    script: 'scripts/verify-no-packed-modelid-leak.ts',
+    doc: 'ccb internally keys on packed `<connId>:<modelId>` (composeModelId / inflateModelSetting); user-facing surfaces (system prompt, /context, /config, error messages) must call unpackModelId / renderModelSetting at the boundary. History: 69f3c7c8 fixed two /config leaks but did NOT sweep — same-class leaks resurfaced in prompts.ts (the system prompt said `The exact model ID is conn_xxx:claude-opus-4-7`) and analyzeContext.ts (/context UI showed `conn_xxx:`). Exact-match (not a ratchet) — every production interpolation of a model variable in a file that does not import an unpack helper is a real bug. Escape via `// modelid:bare-by-construction` (or sibling vouch tags) for the rare case of an alias-only value.',
+  },
+  {
     id: 'stale-todo-comments',
     layer: 'Cross-Cutting',
     subsystem: 'TODO debt accumulation',

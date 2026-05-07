@@ -257,6 +257,10 @@ export function applyBedrockRegionPrefix(
   }
 
   // Check if it's a foundation model (anthropic.*) and add the prefix
+  // modelid:bare-by-construction
+  // Bedrock model ids are foundation-model arns ("anthropic.claude-opus-…");
+  // packed `<connId>:<modelId>` doesn't reach this fn — callers route to
+  // Bedrock only after the Anthropic adapter unpacks at the API seam.
   if (isFoundationModel(modelId)) {
     return `${prefix}.${modelId}`
   }

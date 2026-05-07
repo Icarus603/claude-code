@@ -48,6 +48,10 @@ export async function* streamGeminiGenerateContent(params: {
   const networkLayer = getProviderNetworkLayer()
   const fetchImpl = params.fetchOverride ?? fetch
   const { baseUrl, apiKey } = getGeminiAuth(params.model)
+  // modelid:already-unpacked
+  // The only caller (gemini/indexImpl.ts) feeds `geminiModel`, which is
+  // resolveGeminiModel(options.model) — that fn calls unpackModelId at the
+  // top, so by the time we hit this URL build the value is bare.
   const url = `${baseUrl}/${getGeminiModelPath(params.model)}:streamGenerateContent?alt=sse`
 
   const response = await fetchImpl(url, {

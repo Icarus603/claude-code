@@ -140,6 +140,11 @@ export class PaneBackendExecutor implements TeammateExecutor {
             (flag, i, arr) => flag !== '--model' && arr[i - 1] !== '--model',
           )
           .join(' ')
+        // modelid:bare-by-construction
+        // The packed `<connId>:<modelId>` form is the canonical CLI input
+        // shape; the spawned ccb child runs `inflateModelSetting` on it at
+        // the load boundary. Not a user-display string — it's an inter-
+        // process arg, so the prefix is acceptable.
         inheritedFlags = inheritedFlags
           ? `${inheritedFlags} --model ${quote([config.model])}`
           : `--model ${quote([config.model])}`

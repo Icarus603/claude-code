@@ -950,10 +950,12 @@ export function getAssistantMessageFromError(
   ) {
     const switchCmd = getIsNonInteractiveSession() ? '--model' : '/model'
     const fallbackSuggestion = get3PModelFallbackSuggestion(model)
+    // Strip `<connId>:` prefix so the error names the bare wire id, not ccb internals.
+    const { modelId: bareModelId } = unpackModelId(model)
     return createAssistantAPIErrorMessage({
       content: fallbackSuggestion
-        ? `${API_ERROR_MESSAGE_PREFIX} (${model}): ${error.message}. Try ${switchCmd} to switch to ${fallbackSuggestion}.`
-        : `${API_ERROR_MESSAGE_PREFIX} (${model}): ${error.message}. Run ${switchCmd} to pick a different model.`,
+        ? `${API_ERROR_MESSAGE_PREFIX} (${bareModelId}): ${error.message}. Try ${switchCmd} to switch to ${fallbackSuggestion}.`
+        : `${API_ERROR_MESSAGE_PREFIX} (${bareModelId}): ${error.message}. Run ${switchCmd} to pick a different model.`,
       error: 'invalid_request',
     })
   }

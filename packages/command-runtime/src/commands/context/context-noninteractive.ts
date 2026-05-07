@@ -105,6 +105,9 @@ function formatContextAsMarkdownTable(data: ContextData): string {
   } = data
 
   let output = `## Context Usage\n\n`
+  // modelid:already-unpacked
+  // ContextData.model is set by analyzeContextUsage via renderModelSetting,
+  // so it's already a pretty label like "Opus 4.7" — no `conn_xxx:` prefix.
   output += `**Model:** ${model}  \n`
   output += `**Tokens:** ${formatTokens(totalTokens)} / ${formatTokens(rawMaxTokens)} (${percentage}%)\n`
 

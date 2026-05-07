@@ -216,6 +216,11 @@ function buildDiffableContent(
     })
     .sort()
     .join('\n\n')
+  // modelid:debug-only
+  // This blob feeds the prompt-cache break detection diff — it's compared
+  // byte-for-byte across turns to identify the cache-key drift culprit.
+  // The packed `<connId>:<modelId>` form is the right thing here; if it
+  // changes, that IS a cache-break signal we want to surface.
   return `Model: ${model}\n\n=== System Prompt ===\n\n${systemText}\n\n=== Tools (${tools.length}) ===\n\n${toolDetails}\n`
 }
 

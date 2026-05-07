@@ -40,6 +40,12 @@ function formatAgentAsMarkdown(
   const isAllTools =
     tools === undefined || (tools.length === 1 && tools[0] === '*')
   const toolsLine = isAllTools ? '' : `\ntools: ${tools.join(', ')}`
+  // modelid:alias-only
+  // `model` here is sourced from ModelSelector's getAgentModelOptions() —
+  // sonnet / opus / haiku / inherit aliases, or a user-typed custom wire
+  // id. Never a packed `<connId>:<modelId>` (no UI surface for that on
+  // the agent wizard). The value round-trips through agent .md frontmatter
+  // and is parsed back as alias/wire id, not packed.
   const modelLine = model ? `\nmodel: ${model}` : ''
   const effortLine = effort !== undefined ? `\neffort: ${effort}` : ''
   const colorLine = color ? `\ncolor: ${color}` : ''

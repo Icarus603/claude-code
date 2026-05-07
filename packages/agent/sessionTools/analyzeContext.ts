@@ -55,7 +55,10 @@ import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/log.js'
 import { normalizeMessagesForAPI } from '../messages.js'
-import { getRuntimeMainLoopModel } from '@claude-code/provider/model/model.js'
+import {
+  getRuntimeMainLoopModel,
+  renderModelSetting,
+} from '@claude-code/provider/model/model.js'
 import type { SettingSource } from '@claude-code/config/settings/core/constants.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { buildEffectiveSystemPrompt } from '@claude-code/provider/systemPrompt.js'
@@ -1351,7 +1354,8 @@ export async function analyzeContextUsage(
     rawMaxTokens: contextWindow,
     percentage: Math.round((finalTotalTokens / contextWindow) * 100),
     gridRows,
-    model: runtimeModel,
+    // Resolve packed `<connId>:<modelId>` to a pretty label — /context UI renders verbatim (cf. 69f3c7c8 for /config).
+    model: renderModelSetting(runtimeModel),
     memoryFiles: memoryFileDetails,
     mcpTools: mcpToolDetails,
     deferredBuiltinTools:
