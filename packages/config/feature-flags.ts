@@ -48,6 +48,23 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
       'memdir_relevance',
     ],
   },
+  // Auto-mode classifier config. ant prod GrowthBook pushes the same shape
+  // (model + twoStageClassifier) — without this, getClassifierModel() falls
+  // through to getMainLoopModel() and runs Opus 4.7 as the classifier on
+  // every non-allowlisted tool call. Opus is ~70× more expensive than Haiku
+  // for the classifier workload, slower (more transcript_too_long /
+  // iron_gate trips), and prompt-tuned to "err on the side of blocking" —
+  // the combination is the user-perceived "auto mode blocks too much".
+  // Haiku 4.5 is in modelSupportsAutoMode() (betas.ts:151) so the model gate
+  // accepts it. twoStageClassifier:true matches ant prod default (j07() in
+  // 2.1.131 resplit/3590.js: twoStageClassifier??!0). Other fields
+  // (enabled, disableFastMode, forceExternalPermissions, jsonlTranscript)
+  // intentionally omitted — readers default-fallback to current ccb
+  // behavior (enabled, no fast-mode breaker, fix #2 picks template).
+  tengu_auto_mode_config: {
+    model: 'claude-haiku-4-5',
+    twoStageClassifier: true,
+  },
   tengu_passport_quail: true,
   // Skip MEMORY.md index injection in system prompt + run per-turn
   // findRelevantMemories prefetch instead. Disabled in ccb so the

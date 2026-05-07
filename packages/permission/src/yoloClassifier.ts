@@ -63,19 +63,31 @@ const EXTERNAL_PERMISSIONS_TEMPLATE: string = feature('TRANSCRIPT_CLASSIFIER')
   ? txtRequire(require('./yolo-classifier-prompts/permissions_external.txt'))
   : ''
 
-const ANTHROPIC_PERMISSIONS_TEMPLATE: string =
-  feature('TRANSCRIPT_CLASSIFIER') && process.env.USER_TYPE === 'ant'
-    ? txtRequire(require('./yolo-classifier-prompts/permissions_anthropic.txt'))
-    : ''
+// ccb: load anthropic-prod template unconditionally (was ant-only via
+// USER_TYPE check). Both .txt files are bundled as string literals at build
+// time regardless — the gate only chose which const got the value. ccb
+// defaults to this template (see isUsingExternalPermissions below) because
+// the external template's deny rules are written too broadly for daily
+// macOS dev use (e.g. blocks `brew install`, any write outside CWD), while
+// the anthropic template matches what v2.1.131 ships in prod and includes
+// allow exceptions for cloud-CLI describe / IaC plan / declared deps.
+const ANTHROPIC_PERMISSIONS_TEMPLATE: string = feature('TRANSCRIPT_CLASSIFIER')
+  ? txtRequire(require('./yolo-classifier-prompts/permissions_anthropic.txt'))
+  : ''
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 
 function isUsingExternalPermissions(): boolean {
-  if (process.env.USER_TYPE !== 'ant') return true
+  // forceExternalPermissions opts into the external template for both ant
+  // and ccb (escape hatch — used by `ccb auto-mode defaults` reviewers and
+  // by ant employees dogfooding the external prompt).
   const config = getFeatureValue_CACHED_MAY_BE_STALE(
     'tengu_auto_mode_config',
     {} as AutoModeConfig,
   )
-  return config?.forceExternalPermissions === true
+  if (config?.forceExternalPermissions === true) return true
+  // ccb (USER_TYPE !== 'ant') defaults to anthropic-prod template — same as
+  // what v2.1.131 ships when the GrowthBook config doesn't override.
+  return false
 }
 
 /**
