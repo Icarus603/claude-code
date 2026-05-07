@@ -1,4 +1,5 @@
 import type { Lesson } from './types.js'
+import { lesson as atMentions } from './at-mentions.js'
 
 /**
  * All lessons in display order. Each lesson lives in its own file under
@@ -9,4 +10,6 @@ import type { Lesson } from './types.js'
  * The 10-lesson set is documented in
  * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3.
  */
-export const ALL_LESSONS: Lesson[] = []
+export const ALL_LESSONS: Lesson[] = [
+  atMentions,
+]
