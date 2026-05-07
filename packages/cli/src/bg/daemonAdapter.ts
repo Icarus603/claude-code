@@ -405,3 +405,12 @@ export async function daemonAwaitAck(opts: {
 }): Promise<DaemonResponse> {
   return daemonRequest('await-ack', opts, { timeoutMs: 10_000 })
 }
+
+/**
+ * ant 5164.js wF3 — request daemon to SIGKILL+respawn a worker that
+ * stalled at startup (attach client never saw first frame). Daemon
+ * tracks attachStallRespawns counter; on 2nd call returns EGAVEUP.
+ */
+export async function daemonRespawnStalled(short: string): Promise<DaemonResponse> {
+  return daemonRequest('respawn-stalled', { short }, { timeoutMs: 10_000 })
+}

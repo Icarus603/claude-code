@@ -118,10 +118,11 @@ export async function runAttach(
   process.stdout.on('resize', onResize)
 
   // ant 5164.js stall watchdog: if no first frame within
-  // ATTACH_STALL_THRESHOLD_MS, fire stall_ms (warning); after
-  // ATTACH_STALL_GAVE_UP_MS, fire stall_gave_up + force exit so user
-  // doesn't sit on a frozen attach forever.
+  // ATTACH_STALL_THRESHOLD_MS, fire stall_ms (warning) + try
+  // daemon-side respawn (auto-recover once). After ATTACH_STALL_GAVE_UP_MS
+  // OR if respawn returned EGAVEUP, fire stall_gave_up + exit.
   let stallWarned = false
+  let respawnAttempted = false
   let stallGaveUp = false
   const stallTimer = setInterval(() => {
     if (firstFrameAt > 0 || detached) return
@@ -129,7 +130,30 @@ export async function runAttach(
     if (!stallWarned && elapsed >= ATTACH_STALL_THRESHOLD_MS) {
       stallWarned = true
       logEvent('tengu_bg_attach_stall_ms', { short, elapsed_ms: String(elapsed) })
-      process.stderr.write(`\n[attach: no output from ${short} in ${Math.round(elapsed/1000)}s — worker may be stalled]\n`)
+      process.stderr.write(`\n[attach: no output from ${short} in ${Math.round(elapsed/1000)}s — worker may be stalled, attempting respawn…]\n`)
+      // Try daemon-side respawn. ant 5164.js wF3.
+      if (!respawnAttempted) {
+        respawnAttempted = true
+        void (async () => {
+          try {
+            const { isDaemonAlive, daemonRespawnStalled } = await import('./daemonAdapter.js')
+            if (await isDaemonAlive()) {
+              const r = await daemonRespawnStalled(short)
+              if (!r.ok && r.code === 'EGAVEUP') {
+                // Daemon refuses 2nd respawn — fall through to give-up.
+                stallGaveUp = true
+                clearInterval(stallTimer)
+                process.stderr.write(`\n[attach: ${short} stalled after respawn — giving up]\n`)
+                detached = true
+                process.stdin.removeListener('data', onStdin)
+              }
+            }
+          } catch {
+            // Best-effort; if daemon unreachable, the second pass of this
+            // setInterval will hit the give-up path below.
+          }
+        })()
+      }
     }
     if (elapsed >= ATTACH_STALL_GAVE_UP_MS) {
       stallGaveUp = true

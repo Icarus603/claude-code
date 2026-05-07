@@ -480,6 +480,44 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       vm.kill(force ? 'reap' : 'grace')
       return ok({ op: 'kill', confirmed: true })
     },
+    /**
+     * respawn-stalled — ant 5164.js wF3. CLI's attach client calls this
+     * when it detects stall (no first frame within ATTACH_STALL_THRESHOLD_MS).
+     * Increments attachStallRespawns counter; if counter ≥1 already (i.e.
+     * already respawned once), refuses with EGAVEUP so client gives up.
+     * Otherwise: SIGKILL the worker, respawn fresh with bumped counter.
+     */
+    'respawn-stalled': async msg => {
+      const short = msg.short as string | undefined
+      if (!short) return err('EBADREQ', 'respawn-stalled: missing short')
+      const vm = state.workers.get(short)
+      if (!vm) return err('ENOJOB', `no worker for short ${short}`)
+      const oldRecord = vm.getRecord()
+      const attempts = oldRecord.attachStallRespawns ?? 0
+      if (attempts >= 1) {
+        // Second stall — give up. Client decides whether to surface error.
+        logEventFn('tengu_bg_attach_stall_gave_up', { short, attempts: String(attempts) })
+        return err('EGAVEUP', `worker ${short} stalled ${attempts} time(s); not respawning again`)
+      }
+      logEventFn('tengu_bg_attach_stall_respawn', { short, attempts: String(attempts) })
+      vm.kill('reap') // SIGKILL — stalled worker won't respond to grace
+      await new Promise(r => setTimeout(r, 200))
+      const fresh = new WorkerVm({
+        short: oldRecord.short,
+        cwd: oldRecord.cwd,
+        env: process.env,
+        ptySocket: oldRecord.ptySocket ?? '',
+        cmd: oldRecord.cmd,
+        cliVersion: process.env.CLAUDE_CODE_VERSION ?? 'dev',
+      })
+      // Carry over the bumped counter so a 2nd stall on this respawned
+      // worker exits via EGAVEUP path above.
+      const freshRecord = fresh.getRecord()
+      freshRecord.attachStallRespawns = attempts + 1
+      state.workers.set(short, fresh)
+      fresh.spawn()
+      return ok({ op: 'respawn-stalled', short, pid: fresh.getRecord().pid, attempts: attempts + 1 })
+    },
     respawn: async msg => {
       const short = msg.short as string | undefined
       if (!short) return err('EBADREQ', 'respawn: missing short')

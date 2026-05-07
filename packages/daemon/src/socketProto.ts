@@ -51,6 +51,7 @@ export type ProtoOp =
   | 'shutdown'
   | 'reply'
   | 'sendclaim'
+  | 'respawn-stalled'
   | 'attacher-caps'
   | 'lease'
 

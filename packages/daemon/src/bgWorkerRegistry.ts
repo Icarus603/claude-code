@@ -58,6 +58,8 @@ export interface WorkerRecord {
   fastCrashStreak?: number
   /** ccb version that spawned this worker; used by adopt to detect upgrade. */
   cliVersion?: string
+  /** Count of attach-stall-triggered respawns. ant 5164.js wF3:23. */
+  attachStallRespawns?: number
 }
 
 /** Cap on respawn attempts (ant hXK = 20). */

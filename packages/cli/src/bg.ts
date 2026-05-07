@@ -82,6 +82,8 @@ interface JobMeta {
   procStart?: number
   /** ccb version that spawned this worker; daemon adopt compares for upgrade. */
   cliVersion?: string
+  /** Count of attach-stall-triggered respawns. ant 5164.js wF3. */
+  attachStallRespawns?: number
 }
 
 const JOB_SHORT_LENGTH = 8
