@@ -757,27 +757,25 @@ export async function respawnHandler(args: readonly string[]): Promise<void> {
 async function respawnSingle(job: JobMeta): Promise<boolean> {
   const args = extractRespawnArgs(job.cmd)
   if (!args) {
-    process.stderr.write(
-      `${job.short}: cannot reconstruct directive from stored cmd (legacy or corrupt meta.json)\n`,
-    )
+    process.stderr.write(`${job.short}: cannot reconstruct directive\n`)
     return false
   }
-  // Stop the old worker if it's still running, then drop its dir so
-  // the new short doesn't collide. The respawn writes a new short.
   if (job.status === 'running' && isProcessRunning(job.pid)) {
-    try {
-      process.kill(job.pid, 'SIGTERM')
-    } catch {
-      // Already gone is fine.
-    }
+    try { process.kill(job.pid, 'SIGTERM') } catch {/**/}
   }
   rmSync(getJobDir(job.short), { recursive: true, force: true })
   try {
-    const newShort = await spawnBgJob({
-      flags: args.flags,
-      directive: args.directive,
-      cwd: job.cwd,
-    })
+    let newShort: string
+    if (job.mode === 'pty') {
+      const { spawnPtyHost } = await import('./bg/spawnPty.js')
+      newShort = generateShortId()
+      const r = spawnPtyHost({
+        short: newShort, jobDir: getJobDir(newShort), ...args, cwd: job.cwd,
+      })
+      writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+    } else {
+      newShort = await spawnBgJob({ ...args, cwd: job.cwd })
+    }
     if (newShort !== job.short) {
       process.stdout.write(`(was ${job.short}, now ${newShort})\n`)
     }

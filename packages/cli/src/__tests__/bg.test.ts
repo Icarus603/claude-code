@@ -308,4 +308,53 @@ describe('extractRespawnArgs', () => {
       directive: 'real directive',
     })
   })
+
+  test('unwraps a pty-mode cmd (--bg-pty-host wrapper)', () => {
+    expect(
+      extractRespawnArgs([
+        'bun',
+        '/cli.js',
+        '--bg-pty-host',
+        '/tmp/x.sock',
+        '200',
+        '50',
+        '--',
+        'bun',
+        '/cli.js',
+        '--debug',
+        '-p',
+        'do the thing',
+      ]),
+    ).toEqual({
+      flags: ['--debug'],
+      directive: 'do the thing',
+    })
+  })
+
+  test('unwraps a pty-mode cmd from compiled binary (no inner bun)', () => {
+    expect(
+      extractRespawnArgs([
+        '/usr/local/bin/ccb',
+        '--bg-pty-host',
+        '/tmp/x.sock',
+        '80',
+        '24',
+        '--',
+        '/usr/local/bin/ccb',
+        '--model',
+        'opus',
+        '-p',
+        'task',
+      ]),
+    ).toEqual({
+      flags: ['--model', 'opus'],
+      directive: 'task',
+    })
+  })
+
+  test('returns null on pty wrapper with missing -- separator', () => {
+    expect(
+      extractRespawnArgs(['bun', '/cli.js', '--bg-pty-host', '/tmp/s']),
+    ).toBeNull()
+  })
 })
