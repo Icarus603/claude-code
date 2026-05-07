@@ -374,14 +374,14 @@ async function spawnBgJob(opts: {
   //   path would try to spawn a browser. Force colors on, browser off.
   // - CLAUDE_JOB_DIR: ant compat marker recording the job's on-disk
   //   directory so future tooling can find it without re-deriving.
+  // ant 4706.js xXK env. BG_BACKEND='detached' (ant 'daemon') = daemon-less.
   const env: NodeJS.ProcessEnv = {
     ...process.env,
-    CLAUDE_CODE_SESSION_KIND: 'bg',
-    CLAUDE_CODE_BG_JOB_SHORT: short,
-    FORCE_COLOR: '3',
-    COLORTERM: 'truecolor',
-    BROWSER: 'true',
-    CLAUDE_JOB_DIR: jobDir,
+    CLAUDE_CODE_SESSION_KIND: 'bg', CLAUDE_CODE_BG_JOB_SHORT: short,
+    FORCE_COLOR: '3', COLORTERM: 'truecolor', BROWSER: 'true',
+    CLAUDE_JOB_DIR: jobDir, CLAUDE_BG_BACKEND: 'detached',
+    CLAUDE_BG_SOURCE: 'cli', CLAUDE_ENABLE_STREAM_WATCHDOG: '1',
+    CLAUDE_CODE_SESSION_NAME: short,
   }
 
   const spawnOpts: SpawnOptions = {
