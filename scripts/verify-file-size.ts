@@ -59,13 +59,28 @@ async function main(): Promise<void> {
   }
 
   if (tighten) {
-    // Snapshot files >SOFT_THRESHOLD only — files ≤800 don't need grandfathering.
+    // One-way down: tighten records min(current, prior baseline) so the
+    // ratchet can only shrink, never grow — protects against grandfathering
+    // a regression. Files currently ≤ SOFT_THRESHOLD are dropped from
+    // baseline entirely (no longer need grandfathering); but if a file
+    // GREW past its prior baseline, we keep the prior baseline so the
+    // verifier catches the violation. Files NOT in prior baseline + over
+    // threshold still skip — those are new violations, not legacy.
     const next: Record<string, number> = {}
     for (const [path, count] of Object.entries(current)) {
-      if (count > SOFT_THRESHOLD) next[path] = count
+      if (count <= SOFT_THRESHOLD) continue
+      const prior = baseline[path]
+      if (prior === undefined) {
+        // New file over threshold — verifier will flag as violation. Don't
+        // grandfather here; force the operator to decompose or explicitly
+        // add to baseline.
+        continue
+      }
+      // min(current, prior) — never loosen.
+      next[path] = Math.min(count, prior)
     }
     writeFileSync(BASELINE_FILE, JSON.stringify(Object.fromEntries(Object.entries(next).sort()), null, 2) + '\n')
-    console.log(`file-size-baseline.json updated (${Object.keys(next).length} large files)`)
+    console.log(`file-size-baseline.json updated (${Object.keys(next).length} large files; one-way down)`)
     return
   }
 
