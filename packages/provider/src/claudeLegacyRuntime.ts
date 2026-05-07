@@ -78,7 +78,7 @@ import {
   getModelMaxOutputTokens,
   getSonnet1mExpTreatmentEnabled,
 } from '@claude-code/agent/context.js'
-import { resolveAppliedEffort } from '@claude-code/agent/effort.js'
+import { resolveAppliedEffort } from '@claude-code/agent/effort.js'; import { computeAttributionMetadata } from '@claude-code/agent/attributionMetadata.js'
 import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { computeFingerprintFromMessages } from './fingerprint.js'
@@ -712,7 +712,7 @@ export type Options = {
   maxOutputTokensOverride?: number
   fallbackModel?: string
   onStreamingFallback?: () => void
-  querySource: QuerySource
+  querySource: QuerySource; spawnedBySkill?: string; activeSkill?: string // ant 2599.js
   agents: AgentDefinition[]
   allowedAgentTypes?: string[]
   hasAppendSystemPrompt: boolean
@@ -2384,7 +2384,7 @@ async function* queryModel(
               requestId: streamRequestId ?? undefined,
               type: 'assistant',
               uuid: randomUUID(),
-              timestamp: new Date().toISOString(),
+              timestamp: new Date().toISOString(), ...computeAttributionMetadata(options.querySource, options.spawnedBySkill, options.activeSkill),
               ...(readEnv('USER_TYPE') === 'ant' &&
                 research !== undefined && { research }),
               ...(advisorModel && { advisorModel }),

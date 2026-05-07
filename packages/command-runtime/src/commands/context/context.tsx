@@ -56,7 +56,7 @@ export async function call(
     tools,
     appState.agentDefinitions,
     terminalWidth,
-    context, // Pass full context for system prompt calculation
+    context as unknown as Parameters<typeof analyzeContextUsage>[6], // Pass full context for system prompt calculation
     undefined, // mainThreadAgentDefinition
     apiView, // Original messages for API usage extraction
   )

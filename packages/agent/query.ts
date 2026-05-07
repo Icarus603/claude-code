@@ -778,7 +778,7 @@ async function* queryLoop(
               onStreamingFallback: () => {
                 streamingFallbackOccured = true
               },
-              querySource,
+              querySource, spawnedBySkill: toolUseContext.options.spawnedBySkill as string | undefined, activeSkill: toolUseContext.options.activeSkill as string | undefined,
               agents: toolUseContext.options.agentDefinitions.activeAgents,
               allowedAgentTypes:
                 toolUseContext.options.agentDefinitions.allowedAgentTypes,

@@ -20,6 +20,10 @@ export type ProviderRequestOptions = {
   fallbackModel?: string
   onStreamingFallback?: () => void
   querySource: ProviderQuerySource
+  /** ant 2599.js — spawnedBySkill from runAgent override propagated. */
+  spawnedBySkill?: string
+  /** ant 2599.js — activeSkill set by SkillTool / REPL submit path. */
+  activeSkill?: string
   agents?: readonly ProviderAgentDefinition[]
   allowedAgentTypes?: string[]
   hasAppendSystemPrompt: boolean

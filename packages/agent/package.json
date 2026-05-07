@@ -166,7 +166,8 @@
     "./testing": "./testing/index.ts",
     "./misc/systemDirectories.js": "./misc/systemDirectories.ts",
     "./yaml.js": "./yaml.ts",
-    "./replHydration.js": "./replHydration.ts"
+    "./replHydration.js": "./replHydration.ts",
+    "./attributionMetadata.js": "./attributionMetadata.ts"
   },
   "dependencies": {
     "zod": "^4.3.6"
