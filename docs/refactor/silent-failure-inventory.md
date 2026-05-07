@@ -22,15 +22,15 @@ Findings are graded:
 | 2 | await-generator-misuse | 0 | 0 | 0 | 0 | 0 |
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
 | 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
-| 5 | empty-catch | 2 | 0 | 0 | 0 | 2 |
+| 5 | empty-catch | 0 | 0 | 0 | 0 | 0 |
 | 6 | nullish-coalesce-critical-path | 86 | 0 | 0 | 0 | 86 |
-| 7 | stub-return-only | 25 | 0 | 0 | 0 | 25 |
+| 7 | stub-return-only | 24 | 0 | 0 | 0 | 24 |
 | 8 | always-false-feature-flag | 474 | 0 | 0 | 0 | 474 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
-| 10 | type-cast-trap | 131 | 0 | 0 | 1 | 130 |
-| 11 | require-fallback-to-stub | 2 | 0 | 0 | 2 | 0 |
+| 10 | type-cast-trap | 135 | 0 | 0 | 0 | 135 |
+| 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **720** | **0** | **0** | **3** | **717** |
+| **TOTAL** | | **719** | **0** | **0** | **0** | **719** |
 
 ## Patterns in detail
 
@@ -64,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9261; **findings**: 0
+**Total scanned**: 9433; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -72,14 +72,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2271; **findings**: 2
-
-#### LOW (2)
-
-- `packages/repl/src/components/ModelPicker.tsx:110` — } catch {}
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
-- `packages/provider/src/connections.ts:270` — } catch {}
-  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
+**Total scanned**: 2345; **findings**: 0
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -87,7 +80,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1176; **findings**: 86
+**Total scanned**: 1195; **findings**: 86
 
 #### LOW (86)
 
@@ -123,11 +116,11 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/repl/src/screens/REPLView.tsx:1936` — log.contentReplacements ?? [],
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:4066` — promptQueueUseCount: (current.promptQueueUseCount ?? 0) + 1,
+- `packages/repl/src/screens/REPLView.tsx:4062` — promptQueueUseCount: (current.promptQueueUseCount ?? 0) + 1,
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:4790` — ? (viewedAgentTask.messages ?? [])
+- `packages/repl/src/screens/REPLView.tsx:4786` — ? (viewedAgentTask.messages ?? [])
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/repl/src/screens/REPLView.tsx:5522` — const kept = result.messagesToKeep ?? [];
+- `packages/repl/src/screens/REPLView.tsx:5518` — const kept = result.messagesToKeep ?? [];
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/provider/src/oauth/auth-code-listener.ts:46` — this.localServer.listen(port ?? 0, 'localhost', () => {
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
@@ -147,9 +140,9 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/provider/src/dumpPrompts.ts:103` — const messages = (req.messages ?? []) as Array<{ role?: string }>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:377` — connections: (current.connections ?? []).filter(c => c.id !== id),
+- `packages/provider/src/connections.ts:369` — connections: (current.connections ?? []).filter(c => c.id !== id),
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:385` — connections: (current.connections ?? []).map(c =>
+- `packages/provider/src/connections.ts:377` — connections: (current.connections ?? []).map(c =>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - ...56 more (run audit with no flags for full JSON)
 
@@ -159,9 +152,9 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5881; **findings**: 25
+**Total scanned**: 6028; **findings**: 24
 
-#### LOW (25)
+#### LOW (24)
 
 - `packages/tool-registry/src/tools/ExitPlanModeTool/UI.tsx:15` — renderToolUseMessage() { return null }
   - Function renderToolUseMessage body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
@@ -175,7 +168,7 @@ Findings are graded:
   - Function renderToolUseMessage body is just `return ''`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/@ant/computer-use-mcp/src/legacy/gates.ts:39` — hasRequiredSubscription() { return true }
   - Function hasRequiredSubscription body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/config/feature-flags.ts:128` — initializeGrowthBook() { return null }
+- `packages/config/feature-flags.ts:145` — initializeGrowthBook() { return null }
   - Function initializeGrowthBook body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/local-observability/src/spans.ts:19` — isBetaTracingEnabled() { return false }
   - Function isBetaTracingEnabled body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
@@ -203,8 +196,6 @@ Findings are graded:
   - Function alwaysValidStatus body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/storage/src/sessionStorage.ts:271` — isCustomTitleEnabled() { return true }
   - Function isCustomTitleEnabled body is just `return true`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
-- `packages/url-handler-napi/src/index.ts:1` — waitForUrlEvent() { return null }
-  - Function waitForUrlEvent body is just `return null`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/permission/src/bashClassifier.ts:24` — isClassifierPermissionsEnabled() { return false }
   - Function isClassifierPermissionsEnabled body is just `return false`. May be intentional (placeholder, feature-flag stub) or leftover from V7 setter-pattern wires that never got real impl. Verify caller expectations.
 - `packages/permission/src/bashClassifier.ts:28` — getBashPromptDenyDescriptions() { return [] }
@@ -262,9 +253,9 @@ Findings are graded:
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/AgentTool/AgentTool.tsx:241` — const schema = feature('KAIROS')
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/AgentTool/AgentTool.tsx:821` — const assistantForceAsync = feature('KAIROS')
+- `packages/tool-registry/src/tools/AgentTool/AgentTool.tsx:820` — const assistantForceAsync = feature('KAIROS')
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:842` — if (feature('MONITOR_TOOL')) {
+- `packages/tool-registry/src/tools/AgentTool/runAgent.ts:832` — if (feature('MONITOR_TOOL')) {
   - `feature('MONITOR_TOOL')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_MONITOR_TOOL=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/AgentTool/loadAgentsDir.ts:348` — if (feature('AGENT_MEMORY_SNAPSHOT') && isAutoMemoryEnabled()) {
   - `feature('AGENT_MEMORY_SNAPSHOT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_AGENT_MEMORY_SNAPSHOT=1. Verify whether this branch is ever exercised; if not, delete it.
@@ -300,14 +291,9 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 658; **findings**: 131
+**Total scanned**: 662; **findings**: 135
 
-#### MEDIUM (1)
-
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1189` — const fallbackBuffer = await (sharp as any)(imageBuffer)
-  - `as any` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-
-#### LOW (130)
+#### LOW (135)
 
 - `packages/swarm/testing/index.ts:20` — } as unknown as SwarmHostDeps
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -321,13 +307,13 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/AgentTool/AgentTool.tsx:473` — return { data: spawnResult } as unknown as { data: Output }
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/AgentTool/AgentTool.tsx:710` — return { data: remoteResult } as unknown as { data: Output }
+- `packages/tool-registry/src/tools/AgentTool/AgentTool.tsx:709` — return { data: remoteResult } as unknown as { data: Output }
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/ToolSearchTool/ToolSearchTool.ts:469` — } as unknown as ToolResultBlockParam
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/ExitWorktreeTool/prompt.ts:9` — - The directory you're in if EnterWorktree was never called
   - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1181` — sharpModule as unknown as {
+- `packages/tool-registry/src/tools/FileReadTool/FileReadTool.ts:1186` — const sharpModule = (await import('sharp')) as unknown as {
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/tool-registry/src/tools/FileReadTool/imageProcessor.ts:71` — )) as unknown as MaybeDefault<SharpFunction>
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
@@ -355,6 +341,8 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/config/testing/index.ts:56` — projectRoot: options.projectRoot ?? undefined as unknown as string,
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
+- `packages/command-runtime/src/commands/context/context.tsx:59` — context as unknown as Parameters<typeof analyzeContextUsage>[6], // Pass full context for system prompt calculation
+  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/command-runtime/src/commands/login/login.tsx:96` — } as never)
   - `as never` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/shell/src/execFileNoThrow.ts:130` — result as unknown as ExecaResultWithError,
@@ -367,9 +355,7 @@ Findings are graded:
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
 - `packages/bridge/src/inboundMessages.ts:79` — return !(block.source as unknown as Record<string, unknown>).media_type
   - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- `packages/local-observability/src/slowLoggingTag.ts:73` — result += `Array[${(v as unknown[]).length}]`
-  - `as unknown` — type system bypass. Verify intent: is this a real escape (FFI, dynamic dispatch, decompiled boilerplate) or hiding a structural mismatch?
-- ...100 more (run audit with no flags for full JSON)
+- ...105 more (run audit with no flags for full JSON)
 
 ### 11. `require-fallback-to-stub`
 
@@ -377,14 +363,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 677; **findings**: 2
-
-#### MEDIUM (2)
-
-- `packages/repl/src/components/ModelPicker.tsx:107` — const fs = require('fs') as typeof import('fs')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
-- `packages/provider/src/connections.ts:266` — const fs = require('fs')
-  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
+**Total scanned**: 680; **findings**: 0
 
 ### 12. `module-level-null-state`
 
@@ -392,5 +371,5 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/12-module-level-null-state.ts`
 
-**Total scanned**: 177; **findings**: 0
+**Total scanned**: 180; **findings**: 0
 
