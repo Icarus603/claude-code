@@ -152,6 +152,10 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       })
     }
   }
+  logEventFn('tengu_bg_daemon_boot', {
+    pid: String(process.pid),
+    origin: parsed.origin ?? 'transient',
+  })
   // Boot scan + every-5s rescan for workers spawned outside our spawn op
   // (e.g. ccb --bg-pty fired by user). ant 5172.js sweep cadence.
   adoptRunningPtyRecords()
@@ -306,6 +310,10 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       return ok({ op: 'retire', short, retired: true })
     },
     shutdown: async () => {
+      logEventFn('tengu_bg_daemon_shutdown', {
+        uptime_ms: String(Date.now() - state.startedAt),
+        workers: String(state.workers.size),
+      })
       // Schedule shutdown after this reply is sent.
       setImmediate(() => state.abort.abort()).unref()
       return ok({ op: 'shutdown', accepted: true })

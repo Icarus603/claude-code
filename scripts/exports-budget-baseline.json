@@ -8,7 +8,7 @@
   "@claude-code/command-runtime": 66,
   "@claude-code/shell": 30,
   "@claude-code/bridge": 6,
-  "@claude-code/local-observability": 32,
+  "@claude-code/local-observability": 33,
   "@claude-code/repl": 179,
   "@claude-code/provider": 94,
   "@claude-code/output": 26,

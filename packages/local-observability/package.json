@@ -37,6 +37,7 @@
     "./aggregates/headlessProfiler.js": "./src/aggregates/headlessProfiler.ts",
     "./aggregates/heatmap.js": "./src/aggregates/heatmap.ts",
     "./aggregates/queryProfiler.js": "./src/aggregates/queryProfiler.ts",
-    "./aggregates/stats.js": "./src/aggregates/stats.ts"
+    "./aggregates/stats.js": "./src/aggregates/stats.ts",
+    "./localEventLogger.js": "./src/localEventLogger.ts"
   }
 }
