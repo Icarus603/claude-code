@@ -32,16 +32,23 @@ const GHA_SUBPROCESS_SCRUB = [
 ] as const
 
 /**
- * Process-control markers ccb sets on its own child for internal
- * coordination (bg session kind, resume hints, etc.). These should NOT
- * leak into nested subprocesses spawned by BashTool — if a hook script
- * happens to invoke `ccb` recursively, the inner ccb must not be
- * mis-tagged as a bg session or pick up a stale resume marker.
+ * Env vars ant 2482.js iy() ALWAYS strips from subprocess env (regardless
+ * of GHA scrub). Three categories:
  *
- * Mirrors ant 2482.js iy() — always scrubbed regardless of
- * CLAUDE_CODE_SUBPROCESS_ENV_SCRUB. Cheap (~5 deletes per spawn).
+ * 1. Auth tokens — daemon injected these for the bg child only; they
+ *    must not leak into bash subprocesses or hook scripts.
+ * 2. Process-control markers — bg-session/resume tags; nested ccb
+ *    invocations would otherwise be mis-tagged.
+ * 3. Telemetry: all OTEL_* (handled separately by prefix match below).
+ *
+ * Mirrors ant 2482.js iy() lines 110-131. Cheap (~10 deletes per spawn).
  */
 const ALWAYS_SCRUB = [
+  // Auth — daemon-injected on macOS (4706.js xXK)
+  'CLAUDE_CODE_OAUTH_TOKEN',
+  'CLAUDE_CODE_SUBSCRIPTION_TYPE',
+  'CLAUDE_CODE_RATE_LIMIT_TIER',
+  // Process-control markers
   'CLAUDE_CODE_SESSION_KIND',
   'CLAUDE_BG_SOURCE',
   'CLAUDE_BG_ISOLATION',
@@ -79,18 +86,24 @@ export function subprocessEnv(
   // ALWAYS_SCRUB applies regardless of the GHA flag — process-control
   // markers must not leak into nested subprocesses. Build a fresh
   // object only if there's actually something to strip; otherwise
-  // return baseEnv unchanged for the hot path.
+  // return baseEnv unchanged for the hot path. OTEL_* matches by prefix
+  // (ant 2482.js:120,132 — strip every key starting with "OTEL_").
   const needsAlwaysScrub = ALWAYS_SCRUB.some(k => k in baseEnv)
+  const needsOtelScrub = Object.keys(baseEnv).some(k => k.startsWith('OTEL_'))
   const needsProxy = Object.keys(proxyEnv).length > 0
   const needsGhaScrub = isEnvTruthy(scrubFlag)
 
-  if (!needsAlwaysScrub && !needsProxy && !needsGhaScrub) {
+  if (!needsAlwaysScrub && !needsOtelScrub && !needsProxy && !needsGhaScrub) {
     return baseEnv as NodeJS.ProcessEnv
   }
 
   const merged: NodeJS.ProcessEnv = { ...baseEnv, ...proxyEnv }
   for (const k of ALWAYS_SCRUB) {
     delete merged[k]
+  }
+  // OTEL_* prefix scrub — ant 2482.js:132 iterates every key.
+  for (const k of Object.keys(merged)) {
+    if (k.startsWith('OTEL_')) delete merged[k]
   }
   if (needsGhaScrub) {
     for (const k of GHA_SUBPROCESS_SCRUB) {

@@ -289,3 +289,51 @@ describe('subprocessEnv — process-control marker scrub (always)', () => {
     expect(env.PATH).toBe('/usr/bin')
   })
 })
+
+describe('subprocessEnv — auth + OTEL scrub (always, parity with ant 2482.js iy)', () => {
+  test('strips CLAUDE_CODE_OAUTH_TOKEN', () => {
+    expect(
+      subprocessEnv({
+        CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oauth01-xxx',
+      }).CLAUDE_CODE_OAUTH_TOKEN,
+    ).toBeUndefined()
+  })
+
+  test('strips CLAUDE_CODE_SUBSCRIPTION_TYPE / RATE_LIMIT_TIER', () => {
+    const env = subprocessEnv({
+      CLAUDE_CODE_SUBSCRIPTION_TYPE: 'pro',
+      CLAUDE_CODE_RATE_LIMIT_TIER: 'tier-3',
+    })
+    expect(env.CLAUDE_CODE_SUBSCRIPTION_TYPE).toBeUndefined()
+    expect(env.CLAUDE_CODE_RATE_LIMIT_TIER).toBeUndefined()
+  })
+
+  test('strips OTEL_* prefix env vars', () => {
+    const env = subprocessEnv({
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:4318',
+      OTEL_RESOURCE_ATTRIBUTES: 'service.name=ccb',
+      OTEL_SERVICE_NAME: 'ccb',
+      FOO: 'preserved',
+    })
+    expect(env.OTEL_EXPORTER_OTLP_ENDPOINT).toBeUndefined()
+    expect(env.OTEL_RESOURCE_ATTRIBUTES).toBeUndefined()
+    expect(env.OTEL_SERVICE_NAME).toBeUndefined()
+    expect(env.FOO).toBe('preserved')
+  })
+
+  test('does NOT strip env that merely contains OTEL_ in the middle', () => {
+    // Prefix match only: `MY_OTEL_THING` should survive.
+    expect(
+      subprocessEnv({ MY_OTEL_THING: 'preserved' }).MY_OTEL_THING,
+    ).toBe('preserved')
+  })
+
+  test('scrubs auth + OTEL even with no GHA scrub flag', () => {
+    const env = subprocessEnv({
+      CLAUDE_CODE_OAUTH_TOKEN: 'tok',
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'url',
+    })
+    expect(env.CLAUDE_CODE_OAUTH_TOKEN).toBeUndefined()
+    expect(env.OTEL_EXPORTER_OTLP_ENDPOINT).toBeUndefined()
+  })
+})
