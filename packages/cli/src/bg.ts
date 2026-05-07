@@ -127,6 +127,22 @@ function writeJobMeta(meta: JobMeta): void {
   writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
 }
 
+/**
+ * Mark a job's meta.json status='stopped'. Used by the in-bg `/stop`
+ * slash command (mirrors ant 4652.js _j6) — writes intent immediately
+ * so `ccb ps` and the tasks panel reflect the user's stop request
+ * before the daemon's adopt sweep observes the worker exiting.
+ *
+ * No-op if no meta.json exists (e.g. unrelated --bg-pty path missed it).
+ *
+ * @dynamicRequire
+ */
+export function markJobStopped(short: string): void {
+  const meta = readJobMeta(short)
+  if (!meta) return
+  writeJobMeta({ ...meta, status: 'stopped', exitedAt: Date.now() })
+}
+
 function reconcileMeta(meta: JobMeta): JobMeta {
   if (meta.status === 'running' && !isProcessRunning(meta.pid)) {
     const updated: JobMeta = { ...meta, status: 'exited', exitedAt: Date.now() }

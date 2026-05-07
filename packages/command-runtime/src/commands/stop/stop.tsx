@@ -26,11 +26,23 @@ export async function call(
     })
     return null
   }
-  // ant 4652.js _j6 — emit agent-action telemetry; the worker's
-  // meta.json is reconciled by the daemon's adopt sweep (status moves
-  // to 'exited' from the settled handler). The user-visible "Session
-  // stopped." string here is enough for the immediate UX; tasks-panel
-  // reflects the new state on the next sweep.
+
+  // ant 4652.js _j6 writes status='stopped' to meta.json BEFORE exiting,
+  // so the tasks panel and `ccb ps` reflect user intent immediately
+  // rather than waiting for the daemon's next adopt sweep. Mirror.
+  const short = process.env.CLAUDE_CODE_BG_JOB_SHORT
+  if (short) {
+    try {
+      // Route through @claude-code/cli/bg.js (which already depends on
+      // daemon) instead of pulling daemon directly into command-runtime.
+      // Stays under the cross-package-coupling budget.
+      const { markJobStopped } = await import('@claude-code/cli/bg.js')
+      markJobStopped?.(short)
+    } catch {
+      // best-effort — fall through to graceful shutdown anyway.
+    }
+  }
+
   logEvent('tengu_bg_agent_action', {
     action: 'stop',
     source: 'stop_command',
