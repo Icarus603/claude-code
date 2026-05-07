@@ -7,7 +7,9 @@
 [![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
 
-Terminal coding agent. Single binary, installed as `ccb`. Community-maintained derivative of Claude Code — see [`ATTRIBUTION.md`](./ATTRIBUTION.md). Not affiliated with Anthropic.
+Terminal coding agent. Single binary `ccb`. Talks to Anthropic, OpenAI-compatible endpoints (Ollama, DeepSeek, vLLM, …), Gemini, and Grok through one agent loop. macOS, Linux, Windows.
+
+Solo-maintained public derivative of Claude Code; baseline reconstructed from the v2.1.88 sourcemap (2026-03-31). See [`ATTRIBUTION.md`](./ATTRIBUTION.md). Not affiliated with Anthropic.
 
 ---
 
@@ -57,25 +59,8 @@ bun run doctor:arch
 - `doctor:arch` and `bun test` must pass. No `--no-verify`.
 - Commit messages explain *why*.
 - No npm publishing — binary-only by design.
-
-```bash
-gh repo fork Icarus603/claude-code
-git checkout -b feat/your-thing
-bun run doctor:arch && bun test
-gh pr create
-```
-
----
-
-## Releasing
-
-Maintainer only:
-
-```bash
-bun run release v26.M.N
-```
-
-Validates, tags, pushes. GitHub Actions builds binaries for all platforms.
+- PRs are reviewed by one maintainer at human pace. No SLA.
+- Open an [Issue](https://github.com/Icarus603/claude-code/issues) before non-trivial PRs.
 
 ---
 

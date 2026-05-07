@@ -7,7 +7,9 @@
 [![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
 
-終端編程智慧體。單一 binary，命令為 `ccb`。Claude Code 的社群維護衍生版 — 詳見 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。與 Anthropic 無關。
+終端編程智慧體。單一 binary `ccb`。同一個 agent loop 對接 Anthropic、OpenAI 相容端點（Ollama、DeepSeek、vLLM……）、Gemini、Grok。支援 macOS、Linux、Windows。
+
+Claude Code 的個人維護公開衍生版；baseline 由 v2.1.88 sourcemap 重建（2026-03-31）。詳見 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。與 Anthropic 無關。
 
 ---
 
@@ -57,25 +59,8 @@ bun run doctor:arch
 - `doctor:arch` 和 `bun test` 必須通過。不准 `--no-verify`。
 - Commit message 解釋 *為什麼*。
 - 不要把 npm 發布加回來 — 本專案 binary-only。
-
-```bash
-gh repo fork Icarus603/claude-code
-git checkout -b feat/your-thing
-bun run doctor:arch && bun test
-gh pr create
-```
-
----
-
-## 發版
-
-只給維護者：
-
-```bash
-bun run release v26.M.N
-```
-
-驗證、打 tag、push。GitHub Actions 自動建構全平台 binary。
+- PR 由單一維護者以人類速度 review，無 SLA。
+- 非 trivial PR 請先開 [Issue](https://github.com/Icarus603/claude-code/issues) 討論。
 
 ---
 
