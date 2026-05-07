@@ -8,6 +8,7 @@ import { lesson as mcp } from './mcp.js'
 import { lesson as automate } from './automate.js'
 import { lesson as fork } from './fork.js'
 import { lesson as modelDial } from './model-dial.js'
+import { lesson as multiProvider } from './multi-provider.js'
 
 /**
  * All lessons in display order. Each lesson lives in its own file under
@@ -16,9 +17,8 @@ import { lesson as modelDial } from './model-dial.js'
  * banner's `(X/N)` denominator (denominator is the live array length, so
  * the banner stays correct as lessons land).
  *
- * The final 10-lesson set is documented in
- * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3. Currently
- * 9 of 10 are implemented (steps 1–9 of the §11 plan).
+ * The full 10-lesson set is documented in
+ * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3.
  */
 export const ALL_LESSONS: Lesson[] = [
   atMentions,
@@ -30,4 +30,5 @@ export const ALL_LESSONS: Lesson[] = [
   automate,
   fork,
   modelDial,
+  multiProvider,
 ]
