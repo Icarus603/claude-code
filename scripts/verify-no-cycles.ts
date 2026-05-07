@@ -164,11 +164,15 @@ for (const v of graph.keys()) {
 // shrinking same-package SCCs; then to 5 (2026-04-27 Ralph loop) by
 // extracting messageStaticness, slowLoggingTag, formatSkillLoadingMetadata
 // to leaves; redirecting provider→repl back-edges through canonicals;
-// dropping the duplicate cli host-bindings registration. Remaining 5
-// SCCs: 153-file mega (cross-cutting tool-registry/repl/provider/agent),
-// 14-file ink theme (same-package), 11-file swarm (same-package),
-// 5-file cli entry (same-package), 2-file AgentTool internal.
-const BUDGET = 2
+// dropping the duplicate cli host-bindings registration. Then to 2 +
+// then to 1 (2026-05-07 maintenance sweep) as the BG/fork session's
+// daemon-side modules avoided introducing new cycles. Remaining 1 SCC
+// is the 250-file cross-cutting mega (provider+agent+config+permission+
+// tool-registry+repl+mcp-runtime). Breaking it requires sustained
+// restructuring that's out of scope for the post-port maintenance
+// sweep; locked at 1 so any regression introducing a separate cycle
+// still fails the verifier.
+const BUDGET = 1
 
 // Diagnostic mode: print cycles to stdout when --list flag is passed
 if (process.argv.includes('--list')) {
