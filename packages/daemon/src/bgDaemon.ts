@@ -94,28 +94,31 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     }
   }
 
-  // Adopt any persisted records that look running.
-  for (const record of readAllWorkerRecords()) {
-    if (record.status !== 'running') continue
-    if (record.mode !== 'pty') continue // only pty-mode is daemon-supervised
-    const cli = record.cmd[0] ?? 'bun'
-    const cwd = record.cwd
-    const ptySocket = record.ptySocket ?? ''
-    const vm = new WorkerVm(
-      {
-        short: record.short,
-        cwd,
-        env: process.env,
-        ptySocket,
-        cmd: record.cmd,
-        cliVersion: process.env.CLAUDE_CODE_VERSION ?? 'dev',
-      },
-      record,
-    )
-    vm.adopt(record)
-    state.workers.set(record.short, vm)
-    void cli
+  function adoptRunningPtyRecords(): void {
+    for (const record of readAllWorkerRecords()) {
+      if (record.status !== 'running') continue
+      if (record.mode !== 'pty') continue
+      if (state.workers.has(record.short)) continue
+      const vm = new WorkerVm(
+        {
+          short: record.short,
+          cwd: record.cwd,
+          env: process.env,
+          ptySocket: record.ptySocket ?? '',
+          cmd: record.cmd,
+          cliVersion: process.env.CLAUDE_CODE_VERSION ?? 'dev',
+        },
+        record,
+      )
+      vm.adopt(record)
+      state.workers.set(record.short, vm)
+    }
   }
+  // Boot scan + every-5s rescan for workers spawned outside our spawn op
+  // (e.g. ccb --bg-pty fired by user). ant 5172.js sweep cadence.
+  adoptRunningPtyRecords()
+  const adoptTimer = setInterval(adoptRunningPtyRecords, 5000)
+  adoptTimer.unref()
 
   // Wire socket op handlers.
   state.server = await startSocketServer({
