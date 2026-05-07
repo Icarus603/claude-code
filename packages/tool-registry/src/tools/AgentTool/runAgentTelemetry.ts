@@ -43,18 +43,44 @@ export async function maybeRecordForkContextRef(
   )
 }
 
+/**
+ * ant 3848.js XI7 — replay REPL log so inner agent's vm.Script REPL
+ * state matches the parent's. ccb's REPLTool is a 1-line stub today
+ * (isEnabled:()=>false) so this no-ops; the path is wired so that
+ * once REPLTool gets a real impl, hydration becomes active.
+ */
+export async function runReplHydration(rh: ReplHydration): Promise<void> {
+  try {
+    const { hydrateRepl } = await import('@claude-code/agent/replHydration.js')
+    const REPLToolModule = await import('@claude-code/tool-registry/tools/REPLTool/REPLTool.js')
+    const replTool = (REPLToolModule as { REPLTool?: { isEnabled?: () => boolean } }).REPLTool
+    const isEnabled = (): boolean => {
+      if (!replTool) return false
+      const fn = replTool.isEnabled
+      return typeof fn === 'function' && fn() === true
+    }
+    const r = await hydrateRepl(rh, { isReplToolEnabled: isEnabled })
+    if (!r.skipped) {
+      logForDebugging(`[runAgent] REPL hydration: ${r.ok}/${r.attempted} ok (${r.drift} drift, ${r.threw} threw)`)
+    }
+  } catch (e) {
+    logForDebugging(`[runAgent] REPL hydration failed: ${e instanceof Error ? e.message : String(e)}`)
+  }
+}
+
 export function emitReplHydrationTelemetry(
   rh: ReplHydration,
   agentId: string,
   agentType: string,
 ): void {
+  const entries = rh.kind === 'fresh' ? 0 : rh.log.length
   logForDebugging(
-    `[runAgent] replHydration kind=${rh.kind} agentId=${agentId} entries=${rh.log.length}`,
+    `[runAgent] replHydration kind=${rh.kind} agentId=${agentId} entries=${entries}`,
   )
   logEvent('tengu_subagent_repl_hydration', {
     kind: rh.kind,
     agent_type: agentType,
-    entries: String(rh.log.length),
+    entries: String(entries),
   })
 }
 

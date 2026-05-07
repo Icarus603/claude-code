@@ -3,7 +3,7 @@ import type { UUID } from 'crypto'
 import { randomUUID } from 'crypto'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { emitReplHydrationTelemetry, emitSpawnedBySkillTelemetry, maybeRecordForkContextRef } from './runAgentTelemetry.js'
+import { emitReplHydrationTelemetry, emitSpawnedBySkillTelemetry, maybeRecordForkContextRef, runReplHydration } from './runAgentTelemetry.js'
 import { getProjectRoot, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getCommand, getSkillToolCommands, hasCommand } from '@claude-code/command-runtime/runtime'
 import {
@@ -330,7 +330,10 @@ export async function* runAgent({
     setAgentTranscriptSubdir(agentId, transcriptSubdir)
   }
 
-  if (override?.replHydration) emitReplHydrationTelemetry(override.replHydration, agentId, agentDefinition.agentType)
+  if (override?.replHydration) {
+    emitReplHydrationTelemetry(override.replHydration, agentId, agentDefinition.agentType)
+    void runReplHydration(override.replHydration)
+  }
 
   // Register agent in Perfetto trace for hierarchy visualization
   if (isPerfettoTracingEnabled()) {
