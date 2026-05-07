@@ -109,10 +109,10 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
     toolUseContext.options.querySource === `agent:builtin:${FORK_AGENT.agentType}` ||
     isInForkChild(toolUseContext.messages as MessageType[])
   ) {
-    // ant 3692.js — recursive-fork telemetry on the slash-command path too.
-    logEvent('tengu_subagent_launch', {
-      action: 'failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      reason: 'subagent_recursive_fork' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    // ant 3692.js uH(): tengu_feature_bad with feature_name=subagent_launch.
+    logEvent('tengu_feature_bad', {
+      feature_name: 'subagent_launch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code: 'subagent_recursive_fork' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     onDone(
       'Fork is not available inside a forked worker. Complete your task directly using your tools.',
@@ -126,9 +126,9 @@ export const call: LocalJSXCommandCall = async (onDone, rawContext, args) => {
   if (toolUseContext.messages.length === 0) {
     // ant 4656.js Wf3 fall-through: empty messages means no parent
     // prompt to inherit — match ant `subagent_fork_prompt_missing`.
-    logEvent('tengu_subagent_launch', {
-      action: 'failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      reason: 'subagent_fork_prompt_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    logEvent('tengu_feature_bad', {
+      feature_name: 'subagent_launch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code: 'subagent_fork_prompt_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     onDone('Cannot fork before the first conversation turn', {
       display: 'system',

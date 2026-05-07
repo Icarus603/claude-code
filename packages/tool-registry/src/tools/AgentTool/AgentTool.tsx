@@ -495,11 +495,11 @@ export const AgentTool = buildTool({
           `agent:builtin:${FORK_AGENT.agentType}` ||
         isInForkChild(toolUseContext.messages)
       ) {
-        // ant 3692.js — recursive-fork guard telemetry. Emit before
-        // throw so observability sees WHY the spawn was rejected.
-        logEvent('tengu_subagent_launch', {
-          action: 'failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-          reason: 'subagent_recursive_fork' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        // ant 3692.js — recursive-fork guard telemetry. ant uH() →
+        // tengu_feature_bad with feature_name=subagent_launch.
+        logEvent('tengu_feature_bad', {
+          feature_name: 'subagent_launch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          error_code: 'subagent_recursive_fork' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         })
         throw new Error(
           'Fork is not available inside a forked worker. Complete your task directly using your tools.',

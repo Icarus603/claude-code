@@ -70,10 +70,11 @@ export async function resumeAgentBackground({
   ])
   if (!transcript) {
     // ant 3898.js UdH:43 — emit action-error telemetry before throwing
-    // so observability sees WHY the resume failed.
-    logEvent('tengu_subagent_launch', {
-      action: 'failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      reason: 'subagent_resume_transcript_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    // so observability sees WHY the resume failed. ant uH() expands to
+    // tengu_feature_bad with feature_name + error_code.
+    logEvent('tengu_feature_bad', {
+      feature_name: 'subagent_launch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code: 'subagent_resume_transcript_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     throw new Error(`No transcript found for agent ID: ${agentId}`)
   }
@@ -153,9 +154,9 @@ export async function resumeAgentBackground({
     if (!forkParentSystemPrompt) {
       // ant 3898.js UdH:88 — fork-resume with no parent prompt is
       // unrecoverable; surface the specific failure subtype.
-      logEvent('tengu_subagent_launch', {
-        action: 'failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-        reason: 'subagent_resume_fork_prompt_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      logEvent('tengu_feature_bad', {
+        feature_name: 'subagent_launch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        error_code: 'subagent_resume_fork_prompt_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       })
       throw new Error(
         'Cannot resume fork agent: unable to reconstruct parent system prompt',
