@@ -79,7 +79,7 @@ export function PowerupScreen({ onExit }: PowerupScreenProps): React.ReactNode {
         lesson.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       was_already_unlocked: unlocked.has(lesson.id),
       unlocked_count: unlocked.size,
-    } as Record<string, AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS>)
+    })
     setMode({ kind: 'detail', lesson })
   }
 
@@ -96,7 +96,7 @@ export function PowerupScreen({ onExit }: PowerupScreenProps): React.ReactNode {
       lesson_id: id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       unlocked_count: next.size,
       all_unlocked: next.size === ALL_LESSONS.length,
-    } as Record<string, AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS>)
+    })
     if (next.size === ALL_LESSONS.length) {
       setMode({ kind: 'celebration' })
     } else {

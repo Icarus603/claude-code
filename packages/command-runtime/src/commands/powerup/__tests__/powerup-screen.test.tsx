@@ -10,6 +10,7 @@ import { describe, expect, test, beforeEach, mock } from 'bun:test'
 // shape, not specific lesson identities, so additional lessons in
 // later tasks won't break this file.
 let mockConfig: { powerupsUnlocked?: string[] } = {}
+// MOCK_FULL_REPLACE: screen test isolates GlobalConfig persistence — same pattern as state.test; full-replace avoids disk I/O.
 mock.module('@claude-code/config', () => ({
   getGlobalConfig: () => mockConfig,
   saveGlobalConfig: (updater: (c: any) => any) => {
@@ -17,6 +18,7 @@ mock.module('@claude-code/config', () => ({
   },
 }))
 
+// MOCK_FULL_REPLACE: telemetry no-op for tests; logEvent is the only surface used.
 mock.module('@claude-code/local-observability', () => ({
   logEvent: () => {},
 }))
@@ -25,6 +27,7 @@ mock.module('@claude-code/local-observability', () => ({
 // context that bun:test does not provide. We only need to verify
 // that PowerupScreen *constructs* the right options and exposes the
 // `onChange` / `onCancel` callbacks.
+// MOCK_FULL_REPLACE: Select stub avoids needing the real Ink keyboard context, which bun:test cannot provide.
 mock.module('@claude-code/repl/components/CustomSelect/index.js', () => ({
   Select: (props: unknown) => ({ props, _stub: 'select' }),
 }))

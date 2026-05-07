@@ -278,8 +278,7 @@ export type GlobalConfig = {
   userID?: string
   theme: ThemeSetting
   hasCompletedOnboarding?: boolean
-  /** /powerup lesson ids the user has marked done. Undefined = never opened /powerup. */
-  powerupsUnlocked?: string[]
+  powerupsUnlocked?: string[] // /powerup lesson ids marked done; undefined = never opened /powerup
   // Tracks the last version that reset onboarding, used with MIN_VERSION_REQUIRING_ONBOARDING_RESET
   lastOnboardingVersion?: string
   mcpServers?: Record<string, McpServerConfig>
@@ -634,7 +633,6 @@ export type GlobalConfig = {
 
   // Speculation configuration (ant-only)
   speculationEnabled?: boolean // Whether speculation is enabled (default: true)
-
 
   // Client data for server-side experiments (fetched during bootstrap).
   clientDataCache?: Record<string, unknown> | null
