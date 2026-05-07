@@ -229,9 +229,13 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         ...[...state.workers.values()].map(vm => buildEntry(vm, false)),
         ...[...state.detached.values()].map(vm => buildEntry(vm, true)),
       ]
-      // Also surface non-running records (recently exited).
+      // Also surface non-running records (recently exited). Skip if
+      // the worker is already in the live or detached map — otherwise a
+      // detached worker that still has a meta.json under jobs/<short>/
+      // would appear twice (once with detached:true, once as 'retired').
       for (const record of readAllWorkerRecords()) {
         if (state.workers.has(record.short)) continue
+        if (state.detached.has(record.short)) continue
         jobs.push({
           short: record.short,
           pid: record.pid,

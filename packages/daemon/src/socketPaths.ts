@@ -71,9 +71,14 @@ export function getClaimSocketPath(short: string): string {
   return join(getDaemonScopeDir(), `${short}.claim.sock`)
 }
 
-/** ~/.claude/daemon directory for breadcrumb files. */
+/**
+ * ~/.claude/daemon directory for breadcrumb files. Respects
+ * CLAUDE_CONFIG_HOME for consistency with bgWorkerRegistry.getJobsRoot()
+ * and so unit tests can isolate by pointing the env var at a tmpdir.
+ */
 export function getDaemonHomeDir(): string {
-  return join(homedir(), '.claude', 'daemon')
+  const root = process.env.CLAUDE_CONFIG_HOME
+  return root ? join(root, 'daemon') : join(homedir(), '.claude', 'daemon')
 }
 
 /** ~/.claude/daemon/pty-pids directory. */
