@@ -6,7 +6,7 @@ import type { Lesson } from './types.js'
 export const lesson: Lesson = {
   id: 'multi-provider',
   title: 'Talk to any model',
-  tagline: 'Anthropic / OpenAI / Gemini / Grok',
+  tagline: 'Anthropic/OpenAI/Gemini/Grok',
   body: (
     <Box flexDirection="column" gap={1}>
       <Text>

@@ -28,7 +28,7 @@ export const lesson: Lesson = {
       </Text>
       <Text dimColor>
         Also: <Text color="suggestion">/fast</Text> toggles fast mode (Opus
-        4.6, faster output, same model family).
+        4.7, faster output, same model family).
       </Text>
     </Box>
   ),
