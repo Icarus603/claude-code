@@ -26,7 +26,7 @@ const BUDGET: Record<string, number> = {
   'cli': 22,  // +1: src/{main,entrypoints/cli,entrypoints/mcp} moved into packages/cli/src/entry/, all their imports now count as cli's deps
   'command-runtime': 20,
   'config': 14,  // +1: mcp-runtime lazy-required by plugin/_deps to fix MCP schema null bug
-  'daemon': 3,
+  'daemon': 5, // bg classifier needs agent/provider/tool-registry for LLM client
   'headless-sdk': 2,
   'ide': 10,
   'local-observability': 13,

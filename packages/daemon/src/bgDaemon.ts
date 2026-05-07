@@ -172,9 +172,24 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       ok({ op: 'ping', uptime: Date.now() - state.startedAt }),
     nudge: async () => ok({ op: 'nudge', restarting: false }),
     list: async () => {
-      const jobs = [...state.workers.values()].map(vm => {
+      const { readState } = await import('./classifier/stateFile.js')
+      interface JobEntry {
+        short: string
+        pid: number
+        status: string
+        phase: string
+        mode?: string
+        startedAt: number
+        attachers: number
+        classifierState?: string
+        classifierTempo?: string
+        classifierDetail?: string
+        classifierNeeds?: string
+      }
+      const jobs: JobEntry[] = [...state.workers.values()].map(vm => {
         const r = vm.getRecord()
-        return {
+        const cs = readState(r.short)
+        const j: JobEntry = {
           short: r.short,
           pid: r.pid,
           status: r.status,
@@ -183,6 +198,14 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
           startedAt: r.startedAt,
           attachers: vm.attacherCount(),
         }
+        // ant 3921.js: classifier state surfaced on list.
+        if (cs) {
+          j.classifierState = cs.state
+          j.classifierTempo = cs.tempo
+          j.classifierDetail = cs.detail
+          if (cs.needs) j.classifierNeeds = cs.needs
+        }
+        return j
       })
       // Also surface non-running records (recently exited).
       for (const record of readAllWorkerRecords()) {
@@ -224,6 +247,8 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         setTimeout(() => state.workers.delete(short), 100).unref()
       })
       vm.spawn()
+      // Start classifier orchestrator if gate is on (intent unknown for spawn op).
+      void import('./classifier/orchestrator.js').then(m => m.startOrchestrator(vm)).catch(() => {})
       return ok({ op: 'spawn', short, pid: vm.getRecord().pid })
     },
     /**
@@ -276,6 +301,8 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         setTimeout(() => { state.workers.delete(short); state.pending.delete(short) }, 100).unref()
       })
       vm.spawn()
+      // Start classifier orchestrator with intent (the dispatch directive).
+      void import('./classifier/orchestrator.js').then(m => m.startOrchestrator(vm, (d.directive as string | undefined) ?? (d.intent as string | undefined))).catch(() => {})
       setTimeout(() => {
         if (pending.acked || pending.failed) return
         if (state.workers.get(short) === vm) {

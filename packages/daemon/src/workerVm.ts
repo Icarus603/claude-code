@@ -145,6 +145,10 @@ export class WorkerVm extends EventEmitter {
         // handler on the server side will remove it.
       }
     }
+    // Emit 'write' so classifier orchestrator + dispatch ack listeners
+    // can react to ring activity. EventEmitter accepts string event names;
+    // we forward chunk as the payload.
+    this.emit('write', chunk)
   }
 
   /** Snapshot of current ring buffer for replay-on-attach. */

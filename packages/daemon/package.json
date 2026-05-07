@@ -20,6 +20,13 @@
     "./workerVm.js": "./src/workerVm.ts",
     "./bgDaemon.js": "./src/bgDaemon.ts",
     "./launchAgent.js": "./src/launchAgent.ts",
-    "./sparePool.js": "./src/sparePool.ts"
+    "./sparePool.js": "./src/sparePool.ts",
+    "./classifier/state.js": "./src/classifier/state.ts",
+    "./classifier/heuristic.js": "./src/classifier/heuristic.ts",
+    "./classifier/patterns.js": "./src/classifier/patterns.ts",
+    "./classifier/llmClient.js": "./src/classifier/llmClient.ts",
+    "./classifier/stateFile.js": "./src/classifier/stateFile.ts",
+    "./classifier/orchestrator.js": "./src/classifier/orchestrator.ts",
+    "./classifier/systemPrompt.js": "./src/classifier/systemPrompt.ts"
   }
 }

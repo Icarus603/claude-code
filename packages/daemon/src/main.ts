@@ -144,7 +144,9 @@ async function bgDaemonStatus(asJson = false): Promise<void> {
     return
   }
   for (const j of jobs) {
-    console.log(`  ${j.short}  ${j.status}  pid=${j.pid}  attachers=${j.attachers}`)
+    const cls = j.classifierState ? ` [${j.classifierState}/${j.classifierTempo}]` : ''
+    const needs = j.classifierNeeds ? ` needs="${String(j.classifierNeeds).slice(0, 60)}"` : ''
+    console.log(`  ${j.short}  ${j.status}${cls}  pid=${j.pid}  attachers=${j.attachers}${needs}`)
   }
 }
 
