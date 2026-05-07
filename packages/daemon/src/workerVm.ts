@@ -356,6 +356,10 @@ export class WorkerVm extends EventEmitter {
       // Escalate to SIGKILL after 5s if SIGTERM didn't take.
       setTimeout(() => {
         if (this.phase.kind === 'retiring' && this.phase.reason === 'grace') {
+          logEvent('tengu_bg_dispatch_sigkill_escalate', {
+            short: this.config.short,
+            pid: String(this.record.pid),
+          })
           try {
             process.kill(-this.record.pid, 'SIGKILL')
           } catch {

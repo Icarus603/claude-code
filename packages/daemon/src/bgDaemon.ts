@@ -231,9 +231,18 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       const d = (msg.d ?? msg) as Record<string, unknown>
       const short = d.short as string | undefined
       const nonce = d.nonce as string | undefined
-      if (!short) return err('EBADREQ', 'dispatch: missing short')
-      if (!nonce) return err('EBADREQ', 'dispatch: missing nonce')
-      if (state.workers.has(short)) return err('EALIVE', `worker ${short} already running`, { short })
+      if (!short) {
+        logEventFn('tengu_bg_dispatch_rejected', { reason: 'missing_short' })
+        return err('EBADREQ', 'dispatch: missing short')
+      }
+      if (!nonce) {
+        logEventFn('tengu_bg_dispatch_rejected', { short, reason: 'missing_nonce' })
+        return err('EBADREQ', 'dispatch: missing nonce')
+      }
+      if (state.workers.has(short)) {
+        logEventFn('tengu_bg_dispatch_rejected', { short, reason: 'already_running' })
+        return err('EALIVE', `worker ${short} already running`, { short })
+      }
       const vm = new WorkerVm({
         short,
         cwd: (d.cwd as string) ?? process.cwd(),
@@ -397,6 +406,14 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
 
   process.off('SIGINT', onSignal)
   process.off('SIGTERM', onSignal)
+
+  // ant tengu_bg_dispatch_stale_drop: in-flight dispatches the daemon
+  // can't see through. Mark pending entries failed before close.
+  for (const [short, p] of state.pending.entries()) {
+    if (p.acked || p.failed) continue
+    p.failed = { code: 'ESHUTDOWN', error: 'daemon shutting down' }
+    logEventFn('tengu_bg_dispatch_stale_drop', { short, ms: String(Date.now() - p.startedAt) })
+  }
 
   // Force-settle workers, persist final state, close server.
   for (const vm of state.workers.values()) {
