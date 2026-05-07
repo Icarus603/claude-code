@@ -28,6 +28,7 @@
     "./classifier/stateFile.js": "./src/classifier/stateFile.ts",
     "./classifier/orchestrator.js": "./src/classifier/orchestrator.ts",
     "./classifier/systemPrompt.js": "./src/classifier/systemPrompt.ts",
-    "./dispatchSpool.js": "./src/dispatchSpool.ts"
+    "./dispatchSpool.js": "./src/dispatchSpool.ts",
+    "./roster.js": "./src/roster.ts"
   }
 }

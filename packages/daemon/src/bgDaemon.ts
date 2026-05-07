@@ -19,6 +19,7 @@ import {
   readAllWorkerRecords,
   writeWorkerRecord,
 } from './bgWorkerRegistry.js'
+import { recordToRosterEntry, readRoster, updateRoster } from './roster.js'
 import { type DaemonServer, err, ok, startSocketServer } from './socketServer.js'
 import { WorkerVm } from './workerVm.js'
 
@@ -104,6 +105,73 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     }
   }
 
+  /**
+   * Boot adopt from roster.json. ant 5166.js / 4139.js — supervisor
+   * loads the previous roster, replays each entry as an adoption attempt
+   * (verifying pid + procStart), and orphans entries whose underlying
+   * process is gone. Roster mode adoptions take precedence over the
+   * jobs/ scan because the roster carries cross-cwd entries the
+   * cwd-scoped jobs/ tree wouldn't see.
+   *
+   * On parseFailed roster, we skip — the file has been quarantined and
+   * we'll fall through to jobs/ scan + write a fresh empty roster.
+   */
+  function adoptFromRoster(): void {
+    const roster = readRoster()
+    if (roster.parseFailed) return
+    let adopted = 0
+    let dead = 0
+    for (const [short, entry] of Object.entries(roster.workers)) {
+      if (state.workers.has(short)) continue
+      if (!isPidAliveSync(entry.pid)) {
+        dead++
+        continue
+      }
+      const ptySocket = entry.ptySock ?? entry.rendezvousSock ?? ''
+      const sockExists = ptySocket ? existsSyncFn(ptySocket) : false
+      if (!sockExists) {
+        // Worker pid alive but socket gone — unreachable for attach.
+        // ant skips; we mirror.
+        logEventFn('tengu_bg_adopt_sock_unlinked', { short, sock: ptySocket })
+        dead++
+        continue
+      }
+      const record: WorkerRecord = {
+        short,
+        pid: entry.pid,
+        cmd: [],
+        cwd: entry.cwd,
+        startedAt: entry.startedAt,
+        status: 'running',
+        mode: 'pty',
+        ptySocket,
+        procStart: entry.procStart,
+        attempt: entry.attempt,
+        cliVersion: entry.cliVersion,
+      }
+      const vm = new WorkerVm(
+        {
+          short,
+          cwd: entry.cwd,
+          env: process.env,
+          ptySocket,
+          cmd: [],
+          cliVersion: process.env.CLAUDE_CODE_VERSION ?? 'dev',
+        },
+        record,
+      )
+      vm.adopt(record)
+      state.workers.set(short, vm)
+      adopted++
+    }
+    if (adopted + dead > 0) {
+      logEventFn('tengu_bg_adopt', {
+        adopted: String(adopted),
+        dead: String(dead),
+        source: 'roster',
+      })
+    }
+  }
   function adoptRunningPtyRecords(): void {
     for (const record of readAllWorkerRecords()) {
       if (record.status !== 'running') continue
@@ -213,9 +281,28 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   }
   // Boot scan + every-5s rescan for workers spawned outside our spawn op
   // (e.g. ccb --bg-pty fired by user). ant 5172.js sweep cadence.
+  // Two source-of-truth: (1) jobs/<short>/meta.json (always authoritative
+  // for status), (2) ~/.claude/daemon/roster.json (cross-cwd index of live
+  // supervisors — survives daemon restart). Adopt from both then unify.
+  adoptFromRoster()
   adoptRunningPtyRecords()
+  // After boot adopt, snapshot the current workers map back to roster.json
+  // so a parallel observer (ccb doctor) sees the new supervisor's view.
+  void updateRoster(r => {
+    r.workers = {}
+    for (const [s, vm] of state.workers) r.workers[s] = recordToRosterEntry(vm.getRecord())
+  }).catch(() => {})
   const adoptTimer = setInterval(adoptRunningPtyRecords, 5000)
   adoptTimer.unref()
+  // Periodic roster refresh (catches state changes that don't go through
+  // our spawn/settle handlers — e.g. record mutated by external tooling).
+  const rosterTimer = setInterval(() => {
+    void updateRoster(r => {
+      r.workers = {}
+      for (const [s, vm] of state.workers) r.workers[s] = recordToRosterEntry(vm.getRecord())
+    }).catch(() => {})
+  }, 30_000)
+  rosterTimer.unref()
 
   // Wire socket op handlers. Captured into a variable so the dispatch
   // file-spool watcher (ant 5165.js) can reuse the same handler table.
@@ -300,12 +387,20 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       state.workers.set(short, vm)
       vm.on('settled', () => {
         // Keep settled vm in registry for one tick so list still
-        // surfaces the result; then drop.
+        // surfaces the result; then drop. Also remove from roster.
         setTimeout(() => state.workers.delete(short), 100).unref()
+        void updateRoster(r => {
+          delete r.workers[short]
+        }).catch(() => {})
       })
       vm.spawn()
       // Start classifier orchestrator if gate is on (intent unknown for spawn op).
       void import('./classifier/orchestrator.js').then(m => m.startOrchestrator(vm)).catch(() => {})
+      // Persist into roster so a subsequent supervisor restart picks
+      // this worker up via adoptFromRoster (cross-cwd visibility).
+      void updateRoster(r => {
+        r.workers[short] = recordToRosterEntry(vm.getRecord())
+      }).catch(() => {})
       return ok({ op: 'spawn', short, pid: vm.getRecord().pid })
     },
     /**
@@ -384,8 +479,12 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
           logEventFn('tengu_bg_respawn_unconfirmed_bail', { short, outcome, ms: String(Date.now() - pending.startedAt) })
         }
         setTimeout(() => { state.workers.delete(short); state.pending.delete(short) }, 100).unref()
+        void updateRoster(r => { delete r.workers[short] }).catch(() => {})
       })
       vm.spawn()
+      void updateRoster(r => {
+        r.workers[short] = recordToRosterEntry(vm.getRecord())
+      }).catch(() => {})
       // Start classifier orchestrator with intent (the dispatch directive).
       void import('./classifier/orchestrator.js').then(m => m.startOrchestrator(vm, (d.directive as string | undefined) ?? (d.intent as string | undefined))).catch(() => {})
       setTimeout(() => {
@@ -531,6 +630,9 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       freshRecord.attachStallRespawns = attempts + 1
       state.workers.set(short, fresh)
       fresh.spawn()
+      void updateRoster(r => {
+        r.workers[short] = recordToRosterEntry(fresh.getRecord())
+      }).catch(() => {})
       return ok({ op: 'respawn-stalled', short, pid: fresh.getRecord().pid, attempts: attempts + 1 })
     },
     respawn: async msg => {
@@ -559,6 +661,9 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       })
       state.workers.set(short, fresh)
       fresh.spawn()
+      void updateRoster(r => {
+        r.workers[short] = recordToRosterEntry(fresh.getRecord())
+      }).catch(() => {})
       return ok({ op: 'respawn', short, pid: fresh.getRecord().pid })
     },
     retire: async msg => {
@@ -586,6 +691,9 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       vm.on('settled', () => {
         setTimeout(() => state.detached.delete(short), 100).unref()
       })
+      // Detached workers stop being supervised; drop from roster so a
+      // daemon restart doesn't try to re-adopt them.
+      void updateRoster(r => { delete r.workers[short] }).catch(() => {})
       return ok({ op: 'detach', short, detached: true })
     },
     shutdown: async () => {
