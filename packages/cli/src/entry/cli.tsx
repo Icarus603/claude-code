@@ -237,6 +237,7 @@ async function main(): Promise<void> {
       args.includes('--bg') ||
       args.includes('--bg-pty') ||
       args.includes('--bg-interactive') ||
+      args.includes('--bg-detached') ||
       args.includes('--background'))
   ) {
     profileCheckpoint('cli_bg_path')
