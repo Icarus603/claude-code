@@ -43,6 +43,7 @@ import {
   isDetailedProfilingEnabled,
 } from '@claude-code/app-host/startup/startupProfiler.js'
 import { EmergencyTip } from './EmergencyTip.js'
+import { PowerupBanner } from '@claude-code/command-runtime/commands/powerup/PowerupBanner.js'
 import { VoiceModeNotice } from './VoiceModeNotice.js'
 import { Opus1mMergeNotice } from './Opus1mMergeNotice.js'
 import { GateOverridesWarning } from './GateOverridesWarning.js'
@@ -175,6 +176,7 @@ export function LogoV2(): React.ReactNode {
           </Box>
         )}
         <EmergencyTip />
+        <PowerupBanner />
         {process.env.CLAUDE_CODE_TMUX_SESSION && (
           <Box paddingLeft={2} flexDirection="column">
             <Text dimColor>
@@ -383,6 +385,7 @@ export function LogoV2(): React.ReactNode {
         </Box>
       )}
       <EmergencyTip />
+      <PowerupBanner />
       {process.env.CLAUDE_CODE_TMUX_SESSION && (
         <Box paddingLeft={2} flexDirection="column">
           <Text dimColor>

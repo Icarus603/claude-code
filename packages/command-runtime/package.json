@@ -35,6 +35,7 @@
     "./commands/powerup/powerup.js": "./src/commands/powerup/powerup.tsx",
     "./commands/powerup/state.js": "./src/commands/powerup/state.ts",
     "./commands/powerup/FrameAnimation.js": "./src/commands/powerup/FrameAnimation.tsx",
+    "./commands/powerup/PowerupBanner.js": "./src/commands/powerup/PowerupBanner.tsx",
     "./commands/powerup/lessons/at-mentions.js": "./src/commands/powerup/lessons/at-mentions.tsx",
     "./commands/powerup/lessons/modes.js": "./src/commands/powerup/lessons/modes.tsx",
     "./commands/powerup/lessons/undo.js": "./src/commands/powerup/lessons/undo.tsx",
