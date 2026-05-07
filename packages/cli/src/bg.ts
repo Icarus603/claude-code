@@ -80,6 +80,8 @@ interface JobMeta {
   ptySocket?: string
   /** procStart timestamp from /proc or ps; defeats PID-recycle false alives. */
   procStart?: number
+  /** ccb version that spawned this worker; daemon adopt compares for upgrade. */
+  cliVersion?: string
 }
 
 const JOB_SHORT_LENGTH = 8
@@ -420,13 +422,10 @@ async function spawnBgJob(opts: {
 
   const { readProcStart } = await import('@claude-code/daemon/bgWorkerRegistry.js')
   const meta: JobMeta = {
-    short,
-    pid: child.pid,
-    cmd: fullCmd,
-    cwd: opts.cwd,
-    startedAt: Date.now(),
-    status: 'running',
+    short, pid: child.pid, cmd: fullCmd, cwd: opts.cwd,
+    startedAt: Date.now(), status: 'running',
     procStart: readProcStart(child.pid) || undefined,
+    cliVersion: MACRO.VERSION,
   }
   writeJobMeta(meta)
 

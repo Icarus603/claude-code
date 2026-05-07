@@ -11,6 +11,8 @@
  * @dynamicRequire
  */
 
+import { existsSync as existsSyncFn } from 'node:fs'
+import { logEvent as logEventFn } from '@claude-code/local-observability'
 import {
   type WorkerRecord,
   readAllWorkerRecords,
@@ -99,19 +101,43 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       if (record.status !== 'running') continue
       if (record.mode !== 'pty') continue
       if (state.workers.has(record.short)) continue
+      // ant 4639.js — sock_unlinked detection: ptySocket file gone means
+      // the worker is unreachable for attach even if pid is alive.
+      const ptySocket = record.ptySocket ?? ''
+      const sockExists = ptySocket ? existsSyncFn(ptySocket) : false
+      if (ptySocket && !sockExists) {
+        logEventFn('tengu_bg_adopt_sock_unlinked', { short: record.short, sock: ptySocket })
+      }
+      // ant adopt_upgrade_respawn: cliVersion mismatch means user
+      // upgraded ccb between worker spawn and daemon adopt — schedule
+      // a respawn under the new binary so adopters see consistent api.
+      const currentCli = process.env.CLAUDE_CODE_VERSION ?? 'dev'
+      if (record.cliVersion && record.cliVersion !== currentCli) {
+        logEventFn('tengu_bg_adopt_upgrade_respawn', { short: record.short, was: record.cliVersion, now: currentCli })
+      }
+      // procStart unreadable → log adopt_unverified but proceed.
+      if (record.procStart === undefined || record.procStart === 0) {
+        logEventFn('tengu_bg_adopt_unverified', { short: record.short, pid: String(record.pid) })
+      }
       const vm = new WorkerVm(
         {
           short: record.short,
           cwd: record.cwd,
           env: process.env,
-          ptySocket: record.ptySocket ?? '',
+          ptySocket,
           cmd: record.cmd,
-          cliVersion: process.env.CLAUDE_CODE_VERSION ?? 'dev',
+          cliVersion: currentCli,
         },
         record,
       )
       vm.adopt(record)
       state.workers.set(record.short, vm)
+      logEventFn('tengu_bg_adopt', {
+        short: record.short,
+        pid: String(record.pid),
+        sock_exists: String(sockExists),
+        verified: String(record.procStart !== undefined && record.procStart !== 0),
+      })
     }
   }
   // Boot scan + every-5s rescan for workers spawned outside our spawn op

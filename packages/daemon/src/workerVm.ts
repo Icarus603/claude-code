@@ -16,6 +16,7 @@
 import { spawn } from 'node:child_process'
 import { EventEmitter } from 'node:events'
 
+import { logEvent } from '@claude-code/local-observability'
 import {
   type WorkerPhase,
   type WorkerRecord,
@@ -165,6 +166,7 @@ export class WorkerVm extends EventEmitter {
     this.phase = { kind: 'spawning', attempt: this.attempt }
     const [cmd, ...args] = this.config.cmd
     if (!cmd) {
+      logEvent('tengu_bg_pty_unavailable', { short: this.config.short, reason: 'empty_cmd' })
       this.settle('crashed')
       return
     }
@@ -176,6 +178,7 @@ export class WorkerVm extends EventEmitter {
     })
     child.unref()
     if (child.pid === undefined) {
+      logEvent('tengu_bg_pty_unavailable', { short: this.config.short, reason: 'spawn_no_pid' })
       this.settle('crashed')
       return
     }
@@ -189,6 +192,11 @@ export class WorkerVm extends EventEmitter {
     writeWorkerRecord(this.record)
     this.phase = { kind: 'running' }
     this.startHeartbeatPoll()
+    logEvent('tengu_bg_worker_spawn', {
+      short: this.config.short,
+      pid: String(child.pid),
+      attempt: String(this.attempt),
+    })
     this.emit('spawned', child.pid)
   }
 
@@ -216,6 +224,7 @@ export class WorkerVm extends EventEmitter {
     this.heartbeatTimer = setInterval(() => {
       if (!this.isRunning()) return
       if (!isPidAlive(this.record.pid)) {
+        logEvent('tengu_bg_worker_vanished', { short: this.config.short, pid: String(this.record.pid) })
         this.onChildExit(0, undefined)
       }
     }, HEARTBEAT_POLL_MS)
@@ -238,6 +247,13 @@ export class WorkerVm extends EventEmitter {
       this.heartbeatTimer = null
     }
     const uptime = Date.now() - this.record.startedAt
+    logEvent('tengu_bg_worker_exit', {
+      short: this.config.short,
+      pid: String(this.record.pid),
+      exit_code: String(exitCode),
+      signal: signal ?? '',
+      uptime_ms: String(uptime),
+    })
     if (this.isKilling()) {
       this.settle('killed')
       return
@@ -255,6 +271,7 @@ export class WorkerVm extends EventEmitter {
     if (uptime < FAST_CRASH_WINDOW_MS) {
       this.fastCrashStreak++
       if (this.fastCrashStreak >= FAST_CRASH_LIMIT) {
+        logEvent('tengu_bg_respawn_exhausted', { short: this.config.short, reason: 'fast_crash', streak: String(this.fastCrashStreak) })
         this.settle('crashed')
         return
       }
@@ -262,6 +279,7 @@ export class WorkerVm extends EventEmitter {
       this.fastCrashStreak = 0
     }
     if (this.attempt >= MAX_RESPAWN_ATTEMPTS) {
+      logEvent('tengu_bg_respawn_exhausted', { short: this.config.short, reason: 'max_attempts', attempts: String(this.attempt) })
       this.settle('crashed')
       return
     }
@@ -284,8 +302,12 @@ export class WorkerVm extends EventEmitter {
    * worker running but daemon should forget about it).
    */
   kill(reason: 'grace' | 'reap' | 'stop'): void {
-    if (this.phase.kind === 'retired') return
+    if (this.phase.kind === 'retired') {
+      logEvent('tengu_bg_phase_illegal', { short: this.config.short, op: 'kill', current: 'retired', requested: reason })
+      return
+    }
     this.phase = { kind: 'retiring', reason }
+    logEvent('tengu_bg_retired', { short: this.config.short, reason })
     if (reason === 'stop') {
       // Just detach; let the worker keep running (it'll be re-adopted
       // next time the daemon starts).
@@ -324,7 +346,10 @@ export class WorkerVm extends EventEmitter {
    * this WorkerVm from the registry's `Map<short, WorkerVm>`.
    */
   private settle(outcome: SettleOutcome): void {
-    if (this.settled) return
+    if (this.settled) {
+      logEvent('tengu_bg_phase_illegal', { short: this.config.short, op: 'settle', current: this.settled, requested: outcome })
+      return
+    }
     this.settled = outcome
     this.phase = { kind: 'retired', outcome }
     if (this.heartbeatTimer) {
@@ -359,6 +384,7 @@ export class WorkerVm extends EventEmitter {
       }
     }
     this.attachers.clear()
+    logEvent('tengu_bg_settle', { short: this.config.short, outcome, attempts: String(this.attempt) })
     this.emit('settled', outcome)
   }
 

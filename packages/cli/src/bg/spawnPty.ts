@@ -28,6 +28,8 @@ export interface SpawnPtyResult {
   mode: 'pty'
   /** procStart timestamp; defeats PID recycle. Read sync at spawn time. */
   procStart?: number
+  /** ccb version that spawned the worker. */
+  cliVersion?: string
 }
 
 /**
@@ -122,5 +124,6 @@ export function spawnPtyHost(opts: {
     socketPath,
     mode: 'pty',
     procStart: readProcStart(child.pid) || undefined,
+    cliVersion: MACRO.VERSION,
   }
 }

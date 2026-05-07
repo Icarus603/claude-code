@@ -56,6 +56,8 @@ export interface WorkerRecord {
   attempt?: number
   /** Consecutive crashes within 5s of spawn. >=3 → settle 'crashed'. */
   fastCrashStreak?: number
+  /** ccb version that spawned this worker; used by adopt to detect upgrade. */
+  cliVersion?: string
 }
 
 /** Cap on respawn attempts (ant hXK = 20). */
