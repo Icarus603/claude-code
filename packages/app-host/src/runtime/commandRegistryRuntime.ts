@@ -130,6 +130,7 @@ import files from '@claude-code/repl/commands/files/index.js'
 import branch from '@claude-code/swarm/commands/branch/index.js'
 import agents from '@claude-code/swarm/commands/agents/index.js'
 import plugin from '@claude-code/command-runtime/commands/plugin/index.js'
+import powerup from '@claude-code/command-runtime/commands/powerup/index.js'
 import reloadPlugins from '@claude-code/config/plugin/commands/reload-plugins/index.js'
 import rewind from '@claude-code/repl/commands/rewind/index.js'
 import heapDump from '@claude-code/repl/commands/heapdump/index.js'
@@ -291,6 +292,7 @@ const COMMANDS = memoize((): Command[] => [
   outputStyle,
   remoteEnv,
   plugin,
+  powerup,
   pr_comments,
   reloadPlugins,
   rename,

@@ -31,6 +31,8 @@
     "./commands/model/model.js": "./src/commands/model/model.tsx",
     "./stubs/emptyCommandStub.js": "./src/stubs/emptyCommandStub.ts",
     "./stubs/resetLimitsStub.js": "./src/stubs/resetLimitsStub.ts",
+    "./commands/powerup/index.js": "./src/commands/powerup/index.ts",
+    "./commands/powerup/powerup.js": "./src/commands/powerup/powerup.tsx",
     "./commands/powerup/state.js": "./src/commands/powerup/state.ts",
     "./commands/powerup/FrameAnimation.js": "./src/commands/powerup/FrameAnimation.tsx",
     "./commands/powerup/lessons/at-mentions.js": "./src/commands/powerup/lessons/at-mentions.tsx",
