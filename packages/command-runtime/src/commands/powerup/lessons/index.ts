@@ -1,5 +1,6 @@
 import type { Lesson } from './types.js'
 import { lesson as atMentions } from './at-mentions.js'
+import { lesson as modes } from './modes.js'
 
 /**
  * All lessons in display order. Each lesson lives in its own file under
@@ -12,4 +13,5 @@ import { lesson as atMentions } from './at-mentions.js'
  */
 export const ALL_LESSONS: Lesson[] = [
   atMentions,
+  modes,
 ]
