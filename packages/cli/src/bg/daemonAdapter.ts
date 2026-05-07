@@ -33,32 +33,105 @@ export async function isDaemonAlive(): Promise<boolean> {
   return r.ok === true
 }
 
-/**
- * Ensure a daemon is reachable. If not, spawn a transient one and
- * wait up to 5s for it to come up. Returns true on success, false if
- * we couldn't get a daemon up (caller falls back to daemon-less).
- */
-export async function ensureDaemon(): Promise<boolean> {
-  if (await isDaemonAlive()) return true
-
+function spawnTransient(): void {
   const isBun = process.argv0.endsWith('bun')
   const cmd = isBun ? process.argv0 : process.argv[0]!
   const cliJs = isBun ? [process.argv[1] ?? ''] : []
-
   const child = spawn(cmd, [...cliJs, 'daemon', 'bg', 'run'], {
     detached: true,
     stdio: ['ignore', 'ignore', 'ignore'],
     env: { ...process.env, CLAUDE_CODE_DAEMON_TRANSIENT: '1' },
   })
   child.unref()
+}
 
-  // Poll for daemon liveness up to SPAWN_WAIT_MS.
-  const deadline = Date.now() + SPAWN_WAIT_MS
+async function pollAlive(deadlineMs: number): Promise<boolean> {
+  const deadline = Date.now() + deadlineMs
   while (Date.now() < deadline) {
     if (await isDaemonAlive()) return true
     await new Promise(r => setTimeout(r, SPAWN_POLL_MS))
   }
   return false
+}
+
+/**
+ * Ensure a daemon is reachable. If not, spawn a transient one and
+ * wait up to 5s for it to come up. Returns true on success, false if
+ * we couldn't get a daemon up (caller falls back to daemon-less).
+ *
+ * Mirrors ant 4640.js wg() — opts.forceTransient skips the LaunchAgent
+ * install path even when one would normally be offered.
+ */
+export async function ensureDaemon(opts: { forceTransient?: boolean } = {}): Promise<boolean> {
+  if (await isDaemonAlive()) return true
+  void opts.forceTransient
+  spawnTransient()
+  return pollAlive(SPAWN_WAIT_MS)
+}
+
+/**
+ * Cold-start prompt — ant 4640.js vX_(). When daemon is dead and we're
+ * on a TTY (not CI), ask whether the user wants to install it as a
+ * persistent service vs. running a transient instance for this session.
+ *
+ * Returns true if a daemon is reachable after the prompt (regardless of
+ * which path was taken). Caller responsibility to invoke only when they
+ * actually need daemon access.
+ */
+export async function ensureDaemonInteractive(): Promise<boolean> {
+  if (await isDaemonAlive()) return true
+  if (
+    !process.stdin.isTTY ||
+    !process.stderr.isTTY ||
+    process.env.CI === 'true' ||
+    process.platform !== 'darwin'
+  ) {
+    spawnTransient()
+    return pollAlive(SPAWN_WAIT_MS)
+  }
+  process.stderr.write(
+    'No background daemon is running.\nInstalling it as a service keeps the daemon up across reboot so background sessions stay available.\n',
+  )
+  const answer = await promptYesNoOnceNever('Install as a service now? [y/N/never, or "once" just for now] ')
+  if (answer === 'yes') {
+    const { homedir } = await import('node:os')
+    const { join } = await import('node:path')
+    const { installLaunchAgent } = await import('@claude-code/daemon/launchAgent.js')
+    const ccbDir = join(homedir(), '.claude', 'daemon')
+    const r = await installLaunchAgent({
+      jsonPath: join(ccbDir, 'state.json'),
+      logPath: join(ccbDir, 'daemon.log'),
+    })
+    if (!r.ok) {
+      process.stderr.write(`Service install failed (${r.error}). Falling back to a transient daemon.\n`)
+      spawnTransient()
+      return pollAlive(SPAWN_WAIT_MS)
+    }
+    process.stderr.write(`Installed: ${r.servicePath}\nRun 'ccb daemon bg uninstall' to undo.\n`)
+    return pollAlive(5000)
+  }
+  spawnTransient()
+  return pollAlive(SPAWN_WAIT_MS)
+}
+
+async function promptYesNoOnceNever(q: string): Promise<'yes' | 'no' | 'once' | 'never'> {
+  const rl = (await import('node:readline')).createInterface({
+    input: process.stdin,
+    output: process.stderr,
+  })
+  try {
+    const ans = await new Promise<string>(resolve => {
+      rl.once('close', () => resolve('n'))
+      rl.question(q, resolve)
+    })
+    const a = ans.trim().toLowerCase()
+    if (a === 'y' || a === 'yes') return 'yes'
+    if (a === 'once' || a === 'o') return 'once'
+    if (a === 'never') return 'never'
+    return 'no'
+  } finally {
+    rl.close()
+  }
 }
 
 /**

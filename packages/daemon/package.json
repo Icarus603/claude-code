@@ -18,6 +18,7 @@
     "./socketServer.js": "./src/socketServer.ts",
     "./bgWorkerRegistry.js": "./src/bgWorkerRegistry.ts",
     "./workerVm.js": "./src/workerVm.ts",
-    "./bgDaemon.js": "./src/bgDaemon.ts"
+    "./bgDaemon.js": "./src/bgDaemon.ts",
+    "./launchAgent.js": "./src/launchAgent.ts"
   }
 }
