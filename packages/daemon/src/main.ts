@@ -54,6 +54,8 @@ export async function daemonMain(args: string[]): Promise<void> {
         process.exitCode = code
       } else if (sub === 'status' || sub === 'list') {
         await bgDaemonStatus(args.includes('--json'))
+      } else if (sub === 'log') {
+        await bgDaemonTailLog()
       } else if (sub === 'stop') {
         await bgDaemonStop()
       } else if (
@@ -87,6 +89,32 @@ export async function daemonMain(args: string[]): Promise<void> {
       printHelp()
       process.exitCode = 1
   }
+}
+
+async function bgDaemonTailLog(): Promise<void> {
+  const { homedir } = await import('node:os')
+  const { join } = await import('node:path')
+  const { existsSync } = await import('node:fs')
+  const today = new Date().toISOString().slice(0, 10)
+  const logPath = join(homedir(), '.claude', 'telemetry', `events-${today}.jsonl`)
+  if (!existsSync(logPath)) {
+    console.error(`bg daemon log: no events file at ${logPath}`)
+    console.error(`(set CLAUDE_CODE_LOCAL_TELEMETRY=1 + restart daemon to populate)`)
+    process.exitCode = 1
+    return
+  }
+  const { spawn } = await import('node:child_process')
+  const tail = spawn('tail', ['-f', logPath], { stdio: 'inherit' })
+  await new Promise<void>(resolve => {
+    tail.on('exit', code => {
+      if (code !== null && code !== 0) process.exitCode = code
+      resolve()
+    })
+    tail.on('error', e => {
+      console.error(`tail failed: ${(e as Error).message}`)
+      process.exit(1)
+    })
+  })
 }
 
 async function bgDaemonStatus(asJson = false): Promise<void> {
