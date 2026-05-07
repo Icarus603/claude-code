@@ -318,14 +318,9 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
   if (args.includes('--bg-pty') || args.includes('--bg-interactive')) {
     const { spawnPtyHost } = await import('./bg/spawnPty.js')
     const short = generateShortId()
-    const r = spawnPtyHost({
-      short,
-      jobDir: getJobDir(short),
-      flags: forwardedFlags,
-      directive,
-      cwd: process.cwd(),
-    })
+    const r = spawnPtyHost({ short, jobDir: getJobDir(short), flags: forwardedFlags, directive, cwd: process.cwd() })
     writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+    ;(await import('./bg/agentActionEvent.js')).emitAgentAction('spawn', short, { mode: 'pty' })
     // Opportunistically ensure daemon is up so subsequent stop/respawn
     // route through RPC. Fire-and-forget.
     void import('./bg/daemonAdapter.js').then(async ({ isDaemonAlive, ensureDaemon }) => {
@@ -627,6 +622,7 @@ export async function stopHandler(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
   const job = resolveJobOrExit(short)
+  ;(await import('./bg/agentActionEvent.js')).emitAgentAction(force ? 'kill' : 'stop', job.short)
   await stopJob(job, {
     force,
     verbLabel: force ? 'Killed' : 'Stopped',
@@ -649,6 +645,7 @@ export async function killHandler(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
   const job = resolveJobOrExit(short)
+  ;(await import('./bg/agentActionEvent.js')).emitAgentAction('kill', job.short)
   await stopJob(job, { force: true, verbLabel: 'Killed', finalStatus: 'killed' })
 }
 
@@ -672,6 +669,7 @@ export async function rmHandler(args: readonly string[]): Promise<void> {
     )
     process.exit(1)
   }
+  ;(await import('./bg/agentActionEvent.js')).emitAgentAction('rm', job.short)
   rmSync(getJobDir(job.short), { recursive: true, force: true })
   process.stdout.write(`Removed ${job.short}.\n`)
 }
@@ -690,6 +688,7 @@ export async function attachHandler(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
   const job = resolveJobOrExit(positional[0]!)
+  ;(await import('./bg/agentActionEvent.js')).emitAgentAction('attach', job.short, { mode: job.mode ?? 'detached' })
   if (job.mode === 'pty' && job.ptySocket) {
     const { runAttach } = await import('./bg/attachClient.js')
     await runAttach(job.ptySocket, job.short)
@@ -741,6 +740,7 @@ export async function respawnHandler(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
   const job = resolveJobOrExit(short)
+  ;(await import('./bg/agentActionEvent.js')).emitAgentAction('respawn', job.short)
   const ok = await respawnSingle(job)
   if (!ok) process.exit(1)
 }
