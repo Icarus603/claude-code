@@ -750,7 +750,10 @@ export async function respawnHandler(args: readonly string[]): Promise<void> {
     return
   }
 
+  const helpers = { getJobDir, generateShortId, spawnBgJob, writeJobMeta }
+
   if (args.includes('--all')) {
+    const { respawnSingle } = await import('./bg/respawnJob.js')
     const targets = listJobs().filter(j => j.status === 'running')
     if (targets.length === 0) {
       process.stdout.write('no live jobs to respawn\n')
@@ -758,7 +761,7 @@ export async function respawnHandler(args: readonly string[]): Promise<void> {
     }
     let okCount = 0
     for (const j of targets) {
-      const restarted = await respawnSingle(j)
+      const restarted = await respawnSingle(j, helpers)
       if (restarted) okCount++
     }
     if (okCount < targets.length) process.exit(1)
@@ -772,55 +775,9 @@ export async function respawnHandler(args: readonly string[]): Promise<void> {
   }
   const job = resolveJobOrExit(short)
   ;(await import('./bg/agentActionEvent.js')).emitAgentAction('respawn', job.short)
-  const ok = await respawnSingle(job)
+  const { respawnSingle } = await import('./bg/respawnJob.js')
+  const ok = await respawnSingle(job, helpers)
   if (!ok) process.exit(1)
-}
-
-async function respawnSingle(job: JobMeta): Promise<boolean> {
-  // pty-mode + daemon alive → daemon respawn (preserves short id).
-  if (job.mode === 'pty') {
-    const { isDaemonAlive, daemonRespawn } = await import('./bg/daemonAdapter.js')
-    if (await isDaemonAlive()) {
-      const r = await daemonRespawn(job.short)
-      if (r.ok) {
-        process.stdout.write(`respawned ${job.short} (same short id)\n`)
-        return true
-      }
-      process.stderr.write(
-        `daemon respawn failed (${r.code}); falling back to short-id-changing respawn\n`,
-      )
-    }
-  }
-
-  const args = extractRespawnArgs(job.cmd)
-  if (!args) {
-    process.stderr.write(`${job.short}: cannot reconstruct directive\n`)
-    return false
-  }
-  if (job.status === 'running' && isProcessRunning(job.pid)) {
-    try { process.kill(job.pid, 'SIGTERM') } catch {/**/}
-  }
-  rmSync(getJobDir(job.short), { recursive: true, force: true })
-  try {
-    let newShort: string
-    if (job.mode === 'pty') {
-      const { spawnPtyHost } = await import('./bg/spawnPty.js')
-      newShort = generateShortId()
-      const r = spawnPtyHost({
-        short: newShort, jobDir: getJobDir(newShort), ...args, cwd: job.cwd,
-      })
-      writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
-    } else {
-      newShort = await spawnBgJob({ ...args, cwd: job.cwd })
-    }
-    if (newShort !== job.short) {
-      process.stdout.write(`(was ${job.short}, now ${newShort})\n`)
-    }
-    return true
-  } catch (e) {
-    process.stderr.write(`${job.short}: ${(e as Error).message}\n`)
-    return false
-  }
 }
 
 export { extractRespawnArgs, splitBgArgs, tailFile }
