@@ -5,6 +5,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   useSyncExternalStore,
 } from 'react'
 import type { ScrollBoxHandle, DOMElement } from '@anthropic/ink'
@@ -160,6 +161,27 @@ export function useVirtualScroll(
   columns: number,
 ): VirtualScrollResult {
   const heightCache = useRef(new Map<string, number>())
+  // Force-render trigger. Used by the listOrigin-shift gate (Logo / status
+  // chrome above the list mounting/unmounting moves listOrigin) and the
+  // scroll-anchor effect (sticky=false drift compensation) to schedule a
+  // re-render after a useLayoutEffect mutates a ref the render path reads.
+  // The "no setState" rule below for heightCache still holds — those changes
+  // converge on the next natural render. listOrigin and scroll-anchor are
+  // different: stream-end / chrome-toggle commits can be the LAST commit of
+  // a turn, so a one-frame lag turns into "stuck until user wiggles scroll".
+  const [, forceRender] = useState(0)
+  // Last frame's top-anchored item, for sticky=false drift compensation.
+  // When sticky breaks (user scrolled up to read), heightCache updates from
+  // measureRef shift offsets[] under a stationary scrollTop → the item the
+  // user was reading drifts up/down. Re-anchor by item key so its yoga top
+  // stays at scrollTop. Cleared on sticky / cold start. Mirror of ant
+  // 4341.js Q ref + scroll-anchor effect.
+  const anchorRef = useRef<{
+    key: string
+    idx: number
+    offset: number
+    scrollTop: number
+  } | null>(null)
   // Bump whenever heightCache mutates so offsets rebuild on next read. Ref
   // (not state) — checked during render phase, zero extra commits.
   const offsetVersionRef = useRef(0)
@@ -587,6 +609,60 @@ export function useVirtualScroll(
     effEnd === n
       ? Infinity
       : Math.max(effTopSpacer, offsets[effEnd]! - viewportH) + listOrigin
+
+  // Scroll-anchor compensation. When sticky=false (user scrolled up to read)
+  // and scrollTop is unchanged from last frame (no user input this commit),
+  // a heightCache update from measureRef shifts offsets[] under a stationary
+  // scrollTop — the item the user was reading drifts up or down by the
+  // height delta. Re-find the anchored item's current offset and adjust
+  // scrollTop by the same delta so its yoga top stays at the same screen
+  // row. Mirror of ant 4341.js:142-164.
+  //
+  // Cleared on sticky / cold start: sticky's tail-walk owns the bottom edge
+  // anyway, and cold start has no anchor to track.
+  useLayoutEffect(() => {
+    if (isSticky || scrollTop < 0 || viewportH === 0) {
+      anchorRef.current = null
+      return
+    }
+    const prev = anchorRef.current
+    if (prev && prev.scrollTop === scrollTop && pendingDelta === 0) {
+      // Item may have moved (prepend / insert at front via
+      // useAssistantHistory). uuid-keyed itemKeys, so lastIndexOf is exact.
+      const idx =
+        itemKeys[prev.idx] === prev.key
+          ? prev.idx
+          : itemKeys.lastIndexOf(prev.key)
+      if (idx >= 0) {
+        const newOffset = offsets[idx]!
+        const delta = newOffset - prev.offset
+        if (delta !== 0) {
+          scrollRef.current?.scrollTo(scrollTop + delta)
+          anchorRef.current = {
+            key: prev.key,
+            idx,
+            offset: newOffset,
+            scrollTop: scrollTop + delta,
+          }
+          return
+        }
+      }
+    }
+    // Re-snapshot: pick the topmost visible item as the next anchor.
+    // viewportTop is content-wrapper-relative (subtract listOrigin to convert
+    // from scrollTop coords). Walk forward from effStart in offsets[] until
+    // the next item is below the viewport top.
+    const viewportTop = Math.max(0, scrollTop - listOriginRef.current)
+    let topIdx = effStart
+    while (topIdx + 1 < effEnd && offsets[topIdx + 1]! <= viewportTop) {
+      topIdx++
+    }
+    const key = itemKeys[topIdx]
+    anchorRef.current = key
+      ? { key, idx: topIdx, offset: offsets[topIdx]!, scrollTop }
+      : null
+  })
+
   useLayoutEffect(() => {
     if (isSticky) {
       scrollRef.current?.setClampBounds(undefined, undefined)
@@ -610,15 +686,41 @@ export function useVirtualScroll(
   // at the start boundary freezes the range (seen as blank viewport when
   // scrolling down after scrolling up).
   //
-  // NO setState. A setState here would schedule a second commit with
-  // shifted offsets, and since Ink writes stdout on every commit
-  // (reconciler.resetAfterCommit → onRender), that's two writes with
-  // different spacer heights → visible flicker. Heights propagate to
-  // offsets on the next natural render. One-frame lag, absorbed by overscan.
+  // NO setState for heightCache changes. A setState here would schedule a
+  // second commit with shifted offsets, and since Ink writes stdout on every
+  // commit (reconciler.resetAfterCommit → onRender), that's two writes with
+  // different spacer heights → visible flicker. Heights propagate to offsets
+  // on the next natural render. One-frame lag, absorbed by overscan.
+  //
+  // EXCEPTION: listOrigin shifts that exceed 1 row force a re-render (gate
+  // below). overscan can't absorb a non-zero listOrigin baseline change —
+  // setClampBounds and the sticky tail-walk both add listOrigin to offsets,
+  // so a stale ref leaves clamp bounds and the tail-walk start computing in
+  // a coordinate space the renderer no longer uses. The most visible failure
+  // mode: streaming-text Box mounts at ScrollBox tail (sibling AFTER the
+  // virtualized region), then unmounts when the assistant message lands;
+  // listOrigin doesn't change for THAT (the streaming Box is below the list,
+  // not above), but Logo / status-notice mount/unmount above the list does
+  // shift it, and stream-end can be the LAST commit of a turn — without the
+  // force-render the new listOrigin sits unread until the user wiggles
+  // scroll, which presents as scrollback "snapping back" until refreshed.
+  // Mirror of ant 4341.js:166-171.
   useLayoutEffect(() => {
     const spacerYoga = spacerRef.current?.yogaNode
     if (spacerYoga && spacerYoga.getComputedWidth() > 0) {
-      listOriginRef.current = spacerYoga.getComputedTop()
+      const newOrigin = spacerYoga.getComputedTop()
+      const prev = listOriginRef.current
+      listOriginRef.current = newOrigin
+      // prev !== 0 guard: cold-start mount goes 0 → real origin in one
+      // step. The render body already reads listOriginRef before this
+      // effect fires the FIRST time (zero), so first-render clamp bounds
+      // are off by listOrigin — but a force-render here would be wasted
+      // since the second render's body picks up the new ref value
+      // anyway. Threshold > 1 absorbs sub-row jitter (border / padding
+      // rounding when terminal width changes).
+      if (prev !== 0 && Math.abs(newOrigin - prev) > 1) {
+        forceRender(n => n + 1)
+      }
     }
     if (skipMeasurementRef.current) {
       skipMeasurementRef.current = false
