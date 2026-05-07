@@ -28,7 +28,9 @@ export const lesson: Lesson = {
       </Text>
       <Text dimColor>
         Also: <Text color="suggestion">/clear</Text> wipes conversation but
-        keeps files.
+        keeps files.{' '}
+        <Text color="suggestion">/branch</Text> forks the conversation to try
+        two approaches.
       </Text>
     </Box>
   ),

@@ -7,10 +7,12 @@ import { lesson as undo } from './undo.js'
  * All lessons in display order. Each lesson lives in its own file under
  * this directory; adding a new lesson means adding the import + array entry
  * here. Order matters for the picker default focus and for the LogoV2
- * banner's `(X/N)` denominator.
+ * banner's `(X/N)` denominator (denominator is the live array length, so
+ * the banner stays correct as lessons land).
  *
- * The 10-lesson set is documented in
- * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3.
+ * The final 10-lesson set is documented in
+ * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3. Currently
+ * 3 of 10 are implemented (steps 1–3 of the §11 plan).
  */
 export const ALL_LESSONS: Lesson[] = [
   atMentions,

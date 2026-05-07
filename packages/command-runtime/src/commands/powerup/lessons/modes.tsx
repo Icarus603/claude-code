@@ -12,6 +12,10 @@ export const lesson: Lesson = {
         Press <Text underline>shift+tab</Text> to cycle permission modes. Each
         mode changes how much Claude asks before acting:
       </Text>
+      {/* ant 4304.js places a live mode-cycler widget (s8K) here that
+          binds confirm:cycleMode through the keybinding system. Omitted
+          from this lesson because the widget needs full keyboard-context
+          wiring that does not fit a pure-data ReactNode body. */}
       <Box flexDirection="column" paddingLeft={2}>
         <Text>
           <Text color="success">default</Text> — ask before every edit
