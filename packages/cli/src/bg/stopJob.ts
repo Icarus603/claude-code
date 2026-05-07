@@ -17,6 +17,8 @@ export interface StopJobInput {
   mode?: 'detached' | 'pty'
   /** procStart from job meta — used by procAliveSamePid to defeat PID recycling. */
   procStart?: number
+  /** When the worker started; used by emitAgentTerminal to compute duration. */
+  startedAt?: number
 }
 
 export interface StopJobOpts {
@@ -104,6 +106,10 @@ export async function stopJob(
       }
     }
     writeMeta({ status: opts.finalStatus, killedAt: Date.now() })
+    if (job.startedAt) {
+      const m = await import('./agentActionEvent.js')
+      m.emitAgentTerminal(job.short, opts.finalStatus, Date.now() - job.startedAt)
+    }
     process.stdout.write(
       `${opts.verbLabel} ${job.short} (pid ${job.pid}, ${signal}).\n`,
     )
@@ -111,6 +117,10 @@ export async function stopJob(
     const err = e as NodeJS.ErrnoException
     if (err.code === 'ESRCH') {
       writeMeta({ status: 'exited', exitedAt: Date.now() })
+      if (job.startedAt) {
+        const m = await import('./agentActionEvent.js')
+        m.emitAgentTerminal(job.short, 'already_exited', Date.now() - job.startedAt)
+      }
       process.stdout.write(`Job ${job.short} was already exited.\n`)
     } else {
       process.stderr.write(

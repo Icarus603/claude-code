@@ -320,7 +320,7 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
     const short = generateShortId()
     const r = spawnPtyHost({ short, jobDir: getJobDir(short), flags: forwardedFlags, directive, cwd: process.cwd() })
     writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
-    ;(await import('./bg/agentActionEvent.js')).emitAgentAction('spawn', short, { mode: 'pty' })
+    { const m = await import('./bg/agentActionEvent.js'); m.emitAgentAction('spawn', short, { mode: 'pty' }); m.emitAgentDispatch(short, directive) }
     // Opportunistically ensure daemon is up so subsequent stop/respawn
     // route through RPC. Fire-and-forget.
     void import('./bg/daemonAdapter.js').then(async ({ isDaemonAlive, ensureDaemon }) => {
