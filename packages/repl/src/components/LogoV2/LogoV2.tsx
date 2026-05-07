@@ -287,6 +287,7 @@ export function LogoV2(): React.ReactNode {
         <VoiceModeNotice />
         <Opus1mMergeNotice />
         {ChannelsNoticeModule && <ChannelsNoticeModule.ChannelsNotice />}
+        <PowerupBanner />
         {showSandboxStatus && (
           <Box marginTop={1} flexDirection="column">
             <Text color="warning">
