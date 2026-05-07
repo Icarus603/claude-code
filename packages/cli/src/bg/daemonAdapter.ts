@@ -18,6 +18,7 @@
 
 import { spawn } from 'node:child_process'
 
+import { logEvent } from '@claude-code/local-observability'
 import {
   daemonRequest,
   type Response as DaemonResponse,
@@ -40,24 +41,40 @@ export async function isDaemonAlive(): Promise<boolean> {
  * daemon stays unreachable returns 'down'.
  */
 export async function nudgeDaemonSkew(): Promise<'up' | 'down'> {
-  const deadline = Date.now() + 10_000
+  const start = Date.now()
+  const deadline = start + 10_000
+  let lastReason: 'restarting' | 'etimeout' | 'enoconn' = 'restarting'
   while (Date.now() < deadline) {
     const r = await daemonRequest('nudge', {}, { timeoutMs: 1000 })
     if (r.ok && r.op === 'nudge') {
-      if (!(r as Record<string, unknown>).restarting) return 'up'
+      if (!(r as Record<string, unknown>).restarting) {
+        if (Date.now() - start > 200) {
+          logEvent('tengu_bg_skew_nudge', { converged: 'true', duration_ms: String(Date.now() - start) })
+        }
+        return 'up'
+      }
+      lastReason = 'restarting'
       await new Promise(res => setTimeout(res, 100))
       continue
     }
     if (!r.ok && r.code === 'ETIMEOUT') {
+      lastReason = 'etimeout'
       await new Promise(res => setTimeout(res, 100))
       continue
     }
     if (!r.ok && r.code === 'ENOCONN') {
+      lastReason = 'enoconn'
       await new Promise(res => setTimeout(res, 100))
       continue
     }
     return 'up'
   }
+  logEvent('tengu_bg_skew_nudge', {
+    converged: 'false',
+    restarting: String(lastReason === 'restarting'),
+    etimeout: String(lastReason === 'etimeout'),
+    enoconn: String(lastReason === 'enoconn'),
+  })
   return 'down'
 }
 
@@ -110,8 +127,15 @@ export async function probeDaemonZombie(): Promise<string | null> {
   const state = await readDaemonState()
   if (!state || Date.now() - state.startedAt <= 5000) return null
   const ping = await daemonRequest('ping', {}, { timeoutMs: 1000 })
-  if (ping.ok || ping.code === 'ETIMEOUT') return null
-  // process.kill(pid, 0) throws ESRCH if dead, returns true if alive
+  const stateMeta = {
+    started_ago_ms: String(Date.now() - state.startedAt),
+    origin_transient: String(state.origin === 'transient'),
+    origin_service: String(state.origin === 'service'),
+  }
+  if (ping.ok || ping.code === 'ETIMEOUT') {
+    logEvent('tengu_bg_daemon_zombie_false_positive', { ...stateMeta, recheck_etimeout: String(!ping.ok) })
+    return null
+  }
   let alive = false
   try {
     process.kill(state.pid, 0)
@@ -120,9 +144,9 @@ export async function probeDaemonZombie(): Promise<string | null> {
     alive = false
   }
   if (!alive) return null
-  // Alive but unreachable → zombie. Best-effort SIGTERM.
   try {
     process.kill(state.pid, 'SIGTERM')
+    logEvent('tengu_bg_daemon_zombie_restart', { pid: String(state.pid), ...stateMeta })
     return null
   } catch (e) {
     const err = e as NodeJS.ErrnoException
@@ -178,6 +202,7 @@ export async function ensureDaemon(opts: { forceTransient?: boolean } = {}): Pro
  */
 export async function ensureDaemonInteractive(): Promise<boolean> {
   if (await isDaemonAlive()) return true
+  const start = Date.now()
   if (
     !process.stdin.isTTY ||
     !process.stderr.isTTY ||
@@ -185,12 +210,25 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
     process.platform !== 'darwin'
   ) {
     spawnTransient()
-    return pollAlive(SPAWN_WAIT_MS)
+    const ok = await pollAlive(SPAWN_WAIT_MS)
+    logEvent('tengu_bg_daemon_install', {
+      outcome_ok: String(ok),
+      via_service: 'false',
+      fresh_install: 'false',
+      duration_ms: String(Date.now() - start),
+    })
+    return ok
   }
   process.stderr.write(
     'No background daemon is running.\nInstalling it as a service keeps the daemon up across reboot so background sessions stay available.\n',
   )
+  logEvent('tengu_bg_daemon_cold_start_ask', {})
   const answer = await promptYesNoOnceNever('Install as a service now? [y/N/never, or "once" just for now] ')
+  logEvent('tengu_bg_daemon_cold_start_ask_answer', {
+    answer_yes: String(answer === 'yes'),
+    answer_once: String(answer === 'once'),
+    answer_never: String(answer === 'never'),
+  })
   if (answer === 'yes') {
     const { homedir } = await import('node:os')
     const { join } = await import('node:path')
@@ -201,15 +239,22 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
       logPath: join(ccbDir, 'daemon.log'),
     })
     if (!r.ok) {
+      logEvent('tengu_bg_daemon_install', { outcome_ok: 'false', via_service: 'true', fresh_install: 'true', duration_ms: String(Date.now() - start) })
       process.stderr.write(`Service install failed (${r.error}). Falling back to a transient daemon.\n`)
       spawnTransient()
-      return pollAlive(SPAWN_WAIT_MS)
+      const ok = await pollAlive(SPAWN_WAIT_MS)
+      logEvent('tengu_bg_daemon_install', { outcome_ok: String(ok), via_service: 'false', fresh_install: 'false', duration_ms: String(Date.now() - start) })
+      return ok
     }
     process.stderr.write(`Installed: ${r.servicePath}\nRun 'ccb daemon bg uninstall' to undo.\n`)
-    return pollAlive(5000)
+    const ok = await pollAlive(5000)
+    logEvent('tengu_bg_daemon_install', { outcome_ok: String(ok), via_service: 'true', fresh_install: 'true', duration_ms: String(Date.now() - start) })
+    return ok
   }
   spawnTransient()
-  return pollAlive(SPAWN_WAIT_MS)
+  const ok = await pollAlive(SPAWN_WAIT_MS)
+  logEvent('tengu_bg_daemon_install', { outcome_ok: String(ok), via_service: 'false', fresh_install: 'false', duration_ms: String(Date.now() - start) })
+  return ok
 }
 
 async function promptYesNoOnceNever(q: string): Promise<'yes' | 'no' | 'once' | 'never'> {
@@ -294,7 +339,32 @@ export async function daemonDispatch(payload: {
   agent?: string
   worktree?: string
 }): Promise<DaemonResponse> {
-  return daemonRequest('dispatch', { d: payload }, { timeoutMs: 10_000 })
+  const start = Date.now()
+  const r = await daemonRequest('dispatch', { d: payload }, { timeoutMs: 10_000 })
+  if (r.ok) {
+    logEvent('tengu_bg_dispatch', {
+      backend_daemon: 'true',
+      source_shell: String(payload.source === 'shell'),
+      source_slash: String(payload.source === 'slash'),
+      source_fleet: String(payload.source === 'fleet'),
+      source_spare: String(payload.source === 'spare'),
+      source_respawn: String(payload.source === 'respawn'),
+      has_worktree: String(payload.worktree !== undefined),
+      has_agent: String(payload.agent !== undefined),
+      ms: String(Date.now() - start),
+      via: String((r as Record<string, unknown>).via ?? 'socket'),
+    })
+  } else {
+    logEvent('tengu_bg_dispatch_fallback', {
+      ms: String(Date.now() - start),
+      reason_unreachable: String(r.code === 'ENOCONN'),
+      reason_ack_timeout: String(r.code === 'ETIMEOUT'),
+      reason_stale_short: String(r.code === 'ESTALE'),
+      reason_short_alive: String(r.code === 'EALIVE'),
+      detail: String(r.error ?? '').slice(0, 80),
+    })
+  }
+  return r
 }
 
 /**
