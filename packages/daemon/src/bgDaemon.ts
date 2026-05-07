@@ -36,13 +36,32 @@ interface DaemonState {
   startedAt: number
 }
 
+interface ParsedArgs {
+  jsonPath?: string
+  logFile?: string
+  origin?: 'transient' | 'service' | 'shell'
+  spawnedBy?: string
+}
+
+function parseArgs(args: readonly string[]): ParsedArgs {
+  const out: ParsedArgs = {}
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i]
+    if (a === '--json-path') out.jsonPath = args[++i]
+    else if (a === '--log-file') out.logFile = args[++i]
+    else if (a === '--origin') out.origin = args[++i] as ParsedArgs['origin']
+    else if (a === '--spawned-by') out.spawnedBy = args[++i]
+  }
+  return out
+}
+
 /**
  * Boot the bg daemon. Resolves once the daemon has shut down
  * (signal or shutdown op received). Returns the daemon's exit code
  * (0 on graceful shutdown, non-zero on error).
  */
 export async function bgDaemonMain(args: readonly string[]): Promise<number> {
-  const _ignored = args // future: --origin, --json-path, --log-file
+  const parsed = parseArgs(args)
   const state: DaemonState = {
     server: undefined,
     workers: new Map(),
@@ -52,6 +71,28 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   }
 
   process.title = 'ccb daemon'
+
+  // ant 4639.js j2() reads this; ccb writes it on boot so external
+  // tooling (zombie-restart, version-skew detection) can introspect.
+  if (parsed.jsonPath) {
+    try {
+      const { writeFileSync, mkdirSync } = await import('node:fs')
+      const { dirname } = await import('node:path')
+      mkdirSync(dirname(parsed.jsonPath), { recursive: true })
+      writeFileSync(
+        parsed.jsonPath,
+        JSON.stringify({
+          pid: process.pid,
+          startedAt: state.startedAt,
+          origin: parsed.origin ?? 'transient',
+          version: process.env.CLAUDE_CODE_VERSION ?? 'dev',
+          spawnedBy: parsed.spawnedBy,
+        }),
+      )
+    } catch {
+      // best-effort
+    }
+  }
 
   // Adopt any persisted records that look running.
   for (const record of readAllWorkerRecords()) {
@@ -297,6 +338,14 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     const r = vm.getRecord()
     try {
       writeWorkerRecord({ ...r, status: 'killed', killedAt: Date.now() } as WorkerRecord)
+    } catch {
+      // best-effort
+    }
+  }
+  if (parsed.jsonPath) {
+    try {
+      const { unlinkSync } = await import('node:fs')
+      unlinkSync(parsed.jsonPath)
     } catch {
       // best-effort
     }
