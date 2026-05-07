@@ -322,6 +322,11 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
       cwd: process.cwd(),
     })
     writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+    // Opportunistically ensure daemon is up so subsequent stop/respawn
+    // route through RPC. Fire-and-forget.
+    void import('./bg/daemonAdapter.js').then(async ({ isDaemonAlive, ensureDaemon }) => {
+      if (!(await isDaemonAlive())) await ensureDaemon().catch(() => false)
+    }).catch(() => {})
     return
   }
 
