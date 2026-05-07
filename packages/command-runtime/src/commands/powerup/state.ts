@@ -10,24 +10,31 @@ import { ALL_LESSONS } from './lessons/index.js'
  * The denominator used by `isAllUnlocked` and the LogoV2 banner is always the
  * live count, never the persisted count.
  */
-function knownIds(): Set<string> {
-  return new Set(ALL_LESSONS.map(l => l.id))
-}
+
+/** Set of ids the current build knows about. ALL_LESSONS is a module-level
+ * constant, so this is computed once. */
+const KNOWN_IDS: Set<string> = new Set(ALL_LESSONS.map(l => l.id))
 
 export function getUnlocked(): Set<string> {
   const persisted = getGlobalConfig().powerupsUnlocked ?? []
-  const known = knownIds()
-  return new Set(persisted.filter(id => known.has(id)))
+  return new Set(persisted.filter(id => KNOWN_IDS.has(id)))
 }
 
+/**
+ * Marks a lesson as unlocked. The new state is built inside the
+ * `saveGlobalConfig` updater so the read-modify-write happens under the
+ * write lock — matches every other `saveGlobalConfig` call site in the
+ * repo and avoids a stale-read window if two callers race.
+ *
+ * Returning `current` unchanged when the id is already persisted lets
+ * `saveGlobalConfig` skip the disk write entirely (it compares references).
+ */
 export function markUnlocked(id: string): void {
-  const next = new Set(getUnlocked())
-  if (next.has(id)) return
-  next.add(id)
-  saveGlobalConfig(current => ({
-    ...current,
-    powerupsUnlocked: [...next],
-  }))
+  saveGlobalConfig(current => {
+    const persisted = current.powerupsUnlocked ?? []
+    if (persisted.includes(id)) return current
+    return { ...current, powerupsUnlocked: [...persisted, id] }
+  })
 }
 
 export function isAllUnlocked(): boolean {
