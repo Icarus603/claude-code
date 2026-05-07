@@ -74,6 +74,63 @@ export async function waitForDaemon(deadlineMs: number): Promise<boolean> {
   return false
 }
 
+interface DaemonStateFile {
+  pid: number
+  startedAt: number
+  origin?: string
+  version?: string
+}
+
+/**
+ * Read the daemon's state.json (written by bgDaemon on boot). Returns
+ * null if the file is missing or unreadable. Mirrors ant 4639.js j2().
+ */
+export async function readDaemonState(): Promise<DaemonStateFile | null> {
+  try {
+    const { homedir } = await import('node:os')
+    const { join } = await import('node:path')
+    const { readFile } = await import('node:fs/promises')
+    const path = join(homedir(), '.claude', 'daemon', 'state.json')
+    const raw = await readFile(path, 'utf8')
+    return JSON.parse(raw) as DaemonStateFile
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Detect a zombie daemon: state.json shows a pid that's still alive,
+ * but the control socket isn't answering ping. ant 4639.js ijK(). When
+ * detected, the caller should signal restart to the supervisor pid.
+ *
+ * Returns null if no zombie (daemon is alive or process is dead),
+ * otherwise an error string explaining what we couldn't fix.
+ */
+export async function probeDaemonZombie(): Promise<string | null> {
+  const state = await readDaemonState()
+  if (!state || Date.now() - state.startedAt <= 5000) return null
+  const ping = await daemonRequest('ping', {}, { timeoutMs: 1000 })
+  if (ping.ok || ping.code === 'ETIMEOUT') return null
+  // process.kill(pid, 0) throws ESRCH if dead, returns true if alive
+  let alive = false
+  try {
+    process.kill(state.pid, 0)
+    alive = true
+  } catch {
+    alive = false
+  }
+  if (!alive) return null
+  // Alive but unreachable → zombie. Best-effort SIGTERM.
+  try {
+    process.kill(state.pid, 'SIGTERM')
+    return null
+  } catch (e) {
+    const err = e as NodeJS.ErrnoException
+    if (err.code === 'EPERM') return `daemon socket missing; could not restart supervisor (EPERM)`
+    return `daemon zombie restart failed: ${err.message}`
+  }
+}
+
 function spawnTransient(): void {
   const isBun = process.argv0.endsWith('bun')
   const cmd = isBun ? process.argv0 : process.argv[0]!
