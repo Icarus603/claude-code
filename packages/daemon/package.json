@@ -29,6 +29,8 @@
     "./classifier/orchestrator.js": "./src/classifier/orchestrator.ts",
     "./classifier/systemPrompt.js": "./src/classifier/systemPrompt.ts",
     "./dispatchSpool.js": "./src/dispatchSpool.ts",
-    "./roster.js": "./src/roster.ts"
+    "./roster.js": "./src/roster.ts",
+    "./bgAdopt.js": "./src/bgAdopt.ts",
+    "./bgDaemonTimers.js": "./src/bgDaemonTimers.ts"
   }
 }

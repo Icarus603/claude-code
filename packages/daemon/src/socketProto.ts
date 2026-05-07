@@ -53,6 +53,7 @@ export type ProtoOp =
   | 'sendclaim'
   | 'respawn-stalled'
   | 'detach'
+  | 'yield'
   | 'attacher-caps'
   | 'lease'
 

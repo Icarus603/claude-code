@@ -14,11 +14,17 @@
 import { logEvent as logEventFn } from '@claude-code/local-observability'
 import { adoptFromRoster, adoptRunningPtyRecords } from './bgAdopt.js'
 import {
+  makeIdleActivityCount,
+  setupIdleExitWatchdog,
+  setupUpgradeWatchdog,
+} from './bgDaemonTimers.js'
+import {
   type WorkerRecord,
   readAllWorkerRecords,
   writeWorkerRecord,
 } from './bgWorkerRegistry.js'
 import { recordToRosterEntry, updateRoster } from './roster.js'
+import type { Socket } from 'node:net'
 import { type DaemonServer, err, ok, startSocketServer } from './socketServer.js'
 import { WorkerVm } from './workerVm.js'
 
@@ -43,6 +49,8 @@ interface DaemonState {
   pending: Map<string, PendingDispatch>
   abort: AbortController
   startedAt: number
+  /** Active client leases. ant 5170.js iFK leaseCount(). */
+  leases: Set<Socket>
 }
 
 interface ParsedArgs {
@@ -78,6 +86,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     pending: new Map(),
     abort: new AbortController(),
     startedAt: Date.now(),
+    leases: new Set(),
   }
 
   process.title = 'ccb daemon'
@@ -107,6 +116,15 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   /* adoptFromRoster + adoptRunningPtyRecords live in ./bgAdopt.ts */
   logEventFn('tengu_bg_daemon_boot', {
     pid: String(process.pid),
+    origin: parsed.origin ?? 'transient',
+  })
+  // ant 5170.js iFK:219 — daemon_start fires once after the supervisor
+  // has bound its control socket and is ready to accept ops. ccb's
+  // worker_kinds and worker_count map to "0/0" since this is the
+  // bg-only supervisor (no remoteControl/bridge sub-workers).
+  logEventFn('tengu_daemon_start', {
+    worker_kinds: '0',
+    worker_count: '0',
     origin: parsed.origin ?? 'transient',
   })
   if (process.env.CLAUDE_CODE_BG_SPARE_POOL === '1') {
@@ -181,6 +199,19 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     }).catch(() => {})
   }, 30_000)
   rosterTimer.unref()
+
+  // ant 5170.js iFK:172-193 + 130-167+244 — idle-exit watchdog +
+  // self-restart on binary upgrade. Implementations live in
+  // ./bgDaemonTimers.ts to keep this file under the 800-LOC budget.
+  const idleExit = setupIdleExitWatchdog({
+    origin: parsed.origin ?? 'transient',
+    abort: state.abort,
+    graceMs: 5_000,
+    countActivity: makeIdleActivityCount(state),
+  })
+  const idleProbeTimer = setInterval(idleExit.probe, 2_000)
+  idleProbeTimer.unref()
+  const upgradeWatchdog = setupUpgradeWatchdog(state.abort)
 
   // Wire socket op handlers. Captured into a variable so the dispatch
   // file-spool watcher (ant 5165.js) can reuse the same handler table.
@@ -587,12 +618,45 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       setImmediate(() => state.abort.abort()).unref()
       return ok({ op: 'shutdown', accepted: true })
     },
-    lease: async (_msg, socket) => {
+    /**
+     * yield — ant 5170.js iFK:50-62. A new daemon launching with
+     * non-transient origin (service/shell) asks the running transient
+     * daemon to step aside. Transient yields; non-transient refuses.
+     *
+     * The takeover flow is: new daemon sends `yield` → we set
+     * `yieldRequested=true`, schedule an abort after a short grace, and
+     * return ok with `yielding:true`. The new daemon polls for our
+     * lock release and emits tengu_daemon_yield_takeover.
+     */
+    yield: async () => {
+      const myOrigin = parsed.origin ?? 'transient'
+      if (myOrigin !== 'transient') {
+        return ok({ op: 'yield', yielding: false, origin: myOrigin })
+      }
+      logEventFn('tengu_daemon_yield', {})
+      // Grace period so the in-flight ack actually flushes before we
+      // tear down the socket server.
+      setTimeout(() => state.abort.abort(), 200).unref()
+      return ok({ op: 'yield', yielding: true, origin: myOrigin })
+    },
+    lease: async (msg, socket) => {
       // Hold the connection open; daemon counts this as an active
-      // client. We just accept the lease and stay quiet.
-      // Don't close the socket; stream stays alive until the client
-      // disconnects (which the server's close handler observes).
-      // Nothing to write back.
+      // client. The socket stays alive until the client disconnects
+      // (server's close handler observes the drop). ant 5170.js
+      // tracks leaseCount + emits tengu_daemon_lease per ack.
+      state.leases.add(socket)
+      const onClose = (): void => {
+        state.leases.delete(socket)
+      }
+      socket.once('close', onClose)
+      socket.once('error', onClose)
+      const client = (msg.client as Record<string, unknown> | undefined) ?? {}
+      logEventFn('tengu_daemon_lease', {
+        label: typeof client.label === 'string' ? client.label : 'unknown',
+        cwd: typeof client.cwd === 'string' ? client.cwd : '',
+        client_pid: typeof client.pid === 'number' ? String(client.pid) : '0',
+        leases: String(state.leases.size),
+      })
       socket.write('') // no-op write to confirm liveness
       return undefined
     },
@@ -667,6 +731,11 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
 
   process.off('SIGINT', onSignal)
   process.off('SIGTERM', onSignal)
+  // Dispose idle-exit + upgrade watchdog timers so they don't keep
+  // the event loop alive after abort.
+  clearInterval(idleProbeTimer)
+  idleExit.dispose()
+  upgradeWatchdog.dispose()
 
   // ant tengu_bg_dispatch_stale_drop: in-flight dispatches the daemon
   // can't see through. Mark pending entries failed before close.
