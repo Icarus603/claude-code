@@ -159,12 +159,29 @@ function spawnTransient(): void {
   const isBun = process.argv0.endsWith('bun')
   const cmd = isBun ? process.argv0 : process.argv[0]!
   const cliJs = isBun ? [process.argv[1] ?? ''] : []
-  const child = spawn(cmd, [...cliJs, 'daemon', 'bg', 'run'], {
-    detached: true,
-    stdio: ['ignore', 'ignore', 'ignore'],
-    env: { ...process.env, CLAUDE_CODE_DAEMON_TRANSIENT: '1' },
-  })
-  child.unref()
+  try {
+    const child = spawn(cmd, [...cliJs, 'daemon', 'bg', 'run'], {
+      detached: true,
+      stdio: ['ignore', 'ignore', 'ignore'],
+      env: { ...process.env, CLAUDE_CODE_DAEMON_TRANSIENT: '1' },
+    })
+    child.once('error', err => {
+      const code = (err as NodeJS.ErrnoException).code ?? 'unknown'
+      logEvent('tengu_bg_daemon_spawn_failed', {
+        errno_enoent: String(code === 'ENOENT'),
+        errno_eacces: String(code === 'EACCES'),
+        errno: code,
+      })
+    })
+    child.unref()
+  } catch (e) {
+    const code = (e as NodeJS.ErrnoException).code ?? 'unknown'
+    logEvent('tengu_bg_daemon_spawn_failed', {
+      errno_enoent: String(code === 'ENOENT'),
+      errno_eacces: String(code === 'EACCES'),
+      errno: code,
+    })
+  }
 }
 
 async function pollAlive(deadlineMs: number): Promise<boolean> {
@@ -232,7 +249,11 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
   if (answer === 'yes') {
     const { homedir } = await import('node:os')
     const { join } = await import('node:path')
-    const { installLaunchAgent } = await import('@claude-code/daemon/launchAgent.js')
+    const { installLaunchAgent, isLaunchAgentStale } = await import('@claude-code/daemon/launchAgent.js')
+    // ant 4639.js: detect stale plist (deleted binary path) before install.
+    if (await isLaunchAgentStale()) {
+      logEvent('tengu_bg_daemon_service_stale_exec', {})
+    }
     const ccbDir = join(homedir(), '.claude', 'daemon')
     const r = await installLaunchAgent({
       jsonPath: join(ccbDir, 'state.json'),
@@ -248,6 +269,12 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
     }
     process.stderr.write(`Installed: ${r.servicePath}\nRun 'ccb daemon bg uninstall' to undo.\n`)
     const ok = await pollAlive(5000)
+    if (!ok) {
+      // ant 4639.js: service installed but daemon didn't bind socket within
+      // 5s — fall back to transient. Often means launchd queued bootstrap
+      // behind another job or the binary takes >5s to cold-start.
+      logEvent('tengu_bg_daemon_service_poll_fallthrough', { duration_ms: String(Date.now() - start) })
+    }
     logEvent('tengu_bg_daemon_install', { outcome_ok: String(ok), via_service: 'true', fresh_install: 'true', duration_ms: String(Date.now() - start) })
     return ok
   }
