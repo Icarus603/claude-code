@@ -157,8 +157,52 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     origin: parsed.origin ?? 'transient',
   })
   if (process.env.CLAUDE_CODE_BG_SPARE_POOL === '1') {
-    const { enableSparePool } = await import('./sparePool.js')
+    const { enableSparePool, shouldPrewarm, setPrewarmInFlight, recordSpareSpawn, markSpareReady } = await import('./sparePool.js')
     enableSparePool()
+    // Pre-warm scheduler: every 30s, if no spare exists + no in-flight,
+    // spawn one. ant 4644.js iw6.
+    const prewarmTimer = setInterval(() => {
+      if (!shouldPrewarm()) return
+      setPrewarmInFlight(true)
+      void (async () => {
+        try {
+          const { randomUUID } = await import('node:crypto')
+          const sessionId = randomUUID()
+          const short = sessionId.slice(0, 8)
+          const cwd = process.cwd()
+          // Spawn spare via existing spawnPtyHost path in bg.ts.
+          const { spawnPtyHost } = await import('@claude-code/cli/bg/spawnPty.js')
+          const { mkdirSync } = await import('node:fs')
+          const { join } = await import('node:path')
+          const { homedir } = await import('node:os')
+          const jobDir = join(homedir(), '.claude', 'jobs', short)
+          mkdirSync(jobDir, { recursive: true })
+          const r = spawnPtyHost({
+            short,
+            jobDir,
+            flags: [],
+            directive: '(idle — waiting for trigger)',
+            cwd,
+          })
+          recordSpareSpawn(short, cwd, sessionId, r.socketPath)
+          // Wait for the worker's PTY socket to come up (proxy for ready).
+          // Poll for socket-file existence then mark ready.
+          const { existsSync } = await import('node:fs')
+          for (let i = 0; i < 50; i++) {
+            await new Promise(res => setTimeout(res, 100))
+            if (existsSync(r.socketPath)) {
+              markSpareReady(short)
+              break
+            }
+          }
+        } catch (e) {
+          logEventFn('tengu_bg_spare_claim_fail', { reason: 'prewarm-spawn-failed', error: (e as Error).message.slice(0, 80) })
+        } finally {
+          setPrewarmInFlight(false)
+        }
+      })()
+    }, 30_000)
+    prewarmTimer.unref()
   }
   // Boot scan + every-5s rescan for workers spawned outside our spawn op
   // (e.g. ccb --bg-pty fired by user). ant 5172.js sweep cadence.
@@ -272,12 +316,40 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         logEventFn('tengu_bg_dispatch_rejected', { short, reason: 'already_running' })
         return err('EALIVE', `worker ${short} already running`, { short })
       }
-      // ant 4644.js: try claim spare before fresh spawn. Today scaffolding
-      // returns ok:false because worker-side claim msg not wired; the
-      // tengu_bg_spare_claim_fail event still fires for observability.
+      // ant 4644.js: try claim spare before fresh spawn. If a ready spare
+      // matches cwd, send 'claim' ctrl-frame with the dispatched intent
+      // so the running spare picks it up; skip fresh spawn.
       const { claimSpare } = await import('./sparePool.js')
       const claim = claimSpare((d.cwd as string) ?? process.cwd())
-      void claim // future: if (claim.ok) reuse short, no spawn
+      if (claim.ok) {
+        const intent = (d.intent as string) ?? (d.directive as string) ?? ''
+        const { connect } = await import('node:net')
+        const { encodeCtrlFrame } = await import('@claude-code/cli/bg/ptyFrame.js')
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const sock = connect(claim.ptySocket)
+            sock.once('connect', () => {
+              sock.write(encodeCtrlFrame({ t: 'claim', intent, cwd: (d.cwd as string), sessionId: claim.sessionId }))
+              sock.end()
+              resolve()
+            })
+            sock.once('error', e => reject(e))
+          })
+          // The spare worker keeps running with its existing short — return
+          // its short instead of spawning fresh.
+          state.pending.set(claim.short, { nonce, acked: true, pid: undefined, startedAt: Date.now() })
+          logEventFn('tengu_bg_dispatch', {
+            backend_daemon: 'true',
+            via: 'spare-claim',
+            short: claim.short,
+            ms: '0',
+          })
+          return ok({ op: 'dispatch', short: claim.short, nonce, pid: -1, via: 'spare-claim' })
+        } catch (e) {
+          // Claim send failed → fall through to fresh spawn.
+          logEventFn('tengu_bg_sendclaim_failed', { reason: 'connect-error', short: claim.short, error: (e as Error).message.slice(0, 80) })
+        }
+      }
       const vm = new WorkerVm({
         short,
         cwd: (d.cwd as string) ?? process.cwd(),
@@ -326,6 +398,78 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       const vm = state.workers.get(short)
       const messagingSock = vm?.getRecord().ptySocket ?? ''
       return ok({ op: 'await-ack', short, nonce, pid: pending.pid, messagingSock, via: 'socket' })
+    },
+    /**
+     * reply — ant 4643.js cw6. Send `text` as a queued user prompt to
+     * a running worker via its PTY socket. Used by spare claim flow
+     * (intent injection) and `ccb reply <short> "<text>"` (deferred).
+     * On ESTARTING, retry up to 10x at 200ms apart.
+     */
+    reply: async msg => {
+      const short = msg.short as string | undefined
+      const text = msg.text as string | undefined
+      if (!short) return err('EBADREQ', 'reply: missing short')
+      if (text === undefined) return err('EBADREQ', 'reply: missing text')
+      const vm = state.workers.get(short)
+      if (!vm) return err('ENOJOB', `no worker for short ${short}`)
+      const ptySocket = vm.getRecord().ptySocket
+      if (!ptySocket) return err('ENOSOCK', `worker ${short} has no ptySocket`)
+      // Open client connection to worker's PTY socket + send 'reply' ctrl-frame.
+      const { connect } = await import('node:net')
+      const { encodeCtrlFrame } = await import('@claude-code/cli/bg/ptyFrame.js')
+      return new Promise<{ ok: true; op: 'reply' } | { ok: false; code: string; error: string }>(resolve => {
+        const sock = connect(ptySocket)
+        sock.once('connect', () => {
+          sock.write(encodeCtrlFrame({ t: 'reply', text }))
+          sock.end()
+          logEventFn('tengu_bg_agent_action', { action: 'reply', short, daemon: 'true' })
+          resolve(ok({ op: 'reply' }) as { ok: true; op: 'reply' })
+        })
+        sock.once('error', e => {
+          resolve(err('ENOCONN', `pty socket connect failed: ${(e as Error).message}`) as { ok: false; code: string; error: string })
+        })
+      })
+    },
+    /**
+     * sendclaim — ant 4644.js cw6 spare claim path. Same wire protocol
+     * as `reply` but uses `claim` ctrl-frame so the worker knows it's a
+     * spare-handoff (lets future worker-side spare-wait mode trigger
+     * session re-init). Today the inner ccb treats both identically;
+     * the distinction is preserved for telemetry + future worker-side.
+     */
+    sendclaim: async msg => {
+      const short = msg.short as string | undefined
+      const intent = msg.intent as string | undefined
+      const cwd = msg.cwd as string | undefined
+      const sessionId = msg.sessionId as string | undefined
+      if (!short || !intent) {
+        logEventFn('tengu_bg_sendclaim_failed', { reason: 'missing-args' })
+        return err('EBADREQ', 'sendclaim: missing short or intent')
+      }
+      const vm = state.workers.get(short)
+      if (!vm) {
+        logEventFn('tengu_bg_sendclaim_failed', { reason: 'no-worker', short })
+        return err('ENOJOB', `no worker for short ${short}`)
+      }
+      const ptySocket = vm.getRecord().ptySocket
+      if (!ptySocket) {
+        logEventFn('tengu_bg_sendclaim_failed', { reason: 'no-sock', short })
+        return err('ENOSOCK', `worker ${short} has no ptySocket`)
+      }
+      const { connect } = await import('node:net')
+      const { encodeCtrlFrame } = await import('@claude-code/cli/bg/ptyFrame.js')
+      return new Promise<{ ok: true; op: 'sendclaim' } | { ok: false; code: string; error: string }>(resolve => {
+        const sock = connect(ptySocket)
+        sock.once('connect', () => {
+          sock.write(encodeCtrlFrame({ t: 'claim', intent, cwd, sessionId }))
+          sock.end()
+          resolve(ok({ op: 'sendclaim' }) as { ok: true; op: 'sendclaim' })
+        })
+        sock.once('error', e => {
+          logEventFn('tengu_bg_sendclaim_failed', { reason: 'connect-error', short, error: (e as Error).message.slice(0, 80) })
+          resolve(err('ENOCONN', `pty socket connect failed: ${(e as Error).message}`) as { ok: false; code: string; error: string })
+        })
+      })
     },
     kill: async msg => {
       const short = msg.short as string | undefined

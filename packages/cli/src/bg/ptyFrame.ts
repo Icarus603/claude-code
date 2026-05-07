@@ -32,6 +32,8 @@ export const FRAME_SIZE_CAP = 1024 * 1024
  *   - `exit`:  server → client, child has exited (code + signal)
  *   - `resize`: client → server, request PTY resize
  *   - `kill`:  client → server, request signal delivery
+ *   - `claim`: daemon → spare worker, hand off intent + cwd (ant 4644.js).
+ *   - `reply`: daemon → worker, queue text as next user prompt (ant 4643.js cw6).
  */
 export type CtrlFrame =
   | { t: 'hello'; replPid: number; version: string }
@@ -39,6 +41,8 @@ export type CtrlFrame =
   | { t: 'exit'; code: number; signal?: string }
   | { t: 'resize'; cols: number; rows: number }
   | { t: 'kill'; sig: 'SIGKILL' | 'SIGTERM' }
+  | { t: 'claim'; intent: string; cwd?: string; sessionId?: string }
+  | { t: 'reply'; text: string }
 
 export type DecodedFrame =
   | { kind: typeof DATA_TAG; payload: Buffer }

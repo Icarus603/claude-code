@@ -17,7 +17,7 @@
   "@claude-code/server": 6,
   "@claude-code/updater": 10,
   "@claude-code/agent": 161,
-  "@claude-code/cli": 18,
+  "@claude-code/cli": 19,
   "@claude-code/storage": 43,
   "image-processor-napi": 1,
   "url-handler-napi": 1,

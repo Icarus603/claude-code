@@ -200,6 +200,21 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
         }
         return
       }
+      case 'reply':
+      case 'claim': {
+        // Inject text as if user typed it: write to the PTY's master so
+        // the inner ccb's stdin (PTY slave) reads it as keystrokes, then
+        // newline to submit. ant 4644.js spare claim flow.
+        const text = String(frame['text'] ?? frame['intent'] ?? '')
+        if (text && !exited) {
+          try {
+            terminal.write(text + '\n')
+          } catch {
+            // best-effort
+          }
+        }
+        return
+      }
       default:
         return
     }
