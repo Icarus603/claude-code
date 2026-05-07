@@ -210,8 +210,9 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   const adoptTimer = setInterval(adoptRunningPtyRecords, 5000)
   adoptTimer.unref()
 
-  // Wire socket op handlers.
-  state.server = await startSocketServer({
+  // Wire socket op handlers. Captured into a variable so the dispatch
+  // file-spool watcher (ant 5165.js) can reuse the same handler table.
+  const opHandlers = {
     ping: async () =>
       ok({ op: 'ping', uptime: Date.now() - state.startedAt }),
     nudge: async () => ok({ op: 'nudge', restarting: false }),
@@ -606,7 +607,24 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       socket.once('close', remove)
       return undefined
     },
-  })
+  }
+  state.server = await startSocketServer(opHandlers)
+
+  // ant 5165.js — file-spool dispatch fallback. CLI writes envelopes
+  // to ~/.claude/daemon/dispatch/ when socket is unreachable; daemon
+  // ingests them on boot + on fs.watch events. Survives daemon restart
+  // between CLI write and daemon read.
+  const { drainSpool, startSpoolWatcher } = await import('./dispatchSpool.js')
+  const deliverSpooled = async (env: { op: string; d: Record<string, unknown>; nonce?: string }): Promise<void> => {
+    const handler = opHandlers[env.op as keyof typeof opHandlers]
+    if (typeof handler !== 'function') return
+    // No-op socket — file-spool envelopes are one-shot, no client to reply to.
+    // Type cast: socket impl detail; handler's runtime path is fire-and-forget.
+    const noopSocket = { write: () => true, end: () => {}, destroyed: false, once: () => {}, on: () => {} } as unknown as Parameters<typeof handler>[1]
+    await handler({ ...env.d, op: env.op, ...(env.nonce && { nonce: env.nonce }) }, noopSocket)
+  }
+  await drainSpool(deliverSpooled)
+  const spoolWatcher = startSpoolWatcher(deliverSpooled)
 
   // SIGINT / SIGTERM → graceful shutdown.
   const onSignal = (): void => state.abort.abort()
@@ -652,6 +670,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       // best-effort
     }
   }
+  spoolWatcher.close()
   await state.server?.close()
   return 0
 }

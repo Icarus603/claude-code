@@ -27,6 +27,7 @@
     "./classifier/llmClient.js": "./src/classifier/llmClient.ts",
     "./classifier/stateFile.js": "./src/classifier/stateFile.ts",
     "./classifier/orchestrator.js": "./src/classifier/orchestrator.ts",
-    "./classifier/systemPrompt.js": "./src/classifier/systemPrompt.ts"
+    "./classifier/systemPrompt.js": "./src/classifier/systemPrompt.ts",
+    "./dispatchSpool.js": "./src/dispatchSpool.ts"
   }
 }

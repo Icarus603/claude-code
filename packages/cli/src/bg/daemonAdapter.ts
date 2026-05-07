@@ -414,3 +414,28 @@ export async function daemonAwaitAck(opts: {
 export async function daemonRespawnStalled(short: string): Promise<DaemonResponse> {
   return daemonRequest('respawn-stalled', { short }, { timeoutMs: 10_000 })
 }
+
+/**
+ * Submit a dispatch envelope through the file-spool fallback path.
+ * ant 5165.js — when socket dispatch fails (ENOCONN/ETIMEOUT), CLI
+ * writes the envelope to ~/.claude/daemon/dispatch/ where the daemon's
+ * fs.watch picks it up. Survives daemon restart between CLI write +
+ * daemon read; socket-only dispatch loses any in-flight request when
+ * daemon dies mid-handle.
+ *
+ * Returns the spooled file path (caller can poll the daemon socket
+ * for ack later via daemonAwaitAck if needed).
+ */
+export async function submitDispatchToSpool(payload: {
+  op: string
+  d: Record<string, unknown>
+  nonce?: string
+}): Promise<string> {
+  const { writeSpoolEnvelope } = await import('@claude-code/daemon/dispatchSpool.js')
+  return writeSpoolEnvelope({
+    createdAt: Date.now(),
+    op: payload.op,
+    d: payload.d,
+    ...(payload.nonce && { nonce: payload.nonce }),
+  })
+}
