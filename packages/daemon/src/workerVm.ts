@@ -26,6 +26,7 @@ import {
   HEARTBEAT_POLL_MS,
   MAX_RESPAWN_ATTEMPTS,
   RESPAWN_BACKOFF_MS,
+  STALLED_THRESHOLD_MS,
   isPidAlive,
   readProcStart,
   verifyAdoption,
@@ -71,6 +72,9 @@ export class WorkerVm extends EventEmitter {
   private backoffTimer: NodeJS.Timeout | null = null
   private heartbeatTimer: NodeJS.Timeout | null = null
   private settled: SettleOutcome | null = null
+  /** Last time the worker emitted ring data; used by stall watchdog. */
+  private lastActivityAt: number = Date.now()
+  private stalledFiredAt: number = 0
 
   constructor(config: WorkerSpawnConfig, initialRecord?: WorkerRecord) {
     super()
@@ -125,6 +129,8 @@ export class WorkerVm extends EventEmitter {
 
   /** Push output bytes into the ring buffer. */
   pushOutput(chunk: Buffer): void {
+    this.lastActivityAt = Date.now()
+    this.stalledFiredAt = 0 // reset so re-stall fires fresh tengu_bg_worker_stalled
     this.ring.push(chunk)
     this.ringBytes += chunk.length
     while (this.ringBytes > RING_BUFFER_BYTES && this.ring.length > 1) {
@@ -228,11 +234,27 @@ export class WorkerVm extends EventEmitter {
    */
   private startHeartbeatPoll(): void {
     if (this.heartbeatTimer) clearInterval(this.heartbeatTimer)
+    this.lastActivityAt = Date.now()
     this.heartbeatTimer = setInterval(() => {
       if (!this.isRunning()) return
       if (!isPidAlive(this.record.pid)) {
         logEvent('tengu_bg_worker_vanished', { short: this.config.short, pid: String(this.record.pid) })
         this.onChildExit(0, undefined)
+        return
+      }
+      // ant 4706.js stall watchdog: pid is alive but no ring activity
+      // for >120s → log once. Doesn't auto-respawn (ant treats this as
+      // "the worker may be legitimately idle waiting for input"; user
+      // can ccb stop + spawn fresh if needed).
+      const silentMs = Date.now() - this.lastActivityAt
+      if (silentMs > STALLED_THRESHOLD_MS && this.stalledFiredAt === 0) {
+        this.stalledFiredAt = Date.now()
+        logEvent('tengu_bg_worker_stalled', {
+          short: this.config.short,
+          pid: String(this.record.pid),
+          silent_ms: String(silentMs),
+          attachers: String(this.attachers.size),
+        })
       }
     }, HEARTBEAT_POLL_MS)
     this.heartbeatTimer.unref()
