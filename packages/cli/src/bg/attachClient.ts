@@ -23,6 +23,10 @@ import { createDecModeTracker } from './decModeTracker.js'
 import { createPtyAdopter, type PtyAdopter } from './ptyAdopter.js'
 
 const DETACH_KEY_BYTE = 0x11 // Ctrl+Q
+/** ant 5164.js $F3 default — first-frame stall warning threshold. */
+const ATTACH_STALL_THRESHOLD_MS = 10_000
+/** Hard timeout after which we fire stall_gave_up + exit. */
+const ATTACH_STALL_GAVE_UP_MS = 30_000
 
 /**
  * Open a PTY socket attach session. Resolves when the bg session
@@ -113,11 +117,37 @@ export async function runAttach(
   const onResize = (): void => initialResize()
   process.stdout.on('resize', onResize)
 
+  // ant 5164.js stall watchdog: if no first frame within
+  // ATTACH_STALL_THRESHOLD_MS, fire stall_ms (warning); after
+  // ATTACH_STALL_GAVE_UP_MS, fire stall_gave_up + force exit so user
+  // doesn't sit on a frozen attach forever.
+  let stallWarned = false
+  let stallGaveUp = false
+  const stallTimer = setInterval(() => {
+    if (firstFrameAt > 0 || detached) return
+    const elapsed = Date.now() - startedAt
+    if (!stallWarned && elapsed >= ATTACH_STALL_THRESHOLD_MS) {
+      stallWarned = true
+      logEvent('tengu_bg_attach_stall_ms', { short, elapsed_ms: String(elapsed) })
+      process.stderr.write(`\n[attach: no output from ${short} in ${Math.round(elapsed/1000)}s — worker may be stalled]\n`)
+    }
+    if (elapsed >= ATTACH_STALL_GAVE_UP_MS) {
+      stallGaveUp = true
+      logEvent('tengu_bg_attach_stall_gave_up', { short, elapsed_ms: String(elapsed) })
+      clearInterval(stallTimer)
+      process.stderr.write(`\n[attach: gave up waiting for ${short} after ${Math.round(elapsed/1000)}s. Try 'ccb respawn ${short}']\n`)
+      detached = true
+      process.stdin.removeListener('data', onStdin)
+    }
+  }, 1000)
+  stallTimer.unref()
+
   // Wait for either exit or detach.
   const detachPromise = new Promise<void>(resolve => {
     const checker = setInterval(() => {
       if (detached) {
         clearInterval(checker)
+        clearInterval(stallTimer)
         resolve()
       }
     }, 25)
@@ -139,13 +169,14 @@ export async function runAttach(
   adopter.dispose()
   restoreTty?.()
 
-  const outcome = detached ? 'detached' : 'exited'
+  const outcome = stallGaveUp ? 'stall_gave_up' : detached ? 'detached' : 'exited'
   logEvent('tengu_bg_attach_outcome', {
     outcome,
     got_first_frame: String(firstFrameAt > 0),
     ms: String(Date.now() - startedAt),
   })
 
+  if (stallGaveUp) process.exit(2)
   if (detached) {
     process.stderr.write(`\n[detached from ${short} — session keeps running]\n`)
     process.exit(0)
