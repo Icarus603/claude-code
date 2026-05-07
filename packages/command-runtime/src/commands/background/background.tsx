@@ -40,11 +40,25 @@ export async function call(
 
   const directive = (args ?? '').trim() || 'continue'
 
+  // ant 4650.js ew6 inherits parent context via --resume <session-id>
+  // --fork-session. Without these flags, the bg job starts blank and
+  // loses the conversation the user wants backgrounded. Mirror.
+  const flags: string[] = []
+  try {
+    const { getSessionId } = await import(
+      '@claude-code/app-host/bootstrap/state.js'
+    )
+    const sessionId = getSessionId()
+    if (sessionId) flags.push('--resume', String(sessionId), '--fork-session')
+  } catch {
+    // best-effort — fall through to a blank session if state lookup fails.
+  }
+
   let short: string | undefined
   try {
     const { spawnBgJob } = await import('@claude-code/cli/bg.js')
     short = await spawnBgJob({
-      flags: [],
+      flags,
       directive,
       cwd: process.cwd(),
     })
