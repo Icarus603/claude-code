@@ -44,10 +44,17 @@ export interface WorkerRecord {
   cmd: readonly string[]
   cwd: string
   startedAt: number
-  status: 'running' | 'exited' | 'stopped' | 'killed' | 'unknown'
+  status: 'running' | 'exited' | 'stopped' | 'killed' | 'failed' | 'unknown'
   killedAt?: number
   exitedAt?: number
   exitCode?: number
+  /**
+   * Human-readable reason explaining a non-natural terminal status —
+   * adoption failure ("process gone while supervisor was down", ant
+   * 5166 UB8), respawn exhaustion, etc. Surfaced by `ccb ps` so the
+   * user sees WHY a job ended terminally.
+   */
+  failedReason?: string
   mode?: 'detached' | 'pty'
   ptySocket?: string
   /** procStart timestamp from /proc/<pid>/stat or ps fallback. */

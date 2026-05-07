@@ -63,12 +63,19 @@ interface JobMeta {
    * `stopped` = graceful SIGTERM via `ccb stop`. `killed` = SIGKILL via
    * `ccb stop --force` / `ccb kill`. `exited` = natural termination.
    */
-  status: 'running' | 'exited' | 'stopped' | 'killed' | 'unknown'
+  status: 'running' | 'exited' | 'stopped' | 'killed' | 'failed' | 'unknown'
   /** Set when `ccb stop`/`ccb kill` runs. Distinct from natural exit. */
   killedAt?: number
   /** Set the first time ps reconciles `running → exited`. */
   exitedAt?: number
   exitCode?: number
+  /**
+   * Human-readable reason explaining a non-natural terminal status.
+   * Populated when the daemon's adopt sweep observes the worker is gone
+   * mid-flight ("process gone while supervisor was down" — ant 5166 UB8)
+   * or when the worker crashes too many times to respawn.
+   */
+  failedReason?: string
   /**
    * Spawn mode. 'detached' = traditional `-p` headless run (default).
    * 'pty' = `--bg-pty-host` interactive REPL inside a PTY socket.
@@ -481,7 +488,12 @@ export async function psHandler(args: readonly string[]): Promise<void> {
   process.stdout.write(header + '\n')
   for (const j of jobs) {
     const cmdSummary = truncate(
-      j.cmd.length > 2 ? j.cmd.slice(2).join(' ') : j.cmd.join(' '),
+      // ant 5166.js UB8 — failed jobs surface their reason inline so
+      // the user sees WHY the supervisor gave up without having to
+      // open meta.json.
+      j.status === 'failed' && j.failedReason
+        ? `(${j.failedReason}) ${j.cmd.length > 2 ? j.cmd.slice(2).join(' ') : j.cmd.join(' ')}`
+        : j.cmd.length > 2 ? j.cmd.slice(2).join(' ') : j.cmd.join(' '),
       60,
     )
     process.stdout.write(

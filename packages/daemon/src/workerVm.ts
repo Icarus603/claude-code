@@ -445,11 +445,21 @@ export class WorkerVm extends EventEmitter {
       outcome === 'done'
         ? 'exited'
         : outcome === 'crashed'
-          ? 'exited'
+          ? 'failed'
           : 'killed'
+    // ant 5166.js UB8 / 4706.js — `crashed` outcome means respawn budget
+    // exhausted (fast-crash streak or max-attempts cap). Carry the
+    // reason through so `ccb ps` can explain why.
+    const failedReason: string | undefined =
+      outcome === 'crashed'
+        ? this.fastCrashStreak >= FAST_CRASH_LIMIT
+          ? `crash loop (${this.fastCrashStreak} fast crashes)`
+          : `respawn budget exhausted (${this.attempt} attempts)`
+        : undefined
     this.record = {
       ...this.record,
       status: finalStatus as WorkerRecord['status'],
+      ...(failedReason ? { failedReason } : {}),
       exitedAt: Date.now(),
     }
     try {

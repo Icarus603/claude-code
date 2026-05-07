@@ -16,6 +16,7 @@ import {
   type WorkerRecord,
   isPidAlive as isPidAliveSync,
   readAllWorkerRecords,
+  readWorkerRecord,
   writeWorkerRecord,
 } from './bgWorkerRegistry.js'
 import { readRoster } from './roster.js'
@@ -41,6 +42,10 @@ export async function adoptFromRoster(
   for (const [short, entry] of Object.entries(roster.workers)) {
     if (workers.has(short)) continue
     if (!isPidAliveSync(entry.pid)) {
+      // ant 5166.js UB8: process is gone but supervisor was down. Mark
+      // the meta.json as 'failed' so `ccb ps` and the tasks panel show
+      // why it ended terminally.
+      markAdoptionFailed(short, 'process gone while supervisor was down')
       dead++
       continue
     }
@@ -48,6 +53,10 @@ export async function adoptFromRoster(
     const sockExists = ptySocket ? existsSyncFn(ptySocket) : false
     if (!sockExists) {
       logEvent('tengu_bg_adopt_sock_unlinked', { short, sock: ptySocket })
+      // pid alive but socket gone — worker is unreachable for attach.
+      // Mark failed with the specific reason so the user understands
+      // why we can't recover the session.
+      markAdoptionFailed(short, 'pty socket gone — worker unreachable')
       dead++
       continue
     }
@@ -106,7 +115,8 @@ export function adoptRunningPtyRecords(workers: Map<string, WorkerVm>): void {
       try {
         writeWorkerRecord({
           ...record,
-          status: 'exited',
+          status: 'failed',
+          failedReason: 'process gone while supervisor was down',
           exitedAt: Date.now(),
         })
       } catch {
@@ -155,5 +165,32 @@ export function adoptRunningPtyRecords(workers: Map<string, WorkerVm>): void {
       sock_exists: String(sockExists),
       verified: String(record.procStart !== undefined && record.procStart !== 0),
     })
+  }
+}
+
+/**
+ * Mark a worker's meta.json as `status='failed'` with a human-readable
+ * reason. ant 5166.js UB8 — when the supervisor adopts a roster entry
+ * but discovers the underlying process / socket is gone, the user-
+ * facing job state is updated so the tasks panel and `ccb ps` show
+ * "why" the job ended terminally instead of leaving it as 'running'.
+ *
+ * No-op if the meta.json is missing (e.g. the roster carried a
+ * cross-cwd entry whose jobs/ tree is on a different mount).
+ */
+function markAdoptionFailed(short: string, reason: string): void {
+  try {
+    const record = readWorkerRecord(short)
+    if (!record) return
+    // Don't trample a status the user already set (stopped/killed/failed).
+    if (record.status !== 'running' && record.status !== 'unknown') return
+    writeWorkerRecord({
+      ...record,
+      status: 'failed',
+      failedReason: reason,
+      exitedAt: Date.now(),
+    })
+  } catch {
+    // best-effort
   }
 }
