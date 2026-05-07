@@ -33,6 +33,47 @@ export async function isDaemonAlive(): Promise<boolean> {
   return r.ok === true
 }
 
+/**
+ * Skew-nudge poll — ant 4639.js hM3(). Tolerates a daemon mid-restart
+ * (upgrade, KILL+respawn). Sends `nudge` op repeatedly for up to 10s,
+ * returning 'up' as soon as the daemon answers `restarting:false`. If
+ * daemon stays unreachable returns 'down'.
+ */
+export async function nudgeDaemonSkew(): Promise<'up' | 'down'> {
+  const deadline = Date.now() + 10_000
+  while (Date.now() < deadline) {
+    const r = await daemonRequest('nudge', {}, { timeoutMs: 1000 })
+    if (r.ok && r.op === 'nudge') {
+      if (!(r as Record<string, unknown>).restarting) return 'up'
+      await new Promise(res => setTimeout(res, 100))
+      continue
+    }
+    if (!r.ok && r.code === 'ETIMEOUT') {
+      await new Promise(res => setTimeout(res, 100))
+      continue
+    }
+    if (!r.ok && r.code === 'ENOCONN') {
+      await new Promise(res => setTimeout(res, 100))
+      continue
+    }
+    return 'up'
+  }
+  return 'down'
+}
+
+/**
+ * Poll for daemon liveness up to deadlineMs. Used after install/spawn
+ * to wait for the daemon to come up. Mirrors ant 4639.js HiH().
+ */
+export async function waitForDaemon(deadlineMs: number): Promise<boolean> {
+  const deadline = Date.now() + deadlineMs
+  while (Date.now() < deadline) {
+    if (await isDaemonAlive()) return true
+    await new Promise(res => setTimeout(res, 100))
+  }
+  return false
+}
+
 function spawnTransient(): void {
   const isBun = process.argv0.endsWith('bun')
   const cmd = isBun ? process.argv0 : process.argv[0]!
