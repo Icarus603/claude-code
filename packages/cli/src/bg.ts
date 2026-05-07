@@ -599,12 +599,16 @@ function stopJob(
   }
   const signal: NodeJS.Signals = opts.force ? 'SIGKILL' : 'SIGTERM'
   try {
-    process.kill(job.pid, signal)
-    writeJobMeta({
-      ...job,
-      status: opts.finalStatus,
-      killedAt: Date.now(),
-    })
+    // pty mode: kill the process group so both host + inner ccb die.
+    // detached mode: single pid kill is correct (no pgroup involvement).
+    if (job.mode === 'pty') {
+      try { process.kill(-job.pid, signal) } catch {
+        process.kill(job.pid, signal) // fallback if pgroup not available
+      }
+    } else {
+      process.kill(job.pid, signal)
+    }
+    writeJobMeta({ ...job, status: opts.finalStatus, killedAt: Date.now() })
     process.stdout.write(
       `${opts.verbLabel} ${job.short} (pid ${job.pid}, ${signal}).\n`,
     )
