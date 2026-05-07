@@ -68,6 +68,20 @@ function writeBreadcrumbAndExit(sock: string | undefined, msg: string): never {
       // best-effort
     }
   }
+  // ant 4138.js / 5172.js tengu_bg_ptyhost_crash on host bring-up failure.
+  // Inline to avoid pulling local-observability into ptyHost (cold-start fast-path).
+  try {
+    const evt = JSON.stringify({ ts: new Date().toISOString(), name: 'tengu_bg_ptyhost_crash', metadata: { msg } }) + '\n'
+    const homeDir = process.env.HOME ?? ''
+    if (homeDir && process.env.CLAUDE_CODE_LOCAL_TELEMETRY === '1') {
+      const today = new Date().toISOString().slice(0, 10)
+      const dir = `${homeDir}/.claude/telemetry`
+      mkdirSync(dir, { recursive: true, mode: 0o700 })
+      writeFileSync(`${dir}/events-${today}.jsonl`, evt, { flag: 'a', mode: 0o600 })
+    }
+  } catch {
+    // best-effort
+  }
   process.exit(1)
 }
 

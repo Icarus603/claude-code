@@ -18,11 +18,13 @@ import {
 } from 'node:net'
 import { dirname } from 'node:path'
 
+import { logEvent } from '@claude-code/local-observability'
 import {
   type ErrorResponse,
   type OkResponse,
   type ProtoOp,
   type Response,
+  PROTO_VERSION,
   createLineDecoder,
   encodeFrame,
 } from './socketProto.js'
@@ -80,6 +82,22 @@ export async function startSocketServer(
       return
     }
     const m = msg as Record<string, unknown>
+    // ant 4138.js proto-version handshake: clients pass `proto: PROTO_VERSION`.
+    // If mismatched, emit tengu_bg_proto_mismatch + reject before op dispatch.
+    const proto = m.proto as number | undefined
+    if (typeof proto === 'number' && proto !== PROTO_VERSION) {
+      logEvent('tengu_bg_proto_mismatch', {
+        client_proto: String(proto),
+        server_proto: String(PROTO_VERSION),
+      })
+      reply(socket, {
+        ok: false,
+        code: 'EUNSUPPORTED',
+        error: `proto mismatch: client=${proto} server=${PROTO_VERSION}`,
+      } as ErrorResponse)
+      socket.end()
+      return
+    }
     const op = m.op as ProtoOp | undefined
     if (!op || typeof op !== 'string') {
       reply(socket, {
