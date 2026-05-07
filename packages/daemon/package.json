@@ -31,6 +31,7 @@
     "./dispatchSpool.js": "./src/dispatchSpool.ts",
     "./roster.js": "./src/roster.ts",
     "./bgAdopt.js": "./src/bgAdopt.ts",
-    "./bgDaemonTimers.js": "./src/bgDaemonTimers.ts"
+    "./bgDaemonTimers.js": "./src/bgDaemonTimers.ts",
+    "./peerUid.js": "./src/peerUid.ts"
   }
 }

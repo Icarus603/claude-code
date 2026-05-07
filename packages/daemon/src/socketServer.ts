@@ -19,6 +19,7 @@ import {
 import { dirname } from 'node:path'
 
 import { logEvent } from '@claude-code/local-observability'
+import { checkPeerUid } from './peerUid.js'
 import {
   type ErrorResponse,
   type OkResponse,
@@ -141,6 +142,25 @@ export async function startSocketServer(
     clients.add(socket)
     socket.on('error', () => socket.destroy())
     socket.once('close', () => clients.delete(socket))
+    // ant 5164.js — reject connections from a different uid before
+    // any data flows. SO_PEERCRED on Linux / LOCAL_PEERCRED on macOS.
+    // Best-effort: null return from checkPeerUid means we can't
+    // verify (Windows / FFI failure / non-fd handle) and we accept.
+    const peerErr = checkPeerUid(socket)
+    if (peerErr) {
+      logEvent('tengu_daemon_peer_uid_reject', {})
+      // ant defers the reply until the first data byte to give the
+      // client decoder a chance to surface a clean error. Mirror.
+      socket.once('data', () => {
+        reply(socket, {
+          ok: false,
+          code: 'EPEERUID',
+          error: peerErr,
+        } as ErrorResponse)
+        socket.end()
+      })
+      return
+    }
     const decoder = createLineDecoder(
       msg => dispatch(socket, msg),
       err => {
