@@ -15,6 +15,8 @@ export interface StopJobInput {
   pid: number
   status: string
   mode?: 'detached' | 'pty'
+  /** procStart from job meta — used by procAliveSamePid to defeat PID recycling. */
+  procStart?: number
 }
 
 export interface StopJobOpts {
@@ -39,16 +41,24 @@ export async function stopJob(
     process.exit(0)
   }
 
-  // Daemon route (preferred for pty-mode jobs).
+  // Daemon route (preferred for pty-mode jobs). ant 4643.js bjH:
+  // retry on ESTARTING up to 10x (200ms apart) so a worker mid-spawn
+  // gets killed once it's ready instead of dropping to direct kill.
   if (job.mode === 'pty') {
     const { isDaemonAlive, daemonKill } = await import('./daemonAdapter.js')
     if (await isDaemonAlive()) {
-      const r = await daemonKill({ short: job.short, force: opts.force })
+      let r = await daemonKill({ short: job.short, force: opts.force })
+      for (let i = 0; !r.ok && r.code === 'ESTARTING' && i < 10; i++) {
+        await new Promise(res => setTimeout(res, 200))
+        r = await daemonKill({ short: job.short, force: opts.force })
+      }
       if (r.ok) {
         writeMeta({ status: opts.finalStatus, killedAt: Date.now() })
         process.stdout.write(`${opts.verbLabel} ${job.short} (via daemon).\n`)
         return
       }
+      // ENOJOB / ENOCONN / ETIMEOUT → fall through to direct kill;
+      // any other code is a hard daemon failure we surface but still try.
       process.stderr.write(
         `daemon kill failed (${r.code}); falling back to direct signal\n`,
       )
@@ -63,6 +73,33 @@ export async function stopJob(
       }
     } else {
       process.kill(job.pid, signal)
+    }
+    // ant 4643.js: poll procStart-verified up to 3s for graceful exit;
+    // if still alive after the budget, second SIGTERM + 500ms budget.
+    if (!opts.force) {
+      const { procAliveSamePid } = await import('./procAlive.js')
+      const deadline = Date.now() + 3000
+      let alive = true
+      while ((alive = procAliveSamePid(job.pid, job.procStart)) && Date.now() < deadline) {
+        await new Promise(res => setTimeout(res, 100))
+      }
+      if (alive) {
+        try {
+          if (job.mode === 'pty') {
+            try { process.kill(-job.pid, 'SIGTERM') } catch {
+              process.kill(job.pid, 'SIGTERM')
+            }
+          } else {
+            process.kill(job.pid, 'SIGTERM')
+          }
+        } catch {
+          // best-effort
+        }
+        const fallbackDeadline = Date.now() + 500
+        while ((alive = procAliveSamePid(job.pid, job.procStart)) && Date.now() < fallbackDeadline) {
+          await new Promise(res => setTimeout(res, 100))
+        }
+      }
     }
     writeMeta({ status: opts.finalStatus, killedAt: Date.now() })
     process.stdout.write(

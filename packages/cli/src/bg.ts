@@ -78,6 +78,8 @@ interface JobMeta {
   mode?: 'detached' | 'pty'
   /** Path to the PTY host's Unix socket. Set iff mode==='pty'. */
   ptySocket?: string
+  /** procStart timestamp from /proc or ps; defeats PID-recycle false alives. */
+  procStart?: number
 }
 
 const JOB_SHORT_LENGTH = 8
@@ -416,6 +418,7 @@ async function spawnBgJob(opts: {
     process.exit(1)
   }
 
+  const { readProcStart } = await import('@claude-code/daemon/bgWorkerRegistry.js')
   const meta: JobMeta = {
     short,
     pid: child.pid,
@@ -423,6 +426,7 @@ async function spawnBgJob(opts: {
     cwd: opts.cwd,
     startedAt: Date.now(),
     status: 'running',
+    procStart: readProcStart(child.pid) || undefined,
   }
   writeJobMeta(meta)
 

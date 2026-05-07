@@ -26,6 +26,8 @@ export interface SpawnPtyResult {
   socketPath: string
   /** Always 'pty'. Set as meta.mode by the caller. */
   mode: 'pty'
+  /** procStart timestamp; defeats PID recycle. Read sync at spawn time. */
+  procStart?: number
 }
 
 /**
@@ -107,6 +109,10 @@ export function spawnPtyHost(opts: {
     ].join('\n'),
   )
 
+  // readProcStart is sync (reads /proc or runs ps); cheap enough at spawn time.
+  // Imported lazily to avoid pulling daemon package into a path this file
+  // could be called from without daemon present.
+  const { readProcStart } = require('@claude-code/daemon/bgWorkerRegistry.js') as typeof import('@claude-code/daemon/bgWorkerRegistry.js')
   return {
     short: opts.short,
     pid: child.pid,
@@ -115,5 +121,6 @@ export function spawnPtyHost(opts: {
     startedAt: Date.now(),
     socketPath,
     mode: 'pty',
+    procStart: readProcStart(child.pid) || undefined,
   }
 }
