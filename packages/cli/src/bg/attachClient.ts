@@ -18,6 +18,8 @@
  * @dynamicRequire
  */
 
+import { logEvent } from '@claude-code/local-observability'
+import { createDecModeTracker } from './decModeTracker.js'
 import { createPtyAdopter, type PtyAdopter } from './ptyAdopter.js'
 
 const DETACH_KEY_BYTE = 0x11 // Ctrl+Q
@@ -36,6 +38,10 @@ export async function runAttach(
   let restoreTty: (() => void) | undefined
   let exitCode = 0
   let detached = false
+  const startedAt = Date.now()
+  let firstFrameAt = 0
+  const decModes = createDecModeTracker()
+  logEvent('tengu_bg_attach', { short })
 
   // Local TTY raw-mode setup. Without this, the local terminal would
   // do its own line-buffering + Ctrl+C → SIGINT → kill the attach
@@ -57,8 +63,16 @@ export async function runAttach(
   // Open adopter against the host socket.
   adopter = createPtyAdopter(socketPath)
 
-  // Render incoming PTY output to local stdout.
+  // Render incoming PTY output to local stdout. ant 4638.js Yg: track
+  // DEC private modes so detach can restore local terminal state.
   const dataSub = adopter.onData(chunk => {
+    if (firstFrameAt === 0) {
+      firstFrameAt = Date.now()
+      logEvent('tengu_bg_attach_first_frame', {
+        ms: String(firstFrameAt - startedAt),
+      })
+    }
+    decModes.feed(chunk)
     process.stdout.write(chunk)
   })
 
@@ -112,6 +126,11 @@ export async function runAttach(
 
   await Promise.race([exitPromise, detachPromise])
 
+  // ant 4638.js: emit DEC mode restore so the local terminal isn't
+  // stuck in mouse-mode / alt-screen / bracketed-paste etc.
+  const restore = decModes.restoreSequence()
+  if (restore) process.stdout.write(restore)
+
   // Cleanup.
   dataSub.dispose()
   process.stdout.removeListener('resize', onResize)
@@ -119,6 +138,13 @@ export async function runAttach(
   if (process.stdin.pause) process.stdin.pause()
   adopter.dispose()
   restoreTty?.()
+
+  const outcome = detached ? 'detached' : 'exited'
+  logEvent('tengu_bg_attach_outcome', {
+    outcome,
+    got_first_frame: String(firstFrameAt > 0),
+    ms: String(Date.now() - startedAt),
+  })
 
   if (detached) {
     process.stderr.write(`\n[detached from ${short} — session keeps running]\n`)
