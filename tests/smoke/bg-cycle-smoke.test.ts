@@ -89,8 +89,12 @@ describe('smoke:bg cycle (detached)', () => {
     // backgrounded · <short> line appears in stdout
     expect(r.stdout).toContain('backgrounded')
     // Capture short id from the cyan banner. Strip ANSI escapes since
-    // FORCE_COLOR=0 might still leak through some chalk paths.
-    const cleaned = r.stdout.replace(/\x1b\[[0-9;]*m/g, '')
+    // FORCE_COLOR=0 might still leak through some chalk paths. Build
+    // the regex from String.fromCharCode(0x1b) to keep biome's
+    // noControlCharactersInRegex rule happy without losing the strip.
+    const ansiEscape = String.fromCharCode(0x1b)
+    const ansiRe = new RegExp(`${ansiEscape}\\[[0-9;]*m`, 'g')
+    const cleaned = r.stdout.replace(ansiRe, '')
     const m = cleaned.match(/backgrounded\s*·\s*([a-f0-9]{8})/)
     expect(m).toBeTruthy()
     short = m?.[1]
