@@ -4,12 +4,7 @@ import type { BetaToolUnion } from '@anthropic-ai/sdk/resources/beta/messages.js
 import { mkdir, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import { z } from 'zod/v4'
-import {
-  getCachedClaudeMdContent,
-  getLastClassifierRequests,
-  getSessionId,
-  setLastClassifierRequests,
-} from '@claude-code/app-host/bootstrap/state.js'
+import { getCachedClaudeMdContent, getLastClassifierRequests, getSessionId, setLastClassifierRequests } from '@claude-code/app-host/bootstrap/state.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
@@ -18,10 +13,7 @@ import { parsePromptTooLongTokenCounts } from '@claude-code/provider/errors.js'
 import { getDefaultMaxRetries } from '@claude-code/provider/withRetry.js'
 import type { Tool, ToolPermissionContext, Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '@claude-code/agent/messageShapes'
-import type {
-  ClassifierUsage,
-  YoloClassifierResult,
-} from './permissionTypes.js'
+import type { ClassifierUsage, YoloClassifierResult } from './permissionTypes.js'
 import { isDebugMode, logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
@@ -33,14 +25,8 @@ import { getAutoModeConfig } from '@claude-code/config/settings'
 import { sideQuery } from '@claude-code/agent/sideQuery.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
-import {
-  getBashPromptAllowDescriptions,
-  getBashPromptDenyDescriptions,
-} from './bashClassifier.js'
-import {
-  extractToolUseBlock,
-  parseClassifierResponse,
-} from './classifierShared.js'
+import { getBashPromptAllowDescriptions, getBashPromptDenyDescriptions } from './bashClassifier.js'
+import { extractToolUseBlock, parseClassifierResponse } from './classifierShared.js'
 import { getClaudeTempDir } from './filesystem.js'
 import { readEnv } from '@claude-code/config/env'
 
