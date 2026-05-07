@@ -52,8 +52,8 @@ export async function daemonMain(args: string[]): Promise<void> {
         const { bgDaemonMain } = await import('./bgDaemon.js')
         const code = await bgDaemonMain(args.slice(2))
         process.exitCode = code
-      } else if (sub === 'status') {
-        await bgDaemonStatus()
+      } else if (sub === 'status' || sub === 'list') {
+        await bgDaemonStatus(args.includes('--json'))
       } else if (sub === 'stop') {
         await bgDaemonStop()
       } else if (
@@ -89,31 +89,34 @@ export async function daemonMain(args: string[]): Promise<void> {
   }
 }
 
-async function bgDaemonStatus(): Promise<void> {
+async function bgDaemonStatus(asJson = false): Promise<void> {
   const { daemonRequest } = await import('./daemonClient.js')
   const r = await daemonRequest('ping', {}, { timeoutMs: 1000 })
   if (!r.ok) {
-    console.log(`bg daemon: not running (${r.code})`)
+    if (asJson) {
+      console.log(JSON.stringify({ ok: false, running: false, code: r.code }))
+    } else {
+      console.log(`bg daemon: not running (${r.code})`)
+    }
     process.exitCode = 1
     return
   }
-  console.log(
-    `bg daemon: running (uptime ${(r as Record<string, unknown>).uptime ?? 'unknown'}ms)`,
-  )
+  const uptime = (r as Record<string, unknown>).uptime
   const list = await daemonRequest('list', {}, { timeoutMs: 2000 })
-  if (list.ok) {
-    const jobs = (list as Record<string, unknown>).jobs as
-      | Array<Record<string, unknown>>
-      | undefined
-    if (jobs?.length) {
-      for (const j of jobs) {
-        console.log(
-          `  ${j.short}  ${j.status}  pid=${j.pid}  attachers=${j.attachers}`,
-        )
-      }
-    } else {
-      console.log('  (no workers)')
-    }
+  const jobs = list.ok
+    ? ((list as Record<string, unknown>).jobs as Array<Record<string, unknown>> | undefined) ?? []
+    : []
+  if (asJson) {
+    console.log(JSON.stringify({ ok: true, running: true, uptime, jobs }, null, 2))
+    return
+  }
+  console.log(`bg daemon: running (uptime ${uptime ?? 'unknown'}ms)`)
+  if (jobs.length === 0) {
+    console.log('  (no workers)')
+    return
+  }
+  for (const j of jobs) {
+    console.log(`  ${j.short}  ${j.status}  pid=${j.pid}  attachers=${j.attachers}`)
   }
 }
 
