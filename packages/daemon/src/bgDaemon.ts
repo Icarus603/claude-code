@@ -156,6 +156,10 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     pid: String(process.pid),
     origin: parsed.origin ?? 'transient',
   })
+  if (process.env.CLAUDE_CODE_BG_SPARE_POOL === '1') {
+    const { enableSparePool } = await import('./sparePool.js')
+    enableSparePool()
+  }
   // Boot scan + every-5s rescan for workers spawned outside our spawn op
   // (e.g. ccb --bg-pty fired by user). ant 5172.js sweep cadence.
   adoptRunningPtyRecords()
@@ -243,6 +247,12 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         logEventFn('tengu_bg_dispatch_rejected', { short, reason: 'already_running' })
         return err('EALIVE', `worker ${short} already running`, { short })
       }
+      // ant 4644.js: try claim spare before fresh spawn. Today scaffolding
+      // returns ok:false because worker-side claim msg not wired; the
+      // tengu_bg_spare_claim_fail event still fires for observability.
+      const { claimSpare } = await import('./sparePool.js')
+      const claim = claimSpare((d.cwd as string) ?? process.cwd())
+      void claim // future: if (claim.ok) reuse short, no spawn
       const vm = new WorkerVm({
         short,
         cwd: (d.cwd as string) ?? process.cwd(),
