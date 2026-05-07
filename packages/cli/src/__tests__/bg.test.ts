@@ -309,7 +309,8 @@ describe('extractRespawnArgs', () => {
     })
   })
 
-  test('unwraps a pty-mode cmd (--bg-pty-host wrapper)', () => {
+  test('unwraps a pty-mode cmd (REPL with positional directive)', () => {
+    // pty cmd uses the FULL REPL (no -p), directive is positional.
     expect(
       extractRespawnArgs([
         'bun',
@@ -322,7 +323,6 @@ describe('extractRespawnArgs', () => {
         'bun',
         '/cli.js',
         '--debug',
-        '-p',
         'do the thing',
       ]),
     ).toEqual({
@@ -343,7 +343,6 @@ describe('extractRespawnArgs', () => {
         '/usr/local/bin/ccb',
         '--model',
         'opus',
-        '-p',
         'task',
       ]),
     ).toEqual({
@@ -355,6 +354,23 @@ describe('extractRespawnArgs', () => {
   test('returns null on pty wrapper with missing -- separator', () => {
     expect(
       extractRespawnArgs(['bun', '/cli.js', '--bg-pty-host', '/tmp/s']),
+    ).toBeNull()
+  })
+
+  test('returns null on pty cmd with no positional directive', () => {
+    expect(
+      extractRespawnArgs([
+        'bun',
+        '/cli.js',
+        '--bg-pty-host',
+        '/tmp/s',
+        '80',
+        '24',
+        '--',
+        'bun',
+        '/cli.js',
+        '--debug',
+      ]),
     ).toBeNull()
   })
 })

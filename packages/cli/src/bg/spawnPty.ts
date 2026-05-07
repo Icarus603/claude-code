@@ -43,9 +43,12 @@ export function spawnPtyHost(opts: {
   mkdirSync(opts.jobDir, { recursive: true })
   const socketPath = join(opts.jobDir, 'pty.sock')
 
-  // Outer process: ccb --bg-pty-host <sock> <cols> <rows> -- <inner ccb>
-  // Inner: ccb [user flags] -p "<directive>"  (later: drop -p for true REPL)
-  const innerArgs = [...opts.flags, '-p', opts.directive]
+  // Outer: ccb --bg-pty-host <sock> <cols> <rows> -- <inner ccb>
+  // Inner: ccb [user flags] "<directive>"  (full REPL, directive as
+  // positional → Commander parses it as [prompt] which the REPL
+  // pre-seeds into PromptInput on launch). Mirrors ant's behaviour:
+  // the user can attach mid-conversation and continue interactively.
+  const innerArgs = [...opts.flags, opts.directive]
   const isBun = process.argv0.endsWith('bun')
   const cmd = isBun ? process.argv0 : process.argv[0]!
   const cliJs = isBun ? [process.argv[1] ?? ''] : []
