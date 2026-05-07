@@ -3,7 +3,7 @@
 [English](./README.md) | [繁體中文](./README.zh-TW.md)
 
 [![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=for-the-badge&color=0f0f0f&label=ccb)](https://github.com/Icarus603/claude-code/releases)
-[![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=for-the-badge&logo=bun&logoColor=000)](https://bun.sh)
+[![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://github.com/Icarus603/claude-code)
 [![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=for-the-badge&color=222&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
 [![Platforms](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-333333?style=for-the-badge)](https://github.com/Icarus603/claude-code/releases/latest)
