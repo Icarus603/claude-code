@@ -694,9 +694,9 @@ export async function attachHandler(args: readonly string[]): Promise<void> {
     await runAttach(job.ptySocket, job.short)
     return
   }
-  process.stderr.write(
-    `attach: detached-mode job — streaming read-only. Use --bg-pty for bidirectional.\n`,
-  )
+  // detached-mode is non-PTY: log + fall through to logs --follow.
+  ;(await import('./bg/agentActionEvent.js')).emitAgentActionRaw('tengu_bg_attach_legacy_autorespawn', { short: job.short, mode: job.mode ?? 'detached' })
+  process.stderr.write(`attach: detached-mode job — streaming read-only. Use --bg-pty for bidirectional.\n`)
   await logsHandler([job.short, '--follow', '--tail', '200'])
 }
 

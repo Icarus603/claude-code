@@ -50,3 +50,8 @@ export function emitAgentTerminal(short: string, outcome: string, durationMs: nu
     duration_ms: String(durationMs),
   })
 }
+
+/** Escape hatch for one-off events that don't fit the action/dispatch/terminal trio. */
+export function emitAgentActionRaw(name: string, metadata: Record<string, string> = {}): void {
+  logEvent(name, metadata)
+}
