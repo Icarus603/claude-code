@@ -8,8 +8,6 @@
  *
  * Mirrors ant 4649.js Kf3 (lastPositional) + VJK (flagsWithoutPositional)
  * + RJK (stdin embed) collapsed into one pass.
- *
- * @dynamicRequire
  */
 
 /**
@@ -44,8 +42,6 @@ const BG_FLAGS_WITH_VALUE = new Set([
  * can do `ccb --bg --model claude-haiku-4-5 "summarize this"`.
  *
  * Exported for unit-test coverage.
- *
- * @dynamicRequire
  */
 export function splitBgArgs(args: readonly string[]): {
   flags: string[]

@@ -9,8 +9,6 @@
  * Detached uses `-p directive` so the marker is unambiguous. Pty uses
  * the directive as a positional (REPL prompt-arg) so we extract the
  * LAST non-flag arg from the inner-ccb tail.
- *
- * @dynamicRequire
  */
 export function extractRespawnArgs(cmd: readonly string[]): {
   flags: string[]

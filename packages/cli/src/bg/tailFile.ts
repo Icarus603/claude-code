@@ -7,8 +7,6 @@
  * Extracted from bg.ts for the file-size budget + isolated test
  * coverage. The trailing-newline + chunk-boundary arithmetic is
  * subtle enough to warrant a regression suite (see __tests__/bg.test.ts).
- *
- * @dynamicRequire
  */
 
 import {
@@ -19,7 +17,6 @@ import {
   statSync,
 } from 'node:fs'
 
-/** @dynamicRequire */
 export function tailFile(path: string, lines: number): string {
   if (!existsSync(path) || lines <= 0) return ''
   const stat = statSync(path)

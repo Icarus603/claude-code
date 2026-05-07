@@ -21,7 +21,7 @@ const IMPORT_RE = /(?:from|import|require)\s*\(?\s*['"]@claude-code\/([a-z@][a-z
 // Tight ratchet — set to current actuals. Future PRs can only reduce.
 const BUDGET: Record<string, number> = {
   'agent': 19,
-  'app-host': 22,
+  'app-host': 21,
   'bridge': 14,
   'cli': 22,  // +1: src/{main,entrypoints/cli,entrypoints/mcp} moved into packages/cli/src/entry/, all their imports now count as cli's deps
   'command-runtime': 20,
@@ -34,7 +34,7 @@ const BUDGET: Record<string, number> = {
   'memory': 5,
   'output': 7,
   'permission': 15,
-  'provider': 17,
+  'provider': 16,
   'repl': 22,
   'server': 8,
   'shell': 11,

@@ -1,16 +1,12 @@
 /**
  * Pure utility helpers for the bg.ts job machinery — extracted to keep
  * the host file under the 800-LOC budget.
- *
- * @dynamicRequire
  */
 
 /**
  * `ps` aux–style probe: send signal 0 (no-op kill) and check whether
  * the kernel reports the process is running. ESRCH = dead, EPERM =
  * exists but we can't signal it (counts as running).
- *
- * @dynamicRequire
  */
 export function isProcessRunning(pid: number): boolean {
   try {
