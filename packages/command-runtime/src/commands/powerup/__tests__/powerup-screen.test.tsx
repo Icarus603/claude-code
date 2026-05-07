@@ -1,6 +1,14 @@
 import { describe, expect, test, beforeEach, mock } from 'bun:test'
-import * as React from 'react'
 
+// `mock.module()` is GLOBAL across the entire bun test run — see
+// `feedback_bun_mock_module_global_scope.md`. The neighbouring
+// state.test.ts already mocks `../lessons/index.js` with three
+// `lesson-{a,b,c}` entries; we cannot install a *competing* mock here
+// without one suite clobbering the other. Instead we exercise
+// powerup.tsx against the **real** lessons/index.ts (currently 3
+// lessons — at-mentions, modes, undo). The assertions below pin only
+// shape, not specific lesson identities, so additional lessons in
+// later tasks won't break this file.
 let mockConfig: { powerupsUnlocked?: string[] } = {}
 mock.module('@claude-code/config', () => ({
   getGlobalConfig: () => mockConfig,
@@ -13,24 +21,12 @@ mock.module('@claude-code/local-observability', () => ({
   logEvent: () => {},
 }))
 
-mock.module('../lessons/index.js', () => ({
-  ALL_LESSONS: [
-    { id: 'a', title: 'Alpha lesson', tagline: 'aaa', body: <></> },
-    { id: 'b', title: 'Beta lesson', tagline: 'bbb', body: <></> },
-  ],
-}))
-
 // Stub the Select component — its full Ink rendering needs the keyboard
 // context that bun:test does not provide. We only need to verify
 // that PowerupScreen *constructs* the right options and exposes the
-// `onChange` / `onCancel` callbacks; pulling props out of the rendered
-// element is enough.
+// `onChange` / `onCancel` callbacks.
 mock.module('@claude-code/repl/components/CustomSelect/index.js', () => ({
-  Select: (props: any) => {
-    // Capture props on the React element via a synthetic data-test path;
-    // tests inspect them after createElement returns.
-    return { props, _stub: 'select' }
-  },
+  Select: (props: unknown) => ({ props, _stub: 'select' }),
 }))
 
 describe('PowerupScreen', () => {
@@ -49,15 +45,36 @@ describe('PowerupScreen', () => {
   })
 })
 
-describe('lessonOptions', () => {
-  test('builds option list from ALL_LESSONS with circle/check markers', async () => {
-    mockConfig = { powerupsUnlocked: ['a'] }
+describe('buildLessonOptions', () => {
+  test('builds an option per real lesson with circle marker when nothing unlocked', async () => {
+    mockConfig = {}
+    const { buildLessonOptions } = await import('../powerup.js')
+    const { ALL_LESSONS } = await import('../lessons/index.js')
+
+    const opts = buildLessonOptions()
+
+    expect(opts).toHaveLength(ALL_LESSONS.length)
+    expect(opts.length).toBeGreaterThan(0) // at least one lesson registered
+    for (let i = 0; i < ALL_LESSONS.length; i++) {
+      expect(opts[i]?.value).toBe(ALL_LESSONS[i]!.id)
+      expect(opts[i]?.description).toBe(ALL_LESSONS[i]!.tagline)
+    }
+  })
+
+  test('marks unlocked lessons with success-coloured ✓ label, others with ○', async () => {
+    const { ALL_LESSONS } = await import('../lessons/index.js')
+    const firstId = ALL_LESSONS[0]!.id
+    mockConfig = { powerupsUnlocked: [firstId] }
+
     const { buildLessonOptions } = await import('../powerup.js')
     const opts = buildLessonOptions()
-    expect(opts).toHaveLength(2)
-    expect(opts[0]?.value).toBe('a')
-    expect(opts[1]?.value).toBe('b')
-    expect(opts[0]?.description).toBe('aaa')
-    expect(opts[1]?.description).toBe('bbb')
+
+    // Unlocked option's label is a JSX element (Text with success colour);
+    // locked option's label is a plain string starting with '○ '.
+    expect(typeof opts[0]?.label).toBe('object')
+    if (opts.length > 1) {
+      expect(typeof opts[1]?.label).toBe('string')
+      expect(opts[1]?.label).toMatch(/^○ /)
+    }
   })
 })

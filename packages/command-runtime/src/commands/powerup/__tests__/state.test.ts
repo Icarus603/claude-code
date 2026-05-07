@@ -1,20 +1,17 @@
 import { describe, expect, test, beforeEach, mock } from 'bun:test'
 
-// Inline-mock pattern: mock.module is GLOBAL across the run, so we keep state per test.
+// `mock.module()` is GLOBAL across the entire bun test run. Mocking
+// `../lessons/index.js` here would clobber other suites that import the
+// real module (e.g. powerup-screen.test). Instead we test against the
+// *real* ALL_LESSONS — at any given commit it has at least one entry,
+// and the invariants below hold parametrically. As new lessons land
+// (Tasks 10–16) this file does not need updating.
 let mockConfig: { powerupsUnlocked?: string[] } = {}
 mock.module('@claude-code/config', () => ({
   getGlobalConfig: () => mockConfig,
   saveGlobalConfig: (updater: (c: any) => any) => {
     mockConfig = updater(mockConfig)
   },
-}))
-
-mock.module('../lessons/index.js', () => ({
-  ALL_LESSONS: [
-    { id: 'lesson-a', title: 'A', tagline: 'a', body: null },
-    { id: 'lesson-b', title: 'B', tagline: 'b', body: null },
-    { id: 'lesson-c', title: 'C', tagline: 'c', body: null },
-  ],
 }))
 
 describe('powerup state', () => {
@@ -28,35 +25,57 @@ describe('powerup state', () => {
   })
 
   test('markUnlocked persists the id', async () => {
+    const { ALL_LESSONS } = await import('../lessons/index.js')
     const { markUnlocked, getUnlocked } = await import('../state.js')
-    markUnlocked('lesson-a')
-    expect(getUnlocked().has('lesson-a')).toBe(true)
-    expect(mockConfig.powerupsUnlocked).toEqual(['lesson-a'])
+    const id = ALL_LESSONS[0]!.id
+    markUnlocked(id)
+    expect(getUnlocked().has(id)).toBe(true)
+    expect(mockConfig.powerupsUnlocked).toEqual([id])
   })
 
   test('markUnlocked is idempotent', async () => {
+    const { ALL_LESSONS } = await import('../lessons/index.js')
     const { markUnlocked, getUnlocked } = await import('../state.js')
-    markUnlocked('lesson-a')
-    markUnlocked('lesson-a')
+    const id = ALL_LESSONS[0]!.id
+    markUnlocked(id)
+    markUnlocked(id)
     expect(getUnlocked().size).toBe(1)
   })
 
   test('getUnlocked filters out stale ids not in ALL_LESSONS', async () => {
-    mockConfig = { powerupsUnlocked: ['lesson-a', 'removed-old-lesson'] }
+    const { ALL_LESSONS } = await import('../lessons/index.js')
+    const realId = ALL_LESSONS[0]!.id
+    mockConfig = { powerupsUnlocked: [realId, 'removed-old-lesson'] }
     const { getUnlocked } = await import('../state.js')
     const u = getUnlocked()
-    expect(u.has('lesson-a')).toBe(true)
+    expect(u.has(realId)).toBe(true)
     expect(u.has('removed-old-lesson')).toBe(false)
     expect(u.size).toBe(1)
   })
 
-  test('isAllUnlocked is true only when all known lessons are unlocked', async () => {
+  test('isAllUnlocked is true only when every lesson is unlocked', async () => {
+    const { ALL_LESSONS } = await import('../lessons/index.js')
     const { markUnlocked, isAllUnlocked } = await import('../state.js')
+
+    // Empty start
     expect(isAllUnlocked()).toBe(false)
-    markUnlocked('lesson-a')
-    markUnlocked('lesson-b')
-    expect(isAllUnlocked()).toBe(false)
-    markUnlocked('lesson-c')
+
+    // Unlock all but one — still not done
+    if (ALL_LESSONS.length >= 2) {
+      for (let i = 0; i < ALL_LESSONS.length - 1; i++) {
+        markUnlocked(ALL_LESSONS[i]!.id)
+      }
+      expect(isAllUnlocked()).toBe(false)
+    }
+
+    // Unlock the last one — done
+    markUnlocked(ALL_LESSONS[ALL_LESSONS.length - 1]!.id)
     expect(isAllUnlocked()).toBe(true)
+  })
+
+  test('totalLessons matches the live ALL_LESSONS length', async () => {
+    const { ALL_LESSONS } = await import('../lessons/index.js')
+    const { totalLessons } = await import('../state.js')
+    expect(totalLessons()).toBe(ALL_LESSONS.length)
   })
 })
