@@ -12,13 +12,10 @@ type Props = {
 }
 
 /**
- * Pure index advancement. Exported for unit-test coverage so the
- * cycling math is tested without mounting React. Wraps via modulo;
- * single-frame input returns 0; empty input returns 0.
- *
- * @dynamicRequire — referenced from the component via JSX, not a
- * dynamic import; this comment is a no-op for the verifier but flags
- * to readers that the helper is not dead code.
+ * Pure index advancement. Wraps via modulo; single-frame and empty input
+ * both return 0. Extracted as a pure function so the cycling math is unit
+ * tested without mounting React (the `@anthropic/ink` fork ships no test
+ * harness).
  */
 export function nextFrameIndex(current: number, total: number): number {
   if (total <= 1) return 0
@@ -32,9 +29,12 @@ export function nextFrameIndex(current: number, total: number): number {
  * `[suggestion:foo]` and `[success:✓]` — for MVP they render verbatim;
  * a marker→colored-span parser is a future enhancement.
  *
- * Sets up exactly one interval per mount and clears it on unmount; safe
- * to mount/unmount during lesson navigation. Single-frame and empty
- * input both skip the timer entirely.
+ * The effect depends on the `frames` reference (not its length) so a
+ * lesson swap that happens to keep the same frame count still resets
+ * the timer AND the index — otherwise navigating from a 3-frame lesson
+ * to another 3-frame lesson would silently keep the prior index. Single
+ * frame and empty arrays skip the timer; we still call `setIndex(0)`
+ * to clear stale state from a prior lesson.
  */
 export function FrameAnimation({
   frames,
@@ -43,12 +43,13 @@ export function FrameAnimation({
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
+    setIndex(0)
     if (frames.length <= 1) return
     const t = setInterval(() => {
       setIndex(prev => nextFrameIndex(prev, frames.length))
     }, intervalMs)
     return () => clearInterval(t)
-  }, [frames.length, intervalMs])
+  }, [frames, intervalMs])
 
   return <Text>{frames[index] ?? ''}</Text>
 }
