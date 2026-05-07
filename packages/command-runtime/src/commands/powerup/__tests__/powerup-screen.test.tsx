@@ -39,19 +39,24 @@ describe('PowerupScreen', () => {
     expect(typeof PowerupScreen).toBe('function')
   })
 
-  test('call() exports an async function returning ReactNode', async () => {
+  test('call() returns a React element', async () => {
     const { call } = await import('../powerup.js')
-    expect(typeof call).toBe('function')
+    const result = await call(() => {})
+    expect(typeof result).toBe('object')
+    // PowerupScreen wraps the actual children; just verify the call
+    // returned something object-shaped that React would treat as an
+    // element (full render coverage requires an Ink test harness which
+    // the @ant/ink fork does not ship).
+    expect(result).not.toBeNull()
   })
 })
 
 describe('buildLessonOptions', () => {
   test('builds an option per real lesson with circle marker when nothing unlocked', async () => {
-    mockConfig = {}
     const { buildLessonOptions } = await import('../powerup.js')
     const { ALL_LESSONS } = await import('../lessons/index.js')
 
-    const opts = buildLessonOptions()
+    const opts = buildLessonOptions(new Set())
 
     expect(opts).toHaveLength(ALL_LESSONS.length)
     expect(opts.length).toBeGreaterThan(0) // at least one lesson registered
@@ -64,10 +69,9 @@ describe('buildLessonOptions', () => {
   test('marks unlocked lessons with success-coloured ✓ label, others with ○', async () => {
     const { ALL_LESSONS } = await import('../lessons/index.js')
     const firstId = ALL_LESSONS[0]!.id
-    mockConfig = { powerupsUnlocked: [firstId] }
 
     const { buildLessonOptions } = await import('../powerup.js')
-    const opts = buildLessonOptions()
+    const opts = buildLessonOptions(new Set([firstId]))
 
     // Unlocked option's label is a JSX element (Text with success colour);
     // locked option's label is a plain string starting with '○ '.

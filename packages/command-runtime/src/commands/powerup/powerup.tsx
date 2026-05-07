@@ -43,13 +43,14 @@ type LessonOption = {
 }
 
 /**
- * Build the option list shown in the lesson picker. Exported so the
- * marker logic (✓ vs ○, success colour on done lessons) is unit-tested
- * without needing to mount the full screen against bun:test (no Ink
+ * Build the option list shown in the lesson picker. Pure: callers pass
+ * the current unlocked set so this function does not read global state
+ * and is unit-testable without mocking config. Exported so the marker
+ * logic (✓ vs ○, success colour on done lessons) has direct unit
+ * coverage without mounting the full screen against bun:test (no Ink
  * renderer is available).
  */
-export function buildLessonOptions(): LessonOption[] {
-  const unlocked = getUnlocked()
+export function buildLessonOptions(unlocked: Set<string>): LessonOption[] {
   return ALL_LESSONS.map(l => {
     const done = unlocked.has(l.id)
     const marker = done ? '✓' : '○'
@@ -137,7 +138,7 @@ function PowerupList({
   onCancel: () => void
 }): React.ReactNode {
   const total = totalLessons()
-  const options = buildLessonOptions()
+  const options = buildLessonOptions(unlocked)
 
   return (
     <Box flexDirection="column">
