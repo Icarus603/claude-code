@@ -10,8 +10,8 @@ describe('FrameAnimation', () => {
     expect(typeof FrameAnimation).toBe('function')
   })
 
-  test('default interval is 1500ms (matches ant)', () => {
-    expect(DEFAULT_FRAME_INTERVAL_MS).toBe(1500)
+  test('default interval is 3000ms (matches ant Q8K)', () => {
+    expect(DEFAULT_FRAME_INTERVAL_MS).toBe(3000)
   })
 })
 

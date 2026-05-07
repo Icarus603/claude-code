@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { useState } from 'react'
-import { Box, Text } from '@anthropic/ink'
+import { Box, Byline, KeyboardShortcutHint, Text } from '@anthropic/ink'
 import { Select } from '@claude-code/repl/components/CustomSelect/index.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
+import { CelebrationShimmer } from './CelebrationShimmer.js'
+import { TopRulePanel } from './TopRulePanel.js'
 import { ALL_LESSONS } from './lessons/index.js'
 import type { Lesson } from './lessons/types.js'
 import {
@@ -22,13 +24,16 @@ import {
  * returns to the list. When all lessons unlock for the first time, a
  * celebration panel takes over until dismissed.
  *
- * Mirrors ant 4304.js _qK + eK3 + the celebration component (a8K). State
- * is local except for the persisted unlocked-set, which goes through
- * state.ts to globalConfig.
+ * Mirrors ant 4304.js _qK + eK3 + a8K. State is local except for the
+ * persisted unlocked-set, which goes through state.ts to globalConfig.
  *
- * The screen owns three modes (list / detail / celebration) and passes
- * the parent's `onExit` through; the slash-command runtime closes the
- * screen when `onExit` is invoked.
+ * Visual structure (matches ant 2.1.131):
+ *   <TopRulePanel>           (G1 — claude-coloured top rule + paddingX 2)
+ *     header (title + counter + progress)
+ *     description / lesson body
+ *     <Select>               (the picker / detail confirm)
+ *     keyboard hints byline  (↑↓ select · Enter open · Esc close)
+ *   </TopRulePanel>
  */
 
 type Mode =
@@ -45,10 +50,7 @@ type LessonOption = {
 /**
  * Build the option list shown in the lesson picker. Pure: callers pass
  * the current unlocked set so this function does not read global state
- * and is unit-testable without mocking config. Exported so the marker
- * logic (✓ vs ○, success colour on done lessons) has direct unit
- * coverage without mounting the full screen against bun:test (no Ink
- * renderer is available).
+ * and is unit-testable without mocking config.
  */
 export function buildLessonOptions(unlocked: Set<string>): LessonOption[] {
   return ALL_LESSONS.map(l => {
@@ -141,7 +143,7 @@ function PowerupList({
   const options = buildLessonOptions(unlocked)
 
   return (
-    <Box flexDirection="column">
+    <TopRulePanel>
       <Box marginBottom={1}>
         <Text bold color="claude">
           Power-ups
@@ -164,7 +166,16 @@ function PowerupList({
         }}
         onCancel={onCancel}
       />
-    </Box>
+      <Box marginTop={1}>
+        <Text dimColor italic>
+          <Byline>
+            <KeyboardShortcutHint shortcut="↑↓" action="select" />
+            <KeyboardShortcutHint shortcut="Enter" action="open" />
+            <KeyboardShortcutHint shortcut="Esc" action="close" />
+          </Byline>
+        </Text>
+      </Box>
+    </TopRulePanel>
   )
 }
 
@@ -184,27 +195,37 @@ function LessonDetail({
     { label: 'No — back to list', value: 'no' },
   ]
   return (
-    <Box flexDirection="column" gap={1}>
-      <Box>
-        <Text>{isUnlocked ? '✓ ' : '○ '}</Text>
-        <Text bold color="claude">
-          {lesson.title}
-        </Text>
+    <TopRulePanel>
+      <Box flexDirection="column" gap={1}>
+        <Box>
+          <Text>{isUnlocked ? '✓ ' : '○ '}</Text>
+          <Text bold color="claude">
+            {lesson.title}
+          </Text>
+        </Box>
+        {lesson.body}
+        <Box flexDirection="column">
+          <Text dimColor>Mark as done?</Text>
+          <Select<string>
+            options={options}
+            hideIndexes
+            onChange={(v: string) => {
+              if (v === 'yes') onMarkDone()
+              else onBack()
+            }}
+            onCancel={onBack}
+          />
+          <Box marginTop={1}>
+            <Text dimColor italic>
+              <Byline>
+                <KeyboardShortcutHint shortcut="Enter" action="mark done" />
+                <KeyboardShortcutHint shortcut="Esc" action="back" />
+              </Byline>
+            </Text>
+          </Box>
+        </Box>
       </Box>
-      {lesson.body}
-      <Box marginTop={1} flexDirection="column">
-        <Text dimColor>Mark as done?</Text>
-        <Select<string>
-          options={options}
-          hideIndexes
-          onChange={(v: string) => {
-            if (v === 'yes') onMarkDone()
-            else onBack()
-          }}
-          onCancel={onBack}
-        />
-      </Box>
-    </Box>
+    </TopRulePanel>
   )
 }
 
@@ -215,21 +236,21 @@ function CelebrationScreen({
 }): React.ReactNode {
   const options = [{ label: 'Close', value: 'close' }]
   return (
-    <Box flexDirection="column" gap={1}>
-      <Text bold color="claude">
-        ✨ All powered up — now go build ✨
-      </Text>
-      <Text dimColor>
-        You've unlocked every power-up. Run /powerup again any time to
-        re-open a lesson; the banner is gone for good.
-      </Text>
-      <Select<string>
-        options={options}
-        hideIndexes
-        onChange={onExit}
-        onCancel={onExit}
-      />
-    </Box>
+    <TopRulePanel>
+      <Box flexDirection="column" gap={1}>
+        <CelebrationShimmer text="✨ All powered up — now go build ✨" />
+        <Text dimColor>
+          You've unlocked every power-up. Run /powerup again any time to
+          re-open a lesson; the banner is gone for good.
+        </Text>
+        <Select<string>
+          options={options}
+          hideIndexes
+          onChange={onExit}
+          onCancel={onExit}
+        />
+      </Box>
+    </TopRulePanel>
   )
 }
 
