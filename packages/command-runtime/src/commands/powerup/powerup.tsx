@@ -8,7 +8,6 @@ import {
 } from '@claude-code/local-observability'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import { CelebrationShimmer } from './CelebrationShimmer.js'
-import { TopRulePanel } from './TopRulePanel.js'
 import { ALL_LESSONS } from './lessons/index.js'
 import type { Lesson } from './lessons/types.js'
 import {
@@ -27,13 +26,21 @@ import {
  * Mirrors ant 4304.js _qK + eK3 + a8K. State is local except for the
  * persisted unlocked-set, which goes through state.ts to globalConfig.
  *
- * Visual structure (matches ant 2.1.131):
- *   <TopRulePanel>           (G1 — claude-coloured top rule + paddingX 2)
+ * Visual structure:
+ *   <Box paddingX={2} flexDirection="column">
  *     header (title + counter + progress)
  *     description / lesson body
  *     <Select>               (the picker / detail confirm)
  *     keyboard hints byline  (↑↓ select · Enter open · Esc close)
- *   </TopRulePanel>
+ *   </Box>
+ *
+ * Ant 2.1.131's `G1` (2453.js) wraps the whole panel with a top
+ * horizontal rule. We deliberately drop that wrapper: ccb's REPL
+ * already inserts a session divider above slash-command output, and
+ * our own rule rendered as a `─`.repeat(columns) string overflows the
+ * terminal width on wrap, producing a "one long line, one short
+ * line" double-rule visual bug. A plain paddingX={2} keeps the same
+ * indent ant gets from G1 without the rule.
  */
 
 type Mode =
@@ -143,7 +150,7 @@ function PowerupList({
   const options = buildLessonOptions(unlocked)
 
   return (
-    <TopRulePanel>
+    <Box flexDirection="column" paddingX={2} paddingTop={1}>
       <Box marginBottom={1}>
         <Text bold color="claude">
           Power-ups
@@ -175,7 +182,7 @@ function PowerupList({
           </Byline>
         </Text>
       </Box>
-    </TopRulePanel>
+    </Box>
   )
 }
 
@@ -195,37 +202,35 @@ function LessonDetail({
     { label: 'No — back to list', value: 'no' },
   ]
   return (
-    <TopRulePanel>
-      <Box flexDirection="column" gap={1}>
-        <Box>
-          <Text>{isUnlocked ? '✓ ' : '○ '}</Text>
-          <Text bold color="claude">
-            {lesson.title}
+    <Box flexDirection="column" paddingX={2} paddingTop={1} gap={1}>
+      <Box>
+        <Text>{isUnlocked ? '✓ ' : '○ '}</Text>
+        <Text bold color="claude">
+          {lesson.title}
+        </Text>
+      </Box>
+      {lesson.body}
+      <Box flexDirection="column">
+        <Text dimColor>Mark as done?</Text>
+        <Select<string>
+          options={options}
+          hideIndexes
+          onChange={(v: string) => {
+            if (v === 'yes') onMarkDone()
+            else onBack()
+          }}
+          onCancel={onBack}
+        />
+        <Box marginTop={1}>
+          <Text dimColor italic>
+            <Byline>
+              <KeyboardShortcutHint shortcut="Enter" action="mark done" />
+              <KeyboardShortcutHint shortcut="Esc" action="back" />
+            </Byline>
           </Text>
         </Box>
-        {lesson.body}
-        <Box flexDirection="column">
-          <Text dimColor>Mark as done?</Text>
-          <Select<string>
-            options={options}
-            hideIndexes
-            onChange={(v: string) => {
-              if (v === 'yes') onMarkDone()
-              else onBack()
-            }}
-            onCancel={onBack}
-          />
-          <Box marginTop={1}>
-            <Text dimColor italic>
-              <Byline>
-                <KeyboardShortcutHint shortcut="Enter" action="mark done" />
-                <KeyboardShortcutHint shortcut="Esc" action="back" />
-              </Byline>
-            </Text>
-          </Box>
-        </Box>
       </Box>
-    </TopRulePanel>
+    </Box>
   )
 }
 
@@ -236,21 +241,19 @@ function CelebrationScreen({
 }): React.ReactNode {
   const options = [{ label: 'Close', value: 'close' }]
   return (
-    <TopRulePanel>
-      <Box flexDirection="column" gap={1}>
-        <CelebrationShimmer text="✨ All powered up — now go build ✨" />
-        <Text dimColor>
-          You've unlocked every power-up. Run /powerup again any time to
-          re-open a lesson; the banner is gone for good.
-        </Text>
-        <Select<string>
-          options={options}
-          hideIndexes
-          onChange={onExit}
-          onCancel={onExit}
-        />
-      </Box>
-    </TopRulePanel>
+    <Box flexDirection="column" paddingX={2} paddingTop={1} gap={1}>
+      <CelebrationShimmer text="✨ All powered up — now go build ✨" />
+      <Text dimColor>
+        You've unlocked every power-up. Run /powerup again any time to
+        re-open a lesson; the banner is gone for good.
+      </Text>
+      <Select<string>
+        options={options}
+        hideIndexes
+        onChange={onExit}
+        onCancel={onExit}
+      />
+    </Box>
   )
 }
 
