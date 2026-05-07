@@ -340,7 +340,13 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
  * Returns the new short id; on spawn failure exits with the OS-level
  * reason included.
  */
-async function spawnBgJob(opts: {
+/**
+ * Spawn a backgrounded `ccb -p "<directive>"`. Used by `--bg` argv
+ * handler and by the `/background` slash command (in-REPL conversion).
+ *
+ * @dynamicRequire
+ */
+export async function spawnBgJob(opts: {
   flags: readonly string[]
   directive: string
   cwd: string

@@ -116,6 +116,8 @@ const forkCmd = feature('FORK_SUBAGENT')
     ).default
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
+import stop from '@claude-code/command-runtime/commands/stop/index.js'
+import background from '@claude-code/command-runtime/commands/background/index.js'
 import thinkback from '@claude-code/config/plugin/commands/thinkback/index.js'
 import thinkbackPlay from '@claude-code/config/plugin/commands/thinkback-play/index.js'
 import permissions from '@claude-code/permission/commands/index.js'
@@ -313,6 +315,8 @@ const COMMANDS = memoize((): Command[] => [
   usage,
   usageReport,
   vim,
+  stop,
+  background,
   ...(webCmd ? [webCmd] : []),
   ...(forkCmd ? [forkCmd] : []),
   ...(proactive ? [proactive] : []),
