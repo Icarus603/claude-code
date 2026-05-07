@@ -11,15 +11,14 @@
  * @dynamicRequire
  */
 
-import { existsSync as existsSyncFn } from 'node:fs'
 import { logEvent as logEventFn } from '@claude-code/local-observability'
+import { adoptFromRoster, adoptRunningPtyRecords } from './bgAdopt.js'
 import {
   type WorkerRecord,
-  isPidAlive as isPidAliveSync,
   readAllWorkerRecords,
   writeWorkerRecord,
 } from './bgWorkerRegistry.js'
-import { recordToRosterEntry, readRoster, updateRoster } from './roster.js'
+import { recordToRosterEntry, updateRoster } from './roster.js'
 import { type DaemonServer, err, ok, startSocketServer } from './socketServer.js'
 import { WorkerVm } from './workerVm.js'
 
@@ -105,128 +104,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     }
   }
 
-  /**
-   * Boot adopt from roster.json. ant 5166.js / 4139.js — supervisor
-   * loads the previous roster, replays each entry as an adoption attempt
-   * (verifying pid + procStart), and orphans entries whose underlying
-   * process is gone. Roster mode adoptions take precedence over the
-   * jobs/ scan because the roster carries cross-cwd entries the
-   * cwd-scoped jobs/ tree wouldn't see.
-   *
-   * On parseFailed roster, we skip — the file has been quarantined and
-   * we'll fall through to jobs/ scan + write a fresh empty roster.
-   */
-  function adoptFromRoster(): void {
-    const roster = readRoster()
-    if (roster.parseFailed) return
-    let adopted = 0
-    let dead = 0
-    for (const [short, entry] of Object.entries(roster.workers)) {
-      if (state.workers.has(short)) continue
-      if (!isPidAliveSync(entry.pid)) {
-        dead++
-        continue
-      }
-      const ptySocket = entry.ptySock ?? entry.rendezvousSock ?? ''
-      const sockExists = ptySocket ? existsSyncFn(ptySocket) : false
-      if (!sockExists) {
-        // Worker pid alive but socket gone — unreachable for attach.
-        // ant skips; we mirror.
-        logEventFn('tengu_bg_adopt_sock_unlinked', { short, sock: ptySocket })
-        dead++
-        continue
-      }
-      const record: WorkerRecord = {
-        short,
-        pid: entry.pid,
-        cmd: [],
-        cwd: entry.cwd,
-        startedAt: entry.startedAt,
-        status: 'running',
-        mode: 'pty',
-        ptySocket,
-        procStart: entry.procStart,
-        attempt: entry.attempt,
-        cliVersion: entry.cliVersion,
-      }
-      const vm = new WorkerVm(
-        {
-          short,
-          cwd: entry.cwd,
-          env: process.env,
-          ptySocket,
-          cmd: [],
-          cliVersion: process.env.CLAUDE_CODE_VERSION ?? 'dev',
-        },
-        record,
-      )
-      vm.adopt(record)
-      state.workers.set(short, vm)
-      adopted++
-    }
-    if (adopted + dead > 0) {
-      logEventFn('tengu_bg_adopt', {
-        adopted: String(adopted),
-        dead: String(dead),
-        source: 'roster',
-      })
-    }
-  }
-  function adoptRunningPtyRecords(): void {
-    for (const record of readAllWorkerRecords()) {
-      if (record.status !== 'running') continue
-      if (record.mode !== 'pty') continue
-      if (state.workers.has(record.short)) continue
-      // ant orphan_reap: pid is gone but meta still says 'running' →
-      // mark exited so list/stop don't show ghosts.
-      if (!isPidAliveSync(record.pid)) {
-        logEventFn('tengu_bg_orphan_reap', { short: record.short, pid: String(record.pid) })
-        try {
-          writeWorkerRecord({ ...record, status: 'exited', exitedAt: Date.now() })
-        } catch {
-          // best-effort
-        }
-        continue
-      }
-      // ant 4639.js — sock_unlinked detection: ptySocket file gone means
-      // the worker is unreachable for attach even if pid is alive.
-      const ptySocket = record.ptySocket ?? ''
-      const sockExists = ptySocket ? existsSyncFn(ptySocket) : false
-      if (ptySocket && !sockExists) {
-        logEventFn('tengu_bg_adopt_sock_unlinked', { short: record.short, sock: ptySocket })
-      }
-      // ant adopt_upgrade_respawn: cliVersion mismatch means user
-      // upgraded ccb between worker spawn and daemon adopt — schedule
-      // a respawn under the new binary so adopters see consistent api.
-      const currentCli = process.env.CLAUDE_CODE_VERSION ?? 'dev'
-      if (record.cliVersion && record.cliVersion !== currentCli) {
-        logEventFn('tengu_bg_adopt_upgrade_respawn', { short: record.short, was: record.cliVersion, now: currentCli })
-      }
-      // procStart unreadable → log adopt_unverified but proceed.
-      if (record.procStart === undefined || record.procStart === 0) {
-        logEventFn('tengu_bg_adopt_unverified', { short: record.short, pid: String(record.pid) })
-      }
-      const vm = new WorkerVm(
-        {
-          short: record.short,
-          cwd: record.cwd,
-          env: process.env,
-          ptySocket,
-          cmd: record.cmd,
-          cliVersion: currentCli,
-        },
-        record,
-      )
-      vm.adopt(record)
-      state.workers.set(record.short, vm)
-      logEventFn('tengu_bg_adopt', {
-        short: record.short,
-        pid: String(record.pid),
-        sock_exists: String(sockExists),
-        verified: String(record.procStart !== undefined && record.procStart !== 0),
-      })
-    }
-  }
+  /* adoptFromRoster + adoptRunningPtyRecords live in ./bgAdopt.ts */
   logEventFn('tengu_bg_daemon_boot', {
     pid: String(process.pid),
     origin: parsed.origin ?? 'transient',
@@ -284,15 +162,15 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   // Two source-of-truth: (1) jobs/<short>/meta.json (always authoritative
   // for status), (2) ~/.claude/daemon/roster.json (cross-cwd index of live
   // supervisors — survives daemon restart). Adopt from both then unify.
-  adoptFromRoster()
-  adoptRunningPtyRecords()
+  adoptFromRoster(state.workers)
+  adoptRunningPtyRecords(state.workers)
   // After boot adopt, snapshot the current workers map back to roster.json
   // so a parallel observer (ccb doctor) sees the new supervisor's view.
   void updateRoster(r => {
     r.workers = {}
     for (const [s, vm] of state.workers) r.workers[s] = recordToRosterEntry(vm.getRecord())
   }).catch(() => {})
-  const adoptTimer = setInterval(adoptRunningPtyRecords, 5000)
+  const adoptTimer = setInterval(() => adoptRunningPtyRecords(state.workers), 5000)
   adoptTimer.unref()
   // Periodic roster refresh (catches state changes that don't go through
   // our spawn/settle handlers — e.g. record mutated by external tooling).
