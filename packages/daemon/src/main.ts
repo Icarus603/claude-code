@@ -75,10 +75,18 @@ export async function daemonMain(args: string[]): Promise<void> {
       break
     }
     case 'status':
-      console.log('daemon status: not yet implemented (requires IPC)')
+      // Delegate to the bg-daemon RPC ping. Top-level `status` is a
+      // shorthand for `daemon bg status`; the supervisor in this file
+      // (runSupervisor) is a separate process model with no RPC of its
+      // own, so showing the bg daemon's status is the most useful
+      // signal here. Pass --json through.
+      await bgDaemonStatus(args.includes('--json'))
       break
     case 'stop':
-      console.log('daemon stop: not yet implemented (requires PID file)')
+      // Same delegation rationale as `status`. The bg daemon owns the
+      // shutdown op; the legacy supervisor in this file responds to
+      // SIGTERM directly and is not addressable via shutdown RPC.
+      await bgDaemonStop()
       break
     case '--help':
     case '-h':
