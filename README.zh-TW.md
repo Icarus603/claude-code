@@ -2,10 +2,11 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat-square&color=blue&label=release)](https://github.com/Icarus603/claude-code/releases)
-[![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&logo=github&color=yellow)](https://github.com/Icarus603/claude-code/stargazers)
-[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=green)](https://github.com/Icarus603/claude-code/commits/main)
-[![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=for-the-badge&color=0f0f0f&label=ccb)](https://github.com/Icarus603/claude-code/releases)
+[![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=for-the-badge&logo=bun&logoColor=000)](https://bun.sh)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://github.com/Icarus603/claude-code)
+[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=for-the-badge&color=222&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
+[![Platforms](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-333333?style=for-the-badge)](https://github.com/Icarus603/claude-code/releases/latest)
 
 終端編程智慧體。單一 binary `ccb`。同一個 agent loop 對接 Anthropic、OpenAI 相容端點（Ollama、DeepSeek、vLLM……）、Gemini、Grok。支援 macOS、Linux、Windows。
 
