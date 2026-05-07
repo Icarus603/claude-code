@@ -3,6 +3,7 @@ import { lesson as atMentions } from './at-mentions.js'
 import { lesson as modes } from './modes.js'
 import { lesson as undo } from './undo.js'
 import { lesson as background } from './background.js'
+import { lesson as memory } from './memory.js'
 
 /**
  * All lessons in display order. Each lesson lives in its own file under
@@ -13,11 +14,12 @@ import { lesson as background } from './background.js'
  *
  * The final 10-lesson set is documented in
  * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3. Currently
- * 4 of 10 are implemented (steps 1–4 of the §11 plan).
+ * 5 of 10 are implemented (steps 1–5 of the §11 plan).
  */
 export const ALL_LESSONS: Lesson[] = [
   atMentions,
   modes,
   undo,
   background,
+  memory,
 ]
