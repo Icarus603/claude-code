@@ -73,6 +73,20 @@ export async function adoptFromRoster(
       attempt: entry.attempt,
       cliVersion: entry.cliVersion,
     }
+    // ant 2459.js Kv9 — orphan adoption: when the roster carries an
+    // entry but the local jobs/<short>/ tree has no meta.json (cross-
+    // cwd entry the previous supervisor wrote, fresh supervisor in a
+    // different cwd-tree), persist meta.json now so `ccb ps`,
+    // `ccb logs`, and the tasks panel can find it.
+    const existing = readWorkerRecord(short)
+    if (!existing) {
+      try {
+        writeWorkerRecord(record)
+        logEvent('tengu_bg_roster_orphan_adopted', { short })
+      } catch {
+        // best-effort
+      }
+    }
     const vm = new WorkerVm(
       {
         short,
