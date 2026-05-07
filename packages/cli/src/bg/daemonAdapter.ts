@@ -179,3 +179,34 @@ export async function daemonSpawn(payload: {
     { timeoutMs: 10_000 },
   )
 }
+
+/**
+ * Send a dispatch op (ant 4648.js MC8 socket path). Spawns the worker
+ * AND records a nonce; caller follows up with daemonAwaitAck.
+ */
+export async function daemonDispatch(payload: {
+  short: string
+  nonce: string
+  cwd: string
+  env: Record<string, string | undefined>
+  ptySocket: string
+  cmd: readonly string[]
+  cliVersion: string
+  source?: 'shell' | 'slash' | 'fleet' | 'spare' | 'respawn'
+  agent?: string
+  worktree?: string
+}): Promise<DaemonResponse> {
+  return daemonRequest('dispatch', { d: payload }, { timeoutMs: 10_000 })
+}
+
+/**
+ * Block waiting for a dispatched worker to ack its nonce. Returns ok
+ * with `pid` + `messagingSock`, or ESTARTING if the ack budget hasn't
+ * elapsed yet (caller should retry).
+ */
+export async function daemonAwaitAck(opts: {
+  short: string
+  nonce: string
+}): Promise<DaemonResponse> {
+  return daemonRequest('await-ack', opts, { timeoutMs: 10_000 })
+}

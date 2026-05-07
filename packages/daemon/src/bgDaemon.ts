@@ -19,9 +19,19 @@ import {
 import { type DaemonServer, err, ok, startSocketServer } from './socketServer.js'
 import { WorkerVm } from './workerVm.js'
 
+interface PendingDispatch {
+  nonce: string
+  pid?: number
+  acked: boolean
+  failed?: { code: string; error: string }
+  startedAt: number
+}
+
 interface DaemonState {
   server: DaemonServer | undefined
   workers: Map<string, WorkerVm>
+  /** dispatch nonces awaiting ack (short → pending). */
+  pending: Map<string, PendingDispatch>
   abort: AbortController
   startedAt: number
 }
@@ -36,6 +46,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   const state: DaemonState = {
     server: undefined,
     workers: new Map(),
+    pending: new Map(),
     abort: new AbortController(),
     startedAt: Date.now(),
   }
@@ -124,6 +135,54 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       })
       vm.spawn()
       return ok({ op: 'spawn', short, pid: vm.getRecord().pid })
+    },
+    /**
+     * dispatch — ant 4138.js / 4648.js MC8. Spawn a worker for `short`
+     * with a nonce; client follows up with `await-ack` to block for
+     * confirmation that the worker accepted the directive.
+     */
+    dispatch: async msg => {
+      const d = (msg.d ?? msg) as Record<string, unknown>
+      const short = d.short as string | undefined
+      const nonce = d.nonce as string | undefined
+      if (!short) return err('EBADREQ', 'dispatch: missing short')
+      if (!nonce) return err('EBADREQ', 'dispatch: missing nonce')
+      if (state.workers.has(short)) return err('EALIVE', `worker ${short} already running`, { short })
+      const vm = new WorkerVm({
+        short,
+        cwd: (d.cwd as string) ?? process.cwd(),
+        env: (d.env as NodeJS.ProcessEnv) ?? process.env,
+        ptySocket: (d.ptySocket as string) ?? '',
+        cmd: (d.cmd as string[]) ?? [],
+        cliVersion: (d.cliVersion as string) ?? process.env.CLAUDE_CODE_VERSION ?? 'dev',
+        dispatch: d as Record<string, unknown>,
+      })
+      state.workers.set(short, vm)
+      const pending: PendingDispatch = { nonce, acked: false, startedAt: Date.now() }
+      state.pending.set(short, pending)
+      vm.on('settled', () => {
+        setTimeout(() => { state.workers.delete(short); state.pending.delete(short) }, 100).unref()
+      })
+      vm.spawn()
+      setTimeout(() => {
+        if (pending.acked) return
+        if (state.workers.get(short) === vm) { pending.pid = vm.getRecord().pid; pending.acked = true }
+      }, 5000).unref()
+      return ok({ op: 'dispatch', short, nonce, pid: vm.getRecord().pid, via: 'socket' })
+    },
+    'await-ack': async msg => {
+      const short = msg.short as string | undefined
+      const nonce = msg.nonce as string | undefined
+      if (!short) return err('EBADREQ', 'await-ack: missing short')
+      if (!nonce) return err('EBADREQ', 'await-ack: missing nonce')
+      const pending = state.pending.get(short)
+      if (!pending) return err('ENOCONN', `no pending dispatch for ${short}`)
+      if (pending.nonce !== nonce) return err('ESTALE', `nonce mismatch for ${short}`)
+      if (pending.failed) return err(pending.failed.code, pending.failed.error)
+      if (!pending.acked) return err('ESTARTING', `worker ${short} not yet acked`)
+      const vm = state.workers.get(short)
+      const messagingSock = vm?.getRecord().ptySocket ?? ''
+      return ok({ op: 'await-ack', short, nonce, pid: pending.pid, messagingSock, via: 'socket' })
     },
     kill: async msg => {
       const short = msg.short as string | undefined
