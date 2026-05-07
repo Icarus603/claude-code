@@ -193,6 +193,22 @@ export type FileHistorySnapshotMessage = {
 }
 
 /**
+ * Fork-context-ref — written when a fork-subagent inherits messages from
+ * its parent. Records the parent's session id + last UUID + how many of the
+ * parent's messages the fork inherited so resume can re-anchor a fork
+ * transcript to its parent without duplicating the prefix.
+ *
+ * Mirrors ant 4661.js E08 / 3930.js:300 fork-context-ref entry.
+ */
+export type ForkContextRefEntry = {
+  type: 'fork-context-ref'
+  agentId: AgentId
+  parentSessionId: UUID
+  parentLastUuid: UUID
+  contextLength: number
+}
+
+/**
  * Per-file attribution state tracking Claude's character contributions.
  */
 export type FileAttributionState = {
@@ -315,6 +331,7 @@ export type Entry =
   | ContentReplacementEntry
   | ContextCollapseCommitEntry
   | ContextCollapseSnapshotEntry
+  | ForkContextRefEntry
 
 export function sortLogs(logs: LogOption[]): LogOption[] {
   return logs.sort((a, b) => {

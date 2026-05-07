@@ -3,7 +3,7 @@ import type { UUID } from 'crypto'
 import { randomUUID } from 'crypto'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { emitReplHydrationTelemetry, emitSpawnedBySkillTelemetry } from './runAgentTelemetry.js'
+import { emitReplHydrationTelemetry, emitSpawnedBySkillTelemetry, maybeRecordForkContextRef } from './runAgentTelemetry.js'
 import { getProjectRoot, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import { getCommand, getSkillToolCommands, hasCommand } from '@claude-code/command-runtime/runtime'
 import {
@@ -727,6 +727,8 @@ export async function* runAgent({
     ...(description && { description }),
     ...(name && { name }),
   }).catch(_err => logForDebugging(`Failed to write agent metadata: ${_err}`))
+
+  await maybeRecordForkContextRef({ forkContextMessages, contextMessages, toolUseContext, agentId })
 
   // Track the last recorded message UUID for parent chain continuity
   let lastRecordedUuid: UUID | null = initialMessages.at(-1)?.uuid ?? null

@@ -924,9 +924,8 @@ class Project {
       void this.enqueueWrite(sessionFile, entry)
     } else {
       const messageSet = await getSessionMessages(sessionId)
-      if (entry.type === 'queue-operation') {
-        // Queue operations are always appended to the session file
-        void this.enqueueWrite(sessionFile, entry)
+      if (entry.type === 'queue-operation' || entry.type === 'fork-context-ref') {
+        void this.enqueueWrite(sessionFile, entry) // sidecar; no dedup
       } else {
         // At this point, entry must be a TranscriptMessage (user/assistant/attachment/system)
         // All other entry types have been handled above
@@ -1170,6 +1169,7 @@ export async function recordSidechainTranscript(
   )
 }
 
+export const recordForkContextRef = async (opts: { agentId: AgentId; parentSessionId: UUID; parentLastUuid: UUID; contextLength: number }): Promise<void> => { await getProject().appendEntry({ type: 'fork-context-ref', ...opts }) }
 export async function recordQueueOperation(queueOp: QueueOperationMessage) {
   await getProject().insertQueueOperation(queueOp)
 }
