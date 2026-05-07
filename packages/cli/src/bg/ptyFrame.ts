@@ -22,8 +22,8 @@ export const CTRL_TAG = 1
 export const FRAME_HEADER_BYTES = 5
 /** ant 4641.js hX_ — ring buffer cap for reattach replay. */
 export const RING_BUFFER_BYTES = 256 * 1024
-/** ant 4641.js qiH — max frame body size. Used internally only. */
-const FRAME_SIZE_CAP = 1024 * 1024
+/** ant 4641.js qiH — max frame body size. */
+export const FRAME_SIZE_CAP = 1024 * 1024
 
 /**
  * Control-frame payload shape. ant 4702.js dispatches on `.t`:

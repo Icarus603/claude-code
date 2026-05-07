@@ -40,6 +40,11 @@ import {
   hasSkipDangerousModePermissionPrompt,
 } from '@claude-code/config/settings'
 import { splitBgArgs } from './bg/argParse.js'
+import {
+  formatRelativeTime,
+  isProcessRunning,
+  truncate,
+} from './bg/jobUtil.js'
 import { extractRespawnArgs } from './bg/respawnArgs.js'
 import { tailFile } from './bg/tailFile.js'
 
@@ -64,6 +69,15 @@ interface JobMeta {
   /** Set the first time ps reconciles `running → exited`. */
   exitedAt?: number
   exitCode?: number
+  /**
+   * Spawn mode. 'detached' = traditional `-p` headless run (default).
+   * 'pty' = `--bg-pty-host` interactive REPL inside a PTY socket.
+   * Undefined defaults to 'detached' for backward compat with meta.json
+   * files written before Phase C landed.
+   */
+  mode?: 'detached' | 'pty'
+  /** Path to the PTY host's Unix socket. Set iff mode==='pty'. */
+  ptySocket?: string
 }
 
 const JOB_SHORT_LENGTH = 8
@@ -105,21 +119,6 @@ function writeJobMeta(meta: JobMeta): void {
   const dir = getJobDir(meta.short)
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
-}
-
-/**
- * `ps` aux–style probe: send signal 0 (no-op kill) and check whether
- * the kernel reports the process is running. ESRCH = dead, EPERM =
- * exists but we can't signal it (counts as running).
- */
-function isProcessRunning(pid: number): boolean {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch (e) {
-    const err = e as NodeJS.ErrnoException
-    return err.code === 'EPERM'
-  }
 }
 
 function reconcileMeta(meta: JobMeta): JobMeta {
@@ -198,22 +197,6 @@ function resolveJobOrExit(short: string): JobMeta {
     `Ambiguous prefix "${short}", matches: ${result.matches.map(j => j.short).join(', ')}\n`,
   )
   process.exit(1)
-}
-
-function formatRelativeTime(ms: number): string {
-  const delta = Math.max(0, Date.now() - ms)
-  const seconds = Math.floor(delta / 1000)
-  if (seconds < 60) return `${seconds}s ago`
-  const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 48) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
-
-function truncate(s: string, n: number): string {
-  return s.length > n ? s.slice(0, n - 1) + '…' : s
 }
 
 // ─── handlers ───────────────────────────────────────────────────────
@@ -327,6 +310,21 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
 
+  // --bg-pty: Phase C PTY-host spawn instead of detached -p.
+  if (args.includes('--bg-pty') || args.includes('--bg-interactive')) {
+    const { spawnPtyHost } = await import('./bg/spawnPty.js')
+    const short = generateShortId()
+    const r = spawnPtyHost({
+      short,
+      jobDir: getJobDir(short),
+      flags: forwardedFlags,
+      directive,
+      cwd: process.cwd(),
+    })
+    writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+    return
+  }
+
   await spawnBgJob({ flags: forwardedFlags, directive, cwd: process.cwd() })
 }
 
@@ -438,7 +436,6 @@ async function spawnBgJob(opts: {
   )
   return short
 }
-
 
 /** @dynamicRequire */
 export async function psHandler(args: readonly string[]): Promise<void> {
@@ -688,19 +685,11 @@ export async function rmHandler(args: readonly string[]): Promise<void> {
   process.stdout.write(`Removed ${job.short}.\n`)
 }
 
-/**
- * `attach` is read-only without a daemon PTY — child stdin was wired
- * to /dev/null at spawn, so keystrokes can't be delivered back. We
- * forward to `logs --follow` (same exit semantics) and tell the user
- * why. Phase C will grow real bidirectional reconnect; the call
- * surface stays the same for forward compat.
- *
- * @dynamicRequire
- */
+/** @dynamicRequire */
 export async function attachHandler(args: readonly string[]): Promise<void> {
   if (args.includes('--help') || args.includes('-h')) {
     process.stdout.write(
-      `Usage: ccb attach <short>\n\n  Stream a background session's output live (read-only — no PTY supervisor\n  in this build, so keystrokes can't be delivered to the child). Equivalent\n  to \`ccb logs <short> --follow --tail 200\`.\n`,
+      `Usage: ccb attach <short>\n  pty-mode: bidirectional (Ctrl+Q detach). detached-mode: logs --follow.\n`,
     )
     return
   }
@@ -710,9 +699,13 @@ export async function attachHandler(args: readonly string[]): Promise<void> {
     process.exit(1)
   }
   const job = resolveJobOrExit(positional[0]!)
+  if (job.mode === 'pty' && job.ptySocket) {
+    const { runAttach } = await import('./bg/attachClient.js')
+    await runAttach(job.ptySocket, job.short)
+    return
+  }
   process.stderr.write(
-    `attach: this build streams output read-only (no PTY supervisor yet).\n` +
-      `        showing live tail; the session keeps running if you Ctrl+C here.\n`,
+    `attach: detached-mode job — streaming read-only. Use --bg-pty for bidirectional.\n`,
   )
   await logsHandler([job.short, '--follow', '--tail', '200'])
 }

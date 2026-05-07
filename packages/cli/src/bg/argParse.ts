@@ -61,7 +61,13 @@ export function splitBgArgs(args: readonly string[]): {
   const positionals: string[] = []
   for (let i = 0; i < beforeDashDash.length; i++) {
     const a = beforeDashDash[i]!
-    if (a === '--bg' || a === '--background' || a === '-bg') {
+    if (
+      a === '--bg' ||
+      a === '--background' ||
+      a === '-bg' ||
+      a === '--bg-pty' ||
+      a === '--bg-interactive'
+    ) {
       continue
     }
     if (a.startsWith('-')) {

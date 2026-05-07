@@ -233,6 +233,8 @@ async function main(): Promise<void> {
       args[0] === 'rm' ||
       args[0] === 'respawn' ||
       args.includes('--bg') ||
+      args.includes('--bg-pty') ||
+      args.includes('--bg-interactive') ||
       args.includes('--background'))
   ) {
     profileCheckpoint('cli_bg_path')
