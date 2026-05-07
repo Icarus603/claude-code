@@ -416,6 +416,16 @@ export async function daemonRespawnStalled(short: string): Promise<DaemonRespons
 }
 
 /**
+ * Detach a worker from the daemon's active supervision (kill('stop')
+ * semantics) without killing the inner process. Worker stays running;
+ * `ccb attach <short>` can still find it; subsequent stop/kill ops
+ * succeed because the daemon keeps the vm in its `detached` map.
+ */
+export async function daemonDetach(short: string): Promise<DaemonResponse> {
+  return daemonRequest('detach', { short }, { timeoutMs: 5000 })
+}
+
+/**
  * Submit a dispatch envelope through the file-spool fallback path.
  * ant 5165.js — when socket dispatch fails (ENOCONN/ETIMEOUT), CLI
  * writes the envelope to ~/.claude/daemon/dispatch/ where the daemon's

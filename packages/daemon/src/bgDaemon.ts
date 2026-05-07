@@ -33,6 +33,12 @@ interface PendingDispatch {
 interface DaemonState {
   server: DaemonServer | undefined
   workers: Map<string, WorkerVm>
+  /**
+   * Detached workers: kill('stop') moves vm here from `workers` so attach
+   * lookup can still find it. ant: detached workers stay reachable until
+   * their inner ccb exits naturally. Daemon shutdown drops all.
+   */
+  detached: Map<string, WorkerVm>
   /** dispatch nonces awaiting ack (short → pending). */
   pending: Map<string, PendingDispatch>
   abort: AbortController
@@ -68,6 +74,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
   const state: DaemonState = {
     server: undefined,
     workers: new Map(),
+    detached: new Map(),
     pending: new Map(),
     abort: new AbortController(),
     startedAt: Date.now(),
@@ -230,8 +237,9 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         classifierTempo?: string
         classifierDetail?: string
         classifierNeeds?: string
+        detached?: boolean
       }
-      const jobs: JobEntry[] = [...state.workers.values()].map(vm => {
+      const buildEntry = (vm: WorkerVm, isDetached: boolean): JobEntry => {
         const r = vm.getRecord()
         const cs = readState(r.short)
         const j: JobEntry = {
@@ -242,8 +250,8 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
           mode: r.mode,
           startedAt: r.startedAt,
           attachers: vm.attacherCount(),
+          ...(isDetached && { detached: true }),
         }
-        // ant 3921.js: classifier state surfaced on list.
         if (cs) {
           j.classifierState = cs.state
           j.classifierTempo = cs.tempo
@@ -251,7 +259,11 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
           if (cs.needs) j.classifierNeeds = cs.needs
         }
         return j
-      })
+      }
+      const jobs: JobEntry[] = [
+        ...[...state.workers.values()].map(vm => buildEntry(vm, false)),
+        ...[...state.detached.values()].map(vm => buildEntry(vm, true)),
+      ]
       // Also surface non-running records (recently exited).
       for (const record of readAllWorkerRecords()) {
         if (state.workers.has(record.short)) continue
@@ -411,7 +423,9 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       const text = msg.text as string | undefined
       if (!short) return err('EBADREQ', 'reply: missing short')
       if (text === undefined) return err('EBADREQ', 'reply: missing text')
-      const vm = state.workers.get(short)
+      // Reply can target detached workers too (they're still running
+      // their inner ccb, daemon just stopped supervising).
+      const vm = state.workers.get(short) ?? state.detached.get(short)
       if (!vm) return err('ENOJOB', `no worker for short ${short}`)
       const ptySocket = vm.getRecord().ptySocket
       if (!ptySocket) return err('ENOSOCK', `worker ${short} has no ptySocket`)
@@ -555,6 +569,25 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       vm.kill('grace')
       return ok({ op: 'retire', short, retired: true })
     },
+    /**
+     * detach — ant: vm.kill('stop') doesn't kill the worker, just makes
+     * daemon forget about it. Move from active workers map → detached map
+     * so subsequent attach lookup can still find it. Worker keeps running
+     * until its inner ccb exits naturally or daemon restarts.
+     */
+    detach: async msg => {
+      const short = msg.short as string | undefined
+      if (!short) return err('EBADREQ', 'detach: missing short')
+      const vm = state.workers.get(short)
+      if (!vm) return err('ENOJOB', `no worker for short ${short}`)
+      vm.kill('stop')
+      state.workers.delete(short)
+      state.detached.set(short, vm)
+      vm.on('settled', () => {
+        setTimeout(() => state.detached.delete(short), 100).unref()
+      })
+      return ok({ op: 'detach', short, detached: true })
+    },
     shutdown: async () => {
       logEventFn('tengu_bg_daemon_shutdown', {
         uptime_ms: String(Date.now() - state.startedAt),
@@ -576,7 +609,8 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     subscribe: async (msg, socket) => {
       const short = msg.short as string | undefined
       if (!short) return err('EBADREQ', 'subscribe: missing short')
-      const vm = state.workers.get(short)
+      // Allow re-attach to detached workers (the entire point of detach).
+      const vm = state.workers.get(short) ?? state.detached.get(short)
       if (!vm) return err('ENOJOB', `no worker for short ${short}`)
       // Send snapshot, then live updates.
       socket.write(

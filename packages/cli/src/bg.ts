@@ -611,41 +611,36 @@ async function stopJob(
 /** @dynamicRequire */
 export async function stopHandler(args: readonly string[]): Promise<void> {
   if (args.includes('--help') || args.includes('-h')) {
-    process.stdout.write(
-      `Usage: ccb stop <short> [--force]\n\n  Stop a running background session. By default sends SIGTERM (graceful);\n  --force / -9 escalates to SIGKILL.\n`,
-    )
-    return
+    process.stdout.write(`Usage: ccb stop <short> [--force | --detach]\n\n  Stop a running background session. SIGTERM by default; --force / -9 → SIGKILL;\n  --detach: leave worker running, daemon stops supervising (re-attach with ccb attach).\n`); return
   }
   const positional = args.filter(a => !a.startsWith('-'))
   const short = positional[0]
   const force = args.includes('--force') || args.includes('-9')
-  if (!short) {
-    process.stderr.write('Usage: ccb stop <short> [--force]\n')
-    process.exit(1)
-  }
+  const detach = args.includes('--detach')
+  if (!short) { process.stderr.write('Usage: ccb stop <short> [--force | --detach]\n'); process.exit(1) }
   const job = resolveJobOrExit(short)
+  if (detach) {
+    const { isDaemonAlive, daemonDetach } = await import('./bg/daemonAdapter.js')
+    if (await isDaemonAlive()) {
+      const r = await daemonDetach(job.short)
+      if (r.ok) {
+        ;(await import('./bg/agentActionEvent.js')).emitAgentAction('stop', job.short, { detach: 'true' })
+        process.stdout.write(`Detached ${job.short} (worker still running)\n`); return
+      }
+      process.stderr.write(`detach failed (${r.code}); falling back to graceful stop\n`)
+    } else process.stderr.write(`detach requires daemon; falling back to graceful stop\n`)
+  }
   ;(await import('./bg/agentActionEvent.js')).emitAgentAction(force ? 'kill' : 'stop', job.short)
-  await stopJob(job, {
-    force,
-    verbLabel: force ? 'Killed' : 'Stopped',
-    finalStatus: force ? 'killed' : 'stopped',
-  })
+  await stopJob(job, { force, verbLabel: force ? 'Killed' : 'Stopped', finalStatus: force ? 'killed' : 'stopped' })
 }
 
 /** Alias for `stop --force`. @dynamicRequire */
 export async function killHandler(args: readonly string[]): Promise<void> {
   if (args.includes('--help') || args.includes('-h')) {
-    process.stdout.write(
-      `Usage: ccb kill <short>\n\n  Alias for \`ccb stop --force\` — sends SIGKILL immediately.\n`,
-    )
-    return
+    process.stdout.write(`Usage: ccb kill <short>\n\n  Alias for \`ccb stop --force\` — sends SIGKILL immediately.\n`); return
   }
-  const positional = args.filter(a => !a.startsWith('-'))
-  const short = positional[0]
-  if (!short) {
-    process.stderr.write('Usage: ccb kill <short>   (alias of `ccb stop --force`)\n')
-    process.exit(1)
-  }
+  const short = args.filter(a => !a.startsWith('-'))[0]
+  if (!short) { process.stderr.write('Usage: ccb kill <short>   (alias of `ccb stop --force`)\n'); process.exit(1) }
   const job = resolveJobOrExit(short)
   ;(await import('./bg/agentActionEvent.js')).emitAgentAction('kill', job.short)
   await stopJob(job, { force: true, verbLabel: 'Killed', finalStatus: 'killed' })
