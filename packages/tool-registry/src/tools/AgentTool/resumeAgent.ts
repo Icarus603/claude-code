@@ -11,6 +11,10 @@ import { runWithAgentContext } from '@claude-code/agent/agentContext.js'
 import { runWithCwdOverride } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  logEvent,
+} from '@claude-code/local-observability'
+import {
   createUserMessage,
   filterOrphanedThinkingOnlyMessages,
   filterUnresolvedToolUses,
@@ -65,6 +69,12 @@ export async function resumeAgentBackground({
     readAgentMetadata(asAgentId(agentId)),
   ])
   if (!transcript) {
+    // ant 3898.js UdH:43 — emit action-error telemetry before throwing
+    // so observability sees WHY the resume failed.
+    logEvent('tengu_subagent_launch', {
+      action: 'failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      reason: 'subagent_resume_transcript_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     throw new Error(`No transcript found for agent ID: ${agentId}`)
   }
   const resumedMessages = filterWhitespaceOnlyAssistantMessages(
@@ -141,6 +151,12 @@ export async function resumeAgentBackground({
       })
     }
     if (!forkParentSystemPrompt) {
+      // ant 3898.js UdH:88 — fork-resume with no parent prompt is
+      // unrecoverable; surface the specific failure subtype.
+      logEvent('tengu_subagent_launch', {
+        action: 'failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        reason: 'subagent_resume_fork_prompt_missing' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
       throw new Error(
         'Cannot resume fork agent: unable to reconstruct parent system prompt',
       )
