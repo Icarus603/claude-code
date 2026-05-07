@@ -5,6 +5,7 @@ import { lesson as undo } from './undo.js'
 import { lesson as background } from './background.js'
 import { lesson as memory } from './memory.js'
 import { lesson as mcp } from './mcp.js'
+import { lesson as automate } from './automate.js'
 
 /**
  * All lessons in display order. Each lesson lives in its own file under
@@ -15,7 +16,7 @@ import { lesson as mcp } from './mcp.js'
  *
  * The final 10-lesson set is documented in
  * `docs/superpowers/specs/2026-05-08-powerup-design.md` §3. Currently
- * 6 of 10 are implemented (steps 1–6 of the §11 plan).
+ * 7 of 10 are implemented (steps 1–7 of the §11 plan).
  */
 export const ALL_LESSONS: Lesson[] = [
   atMentions,
@@ -24,4 +25,5 @@ export const ALL_LESSONS: Lesson[] = [
   background,
   memory,
   mcp,
+  automate,
 ]
