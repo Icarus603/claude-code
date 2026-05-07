@@ -795,5 +795,5 @@ async function respawnSingle(job: JobMeta): Promise<boolean> {
   }
 }
 
-// Re-export pure helpers from ./bg/ subdir for __tests__/bg.test.ts.
 export { extractRespawnArgs, splitBgArgs, tailFile }
+export { runPtyHost } from './bg/ptyHost.js'

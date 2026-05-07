@@ -22,15 +22,15 @@ Findings are graded:
 | 2 | await-generator-misuse | 0 | 0 | 0 | 0 | 0 |
 | 3 | optional-chain-on-required-binding | 0 | 0 | 0 | 0 | 0 |
 | 4 | dual-storage-divergence | 0 | 0 | 0 | 0 | 0 |
-| 5 | empty-catch | 0 | 0 | 0 | 0 | 0 |
+| 5 | empty-catch | 2 | 0 | 0 | 0 | 2 |
 | 6 | nullish-coalesce-critical-path | 86 | 0 | 0 | 0 | 86 |
 | 7 | stub-return-only | 25 | 0 | 0 | 0 | 25 |
-| 8 | always-false-feature-flag | 489 | 0 | 0 | 0 | 489 |
+| 8 | always-false-feature-flag | 474 | 0 | 0 | 0 | 474 |
 | 9 | optional-method-no-guard | 0 | 0 | 0 | 0 | 0 |
 | 10 | type-cast-trap | 131 | 0 | 0 | 1 | 130 |
-| 11 | require-fallback-to-stub | 0 | 0 | 0 | 0 | 0 |
+| 11 | require-fallback-to-stub | 2 | 0 | 0 | 2 | 0 |
 | 12 | module-level-null-state | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | | **731** | **0** | **0** | **1** | **730** |
+| **TOTAL** | | **720** | **0** | **0** | **3** | **717** |
 
 ## Patterns in detail
 
@@ -64,7 +64,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/04-dual-storage-divergence.ts`
 
-**Total scanned**: 9222; **findings**: 0
+**Total scanned**: 9261; **findings**: 0
 
 ### 5. `empty-catch`
 
@@ -72,7 +72,14 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/05-empty-catch.ts`
 
-**Total scanned**: 2253; **findings**: 0
+**Total scanned**: 2271; **findings**: 2
+
+#### LOW (2)
+
+- `packages/repl/src/components/ModelPicker.tsx:110` — } catch {}
+  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
+- `packages/provider/src/connections.ts:270` — } catch {}
+  - Empty catch block — every exception silently swallowed. If this is intentional, add a single-line comment explaining why. If not, log the error or rethrow.
 
 ### 6. `nullish-coalesce-critical-path`
 
@@ -80,7 +87,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/06-nullish-coalesce-critical-path.ts`
 
-**Total scanned**: 1175; **findings**: 86
+**Total scanned**: 1176; **findings**: 86
 
 #### LOW (86)
 
@@ -140,9 +147,9 @@ Findings are graded:
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - `packages/provider/src/dumpPrompts.ts:103` — const messages = (req.messages ?? []) as Array<{ role?: string }>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:282` — connections: (current.connections ?? []).filter(c => c.id !== id),
+- `packages/provider/src/connections.ts:377` — connections: (current.connections ?? []).filter(c => c.id !== id),
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
-- `packages/provider/src/connections.ts:290` — connections: (current.connections ?? []).map(c =>
+- `packages/provider/src/connections.ts:385` — connections: (current.connections ?? []).map(c =>
   - `??` default in critical-path file. If the LHS expression returning null/undefined indicates a real failure (not just absence), this default silently masks it. Verify whether the LHS must be non-null for the caller to function correctly.
 - ...56 more (run audit with no flags for full JSON)
 
@@ -152,7 +159,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/07-stub-return-only.ts`
 
-**Total scanned**: 5840; **findings**: 25
+**Total scanned**: 5881; **findings**: 25
 
 #### LOW (25)
 
@@ -213,12 +220,10 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/08-always-false-feature-flags.ts`
 
-**Total scanned**: 815; **findings**: 489
+**Total scanned**: 817; **findings**: 474
 
-#### LOW (489)
+#### LOW (474)
 
-- `packages/swarm/commands/branch/index.ts:8` — aliases: feature('FORK_SUBAGENT') ? [] : ['fork'],
-  - `feature('FORK_SUBAGENT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_FORK_SUBAGENT=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/swarm/src/runtime/inProcessRunner.ts:166` — feature('BASH_CLASSIFIER') &&
   - `feature('BASH_CLASSIFIER')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_BASH_CLASSIFIER=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/swarm/src/worktree/index.ts:603` — if (feature('COMMIT_ATTRIBUTION')) {
@@ -263,21 +268,23 @@ Findings are graded:
   - `feature('MONITOR_TOOL')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_MONITOR_TOOL=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/AgentTool/loadAgentsDir.ts:348` — if (feature('AGENT_MEMORY_SNAPSHOT') && isAutoMemoryEnabled()) {
   - `feature('AGENT_MEMORY_SNAPSHOT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_AGENT_MEMORY_SNAPSHOT=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/AgentTool/forkSubagent.ts:33` — if (feature('FORK_SUBAGENT')) {
-  - `feature('FORK_SUBAGENT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_FORK_SUBAGENT=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:9` — feature('KAIROS') || feature('KAIROS_BRIEF')
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:14` — const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS')
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
-- `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:69` — if (feature('FORK_SUBAGENT') && tool.name === AGENT_TOOL_NAME) {
-  - `feature('FORK_SUBAGENT')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_FORK_SUBAGENT=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:82` — (feature('KAIROS') || feature('KAIROS_BRIEF')) &&
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/ToolSearchTool/prompt.ts:92` — feature('KAIROS') &&
   - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
 - `packages/tool-registry/src/tools/registry/providers/BuiltInToolsProvider.ts:58` — feature('PROACTIVE') || feature('KAIROS')
   - `feature('PROACTIVE')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_PROACTIVE=1. Verify whether this branch is ever exercised; if not, delete it.
-- ...459 more (run audit with no flags for full JSON)
+- `packages/tool-registry/src/tools/registry/providers/BuiltInToolsProvider.ts:58` — feature('PROACTIVE') || feature('KAIROS')
+  - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
+- `packages/tool-registry/src/tools/registry/providers/BuiltInToolsProvider.ts:74` — feature('MONITOR_TOOL')
+  - `feature('MONITOR_TOOL')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_MONITOR_TOOL=1. Verify whether this branch is ever exercised; if not, delete it.
+- `packages/tool-registry/src/tools/registry/providers/BuiltInToolsProvider.ts:79` — feature('KAIROS')
+  - `feature('KAIROS')` is not enabled in dev (scripts/dev.ts) or build (build.ts) defaults. Branch is dead code unless user manually sets FEATURE_KAIROS=1. Verify whether this branch is ever exercised; if not, delete it.
+- ...444 more (run audit with no flags for full JSON)
 
 ### 9. `optional-method-no-guard`
 
@@ -293,7 +300,7 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/10-type-cast-traps.ts`
 
-**Total scanned**: 659; **findings**: 131
+**Total scanned**: 658; **findings**: 131
 
 #### MEDIUM (1)
 
@@ -370,7 +377,14 @@ Findings are graded:
 
 **Audit script**: `scripts/audit-silent-failures/11-require-fallback.ts`
 
-**Total scanned**: 673; **findings**: 0
+**Total scanned**: 677; **findings**: 2
+
+#### MEDIUM (2)
+
+- `packages/repl/src/components/ModelPicker.tsx:107` — const fs = require('fs') as typeof import('fs')
+  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
+- `packages/provider/src/connections.ts:266` — const fs = require('fs')
+  - require() inside try/catch with safe-default fallback. If the require target is missing or broken, the call silently returns the default. Verify the require path resolves under all build configs; if it's intentionally feature-gated, document why.
 
 ### 12. `module-level-null-state`
 

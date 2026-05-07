@@ -99,6 +99,21 @@ async function main(): Promise<void> {
     return
   }
 
+  // Fast-path for `ccb --bg-pty-host <sock> <cols> <rows> -- <cmd> [args...]`.
+  // This is the daemon-supervised PTY host runtime — spawned by the bg
+  // dispatcher (ccb side) or by an external daemon. It opens a Bun.Terminal,
+  // spawns the requested child inside it, and bridges the PTY ↔ Unix socket
+  // bidirectionally. Mirrors ant 5173.js:103-106 + 4702.js DW3.
+  if (
+    feature('BG_SESSIONS') &&
+    args[0] === '--bg-pty-host'
+  ) {
+    profileCheckpoint('cli_bg_pty_host_path')
+    const { runPtyHost } = await import('../bg/ptyHost.js')
+    await runPtyHost(args.slice(1))
+    return
+  }
+
   if (process.argv[2] === '--claude-in-chrome-mcp') {
     profileCheckpoint('cli_claude_in_chrome_mcp_path')
     const { runClaudeInChromeMcpServer } = await import(
