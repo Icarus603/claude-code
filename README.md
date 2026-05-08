@@ -2,13 +2,24 @@
 
 [繁體中文](./README.zh-TW.md) | [简体中文](./README.zh-CN.md)
 
-[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=for-the-badge&color=0f0f0f&label=ccb)](https://github.com/Icarus603/claude-code/releases)
-[![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://github.com/Icarus603/claude-code)
-[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=for-the-badge&color=222&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
-[![Platforms](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-333333?style=for-the-badge)](https://github.com/Icarus603/claude-code/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat-square&color=0f0f0f&label=ccb)](https://github.com/Icarus603/claude-code/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/Icarus603/claude-code/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/Icarus603/claude-code/actions/workflows/ci.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=222&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
+[![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&color=222)](https://github.com/Icarus603/claude-code/stargazers)
+[![Platforms](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-1F4E8C?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
+[![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=flat-square&logo=bun&logoColor=white)](https://bun.sh)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://github.com/Icarus603/claude-code)
 
-Terminal coding agent. Single binary `ccb`. Talks to Anthropic, OpenAI-compatible endpoints (Ollama, DeepSeek, vLLM, …), Gemini, and Grok through one agent loop. macOS, Linux, Windows.
+[![Models](https://img.shields.io/badge/MODELS-D4A017?style=flat-square)](#install)
+[![Claude Subscription](https://img.shields.io/badge/Claude%20Subscription-191919?style=flat-square&logo=claude&logoColor=D97757)](https://claude.ai/upgrade)
+[![Anthropic API](https://img.shields.io/badge/Anthropic%20API-191919?style=flat-square&logo=anthropic&logoColor=white)](https://console.anthropic.com)
+[![Anthropic Compatible](https://img.shields.io/badge/Anthropic%20Compatible-191919?style=flat-square&logo=anthropic&logoColor=D97757)](https://docs.anthropic.com/en/api)
+[![OpenAI Compatible](https://img.shields.io/badge/OpenAI%20Compatible-191919?style=flat-square)](https://platform.openai.com/docs/api-reference/chat)
+[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-10A37F?style=flat-square)](https://openai.com/codex)
+[![Gemini](https://img.shields.io/badge/Gemini-191919?style=flat-square&logo=googlegemini&logoColor=4285F4)](https://ai.google.dev)
+[![Grok](https://img.shields.io/badge/Grok-191919?style=flat-square)](https://x.ai)
+
+Terminal coding agent. Single binary `ccb`. Talks to Anthropic (OAuth or API key), Anthropic-compatible endpoints, ChatGPT Codex (OAuth), OpenAI-compatible endpoints (Ollama, DeepSeek, vLLM, xAI Grok, …), and Gemini through one agent loop. macOS, Linux, Windows.
 
 Solo-maintained public derivative of Claude Code; baseline reconstructed from the v2.1.88 sourcemap (2026-03-31). See [`ATTRIBUTION.md`](./ATTRIBUTION.md). Not affiliated with Anthropic.
 
@@ -72,17 +83,19 @@ ccb --continue
 | `/help` | Show all slash commands |
 | `Ctrl+C` | Exit |
 
-**Uninstall:**
+> Windows ARM64 is not supported. Use x64 under emulation, or WSL.
 
-```bash
-# macOS / Linux
-rm -rf ~/.local/share/ccb ~/.local/bin/ccb
+---
 
-# Windows (PowerShell)
-Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"
+## Learn ccb in 10 minutes — `/powerup`
+
+New here? Inside the REPL, type:
+
+```
+/powerup
 ```
 
-> Windows ARM64 is not supported. Use x64 under emulation, or WSL.
+Ten short interactive lessons walk you through what makes ccb worth using — `@` file mentions, permission modes, `/rewind` and Esc-Esc to undo, background sessions, CLAUDE.md, MCP, skills + hooks, `/fork` for parallel branches, model dialing, and multi-provider switching. Open one, try it, mark it done. The home banner tracks progress until you've finished all ten.
 
 ---
 
@@ -104,6 +117,18 @@ bun run doctor:arch
 - No npm publishing — binary-only by design.
 - PRs are reviewed by one maintainer at human pace. No SLA.
 - Open an [Issue](https://github.com/Icarus603/claude-code/issues) before non-trivial PRs.
+
+---
+
+## Uninstall
+
+```bash
+# macOS / Linux
+rm -rf ~/.local/share/ccb ~/.local/bin/ccb
+
+# Windows (PowerShell)
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"
+```
 
 ---
 

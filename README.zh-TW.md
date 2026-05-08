@@ -2,13 +2,24 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=for-the-badge&color=0f0f0f&label=ccb)](https://github.com/Icarus603/claude-code/releases)
-[![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://github.com/Icarus603/claude-code)
-[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=for-the-badge&color=222&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
-[![Platforms](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-333333?style=for-the-badge)](https://github.com/Icarus603/claude-code/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat-square&color=0f0f0f&label=ccb)](https://github.com/Icarus603/claude-code/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/Icarus603/claude-code/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/Icarus603/claude-code/actions/workflows/ci.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat-square&color=222&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
+[![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat-square&color=222)](https://github.com/Icarus603/claude-code/stargazers)
+[![Platforms](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-1F4E8C?style=flat-square)](https://github.com/Icarus603/claude-code/releases/latest)
+[![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=flat-square&logo=bun&logoColor=white)](https://bun.sh)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://github.com/Icarus603/claude-code)
 
-終端編程智慧體。單一 binary `ccb`。同一個 agent loop 對接 Anthropic、OpenAI 相容端點（Ollama、DeepSeek、vLLM……）、Gemini、Grok。支援 macOS、Linux、Windows。
+[![Models](https://img.shields.io/badge/%E6%A8%A1%E5%9E%8B-D4A017?style=flat-square)](#install)
+[![Claude Subscription](https://img.shields.io/badge/Claude%20Subscription-191919?style=flat-square&logo=claude&logoColor=D97757)](https://claude.ai/upgrade)
+[![Anthropic API](https://img.shields.io/badge/Anthropic%20API-191919?style=flat-square&logo=anthropic&logoColor=white)](https://console.anthropic.com)
+[![Anthropic Compatible](https://img.shields.io/badge/Anthropic%20Compatible-191919?style=flat-square&logo=anthropic&logoColor=D97757)](https://docs.anthropic.com/en/api)
+[![OpenAI Compatible](https://img.shields.io/badge/OpenAI%20Compatible-191919?style=flat-square)](https://platform.openai.com/docs/api-reference/chat)
+[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-10A37F?style=flat-square)](https://openai.com/codex)
+[![Gemini](https://img.shields.io/badge/Gemini-191919?style=flat-square&logo=googlegemini&logoColor=4285F4)](https://ai.google.dev)
+[![Grok](https://img.shields.io/badge/Grok-191919?style=flat-square)](https://x.ai)
+
+終端編程智慧體。單一 binary `ccb`。同一個 agent loop 對接 Anthropic（OAuth 或 API key）、Anthropic 相容端點、ChatGPT Codex（OAuth）、OpenAI 相容端點（Ollama、DeepSeek、vLLM、xAI Grok……）、Gemini。支援 macOS、Linux、Windows。
 
 Claude Code 的個人維護公開衍生版；baseline 由 v2.1.88 sourcemap 重建（2026-03-31）。詳見 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。與 Anthropic 無關。
 
@@ -72,17 +83,19 @@ ccb --continue
 | `/help` | 顯示所有指令 |
 | `Ctrl+C` | 離開 |
 
-**解除安裝：**
+> 不支援 Windows ARM64，請在 x64 模擬下執行，或改走 WSL。
 
-```bash
-# macOS / Linux
-rm -rf ~/.local/share/ccb ~/.local/bin/ccb
+---
 
-# Windows (PowerShell)
-Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"
+## 10 分鐘上手 ccb — `/powerup`
+
+新手？在 REPL 中輸入：
+
+```
+/powerup
 ```
 
-> 不支援 Windows ARM64，請在 x64 模擬下執行，或改走 WSL。
+10 個短小的互動課程，帶你逐一體驗 ccb 真正值得用的功能 — `@` 檔案提及、權限模式、`/rewind` 與 Esc-Esc 還原、背景 session、CLAUDE.md、MCP、Skills 與 hooks、`/fork` 平行分支、模型調節、多 provider 切換。打開一條、試一試、標記完成。首頁 banner 會持續顯示進度直到 10 條全部解鎖。
 
 ---
 
@@ -104,6 +117,18 @@ bun run doctor:arch
 - 不要把 npm 發布加回來 — 本專案 binary-only。
 - PR 由單一維護者以人類速度 review，無 SLA。
 - 非 trivial PR 請先開 [Issue](https://github.com/Icarus603/claude-code/issues) 討論。
+
+---
+
+## 解除安裝
+
+```bash
+# macOS / Linux
+rm -rf ~/.local/share/ccb ~/.local/bin/ccb
+
+# Windows (PowerShell)
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\ccb"
+```
 
 ---
 
