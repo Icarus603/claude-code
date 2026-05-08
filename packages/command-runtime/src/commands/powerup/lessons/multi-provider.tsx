@@ -6,46 +6,47 @@ import type { Lesson } from './types.js'
 export const lesson: Lesson = {
   id: 'multi-provider',
   title: 'Talk to any model',
-  tagline: 'Anthropic/OpenAI/Gemini/Grok',
+  tagline: 'Anthropic/Codex/OpenAI/Gemini',
   body: (
     <Box flexDirection="column" gap={1}>
       <Text>
-        ccb talks to four model families through one agent loop. The same
-        tools, MCP servers, agents, and hooks all work — only the model
-        behind the curtain changes.
+        ccb talks to every major model family through one agent loop. The
+        same tools, MCP servers, agents, and hooks all work — only the
+        model behind the curtain changes.
       </Text>
       <Box flexDirection="column" paddingLeft={2}>
         <Text>
-          <Text color="success">Anthropic</Text> — default. Run{' '}
-          <Text color="suggestion">ccb auth</Text> for OAuth or set{' '}
-          <Text color="suggestion">ANTHROPIC_API_KEY</Text>.
+          <Text color="success">Anthropic OAuth</Text> — sign in with your
+          Pro / Max account; no API key needed.
         </Text>
         <Text>
-          <Text color="success">OpenAI-compatible</Text> —{' '}
-          <Text color="suggestion">CLAUDE_CODE_USE_OPENAI=1</Text> with{' '}
-          <Text color="suggestion">OPENAI_API_KEY</Text> /{' '}
-          <Text color="suggestion">OPENAI_BASE_URL</Text>. Works with Ollama,
-          DeepSeek, vLLM.
+          <Text color="success">Anthropic-compatible</Text> — any endpoint
+          that speaks the Anthropic API (proxies, gateways).
         </Text>
         <Text>
-          <Text color="success">Gemini</Text> —{' '}
-          <Text color="suggestion">CLAUDE_CODE_USE_GEMINI=1</Text> +{' '}
-          <Text color="suggestion">GEMINI_API_KEY</Text>.
+          <Text color="success">ChatGPT Codex OAuth</Text> — sign in with
+          your ChatGPT Plus / Pro / Business / Enterprise account.
         </Text>
         <Text>
-          <Text color="success">Grok</Text> — same env-var pattern.
+          <Text color="success">OpenAI-compatible</Text> — Ollama, DeepSeek,
+          vLLM, xAI (Grok), anything that speaks Chat Completions.
+        </Text>
+        <Text>
+          <Text color="success">Gemini</Text> — Google AI Studio API key.
         </Text>
       </Box>
       <FrameAnimation
         frames={[
-          '> [suggestion:/model]\n#◯ claude-opus-4-7\n#● gpt-5o\n#◯ gemini-2.5-pro',
-          '> reload that on Gemini\n#◐ switching connection…',
-          '#[gemini:thinking…]\nSame answer, different model.',
+          '> [suggestion:/login]\n#add a new connection…',
+          '#─ Connections ─\n#  [success:✓] claude-account   anthropic\n#  [success:✓] my-openai       openai',
+          '> [suggestion:/model]\n#  [claude:●] claude-opus-4-7\n#  ◯ gpt-5.5\n#  ◯ gemini-3-pro',
         ]}
       />
-      <Text dimColor>
-        Switch mid-session with <Text color="suggestion">/model</Text>, or
-        per-process with the env vars above.
+      <Text>
+        Run <Text color="suggestion">/login</Text> to add a connection,{' '}
+        <Text color="suggestion">/model</Text> to switch between them. Each
+        connection stores its own credentials and base URL — log in once,
+        flip mid-session whenever you want.
       </Text>
     </Box>
   ),

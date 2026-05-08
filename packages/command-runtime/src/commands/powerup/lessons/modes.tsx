@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
+import { LiveModeCycler } from '../LiveModeCycler.js'
 import type { Lesson } from './types.js'
 
 export const lesson: Lesson = {
@@ -12,10 +13,7 @@ export const lesson: Lesson = {
         Press <Text underline>shift+tab</Text> to cycle permission modes. Each
         mode changes how much Claude asks before acting:
       </Text>
-      {/* ant 4304.js places a live mode-cycler widget (s8K) here that
-          binds confirm:cycleMode through the keybinding system. Omitted
-          from this lesson because the widget needs full keyboard-context
-          wiring that does not fit a pure-data ReactNode body. */}
+      <LiveModeCycler />
       <Box flexDirection="column" paddingLeft={2}>
         <Text>
           <Text color="success">default</Text> — ask before every edit
