@@ -29,7 +29,7 @@ export const lesson: Lesson = {
         </Text>
         <Text>
           <Text color="success">OpenAI-compatible</Text> — Ollama, DeepSeek,
-          vLLM, xAI (Grok), anything that speaks Chat Completions.
+          vLLM, anything that speaks Chat Completions.
         </Text>
         <Text>
           <Text color="success">Gemini</Text> — Google AI Studio API key.

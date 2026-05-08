@@ -12,7 +12,6 @@ export type APIProvider =
   | 'foundry'
   | 'openai'
   | 'gemini'
-  | 'grok'
   | 'codex'
 
 export function getAPIProvider(): APIProvider {
@@ -53,7 +52,6 @@ export function getAPIProvider(): APIProvider {
   const modelType = getInitialSettings().modelType
   if (modelType === 'openai') return 'openai'
   if (modelType === 'gemini') return 'gemini'
-  if (modelType === 'grok') return 'grok'
 
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) return 'bedrock'
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'
@@ -61,7 +59,6 @@ export function getAPIProvider(): APIProvider {
 
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_OPENAI'))) return 'openai'
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GEMINI'))) return 'gemini'
-  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GROK'))) return 'grok'
 
   return 'firstParty'
 }
@@ -152,7 +149,7 @@ export function resolveConnectionForModel(
  * Prefers connection-based routing over the global provider.
  *
  * `AuthProtocol` (`'anthropic' | 'openai' | 'codex' | 'gemini'`) and
- * `APIProvider` (firstParty/bedrock/vertex/foundry/openai/gemini/grok/codex)
+ * `APIProvider` (firstParty/bedrock/vertex/foundry/openai/gemini/codex)
  * are different vocabularies — only the last three values overlap. The
  * old code did `conn.protocol as APIProvider`, which silently leaked the
  * string `'anthropic'` (a valid AuthProtocol but not a valid APIProvider)

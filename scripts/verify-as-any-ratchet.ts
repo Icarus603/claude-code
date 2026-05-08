@@ -15,7 +15,7 @@
  *
  * Common (legitimate) uses in this repo:
  *   - V7 §7.2 host-binding placeholder: `let X = missingBinding('X') as any`
- *   - Cross-package boundary at provider adapters (openai/grok/gemini)
+ *   - Cross-package boundary at provider adapters (openai/gemini)
  *     where the SDK's typing is dynamic by design
  *   - Multi-line `missingBinding(\n  'name',\n) as any` (these get matched
  *     by the regex too — same intent)

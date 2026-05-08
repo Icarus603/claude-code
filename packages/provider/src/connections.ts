@@ -2,7 +2,7 @@
  * Connection-based multi-provider architecture.
  *
  * Each connection represents a single authentication source — an OAuth account
- * (Claude, Codex), an API key endpoint (Ollama, DeepSeek, Grok), or a cloud
+ * (Claude, Codex), an API key endpoint (Ollama, DeepSeek), or a cloud
  * provider (Bedrock, Vertex). Connections are independent: logging in/out of
  * one does not affect any other.
  *

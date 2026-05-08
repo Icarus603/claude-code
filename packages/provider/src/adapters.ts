@@ -11,14 +11,12 @@ import { getProviderNetworkLayer } from './network.js'
 import {
   anthropicAuthProvider,
   geminiAuthProvider,
-  grokAuthProvider,
   openAIAuthProvider,
 } from './auth.js'
 import { getProviderHostBindings } from './host.js'
 import { HostBindingsError, StreamError } from './errors.js'
 import { queryModelOpenAI } from './openai/indexImpl.js'
 import { queryModelGemini } from './gemini/indexImpl.js'
-import { queryModelGrok } from './grok/indexImpl.js'
 import { getProviderForModel } from './providers.js'
 import { unpackModelId } from './connections.js'
 
@@ -32,7 +30,6 @@ const API_PROVIDER_VALUES: ReadonlySet<APIProvider> = new Set<APIProvider>([
   'foundry',
   'openai',
   'gemini',
-  'grok',
   'codex',
 ])
 
@@ -160,20 +157,6 @@ export function getProviderAdapter(
             args.signal,
             args.options,
             args.thinkingConfig,
-          )
-        },
-      })
-    case 'grok':
-      return createAdapter('grok', {
-        authProvider: grokAuthProvider,
-        queryStream: rawArgs => {
-          const args = stripModelPrefix(rawArgs)
-          return queryModelGrok(
-            args.messages,
-            args.systemPrompt,
-            args.tools,
-            args.signal,
-            args.options,
           )
         },
       })

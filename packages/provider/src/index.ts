@@ -24,7 +24,6 @@ export {
   anthropicAuthProvider,
   geminiAuthProvider,
   getAnthropicAuthProvider,
-  grokAuthProvider,
   openAIAuthProvider,
 } from './auth.js'
 
@@ -37,5 +36,4 @@ export {
 } from './anthropic/client.js'
 export * from './openai/index.js'
 export * from './gemini/index.js'
-export * from './grok/index.js'
 export * from './errors.js'

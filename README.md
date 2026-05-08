@@ -17,9 +17,8 @@
 [![OpenAI Compatible](https://img.shields.io/badge/OpenAI%20Compatible-10A37F?style=flat)](https://platform.openai.com/docs/api-reference/chat)
 [![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-0E7C5E?style=flat)](https://openai.com/codex)
 [![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=flat&logo=googlegemini&logoColor=fff)](https://ai.google.dev)
-[![Grok](https://img.shields.io/badge/Grok-000?style=flat)](https://x.ai)
 
-Terminal coding agent. Single binary `ccb`. Talks to Anthropic (OAuth or API key), Anthropic-compatible endpoints, ChatGPT Codex (OAuth), OpenAI-compatible endpoints (Ollama, DeepSeek, vLLM, xAI Grok, …), and Gemini through one agent loop. macOS, Linux, Windows.
+Terminal coding agent. Single binary `ccb`. Talks to Anthropic (OAuth or API key), Anthropic-compatible endpoints, ChatGPT Codex (OAuth), OpenAI-compatible endpoints (Ollama, DeepSeek, vLLM, …), and Gemini through one agent loop. macOS, Linux, Windows.
 
 Solo-maintained public derivative of Claude Code; baseline reconstructed from the v2.1.88 sourcemap (2026-03-31). See [`ATTRIBUTION.md`](./ATTRIBUTION.md). Not affiliated with Anthropic.
 

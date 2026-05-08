@@ -32,7 +32,6 @@ const TRACKED_KEYS = [
   'CLAUDE_CODE_USE_FOUNDRY',
   'CLAUDE_CODE_USE_OPENAI',
   'CLAUDE_CODE_USE_GEMINI',
-  'CLAUDE_CODE_USE_GROK',
 ] as const
 const savedEnv = new Map<string, string | undefined>()
 

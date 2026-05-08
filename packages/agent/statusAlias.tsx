@@ -341,7 +341,6 @@ export function buildAPIProviderProperties(): Property[] {
       vertex: 'Google Vertex AI',
       foundry: 'Microsoft Foundry',
       gemini: 'Gemini API',
-      grok: 'Grok API',
       openai: 'OpenAI API',
     }[apiProvider]
     properties.push({
@@ -432,12 +431,6 @@ export function buildAPIProviderProperties(): Property[] {
     properties.push({
       label: 'Gemini base URL',
       value: geminiBaseUrl,
-    })
-  } else if (apiProvider === 'grok') {
-    const grokBaseUrl = readEnv('GROK_BASE_URL')
-    properties.push({
-      label: 'Grok base URL',
-      value: grokBaseUrl,
     })
   } else if (apiProvider === 'openai') {
     const openaiBaseUrl = readEnv('OPENAI_BASE_URL')

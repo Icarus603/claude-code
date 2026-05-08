@@ -10,7 +10,6 @@ export type ProviderAPIProvider =
   | 'foundry'
   | 'openai'
   | 'gemini'
-  | 'grok'
   | 'codex'
 
 export type ProviderModelOption = {

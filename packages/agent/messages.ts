@@ -20,8 +20,8 @@
  *    transforms (`stripCrossConnectionThinkingBlocks`,
  *    `stripInvalidThinkingBlocks`). Each preserves Message[] length
  *    OR documents the drop reason in a returned diagnostic.
- *  - Provider-shape mapping helpers — Anthropic ↔ OpenAI ↔ Gemini ↔
- *    Grok message coercion. Provider adapters call these; do NOT
+ *  - Provider-shape mapping helpers — Anthropic ↔ OpenAI ↔ Gemini
+ *    message coercion. Provider adapters call these; do NOT
  *    add provider-specific shape logic outside this file.
  *
  * **Invariants**:

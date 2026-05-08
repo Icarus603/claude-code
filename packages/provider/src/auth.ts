@@ -96,12 +96,6 @@ export const geminiAuthProvider = createEnvAuthProvider(
   'GEMINI_API_KEY is not configured.',
 )
 
-export const grokAuthProvider = createEnvAuthProvider(
-  'grok',
-  () => readEnv('GROK_API_KEY') || readEnv('XAI_API_KEY'),
-  'GROK_API_KEY or XAI_API_KEY is not configured.',
-)
-
 // Codex doesn't have a standalone AuthProvider here. Codex requests
 // flow through the Anthropic SDK with a custom `fetch` installed in
 // `getAnthropicClient`; auth is plumbed inside that fetch via

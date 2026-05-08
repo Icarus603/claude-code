@@ -6,7 +6,7 @@
  * server-tool path via ApiSearchAdapter — which lets the model
  * iterate up to 8 search refinements per call.
  *
- * Other providers (OpenAI / Gemini / Grok / Codex / Ollama-compat)
+ * Other providers (OpenAI / Gemini / Codex / Ollama-compat)
  * fall back to BingSearchAdapter — they can't serve the Anthropic
  * server tool, so a client-side scrape is the only option until each
  * provider's native search tool is wired in.

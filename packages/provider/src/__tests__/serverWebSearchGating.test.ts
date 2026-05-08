@@ -49,7 +49,6 @@ describe('isAnthropicServerWebSearchCapable', () => {
     expect(isAnthropicServerWebSearchCapable('openai')).toBe(false)
     expect(isAnthropicServerWebSearchCapable('openai', 'gpt-5.5')).toBe(false)
     expect(isAnthropicServerWebSearchCapable('gemini')).toBe(false)
-    expect(isAnthropicServerWebSearchCapable('grok')).toBe(false)
     expect(isAnthropicServerWebSearchCapable('codex')).toBe(false)
   })
 })

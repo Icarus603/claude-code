@@ -1410,8 +1410,7 @@ async function* queryModel(
   // codex branch.
   if (
     routedProvider === 'openai' ||
-    routedProvider === 'gemini' ||
-    routedProvider === 'grok'
+    routedProvider === 'gemini'
   ) {
     const adapter = getProviderAdapter(routedProvider)
     yield* adapter.queryStream({

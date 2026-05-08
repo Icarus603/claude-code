@@ -16,8 +16,6 @@ function getEnvVarForProvider(provider: string): string {
       return 'CLAUDE_CODE_USE_FOUNDRY'
     case 'gemini':
       return 'CLAUDE_CODE_USE_GEMINI'
-    case 'grok':
-      return 'CLAUDE_CODE_USE_GROK'
     default:
       throw new Error(`Unknown provider: ${provider}`)
   }
@@ -51,7 +49,6 @@ const call: LocalCommandCall = async (args, context) => {
     delete readEnv('CLAUDE_CODE_USE_FOUNDRY')
     delete readEnv('CLAUDE_CODE_USE_OPENAI')
     delete readEnv('CLAUDE_CODE_USE_GEMINI')
-    delete readEnv('CLAUDE_CODE_USE_GROK')
     return {
       type: 'text',
       value: 'API provider cleared (will use environment variables).',
@@ -63,7 +60,6 @@ const call: LocalCommandCall = async (args, context) => {
     'anthropic',
     'openai',
     'gemini',
-    'grok',
     'bedrock',
     'vertex',
     'foundry',
@@ -92,19 +88,6 @@ const call: LocalCommandCall = async (args, context) => {
     }
   }
 
-  // Check env vars when switching to grok (including settings.env)
-  if (arg === 'grok') {
-    const mergedEnv = getMergedEnv()
-    const hasKey = !!(mergedEnv.GROK_API_KEY || mergedEnv.XAI_API_KEY)
-    if (!hasKey) {
-      updateSettingsForSource('userSettings', { modelType: 'grok' })
-      return {
-        type: 'text',
-        value: `Switched to Grok provider.\nWarning: Missing env var: GROK_API_KEY (or XAI_API_KEY)\nConfigure it via settings.json env or set manually.`,
-      }
-    }
-  }
-
   // Check env vars when switching to gemini (including settings.env)
   if (arg === 'gemini') {
     const mergedEnv = getMergedEnv()
@@ -122,14 +105,13 @@ const call: LocalCommandCall = async (args, context) => {
   // Handle different provider types
   // - 'anthropic', 'openai', 'gemini' are stored in settings.json (persistent)
   // - 'bedrock', 'vertex', 'foundry' are env-only (do NOT touch settings.json)
-  if (arg === 'anthropic' || arg === 'openai' || arg === 'gemini' || arg === 'grok') {
+  if (arg === 'anthropic' || arg === 'openai' || arg === 'gemini') {
     // Clear any cloud provider env vars to avoid conflicts
     delete readEnv('CLAUDE_CODE_USE_BEDROCK')
     delete readEnv('CLAUDE_CODE_USE_VERTEX')
     delete readEnv('CLAUDE_CODE_USE_FOUNDRY')
     delete readEnv('CLAUDE_CODE_USE_OPENAI')
     delete readEnv('CLAUDE_CODE_USE_GEMINI')
-    delete readEnv('CLAUDE_CODE_USE_GROK')
     // Update settings.json
     updateSettingsForSource('userSettings', { modelType: arg })
     // Ensure settings.env gets applied to process.env
@@ -141,7 +123,6 @@ const call: LocalCommandCall = async (args, context) => {
     deleteEnv('OPENAI_API_KEY')
     deleteEnv('OPENAI_BASE_URL')
     deleteEnv('CLAUDE_CODE_USE_GEMINI')
-    deleteEnv('CLAUDE_CODE_USE_GROK')
     setEnv(getEnvVarForProvider(arg), '1')
     // Do not modify settings.json - cloud providers controlled solely by env vars
     applyConfigEnvironmentVariables()
@@ -156,9 +137,9 @@ const provider = {
   type: 'local',
   name: 'provider',
   description:
-    'Switch API provider (anthropic/openai/gemini/grok/bedrock/vertex/foundry)',
+    'Switch API provider (anthropic/openai/gemini/bedrock/vertex/foundry)',
   aliases: ['api'],
-  argumentHint: '[anthropic|openai|gemini|grok|bedrock|vertex|foundry|unset]',
+  argumentHint: '[anthropic|openai|gemini|bedrock|vertex|foundry|unset]',
   supportsNonInteractive: true,
   load: () => Promise.resolve({ call }),
 } satisfies Command

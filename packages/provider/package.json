@@ -94,7 +94,6 @@
     "./openai/convertTools.js": "./src/openai/convertTools.ts",
     "./gemini/types.js": "./src/gemini/types.ts",
     "./gemini/convertTools.js": "./src/gemini/convertTools.ts",
-    "./grok/client.js": "./src/grok/client.ts",
     "./connections.js": "./src/connections.ts",
     "./model/aliases.js": "./src/model/aliases.ts",
     "./model/model.js": "./src/model/model.ts",
