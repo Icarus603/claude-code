@@ -15,7 +15,6 @@ import { normalizeApiKeyForConfig } from '@claude-code/provider/authPortable.js'
 import { getCustomApiKeyStatus } from '@claude-code/config'
 import { env } from '@claude-code/config/env/paths'
 import { isRunningOnHomespace } from '@claude-code/config/env/utils'
-import { PreflightStep } from '../diagnostics/preflightChecks.js'
 import type { ThemeSetting } from '@anthropic/ink'
 import { ApproveApiKey } from './ApproveApiKey.js'
 import { ConsoleOAuthFlow } from './ConsoleOAuthFlow.js'
@@ -26,7 +25,6 @@ import { ThemePicker } from './ThemePicker.js'
 import { OrderedList } from './ui/OrderedList.js'
 
 type StepId =
-  | 'preflight'
   | 'theme'
   | 'oauth'
   | 'api-key'
@@ -140,8 +138,6 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
     </Box>
   )
 
-  const preflightStep = <PreflightStep onSuccess={goToNextStep} />
-
   function handleApiKeyDone(approved: boolean) {
     if (approved) {
       setSkipOAuth(true)
@@ -150,9 +146,6 @@ export function Onboarding({ onDone }: Props): React.ReactNode {
   }
 
   const steps: OnboardingStep[] = []
-  if (oauthEnabled) {
-    steps.push({ id: 'preflight', component: preflightStep })
-  }
   steps.push({ id: 'theme', component: themeStep })
 
   if (apiKeyNeedingApproval) {
