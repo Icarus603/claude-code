@@ -21,9 +21,6 @@ logs/
 .env
 .env.*
 
-# AI tool / agent runtime state — regenerated, never tracked
-.agents/
-
 # Plugin-local state (e.g. ralph-loop session files)
 .claude/*.local.md
 
@@ -34,7 +31,7 @@ logs/
 .claude/scheduled_tasks.lock
 .claude/loop.md
 
-# Python bytecode (some tooling under .agents/ shells out to python)
+# Python bytecode
 __pycache__/
 *.pyc
 
