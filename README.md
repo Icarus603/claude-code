@@ -2,22 +2,22 @@
 
 [繁體中文](./README.zh-TW.md) | [简体中文](./README.zh-CN.md)
 
-[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat&color=444444&label=ccb)](https://github.com/Icarus603/claude-code/releases)
+[![Release](https://img.shields.io/github/v/release/Icarus603/claude-code?style=flat&color=58BEFF&label=ccb)](https://github.com/Icarus603/claude-code/releases)
 [![CI](https://img.shields.io/github/actions/workflow/status/Icarus603/claude-code/ci.yml?branch=main&style=flat&label=ci)](https://github.com/Icarus603/claude-code/actions/workflows/ci.yml)
-[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat&color=444444&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
-[![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat&color=444444)](https://github.com/Icarus603/claude-code/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/Icarus603/claude-code?style=flat&color=7C3AED&label=updated)](https://github.com/Icarus603/claude-code/commits/main)
+[![Stars](https://img.shields.io/github/stars/Icarus603/claude-code?style=flat&color=D4A017)](https://github.com/Icarus603/claude-code/stargazers)
 [![Platforms](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-1F4E8C?style=flat)](https://github.com/Icarus603/claude-code/releases/latest)
 [![Bun](https://img.shields.io/badge/runtime-bun-F9F1E1?style=flat&logo=bun&logoColor=white)](https://bun.sh)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://github.com/Icarus603/claude-code)
 
-[![Models](https://img.shields.io/badge/MODELS-D4A017?style=flat)](#install)
-[![Claude Subscription](https://img.shields.io/badge/Claude%20Subscription-444444?style=flat&logo=claude&logoColor=D97757)](https://claude.ai/upgrade)
-[![Anthropic API](https://img.shields.io/badge/Anthropic%20API-444444?style=flat&logo=anthropic&logoColor=white)](https://console.anthropic.com)
-[![Anthropic Compatible](https://img.shields.io/badge/Anthropic%20Compatible-444444?style=flat&logo=anthropic&logoColor=D97757)](https://docs.anthropic.com/en/api)
-[![OpenAI Compatible](https://img.shields.io/badge/OpenAI%20Compatible-444444?style=flat)](https://platform.openai.com/docs/api-reference/chat)
-[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-10A37F?style=flat)](https://openai.com/codex)
-[![Gemini](https://img.shields.io/badge/Gemini-444444?style=flat&logo=googlegemini&logoColor=4285F4)](https://ai.google.dev)
-[![Grok](https://img.shields.io/badge/Grok-444444?style=flat)](https://x.ai)
+[![Models](https://img.shields.io/badge/MODELS-722F37?style=flat)](#install)
+[![Claude Subscription](https://img.shields.io/badge/Claude%20Subscription-D97757?style=flat&logo=claude&logoColor=fff)](https://claude.ai/upgrade)
+[![Anthropic API](https://img.shields.io/badge/Anthropic%20API-191919?style=flat&logo=anthropic&logoColor=fff)](https://console.anthropic.com)
+[![Anthropic Compatible](https://img.shields.io/badge/Anthropic%20Compatible-CC785C?style=flat&logo=anthropic&logoColor=fff)](https://docs.anthropic.com/en/api)
+[![OpenAI Compatible](https://img.shields.io/badge/OpenAI%20Compatible-10A37F?style=flat)](https://platform.openai.com/docs/api-reference/chat)
+[![ChatGPT Codex](https://img.shields.io/badge/ChatGPT%20Codex-0E7C5E?style=flat)](https://openai.com/codex)
+[![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=flat&logo=googlegemini&logoColor=fff)](https://ai.google.dev)
+[![Grok](https://img.shields.io/badge/Grok-000?style=flat)](https://x.ai)
 
 Terminal coding agent. Single binary `ccb`. Talks to Anthropic (OAuth or API key), Anthropic-compatible endpoints, ChatGPT Codex (OAuth), OpenAI-compatible endpoints (Ollama, DeepSeek, vLLM, xAI Grok, …), and Gemini through one agent loop. macOS, Linux, Windows.
 
