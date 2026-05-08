@@ -9,7 +9,10 @@ import {
 } from '@claude-code/provider/authAlias.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { getAPIProvider } from '@claude-code/provider/providers.js'
-import { resolveConnectionForModel } from '@claude-code/provider/providers.js'
+import {
+  resolveConnectionForModel,
+  isFirstPartyAnthropicEndpoint,
+} from '@claude-code/provider/providers.js'
 import { unpackModelId } from '@claude-code/provider/connections.js'
 import { get3PModelCapabilityOverride } from '@claude-code/provider/model/modelSupportOverrides.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
@@ -91,6 +94,17 @@ export function modelSupportsEffort(model: string): boolean {
 // 'max' is Anthropic-specific; gpt-* models reported via the connection
 // record max out at xhigh, so the connection check below returns false
 // for them and the request never carries an unsupported value.
+//
+// Native vs proxy asymmetry — same shape as `modelSupportsEffort` above.
+// On *native* api.anthropic.com (Claude Account / Console / api_key) the
+// Anthropic capability matrix is authoritative, so unknown models stay
+// false. On anthropic-protocol *proxies* (DeepSeek's
+// api.deepseek.com/anthropic, LiteLLM, self-hosted Anthropic-compat
+// gateways) the proxy's own enum is what matters — we don't have it, the
+// user does. DeepSeek's own docs instruct setting
+// `CLAUDE_CODE_EFFORT_LEVEL=max`, and clamping that down to 'high' here
+// would silently override a deliberate user choice. Default-trust the
+// proxy and let the API surface a 400 if the value really is unsupported.
 export function modelSupportsMaxEffort(model: string): boolean {
   const fromConnection = getConnectionModelEntry(model)?.supportedEfforts
   if (fromConnection !== undefined) {
@@ -112,6 +126,10 @@ export function modelSupportsMaxEffort(model: string): boolean {
   if (process.env.USER_TYPE === 'ant' && resolveAntModel(model)) {
     return true
   }
+  // Anthropic-protocol proxy fallthrough: trust the user's endpoint.
+  if (getAPIProvider() === 'firstParty' && !isFirstPartyAnthropicEndpoint(model)) {
+    return true
+  }
   return false
 }
 
@@ -120,6 +138,17 @@ export function modelSupportsMaxEffort(model: string): boolean {
 // xhigh is **Opus 4.7 only** on Anthropic — but Codex's gpt-* models
 // also expose `xhigh` natively in their ReasoningEffort enum, surfaced
 // via the connection record's supportedEfforts.
+//
+// Unlike `modelSupportsMaxEffort`, we DO NOT default-trust anthropic-
+// protocol proxies for xhigh. Rationale: 'max' has explicit user-facing
+// documentation from major proxy vendors (DeepSeek's official Claude
+// Code recipe sets `CLAUDE_CODE_EFFORT_LEVEL=max`), but xhigh is a
+// 2026-04-27 Anthropic-internal middle tier with no known proxy support.
+// If we returned true here for proxies, /effort and the picker would
+// offer users a level that the proxy almost certainly rejects with 400 —
+// strictly worse than the old silent clamp. Proxies that genuinely
+// support xhigh should declare it via a connection record's
+// `supportedEfforts` (handled at the top of this function).
 export function modelSupportsXhighEffort(model: string): boolean {
   const fromConnection = getConnectionModelEntry(model)?.supportedEfforts
   if (fromConnection !== undefined) {
