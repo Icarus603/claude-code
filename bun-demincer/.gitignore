@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# OS
+.DS_Store
+
+# Generated output directories (from pipeline runs)
+extracted/
+resplit/
+decoded/
+decoded-organized/
+
+# Generated artifacts
+deps-graph.json
+clusters-core.json
+cluster-labels.json
+clusters*.png
+*.progress.json
+.wakaru-out/
+
+# Reassembled bundles
+reassembled.js
+
+# decode.sh / delta.sh / analyze.sh runtime artifacts (per-machine, regenerated)
+work/
+deltas/
+reports/
+runs.log
+.launchd-stdout.log
+.launchd-stderr.log
+.update.lockdir/

@@ -39,8 +39,10 @@ __pycache__/
 /*.png
 *.bmp
 
-# bun-demincer (decompiler tool — separate checkout, not part of build)
-bun-demincer/
+# bun-demincer/ — vendored fork (folded 2026-05-09 from Icarus603/bun-demincer).
+# The directory itself is tracked; only its per-machine runtime artefacts are
+# excluded. See bun-demincer/.gitignore for the inner rules (work/, deltas/,
+# reports/, runs.log, .launchd-*.log, .update.lockdir/, etc.).
 
 # Rust / cargo build artifacts
 # packages/ripgrep-napi/.cargo/config.toml redirects target-dir here so

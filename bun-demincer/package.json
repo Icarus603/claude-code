@@ -1,0 +1,21 @@
+{
+  "name": "bun-demincer",
+  "type": "module",
+  "dependencies": {
+    "@babel/generator": "^7.26.0",
+    "@babel/parser": "^7.26.0",
+    "@babel/traverse": "^7.26.0",
+    "@google/generative-ai": "^0.24.0",
+    "@mapequation/infomap": "^2.8.0",
+    "@wakaru/unminify": "^0.2.2",
+    "canvas": "^3.2.1",
+    "dotenv": "^16.4.0",
+    "graphology": "^0.26.0",
+    "graphology-communities-louvain": "^2.0.2",
+    "graphology-layout-forceatlas2": "^0.10.1",
+    "graphology-metrics": "^2.4.0",
+    "lebab": "^3.2.0",
+    "prettier": "^3.4.0",
+    "recast": "^0.23.11"
+  }
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  com.icarus.bun-demincer — daily auto-trigger for the bun-demincer pipeline.
+
+  Loaded into the user (Aqua) launchd domain via:
+    launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.icarus.bun-demincer.plist
+
+  Fires once per day at 09:07 local. If the machine was asleep at 09:07,
+  launchd fires the job when the machine wakes up next (default
+  catch-up behavior — no extra config needed).
+
+  Why 09:07: avoid the 09:00 / 09:30 fleet-collision marks. Jitter is
+  applied at the macOS scheduler level — but a non-round minute is the
+  bigger lever, same logic as ccb's CronCreate guidance.
+
+  StartCalendarInterval semantics: omitting any field means "any value"
+  for that field. Below is "every day at 09:07".
+
+  RunAtLoad is false on purpose: bootstrap shouldn't immediately fire
+  the pipeline (decode.sh on a fresh version takes 30-60s and
+  bootstrap-time isn't the right moment for that). To trigger a one-off
+  run for testing: launchctl kickstart gui/$UID/com.icarus.bun-demincer
+
+  PATH: launchd's default is /usr/bin:/bin:/usr/sbin:/sbin which is
+  missing /opt/homebrew/bin (node) and ~/.bun/bin. decode.sh shells out
+  to `node` so we must expose the full PATH explicitly.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.icarus.bun-demincer</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/liuzetfung/code/playground/claude-code/bun-demincer/check-and-update.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/liuzetfung/code/playground/claude-code/bun-demincer</string>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>9</integer>
+        <key>Minute</key>
+        <integer>7</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/liuzetfung/.local/bin:/Users/liuzetfung/.bun/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/liuzetfung</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/liuzetfung/code/playground/claude-code/bun-demincer/.launchd-stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/liuzetfung/code/playground/claude-code/bun-demincer/.launchd-stderr.log</string>
+
+    <!-- KeepAlive intentionally omitted: this is a scheduled-fire job,
+         not a service. ProcessType Background hints to macOS that this
+         can take more than 10s and shouldn't be killed for being slow. -->
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
