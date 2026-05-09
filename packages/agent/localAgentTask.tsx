@@ -342,7 +342,15 @@ export function enqueueAgentNotification({
 <${SUMMARY_TAG}>${summary}</${SUMMARY_TAG}>${resultSection}${usageSection}${worktreeSection}
 </${TASK_NOTIFICATION_TAG}>`
 
-  enqueuePendingNotification({ value: message, mode: 'task-notification' })
+  // Priority 'next' (not the default 'later') so the query-loop mid-turn
+  // drain (query.ts:1736) picks this up immediately and injects it as an
+  // attachment. Without this, notifications stack up until the parent query
+  // ends or a Sleep tool flushes the 'later' tier.
+  enqueuePendingNotification({
+    value: message,
+    mode: 'task-notification',
+    priority: 'next',
+  })
 
   // Force the REPL's useQueueProcessor to re-check the command queue.
   // Without this, notifications enqueued while the parent query is active
