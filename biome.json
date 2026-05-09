@@ -6,7 +6,12 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": ["**", "!!**/dist", "!!**/packages/@ant"]
+		"includes": [
+			"**",
+			"!!**/dist",
+			"!!**/packages/@ant",
+			"!!bun-demincer/**"
+		]
 	},
 	"formatter": {
 		"enabled": true,
