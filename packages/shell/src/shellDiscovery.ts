@@ -6,6 +6,7 @@ import { constants as fsConstants, accessSync } from 'fs'
 import memoize from 'lodash-es/memoize.js'
 import type { ShellExecContext } from './context.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { getPlatform } from '@claude-code/config/platform'
 import { createBashShellProvider } from './providers/bashProvider.js'
 import { getCachedPowerShellPath } from './providers/powershellDetection.js'
 import { createPowerShellProvider } from './providers/powershellProvider.js'
@@ -89,6 +90,15 @@ export async function findSuitableShell(
   const shellPath = supportedShells.find(shell => shell && isExecutable(shell))
 
   if (!shellPath) {
+    if (getPlatform() === 'windows') {
+      throw new ExecError(
+        'No suitable shell found. On Windows, Claude Code requires git-bash ' +
+          '(https://git-scm.com/downloads/win). Install git-bash, ensure ' +
+          'bash.exe is discoverable, or set CLAUDE_CODE_GIT_BASH_PATH to the ' +
+          'full path of bash.exe. PowerShell commands (via the PowerShell tool) ' +
+          'do not require git-bash.',
+      )
+    }
     throw new ExecError(
       'No suitable shell found. Claude CLI requires a Posix shell environment. ' +
         'Please ensure you have a valid shell installed and the SHELL environment variable set.',

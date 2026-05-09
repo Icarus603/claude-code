@@ -25,6 +25,8 @@ import { detectCurrentRepository } from '@claude-code/storage/detectRepository.j
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { initJetBrainsDetection } from '@claude-code/config/env/dynamic'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { getPlatform } from '@claude-code/config/platform'
+import { getCachedPowerShellPath, isPowerShellToolEnabled } from '@claude-code/shell'
 import { ConfigParseError, errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 // showInvalidConfigDialog is dynamically imported in the error path to avoid loading React at init
 import {
@@ -46,7 +48,7 @@ import {
 import { configureGlobalAgents } from '@claude-code/provider/proxy.js'
 import { isBetaTracingEnabled } from '@claude-code/local-observability/betaSessionTracing.js'
 import { getTelemetryAttributes } from '@claude-code/local-observability/telemetry'
-import { setShellIfWindows } from '@claude-code/storage/windowsPaths.js'
+import { setShellIfWindows, findGitBashPath } from '@claude-code/storage/windowsPaths.js'
 import { initSentry } from '@claude-code/local-observability/sentry.js'
 
 // initialize1PEventLogging is dynamically imported to defer OpenTelemetry sdk-logs/resources
@@ -246,8 +248,32 @@ export const init = memoize(async (): Promise<void> => {
       }
     }
 
-    // Set up git-bash if relevant
+    // Set up shell on Windows.
+    // When git-bash is not found, PowerShell is a fully-supported fallback —
+    // all non-bash tools (including PowerShellTool) remain available. Only
+    // exit when NEITHER bash NOR PowerShell exists on the system.
     setShellIfWindows()
+    if (getPlatform() === 'windows' && !findGitBashPath()) {
+      if (!isPowerShellToolEnabled()) {
+        process.stderr.write(
+          'Claude Code on Windows requires a shell tool. Git Bash was not found and the PowerShell tool is disabled (CLAUDE_CODE_USE_POWERSHELL_TOOL=0).\n' +
+            '  - Install Git for Windows: https://git-scm.com/downloads/win, or\n' +
+            '  - Remove CLAUDE_CODE_USE_POWERSHELL_TOOL from your environment or settings.\n',
+        )
+        // eslint-disable-next-line custom-rules/no-process-exit
+        process.exit(1)
+      }
+      if ((await getCachedPowerShellPath()) === null) {
+        process.stderr.write(
+          'Claude Code on Windows requires either Git for Windows (for bash) or PowerShell. Install one of:\n' +
+            '  - Git for Windows: https://git-scm.com/downloads/win\n' +
+            '  - PowerShell 7: https://aka.ms/powershell\n' +
+            'Or set CLAUDE_CODE_GIT_BASH_PATH to your bash.exe location.\n',
+        )
+        // eslint-disable-next-line custom-rules/no-process-exit
+        process.exit(1)
+      }
+    }
 
     // Register LSP manager cleanup (initialization happens in main.tsx after --plugin-dir is processed)
     registerCleanup(shutdownLspServerManager)

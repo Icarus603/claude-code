@@ -83,19 +83,33 @@ function findExecutable(executable: string): string | null {
  * If Windows, set the SHELL environment variable to git-bash path.
  * This is used by BashTool and Shell.ts for user shell commands.
  * COMSPEC is left unchanged for system process execution.
+ *
+ * When git-bash is not found, SHELL is left unset (or at its prior value).
+ * The bash execution path will surface a clear error when a bash command is
+ * actually run; PowerShell commands and non-shell tools remain fully usable.
  */
 export function setShellIfWindows(): void {
   if (getPlatform() === 'windows') {
     const gitBashPath = findGitBashPath()
-    process.env.SHELL = gitBashPath
-    logForDebugging(`Using bash path: "${gitBashPath}"`)
+    if (gitBashPath) {
+      process.env.SHELL = gitBashPath
+      logForDebugging(`Using bash path: "${gitBashPath}"`)
+    } else {
+      logForDebugging(
+        'Git Bash not found — bash commands will fail; PowerShell and other tools remain available.',
+        { level: 'warn' },
+      )
+    }
   }
 }
 
 /**
- * Find the path where `bash.exe` included with git-bash exists, exiting the process if not found.
+ * Find the path where `bash.exe` included with git-bash exists.
+ * Returns null when git-bash is not found — callers decide whether
+ * that is fatal for their specific use case (e.g. a bash hook fails,
+ * but PowerShell hooks and non-shell tools keep working).
  */
-export const findGitBashPath = memoize((): string => {
+export const findGitBashPath = memoize((): string | null => {
   if (process.env.CLAUDE_CODE_GIT_BASH_PATH) {
     if (checkPathExists(process.env.CLAUDE_CODE_GIT_BASH_PATH)) {
       return process.env.CLAUDE_CODE_GIT_BASH_PATH
@@ -103,8 +117,7 @@ export const findGitBashPath = memoize((): string => {
     console.error(
       `Claude Code was unable to find CLAUDE_CODE_GIT_BASH_PATH path "${process.env.CLAUDE_CODE_GIT_BASH_PATH}"`,
     )
-    // eslint-disable-next-line custom-rules/no-process-exit
-    process.exit(1)
+    return null
   }
 
   const gitPath = findExecutable('git')
@@ -115,11 +128,7 @@ export const findGitBashPath = memoize((): string => {
     }
   }
 
-  console.error(
-    'Claude Code on Windows requires git-bash (https://git-scm.com/downloads/win). If installed but not in PATH, set environment variable pointing to your bash.exe, similar to: CLAUDE_CODE_GIT_BASH_PATH=C:\\Program Files\\Git\\bin\\bash.exe',
-  )
-  // eslint-disable-next-line custom-rules/no-process-exit
-  process.exit(1)
+  return null
 })
 
 /** Convert a Windows path to a POSIX path using pure JS. */

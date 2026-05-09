@@ -1130,14 +1130,6 @@ async function execCommandHook(
   //   '-Command', cmd]) — explicit argv, no shell option. -NoProfile
   //   skips user profile scripts (faster, deterministic).
   //   -NonInteractive fails fast instead of prompting.
-  //
-  // The Git Bash hard-exit in findGitBashPath() is still in place for
-  // bash hooks. PowerShell hooks never call it, so a Windows user with
-  // only pwsh and shell: 'powershell' on every hook could in theory run
-  // without Git Bash — but init.ts still calls setShellIfWindows() on
-  // startup, which will exit first. Relaxing that is phase 1 of the
-  // design's implementation order (separate PR).
-
   // SECURITY: Apply network-only sandbox to hook commands when sandboxing is enabled.
   // Hooks execute arbitrary shell commands from settings.json without going
   // through the Bash tool's permission prompt. Unlike the full Bash sandbox,
@@ -1207,7 +1199,13 @@ async function execCommandHook(
   } else {
     // On Windows, use Git Bash explicitly (cmd.exe can't run bash syntax).
     // On other platforms, shell: true uses /bin/sh.
-    const shell = isWindows ? findGitBashPath() : true
+    // When git-bash is absent, fail at runtime (PowerShell hooks bypass this).
+    if (isWindows && !findGitBashPath()) {
+      throw new Error(
+        `Hook "${hook.command}" requires git-bash. Install: https://git-scm.com/downloads/win, set CLAUDE_CODE_GIT_BASH_PATH, or use "shell":"powershell".`,
+      )
+    }
+    const shell = isWindows ? findGitBashPath()! : true
     child = spawn(sandboxedCommand, [], {
       env: envVars,
       cwd: safeCwd,
