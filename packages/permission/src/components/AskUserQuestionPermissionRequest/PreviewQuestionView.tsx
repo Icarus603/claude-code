@@ -228,8 +228,14 @@ export function PreviewQuestionView({
       }
 
       if (isInNotesInput) {
-        // In notes input mode, handle escape to exit back to option navigation
+        // In notes input mode, intercept escape + enter as a fallback
+        // in case the EventEmitter-phase (useInput) handlers consume
+        // them before they reach TextInput. See the commit message for
+        // the full event-dispatch chain analysis.
         if (e.key === 'escape') {
+          e.preventDefault()
+          handleNotesExit()
+        } else if (e.key === 'return') {
           e.preventDefault()
           handleNotesExit()
         }
