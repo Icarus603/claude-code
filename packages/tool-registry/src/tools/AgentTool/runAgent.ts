@@ -416,7 +416,7 @@ export async function* runAgent({
       }
     }
 
-    // Set flag to auto-deny prompts for agents that can't show UI
+    // Set flag to auto-deny prompts for agents that can't show UI.
     // Use explicit canShowPermissionPrompts if provided, otherwise:
     //   - bubble mode: always show prompts (bubbles to parent terminal)
     //   - default: !isAsync (sync agents show prompts, async agents don't)

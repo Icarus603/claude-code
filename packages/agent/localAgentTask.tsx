@@ -27,7 +27,7 @@ import {
 } from './abortController.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { getToolSearchOrReadInfo } from '@claude-code/tool-registry/collapseReadSearch.js'
-import { enqueuePendingNotification } from './messageQueueManager.js'
+import { enqueuePendingNotification, recheckCommandQueue } from './messageQueueManager.js'
 import { getAgentTranscriptPath } from '@claude-code/storage/sessionStorage.js'
 import {
   evictTaskOutput,
@@ -343,6 +343,12 @@ export function enqueueAgentNotification({
 </${TASK_NOTIFICATION_TAG}>`
 
   enqueuePendingNotification({ value: message, mode: 'task-notification' })
+
+  // Force the REPL's useQueueProcessor to re-check the command queue.
+  // Without this, notifications enqueued while the parent query is active
+  // can stall until the next user action — useSyncExternalStore in Ink's
+  // reconciler may not trigger immediately on module-level signal changes.
+  recheckCommandQueue()
 }
 
 /**

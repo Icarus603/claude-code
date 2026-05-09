@@ -1023,7 +1023,11 @@ export const AgentTool = buildTool({
             getWorktreeResult: cleanupWorktreeIfNeeded,
           }),
         ),
-      )
+      ).catch((error: unknown) => {
+        logForDebugging(
+          `[AgentTool] runAsyncAgentLifecycle failed: ${String(error)}`,
+        )
+      })
 
       const canReadOutputFile = toolUseContext.options.tools.some(
         t =>
