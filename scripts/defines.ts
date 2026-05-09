@@ -49,8 +49,5 @@ export function getMacroDefines(): Record<string, string> {
     'process.env.NODE_ENV': JSON.stringify(
       isDevBuild ? 'development' : 'production',
     ),
-    // ccb is the first-party build — single maintainer, operator-trusted,
-    // no multi-tenant concerns. All 326 USER_TYPE gates flip appropriately.
-    'process.env.USER_TYPE': JSON.stringify('ant'),
   }
 }
