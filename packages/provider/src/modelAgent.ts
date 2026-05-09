@@ -10,7 +10,11 @@ import {
   getRuntimeMainLoopModel,
   parseUserSpecifiedModel,
 } from './model.js'
-import { getAPIProvider } from './providers.js'
+import {
+  getAPIProvider,
+  resolveConnectionForModel,
+} from './providers.js'
+import { composeModelId, unpackModelId } from './connections.js'
 import { readEnv } from '@claude-code/config/env/utils'
 
 export const AGENT_MODEL_OPTIONS = [...MODEL_ALIASES, 'inherit'] as const
@@ -48,6 +52,61 @@ export function getAgentModel(
     return parseUserSpecifiedModel(readEnv('CLAUDE_CODE_SUBAGENT_MODEL'))
   }
 
+  // Unpack the parent model to detect which connection it routes through.
+  // Non-Anthropic connections (ant-compatible URLs, OpenAI, Gemini, Codex)
+  // need subagent model resolution to follow the same connection so API
+  // calls land on the correct endpoint with the correct auth.
+  const { connectionId: parentConnId } = unpackModelId(parentModel)
+  const parentConn = parentConnId
+    ? resolveConnectionForModel(parentModel)
+    : undefined
+
+  // Codex connections use a completely different model namespace (GPT).
+  // Tier aliases (haiku/sonnet/opus) have no equivalent — always inherit
+  // the parent's model so the Codex fetch adapter receives a valid GPT slug.
+  if (parentConn?.protocol === 'codex') {
+    return parentModel
+  }
+
+  /**
+   * Resolve a tier alias (haiku/sonnet/opus) through the parent connection's
+   * protocol-specific env vars before falling back to the standard
+   * parseUserSpecifiedModel path.
+   *
+   * getDefault{Haiku,Sonnet,Opus}Model() uses the global getAPIProvider() to
+   * decide which env vars to check. When connections exist, getAPIProvider()
+   * always returns 'firstParty', so OPENAI_DEFAULT_{HAIKU,SONNET,OPUS}_MODEL
+   * and GEMINI_DEFAULT_{HAIKU,SONNET,OPUS}_MODEL are never checked — only
+   * ANTHROPIC_DEFAULT_* is. This helper checks the parent connection's actual
+   * protocol first, then falls through to the standard resolution.
+   */
+  const resolveModelAlias = (alias: string): string => {
+    const connProtocol = parentConn?.protocol
+    // Protocol-specific env var tier map
+    const tierMap: Record<string, Record<string, string>> = {
+      openai: {
+        haiku: 'OPENAI_DEFAULT_HAIKU_MODEL',
+        sonnet: 'OPENAI_DEFAULT_SONNET_MODEL',
+        opus: 'OPENAI_DEFAULT_OPUS_MODEL',
+      },
+      gemini: {
+        haiku: 'GEMINI_DEFAULT_HAIKU_MODEL',
+        sonnet: 'GEMINI_DEFAULT_SONNET_MODEL',
+        opus: 'GEMINI_DEFAULT_OPUS_MODEL',
+      },
+    }
+    if (connProtocol && tierMap[connProtocol]) {
+      const envVar = tierMap[connProtocol][alias]
+      if (envVar) {
+        const value = readEnv(envVar)
+        if (value) return value
+      }
+    }
+    // Fall through: standard resolution checks ANTHROPIC_DEFAULT_* env vars
+    // (which are checked regardless of provider) and built-in defaults.
+    return parseUserSpecifiedModel(alias)
+  }
+
   const parentRegionPrefix = getBedrockRegionPrefix(parentModel)
 
   const applyParentRegionPrefix = (
@@ -61,12 +120,33 @@ export function getAgentModel(
     return resolvedModel
   }
 
+  /**
+   * After resolving a subagent model, ensure it carries the parent's connection
+   * prefix so routing (resolveConnectionForModel) finds the right API endpoint.
+   *
+   * Without this, a bare alias resolution (e.g. 'haiku' → 'claude-haiku-4-5')
+   * has no connection prefix and falls through the connection lookup, landing on
+   * the global fallback provider instead of the user's configured connection.
+   *
+   * The model name is already correct — resolved through the user's env var
+   * mappings (ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU}_MODEL, OPENAI_DEFAULT_*,
+   * GEMINI_DEFAULT_*) — we only add the routing prefix.
+   */
+  const repackWithParentConnection = (resolvedModel: string): string => {
+    if (!parentConnId) return resolvedModel
+    const { connectionId: resultConnId } = unpackModelId(resolvedModel)
+    if (resultConnId) return resolvedModel // already has a prefix
+    return composeModelId(parentConnId, resolvedModel)
+  }
+
   if (toolSpecifiedModel) {
     if (aliasMatchesParentTier(toolSpecifiedModel, parentModel)) {
       return parentModel
     }
-    const model = parseUserSpecifiedModel(toolSpecifiedModel)
-    return applyParentRegionPrefix(model, toolSpecifiedModel)
+    const model = resolveModelAlias(toolSpecifiedModel)
+    return repackWithParentConnection(
+      applyParentRegionPrefix(model, toolSpecifiedModel),
+    )
   }
 
   const agentModelWithExp = agentModel ?? getDefaultSubagentModel()
@@ -82,8 +162,10 @@ export function getAgentModel(
   if (aliasMatchesParentTier(agentModelWithExp, parentModel)) {
     return parentModel
   }
-  const model = parseUserSpecifiedModel(agentModelWithExp)
-  return applyParentRegionPrefix(model, agentModelWithExp)
+  const model = resolveModelAlias(agentModelWithExp)
+  return repackWithParentConnection(
+    applyParentRegionPrefix(model, agentModelWithExp),
+  )
 }
 
 /**
