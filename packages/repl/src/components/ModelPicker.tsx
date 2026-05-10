@@ -51,6 +51,11 @@ export type Props = {
   /** Overrides the dim header line below "Select model". */
   headerText?: string
   /**
+   * When true, prepend a null-value "Default (leader's model)" option
+   * even when connections are configured. Used by the teammate model picker.
+   */
+  showDefaultOption?: boolean
+  /**
    * When true, persist the effortLevel to userSettings on selection. Default
    * is false — the picker is session-only by default, matching the contract
    * for `/model` and `/effort` slash commands. Settings → Model and similar
@@ -70,6 +75,7 @@ export function ModelPicker({
   showFastModeNotice,
   headerText,
   persistToSettings,
+  showDefaultOption,
 }: Props): React.ReactNode {
   const setAppState = useSetAppState()
   const exitState = useExitOnCtrlCDWithKeybindings()
@@ -94,8 +100,8 @@ export function ModelPicker({
 
   // Memoize all derived values to prevent re-renders
   const modelOptions = useMemo(
-    () => getModelOptions(isFastMode ?? false),
-    [isFastMode],
+    () => getModelOptions(isFastMode ?? false, { includeDefaultOption: showDefaultOption }),
+    [isFastMode, showDefaultOption],
   )
 
   // Ensure the initial value is in the options list

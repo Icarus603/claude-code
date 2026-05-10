@@ -1858,6 +1858,7 @@ export function Config({
         <>
           <ModelPicker
             initial={globalConfig.teammateDefaultModel ?? null}
+            showDefaultOption
             headerText="Default model for newly spawned teammates. The leader can override via the tool call's model parameter."
             onSelect={(model, _effort) => {
               setShowSubmenu(null)

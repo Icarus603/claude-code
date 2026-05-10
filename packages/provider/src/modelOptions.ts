@@ -585,7 +585,10 @@ function getConnectionModelOptions(): ModelOption[] {
   return options
 }
 
-export function getModelOptions(fastMode = false): ModelOption[] {
+export function getModelOptions(
+  fastMode = false,
+  opts?: { includeDefaultOption?: boolean },
+): ModelOption[] {
   // If connections are configured, use connection-based model list.
   // No separate "Default (…)" entry is added — each connection's first
   // model is already in the list, and the picker marks the current model
@@ -594,7 +597,19 @@ export function getModelOptions(fastMode = false): ModelOption[] {
   // supported") and created a visual duplicate of the first model.
   const connectionOptions = getConnectionModelOptions()
   if (connectionOptions.length > 0) {
-    return filterModelOptionsByAllowlist(connectionOptions)
+    const options = filterModelOptionsByAllowlist(connectionOptions)
+    if (opts?.includeDefaultOption) {
+      // Teammate model picker needs a null-value "Default (leader's model)"
+      // option so users can opt into following the leader rather than
+      // hardcoding a specific model.
+      options.unshift({
+        value: null,
+        label: "Default (leader's model)",
+        description:
+          "Use the same model as the leader. Teammates follow the leader's model choice.",
+      })
+    }
+    return options
   }
 
   // Legacy path: no connections configured, use old provider-based options
