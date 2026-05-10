@@ -12,6 +12,10 @@ import { FILE_READ_TOOL_NAME } from '@claude-code/tool-registry/tools/FileReadTo
 import { FILE_EDIT_TOOL_NAME } from '@claude-code/tool-registry/tools/FileEditTool/constants.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
 import { TASK_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TaskCreateTool/constants.js'
+import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCreateTool/constants.js'
+import { SEND_MESSAGE_TOOL_NAME } from '@claude-code/tool-registry/tools/SendMessageTool/constants.js'
+import { TEAM_DELETE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamDeleteTool/constants.js'
+import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/constants.js'
 import type { Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Command } from '@claude-code/command-runtime/types'
 import { BASH_TOOL_NAME } from '@claude-code/tool-registry/tools/BashTool/toolName.js'
@@ -372,6 +376,10 @@ function getAgentToolSection(): string {
     : `Use the ${AGENT_TOOL_NAME} tool with specialized agents when the task at hand matches the agent's description. Subagents are valuable for parallelizing independent queries or for protecting the main context window from excessive results, but they should not be used excessively when not needed. Importantly, avoid duplicating work that subagents are already doing - if you delegate research to a subagent, do not also perform the same searches yourself.`
 }
 
+function getTeamGuidanceSection(): string {
+  return `Team tools (${TEAM_CREATE_TOOL_NAME}, ${TEAM_DELETE_TOOL_NAME}, ${SEND_MESSAGE_TOOL_NAME}, and Task tools) are available for coordinating multiple agents into a distributed multi-agent system. Team agents share a task list and communicate via ${SEND_MESSAGE_TOOL_NAME}. Use ${TOOL_SEARCH_TOOL_NAME} when you need to discover the full workflow — the deferred-tool surface only lists tool names, not descriptions. Prefer teams over subagents when a task can be decomposed into independent pieces that benefit from parallel execution with inter-agent communication.`
+}
+
 /**
  * Guidance for the skill_discovery attachment ("Skills relevant to your
  * task:") and the DiscoverSkills tool. Shared between the main-session
@@ -408,15 +416,23 @@ export function getSessionSpecificGuidanceSection(
 ): string | null {
   const hasAgentTool = enabledTools.has(AGENT_TOOL_NAME)
 
+  const hasTeamTools =
+    enabledTools.has(TEAM_CREATE_TOOL_NAME as string) &&
+    enabledTools.has(SEND_MESSAGE_TOOL_NAME as string)
+
   // All other turn-1 bullets the fork used to add (AskUserQuestion denial,
   // `! <command>` shell hint, /<skill-name> shorthand, Glob/Grep vs Explore,
-  // Swarm 7-step workflow, Verification contract) are redundant: the model
-  // sees those tools in the deferred-tool surface or in the Agent tool's
-  // own subagent_type list, and each tool's own description carries its
-  // workflow guidance. Upstream v2.1.128 carries none of these bullets.
-  const items = [hasAgentTool ? getAgentToolSection() : null].filter(
-    item => item !== null,
-  )
+  // Verification contract) are redundant: the model sees those tools in the
+  // deferred-tool surface or in the Agent tool's own subagent_type list, and
+  // each tool's own description carries its workflow guidance.
+  // Upstream v2.1.128 carries none of these bullets.
+  // Team tools ARE listed here because they're deferred-only — the model sees
+  // just the names without descriptions, and won't know to search for them
+  // unless prompted.
+  const items = [
+    hasAgentTool ? getAgentToolSection() : null,
+    hasTeamTools ? getTeamGuidanceSection() : null,
+  ].filter(item => item !== null)
 
   if (items.length === 0) return null
   return ['# Session-specific guidance', ...prependBullets(items)].join('\n')
