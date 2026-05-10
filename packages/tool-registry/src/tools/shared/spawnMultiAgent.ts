@@ -74,14 +74,14 @@ import { isCustomAgent } from '../AgentTool/loadAgentsDir.js'
 
 function getDefaultTeammateModel(leaderModel: string | null): string {
   const configured = getGlobalConfig().teammateDefaultModel
-  if (configured === null) {
-    // User picked "Default" in the /config picker — follow the leader.
+  if (configured === null || configured === undefined) {
+    // No explicit model configured — follow the leader.
+    // undefined follows the leader too, not hardcoded Opus; ant's
+    // backward-compat default (hardcoded Opus) doesn't apply to ccb
+    // where non-Anthropic connections have no Claude models.
     return leaderModel ?? getHardcodedTeammateModelFallback()
   }
-  if (configured !== undefined) {
-    return parseUserSpecifiedModel(configured)
-  }
-  return getHardcodedTeammateModelFallback()
+  return parseUserSpecifiedModel(configured)
 }
 
 /**

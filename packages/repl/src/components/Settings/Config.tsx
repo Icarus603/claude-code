@@ -96,7 +96,6 @@ import {
   getCliTeammateModeOverride,
   clearCliTeammateModeOverride,
 } from '@claude-code/swarm'
-import { getHardcodedTeammateModelFallback } from '@claude-code/swarm'
 import { useSearchInput } from '@anthropic/ink/search'
 import { useTerminalSize } from '@anthropic/ink'
 import {
@@ -2297,9 +2296,7 @@ export function Config({
 }
 
 function teammateModelDisplayString(value: string | null | undefined): string {
-  if (value === undefined) {
-    return modelDisplayString(getHardcodedTeammateModelFallback())
-  }
+  if (value === undefined) return "Default (leader's model)"
   if (value === null) return "Default (leader's model)"
   return modelDisplayString(value)
 }
