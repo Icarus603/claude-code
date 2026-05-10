@@ -259,7 +259,11 @@ function enqueueMainSessionNotification(
 <${SUMMARY_TAG}>${summary}</${SUMMARY_TAG}>
 </${TASK_NOTIFICATION_TAG}>`
 
-  enqueuePendingNotification({ value: message, mode: 'task-notification' })
+  enqueuePendingNotification({
+    value: message,
+    mode: 'task-notification',
+    priority: 'next',
+  })
 }
 
 /**

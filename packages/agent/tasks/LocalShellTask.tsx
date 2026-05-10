@@ -219,7 +219,7 @@ function enqueueShellNotification(
   enqueuePendingNotification({
     value: message,
     mode: 'task-notification',
-    priority: feature('MONITOR_TOOL') ? 'next' : 'later',
+    priority: 'next',
     agentId,
   })
 }
