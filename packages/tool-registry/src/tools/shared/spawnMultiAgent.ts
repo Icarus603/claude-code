@@ -25,6 +25,7 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { parseUserSpecifiedModel } from '@claude-code/provider/model.js'
+import { composeModelId, unpackModelId } from '@claude-code/provider/connections.js'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
 import { isTmuxAvailable } from '@claude-code/swarm'
 import {
@@ -90,16 +91,38 @@ function getDefaultTeammateModel(leaderModel: string | null): string {
  * have access". If leader model is null (not yet set), falls through to the
  * default.
  *
+ * After resolution, the result is repacked with the leader's connection
+ * prefix so spawned processes route API calls to the correct endpoint.
+ * Without this, non-Anthropic connections (ant-compatible URLs, OpenAI,
+ * Gemini) resolve to bare Claude model names that don't match any
+ * connection and fall through to the Anthropic first-party API.
+ *
  * Exported for testing.
  */
 export function resolveTeammateModel(
   inputModel: string | undefined,
   leaderModel: string | null,
 ): string {
-  if (inputModel === 'inherit') {
-    return leaderModel ?? getDefaultTeammateModel(leaderModel)
+  const resolved =
+    inputModel === 'inherit'
+      ? leaderModel ?? getDefaultTeammateModel(leaderModel)
+      : inputModel ?? getDefaultTeammateModel(leaderModel)
+
+  // Repack with leader's connection prefix so the spawned process inherits
+  // the same routing. Leader model is already packed (e.g.
+  // 'claude-account:claude-opus-4-7'); resolved model may be bare
+  // (e.g. 'claude-opus-4-7' from getHardcodedTeammateModelFallback).
+  if (leaderModel) {
+    const { connectionId: leaderConnId } = unpackModelId(leaderModel)
+    if (leaderConnId) {
+      const { connectionId: resolvedConnId } = unpackModelId(resolved)
+      if (!resolvedConnId) {
+        return composeModelId(leaderConnId, resolved)
+      }
+    }
   }
-  return inputModel ?? getDefaultTeammateModel(leaderModel)
+
+  return resolved
 }
 
 // ============================================================================

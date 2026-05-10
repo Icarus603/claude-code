@@ -131,7 +131,7 @@
   "packages/tool-registry/src/tools/PowerShellTool/powershellSecurity.ts": 1091,
   "packages/tool-registry/src/tools/PowerShellTool/readOnlyValidation.ts": 1824,
   "packages/tool-registry/src/tools/SkillTool/SkillTool.ts": 1110,
-  "packages/tool-registry/src/tools/shared/spawnMultiAgent.ts": 1077,
+  "packages/tool-registry/src/tools/shared/spawnMultiAgent.ts": 1100,
   "packages/tool-registry/src/words.ts": 801,
   "packages/updater/src/nativeInstaller/installer.ts": 1707,
   "packages/voice/src/hooks/useVoice.ts": 1145
