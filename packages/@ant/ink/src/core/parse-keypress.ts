@@ -535,11 +535,11 @@ function decodeModifier(modifier: number): {
 }
 
 /**
- * Map keycode to key name for modifyOtherKeys/CSI u sequences.
- * Handles both ASCII keycodes and Kitty keyboard protocol functional keys.
- *
- * Numpad codepoints are from Unicode Private Use Area, defined at:
- * https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
+ * Map keycode to key name for modifyOtherKeys/CSI u sequences. Handles
+ * ASCII + Kitty functional keys (Unicode PUA, see kitty keyboard-protocol).
+ * Returns a **keybinding identifier**, not a printable char — letters are
+ * always lowercase (Shift+A → 'a', shift flag separate). Printable
+ * derivation lives in input-event.ts:deriveShiftedInput.
  */
 function keycodeToName(keycode: number): string | undefined {
   switch (keycode) {

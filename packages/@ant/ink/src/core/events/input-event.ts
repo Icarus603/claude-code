@@ -1,6 +1,36 @@
 import { nonAlphanumericKeys, type ParsedKey } from '../parse-keypress.js'
 import { Event } from './event.js'
 
+/**
+ * Derive the printable character a user expects to type from a key that
+ * came in via CSI u / modifyOtherKeys.
+ *
+ * Background: `keypress.name` from parse-keypress.ts is a keybinding
+ * identifier — letters are always lowercase, with `shift` carried as a
+ * separate flag. That's correct for `key.name === 'a'` style handlers,
+ * but wrong for text insertion: Shift+A should insert `'A'`, not `'a'`.
+ *
+ * On the raw `s.length === 1 && s >= 'A' && s <= 'Z'` path the original
+ * sequence preserves case (input-event.ts uses `keypress.sequence`), so
+ * shift+letter works without intervention. But the CSI u and
+ * modifyOtherKeys branches discard the sequence (it's an unprintable
+ * escape sequence like `\x1b[27;2;65~`) and substitute `keypress.name`
+ * — which is the lowercase keybinding id. Without this derivation the
+ * 'A' becomes an 'a' the user can't fix by holding shift harder.
+ *
+ * Letter casing only — number-row shift symbols (Shift+1 → '!') depend
+ * on keyboard layout and aren't carried in the protocol. Terminals that
+ * implement modifyOtherKeys correctly already send the shifted symbol
+ * directly (keycode 33 for '!'), bypassing this path. The lower-letter
+ * gap is the actual reported failure.
+ */
+function deriveShiftedInput(input: string, shift: boolean): string {
+  if (!shift) return input
+  if (input.length !== 1) return input
+  if (input >= 'a' && input <= 'z') return input.toUpperCase()
+  return input
+}
+
 export type Key = {
   upArrow: boolean
   downArrow: boolean
@@ -118,13 +148,16 @@ function parseKey(keypress: ParsedKey): [Key, string] {
       // 'space' → ' '; 'escape' → '' (key.escape carries it;
       // processedAsSpecialSequence bypasses the nonAlphanumericKeys
       // clear below, so we must handle it explicitly here);
-      // otherwise use key name.
+      // otherwise use key name. `keypress.name` from CSI u is a
+      // keybinding identifier (always lowercase for letters), so we
+      // apply shift-derivation to recover the printable character —
+      // otherwise Shift+A would insert 'a'. See deriveShiftedInput.
       input =
         keypress.name === 'space'
           ? ' '
           : keypress.name === 'escape'
             ? ''
-            : keypress.name
+            : deriveShiftedInput(keypress.name, keypress.shift)
     }
     processedAsSpecialSequence = true
   }
@@ -141,12 +174,14 @@ function parseKey(keypress: ParsedKey): [Key, string] {
       // guards against future terminal behavior.
       input = ''
     } else {
+      // Apply shift-derivation for the same reason as the CSI u branch
+      // above — without it, Shift+A via modifyOtherKeys inserts 'a'.
       input =
         keypress.name === 'space'
           ? ' '
           : keypress.name === 'escape'
             ? ''
-            : keypress.name
+            : deriveShiftedInput(keypress.name, keypress.shift)
     }
     processedAsSpecialSequence = true
   }
