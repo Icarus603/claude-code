@@ -52,6 +52,7 @@ export function getAPIProvider(): APIProvider {
   const modelType = getInitialSettings().modelType
   if (modelType === 'openai') return 'openai'
   if (modelType === 'gemini') return 'gemini'
+  if (modelType === 'codex') return 'codex'
 
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) return 'bedrock'
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'

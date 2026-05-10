@@ -60,6 +60,7 @@ const call: LocalCommandCall = async (args, context) => {
     'anthropic',
     'openai',
     'gemini',
+    'codex',
     'bedrock',
     'vertex',
     'foundry',
@@ -103,9 +104,9 @@ const call: LocalCommandCall = async (args, context) => {
   }
 
   // Handle different provider types
-  // - 'anthropic', 'openai', 'gemini' are stored in settings.json (persistent)
+  // - 'anthropic', 'openai', 'gemini', 'codex' are stored in settings.json (persistent)
   // - 'bedrock', 'vertex', 'foundry' are env-only (do NOT touch settings.json)
-  if (arg === 'anthropic' || arg === 'openai' || arg === 'gemini') {
+  if (arg === 'anthropic' || arg === 'openai' || arg === 'gemini' || arg === 'codex') {
     // Clear any cloud provider env vars to avoid conflicts
     delete readEnv('CLAUDE_CODE_USE_BEDROCK')
     delete readEnv('CLAUDE_CODE_USE_VERTEX')
@@ -137,9 +138,9 @@ const provider = {
   type: 'local',
   name: 'provider',
   description:
-    'Switch API provider (anthropic/openai/gemini/bedrock/vertex/foundry)',
+    'Switch API provider (anthropic/openai/gemini/codex/bedrock/vertex/foundry)',
   aliases: ['api'],
-  argumentHint: '[anthropic|openai|gemini|bedrock|vertex|foundry|unset]',
+  argumentHint: '[anthropic|openai|gemini|codex|bedrock|vertex|foundry|unset]',
   supportsNonInteractive: true,
   load: () => Promise.resolve({ call }),
 } satisfies Command
