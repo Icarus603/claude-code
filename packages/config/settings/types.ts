@@ -391,9 +391,8 @@ export const SettingsSchema = lazySchema(() =>
         .describe(
           'API provider type. "anthropic" uses the Anthropic API (default), ' +
             '"openai" uses the OpenAI Chat Completions API (/v1/chat/completions), ' +
-            '"gemini" uses the Google Gemini API, ' +
-            '"codex" uses OpenAI Codex (ChatGPT subscription). Configure provider-specific ' +
-            'env vars (OPENAI_*/GEMINI_*) accordingly.',
+            '"gemini" uses the Google Gemini API, "codex" uses OpenAI Codex ' +
+            '(ChatGPT subscription). Configure provider-specific env vars (OPENAI_*/GEMINI_*) accordingly.',
         ),
       model: z
         .string()
