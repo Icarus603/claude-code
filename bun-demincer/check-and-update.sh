@@ -103,15 +103,18 @@ fi
 if [[ -n "$decoded_max" ]]; then
     newest="$(printf '%s\n%s\n' "$local_max" "$decoded_max" | sort -V | tail -1)"
     if [[ "$newest" == "$decoded_max" && "$local_max" == "$decoded_max" ]]; then
-        # equal — caught up
+        # equal — caught up on decoding, but still run analyze to fill any
+        # report gaps (idempotent — skips pairs that already have analysis.md).
         log "up to date (local=$local_max, decoded=$decoded_max)"
+        "$ROOT/analyze.sh" --all-pairs
         exit 0
     fi
     if [[ "$newest" == "$decoded_max" ]]; then
         # decoded > local — happens after manual decode of a version no
         # longer present in versions/ (auto-updater pruned older binaries).
-        # Not an error, just nothing to do.
-        log "decoded ahead of local (local=$local_max, decoded=$decoded_max) — nothing to do"
+        # Still run analyze to catch any missing reports.
+        log "decoded ahead of local (local=$local_max, decoded=$decoded_max) — nothing to decode"
+        "$ROOT/analyze.sh" --all-pairs
         exit 0
     fi
 fi
