@@ -47,10 +47,17 @@ grep -rl 'managed-agents-2026-04-01' work/claude-code-$B/decoded/
 ### 1b · New feature flags (`tengu_*`)
 
 ```bash
+# NOTE: regex must include digits — flags like tengu_porch_bell_9f or
+# tengu_loud_sugary_rock2 are common (versioned/cohort-suffixed). If you
+# use `[a-z_]+` you will miss these.
 comm -13 \
-    <(grep -rohE 'tengu_[a-z_]+' work/claude-code-$A/decoded/ | sort -u) \
-    <(grep -rohE 'tengu_[a-z_]+' work/claude-code-$B/decoded/ | sort -u)
+    <(grep -rohE 'tengu_[a-z][a-z_0-9]+' work/claude-code-$A/decoded/ | sort -u) \
+    <(grep -rohE 'tengu_[a-z][a-z_0-9]+' work/claude-code-$B/decoded/ | sort -u)
 ```
+
+Also run the *removed* direction (set `comm -23`) — flag renames (e.g.
+`tengu_loud_sugary_rock` → `tengu_loud_sugary_rock2`) appear as one new +
+one removed and the pair is the actual story.
 
 For each new flag, find the module(s) that read it:
 ```bash
@@ -67,6 +74,19 @@ comm -13 \
         work/claude-code-$A/decoded/ | sort -u) \
     <(grep -rohE '(CLAUDE_CODE|ANTHROPIC|CCB)_[A-Z][A-Z_0-9]*' \
         work/claude-code-$B/decoded/ | sort -u)
+```
+
+**Caveat — outbound env vars vs inbound env vars.** The above catches
+env vars that ant *reads* (`process.env.CLAUDE_CODE_X`). It misses env
+vars that ant *sets* on a child process (e.g. `CLAUDE_EFFORT` in
+v2.1.133). To catch those, also grep for assignment patterns:
+
+```bash
+# Outbound: env vars ant exposes to child processes / hooks / status line
+comm -13 \
+    <(grep -rohE 'CLAUDE_[A-Z][A-Z_0-9]* = ' work/claude-code-$A/decoded/ | sort -u) \
+    <(grep -rohE 'CLAUDE_[A-Z][A-Z_0-9]* = ' work/claude-code-$B/decoded/ | sort -u)
+# Also useful: grep for `\${CLAUDE_X}` template-string usages and `env.X` field assignments
 ```
 
 ### 1d · New API paths
