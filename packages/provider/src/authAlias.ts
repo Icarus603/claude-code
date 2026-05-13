@@ -1510,6 +1510,17 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
       logEvent('tengu_oauth_token_refresh_lock_retry_limit_reached', {
         maxRetries: MAX_RETRIES,
       })
+      // Port of ant pt6 (1997.js): G6("oauth_token_refresh",
+      // "oauth_refresh_lock_timeout"). This is the "sad path" outcome event
+      // (tengu_feature_sad) that feeds the OAuth-refresh dashboard so SREs
+      // can distinguish a refresh that ran out of lock retries from a
+      // refresh that ran fine but the token didn't change.
+      logEvent('tengu_feature_sad', {
+        feature_name:
+          'oauth_token_refresh' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        error_code:
+          'oauth_refresh_lock_timeout' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
       return false
     }
     logError(err)
@@ -1517,6 +1528,16 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
       error: errorMessage(
         err,
       ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+    // Port of ant pt6 (1997.js): xH("oauth_token_refresh",
+    // "oauth_refresh_lock_error"). Distinct outcome from lock_timeout so
+    // dashboards can separate "lock contention exhausted retries" from
+    // "lock-acquire failed for some other fs reason".
+    logEvent('tengu_feature_bad', {
+      feature_name:
+        'oauth_token_refresh' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'oauth_refresh_lock_error' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     return false
   }
@@ -1583,8 +1604,23 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
     return false
   } finally {
     logEvent('tengu_oauth_token_refresh_lock_releasing', {})
-    await release()
-    logEvent('tengu_oauth_token_refresh_lock_released', {})
+    // Port of ant pt6 (1997.js) finally: a failing release MUST NOT
+    // propagate — the process is already past the refresh attempt; we
+    // just log and continue. Without this guard, an ELOCK NOTACQUIRED
+    // (sibling already released) would throw out of the finally and
+    // hide the real outcome. Emit a distinct telemetry event so prod can
+    // distinguish "release failed" from normal "release succeeded".
+    try {
+      await release()
+      logEvent('tengu_oauth_token_refresh_lock_released', {})
+    } catch (releaseError) {
+      logError(releaseError)
+      logEvent('tengu_oauth_token_refresh_lock_release_error', {
+        error: errorMessage(
+          releaseError,
+        ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
+    }
   }
 }
 
