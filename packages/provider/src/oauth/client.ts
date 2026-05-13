@@ -306,6 +306,7 @@ export async function refreshOAuthToken(
       config.oauthAccount?.billingType !== undefined &&
       config.oauthAccount?.accountCreatedAt !== undefined &&
       config.oauthAccount?.subscriptionCreatedAt !== undefined &&
+      config.oauthAccount?.ccOnboardingFlags !== undefined &&
       existing?.subscriptionType != null &&
       existing?.rateLimitTier != null
 
@@ -330,6 +331,16 @@ export async function refreshOAuthToken(
       }
       if (profileInfo.subscriptionCreatedAt !== undefined) {
         updates.subscriptionCreatedAt = profileInfo.subscriptionCreatedAt
+      }
+      // ant Bq_: only stamp the trial/seat fields when we actually fetched a
+      // rawProfile this turn (haveProfileAlready short-circuit produced no
+      // profile, so we must not clobber the stored seatTier with null).
+      if (profileInfo.rawProfile) {
+        updates.ccOnboardingFlags = profileInfo.ccOnboardingFlags
+        updates.claudeCodeTrialEndsAt = profileInfo.claudeCodeTrialEndsAt
+        updates.claudeCodeTrialDurationDays =
+          profileInfo.claudeCodeTrialDurationDays
+        updates.seatTier = profileInfo.seatTier
       }
       if (Object.keys(updates).length > 0) {
         saveGlobalConfig(current => ({
@@ -471,6 +482,10 @@ export async function fetchProfileInfo(accessToken: string): Promise<{
   billingType: BillingType | null
   accountCreatedAt?: string
   subscriptionCreatedAt?: string
+  seatTier: string | null
+  ccOnboardingFlags: Record<string, unknown>
+  claudeCodeTrialEndsAt: string | null
+  claudeCodeTrialDurationDays: number | null
   rawProfile?: OAuthProfileResponse
 }> {
   const profile = await getOauthProfileFromOauthToken(accessToken)
@@ -505,12 +520,22 @@ export async function fetchProfileInfo(accessToken: string): Promise<{
     billingType: BillingType | null
     accountCreatedAt?: string
     subscriptionCreatedAt?: string
+    seatTier: string | null
+    ccOnboardingFlags: Record<string, unknown>
+    claudeCodeTrialEndsAt: string | null
+    claudeCodeTrialDurationDays: number | null
   } = {
     subscriptionType,
     rateLimitTier: profile?.organization?.rate_limit_tier ?? null,
     hasExtraUsageEnabled:
       profile?.organization?.has_extra_usage_enabled ?? null,
     billingType: profile?.organization?.billing_type ?? null,
+    seatTier: profile?.organization?.seat_tier ?? null,
+    ccOnboardingFlags: profile?.organization?.cc_onboarding_flags ?? {},
+    claudeCodeTrialEndsAt:
+      profile?.organization?.claude_code_trial_ends_at ?? null,
+    claudeCodeTrialDurationDays:
+      profile?.organization?.claude_code_trial_duration_days ?? null,
   }
 
   if (profile?.account?.display_name) {

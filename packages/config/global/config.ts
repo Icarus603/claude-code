@@ -212,20 +212,19 @@ export type AccountInfo = {
   accountCreatedAt?: string
   subscriptionCreatedAt?: string
   seatTier?: string | null // enterprise PAYG vs flat-rate
+  ccOnboardingFlags?: Record<string, unknown>
+  claudeCodeTrialEndsAt?: string | null
+  claudeCodeTrialDurationDays?: number | null
 }
 
 export type AuthProtocol = 'anthropic' | 'openai' | 'codex' | 'gemini'
 
 /**
- * Reasoning effort levels surfaced in Claude Code's /effort picker.
- *
- * Mirrored here (not imported from @claude-code/agent/effort) because
- * config types must not depend on agent — the import direction is
- * agent → config. Keep in sync with EFFORT_LEVELS in
- * packages/agent/effort.ts. Codex /models returns its own
- * ReasoningEffort enum (none / minimal / low / medium / high / xhigh);
- * none / minimal are mapped out before persisting since /effort doesn't
- * surface them.
+ * Reasoning effort levels for /effort picker. Mirrored here (not imported
+ * from @claude-code/agent/effort) because config must not depend on agent.
+ * Keep in sync with EFFORT_LEVELS in packages/agent/effort.ts. Codex's
+ * /models returns none/minimal/low/medium/high/xhigh; we map out none/minimal
+ * before persisting (not surfaced in /effort).
  */
 export type ConnectionModelEffort = 'low' | 'medium' | 'high' | 'xhigh' | 'max'
 
