@@ -2319,22 +2319,23 @@ async function* executeHooks({
     return
   }
 
-  // Collect hook definitions for beta tracing telemetry
-  const hookDefinitionsJson = isBetaTracingEnabled()
+  // Collect hook definitions for beta tracing telemetry (only when beta is on,
+  // matches ant 4767.js:1171 — `let W = TX() && JA(), Z = W ? hH(...) : "[]"`)
+  const betaTracingOn = isBetaTracingEnabled()
+  const hookDefinitionsJson = betaTracingOn
     ? jsonStringify(getHookDefinitionsForTelemetry(matchingHooks))
     : '[]'
 
-  // Log hook execution start to OTEL (only for beta tracing)
-  if (isBetaTracingEnabled()) {
-    void logOTelEvent('hook_execution_start', {
-      hook_event: hookEvent,
-      hook_name: hookName,
-      num_hooks: String(matchingHooks.length),
-      managed_only: String(shouldAllowManagedHooksOnly()),
-      hook_definitions: hookDefinitionsJson,
-      hook_source: shouldAllowManagedHooksOnly() ? 'policySettings' : 'merged',
-    })
-  }
+  // ant 4767.js:1174 — hook_execution_start is UNCONDITIONAL; only the
+  // hook_definitions field is gated on beta tracing (`...(W && { hook_definitions: Z })`).
+  void logOTelEvent('hook_execution_start', {
+    hook_event: hookEvent,
+    hook_name: hookName,
+    num_hooks: String(matchingHooks.length),
+    managed_only: String(shouldAllowManagedHooksOnly()),
+    hook_source: shouldAllowManagedHooksOnly() ? 'policySettings' : 'merged',
+    ...(betaTracingOn && { hook_definitions: hookDefinitionsJson }),
+  })
 
   // Start hook span for beta tracing
   const hookSpan = startHookSpan(

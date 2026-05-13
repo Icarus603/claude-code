@@ -12,6 +12,14 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
+import {
+  logOTelEvent,
+  toolDetailsLoggingEnabled,
+} from '@claude-code/local-observability/telemetry'
+import {
+  hashPluginId,
+  getTelemetryPluginScope,
+} from '../../telemetry/pluginTelemetry.js'
 import { clearDumpState } from '@claude-code/provider/dumpPrompts.js'
 import type { AppStateLike as AppState } from '../../contracts.js'
 import type {
@@ -284,6 +292,17 @@ export function finalizeAgentTool(
     startTime: number
     agentType: string
     isAsync: boolean
+    /**
+     * The agent's `source` (built-in / plugin / setting source). Mirrors ant
+     * V36's `Y` (3660.js:175). Surfaced in `subagent_completed.agent.source`.
+     */
+    source?: string
+    /**
+     * For plugin-sourced agents, the plugin identity (name + marketplace).
+     * Mirrors ant V36's `w` (3660.js:176). Used to compute plugin_id_hash
+     * and the redacted plugin.name field on `subagent_completed`.
+     */
+    pluginInfo?: { name: string; marketplace?: string }
   },
 ): AgentToolResult {
   const {
@@ -293,6 +312,8 @@ export function finalizeAgentTool(
     startTime,
     agentType,
     isAsync,
+    source: agentSource,
+    pluginInfo,
   } = metadata
 
   const lastAssistantMessage = getLastAssistantMessage(agentMessages)
@@ -319,6 +340,26 @@ export function finalizeAgentTool(
 
   const totalTokens = getTokenCountFromUsage(lastAssistantMessage.message?.usage as Parameters<typeof getTokenCountFromUsage>[0])
   const totalToolUseCount = countToolUses(agentMessages)
+  const durationMs = Date.now() - startTime
+
+  // ant V36 3660.js:200 — response_char_count sums all text-block lengths,
+  // NOT the count of text blocks. ant V36 3660.js:201 — assistant_message_count
+  // is the unique-by-id set size, not total agentMessages.length (which would
+  // include user-side turn-completion messages).
+  const responseCharCount = content.reduce<number>((sum, block) => {
+    const text =
+      typeof (block as { text?: unknown }).text === 'string'
+        ? ((block as { text: string }).text)
+        : ''
+    return sum + text.length
+  }, 0)
+  const uniqueAssistantMessageIds = new Set<string>()
+  for (const m of agentMessages) {
+    if (m.type === 'assistant') {
+      const id = (m.message as { id?: string } | undefined)?.id
+      if (id !== undefined) uniqueAssistantMessageIds.add(id)
+    }
+  }
 
   logEvent('tengu_agent_tool_completed', {
     agent_type:
@@ -326,13 +367,43 @@ export function finalizeAgentTool(
     model:
       resolvedAgentModel as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     prompt_char_count: prompt.length,
-    response_char_count: content.length,
-    assistant_message_count: agentMessages.length,
+    response_char_count: responseCharCount,
+    assistant_message_count: uniqueAssistantMessageIds.size,
     total_tool_uses: totalToolUseCount,
-    duration_ms: Date.now() - startTime,
+    duration_ms: durationMs,
     total_tokens: totalTokens,
     is_built_in_agent: isBuiltInAgent,
     is_async: isAsync,
+  })
+
+  // ant V36 3660.js:210 — subagent_completed OTel companion. agent_type is
+  // shown verbatim for built-in / official-marketplace / details-on; for
+  // everything else (custom + non-official plugins) it collapses to the
+  // bucket string 'custom'. plugin.name uses the same redaction policy.
+  const isOfficialPluginMarketplace =
+    pluginInfo !== undefined &&
+    pluginInfo.marketplace !== undefined &&
+    getTelemetryPluginScope(pluginInfo.name, pluginInfo.marketplace, null) ===
+      'official'
+  const detailsOn = toolDetailsLoggingEnabled()
+  const showRealAgentType =
+    isBuiltInAgent || isOfficialPluginMarketplace || detailsOn
+  void logOTelEvent('subagent_completed', {
+    agent_type: showRealAgentType ? agentType : 'custom',
+    ...(agentSource && { 'agent.source': agentSource }),
+    is_built_in: String(isBuiltInAgent),
+    is_async: String(isAsync),
+    total_tokens: String(totalTokens),
+    total_tool_uses: String(totalToolUseCount),
+    duration_ms: String(durationMs),
+    model: resolvedAgentModel,
+    ...(pluginInfo && {
+      plugin_id_hash: hashPluginId(pluginInfo.name, pluginInfo.marketplace),
+      'plugin.name':
+        isOfficialPluginMarketplace || detailsOn
+          ? pluginInfo.name
+          : 'third-party',
+    }),
   })
 
   // Signal to inference that this subagent's cache chain can be evicted.

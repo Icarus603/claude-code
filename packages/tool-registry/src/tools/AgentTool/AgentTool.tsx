@@ -18,6 +18,7 @@ import {
 import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
 import { startAgentSummarization } from '@claude-code/agent/AgentSummary/agentSummary.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { buildAgentMetadata } from './agentMetadata.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -789,16 +790,15 @@ export const AgentTool = buildTool({
       promptMessages = [createUserMessage({ content: prompt })]
     }
 
-    const metadata = {
+    const metadata = buildAgentMetadata({
+      selectedAgent,
       prompt,
       resolvedAgentModel,
-      isBuiltInAgent: isBuiltInAgent(selectedAgent),
       startTime,
-      agentType: selectedAgent.agentType,
       isAsync:
         (run_in_background === true || selectedAgent.background === true) &&
         !isBackgroundTasksDisabled,
-    }
+    })
 
     // Use inline env check instead of coordinatorModule to avoid circular
     // dependency issues during test module loading.

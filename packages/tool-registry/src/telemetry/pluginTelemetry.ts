@@ -18,6 +18,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
+import { logOTelEvent } from '@claude-code/local-observability/telemetry'
 import type {
   LoadedPlugin,
   PluginError,
@@ -27,6 +28,10 @@ import {
   isOfficialMarketplaceName,
   parsePluginIdentifier,
 } from '@claude-code/config/plugin/pluginIdentifier'
+
+// Redacted name string used when the plugin marketplace is NOT
+// Anthropic-controlled (ant 2643.js: `mu = "third-party"`).
+const PLUGIN_NAME_REDACTED_THIRD_PARTY = 'third-party'
 
 // builtinPlugins.ts:BUILTIN_MARKETPLACE_NAME — inlined to avoid the cycle
 // through commands.js. Marketplace schemas.ts enforces 'builtin' is reserved.
@@ -195,6 +200,20 @@ export function logPluginsEnabledForSession(
 ): void {
   for (const plugin of plugins) {
     const { marketplace } = parsePluginIdentifier(plugin.repository)
+    const enabledVia = getEnabledVia(plugin, managedNames, seedDirs)
+    const scope = getTelemetryPluginScope(plugin.name, marketplace, managedNames)
+    const isAnthropicControlled =
+      scope === 'official' || scope === 'default-bundle'
+    const skillPathCount =
+      (plugin.skillsPath ? 1 : 0) + (plugin.skillsPaths?.length ?? 0)
+    const commandPathCount =
+      (plugin.commandsPath ? 1 : 0) + (plugin.commandsPaths?.length ?? 0)
+    const agentPathCount =
+      (plugin.agentsPath ? 1 : 0) + (plugin.agentsPaths?.length ?? 0)
+    const hasMcp = plugin.manifest.mcpServers !== undefined
+    const hasLsp = plugin.lspServers !== undefined
+    const hasHooks = plugin.hooksConfig !== undefined
+    const hasSettings = plugin.settings !== undefined
 
     logEvent('tengu_plugin_enabled_for_session', {
       _PROTO_plugin_name:
@@ -204,22 +223,141 @@ export function logPluginsEnabledForSession(
           marketplace as AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
       }),
       ...buildPluginTelemetryFields(plugin.name, marketplace, managedNames),
-      enabled_via: getEnabledVia(
-        plugin,
-        managedNames,
-        seedDirs,
-      ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      skill_path_count:
-        (plugin.skillsPath ? 1 : 0) + (plugin.skillsPaths?.length ?? 0),
-      command_path_count:
-        (plugin.commandsPath ? 1 : 0) + (plugin.commandsPaths?.length ?? 0),
-      has_mcp: plugin.manifest.mcpServers !== undefined,
-      has_hooks: plugin.hooksConfig !== undefined,
+      enabled_via:
+        enabledVia as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      skill_path_count: skillPathCount,
+      command_path_count: commandPathCount,
+      // ant v2.1.139 2648.js:135 adds agent_path_count alongside the existing
+      // skill/command counts so the per-session aggregate matches OTel.
+      agent_path_count: agentPathCount,
+      has_mcp: hasMcp,
+      // ant v2.1.139 2648.js:137 — has_lsp included alongside the other has_*
+      // flags. ccb was previously emitting only mcp/hooks; align with ant.
+      has_lsp: hasLsp,
+      has_hooks: hasHooks,
+      // ant v2.1.139 2648.js:139-140 — emit has_settings plus a comma-joined
+      // sorted key list so dashboards can answer "which plugins ship N+ settings".
+      has_settings: hasSettings,
+      ...(plugin.settings && {
+        settings_keys: Object.keys(plugin.settings)
+          .sort()
+          .join(',') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      }),
       ...(plugin.manifest.version && {
         version: plugin.manifest
           .version as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       }),
     })
+
+    // ant v2.1.139 2648.js:117 — plugin_loaded OTel companion to the
+    // tengu_* analytics event above. Twin-column redaction: real plugin
+    // name+marketplace only emitted for Anthropic-controlled plugins;
+    // third-party plugins emit "third-party" so OTel sinks never receive
+    // user-defined plugin names.
+    void logOTelEvent('plugin_loaded', {
+      'plugin.name': isAnthropicControlled
+        ? plugin.name
+        : PLUGIN_NAME_REDACTED_THIRD_PARTY,
+      ...(marketplace && {
+        'marketplace.name': isAnthropicControlled
+          ? marketplace
+          : PLUGIN_NAME_REDACTED_THIRD_PARTY,
+      }),
+      ...(isAnthropicControlled &&
+        plugin.manifest.version && {
+          'plugin.version': plugin.manifest.version,
+        }),
+      'plugin.scope': scope,
+      enabled_via: enabledVia,
+      plugin_id_hash: hashPluginId(plugin.name, marketplace),
+      has_hooks: String(hasHooks),
+      has_mcp: String(hasMcp),
+      skill_path_count: String(skillPathCount),
+      command_path_count: String(commandPathCount),
+      agent_path_count: String(agentPathCount),
+    })
+  }
+}
+
+/**
+ * Emit `hook_registered` OTel events for every settings-sourced and
+ * plugin-sourced hook. Mirrors ant v2.1.139 5204.js:GiK — called from the
+ * plugin-enable flow once enabledPlugins is finalised (5249.js:69).
+ *
+ * Settings sources are enumerated in priority order; the per-source
+ * `hook_source` attribute lets dashboards split by where the hook was
+ * configured. Plugin hooks emit additional plugin.name + plugin_id_hash
+ * fields so a single plugin's hooks roll up cleanly.
+ *
+ * `hooksBySource` should map each settings source to its hooks block, or
+ * undefined if that source contributes nothing.
+ */
+export function logHooksRegistered(
+  hooksBySource: Partial<
+    Record<
+      'userSettings' | 'projectSettings' | 'localSettings' | 'flagSettings' | 'policySettings',
+      // The settings hooks shape — Record<HookEventName, MatcherEntry[]>
+      // — varies by package, so accept the loose shape here. Caller passes
+      // the raw `.hooks` blob from each source's settings.
+      Record<string, Array<{ matcher?: string; hooks: Array<{ type: string }> }>>
+      | undefined
+    >
+  >,
+  enabledPlugins: Array<{
+    name: string
+    marketplace?: string
+    hooksConfig?: Record<
+      string,
+      Array<{ matcher?: string; hooks: Array<{ type: string }> }>
+    >
+  }>,
+  managedNames: Set<string> | null,
+): void {
+  // First: settings-sourced hooks (ant iterates JG = userSettings/project/
+  // local/flag/policy in that order; same as ccb config.settings.JG).
+  const settingsSources: Array<
+    'userSettings' | 'projectSettings' | 'localSettings' | 'flagSettings' | 'policySettings'
+  > = ['userSettings', 'projectSettings', 'localSettings', 'flagSettings', 'policySettings']
+  for (const source of settingsSources) {
+    const hooks = hooksBySource[source]
+    if (!hooks) continue
+    for (const [hookEvent, matchers] of Object.entries(hooks)) {
+      for (const matcher of matchers) {
+        for (const hook of matcher.hooks) {
+          void logOTelEvent('hook_registered', {
+            hook_event: hookEvent,
+            hook_type: hook.type,
+            hook_source: source,
+            ...(matcher.matcher && { hook_matcher: matcher.matcher }),
+          })
+        }
+      }
+    }
+  }
+  // Second: plugin-sourced hooks. hook_source is the literal 'pluginHook'
+  // (ant 5204.js:46) regardless of the plugin's marketplace; the plugin
+  // identity is carried separately in plugin.name + plugin_id_hash.
+  for (const plugin of enabledPlugins) {
+    if (!plugin.hooksConfig) continue
+    const scope = getTelemetryPluginScope(plugin.name, plugin.marketplace, managedNames)
+    const isAnthropicControlled =
+      scope === 'official' || scope === 'default-bundle'
+    for (const [hookEvent, matchers] of Object.entries(plugin.hooksConfig)) {
+      for (const matcher of matchers) {
+        for (const hook of matcher.hooks) {
+          void logOTelEvent('hook_registered', {
+            hook_event: hookEvent,
+            hook_type: hook.type,
+            hook_source: 'pluginHook',
+            'plugin.name': isAnthropicControlled
+              ? plugin.name
+              : PLUGIN_NAME_REDACTED_THIRD_PARTY,
+            plugin_id_hash: hashPluginId(plugin.name, plugin.marketplace),
+            ...(matcher.matcher && { hook_matcher: matcher.matcher }),
+          })
+        }
+      }
+    }
   }
 }
 

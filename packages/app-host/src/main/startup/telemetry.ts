@@ -10,14 +10,16 @@ import { getCwd } from "../../bootstrap/cwd.js";
 import { loadAllPluginsCacheOnly } from "@claude-code/config/plugin/pluginLoader";
 import { getManagedPluginNames } from "@claude-code/config/plugin/managedPlugins";
 import { getPluginSeedDirs } from "@claude-code/config/plugin/pluginDirectories";
+import { parsePluginIdentifier } from "@claude-code/config/plugin/pluginIdentifier";
 import {
+	logHooksRegistered,
 	logPluginLoadErrors,
 	logPluginsEnabledForSession,
 } from "@claude-code/tool-registry/telemetry/pluginTelemetry.js";
 import { logError } from "@claude-code/local-observability/logging";
 import { hasNodeOption } from "@claude-code/config/env/utils";
 import { getIsGit, getWorktreeCount } from "@claude-code/storage/git.js";
-import { getInitialSettings } from "@claude-code/config/settings";
+import { getInitialSettings, getSettingsForSource } from "@claude-code/config/settings";
 import { getGhAuthStatus } from "../../startup/ghAuthStatus.js";
 import { isAutoUpdaterDisabled } from "@claude-code/config";
 import { isAnalyticsDisabled } from "@claude-code/config/env/privacy";
@@ -37,6 +39,26 @@ export function logSessionTelemetry(): void {
 			const managedNames = getManagedPluginNames();
 			logPluginsEnabledForSession(enabled, managedNames, getPluginSeedDirs());
 			logPluginLoadErrors(errors, managedNames);
+			// ant v2.1.139 5249.js:69 — emit hook_registered alongside the
+			// plugin-loaded pipeline so settings hooks + plugin hooks both
+			// surface in OTel exactly once per session start. Iterates the
+			// five settings sources in priority order (ant 0659.js JG enum)
+			// plus every enabled plugin's hooksConfig.
+			logHooksRegistered(
+				{
+					userSettings: getSettingsForSource("userSettings")?.hooks,
+					projectSettings: getSettingsForSource("projectSettings")?.hooks,
+					localSettings: getSettingsForSource("localSettings")?.hooks,
+					flagSettings: getSettingsForSource("flagSettings")?.hooks,
+					policySettings: getSettingsForSource("policySettings")?.hooks,
+				},
+				enabled.map((p) => ({
+					name: p.name,
+					marketplace: parsePluginIdentifier(p.repository).marketplace,
+					hooksConfig: p.hooksConfig,
+				})),
+				managedNames,
+			);
 		})
 		.catch((err) => logError(err));
 }
