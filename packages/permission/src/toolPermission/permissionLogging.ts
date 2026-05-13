@@ -231,6 +231,7 @@ function logPermissionDecision(
     decision,
     source: sourceString,
     tool_name: sanitizeToolNameForAnalytics(tool.name),
+    tool_use_id: toolUseID, // ant 3144.js: required for span-correlation
   })
 }
 

@@ -318,8 +318,8 @@ const ANSI_SCOPES: Record<string, Color> = {
 // Brand colors for diff highlighting
 const BRAND_DIFF_RED = rgb(162, 0, 67)
 const BRAND_DIFF_GREEN = rgb(34, 139, 34)
-const BRAND_DIFF_RED_DARK_LINE = rgb(54, 5, 32)
-const BRAND_DIFF_RED_DARK_WORD = rgb(84, 8, 50)
+const BRAND_DIFF_RED_DARK_LINE = rgb(48, 8, 32)
+const BRAND_DIFF_RED_DARK_WORD = rgb(74, 13, 50)
 const BRAND_DIFF_GREEN_DARK_LINE = rgb(5, 30, 34)
 const BRAND_DIFF_GREEN_DARK_WORD = rgb(8, 47, 53)
 const BRAND_DIFF_RED_LIGHT_LINE = rgb(242, 220, 230)

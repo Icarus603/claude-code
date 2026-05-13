@@ -88,6 +88,7 @@ import { parseSlashCommand } from '@claude-code/command-runtime/slashCommandPars
 import { sleep } from '@claude-code/config/sleep'
 import { recordSkillUsage } from '@claude-code/tool-registry/suggestions/skillUsageTracking.js'
 import { logOTelEvent, redactIfDisabled } from '@claude-code/local-observability/telemetry'
+import { emitSlashUserPrompt } from './slashUserPromptTelemetry.js'
 import { buildPluginCommandTelemetryFields } from '@claude-code/tool-registry/telemetry/pluginTelemetry.js'
 import { getAssistantMessageContentLength } from '@claude-code/agent/tokens.js'
 import { createAgentId } from '@claude-code/agent/uuid.js'
@@ -152,18 +153,9 @@ async function executeForkedSlashCommand(
     `Executing forked slash command /${command.name} with agent ${agentDefinition.agentType}`,
   )
 
-  // Assistant mode: fire-and-forget. Launch subagent in background, return
-  // immediately, re-enqueue the result as an isMeta prompt when done.
-  // Without this, N scheduled tasks on startup = N serial (subagent + main
-  // agent turn) cycles blocking user input. With this, N subagents run in
-  // parallel and results trickle into the queue as they finish.
-  //
-  // Gated on kairosEnabled (not CLAUDE_CODE_BRIEF) because the closed loop
-  // depends on assistant-mode invariants: scheduled_tasks.json exists,
-  // the main agent knows to pipe results through SendUserMessage, and
-  // isMeta prompts are hidden. Outside assistant mode, context:fork commands
-  // are user-invoked skills (/commit etc.) that should run synchronously
-  // with the progress UI.
+  // Assistant mode: fire-and-forget subagent; re-enqueue result as isMeta.
+  // Without this, N scheduled tasks = N serial cycles blocking user input.
+  // Gated on kairosEnabled — outside assistant mode, /commit etc. run sync.
   if (feature('KAIROS') && (await context.getAppState()).kairosEnabled) {
     // Standalone abortController — background subagents survive main-thread
     // ESC (same policy as AgentTool's async path). They're cron-driven; if
@@ -666,6 +658,9 @@ export async function processSlashCommand(
       }),
     }),
   })
+
+  const _builtinCmd = returnedCommand.type !== 'prompt' || returnedCommand.source === 'bundled' || returnedCommand.source === 'builtin'
+  emitSlashUserPrompt({ inputString, commandName, cmdArgs: parsedArgs, isMcp, isBuiltinCmd: _builtinCmd, isSensitive: !!returnedCommand.isSensitive }) // ant 3753.js qm5
 
   // Check if this is a compact result which handle their own synthetic caveat message ordering
   const isCompactResult =

@@ -130,6 +130,7 @@ import {
   runPostToolUseHooks,
   runPreToolUseHooks,
 } from './toolHooks.js'
+import { emitToolResultFailure, emitToolResultSuccess } from './toolResultTelemetry.js'
 
 /** Minimum total hook duration (ms) to show inline timing summary */
 export const HOOK_TIMING_DISPLAY_THRESHOLD_MS = 500
@@ -137,39 +138,9 @@ export const HOOK_TIMING_DISPLAY_THRESHOLD_MS = 500
  * BashTool's PROGRESS_THRESHOLD_MS — the collapsed view feels stuck past this. */
 const SLOW_PHASE_LOG_THRESHOLD_MS = 2000
 
-/**
- * Classify a tool execution error into a telemetry-safe string.
- *
- * In minified/external builds, `error.constructor.name` is mangled into
- * short identifiers like "nJT" or "Chq" — useless for diagnostics.
- * This function extracts structured, telemetry-safe information instead:
- * - TelemetrySafeError: use its telemetryMessage (already vetted)
- * - Node.js fs errors: log the error code (ENOENT, EACCES, etc.)
- * - Known error types: use their unminified name
- * - Fallback: "Error" (better than a mangled 3-char identifier)
- */
-export function classifyToolError(error: unknown): string {
-  if (
-    error instanceof TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
-  ) {
-    return error.telemetryMessage.slice(0, 200)
-  }
-  if (error instanceof Error) {
-    // Node.js filesystem errors have a `code` property (ENOENT, EACCES, etc.)
-    // These are safe to log and much more useful than the constructor name.
-    const errnoCode = getErrnoCode(error)
-    if (typeof errnoCode === 'string') {
-      return `Error:${errnoCode}`
-    }
-    // ShellError, ImageSizeError, etc. have stable `.name` properties
-    // that survive minification (they're set in the constructor).
-    if (error.name && error.name !== 'Error' && error.name.length > 3) {
-      return error.name.slice(0, 60)
-    }
-    return 'Error'
-  }
-  return 'UnknownError'
-}
+// Re-export from dedicated file — moved out so toolResultTelemetry.ts
+// can import it without creating an import cycle through toolExecution.
+export { classifyToolError } from './classifyToolError.js'
 
 /**
  * Map a rule's origin to the documented OTel `source` vocabulary, matching
@@ -964,6 +935,7 @@ async function checkPermissionsAndCallTool(
       decision,
       source,
       tool_name: sanitizeToolNameForAnalytics(tool.name),
+      tool_use_id: toolUseID, // ant 3144.js/3952.js: required for span-correlation
     })
 
     // Increment code-edit tool decision counter for headless mode
@@ -1379,20 +1351,10 @@ async function checkPermissionsAndCallTool(
       ? getMcpServerScopeFromToolName(tool.name)
       : null
 
-    void logOTelEvent('tool_result', {
-      tool_name: sanitizeToolNameForAnalytics(tool.name),
-      success: 'true',
-      duration_ms: String(durationMs),
-      ...(Object.keys(toolParameters).length > 0 && {
-        tool_parameters: jsonStringify(toolParameters),
-      }),
-      ...(telemetryToolInput && { tool_input: telemetryToolInput }),
-      tool_result_size_bytes: String(toolResultSizeBytes),
-      ...(decisionInfo && {
-        decision_source: decisionInfo.source,
-        decision_type: decisionInfo.decision,
-      }),
-      ...(mcpServerScope && { mcp_server_scope: mcpServerScope }),
+    emitToolResultSuccess({ // ant 3952.js k5("tool_result") success
+      toolName: sanitizeToolNameForAnalytics(tool.name),
+      toolUseID, durationMs, processedInput, toolParameters,
+      telemetryToolInput, decisionInfo, mcpServerScope, toolResultSizeBytes,
     })
 
     // Run PostToolUse hooks
@@ -1672,21 +1634,10 @@ async function checkPermissionsAndCallTool(
         ? getMcpServerScopeFromToolName(tool.name)
         : null
 
-      void logOTelEvent('tool_result', {
-        tool_name: sanitizeToolNameForAnalytics(tool.name),
-        use_id: toolUseID,
-        success: 'false',
-        duration_ms: String(durationMs),
-        error: errorMessage(error),
-        ...(Object.keys(toolParameters).length > 0 && {
-          tool_parameters: jsonStringify(toolParameters),
-        }),
-        ...(telemetryToolInput && { tool_input: telemetryToolInput }),
-        ...(decisionInfo && {
-          decision_source: decisionInfo.source,
-          decision_type: decisionInfo.decision,
-        }),
-        ...(mcpServerScope && { mcp_server_scope: mcpServerScope }),
+      emitToolResultFailure({ // ant 3952.js k5("tool_result") failure
+        toolName: sanitizeToolNameForAnalytics(tool.name),
+        toolUseID, durationMs, processedInput, toolParameters,
+        telemetryToolInput, decisionInfo, mcpServerScope, error,
       })
     }
     const content = formatError(error)

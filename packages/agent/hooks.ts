@@ -3211,11 +3211,9 @@ async function* executeHooks({
     totalDurationMs,
   })
 
-  // Log hook execution completion to OTEL (only for beta tracing)
+  // OTEL hook_execution_complete (beta tracing only)
   if (isBetaTracingEnabled()) {
-    const hookDefinitionsComplete =
-      getHookDefinitionsForTelemetry(matchingHooks)
-
+    const hookDefinitionsComplete = getHookDefinitionsForTelemetry(matchingHooks)
     void logOTelEvent('hook_execution_complete', {
       hook_event: hookEvent,
       hook_name: hookName,
@@ -3224,6 +3222,7 @@ async function* executeHooks({
       num_blocking: String(outcomes.blocking),
       num_non_blocking_error: String(outcomes.non_blocking_error),
       num_cancelled: String(outcomes.cancelled),
+      total_duration_ms: String(totalDurationMs), // ant 4750.js: hook-latency dashboards
       managed_only: String(shouldAllowManagedHooksOnly()),
       hook_definitions: jsonStringify(hookDefinitionsComplete),
       hook_source: shouldAllowManagedHooksOnly() ? 'policySettings' : 'merged',

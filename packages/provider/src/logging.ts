@@ -15,6 +15,7 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { QueryChainTracking } from '@claude-code/tool-registry/Tool.js'
 import { isConnectorTextBlock } from './connectorTextTypes.js'
+import { redactQuerySourceForTelemetry } from './querySourceTelemetry.js'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { EffortLevel } from '@claude-code/agent/effort.js'
@@ -91,9 +92,7 @@ const GATEWAY_FINGERPRINTS: Partial<
   },
 }
 
-// Gateways that use provider-owned domains (not self-hosted), so the
-// ANTHROPIC_BASE_URL hostname is a reliable signal even without a
-// distinctive response header.
+// Gateways on provider-owned domains: ANTHROPIC_BASE_URL hostname is a reliable signal.
 const GATEWAY_HOST_SUFFIXES: Partial<Record<KnownGateway, string[]>> = {
   // https://docs.databricks.com/aws/en/ai-gateway/
   databricks: [
@@ -366,14 +365,16 @@ export function logAPIError({
     ...getAnthropicEnvMetadata(),
   })
 
-  // Log API error event for OTLP
+  // ant 2914.js k5("api_error"): request_id + query_source for pivots.
   void logOTelEvent('api_error', {
     model: model,
     error: errStr,
-    status_code: String(status),
+    status_code: status !== undefined ? String(status) : undefined,
     duration_ms: String(durationMs),
     attempt: String(attempt),
+    request_id: requestId === null ? undefined : requestId,
     speed: fastMode ? 'fast' : 'normal',
+    query_source: redactQuerySourceForTelemetry(querySource),
   })
 
   // Pass the span to correctly match responses to requests when beta tracing is enabled
@@ -554,9 +555,7 @@ function logAPISuccess({
         } as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS)
       : {}),
     fastMode,
-    // Log cache_deleted_input_tokens for cache editing analysis. Casts needed
-    // because the field is intentionally not on NonNullableUsage (excluded from
-    // external builds). Set by updateUsage() when cache editing is active.
+    // cache_deleted_input_tokens (cache-editing analytics) — cast: field intentionally off NonNullableUsage.
     ...(feature('CACHED_MICROCOMPACT') &&
     ((usage as unknown as { cache_deleted_input_tokens?: number })
       .cache_deleted_input_tokens ?? 0) > 0
@@ -718,7 +717,7 @@ export function logAPISuccessAndDuration({
     previousRequestId,
     betas,
   })
-  // Log API request event for OTLP
+  // ant 2914.js k5("api_request").
   void logOTelEvent('api_request', {
     model,
     input_tokens: String(usage.input_tokens),
@@ -727,7 +726,9 @@ export function logAPISuccessAndDuration({
     cache_creation_tokens: String(usage.cache_creation_input_tokens),
     cost_usd: String(costUSD),
     duration_ms: String(durationMs),
+    request_id: requestId === null ? undefined : requestId,
     speed: fastMode ? 'fast' : 'normal',
+    query_source: redactQuerySourceForTelemetry(querySource),
   })
 
   // Extract model output, thinking output, and tool call flag when beta tracing is enabled
