@@ -615,7 +615,8 @@ export async function populateOAuthAccountInfoIfNeeded(): Promise<boolean> {
     (config.oauthAccount &&
       config.oauthAccount.billingType !== undefined &&
       config.oauthAccount.accountCreatedAt !== undefined &&
-      config.oauthAccount.subscriptionCreatedAt !== undefined) ||
+      config.oauthAccount.subscriptionCreatedAt !== undefined &&
+      config.oauthAccount.ccOnboardingFlags !== undefined) ||
     !isClaudeAISubscriber() ||
     !hasProfileScope()
   ) {
@@ -643,6 +644,12 @@ export async function populateOAuthAccountInfoIfNeeded(): Promise<boolean> {
         accountCreatedAt: profile.account.created_at,
         subscriptionCreatedAt:
           profile.organization.subscription_created_at ?? undefined,
+        ccOnboardingFlags: profile.organization?.cc_onboarding_flags ?? {},
+        claudeCodeTrialEndsAt:
+          profile.organization?.claude_code_trial_ends_at ?? null,
+        claudeCodeTrialDurationDays:
+          profile.organization?.claude_code_trial_duration_days ?? null,
+        seatTier: profile.organization?.seat_tier ?? null,
       })
       return true
     }
@@ -659,6 +666,10 @@ export function storeOAuthAccountInfo({
   billingType,
   accountCreatedAt,
   subscriptionCreatedAt,
+  ccOnboardingFlags,
+  claudeCodeTrialEndsAt,
+  claudeCodeTrialDurationDays,
+  seatTier,
 }: {
   accountUuid: string
   emailAddress: string
@@ -668,6 +679,10 @@ export function storeOAuthAccountInfo({
   billingType?: BillingType
   accountCreatedAt?: string
   subscriptionCreatedAt?: string
+  ccOnboardingFlags?: Record<string, unknown>
+  claudeCodeTrialEndsAt?: string | null
+  claudeCodeTrialDurationDays?: number | null
+  seatTier?: string | null
 }): void {
   const accountInfo: AccountInfo = {
     accountUuid,
@@ -677,12 +692,20 @@ export function storeOAuthAccountInfo({
     billingType,
     accountCreatedAt,
     subscriptionCreatedAt,
+    ccOnboardingFlags,
+    claudeCodeTrialEndsAt,
+    claudeCodeTrialDurationDays,
+    seatTier,
   }
   if (displayName) {
     accountInfo.displayName = displayName
   }
   saveGlobalConfig(current => {
-    // For oauthAccount we need to compare content since it's an object
+    // For oauthAccount we need to compare content since it's an object.
+    // ant ZIH includes the four new fields in this idempotency check —
+    // without them, a profile that gained ccOnboardingFlags / trial / seat
+    // fields would re-write on every refresh even though the user-facing
+    // identity (uuid/email/org) didn't change.
     if (
       current.oauthAccount?.accountUuid === accountInfo.accountUuid &&
       current.oauthAccount?.emailAddress === accountInfo.emailAddress &&
@@ -693,7 +716,14 @@ export function storeOAuthAccountInfo({
       current.oauthAccount?.billingType === accountInfo.billingType &&
       current.oauthAccount?.accountCreatedAt === accountInfo.accountCreatedAt &&
       current.oauthAccount?.subscriptionCreatedAt ===
-        accountInfo.subscriptionCreatedAt
+        accountInfo.subscriptionCreatedAt &&
+      current.oauthAccount?.claudeCodeTrialEndsAt ===
+        accountInfo.claudeCodeTrialEndsAt &&
+      current.oauthAccount?.claudeCodeTrialDurationDays ===
+        accountInfo.claudeCodeTrialDurationDays &&
+      current.oauthAccount?.seatTier === accountInfo.seatTier &&
+      JSON.stringify(current.oauthAccount?.ccOnboardingFlags) ===
+        JSON.stringify(accountInfo.ccOnboardingFlags)
     ) {
       return current
     }
