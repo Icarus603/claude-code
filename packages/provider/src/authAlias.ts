@@ -117,6 +117,11 @@ export function isAnthropicAuthEnabled(): boolean {
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK')) ||
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX')) ||
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY')) ||
+    // ant YD also flags ANTHROPIC_AWS / MANTLE; ccb has no provider impl for
+    // these but still disables OAuth so we don't leak Bearer headers to a
+    // mis-configured 3P endpoint.
+    isEnvTruthy(readEnv('CLAUDE_CODE_USE_ANTHROPIC_AWS')) ||
+    isEnvTruthy(readEnv('CLAUDE_CODE_USE_MANTLE')) ||
     settings.modelType === 'openai' ||
     settings.modelType === 'gemini' ||
     !!readEnv('OPENAI_BASE_URL') ||
@@ -1612,20 +1617,8 @@ export function hasProfileScope(): boolean {
 }
 
 export function is1PApiCustomer(): boolean {
-  // 1P API customers are users who are NOT:
-  // 1. Claude.ai subscribers (Max, Pro, Enterprise, Team)
-  // 2. Vertex AI users
-  // 3. AWS Bedrock users
-  // 4. Foundry users
-
-  // Exclude Vertex, Bedrock, and Foundry customers
-  if (
-    isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK')) ||
-    isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX')) ||
-    isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY'))
-  ) {
-    return false
-  }
+  // 1P API customers: NOT Claude.ai subs, NOT 3P. Mirror of ant j2H.
+  if (isUsing3PServices()) return false
 
   // Exclude Claude.ai subscribers
   if (isClaudeAISubscriber()) {
@@ -1756,12 +1749,14 @@ export function getSubscriptionName(): string {
   }
 }
 
-/** Check if using third-party services (Bedrock or Vertex or Foundry) */
+/** Check if using third-party services. Mirror of ant vo (1997.js). */
 export function isUsing3PServices(): boolean {
   return !!(
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK')) ||
     isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX')) ||
-    isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY'))
+    isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY')) ||
+    isEnvTruthy(readEnv('CLAUDE_CODE_USE_ANTHROPIC_AWS')) ||
+    isEnvTruthy(readEnv('CLAUDE_CODE_USE_MANTLE'))
   )
 }
 
