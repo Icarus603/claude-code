@@ -4,6 +4,7 @@ import type { OAuthProfileResponse } from './types.js'
 import { getAnthropicApiKey } from '../authAlias.js'
 import { getGlobalConfig } from '@claude-code/config'
 import { logEvent } from '@claude-code/local-observability'
+import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability'
 import { logError } from '@claude-code/local-observability/logging'
 
 export async function getOauthProfileFromApiKey(): Promise<
@@ -31,9 +32,21 @@ export async function getOauthProfileFromApiKey(): Promise<
       timeout: 10000,
     })
     logEvent('tengu_oauth_profile_fetch_succeeded', { method: 'api_key' })
+    // Port of ant 1254.js yH("oauth_profile_fetch") — feature-ok counter.
+    logEvent('tengu_feature_ok', {
+      feature_name:
+        'oauth_profile_fetch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     return response.data
   } catch (error) {
     logEvent('tengu_oauth_profile_fetch_failed', { method: 'api_key' })
+    // Port of ant 1254.js G6("oauth_profile_fetch", "oauth_profile_api_key_failed").
+    logEvent('tengu_feature_sad', {
+      feature_name:
+        'oauth_profile_fetch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'oauth_profile_api_key_failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     logError(error as Error)
   }
 }
@@ -51,9 +64,21 @@ export async function getOauthProfileFromOauthToken(
       timeout: 10000,
     })
     logEvent('tengu_oauth_profile_fetch_succeeded', { method: 'oauth_token' })
+    // Port of ant 1254.js Ur() yH("oauth_profile_fetch") — feature-ok counter.
+    logEvent('tengu_feature_ok', {
+      feature_name:
+        'oauth_profile_fetch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     return response.data
   } catch (error) {
     logEvent('tengu_oauth_profile_fetch_failed', { method: 'oauth_token' })
+    // Port of ant 1254.js Ur() G6("oauth_profile_fetch", "oauth_profile_token_failed").
+    logEvent('tengu_feature_sad', {
+      feature_name:
+        'oauth_profile_fetch' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'oauth_profile_token_failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     logError(error as Error)
   }
 }

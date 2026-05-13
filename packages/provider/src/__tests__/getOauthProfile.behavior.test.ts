@@ -61,9 +61,14 @@ describe('getOauthProfile (ant Ur/DBq parity)', () => {
   test('failure paths also call logError to capture the error itself', () => {
     // ant TH(q) — pin the dual emission (telemetry counter + error logger).
     // Otherwise we'd have hit counts without diagnostic context.
-    const oauthCatch = source.indexOf("method: 'oauth_token' })\n    logError")
-    const apiKeyCatch = source.indexOf("method: 'api_key' })\n    logError")
-    expect(oauthCatch).toBeGreaterThan(0)
-    expect(apiKeyCatch).toBeGreaterThan(0)
+    // logError now appears after the canonical tengu_feature_sad event;
+    // we just need it present in each catch block, not immediately
+    // after the failed event.
+    expect(source).toMatch(
+      /method:\s*'oauth_token'\s*\}\)[\s\S]{0,500}?logError\(error/,
+    )
+    expect(source).toMatch(
+      /method:\s*'api_key'\s*\}\)[\s\S]{0,500}?logError\(error/,
+    )
   })
 })
