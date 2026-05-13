@@ -22,7 +22,7 @@ describe('OAuth roles + API key telemetry (ant cg6/lg6)', () => {
 
   describe('fetchAndStoreUserRoles (ant cg6)', () => {
     const fnStart = source.indexOf('export async function fetchAndStoreUserRoles')
-    const fnSlice = source.slice(fnStart, fnStart + 2000)
+    const fnSlice = source.slice(fnStart, fnStart + 3500)
 
     test('non-200 status emits telemetry BEFORE throw (ant xH http_error)', () => {
       expect(fnSlice).toMatch(
@@ -51,7 +51,7 @@ describe('OAuth roles + API key telemetry (ant cg6/lg6)', () => {
 
   describe('createAndStoreApiKey (ant lg6)', () => {
     const fnStart = source.indexOf('export async function createAndStoreApiKey')
-    const fnSlice = source.slice(fnStart, fnStart + 2000)
+    const fnSlice = source.slice(fnStart, fnStart + 3500)
 
     test('success path saves API key and emits tengu_oauth_api_key success', () => {
       expect(fnSlice).toMatch(/await saveApiKey\(apiKey\)/)
@@ -61,8 +61,12 @@ describe('OAuth roles + API key telemetry (ant cg6/lg6)', () => {
     })
 
     test('empty response emits telemetry (was silent null return)', () => {
+      // ant lg6: xH("oauth_create_api_key", "oauth_api_key_empty_response")
+      // is fired between the user-friendly _failed event and the return null.
+      // Allow up to 500 chars between the _failed event and return null to
+      // accommodate the canonical tengu_feature_bad event in between.
       expect(fnSlice).toMatch(
-        /logEvent\('tengu_oauth_create_api_key_failed',\s*\{\s*reason:\s*'empty_response'\s*\}\)[\s\S]{0,50}return null/,
+        /logEvent\('tengu_oauth_create_api_key_failed',\s*\{\s*reason:\s*'empty_response'\s*\}\)[\s\S]{0,500}return null/,
       )
     })
 

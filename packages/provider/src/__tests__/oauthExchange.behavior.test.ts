@@ -57,7 +57,7 @@ describe('buildAuthUrl + exchangeCodeForTokens (ant au_/dg6 parity)', () => {
 
   describe('exchangeCodeForTokens (ant dg6)', () => {
     const fnStart = source.indexOf('export async function exchangeCodeForTokens')
-    const fnSlice = source.slice(fnStart, fnStart + 2500)
+    const fnSlice = source.slice(fnStart, fnStart + 3500)
 
     test('grant_type=authorization_code with mandatory PKCE fields', () => {
       expect(fnSlice).toMatch(/grant_type:\s*'authorization_code'/)
@@ -84,8 +84,10 @@ describe('buildAuthUrl + exchangeCodeForTokens (ant au_/dg6 parity)', () => {
     })
 
     test('non-200 status fires failure telemetry BEFORE throwing (ant xH)', () => {
+      // Accommodates the refactor that hoists `const reason = ...`
+      // out of the logEvent call into a local before it.
       expect(fnSlice).toMatch(
-        /if\s*\(response\.status !== 200\)\s*\{[\s\S]*?logEvent\('tengu_oauth_token_exchange_failed',\s*\{[\s\S]*?reason:[\s\S]*?\}\)[\s\S]*?throw new Error/,
+        /if\s*\(response\.status !== 200\)\s*\{[\s\S]*?logEvent\('tengu_oauth_token_exchange_failed',\s*\{[\s\S]*?(reason:[\s\S]*?|reason,[\s\S]*?)\}\)[\s\S]*?throw new Error/,
       )
     })
 
@@ -101,8 +103,13 @@ describe('buildAuthUrl + exchangeCodeForTokens (ant au_/dg6 parity)', () => {
     })
 
     test('2xx fires success telemetry after the throw guard', () => {
+      // ant dg6: d("tengu_oauth_token_exchange_success", {}) + yH(...).
+      // The two events are paired; pin both fire before the return.
       expect(fnSlice).toMatch(
-        /logEvent\('tengu_oauth_token_exchange_success',\s*\{\}\)\s*\n?\s*return response\.data/,
+        /logEvent\('tengu_oauth_token_exchange_success',\s*\{\}\)[\s\S]*?return response\.data/,
+      )
+      expect(fnSlice).toMatch(
+        /logEvent\('tengu_feature_ok',[\s\S]{0,200}?feature_name:[\s\S]{0,80}?'oauth_token_exchange'/,
       )
     })
   })

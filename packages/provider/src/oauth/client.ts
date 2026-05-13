@@ -231,12 +231,22 @@ export async function exchangeCodeForTokens(
   if (response.status !== 200) {
     // ant dg6 emits xH("oauth_token_exchange", failure_reason) before throwing
     // so fleet analytics can distinguish the 401-bad-code vs HTTP error path.
+    const reason =
+      response.status === 401
+        ? 'oauth_exchange_invalid_code'
+        : 'oauth_exchange_http_error'
     logEvent('tengu_oauth_token_exchange_failed', {
-      reason:
-        response.status === 401
-          ? 'oauth_exchange_invalid_code'
-          : 'oauth_exchange_http_error',
+      reason,
       status: String(response.status),
+    })
+    // Port of ant dg6 xH("oauth_token_exchange", reason) — fleet
+    // dashboards expect the canonical tengu_feature_bad event in
+    // addition to the user-friendly _failed event.
+    logEvent('tengu_feature_bad', {
+      feature_name:
+        'oauth_token_exchange' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        reason as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     throw new Error(
       response.status === 401
@@ -245,6 +255,11 @@ export async function exchangeCodeForTokens(
     )
   }
   logEvent('tengu_oauth_token_exchange_success', {})
+  // Port of ant dg6 yH("oauth_token_exchange") — feature-ok counter.
+  logEvent('tengu_feature_ok', {
+    feature_name:
+      'oauth_token_exchange' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  })
   return response.data
 }
 
@@ -310,6 +325,11 @@ export async function refreshOAuthToken(
     const scopes = parseScopes(data.scope)
 
     logEvent('tengu_oauth_token_refresh_success', {})
+    // Port of ant Bq_ yH("oauth_token_refresh") — feature-ok counter.
+    logEvent('tengu_feature_ok', {
+      feature_name:
+        'oauth_token_refresh' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
 
     // Skip the extra /api/oauth/profile round-trip when we already have both
     // the global-config profile fields AND the secure-storage subscription data.
@@ -421,6 +441,27 @@ export async function refreshOAuthToken(
     if (isInvalidGrantError(error)) {
       markRefreshTokenDead(refreshToken)
       logEvent('tengu_oauth_refresh_token_marked_dead_invalid_grant', {})
+      // Port of ant Bq_ catch: xH("oauth_token_refresh",
+      // "oauth_refresh_invalid_grant"). This is the tengu_feature_bad
+      // counter — distinct from the _failure event above which carries
+      // the raw error message.
+      logEvent('tengu_feature_bad', {
+        feature_name:
+          'oauth_token_refresh' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        error_code:
+          'oauth_refresh_invalid_grant' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
+    } else {
+      // Port of ant Bq_ catch: G6("oauth_token_refresh",
+      // "oauth_refresh_request_failed"). The non-invalid-grant branch
+      // is tengu_feature_sad (timeout/network/etc) rather than
+      // tengu_feature_bad — different dashboard, different alert path.
+      logEvent('tengu_feature_sad', {
+        feature_name:
+          'oauth_token_refresh' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        error_code:
+          'oauth_refresh_request_failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
     }
     throw error
   }
@@ -437,6 +478,13 @@ export async function fetchAndStoreUserRoles(
     // ant cg6: emit xH("oauth_fetch_roles","oauth_roles_http_error") BEFORE
     // the throw so fleet analytics can distinguish the HTTP failure mode.
     logEvent('tengu_oauth_fetch_roles_failed', { reason: 'http_error', status: String(response.status) })
+    // Port of ant cg6 xH("oauth_fetch_roles", "oauth_roles_http_error").
+    logEvent('tengu_feature_bad', {
+      feature_name:
+        'oauth_fetch_roles' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'oauth_roles_http_error' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     throw new Error(`Failed to fetch user roles: ${response.statusText}`)
   }
   const data = response.data as UserRolesResponse
@@ -446,6 +494,13 @@ export async function fetchAndStoreUserRoles(
     // ant cg6: separate failure reason — config didn't have oauthAccount,
     // which means an OAuth flow was kicked off without storing identity first.
     logEvent('tengu_oauth_fetch_roles_failed', { reason: 'no_account' })
+    // Port of ant cg6 xH("oauth_fetch_roles", "oauth_roles_no_account").
+    logEvent('tengu_feature_bad', {
+      feature_name:
+        'oauth_fetch_roles' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'oauth_roles_no_account' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     throw new Error('OAuth account information not found in config')
   }
 
@@ -465,6 +520,11 @@ export async function fetchAndStoreUserRoles(
     org_role:
       data.organization_role as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   })
+  // Port of ant cg6 yH("oauth_fetch_roles") — feature-ok counter.
+  logEvent('tengu_feature_ok', {
+    feature_name:
+      'oauth_fetch_roles' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  })
 }
 
 export async function createAndStoreApiKey(
@@ -483,12 +543,27 @@ export async function createAndStoreApiKey(
           'success' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         statusCode: response.status,
       })
+      // Port of ant lg6 yH("oauth_create_api_key") — feature-ok event
+      // for the fleet OAuth dashboard. Distinct from the user-visible
+      // {status:success} above; this is the canonical "feature x
+      // succeeded" counter ops queries.
+      logEvent('tengu_feature_ok', {
+        feature_name:
+          'oauth_create_api_key' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
       return apiKey
     }
     // ant lg6: empty response is a distinct failure mode worth its own event —
     // the user-visible message ("no API key returned") is non-specific so
     // dashboards need the structured reason to spot a backend regression.
     logEvent('tengu_oauth_create_api_key_failed', { reason: 'empty_response' })
+    // Port of ant lg6 xH("oauth_create_api_key", "oauth_api_key_empty_response").
+    logEvent('tengu_feature_bad', {
+      feature_name:
+        'oauth_create_api_key' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'oauth_api_key_empty_response' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     return null
   } catch (error) {
     logEvent('tengu_oauth_api_key', {
@@ -504,6 +579,13 @@ export async function createAndStoreApiKey(
     // from the tengu_oauth_api_key{status:failure} above which carries the
     // user-visible error message.
     logEvent('tengu_oauth_create_api_key_failed', { reason: 'request_failed' })
+    // Port of ant lg6 xH("oauth_create_api_key", "oauth_api_key_request_failed").
+    logEvent('tengu_feature_bad', {
+      feature_name:
+        'oauth_create_api_key' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'oauth_api_key_request_failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     throw error
   }
 }

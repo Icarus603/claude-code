@@ -1095,35 +1095,51 @@ export async function saveApiKey(apiKey: string): Promise<void> {
   await maybeRemoveApiKeyFromMacOSKeychain()
   let savedToKeychain = false
   if (process.platform === 'darwin') {
-    try {
-      // TODO: migrate to SecureStorage
-      const storageServiceName = getMacOsKeychainStorageServiceName()
-      const username = getUsername()
+    // Port of ant v2.1.136 ig6 (1997.js). Differences from ccb's prior impl:
+    //   1. timeout: 5000 — bound the spawn at 5 s so a stuck security CLI
+    //      doesn't hang the login flow forever.
+    //   2. Check `z.exitCode !== 0` and THROW. Because we pass
+    //      `reject: false`, execa will NOT throw on non-zero exit, so the
+    //      old try/catch never fired and ccb silently fell back to
+    //      "saved_to_config" — a P0 for /login on locked keychains.
+    //   3. Format stderr (or stdout) into the thrown Error so the user
+    //      sees the keychain failure reason inline. Replace internal
+    //      newlines with "; " for a one-line readable error.
+    //   4. Include the `\`claude doctor\`` hint so users have a next step.
+    // TODO: migrate to SecureStorage
+    const storageServiceName = getMacOsKeychainStorageServiceName()
+    const username = getUsername()
 
-      // Convert to hexadecimal to avoid any escaping issues
-      const hexValue = Buffer.from(apiKey, 'utf-8').toString('hex')
+    // Convert to hexadecimal to avoid any escaping issues
+    const hexValue = Buffer.from(apiKey, 'utf-8').toString('hex')
 
-      // Use security's interactive mode (-i) with -X (hexadecimal) option
-      // This ensures credentials never appear in process command-line arguments
-      // Process monitors only see "security -i", not the password
-      const command = `add-generic-password -U -a "${username}" -s "${storageServiceName}" -X "${hexValue}"\n`
+    // Use security's interactive mode (-i) with -X (hexadecimal) option
+    // This ensures credentials never appear in process command-line arguments
+    // Process monitors only see "security -i", not the password
+    const command = `add-generic-password -U -a "${username}" -s "${storageServiceName}" -X "${hexValue}"\n`
 
-      await execa('security', ['-i'], {
-        input: command,
-        reject: false,
-      })
+    const result = await execa('security', ['-i'], {
+      input: command,
+      reject: false,
+      timeout: 5000,
+    })
 
-      logEvent('tengu_api_key_saved_to_keychain', {})
-      savedToKeychain = true
-    } catch (e) {
-      logError(e)
+    if (result.exitCode !== 0) {
+      // ant ig6: build a one-line summary of stderr/stdout for the user
+      const detail = ((result.stderr as string) || (result.stdout as string) || '')
+        .trim()
+        .replace(/\s*\n\s*/g, '; ')
       logEvent('tengu_api_key_keychain_error', {
-        error: errorMessage(
-          e,
-        ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        error: detail as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       })
-      logEvent('tengu_api_key_saved_to_config', {})
+      throw new Error(
+        `Failed to save API key to macOS Keychain${detail ? ` (${detail})` : ''}. ` +
+          'Run `claude doctor` to diagnose keychain access.',
+      )
     }
+
+    logEvent('tengu_api_key_saved_to_keychain', {})
+    savedToKeychain = true
   } else {
     logEvent('tengu_api_key_saved_to_config', {})
   }

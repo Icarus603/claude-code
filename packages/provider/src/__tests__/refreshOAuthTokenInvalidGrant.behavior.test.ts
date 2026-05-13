@@ -64,10 +64,12 @@ describe('refreshOAuthToken invalid_grant wiring (vs ant pt6/Bq_)', () => {
     const throwIdx = clientSource.indexOf('throw error', markDeadIdx)
     expect(markDeadIdx).toBeGreaterThan(0)
     expect(throwIdx).toBeGreaterThan(markDeadIdx)
-    // Re-throw must be within the same catch block (no more than ~200 chars
-    // away). Anything further means there's intervening logic that might
-    // swallow the throw conditionally.
-    expect(throwIdx - markDeadIdx).toBeLessThan(200)
+    // Re-throw must be within the same catch block (no more than ~1500
+    // chars away to allow the canonical tengu_feature_bad / tengu_feature_sad
+    // outcome events + AnalyticsMetadata casts between the dead-set marker
+    // and the throw). Anything further means there's intervening logic
+    // that might swallow the throw conditionally.
+    expect(throwIdx - markDeadIdx).toBeLessThan(1500)
   })
 
   test('authAlias.ts does NOT also call markRefreshTokenDead (single-write boundary)', () => {
