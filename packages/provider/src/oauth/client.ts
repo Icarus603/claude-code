@@ -579,18 +579,30 @@ export async function fetchProfileInfo(accessToken: string): Promise<{
 }
 
 /**
- * Gets the organization UUID from the OAuth access token
- * @returns The organization UUID or null if not authenticated
+ * Get the organization UUID for the current session. Three-tier lookup
+ * (mirror of ant sV 1255.js):
+ *   1. CLAUDE_CODE_ORGANIZATION_UUID env var — operator override, wins even
+ *      when a different org's identity is in stored config. Used by SDK
+ *      callers (Cowork) to route a session against a non-default org.
+ *   2. Stored oauthAccount.organizationUuid — captured at /login time.
+ *   3. Live profile fetch via /api/oauth/profile (requires user:profile scope).
+ * @returns The organization UUID or null if not authenticated.
  */
 export async function getOrganizationUUID(): Promise<string | null> {
-  // Check global config first to avoid unnecessary API call
+  // Env-var override takes priority — operator can force a specific org
+  // even when stored oauthAccount belongs to a different one.
+  const envOrgUUID = readEnv('CLAUDE_CODE_ORGANIZATION_UUID')
+  if (envOrgUUID) return envOrgUUID
+
+  // Stored config — captured during /login, avoids the API round-trip.
   const globalConfig = getGlobalConfig()
   const orgUUID = globalConfig.oauthAccount?.organizationUuid
   if (orgUUID) {
     return orgUUID
   }
 
-  // Fall back to fetching from profile (requires user:profile scope)
+  // Live profile fetch — requires user:profile scope (service-key sessions
+  // hardcode scopes to ['user:inference'] only, so this would 403).
   const accessToken = getClaudeAIOAuthTokens()?.accessToken
   if (accessToken === undefined || !hasProfileScope()) {
     return null
