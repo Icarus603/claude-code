@@ -3584,7 +3584,6 @@ Read the team config to discover your teammates' names. Check the task list peri
     }
   }
 
-
   // skill_discovery handled here (not in the switch) so the 'skill_discovery'
   // string literal lives inside a feature()-guarded block. A case label can't
   // be gated, but this pattern can — same approach as teammate_mailbox above.
@@ -3888,7 +3887,8 @@ Read the team config to discover your teammates' names. Check the task list peri
       }
       return wrapMessagesInSystemReminder([
         createUserMessage({
-          content: `${outputStyle.name} output style is active. Remember to follow the specific guidelines for this style.`,
+          // ant v2.1.139 4097.js:168 — per-style turnReminder fallback.
+          content: `${outputStyle.name} output style is active. ${(outputStyle as { turnReminder?: string }).turnReminder ?? 'Remember to follow the specific guidelines for this style.'}`,
           isMeta: true,
         }),
       ])

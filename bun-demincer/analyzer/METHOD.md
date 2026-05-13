@@ -92,10 +92,19 @@ comm -13 \
 ### 1d · New API paths
 
 ```bash
+# /v1/* (model API) AND /api/* (dashboard API) — ant uses both
 comm -13 \
-    <(grep -rohE '"/v1/[a-z_/?][a-z_/?-]*"' work/claude-code-$A/decoded/ | sort -u) \
-    <(grep -rohE '"/v1/[a-z_/?][a-z_/?-]*"' work/claude-code-$B/decoded/ | sort -u)
+    <(grep -rohE '"/(v1|api)/[a-z_/?][a-z_/?-]*"' work/claude-code-$A/decoded/ | sort -u) \
+    <(grep -rohE '"/(v1|api)/[a-z_/?][a-z_/?-]*"' work/claude-code-$B/decoded/ | sort -u)
 ```
+
+**Caveat — string vs. template literal.** This catches *string-literal* paths only.
+If a module composes the path as `${BASE}/v1/foo` and only the suffix
+is in the regex (e.g. `"/v1/foo"` is never a single literal), the path
+goes undetected. When B refactors an API client to use a stricter
+helper (e.g. `gz.get("/v1/foo", { auth: "..." })`) the path may appear
+as "new" in B even though the endpoint existed in A — read both modules
+before claiming a brand-new endpoint.
 
 ### 1e · New tool names / slash commands
 

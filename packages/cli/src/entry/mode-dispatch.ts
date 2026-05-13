@@ -436,6 +436,7 @@ import {
 } from '@claude-code/swarm'
 import { isAnalyticsDisabled } from '@claude-code/agent/services/privacyConfig.js'
 import { profileCheckpoint } from '@claude-code/app-host/startup/startupProfiler.js'
+import { resolveMaxTurnsFromEnv } from './maxTurnsEnv.js'
 
 // Types for closure variables passed as context
 export type PendingConnect = {
@@ -1532,7 +1533,6 @@ export async function runModeDispatch(
 			warnings.forEach((warning) => {
 				console.error(warning);
 			});
-
 
 			// claude.ai config fetch: -p mode only (interactive uses useManageMCPConnections
 			// two-phase loading). Kicked off here to overlap with setup(); awaited
@@ -2687,7 +2687,7 @@ export async function runModeDispatch(
 						permissionPromptToolName: options.permissionPromptTool,
 						allowedTools,
 						thinkingConfig,
-						maxTurns: options.maxTurns,
+						maxTurns: resolveMaxTurnsFromEnv(options.maxTurns as number | undefined),
 						maxBudgetUsd: options.maxBudgetUsd,
 						taskBudget: options.taskBudget
 							? { total: options.taskBudget }

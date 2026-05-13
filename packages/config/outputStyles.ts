@@ -24,6 +24,12 @@ export type OutputStyleConfig = {
   source: SettingSource | 'built-in' | 'plugin'
   keepCodingInstructions?: boolean
   /**
+   * ant v2.1.139 4096.js MYH — short reminder reinjected each turn so the
+   * style's behavior doesn't drift across long conversations. Currently
+   * used by the Proactive style.
+   */
+  turnReminder?: string
+  /**
    * If true, this output style will be automatically applied when the plugin is enabled.
    * Only applicable to plugin output styles.
    * When multiple plugins have forced output styles, only one is chosen (logged via debug).
@@ -62,8 +68,37 @@ Rules:
 
 export const DEFAULT_OUTPUT_STYLE_NAME = 'default'
 
+// ant v2.1.139 4095.js (hh8) — Proactive style body: directive list that
+// overrides Default's lazy-mode "ask first" behavior with "execute, minimize
+// interruptions, prefer action over planning".
+const PROACTIVE_FEATURE_PROMPT = `The user chose continuous, autonomous execution. You should:
+
+1. **Execute immediately** — Start implementing right away. Make reasonable assumptions and proceed on low-risk work.
+2. **Minimize interruptions** — Prefer making reasonable assumptions over asking questions for routine decisions.
+3. **Prefer action over planning** — Do not enter plan mode unless the user explicitly asks. When in doubt, start coding.
+4. **Expect course corrections** — The user may provide suggestions or course corrections at any point; treat those as normal input.
+5. **Do not take overly destructive actions** — This is not a license to destroy. Anything that deletes data or modifies shared or production systems still needs explicit user confirmation. If you reach such a decision point, ask and wait, or course correct to a safer method instead.
+6. **Avoid data exfiltration** — Post even routine messages to chat platforms or work tickets only if the user has directed you to. You must not share secrets (e.g. credentials, internal documentation) unless the user has explicitly authorized both that specific secret and its destination.`
+
 export const OUTPUT_STYLE_CONFIG: OutputStyles = {
   [DEFAULT_OUTPUT_STYLE_NAME]: null,
+  // ant v2.1.139 4096.js MYH.Proactive — 4th built-in output style. When the
+  // user sets `outputStyle: "Proactive"` Claude flips from default lazy mode
+  // to autonomous-execution mode. keepCodingInstructions stays true so
+  // tool-use safety + coding rules from the default prompt still apply.
+  Proactive: {
+    name: 'Proactive',
+    source: 'built-in',
+    description:
+      'Claude executes immediately, minimizes interruptions, and prefers action over planning',
+    keepCodingInstructions: true,
+    prompt: `You are an interactive CLI tool that helps users with software engineering tasks. You should work proactively and autonomously, executing immediately and minimizing interruptions.
+
+# Proactive Style Active
+${PROACTIVE_FEATURE_PROMPT}`,
+    turnReminder:
+      'Execute autonomously, minimize interruptions, prefer action over planning.',
+  },
   Explanatory: {
     name: 'Explanatory',
     source: 'built-in',
