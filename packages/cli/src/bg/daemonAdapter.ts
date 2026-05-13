@@ -417,6 +417,91 @@ export async function daemonAwaitAck(opts: {
 }
 
 /**
+ * Port of ant v2.1.132 WJK→uMK (4666.js) — ack-timeout redispatch.
+ *
+ * When daemonAwaitAck returns ETIMEOUT but the worker is still alive
+ * (the daemon's awaitAck handler exhausted its own budget while the
+ * worker actually started fine), spending another dispatch + ack cycle
+ * usually succeeds. Without this, transient PTY-init contention surfaces
+ * as a hard "worker failed to start" error and the user has to retry by
+ * hand.
+ *
+ * Error classification:
+ *   - `daemon_unavailable` — ENOCONN / ESOCKET — daemon not running.
+ *   - `transient_exhausted` — ETIMEOUT after rescue retry — worker
+ *     really is wedged; caller should fall back to in-process spawn.
+ *   - `stalled` — ESTALE — daemon thinks worker is dead but it's not.
+ */
+export type BgDispatchFailureKind =
+  | 'daemon_unavailable'
+  | 'transient_exhausted'
+  | 'stalled'
+
+export function classifyBgDispatchFailure(
+  r: DaemonResponse,
+): BgDispatchFailureKind | null {
+  if (r.ok) return null
+  if (r.code === 'ENOCONN' || r.code === 'ESOCKET') return 'daemon_unavailable'
+  if (r.code === 'ETIMEOUT') return 'transient_exhausted'
+  if (r.code === 'ESTALE' || r.code === 'EALIVE') return 'stalled'
+  return null
+}
+
+/**
+ * Dispatch + await-ack with one automatic redispatch attempt on
+ * ack-timeout. Emits `tengu_bg_dispatch_rescued` on successful retry,
+ * matching ant's telemetry payload for the same pattern.
+ */
+export async function daemonDispatchWithAckTimeoutRescue(payload: {
+  short: string
+  nonce: string
+  cwd: string
+  env: Record<string, string | undefined>
+  ptySocket: string
+  cmd: readonly string[]
+  cliVersion: string
+  source?: 'shell' | 'slash' | 'fleet' | 'spare' | 'respawn'
+  agent?: string
+  worktree?: string
+}): Promise<DaemonResponse> {
+  const first = await daemonDispatch(payload)
+  if (first.ok) {
+    const ack = await daemonAwaitAck({
+      short: payload.short,
+      nonce: payload.nonce,
+    })
+    if (ack.ok) return ack
+    const kind = classifyBgDispatchFailure(ack)
+    if (kind === 'transient_exhausted') {
+      // Re-dispatch with the same short — the daemon's dispatch handler
+      // dedupes on `short`, so this returns either the existing worker
+      // (already running, just slow to ack) or spawns fresh. 5s budget
+      // matches ant's redispatch window.
+      const retry = await daemonRequest(
+        'dispatch',
+        { d: payload },
+        { timeoutMs: 5000 },
+      )
+      if (retry.ok) {
+        const ack2 = await daemonAwaitAck({
+          short: payload.short,
+          nonce: payload.nonce,
+        })
+        if (ack2.ok) {
+          logEvent('tengu_bg_dispatch_rescued', {
+            short: payload.short,
+            reason: 'ack-timeout-redispatch',
+          })
+          return ack2
+        }
+      }
+    }
+    return ack
+  }
+  return first
+}
+
+/**
  * ant 5164.js wF3 — request daemon to SIGKILL+respawn a worker that
  * stalled at startup (attach client never saw first frame). Daemon
  * tracks attachStallRespawns counter; on 2nd call returns EGAVEUP.

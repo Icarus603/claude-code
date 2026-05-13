@@ -681,6 +681,21 @@ export const SettingsSchema = lazySchema(() =>
           'Skip the WebFetch blocklist check for enterprise environments with restrictive security policies',
         ),
       sandbox: SandboxSettingsSchema().optional(),
+      // Port of ant v2.1.136 (0679.js). When set to true in either
+      // admin-only Windows source — the HKLM SOFTWARE/Policies/ClaudeCode
+      // registry key or C:/Program Files/ClaudeCode/managed-settings.json
+      // — WSL reads managed settings from the full Windows policy chain
+      // (HKLM, C:/Program Files/ClaudeCode via DrvFs, HKCU) in addition
+      // to /etc/claude-code. Windows sources take priority. The flag is
+      // also required in HKCU itself for HKCU policy to apply on WSL
+      // (double opt-in: admin enables the chain, user confirms HKCU).
+      // On native Windows the flag has no effect.
+      wslInheritsWindowsSettings: z
+        .boolean()
+        .optional()
+        .describe(
+          'Inherit Windows managed settings inside WSL. Admin enables the chain via HKLM or C:/Program Files/ClaudeCode/managed-settings.json; user must also opt in via HKCU. Native Windows ignores this flag.',
+        ),
       spinnerTipsEnabled: z
         .boolean()
         .optional()
@@ -1015,6 +1030,14 @@ export const SettingsSchema = lazySchema(() =>
                   .array(z.string())
                   .optional()
                   .describe('Rules for the auto mode classifier deny section'),
+                hard_deny: z
+                  .array(z.string())
+                  .optional()
+                  .describe(
+                    'Rules for the auto mode classifier hard-deny section. ' +
+                      'Hard-deny rules block actions even with explicit user authorization in the conversation. ' +
+                      'Ported from ant v2.1.136 — used for Sensitive Data Access, Data Exfiltration, and Safety-Check Bypass.',
+                  ),
                 ...(process.env.USER_TYPE === 'ant'
                   ? {
                       // Back-compat alias for ant users; external users use soft_deny

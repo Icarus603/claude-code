@@ -7,6 +7,7 @@
  *
  * Must be synchronous and never throw — on error, returns a safe placeholder.
  */
+import { redactSecrets } from '@claude-code/storage/secretsRegistry.js'
 
 /** Patterns that match known secret/token formats. */
 const SECRET_PATTERNS: Array<{ pattern: RegExp; replacement: string }> = [
@@ -42,6 +43,17 @@ export function sanitizeInboundWebhookContent(content: string): string {
     for (const { pattern, replacement } of SECRET_PATTERNS) {
       pattern.lastIndex = 0
       sanitized = sanitized.replace(pattern, replacement)
+    }
+
+    // ALSO run the shared secrets registry's high-confidence patterns —
+    // ant v2.1.128 yg (0207.js). webhookSanitizer's bespoke list and the
+    // shared registry overlap but each catches things the other misses;
+    // applying both ensures we catch sk-ant-, JWT, PEM keys, etc. that
+    // weren't in the bridge-specific list.
+    try {
+      sanitized = redactSecrets(sanitized, { confidence: 'high' })
+    } catch {
+      // shared registry unavailable — bespoke list above is the floor
     }
 
     // Truncate excessively large payloads after redaction

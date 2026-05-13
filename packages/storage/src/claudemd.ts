@@ -57,6 +57,7 @@ import {
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { logForDiagnosticsNoPII } from '@claude-code/local-observability/logging'
 import { getClaudeConfigHomeDir, isEnvTruthy } from '@claude-code/config/env/utils'
+import { getPolicyHelperClaudeMd } from '@claude-code/config/policyHelper'
 import { getErrnoCode } from '@claude-code/local-observability/errorHelpers.js'
 import { normalizePathForComparison } from './file.js'
 import { cacheKeys, type FileStateCache } from '@claude-code/tool-registry/fileStateCache'
@@ -90,6 +91,15 @@ const MEMORY_INSTRUCTION_PROMPT =
   'Codebase and user instructions are shown below. Be sure to adhere to these instructions. IMPORTANT: These instructions OVERRIDE any default behavior and you MUST follow them exactly as written.'
 // Recommended max character count for a memory file
 export const MAX_MEMORY_CHARACTER_COUNT = 40000
+
+/**
+ * Sentinel "path" used for the synthetic Managed memory entry sourced
+ * from the policyHelper's `claudeMd` envelope field. Port of ant
+ * `H6H = "<policyHelper>"` (0687.js). The string starts with `<` so
+ * downstream path-handling code (which only worries about real
+ * filesystem paths) treats it as a non-file marker.
+ */
+export const POLICY_HELPER_CLAUDE_MD_SENTINEL = '<policyHelper>'
 
 // File extensions that are allowed for @include directives
 // This prevents binary files (images, PDFs, etc.) from being loaded into memory
@@ -810,6 +820,30 @@ export const getMemoryFiles = memoize(
         includeExternal,
       )),
     )
+
+    // Port of ant v2.1.136 `oAq()` (0686.js → 2619.js xf): when the
+    // policyHelper supplied a `claudeMd` field, inject it as a virtual
+    // Managed memory file using the sentinel path `<policyHelper>`.
+    // The synthetic entry is marked `contentDiffersFromDisk` because
+    // it was never on disk to begin with; downstream renderers treat
+    // that flag as "this came from a runtime source, don't try to
+    // read the file again."
+    try {
+      const helperClaudeMd = getPolicyHelperClaudeMd()
+      if (helperClaudeMd) {
+        result.push({
+          path: POLICY_HELPER_CLAUDE_MD_SENTINEL,
+          type: 'Managed',
+          content: helperClaudeMd,
+          globs: [],
+          contentDiffersFromDisk: true,
+          rawContent: helperClaudeMd,
+        })
+      }
+    } catch {
+      // accessor unavailable (e.g. policyHelper not yet initialized)
+    }
+
     // Process Managed .claude/rules/*.md files
     const managedClaudeRulesDir = getManagedClaudeRulesDir()
     result.push(

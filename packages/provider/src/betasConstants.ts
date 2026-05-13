@@ -58,3 +58,18 @@ export const CACHE_EDITING_BETA_HEADER: string = ''
 // `tengu_prompt_cache_diagnostics` statsig flag; ccb's GrowthBook stub
 // always returns false so the env var is the only effective trigger.
 export const CACHE_DIAGNOSIS_BETA_HEADER = 'cache-diagnosis-2026-04-07'
+
+// ant 1387.js kgq (v2.1.131) — `extended-cache-ttl-2025-04-11`. Allows
+// longer prompt-cache TTL than the default 5 min (presumably 1h+). Tracked
+// here as a registry constant so callers can opt in via env-gated flow.
+// Not in any default beta list; the SDK only sends it when explicitly
+// requested by the consumer.
+export const EXTENDED_CACHE_TTL_BETA_HEADER = 'extended-cache-ttl-2025-04-11'
+
+// ant gy 1413.js fp_ (v2.1.136) — mid-conversation-system. Server-side
+// gate to allow changing the system prompt mid-conversation. Activated by
+// CLAUDE_CODE_MID_CONVERSATION_SYSTEM env or `tengu_fennel_kite_model`
+// flag matching the model name (substring match). NOT in default betas;
+// added per-request via `isMidConversationSystemEnabled` (see betas.ts).
+export const MID_CONVERSATION_SYSTEM_BETA_HEADER =
+  'mid-conversation-system-2026-04-07'

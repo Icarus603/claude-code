@@ -4,6 +4,7 @@
  */
 
 import { resolve } from 'path'
+import { sanitizeUnicodeDashes } from '@claude-code/shell/bash/unicodeDashes.js'
 import type { ToolPermissionContext, ToolUseContext } from '../../Tool.js'
 import type {
   PermissionDecisionReason,
@@ -637,9 +638,26 @@ async function getSubCommandsForPermissionCheck(
  * @returns Promise resolving to PermissionResult
  */
 export async function powershellToolHasPermission(
-  input: PowerShellInput,
+  inputRaw: PowerShellInput,
   context: ToolUseContext,
 ): Promise<PermissionResult> {
+  // Port of ant v2.1.136 `Le()` (3999.js): normalize Unicode dashes
+  // (en-/em-/horizontal-bar U+2013/U+2014/U+2015) to ASCII hyphen
+  // BEFORE classification and rule-matching. PowerShell's tokenizer
+  // accepts all three as parameter prefixes (covered by
+  // PS_TOKENIZER_DASH_CHARS during AST parsing), but the
+  // PERMISSION RULE strings are user-authored ASCII. Without this
+  // sweep, a rule like `Get-Item -Path *` allowing reads under
+  // `/foo` would NOT match `Get-Item –Path /foo` (en-dash) →
+  // allow-list bypass risk identical to the BashTool case
+  // (bashPermissions.ts:1668). Ant applies `Le()` at the AST
+  // transform level (11 call sites in `wl7`/`qa5`/`cM_`/`Ka5`); ccb
+  // applies once at the permission entry which has the same effect
+  // for downstream rule matching.
+  const input: PowerShellInput = {
+    ...inputRaw,
+    command: sanitizeUnicodeDashes(inputRaw.command),
+  }
   const toolPermissionContext = context.getAppState().toolPermissionContext
   const command = input.command.trim()
 

@@ -33,7 +33,19 @@ const inputSchema = lazySchema(() =>
       })
       .optional()
       .describe(
-        'Optional name for the worktree. Each "/"-separated segment may contain only letters, digits, dots, underscores, and dashes; max 64 chars total. A random name is generated if not provided.',
+        'Optional name for the worktree to create. Each "/"-separated segment may contain only letters, digits, dots, underscores, and dashes; max 64 chars total. A random name is generated if not provided. Mutually exclusive with `path`.',
+      ),
+    // Port of ant v2.1.128 K7H (3871.js) — `path` mode lets the model
+    // re-enter an existing worktree (e.g. one created during a prior
+    // session). Safety: the path MUST already appear in `git worktree
+    // list` output. We don't accept arbitrary paths because the session
+    // CWD swap has side effects that should only happen against
+    // actually-existing worktrees.
+    path: z
+      .string()
+      .optional()
+      .describe(
+        'Optional absolute path to an existing worktree to enter. The path MUST be present in `git worktree list`. Mutually exclusive with `name`.',
       ),
   }),
 )
@@ -75,6 +87,12 @@ export const EnterWorktreeTool: Tool<InputSchema, Output> = buildTool({
   renderToolUseMessage,
   renderToolResultMessage,
   async call(input) {
+    // Validate mutually exclusive flags.
+    if (input.name && input.path) {
+      throw new Error(
+        'name and path are mutually exclusive — pass one or neither',
+      )
+    }
     // Validate not already in a worktree created by this session
     if (getCurrentWorktreeSession()) {
       throw new Error('Already in a worktree session')
@@ -85,6 +103,58 @@ export const EnterWorktreeTool: Tool<InputSchema, Output> = buildTool({
     if (mainRepoRoot && mainRepoRoot !== getCwd()) {
       process.chdir(mainRepoRoot)
       setCwd(mainRepoRoot)
+    }
+
+    // Port of ant v2.1.128 K7H — `path` mode: enter an existing worktree
+    // after checking it appears in `git worktree list`. We piggy-back on
+    // the shell exec module rather than spawning gh ourselves so the
+    // environment-override + sandbox semantics stay consistent with
+    // BashTool's behaviour.
+    if (input.path) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { execSync } = require('node:child_process') as typeof import('node:child_process')
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { resolve: pathResolve } = require('node:path') as typeof import('node:path')
+      let out: string
+      try {
+        out = execSync('git worktree list --porcelain', {
+          encoding: 'utf-8',
+          timeout: 5000,
+          cwd: mainRepoRoot ?? getCwd(),
+        })
+      } catch {
+        throw new Error(
+          'Failed to enumerate worktrees via `git worktree list`',
+        )
+      }
+      const absPath = pathResolve(input.path)
+      const lines = out.split(/\r?\n/)
+      const known = new Set<string>()
+      for (const line of lines) {
+        if (line.startsWith('worktree ')) known.add(line.slice('worktree '.length).trim())
+      }
+      if (!known.has(absPath)) {
+        throw new Error(
+          `Path "${absPath}" is not in \`git worktree list\`. Use \`name\` to create a new worktree, or pass an existing worktree path.`,
+        )
+      }
+      process.chdir(absPath)
+      setCwd(absPath)
+      setOriginalCwd(absPath)
+      // We didn't create a session here — leave session storage untouched.
+      // Just clear caches so subsequent reads reflect the new cwd.
+      clearSystemPromptSections()
+      clearMemoryFileCaches()
+      getPlansDirectory.cache.clear?.()
+      logEvent('tengu_worktree_entered_existing', {
+        mid_session: true,
+      })
+      return {
+        data: {
+          worktreePath: absPath,
+          message: `Entered existing worktree at ${absPath}. The session is now working in the worktree.`,
+        },
+      }
     }
 
     const slug = input.name ?? getPlanSlug()

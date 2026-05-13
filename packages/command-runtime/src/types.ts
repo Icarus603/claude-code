@@ -9,6 +9,13 @@ export type LocalCommandResult =
       displayText?: string
     }
   | { type: 'skip' }
+  /**
+   * `'query'` — visible system stdout (`value`) PLUS an invisible meta-message
+   * (`prompt`) that drives the agent. Used by `/goal` so the user sees
+   * "Goal set: ..." and the agent silently receives the directive prompt.
+   * Mirrors ant v2.1.136 4689.js OZ3 + 3753.js qm5 'query' branch.
+   */
+  | { type: 'query'; value: string; prompt: string }
 
 export type PromptCommand = {
   type: 'prompt'

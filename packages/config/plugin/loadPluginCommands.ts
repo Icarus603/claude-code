@@ -26,6 +26,7 @@ import {
 import { parseUserSpecifiedModel } from './_deps.js'
 import { executeShellCommandsInPrompt } from './_deps.js'
 import { loadAllPluginsCacheOnly } from './pluginLoader.js'
+import { logNameCollision } from './nameCollision.js'
 import {
   loadPluginOptions,
   substitutePluginVariables,
@@ -673,6 +674,28 @@ export const getPluginCommands = memoize(async (): Promise<Command[]> => {
 
   const allCommands = perPluginCommands.flat()
   logForDebugging(`Total plugin commands loaded: ${allCommands.length}`)
+  // Ant v2.1.136 LzH (2643.js) — emit `tengu_plugin_name_collision` when
+  // two plugin sources contribute a command with the same name. The
+  // loader's own deterministic ordering already picked a winner; this
+  // event is observability-only. LzH walks all entries in source-push
+  // order, dedupes per-name sources, and tags the LAST source as
+  // `winner_source` when `resolves=true` is supplied. Wrap in try/catch
+  // so telemetry can never block plugin command loading.
+  try {
+    logNameCollision({
+      itemType: 'command',
+      entries: allCommands.map(cmd => ({
+        name: cmd.name,
+        source:
+          (cmd as { source?: string }).source ??
+          (cmd as { loadedFrom?: string }).loadedFrom ??
+          'plugin',
+      })),
+      resolves: true,
+    })
+  } catch {
+    // collision telemetry must not block plugin command loading
+  }
   return allCommands
 })
 

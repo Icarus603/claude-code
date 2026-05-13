@@ -285,6 +285,7 @@ import {
   getFlagSettingsInline,
   setFlagSettingsInline,
   getMainThreadAgentType,
+  setMcpClientsAccessor,
 } from '@claude-code/app-host/bootstrap/state.js'
 import { runWithWorkload, WORKLOAD_CRON } from '@claude-code/provider/workloadContext.js'
 import type { UUID } from 'crypto'
@@ -447,6 +448,16 @@ export function runHeadlessStreaming(
   let abortController: AbortController | undefined
   // Same queue sendRequest() enqueues to — one FIFO for everything.
   const output = structuredIO.outbound
+
+  // Port of ant v2.1.136 IyH (4690.js) — install the MCP clients
+  // accessor for headless sessions too, so tool isEnabled gates and any
+  // other non-React reader can see the live client list. Note: the
+  // headless `mcpClients` array is captured at session start and stable
+  // for the lifetime of run-streaming, so no subscription is needed.
+  setMcpClientsAccessor(() => mcpClients)
+  registerCleanup(async () => {
+    setMcpClientsAccessor(null)
+  })
 
   // Ctrl+C in -p mode: abort the in-flight query, then shut down gracefully.
   // gracefulShutdown persists session state and flushes analytics, with a

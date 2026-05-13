@@ -338,6 +338,52 @@ export const ToolSearchTool = buildTool({
       return pending.length > 0 ? pending.map(s => s.name) : undefined
     }
 
+    /**
+     * Port of ant v2.1.128 D56 (3866.js) — wait briefly for pending MCP
+     * servers then re-fetch tools. Used after a search miss when the
+     * query targets a specific MCP server (mcp__<server>__ substring).
+     * The wait is bounded to `WAIT_BUDGET_MS` so the agent loop doesn't
+     * stall indefinitely.
+     */
+    const WAIT_BUDGET_MS = 5000
+    async function waitForPendingMcpServers(
+      targetServers: string[],
+    ): Promise<void> {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getFeatureValue_CACHED_MAY_BE_STALE } = require(
+        '@claude-code/config/feature-flags',
+      ) as typeof import('@claude-code/config/feature-flags')
+      if (!getFeatureValue_CACHED_MAY_BE_STALE('tengu_ashen_kelp', true)) {
+        return
+      }
+      if (targetServers.length === 0) return
+      const start = Date.now()
+      const pendingBefore = (getPendingServerNames() ?? []).length
+      while (Date.now() - start < WAIT_BUDGET_MS) {
+        const pending = getPendingServerNames() ?? []
+        if (pending.length === 0) break
+        const stillTargets = targetServers.filter(t => pending.includes(t))
+        if (stillTargets.length === 0) break
+        await new Promise(r => setTimeout(r, 100))
+      }
+      const pendingAfter = (getPendingServerNames() ?? []).length
+      logEvent('tengu_tool_search_mcp_wait', {
+        waited_ms: Date.now() - start,
+        pending_before: pendingBefore,
+        pending_after: pendingAfter,
+        target_count: targetServers.length,
+      })
+    }
+
+    /**
+     * Detect MCP-server-targeted queries (e.g. `mcp__github__list_issues`).
+     * Returns the server name segment if present, else null.
+     */
+    function extractTargetMcpServer(q: string): string | null {
+      const m = q.match(/mcp__([a-zA-Z0-9_-]+)__/i)
+      return m?.[1] ?? null
+    }
+
     // Helper to log search outcome
     function logSearchOutcome(
       matches: string[],

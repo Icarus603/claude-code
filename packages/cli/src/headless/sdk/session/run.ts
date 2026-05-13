@@ -11,6 +11,11 @@ import { isBuiltInAgent } from '@claude-code/tool-registry/tools/AgentTool/loadA
 import type { ThinkingConfig } from '@claude-code/provider/thinking.js'
 import type { SDKMessage, SDKStatus } from '@claude-code/headless-sdk/agentSdkTypes.js'
 import type { StdoutMessage } from '@claude-code/headless-sdk/controlTypes.js'
+import {
+  recordRssSample,
+  scheduleSdkMemorySummary,
+} from '@claude-code/headless-sdk/sdkMemorySummary.js'
+import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import type { RequiresActionDetails } from '@claude-code/storage/sessionState.js'
 import type { StructuredIO } from '../../../structuredIO.js'
 import type { processSessionStartHooks } from '@claude-code/storage/sessionStart.js'
@@ -126,6 +131,25 @@ export async function runHeadless(
     setSDKStatus?: (status: SDKStatus) => void
   },
 ): Promise<void> {
+  // Port of ant v2.1.136 2144.js `hP9` — SDK memory summary on shutdown.
+  // ant's flow:
+  //   1. Capture initial mem snapshot via recordRssSample at SDK entry.
+  //   2. Register a dispose handler via scheduleSdkMemorySummary; it
+  //      builds the payload (peak vs initial, child kind aggregates,
+  //      attribute providers) and emits ONE event at process shutdown.
+  // The emit-once + schedule-once guards live in the helper module, so
+  // re-entry / duplicate registrations are a no-op.
+  recordRssSample()
+  scheduleSdkMemorySummary(fn => {
+    registerCleanup(async () => {
+      try {
+        fn()
+      } catch {
+        // telemetry sink may be uninstalled at shutdown — fine
+      }
+    })
+  })
+
   if (
     process.env.USER_TYPE === 'ant' &&
     isEnvTruthy(process.env.CLAUDE_CODE_EXIT_AFTER_FIRST_RENDER)

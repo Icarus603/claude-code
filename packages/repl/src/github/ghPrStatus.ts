@@ -1,6 +1,10 @@
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 import { getBranch, getDefaultBranch, getIsGit } from '@claude-code/storage/git.js'
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
+import {
+  fetchPrStatusViaRest,
+  isHarborPrismEnabled,
+} from './ghPrStatusRest.js'
 
 export type PrReviewState =
   | 'approved'
@@ -54,6 +58,44 @@ export async function fetchPrStatus(): Promise<PrStatus | null> {
     getDefaultBranch(),
   ])
   if (branch === defaultBranch) return null
+
+  // Port of ant v2.1.128 gZ7 (3672.js) — when `tengu_harbor_prism` is
+  // on, prefer REST + ETag caching over spawning `gh pr view`. Saves
+  // ~40ms per poll, supports GitHub Enterprise via GH_HOST.
+  try {
+    if (isHarborPrismEnabled() && branch) {
+      // Need owner/repo — derive from git remote.
+      const remote = await execFileNoThrow('git', [
+        'remote',
+        'get-url',
+        'origin',
+      ])
+      const ownerRepo = remote.stdout
+        ? /[:/]([^/:]+)\/([^/]+?)(?:\.git)?$/.exec(remote.stdout.trim())
+        : null
+      if (ownerRepo) {
+        const rest = await fetchPrStatusViaRest({
+          owner: ownerRepo[1]!,
+          repo: ownerRepo[2]!,
+          branch,
+        })
+        if (rest) {
+          return {
+            number: rest.number,
+            url: rest.url,
+            reviewState:
+              rest.reviewDecision === 'APPROVED'
+                ? 'approved'
+                : rest.reviewDecision === 'CHANGES_REQUESTED'
+                  ? 'changes_requested'
+                  : 'pending',
+          }
+        }
+      }
+    }
+  } catch {
+    // REST path failure — fall through to spawn-gh path below.
+  }
 
   const { stdout, code } = await execFileNoThrow(
     'gh',

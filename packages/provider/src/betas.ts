@@ -15,6 +15,7 @@ import {
   CONTEXT_1M_BETA_HEADER,
   CONTEXT_MANAGEMENT_BETA_HEADER,
   INTERLEAVED_THINKING_BETA_HEADER,
+  MID_CONVERSATION_SYSTEM_BETA_HEADER,
   PROMPT_CACHING_SCOPE_BETA_HEADER,
   REDACT_THINKING_BETA_HEADER,
   STRUCTURED_OUTPUTS_BETA_HEADER,
@@ -85,6 +86,40 @@ export function filterAllowedSdkBetas(
     )
   }
   return allowed.length > 0 ? allowed : undefined
+}
+
+/**
+ * Port of ant v2.1.136 `hQ_` (YG / 1989.js). Predicates whether the current
+ * model should opt into the `mid-conversation-system-2026-04-07` beta.
+ *
+ * Activation order:
+ *   1. env `CLAUDE_CODE_MID_CONVERSATION_SYSTEM` — value is matched as a
+ *      substring of the model id. Useful for local pinning.
+ *   2. GrowthBook flag `tengu_fennel_kite_model` — same substring semantics.
+ *      ant's cache-aware lookup is collapsed into a single getFeatureValue
+ *      call here since ccb doesn't expose the dual path.
+ *
+ * Returns false by default. Provider must be firstParty / foundry — the
+ * server-side gate doesn't exist on Bedrock/Vertex/3P routes.
+ */
+export function isMidConversationSystemEnabled(model: string): boolean {
+  const provider = getAPIProvider()
+  if (provider !== 'firstParty' && provider !== 'foundry') return false
+
+  const canonical = getCanonicalName(model)
+
+  const envValue = readEnv('CLAUDE_CODE_MID_CONVERSATION_SYSTEM')
+  if (envValue && canonical.includes(envValue)) return true
+
+  const flagValue = getFeatureValue_CACHED_MAY_BE_STALE<string>(
+    'tengu_fennel_kite_model',
+    '',
+  )
+  if (typeof flagValue === 'string' && flagValue.length > 0) {
+    return canonical.includes(flagValue)
+  }
+
+  return false
 }
 
 export function modelSupportsISP(model: string): boolean {
@@ -284,6 +319,16 @@ export const getAllModelBetas = memoize((model: string): string[] => {
 
   if (includeFirstPartyOnlyBetas) {
     betaHeaders.push(PROMPT_CACHING_SCOPE_BETA_HEADER)
+  }
+
+  // Port of ant v2.1.136 — mid-conversation-system gate. Only added when the
+  // env var or `tengu_fennel_kite_model` flag explicitly opts in (default
+  // false). Server-side feature; non-firstParty providers ignore the header.
+  if (
+    shouldIncludeFirstPartyOnlyBetas() &&
+    isMidConversationSystemEnabled(model)
+  ) {
+    betaHeaders.push(MID_CONVERSATION_SYSTEM_BETA_HEADER)
   }
 
   if (readEnv('ANTHROPIC_BETAS')) {

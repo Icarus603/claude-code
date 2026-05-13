@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import { IneffectivePluginDisables } from '../components/IneffectivePluginDisables.js'
 import { KeybindingWarnings } from '../components/KeybindingWarnings.js'
 import { McpParsingWarnings } from '../components/mcp/McpParsingWarnings.js'
 import { getModelMaxOutputTokens } from '@claude-code/agent/context.js'
@@ -347,6 +348,8 @@ export function Doctor({ onDone }: Props): React.ReactNode {
       <McpParsingWarnings />
 
       <KeybindingWarnings />
+
+      <IneffectivePluginDisables />
 
       {/* Environment Variables */}
       {envValidationErrors.length > 0 && (

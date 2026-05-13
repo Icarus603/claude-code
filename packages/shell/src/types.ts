@@ -57,6 +57,13 @@ export type ExecOptions = {
   shouldAutoBackground?: boolean
   /** When provided, stdout is piped (not sent to file) and this callback fires on each data chunk. */
   onStdout?: (data: string) => void
+  /**
+   * Extra environment variables to merge into the spawned subprocess. Ported
+   * from ant v2.1.133 yZ→RZ (4042.js). Currently used by BashTool to forward
+   * `CLAUDE_EFFORT=<level>` so user-defined shell scripts and status-line
+   * generators can branch on the active effort level.
+   */
+  extraEnv?: Record<string, string>
 }
 
 

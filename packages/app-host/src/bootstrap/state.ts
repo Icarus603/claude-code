@@ -1710,6 +1710,38 @@ export function setIsRemoteMode(value: boolean): void {
   STATE.isRemoteMode = value
 }
 
+// MCP clients accessor — port of ant IyH/OMH (4690.js).
+// MCPConnectionManager installs an accessor at mount time; tools that
+// need to read the current MCP client list (e.g. WaitForMcpServersTool
+// isEnabled gate) call getMcpClientsFromAccessor(). Returns null when
+// no accessor is installed yet (during bootstrap), so callers must
+// nullish-coalesce.
+
+export type McpClientSnapshotEntry = {
+  name: string
+  type:
+    | 'connected'
+    | 'failed'
+    | 'pending'
+    | 'needs-auth'
+    | 'disabled'
+    | string
+}
+
+let mcpClientsAccessor: (() => readonly McpClientSnapshotEntry[]) | null = null
+
+export function setMcpClientsAccessor(
+  accessor: (() => readonly McpClientSnapshotEntry[]) | null,
+): void {
+  mcpClientsAccessor = accessor
+}
+
+export function getMcpClientsFromAccessor():
+  | readonly McpClientSnapshotEntry[]
+  | null {
+  return mcpClientsAccessor?.() ?? null
+}
+
 // System prompt section accessors
 
 export function getSystemPromptSectionCache(): Map<string, string | null> {

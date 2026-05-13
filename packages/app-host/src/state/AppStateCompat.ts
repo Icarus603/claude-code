@@ -432,6 +432,17 @@ export type AppState = DeepImmutable<{
   // Remote-harness side: set via set_permission_mode control_request,
   // pushed to CCR external_metadata.is_ultraplan_mode by onChangeAppState.
   isUltraplanMode?: boolean
+  // Port of ant v2.1.132 (4472.js BTK setActiveGoal). When the user
+  // invokes `/goal <condition>`, a session-scoped Stop hook is registered
+  // (matcher='', type='prompt') AND this state field is set. The Stop
+  // hook blocks the agent from ending until the condition is met; the
+  // state field powers the `/goal active (5m)` UI indicator and the
+  // `/goal` command's "show status" branch when called with no args.
+  activeGoal?: {
+    condition: string
+    iterations: number
+    setAt: number
+  }
   // Always-on bridge: permission callbacks for bidirectional permission checks
   replBridgePermissionCallbacks?: BridgePermissionCallbacks
   // Channel permission callbacks — permission prompts over Telegram/iMessage/etc.

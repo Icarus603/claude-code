@@ -33,7 +33,12 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
-import { getMaxVersion, shouldSkipVersion } from '../autoUpdater.js'
+import {
+  getCanaryVersion,
+  getMaxVersionAndForceDowngrade,
+  shouldForceDowngradeNow,
+  shouldSkipVersion,
+} from '../autoUpdater.js'
 import { registerCleanup } from '@claude-code/app-host/bootstrap/cleanupRegistry.js'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
@@ -489,19 +494,62 @@ async function updateLatest(
   lockHolderPid?: number
 }> {
   const startTime = Date.now()
-  let version = await getLatestVersion(channelOrVersion)
   const { executable: executablePath } = getBaseDirectories()
+
+  // Port of ant v2.1.136 `UV5` (3486.js) target-selection:
+  //   1. Load {maxVersion, forceDowngradeEnabled} in one trip.
+  //   2. Force-downgrade is eligible ONLY when:
+  //      - `forceDowngradeEnabled` is true
+  //      - NOT forceReinstall (explicit version pins skip this guard)
+  //      - channelOrVersion is a channel name (e.g. 'latest' / 'stable'),
+  //        not a pinned semver. ant tests `O = !/^v?\d+\.\d+\.\d+(-\S+)?$/.test(H)`
+  //      - maxVersion is set
+  //      - shouldForceDowngradeNow says current > maxVersion (ant UK6)
+  //   3. When eligible, target = maxVersion; otherwise getLatestVersion.
+  const isPinnedVersion = /^v?\d+\.\d+\.\d+(-\S+)?$/.test(channelOrVersion)
+  const { maxVersion, forceDowngradeEnabled } =
+    await getMaxVersionAndForceDowngrade()
+  const isForceDowngrade =
+    forceDowngradeEnabled &&
+    !forceReinstall &&
+    !isPinnedVersion &&
+    !!maxVersion &&
+    shouldForceDowngradeNow(MACRO.VERSION, maxVersion, 'native_update')
+  let version = isForceDowngrade
+    ? (maxVersion as string)
+    : await getLatestVersion(channelOrVersion)
 
   logForDebugging(`Checking for native installer update to version ${version}`)
 
-  // Check if max version is set (server-side kill switch for auto-updates)
-  if (!forceReinstall) {
-    const maxVersion = await getMaxVersion()
-    if (maxVersion && isVersionNewer(version, maxVersion)) {
+  // Ant `UV5` canary override: when `channelOrVersion === 'latest'` AND
+  // force-downgrade is not active, consult the `tengu_canary` GrowthBook
+  // flag. If a canary version is set AND it's newer than the otherwise-
+  // resolved target AND it's not above maxVersion, override. This lets
+  // ant stage a new native build on a subset of users before bumping
+  // `latest`. Skipped for explicit version pins / 'stable' channel.
+  if (channelOrVersion === 'latest' && !isForceDowngrade) {
+    const canary = getCanaryVersion()
+    const canaryExceedsMax =
+      canary !== null && maxVersion !== undefined && isVersionNewer(canary, maxVersion)
+    if (canary && isVersionNewer(canary, version) && !canaryExceedsMax) {
+      logForDebugging(
+        `Native installer: canary ${canary} active, overriding ${version}`,
+      )
+      version = canary
+    } else if (canaryExceedsMax) {
+      logForDebugging(
+        `Native installer: canary ${canary} exceeds maxVersion ${maxVersion}, not applying`,
+      )
+    }
+  }
+
+  // Cap-only path: when not force-downgrading but maxVersion caps latest,
+  // pin to maxVersion (skip entirely if already at/above).
+  if (!isForceDowngrade && !forceReinstall && maxVersion) {
+    if (isVersionNewer(version, maxVersion)) {
       logForDebugging(
         `Native installer: maxVersion ${maxVersion} is set, capping update from ${version} to ${maxVersion}`,
       )
-      // If we're already at or above maxVersion, skip the update entirely
       if (!isVersionNewer(maxVersion, MACRO.VERSION)) {
         logForDebugging(
           `Native installer: current version ${MACRO.VERSION} is already at or above maxVersion ${maxVersion}, skipping update`,
@@ -517,6 +565,20 @@ async function updateLatest(
       }
       version = maxVersion
     }
+  }
+
+  // Ant `UV5`: fire `tengu_native_update_forced_downgrade` AFTER the
+  // target is locked in, BEFORE the install actually runs. Matches the
+  // `if(z) d("tengu_native_update_forced_downgrade",...)` ordering so
+  // operators see the event regardless of whether the install
+  // succeeds or hits a lock.
+  if (isForceDowngrade) {
+    logEvent('tengu_native_update_forced_downgrade', {
+      from_version:
+        MACRO.VERSION as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      to_version:
+        version as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
   }
 
   // Early exit: if we're already running this exact version AND both the version binary
@@ -1442,16 +1504,20 @@ export async function cleanupOldVersions(): Promise<void> {
  * @returns true if the path is npm-managed, false otherwise
  */
 async function isNpmSymlink(executablePath: string): Promise<boolean> {
-  // Resolve symlink to its target if applicable
-  let targetPath = executablePath
-  const stats = await lstat(executablePath)
-  if (stats.isSymbolicLink()) {
-    targetPath = await realpath(executablePath)
-  }
-
-  // checking npm prefix isn't guaranteed to work, as prefix can change
-  // and users may set --prefix manually when installing
-  // thus we use this heuristic:
+  // Byte-for-byte port of ant `cV5` (3486.js):
+  //   async function cV5(H){
+  //     let _=await uK.realpath(H);
+  //     return _.endsWith(".js")||_.includes("node_modules")
+  //   }
+  //
+  // ant unconditionally realpath()s — works for symlinks, hard links,
+  // and bind mounts on Linux + APFS firmlinks on macOS. The earlier ccb
+  // impl gated on lstat().isSymbolicLink() which silently mis-classified
+  // hard-linked installs (and added an extra syscall).
+  //
+  // ENOENT propagates to caller (removeInstalledSymlink wraps in try
+  // and treats ENOENT as a no-op success, matching ant).
+  const targetPath = await realpath(executablePath)
   return targetPath.endsWith('.js') || targetPath.includes('node_modules')
 }
 
@@ -1463,23 +1529,46 @@ async function isNpmSymlink(executablePath: string): Promise<boolean> {
 export async function removeInstalledSymlink(): Promise<void> {
   const dirs = getBaseDirectories()
 
+  // Byte-for-byte port of ant `Cw_` (3486.js). Fires the
+  // `tengu_native_remove_symlink_outcome` event in three places:
+  //   - npm-managed skip (success)
+  //   - unlink success
+  //   - ENOENT (also success — nothing to remove)
+  //   - any other error → outcome:'unlink_failed'
+  // Prior ccb impl had no telemetry, so the dashboard couldn't tell
+  // whether installation-method switches actually cleaned up.
   try {
-    // Check if this is an npm-managed installation
     if (await isNpmSymlink(dirs.executable)) {
       logForDebugging(
         `Skipping removal of ${dirs.executable} - appears to be npm-managed`,
       )
+      logEvent('tengu_native_remove_symlink_outcome', {
+        outcome:
+          'skipped_npm_managed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
       return
     }
 
-    // It's a native binary symlink, safe to remove
     await unlink(dirs.executable)
     logForDebugging(`Removed claude symlink at ${dirs.executable}`)
+    logEvent('tengu_native_remove_symlink_outcome', {
+      outcome:
+        'removed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
   } catch (error) {
     if (isENOENT(error)) {
+      // ant treats ENOENT as success (no-op) — file already gone.
+      logEvent('tengu_native_remove_symlink_outcome', {
+        outcome:
+          'enoent_already_gone' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      })
       return
     }
     logError(new Error(`Failed to remove claude symlink: ${error}`))
+    logEvent('tengu_native_remove_symlink_outcome', {
+      outcome:
+        'unlink_failed' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
   }
 }
 

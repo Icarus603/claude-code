@@ -45,6 +45,7 @@ import {
 import { REPEATED_529_ERROR_MESSAGE } from './errors.js'
 import { extractConnectionErrorDetails } from './errorUtils.js'
 import { readEnv } from '@claude-code/config/env'
+import { parseImageDimensionExceededError } from './imageDimensionStrip.js'
 
 const abortError = () => new APIUserAbortError()
 
@@ -373,8 +374,15 @@ export async function* withRetry<T>(
       // AWS/GCP errors aren't always APIError, but can be retried
       const handledCloudAuthError =
         handleAwsCredentialError(error) || handleGcpCredentialError(error)
+      // Image-dimension-exceeded 400 is normally non-retryable; the caller
+      // (claudeLegacyRuntime) has already patched messagesForAPI to drop the
+      // offending block in the catch path. Let it through so withRetry sleeps
+      // + retries with the patched request. Ported from ant v2.1.126.
+      const isImageDimensionRetryable =
+        parseImageDimensionExceededError(error) !== undefined
       if (
         !handledCloudAuthError &&
+        !isImageDimensionRetryable &&
         (!(error instanceof APIError) || !shouldRetry(error))
       ) {
         throw new CannotRetryError(error, retryContext)

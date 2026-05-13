@@ -24,7 +24,25 @@ import {
   writeWorkerRecord,
 } from './bgWorkerRegistry.js'
 import { recordToRosterEntry, updateRoster } from './roster.js'
+import { EventEmitter } from 'node:events'
 import type { Socket } from 'node:net'
+
+/**
+ * Build a no-op Socket-shaped value for fire-and-forget RPC paths (file
+ * spool delivery, etc.). Returns an EventEmitter-backed object that has
+ * the minimal net.Socket surface the daemon's op handlers touch:
+ * `write`/`end`/`destroyed`/`once`/`on`.
+ */
+function makeNoopSocketForSpool(): Socket {
+  const ee = new EventEmitter() as Socket
+  // The op handlers only call write/end and never read the response.
+  Object.assign(ee, {
+    write: () => true,
+    end: () => {},
+    destroyed: false,
+  })
+  return ee
+}
 import { type DaemonServer, err, ok, startSocketServer } from './socketServer.js'
 import { WorkerVm } from './workerVm.js'
 
@@ -336,6 +354,64 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
       if (state.workers.has(short)) {
         logEventFn('tengu_bg_dispatch_rejected', { short, reason: 'already_running' })
         return err('EALIVE', `worker ${short} already running`, { short })
+      }
+      // Port of ant v2.1.133 NdK (5196.js) — free-memory cap before spawn.
+      // When the host's available RAM drops below `tengu_bg_low_mem_mb`
+      // (default 1024MB; macOS exempted because vm_stat semantics don't
+      // line up with os.freemem and would cause spurious retires), call
+      // retireIfSettled on every existing worker to reclaim memory before
+      // taking on another. On Linux/Windows we always check — the kernel
+      // tries to over-commit, so spawning one more bg session in a
+      // memory-starved system is what typically tips it into the OOM
+      // killer or thrashing. Emit telemetry so the threshold can be
+      // tuned per environment.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const os = require('node:os') as typeof import('node:os')
+        const platform = os.platform()
+        // Read threshold from env. Daemon's cross-package coupling
+        // budget keeps it independent of @claude-code/config, so we
+        // avoid the GrowthBook flag and gate via env only.
+        // CLAUDE_CODE_BG_LOW_MEM_MB overrides the default (1024 MB on
+        // Linux/Win, 0 on macOS — vm_stat semantics don't line up
+        // with os.freemem and would cause spurious retires).
+        // eslint-disable-next-line custom-rules/no-process-env-top-level
+        const envOverride = Number(process.env.CLAUDE_CODE_BG_LOW_MEM_MB)
+        const thresholdMb =
+          platform === 'darwin'
+            ? Number.isFinite(envOverride)
+              ? envOverride
+              : 0
+            : Number.isFinite(envOverride)
+              ? envOverride
+              : 1024
+        if (thresholdMb > 0) {
+          const thresholdBytes = thresholdMb * 1024 * 1024
+          const freeBytes = os.freemem()
+          if (freeBytes < thresholdBytes) {
+            let retired = 0
+            for (const [s, w] of state.workers.entries()) {
+              const retireIfSettled = (
+                w as { retireIfSettled?: () => boolean }
+              ).retireIfSettled
+              if (typeof retireIfSettled === 'function') {
+                if (retireIfSettled.call(w)) {
+                  retired++
+                  state.workers.delete(s)
+                  state.pending.delete(s)
+                }
+              }
+            }
+            logEventFn('tengu_bg_dispatch_low_mem', {
+              free_mb: String(Math.floor(freeBytes / (1024 * 1024))),
+              handles: String(state.workers.size),
+              retired: String(retired),
+              threshold_mb: String(thresholdMb),
+            })
+          }
+        }
+      } catch {
+        // Low-mem check must not block legitimate dispatch — fall through.
       }
       // ant 4644.js: try claim spare before fresh spawn. If a ready spare
       // matches cwd, send 'claim' ctrl-frame with the dispatched intent
@@ -707,8 +783,11 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
     const handler = opHandlers[env.op as keyof typeof opHandlers]
     if (typeof handler !== 'function') return
     // No-op socket — file-spool envelopes are one-shot, no client to reply to.
-    // Type cast: socket impl detail; handler's runtime path is fire-and-forget.
-    const noopSocket = { write: () => true, end: () => {}, destroyed: false, once: () => {}, on: () => {} } as unknown as Parameters<typeof handler>[1]
+    // Build a minimal net.Socket-shaped value via EventEmitter so the
+    // assignment is structural (no cast) and the handler's fire-and-forget
+    // runtime path stays satisfied.
+    const noopSocket: Parameters<typeof handler>[1] =
+      makeNoopSocketForSpool()
     await handler({ ...env.d, op: env.op, ...(env.nonce && { nonce: env.nonce }) }, noopSocket)
   }
   await drainSpool(deliverSpooled)

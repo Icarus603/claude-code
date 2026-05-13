@@ -17,6 +17,7 @@ import type { LoadedPlugin, PluginError } from '@claude-code/config/plugin/types
 import { getTools } from '@claude-code/tool-registry/runtime'
 import { resolveAgentTools } from '@claude-code/tool-registry/tools/AgentTool/agentToolUtils.js'
 import { getInteractiveMcpClients } from './integrations.js'
+import { setMcpClientsAccessor } from '@claude-code/app-host/bootstrap/state.js'
 
 type McpSnapshot = {
   clients: MCPServerConnection[]
@@ -131,6 +132,14 @@ export function useReplRuntimeViews({
     isRemoteSession,
     mcpClients,
   )
+
+  // Port of ant v2.1.136 IyH (4690.js) — install a live accessor so
+  // non-React code (tool isEnabled gates, etc.) can read the current
+  // MCP client list. Uninstall on unmount.
+  useEffect(() => {
+    setMcpClientsAccessor(() => mcpClients)
+    return () => setMcpClientsAccessor(null)
+  }, [mcpClients])
 
   const combinedInitialTools = useMemo(
     () => [...localTools, ...initialTools],

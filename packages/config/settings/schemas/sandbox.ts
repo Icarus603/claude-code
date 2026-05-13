@@ -76,6 +76,24 @@ export const SandboxSettingsSchema = lazySchema(() =>
         })
         .optional()
         .describe('Custom ripgrep configuration for bundled ripgrep support'),
+      // Port of ant v2.1.133 aTH (2492.js) — explicit overrides for the
+      // sandbox helper binaries. settings layers (userSettings,
+      // projectSettings, localSettings, flagSettings, policySettings) are
+      // walked top-down by `getSandboxBinaryPath` and the first non-empty
+      // wins. Enterprise admins can pin a vendored bwrap/socat without
+      // requiring the user to mutate $PATH.
+      bwrapPath: z
+        .string()
+        .optional()
+        .describe(
+          'Explicit path to the bubblewrap binary. When set, overrides $PATH-based resolution. Layered across settings sources: first non-empty wins.',
+        ),
+      socatPath: z
+        .string()
+        .optional()
+        .describe(
+          'Explicit path to socat (used inside the sandbox for relays). When set, overrides $PATH-based resolution. Layered across settings sources: first non-empty wins.',
+        ),
     })
     .passthrough(),
 )

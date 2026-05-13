@@ -264,6 +264,14 @@ export async function suggestPathUnderCwd(
  * Killswitch pattern: GB can disable if issues surface externally.
  */
 export function isCompactLinePrefixEnabled(): boolean {
+  // Port of ant v2.1.136 (eUH 2869.js) — `tengu_tab_read_sep` explicitly
+  // opts into the TAB separator. ccb already defaults to TAB via the
+  // killswitch pattern below; the new flag is read first so a user who
+  // had the killswitch ON (= arrow separator) can still get TAB by
+  // setting tab_read_sep=true.
+  if (getFeatureValue_CACHED_MAY_BE_STALE('tengu_tab_read_sep', false)) {
+    return true
+  }
   // 3P default: killswitch off = compact format enabled. Client-side only —
   // no server support needed, safe for Bedrock/Vertex/Foundry.
   return !getFeatureValue_CACHED_MAY_BE_STALE(

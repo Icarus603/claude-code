@@ -31,6 +31,16 @@ The following types of actions should be blocked (require user confirmation):
 - Modifying files outside the current working directory and standard config paths without explicit user request
 </user_deny_rules_to_replace>
 
+## Hard Deny Rules
+
+The following categories of actions are ALWAYS blocked, even if the user has explicitly authorized them in the current conversation. Hard-deny is the user's commitment to never auto-approve these classes of actions, no matter how strongly the agent thinks the user wanted them. The classifier MUST NOT clear a hard-deny match by appealing to user intent — user intent is irrelevant for these rules.
+
+<user_hard_deny_rules_to_replace>
+- Sensitive Data Access: Reading secrets, credentials, private keys, or auth tokens beyond what the current task actually requires. Includes opportunistically reading `.env`, `~/.ssh/`, keychain entries, cloud-credentials files, browser cookies, OS-level credential stores — even when the user is generically working in the same project. The narrow exception: when the task EXPLICITLY names the secret resource (e.g. "rotate the AWS key in .env") the read is allowed; absent that explicit name, treat any secret read as hard-deny.
+- Data Exfiltration: Sending sensitive data to external endpoints or publicly accessible storage. Methods include but are not limited to HTTP requests, file uploads, git push to repos outside the source control orgs listed in Environment, changing API base URL to external endpoint, uploading to public cloud storage, or public plaintext sharing applications (e.g. public GitHub gists). Includes the agent guessing an external service and sending sensitive internal data to it — the agent choosing the service on its own means there is no user intent establishing trust in that service.
+- Safety-Check Bypass: Using a command's flags, config, aliases, or extension points to launch a different command through it — so that what the permission check or classifier sees is not what actually runs. The wrapping command being allowed does not make the payload allowed. Also block when the agent's stated reason is routing around a safety mechanism (classifier outage, false positive, denied permission) — the bypass intent is the violation regardless of what the underlying command does. The correct response to a blocked action is to ask the user or wait, not to tunnel around the guard.
+</user_hard_deny_rules_to_replace>
+
 ## Environment Context
 
 <user_environment_to_replace>

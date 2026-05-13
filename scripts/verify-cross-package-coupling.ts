@@ -27,7 +27,7 @@ const BUDGET: Record<string, number> = {
   'command-runtime': 20,
   'config': 14,  // +1: mcp-runtime lazy-required by plugin/_deps to fix MCP schema null bug
   'daemon': 7, // bg classifier (agent/provider/tool-registry/local-observability) + spare claim (cli/ptyFrame) + canonical isPidAlive (shell)
-  'headless-sdk': 2,
+  'headless-sdk': 3,  // +1: sdkMemorySummary lazy-requires local-observability for tengu_sdk_memory_summary (ant v2.1.132 Xd port)
   'ide': 10,
   'local-observability': 13,
   'mcp-runtime': 13,

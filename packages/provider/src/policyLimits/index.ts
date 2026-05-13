@@ -70,6 +70,12 @@ const LOADING_PROMISE_TIMEOUT_MS = 30000 // 30 seconds
 
 // Session-level cache for policy restrictions
 let sessionCache: PolicyLimitsResponse['restrictions'] | null = null
+// Session-level cache for compliance taints (ant v2.1.132 ei7). Separate from
+// the restrictions cache because (a) it has no fail-open vs fail-closed
+// semantics (it's just an additive tag set) and (b) loadCachedRestrictions
+// only loads `restrictions`, not the taints field — kept in sync at every
+// fetch/load site.
+let complianceTaintsCache: string[] | null = null
 
 /**
  * Test-only sync reset. clearPolicyLimitsCache() does file I/O and is too
@@ -79,6 +85,7 @@ let sessionCache: PolicyLimitsResponse['restrictions'] | null = null
 export function _resetPolicyLimitsForTesting(): void {
   stopBackgroundPolling()
   sessionCache = null
+  complianceTaintsCache = null
   loadingCompletePromise = null
   loadingCompleteResolve = null
 }
@@ -335,6 +342,7 @@ async function fetchPolicyLimits(
       return {
         success: true,
         restrictions: null, // Signal that cache is valid
+        complianceTaints: null,
         etag: cachedChecksum,
       }
     }
@@ -345,6 +353,7 @@ async function fetchPolicyLimits(
       return {
         success: true,
         restrictions: {},
+        complianceTaints: [],
         etag: undefined,
       }
     }
@@ -364,6 +373,7 @@ async function fetchPolicyLimits(
     return {
       success: true,
       restrictions: parsed.data.restrictions,
+      complianceTaints: parsed.data.compliance_taints,
     }
   } catch (error) {
     // 404 is handled above via validateStatus, so it won't reach here
@@ -398,6 +408,10 @@ function loadCachedRestrictions(): PolicyLimitsResponse['restrictions'] | null {
       return null
     }
 
+    // Side-effect: keep complianceTaintsCache in sync with the file. Cheap
+    // (default [] on missing field) and avoids a second sync-IO call site.
+    complianceTaintsCache = parsed.data.compliance_taints
+
     return parsed.data.restrictions
   } catch {
     return null
@@ -409,10 +423,14 @@ function loadCachedRestrictions(): PolicyLimitsResponse['restrictions'] | null {
  */
 async function saveCachedRestrictions(
   restrictions: PolicyLimitsResponse['restrictions'],
+  complianceTaints: string[] = [],
 ): Promise<void> {
   try {
     const path = getCachePath()
-    const data: PolicyLimitsResponse = { restrictions }
+    const data: PolicyLimitsResponse = {
+      restrictions,
+      compliance_taints: complianceTaints,
+    }
     await writeFile(path, jsonStringify(data, null, 2), {
       encoding: 'utf-8',
       mode: 0o600,
@@ -458,21 +476,29 @@ async function fetchAndLoadPolicyLimits(): Promise<
     if (result.restrictions === null && cachedRestrictions) {
       logForDebugging('Policy limits: Cache still valid (304 Not Modified)')
       sessionCache = cachedRestrictions
+      // complianceTaintsCache was already populated by loadCachedRestrictions
       return cachedRestrictions
     }
 
     const newRestrictions = result.restrictions || {}
+    const newTaints: typeof result.complianceTaints = Array.isArray(
+      result.complianceTaints,
+    )
+      ? result.complianceTaints
+      : []
     const hasContent = Object.keys(newRestrictions).length > 0
 
     if (hasContent) {
       sessionCache = newRestrictions
-      await saveCachedRestrictions(newRestrictions)
+      complianceTaintsCache = newTaints
+      await saveCachedRestrictions(newRestrictions, newTaints)
       logForDebugging('Policy limits: Applied new restrictions successfully')
       return newRestrictions
     }
 
     // Empty restrictions (404 response) - delete cached file if it exists
     sessionCache = newRestrictions
+    complianceTaintsCache = newTaints
     try {
       await unlink(getCachePath())
       logForDebugging('Policy limits: Deleted cached file (404 response)')
@@ -523,6 +549,49 @@ export function isPolicyAllowed(policy: string): boolean {
     return true // unknown policy = allowed
   }
   return restriction.allowed
+}
+
+/**
+ * Check if a specific policy is explicitly enforced (present in restrictions
+ * and not allowed). Distinct from `isPolicyAllowed` semantics: a policy
+ * absent from the response returns `false` here (no enforcement) but `true`
+ * from `isPolicyAllowed` (fail-open). Ported from ant v2.1.132 `ei7`
+ * `isPolicyEnforced(name)` — coexists with `isPolicyAllowed` (both shapes
+ * stay in v136).
+ */
+export function isPolicyEnforced(policy: string): boolean {
+  const restrictions = getRestrictionsFromCache()
+  if (!restrictions) return false
+  const restriction = restrictions[policy]
+  if (!restriction) return false
+  return restriction.allowed === false
+}
+
+/**
+ * Returns the compliance-taint string set received from the server.
+ * Empty array when no taints, the cache hasn't loaded, or the user isn't
+ * eligible. Compliance taints are an additive tagging primitive — caller
+ * is expected to use `hasComplianceTaint(name)` for individual checks.
+ *
+ * Ported from ant v2.1.132 `ei7` (4049.js) — currently no producer in ccb
+ * (the server doesn't ship taints yet), but the schema and accessor are in
+ * place so consumers can opt into compliance gating without a client roll.
+ */
+export function getComplianceTaints(): string[] {
+  // Touch the cache so a fresh process reads from disk before answering.
+  if (sessionCache === null && complianceTaintsCache === null) {
+    loadCachedRestrictions()
+  }
+  return complianceTaintsCache ? [...complianceTaintsCache] : []
+}
+
+/**
+ * Does the active policy carry the given compliance taint? `false` if the
+ * cache is unavailable, the policy limits aren't eligible, or the taint
+ * simply isn't present.
+ */
+export function hasComplianceTaint(name: string): boolean {
+  return getComplianceTaints().includes(name)
 }
 
 /**
@@ -596,6 +665,7 @@ export async function clearPolicyLimitsCache(): Promise<void> {
   stopBackgroundPolling()
 
   sessionCache = null
+  complianceTaintsCache = null
 
   loadingCompletePromise = null
   loadingCompleteResolve = null

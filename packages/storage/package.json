@@ -11,6 +11,8 @@
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
     "./cache-paths": "./src/cache-paths.ts",
+    "./projectPurge.js": "./src/projectPurge.ts",
+    "./secretsRegistry.js": "./src/secretsRegistry.ts",
     "./sessionActivity.js": "./src/sessionActivity.ts",
     "./sessionStart.js": "./src/sessionStart.ts",
     "./sessionState.js": "./src/sessionState.ts",

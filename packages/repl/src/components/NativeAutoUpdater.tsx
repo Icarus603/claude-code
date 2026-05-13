@@ -7,7 +7,10 @@ import { useInterval } from 'usehooks-ts'
 import { useUpdateNotification } from '../hooks/useUpdateNotification.js'
 import { Box, Text } from '@anthropic/ink'
 import type { AutoUpdaterResult } from '@claude-code/updater/autoUpdater.js'
-import { getMaxVersion, getMaxVersionMessage } from '@claude-code/updater/autoUpdater.js'
+import {
+  getMaxVersion,
+  getMaxVersionMessage,
+} from '@claude-code/updater/autoUpdater.js'
 import { isAutoUpdaterDisabled } from '@claude-code/config'
 import {
   getLatestVersion,
@@ -51,7 +54,7 @@ function getErrorType(errorMessage: string): string {
 type Props = {
   isUpdating: boolean
   onChangeIsUpdating: (isUpdating: boolean) => void
-  onAutoUpdaterResult: (autoUpdaterResult: AutoUpdaterResult) => void
+  onAutoUpdaterResult: (autoUpdaterResult: AutoUpdaterResult | null) => void
   autoUpdaterResult: AutoUpdaterResult | null
   showSuccessMessage: boolean
   verbose: boolean
@@ -120,7 +123,11 @@ export function NativeAutoUpdater({
     logEvent('tengu_native_auto_updater_start', {})
 
     try {
-      // Check if current version is above the max allowed version
+      // Surface the maxVersion banner message to the UI when current
+      // version exceeds the cap. The actual force-downgrade decision
+      // and `tengu_native_update_forced_downgrade` telemetry are
+      // emitted inside installer.ts:updateLatest (port of ant `UV5`)
+      // — fired once when the install starts, not on every cron tick.
       const maxVersion = await getMaxVersion()
       if (maxVersion && isVersionNewer(MACRO.VERSION, maxVersion)) {
         const msg = await getMaxVersionMessage()

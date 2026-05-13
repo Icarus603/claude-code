@@ -122,6 +122,27 @@ export function detectHomebrew(): boolean {
 }
 
 /**
+ * Port of ant v2.1.136 `Vw_` (3481.js). Extract the Homebrew cask name
+ * (e.g. `claude-code` or `claude-code@latest`) from the running
+ * executable's Caskroom path. Returns null when the executable isn't
+ * inside a Caskroom directory.
+ *
+ * Path shape: `/opt/homebrew/Caskroom/<cask-name>/<version>/...`
+ *
+ * This is the only way to tell apart users who installed the stable
+ * `claude-code` cask from those who installed `claude-code@latest`
+ * (which tracks the bleeding-edge channel). The package-manager auto-
+ * updater uses the formula name BOTH to fetch the right version from
+ * formulae.brew.sh AND to build the right `brew upgrade --cask <name>`
+ * command, since `brew upgrade --cask claude-code` won't touch
+ * `claude-code@latest`.
+ */
+export function detectBrewFormulaName(): string | null {
+  const execPath = process.execPath || process.argv[0] || ''
+  return execPath.match(/\/Caskroom\/([^/]+)\//)?.[1] ?? null
+}
+
+/**
  * Detects if the currently running Claude instance was installed via winget
  * by checking if the executable path is within a WinGet directory.
  *

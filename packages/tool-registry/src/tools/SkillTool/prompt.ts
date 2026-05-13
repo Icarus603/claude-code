@@ -170,6 +170,74 @@ export function formatCommandsWithinBudget(
     .join('\n')
 }
 
+/**
+ * Compute skills-budget classification for notification surfacing.
+ * Port of ant v2.1.131 Ws7 (4142.js). The `budgetMode` mirrors ant's
+ * `fits | truncate | priority | drop` enum.
+ */
+export function computeSkillsBudgetStats(
+  commands: Command[],
+  contextWindowTokens?: number,
+): {
+  budgetMode: 'fits' | 'truncate' | 'priority' | 'drop'
+  cappedSkills: string[]
+  budgetTruncatedSkills: string[]
+} {
+  if (commands.length === 0) {
+    return { budgetMode: 'fits', cappedSkills: [], budgetTruncatedSkills: [] }
+  }
+  const budget = getCharBudget(contextWindowTokens)
+  const fullEntries = commands.map(cmd => ({
+    cmd,
+    full: formatCommandDescription(cmd),
+  }))
+  const fullTotal =
+    fullEntries.reduce((sum, e) => sum + stringWidth(e.full), 0) +
+    (fullEntries.length - 1)
+  if (fullTotal <= budget) {
+    return { budgetMode: 'fits', cappedSkills: [], budgetTruncatedSkills: [] }
+  }
+  const bundledIndices = new Set<number>()
+  const restCommands: Command[] = []
+  for (let i = 0; i < commands.length; i++) {
+    const cmd = commands[i]!
+    if (cmd.type === 'prompt' && cmd.source === 'bundled') {
+      bundledIndices.add(i)
+    } else {
+      restCommands.push(cmd)
+    }
+  }
+  const bundledChars = fullEntries.reduce(
+    (sum, e, i) =>
+      bundledIndices.has(i) ? sum + stringWidth(e.full) + 1 : sum,
+    0,
+  )
+  const remainingBudget = budget - bundledChars
+  if (restCommands.length === 0) {
+    return { budgetMode: 'fits', cappedSkills: [], budgetTruncatedSkills: [] }
+  }
+  const restNameOverhead =
+    restCommands.reduce((sum, cmd) => sum + stringWidth(cmd.name) + 4, 0) +
+    (restCommands.length - 1)
+  const availableForDescs = remainingBudget - restNameOverhead
+  const maxDescLen = Math.floor(availableForDescs / restCommands.length)
+  if (maxDescLen < MIN_DESC_LENGTH) {
+    return {
+      budgetMode: 'drop',
+      cappedSkills: restCommands.map(c => c.name),
+      budgetTruncatedSkills: [],
+    }
+  }
+  const budgetTruncatedSkills = restCommands
+    .filter(c => stringWidth(getCommandDescription(c)) > maxDescLen)
+    .map(c => c.name)
+  return {
+    budgetMode: 'truncate',
+    cappedSkills: [],
+    budgetTruncatedSkills,
+  }
+}
+
 export const getPrompt = memoize(async (_cwd: string): Promise<string> => {
   return `Execute a skill within the main conversation
 

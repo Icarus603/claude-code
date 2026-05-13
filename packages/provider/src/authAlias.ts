@@ -24,6 +24,10 @@ import {
   refreshOAuthToken,
   shouldUseClaudeAIAuth,
 } from './oauth/client.js'
+import {
+  clearRefreshTokenDeadSet,
+  isRefreshTokenDead,
+} from './oauth/refreshTokenDeadSet.js'
 import { getOauthProfileFromOauthToken } from './oauth/getOauthProfile.js'
 import type { OAuthTokens, SubscriptionType } from './oauth/types.js'
 import {
@@ -1322,6 +1326,11 @@ async function invalidateOAuthCacheIfDiskChanged(): Promise<void> {
     if (mtimeMs !== lastCredentialsMtimeMs) {
       lastCredentialsMtimeMs = mtimeMs
       clearOAuthTokenCache()
+      // ant `pt6` shares the credentials.json mtime as the invalidation
+      // signal for the refresh-token dead-set: if the file got rewritten
+      // by `claude --login` from another shell, the dead tokens we cached
+      // in-memory might no longer apply to the freshly-issued ones.
+      clearRefreshTokenDeadSet()
     }
   } catch {
     // ENOENT — macOS keychain path (file deleted on migration). Clear only
@@ -1462,7 +1471,23 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
     return false
   }
 
-  if (!shouldUseClaudeAIAuth(tokens.scopes)) {
+  // Port of ant v2.1.136 `pt6` guard (1997.js): if this refresh token
+  // already returned invalid_grant in-process, don't burn another HTTP
+  // round-trip on it. The mtime watcher in
+  // `invalidateOAuthCacheIfDiskChanged` (above) clears the dead-set
+  // whenever credentials.json is rewritten externally, so a sibling
+  // /login or a backup-restore automatically re-enables refreshes.
+  if (isRefreshTokenDead(tokens.refreshToken)) {
+    return false
+  }
+
+  // ant `pt6` also requires Claude.ai scope OR a known subscriptionType
+  // before refreshing — service-key sessions can never refresh because
+  // they only have `user:inference` scope and no refresh endpoint.
+  if (
+    !shouldUseClaudeAIAuth(tokens.scopes) &&
+    !tokens.subscriptionType
+  ) {
     return false
   }
 
@@ -1521,6 +1546,12 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
       !isOAuthTokenExpired(lockedTokens.expiresAt)
     ) {
       logEvent('tengu_oauth_token_refresh_race_resolved', {})
+      return false
+    }
+    // ant `pt6` post-lock re-check: if another worker on this process
+    // already marked the (now-current) refresh token dead while we were
+    // waiting for the lock, don't burn the HTTP call.
+    if (isRefreshTokenDead(lockedTokens.refreshToken)) {
       return false
     }
 

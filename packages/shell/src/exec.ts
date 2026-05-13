@@ -125,6 +125,7 @@ export async function exec(
     shouldUseSandbox,
     shouldAutoBackground,
     onStdout,
+    extraEnv,
   } = options ?? {}
   const commandTimeout = timeout || DEFAULT_TIMEOUT
 
@@ -253,6 +254,9 @@ export async function exec(
               CLAUDE_CODE_SESSION_ID: ctx.getSessionId(),
             }
           : {}),
+        // extraEnv last so caller-provided values win over both subprocessEnv
+        // and provider overrides — mirrors ant's `extraEnv` semantics.
+        ...(extraEnv ?? {}),
       },
       cwd,
       stdio: usePipeMode

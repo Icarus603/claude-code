@@ -54,7 +54,25 @@ export type Key = {
   super: boolean
 }
 
+// Port of ant v2.1.132 Z2H (2244.js) — JetBrains JediTerm scroll-bug
+// workaround. When the IntelliJ Command-Blocks mode is enabled, a real
+// wheel-down sometimes generates an erroneous wheel-up event ~50-200ms
+// later. We detect "wheelup within 250ms of the last wheeldown in the
+// JediTerm env" and re-classify as wheeldown. Imported lazily so the
+// keypress hot path doesn't pay the cost on every keystroke.
+import { correctWheelDirection } from '../jediTermScrollFix.js'
+
 function parseKey(keypress: ParsedKey): [Key, string] {
+  // Apply JediTerm correction here so wheelUp/wheelDown flags reflect
+  // the post-correction direction. The pre-correction name field is
+  // unchanged so downstream code that reads .name directly still sees
+  // the literal input.
+  const correctedName =
+    keypress.name === 'wheelup'
+      ? `wheel${correctWheelDirection('up')}`
+      : keypress.name === 'wheeldown'
+        ? `wheel${correctWheelDirection('down')}`
+        : keypress.name
   const key: Key = {
     upArrow: keypress.name === 'up',
     downArrow: keypress.name === 'down',
@@ -62,8 +80,8 @@ function parseKey(keypress: ParsedKey): [Key, string] {
     rightArrow: keypress.name === 'right',
     pageDown: keypress.name === 'pagedown',
     pageUp: keypress.name === 'pageup',
-    wheelUp: keypress.name === 'wheelup',
-    wheelDown: keypress.name === 'wheeldown',
+    wheelUp: correctedName === 'wheelup',
+    wheelDown: correctedName === 'wheeldown',
     home: keypress.name === 'home',
     end: keypress.name === 'end',
     return: keypress.name === 'return',

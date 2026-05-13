@@ -77,6 +77,7 @@ import { checkPermissionMode } from './modeValidation.js'
 import { checkPathConstraints } from './pathValidation.js'
 import { checkSedConstraints } from './sedValidation.js'
 import { shouldUseSandbox } from './shouldUseSandbox.js'
+import { sanitizeUnicodeDashes } from '@claude-code/shell/bash/unicodeDashes.js'
 
 // Env-var assignment prefix (VAR=value). Shared across three while-loops that
 // skip safe env vars before extracting the command name.
@@ -1651,10 +1652,21 @@ export async function executeAsyncClassifierCheck(
  * The main implementation to check if we need to ask for user permission to call BashTool with a given input
  */
 export async function bashToolHasPermission(
-  input: z.infer<typeof BashTool.inputSchema>,
+  inputRaw: z.infer<typeof BashTool.inputSchema>,
   context: ToolUseContext,
   getCommandSubcommandPrefixFn = getCommandSubcommandPrefix,
 ): Promise<PermissionResult> {
+  // Port of ant v2.1.136 `Le()` (module 3999) — normalise Unicode dashes
+  // (en-/em-/horizontal-bar) to ASCII hyphen BEFORE classification. Closes a
+  // bypass where the model emits `rm —rf` (em-dash) which looks like
+  // `rm --rf` to a human reviewer / classifier but is parsed as a literal
+  // argument by the shell. Applied to input.command so all downstream
+  // permission checks see ASCII; the original is preserved in BashTool.tsx
+  // when needed for UI fidelity.
+  const input: z.infer<typeof BashTool.inputSchema> = {
+    ...inputRaw,
+    command: sanitizeUnicodeDashes(inputRaw.command),
+  }
   let appState = context.getAppState()
 
   // 0. AST-based security parse. This replaces both tryParseShellCommand

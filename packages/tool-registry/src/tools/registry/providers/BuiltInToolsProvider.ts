@@ -33,6 +33,8 @@ import { TaskGetTool } from '../../TaskGetTool/TaskGetTool.js'
 import { TaskUpdateTool } from '../../TaskUpdateTool/TaskUpdateTool.js'
 import { TaskListTool } from '../../TaskListTool/TaskListTool.js'
 import { ListMcpResourcesTool } from '../../ListMcpResourcesTool/ListMcpResourcesTool.js'
+import { WaitForMcpServersTool } from '../../WaitForMcpServersTool/WaitForMcpServersTool.js'
+import { ShareOnboardingGuideTool } from '../../ShareOnboardingGuideTool/ShareOnboardingGuideTool.js'
 import { ReadMcpResourceTool } from '../../ReadMcpResourceTool/ReadMcpResourceTool.js'
 import { ToolSearchTool } from '../../ToolSearchTool/ToolSearchTool.js'
 import { ConfigTool } from '../../ConfigTool/ConfigTool.js'
@@ -299,6 +301,13 @@ export const BuiltInToolsProvider: ToolProvider = {
     // MCP resource tools (always present)
     tools.push(ListMcpResourcesTool)
     tools.push(ReadMcpResourceTool)
+    // WaitForMcpServers — gated by isEnabled() reading tengu_ashen_kelp
+    // (ant v2.1.132 Iz8). Always registered; the tool descriptor's
+    // isEnabled gate hides it from the model when the flag is off.
+    tools.push(WaitForMcpServersTool)
+    // ShareOnboardingGuide — gated by tengu_flint_harbor_share AND OAuth.
+    // (ant v2.1.136 Il5). isEnabled() returns false for non-OAuth users.
+    tools.push(ShareOnboardingGuideTool)
 
     // Tool search (optimistic)
     if (isToolSearchEnabledOptimistic()) {

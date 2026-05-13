@@ -21,6 +21,10 @@ import {
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
 import { asSessionId } from '@claude-code/agent/idTypes'
+import {
+  isGoalCommandEnabled,
+  restoreGoalFromTranscript,
+} from '@claude-code/agent/goalStopHook.js'
 import type {
   AttributionSnapshotMessage,
   ContextCollapseCommitEntry,
@@ -151,6 +155,19 @@ export function restoreSessionStateFromLog(
         todos: { ...prev.todos, [agentId]: todos },
       }))
     }
+  }
+
+  // Port of ant v2.1.136 5037.js E0_/cP6 — restore active /goal from the
+  // resumed transcript. The Stop hook and AppState.activeGoal both need
+  // to be rebuilt so the resumed session resumes its goal-loop behaviour.
+  // Gated on `tengu_maple_tide` (isGoalCommandEnabled) so dogfood sessions
+  // skip the cost when the feature is off.
+  if (isGoalCommandEnabled() && result.messages) {
+    restoreGoalFromTranscript(
+      result.messages as Parameters<typeof restoreGoalFromTranscript>[0],
+      setAppState as Parameters<typeof restoreGoalFromTranscript>[1],
+      getSessionId(),
+    )
   }
 }
 

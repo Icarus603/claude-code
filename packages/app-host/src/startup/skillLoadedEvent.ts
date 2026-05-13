@@ -4,7 +4,10 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
-import { getCharBudget } from '@claude-code/tool-registry/tools/SkillTool/prompt.js'
+import {
+  computeSkillsBudgetStats,
+  getCharBudget,
+} from '@claude-code/tool-registry/tools/SkillTool/prompt.js'
 
 /**
  * Logs a tengu_skill_loaded event for each skill available at session startup.
@@ -35,5 +38,29 @@ export async function logSkillsLoaded(
           skill.kind as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       }),
     })
+  }
+
+  // Port of ant v2.1.131 Ws7+pSK (4142.js / 5025.js): if the budget had
+  // to truncate or drop skill descriptions, emit telemetry so operators
+  // can spot when users start hitting the cap. The user-visible
+  // notification triggers via the useSkillsBudgetNotification hook
+  // (`packages/repl/src/diagnostics/skillsBudgetWarning.ts`).
+  try {
+    const stats = computeSkillsBudgetStats(skills, contextWindowTokens)
+    if (
+      stats.budgetMode !== 'fits' ||
+      stats.cappedSkills.length > 0 ||
+      stats.budgetTruncatedSkills.length > 0
+    ) {
+      logEvent('tengu_skill_budget_truncated', {
+        budget_mode:
+          stats.budgetMode as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        capped_count: stats.cappedSkills.length,
+        truncated_count: stats.budgetTruncatedSkills.length,
+        skill_total: skills.length,
+      })
+    }
+  } catch {
+    // budget computation must not block startup
   }
 }

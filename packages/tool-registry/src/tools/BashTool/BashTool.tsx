@@ -33,6 +33,7 @@ import {
 } from '@claude-code/agent/tasks/LocalShellTask.js'
 import type { AgentId } from '@claude-code/agent/idTypes'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
+import * as effortModule from '@claude-code/agent/effort.js'
 import { parseForSecurity } from '@claude-code/shell/bash/ast-alias.js'
 import {
   splitCommand,
@@ -876,6 +877,30 @@ export const BashTool = buildTool({
     const isMainThread = !toolUseContext.agentId
     const preventCwdChanges = !isMainThread
 
+    // Port of ant v2.1.133 yZ→RZ (4042.js) — surface CLAUDE_EFFORT to bash
+    // subprocesses when the active model supports effort. Status-line
+    // scripts and user-defined hooks both consume this; aligning ccb's
+    // export with ant's makes that ecosystem's scripts work unchanged.
+    let claudeEffortEnv: string | undefined
+    try {
+      const appStateForEffort = toolUseContext.getAppState()
+      const mainLoopModel = toolUseContext.options?.mainLoopModel
+      if (
+        typeof mainLoopModel === 'string' &&
+        effortModule.modelSupportsEffort(mainLoopModel)
+      ) {
+        const resolved = effortModule.resolveAppliedEffort(
+          mainLoopModel,
+          (appStateForEffort as { effortValue?: unknown })?.effortValue as any,
+        )
+        if (resolved !== undefined) {
+          claudeEffortEnv = effortModule.convertEffortValueToLevel(resolved)
+        }
+      }
+    } catch {
+      // Effort resolution must not block bash execution — fall through.
+    }
+
     try {
       // Use the new async generator version of runShellCommand
       const commandGenerator = runShellCommand({
@@ -889,6 +914,7 @@ export const BashTool = buildTool({
         isMainThread,
         toolUseId: toolUseContext.toolUseId,
         agentId: toolUseContext.agentId,
+        claudeEffortEnv,
       })
 
       // Consume the generator and capture the return value
@@ -1110,6 +1136,7 @@ async function* runShellCommand({
   isMainThread,
   toolUseId,
   agentId,
+  claudeEffortEnv,
 }: {
   input: BashToolInput
   abortController: AbortController
@@ -1119,6 +1146,8 @@ async function* runShellCommand({
   isMainThread?: boolean
   toolUseId?: string
   agentId?: AgentId
+  /** Resolved CLAUDE_EFFORT value to expose to the subprocess. */
+  claudeEffortEnv?: string
 }): AsyncGenerator<
   {
     type: 'progress'
@@ -1175,6 +1204,9 @@ async function* runShellCommand({
     preventCwdChanges,
     shouldUseSandbox: shouldUseSandbox(input),
     shouldAutoBackground,
+    ...(claudeEffortEnv && {
+      extraEnv: { CLAUDE_EFFORT: claudeEffortEnv },
+    }),
   })
 
   // Start the command execution

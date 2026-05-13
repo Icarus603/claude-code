@@ -28,6 +28,7 @@ import {
 } from '../StatusLine.js'
 import { Notifications } from './Notifications.js'
 import { PromptInputFooterLeftSide } from './PromptInputFooterLeftSide.js'
+import { GoalActiveIndicator } from '../goal/GoalActiveIndicator.js'
 import {
   PromptInputFooterSuggestions,
   type SuggestionItem,
@@ -221,6 +222,13 @@ function PromptInputFooter({
           {process.env.USER_TYPE === 'ant' && isUndercover() && (
             <Text dimColor>undercover</Text>
           )}
+          {/*
+            Port of ant v2.1.136 4922.js (cyK module) — `/goal active`
+            pill lives on the right side of the footer, with separator
+            shown only when other right-side notifications are visible.
+            Renders null when no active goal.
+          */}
+          <GoalActiveIndicator withSeparator={true} />
           <BridgeStatusIndicator bridgeSelected={bridgeSelected} />
         </Box>
       </Box>

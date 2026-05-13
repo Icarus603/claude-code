@@ -10,12 +10,15 @@ import { Box, Text } from '@anthropic/ink'
 import {
   type AutoUpdaterResult,
   getLatestVersion,
-  getMaxVersion,
+  getMaxVersionAndForceDowngrade,
   type InstallStatus,
   installGlobalPackage,
+  shouldForceDowngradeNow,
   shouldSkipVersion,
 } from '@claude-code/updater/autoUpdater.js'
 import { getGlobalConfig, isAutoUpdaterDisabled } from '@claude-code/config'
+import { isEnvTruthy } from '@claude-code/config/env/utils'
+import { readEnv } from '@claude-code/config/env'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getCurrentInstallationType } from '../doctorDiagnostic.js'
 import {
@@ -29,7 +32,7 @@ import { getInitialSettings } from '@claude-code/config/settings'
 type Props = {
   isUpdating: boolean
   onChangeIsUpdating: (isUpdating: boolean) => void
-  onAutoUpdaterResult: (autoUpdaterResult: AutoUpdaterResult) => void
+  onAutoUpdaterResult: (autoUpdaterResult: AutoUpdaterResult | null) => void
   autoUpdaterResult: AutoUpdaterResult | null
   showSuccessMessage: boolean
   verbose: boolean
@@ -79,42 +82,85 @@ export function AutoUpdater({
 
     const currentVersion = MACRO.VERSION
     const channel = getInitialSettings()?.autoUpdatesChannel ?? 'latest'
-    let latestVersion = await getLatestVersion(channel)
+    const latestVersion = await getLatestVersion(channel)
     const isDisabled = isAutoUpdaterDisabled()
 
-    // Check if max version is set (server-side kill switch for auto-updates)
-    const maxVersion = await getMaxVersion()
-    if (maxVersion && latestVersion && gt(latestVersion, maxVersion)) {
-      logForDebugging(
-        `AutoUpdater: maxVersion ${maxVersion} is set, capping update from ${latestVersion} to ${maxVersion}`,
+    // Port of ant v2.1.136 `TyK` (4908.js). Target-selection flow:
+    //   1. Fetch {maxVersion, forceDowngradeEnabled} from the single
+    //      tengu_max_version_config GrowthBook entry.
+    //   2. If both flags are present, ask `shouldForceDowngradeNow`
+    //      (ant `UK6`): current > target ⇒ force-downgrade target,
+    //      else flag is a no-op (take normal upgrade path).
+    //   3. Otherwise: if maxVersion caps the latest, pin to maxVersion
+    //      (skip when already at-or-above); else use latestVersion.
+    //   4. Fire `tengu_auto_updater_forced_downgrade` only when the
+    //      force-downgrade actually fires (matches ant — fires once
+    //      per chosen-target decision, not on every flag-on check).
+    const { maxVersion, forceDowngradeEnabled } =
+      await getMaxVersionAndForceDowngrade()
+    let target: string | null = null
+    let isForceDowngrade = false
+    if (forceDowngradeEnabled && maxVersion) {
+      isForceDowngrade = shouldForceDowngradeNow(
+        currentVersion,
+        maxVersion,
+        'auto_updater',
       )
-      if (gte(currentVersion, maxVersion)) {
-        logForDebugging(
-          `AutoUpdater: current version ${currentVersion} is already at or above maxVersion ${maxVersion}, skipping update`,
-        )
-        setVersions({ global: currentVersion, latest: latestVersion })
-        return
+      if (isForceDowngrade) {
+        target = maxVersion
       }
-      latestVersion = maxVersion
+    }
+    if (!target && latestVersion) {
+      if (maxVersion && gt(latestVersion, maxVersion)) {
+        logForDebugging(
+          `AutoUpdater: maxVersion ${maxVersion} is set, capping update from ${latestVersion} to ${maxVersion}`,
+        )
+        if (gt(maxVersion, currentVersion)) {
+          target = maxVersion
+        } else {
+          logForDebugging(
+            `AutoUpdater: current version ${currentVersion} is already at or above maxVersion ${maxVersion}, skipping update`,
+          )
+        }
+      } else if (gt(latestVersion, currentVersion)) {
+        target = latestVersion
+      }
     }
 
-    setVersions({ global: currentVersion, latest: latestVersion })
+    setVersions({ global: currentVersion, latest: target ?? latestVersion })
+
+    if (!target || shouldSkipVersion(target)) {
+      return
+    }
+
+    if (isForceDowngrade) {
+      logEvent('tengu_auto_updater_forced_downgrade', {
+        from_version: currentVersion,
+        to_version: target,
+      })
+    }
 
     // Check if update needed and perform update
     if (
       !isDisabled &&
       currentVersion &&
-      latestVersion &&
-      !gte(currentVersion, latestVersion) &&
-      !shouldSkipVersion(latestVersion)
+      target &&
+      !gte(currentVersion, target) &&
+      !shouldSkipVersion(target)
     ) {
       const startTime = Date.now()
       onChangeIsUpdating(true)
 
       // Remove native installer symlink since we're using JS-based updates
-      // But only if user hasn't migrated to native installation
+      // But only if user hasn't migrated to native installation AND
+      // `DISABLE_INSTALLATION_CHECKS` isn't set (ant TyK escape hatch —
+      // pinned for test harnesses + sandboxed installs where the
+      // symlink path is itself the install root).
       const config = getGlobalConfig()
-      if (config.installMethod !== 'native') {
+      if (
+        config.installMethod !== 'native' &&
+        !isEnvTruthy(readEnv('DISABLE_INSTALLATION_CHECKS'))
+      ) {
         await removeInstalledSymlink()
       }
 
@@ -174,7 +220,7 @@ export function AutoUpdater({
           fromVersion:
             currentVersion as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           toVersion:
-            latestVersion as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+            target as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           durationMs: Date.now() - startTime,
           wasMigrated: updateMethod === 'local',
           installationType:
@@ -185,7 +231,7 @@ export function AutoUpdater({
           fromVersion:
             currentVersion as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           attemptedVersion:
-            latestVersion as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+            target as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           status:
             installStatus as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           durationMs: Date.now() - startTime,
@@ -196,7 +242,7 @@ export function AutoUpdater({
       }
 
       onAutoUpdaterResult({
-        version: latestVersion,
+        version: target,
         status: installStatus,
       })
     }

@@ -18,6 +18,10 @@ import { checkOpus1mAccess, checkSonnet1mAccess } from './model/check1mAccess.js
 import { getAPIProvider } from './providers.js'
 import { isModelAllowed } from './model/modelAllowlist.js'
 import {
+  isGatewayModelDiscoveryEnabled,
+  readCachedGatewayModels,
+} from './gatewayModelDiscovery.js'
+import {
   getCanonicalName,
   getClaudeAiUserDefaultModelDescription,
   getDefaultSonnetModel,
@@ -635,6 +639,27 @@ export function getModelOptions(
     if (!options.some(existing => existing.value === opt.value)) {
       options.push(opt)
     }
+  }
+
+  // Port of ant v2.1.131 QO6 (4074.js) — merge gateway-discovered model
+  // ids when CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY is on. Reads from
+  // the file cache so the picker doesn't block; refresh fires elsewhere
+  // and the next picker render picks up the new entries.
+  // Ant `tnH` (4138.js) — merge `VHK()` picker options on top, skipping
+  // any whose `value` already appears. `readCachedGatewayModels` now
+  // returns picker-shaped options directly (`{value,label,description}`)
+  // matching ant's verbatim shape so the merge is a simple existence
+  // check.
+  try {
+    if (isGatewayModelDiscoveryEnabled()) {
+      for (const opt of readCachedGatewayModels()) {
+        if (!options.some(existing => existing.value === opt.value)) {
+          options.push(opt)
+        }
+      }
+    }
+  } catch {
+    // gateway discovery unavailable — fine, picker shows the static list
   }
 
   // Add custom model from either the current model value or the initial one

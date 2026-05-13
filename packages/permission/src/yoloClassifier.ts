@@ -84,6 +84,13 @@ function isUsingExternalPermissions(): boolean {
 export type AutoModeRules = {
   allow: string[]
   soft_deny: string[]
+  /**
+   * Hard-deny rules ported from ant v2.1.136 — these classes of action
+   * are NEVER auto-approved, even with explicit user authorization in
+   * the active conversation. The classifier evaluates hard_deny BEFORE
+   * checking user intent or soft_deny.
+   */
+  hard_deny: string[]
   environment: string[]
 }
 
@@ -100,6 +107,7 @@ export function getDefaultExternalAutoModeRules(): AutoModeRules {
   return {
     allow: extractTaggedBullets('user_allow_rules_to_replace'),
     soft_deny: extractTaggedBullets('user_deny_rules_to_replace'),
+    hard_deny: extractTaggedBullets('user_hard_deny_rules_to_replace'),
     environment: extractTaggedBullets('user_environment_to_replace'),
   }
 }
@@ -132,6 +140,10 @@ export function buildDefaultExternalSystemPrompt(): string {
     )
     .replace(
       /<user_deny_rules_to_replace>([\s\S]*?)<\/user_deny_rules_to_replace>/,
+      (_m, defaults: string) => defaults,
+    )
+    .replace(
+      /<user_hard_deny_rules_to_replace>([\s\S]*?)<\/user_hard_deny_rules_to_replace>/,
       (_m, defaults: string) => defaults,
     )
     .replace(

@@ -85,8 +85,18 @@ export async function getAnthropicClient({
   const remoteSessionId = readEnv('CLAUDE_CODE_REMOTE_SESSION_ID')
   const clientApp = readEnv('CLAUDE_AGENT_SDK_CLIENT_APP')
   const customHeaders = getCustomHeaders()
+  // Ant `bx()` (1984.js): `"x-app": N7() ? "cli-bg" : "cli"`. Background
+  // sessions (CLAUDE_CODE_SESSION_KIND=bg) advertise as `cli-bg` so
+  // server analytics can split desktop/CLI traffic from autonomous
+  // daemon workers. Reading the env directly here avoids pulling the
+  // agent package into provider (cycle).
+  const sessionKind = readEnv('CLAUDE_CODE_SESSION_KIND')
+  const isBgKind =
+    sessionKind === 'bg' ||
+    sessionKind === 'daemon' ||
+    sessionKind === 'daemon-worker'
   const defaultHeaders: { [key: string]: string } = {
-    'x-app': 'cli',
+    'x-app': isBgKind ? 'cli-bg' : 'cli',
     'User-Agent': anthropic.getUserAgent(),
     'X-Claude-Code-Session-Id': anthropic.getSessionId(),
     ...customHeaders,
@@ -154,6 +164,19 @@ export async function getAnthropicClient({
         skipAuth: true,
       }),
       ...(anthropic.isDebugToStdErr() && { logger: createStderrLogger() }),
+    }
+
+    // Port of ant v2.1.123 (module 1956) — ANTHROPIC_BEDROCK_SERVICE_TIER env
+    // var is passed through to AWS Bedrock via the `X-Amzn-Bedrock-Service-Tier`
+    // header. Lets enterprise users select priority vs standard tiers, which
+    // affects both quota and latency. Default behaviour (env unset) is
+    // unchanged — no header sent, AWS picks the default.
+    const bedrockServiceTier = readEnv('ANTHROPIC_BEDROCK_SERVICE_TIER')
+    if (bedrockServiceTier) {
+      bedrockArgs.defaultHeaders = {
+        ...(bedrockArgs.defaultHeaders as Record<string, string> | undefined),
+        'X-Amzn-Bedrock-Service-Tier': bedrockServiceTier,
+      }
     }
 
     // Add API key authentication if available

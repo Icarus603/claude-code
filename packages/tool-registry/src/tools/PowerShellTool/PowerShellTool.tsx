@@ -1,5 +1,6 @@
 import { feature } from 'bun:bundle'
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
+import { sanitizeUnicodeDashes } from '@claude-code/shell/bash/unicodeDashes.js'
 import {
   copyFile,
   stat as fsStat,
@@ -502,7 +503,15 @@ export const PowerShellTool = buildTool({
       !isBackgroundTasksDisabled &&
       !input.run_in_background
     ) {
-      const sleepPattern = detectBlockedSleepPattern(input.command)
+      // Port of ant v2.1.136 `Le()` (3999.js): pre-sanitize Unicode
+      // dashes to ASCII hyphen before the sleep-pattern regex runs.
+      // `Start-Sleep –Seconds 5` (en-dash) would otherwise slip past
+      // `(?:\s+-s(?:econds)?)?` and skip the block — bypass closes by
+      // mirroring the dash normalization done at every other PS
+      // command boundary (powershellPermissions.ts).
+      const sleepPattern = detectBlockedSleepPattern(
+        sanitizeUnicodeDashes(input.command),
+      )
       if (sleepPattern !== null) {
         return {
           result: false,

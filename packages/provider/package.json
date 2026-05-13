@@ -12,6 +12,7 @@
     "./errors": "./src/errors.ts",
     "./testing": "./src/testing/index.ts",
     "./oauth/*.js": "./src/oauth/*.ts",
+    "./gatewayModelDiscovery.js": "./src/gatewayModelDiscovery.ts",
     "./apiLimits.js": "./src/apiLimits.ts",
     "./fileConstants.js": "./src/fileConstants.ts",
     "./sessionIngressAuth.js": "./src/sessionIngressAuth.ts",

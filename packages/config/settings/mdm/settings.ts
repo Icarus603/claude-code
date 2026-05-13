@@ -21,6 +21,11 @@
 import { readdirSync, readFileSync as fsReadFileSync } from 'node:fs'
 import { join } from 'path'
 import { getConfigHostBindings } from '../../host.js'
+import { getWslInheritedWindowsSettings } from '../../wslWindowsSettings.js'
+import {
+  applyPolicyHelper,
+  getPolicyHelperManagedSettings,
+} from '../../policyHelper.js'
 
 // V7 §11.4 — inlined utilities to avoid src/ deps.
 function safeParseJSON(json: string | null | undefined, _shouldLogError?: boolean): unknown {
@@ -81,6 +86,61 @@ export function startMdmSettingsLoad(): void {
     const { mdm, hkcu } = consumeRawReadResult(await rawPromise)
     mdmCache = mdm
     hkcuCache = hkcu
+
+    // Port of ant v2.1.136 (0684.js) — when running inside WSL,
+    // optionally layer Windows policy chain on top of Linux managed-
+    // settings. Double opt-in (admin source flag AND HKCU flag) is
+    // enforced inside getWslInheritedWindowsSettings; null result
+    // means no merge happens.
+    try {
+      const winSettings = await getWslInheritedWindowsSettings()
+      if (winSettings) {
+        mdmCache = {
+          ...mdmCache,
+          settings: { ...mdmCache.settings, ...winSettings },
+        }
+      }
+    } catch (e) {
+      getConfigHostBindings().logDebug?.(
+        `WSL inherited Windows settings read failed: ${(e as Error).message}`,
+      )
+    }
+
+    // Port of ant v2.1.136 fE_ `rAq` (0686.js) — policyHelper. After
+    // loading file/HKLM/HKCU managed settings, if any of them declare
+    // a `policyHelper.path`, invoke that admin binary and merge its
+    // envelope (managedSettings + claudeMd + appendSystemPrompt) into
+    // the cache. Source-restricted: only admin-controlled sources
+    // (plist/hklm/file) may declare a helper.
+    //
+    // The mdm cache is admin-by-construction (we only load
+    // HKLM/plist/file via fireRawRead), so we pass `'file'` as the
+    // source — ant uses the actual source string that contributed
+    // the helper config; ccb's narrowed cache only carries admin
+    // sources so the concrete string is interchangeable for the
+    // source-validation guard.
+    try {
+      const err = await applyPolicyHelper(
+        mdmCache.settings as { policyHelper?: unknown },
+        'file',
+      )
+      if (err) {
+        getConfigHostBindings().logDebug?.(err)
+      } else {
+        const ms = getPolicyHelperManagedSettings()
+        if (ms) {
+          mdmCache = {
+            ...mdmCache,
+            settings: { ...mdmCache.settings, ...ms },
+          }
+        }
+      }
+    } catch (e) {
+      getConfigHostBindings().logDebug?.(
+        `policyHelper invocation failed: ${(e as Error).message}`,
+      )
+    }
+
     getConfigHostBindings().profileCheckpoint?.('mdm_load_end')
 
     const duration = Date.now() - startTime

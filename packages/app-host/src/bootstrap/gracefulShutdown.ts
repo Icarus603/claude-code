@@ -5,6 +5,7 @@
  * others. Errors are swallowed because we're already on the exit path.
  */
 import chalk from 'chalk'
+import { createHash } from 'crypto'
 import { writeSync } from 'fs'
 import memoize from 'lodash-es/memoize.js'
 import { onExit } from 'signal-exit'
@@ -289,7 +290,35 @@ export const setupGracefulShutdown = memoize(() => {
 
   // Log uncaught exceptions for container observability and analytics
   // Error names (e.g., "TypeError") are not sensitive - safe to log
+  // Port of ant v2.1.131 (2821.js): sliding-window detector for runaway
+  // exception loops. When >=EXCEPTION_LOOP_THRESHOLD uncaught exceptions
+  // fire within EXCEPTION_LOOP_WINDOW_MS, emit
+  // `tengu_uncaught_exception_loop` and force a graceful shutdown — without
+  // this guardrail, a setInterval that throws on every tick burns CPU and
+  // log volume until the user hits ^C, often masking the real issue.
+  // Aligned with ant v2.1.131 (2821.js) H38=5000, fo1=10. The reset
+  // semantics also match: when an exception arrives more than 5000ms
+  // after the previous one, the counter resets — so we only trip on
+  // tight bursts (10+ uncaught exceptions in a 5s sliding window).
+  const EXCEPTION_LOOP_WINDOW_MS = 5_000
+  const EXCEPTION_LOOP_THRESHOLD = 10
+  const exceptionTimestamps: number[] = []
+  let loopShutdownFired = false
   process.on('uncaughtException', error => {
+    // Hash the error message for the loop telemetry — lets us detect
+    // "same exception firing 10× / 5s" vs "10 different exceptions
+    // firing 5s apart". sha256 first 16 hex chars matches ant's
+    // `al_(H).error_message_hash` shape.
+    const errorMessageHash = (() => {
+      try {
+        return createHash('sha256')
+          .update(error.message || '')
+          .digest('hex')
+          .slice(0, 16)
+      } catch {
+        return undefined
+      }
+    })()
     logForDiagnosticsNoPII('error', 'uncaught_exception', {
       error_name: error.name,
       error_message: error.message.slice(0, 2000),
@@ -297,7 +326,44 @@ export const setupGracefulShutdown = memoize(() => {
     logEvent('tengu_uncaught_exception', {
       error_name:
         error.name as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      ...(errorMessageHash && {
+        error_message_hash:
+          errorMessageHash as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      }),
     })
+    const now = Date.now()
+    while (
+      exceptionTimestamps.length > 0 &&
+      exceptionTimestamps[0]! < now - EXCEPTION_LOOP_WINDOW_MS
+    ) {
+      exceptionTimestamps.shift()
+    }
+    exceptionTimestamps.push(now)
+    if (
+      exceptionTimestamps.length >= EXCEPTION_LOOP_THRESHOLD &&
+      !loopShutdownFired
+    ) {
+      loopShutdownFired = true
+      logEvent('tengu_uncaught_exception_loop', {
+        count: exceptionTimestamps.length,
+        window_ms: EXCEPTION_LOOP_WINDOW_MS,
+        // ant 2.1.136 adds `error_name` + `error_message_hash` to this
+        // event so dashboards can tell "same exception 10x" apart from
+        // "10 different exceptions" — necessary to triage "is this a
+        // tight infinite loop or a flap?".
+        error_name:
+          error.name as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        ...(errorMessageHash && {
+          error_message_hash:
+            errorMessageHash as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        }),
+      })
+      logForDiagnosticsNoPII('error', 'uncaught_exception_loop', {
+        count: String(exceptionTimestamps.length),
+        window_ms: String(EXCEPTION_LOOP_WINDOW_MS),
+      })
+      void gracefulShutdown(1, 'fatal')
+    }
   })
 
   // Log unhandled promise rejections for container observability and analytics

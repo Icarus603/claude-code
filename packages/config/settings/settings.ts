@@ -840,6 +840,32 @@ export type SettingsWithSources = {
  * Always reads fresh from disk — resets the session cache so that `effective`
  * and `sources` are consistent even if the change detector hasn't fired yet.
  */
+/**
+ * Port of ant v2.1.133 aTH (2492.js) — walk settings sources top-down and
+ * return the first non-null value at `sandbox.<field>`. Used to resolve
+ * explicit bwrap/socat paths from enterprise policy layers without making
+ * them part of the merged settings shape.
+ *
+ * Sources are visited in `getEnabledSettingSources()` order (policy →
+ * flag → local → project → user). The semantics ant uses are "first
+ * non-null wins", so we mirror that — higher-precedence sources can
+ * pin the value.
+ */
+export function getSandboxBinaryPath(
+  field: 'bwrapPath' | 'socatPath',
+): string | undefined {
+  for (const source of getEnabledSettingSources()) {
+    const settings = getSettingsForSource(source)
+    const path = (
+      settings?.sandbox as undefined | { bwrapPath?: string; socatPath?: string }
+    )?.[field]
+    if (path != null && path.length > 0) {
+      return path
+    }
+  }
+  return undefined
+}
+
 export function getSettingsWithSources(): SettingsWithSources {
   // Reset both caches so getSettingsForSource (per-source cache) and
   // getInitialSettings (session cache) agree on the current disk state.
@@ -941,18 +967,30 @@ export function getUseAutoModeDuringPlan(): boolean {
  * otherwise inject classifier allow/deny rules (RCE risk).
  */
 export function getAutoModeConfig():
-  | { allow?: string[]; soft_deny?: string[]; environment?: string[] }
+  | {
+      allow?: string[]
+      soft_deny?: string[]
+      hard_deny?: string[]
+      environment?: string[]
+    }
   | undefined {
   if (feature('TRANSCRIPT_CLASSIFIER')) {
     const schema = z.object({
       allow: z.array(z.string()).optional(),
       soft_deny: z.array(z.string()).optional(),
+      // hard_deny (ant v2.1.136): the user's prior commitment that these
+      // classes of actions are NEVER to be auto-approved, regardless of
+      // user intent expressed in the live conversation. Merged from same
+      // trusted sources as soft_deny; projectSettings excluded so a
+      // malicious project can't relax hard rules.
+      hard_deny: z.array(z.string()).optional(),
       deny: z.array(z.string()).optional(),
       environment: z.array(z.string()).optional(),
     })
 
     const allow: string[] = []
     const soft_deny: string[] = []
+    const hard_deny: string[] = []
     const environment: string[] = []
 
     for (const source of [
@@ -969,6 +1007,7 @@ export function getAutoModeConfig():
       if (result.success) {
         if (result.data.allow) allow.push(...result.data.allow)
         if (result.data.soft_deny) soft_deny.push(...result.data.soft_deny)
+        if (result.data.hard_deny) hard_deny.push(...result.data.hard_deny)
         if (process.env.USER_TYPE === 'ant') {
           if (result.data.deny) soft_deny.push(...result.data.deny)
         }
@@ -977,10 +1016,16 @@ export function getAutoModeConfig():
       }
     }
 
-    if (allow.length > 0 || soft_deny.length > 0 || environment.length > 0) {
+    if (
+      allow.length > 0 ||
+      soft_deny.length > 0 ||
+      hard_deny.length > 0 ||
+      environment.length > 0
+    ) {
       return {
         ...(allow.length > 0 && { allow }),
         ...(soft_deny.length > 0 && { soft_deny }),
+        ...(hard_deny.length > 0 && { hard_deny }),
         ...(environment.length > 0 && { environment }),
       }
     }

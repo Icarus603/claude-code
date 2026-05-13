@@ -272,6 +272,10 @@ import {
   type RetryContext,
   withRetry,
 } from './withRetry.js'
+import {
+  parseImageDimensionExceededError,
+  stripOversizedImageFromMessages,
+} from './imageDimensionStrip.js'
 
 // Define a type that represents valid JSON values
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray
@@ -393,9 +397,33 @@ export function getCacheControl({
  * The allowlist is cached in STATE for session stability — prevents mixed
  * TTLs when GrowthBook's disk cache updates mid-request.
  */
-function should1hCacheTTL(querySource?: QuerySource): boolean {
-  // 3P Bedrock users get 1h TTL when opted in via env var — they manage their own billing
-  // No GrowthBook gating needed since 3P users don't have GrowthBook configured
+export function should1hCacheTTL(querySource?: QuerySource): boolean {
+  // Byte-for-byte port of ant `TLH` (4758.js). Order matters:
+  //
+  //   function TLH(H){
+  //     if(vH(process.env.FORCE_PROMPT_CACHING_5M))return!1;
+  //     if(vH(process.env.ENABLE_PROMPT_CACHING_1H)||
+  //        lq()==="bedrock"&&vH(process.env.ENABLE_PROMPT_CACHING_1H_BEDROCK))return!0;
+  //     if(!Eq()||mW.isUsingOverage)return!1;
+  //     let _=CR6();
+  //     if(_===null) _=M_("tengu_prompt_cache_1h_config",
+  //                       {allowlist:["repl_main_thread*","sdk","auto_mode","memdir_relevance"]}).allowlist??[],
+  //                  IR6(_);
+  //     return H!==void 0 && _.some((q)=>q.endsWith("*")?H.startsWith(q.slice(0,-1)):H===q)
+  //   }
+  //
+  // Critical pinned bits prior ccb impl missed:
+  //   1. `FORCE_PROMPT_CACHING_5M` short-circuit — operator escape hatch.
+  //   2. Generic `ENABLE_PROMPT_CACHING_1H` env (any provider, not just bedrock).
+  //   3. Default allowlist `["repl_main_thread*","sdk","auto_mode","memdir_relevance"]`
+  //      when GrowthBook returns no config — empty fallback would silently
+  //      flip every consumer to 5min TTL and bust the server cache.
+
+  // 1. Hard 5-min override.
+  if (isEnvTruthy(readEnv('FORCE_PROMPT_CACHING_5M'))) return false
+
+  // 2. Generic env opt-in OR bedrock-specific env opt-in.
+  if (isEnvTruthy(readEnv('ENABLE_PROMPT_CACHING_1H'))) return true
   if (
     getAPIProvider() === 'bedrock' &&
     isEnvTruthy(readEnv('ENABLE_PROMPT_CACHING_1H_BEDROCK'))
@@ -403,9 +431,10 @@ function should1hCacheTTL(querySource?: QuerySource): boolean {
     return true
   }
 
-  // Latch eligibility in bootstrap state for session stability — prevents
-  // mid-session overage flips from changing the cache_control TTL, which
-  // would bust the server-side prompt cache (~20K tokens per flip).
+  // 3. Eligibility: Claude.ai subscriber AND not on overage. USER_TYPE='ant'
+  //    short-circuit is a ccb-specific extension (ant's `Eq()` always returns
+  //    true for internal builds anyway); kept for behavioural parity with
+  //    prior ccb where ant-internal devs bypassed the subscriber check.
   let userEligible = getPromptCache1hEligible()
   if (userEligible === null) {
     userEligible =
@@ -415,13 +444,18 @@ function should1hCacheTTL(querySource?: QuerySource): boolean {
   }
   if (!userEligible) return false
 
-  // Cache allowlist in bootstrap state for session stability — prevents mixed
-  // TTLs when GrowthBook's disk cache updates mid-request
+  // 4. GrowthBook-driven querySource allowlist.
+  //    Latch in bootstrap state for session stability — prevents mid-session
+  //    GrowthBook cache flips from changing cache_control TTL (which would
+  //    bust the server-side prompt cache, ~20K tokens per flip).
   let allowlist = getPromptCache1hAllowlist()
   if (allowlist === null) {
     const config = getFeatureValue_CACHED_MAY_BE_STALE<{
       allowlist?: string[]
-    }>('tengu_prompt_cache_1h_config', {})
+    }>('tengu_prompt_cache_1h_config', {
+      // Ant's fallback when GrowthBook returns no payload — pin verbatim.
+      allowlist: ['repl_main_thread*', 'sdk', 'auto_mode', 'memdir_relevance'],
+    })
     allowlist = config.allowlist ?? []
     setPromptCache1hAllowlist(allowlist)
   }
@@ -2001,17 +2035,49 @@ async function* queryModel(
         // Use raw stream instead of BetaMessageStream to avoid O(n²) partial JSON parsing
         // BetaMessageStream calls partialParse() on every input_json_delta, which we don't need
         // since we handle tool input accumulation ourselves
-        const result = await anthropic.beta.messages
-          .create(
-            { ...params, stream: true },
-            {
-              signal,
-              ...(clientRequestId && {
-                headers: { [CLIENT_REQUEST_ID_HEADER]: clientRequestId },
-              }),
-            },
-          )
-          .withResponse()
+        let result
+        try {
+          result = await anthropic.beta.messages
+            .create(
+              { ...params, stream: true },
+              {
+                signal,
+                ...(clientRequestId && {
+                  headers: { [CLIENT_REQUEST_ID_HEADER]: clientRequestId },
+                }),
+              },
+            )
+            .withResponse()
+        } catch (e) {
+          // Port of ant v2.1.136 `Lx9` + `Zv3` retry loop (4758.js). On
+          // 400 "image dimensions exceed max allowed size...
+          // messages.N.content.M.image", replace the outgoing API copy
+          // of `messages` with the patched array (dropping just that
+          // one image) and let withRetry drive the retry. We do NOT
+          // mutate raw `messages` (that's the chat history); only the
+          // outgoing API copy. Next paramsFromContext() will read the
+          // patched array.
+          //
+          // Critical: only emit the strip-retry telemetry when the
+          // patched array is actually different from the input. ant
+          // gates on `_$!==C` so stale coords (e.g. messages reshuffled
+          // since the API saw them) don't pollute analytics.
+          const coords = parseImageDimensionExceededError(e)
+          if (coords) {
+            const patched = stripOversizedImageFromMessages(
+              messagesForAPI as readonly any[],
+              coords,
+            )
+            if (patched !== messagesForAPI) {
+              messagesForAPI = patched as typeof messagesForAPI
+              logEvent('tengu_image_dimension_strip_retry', {
+                message_idx: coords.messageIdx,
+                content_idx: coords.contentIdx,
+              })
+            }
+          }
+          throw e
+        }
         queryCheckpoint('query_response_headers_received')
         streamRequestId = result.request_id
         streamResponse = result.response

@@ -31,6 +31,97 @@ import type {
   UserRolesResponse,
 } from './types.js'
 import { readEnv } from '@claude-code/config/env'
+import {
+  markRefreshTokenDead,
+} from './refreshTokenDeadSet.js'
+
+/**
+ * Regex for valid OAuth error type names — port of ant v2.1.136
+ * `d_1` (1256.js). Matches the canonical RFC 6749 error-type shape:
+ * a lowercase letter followed by up to 39 lowercase-underscore chars.
+ * Used to filter free-form server payloads before logging the type.
+ */
+const OAUTH_ERROR_TYPE_PATTERN = /^[a-z][a-z_]{0,39}$/
+
+/**
+ * Duck-typed axios error detection — axios sets `isAxiosError: true` on
+ * every error its interceptors emit. We don't use `axios.isAxiosError`
+ * because some test fixtures install partial axios mocks (memory:
+ * "bun mock.module is GLOBAL across the test run") that drop the
+ * method without preserving `isAxiosError`. The property check is
+ * robust to those mocks.
+ */
+function isAxiosErrorDuckTyped(
+  error: unknown,
+): error is { isAxiosError: true; response?: { status: number; data: unknown } } {
+  return Boolean(
+    error &&
+      typeof error === 'object' &&
+      (error as { isAxiosError?: unknown }).isAxiosError === true,
+  )
+}
+
+/**
+ * Detect an `invalid_grant` response — port of ant v2.1.136 `tu_`
+ * (1255.js). Walks the axios error shape three layers deep:
+ *   1. The error must come from axios (so we know there is a `.response`).
+ *   2. HTTP status must be 400 OR 401 — anything else is a network /
+ *      gateway / unexpected error and shouldn't mark the token dead.
+ *   3. The body's `error` field must equal `'invalid_grant'`. RFC 6749
+ *      lets the body's `error` be either a bare string OR an object
+ *      with a `type` field; both are inspected.
+ *
+ * Public — callers (refreshOAuthToken's catch, telemetry sweepers) use
+ * this to decide whether to mark the token dead.
+ */
+export function isInvalidGrantError(error: unknown): boolean {
+  if (!isAxiosErrorDuckTyped(error) || !error.response) return false
+  const status = error.response.status
+  if (status !== 400 && status !== 401) return false
+  const data = error.response.data
+  if (!data || typeof data !== 'object') return false
+  const err = (data as { error?: unknown }).error
+  const type =
+    typeof err === 'string'
+      ? err
+      : err && typeof err === 'object'
+        ? (err as { type?: unknown }).type
+        : undefined
+  return type === 'invalid_grant'
+}
+
+/**
+ * Extract `oauth_error_status` and `oauth_error_type` analytics fields
+ * from an axios error — port of ant v2.1.136 `MBq` (1255.js). The
+ * `oauth_error_type` is sanitized through the OAUTH_ERROR_TYPE_PATTERN
+ * regex so we only ship server-controlled values that look like real
+ * error-type names. Unparseable / non-conforming payloads ship
+ * `oauth_error_type:'unparseable'`.
+ */
+export function extractOAuthErrorFields(
+  error: unknown,
+): { oauth_error_status?: string; oauth_error_type?: string } {
+  if (!isAxiosErrorDuckTyped(error) || !error.response) return {}
+  const status = error.response.status
+  const data = error.response.data
+  let type: string = 'unparseable'
+  if (data && typeof data === 'object') {
+    const err = (data as { error?: unknown }).error
+    const rawType =
+      typeof err === 'string'
+        ? err
+        : err && typeof err === 'object'
+          ? (err as { type?: unknown }).type
+          : undefined
+    if (typeof rawType === 'string' && OAUTH_ERROR_TYPE_PATTERN.test(rawType)) {
+      type = rawType
+    }
+  }
+  return {
+    oauth_error_status: String(status),
+    oauth_error_type: type,
+  }
+}
 
 /**
  * Check if the user has Claude.ai authentication scope
@@ -128,9 +219,13 @@ export async function exchangeCodeForTokens(
     requestBody.expires_in = expiresIn
   }
 
+  // Ant `dg6` (1255.js) uses `timeout: 30000`. ccb 15000 is too tight —
+  // OAuth token exchange goes through several backend services and can
+  // exceed 15s under load (especially during /login surges around
+  // release-day). Match ant exactly.
   const response = await axios.post(getOauthConfig().TOKEN_URL, requestBody, {
     headers: { 'Content-Type': 'application/json' },
-    timeout: 15000,
+    timeout: 30000,
   })
 
   if (response.status !== 200) {
@@ -148,6 +243,10 @@ export async function refreshOAuthToken(
   refreshToken: string,
   { scopes: requestedScopes }: { scopes?: string[] } = {},
 ): Promise<OAuthTokens> {
+  // Note: the dead-set check (`isRefreshTokenDead`) lives in the caller
+  // — ant `pt6` (1997.js) — alongside the lockfile + mtime-revalidation
+  // dance. refreshOAuthToken itself is the low-level RPC; it doesn't
+  // know about the higher-level coordination, just like ant `Bq_`.
   const requestBody = {
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
@@ -164,9 +263,12 @@ export async function refreshOAuthToken(
   }
 
   try {
+    // Ant `Bq_` (1255.js) uses `timeout: 30000`. Same rationale as
+    // exchangeCodeForTokens — token refresh round-trips through the
+    // OAuth backend + profile fetch dependencies; 15s is too tight.
     const response = await axios.post(getOauthConfig().TOKEN_URL, requestBody, {
       headers: { 'Content-Type': 'application/json' },
-      timeout: 15000,
+      timeout: 30000,
     })
 
     if (response.status !== 200) {
@@ -258,18 +360,26 @@ export async function refreshOAuthToken(
         : undefined,
     }
   } catch (error) {
-    const responseBody =
-      axios.isAxiosError(error) && error.response?.data
-        ? JSON.stringify(error.response.data)
-        : undefined
+    // Port of ant v2.1.136 `Bq_` catch (1255.js):
+    //   1. Emit `tengu_oauth_token_refresh_failure` with the error
+    //      message AND the structured oauth_error_status /
+    //      oauth_error_type fields (via `extractOAuthErrorFields`,
+    //      sanitized through the OAUTH_ERROR_TYPE_PATTERN regex).
+    //   2. Fire the right outcome event:
+    //        - `oauth_refresh_invalid_grant` (xH) — invalid_grant per `tu_`
+    //        - `oauth_refresh_request_failed` (G6) — everything else
+    //   3. The dead-set marking happens HERE because we have axios-level
+    //      response visibility; the higher-level `pt6` loop only sees
+    //      the throw and uses `tu_()` to mirror our decision.
     logEvent('tengu_oauth_token_refresh_failure', {
       error: (error as Error)
         .message as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      ...(responseBody && {
-        responseBody:
-          responseBody as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      }),
+      ...extractOAuthErrorFields(error),
     })
+    if (isInvalidGrantError(error)) {
+      markRefreshTokenDead(refreshToken)
+      logEvent('tengu_oauth_refresh_token_marked_dead_invalid_grant', {})
+    }
     throw error
   }
 }

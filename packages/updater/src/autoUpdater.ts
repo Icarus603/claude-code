@@ -3,7 +3,10 @@ import { constants as fsConstants } from 'fs'
 import { access, writeFile } from 'fs/promises'
 import { homedir } from 'os'
 import { join } from 'path'
-import { getDynamicConfig_BLOCKS_ON_INIT } from '@claude-code/config/feature-flags'
+import {
+  getDynamicConfig_BLOCKS_ON_INIT,
+  getDynamicConfig_CACHED_MAY_BE_STALE,
+} from '@claude-code/config/feature-flags'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -17,7 +20,7 @@ import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { gracefulShutdownSync } from '@claude-code/app-host/bootstrap/gracefulShutdown.js'
 import { logError } from '@claude-code/local-observability/logging'
-import { gte, lt } from '@claude-code/config/semver'
+import { gt, gte, lt, parseVersion } from '@claude-code/config/semver'
 import { getInitialSettings } from '@claude-code/config/settings'
 import {
   filterClaudeAliases,
@@ -49,6 +52,96 @@ export type MaxVersionConfig = {
   ant?: string
   external_message?: string
   ant_message?: string
+  /**
+   * Port of ant v2.1.136 — when paired with `external`/`ant` maxVersion,
+   * enables a forced downgrade path: the auto-updater will move the user
+   * from a newer version back to `maxVersion`. Default behaviour (flag
+   * absent or false) is no-downgrade; force-downgrade only activates when
+   * this is explicitly true. Acts as a remote kill-switch — must be wired
+   * to telemetry (`tengu_auto_updater_forced_downgrade`) so operators can
+   * see when it fires.
+   */
+  external_force_downgrade?: boolean
+  ant_force_downgrade?: boolean
+}
+
+/**
+ * Returns whether force-downgrade is enabled for the active user type.
+ * Defaults to false. Companion to `getMaxVersion()` — both must be true
+ * for a downgrade to fire.
+ */
+export async function isForceDowngradeEnabled(): Promise<boolean> {
+  const config = await getMaxVersionConfig()
+  if (process.env.USER_TYPE === 'ant') {
+    return config.ant_force_downgrade === true
+  }
+  return config.external_force_downgrade === true
+}
+
+/**
+ * Combined config snapshot — mirror of ant `Lw_()` (3480.js). One async
+ * call returns both `{maxVersion, forceDowngradeEnabled}` so consumers
+ * don't make two trips to the feature-flag service.
+ *
+ * Returns `{maxVersion: undefined, forceDowngradeEnabled: false}` when
+ * the config is missing or the version is invalid (matches ant —
+ * invalid versions are logged via `tengu_max_version_config_invalid`
+ * and treated as absent).
+ */
+export async function getMaxVersionAndForceDowngrade(): Promise<{
+  maxVersion: string | undefined
+  forceDowngradeEnabled: boolean
+}> {
+  const config = await getMaxVersionConfig()
+  const maxVersion = await getMaxVersion()
+  const forceDowngradeEnabled =
+    process.env.USER_TYPE === 'ant'
+      ? config.ant_force_downgrade === true
+      : config.external_force_downgrade === true
+  return { maxVersion, forceDowngradeEnabled }
+}
+
+/**
+ * Port of ant `UK6` (3480.js). Decides whether a force-downgrade should
+ * actually fire by comparing the current version to the target. Returns
+ * true ONLY when `currentVersion > targetVersion` (semver compare); a
+ * "flag set but current already ≤ target" condition logs and returns
+ * false (no downgrade needed, take the normal upgrade path).
+ *
+ * `reason` is the caller context for the log line — values mirror ant:
+ *   - `'native_update'`  → "Native installer: ..."
+ *   - everything else    → "AutoUpdater: ..."
+ *
+ * The version parse is delegated to `gt()` (semver) which returns false
+ * when either side is unparseable. ant additionally `parse(currentVersion)`
+ * up front and short-circuits on null parse; ccb's `gt()` does the same
+ * via its underlying `semver.parse`.
+ */
+export function shouldForceDowngradeNow(
+  currentVersion: string,
+  targetVersion: string,
+  reason: 'native_update' | 'auto_updater',
+): boolean {
+  const tag = reason === 'native_update' ? 'Native installer' : 'AutoUpdater'
+  let isAbove = false
+  try {
+    // Bun.semver.order throws on unparseable input; ant's
+    // `uX8.parse(H)?.compare(_)` returns null. Match the null
+    // contract via try/catch — unparseable on either side ⇒ false.
+    isAbove = gt(currentVersion, targetVersion)
+  } catch {
+    isAbove = false
+  }
+  if (isAbove) {
+    logForDebugging(
+      `${tag}: force-downgrade active — moving from ${currentVersion} to ${targetVersion}`,
+    )
+    return true
+  }
+  logForDebugging(
+    `${tag}: force-downgrade flag set but current ${currentVersion} is not above ${targetVersion} — taking normal upgrade path`,
+  )
+  return false
 }
 
 /**
@@ -106,10 +199,28 @@ This will ensure you have access to the latest features and improvements.
  */
 export async function getMaxVersion(): Promise<string | undefined> {
   const config = await getMaxVersionConfig()
-  if (process.env.USER_TYPE === 'ant') {
-    return config.ant || undefined
+  const raw =
+    process.env.USER_TYPE === 'ant'
+      ? config.ant || undefined
+      : config.external || undefined
+  if (!raw) return undefined
+  // Ant `Lw_`: `uX8.parse(q)?.version ?? void 0`. The server-provided
+  // value may be malformed (typo, build-metadata-only string, etc.); if
+  // it doesn't parse, log telemetry and return undefined so consumers
+  // don't compare against garbage.
+  const parsed = parseVersion(raw)
+  if (!parsed) {
+    logForDebugging(
+      `tengu_max_version_config has invalid version '${raw}' — ignoring`,
+      { level: 'error' },
+    )
+    logEvent('tengu_max_version_config_invalid', {
+      raw_value:
+        raw as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+    return undefined
   }
-  return config.external || undefined
+  return parsed
 }
 
 /**
@@ -133,6 +244,50 @@ async function getMaxVersionConfig(): Promise<MaxVersionConfig> {
   } catch (error) {
     logError(error as Error)
     return {}
+  }
+}
+
+/**
+ * Ant `BV5` (3486.js) — byte-for-byte port. SYNC and reads the
+ * CACHED-MAY-BE-STALE GrowthBook config (NOT blocking). The native
+ * installer fast-paths past the canary check when GrowthBook hasn't
+ * loaded yet — ant explicitly designed this so a slow GB init doesn't
+ * stall `claude install`.
+ *
+ * Prior ccb impl called the BLOCKING variant which would await GB init
+ * on every call site, blocking the native installer until GrowthBook
+ * resolved (could stall multi-second on cold network).
+ *
+ * Ant source:
+ *   function BV5(){
+ *     try{
+ *       let H = M_("tengu_canary",{});
+ *       return typeof H.external==="string" && _27.valid(H.external) || null
+ *     }catch(H){
+ *       y(`getCanaryVersion: GB read failed, falling through: ${VH(H)}`);
+ *       return null
+ *     }
+ *   }
+ *
+ * `_27.valid()` is npm-semver's `valid()`: returns the cleaned
+ * canonical version string (e.g. "1.2.3") or `null`. ccb's
+ * `parseVersion()` is the same shape (returns `string | undefined`);
+ * we coalesce to null to match ant's contract exactly.
+ */
+export function getCanaryVersion(): string | null {
+  try {
+    const config = getDynamicConfig_CACHED_MAY_BE_STALE<{ external?: string }>(
+      'tengu_canary',
+      {},
+    )
+    const raw = config.external
+    if (typeof raw !== 'string') return null
+    return parseVersion(raw) ?? null
+  } catch (error) {
+    logForDebugging(
+      `getCanaryVersion: GB read failed, falling through: ${(error as Error).message}`,
+    )
+    return null
   }
 }
 
@@ -410,6 +565,50 @@ export async function getLatestVersionFromGcs(
     logForDebugging(`Failed to fetch ${channel} from GCS: ${error}`)
     return null
   }
+}
+
+/**
+ * Port of ant v2.1.136 `XV5` (3480.js). Read the cask's published
+ * version from formulae.brew.sh. The Homebrew formula publishes new
+ * versions on its own cadence (manual cask updates by the maintainer),
+ * so the version it returns can lag the GCS pointer by hours. We fall
+ * back to GCS when the brew API fails or returns nothing — see
+ * `getLatestVersionForBrew` below.
+ */
+export async function getLatestVersionFromHomebrew(
+  formulaName: string,
+): Promise<string | null> {
+  try {
+    const response = await axios.get(
+      `https://formulae.brew.sh/api/cask/${formulaName}.json`,
+      { timeout: 5000, responseType: 'json' },
+    )
+    const version = (response.data as { version?: unknown })?.version
+    return typeof version === 'string' ? version : null
+  } catch (error) {
+    logForDebugging(
+      `Failed to fetch ${formulaName} from formulae.brew.sh: ${error}`,
+    )
+    return null
+  }
+}
+
+/**
+ * Port of ant v2.1.136 `FK6` (3480.js). For Homebrew cask installs the
+ * canonical source of truth is `formulae.brew.sh/api/cask/<name>.json`
+ * (so the auto-updater agrees with what `brew upgrade --cask` would
+ * actually fetch). Falls back to the GCS channel pointer when the
+ * brew API fails, so users on dev-channel formulae aren't stuck.
+ */
+export async function getLatestVersionForBrew(
+  formulaName: string,
+  channel: ReleaseChannel,
+): Promise<string | null> {
+  const [brew, gcs] = await Promise.all([
+    getLatestVersionFromHomebrew(formulaName),
+    getLatestVersionFromGcs(channel),
+  ])
+  return brew ?? gcs
 }
 
 /**

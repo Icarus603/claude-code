@@ -36,6 +36,7 @@ import { runModeDispatch } from './mode-dispatch.js'
 import type { PendingHandles } from './preprocess-argv.js'
 import { registerMcpCommands } from '../commands/mcp-commands.js'
 import { registerMiscCommands } from '../commands/misc-commands.js'
+import { registerProjectCommands } from '../commands/project-commands.js'
 
 /**
  * Attach the preAction hook that runs once per subcommand entry.
@@ -101,6 +102,21 @@ function attachPreActionHook(program: CommanderCommand): void {
     // Must happen after init() to ensure config reading is allowed
     void loadRemoteManagedSettings()
     void loadPolicyLimits()
+    // Port of ant v2.1.131 QO6 (4074.js) — kick off gateway model
+    // discovery in the background. Non-blocking; populates the file
+    // cache that getModelOptions reads in the picker.
+    void (async () => {
+      try {
+        const { refreshGatewayModels, isGatewayModelDiscoveryEnabled } =
+          await import('@claude-code/provider/gatewayModelDiscovery.js')
+        if (isGatewayModelDiscoveryEnabled()) {
+          await refreshGatewayModels()
+        }
+      } catch {
+        // Discovery failure must not block startup — picker still has
+        // static list + ANTHROPIC_CUSTOM_MODEL_OPTION.
+      }
+    })()
 
     profileCheckpoint('preAction_after_remote_settings')
 
@@ -371,6 +387,9 @@ export async function runCliProgram(
 
   // claude auth/plugin/setup-token/agents/auto-mode/remote-control/assistant/doctor/up/rollback/install/log/error/export/task/completion (extracted to @claude-code/cli)
   registerMiscCommands(program)
+
+  // claude project purge — port of ant v2.1.126 WD/5142.js
+  registerProjectCommands(program)
 
   profileCheckpoint('run_before_parse')
   await program.parseAsync(process.argv)

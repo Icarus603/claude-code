@@ -456,6 +456,7 @@ import { useAutoModeUnavailableNotification } from '../hooks/notifs/useAutoModeU
 import { AUTO_MODE_DESCRIPTION } from '../components/AutoModeOptInDialog.js';
 import { useLspInitializationNotification } from '../hooks/notifs/useLspInitializationNotification.js';
 import { useLspPluginRecommendation } from '../hooks/useLspPluginRecommendation.js';
+import { useSkillsBudgetNotification } from '../hooks/useSkillsBudgetNotification.js';
 import { LspRecommendationMenu } from '../components/LspRecommendation/LspRecommendationMenu.js';
 import { useClaudeCodeHintRecommendation } from '../hooks/useClaudeCodeHintRecommendation.js';
 import { PluginHintMenu } from '../components/ClaudeCodeHint/PluginHintMenu.js';
@@ -817,6 +818,7 @@ export function REPL({
   useOfficialMarketplaceNotification();
   useLspInitializationNotification();
   useTeammateLifecycleNotification();
+  useSkillsBudgetNotification();
   const { recommendation: lspRecommendation, handleResponse: handleLspResponse } = useLspPluginRecommendation();
   const { recommendation: hintRecommendation, handleResponse: handleHintResponse } = useClaudeCodeHintRecommendation();
 

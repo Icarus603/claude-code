@@ -944,6 +944,28 @@ async function getMessagesForSlashCommand(
             }
           }
 
+          // Port of ant v2.1.136 3753.js qm5 'query' branch — local command
+          // returns visible stdout PLUS an invisible meta-message prompt;
+          // `shouldQuery:true` so the agent picks up the directive without
+          // requiring further user input. Used by `/goal`.
+          if (result.type === 'query') {
+            return {
+              messages: [
+                userMessage,
+                createUserMessage({
+                  content: `<local-command-stdout>${result.value}</local-command-stdout>`,
+                }),
+                createUserMessage({
+                  content: result.prompt,
+                  isMeta: true,
+                }),
+              ],
+              shouldQuery: true,
+              command,
+              resultText: result.value,
+            }
+          }
+
           // Text result — use system message so it doesn't render as a user bubble
           return {
             messages: [

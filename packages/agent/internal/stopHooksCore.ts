@@ -21,6 +21,9 @@ import type {
 } from '../internalTypes.js'
 import { errorMessage, isBareMode, isEnvDefinedFalsy } from '../internalUtils.js'
 import { readEnv } from '@claude-code/config/env'
+import { logEvent as obsLogEvent } from '@claude-code/local-observability'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
+import { removeSessionHook } from '../hooks/sessionHooks.js'
 
 
 type StopHookResult = {
@@ -198,6 +201,82 @@ export async function* handleStopHooks(
               ) {
                 hasOutput = true
               }
+              // Port of ant v2.1.136 (3973.js hd7): /goal Stop hook met.
+              // When the executed hook is the active goal's prompt hook
+              // and it returned successfully, the condition is satisfied:
+              //   1. Bump iterations from activeGoal.iterations + 1.
+              //   2. Compute durationMs from (now - activeGoal.setAt).
+              //   3. Remove the Stop hook so future stops aren't gated.
+              //   4. Clear AppState.activeGoal.
+              //   5. Emit goal_status `{met:true, condition, reason,
+              //      iterations, durationMs}` (NO sentinel — the
+              //      findMostRecentMetGoalStatus lookback skips sentinels).
+              //   6. logEvent `tengu_goal_achieved {promptLength,
+              //      iterations, durationMs}`.
+              //   7. logForDebugging `goal_met`.
+              if (
+                result.message.attachment.hookEvent === 'Stop' &&
+                'hook' in result &&
+                result.hook &&
+                (result.hook as { type: string }).type === 'prompt'
+              ) {
+                const hookPrompt = (result.hook as { prompt: string }).prompt
+                const appState = toolUseContext.getAppState()
+                const activeGoal = (
+                  appState as {
+                    activeGoal?: {
+                      condition: string
+                      iterations: number
+                      setAt: number
+                    }
+                  }
+                ).activeGoal
+                if (activeGoal && activeGoal.condition === hookPrompt) {
+                  const iterations = activeGoal.iterations + 1
+                  const durationMs = Date.now() - activeGoal.setAt
+                  try {
+                    removeSessionHook(
+                      toolUseContext.setAppState,
+                      getAgentHostBindings().getSessionId?.() ?? '',
+                      'Stop',
+                      result.hook as Parameters<
+                        typeof removeSessionHook
+                      >[3],
+                    )
+                  } catch {
+                    // best-effort cleanup
+                  }
+                  toolUseContext.setAppState(prev => ({
+                    ...prev,
+                    activeGoal: undefined,
+                  }))
+                  const goalMet = getAgentHostBindings().createAttachmentMessage?.(
+                    {
+                      type: 'goal_status',
+                      met: true,
+                      condition: hookPrompt,
+                      reason: (result as { stopReason?: string }).stopReason,
+                      iterations,
+                      durationMs,
+                    },
+                  )
+                  if (goalMet) yield goalMet
+                  try {
+                    obsLogEvent('tengu_goal_achieved', {
+                      promptLength: hookPrompt.length,
+                      iterations,
+                      durationMs,
+                    })
+                  } catch {
+                    // telemetry sink might be uninstalled — fine
+                  }
+                  try {
+                    logForDebugging('goal_met')
+                  } catch {
+                    // best-effort diagnostic
+                  }
+                }
+              }
             }
             // Extract per-hook duration for timing visibility.
             // Hooks run in parallel; match by command + first unassigned entry.
@@ -224,6 +303,48 @@ export async function* handleStopHooks(
         hasOutput = true
         // Add to hookErrors so it appears in the summary
         hookErrors.push(result.blockingError.blockingError)
+        // Port of ant v2.1.136 (3973.js hd7 blocking branch):
+        //   /goal not yet met — increment iterations, record lastReason
+        //   on AppState.activeGoal (so renderActiveGoalStatus shows
+        //   "Last check: <reason>"), surface goal_status `{met:false,
+        //   condition, reason}` (NO sentinel) so the model knows it must
+        //   keep going. Hook itself is NOT removed.
+        if (
+          'hook' in result &&
+          result.hook &&
+          (result.hook as { type: string }).type === 'prompt'
+        ) {
+          const hookPrompt = (result.hook as { prompt: string }).prompt
+          const appState = toolUseContext.getAppState()
+          const activeGoal = (
+            appState as {
+              activeGoal?: {
+                condition: string
+                iterations: number
+                setAt: number
+                lastReason?: string
+              }
+            }
+          ).activeGoal
+          if (activeGoal && activeGoal.condition === hookPrompt) {
+            const reason = (result as { stopReason?: string }).stopReason
+            toolUseContext.setAppState(prev => ({
+              ...prev,
+              activeGoal: {
+                ...(prev as { activeGoal: typeof activeGoal }).activeGoal!,
+                iterations: activeGoal.iterations + 1,
+                lastReason: reason,
+              },
+            }))
+            const notMet = getAgentHostBindings().createAttachmentMessage?.({
+              type: 'goal_status',
+              met: false,
+              condition: hookPrompt,
+              reason,
+            })
+            if (notMet) yield notMet
+          }
+        }
       }
       // Check if hook wants to prevent continuation
       if (result.preventContinuation) {

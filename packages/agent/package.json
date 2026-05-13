@@ -18,6 +18,7 @@
     "./agentHostBindings.js": "./agentHostBindings.ts",
     "./eventMetadata.js": "./eventMetadata.ts",
     "./internalLogging.js": "./internalLogging.ts",
+    "./goalStopHook.js": "./goalStopHook.ts",
     "./tokenEstimation.js": "./tokenEstimation.ts",
     "./SessionMemory/*.js": "./SessionMemory/*.ts",
     "./awaySummary.js": "./awaySummary.ts",

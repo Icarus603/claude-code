@@ -83,6 +83,7 @@ import uniqBy from 'lodash-es/uniqBy.js'
 import React from 'react'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { getRemoteSessionUrl } from '@claude-code/config/product'
+import { getPolicyHelperAppendSystemPrompt } from '@claude-code/config/policyHelper'
 import { getSystemContext, getUserContext } from '@claude-code/provider/context.js'
 import { init, initializeTelemetryAfterTrust } from '@claude-code/app-host/init.js'
 import { addToHistory } from '@claude-code/repl/history.js'
@@ -1019,6 +1020,18 @@ export async function runModeDispatch(
 					);
 					process.exit(1);
 				}
+			}
+
+			// Port of ant v2.1.136 `aAq()` (0686.js): when the
+			// policyHelper supplied an `appendSystemPrompt` field, append
+			// it AFTER the user/file-provided value. Admin-controlled
+			// trumps user-supplied for visibility, but appends rather
+			// than replaces so the user's append remains intact.
+			const policyAppend = getPolicyHelperAppendSystemPrompt();
+			if (policyAppend) {
+				appendSystemPrompt = appendSystemPrompt
+					? `${appendSystemPrompt}\n\n${policyAppend}`
+					: policyAppend;
 			}
 
 			// Add teammate-specific system prompt addendum for tmux teammates

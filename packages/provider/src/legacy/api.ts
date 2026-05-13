@@ -5,6 +5,7 @@ import type {
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { createHash } from 'crypto'
 import { SYSTEM_PROMPT_DYNAMIC_BOUNDARY } from '@claude-code/agent/prompts.js'
+import { has1mContext } from '@claude-code/agent/context.js'
 import { getSystemContext, getUserContext } from '../context.js'
 import { isAnalyticsDisabled } from '@claude-code/agent/services/privacyConfig.js'
 import {
@@ -45,6 +46,55 @@ import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { createUserMessage } from '@claude-code/agent/messages.js'
 import { isFirstPartyAnthropicEndpoint } from '../model/providers.js'
+import { getAPIProvider } from '../providers.js'
+import { getCanonicalName } from '../model.js'
+
+/**
+ * Port of ant v2.1.136 `HA[model].eagerInputStreaming.{vertex,bedrock}`
+ * (1250.js b6H module). Returns true when the canonical model name is
+ * in the per-provider opt-in TABLE for fine-grained tool streaming.
+ *
+ * The matrix is per-model, per-provider because Anthropic enabled FGTS
+ * on different release cycles for Vertex vs Bedrock. The previous
+ * regex-based approximation incorrectly enabled FGTS on opus-4-0/4-1
+ * (which DO NOT have eager streaming per ant `Bg6`/`Ug6`), causing
+ * 400s on those models. Mirroring the static table guarantees byte-for-
+ * byte parity with ant.
+ */
+function modelOptInForEagerStreaming(
+  model: string,
+  provider: 'vertex' | 'bedrock',
+): boolean {
+  // ant uses canonical name lookup; ccb's getCanonicalName normalizes
+  // through the same identifier scheme as ant's `aN3` / `I7`.
+  const canonical = getCanonicalName(model)
+  // Static table — exact mirror of ant b6H module (1250.js):
+  //   sonnet35: NO eager
+  //   sonnet37: NO eager
+  //   sonnet40: vertex only
+  //   sonnet45: vertex only
+  //   sonnet46: vertex + bedrock
+  //   opus40:   NO eager
+  //   opus41:   NO eager
+  //   opus45:   vertex only
+  //   opus46:   vertex only
+  //   opus47:   vertex + bedrock
+  //   haiku35:  vertex only
+  //   haiku45:  NO eager
+  switch (canonical) {
+    case 'claude-sonnet-4-0':
+    case 'claude-sonnet-4-5':
+    case 'claude-opus-4-5':
+    case 'claude-opus-4-6':
+    case 'claude-3-5-haiku':
+      return provider === 'vertex'
+    case 'claude-sonnet-4-6':
+    case 'claude-opus-4-7':
+      return provider === 'vertex' || provider === 'bedrock'
+    default:
+      return false
+  }
+}
 import {
   getFileReadIgnorePatterns,
   normalizePatternsToPath,
@@ -142,10 +192,57 @@ export async function toolToAPISchema(
   // call — name-only keying returned a stale schema (5.4% → 51% err rate, see
   // PR#25424). MCP tools also set inputJSONSchema but each has a stable schema,
   // so including it preserves their GB-flip cache stability.
+  // Port of ant v2.1.133 OI→ou (4719.js): include eager-streaming state
+  // in the cache key. A same-named tool with the flag flipped (e.g.
+  // model switched mid-session from Opus 4.5 → 4.6 on Vertex) must not
+  // reuse a cached spec without the eager_input_streaming field, and
+  // vice versa. Prepending `F:` keeps the keyspace partitioned cleanly.
+  // ant `Ez6` cache-key composition (4753.js):
+  //   O = "L:" when the model is in 1M context mode (`[1m]` suffix).
+  //       — partitions 1m and base variants because the API expects
+  //         different schemas / cache discipline on the long-context
+  //         path.
+  //   T = "F:" when the model+provider has eager_input_streaming on.
+  //       — the schema carries the `eager_input_streaming` field; a
+  //         same-named tool with the flag flipped must NOT reuse a
+  //         cached spec built without it (or vice versa).
+  //   key = O + T + (inputJSONSchema ? `name:schemaJson` : name).
+  const oneMillionPrefix =
+    options.model && has1mContext(options.model) ? 'L:' : ''
+  const eagerCachePrefix = (() => {
+    const envOverride = readEnv(
+      'CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING',
+    )
+    if (envOverride === '0') return ''
+    if (envOverride === '1') return 'F:'
+    if (
+      isFirstPartyAnthropicEndpoint(options.model) &&
+      getFeatureValue_CACHED_MAY_BE_STALE('tengu_fgts', false)
+    ) {
+      return 'F:'
+    }
+    if (
+      getAPIProvider() === 'vertex' &&
+      !readEnv('ANTHROPIC_VERTEX_BASE_URL') &&
+      modelOptInForEagerStreaming(options.model, 'vertex')
+    ) {
+      return 'F:'
+    }
+    if (
+      getAPIProvider() === 'bedrock' &&
+      !readEnv('ANTHROPIC_BEDROCK_BASE_URL') &&
+      modelOptInForEagerStreaming(options.model, 'bedrock')
+    ) {
+      return 'F:'
+    }
+    return ''
+  })()
   const cacheKey =
-    'inputJSONSchema' in tool && tool.inputJSONSchema
+    oneMillionPrefix +
+    eagerCachePrefix +
+    ('inputJSONSchema' in tool && tool.inputJSONSchema
       ? `${tool.name}:${jsonStringify(tool.inputJSONSchema)}`
-      : tool.name
+      : tool.name)
   const cache = getToolSchemaCache()
   let base = cache.get(cacheKey)
   if (!base) {
@@ -202,11 +299,34 @@ export async function toolToAPISchema(
     // 'firstParty' && isFirstPartyAnthropicBaseUrl()` returns true and silently
     // sends `eager_input_streaming` to the proxy, which 400s. Resolving the
     // connection's actual endpoint host fixes this.
-    if (
+    // CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING semantics ported from
+    // ant v2.1.133 OI→ou (4719.js):
+    //   - `=1` → force on across all providers (regardless of flags)
+    //   - `=0` → force OFF across all providers (overrides flags too)
+    //   - unset → fall through to the per-provider gates below.
+    const envOverride = readEnv('CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING')
+    if (envOverride === '0') {
+      // explicit suppress
+    } else if (envOverride === '1') {
+      base.eager_input_streaming = true
+    } else if (
       isFirstPartyAnthropicEndpoint(options.model) &&
-      (getFeatureValue_CACHED_MAY_BE_STALE('tengu_fgts', false) ||
-        isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING')))
+      getFeatureValue_CACHED_MAY_BE_STALE('tengu_fgts', false)
     ) {
+      base.eager_input_streaming = true
+    } else if (
+      getAPIProvider() === 'vertex' &&
+      !readEnv('ANTHROPIC_VERTEX_BASE_URL') &&
+      modelOptInForEagerStreaming(options.model, 'vertex')
+    ) {
+      // ant v2.1.133: per-model opt-in for Vertex
+      base.eager_input_streaming = true
+    } else if (
+      getAPIProvider() === 'bedrock' &&
+      !readEnv('ANTHROPIC_BEDROCK_BASE_URL') &&
+      modelOptInForEagerStreaming(options.model, 'bedrock')
+    ) {
+      // ant v2.1.133: per-model opt-in for Bedrock
       base.eager_input_streaming = true
     }
 

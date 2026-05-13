@@ -4,6 +4,7 @@ import { installCommandRegistryHostBindings } from '@claude-code/command-runtime
 import autofixPr from '@claude-code/command-runtime/stubs/stubCommand.js'
 import backfillSessions from '@claude-code/command-runtime/stubs/stubCommand.js'
 import btw from '@claude-code/command-runtime/commands/btw/index.js'
+import goalJsx, { goalLocalCommand as goalLocal } from '@claude-code/command-runtime/commands/goal/index.js'
 import goodClaude from '@claude-code/command-runtime/stubs/stubCommand.js'
 import issue from '@claude-code/command-runtime/stubs/stubCommand.js'
 import clear from '@claude-code/command-runtime/commands/clear/index.js'
@@ -259,6 +260,8 @@ const COMMANDS = memoize((): Command[] => [
   advisor,
   provider,
   agents,
+  goalJsx,
+  goalLocal,
   branch,
   btw,
   chrome,

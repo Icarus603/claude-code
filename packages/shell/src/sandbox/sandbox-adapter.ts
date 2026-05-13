@@ -767,6 +767,33 @@ async function initialize(
         worktreeMainRepoPath = await detectWorktreeMainRepoPath(getCwdState())
       }
 
+      // Port of ant v2.1.133 aTH (2492.js) — read sandbox.bwrapPath /
+      // sandbox.socatPath from layered settings and prepend their
+      // dirnames to PATH so the upstream `@anthropic-ai/sandbox-runtime`
+      // resolution finds them. We can't pass the path directly because
+      // the upstream lib doesn't accept an override prop; the env mutate
+      // is the smallest portable injection point.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { getSandboxBinaryPath } = require(
+          '@claude-code/config/settings',
+        ) as typeof import('@claude-code/config/settings')
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const path = require('node:path') as typeof import('node:path')
+        const extraDirs: string[] = []
+        for (const field of ['bwrapPath', 'socatPath'] as const) {
+          const p = getSandboxBinaryPath(field)
+          if (p && p.length > 0) extraDirs.push(path.dirname(p))
+        }
+        if (extraDirs.length > 0) {
+          const existing = process.env.PATH ?? ''
+          const sep = process.platform === 'win32' ? ';' : ':'
+          process.env.PATH = [...extraDirs, existing].filter(Boolean).join(sep)
+        }
+      } catch (e) {
+        logForDebugging(`Failed to read sandbox.bwrapPath/socatPath: ${errorMessage(e)}`)
+      }
+
       const settings = getSettings()
       const runtimeConfig = convertToSandboxRuntimeConfig(settings)
 

@@ -12,6 +12,7 @@
     "./agentSdkTypes.js": "./src/agentSdkTypes.ts",
     "./controlMessageCompat": "./src/controlMessageCompat.ts",
     "./controlTypes.js": "./src/controlTypes.ts",
+    "./sdkMemorySummary.js": "./src/sdkMemorySummary.ts",
     "./sdkUtilityTypes.js": "./src/sdkUtilityTypes.ts",
     "./runtimeTypes.js": "./src/runtimeTypes.ts",
     "./coreTypes.js": "./src/coreTypes.ts",

@@ -1067,6 +1067,24 @@ async function execCommandHook(
     CLAUDE_PROJECT_DIR: toHookPath(projectDir),
   }
 
+  // Port of ant v2.1.133 PPK→oPK (4716.js). When the hook input JSON carries
+  // an `effort.level` string (matching the same field exposed in the hook
+  // input schema), forward it as `CLAUDE_EFFORT` so hook scripts and
+  // status-line scripts can branch on the user's current effort level
+  // (already silent-downgraded to whatever the active model supports). Safe
+  // to parse defensively — older payloads simply omit the field.
+  try {
+    const parsedInput = JSON.parse(jsonInput) as
+      | { effort?: { level?: unknown } }
+      | null
+    const effortLevel = parsedInput?.effort?.level
+    if (typeof effortLevel === 'string' && effortLevel.length > 0) {
+      envVars.CLAUDE_EFFORT = effortLevel
+    }
+  } catch {
+    // Malformed jsonInput is the caller's bug; don't block the hook.
+  }
+
   // Plugin and skill hooks both set CLAUDE_PLUGIN_ROOT (skills use the same
   // name for consistency — skills can migrate to plugins without code changes)
   if (pluginRoot) {

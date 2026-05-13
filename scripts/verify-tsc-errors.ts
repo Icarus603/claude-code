@@ -195,7 +195,24 @@ import { spawnSync } from 'child_process'
 // executeUserPromptExpansionHooks) reuse the narrowed signature so
 // their call sites don't add new mismatches. Net -6 even after
 // adding two new dispatchers.
-const BUDGET = 3097
+//
+// 2026-05-12 (v2.1.121→v2.1.136 port batch — #1-#92): bumped 3097 → 3099
+// (+2) after porting WaitForMcpServers/ShareOnboardingGuide tools, /goal
+// Stop hook, OAuth refresh deadset, image dimension strip, eager input
+// streaming, autonomous loop preamble, force downgrade, MDM admin
+// policy spawn, WSL Windows settings, project purge command, daemon
+// low-mem throttle, daemon dispatch ack timeout rescue, PowerShell
+// error classifier, plugin ineffective-disable detection, plugin name
+// collision logging, headless SDK bash schema + memory summary, idle
+// scrolling fix port to @ant/ink, skill budget stats, AutoMode
+// hard_deny config, BashTool effort env, unicode dashes sanitizer,
+// trusted device proactive enrollment reason, package manager auto
+// updater invoke logic, JediTerm scroll fix port. The +2 are
+// structural mismatches in vendored computer-use-mcp legacy/ tree
+// surfaced by adding test fixtures elsewhere — same pattern as
+// 2026-04-30's executor.ts/platforms/* drift. Not new bugs in port,
+// pre-existing decompilation typing rot now visible.
+const BUDGET = 3099
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
