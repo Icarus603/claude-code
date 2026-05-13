@@ -1,5 +1,5 @@
 import chokidar, { type FSWatcher } from 'chokidar'
-import { stat } from 'fs/promises'
+import { realpath, stat } from 'fs/promises'
 import * as platformPath from 'path'
 import { getConfigHostBindings } from '../host.js'
 import { createSignal } from '../internal/signal.js'
@@ -66,6 +66,11 @@ let mdmPollTimer: ReturnType<typeof setInterval> | null = null
 let lastMdmSnapshot: string | null = null
 let initialized = false
 let disposed = false
+// ant v2.1.140 2563.js — when a settings file is a symlink, map the symlink
+// target's realpath back to the canonical settings file so chokidar events
+// fired on the realpath translate to the right source (avoids spurious
+// ConfigChange hooks attributed to the wrong file or to no file at all).
+let realpathToCanonical: Map<string, string> = new Map()
 const pendingDeletions = new Map<string, ReturnType<typeof setTimeout>>()
 const settingsChanged = createSignal<[source: SettingSource]>()
 
@@ -91,7 +96,8 @@ export async function initialize(): Promise<void> {
   // Register cleanup to properly dispose during graceful shutdown
   getConfigHostBindings().registerCleanup?.(dispose)
 
-  const { dirs, settingsFiles, dropInDir } = await getWatchTargets()
+  const { dirs, settingsFiles, dropInDir, realpathToCanonical: rpMap } = await getWatchTargets()
+  realpathToCanonical = rpMap
   if (disposed) return // dispose() ran during the await
   if (dirs.length === 0) return
 
@@ -159,6 +165,7 @@ export function dispose(): Promise<void> {
   for (const timer of pendingDeletions.values()) clearTimeout(timer)
   pendingDeletions.clear()
   lastMdmSnapshot = null
+  realpathToCanonical = new Map()
   clearInternalWrites()
   settingsChanged.clear()
   const w = watcher
@@ -180,10 +187,15 @@ async function getWatchTargets(): Promise<{
   dirs: string[]
   settingsFiles: Set<string>
   dropInDir: string | null
+  realpathToCanonical: Map<string, string>
 }> {
   // Map from directory to all potential settings files in that directory
   const dirToSettingsFiles = new Map<string, Set<string>>()
   const dirsWithExistingFiles = new Set<string>()
+  // ant v2.1.140 2563.js:182 — realpath(symlink) → canonical settings path,
+  // used by getSourceForPath() to attribute change events to the right source
+  // when the file is symlinked (chokidar fires on the realpath, not the link).
+  const realpathMap = new Map<string, string>()
 
   for (const source of SETTING_SOURCES) {
     // Skip flagSettings - they're provided via CLI and won't change during the session.
@@ -215,6 +227,25 @@ async function getWatchTargets(): Promise<{
     } catch {
       // File doesn't exist, that's fine
     }
+
+    // Symlink-aware: if the settings file is a symlink, resolve it and watch
+    // the target's parent dir too. Otherwise atomic-save edits to the target
+    // (Vim's "writebackup", editor renames) get reported as the realpath and
+    // we'd lose them (or worse, attribute them to no source).
+    try {
+      const resolved = platformPath.normalize(await realpath(path))
+      if (resolved !== path) {
+        const resolvedDir = platformPath.dirname(resolved)
+        realpathMap.set(resolved, path)
+        dirsWithExistingFiles.add(resolvedDir)
+        if (!dirToSettingsFiles.has(resolvedDir)) {
+          dirToSettingsFiles.set(resolvedDir, new Set())
+        }
+        dirToSettingsFiles.get(resolvedDir)!.add(resolved)
+      }
+    } catch {
+      // Not a symlink, or broken link — fall through.
+    }
   }
 
   // For watched directories, include ALL potential settings file paths
@@ -245,7 +276,7 @@ async function getWatchTargets(): Promise<{
     // Drop-in directory doesn't exist, that's fine
   }
 
-  return { dirs: [...dirsWithExistingFiles], settingsFiles, dropInDir }
+  return { dirs: [...dirsWithExistingFiles], settingsFiles, dropInDir, realpathToCanonical: realpathMap }
 }
 
 function settingSourceToConfigChangeSource(
@@ -364,7 +395,16 @@ function handleDelete(path: string): void {
 
 function getSourceForPath(path: string): SettingSource | undefined {
   // Normalize path because chokidar uses forward slashes on Windows
-  const normalizedPath = platformPath.normalize(path)
+  let normalizedPath = platformPath.normalize(path)
+
+  // ant v2.1.140 2563.js:70 — translate symlink realpath back to canonical
+  // settings file path. If the user's ~/.claude/settings.json is symlinked
+  // to a dotfiles repo, the watcher fires on the realpath; the canonical
+  // path is the one source-attribution lookups expect.
+  const canonical = realpathToCanonical.get(normalizedPath)
+  if (canonical !== undefined) {
+    normalizedPath = canonical
+  }
 
   // Check if the path is inside the managed-settings.d/ drop-in directory
   const dropInDir = getManagedSettingsDropInDir()

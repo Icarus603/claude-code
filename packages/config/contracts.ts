@@ -51,7 +51,13 @@ export type ConfigHostBindings = {
     isEligible: boolean
     baseApiUrl: string
     getAuthHeaders: () => Promise<Record<string, string>>
-    refreshToken: () => Promise<void>
+    // ant v2.1.140 3202.js:124 — `force: true` bypasses the in-memory access
+    // token cache and goes straight to the IdP for a fresh token. Used by
+    // remote-settings on-401 retry.
+    refreshToken: (opts?: { force?: boolean }) => Promise<void>
+    // ant v2.1.140 — fetch current access token (read-only, no refresh).
+    // Used to compare before/after force-refresh to detect a token rotation.
+    getAccessToken?: () => Promise<string | undefined>
   } | null
   isInteractive?: () => boolean
   // V7 §8.6 — memory subsystem bridge (config cannot import claudemd).

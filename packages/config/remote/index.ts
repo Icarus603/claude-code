@@ -245,6 +245,10 @@ async function fetchWithRetry(
  */
 async function fetchRemoteManagedSettings(
   cachedChecksum?: string,
+  // ant v2.1.140 3202.js:123 — internal recursion flag set when we're already
+  // retrying after a 401 with force-refreshed token. Prevents infinite loop
+  // if the second attempt also 401s.
+  isForceRefreshRetry = false,
 ): Promise<RemoteManagedSettingsFetchResult> {
   try {
     // Ensure OAuth token is fresh before fetching settings
@@ -342,6 +346,36 @@ async function fetchRemoteManagedSettings(
     }
     switch (kind) {
       case 'auth':
+        // ant v2.1.140 3202.js:123 — on 401, force-refresh the OAuth token
+        // (skipping cache) and retry once. The pre-fetch refresh above is a
+        // best-effort fresh cache; this catches mid-request token rotation or
+        // a token that was already fresh but rejected by the server.
+        if (status === 401 && !isForceRefreshRetry) {
+          const auth = getConfigHostBindings().getSettingsSyncAuth?.()
+          if (auth) {
+            // getAccessToken is optional on the binding contract; refreshToken
+            // is required. When the host doesn't expose getAccessToken we
+            // can't compare before/after, so assume the refresh rotated the
+            // token and retry once (matches ant's optimistic semantics).
+            const tokenBefore = auth.getAccessToken
+              ? await auth.getAccessToken()
+              : undefined
+            await auth.refreshToken({ force: true })
+            const tokenAfter = auth.getAccessToken
+              ? await auth.getAccessToken()
+              : undefined
+            const tokenRotated =
+              auth.getAccessToken === undefined ||
+              (tokenAfter !== undefined && tokenAfter !== tokenBefore)
+            if (tokenRotated) {
+              getConfigHostBindings().logEvent?.(
+                'tengu_remote_settings_401_force_refresh_retry',
+                {},
+              )
+              return fetchRemoteManagedSettings(cachedChecksum, true)
+            }
+          }
+        }
         // Auth errors (401, 403) should not be retried - the API key doesn't have access
         return {
           success: false,

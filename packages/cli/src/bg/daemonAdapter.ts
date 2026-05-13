@@ -25,7 +25,16 @@ import {
 } from '@claude-code/daemon/daemonClient.js'
 
 const PING_TIMEOUT_MS = 1000
-const SPAWN_WAIT_MS = 5000
+// ant v2.1.140 4722.js:78 — service-install path waits 5s for the
+// just-installed launchd job to bind its socket; the daemon binary itself
+// starts ~instantly, the 5s budget covers launchd's bootstrap latency.
+const SERVICE_POLL_WAIT_MS = 5000
+// ant v2.1.140 4722.js:128 — transient spawn (no launchd) waits 20s for the
+// child to bind. Bumped from 10s in v139 to accommodate enterprise endpoint
+// security (Crowdstrike, SentinelOne, Defender) injecting up to ~10s of
+// scanning latency on first binary execution before the process can even
+// start its event loop.
+const TRANSIENT_SPAWN_WAIT_MS = 20000
 const SPAWN_POLL_MS = 100
 
 /** Quick liveness check. Returns true if daemon answered ping in 1s. */
@@ -205,7 +214,7 @@ export async function ensureDaemon(opts: { forceTransient?: boolean } = {}): Pro
   if (await isDaemonAlive()) return true
   void opts.forceTransient
   spawnTransient()
-  return pollAlive(SPAWN_WAIT_MS)
+  return pollAlive(TRANSIENT_SPAWN_WAIT_MS)
 }
 
 /**
@@ -227,7 +236,7 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
     process.platform !== 'darwin'
   ) {
     spawnTransient()
-    const ok = await pollAlive(SPAWN_WAIT_MS)
+    const ok = await pollAlive(TRANSIENT_SPAWN_WAIT_MS)
     logEvent('tengu_bg_daemon_install', {
       outcome_ok: String(ok),
       via_service: 'false',
@@ -273,12 +282,12 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
       logEvent('tengu_bg_daemon_install', { outcome_ok: 'false', via_service: 'true', fresh_install: 'true', duration_ms: String(Date.now() - start) })
       process.stderr.write(`Service install failed (${r.error}). Falling back to a transient daemon.\n`)
       spawnTransient()
-      const ok = await pollAlive(SPAWN_WAIT_MS)
+      const ok = await pollAlive(TRANSIENT_SPAWN_WAIT_MS)
       logEvent('tengu_bg_daemon_install', { outcome_ok: String(ok), via_service: 'false', fresh_install: 'false', duration_ms: String(Date.now() - start) })
       return ok
     }
     process.stderr.write(`Installed: ${r.servicePath}\nRun 'ccb daemon bg uninstall' to undo.\n`)
-    const ok = await pollAlive(5000)
+    const ok = await pollAlive(SERVICE_POLL_WAIT_MS)
     if (!ok) {
       // ant 4639.js: service installed but daemon didn't bind socket within
       // 5s — fall back to transient. Often means launchd queued bootstrap
@@ -289,7 +298,7 @@ export async function ensureDaemonInteractive(): Promise<boolean> {
     return ok
   }
   spawnTransient()
-  const ok = await pollAlive(SPAWN_WAIT_MS)
+  const ok = await pollAlive(TRANSIENT_SPAWN_WAIT_MS)
   logEvent('tengu_bg_daemon_install', { outcome_ok: String(ok), via_service: 'false', fresh_install: 'false', duration_ms: String(Date.now() - start) })
   return ok
 }

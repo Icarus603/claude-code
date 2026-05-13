@@ -19,6 +19,7 @@ import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
 import { startAgentSummarization } from '@claude-code/agent/AgentSummary/agentSummary.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { buildAgentMetadata } from './agentMetadata.js'
+import { resolveSubagentTypeWithFuzzy } from './resolveSubagentType.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
@@ -513,26 +514,24 @@ export const AgentTool = buildTool({
         AGENT_TOOL_NAME,
       )
 
-      const found = agents.find(agent => agent.agentType === effectiveType)
+      // ant v2.1.140 3751.js:248 — fuzzy-match fallback (helper emits telemetry).
+      let found = agents.find(agent => agent.agentType === effectiveType)
       if (!found) {
-        // Check if the agent exists but is denied by permission rules
-        const agentExistsButDenied = allAgents.find(
-          agent => agent.agentType === effectiveType,
-        )
+        found = resolveSubagentTypeWithFuzzy(effectiveType, {
+          allAgents, agents,
+          getDenyRule: (t, i) => getDenyRuleForAgent(appState.toolPermissionContext, t, i),
+        }) ?? undefined
+      }
+      if (!found) {
+        const agentExistsButDenied = allAgents.find(a => a.agentType === effectiveType)
         if (agentExistsButDenied) {
-          const denyRule = getDenyRuleForAgent(
-            appState.toolPermissionContext,
-            AGENT_TOOL_NAME,
-            effectiveType,
-          )
+          const denyRule = getDenyRuleForAgent(appState.toolPermissionContext, AGENT_TOOL_NAME, effectiveType)
           throw new Error(
             `Agent type '${effectiveType}' has been denied by permission rule '${AGENT_TOOL_NAME}(${effectiveType})' from ${denyRule?.source ?? 'settings'}.`,
           )
         }
         throw new Error(
-          `Agent type '${effectiveType}' not found. Available agents: ${agents
-            .map(a => a.agentType)
-            .join(', ')}`,
+          `Agent type '${effectiveType}' not found. Available agents: ${agents.map(a => a.agentType).join(', ')}`,
         )
       }
       selectedAgent = found

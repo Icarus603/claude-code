@@ -16,6 +16,10 @@
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import {
+  shouldAllowManagedHooksOnly,
+  shouldDisableAllHooksIncludingManaged,
+} from '@claude-code/agent/hooksConfigSnapshot.js'
+import {
   addGoalStopHook,
   buildGoalMetaMessage,
   clearGoalStopHook,
@@ -64,6 +68,21 @@ export async function call(
     onDone(prior === null ? 'No goal set' : `Goal cleared: ${prior}`, {
       display: 'system',
     })
+    return null
+  }
+
+  // ant v2.1.140 4534.js:45 — gate /goal when hooks are globally disabled.
+  // /goal installs a Stop hook; if hooks can't fire, the goal never resolves
+  // and the user sees a hanging spinner. Refuse early with a clear message.
+  if (shouldDisableAllHooksIncludingManaged() || shouldAllowManagedHooksOnly()) {
+    logEvent('tengu_feature_sad', {
+      feature_name: 'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code: 'hooks_gate' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+    onDone(
+      "/goal can't run while hooks are disabled (disableAllHooks or allowManagedHooksOnly is set in settings or by policy).",
+      { display: 'system' },
+    )
     return null
   }
 

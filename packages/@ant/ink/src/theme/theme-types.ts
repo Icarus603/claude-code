@@ -148,14 +148,16 @@ const lightTheme: Theme = {
   diffAddedWord: 'rgb(51,102,204)', // Medium green
   diffRemovedWord: 'rgb(153,51,51)', // Medium red
   // Agent colors
-  red_FOR_SUBAGENTS_ONLY: 'rgb(220,38,38)', // Red 600
-  blue_FOR_SUBAGENTS_ONLY: 'rgb(37,99,235)', // Blue 600
-  green_FOR_SUBAGENTS_ONLY: 'rgb(22,163,74)', // Green 600
-  yellow_FOR_SUBAGENTS_ONLY: 'rgb(202,138,4)', // Yellow 600
-  purple_FOR_SUBAGENTS_ONLY: 'rgb(147,51,234)', // Purple 600
-  orange_FOR_SUBAGENTS_ONLY: 'rgb(234,88,12)', // Orange 600
-  pink_FOR_SUBAGENTS_ONLY: 'rgb(219,39,119)', // Pink 600
-  cyan_FOR_SUBAGENTS_ONLY: 'rgb(8,145,178)', // Cyan 600
+  // ant v2.1.140 palette refresh — desaturated blue/purple/orange/pink so the
+  // 8 subagent colors read as "color-coded" rather than Tailwind 600 swatches.
+  red_FOR_SUBAGENTS_ONLY: 'rgb(220,38,38)', // unchanged
+  blue_FOR_SUBAGENTS_ONLY: 'rgb(106,155,204)', // was rgb(37,99,235)
+  green_FOR_SUBAGENTS_ONLY: 'rgb(22,163,74)', // unchanged
+  yellow_FOR_SUBAGENTS_ONLY: 'rgb(202,138,4)', // unchanged
+  purple_FOR_SUBAGENTS_ONLY: 'rgb(130,125,189)', // was rgb(147,51,234)
+  orange_FOR_SUBAGENTS_ONLY: 'rgb(217,119,87)', // was rgb(234,88,12)
+  pink_FOR_SUBAGENTS_ONLY: 'rgb(196,102,134)', // was rgb(219,39,119)
+  cyan_FOR_SUBAGENTS_ONLY: 'rgb(8,145,178)', // unchanged
   // Grove colors
   professionalBlue: 'rgb(106,155,204)',
   // Chrome colors
@@ -473,14 +475,16 @@ const darkTheme: Theme = {
   diffAddedWord: 'rgb(13,85,46)', // Deep emerald green (pairs with wine-red)
   diffRemovedWord: 'rgb(110,0,45)', // Softer red (less intense than bright red)
   // Agent colors
-  red_FOR_SUBAGENTS_ONLY: 'rgb(220,38,38)', // Red 600
-  blue_FOR_SUBAGENTS_ONLY: 'rgb(37,99,235)', // Blue 600
-  green_FOR_SUBAGENTS_ONLY: 'rgb(22,163,74)', // Green 600
-  yellow_FOR_SUBAGENTS_ONLY: 'rgb(202,138,4)', // Yellow 600
-  purple_FOR_SUBAGENTS_ONLY: 'rgb(147,51,234)', // Purple 600
-  orange_FOR_SUBAGENTS_ONLY: 'rgb(234,88,12)', // Orange 600
-  pink_FOR_SUBAGENTS_ONLY: 'rgb(219,39,119)', // Pink 600
-  cyan_FOR_SUBAGENTS_ONLY: 'rgb(8,145,178)', // Cyan 600
+  // ant v2.1.140 palette refresh — desaturated blue/purple/orange/pink so the
+  // 8 subagent colors read as "color-coded" rather than Tailwind 600 swatches.
+  red_FOR_SUBAGENTS_ONLY: 'rgb(220,38,38)', // unchanged
+  blue_FOR_SUBAGENTS_ONLY: 'rgb(106,155,204)', // was rgb(37,99,235)
+  green_FOR_SUBAGENTS_ONLY: 'rgb(22,163,74)', // unchanged
+  yellow_FOR_SUBAGENTS_ONLY: 'rgb(202,138,4)', // unchanged
+  purple_FOR_SUBAGENTS_ONLY: 'rgb(130,125,189)', // was rgb(147,51,234)
+  orange_FOR_SUBAGENTS_ONLY: 'rgb(217,119,87)', // was rgb(234,88,12)
+  pink_FOR_SUBAGENTS_ONLY: 'rgb(196,102,134)', // was rgb(219,39,119)
+  cyan_FOR_SUBAGENTS_ONLY: 'rgb(8,145,178)', // unchanged
   // Grove colors
   professionalBlue: 'rgb(106,155,204)',
   // Chrome colors
