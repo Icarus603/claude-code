@@ -31,6 +31,14 @@ import type {
 // accounting differences.
 const SECURITY_STDIN_LINE_LIMIT = 4096 - 64
 
+// Port of ant v2.1.136 bQ_ = 2000 — every sync `security` spawn capped at 2s.
+// A keychain locked, prompting for unlock, or otherwise slow MUST NOT block
+// the event loop for the default 10-min `execSyncWithDefaults` timeout. The
+// 2s cap matches ant's measured worst-case for an unlocked keychain on a busy
+// system; longer than that and we'd rather fail (and fall back to disk) than
+// freeze the UI.
+const SECURITY_SPAWN_TIMEOUT_MS = 2000
+
 export const macOsKeychainStorage = {
   name: 'keychain',
   read(): SecureStorageData | null {
@@ -46,6 +54,7 @@ export const macOsKeychainStorage = {
       const username = getUsername()
       const result = execSyncWithDefaults(
         `security find-generic-password -a "${username}" -w -s "${storageServiceName}"`,
+        { timeout: SECURITY_SPAWN_TIMEOUT_MS },
       )
       if (result) {
         const data = jsonParse(result)
@@ -126,6 +135,7 @@ export const macOsKeychainStorage = {
           input: command,
           stdio: ['pipe', 'pipe', 'pipe'],
           reject: false,
+          timeout: SECURITY_SPAWN_TIMEOUT_MS,
         })
       } else {
         logForDebugging(
@@ -144,7 +154,11 @@ export const macOsKeychainStorage = {
             '-X',
             hexValue,
           ],
-          { stdio: ['ignore', 'pipe', 'pipe'], reject: false },
+          {
+            stdio: ['ignore', 'pipe', 'pipe'],
+            reject: false,
+            timeout: SECURITY_SPAWN_TIMEOUT_MS,
+          },
         )
       }
 
@@ -168,6 +182,7 @@ export const macOsKeychainStorage = {
       const username = getUsername()
       execSyncWithDefaults(
         `security delete-generic-password -a "${username}" -s "${storageServiceName}"`,
+        { timeout: SECURITY_SPAWN_TIMEOUT_MS },
       )
       return true
     } catch (_e) {
@@ -220,6 +235,9 @@ export function isMacOsKeychainLocked(): boolean {
     const result = execaSync('security', ['show-keychain-info'], {
       reject: false,
       stdio: ['ignore', 'pipe', 'pipe'],
+      // Match ant v2.1.136 bQ_ = 2000 — a hung security probe must not
+      // block the AssistantTextMessage render path on its first lookup.
+      timeout: SECURITY_SPAWN_TIMEOUT_MS,
     })
     keychainLockedCache = result.exitCode === 36
   } catch {
