@@ -1941,43 +1941,47 @@ export type OrgValidationResult =
   | { valid: false; message: string }
 
 /**
- * Validate that the active OAuth token belongs to the organization required
- * by `forceLoginOrgUUID` in managed settings. Returns a result object
- * rather than throwing so callers can choose how to surface the error.
- *
- * Fails closed: if `forceLoginOrgUUID` is set and we cannot determine the
- * token's org (network error, missing profile data), validation fails.
+ * Validate that the active OAuth token belongs to an allowed organization
+ * (forceLoginOrgUUID policy). Returns a result object, fails closed when
+ * the profile fetch fails. Mirror of ant I8H (1997.js).
  */
 export async function validateForceLoginOrg(): Promise<OrgValidationResult> {
-  // `claude ssh` remote: real auth lives on the local machine and is injected
-  // by the proxy. The placeholder token can't be validated against the profile
-  // endpoint. The local side already ran this check before establishing the session.
-  if (readEnv('ANTHROPIC_UNIX_SOCKET')) {
-    return { valid: true }
-  }
+  // `claude ssh` remote: real auth is local-side; proxy already checked.
+  if (readEnv('ANTHROPIC_UNIX_SOCKET')) return { valid: true }
+  if (!isAnthropicAuthEnabled()) return { valid: true }
 
-  if (!isAnthropicAuthEnabled()) {
-    return { valid: true }
-  }
-
-  const requiredOrgUuid =
+  const requiredOrgUuidRaw =
     getSettingsForSource('policySettings')?.forceLoginOrgUUID
-  if (!requiredOrgUuid) {
-    return { valid: true }
+  if (requiredOrgUuidRaw === undefined) return { valid: true }
+
+  // Normalize string→[string]; arrays are passed through (ant: typeof check).
+  const allowedOrgUuids =
+    typeof requiredOrgUuidRaw === 'string'
+      ? [requiredOrgUuidRaw]
+      : requiredOrgUuidRaw
+
+  if (allowedOrgUuids.length === 0) {
+    return {
+      valid: false,
+      message:
+        `forceLoginOrgUUID in managed settings is set to an empty array.\n` +
+        `No organizations are permitted. This is almost certainly a misconfiguration.\n` +
+        `Contact your administrator.`,
+    }
   }
 
-  // Ensure the access token is fresh before hitting the profile endpoint.
-  // No-op for env-var tokens (refreshToken is null).
+  const requiredPhrase =
+    allowedOrgUuids.length === 1
+      ? `organization ${allowedOrgUuids[0]}`
+      : `one of these organizations: ${allowedOrgUuids.join(', ')}`
+
+  // Refresh access token before profile fetch (no-op for env-var tokens).
   await checkAndRefreshOAuthTokenIfNeeded()
-
   const tokens = getClaudeAIOAuthTokens()
-  if (!tokens) {
-    return { valid: true }
-  }
+  if (!tokens) return { valid: true }
 
-  // Always fetch the authoritative org UUID from the profile endpoint.
-  // Even keychain-sourced tokens verify server-side: the cached org UUID
-  // in ~/.claude.json is user-writable and cannot be trusted.
+  // Always fetch authoritative org UUID server-side — ~/.claude.json org
+  // cache is user-writable and untrusted.
   const { source } = getAuthTokenSource()
   const isEnvVarToken =
     source === 'CLAUDE_CODE_OAUTH_TOKEN' ||
@@ -1985,12 +1989,11 @@ export async function validateForceLoginOrg(): Promise<OrgValidationResult> {
 
   const profile = await getOauthProfileFromOauthToken(tokens.accessToken)
   if (!profile) {
-    // Fail closed — we can't verify the org
     return {
       valid: false,
       message:
         `Unable to verify organization for the current authentication token.\n` +
-        `This machine requires organization ${requiredOrgUuid} but the profile could not be fetched.\n` +
+        `This machine requires ${requiredPhrase} but the profile could not be fetched.\n` +
         `This may be a network error, or the token may lack the user:profile scope required for\n` +
         `verification (tokens from 'claude setup-token' do not include this scope).\n` +
         `Try again, or obtain a full-scope token via 'claude auth login'.`,
@@ -1998,23 +2001,18 @@ export async function validateForceLoginOrg(): Promise<OrgValidationResult> {
   }
 
   const tokenOrgUuid = profile.organization.uuid
-  if (tokenOrgUuid === requiredOrgUuid) {
-    return { valid: true }
-  }
+  if (allowedOrgUuids.includes(tokenOrgUuid)) return { valid: true }
 
   if (isEnvVarToken) {
-    const envVarName =
-      source === 'CLAUDE_CODE_OAUTH_TOKEN'
-        ? 'CLAUDE_CODE_OAUTH_TOKEN'
-        : 'CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR'
+    const envVarName = source as 'CLAUDE_CODE_OAUTH_TOKEN' | 'CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR'
     return {
       valid: false,
       message:
         `The ${envVarName} environment variable provides a token for a\n` +
         `different organization than required by this machine's managed settings.\n\n` +
-        `Required organization: ${requiredOrgUuid}\n` +
-        `Token organization:   ${tokenOrgUuid}\n\n` +
-        `Remove the environment variable or obtain a token for the correct organization.`,
+        `Required: ${requiredPhrase}\n` +
+        `Token organization: ${tokenOrgUuid}\n\n` +
+        `Remove the environment variable or obtain a token for a permitted organization.`,
     }
   }
 
@@ -2022,8 +2020,8 @@ export async function validateForceLoginOrg(): Promise<OrgValidationResult> {
     valid: false,
     message:
       `Your authentication token belongs to organization ${tokenOrgUuid},\n` +
-      `but this machine requires organization ${requiredOrgUuid}.\n\n` +
-      `Please log in with the correct organization: claude auth login`,
+      `but this machine requires ${requiredPhrase}.\n\n` +
+      `Please log in with a permitted organization: claude auth login`,
   }
 }
 

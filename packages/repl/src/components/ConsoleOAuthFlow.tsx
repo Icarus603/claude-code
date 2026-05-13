@@ -89,7 +89,9 @@ export function ConsoleOAuthFlow({
 }: Props): React.ReactNode {
   const settings = getSettings() || {}
   const forceLoginMethod = forceLoginMethodProp ?? settings.forceLoginMethod
-  const orgUUID = settings.forceLoginOrgUUID
+  // Multi-org: OAuth URL takes one UUID; post-login check covers the rest.
+  const orgUUIDRaw = settings.forceLoginOrgUUID
+  const orgUUID = Array.isArray(orgUUIDRaw) ? orgUUIDRaw[0] : orgUUIDRaw
   const forcedMethodMessage =
     forceLoginMethod === 'claudeai'
       ? 'Login method pre-selected: Subscription Plan (Claude Pro/Max)'
@@ -389,18 +391,11 @@ export function ConsoleOAuthFlow({
       )
       // Save directly via saveCodexOAuthTokens (bypasses installOAuthTokens Anthropic path)
       saveCodexOAuthTokens(codexTokens)
-      // Codex models come from the static mirror in
-      // getDefaultModelsForProtocol('codex'). We tried dynamic /models
-      // discovery; it requires impersonating the openai/codex Rust CLI's
-      // version space and returned a tier-filtered list that varied
-      // unpredictably with `client_version`. Static-list-as-mirror is
-      // both more correct and less fragile.
-      //
-      // Routing happens per-model via the connection record; do NOT set
-      // CLAUDE_CODE_USE_OPENAI here — that env var globally forces every
-      // request (including Claude models on a coexisting Claude Account
-      // connection) into the OpenAI adapter, which then 401s against
-      // api.openai.com.
+      // Codex models: static mirror from getDefaultModelsForProtocol.
+      // Dynamic /models needs impersonating openai/codex Rust CLI version
+      // space and returns tier-filtered varying lists. Routing is per-model
+      // via the connection record — do NOT set CLAUDE_CODE_USE_OPENAI here
+      // (would clobber Claude Account requests with the OpenAI adapter).
       upsertProtocolConnection(
         'codex',
         'ChatGPT Codex',

@@ -649,11 +649,11 @@ export const SettingsSchema = lazySchema(() =>
         .describe(
           'Force a specific login method: "claudeai" for Claude Pro/Max, "console" for Console billing',
         ),
-      // Organization UUID to use for OAuth login (will be added as URL param to authorization URL)
+      // string for single-org, array for multi-org (ant I8H 1997.js).
       forceLoginOrgUUID: z
-        .string()
+        .union([z.string(), z.array(z.string())])
         .optional()
-        .describe('Organization UUID to use for OAuth login'),
+        .describe('Organization UUID(s) to use for OAuth login'),
       otelHeadersHelper: z
         .string()
         .optional()
