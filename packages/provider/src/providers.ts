@@ -42,10 +42,14 @@ export function getAPIProvider(): APIProvider {
       return false
     }
   })()
+  // Ant lq() priority: BEDROCK > FOUNDRY > ANTHROPIC_AWS > MANTLE > VERTEX.
+  // ccb has no impl for ANTHROPIC_AWS / MANTLE so the env vars fall through
+  // to firstParty (isAnthropicAuthEnabled still gates OAuth Bearer off when
+  // they're set, so credentials don't leak — see authAlias.ts is3P check).
   if (hasConnections) {
     if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) return 'bedrock'
-    if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'
     if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY'))) return 'foundry'
+    if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'
     return 'firstParty'
   }
 
@@ -55,8 +59,8 @@ export function getAPIProvider(): APIProvider {
   if (modelType === 'codex') return 'codex'
 
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_BEDROCK'))) return 'bedrock'
-  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_FOUNDRY'))) return 'foundry'
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_VERTEX'))) return 'vertex'
 
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_OPENAI'))) return 'openai'
   if (isEnvTruthy(readEnv('CLAUDE_CODE_USE_GEMINI'))) return 'gemini'
