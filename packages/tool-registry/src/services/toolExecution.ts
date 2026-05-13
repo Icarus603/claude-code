@@ -140,7 +140,8 @@ const SLOW_PHASE_LOG_THRESHOLD_MS = 2000
 
 // Re-export from dedicated file — moved out so toolResultTelemetry.ts
 // can import it without creating an import cycle through toolExecution.
-export { classifyToolError } from './classifyToolError.js'
+import { classifyToolError } from './classifyToolError.js'
+export { classifyToolError }
 
 /**
  * Map a rule's origin to the documented OTel `source` vocabulary, matching
