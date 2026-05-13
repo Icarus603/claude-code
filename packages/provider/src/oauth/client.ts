@@ -229,6 +229,15 @@ export async function exchangeCodeForTokens(
   })
 
   if (response.status !== 200) {
+    // ant dg6 emits xH("oauth_token_exchange", failure_reason) before throwing
+    // so fleet analytics can distinguish the 401-bad-code vs HTTP error path.
+    logEvent('tengu_oauth_token_exchange_failed', {
+      reason:
+        response.status === 401
+          ? 'oauth_exchange_invalid_code'
+          : 'oauth_exchange_http_error',
+      status: String(response.status),
+    })
     throw new Error(
       response.status === 401
         ? 'Authentication failed: Invalid authorization code'
