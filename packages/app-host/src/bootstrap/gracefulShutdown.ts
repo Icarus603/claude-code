@@ -21,6 +21,7 @@ import { DISABLE_KITTY_KEYBOARD, DISABLE_MODIFY_OTHER_KEYS, DBP, DFE, DISABLE_MO
 import {
   logEvent,
 } from '@claude-code/local-observability'
+import { logInternalErrorEvent } from '@claude-code/local-observability/telemetry'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   shutdownEventLoggers,
@@ -331,6 +332,10 @@ export const setupGracefulShutdown = memoize(() => {
           errorMessageHash as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       }),
     })
+    // Port of ant LF9 (2642.js): structured `internal_error` OTel event.
+    // Reentrancy guard inside logInternalErrorEvent prevents recursive
+    // emission if logger throws while reporting an unrelated crash.
+    logInternalErrorEvent(error)
     const now = Date.now()
     while (
       exceptionTimestamps.length > 0 &&

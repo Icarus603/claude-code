@@ -97,6 +97,7 @@ import {
 } from '@claude-code/storage/toolResultStorage.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { logEvent } from '@claude-code/local-observability'
+import { emitMcpConnectionEvent } from './mcpConnectionTelemetry.js'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   type ElicitationWaitingState,
@@ -250,10 +251,7 @@ const MAX_MCP_DESCRIPTION_LENGTH = 2048
  * Uses MCP_TOOL_TIMEOUT environment variable if set, otherwise defaults to ~27.8 hours.
  */
 function getMcpToolTimeoutMs(): number {
-  return (
-    parseInt(process.env.MCP_TOOL_TIMEOUT || '', 10) ||
-    DEFAULT_MCP_TOOL_TIMEOUT_MS
-  )
+  return parseInt(process.env.MCP_TOOL_TIMEOUT || '', 10) || DEFAULT_MCP_TOOL_TIMEOUT_MS
 }
 
 import { isClaudeInChromeMCPServer } from '@claude-code/agent/claudeInChromeCommon.js'
@@ -1319,6 +1317,7 @@ export const connectToServer = memoize(
         wsIdeCount: serverStats?.wsIdeCount,
         ...mcpBaseUrlAnalytics(serverRef),
       })
+      void emitMcpConnectionEvent(name, serverRef, 'success', connectionDurationMs)
       return {
         name,
         client,
@@ -1347,6 +1346,7 @@ export const connectToServer = memoize(
           'stdio') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         ...mcpBaseUrlAnalytics(serverRef),
       })
+      void emitMcpConnectionEvent(name, serverRef, 'failure', connectionDurationMs, error)
       logMCPDebug(
         name,
         `Connection failed after ${connectionDurationMs}ms: ${errorMessage(error)}`,

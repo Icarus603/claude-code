@@ -40,6 +40,19 @@ function userPromptLoggingEnabled(): boolean {
   return isEnvTruthy(process.env.OTEL_LOG_USER_PROMPTS)
 }
 
+// Port of ant `P$()` — gate identifying fields (server names, plugin
+// names, full error detail) on OTEL_LOG_TOOL_DETAILS. Off by default so
+// the observability stream stays scrubbed for most operators.
+export function toolDetailsLoggingEnabled(): boolean {
+  return isEnvTruthy(process.env.OTEL_LOG_TOOL_DETAILS)
+}
+
+// Port of ant `uc_()` — gate full tool content (BashTool stdout, etc.)
+// on OTEL_LOG_TOOL_CONTENT.
+export function toolContentLoggingEnabled(): boolean {
+  return isEnvTruthy(process.env.OTEL_LOG_TOOL_CONTENT)
+}
+
 // Port of ant `YT_(H)`. Free-form user content stays hidden unless the
 // operator opts in; the rest of the event still flies (so dashboards see
 // the user_prompt count + length, just not the body).

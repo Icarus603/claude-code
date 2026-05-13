@@ -52,6 +52,7 @@ import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 } from '@claude-code/local-observability'
+import { emitAtMention } from './atMentionTelemetry.js'
 import {
   toolMatchesName,
   type Tools,
@@ -1972,7 +1973,7 @@ async function processAtMentionedFiles(
               }
               const stdout = names.join('\n')
               logEvent('tengu_at_mention_extracting_directory_success', {})
-
+              emitAtMention('directory', true)
               return {
                 type: 'directory' as const,
                 path: absoluteFilename,
@@ -1987,19 +1988,18 @@ async function processAtMentionedFiles(
           // If stat fails, continue with file logic
         }
 
-        return await generateFileAttachment(
+        const r = await generateFileAttachment(
           absoluteFilename,
           toolUseContext,
           'tengu_at_mention_extracting_filename_success',
           'tengu_at_mention_extracting_filename_error',
           'at-mention',
-          {
-            offset: lineStart,
-            limit: lineEnd && lineStart ? lineEnd - lineStart + 1 : undefined,
-          },
+          { offset: lineStart, limit: lineEnd && lineStart ? lineEnd - lineStart + 1 : undefined },
         )
+        return (emitAtMention('file', r !== null), r)
       } catch {
         logEvent('tengu_at_mention_extracting_filename_error', {})
+        emitAtMention('file', false)
       }
     }),
   )
