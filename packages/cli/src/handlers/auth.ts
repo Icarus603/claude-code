@@ -9,6 +9,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '@claude-code/local-observability'
+import { logAuthEvent } from '@claude-code/local-observability/telemetry'
 import { getSSLErrorHint } from '@claude-code/provider/errorUtils.js'
 import { fetchAndStoreClaudeCodeFirstTokenDate } from '@claude-code/provider/firstTokenDate.js'
 import {
@@ -137,6 +138,14 @@ export async function installOAuthTokens(tokens: OAuthTokens): Promise<void> {
       organizationUuid: tokens.tokenAccount.organizationUuid,
     })
   }
+
+  // Port of ant NZH (3508.js): vBH({action:"login", success:true,
+  // authMethod:"oauth"}) — emits the structured `claude_code.auth` OTel
+  // event so dashboards can join login volume with the rest of the OTEL
+  // stream. Fired AFTER identity storage but BEFORE token storage
+  // (matches ant ordering — telemetry reflects the identity commit even
+  // if SxH later errors).
+  void logAuthEvent({ action: 'login', success: true, authMethod: 'oauth' })
 
   const storageResult = saveOAuthTokensIfNeeded(tokens)
   clearOAuthTokenCache()

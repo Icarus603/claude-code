@@ -4,6 +4,7 @@
  */
 
 export * from './attributes.js'
+export * from './authEvent.js'
 export * from './beta-session-tracing.js'
 export * from './events.js'
 export * from './instrumentation.js'

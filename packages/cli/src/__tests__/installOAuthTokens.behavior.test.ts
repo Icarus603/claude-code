@@ -21,7 +21,7 @@ describe('installOAuthTokens stores ALL 4 new ant fields (ant ng6/ZIH parity)', 
   )
 
   const fnStart = source.indexOf('export async function installOAuthTokens')
-  const fnSlice = source.slice(fnStart, fnStart + 5000)
+  const fnSlice = source.slice(fnStart, fnStart + 6000)
 
   test('passes ccOnboardingFlags to storeOAuthAccountInfo (with empty-object default)', () => {
     expect(fnSlice).toMatch(
