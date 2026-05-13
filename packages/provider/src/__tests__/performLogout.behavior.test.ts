@@ -20,7 +20,7 @@ describe('performLogout + clearAuthRelatedCaches order invariants', () => {
 
   describe('performLogout (top-level orchestration)', () => {
     const fnStart = source.indexOf('export async function performLogout')
-    const fnSlice = source.slice(fnStart, fnStart + 2000)
+    const fnSlice = source.slice(fnStart, fnStart + 3000)
 
     test('CRITICAL: flushTelemetry BEFORE removeApiKey (prevents org data leak)', () => {
       const flushIdx = fnSlice.indexOf('await flushTelemetry()')

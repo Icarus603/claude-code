@@ -92,8 +92,15 @@ async function readManualAuthCode(): Promise<string | null> {
 }
 
 export async function installOAuthTokens(tokens: OAuthTokens): Promise<void> {
-  // Clear old state before saving new credentials
-  await performLogout({ clearOnboarding: false })
+  // Clear old state before saving new credentials.
+  //
+  // Port of ant NZH (3508.js) which calls
+  //   `Xw_({ clearOnboarding: false, preserveInProcessTokens: true })`.
+  // The preserve flag matters because installOAuthTokens may be called during
+  // a refresh-token re-login while CLAUDE_CODE_OAUTH_TOKEN env var (or the
+  // FD-loaded token) is still the live source — wiping them mid-flow would
+  // race against the new tokens being written.
+  await performLogout({ clearOnboarding: false, preserveInProcessTokens: true })
 
   // Reuse pre-fetched profile if available, otherwise fetch fresh
   const profile =
@@ -133,6 +140,33 @@ export async function installOAuthTokens(tokens: OAuthTokens): Promise<void> {
 
   const storageResult = saveOAuthTokensIfNeeded(tokens)
   clearOAuthTokenCache()
+
+  // Port of ant NZH (3508.js) env-var + FD-token coordination:
+  //   if (process.env.CLAUDE_CODE_OAUTH_TOKEN)
+  //     if (q.success) delete process.env.CLAUDE_CODE_OAUTH_TOKEN
+  //     else process.env.CLAUDE_CODE_OAUTH_TOKEN = H.accessToken
+  //   if (BsH()) A_H(q.success ? null : H.accessToken)
+  //
+  // Once secure storage holds the token, the env var becomes redundant
+  // and we delete it so subsequent reads use the canonical disk source.
+  // If storage failed, we ROLL FORWARD the env var to the new access
+  // token so the current process keeps working (the next refresh will
+  // retry storage).
+  if (process.env.CLAUDE_CODE_OAUTH_TOKEN) {
+    if (storageResult.success) {
+      delete process.env.CLAUDE_CODE_OAUTH_TOKEN
+    } else {
+      process.env.CLAUDE_CODE_OAUTH_TOKEN = tokens.accessToken
+    }
+  }
+  // Same logic for FD-loaded token: only update if a prior FD token exists.
+  // BsH() returns the cached value; A_H(null|token) replaces it.
+  const { getOauthTokenFromFd, setOauthTokenFromFd } = await import(
+    '@claude-code/app-host/bootstrap/state.js'
+  )
+  if (getOauthTokenFromFd()) {
+    setOauthTokenFromFd(storageResult.success ? null : tokens.accessToken)
+  }
 
   if (storageResult.warning) {
     logEvent('tengu_oauth_storage_warning', {

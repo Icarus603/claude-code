@@ -17,12 +17,34 @@ import { resetUserCache } from '../../user.js'
 
 export async function performLogout({
   clearOnboarding = false,
-}): Promise<void> {
+  preserveInProcessTokens = false,
+}: {
+  clearOnboarding?: boolean
+  // Port of ant Xw_ (3471.js) `preserveInProcessTokens` flag. installOAuthTokens
+  // (ant NZH) calls performLogout to clear prior state BEFORE storing the new
+  // credentials — but the in-process `oauthTokenFromFd` (BsH/A_H) and the
+  // `CLAUDE_CODE_OAUTH_TOKEN` env var must NOT be wiped during this prelude,
+  // because installOAuthTokens may re-establish them afterwards. A regular
+  // logout (clearOnboarding-driven or user-invoked) does want them wiped.
+  preserveInProcessTokens?: boolean
+} = {}): Promise<void> {
   // Flush telemetry BEFORE clearing credentials to prevent org data leakage
   const { flushTelemetry } = await import(
     '@claude-code/local-observability/telemetry'
   )
   await flushTelemetry()
+
+  // Ant Xw_: `if (!_) (delete process.env.CLAUDE_CODE_OAUTH_TOKEN, A_H(null))`.
+  // Skip when re-logging in (preserveInProcessTokens=true) so the env-var path
+  // (CLAUDE_CODE_OAUTH_TOKEN headless login) doesn't lose its source mid-flow.
+  if (!preserveInProcessTokens) {
+    delete process.env.CLAUDE_CODE_OAUTH_TOKEN
+    // Lazy import to avoid circular dep through app-host barrel.
+    const { setOauthTokenFromFd } = await import(
+      '@claude-code/app-host/bootstrap/state.js'
+    )
+    setOauthTokenFromFd(null)
+  }
 
   await removeApiKey()
 
