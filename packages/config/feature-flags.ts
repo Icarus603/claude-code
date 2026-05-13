@@ -92,6 +92,10 @@ const LOCAL_GATE_DEFAULTS: FeatureMap = {
   tengu_kairos_loop_dynamic: true,
   tengu_kairos_loop_prompt: true,
   tengu_sedge_lantern: true,
+  // Holdback gate (ant 3180.js:14 / 4161.js:249) — when true the away-summary
+  // card and /recap command are suppressed. Default false; flip via env or
+  // setting to A/B test the feature.
+  tengu_sedge_lantern_holdback: false,
   tengu_willow_mode: 'dialog',
   // Kill switches (default on)
   tengu_turtle_carbon: true,

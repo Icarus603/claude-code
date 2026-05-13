@@ -183,6 +183,7 @@ import {
   extraUsageNonInteractive,
 } from '@claude-code/repl/extraUsage.js'
 import rateLimitOptions from '@claude-code/command-runtime/commands/rate-limit-options/index.js'
+import recap from '@claude-code/command-runtime/commands/recap/index.js'
 import statusline from '@claude-code/repl/commands/statusline.js'
 import effort from '@claude-code/command-runtime/commands/effort/index.js'
 import stats from '@claude-code/repl/commands/stats/index.js'
@@ -317,6 +318,7 @@ const COMMANDS = memoize((): Command[] => [
   extraUsage,
   extraUsageNonInteractive,
   rateLimitOptions,
+  recap,
   usage,
   usageReport,
   vim,

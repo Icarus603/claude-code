@@ -24,6 +24,10 @@ import {
   renderActiveGoalStatus,
 } from '@claude-code/agent/goalStopHook.js'
 import type { Message } from '@claude-code/agent/messageShapes'
+import {
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  logEvent,
+} from '@claude-code/local-observability'
 
 export async function call(
   onDone: LocalJSXCommandOnDone,
@@ -64,6 +68,15 @@ export async function call(
   }
 
   if (trimmed.length > GOAL_CONDITION_MAX_LENGTH) {
+    // ant v2.1.139 4705.js:33 — j6("goal_set", "too_long") → emits
+    // tengu_feature_sad so over-limit attempts show up in feature-funnel
+    // dashboards. Without this the user-error path is invisible to telemetry.
+    logEvent('tengu_feature_sad', {
+      feature_name:
+        'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'too_long' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
     onDone(
       `Goal condition is limited to ${GOAL_CONDITION_MAX_LENGTH} characters (got ${trimmed.length})`,
       { display: 'system' },
