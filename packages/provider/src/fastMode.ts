@@ -141,10 +141,31 @@ export function getFastModeUnavailableReason(): string | null {
 }
 
 // @[MODEL LAUNCH]: Update supported Fast Mode models.
+// ant v2.1.140 1413.js:ad reverted their Fast Mode default from Opus 4.7 to
+// Opus 4.6 (likely a cost/latency reason). ccb keeps 4.7 as default for the
+// operator but honors the ant-style overrides so the operator can A/B test
+// without a code change:
+//   CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE=1 → force Opus 4.6
+//   CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE=1   → reverse the override
+function shouldUseOpus46FastMode(): boolean {
+  // The explicit 4.7 enabler wins if both are set — matches ant precedence.
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE'))) return false
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE'))) return true
+  return false
+}
+
+export function getFastModeModelDisplay(): string {
+  return shouldUseOpus46FastMode() ? 'Opus 4.6' : 'Opus 4.7'
+}
+
+// Kept as a const for callers that resolve the display name at module-load
+// time; runtime callers should prefer getFastModeModelDisplay() so the
+// env-driven override is honored even when set after module load.
 export const FAST_MODE_MODEL_DISPLAY = 'Opus 4.7'
 
 export function getFastModeModel(): string {
-  return 'opus' + (isOpus1mMergeEnabled() ? '[1m]' : '')
+  const base = shouldUseOpus46FastMode() ? 'claude-opus-4-6' : 'opus'
+  return base + (isOpus1mMergeEnabled() ? '[1m]' : '')
 }
 
 export function getInitialFastModeSetting(model: ModelSetting): boolean {

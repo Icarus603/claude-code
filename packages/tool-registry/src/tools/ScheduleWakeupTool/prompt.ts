@@ -25,7 +25,11 @@ The Anthropic prompt cache has a 5-minute TTL. Sleeping past 300 seconds means t
 
 For idle ticks with no specific signal to watch, default to **1200s–1800s** (20–30 min). The loop checks back, you don't burn cache 12× per hour for nothing, and the user can always interrupt if they need you sooner.
 
-Think about what you're actually waiting for, not just "how long should I sleep." If you kicked off an 8-minute build, sleeping 60s burns the cache 8 times before it finishes — sleep ~270s twice instead.
+Think about what you're actually waiting for, not just "how long should I sleep." If you kicked off a CI run that takes ~8 minutes, sleeping 60s burns the cache 8 times before it finishes — sleep ~270s twice instead.
+
+## Don't poll harness-tracked work
+
+Do NOT schedule a short-interval wakeup to poll for background work you started — when harness-tracked work finishes (a TaskOutput, BashOutput, KillShell, agent completion, etc.), you are re-invoked automatically, so polling is wasted. Instead schedule a long fallback (1200s+) so the loop survives if the work hangs or never notifies. The exception is external work the harness cannot track (a CI run, a deploy, a remote queue) — there, pick a delay matched to how fast that state actually changes.
 
 The runtime clamps to [60, 3600], so you don't need to clamp yourself.
 

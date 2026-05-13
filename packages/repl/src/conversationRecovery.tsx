@@ -208,9 +208,12 @@ export function deserializeMessagesWithInterruptDetection(
     // so the consumer only needs to handle interrupted_prompt.
     let turnInterruptionState: TurnInterruptionState
     if (internalState.kind === 'interrupted_turn') {
+      // ant v2.1.140 3623.js:48 — env override for the synthetic resume prompt.
+      const resumeText =
+        process.env.CLAUDE_CODE_RESUME_PROMPT || 'Continue from where you left off.'
       const [continuationMessage] = normalizeMessages([
         createUserMessage({
-          content: 'Continue from where you left off.',
+          content: resumeText,
           isMeta: true,
         }),
       ])
