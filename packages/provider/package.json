@@ -62,6 +62,7 @@
     "./systemPromptSections": "./src/systemPromptSections.ts",
     "./authPortable.js": "./src/authPortable.ts",
     "./authAlias.js": "./src/authAlias.ts",
+    "./oauthConstants.js": "./src/oauthConstants.ts",
     "./model.js": "./src/model.ts",
     "./providers.js": "./src/providers.ts",
     "./mtls.js": "./src/mtls.ts",

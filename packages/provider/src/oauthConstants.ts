@@ -35,6 +35,9 @@ export const CLAUDE_AI_PROFILE_SCOPE = 'user:profile' as const
 const CONSOLE_SCOPE = 'org:create_api_key' as const
 export const OAUTH_BETA_HEADER = 'oauth-2025-04-20' as const
 
+/** Long-lived OAuth token TTL (1 year). Mirror of ant ffH=31536000. */
+export const LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS = 365 * 24 * 60 * 60
+
 // Console OAuth scopes - for API key creation via Console
 export const CONSOLE_OAUTH_SCOPES = [
   CONSOLE_SCOPE,

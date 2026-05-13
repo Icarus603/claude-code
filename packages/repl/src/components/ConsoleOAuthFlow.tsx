@@ -10,6 +10,7 @@ import { useKeybinding } from '@anthropic/ink/keybindings'
 import { getSSLErrorHint } from '@claude-code/provider/errorUtils.js'
 import { sendNotification } from '../notifier.js'
 import { OAuthService, runCodexOAuthFlow, saveCodexOAuthTokens } from '@claude-code/provider/oauth/index.js'
+import { LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS } from '@claude-code/provider/oauthConstants.js'
 import { getOauthAccountInfo, validateForceLoginOrg } from '@claude-code/provider/authAlias.js'
 import { logError } from '@claude-code/local-observability/logging'
 import { getSettings, updateSettingsForSource } from '@claude-code/config/settings'
@@ -301,7 +302,7 @@ export function ConsoleOAuthFlow({
           {
             loginWithClaudeAi,
             inferenceOnly: mode === 'setup-token',
-            expiresIn: mode === 'setup-token' ? 365 * 24 * 60 * 60 : undefined, // 1 year for setup-token
+            expiresIn: mode === 'setup-token' ? LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS : undefined,
             orgUUID,
           },
         )

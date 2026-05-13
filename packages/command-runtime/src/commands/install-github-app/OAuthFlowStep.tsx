@@ -9,6 +9,7 @@ import TextInput from '@claude-code/repl/components/TextInput.js'
 import { useTerminalSize } from '@anthropic/ink'
 import { type KeyboardEvent, setClipboard, Box, Link, Text } from '@anthropic/ink'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'
+import { LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS } from '@claude-code/provider/oauthConstants.js'
 import { saveOAuthTokensIfNeeded } from '@claude-code/provider/authAlias.js'
 import { logError } from '@claude-code/local-observability/log.js'
 
@@ -109,7 +110,7 @@ export function OAuthFlowStep({
         {
           loginWithClaudeAi: true, // Always use Claude AI for subscription tokens
           inferenceOnly: true,
-          expiresIn: 365 * 24 * 60 * 60, // 1 year
+          expiresIn: LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS,
         },
       )
 
