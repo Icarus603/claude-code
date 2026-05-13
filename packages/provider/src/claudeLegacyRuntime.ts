@@ -236,6 +236,7 @@ import {
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { logEvent } from '@claude-code/local-observability'
 import { emitApiRetriesExhausted } from './apiRetryTelemetry.js'
+import { maybeEmitSystemPromptEvent } from './systemPromptTelemetry.js'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   consumePendingCacheEdits,
@@ -1093,6 +1094,8 @@ async function* queryModel(
   const routedProvider = getProviderForModel(requestedModel)
   const { connectionId, modelId: bareModelId } = unpackModelId(requestedModel)
   if (connectionId) options = { ...options, model: bareModelId }
+
+  maybeEmitSystemPromptEvent(systemPrompt.join('\n')) // ant D_7 (2911.js) dedup'd OTel
 
   // Check cheap conditions first — the off-switch await blocks on GrowthBook
   // init (~10ms). For non-Opus models (haiku, sonnet) this skips the await

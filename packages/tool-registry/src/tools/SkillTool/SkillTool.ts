@@ -46,6 +46,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '@claude-code/local-observability'
+import { emitSkillActivated } from './skillActivatedTelemetry.js'
 import { getAgentContext } from '@claude-code/agent/agentContext.js'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import {
@@ -200,6 +201,12 @@ async function executeForkedSkill(
         : 'third-party') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       ...buildPluginCommandTelemetryFields(command.pluginInfo),
     }),
+  })
+  emitSkillActivated({ // ant wT_ (2643.js) skill_activated OTel event
+    commandName, isBuiltIn, isBundled, isOfficialMarketplace: isOfficialSkill,
+    queryDepth, source: command.source, kind: command.kind,
+    pluginName: command.pluginInfo?.pluginManifest.name,
+    marketplaceName: pluginMarketplace,
   })
 
   const { modifiedGetAppState, baseAgent, promptMessages, skillContent } =
@@ -942,11 +949,7 @@ function isOfficialMarketplaceSkill(command: PromptCommand): boolean {
   )
 }
 
-/**
- * Extract URL scheme for telemetry. Defaults to 'gs' for unrecognized schemes
- * since the AKI backend is the only production path and the loader throws on
- * unknown schemes before we reach telemetry anyway.
- */
+/** Extract URL scheme for telemetry; AKI is the only prod path so 'gs' default. */
 function extractUrlScheme(url: string): 'gs' | 'http' | 'https' | 's3' {
   if (url.startsWith('gs://')) return 'gs'
   if (url.startsWith('https://')) return 'https'
@@ -956,16 +959,10 @@ function extractUrlScheme(url: string): 'gs' | 'http' | 'https' | 's3' {
 }
 
 /**
- * Load a remote canonical skill and inject its SKILL.md content into the
- * conversation. Unlike local skills (which go through processPromptSlashCommand
- * for !command / $ARGUMENTS expansion), remote skills are declarative markdown
- * — we wrap the content directly in a user message.
- *
- * The skill is also registered with addInvokedSkill so it survives compaction
- * (same as local skills).
- *
- * Only called from within a feature('EXPERIMENTAL_SKILL_SEARCH') guard in
- * call() — remoteSkillModules is non-null here.
+ * Load a remote canonical skill and inject its SKILL.md as a user message.
+ * Remote skills are declarative markdown — no !command / $ARGUMENTS pass.
+ * Registered with addInvokedSkill so it survives compaction. Only called
+ * under feature('EXPERIMENTAL_SKILL_SEARCH'); remoteSkillModules non-null.
  */
 async function executeRemoteSkill(
   slug: string,
