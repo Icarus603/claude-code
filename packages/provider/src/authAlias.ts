@@ -14,6 +14,7 @@ import { getAPIProvider } from './model/providers.js'
 import {
   getIsNonInteractiveSession,
   preferThirdPartyAuthentication,
+  setOauthTokenFromFd,
 } from '@claude-code/app-host/bootstrap/state.js'
 import {
   getMockSubscriptionType,
@@ -86,12 +87,9 @@ import { clearToolSchemaCache } from '@claude-code/tool-registry/toolSchemaCache
 const DEFAULT_API_KEY_HELPER_TTL = 5 * 60 * 1000
 
 /**
- * CCR and Claude Desktop spawn the CLI with OAuth and should never fall back
- * to the user's ~/.claude/settings.json API-key config (apiKeyHelper,
- * env.ANTHROPIC_API_KEY, env.ANTHROPIC_AUTH_TOKEN). Those settings exist for
- * the user's terminal CLI, not managed sessions. Without this guard, a user
- * who runs `claude` in their terminal with an API key sees every CCD session
- * also use that key — and fail if it's stale/wrong-org.
+ * CCR and Claude Desktop spawn the CLI with OAuth and must never fall back to
+ * the user's terminal-CLI ~/.claude API-key config (would leak terminal keys
+ * into managed sessions and 401 with stale/wrong-org keys).
  */
 function isManagedOAuthContext(): boolean {
   return (
@@ -106,13 +104,10 @@ export function isAnthropicAuthEnabled(): boolean {
   // --bare: API-key-only, never OAuth.
   if (isBareMode()) return false
 
-  // `claude ssh` remote: ANTHROPIC_UNIX_SOCKET tunnels API calls through a
-  // local auth-injecting proxy. The launcher sets CLAUDE_CODE_OAUTH_TOKEN as a
-  // placeholder iff the local side is a subscriber (so the remote includes the
-  // oauth-2025 beta header to match what the proxy will inject). The remote's
-  // ~/.claude settings (apiKeyHelper, settings.env.ANTHROPIC_API_KEY) MUST NOT
-  // flip this — they'd cause a header mismatch with the proxy and a bogus
-  // "invalid x-api-key" from the API. See src/ssh/sshAuthProxy.ts.
+  // `claude ssh` remote: ANTHROPIC_UNIX_SOCKET tunnels through a local
+  // auth-injecting proxy. CLAUDE_CODE_OAUTH_TOKEN placeholder is set iff
+  // local subscriber. Don't let remote ~/.claude settings flip this — would
+  // mismatch the proxy's injected header. See src/ssh/sshAuthProxy.ts.
   if (readEnv('ANTHROPIC_UNIX_SOCKET')) {
     return !!readEnv('CLAUDE_CODE_OAUTH_TOKEN')
   }
@@ -139,13 +134,9 @@ export function isAnthropicAuthEnabled(): boolean {
   const hasExternalApiKey =
     apiKeySource === 'ANTHROPIC_API_KEY' || apiKeySource === 'apiKeyHelper'
 
-  // Disable Anthropic auth if:
-  // 1. Using 3rd party services (Bedrock/Vertex/Foundry)
-  // 2. User has an external API key (regardless of proxy configuration)
-  // 3. User has an external auth token (regardless of proxy configuration)
-  // this may cause issues if users have complex proxy / gateway "client-side creds" auth scenarios,
-  // e.g. if they want to set X-Api-Key to a gateway key but use Anthropic OAuth for the Authorization
-  // if we get reports of that, we should probably add an env var to force OAuth enablement
+  // Disable Anthropic auth: (1) 3P services (Bedrock/Vertex/Foundry), (2)
+  // external API key, (3) external auth token. Managed (CCD/CCR) contexts
+  // exempt — they expect to use OAuth even with these env vars set.
   const shouldDisableAuth =
     is3P ||
     (hasExternalAuthToken && !isManagedOAuthContext()) ||
@@ -154,12 +145,10 @@ export function isAnthropicAuthEnabled(): boolean {
   return !shouldDisableAuth
 }
 
-/** Where the auth token is being sourced from, if any. */
-// this code is closely related to isAnthropicAuthEnabled
+/** Where the auth token is sourced from. Closely tied to isAnthropicAuthEnabled. */
 export function getAuthTokenSource() {
-  // --bare: API-key-only. apiKeyHelper (from --settings) is the only
-  // bearer-token-shaped source allowed. OAuth env vars, FD tokens, and
-  // keychain are ignored.
+  // --bare: API-key-only. apiKeyHelper (via --settings) is the only token
+  // source allowed; OAuth env/FD/keychain are ignored.
   if (isBareMode()) {
     if (getConfiguredApiKeyHelper()) {
       return { source: 'apiKeyHelper' as const, hasToken: true }
@@ -175,29 +164,20 @@ export function getAuthTokenSource() {
     return { source: 'CLAUDE_CODE_OAUTH_TOKEN' as const, hasToken: true }
   }
 
-  // Check for OAuth token from file descriptor (or its CCR disk fallback)
+  // OAuth token from FD (or CCR disk fallback for subprocesses without the
+  // pipe FD). Distinguish by env-var presence so error messages don't ask the
+  // user to unset a non-existent variable. Both branches fall through to
+  // non-'none' source for downstream code paths.
   const oauthTokenFromFd = getOAuthTokenFromFileDescriptor()
   if (oauthTokenFromFd) {
-    // getOAuthTokenFromFileDescriptor has a disk fallback for CCR subprocesses
-    // that can't inherit the pipe FD. Distinguish by env var presence so the
-    // org-mismatch message doesn't tell the user to unset a variable that
-    // doesn't exist. Call sites fall through correctly — the new source is
-    // !== 'none' (cli/handlers/auth.ts → oauth_token) and not in the
-    // isEnvVarToken set (auth.ts:1844 → generic re-login message).
     if (readEnv('CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR')) {
-      return {
-        source: 'CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR' as const,
-        hasToken: true,
-      }
+      return { source: 'CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR' as const, hasToken: true }
     }
-    return {
-      source: 'CCR_OAUTH_TOKEN_FILE' as const,
-      hasToken: true,
-    }
+    return { source: 'CCR_OAUTH_TOKEN_FILE' as const, hasToken: true }
   }
 
-  // Check if apiKeyHelper is configured without executing it
-  // This prevents security issues where arbitrary code could execute before trust is established
+  // Check apiKeyHelper is configured without executing it — prevents arbitrary
+  // code execution before workspace trust is confirmed.
   const apiKeyHelper = getConfiguredApiKeyHelper()
   if (apiKeyHelper && !isManagedOAuthContext()) {
     return { source: 'apiKeyHelper' as const, hasToken: true }
@@ -209,6 +189,27 @@ export function getAuthTokenSource() {
   }
 
   return { source: 'none' as const, hasToken: false }
+}
+
+/**
+ * Human-readable instruction for disabling a given auth-token source.
+ * Used by status-notice UI. Most sources are env vars (generic "Unset the X
+ * env var" message); claude.ai/apiKeyHelper/CCR_OAUTH_TOKEN_FILE have
+ * non-env-var disable paths. Mirror of ant gt6 (1997.js).
+ */
+export function describeHowToDisableAuthTokenSource(source: string): string {
+  switch (source) {
+    case 'claude.ai':
+      return 'claude /logout to sign out of claude.ai.'
+    case 'apiKeyHelper':
+      return 'Unset the apiKeyHelper setting.'
+    case 'CCR_OAUTH_TOKEN_FILE':
+      return 'This token is injected by the CCR host; check the host session.'
+    case 'none':
+      return ''
+    default:
+      return `Unset the ${source} environment variable.`
+  }
 }
 
 export type ApiKeySource =
@@ -235,9 +236,8 @@ export function getAnthropicApiKeyWithSource(
   key: null | string
   source: ApiKeySource
 } {
-  // --bare: hermetic auth. Only ANTHROPIC_API_KEY env or apiKeyHelper from
-  // the --settings flag. Never touches keychain, config file, or approval
-  // lists. 3P (Bedrock/Vertex/Foundry) uses provider creds, not this path.
+  // --bare: hermetic auth — only ANTHROPIC_API_KEY env or --settings
+  // apiKeyHelper. No keychain, config, approval lists, or 3P paths.
   if (isBareMode()) {
     if (readEnv('ANTHROPIC_API_KEY')) {
       return { key: readEnv('ANTHROPIC_API_KEY'), source: 'ANTHROPIC_API_KEY' }
@@ -332,10 +332,9 @@ export function getAnthropicApiKeyWithSource(
         source: 'apiKeyHelper',
       }
     }
-    // Cache may be cold (helper hasn't finished yet). Return null with
-    // source='apiKeyHelper' rather than falling through to keychain —
-    // apiKeyHelper must win. Callers needing a real key must await
-    // getApiKeyFromApiKeyHelper() first (client.ts, useApiKeyVerification do).
+    // Cold cache: return null/apiKeyHelper rather than fall through to
+    // keychain (apiKeyHelper must win). Callers needing a real key first
+    // await getApiKeyFromApiKeyHelper (client.ts, useApiKeyVerification).
     return {
       key: getApiKeyFromApiKeyHelperCached(),
       source: 'apiKeyHelper',
@@ -455,14 +454,13 @@ export function calculateApiKeyHelperTTL(): number {
   return DEFAULT_API_KEY_HELPER_TTL
 }
 
-// Async API key helper with sync cache for non-blocking reads.
-// Epoch bumps on clearApiKeyHelperCache() — orphaned executions check their
-// captured epoch before touching module state so a settings-change or 401-retry
-// mid-flight can't clobber the newer cache/inflight.
+// Async API key helper with sync cache. Epoch bumps on clear — orphaned
+// executions check their captured epoch before touching state so a
+// settings-change or 401-retry mid-flight can't clobber the newer cache.
 let _apiKeyHelperCache: { value: string; timestamp: number } | null = null
+// startedAt: set on cold launches (user waiting); null for SWR refresh.
 let _apiKeyHelperInflight: {
   promise: Promise<string | null>
-  // Only set on cold launches (user is waiting); null for SWR background refreshes.
   startedAt: number | null
 } | null = null
 let _apiKeyHelperEpoch = 0
@@ -523,9 +521,8 @@ async function _runAndCache(
     logForDebugging(`Error getting API key from apiKeyHelper: ${detail}`, {
       level: 'error',
     })
-    // SWR path: a transient failure shouldn't replace a working key with
-    // the ' ' sentinel — keep serving the stale value and bump timestamp
-    // so we don't hammer-retry every call.
+    // SWR path: transient failure keeps the stale value (not ' ' sentinel)
+    // and bumps timestamp so we don't hammer-retry every call.
     if (!isCold && _apiKeyHelperCache && _apiKeyHelperCache.value !== ' ') {
       _apiKeyHelperCache = { ..._apiKeyHelperCache, timestamp: Date.now() }
       return _apiKeyHelperCache.value
@@ -1348,27 +1345,34 @@ async function invalidateOAuthCacheIfDiskChanged(): Promise<void> {
 // sync spawns stacked to 800ms+ of blocked render frames.
 const pending401Handlers = new Map<string, Promise<boolean>>()
 
+/** Narrowed view of OAuthTokens (canonical type is `unknown` per V7 stubs). */
+type OAuthTokensView = {
+  accessToken?: string; refreshToken?: string; expiresAt?: number
+  scopes?: readonly string[]; subscriptionType?: string | null
+}
+const asView = (t: OAuthTokens | null | undefined): OAuthTokensView | null =>
+  (t as OAuthTokensView | null) ?? null
+
+/** Read claudeAiOauth from disk, bypassing in-memory short-circuits. */
+async function readClaudeAiOauthFromDisk(): Promise<OAuthTokens | null> {
+  try {
+    const storage = getSecureStorage() as {
+      readAsync(): Promise<{ claudeAiOauth?: OAuthTokens } | null>
+    }
+    return (await storage.readAsync())?.claudeAiOauth ?? null
+  } catch (error) {
+    logError(error); return null
+  }
+}
+
 /**
- * Handle a 401 "OAuth token has expired" error from the API.
- *
- * This function forces a token refresh when the server says the token is expired,
- * even if our local expiration check disagrees (which can happen due to clock
- * issues when the token was issued).
- *
- * Safety: We compare the failed token with what's in keychain. If another tab
- * already refreshed (different token in keychain), we use that instead of
- * refreshing again. Concurrent calls with the same failedAccessToken are
- * deduplicated to a single keychain read.
- *
- * @param failedAccessToken - The access token that was rejected with 401
- * @returns true if we now have a valid token, false otherwise
+ * Handle a 401 from the API: force refresh even if our local expiration check
+ * disagrees (clock skew); adopt a sibling-refreshed keychain token if present.
+ * Concurrent calls with the same token are deduplicated.
  */
-export function handleOAuth401Error(
-  failedAccessToken: string,
-): Promise<boolean> {
+export function handleOAuth401Error(failedAccessToken: string): Promise<boolean> {
   const pending = pending401Handlers.get(failedAccessToken)
   if (pending) return pending
-
   const promise = handleOAuth401ErrorImpl(failedAccessToken).finally(() => {
     pending401Handlers.delete(failedAccessToken)
   })
@@ -1381,9 +1385,24 @@ async function handleOAuth401ErrorImpl(
 ): Promise<boolean> {
   // Clear caches and re-read from keychain (async — sync read blocks ~100ms/call)
   clearOAuthTokenCache()
-  const currentTokens = await getClaudeAIOAuthTokensAsync()
+  const currentTokens = asView(await getClaudeAIOAuthTokensAsync())
 
   if (!currentTokens?.refreshToken) {
+    // Disk re-read fallback (ant hX1): env/CCR mode short-circuits in
+    // getClaudeAIOAuthTokensAsync and never reads the on-disk blob. If
+    // /login or CCR host pushed a newer token to disk, adopt it directly.
+    const hasEnvToken = !!readEnv('CLAUDE_CODE_OAUTH_TOKEN')
+    const hasCcrToken = !!getOAuthTokenFromFileDescriptor()
+    if (hasEnvToken || hasCcrToken) {
+      const diskOauth = asView(await readClaudeAiOauthFromDisk())
+      if (diskOauth?.accessToken && diskOauth.accessToken !== failedAccessToken) {
+        if (hasEnvToken) process.env.CLAUDE_CODE_OAUTH_TOKEN = diskOauth.accessToken
+        if (hasCcrToken) setOauthTokenFromFd(diskOauth.accessToken)
+        clearOAuthTokenCache()
+        logEvent('tengu_oauth_401_recovered_from_disk', {})
+        return true
+      }
+    }
     return false
   }
 
@@ -1394,7 +1413,7 @@ async function handleOAuth401ErrorImpl(
   }
 
   // Same token that failed - force refresh, bypassing local expiration check
-  return checkAndRefreshOAuthTokenIfNeeded(0, true)
+  return checkAndRefreshOAuthTokenIfNeeded(0, true, failedAccessToken)
 }
 
 /**
@@ -1413,18 +1432,7 @@ export async function getClaudeAIOAuthTokensAsync(): Promise<OAuthTokens | null>
     return getClaudeAIOAuthTokens()
   }
 
-  try {
-    const secureStorage = getSecureStorage()
-    const storageData = await secureStorage.readAsync()
-    const oauthData = storageData?.claudeAiOauth
-    if (!oauthData?.accessToken) {
-      return null
-    }
-    return oauthData
-  } catch (error) {
-    logError(error)
-    return null
-  }
+  return readClaudeAiOauthFromDisk()
 }
 
 // In-flight promise for deduplicating concurrent calls
@@ -1433,6 +1441,7 @@ let pendingRefreshCheck: Promise<boolean> | null = null
 export function checkAndRefreshOAuthTokenIfNeeded(
   retryCount = 0,
   force = false,
+  expectedAccessToken?: string,
 ): Promise<boolean> {
   // Deduplicate concurrent non-retry, non-force calls
   if (retryCount === 0 && !force) {
@@ -1440,70 +1449,66 @@ export function checkAndRefreshOAuthTokenIfNeeded(
       return pendingRefreshCheck
     }
 
-    const promise = checkAndRefreshOAuthTokenIfNeededImpl(retryCount, force)
+    const promise = checkAndRefreshOAuthTokenIfNeededImpl(
+      retryCount,
+      force,
+      expectedAccessToken,
+    )
     pendingRefreshCheck = promise.finally(() => {
       pendingRefreshCheck = null
     })
     return pendingRefreshCheck
   }
 
-  return checkAndRefreshOAuthTokenIfNeededImpl(retryCount, force)
+  return checkAndRefreshOAuthTokenIfNeededImpl(
+    retryCount,
+    force,
+    expectedAccessToken,
+  )
 }
 
 async function checkAndRefreshOAuthTokenIfNeededImpl(
   retryCount: number,
   force: boolean,
+  expectedAccessToken?: string,
 ): Promise<boolean> {
   const MAX_RETRIES = 5
 
   await invalidateOAuthCacheIfDiskChanged()
 
-  // First check if token is expired with cached value
-  // Skip this check if force=true (server already told us token is bad)
-  const tokens = getClaudeAIOAuthTokens()
+  // First check if token is expired (skip if force=true — server already 401'd)
+  const tokens = asView(getClaudeAIOAuthTokens())
   if (!force) {
-    if (!tokens?.refreshToken || !isOAuthTokenExpired(tokens.expiresAt)) {
-      return false
-    }
+    if (!tokens?.refreshToken || !isOAuthTokenExpired(tokens.expiresAt)) return false
   }
+  if (!tokens?.refreshToken) return false
 
-  if (!tokens?.refreshToken) {
-    return false
-  }
+  // ant pt6 guard: don't burn HTTP on a refresh token already known-dead in
+  // this process. The mtime watcher clears the dead-set on external rewrite.
+  if (isRefreshTokenDead(tokens.refreshToken)) return false
 
-  // Port of ant v2.1.136 `pt6` guard (1997.js): if this refresh token
-  // already returned invalid_grant in-process, don't burn another HTTP
-  // round-trip on it. The mtime watcher in
-  // `invalidateOAuthCacheIfDiskChanged` (above) clears the dead-set
-  // whenever credentials.json is rewritten externally, so a sibling
-  // /login or a backup-restore automatically re-enables refreshes.
-  if (isRefreshTokenDead(tokens.refreshToken)) {
-    return false
-  }
+  // ant pt6: requires Claude.ai scope OR known subscriptionType — service-key
+  // sessions (user:inference only) have no refresh endpoint.
+  if (!shouldUseClaudeAIAuth(tokens.scopes) && !tokens.subscriptionType) return false
 
-  // ant `pt6` also requires Claude.ai scope OR a known subscriptionType
-  // before refreshing — service-key sessions can never refresh because
-  // they only have `user:inference` scope and no refresh endpoint.
-  if (
-    !shouldUseClaudeAIAuth(tokens.scopes) &&
-    !tokens.subscriptionType
-  ) {
-    return false
-  }
+  // Race-detection baseline (ant pt6 `T=q??O.accessToken`): caller can pass
+  // the rejected token so a sibling-process refresh is detected as success.
+  const baselineAccessToken = expectedAccessToken ?? tokens.accessToken
 
   // Re-read tokens async to check if they're still expired
   // Another process might have refreshed them
   getClaudeAIOAuthTokens.cache?.clear?.()
   clearKeychainCache()
-  const freshTokens = await getClaudeAIOAuthTokensAsync()
-  if (
-    !freshTokens?.refreshToken ||
-    !isOAuthTokenExpired(freshTokens.expiresAt)
-  ) {
-    return false
+  const freshTokens = asView(await getClaudeAIOAuthTokensAsync())
+  if (!freshTokens?.refreshToken) return false
+  // Pre-lock race-detection: sibling refresh already landed.
+  if (freshTokens.accessToken !== baselineAccessToken) {
+    logEvent('tengu_oauth_token_refresh_race_resolved', {})
+    return true
   }
+  if (!force && !isOAuthTokenExpired(freshTokens.expiresAt)) return false
 
-  // Tokens are still expired, try to acquire lock and refresh
+  // Acquire lock and refresh
   const claudeDir = getClaudeConfigHomeDir()
   await mkdir(claudeDir, { recursive: true })
 
@@ -1514,14 +1519,18 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
     logEvent('tengu_oauth_token_refresh_lock_acquired', {})
   } catch (err) {
     if ((err as { code?: string }).code === 'ELOCKED') {
-      // Another process has the lock, let's retry if we haven't exceeded max retries
+      // Another worker holds the lock — retry with backoff.
       if (retryCount < MAX_RETRIES) {
         logEvent('tengu_oauth_token_refresh_lock_retry', {
           retryCount: retryCount + 1,
         })
         // Wait a bit before retrying
         await sleep(1000 + Math.random() * 1000)
-        return checkAndRefreshOAuthTokenIfNeededImpl(retryCount + 1, force)
+        return checkAndRefreshOAuthTokenIfNeededImpl(
+          retryCount + 1,
+          force,
+          baselineAccessToken,
+        )
       }
       logEvent('tengu_oauth_token_refresh_lock_retry_limit_reached', {
         maxRetries: MAX_RETRIES,
@@ -1537,36 +1546,25 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
     return false
   }
   try {
-    // Check one more time after acquiring lock
+    // Post-lock recheck (ant pt6): sibling may have refreshed while blocked.
     getClaudeAIOAuthTokens.cache?.clear?.()
     clearKeychainCache()
-    const lockedTokens = await getClaudeAIOAuthTokensAsync()
-    if (
-      !lockedTokens?.refreshToken ||
-      !isOAuthTokenExpired(lockedTokens.expiresAt)
-    ) {
+    const lockedTokens = asView(await getClaudeAIOAuthTokensAsync())
+    if (!lockedTokens?.refreshToken) return false
+    if (lockedTokens.accessToken !== baselineAccessToken) {
       logEvent('tengu_oauth_token_refresh_race_resolved', {})
-      return false
+      return true
     }
-    // ant `pt6` post-lock re-check: if another worker on this process
-    // already marked the (now-current) refresh token dead while we were
-    // waiting for the lock, don't burn the HTTP call.
-    if (isRefreshTokenDead(lockedTokens.refreshToken)) {
-      return false
-    }
+    if (!force && !isOAuthTokenExpired(lockedTokens.expiresAt)) return false
+    if (isRefreshTokenDead(lockedTokens.refreshToken)) return false
 
     logEvent('tengu_oauth_token_refresh_starting', {})
+    // Claude.ai subscribers: omit scopes so the default CLAUDE_AI_OAUTH_SCOPES
+    // applies and scope expansion (e.g. user:file_upload) works without re-login.
     const refreshedTokens = await refreshOAuthToken(lockedTokens.refreshToken, {
-      // For Claude.ai subscribers, omit scopes so the default
-      // CLAUDE_AI_OAUTH_SCOPES applies — this allows scope expansion
-      // (e.g. adding user:file_upload) on refresh without re-login.
-      scopes: shouldUseClaudeAIAuth(lockedTokens.scopes)
-        ? undefined
-        : lockedTokens.scopes,
+      scopes: shouldUseClaudeAIAuth(lockedTokens.scopes) ? undefined : lockedTokens.scopes,
     })
     saveOAuthTokensIfNeeded(refreshedTokens)
-
-    // Clear the cache after refreshing token
     getClaudeAIOAuthTokens.cache?.clear?.()
     clearKeychainCache()
     return true
@@ -1575,8 +1573,10 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
 
     getClaudeAIOAuthTokens.cache?.clear?.()
     clearKeychainCache()
-    const currentTokens = await getClaudeAIOAuthTokensAsync()
-    if (currentTokens && !isOAuthTokenExpired(currentTokens.expiresAt)) {
+    // Race-recovered (ant `J.accessToken!==T`): identity check, not freshness
+    // — a sibling-refreshed token is valid even if not far from expiry.
+    const currentTokens = asView(await getClaudeAIOAuthTokensAsync())
+    if (currentTokens && currentTokens.accessToken !== baselineAccessToken) {
       logEvent('tengu_oauth_token_refresh_race_recovered', {})
       return true
     }

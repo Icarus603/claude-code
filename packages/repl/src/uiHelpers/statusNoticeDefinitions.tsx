@@ -12,6 +12,7 @@ import { relative } from 'path'
 import { formatNumber } from '@claude-code/output/formatters'
 import type { getGlobalConfig } from '@claude-code/config'
 import {
+  describeHowToDisableAuthTokenSource,
   getAnthropicApiKeyWithSource,
   getApiKeyFromConfigOrMacOSKeychain,
   getAuthTokenSource,
@@ -176,9 +177,7 @@ const bothAuthMethodsNotice: StatusNoticeDefinition = {
           </Text>
           <Text color="warning">
             · Trying to use {apiKeySource}?{' '}
-            {authTokenInfo.source === 'claude.ai'
-              ? 'claude /logout to sign out of claude.ai.'
-              : `Unset the ${authTokenInfo.source} environment variable.`}
+            {describeHowToDisableAuthTokenSource(authTokenInfo.source)}
           </Text>
         </Box>
       </Box>
