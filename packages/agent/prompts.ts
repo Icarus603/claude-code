@@ -1,5 +1,6 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { type as osType, version as osVersion, release as osRelease } from 'os'
+import { CONTEXT_MANAGEMENT_SECTION, SUMMARIZE_TOOL_RESULTS_SECTION } from './staticPromptSections.js'
 import { env } from '@claude-code/config/env'
 import { getIsGit } from '@claude-code/storage/git.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
@@ -548,6 +549,7 @@ ${CYBER_RISK_INSTRUCTION}`,
       'summarize_tool_results',
       () => SUMMARIZE_TOOL_RESULTS_SECTION,
     ),
+    systemPromptSection('context_management', () => CONTEXT_MANAGEMENT_SECTION),
     // ant 4692.js:296 — env-gated reproduce → fix → verify workflow.
     // Skip GrowthBook tengu_sparrow_ledger since ccb's GB stub returns default.
     systemPromptSection('reproduce_verify_workflow', () =>
@@ -910,8 +912,6 @@ function getFunctionResultClearingSection(model: string): string | null {
 
 Old tool results will be automatically cleared from context to free up space. The ${config.keepRecent} most recent results are always kept.`
 }
-
-const SUMMARIZE_TOOL_RESULTS_SECTION = `When working with tool results, write down any important information you might need later in your response, as the original tool result may be cleared later.`
 
 function getBriefSection(): string | null {
   if (!(feature('KAIROS') || feature('KAIROS_BRIEF'))) return null
