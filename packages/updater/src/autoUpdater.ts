@@ -292,18 +292,23 @@ export function getCanaryVersion(): string | null {
 }
 
 /**
- * Checks if a target version should be skipped due to user's minimumVersion setting.
- * This is used when switching to stable channel - the user can choose to stay on their
- * current version until stable catches up, preventing downgrades.
+ * Skip a target version that's below the user's `minimumVersion` setting.
+ * Ant `O7H` (3480.js) uses npm-semver's `lR` with `{loose:true}` which
+ * returns `false` for unparseable input. Bun.semver.order (under
+ * ccb's `gte`) throws on unparseable — wrap in try/catch and fall
+ * back to `true` (skip) to keep the updater non-fatal on bad
+ * minimumVersion settings (e.g. ccb's legacy `1.carus.000` calver).
  */
 export function shouldSkipVersion(targetVersion: string): boolean {
   const settings = getInitialSettings()
   const minimumVersion = settings?.minimumVersion
-  if (!minimumVersion) {
-    return false
+  if (!minimumVersion) return false
+  let shouldSkip: boolean
+  try {
+    shouldSkip = !gte(targetVersion, minimumVersion)
+  } catch {
+    shouldSkip = true
   }
-  // Skip if target version is less than minimum
-  const shouldSkip = !gte(targetVersion, minimumVersion)
   if (shouldSkip) {
     logForDebugging(
       `Skipping update to ${targetVersion} - below minimumVersion ${minimumVersion}`,
