@@ -235,6 +235,7 @@ import {
 } from '@claude-code/local-observability/spans'
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { logEvent } from '@claude-code/local-observability'
+import { emitApiRetriesExhausted } from './apiRetryTelemetry.js'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   consumePendingCacheEdits,
@@ -381,21 +382,10 @@ export function getCacheControl({
 }
 
 /**
- * Determines if 1h TTL should be used for prompt caching.
- *
- * Only applied when:
- * 1. User is eligible (ant or subscriber within rate limits)
- * 2. The query source matches a pattern in the GrowthBook allowlist
- *
- * GrowthBook config shape: { allowlist: string[] }
- * Patterns support trailing '*' for prefix matching.
- * Examples:
- * - { allowlist: ["repl_main_thread*", "sdk"] } — main thread + SDK only
- * - { allowlist: ["repl_main_thread*", "sdk", "agent:*"] } — also subagents
- * - { allowlist: ["*"] } — all sources
- *
- * The allowlist is cached in STATE for session stability — prevents mixed
- * TTLs when GrowthBook's disk cache updates mid-request.
+ * 1h prompt cache TTL: eligible user AND querySource matches GrowthBook
+ * allowlist (`{ allowlist: string[] }`, trailing '*' = prefix). Allowlist
+ * cached in STATE to prevent mixed TTLs when GrowthBook disk cache flips
+ * mid-request. Examples: ["repl_main_thread*", "sdk"], ["*"].
  */
 export function should1hCacheTTL(querySource?: QuerySource): boolean {
   // Byte-for-byte port of ant `TLH` (4758.js). Order matters:
@@ -2983,6 +2973,8 @@ async function* queryModel(
           previousRequestId,
         })
 
+        if (fallbackError instanceof CannotRetryError) emitApiRetriesExhausted({ error, model: errorModel, attempts: attemptNumber, totalRetryDurationMs: Date.now() - startIncludingRetries, fastMode: isFastModeRequest, querySource: options.querySource, thinkingType: thinkingConfig.type }) // ant 2914.js (non-streaming fallback path)
+
         if (error instanceof APIUserAbortError) {
           releaseStreamResources()
           return
@@ -3038,6 +3030,8 @@ async function* queryModel(
         fastMode: isFastModeRequest,
         previousRequestId,
       })
+
+      if (errorFromRetry instanceof CannotRetryError) emitApiRetriesExhausted({ error, model: errorModel, attempts: attemptNumber, totalRetryDurationMs: Date.now() - startIncludingRetries, fastMode: isFastModeRequest, querySource: options.querySource, thinkingType: thinkingConfig.type }) // ant 2914.js api_retries_exhausted
 
       // Don't yield an assistant error message for user aborts
       // The interruption message is handled in query.ts

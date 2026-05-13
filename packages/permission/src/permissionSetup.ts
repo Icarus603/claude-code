@@ -86,6 +86,7 @@ import {
   permissionRuleValueToString,
 } from './permissionRuleParser.js'
 import { readEnv } from '@claude-code/config/env'
+import { logPermissionModeChangeEvent } from '@claude-code/local-observability/telemetry'
 
 /**
  * Checks if a Bash permission rule is dangerous for auto mode.
@@ -593,21 +594,17 @@ export function restoreDangerousPermissions(
  * - Plan mode enter/exit attachments (via handlePlanModeTransition)
  * - Auto mode activation: setAutoModeActive, stripDangerousPermissionsForAutoMode
  *
- * Returns the (possibly modified) context. Caller is responsible for setting
- * the mode on the returned context.
- *
- * @param fromMode The current permission mode
- * @param toMode The target permission mode
- * @param context The current tool permission context
+ * Returns the (possibly modified) context. Caller sets `mode` on the result.
  */
 export function transitionPermissionMode(
   fromMode: string,
   toMode: string,
   context: ToolPermissionContext,
+  trigger?: string, // ant Ts (2642.js) OTel event label
 ): ToolPermissionContext {
   // plan→plan (SDK set_permission_mode) would wrongly hit the leave branch below
   if (fromMode === toMode) return context
-
+  void logPermissionModeChangeEvent({ from: fromMode, to: toMode, trigger }) // ant Ts
   handlePlanModeTransition(fromMode, toMode)
   handleAutoModeTransition(fromMode, toMode)
 

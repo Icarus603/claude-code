@@ -58,7 +58,7 @@
 import { randomUUID } from 'node:crypto'
 import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
+import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import type { HookCommand } from '@claude-code/config/types'
 import {
   addSessionHook,
@@ -107,12 +107,13 @@ export function isGoalClearKeyword(input: string): boolean {
 }
 
 /**
- * Ant `HoH`: /goal feature gate. Flips on `tengu_maple_tide`. Surfacing
- * here so the two command definitions (local-jsx and local) can share
- * the check without duplicating.
+ * Ant `HoH`: /goal feature gate. ccb is a solo-maintained CLI, not an
+ * enterprise product — no need to mirror ant's GrowthBook gating. The
+ * command is always enabled; CLAUDE_CODE_DISABLE_GOAL=1 turns it off as
+ * an emergency kill-switch.
  */
 export function isGoalCommandEnabled(): boolean {
-  return getFeatureValue_CACHED_MAY_BE_STALE('tengu_maple_tide', false)
+  return !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_GOAL'))
 }
 
 /** Ant `Wj6`. Plain-text formatter for activeGoal.lastReason. */

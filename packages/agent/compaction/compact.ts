@@ -95,6 +95,7 @@ import {
 } from '../toolSearch.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
+import { emitCompactionFailure, emitCompactionSuccess } from './compactionTelemetry.js'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/local-observability/compat'
 import {
   getMaxOutputTokensForModel,
@@ -393,6 +394,9 @@ export async function compactConversation(
   isAutoCompact: boolean = false,
   recompactionInfo?: RecompactionInfo,
 ): Promise<CompactionResult> {
+  // ant ZzH (2642.js) compaction OTel timer + trigger (shared success+failure).
+  const compactStartMs = Date.now()
+  const compactTrigger = isAutoCompact ? 'auto' : 'manual'
   try {
     if (messages.length === 0) {
       throw new Error(ERROR_MESSAGE_NOT_ENOUGH_MESSAGES)
@@ -735,6 +739,7 @@ export async function compactConversation(
       .filter(Boolean)
       .join('\n')
 
+    emitCompactionSuccess(compactTrigger, compactStartMs, preCompactTokenCount, truePostCompactTokenCount) // ant ZzH
     return {
       boundaryMarker,
       summaryMessages,
@@ -747,6 +752,7 @@ export async function compactConversation(
       compactionUsage,
     }
   } catch (error) {
+    emitCompactionFailure(compactTrigger, compactStartMs, error) // ant ZzH
     // Only show the error notification for manual /compact.
     // Auto-compact failures are retried on the next turn and the
     // notification is confusing when compaction eventually succeeds.
@@ -1395,21 +1401,10 @@ async function streamCompactSummary({
 }
 
 /**
- * Creates attachment messages for recently accessed files to restore them after compaction.
- * This prevents the model from having to re-read files that were recently accessed.
- * Re-reads files using FileReadTool to get fresh content with proper validation.
- * Files are selected based on recency, but constrained by both file count and token budget limits.
- *
- * Files already present as Read tool results in preservedMessages are skipped —
- * re-injecting identical content the model can already see in the preserved tail
- * is pure waste (up to 25K tok/compact). Mirrors the diff-against-preserved
- * pattern that getDeferredToolsDeltaAttachment uses at the same call sites.
- *
- * @param readFileState The current file state tracking recently read files
- * @param toolUseContext The tool use context for calling FileReadTool
- * @param maxFiles Maximum number of files to restore (default: 5)
- * @param preservedMessages Messages kept post-compact; Read results here are skipped
- * @returns Array of attachment messages for the most recently accessed files that fit within token budget
+ * Re-attach recent files after compaction using FileReadTool (fresh content,
+ * proper validation). Selected by recency; bounded by file count + token
+ * budget. Files already present in `preservedMessages` Read results are
+ * skipped — re-injecting them is pure waste (25K tok/compact saved).
  */
 export async function createPostCompactFileAttachments(
   readFileState: Record<string, { content: string; timestamp: number }>,
