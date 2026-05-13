@@ -39,6 +39,7 @@ import {
   maybeRemoveApiKeyFromMacOSKeychainThrows,
   normalizeApiKeyForConfig,
 } from './authPortable.js'
+import { saveApiKey as saveApiKeyImpl } from './oauth/saveApiKey.js'
 import {
   checkStsCallerIdentity,
   clearAwsIniCache,
@@ -1079,93 +1080,15 @@ export const getApiKeyFromConfigOrMacOSKeychain = memoize(
   },
 )
 
-function isValidApiKey(apiKey: string): boolean {
-  // Only allow alphanumeric characters, dashes, and underscores
-  return /^[a-zA-Z0-9-_]+$/.test(apiKey)
-}
-
+// Port of ant ig6 (1997.js) extracted to ./oauth/saveApiKey.ts to keep
+// authAlias.ts under its grandfather LOC budget. Thin wrapper here so
+// callers keep importing `saveApiKey` from authAlias unchanged; the
+// wrapper bridges the memoize.cache.clear callback that would otherwise
+// create a circular import.
 export async function saveApiKey(apiKey: string): Promise<void> {
-  if (!isValidApiKey(apiKey)) {
-    throw new Error(
-      'Invalid API key format. API key must contain only alphanumeric characters, dashes, and underscores.',
-    )
-  }
-
-  // Store as primary API key
-  await maybeRemoveApiKeyFromMacOSKeychain()
-  let savedToKeychain = false
-  if (process.platform === 'darwin') {
-    // Port of ant v2.1.136 ig6 (1997.js). Differences from ccb's prior impl:
-    //   1. timeout: 5000 — bound the spawn at 5 s so a stuck security CLI
-    //      doesn't hang the login flow forever.
-    //   2. Check `z.exitCode !== 0` and THROW. Because we pass
-    //      `reject: false`, execa will NOT throw on non-zero exit, so the
-    //      old try/catch never fired and ccb silently fell back to
-    //      "saved_to_config" — a P0 for /login on locked keychains.
-    //   3. Format stderr (or stdout) into the thrown Error so the user
-    //      sees the keychain failure reason inline. Replace internal
-    //      newlines with "; " for a one-line readable error.
-    //   4. Include the `\`claude doctor\`` hint so users have a next step.
-    // TODO: migrate to SecureStorage
-    const storageServiceName = getMacOsKeychainStorageServiceName()
-    const username = getUsername()
-
-    // Convert to hexadecimal to avoid any escaping issues
-    const hexValue = Buffer.from(apiKey, 'utf-8').toString('hex')
-
-    // Use security's interactive mode (-i) with -X (hexadecimal) option
-    // This ensures credentials never appear in process command-line arguments
-    // Process monitors only see "security -i", not the password
-    const command = `add-generic-password -U -a "${username}" -s "${storageServiceName}" -X "${hexValue}"\n`
-
-    const result = await execa('security', ['-i'], {
-      input: command,
-      reject: false,
-      timeout: 5000,
-    })
-
-    if (result.exitCode !== 0) {
-      // ant ig6: build a one-line summary of stderr/stdout for the user
-      const detail = ((result.stderr as string) || (result.stdout as string) || '')
-        .trim()
-        .replace(/\s*\n\s*/g, '; ')
-      logEvent('tengu_api_key_keychain_error', {
-        error: detail as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      })
-      throw new Error(
-        `Failed to save API key to macOS Keychain${detail ? ` (${detail})` : ''}. ` +
-          'Run `claude doctor` to diagnose keychain access.',
-      )
-    }
-
-    logEvent('tengu_api_key_saved_to_keychain', {})
-    savedToKeychain = true
-  } else {
-    logEvent('tengu_api_key_saved_to_config', {})
-  }
-
-  const normalizedKey = normalizeApiKeyForConfig(apiKey)
-
-  // Save config with all updates
-  saveGlobalConfig(current => {
-    const approved = current.customApiKeyResponses?.approved ?? []
-    return {
-      ...current,
-      // Only save to config if keychain save failed or not on darwin
-      primaryApiKey: savedToKeychain ? current.primaryApiKey : apiKey,
-      customApiKeyResponses: {
-        ...current.customApiKeyResponses,
-        approved: approved.includes(normalizedKey)
-          ? approved
-          : [...approved, normalizedKey],
-        rejected: current.customApiKeyResponses?.rejected ?? [],
-      },
-    }
+  await saveApiKeyImpl(apiKey, {
+    onSaved: () => getApiKeyFromConfigOrMacOSKeychain.cache.clear?.(),
   })
-
-  // Clear memo cache
-  getApiKeyFromConfigOrMacOSKeychain.cache.clear?.()
-  clearLegacyApiKeyPrefetch()
 }
 
 export function isCustomApiKeyApproved(apiKey: string): boolean {
@@ -1527,10 +1450,9 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
         maxRetries: MAX_RETRIES,
       })
       // Port of ant pt6 (1997.js): G6("oauth_token_refresh",
-      // "oauth_refresh_lock_timeout"). This is the "sad path" outcome event
-      // (tengu_feature_sad) that feeds the OAuth-refresh dashboard so SREs
-      // can distinguish a refresh that ran out of lock retries from a
-      // refresh that ran fine but the token didn't change.
+      // "oauth_refresh_lock_timeout"). The "sad path" outcome event so
+      // the OAuth-refresh dashboard distinguishes "we ran out of lock
+      // retries" from "refresh ran fine but token didn't change".
       logEvent('tengu_feature_sad', {
         feature_name:
           'oauth_token_refresh' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -1547,7 +1469,7 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
     })
     // Port of ant pt6 (1997.js): xH("oauth_token_refresh",
     // "oauth_refresh_lock_error"). Distinct outcome from lock_timeout so
-    // dashboards can separate "lock contention exhausted retries" from
+    // dashboards separate "lock contention exhausted retries" from
     // "lock-acquire failed for some other fs reason".
     logEvent('tengu_feature_bad', {
       feature_name:
@@ -1571,7 +1493,7 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
     if (isRefreshTokenDead(lockedTokens.refreshToken)) return false
 
     logEvent('tengu_oauth_token_refresh_starting', {})
-    // Port of ant v2.1.136 pt6 (1997.js):
+    // Port of ant v2.1.136 pt6 (1997.js) refresh call:
     //   scopes: (bB(w.scopes) || w.subscriptionType) && !w.clientId ? void 0 : w.scopes,
     //   clientId: w.clientId,
     //

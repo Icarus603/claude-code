@@ -16,13 +16,11 @@ import { resolve } from 'path'
  * These feed the fleet-wide feature-health dashboards. Without them, OAuth
  * regressions are invisible to ops until users start reporting.
  *
- * Pin matrix:
- *   - exchangeCodeForTokens:  yH success + xH(invalid_code | http_error) on failure
- *   - refreshOAuthToken:      yH success + xH(invalid_grant) | G6(request_failed)
- *   - fetchAndStoreUserRoles: yH success + xH(http_error | no_account) on failure
- *   - createAndStoreApiKey:   yH success + xH(empty_response | request_failed)
- *   - pt6 lock paths:         G6(lock_timeout) | xH(lock_error) (already
- *     locked in by pt6LockTelemetry.behavior.test.ts; not duplicated here)
+ * ccb's oauth/client.ts factors the three patterns into local helpers
+ *   featureOk / featureBad / featureSad
+ * so the call sites read as one-liners. This pin file verifies (a) the
+ * helpers exist and (b) each call site is wired to the right feature_name
+ * and error_code.
  */
 describe('OAuth canonical feature-ok / feature-bad / feature-sad events', () => {
   const clientSource = readFileSync(
@@ -30,81 +28,102 @@ describe('OAuth canonical feature-ok / feature-bad / feature-sad events', () => 
     'utf-8',
   )
 
-  describe('exchangeCodeForTokens (ant dg6)', () => {
-    test('success path fires tengu_feature_ok with feature_name="oauth_token_exchange"', () => {
+  describe('Helper-functions present (avoid repeated inline blocks)', () => {
+    test('featureOk helper defined', () => {
+      // Pin: ant 0567.js yH equivalent.
       expect(clientSource).toMatch(
-        /tengu_oauth_token_exchange_success[\s\S]{0,500}?logEvent\('tengu_feature_ok',[\s\S]{0,200}?feature_name:[\s\S]{0,80}?'oauth_token_exchange'/,
+        /function featureOk\([\s\S]{0,200}?logEvent\('tengu_feature_ok',[\s\S]{0,200}?feature_name:/,
       )
     })
 
-    test('non-200 fires tengu_feature_bad with reason as error_code (401 → invalid_code, else http_error)', () => {
+    test('featureBad helper defined', () => {
+      // Pin: ant 0567.js xH equivalent.
+      expect(clientSource).toMatch(
+        /function featureBad\([\s\S]{0,200}?logEvent\('tengu_feature_bad',[\s\S]{0,200}?error_code:/,
+      )
+    })
+
+    test('featureSad helper defined', () => {
+      // Pin: ant 0567.js G6 equivalent.
+      expect(clientSource).toMatch(
+        /function featureSad\([\s\S]{0,200}?logEvent\('tengu_feature_sad',[\s\S]{0,200}?error_code:/,
+      )
+    })
+  })
+
+  describe('exchangeCodeForTokens (ant dg6)', () => {
+    test('success calls featureOk("oauth_token_exchange")', () => {
+      expect(clientSource).toMatch(
+        /tengu_oauth_token_exchange_success[\s\S]{0,300}?featureOk\('oauth_token_exchange'\)/,
+      )
+    })
+
+    test('non-200 calls featureBad("oauth_token_exchange", reason)', () => {
       // Pin: feature_bad uses the SAME reason string as the failed event.
       expect(clientSource).toMatch(
-        /tengu_oauth_token_exchange_failed[\s\S]{0,500}?logEvent\('tengu_feature_bad',[\s\S]{0,200}?feature_name:[\s\S]{0,80}?'oauth_token_exchange'[\s\S]{0,300}?error_code:[\s\S]{0,80}?reason/,
+        /tengu_oauth_token_exchange_failed[\s\S]{0,500}?featureBad\('oauth_token_exchange', reason\)/,
       )
     })
   })
 
   describe('refreshOAuthToken (ant Bq_)', () => {
-    test('success path fires tengu_feature_ok with feature_name="oauth_token_refresh"', () => {
+    test('success calls featureOk("oauth_token_refresh")', () => {
       expect(clientSource).toMatch(
-        /tengu_oauth_token_refresh_success[\s\S]{0,500}?logEvent\('tengu_feature_ok',[\s\S]{0,200}?feature_name:[\s\S]{0,80}?'oauth_token_refresh'/,
+        /tengu_oauth_token_refresh_success[\s\S]{0,300}?featureOk\('oauth_token_refresh'\)/,
       )
     })
 
-    test('invalid_grant fires tengu_feature_bad (xH)', () => {
-      // Pin: ant Bq_ catch — xH("oauth_token_refresh", "oauth_refresh_invalid_grant").
-      // feature_bad = deterministic failure path (invalid creds).
+    test('invalid_grant calls featureBad("oauth_token_refresh", "oauth_refresh_invalid_grant")', () => {
+      // Pin: ant Bq_ catch xH branch. feature_bad = deterministic (invalid creds).
       expect(clientSource).toMatch(
-        /isInvalidGrantError\(error\)[\s\S]{0,400}?logEvent\('tengu_feature_bad',[\s\S]{0,300}?'oauth_token_refresh'[\s\S]{0,300}?'oauth_refresh_invalid_grant'/,
+        /isInvalidGrantError\(error\)[\s\S]{0,400}?featureBad\('oauth_token_refresh', 'oauth_refresh_invalid_grant'\)/,
       )
     })
 
-    test('non-invalid_grant fires tengu_feature_sad (G6)', () => {
-      // Pin: ant Bq_ else-branch — G6("oauth_token_refresh", "oauth_refresh_request_failed").
-      // feature_sad = retryable failure (timeout/network/5xx).
+    test('non-invalid_grant calls featureSad("oauth_token_refresh", "oauth_refresh_request_failed")', () => {
+      // Pin: ant Bq_ catch G6 branch. feature_sad = retryable (timeout/5xx).
       expect(clientSource).toMatch(
-        /\} else \{[\s\S]{0,400}?logEvent\('tengu_feature_sad',[\s\S]{0,300}?'oauth_token_refresh'[\s\S]{0,300}?'oauth_refresh_request_failed'/,
+        /\} else \{[\s\S]{0,300}?featureSad\('oauth_token_refresh', 'oauth_refresh_request_failed'\)/,
       )
     })
   })
 
   describe('fetchAndStoreUserRoles (ant cg6)', () => {
-    test('success path fires tengu_feature_ok with feature_name="oauth_fetch_roles"', () => {
+    test('success calls featureOk("oauth_fetch_roles")', () => {
       expect(clientSource).toMatch(
-        /tengu_oauth_roles_stored[\s\S]{0,500}?logEvent\('tengu_feature_ok',[\s\S]{0,200}?feature_name:[\s\S]{0,80}?'oauth_fetch_roles'/,
+        /tengu_oauth_roles_stored[\s\S]{0,400}?featureOk\('oauth_fetch_roles'\)/,
       )
     })
 
-    test('http_error fires tengu_feature_bad with error_code="oauth_roles_http_error"', () => {
+    test('http_error calls featureBad("oauth_fetch_roles", "oauth_roles_http_error")', () => {
       expect(clientSource).toMatch(
-        /'http_error'[\s\S]{0,500}?logEvent\('tengu_feature_bad',[\s\S]{0,300}?'oauth_fetch_roles'[\s\S]{0,300}?'oauth_roles_http_error'/,
+        /'http_error'[\s\S]{0,400}?featureBad\('oauth_fetch_roles', 'oauth_roles_http_error'\)/,
       )
     })
 
-    test('no_account fires tengu_feature_bad with error_code="oauth_roles_no_account"', () => {
+    test('no_account calls featureBad("oauth_fetch_roles", "oauth_roles_no_account")', () => {
       expect(clientSource).toMatch(
-        /'no_account'[\s\S]{0,500}?logEvent\('tengu_feature_bad',[\s\S]{0,300}?'oauth_fetch_roles'[\s\S]{0,300}?'oauth_roles_no_account'/,
+        /'no_account'[\s\S]{0,400}?featureBad\('oauth_fetch_roles', 'oauth_roles_no_account'\)/,
       )
     })
   })
 
   describe('createAndStoreApiKey (ant lg6)', () => {
-    test('success path fires tengu_feature_ok with feature_name="oauth_create_api_key"', () => {
+    test('success calls featureOk("oauth_create_api_key")', () => {
       expect(clientSource).toMatch(
-        /tengu_oauth_api_key',[\s\S]{0,300}?'success'[\s\S]{0,500}?logEvent\('tengu_feature_ok',[\s\S]{0,200}?feature_name:[\s\S]{0,80}?'oauth_create_api_key'/,
+        /tengu_oauth_api_key',[\s\S]{0,300}?'success'[\s\S]{0,400}?featureOk\('oauth_create_api_key'\)/,
       )
     })
 
-    test('empty response fires tengu_feature_bad with error_code="oauth_api_key_empty_response"', () => {
+    test('empty response calls featureBad("oauth_create_api_key", "oauth_api_key_empty_response")', () => {
       expect(clientSource).toMatch(
-        /'empty_response'[\s\S]{0,500}?logEvent\('tengu_feature_bad',[\s\S]{0,300}?'oauth_create_api_key'[\s\S]{0,300}?'oauth_api_key_empty_response'/,
+        /'empty_response'[\s\S]{0,400}?featureBad\('oauth_create_api_key', 'oauth_api_key_empty_response'\)/,
       )
     })
 
-    test('request_failed fires tengu_feature_bad with error_code="oauth_api_key_request_failed"', () => {
+    test('request_failed calls featureBad("oauth_create_api_key", "oauth_api_key_request_failed")', () => {
       expect(clientSource).toMatch(
-        /'request_failed'[\s\S]{0,500}?logEvent\('tengu_feature_bad',[\s\S]{0,300}?'oauth_create_api_key'[\s\S]{0,300}?'oauth_api_key_request_failed'/,
+        /'request_failed'[\s\S]{0,400}?featureBad\('oauth_create_api_key', 'oauth_api_key_request_failed'\)/,
       )
     })
   })
@@ -112,48 +131,33 @@ describe('OAuth canonical feature-ok / feature-bad / feature-sad events', () => 
   describe('Comment / port references (rationale stays visible)', () => {
     test('ant dg6 xH port comment present', () => {
       expect(clientSource).toMatch(
-        /Port of ant dg6 xH\("oauth_token_exchange"/,
+        /ant dg6 xH\("oauth_token_exchange", reason\)/,
       )
     })
 
     test('ant dg6 yH port comment present', () => {
-      expect(clientSource).toMatch(
-        /Port of ant dg6 yH\("oauth_token_exchange"\)/,
-      )
+      expect(clientSource).toMatch(/ant dg6 yH/)
     })
 
-    test('ant Bq_ catch port comment present (xH invalid_grant)', () => {
-      expect(clientSource).toMatch(
-        /Port of ant Bq_ catch: xH\("oauth_token_refresh",\s*\n?\s*\/\/ "oauth_refresh_invalid_grant"\)/,
-      )
+    test('ant Bq_ catch port comment present (invalid_grant)', () => {
+      // The compressed form keeps the references inline as trailing comments.
+      expect(clientSource).toMatch(/ant Bq_ xH/)
     })
 
-    test('ant Bq_ catch port comment present (G6 request_failed)', () => {
-      expect(clientSource).toMatch(
-        /Port of ant Bq_ catch: G6\("oauth_token_refresh",/,
-      )
+    test('ant Bq_ catch port comment present (request_failed)', () => {
+      expect(clientSource).toMatch(/ant Bq_ G6/)
     })
 
     test('ant cg6 yH/xH port comments present', () => {
-      expect(clientSource).toMatch(
-        /Port of ant cg6 yH\("oauth_fetch_roles"\)/,
-      )
-      expect(clientSource).toMatch(
-        /Port of ant cg6 xH\("oauth_fetch_roles", "oauth_roles_http_error"\)/,
-      )
-      expect(clientSource).toMatch(
-        /Port of ant cg6 xH\("oauth_fetch_roles", "oauth_roles_no_account"\)/,
-      )
+      expect(clientSource).toMatch(/ant cg6 yH/)
+      expect(clientSource).toMatch(/oauth_roles_http_error/)
+      expect(clientSource).toMatch(/oauth_roles_no_account/)
     })
 
     test('ant lg6 yH/xH port comments present', () => {
-      expect(clientSource).toMatch(/Port of ant lg6 yH\("oauth_create_api_key"\)/)
-      expect(clientSource).toMatch(
-        /Port of ant lg6 xH\("oauth_create_api_key", "oauth_api_key_empty_response"\)/,
-      )
-      expect(clientSource).toMatch(
-        /Port of ant lg6 xH\("oauth_create_api_key", "oauth_api_key_request_failed"\)/,
-      )
+      expect(clientSource).toMatch(/ant lg6 yH/)
+      expect(clientSource).toMatch(/oauth_api_key_empty_response/)
+      expect(clientSource).toMatch(/oauth_api_key_request_failed/)
     })
   })
 })

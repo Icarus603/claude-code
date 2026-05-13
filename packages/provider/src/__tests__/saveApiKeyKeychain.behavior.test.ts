@@ -26,15 +26,15 @@ import { resolve } from 'path'
  * This pin locks all three pieces.
  */
 describe('saveApiKey — port of ant ig6', () => {
+  // saveApiKey body now lives in oauth/saveApiKey.ts (split out so
+  // authAlias.ts stays under the grandfather LOC budget).
   const source = readFileSync(
-    resolve(__dirname, '..', 'authAlias.ts'),
+    resolve(__dirname, '..', 'oauth', 'saveApiKey.ts'),
     'utf-8',
   )
 
-  // Isolate the saveApiKey body slice to keep matches local.
-  const fnStart = source.indexOf('export async function saveApiKey')
-  expect(fnStart).toBeGreaterThan(0)
-  const fnSlice = source.slice(fnStart, fnStart + 3500)
+  // The extracted module is small enough that whole-file matching is fine.
+  const fnSlice = source
 
   test('darwin path uses execa security -i with timeout: 5000', () => {
     // Pin: ant ig6 — Zy("security", ["-i"], { ..., timeout: 5000 }).

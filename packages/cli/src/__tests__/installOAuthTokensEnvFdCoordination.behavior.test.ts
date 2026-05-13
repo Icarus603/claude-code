@@ -55,9 +55,10 @@ describe('installOAuthTokens env var + FD coordination (ant NZH)', () => {
 
   test('post-storage: env var REPLACED with new accessToken on storage failure', () => {
     // Pin: if env was set AND storage failed → roll forward env var so
-    // current process keeps working.
+    // current process keeps working. Code uses local `tokensView` cast
+    // (tokens is OAuthTokens=unknown so direct .accessToken would TS-error).
     expect(fnSlice).toMatch(
-      /process\.env\.CLAUDE_CODE_OAUTH_TOKEN = tokens\.accessToken/,
+      /process\.env\.CLAUDE_CODE_OAUTH_TOKEN = tokensView\.accessToken/,
     )
   })
 
@@ -66,7 +67,7 @@ describe('installOAuthTokens env var + FD coordination (ant NZH)', () => {
     // SET the FD token when none existed (changes the canonical source
     // for sessions that load FD-free).
     expect(fnSlice).toMatch(
-      /if \(getOauthTokenFromFd\(\)\) \{[\s\S]{0,300}?setOauthTokenFromFd\(storageResult\.success \? null : tokens\.accessToken\)/,
+      /if \(getOauthTokenFromFd\(\)\) \{[\s\S]{0,300}?setOauthTokenFromFd\(storageResult\.success \? null : tokensView\.accessToken\)/,
     )
   })
 
@@ -123,8 +124,10 @@ describe('performLogout preserveInProcessTokens flag (ant Xw_)', () => {
 
   test('preserveInProcessTokens=false → wipe env var + null FD token', () => {
     // Pin: ant: `if (!_) (delete process.env.CLAUDE_CODE_OAUTH_TOKEN, A_H(null))`.
+    // V7 §8.6 routes env mutation through the canonical `deleteEnv` helper
+    // (anti-pattern verifier blocks bare `delete process.env[...]`).
     expect(source).toMatch(
-      /if \(!preserveInProcessTokens\) \{[\s\S]{0,400}?delete process\.env\.CLAUDE_CODE_OAUTH_TOKEN[\s\S]{0,300}?setOauthTokenFromFd\(null\)/,
+      /if \(!preserveInProcessTokens\) \{[\s\S]{0,400}?deleteEnv\('CLAUDE_CODE_OAUTH_TOKEN'\)[\s\S]{0,300}?setOauthTokenFromFd\(null\)/,
     )
   })
 

@@ -152,11 +152,14 @@ export async function installOAuthTokens(tokens: OAuthTokens): Promise<void> {
   // If storage failed, we ROLL FORWARD the env var to the new access
   // token so the current process keeps working (the next refresh will
   // retry storage).
+  // tokens is typed as `unknown` (OAuthTokens stub); local cast keeps the
+  // type errors confined to one site instead of a dozen access lines.
+  const tokensView = tokens as { accessToken: string }
   if (process.env.CLAUDE_CODE_OAUTH_TOKEN) {
     if (storageResult.success) {
       delete process.env.CLAUDE_CODE_OAUTH_TOKEN
     } else {
-      process.env.CLAUDE_CODE_OAUTH_TOKEN = tokens.accessToken
+      process.env.CLAUDE_CODE_OAUTH_TOKEN = tokensView.accessToken
     }
   }
   // Same logic for FD-loaded token: only update if a prior FD token exists.
@@ -165,7 +168,7 @@ export async function installOAuthTokens(tokens: OAuthTokens): Promise<void> {
     '@claude-code/app-host/bootstrap/state.js'
   )
   if (getOauthTokenFromFd()) {
-    setOauthTokenFromFd(storageResult.success ? null : tokens.accessToken)
+    setOauthTokenFromFd(storageResult.success ? null : tokensView.accessToken)
   }
 
   if (storageResult.warning) {

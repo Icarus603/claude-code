@@ -65,13 +65,13 @@ describe('refreshOAuthToken — clientId + expiresIn signature pins', () => {
   test('return-shape comment references ant Bq_ rationale', () => {
     // Pin: keep the rationale visible so future refactors don't strip it.
     expect(clientSource).toMatch(
-      /Port of ant v2\.1\.136 Bq_ return shape[\s\S]{0,200}?clientId/,
+      /ant Bq_ return[\s\S]{0,200}?clientId/,
     )
   })
 
   test('signature doc references ant Bq_', () => {
     expect(clientSource).toMatch(
-      /Port of ant v2\.1\.136 `Bq_` signature/,
+      /Port of ant Bq_ signature/,
     )
   })
 

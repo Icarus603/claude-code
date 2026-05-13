@@ -104,12 +104,13 @@ describe('buildAuthUrl + exchangeCodeForTokens (ant au_/dg6 parity)', () => {
 
     test('2xx fires success telemetry after the throw guard', () => {
       // ant dg6: d("tengu_oauth_token_exchange_success", {}) + yH(...).
-      // The two events are paired; pin both fire before the return.
+      // ccb factored yH into the featureOk() helper; pin both fire
+      // before the return.
       expect(fnSlice).toMatch(
         /logEvent\('tengu_oauth_token_exchange_success',\s*\{\}\)[\s\S]*?return response\.data/,
       )
       expect(fnSlice).toMatch(
-        /logEvent\('tengu_feature_ok',[\s\S]{0,200}?feature_name:[\s\S]{0,80}?'oauth_token_exchange'/,
+        /featureOk\('oauth_token_exchange'\)/,
       )
     })
   })

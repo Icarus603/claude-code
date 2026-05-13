@@ -38,7 +38,9 @@ export async function performLogout({
   // Skip when re-logging in (preserveInProcessTokens=true) so the env-var path
   // (CLAUDE_CODE_OAUTH_TOKEN headless login) doesn't lose its source mid-flow.
   if (!preserveInProcessTokens) {
-    delete process.env.CLAUDE_CODE_OAUTH_TOKEN
+    // V7 §8.6: core-domain package must go through config helper for env access.
+    const { deleteEnv } = await import('@claude-code/config/env/utils')
+    deleteEnv('CLAUDE_CODE_OAUTH_TOKEN')
     // Lazy import to avoid circular dep through app-host barrel.
     const { setOauthTokenFromFd } = await import(
       '@claude-code/app-host/bootstrap/state.js'
