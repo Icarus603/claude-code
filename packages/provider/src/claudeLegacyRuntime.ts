@@ -2974,6 +2974,7 @@ async function* queryModel(
           llmSpan,
           fastMode: isFastModeRequest,
           previousRequestId,
+          effort: typeof thinkingConfig.type === 'string' && thinkingConfig.type !== 'disabled' ? thinkingConfig.type : undefined,
         })
 
         if (fallbackError instanceof CannotRetryError) emitApiRetriesExhausted({ error, model: errorModel, attempts: attemptNumber, totalRetryDurationMs: Date.now() - startIncludingRetries, fastMode: isFastModeRequest, querySource: options.querySource, thinkingType: thinkingConfig.type }) // ant 2914.js (non-streaming fallback path)
@@ -3032,6 +3033,7 @@ async function* queryModel(
         llmSpan,
         fastMode: isFastModeRequest,
         previousRequestId,
+        effort: typeof thinkingConfig.type === 'string' && thinkingConfig.type !== 'disabled' ? thinkingConfig.type : undefined,
       })
 
       if (errorFromRetry instanceof CannotRetryError) emitApiRetriesExhausted({ error, model: errorModel, attempts: attemptNumber, totalRetryDurationMs: Date.now() - startIncludingRetries, fastMode: isFastModeRequest, querySource: options.querySource, thinkingType: thinkingConfig.type }) // ant 2914.js api_retries_exhausted
@@ -3129,6 +3131,7 @@ async function* queryModel(
       fastMode: isFastModeRequest,
       previousRequestId,
       betas: lastRequestBetas,
+      effort: typeof thinkingConfig.type === 'string' && thinkingConfig.type !== 'disabled' ? thinkingConfig.type : undefined,
     })
   })
 

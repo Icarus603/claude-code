@@ -15,7 +15,7 @@ import {
 } from '@claude-code/app-host/bootstrap/state.js'
 import type { QueryChainTracking } from '@claude-code/tool-registry/Tool.js'
 import { isConnectorTextBlock } from './connectorTextTypes.js'
-import { redactQuerySourceForTelemetry } from './querySourceTelemetry.js'
+import { emitApiErrorOTel, emitApiRequestOTel } from './apiOTelEmit.js'
 import type { AssistantMessage } from '@claude-code/agent/messageShapes'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type { EffortLevel } from '@claude-code/agent/effort.js'
@@ -251,6 +251,7 @@ export function logAPIError({
   llmSpan,
   fastMode,
   previousRequestId,
+  effort,
 }: {
   error: unknown
   model: string
@@ -271,6 +272,8 @@ export function logAPIError({
   llmSpan?: Span
   fastMode?: boolean
   previousRequestId?: string | null
+  /** ant 2920.js:184 — `...(W && { effort: W })`. Reasoning effort on failure. */
+  effort?: string
 }): void {
   const gateway = detectGateway({
     headers:
@@ -365,16 +368,11 @@ export function logAPIError({
     ...getAnthropicEnvMetadata(),
   })
 
-  // ant 2914.js k5("api_error"): request_id + query_source for pivots.
-  void logOTelEvent('api_error', {
-    model: model,
-    error: errStr,
-    status_code: status !== undefined ? String(status) : undefined,
-    duration_ms: String(durationMs),
-    attempt: String(attempt),
-    request_id: requestId === null ? undefined : requestId,
-    speed: fastMode ? 'fast' : 'normal',
-    query_source: redactQuerySourceForTelemetry(querySource),
+  // ant 2920.js:175 — api_error emit moved to apiOTelEmit.ts.
+  emitApiErrorOTel({
+    model, error: errStr,
+    statusCode: status !== undefined ? Number.parseInt(status, 10) : undefined,
+    durationMs, attempt, requestId, fastMode: fastMode === true, querySource, effort,
   })
 
   // Pass the span to correctly match responses to requests when beta tracing is enabled
@@ -424,6 +422,7 @@ function logAPISuccess({
   fastMode,
   previousRequestId,
   betas,
+  effort,
 }: {
   model: string
   preNormalizedModel: string
@@ -450,6 +449,8 @@ function logAPISuccess({
   fastMode?: boolean
   previousRequestId?: string | null
   betas?: string[]
+  /** ant 2920.js:405 — Reasoning effort applied to this request. */
+  effort?: string
 }): void {
   const isNonInteractiveSession = getIsNonInteractiveSession()
   const isPostCompaction = consumePostCompaction()
@@ -605,6 +606,7 @@ export function logAPISuccessAndDuration({
   fastMode,
   previousRequestId,
   betas,
+  effort,
 }: {
   model: string
   preNormalizedModel: string
@@ -638,6 +640,8 @@ export function logAPISuccessAndDuration({
   /** Request ID from the previous API call in this session */
   previousRequestId?: string | null
   betas?: string[]
+  /** ant 2920.js:405 — Reasoning effort applied to this request. */
+  effort?: string
 }): void {
   const gateway = detectGateway({
     headers,
@@ -716,19 +720,14 @@ export function logAPISuccessAndDuration({
     fastMode,
     previousRequestId,
     betas,
+    effort,
   })
-  // ant 2914.js k5("api_request").
-  void logOTelEvent('api_request', {
-    model,
-    input_tokens: String(usage.input_tokens),
-    output_tokens: String(usage.output_tokens),
-    cache_read_tokens: String(usage.cache_read_input_tokens),
-    cache_creation_tokens: String(usage.cache_creation_input_tokens),
-    cost_usd: String(costUSD),
-    duration_ms: String(durationMs),
-    request_id: requestId === null ? undefined : requestId,
-    speed: fastMode ? 'fast' : 'normal',
-    query_source: redactQuerySourceForTelemetry(querySource),
+  // ant 2920.js:393 — api_request emit moved to apiOTelEmit.ts.
+  emitApiRequestOTel({
+    model, inputTokens: usage.input_tokens, outputTokens: usage.output_tokens,
+    cacheReadTokens: usage.cache_read_input_tokens,
+    cacheCreationTokens: usage.cache_creation_input_tokens,
+    costUSD, durationMs, requestId, fastMode: fastMode === true, querySource, effort,
   })
 
   // Extract model output, thinking output, and tool call flag when beta tracing is enabled
