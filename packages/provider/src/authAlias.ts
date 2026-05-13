@@ -169,10 +169,8 @@ export function getAuthTokenSource() {
     return { source: 'CLAUDE_CODE_OAUTH_TOKEN' as const, hasToken: true }
   }
 
-  // OAuth token from FD (or CCR disk fallback for subprocesses without the
-  // pipe FD). Distinguish by env-var presence so error messages don't ask the
-  // user to unset a non-existent variable. Both branches fall through to
-  // non-'none' source for downstream code paths.
+  // OAuth from FD (or CCR disk fallback). Distinguish by env-var presence
+  // so error messages don't ask to unset a non-existent variable.
   const oauthTokenFromFd = getOAuthTokenFromFileDescriptor()
   if (oauthTokenFromFd) {
     if (readEnv('CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR')) {
@@ -370,9 +368,7 @@ export function getConfiguredApiKeyHelper(): string | undefined {
   return mergedSettings.apiKeyHelper
 }
 
-/**
- * Check if the configured apiKeyHelper comes from project settings (projectSettings or localSettings)
- */
+/** Project/local settings apiKeyHelper (security-sensitive: triggers trust gate). */
 function isApiKeyHelperFromProjectOrLocalSettings(): boolean {
   const apiKeyHelper = getConfiguredApiKeyHelper()
   if (!apiKeyHelper) {
@@ -387,17 +383,11 @@ function isApiKeyHelperFromProjectOrLocalSettings(): boolean {
   )
 }
 
-/**
- * Get the configured awsAuthRefresh from settings
- */
 function getConfiguredAwsAuthRefresh(): string | undefined {
-  const mergedSettings = getSettings() || {}
-  return mergedSettings.awsAuthRefresh
+  return (getSettings() || {}).awsAuthRefresh
 }
 
-/**
- * Check if the configured awsAuthRefresh comes from project settings
- */
+/** Project/local awsAuthRefresh (triggers trust gate). */
 export function isAwsAuthRefreshFromProjectSettings(): boolean {
   const awsAuthRefresh = getConfiguredAwsAuthRefresh()
   if (!awsAuthRefresh) {
@@ -1222,9 +1212,8 @@ export function saveOAuthTokensIfNeeded(tokens: OAuthTokens): {
       refreshToken: tokens.refreshToken,
       expiresAt: tokens.expiresAt,
       scopes: tokens.scopes,
-      // Profile fetch in refreshOAuthToken swallows errors and returns null on
-      // transient failures (network, 5xx, rate limit). Don't clobber a valid
-      // stored subscription with null — fall back to the existing value.
+      // Transient profile-fetch failures return null — fall back to stored
+      // value rather than clobbering a valid subscription.
       subscriptionType:
         tokens.subscriptionType ?? existingOauth?.subscriptionType ?? null,
       rateLimitTier:
@@ -1255,36 +1244,29 @@ export function saveOAuthTokensIfNeeded(tokens: OAuthTokens): {
   }
 }
 
+/** Bearer-token-only OAuth shape (env or FD tokens have no refresh/expiry). */
+function inferenceOnlyToken(accessToken: string): OAuthTokens {
+  return {
+    accessToken,
+    refreshToken: null,
+    expiresAt: null,
+    scopes: ['user:inference'],
+    subscriptionType: null,
+    rateLimitTier: null,
+  } as OAuthTokens
+}
+
 export const getClaudeAIOAuthTokens = memoize((): OAuthTokens | null => {
   // --bare: API-key-only. No OAuth env tokens, no keychain, no credentials file.
   if (isBareMode()) return null
 
-  // Check for force-set OAuth token from environment variable
+  // Force-set OAuth token from env var → inference-only token shape.
   if (readEnv('CLAUDE_CODE_OAUTH_TOKEN')) {
-    // Return an inference-only token (unknown refresh and expiry)
-    return {
-      accessToken: readEnv('CLAUDE_CODE_OAUTH_TOKEN'),
-      refreshToken: null,
-      expiresAt: null,
-      scopes: ['user:inference'],
-      subscriptionType: null,
-      rateLimitTier: null,
-    }
+    return inferenceOnlyToken(readEnv('CLAUDE_CODE_OAUTH_TOKEN')!)
   }
-
-  // Check for OAuth token from file descriptor
+  // OAuth token from FD (or CCR disk fallback).
   const oauthTokenFromFd = getOAuthTokenFromFileDescriptor()
-  if (oauthTokenFromFd) {
-    // Return an inference-only token (unknown refresh and expiry)
-    return {
-      accessToken: oauthTokenFromFd,
-      refreshToken: null,
-      expiresAt: null,
-      scopes: ['user:inference'],
-      subscriptionType: null,
-      rateLimitTier: null,
-    }
-  }
+  if (oauthTokenFromFd) return inferenceOnlyToken(oauthTokenFromFd)
 
   try {
     const secureStorage = getSecureStorage()
@@ -1303,10 +1285,8 @@ export const getClaudeAIOAuthTokens = memoize((): OAuthTokens | null => {
 })
 
 /**
- * Clears all OAuth token caches. Call this on 401 errors to ensure
- * the next token read comes from secure storage, not stale in-memory caches.
- * This handles the case where the local expiration check disagrees with the
- * server (e.g., due to clock corrections after token was issued).
+ * Clear all OAuth token caches. Call on 401 to force re-read from secure
+ * storage rather than stale in-memory copies (handles clock-skew cases).
  */
 export function clearOAuthTokenCache(): void {
   getClaudeAIOAuthTokens.cache?.clear?.()
@@ -1315,11 +1295,8 @@ export function clearOAuthTokenCache(): void {
 
 let lastCredentialsMtimeMs = 0
 
-// Cross-process staleness: another CC instance may write fresh tokens to
-// disk (refresh or /login), but this process's memoize caches forever.
-// Without this, terminal 1's /login fixes terminal 1; terminal 2's /login
-// then revokes terminal 1 server-side, and terminal 1's memoize never
-// re-reads — infinite /login regress (CC-1096, GH#24317).
+// Cross-process staleness: sibling /login writes credentials.json but this
+// process's memoize never re-reads — infinite /login regress (CC-1096).
 async function invalidateOAuthCacheIfDiskChanged(): Promise<void> {
   try {
     const { mtimeMs } = await stat(
@@ -1329,25 +1306,18 @@ async function invalidateOAuthCacheIfDiskChanged(): Promise<void> {
       lastCredentialsMtimeMs = mtimeMs
       clearOAuthTokenCache()
       // ant `pt6` shares the credentials.json mtime as the invalidation
-      // signal for the refresh-token dead-set: if the file got rewritten
-      // by `claude --login` from another shell, the dead tokens we cached
-      // in-memory might no longer apply to the freshly-issued ones.
+      // ant pt6: file rewrite by sibling /login invalidates dead-set too.
       clearRefreshTokenDeadSet()
     }
   } catch {
-    // ENOENT — macOS keychain path (file deleted on migration). Clear only
-    // the memoize so it delegates to the keychain cache's 30s TTL instead
-    // of caching forever on top. `security find-generic-password` is
-    // ~15ms; bounded to once per 30s by the keychain cache.
+    // ENOENT (keychain path, file deleted): clear memoize only — keychain
+    // cache's 30s TTL handles the rest (~15ms per security spawn).
     getClaudeAIOAuthTokens.cache?.clear?.()
   }
 }
 
-// In-flight dedup: when N claude.ai proxy connectors hit 401 with the same
-// token simultaneously (common at startup — #20930), only one should clear
-// caches and re-read the keychain. Without this, each call's clearOAuthTokenCache()
-// nukes readInFlight in macOsKeychainStorage and triggers a fresh spawn —
-// sync spawns stacked to 800ms+ of blocked render frames.
+// In-flight 401 dedup — without this, N proxy connectors race on cache clear
+// and stack sync keychain spawns to 800ms+ of blocked frames (#20930).
 const pending401Handlers = new Map<string, Promise<boolean>>()
 
 /** Narrowed view of OAuthTokens (canonical type is `unknown` per V7 stubs). */
@@ -1520,7 +1490,7 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
   let release
   try {
     logEvent('tengu_oauth_token_refresh_lock_acquiring', {})
-    release = await lockfile.lock(claudeDir)
+    release = await lockfile.lock(claudeDir, oauthRefreshLockOptions(claudeDir))
     logEvent('tengu_oauth_token_refresh_lock_acquired', {})
   } catch (err) {
     if ((err as { code?: string }).code === 'ELOCKED') {
@@ -1716,9 +1686,45 @@ export function isEnterpriseSubscriber(): boolean {
   return getSubscriptionType() === 'enterprise'
 }
 
+/** ant wA9: oauthAccount.seatTier. */
+export function getSeatTier(): string | null {
+  return getOauthAccountInfo()?.seatTier ?? null
+}
+
+/** ant nIH: enterprise + usage-based seat tier (PAYG billing). */
+export function isEnterprisePAYGSubscriber(): boolean {
+  return getSubscriptionType() === 'enterprise' && getSeatTier() === 'enterprise_usage_based'
+}
+
 export function isProSubscriber(): boolean {
   return getSubscriptionType() === 'pro'
 }
+
+/** Test-only alias for clearRefreshTokenDeadSet — ant vX1. */
+export function __resetKnownDeadRefreshTokensForTest(): void {
+  clearRefreshTokenDeadSet()
+}
+
+/**
+ * Lockfile options for OAuth refresh (ant YA9): sibling .oauth_refresh.lock
+ * file, 10s stale timeout, skip realpath, log compromised events.
+ */
+export function oauthRefreshLockOptions(claudeDir: string): {
+  lockfilePath: string
+  realpath: boolean
+  stale: number
+  onCompromised: (err: Error) => void
+} {
+  return {
+    lockfilePath: join(claudeDir, '.oauth_refresh.lock'),
+    realpath: false,
+    stale: 10_000,
+    onCompromised: (err) => logError(err),
+  }
+}
+
+/** ant Ft6: SDK entrypoint allowlist for OAuth refresh. ccb has no SDK. */
+export const SDK_OAUTH_REFRESH_ENTRYPOINTS: readonly string[] = []
 
 export function getRateLimitTier(): string | null {
   if (!isAnthropicAuthEnabled()) {

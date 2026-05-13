@@ -7,8 +7,7 @@ import { basename, dirname, join, resolve } from 'path'
 import { AccessError, ParseError as ConfigParseError } from '../errors.js'
 // V7 §7 — bootstrap state accessed via host bindings
 // V7 §8.6 — logEvent via host binding
-// V7 §11.4 — type-only imports inlined to avoid cross-layer deps.
-// These types are used only in GlobalConfig type definition.
+// V7 §11.4 — type-only imports inlined (used only in GlobalConfig).
 type McpServerConfig = Record<string, unknown>
 type BillingType = unknown
 type ReferralEligibilityResponse = unknown
@@ -212,6 +211,7 @@ export type AccountInfo = {
   billingType?: BillingType | null
   accountCreatedAt?: string
   subscriptionCreatedAt?: string
+  seatTier?: string | null // enterprise PAYG vs flat-rate
 }
 
 export type AuthProtocol = 'anthropic' | 'openai' | 'codex' | 'gemini'
