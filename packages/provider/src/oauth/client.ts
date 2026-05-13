@@ -412,12 +412,18 @@ export async function fetchAndStoreUserRoles(
   })
 
   if (response.status !== 200) {
+    // ant cg6: emit xH("oauth_fetch_roles","oauth_roles_http_error") BEFORE
+    // the throw so fleet analytics can distinguish the HTTP failure mode.
+    logEvent('tengu_oauth_fetch_roles_failed', { reason: 'http_error', status: String(response.status) })
     throw new Error(`Failed to fetch user roles: ${response.statusText}`)
   }
   const data = response.data as UserRolesResponse
   const config = getGlobalConfig()
 
   if (!config.oauthAccount) {
+    // ant cg6: separate failure reason — config didn't have oauthAccount,
+    // which means an OAuth flow was kicked off without storing identity first.
+    logEvent('tengu_oauth_fetch_roles_failed', { reason: 'no_account' })
     throw new Error('OAuth account information not found in config')
   }
 
@@ -457,6 +463,10 @@ export async function createAndStoreApiKey(
       })
       return apiKey
     }
+    // ant lg6: empty response is a distinct failure mode worth its own event —
+    // the user-visible message ("no API key returned") is non-specific so
+    // dashboards need the structured reason to spot a backend regression.
+    logEvent('tengu_oauth_create_api_key_failed', { reason: 'empty_response' })
     return null
   } catch (error) {
     logEvent('tengu_oauth_api_key', {
@@ -468,6 +478,10 @@ export async function createAndStoreApiKey(
             error,
           )) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
+    // ant lg6 also fires the structured xH event before re-throwing — distinct
+    // from the tengu_oauth_api_key{status:failure} above which carries the
+    // user-visible error message.
+    logEvent('tengu_oauth_create_api_key_failed', { reason: 'request_failed' })
     throw error
   }
 }
