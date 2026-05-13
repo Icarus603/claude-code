@@ -104,11 +104,22 @@ export async function installOAuthTokens(tokens: OAuthTokens): Promise<void> {
       organizationUuid: profile.organization.uuid,
       displayName: profile.account.display_name || undefined,
       hasExtraUsageEnabled:
-        profile.organization.has_extra_usage_enabled ?? undefined,
-      billingType: profile.organization.billing_type ?? undefined,
+        profile.organization?.has_extra_usage_enabled ?? undefined,
+      billingType: profile.organization?.billing_type ?? undefined,
       subscriptionCreatedAt:
-        profile.organization.subscription_created_at ?? undefined,
+        profile.organization?.subscription_created_at ?? undefined,
       accountCreatedAt: profile.account.created_at,
+      // ant ng6 / ZIH (1255.js): full profile field set including seat tier
+      // and trial fields. Without these, /login users start with stale
+      // oauthAccount missing the trial countdown / enterprise PAYG flag,
+      // and the next routine token refresh's haveProfileAlready guard
+      // skips the profile re-fetch (cumulative miss).
+      ccOnboardingFlags: profile.organization?.cc_onboarding_flags ?? {},
+      claudeCodeTrialEndsAt:
+        profile.organization?.claude_code_trial_ends_at ?? null,
+      claudeCodeTrialDurationDays:
+        profile.organization?.claude_code_trial_duration_days ?? null,
+      seatTier: profile.organization?.seat_tier ?? null,
     })
   } else if (tokens.tokenAccount) {
     // Fallback to token exchange account data when profile endpoint fails
