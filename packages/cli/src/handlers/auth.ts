@@ -21,6 +21,7 @@ import {
 import { getOauthProfileFromOauthToken } from '@claude-code/provider/oauth/getOauthProfile.js'
 import { OAuthService } from '@claude-code/provider/oauth/index.js'
 import type { OAuthTokens } from '@claude-code/provider/oauth/types.js'
+import { LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS } from '@claude-code/provider/oauthConstants.js'
 import {
   clearOAuthTokenCache,
   getAnthropicApiKeyWithSource,
@@ -210,7 +211,15 @@ export async function authLogin({
     try {
       logEvent('tengu_login_from_refresh_token', {})
 
-      const tokens = await refreshOAuthToken(envRefreshToken, { scopes })
+      // Port of ant v2.1.136 (3508.js): the headless refresh-token login
+      // requests a LONG-LIVED token (1 year via LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS)
+      // and propagates CLAUDE_CODE_OAUTH_CLIENT_ID through to the refresh
+      // request body so the token stays bound to the env-overridden client.
+      const tokens = await refreshOAuthToken(envRefreshToken, {
+        scopes,
+        expiresIn: LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS,
+        clientId: process.env.CLAUDE_CODE_OAUTH_CLIENT_ID || undefined,
+      })
       await installOAuthTokens(tokens)
 
       const orgResult = await validateForceLoginOrg()

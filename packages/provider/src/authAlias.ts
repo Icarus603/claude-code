@@ -1534,10 +1534,34 @@ async function checkAndRefreshOAuthTokenIfNeededImpl(
     if (isRefreshTokenDead(lockedTokens.refreshToken)) return false
 
     logEvent('tengu_oauth_token_refresh_starting', {})
-    // Claude.ai subscribers: omit scopes so the default CLAUDE_AI_OAUTH_SCOPES
-    // applies and scope expansion (e.g. user:file_upload) works without re-login.
+    // Port of ant v2.1.136 pt6 (1997.js):
+    //   scopes: (bB(w.scopes) || w.subscriptionType) && !w.clientId ? void 0 : w.scopes,
+    //   clientId: w.clientId,
+    //
+    // The double-condition matters:
+    //   - bB(scopes)        → token includes the user:inference scope marker
+    //   - subscriptionType  → also treat any token with a known sub as
+    //                          Claude.ai (covers tokens issued before scope
+    //                          tracking landed).
+    //   - !clientId guard   → if the token is bound to a custom OAuth
+    //                          client (e.g., Xcode), we MUST keep the
+    //                          original scopes — defaulting to
+    //                          CLAUDE_AI_OAUTH_SCOPES would drop the
+    //                          custom scope set and break refresh.
+    // The clientId pass-through lets a non-default OAuth client identity
+    // survive refresh round-trips.
+    const lockedSubscriptionType = (
+      lockedTokens as { subscriptionType?: string | null }
+    ).subscriptionType
+    const lockedClientId = (
+      lockedTokens as { clientId?: string }
+    ).clientId
+    const shouldOmitScopes =
+      (shouldUseClaudeAIAuth(lockedTokens.scopes) || lockedSubscriptionType) &&
+      !lockedClientId
     const refreshedTokens = await refreshOAuthToken(lockedTokens.refreshToken, {
-      scopes: shouldUseClaudeAIAuth(lockedTokens.scopes) ? undefined : lockedTokens.scopes,
+      scopes: shouldOmitScopes ? undefined : lockedTokens.scopes,
+      clientId: lockedClientId,
     })
     saveOAuthTokensIfNeeded(refreshedTokens)
     getClaudeAIOAuthTokens.cache?.clear?.()

@@ -250,16 +250,30 @@ export async function exchangeCodeForTokens(
 
 export async function refreshOAuthToken(
   refreshToken: string,
-  { scopes: requestedScopes }: { scopes?: string[] } = {},
+  {
+    scopes: requestedScopes,
+    expiresIn,
+    clientId,
+  }: { scopes?: string[]; expiresIn?: number; clientId?: string } = {},
 ): Promise<OAuthTokens> {
   // Note: the dead-set check (`isRefreshTokenDead`) lives in the caller
   // — ant `pt6` (1997.js) — alongside the lockfile + mtime-revalidation
   // dance. refreshOAuthToken itself is the low-level RPC; it doesn't
   // know about the higher-level coordination, just like ant `Bq_`.
-  const requestBody = {
+  //
+  // Port of ant v2.1.136 `Bq_` signature: `{ scopes, expiresIn, clientId }`.
+  //   - `clientId`: each refresh remembers the client_id the token was
+  //     issued under (e.g., CLAUDE_CODE_OAUTH_CLIENT_ID for Xcode
+  //     integration). Without this, a refresh would silently switch the
+  //     token's client identity if the env var changed.
+  //   - `expiresIn`: long-lived refresh path (1-year TTL via
+  //     LONG_LIVED_OAUTH_TOKEN_TTL_SECONDS) for `CLAUDE_CODE_OAUTH_REFRESH_TOKEN`
+  //     env login. The OAuth server honors this on long-lived refresh
+  //     tokens and silently caps for normal ones.
+  const requestBody: Record<string, unknown> = {
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
-    client_id: getOauthConfig().CLIENT_ID,
+    client_id: clientId ?? getOauthConfig().CLIENT_ID,
     // Request specific scopes, defaulting to the full Claude AI set. The
     // backend's refresh-token grant allows scope expansion beyond what the
     // initial authorize granted (see ALLOWED_SCOPE_EXPANSIONS), so this is
@@ -270,6 +284,7 @@ export async function refreshOAuthToken(
       : CLAUDE_AI_OAUTH_SCOPES
     ).join(' '),
   }
+  if (expiresIn !== undefined) requestBody.expires_in = expiresIn
 
   try {
     // Ant `Bq_` (1255.js) uses `timeout: 30000`. Same rationale as
@@ -366,6 +381,13 @@ export async function refreshOAuthToken(
       refreshToken: newRefreshToken,
       expiresAt,
       scopes,
+      // Port of ant v2.1.136 Bq_ return shape: `clientId: K`. Stamping the
+      // request-time client_id onto the stored token means the NEXT refresh
+      // (via pt6/checkAndRefreshOAuthTokenIfNeeded) sees `w.clientId` and
+      // routes it back into `Bq_(..., { clientId: w.clientId })` — so a
+      // token issued under CLAUDE_CODE_OAUTH_CLIENT_ID survives env-var
+      // unset across refreshes.
+      clientId,
       subscriptionType:
         profileInfo?.subscriptionType ?? existing?.subscriptionType ?? null,
       rateLimitTier:
