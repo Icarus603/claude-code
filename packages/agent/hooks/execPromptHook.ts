@@ -110,23 +110,58 @@ Your response must be a JSON object matching one of the following schemas:
       const fullResponse = content.trim()
       logForDebugging(`Hooks: Model response: ${fullResponse}`)
 
-      const json = safeParseJSON(fullResponse)
+      // Some models wrap JSON in markdown fences or include leading/trailing
+      // text even with structured output requested. Extract JSON aggressively:
+      //   1. Try raw parse (pure JSON response — best case)
+      //   2. Try extracting from ```json ... ``` fences
+      //   3. Try extracting from ``` ... ``` fences (no language tag)
+      //   4. Try finding the first { or [ ... } or ] in the response
+      let json = safeParseJSON(fullResponse)
+      if (!json) {
+        // Markdown code fence extraction: match ```json or ``` blocks
+        const fenceMatch =
+          /```(?:json)?\s*\n?([\s\S]*?)\n?```/.exec(fullResponse)
+        if (fenceMatch) {
+          json = safeParseJSON(fenceMatch[1]!.trim())
+        }
+      }
+      if (!json) {
+        // Last resort: find first JSON object/array in the text
+        const braceIdx = fullResponse.indexOf('{')
+        const bracketIdx = fullResponse.indexOf('[')
+        const startIdx =
+          braceIdx === -1
+            ? bracketIdx
+            : bracketIdx === -1
+              ? braceIdx
+              : Math.min(braceIdx, bracketIdx)
+        if (startIdx >= 0) {
+          const endIdx =
+            fullResponse[startIdx] === '{'
+              ? fullResponse.lastIndexOf('}')
+              : fullResponse.lastIndexOf(']')
+          if (endIdx > startIdx) {
+            json = safeParseJSON(fullResponse.slice(startIdx, endIdx + 1))
+          }
+        }
+      }
       if (!json) {
         logForDebugging(
           `Hooks: error parsing response as JSON: ${fullResponse}`,
         )
+        // Fail closed: if we can't parse the model's response, we can't
+        // verify the condition is met — treat as blocking so the goal
+        // isn't silently bypassed.
         return {
           hook,
-          outcome: 'non_blocking_error',
-          message: createAttachmentMessage({
-            type: 'hook_non_blocking_error',
-            hookName,
-            toolUseID: effectiveToolUseID,
-            hookEvent,
-            stderr: 'JSON validation failed',
-            stdout: fullResponse,
-            exitCode: 1,
-          }),
+          outcome: 'blocking',
+          blockingError: {
+            blockingError:
+              'Prompt hook could not be validated (LLM returned non-JSON response). Try again.',
+            command: hook.prompt,
+          },
+          preventContinuation: true,
+          stopReason: 'LLM response could not be parsed as JSON',
         }
       }
 
@@ -135,18 +170,18 @@ Your response must be a JSON object matching one of the following schemas:
         logForDebugging(
           `Hooks: model response does not conform to expected schema: ${parsed.error.message}`,
         )
+        // Fail closed: model returned valid JSON but not in the expected
+        // `{ok, reason}` shape. Block the stop so the condition can't be
+        // silently bypassed.
         return {
           hook,
-          outcome: 'non_blocking_error',
-          message: createAttachmentMessage({
-            type: 'hook_non_blocking_error',
-            hookName,
-            toolUseID: effectiveToolUseID,
-            hookEvent,
-            stderr: `Schema validation failed: ${parsed.error.message}`,
-            stdout: fullResponse,
-            exitCode: 1,
-          }),
+          outcome: 'blocking',
+          blockingError: {
+            blockingError: `Prompt hook returned unexpected JSON schema: ${parsed.error.message}`,
+            command: hook.prompt,
+          },
+          preventContinuation: true,
+          stopReason: `Schema validation failed: ${parsed.error.message}`,
         }
       }
 
