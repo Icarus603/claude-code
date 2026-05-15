@@ -56,7 +56,10 @@
  *       Hook is NOT removed — it stays active so the goal keeps blocking.
  */
 import { randomUUID } from 'node:crypto'
-import { logEvent } from '@claude-code/local-observability'
+import {
+  logEvent,
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+} from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import { getTotalOutputTokens } from '@claude-code/app-host/bootstrap/state.js'
