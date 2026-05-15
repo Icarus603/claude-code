@@ -177,8 +177,8 @@ function getIntensity(
   return 1
 }
 
-// ccb brand blue (matches BRAND_COLOR rgb(105,185,238))
-const brandBlue = chalk.hex('#69b9ee')
+// ccb brand blue (matches BRAND_COLOR rgb(128,189,255))
+const brandBlue = chalk.hex('#80bdff')
 
 function getHeatmapChar(intensity: number): string {
   switch (intensity) {

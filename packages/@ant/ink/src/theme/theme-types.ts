@@ -1,8 +1,8 @@
 import chalk, { Chalk } from 'chalk'
 // env import replaced with process.env
 
-const BRAND_COLOR = 'rgb(105,185,238)'
-const BRAND_COLOR_LIGHT = 'rgb(147,205,243)'
+const BRAND_COLOR = 'rgb(128,189,255)'
+const BRAND_COLOR_LIGHT = 'rgb(163,209,255)'
 
 export type Theme = {
   autoAccept: string
