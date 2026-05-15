@@ -1,9 +1,9 @@
 /**
- * `/goal` local-jsx command body — port of ant v2.1.136 4688.js `_Z3`.
+ * `/goal` local-jsx command body — port of ant v2.1.142 4752.js (vVK).
  *
- * Behaviour (byte-for-byte ant):
+ * Behaviour:
  *   - empty args → render current goal status (or "no goal set" + last
- *     met goal line); read-only.
+ *     met goal line); read-only. Includes token stats (v2.1.142 delta).
  *   - clear keyword (clear / stop / off / reset / none / cancel,
  *     case-insensitive) → clear the active /goal Stop hook.
  *   - other → set a new goal subject to GOAL_CONDITION_MAX_LENGTH.
@@ -12,6 +12,10 @@
  * immediately picks up the new instruction without the user typing
  * anything more. Clear / status / over-limit paths return a single
  * system message.
+ *
+ * TODO: wire GoalPanel component for the empty-args case (ant NVK).
+ * The component exists at repl/components/goal/GoalPanel.tsx but the
+ * command-runtime → repl cross-package export needs wiring first.
  */
 import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
@@ -36,7 +40,7 @@ import {
 export async function call(
   onDone: LocalJSXCommandOnDone,
   context: {
-    getAppState: () => { activeGoal?: { condition: string; iterations: number; setAt: number; lastReason?: string } }
+    getAppState: () => { activeGoal?: { condition: string; iterations: number; setAt: number; tokensAtStart: number; lastReason?: string } }
     setAppState: (updater: (prev: any) => any) => void
     setMessages: (updater: (prev: any[]) => any[]) => void
     messages?: Message[]
@@ -53,6 +57,9 @@ export async function call(
   }
 
   if (trimmed === '') {
+    // ant v2.1.142 vVK: render goal status. Currently uses text-based
+    // renderActiveGoalStatus (which includes tokens stat from v2.1.142).
+    // TODO: wire GoalPanel interactive component from repl.
     onDone(
       renderActiveGoalStatus(
         context.getAppState().activeGoal,
@@ -71,9 +78,12 @@ export async function call(
     return null
   }
 
-  // ant v2.1.140 4534.js:45 — gate /goal when hooks are globally disabled.
+  // ant v2.1.142 baH: gate /goal when hooks are globally disabled.
   // /goal installs a Stop hook; if hooks can't fire, the goal never resolves
   // and the user sees a hanging spinner. Refuse early with a clear message.
+  // TODO: trust workspace gate — ant also checks !R8() && !O3()
+  // (isTrustedWorkspace && isRemoteMode). ccb doesn't have the
+  // same workspace-trust infrastructure yet; add when ported.
   if (shouldDisableAllHooksIncludingManaged() || shouldAllowManagedHooksOnly()) {
     logEvent('tengu_feature_sad', {
       feature_name: 'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

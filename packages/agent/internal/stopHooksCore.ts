@@ -24,6 +24,7 @@ import { readEnv } from '@claude-code/config/env'
 import { logEvent as obsLogEvent } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { removeSessionHook } from '../hooks/sessionHooks.js'
+import { getTotalOutputTokens } from '@claude-code/app-host/bootstrap/state.js'
 
 
 type StopHookResult = {
@@ -228,12 +229,14 @@ export async function* handleStopHooks(
                       condition: string
                       iterations: number
                       setAt: number
+                      tokensAtStart: number
                     }
                   }
                 ).activeGoal
                 if (activeGoal && activeGoal.condition === hookPrompt) {
                   const iterations = activeGoal.iterations + 1
                   const durationMs = Date.now() - activeGoal.setAt
+                  const tokens = getTotalOutputTokens() - activeGoal.tokensAtStart
                   try {
                     removeSessionHook(
                       toolUseContext.setAppState,
@@ -258,6 +261,7 @@ export async function* handleStopHooks(
                       reason: (result as { stopReason?: string }).stopReason,
                       iterations,
                       durationMs,
+                      tokens,
                     },
                   )
                   if (goalMet) yield goalMet
@@ -266,6 +270,7 @@ export async function* handleStopHooks(
                       promptLength: hookPrompt.length,
                       iterations,
                       durationMs,
+                      tokens,
                     })
                   } catch {
                     // telemetry sink might be uninstalled — fine

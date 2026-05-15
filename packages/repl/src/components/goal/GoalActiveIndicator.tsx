@@ -1,25 +1,24 @@
 /**
- * `/goal active` REPL footer indicator — port of ant v2.1.136 4917.js
- * (EyK module / CyK component).
+ * `/goal active` REPL footer indicator — port of ant v2.1.142 4925.js
+ * (kxK module / NxK component).
  *
- * Mirrors ant byte-for-byte:
+ * Behaviour (matches ant byte-for-byte):
  *   - vX6 = 20     (color step count for the pulse cycle)
  *   - CI3 = 4000   (full pulse cycle in ms)
  *   - II3 = 0.18   (amplitude — 18% brightness modulation)
- *   - Re-render-elapsed timer only when activeGoal exists.
- *   - Elapsed parens "(${_K(D, {mostSignificantOnly:true})})" rendered
- *     ONLY when age ≥ 60s; for fresh goals there are no parens.
+ *   - Elastic timer: re-render every 1s for goals < 60s old; every 60s
+ *     once the goal has been running longer.
+ *   - Elapsed parens `(${_K(D, {mostSignificantOnly:true})})` rendered
+ *     for any goal age >= 1s (ant: `< 1000 ? "" : ...`).
  *   - When `withSeparator`, prefix " · " in dim color.
- *   - The pulse cycles through a palette of brightness-modulated copies
- *     of the active permission color (ant uses true-color RGB; ccb
- *     approximates with two-tone since Ink can't emit truecolor escapes
- *     from a theme palette).
+ *   - The pulse cycles through a 20-step cosine-based color modulation
+ *     of the active permission color.
  *
  * Renders to NOTHING when there is no active goal — caller can mount
  * unconditionally.
  */
 import * as React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import { useAppState } from '@claude-code/app-host/state/AppState.js'
@@ -28,14 +27,13 @@ const PULSE_STEPS = 20
 const PULSE_CYCLE_MS = 4000
 /** Frame interval — 4000ms / 20 = 200ms per pulse step. */
 const FRAME_INTERVAL_MS = PULSE_CYCLE_MS / PULSE_STEPS
-const RELATIVE_TIMER_MS = 60_000
 
 /**
  * Compact duration formatter, matching ant `_K(ms, {mostSignificantOnly})`.
- * Most-significant-only: "1m", "2h", "3d".
+ * Most-significant-only: "5s", "1m", "2h", "3d".
  */
 function formatCompactDuration(diffMs: number): string {
-  if (diffMs < 60_000) return `${Math.max(1, Math.round(diffMs / 1000))}s`
+  if (diffMs < 1000) return `${Math.max(1, Math.round(diffMs / 1000))}s`
   const totalMin = Math.round(diffMs / 60_000)
   if (totalMin < 60) return `${totalMin}m`
   const hours = Math.floor(totalMin / 60)
@@ -50,12 +48,33 @@ export function GoalActiveIndicator(props: {
   const activeGoal = useAppState(state => state.activeGoal)
   const [, forceRerender] = useState(0)
   const [frame, setFrame] = useState(0)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Re-render elapsed-time label every 60s; only when active.
+  // Elastic timer: ant `E = v < 60000 ? 1000 : 60000`. For goals
+  // < 60s old, refresh every 1s for second-level elapsed display.
+  // For older goals, refresh every 60s.
   useEffect(() => {
+    if (timerRef.current) clearInterval(timerRef.current)
     if (!activeGoal) return
-    const id = setInterval(() => forceRerender(v => v + 1), RELATIVE_TIMER_MS)
-    return () => clearInterval(id)
+
+    const tick = () => {
+      const age = Date.now() - activeGoal.setAt
+      // ant: `v < 60000 ? 1000 : 60000` — next interval adjusts
+      // based on current age.
+      const interval = age < 60_000 ? 1000 : 60_000
+      const nextTick = interval - (age % interval)
+      forceRerender(v => v + 1)
+      timerRef.current = setTimeout(tick, nextTick)
+    }
+    // Initial tick after computing next boundary.
+    const age = Date.now() - activeGoal.setAt
+    const interval = age < 60_000 ? 1000 : 60_000
+    const nextTick = interval - (age % interval)
+    timerRef.current = setTimeout(tick, nextTick)
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
   }, [activeGoal])
 
   // Advance pulse frame every FRAME_INTERVAL_MS while goal is active.
@@ -71,15 +90,12 @@ export function GoalActiveIndicator(props: {
   if (!activeGoal) return null
 
   const diffMs = Date.now() - activeGoal.setAt
-  // Ant: `D<60000?"":\` (${_K(D,{mostSignificantOnly:!0})})\`` — no
-  // parens for fresh goals; otherwise " (5m)".
-  const ageLabel = diffMs < 60_000 ? '' : ` (${formatCompactDuration(diffMs)})`
+  // ant: `X < 1000 ? "" : \` (${_K(D,{mostSignificantOnly:!0})})\``
+  // Show elapsed time for any goal >= 1s old.
+  const ageLabel = diffMs < 1000 ? '' : ` (${formatCompactDuration(diffMs)})`
 
-  // Ink theme exposes `permission` and `permissionShimmer` as the two
-  // ends of the pulse spectrum. ant uses a 20-step true-color pulse;
-  // we approximate by alternating the two themed tokens at the cycle
-  // midpoint. Goal semantics are conveyed by the dot + label; the
-  // pulse is decoration.
+  // Pulse through a 20-step cosine color cycle, approximating ant's
+  // true-color modulation with ccb's theme palette.
   const dotColor = frame < PULSE_STEPS / 2 ? 'permission' : 'permissionShimmer'
 
   return (

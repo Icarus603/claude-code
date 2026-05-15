@@ -182,7 +182,7 @@ describe('renderActiveGoalStatus (ant qZ3)', () => {
   })
   test('active goal renders bullet + iter + clear line', () => {
     const out = renderActiveGoalStatus(
-      { condition: 'X', iterations: 0, setAt: Date.now() },
+      { condition: 'X', iterations: 0, setAt: Date.now(), tokensAtStart: 0 },
       [],
     )
     expect(out).toContain('● Goal: X')
@@ -195,6 +195,7 @@ describe('renderActiveGoalStatus (ant qZ3)', () => {
         condition: 'Y',
         iterations: 3,
         setAt: Date.now(),
+        tokensAtStart: 0,
         lastReason: 'still failing tests',
       },
       [],
@@ -206,7 +207,7 @@ describe('renderActiveGoalStatus (ant qZ3)', () => {
   })
   test('1 iteration = singular', () => {
     const out = renderActiveGoalStatus(
-      { condition: 'Z', iterations: 1, setAt: Date.now() },
+      { condition: 'Z', iterations: 1, setAt: Date.now(), tokensAtStart: 0 },
       [],
     )
     expect(out).toContain('1 iteration')

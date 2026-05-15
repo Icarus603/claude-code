@@ -19,6 +19,10 @@ import type {
   LocalCommandResult,
 } from '@claude-code/agent/command.js'
 import {
+  shouldDisableAllHooksIncludingManaged,
+  shouldAllowManagedHooksOnly,
+} from '@claude-code/agent/hooksConfigSnapshot.js'
+import {
   addGoalStopHook,
   buildGoalMetaMessage,
   clearGoalStopHook,
@@ -77,6 +81,21 @@ export const call: LocalCommandCall = async (
     return {
       type: 'text',
       value: `Goal condition is limited to ${GOAL_CONDITION_MAX_LENGTH} characters (got ${trimmed.length})`,
+    }
+  }
+
+  // ant v2.1.142 baH: gate /goal set behind hooks check.
+  // TODO: trust workspace gate — ant also checks !R8() && !O3()
+  // (isTrustedWorkspace && isRemoteMode). ccb doesn't have the
+  // same workspace-trust infrastructure yet; add when ported.
+  if (
+    shouldDisableAllHooksIncludingManaged() ||
+    shouldAllowManagedHooksOnly()
+  ) {
+    return {
+      type: 'text',
+      value:
+        "/goal can't run while hooks are disabled (disableAllHooks or allowManagedHooksOnly is set in settings or by policy).",
     }
   }
 

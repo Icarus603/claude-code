@@ -765,6 +765,16 @@ export type Attachment =
       warningCount: number
       sample: string
     }
+  | {
+      type: 'goal_status'
+      met: boolean
+      condition: string
+      sentinel?: boolean
+      reason?: string
+      iterations?: number
+      durationMs?: number
+      tokens?: number
+    }
 
 export type TeammateMailboxAttachment = {
   type: 'teammate_mailbox'

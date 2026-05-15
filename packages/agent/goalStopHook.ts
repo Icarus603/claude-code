@@ -59,7 +59,12 @@ import { randomUUID } from 'node:crypto'
 import { logEvent } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
+import { getTotalOutputTokens } from '@claude-code/app-host/bootstrap/state.js'
 import type { HookCommand } from '@claude-code/config/types'
+import {
+  shouldDisableAllHooksIncludingManaged,
+  shouldAllowManagedHooksOnly,
+} from './hooksConfigSnapshot.js'
 import {
   addSessionHook,
   getSessionHooks,
@@ -89,12 +94,16 @@ export type ActiveGoal = {
   setAt: number
   /** Last failure reason from a blocking Stop hook eval — ant 3973.js. */
   lastReason?: string
+  /** Cumulative output tokens at goal-set time — ant v2.1.142 nf(). */
+  tokensAtStart: number
 }
 
 /** Most-recent met-goal record, surfaced as "Last: ✔ <cond> — <stats>". */
 export type LastMetGoalRecord = {
   condition: string
   stats: string
+  /** Cumulative output tokens consumed — ant v2.1.142 nf() delta. */
+  tokens?: number
 }
 
 /**
@@ -114,6 +123,19 @@ export function isGoalClearKeyword(input: string): boolean {
  */
 export function isGoalCommandEnabled(): boolean {
   return !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_GOAL'))
+}
+
+/**
+ * Ant `PB8` hooks-gate half: returns true when hooks are globally
+ * disabled or managed-only. This check lives here (shared by all goal
+ * callers); the trust-gate check lives in the callers (command handlers,
+ * session-restore) so we don't create an import cycle with bootstrap/state.
+ */
+export function isGoalBlockedByHooksGate(): boolean {
+  return (
+    shouldDisableAllHooksIncludingManaged() ||
+    shouldAllowManagedHooksOnly()
+  )
 }
 
 /** Ant `Wj6`. Plain-text formatter for activeGoal.lastReason. */
@@ -215,13 +237,15 @@ export function addGoalStopHook(
     '',
     promptHook,
   )
-  // 3. Set AppState.activeGoal.
+  // 3. Set AppState.activeGoal — include tokensAtStart so we can compute
+  //    token consumption toward the goal (ant v2.1.142 nf() baseline).
   ctx.setAppState(prev => ({
     ...prev,
     activeGoal: {
       condition,
       iterations: 0,
       setAt: Date.now(),
+      tokensAtStart: getTotalOutputTokens(),
     } satisfies ActiveGoal,
   }))
   // 4. Append the `dYK(false, condition)` sentinel to messages so the
@@ -290,8 +314,16 @@ export function findMostRecentMetGoalStatus(
         })
       | undefined
     if (!m || m.type !== 'attachment') continue
-    const att = m.attachment
-    if (att?.type !== 'goal_status') continue
+    const att = m.attachment as {
+      type: string
+      met?: boolean
+      sentinel?: boolean
+      condition?: string
+      durationMs?: number
+      iterations?: number
+      tokens?: number
+    }
+    if (att.type !== 'goal_status') continue
     if (!att.met || att.sentinel) continue
     const stats: string[] = []
     if (att.durationMs !== undefined) {
@@ -300,11 +332,15 @@ export function findMostRecentMetGoalStatus(
     if (att.iterations !== undefined) {
       stats.push(`${att.iterations} ${pluralize(att.iterations, 'turn')}`)
     }
+    if (att.tokens !== undefined) {
+      stats.push(`${formatTokensCompact(att.tokens)} tokens`)
+    }
     const ts = (m as { timestamp?: string }).timestamp
     stats.push(formatRelativeDate(ts ? new Date(ts) : new Date()))
     return {
       condition: att.condition ?? '',
       stats: stats.join(' · '),
+      tokens: att.tokens,
     }
   }
   return null
@@ -341,9 +377,20 @@ export function renderActiveGoalStatus(
       ? 'not yet evaluated'
       : `${goal.iterations} ${pluralize(goal.iterations, 'iteration')}`
   const setLine = `set ${formatRelativeDate(new Date(goal.setAt))} · `
+  // Compute token delta from goal baseline — ant v2.1.142 nf() delta.
+  // Safe-guarded: in test environments getTotalOutputTokens may not be
+  // wired yet; skip the line rather than crashing.
+  let tokenLine: string | undefined
+  try {
+    const tokenDelta = getTotalOutputTokens() - goal.tokensAtStart
+    tokenLine = `${formatTokensCompact(tokenDelta)} tokens consumed`
+  } catch {
+    // bootstrap/state not initialised (test environment) — skip
+  }
   const lines: Array<string | false | undefined> = [
     `● Goal: ${goal.condition}`,
     `${setLine}${iter}`,
+    tokenLine,
     goal.lastReason && formatLastCheck(goal.lastReason),
     '`/goal clear` to remove',
   ]
@@ -355,7 +402,7 @@ export function renderActiveGoalStatus(
  * Verbatim ant Gj6 (v2.1.136 4513.js).
  */
 export function buildGoalMetaMessage(condition: string): string {
-  return `A session-scoped Stop hook is now active with condition: "${condition}". Briefly acknowledge the goal, then immediately start (or continue) working toward it — treat the condition itself as your directive and do not pause to ask the user what to do. The hook will block stopping until the condition holds (clearable via \`/goal clear\`).`
+  return `A session-scoped Stop hook is now active with condition: "${condition}". Briefly acknowledge the goal, then immediately start (or continue) working toward it — treat the condition itself as your directive and do not pause to ask the user what to do. The hook will block stopping until the condition holds. It auto-clears once the condition is met — do not tell the user to run \`/goal clear\` after success; that's only for clearing a goal early.`
 }
 
 // ─── session restore ────────────────────────────────────────────────────
@@ -417,6 +464,18 @@ export function restoreGoalFromTranscript(
     )
     return
   }
+  // ant v2.1.142 n06: re-check gates on restore — hooks or trust may have
+  // changed since the goal was originally set.
+  if (isGoalBlockedByHooksGate()) {
+    logEvent('tengu_feature_sad', {
+      feature_name: 'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code: 'hooks_gate' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+    setAppState(prev =>
+      prev.activeGoal === undefined ? prev : { ...prev, activeGoal: undefined },
+    )
+    return
+  }
   addSessionHook(setAppState, sessionId, 'Stop', '', {
     type: 'prompt',
     prompt: condition,
@@ -427,6 +486,7 @@ export function restoreGoalFromTranscript(
       condition,
       iterations: 0,
       setAt: Date.now(),
+      tokensAtStart: getTotalOutputTokens(),
     } satisfies ActiveGoal,
   }))
   logEvent('tengu_goal_restored_on_resume', { promptLength: condition.length })
@@ -439,10 +499,20 @@ function pluralize(n: number, base: string): string {
 }
 
 /**
+ * Compact token formatter — matches ant `r4()`. Formats cumulative
+ * output tokens in human-readable form (e.g. "2.3k", "1.2M").
+ */
+export function formatTokensCompact(tokens: number): string {
+  if (tokens >= 1_000_000) return `${(tokens / 1_000_000).toFixed(1)}M`
+  if (tokens >= 1_000) return `${(tokens / 1_000).toFixed(1)}k`
+  return String(tokens)
+}
+
+/**
  * Compact duration formatter — matches ant `_K(ms, {mostSignificantOnly:true})`.
  * Shows the largest unit only: `1h`, `42m`, `13s`, `120ms`.
  */
-function formatDurationCompact(ms: number): string {
+export function formatDurationCompact(ms: number): string {
   if (ms < 1000) return `${ms}ms`
   const s = Math.round(ms / 1000)
   if (s < 60) return `${s}s`

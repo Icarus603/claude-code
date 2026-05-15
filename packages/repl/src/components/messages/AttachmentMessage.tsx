@@ -18,6 +18,10 @@ import { UserImageMessage } from './UserImageMessage.js'
 
 import { jsonParse } from '@claude-code/local-observability/slowOperations.js'
 import { plural } from '@claude-code/output/utils/stringUtils.js'
+import {
+  formatDurationCompact,
+  formatTokensCompact,
+} from '@claude-code/agent/goalStopHook.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import {
@@ -451,6 +455,57 @@ export function AttachmentMessage({
           </Text>
         </Box>
       )
+    case 'goal_status': {
+      // ant v2.1.142 3737.js:326-364 — lifecycle sentinels (set/clear events)
+      // are invisible; real completions and "not yet met" blocks are shown.
+      if (attachment.sentinel) return null
+      const stats: string[] = []
+      if (attachment.durationMs !== undefined) {
+        stats.push(formatDurationCompact(attachment.durationMs))
+      }
+      if (attachment.iterations !== undefined) {
+        stats.push(
+          `${attachment.iterations} ${plural(attachment.iterations, 'turn')}`,
+        )
+      }
+      if (attachment.tokens !== undefined) {
+        stats.push(`${formatTokensCompact(attachment.tokens)} tokens`)
+      }
+      const statsLabel =
+        stats.length > 0 ? ` (${stats.join(' · ')})` : ''
+      return (
+        <Box flexDirection="column" marginTop={1}>
+          <Box flexDirection="row">
+            <Text>
+              {attachment.met ? (
+                <>
+                  <Text color="success">✔ </Text>
+                  Goal achieved
+                </>
+              ) : (
+                <>
+                  <Text dimColor>○ </Text>
+                  <Text dimColor>Goal not yet met… continuing</Text>
+                </>
+              )}
+            </Text>
+            {statsLabel ? <Text dimColor>{statsLabel}</Text> : null}
+          </Box>
+          <Box paddingLeft={2}>
+            <Text dimColor wrap="wrap">
+              Goal: {attachment.condition}
+            </Text>
+          </Box>
+          {attachment.reason && (
+            <Box paddingLeft={2}>
+              <Text dimColor wrap="wrap">
+                Reason: {attachment.reason}
+              </Text>
+            </Box>
+          )}
+        </Box>
+      )
+    }
     default:
       // Exhaustiveness: every type reaching here must be in NULL_RENDERING_TYPES.
       // If TS errors, a new Attachment type was added without a case above AND
@@ -465,6 +520,7 @@ export function AttachmentMessage({
         | NullRenderingAttachmentType
         | 'skill_discovery'
         | 'teammate_mailbox'
+        | 'goal_status'
       return null
   }
 }
