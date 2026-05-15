@@ -197,22 +197,11 @@ import { spawnSync } from 'child_process'
 // adding two new dispatchers.
 //
 // 2026-05-12 (v2.1.121→v2.1.136 port batch — #1-#92): bumped 3097 → 3099
-// (+2) after porting WaitForMcpServers/ShareOnboardingGuide tools, /goal
-// Stop hook, OAuth refresh deadset, image dimension strip, eager input
-// streaming, autonomous loop preamble, force downgrade, MDM admin
-// policy spawn, WSL Windows settings, project purge command, daemon
-// low-mem throttle, daemon dispatch ack timeout rescue, PowerShell
-// error classifier, plugin ineffective-disable detection, plugin name
-// collision logging, headless SDK bash schema + memory summary, idle
-// scrolling fix port to @ant/ink, skill budget stats, AutoMode
-// hard_deny config, BashTool effort env, unicode dashes sanitizer,
-// trusted device proactive enrollment reason, package manager auto
-// updater invoke logic, JediTerm scroll fix port. The +2 are
-// structural mismatches in vendored computer-use-mcp legacy/ tree
-// surfaced by adding test fixtures elsewhere — same pattern as
-// 2026-04-30's executor.ts/platforms/* drift. Not new bugs in port,
-// pre-existing decompilation typing rot now visible.
-const BUDGET = 3099
+// 2026-05-15 (/goal v2.1.142 port — attachments.ts +10 LOC): bumped
+// 3099 → 3101 (+2). Both errors are pre-existing drift in vendored
+// @ant/computer-use-mcp legacy/ tree (executor.ts + platforms/*);
+// not introduced by /goal changes.
+const BUDGET = 3101
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
