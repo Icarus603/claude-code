@@ -63,6 +63,8 @@ const STABLE_FEATURES = [
   'ULTRAPLAN',
   // P2: daemon + remote control server
   'DAEMON',
+  // Auto theme detection (match terminal background color)
+  'AUTO_THEME',
 ] as const
 
 /**

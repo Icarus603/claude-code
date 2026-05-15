@@ -14,7 +14,7 @@ from there. To make a flag default-on, add it to that array.
 invocation. Use this for flags that aren't yet stable enough to ship by
 default but you want to exercise locally.
 
-## On by default (31)
+## On by default (32)
 
 These are the production-ready features baked into every release binary
 and `bun run dev` invocation.
@@ -52,8 +52,9 @@ and `bun run dev` invocation.
 | `ULTRATHINK` | Agent | Extended-thinking turn budget bump |
 | `VERIFICATION_AGENT` | Agent | Spawn `verification` subagent after non-trivial work |
 | `VOICE_MODE` | Voice | Push-to-talk speech-to-text input |
+| `AUTO_THEME` | UI | Detect terminal background color and pick theme ('auto' option in /theme) |
 
-## Available, off by default (53)
+## Available, off by default (52)
 
 These exist as `feature('<NAME>')` gates but aren't in the stable list.
 Enable per-run with `FEATURE_<NAME>=1`.
@@ -111,7 +112,6 @@ Enable per-run with `FEATURE_<NAME>=1`.
 
 ### Settings / Updates
 - `ALLOW_TEST_VERSIONS` — Allow installing pre-release versions
-- `AUTO_THEME` — Detect terminal background and pick theme
 - `COMMIT_ATTRIBUTION` — Add Co-Authored-By to git commits
 - `DOWNLOAD_USER_SETTINGS` — Cloud-sync settings (download)
 - `SKIP_DETECTION_WHEN_AUTOUPDATES_DISABLED` — Skip update probe when disabled
