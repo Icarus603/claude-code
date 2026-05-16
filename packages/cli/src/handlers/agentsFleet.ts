@@ -63,12 +63,22 @@ export async function agentsFleetHandler(): Promise<void> {
   // skip their `EXIT_ALT_SCREEN` writes — the alt buffer stays flipped
   // through the entire transition. runAttach paints into the same
   // alt buffer (CCB_ATTACH_OWNED_ALT_SCREEN env tells it not to toggle).
+
+  // Carries the last-attached short across iterations. Source: ant 5092.js
+  // `let z = process.env.CLAUDE_AGENTS_SELECT; … z = f.job.id` — when
+  // FleetView remounts after attach, this seeds the focused row so the
+  // user lands back on the session they just left (not the default
+  // first row / "Working" group header).
+  let lastFocusedShort: string | undefined =
+    process.env.CLAUDE_AGENTS_SELECT || undefined
+
   for (;;) {
     const root = await createRoot({ exitOnCtrlC: false })
 
     const action: FleetAction = await new Promise<FleetAction>(resolve => {
       void mountFleetView({
         currentSessionId: process.env.CLAUDE_SESSION_ID ?? '',
+        initialFocusedShort: lastFocusedShort,
         root,
         onDispatch: prompt => {
           // Async-fire spawnBgPty; row surfaces via state.json polling.
@@ -98,6 +108,9 @@ export async function agentsFleetHandler(): Promise<void> {
       // chain doesn't write EXIT_ALT_SCREEN.
       instances.get(process.stdout)?.handoffAltScreen()
       process.env.CCB_ATTACH_OWNED_ALT_SCREEN = '1'
+      // Remember the attached short so the next FleetView mount can
+      // land the focus on the same row.
+      lastFocusedShort = action.short
     }
     root.render(null)
     root.unmount()

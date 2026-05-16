@@ -84,6 +84,13 @@ export interface FleetViewProps {
   prCache?: FleetPrCache
   /** Called when user submits a non-command task in the dispatch box. */
   onDispatch?: (prompt: string) => void
+  /**
+   * Initial focused job short — passed by the agentsFleet loop on
+   * remount after an attach so the user lands back on the row they
+   * just detached from, not the default "Working" header.
+   * Source: ant 5092.js Ot3 `z = f.job.id` carried across iterations.
+   */
+  initialFocusedShort?: string
 }
 
 const EXIT_ALIASES = new Set(['/exit', '/quit', 'q', 'exit', 'quit'])
@@ -98,7 +105,15 @@ interface RenameState {
 
 /** Top-level FleetView. Source: ant BdK + xd. */
 export function FleetView(props: FleetViewProps): React.ReactNode {
-  const { currentSessionId, seedJobs, onQuit, onAttach, prCache, onDispatch } = props
+  const {
+    currentSessionId,
+    seedJobs,
+    onQuit,
+    onAttach,
+    prCache,
+    onDispatch,
+    initialFocusedShort,
+  } = props
 
   const terminalWidth = useTerminalSize().columns
 
@@ -232,6 +247,25 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     collapsedGroups,
     currentSessionId,
   })
+
+  // After rows are computed, jump selection to the initialFocusedShort
+  // row exactly once on mount. ant 5092.js Ot3 carries `z = f.job.id`
+  // across loop iterations so the user lands back on the row they just
+  // detached from; ccb's loop passes the value into props and this
+  // effect resolves it to a concrete row index after the first poll.
+  const initialFocusAppliedRef = useRef(false)
+  useEffect(() => {
+    if (initialFocusAppliedRef.current) return
+    if (!initialFocusedShort) return
+    if (rows.length === 0) return
+    const idx = rows.findIndex(
+      r => r.kind === 'job' && r.job.id === initialFocusedShort,
+    )
+    if (idx >= 0) {
+      setSelectionIndex(idx)
+      initialFocusAppliedRef.current = true
+    }
+  }, [rows, initialFocusedShort])
 
   const clampedIndex = rows.length === 0 ? 0 : Math.min(selectionIndex, rows.length - 1)
   const focused = rows[clampedIndex]
@@ -774,6 +808,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       {peekOpen && focusedJob !== undefined ? (
         <Box marginTop={1}>
           <PeekPanel
+            job={focusedJob}
             value={peekDraft}
             onValueChange={setPeekDraft}
             cursorOffset={peekCursor}

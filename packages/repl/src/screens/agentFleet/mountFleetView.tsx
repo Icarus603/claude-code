@@ -62,6 +62,7 @@ export async function mountFleetView(options: MountFleetViewOptions): Promise<vo
       <AlternateScreen mouseTracking={isMouseTrackingEnabled()}>
         <FleetView
           currentSessionId={options.currentSessionId}
+          initialFocusedShort={options.initialFocusedShort}
           seedJobs={options.seedJobs}
           prCache={options.prCache}
           onAttach={options.onAttach}

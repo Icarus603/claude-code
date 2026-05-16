@@ -207,6 +207,7 @@ import { deriveStopHookSpinnerSuffix } from './repl/stopHookSpinnerSuffix.js';
 import { useSuspendResumeHandlers } from './repl/useSuspendResumeHandlers.js';
 import { useTranscriptFreeze } from './repl/useTranscriptFreeze.js';
 import { useHandleExit } from './repl/useHandleExit.js';
+import { useBgFleetStateSync } from './repl/useBgFleetStateSync.js';
 import { useRateLimitHandlers } from './repl/useRateLimitHandlers.js';
 import { useQueuedCommandOnCancel } from './repl/useQueuedCommandOnCancel.js';
 import { useStartupCallouts } from './repl/useStartupCallouts.js';
@@ -902,6 +903,12 @@ export function REPL({
   // loading is driven by queryGuard (reserve/tryStart/end/cancelReservation),
   // external loading by setIsExternalLoading.
   const isLoading = isQueryActive || isExternalLoading;
+
+  // Bg session → on-disk state.json sync so FleetView buckets rows
+  // correctly (Working → Completed when the assistant turn finishes,
+  // and back to Working on follow-up). See useBgFleetStateSync for
+  // the ant lineage (3988.js + 4835.js daemon supervisor).
+  useBgFleetStateSync(isLoading);
 
   // Elapsed time is computed by SpinnerWithVerb from these refs on each
   // animation frame, avoiding a useInterval that re-renders the entire REPL.
