@@ -110,7 +110,21 @@ export interface FleetViewProps {
   initialFocusedShort?: string
 }
 
-const EXIT_ALIASES = new Set(['/exit', '/quit', 'q', 'exit', 'quit'])
+// Source: ant 4668.js `bX6 = ["exit", "quit", ":q", ":q!", ":wq", ":wq!"]`
+// — vim-style quit aliases honored alongside the `/exit /quit` slash
+// commands so muscle-memory works. ccb adds the slash variants since
+// they're how the user explicitly invokes the slash-command.
+const EXIT_ALIASES = new Set([
+  '/exit',
+  '/quit',
+  'exit',
+  'quit',
+  'q',
+  ':q',
+  ':q!',
+  ':wq',
+  ':wq!',
+])
 
 const QUIT_CONFIRM_TIMEOUT_MS = 2000
 const DELETE_ARM_TIMEOUT_MS = 2000
