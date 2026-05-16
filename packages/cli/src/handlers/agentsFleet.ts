@@ -71,14 +71,23 @@ export async function agentsFleetHandler(): Promise<void> {
   // first row / "Working" group header).
   let lastFocusedShort: string | undefined =
     process.env.CLAUDE_AGENTS_SELECT || undefined
+  // Carries an error message from the previous attach attempt so the
+  // remounted FleetView can surface it as an errorToast. Source: ant
+  // 5092.js Ot3 `let J; … if (k.kind === "error" && !k.ended) J = k.msg`
+  // and `initialError: J` on next render.
+  let initialError: string | undefined
 
   for (;;) {
     const root = await createRoot({ exitOnCtrlC: false })
+
+    const errorForThisMount = initialError
+    initialError = undefined
 
     const action: FleetAction = await new Promise<FleetAction>(resolve => {
       void mountFleetView({
         currentSessionId: process.env.CLAUDE_SESSION_ID ?? '',
         initialFocusedShort: lastFocusedShort,
+        initialError: errorForThisMount,
         root,
         onDispatch: info => {
           // Async-fire spawnBgPty; row surfaces via state.json polling.
@@ -129,9 +138,12 @@ export async function agentsFleetHandler(): Promise<void> {
       // runAttach paints into the same alt-screen buffer we just
       // handed off. It writes `\x1b[2J\x1b[H` to clear (mirroring
       // ant's PzH() clear+home) and the inner REPL's data fills it.
-      await fleetAttach(action.short).catch(err =>
-        process.stderr.write(`attach failed: ${(err as Error).message}\n`),
-      )
+      // Capture errors into `initialError` so the next FleetView mount
+      // can surface them as a toast (matches ant Ot3's `J = k.msg`
+      // carried into the next iteration's BdK as `initialError={J}`).
+      await fleetAttach(action.short).catch(err => {
+        initialError = `attach failed — ${(err as Error).message}`
+      })
     } finally {
       delete process.env.CCB_ATTACH_OWNED_ALT_SCREEN
       // Loop top creates a fresh Ink root, AlternateScreen runs its

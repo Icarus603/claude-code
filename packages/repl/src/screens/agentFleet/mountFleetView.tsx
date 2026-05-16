@@ -63,6 +63,7 @@ export async function mountFleetView(options: MountFleetViewOptions): Promise<vo
         <FleetView
           currentSessionId={options.currentSessionId}
           initialFocusedShort={options.initialFocusedShort}
+          initialError={options.initialError}
           seedJobs={options.seedJobs}
           prCache={options.prCache}
           onAttach={options.onAttach}

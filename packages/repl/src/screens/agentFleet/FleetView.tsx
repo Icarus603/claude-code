@@ -108,6 +108,13 @@ export interface FleetViewProps {
    * Source: ant 5092.js Ot3 `z = f.job.id` carried across iterations.
    */
   initialFocusedShort?: string
+  /**
+   * Error message carried over from the previous iteration's attach
+   * attempt (e.g., daemon timeout, ENOJOB). Surfaces as a 4s toast
+   * on mount so the user sees why the attach didn't land them in
+   * a session. Source: ant 5092.js Ot3 `initialError: J` prop.
+   */
+  initialError?: string
 }
 
 // Source: ant 4668.js `bX6 = ["exit", "quit", ":q", ":q!", ":wq", ":wq!"]`
@@ -144,6 +151,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     prCache,
     onDispatch,
     initialFocusedShort,
+    initialError,
   } = props
 
   const terminalWidth = useTerminalSize().columns
@@ -191,7 +199,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const [armedDeleteId, setArmedDeleteId] = useState<string | undefined>(undefined)
   const [renameState, setRenameState] = useState<RenameState | undefined>(undefined)
   const [pendingQuitConfirm, setPendingQuitConfirm] = useState(false)
-  const [errorToast, setErrorToast] = useState<string | undefined>(undefined)
+  const [errorToast, setErrorToast] = useState<string | undefined>(initialError)
   // Dispatch buffer (ant `j_.current`) — what the user is typing.
   const [dispatchBuf, setDispatchBuf] = useState('')
   // Cursor offset within the dispatch buffer (ant `U_` / `setU` in
