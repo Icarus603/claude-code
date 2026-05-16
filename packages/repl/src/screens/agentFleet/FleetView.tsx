@@ -723,6 +723,21 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
           </Box>
         ) : null}
       </Box>
+      {/* Slash-command suggestion popup. Source: ant 5092.js
+          `ZB = vA.length>0 ? <B paddingLeft=2 marginBottom=1><SZH .../></B> : null`
+          — ABOVE the input box (just before the border), so the
+          highlight scans visually upward from the user's `/<token>` and
+          the list grows up into the row area instead of pushing the
+          footer down. */}
+      {suggestions.length > 0 ? (
+        <Box paddingLeft={2} marginBottom={1}>
+          <PromptInputFooterSuggestions
+            suggestions={suggestions}
+            selectedSuggestion={suggestionIndex}
+            maxColumnWidth={35}
+          />
+        </Box>
+      ) : null}
       {/* Dispatch input. Source: ant PN at 5092.js:3395-3419. */}
       <Box
         flexShrink={0}
@@ -744,21 +759,6 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
           />
         </Box>
       </Box>
-      {/* Slash-command suggestion popup. Source: ant 5092.js `ZB = vA.length>0
-          ? <B paddingLeft=2 marginBottom=1><SZH .../></B> : null` — rendered
-          between the row list and the input box. ccb places it AFTER the
-          input box (Box flexDirection="column" stacking) so the suggestion
-          list grows downward into the footer area, which feels more natural
-          for an inline (non-fullscreen) terminal flow. */}
-      {suggestions.length > 0 ? (
-        <Box paddingLeft={2} marginTop={1}>
-          <PromptInputFooterSuggestions
-            suggestions={suggestions}
-            selectedSuggestion={suggestionIndex}
-            maxColumnWidth={35}
-          />
-        </Box>
-      ) : null}
       {showVoiceWarmup || showVoiceIndicator || showVoiceMeter ? (
         <Box marginTop={1} flexDirection="row">
           {showVoiceWarmup ? <VoiceWarmupHint /> : null}
