@@ -146,7 +146,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // useCopyOnSelect API's "onCopied omitted → silent" mode — FleetView's
   // own footer doesn't have a notification slot wired in yet.
   const selection = useSelection()
-  useCopyOnSelect(selection, true)
+  // Surface a toast on copy. ant 5085.js jZ6: `copied N chars to
+  // clipboard` (or via tmux-buffer / OSC 52 hint depending on transport).
+  // Simpler form here — show "copied" briefly so the user knows the
+  // clipboard write went through.
+  useCopyOnSelect(selection, true, text => {
+    const n = text.length
+    setErrorToast(`copied ${n} ${n === 1 ? 'char' : 'chars'} to clipboard`)
+  })
   useSelectionBgColor(selection)
 
   // ── core UI state ──────────────────────────────────────────────────
@@ -276,13 +283,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       // already resolved an agent in the buffer; simpler heuristic here is
       // to dedupe by name).
       const q = atMatch.token.toLowerCase()
+      // Suggestion description format. Source: ant 5093.js `Bs3` →
+      // `description: ${Bs3[kind]} · ${origDesc}` — kind prefix like
+      // `background · "Investigate why test/auth..."`. Bs3:
+      //   agent  → "background"
+      //   repo   → "repo"
+      //   skill  → "skill"
+      //   routine→ "routine"
       const agentItems = agents
         .filter(a => a.agentType.toLowerCase().startsWith(q))
         .sort((a, b) => a.agentType.localeCompare(b.agentType))
         .map<SuggestionItem>(a => ({
           id: `agent:${a.agentType}`,
           displayText: `@${a.agentType}`,
-          description: a.whenToUse,
+          description: `background · ${a.whenToUse}`,
           metadata: { kind: 'agent', name: a.agentType },
         }))
       const agentNames = new Set(
@@ -298,7 +312,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         .map<SuggestionItem>(([name, path]) => ({
           id: `repo:${name}`,
           displayText: `@${name}`,
-          description: path,
+          description: `repo · ${path}`,
           metadata: { kind: 'repo', name, path },
         }))
       return [...agentItems, ...repoItems]
