@@ -654,9 +654,70 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     )
     if (idx >= 0) {
       setSelectionIndex(idx)
+      followIdRef.current = initialFocusedShort
       initialFocusAppliedRef.current = true
     }
   }, [rows, initialFocusedShort])
+
+  // ant 5092.js follow-id mechanism (refs `B_`/`l_` + Effect 16 in BdK).
+  // On every render, if `B_.current` is set, locate its row in `cH` and
+  // jump `selectionIndex` to it. This is how dispatch focuses the new
+  // row: dispatch sets `B_.current = r4` (the new short), the next
+  // render runs this layout effect which finds the row (just inserted
+  // into the inflight set or polled) and moves selection there.
+  //
+  //   useLayoutEffect(() => {
+  //     if (l_.current) { jump to header; return }
+  //     if (!B_.current) return
+  //     let W_ = B8(B_.current)
+  //     if (W_ < 0) { B_.current = null; return }
+  //     if (W_ !== o) s(W_)
+  //   })  // ← no deps array, runs every render
+  const followIdRef = useRef<string | undefined>(undefined)
+  const followGroupRef = useRef<string | undefined>(undefined)
+  useLayoutEffect(() => {
+    if (rows.length === 0) return
+    // Header follow first — when set, find header by group label.
+    if (followGroupRef.current !== undefined) {
+      const idx = rows.findIndex(
+        r => r.kind === 'header' && r.group === followGroupRef.current,
+      )
+      if (idx >= 0 && idx !== selectionIndex) setSelectionIndex(idx)
+      if (idx < 0) followGroupRef.current = undefined
+      return
+    }
+    if (followIdRef.current === undefined) return
+    const idx = rows.findIndex(
+      r => r.kind === 'job' && r.job.id === followIdRef.current,
+    )
+    if (idx < 0) {
+      // Row no longer exists (deleted / never appeared) — give up.
+      followIdRef.current = undefined
+      return
+    }
+    if (idx !== selectionIndex) setSelectionIndex(idx)
+  })
+
+  // When polling dedups an inflight row by (cwd, intent), the row's id
+  // changes from the temp `inflight-…` to the real short. Update the
+  // follow id so focus tracks the real row. ant gets this for free
+  // because its dispatch path pre-allocates the real short and S7 uses
+  // it directly; ccb generates the short inside spawnBgPty so the temp
+  // → real swap requires this lookup.
+  useEffect(() => {
+    if (followIdRef.current === undefined) return
+    const cur = followIdRef.current
+    if (!cur.startsWith('inflight-')) return
+    // Find the inflight entry currently held by follow id.
+    const stale = inflightJobs.find(j => j.id === cur)
+    if (stale === undefined) return
+    const replacement = polledJobs.find(
+      p => p.state.cwd === stale.state.cwd && p.state.intent === stale.state.intent,
+    )
+    if (replacement !== undefined) {
+      followIdRef.current = replacement.id
+    }
+  }, [polledJobs, inflightJobs])
 
   // Hyperlink click handler. Source: ant 5092.js Ot3 useLayoutEffect[]:
   //   let W_=P5.get(process.stdout); if(!W_)return;
@@ -805,9 +866,33 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
   const handleMove = useCallback(
     (delta: number): void => {
-      setSelectionIndex(prev => stepIndex(prev, delta))
+      // Source: ant 5092.js up/down handler. After moving selection,
+      // ant updates B_.current / l_.current to MATCH the new row so
+      // the per-render follow-id layout effect doesn't drag focus back:
+      //   s(l6 => {
+      //     let Dq = Id(l6, -1), K9 = cH[Dq]
+      //     if (K9?.kind === "job")    B_.current = K9.job.id; l_.current = null
+      //     else if (K9?.kind === "header") B_.current = null; l_.current = K9.group
+      //     else                        B_.current = null; l_.current = null
+      //     return Dq
+      //   })
+      setSelectionIndex(prev => {
+        const next = stepIndex(prev, delta)
+        const row = rows[next]
+        if (row?.kind === 'job') {
+          followIdRef.current = row.job.id
+          followGroupRef.current = undefined
+        } else if (row?.kind === 'header') {
+          followIdRef.current = undefined
+          followGroupRef.current = row.group
+        } else {
+          followIdRef.current = undefined
+          followGroupRef.current = undefined
+        }
+        return next
+      })
     },
-    [stepIndex],
+    [rows, stepIndex],
   )
 
   /** Source: ant wx — shift+up/down reorder. */
@@ -1089,11 +1174,23 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         },
       }
       setInflightJobs(prev => [...prev, optimisticRow])
+      // Source: ant 5092.js dispatch path — `B_.current = r4`. The
+      // follow id makes the next render (which already includes the
+      // inflight row) jump selection to this new row, so the user can
+      // immediately press right-arrow to attach. Without this, focus
+      // stays on whatever row was selected before — user has to
+      // manually navigate to the new row.
+      followIdRef.current = tempShort
+      followGroupRef.current = undefined
       // Safety net: drop after 5s even if polling never picks it up
       // (e.g. spawn failed silently). ant equivalent: failure path
       // calls dW(error) which removes from S7.
       setTimeout(() => {
         setInflightJobs(prev => prev.filter(j => j.id !== tempShort))
+        // Clear stale follow id if still pointing at this temp.
+        if (followIdRef.current === tempShort) {
+          followIdRef.current = undefined
+        }
       }, 5000)
     }
 
@@ -1671,15 +1768,36 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
                     (row.job.state.tempo === 'active' ? 'busy' : undefined)
                   : undefined
               }
-              onMouseEnter={() => setSelectionIndex(idx)}
+              onMouseEnter={() => {
+                // ant: mouse hover updates B_/l_ so the per-render
+                // follow-id effect doesn't drag focus back to the
+                // previous row.
+                setSelectionIndex(idx)
+                if (row.kind === 'job') {
+                  followIdRef.current = row.job.id
+                  followGroupRef.current = undefined
+                } else if (row.kind === 'header') {
+                  followIdRef.current = undefined
+                  followGroupRef.current = row.group
+                } else {
+                  followIdRef.current = undefined
+                  followGroupRef.current = undefined
+                }
+              }}
               onClick={() => {
                 setSelectionIndex(idx)
                 if (row.kind === 'job') {
+                  followIdRef.current = row.job.id
+                  followGroupRef.current = undefined
                   setAttachingShort(row.job.id)
                   onAttach?.(row.job.id)
                 } else if (row.kind === 'header') {
+                  followIdRef.current = undefined
+                  followGroupRef.current = row.group
                   handleToggleCollapse(row.group)
                 } else if (row.kind === 'fold') {
+                  followIdRef.current = undefined
+                  followGroupRef.current = undefined
                   handleExpandFold(row.group)
                 }
               }}
