@@ -53,6 +53,10 @@ interface BgMeta {
 interface FleetState {
   cwd?: string
   respawnFlags?: readonly string[]
+  /** Optional display name (ant `name` field — set via /rename). */
+  name?: string
+  /** Initial dispatch prompt — fallback when name is missing. */
+  intent?: string
 }
 
 function readMeta(short: string): BgMeta | null {
@@ -91,6 +95,13 @@ export async function fleetAttach(short: string): Promise<void> {
 
   const ptySocketPath = meta?.ptySocket ?? join(jobDir, 'pty.sock')
   const hasLivePty = existsSync(ptySocketPath)
+
+  // Source: ant 5092.js Ot3 — `process.stdout.write(dD(ZY.SET_TITLE_AND_ICON,
+  // vZ6(f.job.state, true)))` updates the terminal window/tab title to
+  // the job's label whenever an attach launches. Lets users tell tabs
+  // apart at a glance (`hi (a31abc44)` instead of `bash`).
+  const labelForTitle = (state?.name ?? state?.intent ?? short).trim() || short
+  process.stdout.write(`\x1b]0;${labelForTitle.slice(0, 80)}\x07`)
 
   if (hasLivePty) {
     try {
