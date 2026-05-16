@@ -51,6 +51,18 @@ export interface UseFleetRowsArgs {
   presence: Map<string, FleetPresence>
   prCache: FleetPrCache | undefined
   collapsedGroups: ReadonlySet<string>
+  /**
+   * Groups where the user clicked the fold row to "show all". Source:
+   * ant `M_` set — used to skip the doneFoldCap clamp once the user
+   * has explicitly asked to see everything in that bucket.
+   */
+  expandedFolds: ReadonlySet<string>
+  /**
+   * Terminal height in rows. Source: ant `__ = kdK(CH)` where CH is
+   * `s6().rows`. The done-fold cap is computed from this, NOT from the
+   * item count.
+   */
+  terminalRows: number
   /** Foreground session id — separates "Pinned" pseudo-group anchor. */
   currentSessionId?: string
   /** When set, restrict to jobs whose spawnOrigin is inside this cwd. */
@@ -110,6 +122,8 @@ export function useFleetRows({
   presence,
   prCache,
   collapsedGroups,
+  expandedFolds,
+  terminalRows,
   currentSessionId,
   scopedCwd,
 }: UseFleetRowsArgs): UseFleetRowsResult {
@@ -195,7 +209,54 @@ export function useFleetRows({
 
       if (collapsed) continue
 
-      const visible = group === 'done' ? items.slice(0, doneFoldCap(items.length)) : items
+      // Done-bucket fold logic. Source: ant 5092.js verbatim:
+      //
+      //   let BS = 1/0;
+      //   if (zA && !M_.has("done")) {
+      //     let W_ = O$.filter(b => Lj.get(b.id) === "done");
+      //     if (W_.length >= __ + AdK) {                       // cap + 3
+      //       let B6 = d => fR_(d.state, "done"),              // sort-key (ms)
+      //           M8 = B6(W_[__-1]),                           // boundary ts
+      //           l6 = __;
+      //       while (l6 < W_.length && M8 - B6(W_[l6]) < Ws3)  // extend 60s window
+      //         l6++;
+      //       if (W_.length - l6 >= AdK && ...) BS = l6        // still ≥3 hidden
+      //     }
+      //   }
+      //
+      // Constants: AdK = 3, Ws3 = 60_000 ms, kdK(terminalRows) for cap.
+      //
+      // The 60s clustering keeps recent batches together — 10 sessions
+      // completed within 60s of each other all stay visible. Sparse
+      // older history compresses into the fold.
+      const AdK = 3
+      const Ws3 = 60_000
+      const cap = doneFoldCap(terminalRows)
+      let foldBoundary = items.length // default: no fold
+      const foldEligible =
+        groupMode === 'state' &&
+        group === 'done' &&
+        !expandedFolds.has(group) &&
+        items.length >= cap + AdK
+      if (foldEligible) {
+        const sortKey = (it: { job: FleetJob }): number => {
+          const s = it.job.state
+          if (s.stateSortOrder !== undefined) return s.stateSortOrder
+          return Date.parse(s.firstTerminalAt ?? s.updatedAt)
+        }
+        const boundaryTs = sortKey(items[cap - 1]!)
+        let boundary = cap
+        while (
+          boundary < items.length &&
+          boundaryTs - sortKey(items[boundary]!) < Ws3
+        ) {
+          boundary++
+        }
+        if (items.length - boundary >= AdK) {
+          foldBoundary = boundary
+        }
+      }
+      const visible = items.slice(0, foldBoundary)
       for (const item of visible) {
         rows.push({ kind: 'job', group, job: item.job, activity: item.activity })
       }

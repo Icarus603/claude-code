@@ -1,23 +1,44 @@
 /**
- * Peek panel — full job summary + child rows + output sections + reply input.
+ * Peek panel — full job summary + child rows + outputs + reply input.
  *
- * Source: ant 5092.js gs3 (15454-22000+). ant's peek panel renders 4
- * stacked sections (all conditional on `job.state` shape):
+ * Source: ant 5092.js `gs3` (verbatim port). The panel renders a single
+ * `<Box borderStyle="round" borderDimColor paddingX={1} minHeight={5}>`
+ * containing a flexible vertical column. Below the box, the footer chord
+ * cascade (`U_` in ant) is rendered as a sibling, NOT inside the box.
  *
- *   1. Age + detail / needs (only when no children/outputs)
- *   2. Child rows — PR/issue links with status icons + diff stats
- *   3. Output sections — one block per named output (state.output)
- *   4. Questions panel (when tempo==='blocked' && block.questions)
- *      OR a `needs` block when waiting for input
- *   5. Reply input box at the bottom (bash-mode toggle: type `!`)
+ * Render sections (top to bottom inside the bordered box):
  *
- * Previous ccb cut rendered ONLY (5) — user reported "完全空 + 一個
- * reply box". This rewrite ports the data sections so peek shows the
- * session's recent output and what it's waiting on.
+ *   1. **Age + detail header** (`u_`) — renders ONLY when no children,
+ *      no outputs, and no needs (`RH === false`). Shape:
+ *         <Text color={tempoColor}>{age}</Text> {flatDetail}
+ *      In our screenshot: "2h hi" — the dim trailing "hi" is the
+ *      flattened state.detail (last assistant text via the worker's
+ *      detail-summary writer). No template prefix, no second line.
  *
- * The reply input remains the focus owner — keyboard cascade still
- * goes through FleetView's main `useInput`, which routes peek-typed
- * characters into `peekDraft` via the existing TextInput.
+ *   2. **Children** (`c_`) — PR/issue/frame child rows. Each row:
+ *      glyph (colored ●/◐) + truncated label + diffStat + status badges.
+ *
+ *   3. **Outputs** (`WH`) — named output sections. Filtered to skip any
+ *      entry whose value already appears verbatim in a child label
+ *      (avoids duplicating PR titles).
+ *
+ *   4. **Needs / Questions** (`CH`) — when `state.tempo==="blocked"`,
+ *      shows `state.block.questions` as a structured prompt; otherwise
+ *      `state.needs` as a flat wrap-text block.
+ *
+ *   5. Flex spacer (`__`) — pushes the reply input to the bottom of the
+ *      bordered box even when the rest is sparse, hitting `minHeight=5`.
+ *
+ *   6. **Reply input** (`bH`) — single PromptInput-style text field.
+ *
+ *   7. **Reply error** (`j_`) — red dim-text below input on send failure.
+ *
+ * Below the box, ant renders `U_` — the footer chord cascade:
+ *   reply empty + not bash:  "enter to resume · space to close · ctrl+x to delete"
+ *   reply has text:          "enter to send · escape to close · ctrl+x to delete"
+ *   renaming:                "enter to save · escape to cancel"
+ *
+ * Where "resume" vs "open" hinges on `qi8(state)` (needsRespawn).
  */
 
 import type React from 'react'
@@ -26,6 +47,9 @@ import { Box, Text, type Theme } from '@anthropic/ink'
 
 import type { FleetJob } from '@claude-code/agent/background/fleet/fleetTypes.js'
 import TextInput from '../../../components/TextInput.js'
+
+import { needsRespawn } from '../helpers/needsRespawn.js'
+import { flattenDetail } from '../helpers/flattenDetail.js'
 
 export interface PeekPanelProps {
   /** Focused job — drives all summary/output/child rendering. */
@@ -40,16 +64,20 @@ export interface PeekPanelProps {
   onCursorChange: (offset: number) => void
   /** Submit handler — called with the trimmed draft (only when non-empty). */
   onSubmit: (text: string) => void
-  /** Close handler — called on enter-on-empty. */
+  /** Close handler — called on enter-on-empty (= resume/attach in ant). */
   onClose: () => void
+  /** Resume / attach handler — fired by Enter on empty buffer (ant `z`). */
+  onResume?: () => void
   /** Terminal column width for input wrapping. */
   columns: number
   /** Optional placeholder shown when value is empty. */
   placeholder?: string
+  /** Recent reply error (rendered as `j_` below the input). */
+  replyError?: string
 }
 
 /**
- * Compute age label from updatedAt. Source: ant gs3 `v = HK(L, {mostSignificantOnly:!0})`
+ * Age label from updatedAt. Source: ant gs3 `v = HK(L, {mostSignificantOnly:!0})`
  * — short relative timestamp like "1m", "2h", "3d".
  */
 function formatAge(updatedAt: string): string {
@@ -68,7 +96,6 @@ function tempoColor(job: FleetJob): keyof Theme {
   const t = job.state.tempo
   if (t === 'blocked') return 'error'
   if (t === 'active') return 'warning'
-  if (t === 'idle') return 'text'
   return 'text'
 }
 
@@ -80,130 +107,173 @@ export function PeekPanel({
   onCursorChange,
   onSubmit,
   onClose,
+  onResume,
   columns,
   placeholder = 'reply',
+  replyError,
 }: PeekPanelProps): React.ReactNode {
+  // ant onExit: empty buffer → onResume (attach); non-empty → onSubmit.
   const handleSubmit = useCallback(
     (submitted: string) => {
       const trimmed = submitted.trim()
       if (trimmed === '') {
-        onClose()
+        if (onResume !== undefined) onResume()
+        else onClose()
         return
       }
       onSubmit(trimmed)
     },
-    [onClose, onSubmit],
+    [onClose, onResume, onSubmit],
   )
 
   const age = formatAge(job.state.updatedAt)
   const color = tempoColor(job)
 
-  // Child rows. ant `c_` = `gH = w.slice(0, dH)` mapped to `<B>{icon}{label}{diff}{status}</B>`.
-  // For ccb's first cut: render kind/label only (no diff stat / status icons yet — those
-  // come from the prCache pipeline which the user isn't focused on right now).
+  // Children/outputs/needs presence — ant `RH = w.length>0 || KH.length>0
+  // || !!q.state.needs`. When RH is false, render the "u_" header line.
   const children = job.state.children ?? []
+  const allOutputs = Object.entries(job.state.output ?? {})
+  // Drop outputs already covered by child labels (ant t = ...).
+  const childLabels = children
+    .filter(c => c.label !== undefined)
+    .map(c => c.label as string)
+  const outputs = allOutputs.filter(([, v]) => {
+    return !childLabels.some(label => {
+      const idx = v.indexOf(label)
+      return (
+        idx >= 0 &&
+        !/\w/.test(v[idx + label.length] ?? '') &&
+        v.length - label.length < 16
+      )
+    })
+  })
+  const hasNeeds = job.state.needs !== undefined && job.state.needs !== ''
+  const RH = children.length > 0 || outputs.length > 0 || hasNeeds
 
-  // Named outputs. ant `WH = KH.map(...)` — Object.entries(state.output)
-  // filtered to drop entries already covered by child labels.
-  const outputs = Object.entries(job.state.output ?? {})
-
-  // Has anything to show above the reply input?
-  const hasContent =
-    children.length > 0 ||
-    outputs.length > 0 ||
-    !!job.state.needs ||
-    !!job.state.detail
+  // Footer chord — ant `U_`.
+  //   reply text non-empty             → "enter to send · escape to close · ctrl+x to delete"
+  //   reply text empty + needs respawn → "enter to resume · space to close · ctrl+x to delete"
+  //   reply text empty + alive         → "enter to open · space to close · ctrl+x to delete"
+  const hasReply = value.trim() !== ''
+  const enterChord = hasReply
+    ? 'enter to send'
+    : needsRespawn(job)
+      ? 'enter to resume'
+      : 'enter to open'
+  const closeChord = hasReply ? 'escape to close' : 'space to close'
 
   return (
-    <Box
-      borderStyle="round"
-      paddingX={1}
-      paddingY={0}
-      borderColor={color}
-      flexDirection="column"
-    >
-      {/* (1) Age + state summary line. Always rendered. */}
-      <Box>
-        <Text color={color}>{age}</Text>
-        <Text> </Text>
-        <Text dimColor>{job.state.template}</Text>
-        {job.state.intent ? (
-          <>
-            <Text dimColor> · </Text>
-            <Text wrap="truncate-end">{job.state.intent}</Text>
-          </>
+    <Box flexDirection="column">
+      {/* The bordered peek box. ant `w_` = root <Box ...>{u_, c_, WH, CH, __, bH, j_}</Box>. */}
+      <Box
+        flexDirection="column"
+        borderStyle="round"
+        borderDimColor
+        paddingX={1}
+        minHeight={5}
+        width="100%"
+      >
+        {/* (1) u_ — age + flat-detail header. Only when RH=false. */}
+        {!RH ? (
+          <Box maxHeight={5} overflowY="hidden">
+            <Text wrap="wrap">
+              <Text color={color}>{age}</Text>
+              {job.state.detail !== undefined && job.state.detail !== '' ? (
+                <Text> {flattenDetail(job.state.detail)}</Text>
+              ) : null}
+            </Text>
+          </Box>
+        ) : null}
+
+        {/* (2) c_ — child PR/frame rows. */}
+        {children.length > 0 ? (
+          <Box flexDirection="column">
+            {children.slice(0, 8).map(child => (
+              <Box key={child.href}>
+                <Box width={2} flexShrink={0}>
+                  <Text dimColor>·</Text>
+                </Box>
+                <Box flexGrow={1} width={0}>
+                  <Text wrap="truncate">{child.label ?? child.href}</Text>
+                </Box>
+              </Box>
+            ))}
+            {children.length > 8 ? (
+              <Box paddingLeft={2}>
+                <Text dimColor>… {children.length - 8} more</Text>
+              </Box>
+            ) : null}
+          </Box>
+        ) : null}
+
+        {/* (3) WH — named outputs (filtered). */}
+        {outputs.length > 0 ? (
+          <Box flexDirection="column" marginTop={children.length > 0 ? 1 : 0}>
+            {outputs.map(([name, text]) => (
+              <Box key={name}>
+                {outputs.length > 1 ? (
+                  <Box flexShrink={0} paddingRight={1}>
+                    <Text dimColor>{name}</Text>
+                  </Box>
+                ) : null}
+                <Box flexGrow={1} width={0} maxHeight={5} overflowY="hidden">
+                  <Text wrap="wrap">
+                    <Text color={color}>{age}</Text> {flattenDetail(text)}
+                  </Text>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        ) : null}
+
+        {/* (4) CH — needs / questions. */}
+        {hasNeeds ? (
+          <Box
+            marginTop={children.length > 0 || outputs.length > 0 ? 1 : 0}
+            maxHeight={5}
+            overflowY="hidden"
+          >
+            <Text wrap="wrap">
+              <Text color={color}>{age}</Text>{' '}
+              <Text>{flattenDetail(job.state.needs ?? '')}</Text>
+            </Text>
+          </Box>
+        ) : null}
+
+        {/* (5) flex spacer — fills bordered box to minHeight=5. */}
+        <Box flexGrow={1} />
+
+        {/* (6) bH — reply input. */}
+        <Box marginTop={1}>
+          <Text color={color}>{'> '}</Text>
+          <TextInput
+            value={value}
+            onChange={onValueChange}
+            cursorOffset={cursorOffset}
+            onChangeCursorOffset={onCursorChange}
+            onSubmit={handleSubmit}
+            placeholder={placeholder}
+            focus={true}
+            multiline={true}
+            columns={Math.max(columns - 6, 20)}
+          />
+        </Box>
+
+        {/* (7) j_ — reply error. */}
+        {replyError !== undefined && replyError !== '' ? (
+          <Box>
+            <Text color="error" dimColor wrap="truncate">
+              {replyError}
+            </Text>
+          </Box>
         ) : null}
       </Box>
 
-      {/* (2) Children — PR/issue links from `state.children`. */}
-      {children.length > 0 ? (
-        <Box flexDirection="column" marginTop={1}>
-          {children.slice(0, 8).map(child => (
-            <Box key={child.href}>
-              <Box width={2} flexShrink={0}>
-                <Text dimColor>·</Text>
-              </Box>
-              <Box flexGrow={1} width={0}>
-                <Text wrap="truncate">{child.label ?? child.href}</Text>
-              </Box>
-            </Box>
-          ))}
-          {children.length > 8 ? (
-            <Box paddingLeft={2}>
-              <Text dimColor>… {children.length - 8} more</Text>
-            </Box>
-          ) : null}
-        </Box>
-      ) : null}
-
-      {/* (3) Named outputs — primary content the user wants to peek at. */}
-      {outputs.length > 0 ? (
-        <Box flexDirection="column" marginTop={children.length > 0 ? 1 : 1}>
-          {outputs.map(([name, text]) => (
-            <Box key={name} flexDirection="column" marginTop={1}>
-              {outputs.length > 1 ? (
-                <Text dimColor>{name}</Text>
-              ) : null}
-              <Box maxHeight={6} overflowY="hidden">
-                <Text wrap="wrap">{text}</Text>
-              </Box>
-            </Box>
-          ))}
-        </Box>
-      ) : null}
-
-      {/* (4) Needs / detail. ant: `state.needs` shown as blocked-input prompt
-          when non-empty AND no questions panel; else `state.detail` as
-          neutral status line when there are no other sections. */}
-      {job.state.needs ? (
-        <Box marginTop={hasContent ? 1 : 0} maxHeight={4} overflowY="hidden">
-          <Text wrap="wrap">
-            <Text color={color}>↳ </Text>
-            <Text>{job.state.needs}</Text>
-          </Text>
-        </Box>
-      ) : !children.length && !outputs.length && job.state.detail ? (
-        <Box marginTop={1}>
-          <Text dimColor wrap="wrap">
-            {job.state.detail}
-          </Text>
-        </Box>
-      ) : null}
-
-      {/* (5) Reply input — bottom row. */}
-      <Box marginTop={hasContent ? 1 : 0}>
-        <Text color={color}>{'> '}</Text>
-        <TextInput
-          value={value}
-          onChange={onValueChange}
-          cursorOffset={cursorOffset}
-          onChangeCursorOffset={onCursorChange}
-          onSubmit={handleSubmit}
-          placeholder={placeholder}
-          focus={true}
-          multiline={true}
-          columns={Math.max(columns - 6, 20)}
-        />
+      {/* U_ — footer chord cascade rendered OUTSIDE the box, paddingLeft=2. */}
+      <Box paddingLeft={2}>
+        <Text dimColor>
+          {enterChord} · {closeChord} · ctrl+x to delete
+        </Text>
       </Box>
     </Box>
   )

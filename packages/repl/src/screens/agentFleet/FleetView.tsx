@@ -249,7 +249,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     initialError,
   } = props
 
-  const terminalWidth = useTerminalSize().columns
+  const terminalSize = useTerminalSize()
+  const terminalWidth = terminalSize.columns
+  const terminalRows = terminalSize.rows
+  // ant `M_` — groups where the user clicked "… N more" to expand.
+  // Once expanded, the done-fold logic skips this group.
+  const [expandedFolds, setExpandedFolds] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  )
 
   // Banner data — self-resolved from ccb state (ant 5092.js:3210-3215).
   const model = useMainLoopModel()
@@ -567,6 +574,8 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     presence,
     prCache,
     collapsedGroups,
+    expandedFolds,
+    terminalRows,
     currentSessionId,
   })
 
@@ -868,10 +877,15 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   }, [])
 
   const handleExpandFold = useCallback((group: string): void => {
-    setCollapsedGroups(prev => {
-      if (!prev.has(group)) return prev
+    // Source: ant 5092.js fold-row click handler:
+    //   J_(W_ => new Set(W_).add(group))
+    // where J_ is `setExpandedFolds`. Adds the group to the "user
+    // wants to see all of this bucket" set; useFleetRows then skips
+    // the done-fold clamp for that group. NOT related to collapsedGroups.
+    setExpandedFolds(prev => {
+      if (prev.has(group)) return prev
       const next = new Set(prev)
-      next.delete(group)
+      next.add(group)
       return next
     })
   }, [])
@@ -1513,6 +1527,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             onCursorChange={setPeekCursor}
             onSubmit={handlePeekSubmit}
             onClose={handlePeekClose}
+            // ant gs3 `onExit: () => if (empty && prompt) z()` where z =
+            // onAttach. So enter-on-empty in the peek = resume/attach to
+            // the session, not close. Wire onResume to onAttach handler.
+            onResume={() => {
+              handlePeekClose()
+              setAttachingShort(focusedJob.id)
+              onAttach?.(focusedJob.id)
+            }}
             columns={terminalWidth}
           />
         </Box>
