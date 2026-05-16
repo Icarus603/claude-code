@@ -265,7 +265,59 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const { version, cwd: cwdLabel } = getLogoDisplayData()
   const versionLabel = `v${version}`
 
-  const { jobs, presence, refresh: refreshJobs } = useFleetPolling(seedJobs)
+  const { jobs: polledJobs, presence, refresh: refreshJobs } = useFleetPolling(seedJobs)
+  // Optimistic in-flight rows (ant `S7` / Wj). On dispatch, push a row
+  // with the user's intent immediately so the user sees feedback the
+  // moment they press Enter — no polling lag. Once the polled jobs
+  // include this id, the merge filter drops the in-flight entry.
+  //
+  // Source: ant 5092.js BdK:
+  //   let [S7, Wj] = n8.useState([])
+  //   ...
+  //   let bN = S7.filter(W_ => !J3.some(B6 => B6.id === W_.id))
+  //   let aK = bN.length > 0 ? XR_([...bN, ...J3]) : J3
+  //   ...
+  //   useEffect(() => {  // cleanup when polled catches up
+  //     if (S7.length === 0 || !w) return
+  //     let matched = S7.filter(M8 => w.some(l6 => l6.id === M8.id))
+  //     if (matched.length === 0) return
+  //     ...for each matched, mark sessionId in cf (clear-cache),
+  //     ...Wj(set => set.filter(l6 => !matched.has(l6.id))),
+  //   }, [S7, w])
+  const [inflightJobs, setInflightJobs] = useState<readonly FleetJob[]>([])
+  // Merge: drop inflight entries whose intent+cwd matches a polled row
+  // (polling has caught up to the optimistic insertion). Since ccb's
+  // spawnBgPty generates the real short internally we can't match by id,
+  // so we match by (intent, cwd) heuristic — sufficient because the
+  // user can't dispatch two identical intents in the same cwd within
+  // the 5-second safety-net window.
+  const jobs = useMemo(() => {
+    if (inflightJobs.length === 0) return polledJobs
+    const polledKeys = new Set(
+      polledJobs.map(j => `${j.state.cwd}\x00${j.state.intent}`),
+    )
+    const pending = inflightJobs.filter(
+      j => !polledKeys.has(`${j.state.cwd}\x00${j.state.intent}`),
+    )
+    if (pending.length === 0) return polledJobs
+    return [...pending, ...polledJobs]
+  }, [polledJobs, inflightJobs])
+  // Garbage-collect inflight entries once polling picks them up.
+  useEffect(() => {
+    if (inflightJobs.length === 0) return
+    const polledKeys = new Set(
+      polledJobs.map(j => `${j.state.cwd}\x00${j.state.intent}`),
+    )
+    const toRemove = inflightJobs.filter(j =>
+      polledKeys.has(`${j.state.cwd}\x00${j.state.intent}`),
+    )
+    if (toRemove.length === 0) return
+    setInflightJobs(prev =>
+      prev.filter(
+        j => !polledKeys.has(`${j.state.cwd}\x00${j.state.intent}`),
+      ),
+    )
+  }, [polledJobs, inflightJobs])
   const actions = useFleetActions({ currentSessionId })
 
   // Copy-on-select wiring. Source: ant 5092.js FleetView body —
@@ -991,6 +1043,60 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       .trim()
     // Bare leading word may name an agent. ant: "let J = ... ; let D = $
     // ? undefined : _.find(M => M.name.toLowerCase() === J)".
+    // Optimistic row builder — ant 5092.js:
+    //   let b3 = {
+    //     id: r4,                          // short id
+    //     state: _7H({                     // _7H = default-state factory
+    //       template: L9.routine ? {name:L9.routine, description:""} : L9.template,
+    //       intent: OK,
+    //       sessionId: R1,
+    //       cwd: NT,
+    //       originCwd: NT
+    //     }),
+    //     activity: "flowing"
+    //   }
+    //   Wj((LJ) => [...LJ, b3])
+    //
+    // ccb temp short — random UUID slice, same length as bg.generateShortId
+    // (8 hex chars). Replaced when polling picks up the real short.
+    const pushOptimistic = (intent: string, dispatchAgent?: string): void => {
+      const now = new Date().toISOString()
+      const tempShort = `inflight-${Math.random().toString(36).slice(2, 8)}`
+      const label = intent.split(/\r?\n/)[0]!.slice(0, 60).trim() || 'session'
+      const optimisticRow: FleetJob = {
+        id: tempShort,
+        activity: 'flowing',
+        state: {
+          state: 'working',
+          tempo: 'active',
+          detail: label,
+          output: null,
+          children: null,
+          linkScanOffset: 0,
+          template: dispatchAgent ?? 'bg',
+          respawnFlags: dispatchAgent ? ['--agent', dispatchAgent] : [],
+          intent,
+          name: label,
+          nameSource: 'auto',
+          initialPrompt: intent,
+          sessionId: tempShort,
+          daemonShort: tempShort,
+          cwd: cwd ?? getCwd(),
+          createdAt: now,
+          updatedAt: now,
+          firstTerminalAt: null,
+          backend: 'daemon',
+        },
+      }
+      setInflightJobs(prev => [...prev, optimisticRow])
+      // Safety net: drop after 5s even if polling never picks it up
+      // (e.g. spawn failed silently). ant equivalent: failure path
+      // calls dW(error) which removes from S7.
+      setTimeout(() => {
+        setInflightJobs(prev => prev.filter(j => j.id !== tempShort))
+      }, 5000)
+    }
+
     if (agent === undefined) {
       const space = stripped.search(/\s/)
       const firstWord = (space < 0 ? stripped : stripped.slice(0, space)).toLowerCase()
@@ -999,12 +1105,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         agent = a.agentType
         const rest = space < 0 ? '' : stripped.slice(space + 1).trim()
         markAgentUsed(agent)
+        pushOptimistic(rest, agent)
         onDispatch?.({ intent: rest, cwd, agent })
         setTimeout(() => refreshJobs(), 50)
         return
       }
     }
     if (agent !== undefined) markAgentUsed(agent)
+    pushOptimistic(stripped, agent)
     onDispatch?.({ intent: stripped, cwd, agent })
     setTimeout(() => refreshJobs(), 50)
   }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, refreshJobs, agents, worktreeRepos])
@@ -1383,8 +1491,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Return — /exit/quit aliases, accept suggestion, dispatch, or open.
-    // Source: ant 5092.js xd return branch:
+    // Return — ant 5092.js xd verbatim:
     //
     //   if (W_.key === "return") {
     //     if (!W_.shift && (W_.meta || j_.current[U_-1] === "\\")) {
@@ -1395,18 +1502,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     //     ...
     //   }
     //
-    // So shift+Enter submits; meta+Enter (Alt/Cmd+Enter) inserts newline;
-    // backslash-prefix Enter (last char before cursor is "\") inserts
-    // newline. Plain Enter submits.
+    // shift+Enter submits; meta+Enter inserts newline; backslash-prefix
+    // Enter inserts newline; plain Enter submits.
     if (key.return) {
       const cursor = Math.min(dispatchCursor, dispatchBuf.length)
       const prevChar = cursor > 0 ? dispatchBuf[cursor - 1] : undefined
       const wantsNewline =
         !key.shift && (key.meta || prevChar === '\\')
       if (wantsNewline && dispatchBuf !== '') {
-        // Insert newline at cursor. If previous char is "\", consume
-        // it (so the final intent doesn't have a literal backslash).
-        // Source: ant text input multiline path drops the trailing "\".
         setDispatchBuf(prev => {
           const c = Math.min(dispatchCursor, prev.length)
           if (prevChar === '\\') {
