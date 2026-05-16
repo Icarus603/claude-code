@@ -22,10 +22,18 @@ import type React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Text, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
 
+import { type Command, getCommands, getCommandName } from '@claude-code/command-runtime/runtime'
+import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
   useCopyOnSelect,
   useSelectionBgColor,
 } from '../../hooks/useCopyOnSelect.js'
+import {
+  generateCommandSuggestions,
+  isCommandInput,
+} from '../../suggestions/commandSuggestions.js'
+import PromptInputFooterSuggestions from '../../components/PromptInput/PromptInputFooterSuggestions.js'
+import type { SuggestionItem } from '../../components/PromptInput/PromptInputFooterSuggestions.js'
 import figures from 'figures'
 
 import { renderModelSetting } from '@claude-code/provider/model.js'
@@ -133,6 +141,62 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const [errorToast, setErrorToast] = useState<string | undefined>(undefined)
   // Dispatch buffer (ant `j_.current`) — what the user is typing.
   const [dispatchBuf, setDispatchBuf] = useState('')
+  // Slash-command suggestion state. Source: ant 5092.js `Fs3()` result +
+  // `j3`/`Rj` (selection index) — when the dispatch buffer starts with
+  // `/`, popup lists matching skills/commands; Tab/Enter accepts the
+  // currently highlighted entry.
+  const [commands, setCommands] = useState<readonly Command[]>([])
+  const [suggestionIndex, setSuggestionIndex] = useState(0)
+
+  // Load commands once on mount (and refresh whenever the cwd snapshot
+  // changes via /reload-plugins — we don't subscribe to that here, the
+  // FleetView dispatch popup just needs the snapshot the user has when
+  // they open the view).
+  useEffect(() => {
+    let cancelled = false
+    void getCommands(getCwd())
+      .then(list => {
+        if (!cancelled) setCommands(list)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Suggestion list derived from current buffer. Empty when not a
+  // slash query — ant's `Fs3` returns `suggestions: []` in that case
+  // (also covers the `slashMatch` regex path). Re-clamp the highlight
+  // index whenever the list shrinks past it.
+  const suggestions = useMemo<SuggestionItem[]>(() => {
+    if (!isCommandInput(dispatchBuf)) return []
+    return generateCommandSuggestions(dispatchBuf, commands as Command[])
+  }, [dispatchBuf, commands])
+  useEffect(() => {
+    if (suggestions.length === 0) {
+      if (suggestionIndex !== 0) setSuggestionIndex(0)
+      return
+    }
+    if (suggestionIndex >= suggestions.length) {
+      setSuggestionIndex(Math.max(0, suggestions.length - 1))
+    }
+  }, [suggestions.length, suggestionIndex])
+
+  // Accept the currently highlighted suggestion. Source: ant 5092.js
+  // `M8(vA[j3] ?? vA[0])` (Tab / Enter accept) where the suggestion is
+  // inserted via `ps3(buf, sigil, name)` — replace the trailing
+  // `/<token>` (or `@<token>`) with `<sigil><name> `.
+  const acceptSuggestion = useCallback(() => {
+    const pick = suggestions[suggestionIndex] ?? suggestions[0]
+    if (!pick) return false
+    // SuggestionItem.metadata is Command when generated from
+    // generateCommandSuggestions; fall back to displayText otherwise.
+    const meta = pick.metadata as Command | undefined
+    const name = meta ? getCommandName(meta) : pick.displayText.replace(/^[/@]/, '')
+    setDispatchBuf(prev => prev.replace(/[@/]\S*$/, `/${name} `))
+    setSuggestionIndex(0)
+    return true
+  }, [suggestions, suggestionIndex])
 
   // Auto-clear armed-delete after 2s — ant `mJ(() => oK(null), tq ? 2000 : null, [tq])`.
   useEffect(() => {
@@ -447,6 +511,10 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         setHelpOpen(false)
         return
       }
+      // ant 5092.js: closing the suggestion popup is a step before
+      // clearing the buffer (`if (vA.length > 0) { Kz(false); return }`
+      // analogue — ccb's popup auto-clears when buffer no longer
+      // matches, so simply clearing the buffer collapses both).
       if (dispatchBuf !== '') {
         setDispatchBuf('')
         return
@@ -457,6 +525,12 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       }
       handleQuit()
       return
+    }
+
+    // Tab — accept the highlighted slash suggestion. ant 5092.js:
+    //   if (W_.key === "tab") { if (vA.length > 0) M8(vA[j3] ?? vA[0]) }
+    if (key.tab) {
+      if (suggestions.length > 0 && acceptSuggestion()) return
     }
 
     // Most keys close the help overlay (mirrors ant 2803-2810).
@@ -494,14 +568,25 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Up / Ctrl+P — row up.
+    // Up / Ctrl+P — navigate suggestion popup when visible, else row up.
+    // Source: ant 5092.js `if (W_.key === "up" ...) { if (vA.length > 0)
+    //   { Rj((l6) => Math.max(0, l6 - 1)); return } }` — popup
+    // intercepts arrow keys before they reach the list nav.
     if (key.upArrow || (key.ctrl && input === 'p')) {
+      if (suggestions.length > 0) {
+        setSuggestionIndex(i => Math.max(0, i - 1))
+        return
+      }
       handleMove(-1)
       return
     }
 
-    // Down / Ctrl+N — row down.
+    // Down / Ctrl+N — navigate suggestion popup when visible, else row down.
     if (key.downArrow || (key.ctrl && input === 'n')) {
+      if (suggestions.length > 0) {
+        setSuggestionIndex(i => Math.min(suggestions.length - 1, i + 1))
+        return
+      }
       handleMove(1)
       return
     }
@@ -520,6 +605,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         handleQuit()
         return
       }
+      // ant 5092.js `if (vA.length > 0) { M8(vA[j3] ?? vA[0]); Kz(false); return }`
+      // — Enter with the suggestion popup open accepts the highlight
+      // and DOES NOT submit. User has to press Enter again on the
+      // expanded `/<command> ` buffer to actually run it.
+      if (suggestions.length > 0 && acceptSuggestion()) return
       handleSubmitDispatch()
       return
     }
@@ -654,6 +744,21 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
           />
         </Box>
       </Box>
+      {/* Slash-command suggestion popup. Source: ant 5092.js `ZB = vA.length>0
+          ? <B paddingLeft=2 marginBottom=1><SZH .../></B> : null` — rendered
+          between the row list and the input box. ccb places it AFTER the
+          input box (Box flexDirection="column" stacking) so the suggestion
+          list grows downward into the footer area, which feels more natural
+          for an inline (non-fullscreen) terminal flow. */}
+      {suggestions.length > 0 ? (
+        <Box paddingLeft={2} marginTop={1}>
+          <PromptInputFooterSuggestions
+            suggestions={suggestions}
+            selectedSuggestion={suggestionIndex}
+            maxColumnWidth={35}
+          />
+        </Box>
+      ) : null}
       {showVoiceWarmup || showVoiceIndicator || showVoiceMeter ? (
         <Box marginTop={1} flexDirection="row">
           {showVoiceWarmup ? <VoiceWarmupHint /> : null}
