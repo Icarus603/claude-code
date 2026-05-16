@@ -81,6 +81,22 @@ export type UseTextInputProps = {
    * (matches the "space to close" chord hint).
    */
   onSpaceOnEmpty?: () => void
+  /**
+   * Optional ref mirroring `value`. When provided, submit and "empty"
+   * predicates read from `valueRef.current` instead of the `value`
+   * prop, so a synchronous in-flight commit (e.g. paste handler
+   * setting the ref before its setState propagates through React)
+   * is visible to the very next keystroke. Mirrors ant 4208.js zZ
+   * `queryRef: G` — ant's setQuery writes G.current synchronously
+   * THEN setState; submit reads G.current, dodging React's async
+   * commit window.
+   *
+   * Without this, paste-then-Enter (e.g. ptyHost's claim sequence
+   * writes \\x1B[200~text\\x1B[201~ then \\r 10 ms later) sees a stale
+   * empty value at submit time, so the Enter no-ops and the paste
+   * content stays in the buffer.
+   */
+  valueRef?: { readonly current: string }
 }
 
 export function useTextInput({
@@ -109,7 +125,13 @@ export function useTextInput({
   dim,
   onLeftArrowOnEmpty,
   onSpaceOnEmpty,
+  valueRef,
 }: UseTextInputProps): TextInputState {
+  // Source: ant 4208.js zZ — `queryRef: G` always wins over the
+  // state prop for reads that need the latest paste-commit. ccb's
+  // PromptInput threads lastInternalInputRef through this prop.
+  const readCurrentValue = (): string =>
+    valueRef !== undefined ? valueRef.current : originalValue
   // Pre-warm the modifiers module for Apple Terminal (has internal guard, safe to call multiple times)
   if (env.terminal === 'Apple_Terminal') {
     prewarmModifiers()
@@ -278,7 +300,9 @@ export function useTextInput({
     if (env.terminal === 'Apple_Terminal' && isModifierPressed('shift')) {
       return cursor.insert('\n')
     }
-    onSubmit?.(originalValue)
+    // Read the freshest value from the ref when provided so a
+    // synchronous paste-commit doesn't race with the next Enter.
+    onSubmit?.(readCurrentValue())
   }
 
   function upOrHistoryUp() {
@@ -394,7 +418,13 @@ export function useTextInput({
         //   if (T && !ZH.shift && F.text === "") { ... T(); return F }
         // Fires the onLeftArrowOnEmpty callback when input is empty
         // and no shift modifier is held. Cursor stays at 0.
-        if (onLeftArrowOnEmpty && originalValue === '' && !key.shift) {
+        // Read from valueRef (when provided) so a paste that just
+        // committed synchronously isn't missed.
+        if (
+          onLeftArrowOnEmpty &&
+          readCurrentValue() === '' &&
+          !key.shift
+        ) {
           return () => {
             onLeftArrowOnEmpty()
             return cursor
@@ -412,7 +442,7 @@ export function useTextInput({
           if (
             onSpaceOnEmpty !== undefined &&
             input === ' ' &&
-            originalValue === ''
+            readCurrentValue() === ''
           ) {
             onSpaceOnEmpty()
             return cursor

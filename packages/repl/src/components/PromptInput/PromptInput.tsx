@@ -2882,6 +2882,13 @@ function PromptInput({
     inlineGhostText,
     inputFilter: lazySpaceInputFilter,
     onLeftArrowOnEmpty,
+    // Source: ant 4208.js zZ `queryRef: G`. ccb's lastInternalInputRef
+    // is the equivalent sync mirror — trackAndSetInput writes to it
+    // BEFORE calling onInputChange (the async setState). Threading the
+    // ref through useTextInput so submit / onLeftArrowOnEmpty /
+    // onSpaceOnEmpty read fresh values lets paste-then-Enter (and
+    // paste-then-LeftArrow) work without a setState round-trip.
+    valueRef: lastInternalInputRef,
   }
 
   const getBorderColor = (): keyof Theme => {

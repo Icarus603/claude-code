@@ -127,6 +127,7 @@ export default function TextInput(props: Props): React.ReactNode {
     dim: chalk.dim,
     onLeftArrowOnEmpty: props.onLeftArrowOnEmpty,
     onSpaceOnEmpty: props.onSpaceOnEmpty,
+    valueRef: props.valueRef,
   })
 
   return (

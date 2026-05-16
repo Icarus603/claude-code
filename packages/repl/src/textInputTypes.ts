@@ -108,6 +108,16 @@ export type BaseTextInputProps = {
   readonly onSpaceOnEmpty?: () => void
 
   /**
+   * Synchronous mirror of \`value\`. When provided, useTextInput reads
+   * submit/empty predicates from this ref instead of the \`value\` prop.
+   * Source: ant 4208.js zZ \`queryRef: G\` — ant's setQuery writes
+   * G.current SYNCHRONOUSLY then setState; submit reads G.current,
+   * dodging React's async commit window. ccb's PromptInput threads
+   * its \`lastInternalInputRef\` here.
+   */
+  readonly valueRef?: { readonly current: string }
+
+  /**
    * Optional callback to show custom message
    */
   // readonly onMessage?: (show: boolean, message?: string) => void
