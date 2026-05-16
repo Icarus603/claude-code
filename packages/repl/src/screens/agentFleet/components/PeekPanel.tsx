@@ -252,6 +252,12 @@ export function PeekPanel({
             cursorOffset={cursorOffset}
             onChangeCursorOffset={onCursorChange}
             onSubmit={handleSubmit}
+            // Source: ant 5092.js gs3 zZ instantiation:
+            //   onSpaceOnEmpty: F ? void 0 : $   // $ = onBack = close
+            // When reply buffer is empty AND not in bash mode, Space
+            // closes the peek panel — matches the "space to close"
+            // chord rendered in the footer.
+            onSpaceOnEmpty={value === '' ? onClose : undefined}
             placeholder={placeholder}
             focus={true}
             multiline={true}

@@ -100,6 +100,14 @@ export type BaseTextInputProps = {
   readonly onLeftArrowOnEmpty?: () => void
 
   /**
+   * Source: ant 4208.js zZ `onSpaceOnEmpty` — fires when Space is
+   * pressed with an empty input buffer. ccb FleetView's peek panel
+   * wires this to onBack so Space closes the peek when reply is
+   * empty (matches the "space to close" chord hint).
+   */
+  readonly onSpaceOnEmpty?: () => void
+
+  /**
    * Optional callback to show custom message
    */
   // readonly onMessage?: (show: boolean, message?: string) => void

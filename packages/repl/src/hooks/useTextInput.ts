@@ -74,6 +74,13 @@ export type UseTextInputProps = {
    * implement "return to FleetView" from inside an attached bg session.
    */
   onLeftArrowOnEmpty?: () => void
+  /**
+   * Source: ant 4208.js zZ `onSpaceOnEmpty` — fires when Space is
+   * pressed and input is empty. ccb FleetView peek panel wires this
+   * to onBack so Space closes the peek when the reply buffer is empty
+   * (matches the "space to close" chord hint).
+   */
+  onSpaceOnEmpty?: () => void
 }
 
 export function useTextInput({
@@ -101,6 +108,7 @@ export function useTextInput({
   inlineGhostText,
   dim,
   onLeftArrowOnEmpty,
+  onSpaceOnEmpty,
 }: UseTextInputProps): TextInputState {
   // Pre-warm the modifiers module for Apple Terminal (has internal guard, safe to call multiple times)
   if (env.terminal === 'Apple_Terminal') {
@@ -397,6 +405,18 @@ export function useTextInput({
         return () => cursor.right()
       default: {
         return function (input: string) {
+          // Source: ant 4208.js zZ:
+          //   if (Y && C.key === " " && m === "") { C.preventDefault(); Y(); return }
+          // Space pressed on empty buffer → fire onSpaceOnEmpty (e.g.
+          // FleetView peek panel uses this to close the peek).
+          if (
+            onSpaceOnEmpty !== undefined &&
+            input === ' ' &&
+            originalValue === ''
+          ) {
+            onSpaceOnEmpty()
+            return cursor
+          }
           switch (true) {
             // Home key
             case input === '\x1b[H' || input === '\x1b[1~':
