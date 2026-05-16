@@ -274,6 +274,14 @@ export function PeekPanel({
             onChangeCursorOffset={onCursorChange}
             onSubmit={handleSubmit}
             onSpaceOnEmpty={onClose}
+            // Source: ant 5092.js gs3 l_:
+            //   if (e_.key === "right" && !e_.shift && !o.current) {
+            //     e_.preventDefault(); z(); return  // z = onAttach
+            //   }
+            // Right arrow with empty reply buffer fires onAttach
+            // (= ccb's onResume → handlePeekClose + onAttach in
+            // FleetView). Parallel to Enter-on-empty.
+            onRightArrowOnEmpty={onResume ?? onClose}
             placeholder={placeholder}
             focus={true}
             showCursor={true}

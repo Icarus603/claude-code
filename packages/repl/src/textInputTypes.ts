@@ -100,6 +100,14 @@ export type BaseTextInputProps = {
   readonly onLeftArrowOnEmpty?: () => void
 
   /**
+   * Source: ant 5092.js gs3 onKeyDown — fires when rightArrow is
+   * pressed with an empty input buffer (no shift). ant's gs3 (peek
+   * panel) uses this to attach to the peeked job — parallel to
+   * Enter-on-empty.
+   */
+  readonly onRightArrowOnEmpty?: () => void
+
+  /**
    * Source: ant 4208.js `zZ` — fires when space is pressed with an
    * empty input buffer (no modifiers). ant's gs3 (peek panel) uses
    * this to close the peek when reply buffer is empty.

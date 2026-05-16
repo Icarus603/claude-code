@@ -76,6 +76,20 @@ export type UseTextInputProps = {
   onLeftArrowOnEmpty?: () => void
 
   /**
+   * Source: ant 5092.js gs3 onKeyDown (peek panel):
+   *   if (e_.key === "right" && !e_.shift && !o.current) {
+   *     e_.preventDefault();
+   *     if (E.current) return;
+   *     E.current = !0;
+   *     z();              // = onAttach
+   *     return;
+   *   }
+   * ant fires onAttach when the user presses right-arrow with an empty
+   * peek reply buffer. ccb uses this for the same purpose.
+   */
+  onRightArrowOnEmpty?: () => void
+
+  /**
    * Source: ant 4208.js `zZ` — fires on space when input is empty AND
    * no shift/ctrl/meta modifier is held. ant's gs3 (peek panel) passes
    * `onSpaceOnEmpty: F ? void 0 : $` (= onBack/close) so space closes
@@ -128,6 +142,7 @@ export function useTextInput({
   inlineGhostText,
   dim,
   onLeftArrowOnEmpty,
+  onRightArrowOnEmpty,
   onSpaceOnEmpty,
   valueRef,
 }: UseTextInputProps): TextInputState {
@@ -429,6 +444,19 @@ export function useTextInput({
         }
         return () => cursor.left()
       case key.rightArrow:
+        // Source: ant 5092.js gs3 l_:
+        //   if (e_.key === "right" && !e_.shift && !o.current) {
+        //     e_.preventDefault(); z(); return  // z = onAttach
+        //   }
+        // Fires onRightArrowOnEmpty when input is empty and no shift
+        // modifier is held. ant uses this in the peek panel to attach
+        // the focused job via right arrow (parallel to enter-on-empty).
+        if (onRightArrowOnEmpty && originalValue === '' && !key.shift) {
+          return () => {
+            onRightArrowOnEmpty()
+            return cursor
+          }
+        }
         return () => cursor.right()
       default: {
         return function (input: string) {

@@ -1351,11 +1351,15 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         return
       }
       // ant 5092.js xd peek branch:
-      //   if (_H && W_.ctrl && W_.key === "x") $P("x", E9)
+      //   if (_H && W_.ctrl && W_.key === "x") {
+      //     if (E9 && S7.some(l6 => l6.id === E9.id)) return    // inflight guard
+      //     $P("x", E9); return
+      //   }
       // Ctrl+X armed-delete works inside peek too — fires `handleArmDelete`
       // against the currently-peeked job. Skip when peek is owned by a job
-      // already in transition (delete during in-flight reply would race).
+      // already in transition (inflight).
       if (key.ctrl && input === 'x' && focusedJob !== undefined) {
+        if (inflightJobs.some(j => j.id === focusedJob.id)) return
         handleArmDelete()
         return
       }
@@ -1416,19 +1420,22 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Tab — accept the highlighted suggestion, OR (when buffer is
-    // empty + agents available + no suggestions yet) toggle the
-    // "show all agents" drawer. Source: ant 5092.js xd:
-    //   if (key === "tab") {
-    //     if (!j_.current && I3.length > 0) Kz(l6 => !l6)
-    //     else if (vA.length > 0) M8(vA[j3] ?? vA[0])
-    //   }
+    // Tab — Source: ant 5092.js xd verbatim ORDER:
+    //   if (!j_.current && I3.length > 0) Kz(l6 => !l6)   // ← toggle FIRST
+    //   else if (vA.length > 0) M8(vA[j3] ?? vA[0])
+    //
+    // ant prioritises drawer toggle over suggestion accept when buffer
+    // is empty + agents exist. So Tab on empty buffer with the drawer
+    // showing agents toggles the drawer OFF — doesn't accept the
+    // first agent. ccb had the order reversed: suggestions.length>0
+    // hit first because the drawer populates vA, so Tab accepted the
+    // top agent suggestion instead of closing the drawer.
     if (key.tab) {
-      if (suggestions.length > 0 && acceptSuggestion()) return
       if (dispatchBuf === '' && agents.length > 0) {
         setShowAgentsDrawer(prev => !prev)
         return
       }
+      if (suggestions.length > 0 && acceptSuggestion()) return
     }
 
     // Most keys close the help overlay (mirrors ant 2803-2810).
@@ -1442,14 +1449,26 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       setHelpOpen(false)
     }
 
-    // Shift+Up / Shift+Down — reorder.
-    if (key.shift && (key.upArrow || key.downArrow)) {
+    // Shift+Up / Shift+Down — reorder. Source: ant 5092.js xd:
+    //   if (W_.shift && (W_.key === "up" || W_.key === "down")
+    //       && vA.length === 0 && !_H) { B6(); wx(...); return }
+    // Gate on no-suggestions to avoid clobbering keyboard-nav of the
+    // popup; peek branch is earlier so !_H is implicit here.
+    if (
+      key.shift &&
+      (key.upArrow || key.downArrow) &&
+      suggestions.length === 0
+    ) {
       handleReorder(key.upArrow ? -1 : 1)
       return
     }
 
-    // Ctrl+R — rename.
+    // Ctrl+R — rename. Source: ant 5092.js xd:
+    //   if (B6(), !E9 || S7.some(l6 => l6.id === E9.id)) return
+    // Skip when no focused job OR focused row is inflight.
     if (key.ctrl && input === 'r') {
+      if (focusedJob === undefined) return
+      if (inflightJobs.some(j => j.id === focusedJob.id)) return
       handleStartRename()
       return
     }
@@ -1460,8 +1479,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Ctrl+T — pin/unpin.
+    // Ctrl+T — pin/unpin. Source: ant 5092.js xd same inflight guard
+    // pattern as Ctrl+R.
     if (key.ctrl && input === 't') {
+      if (focusedJob === undefined) return
+      if (inflightJobs.some(j => j.id === focusedJob.id)) return
       handleTogglePin()
       return
     }
@@ -1692,8 +1714,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Ctrl+X — armed delete.
+    // Ctrl+X — Source: ant 5092.js xd non-peek branch:
+    //   if (B6(), vA.length > 0) return                      // suggestions open → no-op
+    //   if (!y5 && S4?.kind==="header" && qh.length > 0) {   // header delete-all
+    //     ...
+    //   }
+    //   if (E9 && S7.some(l6 => l6.id === E9.id)) return    // inflight guard
+    //   $P("x", E9, ...)
     if (key.ctrl && input === 'x') {
+      if (suggestions.length > 0) return
+      if (
+        focusedJob !== undefined &&
+        inflightJobs.some(j => j.id === focusedJob.id)
+      )
+        return
       handleArmDelete()
       return
     }
