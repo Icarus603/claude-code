@@ -130,34 +130,44 @@ export async function agentsFleetHandler(): Promise<void> {
           const isPlainDispatch =
             info.agent === undefined || info.agent === 'claude'
           if (isPlainDispatch) {
-            // Spare's short was the value peekSpare returned, so
-            // info.short equals the spare's short. claimSpare consumes
-            // the singleton and returns it (verifying the cwd match
-            // still holds — guards a race where the spare died between
-            // peek and claim).
-            const slot = sparePool.claimSpare(cwd)
-            if (slot !== undefined && slot.short === info.short) {
-              void (async () => {
-                try {
-                  await sparePool.rewriteSpareState(
-                    slot.short,
-                    info.intent,
-                    cwd,
-                  )
-                  await sparePool.sendClaim(slot.socketPath, info.intent)
-                } catch (err) {
-                  process.stderr.write(
-                    `spare claim failed: ${(err as Error).message}\n`,
-                  )
-                } finally {
-                  ensureSpareForCwd(cwd)
-                }
-              })()
-              return
+            // Peek BEFORE claim. If FleetView's peekSpare returned a
+            // slot AND the singleton still holds the same slot, claim
+            // it. Otherwise leave the singleton untouched — happens
+            // when peekSpare returned undefined (spare not ready at
+            // dispatch time, info.short was a fresh UUID) but the
+            // spare became ready by the time the handler runs.
+            //
+            // Old code called claimSpare unconditionally and dropped
+            // the slot on mismatch — that LEAKED a freshly-ready spare
+            // by consuming the singleton without using the worker,
+            // forcing the dispatch to cold-spawn AND wasting the spare.
+            // Re-introduced the 卡頓 the spare pool was supposed to
+            // eliminate.
+            const peek = sparePool.peekSpareSlot(cwd)
+            if (peek !== undefined && peek.short === info.short) {
+              const slot = sparePool.claimSpare(cwd)
+              if (slot !== undefined) {
+                void (async () => {
+                  try {
+                    await sparePool.rewriteSpareState(
+                      slot.short,
+                      info.intent,
+                      cwd,
+                    )
+                    await sparePool.sendClaim(slot.socketPath, info.intent)
+                  } catch (err) {
+                    process.stderr.write(
+                      `spare claim failed: ${(err as Error).message}\n`,
+                    )
+                  } finally {
+                    ensureSpareForCwd(cwd)
+                  }
+                })()
+                return
+              }
             }
-            // Spare disappeared between peek and claim — cold spawn
-            // with the pre-allocated short so the row identity stays
-            // consistent with FleetView's optimistic insert.
+            // No peek match — fall through to cold spawn. The spare (if
+            // any) stays intact for the next dispatch.
           }
           // Cold path — no spare, dispatch needs a non-default agent,
           // OR spare slot got pulled out from under us.
