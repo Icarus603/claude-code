@@ -48,6 +48,7 @@ import {
 
 import { formatJobAge } from './helpers/elapsed.js'
 import { deriveBand } from './helpers/deriveBand.js'
+import { deriveChildSummaries } from './helpers/deriveChildSummaries.js'
 
 import { useFleetActions } from './hooks/useFleetActions.js'
 import { useFleetPolling } from './hooks/useFleetPolling.js'
@@ -343,7 +344,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
     onDispatch?.(text)
-  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch])
+    // Kick a refresh on the next tick so the optimistic state.json
+    // written by spawnBgPty surfaces immediately, not on the 1s poll.
+    // Mirrors ant's `Wj((LJ) => [...LJ, b3])` (5092.js:3070-3082).
+    setTimeout(() => refreshJobs(), 50)
+  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, refreshJobs])
 
   const handlePeekSubmit = useCallback(
     (text: string): void => {
@@ -577,6 +582,17 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
               collapsed={row.kind === 'header' && collapsedGroups.has(row.group)}
               renameState={renameState}
               prCache={prCache}
+              onMouseEnter={() => setSelectionIndex(idx)}
+              onClick={() => {
+                setSelectionIndex(idx)
+                if (row.kind === 'job') {
+                  onAttach?.(row.job.id)
+                } else if (row.kind === 'header') {
+                  handleToggleCollapse(row.group)
+                } else if (row.kind === 'fold') {
+                  handleExpandFold(row.group)
+                }
+              }}
             />
           ))}
         </Box>
@@ -738,6 +754,8 @@ interface RowProps {
   collapsed: boolean
   renameState: RenameState | undefined
   prCache: FleetPrCache | undefined
+  onMouseEnter: () => void
+  onClick: () => void
 }
 
 function Row({
@@ -751,21 +769,25 @@ function Row({
   collapsed,
   renameState,
   prCache,
+  onMouseEnter,
+  onClick,
 }: RowProps): React.ReactNode {
   if (row.kind === 'header') {
     return (
-      <FleetSectionHeader
-        label={row.label}
-        rowCount={row.rowCount}
-        collapsed={collapsed}
-        focused={focused}
-        width={terminalWidth}
-      />
+      <Box onMouseEnter={onMouseEnter} onClick={onClick}>
+        <FleetSectionHeader
+          label={row.label}
+          rowCount={row.rowCount}
+          collapsed={collapsed}
+          focused={focused}
+          width={terminalWidth}
+        />
+      </Box>
     )
   }
   if (row.kind === 'fold') {
     return (
-      <Box paddingLeft={2}>
+      <Box paddingLeft={2} onMouseEnter={onMouseEnter} onClick={onClick}>
         <FleetSectionHeader
           label={`… ${row.hidden} more`}
           rowCount={row.hidden}
@@ -777,25 +799,29 @@ function Row({
     )
   }
   const isCurrent = row.job.state.sessionId === currentSessionId
-  void prCache
   const renaming =
     renameState !== undefined && renameState.id === row.job.id
       ? { draft: renameState.draft, cursor: renameState.draft.length }
       : undefined
+  // Source: ant 5092.js `GBK(B9.state.children, M)` — map per-row
+  // children + PR cache into FleetJobRow's ChildRollup display data.
+  const childSummaries = deriveChildSummaries(row.job.state.children, prCache)
   return (
-    <FleetJobRow
-      state={row.job.state}
-      activity={row.activity}
-      presence={undefined}
-      isCurrentSession={isCurrent}
-      focused={focused}
-      attaching={false}
-      deleteArmed={armedDeleteId === row.job.id ? { justKilled: false } : undefined}
-      renaming={renaming}
-      childSummaries={[]}
-      age={formatJobAge(row.job)}
-      labelWidth={labelWidth}
-      ageWidth={ageWidth}
-    />
+    <Box onMouseEnter={onMouseEnter} onClick={onClick}>
+      <FleetJobRow
+        state={row.job.state}
+        activity={row.activity}
+        presence={undefined}
+        isCurrentSession={isCurrent}
+        focused={focused}
+        attaching={false}
+        deleteArmed={armedDeleteId === row.job.id ? { justKilled: false } : undefined}
+        renaming={renaming}
+        childSummaries={childSummaries}
+        age={formatJobAge(row.job)}
+        labelWidth={labelWidth}
+        ageWidth={ageWidth}
+      />
+    </Box>
   )
 }

@@ -23,10 +23,7 @@ import {
 } from '@claude-code/app-host/state/AppState.js'
 import { VoiceProvider } from '@claude-code/voice/voiceContext.js'
 
-import {
-  isFullscreenEnvEnabled,
-  isMouseTrackingEnabled,
-} from '../../fullscreen.js'
+import { isMouseTrackingEnabled } from '../../fullscreen.js'
 import { FleetView, type FleetViewProps } from './FleetView.js'
 
 export interface InkRootLike {
@@ -55,30 +52,30 @@ export interface MountFleetViewOptions extends Omit<FleetViewProps, 'onQuit'> {
  */
 export async function mountFleetView(options: MountFleetViewOptions): Promise<void> {
   return new Promise<void>(resolve => {
+    // Wrap in `<AlternateScreen>` to match ant 5092.js Kt3 +
+    // 5089.js MR_. agentsFleet.ts calls `ink.handoffAltScreen()` before
+    // unmounting this root for attach, which sets
+    // `ink.altScreenActive = false`; AlternateScreen's cleanup detects
+    // that flag and skips writing `EXIT_ALT_SCREEN`, so the buffer
+    // stays flipped across the FleetView → attach handoff (no flash).
     const fleetEl = (
-      <FleetView
-        currentSessionId={options.currentSessionId}
-        seedJobs={options.seedJobs}
-        prCache={options.prCache}
-        onAttach={options.onAttach}
-        onDispatch={options.onDispatch}
-        onQuit={() => {
-          options.root.unmount()
-          resolve()
-        }}
-      />
-    )
-    // Respect the `/tui` setting + CLAUDE_CODE_NO_FLICKER env. When
-    // fullscreen is on, wrap in <AlternateScreen> with mouse tracking
-    // (matching the main REPL's behaviour at REPLView.tsx:5585).
-    const wrapped = isFullscreenEnvEnabled() ? (
-      <AlternateScreen mouseTracking={isMouseTrackingEnabled()}>{fleetEl}</AlternateScreen>
-    ) : (
-      fleetEl
+      <AlternateScreen mouseTracking={isMouseTrackingEnabled()}>
+        <FleetView
+          currentSessionId={options.currentSessionId}
+          seedJobs={options.seedJobs}
+          prCache={options.prCache}
+          onAttach={options.onAttach}
+          onDispatch={options.onDispatch}
+          onQuit={() => {
+            options.root.unmount()
+            resolve()
+          }}
+        />
+      </AlternateScreen>
     )
     const tree = (
       <AppStateProvider initialState={getDefaultAppState()}>
-        <VoiceProvider>{wrapped}</VoiceProvider>
+        <VoiceProvider>{fleetEl}</VoiceProvider>
       </AppStateProvider>
     )
     options.root.render(tree)

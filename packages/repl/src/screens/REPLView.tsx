@@ -3845,6 +3845,44 @@ export function REPL({
 
   const handleExit = useHandleExit(setIsExiting, setExitFlow);
 
+  /**
+   * Source: ant 4991.js `onLeftArrowOnEmpty: C` — pressing left arrow
+   * with an empty prompt opens the agents view.
+   *
+   * In ccb, when the REPL is running as a bg session attached via
+   * FleetView (`CLAUDE_CODE_SESSION_KIND === 'bg'`), we emit a sentinel
+   * OSC sequence over stdout. The outer `runAttach` client scans PTY
+   * data for the sentinel and detaches — landing the user back in
+   * the FleetView (which is paused on the outer process).
+   *
+   * Standalone-REPL left-arrow → mount-FleetView (ant's `sBK`) is a
+   * separate port that requires daemon dispatch primitives ccb is still
+   * filling in; for now we no-op outside bg.
+   */
+  const handleLeftArrowOnEmpty = useCallback(() => {
+    // Source: ant 4177.js `$1H()`:
+    //   if (!PF_()) return                     // PF_() = CLAUDE_BG_BACKEND==="daemon"
+    //   let H = f4K()                          // detach message
+    //   ri({type:"detach-request", msg:H})    // daemon RPC (ccb has no daemon)
+    //   process.stdout.write(w_H(H))          // APC wire format
+    //
+    // w_H = ant 4176.js: with msg → `\x1b_cc-detach-msg;<msg>\x1b\\` + aNH; without → aNH
+    // aNH = `\x1b_cc-daemon-detach\x1b\\`
+    if (process.env.CLAUDE_CODE_SESSION_KIND === 'bg') {
+      // PTY-attached bg session: write ant's canonical APC detach
+      // sequence to stdout. The outer runAttach scans the PTY stream
+      // for it and detaches — the bg worker keeps running.
+      process.stdout.write('\x1b_cc-daemon-detach\x1b\\');
+      return;
+    }
+    if (process.env.CCB_FLEET_ATTACH_CHILD === '1') {
+      // Fresh ccb spawned by fleetAttach (agentFleetAttach.ts slow path):
+      // no PTY/daemon to detach to. Exit cleanly — the outer spawnSync
+      // returns and fleetAttach's `finally` resumes Ink.
+      process.exit(0);
+    }
+  }, []);
+
   const handleShowMessageSelector = useCallback(() => {
     setIsMessageSelectorVisible(prev => !prev);
   }, []);
@@ -5437,6 +5475,7 @@ export function REPL({
                       setHelpOpen={setIsHelpOpen}
                       insertTextRef={feature('VOICE_MODE') ? insertTextRef : undefined}
                       voiceInterimRange={voice.interimRange}
+                      onLeftArrowOnEmpty={handleLeftArrowOnEmpty}
                     />
                     <SessionBackgroundHint onBackgroundSession={handleBackgroundSession} isLoading={isLoading} />
                   </>

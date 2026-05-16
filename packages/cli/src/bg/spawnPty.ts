@@ -43,6 +43,10 @@ export function spawnPtyHost(opts: {
   flags: readonly string[]
   directive: string
   cwd: string
+  /** Suppress the "backgrounded (pty)" stdout banner. Used by FleetView
+   *  dispatch — the new job is surfaced via state.json polling, not
+   *  by writing to the terminal (which would corrupt the TUI). */
+  quiet?: boolean
 }): SpawnPtyResult {
   mkdirSync(opts.jobDir, { recursive: true })
   const socketPath = join(opts.jobDir, 'pty.sock')
@@ -100,16 +104,19 @@ export function spawnPtyHost(opts: {
   }
 
   // Pretty hint output: cyan short, dim hints (ant 4649.js tw6).
-  const d = (l: string, r: string) => chalk.dim(`  ${l.padEnd(26)}${r}`)
-  process.stdout.write(
-    [
-      `backgrounded (pty) · ${chalk.cyan(opts.short)}`,
-      d(`ccb attach ${opts.short}`, 'open in this terminal (bidirectional)'),
-      d(`ccb stop ${opts.short}`, 'stop this session (SIGTERM)'),
-      d(`ccb rm   ${opts.short}`, 'remove the job directory'),
-      '',
-    ].join('\n'),
-  )
+  // Suppressed when called from FleetView (TUI owns the screen).
+  if (opts.quiet !== true) {
+    const d = (l: string, r: string) => chalk.dim(`  ${l.padEnd(26)}${r}`)
+    process.stdout.write(
+      [
+        `backgrounded (pty) · ${chalk.cyan(opts.short)}`,
+        d(`ccb attach ${opts.short}`, 'open in this terminal (bidirectional)'),
+        d(`ccb stop ${opts.short}`, 'stop this session (SIGTERM)'),
+        d(`ccb rm   ${opts.short}`, 'remove the job directory'),
+        '',
+      ].join('\n'),
+    )
+  }
 
   // readProcStart is sync (reads /proc or runs ps); cheap enough at spawn time.
   // Imported lazily to avoid pulling daemon package into a path this file

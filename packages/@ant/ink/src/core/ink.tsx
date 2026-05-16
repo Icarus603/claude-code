@@ -1051,6 +1051,29 @@ export default class Ink {
   }
 
   /**
+   * Hand alt-screen ownership off to an external caller. Source: ant
+   * 2356.js `handoffAltScreen`:
+   *   handoffAltScreen() { this.isPaused = true; this.altScreenActive = false }
+   *
+   * Just two flags — no terminal writes. After this call:
+   *   - `isPaused` stops `onRender`, so no stale frame is flushed during
+   *     the transition out.
+   *   - `altScreenActive=false` makes `unmount()` skip its
+   *     `writeSync(1, EXIT_ALT_SCREEN)` branch, AND makes any pending
+   *     `<AlternateScreen>` cleanup detect the handoff (cleanup checks
+   *     `!ink.isAltScreenActive` and short-circuits the EXIT_ALT_SCREEN
+   *     write — see ant 5089.js MR_).
+   *
+   * Used by the FleetView attach loop (ant 5092.js Ot3 / ccb
+   * agentsFleet.ts) so the user never sees a `?1049l` followed by
+   * `?1049h` flash when transitioning FleetView → attach.
+   */
+  handoffAltScreen(): void {
+    this.isPaused = true
+    this.altScreenActive = false
+  }
+
+  /**
    * Re-assert terminal modes after a gap (>5s stdin silence or event-loop
    * stall). Catches tmux detach→attach, ssh reconnect, and laptop
    * sleep/wake — none of which send SIGCONT. The terminal may reset DEC
@@ -1723,9 +1746,23 @@ export default class Ink {
     this.unsubscribeTTYHandlers?.()
 
     // Non-TTY environments don't handle erasing ansi escapes well, so it's better to
-    // only render last frame of non-static output
-    const diff = this.log.renderPreviousOutput(this.frontFrame)
-    writeDiffToTerminal(this.terminal, optimize(diff))
+    // only render last frame of non-static output.
+    //
+    // Source: ant 2356.js unmount —
+    //   if (this.renderCalled && !this.isPaused) {
+    //     let _ = this.log.renderPreviousOutput_DEPRECATED(this.frontFrame)
+    //     LK8(this.terminal, i48(_), this.skipSyncMarkers())
+    //   }
+    //
+    // Gating on `!isPaused` matters for alt-screen handoff: when
+    // `handoffAltScreen()` set isPaused=true to transfer ownership,
+    // any final-frame write here would paint stale FleetView pixels
+    // into the alt-screen buffer that runAttach is about to take over,
+    // causing the visible intermediate flash the user reports.
+    if (!this.isPaused) {
+      const diff = this.log.renderPreviousOutput(this.frontFrame)
+      writeDiffToTerminal(this.terminal, optimize(diff))
+    }
 
     // Clean up terminal modes synchronously before process exit.
     // React's componentWillUnmount won't run in time when process.exit() is called,

@@ -68,6 +68,12 @@ export type UseTextInputProps = {
   inputFilter?: (input: string, key: Key) => string
   inlineGhostText?: InlineGhostText
   dim?: (text: string) => string
+  /**
+   * Source: ant 2462.js `to_` — fires on leftArrow when input is empty
+   * and no shift modifier is held. ccb wires this from REPLView to
+   * implement "return to FleetView" from inside an attached bg session.
+   */
+  onLeftArrowOnEmpty?: () => void
 }
 
 export function useTextInput({
@@ -94,6 +100,7 @@ export function useTextInput({
   inputFilter,
   inlineGhostText,
   dim,
+  onLeftArrowOnEmpty,
 }: UseTextInputProps): TextInputState {
   // Pre-warm the modifiers module for Apple Terminal (has internal guard, safe to call multiple times)
   if (env.terminal === 'Apple_Terminal') {
@@ -375,6 +382,16 @@ export function useTextInput({
       case key.downArrow && !key.shift:
         return downOrHistoryDown
       case key.leftArrow:
+        // Source: ant 2462.js `to_` → case "left":
+        //   if (T && !ZH.shift && F.text === "") { ... T(); return F }
+        // Fires the onLeftArrowOnEmpty callback when input is empty
+        // and no shift modifier is held. Cursor stays at 0.
+        if (onLeftArrowOnEmpty && originalValue === '' && !key.shift) {
+          return () => {
+            onLeftArrowOnEmpty()
+            return cursor
+          }
+        }
         return () => cursor.left()
       case key.rightArrow:
         return () => cursor.right()

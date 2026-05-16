@@ -92,6 +92,14 @@ export type BaseTextInputProps = {
   readonly onExitMessage?: (show: boolean, key?: string) => void
 
   /**
+   * Source: ant 2462.js `to_` (TextInput core) — fires when leftArrow
+   * is pressed with an empty input buffer (no shift). In ant this opens
+   * the agents view; ccb uses it to detach/return from a FleetView
+   * attach (REPLView wires the actual handler).
+   */
+  readonly onLeftArrowOnEmpty?: () => void
+
+  /**
    * Optional callback to show custom message
    */
   // readonly onMessage?: (show: boolean, message?: string) => void

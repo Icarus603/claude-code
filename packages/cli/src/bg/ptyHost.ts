@@ -46,6 +46,14 @@ import { createRing } from './ptyRing.js'
 
 /** Per-client writable backpressure cap; matches ant JW3. */
 const CLIENT_BACKPRESSURE_BYTES = 1024 * 1024
+/**
+ * APC detach sentinel — ant 4176.js `aNH = "\x1b_cc-daemon-detach\x1b\\"`.
+ * Must be stripped from the ring buffer so replays to new attach
+ * clients don't trigger spurious detach. Source: ant 4835.js
+ * WorkerVm.wirePty `pushRing(q.replaceAll(aNH, ""))`.
+ */
+const DETACH_APC_STR = '\x1b_cc-daemon-detach\x1b\\'
+const DETACH_APC_BUF = Buffer.from(DETACH_APC_STR)
 /** SIGTERM → SIGKILL escalation delay; matches ant 4702.js:91. */
 const SIGTERM_GRACE_MS = 5000
 
@@ -223,7 +231,17 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
       rows,
       data(_term: unknown, data: Buffer | Uint8Array): void {
         const buf = Buffer.from(data)
-        ring.push(buf)
+        // Strip APC detach sentinels from the ring so a NEW attach
+        // client that replays the ring does NOT see a stale detach
+        // and immediately disconnect. The live broadcast still sends
+        // the original bytes so currently-attached clients can react.
+        // Source: ant 4835.js WorkerVm.wirePty:
+        //   this.pushRing(q.includes(aNH) ? q.replaceAll(aNH, "") : q)
+        //   this.onStream.emit(q)
+        const ringBuf = buf.includes(DETACH_APC_BUF)
+          ? Buffer.from(buf.toString('binary').replaceAll(DETACH_APC_STR, ''), 'binary')
+          : buf
+        ring.push(ringBuf)
         if (clients.size > 0) broadcast(encodeDataFrame(buf))
       },
     })

@@ -68,8 +68,24 @@ export function AlternateScreen({
     ink?.setAltScreenActive(true, mouseTracking)
 
     return () => {
+      // Handoff detection: if the Ink instance's altScreenActive flag
+      // is ALREADY false at cleanup time, an external caller has taken
+      // ownership of the alt-screen buffer (via `ink.handoffAltScreen()`).
+      // In that case we MUST NOT write `EXIT_ALT_SCREEN` — leaving the
+      // buffer flipped is precisely the point of the handoff (no flash
+      // back to main screen across attach transitions).
+      // Source: ant 5089.js MR_ cleanup —
+      //   let J = j ? !j.isAltScreenActive : false
+      //   j?.setAltScreenActive(false)
+      //   if (J) { $(O ? ms : ""); return }
+      //   $((O ? ms : "") + KE() + (j?.hasUnmounted ? "" : Fl()))
+      const handedOff = ink ? !ink.isAltScreenActive : false
       ink?.setAltScreenActive(false)
       ink?.clearTextSelection()
+      if (handedOff) {
+        writeRaw(mouseTracking ? DISABLE_MOUSE_TRACKING : '')
+        return
+      }
       writeRaw((mouseTracking ? DISABLE_MOUSE_TRACKING : '') + EXIT_ALT_SCREEN)
     }
   }, [writeRaw, mouseTracking])

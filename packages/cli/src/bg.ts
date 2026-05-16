@@ -135,6 +135,49 @@ function writeJobMeta(meta: JobMeta): void {
 }
 
 /**
+ * Write a minimal optimistic FleetView state.json for a freshly-spawned
+ * pty session. Mirrors ant `iP6` (4774.js:93-148) — without this, the
+ * FleetView polling tick wouldn't see the row until the child REPL
+ * boots far enough to write its own state.json.
+ *
+ * The optimistic state is overwritten as soon as the child writes its
+ * real state, so any divergence (e.g. derived `name` from `intent`) is
+ * self-healing.
+ */
+async function writeOptimisticFleetState(
+  short: string,
+  opts: { directive: string; cwd: string },
+): Promise<void> {
+  const { writeJobState } = await import(
+    '@claude-code/agent/background/fleet/fleetStore.js'
+  )
+  const now = new Date().toISOString()
+  // Derive a short label from directive (first 60 chars, single line).
+  const label = opts.directive.split(/\r?\n/)[0]!.slice(0, 60).trim() || 'session'
+  await writeJobState(getJobDir(short), {
+    state: 'working',
+    tempo: 'active',
+    detail: label,
+    output: null,
+    children: null,
+    linkScanOffset: 0,
+    template: 'bg',
+    respawnFlags: [],
+    intent: opts.directive,
+    name: label,
+    nameSource: 'auto',
+    initialPrompt: opts.directive,
+    sessionId: '',
+    daemonShort: short,
+    cwd: opts.cwd,
+    createdAt: now,
+    updatedAt: now,
+    firstTerminalAt: null,
+    backend: 'daemon',
+  })
+}
+
+/**
  * Mark a job's meta.json status='stopped'. Used by the in-bg `/stop`
  * slash command (mirrors ant 4652.js _j6) — writes intent immediately
  * so `ccb ps` and the tasks panel reflect the user's stop request
@@ -383,6 +426,8 @@ export async function spawnBgPty(opts: {
   cwd: string
   /** Wait (ms) for pty.sock to appear so callers can attach right away. */
   waitForSocketMs?: number
+  /** Suppress stdout banner — used by FleetView, which owns the screen. */
+  quiet?: boolean
 }): Promise<{ short: string; socketPath: string }> {
   const { spawnPtyHost } = await import('./bg/spawnPty.js')
   const short = generateShortId()
@@ -392,8 +437,23 @@ export async function spawnBgPty(opts: {
     flags: opts.flags ?? [],
     directive: opts.directive,
     cwd: opts.cwd,
+    quiet: opts.quiet,
   })
   writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+
+  // Optimistic state.json — mirrors ant `iP6` (4774.js:93-148) which
+  // writes state.json synchronously at dispatch time so the FleetView
+  // polling tick surfaces the new row in the Working section
+  // immediately. Without this, the row would only appear once the
+  // child REPL boots far enough to write its own state.json, which
+  // can be 1-2s of "where did my session go" delay.
+  if (opts.quiet === true) {
+    void writeOptimisticFleetState(short, {
+      directive: opts.directive,
+      cwd: opts.cwd,
+    }).catch(() => {})
+  }
+
   {
     const m = await import('./bg/agentActionEvent.js')
     m.emitAgentAction('spawn', short, { mode: 'pty' })

@@ -1,18 +1,23 @@
 /**
- * fleetAttach — right-arrow on a session row.
+ * fleetAttach — runs the attach handoff between two FleetView mounts.
  *
- * Two paths:
+ * Source: ant 5092.js Ot3 attach branch — after FleetView resolves with
+ * action="open" and the root is unmounted, ant calls `ZvK(short, {alreadyInAlt})`
+ * which is the attach core (ant 4767.js Md client equivalent of ccb's runAttach).
+ *
+ * Two paths in ccb:
  *   1. Live PTY socket (meta.ptySocket or <jobDir>/pty.sock exists):
  *      runAttach connects to it. Instant — Unix socket connect + first
  *      PTY frame is sub-100ms. Used for sessions freshly dispatched
  *      via spawnBgPty.
- *   2. No live PTY (e.g. old daemon-managed sessions inherited from
- *      ant): spawn a fresh ccb REPL in the job's cwd. Boot delay is
- *      ~1-2s (Bun + ccb bundle). User accepts this for "ghost"
- *      sessions that have no running worker process.
+ *   2. No live PTY (old / orphaned sessions): spawn a fresh ccb REPL
+ *      in the job's cwd via spawnSync(stdio:'inherit'). Boot delay is
+ *      ~1-2s (Bun + ccb bundle).
  *
- * Both paths use Ink's pause + suspendStdin so FleetView's last frame
- * stays visible during the handoff (no main-screen scrollback flash).
+ * NOTE: pause/suspendStdin/resume is gone — the caller (agentsFleet.ts
+ * loop) unmounts the FleetView Ink root BEFORE calling this and mounts
+ * a fresh one AFTER. That gives the inner REPL a clean terminal and
+ * avoids the frame-buffer drift that broke the return-to-FleetView path.
  */
 
 import { spawnSync } from 'node:child_process'
@@ -84,36 +89,29 @@ export async function fleetAttach(short: string): Promise<void> {
   const state = readFleetState(short)
   const jobDir = getJobDir(short)
 
-  const { instances } = await import('@anthropic/ink')
-  const ink = instances.get(process.stdout)
-
   const ptySocketPath = meta?.ptySocket ?? join(jobDir, 'pty.sock')
   const hasLivePty = existsSync(ptySocketPath)
 
-  ink?.pause()
-  ink?.suspendStdin()
-  try {
-    if (hasLivePty) {
-      // INSTANT path — Unix socket connect + first frame in <100ms.
-      try {
-        const { runAttach } = await import('../bg/attachClient.js')
-        await runAttach(ptySocketPath, short)
-        return
-      } catch (err) {
-        process.stderr.write(`pty attach failed: ${(err as Error).message}\n`)
-        // Fall through.
-      }
+  if (hasLivePty) {
+    try {
+      const { runAttach } = await import('../bg/attachClient.js')
+      await runAttach(ptySocketPath, short)
+      return
+    } catch (err) {
+      process.stderr.write(`pty attach failed: ${(err as Error).message}\n`)
+      // Fall through to spawnSync path.
     }
-
-    // SLOW path — fresh ccb boot. ~1-2s of "starting" delay. Only hit
-    // for sessions without a running PTY worker (old / orphan).
-    const cwd = state?.cwd ?? process.cwd()
-    const flags = state?.respawnFlags ?? []
-    const { cmd, args } = buildCcbArgv([...flags])
-    spawnSync(cmd, args, { cwd, stdio: 'inherit' })
-  } finally {
-    ink?.repaint()
-    ink?.resumeStdin()
-    ink?.resume()
   }
+
+  // SLOW path — no live PTY worker. Spawn a fresh ccb REPL inheriting
+  // the user's TTY. CCB_FLEET_ATTACH_CHILD lets the child REPL detect
+  // it's a FleetView attach handoff (left-arrow on empty exits cleanly).
+  const cwd = state?.cwd ?? process.cwd()
+  const flags = state?.respawnFlags ?? []
+  const { cmd, args } = buildCcbArgv([...flags])
+  spawnSync(cmd, args, {
+    cwd,
+    stdio: 'inherit',
+    env: { ...process.env, CCB_FLEET_ATTACH_CHILD: '1' },
+  })
 }

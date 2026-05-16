@@ -29,11 +29,12 @@ interface FleetSectionHeaderProps {
 }
 
 /**
- * Source: ant `zdK[bucket]` header rendering (5092.js:3289-3320).
+ * Source: ant `fBK[bucket]` header rendering (5076.js inside Sc8).
  *
- * The header is always rendered italic in ant's TUI; bold is applied
- * when focused so the user can see selection move from a row to its
- * header band.
+ *   N_.createElement(V, {bold: Y4||C6, dimColor: !C6}, ...)
+ *
+ * Where `C6` is focus (or armed-fold), `Y4` is the fold-armed marker.
+ * No italic — that was added by mistake. Bold = focused/armed, dim = not focused.
  */
 export function FleetSectionHeader({
   label,
@@ -47,7 +48,7 @@ export function FleetSectionHeader({
       width={width}
       backgroundColor={focused ? 'userMessageBackground' : undefined}
     >
-      <Text italic bold={focused} dimColor={!focused}>
+      <Text bold={focused} dimColor={!focused}>
         {label}
         {collapsed && rowCount > 0 ? ` ${rowCount}` : ''}
       </Text>

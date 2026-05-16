@@ -299,6 +299,14 @@ type Props = {
     cursorOffset: number
   } | null>
   voiceInterimRange?: { start: number; end: number } | null
+  /**
+   * Source: ant 4991.js `jS.onLeftArrowOnEmpty: C` — fires when the user
+   * presses the left arrow with an empty input buffer and the cursor at
+   * position 0. In ant this opens the agents view (`sBK`); in ccb it's
+   * used to signal "return to FleetView" from inside an attached bg
+   * session.
+   */
+  onLeftArrowOnEmpty?: () => void
 }
 
 // Bottom slot has maxHeight="50%"; reserve lines for footer, border, status.
@@ -348,6 +356,7 @@ function PromptInput({
   isLocalJSXCommandActive = false,
   insertTextRef,
   voiceInterimRange,
+  onLeftArrowOnEmpty,
 }: Props): React.ReactNode {
   const mainLoopModel = useMainLoopModel()
   // A local-jsx command (e.g., /mcp while agent is running) renders a full-
@@ -2423,6 +2432,7 @@ function PromptInput({
       setHelpOpen(false)
     }
 
+
     // Exit help mode when backspace is pressed and input is empty
     if (helpOpen && input === '' && (key.backspace || key.delete)) {
       setHelpOpen(false)
@@ -2871,6 +2881,7 @@ function PromptInput({
     highlights: combinedHighlights,
     inlineGhostText,
     inputFilter: lazySpaceInputFilter,
+    onLeftArrowOnEmpty,
   }
 
   const getBorderColor = (): keyof Theme => {
