@@ -32,7 +32,7 @@
  */
 
 import type React from 'react'
-import { Box, Text } from '@anthropic/ink'
+import { Box, Link, Text } from '@anthropic/ink'
 import figures from 'figures'
 
 import {
@@ -49,6 +49,7 @@ import type {
 import { flattenDetail } from '../helpers/flattenDetail.js'
 import { glyphColor } from '../helpers/glyphColor.js'
 import { jobLabel } from '../helpers/jobLabel.js'
+import { resolveResultUrl } from '../helpers/resultUrl.js'
 import { useLabelReplaceAnim } from '../hooks/useLabelReplaceAnim.js'
 import { pickIcon } from '../helpers/pickIcon.js'
 import { stateOutcome } from '../helpers/stateOutcome.js'
@@ -159,6 +160,10 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
   const internalTypingFrame = useLabelReplaceAnim(label, hasName)
   const effectiveTypingFrame = typingFrame ?? internalTypingFrame
   const badge = colorBadgeStyleFor(state.color)
+  // ant 5092.js rs3 LabelCell: `L = xs3(state.output?.result)`. When set,
+  // the label becomes an OSC 8 hyperlink — clicking opens the URL/path
+  // via FleetView's onHyperlinkClick handler (openBrowser / openPath).
+  const resultUrl = resolveResultUrl(state.output?.result)
 
   const middleText = pickMiddleText({
     state,
@@ -194,6 +199,7 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
           typingFrame={effectiveTypingFrame}
           badge={badge}
           focused={focused}
+          resultUrl={resultUrl}
         />
       </Box>
 
@@ -230,20 +236,35 @@ interface LabelCellProps {
   typingFrame?: { display: string; newLen: number }
   badge?: { theme: keyof import('@anthropic/ink').Theme }
   focused: boolean
+  /** OSC 8 URL the label should hyperlink to. ant rs3 wraps the label
+   *  in `<sq url={L}>` when state.output.result resolves to a URL. */
+  resultUrl?: string | null
 }
 
-function LabelCell({ label, renaming, typingFrame, badge, focused }: LabelCellProps): React.ReactNode {
+function LabelCell({
+  label,
+  renaming,
+  typingFrame,
+  badge,
+  focused,
+  resultUrl,
+}: LabelCellProps): React.ReactNode {
   if (renaming !== undefined) {
     return <RenameInput draft={renaming.draft} cursor={renaming.cursor} />
   }
   if (badge !== undefined && renaming === undefined) {
+    // Source: ant rs3 — `<Xw color={p} bold={focused} padded>{L?<sq url=L>{m}</sq>:m}</Xw>`.
+    // Hyperlink only wraps the LABEL inside the colored chip.
     return (
       <Text color={badge.theme} bold={focused}>
-        {label}
+        {resultUrl ? <Link url={resultUrl}>{label}</Link> : label}
       </Text>
     )
   }
   if (typingFrame !== undefined) {
+    // Mid-anim — don't hyperlink (text is transient, click would target
+    // a confusing partial label). Source: ant rs3 branches typingFrame
+    // BEFORE the L fallback.
     return (
       <>
         <Text dimColor={!focused}>{typingFrame.display.slice(0, typingFrame.newLen)}</Text>
@@ -251,7 +272,12 @@ function LabelCell({ label, renaming, typingFrame, badge, focused }: LabelCellPr
       </>
     )
   }
-  return <Text dimColor={!focused}>{label}</Text>
+  // ant rs3 plain-label branch: `L ? <sq url=L>{m}</sq> : m`.
+  return (
+    <Text dimColor={!focused}>
+      {resultUrl ? <Link url={resultUrl}>{label}</Link> : label}
+    </Text>
+  )
 }
 
 interface RenameInputProps {
