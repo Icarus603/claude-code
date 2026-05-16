@@ -69,6 +69,7 @@ import {
 import { formatJobAge } from './helpers/elapsed.js'
 import { deriveBand } from './helpers/deriveBand.js'
 import { deriveChildSummaries } from './helpers/deriveChildSummaries.js'
+import { needsRespawn } from './helpers/needsRespawn.js'
 
 import { useFleetActions } from './hooks/useFleetActions.js'
 import { useFleetPolling } from './hooks/useFleetPolling.js'
@@ -1342,7 +1343,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
           isRenaming={renameState !== undefined}
           isTransitional={false}
           isHeaderCollapsed={isHeaderCollapsed}
-          jobEnterAction={peekOpen ? 'close' : 'open'}
+          // ant 5092.js `_h = S$ ? "create" : (E9 && qi8(E9.state)) ? "resume" : "open"`
+          // - peek open → close (Enter closes peek)
+          // - dispatch buffer has parseable text → create (new job)
+          // - focused job is failed/stopped → resume (respawn)
+          // - else → open (attach)
+          jobEnterAction={
+            peekOpen
+              ? 'close'
+              : dispatchBuf.trim() !== ''
+                ? 'create'
+                : focusedJob && needsRespawn(focusedJob)
+                  ? 'resume'
+                  : 'open'
+          }
           hasDeletableJobs={hasDeletableJobs}
           isArmedToDelete={armedDeleteId !== undefined}
           isGrouped={groupMode === 'directory'}

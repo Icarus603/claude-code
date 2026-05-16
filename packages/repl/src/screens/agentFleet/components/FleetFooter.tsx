@@ -51,8 +51,15 @@ export interface FleetFooterProps {
   isTransitional: boolean
   /** Whether the focused header's section is currently collapsed. */
   isHeaderCollapsed: boolean
-  /** Open/close label for the `enter` chord on jobs. ant `_h`. */
-  jobEnterAction: 'open' | 'close'
+  /**
+   * Label for the `enter` chord on jobs. Source: ant 5092.js `_h`:
+   *   _h = S$ ? "create" : (E9 && qi8(E9.state)) ? "resume" : "open"
+   * - "create" when the buffer parses to a new-job dispatch
+   * - "resume" when the focused job is failed/stopped (needs respawn)
+   * - "open"   default — attach to a running session
+   * - "close"  in peek mode (Enter closes the peek panel)
+   */
+  jobEnterAction: 'open' | 'close' | 'resume' | 'create'
   /** True when any non-empty deletable queue exists (ant `qh.length > 0`). */
   hasDeletableJobs: boolean
   /** True when the focused row is in "armed to delete" state (RJ). */
