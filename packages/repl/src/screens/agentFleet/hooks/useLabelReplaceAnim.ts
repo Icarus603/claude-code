@@ -1,22 +1,33 @@
 /**
  * Hook that animates a row label changing in place.
  *
- * Source: ant 5092.js `Ms3` (line 82). When `state.name` is set (after
- * rename or after first-turn auto-name), the row label changes from the
- * old intent snippet to the new name. Ms3 watches the label string and
- * runs `LdK` (labelReplaceFrame) from n=1 up to J = max(graphemes(old),
- * graphemes(new)) over `Math.max(16, Math.floor(360 / J))` ms per step
- * — producing a left-to-right typing replacement.
+ * Source: ant 5092.js `Ms3` (line 82). Verbatim semantics:
  *
- * Returns `undefined` when no animation is running, or the current frame
- * `{display, newLen}` otherwise. Caller passes through to FleetJobRow's
- * `typingFrame` prop, which overrides the static label rendering.
+ *   function Ms3(H, _) {  // H = current label, _ = hasName
+ *     ref = { label, hasName, fired }
+ *     A = () => {
+ *       if (ref.fired || ref.hasName || !_) {
+ *         ref = { label: H, hasName: _, fired: ref.fired }
+ *         return  // skip animation
+ *       }
+ *       let oldLabel = ref.label
+ *       ref = { label: H, hasName: true, fired: true }
+ *       // ...animate from oldLabel to H over J steps at 360/J ms/step...
+ *     }
  *
- * The first paint of a mounted row never animates: `prevRef` is seeded
- * from the initial label so we only animate subsequent CHANGES.
+ * Animation fires EXACTLY ONCE per row mount — specifically on the
+ * transition from `hasName === false` to `hasName === true` (typically
+ * the auto-name event after first turn, or a manual rename of a not-
+ * yet-named session). Subsequent label changes (renaming after the
+ * row already had a name, intent updates, etc) do NOT animate. This
+ * preserves the original "watching a worker pick its identity" cue
+ * without animating every minor label edit forever.
+ *
+ * Returns the current frame `{display, newLen}` while animating, or
+ * `undefined` when not animating (either pre-animation or post-fire).
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import {
   labelReplaceFrame,
@@ -24,22 +35,36 @@ import {
 } from '../helpers/labelReplaceAnim.js'
 import { splitGraphemes } from '../helpers/grapheme.js'
 
-export function useLabelReplaceAnim(label: string): LabelReplaceFrame | undefined {
-  const prevRef = useRef(label)
+interface AnimRef {
+  label: string
+  hasName: boolean
+  fired: boolean
+}
+
+export function useLabelReplaceAnim(
+  label: string,
+  hasName: boolean,
+): LabelReplaceFrame | undefined {
+  const ref = useRef<AnimRef>({ label, hasName, fired: false })
   const [frame, setFrame] = useState<LabelReplaceFrame | undefined>(undefined)
 
-  useEffect(() => {
-    const oldLabel = prevRef.current
-    if (oldLabel === label) return
-    prevRef.current = label
-    // First non-empty label → no animation (treat as initial assignment,
-    // not a replacement). Mirrors ant: animation only triggers when both
-    // labels are non-empty so blank-to-name doesn't typewriter through
-    // an empty string of placeholder chars.
-    if (oldLabel === '' || label === '') {
-      setFrame(undefined)
+  // useLayoutEffect — ant uses useLayoutEffect for Ms3 (precommit), so
+  // the animation starts in the same frame as the label change rather
+  // than one tick later.
+  useLayoutEffect(() => {
+    // Skip when: animation already fired this row mount, the row
+    // already had a name on entry, or it still doesn't have a name.
+    // (Identical to ant's `if(fired || hasName || !_)`.)
+    if (ref.current.fired || ref.current.hasName || !hasName) {
+      ref.current = {
+        label,
+        hasName,
+        fired: ref.current.fired,
+      }
       return
     }
+    const oldLabel = ref.current.label
+    ref.current = { label, hasName: true, fired: true }
     const J = Math.max(
       splitGraphemes(oldLabel).length,
       splitGraphemes(label).length,
@@ -54,7 +79,7 @@ export function useLabelReplaceAnim(label: string): LabelReplaceFrame | undefine
     let handle: ReturnType<typeof setTimeout> | undefined
     const tick = (): void => {
       n += 1
-      if (n > J) {
+      if (n >= J) {
         setFrame(undefined)
         handle = undefined
         return
@@ -65,8 +90,9 @@ export function useLabelReplaceAnim(label: string): LabelReplaceFrame | undefine
     handle = setTimeout(tick, stepMs)
     return () => {
       if (handle !== undefined) clearTimeout(handle)
+      setFrame(undefined)
     }
-  }, [label])
+  }, [label, hasName])
 
   return frame
 }

@@ -143,10 +143,12 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
   const { glyph, isAnimated } = pickRowGlyph(state, presence, attaching, deleteArmed, outcome)
 
   const label = jobLabel(state, isCurrentSession)
-  // ant 5092.js `Ms3` — animate label CHANGES (rename commit, auto-name
-  // after first turn). Caller's typingFrame prop (if any) wins; in
-  // practice nobody passes it externally, so the hook owns the anim.
-  const internalTypingFrame = useLabelReplaceAnim(label)
+  // ant 5092.js `Ms3` — animate ONLY on the first transition from "no
+  // name" to "has name" (auto-name after first turn). Caller's
+  // typingFrame prop (if any) wins; in practice nobody passes it
+  // externally, so the hook owns the anim.
+  const hasName = state.name !== undefined && state.name !== ''
+  const internalTypingFrame = useLabelReplaceAnim(label, hasName)
   const effectiveTypingFrame = typingFrame ?? internalTypingFrame
   const badge = colorBadgeStyleFor(state.color)
 
