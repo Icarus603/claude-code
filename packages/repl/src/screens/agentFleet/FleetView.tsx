@@ -618,7 +618,19 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       sigil = pick.displayText.startsWith('@') ? '@' : '/'
       name = pick.displayText.replace(/^[/@]/, '')
     }
-    setDispatchBuf(prev => prev.replace(/[@/]\S*$/, `${sigil}${name} `))
+    // Replace the trailing `/<token>` or `@<token>` with `<sigil><name> `.
+    // Source: ant 5092.js ps3(buf, sigil, name) — same regex.
+    // CRITICAL: also move the cursor to end of buffer so subsequent
+    // keystrokes (typing args, pressing Enter to submit) land where the
+    // user expects. ccb previously left dispatchCursor at the position
+    // before accept, so typing extended the OLD `/`-position content
+    // instead of appending after the inserted command — "不讓輸入"
+    // symptom the user reported.
+    setDispatchBuf(prev => {
+      const next = prev.replace(/[@/]\S*$/, `${sigil}${name} `)
+      setDispatchCursor(next.length)
+      return next
+    })
     setSuggestionIndex(0)
     return true
   }, [suggestions, suggestionIndex])
@@ -1806,22 +1818,33 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
                     (row.job.state.tempo === 'active' ? 'busy' : 'waiting')
                   : undefined
               }
-              onMouseEnter={() => {
-                // ant: mouse hover updates B_/l_ so the per-render
-                // follow-id effect doesn't drag focus back to the
-                // previous row.
-                setSelectionIndex(idx)
-                if (row.kind === 'job') {
-                  followIdRef.current = row.job.id
-                  followGroupRef.current = undefined
-                } else if (row.kind === 'header') {
-                  followIdRef.current = undefined
-                  followGroupRef.current = row.group
-                } else {
-                  followIdRef.current = undefined
-                  followGroupRef.current = undefined
-                }
-              }}
+              // Source: ant 5092.js `onMouseEnter: bH || _H ? void 0 : K9`.
+              // `_H` is peek-open, `bH` is dispatch-buffer non-empty.
+              // ant DISABLES mouse hover when peek is open or the user is
+              // composing a dispatch — a stray cursor movement would
+              // otherwise switch the focused row (and thus the peek
+              // panel's content) underneath the user's intent. Same
+              // behaviour ccb should have.
+              onMouseEnter={
+                peekOpen || dispatchBuf !== ''
+                  ? undefined
+                  : () => {
+                      // ant: mouse hover updates B_/l_ so the per-render
+                      // follow-id effect doesn't drag focus back to the
+                      // previous row.
+                      setSelectionIndex(idx)
+                      if (row.kind === 'job') {
+                        followIdRef.current = row.job.id
+                        followGroupRef.current = undefined
+                      } else if (row.kind === 'header') {
+                        followIdRef.current = undefined
+                        followGroupRef.current = row.group
+                      } else {
+                        followIdRef.current = undefined
+                        followGroupRef.current = undefined
+                      }
+                    }
+              }
               onClick={() => {
                 setSelectionIndex(idx)
                 if (row.kind === 'job') {
