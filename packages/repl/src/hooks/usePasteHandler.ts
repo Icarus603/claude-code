@@ -268,6 +268,35 @@ export function usePasteHandler({
       return
     }
 
+    // Bracketed-paste FAST PATH (align with ant 4208.js zZ.handlePaste).
+    // Ink's tokenizer delimits the paste body via \x1B[200~…\x1B[201~ and
+    // emits the FULL paste content as a SINGLE event with isPasted=true.
+    // No fragmentation possible at this layer, so no debounce is needed.
+    //
+    // Skipping the 100 ms debounce matters when a writer sends
+    // bracketed-paste + Enter back-to-back (ant 4835.js WorkerVm.reply +
+    // ccb spare-claim flow): 10 ms after PASTE_END we send \r — the
+    // submit handler must see the committed paste in the buffer. With
+    // the debounce, \r arrives during the debounce window, gets folded
+    // into chunks (because pastePendingRef is still true), and the
+    // submit never fires.
+    //
+    // Gates: isFromPaste (single bracketed event), no pending chunks
+    // from a previous fragmented paste, no image-file-path detection,
+    // non-empty content (the empty-input macOS image probe is handled
+    // a few lines above and returns before reaching here).
+    if (
+      onPaste &&
+      isFromPaste &&
+      !pastePendingRef.current &&
+      !hasImageFilePath &&
+      input.length > 0
+    ) {
+      onPaste(input)
+      setIsPasting(false)
+      return
+    }
+
     // Check if we should handle as paste (from bracketed paste, large input, or continuation)
     const shouldHandleAsPaste =
       onPaste &&

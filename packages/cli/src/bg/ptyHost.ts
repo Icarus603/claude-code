@@ -230,20 +230,9 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
         if (text && !exited) {
           try {
             terminal.write(`\x1b[200~${text}\x1b[201~`)
-            // ant 4835.js uses 10ms here, but ccb's PromptInput goes
-            // through usePasteHandler which DEBOUNCES paste chunks via
-            // PASTE_COMPLETION_TIMEOUT_MS = 100ms (packages/repl/src/
-            // hooks/usePasteHandler.ts:16). Until that timer fires the
-            // paste content isn't committed to the buffer. If we send
-            // \r before that timeout, onSubmit reads an empty buffer
-            // and the submit no-ops — user sees the text typed but
-            // never sent (the exact bug ccb shipped: prompt shows
-            // "hi" but assistant never responds).
-            //
-            // Use 150 ms to be safely past the debounce. ant doesn't
-            // have this hop because its paste handler commits via ref
-            // synchronously; ccb's introduces the debounce so the
-            // server-side write must compensate.
+            // ant 4835.js verbatim: 10ms between paste body and \r.
+            // ccb aligns by making usePasteHandler commit bracketed
+            // paste synchronously (no debounce when isFromPaste=true).
             setTimeout(() => {
               if (!exited) {
                 try {
@@ -252,7 +241,7 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
                   // best-effort
                 }
               }
-            }, 150)
+            }, 10)
           } catch {
             // best-effort
           }
