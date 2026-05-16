@@ -579,6 +579,16 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return [...agentItems, ...repoItems]
     }
     if (!isCommandInput(dispatchBuf)) return []
+    // Source: ant 5092.js Fs3 — `f = H.match(/(?:^|\s)\/(\S*)$/)`. The
+    // regex anchor requires the slash token to extend to END of input
+    // (no trailing whitespace). Once the user accepts a command, the
+    // buffer becomes `/help ` (trailing space) and ant's f === null →
+    // suggestions empty. ccb's generateCommandSuggestions only filters
+    // on hasCommandArgs (which returns FALSE for trailing-space) so it
+    // kept returning suggestions and the next Enter just re-accepted
+    // the same command instead of submitting — "回車選中的 command
+    // 都發不出去" symptom. Match ant's anchor here.
+    if (/\s$/.test(dispatchBuf)) return []
     return generateCommandSuggestions(dispatchBuf, commands as Command[])
   }, [dispatchBuf, commands, agents, worktreeRepos, atMatch])
   useEffect(() => {
