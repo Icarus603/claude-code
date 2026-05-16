@@ -1204,12 +1204,34 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     }
 
     // Up / Ctrl+P — navigate suggestion popup when visible, else row up.
-    // Source: ant 5092.js `if (W_.key === "up" ...) { if (vA.length > 0)
-    //   { Rj((l6) => Math.max(0, l6 - 1)); return } }` — popup
-    // intercepts arrow keys before they reach the list nav.
+    // Source: ant 5092.js up branch:
+    //
+    //   if (W_.key === "up" || W_.ctrl && W_.key === "p") {
+    //     if (vA.length > 0) { Rj(i => max(0, i-1)); return }
+    //     if (W_.key === "up" && !_H && j_.current.includes("\n")) {
+    //       e_(W_); return    // ← multi-line buffer: pass to text input
+    //     }
+    //     scroll row index up
+    //   }
+    //
+    // The multi-line check lets users navigate within a multi-line
+    // dispatch buffer (composed via \\<Enter> or meta+Enter) without
+    // accidentally jumping rows.
     if (key.upArrow || (key.ctrl && input === 'p')) {
       if (suggestions.length > 0) {
         setSuggestionIndex(i => Math.max(0, i - 1))
+        return
+      }
+      if (key.upArrow && dispatchBuf.includes('\n')) {
+        // Multi-line buffer: move cursor up by one visual line.
+        setDispatchCursor(c => {
+          const before = dispatchBuf.slice(0, c)
+          const lastNl = before.lastIndexOf('\n')
+          if (lastNl < 0) return c // already on first line
+          const lineStart = before.slice(0, lastNl).lastIndexOf('\n') + 1
+          const col = c - lastNl - 1
+          return Math.min(lastNl, lineStart + col)
+        })
         return
       }
       handleMove(-1)
@@ -1220,6 +1242,21 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     if (key.downArrow || (key.ctrl && input === 'n')) {
       if (suggestions.length > 0) {
         setSuggestionIndex(i => Math.min(suggestions.length - 1, i + 1))
+        return
+      }
+      if (key.downArrow && dispatchBuf.includes('\n')) {
+        // Multi-line buffer: move cursor down by one visual line.
+        setDispatchCursor(c => {
+          const after = dispatchBuf.slice(c)
+          const nextNl = after.indexOf('\n')
+          if (nextNl < 0) return c // already on last line
+          const lineStart = dispatchBuf.slice(0, c).lastIndexOf('\n') + 1
+          const col = c - lineStart
+          const downStart = c + nextNl + 1
+          const lineEndIdx = dispatchBuf.indexOf('\n', downStart)
+          const downEnd = lineEndIdx < 0 ? dispatchBuf.length : lineEndIdx
+          return Math.min(downEnd, downStart + col)
+        })
         return
       }
       handleMove(1)
@@ -1319,7 +1356,42 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     }
 
     // Return — /exit/quit aliases, accept suggestion, dispatch, or open.
+    // Source: ant 5092.js xd return branch:
+    //
+    //   if (W_.key === "return") {
+    //     if (!W_.shift && (W_.meta || j_.current[U_-1] === "\\")) {
+    //       e_(W_)  // delegate to text input → insert newline
+    //       return
+    //     }
+    //     B6()  // preventDefault → submit path
+    //     ...
+    //   }
+    //
+    // So shift+Enter submits; meta+Enter (Alt/Cmd+Enter) inserts newline;
+    // backslash-prefix Enter (last char before cursor is "\") inserts
+    // newline. Plain Enter submits.
     if (key.return) {
+      const cursor = Math.min(dispatchCursor, dispatchBuf.length)
+      const prevChar = cursor > 0 ? dispatchBuf[cursor - 1] : undefined
+      const wantsNewline =
+        !key.shift && (key.meta || prevChar === '\\')
+      if (wantsNewline && dispatchBuf !== '') {
+        // Insert newline at cursor. If previous char is "\", consume
+        // it (so the final intent doesn't have a literal backslash).
+        // Source: ant text input multiline path drops the trailing "\".
+        setDispatchBuf(prev => {
+          const c = Math.min(dispatchCursor, prev.length)
+          if (prevChar === '\\') {
+            const next = prev.slice(0, c - 1) + '\n' + prev.slice(c)
+            setDispatchCursor(c)
+            return next
+          }
+          const next = prev.slice(0, c) + '\n' + prev.slice(c)
+          setDispatchCursor(c + 1)
+          return next
+        })
+        return
+      }
       const trimmed = dispatchBuf.trim().toLowerCase()
       if (EXIT_ALIASES.has(trimmed)) {
         setDispatchBuf('')
