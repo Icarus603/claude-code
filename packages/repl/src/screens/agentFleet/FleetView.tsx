@@ -29,6 +29,12 @@ import { FleetJobRow } from './components/FleetJobRow.js'
 import { FleetSectionHeader } from './components/FleetSectionHeader.js'
 import { HelpOverlay } from './components/HelpOverlay.js'
 import { PeekPanel } from './components/PeekPanel.js'
+import { VoiceAudioMeter } from './components/VoiceAudioMeter.js'
+import { useVoiceState } from '@claude-code/voice/voiceContext.js'
+import {
+  VoiceIndicator,
+  VoiceWarmupHint,
+} from '../../components/PromptInput/VoiceIndicator.js'
 
 import { formatJobAge } from './helpers/elapsed.js'
 import { deriveBand } from './helpers/deriveBand.js'
@@ -270,6 +276,13 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     [jobs],
   )
 
+  // ─── voice state (ant 5092.js:1826-1839, 3470-3475) ────────────────
+  const voiceState = useVoiceState(s => s.voiceState)
+  const voiceWarmingUp = useVoiceState(s => s.voiceWarmingUp)
+  const showVoiceWarmup = voiceWarmingUp
+  const showVoiceIndicator = !voiceWarmingUp && voiceState !== 'idle'
+  const showVoiceMeter = voiceState === 'recording'
+
   // ─── render ────────────────────────────────────────────────────────
   return (
     <Box flexDirection="column">
@@ -295,6 +308,18 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
           />
         ))}
       </Box>
+      {showVoiceWarmup || showVoiceIndicator || showVoiceMeter ? (
+        <Box marginTop={1} flexDirection="row">
+          {showVoiceWarmup ? <VoiceWarmupHint /> : null}
+          {showVoiceIndicator ? <VoiceIndicator voiceState={voiceState} /> : null}
+          {showVoiceMeter ? (
+            <>
+              <Box width={1} />
+              <VoiceAudioMeter />
+            </>
+          ) : null}
+        </Box>
+      ) : null}
       {peekOpen && focusedJob !== undefined ? (
         <Box marginTop={1}>
           <PeekPanel
