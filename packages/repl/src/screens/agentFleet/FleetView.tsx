@@ -1004,7 +1004,22 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         </Box>
       ) : null}
       {peekOpen && focusedJob !== undefined ? (
-        <Box marginTop={1}>
+        // Source: ant 5092.js — peek panel is rendered as an OVERLAY:
+        //   <B position="absolute" bottom=0 left=0 right=0 flexDirection="column" opaque=true>
+        //     <gs3 .../>
+        //   </B>
+        // The overlay covers the row list while peek is open, so the
+        // entire screen below the banner is the peek experience.
+        // ccb previously rendered the panel inline below the input —
+        // user saw a sliver at the bottom and an empty row area above.
+        <Box
+          position="absolute"
+          bottom={0}
+          left={0}
+          right={0}
+          flexDirection="column"
+          opaque
+        >
           <PeekPanel
             job={focusedJob}
             value={peekDraft}
