@@ -20,7 +20,12 @@
 
 import type React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Text, useInput, useTerminalSize } from '@anthropic/ink'
+import { Box, Text, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
+
+import {
+  useCopyOnSelect,
+  useSelectionBgColor,
+} from '../../hooks/useCopyOnSelect.js'
 import figures from 'figures'
 
 import { renderModelSetting } from '@claude-code/provider/model.js'
@@ -97,6 +102,22 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
   const { jobs, presence, refresh: refreshJobs } = useFleetPolling(seedJobs)
   const actions = useFleetActions({ currentSessionId })
+
+  // Copy-on-select wiring. Source: ant 5092.js FleetView body —
+  //   let yw = BzH()              // useSelection
+  //   JZ6(yw, true, ...)          // useCopyOnSelect with toast on copy
+  //   DZ6(yw)                     // useSelectionBgColor
+  //
+  // Without these, mouse drag-selection in FleetView builds the selection
+  // overlay (via Ink's dispatchClick/handleSelectionDrag) but the drag-end
+  // never writes to the clipboard — ccb's REPL wires the same hooks via
+  // ScrollKeybindingHandler, but FleetView is a separate Ink root that
+  // never mounted that handler. Silent copy here (no toast) matches the
+  // useCopyOnSelect API's "onCopied omitted → silent" mode — FleetView's
+  // own footer doesn't have a notification slot wired in yet.
+  const selection = useSelection()
+  useCopyOnSelect(selection, true)
+  useSelectionBgColor(selection)
 
   // ── core UI state ──────────────────────────────────────────────────
   const [groupMode, setGroupMode] = useState<FleetGroupMode>('state')
