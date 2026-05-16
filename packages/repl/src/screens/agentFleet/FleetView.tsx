@@ -284,7 +284,16 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
   // Banner data — self-resolved from ccb state (ant 5092.js:3210-3215).
   const model = useMainLoopModel()
-  const modelLabel = renderModelSetting(model)
+  // Source: ant 5092.js `Dx = FU(A?.model ?? C7())`. ant's `A.model` is
+  // the saved SETTING (alias like "opus") not the resolved canonical name
+  // — its r7 only appends "[1m]" when the input string explicitly has
+  // it. ccb's useMainLoopModel runs parseUserSpecifiedModel which can
+  // re-append "[1m]" from defaults (Max + 1m merge), so the banner ended
+  // up reading "Opus 4.7 (1M context)" even when the user never picked
+  // the 1m variant. Strip the trailing " (1M context)" suffix at the
+  // banner level so the compact head reads "Opus 4.7" — matches ant.
+  // The actual mainLoopModel still carries [1m] for the API.
+  const modelLabel = renderModelSetting(model).replace(/ \(1M context\)$/, '')
   const { version, cwd: cwdLabel } = getLogoDisplayData()
   const versionLabel = `v${version}`
 
