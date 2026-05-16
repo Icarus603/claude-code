@@ -51,6 +51,19 @@ export async function agentsFleetHandler(): Promise<void> {
   await import('../bg/attachClient.js')
   await import('../bg/ptyAdopter.js')
   const { getCwd } = await import('@claude-code/app-host/bootstrap/cwd.js')
+  // Spare-pool wiring. Source: ant 4774.js rP6/yvK + 5092.js useEffect
+  // that calls `rP6(m, true, A)` on FleetView mount. ccb fires ensure
+  // here at handler start (one process == one FleetView lifetime in
+  // ccb's loop model) so the spare boots in parallel with the rest of
+  // the startup work, and is ready by the time the user dispatches.
+  const sparePool = await import('../bg/sparePool.js')
+  sparePool.enableSparePool()
+  const ensureSpareForCwd = (cwd: string): void => {
+    void sparePool.ensureSpare(cwd).catch(() => undefined)
+  }
+  // Kick off the first spare immediately. Doesn't block — the wait
+  // happens in the background while FleetView mounts.
+  ensureSpareForCwd(getCwd())
 
   const { instances } = await import('@anthropic/ink')
 
@@ -90,20 +103,50 @@ export async function agentsFleetHandler(): Promise<void> {
         initialError: errorForThisMount,
         root,
         onDispatch: info => {
+          // Source: ant 5092.js Ot3 dispatch — tries spare claim FIRST
+          // when no agent/routine is specified AND cwd matches the
+          // spare's cwd. Only then falls through to cold spawn.
+          //
+          //   let A7 = !!AP && AP.ready && !L9.matched && !L9.routine
+          //            && NT === AP.cwd && $1
+          //   ;(A7 ? yvK(intent) : kvK(intent, ...).then(iP6)).then(...)
+          //
+          // ccb mirrors: if dispatch is plain text (no @agent / no
+          // --routine) and cwd matches the spare's cwd, claim it.
+          // Spare was spawned with `--agent claude` (the default) so
+          // it can only serve dispatches with the same default.
+          const cwd = info.cwd ?? getCwd()
+          const isPlainDispatch =
+            info.agent === undefined || info.agent === 'claude'
+          if (isPlainDispatch) {
+            const slot = sparePool.claimSpare(cwd)
+            if (slot !== undefined) {
+              // Send the intent to the live spare's PTY stdin.
+              void (async () => {
+                try {
+                  await sparePool.sendClaim(slot.socketPath, info.intent)
+                  await sparePool.rewriteSpareState(slot.short, info.intent)
+                } catch (err) {
+                  process.stderr.write(
+                    `spare claim failed: ${(err as Error).message}\n`,
+                  )
+                } finally {
+                  // Replenish the pool for the next dispatch.
+                  ensureSpareForCwd(cwd)
+                }
+              })()
+              return
+            }
+          }
+          // Cold path — no spare, or dispatch needs a non-default agent.
           // Async-fire spawnBgPty; row surfaces via state.json polling.
-          // quiet:true — outer Ink owns the screen, don't print banner.
-          // Source: ant 5092.js Ot3 → on8 parse result feeds iP6:
-          //   - `template.name` becomes the --agent flag value
-          //   - `cwd` overrides spawn cwd (from @repo mention)
-          // ccb mirrors with `--agent <name>` when info.agent is set
-          // and uses info.cwd if specified, falling back to getCwd().
           const flags: string[] = info.agent
             ? ['--agent', info.agent]
             : []
           void spawnBgPty({
             flags,
             directive: info.intent,
-            cwd: info.cwd ?? getCwd(),
+            cwd,
             waitForSocketMs: 0,
             quiet: true,
           }).catch(err =>
@@ -132,7 +175,13 @@ export async function agentsFleetHandler(): Promise<void> {
     root.render(null)
     root.unmount()
 
-    if (action.type === 'quit') return
+    if (action.type === 'quit') {
+      // Kill any spare worker on quit so a "ccb agents → quit → quit
+      // terminal" cycle doesn't leak a long-lived bg process. ant 4774.js
+      // hvK does the same via `nP6 = true` + drop singleton.
+      await sparePool.disableSparePool().catch(() => undefined)
+      return
+    }
 
     try {
       // runAttach paints into the same alt-screen buffer we just

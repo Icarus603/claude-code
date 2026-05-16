@@ -56,7 +56,16 @@ export function spawnPtyHost(opts: {
   // positional → Commander parses it as [prompt] which the REPL
   // pre-seeds into PromptInput on launch). Mirrors ant's behaviour:
   // the user can attach mid-conversation and continue interactively.
-  const innerArgs = [...opts.flags, opts.directive]
+  //
+  // Spare-pool path: caller passes directive="" to spawn a worker that
+  // idles at empty prompt (waiting for a CTRL `claim` frame to inject
+  // the real intent later). For that case we omit the directive arg
+  // entirely so Commander doesn't see a literal "" positional (which
+  // would auto-submit an empty turn). Source: ant `m_H` "spare" mode.
+  const innerArgs =
+    opts.directive === ''
+      ? [...opts.flags]
+      : [...opts.flags, opts.directive]
   const isBun = process.argv0.endsWith('bun')
   const cmd = isBun ? process.argv0 : process.argv[0]!
   const cliJs = isBun ? [process.argv[1] ?? ''] : []
@@ -87,6 +96,13 @@ export function spawnPtyHost(opts: {
     CLAUDE_BG_SOURCE: 'cli',
     CLAUDE_ENABLE_STREAM_WATCHDOG: '1',
     CLAUDE_CODE_SESSION_NAME: opts.short,
+    // Spare-pool marker: empty directive means this worker is a spare
+    // idling for a future claim. Read by useBgFleetStateSync to skip
+    // its own state.json sync — we don't want the worker writing
+    // `state: 'working'` while it's actually idle waiting. Source:
+    // ant 4774.js spare workers run with `m_H(..., "spare", ...)`
+    // which sets internal mode='spare' on the worker side.
+    ...(opts.directive === '' ? { CCB_SPARE: '1' } : {}),
   }
 
   const child = spawn(cmd, hostArgs, {

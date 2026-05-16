@@ -447,7 +447,16 @@ export async function spawnBgPty(opts: {
   // immediately. Without this, the row would only appear once the
   // child REPL boots far enough to write its own state.json, which
   // can be 1-2s of "where did my session go" delay.
-  if (opts.quiet === true) {
+  //
+  // Skip when directive is empty: that's the spare-pool path (worker
+  // idles at empty prompt waiting for a CTRL `claim` frame). The
+  // FleetView must NOT show this as a row until the user actually
+  // dispatches into it; the claim handler will rewrite state.json
+  // with the real intent. Source: ant `m_H(..., "spare", ...)` skips
+  // the user-visible state.json write — spares are tracked via the
+  // s1H singleton and `w.source !== "spare"` filtering in the
+  // daemon-roster join.
+  if (opts.quiet === true && opts.directive !== '') {
     void writeOptimisticFleetState(short, {
       directive: opts.directive,
       cwd: opts.cwd,
