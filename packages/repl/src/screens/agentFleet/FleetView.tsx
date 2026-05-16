@@ -226,6 +226,13 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // toggles this on, populating the suggestion popup with every agent
   // (sorted by recency). Pressing Tab again or typing closes it.
   const [showAgentsDrawer, setShowAgentsDrawer] = useState(false)
+  // Short of the row currently being attached to. ant 5092.js
+  // `rH = K_.current = W_.id` is set before kZ6 respawn fires, used
+  // to render the row spinner as "opening…". ccb's loop unmount makes
+  // this hard to observe in practice (the row component is gone the
+  // moment onAttach resolves), but the value is set on the click side
+  // so any pre-unmount frame surfaces the indicator.
+  const [attachingShort, setAttachingShort] = useState<string | null>(null)
 
   // Load commands + agents + sibling worktree repos once on mount.
   // ant 5092.js Fs3 has three @-axis sources:
@@ -657,6 +664,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         return
       }
       if (focused?.kind === 'job') {
+        setAttachingShort(focused.job.id)
         onAttach?.(focused.job.id)
         return
       }
@@ -934,6 +942,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
     // Right arrow on a job row — open/attach. Source: ant 2941-2944.
     if (key.rightArrow && dispatchBuf === '' && focused?.kind === 'job') {
+      setAttachingShort(focused.job.id)
       onAttach?.(focused.job.id)
       return
     }
@@ -958,6 +967,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       for (const row of rows) {
         if (row.kind !== 'job') continue
         if (++i === n) {
+          setAttachingShort(row.job.id)
           onAttach?.(row.job.id)
           return
         }
@@ -1100,6 +1110,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
               focused={idx === clampedIndex}
               currentSessionId={currentSessionId}
               armedDeleteId={armedDeleteId}
+              attachingShort={attachingShort}
               terminalWidth={terminalWidth}
               labelWidth={labelWidth}
               ageWidth={ageWidth}
@@ -1110,6 +1121,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
               onClick={() => {
                 setSelectionIndex(idx)
                 if (row.kind === 'job') {
+                  setAttachingShort(row.job.id)
                   onAttach?.(row.job.id)
                 } else if (row.kind === 'header') {
                   handleToggleCollapse(row.group)
@@ -1340,6 +1352,7 @@ interface RowProps {
   focused: boolean
   currentSessionId: string
   armedDeleteId: string | undefined
+  attachingShort: string | null
   terminalWidth: number
   labelWidth: number
   ageWidth: number
@@ -1355,6 +1368,7 @@ function Row({
   focused,
   currentSessionId,
   armedDeleteId,
+  attachingShort,
   terminalWidth,
   labelWidth,
   ageWidth,
@@ -1406,7 +1420,7 @@ function Row({
         presence={undefined}
         isCurrentSession={isCurrent}
         focused={focused}
-        attaching={false}
+        attaching={attachingShort === row.job.id}
         deleteArmed={armedDeleteId === row.job.id ? { justKilled: false } : undefined}
         renaming={renaming}
         childSummaries={childSummaries}
