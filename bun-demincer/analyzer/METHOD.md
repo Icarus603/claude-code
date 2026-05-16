@@ -68,11 +68,13 @@ Read that module to understand what the flag gates.
 ### 1c · New environment variables
 
 ```bash
-# CLAUDE_CODE_*, ANTHROPIC_*, CCB_*, USER_TYPE
+# CLAUDE_*, ANTHROPIC_*, CCB_*, USER_TYPE
+# Note: use bare CLAUDE_ (not CLAUDE_CODE_) — v2.1.142 introduced
+# CLAUDE_BG_AUTH_SNAPSHOT_PATH which the narrower regex misses.
 comm -13 \
-    <(grep -rohE '(CLAUDE_CODE|ANTHROPIC|CCB)_[A-Z][A-Z_0-9]*' \
+    <(grep -rohE '(CLAUDE|ANTHROPIC|CCB)_[A-Z][A-Z_0-9]*' \
         work/claude-code-$A/decoded/ | sort -u) \
-    <(grep -rohE '(CLAUDE_CODE|ANTHROPIC|CCB)_[A-Z][A-Z_0-9]*' \
+    <(grep -rohE '(CLAUDE|ANTHROPIC|CCB)_[A-Z][A-Z_0-9]*' \
         work/claude-code-$B/decoded/ | sort -u)
 ```
 

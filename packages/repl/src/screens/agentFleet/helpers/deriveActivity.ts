@@ -22,8 +22,16 @@ import type {
 import { stateOutcome } from './stateOutcome.js'
 import { isSelfDriving } from './selfDriving.js'
 
-/** Skill template name — when matched + all PR children MERGED → success. */
-const SKILL_TEMPLATE_NAME = 'skill'
+/**
+ * Default agent template. Source: ant `a1H.name` (4775.js) = "claude" —
+ * the CLAUDE_AGENT built-in (2855.js Aj8). ccb uses 'bg' as its default
+ * template (listFleetJobs.ts:31 falls back to 'bg' when no agent name
+ * is recorded). The check below rolls up the default-agent row to
+ * "success" when all its child PRs have merged — a "you can stop
+ * watching this one" signal specific to the leader template that
+ * dispatched sub-PRs.
+ */
+const DEFAULT_AGENT_TEMPLATE = 'bg'
 
 /** Source: ant GZ6. */
 export function deriveActivity(
@@ -38,7 +46,7 @@ export function deriveActivity(
   if (
     prCache !== undefined &&
     state.tempo !== 'active' &&
-    state.template === SKILL_TEMPLATE_NAME &&
+    state.template === DEFAULT_AGENT_TEMPLATE &&
     liveChildren !== undefined &&
     liveChildren.length > 0 &&
     liveChildren.every(c => prCache.get(c.href)?.state === 'MERGED')
