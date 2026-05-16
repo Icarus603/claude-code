@@ -16,12 +16,18 @@
 
 import type React from 'react'
 import { useCallback, useMemo, useState } from 'react'
-import { Box, useInput, useTerminalSize } from '@anthropic/ink'
+import { Box, Text, useInput, useTerminalSize } from '@anthropic/ink'
 
+import { renderModelSetting } from '@claude-code/provider/model.js'
 import type {
   FleetJob,
   FleetPrCache,
 } from '@claude-code/agent/background/fleet/fleetTypes.js'
+
+import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
+import { getLogoDisplayData } from '../../uiHelpers/logoV2Utils.js'
+import { Clawd } from '../../components/LogoV2/Clawd.js'
+import TextInput from '../../components/TextInput.js'
 
 import { FleetBanner } from './components/FleetBanner.js'
 import { FleetFooter, type FleetFooterSelectionKind } from './components/FleetFooter.js'
@@ -49,12 +55,6 @@ import {
 } from './hooks/useFleetRows.js'
 
 export interface FleetViewProps {
-  /** Bundled version label (e.g. "v26.5.43"). */
-  versionLabel: string
-  /** Display model name (e.g. "Opus 4.7"). */
-  modelLabel?: string
-  /** Pretty cwd label (e.g. "~/code/foo"). */
-  cwdLabel?: string
   /** Current foreground session id (drives "current session" labelling). */
   currentSessionId: string
   /** Optional seed jobs to render before first poll completes. */
@@ -65,22 +65,28 @@ export interface FleetViewProps {
   onAttach?: (short: string) => void
   /** PR cache passed through from caller (Phase 7 leaves undefined). */
   prCache?: FleetPrCache
+  /**
+   * Optional dispatch callback — invoked with the trimmed prompt when
+   * user submits in the "start a task in the background" input. When
+   * omitted the input is read-only (placeholder shown but enter is a no-op).
+   */
+  onDispatch?: (prompt: string) => void
 }
 
 /** Top-level FleetView. Source: ant BdK. */
 export function FleetView(props: FleetViewProps): React.ReactNode {
-  const {
-    versionLabel,
-    modelLabel,
-    cwdLabel,
-    currentSessionId,
-    seedJobs,
-    onQuit,
-    onAttach,
-    prCache,
-  } = props
+  const { currentSessionId, seedJobs, onQuit, onAttach, prCache, onDispatch } = props
 
   const terminalWidth = useTerminalSize().columns
+
+  // Banner data — self-resolved from ccb state (ant 5092.js:3210-3215).
+  // We deliberately don't take versionLabel/modelLabel/cwdLabel as props:
+  // the source values live in ccb singletons, and threading them through
+  // every caller bloats the API for no win.
+  const model = useMainLoopModel()
+  const modelLabel = renderModelSetting(model)
+  const { version, cwd: cwdLabel } = getLogoDisplayData()
+  const versionLabel = `v${version}`
 
   const { jobs, presence } = useFleetPolling(seedJobs)
   const actions = useFleetActions({ currentSessionId })
@@ -94,6 +100,9 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const [peekDraft, setPeekDraft] = useState('')
   const [peekCursor, setPeekCursor] = useState(0)
   const [armedDeleteId, setArmedDeleteId] = useState<string | undefined>(undefined)
+  // Dispatch input — "start a task in the background" (ant `<PN>` at 5092.js:3404).
+  const [dispatchDraft, setDispatchDraft] = useState('')
+  const [dispatchCursor, setDispatchCursor] = useState(0)
 
   const { rows, bucketCounts, groupCounts } = useFleetRows({
     jobs,
@@ -276,6 +285,26 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     [jobs],
   )
 
+  // Empty-state condition. Source: ant 5092.js:3363-3373 — show hint when
+  // every job is the current session AND no filter is active. For the
+  // standalone `ccb agents` entry, there's no current session in the list,
+  // so the equivalent invariant is "no job rows at all + filter empty".
+  const hasAnyJobRow = useMemo(() => rows.some(r => r.kind === 'job'), [rows])
+  const showEmptyHint = !hasAnyJobRow && filterText === ''
+  const showNoMatchHint = !hasAnyJobRow && filterText !== ''
+
+  // Dispatch input handlers.
+  const handleDispatchSubmit = useCallback(
+    (text: string): void => {
+      const trimmed = text.trim()
+      setDispatchDraft('')
+      setDispatchCursor(0)
+      if (trimmed === '') return
+      onDispatch?.(trimmed)
+    },
+    [onDispatch],
+  )
+
   // ─── voice state (ant 5092.js:1826-1839, 3470-3475) ────────────────
   const voiceState = useVoiceState(s => s.voiceState)
   const voiceWarmingUp = useVoiceState(s => s.voiceWarmingUp)
@@ -283,16 +312,27 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const showVoiceIndicator = !voiceWarmingUp && voiceState !== 'idle'
   const showVoiceMeter = voiceState === 'recording'
 
+  // While the dispatch input is in focus (it always is — peek/help take
+  // priority but our useInput skips during those), filter typing is
+  // disabled; user input flows into dispatchDraft instead.
+  const dispatchActive = !peekOpen && !helpOpen
+
   // ─── render ────────────────────────────────────────────────────────
+  // Banner row mirrors ant 5092.js:3236-3262 — Clawd to the left at
+  // width ≥70, banner block (Claude Code / model · cwd / counts) to the
+  // right. Both children sit inside one `<Box gap=2 marginBottom=1>`.
   return (
     <Box flexDirection="column">
-      <FleetBanner
-        versionLabel={versionLabel}
-        modelLabel={modelLabel}
-        cwdLabel={cwdLabel}
-        bandCounts={bandCounts}
-      />
-      <Box flexDirection="column" marginTop={1}>
+      <Box gap={2} marginBottom={1}>
+        {terminalWidth >= 70 ? <Clawd /> : null}
+        <FleetBanner
+          versionLabel={versionLabel}
+          modelLabel={modelLabel}
+          cwdLabel={cwdLabel}
+          bandCounts={bandCounts}
+        />
+      </Box>
+      <Box flexDirection="column">
         {rows.map((row, idx) => (
           <Row
             key={rowKey(row, idx)}
@@ -307,6 +347,47 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             prCache={prCache}
           />
         ))}
+      </Box>
+      {/* Empty-state hint. Source: ant 5092.js:3363-3365 (Tz). */}
+      {showEmptyHint ? (
+        <Box paddingLeft={2} marginTop={1} flexDirection="column" gap={1}>
+          <Text dimColor>
+            Type a task below to start a background session. It keeps running even after you close this terminal.
+          </Text>
+          <Text dimColor>
+            Try: paste a PR or issue URL · "investigate why test/auth.test.ts is flaky" · "address the review comments on #1234"
+          </Text>
+        </Box>
+      ) : null}
+      {/* "no sessions match" — ant 5092.js:3366-3373. */}
+      {showNoMatchHint ? (
+        <Box paddingLeft={2} marginTop={1}>
+          <Text dimColor>no sessions match</Text>
+        </Box>
+      ) : null}
+      {/* Dispatch input box — ant 5092.js:3395-3419, with placeholder
+          "start a task in the background". Bordered top + bottom (no
+          sides), dim border. Sits above the footer. */}
+      <Box
+        flexShrink={0}
+        flexDirection="column"
+        marginTop={1}
+        borderStyle="round"
+        borderLeft={false}
+        borderRight={false}
+        borderDimColor
+      >
+        <TextInput
+          value={dispatchDraft}
+          onChange={setDispatchDraft}
+          cursorOffset={dispatchCursor}
+          onChangeCursorOffset={setDispatchCursor}
+          onSubmit={handleDispatchSubmit}
+          placeholder="start a task in the background"
+          focus={dispatchActive}
+          multiline={true}
+          columns={Math.max(terminalWidth - 4, 20)}
+        />
       </Box>
       {showVoiceWarmup || showVoiceIndicator || showVoiceMeter ? (
         <Box marginTop={1} flexDirection="row">

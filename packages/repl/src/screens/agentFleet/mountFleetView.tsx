@@ -52,13 +52,11 @@ export async function mountFleetView(options: MountFleetViewOptions): Promise<vo
         VoiceProvider,
         null,
         createElement(FleetView, {
-          versionLabel: options.versionLabel,
-          modelLabel: options.modelLabel,
-          cwdLabel: options.cwdLabel,
           currentSessionId: options.currentSessionId,
           seedJobs: options.seedJobs,
           prCache: options.prCache,
           onAttach: options.onAttach,
+          onDispatch: options.onDispatch,
           onQuit: () => {
             options.root.unmount()
             resolve()
