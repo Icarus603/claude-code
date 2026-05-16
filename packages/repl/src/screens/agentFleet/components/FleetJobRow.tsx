@@ -176,14 +176,17 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
   return (
     <Box backgroundColor={focused ? 'userMessageBackground' : undefined}>
       {/* glyph column — width = labelWidth.glyph (2 cells).
-          Working/active spinner uses the brand 'claude' color so the
-          animation stands out as the user's eye scans the list. Static
-          glyphs keep their derived glyphColor (which carries the
-          success/failure/blocked semantic). ccb customization vs ant
-          (which renders spinner uncolored). */}
+          Source: ant 5092.js rs3:
+            wH = N_.createElement(V, {color: M, dimColor: o}, s)
+          The SAME (color, dim) wrapper applies to both the static glyph
+          and the Cs3 spinner — derived from Ti8(state, activity,
+          presence). For busy presence Ti8 returns {color:undefined,
+          dim:false} so the spinner renders uncolored, NOT brand color.
+          ccb previously hardcoded 'claude' for the spinner; reverted to
+          ant verbatim so the spinner shares the row's tempo color. */}
       <Box width={2} flexShrink={0}>
         {isAnimated ? (
-          <FleetSpinner color="claude" dim={false} />
+          <FleetSpinner color={glyphCol} dim={glyphDim} />
         ) : (
           <Text color={glyphCol} dimColor={glyphDim}>
             {glyph ?? ' '}

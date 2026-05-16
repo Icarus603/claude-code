@@ -1362,16 +1362,22 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Ctrl+C — 2-step confirm.
+    // Ctrl+C — Source: ant 5092.js xd:
+    //   if (zH || $H) { jH(!1), fH(!1); return }   // close help/other
+    //   if (j_.current) w_("")                      // clear buffer
+    //   yH()                                        // 2-step quit (ME doublePress)
+    //   return
+    // KEY DETAIL: when buffer is non-empty, ant CLEARS the buffer AND
+    // still calls yH() in the same keystroke — so the user sees "press
+    // ctrl+c again to quit" message right away. ccb previously returned
+    // early after clearing, requiring a SECOND ctrl+c to even start the
+    // confirm flow.
     if (key.ctrl && input === 'c') {
       if (helpOpen) {
         setHelpOpen(false)
         return
       }
-      if (dispatchBuf !== '') {
-        setDispatchBuf('')
-        return
-      }
+      if (dispatchBuf !== '') setDispatchBuf('')
       if (pendingQuitConfirm) {
         handleQuit()
         return
@@ -1855,8 +1861,17 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
                       }
                     }
               }
+              // Source: ant 5092.js K9 + onClick handlers. K9's short-circuit
+              // `if (B6===o || _H && W_.kind!=="job") return` skips
+              // setSelectionIndex when peek is open and the clicked row
+              // is NOT a job — toggle-collapse / expand-fold still runs
+              // (post-K9 in ant), just the row-focus doesn't follow the
+              // mouse pointer.
               onClick={() => {
-                setSelectionIndex(idx)
+                const isPeekNonJob = peekOpen && row.kind !== 'job'
+                if (!isPeekNonJob) {
+                  setSelectionIndex(idx)
+                }
                 if (row.kind === 'job') {
                   followIdRef.current = row.job.id
                   followGroupRef.current = undefined

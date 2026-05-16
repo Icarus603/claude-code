@@ -77,6 +77,11 @@ interface FleetState {
   name?: string
   /** Initial dispatch prompt — fallback when name is missing. */
   intent?: string
+  /** Source: ant GsH `K.sessionId` — original dispatch session id. */
+  sessionId?: string
+  /** Source: ant GsH `$.resumeSessionId ?? K.sessionId` — set by the
+   *  worker's own resume bookkeeping. ant uses this when present. */
+  resumeSessionId?: string
 }
 
 function readMeta(short: string): BgMeta | null {
@@ -162,15 +167,52 @@ export async function fleetAttach(short: string): Promise<void> {
     }
   }
 
-  // SLOW path — no live PTY worker. Spawn a fresh ccb REPL inheriting
-  // the user's TTY. CCB_FLEET_ATTACH_CHILD lets the child REPL detect
-  // it's a FleetView attach handoff (left-arrow on empty exits cleanly).
+  // SLOW path — no live PTY worker. Source: ant 4774.js GsH respawn flag
+  // build:
+  //   let w = $.resumeSessionId ?? K.sessionId
+  //   let j = path.join(history, `${w}.jsonl`)
+  //   let J = await qOH(j)                       // jsonl exists?
+  //   let f = [...J?["--resume",w]:[], ...D, ...M?["--",M]:[]]
+  // So when the on-disk transcript exists, ant respawns with --resume
+  // to load the conversation. ccb previously spawned a brand-new REPL
+  // without --resume, losing the conversation on attach to an
+  // orphaned/exited job.
   const cwd = state?.cwd ?? process.cwd()
   const flags = state?.respawnFlags ?? []
-  const { cmd, args } = buildCcbArgv([...flags])
+  const resumeSessionId = state?.resumeSessionId ?? state?.sessionId
+  const resumeArgs = resumeSessionId !== undefined && resumeSessionId !== ''
+    ? buildResumeArgsIfTranscriptExists(cwd, resumeSessionId)
+    : []
+  const { cmd, args } = buildCcbArgv([...resumeArgs, ...flags])
   spawnSync(cmd, args, {
     cwd,
     stdio: 'inherit',
     env: { ...process.env, CCB_FLEET_ATTACH_CHILD: '1' },
   })
+}
+
+/**
+ * Source: ant 4774.js GsH transcript-exists gate:
+ *   let j = path.join(I2(await Qz(K.cwd)), `${w}.jsonl`)
+ *   let J = await qOH(j)
+ *   let f = [...J ? ["--resume", w] : [], ...]
+ *
+ * ccb's projects dir derivation mirrors ant `I2`: replace path separators
+ * with `-` then prefix `~/.claude/projects/`. The slow-path attach uses
+ * --resume only when the transcript file actually exists on disk; missing
+ * transcript means fresh REPL (ant's same fallback).
+ */
+function buildResumeArgsIfTranscriptExists(
+  cwd: string,
+  sessionId: string,
+): readonly string[] {
+  try {
+    const root = process.env.CLAUDE_CONFIG_HOME ?? join(homedir(), '.claude')
+    const projectsDir = join(root, 'projects')
+    const slug = cwd.replace(/[/\\]/g, '-').replace(/^-/, '-')
+    const transcript = join(projectsDir, slug, `${sessionId}.jsonl`)
+    return existsSync(transcript) ? ['--resume', sessionId] : []
+  } catch {
+    return []
+  }
 }
