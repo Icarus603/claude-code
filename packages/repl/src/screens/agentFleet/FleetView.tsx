@@ -121,6 +121,35 @@ export interface FleetViewProps {
 // — vim-style quit aliases honored alongside the `/exit /quit` slash
 // commands so muscle-memory works. ccb adds the slash variants since
 // they're how the user explicitly invokes the slash-command.
+/**
+ * Module-level recency tracker for the agents drawer. ant 5092.js
+ * persists `agentLastUsed` (a `Record<name, msSinceEpoch>` map) in
+ * user settings + reads on dispatch; ccb keeps it in-memory for the
+ * process lifetime — close enough for the drawer's "recent first"
+ * sort across iterations of `ccb agents`. Persisting to user settings
+ * requires schema migration; the in-memory map handles the common
+ * within-session case (open agents, dispatch agent A, open agents
+ * again — A is at the top).
+ *
+ * Source: ant 5092.js Fs3 `XdK` recency sort + dispatch write.
+ */
+const agentLastUsed = new Map<string, number>()
+
+function markAgentUsed(name: string): void {
+  agentLastUsed.set(name, Date.now())
+}
+
+function sortByRecency(
+  agents: readonly AgentDefinition[],
+): readonly AgentDefinition[] {
+  return [...agents].sort((a, b) => {
+    const ta = agentLastUsed.get(a.agentType) ?? 0
+    const tb = agentLastUsed.get(b.agentType) ?? 0
+    if (ta !== tb) return tb - ta
+    return a.agentType.localeCompare(b.agentType)
+  })
+}
+
 const EXIT_ALIASES = new Set([
   '/exit',
   '/quit',
@@ -325,16 +354,15 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     // Empty buffer + drawer toggled on → show ALL agents (ant 5092.js
     // `($ && !H) ? XdK(_).map(cn8)` — drawer mode is the `$` flag,
     // which becomes truthy when Tab toggles `Kz` on an empty buffer).
+    // `XdK` is the recency sort — agents the user dispatched recently
+    // bubble to the top.
     if (showAgentsDrawer && dispatchBuf === '' && agents.length > 0) {
-      return agents
-        .slice()
-        .sort((a, b) => a.agentType.localeCompare(b.agentType))
-        .map<SuggestionItem>(a => ({
-          id: `agent:${a.agentType}`,
-          displayText: `@${a.agentType}`,
-          description: `background · ${a.whenToUse}`,
-          metadata: { kind: 'agent', name: a.agentType },
-        }))
+      return sortByRecency(agents).map<SuggestionItem>(a => ({
+        id: `agent:${a.agentType}`,
+        displayText: `@${a.agentType}`,
+        description: `background · ${a.whenToUse}`,
+        metadata: { kind: 'agent', name: a.agentType },
+      }))
     }
     if (atMatch !== null) {
       // ant 5092.js Fs3 @-branch:
@@ -743,11 +771,13 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       if (a) {
         agent = a.agentType
         const rest = space < 0 ? '' : stripped.slice(space + 1).trim()
+        markAgentUsed(agent)
         onDispatch?.({ intent: rest, cwd, agent })
         setTimeout(() => refreshJobs(), 50)
         return
       }
     }
+    if (agent !== undefined) markAgentUsed(agent)
     onDispatch?.({ intent: stripped, cwd, agent })
     setTimeout(() => refreshJobs(), 50)
   }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, refreshJobs, agents, worktreeRepos])
