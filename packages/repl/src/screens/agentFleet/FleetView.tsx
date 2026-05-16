@@ -1096,23 +1096,17 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   )
 
   const hasAnyJobRow = useMemo(() => rows.some(r => r.kind === 'job'), [rows])
-  // ant 5092.js Tz render gate:
-  //   `O$.every(W_ => W_.id === _) && !bH` — every job row's id matches
-  //   the current session id AND the dispatch buffer is empty.
-  // The two conditions matter:
-  //   - "every is current" is vacuously true when there are zero jobs
-  //     (the standard empty-fleet state)
-  //   - "every is current" is true when the user opened agents from
-  //     within a session and that's the only session
-  //   - In both cases, buffer must be empty (Tz is the empty-state hint,
-  //     not the in-progress dispatch hint)
+  // ant 5092.js Tz render gate uses `O$` — the post-filter sorted job
+  // list — NOT the row list (which excludes collapsed-section jobs).
+  // So the empty-state hint shows only when the FLEET is empty or the
+  // only existing job is the current session, regardless of which
+  // sections are currently collapsed.
   const showEmptyHint = useMemo(() => {
     if (filterText !== '') return false
     if (dispatchBuf !== '') return false
-    const jobs = rows.filter(r => r.kind === 'job')
     if (jobs.length === 0) return true
-    return jobs.every(r => r.kind === 'job' && r.job.id === currentSessionId)
-  }, [rows, filterText, dispatchBuf, currentSessionId])
+    return jobs.every(j => j.id === currentSessionId)
+  }, [jobs, filterText, dispatchBuf, currentSessionId])
   const showNoMatchHint = !hasAnyJobRow && filterText !== ''
   // ant 5092.js: `wk = O$.some(W_ => W_.id === _)` — true when ANY
   // job row matches the current session id (i.e., the current session
