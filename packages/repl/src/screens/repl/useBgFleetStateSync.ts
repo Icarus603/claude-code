@@ -10,19 +10,20 @@
  * the assistant finishes, and the row never moves to the Completed
  * bucket.
  *
- * Minimal port from ant's signals (3988.js + 4835.js): drive state
- * transitions off the REPL's `isLoading` flag. The lifecycle is:
+ * Driven by `isLoading` + the last assistant message. Lifecycle:
  *
  *   mount (isLoading=true):       state=working, tempo=active
- *   turn complete (true→false):   state=done,    tempo=idle, firstTerminalAt=now
+ *   turn complete (true→false):
+ *     - assistant asked a question  → state=working, tempo=blocked, needs=question
+ *     - "failed" / "giving up" text → state=failed,  tempo=idle
+ *     - everything else             → state=done,    tempo=idle
  *   new user message (false→true): state=working, tempo=active
  *
- * This isn't the full ant text-inference engine — `result-marker` /
- * `blocked-marker` / `ready-for` etc. (3988.js) detect specific
- * patterns in assistant output and write distinct state values. The
- * one-shot done/working toggle here matches the user's expectation
- * that a session showing "Working" rolls over to "Completed" as soon
- * as the assistant finishes responding, and reverts on follow-up.
+ * The patterns mirror ant 3988.js — the inference engine that scans
+ * assistant output for state markers:
+ *   - result-marker / ready-for / pushed-committed → state=done
+ *   - blocked-marker / `?` at end                  → state=blocked
+ *   - giving-up                                    → state=failed
  *
  * Gated on `CLAUDE_CODE_SESSION_KIND === 'bg'` AND `CLAUDE_JOB_DIR`
  * being set — both written by spawnPty so the foreground REPL is
@@ -30,14 +31,92 @@
  */
 
 import { useEffect, useRef } from 'react'
+import type { MessageType } from '@claude-code/agent/messages.js'
 import {
   readJobState,
   writeJobState,
   invalidateCache,
 } from '@claude-code/agent/background/fleet/fleetStore.js'
 
-export function useBgFleetStateSync(isLoading: boolean): void {
+/**
+ * Pull the text of the last assistant message in the conversation. Used
+ * by the text-inference path to decide whether the turn ended on a
+ * question, a failure, or a normal completion.
+ */
+function lastAssistantText(messages: readonly MessageType[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i]
+    if (m && m.type === 'assistant' && 'message' in m) {
+      const content = m.message?.content
+      if (Array.isArray(content)) {
+        for (let j = content.length - 1; j >= 0; j--) {
+          const block = content[j] as { type?: string; text?: unknown }
+          if (block?.type === 'text' && typeof block.text === 'string') {
+            return block.text
+          }
+        }
+      }
+    }
+  }
+  return ''
+}
+
+/**
+ * Simplified port of ant 3988.js inference branches.
+ *
+ *   ?-at-end OR "question:" OR "need more"          → 'blocked'
+ *   "giving up" / "I can't" / explicit failure      → 'failed'
+ *   default                                          → 'done'
+ *
+ * Returns the message text on the question path so the caller can
+ * store it in `state.needs` for the FleetView "Needs input" group.
+ */
+function inferTurnOutcome(text: string): {
+  kind: 'done' | 'blocked' | 'failed'
+  needs?: string
+} {
+  const trimmed = text.trim()
+  if (trimmed === '') return { kind: 'done' }
+
+  // failure markers (ant 3988.js `s83` "giving up", `Hq3` verdict-failed,
+  // `e83` "ready for" — handled inverted: only true failure phrases).
+  if (
+    /\b(i\s*can't|giving up|unable to|cannot proceed)\b/i.test(trimmed) ||
+    /\b(failed|error|crashed)\b/i.test(trimmed.slice(-200))
+  ) {
+    // false-positive guard: success messages often contain "no errors".
+    if (!/\bno (errors?|failures?)\b/i.test(trimmed.slice(-200))) {
+      return { kind: 'failed' }
+    }
+  }
+
+  // question / blocked markers (ant 3988.js `?` at end + "question:"
+  // markers + "[Aa]ction (?:needed|required)").
+  const endsWithQuestion = /[?？]\s*$/.test(trimmed)
+  const blockedMarker =
+    /\b(action (?:needed|required)|need (?:your )?input|please (?:confirm|clarify|tell|specify))\b/i.test(
+      trimmed.slice(-300),
+    )
+  if (endsWithQuestion || blockedMarker) {
+    // Use the last sentence (split on `.` or newline) as the needs prompt.
+    const lastSentence =
+      trimmed
+        .split(/[\n.]/)
+        .filter(s => s.trim() !== '')
+        .pop() ?? trimmed
+    return { kind: 'blocked', needs: lastSentence.trim().slice(0, 240) }
+  }
+
+  return { kind: 'done' }
+}
+
+export function useBgFleetStateSync(
+  isLoading: boolean,
+  messages: readonly MessageType[],
+): void {
   const previousLoadingRef = useRef<boolean | null>(null)
+  const messagesRef = useRef(messages)
+  messagesRef.current = messages
 
   useEffect(() => {
     if (process.env.CLAUDE_CODE_SESSION_KIND !== 'bg') return
@@ -47,10 +126,6 @@ export function useBgFleetStateSync(isLoading: boolean): void {
     const previous = previousLoadingRef.current
     previousLoadingRef.current = isLoading
 
-    // No-op on first effect run (mount) — the seed state.json from
-    // spawnBgPty already encodes `state=working, tempo=active`. We only
-    // intervene on subsequent transitions to avoid clobbering the
-    // dispatch-time intent/name fields with a partial update.
     if (previous === null) return
     if (previous === isLoading) return
 
@@ -62,32 +137,48 @@ export function useBgFleetStateSync(isLoading: boolean): void {
 
         const now = new Date().toISOString()
         if (isLoading) {
-          // false → true: new user turn started — back to working.
-          // Don't overwrite if it's already in a terminal state we
-          // shouldn't undo (e.g. user typed /exit then re-entered).
           if (current.state === 'stopped' || current.state === 'failed') return
           if (current.state === 'working' && current.tempo === 'active') return
           await writeJobState(jobDir, {
             ...current,
             state: 'working',
             tempo: 'active',
+            needs: undefined,
             updatedAt: now,
           })
         } else {
-          // true → false: assistant turn complete — mark done/idle so
-          // FleetView buckets the row as Completed. This is the one-shot
-          // model — ant's text-inference engine (3988.js) produces finer
-          // states (`blocked` when assistant asks a follow-up question,
-          // `failed` on giving-up phrases, etc.) but a single
-          // turn-complete signal covers the user's reported regression.
           if (current.state === 'stopped' || current.state === 'failed') return
-          await writeJobState(jobDir, {
-            ...current,
-            state: 'done',
-            tempo: 'idle',
-            updatedAt: now,
-            firstTerminalAt: current.firstTerminalAt ?? now,
-          })
+          const outcome = inferTurnOutcome(lastAssistantText(messagesRef.current))
+          if (outcome.kind === 'blocked') {
+            // Stay "working" but flip tempo to blocked + record needs —
+            // FleetView buckets `tempo='blocked'` into "Needs input"
+            // (matches ant deriveBand). Don't set firstTerminalAt — this
+            // isn't a terminal outcome, we expect a follow-up.
+            await writeJobState(jobDir, {
+              ...current,
+              state: 'working',
+              tempo: 'blocked',
+              needs: outcome.needs,
+              updatedAt: now,
+            })
+          } else if (outcome.kind === 'failed') {
+            await writeJobState(jobDir, {
+              ...current,
+              state: 'failed',
+              tempo: 'idle',
+              updatedAt: now,
+              firstTerminalAt: current.firstTerminalAt ?? now,
+            })
+          } else {
+            await writeJobState(jobDir, {
+              ...current,
+              state: 'done',
+              tempo: 'idle',
+              needs: undefined,
+              updatedAt: now,
+              firstTerminalAt: current.firstTerminalAt ?? now,
+            })
+          }
         }
       } catch {
         // Best-effort — disk sync is observability, not correctness.

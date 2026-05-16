@@ -904,12 +904,6 @@ export function REPL({
   // external loading by setIsExternalLoading.
   const isLoading = isQueryActive || isExternalLoading;
 
-  // Bg session → on-disk state.json sync so FleetView buckets rows
-  // correctly (Working → Completed when the assistant turn finishes,
-  // and back to Working on follow-up). See useBgFleetStateSync for
-  // the ant lineage (3988.js + 4835.js daemon supervisor).
-  useBgFleetStateSync(isLoading);
-
   // Elapsed time is computed by SpinnerWithVerb from these refs on each
   // animation frame, avoiding a useInterval that re-renders the entire REPL.
   const [userInputOnProcessing, setUserInputOnProcessingRaw] = React.useState<string | undefined>(undefined);
@@ -1191,6 +1185,15 @@ export function REPL({
 
   const [messages, rawSetMessages] = useState<MessageType[]>(initialMessages ?? []);
   const messagesRef = useRef(messages);
+
+  // Bg session → on-disk state.json sync so FleetView buckets rows
+  // correctly (Working → Completed when the assistant turn finishes,
+  // Working → Needs input when the assistant ends on a question, and
+  // back to Working on follow-up). Reads the last assistant message
+  // to choose between done / blocked / failed via the simplified
+  // 3988.js text inference. See useBgFleetStateSync for the ant
+  // lineage (3988.js text patterns + 4835.js daemon supervisor).
+  useBgFleetStateSync(isLoading, messages);
   // Stores the willowMode variant that was shown (or false if no hint shown).
   // Captured at hint_shown time so hint_converted telemetry reports the same
   // variant — the GrowthBook value shouldn't change mid-session, but reading
