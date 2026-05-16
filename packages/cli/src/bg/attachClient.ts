@@ -183,7 +183,36 @@ export async function runAttach(
   const FRAME_HOME_ERASE = Buffer.from('\x1b[H\x1b[2K')
   const BSU = Buffer.from('\x1b[?2026h')
   const ESU = Buffer.from('\x1b[?2026l')
-  let attachBuffer: Buffer | null = Buffer.alloc(0)
+  // Source: ant 4767.js `Md` write logic — line:
+  //   K.write(_.alreadyInAlt ? ru + Fl() + YH : PzH() + YH + (m ? ru : "") + ...)
+  // When `alreadyInAlt` is true, ant DOES NOT buffer waiting for a
+  // frame-boundary marker. It writes the ack DEC modes immediately and
+  // then paints incoming PTY bytes the moment they arrive. The trick:
+  //
+  //   - The alt-screen buffer already has the outer FleetView pixels
+  //     (preserved by `handoffAltScreen()` — no \x1b[?1049l was emitted).
+  //   - The inner REPL's first paint is INVISIBLE escape codes (DEC
+  //     mode sets/resets) until it finally emits its own \x1b[2J or
+  //     home-erase as part of its first render. Those invisible codes
+  //     change terminal state, not the visible cells.
+  //   - When the inner's first render does fire, its CLEAR+CELLS pair
+  //     overwrites the FleetView pixels in a single coherent paint.
+  //
+  // ccb previously buffered everything until a frame-boundary marker
+  // appeared, which meant during the inner REPL's boot delay (~1-2s of
+  // bun + bundle load + first-render) NOTHING was painted. With proper
+  // handoff the alt-screen WOULD still show FleetView pixels — but only
+  // if no other write happened. Inner-REPL boot emits non-clearing
+  // escape codes that are safely ignored by the terminal; buffering
+  // them deferred the natural transition without benefit.
+  //
+  // Set `attachBuffer = null` initially when CCB_ATTACH_OWNED_ALT_SCREEN
+  // is set so we mirror ant exactly (no buffer). Standalone `ccb attach`
+  // (no env var) keeps the buffer because runAttach itself wrote
+  // `\x1b[?1049h\x1b[2J\x1b[H` and the screen is blank — buffering until
+  // first frame avoids painting partial mode-setup garbage.
+  const ownedAltScreen = !!process.env.CCB_ATTACH_OWNED_ALT_SCREEN
+  let attachBuffer: Buffer | null = ownedAltScreen ? null : Buffer.alloc(0)
 
   // Render incoming PTY output to local stdout. Track DEC private modes
   // (ant 4638.js Yg) so detach can restore local terminal state. Also
