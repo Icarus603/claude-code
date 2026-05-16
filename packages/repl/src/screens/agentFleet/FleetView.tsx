@@ -191,6 +191,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   useEffect(() => {
     setDispatchCursor(c => Math.min(c, dispatchBuf.length))
   }, [dispatchBuf.length])
+
+  // Close the agents drawer the moment the user starts typing. ant
+  // 5092.js does this implicitly because the drawer only renders when
+  // `($ && !H)` — typing makes H non-empty so the drawer-mode branch
+  // in Fs3 stops returning agents.
+  useEffect(() => {
+    if (dispatchBuf !== '') setShowAgentsDrawer(false)
+  }, [dispatchBuf])
   // Slash-command suggestion state. Source: ant 5092.js `Fs3()` result +
   // `j3`/`Rj` (selection index) — when the dispatch buffer starts with
   // `/`, popup lists matching skills/commands; Tab/Enter accepts the
@@ -199,6 +207,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const [agents, setAgents] = useState<readonly AgentDefinition[]>([])
   const [worktreeRepos, setWorktreeRepos] = useState<Record<string, string>>({})
   const [suggestionIndex, setSuggestionIndex] = useState(0)
+  // Toggle for the "show all agents" drawer — ant 5092.js `qz`/`Kz`.
+  // Pressing Tab on an empty dispatch buffer when agents are available
+  // toggles this on, populating the suggestion popup with every agent
+  // (sorted by recency). Pressing Tab again or typing closes it.
+  const [showAgentsDrawer, setShowAgentsDrawer] = useState(false)
 
   // Load commands + agents + sibling worktree repos once on mount.
   // ant 5092.js Fs3 has three @-axis sources:
@@ -280,6 +293,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   //   - generic single-word    → all of the above prefix-matched
   // ccb's first cut implements the @<token> + /<token> branches.
   const suggestions = useMemo<SuggestionItem[]>(() => {
+    // Empty buffer + drawer toggled on → show ALL agents (ant 5092.js
+    // `($ && !H) ? XdK(_).map(cn8)` — drawer mode is the `$` flag,
+    // which becomes truthy when Tab toggles `Kz` on an empty buffer).
+    if (showAgentsDrawer && dispatchBuf === '' && agents.length > 0) {
+      return agents
+        .slice()
+        .sort((a, b) => a.agentType.localeCompare(b.agentType))
+        .map<SuggestionItem>(a => ({
+          id: `agent:${a.agentType}`,
+          displayText: `@${a.agentType}`,
+          description: `background · ${a.whenToUse}`,
+          metadata: { kind: 'agent', name: a.agentType },
+        }))
+    }
     if (atMatch !== null) {
       // ant 5092.js Fs3 @-branch:
       //   M = [
@@ -761,10 +788,19 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Tab — accept the highlighted slash suggestion. ant 5092.js:
-    //   if (W_.key === "tab") { if (vA.length > 0) M8(vA[j3] ?? vA[0]) }
+    // Tab — accept the highlighted suggestion, OR (when buffer is
+    // empty + agents available + no suggestions yet) toggle the
+    // "show all agents" drawer. Source: ant 5092.js xd:
+    //   if (key === "tab") {
+    //     if (!j_.current && I3.length > 0) Kz(l6 => !l6)
+    //     else if (vA.length > 0) M8(vA[j3] ?? vA[0])
+    //   }
     if (key.tab) {
       if (suggestions.length > 0 && acceptSuggestion()) return
+      if (dispatchBuf === '' && agents.length > 0) {
+        setShowAgentsDrawer(prev => !prev)
+        return
+      }
     }
 
     // Most keys close the help overlay (mirrors ant 2803-2810).
