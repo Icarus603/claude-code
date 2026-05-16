@@ -518,17 +518,43 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     if (onQuit !== undefined) onQuit()
   }, [onQuit])
 
-  /** Source: ant Id step-helper — skip past header rows when navigating. */
+  /**
+   * Step the selection index by `delta`, wrapping around at the
+   * boundaries and skipping rows that aren't currently navigable.
+   *
+   * Source: ant 5092.js `Id`:
+   *   let Id = (W_, B6) => {
+   *     let M8 = cH.length
+   *     if (M8 === 0) return 0
+   *     let l6 = peekOpen ? K9 => K9?.kind !== "job" : null
+   *     let Dq = (W_ + B6 + M8) % M8   // MODULO wraps
+   *     if (l6) while (Dq !== W_ && l6(cH[Dq])) Dq = (Dq + B6 + M8) % M8
+   *     return Dq
+   *   }
+   *
+   * Two behaviour bumps over ccb's previous clamp-only:
+   *   - Wraps top↔bottom (modulo) — Up at row 0 lands at the last row
+   *   - When peek is open, skips non-job rows (peek operates on jobs)
+   */
   const stepIndex = useCallback(
     (from: number, delta: number): number => {
-      if (rows.length === 0) return 0
-      let next = from + delta
-      while (next >= 0 && next < rows.length && rows[next]?.kind === 'header' && delta !== 0) {
-        next += delta
+      const n = rows.length
+      if (n === 0) return 0
+      // Wrap with proper modulo (negative-safe).
+      const wrap = (i: number): number => ((i % n) + n) % n
+      let next = wrap(from + delta)
+      const shouldSkip = peekOpen
+        ? (r: FleetRow | undefined) => r?.kind !== 'job'
+        : null
+      if (shouldSkip) {
+        let guard = 0
+        while (next !== from && shouldSkip(rows[next]) && guard++ < n) {
+          next = wrap(next + delta)
+        }
       }
-      return Math.max(0, Math.min(rows.length - 1, next))
+      return next
     },
-    [rows],
+    [rows, peekOpen],
   )
 
   const handleMove = useCallback(
