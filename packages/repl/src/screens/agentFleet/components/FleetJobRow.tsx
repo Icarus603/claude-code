@@ -31,6 +31,7 @@
  * for the foreground row, prefixed with detail when E is set).
  */
 
+import type React from 'react'
 import { Box, Text } from '@anthropic/ink'
 import figures from 'figures'
 
@@ -56,8 +57,8 @@ import { FleetSpinner } from './FleetSpinner.js'
 type ActivityOrPending = FleetActivity | undefined
 
 export interface FleetRowChildSummary {
-  /** Hex/named color for the child rollup glyph (or undefined to suppress). */
-  color?: string
+  /** Theme color key for the child rollup glyph (or undefined to suppress). */
+  color?: keyof import('@anthropic/ink').Theme
   href: string
   kind: 'agent' | 'frame'
 }
@@ -92,7 +93,7 @@ export interface FleetJobRowProps {
 
 function colorBadgeStyleFor(
   color: string | undefined,
-): { theme: string } | undefined {
+): { theme: keyof import('@anthropic/ink').Theme } | undefined {
   if (color === undefined) return undefined
   if (!(AGENT_COLORS as readonly string[]).includes(color)) return undefined
   return { theme: AGENT_COLOR_TO_THEME_COLOR[color as AgentColorName] }
@@ -116,7 +117,7 @@ function pickRowGlyph(
 }
 
 /** Source: ant row rendering (5092.js:1380-1610). */
-export function FleetJobRow(props: FleetJobRowProps): JSX.Element {
+export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
   const {
     state,
     activity,
@@ -135,7 +136,8 @@ export function FleetJobRow(props: FleetJobRowProps): JSX.Element {
   } = props
 
   const outcome = stateOutcome(state.state)
-  const { color: glyphCol, dim: glyphDim } = glyphColor(state, activity, presence)
+  const { color: glyphColorKey, dim: glyphDim } = glyphColor(state, activity, presence)
+  const glyphCol = glyphColorKey as keyof import('@anthropic/ink').Theme | undefined
 
   const { glyph, isAnimated } = pickRowGlyph(state, presence, attaching, deleteArmed, outcome)
 
@@ -205,11 +207,11 @@ interface LabelCellProps {
   label: string
   renaming?: { draft: string; cursor: number }
   typingFrame?: { display: string; newLen: number }
-  badge?: { theme: string }
+  badge?: { theme: keyof import('@anthropic/ink').Theme }
   focused: boolean
 }
 
-function LabelCell({ label, renaming, typingFrame, badge, focused }: LabelCellProps): JSX.Element {
+function LabelCell({ label, renaming, typingFrame, badge, focused }: LabelCellProps): React.ReactNode {
   if (renaming !== undefined) {
     return <RenameInput draft={renaming.draft} cursor={renaming.cursor} />
   }
@@ -240,7 +242,7 @@ interface RenameInputProps {
  * Inline-rename buffer renderer — shows the draft with a block cursor at
  * `cursor` offset. Source: ant `is3` helper (5092.js, inline draft writer).
  */
-function RenameInput({ draft, cursor }: RenameInputProps): JSX.Element {
+function RenameInput({ draft, cursor }: RenameInputProps): React.ReactNode {
   const before = draft.slice(0, cursor)
   const at = draft.slice(cursor, cursor + 1) || ' '
   const after = draft.slice(cursor + 1)
@@ -319,7 +321,7 @@ interface ChildRollupProps {
  * multiple, falls through to a "claude" colored frame glyph for frame
  * children when no PR is rollable.
  */
-function ChildRollup({ summaries }: ChildRollupProps): JSX.Element | null {
+function ChildRollup({ summaries }: ChildRollupProps): React.ReactNode | null {
   const colorable = summaries.filter(s => s.color !== undefined)
   const frames = summaries.filter(s => s.kind === 'frame')
   if (colorable.length === 0 && frames.length === 0) return null
@@ -338,7 +340,7 @@ function ChildRollup({ summaries }: ChildRollupProps): JSX.Element | null {
   if (lastFrame !== undefined) {
     return (
       <Box flexShrink={0}>
-        <Text color="cyan">{frames.length > 1 ? `${frames.length} ` : ''}◐</Text>
+        <Text color="cyan_FOR_SUBAGENTS_ONLY">{frames.length > 1 ? `${frames.length} ` : ''}◐</Text>
         <Text>  </Text>
       </Box>
     )

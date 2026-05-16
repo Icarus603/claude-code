@@ -7,8 +7,9 @@
  * order — a visual win when a column of rows is all working at once.
  */
 
-import { Text } from '@anthropic/ink'
+import type React from 'react'
 import { useEffect, useState } from 'react'
+import { Text } from '@anthropic/ink'
 
 import {
   SPINNER_FRAME_MS,
@@ -17,16 +18,16 @@ import {
 
 interface FleetSpinnerProps {
   /**
-   * Color name passed straight to Ink `<Text color>`. Undefined renders
+   * Theme color key passed to Ink `<Text color>`. Undefined renders
    * with the parent's color (typically dimmed).
    */
-  color?: string
+  color?: keyof import('@anthropic/ink').Theme
   /** If true, applies `dimColor` on the glyph text. */
   dim?: boolean
 }
 
 /** Source: ant Cs3. */
-export function FleetSpinner({ color, dim }: FleetSpinnerProps): JSX.Element {
+export function FleetSpinner({ color, dim }: FleetSpinnerProps): React.ReactNode {
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     const handle = setInterval(() => setNow(Date.now()), SPINNER_FRAME_MS)

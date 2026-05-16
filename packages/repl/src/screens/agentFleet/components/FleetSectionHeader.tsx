@@ -13,6 +13,7 @@
  * background — this component only renders the label/count itself.
  */
 
+import type React from 'react'
 import { Box, Text } from '@anthropic/ink'
 
 interface FleetSectionHeaderProps {
@@ -40,7 +41,7 @@ export function FleetSectionHeader({
   collapsed,
   focused,
   width,
-}: FleetSectionHeaderProps): JSX.Element {
+}: FleetSectionHeaderProps): React.ReactNode {
   return (
     <Box width={width}>
       <Text italic bold={focused} inverse={focused}>
