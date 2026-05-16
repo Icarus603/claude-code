@@ -176,17 +176,19 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
   return (
     <Box backgroundColor={focused ? 'userMessageBackground' : undefined}>
       {/* glyph column — width = labelWidth.glyph (2 cells).
-          Source: ant 5092.js rs3:
-            wH = N_.createElement(V, {color: M, dimColor: o}, s)
-          The SAME (color, dim) wrapper applies to both the static glyph
-          and the Cs3 spinner — derived from Ti8(state, activity,
-          presence). For busy presence Ti8 returns {color:undefined,
-          dim:false} so the spinner renders uncolored, NOT brand color.
-          ccb previously hardcoded 'claude' for the spinner; reverted to
-          ant verbatim so the spinner shares the row's tempo color. */}
+          ant 5092.js rs3 wraps BOTH static glyph + spinner in the same
+          (color M, dim o) Text from Ti8(state, activity, presence) — so
+          ant's spinner renders uncolored when presence='busy' (Ti8
+          returns {color:undefined, dim:false}). ccb keeps the brand
+          'claude' color on the spinner specifically: the active row's
+          spinner is the user's primary scanning cue across the fleet,
+          and the warm-claude tint makes it stand out in a way the
+          uncolored default doesn't. Static glyphs still use the
+          Ti8-derived color (success/error/warning) so terminal
+          outcomes remain semantically colored. */}
       <Box width={2} flexShrink={0}>
         {isAnimated ? (
-          <FleetSpinner color={glyphCol} dim={glyphDim} />
+          <FleetSpinner color="claude" dim={false} />
         ) : (
           <Text color={glyphCol} dimColor={glyphDim}>
             {glyph ?? ' '}

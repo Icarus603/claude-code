@@ -1315,6 +1315,16 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
   // ── key router (ant xd at 5092.js:2767-3115) ────────────────────────
   useInput((input, key) => {
+    // Source: ant xd `if (rH !== null) { if (ctrl+c) aH(null); return; }`.
+    // `rH` is the attaching-job id (set when user attaches, cleared when
+    // the open promise resolves). While attach is in flight, ant swallows
+    // ALL keys except Ctrl+C (which cancels the attach). Prevents the
+    // user from triggering a second action between right-arrow and the
+    // FleetView unmount.
+    if (attachingShort !== null) {
+      if (key.ctrl && input === 'c') setAttachingShort(null)
+      return
+    }
     // Renaming intercepts everything.
     if (renameState !== undefined) {
       if (key.ctrl && input === 'c') {
