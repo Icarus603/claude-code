@@ -80,13 +80,21 @@ export async function agentsFleetHandler(): Promise<void> {
         currentSessionId: process.env.CLAUDE_SESSION_ID ?? '',
         initialFocusedShort: lastFocusedShort,
         root,
-        onDispatch: prompt => {
+        onDispatch: info => {
           // Async-fire spawnBgPty; row surfaces via state.json polling.
           // quiet:true — outer Ink owns the screen, don't print banner.
+          // Source: ant 5092.js Ot3 → on8 parse result feeds iP6:
+          //   - `template.name` becomes the --agent flag value
+          //   - `cwd` overrides spawn cwd (from @repo mention)
+          // ccb mirrors with `--agent <name>` when info.agent is set
+          // and uses info.cwd if specified, falling back to getCwd().
+          const flags: string[] = info.agent
+            ? ['--agent', info.agent]
+            : []
           void spawnBgPty({
-            flags: [],
-            directive: prompt,
-            cwd: getCwd(),
+            flags,
+            directive: info.intent,
+            cwd: info.cwd ?? getCwd(),
             waitForSocketMs: 0,
             quiet: true,
           }).catch(err =>

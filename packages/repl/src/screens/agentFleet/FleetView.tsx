@@ -89,8 +89,18 @@ export interface FleetViewProps {
   onAttach?: (short: string) => void
   /** PR cache passed through from caller. */
   prCache?: FleetPrCache
-  /** Called when user submits a non-command task in the dispatch box. */
-  onDispatch?: (prompt: string) => void
+  /**
+   * Called when user submits a non-command task in the dispatch box.
+   * Includes optional cwd override (from `@<repo>` mention) and agent
+   * name (from `@<agent>` mention). Source: ant on8 parser (5092.js)
+   * returns `{ template, intent, cwd, routine }` which the dispatcher
+   * passes to spawnBgPty as agent flag + cwd.
+   */
+  onDispatch?: (info: {
+    intent: string
+    cwd?: string
+    agent?: string
+  }) => void
   /**
    * Initial focused job short — passed by the agentsFleet loop on
    * remount after an attach so the user lands back on the row they
@@ -611,12 +621,53 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       }
       return
     }
-    onDispatch?.(text)
-    // Kick a refresh on the next tick so the optimistic state.json
-    // written by spawnBgPty surfaces immediately, not on the 1s poll.
-    // Mirrors ant's `Wj((LJ) => [...LJ, b3])` (5092.js:3070-3082).
+
+    // Parse @-mentions out of the buffer. Source: ant 5092.js on8:
+    //   - Walks each /(?:^|\s)@(\S+)/ match
+    //   - First @<name> matching an active agent → set template, strip
+    //   - First @<name> matching a worktree repo → set cwd, strip
+    //   - First @<name> matching a nested skill → set routine, strip
+    //   - Unmatched @-tokens stay in the buffer
+    //   - Then leading word may itself be an agent name (without @)
+    let cwd: string | undefined
+    let agent: string | undefined
+    const agentMap = new Map(agents.map(a => [a.agentType.toLowerCase(), a]))
+    const repoMap = new Map(
+      Object.entries(worktreeRepos).map(([n, p]) => [n.toLowerCase(), p]),
+    )
+    const stripped = text
+      .replace(/(?:^|\s)@(\S+)/g, (match, token) => {
+        const t = token.toLowerCase()
+        const a = agentMap.get(t)
+        if (a) {
+          if (agent === undefined) agent = a.agentType
+          return ''
+        }
+        const r = repoMap.get(t)
+        if (r) {
+          if (cwd === undefined) cwd = r
+          return ''
+        }
+        return match
+      })
+      .trim()
+    // Bare leading word may name an agent. ant: "let J = ... ; let D = $
+    // ? undefined : _.find(M => M.name.toLowerCase() === J)".
+    if (agent === undefined) {
+      const space = stripped.search(/\s/)
+      const firstWord = (space < 0 ? stripped : stripped.slice(0, space)).toLowerCase()
+      const a = agentMap.get(firstWord)
+      if (a) {
+        agent = a.agentType
+        const rest = space < 0 ? '' : stripped.slice(space + 1).trim()
+        onDispatch?.({ intent: rest, cwd, agent })
+        setTimeout(() => refreshJobs(), 50)
+        return
+      }
+    }
+    onDispatch?.({ intent: stripped, cwd, agent })
     setTimeout(() => refreshJobs(), 50)
-  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, refreshJobs])
+  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, refreshJobs, agents, worktreeRepos])
 
   const handlePeekSubmit = useCallback(
     (text: string): void => {
