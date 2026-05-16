@@ -1368,7 +1368,22 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       {/* Status line. Priority: quit-confirm > error > footer chord cascade. */}
       {pendingQuitConfirm ? (
         <Box flexShrink={0} paddingLeft={2} height={1}>
-          <Text dimColor>Press Ctrl-C again to exit</Text>
+          <Text dimColor>
+            {(() => {
+              // ant 5092.js quit-confirm message:
+              //   `Press Ctrl-C again to exit${GB > 0 ? \` · ${GB} ${v6(GB,'agent')} will keep running\` : ''}`
+              // where GB counts rows in `blocked` or `working` bucket via
+              // `PZ6 === "blocked" || PZ6 === "working"`. Reassures the user
+              // that bg sessions outlive the FleetView quit.
+              const keepCount = jobs.filter(j => {
+                const band = deriveBand(j.state, presence.get(j.id))
+                return band === 'blocked' || band === 'active'
+              }).length
+              if (keepCount === 0) return 'Press Ctrl-C again to exit'
+              const noun = keepCount === 1 ? 'agent' : 'agents'
+              return `Press Ctrl-C again to exit · ${keepCount} ${noun} will keep running`
+            })()}
+          </Text>
         </Box>
       ) : errorToast !== undefined ? (
         <Box flexShrink={0} paddingLeft={2} height={1}>
