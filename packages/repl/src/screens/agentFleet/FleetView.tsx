@@ -1768,15 +1768,23 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
               presence={
                 row.kind === 'job'
                   ? // Source: ant 5092.js `yA` presence resolver. ant has a
-                    // daemon roster that publishes per-worker {sessionId,
-                    // status:"busy"|"shell"|"waiting"} via $M_() — ccb's
-                    // daemon doesn't emit that yet, so when no daemon
-                    // presence is recorded for the worker we synthesize
-                    // "busy" from state.tempo === 'active'. Same end-user
-                    // visual: actively-processing rows animate the spinner;
-                    // idle rows show the static glyph.
+                    // daemon roster (q$) populated from attacher.json files —
+                    // every alive worker reports a status ("busy"|"shell"|
+                    // "waiting"). pdK's first branch (`_ && tempo!=='active'
+                    // && presence===undefined → sq_`) only fires when no
+                    // roster entry exists → exited workers get ∙.
+                    //
+                    // ccb's PTY-only mode has no daemon roster, so `presence`
+                    // map is always empty for these workers. Without
+                    // synthesis EVERY idle row landed in the "exited" branch
+                    // and rendered ∙. Mirror ant by reporting:
+                    //   tempo === 'active' → 'busy' (alive + working, spinner)
+                    //   else (alive idle)  → 'waiting' (matches ant attacher
+                    //                       roster idle status — pdK falls
+                    //                       through to Vs3 = ✻)
+                    // Daemon-managed rows still defer to the real roster.
                     presence.get(row.job.id) ??
-                    (row.job.state.tempo === 'active' ? 'busy' : undefined)
+                    (row.job.state.tempo === 'active' ? 'busy' : 'waiting')
                   : undefined
               }
               onMouseEnter={() => {
