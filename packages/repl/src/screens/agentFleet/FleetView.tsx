@@ -830,7 +830,19 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
     // PeekPanel handles its own input via its TextInput child.
     if (peekOpen) {
-      if (key.escape || (key.ctrl && input === 'c')) handlePeekClose()
+      if (key.escape || (key.ctrl && input === 'c')) {
+        handlePeekClose()
+        return
+      }
+      // ant 5092.js xd peek branch:
+      //   if (_H && W_.ctrl && W_.key === "x") $P("x", E9)
+      // Ctrl+X armed-delete works inside peek too — fires `handleArmDelete`
+      // against the currently-peeked job. Skip when peek is owned by a job
+      // already in transition (delete during in-flight reply would race).
+      if (key.ctrl && input === 'x' && focusedJob !== undefined) {
+        handleArmDelete()
+        return
+      }
       return
     }
 
