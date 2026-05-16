@@ -17,6 +17,8 @@
 import type React from 'react'
 import { createElement } from 'react'
 
+import { VoiceProvider } from '@claude-code/voice/voiceContext.js'
+
 import { FleetView, type FleetViewProps } from './FleetView.js'
 
 export interface InkRootLike {
@@ -33,23 +35,36 @@ export interface MountFleetViewOptions extends Omit<FleetViewProps, 'onQuit'> {
   root: InkRootLike
 }
 
-/** Source: ant Ot3 (5092.js:3839). */
+/**
+ * Source: ant Ot3 (5092.js:3839).
+ *
+ * Wraps FleetView in VoiceProvider because the prompt-area voice cascade
+ * (warmup hint / indicator / audio meter) subscribes via useVoiceState.
+ * `ccb agents` is a standalone TUI entrypoint that doesn't inherit the
+ * REPL's provider tree, so we mount a fresh default VoiceProvider here
+ * — voiceState starts 'idle', UI renders nothing for voice until/unless
+ * the user triggers it from inside the fleet view.
+ */
 export async function mountFleetView(options: MountFleetViewOptions): Promise<void> {
   return new Promise<void>(resolve => {
     options.root.render(
-      createElement(FleetView, {
-        versionLabel: options.versionLabel,
-        modelLabel: options.modelLabel,
-        cwdLabel: options.cwdLabel,
-        currentSessionId: options.currentSessionId,
-        seedJobs: options.seedJobs,
-        prCache: options.prCache,
-        onAttach: options.onAttach,
-        onQuit: () => {
-          options.root.unmount()
-          resolve()
-        },
-      }),
+      createElement(
+        VoiceProvider,
+        null,
+        createElement(FleetView, {
+          versionLabel: options.versionLabel,
+          modelLabel: options.modelLabel,
+          cwdLabel: options.cwdLabel,
+          currentSessionId: options.currentSessionId,
+          seedJobs: options.seedJobs,
+          prCache: options.prCache,
+          onAttach: options.onAttach,
+          onQuit: () => {
+            options.root.unmount()
+            resolve()
+          },
+        }),
+      ),
     )
     void options.root.waitUntilExit().then(() => resolve())
   })
