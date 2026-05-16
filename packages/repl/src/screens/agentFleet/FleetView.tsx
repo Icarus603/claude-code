@@ -1180,9 +1180,22 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       const targetCwd = cwd ?? getCwd()
       const isPlainDispatch =
         dispatchAgent === undefined || dispatchAgent === 'claude'
+      // Source: ant 5092.js xd Return:
+      //   let $1 = !hasImages && OK.length <= LZH && !OK.includes("\n")
+      //   let A7 = !!AP && AP.ready && !L9.matched && !L9.routine
+      //            && NT === AP.cwd && $1
+      // ant only consumes the spare when the intent fits a SINGLE
+      // bracketed paste — length ≤ 800 chars (LZH) and no embedded
+      // newlines. Multi-line/long intents go through cold spawn so the
+      // inner REPL renders them via the normal stdin write path.
+      // ccb dispatch buffer doesn't attach images yet — so just check
+      // length and newlines.
+      const SPARE_INTENT_MAX = 800
+      const fitsSpare =
+        intent.length <= SPARE_INTENT_MAX && !intent.includes('\n')
       let resolvedShort: string | undefined
       let resolvedSessionId: string | undefined
-      if (isPlainDispatch && peekSpare !== undefined) {
+      if (isPlainDispatch && fitsSpare && peekSpare !== undefined) {
         const slot = peekSpare(targetCwd)
         if (slot !== undefined) {
           resolvedShort = slot.short
@@ -1258,6 +1271,21 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         setTimeout(() => refreshJobs(), 50)
         return
       }
+    }
+    // Source: ant 5092.js xd Return branch:
+    //   if (!L9.routine && !L9.matched && OK.trim().length < js3) {
+    //     Gq(null); t5("Too short — describe the task"); return;
+    //   }
+    // js3 = 4 (5092.js end). When the dispatch isn't matched to a skill
+    // or routine and the intent is shorter than 4 chars, ant rejects
+    // with a "Too short" hint. For agent-prefixed dispatches the check
+    // is skipped (matched=true). ccb adds the same gate so a typo'd
+    // 1-2 char dispatch doesn't waste a session boot.
+    const MIN_INTENT_LEN = 4
+    if (agent === undefined && stripped.trim().length < MIN_INTENT_LEN) {
+      setErrorToast('Too short — describe the task')
+      setDispatchBuf(text)
+      return
     }
     if (agent !== undefined) markAgentUsed(agent)
     const short = pushOptimistic(stripped, agent)
