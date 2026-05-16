@@ -189,19 +189,41 @@ export function PeekPanel({
           </Box>
         ) : null}
 
-        {/* (2) c_ — child PR/frame rows. */}
+        {/* (2) c_ — child PR/frame rows. Source: ant gs3:
+              gH.map(e_ => <B key=e_.row.href>
+                <B width={rH} flexShrink={0}>
+                  {e_.color && <V color={e_.color}>{myH(e_) ? tq_ : Q4}</V>}
+                </B>
+                <B flexGrow={1} width={0}>
+                  <V wrap="truncate"><sq url={e_.row.href}>{e_.label}</sq></V>
+                </B>
+                ...diffStat + status badges
+              </B>)
+            where:
+              Q4  = '⏺' (●, macos) or '○' (○)
+              tq_ = '⧉' (⧉, frame join glyph)
+              myH(e) = e.row.kind === "frame"
+            ccb's FleetChildSummary carries kind + href; label/color/diff/
+            status enrichment requires the PR cache integration in
+            FleetView (deriveChildSummaries) — TODO to plumb through.
+            For now port the glyph distinction so frames vs PR children
+            are visually distinguishable. */}
         {children.length > 0 ? (
           <Box flexDirection="column">
-            {children.slice(0, 8).map(child => (
-              <Box key={child.href}>
-                <Box width={2} flexShrink={0}>
-                  <Text dimColor>·</Text>
+            {children.slice(0, 8).map(child => {
+              // ant Q4 vs tq_ glyph selection.
+              const glyph = child.kind === 'frame' ? '⧉' : '●'
+              return (
+                <Box key={child.href}>
+                  <Box width={2} flexShrink={0}>
+                    <Text dimColor>{glyph}</Text>
+                  </Box>
+                  <Box flexGrow={1} width={0}>
+                    <Text wrap="truncate">{child.label ?? child.href}</Text>
+                  </Box>
                 </Box>
-                <Box flexGrow={1} width={0}>
-                  <Text wrap="truncate">{child.label ?? child.href}</Text>
-                </Box>
-              </Box>
-            ))}
+              )
+            })}
             {children.length > 8 ? (
               <Box paddingLeft={2}>
                 <Text dimColor>… {children.length - 8} more</Text>
