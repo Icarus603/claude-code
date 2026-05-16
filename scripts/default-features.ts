@@ -66,6 +66,10 @@ const STABLE_FEATURES = [
   'DAEMON',
   // Auto theme detection (match terminal background color)
   'AUTO_THEME',
+  // FleetView (`ccb agents` TUI dashboard) — re-ported from ant v2.1.143.
+  // Phase 1-7 landed; CLI handler dispatches TUI when TTY, falls through
+  // to plain text list otherwise.
+  'AGENTS_FLEET',
 ] as const
 
 /**

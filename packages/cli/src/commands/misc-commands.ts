@@ -305,8 +305,8 @@ export function registerMiscCommands(program: Command): void {
       'Comma-separated list of setting sources to load (user, project, local).',
     )
     .action(async () => {
-      const { agentsHandler } = await import('../handlers/agents.js')
-      await agentsHandler()
+      const { agentsFleetHandler } = await import('../handlers/agentsFleet.js')
+      await agentsFleetHandler()
       process.exit(0)
     })
 

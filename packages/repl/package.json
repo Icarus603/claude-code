@@ -8,6 +8,8 @@
   "exports": {
     "./screens/*.js": "./src/screens/*.tsx",
     "./screens/*": "./src/screens/*",
+    "./screens/agentFleet/mountFleetView.js": "./src/screens/agentFleet/mountFleetView.tsx",
+    "./screens/agentFleet/FleetView.js": "./src/screens/agentFleet/FleetView.tsx",
     "./keybindings/KeybindingProviderSetup.js": "./src/keybindings/KeybindingProviderSetup.tsx",
     "./keybindings/*.js": "./src/keybindings/*.ts",
     "./keybindings/*": "./src/keybindings/*",
