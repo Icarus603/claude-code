@@ -22,6 +22,17 @@ import type {
 
 const JOBS_POLL_MS = 1_000
 
+/**
+ * Module-level snapshot cache. ant 5092.js stores the most recent
+ * `Ki8` (jobs) / `NdK` (loopKicks) / `vdK` (statuses) / `sn8`
+ * (prStatuses) at module scope so a fresh FleetView mount can seed
+ * its first render from them — avoids the "0 awaiting · 0 working ·
+ * 0 completed" flash while the first poll runs after returning from
+ * an attach. The cache lives across the loop's unmount/remount cycle
+ * but is reset when the process exits.
+ */
+let lastJobsCache: readonly FleetJob[] | undefined
+
 export interface FleetPollResult {
   jobs: FleetJob[]
   presence: Map<string, FleetPresence>
@@ -41,7 +52,9 @@ export function useFleetPolling(seed: readonly FleetJob[] | undefined): FleetPol
   const refreshRef = useRef<() => void>(() => {})
   const refresh = useCallback(() => refreshRef.current(), [])
   const [result, setResult] = useState<FleetPollResult>(() => ({
-    jobs: seed === undefined ? [] : [...seed],
+    // Seed priority: explicit prop → module-cache snapshot → empty.
+    // ant Ot3 reuses `Ki8` for the same purpose.
+    jobs: seed !== undefined ? [...seed] : (lastJobsCache ? [...lastJobsCache] : []),
     presence: new Map(),
     prCache: undefined,
     generation: 0,
@@ -82,6 +95,9 @@ export function useFleetPolling(seed: readonly FleetJob[] | undefined): FleetPol
           }
         }
         gen += 1
+        // Persist the latest jobs so a fresh FleetView mount in the
+        // same process can seed from it (ant Ot3 `Ki8 = f.jobs`).
+        lastJobsCache = jobs
         setResult({ jobs, presence, prCache: undefined, generation: gen, refresh })
       } catch (err) {
         if (!cancelled) {
