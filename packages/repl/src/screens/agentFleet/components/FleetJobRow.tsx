@@ -170,10 +170,15 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
 
   return (
     <Box backgroundColor={focused ? 'userMessageBackground' : undefined}>
-      {/* glyph column — width = labelWidth.glyph (2 cells) */}
+      {/* glyph column — width = labelWidth.glyph (2 cells).
+          Working/active spinner uses the brand 'claude' color so the
+          animation stands out as the user's eye scans the list. Static
+          glyphs keep their derived glyphColor (which carries the
+          success/failure/blocked semantic). ccb customization vs ant
+          (which renders spinner uncolored). */}
       <Box width={2} flexShrink={0}>
         {isAnimated ? (
-          <FleetSpinner color={glyphCol} dim={glyphDim} />
+          <FleetSpinner color="claude" dim={false} />
         ) : (
           <Text color={glyphCol} dimColor={glyphDim}>
             {glyph ?? ' '}
