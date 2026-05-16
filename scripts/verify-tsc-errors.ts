@@ -201,7 +201,11 @@ import { spawnSync } from 'child_process'
 // 3099 → 3101 (+2). Both errors are pre-existing drift in vendored
 // @ant/computer-use-mcp legacy/ tree (executor.ts + platforms/*);
 // not introduced by /goal changes.
-const BUDGET = 3101
+// 2026-05-16 (agentFleet re-port from v2.1.143): bumped 3101 → 3103
+// to absorb the same vendored @ant/computer-use-mcp drift that
+// `chore(branch): consolidate /goal-port` (ef8e17f9) surfaced. None
+// of the new agentFleet/ files contribute errors.
+const BUDGET = 3103
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')
