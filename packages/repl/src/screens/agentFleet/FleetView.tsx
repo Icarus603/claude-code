@@ -1044,14 +1044,34 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   )
 
   const hasAnyJobRow = useMemo(() => rows.some(r => r.kind === 'job'), [rows])
-  const showEmptyHint = !hasAnyJobRow && filterText === ''
+  // ant 5092.js Tz render gate:
+  //   `O$.every(W_ => W_.id === _) && !bH` — every job row's id matches
+  //   the current session id AND the dispatch buffer is empty.
+  // The two conditions matter:
+  //   - "every is current" is vacuously true when there are zero jobs
+  //     (the standard empty-fleet state)
+  //   - "every is current" is true when the user opened agents from
+  //     within a session and that's the only session
+  //   - In both cases, buffer must be empty (Tz is the empty-state hint,
+  //     not the in-progress dispatch hint)
+  const showEmptyHint = useMemo(() => {
+    if (filterText !== '') return false
+    if (dispatchBuf !== '') return false
+    const jobs = rows.filter(r => r.kind === 'job')
+    if (jobs.length === 0) return true
+    return jobs.every(r => r.kind === 'job' && r.job.id === currentSessionId)
+  }, [rows, filterText, dispatchBuf, currentSessionId])
   const showNoMatchHint = !hasAnyJobRow && filterText !== ''
-  // ant 5092.js: `wk = O$.some(W_ => W_.id === _)` — true when the
-  // current session id matches one of the listed jobs (i.e., we're
-  // viewing the fleet from inside an existing session). When true the
-  // empty-state hint becomes "Press → to return to your session
-  // anytime". Falls back to the generic "Type a task below to start a
-  // background session." text when the current session isn't in view.
+  // ant 5092.js: `wk = O$.some(W_ => W_.id === _)` — true when ANY
+  // job row matches the current session id (i.e., the current session
+  // appears in the fleet). The hint render is then gated separately on
+  // `O$.every(W_ => W_.id === _) && !bH` — every job IS the current
+  // session AND buffer is empty. ccb keeps two separate signals:
+  //   - currentSessionInRows: at least one row is the current session
+  //   - showReturnHint:       every job row is the current session
+  //     (i.e., user's only session in view) and buffer is empty —
+  //     this is the variant that switches "type a task below" to
+  //     "press → to return to your session anytime".
   const currentSessionInRows = useMemo(
     () =>
       currentSessionId !== '' &&
