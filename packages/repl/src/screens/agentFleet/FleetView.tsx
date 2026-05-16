@@ -163,6 +163,17 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const [errorToast, setErrorToast] = useState<string | undefined>(undefined)
   // Dispatch buffer (ant `j_.current`) — what the user is typing.
   const [dispatchBuf, setDispatchBuf] = useState('')
+  // Cursor offset within the dispatch buffer (ant `U_` / `setU` in
+  // 5092.js — passed as `cursorOffset` / `onCursorOffsetChange` to PN
+  // SearchInput). Without this, typed text can only be appended at end
+  // and backspace only deletes the last char.
+  const [dispatchCursor, setDispatchCursor] = useState(0)
+
+  // Clamp cursor whenever the buffer shrinks (programmatic clears, paste
+  // truncation, etc.) so we never index past the end.
+  useEffect(() => {
+    setDispatchCursor(c => Math.min(c, dispatchBuf.length))
+  }, [dispatchBuf.length])
   // Slash-command suggestion state. Source: ant 5092.js `Fs3()` result +
   // `j3`/`Rj` (selection index) — when the dispatch buffer starts with
   // `/`, popup lists matching skills/commands; Tab/Enter accepts the
@@ -749,9 +760,23 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
+    // Left arrow — when dispatch buffer non-empty, move cursor within it.
+    // ant 4205.js PN consumes left/right inside the input naturally;
+    // ccb's InlineDispatchBuffer doesn't, so we route through here.
+    if (key.leftArrow && dispatchBuf !== '') {
+      setDispatchCursor(c => Math.max(0, c - 1))
+      return
+    }
+
     // Right arrow on a job row — open/attach. Source: ant 2941-2944.
     if (key.rightArrow && dispatchBuf === '' && focused?.kind === 'job') {
       onAttach?.(focused.job.id)
+      return
+    }
+
+    // Right arrow — when dispatch buffer non-empty, move cursor right.
+    if (key.rightArrow && dispatchBuf !== '') {
+      setDispatchCursor(c => Math.min(dispatchBuf.length, c + 1))
       return
     }
 
@@ -811,15 +836,28 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Backspace — delete last char of buffer.
+    // Backspace — delete char before cursor (or last char when cursor
+    // is at end). Source: ant 4205.js PN useTextInput.backspace.
     if (key.backspace || key.delete) {
-      setDispatchBuf(prev => prev.slice(0, -1))
+      setDispatchBuf(prev => {
+        if (prev === '') return prev
+        const c = Math.min(dispatchCursor, prev.length)
+        if (c === 0) return prev
+        const next = prev.slice(0, c - 1) + prev.slice(c)
+        setDispatchCursor(c - 1)
+        return next
+      })
       return
     }
 
-    // Free typing — append to dispatch buffer.
+    // Free typing — insert chars at cursor.
     if (input !== '' && !key.ctrl && !key.meta) {
-      setDispatchBuf(prev => prev + input)
+      setDispatchBuf(prev => {
+        const c = Math.min(dispatchCursor, prev.length)
+        const next = prev.slice(0, c) + input + prev.slice(c)
+        setDispatchCursor(c + input.length)
+        return next
+      })
     }
   })
 
@@ -844,6 +882,18 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const hasAnyJobRow = useMemo(() => rows.some(r => r.kind === 'job'), [rows])
   const showEmptyHint = !hasAnyJobRow && filterText === ''
   const showNoMatchHint = !hasAnyJobRow && filterText !== ''
+  // ant 5092.js: `wk = O$.some(W_ => W_.id === _)` — true when the
+  // current session id matches one of the listed jobs (i.e., we're
+  // viewing the fleet from inside an existing session). When true the
+  // empty-state hint becomes "Press → to return to your session
+  // anytime". Falls back to the generic "Type a task below to start a
+  // background session." text when the current session isn't in view.
+  const currentSessionInRows = useMemo(
+    () =>
+      currentSessionId !== '' &&
+      rows.some(r => r.kind === 'job' && r.job.id === currentSessionId),
+    [rows, currentSessionId],
+  )
 
   // ── render ─────────────────────────────────────────────────────────
   return (
@@ -889,7 +939,9 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         {showEmptyHint ? (
           <Box paddingLeft={2} marginTop={1} flexDirection="column" gap={1}>
             <Text dimColor>
-              Type a task below to start a background session. It keeps running even after you close this terminal.
+              {currentSessionInRows
+                ? 'Press → to return to your session anytime. Type a task below to dispatch a session alongside it. Sessions keep running even after you close the terminal.'
+                : 'Type a task below to start a background session. It keeps running even after you close this terminal.'}
             </Text>
             <Text dimColor>
               Try: paste a PR or issue URL · "investigate why test/auth.test.ts is flaky" · "address the review comments on #1234"
@@ -935,6 +987,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             buffer={dispatchBuf}
             placeholder="start a task in the background"
             focused={dispatchActive}
+            cursor={dispatchCursor}
           />
         </Box>
       </Box>
@@ -1021,10 +1074,13 @@ function InlineDispatchBuffer({
   buffer,
   placeholder,
   focused,
+  cursor,
 }: {
   buffer: string
   placeholder: string
   focused: boolean
+  /** Cursor offset within `buffer` (0..buffer.length). */
+  cursor: number
 }): React.ReactNode {
   const showCursor = focused
   if (buffer === '') {
@@ -1044,11 +1100,26 @@ function InlineDispatchBuffer({
       </Box>
     )
   }
-  // Non-empty buffer + focused: steady inverse-block AFTER the last char.
+  // Non-empty + focused: split around the cursor offset so the inverse
+  // block sits at the correct character. Source: ant cursor.ts render:
+  //   beforeCursor + invert(charAtCursor) + afterCursor
+  // Cursor at end → trailing inverse space.
+  if (!showCursor) {
+    return (
+      <Box>
+        <Text>{buffer}</Text>
+      </Box>
+    )
+  }
+  const c = Math.min(Math.max(0, cursor), buffer.length)
+  const before = buffer.slice(0, c)
+  const atCursor = buffer[c] ?? ' '
+  const after = c < buffer.length ? buffer.slice(c + 1) : ''
   return (
     <Box>
-      <Text>{buffer}</Text>
-      {showCursor ? <Text inverse> </Text> : null}
+      <Text>{before}</Text>
+      <Text inverse>{atCursor}</Text>
+      <Text>{after}</Text>
     </Box>
   )
 }
