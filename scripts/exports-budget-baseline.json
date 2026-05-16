@@ -16,7 +16,7 @@
   "@claude-code/teleport": 6,
   "@claude-code/server": 6,
   "@claude-code/updater": 10,
-  "@claude-code/agent": 164,
+  "@claude-code/agent": 171,
   "@claude-code/cli": 22,
   "@claude-code/storage": 45,
   "image-processor-napi": 1,
