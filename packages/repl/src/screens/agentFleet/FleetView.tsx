@@ -43,6 +43,7 @@ import PromptInputFooterSuggestions from '../../components/PromptInput/PromptInp
 import type { SuggestionItem } from '../../components/PromptInput/PromptInputFooterSuggestions.js'
 import figures from 'figures'
 
+import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { renderModelSetting } from '@claude-code/provider/model.js'
 import type {
   FleetJob,
@@ -123,29 +124,85 @@ export interface FleetViewProps {
 // commands so muscle-memory works. ccb adds the slash variants since
 // they're how the user explicitly invokes the slash-command.
 /**
- * Module-level recency tracker for the agents drawer. ant 5092.js
- * persists `agentLastUsed` (a `Record<name, msSinceEpoch>` map) in
- * user settings + reads on dispatch; ccb keeps it in-memory for the
- * process lifetime — close enough for the drawer's "recent first"
- * sort across iterations of `ccb agents`. Persisting to user settings
- * requires schema migration; the in-memory map handles the common
- * within-session case (open agents, dispatch agent A, open agents
- * again — A is at the top).
+ * Recency tracker for the agents drawer + @-mention popup.
  *
- * Source: ant 5092.js Fs3 `XdK` recency sort + dispatch write.
+ * Source: ant 5092.js Fs3 `XdK` recency sort + bootstrap+dispatch writes:
+ *   - XdK reads `v_().agentLastUsed ?? {}` and sorts agents by descending
+ *     ms-since-epoch (ties broken by name).
+ *   - Bootstrap scan (ant 5092.js Ot3 useEffect): on FleetView mount,
+ *     scans existing jobs and seeds `agentLastUsed[template] =
+ *     Date.parse(createdAt)` for any template not already present. Skips
+ *     the default "claude" template (a1H.name).
+ *   - Dispatch write: 60-second debounce — only writes if the previous
+ *     timestamp is older than 60 000 ms (or absent).
+ *
+ * Persisted in GlobalConfig.agentLastUsed so muscle-memory survives
+ * across `ccb agents` invocations and process restarts.
  */
-const agentLastUsed = new Map<string, number>()
+const AGENT_LAST_USED_DEBOUNCE_MS = 60_000
+
+function readAgentLastUsed(): Record<string, number> {
+  try {
+    return getGlobalConfig().agentLastUsed ?? {}
+  } catch {
+    return {}
+  }
+}
 
 function markAgentUsed(name: string): void {
-  agentLastUsed.set(name, Date.now())
+  // 60s debounce mirrors ant 5092.js: avoids one config write per Enter
+  // when the user dispatches the same agent in quick succession.
+  saveGlobalConfig(current => {
+    const map = current.agentLastUsed ?? {}
+    const prev = map[name]
+    const now = Date.now()
+    if (prev !== undefined && now - prev < AGENT_LAST_USED_DEBOUNCE_MS) {
+      return current
+    }
+    return { ...current, agentLastUsed: { ...map, [name]: now } }
+  })
+}
+
+/**
+ * Bootstrap-scan existing jobs to seed entries we don't have yet.
+ * Source: ant 5092.js `if(K9.state.template===a1H.name)continue` —
+ * skips the default agent (so the drawer doesn't always have "claude"
+ * pinned to the top just because the user opened FleetView once).
+ */
+function seedAgentLastUsedFromJobs(
+  jobs: readonly { state: { template?: string; createdAt?: string } }[],
+  defaultAgentType: string,
+): void {
+  if (jobs.length === 0) return
+  saveGlobalConfig(current => {
+    const map = current.agentLastUsed ?? {}
+    let changed = false
+    const next = { ...map }
+    for (const j of jobs) {
+      const tmpl = j.state.template
+      const created = j.state.createdAt
+      if (tmpl === undefined || tmpl === defaultAgentType) continue
+      if (map[tmpl] !== undefined) continue
+      if (created === undefined) continue
+      const ts = Date.parse(created)
+      if (Number.isNaN(ts)) continue
+      if (ts > (next[tmpl] ?? 0)) {
+        next[tmpl] = ts
+        changed = true
+      }
+    }
+    if (!changed) return current
+    return { ...current, agentLastUsed: next }
+  })
 }
 
 function sortByRecency(
   agents: readonly AgentDefinition[],
 ): readonly AgentDefinition[] {
+  const map = readAgentLastUsed()
   return [...agents].sort((a, b) => {
-    const ta = agentLastUsed.get(a.agentType) ?? 0
-    const tb = agentLastUsed.get(b.agentType) ?? 0
+    const ta = map[a.agentType] ?? 0
+    const tb = map[b.agentType] ?? 0
     if (ta !== tb) return tb - ta
     return a.agentType.localeCompare(b.agentType)
   })
@@ -221,7 +278,16 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   useSelectionBgColor(selection)
 
   // ── core UI state ──────────────────────────────────────────────────
-  const [groupMode, setGroupMode] = useState<FleetGroupMode>('state')
+  // Source: ant 5092.js `O_.current` seeded from `v_().fleetViewGroupMode`.
+  // Defaults to 'state' (the more informative grouping) when never set.
+  const [groupMode, setGroupMode] = useState<FleetGroupMode>(() => {
+    try {
+      const v = getGlobalConfig().fleetViewGroupMode
+      return v === 'directory' ? 'directory' : 'state'
+    } catch {
+      return 'state'
+    }
+  })
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [selectionIndex, setSelectionIndex] = useState(0)
   const [helpOpen, setHelpOpen] = useState(false)
@@ -513,6 +579,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     }
   }, [rows, initialFocusedShort])
 
+  // Bootstrap-scan agentLastUsed from existing job createdAt timestamps.
+  // Runs once after the first poll completes. Source: ant 5092.js Ot3
+  // useEffect[] that calls H7H() (listFleetJobs) and seeds entries for
+  // any non-default template not already in the map. Ensures the agents
+  // drawer's recency sort is meaningful on first open even if the user
+  // hasn't dispatched anything yet in this `ccb agents` invocation.
+  const agentSeedAppliedRef = useRef(false)
+  useEffect(() => {
+    if (agentSeedAppliedRef.current) return
+    if (jobs.length === 0) return
+    agentSeedAppliedRef.current = true
+    seedAgentLastUsedFromJobs(jobs, 'general-purpose')
+  }, [jobs])
+
   const clampedIndex = rows.length === 0 ? 0 : Math.min(selectionIndex, rows.length - 1)
   const focused = rows[clampedIndex]
   const focusedJob = focused?.kind === 'job' ? focused.job : undefined
@@ -673,7 +753,17 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   }, [focusedJob, actions])
 
   const handleToggleGroupMode = useCallback((): void => {
-    setGroupMode(prev => (prev === 'state' ? 'directory' : 'state'))
+    setGroupMode(prev => {
+      const next: FleetGroupMode = prev === 'state' ? 'directory' : 'state'
+      // Persist to GlobalConfig. Source: ant 5092.js `a_(M8 =>
+      //   M8.fleetViewGroupMode === l6 ? M8 : {...M8, fleetViewGroupMode: l6})`.
+      saveGlobalConfig(current =>
+        current.fleetViewGroupMode === next
+          ? current
+          : { ...current, fleetViewGroupMode: next },
+      )
+      return next
+    })
   }, [])
 
   const handleStartRename = useCallback((): void => {

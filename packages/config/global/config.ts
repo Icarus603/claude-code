@@ -651,6 +651,19 @@ export type GlobalConfig = {
   // CURRENT_MIGRATION_VERSION, runMigrations() skips all sync migrations
   // (avoiding 11× saveGlobalConfig lock+re-read on every startup).
   migrationVersion?: number
+
+  // FleetView (ccb agents) — recency of agent dispatch across sessions.
+  // Source: ant 5092.js Fs3 `XdK` sort uses `v_().agentLastUsed??{}`.
+  // Drives the "recent first" ordering in the agent drawer + @-mention
+  // popup so muscle-memory survives process restarts.
+  // Key: template/agent name. Value: ms-since-epoch of last dispatch.
+  agentLastUsed?: Record<string, number>
+
+  // FleetView (ccb agents) — last-selected group mode (state vs directory).
+  // Source: ant 5092.js `O_.current` + `fleetViewGroupMode` persisted via
+  // `a_(M8 => M8.fleetViewGroupMode === l6 ? M8 : {...M8, fleetViewGroupMode: l6})`.
+  // Persists the user's grouping pref across `ccb agents` invocations.
+  fleetViewGroupMode?: 'state' | 'directory'
 }
 
 /**
