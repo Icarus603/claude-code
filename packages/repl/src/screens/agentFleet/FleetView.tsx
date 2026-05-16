@@ -70,6 +70,9 @@ import {
 } from '../../components/PromptInput/VoiceIndicator.js'
 
 import { formatJobAge } from './helpers/elapsed.js'
+import { jobLabel } from './helpers/jobLabel.js'
+import { stringWidth } from './helpers/grapheme.js'
+import { AGENT_COLORS } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { deriveBand } from './helpers/deriveBand.js'
 import { deriveChildSummaries } from './helpers/deriveChildSummaries.js'
 import { needsRespawn } from './helpers/needsRespawn.js'
@@ -635,8 +638,32 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const focused = rows[clampedIndex]
   const focusedJob = focused?.kind === 'job' ? focused.job : undefined
 
-  const labelWidth = useMemo(() => 24, [])
-  const ageWidth = useMemo(() => 6, [])
+  // Dynamic column widths. Source: ant fs3 (5092.js:1300-1310) +
+  // ws3=3 (min age) + Js3=2 (prefix offset) + label min=12, max=40.
+  //
+  //   age   = max(ws3, ...jobs.map(j => width(formatJobAge(j))))
+  //   label = clamp(12..40, max(...jobs.map(j => width(jobLabel(j))
+  //                                + (hasColorBadge(j) ? 2 : 0))))
+  //
+  // hasColorBadge: state.color is set to a known agent color. The +2
+  // is the chip's extra render width (one space + colored dot).
+  const { labelWidth, ageWidth } = useMemo(() => {
+    const AGE_MIN = 3
+    const LABEL_MIN = 12
+    const LABEL_MAX = 40
+    let age = AGE_MIN
+    let label = LABEL_MIN
+    const colorSet = new Set<string>(AGENT_COLORS as readonly string[])
+    for (const job of jobs) {
+      const isCurrent = job.id === currentSessionId
+      const w = stringWidth(jobLabel(job.state, isCurrent))
+      const badgeExtra =
+        job.state.color !== undefined && colorSet.has(job.state.color) ? 2 : 0
+      label = Math.max(label, w + badgeExtra)
+      age = Math.max(age, stringWidth(formatJobAge(job)))
+    }
+    return { labelWidth: Math.min(LABEL_MAX, label), ageWidth: age }
+  }, [jobs, currentSessionId])
 
   // Banner band counts use uyH (deriveBand) — 3 buckets.
   const bandCounts = useMemo(() => {
