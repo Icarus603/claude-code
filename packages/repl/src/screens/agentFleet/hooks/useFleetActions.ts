@@ -19,6 +19,10 @@ import {
   setFleetSortOrder,
   setFleetStateSortOrder,
 } from '@claude-code/agent/background/fleet/sortFleetJobs.js'
+import {
+  deleteJobDir,
+  markJobStopped,
+} from '@claude-code/agent/background/fleet/fleetStore.js'
 import { daemonKill, daemonRespawn } from '@claude-code/cli/bg/daemonAdapter.js'
 
 export type FleetActionResult = { ok: true } | { ok: false; error: string }
@@ -34,6 +38,17 @@ export interface FleetActions {
   rename(sessionId: string, newName: string): Promise<FleetActionResult>
   reorder(short: string, newSortOrder: number): Promise<FleetActionResult>
   reorderInBucket(short: string, newStateSortOrder: number): Promise<FleetActionResult>
+  /**
+   * Stop a running worker: best-effort daemon kill + mark state.json
+   * as stopped. Mirrors ant Gs3 'stop' action (5092.js:296-347). The
+   * row stays in the list as "stopped"; second Ctrl+X removes it.
+   */
+  stop(short: string): Promise<FleetActionResult>
+  /**
+   * Delete the job dir entirely. Mirrors ant Gs3 'delete' (5092.js:353
+   * + u_H 4774.js:264). The row disappears from the list.
+   */
+  remove(short: string): Promise<FleetActionResult>
   kill(short: string): Promise<FleetActionResult>
   respawn(short: string): Promise<FleetActionResult>
 }
@@ -106,6 +121,36 @@ export function useFleetActions({
     return { ok: false, error: r.error ?? 'daemon kill failed' }
   }, [])
 
+  /**
+   * 'stop' action — daemon kill (best-effort, ignores ENOJOB / no daemon)
+   * + mark state.json as stopped. Source: ant Gs3 first entry.
+   */
+  const stop = useCallback(async (short: string): Promise<FleetActionResult> => {
+    // Daemon kill is best-effort: if daemon isn't running OR doesn't
+    // know about this job, we still mark the on-disk state as stopped.
+    await daemonKill({ short }).catch(() => undefined)
+    try {
+      await markJobStopped(short)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: err(e) }
+    }
+  }, [])
+
+  /**
+   * 'delete' action — wipe the job dir from disk. Source: ant u_H.
+   */
+  const remove = useCallback(async (short: string): Promise<FleetActionResult> => {
+    // Best-effort daemon kill first (no-op if not running).
+    await daemonKill({ short }).catch(() => undefined)
+    try {
+      await deleteJobDir(short)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: err(e) }
+    }
+  }, [])
+
   const respawn = useCallback(async (short: string): Promise<FleetActionResult> => {
     const r = await daemonRespawn(short)
     if (r.ok === true) return { ok: true }
@@ -113,7 +158,17 @@ export function useFleetActions({
   }, [])
 
   return useMemo(
-    () => ({ reply, togglePin, rename, reorder, reorderInBucket, kill, respawn }),
-    [reply, togglePin, rename, reorder, reorderInBucket, kill, respawn],
+    () => ({
+      reply,
+      togglePin,
+      rename,
+      reorder,
+      reorderInBucket,
+      stop,
+      remove,
+      kill,
+      respawn,
+    }),
+    [reply, togglePin, rename, reorder, reorderInBucket, stop, remove, kill, respawn],
   )
 }

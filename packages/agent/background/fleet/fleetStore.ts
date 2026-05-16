@@ -253,3 +253,46 @@ export async function writeStateSortOrder(jobDir: string, order: number): Promis
   await fs.writeFile(join(jobDir, STATE_ORDER_FILE), String(order))
   invalidateCache(jobDir)
 }
+
+/**
+ * Mark a job's state.json as stopped. Source: ant Gs3 'stop' action
+ * (5092.js:296-347). Sets state='stopped', tempo='idle', detail='stopped',
+ * sets firstTerminalAt to now if absent.
+ */
+export async function markJobStopped(short: string): Promise<void> {
+  const dir = getJobDir(short)
+  const state = await readJobState(dir)
+  if (state === null) return
+  const now = new Date().toISOString()
+  await writeJobState(dir, {
+    ...state,
+    state: 'stopped',
+    detail: 'stopped',
+    tempo: 'idle',
+    updatedAt: now,
+    firstTerminalAt: state.firstTerminalAt ?? now,
+  })
+}
+
+/**
+ * Wipe the job dir + drop from pins.json. Source: ant u_H (4774.js:264) —
+ * the second-Ctrl+X delete that removes the row from disk entirely.
+ */
+export async function deleteJobDir(short: string): Promise<void> {
+  const dir = getJobDir(short)
+  try {
+    await fs.rm(dir, { recursive: true, force: true })
+  } catch {
+    // best-effort
+  }
+  try {
+    const pins = await readPinSet()
+    if (pins.has(short)) {
+      pins.delete(short)
+      await writePinSet(pins)
+    }
+  } catch {
+    // best-effort
+  }
+  invalidateCache(dir)
+}

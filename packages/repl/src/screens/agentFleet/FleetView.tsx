@@ -133,10 +133,10 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     return () => clearTimeout(t)
   }, [errorToast])
 
-  // Dispatch buffer doubles as the filter input (ant `bH`). parseQuery
-  // strips `a:` / `s:` / `o:` / #PR tokens; the remainder is the
-  // dispatch text used as the spawn directive on Enter.
-  const filterText = dispatchBuf
+  // The dispatch buffer is ONLY for composing a new task — it is NOT a
+  // session filter (user explicitly confirmed). No row filtering by
+  // typed text. Filter stays empty.
+  const filterText = ''
   const { rows, bucketCounts, groupCounts } = useFleetRows({
     jobs,
     filterText,
@@ -230,18 +230,46 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     setPeekOpen(true)
   }, [focused])
 
+  /**
+   * Ctrl+X handler. Source: ant $P (5092.js:2613-2641) +
+   * Gs3 action table (5092.js:290-376).
+   *
+   *   1st press on active/blocked → 'stop' (daemon kill + state.json
+   *                                  marked stopped) AND arm delete.
+   *   2nd press on same job        → 'delete' (rm -rf job dir).
+   *   1st press on completed/stopped → 'delete' immediately
+   *                                  (skip the arm step).
+   */
   const handleArmDelete = useCallback((): void => {
     if (focusedJob === undefined) return
+    const band = deriveBand(focusedJob.state, presence.get(focusedJob.id))
+
+    // Path 1: already armed for THIS row → run delete.
     if (armedDeleteId === focusedJob.id) {
-      void actions.kill(focusedJob.id).then(r => {
-        if (r.ok === false) setErrorToast(`Kill failed: ${r.error}`)
+      void actions.remove(focusedJob.id).then(r => {
+        if (r.ok === false) setErrorToast(`Delete failed: ${r.error}`)
         else refreshJobs()
       })
       setArmedDeleteId(undefined)
       return
     }
+
+    // Path 2: row is completed/stopped → delete immediately (no arm step).
+    if (band === 'completed') {
+      void actions.remove(focusedJob.id).then(r => {
+        if (r.ok === false) setErrorToast(`Delete failed: ${r.error}`)
+        else refreshJobs()
+      })
+      return
+    }
+
+    // Path 3: row is active/blocked → stop the worker + arm delete.
+    void actions.stop(focusedJob.id).then(r => {
+      if (r.ok === false) setErrorToast(`Stop failed: ${r.error}`)
+      else refreshJobs()
+    })
     setArmedDeleteId(focusedJob.id)
-  }, [focusedJob, armedDeleteId, actions])
+  }, [focusedJob, armedDeleteId, presence, actions, refreshJobs])
 
   const handleTogglePin = useCallback((): void => {
     if (focusedJob === undefined) return
