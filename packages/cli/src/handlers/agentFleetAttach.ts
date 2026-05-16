@@ -1,21 +1,25 @@
 /**
  * Inline attach handler for FleetView right-arrow / enter on a job.
  *
- * Unlike `bg.ts:attachHandler` which calls `process.exit(1)` on lookup
- * failure (would kill the FleetView loop), this is a graceful version
- * that:
+ * User intent: pressing right-arrow on a session MUST drop the user
+ * INTO that session as a real interactive Claude Code REPL — not show
+ * logs, not exit with a hint. This module spawns `ccb --resume
+ * <sessionId>` as a foreground child with inherited stdio, blocks
+ * until the child exits, then returns control to the FleetView loop.
  *
- *   1. Resolves the job via meta.json if present
- *   2. Falls through to streaming stdout.log directly if meta.json is
- *      missing but state.json (FleetView's storage) shows the row
- *   3. Returns cleanly when the user presses Ctrl+C / Ctrl+Q so the
- *      caller can re-mount FleetView
+ * Fallbacks (in order):
+ *   1. state.json present + sessionId set → `ccb --resume <sessionId>`
+ *      (the real REPL with full history).
+ *   2. meta.json present + PTY mode + running → bidirectional PTY attach
+ *      (sessions spawned with --bg-pty).
+ *   3. detached mode → stream stdout.log + stderr.log (read-only logs).
+ *   4. No log files at all → friendly message + wait for any key.
  *
- * In PTY mode (worker spawned with `--bg-pty`), uses ccb's `runAttach`
- * for bidirectional terminal; otherwise streams stdout+stderr from the
- * job directory.
+ * Never calls process.exit. Always resolves so the FleetView loop can
+ * re-mount on return.
  */
 
+import { spawnSync } from 'node:child_process'
 import { existsSync, openSync, readSync, closeSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -41,12 +45,27 @@ interface BgMeta {
   pid?: number
 }
 
+interface FleetState {
+  sessionId?: string
+  resumeSessionId?: string
+}
+
 function readMeta(short: string): BgMeta | null {
   const path = join(getJobDir(short), 'meta.json')
   if (!existsSync(path)) return null
   try {
     const buf = readWholeFile(path)
     return JSON.parse(buf) as BgMeta
+  } catch {
+    return null
+  }
+}
+
+function readFleetState(short: string): FleetState | null {
+  const path = join(getJobDir(short), 'state.json')
+  if (!existsSync(path)) return null
+  try {
+    return JSON.parse(readWholeFile(path)) as FleetState
   } catch {
     return null
   }
@@ -65,14 +84,54 @@ function readWholeFile(path: string): string {
 }
 
 /**
- * Attach to a fleet job. Returns when the user detaches (Ctrl+Q in PTY,
- * Ctrl+C in streaming). Never throws or calls process.exit.
+ * Build the argv for re-running ccb with the given flags. Matches
+ * spawnBgJob's logic in bg.ts:404-410 — uses argv0+argv[1] under Bun
+ * (need to keep the .js path), argv[0] directly for the standalone
+ * binary.
+ */
+function buildCcbArgv(extraArgs: readonly string[]): { cmd: string; args: string[] } {
+  const isBun = process.argv0.endsWith('bun')
+  if (isBun) {
+    const cliJs = process.argv[1] ?? ''
+    return { cmd: process.argv0, args: [cliJs, ...extraArgs] }
+  }
+  return { cmd: process.argv[0]!, args: [...extraArgs] }
+}
+
+/**
+ * Run `ccb --resume <sessionId>` as a foreground subprocess inheriting
+ * the terminal stdio. Returns when the child exits.
+ */
+function resumeSessionInline(sessionId: string): void {
+  const { cmd, args } = buildCcbArgv(['--resume', sessionId])
+  spawnSync(cmd, args, { stdio: 'inherit' })
+}
+
+/**
+ * Attach to a fleet job. Returns when the user detaches. Never throws
+ * or calls process.exit.
+ *
+ * Resolution order:
+ *   1. state.json sessionId → spawn `ccb --resume <sessionId>` with
+ *      inherited stdio. This is the REAL session REPL — the user lands
+ *      in a fully interactive Claude Code session with the bg job's
+ *      conversation history loaded.
+ *   2. meta.json + PTY mode → bidirectional PTY attach via runAttach.
+ *   3. fallback → stream stdout.log / stderr.log.
  */
 export async function fleetAttach(short: string): Promise<void> {
+  const state = readFleetState(short)
   const meta = readMeta(short)
   const jobDir = getJobDir(short)
 
-  // PTY mode + meta present → bidirectional attach via ccb's existing client.
+  // Primary path: resume the actual REPL session (ant equivalent).
+  const sessionId = state?.sessionId ?? state?.resumeSessionId
+  if (sessionId !== undefined && sessionId !== '') {
+    resumeSessionInline(sessionId)
+    return
+  }
+
+  // Fallback: PTY-mode attach (sessions spawned with --bg-pty).
   if (meta?.mode === 'pty' && meta.ptySocket !== undefined && meta.status === 'running') {
     try {
       const { runAttach } = await import('../bg/attachClient.js')
