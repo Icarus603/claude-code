@@ -25,6 +25,11 @@ import { Box, Text, useInput, useSelection, useTerminalSize } from '@anthropic/i
 import { type Command, getCommands, getCommandName } from '@claude-code/command-runtime/runtime'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import {
+  getAgentDefinitionsWithOverrides,
+  getActiveAgentsFromList,
+  type AgentDefinition,
+} from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
+import {
   useCopyOnSelect,
   useSelectionBgColor,
 } from '../../hooks/useCopyOnSelect.js'
@@ -161,12 +166,13 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // `/`, popup lists matching skills/commands; Tab/Enter accepts the
   // currently highlighted entry.
   const [commands, setCommands] = useState<readonly Command[]>([])
+  const [agents, setAgents] = useState<readonly AgentDefinition[]>([])
   const [suggestionIndex, setSuggestionIndex] = useState(0)
 
-  // Load commands once on mount (and refresh whenever the cwd snapshot
-  // changes via /reload-plugins — we don't subscribe to that here, the
-  // FleetView dispatch popup just needs the snapshot the user has when
-  // they open the view).
+  // Load commands + agents once on mount. ant's Fs3 sources `_` (agents)
+  // from `agents:c.activeAgents` (5180.js prop), `O` (skills/slash) from
+  // commands. ccb wires both here off the same disk snapshot the REPL
+  // would use — async and best-effort.
   useEffect(() => {
     let cancelled = false
     void getCommands(getCwd())
@@ -174,19 +180,47 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         if (!cancelled) setCommands(list)
       })
       .catch(() => {})
+    void getAgentDefinitionsWithOverrides(getCwd())
+      .then(({ allAgents }) => {
+        if (cancelled) return
+        setAgents(getActiveAgentsFromList(allAgents))
+      })
+      .catch(() => {})
     return () => {
       cancelled = true
     }
   }, [])
 
-  // Suggestion list derived from current buffer. Empty when not a
-  // slash query — ant's `Fs3` returns `suggestions: []` in that case
-  // (also covers the `slashMatch` regex path). Re-clamp the highlight
-  // index whenever the list shrinks past it.
+  // Detect a trailing `@<token>` for agent mentions. Source: ant 5092.js
+  // `Y = H.match(/(?:^|\s)@(\S*)$/)` — the popup activates whenever the
+  // cursor is somewhere in or right after an @-token.
+  const atMatch = useMemo(() => {
+    const m = dispatchBuf.match(/(?:^|\s)@(\S*)$/)
+    return m ? { token: m[1] ?? '', start: m.index! + m[0].length - (m[1] ?? '').length - 1 } : null
+  }, [dispatchBuf])
+
+  // Suggestion list. Source: ant 5092.js Fs3 result:
+  //   - `Y` (@<token>) match  → agents/skills/repos filtered by token
+  //   - `f` (/<token>) match  → slash commands filtered by token
+  //   - empty buffer + flagged → recent agents
+  //   - generic single-word    → all of the above prefix-matched
+  // ccb's first cut implements the @<token> + /<token> branches.
   const suggestions = useMemo<SuggestionItem[]>(() => {
+    if (atMatch !== null) {
+      const q = atMatch.token.toLowerCase()
+      return agents
+        .filter(a => a.agentType.toLowerCase().startsWith(q))
+        .sort((a, b) => a.agentType.localeCompare(b.agentType))
+        .map(a => ({
+          id: `agent:${a.agentType}`,
+          displayText: `@${a.agentType}`,
+          description: a.whenToUse,
+          metadata: { kind: 'agent', name: a.agentType },
+        }))
+    }
     if (!isCommandInput(dispatchBuf)) return []
     return generateCommandSuggestions(dispatchBuf, commands as Command[])
-  }, [dispatchBuf, commands])
+  }, [dispatchBuf, commands, agents, atMatch])
   useEffect(() => {
     if (suggestions.length === 0) {
       if (suggestionIndex !== 0) setSuggestionIndex(0)
@@ -200,15 +234,31 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // Accept the currently highlighted suggestion. Source: ant 5092.js
   // `M8(vA[j3] ?? vA[0])` (Tab / Enter accept) where the suggestion is
   // inserted via `ps3(buf, sigil, name)` — replace the trailing
-  // `/<token>` (or `@<token>`) with `<sigil><name> `.
+  // `/<token>` or `@<token>` with `<sigil><name> `. ant's M8:
+  //   let Dq = l6.kind === "skill" ? "/" : "@"
+  //   w_(kM||Fz ? ps3(bH, Dq, l6.name) : `${Dq}${l6.name} `)
   const acceptSuggestion = useCallback(() => {
     const pick = suggestions[suggestionIndex] ?? suggestions[0]
     if (!pick) return false
-    // SuggestionItem.metadata is Command when generated from
-    // generateCommandSuggestions; fall back to displayText otherwise.
-    const meta = pick.metadata as Command | undefined
-    const name = meta ? getCommandName(meta) : pick.displayText.replace(/^[/@]/, '')
-    setDispatchBuf(prev => prev.replace(/[@/]\S*$/, `/${name} `))
+    const meta = pick.metadata as
+      | { kind: 'agent' | 'skill' | 'repo'; name: string }
+      | Command
+      | undefined
+    let sigil = '/'
+    let name: string
+    if (meta && typeof meta === 'object' && 'kind' in meta) {
+      sigil = meta.kind === 'agent' || meta.kind === 'repo' ? '@' : '/'
+      name = meta.name
+    } else if (meta) {
+      // Command metadata (slash command).
+      sigil = '/'
+      name = getCommandName(meta as Command)
+    } else {
+      // Fallback: parse sigil from displayText.
+      sigil = pick.displayText.startsWith('@') ? '@' : '/'
+      name = pick.displayText.replace(/^[/@]/, '')
+    }
+    setDispatchBuf(prev => prev.replace(/[@/]\S*$/, `${sigil}${name} `))
     setSuggestionIndex(0)
     return true
   }, [suggestions, suggestionIndex])
