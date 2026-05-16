@@ -126,6 +126,31 @@ export async function ensureSpare(cwd: string): Promise<void> {
         await killSpareWorker(r.short).catch(() => undefined)
         return
       }
+      // Wait for the inner REPL to write `spare-ready.flag` (REPLView's
+      // mount effect with CCB_SPARE=1). Source: ant 4774.js — spare's
+      // `ready` flag is set when daemon roster reports the spare. ccb
+      // has no roster; we use a marker file. Until the inner REPL is
+      // mounted (PromptInput's useInput registered), bracketed-paste
+      // sent to its PTY is dropped — that was the "REPL is empty after
+      // attach" bug.
+      const { join } = await import('node:path')
+      const { getJobDir } = await import(
+        '@claude-code/agent/background/fleet/fleetStore.js'
+      )
+      const markerPath = join(getJobDir(r.short), 'spare-ready.flag')
+      const readyDeadline = Date.now() + 10_000
+      while (Date.now() < readyDeadline) {
+        if (existsSync(markerPath)) break
+        if (disabled) {
+          await killSpareWorker(r.short).catch(() => undefined)
+          return
+        }
+        await new Promise(resolve => setTimeout(resolve, 50))
+      }
+      if (disabled) {
+        await killSpareWorker(r.short).catch(() => undefined)
+        return
+      }
       spare = {
         short: r.short,
         cwd,

@@ -208,6 +208,7 @@ import { useSuspendResumeHandlers } from './repl/useSuspendResumeHandlers.js';
 import { useTranscriptFreeze } from './repl/useTranscriptFreeze.js';
 import { useHandleExit } from './repl/useHandleExit.js';
 import { useBgFleetStateSync } from './repl/useBgFleetStateSync.js';
+import { useSpareReadyMarker } from './repl/useSpareReadyMarker.js';
 import { useRateLimitHandlers } from './repl/useRateLimitHandlers.js';
 import { useQueuedCommandOnCancel } from './repl/useQueuedCommandOnCancel.js';
 import { useStartupCallouts } from './repl/useStartupCallouts.js';
@@ -1194,6 +1195,7 @@ export function REPL({
   // 3988.js text inference. See useBgFleetStateSync for the ant
   // lineage (3988.js text patterns + 4835.js daemon supervisor).
   useBgFleetStateSync(isLoading, messages);
+  useSpareReadyMarker();
   // Stores the willowMode variant that was shown (or false if no hint shown).
   // Captured at hint_shown time so hint_converted telemetry reports the same
   // variant — the GrowthBook value shouldn't change mid-session, but reading
