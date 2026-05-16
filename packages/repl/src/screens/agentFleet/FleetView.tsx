@@ -169,6 +169,8 @@ const DELETE_ARM_TIMEOUT_MS = 2000
 interface RenameState {
   id: string
   draft: string
+  /** Cursor offset within `draft` — mirrors ant `zT` (5092.js gs3 renaming). */
+  cursor: number
 }
 
 /** Top-level FleetView. Source: ant BdK + xd. */
@@ -676,7 +678,12 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
   const handleStartRename = useCallback((): void => {
     if (focusedJob === undefined) return
-    setRenameState({ id: focusedJob.id, draft: focusedJob.state.name ?? '' })
+    const initialDraft = focusedJob.state.name ?? ''
+    setRenameState({
+      id: focusedJob.id,
+      draft: initialDraft,
+      cursor: initialDraft.length,
+    })
   }, [focusedJob])
 
   const handleCancelRename = useCallback((): void => {
@@ -819,12 +826,45 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         handleCancelRename()
         return
       }
+      if (key.leftArrow) {
+        setRenameState(s => (s ? { ...s, cursor: Math.max(0, s.cursor - 1) } : s))
+        return
+      }
+      if (key.rightArrow) {
+        setRenameState(s =>
+          s ? { ...s, cursor: Math.min(s.draft.length, s.cursor + 1) } : s,
+        )
+        return
+      }
+      if (key.ctrl && input === 'a') {
+        setRenameState(s => (s ? { ...s, cursor: 0 } : s))
+        return
+      }
+      if (key.ctrl && input === 'e') {
+        setRenameState(s => (s ? { ...s, cursor: s.draft.length } : s))
+        return
+      }
       if (key.backspace || key.delete) {
-        setRenameState(s => (s ? { ...s, draft: s.draft.slice(0, -1) } : s))
+        setRenameState(s => {
+          if (!s) return s
+          if (s.cursor === 0) return s
+          return {
+            ...s,
+            draft: s.draft.slice(0, s.cursor - 1) + s.draft.slice(s.cursor),
+            cursor: s.cursor - 1,
+          }
+        })
         return
       }
       if (input !== '' && !key.ctrl && !key.meta) {
-        setRenameState(s => (s ? { ...s, draft: s.draft + input } : s))
+        setRenameState(s => {
+          if (!s) return s
+          return {
+            ...s,
+            draft: s.draft.slice(0, s.cursor) + input + s.draft.slice(s.cursor),
+            cursor: s.cursor + input.length,
+          }
+        })
       }
       return
     }
