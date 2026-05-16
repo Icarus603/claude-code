@@ -74,29 +74,14 @@ export type UseTextInputProps = {
    * implement "return to FleetView" from inside an attached bg session.
    */
   onLeftArrowOnEmpty?: () => void
+
   /**
-   * Source: ant 4208.js zZ `onSpaceOnEmpty` — fires when Space is
-   * pressed and input is empty. ccb FleetView peek panel wires this
-   * to onBack so Space closes the peek when the reply buffer is empty
-   * (matches the "space to close" chord hint).
+   * Source: ant 4208.js `zZ` — fires on space when input is empty AND
+   * no shift/ctrl/meta modifier is held. ant's gs3 (peek panel) passes
+   * `onSpaceOnEmpty: F ? void 0 : $` (= onBack/close) so space closes
+   * the peek when the reply buffer is empty.
    */
   onSpaceOnEmpty?: () => void
-  /**
-   * Optional ref mirroring `value`. When provided, submit and "empty"
-   * predicates read from `valueRef.current` instead of the `value`
-   * prop, so a synchronous in-flight commit (e.g. paste handler
-   * setting the ref before its setState propagates through React)
-   * is visible to the very next keystroke. Mirrors ant 4208.js zZ
-   * `queryRef: G` — ant's setQuery writes G.current synchronously
-   * THEN setState; submit reads G.current, dodging React's async
-   * commit window.
-   *
-   * Without this, paste-then-Enter (e.g. ptyHost's claim sequence
-   * writes \\x1B[200~text\\x1B[201~ then \\r 10 ms later) sees a stale
-   * empty value at submit time, so the Enter no-ops and the paste
-   * content stays in the buffer.
-   */
-  valueRef?: { readonly current: string }
 }
 
 export function useTextInput({
@@ -125,13 +110,7 @@ export function useTextInput({
   dim,
   onLeftArrowOnEmpty,
   onSpaceOnEmpty,
-  valueRef,
 }: UseTextInputProps): TextInputState {
-  // Source: ant 4208.js zZ — `queryRef: G` always wins over the
-  // state prop for reads that need the latest paste-commit. ccb's
-  // PromptInput threads lastInternalInputRef through this prop.
-  const readCurrentValue = (): string =>
-    valueRef !== undefined ? valueRef.current : originalValue
   // Pre-warm the modifiers module for Apple Terminal (has internal guard, safe to call multiple times)
   if (env.terminal === 'Apple_Terminal') {
     prewarmModifiers()
@@ -300,9 +279,7 @@ export function useTextInput({
     if (env.terminal === 'Apple_Terminal' && isModifierPressed('shift')) {
       return cursor.insert('\n')
     }
-    // Read the freshest value from the ref when provided so a
-    // synchronous paste-commit doesn't race with the next Enter.
-    onSubmit?.(readCurrentValue())
+    onSubmit?.(originalValue)
   }
 
   function upOrHistoryUp() {
@@ -418,13 +395,7 @@ export function useTextInput({
         //   if (T && !ZH.shift && F.text === "") { ... T(); return F }
         // Fires the onLeftArrowOnEmpty callback when input is empty
         // and no shift modifier is held. Cursor stays at 0.
-        // Read from valueRef (when provided) so a paste that just
-        // committed synchronously isn't missed.
-        if (
-          onLeftArrowOnEmpty &&
-          readCurrentValue() === '' &&
-          !key.shift
-        ) {
+        if (onLeftArrowOnEmpty && originalValue === '' && !key.shift) {
           return () => {
             onLeftArrowOnEmpty()
             return cursor
@@ -435,19 +406,22 @@ export function useTextInput({
         return () => cursor.right()
       default: {
         return function (input: string) {
-          // Source: ant 4208.js zZ:
-          //   if (Y && C.key === " " && m === "") { C.preventDefault(); Y(); return }
-          // Space pressed on empty buffer → fire onSpaceOnEmpty (e.g.
-          // FleetView peek panel uses this to close the peek).
-          if (
-            onSpaceOnEmpty !== undefined &&
-            input === ' ' &&
-            readCurrentValue() === ''
-          ) {
-            onSpaceOnEmpty()
-            return cursor
-          }
           switch (true) {
+            // Space on empty input — fires onSpaceOnEmpty when set and
+            // no modifier is held. Source: ant 4208.js zZ:
+            //   if (Y && C.key === " " && m === "") {
+            //     C.preventDefault(); Y(); return
+            //   }
+            // ant's gs3 (peek panel) uses this to close the peek when
+            // the reply buffer is empty.
+            case onSpaceOnEmpty !== undefined &&
+              input === ' ' &&
+              originalValue === '' &&
+              !key.shift &&
+              !key.ctrl &&
+              !key.meta:
+              onSpaceOnEmpty!()
+              return cursor
             // Home key
             case input === '\x1b[H' || input === '\x1b[1~':
               return cursor.startOfLine()

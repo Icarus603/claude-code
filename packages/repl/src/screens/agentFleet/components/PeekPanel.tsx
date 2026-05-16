@@ -243,7 +243,10 @@ export function PeekPanel({
         {/* (5) flex spacer — fills bordered box to minHeight=5. */}
         <Box flexGrow={1} />
 
-        {/* (6) bH — reply input. */}
+        {/* (6) bH — reply input.
+            ant gs3: `onSpaceOnEmpty: F ? void 0 : $` — when NOT in bash
+            mode, space-on-empty-buffer fires onBack (= close peek).
+            ccb doesn't have bash-mode yet so always wire to onClose. */}
         <Box marginTop={1}>
           <Text color={color}>{'> '}</Text>
           <TextInput
@@ -252,12 +255,7 @@ export function PeekPanel({
             cursorOffset={cursorOffset}
             onChangeCursorOffset={onCursorChange}
             onSubmit={handleSubmit}
-            // Source: ant 5092.js gs3 zZ instantiation:
-            //   onSpaceOnEmpty: F ? void 0 : $   // $ = onBack = close
-            // When reply buffer is empty AND not in bash mode, Space
-            // closes the peek panel — matches the "space to close"
-            // chord rendered in the footer.
-            onSpaceOnEmpty={value === '' ? onClose : undefined}
+            onSpaceOnEmpty={onClose}
             placeholder={placeholder}
             focus={true}
             multiline={true}
