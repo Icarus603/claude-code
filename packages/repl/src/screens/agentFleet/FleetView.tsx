@@ -17,6 +17,7 @@
 import type React from 'react'
 import { useCallback, useMemo, useState } from 'react'
 import { Box, Text, useInput, useTerminalSize } from '@anthropic/ink'
+import figures from 'figures'
 
 import { renderModelSetting } from '@claude-code/provider/model.js'
 import type {
@@ -367,27 +368,33 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       ) : null}
       {/* Dispatch input box — ant 5092.js:3395-3419, with placeholder
           "start a task in the background". Bordered top + bottom (no
-          sides), dim border. Sits above the footer. */}
+          sides), dim border. `❯` prefix prompt on the left mirrors
+          ant `<PN prefix={sH.pointer}>`. Sits above the footer. */}
       <Box
         flexShrink={0}
-        flexDirection="column"
+        flexDirection="row"
         marginTop={1}
         borderStyle="round"
         borderLeft={false}
         borderRight={false}
         borderDimColor
       >
-        <TextInput
-          value={dispatchDraft}
-          onChange={setDispatchDraft}
-          cursorOffset={dispatchCursor}
-          onChangeCursorOffset={setDispatchCursor}
-          onSubmit={handleDispatchSubmit}
-          placeholder="start a task in the background"
-          focus={dispatchActive}
-          multiline={true}
-          columns={Math.max(terminalWidth - 4, 20)}
-        />
+        <Box flexShrink={0} paddingRight={1}>
+          <Text dimColor={!dispatchActive}>{figures.pointer}</Text>
+        </Box>
+        <Box flexGrow={1}>
+          <TextInput
+            value={dispatchDraft}
+            onChange={setDispatchDraft}
+            cursorOffset={dispatchCursor}
+            onChangeCursorOffset={setDispatchCursor}
+            onSubmit={handleDispatchSubmit}
+            placeholder="start a task in the background"
+            focus={dispatchActive}
+            multiline={true}
+            columns={Math.max(terminalWidth - 6, 20)}
+          />
+        </Box>
       </Box>
       {showVoiceWarmup || showVoiceIndicator || showVoiceMeter ? (
         <Box marginTop={1} flexDirection="row">

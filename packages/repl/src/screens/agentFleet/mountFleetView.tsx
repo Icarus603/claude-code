@@ -14,11 +14,19 @@
  * launches the dashboard and exits cleanly".
  */
 
-import type React from 'react'
-import { createElement } from 'react'
+import * as React from 'react'
+import { AlternateScreen } from '@anthropic/ink'
 
+import {
+  AppStateProvider,
+  getDefaultAppState,
+} from '@claude-code/app-host/state/AppState.js'
 import { VoiceProvider } from '@claude-code/voice/voiceContext.js'
 
+import {
+  isFullscreenEnvEnabled,
+  isMouseTrackingEnabled,
+} from '../../fullscreen.js'
 import { FleetView, type FleetViewProps } from './FleetView.js'
 
 export interface InkRootLike {
@@ -47,23 +55,33 @@ export interface MountFleetViewOptions extends Omit<FleetViewProps, 'onQuit'> {
  */
 export async function mountFleetView(options: MountFleetViewOptions): Promise<void> {
   return new Promise<void>(resolve => {
-    options.root.render(
-      createElement(
-        VoiceProvider,
-        null,
-        createElement(FleetView, {
-          currentSessionId: options.currentSessionId,
-          seedJobs: options.seedJobs,
-          prCache: options.prCache,
-          onAttach: options.onAttach,
-          onDispatch: options.onDispatch,
-          onQuit: () => {
-            options.root.unmount()
-            resolve()
-          },
-        }),
-      ),
+    const fleetEl = (
+      <FleetView
+        currentSessionId={options.currentSessionId}
+        seedJobs={options.seedJobs}
+        prCache={options.prCache}
+        onAttach={options.onAttach}
+        onDispatch={options.onDispatch}
+        onQuit={() => {
+          options.root.unmount()
+          resolve()
+        }}
+      />
     )
+    // Respect the `/tui` setting + CLAUDE_CODE_NO_FLICKER env. When
+    // fullscreen is on, wrap in <AlternateScreen> with mouse tracking
+    // (matching the main REPL's behaviour at REPLView.tsx:5585).
+    const wrapped = isFullscreenEnvEnabled() ? (
+      <AlternateScreen mouseTracking={isMouseTrackingEnabled()}>{fleetEl}</AlternateScreen>
+    ) : (
+      fleetEl
+    )
+    const tree = (
+      <AppStateProvider initialState={getDefaultAppState()}>
+        <VoiceProvider>{wrapped}</VoiceProvider>
+      </AppStateProvider>
+    )
+    options.root.render(tree)
     void options.root.waitUntilExit().then(() => resolve())
   })
 }
