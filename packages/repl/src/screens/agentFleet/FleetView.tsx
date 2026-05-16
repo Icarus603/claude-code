@@ -833,6 +833,55 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
+    // Ctrl+A / Home — jump cursor to start of buffer.
+    // Source: ant useTextInput.ts readline-style emacs keys.
+    if (
+      dispatchBuf !== '' &&
+      ((key.ctrl && input === 'a') || (key as unknown as { home?: boolean }).home)
+    ) {
+      setDispatchCursor(0)
+      return
+    }
+
+    // Ctrl+E / End — jump cursor to end of buffer.
+    if (
+      dispatchBuf !== '' &&
+      ((key.ctrl && input === 'e') || (key as unknown as { end?: boolean }).end)
+    ) {
+      setDispatchCursor(dispatchBuf.length)
+      return
+    }
+
+    // Ctrl+U — kill from cursor to start of buffer (readline kill-line-backward).
+    // Source: ant useTextInput.ts → tt7 "deleteToLineStart".
+    if (key.ctrl && input === 'u' && dispatchBuf !== '') {
+      setDispatchBuf(prev => prev.slice(dispatchCursor))
+      setDispatchCursor(0)
+      return
+    }
+
+    // Ctrl+K — kill from cursor to end of buffer (readline kill-line-forward).
+    if (key.ctrl && input === 'k' && dispatchBuf !== '') {
+      setDispatchBuf(prev => prev.slice(0, dispatchCursor))
+      return
+    }
+
+    // Ctrl+W — kill word before cursor.
+    if (key.ctrl && input === 'w' && dispatchBuf !== '') {
+      setDispatchBuf(prev => {
+        const c = Math.min(dispatchCursor, prev.length)
+        if (c === 0) return prev
+        // Walk back over trailing spaces then word chars.
+        let i = c - 1
+        while (i > 0 && /\s/.test(prev[i]!)) i--
+        while (i > 0 && !/\s/.test(prev[i - 1]!)) i--
+        const next = prev.slice(0, i) + prev.slice(c)
+        setDispatchCursor(i)
+        return next
+      })
+      return
+    }
+
     // Right arrow on a job row — open/attach. Source: ant 2941-2944.
     if (key.rightArrow && dispatchBuf === '' && focused?.kind === 'job') {
       onAttach?.(focused.job.id)
