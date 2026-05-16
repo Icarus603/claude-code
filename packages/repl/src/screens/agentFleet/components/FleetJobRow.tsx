@@ -153,7 +153,7 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
   })
 
   return (
-    <Box width={focused ? undefined : undefined}>
+    <Box backgroundColor={focused ? 'userMessageBackground' : undefined}>
       {/* glyph column — width = labelWidth.glyph (2 cells) */}
       <Box width={2} flexShrink={0}>
         {isAnimated ? (

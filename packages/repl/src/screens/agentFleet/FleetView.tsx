@@ -98,7 +98,6 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const actions = useFleetActions({ currentSessionId })
 
   // ── core UI state ──────────────────────────────────────────────────
-  const [filterText, _setFilterText] = useState('')
   const [groupMode, setGroupMode] = useState<FleetGroupMode>('state')
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [selectionIndex, setSelectionIndex] = useState(0)
@@ -134,6 +133,10 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     return () => clearTimeout(t)
   }, [errorToast])
 
+  // Dispatch buffer doubles as the filter input (ant `bH`). parseQuery
+  // strips `a:` / `s:` / `o:` / #PR tokens; the remainder is the
+  // dispatch text used as the spawn directive on Enter.
+  const filterText = dispatchBuf
   const { rows, bucketCounts, groupCounts } = useFleetRows({
     jobs,
     filterText,
@@ -386,16 +389,12 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         setHelpOpen(false)
         return
       }
-      if (filterText !== '') {
-        _setFilterText('')
+      if (dispatchBuf !== '') {
+        setDispatchBuf('')
         return
       }
       if (armedDeleteId !== undefined) {
         setArmedDeleteId(undefined)
-        return
-      }
-      if (dispatchBuf !== '') {
-        setDispatchBuf('')
         return
       }
       handleQuit()

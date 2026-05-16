@@ -43,8 +43,11 @@ export function FleetSectionHeader({
   width,
 }: FleetSectionHeaderProps): React.ReactNode {
   return (
-    <Box width={width}>
-      <Text italic bold={focused} inverse={focused}>
+    <Box
+      width={width}
+      backgroundColor={focused ? 'userMessageBackground' : undefined}
+    >
+      <Text italic bold={focused} dimColor={!focused}>
         {label}
         {collapsed && rowCount > 0 ? ` ${rowCount}` : ''}
       </Text>
