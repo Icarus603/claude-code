@@ -89,6 +89,7 @@
     "./fileChangedWatcher.js": "./fileChangedWatcher.ts",
     "./claudeInChrome/prompt.js": "./claudeInChrome/prompt.ts",
     "./background/preconditions.js": "./background/preconditions.ts",
+    "./background/fleet/fleetTypes.js": "./background/fleet/fleetTypes.ts",
     "./tasks/stopTask.js": "./tasks/stopTask.ts",
     "./tasks/LocalShellTask.js": "./tasks/LocalShellTask.tsx",
     "./tasks/LocalMainSessionTask.js": "./tasks/LocalMainSessionTask.tsx",
