@@ -2147,9 +2147,20 @@ function Row({
       </Box>
     )
   }
+  // Source: ant 5092.js `OH=WH>=120?1:0`. Wide terminals indent
+  // job + fold rows by 1 column so the row glyph ("✻"/"•") sits one
+  // column right of the section header. Narrow terminals (<120 cols)
+  // skip the indent to preserve label width. Headers always start at
+  // column 0 — the indent visually distinguishes "section title" from
+  // "section items".
+  const rowPaddingLeft = terminalWidth >= 120 ? 1 : 0
   if (row.kind === 'fold') {
     return (
-      <Box paddingLeft={2} onMouseEnter={onMouseEnter} onClick={onClick}>
+      <Box
+        paddingLeft={rowPaddingLeft}
+        onMouseEnter={onMouseEnter}
+        onClick={onClick}
+      >
         <FleetSectionHeader
           label={`… ${row.hidden} more`}
           rowCount={row.hidden}
@@ -2169,7 +2180,11 @@ function Row({
   // children + PR cache into FleetJobRow's ChildRollup display data.
   const childSummaries = deriveChildSummaries(row.job.state.children, prCache)
   return (
-    <Box onMouseEnter={onMouseEnter} onClick={onClick}>
+    <Box
+      paddingLeft={rowPaddingLeft}
+      onMouseEnter={onMouseEnter}
+      onClick={onClick}
+    >
       <FleetJobRow
         state={row.job.state}
         activity={row.activity}
