@@ -82,6 +82,25 @@ export type UseTextInputProps = {
    * the peek when the reply buffer is empty.
    */
   onSpaceOnEmpty?: () => void
+
+  /**
+   * Sync-current value ref. Source: ant 4208.js zZ verbatim — `G` is
+   * the value ref, `k = useCallback(C => { G.current = C; P(C) })`,
+   * and `onExit` reads `o.current` (= G.current = queryRef) so submit
+   * always sees the LATEST value.
+   *
+   * In ccb the state lives in the parent (PromptInput owns `input`
+   * via prop + `lastInternalInputRef` for sync mirror). Without this
+   * ref, `handleEnter` reads `originalValue` from closure — which is
+   * captured at the LAST render. When a bracketed paste arrives just
+   * before \r in the same sync tokenizer chain, paste's setState
+   * hasn't committed yet, so submit fires with the OLD value (empty).
+   *
+   * When provided, `handleEnter` reads from this ref so the submit
+   * value reflects any synchronous updates that happened between
+   * renders.
+   */
+  valueRef?: { readonly current: string }
 }
 
 export function useTextInput({
@@ -110,6 +129,7 @@ export function useTextInput({
   dim,
   onLeftArrowOnEmpty,
   onSpaceOnEmpty,
+  valueRef,
 }: UseTextInputProps): TextInputState {
   // Pre-warm the modifiers module for Apple Terminal (has internal guard, safe to call multiple times)
   if (env.terminal === 'Apple_Terminal') {
@@ -279,7 +299,13 @@ export function useTextInput({
     if (env.terminal === 'Apple_Terminal' && isModifierPressed('shift')) {
       return cursor.insert('\n')
     }
-    onSubmit?.(originalValue)
+    // Source: ant 4208.js zZ `onExit: () => let e_ = o.current.trim() ...`
+    // — reads via queryRef so a bracketed-paste-then-\r sequence sees
+    // the freshly committed paste value. ccb's valueRef is the parent
+    // PromptInput's lastInternalInputRef (synchronously mirrored in
+    // trackAndSetInput). Fall back to closure-captured originalValue
+    // when no ref is provided (e.g. standalone TextInput in dialogs).
+    onSubmit?.(valueRef?.current ?? originalValue)
   }
 
   function upOrHistoryUp() {

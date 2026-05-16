@@ -107,6 +107,17 @@ export type BaseTextInputProps = {
   readonly onSpaceOnEmpty?: () => void
 
   /**
+   * Sync-current value ref. Source: ant 4208.js zZ `G` (queryRef).
+   * When provided, useTextInput's onSubmit reads from this ref instead
+   * of the closure-captured `value` prop — necessary so a bracketed
+   * paste committing right before \r in the same sync tokenizer chain
+   * is reflected in the submit value. Parent components that maintain
+   * their own ref (PromptInput's lastInternalInputRef) should pass it
+   * here.
+   */
+  readonly valueRef?: { readonly current: string }
+
+  /**
    * Optional callback to show custom message
    */
   // readonly onMessage?: (show: boolean, message?: string) => void

@@ -2882,6 +2882,14 @@ function PromptInput({
     inlineGhostText,
     inputFilter: lazySpaceInputFilter,
     onLeftArrowOnEmpty,
+    // ant 4208.js zZ queryRef equivalent — useTextInput.handleEnter
+    // reads valueRef.current instead of closure-captured originalValue
+    // so a bracketed-paste-then-\r sequence sees the freshly committed
+    // value. lastInternalInputRef is updated synchronously by
+    // trackAndSetInput (line 386), so paste arriving via onTextPaste
+    // → insertTextAtCursor → trackAndSetInput commits to the ref
+    // BEFORE the \r reaches handleEnter.
+    valueRef: lastInternalInputRef,
   }
 
   const getBorderColor = (): keyof Theme => {
