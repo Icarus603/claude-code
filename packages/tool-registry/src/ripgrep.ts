@@ -105,6 +105,8 @@ interface ParsedArgs {
   countOnly: boolean
   /** True for `-n` (line numbers in output). */
   lineNumbers: boolean
+  /** True for `-o` / `--only-matching`: emit each non-empty match only. */
+  onlyMatching: boolean
   /** Sort by mtime descending. */
   sortModified: boolean
 }
@@ -152,6 +154,7 @@ function parseArgs(args: string[]): ParsedArgs {
     filesWithMatchesOnly: false,
     countOnly: false,
     lineNumbers: false,
+    onlyMatching: false,
     sortModified: false,
   }
   for (let i = 0; i < args.length; i++) {
@@ -189,6 +192,10 @@ function parseArgs(args: string[]): ParsedArgs {
       case '-n':
       case '--line-number':
         out.lineNumbers = true
+        break
+      case '-o':
+      case '--only-matching':
+        out.onlyMatching = true
         break
       case '--no-heading':
         // we never produce headings, no-op
@@ -391,6 +398,7 @@ async function runSearch(
     globs: parsed.globs.length > 0 ? parsed.globs : undefined,
     hidden: parsed.hidden,
     noIgnore: parsed.noIgnore,
+    onlyMatching: parsed.onlyMatching,
   }
 
   const matches = await raceTimeout(
@@ -399,6 +407,14 @@ async function runSearch(
     signal,
     [],
   )
+
+  if (parsed.onlyMatching) {
+    return matches.flatMap(m =>
+      [...m.content.matchAll(new RegExp(parsed.pattern!, parsed.caseInsensitive ? 'giu' : 'gu'))]
+        .filter(match => match[0].length > 0)
+        .map(match => `${m.path}:${m.lineNumber ?? 0}:${match[0]}`),
+    )
+  }
 
   if (parsed.filesWithMatchesOnly) {
     const seen = new Set<string>()

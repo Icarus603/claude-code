@@ -20,6 +20,15 @@ export const hookResponseSchema = lazySchema(() =>
       .string()
       .describe('Reason, if the condition was not met')
       .optional(),
+    // ant v2.1.143 4798.js (aZ_): only meaningful when ok=false on a
+    // Stop/SubagentStop hook. Signals "this condition can never be
+    // satisfied in this session". When true, the dispatcher emits a
+    // `goal_status {met:false, failed:true}` attachment and fires
+    // `tengu_goal_failed` instead of looping on /goal.
+    impossible: z
+      .boolean()
+      .describe('Whether the condition can never be satisfied (only meaningful when ok is false)')
+      .optional(),
   }),
 )
 

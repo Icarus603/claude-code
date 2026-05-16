@@ -13,23 +13,28 @@
  *     up the directive immediately (visible "Goal set: ..." + invisible
  *     meta-prompt via Gj6).
  */
-import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import {
+  getIsNonInteractiveSession,
+  getSessionId,
+} from '@claude-code/app-host/bootstrap/state.js'
+import { checkHasTrustDialogAccepted } from '@claude-code/config'
 import type {
   LocalCommandCall,
   LocalCommandResult,
 } from '@claude-code/agent/command.js'
 import {
-  shouldDisableAllHooksIncludingManaged,
-  shouldAllowManagedHooksOnly,
-} from '@claude-code/agent/hooksConfigSnapshot.js'
-import {
   addGoalStopHook,
   buildGoalMetaMessage,
+  checkGoalSetGate,
   clearGoalStopHook,
   formatLastCheck,
   GOAL_CONDITION_MAX_LENGTH,
   isGoalClearKeyword,
 } from '@claude-code/agent/goalStopHook.js'
+import {
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  logEvent,
+} from '@claude-code/local-observability'
 
 function plural(n: number, word: string): string {
   return n === 1 ? word : `${word}s`
@@ -84,19 +89,17 @@ export const call: LocalCommandCall = async (
     }
   }
 
-  // ant v2.1.142 baH: gate /goal set behind hooks check.
-  // TODO: trust workspace gate — ant also checks !R8() && !O3()
-  // (isTrustedWorkspace && isRemoteMode). ccb doesn't have the
-  // same workspace-trust infrastructure yet; add when ported.
-  if (
-    shouldDisableAllHooksIncludingManaged() ||
-    shouldAllowManagedHooksOnly()
-  ) {
-    return {
-      type: 'text',
-      value:
-        "/goal can't run while hooks are disabled (disableAllHooks or allowManagedHooksOnly is set in settings or by policy).",
-    }
+  // ant v2.1.142 baH/PB8: gate /goal set behind hooks-enabled AND trust-accepted.
+  const gate = checkGoalSetGate({
+    isNonInteractive: getIsNonInteractiveSession,
+    hasTrustDialogAccepted: checkHasTrustDialogAccepted,
+  })
+  if (gate !== null) {
+    logEvent('tengu_feature_sad', {
+      feature_name: 'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code: gate.code as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+    return { type: 'text', value: gate.message }
   }
 
   addGoalStopHook(trimmed, ctx)

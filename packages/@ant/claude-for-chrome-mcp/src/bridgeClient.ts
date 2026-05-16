@@ -436,6 +436,19 @@ export class BridgeClient implements SocketClient {
     );
   }
 
+  public async listConnectedBrowsers(): Promise<ChromeExtensionInfo[]> {
+    return this.queryBridgeExtensions();
+  }
+
+  public async selectBrowser(deviceId: string): Promise<ChromeExtensionInfo | null> {
+    const extensions = await this.queryBridgeExtensions();
+    const selected = extensions.find((ext) => ext.deviceId === deviceId) ?? null;
+    if (selected) {
+      this.selectExtension(selected.deviceId);
+    }
+    return selected;
+  }
+
   /**
    * Switch to a different browser. Broadcasts a pairing request and blocks
    * until a response arrives or timeout (120s). Returns the paired extension

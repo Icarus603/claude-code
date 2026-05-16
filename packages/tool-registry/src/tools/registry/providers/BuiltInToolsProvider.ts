@@ -78,7 +78,7 @@ const getMonitorTool = () =>
     : null
 
 const getSendUserFileTool = () =>
-  feature('KAIROS')
+  feature('KAIROS_SEND_USER_FILE')
     ? require('@claude-code/tool-registry/tools/SendUserFileTool/SendUserFileTool.js').SendUserFileTool as Tool
     : null
 

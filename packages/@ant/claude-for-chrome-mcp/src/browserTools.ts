@@ -534,6 +534,31 @@ export const BROWSER_TOOLS = [
     },
   },
   {
+    name: "list_connected_browsers",
+    description:
+      "List Chrome browsers currently connected to the bridge. Use this before browser actions when multiple browsers may be available.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      required: [],
+    },
+  },
+  {
+    name: "select_browser",
+    description:
+      "Select which connected Chrome browser should be used for browser automation by deviceId. Use list_connected_browsers first to get valid device IDs.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        deviceId: {
+          type: "string",
+          description: "Device ID returned by list_connected_browsers.",
+        },
+      },
+      required: ["deviceId"],
+    },
+  },
+  {
     name: "switch_browser",
     description:
       "Switch which Chrome browser is used for browser automation. Call this when the user wants to connect to a different Chrome browser. Broadcasts a connection request to all Chrome browsers with the extension installed — the user clicks 'Connect' in the desired browser.",

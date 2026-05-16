@@ -17,15 +17,16 @@
  * The component exists at repl/components/goal/GoalPanel.tsx but the
  * command-runtime → repl cross-package export needs wiring first.
  */
-import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
-import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import {
-  shouldAllowManagedHooksOnly,
-  shouldDisableAllHooksIncludingManaged,
-} from '@claude-code/agent/hooksConfigSnapshot.js'
+  getIsNonInteractiveSession,
+  getSessionId,
+} from '@claude-code/app-host/bootstrap/state.js'
+import { checkHasTrustDialogAccepted } from '@claude-code/config'
+import type { LocalJSXCommandOnDone } from '@claude-code/agent/command.js'
 import {
   addGoalStopHook,
   buildGoalMetaMessage,
+  checkGoalSetGate,
   clearGoalStopHook,
   GOAL_CONDITION_MAX_LENGTH,
   isGoalClearKeyword,
@@ -78,21 +79,20 @@ export async function call(
     return null
   }
 
-  // ant v2.1.142 baH: gate /goal when hooks are globally disabled.
-  // /goal installs a Stop hook; if hooks can't fire, the goal never resolves
-  // and the user sees a hanging spinner. Refuse early with a clear message.
-  // TODO: trust workspace gate — ant also checks !R8() && !O3()
-  // (isTrustedWorkspace && isRemoteMode). ccb doesn't have the
-  // same workspace-trust infrastructure yet; add when ported.
-  if (shouldDisableAllHooksIncludingManaged() || shouldAllowManagedHooksOnly()) {
+  // ant v2.1.142 baH/PB8: gate /goal behind hooks-enabled AND trust-accepted.
+  // /goal installs a Stop hook; if hooks can't fire, the goal hangs.
+  // If the workspace isn't trusted, prompt-hook evaluators see untrusted
+  // file contents → ant blocks set in interactive sessions until trust accepted.
+  const gate = checkGoalSetGate({
+    isNonInteractive: getIsNonInteractiveSession,
+    hasTrustDialogAccepted: checkHasTrustDialogAccepted,
+  })
+  if (gate !== null) {
     logEvent('tengu_feature_sad', {
       feature_name: 'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      error_code: 'hooks_gate' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code: gate.code as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
-    onDone(
-      "/goal can't run while hooks are disabled (disableAllHooks or allowManagedHooksOnly is set in settings or by policy).",
-      { display: 'system' },
-    )
+    onDone(gate.message, { display: 'system' })
     return null
   }
 

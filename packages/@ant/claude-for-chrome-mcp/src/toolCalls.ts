@@ -20,7 +20,13 @@ export const handleToolCall = async (
     return handleSetPermissionMode(socketClient, args);
   }
 
-  // Handle switch_browser outside the normal tool call flow (manages its own connection)
+  // Browser-selection tools manage bridge state locally.
+  if (name === "list_connected_browsers") {
+    return handleListConnectedBrowsers(context, socketClient);
+  }
+  if (name === "select_browser") {
+    return handleSelectBrowser(context, socketClient, args);
+  }
   if (name === "switch_browser") {
     return handleSwitchBrowser(context, socketClient);
   }
@@ -215,6 +221,71 @@ async function handleSetPermissionMode(
     content: [
       { type: "text", text: `Permission mode set to: ${permissionMode}` },
     ],
+  };
+}
+
+async function handleListConnectedBrowsers(
+  context: ClaudeForChromeContext,
+  socketClient: SocketClient,
+): Promise<CallToolResult> {
+  if (!context.bridgeConfig) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: "Browser listing is only available with bridge connections.",
+        },
+      ],
+      isError: true,
+    };
+  }
+  const isConnected = await socketClient.ensureConnected();
+  if (!isConnected) return handleToolCallDisconnected(context);
+  const browsers = (await socketClient.listConnectedBrowsers?.()) ?? [];
+  return {
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify({ browsers }, null, 2),
+      },
+    ],
+  };
+}
+
+async function handleSelectBrowser(
+  context: ClaudeForChromeContext,
+  socketClient: SocketClient,
+  args: Record<string, unknown>,
+): Promise<CallToolResult> {
+  if (!context.bridgeConfig) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: "Browser selection is only available with bridge connections.",
+        },
+      ],
+      isError: true,
+    };
+  }
+  const deviceId = typeof args.deviceId === "string" ? args.deviceId : "";
+  if (!deviceId) {
+    return {
+      content: [{ type: "text", text: "select_browser requires deviceId." }],
+      isError: true,
+    };
+  }
+  const isConnected = await socketClient.ensureConnected();
+  if (!isConnected) return handleToolCallDisconnected(context);
+  const selected = (await socketClient.selectBrowser?.(deviceId)) ?? null;
+  if (!selected) {
+    return {
+      content: [{ type: "text", text: `No connected browser found for deviceId ${deviceId}.` }],
+      isError: true,
+    };
+  }
+  return {
+    content: [{ type: "text", text: `Selected browser "${selected.name ?? selected.deviceId}".` }],
   };
 }
 

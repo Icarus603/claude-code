@@ -396,6 +396,11 @@ export interface HookResult {
   outcome: 'success' | 'blocking' | 'non_blocking_error' | 'cancelled'
   preventContinuation?: boolean
   stopReason?: string
+  // ant v2.1.143 4798.js: only set by prompt-hook evaluator on a Stop /
+  // SubagentStop hook when the LLM judged the condition genuinely
+  // unachievable. Bubbles through the aggregator into stopHooksCore which
+  // emits `goal_status {met:false, failed:true}` + tengu_goal_failed.
+  impossible?: boolean
   permissionBehavior?: 'ask' | 'deny' | 'allow' | 'passthrough' | 'defer'
   hookPermissionDecisionReason?: string
   additionalContext?: string
@@ -427,6 +432,15 @@ export type AggregatedHookResult = {
   elicitationResponse?: ElicitationResponse
   elicitationResultResponse?: ElicitationResponse
   retry?: boolean
+  // ant 3991.js Qo7 keys off `u.hook` in /goal met/not-met dispatch — must
+  // be forwarded from HookResult through every yield site, otherwise the
+  // /goal met-handler in stopHooksCore.ts can't match the success attachment
+  // back to the active goal's prompt hook.
+  hook?: HookCommand | HookCallback | FunctionHook
+  // ant v2.1.143 3993.js Va7: forwarded so the met-handler can branch into
+  // the "goal could not be achieved" failure path (`failed:true` +
+  // tengu_goal_failed) instead of the normal achievement path.
+  impossible?: boolean
 }
 
 /**
@@ -3011,18 +3025,32 @@ async function* executeHooks({
       yield {
         preventContinuation: true,
         stopReason: result.stopReason,
+        hook: result.hook,
       }
     }
 
-    // Handle different result types
+    // Handle different result types. We forward `hook` and `stopReason` on
+    // every yield so downstream consumers (stopHooksCore /goal met-handler
+    // and not-met-handler) can match the yielded message back to the hook
+    // that produced it. ant v2.1.142 3991.js Qo7 keys off `u.hook` and
+    // `u.stopReason` in BOTH the success-attachment and blockingError
+    // branches; dropping them here is what caused `✔ Goal achieved` to
+    // never render and `/goal active` to stay stuck in the footer.
     if (result.blockingError) {
       yield {
         blockingError: result.blockingError,
+        hook: result.hook,
+        stopReason: result.stopReason,
       }
     }
 
     if (result.message) {
-      yield { message: result.message }
+      yield {
+        message: result.message,
+        hook: result.hook,
+        stopReason: result.stopReason,
+        impossible: (result as HookResult & { impossible?: boolean }).impossible,
+      }
     }
 
     // Yield system message separately if present

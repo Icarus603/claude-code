@@ -141,6 +141,44 @@ export function isGoalBlockedByHooksGate(): boolean {
   )
 }
 
+/** ant 4574.js `$V3` / `zV3` — user-facing gate messages. */
+export const GOAL_TRUST_GATE_MESSAGE =
+  '/goal is only available in trusted workspaces. Restart, accept the trust dialog, and try again.'
+export const GOAL_HOOKS_GATE_MESSAGE =
+  "/goal can't run while hooks are disabled (disableAllHooks or allowManagedHooksOnly is set in settings or by policy)."
+
+export type GoalGateResult = {
+  message: string
+  code: 'hooks_gate' | 'trust_gate'
+}
+
+/**
+ * Ant `PB8` (4574.js): full gate for /goal set. Returns the reason if
+ * blocked, or null if allowed. ant's exact predicate:
+ *   if (disableAllHooks || allowManagedHooksOnly) → hooks_gate
+ *   if (!isNonInteractive && !trustDialogAccepted) → trust_gate
+ *
+ * Trust gate exempts non-interactive sessions: -p / SDK / headless paths
+ * don't get the interactive trust dialog, so requiring it would lock /goal
+ * out of every CI integration.
+ *
+ * Callers must emit `tengu_feature_sad {feature_name:'goal_set', error_code}`
+ * themselves so they can attach the surface they were called from
+ * (local-jsx vs local) — same as ant baH() does at the call site.
+ */
+export function checkGoalSetGate(deps: {
+  isNonInteractive: () => boolean
+  hasTrustDialogAccepted: () => boolean
+}): GoalGateResult | null {
+  if (isGoalBlockedByHooksGate()) {
+    return { message: GOAL_HOOKS_GATE_MESSAGE, code: 'hooks_gate' }
+  }
+  if (!deps.isNonInteractive() && !deps.hasTrustDialogAccepted()) {
+    return { message: GOAL_TRUST_GATE_MESSAGE, code: 'trust_gate' }
+  }
+  return null
+}
+
 /** Ant `Wj6`. Plain-text formatter for activeGoal.lastReason. */
 export function formatLastCheck(reason: string): string {
   return `Last check: ${reason.trim()}`
@@ -468,7 +506,9 @@ export function restoreGoalFromTranscript(
     return
   }
   // ant v2.1.142 n06: re-check gates on restore — hooks or trust may have
-  // changed since the goal was originally set.
+  // changed since the goal was originally set. Restore-path gate excludes
+  // the trust check (trust dialog runs before restore and a restored
+  // transcript inherits the session's trust state).
   if (isGoalBlockedByHooksGate()) {
     logEvent('tengu_feature_sad', {
       feature_name: 'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,

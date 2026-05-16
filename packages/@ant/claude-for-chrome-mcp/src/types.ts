@@ -122,6 +122,10 @@ export interface SocketClient {
     mode: PermissionMode,
     allowedDomains?: string[],
   ): Promise<void>;
+  /** List connected browsers. Only available on BridgeClient. */
+  listConnectedBrowsers?(): Promise<ChromeExtensionInfo[]>;
+  /** Select a connected browser by device ID. Only available on BridgeClient. */
+  selectBrowser?(deviceId: string): Promise<ChromeExtensionInfo | null>;
   /** Switch to a different browser. Only available on BridgeClient. */
   switchBrowser?(): Promise<
     | {

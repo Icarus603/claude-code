@@ -44,6 +44,7 @@ import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/st
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { PRODUCT_URL } from '@claude-code/config/product'
+import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import type { AppState } from './appStateHooks.js'
 import {
   type Tool,
@@ -2447,6 +2448,8 @@ export type TransformedMCPResult = {
   content: MCPToolResult
   type: MCPResultType
   schema?: string
+  structuredContent?: Record<string, unknown>
+  _meta?: Record<string, unknown>
 }
 
 /**
@@ -2481,6 +2484,7 @@ export async function transformMCPResult(
       return {
         content: String(result.toolResult),
         type: 'toolResult',
+        _meta: '_meta' in result ? result._meta as Record<string, unknown> : undefined,
       }
     }
 
@@ -2501,6 +2505,20 @@ export async function transformMCPResult(
           result.content.map(item => transformResultContent(item, name)),
         )
       ).flat()
+      if (
+        getFeatureValue_CACHED_MAY_BE_STALE(
+          'tengu_mcp_singleton_unwrap',
+          true,
+        ) &&
+        transformedContent.length === 1 &&
+        transformedContent[0]?.type === 'text'
+      ) {
+        return {
+          content: transformedContent[0].text,
+          type: 'contentArray',
+          schema: 'string',
+        }
+      }
       return {
         content: transformedContent,
         type: 'contentArray',

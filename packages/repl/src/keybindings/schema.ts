@@ -115,7 +115,6 @@ export const KEYBINDING_ACTIONS = [
   'confirm:previousField',
   'confirm:cycleMode',
   'confirm:toggle',
-  'confirm:toggleExplanation',
   // Tabs navigation actions
   'tabs:next',
   'tabs:previous',

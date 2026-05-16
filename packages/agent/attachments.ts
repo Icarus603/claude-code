@@ -774,6 +774,11 @@ export type Attachment =
       iterations?: number
       durationMs?: number
       tokens?: number
+      // ant v2.1.143: only meaningful when met=false. Indicates the goal
+      // was judged genuinely unachievable by the prompt-hook evaluator.
+      // Renders as red "Goal could not be achieved" instead of dim
+      // "Goal not yet met… continuing".
+      failed?: boolean
     }
 
 export type TeammateMailboxAttachment = {

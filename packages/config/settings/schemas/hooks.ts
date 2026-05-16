@@ -77,6 +77,12 @@ function buildHookSchemas() {
     model: z.string().optional().describe('Model to use (e.g., "claude-sonnet-4-6"). Defaults to small fast model.'),
     statusMessage: z.string().optional().describe('Custom spinner status message'),
     once: z.boolean().optional().describe('If true, hook runs once and is removed'),
+    // ant v2.1.142 4793.js: PreToolUse / PostToolUse etc. set preventContinuation
+    // to true on blocking by default. continueOnBlock=true flips that — the
+    // hook reports blocking with a reason, but the model is allowed to keep
+    // running (useful for soft-fail verifiers). Stop / SubagentStop always
+    // continue regardless (loop semantics).
+    continueOnBlock: z.boolean().optional().describe('If true, a blocking outcome surfaces the reason but does not prevent the model from continuing. Ignored for Stop/SubagentStop hooks, which always continue.'),
   })
 
   const HttpHookSchema = z.object({

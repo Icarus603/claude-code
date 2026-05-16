@@ -164,6 +164,15 @@ export async function connectVoiceStream(
     logForDebugging('[voice_stream] Nova 3 gate enabled (tengu_cobalt_frost)')
   }
 
+  const forwardInterimsTyped =
+    process.env.CLAUDE_CODE_VOICE_FORWARD_INTERIMS_TYPED === '1' ||
+    process.env.CLAUDE_CODE_VOICE_FORWARD_INTERIMS_TYPED === 'true' ||
+    getFeatureValue_CACHED_MAY_BE_STALE('tengu_brick_follow', false)
+  if (forwardInterimsTyped) {
+    params.set('forward_interims', 'typed')
+    logForDebugging('[voice_stream] forward_interims=typed enabled')
+  }
+
   // Append keyterms as query params — the voice_stream proxy forwards
   // these to the STT service which applies appropriate boosting.
   if (options?.keyterms?.length) {

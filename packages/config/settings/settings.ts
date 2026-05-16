@@ -2,6 +2,7 @@ import { feature } from 'bun:bundle'
 import mergeWith from 'lodash-es/mergeWith.js'
 import { dirname, join, resolve } from 'path'
 import { z } from 'zod/v4'
+import type { PermissionMode } from '@claude-code/permission/permissionTypes'
 import { getRemoteManagedSettingsSyncFromCache } from '../remote/syncCacheState.js'
 import { getConfigHostBindings, tryGetConfigHostBindings } from '../host.js'
 
@@ -30,6 +31,34 @@ function safeParseJSON(json: string | null | undefined): unknown {
   try { return JSON.parse(json) } catch { return null }
 }
 function logError(e: unknown) { tryGetConfigHostBindings().logDebug?.(`[error] ${e instanceof Error ? e.message : String(e)}`) }
+import { logEvent } from '@claude-code/local-observability'
+
+const AUTO_MODE_TRUSTED_SOURCES = new Set<SettingSource>([
+  'userSettings',
+  'flagSettings',
+  'policySettings',
+])
+
+function sanitizeUntrustedAutoDefaultMode(
+  source: SettingSource,
+  settings: SettingsJson,
+): SettingsJson {
+  if (
+    AUTO_MODE_TRUSTED_SOURCES.has(source) ||
+    settings.permissions?.defaultMode !== 'auto'
+  ) {
+    return settings
+  }
+  logEvent('tengu_settings_auto_mode_untrusted_source_ignored', {})
+  return {
+    ...settings,
+    permissions: {
+      ...settings.permissions,
+      defaultMode: undefined as unknown as PermissionMode,
+    },
+  }
+}
+
 import {
   type EditableSettingSource,
   getEnabledSettingSources,
@@ -767,7 +796,7 @@ function loadSettingsFromDisk(): SettingsWithErrors {
           if (settings) {
             mergedSettings = mergeWith(
               mergedSettings,
-              settings,
+              sanitizeUntrustedAutoDefaultMode(source, settings),
               settingsMergeCustomizer,
             )
           }

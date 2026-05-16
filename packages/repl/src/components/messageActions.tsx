@@ -72,6 +72,11 @@ export function isNavigableMessage(msg: NavigableMessage): boolean {
         case 'hook_blocking_error':
         case 'hook_error_during_execution':
           return true
+        case 'goal_status':
+          // ant v2.1.143 3738.js: goal_status (met or failed) is clickable
+          // to expand Goal: + Reason: details. Sentinels (lifecycle set/clear
+          // events) are invisible and not navigable.
+          return msg.attachment.sentinel !== true
       }
       return false
   }

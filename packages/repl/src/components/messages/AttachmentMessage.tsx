@@ -456,53 +456,83 @@ export function AttachmentMessage({
         </Box>
       )
     case 'goal_status': {
-      // ant v2.1.142 3737.js:326-364 — lifecycle sentinels (set/clear events)
-      // are invisible; real completions and "not yet met" blocks are shown.
+      // ant v2.1.143 3738.js — three rendering states:
+      //   1. failed (impossible): red ✗ "Goal could not be achieved"
+      //   2. met:    green ✔ "Goal achieved (stats)"
+      //   3. pending: dim ○ "Goal not yet met… continuing"
+      // Sentinels (set/clear lifecycle events) are invisible.
+      // Stats render for met OR failed.
+      // Click-to-expand: when this row is hovered/selected (isItemClickable
+      // wired in Messages.tsx) the parent flips `verbose=true` and Goal:/
+      // Reason: details show. Failure path renders the failure reason
+      // inline without a label so users instantly see why.
       if (attachment.sentinel) return null
+      const isFailed = attachment.failed === true
       const stats: string[] = []
-      if (attachment.durationMs !== undefined) {
-        stats.push(formatDurationCompact(attachment.durationMs))
-      }
-      if (attachment.iterations !== undefined) {
-        stats.push(
-          `${attachment.iterations} ${plural(attachment.iterations, 'turn')}`,
-        )
-      }
-      if (attachment.tokens !== undefined) {
-        stats.push(`${formatTokensCompact(attachment.tokens)} tokens`)
+      if (attachment.met || isFailed) {
+        if (attachment.durationMs !== undefined) {
+          stats.push(formatDurationCompact(attachment.durationMs))
+        }
+        if (attachment.iterations !== undefined) {
+          stats.push(
+            `${attachment.iterations} ${plural(attachment.iterations, 'turn')}`,
+          )
+        }
+        if (attachment.tokens !== undefined) {
+          stats.push(`${formatTokensCompact(attachment.tokens)} tokens`)
+        }
       }
       const statsLabel =
         stats.length > 0 ? ` (${stats.join(' · ')})` : ''
+      const statusGlyph = isFailed ? '✗' : attachment.met ? '✔' : '○'
+      const statusColor: 'error' | 'success' | undefined = isFailed
+        ? 'error'
+        : attachment.met
+          ? 'success'
+          : undefined
+      const headlineText = isFailed
+        ? 'Goal could not be achieved'
+        : attachment.met
+          ? 'Goal achieved'
+          : 'Goal not yet met… continuing'
       return (
         <Box flexDirection="column" marginTop={1}>
           <Box flexDirection="row">
             <Text>
-              {attachment.met ? (
-                <>
-                  <Text color="success">✔ </Text>
-                  Goal achieved
-                </>
-              ) : (
-                <>
-                  <Text dimColor>○ </Text>
-                  <Text dimColor>Goal not yet met… continuing</Text>
-                </>
-              )}
+              <Text color={statusColor}>{statusGlyph} </Text>
+              <Text
+                color={isFailed ? 'error' : undefined}
+                dimColor={!attachment.met && !isFailed}
+              >
+                {headlineText}
+              </Text>
             </Text>
             {statsLabel ? <Text dimColor>{statsLabel}</Text> : null}
           </Box>
-          <Box paddingLeft={2}>
-            <Text dimColor wrap="wrap">
-              Goal: {attachment.condition}
-            </Text>
-          </Box>
-          {attachment.reason && (
+          {/* On failure: surface the reason inline (no "Reason:" label) so the
+              user immediately sees why the LLM gave up. ant v2.1.143 3738.js
+              renders this BEFORE the Goal/Reason verbose block. */}
+          {isFailed && attachment.reason ? (
+            <Box paddingLeft={2}>
+              <Text dimColor wrap="wrap">
+                {attachment.reason}
+              </Text>
+            </Box>
+          ) : null}
+          {verbose ? (
+            <Box paddingLeft={2}>
+              <Text dimColor wrap="wrap">
+                Goal: {attachment.condition}
+              </Text>
+            </Box>
+          ) : null}
+          {verbose && !isFailed && attachment.reason ? (
             <Box paddingLeft={2}>
               <Text dimColor wrap="wrap">
                 Reason: {attachment.reason}
               </Text>
             </Box>
-          )}
+          ) : null}
         </Box>
       )
     }

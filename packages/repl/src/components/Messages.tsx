@@ -107,7 +107,7 @@ const BRIEF_TOOL_NAME: string | null =
         require('@claude-code/tool-registry/tools/BriefTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/BriefTool/prompt.js')
       ).BRIEF_TOOL_NAME
     : null
-const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS')
+const SEND_USER_FILE_TOOL_NAME: string | null = feature('KAIROS_SEND_USER_FILE')
   ? (
       require('@claude-code/tool-registry/tools/SendUserFileTool/prompt.js') as typeof import('@claude-code/tool-registry/tools/SendUserFileTool/prompt.js')
     ).SEND_USER_FILE_TOOL_NAME
@@ -746,6 +746,15 @@ const MessagesImpl = ({
           isAdvisorBlock(b) &&
           b.type === 'advisor_tool_result' &&
           b.content.type === 'advisor_result'
+        )
+      }
+      // ant v2.1.143 3738.js: goal_status (met / failed) is clickable —
+      // the click toggles `verbose` on the row so Goal:/Reason: details
+      // show. Sentinels are skipped (they render to null anyway).
+      if (msg.type === 'attachment') {
+        return (
+          msg.attachment.type === 'goal_status' &&
+          msg.attachment.sentinel !== true
         )
       }
       if (msg.type !== 'user') return false

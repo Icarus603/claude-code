@@ -1263,6 +1263,7 @@ const pending401Handlers = new Map<string, Promise<boolean>>()
 type OAuthTokensView = {
   accessToken?: string; refreshToken?: string; expiresAt?: number
   scopes?: readonly string[]; subscriptionType?: string | null
+  clientId?: string
 }
 const asView = (t: OAuthTokens | null | undefined): OAuthTokensView | null =>
   (t as OAuthTokensView | null) ?? null
@@ -1351,6 +1352,53 @@ export async function getClaudeAIOAuthTokensAsync(): Promise<OAuthTokens | null>
 
 // In-flight promise for deduplicating concurrent calls
 let pendingRefreshCheck: Promise<boolean> | null = null
+
+export async function withOAuthRefreshLock<T>(
+  callback: (ctx: {
+    lockedTokens: OAuthTokensView | null
+    lockAttempts: number
+  }) => Promise<T>,
+): Promise<T> {
+  const claudeDir = getClaudeConfigHomeDir()
+  await mkdir(claudeDir, { recursive: true })
+  let retryCount = 0
+  while (true) {
+    let release: (() => Promise<void>) | undefined
+    try {
+      logEvent('tengu_oauth_token_refresh_lock_acquiring', {})
+      release = await lockfile.lock(claudeDir, oauthRefreshLockOptions(claudeDir))
+      logEvent('tengu_oauth_token_refresh_lock_acquired', {})
+      getClaudeAIOAuthTokens.cache?.clear?.()
+      clearKeychainCache()
+      return await callback({
+        lockedTokens: asView(await getClaudeAIOAuthTokensAsync()),
+        lockAttempts: retryCount + 1,
+      })
+    } catch (err) {
+      if ((err as { code?: string }).code === 'ELOCKED' && retryCount < MAX_RETRIES) {
+        retryCount++
+        logEvent('tengu_oauth_token_refresh_lock_retry', { retryCount })
+        await sleep(1000 + Math.random() * 1000)
+        continue
+      }
+      throw err
+    } finally {
+      if (release) {
+        try {
+          await release()
+          logEvent('tengu_oauth_token_refresh_lock_released', {})
+        } catch (releaseError) {
+          logError(releaseError)
+          logEvent('tengu_oauth_token_refresh_lock_release_error', {
+            error: errorMessage(
+              releaseError,
+            ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          })
+        }
+      }
+    }
+  }
+}
 
 export function checkAndRefreshOAuthTokenIfNeeded(
   retryCount = 0,

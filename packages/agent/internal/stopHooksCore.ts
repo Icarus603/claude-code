@@ -23,7 +23,11 @@ import { errorMessage, isBareMode, isEnvDefinedFalsy } from '../internalUtils.js
 import { readEnv } from '@claude-code/config/env'
 import { logEvent as obsLogEvent } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { removeSessionHook } from '../hooks/sessionHooks.js'
+import {
+  addSessionHook,
+  getSessionHooks,
+  removeSessionHook,
+} from '../hooks/sessionHooks.js'
 import { getTotalOutputTokens } from '@claude-code/app-host/bootstrap/state.js'
 
 
@@ -136,10 +140,69 @@ export async function* handleStopHooks(
     }
   }
 
+  // ant v2.1.143 3993.js Va7: if a /goal hook is active AND background
+  // work is in flight (in-progress / running tasks owned by a teammate),
+  // temporarily remove the goal Stop hook before evaluating. Otherwise
+  // every Stop tick re-evaluates an unfinished goal while subagents are
+  // still working, burning Haiku calls and producing noisy "Goal not yet
+  // met" attachments. The hook is restored in the finally block below.
+  let deferredGoalHook:
+    | { type: 'prompt'; prompt: string }
+    | undefined
   try {
     const blockingErrors = []
     const appState = toolUseContext.getAppState()
     const permissionMode = appState.toolPermissionContext.mode
+
+    {
+      const activeGoal = (
+        appState as { activeGoal?: { condition: string } }
+      ).activeGoal
+      if (activeGoal) {
+        try {
+          const taskListId = getAgentHostBindings().getTaskListId?.()
+          const tasks = (await getAgentHostBindings().listTasks?.(taskListId)) ?? []
+          const hasBgWork = tasks.some(
+            t =>
+              (t.status === 'in_progress' || t.status === 'running') &&
+              t.owner !== undefined,
+          )
+          if (hasBgWork) {
+            const sessionId =
+              getAgentHostBindings().getSessionId?.() ?? ''
+            const hooksMap = getSessionHooks(appState, sessionId, 'Stop')
+            const stop = hooksMap.get('Stop') ?? []
+            for (const matcher of stop) {
+              if (matcher.matcher !== '' || matcher.skillRoot !== undefined)
+                continue
+              for (const hookEntry of matcher.hooks) {
+                const h = hookEntry as { hook?: { type: string; prompt?: string } }
+                if (
+                  h.hook?.type === 'prompt' &&
+                  h.hook.prompt === activeGoal.condition
+                ) {
+                  deferredGoalHook = {
+                    type: 'prompt',
+                    prompt: h.hook.prompt,
+                  }
+                  removeSessionHook(
+                    toolUseContext.setAppState,
+                    sessionId,
+                    'Stop',
+                    deferredGoalHook,
+                  )
+                  break
+                }
+              }
+              if (deferredGoalHook) break
+            }
+          }
+        } catch {
+          // Defer is an optimisation — if listTasks errors, fall through
+          // to normal hook evaluation rather than crashing the Stop pipeline.
+        }
+      }
+    }
 
     const generator = getAgentHostBindings().executeStopHooks?.(
       permissionMode,
@@ -237,6 +300,15 @@ export async function* handleStopHooks(
                   const iterations = activeGoal.iterations + 1
                   const durationMs = Date.now() - activeGoal.setAt
                   const tokens = getTotalOutputTokens() - activeGoal.tokensAtStart
+                  // ant v2.1.143 3993.js: when evaluator judged the goal
+                  // impossible, the hook still returns `outcome:'success'`
+                  // (so the Stop hook is removed and activeGoal cleared),
+                  // but stopHooksCore branches into the failure path:
+                  // emits `goal_status {met:false, failed:true}` + fires
+                  // `tengu_goal_failed`. The achievement path is skipped.
+                  const isImpossible =
+                    (result as { impossible?: boolean }).impossible === true
+                  const stopReason = (result as { stopReason?: string }).stopReason
                   try {
                     removeSessionHook(
                       toolUseContext.setAppState,
@@ -253,32 +325,64 @@ export async function* handleStopHooks(
                     ...prev,
                     activeGoal: undefined,
                   }))
-                  const goalMet = getAgentHostBindings().createAttachmentMessage?.(
-                    {
-                      type: 'goal_status',
-                      met: true,
-                      condition: hookPrompt,
-                      reason: (result as { stopReason?: string }).stopReason,
-                      iterations,
-                      durationMs,
-                      tokens,
-                    },
-                  )
-                  if (goalMet) yield goalMet
-                  try {
-                    obsLogEvent('tengu_goal_achieved', {
-                      promptLength: hookPrompt.length,
-                      iterations,
-                      durationMs,
-                      tokens,
-                    })
-                  } catch {
-                    // telemetry sink might be uninstalled — fine
-                  }
-                  try {
-                    logForDebugging('goal_met')
-                  } catch {
-                    // best-effort diagnostic
+                  if (isImpossible) {
+                    const goalFailed = getAgentHostBindings().createAttachmentMessage?.(
+                      {
+                        type: 'goal_status',
+                        met: false,
+                        failed: true,
+                        condition: hookPrompt,
+                        reason: stopReason,
+                        iterations,
+                        durationMs,
+                        tokens,
+                      },
+                    )
+                    if (goalFailed) yield goalFailed
+                    try {
+                      obsLogEvent('tengu_goal_failed', {
+                        promptLength: hookPrompt.length,
+                        reasonLength: stopReason?.length ?? 0,
+                        iterations,
+                        durationMs,
+                        tokens,
+                      })
+                    } catch {
+                      // telemetry sink might be uninstalled — fine
+                    }
+                    try {
+                      logForDebugging('goal_met:impossible')
+                    } catch {
+                      // best-effort diagnostic
+                    }
+                  } else {
+                    const goalMet = getAgentHostBindings().createAttachmentMessage?.(
+                      {
+                        type: 'goal_status',
+                        met: true,
+                        condition: hookPrompt,
+                        reason: stopReason,
+                        iterations,
+                        durationMs,
+                        tokens,
+                      },
+                    )
+                    if (goalMet) yield goalMet
+                    try {
+                      obsLogEvent('tengu_goal_achieved', {
+                        promptLength: hookPrompt.length,
+                        iterations,
+                        durationMs,
+                        tokens,
+                      })
+                    } catch {
+                      // telemetry sink might be uninstalled — fine
+                    }
+                    try {
+                      logForDebugging('goal_met')
+                    } catch {
+                      // best-effort diagnostic
+                    }
                   }
                 }
               }
@@ -306,14 +410,13 @@ export async function* handleStopHooks(
         blockingErrors.push(userMessage)
         yield userMessage
         hasOutput = true
-        // Add to hookErrors so it appears in the summary
-        hookErrors.push(result.blockingError.blockingError)
-        // Port of ant v2.1.136 (3973.js hd7 blocking branch):
-        //   /goal not yet met — increment iterations, record lastReason
-        //   on AppState.activeGoal (so renderActiveGoalStatus shows
-        //   "Last check: <reason>"), surface goal_status `{met:false,
-        //   condition, reason}` (NO sentinel) so the model knows it must
-        //   keep going. Hook itself is NOT removed.
+
+        // Detect /goal blocking: the prompt hook's `prompt` field matches
+        // AppState.activeGoal.condition. ant v2.1.142 3991.js Qo7 branches
+        // here — goal hooks DON'T contribute to hookErrors (they render via
+        // the dim `○ Goal not yet met` attachment instead, not the "Ran N
+        // stop hooks / Stop hook error: ..." summary block).
+        let isGoalBlock = false
         if (
           'hook' in result &&
           result.hook &&
@@ -332,7 +435,13 @@ export async function* handleStopHooks(
             }
           ).activeGoal
           if (activeGoal && activeGoal.condition === hookPrompt) {
+            isGoalBlock = true
             const reason = (result as { stopReason?: string }).stopReason
+            // Port of ant 3991.js Qo7 + 3973.js hd7 blocking branch:
+            //   /goal not yet met — increment iterations, record lastReason
+            //   so renderActiveGoalStatus shows "Last check: <reason>",
+            //   surface goal_status `{met:false, condition, reason}` (no
+            //   sentinel) so the model sees it must keep going. Hook stays.
             toolUseContext.setAppState(prev => ({
               ...prev,
               activeGoal: {
@@ -349,6 +458,12 @@ export async function* handleStopHooks(
             })
             if (notMet) yield notMet
           }
+        }
+
+        // Only non-goal blocking errors contribute to the "Ran N stop hooks"
+        // summary. Goal hooks have their own dim status line.
+        if (!isGoalBlock) {
+          hookErrors.push(result.blockingError.blockingError)
         }
       }
       // Check if hook wants to prevent continuation
@@ -560,5 +675,38 @@ export async function* handleStopHooks(
     )
     if (sysMsg) yield sysMsg
     return { blockingErrors: [], preventContinuation: false }
+  } finally {
+    // ant v2.1.143 3993.js Va7: restore the deferred /goal hook so the
+    // next turn re-evaluates after background work finishes. Skipped when
+    // the met-handler already removed the hook (we only defer when bg
+    // work is running — if the hook fired and met, deferredGoalHook stays
+    // set but it was never installed; we still try to re-add. The
+    // sessionHooksRegistry add is idempotent on shape, so re-installing
+    // an already-installed condition is a no-op.) Wrap in try/catch
+    // because finally runs even on abort, and we never want a finally
+    // failure to mask the original error.
+    if (deferredGoalHook) {
+      try {
+        const sessionId = getAgentHostBindings().getSessionId?.() ?? ''
+        const currentGoal = (
+          toolUseContext.getAppState() as {
+            activeGoal?: { condition: string }
+          }
+        ).activeGoal
+        // Only restore if the goal is still active (met-handler may have
+        // cleared activeGoal during the loop above).
+        if (currentGoal?.condition === deferredGoalHook.prompt) {
+          addSessionHook(
+            toolUseContext.setAppState,
+            sessionId,
+            'Stop',
+            '',
+            deferredGoalHook,
+          )
+        }
+      } catch {
+        // best-effort
+      }
+    }
   }
 }

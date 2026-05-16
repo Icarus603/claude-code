@@ -275,8 +275,8 @@ import {
   withRetry,
 } from './withRetry.js'
 import {
-  parseImageDimensionExceededError,
-  stripOversizedImageFromMessages,
+  parseMediaBlockStripError,
+  stripMediaBlockFromMessages,
 } from './imageDimensionStrip.js'
 
 // Define a type that represents valid JSON values
@@ -2055,17 +2055,27 @@ async function* queryModel(
           // patched array is actually different from the input. ant
           // gates on `_$!==C` so stale coords (e.g. messages reshuffled
           // since the API saw them) don't pollute analytics.
-          const coords = parseImageDimensionExceededError(e)
-          if (coords) {
-            const patched = stripOversizedImageFromMessages(
+          const target = parseMediaBlockStripError(e)
+          if (target) {
+            const patched = stripMediaBlockFromMessages(
               messagesForAPI as readonly any[],
-              coords,
+              target,
             )
             if (patched !== messagesForAPI) {
               messagesForAPI = patched as typeof messagesForAPI
-              logEvent('tengu_image_dimension_strip_retry', {
-                message_idx: coords.messageIdx,
-                content_idx: coords.contentIdx,
+              logEvent('tengu_media_block_strip_retry', {
+                kind: target.kind,
+                targeted:
+                  target.messageIdx !== undefined &&
+                  target.contentIdx !== undefined
+                    ? 1
+                    : 0,
+                ...(target.messageIdx !== undefined && {
+                  message_idx: target.messageIdx,
+                }),
+                ...(target.contentIdx !== undefined && {
+                  content_idx: target.contentIdx,
+                }),
               })
             }
           }

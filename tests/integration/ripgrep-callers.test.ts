@@ -91,6 +91,20 @@ describe('ripgrep callers (post-NAPI)', () => {
     }
   })
 
+  test('GrepTool -o (only matching) mode returns matched text only', async () => {
+    const root = makeTempTree({ 'a.ts': 'abc123 xyz456\nno digits' })
+    try {
+      const args = ['--hidden', '-n', '-o', '-e', '\\d+']
+      const lines = await ripGrep(args, root, new AbortController().signal)
+      expect(lines).toHaveLength(2)
+      expect(lines.every(l => /:\d+:\d+$/.test(l))).toBe(true)
+      expect(lines.some(l => l.endsWith(':123'))).toBe(true)
+      expect(lines.some(l => l.endsWith(':456'))).toBe(true)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
   test('GrepTool -c (count) mode returns path:count', async () => {
     const root = makeTempTree({
       'a.ts': 'foo\nfoo\nfoo',
