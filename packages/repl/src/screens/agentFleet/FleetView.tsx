@@ -809,6 +809,40 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
    * first press — that diverged from ant. Now: every state arms first.
    */
   const handleArmDelete = useCallback((): void => {
+    // Header-focus "delete all" path. Source: ant 5092.js ctrl+x branch:
+    //   if (!y5 && S4?.kind === "header" && qh.length > 0) {
+    //     if (i1.current?.id !== S4.group) { oK(S4.group); return }  // arm group
+    //     oK(null)
+    //     for (let l6 of qh) if (!S7.some(j => j.id === l6.id)) $P("x", l6, true)
+    //   }
+    // Where qh is the deletable rows in the focused header's group. The
+    // group's "arm" reuses the same armedDelete state — just keyed by
+    // group label instead of a job id.
+    if (focused?.kind === 'header') {
+      const group = focused.group
+      const groupRows = jobs.filter(j => {
+        const band = deriveBand(j.state, presence.get(j.id))
+        if (group === 'done') return band === 'completed'
+        if (group === 'working') return band === 'active'
+        if (group === 'blocked') return band === 'blocked'
+        if (group === 'review') return false
+        return false
+      })
+      if (groupRows.length === 0) return
+      // Second press on same group → delete all.
+      if (armedDeleteId === group) {
+        for (const row of groupRows) {
+          void actions.remove(row.id).catch(() => undefined)
+        }
+        setArmedDelete(undefined)
+        setTimeout(() => refreshJobs(), 100)
+        return
+      }
+      // First press → arm the group.
+      setArmedDelete({ id: group, justKilled: false })
+      return
+    }
+
     if (focusedJob === undefined) return
     const band = deriveBand(focusedJob.state, presence.get(focusedJob.id))
 
@@ -833,7 +867,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         else refreshJobs()
       })
     }
-  }, [focusedJob, armedDeleteId, presence, actions, refreshJobs])
+  }, [focused, focusedJob, jobs, armedDeleteId, presence, actions, refreshJobs])
 
   const handleTogglePin = useCallback((): void => {
     if (focusedJob === undefined) return
