@@ -1754,6 +1754,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             <Row
               key={rowKey(row, idx)}
               row={row}
+              idx={idx}
               focused={idx === clampedIndex}
               currentSessionId={currentSessionId}
               armedDelete={armedDelete}
@@ -2088,6 +2089,14 @@ function rowKey(row: FleetRow, idx: number): string {
 
 interface RowProps {
   row: FleetRow
+  /**
+   * Index within the rendered row list. Drives ant's `marginTop:B6>0?1:0`
+   * spacing rule on section headers — every header EXCEPT the first
+   * gets one blank line above it, so "Needs input", "Working",
+   * "Completed" sections visually separate. Source: ant 5092.js
+   * `if(W_.kind==="header"){…marginTop:B6>0?1:0…}`.
+   */
+  idx: number
   focused: boolean
   currentSessionId: string
   armedDelete: { id: string; justKilled: boolean } | undefined
@@ -2106,6 +2115,7 @@ interface RowProps {
 
 function Row({
   row,
+  idx,
   focused,
   currentSessionId,
   armedDelete,
@@ -2122,7 +2132,11 @@ function Row({
 }: RowProps): React.ReactNode {
   if (row.kind === 'header') {
     return (
-      <Box onMouseEnter={onMouseEnter} onClick={onClick}>
+      <Box
+        marginTop={idx > 0 ? 1 : 0}
+        onMouseEnter={onMouseEnter}
+        onClick={onClick}
+      >
         <FleetSectionHeader
           label={row.label}
           rowCount={row.rowCount}

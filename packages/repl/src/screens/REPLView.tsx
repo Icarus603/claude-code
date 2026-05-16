@@ -209,6 +209,7 @@ import { useTranscriptFreeze } from './repl/useTranscriptFreeze.js';
 import { useHandleExit } from './repl/useHandleExit.js';
 import { useBgFleetStateSync } from './repl/useBgFleetStateSync.js';
 import { useSpareReadyMarker } from './repl/useSpareReadyMarker.js';
+import { sendBgDetachSignal } from './repl/bgDetachSignal.js';
 import { useRateLimitHandlers } from './repl/useRateLimitHandlers.js';
 import { useQueuedCommandOnCancel } from './repl/useQueuedCommandOnCancel.js';
 import { useStartupCallouts } from './repl/useStartupCallouts.js';
@@ -3881,10 +3882,7 @@ export function REPL({
     // w_H = ant 4176.js: with msg → `\x1b_cc-detach-msg;<msg>\x1b\\` + aNH; without → aNH
     // aNH = `\x1b_cc-daemon-detach\x1b\\`
     if (process.env.CLAUDE_CODE_SESSION_KIND === 'bg') {
-      // PTY-attached bg session: write ant's canonical APC detach
-      // sequence to stdout. The outer runAttach scans the PTY stream
-      // for it and detaches — the bg worker keeps running.
-      process.stdout.write('\x1b_cc-daemon-detach\x1b\\');
+      sendBgDetachSignal();
       return;
     }
     if (process.env.CCB_FLEET_ATTACH_CHILD === '1') {

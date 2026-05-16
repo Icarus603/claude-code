@@ -202,6 +202,26 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
         }
         return
       }
+      case 'detach': {
+        // Source: ant 4835.js WorkerVm.rv `case "detach-request":
+        //   this.onStream.emit(w_H(H.msg))` — the daemon receives a
+        // detach-request RPC from the inner REPL and emits the APC
+        // sentinel through onStream to all subscribed attachers.
+        //
+        // ccb has no daemon, so ptyHost plays this role: when the
+        // inner REPL writes APC to stdout, Bun.Terminal MAY parse and
+        // consume it (APC is a recognized terminal control sequence),
+        // so the bytes never reach the `data` callback → never reach
+        // attached clients. The robust path: the inner connects to
+        // pty.sock from inside the spawned process (which it can do
+        // because it knows CLAUDE_JOB_DIR), sends a 'detach' frame,
+        // and we broadcast the APC frame directly to all attach
+        // clients via the data-frame channel — bypassing the PTY
+        // entirely. attachClient's handleLivePaint scans for the
+        // sentinel and detaches.
+        if (clients.size > 0) broadcast(encodeDataFrame(DETACH_APC_BUF))
+        return
+      }
       case 'reply':
       case 'claim': {
         // Inject text as if user typed it. Source: ant 4835.js WorkerVm.reply:
