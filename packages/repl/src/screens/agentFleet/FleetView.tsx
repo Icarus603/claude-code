@@ -455,9 +455,13 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       //   repo   → "repo"
       //   skill  → "skill"
       //   routine→ "routine"
-      const agentItems = agents
+      // Recency sort BEFORE prefix filter so the most-recently-used
+      // matching agent floats to the top. Source: ant 5092.js Fs3:
+      //   ...XdK(_).filter(G => G.name.toLowerCase().startsWith(w)).map(cn8)
+      // XdK sorts by agentLastUsed (descending), then name. ccb's
+      // sortByRecency reads getGlobalConfig().agentLastUsed.
+      const agentItems = sortByRecency(agents)
         .filter(a => a.agentType.toLowerCase().startsWith(q))
-        .sort((a, b) => a.agentType.localeCompare(b.agentType))
         .map<SuggestionItem>(a => ({
           id: `agent:${a.agentType}`,
           displayText: `@${a.agentType}`,
