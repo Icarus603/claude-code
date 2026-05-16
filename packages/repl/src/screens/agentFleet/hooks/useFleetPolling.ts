@@ -10,7 +10,7 @@
  * Returns the freshest snapshot; caller passes into `useFleetRows`.
  */
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { daemonList } from '@claude-code/cli/bg/daemonAdapter.js'
 import { listFleetJobs } from '@claude-code/agent/background/fleet/listFleetJobs.js'
@@ -28,6 +28,8 @@ export interface FleetPollResult {
   prCache: FleetPrCache | undefined
   /** Monotonic counter incremented each refresh; useful for debug. */
   generation: number
+  /** Force an immediate refresh outside the regular 1s tick. */
+  refresh: () => void
 }
 
 /**
@@ -36,11 +38,14 @@ export interface FleetPollResult {
  * GitHub PR fetcher later); polling here only refreshes jobs+presence.
  */
 export function useFleetPolling(seed: readonly FleetJob[] | undefined): FleetPollResult {
+  const refreshRef = useRef<() => void>(() => {})
+  const refresh = useCallback(() => refreshRef.current(), [])
   const [result, setResult] = useState<FleetPollResult>(() => ({
     jobs: seed === undefined ? [] : [...seed],
     presence: new Map(),
     prCache: undefined,
     generation: 0,
+    refresh,
   }))
 
   useEffect(() => {
@@ -77,7 +82,7 @@ export function useFleetPolling(seed: readonly FleetJob[] | undefined): FleetPol
           }
         }
         gen += 1
-        setResult({ jobs, presence, prCache: undefined, generation: gen })
+        setResult({ jobs, presence, prCache: undefined, generation: gen, refresh })
       } catch (err) {
         if (!cancelled) {
           console.warn(`[fleet] poll failed: ${(err as Error).message}`)
@@ -85,13 +90,14 @@ export function useFleetPolling(seed: readonly FleetJob[] | undefined): FleetPol
       }
     }
 
+    refreshRef.current = () => void tick()
     void tick()
     const handle = setInterval(() => void tick(), JOBS_POLL_MS)
     return () => {
       cancelled = true
       clearInterval(handle)
     }
-  }, [])
+  }, [refresh])
 
   return result
 }

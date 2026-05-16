@@ -94,7 +94,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const { version, cwd: cwdLabel } = getLogoDisplayData()
   const versionLabel = `v${version}`
 
-  const { jobs, presence } = useFleetPolling(seedJobs)
+  const { jobs, presence, refresh: refreshJobs } = useFleetPolling(seedJobs)
   const actions = useFleetActions({ currentSessionId })
 
   // ── core UI state ──────────────────────────────────────────────────
@@ -218,6 +218,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       const target = neighbor.job.state.sortOrder ?? Date.parse(neighbor.job.state.createdAt)
       void actions.reorder(focusedJob.id, target + (delta < 0 ? -1 : 1)).then(r => {
         if (r.ok === false) setErrorToast(`Reorder failed: ${r.error}`)
+        else refreshJobs()
       })
       setSelectionIndex(neighborIdx)
     },
@@ -234,6 +235,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     if (armedDeleteId === focusedJob.id) {
       void actions.kill(focusedJob.id).then(r => {
         if (r.ok === false) setErrorToast(`Kill failed: ${r.error}`)
+        else refreshJobs()
       })
       setArmedDeleteId(undefined)
       return
@@ -246,6 +248,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     const next = focusedJob.state.pinned !== true
     void actions.togglePin(focusedJob.id, next).then(r => {
       if (r.ok === false) setErrorToast(`${next ? 'Pin' : 'Unpin'} failed: ${r.error}`)
+      else refreshJobs()
     })
   }, [focusedJob, actions])
 
@@ -268,6 +271,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     if (job !== undefined) {
       void actions.rename(job.state.sessionId, renameState.draft.trim()).then(r => {
         if (r.ok === false) setErrorToast(`Rename failed: ${r.error}`)
+        else refreshJobs()
       })
     }
     setRenameState(undefined)
