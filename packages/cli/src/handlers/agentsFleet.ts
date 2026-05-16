@@ -121,11 +121,22 @@ export async function agentsFleetHandler(): Promise<void> {
           if (isPlainDispatch) {
             const slot = sparePool.claimSpare(cwd)
             if (slot !== undefined) {
-              // Send the intent to the live spare's PTY stdin.
+              // Write state.json SYNCHRONOUSLY (await before next tick)
+              // so the FleetView polling tick — which races us — sees a
+              // row in this iteration, not next. ant inserts the row
+              // synchronously into S7 (inflight optimistic) for the same
+              // reason: user must see immediate feedback on Enter.
               void (async () => {
                 try {
+                  // Order: state.json first (row appears in FleetView),
+                  // then claim-frame (REPL starts processing). Failure
+                  // of either is logged but doesn't break the other.
+                  await sparePool.rewriteSpareState(
+                    slot.short,
+                    info.intent,
+                    cwd,
+                  )
                   await sparePool.sendClaim(slot.socketPath, info.intent)
-                  await sparePool.rewriteSpareState(slot.short, info.intent)
                 } catch (err) {
                   process.stderr.write(
                     `spare claim failed: ${(err as Error).message}\n`,

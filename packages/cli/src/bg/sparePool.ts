@@ -212,22 +212,62 @@ export async function sendClaim(
  *
  * Source: ant `K = PsH(_7H({...spare, intent}), intent)` then
  * `await UT(jobDir, K)`.
+ *
+ * Because spawnBgPty's optimistic state.json write is SKIPPED for
+ * spare (directive===""), the file does NOT exist at claim time —
+ * the spare worker's own `useBgFleetStateSync` only writes state.json
+ * on the first isLoading transition, which happens AFTER the claim
+ * frame's `intent + '\n'` reaches the REPL. So this function writes
+ * the initial state.json from scratch using the spare's identity +
+ * the user's intent. Same shape as `writeOptimisticFleetState` in
+ * bg.ts (kept in sync — both follow ant `iP6` 4774.js:93-148).
  */
 export async function rewriteSpareState(
   short: string,
   intent: string,
+  cwd: string,
 ): Promise<void> {
   const { join } = await import('node:path')
   const { homedir } = await import('node:os')
   const root = process.env.CLAUDE_CONFIG_HOME ?? join(homedir(), '.claude')
   const jobDir = join(root, 'jobs', short)
   invalidateCache(jobDir)
+  const now = new Date().toISOString()
+  // Single-line label from intent, capped at 60 chars. Mirrors
+  // writeOptimisticFleetState's `label` derivation in bg.ts.
+  const label = intent.split(/\r?\n/)[0]!.slice(0, 60).trim() || 'session'
   const current = await readJobState(jobDir).catch(() => null)
-  if (current === null) return
+  const base: FleetJobState =
+    current !== null
+      ? current
+      : {
+          state: 'working',
+          tempo: 'active',
+          detail: label,
+          output: null,
+          children: null,
+          linkScanOffset: 0,
+          template: 'bg',
+          respawnFlags: [],
+          intent,
+          name: label,
+          nameSource: 'auto',
+          initialPrompt: intent,
+          sessionId: '',
+          daemonShort: short,
+          cwd,
+          createdAt: now,
+          updatedAt: now,
+          firstTerminalAt: null,
+          backend: 'daemon',
+        }
   const next: FleetJobState = {
-    ...current,
+    ...base,
     intent,
-    updatedAt: new Date().toISOString(),
+    name: base.name ?? label,
+    initialPrompt: base.initialPrompt ?? intent,
+    detail: base.detail || label,
+    updatedAt: now,
   }
   await writeJobState(jobDir, next).catch(() => undefined)
 }
