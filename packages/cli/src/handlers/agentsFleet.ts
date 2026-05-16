@@ -25,16 +25,46 @@ export async function agentsFleetHandler(): Promise<void> {
     import('@anthropic/ink'),
   ])
 
-  // Use the global MACRO.VERSION (set at build time from the git tag).
-  // Falls back to a "dev" label when MACRO is absent (REPL evaluator).
-  const versionLabel = `v${typeof MACRO !== 'undefined' ? MACRO.VERSION : 'dev'}`
-
   const root = await createRoot({ exitOnCtrlC: false })
+
+  // Buffered post-exit messages — printed AFTER unmount so they don't
+  // corrupt the TUI. e.g. attach hint shown after user picks a job.
+  const postExitLines: string[] = []
+
+  const { spawnBgJob } = await import('@claude-code/cli/bg.js')
+  const { getCwd } = await import('@claude-code/app-host/bootstrap/cwd.js')
+
   await mountFleetView({
-    versionLabel,
     currentSessionId: process.env.CLAUDE_SESSION_ID ?? '',
     root,
+    onDispatch: prompt => {
+      // Capture into the post-exit log; spawnBgJob writes its own hint
+      // banner to stdout (the cyan short + "ccb ps" tips), so defer the
+      // actual spawn until after the TUI unmounts.
+      postExitLines.push(`__SPAWN__::${prompt}`)
+      root.unmount()
+    },
+    onAttach: short => {
+      postExitLines.push(
+        `\nTo resume this session: ${'\x1b[36m'}ccb resume ${short}${'\x1b[0m'}\n`,
+      )
+      root.unmount()
+    },
   })
+
+  // Replay post-exit log. SPAWN lines actually call spawnBgJob now that
+  // the TUI is unmounted and stdout is free.
+  for (const line of postExitLines) {
+    if (line.startsWith('__SPAWN__::')) {
+      const directive = line.slice('__SPAWN__::'.length)
+      try {
+        await spawnBgJob({ flags: [], directive, cwd: getCwd() })
+      } catch (err) {
+        process.stderr.write(`spawn failed: ${(err as Error).message}\n`)
+      }
+    } else {
+      process.stdout.write(line)
+    }
+  }
 }
 
-declare const MACRO: { VERSION: string } | undefined
