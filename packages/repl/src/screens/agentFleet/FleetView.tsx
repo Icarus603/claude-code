@@ -844,9 +844,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     }
 
     if (focusedJob === undefined) return
-    const band = deriveBand(focusedJob.state, presence.get(focusedJob.id))
 
-    // Second press on the SAME armed row → real delete.
+    // Second press on the SAME armed row → real delete. `actions.remove`
+    // already does best-effort daemonKill before deleteJobDir, so the
+    // worker is stopped AND removed atomically — no need for a separate
+    // stop step on first press.
     if (armedDeleteId === focusedJob.id) {
       void actions.remove(focusedJob.id).then(r => {
         if (r.ok === false) setErrorToast(`Delete failed: ${r.error}`)
@@ -856,17 +858,12 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // First press: arm the row. ant sets justKilled = (Dq.label === "stop")
-    // — true for active/blocked (where Dq is the stop action), false for
-    // completed (Dq is delete). Drives the "stopped · …" warning text.
-    const isStopBand = band === 'active' || band === 'blocked'
-    setArmedDelete({ id: focusedJob.id, justKilled: isStopBand })
-    if (isStopBand) {
-      void actions.stop(focusedJob.id).then(r => {
-        if (r.ok === false) setErrorToast(`Stop failed: ${r.error}`)
-        else refreshJobs()
-      })
-    }
+    // First press: arm the row. WARN ONLY — do NOT optimistically move
+    // active/blocked rows to completed via a side-effect stop. User
+    // wants "any stage, two presses, delete" without the row jumping
+    // buckets between presses. The remove action on the SECOND press
+    // handles the worker kill on its own (daemonKill then deleteJobDir).
+    setArmedDelete({ id: focusedJob.id, justKilled: false })
   }, [focused, focusedJob, jobs, armedDeleteId, presence, actions, refreshJobs])
 
   const handleTogglePin = useCallback((): void => {
@@ -1632,6 +1629,13 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         <Box flexShrink={0} paddingLeft={2} height={1}>
           <Text color="error" wrap="truncate-end">{errorToast}</Text>
         </Box>
+      ) : peekOpen ? (
+        // Source: ant 5092.js Ot3 footer cascade gate `!_H && vA.length===0`
+        // — when peek (`_H`) is open, the main FleetView chord cascade is
+        // suppressed. The peek panel renders its OWN footer (`U_`) so the
+        // chords on screen reflect the peek context (resume/close/delete)
+        // instead of the fleet navigation context (open/space/reply/?).
+        null
       ) : (
         <FleetFooter
           terminalWidth={terminalWidth}
