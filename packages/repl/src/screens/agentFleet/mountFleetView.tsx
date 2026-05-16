@@ -4,14 +4,14 @@
  * Source: ant Ot3 (5092.js:3839-3980) — owns the async render loop,
  * unmount/remount when attaching to a job, return-to-fleet after detach.
  *
- * For Phase 8 we expose a single async entrypoint that:
+ * Exposes a single async entrypoint that:
  *   - renders FleetView in an alternate-screen Ink instance
- *   - awaits exit via onQuit / ctrl+c
- *   - returns when the user leaves the fleet view
+ *   - awaits a user action (attach / dispatch / quit) via onAttach/onQuit
+ *   - resolves when the user leaves the fleet view
  *
- * Job attach (left-arrow loop to dispatch into a PTY session) is
- * deferred to a Phase 8 follow-up; the immediate goal is "ccb agents
- * launches the dashboard and exits cleanly".
+ * The owning handler (`agentsFleetHandler`) runs the for(;;) loop —
+ * after this entrypoint resolves on an attach, the handler unmounts,
+ * runs the attach via fleetAttach, then re-mounts a fresh FleetView.
  */
 
 import * as React from 'react'
