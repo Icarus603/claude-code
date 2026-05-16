@@ -1104,8 +1104,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             canReorder={focused?.kind === 'job'}
             canRename={focused?.kind === 'job'}
             canPin={focused?.kind === 'job'}
-            canMention={false}
-            altOpenCount={0}
+            // ant 5092.js ts3 `canMention: I3.length + _$.length +
+            // Object.keys(l).length > 0` — show "@ to mention" when
+            // ANY of agents / skills / repos are available.
+            canMention={agents.length > 0 || Object.keys(worktreeRepos).length > 0}
+            // ant 5092.js Ot3: `altOpenCount: Math.min(9, H8(cH, W_ =>
+            // W_.kind === "job" && W_.origin === TP))` — the number of
+            // alt+digit slots actually wired up (capped at 9).
+            altOpenCount={Math.min(9, rows.filter(r => r.kind === 'job').length)}
           />
         </Box>
       ) : null}
