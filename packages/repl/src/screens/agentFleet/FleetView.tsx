@@ -698,7 +698,19 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   )
 }
 
-/** Hand-rolled dispatch buffer renderer — keeps focus invariant simple. */
+/**
+ * Hand-rolled dispatch buffer renderer — keeps focus invariant simple.
+ *
+ * Source: ant 4205.js PN (SearchInput) default cursor rendering — when
+ * `cursorChar` is undefined, ant renders the first placeholder character
+ * (or character at cursor position) wrapped in `<V inverse>` for a
+ * STEADY inverse-block cursor. NO blink interval.
+ *
+ * ccb previously had a `setInterval(setBlink, 500)` here that flashed
+ * the cursor every half-second. ant doesn't blink — terminals already
+ * blink the native cursor based on user preference, and the inverse
+ * block is a render-time visual marker that should stay solid.
+ */
 function InlineDispatchBuffer({
   buffer,
   placeholder,
@@ -708,31 +720,29 @@ function InlineDispatchBuffer({
   placeholder: string
   focused: boolean
 }): React.ReactNode {
-  // Block cursor on / after the last char when buffer non-empty + focused.
   const showCursor = focused
-  const ref = useRef<NodeJS.Timeout | null>(null)
-  const [blink, setBlink] = useState(true)
-  useEffect(() => {
-    if (!showCursor) return
-    ref.current = setInterval(() => setBlink(b => !b), 500)
-    return () => {
-      if (ref.current) clearInterval(ref.current)
-    }
-  }, [showCursor])
   if (buffer === '') {
+    // Empty buffer + focused: render placeholder with first char as
+    // inverse cursor (ant 4205.js PN line: `<V inverse>{P.charAt(0)}</V>`).
+    if (showCursor && placeholder.length > 0) {
+      return (
+        <Box>
+          <Text inverse>{placeholder.charAt(0)}</Text>
+          <Text dimColor>{placeholder.slice(1)}</Text>
+        </Box>
+      )
+    }
     return (
       <Box>
-        <Text dimColor>
-          {showCursor && blink ? '█' : ' '}
-          {placeholder}
-        </Text>
+        <Text dimColor>{placeholder}</Text>
       </Box>
     )
   }
+  // Non-empty buffer + focused: steady inverse-block AFTER the last char.
   return (
     <Box>
       <Text>{buffer}</Text>
-      {showCursor ? <Text>{blink ? '█' : ' '}</Text> : null}
+      {showCursor ? <Text inverse> </Text> : null}
     </Box>
   )
 }
