@@ -802,10 +802,18 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         setHelpOpen(false)
         return
       }
-      // ant 5092.js: closing the suggestion popup is a step before
-      // clearing the buffer (`if (vA.length > 0) { Kz(false); return }`
-      // analogue — ccb's popup auto-clears when buffer no longer
-      // matches, so simply clearing the buffer collapses both).
+      // ant 5092.js Esc cascade:
+      //   _H → close peek (handled above)
+      //   zH → close help (handled above)
+      //   $H → close other dialog
+      //   qz → close suggestion drawer (Kz(false))
+      //   j_.current → clear buffer
+      //   i1.current → clear armed delete
+      //   else → DH() quit
+      if (showAgentsDrawer) {
+        setShowAgentsDrawer(false)
+        return
+      }
       if (dispatchBuf !== '') {
         setDispatchBuf('')
         return
