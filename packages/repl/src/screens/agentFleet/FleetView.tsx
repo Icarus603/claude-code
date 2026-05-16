@@ -624,7 +624,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     if (agentSeedAppliedRef.current) return
     if (jobs.length === 0) return
     agentSeedAppliedRef.current = true
-    seedAgentLastUsedFromJobs(jobs, 'general-purpose')
+    // Skip 'bg' — the default template (listFleetJobs.ts:31 fallback),
+    // mirroring ant's `a1H.name` skip. Otherwise the recency map would
+    // always have "bg" pinned to the top just because the user opened
+    // FleetView once with the default agent.
+    seedAgentLastUsedFromJobs(jobs, 'bg')
   }, [jobs])
 
   const clampedIndex = rows.length === 0 ? 0 : Math.min(selectionIndex, rows.length - 1)
