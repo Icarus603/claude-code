@@ -127,10 +127,17 @@ export async function runAttach(
   // Open adopter against the host socket.
   adopter = createPtyAdopter(socketPath)
 
-  // Forward stdin keystrokes to the PTY. Source: ant 4767.js Md uses
-  // 'readable' + .read() (paused mode) NOT 'data' (flowing mode) — Ink
-  // had set encoding to utf8 and uses 'readable' too, so we mirror to
-  // avoid mode-switching races where bytes get stuck in the buffer.
+  // Forward stdin keystrokes to the PTY. Empirically (verified against
+  // /tmp/ccb-detach.log diag) Bun's process.stdin doesn't fire 'readable'
+  // events reliably for user keystrokes after Ink unmount — bytes arrive
+  // via 'data' events instead (the previous 'readable'+read() pattern
+  // ate the keystroke without invoking onReadable, so left-arrow detach
+  // never worked because the inner REPL never received the bytes).
+  // Switch to 'data' (flowing mode) which IS reliable.
+  //
+  // ant 4767.js uses 'readable' because ant runs in its `bun-internal`
+  // private fork which has different stdin semantics — public Bun's
+  // readable event under raw mode after Ink unmount is broken.
   const handleByteChunk = (chunkBuf: Buffer): void => {
     // Scan for Ctrl+Q. Pass everything before the sentinel through;
     // anything after is dropped because we're detaching.
@@ -143,24 +150,17 @@ export async function runAttach(
       adopter!.write(chunkBuf.subarray(0, idx).toString('binary'))
     }
     detached = true
-    process.stdin.removeListener('readable', onReadable)
+    process.stdin.removeListener('data', onData)
   }
-  const onReadable = (): void => {
-    let chunk: Buffer | string | null
-    while ((chunk = process.stdin.read() as Buffer | string | null) !== null) {
-      const buf = Buffer.isBuffer(chunk)
-        ? chunk
-        : Buffer.from(chunk as string, 'utf8')
-      handleByteChunk(buf)
-    }
+  const onData = (chunk: Buffer | string): void => {
+    const buf = Buffer.isBuffer(chunk)
+      ? chunk
+      : Buffer.from(chunk as string, 'utf8')
+    handleByteChunk(buf)
   }
-  process.stdin.on('readable', onReadable)
-  // ant 4767.js: resume()+pause() pump-primes the stream into readable
-  // mode without entering flowing mode.
+  process.stdin.on('data', onData)
+  process.stdin.ref()
   process.stdin.resume()
-  process.stdin.pause()
-  // Drain any data already buffered (e.g. OSC handshake responses).
-  onReadable()
 
   // Frame-boundary buffer: hold all incoming PTY bytes until we see
   // the inner REPL emit a frame boundary marker — either:
@@ -240,7 +240,7 @@ export async function runAttach(
       }
       pendingTail = Buffer.alloc(0)
       detached = true
-      process.stdin.removeListener('readable', onReadable)
+      process.stdin.removeListener('data', onData)
       return
     }
 
@@ -338,7 +338,7 @@ export async function runAttach(
                 clearInterval(stallTimer)
                 process.stderr.write(`\n[attach: ${short} stalled after respawn — giving up]\n`)
                 detached = true
-                process.stdin.removeListener('readable', onReadable)
+                process.stdin.removeListener('data', onData)
               }
             }
           } catch {
@@ -354,7 +354,7 @@ export async function runAttach(
       clearInterval(stallTimer)
       process.stderr.write(`\n[attach: gave up waiting for ${short} after ${Math.round(elapsed/1000)}s. Try 'ccb respawn ${short}']\n`)
       detached = true
-      process.stdin.removeListener('readable', onReadable)
+      process.stdin.removeListener('data', onData)
     }
   }, 1000)
   stallTimer.unref()
@@ -388,7 +388,7 @@ export async function runAttach(
   // Cleanup.
   dataSub.dispose()
   process.stdout.removeListener('resize', onResize)
-  process.stdin.removeListener('readable', onReadable)
+  process.stdin.removeListener('data', onData)
   // NOTE: do NOT pause stdin — the caller (fleetAttach loop) is about
   // to mount a fresh Ink root which needs an active readable stream.
   // The standalone `ccb attach` CLI exits process after this anyway,
