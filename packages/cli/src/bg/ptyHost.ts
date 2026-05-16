@@ -204,13 +204,41 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
       }
       case 'reply':
       case 'claim': {
-        // Inject text as if user typed it: write to the PTY's master so
-        // the inner ccb's stdin (PTY slave) reads it as keystrokes, then
-        // newline to submit. ant 4644.js spare claim flow.
+        // Inject text as if user typed it. Source: ant 4835.js WorkerVm.reply:
+        //
+        //   this.replyChain = this.replyChain.then(() => new Promise((q) => {
+        //     this.pty?.write(`\x1B[200~${H}\x1B[201~`)   // bracketed paste
+        //     setTimeout((K) => {
+        //       this.pty?.write("\r")                     // CR (Enter)
+        //       K()
+        //     }, 10, q)
+        //   }))
+        //
+        // Two critical details ccb previously got wrong:
+        //   1. Wrap in bracketed paste \x1B[200~…\x1B[201~ so the REPL's
+        //      paste-mode handler buffers the whole intent as one unit
+        //      (otherwise embedded newlines could trigger early submit /
+        //      partial processing).
+        //   2. Use \r (CR), NOT \n, as the Enter keystroke. ccb's
+        //      PromptInput key handler binds to `return` which Ink maps
+        //      from CR — writing \n alone left the text typed but never
+        //      submitted, hence the "empty REPL prompt" bug.
+        //   3. 10 ms delay BETWEEN paste body and \r so the REPL has time
+        //      to fully ingest the pasted text before the Enter key
+        //      triggers submit.
         const text = String(frame['text'] ?? frame['intent'] ?? '')
         if (text && !exited) {
           try {
-            terminal.write(text + '\n')
+            terminal.write(`\x1b[200~${text}\x1b[201~`)
+            setTimeout(() => {
+              if (!exited) {
+                try {
+                  terminal.write('\r')
+                } catch {
+                  // best-effort
+                }
+              }
+            }, 10)
           } catch {
             // best-effort
           }
