@@ -75,6 +75,7 @@ import { jobLabel } from './helpers/jobLabel.js'
 import { stringWidth } from './helpers/grapheme.js'
 import { AGENT_COLORS } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import { deriveBand } from './helpers/deriveBand.js'
+import { spawnOrigin as spawnOriginOf } from './helpers/repoGroup.js'
 import { deriveChildSummaries } from './helpers/deriveChildSummaries.js'
 import { needsRespawn } from './helpers/needsRespawn.js'
 
@@ -1320,8 +1321,19 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Right arrow on a job row — open/attach. Source: ant 2941-2944.
-    if (key.rightArrow && dispatchBuf === '' && focused?.kind === 'job') {
+    // Right arrow on a job row — open/attach.
+    // Source: ant 5092.js: `if (W_.key === "right" && !W_.shift && !j_.current
+    //   && !_H) { B6(); US(E9); return }`
+    // - !W_.shift: shift+right is reserved (no current binding, but must not
+    //   accidentally fire attach when user holds shift for some other intent)
+    // - !j_.current: buffer empty (when typing, right is cursor-right)
+    // - !_H: not in peek (peek branch handles right separately if at all)
+    if (
+      key.rightArrow &&
+      !key.shift &&
+      dispatchBuf === '' &&
+      focused?.kind === 'job'
+    ) {
       setAttachingShort(focused.job.id)
       onAttach?.(focused.job.id)
       return
@@ -1333,19 +1345,35 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Alt/Cmd + 1-9 — quick-open the Nth job row. Source: ant 5092.js
+    // Alt/Cmd + 1-9 — quick-open the Nth job row IN THE CURRENT ORIGIN.
+    // Source: ant 5092.js verbatim:
     //   if ((W_.meta||W_.superKey) && W_.key >= "1" && W_.key <= "9") {
-    //     let l6 = Number(W_.key);
-    //     let Dq = cH.find(K9 => K9.kind === "job" && K9.origin === TP && --l6 === 0);
-    //     if (Dq?.kind === "job") US(Dq.job);
+    //     let l6 = Number(W_.key)
+    //     let Dq = cH.find(K9 => K9.kind === "job" && K9.origin === TP
+    //                       && --l6 === 0)
+    //     if (Dq?.kind === "job") US(Dq.job)
     //   }
-    // ccb skips the origin filter (cross-cwd attach is rare here) and
-    // just picks the Nth job in display order.
+    //
+    // TP = focused row's origin (S4?.origin ?? cwd). So alt+1 picks the
+    // FIRST job whose origin matches the focused row's origin, not
+    // first-job-overall. Lets the user quickly toggle within a repo
+    // when multiple repos are in the fleet.
     if (key.meta && input >= '1' && input <= '9') {
       const n = Number(input)
+      const focusedRow = rows[clampedIndex]
+      const focusedOrigin =
+        focusedRow?.kind === 'job'
+          ? spawnOriginOf(focusedRow.job.state)
+          : focusedRow?.kind === 'header'
+            ? // header doesn't carry origin in ccb's FleetRow; fall back
+              // to current-cwd derivation. Acceptable for now since the
+              // typical case is the user is on a job row.
+              getCwd()
+            : getCwd()
       let i = 0
       for (const row of rows) {
         if (row.kind !== 'job') continue
+        if (spawnOriginOf(row.job.state) !== focusedOrigin) continue
         if (++i === n) {
           setAttachingShort(row.job.id)
           onAttach?.(row.job.id)
@@ -1672,8 +1700,22 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             canMention={agents.length > 0 || Object.keys(worktreeRepos).length > 0}
             // ant 5092.js Ot3: `altOpenCount: Math.min(9, H8(cH, W_ =>
             // W_.kind === "job" && W_.origin === TP))` — the number of
-            // alt+digit slots actually wired up (capped at 9).
-            altOpenCount={Math.min(9, rows.filter(r => r.kind === 'job').length)}
+            // alt+digit slots actually wired up (capped at 9). TP is the
+            // FOCUSED ROW's origin, so the count reflects "jobs in this
+            // repo" not "jobs total". Matches the alt+digit handler's
+            // origin filter (see meta-digit branch above).
+            altOpenCount={Math.min(
+              9,
+              (() => {
+                const f = rows[clampedIndex]
+                const origin =
+                  f?.kind === 'job' ? spawnOriginOf(f.job.state) : getCwd()
+                return rows.filter(
+                  r =>
+                    r.kind === 'job' && spawnOriginOf(r.job.state) === origin,
+                ).length
+              })(),
+            )}
           />
         </Box>
       ) : null}
