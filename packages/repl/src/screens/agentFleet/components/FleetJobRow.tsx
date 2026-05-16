@@ -100,6 +100,15 @@ function colorBadgeStyleFor(
   return { theme: AGENT_COLOR_TO_THEME_COLOR[color as AgentColorName] }
 }
 
+/**
+ * Source: ant rs3 glyph branch (5092.js):
+ *   P = D ? void 0 : J?.justKilled ? sq_ : pdK(q.state, X, $)
+ *   s = P ?? <Cs3/>          // null from pdK → animated spinner
+ *
+ * where X = bZH(state.state) (terminal outcome | null), $ = presence.
+ * pdK returning null is the ONLY animation trigger — it returns null
+ * only when presence is "busy" or "shell".
+ */
 function pickRowGlyph(
   state: FleetJobState,
   presence: FleetPresence,
@@ -109,12 +118,11 @@ function pickRowGlyph(
 ): { glyph: string | null; isAnimated: boolean } {
   if (attaching) return { glyph: null, isAnimated: false }
   if (deleteArmed?.justKilled === true) return { glyph: '∙', isAnimated: false }
-  const isPinned = state.pinned === true
-  const staticGlyph = pickIcon(state, isPinned, presence)
+  const staticGlyph = pickIcon(state, outcome, presence)
   if (staticGlyph !== null) return { glyph: staticGlyph, isAnimated: false }
-  // outcome === null means it's still running — animate
-  if (outcome === null) return { glyph: null, isAnimated: true }
-  return { glyph: null, isAnimated: false }
+  // pickIcon returned null → presence is busy/shell → animate. ant
+  // doesn't gate this on outcome — busy presence wins regardless.
+  return { glyph: null, isAnimated: true }
 }
 
 /** Source: ant row rendering (5092.js:1380-1610). */

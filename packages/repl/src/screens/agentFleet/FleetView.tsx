@@ -50,6 +50,7 @@ import { renderModelSetting } from '@claude-code/provider/model.js'
 import type {
   FleetJob,
   FleetPrCache,
+  FleetPresence,
 } from '@claude-code/agent/background/fleet/fleetTypes.js'
 
 import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
@@ -1391,6 +1392,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
               collapsed={row.kind === 'header' && collapsedGroups.has(row.group)}
               renameState={renameState}
               prCache={prCache}
+              presence={
+                row.kind === 'job'
+                  ? // Source: ant 5092.js `yA` presence resolver. ant has a
+                    // daemon roster that publishes per-worker {sessionId,
+                    // status:"busy"|"shell"|"waiting"} via $M_() — ccb's
+                    // daemon doesn't emit that yet, so when no daemon
+                    // presence is recorded for the worker we synthesize
+                    // "busy" from state.tempo === 'active'. Same end-user
+                    // visual: actively-processing rows animate the spinner;
+                    // idle rows show the static glyph.
+                    presence.get(row.job.id) ??
+                    (row.job.state.tempo === 'active' ? 'busy' : undefined)
+                  : undefined
+              }
               onMouseEnter={() => setSelectionIndex(idx)}
               onClick={() => {
                 setSelectionIndex(idx)
@@ -1661,6 +1676,8 @@ interface RowProps {
   collapsed: boolean
   renameState: RenameState | undefined
   prCache: FleetPrCache | undefined
+  /** Per-row presence from daemon roster (busy/shell/waiting/undefined). */
+  presence: FleetPresence
   onMouseEnter: () => void
   onClick: () => void
 }
@@ -1677,6 +1694,7 @@ function Row({
   collapsed,
   renameState,
   prCache,
+  presence,
   onMouseEnter,
   onClick,
 }: RowProps): React.ReactNode {
@@ -1719,7 +1737,7 @@ function Row({
       <FleetJobRow
         state={row.job.state}
         activity={row.activity}
-        presence={undefined}
+        presence={presence}
         isCurrentSession={isCurrent}
         focused={focused}
         attaching={attachingShort === row.job.id}
