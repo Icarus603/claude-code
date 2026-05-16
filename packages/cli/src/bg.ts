@@ -368,6 +368,57 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
 }
 
 /**
+ * High-level "spawn a PTY-mode bg job" — mirrors the `--bg-pty` branch
+ * of handleBgFlag above. Generates a short id, calls spawnPtyHost,
+ * writes meta.json with the pty socket path, fires the agent_dispatch
+ * telemetry, and opportunistically ensures the daemon is up. Returns
+ * the short id so callers (like FleetView dispatch) can immediately
+ * focus / attach the new row.
+ *
+ * @dynamicRequire
+ */
+export async function spawnBgPty(opts: {
+  flags?: readonly string[]
+  directive: string
+  cwd: string
+  /** Wait (ms) for pty.sock to appear so callers can attach right away. */
+  waitForSocketMs?: number
+}): Promise<{ short: string; socketPath: string }> {
+  const { spawnPtyHost } = await import('./bg/spawnPty.js')
+  const short = generateShortId()
+  const r = spawnPtyHost({
+    short,
+    jobDir: getJobDir(short),
+    flags: opts.flags ?? [],
+    directive: opts.directive,
+    cwd: opts.cwd,
+  })
+  writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+  {
+    const m = await import('./bg/agentActionEvent.js')
+    m.emitAgentAction('spawn', short, { mode: 'pty' })
+    m.emitAgentDispatch(short, opts.directive)
+  }
+  void import('./bg/daemonAdapter.js')
+    .then(async ({ isDaemonAlive, ensureDaemon }) => {
+      if (!(await isDaemonAlive())) await ensureDaemon().catch(() => false)
+    })
+    .catch(() => {})
+
+  // Poll for pty.sock so callers (e.g. FleetView dispatch) can attach
+  // immediately without racing the host-process socket creation.
+  const budget = opts.waitForSocketMs ?? 5000
+  if (budget > 0) {
+    const deadline = Date.now() + budget
+    while (Date.now() < deadline) {
+      if (existsSync(r.socketPath)) break
+      await new Promise(resolve => setTimeout(resolve, 50))
+    }
+  }
+  return { short, socketPath: r.socketPath }
+}
+
+/**
  * Spawn a single backgrounded ccb child + write its meta.json. Shared
  * between `--bg` (fresh) and `respawn` (re-launch from stored cmd).
  * Returns the new short id; on spawn failure exits with the OS-level

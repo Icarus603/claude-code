@@ -1,29 +1,17 @@
 /**
- * `ccb agents` CLI handler — dispatches the FleetView TUI when the
- * terminal is interactive + the feature flag is on, falls through to
- * the plain text list otherwise.
+ * `ccb agents` CLI handler — mounts FleetView once and keeps it
+ * mounted across attach/dispatch handoffs. Mirrors ant 5297.js + Ot3
+ * (5092.js:3839) — single Ink root, callbacks run inline.
  *
- * Source: ant 5297.js (the agents CLI subcommand handler that
- * eventually calls mountFleetView at 5297.js:365).
- *
- * Lifecycle:
- *   Loop:
- *     mountFleetView → user picks an action
- *     if onQuit → break
- *     if onDispatch(prompt) → spawnBgJob, then re-mount FleetView
- *     if onAttach(short) → attachHandler (PTY or logs), then re-mount
- *   The loop is what lets the user fluidly bounce between FleetView
- *   and an open session via right-arrow / left-arrow.
+ * Smooth-transition invariant: never unmount/remount the Ink root for
+ * attach. Pause Ink, run the child synchronously, resume Ink. The
+ * user sees FleetView "freeze" while the child boots, then the child
+ * paints on top. No exit-then-enter flash.
  */
 
 import { feature } from 'bun:bundle'
 
 import { agentsHandler as plainTextHandler } from './agents.js'
-
-type Action =
-  | { kind: 'quit' }
-  | { kind: 'dispatch'; prompt: string }
-  | { kind: 'attach'; short: string }
 
 export async function agentsFleetHandler(): Promise<void> {
   if (!feature('AGENTS_FLEET')) {
@@ -37,69 +25,39 @@ export async function agentsFleetHandler(): Promise<void> {
     import('@claude-code/repl/screens/agentFleet/mountFleetView.js'),
     import('@anthropic/ink'),
   ])
-  const { spawnBgJob } = await import('@claude-code/cli/bg.js')
+  const { spawnBgPty } = await import('@claude-code/cli/bg.js')
   const { fleetAttach } = await import('./agentFleetAttach.js')
   const { getCwd } = await import('@claude-code/app-host/bootstrap/cwd.js')
 
-  // Top-level loop: each iteration is one mount/unmount of FleetView.
-  // dispatch/attach actions run between iterations.
-  while (true) {
-    const action = await runOneFleetSession({
-      mountFleetView,
-      createRoot,
-    })
-
-    if (action.kind === 'quit') break
-
-    if (action.kind === 'dispatch') {
-      try {
-        await spawnBgJob({ flags: [], directive: action.prompt, cwd: getCwd() })
-      } catch (err) {
-        process.stderr.write(`spawn failed: ${(err as Error).message}\n`)
-      }
-      // Loop back into FleetView so the user sees the new row.
-      continue
-    }
-
-    if (action.kind === 'attach') {
-      try {
-        await fleetAttach(action.short)
-      } catch (err) {
-        process.stderr.write(`attach failed: ${(err as Error).message}\n`)
-      }
-      // On exit from attach (Ctrl+C/Q/Esc), loop back into FleetView.
-      continue
-    }
-  }
-}
-
-interface RunOneOpts {
-  mountFleetView: typeof import('@claude-code/repl/screens/agentFleet/mountFleetView.js').mountFleetView
-  createRoot: typeof import('@anthropic/ink').createRoot
-}
-
-async function runOneFleetSession({
-  mountFleetView,
-  createRoot,
-}: RunOneOpts): Promise<Action> {
   const root = await createRoot({ exitOnCtrlC: false })
 
-  let resolved: Action | undefined
-
+  // Mount FleetView ONCE; callbacks run inline. Callback ordering:
+  //   onDispatch → spawnBgPty (fork bg worker, returns immediately)
+  //   onAttach   → fleetAttach (pauses Ink, runs child sync, resumes)
+  //   onQuit     → root.unmount() (only path that ends the session)
   await mountFleetView({
     currentSessionId: process.env.CLAUDE_SESSION_ID ?? '',
     root,
     onDispatch: prompt => {
-      if (resolved !== undefined) return
-      resolved = { kind: 'dispatch', prompt }
-      root.unmount()
+      // waitForSocketMs:0 — don't block the dispatch callback. The
+      // socket will appear soon; FleetView's onAttach has its own
+      // wait-for-socket loop.
+      void spawnBgPty({
+        flags: [],
+        directive: prompt,
+        cwd: getCwd(),
+        waitForSocketMs: 0,
+      }).catch(err =>
+        process.stderr.write(`spawn failed: ${(err as Error).message}\n`),
+      )
     },
     onAttach: short => {
-      if (resolved !== undefined) return
-      resolved = { kind: 'attach', short }
-      root.unmount()
+      // fleetAttach pauses Ink, runs the child synchronously with
+      // stdio:inherit, then resumes Ink. FleetView stays mounted —
+      // user lands back in it instantly when the child exits.
+      void fleetAttach(short).catch(err =>
+        process.stderr.write(`attach failed: ${(err as Error).message}\n`),
+      )
     },
   })
-
-  return resolved ?? { kind: 'quit' }
 }
