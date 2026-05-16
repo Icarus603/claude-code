@@ -211,8 +211,12 @@ export function PeekPanel({
         {children.length > 0 ? (
           <Box flexDirection="column">
             {children.slice(0, 8).map(child => {
-              // ant Q4 vs tq_ glyph selection.
-              const glyph = child.kind === 'frame' ? '⧉' : '●'
+              // Source: ant 0665.js `Q4 = d_() === "macos" ? "⏺" : "●"`,
+              // 0664.js `tq_ = "⧉"`. macOS terminals render ⏺ at a
+              // slightly larger weight that better matches the surrounding
+              // glyph palette; ● is the cross-platform default.
+              const Q4 = process.platform === 'darwin' ? '⏺' : '●'
+              const glyph = child.kind === 'frame' ? '⧉' : Q4
               return (
                 <Box key={child.href}>
                   <Box width={2} flexShrink={0}>
