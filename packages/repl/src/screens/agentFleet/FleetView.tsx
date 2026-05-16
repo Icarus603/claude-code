@@ -759,6 +759,16 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const clampedIndex = rows.length === 0 ? 0 : Math.min(selectionIndex, rows.length - 1)
   const focused = rows[clampedIndex]
   const focusedJob = focused?.kind === 'job' ? focused.job : undefined
+  // Source: ant gs3 receives `q.activity` + `K` (presence) for Ti8.
+  // Pull both from the focused row so PeekPanel's age coloring picks
+  // the same color the row uses.
+  const focusedActivity =
+    focused?.kind === 'job' ? focused.activity : undefined
+  const focusedPresence =
+    focused?.kind === 'job'
+      ? (presence.get(focused.job.id) ??
+        (focused.job.state.tempo === 'active' ? 'busy' : 'waiting'))
+      : undefined
 
   // Dynamic column widths. Source: ant fs3 (5092.js:1300-1310) +
   // ws3=3 (min age) + Js3=2 (prefix offset) + label min=12, max=40.
@@ -1909,6 +1919,8 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         >
           <PeekPanel
             job={focusedJob}
+            activity={focusedActivity}
+            presence={focusedPresence}
             value={peekDraft}
             onValueChange={setPeekDraft}
             cursorOffset={peekCursor}

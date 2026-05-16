@@ -45,15 +45,24 @@ import type React from 'react'
 import { useCallback } from 'react'
 import { Box, Text, type Theme } from '@anthropic/ink'
 
-import type { FleetJob } from '@claude-code/agent/background/fleet/fleetTypes.js'
+import type {
+  FleetActivity,
+  FleetJob,
+  FleetPresence,
+} from '@claude-code/agent/background/fleet/fleetTypes.js'
 import TextInput from '../../../components/TextInput.js'
 
 import { needsRespawn } from '../helpers/needsRespawn.js'
 import { flattenDetail } from '../helpers/flattenDetail.js'
+import { glyphColor } from '../helpers/glyphColor.js'
 
 export interface PeekPanelProps {
   /** Focused job — drives all summary/output/child rendering. */
   job: FleetJob
+  /** Per-row activity rollup. Source: ant `q.activity` arg to Ti8. */
+  activity?: FleetActivity
+  /** Daemon roster presence. Source: ant `K` arg to Ti8 (status). */
+  presence?: FleetPresence
   /** Current draft text. Caller owns state. */
   value: string
   /** Setter for the draft text. */
@@ -88,19 +97,10 @@ function formatAge(updatedAt: string): string {
   return `${Math.floor(ms / 86_400_000)}d`
 }
 
-/**
- * Tempo → theme color. Source: ant `Ti8(state, activity, status)` color
- * field — `blocked` red, `active` yellow, idle/done dim.
- */
-function tempoColor(job: FleetJob): keyof Theme {
-  const t = job.state.tempo
-  if (t === 'blocked') return 'error'
-  if (t === 'active') return 'warning'
-  return 'text'
-}
-
 export function PeekPanel({
   job,
+  activity,
+  presence,
   value,
   onValueChange,
   cursorOffset,
@@ -127,7 +127,11 @@ export function PeekPanel({
   )
 
   const age = formatAge(job.state.updatedAt)
-  const color = tempoColor(job)
+  // Source: ant gs3 `pH = Ti8(q.state, q.activity, K); {color: UH} = pH`.
+  // UH drives age coloring across all sections (u_, WH, CH). Same Ti8
+  // verbatim port lives in glyphColor.ts and FleetJobRow uses it.
+  const { color: tempoColor } = glyphColor(job.state, activity, presence)
+  const ageColor = tempoColor as keyof Theme | undefined
 
   // Children/outputs/needs presence — ant `RH = w.length>0 || KH.length>0
   // || !!q.state.needs`. When RH is false, render the "u_" header line.
@@ -177,7 +181,7 @@ export function PeekPanel({
         {!RH ? (
           <Box maxHeight={5} overflowY="hidden">
             <Text wrap="wrap">
-              <Text color={color}>{age}</Text>
+              <Text color={ageColor}>{age}</Text>
               {job.state.detail !== undefined && job.state.detail !== '' ? (
                 <Text> {flattenDetail(job.state.detail)}</Text>
               ) : null}
@@ -218,7 +222,7 @@ export function PeekPanel({
                 ) : null}
                 <Box flexGrow={1} width={0} maxHeight={5} overflowY="hidden">
                   <Text wrap="wrap">
-                    <Text color={color}>{age}</Text> {flattenDetail(text)}
+                    <Text color={ageColor}>{age}</Text> {flattenDetail(text)}
                   </Text>
                 </Box>
               </Box>
@@ -234,7 +238,7 @@ export function PeekPanel({
             overflowY="hidden"
           >
             <Text wrap="wrap">
-              <Text color={color}>{age}</Text>{' '}
+              <Text color={ageColor}>{age}</Text>{' '}
               <Text>{flattenDetail(job.state.needs ?? '')}</Text>
             </Text>
           </Box>
@@ -243,12 +247,26 @@ export function PeekPanel({
         {/* (5) flex spacer — fills bordered box to minHeight=5. */}
         <Box flexGrow={1} />
 
-        {/* (6) bH — reply input.
-            ant gs3: `onSpaceOnEmpty: F ? void 0 : $` — when NOT in bash
-            mode, space-on-empty-buffer fires onBack (= close peek).
-            ccb doesn't have bash-mode yet so always wire to onClose. */}
+        {/* (6) bH — reply input. Source: ant gs3 PN render:
+              prefix       = F ? "!" : sH.pointer    // ❯ (U+276F)
+              prefixColor  = F ? "bashBorder" : void 0
+              prefixDim    = !LH                     // dim when Q.trim() empty
+              placeholder  = "reply" (default, blocked uses suggestedReply)
+              borderless   = true
+              isFocused    = !M (not renaming)
+            ant 4205.js PN:
+              prefix renders inside V with {color, dimColor}
+              query/placeholder renders with cursor (uj3 inline highlight
+              when query has content, inverse char when empty placeholder).
+            ccb doesn't have bash mode wired yet so prefix is always
+            sH.pointer (❯). Cursor visibility relies on focus + showCursor
+            which TextInput already handles for non-empty buffers; for empty
+            buffer the placeholder shows dim, with the inverse first-char
+            acting as cursor. */}
         <Box marginTop={1}>
-          <Text color={color}>{'> '}</Text>
+          <Text color={undefined} dimColor={value.trim() === ''}>
+            {'❯ '}
+          </Text>
           <TextInput
             value={value}
             onChange={onValueChange}
@@ -258,6 +276,7 @@ export function PeekPanel({
             onSpaceOnEmpty={onClose}
             placeholder={placeholder}
             focus={true}
+            showCursor={true}
             multiline={true}
             columns={Math.max(columns - 6, 20)}
           />
