@@ -307,7 +307,14 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   const [peekOpen, setPeekOpen] = useState(false)
   const [peekDraft, setPeekDraft] = useState('')
   const [peekCursor, setPeekCursor] = useState(0)
-  const [armedDeleteId, setArmedDeleteId] = useState<string | undefined>(undefined)
+  // Armed-delete payload. Source: ant `i1.current = {id, justKilled, group, sortKey}`.
+  // justKilled=true when the first ctrl+x ALSO fired "stop" — drives the
+  // "stopped · ctrl+x again to delete" warning text on active/blocked
+  // rows. For completed rows justKilled=false → "ctrl+x again to delete".
+  const [armedDelete, setArmedDelete] = useState<
+    { id: string; justKilled: boolean } | undefined
+  >(undefined)
+  const armedDeleteId = armedDelete?.id
   const [renameState, setRenameState] = useState<RenameState | undefined>(undefined)
   const [pendingQuitConfirm, setPendingQuitConfirm] = useState(false)
   const [errorToast, setErrorToast] = useState<string | undefined>(initialError)
@@ -545,7 +552,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // Auto-clear armed-delete after 2s — ant `mJ(() => oK(null), tq ? 2000 : null, [tq])`.
   useEffect(() => {
     if (armedDeleteId === undefined) return
-    const t = setTimeout(() => setArmedDeleteId(undefined), DELETE_ARM_TIMEOUT_MS)
+    const t = setTimeout(() => setArmedDelete(undefined), DELETE_ARM_TIMEOUT_MS)
     return () => clearTimeout(t)
   }, [armedDeleteId])
 
@@ -778,44 +785,54 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   }, [focused])
 
   /**
-   * Ctrl+X handler. Source: ant $P (5092.js:2613-2641) +
-   * Gs3 action table (5092.js:290-376).
+   * Ctrl+X handler. Source: ant `$P` (5092.js:2613-2641) verbatim:
    *
-   *   1st press on active/blocked → 'stop' (daemon kill + state.json
-   *                                  marked stopped) AND arm delete.
-   *   2nd press on same job        → 'delete' (rm -rf job dir).
-   *   1st press on completed/stopped → 'delete' immediately
-   *                                  (skip the arm step).
+   *   if (W === "x" && !M && i1.current?.id !== B.id) {
+   *     // FIRST PRESS (or pressing on a different row than armed):
+   *     // arm THIS row AND run "stop" (which is a no-op for already
+   *     // terminal rows but moves active/blocked to completed).
+   *     let stopAction = u1.find(a => a.label === "stop")
+   *     oK(B.id, Dq.label === "stop", group, sortKey)  // arm
+   *     if (stopAction) Promise.resolve(stopAction.run(B)).catch(...)
+   *     return
+   *   }
+   *   // SECOND PRESS on SAME row (or delete-all mode M=true):
+   *   oK(null)  // unarm
+   *   let act = u1.find(a => a.label === "delete") ?? Dq
+   *   Promise.resolve(act.run(B))
+   *
+   * So the flow is identical across all bands:
+   *   1st press → ARM + (stop side-effect for active/blocked; no-op for completed)
+   *   2nd press on SAME row → DELETE
+   *
+   * Previous ccb port had a Path 2 that DELETED completed rows on the
+   * first press — that diverged from ant. Now: every state arms first.
    */
   const handleArmDelete = useCallback((): void => {
     if (focusedJob === undefined) return
     const band = deriveBand(focusedJob.state, presence.get(focusedJob.id))
 
-    // Path 1: already armed for THIS row → run delete.
+    // Second press on the SAME armed row → real delete.
     if (armedDeleteId === focusedJob.id) {
       void actions.remove(focusedJob.id).then(r => {
         if (r.ok === false) setErrorToast(`Delete failed: ${r.error}`)
         else refreshJobs()
       })
-      setArmedDeleteId(undefined)
+      setArmedDelete(undefined)
       return
     }
 
-    // Path 2: row is completed/stopped → delete immediately (no arm step).
-    if (band === 'completed') {
-      void actions.remove(focusedJob.id).then(r => {
-        if (r.ok === false) setErrorToast(`Delete failed: ${r.error}`)
+    // First press: arm the row. ant sets justKilled = (Dq.label === "stop")
+    // — true for active/blocked (where Dq is the stop action), false for
+    // completed (Dq is delete). Drives the "stopped · …" warning text.
+    const isStopBand = band === 'active' || band === 'blocked'
+    setArmedDelete({ id: focusedJob.id, justKilled: isStopBand })
+    if (isStopBand) {
+      void actions.stop(focusedJob.id).then(r => {
+        if (r.ok === false) setErrorToast(`Stop failed: ${r.error}`)
         else refreshJobs()
       })
-      return
     }
-
-    // Path 3: row is active/blocked → stop the worker + arm delete.
-    void actions.stop(focusedJob.id).then(r => {
-      if (r.ok === false) setErrorToast(`Stop failed: ${r.error}`)
-      else refreshJobs()
-    })
-    setArmedDeleteId(focusedJob.id)
   }, [focusedJob, armedDeleteId, presence, actions, refreshJobs])
 
   const handleTogglePin = useCallback((): void => {
@@ -1098,7 +1115,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         return
       }
       if (armedDeleteId !== undefined) {
-        setArmedDeleteId(undefined)
+        setArmedDelete(undefined)
         return
       }
       handleQuit()
@@ -1398,7 +1415,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
               row={row}
               focused={idx === clampedIndex}
               currentSessionId={currentSessionId}
-              armedDeleteId={armedDeleteId}
+              armedDelete={armedDelete}
               attachingShort={attachingShort}
               terminalWidth={terminalWidth}
               labelWidth={labelWidth}
@@ -1690,7 +1707,7 @@ interface RowProps {
   row: FleetRow
   focused: boolean
   currentSessionId: string
-  armedDeleteId: string | undefined
+  armedDelete: { id: string; justKilled: boolean } | undefined
   attachingShort: string | null
   terminalWidth: number
   labelWidth: number
@@ -1708,7 +1725,7 @@ function Row({
   row,
   focused,
   currentSessionId,
-  armedDeleteId,
+  armedDelete,
   attachingShort,
   terminalWidth,
   labelWidth,
@@ -1763,7 +1780,11 @@ function Row({
         isCurrentSession={isCurrent}
         focused={focused}
         attaching={attachingShort === row.job.id}
-        deleteArmed={armedDeleteId === row.job.id ? { justKilled: false } : undefined}
+        deleteArmed={
+          armedDelete !== undefined && armedDelete.id === row.job.id
+            ? { justKilled: armedDelete.justKilled }
+            : undefined
+        }
         renaming={renaming}
         childSummaries={childSummaries}
         age={formatJobAge(row.job)}
