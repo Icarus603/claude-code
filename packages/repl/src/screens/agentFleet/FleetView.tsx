@@ -109,7 +109,29 @@ export interface FleetViewProps {
     intent: string
     cwd?: string
     agent?: string
+    /**
+     * Pre-allocated short id from FleetView. Source: ant 5092.js
+     *   R1 = A7 ? AP.sessionId : PdK.randomUUID()
+     *   r4 = R1.slice(0, 8)
+     *   B_.current = r4
+     *   Wj(LJ => [...LJ, {id: r4, ...}])
+     *   ... spawn uses r4 ...
+     *
+     * FleetView generates r4 and passes it down so the optimistic row
+     * id, follow-id, and the spawned worker's id all agree. Without
+     * this the row's tempId never resolves to a real attach target.
+     */
+    short: string
   }) => void
+  /**
+   * Sync probe for the spare pool's current slot. ant uses `Cg8()` —
+   * `let AP = Cg8()` is read synchronously in the dispatch path so r4
+   * can be set to AP.sessionId when a spare matches. ccb's spare pool
+   * lives in @claude-code/cli; FleetView gets it through this callback
+   * provided by the agentsFleet handler. Returns undefined when no
+   * spare is currently ready or cwd doesn't match.
+   */
+  peekSpare?: (cwd: string) => { short: string; sessionId?: string } | undefined
   /**
    * Initial focused job short — passed by the agentsFleet loop on
    * remount after an attach so the user lands back on the row they
@@ -246,6 +268,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     onAttach,
     prCache,
     onDispatch,
+    peekSpare,
     initialFocusedShort,
     initialError,
   } = props
@@ -285,38 +308,27 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   //     ...Wj(set => set.filter(l6 => !matched.has(l6.id))),
   //   }, [S7, w])
   const [inflightJobs, setInflightJobs] = useState<readonly FleetJob[]>([])
-  // Merge: drop inflight entries whose intent+cwd matches a polled row
-  // (polling has caught up to the optimistic insertion). Since ccb's
-  // spawnBgPty generates the real short internally we can't match by id,
-  // so we match by (intent, cwd) heuristic — sufficient because the
-  // user can't dispatch two identical intents in the same cwd within
-  // the 5-second safety-net window.
+  // Merge inflight + polled. Source: ant 5092.js verbatim:
+  //   let bN = S7.filter(W_ => !J3.some(B6 => B6.id === W_.id))
+  //   let aK = bN.length > 0 ? XR_([...bN, ...J3]) : J3
+  //
+  // ccb pre-allocates the short for the inflight row (FleetView's
+  // pushOptimistic peeks the spare pool / generates a UUID slice and
+  // passes the same short to onDispatch), so id-based dedup works
+  // directly — same semantic as ant.
   const jobs = useMemo(() => {
     if (inflightJobs.length === 0) return polledJobs
-    const polledKeys = new Set(
-      polledJobs.map(j => `${j.state.cwd}\x00${j.state.intent}`),
-    )
-    const pending = inflightJobs.filter(
-      j => !polledKeys.has(`${j.state.cwd}\x00${j.state.intent}`),
-    )
+    const polledIds = new Set(polledJobs.map(j => j.id))
+    const pending = inflightJobs.filter(j => !polledIds.has(j.id))
     if (pending.length === 0) return polledJobs
     return [...pending, ...polledJobs]
   }, [polledJobs, inflightJobs])
-  // Garbage-collect inflight entries once polling picks them up.
+  // ant Effect 17: drop inflight entries once polling picks them up.
   useEffect(() => {
     if (inflightJobs.length === 0) return
-    const polledKeys = new Set(
-      polledJobs.map(j => `${j.state.cwd}\x00${j.state.intent}`),
-    )
-    const toRemove = inflightJobs.filter(j =>
-      polledKeys.has(`${j.state.cwd}\x00${j.state.intent}`),
-    )
-    if (toRemove.length === 0) return
-    setInflightJobs(prev =>
-      prev.filter(
-        j => !polledKeys.has(`${j.state.cwd}\x00${j.state.intent}`),
-      ),
-    )
+    const polledIds = new Set(polledJobs.map(j => j.id))
+    if (inflightJobs.every(j => !polledIds.has(j.id))) return
+    setInflightJobs(prev => prev.filter(j => !polledIds.has(j.id)))
   }, [polledJobs, inflightJobs])
   const actions = useFleetActions({ currentSessionId })
 
@@ -697,27 +709,6 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     }
     if (idx !== selectionIndex) setSelectionIndex(idx)
   })
-
-  // When polling dedups an inflight row by (cwd, intent), the row's id
-  // changes from the temp `inflight-…` to the real short. Update the
-  // follow id so focus tracks the real row. ant gets this for free
-  // because its dispatch path pre-allocates the real short and S7 uses
-  // it directly; ccb generates the short inside spawnBgPty so the temp
-  // → real swap requires this lookup.
-  useEffect(() => {
-    if (followIdRef.current === undefined) return
-    const cur = followIdRef.current
-    if (!cur.startsWith('inflight-')) return
-    // Find the inflight entry currently held by follow id.
-    const stale = inflightJobs.find(j => j.id === cur)
-    if (stale === undefined) return
-    const replacement = polledJobs.find(
-      p => p.state.cwd === stale.state.cwd && p.state.intent === stale.state.intent,
-    )
-    if (replacement !== undefined) {
-      followIdRef.current = replacement.id
-    }
-  }, [polledJobs, inflightJobs])
 
   // Hyperlink click handler. Source: ant 5092.js Ot3 useLayoutEffect[]:
   //   let W_=P5.get(process.stdout); if(!W_)return;
@@ -1128,28 +1119,49 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       .trim()
     // Bare leading word may name an agent. ant: "let J = ... ; let D = $
     // ? undefined : _.find(M => M.name.toLowerCase() === J)".
-    // Optimistic row builder — ant 5092.js:
-    //   let b3 = {
-    //     id: r4,                          // short id
-    //     state: _7H({                     // _7H = default-state factory
-    //       template: L9.routine ? {name:L9.routine, description:""} : L9.template,
-    //       intent: OK,
-    //       sessionId: R1,
-    //       cwd: NT,
-    //       originCwd: NT
-    //     }),
-    //     activity: "flowing"
-    //   }
-    //   Wj((LJ) => [...LJ, b3])
+    // Optimistic row builder — ant 5092.js verbatim:
+    //   R1 = A7 ? AP.sessionId : PdK.randomUUID()
+    //   r4 = R1.slice(0, 8)
+    //   B_.current = r4
+    //   b3 = {id: r4, state: _7H({sessionId: R1, ...}), activity: "flowing"}
+    //   Wj(LJ => [...LJ, b3])
+    //   ... spawn uses r4 ...
     //
-    // ccb temp short — random UUID slice, same length as bg.generateShortId
-    // (8 hex chars). Replaced when polling picks up the real short.
-    const pushOptimistic = (intent: string, dispatchAgent?: string): void => {
+    // r4 is the SAME id used for: optimistic row, follow id, AND the
+    // spawned worker. Right-arrow attach to the optimistic row hits
+    // the same on-disk job dir the worker writes to. No tempId / real
+    // id swap needed.
+    //
+    // ccb: peek the spare pool synchronously (same as ant's Cg8()) and
+    // use the spare's short if it matches cwd. Otherwise allocate a
+    // fresh UUID slice. Pass r4 to the handler so spawnBgPty uses it.
+    const pushOptimistic = (intent: string, dispatchAgent?: string): string => {
+      const targetCwd = cwd ?? getCwd()
+      const isPlainDispatch =
+        dispatchAgent === undefined || dispatchAgent === 'claude'
+      let resolvedShort: string | undefined
+      let resolvedSessionId: string | undefined
+      if (isPlainDispatch && peekSpare !== undefined) {
+        const slot = peekSpare(targetCwd)
+        if (slot !== undefined) {
+          resolvedShort = slot.short
+          resolvedSessionId = slot.sessionId
+        }
+      }
+      if (resolvedShort === undefined) {
+        // ant: PdK.randomUUID() then slice(0,8). ccb: same shape — 8
+        // lowercase hex chars from crypto.randomUUID().
+        const uuid =
+          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : Math.random().toString(16).slice(2, 18)
+        resolvedShort = uuid.replace(/-/g, '').slice(0, 8)
+        resolvedSessionId = uuid
+      }
       const now = new Date().toISOString()
-      const tempShort = `inflight-${Math.random().toString(36).slice(2, 8)}`
       const label = intent.split(/\r?\n/)[0]!.slice(0, 60).trim() || 'session'
       const optimisticRow: FleetJob = {
-        id: tempShort,
+        id: resolvedShort,
         activity: 'flowing',
         state: {
           state: 'working',
@@ -1164,9 +1176,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
           name: label,
           nameSource: 'auto',
           initialPrompt: intent,
-          sessionId: tempShort,
-          daemonShort: tempShort,
-          cwd: cwd ?? getCwd(),
+          sessionId: resolvedSessionId ?? resolvedShort,
+          resumeSessionId: resolvedSessionId ?? resolvedShort,
+          daemonShort: resolvedShort,
+          cwd: targetCwd,
+          originCwd: targetCwd,
           createdAt: now,
           updatedAt: now,
           firstTerminalAt: null,
@@ -1174,24 +1188,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         },
       }
       setInflightJobs(prev => [...prev, optimisticRow])
-      // Source: ant 5092.js dispatch path — `B_.current = r4`. The
-      // follow id makes the next render (which already includes the
-      // inflight row) jump selection to this new row, so the user can
-      // immediately press right-arrow to attach. Without this, focus
-      // stays on whatever row was selected before — user has to
-      // manually navigate to the new row.
-      followIdRef.current = tempShort
+      followIdRef.current = resolvedShort
       followGroupRef.current = undefined
-      // Safety net: drop after 5s even if polling never picks it up
-      // (e.g. spawn failed silently). ant equivalent: failure path
-      // calls dW(error) which removes from S7.
+      // Safety net: drop after 5s if polling never catches up. ant's
+      // failure path (dW callback) removes from S7 immediately on
+      // spawn failure; ccb's spare claim / cold spawn doesn't surface
+      // failures back to FleetView synchronously, so we rely on
+      // the timer plus the dedup useEffect.
       setTimeout(() => {
-        setInflightJobs(prev => prev.filter(j => j.id !== tempShort))
-        // Clear stale follow id if still pointing at this temp.
-        if (followIdRef.current === tempShort) {
+        setInflightJobs(prev => prev.filter(j => j.id !== resolvedShort))
+        if (followIdRef.current === resolvedShort) {
           followIdRef.current = undefined
         }
       }, 5000)
+      return resolvedShort
     }
 
     if (agent === undefined) {
@@ -1202,17 +1212,17 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         agent = a.agentType
         const rest = space < 0 ? '' : stripped.slice(space + 1).trim()
         markAgentUsed(agent)
-        pushOptimistic(rest, agent)
-        onDispatch?.({ intent: rest, cwd, agent })
+        const short = pushOptimistic(rest, agent)
+        onDispatch?.({ intent: rest, cwd, agent, short })
         setTimeout(() => refreshJobs(), 50)
         return
       }
     }
     if (agent !== undefined) markAgentUsed(agent)
-    pushOptimistic(stripped, agent)
-    onDispatch?.({ intent: stripped, cwd, agent })
+    const short = pushOptimistic(stripped, agent)
+    onDispatch?.({ intent: stripped, cwd, agent, short })
     setTimeout(() => refreshJobs(), 50)
-  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, refreshJobs, agents, worktreeRepos])
+  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, peekSpare, refreshJobs, agents, worktreeRepos])
 
   const handlePeekSubmit = useCallback(
     (text: string): void => {

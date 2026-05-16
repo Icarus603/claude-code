@@ -428,9 +428,18 @@ export async function spawnBgPty(opts: {
   waitForSocketMs?: number
   /** Suppress stdout banner — used by FleetView, which owns the screen. */
   quiet?: boolean
+  /**
+   * Pre-allocated short id. Source: ant 5092.js dispatch path —
+   * `r4 = R1.slice(0,8)` is passed to `kvK(OK, jk, r4)` so the
+   * optimistic row id, follow id, and the worker's job dir all use
+   * the same id. Without this, FleetView's optimistic row carries
+   * a temp id that doesn't match the actual on-disk job dir, so
+   * right-arrow attach on the optimistic row hits the wrong place.
+   */
+  short?: string
 }): Promise<{ short: string; socketPath: string }> {
   const { spawnPtyHost } = await import('./bg/spawnPty.js')
-  const short = generateShortId()
+  const short = opts.short ?? generateShortId()
   const r = spawnPtyHost({
     short,
     jobDir: getJobDir(short),

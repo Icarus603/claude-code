@@ -102,35 +102,43 @@ export async function agentsFleetHandler(): Promise<void> {
         initialFocusedShort: lastFocusedShort,
         initialError: errorForThisMount,
         root,
+        // ant 5092.js dispatch reads `let AP = Cg8()` synchronously to
+        // pre-allocate r4 = AP.sessionId. ccb's spare pool lives in
+        // this package so FleetView accesses it through this callback.
+        // FleetView calls peekSpare(cwd) BEFORE building the optimistic
+        // row so the row's id agrees with the worker's real short.
+        peekSpare: cwd => {
+          const slot = sparePool.peekSpareSlot(cwd)
+          if (slot === undefined) return undefined
+          return { short: slot.short }
+        },
         onDispatch: info => {
-          // Source: ant 5092.js Ot3 dispatch — tries spare claim FIRST
-          // when no agent/routine is specified AND cwd matches the
-          // spare's cwd. Only then falls through to cold spawn.
-          //
+          // Source: ant 5092.js Ot3 dispatch verbatim:
           //   let A7 = !!AP && AP.ready && !L9.matched && !L9.routine
           //            && NT === AP.cwd && $1
-          //   ;(A7 ? yvK(intent) : kvK(intent, ...).then(iP6)).then(...)
+          //   let R1 = A7 ? AP.sessionId : PdK.randomUUID()
+          //   let r4 = R1.slice(0, 8)         // ← passed to spawn
+          //   ;(A7 ? yvK(intent) : kvK(intent, jk, r4).then(iP6)).then(...)
           //
-          // ccb mirrors: if dispatch is plain text (no @agent / no
-          // --routine) and cwd matches the spare's cwd, claim it.
-          // Spare was spawned with `--agent claude` (the default) so
-          // it can only serve dispatches with the same default.
+          // FleetView pre-allocated `info.short` (= r4) and pushed the
+          // optimistic row with it. The spawn / claim path here uses
+          // info.short so the worker writes to the SAME job dir, the
+          // optimistic row id matches the polled row id, and a right-
+          // arrow attach on the optimistic row hits the correct
+          // pty.sock.
           const cwd = info.cwd ?? getCwd()
           const isPlainDispatch =
             info.agent === undefined || info.agent === 'claude'
           if (isPlainDispatch) {
+            // Spare's short was the value peekSpare returned, so
+            // info.short equals the spare's short. claimSpare consumes
+            // the singleton and returns it (verifying the cwd match
+            // still holds — guards a race where the spare died between
+            // peek and claim).
             const slot = sparePool.claimSpare(cwd)
-            if (slot !== undefined) {
-              // Write state.json SYNCHRONOUSLY (await before next tick)
-              // so the FleetView polling tick — which races us — sees a
-              // row in this iteration, not next. ant inserts the row
-              // synchronously into S7 (inflight optimistic) for the same
-              // reason: user must see immediate feedback on Enter.
+            if (slot !== undefined && slot.short === info.short) {
               void (async () => {
                 try {
-                  // Order: state.json first (row appears in FleetView),
-                  // then claim-frame (REPL starts processing). Failure
-                  // of either is logged but doesn't break the other.
                   await sparePool.rewriteSpareState(
                     slot.short,
                     info.intent,
@@ -142,15 +150,17 @@ export async function agentsFleetHandler(): Promise<void> {
                     `spare claim failed: ${(err as Error).message}\n`,
                   )
                 } finally {
-                  // Replenish the pool for the next dispatch.
                   ensureSpareForCwd(cwd)
                 }
               })()
               return
             }
+            // Spare disappeared between peek and claim — cold spawn
+            // with the pre-allocated short so the row identity stays
+            // consistent with FleetView's optimistic insert.
           }
-          // Cold path — no spare, or dispatch needs a non-default agent.
-          // Async-fire spawnBgPty; row surfaces via state.json polling.
+          // Cold path — no spare, dispatch needs a non-default agent,
+          // OR spare slot got pulled out from under us.
           const flags: string[] = info.agent
             ? ['--agent', info.agent]
             : []
@@ -158,6 +168,7 @@ export async function agentsFleetHandler(): Promise<void> {
             flags,
             directive: info.intent,
             cwd,
+            short: info.short,
             waitForSocketMs: 0,
             quiet: true,
           }).catch(err =>

@@ -68,6 +68,7 @@ export async function mountFleetView(options: MountFleetViewOptions): Promise<vo
           prCache={options.prCache}
           onAttach={options.onAttach}
           onDispatch={options.onDispatch}
+          peekSpare={options.peekSpare}
           onQuit={() => {
             options.root.unmount()
             resolve()

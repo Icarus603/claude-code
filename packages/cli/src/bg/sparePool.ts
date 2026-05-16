@@ -165,6 +165,19 @@ export function claimSpare(cwd: string): SpareSlot | undefined {
 }
 
 /**
+ * Read-only peek at the current spare slot — used by FleetView dispatch
+ * to pre-allocate the optimistic row's short id so it agrees with the
+ * worker's real short. Source: ant 5092.js `let AP = Cg8()` — sync
+ * read of the singleton, no consumption.
+ */
+export function peekSpareSlot(cwd: string): SpareSlot | undefined {
+  if (spare === undefined) return undefined
+  if (spare.cwd !== cwd) return undefined
+  if (!existsSync(spare.socketPath)) return undefined
+  return spare
+}
+
+/**
  * Send a CTRL `claim` frame to the spare's pty.sock. The ptyHost
  * handles it by writing `intent + '\n'` to the inner REPL's stdin,
  * which the REPL reads as if the user had typed and submitted.
