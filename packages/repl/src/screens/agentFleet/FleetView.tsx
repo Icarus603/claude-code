@@ -29,6 +29,8 @@ import {
   getActiveAgentsFromList,
   type AgentDefinition,
 } from '@claude-code/tool-registry/tools/AgentTool/loadAgentsDir.js'
+import { readdir, stat } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import {
   useCopyOnSelect,
   useSelectionBgColor,
@@ -167,25 +169,69 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // currently highlighted entry.
   const [commands, setCommands] = useState<readonly Command[]>([])
   const [agents, setAgents] = useState<readonly AgentDefinition[]>([])
+  const [worktreeRepos, setWorktreeRepos] = useState<Record<string, string>>({})
   const [suggestionIndex, setSuggestionIndex] = useState(0)
 
-  // Load commands + agents once on mount. ant's Fs3 sources `_` (agents)
-  // from `agents:c.activeAgents` (5180.js prop), `O` (skills/slash) from
-  // commands. ccb wires both here off the same disk snapshot the REPL
-  // would use — async and best-effort.
+  // Load commands + agents + sibling worktree repos once on mount.
+  // ant 5092.js Fs3 has three @-axis sources:
+  //   _ = agents (active, non-built-in)            — ant `_.filter(WRH)`
+  //   q = nested skill teammates                   — _$
+  //   K = worktree repos {name: path}              — ant `LvK(parentDir)`
+  // ccb wires (_) and (K). Nested skill teammates (q) require the swarm
+  // hierarchy hook which FleetView doesn't have direct access to.
   useEffect(() => {
     let cancelled = false
-    void getCommands(getCwd())
+    const cwd = getCwd()
+    void getCommands(cwd)
       .then(list => {
         if (!cancelled) setCommands(list)
       })
       .catch(() => {})
-    void getAgentDefinitionsWithOverrides(getCwd())
+    // Source: ant 4774.js RvK — getAgentDefinitionsWithOverrides + filter
+    // out built-in / plugin agents (ant `WRH` = source !== "built-in" &&
+    // source !== "plugin"). Built-in agents like general-purpose are
+    // available everywhere, no point in @-mentioning them by name.
+    void getAgentDefinitionsWithOverrides(cwd)
       .then(({ allAgents }) => {
         if (cancelled) return
-        setAgents(getActiveAgentsFromList(allAgents))
+        const active = getActiveAgentsFromList(allAgents)
+        setAgents(
+          active.filter(a => a.source !== 'built-in' && a.source !== 'plugin'),
+        )
       })
       .catch(() => {})
+    // Source: ant 4774.js LvK — scan parent dir for sibling dirs that
+    // are git repos; returns {name: absolutePath}. Used as `@<reponame>`
+    // suggestion targets in the dispatch buffer (selecting one sets the
+    // cwd for the new bg session to that repo).
+    void (async () => {
+      try {
+        const parent = dirname(cwd)
+        const entries = await readdir(parent, { withFileTypes: true })
+        const repos: Record<string, string> = {}
+        await Promise.all(
+          entries
+            .filter(
+              e =>
+                (e.isDirectory() || e.isSymbolicLink()) &&
+                !e.name.startsWith('.') &&
+                !/\s/.test(e.name),
+            )
+            .map(async e => {
+              const full = join(parent, e.name)
+              try {
+                await stat(join(full, '.git'))
+                repos[e.name] = full
+              } catch {
+                /* not a git repo */
+              }
+            }),
+        )
+        if (!cancelled) setWorktreeRepos(repos)
+      } catch {
+        /* parent unreadable — leave empty */
+      }
+    })()
     return () => {
       cancelled = true
     }
@@ -207,20 +253,48 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // ccb's first cut implements the @<token> + /<token> branches.
   const suggestions = useMemo<SuggestionItem[]>(() => {
     if (atMatch !== null) {
+      // ant 5092.js Fs3 @-branch:
+      //   M = [
+      //     ...XdK(_).filter(prefix).map(cn8),         // agents (recent-first)
+      //     ...q.filter(prefix).sort(name),            // nested skills (omitted)
+      //     ...D.filter(prefix).sort().map(repo),      // worktree repos
+      //   ]
+      // ccb does agents + repos. Don't double-list a repo whose name
+      // collides with an agent name (ant: `let j = ... zi8(...) !== void 0`
+      // then `j ? [] : D.filter(...)` — drops repos when an at-mention has
+      // already resolved an agent in the buffer; simpler heuristic here is
+      // to dedupe by name).
       const q = atMatch.token.toLowerCase()
-      return agents
+      const agentItems = agents
         .filter(a => a.agentType.toLowerCase().startsWith(q))
         .sort((a, b) => a.agentType.localeCompare(b.agentType))
-        .map(a => ({
+        .map<SuggestionItem>(a => ({
           id: `agent:${a.agentType}`,
           displayText: `@${a.agentType}`,
           description: a.whenToUse,
           metadata: { kind: 'agent', name: a.agentType },
         }))
+      const agentNames = new Set(
+        agentItems.map(i => i.displayText.slice(1).toLowerCase()),
+      )
+      const repoItems = Object.entries(worktreeRepos)
+        .filter(
+          ([name]) =>
+            name.toLowerCase().startsWith(q) &&
+            !agentNames.has(name.toLowerCase()),
+        )
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map<SuggestionItem>(([name, path]) => ({
+          id: `repo:${name}`,
+          displayText: `@${name}`,
+          description: path,
+          metadata: { kind: 'repo', name, path },
+        }))
+      return [...agentItems, ...repoItems]
     }
     if (!isCommandInput(dispatchBuf)) return []
     return generateCommandSuggestions(dispatchBuf, commands as Command[])
-  }, [dispatchBuf, commands, agents, atMatch])
+  }, [dispatchBuf, commands, agents, worktreeRepos, atMatch])
   useEffect(() => {
     if (suggestions.length === 0) {
       if (suggestionIndex !== 0) setSuggestionIndex(0)
@@ -678,6 +752,27 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     // Right arrow on a job row — open/attach. Source: ant 2941-2944.
     if (key.rightArrow && dispatchBuf === '' && focused?.kind === 'job') {
       onAttach?.(focused.job.id)
+      return
+    }
+
+    // Alt/Cmd + 1-9 — quick-open the Nth job row. Source: ant 5092.js
+    //   if ((W_.meta||W_.superKey) && W_.key >= "1" && W_.key <= "9") {
+    //     let l6 = Number(W_.key);
+    //     let Dq = cH.find(K9 => K9.kind === "job" && K9.origin === TP && --l6 === 0);
+    //     if (Dq?.kind === "job") US(Dq.job);
+    //   }
+    // ccb skips the origin filter (cross-cwd attach is rare here) and
+    // just picks the Nth job in display order.
+    if (key.meta && input >= '1' && input <= '9') {
+      const n = Number(input)
+      let i = 0
+      for (const row of rows) {
+        if (row.kind !== 'job') continue
+        if (++i === n) {
+          onAttach?.(row.job.id)
+          return
+        }
+      }
       return
     }
 
