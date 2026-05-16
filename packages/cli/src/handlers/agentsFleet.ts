@@ -37,7 +37,8 @@ export async function agentsFleetHandler(): Promise<void> {
     import('@claude-code/repl/screens/agentFleet/mountFleetView.js'),
     import('@anthropic/ink'),
   ])
-  const { spawnBgJob, attachHandler } = await import('@claude-code/cli/bg.js')
+  const { spawnBgJob } = await import('@claude-code/cli/bg.js')
+  const { fleetAttach } = await import('./agentFleetAttach.js')
   const { getCwd } = await import('@claude-code/app-host/bootstrap/cwd.js')
 
   // Top-level loop: each iteration is one mount/unmount of FleetView.
@@ -62,11 +63,11 @@ export async function agentsFleetHandler(): Promise<void> {
 
     if (action.kind === 'attach') {
       try {
-        await attachHandler([action.short])
+        await fleetAttach(action.short)
       } catch (err) {
         process.stderr.write(`attach failed: ${(err as Error).message}\n`)
       }
-      // On exit from attach (Ctrl+Q in PTY, Ctrl+C in logs), back to FleetView.
+      // On exit from attach (Ctrl+C/Q/Esc), loop back into FleetView.
       continue
     }
   }
