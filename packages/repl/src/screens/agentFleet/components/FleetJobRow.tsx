@@ -49,6 +49,7 @@ import type {
 import { flattenDetail } from '../helpers/flattenDetail.js'
 import { glyphColor } from '../helpers/glyphColor.js'
 import { jobLabel } from '../helpers/jobLabel.js'
+import { useLabelReplaceAnim } from '../hooks/useLabelReplaceAnim.js'
 import { pickIcon } from '../helpers/pickIcon.js'
 import { stateOutcome } from '../helpers/stateOutcome.js'
 import { FleetSpinner } from './FleetSpinner.js'
@@ -142,6 +143,11 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
   const { glyph, isAnimated } = pickRowGlyph(state, presence, attaching, deleteArmed, outcome)
 
   const label = jobLabel(state, isCurrentSession)
+  // ant 5092.js `Ms3` — animate label CHANGES (rename commit, auto-name
+  // after first turn). Caller's typingFrame prop (if any) wins; in
+  // practice nobody passes it externally, so the hook owns the anim.
+  const internalTypingFrame = useLabelReplaceAnim(label)
+  const effectiveTypingFrame = typingFrame ?? internalTypingFrame
   const badge = colorBadgeStyleFor(state.color)
 
   const middleText = pickMiddleText({
@@ -170,7 +176,7 @@ export function FleetJobRow(props: FleetJobRowProps): React.ReactNode {
         <LabelCell
           label={label}
           renaming={renaming}
-          typingFrame={typingFrame}
+          typingFrame={effectiveTypingFrame}
           badge={badge}
           focused={focused}
         />
