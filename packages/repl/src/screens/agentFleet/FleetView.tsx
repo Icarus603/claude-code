@@ -19,8 +19,10 @@
  */
 
 import type React from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Text, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Box, Text, instances, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
+import { fileURLToPath } from 'node:url'
+import { openBrowser, openPath } from '@claude-code/storage/browser.js'
 
 import { type Command, getCommands, getCommandName } from '@claude-code/command-runtime/runtime'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
@@ -578,6 +580,34 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       initialFocusAppliedRef.current = true
     }
   }, [rows, initialFocusedShort])
+
+  // Hyperlink click handler. Source: ant 5092.js Ot3 useLayoutEffect[]:
+  //   let W_=P5.get(process.stdout); if(!W_)return;
+  //   return W_.onHyperlinkClick=(B6)=>{
+  //     if(B6.startsWith("file:"))try{TjH(NZ6.fileURLToPath(B6))}catch{}
+  //     else K4(B6)  // K4 = open URL in browser
+  //   },()=>{W_.onHyperlinkClick=void 0}
+  // ccb's PeekPanel + FleetJobRow PR rows emit OSC 8 hyperlinks for PR
+  // URLs; mouse-tracking captures clicks before the terminal can open
+  // them natively, so we have to route them through Ink's hook.
+  useLayoutEffect(() => {
+    const ink = instances.get(process.stdout)
+    if (!ink) return
+    ink.onHyperlinkClick = url => {
+      if (url.startsWith('file:')) {
+        try {
+          void openPath(fileURLToPath(url))
+        } catch {
+          // Malformed file: URLs — ignore silently.
+        }
+      } else {
+        void openBrowser(url)
+      }
+    }
+    return () => {
+      ink.onHyperlinkClick = undefined
+    }
+  }, [])
 
   // Bootstrap-scan agentLastUsed from existing job createdAt timestamps.
   // Runs once after the first poll completes. Source: ant 5092.js Ot3
