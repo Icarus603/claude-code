@@ -313,26 +313,39 @@ export default class App extends PureComponent<Props, State> {
     if (isEnabled) {
       // Ensure raw mode is enabled only once
       if (this.rawModeEnabledCount === 0) {
-        // Stop early input capture right before we add our own readable handler.
-        // Both use the same stdin 'readable' + read() pattern, so they can't
-        // coexist -- the early capture handler would drain stdin before ours
-        // can see it. The buffered text is preserved for REPL.tsx via consumeEarlyInput().
+        // Stop early input capture right before we add our own input handler.
+        // The early-capture handler uses 'readable'+read(); both modes drain
+        // the same buffer, so they can't coexist — drop early capture before
+        // we attach our 'data' listener. The buffered text is preserved for
+        // REPL.tsx via consumeEarlyInput().
         defaultCallbacks.stopCapturingEarlyInput()
 
-        // Safety net: remove any pre-existing readable listeners that aren't
-        // ours. In builds where setAppCallbacks() was never called, the early
-        // input capture's readableHandler remains attached and would consume
-        // all stdin data before our handleReadable sees it.
+        // Safety net: remove any pre-existing 'readable' listeners that
+        // aren't ours. In builds where setAppCallbacks() was never called,
+        // the early input capture's readableHandler remains attached and
+        // would drain stdin before our 'data' handler sees it (a 'readable'
+        // listener calling .read() empties the buffer, so 'data' never fires
+        // for that chunk).
         const existingListeners = stdin.listeners('readable')
         for (const listener of existingListeners) {
-          if (listener !== this.handleReadable) {
-            stdin.removeListener('readable', listener as (...args: unknown[]) => void)
-          }
+          stdin.removeListener('readable', listener as (...args: unknown[]) => void)
         }
 
         stdin.ref()
         stdin.setRawMode(true)
-        stdin.addListener('readable', this.handleReadable)
+        // Use 'data' (flowing mode) instead of 'readable'+read(). Bun
+        // compiled standalone binaries don't fire 'readable' reliably for
+        // raw-mode TTY keystrokes — escape sequences get sliced apart so
+        // the ESC byte is flushed on the 50ms incomplete-flush timer and
+        // the tail (e.g. "[C" for right-arrow) is parsed as plain text and
+        // leaks into the prompt. Same root cause that forced
+        // packages/cli/src/bg/attachClient.ts (6f9c51cb) onto 'data'; that
+        // fix was scoped to the attach client only — the main Ink input
+        // loop has the same bug class because compiled binaries are the
+        // distribution form for every release `ccb`. Switching to flowing
+        // mode mirrors the proven-working attachClient pattern and matches
+        // how Node's tty also delivers chunks.
+        stdin.addListener('data', this.handleData)
         // Enable bracketed paste mode
         this.props.stdout.write(EBP)
         // Enable terminal focus reporting (DECSET 1004)
@@ -393,7 +406,7 @@ export default class App extends PureComponent<Props, State> {
       // Disable bracketed paste mode
       this.props.stdout.write(DBP)
       stdin.setRawMode(false)
-      stdin.removeListener('readable', this.handleReadable)
+      stdin.removeListener('data', this.handleData)
       stdin.unref()
     }
   }
@@ -410,8 +423,8 @@ export default class App extends PureComponent<Props, State> {
     // continuation of the buffered sequence (e.g. `[<64;74;16M` after a
     // lone ESC). Node's event loop runs the timers phase before the poll
     // phase, so when a heavy render blocks the loop past 50ms, this timer
-    // fires before the queued readable event even though the bytes are
-    // already buffered. Re-arm instead of flushing: handleReadable will
+    // fires before the queued data event even though the bytes are
+    // already buffered. Re-arm instead of flushing: handleData will
     // drain stdin next and clear this timer. Prevents both the spurious
     // Escape key and the lost scroll event.
     if (this.props.stdin.readableLength > 0) {
@@ -463,27 +476,27 @@ export default class App extends PureComponent<Props, State> {
     }
   }
 
-  handleReadable = (): void => {
+  handleData = (chunk: string | Buffer): void => {
     // Detect long stdin gaps (tmux attach, ssh reconnect, laptop wake).
     // The terminal may have reset DEC private modes; re-assert mouse
-    // tracking. Checked before the read loop so one Date.now() covers
-    // all chunks in this readable event.
+    // tracking. Checked before processing so one Date.now() covers the
+    // whole chunk.
     const now = Date.now()
     if (now - this.lastStdinTime > STDIN_RESUME_GAP_MS) {
       this.props.onStdinResume?.()
     }
     this.lastStdinTime = now
     try {
-      let chunk
-      while ((chunk = this.props.stdin.read() as string | null) !== null) {
-        // Process the input chunk
-        this.processInput(chunk)
-      }
+      // setEncoding('utf8') was called above, so flowing-mode 'data' events
+      // deliver strings. Buffer fallback handles edge cases (e.g. encoding
+      // cleared by a downstream listener) without losing keystrokes.
+      const input = typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+      this.processInput(input)
     } catch (error) {
-      // In Bun, an uncaught throw inside a stream 'readable' handler can
-      // permanently wedge the stream: data stays buffered and 'readable'
-      // never re-emits. Catching here ensures the stream stays healthy so
-      // subsequent keystrokes are still delivered.
+      // In Bun, an uncaught throw inside a stream 'data' handler can
+      // permanently wedge the stream: subsequent events never fire.
+      // Catching here ensures the stream stays healthy so further
+      // keystrokes are still delivered.
       defaultCallbacks.logError(error)
 
       // Re-attach the listener in case the exception detached it.
@@ -492,13 +505,13 @@ export default class App extends PureComponent<Props, State> {
       const { stdin } = this.props
       if (
         this.rawModeEnabledCount > 0 &&
-        !stdin.listeners('readable').includes(this.handleReadable)
+        !stdin.listeners('data').includes(this.handleData)
       ) {
         defaultCallbacks.logForDebugging(
-          'handleReadable: re-attaching stdin readable listener after error recovery',
+          'handleData: re-attaching stdin data listener after error recovery',
           { level: 'warn' },
         )
-        stdin.addListener('readable', this.handleReadable)
+        stdin.addListener('data', this.handleData)
       }
     }
   }

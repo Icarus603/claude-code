@@ -1614,12 +1614,25 @@ export default class Ink {
       return
     }
 
-    // Store and remove all 'readable' event listeners temporarily
-    // This prevents Ink from consuming stdin while the editor is active
+    // Store and remove all input event listeners temporarily so Ink
+    // doesn't consume stdin while the external editor is active. We
+    // listen on 'data' (flowing mode) since App.tsx switched off
+    // 'readable'+read() — but old or third-party code might still
+    // attach to 'readable', so we sweep both. See packages/@ant/ink/src/
+    // components/App.tsx for the rationale (Bun compiled-binary stdin
+    // 'readable' is unreliable in raw mode).
+    const dataListeners = stdin.listeners('data')
     const readableListeners = stdin.listeners('readable')
     this.logger.debug(
-      `[stdin] suspendStdin: removing ${readableListeners.length} readable listener(s), wasRawMode=${(stdin as NodeJS.ReadStream & { isRaw?: boolean }).isRaw ?? false}`,
+      `[stdin] suspendStdin: removing ${dataListeners.length} data + ${readableListeners.length} readable listener(s), wasRawMode=${(stdin as NodeJS.ReadStream & { isRaw?: boolean }).isRaw ?? false}`,
     )
+    dataListeners.forEach(listener => {
+      this.stdinListeners.push({
+        event: 'data',
+        listener: listener as (...args: unknown[]) => void,
+      })
+      stdin.removeListener('data', listener as (...args: unknown[]) => void)
+    })
     readableListeners.forEach(listener => {
       this.stdinListeners.push({
         event: 'readable',
