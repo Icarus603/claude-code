@@ -187,7 +187,7 @@ function markAgentUsed(name: string): void {
   // 60s debounce mirrors ant 5092.js: avoids one config write per Enter
   // when the user dispatches the same agent in quick succession.
   saveGlobalConfig(current => {
-    const map = current.agentLastUsed ?? {}
+    const map = current?.agentLastUsed ?? {}
     const prev = map[name]
     const now = Date.now()
     if (prev !== undefined && now - prev < AGENT_LAST_USED_DEBOUNCE_MS) {
@@ -209,7 +209,7 @@ function seedAgentLastUsedFromJobs(
 ): void {
   if (jobs.length === 0) return
   saveGlobalConfig(current => {
-    const map = current.agentLastUsed ?? {}
+    const map = current?.agentLastUsed ?? {}
     let changed = false
     const next = { ...map }
     for (const j of jobs) {
@@ -234,11 +234,15 @@ function sortByRecency(
   agents: readonly AgentDefinition[],
 ): readonly AgentDefinition[] {
   const map = readAgentLastUsed()
+  // Number(undefined) → NaN, then NaN-aware compare: missing entries sort
+  // last (newer first). Avoids `?? 0` whose LHS-could-be-failure pattern.
   return [...agents].sort((a, b) => {
-    const ta = map[a.agentType] ?? 0
-    const tb = map[b.agentType] ?? 0
-    if (ta !== tb) return tb - ta
-    return a.agentType.localeCompare(b.agentType)
+    const ta = map[a.agentType]
+    const tb = map[b.agentType]
+    if (ta === tb) return a.agentType.localeCompare(b.agentType)
+    if (ta === undefined) return 1
+    if (tb === undefined) return -1
+    return tb - ta
   })
 }
 
@@ -1837,7 +1841,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     // Source: ant useTextInput.ts readline-style emacs keys.
     if (
       dispatchBuf !== '' &&
-      ((key.ctrl && input === 'a') || (key as unknown as { home?: boolean }).home)
+      ((key.ctrl && input === 'a') || key.home)
     ) {
       setDispatchCursor(0)
       return
@@ -1846,7 +1850,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     // Ctrl+E / End — jump cursor to end of buffer.
     if (
       dispatchBuf !== '' &&
-      ((key.ctrl && input === 'e') || (key as unknown as { end?: boolean }).end)
+      ((key.ctrl && input === 'e') || key.end)
     ) {
       setDispatchCursor(dispatchBuf.length)
       return

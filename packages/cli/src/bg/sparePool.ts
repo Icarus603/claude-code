@@ -52,6 +52,7 @@
 import { connect } from 'node:net'
 import { existsSync } from 'node:fs'
 
+import { readEnv } from '@claude-code/config/env'
 import {
   invalidateCache,
   readJobState,
@@ -71,12 +72,34 @@ let spare: SpareSlot | undefined
 let ensureInflight: Promise<void> | undefined
 let disabled = false
 
-/** Source: ant 4774.js `wvK()` low-memory guard — refuses to spawn a
- *  spare when free memory is critically low. Stub for now; revisit if
- *  spare-pool causes user-visible OOM.
+/**
+ * Source: ant 4771.js `wvK()` + `VZ_()` low-memory guard — refuses to
+ * spawn a spare when free RAM drops below the threshold.
+ *
+ *   function VZ_(){
+ *     if (d_()==="macos") return 0;
+ *     return Z_("tengu_bg_low_mem_mb", 1024) * 1024 * 1024;
+ *   }
+ *   function wvK(){
+ *     let H = VZ_();
+ *     return H>0 && YvK.freemem() < H;
+ *   }
+ *
+ * macOS exempted because `os.freemem()` doesn't line up with vm_stat
+ * (would cause spurious retires). Linux/Windows: default 1024 MB,
+ * overridable via CLAUDE_CODE_BG_LOW_MEM_MB env (matches the daemon's
+ * NdK port at bgDaemon.ts:355 — same env, same default).
  */
 function lowMemory(): boolean {
-  return false
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const os = require('node:os') as typeof import('node:os')
+  if (os.platform() === 'darwin') return false
+  const envOverride = Number(readEnv('CLAUDE_CODE_BG_LOW_MEM_MB'))
+  const thresholdMb = Number.isFinite(envOverride) && envOverride > 0
+    ? envOverride
+    : 1024
+  const thresholdBytes = thresholdMb * 1024 * 1024
+  return os.freemem() < thresholdBytes
 }
 
 /**
@@ -334,9 +357,4 @@ export async function disableSparePool(): Promise<void> {
  */
 export function enableSparePool(): void {
   disabled = false
-}
-
-/** For tests/debug only — returns the current spare state. */
-export function _peekSpare(): Readonly<SpareSlot> | undefined {
-  return spare
 }

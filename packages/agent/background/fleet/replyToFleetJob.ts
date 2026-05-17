@@ -1,22 +1,15 @@
 /**
- * Send a user reply to a paused FleetJob.
+ * Send a user reply to a paused FleetJob via the daemon's `reply` op.
  *
  * Source: ant 5092.js:3568-3606 (the daemonReply call inside the peek
  * panel submit handler). ant's `cP6` always goes through the daemon's
- * `reply` op. ccb's PTY-only deployments have no daemon — we fall back
- * to writing a `t:'reply'` ctrl frame directly to the worker's pty.sock
- * (ptyHost handleCtrl handles 'reply' the same way as 'claim': inject
- * via bracketed paste + CR). Same end-user behaviour, different
- * transport.
+ * `reply` op.
  *
  * Retries up to 10× @ 200ms on transient daemon states (ESTARTING /
  * ENOREPLY). Caller chooses respawn fallback when reply reports
- * ENOWORKER ("no live worker").
+ * ENOWORKER ("no live worker"), and chooses PTY-sock fallback when
+ * reply reports ENOCONN (PTY-only deployment without daemon).
  */
-
-import { existsSync } from 'node:fs'
-import { homedir } from 'node:os'
-import { join } from 'node:path'
 
 import { daemonRequest } from '@claude-code/daemon/daemonClient.js'
 
@@ -33,58 +26,12 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Direct pty.sock fallback for PTY-only deployments (no daemon). Resolves
- * to true when the ctrl frame is flushed to the host, false otherwise.
- */
-async function ptySockReplyFallback(
-  short: string,
-  text: string,
-): Promise<boolean> {
-  try {
-    const root = process.env.CLAUDE_CONFIG_HOME ?? join(homedir(), '.claude')
-    const sockPath = join(root, 'jobs', short, 'pty.sock')
-    if (!existsSync(sockPath)) return false
-    const [{ connect }, { encodeCtrlFrame }] = await Promise.all([
-      import('node:net'),
-      import('@claude-code/cli/bg/ptyFrame.js'),
-    ])
-    return await new Promise<boolean>(resolve => {
-      const sock = connect(sockPath)
-      let settled = false
-      const settle = (ok: boolean): void => {
-        if (settled) return
-        settled = true
-        try {
-          sock.destroy()
-        } catch {
-          /* best-effort */
-        }
-        resolve(ok)
-      }
-      sock.once('error', () => settle(false))
-      sock.once('connect', () => {
-        try {
-          sock.write(encodeCtrlFrame({ t: 'reply', text }))
-          setTimeout(() => settle(true), 50)
-        } catch {
-          settle(false)
-        }
-      })
-    })
-  } catch {
-    return false
-  }
-}
-
-/**
- * Reply to a paused worker. On transient daemon states retries quietly;
- * on terminal failure returns a typed outcome so the caller (peek-panel
- * submit) can decide whether to respawn the worker with the reply as
- * the new initial prompt.
+ * Reply to a paused worker through the daemon. On transient states
+ * retries quietly; on terminal failure returns a typed outcome so the
+ * caller decides which fallback to use (PTY-sock for ENOCONN, respawn
+ * for ENOWORKER).
  *
- * Source: ant 5092.js:3568-3603 (daemon path). PTY-sock fallback is
- * ccb-specific — same semantics as ant's reply (inject as bracketed
- * paste + CR) but bypasses the missing daemon.
+ * Source: ant 5092.js:3568-3603 (daemon path).
  */
 export async function replyToFleetJob(
   short: string,
@@ -110,10 +57,6 @@ export async function replyToFleetJob(
       return { ok: false, code: 'ETIMEOUT', error: lastError }
     }
     if (code === 'ENOCONN') {
-      // PTY-only deployments — try direct pty.sock fallback. ptyHost
-      // accepts the same 'reply' ctrl frame as 'claim'; the worker
-      // doesn't care whether the reply came via daemon RPC or socket.
-      if (await ptySockReplyFallback(short, text)) return { ok: true }
       return { ok: false, code: 'ENOCONN', error: lastError }
     }
     return { ok: false, code: 'EUNKNOWN', error: lastError }

@@ -78,6 +78,13 @@ export function useFleetActions({
     async (short: string, text: string): Promise<FleetActionResult> => {
       const result = await replyToFleetJob(short, text)
       if (result.ok === true) return { ok: true }
+      // ENOCONN = no daemon connection (PTY-only deployment). Try the
+      // direct pty.sock fallback before surfacing the failure. ptyHost
+      // accepts the same 'reply' ctrl frame as 'claim'.
+      if (result.code === 'ENOCONN') {
+        const { ptySockReply } = await import('@claude-code/cli/bg/fleetReplyHelpers.js')
+        if (await ptySockReply(short, text)) return { ok: true }
+      }
       return { ok: false, error: result.error }
     },
     [],
@@ -175,7 +182,7 @@ export function useFleetActions({
       // peek-panel onReply uses when reply fails with ENOWORKER.
       if (opts?.initialPrompt !== undefined && opts.initialPrompt !== '') {
         const { respawnFleetJobWithPrompt } = await import(
-          '@claude-code/agent/background/fleet/respawnFleetJobWithPrompt.js'
+          '@claude-code/cli/bg/fleetReplyHelpers.js'
         )
         const r = await respawnFleetJobWithPrompt(short, opts.initialPrompt)
         if (r.ok === true) return { ok: true }

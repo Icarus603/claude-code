@@ -1361,6 +1361,9 @@ export async function withOAuthRefreshLock<T>(
 ): Promise<T> {
   const claudeDir = getClaudeConfigHomeDir()
   await mkdir(claudeDir, { recursive: true })
+  // Mirror the constant from the sibling refreshOAuthAccessToken loop
+  // below (line ~1437) so transient ELOCKED retries cap consistently.
+  const MAX_RETRIES = 5
   let retryCount = 0
   while (true) {
     let release: (() => Promise<void>) | undefined

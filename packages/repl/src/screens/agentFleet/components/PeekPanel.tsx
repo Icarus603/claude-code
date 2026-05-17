@@ -185,7 +185,7 @@ export function PeekPanel({
   const childRows: readonly PeekChildRow[] = job.state.children
     ? derivePeekChildRows(job.state.children, prCache)
     : []
-  const allOutputs = Object.entries(job.state.output ?? {})
+  const allOutputs = Object.entries(job?.state?.output ?? {})
   // Source: ant gs3 `_H = w.map(ls3)` then `t = (e_) => _H.some(...)` —
   // skips outputs whose value already names a child row.
   const childLabels = childRows.map(c => c.label)

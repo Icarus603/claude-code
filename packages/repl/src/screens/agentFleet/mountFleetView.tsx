@@ -32,7 +32,7 @@ export interface InkRootLike {
   waitUntilExit: () => Promise<void>
 }
 
-export interface MountFleetViewOptions extends Omit<FleetViewProps, 'onQuit'> {
+export interface MountFleetViewOptions extends FleetViewProps {
   /**
    * Pre-constructed Ink root (the caller awaits `createRoot()` and
    * passes the result). mountFleetView calls `.render(<FleetView/>)`.
@@ -69,10 +69,15 @@ export async function mountFleetView(options: MountFleetViewOptions): Promise<vo
           onAttach={options.onAttach}
           onDispatch={options.onDispatch}
           peekSpare={options.peekSpare}
-          onQuit={() => {
-            options.root.unmount()
-            resolve()
-          }}
+          // Source: ant 5092.js Ot3 — FleetView's onAction (= onQuit here)
+          // ONLY resolves the outer Promise. The outer agentsFleet handler
+          // then runs `$.unmount()` + breaks the loop. We must NOT
+          // unmount or resolve mountFleetView's own Promise here —
+          // doing so detaches Ink while the handler is still awaiting a
+          // FleetAction, leaving stdin/raw-mode dangling and the process
+          // stuck (the symptom: `/exit` returns to shell but terminal
+          // can't accept input).
+          onQuit={options.onQuit}
         />
       </AlternateScreen>
     )

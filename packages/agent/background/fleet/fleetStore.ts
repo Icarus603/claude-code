@@ -20,6 +20,8 @@
 import { promises as fs } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
+import { readEnv } from '@claude-code/config/env'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type {
   FleetJob,
   FleetJobState,
@@ -33,7 +35,7 @@ const PINS_FILE = 'pins.json'
 
 /** Source: ant b0(). */
 export function getJobsRoot(): string {
-  const root = process.env.CLAUDE_CONFIG_HOME
+  const root = readEnv('CLAUDE_CONFIG_HOME')
   return root ? join(root, 'jobs') : join(homedir(), '.claude', 'jobs')
 }
 
@@ -88,8 +90,9 @@ export async function readJobState(jobDir: string): Promise<FleetJobState | null
     stateCache.delete(jobDir)
     if (!isNoEnt(err)) {
       // Best-effort warn — caller treats null as "skip job".
-      console.warn(
+      logForDebugging(
         `[fleet] skipping ${basename(jobDir)}: state.json stat failed — ${err instanceof Error ? err.message : String(err)}`,
+        { level: 'warn' },
       )
     }
     return null
@@ -115,8 +118,9 @@ export async function readJobState(jobDir: string): Promise<FleetJobState | null
     return merged
   } catch (err) {
     stateCache.delete(jobDir)
-    console.warn(
+    logForDebugging(
       `[fleet] skipping ${basename(jobDir)}: state.json read/parse failed — ${err instanceof Error ? err.message : String(err)}`,
+      { level: 'warn' },
     )
     return null
   }
@@ -201,7 +205,8 @@ async function migratePinMarkers(): Promise<Set<string>> {
   )
   const set = new Set(pinned)
   await writePinSet(set).catch(err => {
-    if (!isNoEnt(err)) console.warn(`[fleet] migrate pins: ${(err as Error).message}`)
+    if (!isNoEnt(err))
+      logForDebugging(`[fleet] migrate pins: ${(err as Error).message}`, { level: 'warn' })
   })
   return set
 }

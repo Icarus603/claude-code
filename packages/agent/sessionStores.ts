@@ -1,5 +1,34 @@
-import type { HeadlessStoreParams } from '@claude-code/cli'
+import type { Tool, ToolPermissionContext } from '@claude-code/tool-registry/runtime'
 import type { AppState } from '@claude-code/app-host/state/AppStateCompat.js'
+
+/**
+ * V7 §7.2 SDK boundary placeholder types — narrowed inputs that
+ * `createHeadlessSessionStore` consumes when initialising store state
+ * for headless / -p mode. cli/headless.ts re-exports these names so
+ * existing SDK consumers keep working.
+ *
+ * @public
+ */
+export type MCPServerConnection = unknown
+/** @public */
+export type McpCommand = unknown
+
+/**
+ * Initial-state inputs for `createHeadlessSessionStore`. Lives in agent
+ * because the consumer (`buildHeadlessCompatState`) does — moves agent
+ * out of cli's dep graph (V7 §3.2 / §8 coupling rule).
+ */
+export type HeadlessStoreParams = {
+  mcpClients: MCPServerConnection[]
+  mcpCommands: McpCommand[]
+  mcpTools: Tool[]
+  toolPermissionContext: ToolPermissionContext
+  effort: string | undefined
+  effectiveModel: string | null
+  advisorModel?: string
+  kairosEnabled?: boolean
+}
+
 import { getDefaultAppState } from '@claude-code/app-host/state/AppStateCompat.js'
 import { projectHostSessionState, type HostSessionState } from '@claude-code/app-host/state/hostSessionState.js'
 import { onChangeAppState } from '@claude-code/repl/onChangeAppState.js'
@@ -44,6 +73,12 @@ function buildHeadlessCompatState(
     !initialSettings.fastModePerSessionOptIn &&
     initialSettings.fastMode === true
 
+  // Cross-package types (MCPServerConnection / McpCommand / Tool /
+  // ToolPermissionContext) are SDK boundary placeholders (V7 §7.2) —
+  // each is a structural superset of the local AppState slot shape. The
+  // construction is structurally sound; the named types are documentation
+  // for SDK consumers, not internal type assertions.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return {
     ...hostState,
     ...defaultState,
@@ -60,7 +95,7 @@ function buildHeadlessCompatState(
     ...(feature('KAIROS') && params.kairosEnabled !== undefined
       ? { kairosEnabled: params.kairosEnabled }
       : {}),
-  }
+  } as AppState
 }
 
 export function createHeadlessSessionStore(

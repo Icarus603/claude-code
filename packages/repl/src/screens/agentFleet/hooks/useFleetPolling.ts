@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { daemonList } from '@claude-code/cli/bg/daemonAdapter.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { listFleetJobs } from '@claude-code/agent/background/fleet/listFleetJobs.js'
 import type {
   FleetJob,
@@ -67,11 +68,11 @@ export function useFleetPolling(seed: readonly FleetJob[] | undefined): FleetPol
 
     const tick = async (): Promise<void> => {
       try {
-        const daemonResp = await daemonList().catch(() => null)
-        const jobs = await listFleetJobs(daemonResp ?? undefined)
+        const daemonResp = await daemonList().catch(() => undefined)
+        const jobs = await listFleetJobs(daemonResp)
         if (cancelled) return
         const presence = new Map<string, FleetPresence>()
-        if (daemonResp !== null && daemonResp.ok === true) {
+        if (daemonResp !== undefined && daemonResp.ok === true) {
           const workers = (daemonResp as { workers?: unknown }).workers
           if (Array.isArray(workers)) {
             for (const w of workers) {
@@ -101,7 +102,7 @@ export function useFleetPolling(seed: readonly FleetJob[] | undefined): FleetPol
         setResult({ jobs, presence, prCache: undefined, generation: gen, refresh })
       } catch (err) {
         if (!cancelled) {
-          console.warn(`[fleet] poll failed: ${(err as Error).message}`)
+          logForDebugging(`[fleet] poll failed: ${(err as Error).message}`, { level: 'warn' })
         }
       }
     }

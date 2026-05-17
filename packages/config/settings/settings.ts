@@ -456,10 +456,11 @@ export function updateSettingsForSource(
   source: EditableSettingSource,
   settings: SettingsJson,
 ): { error: Error | null } {
-  if (
-    (source as unknown) === 'policySettings' ||
-    (source as unknown) === 'flagSettings'
-  ) {
+  // EditableSettingSource excludes 'policySettings'/'flagSettings' at the
+  // type level, but defensive runtime guard for callers narrowing from
+  // SettingSource at runtime (see constants.ts EditableSettingSource).
+  const src = source as string
+  if (src === 'policySettings' || src === 'flagSettings') {
     return { error: null }
   }
 

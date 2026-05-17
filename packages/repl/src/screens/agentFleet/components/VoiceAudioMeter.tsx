@@ -33,7 +33,7 @@ export function VoiceAudioMeter(): React.ReactNode {
   const voiceState = useVoiceState(s => s.voiceState)
   const audioLevels = useVoiceState(s => s.voiceAudioLevels)
   const settings = useSettings()
-  const reducedMotion = settings.prefersReducedMotion ?? false
+  const reducedMotion = settings?.prefersReducedMotion ?? false
   const active = voiceState === 'recording' && !reducedMotion
 
   // EMA state — reset on recording-start transition (ant `if (q && !e58) ST_=0`).

@@ -8,8 +8,21 @@
  * `now` is injectable, so tests are deterministic regardless of when
  * they run. Wrong day boundary = labels shift by ±1 day on midnight.
  */
-import { describe, expect, test } from 'bun:test'
+import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { formatBriefTimestamp } from '../formatters/brief-timestamp.js'
+
+// Pin locale to en-US for deterministic weekday/month strings. The
+// implementation honours LC_ALL > LC_TIME > LANG; without this, the
+// test machine's locale (e.g. zh_TW) produces 星期三 instead of
+// Wednesday and the `/[a-zA-Z]/` assertions break.
+const prevLcAll = process.env.LC_ALL
+beforeAll(() => {
+  process.env.LC_ALL = 'en_US.UTF-8'
+})
+afterAll(() => {
+  if (prevLcAll === undefined) delete process.env.LC_ALL
+  else process.env.LC_ALL = prevLcAll
+})
 
 const NOW = new Date('2026-04-30T12:00:00Z')
 

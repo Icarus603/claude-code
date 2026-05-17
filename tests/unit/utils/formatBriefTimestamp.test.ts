@@ -1,9 +1,22 @@
-import { describe, expect, test } from 'bun:test'
+import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { formatBriefTimestamp } from '@claude-code/output/formatters'
 
 describe('formatBriefTimestamp', () => {
   // Fixed "now" for deterministic tests: 2026-04-02T14:00:00Z (Thursday)
   const now = new Date('2026-04-02T14:00:00Z')
+
+  // Pin locale to en-US for deterministic weekday/month strings. The
+  // implementation honours LC_ALL > LC_TIME > LANG; without this, the
+  // test machine's locale (e.g. zh_TW) produces 星期三 instead of
+  // Wednesday and the assertions break.
+  const prevLcAll = process.env.LC_ALL
+  beforeAll(() => {
+    process.env.LC_ALL = 'en_US.UTF-8'
+  })
+  afterAll(() => {
+    if (prevLcAll === undefined) delete process.env.LC_ALL
+    else process.env.LC_ALL = prevLcAll
+  })
 
   test('same day timestamp returns time only (contains colon)', () => {
     const result = formatBriefTimestamp('2026-04-02T10:30:00Z', now)

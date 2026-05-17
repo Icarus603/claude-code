@@ -49,8 +49,10 @@ export function renderDeleteResultMessage(
 
 // --- CronList ---------------------------------------------------------------
 
+const CRON_LIST_EMPTY_MESSAGE = '' // CronList has no inputs to summarise.
+
 export function renderListToolUseMessage(): React.ReactNode {
-  return ''
+  return CRON_LIST_EMPTY_MESSAGE
 }
 
 export function renderListResultMessage(output: ListOutput): React.ReactNode {

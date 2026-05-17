@@ -13,12 +13,14 @@
  * user-set name, the rename is a no-op (don't overwrite manual edits).
  */
 
+import { readEnv } from '@claude-code/config/env'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { getJobDir, invalidateCache, readJobState, writeJobState } from './fleetStore.js'
 import type { FleetNameSource } from './fleetTypes.js'
 
 function getCurrentJobDir(currentSessionId: string, requestedSessionId: string): string {
   if (currentSessionId === requestedSessionId) {
-    const envDir = process.env.CLAUDE_JOB_DIR
+    const envDir = readEnv('CLAUDE_JOB_DIR')
     if (envDir !== undefined) return envDir
     return getJobDir(currentSessionId.slice(0, 8))
   }
@@ -60,7 +62,7 @@ export async function renameFleetJob(
     })
     return true
   } catch (err) {
-    console.warn(`[fleet] rename ${sessionId.slice(0, 8)}: ${(err as Error).message}`)
+    logForDebugging(`[fleet] rename ${sessionId.slice(0, 8)}: ${(err as Error).message}`, { level: 'warn' })
     return false
   }
 }

@@ -8,6 +8,7 @@
  */
 
 import type { Response as DaemonResponse } from '@claude-code/daemon/daemonClient.js'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import type {
   FleetDaemonWorker,
   FleetJob,
@@ -69,7 +70,7 @@ async function adoptOrphanWorkers(
       const jobDir = getJobDir(w.short)
       await writeJobState(jobDir, state).catch(err => {
         if ((err as { code?: string }).code !== 'EEXIST') {
-          console.warn(`[fleet] adopt ${w.short}: ${(err as Error).message}`)
+          logForDebugging(`[fleet] adopt ${w.short}: ${(err as Error).message}`, { level: 'warn' })
         }
       })
       return { id: w.short, state }

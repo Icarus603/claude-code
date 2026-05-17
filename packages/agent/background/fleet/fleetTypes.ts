@@ -185,6 +185,13 @@ export interface FleetJob {
   /** Daemon short id (8 chars of session id). */
   id: string
   state: FleetJobState
+  /**
+   * Optimistic-overlay-only field used by FleetView's reply/dispatch
+   * paths to track in-flight activity (`'flowing'` while the worker is
+   * acting on the user's reply). Not persisted; not returned by
+   * listFleetJobs from disk.
+   */
+  activity?: FleetActivity
 }
 
 /**

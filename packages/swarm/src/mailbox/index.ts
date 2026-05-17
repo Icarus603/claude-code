@@ -152,7 +152,7 @@ export function extractDedupKey(
   // without installing the swarm runtime bindings.
   if (!text || text[0] !== '{') return null
   try {
-    const parsed = JSON.parse(text) as unknown
+    const parsed: unknown = JSON.parse(text)
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       return null
     }

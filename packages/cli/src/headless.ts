@@ -3,10 +3,13 @@ import { getCliHostBindings } from './host.js'
 import type { HeadlessStateStore } from './contracts.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import type {
-  Tool,
-  ToolPermissionContext,
   Tools,
 } from '@claude-code/tool-registry/runtime'
+import {
+  type HeadlessStoreParams,
+  type MCPServerConnection,
+  type McpCommand,
+} from '@claude-code/agent/sessionStores.js'
 
 /**
  * V7 §7.2 SDK boundary placeholder types. Internal headless flow uses
@@ -17,26 +20,15 @@ import type {
  */
 export type SDKStatus = 'active' | 'idle' | 'error' | string
 /** @public */
-export type MCPServerConnection = unknown
-/** @public */
-export type McpCommand = unknown
-/** @public */
 export type McpSdkServerConfig = unknown
 /** @public */
 export type AgentDefinition = unknown
 /** @public */
 export type ThinkingConfig = unknown
 
-export type HeadlessStoreParams = {
-  mcpClients: MCPServerConnection[]
-  mcpCommands: McpCommand[]
-  mcpTools: Tool[]
-  toolPermissionContext: ToolPermissionContext
-  effort: string | undefined
-  effectiveModel: string | null
-  advisorModel?: string
-  kairosEnabled?: boolean
-}
+// Re-export the agent-owned types so existing SDK consumers keep
+// `import { HeadlessStoreParams } from '@claude-code/cli'` working.
+export type { HeadlessStoreParams, MCPServerConnection, McpCommand }
 
 export type HeadlessRunOptions = {
   continue: boolean | undefined
