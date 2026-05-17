@@ -48,6 +48,7 @@ import { Box, Text, type Theme } from '@anthropic/ink'
 import type {
   FleetActivity,
   FleetJob,
+  FleetPrCache,
   FleetPresence,
 } from '@claude-code/agent/background/fleet/fleetTypes.js'
 import TextInput from '../../../components/TextInput.js'
@@ -55,6 +56,10 @@ import TextInput from '../../../components/TextInput.js'
 import { needsRespawn } from '../helpers/needsRespawn.js'
 import { flattenDetail } from '../helpers/flattenDetail.js'
 import { glyphColor } from '../helpers/glyphColor.js'
+import {
+  derivePeekChildRows,
+  type PeekChildRow,
+} from '../helpers/derivePeekChildRows.js'
 import {
   BlockedQuestionsPrompt,
   pickOptionLabelByKey,
@@ -67,6 +72,12 @@ export interface PeekPanelProps {
   activity?: FleetActivity
   /** Daemon roster presence. Source: ant `K` arg to Ti8 (status). */
   presence?: FleetPresence
+  /**
+   * PR status cache. Source: ant 5092.js gs3 `P` arg → JdK(children, P).
+   * Used to enrich child rows with label/status/diffStat/color. When
+   * absent (no daemon PR scanning), child rows show plain `#<id>`.
+   */
+  prCache?: FleetPrCache
   /** Current draft text. Caller owns state. */
   value: string
   /** Setter for the draft text. */
@@ -105,6 +116,7 @@ export function PeekPanel({
   job,
   activity,
   presence,
+  prCache,
   value,
   onValueChange,
   cursorOffset,
@@ -168,12 +180,15 @@ export function PeekPanel({
 
   // Children/outputs/needs presence — ant `RH = w.length>0 || KH.length>0
   // || !!q.state.needs`. When RH is false, render the "u_" header line.
-  const children = job.state.children ?? []
+  // Source: ant 5092.js gs3 — `childRows: state.children ? JdK(state.children, P) : []`.
+  // We use derivePeekChildRows (= JdK) which enriches via prCache.
+  const childRows: readonly PeekChildRow[] = job.state.children
+    ? derivePeekChildRows(job.state.children, prCache)
+    : []
   const allOutputs = Object.entries(job.state.output ?? {})
-  // Drop outputs already covered by child labels (ant t = ...).
-  const childLabels = children
-    .filter(c => c.label !== undefined)
-    .map(c => c.label as string)
+  // Source: ant gs3 `_H = w.map(ls3)` then `t = (e_) => _H.some(...)` —
+  // skips outputs whose value already names a child row.
+  const childLabels = childRows.map(c => c.label)
   const outputs = allOutputs.filter(([, v]) => {
     return !childLabels.some(label => {
       const idx = v.indexOf(label)
@@ -185,7 +200,7 @@ export function PeekPanel({
     })
   })
   const hasNeeds = job.state.needs !== undefined && job.state.needs !== ''
-  const RH = children.length > 0 || outputs.length > 0 || hasNeeds
+  const RH = childRows.length > 0 || outputs.length > 0 || hasNeeds
 
   // Footer chord — ant `U_`.
   //   reply text non-empty             → "enter to send · escape to close · ctrl+x to delete"
@@ -228,7 +243,7 @@ export function PeekPanel({
           </Box>
         ) : null}
 
-        {/* (2) c_ — child PR/frame rows. Source: ant gs3:
+        {/* (2) c_ — child PR/frame rows. Source: ant 5092.js gs3:
               gH.map(e_ => <B key=e_.row.href>
                 <B width={rH} flexShrink={0}>
                   {e_.color && <V color={e_.color}>{myH(e_) ? tq_ : Q4}</V>}
@@ -236,48 +251,93 @@ export function PeekPanel({
                 <B flexGrow={1} width={0}>
                   <V wrap="truncate"><sq url={e_.row.href}>{e_.label}</sq></V>
                 </B>
-                ...diffStat + status badges
+                e_.diffStat && e_.diffStat.additions + e_.diffStat.deletions > 0 &&
+                  <B flexShrink={0} paddingLeft={1}>
+                    <sq url={`${e_.row.href}/files`}>
+                      <Em added={e_.diffStat.additions} removed={e_.diffStat.deletions}/>
+                    </sq>
+                  </B>,
+                <B flexShrink={0} paddingLeft={1}>
+                  {e_.status.map(Qs3)}
+                </B>
               </B>)
             where:
-              Q4  = '⏺' (●, macos) or '○' (○)
-              tq_ = '⧉' (⧉, frame join glyph)
+              Q4  = darwin ? '⏺' (U+23FA) : '●' (U+25CF)
+              tq_ = '⧉' (U+29C9)
               myH(e) = e.row.kind === "frame"
-            ccb's FleetChildSummary carries kind + href; label/color/diff/
-            status enrichment requires the PR cache integration in
-            FleetView (deriveChildSummaries) — TODO to plumb through.
-            For now port the glyph distinction so frames vs PR children
-            are visually distinguishable. */}
-        {children.length > 0 ? (
-          <Box flexDirection="column">
-            {children.slice(0, 8).map(child => {
-              // Source: ant 0665.js `Q4 = d_() === "macos" ? "⏺" : "●"`,
-              // 0664.js `tq_ = "⧉"`. macOS terminals render ⏺ at a
-              // slightly larger weight that better matches the surrounding
-              // glyph palette; ● is the cross-platform default.
-              const Q4 = process.platform === 'darwin' ? '⏺' : '●'
-              const glyph = child.kind === 'frame' ? '⧉' : Q4
-              return (
-                <Box key={child.href}>
-                  <Box width={2} flexShrink={0}>
-                    <Text dimColor>{glyph}</Text>
+              rH = gH.some(myH) ? 3 : 2          // glyph col width
+            childRows is JdK(state.children, prCache) — sorted by sortRank desc. */}
+        {childRows.length > 0 ? (() => {
+          // ant gs3 `gH = w.slice(0, dH)` — dH is max rows by available
+          // vertical space; for now cap at 8 (ccb existing).
+          const visible = childRows.slice(0, 8)
+          const overflow = childRows.length - visible.length
+          // ant gs3 `rH = gH.some(myH) ? 3 : 2` — glyph col width bumps to
+          // 3 when any frame child is in view (frame glyph wider).
+          const hasFrameRow = visible.some(c => c.row.kind === 'frame')
+          const glyphColWidth = hasFrameRow ? 3 : 2
+          const Q4 = process.platform === 'darwin' ? '⏺' : '●'
+          return (
+            <Box flexDirection="column">
+              {visible.map(c => {
+                // Source: ant `myH(e_) ? tq_ : Q4`.
+                const glyph = c.row.kind === 'frame' ? '⧉' : Q4
+                const showDiffStat =
+                  c.diffStat !== undefined &&
+                  c.diffStat.additions + c.diffStat.deletions > 0
+                return (
+                  <Box key={c.row.href}>
+                    <Box width={glyphColWidth} flexShrink={0}>
+                      {c.color !== undefined ? (
+                        <Text color={c.color}>{glyph}</Text>
+                      ) : null}
+                    </Box>
+                    <Box flexGrow={1} width={0}>
+                      <Text wrap="truncate">{c.label}</Text>
+                    </Box>
+                    {showDiffStat && c.diffStat !== undefined ? (
+                      <Box flexShrink={0} paddingLeft={1}>
+                        {/* Source: ant 2873.js Em — +N green / -N red. */}
+                        {c.diffStat.additions > 0 ? (
+                          <Text color="diffAddedWord">
+                            +{c.diffStat.additions}
+                          </Text>
+                        ) : null}
+                        {c.diffStat.additions > 0 && c.diffStat.deletions > 0
+                          ? ' '
+                          : ''}
+                        {c.diffStat.deletions > 0 ? (
+                          <Text color="diffRemovedWord">
+                            -{c.diffStat.deletions}
+                          </Text>
+                        ) : null}
+                      </Box>
+                    ) : null}
+                    {c.status.length > 0 ? (
+                      <Box flexShrink={0} paddingLeft={1}>
+                        {c.status.map((badge, idx) => (
+                          <Text key={badge.text} color={badge.color}>
+                            {idx > 0 ? ' ' : ''}
+                            {badge.text}
+                          </Text>
+                        ))}
+                      </Box>
+                    ) : null}
                   </Box>
-                  <Box flexGrow={1} width={0}>
-                    <Text wrap="truncate">{child.label ?? child.href}</Text>
-                  </Box>
+                )
+              })}
+              {overflow > 0 ? (
+                <Box paddingLeft={2}>
+                  <Text dimColor>… {overflow} more</Text>
                 </Box>
-              )
-            })}
-            {children.length > 8 ? (
-              <Box paddingLeft={2}>
-                <Text dimColor>… {children.length - 8} more</Text>
-              </Box>
-            ) : null}
-          </Box>
-        ) : null}
+              ) : null}
+            </Box>
+          )
+        })() : null}
 
         {/* (3) WH — named outputs (filtered). */}
         {outputs.length > 0 ? (
-          <Box flexDirection="column" marginTop={children.length > 0 ? 1 : 0}>
+          <Box flexDirection="column" marginTop={childRows.length > 0 ? 1 : 0}>
             {outputs.map(([name, text]) => (
               <Box key={name}>
                 {outputs.length > 1 ? (
@@ -306,7 +366,7 @@ export function PeekPanel({
         {job.state.tempo === 'blocked' &&
         job.state.block?.questions !== undefined &&
         job.state.block.questions.length > 0 ? (
-          <Box marginTop={children.length > 0 || outputs.length > 0 ? 1 : 0}>
+          <Box marginTop={childRows.length > 0 || outputs.length > 0 ? 1 : 0}>
             <BlockedQuestionsPrompt
               questions={job.state.block.questions}
               ageLabel={age}
@@ -315,7 +375,7 @@ export function PeekPanel({
           </Box>
         ) : hasNeeds ? (
           <Box
-            marginTop={children.length > 0 || outputs.length > 0 ? 1 : 0}
+            marginTop={childRows.length > 0 || outputs.length > 0 ? 1 : 0}
             maxHeight={5}
             overflowY="hidden"
           >

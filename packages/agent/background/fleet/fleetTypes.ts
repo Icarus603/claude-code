@@ -215,7 +215,16 @@ export interface FleetDaemonWorker {
  * Source: ant 5092.js readers of `_?.get(href)`.
  */
 export interface FleetPrSummary {
-  state: 'OPEN' | 'MERGED' | 'CLOSED'
+  /** Source: ant Il5 — PR number for display label `#<number> <title>`. */
+  number?: number
+  /** Source: ant Il5 — PR title for display label. */
+  title?: string
+  /**
+   * Source: ant Il5 — PR state. ant has "DRAFT" as a distinct state when
+   * H.isDraft (Il5: `state: H.isDraft ? "DRAFT" : "OPEN"`). M$6 handles
+   * DRAFT → "inactive".
+   */
+  state: 'OPEN' | 'DRAFT' | 'MERGED' | 'CLOSED'
   review:
     | 'APPROVED'
     | 'CHANGES_REQUESTED'
@@ -223,6 +232,10 @@ export interface FleetPrSummary {
     | 'COMMENTED'
     | null
   checks: { failed: number; pending: number; passed: number }
+  /** Source: ant Il5 — added LOC for peek diffStat. */
+  additions?: number
+  /** Source: ant Il5 — removed LOC for peek diffStat. */
+  deletions?: number
 }
 
 /** PR cache passed through hooks. Source: ant 5092.js prCache arg. */

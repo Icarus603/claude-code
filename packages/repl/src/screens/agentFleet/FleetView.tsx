@@ -2181,6 +2181,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             job={focusedJob}
             activity={focusedActivity}
             presence={focusedPresence}
+            prCache={prCache}
             value={peekDraft}
             onValueChange={setPeekDraft}
             cursorOffset={peekCursor}
