@@ -42,7 +42,7 @@
  */
 
 import type React from 'react'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Box, Text, type Theme } from '@anthropic/ink'
 
 import type {
@@ -116,7 +116,32 @@ export function PeekPanel({
   placeholder = 'reply',
   replyError,
 }: PeekPanelProps): React.ReactNode {
-  // ant onExit: empty buffer → onResume (attach); non-empty → onSubmit.
+  // Source: ant 5092.js gs3 mode state:
+  //   let [C, m] = n8.useState(zG(I) === "bash" ? "bash" : "prompt")
+  //   let F = C === "bash"
+  // The `zG` predicate looks at the SAVED draft prefix — if it starts
+  // with "!", the panel opens in bash mode. ccb's value prop is the
+  // current draft, controlled by FleetView. We default to prompt mode
+  // here; PeekPanel internally tracks bash mode via the ws_/backspace
+  // handlers below.
+  const [mode, setMode] = useState<'prompt' | 'bash'>(() =>
+    value.startsWith('!') ? 'bash' : 'prompt',
+  )
+  const isBash = mode === 'bash'
+
+  // Source: ant 5092.js gs3 zZ.onExit:
+  //   onExit: () => {
+  //     let e_ = o.current.trim();
+  //     if (!e_ && p.current === "prompt") {
+  //       E.current = true; z(); return;       // empty + prompt → attach
+  //     }
+  //     if (!e_) return;
+  //     let L6 = dBH(e_, p.current);            // prepend "!" if bash
+  //     ...send L6 as reply...
+  //   }
+  // ant uses dBH(text, mode) to format the submission: bash mode
+  // prepends "!", prompt mode passes through. ccb's submit prepends
+  // "!" when in bash mode, then passes to caller.
   const handleSubmit = useCallback(
     (submitted: string) => {
       const trimmed = submitted.trim()
@@ -125,9 +150,13 @@ export function PeekPanel({
         else onClose()
         return
       }
-      onSubmit(trimmed)
+      // Source: ant dBH (2451.js) — bash mode wraps with leading "!".
+      const formatted = isBash ? `!${trimmed}` : trimmed
+      onSubmit(formatted)
+      // Reset mode after submit so the next peek opens in prompt.
+      setMode('prompt')
     },
-    [onClose, onResume, onSubmit],
+    [onClose, onResume, onSubmit, isBash],
   )
 
   const age = formatAge(job.state.updatedAt)
@@ -172,11 +201,17 @@ export function PeekPanel({
 
   return (
     <Box flexDirection="column">
-      {/* The bordered peek box. ant `w_` = root <Box ...>{u_, c_, WH, CH, __, bH, j_}</Box>. */}
+      {/* The bordered peek box. ant `w_` = root <Box ...>{u_, c_, WH, CH, __, bH, j_}</Box>.
+          ant gs3:
+            T_ = F ? "bashBorder" : void 0       // borderColor
+            H_ = !F                                // borderDimColor
+          In bash mode the box gets a colored bashBorder; otherwise the
+          border is dim. */}
       <Box
         flexDirection="column"
         borderStyle="round"
-        borderDimColor
+        borderColor={isBash ? 'bashBorder' : undefined}
+        borderDimColor={!isBash}
         paddingX={1}
         minHeight={5}
         width="100%"
@@ -311,8 +346,16 @@ export function PeekPanel({
             buffer the placeholder shows dim, with the inverse first-char
             acting as cursor. */}
         <Box marginTop={1}>
-          <Text color={undefined} dimColor={value.trim() === ''}>
-            {'❯ '}
+          {/* Source: ant 5092.js gs3 PN render:
+                a = F ? "!" : sH.pointer                    // prefix char
+                OH = F ? "bashBorder" : void 0              // prefixColor
+                IH = !LH                                     // prefixDim
+              Bash mode renders "!" prefix in bashBorder color. */}
+          <Text
+            color={isBash ? 'bashBorder' : undefined}
+            dimColor={value.trim() === ''}
+          >
+            {isBash ? '! ' : '❯ '}
           </Text>
           <TextInput
             value={value}
@@ -320,20 +363,29 @@ export function PeekPanel({
             cursorOffset={cursorOffset}
             onChangeCursorOffset={onCursorChange}
             onSubmit={handleSubmit}
-            onSpaceOnEmpty={onClose}
-            // Source: ant 5092.js gs3 OdK branch — 1-9 on empty buffer
-            // picks questions[0].options[N-1].label when blocked.
-            onNumberKeyOnEmpty={key =>
-              pickOptionLabelByKey(key, job.state.block?.questions)
+            // Source: ant gs3: `onSpaceOnEmpty: F ? void 0 : $`. Bash
+            // mode disables space-close so space inserts normally.
+            onSpaceOnEmpty={isBash ? undefined : onClose}
+            // Source: ant 5092.js gs3 OdK branch — only fires in prompt
+            // mode (`p.current === "prompt"`).
+            onNumberKeyOnEmpty={
+              isBash
+                ? undefined
+                : key => pickOptionLabelByKey(key, job.state.block?.questions)
             }
+            // Source: ant 5092.js gs3 l_ — right-arrow attach only in
+            // prompt mode.
+            onRightArrowOnEmpty={isBash ? undefined : (onResume ?? onClose)}
             // Source: ant 5092.js gs3 l_:
-            //   if (e_.key === "right" && !e_.shift && !o.current) {
-            //     e_.preventDefault(); z(); return  // z = onAttach
+            //   if (ws_(e_.key) && !o.current) { x("bash"); return; }
+            // "!" on empty prompt buffer enters bash mode.
+            onExclamationOnEmpty={isBash ? undefined : () => setMode('bash')}
+            // Source: ant 5092.js gs3 l_:
+            //   else if (e_.name === "backspace" && !o.current) {
+            //     x("prompt"); return;
             //   }
-            // Right arrow with empty reply buffer fires onAttach
-            // (= ccb's onResume → handlePeekClose + onAttach in
-            // FleetView). Parallel to Enter-on-empty.
-            onRightArrowOnEmpty={onResume ?? onClose}
+            // Backspace on empty bash buffer exits bash mode.
+            onBackspaceOnEmpty={isBash ? () => setMode('prompt') : undefined}
             placeholder={placeholder}
             focus={true}
             showCursor={true}

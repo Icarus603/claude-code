@@ -123,6 +123,20 @@ export type BaseTextInputProps = {
   readonly onNumberKeyOnEmpty?: (key: string) => string | null
 
   /**
+   * Source: ant 5092.js gs3 ws_ branch — fires when "!" is pressed with
+   * an empty input buffer (no ctrl/meta). gs3 uses this to enter bash
+   * mode. The "!" is NOT inserted into the buffer.
+   */
+  readonly onExclamationOnEmpty?: () => void
+
+  /**
+   * Source: ant 5092.js gs3 bash-exit branch — fires when backspace is
+   * pressed on an empty input buffer (no ctrl/meta). gs3 uses this to
+   * exit bash mode (back to prompt mode).
+   */
+  readonly onBackspaceOnEmpty?: () => void
+
+  /**
    * Sync-current value ref. Source: ant 4208.js zZ `G` (queryRef).
    * When provided, useTextInput's onSubmit reads from this ref instead
    * of the closure-captured `value` prop — necessary so a bracketed

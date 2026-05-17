@@ -115,6 +115,33 @@ export type UseTextInputProps = {
   onNumberKeyOnEmpty?: (key: string) => string | null
 
   /**
+   * Source: ant 5092.js gs3 onKeyDown bash-enter branch:
+   *   if (ws_(e_.key) && !o.current) {     // ws_ = key === "!"
+   *     e_.preventDefault();
+   *     x("bash");
+   *     return;
+   *   }
+   * Fires when "!" is typed on an empty buffer (no modifiers). gs3
+   * uses this to enter bash mode (changes prefix to "!", border to
+   * bashBorder color, etc). The "!" character is NOT inserted into
+   * the buffer — it becomes a mode switch.
+   */
+  onExclamationOnEmpty?: () => void
+
+  /**
+   * Source: ant 5092.js gs3 onKeyDown bash-exit branch:
+   *   else if (e_.name === "backspace" && !o.current) {
+   *     e_.preventDefault();
+   *     x("prompt");
+   *     return;
+   *   }
+   * Fires when backspace is pressed on an empty buffer (no modifiers).
+   * gs3 uses this to exit bash mode (back to prompt mode prefix +
+   * borders).
+   */
+  onBackspaceOnEmpty?: () => void
+
+  /**
    * Sync-current value ref. Source: ant 4208.js zZ verbatim — `G` is
    * the value ref, `k = useCallback(C => { G.current = C; P(C) })`,
    * and `onExit` reads `o.current` (= G.current = queryRef) so submit
@@ -162,6 +189,8 @@ export function useTextInput({
   onRightArrowOnEmpty,
   onSpaceOnEmpty,
   onNumberKeyOnEmpty,
+  onExclamationOnEmpty,
+  onBackspaceOnEmpty,
   valueRef,
 }: UseTextInputProps): TextInputState {
   // Pre-warm the modifiers module for Apple Terminal (has internal guard, safe to call multiple times)
@@ -409,6 +438,24 @@ export function useTextInput({
       case key.rightArrow && (key.ctrl || key.meta || key.fn):
         return () => cursor.nextWord()
       case key.backspace:
+        // Source: ant 5092.js gs3 bash-exit branch:
+        //   else if (e_.name === "backspace" && !o.current) {
+        //     e_.preventDefault(); x("prompt"); return;
+        //   }
+        // When buffer is empty and a callback is provided, fire it
+        // instead of deleting. ant uses this to exit bash mode in the
+        // peek panel.
+        if (
+          onBackspaceOnEmpty !== undefined &&
+          originalValue === '' &&
+          !key.meta &&
+          !key.ctrl
+        ) {
+          return () => {
+            onBackspaceOnEmpty()
+            return cursor
+          }
+        }
         return key.meta || key.ctrl
           ? killWordBefore
           : () => cursor.deleteTokenBefore() ?? cursor.backspace()
@@ -493,6 +540,19 @@ export function useTextInput({
               !key.ctrl &&
               !key.meta:
               onSpaceOnEmpty!()
+              return cursor
+            // Source: ant 5092.js gs3 bash-enter branch:
+            //   if (ws_(e_.key) && !o.current) {  // ws_ = key === "!"
+            //     e_.preventDefault(); x("bash"); return;
+            //   }
+            // Suppress "!" insertion when on empty buffer + handler set
+            // → caller takes over (switches mode in PeekPanel).
+            case onExclamationOnEmpty !== undefined &&
+              input === '!' &&
+              originalValue === '' &&
+              !key.ctrl &&
+              !key.meta:
+              onExclamationOnEmpty!()
               return cursor
             // Number key on empty input — fires onNumberKeyOnEmpty when
             // set and no modifier is held. Source: ant 5092.js gs3

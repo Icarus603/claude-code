@@ -129,6 +129,8 @@ export default function TextInput(props: Props): React.ReactNode {
     onRightArrowOnEmpty: props.onRightArrowOnEmpty,
     onSpaceOnEmpty: props.onSpaceOnEmpty,
     onNumberKeyOnEmpty: props.onNumberKeyOnEmpty,
+    onExclamationOnEmpty: props.onExclamationOnEmpty,
+    onBackspaceOnEmpty: props.onBackspaceOnEmpty,
     valueRef: props.valueRef,
   })
 
