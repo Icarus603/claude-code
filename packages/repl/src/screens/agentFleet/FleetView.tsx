@@ -1122,25 +1122,30 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     // group label instead of a job id.
     if (focused?.kind === 'header') {
       const group = focused.group
-      const groupRows = jobs.filter(j => {
-        const band = deriveBand(j.state, presence.get(j.id))
-        if (group === 'done') return band === 'completed'
-        if (group === 'working') return band === 'active'
-        if (group === 'blocked') return band === 'blocked'
-        if (group === 'review') return false
-        return false
-      })
-      if (groupRows.length === 0) return
-      // Second press on same group → delete all.
+      // ant 5092.js: `qh = S4?.kind==="header" ? O$.filter(W_ => Lj.get(W_.id)
+      // === S4.group) : []`. Lj is the per-job → group map; ccb has the
+      // group baked into each row directly via useFleetRows, so just filter
+      // the visible rows by matching group. This is the same logic ant
+      // applies for the visual armed-state hint AND for the second-press
+      // bulk delete fan-out.
+      const groupJobs = rows
+        .filter(r => r.kind === 'job' && r.group === group)
+        .map(r => (r as { kind: 'job'; job: typeof jobs[number] }).job)
+      if (groupJobs.length === 0) return
+      // Second press on same group → delete all eligible (ant excludes
+      // inflightJobs via `if (S7.some(Dq => Dq.id === l6.id)) continue`).
       if (armedDeleteId === group) {
-        for (const row of groupRows) {
-          void actions.remove(row.id).catch(() => undefined)
+        for (const j of groupJobs) {
+          if (inflightJobs.some(f => f.id === j.id)) continue
+          void actions.remove(j.id).catch(() => undefined)
         }
         setArmedDelete(undefined)
         setTimeout(() => refreshJobs(), 100)
         return
       }
-      // First press → arm the group.
+      // First press → arm the group. Visual: every row whose `group`
+      // matches `armedDelete.id` renders with the warning state (see
+      // Row component below).
       setArmedDelete({ id: group, justKilled: false })
       return
     }
@@ -1166,7 +1171,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     // buckets between presses. The remove action on the SECOND press
     // handles the worker kill on its own (daemonKill then deleteJobDir).
     setArmedDelete({ id: focusedJob.id, justKilled: false })
-  }, [focused, focusedJob, jobs, armedDeleteId, presence, actions, refreshJobs])
+  }, [focused, focusedJob, rows, inflightJobs, armedDeleteId, actions, refreshJobs])
 
   const handleTogglePin = useCallback((): void => {
     if (focusedJob === undefined) return
@@ -2646,7 +2651,13 @@ function Row({
         focused={focused}
         attaching={attachingShort === row.job.id}
         deleteArmed={
-          armedDelete !== undefined && armedDelete.id === row.job.id
+          // ant 5092.js: a row shows the armed warning when the row's id
+          // matches armedDelete.id (single-row arm) OR when the row's
+          // group matches armedDelete.id (header-arm = whole bucket
+          // armed). Header-arm warning applies to every child row in
+          // the focused header's group — that's what `qh` represents.
+          armedDelete !== undefined &&
+          (armedDelete.id === row.job.id || armedDelete.id === row.group)
             ? { justKilled: armedDelete.justKilled }
             : undefined
         }
