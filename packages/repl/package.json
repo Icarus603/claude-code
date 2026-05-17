@@ -119,6 +119,7 @@
     "./queryHelpers.js": "./src/queryHelpers.ts",
     "./hookEvents.js": "./src/hookEvents.ts",
     "./earlyInput.js": "./src/earlyInput.ts",
+    "./relaunch.js": "./src/relaunch.ts",
     "./terminalSetup.js": "./src/terminalSetup.ts",
     "./promptSuggestionSpeculation.js": "./src/promptSuggestionSpeculation.tsx",
     "./promptSuggestion.js": "./src/promptSuggestion.tsx",

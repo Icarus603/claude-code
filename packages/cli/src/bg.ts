@@ -48,6 +48,8 @@ import {
 import { extractRespawnArgs } from './bg/respawnArgs.js'
 import { tailFile } from './bg/tailFile.js'
 
+import { getDefaultLauncher } from '@claude-code/repl/relaunch.js'
+
 interface JobMeta {
   short: string
   pid: number
@@ -520,22 +522,19 @@ export async function spawnBgJob(opts: {
   const stdoutFd = openSync(join(jobDir, 'stdout.log'), 'a')
   const stderrFd = openSync(join(jobDir, 'stderr.log'), 'a')
 
-  // Resolve our own binary so the child runs the same ccb. argv[0] when
-  // running from `bun dist/cli.js` or the compiled standalone binary is
-  // already the right thing to spawn. Forward the user's flags through
-  // (--model, --permission-mode, etc) so `ccb --bg --model X "task"`
-  // doesn't lose model selection.
+  // Resolve our own binary so the child runs the same ccb. Forward the
+  // user's flags through (--model, --permission-mode, etc) so
+  // `ccb --bg --model X "task"` doesn't lose model selection.
+  //
+  // Use getDefaultLauncher (ccb's `Pb`) which mirrors ant 5286.js uKO:
+  // standalone binary → [execPath], script mode → [execPath, argv[1]].
+  // The previous `process.argv0.endsWith('bun')` heuristic was wrong for
+  // standalone binaries — see packages/cli/src/bg/spawnPty.ts for the
+  // full incident write-up.
   const childArgs = [...opts.flags, '-p', opts.directive]
-  // Two cases: when launched via `bun dist/cli.js`, argv0='bun' and
-  // argv[1]='/.../dist/cli.js' — we need to invoke bun with cli.js as
-  // the first arg so the child boots through bun. When launched via
-  // the compiled standalone binary, argv0 IS the binary path and
-  // argv[1] is the first user flag — invoke argv[0] directly.
-  const isBun = process.argv0.endsWith('bun')
-  const cmd = isBun ? process.argv0 : process.argv[0]!
-  const nodeArgs = isBun
-    ? [process.argv[1] ?? '', ...childArgs]
-    : childArgs
+  const launcher = getDefaultLauncher({ pinToCurrentBinary: true })
+  const cmd = launcher.cmd
+  const nodeArgs = [...launcher.prefixArgs, ...childArgs]
   const fullCmd = [cmd, ...nodeArgs]
 
   // Marker env (parity with ant 4706.js xXK):

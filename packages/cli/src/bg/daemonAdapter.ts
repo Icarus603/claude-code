@@ -23,6 +23,7 @@ import {
   daemonRequest,
   type Response as DaemonResponse,
 } from '@claude-code/daemon/daemonClient.js'
+import { getDefaultLauncher } from '@claude-code/repl/relaunch.js'
 
 const PING_TIMEOUT_MS = 1000
 // ant v2.1.140 4722.js:78 — service-install path waits 5s for the
@@ -165,11 +166,14 @@ export async function probeDaemonZombie(): Promise<string | null> {
 }
 
 function spawnTransient(): void {
-  const isBun = process.argv0.endsWith('bun')
-  const cmd = isBun ? process.argv0 : process.argv[0]!
-  const cliJs = isBun ? [process.argv[1] ?? ''] : []
+  // ant 5286.js uKO equivalent via getDefaultLauncher (ccb's Pb).
+  // The old `process.argv0.endsWith('bun')` heuristic mis-detected
+  // standalone binaries — see packages/cli/src/bg/spawnPty.ts incident.
+  const launcher = getDefaultLauncher({ pinToCurrentBinary: true })
+  const cmd = launcher.cmd
+  const prefixArgs = launcher.prefixArgs
   try {
-    const child = spawn(cmd, [...cliJs, 'daemon', 'bg', 'run'], {
+    const child = spawn(cmd, [...prefixArgs, 'daemon', 'bg', 'run'], {
       detached: true,
       stdio: ['ignore', 'ignore', 'ignore'],
       env: { ...process.env, CLAUDE_CODE_DAEMON_TRANSIENT: '1' },

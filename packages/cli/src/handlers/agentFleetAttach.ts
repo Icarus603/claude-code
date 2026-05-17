@@ -35,6 +35,8 @@ import { existsSync, openSync, readSync, closeSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
+import { getDefaultLauncher } from '@claude-code/repl/relaunch.js'
+
 /**
  * Source: ant 4774.js spare-ready loop uses 10s budget (`Date.now() + 10_000`).
  * Worker boot path: bun-boot (~300ms with embedded files) + bundle eval
@@ -105,12 +107,12 @@ function readFleetState(short: string): FleetState | null {
 }
 
 function buildCcbArgv(extraArgs: readonly string[]): { cmd: string; args: string[] } {
-  const isBun = process.argv0.endsWith('bun')
-  if (isBun) {
-    const cliJs = process.argv[1] ?? ''
-    return { cmd: process.argv0, args: [cliJs, ...extraArgs] }
-  }
-  return { cmd: process.argv[0]!, args: [...extraArgs] }
+  // ant 5286.js uKO equivalent — getDefaultLauncher (ccb's Pb) handles
+  // both `bun cli.js` dev mode and compiled standalone binaries. The
+  // old `process.argv0.endsWith('bun')` heuristic mis-detected
+  // standalone — see packages/cli/src/bg/spawnPty.ts incident write-up.
+  const launcher = getDefaultLauncher({ pinToCurrentBinary: true })
+  return { cmd: launcher.cmd, args: [...launcher.prefixArgs, ...extraArgs] }
 }
 
 export async function fleetAttach(short: string): Promise<void> {

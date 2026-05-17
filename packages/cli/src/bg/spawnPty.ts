@@ -17,6 +17,8 @@ import { join } from 'node:path'
 
 import chalk from 'chalk'
 
+import { getDefaultLauncher } from '@claude-code/repl/relaunch.js'
+
 export interface SpawnPtyResult {
   short: string
   pid: number
@@ -66,20 +68,43 @@ export function spawnPtyHost(opts: {
     opts.directive === ''
       ? [...opts.flags]
       : [...opts.flags, opts.directive]
-  const isBun = process.argv0.endsWith('bun')
-  const cmd = isBun ? process.argv0 : process.argv[0]!
-  const cliJs = isBun ? [process.argv[1] ?? ''] : []
+  // Source: ant 5286.js uKO() — `return D$() ? [process.execPath] :
+  // [process.execPath, process.argv[1]]`. D$ = isBunStandalone. Both
+  // `bun cli.js` and the compiled standalone binary go through one
+  // codepath that prepends `[process.argv[1]]` only when NOT standalone.
+  //
+  // ccb previously used `process.argv0.endsWith('bun')` for this branch,
+  // which BREAKS in compiled standalone binaries because Bun's compile
+  // mode sets argv0='bun' (so the embedded runtime can find itself). The
+  // heuristic mis-classified standalone as bun-script mode, then prepended
+  // process.argv[1] (= the first user CLI flag, e.g. "who am i") in
+  // front of --bg-pty-host. The spawn line ended up looking like
+  // `bun --bg-pty-host …` which, when resolved through PATH, found the
+  // user's local bun and tried to load "--bg-pty-host" as a script — exit
+  // immediately, pty.sock never appears, fleetAttach polls 10s, and the
+  // user's right-arrow keystrokes leak into the terminal as ^[[C because
+  // stdin raw mode was already released during ink unmount.
+  //
+  // getDefaultLauncher({pinToCurrentBinary:true}) is ccb's `Pb` —
+  // mirrors ant 5286.js uKO + 4835.js `Pb({pinToCurrentBinary:!0})`.
+  // pinToCurrentBinary skips the auto-update symlink redirect: the bg
+  // worker must boot the SAME binary that spawned it, otherwise an
+  // auto-update mid-spawn would race the worker against a different
+  // version's wire protocol.
+  const launcher = getDefaultLauncher({ pinToCurrentBinary: true })
+  const cmd = launcher.cmd
+  const prefixArgs = launcher.prefixArgs
   const cols = String(process.stdout.columns || 200)
   const rows = String(process.stdout.rows || 50)
   const hostArgs = [
-    ...cliJs,
+    ...prefixArgs,
     '--bg-pty-host',
     socketPath,
     cols,
     rows,
     '--',
     cmd,
-    ...cliJs,
+    ...prefixArgs,
     ...innerArgs,
   ]
   const fullCmd = [cmd, ...hostArgs]
