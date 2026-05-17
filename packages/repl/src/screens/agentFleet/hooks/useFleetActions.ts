@@ -50,7 +50,20 @@ export interface FleetActions {
    */
   remove(short: string): Promise<FleetActionResult>
   kill(short: string): Promise<FleetActionResult>
-  respawn(short: string): Promise<FleetActionResult>
+  /**
+   * Respawn a job. Source: ant 4774.js GsH (kZ6).
+   *
+   *   - No options: respawn with the original intent (or no prompt if a
+   *     resumable transcript exists). Used by the orphan-recovery path.
+   *   - `initialPrompt` option: respawn with the given text as the new
+   *     first prompt. Used by gs3's onReply ENOWORKER fallback —
+   *     resumes the conversation AND posts the user's reply as the
+   *     first turn so they don't have to retype.
+   */
+  respawn(
+    short: string,
+    opts?: { initialPrompt?: string },
+  ): Promise<FleetActionResult>
 }
 
 function err(e: unknown): string {
@@ -151,11 +164,29 @@ export function useFleetActions({
     }
   }, [])
 
-  const respawn = useCallback(async (short: string): Promise<FleetActionResult> => {
-    const r = await daemonRespawn(short)
-    if (r.ok === true) return { ok: true }
-    return { ok: false, error: r.error ?? 'daemon respawn failed' }
-  }, [])
+  const respawn = useCallback(
+    async (
+      short: string,
+      opts?: { initialPrompt?: string },
+    ): Promise<FleetActionResult> => {
+      // Source: ant 4774.js GsH — when initialPrompt is set, the respawn
+      // re-spawns the worker with the prompt as its first turn. For
+      // ccb's PTY-only mode (no daemon), this is the fallback path the
+      // peek-panel onReply uses when reply fails with ENOWORKER.
+      if (opts?.initialPrompt !== undefined && opts.initialPrompt !== '') {
+        const { respawnFleetJobWithPrompt } = await import(
+          '@claude-code/agent/background/fleet/respawnFleetJobWithPrompt.js'
+        )
+        const r = await respawnFleetJobWithPrompt(short, opts.initialPrompt)
+        if (r.ok === true) return { ok: true }
+        return { ok: false, error: r.error }
+      }
+      const r = await daemonRespawn(short)
+      if (r.ok === true) return { ok: true }
+      return { ok: false, error: r.error ?? 'daemon respawn failed' }
+    },
+    [],
+  )
 
   return useMemo(
     () => ({

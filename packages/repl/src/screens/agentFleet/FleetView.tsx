@@ -48,10 +48,14 @@ import figures from 'figures'
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
 import { renderModelSetting } from '@claude-code/provider/model.js'
 import type {
+  FleetActivity,
   FleetJob,
+  FleetJobState,
   FleetPrCache,
   FleetPresence,
 } from '@claude-code/agent/background/fleet/fleetTypes.js'
+import { deriveActivity } from './helpers/deriveActivity.js'
+import { patchStateOnReply } from './helpers/patchStateOnReply.js'
 
 import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { getLogoDisplayData } from '../../uiHelpers/logoV2Utils.js'
@@ -325,13 +329,36 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // pushOptimistic peeks the spare pool / generates a UUID slice and
   // passes the same short to onDispatch), so id-based dedup works
   // directly — same semantic as ant.
+  // Optimistic reply patches. Source: ant 5092.js onReply:
+  //   j((K9) => K9.map(L9 => {
+  //     if (L9.id !== E9.id) return L9;
+  //     let OK = PsH(L9.state, W_);              // patch state
+  //     return {...L9, state: OK, activity: GZ6(OK)};
+  //   }))
+  // ant mutates the polled-jobs state in place; the next polling tick
+  // overwrites it with daemon-reported state. ccb's polledJobs is owned
+  // by useFleetPolling — instead of mutating it, we keep an overlay map
+  // keyed by short. The jobs useMemo applies the overlay until the
+  // polled state.updatedAt catches up, then the effect below drops it.
+  const [replyPatches, setReplyPatches] = useState<
+    Map<string, { state: FleetJobState; activity: FleetActivity; appliedAt: number }>
+  >(() => new Map())
   const jobs = useMemo(() => {
-    if (inflightJobs.length === 0) return polledJobs
+    const out: FleetJob[] = []
+    for (const job of polledJobs) {
+      const patch = replyPatches.get(job.id)
+      if (patch !== undefined) {
+        out.push({ ...job, state: patch.state, activity: patch.activity })
+      } else {
+        out.push(job)
+      }
+    }
+    if (inflightJobs.length === 0) return out
     const polledIds = new Set(polledJobs.map(j => j.id))
     const pending = inflightJobs.filter(j => !polledIds.has(j.id))
-    if (pending.length === 0) return polledJobs
-    return [...pending, ...polledJobs]
-  }, [polledJobs, inflightJobs])
+    if (pending.length === 0) return out
+    return [...pending, ...out]
+  }, [polledJobs, inflightJobs, replyPatches])
   // ant Effect 17: drop inflight entries once polling picks them up.
   useEffect(() => {
     if (inflightJobs.length === 0) return
@@ -339,6 +366,27 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     if (inflightJobs.every(j => !polledIds.has(j.id))) return
     setInflightJobs(prev => prev.filter(j => !polledIds.has(j.id)))
   }, [polledJobs, inflightJobs])
+  // Drop reply patches when polled state catches up (updatedAt advances
+  // past the patch's appliedAt) OR after 5s safety timeout. Mirrors ant's
+  // implicit drop: ant just lets the polling tick overwrite the optimistic
+  // state, no explicit cleanup.
+  useEffect(() => {
+    if (replyPatches.size === 0) return
+    const now = Date.now()
+    let mutated = false
+    const next = new Map(replyPatches)
+    for (const [short, patch] of replyPatches) {
+      const polled = polledJobs.find(j => j.id === short)
+      const polledTs = polled
+        ? Date.parse(polled.state.updatedAt)
+        : Number.POSITIVE_INFINITY
+      if (polledTs > patch.appliedAt || now - patch.appliedAt > 5_000) {
+        next.delete(short)
+        mutated = true
+      }
+    }
+    if (mutated) setReplyPatches(next)
+  }, [polledJobs, replyPatches])
   const actions = useFleetActions({ currentSessionId })
 
   // Copy-on-select wiring. Source: ant 5092.js FleetView body —
@@ -1293,18 +1341,101 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     setTimeout(() => refreshJobs(), 50)
   }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, peekSpare, refreshJobs, agents, worktreeRepos])
 
+  // Source: ant 5092.js gs3 onReply (lines after gs3):
+  //   onReply: async (W_) => {
+  //     let B6 = l9(E9.id);                   // operation lock
+  //     let M8 = E9.state.resumeSessionId ?? E9.state.sessionId;
+  //     MO.current.add(M8);
+  //     Y.setTimeout(() => MO.current.delete(M8), 30000);
+  //     j((K9) => K9.map(L9 => {              // OPTIMISTIC STATE PATCH
+  //       if (L9.id !== E9.id) return L9;
+  //       let OK = PsH(L9.state, W_);
+  //       return {...L9, state: OK, activity: GZ6(OK)};
+  //     }));
+  //     let l6, Dq = false;
+  //     try {
+  //       if (l6 = await cP6(E9.id, W_, E9.state),
+  //           l6 === WsH && zG(W_) === "prompt") {
+  //         let K9 = await kZ6(E9.id, {knownState: E9.state, initialPrompt: W_});
+  //         Dq = !K9.ok;
+  //         l6 = K9.ok ? null : K9.error;
+  //       }
+  //       if (l6) MO.current.delete(M8);
+  //     } finally { B6(); }
+  //     ...handle outcome...
+  //   }
+  //
+  // Three pieces ported here:
+  //  1. PATCH optimistically via setReplyPatches (= ant j(...map))
+  //  2. cP6 (= ccb's actions.reply) with PTY-sock fallback already in
+  //     replyToFleetJob.ts
+  //  3. ENOWORKER → respawn-with-initial-prompt fallback
   const handlePeekSubmit = useCallback(
     (text: string): void => {
-      if (focusedJob !== undefined) {
-        void actions.reply(focusedJob.id, text).then(r => {
-          if (r.ok === false) setErrorToast(`Reply failed: ${r.error}`)
-        })
+      if (focusedJob === undefined) {
+        setPeekOpen(false)
+        setPeekDraft('')
+        setPeekCursor(0)
+        return
       }
+      const targetJob = focusedJob
+      // Optimistic patch — bump tempo to active, set detail to truncated
+      // reply, clear needs/block/suggestedReply/output. ant PsH verbatim.
+      const patchedState = patchStateOnReply(targetJob.state, text)
+      const patchedActivity = deriveActivity(patchedState, prCache)
+      setReplyPatches(prev => {
+        const next = new Map(prev)
+        next.set(targetJob.id, {
+          state: patchedState,
+          activity: patchedActivity,
+          appliedAt: Date.parse(patchedState.updatedAt),
+        })
+        return next
+      })
+      void (async () => {
+        const result = await actions.reply(targetJob.id, text)
+        if (result.ok === true) return
+        // Source: ant onReply ENOWORKER branch:
+        //   if (l6 === WsH && zG(W_) === "prompt") {
+        //     let K9 = await kZ6(E9.id, {knownState, initialPrompt: W_});
+        //     ...
+        //   }
+        // When reply reports "no live worker" AND the user typed a
+        // prompt-mode message (not bash), respawn the worker with the
+        // reply as the new initial prompt. zG returns "bash" when text
+        // starts with `!`; that respawn branch is gated to prompt mode
+        // (bash replies must reach an alive worker because they're
+        // shell-mode-aware, not first-prompt material).
+        if (
+          result.error !== undefined &&
+          !text.startsWith('!') &&
+          /no(t)?\s+running|already running|ENOWORKER/i.test(result.error)
+        ) {
+          const respawnResult = await actions
+            .respawn(targetJob.id, { initialPrompt: text })
+            .catch(err => ({ ok: false as const, error: String(err) }))
+          if (respawnResult.ok === true) return
+          setErrorToast(`Reply failed: ${respawnResult.error ?? result.error}`)
+          // Drop the optimistic patch so polled state surfaces.
+          setReplyPatches(prev => {
+            const next = new Map(prev)
+            next.delete(targetJob.id)
+            return next
+          })
+          return
+        }
+        setErrorToast(`Reply failed: ${result.error}`)
+        setReplyPatches(prev => {
+          const next = new Map(prev)
+          next.delete(targetJob.id)
+          return next
+        })
+      })()
       setPeekOpen(false)
       setPeekDraft('')
       setPeekCursor(0)
     },
-    [focusedJob, actions],
+    [focusedJob, actions, prCache],
   )
 
   const handlePeekClose = useCallback((): void => {

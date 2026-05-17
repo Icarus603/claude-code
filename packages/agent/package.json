@@ -93,6 +93,7 @@
     "./background/fleet/fleetStore.js": "./background/fleet/fleetStore.ts",
     "./background/fleet/listFleetJobs.js": "./background/fleet/listFleetJobs.ts",
     "./background/fleet/replyToFleetJob.js": "./background/fleet/replyToFleetJob.ts",
+    "./background/fleet/respawnFleetJobWithPrompt.js": "./background/fleet/respawnFleetJobWithPrompt.ts",
     "./background/fleet/renameFleetJob.js": "./background/fleet/renameFleetJob.ts",
     "./background/fleet/pinFleetJob.js": "./background/fleet/pinFleetJob.ts",
     "./background/fleet/sortFleetJobs.js": "./background/fleet/sortFleetJobs.ts",
