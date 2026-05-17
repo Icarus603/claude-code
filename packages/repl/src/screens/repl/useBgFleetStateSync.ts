@@ -37,6 +37,8 @@ import {
   writeJobState,
   invalidateCache,
 } from '@claude-code/agent/background/fleet/fleetStore.js'
+import { generateJobName } from '@claude-code/agent/background/fleet/generateJobName.js'
+import { basename } from 'node:path'
 
 /**
  * Pull the text of the last assistant message in the conversation. Used
@@ -148,7 +150,8 @@ export function useBgFleetStateSync(
           })
         } else {
           if (current.state === 'stopped' || current.state === 'failed') return
-          const outcome = inferTurnOutcome(lastAssistantText(messagesRef.current))
+          const assistantText = lastAssistantText(messagesRef.current)
+          const outcome = inferTurnOutcome(assistantText)
           if (outcome.kind === 'blocked') {
             // Stay "working" but flip tempo to blocked + record needs —
             // FleetView buckets `tempo='blocked'` into "Needs input"
@@ -178,6 +181,27 @@ export function useBgFleetStateSync(
               updatedAt: now,
               firstTerminalAt: current.firstTerminalAt ?? now,
             })
+          }
+          // Source: ant 3991.js Ja7 — fire namer once per worker after
+          // the first turn's classify result resolves to a non-active
+          // state, when state.name is still empty AND intent is known.
+          // ant gates on `$==="llm"` (classifier source) but ccb's
+          // in-worker classifier here is heuristic; the equivalent
+          // intent is "we've seen a turn complete and have assistant
+          // output to feed the namer". Fires only on blocked/done/failed
+          // — never on the active→working transition (no assistant tail
+          // yet). The namer module self-debounces with a per-short
+          // attempted Set, so re-firing on subsequent turns is a no-op.
+          const intent = current.intent ?? current.initialPrompt ?? ''
+          if (
+            (current.name === undefined || current.name === '') &&
+            intent.length > 0
+          ) {
+            void generateJobName({
+              short: basename(jobDir),
+              userMsg: intent,
+              agentTail: assistantText,
+            }).catch(() => undefined)
           }
         }
       } catch {

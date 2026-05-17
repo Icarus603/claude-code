@@ -18,6 +18,8 @@
  */
 
 import { logEvent } from '@claude-code/local-observability'
+import { readJobState } from '@claude-code/agent/background/fleet/fleetStore.js'
+import { generateJobName } from '@claude-code/agent/background/fleet/generateJobName.js'
 import type { WorkerVm } from '../workerVm.js'
 import { closingShape } from './heuristic.js'
 import { classify } from './llmClient.js'
@@ -235,6 +237,46 @@ async function runClassify(state: OrchestratorState): Promise<void> {
   state.prevState = result.state
   state.prevDetail = result.detail
   state.prevTempo = result.tempo
+
+  // Source: ant 3991.js — namer trigger from the classifier post-LLM
+  // pass:
+  //   if (!f?.name && C && $==="llm" && !H.nameInFlight) {
+  //     let m = O.filter(x => !x.isApiErrorMessage).map(rE).find(Boolean)
+  //     let p = m ? "" : yy8(O)
+  //     let S = f3H(X3(m ?? (p ? `[calling ${p}]` : "")), 500)
+  //     H.nameInFlight = !0
+  //     Vq3(Y, C, S).catch(vH).finally(() => { H.nameInFlight = !1 })
+  //   }
+  //
+  // Where `f` is the FleetJobState (we re-read after writing to pick up
+  // the freshly persisted intent), `$` is the classifier source, `C` is
+  // the user prompt (state.intent), and `S` is the agent's first text
+  // message tail (we approximate with the ring tail used by classify).
+  //
+  // The namer is fire-once per worker lifetime (via attempted Set in
+  // namer.ts), so spamming this branch is safe — it self-debounces.
+  if (result.source === 'llm') {
+    const jobsRoot = process.env.CLAUDE_CONFIG_HOME
+      ? `${process.env.CLAUDE_CONFIG_HOME}/jobs/${state.vm.short}`
+      : `${process.env.HOME ?? ''}/.claude/jobs/${state.vm.short}`
+    const fleetState = await readJobState(jobsRoot).catch(() => null)
+    const intent =
+      fleetState?.intent ?? state.intent ?? fleetState?.initialPrompt
+    if (
+      fleetState !== null &&
+      (fleetState.name === undefined || fleetState.name === '') &&
+      typeof intent === 'string' &&
+      intent.length > 0
+    ) {
+      void generateJobName({
+        short: state.vm.short,
+        userMsg: intent,
+        // Use the LLM detail as a compact agent-tail proxy — full text
+        // would blow past Vq3's 300-char cap and ant truncates anyway.
+        agentTail: result.detail ?? '',
+      }).catch(() => undefined)
+    }
+  }
 }
 
 /** Test/inspection helper. */

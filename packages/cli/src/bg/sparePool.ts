@@ -311,8 +311,12 @@ export async function rewriteSpareState(
           template: 'bg',
           respawnFlags: [],
           intent,
-          name: label,
-          nameSource: 'auto',
+          // name / nameSource intentionally omitted — daemon namer
+          // (Vq3 in ant) fills these after the first LLM classify.
+          // Pre-setting `name: label` would make the namer's
+          // `if ($.name) return` early-exit fire and the row would
+          // forever show the raw user prompt. See bg.ts for the
+          // matching change at the cold-spawn path.
           initialPrompt: intent,
           sessionId: '',
           daemonShort: short,
@@ -325,7 +329,11 @@ export async function rewriteSpareState(
   const next: FleetJobState = {
     ...base,
     intent,
-    name: base.name ?? label,
+    // Preserve existing base.name if a previous claim already wrote one
+    // (e.g. namer ran on a long-lived spare before re-claim). Otherwise
+    // leave undefined so the namer can pick it. Don't fall back to
+    // `label` — that was the bug that suppressed name generation.
+    name: base.name,
     initialPrompt: base.initialPrompt ?? intent,
     detail: base.detail || label,
     updatedAt: now,

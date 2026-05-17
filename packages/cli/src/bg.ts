@@ -154,7 +154,9 @@ async function writeOptimisticFleetState(
     '@claude-code/agent/background/fleet/fleetStore.js'
   )
   const now = new Date().toISOString()
-  // Derive a short label from directive (first 60 chars, single line).
+  // `label` → `detail` only. `name`/`nameSource` left undefined — namer
+  // (generateJobName.ts, mirrors ant 3991.js Vq3) fills them after the
+  // first classify. Pre-setting `name` early-exits the namer.
   const label = opts.directive.split(/\r?\n/)[0]!.slice(0, 60).trim() || 'session'
   await writeJobState(getJobDir(short), {
     state: 'working',
@@ -166,8 +168,6 @@ async function writeOptimisticFleetState(
     template: 'bg',
     respawnFlags: [],
     intent: opts.directive,
-    name: label,
-    nameSource: 'auto',
     initialPrompt: opts.directive,
     sessionId: '',
     daemonShort: short,
