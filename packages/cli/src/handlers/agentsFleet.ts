@@ -38,6 +38,13 @@ export async function agentsFleetHandler(): Promise<void> {
     return plainTextHandler()
   }
 
+  // Source: ant 4779.js / 4767.js / 4780.js — A1H() fires on first
+  // FleetView entry. Flips settings.hasUsedAgentsFleet=true so the
+  // `← opens agents` config row becomes visible (gated by ant PoH).
+  void import('@claude-code/config').then(({ markHasUsedAgentsFleet }) =>
+    markHasUsedAgentsFleet(),
+  )
+
   // Eagerly load the attach module too — dynamic-import latency during
   // the right-arrow handoff (~50-100ms cold) is part of the perceived
   // "blank window" the user complained about. Pre-warming the module
