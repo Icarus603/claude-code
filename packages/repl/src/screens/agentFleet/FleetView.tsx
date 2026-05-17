@@ -1648,6 +1648,34 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
+    // Ctrl+G — open dispatch buffer in $EDITOR. Source: ant 5092.js xd:
+    //   if (W_.ctrl && W_.key === "g" && !_H) {
+    //     B6();
+    //     let l6 = Fy(j_.current);
+    //     if (l6.content !== null && l6.content !== j_.current) w_(l6.content);
+    //     if (l6.error) Gq(l6.error);
+    //     return;
+    //   }
+    // Fy = 4270.js: writes buffer to temp file, invokes $VISUAL/$EDITOR,
+    // reads back the saved content. ccb's editPromptInEditor is the
+    // verbatim equivalent (used elsewhere in the REPL for slash command
+    // edits). Suppressed when peek is open — peek's TextInput has its
+    // own keybindings.
+    if (key.ctrl && input === 'g') {
+      void (async () => {
+        const { editPromptInEditor } = await import('../../promptEditor.js')
+        const result = editPromptInEditor(dispatchBuf)
+        if (result.content !== null && result.content !== dispatchBuf) {
+          setDispatchBuf(result.content)
+          setDispatchCursor(result.content.length)
+        }
+        if (result.error !== undefined) {
+          setErrorToast(result.error)
+        }
+      })()
+      return
+    }
+
     // Ctrl+T — pin/unpin. Source: ant 5092.js xd same inflight guard
     // pattern as Ctrl+R.
     if (key.ctrl && input === 't') {
