@@ -56,6 +56,7 @@ import type {
 } from '@claude-code/agent/background/fleet/fleetTypes.js'
 import { deriveActivity } from './helpers/deriveActivity.js'
 import { patchStateOnReply } from './helpers/patchStateOnReply.js'
+import { composeDispatchHighlights } from './helpers/dispatchHighlights.js'
 
 import { useMainLoopModel } from '../../hooks/useMainLoopModel.js'
 import { getLogoDisplayData } from '../../uiHelpers/logoV2Utils.js'
@@ -648,6 +649,34 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       setSuggestionIndex(Math.max(0, suggestions.length - 1))
     }
   }, [suggestions.length, suggestionIndex])
+
+  // Source: ant 5092.js zP composition + ms3 mention highlight:
+  //   HR = ms3(bH, gW)                                  // @-mentions
+  //   zP = p4?.matched && jD === p4.template.name.toLowerCase()
+  //        ? [[0, jD.length], ...HR]                    // leading agent match
+  //        : C$ ? [[0, jD.length], ...HR]
+  //        : [...us3(bH), ...HR]                        // a:/s:/o: prefixes
+  // ccb composes the @-mention highlights via the agents+repos name set
+  // plus a leading-word agent match. us3 (a:/s:/o:) ranges are not
+  // ported — they're specific to ant's bridge filter syntax which ccb
+  // doesn't have.
+  const dispatchHighlights = useMemo<readonly [number, number][]>(() => {
+    if (dispatchBuf === '') return []
+    const knownNames = new Set<string>()
+    for (const a of agents) knownNames.add(a.agentType.toLowerCase())
+    for (const name of Object.keys(worktreeRepos))
+      knownNames.add(name.toLowerCase())
+    // Leading bare word agent match.
+    let leadingMatchLength: number | undefined
+    const spaceIdx = dispatchBuf.search(/\s/)
+    const firstWord = (
+      spaceIdx < 0 ? dispatchBuf : dispatchBuf.slice(0, spaceIdx)
+    ).toLowerCase()
+    if (firstWord !== '' && knownNames.has(firstWord)) {
+      leadingMatchLength = firstWord.length
+    }
+    return composeDispatchHighlights(dispatchBuf, knownNames, leadingMatchLength)
+  }, [dispatchBuf, agents, worktreeRepos])
 
   // Accept the currently highlighted suggestion. Source: ant 5092.js
   // `M8(vA[j3] ?? vA[0])` (Tab / Enter accept) where the suggestion is
@@ -2173,6 +2202,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
             placeholder="start a task in the background"
             focused={dispatchActive}
             cursor={dispatchCursor}
+            highlights={dispatchHighlights}
           />
         </Box>
       </Box>
@@ -2336,17 +2366,91 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
  * blink the native cursor based on user preference, and the inverse
  * block is a render-time visual marker that should stay solid.
  */
+/**
+ * Source: ant 4205.js `uj3` — inline cursor + highlight renderer.
+ *
+ *   function uj3(H, _, q, K, O) {
+ *     // H = query, _ = highlights[[s,e]], q = dimRange[s,e] | undef,
+ *     // K = cursorOffset (or -1 for hidden), O = cursorChar | undef.
+ *     let T = (w) => _.some(([j, J]) => w >= j && w < J);
+ *     let $ = (w) => !!q && w >= q[0] && w < q[1];
+ *     let z = new Set([0, H.length]);
+ *     for (let [w, j] of _) z.add(w), z.add(j);
+ *     if (q) z.add(q[0]), z.add(q[1]);
+ *     if (K >= 0) z.add(K), z.add(K + 1);
+ *     let A = [...z].sort((w, j) => w - j), Y = [];
+ *     for (let w = 0; w < A.length - 1; w++) {
+ *       let j = A[w], J = A[w + 1];
+ *       let D = j < H.length ? H.slice(j, J) : " ";
+ *       if (!D) continue;
+ *       let M = j === K, f = M && D === "\n";
+ *       Y.push(M && O
+ *         ? <V key={j}>{O}{f ? "\n" : null}</V>
+ *         : <V key={j} color={T(j) ? "suggestion" : void 0}
+ *                      dimColor={$(j)} inverse={M}>{f ? " \n" : D}</V>);
+ *     }
+ *     return Y;
+ *   }
+ *
+ * Builds segment break points (highlight + cursor + dimRange + buffer
+ * ends), sorts, renders each segment with the appropriate styling.
+ */
+function renderUj3Segments(
+  buffer: string,
+  highlights: readonly [number, number][],
+  cursor: number,
+): React.ReactNode[] {
+  const inHighlight = (pos: number): boolean =>
+    highlights.some(([s, e]) => pos >= s && pos < e)
+  const breakPoints = new Set<number>([0, buffer.length])
+  for (const [s, e] of highlights) {
+    breakPoints.add(s)
+    breakPoints.add(e)
+  }
+  if (cursor >= 0) {
+    breakPoints.add(cursor)
+    breakPoints.add(cursor + 1)
+  }
+  const sorted = [...breakPoints].sort((a, b) => a - b)
+  const out: React.ReactNode[] = []
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const j = sorted[i]!
+    const k = sorted[i + 1]!
+    const seg = j < buffer.length ? buffer.slice(j, k) : ' '
+    if (!seg) continue
+    const atCursor = j === cursor
+    const isNewline = atCursor && seg === '\n'
+    out.push(
+      <Text
+        key={j}
+        color={inHighlight(j) ? 'suggestion' : undefined}
+        inverse={atCursor}
+      >
+        {isNewline ? ' \n' : seg}
+      </Text>,
+    )
+  }
+  return out
+}
+
 function InlineDispatchBuffer({
   buffer,
   placeholder,
   focused,
   cursor,
+  highlights = [],
 }: {
   buffer: string
   placeholder: string
   focused: boolean
   /** Cursor offset within `buffer` (0..buffer.length). */
   cursor: number
+  /**
+   * Source: ant 5092.js `zP` — highlight ranges for matched @-mentions
+   * and leading-word agent matches. Each range is [start, end) on the
+   * buffer's character indices.
+   */
+  highlights?: readonly [number, number][]
 }): React.ReactNode {
   const showCursor = focused
   if (buffer === '') {
@@ -2366,28 +2470,13 @@ function InlineDispatchBuffer({
       </Box>
     )
   }
-  // Non-empty + focused: split around the cursor offset so the inverse
-  // block sits at the correct character. Source: ant cursor.ts render:
-  //   beforeCursor + invert(charAtCursor) + afterCursor
-  // Cursor at end → trailing inverse space.
   if (!showCursor) {
-    return (
-      <Box>
-        <Text>{buffer}</Text>
-      </Box>
-    )
+    // Source: ant uj3 with cursor=-1 (hidden) — still segments highlights.
+    return <Box>{renderUj3Segments(buffer, highlights, -1)}</Box>
   }
+  // Source: ant uj3 verbatim. Cursor inverse + highlights interleaved.
   const c = Math.min(Math.max(0, cursor), buffer.length)
-  const before = buffer.slice(0, c)
-  const atCursor = buffer[c] ?? ' '
-  const after = c < buffer.length ? buffer.slice(c + 1) : ''
-  return (
-    <Box>
-      <Text>{before}</Text>
-      <Text inverse>{atCursor}</Text>
-      <Text>{after}</Text>
-    </Box>
-  )
+  return <Box>{renderUj3Segments(buffer, highlights, c)}</Box>
 }
 
 function rowKey(row: FleetRow, idx: number): string {
