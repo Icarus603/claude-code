@@ -98,6 +98,23 @@ export type UseTextInputProps = {
   onSpaceOnEmpty?: () => void
 
   /**
+   * Source: ant 5092.js gs3 onKeyDown number-shortcut branch:
+   *   if (!o.current) {
+   *     let L6 = OdK(e_.key, YH);
+   *     if (L6) { e_.preventDefault(); s(L6); qH(L6.length); return; }
+   *   }
+   * When peek buffer is empty AND key is 1-9, OdK looks up the
+   * questions[0].options[N-1].label and sets the buffer to it. ccb
+   * exposes this as a callback: receives the key char ('1'-'9'),
+   * returns the replacement text or null to ignore.
+   *
+   * When the callback returns a string, useTextInput inserts it at
+   * position 0 and moves the cursor to the end — same end state as
+   * ant's `s(L6); qH(L6.length)` pair.
+   */
+  onNumberKeyOnEmpty?: (key: string) => string | null
+
+  /**
    * Sync-current value ref. Source: ant 4208.js zZ verbatim — `G` is
    * the value ref, `k = useCallback(C => { G.current = C; P(C) })`,
    * and `onExit` reads `o.current` (= G.current = queryRef) so submit
@@ -144,6 +161,7 @@ export function useTextInput({
   onLeftArrowOnEmpty,
   onRightArrowOnEmpty,
   onSpaceOnEmpty,
+  onNumberKeyOnEmpty,
   valueRef,
 }: UseTextInputProps): TextInputState {
   // Pre-warm the modifiers module for Apple Terminal (has internal guard, safe to call multiple times)
@@ -476,6 +494,27 @@ export function useTextInput({
               !key.meta:
               onSpaceOnEmpty!()
               return cursor
+            // Number key on empty input — fires onNumberKeyOnEmpty when
+            // set and no modifier is held. Source: ant 5092.js gs3
+            // OdK branch — looks up questions[0].options[N-1].label and
+            // sets the buffer to it. Returning the option label here
+            // replaces the keystroke with the inserted label.
+            case onNumberKeyOnEmpty !== undefined &&
+              input.length === 1 &&
+              input >= '1' &&
+              input <= '9' &&
+              originalValue === '' &&
+              !key.shift &&
+              !key.ctrl &&
+              !key.meta: {
+              const label = onNumberKeyOnEmpty!(input)
+              if (label === null) {
+                // Caller said "no option for this digit" → fall through
+                // to default printable-char insertion.
+                return cursor.insert(input)
+              }
+              return Cursor.fromText(label, columns, label.length)
+            }
             // Home key
             case input === '\x1b[H' || input === '\x1b[1~':
               return cursor.startOfLine()

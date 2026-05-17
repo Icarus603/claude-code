@@ -84,10 +84,38 @@ export interface FleetChildSummary {
 
 /**
  * Block payload when a worker is paused waiting for the user.
- * Source: ant state.block — `{questions?: string[]}` for structured asks.
+ * Source: ant state.block — schema at 2508.js:
+ *   block: y.object({
+ *     questions: y.array(y.object({
+ *       question: y.string(),
+ *       options: y.array(y.object({
+ *         label: y.string(),
+ *         description: y.string()
+ *       }))
+ *     }))
+ *   }).optional()
+ *
+ * Each question carries an optional list of pre-canned answer options
+ * (e.g. yes/no/skip). ant's peek panel renders questions[0] as a bold
+ * header + numbered options list (KdK 5091.js) and ant's gs3 onKeyDown
+ * lets the user press 1-9 to pick options[N-1].label (OdK 5091.js).
  */
+export interface FleetBlockQuestionOption {
+  /** Source: ant option.label — what the option submits as a reply. */
+  label: string
+  /** Source: ant option.description — optional dim subtitle. */
+  description: string
+}
+
+export interface FleetBlockQuestion {
+  /** Source: ant question.question — the bold header text. */
+  question: string
+  /** Source: ant question.options. */
+  options: FleetBlockQuestionOption[]
+}
+
 export interface FleetBlockPayload {
-  questions?: string[]
+  questions?: FleetBlockQuestion[]
 }
 
 /**

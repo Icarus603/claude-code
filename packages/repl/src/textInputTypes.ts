@@ -115,6 +115,14 @@ export type BaseTextInputProps = {
   readonly onSpaceOnEmpty?: () => void
 
   /**
+   * Source: ant 5092.js gs3 OdK branch — fires when a digit 1-9 is
+   * pressed with an empty input buffer (no modifiers). The callback
+   * receives the digit and returns the replacement label or null to
+   * fall through to normal character insertion.
+   */
+  readonly onNumberKeyOnEmpty?: (key: string) => string | null
+
+  /**
    * Sync-current value ref. Source: ant 4208.js zZ `G` (queryRef).
    * When provided, useTextInput's onSubmit reads from this ref instead
    * of the closure-captured `value` prop — necessary so a bracketed

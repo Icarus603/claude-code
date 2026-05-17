@@ -55,6 +55,10 @@ import TextInput from '../../../components/TextInput.js'
 import { needsRespawn } from '../helpers/needsRespawn.js'
 import { flattenDetail } from '../helpers/flattenDetail.js'
 import { glyphColor } from '../helpers/glyphColor.js'
+import {
+  BlockedQuestionsPrompt,
+  pickOptionLabelByKey,
+} from './BlockedQuestionsPrompt.js'
 
 export interface PeekPanelProps {
   /** Focused job — drives all summary/output/child rendering. */
@@ -256,8 +260,25 @@ export function PeekPanel({
           </Box>
         ) : null}
 
-        {/* (4) CH — needs / questions. */}
-        {hasNeeds ? (
+        {/* (4) CH — needs / questions. Source: ant gs3 (5092.js):
+              YH = state.tempo === "blocked" ? state.block?.questions : undefined
+              CH = YH ? <B marginTop=...><KdK questions={YH} ageLabel={v} ageColor={UH}/></B>
+                 : state.needs ? <B marginTop=... maxHeight overflowY="hidden">
+                                   <V wrap="wrap">{age} {flattenDetail(needs)}</V>
+                                 </B>
+                 : null
+            Structured questions take priority over flat needs.  */}
+        {job.state.tempo === 'blocked' &&
+        job.state.block?.questions !== undefined &&
+        job.state.block.questions.length > 0 ? (
+          <Box marginTop={children.length > 0 || outputs.length > 0 ? 1 : 0}>
+            <BlockedQuestionsPrompt
+              questions={job.state.block.questions}
+              ageLabel={age}
+              ageColor={ageColor}
+            />
+          </Box>
+        ) : hasNeeds ? (
           <Box
             marginTop={children.length > 0 || outputs.length > 0 ? 1 : 0}
             maxHeight={5}
@@ -300,6 +321,11 @@ export function PeekPanel({
             onChangeCursorOffset={onCursorChange}
             onSubmit={handleSubmit}
             onSpaceOnEmpty={onClose}
+            // Source: ant 5092.js gs3 OdK branch — 1-9 on empty buffer
+            // picks questions[0].options[N-1].label when blocked.
+            onNumberKeyOnEmpty={key =>
+              pickOptionLabelByKey(key, job.state.block?.questions)
+            }
             // Source: ant 5092.js gs3 l_:
             //   if (e_.key === "right" && !e_.shift && !o.current) {
             //     e_.preventDefault(); z(); return  // z = onAttach
