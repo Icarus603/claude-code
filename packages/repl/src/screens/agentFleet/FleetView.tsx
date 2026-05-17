@@ -759,25 +759,76 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     currentSessionId,
   })
 
-  // After rows are computed, jump selection to the initialFocusedShort
-  // row exactly once on mount. ant 5092.js Ot3 carries `z = f.job.id`
-  // across loop iterations so the user lands back on the row they just
-  // detached from; ccb's loop passes the value into props and this
-  // effect resolves it to a concrete row index after the first poll.
-  const initialFocusAppliedRef = useRef(false)
+  // Source: ant 5092.js BdK initial-focus effect (Y9 default + initialJobId match):
+  //
+  //   let Y9 = cH[1]?.kind === "job" && cH[1].origin === E ? 1 : 0
+  //   let vM = useRef(0)
+  //   useEffect(() => {
+  //     if (vM.current >= 2 || w === null) return
+  //     vM.current++
+  //     let W_ = () => {
+  //       s(Y9)                                          // setSelectionIndex(Y9)
+  //       let M8 = B4.current[Y9]
+  //       if (M8?.kind === "job") B_.current = M8.job.id, l_.current = null
+  //       else if (M8?.kind === "header") B_.current = null, l_.current = M8.group
+  //     }
+  //     if (!_) { vM.current = 2; W_(); return }
+  //     let B6 = B4.current.findIndex(M8 => M8.kind === "job" && M8.job.id === _)
+  //     if (B6 >= 0) vM.current = 2, s(B6), B_.current = _
+  //     else if (vM.current >= 2) W_()
+  //   }, [w, _, Y9])
+  //
+  // The Y9 default — when row[1] is a job whose origin matches the
+  // current cwd, focus row 1 (the first session under the first
+  // section header). Otherwise focus row 0 (the section header itself).
+  // This is "land on the most relevant row" — typically the active
+  // session in the current repo. ant runs this effect at most TWICE
+  // via the vM counter, allowing one re-resolve when rows arrive
+  // asynchronously from polling.
+  const initialFocusRunsRef = useRef(0)
+  // ant Y9. Computed per-render so rows[1].origin === currentCwd is
+  // re-evaluated as the polled rows arrive.
+  const defaultFocusIdx = useMemo(() => {
+    const row1 = rows[1]
+    if (
+      row1?.kind === 'job' &&
+      spawnOriginOf(row1.job.state) === getCwd()
+    ) {
+      return 1
+    }
+    return 0
+  }, [rows])
   useEffect(() => {
-    if (initialFocusAppliedRef.current) return
-    if (!initialFocusedShort) return
+    if (initialFocusRunsRef.current >= 2) return
     if (rows.length === 0) return
+    initialFocusRunsRef.current += 1
+    const applyDefault = (): void => {
+      setSelectionIndex(defaultFocusIdx)
+      const r = rows[defaultFocusIdx]
+      if (r?.kind === 'job') {
+        followIdRef.current = r.job.id
+        followGroupRef.current = undefined
+      } else if (r?.kind === 'header') {
+        followIdRef.current = undefined
+        followGroupRef.current = r.group
+      }
+    }
+    if (!initialFocusedShort) {
+      initialFocusRunsRef.current = 2
+      applyDefault()
+      return
+    }
     const idx = rows.findIndex(
       r => r.kind === 'job' && r.job.id === initialFocusedShort,
     )
     if (idx >= 0) {
+      initialFocusRunsRef.current = 2
       setSelectionIndex(idx)
       followIdRef.current = initialFocusedShort
-      initialFocusAppliedRef.current = true
+    } else if (initialFocusRunsRef.current >= 2) {
+      applyDefault()
     }
-  }, [rows, initialFocusedShort])
+  }, [rows, initialFocusedShort, defaultFocusIdx])
 
   // ant 5092.js follow-id mechanism (refs `B_`/`l_` + Effect 16 in BdK).
   // On every render, if `B_.current` is set, locate its row in `cH` and
