@@ -9,7 +9,7 @@
   "@claude-code/shell": 30,
   "@claude-code/bridge": 6,
   "@claude-code/local-observability": 33,
-  "@claude-code/repl": 181,
+  "@claude-code/repl": 182,
   "@claude-code/provider": 95,
   "@claude-code/output": 26,
   "@claude-code/mcp-runtime": 34,

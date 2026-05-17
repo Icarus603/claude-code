@@ -313,19 +313,12 @@ export default class App extends PureComponent<Props, State> {
     if (isEnabled) {
       // Ensure raw mode is enabled only once
       if (this.rawModeEnabledCount === 0) {
-        // Stop early input capture right before we add our own input handler.
-        // The early-capture handler uses 'readable'+read(); both modes drain
-        // the same buffer, so they can't coexist — drop early capture before
-        // we attach our 'data' listener. The buffered text is preserved for
-        // REPL.tsx via consumeEarlyInput().
+        // Drop early-input capture (uses 'readable'+read(), incompatible
+        // with our 'data' listener — read() empties the buffer first).
+        // Buffered text is preserved for REPL.tsx via consumeEarlyInput().
         defaultCallbacks.stopCapturingEarlyInput()
 
-        // Safety net: remove any pre-existing 'readable' listeners that
-        // aren't ours. In builds where setAppCallbacks() was never called,
-        // the early input capture's readableHandler remains attached and
-        // would drain stdin before our 'data' handler sees it (a 'readable'
-        // listener calling .read() empties the buffer, so 'data' never fires
-        // for that chunk).
+        // Safety net for builds where setAppCallbacks() was never called.
         const existingListeners = stdin.listeners('readable')
         for (const listener of existingListeners) {
           stdin.removeListener('readable', listener as (...args: unknown[]) => void)
@@ -333,18 +326,9 @@ export default class App extends PureComponent<Props, State> {
 
         stdin.ref()
         stdin.setRawMode(true)
-        // Use 'data' (flowing mode) instead of 'readable'+read(). Bun
-        // compiled standalone binaries don't fire 'readable' reliably for
-        // raw-mode TTY keystrokes — escape sequences get sliced apart so
-        // the ESC byte is flushed on the 50ms incomplete-flush timer and
-        // the tail (e.g. "[C" for right-arrow) is parsed as plain text and
-        // leaks into the prompt. Same root cause that forced
-        // packages/cli/src/bg/attachClient.ts (6f9c51cb) onto 'data'; that
-        // fix was scoped to the attach client only — the main Ink input
-        // loop has the same bug class because compiled binaries are the
-        // distribution form for every release `ccb`. Switching to flowing
-        // mode mirrors the proven-working attachClient pattern and matches
-        // how Node's tty also delivers chunks.
+        // 'data' (flowing) not 'readable'+read(): mirrors attachClient.ts
+        // 6f9c51cb — Bun compiled standalone TTY raw-mode 'readable'
+        // delivery is unreliable.
         stdin.addListener('data', this.handleData)
         // Enable bracketed paste mode
         this.props.stdout.write(EBP)
@@ -487,21 +471,14 @@ export default class App extends PureComponent<Props, State> {
     }
     this.lastStdinTime = now
     try {
-      // setEncoding('utf8') was called above, so flowing-mode 'data' events
-      // deliver strings. Buffer fallback handles edge cases (e.g. encoding
-      // cleared by a downstream listener) without losing keystrokes.
+      // setEncoding('utf8') above → strings; Buffer fallback is defensive.
       const input = typeof chunk === 'string' ? chunk : chunk.toString('utf8')
       this.processInput(input)
     } catch (error) {
-      // In Bun, an uncaught throw inside a stream 'data' handler can
-      // permanently wedge the stream: subsequent events never fire.
-      // Catching here ensures the stream stays healthy so further
-      // keystrokes are still delivered.
+      // Uncaught throw in Bun's 'data' handler can wedge the stream.
+      // Re-attach listener if Bun detached it after the error, else
+      // session freezes permanently (reader dead, event loop alive).
       defaultCallbacks.logError(error)
-
-      // Re-attach the listener in case the exception detached it.
-      // Bun may remove the listener after an error; without this,
-      // the session freezes permanently (stdin reader dead, event loop alive).
       const { stdin } = this.props
       if (
         this.rawModeEnabledCount > 0 &&

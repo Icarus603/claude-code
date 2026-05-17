@@ -1614,32 +1614,18 @@ export default class Ink {
       return
     }
 
-    // Store and remove all input event listeners temporarily so Ink
-    // doesn't consume stdin while the external editor is active. We
-    // listen on 'data' (flowing mode) since App.tsx switched off
-    // 'readable'+read() — but old or third-party code might still
-    // attach to 'readable', so we sweep both. See packages/@ant/ink/src/
-    // components/App.tsx for the rationale (Bun compiled-binary stdin
-    // 'readable' is unreliable in raw mode).
-    const dataListeners = stdin.listeners('data')
-    const readableListeners = stdin.listeners('readable')
+    // Sweep both 'data' (App.tsx) and 'readable' (early-input / 3p).
+    const sweep = (event: 'data' | 'readable'): void => {
+      for (const listener of stdin.listeners(event)) {
+        this.stdinListeners.push({ event, listener: listener as (...args: unknown[]) => void })
+        stdin.removeListener(event, listener as (...args: unknown[]) => void)
+      }
+    }
     this.logger.debug(
-      `[stdin] suspendStdin: removing ${dataListeners.length} data + ${readableListeners.length} readable listener(s), wasRawMode=${(stdin as NodeJS.ReadStream & { isRaw?: boolean }).isRaw ?? false}`,
+      `[stdin] suspendStdin: removing ${stdin.listeners('data').length} data + ${stdin.listeners('readable').length} readable listener(s), wasRawMode=${(stdin as NodeJS.ReadStream & { isRaw?: boolean }).isRaw ?? false}`,
     )
-    dataListeners.forEach(listener => {
-      this.stdinListeners.push({
-        event: 'data',
-        listener: listener as (...args: unknown[]) => void,
-      })
-      stdin.removeListener('data', listener as (...args: unknown[]) => void)
-    })
-    readableListeners.forEach(listener => {
-      this.stdinListeners.push({
-        event: 'readable',
-        listener: listener as (...args: unknown[]) => void,
-      })
-      stdin.removeListener('readable', listener as (...args: unknown[]) => void)
-    })
+    sweep('data')
+    sweep('readable')
 
     // If raw mode is enabled, disable it temporarily
     const stdinWithRaw = stdin as NodeJS.ReadStream & {
