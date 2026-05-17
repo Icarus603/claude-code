@@ -41,6 +41,33 @@ import { generateJobName } from '@claude-code/agent/background/fleet/generateJob
 import { basename } from 'node:path'
 
 /**
+ * Compress assistant text into a single-line FleetView middle-column
+ * snippet. ant 3988.js leans on the LLM classifier to produce a 1-line
+ * `detail` (typically ≤80 chars) and store it as both `detail` and
+ * `output.result`; without an LLM in ccb's in-worker path we approximate
+ * by stripping markdown, picking the last sentence, then hard-clamping
+ * to MAX. ant's row Text wraps the whole line in `<Text wrap="truncate">`
+ * so the column itself enforces a visible cap; the MAX here mirrors
+ * ant's `xf=80` (5092.js detail truncation) so an overly long reply
+ * doesn't blow past the column and force ellipsis on every screen.
+ */
+const FLEET_DETAIL_MAX = 80
+function flattenAssistantReply(text: string, maxChars: number): string {
+  const trimmed = text.trim()
+  if (!trimmed) return ''
+  const noFences = trimmed.replace(/```[\s\S]*?```/g, ' ')
+  const flat = noFences
+    .replace(/\*\*?([^*]+)\*\*?/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (!flat) return ''
+  const sentences = flat.match(/[^.!?。！？]+[.!?。！？]/g) ?? [flat]
+  const pick = (sentences.at(-1) ?? flat).trim()
+  return pick.length > maxChars ? `${pick.slice(0, maxChars - 1)}…` : pick
+}
+
+/**
  * Pull the text of the last assistant message in the conversation. Used
  * by the text-inference path to decide whether the turn ended on a
  * question, a failure, or a normal completion.
@@ -152,8 +179,12 @@ export function useBgFleetStateSync(
           if (current.state === 'stopped' || current.state === 'failed') return
           const assistantText = lastAssistantText(messagesRef.current)
           const outcome = inferTurnOutcome(assistantText)
+          // ant 3988.js heuristic branches all set `detail:D, output:{result:D}`
+          // where D is the short LLM summary. Without an LLM we squeeze
+          // to the same 80-char width ant uses for row detail (xf=80).
+          const replyDetail = flattenAssistantReply(assistantText, FLEET_DETAIL_MAX)
           if (outcome.kind === 'blocked') {
-            // Stay "working" but flip tempo to blocked + record needs —
+            // Stay "working" but flip tempo to blocked + record needs.
             // FleetView buckets `tempo='blocked'` into "Needs input"
             // (matches ant deriveBand). Don't set firstTerminalAt — this
             // isn't a terminal outcome, we expect a follow-up.
@@ -161,6 +192,7 @@ export function useBgFleetStateSync(
               ...current,
               state: 'working',
               tempo: 'blocked',
+              detail: replyDetail || current.detail,
               needs: outcome.needs,
               updatedAt: now,
             })
@@ -169,6 +201,7 @@ export function useBgFleetStateSync(
               ...current,
               state: 'failed',
               tempo: 'idle',
+              detail: replyDetail || current.detail,
               updatedAt: now,
               firstTerminalAt: current.firstTerminalAt ?? now,
             })
@@ -177,6 +210,12 @@ export function useBgFleetStateSync(
               ...current,
               state: 'done',
               tempo: 'idle',
+              detail: replyDetail || current.detail,
+              // ant: pickMiddleText prefers state.output.result over
+              // state.detail for `outcome === 'success'`. Mirror the
+              // detail into output.result so the row displays the
+              // agent's reply instead of falling back to intent.
+              output: replyDetail ? { result: replyDetail } : current.output,
               needs: undefined,
               updatedAt: now,
               firstTerminalAt: current.firstTerminalAt ?? now,
