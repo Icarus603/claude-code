@@ -48,6 +48,53 @@ const VoiceIndicator: typeof import('./VoiceIndicator.js').VoiceIndicator =
 
 export const FOOTER_TEMPORARY_STATUS_TIMEOUT = 5000
 
+/**
+ * Ant `o = Boolean(G || I || m && !x || q==='invalid' || q==='missing' || K || T || O)`
+ * (v2.1.143 4930.js QW6). Returns true when the right-side notification
+ * stack is rendering any visible content. The `/goal active` indicator
+ * uses this to decide whether to prefix itself with " · " — otherwise
+ * the separator dangles on its own when no other right-side content is
+ * visible (the leading "·" bug).
+ */
+export function useNotificationsVisible(args: {
+  apiKeyStatus: VerificationStatus
+  autoUpdaterResult: AutoUpdaterResult | null
+  isAutoUpdating: boolean
+  debug: boolean
+  verbose: boolean
+  ideSelection: IDESelection | undefined
+  mcpClients?: MCPServerConnection[]
+}): boolean {
+  const { status: ideStatus } = useIdeConnectionStatus(args.mcpClients)
+  const notificationCurrent = useAppState(s => s.notifications.current)
+  const claudeAiLimits = useClaudeAiLimits()
+
+  const subscriptionType = getSubscriptionType()
+  const isTeamOrEnterprise =
+    subscriptionType === 'team' || subscriptionType === 'enterprise'
+  const isInOverageMode = claudeAiLimits.isUsingOverage ?? false
+
+  const shouldShowIdeSelection = Boolean(
+    ideStatus === 'connected' &&
+      (args.ideSelection?.filePath ||
+        (args.ideSelection?.text && args.ideSelection.lineCount > 0)),
+  )
+
+  // ant 4930.js QW6 — `O = isAutoUpdating`. We DON'T include
+  // autoUpdaterResult?.status==='success' here even though that flashes
+  // a banner: ant doesn't include it either, matching ant byte-for-byte.
+  return Boolean(
+    notificationCurrent !== null ||
+      shouldShowIdeSelection ||
+      (isInOverageMode && !isTeamOrEnterprise) ||
+      args.apiKeyStatus === 'invalid' ||
+      args.apiKeyStatus === 'missing' ||
+      args.debug ||
+      args.verbose ||
+      args.isAutoUpdating,
+  )
+}
+
 type Props = {
   apiKeyStatus: VerificationStatus
   autoUpdaterResult: AutoUpdaterResult | null

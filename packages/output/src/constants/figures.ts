@@ -10,6 +10,12 @@ export const EFFORT_MEDIUM = '◐' // \u25d0 - effort level: medium
 export const EFFORT_HIGH = '●' // \u25cf - effort level: high
 export const EFFORT_MAX = '◉' // \u25c9 - effort level: max (Opus 4.7/4.6 only)
 
+// Goal indicator glyph — ant `UC_` (U+25CE CIRCLED BULLET). Used by the
+// `/goal active` footer pill and `Goal active` panel title. Distinct
+// from BLACK_CIRCLE so the user can tell a goal indicator from an
+// assistant-turn dot at a glance.
+export const CIRCLED_BULLET = '\u25ce' // ◎
+
 // Media/trigger status indicators
 export const PLAY_ICON = '\u25b6' // ▶
 export const PAUSE_ICON = '\u23f8' // ⏸

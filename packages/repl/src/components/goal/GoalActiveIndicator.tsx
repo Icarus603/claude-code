@@ -20,7 +20,7 @@
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Box, Text } from '@anthropic/ink'
-import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
+import { CIRCLED_BULLET } from '@claude-code/output/constants/figures.js'
 import { useAppState } from '@claude-code/app-host/state/AppState.js'
 
 const PULSE_STEPS = 20
@@ -101,7 +101,7 @@ export function GoalActiveIndicator(props: {
   return (
     <Box flexShrink={0}>
       {props.withSeparator && <Text dimColor> · </Text>}
-      <Text color={dotColor}>{`${BLACK_CIRCLE} /goal active${ageLabel}`}</Text>
+      <Text color={dotColor}>{`${CIRCLED_BULLET} /goal active${ageLabel}`}</Text>
     </Box>
   )
 }

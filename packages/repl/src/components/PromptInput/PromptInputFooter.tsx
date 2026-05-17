@@ -26,7 +26,7 @@ import {
   StatusLine,
   statusLineShouldDisplay,
 } from '../StatusLine.js'
-import { Notifications } from './Notifications.js'
+import { Notifications, useNotificationsVisible } from './Notifications.js'
 import { PromptInputFooterLeftSide } from './PromptInputFooterLeftSide.js'
 import { GoalActiveIndicator } from '../goal/GoalActiveIndicator.js'
 import {
@@ -42,6 +42,13 @@ type Props = {
     show: boolean
     key?: string
   }
+  /**
+   * Source: ant 4967.js npK `leftArrowPending: K`. True during the 800ms
+   * confirm window after the user's first leftArrow-on-empty press.
+   * The footer renders `← again for agents` while pending, `← for agents`
+   * otherwise.
+   */
+  leftArrowPending?: boolean
   vimMode: VimMode | undefined
   mode: PromptInputMode
   autoUpdaterResult: AutoUpdaterResult | null
@@ -77,6 +84,7 @@ function PromptInputFooter({
   apiKeyStatus,
   debug,
   exitMessage,
+  leftArrowPending,
   vimMode,
   mode,
   autoUpdaterResult,
@@ -132,6 +140,20 @@ function PromptInputFooter({
   const pillSelected =
     tasksSelected && (coordinatorTaskCount === 0 || coordinatorTaskIndex < 0)
 
+  // ant 4930.js QW6 `o` — true when the right-side notification stack
+  // would render any visible content. /goal active pill uses this to
+  // decide whether to prefix " · ". Without this gate the separator
+  // dangles on its own (the leading "·" bug).
+  const notificationsVisible = useNotificationsVisible({
+    apiKeyStatus,
+    autoUpdaterResult,
+    isAutoUpdating,
+    debug,
+    verbose,
+    ideSelection,
+    mcpClients,
+  })
+
   // Hide `? for shortcuts` if the user has a custom status line, or during ctrl-r
   const suppressHint =
     suppressHintFromProps || statusLineShouldDisplay(settings) || isSearching
@@ -185,6 +207,7 @@ function PromptInputFooter({
             )}
           <PromptInputFooterLeftSide
             exitMessage={exitMessage}
+            leftArrowPending={leftArrowPending}
             vimMode={vimMode}
             mode={mode}
             toolPermissionContext={toolPermissionContext}
@@ -223,12 +246,14 @@ function PromptInputFooter({
             <Text dimColor>undercover</Text>
           )}
           {/*
-            Port of ant v2.1.136 4922.js (cyK module) — `/goal active`
-            pill lives on the right side of the footer, with separator
-            shown only when other right-side notifications are visible.
-            Renders null when no active goal.
+            Port of ant v2.1.143 4925.js / 4930.js — `/goal active`
+            pill lives on the right side of the footer. ant gates the
+            " · " separator on `o` (any other right-side content visible);
+            we mirror that via useNotificationsVisible. Without the gate
+            the separator dangles on its own. Renders null when no
+            active goal.
           */}
-          <GoalActiveIndicator withSeparator={true} />
+          <GoalActiveIndicator withSeparator={notificationsVisible} />
           <BridgeStatusIndicator bridgeSelected={bridgeSelected} />
         </Box>
       </Box>
