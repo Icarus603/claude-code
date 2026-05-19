@@ -449,16 +449,19 @@ export function buildGoalMetaMessage(condition: string): string {
 // ─── session restore ────────────────────────────────────────────────────
 
 /**
- * Ant `wbK` (5036.js dP6 module). Walk messages backward; return the
- * condition of the LAST goal_status attachment IF that attachment is
- * `met:false`. Returns null when the most recent goal_status is met
- * (= goal completed; nothing to restore) or no goal_status exists.
+ * Ant `BQK` (v2.1.143 5083.js, was `wbK` in v2.1.136). Walk messages backward;
+ * return the condition of the LAST goal_status attachment ONLY IF that
+ * attachment is unresolved (`!met && !failed`). Returns null otherwise.
  *
- * Why "last met:false wins": both sentinel-and-not-sentinel records
- * contribute, but the chronologically-last one determines current state.
- * A `met:true` last record means the goal was either completed
- * (`!sentinel`) or explicitly cleared by `/goal clear` (`sentinel:true`).
- * A `met:false` last record means the goal is still active and waiting.
+ * Three terminal states make a stale goal unsafe to restore:
+ *   - `met:true && !sentinel` — goal was achieved by the evaluator
+ *   - `met:true && sentinel`  — user ran `/goal clear`
+ *   - `failed:true`           — evaluator returned `impossible:true`
+ *
+ * Without the `failed` check, resuming a session whose goal was judged
+ * impossible would silently re-arm the same impossible goal. ant 1.43
+ * added this check when impossible was introduced; ccb shipped impossible
+ * (stopHooksCore.ts) without the matching restore-side guard.
  */
 export function findGoalToRestore(messages: Message[]): string | null {
   if (!messages) return null
@@ -469,13 +472,16 @@ export function findGoalToRestore(messages: Message[]): string | null {
           attachment: {
             type: string
             met?: boolean
+            failed?: boolean
             condition?: string
           }
         })
       | undefined
     if (!m || m.type !== 'attachment') continue
     if (m.attachment?.type !== 'goal_status') continue
-    return m.attachment.met ? null : (m.attachment.condition ?? null)
+    return m.attachment.met || m.attachment.failed
+      ? null
+      : (m.attachment.condition ?? null)
   }
   return null
 }

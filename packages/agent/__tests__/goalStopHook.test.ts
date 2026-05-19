@@ -160,6 +160,37 @@ describe('findGoalToRestore (ant wbK)', () => {
       ]),
     ).toBeNull()
   })
+  test('null when last goal_status is failed:true (ant 1.43 BQK)', () => {
+    // Source: ant v2.1.143 5083.js BQK — `q.attachment.met||q.attachment.failed`.
+    // Without this guard, resume-after-impossible would silently re-arm a goal
+    // the evaluator already judged unachievable. Regression test pinning the
+    // 1.43 behavior.
+    const messages = [
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        failed: true,
+        condition: 'impossible thing',
+      }),
+    ]
+    expect(findGoalToRestore(messages)).toBeNull()
+  })
+  test('failed:true after older active: failed terminates restore chain', () => {
+    const messages = [
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        condition: 'older active',
+      }),
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        failed: true,
+        condition: 'newer failed',
+      }),
+    ]
+    expect(findGoalToRestore(messages)).toBeNull()
+  })
 })
 
 describe('renderActiveGoalStatus (ant qZ3)', () => {
