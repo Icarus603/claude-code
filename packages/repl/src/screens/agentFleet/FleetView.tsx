@@ -2350,64 +2350,63 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
           />
         </Box>
       ) : null}
-      {/* Status line. Priority: quit-confirm > error > footer chord cascade. */}
-      {pendingQuitConfirm ? (
+      {/*
+       * Status line. Priority: quit-confirm > error > footer chord cascade.
+       *
+       * Source: ant 5092.js Ot3 — all footer branches render inside a single
+       *   N_.createElement(B,{flexShrink:0,paddingLeft:2,height:1},...)
+       * The paddingLeft:2 is on the WRAPPER, not on individual branches,
+       * so every footer variant (quit-confirm, error, chord cascade) gets
+       * the same 2-col left indent. peekOpen renders null here because the
+       * PeekPanel renders its own footer with its own padding.
+       */}
+      {peekOpen ? null : (
         <Box flexShrink={0} paddingLeft={2} height={1}>
-          <Text dimColor>
-            {(() => {
-              // ant 5092.js quit-confirm message:
-              //   `Press Ctrl-C again to exit${GB > 0 ? \` · ${GB} ${v6(GB,'agent')} will keep running\` : ''}`
-              // where GB counts rows in `blocked` or `working` bucket via
-              // `PZ6 === "blocked" || PZ6 === "working"`. Reassures the user
-              // that bg sessions outlive the FleetView quit.
-              const keepCount = jobs.filter(j => {
-                const band = deriveBand(j.state, presence.get(j.id))
-                return band === 'blocked' || band === 'active'
-              }).length
-              if (keepCount === 0) return 'Press Ctrl-C again to exit'
-              const noun = keepCount === 1 ? 'agent' : 'agents'
-              return `Press Ctrl-C again to exit · ${keepCount} ${noun} will keep running`
-            })()}
-          </Text>
+          {pendingQuitConfirm ? (
+            <Text dimColor>
+              {(() => {
+                // ant 5092.js quit-confirm message:
+                //   `Press Ctrl-C again to exit${GB > 0 ? \` · ${GB} ${v6(GB,'agent')} will keep running\` : ''}`
+                // where GB counts rows in `blocked` or `working` bucket via
+                // `PZ6 === "blocked" || PZ6 === "working"`. Reassures the user
+                // that bg sessions outlive the FleetView quit.
+                const keepCount = jobs.filter(j => {
+                  const band = deriveBand(j.state, presence.get(j.id))
+                  return band === 'blocked' || band === 'active'
+                }).length
+                if (keepCount === 0) return 'Press Ctrl-C again to exit'
+                const noun = keepCount === 1 ? 'agent' : 'agents'
+                return `Press Ctrl-C again to exit · ${keepCount} ${noun} will keep running`
+              })()}
+            </Text>
+          ) : errorToast !== undefined ? (
+            <Text color="error" wrap="truncate-end">{errorToast}</Text>
+          ) : (
+            <FleetFooter
+              terminalWidth={terminalWidth}
+              selectionKind={selectionKind}
+              filterText={filterText}
+              isCurrentSession={focusedJob?.state.sessionId === currentSessionId}
+              isRenaming={renameState !== undefined}
+              isTransitional={false}
+              isHeaderCollapsed={isHeaderCollapsed}
+              // ant 5092.js `_h = S$ ? "create" : (E9 && qi8(E9.state)) ? "resume" : "open"`
+              // - dispatch buffer has parseable text → create (new job)
+              // - focused job is failed/stopped → resume (respawn)
+              // - else → open (attach)
+              jobEnterAction={
+                dispatchBuf.trim() !== ''
+                  ? 'create'
+                  : focusedJob && needsRespawn(focusedJob)
+                    ? 'resume'
+                    : 'open'
+              }
+              hasDeletableJobs={hasDeletableJobs}
+              isArmedToDelete={armedDeleteId !== undefined}
+              isGrouped={groupMode === 'directory'}
+            />
+          )}
         </Box>
-      ) : errorToast !== undefined ? (
-        <Box flexShrink={0} paddingLeft={2} height={1}>
-          <Text color="error" wrap="truncate-end">{errorToast}</Text>
-        </Box>
-      ) : peekOpen ? (
-        // Source: ant 5092.js Ot3 footer cascade gate `!_H && vA.length===0`
-        // — when peek (`_H`) is open, the main FleetView chord cascade is
-        // suppressed. The peek panel renders its OWN footer (`U_`) so the
-        // chords on screen reflect the peek context (resume/close/delete)
-        // instead of the fleet navigation context (open/space/reply/?).
-        null
-      ) : (
-        <FleetFooter
-          terminalWidth={terminalWidth}
-          selectionKind={peekOpen ? 'job' : selectionKind}
-          filterText={filterText}
-          isCurrentSession={focusedJob?.state.sessionId === currentSessionId}
-          isRenaming={renameState !== undefined}
-          isTransitional={false}
-          isHeaderCollapsed={isHeaderCollapsed}
-          // ant 5092.js `_h = S$ ? "create" : (E9 && qi8(E9.state)) ? "resume" : "open"`
-          // - peek open → close (Enter closes peek)
-          // - dispatch buffer has parseable text → create (new job)
-          // - focused job is failed/stopped → resume (respawn)
-          // - else → open (attach)
-          jobEnterAction={
-            peekOpen
-              ? 'close'
-              : dispatchBuf.trim() !== ''
-                ? 'create'
-                : focusedJob && needsRespawn(focusedJob)
-                  ? 'resume'
-                  : 'open'
-          }
-          hasDeletableJobs={hasDeletableJobs}
-          isArmedToDelete={armedDeleteId !== undefined}
-          isGrouped={groupMode === 'directory'}
-        />
       )}
     </Box>
   )

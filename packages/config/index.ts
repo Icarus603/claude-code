@@ -74,7 +74,6 @@ export {
   enableConfigs,
   getOrCreateUserID,
   recordFirstStartTime,
-  markHasUsedAgentsFleet,
   getMemoryPath,
   getManagedClaudeRulesDir,
   getUserClaudeRulesDir,
