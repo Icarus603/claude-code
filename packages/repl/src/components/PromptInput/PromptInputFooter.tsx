@@ -42,13 +42,6 @@ type Props = {
     show: boolean
     key?: string
   }
-  /**
-   * Source: ant 4967.js npK `leftArrowPending: K`. True during the 800ms
-   * confirm window after the user's first leftArrow-on-empty press.
-   * The footer renders `← again for agents` while pending, `← for agents`
-   * otherwise.
-   */
-  leftArrowPending?: boolean
   vimMode: VimMode | undefined
   mode: PromptInputMode
   autoUpdaterResult: AutoUpdaterResult | null
@@ -84,7 +77,6 @@ function PromptInputFooter({
   apiKeyStatus,
   debug,
   exitMessage,
-  leftArrowPending,
   vimMode,
   mode,
   autoUpdaterResult,
@@ -207,7 +199,6 @@ function PromptInputFooter({
             )}
           <PromptInputFooterLeftSide
             exitMessage={exitMessage}
-            leftArrowPending={leftArrowPending}
             vimMode={vimMode}
             mode={mode}
             toolPermissionContext={toolPermissionContext}

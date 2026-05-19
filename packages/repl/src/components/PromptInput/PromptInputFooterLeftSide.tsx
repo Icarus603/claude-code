@@ -35,6 +35,7 @@ import { shouldHideTasksFooter } from '../tasks/taskStatusUtils.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
 import { TeamStatus } from '../teams/TeamStatus.js'
 import { isInProcessEnabled } from '@claude-code/swarm'
+import { isBgSession } from '@claude-code/agent/concurrentSessions.js'
 import { useAppState, useAppStateStore } from '../../appStateHooks.js'
 import { getIsRemoteMode } from '@claude-code/app-host/bootstrap/state.js'
 import HistorySearchInput from './HistorySearchInput.js'
@@ -424,6 +425,23 @@ function ModeIndicator({
             url={prStatus.url!}
             reviewState={prStatus.reviewState!}
           />,
+        ]
+      : []),
+    // Source: ant 4967.js Ln3 — when running as a bg session attached
+    // via FleetView, hint that ← detaches back to the fleet list. Render
+    // conditions mirror ant exactly (G7() && K && !P):
+    //   - isBgSession()        — CLAUDE_CODE_SESSION_KIND === 'bg'
+    //   - showHint             — input empty AND !isSearching (composed
+    //                            upstream by PromptInputFooter)
+    // ant's foreground !G7() branch (←-opens-FleetView via REPL bridge)
+    // is intentionally NOT ported — see memory project_fleet_left_arrow_port_failure.
+    // Pressing ← on empty prompt in a bg session triggers
+    // sendBgDetachSignal() in REPLView.tsx, which is the live counterpart.
+    ...(isBgSession() && showHint
+      ? [
+          <Text dimColor key="bg-agents">
+            ← for agents
+          </Text>,
         ]
       : []),
   ]
