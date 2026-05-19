@@ -86,6 +86,42 @@ ccb --continue
 
 ---
 
+## 代理檢視 — `ccb agents`
+
+一個用來統籌背景 session 的 TUI 儀表板。在終端機輸入：
+
+```bash
+ccb agents
+```
+
+即可看到所有背景 session 依狀態分組（等待輸入 · 進行中 · 已完成）即時列出，下方有 dispatch 輸入框可開新 session，還能用 peek 面板查看任一 session 的最近活動而不需要 attach 進去。
+
+**檢視內快捷鍵：**
+
+| 按鍵 | 動作 |
+|------|------|
+| 輸入後 `Enter` | 派發一個新的背景 session 執行該任務 |
+| `Shift+Enter` | dispatch 輸入框換行 |
+| `↑` / `↓` | 在 session 之間移動焦點 |
+| `→` | Attach 進入焦點的 session |
+| `Space` | Peek 焦點 session（不 attach 就能回覆） |
+| `Tab` | 切換 agents drawer / 接受候選 |
+| `@name` / `/cmd` | 提及 agent、skill 或 repo |
+| `Shift+↑` / `Shift+↓` | 在同一群組內重新排序 |
+| `Ctrl+R` | 重新命名焦點 session |
+| `Ctrl+T` | 把焦點 session 釘到最上面 |
+| `Ctrl+X` | 停止／刪除焦點 session（兩段式確認） |
+| `Ctrl+S` | 切換分組方式（按狀態 ↔ 按目錄） |
+| `Ctrl+G` | 把 dispatch 輸入框內容丟進 `$EDITOR` |
+| 滑鼠點擊 | 點 row 切換焦點；點輸入框可直接定位游標 |
+| `?` | 開啟檢視內說明 |
+| `Esc` | 先清空輸入，再按一次離開 |
+| `Ctrl+C` | 兩段式確認離開（背景 session 不會被停） |
+
+session 都是 PTY-backed 的，關掉終端機之後依然存活 — 之後再 `ccb agents` 就會看到它們繼續在跑。Dispatch 走 spare-worker pool，當預熱好的 worker 在的時候，新 session 幾乎瞬間就能啟動。
+
+---
+
 ## 10 分鐘上手 ccb — `/powerup`
 
 新手？在 REPL 中輸入：

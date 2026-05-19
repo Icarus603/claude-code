@@ -86,6 +86,42 @@ ccb --continue
 
 ---
 
+## Agents view — `ccb agents`
+
+A TUI dashboard for orchestrating background sessions. Type:
+
+```bash
+ccb agents
+```
+
+You get a live list of every background session grouped by state (Needs input · Working · Done), a dispatch input to launch new ones, and a peek panel for reading any session's recent activity without attaching.
+
+**Inside the agents view:**
+
+| Key | Action |
+|-----|--------|
+| Type then `Enter` | Dispatch a new background session with that task |
+| `Shift+Enter` | Newline in the dispatch input |
+| `↑` / `↓` | Move focus between sessions |
+| `→` | Attach into the focused session |
+| `Space` | Peek the focused session (reply inline without attaching) |
+| `Tab` | Toggle the agents drawer / accept suggestion |
+| `@name` / `/cmd` | Mention an agent, skill, or repo |
+| `Shift+↑` / `Shift+↓` | Reorder within a bucket |
+| `Ctrl+R` | Rename the focused session |
+| `Ctrl+T` | Pin the focused session to the top |
+| `Ctrl+X` | Stop / delete the focused session (two-step) |
+| `Ctrl+S` | Switch grouping (by state ↔ by directory) |
+| `Ctrl+G` | Open the dispatch buffer in `$EDITOR` |
+| Click | Click a row to focus it; click inside the input to move the cursor |
+| `?` | Open the in-view help overlay |
+| `Esc` | Clear input, then exit |
+| `Ctrl+C` | Confirm-then-exit (background sessions keep running) |
+
+Sessions are PTY-backed and survive after you close the terminal — re-open `ccb agents` later to find them. Dispatch goes through a spare-worker pool so a fresh session boots in ~0ms when one is ready.
+
+---
+
 ## Learn ccb in 10 minutes — `/powerup`
 
 New here? Inside the REPL, type:

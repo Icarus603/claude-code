@@ -86,6 +86,42 @@ ccb --continue
 
 ---
 
+## 代理视图 — `ccb agents`
+
+一个用来统筹后台 session 的 TUI 仪表板。在终端输入：
+
+```bash
+ccb agents
+```
+
+即可看到所有后台 session 按状态分组（等待输入 · 进行中 · 已完成）实时列出，下方有 dispatch 输入框可以开新 session，还能用 peek 面板查看任一 session 的最近活动而不必 attach 进去。
+
+**视图内快捷键：**
+
+| 按键 | 动作 |
+|------|------|
+| 输入后 `Enter` | 派发一个新的后台 session 执行该任务 |
+| `Shift+Enter` | dispatch 输入框换行 |
+| `↑` / `↓` | 在 session 之间移动焦点 |
+| `→` | Attach 进入焦点的 session |
+| `Space` | Peek 焦点 session（不 attach 就能回复） |
+| `Tab` | 切换 agents drawer / 接受候选 |
+| `@name` / `/cmd` | 提及 agent、skill 或 repo |
+| `Shift+↑` / `Shift+↓` | 在同一分组内重新排序 |
+| `Ctrl+R` | 重命名焦点 session |
+| `Ctrl+T` | 将焦点 session 钉到最上面 |
+| `Ctrl+X` | 停止 / 删除焦点 session（两步确认） |
+| `Ctrl+S` | 切换分组方式（按状态 ↔ 按目录） |
+| `Ctrl+G` | 把 dispatch 输入框内容丢进 `$EDITOR` |
+| 鼠标点击 | 点 row 切换焦点；点输入框可直接定位光标 |
+| `?` | 打开视图内帮助 |
+| `Esc` | 先清空输入，再按一次离开 |
+| `Ctrl+C` | 两步确认离开（后台 session 不会被停） |
+
+session 都是 PTY-backed 的，关掉终端之后依然存活 — 之后再 `ccb agents` 就能看到它们继续在跑。Dispatch 走 spare-worker pool，预热好的 worker 在线时新 session 几乎瞬间就能启动。
+
+---
+
 ## 10 分钟上手 ccb — `/powerup`
 
 新手？在 REPL 中输入：
