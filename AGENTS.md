@@ -1,0 +1,289 @@
+# AGENTS.md
+
+Guidance for Codex working in this repository.
+
+## Project Overview
+
+**ccb** — a public, solo-maintained Codex derivative, originating from the Anthropic npm sourcemap leak (v2.1.88, 2026-03-31) and subsequently reorganised into a packages-based monorepo. Repo is public on GitHub; binaries are distributed via GitHub Releases (`install.sh` / `install.ps1`). "Solo-maintained" means one maintainer (`Icarus603`) — not "private repo". Each install runs locally for its operator (no server-side multi-tenant), and there is no public npm package.
+
+The repo is post-V7 refactor: monolithic `src/` is gone, all code lives in `packages/*` and `packages/@ant/*` workspaces. Test count drifts week-to-week (see `bun test` output for the current number); the invariant is **0 fail**.
+
+## Commands
+
+```bash
+bun install                  # install + wire git hooks
+bun run dev                  # dev mode (MACRO defines + STABLE_FEATURES injected)
+bun run dev:inspect          # dev mode w/ debugger (set BUN_INSPECT=9229)
+bun run build                # release build → dist/cli.js (single file, target=bun)
+bun run build:standalone     # standalone binary for current platform
+bun run build:platforms      # cross-compile binaries for all platforms
+
+bun test                     # all unit + integration tests
+bun run smoke                # tests/smoke/ — runtime probe + plugin hooks
+bun test <path>              # single file
+
+bun run lint                 # biome lint .
+bun run lint:fix             # biome lint --fix .
+bun run format               # biome format --write .
+
+bun run health               # one-shot: lint + tests + build + verifier subset
+bun run doctor:arch          # full architecture verifier suite (~80 rules)
+bun run check:unused         # knip — find unused exports
+
+bun run release v26.5.N      # tag + push; release.yml builds + publishes binaries
+```
+
+### `ccb` vs `ccbdev` vs `Codex` — three CLIs, three roles
+
+The user's `~/.local/bin/` contains three look-alike binaries. Knowing which
+is which matters when debugging — testing the wrong one wastes a session.
+
+| Command  | Symlink target                                  | Purpose                                                       |
+|----------|-------------------------------------------------|---------------------------------------------------------------|
+| `ccb`    | `~/.local/share/ccb/versions/<vX.Y.Z>` binary   | Released ccb — frozen at last `bun run release`. Auto-updates from GitHub Releases. **Stable** snapshot, no local edits visible. |
+| `ccbdev` | `→ <repo>/dist/cli.js` (live symlink)           | Local-build ccb — runs whatever `bun run build` last produced. **Reflects every code change** the moment build finishes. |
+| `Codex` | Anthropic's official CLI (separate npm install) | Upstream Codex from Anthropic. Used as reference / sanity comparison; unrelated to this repo. |
+
+**Verifying a code change**: always use `ccbdev` after `bun run build`. `ccb`
+will show stale behaviour because it's pinned to the last released version.
+
+**Restart matters**: `ccbdev` reads `dist/cli.js` at process start. A running
+session keeps the OLD bytecode in memory — rebuild + restart, not just
+rebuild. (The 2026-04-29 bash-mode-debugging session lost ~30min to a
+stale ccbdev process making one fix look like it didn't take.)
+
+**`which`/symlink check** (paste this if you forget):
+```bash
+ls -la ~/.local/bin/ccb ~/.local/bin/ccbdev ~/.local/bin/Codex
+```
+
+## Architecture
+
+### Runtime & Build
+
+- **Runtime**: Bun ≥ 1.3 (not Node). `bun:bundle`, `bun:ffi`, `Bun.embeddedFiles`, `globalThis.Bun.$` are all in use.
+- **Build**: `build.ts` calls `Bun.build({ target: 'bun', splitting: false })`. Entry: `packages/cli/src/entry/cli.tsx`. Output: single `dist/cli.js` (~13 MB). The artifact is **Bun-only** — `node dist/cli.js` will throw on the first `Bun.$` reference.
+- **Defines**: `scripts/defines.ts` (centralized). `MACRO.VERSION` is derived from the latest reachable git tag — never hardcoded.
+- **Module system**: ESM (`"type": "module"`), TSX with `react-jsx`.
+- **Monorepo**: Bun workspaces — `packages/*` and `packages/@ant/*` resolved via `workspace:*`.
+- **Lint/Format**: Biome 2.x (`biome.json`).
+- **Distribution**: Standalone binaries via `bun build --compile`, installed to `~/.local/share/ccb/versions/<version>` and symlinked from `~/.local/bin/ccb`. Auto-update lives in the binary itself. Not on npm.
+
+### Entry & Bootstrap
+
+1. **`packages/cli/src/entry/cli.tsx`** — true entrypoint. `main()` dispatches fast paths (version, mcp, bridge, daemon, ps/logs/attach, dump-system-prompt, etc.) before falling through to `main.tsx`.
+2. **`packages/cli/src/entry/main.tsx`** — Commander.js CLI definition. Subcommands: `mcp`, `server`, `ssh`, `open`, `auth`, `plugin`, `agents`, `auto-mode`, `doctor`, `update`, etc. The default `.action()` handler dispatches REPL vs headless via `mode-dispatch.ts`.
+3. **`packages/cli/src/entry/mode-dispatch.ts`** — owns the REPL-launch / `--print` / `--continue` / `--resume` / setup branches. Calls `processSessionStartHooks`, `loadPluginHooks`, MCP prefetch.
+4. **`packages/app-host/src/init.ts`** — one-shot init (`enableConfigs()`, env var application, OAuth populate, telemetry).
+
+### Core Loop
+
+- **`packages/agent/query.ts`** — turn-loop generator (the central API call function). Drives streaming response, tool dispatch, stop-hook handling.
+- **`packages/agent/QueryEngine.ts`** — higher-level orchestrator wrapping `query()`. Owns conversation state, compaction, file-history snapshots, attribution.
+- **`packages/repl/src/screens/REPLView.tsx`** — interactive REPL screen (Ink/React). Input handling, message display, permission prompts, keyboard shortcuts.
+- **`packages/agent/core/AgentLoop.ts`** — the headless `-p` mode loop (used by `bun run dev -p` and SDK).
+
+### API Layer
+
+- **`packages/provider/src/`** — provider abstraction.
+  - `claudeLegacyRuntime.ts` — main streaming path; calls `anthropic.beta.messages.create`.
+  - `anthropic/client.ts` — Anthropic SDK client construction.
+  - `openai/`, `gemini/`, `grok/`, `codex/` — alt-provider adapters (each translates Anthropic-shape requests/responses to its own SDK).
+  - `cyberRiskInstruction.ts` — security-work authorization injected into the system prompt.
+  - `connections.ts` — connection registry (single source of truth for provider config; env vars are fallback only).
+- **Provider selection** in `packages/provider/src/providers.ts`.
+
+### Tool System
+
+- **`packages/tool-registry/src/tools/`** — 56 tool directories. Each: `<ToolName>/<ToolName>.ts(x)` (definition + `call()`), often with a UI component. Examples: BashTool, FileReadTool, FileEditTool, GrepTool, AgentTool, SkillTool, McpAuthTool, EnterPlanModeTool, etc.
+- **`packages/tool-registry/src/tools/registry/`** — tool assembly + feature-gated inclusion.
+- **`packages/tool-registry/src/services/toolExecution.ts`** — execution dispatcher (permission checks → call → result mapping).
+
+### UI Layer
+
+- **`packages/@ant/ink/`** — forked Ink (custom reconciler, hooks, virtual-list rendering).
+- **`packages/repl/src/components/`** — REPL React components (170+).
+  - `REPLView.tsx`, `Messages.tsx`, `MessageRow.tsx`, `PromptInput/`, `Settings/`, etc.
+- **`packages/output/`** — non-REPL output rendering (headless `--print` mode).
+- React Compiler runtime (`react/compiler-runtime`) — decompiled output has `_c()` memoization calls.
+
+### State Management
+
+- **`packages/app-host/src/state/AppState.tsx`** — central app state context.
+- **`packages/app-host/src/state/AppStateStore.ts`** — store factory + defaults.
+- **`packages/app-host/src/state/store.ts`** — Zustand-style store.
+- **`packages/app-host/src/bootstrap/state.ts`** — module-level singletons (session ID, CWD, project root, registered hooks, token counts, model overrides, permission mode).
+- **Selectors** — `state/selectors.ts`, `state/sessionSelectors.ts`, `state/permissionSelectors.ts`, `state/mcpSelectors.ts`, etc.
+
+### Host Bindings
+
+The codebase uses a **ports-and-adapters** pattern. Inner packages declare contracts; outer packages (`app-host`, `cli`) install bindings at startup.
+
+- **`packages/app-host/src/runtime/installPluginBindings.ts`** — wires `@Codex/config/plugin/_deps.ts` setters to real implementations.
+- **`packages/app-host/src/runtime/bootstrap.ts`** — installs runtime skeleton bindings (logging, fs, plugins).
+- **`packages/agent/host.ts`** — `installAgentHostBindings()` / `getAgentHostBindings()` — the agent package consumes hooks/messages/UI APIs through this.
+- **`packages/agent/agentHostBindings.ts`** — concrete binding factory; `executeStopHooks`, `executeTaskCompletedHooks`, etc. all wire here.
+- **Only one `_deps.ts` left**: `packages/config/plugin/_deps.ts` (cross-boundary plugin loader). Other packages migrated to direct imports + host bindings (V7 P7.1).
+
+### Bridge / Daemon / Background Sessions
+
+- **`packages/bridge/`** — Remote Control / Bridge mode (feature-gated `BRIDGE_MODE`). CLI: `ccb remote-control` / `ccb rc` / `ccb bridge`.
+- **`packages/daemon/`** — long-running supervisor (feature-gated `DAEMON`).
+- **Background sessions** — `ccb ps` / `logs` / `attach` / `kill` / `--bg` (feature-gated `BG_SESSIONS`).
+
+### Context & System Prompt
+
+- **`packages/agent/context.ts`** — assembles env info, git status, AGENTS.md hierarchy.
+- **`packages/agent/prompts.ts`** — `getSystemPrompt()` builds the static + dynamic prompt sections (default vs proactive paths).
+- **`packages/storage/src/claudemd.ts`** — discovers and loads AGENTS.md from project hierarchy.
+- **`packages/config/outputStyles.ts`** — output style definitions (Default / Explanatory / Learning + user-defined `.md`).
+- **`packages/agent/coordinatorMode.ts`** — coordinator-mode prompt (replaces default when `CLAUDE_CODE_COORDINATOR_MODE=1`).
+
+### Feature Flag System
+
+- **SSOT**: `scripts/default-features.ts` (`STABLE_FEATURES` array). Both `dev.ts` and `build.ts` import from here so dev and release stay aligned.
+- **Per-run override**: `FEATURE_<NAME>=1 bun run dev`.
+- **In code**: `import { feature } from 'bun:bundle'` then `feature('FLAG_NAME')` returns boolean.
+- **Type**: declared in `packages/cli/src/types/internal-modules.d.ts`.
+- **Full registry**: see `docs/feature-flags.md` (84 flags, categorised stable / opt-in / platform-detect).
+- **Common stable flags** (currently default-on): `BRIDGE_MODE`, `CHICAGO_MCP`, `VOICE_MODE`, `TOKEN_BUDGET`, `TEMPLATES`, `COORDINATOR_MODE`, `MCP_SKILLS`, `TRANSCRIPT_CLASSIFIER`.
+- **Don't redefine `feature` locally** — always import from `bun:bundle`.
+
+### Key Restored / Reimplemented Modules
+
+| Area | Status | Path |
+|------|--------|------|
+| Computer Use (macOS + Win) | Restored, working | `packages/@ant/computer-use-{mcp,input,swift}` |
+| Chrome Native Host | Restored | `packages/@ant/Codex-for-chrome-mcp` |
+| Voice Mode (Push-to-Talk) | Restored, requires Anthropic OAuth | `packages/voice/` |
+| OpenAI compat (Ollama/DeepSeek/vLLM) | Restored | `packages/provider/src/openai/` |
+| Gemini compat | Restored | `packages/provider/src/gemini/` |
+| Grok compat | Restored | `packages/provider/src/grok/` |
+| Plugins / Marketplace | Restored | `packages/config/plugin/`, `packages/repl/src/components/plugin/` |
+| MCP OAuth | Working | `packages/mcp-runtime/src/auth.ts` |
+| audio-capture-napi, image-processor-napi, color-diff-napi | Implemented | `packages/*-napi/` |
+| ripgrep-napi | Implemented (rust + napi-rs, in-process ripgrep) | `packages/ripgrep-napi/` |
+| modifiers-napi | Working — `bun:ffi` Carbon shim, not real NAPI (name is historical) | `packages/modifiers-napi/` |
+| url-handler-napi | Stub | `packages/url-handler-napi/` |
+| Analytics / GrowthBook / Sentry | Empty implementations | various |
+| LSP Server (host side) | Removed | — |
+
+### Provider Compat Layers
+
+**OpenAI** (`CLAUDE_CODE_USE_OPENAI=1`):
+- Stream adapter mode — Anthropic-shape requests get translated to OpenAI Chat Completions; SSE response gets translated back to `BetaRawMessageStreamEvent`. Downstream code is provider-agnostic.
+- Env: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, `OPENAI_DEFAULT_{HAIKU,SONNET,OPUS}_MODEL`.
+
+**Gemini** (`CLAUDE_CODE_USE_GEMINI=1`):
+- Independent env namespace — does not share with OpenAI/Anthropic.
+- Env: `GEMINI_API_KEY`, `GEMINI_BASE_URL` (default `https://generativelanguage.googleapis.com/v1beta`), `GEMINI_MODEL`, `GEMINI_DEFAULT_{HAIKU,SONNET,OPUS}_MODEL`.
+
+**Grok** — `packages/provider/src/grok/`. Similar adapter pattern.
+
+## Testing
+
+- **Framework**: `bun:test` (built-in assertions + mocks).
+- **Layout**: tests live in `packages/<pkg>/src/**/__tests__/<name>.test.ts` (in-tree) or `tests/{integration,smoke,unit}/`.
+- **Smoke**: `bun run smoke` — runtime probe + live-fire plugin hooks (validates host bindings, hook dispatch, real binary boot).
+- **Mock pattern**: `mock.module()` + `await import()` — must be inlined per test file (cannot be hoisted to a shared helper).
+- **Current state**: 0 fail invariant — see `scripts/health-check.ts` for the file split (`packages/` vs `tests/`). Total counts drift; don't pin them in docs.
+
+## Architecture Doctor
+
+- **Run**: `bun run doctor:arch` — ~80 rules covering owner-over-shim, encapsulation, ratchets, host-binding completeness, silent-failure detection, feature-flag boundaries, file-size LOC budgets, model-id boundary, etc.
+- **Pre-commit hook**: `.githooks/pre-commit` runs the fast subset (~8 rules, <2s). Wired by `bun install` (the `prepare` script sets `core.hooksPath`).
+- **Pre-push hook**: full `doctor:arch` + smoke tests. See `.githooks/pre-push`.
+- **Bypass**: `PRE_COMMIT_SKIP=1 git commit ...` only when you're certain the rule mis-flags. Don't use `--no-verify`.
+- **Ratchets**: many rules count something (LOC, tsc errors, cycles, coupling, silent-failure findings) and lock the current value. They can shrink, not grow. To bump downward: do the work, run the verifier with `--tighten`, commit the new constant.
+
+### Verifier Highlights
+
+- **`verify-deps-setters-wired`** — every `_deps.ts` setter slot must be wired by some `installXxxBindings()` (P7.1 lock).
+- **`verify-host-binding-completeness`** — every host binding contract method has a wire.
+- **`verify-silent-failure-ratchet`** — 12-audit suite (`scripts/audit-silent-failures/`); current baseline ≈ 818 findings, all CRITICAL=0 / HIGH=0.
+- **`verify-file-size`** — grandfathered LOC ratchet (`scripts/file-size-baseline.json`); new files ≤ 800 LOC.
+- **`verify-tsc-errors`** — decompilation tsc-error budget (current ~3300, ratchet down only).
+- **`verify-feature-canonical`** — `feature()` calls must come from `bun:bundle` import, not redefined.
+- **`verify-no-packed-modelid-leak`** — packed `<connId>:<modelId>` must be unpacked at user-facing boundaries (system prompt, /context, /config, error messages). Vouch tags `// modelid:bare-by-construction|already-unpacked|alias-only|debug-only` for the rare exception. History: 69f3c7c8 fixed two /config leaks but did NOT sweep — same-class leaks resurfaced in prompts.ts and analyzeContext.ts a week later (254615e2).
+- **`verify-tighten-monotonic`** — meta-verifier: every ratchet's `--tighten` is one-way down. Caught yoloClassifier 1497→1509 regression in 739c83e1; fixed 7 ratchets in one sweep.
+
+## Versioning & Releases
+
+**Tag scheme**: `v<year>.<month>.<Nth-of-month>` CalVer.
+
+```
+v26.4.1   ← Apr 2026, 1st release
+v26.4.13  ← Apr 2026, 13th release
+v26.5.1   ← May 2026, counter resets
+```
+
+- Strict 3-segment numeric → semver tools (`isVersionNewer`, npm semver, GitHub Release sort) all work natively.
+- `26.4.99 < 26.5.1` holds correctly.
+- One month rarely exceeds tens of releases — patch segment never overflows.
+- Visually distinct from ant's `v2.1.NNN` series.
+- **Don't put identifier strings (`carus`, etc.) in version numbers** — breaks sort. Identifiers go in `--version` output / banner / README.
+- **Historical `v1.carus.NNN`** (001 ~ 009) retained as history. `v26.x.x > v1.x.x` numerically, so auto-update naturally moves users forward.
+
+**Release flow** — strict order matters. release.ts v2 only tags ci.yml-verified SHAs:
+
+```bash
+# 1. commit (pre-commit hook: lint + fast doctor:arch ~8 rules)
+git commit -m "..."
+
+# 2. push (pre-push hook: full doctor:arch + smoke tests)
+git push origin main
+
+# 3. wait for ci.yml on the new SHA (release.ts requires HEAD === origin/main, but
+#    won't gate on ci.yml status — be a good citizen and verify it's green first)
+gh run watch <run-id> --exit-status
+
+# 4. tag — release.ts pre-flight refuses if HEAD ≠ origin/main
+bun run release v26.5.34
+```
+
+What `bun run release` does (see `scripts/release.ts`):
+- Pre-flight: clean working tree, valid CalVer tag, branch=main (`--force-branch` to override), HEAD === origin/main, no stale draft releases.
+- Warns if the previous `release.yml` run failed or is still in-progress.
+- Creates an annotated tag at HEAD, pushes it. `release.yml` then builds binaries for darwin-{arm64,x64} / linux-{arm64,x64} / win-x64, generates SHA256 sidecars, publishes to GitHub Releases.
+- `MACRO.VERSION` is derived from the tag (`scripts/defines.ts`) — no manual version bump anywhere.
+
+Two GH Actions pipelines, two roles:
+- **`ci.yml`** — fires on every `push` to `main`. Runs lint / build / tests / doctor:arch / smoke. Gates whether a SHA is releasable.
+- **`release.yml`** — fires on tag push (`v*.*.*`). Builds + publishes platform binaries. Doesn't re-run tests.
+
+**Auto-update**: built into the binary (`packages/updater/src/`). Polls GitHub Releases, downloads new platform binary, atomically swaps the version symlink.
+
+## Working with This Codebase
+
+- **Don't try to fix all tsc errors** — many come from decompilation (`unknown` / `never` / `{}` types). They don't affect Bun runtime. The ratchet locks the count from growing.
+- **Build artifact is Bun-only** — `node dist/cli.js` does not work (Bun-native APIs in the bundle). Run via `bun dist/cli.js` or the release binary.
+- **`bun:bundle` import** — Bun built-in module, resolved by the runtime/builder. Don't replace with a custom function.
+- **MACRO defines** — only edit `scripts/defines.ts`. `MACRO.VERSION` comes from git tag.
+- **Feature flags default-off** — every `feature('X')` returns `false` unless added to `STABLE_FEATURES` in `scripts/default-features.ts` or set per-run via `FEATURE_X=1`.
+- **React Compiler output** — decompiled `const $ = _c(N)` memoization is normal, don't "clean it up".
+- **Biome config** — many lint rules disabled (decompiled code isn't strict-lint-friendly). `.tsx` files: 120-col width + required semicolons; everything else: 80-col + as-needed.
+- **No `src/` directory** — V7 refactor is complete. All code is under `packages/<pkg>/`. Inter-package imports use the `@Codex/<pkg>` path; intra-package imports stay relative.
+- **Plugin hooks** — `loadPluginHooks()` writes to `packages/config/plugin/_deps.ts` placeholders, which `installPluginBindings.ts` wires through to `app-host` STATE. Plugin hooks and registered callbacks live in the same `STATE.registeredHooks` slot. See `docs/feature-flags.md` and `packages/agent/hooks.ts`.
+- **Solo-maintained, operator-trusted** — `CYBER_RISK_INSTRUCTION` (`packages/provider/src/cyberRiskInstruction.ts`) authorizes full security work for the operator. The binary runs locally for whoever installed it; don't add gatekeeping for hypothetical multi-tenant / hosted-service concerns. The repo is public, but solo-maintained — design decisions belong to the maintainer, not imagined downstream users (see `feedback_no_imagined_users.md`).
+
+### V9 series learnings (2026-05-04)
+
+The V9 type-narrowing pass (commits `a6f851da` → `3d3f07e4`, ~10 commits, tsc 3209 → 3103) discovered four patterns worth carrying forward:
+
+- **Shadow-stub bugs are P0**: setter-injected forwarder modules like `_deps.ts` accumulate hand-typed local stubs that drift from the real impl elsewhere. `: unknown` accepts any literal at construction sites, so the bug never surfaces — until a caller passes more args than the stub takes (V9-2.6 `isDuplicatePath`), or the return value differs (V9-2.7 `coerceDescriptionToString` returns `''` instead of `null`, breaking `?? fallback`), or the value disagrees with the canonical (V9-2.8 `BUILTIN_MARKETPLACE_NAME = 'anthropics'` vs canonical `'builtin'`). When auditing such files, **grep every `export function NAME` for OTHER `export function NAME` in the repo**; each match is a candidate broken stub. Compare signature/return/value against the canonical by hand. Memory: `feedback_p0_bug_chains_in_setter_injected_repos.md`, `feedback_shadow_stubs_compound_with_dead_code_cleanup.md`.
+- **ACCESS-vs-CONSTRUCTION rule**: when narrowing a `: unknown` shim via `import type` re-export, only **ACCESS-pattern** callers (`x.field`/`x.method()`) yield TS error elimination. **CONSTRUCTION-pattern** callers (`: T = {…}`) produce ZERO yield because `: unknown` already accepts every literal. Triage by `grep` before changing: ≥3 access sites = worth narrowing; type-annotation-only = skip. Memory: `feedback_only_access_pattern_unknown_shims_yield.md`.
+- **Three strategies for `unknown` shims**: (a) re-export from canonical home (V9-3 `TaskStateBase`, V9-2c `ToolUseContext`/`Message`), (b) delete if dead (V9-2/2.5 11 dead pairs), (c) **build the canonical type FROM the construction site** when no separate canonical home exists (V9-2b real `BashProgress`/`PowerShellProgress`/`MCPProgress` extracted from each tool's `onProgress({ data: {...} })`). Iter-18's "no canonical home → not feasible" verdict was wrong; iter-19 retracted it.
+- **`bun run scripts/verify-build-resolves.ts` after every shim deletion**: a "0-caller" delete that breaks build is a shadow stub being silently used, not dead code. Caught a bug in V9-2.7 immediately; would have looked like "the whole batch is bad" if batched at the end.
+- **When to STOP V9-style work**: V9-2d (`cli/headless.ts` 5 slots) and V9-4 (~60 misc slots) are documented in `docs/refactor/v9-deps-shrinkpath.md` as either NOT FEASIBLE or DEFERRED. The 95-shim ecosystem has been triaged; remaining yield per shim is ≤5 errors and most fall into CONSTRUCTION/no-caller categories. **Don't restart V9-style mining without a specific shim identified as ACCESS-pattern with concrete yield estimate**. The "Don't try to fix all tsc errors" rule above is the binding upper guideline.
+
+## Where to Look
+
+- **Slow startup**: `packages/app-host/src/init.ts`, `packages/cli/src/setup/setup.ts`.
+- **Stop hook didn't fire**: `packages/agent/internal/stopHooksCore.ts` → `packages/agent/agentHostBindings.ts:executeStopHooks` → `packages/agent/hooks.ts:executeStopHooks` → `hasHookForEvent` → `getRegisteredHooks()`.
+- **Tool didn't run**: `packages/tool-registry/src/services/toolExecution.ts` (permission gate + dispatch).
+- **MCP server didn't connect**: `packages/mcp-runtime/src/clientRuntime.ts`, `useManageMCPConnections.ts`.
+- **Provider routing**: `packages/provider/src/providers.ts:resolveConnectionForModel`.
+- **Plugin not loaded**: `packages/config/plugin/pluginLoader.ts:loadAllPluginsCacheOnly`, `loadPluginHooks.ts`.
+- **AGENTS.md not picked up**: `packages/storage/src/claudemd.ts`.
+- **Feature flag not taking effect**: check `scripts/default-features.ts:STABLE_FEATURES` (build/dev) and `FEATURE_X=1` env var (per-run).
+- **V9 territory** (next major refactor pass — type narrowing through `import type`): `docs/refactor/v9-deps-shrinkpath.md` is the launch blueprint. Five sections cover §1 the last `_deps.ts` lazy-require (✅ V9-1 landed 2026-05-04), §2 8 unknown setter slots + 3 LSP/MCP getter pairs (✅ V9-2 + V9-2.5 landed 2026-05-04 — both turned out to be pure dead code, not type-narrowing candidates), §3 TaskState double-union, §4+§5 the 95-slot `= unknown` boundary-shim ecosystem. Each phase has an atomic-rollback assessment.
