@@ -20,7 +20,8 @@
 
 import type React from 'react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Box, Text, instances, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
+import { Box, Text, type ClickEvent, instances, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
+import { Cursor } from '../../Cursor.js'
 import { fileURLToPath } from 'node:url'
 import { openBrowser, openPath } from '@claude-code/storage/browser.js'
 
@@ -43,6 +44,7 @@ import {
 } from '../../suggestions/commandSuggestions.js'
 import PromptInputFooterSuggestions from '../../components/PromptInput/PromptInputFooterSuggestions.js'
 import type { SuggestionItem } from '../../components/PromptInput/PromptInputFooterSuggestions.js'
+import TextInput from '../../components/TextInput.js'
 import figures from 'figures'
 
 import { getGlobalConfig, saveGlobalConfig } from '@claude-code/config'
@@ -1545,7 +1547,9 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       if (key.ctrl && input === 'c') setAttachingShort(null)
       return
     }
-    // Renaming intercepts everything.
+    // Renaming intercepts everything — route through ccb's Cursor
+    // class so the rename input gets the same key-map as the dispatch
+    // input (word jumps, kill-line, fn+backspace, etc).
     if (renameState !== undefined) {
       if (key.ctrl && input === 'c') {
         handleCancelRename()
@@ -1559,45 +1563,63 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         handleCancelRename()
         return
       }
+      const renameColumns = Math.max(terminalWidth - 4, 20)
+      const rcur = Cursor.fromText(
+        renameState.draft,
+        renameColumns,
+        renameState.cursor,
+      )
+      const applyRename = (next: Cursor): void => {
+        setRenameState(s =>
+          s ? { ...s, draft: next.text, cursor: next.offset } : s,
+        )
+      }
+      if (key.leftArrow && (key.ctrl || key.meta || key.fn)) {
+        applyRename(rcur.prevWord())
+        return
+      }
+      if (key.rightArrow && (key.ctrl || key.meta || key.fn)) {
+        applyRename(rcur.nextWord())
+        return
+      }
       if (key.leftArrow) {
-        setRenameState(s => (s ? { ...s, cursor: Math.max(0, s.cursor - 1) } : s))
+        applyRename(rcur.left())
         return
       }
       if (key.rightArrow) {
-        setRenameState(s =>
-          s ? { ...s, cursor: Math.min(s.draft.length, s.cursor + 1) } : s,
-        )
+        applyRename(rcur.right())
         return
       }
-      if (key.ctrl && input === 'a') {
-        setRenameState(s => (s ? { ...s, cursor: 0 } : s))
+      if (key.home || (key.ctrl && input === 'a')) {
+        applyRename(rcur.startOfLine())
         return
       }
-      if (key.ctrl && input === 'e') {
-        setRenameState(s => (s ? { ...s, cursor: s.draft.length } : s))
+      if (key.end || (key.ctrl && input === 'e')) {
+        applyRename(rcur.endOfLine())
         return
       }
-      if (key.backspace || key.delete) {
-        setRenameState(s => {
-          if (!s) return s
-          if (s.cursor === 0) return s
-          return {
-            ...s,
-            draft: s.draft.slice(0, s.cursor - 1) + s.draft.slice(s.cursor),
-            cursor: s.cursor - 1,
-          }
-        })
+      if (key.ctrl && input === 'u') {
+        applyRename(rcur.deleteToLineStart().cursor)
+        return
+      }
+      if (key.ctrl && input === 'k') {
+        applyRename(rcur.deleteToLineEnd().cursor)
+        return
+      }
+      if ((key.ctrl && input === 'w') || ((key.ctrl || key.meta) && key.backspace)) {
+        applyRename(rcur.deleteWordBefore().cursor)
+        return
+      }
+      if (key.delete) {
+        applyRename(key.meta ? rcur.deleteToLineEnd().cursor : rcur.del())
+        return
+      }
+      if (key.backspace) {
+        applyRename(rcur.backspace())
         return
       }
       if (input !== '' && !key.ctrl && !key.meta) {
-        setRenameState(s => {
-          if (!s) return s
-          return {
-            ...s,
-            draft: s.draft.slice(0, s.cursor) + input + s.draft.slice(s.cursor),
-            cursor: s.cursor + input.length,
-          }
-        })
+        applyRename(rcur.insert(input))
       }
       return
     }
@@ -1794,15 +1816,15 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         return
       }
       if (key.upArrow && dispatchBuf.includes('\n')) {
-        // Multi-line buffer: move cursor up by one visual line.
-        setDispatchCursor(c => {
-          const before = dispatchBuf.slice(0, c)
-          const lastNl = before.lastIndexOf('\n')
-          if (lastNl < 0) return c // already on first line
-          const lineStart = before.slice(0, lastNl).lastIndexOf('\n') + 1
-          const col = c - lastNl - 1
-          return Math.min(lastNl, lineStart + col)
-        })
+        // Multi-line buffer: move cursor up by one visual line via
+        // ccb's Cursor (same primitive ant uses through e_).
+        const inputColumns = Math.max(terminalWidth - 4, 20)
+        const next = Cursor.fromText(
+          dispatchBuf,
+          inputColumns,
+          dispatchCursor,
+        ).up()
+        setDispatchCursor(next.offset)
         return
       }
       handleMove(-1)
@@ -1816,78 +1838,16 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         return
       }
       if (key.downArrow && dispatchBuf.includes('\n')) {
-        // Multi-line buffer: move cursor down by one visual line.
-        setDispatchCursor(c => {
-          const after = dispatchBuf.slice(c)
-          const nextNl = after.indexOf('\n')
-          if (nextNl < 0) return c // already on last line
-          const lineStart = dispatchBuf.slice(0, c).lastIndexOf('\n') + 1
-          const col = c - lineStart
-          const downStart = c + nextNl + 1
-          const lineEndIdx = dispatchBuf.indexOf('\n', downStart)
-          const downEnd = lineEndIdx < 0 ? dispatchBuf.length : lineEndIdx
-          return Math.min(downEnd, downStart + col)
-        })
+        const inputColumns = Math.max(terminalWidth - 4, 20)
+        const next = Cursor.fromText(
+          dispatchBuf,
+          inputColumns,
+          dispatchCursor,
+        ).down()
+        setDispatchCursor(next.offset)
         return
       }
       handleMove(1)
-      return
-    }
-
-    // Left arrow — when dispatch buffer non-empty, move cursor within it.
-    // ant 4205.js PN consumes left/right inside the input naturally;
-    // ccb's InlineDispatchBuffer doesn't, so we route through here.
-    if (key.leftArrow && dispatchBuf !== '') {
-      setDispatchCursor(c => Math.max(0, c - 1))
-      return
-    }
-
-    // Ctrl+A / Home — jump cursor to start of buffer.
-    // Source: ant useTextInput.ts readline-style emacs keys.
-    if (
-      dispatchBuf !== '' &&
-      ((key.ctrl && input === 'a') || key.home)
-    ) {
-      setDispatchCursor(0)
-      return
-    }
-
-    // Ctrl+E / End — jump cursor to end of buffer.
-    if (
-      dispatchBuf !== '' &&
-      ((key.ctrl && input === 'e') || key.end)
-    ) {
-      setDispatchCursor(dispatchBuf.length)
-      return
-    }
-
-    // Ctrl+U — kill from cursor to start of buffer (readline kill-line-backward).
-    // Source: ant useTextInput.ts → tt7 "deleteToLineStart".
-    if (key.ctrl && input === 'u' && dispatchBuf !== '') {
-      setDispatchBuf(prev => prev.slice(dispatchCursor))
-      setDispatchCursor(0)
-      return
-    }
-
-    // Ctrl+K — kill from cursor to end of buffer (readline kill-line-forward).
-    if (key.ctrl && input === 'k' && dispatchBuf !== '') {
-      setDispatchBuf(prev => prev.slice(0, dispatchCursor))
-      return
-    }
-
-    // Ctrl+W — kill word before cursor.
-    if (key.ctrl && input === 'w' && dispatchBuf !== '') {
-      setDispatchBuf(prev => {
-        const c = Math.min(dispatchCursor, prev.length)
-        if (c === 0) return prev
-        // Walk back over trailing spaces then word chars.
-        let i = c - 1
-        while (i > 0 && /\s/.test(prev[i]!)) i--
-        while (i > 0 && !/\s/.test(prev[i - 1]!)) i--
-        const next = prev.slice(0, i) + prev.slice(c)
-        setDispatchCursor(i)
-        return next
-      })
       return
     }
 
@@ -1906,12 +1866,6 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     ) {
       setAttachingShort(focused.job.id)
       onAttach?.(focused.job.id)
-      return
-    }
-
-    // Right arrow — when dispatch buffer non-empty, move cursor right.
-    if (key.rightArrow && dispatchBuf !== '') {
-      setDispatchCursor(c => Math.min(dispatchBuf.length, c + 1))
       return
     }
 
@@ -2030,28 +1984,114 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
 
-    // Backspace — delete char before cursor (or last char when cursor
-    // is at end). Source: ant 4205.js PN useTextInput.backspace.
-    if (key.backspace || key.delete) {
-      setDispatchBuf(prev => {
-        if (prev === '') return prev
-        const c = Math.min(dispatchCursor, prev.length)
-        if (c === 0) return prev
-        const next = prev.slice(0, c - 1) + prev.slice(c)
-        setDispatchCursor(c - 1)
-        return next
-      })
+    // ── Text-edit fallthrough ──────────────────────────────────────────
+    //
+    // Source: ant 5092.js xd delegates to `e_(W_)` for every key it
+    // doesn't itself consume — `e_` is the text-input handler from `zZ`
+    // (= ccb's `useTextInput`). Rather than hand-rolling each key, route
+    // EVERYTHING that reaches this point through ccb's canonical
+    // `Cursor` class — same primitive ant uses, same primitive
+    // PromptInput / TextInput use elsewhere in ccb.
+    //
+    // Covers: arrows, ctrl/meta/fn+arrows (word jump), home/end,
+    // ctrl+a/e, ctrl+u/k/w (kill), backspace, fn+backspace = delete,
+    // ctrl/meta+backspace (kill word before), meta+delete (kill to
+    // line end), raw \x1b[H/[F escape sequences, \x7f DEL stream
+    // (SSH/tmux), embedded \r → \n, and plain char insertion.
+    const inputColumns = Math.max(terminalWidth - 4, 20)
+    const cur = Cursor.fromText(dispatchBuf, inputColumns, dispatchCursor)
+    const applyCursor = (nextCursor: Cursor): void => {
+      if (nextCursor.text !== dispatchBuf) setDispatchBuf(nextCursor.text)
+      if (nextCursor.offset !== dispatchCursor)
+        setDispatchCursor(nextCursor.offset)
+    }
+
+    if (key.leftArrow && (key.ctrl || key.meta || key.fn)) {
+      applyCursor(cur.prevWord())
+      return
+    }
+    if (key.rightArrow && (key.ctrl || key.meta || key.fn)) {
+      applyCursor(cur.nextWord())
+      return
+    }
+    if (key.leftArrow) {
+      applyCursor(cur.left())
+      return
+    }
+    if (key.rightArrow) {
+      applyCursor(cur.right())
+      return
+    }
+    if (key.home || (key.ctrl && input === 'a')) {
+      applyCursor(cur.startOfLine())
+      return
+    }
+    if (key.end || (key.ctrl && input === 'e')) {
+      applyCursor(cur.endOfLine())
+      return
+    }
+    if (key.ctrl && input === 'u') {
+      applyCursor(cur.deleteToLineStart().cursor)
+      return
+    }
+    if (key.ctrl && input === 'k') {
+      applyCursor(cur.deleteToLineEnd().cursor)
+      return
+    }
+    if (key.ctrl && input === 'w') {
+      applyCursor(cur.deleteWordBefore().cursor)
+      return
+    }
+    if (key.delete) {
+      // fn+Backspace on macOS, Del key elsewhere = forward delete.
+      // Meta+Delete = kill to end of line.
+      if (key.meta) {
+        applyCursor(cur.deleteToLineEnd().cursor)
+      } else {
+        applyCursor(cur.del())
+      }
+      return
+    }
+    if (key.backspace) {
+      // Ctrl/Meta+Backspace = kill word before. Plain = single-char.
+      if (key.ctrl || key.meta) {
+        applyCursor(cur.deleteWordBefore().cursor)
+      } else {
+        applyCursor(cur.backspace())
+      }
       return
     }
 
-    // Free typing — insert chars at cursor.
+    // Raw escape sequences some terminals send instead of triggering
+    // key.home / key.end.
+    if (input === '\x1b[H' || input === '\x1b[1~') {
+      applyCursor(cur.startOfLine())
+      return
+    }
+    if (input === '\x1b[F' || input === '\x1b[4~') {
+      applyCursor(cur.endOfLine())
+      return
+    }
+
+    // SSH/tmux: backspace can leak through as raw \x7f without
+    // key.backspace firing. Strip + apply as backspace, then insert
+    // any remainder. Source: ant useTextInput.ts:636-651, Issue #1853.
+    if (!key.backspace && !key.delete && input.includes('\x7f')) {
+      let working = cur
+      for (const ch of input) {
+        if (ch === '\x7f') working = working.backspace()
+        else if (!key.ctrl && !key.meta) {
+          working = working.insert(ch === '\r' ? '\n' : ch)
+        }
+      }
+      applyCursor(working)
+      return
+    }
+
+    // Free typing. Embedded \r → \n (multi-line paste from terminals
+    // without bracketed paste). Source: ant useTextInput.ts:584-602.
     if (input !== '' && !key.ctrl && !key.meta) {
-      setDispatchBuf(prev => {
-        const c = Math.min(dispatchCursor, prev.length)
-        const next = prev.slice(0, c) + input + prev.slice(c)
-        setDispatchCursor(c + input.length)
-        return next
-      })
+      applyCursor(cur.insert(input.replace(/\r/g, '\n')))
     }
   })
 
@@ -2256,13 +2296,89 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         <Box flexShrink={0} paddingRight={1}>
           <Text dimColor={!dispatchActive}>{figures.pointer}</Text>
         </Box>
-        <Box flexGrow={1}>
-          <InlineDispatchBuffer
-            buffer={dispatchBuf}
+        <Box
+          flexGrow={1}
+          // Source: ant 4205.js PN — clicking inside the input area
+          // moves the cursor to the clicked offset. Mirrors the
+          // PromptInput.handleInputClick handler at PromptInput.tsx:2536:
+          // build a Cursor for the current text + width, compute
+          // (line, column) from (localRow, localCol), then ask the
+          // measuredText for the corresponding buffer offset.
+          //
+          // Mouse tracking is enabled only inside <AlternateScreen>,
+          // which agentsFleet mounts via mountFleetView. Outside alt-
+          // screen (e.g., tests, headless), onClick simply never fires.
+          onClick={(e: ClickEvent) => {
+            if (!dispatchActive) return
+            if (!dispatchBuf) {
+              setDispatchCursor(0)
+              return
+            }
+            const inputColumns = Math.max(terminalWidth - 4, 20)
+            const c = Cursor.fromText(
+              dispatchBuf,
+              inputColumns,
+              dispatchCursor,
+            )
+            const viewportStart = c.getViewportStartLine()
+            const offset = c.measuredText.getOffsetFromPosition({
+              line: e.localRow + viewportStart,
+              column: e.localCol,
+            })
+            setDispatchCursor(offset)
+          }}
+        >
+          {/* Source: ant 5092.js Ot3 PN render — uses the canonical PN
+              (PromptInput / TextInput) component, NOT a hand-rolled
+              inline buffer renderer. The hand-rolled InlineDispatchBuffer
+              used by ccb pre-v26.5.78 broke at the wrap boundary
+              (each <Text> segment rendered as a separate row, doubling
+              the cursor cell at end-of-line) and offered no click-to-
+              position support. TextInput renders via Ansi-encoded
+              renderedValue which handles wrap + cursor correctly.
+
+              focus={false} keeps TextInput's internal useInput INACTIVE
+              so the FleetView outer useInput cascade (escape, ctrl+c,
+              tab, return, char insert, backspace, arrows) continues to
+              drive the buffer state. dispatchBuf + dispatchCursor are
+              the source of truth; TextInput just renders.
+
+              dispatchHighlights are converted from [start,end] tuples
+              to TextHighlight records with `color: 'suggestion'`. */}
+          <TextInput
+            value={dispatchBuf}
+            onChange={setDispatchBuf}
+            cursorOffset={dispatchCursor}
+            onChangeCursorOffset={setDispatchCursor}
             placeholder="start a task in the background"
-            focused={dispatchActive}
-            cursor={dispatchCursor}
-            highlights={dispatchHighlights}
+            focus={false}
+            showCursor={dispatchActive}
+            multiline={true}
+            columns={Math.max(terminalWidth - 4, 20)}
+            highlights={dispatchHighlights.map(([start, end]) => ({
+              start,
+              end,
+              color: 'suggestion',
+            }))}
+            // We pass focus={false} so TextInput's internal useInput
+            // doesn't steal chords from FleetView's outer cascade.
+            // But renderPlaceholder gates the inverse-cursor on
+            // `focus && terminalFocus`, so when dispatchBuf === '' the
+            // placeholder renders WITHOUT a cursor — the user opens
+            // FleetView and sees a "cursorless" prompt. Override with
+            // placeholderElement: inverse first char + dim rest,
+            // active whenever dispatch is active. Matches the old
+            // InlineDispatchBuffer empty-buffer rendering.
+            placeholderElement={
+              dispatchActive ? (
+                <>
+                  <Text inverse>{'s'}</Text>
+                  <Text dimColor>{'tart a task in the background'}</Text>
+                </>
+              ) : (
+                <Text dimColor>{'start a task in the background'}</Text>
+              )
+            }
           />
         </Box>
       </Box>
