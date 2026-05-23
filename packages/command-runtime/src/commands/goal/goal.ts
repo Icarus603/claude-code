@@ -30,7 +30,9 @@ import {
   clearGoalStopHook,
   GOAL_CONDITION_MAX_LENGTH,
   isGoalClearKeyword,
+  pauseGoalStopHook,
   renderActiveGoalStatus,
+  resumeGoalStopHook,
 } from '@claude-code/agent/goalStopHook.js'
 import type { Message } from '@claude-code/agent/messageShapes'
 import {
@@ -41,7 +43,7 @@ import {
 export async function call(
   onDone: LocalJSXCommandOnDone,
   context: {
-    getAppState: () => { activeGoal?: { condition: string; iterations: number; setAt: number; tokensAtStart: number; lastReason?: string } }
+    getAppState: () => { activeGoal?: { condition: string; iterations: number; setAt: number; tokensAtStart: number; lastReason?: string; paused?: boolean } }
     setAppState: (updater: (prev: any) => any) => void
     setMessages: (updater: (prev: any[]) => any[]) => void
     messages?: Message[]
@@ -75,6 +77,25 @@ export async function call(
     const prior = clearGoalStopHook(ctx)
     onDone(prior === null ? 'No goal set' : `Goal cleared: ${prior}`, {
       display: 'system',
+    })
+    return null
+  }
+
+  if (trimmed.toLowerCase() === 'pause') {
+    const prior = pauseGoalStopHook(ctx)
+    onDone(prior === null ? 'No goal set' : `Goal paused: ${prior}`, {
+      display: 'system',
+    })
+    return null
+  }
+
+  if (trimmed.toLowerCase() === 'resume') {
+    const prior = resumeGoalStopHook(ctx)
+    onDone(prior === null ? 'No goal set' : `Goal resumed: ${prior}`, {
+      display: 'system',
+      ...(prior === null
+        ? {}
+        : { shouldQuery: true, metaMessages: [buildGoalMetaMessage(prior)] }),
     })
     return null
   }

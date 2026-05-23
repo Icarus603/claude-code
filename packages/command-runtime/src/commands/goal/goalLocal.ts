@@ -30,6 +30,8 @@ import {
   formatLastCheck,
   GOAL_CONDITION_MAX_LENGTH,
   isGoalClearKeyword,
+  pauseGoalStopHook,
+  resumeGoalStopHook,
 } from '@claude-code/agent/goalStopHook.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -58,6 +60,7 @@ export const call: LocalCommandCall = async (
           condition: string
           iterations: number
           lastReason?: string
+          paused?: boolean
         }
       | undefined
     if (!goal) {
@@ -66,7 +69,9 @@ export const call: LocalCommandCall = async (
         value: 'No goal set. Usage: `/goal <condition>`',
       }
     }
-    const iter = `${goal.iterations} ${plural(goal.iterations, 'iteration')}`
+    const iter = goal.paused
+      ? 'paused'
+      : `${goal.iterations} ${plural(goal.iterations, 'iteration')}`
     const reasonLine = goal.lastReason ? `\n${formatLastCheck(goal.lastReason)}` : ''
     return {
       type: 'text',
@@ -82,11 +87,23 @@ export const call: LocalCommandCall = async (
     }
   }
 
-  if (trimmed.length > GOAL_CONDITION_MAX_LENGTH) {
+  if (trimmed.toLowerCase() === 'pause') {
+    const prior = pauseGoalStopHook(ctx)
     return {
       type: 'text',
-      value: `Goal condition is limited to ${GOAL_CONDITION_MAX_LENGTH} characters (got ${trimmed.length})`,
+      value: prior === null ? 'No goal set' : `Goal paused: ${prior}`,
     }
+  }
+
+  if (trimmed.toLowerCase() === 'resume') {
+    const prior = resumeGoalStopHook(ctx)
+    return prior === null
+      ? { type: 'text', value: 'No goal set' }
+      : {
+          type: 'query',
+          value: `Goal resumed: ${prior}`,
+          prompt: buildGoalMetaMessage(prior),
+        }
   }
 
   // ant v2.1.142 baH/PB8: gate /goal set behind hooks-enabled AND trust-accepted.
@@ -100,6 +117,19 @@ export const call: LocalCommandCall = async (
       error_code: gate.code as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     return { type: 'text', value: gate.message }
+  }
+
+  if (trimmed.length > GOAL_CONDITION_MAX_LENGTH) {
+    logEvent('tengu_feature_sad', {
+      feature_name:
+        'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_code:
+        'too_long' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+    return {
+      type: 'text',
+      value: `Goal condition is limited to ${GOAL_CONDITION_MAX_LENGTH} characters (got ${trimmed.length})`,
+    }
   }
 
   addGoalStopHook(trimmed, ctx)

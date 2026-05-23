@@ -293,10 +293,11 @@ export async function* handleStopHooks(
                       iterations: number
                       setAt: number
                       tokensAtStart: number
+                      paused?: boolean
                     }
                   }
                 ).activeGoal
-                if (activeGoal && activeGoal.condition === hookPrompt) {
+                if (activeGoal && !activeGoal.paused && activeGoal.condition === hookPrompt) {
                   const iterations = activeGoal.iterations + 1
                   const durationMs = Date.now() - activeGoal.setAt
                   const tokens = getTotalOutputTokens() - activeGoal.tokensAtStart
@@ -431,10 +432,11 @@ export async function* handleStopHooks(
                 iterations: number
                 setAt: number
                 lastReason?: string
+                paused?: boolean
               }
             }
           ).activeGoal
-          if (activeGoal && activeGoal.condition === hookPrompt) {
+          if (activeGoal && !activeGoal.paused && activeGoal.condition === hookPrompt) {
             isGoalBlock = true
             const reason = (result as { stopReason?: string }).stopReason
             // Port of ant 3991.js Qo7 + 3973.js hd7 blocking branch:

@@ -443,6 +443,8 @@ export type AppState = DeepImmutable<{
     iterations: number
     setAt: number
     tokensAtStart: number
+    lastReason?: string
+    paused?: boolean
   }
   // Always-on bridge: permission callbacks for bidirectional permission checks
   replBridgePermissionCallbacks?: BridgePermissionCallbacks

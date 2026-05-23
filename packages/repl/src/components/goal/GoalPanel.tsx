@@ -63,7 +63,9 @@ export function GoalPanel(props: {
     const tokensSince = getTotalOutputTokens() - activeGoal.tokensAtStart
     const tokensLabel = `${formatTokensCompact(tokensSince)} tokens`
 
-    const statParts: string[] = [`running ${elapsed}`]
+    const statParts: string[] = [
+      activeGoal.paused ? `paused after ${elapsed}` : `running ${elapsed}`,
+    ]
     if (activeGoal.iterations > 0) {
       statParts.push(
         `${activeGoal.iterations} ${plural(activeGoal.iterations, 'turn')}`,
@@ -76,7 +78,7 @@ export function GoalPanel(props: {
       <Box flexDirection="column">
         <Box flexDirection="row">
           <Text>⏺ </Text>
-          <Text>Goal active</Text>
+          <Text>{activeGoal.paused ? 'Goal paused' : 'Goal active'}</Text>
         </Box>
         <Box paddingLeft={2}>
           <Text dimColor>{subtitle}</Text>
@@ -96,7 +98,9 @@ export function GoalPanel(props: {
         </Box>
         <Box marginTop={1}>
           <Text dimColor>
-            /goal clear to stop early · esc to dismiss
+            {activeGoal.paused
+              ? '/goal resume to continue · /goal clear to remove · esc to dismiss'
+              : '/goal pause to pause · /goal clear to stop early · esc to dismiss'}
           </Text>
         </Box>
       </Box>

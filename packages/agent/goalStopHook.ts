@@ -15,7 +15,7 @@
  *   - qZ3  → renderActiveGoalStatus (with KZ3 "last met" lookback)
  *   - KZ3  → findMostRecentMetGoalStatus
  *   - Wj6  → formatLastCheck (` "Last check: <reason>" `)
- *   - HoH  → isGoalCommandEnabled (`tengu_maple_tide` flag)
+ *   - HoH  → isGoalCommandEnabled (ccb default-on, env kill-switch)
  *
  * Algorithm (matches ant byte-for-byte):
  *   addGoalStopHook (krH):
@@ -99,6 +99,8 @@ export type ActiveGoal = {
   lastReason?: string
   /** Cumulative output tokens at goal-set time — ant v2.1.142 nf(). */
   tokensAtStart: number
+  /** User-paused goals retain status in AppState but remove the Stop hook. */
+  paused?: boolean
 }
 
 /** Most-recent met-goal record, surfaced as "Last: ✔ <cond> — <stats>". */
@@ -254,6 +256,34 @@ function existingGoalHooks(ctx: GoalHookContext): HookCommand[] {
   return matches
 }
 
+function clearGoalRuntimeState(
+  setAppState: GoalHookContext['setAppState'],
+  sessionId: string,
+): void {
+  setAppState(prev => {
+    const store = prev.sessionHooks.get(sessionId)
+    if (!store) return { ...prev, activeGoal: undefined }
+
+    const stopMatchers = store.hooks.Stop ?? []
+    const updatedStopMatchers = stopMatchers.flatMap(matcher => {
+      if (matcher.matcher !== '' || matcher.skillRoot !== undefined) {
+        return [matcher]
+      }
+      const hooks = matcher.hooks.filter(({ hook }) => hook.type !== 'prompt')
+      return hooks.length === 0 ? [] : [{ ...matcher, hooks }]
+    })
+
+    const hooks = { ...store.hooks }
+    if (updatedStopMatchers.length === 0) {
+      delete hooks.Stop
+    } else {
+      hooks.Stop = updatedStopMatchers
+    }
+    prev.sessionHooks.set(sessionId, { ...store, hooks })
+    return { ...prev, activeGoal: undefined }
+  })
+}
+
 /**
  * Add a /goal Stop hook. Replaces any existing /goal hook (no two goals
  * at once — ant's krH semantics).
@@ -307,21 +337,95 @@ export function addGoalStopHook(
  * Clear the active /goal Stop hook. Returns the prior condition (so the
  * caller can show "Goal cleared: <text>"), or null when no goal was set.
  */
-export function clearGoalStopHook(ctx: GoalHookContext): string | null {
-  const matches = existingGoalHooks(ctx)
-  if (matches.length === 0) return null
-  // ant VrH: first hook's prompt is the canonical "condition" used in the
-  // cleared message even if more than one goal hook somehow co-existed.
-  const first = matches[0]!
-  const condition =
-    first.type === 'prompt' ? (first as { prompt: string }).prompt : ''
-  for (const hook of matches) {
+function appendGoalStatusAttachment(
+  ctx: GoalHookContext,
+  attachment: {
+    met: boolean
+    condition: string
+    failed?: boolean
+    paused?: boolean
+    reason?: string
+    iterations?: number
+    durationMs?: number
+    tokens?: number
+  },
+): void {
+  ctx.setMessages(prev => [
+    ...prev,
+    {
+      type: 'attachment',
+      uuid: randomUUID(),
+      timestamp: new Date().toISOString(),
+      attachment: {
+        type: 'goal_status',
+        ...attachment,
+      },
+    } as AttachmentMessage,
+  ])
+}
+
+export function pauseGoalStopHook(ctx: GoalHookContext): string | null {
+  const activeGoal = ctx.getAppState().activeGoal
+  if (!activeGoal) return null
+  for (const hook of existingGoalHooks(ctx)) {
     removeSessionHook(ctx.setAppState, ctx.sessionId, 'Stop', hook)
   }
   ctx.setAppState(prev => ({
     ...prev,
-    activeGoal: undefined,
+    activeGoal: prev.activeGoal && { ...prev.activeGoal, paused: true },
   }))
+  appendGoalStatusAttachment(ctx, {
+    met: false,
+    paused: true,
+    condition: activeGoal.condition,
+    reason: 'Goal paused by user',
+    iterations: activeGoal.iterations,
+    tokens: getTotalOutputTokens() - activeGoal.tokensAtStart,
+  })
+  logEvent('tengu_goal_paused', { promptLength: activeGoal.condition.length })
+  return activeGoal.condition
+}
+
+export function resumeGoalStopHook(ctx: GoalHookContext): string | null {
+  const activeGoal = ctx.getAppState().activeGoal
+  if (!activeGoal) return null
+  for (const hook of existingGoalHooks(ctx)) {
+    removeSessionHook(ctx.setAppState, ctx.sessionId, 'Stop', hook)
+  }
+  addSessionHook(ctx.setAppState, ctx.sessionId, 'Stop', '', {
+    type: 'prompt',
+    prompt: activeGoal.condition,
+  })
+  ctx.setAppState(prev => ({
+    ...prev,
+    activeGoal: prev.activeGoal && { ...prev.activeGoal, paused: false },
+  }))
+  appendGoalStatusAttachment(ctx, {
+    met: false,
+    condition: activeGoal.condition,
+    reason: 'Goal resumed by user',
+    iterations: activeGoal.iterations,
+    tokens: getTotalOutputTokens() - activeGoal.tokensAtStart,
+  })
+  logEvent('tengu_goal_resumed', { promptLength: activeGoal.condition.length })
+  return activeGoal.condition
+}
+
+export function clearGoalStopHook(ctx: GoalHookContext): string | null {
+  const matches = existingGoalHooks(ctx)
+  const activeGoal = ctx.getAppState().activeGoal
+  if (matches.length === 0 && activeGoal === undefined) return null
+  // ant VrH: first hook's prompt is the canonical "condition" used in the
+  // cleared message even if more than one goal hook somehow co-existed.
+  const first = matches[0]
+  const condition =
+    first?.type === 'prompt'
+      ? (first as { prompt: string }).prompt
+      : activeGoal?.condition ?? ''
+  for (const hook of matches) {
+    removeSessionHook(ctx.setAppState, ctx.sessionId, 'Stop', hook)
+  }
+  clearGoalRuntimeState(ctx.setAppState, ctx.sessionId)
   // Sentinel attachment so the model sees a clear event in the transcript.
   ctx.setMessages(prev => [
     ...prev,
@@ -417,6 +521,7 @@ export function renderActiveGoalStatus(
     goal.iterations === 0
       ? 'not yet evaluated'
       : `${goal.iterations} ${pluralize(goal.iterations, 'iteration')}`
+  const status = goal.paused ? 'paused' : iter
   const setLine = `set ${formatRelativeDate(new Date(goal.setAt))} · `
   // Compute token delta from goal baseline — ant v2.1.142 nf() delta.
   // Safe-guarded: in test environments getTotalOutputTokens may not be
@@ -430,10 +535,12 @@ export function renderActiveGoalStatus(
   }
   const lines: Array<string | false | undefined> = [
     `● Goal: ${goal.condition}`,
-    `${setLine}${iter}`,
+    `${setLine}${status}`,
     tokenLine,
     goal.lastReason && formatLastCheck(goal.lastReason),
-    '`/goal clear` to remove',
+    goal.paused
+      ? '`/goal resume` to continue · `/goal clear` to remove'
+      : '`/goal pause` to pause · `/goal clear` to remove',
   ]
   return lines.filter(Boolean).join('\n')
 }
@@ -463,7 +570,12 @@ export function buildGoalMetaMessage(condition: string): string {
  * added this check when impossible was introduced; ccb shipped impossible
  * (stopHooksCore.ts) without the matching restore-side guard.
  */
-export function findGoalToRestore(messages: Message[]): string | null {
+type GoalRestoreState = {
+  condition: string
+  paused: boolean
+}
+
+function findGoalRestoreState(messages: Message[]): GoalRestoreState | null {
   if (!messages) return null
   for (let i = messages.length - 1; i >= 0; i--) {
     const m = messages[i] as
@@ -473,17 +585,23 @@ export function findGoalToRestore(messages: Message[]): string | null {
             type: string
             met?: boolean
             failed?: boolean
+            paused?: boolean
             condition?: string
           }
         })
       | undefined
     if (!m || m.type !== 'attachment') continue
     if (m.attachment?.type !== 'goal_status') continue
-    return m.attachment.met || m.attachment.failed
-      ? null
-      : (m.attachment.condition ?? null)
+    if (m.attachment.met || m.attachment.failed) return null
+    const condition = m.attachment.condition
+    return condition ? { condition, paused: m.attachment.paused === true } : null
   }
   return null
+}
+
+export function findGoalToRestore(messages: Message[]): string | null {
+  const state = findGoalRestoreState(messages)
+  return state && !state.paused ? state.condition : null
 }
 
 /**
@@ -504,18 +622,19 @@ export function restoreGoalFromTranscript(
   setAppState: (updater: (prev: any) => any) => void,
   sessionId: string,
 ): void {
-  const condition = findGoalToRestore(messages)
-  if (condition === null) {
+  const restore = findGoalRestoreState(messages)
+  if (restore === null) {
     setAppState(prev =>
       prev.activeGoal === undefined ? prev : { ...prev, activeGoal: undefined },
     )
     return
   }
+  const { condition, paused } = restore
   // ant v2.1.142 n06: re-check gates on restore — hooks or trust may have
   // changed since the goal was originally set. Restore-path gate excludes
   // the trust check (trust dialog runs before restore and a restored
   // transcript inherits the session's trust state).
-  if (isGoalBlockedByHooksGate()) {
+  if (!paused && isGoalBlockedByHooksGate()) {
     logEvent('tengu_feature_sad', {
       feature_name: 'goal_set' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       error_code: 'hooks_gate' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -525,10 +644,12 @@ export function restoreGoalFromTranscript(
     )
     return
   }
-  addSessionHook(setAppState, sessionId, 'Stop', '', {
-    type: 'prompt',
-    prompt: condition,
-  })
+  if (!paused) {
+    addSessionHook(setAppState, sessionId, 'Stop', '', {
+      type: 'prompt',
+      prompt: condition,
+    })
+  }
   setAppState(prev => ({
     ...prev,
     activeGoal: {
@@ -536,6 +657,7 @@ export function restoreGoalFromTranscript(
       iterations: 0,
       setAt: Date.now(),
       tokensAtStart: getTotalOutputTokens(),
+      paused,
     } satisfies ActiveGoal,
   }))
   logEvent('tengu_goal_restored_on_resume', { promptLength: condition.length })

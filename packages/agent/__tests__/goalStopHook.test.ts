@@ -2,22 +2,34 @@
  * Tests for /goal Stop-hook helpers — port-correctness against ant
  * v2.1.136 (4513.js, 4688.js, 4689.js, 5036.js).
  *
- * The setAppState/setMessages/sessionHooks plumbing is integration —
- * we keep these tests focused on the pure helpers (KZ3/qZ3, Pj6, jf3,
- * dYK, wbK) so future regressions in those invariants are caught at
- * unit-test cost.
+ * Coverage includes pure helpers (KZ3/qZ3, Pj6, jf3, dYK, wbK) plus the
+ * session-hook/AppState mutation path. /goal is a state machine: helper-only
+ * tests miss hook replacement, sentinel persistence, and restore side effects.
  */
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, mock, test } from 'bun:test'
+
+const realHooksConfigSnapshot = await import('../hooksConfigSnapshot.js')
+mock.module('../hooksConfigSnapshot.js', () => ({
+  ...realHooksConfigSnapshot,
+  shouldDisableAllHooksIncludingManaged: () => false,
+  shouldAllowManagedHooksOnly: () => false,
+}))
 import {
   GOAL_CLEAR_KEYWORDS,
   GOAL_CONDITION_MAX_LENGTH,
+  addGoalStopHook,
   buildGoalMetaMessage,
+  clearGoalStopHook,
   findGoalToRestore,
   findMostRecentMetGoalStatus,
   formatLastCheck,
   isGoalClearKeyword,
+  pauseGoalStopHook,
   renderActiveGoalStatus,
+  restoreGoalFromTranscript,
+  resumeGoalStopHook,
 } from '../goalStopHook.js'
+import { getSessionHooks } from '../hooks/sessionHooks.js'
 import type { Message } from '../messageShapes.js'
 
 describe('GOAL_CONDITION_MAX_LENGTH', () => {
@@ -76,6 +88,208 @@ function attachmentMessage(
     attachment,
   } as unknown as Message
 }
+
+type TestState = {
+  activeGoal?: {
+    condition: string
+    iterations: number
+    setAt: number
+    tokensAtStart: number
+    lastReason?: string
+    paused?: boolean
+  }
+  sessionHooks: Map<string, { hooks: Record<string, unknown[]> }>
+}
+
+function createGoalContext(sessionId = 'session-goal') {
+  let state: TestState = { sessionHooks: new Map() }
+  let messages: Message[] = []
+  const setAppState = (updater: (prev: TestState) => TestState) => {
+    state = updater(state)
+  }
+  const setMessages = (updater: (prev: Message[]) => Message[]) => {
+    messages = updater(messages)
+  }
+  return {
+    sessionId,
+    ctx: {
+      getAppState: () => state as any,
+      setAppState: setAppState as any,
+      setMessages,
+      sessionId,
+      getMessages: () => messages,
+    },
+    get state() {
+      return state
+    },
+    get messages() {
+      return messages
+    },
+  }
+}
+
+function stopPromptHooks(state: TestState, sessionId: string): string[] {
+  const stopHooks = getSessionHooks(state as any, sessionId, 'Stop').get('Stop') ?? []
+  return stopHooks.flatMap(matcher =>
+    matcher.hooks
+      .filter(hook => hook.type === 'prompt')
+      .map(hook => (hook as { prompt: string }).prompt),
+  )
+}
+
+describe('goal Stop-hook lifecycle mutation', () => {
+  test('addGoalStopHook installs one Stop prompt hook, activeGoal, and set sentinel', () => {
+    const harness = createGoalContext()
+
+    addGoalStopHook('ship the patch', harness.ctx)
+
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([
+      'ship the patch',
+    ])
+    expect(harness.state.activeGoal?.condition).toBe('ship the patch')
+    expect(harness.state.activeGoal?.iterations).toBe(0)
+    expect(harness.state.activeGoal?.tokensAtStart).toBeNumber()
+    expect(harness.messages).toHaveLength(1)
+    expect((harness.messages[0] as any).attachment).toMatchObject({
+      type: 'goal_status',
+      met: false,
+      sentinel: true,
+      condition: 'ship the patch',
+    })
+  })
+
+  test('addGoalStopHook replaces the previous goal hook instead of stacking goals', () => {
+    const harness = createGoalContext()
+
+    addGoalStopHook('first goal', harness.ctx)
+    addGoalStopHook('second goal', harness.ctx)
+
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([
+      'second goal',
+    ])
+    expect(harness.state.activeGoal?.condition).toBe('second goal')
+    expect(harness.messages.map(m => (m as any).attachment.condition)).toEqual([
+      'first goal',
+      'second goal',
+    ])
+  })
+
+  test('clearGoalStopHook removes goal hook, clears activeGoal, and appends clear sentinel', () => {
+    const harness = createGoalContext()
+    addGoalStopHook('goal to clear', harness.ctx)
+
+    const prior = clearGoalStopHook(harness.ctx)
+
+    expect(prior).toBe('goal to clear')
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([])
+    expect(harness.state.activeGoal).toBeUndefined()
+    expect((harness.messages.at(-1) as any).attachment).toMatchObject({
+      type: 'goal_status',
+      met: true,
+      sentinel: true,
+      condition: 'goal to clear',
+    })
+  })
+
+  test('pauseGoalStopHook removes Stop hook but keeps paused activeGoal', () => {
+    const harness = createGoalContext()
+    addGoalStopHook('pause me', harness.ctx)
+
+    const prior = pauseGoalStopHook(harness.ctx)
+
+    expect(prior).toBe('pause me')
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([])
+    expect(harness.state.activeGoal).toMatchObject({
+      condition: 'pause me',
+      paused: true,
+    })
+    expect((harness.messages.at(-1) as any).attachment).toMatchObject({
+      type: 'goal_status',
+      met: false,
+      paused: true,
+      condition: 'pause me',
+    })
+  })
+
+  test('resumeGoalStopHook restores Stop hook and unpauses activeGoal', () => {
+    const harness = createGoalContext()
+    addGoalStopHook('resume me', harness.ctx)
+    pauseGoalStopHook(harness.ctx)
+
+    const prior = resumeGoalStopHook(harness.ctx)
+
+    expect(prior).toBe('resume me')
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([
+      'resume me',
+    ])
+    expect(harness.state.activeGoal).toMatchObject({
+      condition: 'resume me',
+      paused: false,
+    })
+    expect((harness.messages.at(-1) as any).attachment).toMatchObject({
+      type: 'goal_status',
+      met: false,
+      condition: 'resume me',
+    })
+  })
+
+  test('clearGoalStopHook returns null without mutating messages when no goal hook exists', () => {
+    const harness = createGoalContext()
+
+    expect(clearGoalStopHook(harness.ctx)).toBeNull()
+    expect(harness.messages).toEqual([])
+    expect(harness.state.activeGoal).toBeUndefined()
+  })
+
+  test('restoreGoalFromTranscript re-arms unresolved transcript goal', () => {
+    const harness = createGoalContext('restore-session')
+    const messages = [
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        condition: 'finish restored work',
+      }),
+    ]
+
+    restoreGoalFromTranscript(
+      messages,
+      harness.ctx.setAppState,
+      harness.sessionId,
+    )
+
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([
+      'finish restored work',
+    ])
+    expect(harness.state.activeGoal).toMatchObject({
+      condition: 'finish restored work',
+      iterations: 0,
+    })
+  })
+
+  test('restoreGoalFromTranscript clears stale activeGoal after terminal transcript state', () => {
+    const harness = createGoalContext('terminal-session')
+    addGoalStopHook('stale goal', harness.ctx)
+    const messages = [
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        failed: true,
+        condition: 'stale goal',
+      }),
+    ]
+
+    restoreGoalFromTranscript(
+      messages,
+      harness.ctx.setAppState,
+      harness.sessionId,
+    )
+
+    expect(harness.state.activeGoal).toBeUndefined()
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([
+      'stale goal',
+    ])
+  })
+})
 
 describe('findMostRecentMetGoalStatus (ant KZ3)', () => {
   test('returns null when no goal_status messages', () => {
@@ -175,6 +389,47 @@ describe('findGoalToRestore (ant wbK)', () => {
     ]
     expect(findGoalToRestore(messages)).toBeNull()
   })
+  test('paused:true after older active is not restored as a running hook', () => {
+    const messages = [
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        condition: 'older active',
+      }),
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        paused: true,
+        condition: 'paused goal',
+      }),
+    ]
+    expect(findGoalToRestore(messages)).toBeNull()
+  })
+
+  test('restoreGoalFromTranscript restores paused goal without re-arming Stop hook', () => {
+    const harness = createGoalContext('paused-restore-session')
+    const messages = [
+      attachmentMessage({
+        type: 'goal_status',
+        met: false,
+        paused: true,
+        condition: 'paused restore',
+      }),
+    ]
+
+    restoreGoalFromTranscript(
+      messages,
+      harness.ctx.setAppState,
+      harness.sessionId,
+    )
+
+    expect(stopPromptHooks(harness.state, harness.sessionId)).toEqual([])
+    expect(harness.state.activeGoal).toMatchObject({
+      condition: 'paused restore',
+      paused: true,
+    })
+  })
+
   test('failed:true after older active: failed terminates restore chain', () => {
     const messages = [
       attachmentMessage({

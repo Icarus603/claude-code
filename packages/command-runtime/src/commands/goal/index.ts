@@ -12,9 +12,9 @@
  *     `"post-text"` — ccb's slash dispatcher always posts text already,
  *     so the flag is implicit.
  *
- * Both gate on the `tengu_maple_tide` feature flag via
- * `isGoalCommandEnabled()`. Default-off; flipping the flag activates the
- * command without re-porting.
+ * ccb keeps the command enabled by default (solo local CLI, no GrowthBook).
+ * `isGoalCommandEnabled()` is an emergency kill-switch wrapper around
+ * CLAUDE_CODE_DISABLE_GOAL.
  */
 import {
   isGoalCommandEnabled,
@@ -31,8 +31,8 @@ export { GOAL_CONDITION_MAX_LENGTH } from '@claude-code/agent/goalStopHook.js'
 const goalJsxCommand: Command = {
   type: 'local-jsx',
   name: 'goal',
-  description: 'Set a goal — keep working until the condition is met',
-  argumentHint: '[<condition> | clear]',
+  description: 'Set, pause, resume, or view a goal — keep working until it is met',
+  argumentHint: '[<condition> | clear | pause | resume]',
   immediate: true,
   isEnabled: () => isGoalCommandEnabled(),
   load: () => import('./goal.js'),
@@ -44,7 +44,8 @@ export const goalLocalCommand: Command = {
   type: 'local',
   name: 'goal',
   supportsNonInteractive: true,
-  description: 'Set a goal — keep working until the condition is met',
+  description: 'Set, pause, resume, or view a goal — keep working until it is met',
+  argumentHint: '[<condition> | clear | pause | resume]',
   // ant AZ3: `get isHidden(){return!v8()}` — visible only when running
   // non-interactively (headless / SDK / thinClient). In the REPL the
   // local-jsx flavour above handles it.

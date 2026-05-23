@@ -33,10 +33,11 @@ const FRAME_INTERVAL_MS = PULSE_CYCLE_MS / PULSE_STEPS
  * Most-significant-only: "5s", "1m", "2h", "3d".
  */
 function formatCompactDuration(diffMs: number): string {
-  if (diffMs < 1000) return `${Math.max(1, Math.round(diffMs / 1000))}s`
-  const totalMin = Math.round(diffMs / 60_000)
-  if (totalMin < 60) return `${totalMin}m`
-  const hours = Math.floor(totalMin / 60)
+  const seconds = Math.round(diffMs / 1000)
+  if (seconds < 60) return `${Math.max(1, seconds)}s`
+  const minutes = Math.round(seconds / 60)
+  if (minutes < 60) return `${minutes}m`
+  const hours = Math.floor(minutes / 60)
   if (hours < 24) return `${hours}h`
   const days = Math.floor(hours / 24)
   return `${days}d`
@@ -87,7 +88,7 @@ export function GoalActiveIndicator(props: {
     return () => clearInterval(id)
   }, [activeGoal])
 
-  if (!activeGoal) return null
+  if (!activeGoal || activeGoal.paused) return null
 
   const diffMs = Date.now() - activeGoal.setAt
   // ant: `X < 1000 ? "" : \` (${_K(D,{mostSignificantOnly:!0})})\``

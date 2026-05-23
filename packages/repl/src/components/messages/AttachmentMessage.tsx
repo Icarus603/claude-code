@@ -468,8 +468,9 @@ export function AttachmentMessage({
       // inline without a label so users instantly see why.
       if (attachment.sentinel) return null
       const isFailed = attachment.failed === true
+      const isPaused = attachment.paused === true
       const stats: string[] = []
-      if (attachment.met || isFailed) {
+      if (attachment.met || isFailed || isPaused) {
         if (attachment.durationMs !== undefined) {
           stats.push(formatDurationCompact(attachment.durationMs))
         }
@@ -494,7 +495,9 @@ export function AttachmentMessage({
         ? 'Goal could not be achieved'
         : attachment.met
           ? 'Goal achieved'
-          : 'Goal not yet met… continuing'
+          : isPaused
+            ? 'Goal paused'
+            : 'Goal not yet met… continuing'
       return (
         <Box flexDirection="column" marginTop={1}>
           <Box flexDirection="row">
