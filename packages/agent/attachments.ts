@@ -774,8 +774,6 @@ export type Attachment =
       iterations?: number
       durationMs?: number
       tokens?: number
-      /** Goal is intentionally paused by the user; resume with `/goal resume`. */
-      paused?: boolean
       // ant v2.1.143: only meaningful when met=false. Indicates the goal
       // was judged genuinely unachievable by the prompt-hook evaluator.
       // Renders as red "Goal could not be achieved" instead of dim
