@@ -366,72 +366,31 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
     // Force the inner REPL to repaint on attach. The ring replay above shows
     // whatever the worker last emitted, but an IDLE worker (sitting at its
     // prompt, "send a prompt to start") emits nothing new after boot — so a
-    // fresh attach would otherwise see a stale/blank screen. Worse, the alt
-    // buffer still holds the PREVIOUS occupant's pixels: when the user came
-    // from FleetView (left-arrow → fleet → right-arrow attach), the FleetView
-    // footer ("enter to open · space to reply · ? for shortcuts") and prompt
-    // sit in the alt buffer, and the worker's @ant/ink is a DIFF renderer —
-    // it only writes its own non-blank cells, so the rows FleetView wrote but
-    // the worker leaves blank are never cleared → residual footer/ghost.
-    //
-    // ant forces a redraw on every attach (5017.js resizeForRepaint → daemon
-    // rv `{type:"repaint"}` → worker forceRedraw). ccb has no rv channel, so
-    // it nudges the pty into a resize so the inner @ant/ink's handleResize
-    // runs resetFramesForAltScreen + needsEraseBeforePaint → ERASE_SCREEN +
-    // full repaint (the forceRedraw-equivalent path), wiping the stale buffer.
-    //
-    // The jiggle MUST be cols-1 → (gap) → cols with a real delay between the
-    // two TIOCSWINSZ calls. ant's resizeForRepaint separates them by 30ms
-    // (5017.js: `setTimeout(...,30,...)`) precisely because doing them
-    // back-to-back collapses at the kernel level — the worker's TIOCGWINSZ on
-    // the SIGWINCH only ever observes the FINAL `cols`, identical to before,
-    // so handleResize early-returns on same-dimensions (ink.tsx handleResize
-    // `if (cols === this.terminalColumns ...) return`) and nothing repaints.
-    // ccb previously did both resizes synchronously, which is exactly that
-    // collapse — the residual-footer bug. The 30ms gap makes the intermediate
-    // cols-1 observable so each SIGWINCH triggers a real handleResize.
+    // fresh attach would otherwise see a stale/blank screen and (before the
+    // client watchdog was removed) get misjudged as stalled. ant forces a
+    // redraw on every attach (5473.js resizeForRepaint → worker forceRedraw);
+    // we don't have a worker control channel, so we nudge the pty: a
+    // resize-jiggle (cols-1 then back) makes the inner @ant/ink reassert
+    // terminal modes + repaint a full frame via its SIGWINCH handler. Guard
+    // on not-exited and a sane cols. Deferred a tick so it lands after the
+    // client has finished consuming the hello/replay/live frames.
     if (!exited && cols > 1) {
-      // SIGWINCH the worker after a TIOCSWINSZ so its libuv re-reads winsize
-      // and emits a 'resize' (→ handleResize → ERASE + full repaint).
-      // Bun.Terminal.resize delivers SIGWINCH to the fg pgrp via the kernel
-      // already, but the explicit signal is the reliable cross-platform path.
-      // Deferred 15ms (ant signalPtyPgrp) so it lands after TIOCSWINSZ settles.
-      const nudge = (): void => {
-        if (process.platform === 'win32' || !child.pid) return
-        setTimeout(() => {
-          try {
-            process.kill(child.pid!, 'SIGWINCH')
-          } catch {
-            // best-effort
-          }
-        }, 15).unref()
-      }
       setTimeout(() => {
-        if (exited || cols <= 1) return
-        // Read live cols/rows (a client resize ctrl-frame may have updated
-        // them between connect and now); jiggle relative to the CURRENT size.
-        const targetCols = cols
-        const targetRows = rows
-        const jiggleCols = Math.max(2, targetCols - 1)
+        if (exited) return
         try {
-          terminal.resize(jiggleCols, targetRows)
-          nudge()
+          terminal.resize(cols - 1, rows)
+          terminal.resize(cols, rows)
+          if (process.platform !== 'win32' && child.pid) {
+            try {
+              process.kill(child.pid, 'SIGWINCH')
+            } catch {
+              // best-effort
+            }
+          }
         } catch {
           // best-effort repaint nudge
         }
-        // Resize back to full width after a gap so the intermediate cols-1 is
-        // observable (ant's 30ms). Guard against a concurrent real resize
-        // having moved the live size on in the meantime.
-        setTimeout(() => {
-          if (exited) return
-          try {
-            terminal.resize(cols, rows)
-            nudge()
-          } catch {
-            // best-effort repaint nudge
-          }
-        }, 30).unref()
-      }, 50).unref()
+      }, 50)
     }
   })
   server.on('error', err => {
