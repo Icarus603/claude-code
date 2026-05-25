@@ -25,6 +25,7 @@ import * as React from 'react'
 import { useMemo, useState } from 'react'
 import figures from 'figures'
 import { Box, Byline, Dialog, KeyboardShortcutHint, Text } from '@anthropic/ink'
+import type { Theme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import type { Message } from '@claude-code/agent/messageShapes'
 import {
@@ -60,7 +61,7 @@ function plural(n: number, word: string): string {
 /** Status icon + theme color, mirroring ant m4O. */
 function statusGlyph(status: GoalRunRecord['status']): {
   glyph: string
-  color: string | undefined
+  color: keyof Theme | undefined
 } {
   switch (status) {
     case 'completed':
