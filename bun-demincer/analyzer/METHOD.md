@@ -108,6 +108,34 @@ helper (e.g. `gz.get("/v1/foo", { auth: "..." })`) the path may appear
 as "new" in B even though the endpoint existed in A — read both modules
 before claiming a brand-new endpoint.
 
+**Confirmed on 2.1.143→2.1.149:** `comm -13` flagged `/v1/code/triggers`,
+`/v1/code/github/import-token`, `/api/claude_cli_feedback` as "new"
+literals in B. All three existed in A but as **template literals**
+(`` `${URL}/v1/code/triggers` ``) — B refactored them into bare string
+literals (`_K.post("/v1/code/github/import-token", ...)`). They are NOT
+new endpoints. **Mandatory verification step** before listing any path
+under "新增 API endpoints": strip the quotes and grep the *unquoted*
+fragment in A:
+
+```bash
+grep -rl 'code/triggers' work/claude-code-$A/decoded/   # finds template-literal usages too
+```
+
+If A has it in any form, it's a refactor, not a new endpoint — say so
+explicitly so the ccb maintainer doesn't try to implement an
+already-existing surface.
+
+**Caveat — skill-prompt paths are not CLI behaviour.** ant ships large
+`/claude-api`-style skill files whose prompt text contains full API
+reference tables (`POST /v1/agents`, `/v1/sessions`, `/v1/environments`,
+…). These are *documentation strings fed to Claude*, not endpoints the
+CLI calls. On 2.1.143→2.1.149 the entire Managed Agents `/v1/agents*`
+surface lived only in `5412.js` (the skill doc). To distinguish: grep
+the path and check whether the hit is inside a backtick-delimited
+markdown table / instruction block (doc) vs. an actual `.get(`/`.post(`
+call (real client). Flag doc-only paths as "skill prompt text, not CLI
+behaviour" so they aren't mistaken for port targets.
+
 ### 1e · New tool names / slash commands
 
 ant defines slash commands in their command-runtime equivalent. Tool
@@ -155,6 +183,49 @@ diff -u work/claude-code-$A/decoded/$fileA work/claude-code-$B/decoded/$fileB | 
 Read both modules in full (`Read` tool) when the diff looks
 semantically interesting. **Don't trust truncated diffs** — they
 often hide the real change in the middle.
+
+### 2a · Caveat — `sizeChange` alone misses equal-length rewrites
+
+The `|sizeChange|>200` gate above silently drops the most common
+real-change pattern in small patch releases: a module whose
+identifiers all shift by one (`KTO→qTO`, `OTO→KTO`, …) so the file is
+**byte-length-identical** (`sizeChange=0`) yet has thousands of
+`diffLines`. Confirmed on 2.1.149→2.1.150 where `5412.js` had
+`sizeΔ=0, diffLines=4234` (pure rename) and the *only* real feature
+change `5000.js` sat at `sizeΔ=+159, diffLines=120`. Lesson: **sort by
+`diffLines` too, not just `sizeChange`**, and never assume `sizeΔ=0`
+means "unchanged". Add a second pass:
+
+```bash
+jq -r '.changed | sort_by(.diffLines) | reverse | .[0:30] | .[]
+       | "\(.fileA)→\(.fileB) sizeΔ=\(.sizeChange) diffLines=\(.diffLines)"' \
+    deltas/$A-to-$B.json
+```
+
+### 2b · Fast minifier-noise filter — cross-pair added-literal scan
+
+When the changed set is large but you suspect most pairs are pure
+identifier churn, run ONE scan across all pairs that surfaces only
+*new string literals* (the real signal — new flags, new prompt text,
+new error messages). Identifier renames produce no new quoted strings,
+so they drop out automatically:
+
+```bash
+jq -r '.changed[] | "\(.fileA) \(.fileB)"' deltas/$A-to-$B.json | while read fa fb; do
+  added=$(diff <(grep -oE '"[^"]{6,}"' work/claude-code-$A/decoded/$fa 2>/dev/null | sort -u) \
+               <(grep -oE '"[^"]{6,}"' work/claude-code-$B/decoded/$fb 2>/dev/null | sort -u) \
+          | grep '^>' | grep -vE 'VERSION_STRING|BUILD_DATE|GIT_SHA_REGEX')
+  [ -n "$added" ] && { echo "=== $fa -> $fb ==="; echo "$added" | head -8; }
+done
+```
+
+Replace the `grep -vE` exclusion with the actual version/date/sha
+literals of version B (find them once in any `5469.js`-style file).
+On 2.1.149→2.1.150 this collapsed all 37 changed pairs down to a
+single pair (`5000.js`) with genuinely new strings
+(`"tengu_heron_brook"`, `"heron_brook"`) — minutes of work instead of
+37 manual diffs. Highly recommended as step 1 for any patch-level
+delta before deciding which pairs need full `diff -u`.
 
 ---
 
