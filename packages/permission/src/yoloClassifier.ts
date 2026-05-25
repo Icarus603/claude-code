@@ -18,7 +18,7 @@ import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { extractTextContent } from '@claude-code/agent/messages.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
-import { getMainLoopModel } from '@claude-code/provider/model.js'
+import { getMainLoopModel, getSmallFastModel } from '@claude-code/provider/model.js'
 import type { SideQueryOptions } from '@claude-code/agent/sideQuery.js'
 import {
   type AttemptCounter,
@@ -1250,10 +1250,15 @@ type AutoModeConfig = {
  * then the main loop model.
  */
 function getClassifierModel(): string {
-  if (process.env.USER_TYPE === 'ant') {
-    const envModel = readEnv('CLAUDE_CODE_AUTO_MODE_MODEL')
-    if (envModel) return envModel
-  }
+  // Explicit override always wins. The ant build gates this on
+  // USER_TYPE==='ant', but that gate locks a ccb operator out of the only
+  // escape hatch for picking the classifier model — same anti-pattern class
+  // as the fullscreen-renderer USER_TYPE gate (7895b9d6). ccb is
+  // operator-trusted and solo-maintained, so the env var is read
+  // unconditionally; on the ant build USER_TYPE==='ant' so behaviour is
+  // unchanged there.
+  const envModel = readEnv('CLAUDE_CODE_AUTO_MODE_MODEL')
+  if (envModel) return envModel
   const config = getFeatureValue_CACHED_MAY_BE_STALE(
     'tengu_auto_mode_config',
     {} as AutoModeConfig,
@@ -1261,7 +1266,20 @@ function getClassifierModel(): string {
   if (config?.model) {
     return config.model
   }
-  return getMainLoopModel()
+  // Default to the SMALL-FAST model (Haiku when reachable), NOT the main-loop
+  // model. ant runs the auto-mode classifier on a small dedicated model via
+  // its GrowthBook config; ccb has no GrowthBook backend, so this fell through
+  // to getMainLoopModel() and ran the classifier on the operator's SESSION
+  // model — typically Opus. The stage-1 XML prompt demands the response BEGIN
+  // with <block> and emit no preamble (classifierXmlFormat.ts
+  // replaceOutputFormatWithXml); a large reasoning model intermittently emits
+  // a reasoning preamble anyway, so parseXmlBlock returns null → the
+  // fail-closed path blocks the action with "could not evaluate" — at random,
+  // on zero-danger commands like `bun run build`. getSmallFastModel adheres to
+  // the strict format reliably and already has a reachability gate that falls
+  // back to the main-loop model when Haiku can't be served (alt providers /
+  // no Anthropic endpoint), so this never breaks non-Anthropic setups.
+  return getSmallFastModel()
 }
 
 /**
