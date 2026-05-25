@@ -117,8 +117,17 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
     ),
   )
 
-  const cols = Number(args[1]) || 200
-  const rows = Number(args[2]) || 50
+  // Live PTY dimensions. Spawn-time argv seeds the INITIAL size, but every
+  // client resize ctrl frame mutates these (see handleCtrl 'resize'). Source:
+  // ant 5017.js WorkerVm — `ptyCols`/`ptyRows` are mutable instance state, NOT
+  // frozen at spawn. `resize()` writes both, and `resizeForRepaint()` compares
+  // against the CURRENT values, so a repaint never reverts the PTY to the
+  // spawn-time width. ccb previously froze these as `const`, so the attach
+  // repaint-jiggle below re-applied the STALE spawn-time cols — clobbering the
+  // fresh size the client just sent after a terminal resize, leaving the inner
+  // REPL rendering at the wrong width (the FleetView→attach overlap bug).
+  let cols = Number(args[1]) || 200
+  let rows = Number(args[2]) || 50
   const cmd = args[dashDash + 1]!
   const cmdArgs = args.slice(dashDash + 2)
 
@@ -170,6 +179,12 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
         const c = Number(frame['cols'])
         const r = Number(frame['rows'])
         if (c > 0 && c <= 10000 && r > 0 && r <= 10000 && !exited) {
+          // Track the live size so the attach repaint-jiggle (and any later
+          // repaint) uses THIS width, not the stale spawn-time argv. ant
+          // 5017.js WorkerVm.resize does the same: writes ptyCols/ptyRows
+          // before resizing the pty.
+          cols = c
+          rows = r
           terminal.resize(c, r)
           if (process.platform !== 'win32') {
             try {
