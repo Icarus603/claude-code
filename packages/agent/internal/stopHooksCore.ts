@@ -36,6 +36,70 @@ type StopHookResult = {
   preventContinuation: boolean
 }
 
+/**
+ * Resolve the consecutive Stop-hook block cap. ant v2.1.143 3999.js:
+ *   parseInt(env.CLAUDE_CODE_STOP_HOOK_BLOCK_CAP) ?? 8, then `cap > 0 && n > cap`.
+ *
+ * - unset / non-numeric → 8 (the default backstop)
+ * - 0 or negative       → disabled (the `cap > 0` guard below short-circuits)
+ * - positive N          → N
+ */
+export function resolveStopHookBlockCap(envValue: string | undefined): number {
+  const parsed = Number.parseInt(envValue ?? '', 10)
+  return Number.isNaN(parsed) ? 8 : parsed
+}
+
+/**
+ * Decide what happens after a Stop hook blocks the turn from ending — ant
+ * v2.1.143 3999.js consecutive-block guard.
+ *
+ * A `/goal` Stop hook whose condition can never be satisfied blocks every
+ * cycle, and each block injects a blockingError into the transcript. Left
+ * unbounded the transcript grows until the main API call 413s
+ * ("Prompt is too long"). This is the structural backstop: bound the streak
+ * by maxTurns AND by CLAUDE_CODE_STOP_HOOK_BLOCK_CAP (default 8). The
+ * `impossible` evaluator verdict (execPromptHook) can short-circuit some
+ * cases but relies on the evaluator volunteering it — the cap is the guarantee.
+ *
+ * Pure decision function: query.ts owns the yield/state-construction; this
+ * owns the arithmetic so it can be unit-locked without the generator loop.
+ */
+export type StopHookBlockDecision =
+  | { kind: 'continue'; nextTurnCount: number; nextBlockingCount: number }
+  | { kind: 'max_turns'; nextTurnCount: number; nextBlockingCount: number }
+  | { kind: 'cap_exceeded'; nextBlockingCount: number }
+
+export function evaluateStopHookBlockOutcome(params: {
+  turnCount: number
+  blockingCount: number
+  maxTurns: number | undefined
+  blockCapEnv: string | undefined
+}): StopHookBlockDecision {
+  const nextTurnCount = params.turnCount + 1
+  const nextBlockingCount = params.blockingCount + 1
+
+  // maxTurns bounds blocking loops too — without this a blocking Stop hook
+  // would re-query forever in headless mode regardless of --max-turns.
+  if (params.maxTurns && nextTurnCount > params.maxTurns) {
+    return { kind: 'max_turns', nextTurnCount, nextBlockingCount }
+  }
+
+  const blockCap = resolveStopHookBlockCap(params.blockCapEnv)
+  if (blockCap > 0 && nextBlockingCount > blockCap) {
+    return { kind: 'cap_exceeded', nextBlockingCount }
+  }
+
+  return { kind: 'continue', nextTurnCount, nextBlockingCount }
+}
+
+/** ant v2.1.143 3999.js cap-override message — verbatim. */
+export function stopHookBlockCapMessage(blockingCount: number): string {
+  return (
+    `A hook blocked the turn from ending ${blockingCount} consecutive times — overriding and ending turn. ` +
+    "For Stop/SubagentStop hooks, check stop_hook_active in the input and return success while it's true. Set CLAUDE_CODE_STOP_HOOK_BLOCK_CAP to raise this limit."
+  )
+}
+
 export async function* handleStopHooks(
   messagesForQuery: AgentMessage[],
   assistantMessages: AgentAssistantMessage[],

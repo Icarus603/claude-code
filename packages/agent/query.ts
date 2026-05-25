@@ -10,16 +10,16 @@ import {
   remove as removeFromQueue,
 } from './internal/commandQueue.js'
 import {
-  checkStatsigFeatureGate_CACHED_MAY_BE_STALE,
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '@claude-code/config/feature-flags'
-import { getGlobalConfig } from '@claude-code/config'
-import { getMaxOutputTokensForModel } from '@claude-code/provider/claudeLegacy'
 import {
   buildPostCompactMessages,
-  calculateTokenWarningState as calculateTokenWarningStateCore,
 } from './compaction/index.js'
-import { handleStopHooks } from './hooks/index.js'
+import {
+  evaluateStopHookBlockOutcome,
+  handleStopHooks,
+  stopHookBlockCapMessage,
+} from './hooks/index.js'
 import { executePostToolBatchHooks } from './hooks.js'
 // query.ts aliases AgentToolUseContext (the agent package's V7 §8 partial
 // shape) as ToolUseContext locally. PostToolBatch dispatch lives in
@@ -29,11 +29,20 @@ import { executePostToolBatchHooks } from './hooks.js'
 // same toolUseContext object either way.
 import type { ToolUseContext as CanonicalToolUseContext } from '@claude-code/tool-registry/Tool.js'
 import { productionDeps, type QueryDeps } from './internal/queryDeps.js'
+import {
+  buildQueryConfig,
+  calculateTokenWarningState,
+  createInitialQueryState,
+  isAutoCompactEnabled,
+  isWithheldMaxOutputTokens,
+  MAX_OUTPUT_TOKENS_RECOVERY_LIMIT,
+  type Continue,
+  type QueryLoopState,
+  type Terminal,
+} from './internal/queryConfig.js'
 import { feature } from 'bun:bundle'
 import {
   getCurrentTurnTokenBudget,
-  getSdkBetas,
-  getSessionId,
   getTurnOutputTokens,
   incrementBudgetContinuationCount,
 } from './internal/sessionRuntime.js'
@@ -90,7 +99,6 @@ import {
   finalContextTokensFromLastResponse,
   generateToolUseSummary,
   getAttachmentMessages,
-  getContextWindowForModel,
   getEscalatedMaxTokens,
   getMessagesAfterCompactBoundary,
   getPromptTooLongErrorMessage,
@@ -126,124 +134,7 @@ type CanUseToolFn = (...args: unknown[]) => Promise<{
   updatedInput?: unknown
 }>
 
-/**
- * The rules of thinking are lengthy and fortuitous. They require plenty of thinking
- * of most long duration and deep meditation for a wizard to wrap one's noggin around.
- *
- * The rules follow:
- * 1. A message that contains a thinking or redacted_thinking block must be part of a query whose max_thinking_length > 0
- * 2. A thinking block may not be the last message in a block
- * 3. Thinking blocks must be preserved for the duration of an assistant trajectory (a single turn, or if that turn includes a tool_use block then also its subsequent tool_result and the following assistant message)
- *
- * Heed these rules well, young wizard. For they are the rules of thinking, and
- * the rules of thinking are the rules of the universe. If ye does not heed these
- * rules, ye will be punished with an entire day of debugging and hair pulling.
- */
-const MAX_OUTPUT_TOKENS_RECOVERY_LIMIT = 3
-
-type QueryConfig = {
-  sessionId: string
-  gates: {
-    streamingToolExecution: boolean
-    emitToolUseSummaries: boolean
-    isAnt: boolean
-    fastModeEnabled: boolean
-  }
-}
-
-type AutoCompactTrackingState = {
-  compacted: boolean
-  turnCounter: number
-  turnId: string
-  consecutiveFailures?: number
-  // Mirrors the field in compaction/autoCompact.ts. Kept structurally
-  // compatible (not re-exported) to avoid a circular import.
-  consecutiveRapidRefills?: number
-}
-
-function buildQueryConfig(): QueryConfig {
-  return {
-    sessionId: getSessionId(),
-    gates: {
-      streamingToolExecution: checkStatsigFeatureGate_CACHED_MAY_BE_STALE(
-        'tengu_streaming_tool_execution2',
-      ),
-      emitToolUseSummaries: isEnvTruthy(
-        readEnv('CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES'),
-      ),
-      isAnt: process.env.USER_TYPE === 'ant',
-      fastModeEnabled: !isEnvTruthy(readEnv('CLAUDE_CODE_DISABLE_FAST_MODE')),
-    },
-  }
-}
-
-function isAutoCompactEnabled(): boolean {
-  if (isEnvTruthy(readEnv('DISABLE_COMPACT'))) {
-    return false
-  }
-  if (isEnvTruthy(readEnv('DISABLE_AUTO_COMPACT'))) {
-    return false
-  }
-  return getGlobalConfig().autoCompactEnabled
-}
-
-function calculateTokenWarningState(tokenUsage: number, model: string) {
-  return calculateTokenWarningStateCore(
-    tokenUsage,
-    model,
-    {
-      getContextWindowSize: getContextWindowForModel,
-      getMaxOutputTokensForModel,
-      getSdkBetas,
-      getEnv: key => readEnv(key),
-    },
-    isAutoCompactEnabled(),
-  )
-}
-
-type Continue = {
-  reason: string
-  [key: string]: unknown
-}
-
-type Terminal = {
-  reason: string
-  [key: string]: unknown
-}
-
-type QueryLoopState = {
-  messages: Message[]
-  toolUseContext: ToolUseContext
-  autoCompactTracking: AutoCompactTrackingState | undefined
-  maxOutputTokensRecoveryCount: number
-  hasAttemptedReactiveCompact: boolean
-  maxOutputTokensOverride: number | undefined
-  pendingToolUseSummary: Promise<ToolUseSummaryMessage | null> | undefined
-  stopHookActive: boolean | undefined
-  turnCount: number
-  transition: Continue | undefined
-}
-
 type State = QueryLoopState
-
-function createInitialQueryState(params: {
-  messages: Message[]
-  toolUseContext: ToolUseContext
-  maxOutputTokensOverride: number | undefined
-}): QueryLoopState {
-  return {
-    messages: params.messages,
-    toolUseContext: params.toolUseContext,
-    maxOutputTokensOverride: params.maxOutputTokensOverride,
-    autoCompactTracking: undefined,
-    stopHookActive: undefined,
-    maxOutputTokensRecoveryCount: 0,
-    hasAttemptedReactiveCompact: false,
-    turnCount: 1,
-    pendingToolUseSummary: undefined,
-    transition: undefined,
-  }
-}
 
 function* yieldMissingToolResultBlocks(
   assistantMessages: AssistantMessage[],
@@ -273,21 +164,6 @@ function* yieldMissingToolResultBlocks(
   }
 }
 
-function isWithheldMaxOutputTokens(
-  msg: Message | StreamEvent | undefined,
-): msg is AssistantMessage {
-  return msg?.type === 'assistant' && msg.apiError === 'max_output_tokens'
-}
-
-/**
- * Is this a max_output_tokens error message? If so, the streaming loop should
- * withhold it from SDK callers until we know whether the recovery loop can
- * continue. Yielding early leaks an intermediate error to SDK callers (e.g.
- * cowork/desktop) that terminate the session on any `error` field — the
- * recovery loop keeps running but nobody is listening.
- *
- * Mirrors reactiveCompact.isWithheldPromptTooLong.
- */
 export type QueryParams = {
   messages: Message[]
   systemPrompt: SystemPrompt
@@ -405,6 +281,7 @@ async function* queryLoop(
       maxOutputTokensOverride,
       pendingToolUseSummary,
       stopHookActive,
+      stopHookBlockingCount,
       turnCount,
     } = state
 
@@ -1201,6 +1078,7 @@ async function* queryLoop(
               maxOutputTokensOverride: undefined,
               pendingToolUseSummary: undefined,
               stopHookActive: undefined,
+              stopHookBlockingCount: 0,
               turnCount,
               transition: {
                 reason: 'collapse_drain_retry',
@@ -1254,6 +1132,7 @@ async function* queryLoop(
             maxOutputTokensOverride: undefined,
             pendingToolUseSummary: undefined,
             stopHookActive: undefined,
+            stopHookBlockingCount: 0,
             turnCount,
             transition: { reason: 'reactive_compact_retry' },
           }
@@ -1309,6 +1188,7 @@ async function* queryLoop(
             maxOutputTokensOverride: getEscalatedMaxTokens(),
             pendingToolUseSummary: undefined,
             stopHookActive: undefined,
+            stopHookBlockingCount: 0,
             turnCount,
             transition: { reason: 'max_output_tokens_escalate' },
           }
@@ -1337,6 +1217,7 @@ async function* queryLoop(
             maxOutputTokensOverride: undefined,
             pendingToolUseSummary: undefined,
             stopHookActive: undefined,
+            stopHookBlockingCount: 0,
             turnCount,
             transition: {
               reason: 'max_output_tokens_recovery',
@@ -1371,11 +1252,69 @@ async function* queryLoop(
         stopHookActive,
       )
 
+      // ant v2.1.143 3999.js: a run of consecutive blocks just ended (this
+      // turn produced none, but earlier ones in the streak did) — record how
+      // long the streak was so dashboards can see /goal blocking pressure.
+      if (
+        stopHookBlockingCount > 0 &&
+        stopHookResult.blockingErrors.length === 0
+      ) {
+        logEvent('tengu_stop_hook_block_count', {
+          count: stopHookBlockingCount,
+          is_subagent: Boolean(toolUseContext.agentId),
+          hit_max_turns: false,
+          hit_cap: false,
+        })
+      }
+
       if (stopHookResult.preventContinuation) {
         return { reason: 'stop_hook_prevented' }
       }
 
       if (stopHookResult.blockingErrors.length > 0) {
+        // ant v2.1.143 3999.js: bound the consecutive-block streak so an
+        // unsatisfiable Stop hook (e.g. a /goal condition that can never be
+        // met) can't block forever. Each block injects a blockingError into
+        // the transcript; left unbounded the transcript grows every cycle
+        // until the main API call 413s (prompt-too-long). Decision arithmetic
+        // (maxTurns bound + CLAUDE_CODE_STOP_HOOK_BLOCK_CAP, default 8) lives
+        // in stopHooksCore so it's unit-lockable.
+        const decision = evaluateStopHookBlockOutcome({
+          turnCount,
+          blockingCount: stopHookBlockingCount,
+          maxTurns,
+          blockCapEnv: readEnv('CLAUDE_CODE_STOP_HOOK_BLOCK_CAP'),
+        })
+
+        if (decision.kind === 'max_turns') {
+          logEvent('tengu_stop_hook_block_count', {
+            count: decision.nextBlockingCount,
+            is_subagent: Boolean(toolUseContext.agentId),
+            hit_max_turns: true,
+            hit_cap: false,
+          })
+          yield createAttachmentMessage({
+            type: 'max_turns_reached',
+            maxTurns: maxTurns!,
+            turnCount: decision.nextTurnCount,
+          })
+          return { reason: 'max_turns', turnCount: decision.nextTurnCount }
+        }
+
+        if (decision.kind === 'cap_exceeded') {
+          logEvent('tengu_stop_hook_block_count', {
+            count: decision.nextBlockingCount,
+            is_subagent: Boolean(toolUseContext.agentId),
+            hit_max_turns: false,
+            hit_cap: true,
+          })
+          yield createSystemMessage(
+            stopHookBlockCapMessage(decision.nextBlockingCount),
+            'warning',
+          )
+          return { reason: 'completed' }
+        }
+
         const next: State = {
           messages: [
             ...messagesForQuery,
@@ -1394,7 +1333,8 @@ async function* queryLoop(
           maxOutputTokensOverride: undefined,
           pendingToolUseSummary: undefined,
           stopHookActive: true,
-          turnCount,
+          stopHookBlockingCount: decision.nextBlockingCount,
+          turnCount: decision.nextTurnCount,
           transition: { reason: 'stop_hook_blocking' },
         }
         state = next
@@ -1430,6 +1370,7 @@ async function* queryLoop(
             maxOutputTokensOverride: undefined,
             pendingToolUseSummary: undefined,
             stopHookActive: undefined,
+            stopHookBlockingCount: 0,
             turnCount,
             transition: { reason: 'token_budget_continuation' },
           }
@@ -1888,6 +1829,7 @@ async function* queryLoop(
       pendingToolUseSummary: nextPendingToolUseSummary,
       maxOutputTokensOverride: undefined,
       stopHookActive,
+      stopHookBlockingCount: 0,
       transition: { reason: 'next_turn' },
     }
     state = next
