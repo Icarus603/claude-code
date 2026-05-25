@@ -308,3 +308,230 @@ describe('searchStream', () => {
     }
   })
 })
+
+// ---------------------------------------------------------------------------
+// rg-equivalence regression tests. Each pins a divergence from the spawned
+// `rg` binary that ccb's earlier hand-built GlobSet implementation got
+// wrong. These were found by diffing NAPI output against system `rg` on a
+// real .git repo; see __tests__/equiv-probe*.ts for the diff harnesses.
+// ---------------------------------------------------------------------------
+describe('rg-equivalence regressions', () => {
+  // P0: VCS-directory exclusion. GrepTool/Glob push `!.git` (etc.) to
+  // exclude version-control noise, and always pass --hidden (which kills
+  // the hidden-file filter). The old GlobSet turned `!.git` into a no-op
+  // that matched only a path whose final component was exactly `.git`, so
+  // `.git/config` and every other VCS-internal file leaked into results.
+  // OverrideBuilder gives gitignore semantics: `!.git` excludes the whole
+  // subtree. This test would FAIL (return .git/* entries) under the old impl.
+  test('!.git excludes the entire .git subtree (not just a path named .git)', async () => {
+    const root = makeTempTree({
+      'a.ts': 'foo',
+      '.git/config': 'foo',
+      '.git/hooks/pre-commit': 'foo',
+      'sub/.git/cfg': 'foo',
+      'sub/b.ts': 'foo',
+    })
+    try {
+      const files = await findFiles({
+        root,
+        globs: ['!.git'],
+        hidden: true,
+        noIgnore: true,
+      })
+      const rels = files.map(f => f.slice(root.length + 1)).sort()
+      expect(rels).toEqual(['a.ts', 'sub/b.ts'])
+      // Belt-and-suspenders: no entry under any .git dir survived.
+      expect(rels.some(r => r.includes('.git/'))).toBe(false)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  test('searchContent honors !.git exclusion (content does not leak)', async () => {
+    const root = makeTempTree({
+      'a.ts': 'secret',
+      '.git/config': 'secret',
+    })
+    try {
+      const matches = await searchContent({
+        root,
+        pattern: 'secret',
+        globs: ['!.git'],
+        hidden: true,
+        noIgnore: true,
+      })
+      const paths = matches.map(m => m.path.slice(root.length + 1))
+      expect(paths).toEqual(['a.ts'])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  // Bare glob (no slash) matches at any depth — gitignore semantics. The
+  // old impl required a `**/` prefix to achieve this; OverrideBuilder does
+  // it natively, which is why ripgrep.ts no longer string-rewrites globs.
+  test('bare glob *.ts matches at any depth', async () => {
+    const root = makeTempTree({
+      'a.ts': '',
+      'sub/b.ts': '',
+      'sub/deep/c.ts': '',
+      'd.md': '',
+    })
+    try {
+      const files = await findFiles({
+        root,
+        globs: ['*.ts'],
+        hidden: true,
+        noIgnore: true,
+      })
+      const rels = files.map(f => f.slice(root.length + 1)).sort()
+      expect(rels).toEqual(['a.ts', 'sub/b.ts', 'sub/deep/c.ts'])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  // P1: --type filter. GrepTool advertises `type: js/py/rust/...` in its
+  // schema and pushes --type, but it used to be parsed JS-side and dropped
+  // — a no-op. Now wired through TypesBuilder.add_defaults().
+  test('fileTypes restricts to ripgrep built-in types', async () => {
+    const root = makeTempTree({
+      'a.ts': 'x',
+      'b.py': 'x',
+      'c.md': 'x',
+      'd.rs': 'x',
+    })
+    try {
+      const ts = await findFiles({
+        root,
+        fileTypes: ['ts'],
+        hidden: true,
+        noIgnore: true,
+      })
+      expect(ts.map(f => f.slice(root.length + 1))).toEqual(['a.ts'])
+
+      const multi = (
+        await findFiles({
+          root,
+          fileTypes: ['py', 'rust'],
+          hidden: true,
+          noIgnore: true,
+        })
+      )
+        .map(f => f.slice(root.length + 1))
+        .sort()
+      expect(multi).toEqual(['b.py', 'd.rs'])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  test('unknown fileType degrades gracefully (no throw, filter dropped)', async () => {
+    const root = makeTempTree({ 'a.ts': '', 'b.py': '' })
+    try {
+      // A typo'd type ("typescript" instead of "ts") arrives from an LLM
+      // tool call. rg would hard-error; we drop the filter and list all,
+      // which is the safer failure for an agent loop.
+      const files = await findFiles({
+        root,
+        fileTypes: ['notarealtype'],
+        hidden: true,
+        noIgnore: true,
+      })
+      expect(files).toHaveLength(2)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  // P2: max-columns must not drop a file from -l whose only match is on an
+  // over-long line. The native side emits a membership stub (empty content,
+  // columnTruncated=true) so files-with-matches / count callers still see
+  // the file, mirroring `rg -l`/`rg -c`.
+  test('maxColumns keeps file membership via columnTruncated stub', async () => {
+    const root = makeTempTree({
+      'x.ts': `short foo\n${'y'.repeat(600)} foo\nfoo end\n`,
+    })
+    try {
+      const matches = await searchContent({
+        root,
+        pattern: 'foo',
+        maxColumns: 500,
+        hidden: true,
+        noIgnore: true,
+      })
+      // 3 matches total; the middle one is column-truncated with empty body.
+      expect(matches).toHaveLength(3)
+      const trunc = matches.filter(m => m.columnTruncated)
+      expect(trunc).toHaveLength(1)
+      expect(trunc[0].content).toBe('')
+      // -l membership: file still present despite the long-only match.
+      const files = new Set(matches.map(m => m.path))
+      expect(files.size).toBe(1)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  // P2: context lines -A/-B/-C. Used to be silently skipped. Now wired via
+  // SearcherBuilder before/after_context + Sink::context. Context entries
+  // carry isContext=true; the group-break sentinel has lineNumber absent
+  // (napi maps None -> undefined) and content '--'.
+  test('context lines are emitted with isContext + group-break sentinel', async () => {
+    const root = makeTempTree({
+      'f.ts': 'l1\nl2\nMATCH-a\nl4\nl5\nl6\nMATCH-b\nl8\n',
+    })
+    try {
+      const m = await searchContent({
+        root,
+        pattern: 'MATCH',
+        beforeContext: 1,
+        afterContext: 1,
+        hidden: true,
+        noIgnore: true,
+      })
+      // Reduce to (lineNumber, kind) ignoring the sentinel's path noise.
+      const shape = m.map(x =>
+        x.lineNumber == null && x.content === '--'
+          ? '--'
+          : `${x.lineNumber}${x.isContext ? 'C' : 'M'}`,
+      )
+      // l2(ctx) MATCH-a l4(ctx) -- l6(ctx) MATCH-b l8(ctx)
+      expect(shape).toEqual(['2C', '3M', '4C', '--', '6C', '7M', '8C'])
+      // Real matches (excluding context + sentinel) = 2.
+      const realMatches = m.filter(
+        x => !x.isContext && !(x.lineNumber == null),
+      )
+      expect(realMatches).toHaveLength(2)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  test('-A and -B asymmetric context', async () => {
+    const root = makeTempTree({ 'f.ts': 'a\nb\nHIT\nc\nd\n' })
+    try {
+      const after = await searchContent({
+        root,
+        pattern: 'HIT',
+        afterContext: 2,
+        hidden: true,
+        noIgnore: true,
+      })
+      expect(after.map(x => x.lineNumber)).toEqual([3, 4, 5])
+      expect(after.map(x => x.isContext)).toEqual([false, true, true])
+
+      const before = await searchContent({
+        root,
+        pattern: 'HIT',
+        beforeContext: 1,
+        hidden: true,
+        noIgnore: true,
+      })
+      expect(before.map(x => x.lineNumber)).toEqual([2, 3])
+      expect(before.map(x => x.isContext)).toEqual([true, false])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+})

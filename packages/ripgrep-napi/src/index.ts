@@ -33,7 +33,16 @@ interface CancelHandle {
 
 interface FindFilesOptions {
   root: string
+  /**
+   * Globs in gitignore semantics, same as `rg --glob`: a bare pattern
+   * (`*.ts`) matches at any depth, a leading `!` (`!.git`) excludes a
+   * whole subtree. Pass the raw rg-style glob — the native side feeds it
+   * straight to the `ignore` crate's OverrideBuilder. Do NOT pre-prefix
+   * with `**​/`.
+   */
   globs?: string[]
+  /** `--type` filter, e.g. `['ts', 'py']`. Unknown names are ignored. */
+  fileTypes?: string[]
   hidden?: boolean
   noIgnore?: boolean
   follow?: boolean
@@ -49,15 +58,48 @@ interface SearchContentOptions {
   multilineDotall?: boolean
   maxColumns?: number
   maxCountPerFile?: number
+  /** `-B`: leading context lines around each match. */
+  beforeContext?: number
+  /** `-A`: trailing context lines around each match. */
+  afterContext?: number
   globs?: string[]
+  fileTypes?: string[]
   hidden?: boolean
   noIgnore?: boolean
+  /**
+   * `-o` / `--only-matching`. Handled entirely JS-side in ripgrep.ts (it
+   * re-scans each match's content with the pattern), NOT consumed by the
+   * native module — napi-rs ignores unknown object fields. Declared here
+   * so the ripgrep.ts adapter can pass it on the same options literal
+   * without a TS2353 excess-property error.
+   */
+  onlyMatching?: boolean
 }
 
 interface ContentMatch {
   path: string
-  lineNumber: number | null
+  /**
+   * Line number, or absent. The native side's `Option<u32>::None` is
+   * surfaced by napi-rs as `undefined` (NOT `null`) — callers comparing
+   * against absence must use a loose `== null` check to catch both.
+   */
+  lineNumber: number | null | undefined
   content: string
+  /**
+   * True when the match's line exceeded `maxColumns` and its content was
+   * suppressed (empty `content`). The file still counts as a match so
+   * files-with-matches / count callers include it — mirrors `rg -l`/`-c`,
+   * which list/count a file even when every match is on an over-long line.
+   * Content-mode callers should filter these out.
+   */
+  columnTruncated: boolean
+  /**
+   * True when this entry is a CONTEXT line (`-A`/`-B`/`-C`), not a real
+   * match. rg renders context with a `-` separator vs `:` for matches;
+   * `-l`/`-c` modes ignore context entries. Content-mode formats them
+   * with the `-` separator for rg parity.
+   */
+  isContext: boolean
 }
 
 interface NativeBinding {

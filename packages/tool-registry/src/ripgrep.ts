@@ -88,6 +88,17 @@ interface ParsedArgs {
   filesOnly: boolean
   /** Pattern (only meaningful when filesOnly is false). */
   pattern: string | null
+  /**
+   * rg-style `--glob` patterns, passed through verbatim. The NAPI side
+   * feeds them to the `ignore` crate's OverrideBuilder, which applies
+   * exact gitignore semantics (bare pattern → any depth; `!dir` → exclude
+   * subtree). We do NOT pre-mangle them — an earlier `normalizeRipgrepGlob`
+   * shim tried to emulate those conventions by string-rewriting (`*.ts` →
+   * `**​/*.ts`, `!.git` → `!**​/.git`) and got directory exclusion wrong:
+   * `!**​/.git` only matched a path whose final component was `.git`, so
+   * `.git/config` leaked into every Grep/Glob result. OverrideBuilder does
+   * it correctly, so the shim is gone.
+   */
   globs: string[]
   fileTypes: string[]
   hidden: boolean
@@ -99,6 +110,10 @@ interface ParsedArgs {
   multilineDotall: boolean
   maxColumns: number | null
   maxCountPerFile: number | null
+  /** `-B`: leading context lines. null = none. */
+  beforeContext: number | null
+  /** `-A`: trailing context lines. null = none. */
+  afterContext: number | null
   /** True for `-l` (files-with-matches) — caller expects file paths only. */
   filesWithMatchesOnly: boolean
   /** True for `-c` (count) — caller expects `path:count` lines. */
@@ -109,31 +124,6 @@ interface ParsedArgs {
   onlyMatching: boolean
   /** Sort by mtime descending. */
   sortModified: boolean
-}
-
-/**
- * Normalize a single ripgrep `--glob` pattern to a globset-compatible
- * shape. ripgrep treats glob patterns as gitignore-style with two
- * implicit conventions:
- *
- *   1. A pattern with no `/` matches at any depth (e.g. `.orphaned_at`
- *      → `**\/.orphaned_at`)
- *   2. A trailing `/` anchors to a directory and matches its contents
- *      (e.g. `.git/` → `.git/**`)
- *
- * globset crate doesn't apply either implicitly. Without these shims,
- * ccb call sites that worked under spawn-based ripgrep silently return
- * zero results.
- */
-function normalizeRipgrepGlob(pattern: string): string {
-  const negated = pattern.startsWith('!')
-  let body = negated ? pattern.slice(1) : pattern
-  if (body.endsWith('/')) {
-    body = body + '**'
-  } else if (!body.includes('/')) {
-    body = '**/' + body
-  }
-  return negated ? '!' + body : body
 }
 
 function parseArgs(args: string[]): ParsedArgs {
@@ -151,6 +141,8 @@ function parseArgs(args: string[]): ParsedArgs {
     multilineDotall: false,
     maxColumns: null,
     maxCountPerFile: null,
+    beforeContext: null,
+    afterContext: null,
     filesWithMatchesOnly: false,
     countOnly: false,
     lineNumbers: false,
@@ -201,8 +193,10 @@ function parseArgs(args: string[]): ParsedArgs {
         // we never produce headings, no-op
         break
       case '--glob':
+        // Pass the rg-style glob through verbatim — OverrideBuilder on the
+        // NAPI side applies gitignore semantics. No string rewriting.
         if (i + 1 < args.length) {
-          out.globs.push(normalizeRipgrepGlob(args[++i]!))
+          out.globs.push(args[++i]!)
         }
         break
       case '--type':
@@ -225,14 +219,20 @@ function parseArgs(args: string[]): ParsedArgs {
         if (i + 1 < args.length) out.pattern = args[++i]!
         break
       case '-A':
+        // Trailing context lines.
+        if (i + 1 < args.length) out.afterContext = parseInt(args[++i]!, 10)
+        break
       case '-B':
+        // Leading context lines.
+        if (i + 1 < args.length) out.beforeContext = parseInt(args[++i]!, 10)
+        break
       case '-C':
-        // Context lines: consume the numeric arg. We don't currently
-        // surface them via NAPI — none of ccb's actual call sites
-        // depend on context for correctness (GrepTool requests them
-        // but only for human-facing output, which now goes through
-        // searchContent's structured matches). Skip silently.
-        if (i + 1 < args.length) i++
+        // Symmetric context: -C N == -A N -B N.
+        if (i + 1 < args.length) {
+          const n = parseInt(args[++i]!, 10)
+          out.beforeContext = n
+          out.afterContext = n
+        }
         break
       default:
         // First non-flag argument that isn't preceded by -e is the pattern.
@@ -299,6 +299,7 @@ export async function ripGrepStream(
     maxColumns: parsed.maxColumns ?? undefined,
     maxCountPerFile: parsed.maxCountPerFile ?? undefined,
     globs: parsed.globs.length > 0 ? parsed.globs : undefined,
+    fileTypes: parsed.fileTypes.length > 0 ? parsed.fileTypes : undefined,
     hidden: parsed.hidden,
     noIgnore: parsed.noIgnore,
   }
@@ -373,6 +374,7 @@ async function runFindFiles(
   const opts: FindFilesOptions = {
     root: target,
     globs: parsed.globs.length > 0 ? parsed.globs : undefined,
+    fileTypes: parsed.fileTypes.length > 0 ? parsed.fileTypes : undefined,
     hidden: parsed.hidden,
     noIgnore: parsed.noIgnore,
     follow: parsed.follow,
@@ -395,7 +397,10 @@ async function runSearch(
     multilineDotall: parsed.multilineDotall,
     maxColumns: parsed.maxColumns ?? undefined,
     maxCountPerFile: parsed.maxCountPerFile ?? undefined,
+    beforeContext: parsed.beforeContext ?? undefined,
+    afterContext: parsed.afterContext ?? undefined,
     globs: parsed.globs.length > 0 ? parsed.globs : undefined,
+    fileTypes: parsed.fileTypes.length > 0 ? parsed.fileTypes : undefined,
     hidden: parsed.hidden,
     noIgnore: parsed.noIgnore,
     onlyMatching: parsed.onlyMatching,
@@ -409,17 +414,29 @@ async function runSearch(
   )
 
   if (parsed.onlyMatching) {
-    return matches.flatMap(m =>
-      [...m.content.matchAll(new RegExp(parsed.pattern!, parsed.caseInsensitive ? 'giu' : 'gu'))]
-        .filter(match => match[0].length > 0)
-        .map(match => `${m.path}:${m.lineNumber ?? 0}:${match[0]}`),
-    )
+    // -o emits each matched substring. Context lines and column-truncated
+    // entries have no emittable content, so they yield nothing here —
+    // matching rg, which prints no `-o` output for context or omitted lines.
+    return matches
+      .filter(m => !m.isContext)
+      .flatMap(m =>
+        [...m.content.matchAll(new RegExp(parsed.pattern!, parsed.caseInsensitive ? 'giu' : 'gu'))]
+          .filter(match => match[0].length > 0)
+          .map(match => `${m.path}:${m.lineNumber ?? 0}:${match[0]}`),
+      )
   }
 
   if (parsed.filesWithMatchesOnly) {
+    // -l: file membership only. Column-truncated entries are still real
+    // matches (rg -l lists a file even when every hit is on a long line),
+    // so we count them — that's the whole reason the native side emits a
+    // membership stub instead of dropping the match. Context lines never
+    // introduce a new file (they only appear around an actual match in the
+    // same file), but skip them explicitly for clarity.
     const seen = new Set<string>()
     const out: string[] = []
     for (const m of matches) {
+      if (m.isContext) continue
       if (!seen.has(m.path)) {
         seen.add(m.path)
         out.push(m.path)
@@ -429,18 +446,42 @@ async function runSearch(
   }
 
   if (parsed.countOnly) {
+    // -c counts real matches (incl. column-truncated) but NOT context
+    // lines — rg -c does not count -A/-B/-C context toward the per-file
+    // total. Skipping is_context here is load-bearing for count parity.
     const counts = new Map<string, number>()
     for (const m of matches) {
+      if (m.isContext) continue
       counts.set(m.path, (counts.get(m.path) ?? 0) + 1)
     }
     return Array.from(counts.entries()).map(([p, c]) => `${p}:${c}`)
   }
 
-  // Content mode: format `path:line:content`. All callers parse this
-  // exact shape (see GrepTool, GlobalSearchDialog).
-  return matches.map(
-    m => `${m.path}:${m.lineNumber ?? 0}:${m.content}`,
-  )
+  // Content mode. Two line shapes, matching ripgrep's conventions:
+  //   match:   `path:line:content`   (colon between line and content)
+  //   context: `path:line-content`   (dash between line and content)
+  // rg actually uses `path-line-content` for context, but the path↔line
+  // boundary MUST stay a colon here: GrepTool relativizes by splitting on
+  // the first `:`, and file paths can legitimately contain `-`. Keeping the
+  // path-boundary colon makes that split unambiguous for both shapes, while
+  // the line↔content dash still flags context the way rg does. For a
+  // column-truncated match, rg prints "[Omitted long matching line]" in
+  // place of the (suppressed) content — reproduce that so the model sees
+  // the line exists without the base64/minified noise.
+  return matches.map(m => {
+    // Group-break sentinel from the native context_break callback: rg's
+    // `--` separator between non-contiguous context groups. Its line_number
+    // is None, which napi-rs surfaces as `undefined` (not `null`), so use a
+    // loose `== null` check to catch both.
+    if (m.isContext && m.lineNumber == null && m.content === '--') {
+      return '--'
+    }
+    const body = m.columnTruncated
+      ? '[Omitted long matching line]'
+      : m.content
+    const sep = m.isContext ? '-' : ':'
+    return `${m.path}:${m.lineNumber ?? 0}${sep}${body}`
+  })
 }
 
 /**

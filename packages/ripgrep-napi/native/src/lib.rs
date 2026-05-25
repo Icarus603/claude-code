@@ -22,6 +22,27 @@
 //! `searchStream` already runs on a dedicated `std::thread` and emits
 //! results via `ThreadsafeFunction`, so it stays unchanged.
 //!
+//! ## Glob & file-type filtering — rg-exact, not hand-rolled
+//!
+//! Globs and `--type` filters are handed straight to the `ignore` crate's
+//! `WalkBuilder` via `OverrideBuilder` and `TypesBuilder` — the *same*
+//! matchers the real `rg` binary uses. This is load-bearing for parity:
+//!
+//!   * `OverrideBuilder` gives gitignore-semantics globs. A bare pattern
+//!     (`*.ts`) matches at any depth; a leading `!` (`!.git`) excludes a
+//!     whole directory subtree recursively. The previous hand-built
+//!     `GlobSet` had neither property — `!.git` only matched a path whose
+//!     final component was exactly `.git`, so `.git/config` slipped
+//!     through and the VCS-exclude globs every GrepTool/Glob call pushes
+//!     were silently no-ops (the walker handed back `.git/*` contents).
+//!   * `TypesBuilder::add_defaults()` wires rg's built-in type table
+//!     (`ts`, `py`, `rust`, `go`, `java`, …) so `--type ts` actually
+//!     filters. It used to be parsed JS-side and then dropped on the floor.
+//!
+//! Because `WalkBuilder` applies both filters during the walk itself,
+//! the walk loop no longer does any per-entry glob matching — it only
+//! drops non-files, polls the cancel flag, and collects paths.
+//!
 //! ## Cancellation
 //!
 //! `searchStream` returns a `CancelHandle`; flipping the flag aborts at
@@ -43,9 +64,10 @@
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Arc;
 
-use globset::{Glob, GlobSet, GlobSetBuilder};
 use grep_regex::RegexMatcherBuilder;
 use grep_searcher::{Searcher, SearcherBuilder, Sink, SinkMatch};
+use ignore::overrides::OverrideBuilder;
+use ignore::types::TypesBuilder;
 use ignore::{DirEntry, WalkBuilder};
 use napi::bindgen_prelude::*;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
@@ -90,8 +112,15 @@ impl CancelHandle {
 pub struct FindFilesOptions {
   pub root: String,
   /// Globs to apply. Plain pattern = include; leading `!` = exclude.
-  /// Same shape ripgrep accepts via `--glob`.
+  /// Exact gitignore semantics, same as ripgrep's `--glob`: a pattern
+  /// with no `/` matches at any depth, and `!<dir>` excludes the whole
+  /// subtree. Do NOT pre-mangle these JS-side (no `**/` prefixing) — the
+  /// `ignore` crate's OverrideBuilder applies the conventions itself.
   pub globs: Option<Vec<String>>,
+  /// File types to restrict to (`--type`), e.g. `["ts", "py"]`. Resolved
+  /// against ripgrep's built-in type table. Unknown names are ignored
+  /// (graceful — a typo'd type shouldn't abort the whole search).
+  pub file_types: Option<Vec<String>>,
   pub hidden: Option<bool>,
   pub no_ignore: Option<bool>,
   pub follow: Option<bool>,
@@ -123,40 +152,97 @@ pub async fn count_files(opts: FindFilesOptions) -> Result<u32> {
     .map_err(|e| Error::from_reason(format!("count_files join error: {e}")))?
 }
 
-/// Internal: shared walker for find/count. Optional cancel flag for the
-/// streaming path to short-circuit.
-fn walk(
-  opts: &FindFilesOptions,
-  cancel: Option<&Arc<AtomicBool>>,
-) -> Result<(Vec<String>, bool)> {
-  let glob_set = build_globset(opts.globs.as_deref())?;
-  let exclude_set = build_globset_excludes(opts.globs.as_deref())?;
-
-  let mut builder = WalkBuilder::new(&opts.root);
+/// Build a `WalkBuilder` configured with the override globs, file-type
+/// filter, and the hidden/ignore/follow/depth knobs. Shared by every
+/// walking path (find/count/searchContent/searchStream) so glob+type
+/// semantics can't drift between them.
+fn build_walk_builder(
+  root: &str,
+  globs: Option<&[String]>,
+  file_types: Option<&[String]>,
+  hidden: bool,
+  no_ignore: bool,
+  follow: bool,
+  max_depth: Option<u32>,
+) -> Result<WalkBuilder> {
+  let mut builder = WalkBuilder::new(root);
 
   // standard_filters(false) is a sledgehammer: it disables hidden,
   // parents, ignore, git_ignore, git_global, git_exclude all at once.
   // ripgrep's actual semantics differ: --no-ignore turns off the
   // ignore-file family but leaves hidden-file filtering intact.
   // Apply standard_filters first, then re-apply hidden() so it wins.
-  if opts.no_ignore.unwrap_or(false) {
+  if no_ignore {
     builder.standard_filters(false);
   }
   // ignore::WalkBuilder::hidden(yes) means "filter hidden files when yes
   // is true". Inverted from the CLI flag's --hidden (which makes them
   // visible). Default: skip hidden files.
-  builder.hidden(!opts.hidden.unwrap_or(false));
-  builder.follow_links(opts.follow.unwrap_or(false));
-  if let Some(d) = opts.max_depth {
+  builder.hidden(!hidden);
+  builder.follow_links(follow);
+  if let Some(d) = max_depth {
     builder.max_depth(Some(d as usize));
   }
 
+  // Glob overrides — gitignore semantics, `!` inverted to mean exclude.
+  // This is exactly what `rg --glob` feeds the walker. An empty override
+  // set is a no-op, so only attach when there's at least one glob.
+  if let Some(globs) = globs {
+    if !globs.is_empty() {
+      let mut ob = OverrideBuilder::new(root);
+      for g in globs {
+        ob.add(g)
+          .map_err(|e| Error::from_reason(format!("bad glob {g:?}: {e}")))?;
+      }
+      let ov = ob
+        .build()
+        .map_err(|e| Error::from_reason(format!("override build: {e}")))?;
+      builder.overrides(ov);
+    }
+  }
+
+  // File-type filter — ripgrep's built-in type table (`ts`, `py`, …).
+  // Unknown types are dropped gracefully: if `build()` rejects a name we
+  // fall back to no type filter rather than failing the whole search,
+  // because `type` arrives from an LLM tool call and a typo ("typescript"
+  // for "ts") shouldn't black-hole every result. rg itself hard-errors
+  // here, but graceful-degrade is the right call for this caller.
+  if let Some(types) = file_types {
+    if !types.is_empty() {
+      let mut tb = TypesBuilder::new();
+      tb.add_defaults();
+      for t in types {
+        tb.select(t);
+      }
+      if let Ok(built) = tb.build() {
+        builder.types(built);
+      }
+    }
+  }
+
+  Ok(builder)
+}
+
+/// Internal: shared walker for find/count. Optional cancel flag for the
+/// streaming path to short-circuit.
+fn walk(
+  opts: &FindFilesOptions,
+  cancel: Option<&Arc<AtomicBool>>,
+) -> Result<(Vec<String>, bool)> {
+  let builder = build_walk_builder(
+    &opts.root,
+    opts.globs.as_deref(),
+    opts.file_types.as_deref(),
+    opts.hidden.unwrap_or(false),
+    opts.no_ignore.unwrap_or(false),
+    opts.follow.unwrap_or(false),
+    opts.max_depth,
+  )?;
   let walk = builder.build();
 
   let mut out: Vec<String> = Vec::new();
   let mut entries_seen: usize = 0;
   let cancelled = AtomicBool::new(false);
-  let root_path = std::path::Path::new(&opts.root);
 
   for entry in walk {
     // Cheap cancel poll. Once per 100 entries keeps the hot path branch-free
@@ -179,32 +265,13 @@ fn walk(
       Err(_) => continue,
     };
 
+    // Glob/type filtering already happened inside the walker (overrides +
+    // types). All we do here is drop non-files and collect paths.
     if !entry.file_type().map(|t| t.is_file()).unwrap_or(false) {
       continue;
     }
 
-    let path = entry.path();
-
-    // Glob filter: include set must match (when non-empty), exclude set
-    // must not. Order matters because exclude wins on overlap. Glob
-    // patterns are matched against the path RELATIVE to the search
-    // root — same as ripgrep's `--glob` semantics. Without this,
-    // patterns like `sub/**` never match because the walker hands us
-    // absolute paths like /tmp/abc/sub/b.ts and globset expects the
-    // relative segment.
-    let rel = path.strip_prefix(root_path).unwrap_or(path);
-    if let Some(ref ex) = exclude_set {
-      if ex.is_match(rel) {
-        continue;
-      }
-    }
-    if let Some(ref inc) = glob_set {
-      if !inc.is_match(rel) {
-        continue;
-      }
-    }
-
-    if let Some(s) = path.to_str() {
+    if let Some(s) = entry.path().to_str() {
       out.push(s.to_owned());
     }
   }
@@ -235,48 +302,6 @@ fn sort_by_mtime_desc(paths: &mut [String]) {
   }
 }
 
-fn build_globset(globs: Option<&[String]>) -> Result<Option<GlobSet>> {
-  let Some(globs) = globs else {
-    return Ok(None);
-  };
-  let mut b = GlobSetBuilder::new();
-  let mut have_includes = false;
-  for g in globs {
-    if g.starts_with('!') {
-      continue;
-    }
-    have_includes = true;
-    let glob = Glob::new(g).map_err(|e| Error::from_reason(e.to_string()))?;
-    b.add(glob);
-  }
-  if !have_includes {
-    return Ok(None);
-  }
-  let set = b.build().map_err(|e| Error::from_reason(e.to_string()))?;
-  Ok(Some(set))
-}
-
-fn build_globset_excludes(globs: Option<&[String]>) -> Result<Option<GlobSet>> {
-  let Some(globs) = globs else {
-    return Ok(None);
-  };
-  let mut b = GlobSetBuilder::new();
-  let mut have_excludes = false;
-  for g in globs {
-    let Some(stripped) = g.strip_prefix('!') else {
-      continue;
-    };
-    have_excludes = true;
-    let glob = Glob::new(stripped).map_err(|e| Error::from_reason(e.to_string()))?;
-    b.add(glob);
-  }
-  if !have_excludes {
-    return Ok(None);
-  }
-  let set = b.build().map_err(|e| Error::from_reason(e.to_string()))?;
-  Ok(Some(set))
-}
-
 // ---------------------------------------------------------------------------
 // Content search (regex)
 // ---------------------------------------------------------------------------
@@ -290,12 +315,20 @@ pub struct SearchContentOptions {
   pub literal: Option<bool>,
   /// `-U --multiline-dotall`: `.` matches newlines.
   pub multiline_dotall: Option<bool>,
-  /// `--max-columns`: drop matches in lines longer than this.
+  /// `--max-columns`: drop the *content* of matches on lines longer than
+  /// this. The file still counts as a match for files-with-matches mode —
+  /// see CollectingSink for the membership-vs-content split.
   pub max_columns: Option<u32>,
   /// `-m`: stop after this many matches per file.
   pub max_count_per_file: Option<u32>,
+  /// `-B`: lines of leading context to report around each match.
+  pub before_context: Option<u32>,
+  /// `-A`: lines of trailing context to report around each match.
+  pub after_context: Option<u32>,
   /// File-level filters (same shape as findFiles).
   pub globs: Option<Vec<String>>,
+  /// `--type` filter (same shape as findFiles).
+  pub file_types: Option<Vec<String>>,
   pub hidden: Option<bool>,
   pub no_ignore: Option<bool>,
 }
@@ -306,6 +339,18 @@ pub struct ContentMatch {
   pub path: String,
   pub line_number: Option<u32>,
   pub content: String,
+  /// True when this match's line exceeded `max_columns` and its content
+  /// was suppressed. The entry is still emitted (with empty `content`) so
+  /// files-with-matches callers count the file — mirrors `rg -l`, which
+  /// lists a file even when every match is on an over-long line. Content
+  /// and count callers filter these out.
+  pub column_truncated: bool,
+  /// True when this entry is a CONTEXT line (from `-A`/`-B`/`-C`), not a
+  /// real match. rg renders context with a `-` separator and matches with
+  /// `:`; the JS content-mode formatter does the same. Context entries are
+  /// NOT counted by `-c` and NOT listed as distinct files by `-l` (the
+  /// file is already present from its real match), so those modes skip them.
+  pub is_context: bool,
 }
 
 #[napi]
@@ -333,7 +378,7 @@ fn search_content_inner(opts: SearchContentOptions) -> Result<Vec<ContentMatch>>
       max_columns,
       cancel: None,
     };
-    if let Err(_) = searcher.search_path(&matcher, &path, &mut sink) {
+    if searcher.search_path(&matcher, &path, &mut sink).is_err() {
       // I/O on one file shouldn't abort the whole search. Skip and move on.
       continue;
     }
@@ -358,6 +403,17 @@ fn build_search(opts: &SearchContentOptions) -> Result<(grep_regex::RegexMatcher
   sb.line_number(true);
   if opts.multiline_dotall.unwrap_or(false) {
     sb.multi_line(true);
+    // grep-searcher forces before/after_context to 0 in multi-line mode
+    // (see Config: multi_line disables context). Don't fight it — context
+    // + multiline is a combination rg itself doesn't support either.
+  } else {
+    // Context lines (-A/-B/-C). Only meaningful in single-line mode.
+    if let Some(b) = opts.before_context {
+      sb.before_context(b as usize);
+    }
+    if let Some(a) = opts.after_context {
+      sb.after_context(a as usize);
+    }
   }
   let searcher = sb.build();
 
@@ -368,6 +424,7 @@ fn walk_opts_from_search(opts: &SearchContentOptions) -> FindFilesOptions {
   FindFilesOptions {
     root: opts.root.clone(),
     globs: opts.globs.clone(),
+    file_types: opts.file_types.clone(),
     hidden: opts.hidden,
     no_ignore: opts.no_ignore,
     follow: None,
@@ -398,17 +455,76 @@ impl<'a> Sink for CollectingSink<'a> {
       return Ok(false);
     }
     let line = std::str::from_utf8(mat.bytes()).unwrap_or("").trim_end_matches('\n');
+    let line_number = mat.line_number().map(|n| n as u32);
     if line.len() as u32 > self.max_columns {
-      // ripgrep --max-columns drops long lines silently. Same here.
-      return Ok(true);
+      // ripgrep --max-columns suppresses the long line's CONTENT but the
+      // file is still a match: `rg -l` lists it, `rg -c` counts it. Emit a
+      // membership marker with empty content + column_truncated=true so
+      // files-with-matches / count callers see the file. Content-mode
+      // callers drop these (see ripgrep.ts).
+      self.out.push(ContentMatch {
+        path: self.path.to_owned(),
+        line_number,
+        content: String::new(),
+        column_truncated: true,
+        is_context: false,
+      });
+    } else {
+      self.out.push(ContentMatch {
+        path: self.path.to_owned(),
+        line_number,
+        content: line.to_owned(),
+        column_truncated: false,
+        is_context: false,
+      });
     }
+    self.remaining = self.remaining.saturating_sub(1);
+    // When -m caps matches, keep going only if there's budget left. But
+    // grep-searcher still emits this match's trailing after-context lines
+    // via context() even after we stop matching — returning false here
+    // would cut them off, so only stop once remaining hits 0 AND there is
+    // no after-context to flush. Simplest correct behavior: keep returning
+    // true while remaining>0; the searcher itself stops at EOF. GrepTool
+    // never sets -m alongside -A/-B, so the cap+context combo is academic.
+    Ok(self.remaining > 0)
+  }
+
+  fn context(&mut self, _: &Searcher, ctx: &grep_searcher::SinkContext<'_>) -> std::result::Result<bool, std::io::Error> {
+    if let Some(c) = self.cancel {
+      if c.load(Ordering::Relaxed) {
+        return Ok(false);
+      }
+    }
+    // Context lines (-A/-B/-C). Emitted with is_context=true so the JS
+    // formatter renders them with rg's `-` separator and `-l`/`-c` skip
+    // them. They do NOT consume the per-file match budget (`remaining`).
+    let line = std::str::from_utf8(ctx.bytes()).unwrap_or("").trim_end_matches('\n');
+    let line_number = ctx.line_number().map(|n| n as u32);
+    let truncated = line.len() as u32 > self.max_columns;
     self.out.push(ContentMatch {
       path: self.path.to_owned(),
-      line_number: mat.line_number().map(|n| n as u32),
-      content: line.to_owned(),
+      line_number,
+      content: if truncated { String::new() } else { line.to_owned() },
+      column_truncated: truncated,
+      is_context: true,
     });
-    self.remaining = self.remaining.saturating_sub(1);
-    Ok(self.remaining > 0)
+    Ok(true)
+  }
+
+  fn context_break(&mut self, _: &Searcher) -> std::result::Result<bool, std::io::Error> {
+    // rg prints a `--` separator between non-contiguous context groups
+    // (only when before/after_context > 0). Emit a sentinel the JS side
+    // renders as a bare `--`: line_number=None, content="--", is_context.
+    // It carries the file's path so single-file callers stay consistent,
+    // but the content-mode formatter special-cases it to a bare `--`.
+    self.out.push(ContentMatch {
+      path: self.path.to_owned(),
+      line_number: None,
+      content: "--".to_owned(),
+      column_truncated: false,
+      is_context: true,
+    });
+    Ok(true)
   }
 }
 
@@ -451,24 +567,23 @@ fn stream_inner(
   let walk_opts = walk_opts_from_search(opts);
 
   // For streaming, we don't pre-collect paths. We walk and emit per match.
-  // We DO honor the cancel flag both at walker level and sink level.
-  let glob_set = build_globset(walk_opts.globs.as_deref())?;
-  let exclude_set = build_globset_excludes(walk_opts.globs.as_deref())?;
-
-  let mut builder = WalkBuilder::new(&walk_opts.root);
-  // Same ordering rule as walk(): standard_filters(false) first, then
-  // hidden() to re-apply hidden filtering. See comment at the matching
-  // section above.
-  if walk_opts.no_ignore.unwrap_or(false) {
-    builder.standard_filters(false);
-  }
-  builder.hidden(!walk_opts.hidden.unwrap_or(false));
+  // We DO honor the cancel flag both at walker level and sink level. The
+  // walker itself applies the override globs + type filter (same builder
+  // as the buffered path), so no per-entry glob matching here either.
+  let builder = build_walk_builder(
+    &walk_opts.root,
+    walk_opts.globs.as_deref(),
+    walk_opts.file_types.as_deref(),
+    walk_opts.hidden.unwrap_or(false),
+    walk_opts.no_ignore.unwrap_or(false),
+    false,
+    None,
+  )?;
   let walk = builder.build();
 
   let max_per_file = opts.max_count_per_file.unwrap_or(u32::MAX);
   let max_columns = opts.max_columns.unwrap_or(u32::MAX);
   let entries_seen = AtomicUsize::new(0);
-  let root_path = std::path::Path::new(&walk_opts.root);
 
   for entry in walk {
     if entries_seen.fetch_add(1, Ordering::Relaxed) % 100 == 0
@@ -484,17 +599,6 @@ fn stream_inner(
       continue;
     }
     let path = entry.path();
-    let rel = path.strip_prefix(root_path).unwrap_or(path);
-    if let Some(ref ex) = exclude_set {
-      if ex.is_match(rel) {
-        continue;
-      }
-    }
-    if let Some(ref inc) = glob_set {
-      if !inc.is_match(rel) {
-        continue;
-      }
-    }
     let path_str = match path.to_str() {
       Some(s) => s.to_owned(),
       None => continue,
@@ -536,6 +640,10 @@ impl<'a> Sink for StreamingSink<'a> {
       return Ok(false);
     }
     let line = std::str::from_utf8(mat.bytes()).unwrap_or("").trim_end_matches('\n');
+    // Streaming feeds GlobalSearchDialog, which renders the line content.
+    // An over-max_columns line is dropped entirely (not emitted as an
+    // empty stub) — there's no -l semantics to preserve here, and a blank
+    // line in the picker is noise.
     if line.len() as u32 > self.max_columns {
       return Ok(true);
     }
