@@ -383,6 +383,17 @@ function PromptInput({
     key?: string
   }>({ show: false })
   const [cursorOffset, setCursorOffset] = useState<number>(input.length)
+  // Render-time cursor mirror. Source: ant 5163.js:77-78 `FH = useRef(hH);
+  // FH.current = hH`. insertTextAtCursor reads + advances this ref instead
+  // of the `cursorOffset` STATE so that a multi-insert burst within ONE
+  // React tick (e.g. dragging several images → usePasteHandler fires
+  // onImagePaste in a sync loop) lands each insert after the previous one.
+  // Reading the state would give the stale pre-tick offset on the 2nd..Nth
+  // call, so every insert spliced at the same position and trackAndSetInput
+  // (an absolute assignment) kept only the last [Image #N]. The mirror is
+  // re-synced to state every render, matching ant's FH.
+  const cursorOffsetRef = React.useRef(cursorOffset)
+  cursorOffsetRef.current = cursorOffset
   // Track the last input value set via internal handlers so we can detect
   // external input changes (e.g. speech-to-text injection) and move cursor to end.
   const lastInternalInputRef = React.useRef(input)
@@ -1678,13 +1689,26 @@ function PromptInput({
   )
 
   function insertTextAtCursor(text: string) {
+    // Source: ant 5163.js:822 `D$`. Read the CURRENT input + cursor from
+    // refs, not state — a multi-insert burst in one React tick (multi-image
+    // drag → onImagePaste sync loop) must see each prior insert. State is
+    // stale until commit; lastInternalInputRef (= ant aH, written
+    // synchronously by trackAndSetInput) and cursorOffsetRef (= ant FH)
+    // carry the live values, and we advance cursorOffsetRef synchronously
+    // so the next call splices after this one. Without this, every image
+    // spliced at the same offset and only the last [Image #N] survived.
+    const curInput = lastInternalInputRef.current
+    const curOffset = Math.min(cursorOffsetRef.current, curInput.length)
+
     // Push current state to buffer before inserting
-    pushToBuffer(input, cursorOffset, pastedContents)
+    pushToBuffer(curInput, curOffset, pastedContents)
 
     const newInput =
-      input.slice(0, cursorOffset) + text + input.slice(cursorOffset)
+      curInput.slice(0, curOffset) + text + curInput.slice(curOffset)
+    const newOffset = curOffset + text.length
+    cursorOffsetRef.current = newOffset
     trackAndSetInput(newInput)
-    setCursorOffset(cursorOffset + text.length)
+    setCursorOffset(newOffset)
   }
 
   const doublePressEscFromEmpty = useDoublePress(

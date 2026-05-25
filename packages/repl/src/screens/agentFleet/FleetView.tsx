@@ -20,7 +20,7 @@
 
 import type React from 'react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Box, Text, type ClickEvent, instances, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
+import { Box, Text, type ClickEvent, type Key, instances, useInput, useSelection, useTerminalSize } from '@anthropic/ink'
 import { Cursor } from '../../Cursor.js'
 import { fileURLToPath } from 'node:url'
 import { openBrowser, openPath } from '@claude-code/storage/browser.js'
@@ -93,6 +93,10 @@ import {
   type FleetRow,
   useFleetRows,
 } from './hooks/useFleetRows.js'
+
+import { usePasteHandler } from '../../hooks/usePasteHandler.js'
+import { materializeFleetImages } from './helpers/materializeFleetImages.js'
+import { useFleetDispatchPaste } from './hooks/useFleetDispatchPaste.js'
 
 export interface FleetViewProps {
   /** Current foreground session id (drives "current session" labelling). */
@@ -454,6 +458,15 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   // SearchInput). Without this, typed text can only be appended at end
   // and backspace only deletes the last char.
   const [dispatchCursor, setDispatchCursor] = useState(0)
+
+  // Image/text paste for the dispatch buffer (ant 5277.js fq/HK + on*Paste).
+  // See useFleetDispatchPaste.ts for the full ant source mapping.
+  const dispatchPaste = useFleetDispatchPaste({
+    dispatchBuf,
+    dispatchCursor,
+    setDispatchBuf,
+    setDispatchCursor,
+  })
 
   // Clamp cursor whenever the buffer shrinks (programmatic clears, paste
   // truncation, etc.) so we never index past the end.
@@ -1249,6 +1262,8 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
 
   const handleSubmitDispatch = useCallback((): void => {
     const text = dispatchBuf.trim()
+    const { pastedContents: submittedPastedContents, hasImages } =
+      dispatchPaste.snapshotAndClear()
     setDispatchBuf('')
     if (text === '') {
       // No buffer text — "open / expand" based on focus.
@@ -1324,14 +1339,16 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       //   let A7 = !!AP && AP.ready && !L9.matched && !L9.routine
       //            && NT === AP.cwd && $1
       // ant only consumes the spare when the intent fits a SINGLE
-      // bracketed paste — length ≤ 800 chars (LZH) and no embedded
-      // newlines. Multi-line/long intents go through cold spawn so the
-      // inner REPL renders them via the normal stdin write path.
-      // ccb dispatch buffer doesn't attach images yet — so just check
-      // length and newlines.
+      // bracketed paste — length ≤ 800 chars (LZH), no embedded newlines,
+      // AND no attached images. A dispatch with images MUST cold-spawn:
+      // jnK rewrites the `[Image #N]` placeholders into file paths inside
+      // the worker's own job dir, which only exists for a freshly-spawned
+      // short — a claimed spare already booted with a different job dir.
       const SPARE_INTENT_MAX = 800
       const fitsSpare =
-        intent.length <= SPARE_INTENT_MAX && !intent.includes('\n')
+        !hasImages &&
+        intent.length <= SPARE_INTENT_MAX &&
+        !intent.includes('\n')
       let resolvedShort: string | undefined
       let resolvedSessionId: string | undefined
       if (isPlainDispatch && fitsSpare && peekSpare !== undefined) {
@@ -1397,6 +1414,20 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return resolvedShort
     }
 
+    // pushOptimistic + materialize images + dispatch. Source: ant 5277.js
+    // `jnK(M1, kY, w3).then((U7) => $V6(...))` — the placeholder→path
+    // rewrite is awaited before the worker is told its intent. Shared by
+    // the agent-prefixed and plain branches (ant calls jnK once per path).
+    const dispatch = (intent: string, dispatchAgent?: string): void => {
+      const short = pushOptimistic(intent, dispatchAgent)
+      void materializeFleetImages(intent, submittedPastedContents, short).then(
+        materialized => {
+          onDispatch?.({ intent: materialized, cwd, agent: dispatchAgent, short })
+          setTimeout(() => refreshJobs(), 50)
+        },
+      )
+    }
+
     if (agent === undefined) {
       const space = stripped.search(/\s/)
       const firstWord = (space < 0 ? stripped : stripped.slice(0, space)).toLowerCase()
@@ -1405,9 +1436,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
         agent = a.agentType
         const rest = space < 0 ? '' : stripped.slice(space + 1).trim()
         markAgentUsed(agent)
-        const short = pushOptimistic(rest, agent)
-        onDispatch?.({ intent: rest, cwd, agent, short })
-        setTimeout(() => refreshJobs(), 50)
+        dispatch(rest, agent)
         return
       }
     }
@@ -1427,10 +1456,8 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
       return
     }
     if (agent !== undefined) markAgentUsed(agent)
-    const short = pushOptimistic(stripped, agent)
-    onDispatch?.({ intent: stripped, cwd, agent, short })
-    setTimeout(() => refreshJobs(), 50)
-  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, peekSpare, refreshJobs, agents, worktreeRepos])
+    dispatch(stripped, agent)
+  }, [dispatchBuf, focused, handleToggleCollapse, handleExpandFold, onAttach, onDispatch, peekSpare, refreshJobs, agents, worktreeRepos, dispatchPaste])
 
   // Source: ant 5092.js gs3 onReply (lines after gs3):
   //   onReply: async (W_) => {
@@ -1536,7 +1563,11 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
   }, [])
 
   // ── key router (ant xd at 5092.js:2767-3115) ────────────────────────
-  useInput((input, key) => {
+  // The raw, un-wrapped key handler. Source: ant 5277.js `yG`. W86
+  // (= ccb usePasteHandler) wraps this so bracketed-paste events get
+  // intercepted for image/text detection BEFORE the cascade sees them.
+  // Everything below is the original cascade, unchanged.
+  const handleInputKey = (input: string, key: Key): void => {
     // Source: ant xd `if (rH !== null) { if (ctrl+c) aH(null); return; }`.
     // `rH` is the attaching-job id (set when user attaches, cleared when
     // the open promise resolves). While attach is in flight, ant swallows
@@ -2093,6 +2124,23 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
     if (input !== '' && !key.ctrl && !key.meta) {
       applyCursor(cur.insert(input.replace(/\r/g, '\n')))
     }
+  }
+
+  // Wrap the raw key handler with paste detection. Source: ant 5277.js
+  // `W86({ handleKeyDown: yG, onPaste, onImagePaste })` — W86 = ccb's
+  // usePasteHandler. ant wires the result to the input element's
+  // onKeyDown/onPaste DOM props; ccb has a single useInput cascade, so we
+  // route every event through wrappedOnInput, which reads
+  // `event.keypress.isPasted` to split paste bodies (drag-path → image,
+  // empty Cmd+V → clipboard probe, else text).
+  const { wrappedOnInput } = usePasteHandler({
+    onInput: handleInputKey,
+    onPaste: dispatchPaste.onTextPaste,
+    onImagePaste: dispatchPaste.onImagePaste,
+  })
+
+  useInput((input, key, event) => {
+    wrappedOnInput(input, key, event)
   })
 
   // ── derived UI state ───────────────────────────────────────────────
