@@ -181,7 +181,9 @@ import { findTokenBudgetPositions } from '@claude-code/agent/tokenBudget'
 import {
   findUltraplanTriggerPositions,
   findUltrareviewTriggerPositions,
+  findUltraworkTriggerPositions,
 } from '../../ultraplan/keyword.js'
+import { isWorkflowsCommandEnabled } from '@claude-code/agent/goalStopHook.js'
 import { AutoModeOptInDialog } from '../AutoModeOptInDialog.js'
 import { BridgeDialog } from '../BridgeDialog.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
@@ -764,6 +766,14 @@ function PromptInput({
     [displayedValue],
   )
 
+  const ultraworkTriggers = useMemo(
+    () =>
+      feature('ULTRAWORK') && isWorkflowsCommandEnabled()
+        ? findUltraworkTriggerPositions(displayedValue)
+        : [],
+    [displayedValue],
+  )
+
   const btwTriggers = useMemo(
     () => findBtwTriggerPositions(displayedValue),
     [displayedValue],
@@ -998,6 +1008,19 @@ function PromptInput({
       }
     }
 
+    // Same rainbow treatment for the ultrawork keyword
+    for (const trigger of ultraworkTriggers) {
+      for (let i = trigger.start; i < trigger.end; i++) {
+        highlights.push({
+          start: i,
+          end: i + 1,
+          color: getRainbowColor(i - trigger.start),
+          shimmerColor: getRainbowColor(i - trigger.start, true),
+          priority: 10,
+        })
+      }
+    }
+
     return highlights
   }, [
     isSearchingHistory,
@@ -1016,6 +1039,7 @@ function PromptInput({
     thinkTriggers,
     ultraplanTriggers,
     ultrareviewTriggers,
+    ultraworkTriggers,
   ])
 
   const { addNotification, removeNotification } = useNotifications()
@@ -1057,6 +1081,19 @@ function PromptInput({
       })
     }
   }, [addNotification, ultrareviewTriggers.length])
+
+  useEffect(() => {
+    if (ultraworkTriggers.length) {
+      addNotification({
+        key: 'ultrawork-active',
+        text: 'This prompt will steer Claude into autonomous workflow mode',
+        priority: 'immediate',
+        timeoutMs: 5000,
+      })
+    } else {
+      removeNotification('ultrawork-active')
+    }
+  }, [addNotification, removeNotification, ultraworkTriggers.length])
 
   // Track input length for stash hint
   const prevInputLengthRef = useRef(input.length)
