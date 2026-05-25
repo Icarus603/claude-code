@@ -15,6 +15,7 @@ import {
   CONTEXT_1M_BETA_HEADER,
   CONTEXT_MANAGEMENT_BETA_HEADER,
   INTERLEAVED_THINKING_BETA_HEADER,
+  LN_BETA_HEADER,
   MID_CONVERSATION_SYSTEM_BETA_HEADER,
   PROMPT_CACHING_SCOPE_BETA_HEADER,
   REDACT_THINKING_BETA_HEADER,
@@ -276,6 +277,20 @@ export const getAllModelBetas = memoize((model: string): string[] => {
     getInitialSettings().showThinkingSummaries !== true
   ) {
     betaHeaders.push(REDACT_THINKING_BETA_HEADER)
+  }
+
+  // ant 2005.js (v2.1.150) — ln beta gate. Mirrors the redact-thinking
+  // predicate (firstParty/experimental + ISP + interactive) but with the
+  // server-side `tengu_ln` flag (default off) as the final gate instead of
+  // the showThinkingSummaries setting:
+  //   if (ul_ && O && H38(H) && !h8() && k_("tengu_ln", !1)) _.push(ul_)
+  if (
+    includeFirstPartyOnlyBetas &&
+    modelSupportsISP(model) &&
+    !getIsNonInteractiveSession() &&
+    getFeatureValue_CACHED_MAY_BE_STALE('tengu_ln', false)
+  ) {
+    betaHeaders.push(LN_BETA_HEADER)
   }
 
   const antOptedIntoToolClearing =

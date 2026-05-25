@@ -73,3 +73,12 @@ export const EXTENDED_CACHE_TTL_BETA_HEADER = 'extended-cache-ttl-2025-04-11'
 // added per-request via `isMidConversationSystemEnabled` (see betas.ts).
 export const MID_CONVERSATION_SYSTEM_BETA_HEADER =
   'mid-conversation-system-2026-04-07'
+
+// ant 1415.js ul_ (v2.1.150) — `ln-2026-05-13`. The v149 delta introduced
+// this as `thinking-token-count-2026-05-13` gated by `tengu_chert_bezel`;
+// v150 renamed both the header (→ `ln-2026-05-13`) and the gate (→
+// `tengu_ln`). Server-side beta reporting thinking-token counts. Added
+// per-request alongside redact-thinking, sharing the same firstParty +
+// interleaved-thinking + interactive predicate, with `tengu_ln` as the
+// final gate (default off). See `getAllModelBetas` in betas.ts.
+export const LN_BETA_HEADER = 'ln-2026-05-13'
