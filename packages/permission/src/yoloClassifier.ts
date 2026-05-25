@@ -1250,13 +1250,8 @@ type AutoModeConfig = {
  * then the main loop model.
  */
 function getClassifierModel(): string {
-  // Explicit override always wins. The ant build gates this on
-  // USER_TYPE==='ant', but that gate locks a ccb operator out of the only
-  // escape hatch for picking the classifier model — same anti-pattern class
-  // as the fullscreen-renderer USER_TYPE gate (7895b9d6). ccb is
-  // operator-trusted and solo-maintained, so the env var is read
-  // unconditionally; on the ant build USER_TYPE==='ant' so behaviour is
-  // unchanged there.
+  // Env override read unconditionally (ant gates on USER_TYPE==='ant', which
+  // locks ccb operators out — same anti-pattern as the fullscreen gate 7895b9d6).
   const envModel = readEnv('CLAUDE_CODE_AUTO_MODE_MODEL')
   if (envModel) return envModel
   const config = getFeatureValue_CACHED_MAY_BE_STALE(
@@ -1266,19 +1261,13 @@ function getClassifierModel(): string {
   if (config?.model) {
     return config.model
   }
-  // Default to the SMALL-FAST model (Haiku when reachable), NOT the main-loop
-  // model. ant runs the auto-mode classifier on a small dedicated model via
-  // its GrowthBook config; ccb has no GrowthBook backend, so this fell through
-  // to getMainLoopModel() and ran the classifier on the operator's SESSION
-  // model — typically Opus. The stage-1 XML prompt demands the response BEGIN
-  // with <block> and emit no preamble (classifierXmlFormat.ts
-  // replaceOutputFormatWithXml); a large reasoning model intermittently emits
-  // a reasoning preamble anyway, so parseXmlBlock returns null → the
-  // fail-closed path blocks the action with "could not evaluate" — at random,
-  // on zero-danger commands like `bun run build`. getSmallFastModel adheres to
-  // the strict format reliably and already has a reachability gate that falls
-  // back to the main-loop model when Haiku can't be served (alt providers /
-  // no Anthropic endpoint), so this never breaks non-Anthropic setups.
+  // Small-fast model, NOT the session model. ant uses a dedicated small model
+  // via GrowthBook; ccb has none, so this fell through to Opus. With
+  // max_tokens=64 and XML_S2_SUFFIX asking for <thinking> first, a large model
+  // burns the budget before <block>, parseXmlBlock returns null, and the
+  // fail-closed path blocks at random (e.g. `bun run build`). getSmallFastModel
+  // obeys the format and falls back to the main-loop model when Haiku is
+  // unreachable, so non-Anthropic setups don't break.
   return getSmallFastModel()
 }
 
