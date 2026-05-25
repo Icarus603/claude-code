@@ -442,16 +442,17 @@ function ModeIndicator({
         ]
       : []),
     // Source: ant 4967.js Ln3 — when running as a bg session attached
-    // via FleetView, hint that ← detaches back to the fleet list. Render
-    // conditions mirror ant exactly (G7() && K && !P):
-    //   - isBgSession()        — CLAUDE_CODE_SESSION_KIND === 'bg'
-    //   - showHint             — input empty AND !isSearching (composed
-    //                            upstream by PromptInputFooter)
-    // ant's foreground !G7() branch (←-opens-FleetView via REPL bridge)
-    // is intentionally NOT ported — see memory project_fleet_left_arrow_port_failure.
+    // via FleetView, hint that ← detaches back to the fleet list. ant gates
+    // on `G7() && K && !P` where K = isInputEmpty (NOT the composed showHint):
+    //   - isBgSession()  — CLAUDE_CODE_SESSION_KIND === 'bg'
+    //   - isInputEmpty   — input empty, IGNORING status-line/search suppression
+    // MUST use isInputEmpty, not showHint: showHint folds in suppressHint,
+    // which goes true once the bg session's status line renders (after the
+    // first turn shows tokens/cost). That made "← for agents" vanish after
+    // the first turn — only the foreground branch below was using isInputEmpty.
     // Pressing ← on empty prompt in a bg session triggers
     // sendBgDetachSignal() in REPLView.tsx, which is the live counterpart.
-    ...(isBgSession() && showHint
+    ...(isBgSession() && isInputEmpty
       ? [
           <Text dimColor key="bg-agents">
             ← for agents
