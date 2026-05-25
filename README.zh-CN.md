@@ -88,6 +88,10 @@ ccb --continue
 
 ## 代理视图 — `ccb agents`
 
+<p align="center">
+  <img src="assets/fleetview-demo.gif" alt="ccb 代理视图演示" width="100%">
+</p>
+
 一个用来统筹后台 session 的 TUI 仪表板。在终端输入：
 
 ```bash

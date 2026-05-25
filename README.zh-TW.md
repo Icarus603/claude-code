@@ -88,6 +88,10 @@ ccb --continue
 
 ## 代理檢視 — `ccb agents`
 
+<p align="center">
+  <img src="assets/fleetview-demo.gif" alt="ccb 代理檢視示範" width="100%">
+</p>
+
 一個用來統籌背景 session 的 TUI 儀表板。在終端機輸入：
 
 ```bash

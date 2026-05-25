@@ -88,6 +88,10 @@ ccb --continue
 
 ## Agents view — `ccb agents`
 
+<p align="center">
+  <img src="assets/fleetview-demo.gif" alt="ccb agents view demo" width="100%">
+</p>
+
 A TUI dashboard for orchestrating background sessions. Type:
 
 ```bash
