@@ -32,6 +32,10 @@ import { Select } from '@claude-code/repl/components/CustomSelect/select.js'
 import { ShimmerChar } from '@claude-code/repl/components/Spinner/ShimmerChar.js'
 import { useShimmerAnimation } from '@claude-code/repl/components/Spinner/useShimmerAnimation.js'
 import { type UnaryEvent, usePermissionRequestLogging } from '../hooks.js'
+import {
+  PermissionExplanation,
+  usePermissionExplainer,
+} from '../PermissionExplanation.js'
 import { PermissionDecisionDebugInfo } from '../PermissionDecisionDebugInfo.js'
 import { PermissionDialog } from '../PermissionDialog.js'
 import type { PermissionRequestProps } from '../PermissionRequest.js'
@@ -338,6 +342,14 @@ function BashPermissionRequestInner({
     context: 'Confirmation',
   })
 
+  // ctrl+e — one-shot LLM explainer for the pending command.
+  const explainer = usePermissionExplainer({
+    toolName: toolUseConfirm.tool.name,
+    toolInput: toolUseConfirm.input,
+    toolDescription: toolUseConfirm.description,
+    messages: toolUseContext.messages,
+  })
+
   // Allow Esc to dismiss the checkmark after auto-approval
   const handleDismissCheckmark = useCallback(() => {
     toolUseConfirm.onDismissCheckmark?.()
@@ -573,6 +585,10 @@ function BashPermissionRequestInner({
               onFocus={handleFocus}
               onInputModeToggle={handleInputModeToggle}
             />
+            <PermissionExplanation
+              visible={explainer.visible}
+              promise={explainer.promise}
+            />
           </Box>
           <Box justifyContent="space-between" marginTop={1}>
             <Text dimColor>
@@ -580,6 +596,10 @@ function BashPermissionRequestInner({
               {((focusedOption === 'yes' && !yesInputMode) ||
                 (focusedOption === 'no' && !noInputMode)) &&
                 ' · Tab to amend'}
+              {explainer.enabled &&
+                ` · ${explainer.chord} to ${
+                  explainer.visible ? 'hide' : 'explain'
+                }`}
             </Text>
             {toolUseContext.options.debug && (
               <Text dimColor>Ctrl+d to show debug info</Text>

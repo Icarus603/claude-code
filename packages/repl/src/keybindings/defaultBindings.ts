@@ -143,6 +143,8 @@ export const DEFAULT_BINDINGS: KeybindingBlock[] = [
       'shift+tab': 'confirm:cycleMode',
       // Toggle permission debug info
       'ctrl+d': 'permission:toggleDebug',
+      // Toggle the LLM command explainer
+      'ctrl+e': 'confirm:toggleExplanation',
     },
   },
   {
