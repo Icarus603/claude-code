@@ -37,5 +37,8 @@
     "./context/QueuedMessageContext.js": "./src/context/QueuedMessageContext.tsx",
     "./context/notifications.js": "./src/context/notifications.tsx",
     "./context/stats.js": "./src/context/stats.tsx"
+  },
+  "dependencies": {
+    "stdin-napi": "workspace:*"
   }
 }

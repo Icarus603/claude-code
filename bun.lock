@@ -192,6 +192,9 @@
     "packages/app-host": {
       "name": "@claude-code/app-host",
       "version": "0.1.0",
+      "dependencies": {
+        "stdin-napi": "workspace:*",
+      },
     },
     "packages/audio-capture-napi": {
       "name": "audio-capture-napi",
@@ -204,6 +207,9 @@
     "packages/cli": {
       "name": "@claude-code/cli",
       "version": "0.1.0",
+      "dependencies": {
+        "stdin-napi": "workspace:*",
+      },
     },
     "packages/color-diff-napi": {
       "name": "color-diff-napi",

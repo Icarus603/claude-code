@@ -28,5 +28,8 @@
     "./bg/openAgentsFromRepl.js": "./src/bg/openAgentsFromRepl.ts",
     "./bg/ptyAdopter.js": "./src/bg/ptyAdopter.ts",
     "./bg.js": "./src/bg.ts"
+  },
+  "dependencies": {
+    "stdin-napi": "workspace:*"
   }
 }
