@@ -13,7 +13,7 @@
 
 import { readFile } from 'fs/promises'
 
-const BUDGET = 5691 // -4: removed the v26.5.86 isLoading gate on the left-arrow bridge (broke backgrounding a running/auto-mode conversation)
+const BUDGET = 5736 // +45: mid-turn graceful abort before the left-arrow bridge forks — abort('background') + wait for queryGuard idle so the forked worker resumes a COMPLETE transcript (fixes right-arrow-returns-to-deadlock)
 
 async function main() {
   const content = await readFile('packages/repl/src/screens/REPLView.tsx', 'utf8')

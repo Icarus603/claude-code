@@ -3872,7 +3872,7 @@ export function REPL({
    * separate port that requires daemon dispatch primitives ccb is still
    * filling in; for now we no-op outside bg.
    */
-  const handleLeftArrowOnEmpty = useCallback(() => {
+  const handleLeftArrowOnEmpty = useCallback(async () => {
     // Source: ant 4177.js `$1H()`:
     //   if (!PF_()) return                     // PF_() = CLAUDE_BG_BACKEND==="daemon"
     //   let H = f4K()                          // detach message
@@ -3891,19 +3891,64 @@ export function REPL({
       // returns and fleetAttach's `finally` resumes Ink.
       process.exit(0);
     }
-    // NOTE: no isLoading gate here. v26.5.86 (781dbc8f) added one citing ant
-    // `cOH !kK`, but that broke the core use case — backgrounding a RUNNING
-    // conversation (esp. auto mode, where isLoading is near-permanently true).
-    // The fork resumes the on-disk transcript; an in-flight turn is lost on the
-    // foreground side too (unmount + process.exit below), so the gate protected
-    // no data — it only blocked the user from leaving. Reverted 2026-05-25.
+    // Mid-turn handling. ant blocks the bridge ENTIRELY while a turn is in
+    // flight (cOH `!kK` gate, 5359.js:2181). ccb cannot copy that verbatim:
+    // ant has no auto mode, ccb does, and under auto mode isLoading is
+    // near-permanently true — a verbatim gate makes the bridge unreachable
+    // for exactly the sessions users most want to background (the v26.5.86
+    // regression reverted in 9dce3fba).
+    //
+    // But ant's gate is not there to "block leaving" — it protects an
+    // INVARIANT: the forked worker boots with `--resume <id> --fork-session`
+    // (openAgentsFromReplLeftArrow → buildReplForkFlags), so it inherits the
+    // conversation by replaying the ON-DISK transcript. That transcript MUST
+    // be complete before the fork. ccb preserves the same invariant by a
+    // different means that also works under auto mode: gracefully abort the
+    // in-flight turn first (the same programmatic `abort('background')` that
+    // Ctrl+B's handleBackgroundQuery uses — NOT 'user-cancel', so the onQuery
+    // finally's auto-restore rewind stays off), then wait for the query loop
+    // to drain its partial assistant output + interruption message into the
+    // transcript before backgrounding.
+    //
+    // Skipping this is the deadlock: the worker --resumes a transcript missing
+    // the running turn, the right-arrow attach lands on an idle session (no
+    // spinner, dead agent loop), and the next prompt starts a fresh session.
+    if (queryGuard.isActive) {
+      abortControllerRef.current?.abort('background');
+      // Wait for the query loop to reach idle (all yields consumed: the
+      // partial assistant message AND createUserInterruptionMessage have been
+      // setMessages'd). queryGuard flips to idle in onQuery's finally.
+      await new Promise<void>(resolve => {
+        if (!queryGuard.isActive) {
+          resolve();
+          return;
+        }
+        const unsubscribe = queryGuard.subscribe(() => {
+          if (!queryGuard.isActive) {
+            unsubscribe();
+            resolve();
+          }
+        });
+        // Safety valve: never wedge the handoff if end() somehow never fires.
+        setTimeout(() => {
+          unsubscribe();
+          resolve();
+        }, 5000);
+      });
+      // Yield one macrotask so React commits the final setMessages and
+      // useLogMessages' effect enqueues the interruption + last partial chunk
+      // before openAgentsFromReplLeftArrow's flushSessionStorage drains the
+      // write queue. Without this the effect may not have run yet and the
+      // flush would race the tail of the turn onto disk.
+      await new Promise<void>(resolve => setTimeout(resolve, 0));
+    }
     // Foreground REPL: ← on empty prompt opens FleetView, backgrounding the
     // current conversation. Source: ant 5279.js o14 (the bridge). Re-ported
     // after the native stdin reader (stdin-napi) made the unmount→remount
     // cycle survivable. Dynamic import keeps the fleet/bg graph out of the
     // REPL boot path. On error, surface it as a warning message; on success
     // openAgentsFromReplLeftArrow unmounts and process.exit(0)s into FleetView.
-    void import('@claude-code/cli/bg/openAgentsFromRepl.js')
+    await import('@claude-code/cli/bg/openAgentsFromRepl.js')
       .then(({ openAgentsFromReplLeftArrow }) =>
         openAgentsFromReplLeftArrow(messagesRef.current),
       )
