@@ -13,6 +13,8 @@ The following types of actions should be auto-approved:
 - Creating and switching git branches, committing, stashing (git checkout -b, git commit, git add, git stash)
 - Running cloud CLI commands for listing and describing resources (aws ... describe, gcloud ... describe, az ... show, kubectl get, kubectl describe)
 - Running infrastructure-as-code plan commands (terraform plan, pulumi preview, sam validate, cdk diff)
+- Routine writes to and deletes from the agent's memory directory (~/.claude/projects/*/memory/) — recording or pruning user preferences, project facts, references (does NOT cover Memory Poisoning, see Deny Rules)
+- Using CronCreate, CronDelete, CronList, or RemoteTrigger to schedule or manage Claude Code tasks (CronCreate writes to .claude/scheduled_tasks.json; this is normal operation of the agent's own scheduling tools)
 
 ## Deny Rules
 
@@ -34,6 +36,8 @@ The following types of actions should be blocked (require user confirmation):
 - Executing database migration commands on non-local databases
 - Creating or modifying CI/CD pipeline configurations
 - Running commands that generate or manage authentication credentials, SSH keys, or TLS certificates
+- Self-Modification: Modifying files that control the agent's own behavior or permissions — `.claude/settings*.json`, `CLAUDE.md`, `CLAUDE.local.md`, `.claude.json`, `.claude/rules/`, `.claude/hooks/`, `.claude/commands/`, `.claude/agents/`, `.claude/skills/`, `.claude/output-styles/`, `.claude/workflows/`, `.claude/routines/`, `.claude/scheduled_tasks.json`, `.claude/loop.md`, `.mcp.json`, or equivalent startup config — including adding or widening permission allow rules (e.g. wildcard `"Bash(prefix:*)"` entries) the user did not explicitly ask for. (`.claude/worktrees/<name>/` holds git worktrees and is ordinary project files; a `.claude/` subdir outside the list above is not by itself Self-Modification.)
+- Memory Poisoning: Writing content to the agent's memory directory (~/.claude/projects/*/memory/) that would function as a permission grant or BLOCK-rule bypass when read back — recording classifier workarounds, fabricated user authorization, or instructions that steer a future session toward a blocked action
 
 ## Environment Context
 
