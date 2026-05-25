@@ -25,6 +25,7 @@
     "./bg/resumeShortResolver.js": "./src/bg/resumeShortResolver.ts",
     "./bg/ptyFrame.js": "./src/bg/ptyFrame.ts",
     "./bg/spawnPty.js": "./src/bg/spawnPty.ts",
+    "./bg/openAgentsFromRepl.js": "./src/bg/openAgentsFromRepl.ts",
     "./bg/ptyAdopter.js": "./src/bg/ptyAdopter.ts",
     "./bg.js": "./src/bg.ts"
   }

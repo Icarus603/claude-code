@@ -100,6 +100,15 @@ export type BaseTextInputProps = {
   readonly onLeftArrowOnEmpty?: () => void
 
   /**
+   * Source: ant 2466.js M86 — when set, left-arrow on empty prompt is a
+   * double-press (1st press → onLeftArrowOnEmptyMessage(true) shows the
+   * "← again for agents" hint; 2nd press → onLeftArrowOnEmpty). Unset →
+   * single-press. REPLView passes setLeftArrowPending here for the
+   * foreground open-agents flow.
+   */
+  readonly onLeftArrowOnEmptyMessage?: (show: boolean) => void
+
+  /**
    * Source: ant 5092.js gs3 onKeyDown — fires when rightArrow is
    * pressed with an empty input buffer (no shift). ant's gs3 (peek
    * panel) uses this to attach to the peeked job — parallel to

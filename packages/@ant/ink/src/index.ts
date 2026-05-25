@@ -128,6 +128,13 @@ export type { Props as AppProps } from './components/AppContext.js'
 export type { Props as StdinProps } from './components/StdinContext.js'
 export { TerminalSizeContext, type TerminalSize } from './components/TerminalSizeContext.js'
 
+// App callbacks — business-layer injection (e.g. native stdin reader).
+// Call setAppCallbacks() once at bootstrap to wire these.
+export {
+  setAppCallbacks,
+  type NativeReaderControl,
+} from './components/App.js'
+
 // ============================================================
 // Hooks
 // ============================================================

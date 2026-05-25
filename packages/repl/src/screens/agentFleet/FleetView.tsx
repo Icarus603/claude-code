@@ -2502,7 +2502,7 @@ export function FleetView(props: FleetViewProps): React.ReactNode {
               terminalWidth={terminalWidth}
               selectionKind={selectionKind}
               filterText={filterText}
-              isCurrentSession={focusedJob?.state.sessionId === currentSessionId}
+              isCurrentSession={focusedJob?.id === currentSessionId}
               isRenaming={renameState !== undefined}
               isTransitional={false}
               isHeaderCollapsed={isHeaderCollapsed}
@@ -2618,7 +2618,12 @@ function Row({
       </Box>
     )
   }
-  const isCurrent = row.job.state.sessionId === currentSessionId
+  // ant 5277.js: isOrigin = `job.id === initialJobId` (both SHORT ids;
+  // initialJobId = CLAUDE_AGENTS_SELECT = the backgrounded job's short).
+  // Compare job.id (short), NOT state.sessionId (full UUID) — the latter
+  // never equals the short-id currentSessionId, so the "current session"
+  // label never fired (FleetView short-vs-UUID gotcha).
+  const isCurrent = row.job.id === currentSessionId
   const renaming =
     renameState !== undefined && renameState.id === row.job.id
       ? { draft: renameState.draft, cursor: renameState.draft.length }

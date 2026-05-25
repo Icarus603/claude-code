@@ -175,6 +175,18 @@ export interface FleetJobState {
   sortOrder?: number
   /** Manual reorder marker for cross-bucket order. */
   stateSortOrder?: number
+  /** Last classifier source ('preclassify'/'heuristic'/'llm'). Was in the
+   *  now-merged classifier-state.json — ant keeps it in the single state.json. */
+  classifySource?: string
+  /** ccb version that classified. */
+  cliVersion?: string
+  /** Token budget accumulated by the classifier. */
+  tokens?: {
+    input: number
+    output: number
+    cacheRead: number
+    cacheCreation: number
+  }
 }
 
 /**

@@ -91,6 +91,7 @@
     "./background/preconditions.js": "./background/preconditions.ts",
     "./background/fleet/fleetTypes.js": "./background/fleet/fleetTypes.ts",
     "./background/fleet/fleetStore.js": "./background/fleet/fleetStore.ts",
+    "./background/fleet/replBridgeSeed.js": "./background/fleet/replBridgeSeed.ts",
     "./background/fleet/listFleetJobs.js": "./background/fleet/listFleetJobs.ts",
     "./background/fleet/replyToFleetJob.js": "./background/fleet/replyToFleetJob.ts",
     "./background/fleet/renameFleetJob.js": "./background/fleet/renameFleetJob.ts",

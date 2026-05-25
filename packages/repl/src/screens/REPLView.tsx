@@ -3891,7 +3891,51 @@ export function REPL({
       // returns and fleetAttach's `finally` resumes Ink.
       process.exit(0);
     }
+    // Foreground REPL: ← on empty prompt opens FleetView, backgrounding the
+    // current conversation. Source: ant 5279.js o14 (the bridge). Re-ported
+    // after the native stdin reader (stdin-napi) made the unmount→remount
+    // cycle survivable. Dynamic import keeps the fleet/bg graph out of the
+    // REPL boot path. On error, surface it as a warning message; on success
+    // openAgentsFromReplLeftArrow unmounts and process.exit(0)s into FleetView.
+    void import('@claude-code/cli/bg/openAgentsFromRepl.js')
+      .then(({ openAgentsFromReplLeftArrow }) =>
+        openAgentsFromReplLeftArrow(messagesRef.current),
+      )
+      .then(errMsg => {
+        if (errMsg) {
+          setMessages(prev => [
+            ...prev,
+            createSystemMessage(errMsg, 'warning'),
+          ]);
+        }
+      })
+      .catch((e: unknown) => {
+        setMessages(prev => [
+          ...prev,
+          createSystemMessage(
+            `Cannot open agents — ${e instanceof Error ? e.message : String(e)}`,
+            'warning',
+          ),
+        ]);
+      });
   }, []);
+
+  // Source: ant 5163.js `onLeftArrowOnEmptyMessage: b7() ? void 0 : SH`.
+  // Defined only in the FOREGROUND REPL → arms the left-arrow double-press
+  // (PromptInput owns the leftArrowPending footer toggle; this callback's
+  // mere presence routes useTextInput to the double-press path). In a bg /
+  // fleet-attach-child session it's undefined, so left-arrow is single-press
+  // (detach / exit via handleLeftArrowOnEmpty).
+  const leftArrowMessageHandler = useMemo(
+    () =>
+      process.env.CLAUDE_CODE_SESSION_KIND === 'bg' ||
+      process.env.CCB_FLEET_ATTACH_CHILD === '1'
+        ? undefined
+        : (_show: boolean) => {
+            /* PromptInput toggles leftArrowPending; nothing else needed here */
+          },
+    [],
+  );
 
   const handleShowMessageSelector = useCallback(() => {
     setIsMessageSelectorVisible(prev => !prev);
@@ -5486,6 +5530,9 @@ export function REPL({
                       insertTextRef={feature('VOICE_MODE') ? insertTextRef : undefined}
                       voiceInterimRange={voice.interimRange}
                       onLeftArrowOnEmpty={handleLeftArrowOnEmpty}
+                      onLeftArrowOnEmptyMessage={
+                        leftArrowMessageHandler
+                      }
                     />
                     <SessionBackgroundHint onBackgroundSession={handleBackgroundSession} isLoading={isLoading} />
                   </>

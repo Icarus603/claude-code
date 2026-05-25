@@ -15,7 +15,7 @@ import { onExit } from 'signal-exit'
 import { getYogaCounters } from './yoga-layout/index.js'
 import { format } from 'util'
 import { colorize } from './colorize.js'
-import App from '../components/App.js'
+import App, { type NativeReaderControl } from '../components/App.js'
 import type {
   CursorDeclaration,
   CursorDeclarationSetter,
@@ -1148,6 +1148,16 @@ export default class Ink {
       isRaw?: boolean
       setRawMode?: (m: boolean) => void
     }
+    // Native-reader mode: this React-unmount short-circuit skips
+    // App.handleSetRawMode(false), so the reader would leak and the tty stay
+    // in raw mode. Stop it here — suspend() restores cooked termios
+    // synchronously. (stdin.isRaw is false in reader mode because the reader,
+    // not the Node stream, set raw mode, so the setRawMode branch below is a
+    // no-op and can't cover this.)
+    if (this.nativeReaderControl !== null) {
+      this.nativeReaderControl.suspend()
+      this.nativeReaderControl = null
+    }
     this.drainStdin()
     if (stdin.isTTY && stdin.isRaw && stdin.setRawMode) {
       stdin.setRawMode(false)
@@ -1608,9 +1618,35 @@ export default class Ink {
   }> = []
   private wasRawMode = false
 
+  // Native reader control, registered by App when it enters reader mode
+  // (stdin-napi). When set, the reader — not the Node stream — owns stdin, so
+  // suspend/resume must pause/restart it for editor handoff. null when not in
+  // reader mode (App passes null on teardown / standard path).
+  private nativeReaderControl: NativeReaderControl | null = null
+
+  // Called by App via the onReaderControl prop. Passing a control means we're
+  // in native-reader mode; null means we left it.
+  private setNativeReaderControl = (control: NativeReaderControl | null): void => {
+    this.nativeReaderControl = control
+  }
+
   suspendStdin(): void {
     const stdin = this.options.stdin
     if (!stdin.isTTY) {
+      return
+    }
+
+    // Native-reader mode: the reader owns the tty, not the Node stream. Stop
+    // it (restores cooked termios) so the external program ($EDITOR) gets a
+    // clean tty. resumeStdin restarts it. The listener-sweep below would find
+    // nothing in this mode, so without this the reader would keep eating
+    // keystrokes while the editor is up.
+    if (this.nativeReaderControl !== null) {
+      this.logger.debug('[stdin] suspendStdin: suspending native reader')
+      this.nativeReaderControl.suspend()
+      // Mark that we suspended via the reader so resumeStdin restarts it
+      // rather than re-attaching (nonexistent) Node listeners.
+      this.wasRawMode = false
       return
     }
 
@@ -1641,6 +1677,14 @@ export default class Ink {
   resumeStdin(): void {
     const stdin = this.options.stdin
     if (!stdin.isTTY) {
+      return
+    }
+
+    // Native-reader mode: restart the reader the editor handoff suspended.
+    // Mirror of the suspendStdin branch above.
+    if (this.nativeReaderControl !== null) {
+      this.logger.debug('[stdin] resumeStdin: resuming native reader')
+      this.nativeReaderControl.resume()
       return
     }
 
@@ -1716,6 +1760,7 @@ export default class Ink {
         onStdinResume={this.reassertTerminalModes}
         onCursorDeclaration={this.setCursorDeclaration}
         dispatchKeyboardEvent={this.dispatchKeyboardEvent}
+        onReaderControl={this.setNativeReaderControl}
       >
         <TerminalWriteProvider value={this.writeRaw}>
           {node}
@@ -1727,6 +1772,30 @@ export default class Ink {
     reconciler.updateContainerSync(tree, this.container, null, noop)
     // @ts-expect-error flushSyncWork exists in react-reconciler but not in @types/react-reconciler
     reconciler.flushSyncWork()
+  }
+
+  // When true, unmount() skips resolving/rejecting the exit promise. Used for
+  // REPL → FleetView handoff: the REPL's renderAndRun chain awaits
+  // waitUntilExit() and then calls gracefulShutdown(0) — but a handoff is NOT
+  // a session exit, it's a transfer of the terminal to FleetView in the same
+  // process. Resolving the exit promise here would make the REPL launcher
+  // tear the whole process down right after FleetView mounts. The bridge
+  // (openAgentsFromRepl) sets this so the launcher's await never resolves and
+  // FleetView owns the rest of the process lifetime.
+  private suppressExitPromiseOnUnmount = false
+
+  /**
+   * Unmount for an in-process handoff (REPL → FleetView). Identical to
+   * unmount() but leaves the exit promise pending, so the REPL launcher's
+   * `await waitUntilExit()` does not fall through to gracefulShutdown().
+   */
+  unmountForHandoff(): void {
+    this.suppressExitPromiseOnUnmount = true
+    try {
+      this.unmount()
+    } finally {
+      this.suppressExitPromiseOnUnmount = false
+    }
   }
 
   unmount(error?: Error | number | null): void {
@@ -1802,6 +1871,21 @@ export default class Ink {
 
     this.isUnmounted = true
 
+    // Stop the native stdin reader SYNCHRONOUSLY before tearing down React.
+    // The reader (stdin-napi) runs a rust thread doing a blocking read() on
+    // fd 0. React's componentWillUnmount → handleSetRawMode(false) is NOT a
+    // reliable place to stop it: React 19 may mount the next root's App
+    // (which starts a NEW reader) before the old App's cleanup runs, so the
+    // rawModeEnabledCount never reaches 0 and the old reader leaks — two rust
+    // threads then race for fd 0 and the event loop wedges (setImmediate
+    // stops firing). Stopping here, before updateContainerSync(null),
+    // guarantees the old reader releases fd 0 first. stop() restores termios
+    // synchronously and is idempotent. (Mirrors detachForShutdown.)
+    if (this.nativeReaderControl !== null) {
+      this.nativeReaderControl.suspend()
+      this.nativeReaderControl = null
+    }
+
     // Cancel any pending throttled renders to prevent accessing freed Yoga nodes
     this.scheduleRender.cancel?.()
     if (this.drainTimer !== null) {
@@ -1821,6 +1905,11 @@ export default class Ink {
     this.rootNode.yogaNode?.free()
     this.rootNode.yogaNode = undefined
 
+    if (this.suppressExitPromiseOnUnmount) {
+      // Handoff unmount — leave the exit promise pending so the REPL launcher
+      // doesn't gracefulShutdown the process out from under FleetView.
+      return
+    }
     if (error instanceof Error) {
       this.rejectExitPromise(error)
     } else {

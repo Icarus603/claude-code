@@ -307,6 +307,14 @@ type Props = {
    * session.
    */
   onLeftArrowOnEmpty?: () => void
+  /**
+   * Source: ant 2466.js M86 / 5163.js wiring. When provided, left-arrow on
+   * empty prompt becomes a double-press (1st shows the "← again for agents"
+   * footer hint, 2nd opens FleetView). REPLView passes setLeftArrowPending
+   * here in the foreground open-agents flow; bg-attach leaves it undefined
+   * so left-arrow detaches on a single press.
+   */
+  onLeftArrowOnEmptyMessage?: (show: boolean) => void
 }
 
 // Bottom slot has maxHeight="50%"; reserve lines for footer, border, status.
@@ -357,6 +365,7 @@ function PromptInput({
   insertTextRef,
   voiceInterimRange,
   onLeftArrowOnEmpty,
+  onLeftArrowOnEmptyMessage,
 }: Props): React.ReactNode {
   const mainLoopModel = useMainLoopModel()
   // A local-jsx command (e.g., /mcp while agent is running) renders a full-
@@ -525,6 +534,11 @@ function PromptInput({
   const [showTeamsDialog, setShowTeamsDialog] = useState(false)
   const [showBridgeDialog, setShowBridgeDialog] = useState(false)
   const [teammateFooterIndex, setTeammateFooterIndex] = useState(0)
+  // Source: ant 5163.js `[ZH, SH] = useState(false)` — left-arrow double-press
+  // pending flag. True after the 1st left-arrow on empty prompt; the footer
+  // then renders "← again for agents". Reset by the double-press timeout or
+  // the 2nd press (which opens FleetView).
+  const [leftArrowPending, setLeftArrowPending] = useState(false)
   // -1 sentinel: tasks pill is selected but no specific agent row is selected yet.
   // First ↓ selects the pill, second ↓ moves to row 0. Prevents double-select
   // of pill + row when both bg tasks (pill) and forked agents (rows) are visible.
@@ -2882,6 +2896,16 @@ function PromptInput({
     inlineGhostText,
     inputFilter: lazySpaceInputFilter,
     onLeftArrowOnEmpty,
+    // Source: ant 5163.js `onLeftArrowOnEmptyMessage: b7() ? void 0 : SH`.
+    // When the parent (REPLView) wired the foreground open-agents flow, arm
+    // the double-press: each press toggles the footer hint (leftArrowPending)
+    // and forwards to the parent's setter. Undefined → single-press.
+    onLeftArrowOnEmptyMessage: onLeftArrowOnEmptyMessage
+      ? (show: boolean) => {
+          setLeftArrowPending(show)
+          onLeftArrowOnEmptyMessage(show)
+        }
+      : undefined,
     // ant 4208.js zZ queryRef equivalent — useTextInput.handleEnter
     // reads valueRef.current instead of closure-captured originalValue
     // so a bracketed-paste-then-\r sequence sees the freshly committed
@@ -3040,6 +3064,7 @@ function PromptInput({
         helpOpen={helpOpen}
         suppressHint={input.length > 0}
         isLoading={isLoading}
+        leftArrowPending={leftArrowPending}
         tasksSelected={tasksSelected}
         teamsSelected={teamsSelected}
         bridgeSelected={bridgeSelected}

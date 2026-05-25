@@ -84,6 +84,16 @@ export async function agentsFleetHandler(): Promise<void> {
   // first row / "Working" group header).
   let lastFocusedShort: string | undefined =
     process.env.CLAUDE_AGENTS_SELECT || undefined
+  // The "current session" row — the job the user just backgrounded via the
+  // REPL left-arrow bridge. Source: ant 5277.js uWO — `initialJobId =
+  // process.env.CLAUDE_AGENTS_SELECT` (then deleted), passed as `isOrigin`
+  // (`job.id === initialJobId`) into the row label so an empty-intent job
+  // shows "current session" / "new session" instead of the bare template
+  // name "bg". ant uses CLAUDE_AGENTS_SELECT, NOT a session id — captured
+  // once at mount (before attach loops can change focus). Falls back to
+  // CLAUDE_SESSION_ID for the standalone `ccb agents` entry (no left-arrow).
+  const originSessionId =
+    process.env.CLAUDE_AGENTS_SELECT || process.env.CLAUDE_SESSION_ID || ''
   // Carries an error message from the previous attach attempt so the
   // remounted FleetView can surface it as an errorToast. Source: ant
   // 5092.js Ot3 `let J; … if (k.kind === "error" && !k.ended) J = k.msg`
@@ -98,7 +108,7 @@ export async function agentsFleetHandler(): Promise<void> {
 
     const action: FleetAction = await new Promise<FleetAction>(resolve => {
       void mountFleetView({
-        currentSessionId: process.env.CLAUDE_SESSION_ID ?? '',
+        currentSessionId: originSessionId,
         initialFocusedShort: lastFocusedShort,
         initialError: errorForThisMount,
         root,

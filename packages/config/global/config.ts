@@ -541,6 +541,11 @@ export type GlobalConfig = {
   // Fullscreen in-app text selection behavior
   copyOnSelect?: boolean // Auto-copy to clipboard on mouse-up (undefined → true; lets cmd+c "work" via no-op)
 
+  // ant 5180.js / 4209.js — REPL ↔ FleetView transition controls.
+  leftArrowOpensAgents?: boolean // ← on empty prompt → FleetView (def: on)
+  defaultToAgentsView?: boolean // ccb boots into FleetView, not REPL (def: off)
+  hasUsedAgentsFleet?: boolean // set on first FleetView entry — gates ant JeH
+
   // GitHub repo path mapping for teleport directory switching
   // Key: "owner/repo" (lowercase), Value: array of absolute paths where repo is cloned
   githubRepoPaths?: Record<string, string[]>
@@ -747,6 +752,9 @@ export const GLOBAL_CONFIG_KEYS = [
   'lspRecommendationIgnoredCount',
   'copyFullResponse',
   'copyOnSelect',
+  'leftArrowOpensAgents',
+  'defaultToAgentsView',
+  'hasUsedAgentsFleet',
   'permissionExplainerEnabled',
   'prStatusFooterEnabled',
   'remoteControlAtStartup',
@@ -1863,6 +1871,12 @@ export function recordFirstStartTime(): void {
       firstStartTime: current.firstStartTime ?? firstStartTime,
     }))
   }
+}
+
+/** Source: ant 4206.js A1H — flips hasUsedAgentsFleet on first FleetView entry. */
+export function markHasUsedAgentsFleet(): void {
+  if (getGlobalConfig().hasUsedAgentsFleet === true) return
+  saveGlobalConfig(current => ({ ...current, hasUsedAgentsFleet: true }))
 }
 
 export function getMemoryPath(memoryType: MemoryType): string {

@@ -56,6 +56,9 @@ type Props = {
   helpOpen: boolean
   suppressHint: boolean
   isLoading: boolean
+  /** ant 5163.js leftArrowPending — true after 1st left-arrow on empty
+   * prompt; LeftSide renders "← again for agents" instead of "← for agents". */
+  leftArrowPending?: boolean
   tasksSelected: boolean
   teamsSelected: boolean
   bridgeSelected: boolean
@@ -91,6 +94,7 @@ function PromptInputFooter({
   helpOpen,
   suppressHint: suppressHintFromProps,
   isLoading,
+  leftArrowPending,
   tasksSelected,
   teamsSelected,
   bridgeSelected,
@@ -203,6 +207,8 @@ function PromptInputFooter({
             mode={mode}
             toolPermissionContext={toolPermissionContext}
             suppressHint={suppressHint}
+            isInputEmpty={!suppressHintFromProps}
+            leftArrowPending={leftArrowPending}
             isLoading={isLoading}
             tasksSelected={pillSelected}
             teamsSelected={teamsSelected}

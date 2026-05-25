@@ -13,7 +13,7 @@
 
 import { readFile } from 'fs/promises'
 
-const BUDGET = 5642 // post #88 iter 2 — useStartupCallouts extraction
+const BUDGET = 5685 // +43: REPL←FleetView left-arrow bridge handler (rust stdin reader port)
 
 async function main() {
   const content = await readFile('packages/repl/src/screens/REPLView.tsx', 'utf8')

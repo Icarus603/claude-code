@@ -276,8 +276,19 @@ export const setupGracefulShutdown = memoize(() => {
         // Skip during scroll drain — even a cheap check consumes an event
         // loop tick that scroll frames need. 30s interval → missing one is fine.
         if (getIsScrollDraining()) return
+        // When the native stdin reader (stdin-napi) is active for the
+        // FleetView path, App.tsx destroy()s Bun's process.stdin to give the
+        // rust reader sole ownership of fd 0 — which makes
+        // process.stdin.readable === false even though the process is very
+        // much alive (the rust reader is reading fd 0 on its own thread). The
+        // orphan check would then misfire at 30s and kill the FleetView /
+        // attached session. So in reader mode, only trust process.stdout
+        // (whose writability still reflects a revoked TTY); ignore
+        // process.stdin.readable.
+        const readerOwnsStdin = process.env.CCB_FLEET_INPROCESS_REMOUNT === '1'
+        const stdinDead = readerOwnsStdin ? false : !process.stdin.readable
         // process.stdout.writable becomes false when the TTY is revoked
-        if (!process.stdout.writable || !process.stdin.readable) {
+        if (!process.stdout.writable || stdinDead) {
           clearInterval(orphanCheckInterval)
           logForDiagnosticsNoPII('info', 'shutdown_signal', {
             signal: 'orphan_detected',

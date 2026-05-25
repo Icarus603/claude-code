@@ -347,6 +347,36 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
       () => socket.destroy(),
     )
     socket.on('data', decoder)
+
+    // Force the inner REPL to repaint on attach. The ring replay above shows
+    // whatever the worker last emitted, but an IDLE worker (sitting at its
+    // prompt, "send a prompt to start") emits nothing new after boot — so a
+    // fresh attach would otherwise see a stale/blank screen and (before the
+    // client watchdog was removed) get misjudged as stalled. ant forces a
+    // redraw on every attach (5473.js resizeForRepaint → worker forceRedraw);
+    // we don't have a worker control channel, so we nudge the pty: a
+    // resize-jiggle (cols-1 then back) makes the inner @ant/ink reassert
+    // terminal modes + repaint a full frame via its SIGWINCH handler. Guard
+    // on not-exited and a sane cols. Deferred a tick so it lands after the
+    // client has finished consuming the hello/replay/live frames.
+    if (!exited && cols > 1) {
+      setTimeout(() => {
+        if (exited) return
+        try {
+          terminal.resize(cols - 1, rows)
+          terminal.resize(cols, rows)
+          if (process.platform !== 'win32' && child.pid) {
+            try {
+              process.kill(child.pid, 'SIGWINCH')
+            } catch {
+              // best-effort
+            }
+          }
+        } catch {
+          // best-effort repaint nudge
+        }
+      }, 50)
+    }
   })
   server.on('error', err => {
     try {

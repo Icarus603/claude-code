@@ -42,8 +42,12 @@ export interface PtyAdopter {
   replPid(): number
   /** Currently-known REPL version (from hello frame). '' if not yet seen. */
   replVersion(): string
-  /** Send raw bytes to the PTY (will be decoded as user input). */
-  write(s: string): void
+  /** Send raw bytes to the PTY (will be decoded as user input). Takes a
+   *  Buffer, NOT a string: stdin bytes (esp. multi-byte UTF-8 like CJK) must
+   *  pass through verbatim. A string round-trip (toString('binary') at the
+   *  caller + Buffer.from(s,'utf8') here) double-encoded high bytes and
+   *  corrupted CJK input. */
+  write(b: Buffer): void
   /** Send a resize ctrl frame. */
   resize(cols: number, rows: number): void
   /** Send a kill ctrl frame. SIGTERM auto-escalates to SIGKILL after 5s. */
@@ -245,9 +249,8 @@ export function createPtyAdopter(socketPath: string): PtyAdopter {
   return {
     replPid: () => helloPid,
     replVersion: () => helloVersion,
-    write(s: string): void {
+    write(buf: Buffer): void {
       if (disposed) return
-      const buf = Buffer.from(s, 'utf8')
       // Frame body cap is 1 MiB; chunk if larger.
       const chunkSize = FRAME_SIZE_CAP - 1
       for (let i = 0; i < buf.length; i += chunkSize) {

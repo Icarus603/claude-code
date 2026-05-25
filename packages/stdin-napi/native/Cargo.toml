@@ -1,0 +1,40 @@
+# In-process TTY stdin reader, exposed to Bun via napi-rs.
+#
+# Why this exists: Bun's standalone (`bun build --compile`) build inherits an
+# unpatched libuv whose TTY stdin poll stops re-arming after an Ink
+# mount→unmount→re-mount cycle — `process.stdin`'s 'data'/'readable' events
+# go silent while the user keeps typing. Anthropic's `claude` avoids this by
+# shipping a private bun fork (bun-internal) that patches libuv; we can't get
+# that fork. So instead of reading stdin through libuv, this crate opens the
+# tty fd directly, sets raw mode via termios, and does a blocking read on a
+# dedicated thread, pushing each chunk to JS via a ThreadsafeFunction. The
+# read loop never touches libuv's event loop, so the poll bug can't reach it.
+#
+# Same vendoring/build pattern as packages/ripgrep-napi.
+
+[package]
+name = "stdin-napi"
+version = "1.0.0"
+edition = "2021"
+publish = false
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "3", default-features = false, features = ["napi4"] }
+napi-derive = "3"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[build-dependencies]
+napi-build = "2"
+
+# Smaller .node files committed to git (5 platforms).
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = 3

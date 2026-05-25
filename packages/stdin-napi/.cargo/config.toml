@@ -1,0 +1,7 @@
+# Cargo build artifacts go under the ccb repo's top-level /target so
+# packages/ stays clean (verify-empty-folders.ts walks packages/ and trips on
+# the transient empty subdirs cargo creates during compile). Path resolves
+# relative to the manifest dir (packages/stdin-napi/native/): 3 ".." segments
+# land at repo-root, then anchor at <repo-root>/target/stdin-napi.
+[build]
+target-dir = "../../target/stdin-napi"

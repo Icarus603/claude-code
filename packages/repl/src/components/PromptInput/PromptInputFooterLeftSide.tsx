@@ -73,7 +73,10 @@ type Props = {
   mode: PromptInputMode
   toolPermissionContext: ToolPermissionContext
   suppressHint: boolean
+  /** input empty ignoring status-line/search suppression — for fg-agents hint. */
+  isInputEmpty: boolean
   isLoading: boolean
+  leftArrowPending?: boolean
   showMemoryTypeSelector?: boolean
   tasksSelected: boolean
   teamsSelected: boolean
@@ -131,7 +134,9 @@ export function PromptInputFooterLeftSide({
   mode,
   toolPermissionContext,
   suppressHint,
+  isInputEmpty,
   isLoading,
+  leftArrowPending,
   tasksSelected,
   teamsSelected,
   tmuxSelected,
@@ -178,7 +183,9 @@ export function PromptInputFooterLeftSide({
         mode={mode}
         toolPermissionContext={toolPermissionContext}
         showHint={!suppressHint && !showVim}
+        isInputEmpty={isInputEmpty}
         isLoading={isLoading}
+        leftArrowPending={leftArrowPending}
         tasksSelected={tasksSelected}
         teamsSelected={teamsSelected}
         teammateFooterIndex={teammateFooterIndex}
@@ -193,7 +200,12 @@ type ModeIndicatorProps = {
   mode: PromptInputMode
   toolPermissionContext: ToolPermissionContext
   showHint: boolean
+  /** input empty, IGNORING status-line/search suppression (ant `K`). The
+   * fg-agents hint uses this so a custom status line doesn't hide it —
+   * ant's CDO gates on isInputEmpty, not the composed showHint. */
+  isInputEmpty: boolean
   isLoading: boolean
+  leftArrowPending?: boolean
   tasksSelected: boolean
   teamsSelected: boolean
   tmuxSelected: boolean
@@ -205,7 +217,9 @@ function ModeIndicator({
   mode,
   toolPermissionContext,
   showHint,
+  isInputEmpty,
   isLoading,
+  leftArrowPending,
   tasksSelected,
   teamsSelected,
   tmuxSelected,
@@ -444,6 +458,29 @@ function ModeIndicator({
           </Text>,
         ]
       : []),
+    // Source: ant 5150.js CDO foreground branch (!b7() && !isLoading &&
+    // inputEmpty && gate && leftArrowOpensAgents). Standard REPL: ← on empty
+    // prompt opens FleetView (double-press — 1st arms leftArrowPending → this
+    // renders "← again for agents", 2nd opens). Re-ported after the native
+    // stdin reader made the unmount→remount cycle survivable.
+    ...((() => {
+      const fleetOn = feature('AGENTS_FLEET') ? true : false
+      // ant CDO gates on isInputEmpty (K), NOT the composed showHint — so a
+      // custom status line (which sets suppressHint) doesn't hide the hint.
+      const cond =
+        !isBgSession() &&
+        !isLoading &&
+        isInputEmpty &&
+        fleetOn &&
+        getGlobalConfig().leftArrowOpensAgents !== false
+      return cond
+        ? [
+            <Text dimColor key="fg-agents">
+              ← {leftArrowPending ? 'again ' : ''}for agents
+            </Text>,
+          ]
+        : []
+    })()),
   ]
 
   // Check if any in-process teammates exist (for hint text cycling)

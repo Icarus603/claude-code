@@ -72,10 +72,6 @@ function suffixMatchLen(buf: Buffer, needle: Buffer): number {
   }
   return 0
 }
-/** ant 5164.js $F3 default — first-frame stall warning threshold. */
-const ATTACH_STALL_THRESHOLD_MS = 10_000
-/** Hard timeout after which we fire stall_gave_up + exit. */
-const ATTACH_STALL_GAVE_UP_MS = 30_000
 
 /**
  * Open a PTY socket attach session. Resolves when the bg session
@@ -96,11 +92,29 @@ export async function runAttach(
   const decModes = createDecModeTracker()
   logEvent('tengu_bg_attach', { short })
 
+  // stdin source. Two cases:
+  //
+  //   (A) Came from in-process FleetView (left-arrow → agents → right-arrow
+  //       attach). FleetView destroy()s Bun's process.stdin to give its rust
+  //       reader sole ownership of fd 0, so process.stdin is dead here — its
+  //       'data'/setRawMode are no-ops. We must read fd 0 through the SAME
+  //       rust reader (stdin-napi). Detected via process.stdin.destroyed.
+  //
+  //   (B) Standalone `ccb attach <short>` from the user's shell. Bun's
+  //       process.stdin is alive; use it directly.
+  //
+  // Both feed the same onData handler below.
+  const stdinDestroyed = (process.stdin as NodeJS.ReadStream & {
+    destroyed?: boolean
+  }).destroyed === true
+  let nativeReaderStop: (() => void) | undefined
+
   // Local TTY raw-mode setup. Without this, the local terminal would
   // do its own line-buffering + Ctrl+C → SIGINT → kill the attach
   // client's process (which we don't want). Raw mode also lets us
-  // detect the Ctrl+Q sentinel.
-  if (process.stdin.isTTY && process.stdin.setRawMode) {
+  // detect the Ctrl+Q sentinel. In case (A) the rust reader owns termios,
+  // so we skip the Node setRawMode (it would throw on a destroyed stream).
+  if (!stdinDestroyed && process.stdin.isTTY && process.stdin.setRawMode) {
     const wasRaw = process.stdin.isRaw
     process.stdin.setRawMode(true)
     restoreTty = () => {
@@ -127,30 +141,34 @@ export async function runAttach(
   // Open adopter against the host socket.
   adopter = createPtyAdopter(socketPath)
 
-  // Forward stdin keystrokes to the PTY. Empirically (verified against
-  // /tmp/ccb-detach.log diag) Bun's process.stdin doesn't fire 'readable'
-  // events reliably for user keystrokes after Ink unmount — bytes arrive
-  // via 'data' events instead (the previous 'readable'+read() pattern
-  // ate the keystroke without invoking onReadable, so left-arrow detach
-  // never worked because the inner REPL never received the bytes).
-  // Switch to 'data' (flowing mode) which IS reliable.
-  //
-  // ant 4767.js uses 'readable' because ant runs in its `bun-internal`
-  // private fork which has different stdin semantics — public Bun's
-  // readable event under raw mode after Ink unmount is broken.
+  // Forward local stdin keystrokes to the PTY. Two sources (see stdinDestroyed
+  // above): the rust reader (case A — FleetView destroy()d process.stdin) or
+  // Bun's process.stdin 'data' event (case B — standalone `ccb attach`). Both
+  // feed onData. We use 'data' (flowing), not 'readable'+read(): on public Bun,
+  // process.stdin's 'readable' is unreliable for raw-mode keystrokes after an
+  // Ink unmount (ant uses 'readable' only because its bun-internal fork patches
+  // this). Stop reading local stdin — works for both sources. Idempotent.
+  const stopStdin = (): void => {
+    if (nativeReaderStop) {
+      nativeReaderStop()
+      nativeReaderStop = undefined
+    } else {
+      process.stdin.removeListener('data', onData)
+    }
+  }
   const handleByteChunk = (chunkBuf: Buffer): void => {
     // Scan for Ctrl+Q. Pass everything before the sentinel through;
     // anything after is dropped because we're detaching.
     const idx = chunkBuf.indexOf(DETACH_KEY_BYTE)
     if (idx === -1) {
-      adopter!.write(chunkBuf.toString('binary'))
+      adopter!.write(chunkBuf)
       return
     }
     if (idx > 0) {
-      adopter!.write(chunkBuf.subarray(0, idx).toString('binary'))
+      adopter!.write(chunkBuf.subarray(0, idx))
     }
     detached = true
-    process.stdin.removeListener('data', onData)
+    stopStdin()
   }
   const onData = (chunk: Buffer | string): void => {
     const buf = Buffer.isBuffer(chunk)
@@ -158,9 +176,30 @@ export async function runAttach(
       : Buffer.from(chunk as string, 'utf8')
     handleByteChunk(buf)
   }
-  process.stdin.on('data', onData)
-  process.stdin.ref()
-  process.stdin.resume()
+  if (stdinDestroyed) {
+    // Case (A): read fd 0 through the rust reader (Bun's process.stdin is
+    // destroyed by FleetView). The reader owns termios + reads on its own
+    // thread, feeding onData with each chunk. redirect_fd0=false: fd 0 is
+    // free (Bun no longer reads it), so no dup2 redirect needed.
+    const { startReader } = await import('stdin-napi')
+    let handle: { stop(): void } | undefined
+    try {
+      handle = startReader(false, onData)
+    } catch {
+      // reader failed to start; leave handle undefined (no input forwarding)
+    }
+    nativeReaderStop = () => {
+      try {
+        handle?.stop()
+      } catch {
+        // best-effort
+      }
+    }
+  } else {
+    process.stdin.on('data', onData)
+    process.stdin.ref()
+    process.stdin.resume()
+  }
 
   // Frame-boundary buffer: hold all incoming PTY bytes until we see
   // the inner REPL emit a frame boundary marker — either:
@@ -240,7 +279,7 @@ export async function runAttach(
       }
       pendingTail = Buffer.alloc(0)
       detached = true
-      process.stdin.removeListener('data', onData)
+      stopStdin()
       return
     }
 
@@ -311,60 +350,25 @@ export async function runAttach(
   process.stdout.on('resize', onResize)
 
   // ant 5164.js stall watchdog: if no first frame within
-  // ATTACH_STALL_THRESHOLD_MS, fire stall_ms (warning) + try
-  // daemon-side respawn (auto-recover once). After ATTACH_STALL_GAVE_UP_MS
-  // OR if respawn returned EGAVEUP, fire stall_gave_up + exit.
-  let stallWarned = false
-  let respawnAttempted = false
-  let stallGaveUp = false
-  const stallTimer = setInterval(() => {
-    if (firstFrameAt > 0 || detached) return
-    const elapsed = Date.now() - startedAt
-    if (!stallWarned && elapsed >= ATTACH_STALL_THRESHOLD_MS) {
-      stallWarned = true
-      logEvent('tengu_bg_attach_stall_ms', { short, elapsed_ms: String(elapsed) })
-      process.stderr.write(`\n[attach: no output from ${short} in ${Math.round(elapsed/1000)}s — worker may be stalled, attempting respawn…]\n`)
-      // Try daemon-side respawn. ant 5164.js wF3.
-      if (!respawnAttempted) {
-        respawnAttempted = true
-        void (async () => {
-          try {
-            const { isDaemonAlive, daemonRespawnStalled } = await import('./daemonAdapter.js')
-            if (await isDaemonAlive()) {
-              const r = await daemonRespawnStalled(short)
-              if (!r.ok && r.code === 'EGAVEUP') {
-                // Daemon refuses 2nd respawn — fall through to give-up.
-                stallGaveUp = true
-                clearInterval(stallTimer)
-                process.stderr.write(`\n[attach: ${short} stalled after respawn — giving up]\n`)
-                detached = true
-                process.stdin.removeListener('data', onData)
-              }
-            }
-          } catch {
-            // Best-effort; if daemon unreachable, the second pass of this
-            // setInterval will hit the give-up path below.
-          }
-        })()
-      }
-    }
-    if (elapsed >= ATTACH_STALL_GAVE_UP_MS) {
-      stallGaveUp = true
-      logEvent('tengu_bg_attach_stall_gave_up', { short, elapsed_ms: String(elapsed) })
-      clearInterval(stallTimer)
-      process.stderr.write(`\n[attach: gave up waiting for ${short} after ${Math.round(elapsed/1000)}s. Try 'ccb respawn ${short}']\n`)
-      detached = true
-      process.stdin.removeListener('data', onData)
-    }
-  }, 1000)
-  stallTimer.unref()
+  // NO client-side first-frame/stall watchdog. Source: ant `dc` (4945.js)
+  // has none — its only timeout is a 10s ACK timeout cleared the moment the
+  // daemon's attach-ack arrives; after that the client never times out on
+  // frame data. An idle worker (state.tempo=blocked, "send a prompt to
+  // start") sits silent at its prompt and emits no frame, so a client-side
+  // "no first frame in 30s → kill" watchdog MISFIRES on idle sessions and
+  // tears the whole attach (and process) down at exactly 30s. ant avoids
+  // this by (a) keeping stall detection on the DAEMON/host side, gated on
+  // "did a forced repaint produce bytes", not on a blind client clock, and
+  // (b) forcing the inner REPL to redraw on every attach so a frame always
+  // arrives. ccb's host-side repaint-on-attach lives in ptyHost.ts; the
+  // client just paints whatever the PTY sends, including nothing.
+  // firstFrameAt below is kept for telemetry only (ant's f() does the same).
 
   // Wait for either exit or detach.
   const detachPromise = new Promise<void>(resolve => {
     const checker = setInterval(() => {
       if (detached) {
         clearInterval(checker)
-        clearInterval(stallTimer)
         resolve()
       }
     }, 25)
@@ -388,7 +392,7 @@ export async function runAttach(
   // Cleanup.
   dataSub.dispose()
   process.stdout.removeListener('resize', onResize)
-  process.stdin.removeListener('data', onData)
+  stopStdin()
   // NOTE: do NOT pause stdin — the caller (fleetAttach loop) is about
   // to mount a fresh Ink root which needs an active readable stream.
   // The standalone `ccb attach` CLI exits process after this anyway,
@@ -396,7 +400,7 @@ export async function runAttach(
   adopter.dispose()
   restoreTty?.()
 
-  const outcome = stallGaveUp ? 'stall_gave_up' : detached ? 'detached' : 'exited'
+  const outcome = detached ? 'detached' : 'exited'
   logEvent('tengu_bg_attach_outcome', {
     outcome,
     got_first_frame: String(firstFrameAt > 0),
@@ -408,12 +412,6 @@ export async function runAttach(
   // standalone `ccb attach <short>` CLI path catches this in
   // attachHandler and exits cleanly. Detach/exit reasons are surfaced
   // via the returned outcome string so callers can decide.
-  if (stallGaveUp) {
-    process.stderr.write(
-      `\n[attach: gave up waiting for ${short}; session may be stalled]\n`,
-    )
-    return
-  }
   if (detached) {
     process.stderr.write(`\n[detached from ${short} — session keeps running]\n`)
     return

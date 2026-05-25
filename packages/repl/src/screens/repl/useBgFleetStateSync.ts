@@ -91,6 +91,32 @@ function lastAssistantText(messages: readonly MessageType[]): string {
 }
 
 /**
+ * Most-recent non-meta user prompt text. Used to backfill state.intent for a
+ * job dispatched EMPTY (the REPL left-arrow "current session" / FleetView
+ * "new session" path): the worker boots with intent="", the user sends the
+ * first prompt from FleetView, and we must capture it as the intent so the
+ * row label switches from "current session"/"new session" to the prompt
+ * snippet and the namer (gated on intent.length>0) can fire.
+ */
+function lastUserText(messages: readonly MessageType[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i]
+    if (m && m.type === 'user' && 'isMeta' in m && m.isMeta === true) continue
+    if (m && m.type === 'user' && 'message' in m) {
+      const content = m.message?.content
+      if (typeof content === 'string') return content
+      if (Array.isArray(content)) {
+        for (const block of content) {
+          const b = block as { type?: string; text?: unknown }
+          if (b?.type === 'text' && typeof b.text === 'string') return b.text
+        }
+      }
+    }
+  }
+  return ''
+}
+
+/**
  * Simplified port of ant 3988.js inference branches.
  *
  *   ?-at-end OR "question:" OR "need more"          → 'blocked'
@@ -168,10 +194,24 @@ export function useBgFleetStateSync(
         if (isLoading) {
           if (current.state === 'stopped' || current.state === 'failed') return
           if (current.state === 'working' && current.tempo === 'active') return
+          // Backfill intent for an empty-dispatched job (left-arrow "current
+          // session"): worker booted with intent="", the user's first prompt
+          // is the real intent. Capturing it flips the row label off "current
+          // session"/"new session" to the prompt snippet + unblocks the namer
+          // (intent.length>0 gate). The daemon classifier preserves this via
+          // `prev?.intent ?? …` so it isn't clobbered. messagesRef may not yet
+          // hold the just-submitted user turn at isLoading-start, so fall back
+          // to current.intent when empty (the isLoading-end pass below also
+          // re-checks).
+          const nextIntent =
+            current.intent && current.intent.length > 0
+              ? current.intent
+              : lastUserText(messagesRef.current).replace(/\s+/g, ' ').trim()
           await writeJobState(jobDir, {
             ...current,
             state: 'working',
             tempo: 'active',
+            intent: nextIntent || current.intent,
             needs: undefined,
             updatedAt: now,
           })
@@ -183,6 +223,14 @@ export function useBgFleetStateSync(
           // where D is the short LLM summary. Without an LLM we squeeze
           // to the same 80-char width ant uses for row detail (xf=80).
           const replyDetail = flattenAssistantReply(assistantText, FLEET_DETAIL_MAX)
+          // Backfill intent at turn-END too (messages are fully settled here,
+          // unlike isLoading-start which can race the user-turn append). This
+          // is the reliable point that flips an empty "current session" label
+          // to the prompt snippet for a left-arrow-backgrounded session.
+          const intentAtEnd =
+            current.intent && current.intent.length > 0
+              ? current.intent
+              : lastUserText(messagesRef.current).replace(/\s+/g, ' ').trim()
           if (outcome.kind === 'blocked') {
             // Stay "working" but flip tempo to blocked + record needs.
             // FleetView buckets `tempo='blocked'` into "Needs input"
@@ -193,6 +241,7 @@ export function useBgFleetStateSync(
               state: 'working',
               tempo: 'blocked',
               detail: replyDetail || current.detail,
+              intent: intentAtEnd || current.intent,
               needs: outcome.needs,
               updatedAt: now,
             })
@@ -202,6 +251,7 @@ export function useBgFleetStateSync(
               state: 'failed',
               tempo: 'idle',
               detail: replyDetail || current.detail,
+              intent: intentAtEnd || current.intent,
               updatedAt: now,
               firstTerminalAt: current.firstTerminalAt ?? now,
             })
@@ -211,6 +261,7 @@ export function useBgFleetStateSync(
               state: 'done',
               tempo: 'idle',
               detail: replyDetail || current.detail,
+              intent: intentAtEnd || current.intent,
               // ant: pickMiddleText prefers state.output.result over
               // state.detail for `outcome === 'success'`. Mirror the
               // detail into output.result so the row displays the

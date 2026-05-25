@@ -76,6 +76,16 @@ export type UseTextInputProps = {
   onLeftArrowOnEmpty?: () => void
 
   /**
+   * Source: ant 2466.js M86 "left" case + 5163.js wiring. When set,
+   * left-arrow on an empty prompt becomes a DOUBLE-press: the first press
+   * calls this with `show=true` (footer shows "← again for agents"), the
+   * second press within the window fires `onLeftArrowOnEmpty`. When unset
+   * (e.g. bg-attach session), left-arrow is single-press → onLeftArrowOnEmpty
+   * directly. ant: `onLeftArrowOnEmptyMessage`.
+   */
+  onLeftArrowOnEmptyMessage?: (show: boolean) => void
+
+  /**
    * Source: ant 5092.js gs3 onKeyDown (peek panel):
    *   if (e_.key === "right" && !e_.shift && !o.current) {
    *     e_.preventDefault();
@@ -186,6 +196,7 @@ export function useTextInput({
   inlineGhostText,
   dim,
   onLeftArrowOnEmpty,
+  onLeftArrowOnEmptyMessage,
   onRightArrowOnEmpty,
   onSpaceOnEmpty,
   onNumberKeyOnEmpty,
@@ -263,6 +274,16 @@ export function useTextInput({
       }
       onExit?.()
     },
+  )
+
+  // Source: ant 2466.js M86 "left" case → `s = kS(z, T)`. Double-press
+  // left-arrow on empty prompt: first press shows the "← again for agents"
+  // footer hint (via onLeftArrowOnEmptyMessage), second press within the
+  // window fires onLeftArrowOnEmpty (opens FleetView). Only armed when
+  // onLeftArrowOnEmptyMessage is provided.
+  const handleLeftArrowDoublePress = useDoublePress(
+    (show: boolean) => onLeftArrowOnEmptyMessage?.(show),
+    () => onLeftArrowOnEmpty?.(),
   )
 
   function handleCtrlD(): MaybeCursor {
@@ -497,13 +518,20 @@ export function useTextInput({
       case key.downArrow && !key.shift:
         return downOrHistoryDown
       case key.leftArrow:
-        // Source: ant 2462.js `to_` → case "left":
-        //   if (T && !ZH.shift && F.text === "") { ... T(); return F }
-        // Fires the onLeftArrowOnEmpty callback when input is empty
-        // and no shift modifier is held. Cursor stays at 0.
+        // Source: ant 2466.js M86 "left" case:
+        //   if (T && !shift && text === "") { if (z) s(); else T(); return F }
+        // where T = onLeftArrowOnEmpty, z = onLeftArrowOnEmptyMessage,
+        // s = the double-press wrapper. When the message callback is present
+        // (REPL foreground), left-arrow is a double-press (1st shows hint,
+        // 2nd opens agents); otherwise single-press fires directly (e.g.
+        // bg-attach detach). Cursor stays at 0.
         if (onLeftArrowOnEmpty && originalValue === '' && !key.shift) {
           return () => {
-            onLeftArrowOnEmpty()
+            if (onLeftArrowOnEmptyMessage) {
+              handleLeftArrowDoublePress()
+            } else {
+              onLeftArrowOnEmpty()
+            }
             return cursor
           }
         }

@@ -16,7 +16,7 @@
   "@claude-code/teleport": 6,
   "@claude-code/server": 6,
   "@claude-code/updater": 10,
-  "@claude-code/agent": 172,
+  "@claude-code/agent": 173,
   "@claude-code/cli": 22,
   "@claude-code/storage": 45,
   "image-processor-napi": 1,
@@ -29,6 +29,7 @@
   "audio-capture-napi": 1,
   "color-diff-napi": 1,
   "@claude-code/permission": 47,
+  "stdin-napi": 1,
   "@anthropic/ink": 4,
   "@ant/computer-use-mcp": 11
 }

@@ -81,6 +81,10 @@ export function installRuntimeSkeletonBindings(): void {
   // subsystem that was migrated out of src/utils/plugins/ in Round 4.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('./installPluginBindings.js')
+  // Native stdin reader (stdin-napi) → @anthropic/ink App. Bypasses Bun
+  // standalone's libuv TTY poll bug. Safe no-op fallback when unsupported.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./installNativeStdinReader.js')
   // Local-only event logger — never sends to network. Default OFF;
   // enable with CLAUDE_CODE_LOCAL_TELEMETRY=1 to write tengu_bg_*
   // events into ~/.claude/debug/<sid>.txt.

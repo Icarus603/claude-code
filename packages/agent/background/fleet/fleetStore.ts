@@ -17,7 +17,13 @@
  * mutate background-job state. NOT in the hot path of regular CLI ops.
  */
 
-import { promises as fs } from 'node:fs'
+import {
+  promises as fs,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
+import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { readEnv } from '@claude-code/config/env'
@@ -141,6 +147,35 @@ export async function writeJobState(jobDir: string, state: FleetJobState): Promi
   } = state
   await fs.mkdir(jobDir, { recursive: true })
   await fs.writeFile(join(jobDir, STATE_FILE), JSON.stringify(rest, null, 2))
+  invalidateCache(jobDir)
+}
+
+/**
+ * Sync read of state.json. For the daemon classifier (runs in a sync write
+ * path; ant's xO/c7 are sync too). Returns null if missing/malformed. Does
+ * NOT use the mtime cache (the classifier always wants fresh disk state).
+ */
+export function readJobStateSync(jobDir: string): FleetJobState | null {
+  const path = join(jobDir, STATE_FILE)
+  if (!existsSync(path)) return null
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')) as FleetJobState
+  } catch {
+    return null
+  }
+}
+
+/** Sync write of state.json. Mirrors writeJobState (strips sidecar-owned
+ *  fields) but synchronous, for the daemon classifier. */
+export function writeJobStateSync(jobDir: string, state: FleetJobState): void {
+  const {
+    pinned: _pinned,
+    sortOrder: _sortOrder,
+    stateSortOrder: _stateSortOrder,
+    ...rest
+  } = state
+  mkdirSync(jobDir, { recursive: true })
+  writeFileSync(join(jobDir, STATE_FILE), JSON.stringify(rest, null, 2))
   invalidateCache(jobDir)
 }
 

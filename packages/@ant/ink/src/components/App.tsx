@@ -2,21 +2,48 @@ import React, { PureComponent, type ReactNode } from 'react'
 // Business-layer callbacks — replaced with inline defaults so this package
 // has zero dependencies on business code. The business layer can inject
 // implementations via AppCallbacks when needed.
+/**
+ * A native TTY stdin reader injected by the business layer. When present and
+ * supported, App reads keystrokes through this instead of `process.stdin`'s
+ * 'data' event — bypassing Bun standalone's libuv TTY poll bug (the stdin
+ * stream goes silent after an Ink mount→unmount→re-mount cycle; see
+ * packages/stdin-napi). The reader owns raw mode (termios) for the duration,
+ * so App does NOT call stdin.setRawMode() in reader mode.
+ */
+type NativeStdinReader = {
+  /** Whether the native reader can be used (false → App uses the 'data' path). */
+  isSupported: () => boolean
+  /** Start reading; `onChunk` receives each byte chunk (UTF-8 boundary trimmed). */
+  start: (onChunk: (chunk: Buffer | string) => void) => NativeStdinReaderHandle
+}
+type NativeStdinReaderHandle = {
+  /** Stop reading and restore the tty's original termios synchronously. */
+  stop: () => void
+}
+
 type AppCallbacks = {
   updateLastInteractionTime?: () => void
   stopCapturingEarlyInput?: () => void
   isMouseClicksDisabled?: () => boolean
   logError?: (error: unknown) => void
   logForDebugging?: (message: string, opts?: { level?: string }) => void
+  /**
+   * Native stdin reader. Injected by the business layer (ink.tsx) so this
+   * package stays free of a direct stdin-napi dependency. When undefined or
+   * unsupported, App falls back to the standard process.stdin 'data' path.
+   */
+  nativeStdinReader?: NativeStdinReader
 }
 
 /** Default no-op / safe-default implementations */
-const defaultCallbacks: Required<AppCallbacks> = {
+const defaultCallbacks: Required<Omit<AppCallbacks, 'nativeStdinReader'>> &
+  Pick<AppCallbacks, 'nativeStdinReader'> = {
   updateLastInteractionTime: () => {},
   stopCapturingEarlyInput: () => {},
   isMouseClicksDisabled: () => false,
   logError: (error: unknown) => console.error(error),
   logForDebugging: (_message: string, _opts?: { level?: string }) => {},
+  nativeStdinReader: undefined,
 }
 
 /**
@@ -146,6 +173,24 @@ type Props = {
   // Dispatch a keyboard event through the DOM tree. Called for each
   // parsed key alongside the legacy EventEmitter path.
   readonly dispatchKeyboardEvent: (parsedKey: ParsedKey) => void
+  // When App enters native-reader mode, it hands Ink a controller so
+  // suspendStdin/resumeStdin (e.g. $EDITOR handoff) can pause/restart the
+  // reader alongside their existing termios work — the reader bypasses the
+  // Node stream, so Ink's listener-sweep can't reach it otherwise. App
+  // passes null when leaving reader mode. Optional so testing.tsx doesn't
+  // stub it.
+  readonly onReaderControl?: (control: NativeReaderControl | null) => void
+}
+
+/**
+ * Pause/resume hooks for the native stdin reader, handed from App to Ink.
+ * `suspend()` stops the reader and releases the tty (restores cooked mode) so
+ * an external program ($EDITOR) can own it; `resume()` restarts it. Both are
+ * idempotent and safe to call when no reader is active.
+ */
+export type NativeReaderControl = {
+  suspend: () => void
+  resume: () => void
 }
 
 // Multi-click detection thresholds. 500ms is the macOS default; a small
@@ -174,6 +219,17 @@ export default class App extends PureComponent<Props, State> {
   // Count how many components enabled raw mode to avoid disabling
   // raw mode until all components don't need it anymore
   rawModeEnabledCount = 0
+
+  // Handle to the native stdin reader (stdin-napi) when in reader mode.
+  // Non-null between the first raw-mode enable and the last disable. When
+  // set, keystrokes flow through this reader instead of process.stdin's
+  // 'data' event, and the reader (not stdin.setRawMode) owns termios.
+  nativeReaderHandle: NativeStdinReaderHandle | null = null
+  // True while the reader is paused for an external handoff ($EDITOR). In
+  // this state nativeReaderHandle is null but we're still logically in reader
+  // mode — resume() restarts it. Distinguishes "suspended" from "never had a
+  // reader" so teardown and resume behave correctly.
+  readerSuspended = false
 
   internal_eventEmitter = new EventEmitter()
   keyParseState = INITIAL_STATE
@@ -213,6 +269,78 @@ export default class App extends PureComponent<Props, State> {
   // Determines if TTY is supported on the provided stdin
   isRawModeSupported(): boolean {
     return this.props.stdin.isTTY
+  }
+
+  // Whether to read keystrokes through the native reader (stdin-napi) instead
+  // of process.stdin's 'data' event.
+  //
+  // SCOPED TO THE REMOUNT CASE ONLY. The libuv TTY-poll bug the reader works
+  // around ONLY manifests after an Ink mount→unmount→re-mount cycle (the
+  // REPL→FleetView handoff). A first-mount foreground REPL has a perfectly
+  // working process.stdin — routing it through the reader instead just buys
+  // the reader's downsides (IME composition hiccups, render cadence changes)
+  // for ZERO benefit. So the reader activates ONLY when the bridge set
+  // CCB_FLEET_INPROCESS_REMOUNT=1 (i.e. we're mounting FleetView after
+  // unmounting the REPL in-process). Everything else keeps native stdin.
+  //
+  // Requires additionally: a supported reader injected by the business layer,
+  // AND that we're reading the real process.stdin (the reader reads fd 0).
+  private useNativeReader(): boolean {
+    if (process.env.CCB_FLEET_INPROCESS_REMOUNT !== '1') {
+      return false
+    }
+    const reader = defaultCallbacks.nativeStdinReader
+    return (
+      reader !== undefined &&
+      this.props.stdin === process.stdin &&
+      reader.isSupported()
+    )
+  }
+
+  // Start the native reader. Returns true on success. On failure (or if no
+  // reader is injected) returns false and the caller falls back to the
+  // standard process.stdin 'data' path. Reads fd 0 directly; keystrokes land
+  // in the unchanged handleData.
+  private startNativeReader(): boolean {
+    try {
+      this.nativeReaderHandle =
+        defaultCallbacks.nativeStdinReader?.start(this.handleData) ?? null
+    } catch (e) {
+      // Reader failed to start — fall back to the standard path so the session
+      // is still usable (degraded by the libuv bug, but alive).
+      defaultCallbacks.logError(e)
+      this.nativeReaderHandle = null
+    }
+    return this.nativeReaderHandle !== null
+  }
+
+  // Control handed to Ink for editor-handoff coordination. suspend() stops the
+  // reader and restores cooked termios so an external program can own the tty;
+  // resume() restarts it. Both idempotent. Stable identity (class field) so
+  // Ink can hold the reference across renders.
+  private readerControl: NativeReaderControl = {
+    suspend: () => {
+      if (this.nativeReaderHandle !== null) {
+        this.nativeReaderHandle.stop()
+        this.nativeReaderHandle = null
+        this.readerSuspended = true
+      }
+    },
+    resume: () => {
+      if (this.readerSuspended) {
+        this.readerSuspended = false
+        // Restart on fd 0. If restart fails, fall back to the standard path so
+        // input isn't permanently dead.
+        if (!this.startNativeReader()) {
+          const { stdin } = this.props
+          stdin.ref()
+          if (this.isRawModeSupported()) {
+            stdin.setRawMode(true)
+          }
+          stdin.addListener('data', this.handleData)
+        }
+      }
+    },
   }
 
   override render() {
@@ -324,12 +452,50 @@ export default class App extends PureComponent<Props, State> {
           stdin.removeListener('readable', listener as (...args: unknown[]) => void)
         }
 
-        stdin.ref()
-        stdin.setRawMode(true)
-        // 'data' (flowing) not 'readable'+read(): mirrors attachClient.ts
-        // 6f9c51cb — Bun compiled standalone TTY raw-mode 'readable'
-        // delivery is unreliable.
-        stdin.addListener('data', this.handleData)
+        if (this.useNativeReader()) {
+          // Detach Bun's JS-level stdin listeners before the rust reader takes
+          // over. We arrive here after an in-process REPL→FleetView handoff;
+          // the prior REPL had a 'data'/'readable' listener + raw mode. Drop
+          // them + pause + unref so the Node stream is quiet.
+          //
+          // NOTE: pause()+unref() do NOT stop Bun's libuv from reading fd 0 —
+          // Bun dup'd fd 0 into an internal tty handle at startup, and dup2 on
+          // fd 0 can't touch that internal fd. The only thing that closes
+          // Bun's internal tty handle is destroy(). Without it, Bun's libuv
+          // keeps reading the tty and STEALS bytes from the rust reader (typed
+          // "hello" → reader only sees "hl"). So we destroy() — the rust
+          // reader then owns fd 0 alone. The FleetView→attach handoff is
+          // handled separately: attach reads through the rust reader too (not
+          // a revived process.stdin), so a destroyed handle is fine.
+          // Do NOT setRawMode here — the reader owns termios.
+          const _s = stdin as NodeJS.ReadStream & { isRaw?: boolean }
+          stdin.removeAllListeners('data')
+          stdin.removeAllListeners('readable')
+          if (stdin.isTTY && _s.isRaw) {
+            stdin.setRawMode(false)
+          }
+          stdin.pause()
+          stdin.unref()
+          try {
+            stdin.destroy()
+          } catch {
+            // best-effort; proceed with the reader regardless
+          }
+          this.startNativeReader()
+        }
+        if (this.nativeReaderHandle !== null) {
+          // Native reader started — it owns termios and reads fd 0 on its own
+          // thread, bypassing Bun standalone's libuv TTY poll bug. We hand Ink
+          // a control so editor handoff (suspendStdin) can pause/restart it.
+          this.props.onReaderControl?.(this.readerControl)
+        } else {
+          stdin.ref()
+          stdin.setRawMode(true)
+          // 'data' (flowing) not 'readable'+read(): mirrors attachClient.ts
+          // 6f9c51cb — Bun compiled standalone TTY raw-mode 'readable'
+          // delivery is unreliable.
+          stdin.addListener('data', this.handleData)
+        }
         // Enable bracketed paste mode
         this.props.stdout.write(EBP)
         // Enable terminal focus reporting (DECSET 1004)
@@ -389,9 +555,22 @@ export default class App extends PureComponent<Props, State> {
       this.props.stdout.write(DFE)
       // Disable bracketed paste mode
       this.props.stdout.write(DBP)
-      stdin.setRawMode(false)
-      stdin.removeListener('data', this.handleData)
-      stdin.unref()
+      if (this.nativeReaderHandle !== null || this.readerSuspended) {
+        // Native-reader path: stop() restores the original termios
+        // synchronously and releases the reader thread. fd 0 is owned by Bun
+        // and stays open. No setRawMode/removeListener/unref — we never
+        // touched the Node stream in reader mode. (readerSuspended guards the
+        // case where teardown races an editor handoff that already stopped
+        // the reader.)
+        this.nativeReaderHandle?.stop()
+        this.nativeReaderHandle = null
+        this.readerSuspended = false
+        this.props.onReaderControl?.(null)
+      } else {
+        stdin.setRawMode(false)
+        stdin.removeListener('data', this.handleData)
+        stdin.unref()
+      }
     }
   }
 
@@ -443,6 +622,20 @@ export default class App extends PureComponent<Props, State> {
         undefined,
         undefined,
       )
+      // Native-reader path: the keystroke arrives in the rust reader's
+      // ThreadsafeFunction callback, NOT in a Node 'data' event. React's
+      // discreteUpdates does not auto-flush outside a recognized discrete
+      // event context, so the state updates sit pending until the next
+      // unrelated tick (a 1s Clock interval) commits them — the FleetView
+      // froze to ~1 fps. Force a synchronous flush so the commit (and its
+      // resetAfterCommit → scheduleRender) fires now. The standard
+      // process.stdin path doesn't need this: its 'data' handler runs in a
+      // libuv I/O context React already flushes.
+      if (this.nativeReaderHandle !== null) {
+        ;(
+          reconciler as { flushSyncWork?: () => void }
+        ).flushSyncWork?.()
+      }
     }
 
     // If we have incomplete escape sequences, set a timer to flush them
@@ -479,6 +672,12 @@ export default class App extends PureComponent<Props, State> {
       // Re-attach listener if Bun detached it after the error, else
       // session freezes permanently (reader dead, event loop alive).
       defaultCallbacks.logError(error)
+      // In native-reader mode there is no Node 'data' listener to re-attach —
+      // chunks arrive from the reader thread, which a JS throw here doesn't
+      // detach. The recovery below only applies to the standard stdin path.
+      if (this.nativeReaderHandle !== null) {
+        return
+      }
       const { stdin } = this.props
       if (
         this.rawModeEnabledCount > 0 &&
