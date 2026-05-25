@@ -18,6 +18,7 @@ import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { extractTextContent } from '@claude-code/agent/messages.js'
+import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getAutoModeConfig } from '@claude-code/config/settings'
 import type { SideQueryOptions } from '@claude-code/agent/sideQuery.js'
@@ -337,6 +338,10 @@ export type TranscriptEntry = {
  */
 export function buildTranscriptEntries(messages: Message[]): TranscriptEntry[] {
   const transcript: TranscriptEntry[] = []
+  // tool_use ids of AskUserQuestion calls; their later user tool_result answer
+  // IS genuine intent and must reach the classifier. ant `gZ7` `q` set
+  // (3149.js:190/226/209).
+  const askUserQuestionIds = new Set<string>()
   for (const msg of messages) {
     if (msg.type === 'attachment' && msg.attachment.type === 'queued_command') {
       const prompt = msg.attachment.prompt
@@ -360,6 +365,13 @@ export function buildTranscriptEntries(messages: Message[]): TranscriptEntry[] {
         })
       }
     } else if (msg.type === 'user') {
+      // Skip meta user messages — system-injected context (system-reminders,
+      // hook additional-context, screenshot/file notices), NOT user intent.
+      // Feeding them poisons the classifier: it latches onto stale meta (a
+      // /var/folders screenshot path, an old CI-log discussion) and fabricates
+      // an unrelated deny reason for the action being classified. ant `gZ7`
+      // (3149.js:202); ccb's port had dropped this.
+      if (msg.isMeta) continue
       const content = msg.message.content
       const textBlocks: TranscriptBlock[] = []
       if (typeof content === 'string') {
@@ -368,6 +380,24 @@ export function buildTranscriptEntries(messages: Message[]): TranscriptEntry[] {
         for (const block of content) {
           if (block.type === 'text') {
             textBlocks.push({ type: 'text', text: block.text })
+          } else if (
+            block.type === 'tool_result' &&
+            block.is_error !== true &&
+            askUserQuestionIds.has(block.tool_use_id)
+          ) {
+            // The user's answer to an AskUserQuestion is genuine intent — fold
+            // it into the transcript so the classifier sees what the user chose.
+            // ant `gZ7` 3149.js:209-218.
+            const answer =
+              typeof block.content === 'string'
+                ? block.content
+                : extractTextContent(block.content ?? [])
+            if (answer) {
+              textBlocks.push({
+                type: 'text',
+                text: `[User answered ${ASK_USER_QUESTION_TOOL_NAME}]: ${answer}`,
+              })
+            }
           }
         }
       }
@@ -380,6 +410,11 @@ export function buildTranscriptEntries(messages: Message[]): TranscriptEntry[] {
         // Only include tool_use blocks — assistant text is model-authored
         // and could be crafted to influence the classifier's decision.
         if (typeof block !== 'string' && block.type === 'tool_use') {
+          // Record AskUserQuestion calls so the matching user tool_result
+          // answer gets folded in above. ant `gZ7` 3149.js:226.
+          if (block.name === ASK_USER_QUESTION_TOOL_NAME) {
+            askUserQuestionIds.add(block.id)
+          }
           blocks.push({
             type: 'tool_use',
             name: block.name,

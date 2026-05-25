@@ -71,7 +71,7 @@
   "packages/permission/src/filesystem.ts": 1786,
   "packages/permission/src/permissionSetup.ts": 1539,
   "packages/permission/src/permissions.ts": 1495,
-  "packages/permission/src/yoloClassifier.ts": 1484,
+  "packages/permission/src/yoloClassifier.ts": 1519,
   "packages/provider/src/authAlias.ts": 2079,
   "packages/provider/src/claudeLegacyRuntime.ts": 3685,
   "packages/provider/src/errors.ts": 1302,
