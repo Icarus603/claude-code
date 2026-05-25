@@ -182,6 +182,7 @@ function convertInternalAssistantMessage(
 
   const textParts: string[] = []
   const toolCalls: NonNullable<ChatCompletionAssistantMessageParam['tool_calls']> = []
+  let reasoningContent: string | undefined
 
   for (const block of content) {
     if (typeof block === 'string') {
@@ -199,14 +200,29 @@ function convertInternalAssistantMessage(
             typeof tu.input === 'string' ? tu.input : JSON.stringify(tu.input),
         },
       })
+    } else if (block.type === 'thinking') {
+      // `block` is narrowed to ThinkingBlock(Param); `.thinking` is a string.
+      const thinkingText = block.thinking
+      if (typeof thinkingText === 'string') {
+        reasoningContent = (reasoningContent || '') + thinkingText
+      }
     }
-    // Skip thinking, redacted_thinking, server_tool_use, etc.
+    // Skip redacted_thinking, server_tool_use, etc.
   }
 
-  const result: ChatCompletionAssistantMessageParam = {
+  // `reasoning_content` is a non-standard field that OpenAI-compatible
+  // providers (DeepSeek, MoonshotAI) require on assistant turns when thinking
+  // is enabled — it's not in OpenAI's own ChatCompletion type, so we widen the
+  // result type locally instead of casting to `any` (keeps it type-checked).
+  const result: ChatCompletionAssistantMessageParam & {
+    reasoning_content?: string
+  } = {
     role: 'assistant',
     content: textParts.length > 0 ? textParts.join('\n') : null,
     ...(toolCalls.length > 0 && { tool_calls: toolCalls }),
+    ...(reasoningContent !== undefined && {
+      reasoning_content: reasoningContent,
+    }),
   }
 
   return [result]

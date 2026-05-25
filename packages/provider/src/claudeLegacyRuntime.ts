@@ -1384,37 +1384,6 @@ async function* queryModel(
     messagesForAPI = stripAdvisorBlocks(messagesForAPI)
   }
 
-  // Cross-connection thinking-block scrub. Two layers:
-  //
-  // (1) Strip thinking blocks whose originating connection differs
-  //     from the current one — Anthropic binds thinking signatures to
-  //     the auth context, so a Claude Account turn's signed thinking
-  //     becomes invalid the moment we send it to an Anthropic
-  //     Compatible proxy (different api_key) or any other connection,
-  //     and Anthropic rejects with "Invalid signature in thinking
-  //     block".
-  // (2) Strip thinking blocks that are structurally invalid (empty
-  //     `thinking` text, missing `signature`, empty
-  //     `redacted_thinking.data`). Catches cases (1) misses —
-  //     same-connection turns that came through malformed.
-  //
-  // Order: (1) first, (2) second — (1) is selective so (2) only
-  // operates on the smaller surviving set.
-  {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { resolveConnectionForModel } = require(
-      './providers.js',
-    ) as typeof import('./providers.js')
-    const currentConnId = requestedModel
-      ? resolveConnectionForModel(requestedModel)?.id
-      : undefined
-    messagesForAPI = stripCrossConnectionThinkingBlocks(
-      messagesForAPI,
-      currentConnId,
-    )
-  }
-  messagesForAPI = stripInvalidThinkingBlocks(messagesForAPI)
-
   // Strip excess media items before making the API call.
   // The API rejects requests with >100 media items but returns a confusing error.
   // Rather than erroring (which is hard to recover from in Cowork/CCD), we
@@ -1450,6 +1419,44 @@ async function* queryModel(
     })
     return
   }
+
+  // Cross-connection thinking-block scrub. Two layers:
+  //
+  // (1) Strip thinking blocks whose originating connection differs
+  //     from the current one — Anthropic binds thinking signatures to
+  //     the auth context, so a Claude Account turn's signed thinking
+  //     becomes invalid the moment we send it to an Anthropic
+  //     Compatible proxy (different api_key) or any other connection,
+  //     and Anthropic rejects with "Invalid signature in thinking
+  //     block".
+  // (2) Strip thinking blocks that are structurally invalid (empty
+  //     `thinking` text, missing `signature`, empty
+  //     `redacted_thinking.data`). Catches cases (1) misses —
+  //     same-connection turns that came through malformed.
+  //
+  // Order: (1) first, (2) second — (1) is selective so (2) only
+  // operates on the smaller surviving set.
+  //
+  // NOTE: This MUST run after the openai/gemini branch above.
+  // OpenAI-compatible providers (DeepSeek, MoonshotAI) require
+  // reasoning_content on every assistant message when thinking is
+  // enabled. If we strip thinking blocks before the adapter, the
+  // adapter can't emit reasoning_content and the API returns:
+  //   400 thinking is enabled but reasoning_content is missing
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveConnectionForModel } = require(
+      './providers.js',
+    ) as typeof import('./providers.js')
+    const currentConnId = requestedModel
+      ? resolveConnectionForModel(requestedModel)?.id
+      : undefined
+    messagesForAPI = stripCrossConnectionThinkingBlocks(
+      messagesForAPI,
+      currentConnId,
+    )
+  }
+  messagesForAPI = stripInvalidThinkingBlocks(messagesForAPI)
 
   // Instrumentation: Track message count after normalization
   logEvent('tengu_api_after_normalize', {

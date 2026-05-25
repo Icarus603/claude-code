@@ -366,6 +366,14 @@ export type YoloClassifierResult = {
   }
   /** Path where error prompts were dumped (only set when unavailable due to API error) */
   errorDumpPath?: string
+  /**
+   * Why a parse_failure block happened. Mirrors ant 150's failureMode field
+   * so the caller and telemetry can distinguish an upstream policy refusal
+   * (model declined to respond) from a genuinely unparseable response, a
+   * missing tool_use block, or an invalid schema. Only set when shouldBlock
+   * is true due to a parse failure (not API error / abort).
+   */
+  failureMode?: 'policy_refusal' | 'unparseable' | 'no_tool_use' | 'invalid_schema'
   /** Which classifier stage produced the final decision (2-stage XML only) */
   stage?: 'fast' | 'thinking'
   /** Token usage from stage 1 (fast) when stage 2 was also run */

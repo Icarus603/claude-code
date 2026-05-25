@@ -124,7 +124,10 @@ describe('anthropicMessagesToOpenAI', () => {
     ])
   })
 
-  test('strips thinking blocks', () => {
+  test('maps thinking blocks to reasoning_content', () => {
+    // OpenAI-compatible providers (DeepSeek, MoonshotAI) require
+    // reasoning_content on assistant turns when thinking is enabled — the
+    // thinking text is surfaced there, not silently dropped.
     const result = anthropicMessagesToOpenAI(
       [
         makeAssistantMsg([
@@ -134,7 +137,13 @@ describe('anthropicMessagesToOpenAI', () => {
       ],
       [] as any,
     )
-    expect(result).toEqual([{ role: 'assistant', content: 'visible response' }])
+    expect(result).toEqual([
+      {
+        role: 'assistant',
+        content: 'visible response',
+        reasoning_content: 'internal thoughts...',
+      },
+    ])
   })
 
   test('handles full conversation with tools', () => {

@@ -1,4 +1,5 @@
 import type Anthropic from '@anthropic-ai/sdk'
+import type { ClientOptions } from '@anthropic-ai/sdk'
 import type { BetaToolUnion } from '@anthropic-ai/sdk/resources/beta/messages.js'
 import {
   getLastApiCompletionTimestamp,
@@ -66,6 +67,24 @@ export type SideQueryOptions = {
   stop_sequences?: string[]
   /** Attributes this call in tengu_api_success for COGS joining against reporting.sampling_calls. */
   querySource: QuerySource
+  /**
+   * Extra request-body params spread onto the API call (ant `Zx`'s `...f`).
+   * Carries `CLAUDE_CODE_EXTRA_BODY` JSON + merged `anthropic_beta` headers via
+   * getExtraBodyParams(). Lets internal classifiers honor the same proxy /
+   * beta-header overrides the main loop uses. Omitted = no extra body.
+   */
+  extraBodyParams?: Record<string, unknown>
+  /**
+   * Per-attempt fetch hook (ant `Zx`'s `onFetchAttempt`). Invoked once per
+   * underlying fetch (including SDK retries) so callers can count attempts for
+   * stall diagnostics. Wired through getAnthropicClient's fetchOverride.
+   */
+  onFetchAttempt?: () => void
+  /**
+   * Per-request wall-clock timeout in ms (ant `Zx`'s `timeout`). Passed to the
+   * SDK's create() options. Omitted = SDK default.
+   */
+  timeout?: number
 }
 
 /**
@@ -111,12 +130,26 @@ export async function sideQuery(opts: SideQueryOptions): Promise<BetaMessage> {
     temperature,
     thinking,
     stop_sequences,
+    extraBodyParams,
+    onFetchAttempt,
+    timeout,
   } = opts
 
+  // ant Zx: `...X&&{fetchOverride:(l,d)=>{return X(),globalThis.fetch(l,d)}}`
+  // — increment the attempt counter on every underlying fetch (initial + SDK
+  // retries), then delegate to the real fetch. Typed as ClientOptions['fetch']
+  // so the params infer and globalThis.fetch matches without a cast.
+  const countingFetch: ClientOptions['fetch'] | undefined = onFetchAttempt
+    ? (input, init) => {
+        onFetchAttempt()
+        return globalThis.fetch(input, init)
+      }
+    : undefined
   const client = await getAnthropicClient({
     maxRetries,
     model,
     source: 'side_query',
+    ...(countingFetch && { fetchOverride: countingFetch }),
   })
   const betas = [...getModelBetas(model)]
   if (
@@ -178,8 +211,12 @@ export async function sideQuery(opts: SideQueryOptions): Promise<BetaMessage> {
       ...(thinkingConfig && { thinking: thinkingConfig }),
       ...(betas.length > 0 && { betas }),
       metadata: getAPIMetadata(),
+      // ant Zx: `...f` — extra body params spread last so a caller-supplied
+      // anthropic_beta / proxy override wins over the defaults above.
+      ...(extraBodyParams ?? {}),
     },
-    { signal },
+    // ant Zx: `{signal:w, ...Y!==void 0&&{timeout:Y}}`
+    { signal, ...(timeout !== undefined && { timeout }) },
   )
 
   const requestId =

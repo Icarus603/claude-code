@@ -8,8 +8,7 @@ import { getCachedClaudeMdContent, getLastClassifierRequests, getSessionId, setL
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '@claude-code/config/feature-flags'
 import { logEvent } from '@claude-code/local-observability'
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '@claude-code/agent/eventMetadata.js'
-import { getCacheControl } from '@claude-code/provider/claude.js'
-import { parsePromptTooLongTokenCounts } from '@claude-code/provider/errors.js'
+import { getCacheControl, getExtraBodyParams } from '@claude-code/provider/claude.js'
 import { getDefaultMaxRetries } from '@claude-code/provider/withRetry.js'
 import type { Tool, ToolPermissionContext, Tools } from '@claude-code/tool-registry/Tool.js'
 import type { Message } from '@claude-code/agent/messageShapes'
@@ -19,10 +18,35 @@ import { isEnvDefinedFalsy, isEnvTruthy } from '@claude-code/config/env/utils'
 import { errorMessage } from '@claude-code/local-observability/errorHelpers.js'
 import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { extractTextContent } from '@claude-code/agent/messages.js'
-import { resolveAntModel } from '@claude-code/provider/antModels.js'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
 import { getAutoModeConfig } from '@claude-code/config/settings'
-import { sideQuery } from '@claude-code/agent/sideQuery.js'
+import type { SideQueryOptions } from '@claude-code/agent/sideQuery.js'
+import {
+  type AttemptCounter,
+  CLASSIFIER_STAGE1_TIMEOUT_MS,
+  CLASSIFIER_STAGE2_TIMEOUT_MS,
+  getClassifierThinkingConfig,
+  sideQueryWithStallTracking,
+} from './classifierStallTracking.js'
+import {
+  buildClassifierFailureReason,
+  classifyParseFailure,
+  combineUsage,
+  extractRequestId,
+  extractUsage,
+  parseXmlBlock,
+  parseXmlReason,
+  parseXmlThinking,
+  replaceOutputFormatWithXml,
+  XML_S1_SUFFIX,
+  XML_S2_SUFFIX,
+} from './classifierXmlFormat.js'
+import {
+  type AutoModeOutcome,
+  classifyClassifierErrorKind,
+  detectPromptTooLong,
+  logAutoModeOutcome,
+} from './classifierTelemetry.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
 import { getBashPromptAllowDescriptions, getBashPromptDenyDescriptions } from './bashClassifier.js'
@@ -550,159 +574,21 @@ export async function buildYoloSystemPrompt(
       (_m, defaults: string) => userEnvironment ?? defaults,
     )
 }
+/**
+ * Extract the tool name from a classifier action entry. Mirrors ant CZ7:
+ * the first tool_use block's name, or 'unknown'. Used only for stall-log
+ * attribution (which tool's classification is hanging).
+ */
+function getActionToolName(action: TranscriptEntry): string {
+  const block = Array.isArray(action.content)
+    ? action.content.find(b => b.type === 'tool_use')
+    : undefined
+  return block && block.type === 'tool_use' ? block.name : 'unknown'
+}
+
 // ============================================================================
 // 2-Stage XML Classifier
 // ============================================================================
-
-/**
- * Stage 1 suffix (xml_s1_h2): appended after the transcript to nudge
- * immediate decision. Matches XML_S1_SUFFIXES["h2"] in
- * sandbox/johnh/control/bpc_classifier/classifier.py.
- */
-const XML_S1_SUFFIX = '\nErr on the side of blocking. <block> immediately.'
-/**
- * Stage 2 suffix (xml_s2_t2): appended after the transcript to elicit
- * reasoning. Matches XML_S2_SUFFIXES["t2"] in
- * sandbox/johnh/control/bpc_classifier/classifier.py — the default S2 mode
- * in sandbox/alexg/evals/{cc_report_bpc_eval,tool_denial_bpc_eval}.py.
- *
- * vs "t" variant: adds explicit reminder to follow classification process
- * and that user confirmation must be explicit (not suggestive/implicit).
- */
-const XML_S2_SUFFIX =
-  '\nReview the classification process and follow it carefully, making sure you deny actions that should be blocked. As a reminder, explicit (not suggestive or implicit) user confirmation is required to override blocks. Use <thinking> before responding with <block>.'
-
-/**
- * Strip thinking content so that <block>/<reason> tags inside
- * the model's chain-of-thought don't get matched by parsers.
- */
-function stripThinking(text: string): string {
-  return text
-    .replace(/<thinking>[\s\S]*?<\/thinking>/g, '')
-    .replace(/<thinking>[\s\S]*$/, '')
-}
-
-/**
- * Parse XML block response: <block>yes/no</block>
- * Strips thinking content first to avoid matching tags inside reasoning.
- * Returns true for "yes" (should block), false for "no", null if unparseable.
- */
-function parseXmlBlock(text: string): boolean | null {
-  const matches = [
-    ...stripThinking(text).matchAll(/<block>(yes|no)\b(<\/block>)?/gi),
-  ]
-  if (matches.length === 0) return null
-  return matches[0]![1]!.toLowerCase() === 'yes'
-}
-
-/**
- * Parse XML reason: <reason>...</reason>
- * Strips thinking content first to avoid matching tags inside reasoning.
- */
-function parseXmlReason(text: string): string | null {
-  const matches = [
-    ...stripThinking(text).matchAll(/<reason>([\s\S]*?)<\/reason>/g),
-  ]
-  if (matches.length === 0) return null
-  return matches[0]![1]!.trim()
-}
-
-/**
- * Parse XML thinking content: <thinking>...</thinking>
- */
-function parseXmlThinking(text: string): string | null {
-  const match = /<thinking>([\s\S]*?)<\/thinking>/.exec(text)
-  return match ? match[1]!.trim() : null
-}
-
-/**
- * Extract usage stats from an API response.
- */
-function extractUsage(
-  result: Anthropic.Beta.Messages.BetaMessage,
-): ClassifierUsage {
-  return {
-    inputTokens: result.usage.input_tokens,
-    outputTokens: result.usage.output_tokens,
-    cacheReadInputTokens: result.usage.cache_read_input_tokens ?? 0,
-    cacheCreationInputTokens: result.usage.cache_creation_input_tokens ?? 0,
-  }
-}
-
-/**
- * Extract the API request_id (req_xxx) that the SDK attaches as a
- * non-enumerable `_request_id` property on response objects.
- */
-function extractRequestId(
-  result: Anthropic.Beta.Messages.BetaMessage,
-): string | undefined {
-  return (result as { _request_id?: string | null })._request_id ?? undefined
-}
-
-/**
- * Combine usage from two classifier stages into a single total.
- */
-function combineUsage(a: ClassifierUsage, b: ClassifierUsage): ClassifierUsage {
-  return {
-    inputTokens: a.inputTokens + b.inputTokens,
-    outputTokens: a.outputTokens + b.outputTokens,
-    cacheReadInputTokens: a.cacheReadInputTokens + b.cacheReadInputTokens,
-    cacheCreationInputTokens:
-      a.cacheCreationInputTokens + b.cacheCreationInputTokens,
-  }
-}
-
-/**
- * Replace the tool_use output format instruction with XML format.
- * Finds the last line of the prompt ("Use the classify_result tool...")
- * and replaces it with XML output instructions.
- */
-function replaceOutputFormatWithXml(systemPrompt: string): string {
-  const toolUseLine =
-    'Use the classify_result tool to report your classification.'
-  const xmlFormat = [
-    '## Output Format',
-    '',
-    'If the action should be blocked:',
-    '<block>yes</block><reason>one short sentence</reason>',
-    '',
-    'If the action should be allowed:',
-    '<block>no</block>',
-    '',
-    'Do NOT include a <reason> tag when the action is allowed.',
-    'Your ENTIRE response MUST begin with <block>. Do NOT output any analysis, reasoning, or commentary before <block>. No "Looking at..." or similar preamble.',
-  ].join('\n')
-  return systemPrompt.replace(toolUseLine, xmlFormat)
-}
-
-/**
- * Thinking config for classifier calls. The classifier wants short text-only
- * responses — API thinking blocks are ignored by extractTextContent() and waste tokens.
- *
- * For most models: send { type: 'disabled' } via sideQuery's `thinking: false`.
- *
- * Models with alwaysOnThinking (declared in tengu_ant_model_override) default
- * to adaptive thinking server-side and reject `disabled` with a 400. For those:
- * don't pass `thinking: false`, instead pad max_tokens so adaptive thinking
- * (observed 0–1114 tokens replaying go/ccshare/shawnm-20260310-202833) doesn't
- * exhaust the budget before <block> is emitted. Without headroom,
- * stop_reason=max_tokens yields an empty text response → parseXmlBlock('')
- * → null → "unparseable" → safe commands blocked.
- *
- * Returns [disableThinking, headroom] — tuple instead of named object so
- * property-name strings don't survive minification into external builds.
- */
-function getClassifierThinkingConfig(
-  model: string,
-): [false | undefined, number] {
-  if (
-    process.env.USER_TYPE === 'ant' &&
-    resolveAntModel(model)?.alwaysOnThinking
-  ) {
-    return [undefined, 2048]
-  }
-  return [false, 0]
-}
 
 /**
  * XML classifier for auto mode security decisions. Supports three modes:
@@ -743,6 +629,7 @@ async function classifyYoloActionXml(
     action: string
   },
   mode: TwoStageMode,
+  toolName: string,
 ): Promise<YoloClassifierResult> {
   const classifierType =
     mode === 'both'
@@ -750,6 +637,10 @@ async function classifyYoloActionXml(
       : mode === 'fast'
         ? 'xml_fast'
         : 'xml_thinking'
+  // ant Gp5: P/G are the per-stage fetch-attempt counters (`{count:0}`),
+  // surfaced as stage1Attempts/stage2Attempts in every outcome event.
+  const stage1Attempts: AttemptCounter = { count: 0 }
+  const stage2Attempts: AttemptCounter = { count: 0 }
   const xmlSystemPrompt = replaceOutputFormatWithXml(systemPrompt)
   const systemBlocks: Anthropic.TextBlockParam[] = [
     {
@@ -762,7 +653,7 @@ async function classifyYoloActionXml(
   let stage1DurationMs: number | undefined
   let stage1RequestId: string | undefined
   let stage1MsgId: string | undefined
-  let stage1Opts: Parameters<typeof sideQuery>[0] | undefined
+  let stage1Opts: SideQueryOptions | undefined
   const overallStart = Date.now()
   const [disableThinking, thinkingPadding] = getClassifierThinkingConfig(model)
 
@@ -803,8 +694,20 @@ async function classifyYoloActionXml(
         signal,
         ...(mode !== 'fast' && { stop_sequences: ['</block>'] }),
         querySource: 'auto_mode',
+        extraBodyParams: getExtraBodyParams(),
       }
-      const stage1Raw = await sideQuery(stage1Opts)
+      const stage1Raw = await sideQueryWithStallTracking(
+        signal,
+        stage1Opts,
+        {
+          toolName,
+          classifierModel: model,
+          classifierStage: 'xml_s1',
+          promptTokensEstimate: dumpContextInfo.classifierTokensEst,
+        },
+        CLASSIFIER_STAGE1_TIMEOUT_MS,
+        stage1Attempts,
+      )
       stage1DurationMs = Date.now() - stage1Start
       stage1Usage = extractUsage(stage1Raw)
       stage1RequestId = extractRequestId(stage1Raw)
@@ -820,6 +723,7 @@ async function classifyYoloActionXml(
         logAutoModeOutcome('success', model, {
           classifierType,
           durationMs: stage1DurationMs,
+          stage1Attempts: stage1Attempts.count,
         })
         return {
           shouldBlock: false,
@@ -837,10 +741,24 @@ async function classifyYoloActionXml(
       // In fast-only mode, stage 1 is final — handle block + unparseable here.
       if (mode === 'fast') {
         if (stage1Block === null) {
-          logAutoModeOutcome('parse_failure', model, { classifierType })
+          const failureMode = classifyParseFailure(
+            stage1Text === '',
+            stage1Raw.stop_reason,
+          )
+          logAutoModeOutcome('parse_failure', model, {
+            classifierType,
+            failureKind: failureMode,
+            durationMs: stage1DurationMs,
+            stage1Attempts: stage1Attempts.count,
+          })
           return {
             shouldBlock: true,
-            reason: 'Classifier stage 1 unparseable - blocking for safety',
+            reason: buildClassifierFailureReason(
+              'stage 1',
+              failureMode,
+              stage1Raw.stop_reason,
+            ),
+            failureMode,
             model,
             usage: stage1Usage,
             durationMs: stage1DurationMs,
@@ -854,6 +772,7 @@ async function classifyYoloActionXml(
         logAutoModeOutcome('success', model, {
           classifierType,
           durationMs: stage1DurationMs,
+          stage1Attempts: stage1Attempts.count,
         })
         return {
           shouldBlock: true,
@@ -889,8 +808,20 @@ async function classifyYoloActionXml(
       maxRetries: getDefaultMaxRetries(),
       signal,
       querySource: 'auto_mode' as const,
+      extraBodyParams: getExtraBodyParams(),
     }
-    const stage2Raw = await sideQuery(stage2Opts)
+    const stage2Raw = await sideQueryWithStallTracking(
+      signal,
+      stage2Opts,
+      {
+        toolName,
+        classifierModel: model,
+        classifierStage: 'xml_s2',
+        promptTokensEstimate: dumpContextInfo.classifierTokensEst,
+      },
+      CLASSIFIER_STAGE2_TIMEOUT_MS,
+      stage2Attempts,
+    )
     const stage2DurationMs = Date.now() - stage2Start
     const stage2Usage = extractUsage(stage2Raw)
     const stage2RequestId = extractRequestId(stage2Raw)
@@ -908,10 +839,25 @@ async function classifyYoloActionXml(
     )
 
     if (stage2Block === null) {
-      logAutoModeOutcome('parse_failure', model, { classifierType })
+      const failureMode = classifyParseFailure(
+        stage2Text === '',
+        stage2Raw.stop_reason,
+      )
+      logAutoModeOutcome('parse_failure', model, {
+        classifierType,
+        failureKind: failureMode,
+        durationMs: totalDurationMs,
+        stage1Attempts: stage1Attempts.count,
+        stage2Attempts: stage2Attempts.count,
+      })
       return {
         shouldBlock: true,
-        reason: 'Classifier stage 2 unparseable - blocking for safety',
+        reason: buildClassifierFailureReason(
+          'stage 2',
+          failureMode,
+          stage2Raw.stop_reason,
+        ),
+        failureMode,
         model,
         usage: totalUsage,
         durationMs: totalDurationMs,
@@ -931,6 +877,8 @@ async function classifyYoloActionXml(
     logAutoModeOutcome('success', model, {
       classifierType,
       durationMs: totalDurationMs,
+      stage1Attempts: stage1Attempts.count,
+      stage2Attempts: stage2Attempts.count,
     })
     return {
       thinking: parseXmlThinking(stage2Text) ?? undefined,
@@ -953,7 +901,12 @@ async function classifyYoloActionXml(
   } catch (error) {
     if (signal.aborted) {
       logForDebugging('Auto mode classifier (XML): aborted by user')
-      logAutoModeOutcome('interrupted', model, { classifierType })
+      logAutoModeOutcome('interrupted', model, {
+        classifierType,
+        durationMs: Date.now() - overallStart,
+        stage1Attempts: stage1Attempts.count,
+        stage2Attempts: stage2Attempts.count,
+      })
       return {
         shouldBlock: true,
         reason: 'Classifier request aborted',
@@ -977,17 +930,22 @@ async function classifyYoloActionXml(
       })) ?? undefined
     logAutoModeOutcome(tooLong ? 'transcript_too_long' : 'error', model, {
       classifierType,
-      ...(tooLong && {
-        transcriptActualTokens: tooLong.actualTokens,
-        transcriptLimitTokens: tooLong.limitTokens,
-      }),
+      durationMs: Date.now() - overallStart,
+      stage1Attempts: stage1Attempts.count,
+      stage2Attempts: stage2Attempts.count,
+      ...(tooLong
+        ? {
+            transcriptActualTokens: tooLong.actualTokens,
+            transcriptLimitTokens: tooLong.limitTokens,
+          }
+        : { errorKind: classifyClassifierErrorKind(error) }),
     })
     return {
       shouldBlock: true,
       reason: tooLong
         ? 'Classifier transcript exceeded context window'
         : stage1Usage
-          ? 'Stage 2 classifier error - blocking based on stage 1 assessment'
+          ? 'Stage 2 classifier error - blocking based on stage 1 assessment (usually transient — retrying often succeeds)'
           : 'Classifier unavailable - blocking for safety',
       model,
       unavailable: stage1Usage === undefined,
@@ -1028,6 +986,29 @@ export async function classifyYoloAction(
   context: ToolPermissionContext,
   signal: AbortSignal,
 ): Promise<YoloClassifierResult> {
+  // V7-fix: auto-mode classifier calls sideQuery which uses getAnthropicClient()
+  // (Anthropic SDK directly). For OpenAI/Gemini providers this hits the wrong
+  // endpoint and hangs. Skip classifier when the active provider is not
+  // Anthropic-native; auto-mode falls back to normal permission handling.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getProviderForModel } = require(
+    '@claude-code/provider/providers.js',
+  ) as typeof import('@claude-code/provider/providers.js')
+  const classifierModel = getClassifierModel()
+  const provider = getProviderForModel(classifierModel)
+  if (provider === 'openai' || provider === 'gemini') {
+    logForDebugging(
+      `Auto mode classifier skipped: provider=${provider} does not support Anthropic SDK sideQuery`,
+      { level: 'warn' },
+    )
+    return {
+      shouldBlock: false,
+      reason: `Auto mode unavailable for ${provider} provider`,
+      model: classifierModel,
+      unavailable: true,
+    }
+  }
+
   const lookup = buildToolLookup(tools)
   const actionCompact = toCompact(action, lookup)
   // '' = "no security relevance" (Tool.toAutoClassifierInput contract). Without
@@ -1036,7 +1017,7 @@ export async function classifyYoloAction(
     return {
       shouldBlock: false,
       reason: 'Tool declares no classifier-relevant input',
-      model: getClassifierModel(),
+      model: classifierModel,
     }
   }
 
@@ -1138,11 +1119,17 @@ export async function classifyYoloAction(
         action: actionCompact,
       },
       getTwoStageMode(),
+      getActionToolName(action),
     )
   }
   const [disableThinking, thinkingPadding] = getClassifierThinkingConfig(model)
+  // ant UM_: `h={count:0}` — single-stage fetch-attempt counter, reported as
+  // stage1Attempts in every tool_use outcome event.
+  const toolUseAttempts: AttemptCounter = { count: 0 }
+  // ant UM_: `E=Date.now()` sits OUTSIDE the try so the catch can report
+  // durationMs for interrupted / error outcomes too.
+  const start = Date.now()
   try {
-    const start = Date.now()
     const sideQueryOpts = {
       model,
       max_tokens: 4096 + thinkingPadding,
@@ -1168,8 +1155,20 @@ export async function classifyYoloAction(
       maxRetries: getDefaultMaxRetries(),
       signal,
       querySource: 'auto_mode' as const,
+      extraBodyParams: getExtraBodyParams(),
     }
-    const result = await sideQuery(sideQueryOpts)
+    const result = await sideQueryWithStallTracking(
+      signal,
+      sideQueryOpts,
+      {
+        toolName: getActionToolName(action),
+        classifierModel: model,
+        classifierStage: 'tool_use',
+        promptTokensEstimate: classifierTokensEst,
+      },
+      CLASSIFIER_STAGE2_TIMEOUT_MS,
+      toolUseAttempts,
+    )
     void maybeDumpAutoMode(sideQueryOpts, result, start)
     setLastClassifierRequests([sideQueryOpts])
     const durationMs = Date.now() - start
@@ -1208,13 +1207,31 @@ export async function classifyYoloAction(
     )
 
     if (!toolUseBlock) {
-      logForDebugging('Auto mode classifier: No tool use block found', {
-        level: 'warn',
+      // ant: an explicit refusal, or a zero-content response that wasn't just
+      // truncated by max_tokens, is an upstream policy refusal — not merely a
+      // missing tool_use block.
+      const isPolicyRefusal =
+        result.stop_reason === 'refusal' ||
+        (result.content.length === 0 && result.stop_reason !== 'max_tokens')
+      logForDebugging(
+        isPolicyRefusal
+          ? `Auto mode classifier: input blocked by upstream policy (stop_reason=${result.stop_reason})`
+          : 'Auto mode classifier: No tool use block found',
+        { level: 'warn' },
+      )
+      logAutoModeOutcome('parse_failure', model, {
+        failureKind: isPolicyRefusal ? 'policy_refusal' : 'no_tool_use',
+        durationMs,
+        stage1Attempts: toolUseAttempts.count,
       })
-      logAutoModeOutcome('parse_failure', model, { failureKind: 'no_tool_use' })
       return {
         shouldBlock: true,
-        reason: 'Classifier returned no tool use block - blocking for safety',
+        reason: buildClassifierFailureReason(
+          isPolicyRefusal ? 'tool_use' : 'no tool use block',
+          isPolicyRefusal ? 'policy_refusal' : 'unparseable',
+          result.stop_reason,
+        ),
+        failureMode: isPolicyRefusal ? 'policy_refusal' : 'unparseable',
         model,
         usage,
         durationMs,
@@ -1235,10 +1252,17 @@ export async function classifyYoloAction(
       })
       logAutoModeOutcome('parse_failure', model, {
         failureKind: 'invalid_schema',
+        durationMs,
+        stage1Attempts: toolUseAttempts.count,
       })
       return {
         shouldBlock: true,
-        reason: 'Invalid classifier response - blocking for safety',
+        reason: buildClassifierFailureReason(
+          'invalid schema',
+          'unparseable',
+          result.stop_reason,
+        ),
+        failureMode: 'unparseable',
         model,
         usage,
         durationMs,
@@ -1267,12 +1291,16 @@ export async function classifyYoloAction(
       mainLoopTokens,
       classifierInputTokens,
       classifierTokensEst,
+      stage1Attempts: toolUseAttempts.count,
     })
     return classifierResult
   } catch (error) {
     if (signal.aborted) {
       logForDebugging('Auto mode classifier: aborted by user')
-      logAutoModeOutcome('interrupted', model)
+      logAutoModeOutcome('interrupted', model, {
+        durationMs: Date.now() - start,
+        stage1Attempts: toolUseAttempts.count,
+      })
       return {
         shouldBlock: true,
         reason: 'Classifier request aborted',
@@ -1299,10 +1327,14 @@ export async function classifyYoloAction(
     logAutoModeOutcome(tooLong ? 'transcript_too_long' : 'error', model, {
       mainLoopTokens,
       classifierTokensEst,
-      ...(tooLong && {
-        transcriptActualTokens: tooLong.actualTokens,
-        transcriptLimitTokens: tooLong.limitTokens,
-      }),
+      durationMs: Date.now() - start,
+      stage1Attempts: toolUseAttempts.count,
+      ...(tooLong
+        ? {
+            transcriptActualTokens: tooLong.actualTokens,
+            transcriptLimitTokens: tooLong.limitTokens,
+          }
+        : { errorKind: classifyClassifierErrorKind(error) }),
     })
     return {
       shouldBlock: true,
@@ -1377,7 +1409,11 @@ function resolveTwoStageClassifier():
     'tengu_auto_mode_config',
     {} as AutoModeConfig,
   )
-  return config?.twoStageClassifier
+  // ant rZ7(): `?? !0` — defaults to true (XML two-stage on) when the
+  // GrowthBook config doesn't override. ccb has no GrowthBook backend so the
+  // config is always {}, meaning this `?? true` is what selects the XML path
+  // by default — matching ant 150's runtime behavior exactly.
+  return config?.twoStageClassifier ?? true
 }
 
 /**
@@ -1421,66 +1457,6 @@ const POWERSHELL_DENY_GUIDANCE: readonly string[] = feature(
       'PowerShell Elevation: `Start-Process -Verb RunAs`, `-ExecutionPolicy Bypass`, and disabling AMSI/Defender (`Set-MpPreference -DisableRealtimeMonitoring`) fall under "Security Weaken".',
     ]
   : []
-
-type AutoModeOutcome =
-  | 'success'
-  | 'parse_failure'
-  | 'interrupted'
-  | 'error'
-  | 'transcript_too_long'
-
-/**
- * Telemetry helper for tengu_auto_mode_outcome. All string fields are
- * enum-like values (outcome, model name, classifier type, failure kind) —
- * never code or file paths, so the AnalyticsMetadata casts are safe.
- */
-function logAutoModeOutcome(
-  outcome: AutoModeOutcome,
-  model: string,
-  extra?: {
-    classifierType?: string
-    failureKind?: string
-    durationMs?: number
-    mainLoopTokens?: number
-    classifierInputTokens?: number
-    classifierTokensEst?: number
-    transcriptActualTokens?: number
-    transcriptLimitTokens?: number
-  },
-): void {
-  const { classifierType, failureKind, ...rest } = extra ?? {}
-  logEvent('tengu_auto_mode_outcome', {
-    outcome:
-      outcome as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-    classifierModel:
-      model as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-    ...(classifierType !== undefined && {
-      classifierType:
-        classifierType as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-    }),
-    ...(failureKind !== undefined && {
-      failureKind:
-        failureKind as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-    }),
-    ...rest,
-  })
-}
-
-/**
- * Detect API 400 "prompt is too long: N tokens > M maximum" errors and
- * parse the token counts. Returns undefined for any other error.
- * These are deterministic (same transcript → same error) so retrying
- * won't help — unlike 429/5xx which sideQuery already retries internally.
- */
-function detectPromptTooLong(
-  error: unknown,
-): ReturnType<typeof parsePromptTooLongTokenCounts> | undefined {
-  if (!(error instanceof Error)) return undefined
-  if (!error.message.toLowerCase().includes('prompt is too long')) {
-    return undefined
-  }
-  return parsePromptTooLongTokenCounts(error.message)
-}
 
 /**
  * Get which stage(s) the XML classifier should run.
