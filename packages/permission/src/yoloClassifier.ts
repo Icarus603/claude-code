@@ -1,4 +1,3 @@
-import { feature } from 'bun:bundle'
 import type Anthropic from '@anthropic-ai/sdk'
 import type { BetaToolUnion } from '@anthropic-ai/sdk/resources/beta/messages.js'
 import { mkdir, writeFile } from 'fs/promises'
@@ -20,7 +19,6 @@ import { lazySchema } from '@claude-code/tool-registry/utils/lazySchema.js'
 import { extractTextContent } from '@claude-code/agent/messages.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code/tool-registry/tools/AskUserQuestionTool/prompt.js'
 import { getMainLoopModel } from '@claude-code/provider/model.js'
-import { getAutoModeConfig } from '@claude-code/config/settings'
 import type { SideQueryOptions } from '@claude-code/agent/sideQuery.js'
 import {
   type AttemptCounter,
@@ -50,132 +48,20 @@ import {
 } from './classifierTelemetry.js'
 import { jsonStringify } from '@claude-code/local-observability/slowOperations.js'
 import { tokenCountWithEstimation } from '@claude-code/agent/tokens.js'
-import { getBashPromptAllowDescriptions, getBashPromptDenyDescriptions } from './bashClassifier.js'
 import { extractToolUseBlock, parseClassifierResponse } from './classifierShared.js'
 import { getClaudeTempDir } from './filesystem.js'
 import { readEnv } from '@claude-code/config/env'
-
-// Dead code elimination: conditional imports for auto mode classifier prompts.
-// At build time, the bundler inlines .txt files as string literals. At test
-// time, require() returns {default: string} — txtRequire normalizes both.
-/* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-function txtRequire(mod: string | { default: string }): string {
-  return typeof mod === 'string' ? mod : mod.default
-}
-
-const BASE_PROMPT: string = feature('TRANSCRIPT_CLASSIFIER')
-  ? txtRequire(require('./yolo-classifier-prompts/auto_mode_system_prompt.txt'))
-  : ''
-
-// External template is loaded separately so it's available for
-// `claude auto-mode defaults` even in ant builds. Ant builds use
-// permissions_anthropic.txt at runtime but should dump external defaults.
-const EXTERNAL_PERMISSIONS_TEMPLATE: string = feature('TRANSCRIPT_CLASSIFIER')
-  ? txtRequire(require('./yolo-classifier-prompts/permissions_external.txt'))
-  : ''
-
-// ccb: load anthropic-prod template unconditionally (was ant-only via
-// USER_TYPE check). Both .txt files are bundled as string literals at build
-// time regardless — the gate only chose which const got the value. ccb
-// defaults to this template (see isUsingExternalPermissions below) because
-// the external template's deny rules are written too broadly for daily
-// macOS dev use (e.g. blocks `brew install`, any write outside CWD), while
-// the anthropic template matches what v2.1.131 ships in prod and includes
-// allow exceptions for cloud-CLI describe / IaC plan / declared deps.
-const ANTHROPIC_PERMISSIONS_TEMPLATE: string = feature('TRANSCRIPT_CLASSIFIER')
-  ? txtRequire(require('./yolo-classifier-prompts/permissions_anthropic.txt'))
-  : ''
-/* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-
-function isUsingExternalPermissions(): boolean {
-  // forceExternalPermissions opts into the external template for both ant
-  // and ccb (escape hatch — used by `ccb auto-mode defaults` reviewers and
-  // by ant employees dogfooding the external prompt).
-  const config = getFeatureValue_CACHED_MAY_BE_STALE(
-    'tengu_auto_mode_config',
-    {} as AutoModeConfig,
-  )
-  if (config?.forceExternalPermissions === true) return true
-  // ccb (USER_TYPE !== 'ant') defaults to anthropic-prod template — same as
-  // what v2.1.131 ships when the GrowthBook config doesn't override.
-  return false
-}
-
-/**
- * Shape of the settings.autoMode config — the three classifier prompt
- * sections a user can customize. Required-field variant (empty arrays when
- * absent) for JSON output; settings.ts uses the optional-field variant.
- */
-export type AutoModeRules = {
-  allow: string[]
-  soft_deny: string[]
-  /**
-   * Hard-deny rules ported from ant v2.1.136 — these classes of action
-   * are NEVER auto-approved, even with explicit user authorization in
-   * the active conversation. The classifier evaluates hard_deny BEFORE
-   * checking user intent or soft_deny.
-   */
-  hard_deny: string[]
-  environment: string[]
-}
-
-/**
- * Parses the external permissions template into the settings.autoMode schema
- * shape. The external template wraps each section's defaults in
- * <user_*_to_replace> tags (user settings REPLACE these defaults), so the
- * captured tag contents ARE the defaults. Bullet items are single-line in the
- * template; each line starting with `- ` becomes one array entry.
- * Used by `claude auto-mode defaults`. Always returns external defaults,
- * never the Anthropic-internal template.
- */
-export function getDefaultExternalAutoModeRules(): AutoModeRules {
-  return {
-    allow: extractTaggedBullets('user_allow_rules_to_replace'),
-    soft_deny: extractTaggedBullets('user_deny_rules_to_replace'),
-    hard_deny: extractTaggedBullets('user_hard_deny_rules_to_replace'),
-    environment: extractTaggedBullets('user_environment_to_replace'),
-  }
-}
-
-function extractTaggedBullets(tagName: string): string[] {
-  const match = EXTERNAL_PERMISSIONS_TEMPLATE.match(
-    new RegExp(`<${tagName}>([\\s\\S]*?)</${tagName}>`),
-  )
-  if (!match) return []
-  return (match[1] ?? '')
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.startsWith('- '))
-    .map(line => line.slice(2))
-}
-
-/**
- * Returns the full external classifier system prompt with default rules (no user
- * overrides). Used by `claude auto-mode critique` to show the model how the
- * classifier sees its instructions.
- */
-export function buildDefaultExternalSystemPrompt(): string {
-  return BASE_PROMPT.replace(
-    '<permissions_template>',
-    () => EXTERNAL_PERMISSIONS_TEMPLATE,
-  )
-    .replace(
-      /<user_allow_rules_to_replace>([\s\S]*?)<\/user_allow_rules_to_replace>/,
-      (_m, defaults: string) => defaults,
-    )
-    .replace(
-      /<user_deny_rules_to_replace>([\s\S]*?)<\/user_deny_rules_to_replace>/,
-      (_m, defaults: string) => defaults,
-    )
-    .replace(
-      /<user_hard_deny_rules_to_replace>([\s\S]*?)<\/user_hard_deny_rules_to_replace>/,
-      (_m, defaults: string) => defaults,
-    )
-    .replace(
-      /<user_environment_to_replace>([\s\S]*?)<\/user_environment_to_replace>/,
-      (_m, defaults: string) => defaults,
-    )
-}
+import { buildYoloSystemPrompt } from './yoloSystemPrompt.js'
+// Re-export the prompt-assembly surface for `claude auto-mode` handlers and
+// the contract test — the assembly logic moved to yoloSystemPrompt.ts (file-size
+// budget), but these names stay importable from yoloClassifier for compat.
+export {
+  type AutoModeRules,
+  type YoloSystemPrompt,
+  buildDefaultExternalSystemPrompt,
+  buildYoloSystemPrompt,
+  getDefaultExternalAutoModeRules,
+} from './yoloSystemPrompt.js'
 
 function getAutoModeDumpDir(): string {
   return join(getClaudeTempDir(), 'auto-mode')
@@ -548,68 +434,6 @@ function buildClaudeMdMessage(): Anthropic.MessageParam | null {
 }
 
 /**
- * Build the system prompt for the auto mode classifier.
- * Assembles the base prompt with the permissions template and substitutes
- * user allow/deny/environment values from settings.autoMode.
- */
-export async function buildYoloSystemPrompt(
-  context: ToolPermissionContext,
-): Promise<string> {
-  const usingExternal = isUsingExternalPermissions()
-  const systemPrompt = BASE_PROMPT.replace('<permissions_template>', () =>
-    usingExternal
-      ? EXTERNAL_PERMISSIONS_TEMPLATE
-      : ANTHROPIC_PERMISSIONS_TEMPLATE,
-  )
-
-  const autoMode = getAutoModeConfig()
-  const includeBashPromptRules = feature('BASH_CLASSIFIER')
-    ? !usingExternal
-    : false
-  const includePowerShellGuidance = feature('POWERSHELL_AUTO_MODE')
-    ? !usingExternal
-    : false
-  const allowDescriptions = [
-    ...(includeBashPromptRules ? getBashPromptAllowDescriptions(context) : []),
-    ...(autoMode?.allow ?? []),
-  ]
-  const denyDescriptions = [
-    ...(includeBashPromptRules ? getBashPromptDenyDescriptions(context) : []),
-    ...(includePowerShellGuidance ? POWERSHELL_DENY_GUIDANCE : []),
-    ...(autoMode?.soft_deny ?? []),
-  ]
-
-  // All three sections use the same <foo_to_replace>...</foo_to_replace>
-  // delimiter pattern. The external template wraps its defaults inside the
-  // tags, so user-provided values REPLACE the defaults entirely. The
-  // anthropic template keeps its defaults outside the tags and uses an empty
-  // tag pair at the end of each section, so user-provided values are
-  // strictly ADDITIVE.
-  const userAllow = allowDescriptions.length
-    ? allowDescriptions.map(d => `- ${d}`).join('\n')
-    : undefined
-  const userDeny = denyDescriptions.length
-    ? denyDescriptions.map(d => `- ${d}`).join('\n')
-    : undefined
-  const userEnvironment = autoMode?.environment?.length
-    ? autoMode.environment.map(e => `- ${e}`).join('\n')
-    : undefined
-
-  return systemPrompt
-    .replace(
-      /<user_allow_rules_to_replace>([\s\S]*?)<\/user_allow_rules_to_replace>/,
-      (_m, defaults: string) => userAllow ?? defaults,
-    )
-    .replace(
-      /<user_deny_rules_to_replace>([\s\S]*?)<\/user_deny_rules_to_replace>/,
-      (_m, defaults: string) => userDeny ?? defaults,
-    )
-    .replace(
-      /<user_environment_to_replace>([\s\S]*?)<\/user_environment_to_replace>/,
-      (_m, defaults: string) => userEnvironment ?? defaults,
-    )
-}
-/**
  * Extract the tool name from a classifier action entry. Mirrors ant CZ7:
  * the first tool_use block's name, or 'unknown'. Used only for stall-log
  * attribution (which tool's classification is hanging).
@@ -644,6 +468,7 @@ function getActionToolName(action: TranscriptEntry): string {
 async function classifyYoloActionXml(
   prefixMessages: Anthropic.MessageParam[],
   systemPrompt: string,
+  sessionContextBlocks: Anthropic.TextBlockParam[],
   userPrompt: string,
   userContentBlocks: Array<
     Anthropic.TextBlockParam | Anthropic.ImageBlockParam
@@ -677,12 +502,16 @@ async function classifyYoloActionXml(
   const stage1Attempts: AttemptCounter = { count: 0 }
   const stage2Attempts: AttemptCounter = { count: 0 }
   const xmlSystemPrompt = replaceOutputFormatWithXml(systemPrompt)
+  // ant Gp5: `j=_.map((v,E)=>E===0?{...v,text:Zp5(v.text)}:v)` — only block 0
+  // (base+template) gets the XML output-format rewrite; the Session Context
+  // block(s) pass through unchanged.
   const systemBlocks: Anthropic.TextBlockParam[] = [
     {
       type: 'text' as const,
       text: xmlSystemPrompt,
       cache_control: getCacheControl({ querySource: 'auto_mode' }),
     },
+    ...sessionContextBlocks,
   ]
   let stage1Usage: ClassifierUsage | undefined
   let stage1DurationMs: number | undefined
@@ -1056,7 +885,8 @@ export async function classifyYoloAction(
     }
   }
 
-  const systemPrompt = await buildYoloSystemPrompt(context)
+  const { systemText: systemPrompt, sessionContextBlocks } =
+    await buildYoloSystemPrompt(context)
   const transcriptEntries = buildTranscriptEntries(messages)
   const claudeMdMessage = buildClaudeMdMessage()
   const prefixMessages: Anthropic.MessageParam[] = claudeMdMessage
@@ -1087,8 +917,15 @@ export async function classifyYoloAction(
   }
 
   const userPrompt = userContentBlocks.map(b => b.text).join('') + actionCompact
+  // ant Dp5 returns a system-block ARRAY; A4($) flattens all blocks' text for
+  // the length/telemetry estimate. Session Context (block 1) counts toward the
+  // system size too.
+  const sessionContextChars = sessionContextBlocks.reduce(
+    (n, b) => n + b.text.length,
+    0,
+  )
   const promptLengths = {
-    systemPrompt: systemPrompt.length,
+    systemPrompt: systemPrompt.length + sessionContextChars,
     toolCalls: toolCallsLength,
     userPrompts: userPromptsLength,
   }
@@ -1098,7 +935,7 @@ export async function classifyYoloAction(
   // response usage + estimates the tail slice) so we compute unconditionally
   // for telemetry. The classifier prompt should stay strictly smaller than
   // main-loop context so auto-compact fires before the classifier overflows.
-  const classifierChars = systemPrompt.length + userPrompt.length
+  const classifierChars = promptLengths.systemPrompt + userPrompt.length
   const classifierTokensEst = Math.round(classifierChars / 4)
   const mainLoopTokens = tokenCountWithEstimation(messages)
   if (isDebugMode()) {
@@ -1140,6 +977,7 @@ export async function classifyYoloAction(
     return classifyYoloActionXml(
       prefixMessages,
       systemPrompt,
+      sessionContextBlocks,
       userPrompt,
       userContentBlocks,
       model,
@@ -1174,6 +1012,7 @@ export async function classifyYoloAction(
           text: systemPrompt,
           cache_control: getCacheControl({ querySource: 'auto_mode' }),
         },
+        ...sessionContextBlocks,
       ],
       skipSystemPromptPrefix: true,
       temperature: 0,
@@ -1471,27 +1310,6 @@ function isJsonlTranscriptEnabled(): boolean {
   )
   return config?.jsonlTranscript === true
 }
-
-/**
- * PowerShell-specific deny guidance for the classifier. Appended to the
- * deny list in buildYoloSystemPrompt when PowerShell auto mode is active.
- * Maps PS idioms to the existing BLOCK categories so the classifier
- * recognizes `iex (iwr ...)` as "Code from External", `Remove-Item
- * -Recurse -Force` as "Irreversible Local Destruction", etc.
- *
- * Guarded at definition for DCE — with external:false, the string content
- * is absent from external builds (same pattern as the .txt requires above).
- */
-const POWERSHELL_DENY_GUIDANCE: readonly string[] = feature(
-  'POWERSHELL_AUTO_MODE',
-)
-  ? [
-      'PowerShell Download-and-Execute: `iex (iwr ...)`, `Invoke-Expression (Invoke-WebRequest ...)`, `Invoke-Expression (New-Object Net.WebClient).DownloadString(...)`, and any pipeline feeding remote content into `Invoke-Expression`/`iex` fall under "Code from External" — same as `curl | bash`.',
-      'PowerShell Irreversible Destruction: `Remove-Item -Recurse -Force`, `rm -r -fo`, `Clear-Content`, and `Set-Content` truncation of pre-existing files fall under "Irreversible Local Destruction" — same as `rm -rf` and `> file`.',
-      'PowerShell Persistence: modifying `$PROFILE` (any of the four profile paths), `Register-ScheduledTask`, `New-Service`, writing to registry Run keys (`HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` or the HKLM equivalent), and WMI event subscriptions fall under "Unauthorized Persistence" — same as `.bashrc` edits and cron jobs.',
-      'PowerShell Elevation: `Start-Process -Verb RunAs`, `-ExecutionPolicy Bypass`, and disabling AMSI/Defender (`Set-MpPreference -DisableRealtimeMonitoring`) fall under "Security Weaken".',
-    ]
-  : []
 
 /**
  * Get which stage(s) the XML classifier should run.
