@@ -13,7 +13,7 @@
 
 import { readFile } from 'fs/promises'
 
-const BUDGET = 5736 // +45: mid-turn graceful abort before the left-arrow bridge forks — abort('background') + wait for queryGuard idle so the forked worker resumes a COMPLETE transcript (fixes right-arrow-returns-to-deadlock)
+const BUDGET = 5750 // +14: left-arrow mid-turn abort uses reason 'interrupt' (not 'background') so query.ts skips the synthetic [Request interrupted by user] — worker resumes a resumable transcript + auto-continues instead of showing a dead/interrupted session (v26.5.88 follow-up)
 
 async function main() {
   const content = await readFile('packages/repl/src/screens/REPLView.tsx', 'utf8')

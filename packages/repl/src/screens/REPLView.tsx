@@ -3901,23 +3901,37 @@ export function REPL({
     // But ant's gate is not there to "block leaving" — it protects an
     // INVARIANT: the forked worker boots with `--resume <id> --fork-session`
     // (openAgentsFromReplLeftArrow → buildReplForkFlags), so it inherits the
-    // conversation by replaying the ON-DISK transcript. That transcript MUST
-    // be complete before the fork. ccb preserves the same invariant by a
-    // different means that also works under auto mode: gracefully abort the
-    // in-flight turn first (the same programmatic `abort('background')` that
-    // Ctrl+B's handleBackgroundQuery uses — NOT 'user-cancel', so the onQuery
-    // finally's auto-restore rewind stays off), then wait for the query loop
-    // to drain its partial assistant output + interruption message into the
-    // transcript before backgrounding.
+    // conversation by replaying the ON-DISK transcript. That transcript must
+    // be in a RESUMABLE shape before the fork. ccb preserves the same
+    // invariant by a different means that also works under auto mode: abort
+    // the in-flight turn with reason 'interrupt', wait for the query loop to
+    // drain its partial assistant output to disk, then fork.
     //
-    // Skipping this is the deadlock: the worker --resumes a transcript missing
-    // the running turn, the right-arrow attach lands on an idle session (no
-    // spinner, dead agent loop), and the next prompt starts a fresh session.
+    // Why reason 'interrupt' and NOT 'background': query.ts:1019/1608 yield a
+    // synthetic `[Request interrupted by user]` user message for EVERY abort
+    // reason except 'interrupt'. That synthetic is NOT meta, so on the worker
+    // side detectTurnInterruption (conversationRecovery.tsx) reads it as the
+    // standing user prompt → the resumed conversation is dead, and
+    // deriveReplSeed picks it as the FleetView row label. That was the v26.5.88
+    // bug: the row read "[Request interrupted by..." and the right-arrow attach
+    // landed on a terminated turn. 'interrupt' SKIPS the synthetic (the reason
+    // submit-interrupt already uses for exactly this — see the comment at
+    // query.ts:1017), leaving the transcript ending in genuine partial
+    // assistant content. The worker's resume path then classifies that as
+    // `interrupted_turn` and auto-appends "Continue from where you left off."
+    // (conversationRecovery.tsx:210) — so the backgrounded turn CONTINUES in
+    // the worker instead of being killed. 'interrupt' is also not 'user-cancel',
+    // so the onQuery-finally auto-restore rewind (gated on 'user-cancel') stays
+    // off.
+    //
+    // Skipping the abort entirely is the original deadlock: process.exit(0)
+    // kills the foreground turn with no finally → recordTranscript, so the
+    // worker --resumes a transcript missing the running turn and lands idle.
     if (queryGuard.isActive) {
-      abortControllerRef.current?.abort('background');
-      // Wait for the query loop to reach idle (all yields consumed: the
-      // partial assistant message AND createUserInterruptionMessage have been
-      // setMessages'd). queryGuard flips to idle in onQuery's finally.
+      abortControllerRef.current?.abort('interrupt');
+      // Wait for the query loop to reach idle (the partial assistant output has
+      // been setMessages'd / recorded). queryGuard flips to idle in onQuery's
+      // finally.
       await new Promise<void>(resolve => {
         if (!queryGuard.isActive) {
           resolve();
@@ -3936,10 +3950,10 @@ export function REPL({
         }, 5000);
       });
       // Yield one macrotask so React commits the final setMessages and
-      // useLogMessages' effect enqueues the interruption + last partial chunk
-      // before openAgentsFromReplLeftArrow's flushSessionStorage drains the
-      // write queue. Without this the effect may not have run yet and the
-      // flush would race the tail of the turn onto disk.
+      // useLogMessages' effect enqueues the last partial chunk before
+      // openAgentsFromReplLeftArrow's flushSessionStorage drains the write
+      // queue. Without this the effect may not have run yet and the flush
+      // would race the tail of the turn onto disk.
       await new Promise<void>(resolve => setTimeout(resolve, 0));
     }
     // Foreground REPL: ← on empty prompt opens FleetView, backgrounding the
