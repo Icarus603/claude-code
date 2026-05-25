@@ -986,19 +986,19 @@ export async function classifyYoloAction(
   context: ToolPermissionContext,
   signal: AbortSignal,
 ): Promise<YoloClassifierResult> {
-  // V7-fix: auto-mode classifier calls sideQuery which uses getAnthropicClient()
-  // (Anthropic SDK directly). For OpenAI/Gemini providers this hits the wrong
-  // endpoint and hangs. Skip classifier when the active provider is not
-  // Anthropic-native; auto-mode falls back to normal permission handling.
+  // V7-fix: classifier builds an Anthropic-protocol request (forced
+  // tool_choice, stop_sequences) openai/gemini adapters can't speak and codex's
+  // fetch-adapter mangles (tool_choice→'auto', drops stop_sequences → forced
+  // classify_result downgraded → spurious block). Skip all three → unavailable.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { getProviderForModel } = require(
     '@claude-code/provider/providers.js',
   ) as typeof import('@claude-code/provider/providers.js')
   const classifierModel = getClassifierModel()
   const provider = getProviderForModel(classifierModel)
-  if (provider === 'openai' || provider === 'gemini') {
+  if (provider === 'openai' || provider === 'gemini' || provider === 'codex') {
     logForDebugging(
-      `Auto mode classifier skipped: provider=${provider} does not support Anthropic SDK sideQuery`,
+      `Auto mode classifier skipped: provider=${provider} cannot honour the Anthropic-shape classifier request (tool_choice/stop_sequences)`,
       { level: 'warn' },
     )
     return {

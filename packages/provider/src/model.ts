@@ -24,7 +24,11 @@ import { getModelStrings, resolveOverriddenModel } from './model/modelStrings.js
 import { formatModelPricing, getOpus46CostTier } from './modelCost.js'
 import { getSettings } from '@claude-code/config/settings'
 import type { PermissionMode } from '@claude-code/permission/PermissionMode'
-import { getAPIProvider } from './providers.js'
+import {
+  getAPIProvider,
+  isFirstPartyAnthropicBaseUrl,
+  resolveConnectionForModel,
+} from './providers.js'
 import { LIGHTNING_BOLT } from '@claude-code/output/constants/figures.js'
 import { isModelAllowed } from './model/modelAllowlist.js'
 import { type ModelAlias, isModelAlias } from './modelAliases.js'
@@ -35,17 +39,53 @@ export type ModelShortName = string
 export type ModelName = string
 export type ModelSetting = ModelName | ModelAlias | null
 
+/**
+ * Small-fast model for background classifiers / prompt-hook evaluators.
+ * Port of ant `wP` (v2.1.150 1419.js), connection-aware for ccb: only return
+ * a Claude Haiku id when Haiku is GENUINELY REACHABLE, else fall back to the
+ * main-loop model (guaranteed to route + auth). Without the gate, a single
+ * OpenAI/Gemini/Codex connection got bare `claude-haiku-4-5` →
+ * resolveConnectionForModel miss → firstParty → no creds → 401 silent.
+ */
 export function getSmallFastModel(): ModelName {
   const provider = getAPIProvider()
-  // Provider-specific small fast model
+  // Explicit overrides win (ant wP precedence: per-provider, then
+  // ANTHROPIC_SMALL_FAST_MODEL, then a deliberately-mapped HAIKU id).
   if (provider === 'openai' && readEnv('OPENAI_SMALL_FAST_MODEL')) {
     return readEnv('OPENAI_SMALL_FAST_MODEL')
   }
   if (provider === 'gemini' && readEnv('GEMINI_SMALL_FAST_MODEL')) {
     return readEnv('GEMINI_SMALL_FAST_MODEL')
   }
-  // Anthropic-specific or fallback
-  return readEnv('ANTHROPIC_SMALL_FAST_MODEL') || getDefaultHaikuModel()
+  if (readEnv('ANTHROPIC_SMALL_FAST_MODEL')) {
+    return readEnv('ANTHROPIC_SMALL_FAST_MODEL')
+  }
+  if (readEnv('ANTHROPIC_DEFAULT_HAIKU_MODEL')) {
+    return readEnv('ANTHROPIC_DEFAULT_HAIKU_MODEL')
+  }
+  // Reachability gate (ant wP's `_` predicate). Return Haiku only when a
+  // Claude-protocol endpoint serves it: (a) main-loop model resolves to an
+  // anthropic-protocol connection listing a Haiku model, or (b) env-only
+  // firstParty on a real Anthropic endpoint / bedrock / vertex / foundry.
+  const mainLoopModel = getMainLoopModel()
+  const haikuReachableViaConnection = (() => {
+    const conn = resolveConnectionForModel(mainLoopModel)
+    if (!conn) return false
+    return (
+      conn.protocol === 'anthropic' &&
+      conn.models.some(m => m.id.toLowerCase().includes('haiku'))
+    )
+  })()
+  const haikuReachableViaEnv =
+    (provider === 'firstParty' && isFirstPartyAnthropicBaseUrl()) ||
+    provider === 'bedrock' ||
+    provider === 'vertex' ||
+    provider === 'foundry'
+  if (haikuReachableViaConnection || haikuReachableViaEnv) {
+    return getDefaultHaikuModel()
+  }
+  // Haiku unreachable → main-loop model (ant wP `return F7()`).
+  return mainLoopModel
 }
 
 export function isNonCustomOpusModel(model: ModelName): boolean {
