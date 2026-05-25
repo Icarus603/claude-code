@@ -34,6 +34,14 @@ describe('anthropic/client.ts headers (ant bx 1984.js parity)', () => {
     expect(source).toMatch(/'User-Agent':\s*anthropic\.getUserAgent\(\)/)
   })
 
+  test('anthropic-client-platform header sent from getClientPlatform (ant v2.1.150 T2)', () => {
+    // Coarse client-surface identifier (cli/vscode/sdk/mcp/remote …) for
+    // server-side traffic attribution. Sent on every request, like x-app.
+    expect(source).toMatch(
+      /'anthropic-client-platform':\s*getClientPlatform\(\)/,
+    )
+  })
+
   test('X-Claude-Code-Session-Id surfaces internal session id (backend correlation)', () => {
     expect(source).toMatch(/'X-Claude-Code-Session-Id':\s*anthropic\.getSessionId\(\)/)
   })

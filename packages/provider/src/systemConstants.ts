@@ -49,6 +49,43 @@ export function getCLISyspromptPrefix(options?: {
 }
 
 /**
+ * Port of ant v2.1.150 `T2()` (resolved in 5452.js / 5166.js / 5072.js etc.
+ * as the `anthropic-client-platform` request header value). Maps the
+ * `CLAUDE_CODE_ENTRYPOINT` env var to a coarse platform identifier sent on
+ * every first-party request so server analytics can split traffic by
+ * surface (CLI vs VS Code vs SDK vs MCP vs remote …).
+ *
+ * Mirrors ant's switch exactly; unknown / unset entrypoints fall through to
+ * `claude_code_cli` (ant's `case "cli": default:`).
+ */
+export function getClientPlatform(): string {
+  switch (readEnv('CLAUDE_CODE_ENTRYPOINT')) {
+    case 'claude-vscode':
+      return 'claude_code_vscode'
+    case 'remote':
+    case 'remote_baku':
+    case 'remote_cowork':
+    case 'remote_desktop':
+    case 'remote_mobile':
+      return 'claude_code_remote'
+    case 'sdk-cli':
+    case 'sdk-ts':
+    case 'sdk-py':
+      return 'claude_code_sdk'
+    case 'mcp':
+      return 'claude_code_mcp'
+    case 'claude-code-github-action':
+      return 'claude_code_github_action'
+    case 'local-agent':
+      return 'claude_code_local_agent'
+    case 'claude_in_slack':
+      return 'claude_in_slack'
+    default:
+      return 'claude_code_cli'
+  }
+}
+
+/**
  * Check if attribution header is enabled.
  * Enabled by default, can be disabled via env var or GrowthBook killswitch.
  */

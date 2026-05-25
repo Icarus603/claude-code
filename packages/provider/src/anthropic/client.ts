@@ -7,6 +7,7 @@ import Anthropic, { type ClientOptions } from '@anthropic-ai/sdk'
 import { getAnthropicAuthProvider } from '../auth.js'
 import { getProviderHostBindings } from '../host.js'
 import { getProviderNetworkLayer } from '../network.js'
+import { getClientPlatform } from '../systemConstants.js'
 import { randomUUID } from 'crypto'
 import type { GoogleAuth } from 'google-auth-library'
 import { readEnv } from '@claude-code/config/env'
@@ -97,6 +98,10 @@ export async function getAnthropicClient({
     sessionKind === 'daemon-worker'
   const defaultHeaders: { [key: string]: string } = {
     'x-app': isBgKind ? 'cli-bg' : 'cli',
+    // ant v2.1.150 T2() — coarse client-surface identifier (cli / vscode /
+    // sdk / mcp / remote …) derived from CLAUDE_CODE_ENTRYPOINT. Sent on
+    // every request for server-side traffic attribution.
+    'anthropic-client-platform': getClientPlatform(),
     'User-Agent': anthropic.getUserAgent(),
     'X-Claude-Code-Session-Id': anthropic.getSessionId(),
     ...customHeaders,
