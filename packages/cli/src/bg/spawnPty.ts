@@ -49,6 +49,16 @@ export function spawnPtyHost(opts: {
    *  dispatch — the new job is surfaced via state.json polling, not
    *  by writing to the terminal (which would corrupt the TUI). */
   quiet?: boolean
+  /**
+   * Mark this worker as a spare-pool member (sets CCB_SPARE=1 so the inner
+   * REPL writes spare-ready.flag and skips its own state.json sync). Mirrors
+   * ant's `i1O` mode param (`q === "spare"`) — an EXPLICIT mode, NOT inferred
+   * from an empty directive. The left-arrow resume path also spawns with an
+   * empty directive (it inherits the transcript via --resume + --fork-session
+   * and must NOT re-run a prompt) yet is a real REPL, not a spare; conflating
+   * the two on `directive === ''` mislabeled it as a spare. Default false.
+   */
+  spare?: boolean
 }): SpawnPtyResult {
   mkdirSync(opts.jobDir, { recursive: true })
   const socketPath = join(opts.jobDir, 'pty.sock')
@@ -121,13 +131,14 @@ export function spawnPtyHost(opts: {
     CLAUDE_BG_SOURCE: 'cli',
     CLAUDE_ENABLE_STREAM_WATCHDOG: '1',
     CLAUDE_CODE_SESSION_NAME: opts.short,
-    // Spare-pool marker: empty directive means this worker is a spare
-    // idling for a future claim. Read by useBgFleetStateSync to skip
-    // its own state.json sync — we don't want the worker writing
-    // `state: 'working'` while it's actually idle waiting. Source:
-    // ant 4774.js spare workers run with `m_H(..., "spare", ...)`
-    // which sets internal mode='spare' on the worker side.
-    ...(opts.directive === '' ? { CCB_SPARE: '1' } : {}),
+    // Spare-pool marker: an EXPLICIT spare flag (ant `i1O` mode "spare"),
+    // not inferred from an empty directive. Read by useSpareReadyMarker
+    // (writes spare-ready.flag) + useBgFleetStateSync (skips its own
+    // state.json sync — we don't want the worker writing `state: 'working'`
+    // while it's actually idle waiting). Source: ant 4774.js spare workers
+    // run with `m_H(..., "spare", ...)`. The left-arrow resume path also
+    // spawns directive='' but is a real REPL, so it must stay UNmarked.
+    ...(opts.spare === true ? { CCB_SPARE: '1' } : {}),
   }
 
   const child = spawn(cmd, hostArgs, {

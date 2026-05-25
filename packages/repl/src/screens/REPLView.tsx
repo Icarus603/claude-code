@@ -1188,6 +1188,11 @@ export function REPL({
   const [messages, rawSetMessages] = useState<MessageType[]>(initialMessages ?? []);
   const messagesRef = useRef(messages);
 
+  // Always-fresh isLoading for []-deps callbacks (handleLeftArrowOnEmpty reads
+  // it; ant gates the agents handler on `!kK` in the cOH memo, 5359.js:2183).
+  const isLoadingRef = useRef(isLoading);
+  isLoadingRef.current = isLoading;
+
   // Bg session → on-disk state.json sync so FleetView buckets rows
   // correctly (Working → Completed when the assistant turn finishes,
   // Working → Needs input when the assistant ends on a question, and
@@ -3891,6 +3896,11 @@ export function REPL({
       // returns and fleetAttach's `finally` resumes Ink.
       process.exit(0);
     }
+    // Refuse to background mid-turn (ant cOH gate `!kK`, 5359.js:2183):
+    // forking while a turn is in flight resumes a transcript missing the
+    // running turn → worker inherits a truncated conversation. The footer
+    // hint is already hidden while loading, so a press here is a stale frame.
+    if (isLoadingRef.current) return;
     // Foreground REPL: ← on empty prompt opens FleetView, backgrounding the
     // current conversation. Source: ant 5279.js o14 (the bridge). Re-ported
     // after the native stdin reader (stdin-napi) made the unmount→remount

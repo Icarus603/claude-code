@@ -439,6 +439,14 @@ export async function spawnBgPty(opts: {
    * right-arrow attach on the optimistic row hits the wrong place.
    */
   short?: string
+  /**
+   * Mark as a spare-pool worker (ant `i1O` mode "spare"). Explicit —
+   * NOT inferred from `directive === ''`, because the left-arrow resume
+   * path also spawns with an empty directive but is a real REPL that
+   * inherits its transcript via --resume + --fork-session. Only
+   * ensureSpare passes spare:true. See spawnPtyHost's `spare` doc.
+   */
+  spare?: boolean
 }): Promise<{ short: string; socketPath: string }> {
   const { spawnPtyHost } = await import('./bg/spawnPty.js')
   const short = opts.short ?? generateShortId()
@@ -449,6 +457,7 @@ export async function spawnBgPty(opts: {
     directive: opts.directive,
     cwd: opts.cwd,
     quiet: opts.quiet,
+    spare: opts.spare,
   })
   writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
 

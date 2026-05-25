@@ -13,7 +13,7 @@
 
 import { readFile } from 'fs/promises'
 
-const BUDGET = 5685 // +43: REPL←FleetView left-arrow bridge handler (rust stdin reader port)
+const BUDGET = 5695 // +10: isLoadingRef + mid-turn gate on the left-arrow bridge (ant cOH `!kK`, fixes fork-of-truncated-transcript)
 
 async function main() {
   const content = await readFile('packages/repl/src/screens/REPLView.tsx', 'utf8')

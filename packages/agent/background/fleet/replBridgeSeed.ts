@@ -86,6 +86,50 @@ export function deriveReplSeed(
   }
 }
 
+/**
+ * Build the worker argv flags for the left-arrow bridge. Port of the ant
+ * `MV6`+`i1O` flag decision (4958.js:102-104 / 4957.js:122-124):
+ *
+ *   [...(L !== null ? ["--resume", L, "--fork-session"] : []),
+ *    ..., ...(_ ? ["--", _] : [])]
+ *
+ * with `L` = the foreground session id and prompt `_` = null on this path.
+ *
+ * THE invariant this locks: the backgrounded worker inherits the entire
+ * conversation by RESUMING the foreground transcript with a forked id — it is
+ * NEVER handed the last user message as a directive to re-run. The directive
+ * passed to spawnBgPty is always `''` (no positional → no auto-submitted turn).
+ * Re-running was the original bug: the worker started a brand-new session and
+ * the prior output vanished.
+ *
+ * `--session-id <forkedId>` is ALWAYS pushed (ant i1O:124 `b = ["--session-id",
+ * z, ...C]`) so the worker uses the pre-allocated id instead of generating its
+ * own — otherwise the optimistic FleetView row + on-disk job dir desync into an
+ * orphan (see memory feedback_fleet_worker_session_id_must_be_pushed).
+ *
+ * @param currentSessionId the live foreground session id (ant `L = rt8()`)
+ * @param forkedSessionId the pre-allocated id for the forked worker (ant `z`)
+ * @param transcriptExists whether the foreground transcript is on disk yet;
+ *   when false (a brand-new session with no flushed turn) there is nothing to
+ *   resume, so the worker boots fresh with just the forked id (ant gates the
+ *   `--resume` on `J = await qOH(j)`, the transcript-file-exists check).
+ */
+export function buildReplForkFlags(
+  currentSessionId: string,
+  forkedSessionId: string,
+  transcriptExists: boolean,
+): string[] {
+  return transcriptExists
+    ? [
+        '--resume',
+        currentSessionId,
+        '--fork-session',
+        '--session-id',
+        forkedSessionId,
+      ]
+    : ['--session-id', forkedSessionId]
+}
+
 /** Options for {@link preSeedReplBgJob}, mirroring ant `dt8`'s second arg. */
 export interface PreSeedOptions {
   intent?: string

@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import {
+  buildReplForkFlags,
   deriveReplSeed,
   IDLE_DETAIL,
   NEEDS_SEND_PROMPT,
@@ -82,6 +83,74 @@ describe('deriveReplSeed', () => {
     expect(seed!.intent).toBe('x')
     // without override, whitespace-only user yields no foundUser → null
     expect(deriveReplSeed([userMsg('   ')])).toBeNull()
+  })
+})
+
+describe('buildReplForkFlags', () => {
+  const CUR = '35894943-c5e0-45a0-9484-f113daa5835b'
+  const FORK = 'b0649465-7e3f-4475-bd55-3c15811d7608'
+
+  test('transcript exists → resume + fork-session + session-id, in that order', () => {
+    const flags = buildReplForkFlags(CUR, FORK, true)
+    expect(flags).toEqual([
+      '--resume',
+      CUR,
+      '--fork-session',
+      '--session-id',
+      FORK,
+    ])
+  })
+
+  test('INVARIANT: never carries a positional prompt (no re-run)', () => {
+    // The whole bug was the worker re-running the last user message. The flag
+    // list must never contain a `--` separator nor any bare positional — the
+    // directive is passed separately as '' so the worker inherits, not reruns.
+    for (const tx of [true, false]) {
+      const flags = buildReplForkFlags(CUR, FORK, tx)
+      expect(flags).not.toContain('--')
+      expect(flags).not.toContain('-p')
+      // every element is either a known flag or one of the two known ids.
+      const allowed = new Set([
+        '--resume',
+        '--fork-session',
+        '--session-id',
+        CUR,
+        FORK,
+      ])
+      for (const f of flags) expect(allowed.has(f)).toBe(true)
+    }
+  })
+
+  test('INVARIANT: forked worker id is always pushed (no orphan)', () => {
+    // ant i1O:124 always appends --session-id. Missing it → worker self-gens a
+    // UUID and the FleetView row / job dir desync into an orphan.
+    expect(buildReplForkFlags(CUR, FORK, true)).toContain('--session-id')
+    expect(buildReplForkFlags(CUR, FORK, true)).toContain(FORK)
+    expect(buildReplForkFlags(CUR, FORK, false)).toContain('--session-id')
+    expect(buildReplForkFlags(CUR, FORK, false)).toContain(FORK)
+  })
+
+  test('no transcript yet → fresh worker (session-id only, no --resume)', () => {
+    // A brand-new session with no flushed turn has nothing to inherit; ant
+    // gates --resume on the transcript file existing (J = await qOH(j)).
+    const flags = buildReplForkFlags(CUR, FORK, false)
+    expect(flags).toEqual(['--session-id', FORK])
+    expect(flags).not.toContain('--resume')
+    expect(flags).not.toContain('--fork-session')
+  })
+
+  test('resume always pairs with fork-session (never resumes in place)', () => {
+    // Resuming WITHOUT --fork-session would make the worker reuse the
+    // foreground session id and contend for its transcript file. The two must
+    // always travel together (ant MV6 emits them as a unit).
+    const flags = buildReplForkFlags(CUR, FORK, true)
+    const ri = flags.indexOf('--resume')
+    const fi = flags.indexOf('--fork-session')
+    expect(ri).toBeGreaterThanOrEqual(0)
+    expect(fi).toBeGreaterThanOrEqual(0)
+    // --resume <id> then --fork-session
+    expect(flags[ri + 1]).toBe(CUR)
+    expect(fi).toBeGreaterThan(ri)
   })
 })
 

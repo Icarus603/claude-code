@@ -137,6 +137,11 @@ export async function ensureSpare(cwd: string): Promise<void> {
       const r = await spawnBgPty({
         directive: '',
         cwd,
+        // Explicit spare mode (ant `i1O` "spare") — sets CCB_SPARE=1 so the
+        // inner REPL writes spare-ready.flag + skips its own state sync.
+        // NOT inferred from directive==='' anymore (the left-arrow resume
+        // path also uses an empty directive but is a real REPL).
+        spare: true,
         // Spare must be reachable for claim — wait up to 5s for pty.sock.
         // Caller (ensureSpare) doesn't await this; if dispatch races, the
         // claim path will see undefined and cold-spawn fall through.

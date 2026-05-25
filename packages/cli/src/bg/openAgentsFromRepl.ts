@@ -22,10 +22,20 @@
  * attach already wired). CLAUDE_AGENTS_SELECT seeds the focused row.
  */
 import { randomUUID } from 'node:crypto'
+import { existsSync } from 'node:fs'
 
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
+import {
+  getSessionId,
+  isSessionPersistenceDisabled,
+} from '@claude-code/app-host/bootstrap/state.js'
 import { markHasUsedAgentsFleet } from '@claude-code/config'
 import {
+  flushSessionStorage,
+  getTranscriptPath,
+} from '@claude-code/storage/sessionStorage.js'
+import {
+  buildReplForkFlags,
   deriveReplSeed,
   preSeedReplBgJob,
 } from '@claude-code/agent/background/fleet/replBridgeSeed.js'
@@ -51,15 +61,34 @@ export async function openAgentsFromReplLeftArrow(
   ) {
     return undefined
   }
+  // ant o14 step 1+guard (5279.js:11-13): if a seed is derivable but session
+  // persistence is OFF, the forked job would have no transcript to resume —
+  // refuse rather than silently spawning a blank session.
   const seed = deriveReplSeed(messages, '')
+  if (seed !== null && isSessionPersistenceDisabled()) {
+    return 'Cannot open agents — session persistence is disabled, so this conversation cannot be backgrounded.'
+  }
   const effectiveSeed = seed ?? { intent: '' }
 
-  const sessionId = randomUUID()
+  // The CURRENT foreground session — this is what the worker --resumes so it
+  // inherits the full transcript (ant MV6 `L = rt8()` = the live sessionFile).
+  // The worker is spawned with --fork-session so it gets a FRESH id and never
+  // contends with the foreground session's file. `forkedSessionId` is that
+  // fresh id (ant MV6 `Y = randomUUID()`, pushed as --session-id).
+  const currentSessionId = getSessionId()
+  const forkedSessionId = randomUUID()
   const cwd = getCwd()
+
+  // Only resume if the foreground transcript actually exists on disk. A brand
+  // new session that hasn't flushed any turn yet has nothing to inherit; in
+  // that case fall back to a plain fresh worker (ant i1O: `f = [...J ?
+  // ["--resume", w] : [], ...]` — the `--resume` is gated on the transcript
+  // file existing, `J = await qOH(j)`).
+  const transcriptExists = existsSync(getTranscriptPath())
 
   let short: string
   try {
-    ;({ short } = await preSeedReplBgJob(sessionId, {
+    ;({ short } = await preSeedReplBgJob(forkedSessionId, {
       intent: effectiveSeed.intent,
       detail: effectiveSeed.detail,
       cwd,
@@ -68,16 +97,48 @@ export async function openAgentsFromReplLeftArrow(
     return `Cannot open agents — ${e instanceof Error ? e.message : String(e)}`
   }
 
-  // Dispatch the daemon PTY worker (fire-and-forget, ant o14 launches MV6
-  // concurrently with the mount). Empty intent → directive "" → the worker
-  // idles at an empty prompt (ant "send a prompt to start"); spawnBgPty's
-  // optimistic state.json write is skipped for empty directives, so our
-  // pre-seeded idle/blocked state.json survives.
+  // Dispatch the worker (fire-and-forget; ant o14 launches MV6 concurrently
+  // with the mount). THE FIX: the worker is NOT handed the last user message
+  // as a directive to re-run. It inherits the entire conversation by resuming
+  // the foreground transcript with a forked id, and boots with an EMPTY
+  // directive so it does NOT re-submit a turn. Mirrors ant MV6 (4958.js:102):
+  //   [...(L !== null ? ["--resume", L, "--fork-session"] : []), ...,
+  //    ...(_ ? ["--", _] : [])]   ← prompt `_` is null on the left-arrow path,
+  // so no `--` positional is appended. The seed.intent is DISPLAY-ONLY (the
+  // FleetView row's middle column), already persisted via preSeedReplBgJob.
+  //
+  // --session-id is ALWAYS pushed for the forked worker (ant i1O:124
+  // `b = ["--session-id", z, ...C]`); without it the worker auto-generates a
+  // UUID and the optimistic row + on-disk job dir desync → orphan. See memory
+  // feedback_fleet_worker_session_id_must_be_pushed. The decision is a pure
+  // helper (buildReplForkFlags) so the invariant is unit-tested.
+  const flags = buildReplForkFlags(
+    currentSessionId,
+    forkedSessionId,
+    transcriptExists,
+  )
+
+  // Drain the transcript write queue before the worker resumes it. The
+  // foreground REPL's useLogMessages enqueues writes fire-and-forget
+  // (insertMessageChain → `void enqueueWrite`), so the last turn's entries
+  // may still be in flight even though the turn has completed. Without this,
+  // the forked worker can --resume a transcript that's missing its tail —
+  // the conversation reappears truncated. Mirrors ant o14's `f.flush()`
+  // (5279.js:46) before the fork dispatch. Best-effort + time-boxed so a
+  // stuck queue can't wedge the handoff (ant bounds it at 2000ms via tO).
+  if (transcriptExists) {
+    await Promise.race([
+      flushSessionStorage().catch(() => {}),
+      new Promise<void>(resolve => setTimeout(resolve, 2000)),
+    ])
+  }
+
   try {
     const { spawnBgPty } = await import('../bg.js')
     void spawnBgPty({
       short,
-      directive: effectiveSeed.intent,
+      flags,
+      directive: '',
       cwd,
       quiet: true,
       waitForSocketMs: 0,
