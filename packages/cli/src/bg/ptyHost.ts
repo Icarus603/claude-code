@@ -171,7 +171,7 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
   /** Handle a control frame from an attach client. */
   function handleCtrl(
     terminal: Bun.Terminal,
-    child: { kill: (sig: NodeJS.Signals) => void },
+    child: { kill: (sig: NodeJS.Signals) => void; pid: number | null },
     frame: { t: string } & Record<string, unknown>,
   ): void {
     switch (frame.t) {
@@ -185,14 +185,21 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
           // before resizing the pty.
           cols = c
           rows = r
+          // Bun.Terminal.resize sets the PTY winsize (TIOCSWINSZ) but does
+          // NOT raise SIGWINCH on the child — empirically verified: a child
+          // spawned with {terminal} sees its updated stdout.rows ONLY after
+          // an explicit SIGWINCH (probe 2026-05-25). Without the signal the
+          // worker's @ant/ink handleResize never fires, so a worker spawned
+          // at the spare-pool default 200x50 keeps rendering at 50 rows after
+          // an 80x24 attach — its absolute CUP (CSI 50;1H / 47;6H) lands off
+          // the bottom of the 24-row client, clamping rows and desyncing the
+          // cursor by exactly the row-count delta (the "input box one row off
+          // + ghost prompt + smear" bug). The signal MUST target child.pid,
+          // NOT `-process.pid`: the child is not in the host's process group
+          // (a `kill(-child.pid)` returns ESRCH — it's not a group leader
+          // either), so the old group-signal never reached it.
           terminal.resize(c, r)
-          if (process.platform !== 'win32') {
-            try {
-              process.kill(-process.pid, 'SIGWINCH')
-            } catch {
-              // best-effort
-            }
-          }
+          signalWorkerWinch()
         }
         return
       }
@@ -322,6 +329,25 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
     writeBreadcrumbAndExit(sock, `spawn failed: ${String(err)}`)
   }
 
+  /**
+   * Raise SIGWINCH on the worker so its @ant/ink picks up a fresh PTY
+   * winsize. Bun.Terminal.resize sets TIOCSWINSZ but does NOT signal the
+   * child (verified 2026-05-25), and the child is NOT in this host's process
+   * group, so the signal must target child.pid directly (a group signal
+   * `-child.pid` returns ESRCH — the child isn't a group leader). No-op on
+   * win32 (no SIGWINCH) and when the pid is unknown/exited.
+   */
+  function signalWorkerWinch(): void {
+    if (process.platform === 'win32' || exited) return
+    const pid = child.pid
+    if (pid === null || pid === undefined) return
+    try {
+      process.kill(pid, 'SIGWINCH')
+    } catch {
+      // best-effort — child may have exited between the check and the signal
+    }
+  }
+
   // Pre-clean any stale socket file at this path. ant 4702.js:103.
   if (existsSync(sock)) {
     await unlink(sock).catch(() => {})
@@ -371,25 +397,37 @@ export async function runPtyHost(args: readonly string[]): Promise<void> {
     // redraw on every attach (5473.js resizeForRepaint → worker forceRedraw);
     // we don't have a worker control channel, so we nudge the pty: a
     // resize-jiggle (cols-1 then back) makes the inner @ant/ink reassert
-    // terminal modes + repaint a full frame via its SIGWINCH handler. Guard
-    // on not-exited and a sane cols. Deferred a tick so it lands after the
-    // client has finished consuming the hello/replay/live frames.
+    // terminal modes + repaint a full frame via its handleResize handler.
+    //
+    // The two resizes MUST be separated by a real delay and each followed by
+    // a SIGWINCH. ant 5017.js resizeForRepaint uses a 30ms gap for the same
+    // reason: a back-to-back cols-1→cols collapses at the kernel TIOCSWINSZ
+    // level, so the worker's winsize only ever reads the final cols (== the
+    // size the client already sent) and handleResize early-returns on
+    // same-dimensions — no repaint. The gap makes the intermediate cols-1
+    // observable. And SIGWINCH MUST be raised explicitly: Bun.Terminal.resize
+    // sets TIOCSWINSZ but does NOT signal the child (verified 2026-05-25), so
+    // without signalWorkerWinch() the resize is invisible to @ant/ink.
     if (!exited && cols > 1) {
       setTimeout(() => {
         if (exited) return
+        const targetCols = cols
+        const targetRows = rows
         try {
-          terminal.resize(cols - 1, rows)
-          terminal.resize(cols, rows)
-          if (process.platform !== 'win32' && child.pid) {
-            try {
-              process.kill(child.pid, 'SIGWINCH')
-            } catch {
-              // best-effort
-            }
-          }
+          terminal.resize(Math.max(2, targetCols - 1), targetRows)
+          signalWorkerWinch()
         } catch {
           // best-effort repaint nudge
         }
+        setTimeout(() => {
+          if (exited) return
+          try {
+            terminal.resize(cols, rows)
+            signalWorkerWinch()
+          } catch {
+            // best-effort repaint nudge
+          }
+        }, 30).unref()
       }, 50)
     }
   })
