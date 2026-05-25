@@ -4,7 +4,7 @@
 import type { ChildProcess } from 'child_process'
 import { stat } from 'fs/promises'
 import type { Readable } from 'stream'
-import treeKill from 'tree-kill'
+import { killProcessTree } from './genericProcessUtils.js'
 import type { ExecResult, ShellCommand } from './types.js'
 import type { TaskOutputPort } from './taskOutputPort.js'
 import { generateTaskId } from '@claude-code/tool-registry/Task.js'
@@ -328,7 +328,10 @@ class ShellCommandImpl implements ShellCommandWithOutput {
   #doKill(code?: number): void {
     this.#status = 'killed'
     if (this.#childProcess.pid) {
-      treeKill(this.#childProcess.pid, 'SIGKILL')
+      // ant v2.1.150 killProcessTree — group-kill (kill(-pid)) fast path
+      // since the shell is spawned detached, with ps-tree fallback + failure
+      // telemetry. Replaces the prior tree-kill npm dependency.
+      killProcessTree(this.#childProcess.pid, 'SIGKILL')
     }
     this.#resolveExitCode(code ?? SIGKILL)
   }

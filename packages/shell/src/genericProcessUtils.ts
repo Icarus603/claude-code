@@ -1,3 +1,5 @@
+import { spawn } from 'child_process'
+import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import {
   execFileNoThrowWithCwd,
   execSyncWithDefaults,
@@ -205,4 +207,189 @@ export function getChildPids(pid: string | number): number[] {
   } catch {
     return []
   }
+}
+
+/** Hard cap on the `ps -A` enumeration used by killProcessTree's fallback. */
+const KILL_PS_ENUM_TIMEOUT_MS = 500
+
+/**
+ * Port of ant v2.1.150 `VrK` (4974.js) — failure telemetry for
+ * killProcessTree. ant emits `tengu_bash_tool_kill_error` with `{stage,
+ * error_code}`; ccb's shell package has no statsig wire, so we surface the
+ * same signal through the debug log. `stage` distinguishes a failed group
+ * kill from a failed `ps` enumeration so a stuck-process report can be
+ * triaged. `errno` is only recorded when it looks like a real errno string
+ * (uppercase, ESRCH/EPERM/…) to avoid logging stringified objects.
+ */
+function logKillFailure(stage: string, err: unknown): void {
+  try {
+    const errno =
+      err && typeof err === 'object' && 'code' in err
+        ? (err as NodeJS.ErrnoException).code
+        : undefined
+    const errorCode =
+      typeof errno === 'string' && /^[A-Z][A-Z0-9_]*$/.test(errno)
+        ? errno
+        : undefined
+    logForDebugging(
+      `killProcessTree ${stage} failed: ${errorCode ?? String(err)}`,
+    )
+  } catch {
+    // never let telemetry crash the kill path
+  }
+}
+
+/**
+ * Port of ant v2.1.150 `WOO` (4974.js) — enumerate every (pid, ppid) pair on
+ * the system via a single `ps -A -o pid= -o ppid=` spawn from `/` (cwd `/`
+ * avoids holding a handle on a directory that may be getting torn down).
+ */
+function enumeratePidPairs(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let child
+    try {
+      child = spawn('ps', ['-A', '-o', 'pid=', '-o', 'ppid='], {
+        cwd: '/',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
+    } catch (err) {
+      reject(err)
+      return
+    }
+    let out = ''
+    child.stdout?.on('data', chunk => {
+      out += chunk
+    })
+    child.once('error', reject)
+    child.once('close', () => resolve(out))
+  })
+}
+
+/**
+ * Port of ant v2.1.150 `POO` (4974.js) — collect the full set of descendant
+ * pids of `rootPid` by parsing the system-wide (pid, ppid) table. Races the
+ * `ps` spawn against a 500ms timeout so a hung `ps` can't wedge the kill
+ * path; on timeout / spawn failure returns an empty set (group-kill alone
+ * still reaps the common case).
+ */
+async function collectDescendantPids(rootPid: number): Promise<Set<number>> {
+  let raw: string
+  try {
+    raw = await Promise.race([
+      enumeratePidPairs(),
+      new Promise<string>(resolve => {
+        const t = setTimeout(() => resolve(''), KILL_PS_ENUM_TIMEOUT_MS)
+        if (typeof t === 'object') t.unref()
+      }),
+    ])
+  } catch (err) {
+    logKillFailure('enum_spawn', err)
+    return new Set()
+  }
+
+  // ppid -> [child pids]
+  const childrenByParent = new Map<number, number[]>()
+  for (const line of raw.split('\n')) {
+    const m = line.match(/^\s*(\d+)\s+(\d+)\s*$/)
+    if (!m) continue
+    const pid = Number(m[1])
+    const ppid = Number(m[2])
+    const existing = childrenByParent.get(ppid)
+    if (existing) existing.push(pid)
+    else childrenByParent.set(ppid, [pid])
+  }
+
+  const descendants = new Set<number>()
+  const queue = [rootPid]
+  while (queue.length > 0) {
+    const cur = queue.shift() as number
+    for (const child of childrenByParent.get(cur) ?? []) {
+      // pid > 1 guards init; skip the root itself and already-seen pids.
+      if (child > 1 && child !== rootPid && !descendants.has(child)) {
+        descendants.add(child)
+        queue.push(child)
+      }
+    }
+  }
+  return descendants
+}
+
+async function killProcessTreeUnix(pid: number, signal: string): Promise<void> {
+  // Collect descendants BEFORE killing — once the group dies, the ps table
+  // no longer shows the children, so escaped (re-parented) processes could
+  // not be reaped afterwards.
+  const descendants = await collectDescendantPids(pid)
+
+  // 1. Group kill — the child was spawned `detached: true` (bashProvider),
+  //    so it leads its own process group; `kill(-pid)` reaps the whole group
+  //    atomically in one syscall. This handles the overwhelming majority.
+  try {
+    process.kill(-pid, signal)
+  } catch (err) {
+    // Fall back to killing the leader directly, then report unless the
+    // process was already gone (ESRCH is expected on a normal exit race).
+    try {
+      process.kill(pid, signal)
+    } catch {
+      // leader already gone
+    }
+    if ((err as NodeJS.ErrnoException).code !== 'ESRCH') {
+      logKillFailure('group_kill', err)
+    }
+  }
+
+  // 2. Mop up any descendants that escaped the group (e.g. double-forked
+  //    daemons that called setsid). Best-effort; missing pids are fine.
+  for (const child of descendants) {
+    try {
+      process.kill(child, signal)
+    } catch {
+      // already gone
+    }
+  }
+}
+
+/**
+ * Port of ant v2.1.150 `krK`/`XOO` (4974.js) — robustly kill a process and
+ * its entire subtree.
+ *
+ * On Unix this uses process-group kill (`process.kill(-pid)`) as the primary
+ * mechanism — atomic, single syscall, and correct because ccb spawns bash
+ * `detached: true` so the child is its own group leader — with a `ps`-derived
+ * descendant sweep as a fallback for re-parented escapees. On Windows there
+ * is no process group; we recurse `getChildPids` and signal each pid.
+ *
+ * Fire-and-forget: ant's `krK` swallows the async rejection. Callers that
+ * were using `tree-kill(pid, 'SIGKILL')` can switch to this for the group-kill
+ * fast path and failure telemetry.
+ */
+export function killProcessTree(
+  pid: number,
+  signal: NodeJS.Signals | string = 'SIGKILL',
+): void {
+  // PID <= 1 guards current-group (0) and init (1).
+  if (!Number.isInteger(pid) || pid <= 1) return
+
+  if (process.platform === 'win32') {
+    // No process groups on Windows: walk children depth-first and signal
+    // each. getChildPids is synchronous (pgrep/CIM), so recurse inline.
+    const killRec = (p: number): void => {
+      for (const child of getChildPids(p)) {
+        if (child > 1 && child !== p) killRec(child)
+      }
+      try {
+        process.kill(p, signal)
+      } catch {
+        // already gone
+      }
+    }
+    try {
+      killRec(pid)
+    } catch (err) {
+      logKillFailure('win_tree', err)
+    }
+    return
+  }
+
+  void killProcessTreeUnix(pid, signal).catch(() => {})
 }
