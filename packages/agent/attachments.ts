@@ -260,6 +260,8 @@ const sessionTranscriptModule = feature('KAIROS')
   : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { hasUltrathinkKeyword, isUltrathinkEnabled } from '@claude-code/provider/thinking.js'
+import { hasUltraworkKeyword } from '@claude-code/repl/ultraplan/keyword.js'
+import { isWorkflowsCommandEnabled } from './goalStopHook.js'
 import {
   tokenCountFromLastAPIResponse,
   tokenCountWithEstimation,
@@ -738,6 +740,13 @@ export type Attachment =
       level: 'high'
     }
   | {
+      // ant 4135.js FZ3 / 4269.js — the user typed `ultrawork`, asking the
+      // model to drive the request through the autonomous-work (workflow)
+      // path rather than answering inline. ccb has no Workflow tool; the
+      // renderer steers the model into the /goal Stop-hook loop instead.
+      type: 'ultrawork_request'
+    }
+  | {
       type: 'deferred_tools_delta'
       addedNames: string[]
       addedLines: string[]
@@ -1002,6 +1011,21 @@ export async function getAttachments(
   // Attachments which are semantically only for the main conversation or don't have concurrency-safe implementations
   const mainThreadAttachments = isMainThread
     ? [
+        // ant 4135.js: ultrawork_request sits at the head of the main-thread
+        // block, gated on bp() (workflows enabled) AND a regular user prompt.
+        // ccb has no isRegularUserPrompt plumbing; `input` is non-null only
+        // on a fresh user prompt (mid-turn re-collection passes input===null),
+        // so `input && isMainThread` is the faithful equivalent. The feature()
+        // gate lets DCE drop the path in builds where ULTRAWORK is off.
+        ...(feature('ULTRAWORK')
+          ? isWorkflowsCommandEnabled()
+            ? [
+                maybe('ultrawork_request', () =>
+                  Promise.resolve(getUltraworkRequestAttachment(input)),
+                ),
+              ]
+            : []
+          : []),
         maybe('ide_selection', async () =>
           getSelectedLinesFromIDE(ideSelection, toolUseContext),
         ),
@@ -1508,6 +1532,27 @@ function getUltrathinkEffortAttachment(input: string | null): Attachment[] {
   }
   logEvent('tengu_ultrathink', {})
   return [{ type: 'ultrathink_effort', level: 'high' }]
+}
+
+/**
+ * ant 4135.js `FZ3`: inject an `ultrawork_request` attachment when the user
+ * typed the `ultrawork` keyword. ant gates this on `bp()` (workflows
+ * enabled) and `z?.isRegularUserPrompt` — i.e. only on a fresh user prompt,
+ * never mid-turn (input===null) or in a subagent. The caller threads the
+ * gate + main-thread/regular-prompt check; this helper just runs the
+ * keyword detector and emits the marker.
+ *
+ * Unlike ultraplan (which rewrites the prompt into `/ultraplan`), ultrawork
+ * leaves the prompt intact and rides on an attachment, mirroring
+ * ultrathink. The renderer (messages.ts) turns the marker into a meta
+ * system-reminder steering the model into the autonomous-work loop.
+ */
+function getUltraworkRequestAttachment(input: string | null): Attachment[] {
+  if (!input || !hasUltraworkKeyword(input)) {
+    return []
+  }
+  logEvent('tengu_ultrawork', {})
+  return [{ type: 'ultrawork_request' }]
 }
 
 // Exported for compact.ts — the gate must be identical at both call sites.

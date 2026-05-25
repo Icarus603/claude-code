@@ -131,6 +131,30 @@ export function isGoalCommandEnabled(): boolean {
 }
 
 /**
+ * Ant `bp` (2518.js): the workflows-enabled gate used by both the
+ * `/workflows` command (4938.js) and the `ultrawork` keyword injection
+ * (4135.js FZ3). ant's predicate is `CLAUDE_CODE_WORKFLOWS` env truthy
+ * AND the `tengu_workflows_enabled` GrowthBook flag (default true).
+ *
+ * ccb has no working Workflow-script subsystem (WorkflowTool /
+ * LocalWorkflowTask / createWorkflowCommand are all stubs gated behind the
+ * opt-in WORKFLOW_SCRIPTS flag). The genuinely-working autonomous-work
+ * primitive in ccb is `/goal` (Stop-hook-driven "work until met"), so
+ * `/workflows` browses goal history and `ultrawork` steers the model into
+ * the goal loop. Both ride a single opt-in gate that mirrors ant's
+ * env-opt-in shape: the ULTRAWORK feature flag (analogous to ant requiring
+ * CLAUDE_CODE_WORKFLOWS), still subject to the /goal kill-switch since the
+ * underlying mechanism is the goal Stop hook.
+ *
+ * The feature() call is read by the command registry / attachment path
+ * (which import from `bun:bundle`); this helper folds in the /goal
+ * kill-switch so the two surfaces stay consistent.
+ */
+export function isWorkflowsCommandEnabled(): boolean {
+  return isGoalCommandEnabled()
+}
+
+/**
  * Ant `PB8` hooks-gate half: returns true when hooks are globally
  * disabled or managed-only. This check lives here (shared by all goal
  * callers); the trust-gate check lives in the callers (command handlers,
@@ -489,6 +513,83 @@ export function findMostRecentMetGoalStatus(
     }
   }
   return null
+}
+
+/**
+ * A single goal "run" extracted from the transcript, for the `/workflows`
+ * history browser. ccb has no separate workflow snapshot store (ant's
+ * `se7()`); goal runs live entirely as `goal_status` attachments in the
+ * message log. This is the faithful ccb analogue of ant's local_workflow
+ * task list (4935.js GlK) — one entry per completed/failed/active goal.
+ */
+export type GoalRunRecord = {
+  /** Stable id derived from the originating attachment uuid (or index). */
+  id: string
+  condition: string
+  status: 'running' | 'completed' | 'failed'
+  /** Epoch ms of the terminal event (or set time for a running goal). */
+  timestamp: number
+  iterations?: number
+  durationMs?: number
+  tokens?: number
+  /** Last evaluator reason (failure / blocking message). */
+  reason?: string
+}
+
+/**
+ * Walk the transcript and collect every terminal goal record — both
+ * achieved (`met:true && !sentinel`) and impossible (`failed:true`). These
+ * map to "completed" rows in `/workflows`. The currently-active goal (from
+ * AppState) is prepended by the dialog as the single "running" row, since
+ * an in-progress goal has no terminal attachment yet.
+ *
+ * Records are returned newest-first (matching ant GlK's E4O sort by
+ * startTime desc).
+ */
+export function findAllGoalRecords(messages: Message[]): GoalRunRecord[] {
+  const records: GoalRunRecord[] = []
+  for (let i = 0; i < messages.length; i++) {
+    const m = messages[i] as
+      | (Message & {
+          type: 'attachment'
+          uuid?: string
+          timestamp?: string
+          attachment: {
+            type: string
+            met?: boolean
+            failed?: boolean
+            sentinel?: boolean
+            condition?: string
+            iterations?: number
+            durationMs?: number
+            tokens?: number
+            reason?: string
+          }
+        })
+      | undefined
+    if (!m || m.type !== 'attachment') continue
+    const att = m.attachment
+    if (att.type !== 'goal_status') continue
+    // Sentinels (set / clear lifecycle markers) are not runs.
+    if (att.sentinel) continue
+    // Only terminal records: achieved or impossible. Blocking (met:false,
+    // !failed) updates are mid-run iterations, not completions.
+    const completed = att.met === true
+    const failed = att.failed === true
+    if (!completed && !failed) continue
+    const ts = m.timestamp ? Date.parse(m.timestamp) : Date.now()
+    records.push({
+      id: m.uuid ?? `goal-${i}`,
+      condition: att.condition ?? '',
+      status: completed ? 'completed' : 'failed',
+      timestamp: Number.isNaN(ts) ? Date.now() : ts,
+      iterations: att.iterations,
+      durationMs: att.durationMs,
+      tokens: att.tokens,
+      reason: att.reason,
+    })
+  }
+  return records.sort((a, b) => b.timestamp - a.timestamp)
 }
 
 /**

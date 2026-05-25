@@ -46,6 +46,8 @@
     "./commands/clear/caches.js": "./src/commands/clear/caches.ts",
     "./commands/btw/index.js": "./src/commands/btw/index.ts",
     "./commands/goal/index.js": "./src/commands/goal/index.ts",
+    "./commands/workflows/index.js": "./src/commands/workflows/index.ts",
+    "./commands/workflows/workflows.js": "./src/commands/workflows/workflows.tsx",
     "./commands/fork/index.js": "./src/commands/fork/index.ts",
     "./commands/fork/fork.js": "./src/commands/fork/fork.tsx",
     "./commands/stop/index.js": "./src/commands/stop/index.ts",

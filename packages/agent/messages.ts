@@ -4263,6 +4263,20 @@ You have exited auto mode. The user may now want to interact more directly. You 
         }),
       ])
     }
+    case 'ultrawork_request': {
+      // ant 4269.js renders this as "...use the Workflow tool to fulfill
+      // their request." ccb has no Workflow tool; its autonomous-work
+      // primitive is the /goal Stop hook ("keep working until the condition
+      // is met"). Steer the model into that loop instead — faithful intent,
+      // ccb's actual mechanism.
+      return wrapMessagesInSystemReminder([
+        createUserMessage({
+          content:
+            'The user included the keyword "ultrawork", asking you to treat this as a sustained, autonomous unit of work rather than a quick reply. Set a goal with the /goal command capturing the desired end state, then keep working through it across as many turns as needed until that condition is met — do not stop to ask the user for direction at each step.',
+          isMeta: true,
+        }),
+      ])
+    }
     case 'deferred_tools_delta': {
       const parts: string[] = []
       if (attachment.addedLines.length > 0) {

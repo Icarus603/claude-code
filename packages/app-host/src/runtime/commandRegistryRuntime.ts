@@ -99,6 +99,15 @@ const subscribePr = null
 const ultraplan = feature('ULTRAPLAN')
   ? require('@claude-code/repl/ultraplan.js').default
   : null
+// `/workflows` — browse goal-run history (running + completed). ant v2.1.150
+// 4938.js NlK. ccb maps "workflow history" onto its real autonomous-work
+// primitive (/goal) since the Workflow-script subsystem is stubbed; gated by
+// the same ULTRAWORK flag as the `ultrawork` keyword trigger.
+const workflowsCommand = feature('ULTRAWORK')
+  ? (
+      require('@claude-code/command-runtime/commands/workflows/index.js') as typeof import('@claude-code/command-runtime/commands/workflows/index.js')
+    ).default
+  : null
 // torch shim deleted — TORCH feature absent.
 const torch = null
 const peersCmd = feature('UDS_INBOX')
@@ -345,6 +354,7 @@ const COMMANDS = memoize((): Command[] => [
   ...(peersCmd ? [peersCmd] : []),
   tasks,
   ...(workflowsCmd ? [workflowsCmd] : []),
+  ...(workflowsCommand ? [workflowsCommand] : []),
   ...(ultraplan ? [ultraplan] : []),
   ...(torch ? [torch] : []),
   ...(process.env.USER_TYPE === 'ant' && !process.env.IS_DEMO

@@ -34,6 +34,7 @@ const NULL_RENDERING_TYPES = [
   'mcp_instructions_delta',
   'token_usage',
   'ultrathink_effort',
+  'ultrawork_request',
   'max_turns_reached',
   'task_reminder',
   'auto_mode',

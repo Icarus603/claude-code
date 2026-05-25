@@ -54,7 +54,7 @@ and `bun run dev` invocation.
 | `VOICE_MODE` | Voice | Push-to-talk speech-to-text input |
 | `AUTO_THEME` | UI | Detect terminal background color and pick theme ('auto' option in /theme) |
 
-## Available, off by default (52)
+## Available, off by default (53)
 
 These exist as `feature('<NAME>')` gates but aren't in the stable list.
 Enable per-run with `FEATURE_<NAME>=1`.
@@ -76,6 +76,7 @@ Enable per-run with `FEATURE_<NAME>=1`.
 - `SKILL_IMPROVEMENT` — Auto-suggest skill improvements
 - `STREAMLINED_OUTPUT` — Tighter user-facing output formatting
 - `TEAMMEM` — Team memory sync (multi-user shared memory)
+- `ULTRAWORK` — `/workflows` history browser + `ultrawork` keyword trigger. ant gates both on `bp()` (`CLAUDE_CODE_WORKFLOWS` env + `tengu_workflows_enabled`); ccb has no working Workflow-script subsystem, so the keyword and command ride the `/goal` Stop-hook loop instead (`/workflows` browses goal history; `ultrawork` steers the model into the goal loop). Opt-in, mirroring ant's env opt-in. Also subject to the `/goal` kill-switch (`CLAUDE_CODE_DISABLE_GOAL`).
 - `UNATTENDED_RETRY` — Auto-retry on transient errors without user prompt
 
 ### Bridge / Daemon / Server

@@ -104,6 +104,23 @@ export function findUltrareviewTriggerPositions(
   return findKeywordTriggerPositions(text, 'ultrareview')
 }
 
+/**
+ * ant 4130.js `Ap8`/`YTK` — detect the `ultrawork` keyword. Unlike
+ * `ultraplan`, ultrawork does NOT rewrite the prompt into a slash command;
+ * it injects an `ultrawork_request` attachment that steers the model into
+ * the autonomous-work (workflow) path. So there is no `replaceUltrawork`
+ * counterpart — the user's text is left intact and the reminder is appended.
+ */
+export function findUltraworkTriggerPositions(
+  text: string,
+): TriggerPosition[] {
+  return findKeywordTriggerPositions(text, 'ultrawork')
+}
+
+export function hasUltraworkKeyword(text: string): boolean {
+  return findUltraworkTriggerPositions(text).length > 0
+}
+
 export function hasUltraplanKeyword(text: string): boolean {
   return findUltraplanTriggerPositions(text).length > 0
 }
