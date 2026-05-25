@@ -6,7 +6,22 @@ import { getInitialSettings } from '@claude-code/config/settings'
 import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
 
 let loggedTmuxCcDisable = false
+let loggedWinSshDisable = false
 let checkedTmuxMouseHint = false
+
+/**
+ * True on Windows when the session is over SSH. ConPTY re-renders the screen
+ * buffer on its own, which double-paints an alt-screen application — so
+ * fullscreen must be disabled. 1:1 port of ant `k$8` (2.1.150 2218.js:42).
+ */
+function isWindowsOverSSH(): boolean {
+  if (process.platform !== 'win32') return false
+  return Boolean(
+    process.env.SSH_CONNECTION ||
+      process.env.SSH_CLIENT ||
+      process.env.SSH_TTY,
+  )
+}
 
 /**
  * Cached result from `tmux display-message -p '#{client_control_mode}'`.
@@ -103,46 +118,62 @@ export function isTmuxControlMode(): boolean {
 export function _resetTmuxControlModeProbeForTesting(): void {
   tmuxControlModeProbed = undefined
   loggedTmuxCcDisable = false
+  loggedWinSshDisable = false
 }
 
 /**
- * Resolution order:
- *   1. Background session (CLAUDE_CODE_SESSION_KIND === 'bg') — ALWAYS
- *      fullscreen, before any opt-out. A bg worker is consumed exclusively
- *      through `ccb attach`, whose render pipeline (alt-screen handoff,
- *      FRAME_CLEAR/home-erase boundary, BSU/ESU sync wrap in attachClient.ts)
- *      and the inner Ink's full-repaint-on-resize path (resetFramesForAltScreen)
- *      only work when the worker is in alt-screen. A main-screen worker uses
- *      DIFFERENTIAL rendering (log-update tracks prev line count + parks the
- *      cursor with relative moves), so after the attach client replays the ring
- *      and jiggles the pty, the worker's relative cursor moves land at the wrong
- *      row → torn frame borders + overlapping rows + the cursor drifting below
- *      the footer. ant forces this unconditionally in `j9` (2.1.150 2218.js:53:
- *      `if (SESSION_KIND === "bg") return true`) ahead of its NO_FLICKER check;
- *      since ant's bg worker is always fullscreen it never hit this corruption.
- *      ccb defaulted fullscreen on for ant USER_TYPE only, so non-ant operators'
- *      bg workers rendered on the main screen — the FleetView→attach overlap bug.
- *   2. CLAUDE_CODE_NO_FLICKER env (explicit) — escape hatch for foreground
- *      sessions (testing / debugging without writing to settings.json).
- *   3. settings.tui ('fullscreen' = on, 'default' = off) — set via /tui.
- *   4. Auto-detection: disabled under tmux -CC (mouse-wheel dead there).
- *   5. Default: on for ants, off for everyone else.
+ * 1:1 port of ant's fullscreen-decision function `j9` (2.1.150 2218.js:51-80).
+ *
+ * The alt-screen ("fullscreen") renderer is ant's BLESSED path: full repaint
+ * every frame, virtualized scrollback, flicker-free. The main-screen renderer
+ * is what ant's own /tui description (0680.js:653) calls the "classic" one —
+ * it uses DIFFERENTIAL rendering (log-update diffs the previous frame and only
+ * repaints changed cells, parking the cursor with relative moves). That diff
+ * path has an unfixed tear: when content overflows the viewport, a changed row
+ * above the viewport-top threshold `P` is silently skipped (2344.js:129 →
+ * `return;` with no recovery), so the input box border tears, the right half
+ * goes blank, and the cursor drifts below the footer. ant never fixed that
+ * bug — instead it ships all its anti-tear engineering (probeExternalClear's
+ * 200ms recovery poll, bg-worker forced fullscreen, ConPTY full-repaint) ONLY
+ * on the alt-screen path, and rolls fullscreen out to everyone via GrowthBook
+ * gates (`tengu_pewter_brook` / `tengu_amber_creek`).
+ *
+ * ant's `j9` has NO `USER_TYPE === 'ant'` check — that gate was a ccb-only
+ * invention that locked non-ant operators onto the legacy, tearing renderer.
+ * ccb is solo-maintained with no GrowthBook server, so the local default is
+ * fullscreen (the rolled-out state), matching ant's intent. Resolution order:
+ *   1. Background session (SESSION_KIND === 'bg') — always fullscreen; the
+ *      `ccb attach` pipeline (alt-screen handoff, FRAME_CLEAR boundary,
+ *      BSU/ESU wrap in attachClient.ts) only works when the worker is in
+ *      alt-screen. ant 2218.js:53.
+ *   2. Explicit opt-out — NO_FLICKER falsy OR DISABLE_ALTERNATE_SCREEN truthy.
+ *      ant `V$8` (2218.js:46).
+ *   3. NO_FLICKER truthy — explicit opt-in. ant 2218.js:55.
+ *   4. tmux -CC — alt-screen + mouse tracking corrupts terminal state there.
+ *      ant `$i` (2218.js:56-63).
+ *   5. Windows over SSH — ConPTY re-rendering breaks alt-screen. ant `k$8`
+ *      (2218.js:64-71).
+ *   6. settings.tui ('fullscreen' / 'default') — persistent /tui choice.
+ *      ant 2218.js:72-77.
+ *   7. Default: fullscreen (ant's GrowthBook-rolled-out state; 2218.js:78-79).
  */
 export function isFullscreenEnvEnabled(): boolean {
-  // Background workers are always fullscreen — the attach pipeline requires
-  // alt-screen. Mirrors ant `j9` (2218.js:53), which short-circuits here
-  // before its own NO_FLICKER opt-out for exactly this reason.
+  // 1. Background workers are always fullscreen — the attach pipeline requires
+  //    alt-screen. ant `j9` short-circuits here (2218.js:53) ahead of its own
+  //    opt-out for exactly this reason.
   if (process.env.CLAUDE_CODE_SESSION_KIND === 'bg') return true
-  // Explicit user opt-out always wins.
-  if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_NO_FLICKER)) return false
-  // Explicit opt-in overrides auto-detection (escape hatch).
+  // 2. Explicit opt-out (ant V$8): NO_FLICKER set falsy OR DISABLE_ALTERNATE_SCREEN
+  //    set truthy. The DISABLE_ALTERNATE_SCREEN arm was missing in ccb.
+  if (
+    isEnvDefinedFalsy(process.env.CLAUDE_CODE_NO_FLICKER) ||
+    isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN)
+  ) {
+    return false
+  }
+  // 3. Explicit opt-in (escape hatch).
   if (isEnvTruthy(process.env.CLAUDE_CODE_NO_FLICKER)) return true
-  // Persistent user choice via /tui — read settings before auto-detect.
-  const tuiSetting = getInitialSettings().tui
-  if (tuiSetting === 'fullscreen') return true
-  if (tuiSetting === 'default') return false
-  // Auto-disable under tmux -CC: alt-screen + mouse tracking corrupts
-  // terminal state on double-click and mouse wheel is dead.
+  // 4. Auto-disable under tmux -CC: alt-screen + mouse tracking corrupts
+  //    terminal state on double-click and mouse wheel is dead.
   if (isTmuxControlMode()) {
     if (!loggedTmuxCcDisable) {
       loggedTmuxCcDisable = true
@@ -152,7 +183,25 @@ export function isFullscreenEnvEnabled(): boolean {
     }
     return false
   }
-  return process.env.USER_TYPE === 'ant'
+  // 5. Auto-disable on Windows over SSH: ConPTY re-renders the screen on its
+  //    own, which double-paints an alt-screen app. ant `k$8` (2218.js:64).
+  if (isWindowsOverSSH()) {
+    if (!loggedWinSshDisable) {
+      loggedWinSshDisable = true
+      logForDebugging(
+        'fullscreen disabled: Windows over SSH (ConPTY re-rendering) detected · set CLAUDE_CODE_NO_FLICKER=1 to override',
+      )
+    }
+    return false
+  }
+  // 6. Persistent user choice via /tui.
+  const tuiSetting = getInitialSettings().tui
+  if (tuiSetting === 'fullscreen') return true
+  if (tuiSetting === 'default') return false
+  // 7. Default: fullscreen. ant's final fallback is the GrowthBook gate
+  //    tengu_pewter_brook, which in the rolled-out state is on; ccb has no
+  //    GrowthBook server, so the local default IS the rolled-out value.
+  return true
 }
 
 /**
@@ -225,5 +274,6 @@ export async function maybeGetTmuxMouseHint(): Promise<string | null> {
 /** Test-only: reset module-level once-per-session flags. */
 export function _resetForTesting(): void {
   loggedTmuxCcDisable = false
+  loggedWinSshDisable = false
   checkedTmuxMouseHint = false
 }
