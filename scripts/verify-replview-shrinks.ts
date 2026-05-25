@@ -13,7 +13,7 @@
 
 import { readFile } from 'fs/promises'
 
-const BUDGET = 5695 // +10: isLoadingRef + mid-turn gate on the left-arrow bridge (ant cOH `!kK`, fixes fork-of-truncated-transcript)
+const BUDGET = 5691 // -4: removed the v26.5.86 isLoading gate on the left-arrow bridge (broke backgrounding a running/auto-mode conversation)
 
 async function main() {
   const content = await readFile('packages/repl/src/screens/REPLView.tsx', 'utf8')

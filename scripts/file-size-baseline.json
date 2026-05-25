@@ -99,7 +99,7 @@
   "packages/repl/src/hooks/useTypeahead.tsx": 1880,
   "packages/repl/src/processUserInput/processSlashCommand.tsx": 1333,
   "packages/repl/src/promptSuggestionSpeculation.tsx": 990,
-  "packages/repl/src/screens/REPLView.tsx": 5695,
+  "packages/repl/src/screens/REPLView.tsx": 5691,
   "packages/repl/src/screens/agentFleet/FleetView.tsx": 2667,
   "packages/shell/src/bash/ast-alias.ts": 2680,
   "packages/shell/src/bash/ast.ts": 2681,

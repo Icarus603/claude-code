@@ -459,18 +459,21 @@ function ModeIndicator({
           </Text>,
         ]
       : []),
-    // Source: ant 5150.js CDO foreground branch (!b7() && !isLoading &&
-    // inputEmpty && gate && leftArrowOpensAgents). Standard REPL: ← on empty
-    // prompt opens FleetView (double-press — 1st arms leftArrowPending → this
-    // renders "← again for agents", 2nd opens). Re-ported after the native
-    // stdin reader made the unmount→remount cycle survivable.
+    // Standard REPL: ← on empty prompt opens FleetView (double-press — 1st
+    // arms leftArrowPending → this renders "← again for agents", 2nd opens).
+    // Re-ported after the native stdin reader made the unmount→remount cycle
+    // survivable.
     ...((() => {
       const fleetOn = feature('AGENTS_FLEET') ? true : false
-      // ant CDO gates on isInputEmpty (K), NOT the composed showHint — so a
-      // custom status line (which sets suppressHint) doesn't hide the hint.
+      // Gate on isInputEmpty, NOT the composed showHint — so a custom status
+      // line (which sets suppressHint) doesn't hide the hint.
+      // NOTE: deliberately NOT gated on !isLoading. The ←← bridge backgrounds
+      // a RUNNING conversation (esp. auto mode, where isLoading is near-always
+      // true); hiding the hint mid-turn made the feature look gone (v26.5.86
+      // regression). The handler has no isLoading gate either — see REPLView
+      // handleLeftArrowOnEmpty.
       const cond =
         !isBgSession() &&
-        !isLoading &&
         isInputEmpty &&
         fleetOn &&
         getGlobalConfig().leftArrowOpensAgents !== false
