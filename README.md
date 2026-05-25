@@ -86,6 +86,91 @@ ccb --continue
 
 ---
 
+## Learn ccb in 10 minutes — `/powerup`
+
+New here? Inside the REPL, type:
+
+```
+/powerup
+```
+
+Ten short interactive lessons walk you through what makes ccb worth using — `@` file mentions, permission modes, `/rewind` and Esc-Esc to undo, background sessions, CLAUDE.md, MCP, skills + hooks, `/fork` for parallel branches, model dialing, and multi-provider switching. Open one, try it, mark it done. The home banner tracks progress until you've finished all ten.
+
+---
+
+## Memory consolidation — `/dream`
+
+<p align="center">
+  <img src="assets/dream-demo.gif" alt="ccb /dream command demo" width="100%">
+</p>
+
+ccb keeps a persistent, file-based memory under `~/.claude/projects/<project>/memory/` — a `MEMORY.md` index plus typed topic files (`user`, `feedback`, `project`, `reference`). It writes to these as it works so a fresh session can orient fast. Over many sessions those files drift: entries go stale, duplicate each other, or contradict the current code. `/dream` is the reflective pass that cleans them up.
+
+Inside the REPL, type:
+
+```
+/dream
+```
+
+It runs **right now, in the foreground, with full tool access** while you watch. The model does a four-phase pass over your memory directory:
+
+1. **Orient** — `ls` the memory dir, read `MEMORY.md`, skim topic files and recent session logs so it improves rather than duplicates.
+2. **Gather** — pull new signal from session logs and transcripts (grepped narrowly, never read whole), and flag memories that have drifted from the code.
+3. **Consolidate** — merge new signal into existing files, convert relative dates to absolute, delete contradicted facts.
+4. **Prune & index** — keep `MEMORY.md` an index (one line per entry, under 200 lines / ~25 KB), drop superseded pointers, reconcile against `CLAUDE.md`.
+
+When it's done you get a short summary of what was consolidated, updated, or pruned.
+
+### Three modes
+
+| Command | What it does |
+|---------|--------------|
+| `/dream` | Consolidate now — foreground, full tools, you're watching. Accepts trailing text as extra context (e.g. `/dream focus on the auth refactor`). |
+| `/dream nightly` | Schedule a recurring nightly consolidation. Installs a `durable`, `recurring` cron that fires `/dream consolidate` at a random minute between 00:00–05:59 local (jittered to avoid thundering-herd across sessions). The schedule persists in `.claude/scheduled_tasks.json` across sessions. |
+| `/dream consolidate` | The bare consolidation body with no manual-mode preface — what the nightly cron fires. You can also run it by hand. |
+
+`/dream` also has the alias `/learn`.
+
+### Nightly notes
+
+- Recurring jobs **auto-expire after 7 days** — re-run `/dream nightly` to renew. (Re-running also de-dupes: it deletes any existing `/dream consolidate` job before scheduling a fresh one.)
+- Cancel anytime — list jobs and delete by ID via the cron tools, or toggle the **Auto-dream** row in `/memory`.
+- Requires auto-memory to be on. The command is hidden in remote mode and when auto-memory is disabled.
+
+---
+
+## Recurring & self-paced tasks — `/loop`
+
+`/loop` turns any prompt or slash command into a repeating job. Two ways to run it: a fixed interval, or no interval at all — in which case the model decides how long to wait between iterations based on what it just saw.
+
+Inside the REPL:
+
+```
+/loop 5m /babysit-prs        # run /babysit-prs every 5 minutes
+/loop 30m check the deploy   # run a plain prompt every 30 minutes
+/loop check the deploy       # no interval → model self-paces the cadence
+/loop                        # bare → autonomous check, dynamically paced
+```
+
+The interval is the leading token (`5m`, `2h`, `1d`) or a trailing `every …` clause (`check the deploy every 20m`, `run tests every 5 minutes`). Granularity is 1 minute minimum. `/loop` runs the task **immediately**, then schedules the next firing — you don't wait for the first tick.
+
+| Form | Behaviour |
+|------|-----------|
+| `/loop <interval> <prompt>` | Fixed cadence. Converts the interval to a cron, fires recurring until you cancel. |
+| `/loop <prompt>` (no interval) | Dynamic mode — after each run the model picks the next delay (via `ScheduleWakeup`) from what it observed: quiet branch → wait longer, lots in flight → wait shorter. |
+| `/loop` (bare) | Autonomous default in dynamic-pacing mode — runs a check now, self-paces from there. |
+
+`/loop` also has the alias `/proactive`.
+
+**Notes**
+
+- Recurring (fixed-interval) jobs **auto-expire after 7 days** — re-run to renew. Dynamic-mode loops stop the moment the model declines to schedule the next wake-up.
+- List jobs with `/cron-list`, cancel with `/cron-delete <id>`.
+- If an interval can't be expressed cleanly as cron (e.g. `7m`, `90m`), the model rounds to the nearest clean cadence and tells you what it picked.
+- GA by default. Disable the whole scheduler locally with `CLAUDE_CODE_DISABLE_CRON=1`.
+
+---
+
 ## Agents view — `ccb agents`
 
 <p align="center">
@@ -126,15 +211,43 @@ Sessions are PTY-backed and survive after you close the terminal — re-open `cc
 
 ---
 
-## Learn ccb in 10 minutes — `/powerup`
+## Agent Teams — coordinate multiple sessions
 
-New here? Inside the REPL, type:
+<p align="center">
+  <img src="assets/swarm-demo.gif" alt="ccb Agent Teams swarm demo" width="100%">
+</p>
+
+Agent Teams let you coordinate several ccb instances working together. One session acts as the **team lead** — it assigns work, synthesizes results, and coordinates. Each **teammate** is a full, independent session with its own context window, and teammates message each other directly. Unlike a plain subagent (which runs inside one session and only reports back to the main agent), you can also talk to any teammate directly without going through the lead.
+
+**You have to ask for a team — it won't form on its own.** Describe the task and the team shape in plain English and the lead sets everything up. ccb may also *propose* a team if it spots parallelizable work, but it always waits for your confirmation first. Either way, nothing spawns without your say-so.
 
 ```
-/powerup
+> Users report the app exits after one message instead of staying connected.
+  Create an agent team: spawn 4 teammates to investigate different hypotheses,
+  have them message each other to disprove each other's theories like a
+  scientific debate, and update the findings doc with the consensus.
 ```
 
-Ten short interactive lessons walk you through what makes ccb worth using — `@` file mentions, permission modes, `/rewind` and Esc-Esc to undo, background sessions, CLAUDE.md, MCP, skills + hooks, `/fork` for parallel branches, model dialing, and multi-provider switching. Open one, try it, mark it done. The home banner tracks progress until you've finished all ten.
+The lead creates a shared task list, spawns teammates, lets them claim and work tasks (with dependencies auto-unblocking as blockers complete), synthesizes the results, and cleans up the team when done. In the REPL, cycle teammates with `Shift+Down` and message any one directly; or run split panes (tmux / iTerm2) to watch everyone at once.
+
+### When to use a team
+
+Teams shine when parallel exploration adds real value and teammates can work independently:
+
+- **Research & review** — split a PR review or a library investigation into independent lenses (security, performance, test coverage) that run at once.
+- **New modules or features** — each teammate owns a separate piece without stepping on the others.
+- **Debugging with competing hypotheses** — teammates test different theories in parallel and argue them out, which beats a single agent that anchors on the first plausible cause.
+- **Cross-layer coordination** — a change spanning frontend, backend, and tests, each layer owned by a different teammate.
+
+**When not to:** teams add coordination overhead and burn significantly more tokens (each teammate is a separate session). For sequential work, same-file edits, or heavily dependent tasks, a single session or a [subagent](#agents-view--ccb-agents) is the better tool. New to teams? Start with research or review — clear boundaries, no parallel-write conflicts.
+
+### Tips
+
+- **Start with 3–5 teammates.** Past that, coordination overhead and token cost outweigh the parallelism; three focused teammates beat five scattered ones.
+- **Split along file boundaries.** Two teammates editing the same file overwrite each other — give each its own set of files.
+- **Give each teammate enough context.** They load `CLAUDE.md`, MCP, and skills like any session, but they do *not* inherit the lead's conversation — put task-specific detail in the spawn prompt.
+- **Steer as it runs.** Press Enter on a teammate to read its session, Escape to interrupt; redirect approaches that aren't working rather than letting the team run unattended.
+- GA by default in ccb — no env var, no CLI flag (upstream still gates it behind `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`). Teams are cleaned up at session end.
 
 ---
 
