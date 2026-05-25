@@ -230,9 +230,13 @@ describe('gracefulShutdown — source pins', () => {
     test('30-second interval check via process.stdout.writable', () => {
       // Pin: macOS revokes TTY without SIGHUP — we poll instead.
       expect(source).toMatch(/30_000/) // 30 second interval
-      expect(source).toMatch(
-        /!process\.stdout\.writable \|\| !process\.stdin\.readable/,
-      )
+      // stdout.writable is the always-trusted signal. stdin.readable is only
+      // trusted OUTSIDE native-reader mode: when the rust stdin reader owns
+      // fd0 (FleetView path), App destroy()s process.stdin so readable===false
+      // even though the process is alive — gating on it there would misfire
+      // and kill FleetView at 30s. See CCB_FLEET_INPROCESS_REMOUNT gate.
+      expect(source).toMatch(/!process\.stdout\.writable \|\| stdinDead/)
+      expect(source).toMatch(/CCB_FLEET_INPROCESS_REMOUNT/)
     })
 
     test('orphan detection only on TTY stdin (not piped)', () => {
