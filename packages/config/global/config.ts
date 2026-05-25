@@ -1,6 +1,7 @@
 import { feature } from 'bun:bundle'
 import { randomBytes } from 'crypto'
 import { unwatchFile, watchFile } from 'fs'
+import { homedir } from 'os'
 import memoize from 'lodash-es/memoize.js'
 import pickBy from 'lodash-es/pickBy.js'
 import { basename, dirname, join, resolve } from 'path'
@@ -819,6 +820,14 @@ function computeTrustDialogAccepted(): boolean {
   // Now check from current working directory and its parents
   // Normalize paths for consistent JSON key lookup
   let currentPath = normalizePathForConfigKey(getConfigHostBindings().getCwd?.() ?? process.cwd())
+
+  // The operator's home directory is implicitly trusted. EXACT-match on
+  // purpose (not the parent-walk below): trusting ~ must NOT cascade, so a
+  // fresh clone under ~/code/... still gets the dialog. Without this, ~
+  // re-prompted every launch (its trust was only ever session-scoped).
+  if (currentPath === normalizePathForConfigKey(homedir())) {
+    return true
+  }
 
   // Traverse all parent directories
   while (true) {
