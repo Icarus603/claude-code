@@ -107,13 +107,32 @@ export function _resetTmuxControlModeProbeForTesting(): void {
 
 /**
  * Resolution order:
- *   1. CLAUDE_CODE_NO_FLICKER env (explicit) — always wins, escape hatch
- *      for testing / debugging without writing to settings.json.
- *   2. settings.tui ('fullscreen' = on, 'default' = off) — set via /tui.
- *   3. Auto-detection: disabled under tmux -CC (mouse-wheel dead there).
- *   4. Default: on for ants, off for everyone else.
+ *   1. Background session (CLAUDE_CODE_SESSION_KIND === 'bg') — ALWAYS
+ *      fullscreen, before any opt-out. A bg worker is consumed exclusively
+ *      through `ccb attach`, whose render pipeline (alt-screen handoff,
+ *      FRAME_CLEAR/home-erase boundary, BSU/ESU sync wrap in attachClient.ts)
+ *      and the inner Ink's full-repaint-on-resize path (resetFramesForAltScreen)
+ *      only work when the worker is in alt-screen. A main-screen worker uses
+ *      DIFFERENTIAL rendering (log-update tracks prev line count + parks the
+ *      cursor with relative moves), so after the attach client replays the ring
+ *      and jiggles the pty, the worker's relative cursor moves land at the wrong
+ *      row → torn frame borders + overlapping rows + the cursor drifting below
+ *      the footer. ant forces this unconditionally in `j9` (2.1.150 2218.js:53:
+ *      `if (SESSION_KIND === "bg") return true`) ahead of its NO_FLICKER check;
+ *      since ant's bg worker is always fullscreen it never hit this corruption.
+ *      ccb defaulted fullscreen on for ant USER_TYPE only, so non-ant operators'
+ *      bg workers rendered on the main screen — the FleetView→attach overlap bug.
+ *   2. CLAUDE_CODE_NO_FLICKER env (explicit) — escape hatch for foreground
+ *      sessions (testing / debugging without writing to settings.json).
+ *   3. settings.tui ('fullscreen' = on, 'default' = off) — set via /tui.
+ *   4. Auto-detection: disabled under tmux -CC (mouse-wheel dead there).
+ *   5. Default: on for ants, off for everyone else.
  */
 export function isFullscreenEnvEnabled(): boolean {
+  // Background workers are always fullscreen — the attach pipeline requires
+  // alt-screen. Mirrors ant `j9` (2218.js:53), which short-circuits here
+  // before its own NO_FLICKER opt-out for exactly this reason.
+  if (process.env.CLAUDE_CODE_SESSION_KIND === 'bg') return true
   // Explicit user opt-out always wins.
   if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_NO_FLICKER)) return false
   // Explicit opt-in overrides auto-detection (escape hatch).
