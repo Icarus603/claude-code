@@ -251,6 +251,10 @@ export const DEFAULT_BINDINGS: KeybindingBlock[] = [
       left: 'footer:previous',
       enter: 'footer:openSelected',
       escape: 'footer:clearSelection',
+      // ant 2402.js Footer context: `x:"footer:close"` — `x` on a selected
+      // coordinator-panel agent row stops (running) or clears (terminal) it.
+      // Was missing in ccb, so `x` fell through to TextInput as a literal char.
+      x: 'footer:close',
     },
   },
   // Message selector (rewind dialog) navigation

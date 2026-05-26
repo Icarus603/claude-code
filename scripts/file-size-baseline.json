@@ -84,7 +84,7 @@
   "packages/repl/src/components/LogSelector.tsx": 1449,
   "packages/repl/src/components/MessageSelector.tsx": 1048,
   "packages/repl/src/components/Messages.tsx": 1108,
-  "packages/repl/src/components/PromptInput/PromptInput.tsx": 3243,
+  "packages/repl/src/components/PromptInput/PromptInput.tsx": 3244,
   "packages/repl/src/components/ScrollKeybindingHandler.tsx": 1082,
   "packages/repl/src/components/Settings/Config.tsx": 2351,
   "packages/repl/src/components/Stats.tsx": 1180,

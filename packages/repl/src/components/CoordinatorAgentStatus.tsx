@@ -10,8 +10,7 @@ import figures from 'figures'
 import * as React from 'react'
 import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
 import type { Theme } from '@anthropic/ink'
-import { useTerminalSize } from '@anthropic/ink'
-import { Box, Byline, KeyboardShortcutHint, Text, stringWidth, wrapText } from '@anthropic/ink'
+import { Box, Byline, KeyboardShortcutHint, Text, stringWidth } from '@anthropic/ink'
 import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import {
   type AppState,
@@ -52,6 +51,32 @@ export function getVisibleAgentTasks(
         isPanelAgentTask(t) && t.evictAfter !== 0,
     )
     .sort((a, b) => a.startTime - b.startTime)
+}
+
+/**
+ * Remap the coordinator cursor index across an agent-list change — byte-for-byte
+ * ant `k64` (5129.js). When the visible agent list changes (an agent is killed,
+ * dismissed, or a new one spawns), the cursor should STAY ON THE SAME AGENT
+ * (matched by id), not blindly clamp to an index. `H` = current index (1-based:
+ * 0 is "main"), `prevIds`/`nextIds` = the agent-id lists before/after the change.
+ * Walk back from the cursor's old agent and return the first surviving agent's
+ * new index (+1 for the main offset); fall back to main (0) if all gone.
+ *
+ * This is the fix for the cursor-reset race: ccb's old clamp compared the index
+ * against a possibly-stale count and snapped the cursor back to 0 right after a
+ * ↓ moved it onto an agent row, so `x` always saw index 0 (main → fall-through).
+ */
+export function remapCoordinatorIndex(
+  index: number,
+  prevIds: string[],
+  nextIds: string[],
+): number {
+  if (index < 1) return index
+  for (let k = Math.min(index, prevIds.length) - 1; k >= 0; k--) {
+    const o = nextIds.indexOf(prevIds[k]!)
+    if (o !== -1) return o + 1
+  }
+  return 0
 }
 
 export function CoordinatorTaskPanel(): React.ReactNode {
@@ -106,6 +131,28 @@ export function CoordinatorTaskPanel(): React.ReactNode {
     return null
   }
 
+  // ant `V64` (5129.js): two shared column widths drive the aligned grid.
+  // labelWidth = the widest agent name/agentType, clamped 4..24 (ant `X`);
+  // statusWidth = the widest "elapsed+tokenText+queuedText" run (ant `W`), so
+  // every row's right-edge status column lines up. Both measured with
+  // stringWidth (ant `D6` = Bun.stringWidth).
+  const statusParts = visibleTasks.map(buildStatusParts)
+  const labelWidth = Math.min(
+    24,
+    Math.max(
+      4,
+      ...visibleTasks.map(t =>
+        stringWidth(nameByAgentId.get(t.id) ?? t.agentType),
+      ),
+    ),
+  )
+  const statusWidth = Math.max(
+    0,
+    ...statusParts.map(p =>
+      stringWidth(p.elapsed + p.tokenText + p.queuedText),
+    ),
+  )
+
   // Hint shown on the MainLine's right edge — byte-for-byte ant `V64` (5129.js).
   // `focused` = the agent row the cursor is parked on (index 0 is "main", so
   // index>0 maps to visibleTasks[index-1]). When an agent row is focused the
@@ -145,6 +192,7 @@ export function CoordinatorTaskPanel(): React.ReactNode {
         isSelected={selectedIndex === 0}
         isViewed={viewingAgentTaskId === undefined}
         hint={hint}
+        labelWidth={labelWidth}
         onClick={() => exitTeammateView(setAppState)}
       />
       {visibleTasks.map((task, i) => (
@@ -154,11 +202,56 @@ export function CoordinatorTaskPanel(): React.ReactNode {
           name={nameByAgentId.get(task.id)}
           isSelected={selectedIndex === i + 1}
           isViewed={viewingAgentTaskId === task.id}
+          labelWidth={labelWidth}
+          statusWidth={statusWidth}
+          statusParts={statusParts[i]!}
           onClick={() => enterTeammateView(task.id, setAppState)}
         />
       ))}
     </Box>
   )
+}
+
+/** Prefix/bullet column width — ant `J6_ = 4` (5128.js): `"❯ ● "`. */
+const PREFIX_BULLET_WIDTH = 4
+
+type StatusParts = {
+  elapsed: string
+  tokenText: string
+  queuedText: string
+  queuedCount: number
+}
+
+/**
+ * Per-row status fields — byte-for-byte ant `ajO` (5129.js). elapsed (paused
+ * time subtracted), tokenText (` · ${↓|↑} ${n} tokens`, the arrow is throughput
+ * direction NOT a row separator), queuedText (` · ${n} queued`). No play/pause
+ * glyph — ant conveys run state via the bullet COLOR only (`ojO`).
+ */
+function buildStatusParts(task: LocalAgentTaskState): StatusParts {
+  const running = !isTerminalStatus(task.status)
+  const pausedMs = task.totalPausedMs ?? 0
+  const elapsedMs = Math.max(
+    0,
+    running
+      ? Date.now() - task.startTime - pausedMs
+      : (task.endTime ?? task.startTime) - task.startTime - pausedMs,
+  )
+  const tokenCount = task.progress?.tokenCount
+  const arrow = task.progress?.lastActivity
+    ? figures.arrowDown
+    : figures.arrowUp
+  const tokenText =
+    tokenCount !== undefined && tokenCount > 0
+      ? ` · ${arrow} ${formatNumber(tokenCount)} tokens`
+      : ''
+  const queuedCount = task.pendingMessages.length
+  return {
+    elapsed: formatDuration(elapsedMs),
+    tokenText,
+    queuedText: queuedCount > 0 ? ` · ${queuedCount} queued` : '',
+    queuedCount,
+  }
 }
 
 /**
@@ -175,22 +268,31 @@ export function useCoordinatorTaskCount(): number {
   }, [tasks])
 }
 
+/**
+ * MainLine — byte-for-byte ant `ejO` (5129.js). The "main" label sits in a
+ * FIXED-WIDTH box (labelWidth + prefix/bullet padding), the hint in a single
+ * <Text> on the right, separated by justifyContent: space-between. The
+ * fixed-width label box is what makes the hint land cleanly at the right edge;
+ * wrapping the hint in <Text> keeps its middot-separated children flowing
+ * inline instead of scattering as flex items across the row.
+ */
 function MainLine({
   isSelected,
   isViewed,
   hint,
+  labelWidth,
   onClick,
 }: {
   isSelected?: boolean
   isViewed?: boolean
   hint?: React.ReactNode
+  labelWidth: number
   onClick: () => void
 }): React.ReactNode {
   const [hover, setHover] = React.useState(false)
   const prefix = isSelected || hover ? figures.pointer + ' ' : '  '
   const bullet = isViewed ? BLACK_CIRCLE : figures.circle
-  // ant `ejO` (5129.js): the "main" label sits left, the hint right, via
-  // justifyContent: space-between on the row Box.
+  const dim = !isSelected && !isViewed && !hover
   return (
     <Box
       justifyContent="space-between"
@@ -198,11 +300,13 @@ function MainLine({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <Text dimColor={!isSelected && !isViewed && !hover} bold={isViewed}>
-        {prefix}
-        {bullet} main
-      </Text>
-      {hint}
+      <Box width={labelWidth + PREFIX_BULLET_WIDTH} flexShrink={0}>
+        <Text dimColor={dim} bold={isViewed}>
+          {prefix}
+          {bullet} main
+        </Text>
+      </Box>
+      <Text dimColor>{hint}</Text>
     </Box>
   )
 }
@@ -212,6 +316,9 @@ type AgentLineProps = {
   name?: string
   isSelected?: boolean
   isViewed?: boolean
+  labelWidth: number
+  statusWidth: number
+  statusParts: StatusParts
   onClick?: () => void
 }
 
@@ -219,8 +326,7 @@ type AgentLineProps = {
  * Bullet color by status — byte-for-byte ant `ojO` (5129.js): completed→success,
  * failed→error, killed→inactive, running/pending→undefined (no color). ant
  * conveys task state through the bullet COLOR alone; it has no play/pause
- * separator glyph. Earlier ccb rendered a homerolled `▶`/`⏸` separator — removed
- * to match `HJO`.
+ * separator glyph.
  */
 function statusBulletColor(status: string): keyof Theme | undefined {
   switch (status) {
@@ -235,95 +341,81 @@ function statusBulletColor(status: string): keyof Theme | undefined {
   }
 }
 
+/**
+ * AgentLine — byte-for-byte ant `HJO` (5129.js). A four-column flex row:
+ *   1. prefix+bullet box (fixed width PREFIX_BULLET_WIDTH=4): `❯ ●`, bullet
+ *      colored by status (`ojO`).
+ *   2. name box (fixed width labelWidth): the steering handle (`name` or
+ *      agentType), bold when named/viewed, truncated.
+ *   3. description (flexGrow:1, width:0, paddingLeft:2): summary||description,
+ *      truncated — this column absorbs the slack so the status column stays
+ *      right-aligned.
+ *   4. status box (minWidth statusWidth, marginLeft:1, justifyContent:flex-end):
+ *      `elapsed tokenText queuedText`, right-aligned so every row's status
+ *      lines up.
+ * The decoration path (ant `O?.content`) is ant-only (Tungsten live monitor);
+ * ccb has no taskDecorations, so only the no-decoration branch is ported.
+ */
 function AgentLine({
   task,
   name,
   isSelected,
   isViewed,
+  labelWidth,
+  statusWidth,
+  statusParts,
   onClick,
 }: AgentLineProps): React.ReactNode {
-  const { columns } = useTerminalSize()
   const [hover, setHover] = React.useState(false)
-  const isRunning = !isTerminalStatus(task.status)
-  const pausedMs = task.totalPausedMs ?? 0
-  const elapsedMs = Math.max(
-    0,
-    isRunning
-      ? Date.now() - task.startTime - pausedMs
-      : (task.endTime ?? task.startTime) - task.startTime - pausedMs,
-  )
-
-  const elapsed = formatDuration(elapsedMs)
-  const tokenCount = task.progress?.tokenCount
-
-  // Token-throughput direction arrow — lives INSIDE tokenText, not as a row
-  // separator (ant `ajO`: `progress.lastActivity ? arrowDown : arrowUp`).
-  const lastActivity = task.progress?.lastActivity
-  const arrow = lastActivity ? figures.arrowDown : figures.arrowUp
-
-  const tokenText =
-    tokenCount !== undefined && tokenCount > 0
-      ? ` · ${arrow} ${formatNumber(tokenCount)} tokens`
-      : ''
-
-  const queuedCount = task.pendingMessages.length
-  const queuedText = queuedCount > 0 ? ` · ${queuedCount} queued` : ''
-
-  // Precedence: AI summary > static description (no tool-call activity noise)
-  const displayDescription = task.progress?.summary || task.description
-
+  const { elapsed, tokenText, queuedText, queuedCount } = statusParts
+  const description = task.progress?.summary || task.description
   const highlighted = isSelected || hover
   const prefix = highlighted ? figures.pointer + ' ' : '  '
   const bullet = isViewed ? BLACK_CIRCLE : figures.circle
   const bulletColor = statusBulletColor(task.status)
   const dim = !highlighted && !isViewed
+  const displayName = name ?? task.agentType
 
-  // Name is the steering handle — kept out of truncation and undimmed so it
-  // stays readable even when the row is inactive. Short by convention (the
-  // Agent tool prompt asks for "one or two words, lowercase").
-  const namePart = name ? `${name}: ` : ''
-  const hintPart =
-    isSelected && !isViewed ? ` · x to ${isRunning ? 'stop' : 'clear'}` : ''
-  const suffixPart = ` ${elapsed}${tokenText}${queuedText}${hintPart}`
-  const availableForDesc =
-    columns -
-    stringWidth(prefix) -
-    stringWidth(`${bullet} `) -
-    stringWidth(namePart) -
-    stringWidth(suffixPart)
-  const truncated = wrapText(
-    displayDescription,
-    Math.max(0, availableForDesc),
-    'truncate-end',
-  )
-
-  const line = (
-    <Text dimColor={dim} bold={isViewed}>
-      {prefix}
-      <Text color={bulletColor}>{bullet}</Text>{' '}
-      {name && (
-        <>
-          <Text dimColor={false} bold>
-            {name}
-          </Text>
-          {': '}
-        </>
-      )}
-      {truncated} {elapsed}
-      {tokenText}
-      {queuedCount > 0 && <Text color="warning">{queuedText}</Text>}
-      {hintPart && <Text dimColor>{hintPart}</Text>}
-    </Text>
-  )
-
-  if (!onClick) return line
   return (
     <Box
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {line}
+      {/* col 1 — prefix + status-colored bullet */}
+      <Box width={PREFIX_BULLET_WIDTH} flexShrink={0}>
+        <Text dimColor={dim} bold={isViewed}>
+          {prefix}
+        </Text>
+        <Text color={bulletColor} dimColor={!bulletColor && dim} bold={isViewed}>
+          {bullet}{' '}
+        </Text>
+      </Box>
+      {/* col 2 — name (steering handle), fixed width */}
+      <Box width={labelWidth} flexShrink={0}>
+        <Text bold={!!name || isViewed} dimColor={!name && dim} wrap="truncate">
+          {displayName}
+        </Text>
+      </Box>
+      {/* col 3 — description, absorbs slack */}
+      <Box flexGrow={1} width={0} paddingLeft={2}>
+        <Text dimColor={dim} bold={isViewed} wrap="truncate">
+          {description}
+        </Text>
+      </Box>
+      {/* col 4 — status, right-aligned, shared minWidth */}
+      <Box
+        minWidth={statusWidth}
+        flexShrink={0}
+        marginLeft={1}
+        justifyContent="flex-end"
+      >
+        <Text dimColor={dim} bold={isViewed}>
+          {elapsed}
+          {tokenText}
+          {queuedCount > 0 && <Text color="warning">{queuedText}</Text>}
+        </Text>
+      </Box>
     </Box>
   )
 }

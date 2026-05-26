@@ -190,6 +190,7 @@ import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import {
   getVisibleAgentTasks,
   isBgAgentPanelEnabled,
+  remapCoordinatorIndex,
   useCoordinatorTaskCount,
 } from '../CoordinatorAgentStatus.js'
 import { getEffortNotificationText } from '../EffortIndicator.js'
@@ -581,16 +582,19 @@ function PromptInput({
     [tasks],
   )
   const minCoordinatorIndex = hasBgTaskPill ? -1 : 0
-  // Clamp index when tasks complete and the list shrinks beneath the cursor
+  // Cursor remap on agent-list change — ant 5163.js clamp effect (k64 id-based)
+  const visibleAgentIds = useMemo(() => getVisibleAgentTasks(tasks).map(t => t.id), [tasks])
+  const prevVisibleAgentIdsRef = useRef(visibleAgentIds)
   useEffect(() => {
-    if (coordinatorTaskIndex >= coordinatorTaskCount) {
-      setCoordinatorTaskIndex(
-        Math.max(minCoordinatorIndex, coordinatorTaskCount - 1),
-      )
-    } else if (coordinatorTaskIndex < minCoordinatorIndex) {
+    const prevIds = prevVisibleAgentIdsRef.current
+    prevVisibleAgentIdsRef.current = visibleAgentIds
+    const remapped = remapCoordinatorIndex(coordinatorTaskIndex, prevIds, visibleAgentIds)
+    if (remapped !== coordinatorTaskIndex) setCoordinatorTaskIndex(remapped)
+    else if (coordinatorTaskIndex >= coordinatorTaskCount)
+      setCoordinatorTaskIndex(Math.max(minCoordinatorIndex, coordinatorTaskCount - 1))
+    else if (coordinatorTaskIndex < minCoordinatorIndex)
       setCoordinatorTaskIndex(minCoordinatorIndex)
-    }
-  }, [coordinatorTaskCount, coordinatorTaskIndex, minCoordinatorIndex])
+  }, [visibleAgentIds, coordinatorTaskCount, coordinatorTaskIndex, minCoordinatorIndex])
   const [isPasting, setIsPasting] = useState(false)
   const [isExternalEditorActive, setIsExternalEditorActive] = useState(false)
   const [showModelPicker, setShowModelPicker] = useState(false)

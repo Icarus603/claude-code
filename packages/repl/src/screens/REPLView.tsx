@@ -379,7 +379,7 @@ import { updateSessionName, updateSessionActivity } from '@claude-code/agent/con
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
 import { restoreRemoteAgentTasks } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js';
 import { useInboxPoller } from '../hooks/useInboxPoller.js';
-import { getViewedLocalAgentTask } from './repl/backgrounding.js';
+import { getViewedLocalAgentTask, hasRunningPanelAgentTask } from './repl/backgrounding.js';
 import { getInteractiveMcpClients } from './repl/integrations.js';
 import { parseImmediateCommandInput } from './repl/submission.js';
 // Dead code elimination: conditional import for loop mode
@@ -1618,6 +1618,8 @@ export function REPL({
     () => getAllInProcessTeammateTasks(tasks).some(t => t.status === 'running'),
     [tasks],
   );
+  // ant `RD` spinner gate widened to bg panel agents — see backgrounding.ts.
+  const hasRunningPanelAgent = useMemo(() => hasRunningPanelAgentTask(tasks), [tasks]);
 
   // Show deferred turn duration message once all swarm teammates finish
   useEffect(() => {
@@ -1724,6 +1726,7 @@ export function REPL({
     (isLoading ||
       userInputOnProcessing ||
       hasRunningTeammates ||
+      hasRunningPanelAgent ||
       // Keep spinner visible while task notifications are queued for processing.
       // Without this, the spinner briefly disappears between consecutive notifications
       // (e.g., multiple background agents completing in rapid succession) because
