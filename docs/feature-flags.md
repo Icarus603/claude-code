@@ -64,7 +64,7 @@ Enable per-run with `FEATURE_<NAME>=1`.
 - `AGENT_MEMORY_SNAPSHOT` — Snapshot agent state for time-travel debugging
 - `COMPACTION_REMINDERS` — Inject compaction-aware reminders during turns
 - `CONTEXT_COLLAPSE` — Aggressive context summarization
-- `FORK_SUBAGENT` — `/fork <directive>` slash command + Agent-tool fork path. Inherits parent conversation as `forkContextMessages`; runs fire-and-forget via `runAsyncAgentLifecycle` so the parent REPL keeps accepting input. Recursion guard via `isInForkChild`. Excluded under coordinator mode and `-p` non-interactive sessions (see `isForkSubagentEnabled`).
+- `FORK_SUBAGENT` — `/fork <directive>` slash command + Agent-tool fork path. Inherits parent conversation as `forkContextMessages`; runs fire-and-forget via `runAsyncAgentLifecycle` so the parent REPL keeps accepting input. Recursion guard via `isInForkChild`. Excluded under coordinator mode and `-p` non-interactive sessions (see `isForkSubagentEnabled`). **Default OFF** — mirrors ant's `tengu_copper_fox` GrowthBook gate (default false in ant v2.1.150 `VP5`). With fork OFF the Agent tool runs subagents in the FOREGROUND (spinner shows, `ctrl+b` to background); with it ON every spawn is forced async (instant-background, unified `<task-notification>` model). Opt in via `FEATURE_FORK_SUBAGENT=1` or `CLAUDE_CODE_FORK_SUBAGENT=1` (the env mirrors ant's env arm).
 - `HARD_FAIL` — Crash on first uncaught error (vs swallow + log)
 - `HISTORY_SNIP` — Trim history mid-session
 - `HOOK_PROMPTS` — Inject prompt fragments via hooks

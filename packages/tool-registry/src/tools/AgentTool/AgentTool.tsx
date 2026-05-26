@@ -722,6 +722,11 @@ export const AgentTool = buildTool({
       | ReturnType<typeof buildEffectiveSystemPrompt>
       | undefined
     let promptMessages: MessageType[]
+    // ant 4036.js fork override `replHydration:{kind:"fork",log:[...]}` — the
+    // Agent-tool fork path must replay the parent REPL log like /fork does.
+    let forkReplHydration:
+      | import('@claude-code/agent/replHydration.js').ReplHydration
+      | undefined
 
     if (isForkPath) {
       if (toolUseContext.renderedSystemPrompt) {
@@ -752,6 +757,9 @@ export const AgentTool = buildTool({
         })
       }
       promptMessages = buildForkedMessages(prompt, assistantMessage)
+      // ant 4656.js mJK:29-37 — pre-compute replHydration log synchronously.
+      const { reconstructLog } = await import('@claude-code/agent/replHydration.js')
+      forkReplHydration = { kind: 'fork', log: reconstructLog(toolUseContext.messages) }
     } else {
       try {
         const additionalWorkingDirectories = Array.from(
@@ -895,7 +903,7 @@ export const AgentTool = buildTool({
       // buildAgentSystemPrompt() runs inside wrapWithCwd where getCwd()
       // returns the override path.
       override: isForkPath
-        ? { systemPrompt: forkParentSystemPrompt }
+        ? { systemPrompt: forkParentSystemPrompt, replHydration: forkReplHydration }
         : enhancedSystemPrompt && !worktreeInfo && !cwd
           ? { systemPrompt: asSystemPrompt(enhancedSystemPrompt) }
           : undefined,

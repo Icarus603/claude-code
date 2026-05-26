@@ -6,7 +6,7 @@ import {
   FORK_BOILERPLATE_TAG,
   FORK_DIRECTIVE_PREFIX,
 } from '@claude-code/command-runtime/xml.js'
-import { isCoordinatorMode } from '@claude-code/agent/coordinatorMode.js'
+import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
 import type {
   AssistantMessage,
   Message as MessageType,
@@ -26,16 +26,24 @@ import type { BuiltInAgentDefinition } from './loadAgentsDir.js'
  *   `<task-notification>` interaction model
  * - `/fork <directive>` slash command is available
  *
- * Mutually exclusive with coordinator mode — coordinator already owns the
- * orchestration role and has its own delegation model.
+ * Ordered precedence — byte-for-byte ant `VP5` (2672.js):
+ *   1. `CLAUDE_CODE_FORK_SUBAGENT` env truthy → enabled (BEFORE the
+ *      non-interactive check, so the env arm forces fork on even in `-p`
+ *      headless sessions — ant `mH(process.env.CLAUDE_CODE_FORK_SUBAGENT)`
+ *      precedes `h8()`).
+ *   2. non-interactive session → disabled (ant `h8()`).
+ *   3. GrowthBook `tengu_copper_fox` (default false) → ccb's
+ *      `feature('FORK_SUBAGENT')` flag (default OFF; opt-in via STABLE or
+ *      `FEATURE_FORK_SUBAGENT=1`).
+ *   4. else disabled.
+ *
+ * ant has NO coordinator-mode exclusion here (the prior ccb `!isCoordinatorMode()`
+ * term was a ccb-addition — removed for parity).
  */
 export function isForkSubagentEnabled(): boolean {
-  if (feature('FORK_SUBAGENT')) {
-    if (isCoordinatorMode()) return false
-    if (getIsNonInteractiveSession()) return false
-    return true
-  }
-  return false
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_FORK_SUBAGENT'))) return true
+  if (getIsNonInteractiveSession()) return false
+  return feature('FORK_SUBAGENT') ? true : false
 }
 
 /** Synthetic agent type name used for analytics when the fork path fires. */
@@ -178,7 +186,7 @@ export function buildChildMessage(directive: string): string {
 You are a worker fork. The transcript above is the parent's history \u2014 inherited reference, not your situation. You are NOT a continuation of that agent. Execute ONE directive, then stop.
 
 Hard rules:
-- Do NOT spawn sub-agents. The "default to forking" guidance in your system prompt is for the parent; you ARE the fork, execute directly.
+- Do NOT spawn sub-agents. The "default to forking" guidance is for the parent; you ARE the fork, execute directly.
 - One shot: report once and stop. No follow-up questions, no proposed next steps, no waiting for the user.
 
 Guidelines (your directive may override any of these):

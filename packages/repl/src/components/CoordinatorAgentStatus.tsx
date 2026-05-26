@@ -8,9 +8,11 @@
 
 import figures from 'figures'
 import * as React from 'react'
-import { BLACK_CIRCLE, PAUSE_ICON, PLAY_ICON } from '@claude-code/output/constants/figures.js'
+import { BLACK_CIRCLE } from '@claude-code/output/constants/figures.js'
+import type { Theme } from '@anthropic/ink'
 import { useTerminalSize } from '@anthropic/ink'
-import { Box, Text, stringWidth, wrapText } from '@anthropic/ink'
+import { Box, Byline, KeyboardShortcutHint, Text, stringWidth, wrapText } from '@anthropic/ink'
+import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js'
 import {
   type AppState,
   useAppState,
@@ -63,6 +65,11 @@ export function CoordinatorTaskPanel(): React.ReactNode {
 
   const visibleTasks = getVisibleAgentTasks(tasks)
   const hasTasks = Object.values(tasks).some(isPanelAgentTask)
+  const killAllShortcut = useShortcutDisplay(
+    'chat:killAgents',
+    'Chat',
+    'ctrl+x ctrl+k',
+  )
 
   // 1s tick: re-render for elapsed time + evict tasks past their deadline.
   // The eviction deletes from prev.tasks, which makes useCoordinatorTaskCount
@@ -99,11 +106,45 @@ export function CoordinatorTaskPanel(): React.ReactNode {
     return null
   }
 
+  // Hint shown on the MainLine's right edge — byte-for-byte ant `V64` (5129.js).
+  // `focused` = the agent row the cursor is parked on (index 0 is "main", so
+  // index>0 maps to visibleTasks[index-1]). When an agent row is focused the
+  // hint is `Enter view · x clear/stop` (+ `stop all agents` when >1 running);
+  // otherwise (cursor on main, or panel unfocused) it's `↑/↓ select · Enter view`.
+  const focused =
+    selectedIndex !== undefined && selectedIndex > 0
+      ? visibleTasks[selectedIndex - 1]
+      : undefined
+  const runningCount = visibleTasks.filter(
+    t => !isTerminalStatus(t.status),
+  ).length
+  const hint = focused ? (
+    <Byline>
+      <KeyboardShortcutHint shortcut="Enter" action="view" />
+      <KeyboardShortcutHint
+        shortcut="x"
+        action={isTerminalStatus(focused.status) ? 'clear' : 'stop'}
+      />
+      {runningCount > 1 && (
+        <KeyboardShortcutHint
+          shortcut={killAllShortcut}
+          action="stop all agents"
+        />
+      )}
+    </Byline>
+  ) : (
+    <Byline>
+      <KeyboardShortcutHint shortcut="↑/↓" action="select" />
+      <KeyboardShortcutHint shortcut="Enter" action="view" />
+    </Byline>
+  )
+
   return (
     <Box flexDirection="column" marginTop={1}>
       <MainLine
         isSelected={selectedIndex === 0}
         isViewed={viewingAgentTaskId === undefined}
+        hint={hint}
         onClick={() => exitTeammateView(setAppState)}
       />
       {visibleTasks.map((task, i) => (
@@ -137,17 +178,22 @@ export function useCoordinatorTaskCount(): number {
 function MainLine({
   isSelected,
   isViewed,
+  hint,
   onClick,
 }: {
   isSelected?: boolean
   isViewed?: boolean
+  hint?: React.ReactNode
   onClick: () => void
 }): React.ReactNode {
   const [hover, setHover] = React.useState(false)
   const prefix = isSelected || hover ? figures.pointer + ' ' : '  '
   const bullet = isViewed ? BLACK_CIRCLE : figures.circle
+  // ant `ejO` (5129.js): the "main" label sits left, the hint right, via
+  // justifyContent: space-between on the row Box.
   return (
     <Box
+      justifyContent="space-between"
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -156,6 +202,7 @@ function MainLine({
         {prefix}
         {bullet} main
       </Text>
+      {hint}
     </Box>
   )
 }
@@ -166,6 +213,26 @@ type AgentLineProps = {
   isSelected?: boolean
   isViewed?: boolean
   onClick?: () => void
+}
+
+/**
+ * Bullet color by status — byte-for-byte ant `ojO` (5129.js): completed→success,
+ * failed→error, killed→inactive, running/pending→undefined (no color). ant
+ * conveys task state through the bullet COLOR alone; it has no play/pause
+ * separator glyph. Earlier ccb rendered a homerolled `▶`/`⏸` separator — removed
+ * to match `HJO`.
+ */
+function statusBulletColor(status: string): keyof Theme | undefined {
+  switch (status) {
+    case 'completed':
+      return 'success'
+    case 'failed':
+      return 'error'
+    case 'killed':
+      return 'inactive'
+    default:
+      return undefined
+  }
 }
 
 function AgentLine({
@@ -189,7 +256,8 @@ function AgentLine({
   const elapsed = formatDuration(elapsedMs)
   const tokenCount = task.progress?.tokenCount
 
-  // Derive direction arrow from activity state, same logic as Spinner
+  // Token-throughput direction arrow — lives INSIDE tokenText, not as a row
+  // separator (ant `ajO`: `progress.lastActivity ? arrowDown : arrowUp`).
   const lastActivity = task.progress?.lastActivity
   const arrow = lastActivity ? figures.arrowDown : figures.arrowUp
 
@@ -207,16 +275,16 @@ function AgentLine({
   const highlighted = isSelected || hover
   const prefix = highlighted ? figures.pointer + ' ' : '  '
   const bullet = isViewed ? BLACK_CIRCLE : figures.circle
+  const bulletColor = statusBulletColor(task.status)
   const dim = !highlighted && !isViewed
 
-  const sep = isRunning ? PLAY_ICON : PAUSE_ICON
   // Name is the steering handle — kept out of truncation and undimmed so it
   // stays readable even when the row is inactive. Short by convention (the
   // Agent tool prompt asks for "one or two words, lowercase").
   const namePart = name ? `${name}: ` : ''
   const hintPart =
     isSelected && !isViewed ? ` · x to ${isRunning ? 'stop' : 'clear'}` : ''
-  const suffixPart = ` ${sep} ${elapsed}${tokenText}${queuedText}${hintPart}`
+  const suffixPart = ` ${elapsed}${tokenText}${queuedText}${hintPart}`
   const availableForDesc =
     columns -
     stringWidth(prefix) -
@@ -232,7 +300,7 @@ function AgentLine({
   const line = (
     <Text dimColor={dim} bold={isViewed}>
       {prefix}
-      {bullet}{' '}
+      <Text color={bulletColor}>{bullet}</Text>{' '}
       {name && (
         <>
           <Text dimColor={false} bold>
@@ -241,7 +309,7 @@ function AgentLine({
           {': '}
         </>
       )}
-      {truncated} {sep} {elapsed}
+      {truncated} {elapsed}
       {tokenText}
       {queuedCount > 0 && <Text color="warning">{queuedText}</Text>}
       {hintPart && <Text dimColor>{hintPart}</Text>}

@@ -121,7 +121,7 @@
   "packages/tool-registry/src/services/toolExecution.ts": 1699,
   "packages/tool-registry/src/tasks/RemoteAgentTask.tsx": 1103,
   "packages/tool-registry/src/teleport.tsx": 1519,
-  "packages/tool-registry/src/tools/AgentTool/AgentTool.tsx": 1837,
+  "packages/tool-registry/src/tools/AgentTool/AgentTool.tsx": 1845,
   "packages/tool-registry/src/tools/AgentTool/UI.tsx": 1143,
   "packages/tool-registry/src/tools/AgentTool/runAgent.ts": 957,
   "packages/tool-registry/src/tools/BashTool/BashTool.tsx": 1505,

@@ -41,12 +41,6 @@ const STABLE_FEATURES = [
   'BUILTIN_EXPLORE_PLAN_AGENTS',
   'LODESTONE',
   'NEW_INIT',
-  // /fork slash command + Agent-tool fork path (ant v2.1.131 4659.js).
-  // The flag turns on FORK_AGENT, the buildForkedMessages helper, the
-  // /fork slash command, and the recursive-fork guard. Additional runtime
-  // gates inside isForkSubagentEnabled() exclude coordinator mode and -p
-  // non-interactive sessions.
-  'FORK_SUBAGENT',
   // OS-level background sessions: `ccb --bg "<task>"` + ccb ps/logs/kill/rm
   // (ant v2.1.131 5173.js dispatch). Detached spawn into
   // ~/.claude/jobs/<short>/; child outlives terminal close. Phase B MVP —
