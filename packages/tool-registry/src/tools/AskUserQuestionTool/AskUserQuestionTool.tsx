@@ -200,7 +200,11 @@ export const AskUserQuestionTool: Tool<InputSchema, Output> = buildTool({
   name: ASK_USER_QUESTION_TOOL_NAME,
   searchHint: 'prompt the user with a multiple-choice question',
   maxResultSizeChars: 100_000,
-  shouldDefer: true,
+  // NOT deferred: upstream ant v2.1.88 (the leaked sourcemap baseline) marked
+  // this shouldDefer, but ant removed it by v2.1.149 — AskUserQuestion is a
+  // first-turn interaction primitive the model must be able to call without a
+  // ToolSearch round-trip. Keeping it deferred forced a load-schema hop every
+  // time the model wanted to ask the user a question. Expose it inline.
   async description() {
     return DESCRIPTION
   },
