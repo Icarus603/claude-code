@@ -24,7 +24,10 @@ import {
 } from '@claude-code/tool-registry/tools/AgentTool/agentColorManager.js'
 import type { Theme } from '@anthropic/ink'
 import { KeyboardShortcutHint } from '@anthropic/ink'
-import { shouldHideTasksFooter } from './taskStatusUtils.js'
+import {
+  isBgAgentPanelEnabled,
+  shouldHideTasksFooter,
+} from './taskStatusUtils.js'
 
 type Props = {
   tasksSelected: boolean
@@ -51,7 +54,7 @@ export function BackgroundTaskStatus({
       (Object.values(tasks ?? {}) as TaskState[]).filter(
         t =>
           isBackgroundTask(t) &&
-          !(process.env.USER_TYPE === 'ant' && isPanelAgentTask(t)),
+          !(isBgAgentPanelEnabled() && isPanelAgentTask(t)),
       ),
     [tasks],
   )

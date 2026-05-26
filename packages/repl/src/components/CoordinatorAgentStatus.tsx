@@ -26,7 +26,12 @@ import {
 } from '@claude-code/agent/localAgentTask.js'
 import { formatDuration, formatNumber } from '@claude-code/output/formatters'
 import { evictTerminalTask } from '@claude-code/agent/taskFramework.js'
-import { isTerminalStatus } from './tasks/taskStatusUtils.js'
+import {
+  isBgAgentPanelEnabled,
+  isTerminalStatus,
+} from './tasks/taskStatusUtils.js'
+
+export { isBgAgentPanelEnabled }
 
 /**
  * Which panel-managed tasks currently have a visible row.
@@ -123,7 +128,7 @@ export function CoordinatorTaskPanel(): React.ReactNode {
 export function useCoordinatorTaskCount(): number {
   const tasks = useAppState(s => s.tasks)
   return React.useMemo(() => {
-    if ("external" !== 'ant') return 0
+    if (!isBgAgentPanelEnabled()) return 0
     const count = getVisibleAgentTasks(tasks).length
     return count > 0 ? count + 1 : 0
   }, [tasks])

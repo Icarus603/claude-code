@@ -209,7 +209,7 @@ export function isLocalAgentTask(task: unknown): task is LocalAgentTaskState {
 
 /**
  * A local_agent task that the CoordinatorTaskPanel manages (not main-session).
- * For ants, these render in the panel instead of the background-task pill.
+ * These render in the steerable panel instead of the background-task pill.
  * This is the ONE predicate that all pill/panel filters must agree on — if
  * the gate changes, change it here.
  */

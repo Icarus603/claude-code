@@ -4,6 +4,7 @@ import { Ansi, Box, Text } from '@anthropic/ink'
 import { FilePathLink } from '../FilePathLink.js'
 import { toInkColor } from '@claude-code/tool-registry/utils/inkColor.js'
 import type { Attachment } from '@claude-code/agent/attachments.js'
+import { isBgAgentPanelEnabled } from '../tasks/taskStatusUtils.js'
 import type { NullRenderingAttachmentType } from './nullRenderingAttachments.js'
 import { useAppState } from '../../appStateHooks.js'
 import { getDisplayPath } from '@claude-code/storage/file.js'
@@ -565,9 +566,10 @@ function TaskStatusMessage({
 }: {
   attachment: TaskStatusAttachment
 }): React.ReactNode {
-  // For ants, killed task status is shown in the CoordinatorTaskPanel.
-  // Don't render it again in the chat.
-  if (process.env.USER_TYPE === 'ant' && attachment.status === 'killed') {
+  // When the steerable panel is active, killed task status is shown in the
+  // CoordinatorTaskPanel. Don't render it again in the chat.
+  // ant 4000.js PX3: `if (F6H() && q.status === 'killed') return null`.
+  if (isBgAgentPanelEnabled() && attachment.status === 'killed') {
     return null
   }
 

@@ -19,6 +19,7 @@ import { isFullscreenEnvEnabled } from '../../fullscreen.js'
 import { isUndercover } from '@claude-code/tool-registry/undercover.js'
 import {
   CoordinatorTaskPanel,
+  isBgAgentPanelEnabled,
   useCoordinatorTaskCount,
 } from '../CoordinatorAgentStatus.js'
 import {
@@ -254,7 +255,7 @@ function PromptInputFooter({
           <BridgeStatusIndicator bridgeSelected={bridgeSelected} />
         </Box>
       </Box>
-      {process.env.USER_TYPE === 'ant' && <CoordinatorTaskPanel />}
+      {isBgAgentPanelEnabled() && <CoordinatorTaskPanel />}
     </>
   )
 }

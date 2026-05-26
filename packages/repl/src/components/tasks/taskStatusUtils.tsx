@@ -5,10 +5,31 @@
 import figures from 'figures'
 import type { InProcessTeammateTaskState } from '@claude-code/swarm'
 import type { TaskStatus } from '@claude-code/tool-registry/Task.js'
+import { getIsNonInteractiveSession } from '@claude-code/app-host/bootstrap/state.js'
 import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
 import { isBackgroundTask, type TaskState } from '../../tasksTypes.js'
 import type { DeepImmutable } from '@claude-code/tool-registry/genericTypeUtils'
 import { summarizeRecentActivities } from '@claude-code/tool-registry/collapseReadSearch.js'
+
+/**
+ * Whether the steerable background-agent panel (CoordinatorTaskPanel) is the
+ * surface for `local_agent` tasks (panel + steerable transcript view) rather
+ * than the read-only summary pill. ant gates this via `F6H()` (3973.js):
+ * `!nonInteractive && (env CLAUDE_CODE_FORK_SUBAGENT || GrowthBook
+ * tengu_copper_fox)`; the decompiler rendered every `F6H()` as
+ * `USER_TYPE === 'ant'`, pinning it OFF for ccb (same class as the fullscreen
+ * `j9` gate). ant renders the panel UNCONDITIONALLY and self-gates on empty.
+ *
+ * ccb (solo operator, no GrowthBook rollout) treats the flag arm as always-on,
+ * so this reduces to ant's `!nonInteractive` guard — the panel is the surface
+ * for every interactive session. Headless `-p` runs through AgentLoop and never
+ * renders this tree, so the guard is belt-and-suspenders, but it keeps intent
+ * explicit. Lives in this dependency-free leaf so every panel/pill filter
+ * shares one chokepoint without an import cycle.
+ */
+export function isBgAgentPanelEnabled(): boolean {
+  return !getIsNonInteractiveSession()
+}
 
 /**
  * Returns true if the given task status represents a terminal (finished) state.
@@ -96,8 +117,8 @@ export function describeTeammateActivity(
  * teammate (teammates are shown in the spinner tree instead).
  *
  * Uses the same task filtering as BackgroundTaskStatus: `isBackgroundTask()`
- * plus exclusion of panel-managed agent tasks for ants (those are shown
- * by CoordinatorTaskPanel).
+ * plus exclusion of panel-managed agent tasks when the steerable panel is
+ * active (those are shown by CoordinatorTaskPanel).
  */
 export function shouldHideTasksFooter(
   tasks: { [taskId: string]: TaskState },
@@ -108,7 +129,7 @@ export function shouldHideTasksFooter(
   for (const t of Object.values(tasks) as TaskState[]) {
     if (
       !isBackgroundTask(t) ||
-      (process.env.USER_TYPE === 'ant' && isPanelAgentTask(t))
+      (isBgAgentPanelEnabled() && isPanelAgentTask(t))
     ) {
       continue
     }

@@ -29,7 +29,10 @@ import {
 import { BackgroundTaskStatus } from '../tasks/BackgroundTaskStatus.js'
 import { isBackgroundTask } from '../../tasksTypes.js'
 import { isPanelAgentTask } from '@claude-code/agent/localAgentTask.js'
-import { getVisibleAgentTasks } from '../CoordinatorAgentStatus.js'
+import {
+  getVisibleAgentTasks,
+  isBgAgentPanelEnabled,
+} from '../CoordinatorAgentStatus.js'
 import { count } from '@claude-code/tool-registry/utils/array.js'
 import { shouldHideTasksFooter } from '../tasks/taskStatusUtils.js'
 import { isAgentSwarmsEnabled } from '@claude-code/agent/agentSwarmsEnabled.js'
@@ -274,7 +277,7 @@ function ModeIndicator({
         Object.values(tasks),
         t =>
           isBackgroundTask(t) &&
-          !(process.env.USER_TYPE === 'ant' && isPanelAgentTask(t)),
+          !(isBgAgentPanelEnabled() && isPanelAgentTask(t)),
       ),
     [tasks],
   )
@@ -558,7 +561,7 @@ function ModeIndicator({
 
   // Add "↓ to manage tasks" hint when panel has visible rows
   const hasCoordinatorTasks =
-    process.env.USER_TYPE === 'ant' && getVisibleAgentTasks(tasks).length > 0
+    isBgAgentPanelEnabled() && getVisibleAgentTasks(tasks).length > 0
 
   // Tasks pill renders as a Box sibling (not a parts entry) so its
   // click-target Box isn't nested inside <Text wrap="truncate"> — the

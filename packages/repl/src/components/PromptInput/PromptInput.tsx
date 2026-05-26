@@ -189,6 +189,7 @@ import { BridgeDialog } from '../BridgeDialog.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
 import {
   getVisibleAgentTasks,
+  isBgAgentPanelEnabled,
   useCoordinatorTaskCount,
 } from '../CoordinatorAgentStatus.js'
 import { getEffortNotificationText } from '../EffortIndicator.js'
@@ -575,7 +576,7 @@ function PromptInput({
       Object.values(tasks).some(
         t =>
           isBackgroundTask(t) &&
-          !(process.env.USER_TYPE === 'ant' && isPanelAgentTask(t)),
+          !(isBgAgentPanelEnabled() && isPanelAgentTask(t)),
       ),
     [tasks],
   )
@@ -655,7 +656,7 @@ function PromptInput({
   // something is running.
   const tasksFooterVisible =
     (runningTaskCount > 0 ||
-      (process.env.USER_TYPE === 'ant' && coordinatorTaskCount > 0)) &&
+      (isBgAgentPanelEnabled() && coordinatorTaskCount > 0)) &&
     !shouldHideTasksFooter(tasks, showSpinnerTree)
   const teamsFooterVisible = cachedTeams.length > 0
 
@@ -2310,7 +2311,7 @@ function PromptInput({
         // ↑ scrolls within the coordinator task list before leaving the pill
         if (
           tasksSelected &&
-          process.env.USER_TYPE === 'ant' &&
+          isBgAgentPanelEnabled() &&
           coordinatorTaskCount > 0 &&
           coordinatorTaskIndex > minCoordinatorIndex
         ) {
@@ -2321,11 +2322,7 @@ function PromptInput({
       },
       'footer:down': () => {
         // ↓ scrolls within the coordinator task list, never leaves the pill
-        if (
-          tasksSelected &&
-          process.env.USER_TYPE === 'ant' &&
-          coordinatorTaskCount > 0
-        ) {
+        if (tasksSelected && isBgAgentPanelEnabled() && coordinatorTaskCount > 0) {
           if (coordinatorTaskIndex < coordinatorTaskCount - 1) {
             setCoordinatorTaskIndex(prev => prev + 1)
           }
