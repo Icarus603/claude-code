@@ -629,6 +629,18 @@ export async function getGcsDistTags(): Promise<NpmDistTags> {
   return { latest, stable }
 }
 
+// Dist-tags for ccb native installs (doctor "Updates" panel). Thin
+// facade over githubReleases — re-exposed here so the doctor screen gets
+// all three dist-tag sources (GCS / npm / GitHub) from one entrypoint
+// without growing the package export-surface budget. Dynamic import
+// mirrors getLatestVersion above and keeps the autoUpdater→githubReleases
+// edge off the static cycle graph. See githubReleases.getGithubDistTags
+// for why native ccb must resolve "latest" from GitHub, not GCS.
+export async function getGithubDistTags(): Promise<NpmDistTags> {
+  const { getGithubDistTags: impl } = await import('./githubReleases.js')
+  return impl()
+}
+
 /**
  * Get version history from npm registry (ant-only feature)
  * Returns versions sorted newest-first, limited to the specified count

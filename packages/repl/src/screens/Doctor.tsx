@@ -28,6 +28,7 @@ import { useAppState } from '../appStateHooks.js'
 import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
 import {
   getGcsDistTags,
+  getGithubDistTags,
   getNpmDistTags,
   type NpmDistTags,
 } from '@claude-code/updater/autoUpdater.js'
@@ -124,8 +125,17 @@ export function Doctor({ onDone }: Props): React.ReactNode {
   const distTagsPromise = useMemo(
     () =>
       getDoctorDiagnostic().then(diag => {
-        const fetchDistTags =
-          diag.installationType === 'native' ? getGcsDistTags : getNpmDistTags
+        // ccb native installs publish to GitHub Releases (26.x CalVer);
+        // only ant-internal native installs use the Anthropic GCS bucket
+        // (2.1.x). Mixing them made the doctor report an unreachable
+        // upstream version. npm/global installs still use npm dist-tags.
+        let fetchDistTags: () => Promise<NpmDistTags>
+        if (diag.installationType === 'native') {
+          fetchDistTags =
+            process.env.USER_TYPE === 'ant' ? getGcsDistTags : getGithubDistTags
+        } else {
+          fetchDistTags = getNpmDistTags
+        }
         return fetchDistTags().catch(() => ({ latest: null, stable: null }))
       }),
     [],
