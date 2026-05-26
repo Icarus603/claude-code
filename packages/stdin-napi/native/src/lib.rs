@@ -121,6 +121,54 @@ mod unix_impl {
   pub fn active_reader_count() -> i32 {
     ACTIVE_READERS.load(Ordering::SeqCst)
   }
+
+  /// Pin fd 0 in raw mode for an ENTIRE FleetView subsystem session, decoupled
+  /// from any single reader's lifetime.
+  ///
+  /// ## Why this exists (the `^[[C` cooked-echo bug)
+  ///
+  /// The per-reader refcount (fd0_acquire_raw on start, fd0_release_raw on stop)
+  /// only keeps fd 0 raw while readers OVERLAP. ccb's FleetView handoff is
+  /// SERIAL, not overlapping: the REPL→FleetView reader stops (refcount → 0 →
+  /// fd 0 flips back to COOKED) BEFORE the attach reader starts, and the attach
+  /// reader stops before the next FleetView reader starts. In every gap fd 0
+  /// sits in cooked+echo for the duration of an async, multi-tick transition
+  /// (Ink remount, `await import`, and — worst — fleetAttach polling pty.sock
+  /// for up to 10s). Any keystroke in that window is echoed by the tty line
+  /// discipline, surfacing as visible `^[[C` / `^[[D` garbage.
+  ///
+  /// ant has no such window: its fd 0 enters raw when the first Ink App mounts
+  /// and stays raw for the whole FleetView subsystem — the attach client's
+  /// detach only restores cooked `if (!enteredRaw)` (2337.js handleSetRawMode
+  /// gated on `!isHandoffRawMode`; 4945.js `if (!C) ON(q,false)`), and since the
+  /// outer FleetView entered raw, attach never flips it back. fd 0 is raw from
+  /// the moment you enter the subsystem until you leave it entirely.
+  ///
+  /// `pin_fd0_raw()` reproduces that invariant: the bridge calls it ONCE when
+  /// entering the FleetView subsystem (after the REPL unmount). It bumps the
+  /// SAME `FD0_RAW_REFCOUNT` the readers use, capturing the cooked baseline if
+  /// fd 0 isn't raw yet. The pin holds a +1 reference across the entire
+  /// subsystem, so even when every reader has stopped (refcount would otherwise
+  /// be 0) the pin keeps it ≥ 1 → fd 0 never flips to cooked → no echo window.
+  /// `unpin_fd0_raw()` drops the pin when the whole fleet loop exits (back to
+  /// the foreground REPL / process shutdown); the last release restores cooked.
+  ///
+  /// Idempotent per process is NOT assumed — the JS side guards against double
+  /// pin/unpin. Scoped to the shared-fd-0 path; redirect-mode readers own a
+  /// private dup and are unaffected.
+  #[napi]
+  pub fn pin_fd0_raw() -> Result<()> {
+    unsafe { fd0_acquire_raw() }.map_err(|m| Error::from_reason(format!("stdin-napi: {m}")))
+  }
+
+  /// Release the subsystem raw-mode pin taken by {@link pin_fd0_raw}. The last
+  /// outstanding fd-0 raw reference (pin or reader) restores the cooked
+  /// baseline. Safe to call even if no pin is held (clamped at 0).
+  #[napi]
+  pub fn unpin_fd0_raw() {
+    unsafe { fd0_release_raw() }
+  }
+
   use napi_derive::napi;
 
   /// JS-visible handle to a running reader. Hold it; call `.stop()` to tear

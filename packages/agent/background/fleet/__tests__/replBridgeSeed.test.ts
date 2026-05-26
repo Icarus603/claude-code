@@ -209,4 +209,60 @@ describe('preSeedReplBgJob', () => {
       rmSync(root, { recursive: true, force: true })
     }
   })
+
+  test('INVARIANT: respawn metadata persisted for the dead-worker respawn path', async () => {
+    // The forked worker's OWN transcript (sessionId) may not be flushed when a
+    // right-arrow respawn is needed; the respawn must resume the ORIGINAL
+    // foreground transcript instead. preSeedReplBgJob persists resumeSessionId
+    // (= original session) + respawnFlags so fleetAttach's respawnThenAttach
+    // (ant V__) can rebuild `--resume <orig> --fork-session`. Without this the
+    // respawn booted a blank session — the "Welcome back, brand-new REPL" bug.
+    const root = mkdtempSync(join(tmpdir(), 'preseed-'))
+    const orig = process.env.CLAUDE_CONFIG_HOME
+    process.env.CLAUDE_CONFIG_HOME = root
+    const ORIGINAL_SESSION = '35894943-c5e0-45a0-9484-f113daa5835b'
+    try {
+      const { jobDir } = await preSeedReplBgJob('b0649465deadbeef', {
+        cwd: '/tmp/work',
+        resumeSessionId: ORIGINAL_SESSION,
+        respawnFlags: ['--fork-session'],
+      })
+      const state = JSON.parse(
+        readFileSync(join(jobDir, 'state.json'), 'utf8'),
+      )
+      // resumeSessionId is the ORIGINAL session (whose transcript is on disk),
+      // NOT the forked worker id (b0649465deadbeef).
+      expect(state.resumeSessionId).toBe(ORIGINAL_SESSION)
+      expect(state.sessionId).toBe('b0649465deadbeef')
+      expect(state.sessionId).not.toBe(state.resumeSessionId)
+      expect(state.respawnFlags).toEqual(['--fork-session'])
+    } finally {
+      if (orig === undefined) delete process.env.CLAUDE_CONFIG_HOME
+      else process.env.CLAUDE_CONFIG_HOME = orig
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  test('no respawn metadata → empty respawnFlags, undefined resumeSessionId', async () => {
+    // The brand-new-session path (no foreground transcript yet) passes neither
+    // — the row stays self-sufficient (sessionId only) and a respawn would fall
+    // through to a fresh worker, matching ant's no-transcript branch.
+    const root = mkdtempSync(join(tmpdir(), 'preseed-'))
+    const orig = process.env.CLAUDE_CONFIG_HOME
+    process.env.CLAUDE_CONFIG_HOME = root
+    try {
+      const { jobDir } = await preSeedReplBgJob('cafef00d12345678', {
+        cwd: '/tmp/work',
+      })
+      const state = JSON.parse(
+        readFileSync(join(jobDir, 'state.json'), 'utf8'),
+      )
+      expect(state.respawnFlags).toEqual([])
+      expect(state.resumeSessionId).toBeUndefined()
+    } finally {
+      if (orig === undefined) delete process.env.CLAUDE_CONFIG_HOME
+      else process.env.CLAUDE_CONFIG_HOME = orig
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
 })

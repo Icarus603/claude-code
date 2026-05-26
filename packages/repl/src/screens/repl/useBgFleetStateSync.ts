@@ -31,7 +31,14 @@
  */
 
 import { useEffect, useRef } from 'react'
-import type { MessageType } from '@claude-code/agent/messages.js'
+// The conversation list is an array of Message OBJECTS, not MessageType (the
+// 'user'|'assistant'|… string union). The old `import { MessageType } from
+// '.../messages.js'` was doubly wrong: messages.js doesn't re-export the name
+// (TS2459), and even resolved it's the string union — the callers below do
+// `m.type === 'assistant'` / `m.message.content`, i.e. they operate on Message
+// objects. REPLView passes its `Message[]` here (it aliases `Message as
+// MessageType` locally). Import the canonical Message object type.
+import type { Message } from '@claude-code/agent/messageShapes.js'
 import {
   readJobState,
   writeJobState,
@@ -90,7 +97,7 @@ function flattenAssistantReply(text: string, maxChars: number): string {
  * by the text-inference path to decide whether the turn ended on a
  * question, a failure, or a normal completion.
  */
-function lastAssistantText(messages: readonly MessageType[]): string {
+function lastAssistantText(messages: readonly Message[]): string {
   for (let i = messages.length - 1; i >= 0; i--) {
     const m = messages[i]
     if (m && m.type === 'assistant' && 'message' in m) {
@@ -116,7 +123,7 @@ function lastAssistantText(messages: readonly MessageType[]): string {
  * row label switches from "current session"/"new session" to the prompt
  * snippet and the namer (gated on intent.length>0) can fire.
  */
-function lastUserText(messages: readonly MessageType[]): string {
+function lastUserText(messages: readonly Message[]): string {
   for (let i = messages.length - 1; i >= 0; i--) {
     const m = messages[i]
     if (m && m.type === 'user' && 'isMeta' in m && m.isMeta === true) continue
@@ -185,7 +192,7 @@ function inferTurnOutcome(text: string): {
 
 export function useBgFleetStateSync(
   isLoading: boolean,
-  messages: readonly MessageType[],
+  messages: readonly Message[],
 ): void {
   const previousLoadingRef = useRef<boolean | null>(null)
   const messagesRef = useRef(messages)

@@ -41,12 +41,51 @@ interface NativeBinding {
     onChunk: (err: Error | null, chunk: Buffer) => void,
   ): ReaderHandle
   activeReaderCount(): number
+  pinFd0Raw(): void
+  unpinFd0Raw(): void
 }
 
 /** Number of live rust reader threads. >1 means a stale reader leaked. */
 export function activeReaderCount(): number {
   const n = load()
   return n ? n.activeReaderCount() : 0
+}
+
+/**
+ * Pin fd 0 in raw mode for the ENTIRE FleetView subsystem, independent of any
+ * single reader's start/stop. Call ONCE when entering the subsystem (after the
+ * REPL unmount, before the FleetView mount). This closes the cooked-echo
+ * window (`^[[C` garbage) that the per-reader refcount leaves open during a
+ * SERIAL handoff — reader#1 stop → (no reader, fd 0 would flip to cooked) →
+ * reader#2 start. The pin holds the underlying refcount ≥ 1 across every gap,
+ * mirroring ant's "fd 0 stays raw for the whole subsystem" invariant. No-op if
+ * the native module is unavailable (the standard process.stdin path manages
+ * raw mode itself). See native/src/lib.rs pin_fd0_raw.
+ */
+export function pinFd0Raw(): void {
+  const native = load()
+  if (native === null) return
+  try {
+    native.pinFd0Raw()
+  } catch {
+    // best-effort; reader path still sets raw on each start
+  }
+}
+
+/**
+ * Release the subsystem raw-mode pin taken by {@link pinFd0Raw}. Call ONCE when
+ * leaving the FleetView subsystem entirely (fleet loop quit / process exit).
+ * The last outstanding fd-0 raw reference restores the original cooked termios.
+ * No-op if unavailable.
+ */
+export function unpinFd0Raw(): void {
+  const native = load()
+  if (native === null) return
+  try {
+    native.unpinFd0Raw()
+  } catch {
+    // best-effort
+  }
 }
 
 let cached: NativeBinding | null = null

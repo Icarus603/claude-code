@@ -40,6 +40,11 @@ import {
   preSeedReplBgJob,
 } from '@claude-code/agent/background/fleet/replBridgeSeed.js'
 import type { Message } from '@claude-code/agent/messageShapes.js'
+// Static import (not `await import`): this whole module is itself lazily
+// imported by REPLView only on the left-arrow press, so pulling stdin-napi in
+// statically here does NOT touch the REPL boot path, and it keeps the
+// pin/unpin exports visible to knip (a dynamic import would read as unused).
+import { pinFd0Raw, unpinFd0Raw } from 'stdin-napi'
 
 /**
  * Open FleetView from the REPL, backgrounding the current conversation as a
@@ -92,6 +97,13 @@ export async function openAgentsFromReplLeftArrow(
       intent: effectiveSeed.intent,
       detail: effectiveSeed.detail,
       cwd,
+      // Respawn metadata (ant V__/4952.js reads these from state.json). If the
+      // worker dies before the user right-arrows back, fleetAttach must respawn
+      // it resuming the ORIGINAL foreground transcript (on disk) with a fresh
+      // fork — never the forked worker's own id (not flushed yet) and never a
+      // blank session. Only meaningful when the foreground transcript exists.
+      resumeSessionId: transcriptExists ? currentSessionId : undefined,
+      respawnFlags: transcriptExists ? ['--fork-session'] : [],
     }))
   } catch (e) {
     return `Cannot open agents — ${e instanceof Error ? e.message : String(e)}`
@@ -179,10 +191,39 @@ export async function openAgentsFromReplLeftArrow(
   } catch {
     // best-effort; proceed to mount FleetView even if unmount throws
   }
+
+  // Pin fd 0 in raw mode for the WHOLE FleetView subsystem now — AFTER the REPL
+  // unmount put fd 0 back to cooked (App.handleSetRawMode(false)), so the pin
+  // captures the genuine cooked baseline, and BEFORE the FleetView mount starts
+  // its first reader. This holds the reader refcount ≥ 1 across every serial
+  // reader handoff inside the subsystem (REPL→FleetView, FleetView→attach,
+  // attach→FleetView), so fd 0 never flips back to cooked in the gaps — closing
+  // the `^[[C` cooked-echo window. Mirrors ant's invariant: fd 0 is raw from
+  // entering the FleetView subsystem until leaving it entirely. The matching
+  // unpin runs when the fleet loop quits (agentsFleetHandler, on type==='quit').
+  try {
+    pinFd0Raw()
+  } catch {
+    // best-effort; the reader still sets raw on each start (degraded: the
+    // cooked-echo window reappears, but input still works)
+  }
+
   await new Promise<void>(resolve => setImmediate(resolve))
   process.env.CLAUDE_AGENTS_SELECT = short
 
   const { agentsFleetHandler } = await import('../handlers/agentsFleet.js')
   await agentsFleetHandler()
+
+  // Leaving the FleetView subsystem entirely (the loop only returns on quit).
+  // Release the raw-mode pin so fd 0 returns to the cooked baseline before the
+  // process exits — otherwise the shell inherits a raw tty (no echo, no line
+  // editing). The last fd-0 raw reference (this pin, all readers already
+  // stopped) restores cooked.
+  try {
+    unpinFd0Raw()
+  } catch {
+    // best-effort
+  }
+
   process.exit(0)
 }

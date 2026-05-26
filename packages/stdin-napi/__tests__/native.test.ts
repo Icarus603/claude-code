@@ -11,7 +11,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { isReaderSupported } from '../src/index.js'
+import { isReaderSupported, pinFd0Raw, unpinFd0Raw } from '../src/index.js'
 
 const isUnix = process.platform !== 'win32'
 
@@ -23,6 +23,21 @@ describe('isReaderSupported', () => {
       // On the CI/dev unix box the vendored .node for this arch must load.
       expect(isReaderSupported()).toBe(true)
     }
+  })
+})
+
+describe('fd0 raw pin', () => {
+  // The native pin needs a real tty (tcgetattr fd 0). In bun:test fd 0 is not
+  // a tty, so pinFd0Raw's underlying set_raw fails — the JS wrapper swallows
+  // it. The contract under test here is the JS-level safety: pin/unpin never
+  // throw and unpin without a prior pin is a no-op. The raw-mode behaviour
+  // itself (refcount holds across serial reader handoff → no cooked echo
+  // window) is covered by the pty test below.
+  test('pin / unpin are no-throw and balanced (non-tty fd 0 in bun:test)', () => {
+    expect(() => pinFd0Raw()).not.toThrow()
+    expect(() => unpinFd0Raw()).not.toThrow()
+    // Unbalanced unpin is clamped, not a crash.
+    expect(() => unpinFd0Raw()).not.toThrow()
   })
 })
 

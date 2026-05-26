@@ -143,6 +143,24 @@ export interface PreSeedOptions {
   worktreeHookBased?: boolean
   originCwd?: string
   memoryToggledOff?: boolean
+  /**
+   * Session id the worker should `--resume` if it dies and the FleetView
+   * right-arrow has to respawn it. For the left-arrow bridge this is the
+   * ORIGINAL foreground session (the one whose transcript the worker forked
+   * from) — NOT the forked id, because the forked worker's own transcript may
+   * not exist on disk yet when a respawn is needed. Mirrors ant `V__`
+   * (4952.js) reading `resumeSessionId ?? sessionId` from state.json to build
+   * `--resume`. Persisted into state.json so the respawn path can rebuild the
+   * same `--resume <orig> --fork-session` flags the original spawn used.
+   */
+  resumeSessionId?: string
+  /**
+   * Flags to re-spawn the worker with if it dies (ant `K.respawnFlags`,
+   * 4774.js). For the left-arrow bridge this is the SAME fork flags the worker
+   * booted with, minus `--resume`/`--session-id` (those are rebuilt from
+   * resumeSessionId at respawn time). Persisted into state.json.
+   */
+  respawnFlags?: readonly string[]
 }
 
 /**
@@ -184,11 +202,16 @@ export async function preSeedReplBgJob(
     children: null,
     linkScanOffset: 0,
     template: 'bg',
-    respawnFlags: [],
+    respawnFlags: opts.respawnFlags ? [...opts.respawnFlags] : [],
     intent,
     name: opts.name,
     nameSource: opts.nameSource,
     sessionId,
+    // ant V__ (4952.js) builds the respawn `--resume` from `resumeSessionId ??
+    // sessionId`. For the left-arrow bridge the worker forked from the original
+    // foreground session, so a respawn must resume THAT transcript (which is on
+    // disk), not the forked worker's own id (which may not be flushed yet).
+    resumeSessionId: opts.resumeSessionId,
     daemonShort: short,
     cwd: opts.cwd,
     createdAt: now,

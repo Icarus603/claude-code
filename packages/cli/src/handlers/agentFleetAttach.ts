@@ -14,15 +14,27 @@
  * dispatched but the socket hasn't appeared yet. This is the ant-aligned
  * "wait for worker to be reachable" step.
  *
- * Two paths in ccb:
+ * Two paths in ccb — BOTH go through the daemon, NEVER a foreground REPL.
+ * This mirrors ant `$nK` (4951.js): every attach connects to a daemon-managed
+ * worker over its PTY socket; ant has NO codepath that spawns a foreground
+ * REPL on the user's TTY. Failures surface as an error string → the
+ * agentsFleet loop shows a toast and remounts FleetView (ant Ot3 `J = k.msg`).
+ *
  *   1. Live PTY socket (meta.ptySocket or <jobDir>/pty.sock exists, OR
  *      appears within budget): runAttach connects to it. Sub-100ms once
  *      the socket is live. Used for fresh dispatches + existing alive
  *      workers.
- *   2. Truly orphaned (state.json exists but no meta.json or socket
- *      after polling): spawn a fresh ccb REPL inheriting the user's TTY
- *      via spawnSync. This is the "old job — start a new conversation
- *      in this cwd" fallback.
+ *   2. Dead/orphaned (state.json exists but no live socket after polling):
+ *      RESPAWN the worker through the daemon (spawnBgPty, --resume the
+ *      original transcript with a fresh fork) so a new pty.sock appears, then
+ *      runAttach to it. Port of ant `V__` (4952.js) — the respawn produces
+ *      another bg worker, NOT a foreground REPL. The previous ccb behaviour
+ *      (spawnSync a fresh ccb inheriting the TTY) was ccb-invented and WRONG:
+ *      it dropped the user into a brand-new "Welcome back" session whenever the
+ *      forked worker's own transcript wasn't on disk yet, AND its foreground
+ *      REPL stole the tty (a second source of the cooked-echo `^[[C` garbage,
+ *      since stdin raw mode is released during the ink unmount that precedes
+ *      this call). Removed entirely.
  *
  * NOTE: pause/suspendStdin/resume is gone — the caller (agentsFleet.ts
  * loop) unmounts the FleetView Ink root BEFORE calling this and mounts
@@ -30,12 +42,9 @@
  * avoids the frame-buffer drift that broke the return-to-FleetView path.
  */
 
-import { spawnSync } from 'node:child_process'
 import { existsSync, openSync, readSync, closeSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-
-import { getDefaultLauncher } from '@claude-code/repl/relaunch.js'
 
 /**
  * Source: ant 4774.js spare-ready loop uses 10s budget (`Date.now() + 10_000`).
@@ -106,15 +115,6 @@ function readFleetState(short: string): FleetState | null {
   }
 }
 
-function buildCcbArgv(extraArgs: readonly string[]): { cmd: string; args: string[] } {
-  // ant 5286.js uKO equivalent — getDefaultLauncher (ccb's Pb) handles
-  // both `bun cli.js` dev mode and compiled standalone binaries. The
-  // old `process.argv0.endsWith('bun')` heuristic mis-detected
-  // standalone — see packages/cli/src/bg/spawnPty.ts incident write-up.
-  const launcher = getDefaultLauncher({ pinToCurrentBinary: true })
-  return { cmd: launcher.cmd, args: [...launcher.prefixArgs, ...extraArgs] }
-}
-
 export async function fleetAttach(short: string): Promise<void> {
   const meta = readMeta(short)
   const state = readFleetState(short)
@@ -133,19 +133,17 @@ export async function fleetAttach(short: string): Promise<void> {
   // For fresh dispatches, ant's kZ6 gives the worker time to become
   // reachable before attach. ccb mirrors by polling for pty.sock.
   //
-  // Why poll instead of slow-spawn immediately: spawnBgPty's spawnPtyHost
+  // Why poll instead of respawning immediately: spawnBgPty's spawnPtyHost
   // fork is synchronous but the bg-pty-host child still has to bun-boot
   // + bundle-eval + create Bun.Terminal + server.listen — ~500ms-1s on
   // warm cache, up to ~3s cold. Without a poll, fresh-dispatch +
-  // right-arrow within that window saw `existsSync(pty.sock) === false`
-  // and fell to the spawnSync slow path → ANOTHER ~1-2s bun boot + a
-  // brand-new REPL that DIDN'T attach to the bg worker we just
-  // dispatched. The user perceives 2-4s of dead time and lands in the
-  // wrong REPL.
+  // right-arrow within that window would see `existsSync(pty.sock) === false`
+  // and respawn an already-booting worker. Poll first; respawn only when
+  // the socket genuinely never appears.
   //
   // Heuristic: if meta.json was written (= ccb dispatched a worker),
   // the pty.sock IS coming — poll. Otherwise (orphan with only
-  // state.json), fall straight through to slow-path.
+  // state.json), go straight to respawn.
   let hasLivePty = existsSync(ptySocketPath)
   if (!hasLivePty && meta !== null) {
     const deadline = Date.now() + PTY_SOCK_WAIT_BUDGET_MS
@@ -159,38 +157,74 @@ export async function fleetAttach(short: string): Promise<void> {
   }
 
   if (hasLivePty) {
-    try {
-      const { runAttach } = await import('../bg/attachClient.js')
-      await runAttach(ptySocketPath, short)
-      return
-    } catch (err) {
-      process.stderr.write(`pty attach failed: ${(err as Error).message}\n`)
-      // Fall through to spawnSync path.
-    }
+    const { runAttach } = await import('../bg/attachClient.js')
+    // Let runAttach errors propagate — the agentsFleet loop catches them into
+    // `initialError` and shows a toast on remount (ant Ot3). Do NOT swallow +
+    // fall to a foreground spawn (the old bug).
+    await runAttach(ptySocketPath, short)
+    return
   }
 
-  // SLOW path — no live PTY worker. Source: ant 4774.js GsH respawn flag
-  // build:
-  //   let w = $.resumeSessionId ?? K.sessionId
-  //   let j = path.join(history, `${w}.jsonl`)
-  //   let J = await qOH(j)                       // jsonl exists?
-  //   let f = [...J?["--resume",w]:[], ...D, ...M?["--",M]:[]]
-  // So when the on-disk transcript exists, ant respawns with --resume
-  // to load the conversation. ccb previously spawned a brand-new REPL
-  // without --resume, losing the conversation on attach to an
-  // orphaned/exited job.
-  const cwd = state?.cwd ?? process.cwd()
-  const flags = state?.respawnFlags ?? []
-  const resumeSessionId = state?.resumeSessionId ?? state?.sessionId
-  const resumeArgs = resumeSessionId !== undefined && resumeSessionId !== ''
-    ? buildResumeArgsIfTranscriptExists(cwd, resumeSessionId)
-    : []
-  const { cmd, args } = buildCcbArgv([...resumeArgs, ...flags])
-  spawnSync(cmd, args, {
+  // DEAD/ORPHANED — no live PTY worker. Respawn through the daemon (ant
+  // `V__`, 4952.js): produce ANOTHER bg worker (resuming the original
+  // transcript with a fresh fork) so a new pty.sock appears, then attach to
+  // it. NEVER spawn a foreground REPL — ant has no such path, and one would
+  // both land the user in the wrong session and steal the tty (cooked-echo
+  // `^[[C`).
+  await respawnThenAttach(short, state)
+}
+
+/**
+ * Respawn a dead worker through the daemon and attach to its fresh PTY socket.
+ * Port of ant `V__` (4952.js): the respawn rebuilds `--resume <id>
+ * --fork-session` from state.json (`resumeSessionId ?? sessionId`, gated on the
+ * transcript existing) and dispatches a new bg worker via spawnBgPty. Throws if
+ * the respawn can't produce a reachable socket — the caller turns that into a
+ * FleetView error toast (ant Ot3 `J = k.msg`).
+ */
+async function respawnThenAttach(
+  short: string,
+  state: FleetState | null,
+): Promise<void> {
+  if (state === null) {
+    throw new Error(`session ${short} is gone (no saved state to respawn)`)
+  }
+  const cwd = state.cwd ?? process.cwd()
+  // ant V__: `w = $.resumeSessionId ?? K.sessionId`. For the left-arrow bridge
+  // resumeSessionId is the ORIGINAL foreground session (its transcript is on
+  // disk); sessionId is the forked worker id (may not be flushed). Prefer the
+  // former — it's what makes the respawn inherit the conversation instead of
+  // booting blank.
+  const resumeSessionId = state.resumeSessionId ?? state.sessionId
+  const resumeArgs =
+    resumeSessionId !== undefined && resumeSessionId !== ''
+      ? buildResumeArgsIfTranscriptExists(cwd, resumeSessionId)
+      : []
+  // ant i1O: `--resume` always pairs with `--fork-session` so the respawn gets
+  // a fresh id and never contends with the original transcript's file.
+  const forkFlags = resumeArgs.length > 0 ? ['--fork-session'] : []
+  const flags = [...resumeArgs, ...forkFlags, ...(state.respawnFlags ?? [])]
+
+  const { spawnBgPty } = await import('../bg.js')
+  // Reuse the SAME short so the FleetView row, job dir, and new socket all
+  // stay in sync (ant keeps the daemonShort stable across respawn). Empty
+  // directive: a --resume worker inherits its transcript and must NOT re-run a
+  // prompt (same invariant as the left-arrow spawn). Poll long enough for the
+  // worker to bind its socket.
+  const { socketPath } = await spawnBgPty({
+    short,
+    flags,
+    directive: '',
     cwd,
-    stdio: 'inherit',
-    env: { ...process.env, CCB_FLEET_ATTACH_CHILD: '1' },
+    quiet: true,
+    waitForSocketMs: PTY_SOCK_WAIT_BUDGET_MS,
   })
+
+  if (!existsSync(socketPath)) {
+    throw new Error(`couldn't restart session ${short} (worker never came up)`)
+  }
+  const { runAttach } = await import('../bg/attachClient.js')
+  await runAttach(socketPath, short)
 }
 
 /**
