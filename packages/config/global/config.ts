@@ -1,7 +1,6 @@
 import { feature } from 'bun:bundle'
 import { randomBytes } from 'crypto'
 import { unwatchFile, watchFile } from 'fs'
-import { homedir } from 'os'
 import memoize from 'lodash-es/memoize.js'
 import pickBy from 'lodash-es/pickBy.js'
 import { basename, dirname, join, resolve } from 'path'
@@ -777,74 +776,28 @@ export const PROJECT_CONFIG_KEYS = [
 type ProjectConfigKey = (typeof PROJECT_CONFIG_KEYS)[number]
 
 /**
- * Check if the user has already accepted the trust dialog for the cwd.
+ * Workspace trust check — always returns true in ccb.
  *
- * This function traverses parent directories to check if a parent directory
- * had approval. Accepting trust for a directory implies trust for child
- * directories.
+ * ccb is solo-maintained and the binary runs locally for whoever installed
+ * it: the operator owns the machine and is the sole trust principal. The
+ * upstream "Accessing workspace / Quick safety check" dialog exists to guard
+ * a hosted/multi-tenant boundary that ccb does not have, so it was pure
+ * friction here (re-prompting per-folder, and forever in ~ because home-dir
+ * trust was session-scoped). We removed it entirely rather than leave the
+ * incoherent "home silent, every other dir asks once" middle state.
  *
- * @returns Whether the trust dialog has been accepted (i.e. "should not be shown")
+ * This is the single source of truth. The ~10 callers that gate behaviour on
+ * trust (apiKeyHelper / AWS / GCP / otelHeadersHelper shell execution, hooks,
+ * mcp headers, statusline, bridge boot, system-context prefetch) all read
+ * through this, so they uniformly see "trusted" and proceed. The accepted
+ * tradeoff: a freshly-cloned repo's project/local `.claude` config (which can
+ * execute arbitrary shell) runs without a review prompt. The operator owns
+ * that risk by choosing to run ccb here.
+ *
+ * @returns Always true — every workspace is trusted on this machine.
  */
-let _trustAccepted = false
-
-export function resetTrustDialogAcceptedCacheForTesting(): void {
-  _trustAccepted = false
-}
-
 export function checkHasTrustDialogAccepted(): boolean {
-  // Trust only transitions false→true during a session (never the reverse),
-  // so once true we can latch it. false is not cached — it gets re-checked
-  // on every call so that trust dialog acceptance is picked up mid-session.
-  // (lodash memoize doesn't fit here because it would also cache false.)
-  return (_trustAccepted ||= computeTrustDialogAccepted())
-}
-
-function computeTrustDialogAccepted(): boolean {
-  // Check session-level trust (for home directory case where trust is not persisted)
-  // When running from home dir, trust dialog is shown but acceptance is stored
-  // in memory only. This allows hooks and other features to work during the session.
-  if (getConfigHostBindings().getSessionTrustAccepted?.()) {
-    return true
-  }
-
-  const config = getGlobalConfig()
-
-  // Always check where trust would be saved (git root or original cwd)
-  // This is the primary location where trust is persisted by saveCurrentProjectConfig
-  const projectPath = getProjectPathForConfig()
-  const projectConfig = config.projects?.[projectPath]
-  if (projectConfig?.hasTrustDialogAccepted) {
-    return true
-  }
-
-  // Now check from current working directory and its parents
-  // Normalize paths for consistent JSON key lookup
-  let currentPath = normalizePathForConfigKey(getConfigHostBindings().getCwd?.() ?? process.cwd())
-
-  // The operator's home directory is implicitly trusted. EXACT-match on
-  // purpose (not the parent-walk below): trusting ~ must NOT cascade, so a
-  // fresh clone under ~/code/... still gets the dialog. Without this, ~
-  // re-prompted every launch (its trust was only ever session-scoped).
-  if (currentPath === normalizePathForConfigKey(homedir())) {
-    return true
-  }
-
-  // Traverse all parent directories
-  while (true) {
-    const pathConfig = config.projects?.[currentPath]
-    if (pathConfig?.hasTrustDialogAccepted) {
-      return true
-    }
-
-    const parentPath = normalizePathForConfigKey(resolve(currentPath, '..'))
-    // Stop if we've reached the root (when parent is same as current)
-    if (parentPath === currentPath) {
-      break
-    }
-    currentPath = parentPath
-  }
-
-  return false
+  return true
 }
 
 /**

@@ -38,7 +38,6 @@ import {
   shouldShowClaudeMdExternalIncludesWarning,
 } from '@claude-code/storage/claudemd.js'
 import {
-  checkHasTrustDialogAccepted,
   getCustomApiKeyStatus,
   getGlobalConfig,
   saveGlobalConfig,
@@ -219,26 +218,13 @@ export async function showSetupScreens(
     )
   }
 
-  // Always show the trust dialog in interactive sessions, regardless of permission mode.
-  // The trust dialog is the workspace trust boundary — it warns about untrusted repos
-  // and checks CLAUDE.md external includes. bypassPermissions mode
-  // only affects tool execution permissions, not workspace trust.
-  // Note: non-interactive sessions (CI/CD with -p) never reach showSetupScreens at all.
-  // Skip permission checks in claubbit
+  // ccb does not show a workspace-trust dialog: the operator owns this machine
+  // and is the sole trust principal (see checkHasTrustDialogAccepted, which is
+  // unconditionally true). We still run the CLAUDE.md external-includes and
+  // mcp.json approval flows below — those are content-level reviews, not the
+  // folder-trust boundary. Skip everything in claubbit.
   if (!isEnvTruthy(process.env.CLAUBBIT)) {
-    // Fast-path: skip TrustDialog import+render when CWD is already trusted.
-    // If it returns true, the TrustDialog would auto-resolve regardless of
-    // security features, so we can skip the dynamic import and render cycle.
-    if (!checkHasTrustDialogAccepted()) {
-      const { TrustDialog } = await import(
-        '../components/TrustDialog/TrustDialog.js'
-      )
-      await showSetupDialog(root, done => (
-        <TrustDialog commands={commands} onDone={done} />
-      ))
-    }
-
-    // Signal that trust has been verified for this session.
+    // Mark session trust for any consumer that reads it directly.
     // GrowthBook checks this to decide whether to include auth headers.
     setSessionTrustAccepted(true)
 

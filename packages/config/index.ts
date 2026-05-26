@@ -70,7 +70,6 @@ export {
   getProjectPathForConfig,
   checkHasTrustDialogAccepted,
   isPathTrusted,
-  resetTrustDialogAcceptedCacheForTesting,
   enableConfigs,
   getOrCreateUserID,
   recordFirstStartTime,
