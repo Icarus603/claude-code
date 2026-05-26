@@ -13,7 +13,7 @@
 
 import { readFile } from 'fs/promises'
 
-const BUDGET = 5750 // +14: left-arrow mid-turn abort uses reason 'interrupt' (not 'background') so query.ts skips the synthetic [Request interrupted by user] — worker resumes a resumable transcript + auto-continues instead of showing a dead/interrupted session (v26.5.88 follow-up)
+const BUDGET = 5712 // -38: replaced the abort+resume mid-turn handling with ant's `!kK` gate — a turn cannot survive the bridge's process.exit(0) (foreground in-process loop dies; worker --resume mounts idle, no auto-continue in interactive), so block mid-turn entry like ant cOH 5359.js:2181
 
 async function main() {
   const content = await readFile('packages/repl/src/screens/REPLView.tsx', 'utf8')

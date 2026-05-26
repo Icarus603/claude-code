@@ -465,15 +465,17 @@ function ModeIndicator({
     // survivable.
     ...((() => {
       const fleetOn = feature('AGENTS_FLEET') ? true : false
-      // Gate on isInputEmpty, NOT the composed showHint — so a custom status
-      // line (which sets suppressHint) doesn't hide the hint.
-      // NOTE: deliberately NOT gated on !isLoading. The ←← bridge backgrounds
-      // a RUNNING conversation (esp. auto mode, where isLoading is near-always
-      // true); hiding the hint mid-turn made the feature look gone (v26.5.86
-      // regression). The handler has no isLoading gate either — see REPLView
-      // handleLeftArrowOnEmpty.
+      // Gate on isInputEmpty (NOT the composed showHint — a custom status line's
+      // suppressHint must not hide it) AND on !isLoading. ant CDO foreground
+      // branch (5150.js) gates the "← for agents" hint on `!isLoading`, matching
+      // the handler's mid-turn gate (REPLView handleLeftArrowOnEmpty `!kK`): the
+      // bridge process.exit(0)s into FleetView, which would kill the in-process
+      // turn, so it's blocked mid-turn — the hint hides to match. Under auto mode
+      // isLoading is near-always true, so the hint is hidden until idle; that is
+      // ant-parity (ant has no auto mode) and accepted by the maintainer.
       const cond =
         !isBgSession() &&
+        !isLoading &&
         isInputEmpty &&
         fleetOn &&
         getGlobalConfig().leftArrowOpensAgents !== false

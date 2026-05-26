@@ -906,6 +906,11 @@ export function REPL({
   // external loading by setIsExternalLoading.
   const isLoading = isQueryActive || isExternalLoading;
 
+  // Always-fresh isLoading for []-deps callbacks. handleLeftArrowOnEmpty reads
+  // it to gate the FleetView bridge mid-turn (ant cOH `!kK`, 5359.js:2181).
+  const isLoadingRef = useRef(isLoading);
+  isLoadingRef.current = isLoading;
+
   // Elapsed time is computed by SpinnerWithVerb from these refs on each
   // animation frame, avoiding a useInterval that re-renders the entire REPL.
   const [userInputOnProcessing, setUserInputOnProcessingRaw] = React.useState<string | undefined>(undefined);
@@ -3872,7 +3877,7 @@ export function REPL({
    * separate port that requires daemon dispatch primitives ccb is still
    * filling in; for now we no-op outside bg.
    */
-  const handleLeftArrowOnEmpty = useCallback(async () => {
+  const handleLeftArrowOnEmpty = useCallback(() => {
     // Source: ant 4177.js `$1H()`:
     //   if (!PF_()) return                     // PF_() = CLAUDE_BG_BACKEND==="daemon"
     //   let H = f4K()                          // detach message
@@ -3891,78 +3896,35 @@ export function REPL({
       // returns and fleetAttach's `finally` resumes Ink.
       process.exit(0);
     }
-    // Mid-turn handling. ant blocks the bridge ENTIRELY while a turn is in
-    // flight (cOH `!kK` gate, 5359.js:2181). ccb cannot copy that verbatim:
-    // ant has no auto mode, ccb does, and under auto mode isLoading is
-    // near-permanently true — a verbatim gate makes the bridge unreachable
-    // for exactly the sessions users most want to background (the v26.5.86
-    // regression reverted in 9dce3fba).
+    // Mid-turn gate — ant parity. ant's left-arrow handler memo (cOH,
+    // 5359.js:2181) returns the bridge handler ONLY when `!kK`
+    // (kK = isLoading = a turn in flight OR an initial prompt pending);
+    // mid-turn it returns undefined so the key does nothing.
     //
-    // But ant's gate is not there to "block leaving" — it protects an
-    // INVARIANT: the forked worker boots with `--resume <id> --fork-session`
-    // (openAgentsFromReplLeftArrow → buildReplForkFlags), so it inherits the
-    // conversation by replaying the ON-DISK transcript. That transcript must
-    // be in a RESUMABLE shape before the fork. ccb preserves the same
-    // invariant by a different means that also works under auto mode: abort
-    // the in-flight turn with reason 'interrupt', wait for the query loop to
-    // drain its partial assistant output to disk, then fork.
+    // This is structural, not cosmetic: the bridge does `process.exit(0)`
+    // into FleetView (openAgentsFromReplLeftArrow), and the foreground turn
+    // is an IN-PROCESS query loop — it dies with the process. The forked
+    // worker boots via `--resume`, which interactive mode-dispatch mounts as
+    // `launchInteractiveSession({ initialMessages })`: it RENDERS the prior
+    // conversation and sits idle at the prompt — it does NOT auto-continue
+    // the turn (the interrupted_turn → "Continue from where you left off."
+    // auto-resume is wired only into the SDK headless paths, not interactive).
+    // So a turn cannot survive the handoff in either process. ant blocks
+    // mid-turn entry for exactly this reason; ccb matches.
     //
-    // Why reason 'interrupt' and NOT 'background': query.ts:1019/1608 yield a
-    // synthetic `[Request interrupted by user]` user message for EVERY abort
-    // reason except 'interrupt'. That synthetic is NOT meta, so on the worker
-    // side detectTurnInterruption (conversationRecovery.tsx) reads it as the
-    // standing user prompt → the resumed conversation is dead, and
-    // deriveReplSeed picks it as the FleetView row label. That was the v26.5.88
-    // bug: the row read "[Request interrupted by..." and the right-arrow attach
-    // landed on a terminated turn. 'interrupt' SKIPS the synthetic (the reason
-    // submit-interrupt already uses for exactly this — see the comment at
-    // query.ts:1017), leaving the transcript ending in genuine partial
-    // assistant content. The worker's resume path then classifies that as
-    // `interrupted_turn` and auto-appends "Continue from where you left off."
-    // (conversationRecovery.tsx:210) — so the backgrounded turn CONTINUES in
-    // the worker instead of being killed. 'interrupt' is also not 'user-cancel',
-    // so the onQuery-finally auto-restore rewind (gated on 'user-cancel') stays
-    // off.
-    //
-    // Skipping the abort entirely is the original deadlock: process.exit(0)
-    // kills the foreground turn with no finally → recordTranscript, so the
-    // worker --resumes a transcript missing the running turn and lands idle.
-    if (queryGuard.isActive) {
-      abortControllerRef.current?.abort('interrupt');
-      // Wait for the query loop to reach idle (the partial assistant output has
-      // been setMessages'd / recorded). queryGuard flips to idle in onQuery's
-      // finally.
-      await new Promise<void>(resolve => {
-        if (!queryGuard.isActive) {
-          resolve();
-          return;
-        }
-        const unsubscribe = queryGuard.subscribe(() => {
-          if (!queryGuard.isActive) {
-            unsubscribe();
-            resolve();
-          }
-        });
-        // Safety valve: never wedge the handoff if end() somehow never fires.
-        setTimeout(() => {
-          unsubscribe();
-          resolve();
-        }, 5000);
-      });
-      // Yield one macrotask so React commits the final setMessages and
-      // useLogMessages' effect enqueues the last partial chunk before
-      // openAgentsFromReplLeftArrow's flushSessionStorage drains the write
-      // queue. Without this the effect may not have run yet and the flush
-      // would race the tail of the turn onto disk.
-      await new Promise<void>(resolve => setTimeout(resolve, 0));
-    }
+    // (Trade-off accepted by the maintainer 2026-05-26: under auto mode
+    // isLoading is near-permanently true, so an auto session effectively
+    // can't open FleetView until it goes idle. That is ant-parity behaviour —
+    // ant has no auto mode — and is preferred over a turn-killing bridge.)
+    if (isLoadingRef.current) return;
     // Foreground REPL: ← on empty prompt opens FleetView, backgrounding the
-    // current conversation. Source: ant 5279.js o14 (the bridge). Re-ported
-    // after the native stdin reader (stdin-napi) made the unmount→remount
-    // cycle survivable. Dynamic import keeps the fleet/bg graph out of the
-    // REPL boot path. On error, surface it as a warning message; on success
-    // openAgentsFromReplLeftArrow unmounts and process.exit(0)s into FleetView.
-    await import('@claude-code/cli/bg/openAgentsFromRepl.js')
+    // (idle) current conversation. Source: ant 5279.js o14 (the bridge).
+    // Re-ported after the native stdin reader (stdin-napi) made the
+    // unmount→remount cycle survivable. Dynamic import keeps the fleet/bg
+    // graph out of the REPL boot path. On error, surface it as a warning
+    // message; on success openAgentsFromReplLeftArrow unmounts and
+    // process.exit(0)s into FleetView.
+    void import('@claude-code/cli/bg/openAgentsFromRepl.js')
       .then(({ openAgentsFromReplLeftArrow }) =>
         openAgentsFromReplLeftArrow(messagesRef.current),
       )
