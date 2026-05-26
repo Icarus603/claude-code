@@ -4264,17 +4264,16 @@ You have exited auto mode. The user may now want to interact more directly. You 
       ])
     }
     case 'ultrawork_request': {
-      // ant 4269.js renders this as "...use the Workflow tool to fulfill
-      // their request." ccb has no Workflow tool; its autonomous-work
-      // primitive is the /goal Stop hook ("keep working until the condition
-      // is met"). Steer the model into that loop instead — faithful intent,
-      // ccb's actual mechanism.
+      // ant 4269.js steers the model to the Workflow tool. ccb now ports the
+      // Workflow engine (packages/agent/workflow/), gated behind
+      // WORKFLOW_SCRIPTS. When the engine is enabled, steer to it (ant-parity);
+      // otherwise fall back to the /goal Stop-hook loop — ccb's other
+      // autonomous-work primitive — so the keyword still does something useful.
+      const content = feature('WORKFLOW_SCRIPTS')
+        ? 'The user included the keyword "ultrawork", which means you should use the Workflow tool to fulfill their request.'
+        : 'The user included the keyword "ultrawork", asking you to treat this as a sustained, autonomous unit of work rather than a quick reply. Set a goal with the /goal command capturing the desired end state, then keep working through it across as many turns as needed until that condition is met — do not stop to ask the user for direction at each step.'
       return wrapMessagesInSystemReminder([
-        createUserMessage({
-          content:
-            'The user included the keyword "ultrawork", asking you to treat this as a sustained, autonomous unit of work rather than a quick reply. Set a goal with the /goal command capturing the desired end state, then keep working through it across as many turns as needed until that condition is met — do not stop to ask the user for direction at each step.',
-          isMeta: true,
-        }),
+        createUserMessage({ content, isMeta: true }),
       ])
     }
     case 'deferred_tools_delta': {

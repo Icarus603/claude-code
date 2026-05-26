@@ -15,6 +15,7 @@
     "./AgentSummary/*.js": "./AgentSummary/*.ts",
     "./compaction/*.js": "./compaction/*.ts",
     "./contextCollapse/*.js": "./contextCollapse/*.ts",
+    "./workflow/*.js": "./workflow/*.ts",
     "./agentHostBindings.js": "./agentHostBindings.ts",
     "./eventMetadata.js": "./eventMetadata.ts",
     "./internalLogging.js": "./internalLogging.ts",

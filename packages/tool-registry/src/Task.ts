@@ -18,6 +18,9 @@ export type TaskStatus =
   | 'completed'
   | 'failed'
   | 'killed'
+  // Workflow-only, NON-terminal: a paused workflow can be resumed via
+  // Workflow({scriptPath, resumeFromRunId}). ant 2.1.150 (3858 dt7 SI8).
+  | 'paused'
 
 /**
  * True when a task is in a terminal state and will not transition further.
