@@ -32,6 +32,7 @@ import {
   verifyAdoption,
   writeWorkerRecord,
 } from './bgWorkerRegistry.js'
+import { type RvClient, type RvServerMessage, createRvClient } from './rvClient.js'
 
 const RING_BUFFER_BYTES = 1024 * 1024
 
@@ -47,6 +48,12 @@ export interface WorkerSpawnConfig {
   cwd: string
   env: NodeJS.ProcessEnv
   ptySocket: string
+  /** Rendezvous (control) socket path — `<jobDir>/rv.sock`. The supervisor
+   *  connects an rv client here to receive out-of-band state/done/heartbeat
+   *  pushed by the inner REPL (ant 5017.js `rvSockPath`). Empty/undefined for
+   *  workers spawned before the rv channel existed — the VM degrades to the
+   *  pty-ctrl heartbeat + pid-poll liveness model. */
+  rvSocket?: string
   /** ccb binary + args, e.g. `[bun, /cli.js, --bg-pty-host, <sock>, ...]`. */
   cmd: readonly string[]
   cliVersion: string
@@ -75,6 +82,11 @@ export class WorkerVm extends EventEmitter {
   /** Last time the worker emitted ring data; used by stall watchdog. */
   private lastActivityAt: number = Date.now()
   private stalledFiredAt: number = 0
+  /** Rendezvous (control) client — ant 5017.js `this.rv`. Out-of-band
+   *  channel to the inner REPL: receives state/done/heartbeat, sends
+   *  shutdown/repaint/reply. Undefined when the worker has no rv socket
+   *  (legacy spawn) or before connectRv() runs. */
+  private rv: RvClient | null = null
 
   constructor(config: WorkerSpawnConfig, initialRecord?: WorkerRecord) {
     super()
@@ -210,6 +222,7 @@ export class WorkerVm extends EventEmitter {
     this.phase = { kind: 'running' }
     this.startHeartbeatPoll()
     this.startHeartbeatStream()
+    this.connectRv()
     logEvent('tengu_bg_worker_spawn', {
       short: this.config.short,
       pid: String(child.pid),
@@ -231,6 +244,120 @@ export class WorkerVm extends EventEmitter {
     this.phase = { kind: 'running' }
     this.startHeartbeatPoll()
     this.startHeartbeatStream()
+    this.connectRv()
+  }
+
+  /**
+   * Connect the rendezvous (control) client to the worker's rv socket.
+   * ant 5017.js `connectRv`. No-op if the worker has no rv socket (legacy
+   * spawn) or if already connected. The rv channel is an OPTIMISATION over
+   * the pty-ctrl heartbeat + pid-poll model, never the sole liveness
+   * signal — `naK` gives up after 30 failed connects and the pid-poll
+   * backstop takes over (ant: "pid-poll is liveness backstop").
+   *
+   * Inbound dispatch mirrors ant 5017.js connectRv onMessage:
+   *   heartbeat      → noteHeartbeat() (same sink as the pty-ctrl path, so
+   *                    the stall watchdog treats rv liveness identically)
+   *   done           → settle(outcome) (authoritative terminal — no more
+   *                    guessing from PTY exit code / disk heuristic)
+   *   state          → patch the record + persist (authoritative state.json
+   *                    push, replacing the disk-poll heuristic's role)
+   *   detach-request → broadcast the APC detach sentinel to attachers
+   *   repaint-done   → (no-op here; the attach repaint-jiggle owns repaint)
+   */
+  private connectRv(): void {
+    if (this.rv) return
+    const sock = this.config.rvSocket
+    if (!sock) return
+    if (this.phase.kind !== 'running') return
+    this.rv = createRvClient(
+      sock,
+      msg => this.handleRvMessage(msg),
+      // onDisconnect — an established rv connection dropped. Immediately
+      // re-check the pid so a worker that died is reaped without waiting
+      // for the next poll tick (ant wires this to `checkPid`).
+      () => {
+        if (!this.isRunning()) return
+        if (!isPidAlive(this.record.pid)) {
+          logEvent('tengu_bg_worker_vanished', {
+            short: this.config.short,
+            pid: String(this.record.pid),
+            via: 'rv-disconnect',
+          })
+          this.onChildExit(0, undefined)
+        }
+      },
+      // onConnect — the worker's rv server accepted us. Treat as proof of
+      // life (resets the stall clock).
+      () => this.noteHeartbeat(),
+    )
+  }
+
+  /** Dispatch one inbound rv frame from the worker. ant 5017.js onMessage. */
+  private handleRvMessage(msg: RvServerMessage): void {
+    switch (msg.type) {
+      case 'heartbeat':
+        this.noteHeartbeat()
+        return
+      case 'done':
+        // Authoritative terminal outcome from the worker itself.
+        this.onRvDone(msg.outcome)
+        return
+      case 'state':
+        // Authoritative state push from the worker. The worker has ALREADY
+        // written the canonical FleetJobState to state.json (rvServer
+        // pushRvState persists before sending), so the FleetView poll +
+        // `ccb ps` see it without the disk heuristic. Here we only treat it
+        // as proof of life — the WorkerRecord (meta.json) tracks process
+        // status, not classifier state, so there's nothing to mirror onto
+        // it. ant routes the patch to its in-memory record for `list`, but
+        // ccb's `list` reads classifier state from the stateFile directly.
+        this.noteHeartbeat()
+        return
+      case 'detach-request':
+        this.emit('detach-request', msg.msg)
+        return
+      case 'repaint-done':
+        this.emit('repaint-done')
+        return
+      case 'shutting-down':
+        // Worker acked our shutdown; it will exit on its own. The pid-poll
+        // / onChildExit path settles the record.
+        return
+      default:
+        return
+    }
+  }
+
+  /**
+   * Worker pushed a terminal `done`. Map ant's rv outcome onto ccb's
+   * settle() (which expects 'done'|'crashed'|'killed'). Only acts if the
+   * VM hasn't already settled via the pid-poll / exit path (whichever
+   * observes the terminal state first wins; settle() is idempotent-guarded).
+   */
+  private onRvDone(outcome: 'done' | 'crashed' | 'killed'): void {
+    if (this.settled) return
+    if (this.phase.kind === 'retired') return
+    logEvent('tengu_bg_rv_done', { short: this.config.short, outcome })
+    this.settle(outcome)
+  }
+
+  /**
+   * Send a control frame to the worker over the rv channel. Returns false
+   * if the rv client isn't connected (caller falls back to pty-ctrl / SIG).
+   * ant 5017.js `this.rv?.send(...)`.
+   */
+  sendShutdown(): boolean {
+    return this.rv?.send({ type: 'shutdown' }) ?? false
+  }
+  sendRepaint(): boolean {
+    return this.rv?.send({ type: 'repaint' }) ?? false
+  }
+  sendReply(text: string): boolean {
+    return this.rv?.send({ type: 'reply', text }) ?? false
+  }
+  sendAttacherCaps(caps: unknown): boolean {
+    return this.rv?.send({ type: 'attacher-caps', caps }) ?? false
   }
 
   /**
@@ -433,6 +560,10 @@ export class WorkerVm extends EventEmitter {
     this.settled = outcome
     this.phase = { kind: 'retired', outcome }
     this.stopHeartbeatStream()
+    if (this.rv) {
+      this.rv.close()
+      this.rv = null
+    }
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer)
       this.heartbeatTimer = null

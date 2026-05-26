@@ -60,6 +60,11 @@ export interface WorkerRecord {
   failedReason?: string
   mode?: 'detached' | 'pty'
   ptySocket?: string
+  /** Rendezvous (control) socket path — `<jobDir>/rv.sock`. The inner REPL
+   *  binds it; the daemon rv client connects to it to receive out-of-band
+   *  state/done/heartbeat. Persisted so the adopt path reconnects after a
+   *  daemon restart (ant rosterEntry carries `rendezvousSock`). */
+  rendezvousSocket?: string
   /** procStart timestamp from /proc/<pid>/stat or ps fallback. */
   procStart?: number
   /** Number of respawn attempts so far. Capped at 20. */

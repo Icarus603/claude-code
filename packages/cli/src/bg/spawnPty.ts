@@ -26,6 +26,10 @@ export interface SpawnPtyResult {
   cwd: string
   startedAt: number
   socketPath: string
+  /** Rendezvous (control) socket path — `<jobDir>/rv.sock`. The inner REPL
+   *  binds it; the daemon supervisor's rv client connects to it. Persisted
+   *  into meta.json so the adopt path can reconnect after a daemon restart. */
+  rendezvousSocketPath: string
   /** Always 'pty'. Set as meta.mode by the caller. */
   mode: 'pty'
   /** procStart timestamp; defeats PID recycle. Read sync at spawn time. */
@@ -62,6 +66,13 @@ export function spawnPtyHost(opts: {
 }): SpawnPtyResult {
   mkdirSync(opts.jobDir, { recursive: true })
   const socketPath = join(opts.jobDir, 'pty.sock')
+  // Rendezvous (control) socket — the out-of-band channel the inner REPL
+  // binds to push authoritative state/done/heartbeat to the daemon
+  // supervisor (ant 4291.js server ← 5016.js naK client). Sits alongside
+  // pty.sock in the flat per-job dir; the inner REPL reads
+  // CLAUDE_BG_RENDEZVOUS_SOCK to know where to bind. See
+  // daemon/socketPaths.ts getRendezvousSocketPath.
+  const rendezvousSocketPath = join(opts.jobDir, 'rv.sock')
 
   // Outer: ccb --bg-pty-host <sock> <cols> <rows> -- <inner ccb>
   // Inner: ccb [user flags] "<directive>"  (full REPL, directive as
@@ -128,6 +139,11 @@ export function spawnPtyHost(opts: {
     BROWSER: 'true',
     CLAUDE_JOB_DIR: opts.jobDir,
     CLAUDE_BG_BACKEND: 'pty',
+    // Rendezvous control socket the inner REPL binds (ant eaK sets the same
+    // CLAUDE_BG_RENDEZVOUS_SOCK env). The bg REPL's useBgRendezvousServer
+    // hook reads this to start the out-of-band control channel; absent it,
+    // the worker degrades to the legacy disk-poll path.
+    CLAUDE_BG_RENDEZVOUS_SOCK: rendezvousSocketPath,
     CLAUDE_BG_SOURCE: 'cli',
     CLAUDE_ENABLE_STREAM_WATCHDOG: '1',
     CLAUDE_CODE_SESSION_NAME: opts.short,
@@ -181,6 +197,7 @@ export function spawnPtyHost(opts: {
     cwd: opts.cwd,
     startedAt: Date.now(),
     socketPath,
+    rendezvousSocketPath,
     mode: 'pty',
     procStart: readProcStart(child.pid) || undefined,
     cliVersion: MACRO.VERSION,

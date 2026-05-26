@@ -96,7 +96,17 @@ export function recordToRosterEntry(r: WorkerRecord): RosterEntry {
   return {
     pid: r.pid,
     procStart: r.procStart,
-    rendezvousSock: r.ptySocket,
+    // The rv (rendezvous control) socket is a DISTINCT socket from the PTY
+    // data socket — it must survive a supervisor restart so adoptFromRoster
+    // can re-point the rv client at the right address (WorkerRecord.
+    // rendezvousSocket docstring). Writing r.ptySocket here (the historical
+    // value, from when `rendezvousSock` was a harmless alias) sent the rv
+    // client's {role:'supervisor'} handshake into the PTY DATA stream of any
+    // roster-adopted worker, corrupting attach output AND re-opening the
+    // "unattached worker has no liveness signal" gap this whole channel
+    // exists to close. Undefined when the worker predates the rv channel —
+    // the rv client no-ops on an absent socket (degrades to pid-poll).
+    rendezvousSock: r.rendezvousSocket,
     ptySock: r.ptySocket,
     cliVersion: r.cliVersion,
     startedAt: r.startedAt,

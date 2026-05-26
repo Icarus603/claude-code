@@ -92,9 +92,18 @@ export function encodeFrame(obj: object): string {
 }
 
 /**
+ * Per-line overflow guard. ant 4291.js's rv server caps its inbound
+ * buffer at 1 MiB (`if(q.length>1048576)q="",_.destroy()`) so a peer that
+ * never sends a newline can't grow the pending buffer without bound. Legit
+ * protocol frames (RPC envelopes, rv control frames) are tiny JSON lines
+ * far under this, so the cap only ever trips on a wedged/hostile peer.
+ */
+const MAX_PENDING_LINE_BYTES = 1024 * 1024
+
+/**
  * Stateful line decoder for socket data. Calls `onMessage` once per
  * complete `\n`-terminated JSON line; calls `onError` and stops on
- * malformed input.
+ * malformed input or on a single line exceeding MAX_PENDING_LINE_BYTES.
  */
 export function createLineDecoder(
   onMessage: (msg: unknown) => void,
@@ -107,7 +116,17 @@ export function createLineDecoder(
     buf += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
     while (true) {
       const idx = buf.indexOf('\n')
-      if (idx < 0) return
+      if (idx < 0) {
+        // No complete line yet — bound the pending buffer (ant 4291.js).
+        if (buf.length > MAX_PENDING_LINE_BYTES) {
+          stopped = true
+          buf = ''
+          onError(
+            `protocol line exceeds ${MAX_PENDING_LINE_BYTES} bytes without terminator`,
+          )
+        }
+        return
+      }
       const line = buf.slice(0, idx)
       buf = buf.slice(idx + 1)
       if (line.length === 0) continue

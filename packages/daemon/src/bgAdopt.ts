@@ -49,7 +49,13 @@ export async function adoptFromRoster(
       dead++
       continue
     }
-    const ptySocket = entry.ptySock ?? entry.rendezvousSock ?? ''
+    // Do NOT fall back to entry.rendezvousSock here: since the rv channel
+    // landed, rendezvousSock is a DISTINCT socket (the control socket), not
+    // an alias for the PTY data socket. The old `?? entry.rendezvousSock`
+    // fallback would mis-assign the rv socket as the PTY socket when ptySock
+    // is absent — wrong socket, corrupts attach. A missing ptySock means the
+    // worker is genuinely unreachable for attach (handled below).
+    const ptySocket = entry.ptySock ?? ''
     const sockExists = ptySocket ? existsSyncFn(ptySocket) : false
     if (!sockExists) {
       logEvent('tengu_bg_adopt_sock_unlinked', { short, sock: ptySocket })
@@ -69,6 +75,7 @@ export async function adoptFromRoster(
       status: 'running',
       mode: 'pty',
       ptySocket,
+      rendezvousSocket: entry.rendezvousSock,
       procStart: entry.procStart,
       attempt: entry.attempt,
       cliVersion: entry.cliVersion,
@@ -93,6 +100,7 @@ export async function adoptFromRoster(
         cwd: entry.cwd,
         env: process.env,
         ptySocket,
+        rvSocket: entry.rendezvousSock,
         cmd: [],
         cliVersion: process.env.CLAUDE_CODE_VERSION ?? 'dev',
       },
@@ -166,6 +174,7 @@ export function adoptRunningPtyRecords(workers: Map<string, WorkerVm>): void {
         cwd: record.cwd,
         env: process.env,
         ptySocket,
+        rvSocket: record.rendezvousSocket,
         cmd: record.cmd,
         cliVersion: currentCli,
       },

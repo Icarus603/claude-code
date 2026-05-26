@@ -310,15 +310,14 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         cwd: (d.cwd as string) ?? process.cwd(),
         env: (d.env as NodeJS.ProcessEnv) ?? process.env,
         ptySocket: (d.ptySocket as string) ?? '',
+        rvSocket: d.rvSocket as string | undefined,
         cmd: (d.cmd as string[]) ?? [],
-        cliVersion:
-          (d.cliVersion as string) ?? process.env.CLAUDE_CODE_VERSION ?? 'dev',
+        cliVersion: (d.cliVersion as string) ?? process.env.CLAUDE_CODE_VERSION ?? 'dev',
         dispatch: d.dispatch as Record<string, unknown> | undefined,
       })
       state.workers.set(short, vm)
       vm.on('settled', () => {
-        // Keep settled vm in registry for one tick so list still
-        // surfaces the result; then drop. Also remove from roster.
+        // Keep settled vm one tick so list still surfaces it; then drop + de-roster.
         setTimeout(() => state.workers.delete(short), 100).unref()
         void updateRoster(r => {
           delete r.workers[short]
@@ -452,6 +451,7 @@ export async function bgDaemonMain(args: readonly string[]): Promise<number> {
         cwd: (d.cwd as string) ?? process.cwd(),
         env: (d.env as NodeJS.ProcessEnv) ?? process.env,
         ptySocket: (d.ptySocket as string) ?? '',
+        rvSocket: d.rvSocket as string | undefined,
         cmd: (d.cmd as string[]) ?? [],
         cliVersion: (d.cliVersion as string) ?? process.env.CLAUDE_CODE_VERSION ?? 'dev',
         dispatch: d as Record<string, unknown>,

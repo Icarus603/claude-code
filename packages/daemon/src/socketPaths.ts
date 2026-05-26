@@ -66,6 +66,29 @@ export function getPtySocketPath(short: string): string {
   return join(getDaemonScopeDir(), `${short}.pty.sock`)
 }
 
+/**
+ * Rendezvous (control) socket path, given a job directory.
+ *
+ * ant runs TWO sockets per bg worker: the PTY socket carries screen
+ * bytes (attach/replay), and a SEPARATE rendezvous socket carries the
+ * out-of-band control channel (ant 4291.js worker-side server bound on
+ * `CLAUDE_BG_RENDEZVOUS_SOCK`; ant 5016.js `naK` supervisor-side client).
+ * ant's layout is `<scope>/rv/<short>.sock`; ccb keeps its existing flat
+ * per-job-dir convention (the PTY socket is `<jobDir>/pty.sock` — see
+ * `spawnPty.ts`), so the rendezvous socket sits alongside it as
+ * `<jobDir>/rv.sock`.
+ *
+ * The rendezvous socket is what lets the INNER bg REPL push authoritative
+ * `state` / `done` / `heartbeat` frames to the daemon supervisor without
+ * round-tripping through disk. ccb previously had no such channel — the
+ * inner REPL is sandboxed inside the PTY (stdout is screen bytes), so the
+ * daemon could only infer liveness from PTY ctrl-frame heartbeats and guess
+ * turn-outcome from a regex over assistant text (`useBgFleetStateSync`).
+ */
+export function getRendezvousSocketPath(jobDir: string): string {
+  return join(jobDir, 'rv.sock')
+}
+
 /** Claim socket path (used by attach handshake). */
 export function getClaimSocketPath(short: string): string {
   return join(getDaemonScopeDir(), `${short}.claim.sock`)

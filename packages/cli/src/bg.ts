@@ -78,15 +78,13 @@ interface JobMeta {
    * or when the worker crashes too many times to respawn.
    */
   failedReason?: string
-  /**
-   * Spawn mode. 'detached' = traditional `-p` headless run (default).
-   * 'pty' = `--bg-pty-host` interactive REPL inside a PTY socket.
-   * Undefined defaults to 'detached' for backward compat with meta.json
-   * files written before Phase C landed.
-   */
+  /** Spawn mode. 'detached' = headless `-p` run (default); 'pty' =
+   *  `--bg-pty-host` interactive REPL. Undefined ⇒ 'detached' (back-compat). */
   mode?: 'detached' | 'pty'
   /** Path to the PTY host's Unix socket. Set iff mode==='pty'. */
   ptySocket?: string
+  /** Rendezvous (control) socket `<jobDir>/rv.sock` (ant rendezvousSock); daemon rv client connects here. Set iff mode==='pty'. */
+  rendezvousSocket?: string
   /** procStart timestamp from /proc or ps; defeats PID-recycle false alives. */
   procStart?: number
   /** ccb version that spawned this worker; daemon adopt compares for upgrade. */
@@ -399,7 +397,7 @@ export async function handleBgFlag(args: readonly string[]): Promise<void> {
     const { spawnPtyHost } = await import('./bg/spawnPty.js')
     const short = generateShortId()
     const r = spawnPtyHost({ short, jobDir: getJobDir(short), flags: forwardedFlags, directive, cwd: process.cwd() })
-    writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+    writeJobMeta({ ...r, ptySocket: r.socketPath, rendezvousSocket: r.rendezvousSocketPath, status: 'running' })
     { const m = await import('./bg/agentActionEvent.js'); m.emitAgentAction('spawn', short, { mode: 'pty' }); m.emitAgentDispatch(short, directive) }
     // Opportunistically ensure daemon is up so subsequent stop/respawn
     // route through RPC. Fire-and-forget.
@@ -459,7 +457,7 @@ export async function spawnBgPty(opts: {
     quiet: opts.quiet,
     spare: opts.spare,
   })
-  writeJobMeta({ ...r, ptySocket: r.socketPath, status: 'running' })
+  writeJobMeta({ ...r, ptySocket: r.socketPath, rendezvousSocket: r.rendezvousSocketPath, status: 'running' })
 
   // Optimistic state.json — mirrors ant `iP6` (4774.js:93-148) which
   // writes state.json synchronously at dispatch time so the FleetView

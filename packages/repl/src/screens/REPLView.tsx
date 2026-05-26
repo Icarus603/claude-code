@@ -208,6 +208,7 @@ import { useSuspendResumeHandlers } from './repl/useSuspendResumeHandlers.js';
 import { useTranscriptFreeze } from './repl/useTranscriptFreeze.js';
 import { useHandleExit } from './repl/useHandleExit.js';
 import { useBgFleetStateSync } from './repl/useBgFleetStateSync.js';
+import { useBgRendezvousServer } from './repl/useBgRendezvousServer.js';
 import { useSpareReadyMarker } from './repl/useSpareReadyMarker.js';
 import { sendBgDetachSignal } from './repl/bgDetachSignal.js';
 import { useRateLimitHandlers } from './repl/useRateLimitHandlers.js';
@@ -1193,14 +1194,10 @@ export function REPL({
   const [messages, rawSetMessages] = useState<MessageType[]>(initialMessages ?? []);
   const messagesRef = useRef(messages);
 
-  // Bg session → on-disk state.json sync so FleetView buckets rows
-  // correctly (Working → Completed when the assistant turn finishes,
-  // Working → Needs input when the assistant ends on a question, and
-  // back to Working on follow-up). Reads the last assistant message
-  // to choose between done / blocked / failed via the simplified
-  // 3988.js text inference. See useBgFleetStateSync for the ant
-  // lineage (3988.js text patterns + 4835.js daemon supervisor).
+  // Bg-session FleetView sync (see hook JSDoc for ant 3988.js lineage):
+  // state.json disk writes + rv-channel mirror on each turn transition.
   useBgFleetStateSync(isLoading, messages);
+  useBgRendezvousServer(isLoading); // ant 4291.js rv server: 30s heartbeat + startup-wedge (no-op unless bg+rv-sock)
   useSpareReadyMarker();
   // Stores the willowMode variant that was shown (or false if no hint shown).
   // Captured at hint_shown time so hint_converted telemetry reports the same

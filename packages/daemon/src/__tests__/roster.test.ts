@@ -173,15 +173,58 @@ describe('recordToRosterEntry', () => {
       startedAt: 1234,
       status: 'running',
       ptySocket: '/foo/pty.sock',
+      rendezvousSocket: '/foo/rv.sock',
       cliVersion: 'v26.5.0',
       attempt: 2,
     })
     expect(e.pid).toBe(42)
     expect(e.cwd).toBe('/foo')
     expect(e.ptySock).toBe('/foo/pty.sock')
-    expect(e.rendezvousSock).toBe('/foo/pty.sock')
+    // The rv (control) socket is a DISTINCT socket from the PTY data socket
+    // and must be projected from r.rendezvousSocket — NOT aliased to
+    // r.ptySocket. A roster restart re-points the rv client using this; if
+    // it carried the PTY path, the rv handshake would corrupt the PTY stream.
+    expect(e.rendezvousSock).toBe('/foo/rv.sock')
     expect(e.cliVersion).toBe('v26.5.0')
     expect(e.attempt).toBe(2)
+  })
+
+  test('rv socket survives a roster write→read round-trip (restart recovery)', async () => {
+    // The whole point of persisting rendezvousSocket: a supervisor restart
+    // must recover the rv address from roster.json so adoptFromRoster can
+    // re-point the rv client. Lock that round-trip.
+    await updateRoster(r => {
+      r.workers['rvjob'] = recordToRosterEntry({
+        short: 'rvjob',
+        pid: 7,
+        cmd: [],
+        cwd: '/work',
+        startedAt: 100,
+        status: 'running',
+        mode: 'pty',
+        ptySocket: '/work/pty.sock',
+        rendezvousSocket: '/work/rv.sock',
+      })
+    })
+    const loaded = await readRoster()
+    expect(loaded.workers['rvjob']?.ptySock).toBe('/work/pty.sock')
+    expect(loaded.workers['rvjob']?.rendezvousSock).toBe('/work/rv.sock')
+  })
+
+  test('rendezvousSock is undefined for a worker with no rv socket (pre-rv-channel)', () => {
+    const e = recordToRosterEntry({
+      short: 'legacy',
+      pid: 9,
+      cmd: [],
+      cwd: '/old',
+      startedAt: 0,
+      status: 'running',
+      ptySocket: '/old/pty.sock',
+      // no rendezvousSocket — worker spawned before the rv channel existed
+    })
+    // Must be undefined (rv client no-ops), NOT silently the PTY path.
+    expect(e.rendezvousSock).toBeUndefined()
+    expect(e.ptySock).toBe('/old/pty.sock')
   })
 
   test('default attempt is 0 when missing', () => {

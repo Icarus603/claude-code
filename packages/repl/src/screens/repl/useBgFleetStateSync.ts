@@ -38,7 +38,25 @@ import {
   invalidateCache,
 } from '@claude-code/agent/background/fleet/fleetStore.js'
 import { generateJobName } from '@claude-code/agent/background/fleet/generateJobName.js'
+import { sendRv } from '@claude-code/agent/background/fleet/rvServer.js'
+import type { FleetJobState } from '@claude-code/agent/background/fleet/fleetTypes.js'
 import { basename } from 'node:path'
+
+/**
+ * Mirror an already-persisted state.json write over the rv control channel
+ * (ant pushes `{type:'state', patch}` after every xO disk write). No-op
+ * when the rv server isn't running (sendRv returns false). We send only the
+ * meaningful fields the supervisor cares about — the disk write above is
+ * authoritative; this is the out-of-band notification so the supervisor's
+ * WorkerVm sees liveness + state without waiting for the FleetView poll.
+ */
+function mirrorRvState(patch: Partial<FleetJobState>): void {
+  try {
+    sendRv({ type: 'state', patch })
+  } catch {
+    // best-effort — rv is an optimisation, the disk write already landed.
+  }
+}
 
 /**
  * Compress assistant text into a single-line FleetView middle-column
@@ -215,6 +233,7 @@ export function useBgFleetStateSync(
             needs: undefined,
             updatedAt: now,
           })
+          mirrorRvState({ state: 'working', tempo: 'active' })
         } else {
           if (current.state === 'stopped' || current.state === 'failed') return
           const assistantText = lastAssistantText(messagesRef.current)
@@ -245,6 +264,12 @@ export function useBgFleetStateSync(
               needs: outcome.needs,
               updatedAt: now,
             })
+            mirrorRvState({
+              state: 'working',
+              tempo: 'blocked',
+              detail: replyDetail || current.detail,
+              needs: outcome.needs,
+            })
           } else if (outcome.kind === 'failed') {
             await writeJobState(jobDir, {
               ...current,
@@ -254,6 +279,17 @@ export function useBgFleetStateSync(
               intent: intentAtEnd || current.intent,
               updatedAt: now,
               firstTerminalAt: current.firstTerminalAt ?? now,
+            })
+            // A 'failed' TURN outcome (assistant said "I can't") is not a
+            // worker EXIT — the REPL stays alive for follow-up. So we mirror
+            // the state but must NOT push rv 'done' here: that settles the
+            // supervisor's WorkerVm, and the worker is still running. Genuine
+            // worker exit is already signalled authoritatively via ptyHost's
+            // 'exit' ctrl-frame + the supervisor's pid-poll.
+            mirrorRvState({
+              state: 'failed',
+              tempo: 'idle',
+              detail: replyDetail || current.detail,
             })
           } else {
             await writeJobState(jobDir, {
@@ -270,6 +306,15 @@ export function useBgFleetStateSync(
               needs: undefined,
               updatedAt: now,
               firstTerminalAt: current.firstTerminalAt ?? now,
+            })
+            // Like the 'failed' branch: a 'done' TURN (assistant finished
+            // this turn) is not a worker EXIT — the REPL idles for the next
+            // prompt. Mirror state to idle, but no rv 'done' (that would
+            // settle the still-running WorkerVm).
+            mirrorRvState({
+              state: 'done',
+              tempo: 'idle',
+              detail: replyDetail || current.detail,
             })
           }
           // Source: ant 3991.js Ja7 — fire namer once per worker after
