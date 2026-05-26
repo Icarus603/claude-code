@@ -16,7 +16,7 @@ export type {
   WindowDisplayInfo,
 } from './types.js'
 
-import type { ResolvePrepareCaptureResult } from './types.js'
+import type { ResolvePrepareCaptureResult, ScreenshotAPI } from './types.js'
 
 function loadBackend() {
   try {
@@ -53,7 +53,7 @@ export class ComputerUseAPI {
     listAll() { throw new Error('@ant/computer-use-swift: macOS only') },
   }
 
-  screenshot = backend?.screenshot ?? {
+  screenshot: ScreenshotAPI = backend?.screenshot ?? {
     async captureExcluding() { throw new Error('@ant/computer-use-swift: macOS only') },
     async captureRegion() { throw new Error('@ant/computer-use-swift: macOS only') },
   }

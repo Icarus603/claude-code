@@ -397,7 +397,7 @@ const screenshot: ScreenshotPlatform = {
   async captureScreen(displayId) {
     // If HWND is bound, capture that specific window
     if (boundHwnd) {
-      const result = this.captureWindow?.(String(boundHwnd))
+      const result = await this.captureWindow?.(String(boundHwnd))
       if (result) return result
     }
 
@@ -418,13 +418,13 @@ const screenshot: ScreenshotPlatform = {
   async captureRegion(x, y, w, h) {
     // When HWND is bound, the window IS the region (matches macOS behavior)
     if (boundHwnd) {
-      const result = this.captureWindow?.(String(boundHwnd))
+      const result = await this.captureWindow?.(String(boundHwnd))
       if (result) return result
     }
     return this.captureScreen()
   },
 
-  captureWindow(hwnd) {
+  async captureWindow(hwnd) {
     // Python Bridge (ctypes PrintWindow + GDI → Pillow JPEG, ~300ms)
     const bridgeResult = bridgeCallSync<ScreenshotResult>('screenshot_window', {
       hwnd: String(hwnd),

@@ -27,12 +27,12 @@ import { requireComputerUseSwift } from '../swiftLoader.js'
 const input: InputPlatform = {
   async moveMouse(x, y) {
     const api = requireComputerUseInput()
-    await api.moveMouse(x, y)
+    await api.moveMouse(x, y, false)
   },
 
   async click(x, y, button) {
     const api = requireComputerUseInput()
-    await api.moveMouse(x, y)
+    await api.moveMouse(x, y, false)
     await api.mouseButton(button, 'click', 1)
   },
 
@@ -76,7 +76,9 @@ const screenshot: ScreenshotPlatform = {
 
   async captureRegion(x, y, w, h) {
     const swift = requireComputerUseSwift()
-    return swift.screenshot.captureRegion([], x, y, w, h)
+    // swift captureRegion(bundleIds, x, y, w, h, outW, outH, quality, displayId?)
+    // — capture at native size (outW=w, outH=h, no downscale), quality 0.75.
+    return swift.screenshot.captureRegion([], x, y, w, h, w, h, 0.75)
   },
 
   // macOS could use SCContentFilter for window capture but we don't expose

@@ -420,6 +420,9 @@ export function createCliExecutor(opts: {
         d.height,
         d.scaleFactor,
       )
+      // swift resolvePrepareCapture takes 6 args (allowedBundleIds,
+      // surrogateHost, quality, targetW, targetH, displayId?). The trailing
+      // autoResolve/doHide were stale — the NAPI signature dropped them.
       const raw = await drainRunLoop(() =>
         cu.resolvePrepareCapture(
           withoutTerminal(opts.allowedBundleIds),
@@ -428,8 +431,6 @@ export function createCliExecutor(opts: {
           targetW,
           targetH,
           opts.preferredDisplayId,
-          opts.autoResolve,
-          opts.doHide,
         ),
       )
       // Ensure the result has fields expected by toolCalls.ts (hidden, displayId).
