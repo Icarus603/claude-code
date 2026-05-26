@@ -118,6 +118,9 @@ async function resolveScript(input: {
 export const WorkflowTool = buildTool({
   isMcp: false,
   name: WORKFLOW_TOOL_NAME,
+  // ant 3904.js gJ3: `aliases:["RunWorkflow"]` — the model may invoke the tool
+  // under either name.
+  aliases: ['RunWorkflow'],
   searchHint: 'orchestrate subagents with a deterministic JavaScript workflow',
   maxResultSizeChars: 100_000,
   isEnabled() {

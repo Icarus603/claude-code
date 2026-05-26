@@ -120,6 +120,33 @@ type AgentExecResult = {
   skipped: boolean
   durationMs: number
   outputTokens?: number
+  // Last assistant message's stop_reason — null when the turn ended without
+  // one (the throttle signal: ant 3886 `aH` treats stopReason==null + tiny
+  // output + long duration as a throttled/empty response).
+  stopReason?: string | null
+}
+
+/**
+ * Abort-aware sleep — ant 3886 `r6(ms, signal, {throwOnAbort:true})`. Resolves
+ * after `ms`, or rejects immediately if `signal` aborts (so a workflow abort
+ * during the throttle cooldown propagates instead of waiting out the 45s).
+ */
+function sleepAbortable(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new Error('Workflow aborted'))
+      return
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort)
+      resolve()
+    }, ms)
+    const onAbort = (): void => {
+      clearTimeout(timer)
+      reject(new Error('Workflow aborted'))
+    }
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
 }
 
 /**
@@ -404,6 +431,44 @@ export function createWorkflowHooks(
       )
     }
 
+    // Throttle backoff — ant 3886 `aH`/`r6(45000)`. A turn with no stop_reason,
+    // no structured output, <50 output tokens, yet running >half the stall
+    // window is a rate-limited/empty response, not real work. Sleep 45s + retry
+    // once (ant parity); without it a throttled workflow burns the hard-stall
+    // (180s) retries instead of cooling down.
+    const isThrottled = (r: AgentExecResult): boolean =>
+      !r.stalled &&
+      !r.skipped &&
+      (r.stopReason == null) &&
+      r.structured === undefined &&
+      (r.outputTokens ?? Infinity) < 50 &&
+      r.durationMs > stallMs * 0.5
+    if (isThrottled(res)) {
+      log(
+        `[throttle] agent "${label}" throttled response (no stop_reason, ${res.outputTokens ?? '?'} output tokens in ${Math.round(res.durationMs / 1000)}s) — sleeping 45s before retry`,
+      )
+      await sleepAbortable(45_000, abortSignal)
+      res = await runWithStall(
+        index,
+        prompt,
+        `${label} (throttle-retry)`,
+        phaseTitle,
+        phaseIndex,
+        stallMs,
+        opts,
+        agentDef,
+        availableTools,
+        !!schemaTool,
+        onAgentId,
+        res.durationMs,
+      )
+      if (isThrottled(res)) {
+        log(
+          `[throttle] agent "${label}" still throttled after retry — continuing with partial result`,
+        )
+      }
+    }
+
     if (res.skipped) return null
     if (res.stalled) {
       throw new Error(
@@ -445,6 +510,7 @@ export function createWorkflowHooks(
     let structured: unknown
     let lastText = ''
     let outputTokens: number | undefined
+    let stopReason: string | null = null
 
     const model = opts?.model ?? toolUseContext.options.mainLoopModel
     const emit = (
@@ -533,6 +599,7 @@ export function createWorkflowHooks(
             message: {
               content: Array<{ type: string; text?: string; name?: string }>
               usage?: { output_tokens?: number }
+              stop_reason?: string | null
             }
           }
           let textPart = ''
@@ -543,6 +610,7 @@ export function createWorkflowHooks(
           }
           if (textPart) lastText = textPart
           toolCalls += calls
+          stopReason = am.message.stop_reason ?? null
           outputTokens = am.message.usage?.output_tokens ?? outputTokens
           if (typeof outputTokens === 'number') tokens = outputTokens
           if (calls > 0) {
@@ -616,6 +684,7 @@ export function createWorkflowHooks(
       skipped: false,
       durationMs,
       outputTokens,
+      stopReason,
     }
   }
 

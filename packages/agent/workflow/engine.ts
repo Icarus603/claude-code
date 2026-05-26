@@ -90,6 +90,12 @@ export async function runWorkflow(
     // Deep-clone the result out of the vm realm so host-side consumers don't
     // hold references into the (frozen) sandbox.
     const cloned = structuredCloneSafe(result)
+    // ant 3892 ZHK calls `IH(M)` (= JSON.stringify) on the cloned result before
+    // returning — a serializability guard. structuredCloneSafe can fall back to
+    // the raw value for non-cloneable inputs, so re-assert here: a result that
+    // can't serialize must surface as a workflow error (caught below), not leak
+    // a non-JSON value into the task notification.
+    JSON.stringify(cloned)
     return {
       result: cloned,
       agentCount: hooks.getAgentCount(),
