@@ -234,7 +234,32 @@ function buildSettingsDenyRulesGuidance(context: ToolPermissionContext): string 
  * USERNAME / git email (local part), sanitized and length-capped, so the
  * classifier can resolve the `$USER/...` branch pattern in the deny rules and
  * recognize that `<other-user>/...` branches are NOT this operator's personal
- * branches. Returns [] when no identity can be resolved.
+ * branches.
+ *
+ * ccb ADDITION — operator-model context. ccb's whole product shape is a
+ * single solo operator running a self-hosted CLI on a machine they own (the
+ * same premise CYBER_RISK_INSTRUCTION encodes for the main agent loop, and
+ * the workspace-trust dialog removal d6593f98 encodes for startup). The
+ * upstream classifier template inherits ant's multi-tenant assumptions —
+ * notably the SOFT BLOCK "Git Push to Default Branch ... bypasses pull
+ * request review", which is simply false for ccb: ccb is solo-maintained,
+ * its documented release flow IS commit + push directly to main, and there
+ * is no PR-review gate to bypass. Without correcting this, the classifier
+ * (a separate LLM that never sees CYBER_RISK_INSTRUCTION) blocks the
+ * operator's normal release workflow and, worse, latches onto a prior
+ * blocked push in the transcript to also block subsequent READ-ONLY git
+ * (`git fetch`/`status`/`rev-parse`).
+ *
+ * The fix lives here, in code, rather than in the .txt templates: (a) the
+ * templates are upstream-synced and would lose the edit on the next ant
+ * pull; (b) this is the established seam for injecting environment facts the
+ * classifier must know (it already injects identity here); (c) it applies to
+ * every ccb install, since the operator model is a property of the product,
+ * not of one user. These lines do NOT relax any HARD BLOCK — pushing to a
+ * repo OUTSIDE the working-dir repo's own remote is still Data Exfiltration
+ * (hard-blocked), and force-push / remote-branch deletion / history rewrite
+ * stay under Git Destructive (soft block). They only correct the
+ * default-branch-push and read-only-git misclassifications.
  */
 async function buildSessionContextLines(): Promise<string[]> {
   const lines: string[] = []
@@ -255,6 +280,35 @@ async function buildSessionContextLines(): Promise<string[]> {
         `(\`<other-user>/...\`) are NOT this user's personal branches.`,
     )
   }
+  // ccb operator model — see the doc comment above for why these correct the
+  // upstream template's multi-tenant assumptions.
+  lines.push(
+    `**Operator model**: This is a self-hosted, single-operator ccb instance ` +
+      `running on a machine the operator owns — NOT a shared, multi-tenant, ` +
+      `or CI-runner environment. There is no separate human reviewer to defer ` +
+      `to; the operator is the owner.`,
+  )
+  lines.push(
+    `**Release flow — default-branch push is authorized**: For the git ` +
+      `repository the session started in, pushing commits to its OWN default ` +
+      `branch (main/master) on its already-configured remote is the operator's ` +
+      `normal, documented release workflow — it does NOT bypass any review ` +
+      `gate (there is none) and must NOT be treated as a SOFT BLOCK under "Git ` +
+      `Push to Default Branch". This authorization is scoped to the working-dir ` +
+      `repo's own remote ONLY: pushing to a repo outside the trusted ` +
+      `source-control orgs is still Data Exfiltration (HARD BLOCK), and ` +
+      `force-push, remote-branch deletion, and history rewrite remain blocked ` +
+      `under Git Destructive.`,
+  )
+  lines.push(
+    `**Read-only git is never security-relevant**: Local read-only / ` +
+      `fetch-only git that cannot mutate a remote or rewrite history — ` +
+      `\`git status\`, \`git fetch\`, \`git rev-parse\`, \`git log\`, ` +
+      `\`git diff\`, \`git show\`, \`git branch --list\`, \`git remote -v\`, ` +
+      `\`git tag --list\` — only reads or updates local refs/tracking state. ` +
+      `Never block these, regardless of surrounding conversation context: a ` +
+      `prior blocked push does NOT make a later read-only query a "retry".`,
+  )
   return lines
 }
 
