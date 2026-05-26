@@ -4264,14 +4264,13 @@ You have exited auto mode. The user may now want to interact more directly. You 
       ])
     }
     case 'ultrawork_request': {
-      // ant 4269.js steers the model to the Workflow tool. ccb now ports the
-      // Workflow engine (packages/agent/workflow/), gated behind
-      // WORKFLOW_SCRIPTS. When the engine is enabled, steer to it (ant-parity);
-      // otherwise fall back to the /goal Stop-hook loop — ccb's other
-      // autonomous-work primitive — so the keyword still does something useful.
-      const content = feature('WORKFLOW_SCRIPTS')
-        ? 'The user included the keyword "ultrawork", which means you should use the Workflow tool to fulfill their request.'
-        : 'The user included the keyword "ultrawork", asking you to treat this as a sustained, autonomous unit of work rather than a quick reply. Set a goal with the /goal command capturing the desired end state, then keep working through it across as many turns as needed until that condition is met — do not stop to ask the user for direction at each step.'
+      // ant 4269.js steers the model to the Workflow tool. ccb ships the
+      // Workflow engine (packages/agent/workflow/) unconditionally now, gated
+      // only at runtime by isWorkflowsEnabled(). This attachment is itself
+      // emitted only when that gate is on (attachments.ts), so the model can
+      // always reach the tool — steer to it verbatim (ant-parity).
+      const content =
+        'The user included the keyword "ultrawork", which means you should use the Workflow tool to fulfill their request.'
       return wrapMessagesInSystemReminder([
         createUserMessage({ content, isMeta: true }),
       ])

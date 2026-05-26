@@ -7,26 +7,22 @@
  * (agents · tokens · duration), with up/down to select, enter to view
  * detail, x to stop a running run, esc to close.
  *
- * ccb has NO working Workflow-script subsystem (WorkflowTool /
- * LocalWorkflowTask are stubs) and no workflow snapshot store. Its real
- * autonomous-work primitive is `/goal` — a session-scoped Stop hook. Goal
- * "runs" live as `goal_status` attachments in the transcript. So this dialog
- * lists GOAL runs: the active goal as the single "running" row, plus every
- * completed / failed goal record from the message log (newest first).
+ * The Workflow engine (packages/agent/workflow/) ships unconditionally now,
+ * runtime-gated by isWorkflowsEnabled() (ant bp()). When the gate is on this
+ * dialog is the real ant GlK — it lists live `local_workflow` tasks merged
+ * with persisted workflow snapshots (readAllWorkflowSnapshots), x stops a
+ * running run, enter views a run's stats.
  *
- * Detail view: goals carry no separate per-run artifact (logs / agent tree)
- * the way ant workflows do, so "enter" surfaces the run's condition + last
- * reason as a system message rather than opening a sub-dialog. This is the
- * faithful ccb adaptation — there is nothing more to show.
- *
- * WORKFLOW_SCRIPTS path: when the Workflow engine is enabled, this dialog
- * becomes the real ant GlK — it lists live `local_workflow` tasks merged with
- * persisted workflow snapshots (readAllWorkflowSnapshots), x stops a running
- * run. The goal-history view above is the fallback when the engine is off.
+ * Fallback (gate off): the GOAL-history view lists `/goal` runs — the active
+ * goal as the single "running" row, plus every completed / failed goal record
+ * from the message log (newest first). Goals carry no separate per-run
+ * artifact, so "enter" surfaces the run's condition + last reason as a system
+ * message rather than opening a sub-dialog. (The /workflows command is hidden
+ * when the gate is off, so this branch is normally unreachable — kept for
+ * robustness.)
  *
  * Clean React (no _c() React-compiler memoization), per ccb conventions.
  */
-import { feature } from 'bun:bundle'
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import figures from 'figures'
@@ -40,6 +36,7 @@ import {
   formatDurationCompact,
   formatTokensCompact,
   type GoalRunRecord,
+  isWorkflowsEnabled,
 } from '@claude-code/agent/goalStopHook.js'
 import { getTotalOutputTokens } from '@claude-code/app-host/bootstrap/state.js'
 import type { CommandResultDisplay } from '@claude-code/command-runtime/runtime'
@@ -126,7 +123,7 @@ function WorkflowRow({
   )
 }
 
-// ─────────────────── WORKFLOW_SCRIPTS engine view (ant GlK) ───────────────────
+// ─────────────────── Workflow engine view (ant GlK) ───────────────────
 
 type WorkflowRowData = {
   id: string
@@ -341,8 +338,11 @@ export function WorkflowsDialog({
   activeGoal,
   messages,
 }: Props): React.ReactNode {
-  // When the Workflow engine is enabled, show real workflow runs (ant GlK).
-  if (feature('WORKFLOW_SCRIPTS')) {
+  // Workflow engine ships unconditionally now — when the runtime gate is on
+  // (ant bp()), show real workflow runs (ant GlK). The goal-history view below
+  // is retained as a fallback for builds/sessions where the gate is off (the
+  // /workflows command is itself hidden then, but keep the view robust).
+  if (isWorkflowsEnabled()) {
     return <WorkflowEngineView onDone={onDone} />
   }
 

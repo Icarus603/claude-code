@@ -19,6 +19,7 @@ import { TEAM_CREATE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamCrea
 import { TEAM_DELETE_TOOL_NAME } from '@claude-code/tool-registry/tools/TeamDeleteTool/constants.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWriteTool/constants.js'
 import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
+import { WORKFLOW_TOOL_NAME } from '@claude-code/tool-registry/tools/WorkflowTool/constants.js'
 import { YOLO_CLASSIFIER_TOOL_NAME } from './yoloClassifier.js'
 import { readEnv } from '@claude-code/config/env'
 
@@ -41,11 +42,6 @@ const VERIFY_PLAN_EXECUTION_TOOL_NAME =
         require('@claude-code/tool-registry/tools/VerifyPlanExecutionTool/constants.js') as typeof import('@claude-code/tool-registry/tools/VerifyPlanExecutionTool/constants.js')
       ).VERIFY_PLAN_EXECUTION_TOOL_NAME
     : null
-const WORKFLOW_TOOL_NAME = feature('WORKFLOW_SCRIPTS')
-  ? (
-      require('@claude-code/tool-registry/tools/WorkflowTool/constants.js') as typeof import('@claude-code/tool-registry/tools/WorkflowTool/constants.js')
-    ).WORKFLOW_TOOL_NAME
-  : null
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 /**
@@ -83,7 +79,7 @@ const SAFE_YOLO_ALLOWLISTED_TOOLS = new Set([
   TEAM_DELETE_TOOL_NAME,
   SEND_MESSAGE_TOOL_NAME,
   // Workflow orchestration — subagents go through canUseTool individually
-  ...(WORKFLOW_TOOL_NAME ? [WORKFLOW_TOOL_NAME] : []),
+  WORKFLOW_TOOL_NAME,
   // Misc safe
   SLEEP_TOOL_NAME,
   // Ant-only safe tools (gates mirror tools.ts)

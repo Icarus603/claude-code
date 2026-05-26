@@ -79,11 +79,6 @@ const voiceCommand = feature('VOICE_MODE')
   : null
 // force-snip shim deleted — HISTORY_SNIP feature absent in this build.
 const forceSnip = null
-const workflowsCmd = feature('WORKFLOW_SCRIPTS')
-  ? (
-      require('@claude-code/command-runtime/stubs/emptyCommandStub.js') as typeof import('@claude-code/command-runtime/stubs/emptyCommandStub.js')
-    ).default
-  : null
 const webCmd = feature('CCR_REMOTE_SETUP')
   ? (
       require('@claude-code/teleport/remote-setup/index.js') as typeof import('@claude-code/teleport/remote-setup/index.js')
@@ -99,15 +94,13 @@ const subscribePr = null
 const ultraplan = feature('ULTRAPLAN')
   ? require('@claude-code/repl/ultraplan.js').default
   : null
-// `/workflows` — browse goal-run history (running + completed). ant v2.1.150
-// 4938.js NlK. ccb maps "workflow history" onto its real autonomous-work
-// primitive (/goal) since the Workflow-script subsystem is stubbed; gated by
-// the same ULTRAWORK flag as the `ultrawork` keyword trigger.
-const workflowsCommand = feature('ULTRAWORK')
-  ? (
-      require('@claude-code/command-runtime/commands/workflows/index.js') as typeof import('@claude-code/command-runtime/commands/workflows/index.js')
-    ).default
-  : null
+// `/workflows` — browse workflow + goal-run history (running + completed).
+// ant v2.1.150 4938.js NlK. Unconditionally registered (ant ships the command
+// in every build); visibility is the command's own runtime `isEnabled` →
+// isWorkflowsEnabled() (ant `bp()`), so DCE must NOT strip it.
+const workflowsCommand = (
+  require('@claude-code/command-runtime/commands/workflows/index.js') as typeof import('@claude-code/command-runtime/commands/workflows/index.js')
+).default
 // torch shim deleted — TORCH feature absent.
 const torch = null
 const peersCmd = feature('UDS_INBOX')
@@ -353,8 +346,7 @@ const COMMANDS = memoize((): Command[] => [
   passes,
   ...(peersCmd ? [peersCmd] : []),
   tasks,
-  ...(workflowsCmd ? [workflowsCmd] : []),
-  ...(workflowsCommand ? [workflowsCommand] : []),
+  workflowsCommand,
   ...(ultraplan ? [ultraplan] : []),
   ...(torch ? [torch] : []),
   ...(process.env.USER_TYPE === 'ant' && !process.env.IS_DEMO
@@ -414,13 +406,13 @@ async function getSkills(cwd: string): Promise<{
   }
 }
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-const getWorkflowCommands = feature('WORKFLOW_SCRIPTS')
-  ? (
-      require('@claude-code/tool-registry/tools/WorkflowTool/createWorkflowCommand.js') as typeof import('@claude-code/tool-registry/tools/WorkflowTool/createWorkflowCommand.js')
-    ).getWorkflowCommands
-  : null
-/* eslint-enable @typescript-eslint/no-require-imports */
+// Named-workflow slash commands (ant `/workflow run <name>` family, built from
+// .claude/workflows/ + bundled registry) are a P5 staged-gap:
+// createWorkflowCommand.ts is still a stub and the named-workflow resolver is
+// not wired (see WorkflowTool.ts resolveScript). Until that lands there are no
+// per-workflow commands to register. The Workflow TOOL + ultrawork keyword +
+// /workflows browser all ship and work without this.
+const getWorkflowCommands: ((cwd: string) => Promise<unknown[]>) | null = null
 
 /**
  * Filters commands by their declared `availability` (auth/provider requirement).

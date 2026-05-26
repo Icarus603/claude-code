@@ -251,6 +251,41 @@ Teams shine when parallel exploration adds real value and teammates can work ind
 
 ---
 
+## Workflows — `ultrawork` & the Workflow tool
+
+Workflows are ccb's **deterministic** multi-agent orchestration primitive. Where an Agent Team is a loose, conversational group of sessions, a Workflow is a single JavaScript script that spawns subagents through `agent()` / `parallel()` / `pipeline()` / `phase()` calls, runs them in a sandbox in the background, and can be **resumed** — completed agents return cached results so only edited or new steps re-run.
+
+**Three ways in:**
+
+1. **The `ultrawork` keyword.** Drop `ultrawork` anywhere in your prompt and it lights up with a rainbow shimmer (like `ultrathink` / `ultraplan`), with a "will use the Workflow tool" hint. It steers the model to treat the request as a sustained, orchestrated unit of work rather than a one-shot reply.
+
+   ```
+   > ultrawork: migrate every call site off the old auth middleware,
+     one subagent per package, then verify the build
+   ```
+
+2. **The Workflow tool**, invoked by the model. It compiles a self-contained script and launches it in the background:
+
+   ```js
+   export const meta = { name: 'audit', description: 'Per-package lint audit', phases: [] }
+   const pkgs = ['cli', 'agent', 'repl']
+   const results = await parallel(pkgs.map(p =>
+     () => agent(`Lint-audit packages/${p} and report findings`)))
+   log(results)
+   ```
+
+   Scripts must be **deterministic** — `Date.now()`, `Math.random()`, and `new Date()` are rejected so a resumed run reproduces exactly. Caps: up to 1000 subagents, `min(16, cpus-2)` concurrency, 180s stall detection, 5 retries.
+
+3. **`/workflows`** — a history browser for running and completed workflow runs (status · agent count · tokens · duration). `↑`/`↓` to select, `Enter` to view, `x` to stop a running one.
+
+**Notes**
+
+- **On by default** in ccb (solo-operator, same rationale as `/goal`). Disable locally with `CLAUDE_CODE_WORKFLOWS=0`. Upstream gates the same subsystem behind an opt-*in* `CLAUDE_CODE_WORKFLOWS` env var plus a server flag; ccb flips it to opt-*out*.
+- Subagents inside a workflow can't recursively launch another workflow.
+- Named workflows (built-in scripts + a `.claude/workflows/` registry) are a planned follow-up — for now provide an inline `script` or a `scriptPath`.
+
+---
+
 ## Contributing
 
 Requires [Bun](https://bun.sh) ≥ 1.3.

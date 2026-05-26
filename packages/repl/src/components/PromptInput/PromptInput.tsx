@@ -183,7 +183,7 @@ import {
   findUltrareviewTriggerPositions,
   findUltraworkTriggerPositions,
 } from '../../ultraplan/keyword.js'
-import { isWorkflowsCommandEnabled } from '@claude-code/agent/goalStopHook.js'
+import { isWorkflowsEnabled } from '@claude-code/agent/goalStopHook.js'
 import { AutoModeOptInDialog } from '../AutoModeOptInDialog.js'
 import { BridgeDialog } from '../BridgeDialog.js'
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js'
@@ -782,11 +782,9 @@ function PromptInput({
     [displayedValue],
   )
 
+  // ant 5163.js `wO=useMemo(()=>bp()?Ap8(j7):[])` — runtime gate, no build flag.
   const ultraworkTriggers = useMemo(
-    () =>
-      feature('ULTRAWORK') && isWorkflowsCommandEnabled()
-        ? findUltraworkTriggerPositions(displayedValue)
-        : [],
+    () => (isWorkflowsEnabled() ? findUltraworkTriggerPositions(displayedValue) : []),
     [displayedValue],
   )
 

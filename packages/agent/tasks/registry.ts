@@ -6,9 +6,11 @@ import { LocalShellTask } from './LocalShellTask.js'
 import { RemoteAgentTask } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-const LocalWorkflowTask: Task | null = feature('WORKFLOW_SCRIPTS')
-  ? require('./LocalWorkflowTask/LocalWorkflowTask.js').LocalWorkflowTask
-  : null
+// Workflow background-task type ships unconditionally (ant parity); the
+// Workflow tool's runtime isEnabled() gate decides whether any run is ever
+// created, so no build flag here.
+const LocalWorkflowTask: Task =
+  require('./LocalWorkflowTask/LocalWorkflowTask.js').LocalWorkflowTask
 const MonitorMcpTask: Task | null = feature('MONITOR_TOOL')
   ? require('./MonitorMcpTask/MonitorMcpTask.js').MonitorMcpTask
   : null
@@ -25,8 +27,8 @@ function getAllTasks(): Task[] {
     LocalAgentTask,
     RemoteAgentTask,
     DreamTask,
+    LocalWorkflowTask,
   ]
-  if (LocalWorkflowTask) tasks.push(LocalWorkflowTask)
   if (MonitorMcpTask) tasks.push(MonitorMcpTask)
   return tasks
 }

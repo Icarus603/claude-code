@@ -44,17 +44,14 @@ const ReviewArtifactPermissionRequest = feature('REVIEW_ARTIFACT')
     ).ReviewArtifactPermissionRequest
   : null
 
-const WorkflowTool = feature('WORKFLOW_SCRIPTS')
-  ? (
-      require('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js') as typeof import('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js')
-    ).WorkflowTool
-  : null
-
-const WorkflowPermissionRequest = feature('WORKFLOW_SCRIPTS')
-  ? (
-      require('@claude-code/tool-registry/tools/WorkflowTool/WorkflowPermissionRequest.js') as typeof import('@claude-code/tool-registry/tools/WorkflowTool/WorkflowPermissionRequest.js')
-    ).WorkflowPermissionRequest
-  : null
+// Workflow tool ships unconditionally (ant parity) — the `case WorkflowTool:`
+// switch compares object identity, so this MUST be the real tool object.
+// There is no dedicated Workflow permission component yet (the script + agent
+// count render via the generic FallbackPermissionRequest), so we don't import
+// the stub — see permissionComponentForTool below.
+const WorkflowTool = (
+  require('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js') as typeof import('@claude-code/tool-registry/tools/WorkflowTool/WorkflowTool.js')
+).WorkflowTool
 
 const MonitorTool = feature('MONITOR_TOOL')
   ? (
@@ -101,7 +98,7 @@ function permissionComponentForTool(
     case AskUserQuestionTool:
       return AskUserQuestionPermissionRequest
     case WorkflowTool:
-      return WorkflowPermissionRequest ?? FallbackPermissionRequest
+      return FallbackPermissionRequest
     case MonitorTool:
       return MonitorPermissionRequest ?? FallbackPermissionRequest
     case GlobTool:

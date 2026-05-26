@@ -11,6 +11,7 @@ import type { PermissionResult } from '@claude-code/permission/PermissionResult'
 import { generateTaskId } from '../../Task.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { WORKFLOW_TOOL_DESCRIPTION, WORKFLOW_TOOL_NAME } from './constants.js'
+import { isWorkflowsEnabled } from '@claude-code/agent/goalStopHook.js'
 import { parseWorkflowScript } from '@claude-code/agent/workflow/metaParser.js'
 import { compileWorkflowScript } from '@claude-code/agent/workflow/sandbox.js'
 import { runWorkflow } from '@claude-code/agent/workflow/engine.js'
@@ -123,8 +124,11 @@ export const WorkflowTool = buildTool({
   aliases: ['RunWorkflow'],
   searchHint: 'orchestrate subagents with a deterministic JavaScript workflow',
   maxResultSizeChars: 100_000,
+  // ant 3904.js `isEnabled:()=>bp()` — runtime workflows gate (default-on,
+  // CLAUDE_CODE_WORKFLOWS=0 kill-switch). The tool module is bundled
+  // unconditionally; this is the sole visibility gate.
   isEnabled() {
-    return true
+    return isWorkflowsEnabled()
   },
   isConcurrencySafe() {
     return false

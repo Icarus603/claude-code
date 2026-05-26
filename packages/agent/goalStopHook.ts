@@ -61,7 +61,11 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 } from '@claude-code/local-observability'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { isEnvTruthy, readEnv } from '@claude-code/config/env/utils'
+import {
+  isEnvDefinedFalsy,
+  isEnvTruthy,
+  readEnv,
+} from '@claude-code/config/env/utils'
 import { getTotalOutputTokens } from '@claude-code/app-host/bootstrap/state.js'
 import type { HookCommand } from '@claude-code/config/types'
 import {
@@ -131,26 +135,20 @@ export function isGoalCommandEnabled(): boolean {
 }
 
 /**
- * Ant `bp` (2518.js): the workflows-enabled gate used by both the
- * `/workflows` command (4938.js) and the `ultrawork` keyword injection
- * (4135.js FZ3). ant's predicate is `CLAUDE_CODE_WORKFLOWS` env truthy
- * AND the `tengu_workflows_enabled` GrowthBook flag (default true).
+ * Ant `bp` (2518.js): the single RUNTIME gate for EVERY Workflow surface —
+ * the Workflow tool (3904 `isEnabled:()=>bp()`), the `ultrawork` keyword
+ * highlight (5163 `bp()?Ap8(j7):[]`) + `ultrawork_request` attachment (4135
+ * `FZ3`), and the `/workflows` command (4938). ant gates on
+ * `CLAUDE_CODE_WORKFLOWS` env opt-IN + `tengu_workflows_enabled`.
  *
- * ccb has no working Workflow-script subsystem (WorkflowTool /
- * LocalWorkflowTask / createWorkflowCommand are all stubs gated behind the
- * opt-in WORKFLOW_SCRIPTS flag). The genuinely-working autonomous-work
- * primitive in ccb is `/goal` (Stop-hook-driven "work until met"), so
- * `/workflows` browses goal history and `ultrawork` steers the model into
- * the goal loop. Both ride a single opt-in gate that mirrors ant's
- * env-opt-in shape: the ULTRAWORK feature flag (analogous to ant requiring
- * CLAUDE_CODE_WORKFLOWS), still subject to the /goal kill-switch since the
- * underlying mechanism is the goal Stop hook.
- *
- * The feature() call is read by the command registry / attachment path
- * (which import from `bun:bundle`); this helper folds in the /goal
- * kill-switch so the two surfaces stay consistent.
+ * ccb defaults ON (solo-operator, like `/goal`); `CLAUDE_CODE_WORKFLOWS=0` is
+ * the kill-switch (opt-OUT). Folds in the `/goal` kill-switch too. Replaces
+ * the former build flags ULTRAWORK + WORKFLOW_SCRIPTS, which mis-ported one
+ * runtime gate as two default-off build flags — `feature()` DCE then stripped
+ * the whole subsystem from every shipped binary.
  */
-export function isWorkflowsCommandEnabled(): boolean {
+export function isWorkflowsEnabled(): boolean {
+  if (isEnvDefinedFalsy(readEnv('CLAUDE_CODE_WORKFLOWS'))) return false
   return isGoalCommandEnabled()
 }
 

@@ -127,21 +127,20 @@ type ListItem =
       status: 'running'
     }
 
-// WORKFLOW_SCRIPTS is ant-only (build_flags.yaml). Static imports would leak
-// ~1.3K lines into external builds. Gate with feature() + require so the
-// bundler can dead-code-eliminate the branch.
 /* eslint-disable @typescript-eslint/no-require-imports */
-const WorkflowDetailDialog = feature('WORKFLOW_SCRIPTS')
-  ? (
-      require('./WorkflowDetailDialog.js') as typeof import('./WorkflowDetailDialog.js')
-    ).WorkflowDetailDialog
-  : null
-const workflowTaskModule = feature('WORKFLOW_SCRIPTS')
-  ? (require('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js') as typeof import('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'))
-  : null
-const killWorkflowTask = workflowTaskModule?.killWorkflowTask ?? null
-const skipWorkflowAgent = workflowTaskModule?.skipWorkflowAgent ?? null
-const retryWorkflowAgent = workflowTaskModule?.retryWorkflowAgent ?? null
+// Workflow background-task controls ship unconditionally now (ant parity) —
+// kill/skip/retry come from the real LocalWorkflowTask module.
+const workflowTaskModule =
+  require('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js') as typeof import('@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js')
+const killWorkflowTask = workflowTaskModule.killWorkflowTask
+const skipWorkflowAgent = workflowTaskModule.skipWorkflowAgent
+const retryWorkflowAgent = workflowTaskModule.retryWorkflowAgent
+// Per-task workflow DETAIL sub-dialog (ant GlK detail pane wo8) is a stub that
+// renders null — not yet ported. Main `/workflows` browser is the working
+// surface (WorkflowsDialog → WorkflowEngineView).
+const WorkflowDetailDialog = (
+  require('./WorkflowDetailDialog.js') as typeof import('./WorkflowDetailDialog.js')
+).WorkflowDetailDialog
 // Relative path, not `src/...` path-mapping — Bun's DCE can statically
 // resolve + eliminate `./` requires, but path-mapped strings stay opaque
 // and survive as dead literals in the bundle. Matches tasks.ts pattern.

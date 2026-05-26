@@ -250,6 +250,41 @@ lead 會建一份共享 task list、spawn teammate、讓它們認領並執行 ta
 
 ---
 
+## 工作流 — `ultrawork` 與 Workflow 工具
+
+工作流是 ccb 的**確定性**多 agent 編排原語。Agent Team 是一群鬆散、對話式的 session；工作流則是一支 JavaScript 腳本，透過 `agent()` / `parallel()` / `pipeline()` / `phase()` 呼叫派生子 agent，在沙箱中於背景執行，並且可**續跑** —— 已完成的 agent 回傳快取結果，只有改動或新增的步驟才重跑。
+
+**三種進入方式：**
+
+1. **`ultrawork` 關鍵字。** 在提示中任意處輸入 `ultrawork`，它會亮起彩虹微光（如同 `ultrathink` / `ultraplan`），並附帶「將使用 Workflow 工具」提示。它引導模型把請求當成一個持續、被編排的工作單元，而非一次性回覆。
+
+   ```
+   > ultrawork：把所有呼叫點從舊的 auth middleware 遷走，
+     每個 package 一個子 agent，最後驗證 build
+   ```
+
+2. **Workflow 工具**，由模型呼叫。它編譯一支自足腳本並於背景啟動：
+
+   ```js
+   export const meta = { name: 'audit', description: 'Per-package lint audit', phases: [] }
+   const pkgs = ['cli', 'agent', 'repl']
+   const results = await parallel(pkgs.map(p =>
+     () => agent(`Lint-audit packages/${p} and report findings`)))
+   log(results)
+   ```
+
+   腳本必須**確定性** —— `Date.now()`、`Math.random()`、`new Date()` 一律被拒，好讓續跑能精確重現。上限：最多 1000 個子 agent、`min(16, cpus-2)` 並發、180 秒停滯偵測、5 次重試。
+
+3. **`/workflows`** —— 執行中與已完成工作流的歷史瀏覽器（狀態 · agent 數 · token · 時長）。`↑`/`↓` 選取、`Enter` 檢視、`x` 停止執行中的工作流。
+
+**注意事項**
+
+- ccb **預設開啟**（單人維運，與 `/goal` 同理）。本地以 `CLAUDE_CODE_WORKFLOWS=0` 關閉。上游把同一子系統擋在 opt-*in* 的 `CLAUDE_CODE_WORKFLOWS` env var 加伺服器旗標之後；ccb 反轉為 opt-*out*。
+- 工作流內的子 agent 不能遞迴啟動另一個工作流。
+- 具名工作流（內建腳本 + `.claude/workflows/` 註冊表）是規劃中的後續工作 —— 目前請提供 inline `script` 或 `scriptPath`。
+
+---
+
 ## 貢獻
 
 需要 [Bun](https://bun.sh) ≥ 1.3。

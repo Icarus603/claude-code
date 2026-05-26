@@ -135,13 +135,13 @@ const getSnipTool = () =>
 // gate UDS_INBOX defaults false in this build.
 const getListPeersTool = () => null
 
-const getWorkflowTool = () =>
-  feature('WORKFLOW_SCRIPTS')
-    ? (() => {
-        require('@claude-code/tool-registry/tools/WorkflowTool/bundled/index.js').initBundledWorkflows()
-        return require('../../WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
-      })()
-    : null
+// Workflow tool ships in every build (ant parity); runtime visibility is the
+// tool's own isEnabled() → isWorkflowsEnabled(). Unconditional require so DCE
+// keeps the engine in the bundle.
+const getWorkflowTool = () => {
+  require('@claude-code/tool-registry/tools/WorkflowTool/bundled/index.js').initBundledWorkflows()
+  return require('../../WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
+}
 
 const getTeamCreateTool = () =>
   require('../../TeamCreateTool/TeamCreateTool.js').TeamCreateTool as Tool

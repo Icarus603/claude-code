@@ -261,7 +261,7 @@ const sessionTranscriptModule = feature('KAIROS')
 /* eslint-enable @typescript-eslint/no-require-imports */
 import { hasUltrathinkKeyword, isUltrathinkEnabled } from '@claude-code/provider/thinking.js'
 import { hasUltraworkKeyword } from '@claude-code/repl/ultraplan/keyword.js'
-import { isWorkflowsCommandEnabled } from './goalStopHook.js'
+import { isWorkflowsEnabled } from './goalStopHook.js'
 import {
   tokenCountFromLastAPIResponse,
   tokenCountWithEstimation,
@@ -1015,16 +1015,14 @@ export async function getAttachments(
         // block, gated on bp() (workflows enabled) AND a regular user prompt.
         // ccb has no isRegularUserPrompt plumbing; `input` is non-null only
         // on a fresh user prompt (mid-turn re-collection passes input===null),
-        // so `input && isMainThread` is the faithful equivalent. The feature()
-        // gate lets DCE drop the path in builds where ULTRAWORK is off.
-        ...(feature('ULTRAWORK')
-          ? isWorkflowsCommandEnabled()
-            ? [
-                maybe('ultrawork_request', () =>
-                  Promise.resolve(getUltraworkRequestAttachment(input)),
-                ),
-              ]
-            : []
+        // so `input && isMainThread` is the faithful equivalent. Gated on the
+        // runtime workflows gate (ant bp()), no build flag.
+        ...(isWorkflowsEnabled()
+          ? [
+              maybe('ultrawork_request', () =>
+                Promise.resolve(getUltraworkRequestAttachment(input)),
+              ),
+            ]
           : []),
         maybe('ide_selection', async () =>
           getSelectedLinesFromIDE(ideSelection, toolUseContext),
