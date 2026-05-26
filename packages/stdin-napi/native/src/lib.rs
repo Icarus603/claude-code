@@ -46,7 +46,7 @@
 mod unix_impl {
   use std::os::unix::io::RawFd;
   use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
-  use std::sync::Arc;
+  use std::sync::{Arc, Mutex};
 
   use napi::bindgen_prelude::*;
   use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
@@ -54,6 +54,67 @@ mod unix_impl {
   // Count of live reader threads. If >1, a stale reader from a prior
   // mount didn't die and is stealing fd 0 bytes (dropped keystrokes).
   static ACTIVE_READERS: AtomicI32 = AtomicI32::new(0);
+
+  // --- Refcounted fd-0 termios baseline ---------------------------------
+  // Every redirect_fd0=false reader reads fd 0 *directly* and, on its own,
+  // would set raw on start and restore cooked on stop. During a CHAINED
+  // handoff — REPL→FleetView reader, then attach reader, then FleetView
+  // reader again on detach — a stop() that restored cooked BETWEEN two raw
+  // readers left fd 0 in cooked+echo for the (async, multi-tick) Ink remount
+  // window. Any keystroke in that window was echoed by the tty line
+  // discipline, so arrow keys surfaced as visible `^[[C` garbage in the
+  // FleetView footer.
+  //
+  // Fix: refcount the raw state on fd 0. The FIRST fd-0 reader captures the
+  // real cooked termios as the baseline and sets raw; later readers in the
+  // chain just bump the count (fd 0 is already raw — they must NOT re-capture,
+  // or they'd store the raw termios as the "baseline" and never restore
+  // cooked). Only when the LAST reader stops do we restore the baseline. fd 0
+  // therefore stays raw across the entire handoff — no cooked echo window.
+  //
+  // Scope: ONLY the shared-fd-0 path (redirect_fd0=false). The redirect path
+  // (owns_tty=true) reads a private dup and keeps its own per-reader save/
+  // restore — no sharing, no refcount.
+  static FD0_RAW_REFCOUNT: AtomicI32 = AtomicI32::new(0);
+  static FD0_BASELINE: Mutex<Option<libc::termios>> = Mutex::new(None);
+
+  /// Acquire a refcounted raw-mode reference on fd 0. The first acquirer saves
+  /// the original (cooked) termios and switches fd 0 to raw; subsequent
+  /// acquirers in a chained handoff only bump the count (fd 0 already raw).
+  unsafe fn fd0_acquire_raw() -> std::result::Result<(), String> {
+    let mut guard = FD0_BASELINE
+      .lock()
+      .map_err(|_| "fd0 baseline mutex poisoned".to_string())?;
+    if FD0_RAW_REFCOUNT.load(Ordering::SeqCst) == 0 {
+      // First reader in the chain — capture the real cooked baseline + raw it.
+      let saved = set_raw(0)?;
+      *guard = Some(saved);
+    }
+    // else: fd 0 is already raw from an earlier reader still in the chain.
+    // Re-capturing now would save the RAW termios as the baseline and the
+    // cooked state would be lost forever — so we deliberately skip the save.
+    FD0_RAW_REFCOUNT.fetch_add(1, Ordering::SeqCst);
+    Ok(())
+  }
+
+  /// Release one fd-0 raw reference. The LAST release restores the original
+  /// cooked termios; intermediate releases leave fd 0 raw for the next reader
+  /// in the chain (closing the echo window).
+  unsafe fn fd0_release_raw() {
+    let mut guard = match FD0_BASELINE.lock() {
+      Ok(g) => g,
+      Err(poisoned) => poisoned.into_inner(),
+    };
+    let prev = FD0_RAW_REFCOUNT.fetch_sub(1, Ordering::SeqCst);
+    if prev <= 1 {
+      // Last reader out — restore the captured cooked termios.
+      if let Some(saved) = guard.take() {
+        libc::tcsetattr(0, libc::TCSANOW, &saved);
+      }
+      // Clamp to 0 in case of an unbalanced release (defensive).
+      FD0_RAW_REFCOUNT.store(0, Ordering::SeqCst);
+    }
+  }
 
   /// JS-visible: how many rust reader threads are currently running.
   #[napi]
@@ -89,6 +150,11 @@ mod unix_impl {
     /// without destroying any handle (mirrors ant's "handle never destroyed"
     /// invariant). -1 means not in redirect mode.
     saved_stdin_dup: RawFd,
+    /// True when this reader took a shared-fd-0 raw reference (redirect_fd0
+    /// =false). stop() then routes through fd0_release_raw (refcounted) rather
+    /// than restoring `saved` itself. False for redirect-mode readers, which
+    /// own a private dup and restore `saved` directly.
+    shared_fd0: bool,
   }
 
   // SAFETY: the raw fds and termios are only mutated under the `stopped`
@@ -118,9 +184,18 @@ mod unix_impl {
         return;
       }
       unsafe {
-        // Restore termios FIRST so the tty is back in its original mode the
-        // moment stop() returns (the caller may spawn an editor next).
-        libc::tcsetattr(self.tty_fd, libc::TCSANOW, &self.saved);
+        if self.shared_fd0 {
+          // Shared-fd-0 path: route through the refcount. Only the LAST reader
+          // in a chained handoff restores cooked termios; intermediate stops
+          // leave fd 0 raw so the next reader inherits raw mode with no echo
+          // window. (See fd0_release_raw + FD0_BASELINE.)
+          fd0_release_raw();
+        } else {
+          // Redirect / private-dup path: restore this reader's own saved
+          // termios FIRST so the tty is back in its original mode the moment
+          // stop() returns (the caller may spawn an editor next).
+          libc::tcsetattr(self.tty_fd, libc::TCSANOW, &self.saved);
+        }
         // fd0-redirect mode: put the REAL tty back onto fd 0 so Bun's
         // process.stdin (alive, never destroyed) reads the tty again. This is
         // the handoff back to the Node-stream path (e.g. attach's runAttach
@@ -246,13 +321,25 @@ mod unix_impl {
       (0, false, -1)
     };
 
-    let saved = match unsafe { set_raw(tty_fd) } {
-      Ok(s) => s,
-      Err(msg) => {
-        if owns_tty {
-          unsafe { libc::close(tty_fd) };
-        }
+    // Raw-mode acquisition. Two ownership models:
+    //   - redirect mode (owns_tty): private dup, so save+raw this reader's own
+    //     fd; `saved` is restored by THIS reader's stop().
+    //   - shared fd 0: refcounted — fd0_acquire_raw() saves the cooked baseline
+    //     once for the whole chain and never flaps it back to cooked between
+    //     chained readers. `saved` is unused on this path (zeroed placeholder).
+    let shared_fd0 = !owns_tty;
+    let saved: libc::termios = if shared_fd0 {
+      if let Err(msg) = unsafe { fd0_acquire_raw() } {
         return Err(Error::from_reason(format!("stdin-napi: {msg}")));
+      }
+      unsafe { std::mem::zeroed() }
+    } else {
+      match unsafe { set_raw(tty_fd) } {
+        Ok(s) => s,
+        Err(msg) => {
+          unsafe { libc::close(tty_fd) };
+          return Err(Error::from_reason(format!("stdin-napi: {msg}")));
+        }
       }
     };
 
@@ -261,8 +348,10 @@ mod unix_impl {
     let mut fds: [libc::c_int; 2] = [0; 2];
     if unsafe { libc::pipe(fds.as_mut_ptr()) } != 0 {
       unsafe {
-        libc::tcsetattr(tty_fd, libc::TCSANOW, &saved);
-        if owns_tty {
+        if shared_fd0 {
+          fd0_release_raw();
+        } else {
+          libc::tcsetattr(tty_fd, libc::TCSANOW, &saved);
           libc::close(tty_fd);
         }
       }
@@ -286,6 +375,7 @@ mod unix_impl {
       owns_tty,
       saved,
       saved_stdin_dup,
+      shared_fd0,
     });
     let thread_state = Arc::clone(&state);
 
