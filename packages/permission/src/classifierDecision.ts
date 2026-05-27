@@ -21,6 +21,7 @@ import { TODO_WRITE_TOOL_NAME } from '@claude-code/tool-registry/tools/TodoWrite
 import { TOOL_SEARCH_TOOL_NAME } from '@claude-code/tool-registry/tools/ToolSearchTool/prompt.js'
 import { WORKFLOW_TOOL_NAME } from '@claude-code/tool-registry/tools/WorkflowTool/constants.js'
 import { YOLO_CLASSIFIER_TOOL_NAME } from './yoloClassifier.js'
+import type { PermissionDecisionReason } from './permissionTypes.js'
 import { readEnv } from '@claude-code/config/env'
 
 // Ant-only tool names: conditional require so Bun can DCE these in external builds.
@@ -92,4 +93,80 @@ const SAFE_YOLO_ALLOWLISTED_TOOLS = new Set([
 
 export function isAutoModeAllowlistedTool(toolName: string): boolean {
   return SAFE_YOLO_ALLOWLISTED_TOOLS.has(toolName)
+}
+
+/**
+ * Whether a permission decision is an explicit user-configured ask rule —
+ * directly, or nested inside a Bash subcommandResults bundle. ant `FW6`
+ * (4260.js). Auto mode must fall back to PROMPTING for these instead of
+ * handing them to the classifier: the user deliberately said "ask me about
+ * this", so the answer is the user's to give, not a weaker LLM's to guess.
+ */
+export function isAskRuleDecision(
+  reason: PermissionDecisionReason | undefined,
+): boolean {
+  if (reason?.type === 'rule' && reason.rule.ruleBehavior === 'ask') {
+    return true
+  }
+  if (reason?.type === 'subcommandResults') {
+    for (const sub of reason.reasons.values()) {
+      if (sub.behavior === 'ask' && isAskRuleDecision(sub.decisionReason)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+/**
+ * Whether a decision is the plan-mode floor (ant `qMK`, 4260.js): plan mode
+ * forces an approval prompt that auto mode must not auto-resolve via the
+ * classifier.
+ */
+export function isPlanModeDecision(
+  reason: PermissionDecisionReason | undefined,
+): boolean {
+  return reason?.type === 'mode' && reason.mode === 'plan'
+}
+
+/**
+ * Pure pre-classifier triage for auto mode (ant `xaH` 4260.js, the
+ * `j||J||D||M||f` block). Decides whether a decision should bypass the
+ * classifier entirely and prompt/deny the user instead. Returns:
+ *   - 'deny-headless'        — a prompt-worthy reason but no prompt available
+ *   - {reason}               — fall back to prompting (caller returns the 'ask'
+ *                              result and logs tengu_auto_mode_fallback_to_ask)
+ *   - null                   — proceed to the classifier
+ * Side-effect-free so it lives here (no host bindings); the caller owns the
+ * logEvent + return. `M` (MCP org ceiling) is omitted — ccb has no org ceiling.
+ * sandboxOverride alone is NOT a fallback (ant's interactive cond is j||D||f).
+ */
+export type AutoModeFallback =
+  | 'deny-headless'
+  | { reason: 'safety_check' | 'ask_rule' | 'plan_mode_floor' }
+  | null
+
+export function computeAutoModeFallback(
+  reason: PermissionDecisionReason | undefined,
+  isHeadless: boolean,
+): AutoModeFallback {
+  const isNonApprovableSafetyCheck =
+    reason?.type === 'safetyCheck' && !reason.classifierApprovable
+  const isSandboxOverride = reason?.type === 'sandboxOverride'
+  const isAskRule = isAskRuleDecision(reason)
+  const isPlanFloor = isPlanModeDecision(reason)
+  if (
+    !isNonApprovableSafetyCheck &&
+    !isSandboxOverride &&
+    !isAskRule &&
+    !isPlanFloor
+  ) {
+    return null
+  }
+  if (isHeadless) return 'deny-headless'
+  if (isNonApprovableSafetyCheck) return { reason: 'safety_check' }
+  if (isAskRule) return { reason: 'ask_rule' }
+  if (isPlanFloor) return { reason: 'plan_mode_floor' }
+  // sandboxOverride alone — fall through to the classifier.
+  return null
 }

@@ -12,11 +12,26 @@ import type { ClassifierUsage } from './permissionTypes.js'
 // ============================================================================
 
 /**
- * Stage 1 suffix (xml_s1_h2): appended after the transcript to nudge
- * immediate decision. Matches XML_S1_SUFFIXES["h2"] in
+ * Stage 1 suffix for FAST-ONLY mode (ant `Mp5`): appended after the transcript
+ * to nudge an immediate decision. In fast-only mode stage 1 is the final
+ * verdict, so it must apply the full rule set itself — no "stage 2 will handle
+ * it" carve-out. Matches XML_S1_SUFFIXES["h2"] in
  * sandbox/johnh/control/bpc_classifier/classifier.py.
  */
 export const XML_S1_SUFFIX = '\nErr on the side of blocking. <block> immediately.'
+
+/**
+ * Stage 1 suffix for the default TWO-STAGE (`both`) mode (ant `fp5`). Stage 1
+ * here is a COARSE pre-filter: it must NOT apply User Intent or ALLOW
+ * exceptions (stage 2 does that with chain-of-thought), and should block if any
+ * rule *could* apply — an over-eager stage-1 block is harmless because it only
+ * escalates to stage 2, which then clears it via intent/ALLOW. Without this,
+ * ccb wrongly ran the fast-only `Mp5` suffix in `both` mode, telling stage 1 to
+ * make a final-quality judgement it isn't equipped for. ant `Gp5`:
+ * `A==="both"?fp5:Mp5`.
+ */
+export const XML_S1_SUFFIX_BOTH =
+  '\nErr on the side of blocking. Stage 1 does NOT apply user intent or ALLOW exceptions — stage 2 will handle those. Block if ANY rule could apply. <block> immediately.'
 /**
  * Stage 2 suffix (xml_s2_t2): appended after the transcript to elicit
  * reasoning. Matches XML_S2_SUFFIXES["t2"] in

@@ -530,30 +530,39 @@ export const hasPermissionsToUseTool: CanUseToolFn = async (
         (appState.toolPermissionContext.mode === 'plan' &&
           (autoModeStateModule?.isAutoModeActive() ?? false)))
     ) {
-      // Non-classifier-approvable safetyCheck decisions stay immune to ALL
-      // auto-approve paths: the acceptEdits fast-path, the safe-tool allowlist,
-      // and the classifier. Step 1g only guards bypassPermissions; this guards
-      // auto. classifierApprovable safetyChecks (sensitive-file paths) fall
-      // through to the classifier — the fast-paths below naturally don't fire
-      // because the tool's own checkPermissions still returns 'ask'.
-      if (
-        result.decisionReason?.type === 'safetyCheck' &&
-        !result.decisionReason.classifierApprovable
-      ) {
-        if (appState.toolPermissionContext.shouldAvoidPermissionPrompts) {
-          return {
-            behavior: 'deny',
-            message: result.message,
-            decisionReason: {
-              type: 'asyncAgent',
-              reason:
-                'Safety check requires interactive approval and permission prompts are not available in this context',
-            },
-          }
+      // Fall back to PROMPTING the user (not the classifier) for decisions the
+      // classifier has no business overriding — non-approvable safetyChecks,
+      // sandboxOverride, explicit user ask rules, plan-mode floor. ant `xaH`
+      // (4260.js) `j||J||D||M||f`; triage logic in computeAutoModeFallback.
+      const fallback = classifierDecisionModule!.computeAutoModeFallback(
+        result.decisionReason,
+        appState.toolPermissionContext.shouldAvoidPermissionPrompts ?? false,
+      )
+      if (fallback === 'deny-headless') {
+        return {
+          behavior: 'deny',
+          message: result.message,
+          decisionReason: {
+            type: 'asyncAgent',
+            reason:
+              'Action requires interactive approval and permission prompts are not available in this context',
+          },
         }
+      }
+      if (fallback) {
+        logEvent('tengu_auto_mode_fallback_to_ask', {
+          reason:
+            fallback.reason as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          toolName: sanitizeToolNameForAnalytics(tool.name),
+        })
         return result
       }
       if (tool.requiresUserInteraction?.() && result.behavior === 'ask') {
+        logEvent('tengu_auto_mode_fallback_to_ask', {
+          reason:
+            'requires_user_interaction' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          toolName: sanitizeToolNameForAnalytics(tool.name),
+        })
         return result
       }
 
@@ -827,6 +836,16 @@ export const hasPermissionsToUseTool: CanUseToolFn = async (
         // error, won't recover on retry. Skip iron_gate and fall back to
         // normal prompting so the user can approve/deny manually.
         if (classifierResult.transcriptTooLong) {
+          // ant `if(H.name===e9)return {allow,mode:auto}`: REPL passes through
+          // (its inner tool calls are classified individually, so allowing the
+          // wrapper is safe).
+          if (tool.name === REPL_TOOL_NAME) {
+            return {
+              behavior: 'allow',
+              updatedInput: input,
+              decisionReason: { type: 'mode', mode: 'auto' },
+            }
+          }
           if (appState.toolPermissionContext.shouldAvoidPermissionPrompts) {
             // Permanent condition (transcript only grows) — deny-retry-deny
             // wastes tokens without ever hitting the denial-limit abort.
@@ -838,12 +857,17 @@ export const hasPermissionsToUseTool: CanUseToolFn = async (
             'Auto mode classifier transcript too long, falling back to normal permission handling',
             { level: 'warn' },
           )
+          logEvent('tengu_auto_mode_fallback_to_ask', {
+            reason:
+              'transcript_too_long' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+            toolName: sanitizeToolNameForAnalytics(tool.name),
+          })
           return {
             ...result,
             decisionReason: {
               type: 'other',
               reason:
-                'Auto mode classifier transcript exceeded context window — falling back to manual approval',
+                'Auto mode classifier transcript exceeded context window — falling back to manual approval (try /compact to reduce conversation size)',
             },
           }
         }
@@ -879,6 +903,11 @@ export const hasPermissionsToUseTool: CanUseToolFn = async (
             'Auto mode classifier unavailable, falling back to normal permission handling (fail open)',
             { level: 'warn' },
           )
+          logEvent('tengu_auto_mode_fallback_to_ask', {
+            reason:
+              'classifier_unavailable_fail_open' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+            toolName: sanitizeToolNameForAnalytics(tool.name),
+          })
           return result
         }
 
