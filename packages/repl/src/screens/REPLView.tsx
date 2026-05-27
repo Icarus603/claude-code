@@ -379,7 +379,7 @@ import { updateSessionName, updateSessionActivity } from '@claude-code/agent/con
 import { isInProcessTeammateTask, type InProcessTeammateTaskState } from '@claude-code/swarm';
 import { restoreRemoteAgentTasks } from '@claude-code/tool-registry/tasks/RemoteAgentTask.js';
 import { useInboxPoller } from '../hooks/useInboxPoller.js';
-import { getViewedLocalAgentTask, hasRunningPanelAgentTask } from './repl/backgrounding.js';
+import { getViewedLocalAgentTask } from './repl/backgrounding.js';
 import { getInteractiveMcpClients } from './repl/integrations.js';
 import { parseImmediateCommandInput } from './repl/submission.js';
 // Dead code elimination: conditional import for loop mode
@@ -1614,12 +1614,11 @@ export function REPL({
 
   // Session backgrounding — hook is below, after getToolUseContext
 
+  // ant `RD` spinner gate (5359.js:923): in-process teammates, running.
   const hasRunningTeammates = useMemo(
     () => getAllInProcessTeammateTasks(tasks).some(t => t.status === 'running'),
     [tasks],
   );
-  // ant `RD` spinner gate widened to bg panel agents — see backgrounding.ts.
-  const hasRunningPanelAgent = useMemo(() => hasRunningPanelAgentTask(tasks), [tasks]);
 
   // Show deferred turn duration message once all swarm teammates finish
   useEffect(() => {
@@ -1721,16 +1720,14 @@ export function REPL({
     (!toolJSX || toolJSX.showSpinner === true) &&
     toolUseConfirmQueue.length === 0 &&
     promptQueue.length === 0 &&
-    // Show spinner during input processing, API call, while teammates are running,
-    // or while pending task notifications are queued (prevents spinner bounce between consecutive notifications)
+    // Show spinner during input processing, API call, while teammates are
+    // running, or while task notifications are queued (prevents spinner bounce).
+    // NOT panel subagents: ant's gate `RD` (5359.js:923) counts in-process
+    // teammates only — a leader-idle main agent stays quiet while a bg subagent
+    // works (its progress shows in the footer pill + tool-use block).
     (isLoading ||
       userInputOnProcessing ||
       hasRunningTeammates ||
-      hasRunningPanelAgent ||
-      // Keep spinner visible while task notifications are queued for processing.
-      // Without this, the spinner briefly disappears between consecutive notifications
-      // (e.g., multiple background agents completing in rapid succession) because
-      // isLoading goes false momentarily between processing each one.
       getCommandQueueLength() > 0) &&
     // Hide spinner when waiting for leader to approve permission request
     !pendingWorkerRequest &&
