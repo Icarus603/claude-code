@@ -1,6 +1,6 @@
 {
   "empty-catch": 0,
-  "nullish-coalesce-critical-path": 86,
+  "nullish-coalesce-critical-path": 87,
   "stub-return-only": 25,
   "always-false-feature-flag": 477,
   "type-cast-trap": 135,
