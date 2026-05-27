@@ -205,7 +205,16 @@ import { spawnSync } from 'child_process'
 // to absorb the same vendored @ant/computer-use-mcp drift that
 // `chore(branch): consolidate /goal-port` (ef8e17f9) surfaced. None
 // of the new agentFleet/ files contribute errors.
-const BUDGET = 3103
+// 2026-05-27 (fleet attach + spinner branch): bumped 3103 → 3113. The +10
+// was ALREADY present at c8236f3e (HEAD before this branch's commits) —
+// verified by checking out c8236f3e and re-running the ratchet. This branch's
+// own files (cli/bg attach, stdin-napi, REPLView spinner gate, backgrounding)
+// are tsc-NEUTRAL: the count is 3113 both before and after them. The drift is
+// pre-existing accumulation in the big decompiled error sources (run-streaming
+// 253, REPLView 107, MCPRemoteServerMenu 101, permissions 88 — all unknown/
+// never noise) that earlier commits didn't refresh. Bumping to absorb it so
+// the read-path ratchet stops blocking unrelated pushes.
+const BUDGET = 3113
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

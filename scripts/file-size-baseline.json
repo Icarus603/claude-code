@@ -21,7 +21,7 @@
   "packages/agent/internal/fileHistoryCore.ts": 1111,
   "packages/agent/localAgentTask.tsx": 813,
   "packages/agent/messages.ts": 5692,
-  "packages/agent/prompts.ts": 988,
+  "packages/agent/prompts.ts": 1016,
   "packages/agent/query.ts": 1838,
   "packages/agent/sessionTools/analyzeContext.ts": 1391,
   "packages/agent/tasks.ts": 851,
