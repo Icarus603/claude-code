@@ -164,22 +164,50 @@ function getHooksSection(): string {
 }
 
 /**
- * Compact harness mode — env var > feature flag. When enabled, the
- * system prompt collapses to getHarnessSection() + CYBER_RISK + a few
- * ccb-only bullets, dropping the full Doing tasks / Executing actions /
- * Using your tools / System sections. Saves ~6-7k tokens per session
- * for power users who don't need the long-form guidance every turn.
+ * ant 2180.js $e1 — model prerequisite for compact harness. Compact mode
+ * is only eligible for opus-4-7 or early-access (`-eap`) models. ant's
+ * kz8/Vz8/MA_ helpers are stubs (return false); Yx9's
+ * clientDataCache/velvet_cascade allowlist has no ccb equivalent (ccb
+ * receives no server-pushed client data), so both are omitted.
  *
- * Mirrors upstream v2.1.128's g$() gate (env var, then GrowthBook). The
- * model-must-be-opus-4-7 prerequisite from upstream is dropped — ccb's
- * single operator runs whatever model they want, the operator picks
- * compact mode based on their familiarity with Claude Code, not model
- * capability.
+ * Restoring this gate (it was dropped in an earlier ccb pass that forced
+ * compact for ALL models) is what keeps non-eligible models — Sonnet,
+ * Haiku, 3P — on the FULL prompt, which carries the strong "Maximize use
+ * of parallel tool calls" guidance (getUsingYourToolsSection). Without it
+ * those models only saw the weak one-line hint in getHarnessSection and
+ * tended to emit one tool_use per turn instead of batching.
  */
-function isCompactHarnessEnabled(): boolean {
+function isCompactHarnessEligibleModel(model: string): boolean {
+  if (getCanonicalName(model).includes('claude-opus-4-7')) return true
+  if (/-eap($|\[)/i.test(model)) return true
+  return false
+}
+
+/**
+ * Compact harness mode — env var > model prerequisite > feature flag,
+ * mirroring ant 2181.js oz(). When enabled, the system prompt collapses
+ * to getHarnessSection() + CYBER_RISK + a few ccb-only bullets, dropping
+ * the full Doing tasks / Executing actions / Using your tools / System
+ * sections. Saves ~6-7k tokens per session for power users who don't need
+ * the long-form guidance every turn.
+ *
+ * The model prerequisite (isCompactHarnessEligibleModel) is back in force
+ * after an earlier ccb pass dropped it on the rationale that "the operator
+ * runs whatever model they want." That reasoning was wrong: the cost of
+ * compact mode isn't operator familiarity, it's that non-opus models lose
+ * the strong parallel-tool-call guidance and stop batching tool calls.
+ * `CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT=1` still forces compact on any model
+ * for an operator who explicitly wants it.
+ */
+function isCompactHarnessEnabled(model: string): boolean {
+  // ant oz() order: explicit env wins first (truthy → on, falsy → off),
+  // then the model prerequisite gates everything, then the flag decides.
   const env = readEnv('CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT')
   if (env !== undefined) {
     return isEnvTruthy(env)
+  }
+  if (!isCompactHarnessEligibleModel(model)) {
+    return false
   }
   return getFeatureValue_CACHED_MAY_BE_STALE('tengu_vellum_lantern', false)
 }
@@ -603,7 +631,7 @@ ${CYBER_RISK_INSTRUCTION}`,
   // Intro+CYBER_RISK and the 6-bullet "# Harness" scaffolding from
   // upstream, plus ccb-only anti-avoidance bullets. Output efficiency
   // collapses to a one-liner. Saves ~6-7k tokens per session.
-  if (isCompactHarnessEnabled()) {
+  if (isCompactHarnessEnabled(model)) {
     logForDebugging(`[SystemPrompt] path=compact-harness`)
     return [
       // --- Static content (cacheable) ---
