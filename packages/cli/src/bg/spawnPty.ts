@@ -157,6 +157,18 @@ export function spawnPtyHost(opts: {
     ...(opts.spare === true ? { CCB_SPARE: '1' } : {}),
   }
 
+  // Strip the FleetView-subsystem reader marker so it NEVER leaks into a
+  // dispatched worker. `CCB_FLEET_INPROCESS_REMOUNT=1` activates the rust
+  // stdin reader (App.useNativeReader) + the orphan-check stdin bypass — both
+  // are correct ONLY for the foreground process driving FleetView. The
+  // standalone `ccb agents` handler sets it PROCESS-GLOBALLY before dispatching
+  // workers (unlike the left-arrow bridge, which dispatches before setting it),
+  // so without this delete every bg worker would inherit it and wrongly run the
+  // reader against its OWN pty slave fd 0 + skip its orphan check. spawnPtyHost
+  // is the single chokepoint for all PTY spawns (spawnBgPty / respawnJob /
+  // bgDaemon all funnel here), so deleting once here covers every path.
+  delete env.CCB_FLEET_INPROCESS_REMOUNT
+
   const child = spawn(cmd, hostArgs, {
     cwd: opts.cwd,
     env,

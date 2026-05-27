@@ -24,6 +24,14 @@
 
 import { feature } from 'bun:bundle'
 
+// Static import (not `await import`): this whole handler is itself lazily
+// imported only when `ccb agents` runs, so pulling stdin-napi in here does NOT
+// touch the REPL boot path, and it keeps the pin/unpin exports visible to knip
+// (a dynamic import would read as unused). Mirrors openAgentsFromRepl.ts.
+import { pinFd0Raw, unpinFd0Raw } from 'stdin-napi'
+
+import { stopCapturingEarlyInput } from '@claude-code/repl/earlyInput.js'
+
 import { agentsHandler as plainTextHandler } from './agents.js'
 
 type FleetAction =
@@ -38,6 +46,69 @@ export async function agentsFleetHandler(): Promise<void> {
     return plainTextHandler()
   }
 
+  // FleetView-subsystem stdin setup. The mount→attach→remount loop below is the
+  // SAME Ink mount→unmount→re-mount cycle that breaks Bun-standalone
+  // process.stdin (libuv TTY poll stops re-arming; 'data'/setRawMode go
+  // unreliable — see feedback_bun_standalone_stdin_unreliable). The fix that
+  // shipped for the REPL left-arrow bridge (v26.5.94) is the rust stdin reader
+  // + a subsystem-wide raw-mode pin; the standalone `ccb agents` entry needs
+  // the IDENTICAL treatment — without it, right-arrow attach lands fd 0 in
+  // cooked mode while the bg worker's fullscreen REPL has mouse tracking on, so
+  // mouse-motion reports (CSI <btn>;x;y M) echo as visible garbage AND keystroke
+  // delivery dies → the "亂碼 + 卡死" the user reported.
+  //
+  // `CCB_FLEET_INPROCESS_REMOUNT=1` activates App.useNativeReader() (rust reader
+  // owns fd 0 across the remount cycle) and the gracefulShutdown orphan-check
+  // stdin bypass. The left-arrow bridge (openAgentsFromRepl) sets it + the pin
+  // BEFORE calling this handler, so only own the setup/teardown when WE are the
+  // subsystem entry (standalone `ccb agents`); otherwise the bridge owns it.
+  const ownsSubsystem = process.env.CCB_FLEET_INPROCESS_REMOUNT !== '1'
+  if (ownsSubsystem) {
+    // Early-input capture (cli.tsx) left fd 0 in RAW mode. pinFd0Raw captures
+    // whatever termios fd 0 currently has as the cooked baseline to restore on
+    // exit — so it MUST run with fd 0 cooked, else the shell inherits a raw tty
+    // (no echo, no line editing) after `ccb agents` quits. Stop early-input and
+    // restore cooked FIRST, then pin. (The left-arrow path gets this for free:
+    // its REPL unmount already cooked fd 0 before it pins.)
+    stopCapturingEarlyInput()
+    const stdin = process.stdin as NodeJS.ReadStream & {
+      isRaw?: boolean
+      setRawMode?: (m: boolean) => void
+    }
+    if (stdin.isTTY && stdin.isRaw && stdin.setRawMode) {
+      try {
+        stdin.setRawMode(false)
+      } catch {
+        // best-effort; pin still captures whatever baseline is current
+      }
+    }
+    process.env.CCB_FLEET_INPROCESS_REMOUNT = '1'
+    try {
+      pinFd0Raw()
+    } catch {
+      // best-effort; the reader still sets raw on each start (degraded: the
+      // cooked-echo window reappears, but input still works)
+    }
+  }
+  try {
+    await runFleetLoop()
+  } finally {
+    if (ownsSubsystem) {
+      // Leaving the FleetView subsystem entirely. Release the raw-mode pin so
+      // fd 0 returns to the cooked baseline before the caller exits the process
+      // — otherwise the shell inherits a raw tty. Unset the env so a future
+      // in-process consumer doesn't see a stale marker.
+      try {
+        unpinFd0Raw()
+      } catch {
+        // best-effort
+      }
+      delete process.env.CCB_FLEET_INPROCESS_REMOUNT
+    }
+  }
+}
+
+async function runFleetLoop(): Promise<void> {
   // Eagerly load the attach module too — dynamic-import latency during
   // the right-arrow handoff (~50-100ms cold) is part of the perceived
   // "blank window" the user complained about. Pre-warming the module
@@ -47,7 +118,9 @@ export async function agentsFleetHandler(): Promise<void> {
     import('@anthropic/ink'),
   ])
   const { spawnBgPty } = await import('@claude-code/cli/bg.js')
-  const { fleetAttach } = await import('./agentFleetAttach.js')
+  const { fleetAttach, waitForWorkerFirstFrame } = await import(
+    './agentFleetAttach.js'
+  )
   await import('../bg/attachClient.js')
   await import('../bg/ptyAdopter.js')
   const { getCwd } = await import('@claude-code/app-host/bootstrap/cwd.js')
@@ -196,7 +269,36 @@ export async function agentsFleetHandler(): Promise<void> {
           )
         },
         onAttach: short => {
-          resolve({ type: 'attach', short })
+          // READY-GATE before the switch (ant 5277.js I0: `aH(id)` sets the row
+          // to "opening…", then `await dy6(id)` resolves BEFORE `H({type:open})`
+          // switches into attach). FleetView already set the row's attaching
+          // state (setAttachingShort) synchronously, so it renders "opening…"
+          // NOW; we defer the resolve (which unmounts FleetView + switches to
+          // runAttach) until the worker has actually emitted its first frame.
+          //
+          // WARM worker (ring already has a frame, e.g. user waited 2-3s before
+          // pressing →): waitForWorkerFirstFrame resolves on the first replayed
+          // chunk → instant switch, "opening…" not perceptible — exactly ant's
+          // millisecond flicker. COLD worker (left-arrow → IMMEDIATE →, worker
+          // still in its ~415ms boot→first-render): the row shows "opening…"
+          // until the worker's first frame lands, THEN switches — never the
+          // black screen of switching onto an empty ring. ccb is daemon-less so
+          // this gate lives here (ant's daemon owns it), but the observable
+          // behaviour is identical: FleetView stays up showing "opening…" on the
+          // row until the worker is ready, then switches in a populated frame.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const os = require('node:os') as typeof import('node:os')
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const path = require('node:path') as typeof import('node:path')
+          const jobsRoot = process.env.CLAUDE_CONFIG_HOME
+            ? path.join(process.env.CLAUDE_CONFIG_HOME, 'jobs')
+            : path.join(os.homedir(), '.claude', 'jobs')
+          const ptySocketPath = path.join(jobsRoot, short, 'pty.sock')
+          // 10s budget matches fleetAttach's PTY_SOCK_WAIT_BUDGET_MS — the
+          // worker's first frame lands in ~415ms warm, up to ~3s cold disk.
+          void waitForWorkerFirstFrame(ptySocketPath, 10_000)
+            .catch(() => undefined)
+            .then(() => resolve({ type: 'attach', short }))
         },
         onQuit: () => {
           resolve({ type: 'quit' })

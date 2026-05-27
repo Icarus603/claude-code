@@ -43,6 +43,7 @@
  */
 
 import { existsSync, openSync, readSync, closeSync, statSync } from 'node:fs'
+import { connect } from 'node:net'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
@@ -55,6 +56,133 @@ import { join } from 'node:path'
  * giving up on truly broken spawns.
  */
 const PTY_SOCK_WAIT_BUDGET_MS = 10_000
+
+/**
+ * Connect-probe backoff (ms). Source: ant 5472.js `vf4` spare-claim backoff
+ * — `[50,100,150,200,250,300,400,500,500,500]`. Progressive ramp: tight at the
+ * start so a worker that finishes booting early is reached within ~50-150ms
+ * (vs the old file-poll's flat 50ms tick that also waited on the file
+ * *appearing*, not on the socket *accepting*), loosening to 500ms so a slow
+ * cold-disk boot doesn't spin the event loop. Repeats the last entry until the
+ * budget is exhausted.
+ */
+const CONNECT_BACKOFF_MS = [
+  50, 100, 150, 200, 250, 300, 400, 500, 500, 500,
+] as const
+
+/**
+ * Probe whether the worker's PTY socket is ACCEPTING connections (not merely
+ * that the socket *file* exists). Mirrors ant's attach model: ant never polls
+ * `fs.existsSync(sock)` — its attach client `dc` (4945.js) does a direct
+ * `net.connect(sock)`, and the orchestrator (`$nK` 4951.js, `aM3` 4957.js)
+ * retries the connect on `ENOENT`/`ECONNREFUSED` with a backoff until the
+ * worker is reachable or the budget is spent. A successful `connect` event is
+ * the precise readiness signal — it fires the instant the worker's
+ * `server.listen()` is accepting, with no listen→accept window and no
+ * fixed-tick latency that file-existence polling adds.
+ *
+ * Resolves true the moment a probe connection succeeds (then immediately
+ * destroys it — runAttach opens its own adopter connection). Resolves false if
+ * the budget is exhausted without a successful connect.
+ */
+async function waitForSocketAccepting(
+  socketPath: string,
+  budgetMs: number,
+): Promise<boolean> {
+  const probeConnect = (): Promise<boolean> =>
+    new Promise<boolean>(resolve => {
+      const sock = connect(socketPath)
+      let settled = false
+      const done = (ok: boolean): void => {
+        if (settled) return
+        settled = true
+        try {
+          sock.destroy()
+        } catch {
+          /* best-effort */
+        }
+        resolve(ok)
+      }
+      sock.once('connect', () => done(true))
+      sock.once('error', () => done(false))
+    })
+
+  const deadline = Date.now() + budgetMs
+  let attempt = 0
+  for (;;) {
+    // Always probe at least once (budgetMs=0 → single fast try).
+    if (await probeConnect()) return true
+    // Not accepting yet (ENOENT = socket file absent / ECONNREFUSED = bound but
+    // not yet listening). Back off and retry — ant `$nK`/`aM3` retry loop.
+    const delay =
+      CONNECT_BACKOFF_MS[Math.min(attempt, CONNECT_BACKOFF_MS.length - 1)]!
+    attempt++
+    const remaining = deadline - Date.now()
+    if (remaining <= 0) return false
+    await new Promise(resolve => setTimeout(resolve, Math.min(delay, remaining)))
+  }
+}
+
+/**
+ * READY-GATE for the FleetView attach switch. Source: ant 5277.js I0 (2560) —
+ * pressing → on a row sets `aH(id)` (the row renders "opening…") and then
+ * `await dy6(id)` (the ready-gate) resolves BEFORE `H({type:"open"})` switches
+ * into attach. The "opening…" indicator is visible for exactly the dy6 await.
+ *
+ * ant's dy6/V__ gate resolves on worker PROCESS reachability (the daemon is
+ * already connected to the worker's rv/pty and knows its state). ccb is
+ * daemon-less and the user's complaint is specifically the COLD worker
+ * (left-arrow → IMMEDIATE right-arrow, worker still in its ~415ms boot→first-
+ * render): switching then lands on an empty ring = black screen. So ccb's gate
+ * waits for the worker to actually EMIT its first rendered frame — connect to
+ * pty.sock, read the ring replay + live output, resolve the instant a chunk
+ * contains the worker's first-render marker (`\x1b[2J` = ant gW, or
+ * `\x1b[H\x1b[2K` = ant P). A WARM worker (ring already holds a frame) resolves
+ * on the first replayed chunk → instant switch, no visible "opening…", exactly
+ * like ant. A COLD worker keeps the FleetView row showing "opening…" until its
+ * first frame lands, THEN switches — never a black screen.
+ *
+ * The probe connection is disposed before returning; runAttach opens its own.
+ * Resolves on first-frame OR budget exhaustion (switch anyway — runAttach's own
+ * ring replay + the loop's error toast handle a truly-dead worker).
+ */
+export async function waitForWorkerFirstFrame(
+  socketPath: string,
+  budgetMs: number,
+): Promise<void> {
+  // Reachability first (socket may not be accepting yet for a just-forked
+  // worker). Cheap connect-probe with backoff; if it never accepts, bail and
+  // let the switch proceed (runAttach will surface the failure).
+  if (!(await waitForSocketAccepting(socketPath, budgetMs))) return
+  const remaining = budgetMs // reachability is usually instant; reuse budget
+  const { createPtyAdopter } = await import('../bg/ptyAdopter.js')
+  const FRAME_MARKERS = [Buffer.from('\x1b[2J'), Buffer.from('\x1b[H\x1b[2K')]
+  await new Promise<void>(resolve => {
+    const adopter = createPtyAdopter(socketPath)
+    let done = false
+    const finish = (): void => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      try {
+        sub.dispose()
+        exitSub.dispose()
+        adopter.dispose()
+      } catch {
+        /* best-effort */
+      }
+      resolve()
+    }
+    const sub = adopter.onData(chunk => {
+      const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, 'binary')
+      if (FRAME_MARKERS.some(m => buf.includes(m))) finish()
+    })
+    // If the worker exits before a frame, stop waiting.
+    const exitSub = adopter.onExit(() => finish())
+    const timer = setTimeout(finish, Math.max(0, remaining))
+    timer.unref()
+  })
+}
 
 function getJobsRoot(): string {
   const root = process.env.CLAUDE_CONFIG_HOME
@@ -129,34 +257,30 @@ export async function fleetAttach(short: string): Promise<void> {
   const labelForTitle = (state?.name ?? state?.intent ?? short).trim() || short
   process.stdout.write(`\x1b]0;${labelForTitle.slice(0, 80)}\x07`)
 
-  // Source: ant 5092.js Ot3 — `W = f.respawnResult ?? await kZ6(f.job.id, ...)`.
-  // For fresh dispatches, ant's kZ6 gives the worker time to become
-  // reachable before attach. ccb mirrors by polling for pty.sock.
+  // Wait for the worker to be REACHABLE before attaching — ant's model, not
+  // file-existence polling. ant never `fs.existsSync(sock)`-polls: its attach
+  // orchestrator (`$nK` 4951.js / `aM3` 4957.js) retries `net.connect(sock)` on
+  // ENOENT/ECONNREFUSED with a backoff until the worker's `server.listen()` is
+  // accepting. A successful connect is the exact readiness edge — it fires the
+  // instant the worker accepts, with no listen→accept gap and no fixed-tick
+  // latency that `existsSync` adds (the file appears at bind time, before the
+  // socket accepts; the old 50ms poll then waited a further tick).
   //
-  // Why poll instead of respawning immediately: spawnBgPty's spawnPtyHost
-  // fork is synchronous but the bg-pty-host child still has to bun-boot
-  // + bundle-eval + create Bun.Terminal + server.listen — ~500ms-1s on
-  // warm cache, up to ~3s cold. Without a poll, fresh-dispatch +
-  // right-arrow within that window would see `existsSync(pty.sock) === false`
-  // and respawn an already-booting worker. Poll first; respawn only when
-  // the socket genuinely never appears.
-  //
-  // Heuristic: if meta.json was written (= ccb dispatched a worker),
-  // the pty.sock IS coming — poll. Otherwise (orphan with only
-  // state.json), go straight to respawn.
-  let hasLivePty = existsSync(ptySocketPath)
-  if (!hasLivePty && meta !== null) {
-    const deadline = Date.now() + PTY_SOCK_WAIT_BUDGET_MS
-    while (Date.now() < deadline) {
-      if (existsSync(ptySocketPath)) {
-        hasLivePty = true
-        break
-      }
-      await new Promise(resolve => setTimeout(resolve, 50))
-    }
+  // Fresh dispatch: spawnPtyHost's fork is synchronous but the bg-pty-host
+  // child still bun-boots + bundle-evals + creates Bun.Terminal + listens
+  // (~500ms-1s warm, up to ~3s cold). The connect-probe tolerates that window
+  // exactly like ant. Heuristic unchanged: meta.json written (= ccb dispatched
+  // a worker) means the socket IS coming, so probe; an orphan with only
+  // state.json goes straight to respawn.
+  let reachable = await waitForSocketAccepting(ptySocketPath, 0) // fast first try
+  if (!reachable && meta !== null) {
+    reachable = await waitForSocketAccepting(
+      ptySocketPath,
+      PTY_SOCK_WAIT_BUDGET_MS,
+    )
   }
 
-  if (hasLivePty) {
+  if (reachable) {
     const { runAttach } = await import('../bg/attachClient.js')
     // Let runAttach errors propagate — the agentsFleet loop catches them into
     // `initialError` and shows a toast on remount (ant Ot3). Do NOT swallow +
@@ -211,16 +335,21 @@ async function respawnThenAttach(
   // directive: a --resume worker inherits its transcript and must NOT re-run a
   // prompt (same invariant as the left-arrow spawn). Poll long enough for the
   // worker to bind its socket.
+  // Respawn fire-and-forget (waitForSocketMs:0) — the connect-probe below owns
+  // the readiness wait, same as the fresh-dispatch path. Using spawnBgPty's own
+  // file-poll here would double-wait (file appears, then we'd still connect-probe).
   const { socketPath } = await spawnBgPty({
     short,
     flags,
     directive: '',
     cwd,
     quiet: true,
-    waitForSocketMs: PTY_SOCK_WAIT_BUDGET_MS,
+    waitForSocketMs: 0,
   })
 
-  if (!existsSync(socketPath)) {
+  // ant `V__` (4952.js) respawn waits for the new worker to be REACHABLE via
+  // connect-retry, not file existence. Same probe as the fresh-dispatch path.
+  if (!(await waitForSocketAccepting(socketPath, PTY_SOCK_WAIT_BUDGET_MS))) {
     throw new Error(`couldn't restart session ${short} (worker never came up)`)
   }
   const { runAttach } = await import('../bg/attachClient.js')

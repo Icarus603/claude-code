@@ -78,21 +78,49 @@ mod unix_impl {
   static FD0_RAW_REFCOUNT: AtomicI32 = AtomicI32::new(0);
   static FD0_BASELINE: Mutex<Option<libc::termios>> = Mutex::new(None);
 
-  /// Acquire a refcounted raw-mode reference on fd 0. The first acquirer saves
-  /// the original (cooked) termios and switches fd 0 to raw; subsequent
-  /// acquirers in a chained handoff only bump the count (fd 0 already raw).
+  /// Acquire a refcounted raw-mode reference on fd 0.
+  ///
+  /// Two responsibilities, deliberately SEPARATED (the 2026-05-27 fleet-reader
+  /// bug was conflating them):
+  ///
+  ///   1. BASELINE CAPTURE — only the first acquirer (refcount 0→1) saves fd 0's
+  ///      current termios as the cooked baseline to restore on the last release.
+  ///      Later acquirers must NOT re-capture: between two acquires fd 0 is
+  ///      already raw, so capturing then would store the RAW termios as the
+  ///      "baseline" and the cooked state would be lost forever.
+  ///
+  ///   2. FORCE RAW — EVERY acquirer re-applies raw mode, even when refcount>0.
+  ///      The old code skipped this on refcount>0, assuming "already raw stays
+  ///      raw". That assumption is FALSE in ccb's pin→destroy→reader sequence:
+  ///      `pinFd0Raw()` raws fd 0 (refcount 0→1), then App.handleSetRawMode's
+  ///      reader branch calls `process.stdin.destroy()` to evict Bun's libuv tty
+  ///      handle — and Bun's destroy resets fd 0's termios back to COOKED out of
+  ///      band, WITHOUT touching our refcount. The subsequent reader acquire
+  ///      (refcount 1→2) then saw refcount>0 and skipped set_raw, so fd 0 stayed
+  ///      cooked: ICANON+ECHO on → arrow/mouse bytes echoed as `^[[C` garbage +
+  ///      poll() never reported POLLIN for unterminated lines → reader read
+  ///      nothing → FleetView input dead. Re-applying raw on every acquire
+  ///      reasserts the mode regardless of who cooked it behind our back.
+  ///      Idempotent: cfmakeraw on an already-raw fd is a no-op.
   unsafe fn fd0_acquire_raw() -> std::result::Result<(), String> {
     let mut guard = FD0_BASELINE
       .lock()
       .map_err(|_| "fd0 baseline mutex poisoned".to_string())?;
-    if FD0_RAW_REFCOUNT.load(Ordering::SeqCst) == 0 {
-      // First reader in the chain — capture the real cooked baseline + raw it.
+    let first = FD0_RAW_REFCOUNT.load(Ordering::SeqCst) == 0;
+    if first {
+      // First acquirer — capture the real cooked baseline AND raw it. set_raw
+      // returns the prior (cooked) termios; stash it for the last release.
       let saved = set_raw(0)?;
       *guard = Some(saved);
+    } else {
+      // Subsequent acquirer — fd 0 SHOULD already be raw, but an out-of-band
+      // actor (Bun's stdin.destroy(), a child that reset termios, SIGCONT) may
+      // have cooked it without our knowledge. Re-assert raw, but do NOT
+      // re-capture the baseline (the cooked baseline from the first acquire is
+      // the one we must restore on the last release). Discard the returned
+      // (possibly already-raw) termios.
+      let _ = set_raw(0)?;
     }
-    // else: fd 0 is already raw from an earlier reader still in the chain.
-    // Re-capturing now would save the RAW termios as the baseline and the
-    // cooked state would be lost forever — so we deliberately skip the save.
     FD0_RAW_REFCOUNT.fetch_add(1, Ordering::SeqCst);
     Ok(())
   }
