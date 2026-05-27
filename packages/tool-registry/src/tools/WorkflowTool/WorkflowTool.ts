@@ -12,9 +12,16 @@ import { generateTaskId } from '../../Task.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { WORKFLOW_TOOL_DESCRIPTION, WORKFLOW_TOOL_NAME } from './constants.js'
 import { isWorkflowsEnabled } from '@claude-code/agent/goalStopHook.js'
-import { parseWorkflowScript } from '@claude-code/agent/workflow/metaParser.js'
-import { compileWorkflowScript } from '@claude-code/agent/workflow/sandbox.js'
-import { runWorkflow } from '@claude-code/agent/workflow/engine.js'
+// NOTE: metaParser / sandbox / engine each `import vm from 'node:vm'`. Importing
+// them statically here would pull node:vm onto the boot path the moment the tool
+// registry materializes this tool (BuiltInToolsProvider does so at REPL start).
+// In a `bun build --compile` standalone, evaluating the vm engine during boot
+// races the Ink/stdin mount and HANGS the REPL on a blank screen (renders fine
+// under `bun run`, hangs in the compiled binary — a timing heisenbug). ant
+// avoids this because its modules are lazy `R(()=>…)` initializers that only
+// evaluate on first call. ccb is plain ESM (eager on import), so we replicate
+// ant's deferral explicitly: load the vm engine via dynamic import inside the
+// methods that need it (validateInput / call), keeping boot free of node:vm.
 import { FileWorkflowJournal } from '@claude-code/agent/workflow/journal.js'
 import {
   getWorkflowRunDir,
@@ -23,13 +30,15 @@ import {
   writeWorkflowSnapshot,
   MAX_WORKFLOW_SCRIPT_BYTES,
 } from '@claude-code/agent/workflow/paths.js'
-import {
-  completeWorkflowTask,
-  enqueueWorkflowNotification,
-  failWorkflowTask,
-  registerWorkflowTask,
-  updateWorkflowProgressBatch,
-} from '@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
+// NOTE: LocalWorkflowTask transitively imports messageQueueManager → messages.ts
+// (the 5.6k-line message module). Static-importing it here pulls that whole graph
+// onto the boot path the moment BuiltInToolsProvider materializes this tool — and
+// in a `bun build --compile` standalone that early-boot load deterministically
+// dead-locks the event loop before the Ink REPL paints (renders fine under
+// `bun run`; hangs in the compiled binary). ant sidesteps this because its tool
+// module is a lazy `R(()=>…)` initializer that only evaluates on first call. ccb
+// is eager ESM, so we replicate that deferral: the task helpers (all call-only)
+// are dynamically imported inside call(), keeping the message graph off boot.
 import type { WorkflowProgress } from '@claude-code/agent/workflow/types.js'
 
 // ant mJ3 — input schema.
@@ -161,6 +170,9 @@ export const WorkflowTool = buildTool({
     if ('error' in resolved) {
       return { result: false, message: resolved.error, errorCode: 1 }
     }
+    const { parseWorkflowScript } = await import(
+      '@claude-code/agent/workflow/metaParser.js'
+    )
     const parsed = parseWorkflowScript(resolved.script)
     if ('error' in parsed) {
       return {
@@ -199,14 +211,38 @@ export const WorkflowTool = buildTool({
     return 'Workflow'
   },
   getToolUseSummary(input) {
+    // Sync — must NOT call parseWorkflowScript (that pulls node:vm via
+    // metaParser; this runs off the boot path but the static import would
+    // resurface vm-at-boot). Cheap textual summary only.
     if (input?.name) return `workflow: ${input.name}`
     if (!input?.script) return null
-    const parsed = parseWorkflowScript(input.script)
-    if (!('error' in parsed)) return parsed.meta.description
     const firstLine = input.script.split('\n').find(l => l.trim()) ?? ''
     return firstLine.length > 50 ? `${firstLine.slice(0, 49)}…` : firstLine
   },
   async call(input, toolUseContext, canUseTool) {
+    // Defer the vm engine (metaParser/sandbox/engine all `import vm`) AND the
+    // task helpers (LocalWorkflowTask → messageQueueManager → messages.ts) to
+    // call-time — see the import-block notes above. Keeps node:vm and the heavy
+    // message graph off the boot path.
+    const [
+      { parseWorkflowScript },
+      { compileWorkflowScript },
+      { runWorkflow },
+      {
+        completeWorkflowTask,
+        enqueueWorkflowNotification,
+        failWorkflowTask,
+        registerWorkflowTask,
+        updateWorkflowProgressBatch,
+      },
+    ] = await Promise.all([
+      import('@claude-code/agent/workflow/metaParser.js'),
+      import('@claude-code/agent/workflow/sandbox.js'),
+      import('@claude-code/agent/workflow/engine.js'),
+      import(
+        '@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
+      ),
+    ])
     const resolved = await resolveScript(input)
     if ('error' in resolved) throw new Error(resolved.error)
     const { script } = resolved

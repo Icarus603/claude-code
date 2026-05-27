@@ -43,6 +43,14 @@ import { BriefTool } from '../../BriefTool/BriefTool.js'
 import { TestingPermissionTool } from '../../testing/TestingPermissionTool.js'
 import { EnterWorktreeTool } from '../../EnterWorktreeTool/EnterWorktreeTool.js'
 import { ExitWorktreeTool } from '../../ExitWorktreeTool/ExitWorktreeTool.js'
+// Workflow is a shipping (default-on) tool → static import like every other
+// shipping tool above, NOT a lazy require-in-getter. A require() at tool-LIST
+// build time (the boot→first-paint critical path) deterministically hangs the
+// standalone binary; a static import resolves at module eval (early, with the
+// other tools) and boots clean. The vm engine + message-queue graph stay
+// deferred inside WorkflowTool.call() (see that file).
+import { WorkflowTool } from '../../WorkflowTool/WorkflowTool.js'
+import { initBundledWorkflows } from '@claude-code/tool-registry/tools/WorkflowTool/bundled/index.js'
 
 // Lazy requires — conditional / feature-gated (preserving dead code elimination)
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -138,9 +146,9 @@ const getListPeersTool = () => null
 // Workflow tool ships in every build (ant parity); runtime visibility is the
 // tool's own isEnabled() → isWorkflowsEnabled(). Unconditional require so DCE
 // keeps the engine in the bundle.
-const getWorkflowTool = () => {
-  require('@claude-code/tool-registry/tools/WorkflowTool/bundled/index.js').initBundledWorkflows()
-  return require('../../WorkflowTool/WorkflowTool.js').WorkflowTool as Tool
+const getWorkflowTool = (): Tool => {
+  initBundledWorkflows()
+  return WorkflowTool as Tool
 }
 
 const getTeamCreateTool = () =>
