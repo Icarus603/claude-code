@@ -211,11 +211,19 @@ export const WorkflowTool = buildTool({
     return 'Workflow'
   },
   getToolUseSummary(input) {
-    // Sync — must NOT call parseWorkflowScript (that pulls node:vm via
-    // metaParser; this runs off the boot path but the static import would
-    // resurface vm-at-boot). Cheap textual summary only.
+    // ant 3904 getToolUseSummary: name → label; else parse and return
+    // meta.description; on parse error → first non-empty line (truncated).
+    // Sync, so we can't `await import`, but this runs only when a Workflow
+    // tool_use is RENDERED in the transcript — always post-boot, after
+    // validateInput/call have already dynamic-imported metaParser (cached). A
+    // lazy `require()` here (NOT a static import) keeps node:vm off the boot
+    // path while preserving ant's parsed-description summary.
     if (input?.name) return `workflow: ${input.name}`
     if (!input?.script) return null
+    const { parseWorkflowScript } =
+      require('@claude-code/agent/workflow/metaParser.js') as typeof import('@claude-code/agent/workflow/metaParser.js')
+    const parsed = parseWorkflowScript(input.script)
+    if (!('error' in parsed)) return parsed.meta.description
     const firstLine = input.script.split('\n').find(l => l.trim()) ?? ''
     return firstLine.length > 50 ? `${firstLine.slice(0, 49)}…` : firstLine
   },
