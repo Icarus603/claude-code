@@ -8,10 +8,12 @@ import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '../../Tool.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 import type { PermissionResult } from '@claude-code/permission/PermissionResult'
+import type { PermissionRule } from '@claude-code/permission/PermissionRule'
 import { generateTaskId } from '../../Task.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { WORKFLOW_TOOL_DESCRIPTION, WORKFLOW_TOOL_NAME } from './constants.js'
 import { isWorkflowsEnabled } from '@claude-code/agent/goalStopHook.js'
+import { getRuleByContentsForToolName } from '@claude-code/permission/permissions'
 // NOTE: metaParser / sandbox / engine each `import vm from 'node:vm'`. Importing
 // them statically here would pull node:vm onto the boot path the moment the tool
 // registry materializes this tool (BuiltInToolsProvider does so at REPL start).
@@ -116,10 +118,19 @@ async function resolveScript(input: {
     return { script: read.script, resolvedScriptPath: read.path }
   }
   if (input.name) {
-    // Named-workflow registry (builtin + .claude/workflows/) is wired in P5.
-    return {
-      error: `Named workflows are not yet available in this build. Provide \`script\` or \`scriptPath\`.`,
+    // ant dHK name branch → O0_ resolve from the merged builtin+user+project
+    // registry. Dynamic import keeps this module's static graph minimal.
+    const { resolveNamedWorkflow, listNamedWorkflowNames } = await import(
+      '@claude-code/agent/workflow/namedWorkflows.js'
+    )
+    const resolved = await resolveNamedWorkflow(input.name)
+    if (!resolved) {
+      const names = (await listNamedWorkflowNames()).map(w => w.name).join(', ')
+      return {
+        error: `No workflow named '${input.name}'. Available: ${names || '(none — add a .js file under ~/.claude/workflows or <project>/.claude/workflows)'}`,
+      }
     }
+    return { script: resolved.script, source: input.name }
   }
   if (input.script) return { script: input.script }
   return { error: 'Must provide script, name, or scriptPath' }
@@ -197,14 +208,73 @@ export const WorkflowTool = buildTool({
     }
     return { result: true }
   },
-  async checkPermissions(input): Promise<PermissionResult> {
-    // Ask before running an arbitrary script (it can spawn many agents and
-    // touch the repo). A future build can add allow/deny rule matching like
-    // ant; for now always confirm.
+  async checkPermissions(input, context): Promise<PermissionResult> {
+    // ant 3904 checkPermissions: a NAMED workflow can be allow/ask/deny'd by a
+    // `Workflow(<name>)` permission rule; inline `script`/`scriptPath` runs have
+    // no name to match, so they always fall through to "ask". Mirrors ant's
+    // `K = scriptPath ? undefined : name` + `O(behavior).get(name)` lookups.
+    const ruleName = input.scriptPath ? undefined : input.name
+    const permissionContext = context.getAppState().toolPermissionContext
+    const ruleFor = (
+      behavior: 'allow' | 'ask' | 'deny',
+    ): PermissionRule | undefined =>
+      ruleName
+        ? getRuleByContentsForToolName(
+            permissionContext,
+            WORKFLOW_TOOL_NAME,
+            behavior,
+          ).get(ruleName)
+        : undefined
+
+    // ant: resolve scriptPath/name → script into updatedInput so the
+    // downstream call() and the permission UI see the actual script body.
+    let updatedInput = input
+    const resolved = await resolveScript(input)
+    if (!('error' in resolved)) {
+      updatedInput = { ...input, script: resolved.script }
+    }
+
+    const denyRule = ruleFor('deny')
+    if (denyRule) {
+      return {
+        behavior: 'deny',
+        message: `Workflow ${ruleName} blocked by permission rules`,
+        decisionReason: { type: 'rule', rule: denyRule },
+      }
+    }
+    const askRule = ruleFor('ask')
+    if (askRule) {
+      return {
+        behavior: 'ask',
+        message: 'Review workflow before running',
+        updatedInput,
+        decisionReason: { type: 'rule', rule: askRule },
+      }
+    }
+    const allowRule = ruleFor('allow')
+    if (allowRule) {
+      return {
+        behavior: 'allow',
+        updatedInput,
+        decisionReason: { type: 'rule', rule: allowRule },
+      }
+    }
+    // ant fall-through: ask, and (for a named workflow) suggest an addRules
+    // shortcut so the user can allow this name permanently.
     return {
       behavior: 'ask',
       message: 'Review workflow before running',
-      updatedInput: input,
+      updatedInput,
+      ...(ruleName && {
+        suggestions: [
+          {
+            type: 'addRules' as const,
+            rules: [{ toolName: WORKFLOW_TOOL_NAME, ruleContent: ruleName }],
+            behavior: 'allow' as const,
+            destination: 'localSettings' as const,
+          },
+        ],
+      }),
     }
   },
   userFacingName() {
@@ -243,6 +313,7 @@ export const WorkflowTool = buildTool({
         registerWorkflowTask,
         updateWorkflowProgressBatch,
       },
+      { resolveNamedWorkflow, listNamedWorkflowNames },
     ] = await Promise.all([
       import('@claude-code/agent/workflow/metaParser.js'),
       import('@claude-code/agent/workflow/sandbox.js'),
@@ -250,6 +321,7 @@ export const WorkflowTool = buildTool({
       import(
         '@claude-code/agent/tasks/LocalWorkflowTask/LocalWorkflowTask.js'
       ),
+      import('@claude-code/agent/workflow/namedWorkflows.js'),
     ])
     const resolved = await resolveScript(input)
     if ('error' in resolved) throw new Error(resolved.error)
@@ -354,6 +426,9 @@ export const WorkflowTool = buildTool({
         args: input.args,
         journal,
         journalState,
+        // ant PHK: nested workflow('name') resolves through the same registry.
+        resolveNamedWorkflow,
+        listAllWorkflows: listNamedWorkflowNames,
       })
       flush()
 

@@ -138,3 +138,20 @@ export interface WorkflowJournal {
 }
 
 export type { WorkflowPhaseMeta }
+
+// Result of one subagent attempt (runAgentAttempt / workflowAgentRun.ts).
+export type AgentExecResult = {
+  structured?: unknown
+  text: string
+  tokens: number
+  toolCalls: number
+  stalled: boolean
+  stalledReason?: string
+  skipped: boolean
+  durationMs: number
+  outputTokens?: number
+  // Last assistant message's stop_reason — null when the turn ended without
+  // one (the throttle signal: ant 3886 `aH` treats stopReason==null + tiny
+  // output + long duration as a throttled/empty response).
+  stopReason?: string | null
+}
