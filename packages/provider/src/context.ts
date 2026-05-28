@@ -168,9 +168,11 @@ export const getUserContext = memoize(
       (isBareMode() && getAdditionalDirectoriesForClaudeMd().length === 0)
     // Await the async I/O (readFile/readdir directory walk) so the event
     // loop yields naturally at the first fs.readFile.
-    const claudeMd = shouldDisableClaudeMd
-      ? null
-      : getClaudeMds(filterInjectedMemoryFiles(await getMemoryFiles()))
+    const memoryFiles = shouldDisableClaudeMd ? [] : await getMemoryFiles()
+    const claudeMdFiles = filterInjectedMemoryFiles(memoryFiles).filter(
+      f => f.type !== 'AutoMem' && f.type !== 'TeamMem',
+    )
+    const claudeMd = shouldDisableClaudeMd ? null : getClaudeMds(claudeMdFiles)
     // Cache for the auto-mode classifier (yoloClassifier.ts reads this
     // instead of importing claudemd.ts directly, which would create a
     // cycle through permissions/filesystem → permissions → yoloClassifier).

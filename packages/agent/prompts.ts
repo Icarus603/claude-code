@@ -164,51 +164,28 @@ function getHooksSection(): string {
 }
 
 /**
- * ant 2180.js $e1 — model prerequisite for compact harness. Compact mode
- * is only eligible for opus-4-7 or early-access (`-eap`) models. ant's
- * kz8/Vz8/MA_ helpers are stubs (return false); Yx9's
- * clientDataCache/velvet_cascade allowlist has no ccb equivalent (ccb
- * receives no server-pushed client data), so both are omitted.
+ * Compact harness mode — env var > feature flag.
+ * When enabled, the system prompt collapses to getHarnessSection() +
+ * CYBER_RISK + ccb-only anti-avoidance bullets, dropping the full Doing
+ * tasks / Executing actions / Using your tools / System sections.
+ * This is intentionally model-agnostic in ccb: the operator controls the
+ * model, and compact mode is the expected default budget profile.
  *
- * Restoring this gate (it was dropped in an earlier ccb pass that forced
- * compact for ALL models) is what keeps non-eligible models — Sonnet,
- * Haiku, 3P — on the FULL prompt, which carries the strong "Maximize use
- * of parallel tool calls" guidance (getUsingYourToolsSection). Without it
- * those models only saw the weak one-line hint in getHarnessSection and
- * tended to emit one tool_use per turn instead of batching.
- */
-function isCompactHarnessEligibleModel(model: string): boolean {
-  if (getCanonicalName(model).includes('claude-opus-4-7')) return true
-  if (/-eap($|\[)/i.test(model)) return true
-  return false
-}
-
-/**
- * Compact harness mode — env var > model prerequisite > feature flag,
- * mirroring ant 2181.js oz(). When enabled, the system prompt collapses
- * to getHarnessSection() + CYBER_RISK + a few ccb-only bullets, dropping
- * the full Doing tasks / Executing actions / Using your tools / System
- * sections. Saves ~6-7k tokens per session for power users who don't need
- * the long-form guidance every turn.
- *
- * The model prerequisite (isCompactHarnessEligibleModel) is back in force
- * after an earlier ccb pass dropped it on the rationale that "the operator
- * runs whatever model they want." That reasoning was wrong: the cost of
- * compact mode isn't operator familiarity, it's that non-opus models lose
- * the strong parallel-tool-call guidance and stop batching tool calls.
- * `CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT=1` still forces compact on any model
- * for an operator who explicitly wants it.
+ * The opus-4-7-only gate from c8236f3e caused Sonnet/Haiku/3P sessions to
+ * fall back to the full prompt and inflated /context System prompt by tens
+ * of thousands of tokens. The parallel-tool-call regression that motivated
+ * that gate is handled in getHarnessSection() instead: compact mode carries
+ * the same strong batching instruction directly.
+ * `CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT=0` reverts to full prompt.
  */
 function isCompactHarnessEnabled(model: string): boolean {
-  // ant oz() order: explicit env wins first (truthy → on, falsy → off),
-  // then the model prerequisite gates everything, then the flag decides.
+  // ccb intentionally omits ant's opus/eap-only prerequisite. Compact mode
+  // is the expected default budget profile for every operator-selected model.
   const env = readEnv('CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT')
   if (env !== undefined) {
     return isEnvTruthy(env)
   }
-  if (!isCompactHarnessEligibleModel(model)) {
-    return false
-  }
+  void model
   return getFeatureValue_CACHED_MAY_BE_STALE('tengu_vellum_lantern', false)
 }
 
@@ -225,7 +202,7 @@ function getHarnessSection(): string {
  - Tools run behind a user-selected permission mode; a denied call means the user declined it — adjust, don't retry verbatim.
  - \`<system-reminder>\` tags in messages and tool results are injected by the harness, not the user. Hooks may intercept tool calls; treat hook output as user feedback.
  - If the conversation grows long, automatic context compaction will be triggered.
- - Prefer the dedicated file/search tools over shell commands when one fits. Independent tool calls can run in parallel in one response.
+ - Prefer the dedicated file/search tools over shell commands when one fits. You can call multiple tools in a single response. If you intend to call multiple tools and there are no dependencies between them, make all independent tool calls in parallel. Maximize use of parallel tool calls where possible to increase efficiency. However, if some tool calls depend on previous calls to inform dependent values, do NOT call these tools in parallel and instead call them sequentially.
  - Reference code as \`file_path:line_number\` — it's clickable.`
 }
 

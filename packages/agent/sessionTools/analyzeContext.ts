@@ -1,5 +1,4 @@
 import { feature } from 'bun:bundle'
-import type { Anthropic } from '@anthropic-ai/sdk'
 import {
   getSystemPrompt,
   SYSTEM_PROMPT_DYNAMIC_BOUNDARY,
@@ -16,8 +15,6 @@ import {
   MANUAL_COMPACT_BUFFER_TOKENS,
 } from '../compaction/autoCompact.js'
 import {
-  countMessagesTokensWithAPI,
-  countTokensViaHaikuFallback,
   roughTokenCountEstimation,
 } from '../tokenEstimation.js'
 import { estimateSkillFrontmatterTokens } from '@claude-code/command-runtime/skills/loadSkillsDir.js'
@@ -52,9 +49,8 @@ import { getContextWindowForModel } from '../context.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { errorMessage, toError } from '@claude-code/local-observability/errorHelpers.js'
+import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { normalizeMessagesForAPI } from '../messages.js'
 import {
   getRuntimeMainLoopModel,
   renderModelSetting,
@@ -77,40 +73,6 @@ const MANUAL_COMPACT_BUFFER_NAME = 'Compact buffer'
  * We subtract this overhead from per-tool counts to show accurate tool content sizes.
  */
 export const TOOL_TOKEN_COUNT_OVERHEAD = 500
-
-async function countTokensWithFallback(
-  messages: Anthropic.Beta.Messages.BetaMessageParam[],
-  tools: Anthropic.Beta.Messages.BetaToolUnion[],
-): Promise<number | null> {
-  try {
-    const result = await countMessagesTokensWithAPI(messages, tools)
-    if (result !== null) {
-      return result
-    }
-    logForDebugging(
-      `countTokensWithFallback: API returned null, trying haiku fallback (${tools.length} tools)`,
-    )
-  } catch (err) {
-    logForDebugging(`countTokensWithFallback: API failed: ${errorMessage(err)}`)
-    logError(err)
-  }
-
-  try {
-    const fallbackResult = await countTokensViaHaikuFallback(messages, tools)
-    if (fallbackResult === null) {
-      logForDebugging(
-        `countTokensWithFallback: haiku fallback also returned null (${tools.length} tools)`,
-      )
-    }
-    return fallbackResult
-  } catch (err) {
-    logForDebugging(
-      `countTokensWithFallback: haiku fallback failed: ${errorMessage(err)}`,
-    )
-    logError(err)
-    return null
-  }
-}
 
 interface ContextCategory {
   name: string
@@ -241,6 +203,10 @@ export async function countToolDefinitionTokens(
   agentInfo: AgentDefinitionsResult | null,
   model?: string,
 ): Promise<number> {
+  if (tools.length < 1) {
+    return 0
+  }
+
   const toolSchemas = await Promise.all(
     tools.map(tool =>
       toolToAPISchema(tool, {
@@ -251,14 +217,14 @@ export async function countToolDefinitionTokens(
       }),
     ),
   )
-  const result = await countTokensWithFallback([], toolSchemas)
-  if (result === null || result === 0) {
+  const result = roughTokenCountEstimation(jsonStringify(toolSchemas))
+  if (result === 0 && tools.length > 0) {
     const toolNames = tools.map(t => t.name).join(', ')
     logForDebugging(
       `countToolDefinitionTokens returned ${result} for ${tools.length} tools: ${toolNames.slice(0, 100)}${toolNames.length > 100 ? '...' : ''}`,
     )
   }
-  return result ?? 0
+  return result
 }
 
 /** Extract a human-readable name from a system prompt section's content */
@@ -273,11 +239,18 @@ function extractSectionName(content: string): string {
   return firstLine.length > 40 ? firstLine.slice(0, 40) + '…' : firstLine
 }
 
+const INJECTED_MEMORY_SECTION_NAMES = new Set([
+  'auto memory',
+  'memory',
+  'team memory',
+])
+
 async function countSystemTokens(
   effectiveSystemPrompt: readonly string[],
 ): Promise<{
   systemPromptTokens: number
   systemPromptSections: SystemPromptSectionDetail[]
+  injectedMemoryTokens: number
 }> {
   // Get system context (gitStatus, etc.) which is always included
   const systemContext = await getSystemContext()
@@ -297,28 +270,31 @@ async function countSystemTokens(
   ]
 
   if (namedEntries.length < 1) {
-    return { systemPromptTokens: 0, systemPromptSections: [] }
+    return { systemPromptTokens: 0, systemPromptSections: [], injectedMemoryTokens: 0 }
   }
 
-  const systemTokenCounts = await Promise.all(
-    namedEntries.map(({ content }) =>
-      countTokensWithFallback([{ role: 'user', content }], []),
-    ),
-  )
+  let systemPromptTokens = 0
+  let injectedMemoryTokens = 0
+  const systemPromptSections: SystemPromptSectionDetail[] = []
 
-  const systemPromptSections: SystemPromptSectionDetail[] = namedEntries.map(
-    (entry, i) => ({
-      name: entry.name,
-      tokens: systemTokenCounts[i] || 0,
-    }),
-  )
+  for (let i = 0; i < namedEntries.length; i++) {
+    const entry = namedEntries[i]!
+    const tokens = roughTokenCountEstimation(entry.content)
+    const excluded = INJECTED_MEMORY_SECTION_NAMES.has(
+      entry.name.toLowerCase(),
+    )
+    if (excluded) {
+      injectedMemoryTokens += tokens
+    } else {
+      systemPromptTokens += tokens
+      systemPromptSections.push({
+        name: entry.name,
+        tokens,
+      })
+    }
+  }
 
-  const systemPromptTokens = systemTokenCounts.reduce(
-    (sum: number, tokens) => sum + (tokens || 0),
-    0,
-  )
-
-  return { systemPromptTokens, systemPromptSections }
+  return { systemPromptTokens, systemPromptSections, injectedMemoryTokens }
 }
 
 async function countMemoryFileTokens(): Promise<{
@@ -330,7 +306,9 @@ async function countMemoryFileTokens(): Promise<{
     return { memoryFileDetails: [], claudeMdTokens: 0 }
   }
 
-  const memoryFilesData = filterInjectedMemoryFiles(await getMemoryFiles())
+  const memoryFilesData = filterInjectedMemoryFiles(
+    await getMemoryFiles(),
+  ).filter(file => file.type !== 'AutoMem' && file.type !== 'TeamMem')
   const memoryFileDetails: MemoryFile[] = []
   let claudeMdTokens = 0
 
@@ -341,18 +319,8 @@ async function countMemoryFileTokens(): Promise<{
     }
   }
 
-  const claudeMdTokenCounts = await Promise.all(
-    memoryFilesData.map(async file => {
-      const tokens = await countTokensWithFallback(
-        [{ role: 'user', content: file.content }],
-        [],
-      )
-
-      return { file, tokens: tokens || 0 }
-    }),
-  )
-
-  for (const { file, tokens } of claudeMdTokenCounts) {
+  for (const file of memoryFilesData) {
+    const tokens = roughTokenCountEstimation(file.content)
     claudeMdTokens += tokens
     memoryFileDetails.push({
       path: file.path,
@@ -425,14 +393,12 @@ async function countBuiltInToolTokens(
         roughTokenCountEstimation(jsonStringify(t.inputSchema ?? {})),
       )
       const estimateTotal = estimates.reduce((s, e) => s + e, 0) || 1
-      const distributable = Math.max(
-        0,
-        alwaysLoadedTokens - TOOL_TOKEN_COUNT_OVERHEAD,
-      )
       systemToolDetails = toolsForBreakdown
         .map((t, i) => ({
           name: t.name,
-          tokens: Math.round((estimates[i]! / estimateTotal) * distributable),
+          tokens: Math.round(
+            (estimates[i]! / estimateTotal) * alwaysLoadedTokens,
+          ),
         }))
         .sort((a, b) => b.tokens - a.tokens)
     }
@@ -479,10 +445,7 @@ async function countBuiltInToolTokens(
     )
 
     for (const [i, tool] of deferredBuiltinTools.entries()) {
-      const tokens = Math.max(
-        0,
-        (tokensByTool[i] || 0) - TOOL_TOKEN_COUNT_OVERHEAD,
-      )
+      const tokens = Math.max(0, tokensByTool[i] || 0)
       const isLoaded = loadedToolNames.has(tool.name)
       deferredBuiltinDetails.push({
         name: tool.name,
@@ -639,11 +602,7 @@ export async function countMcpToolTokens(
     agentInfo,
     model,
   )
-  // Subtract the single overhead since we made one bulk call
-  const totalTokens = Math.max(
-    0,
-    (totalTokensRaw || 0) - TOOL_TOKEN_COUNT_OVERHEAD,
-  )
+  const totalTokens = Math.max(0, totalTokensRaw || 0)
 
   // Estimate per-tool proportions for display using local estimation.
   // Include name + description + input schema to match what toolToAPISchema
@@ -747,27 +706,15 @@ async function countCustomAgentTokens(agentDefinitions: {
   const agentDetails: Agent[] = []
   let agentTokens = 0
 
-  const tokenCounts = await Promise.all(
-    customAgents.map(agent =>
-      countTokensWithFallback(
-        [
-          {
-            role: 'user',
-            content: [agent.agentType, agent.whenToUse].join(' '),
-          },
-        ],
-        [],
-      ),
-    ),
-  )
-
-  for (const [i, agent] of customAgents.entries()) {
-    const tokens = tokenCounts[i] || 0
-    agentTokens += tokens || 0
+  for (const agent of customAgents) {
+    const tokens = roughTokenCountEstimation(
+      [agent.agentType, agent.whenToUse].join(' '),
+    )
+    agentTokens += tokens
     agentDetails.push({
       agentType: agent.agentType,
       source: agent.source,
-      tokens: tokens || 0,
+      tokens,
     })
   }
   return { agentTokens, agentDetails }
@@ -903,22 +850,12 @@ async function approximateMessageTokens(
     }
   }
 
-  // Calculate total tokens using the API for accuracy
-  const approximateMessageTokens = await countTokensWithFallback(
-    normalizeMessagesForAPI(microcompactResult.messages).map(_ => {
-      if (_.type === 'assistant') {
-        return {
-          // Important: strip out fields like id, etc. -- the counting API errors if they're present
-          role: 'assistant' as const,
-          content: _.message.content,
-        }
-      }
-      return _.message
-    }) as Anthropic.Beta.Messages.BetaMessageParam[],
-    [],
-  )
-
-  breakdown.totalTokens = approximateMessageTokens ?? 0
+  breakdown.totalTokens =
+    breakdown.toolCallTokens +
+    breakdown.toolResultTokens +
+    breakdown.attachmentTokens +
+    breakdown.assistantMessageTokens +
+    breakdown.userMessageTokens
   return breakdown
 }
 
@@ -955,7 +892,7 @@ export async function analyzeContextUsage(
 
   // Critical operations that should not fail due to skills
   const [
-    { systemPromptTokens, systemPromptSections },
+    { systemPromptTokens, systemPromptSections, injectedMemoryTokens },
     { claudeMdTokens, memoryFileDetails },
     {
       builtInToolTokens,
@@ -1076,11 +1013,16 @@ export async function analyzeContextUsage(
     })
   }
 
-  // Memory files after custom agents
-  if (claudeMdTokens > 0) {
+  // Memory files after custom agents.
+  // injectedMemoryTokens = loadMemoryPrompt() output injected into the
+  // system prompt via the 'memory' dynamic section — it is auto-memory
+  // content, not static prompt scaffolding. Merge it into the Memory
+  // files total so /context shows memory content in one category.
+  const totalMemoryTokens = claudeMdTokens + (injectedMemoryTokens ?? 0)
+  if (totalMemoryTokens > 0) {
     cats.push({
       name: 'Memory files',
-      tokens: claudeMdTokens,
+      tokens: totalMemoryTokens,
       color: 'claude',
     })
   }
