@@ -16,7 +16,7 @@
  * Run: bun test tests/smoke/bg-cycle-smoke.test.ts
  */
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
-import { spawn } from 'child_process'
+import { spawnSync } from 'child_process'
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -30,14 +30,23 @@ interface SpawnResult {
   exitCode: number | null
 }
 
+// Some test files loaded in the same bun test worker (live-fire, resume,
+// swarm) import @claude-code/cli which triggers run-streaming.ts module-level
+// side effects that break child_process pipe capture (stdout returns empty).
+// Workaround: redirect stdout/stderr to temp files and read them back.
 async function runCli(
   args: string[],
   timeoutMs = 20_000,
 ): Promise<SpawnResult> {
-  return new Promise((resolve, reject) => {
-    const proc = spawn(
-      'bun',
-      ['run', join(REPO_ROOT, 'scripts', 'dev.ts'), ...args],
+  const dir = mkdtempSync(join(tmpdir(), 'ccb-bg-io-'))
+  const outFile = join(dir, 'stdout.txt')
+  const errFile = join(dir, 'stderr.txt')
+  try {
+    const devTs = JSON.stringify(join(REPO_ROOT, 'scripts', 'dev.ts'))
+    const argStr = args.map(a => JSON.stringify(a)).join(' ')
+    const result = spawnSync(
+      'bash',
+      ['-c', `bun run ${devTs} ${argStr} >"${outFile}" 2>"${errFile}"`],
       {
         cwd: REPO_ROOT,
         env: {
@@ -46,34 +55,16 @@ async function runCli(
           FORCE_COLOR: '0',
           CLAUDE_CONFIG_HOME: ISOLATED_HOME,
         },
-        stdio: ['ignore', 'pipe', 'pipe'],
+        stdio: ['ignore', 'ignore', 'ignore'],
+        timeout: timeoutMs,
       },
     )
-    let stdout = ''
-    let stderr = ''
-    proc.stdout?.on('data', d => {
-      stdout += d.toString()
-    })
-    proc.stderr?.on('data', d => {
-      stderr += d.toString()
-    })
-    const timer = setTimeout(() => {
-      proc.kill('SIGKILL')
-      reject(
-        new Error(
-          `runCli ${args.join(' ')} timed out after ${timeoutMs}ms\nstdout: ${stdout}\nstderr: ${stderr}`,
-        ),
-      )
-    }, timeoutMs)
-    proc.once('exit', code => {
-      clearTimeout(timer)
-      resolve({ stdout, stderr, exitCode: code })
-    })
-    proc.once('error', err => {
-      clearTimeout(timer)
-      reject(err)
-    })
-  })
+    const stdout = (() => { try { return readFileSync(outFile, 'utf8') } catch { return '' } })()
+    const stderr = (() => { try { return readFileSync(errFile, 'utf8') } catch { return '' } })()
+    return { stdout, stderr, exitCode: result.status }
+  } finally {
+    try { rmSync(dir, { recursive: true, force: true }) } catch {}
+  }
 }
 
 afterAll(() => {

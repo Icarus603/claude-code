@@ -12,8 +12,10 @@
  * Run: bun test tests/smoke/headless-smoke.test.ts
  */
 import { describe, expect, test } from 'bun:test'
-import { spawn } from 'child_process'
+import { spawnSync } from 'child_process'
+import { mkdtempSync, readFileSync, rmSync } from 'fs'
 import { join } from 'path'
+import { tmpdir } from 'os'
 
 const REPO_ROOT = join(import.meta.dirname, '..', '..')
 
@@ -23,45 +25,39 @@ interface SpawnResult {
   exitCode: number | null
 }
 
+// Some test files that load into the same bun test worker (e.g. live-fire,
+// resume, swarm) import @claude-code/cli which triggers a module-level chain
+// ending in run-streaming.ts. That chain has a side effect that breaks
+// child_process.spawnSync / spawn pipe capture (stdout returns empty buffer
+// even though the child exited 0). Workaround: redirect stdout/stderr to
+// temp files and read them back, bypassing the broken pipe mechanism.
 async function runCli(
   args: string[],
   timeoutMs = 30_000,
 ): Promise<SpawnResult> {
-  return new Promise((resolve, reject) => {
-    const proc = spawn(
-      'bun',
-      ['run', join(REPO_ROOT, 'scripts', 'dev.ts'), ...args],
+  const dir = mkdtempSync(join(tmpdir(), 'ccb-smoke-'))
+  const outFile = join(dir, 'stdout.txt')
+  const errFile = join(dir, 'stderr.txt')
+  try {
+    const result = spawnSync(
+      'bash',
+      [
+        '-c',
+        `bun run ${JSON.stringify(join(REPO_ROOT, 'scripts', 'dev.ts'))} ${args.map(a => JSON.stringify(a)).join(' ')} >"${outFile}" 2>"${errFile}"`,
+      ],
       {
         cwd: REPO_ROOT,
         env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' },
-        stdio: ['ignore', 'pipe', 'pipe'],
+        stdio: ['ignore', 'ignore', 'ignore'],
+        timeout: timeoutMs,
       },
     )
-    let stdout = '',
-      stderr = ''
-    proc.stdout?.on('data', d => {
-      stdout += d.toString()
-    })
-    proc.stderr?.on('data', d => {
-      stderr += d.toString()
-    })
-    const timer = setTimeout(() => {
-      proc.kill('SIGKILL')
-      reject(
-        new Error(
-          `runCli ${args.join(' ')} timed out after ${timeoutMs}ms\nstdout: ${stdout}\nstderr: ${stderr}`,
-        ),
-      )
-    }, timeoutMs)
-    proc.once('exit', code => {
-      clearTimeout(timer)
-      resolve({ stdout, stderr, exitCode: code })
-    })
-    proc.once('error', err => {
-      clearTimeout(timer)
-      reject(err)
-    })
-  })
+    const stdout = (() => { try { return readFileSync(outFile, 'utf8') } catch { return '' } })()
+    const stderr = (() => { try { return readFileSync(errFile, 'utf8') } catch { return '' } })()
+    return { stdout, stderr, exitCode: result.status }
+  } finally {
+    try { rmSync(dir, { recursive: true, force: true }) } catch {}
+  }
 }
 
 describe('smoke:headless boot', () => {
