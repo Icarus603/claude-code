@@ -2055,12 +2055,15 @@ async function loadPluginsFromMarketplaces({
       // (version for the full loader's first-pass probe, installPath for
       // the cache-only loader's direct read).
       const installEntry = installedPluginsData.plugins[pluginId]?.[0]
+      const enabled =
+        enabledValue !== false &&
+        (enabledValue === true || result.entry.defaultEnabled !== false)
       return cacheOnly
         ? loadPluginFromMarketplaceEntryCacheOnly(
             result.entry,
             result.marketplaceInstallLocation,
             pluginId,
-            enabledValue === true,
+            enabled,
             errors,
             installEntry?.installPath,
           )
@@ -2068,7 +2071,7 @@ async function loadPluginsFromMarketplaces({
             result.entry,
             result.marketplaceInstallLocation,
             pluginId,
-            enabledValue === true,
+            enabled,
             errors,
             installEntry?.version,
           )

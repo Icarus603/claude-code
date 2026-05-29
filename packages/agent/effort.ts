@@ -75,7 +75,12 @@ export function modelSupportsEffort(model: string): boolean {
     return supported3P
   }
   const m = model.toLowerCase()
-  if (m.includes('opus-4-7') || m.includes('opus-4-6') || m.includes('sonnet-4-6')) {
+  if (
+    m.includes('opus-4-8') ||
+    m.includes('opus-4-7') ||
+    m.includes('opus-4-6') ||
+    m.includes('sonnet-4-6')
+  ) {
     return true
   }
   if (m.includes('haiku') || m.includes('sonnet') || m.includes('opus')) {
@@ -90,7 +95,7 @@ export function modelSupportsEffort(model: string): boolean {
 }
 
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports 'max' effort.
-// Per API docs, 'max' is on Mythos / Opus 4.7 / Opus 4.6 / Sonnet 4.6.
+// Per API docs, 'max' is on Mythos / Opus 4.8/4.7 / Opus 4.6 / Sonnet 4.6.
 // 'max' is Anthropic-specific; gpt-* models reported via the connection
 // record max out at xhigh, so the connection check below returns false
 // for them and the request never carries an unsupported value.
@@ -116,6 +121,7 @@ export function modelSupportsMaxEffort(model: string): boolean {
   }
   const m = model.toLowerCase()
   if (
+    m.includes('opus-4-8') ||
     m.includes('opus-4-7') ||
     m.includes('opus-4-6') ||
     m.includes('sonnet-4-6') ||
@@ -135,7 +141,7 @@ export function modelSupportsMaxEffort(model: string): boolean {
 
 // @[MODEL LAUNCH]: Add the new model if it supports 'xhigh' effort.
 // Per Anthropic docs (platform.claude.com/docs/en/build-with-claude/effort),
-// xhigh is **Opus 4.7 only** on Anthropic — but Codex's gpt-* models
+// xhigh is **Opus 4.8/4.7 only** on Anthropic — but Codex's gpt-* models
 // also expose `xhigh` natively in their ReasoningEffort enum, surfaced
 // via the connection record's supportedEfforts.
 //
@@ -159,7 +165,7 @@ export function modelSupportsXhighEffort(model: string): boolean {
     return supported3P
   }
   const m = model.toLowerCase()
-  if (m.includes('opus-4-7') || m.includes('mythos')) {
+  if (m.includes('opus-4-8') || m.includes('opus-4-7') || m.includes('mythos')) {
     return true
   }
   if (process.env.USER_TYPE === 'ant' && resolveAntModel(model)) {
@@ -266,8 +272,8 @@ export function resolveAppliedEffort(
   }
   const resolved =
     envOverride ?? appStateEffortValue ?? getDefaultEffortForModel(model)
-  // Clamp unsupported levels down. xhigh requires Opus 4.7; max requires
-  // Opus 4.7/4.6/Sonnet 4.6. Anything below tier falls to 'high', which
+  // Clamp unsupported levels down. xhigh requires Opus 4.8/4.7; max requires
+  // Opus 4.8/4.7/4.6/Sonnet 4.6. Anything below tier falls to 'high', which
   // is the same value the API uses when no effort param is sent.
   if (resolved === 'max' && !modelSupportsMaxEffort(model)) {
     return 'high'
@@ -349,7 +355,7 @@ export function getEffortLevelDescription(level: EffortLevel): string {
     case 'high':
       return 'High capability — equivalent to not setting the parameter (default)'
     case 'xhigh':
-      return 'Extended capability for long-horizon work (Opus 4.7 only)'
+      return 'Extended capability for long-horizon work (Opus 4.8/4.7 only)'
     case 'max':
       return 'Absolute maximum capability with no constraints on token spending'
   }
@@ -430,11 +436,14 @@ export function getDefaultEffortForModel(
   // the model launch DRI and research. Default effort is a sensitive setting
   // that can greatly affect model quality and bashing.
 
-  // Opus 4.7: Anthropic recommends starting at xhigh for coding/agentic
-  // workflows in Claude Code (per docs.claude.com effort guide). Pro
+  // Opus 4.8 defaults to high; Opus 4.7 keeps its xhigh default for
+  // coding/agentic workflows when the subscriber tier can afford it. Pro
   // subscribers stay at medium since their rate limits don't tolerate
   // xhigh's higher token spend by default.
   const m = model.toLowerCase()
+  if (m.includes('opus-4-8')) {
+    return 'high'
+  }
   if (m.includes('opus-4-7')) {
     if (isProSubscriber()) {
       return 'medium'

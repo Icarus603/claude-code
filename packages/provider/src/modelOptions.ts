@@ -31,7 +31,7 @@ import {
   getMarketingNameForModel,
   getUserSpecifiedModelSetting,
   isOpus1mMergeEnabled,
-  getOpus46PricingSuffix,
+  getOpusFastModePricingSuffix,
   renderDefaultModelSetting,
   type ModelSetting,
 } from './model.js'
@@ -177,13 +177,13 @@ function getOpus41Option(): ModelOption {
   }
 }
 
-function getOpus47Option(fastMode = false): ModelOption {
+function getOpus48Option(fastMode = false): ModelOption {
   const is3P = getAPIProvider() !== 'firstParty'
   return {
-    value: is3P ? getModelStrings().opus47 : 'opus',
+    value: is3P ? getModelStrings().opus48 : 'opus',
     label: 'Opus',
-    description: `Opus 4.7 · Most capable for complex work${getOpus46PricingSuffix(fastMode)}`,
-    descriptionForModel: 'Opus 4.7 - most capable for complex work',
+    description: `Opus 4.8 · Most capable for complex work${getOpusFastModePricingSuffix(fastMode)}`,
+    descriptionForModel: 'Opus 4.8 - most capable for complex work',
   }
 }
 
@@ -198,14 +198,14 @@ export function getSonnet46_1MOption(): ModelOption {
   }
 }
 
-export function getOpus47_1MOption(fastMode = false): ModelOption {
+export function getOpus48_1MOption(fastMode = false): ModelOption {
   const is3P = getAPIProvider() !== 'firstParty'
   return {
-    value: is3P ? getModelStrings().opus47 + '[1m]' : 'opus[1m]',
+    value: is3P ? getModelStrings().opus48 + '[1m]' : 'opus[1m]',
     label: 'Opus (1M context)',
-    description: `Opus 4.7 for long sessions${getOpus46PricingSuffix(fastMode)}`,
+    description: `Opus 4.8 for long sessions${getOpusFastModePricingSuffix(fastMode)}`,
     descriptionForModel:
-      'Opus 4.7 with 1M context window - for long sessions with large codebases',
+      'Opus 4.8 with 1M context window - for long sessions with large codebases',
   }
 }
 
@@ -277,7 +277,7 @@ function getMaxOpusOption(fastMode = false): ModelOption {
   return {
     value: 'opus',
     label: 'Opus',
-    description: `Opus 4.7 · Most capable for complex work${fastMode ? getOpus46PricingSuffix(true) : ''}`,
+    description: `Opus 4.8 · Most capable for complex work${fastMode ? getOpusFastModePricingSuffix(true) : ''}`,
   }
 }
 
@@ -291,23 +291,23 @@ export function getMaxSonnet46_1MOption(): ModelOption {
   }
 }
 
-export function getMaxOpus47_1MOption(fastMode = false): ModelOption {
+export function getMaxOpus48_1MOption(fastMode = false): ModelOption {
   const billingInfo = isClaudeAISubscriber() ? ' · Billed as extra usage' : ''
   return {
     value: 'opus[1m]',
     label: 'Opus (1M context)',
-    description: `Opus 4.7 with 1M context${billingInfo}${getOpus46PricingSuffix(fastMode)}`,
+    description: `Opus 4.8 with 1M context${billingInfo}${getOpusFastModePricingSuffix(fastMode)}`,
   }
 }
 
 function getMergedOpus1MOption(fastMode = false): ModelOption {
   const is3P = getAPIProvider() !== 'firstParty'
   return {
-    value: is3P ? getModelStrings().opus47 + '[1m]' : 'opus[1m]',
+    value: is3P ? getModelStrings().opus48 + '[1m]' : 'opus[1m]',
     label: 'Opus (1M context)',
-    description: `Opus 4.7 with 1M context · Most capable for complex work${!is3P && fastMode ? getOpus46PricingSuffix(fastMode) : ''}`,
+    description: `Opus 4.8 with 1M context · Most capable for complex work${!is3P && fastMode ? getOpusFastModePricingSuffix(fastMode) : ''}`,
     descriptionForModel:
-      'Opus 4.7 with 1M context - most capable for complex work',
+      'Opus 4.8 with 1M context - most capable for complex work',
   }
 }
 
@@ -327,7 +327,7 @@ function getOpusPlanOption(): ModelOption {
   return {
     value: 'opusplan',
     label: 'Opus Plan Mode',
-    description: 'Use Opus 4.7 in plan mode, Sonnet 4.6 otherwise',
+    description: 'Use Opus 4.8 in plan mode, Sonnet 4.6 otherwise',
   }
 }
 
@@ -357,7 +357,7 @@ function getModelOptionsBase(fastMode = false): ModelOption[] {
       // Max and Team Premium users: Opus is default, show Sonnet as alternative
       const premiumOptions = [getDefaultOptionForUser(fastMode)]
       if (!isOpus1mMergeEnabled() && checkOpus1mAccess()) {
-        premiumOptions.push(getMaxOpus47_1MOption(fastMode))
+        premiumOptions.push(getMaxOpus48_1MOption(fastMode))
       }
 
       premiumOptions.push(MaxSonnet46Option)
@@ -380,7 +380,7 @@ function getModelOptionsBase(fastMode = false): ModelOption[] {
     } else {
       standardOptions.push(getMaxOpusOption(fastMode))
       if (checkOpus1mAccess()) {
-        standardOptions.push(getMaxOpus47_1MOption(fastMode))
+        standardOptions.push(getMaxOpus48_1MOption(fastMode))
       }
     }
 
@@ -388,7 +388,7 @@ function getModelOptionsBase(fastMode = false): ModelOption[] {
     return standardOptions
   }
 
-  // PAYG 1P API: Default (Sonnet) + Sonnet 1M + Opus 4.7 + Opus 1M + Haiku
+  // PAYG 1P API: Default (Sonnet) + Sonnet 1M + Opus 4.8 + Opus 1M + Haiku
   if (getAPIProvider() === 'firstParty') {
     const payg1POptions = [getDefaultOptionForUser(fastMode)]
     if (checkSonnet1mAccess()) {
@@ -397,9 +397,9 @@ function getModelOptionsBase(fastMode = false): ModelOption[] {
     if (isOpus1mMergeEnabled()) {
       payg1POptions.push(getMergedOpus1MOption(fastMode))
     } else {
-      payg1POptions.push(getOpus47Option(fastMode))
+      payg1POptions.push(getOpus48Option(fastMode))
       if (checkOpus1mAccess()) {
-        payg1POptions.push(getOpus47_1MOption(fastMode))
+        payg1POptions.push(getOpus48_1MOption(fastMode))
       }
     }
     payg1POptions.push(getHaiku45Option())
@@ -424,11 +424,11 @@ function getModelOptionsBase(fastMode = false): ModelOption[] {
   if (customOpus !== undefined) {
     payg3pOptions.push(customOpus)
   } else {
-    // Add Opus 4.1, Opus 4.7 and Opus 4.7 1M
+    // Add Opus 4.1, Opus 4.8 and Opus 4.8 1M
     payg3pOptions.push(getOpus41Option()) // This is the default opus
-    payg3pOptions.push(getOpus47Option(fastMode))
+    payg3pOptions.push(getOpus48Option(fastMode))
     if (checkOpus1mAccess()) {
-      payg3pOptions.push(getOpus47_1MOption(fastMode))
+      payg3pOptions.push(getOpus48_1MOption(fastMode))
     }
   }
   const customHaiku = getCustomHaikuOption()
@@ -529,7 +529,7 @@ function getKnownModelOption(model: string): ModelOption | null {
  * Two pieces of disambiguation:
  *
  *  1. The visible label is `[<connection name>] <model label>` so users
- *     can tell "[Claude Account] Opus 4.7" from "[MyProxy] Opus 4.7".
+ *     can tell "[Claude Account] Opus 4.8" from "[MyProxy] Opus 4.8".
  *  2. The stored value is `<connectionId>:<modelId>`. When two
  *     connections expose the same `modelId`, only the prefix lets the
  *     query path pick the right connection. SDK seams strip the prefix

@@ -4,6 +4,8 @@
 // a task ID; a <task-notification> arrives on completion.
 
 import { randomUUID } from 'node:crypto'
+import { createElement } from 'react'
+import { Text } from '@anthropic/ink'
 import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '../../Tool.js'
 import { lazySchema } from '../../utils/lazySchema.js'
@@ -544,6 +546,6 @@ export const WorkflowTool = buildTool({
     return null
   },
   renderToolResultMessage(output: Output) {
-    return output.summary ?? 'Workflow launched'
+    return createElement(Text, null, output.summary ?? 'Workflow launched')
   },
 } satisfies ToolDef<InputSchema, Output>)

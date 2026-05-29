@@ -316,6 +316,10 @@ const PluginManifestMetadataSchema = lazySchema(() =>
       .describe(
         'Plugins that must be enabled for this plugin to function. Bare names (no "@marketplace") are resolved against the declaring plugin\'s own marketplace.',
       ),
+    defaultEnabled: z
+      .boolean()
+      .optional()
+      .describe('Whether this plugin is enabled by default before a user preference exists.'),
   }),
 )
 
@@ -1199,6 +1203,7 @@ const SettingsMarketplacePluginSchema = lazySchema(() =>
       description: z.string().optional(),
       version: z.string().optional(),
       strict: z.boolean().optional(),
+      defaultEnabled: z.boolean().optional(),
     })
     .refine(p => typeof p.source !== 'string', {
       message:

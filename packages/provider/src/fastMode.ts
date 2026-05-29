@@ -141,27 +141,22 @@ export function getFastModeUnavailableReason(): string | null {
 }
 
 // @[MODEL LAUNCH]: Update supported Fast Mode models.
-// ant v2.1.140 1413.js:ad reverted their Fast Mode default from Opus 4.7 to
-// Opus 4.6 (likely a cost/latency reason). ccb keeps 4.7 as default for the
-// operator but honors the ant-style overrides so the operator can A/B test
-// without a code change:
-//   CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE=1 → force Opus 4.6
-//   CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE=1   → reverse the override
+// Opus 4.8 is the default fast-mode target. The legacy Opus 4.6 override is
+// deprecated upstream but kept here for compatibility while users migrate.
 function shouldUseOpus46FastMode(): boolean {
-  // The explicit 4.7 enabler wins if both are set — matches ant precedence.
-  if (isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE'))) return false
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_OPUS_4_8_FAST_MODE'))) return false
   if (isEnvTruthy(readEnv('CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE'))) return true
   return false
 }
 
 export function getFastModeModelDisplay(): string {
-  return shouldUseOpus46FastMode() ? 'Opus 4.6' : 'Opus 4.7'
+  return shouldUseOpus46FastMode() ? 'Opus 4.6' : 'Opus 4.8'
 }
 
 // Kept as a const for callers that resolve the display name at module-load
 // time; runtime callers should prefer getFastModeModelDisplay() so the
 // env-driven override is honored even when set after module load.
-export const FAST_MODE_MODEL_DISPLAY = 'Opus 4.7'
+export const FAST_MODE_MODEL_DISPLAY = 'Opus 4.8'
 
 export function getFastModeModel(): string {
   const base = shouldUseOpus46FastMode() ? 'claude-opus-4-6' : 'opus'
@@ -194,7 +189,12 @@ export function isFastModeSupportedByModel(
   }
   const model = modelSetting ?? getDefaultMainLoopModelSetting()
   const parsedModel = parseUserSpecifiedModel(model)
-  return parsedModel.toLowerCase().includes('opus-4-7') || parsedModel.toLowerCase().includes('opus-4-6')
+  const normalized = parsedModel.toLowerCase()
+  return (
+    normalized.includes('opus-4-8') ||
+    normalized.includes('opus-4-7') ||
+    normalized.includes('opus-4-6')
+  )
 }
 
 // --- Fast mode runtime state ---

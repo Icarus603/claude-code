@@ -94,7 +94,8 @@ export function isNonCustomOpusModel(model: ModelName): boolean {
     model === getModelStrings().opus41 ||
     model === getModelStrings().opus45 ||
     model === getModelStrings().opus46 ||
-    model === getModelStrings().opus47
+    model === getModelStrings().opus47 ||
+    model === getModelStrings().opus48
   )
 }
 
@@ -183,19 +184,12 @@ export function getDefaultOpusModel(): ModelName {
   if (readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL')) {
     return readEnv('ANTHROPIC_DEFAULT_OPUS_MODEL')
   }
-  // 3P providers (Bedrock, Vertex, Foundry) lag firstParty availability.
-  // Only these specific env-var-driven 3P modes get opus46; anything else
-  // — including connection-based routing where getAPIProvider() legitimately
-  // returns 'firstParty' — should get opus47.
-  // V7 §11.6: getAPIProvider() returns 'firstParty' as the fallback for all
-  // connection-based sessions. The old `provider !== 'firstParty'` check
-  // was returning opus46 whenever the model strings were initialized with a
-  // stale provider (e.g. 'openai' from a previous Codex/OpenAI session),
-  // causing the header to show "Opus 4.6" for a Claude Account subscriber.
+  // Cloud-provider availability still lags firstParty; keep 3P env modes on
+  // Opus 4.6 unless the operator overrides the default with env/model settings.
   if (provider === 'bedrock' || provider === 'vertex' || provider === 'foundry') {
     return getModelStrings().opus46
   }
-  return getModelStrings().opus47
+  return getModelStrings().opus48
 }
 
 // @[MODEL LAUNCH]: Update the default Sonnet model (3P providers may lag so keep defaults unchanged).
@@ -342,7 +336,10 @@ export function getDefaultMainLoopModel(): ModelName {
 export function firstPartyNameToCanonical(name: ModelName): ModelShortName {
   name = name.toLowerCase()
   // Special cases for Claude 4+ models to differentiate versions
-  // Order matters: check more specific versions first (4-7 before 4-6 before 4)
+  // Order matters: check more specific versions first (4-8 before 4-7 before 4-6 before 4)
+  if (name.includes('claude-opus-4-8')) {
+    return 'claude-opus-4-8'
+  }
   if (name.includes('claude-opus-4-7')) {
     return 'claude-opus-4-7'
   }
@@ -416,9 +413,9 @@ export function getClaudeAiUserDefaultModelDescription(
 ): string {
   if (isMaxSubscriber() || isTeamPremiumSubscriber()) {
     if (isOpus1mMergeEnabled()) {
-      return `Opus 4.7 with 1M context · Most capable for complex work${fastMode ? getOpus46PricingSuffix(true) : ''}`
+      return `Opus 4.8 with 1M context · Most capable for complex work${fastMode ? getOpusFastModePricingSuffix(true) : ''}`
     }
-    return `Opus 4.7 · Most capable for complex work${fastMode ? getOpus46PricingSuffix(true) : ''}`
+    return `Opus 4.8 · Most capable for complex work${fastMode ? getOpusFastModePricingSuffix(true) : ''}`
   }
   return 'Sonnet 4.6 · Best for everyday tasks'
 }
@@ -427,17 +424,20 @@ export function renderDefaultModelSetting(
   setting: ModelName | ModelAlias,
 ): string {
   if (setting === 'opusplan') {
-    return 'Opus 4.7 in plan mode, else Sonnet 4.6'
+    return 'Opus 4.8 in plan mode, else Sonnet 4.6'
   }
   return renderModelName(parseUserSpecifiedModel(setting))
 }
 
-export function getOpus46PricingSuffix(fastMode: boolean): string {
+export function getOpusFastModePricingSuffix(fastMode: boolean): string {
   if (getAPIProvider() !== 'firstParty') return ''
   const pricing = formatModelPricing(getOpus46CostTier(fastMode))
   const fastModeIndicator = fastMode ? ` (${LIGHTNING_BOLT})` : ''
   return ` ·${fastModeIndicator} ${pricing}`
 }
+
+// Backcompat alias for older imports/tests.
+export const getOpus46PricingSuffix = getOpusFastModePricingSuffix
 
 export function isOpus1mMergeEnabled(): boolean {
   if (
@@ -467,8 +467,8 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
     return capitalize(setting)
   }
   // V7 §11.6 — composite `<connId>:<modelId>` resolves to the connection's
-  // own model label so the welcome header reads "Opus 4.7" not
-  // "conn_w4ibsphq:claude-opus-4-7". Falls through to bare-id rendering
+  // own model label so the welcome header reads "Opus 4.8" not
+  // "conn_w4ibsphq:claude-opus-4-8". Falls through to bare-id rendering
   // if the connection record is missing (stale prefix after disconnect).
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { unpackModelId, getConnections, prettyModelLabel } = require(
@@ -496,7 +496,7 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
  */
 export function getPublicModelDisplayName(model: ModelName): string | null {
   // Strip composite `<connId>:<modelId>` so attribution / commit trailers
-  // render `Claude Opus 4.7` not `Claude (conn_xxx:claude-opus-4-7)`.
+  // render `Claude Opus 4.8` not `Claude (conn_xxx:claude-opus-4-8)`.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { unpackModelId } = require(
     './connections.js',
@@ -506,6 +506,10 @@ export function getPublicModelDisplayName(model: ModelName): string | null {
     model = modelId as ModelName
   }
   switch (model) {
+    case getModelStrings().opus48:
+      return 'Opus 4.8'
+    case getModelStrings().opus48 + '[1m]':
+      return 'Opus 4.8 (1M context)'
     case getModelStrings().opus47:
       return 'Opus 4.7'
     case getModelStrings().opus47 + '[1m]':
@@ -633,9 +637,9 @@ export function parseUserSpecifiedModel(
 
   // Opus 4/4.1 are no longer available on the first-party API (same as
   // Claude.ai) — silently remap to the current Opus default. The 'opus'
-  // alias already resolves to 4.7, so the only users on these explicit
+  // alias already resolves to the latest Opus, so the only users on these explicit
   // strings pinned them in settings/env/--model/SDK before 4.5 launched.
-  // 3P providers may not yet have 4.7 capacity, so pass through unchanged.
+  // 3P providers may not yet have latest Opus capacity, so pass through unchanged.
   if (
     getAPIProvider() === 'firstParty' &&
     isLegacyOpusFirstParty(modelString) &&
@@ -731,8 +735,8 @@ export function modelDisplayString(model: ModelSetting): string {
   }
   // Composite `<connId>:<modelId>` settings (model picker output for users
   // with multiple connections) — defer to renderModelSetting which resolves
-  // connection metadata to a pretty label like "Opus 4.7" instead of
-  // surfacing the raw "conn_xxx:claude-opus-4-7" string in /config etc.
+  // connection metadata to a pretty label like "Opus 4.8" instead of
+  // surfacing the raw "conn_xxx:claude-opus-4-8" string in /config etc.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { unpackModelId } = require(
     './connections.js',
@@ -754,6 +758,9 @@ export function getMarketingNameForModel(modelId: string): string | undefined {
   const has1m = modelId.toLowerCase().includes('[1m]')
   const canonical = getCanonicalName(modelId)
 
+  if (canonical.includes('claude-opus-4-8')) {
+    return has1m ? 'Opus 4.8 (with 1M context)' : 'Opus 4.8'
+  }
   if (canonical.includes('claude-opus-4-7')) {
     return has1m ? 'Opus 4.7 (with 1M context)' : 'Opus 4.7'
   }

@@ -63,6 +63,20 @@ For each new flag, find the module(s) that read it:
 ```bash
 grep -rl 'tengu_grey_step2' work/claude-code-$B/decoded/
 ```
+
+**Standard cross-check — use new flags to FIND missed semantic changes.**
+The `sizeChange`/`diffLines` gate in §2 regularly misses real features when
+fingerprint pairing is off (confirmed 2.1.150→2.1.152: pair `4300→4317`
+reported `diffLines=2` yet contained the entire new model-refusal-fallback
+block). The new-flag list is the cure: every new `tengu_*` flag points at a
+real feature. For each flag's reader module, confirm it's genuinely new by
+grepping the flag (or its adjacent string constants) in A:
+```bash
+grep -rl 'tengu_refusal_fallback_triggered' work/claude-code-$A/decoded/  # 0 hits → new feature
+```
+If A has 0 hits, force a full `diff -u` of that module's pair regardless of
+what the delta JSON's `diffLines` says. This recovers features the magnitude
+gate drops.
 Read that module to understand what the flag gates.
 
 ### 1c · New environment variables

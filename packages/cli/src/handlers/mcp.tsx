@@ -57,6 +57,14 @@ async function checkMcpServerHealth(
   name: string,
   server: ScopedMcpServerConfig,
 ): Promise<string> {
+  if (server.scope === 'project') {
+    const { getProjectMcpServerStatus } = await import(
+      '@claude-code/mcp-runtime/utils.js'
+    )
+    if (getProjectMcpServerStatus(name) === 'pending') {
+      return '⏸ Pending approval (run `claude` to approve)'
+    }
+  }
   try {
     const result = await connectToServer(name, server)
     if (result.type === 'connected') {
@@ -188,7 +196,9 @@ export async function mcpRemoveHandler(
 // mcp list (lines 4641–4688)
 export async function mcpListHandler(): Promise<void> {
   logEvent('tengu_mcp_list', {})
-  const { servers: configs } = await getAllMcpConfigs()
+  const { servers: configs } = await getAllMcpConfigs({
+    includeUnapprovedProjectServers: true,
+  })
   if (Object.keys(configs).length === 0) {
     console.log(
       'No MCP servers configured. Use `claude mcp add` to add a server.',
@@ -232,7 +242,11 @@ export async function mcpGetHandler(name: string): Promise<void> {
   logEvent('tengu_mcp_get', {
     name: name as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   })
-  const server = getMcpConfigByName(name)
+  let server = getMcpConfigByName(name)
+  if (!server) {
+    const { getMcpConfigsByScope } = await import('@claude-code/mcp-runtime/config.js')
+    server = getMcpConfigsByScope('project').servers[name] ?? null
+  }
   if (!server) {
     cliError(`No MCP server found with name: ${name}`)
   }

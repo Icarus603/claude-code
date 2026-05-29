@@ -154,7 +154,7 @@ describe('prettyModelLabel', () => {
 describe('getDefaultModelsForProtocol', () => {
   test('anthropic returns Opus/Sonnet/Haiku', () => {
     const models = getDefaultModelsForProtocol('anthropic')
-    expect(models.map(m => m.id)).toContain('claude-opus-4-7')
+    expect(models.map(m => m.id)).toContain('claude-opus-4-8')
     expect(models.map(m => m.id)).toContain('claude-sonnet-4-6')
     expect(models.map(m => m.id)).toContain('claude-haiku-4-5')
   })

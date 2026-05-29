@@ -117,17 +117,17 @@ export const SYSTEM_PROMPT_DYNAMIC_BOUNDARY =
 
 // @[MODEL LAUNCH]: Update the model family IDs below to the latest in each tier.
 const CLAUDE_4_5_OR_4_6_MODEL_IDS = {
-  opus: 'claude-opus-4-7',
+  opus: 'claude-opus-4-8',
   sonnet: 'claude-sonnet-4-6',
   haiku: 'claude-haiku-4-5-20251001',
 }
 
-// Mirrors ant 1387.js BV() — fast mode currently runs on Opus 4.6 unless
-// the operator opts into the Opus 4.7 fast variant.
+// Mirrors ant fast-mode display: Opus 4.8 by default, legacy Opus 4.6 override
+// kept for compatibility while users migrate.
 function getFastModelName(): string {
-  return isEnvTruthy(readEnv('CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE'))
-    ? 'Opus 4.7'
-    : 'Opus 4.6'
+  return isEnvTruthy(readEnv('CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE'))
+    ? 'Opus 4.6'
+    : 'Opus 4.8'
 }
 
 // ant 4692.js:550 — w23. Env-gated reproduce/verify workflow guidance.
@@ -141,7 +141,7 @@ const REPRODUCE_VERIFY_WORKFLOW_PROMPT = `Work step by step:
 const FOCUS_MODE_PROMPT = `# Focus mode
 The user has focus mode enabled. In focus mode, the user only sees your final text message in each response. They do not see tool calls, tool results, or any text you emit between tool calls. This overrides earlier guidance about giving short updates between tool calls — skip those updates and put everything the user needs to know in your final message. Do not assume they saw earlier progress updates.`
 
-// ant 4692.js:539 — L23. Investigate-before-asking guidance, opus-4-7 only.
+// ant 4692.js:539 — L23. Investigate-before-asking guidance, latest Opus only.
 const INVESTIGATE_FIRST_PROMPT =
   'Asking the user a clarifying question has a cost: it interrupts them, and often they could have answered it themselves with a grep. Before asking, spend up to a minute on read-only investigation (grep the codebase, check docs, search memory) so your question is specific. "I found tunnels X and Y in the config — which one?" beats "what tunnel?"'
 
@@ -152,7 +152,7 @@ const INVESTIGATE_FIRST_PROMPT =
 function getInvestigateFirstMode(
   model: string,
 ): 'off' | 'additive' | 'compact' {
-  if (!getCanonicalName(model).includes('claude-opus-4-7')) return 'off'
+  if (!getCanonicalName(model).includes('claude-opus-4-8')) return 'off'
   const env = readEnv('CLAUDE_CODE_INVESTIGATE_FIRST')
   if (env === 'additive' || env === 'compact') return env
   if (isEnvTruthy(env)) return 'additive'
@@ -310,13 +310,13 @@ function getSimpleDoingTasksSection(): string {
 }
 
 function getActionsSection(model: string): string {
-  // Compact variant — opus-4-7 + tengu_loud_sugary_rock (default-on in ccb).
+  // Compact variant — Opus 4.8/4.7 + tengu_loud_sugary_rock (default-on in ccb).
   // Power-user fork: skip the long examples list since the operator already
   // knows what counts as destructive / hard-to-reverse. Saves ~150 tokens
   // per session vs the long version. To restore the long version, set
   // tengu_loud_sugary_rock=false in feature-flags.ts.
   if (
-    model.includes('opus-4-7') &&
+    (model.includes('opus-4-8') || model.includes('opus-4-7')) &&
     getFeatureValue_CACHED_MAY_BE_STALE('tengu_loud_sugary_rock', false)
   ) {
     return `# Executing actions with care
@@ -562,7 +562,7 @@ ${CYBER_RISK_INSTRUCTION}`,
         ? REPRODUCE_VERIFY_WORKFLOW_PROMPT
         : null,
     ),
-    // ant 4692.js:280 — opus-4-7 only, env-gated.
+    // ant 4692.js:280 — latest Opus only, env-gated.
     // cache-key includes mode so cross-session prompt cache stays clean.
     systemPromptSection(
       `investigate_first:${getInvestigateFirstMode(model)}`,
@@ -766,7 +766,7 @@ export async function computeSimpleEnvInfo(
     knowledgeCutoffMessage,
     process.env.USER_TYPE === 'ant' && isUndercover()
       ? null
-      : `The most recent Claude model family is Claude 4.X. Model IDs — Opus 4.7: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.opus}', Sonnet 4.6: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.sonnet}', Haiku 4.5: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.haiku}'. When building AI applications, default to the latest and most capable Claude models.`,
+      : `The most recent Claude model family is Claude 4.X. Model IDs — Opus 4.8: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.opus}', Sonnet 4.6: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.sonnet}', Haiku 4.5: '${CLAUDE_4_5_OR_4_6_MODEL_IDS.haiku}'. When building AI applications, default to the latest and most capable Claude models.`,
     process.env.USER_TYPE === 'ant' && isUndercover()
       ? null
       : `Claude Code is available as a CLI in the terminal, desktop app (Mac/Windows), web app (claude.ai/code), and IDE extensions (VS Code, JetBrains).`,
@@ -785,7 +785,9 @@ export async function computeSimpleEnvInfo(
 // @[MODEL LAUNCH]: Add a knowledge cutoff date for the new model.
 function getKnowledgeCutoff(modelId: string): string | null {
   const canonical = getCanonicalName(modelId)
-  if (canonical.includes('claude-opus-4-7')) {
+  if (canonical.includes('claude-opus-4-8')) {
+    return 'January 2026'
+  } else if (canonical.includes('claude-opus-4-7')) {
     return 'January 2026'
   } else if (canonical.includes('claude-sonnet-4-6')) {
     return 'August 2025'

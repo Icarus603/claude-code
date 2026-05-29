@@ -52,6 +52,7 @@ import {
   type McpWebSocketServerConfig,
   type ScopedMcpServerConfig,
 } from './types.js'
+import { normalizeNameForMCP } from './normalization.js'
 import { getProjectMcpServerStatus } from './utils.js'
 
 /**
@@ -1253,7 +1254,9 @@ export async function getClaudeCodeMcpConfigs(
  * This may be slow due to network calls - use getClaudeCodeMcpConfigs() for fast startup.
  * @returns All server configurations with appropriate scopes
  */
-export async function getAllMcpConfigs(): Promise<{
+export async function getAllMcpConfigs(options: {
+  includeUnapprovedProjectServers?: boolean
+} = {}): Promise<{
   servers: Record<string, ScopedMcpServerConfig>
   errors: PluginError[]
 }> {
@@ -1269,6 +1272,17 @@ export async function getAllMcpConfigs(): Promise<{
     {},
     claudeaiPromise,
   )
+  if (options.includeUnapprovedProjectServers) {
+    const { servers: projectServers } = getMcpConfigsByScope('project')
+    for (const [name, config] of Object.entries(projectServers)) {
+      const status = getProjectMcpServerStatus(name)
+      if (status === 'approved' || status === 'rejected') continue
+      const existingKey = Object.keys(claudeCodeServers).find(
+        key => normalizeNameForMCP(key) === normalizeNameForMCP(name),
+      )
+      if (!existingKey) claudeCodeServers[name] = config
+    }
+  }
   const { allowed: claudeaiMcpServers } = filterMcpServersByPolicy(
     await claudeaiPromise,
   )

@@ -59,8 +59,8 @@ export function getDefaultModelsForProtocol(
     case 'anthropic':
       return [
         {
-          id: 'claude-opus-4-7',
-          label: 'Opus 4.7',
+          id: 'claude-opus-4-8',
+          label: 'Opus 4.8',
           description: 'Most capable for complex work',
         },
         {

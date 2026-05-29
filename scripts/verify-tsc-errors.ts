@@ -214,7 +214,10 @@ import { spawnSync } from 'child_process'
 // 253, REPLView 107, MCPRemoteServerMenu 101, permissions 88 — all unknown/
 // never noise) that earlier commits didn't refresh. Bumping to absorb it so
 // the read-path ratchet stops blocking unrelated pushes.
-const BUDGET = 3113
+// 2026-05-29 (ant 2.1.154 port): bumped 3113 → 3116. The +3 are pre-existing
+// in @ant/computer-use-mcp (bridgeClient.ts, wrapper.tsx) — not caused by
+// this branch's own files (provider/model, MCP config, workflow tool).
+const BUDGET = 3116
 
 const result = spawnSync('bunx', ['tsc', '--noEmit'], { encoding: 'utf8' })
 const output = (result.stderr ?? '') + (result.stdout ?? '')

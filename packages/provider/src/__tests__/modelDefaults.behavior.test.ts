@@ -15,7 +15,7 @@ import { resolve } from 'path'
  *
  * Bug history (V7 §11.6): the old `provider !== 'firstParty'` guard treated
  * a stale `'openai'` global provider (residue from a prior Codex session) as
- * 3P, downgrading Opus from 4.7 → 4.6 for a Claude Account subscriber.
+ * 3P, downgrading Opus from latest → 4.6 for a Claude Account subscriber.
  * Fixed by explicitly listing bedrock/vertex/foundry — pin the exact list.
  */
 describe('Model defaults provider-aware cascade (vs ant default-resolver)', () => {
@@ -56,8 +56,8 @@ describe('Model defaults provider-aware cascade (vs ant default-resolver)', () =
       expect(fnSlice).toMatch(/return getModelStrings\(\)\.opus46/)
     })
 
-    test('firstParty (and connection-based) gets latest opus47', () => {
-      expect(fnSlice).toMatch(/return getModelStrings\(\)\.opus47/)
+    test('firstParty (and connection-based) gets latest opus48', () => {
+      expect(fnSlice).toMatch(/return getModelStrings\(\)\.opus48/)
     })
   })
 

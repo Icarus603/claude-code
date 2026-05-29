@@ -150,7 +150,7 @@ function ShowCurrentEffort({
 
 /**
  * Interactive picker shown when /effort is invoked with no args. Uses
- * the visual Speed/Intelligence axis component (xhigh shimmers, max
+ * the visual Faster/Smarter axis component (xhigh shimmers, max
  * rainbow-cycles). On confirm, applies the chosen level via the same
  * `setEffortValue` path that `/effort <level>` already takes — single
  * source of truth for both UI and CLI persistence semantics.
@@ -241,7 +241,7 @@ export async function call(
         '- low:    Most efficient — significant token savings, best for simple tasks',
         '- medium: Balanced — moderate token savings with solid performance',
         '- high:   High capability — equivalent to not setting the parameter (default)',
-        '- xhigh:  Extended capability for long-horizon work (Opus 4.7 only)',
+        '- xhigh:  Extended capability for long-horizon work (Opus 4.8/4.7 only)',
         '- max:    Absolute maximum capability with no constraints on token spending',
         '- auto:   Use the default effort level for your model',
         '- save:   Persist the current session effort as the default in settings.json',
@@ -254,7 +254,7 @@ export async function call(
     return <ShowCurrentEffort onDone={onDone} />
   }
 
-  // No argument → open the visual picker (Speed/Intelligence axis with
+  // No argument → open the visual picker (Faster/Smarter axis with
   // shimmer on xhigh and rainbow on max).
   if (!args) {
     return <EffortPickerCommand onDone={onDone} />

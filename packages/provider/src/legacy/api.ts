@@ -79,6 +79,7 @@ function modelOptInForEagerStreaming(
   //   opus45:   vertex only
   //   opus46:   vertex only
   //   opus47:   vertex + bedrock
+  //   opus48:   vertex + bedrock
   //   haiku35:  vertex only
   //   haiku45:  NO eager
   switch (canonical) {
@@ -90,6 +91,7 @@ function modelOptInForEagerStreaming(
       return provider === 'vertex'
     case 'claude-sonnet-4-6':
     case 'claude-opus-4-7':
+    case 'claude-opus-4-8':
       return provider === 'vertex' || provider === 'bedrock'
     default:
       return false

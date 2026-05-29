@@ -178,15 +178,15 @@ export function EffortPicker({
 
   return (
     <Box flexDirection="column" marginTop={1} marginBottom={1}>
-      {/* Speed / Intelligence axis labels */}
+      {/* Faster / Smarter axis labels */}
       <Box flexDirection="row">
         <Text>{padBox}</Text>
         <Box width={totalWidth} flexDirection="row" justifyContent="space-between">
           <Text dimColor italic>
-            Speed
+            Faster
           </Text>
           <Text dimColor italic>
-            Intelligence
+            Smarter
           </Text>
         </Box>
       </Box>
