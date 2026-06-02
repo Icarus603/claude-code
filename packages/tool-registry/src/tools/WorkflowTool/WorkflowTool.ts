@@ -540,7 +540,7 @@ export const WorkflowTool = buildTool({
     return 'Workflow rejected'
   },
   renderToolUseErrorMessage(output: { error?: string }) {
-    return output.error ?? 'Workflow error'
+    return createElement(Text, null, output.error ?? 'Workflow error')
   },
   renderToolUseProgressMessage() {
     return null
