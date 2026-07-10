@@ -20,7 +20,7 @@
 
 Terminal coding agent. Single binary `ccb`. Talks to Anthropic (OAuth or API key), Anthropic-compatible endpoints, ChatGPT Codex (OAuth), OpenAI-compatible endpoints (Ollama, DeepSeek, vLLM, …), and Gemini through one agent loop. macOS, Linux, Windows.
 
-Solo-maintained public derivative of Claude Code; baseline reconstructed from the v2.1.88 sourcemap (2026-03-31). See [`ATTRIBUTION.md`](./ATTRIBUTION.md). Not affiliated with Anthropic.
+Solo-maintained public derivative of Claude Code; baseline reconstructed from the v2.1.88 sourcemap (2026-03-31), with compatibility reviewed through stable 2.1.197. See [`ATTRIBUTION.md`](./ATTRIBUTION.md) and the [`upstream compatibility baseline`](./docs/upstream-compatibility.md). Not affiliated with Anthropic.
 
 ---
 

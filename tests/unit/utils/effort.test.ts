@@ -242,7 +242,7 @@ describe('getEffortLevelDescription', () => {
   test("returns description for 'xhigh'", () => {
     const desc = getEffortLevelDescription('xhigh')
     expect(desc).toContain('long-horizon')
-    expect(desc).toContain('Opus 4.7')
+    expect(desc).toContain('Opus 4.8/4.7')
   })
 
   test("returns description for 'max'", () => {

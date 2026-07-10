@@ -195,6 +195,17 @@ export function createMainProgram(): CommanderCommand {
       () => true,
     )
     .addOption(
+      new Option(
+        '--prompt-suggestions [value]',
+        'Enable prompt suggestions. In print/SDK mode, emits a prompt_suggestion message after each turn with a predicted next user prompt',
+      )
+        .choices(['true', 'false', '1', '0', 'yes', 'no', 'on', 'off'])
+        .preset('true')
+        .argParser((rawValue: string) =>
+          ['true', '1', 'yes', 'on'].includes(rawValue.toLowerCase()),
+        ),
+    )
+    .addOption(
       new Option('--enable-auth-status', 'Enable auth status messages in SDK mode')
         .default(false)
         .hideHelp(),
@@ -331,10 +342,10 @@ export function createMainProgram(): CommanderCommand {
     .addOption(
       new Option(
         '--effort <level>',
-        `Effort level for the current session (low, medium, high, max)`,
+        `Effort level for the current session (low, medium, high, xhigh, max)`,
       ).argParser((rawValue: string) => {
         const value = rawValue.toLowerCase()
-        const allowed = ['low', 'medium', 'high', 'max']
+        const allowed = ['low', 'medium', 'high', 'xhigh', 'max']
         if (!allowed.includes(value)) {
           throw new InvalidArgumentError(`It must be one of: ${allowed.join(', ')}`)
         }

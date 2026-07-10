@@ -136,9 +136,16 @@ describe('module-level accessors (ant oI6 / oAq / aAq / sAq)', () => {
 // Spawn a real /bin/sh script that emits a known stdout. Skipped on
 // win32 where /bin/sh is unavailable; the cap + byte-counting logic
 // is platform-independent so coverage on Linux/macOS pins the fix.
-import { mkdtempSync, rmSync, writeFileSync, chmodSync } from 'fs'
+import {
+  chmodSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
+import { spawnSync } from 'node:child_process'
 import { invokePolicyHelper } from '../policyHelper.js'
 
 let tmpRoot: string
@@ -148,6 +155,42 @@ function makeScript(body: string, name = 'helper.sh'): string {
   writeFileSync(path, `#!/bin/sh\n${body}\n`, 'utf8')
   chmodSync(path, 0o755)
   return path
+}
+
+/**
+ * A CLI import chain loaded by the full Bun test worker can corrupt that
+ * worker's child-process pipe capture. Exercise the real implementation in a
+ * clean Bun process and transfer the result through a file so the integration
+ * assertions remain deterministic. See 3d2cb514 for the same Bun workaround
+ * in the smoke suite.
+ */
+function invokePolicyHelperIsolated(
+  config: Parameters<typeof invokePolicyHelper>[0],
+): ReturnType<typeof invokePolicyHelper> {
+  const runnerPath = join(tmpRoot, `runner-${crypto.randomUUID()}.ts`)
+  const resultPath = join(tmpRoot, `result-${crypto.randomUUID()}.json`)
+  const modulePath = join(import.meta.dir, '..', 'policyHelper.ts')
+  writeFileSync(
+    runnerPath,
+    `
+import { writeFileSync } from 'node:fs'
+import { invokePolicyHelper } from ${JSON.stringify(modulePath)}
+
+const config = JSON.parse(process.argv[2])
+const result = await invokePolicyHelper(config)
+writeFileSync(process.argv[3], JSON.stringify(result))
+`,
+    'utf8',
+  )
+  const child = spawnSync(
+    'bun',
+    [runnerPath, JSON.stringify(config), resultPath],
+    { stdio: ['ignore', 'ignore', 'ignore'], timeout: 15_000 },
+  )
+  if (child.status !== 0) {
+    throw new Error(`isolated policyHelper runner exited ${child.status}`)
+  }
+  return Promise.resolve(JSON.parse(readFileSync(resultPath, 'utf8')))
 }
 
 describe.skipIf(process.platform === 'win32')(
@@ -180,7 +223,7 @@ describe.skipIf(process.platform === 'win32')(
 {"managedSettings": {"foo": "bar", "policyHelper": {"path": "/evil"}}, "claudeMd": "# CLAUDE.md", "appendSystemPrompt": "extra"}
 EOF`,
       )
-      const result = await invokePolicyHelper({ path })
+      const result = await invokePolicyHelperIsolated({ path })
       expect('output' in result).toBe(true)
       if ('output' in result) {
         // ant strips `policyHelper` so helper can't re-declare itself.
@@ -196,7 +239,7 @@ EOF`,
         `echo "something broke" >&2
 exit 3`,
       )
-      const result = await invokePolicyHelper({ path })
+      const result = await invokePolicyHelperIsolated({ path })
       expect('error' in result).toBe(true)
       if ('error' in result) {
         expect(result.code).toBe('exit_nonzero')
@@ -207,7 +250,7 @@ exit 3`,
     test('invalid JSON → parse_failed code', async () => {
       setup()
       const path = makeScript(`echo "not json at all"`)
-      const result = await invokePolicyHelper({ path })
+      const result = await invokePolicyHelperIsolated({ path })
       expect('error' in result).toBe(true)
       if ('error' in result) expect(result.code).toBe('parse_failed')
     })
@@ -215,7 +258,7 @@ exit 3`,
     test('JSON but not an object → parse_failed code', async () => {
       setup()
       const path = makeScript(`echo '["array","payload"]'`)
-      const result = await invokePolicyHelper({ path })
+      const result = await invokePolicyHelperIsolated({ path })
       expect('error' in result).toBe(true)
       if ('error' in result) expect(result.code).toBe('parse_failed')
     })
@@ -223,7 +266,7 @@ exit 3`,
     test('managedSettings is non-object → schema_rejected code', async () => {
       setup()
       const path = makeScript(`echo '{"managedSettings": "not an object"}'`)
-      const result = await invokePolicyHelper({ path })
+      const result = await invokePolicyHelperIsolated({ path })
       expect('error' in result).toBe(true)
       if ('error' in result) expect(result.code).toBe('schema_rejected')
     })
@@ -240,7 +283,7 @@ exit 3`,
       const path = makeScript(
         `node -e "process.stdout.write('a'.repeat(1100000))"`,
       )
-      const result = await invokePolicyHelper({ path, timeoutMs: 5000 })
+      const result = await invokePolicyHelperIsolated({ path, timeoutMs: 5000 })
       expect('error' in result).toBe(true)
       if ('error' in result) expect(result.code).toBe('oversize')
     })
@@ -253,7 +296,7 @@ exit 3`,
         `exec node -e "setTimeout(()=>{}, 30000)"`,
       )
       const start = Date.now()
-      const result = await invokePolicyHelper({ path, timeoutMs: 200 })
+      const result = await invokePolicyHelperIsolated({ path, timeoutMs: 200 })
       const elapsed = Date.now() - start
       expect('error' in result).toBe(true)
       if ('error' in result) expect(result.code).toBe('exit_nonzero')
@@ -270,8 +313,8 @@ exit 3`,
       const path = makeScript(
         `echo '{"managedSettings":{"foo":"bar"}}'`,
       )
-      const result1 = await invokePolicyHelper({ path })
-      const result2 = await invokePolicyHelper({ path })
+      const result1 = await invokePolicyHelperIsolated({ path })
+      const result2 = await invokePolicyHelperIsolated({ path })
       if ('output' in result1 && 'output' in result2) {
         // Mutate result1 — should not bleed into result2.
         ;(result1.output.managedSettings as Record<string, unknown>).foo =

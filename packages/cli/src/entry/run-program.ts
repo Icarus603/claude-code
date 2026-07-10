@@ -45,6 +45,15 @@ import { registerProjectCommands } from '../commands/project-commands.js'
  */
 function attachPreActionHook(program: CommanderCommand): void {
   program.hook('preAction', async thisCommand => {
+    if (
+      program.getOptionValue('promptSuggestions') &&
+      (!program.getOptionValue('print') || program.getOptionValue('outputFormat') !== 'stream-json')
+    ) {
+      process.stderr.write(
+        'Error: --prompt-suggestions requires --print and --output-format=stream-json (prompt_suggestion messages are only surfaced in stream-json output).\n',
+      )
+      process.exit(1)
+    }
     profileCheckpoint('preAction_start')
     // Await async subprocess loads started at module evaluation in main.tsx.
     // Nearly free — subprocesses complete during the ~135ms of imports.
@@ -305,9 +314,7 @@ function attachSecondaryOptions(program: CommanderCommand): void {
       new Option(
         '--remote-control [name]',
         'Start an interactive session with Remote Control enabled (optionally named)',
-      )
-        .argParser(value => value || true)
-        .hideHelp(),
+      ).argParser(value => value || true),
     )
     program.addOption(
       new Option('--rc [name]', 'Alias for --remote-control')

@@ -2704,6 +2704,7 @@ export async function runModeDispatch(
 						resumeSessionAt: options.resumeSessionAt || undefined,
 						rewindFiles: options.rewindFiles,
 						enableAuthStatus: options.enableAuthStatus,
+						promptSuggestions: options.promptSuggestions,
 						agent: agentCli,
 						workload: options.workload,
 						setupTrigger: setupTrigger ?? undefined,
@@ -3050,8 +3051,7 @@ export async function runModeDispatch(
 						? "tasks"
 						: "none";
 				const initialAttributionState = createEmptyAttributionState();
-				const initialPromptSuggestionEnabled =
-					shouldEnablePromptSuggestion();
+				const initialPromptSuggestionEnabled = options.promptSuggestions ?? shouldEnablePromptSuggestion();
 				const initialEffortValue =
 					parseEffortValue(options.effort) ??
 					toPersistableEffort(initialSettings.effortLevel);

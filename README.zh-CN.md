@@ -20,7 +20,7 @@
 
 终端编程智能体。单一 binary `ccb`。同一个 agent loop 对接 Anthropic（OAuth 或 API key）、Anthropic 兼容端点、ChatGPT Codex（OAuth）、OpenAI 兼容端点（Ollama、DeepSeek、vLLM……）、Gemini。支持 macOS、Linux、Windows。
 
-Claude Code 的个人维护公开衍生版；baseline 由 v2.1.88 sourcemap 重建（2026-03-31）。详见 [`ATTRIBUTION.md`](./ATTRIBUTION.md)。与 Anthropic 无关。
+Claude Code 的个人维护公开衍生版；baseline 由 v2.1.88 sourcemap 重建（2026-03-31），兼容性已检查至 stable 2.1.197。详见 [`ATTRIBUTION.md`](./ATTRIBUTION.md) 与 [`上游兼容性基准`](./docs/upstream-compatibility.md)。与 Anthropic 无关。
 
 ---
 

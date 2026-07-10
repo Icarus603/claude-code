@@ -421,8 +421,7 @@ function baseCreateAssistantMessage({
       ephemeral_5m_input_tokens: 0,
     },
     inference_geo: null,
-    iterations: null,
-    speed: null,
+    iterations: null, speed: null, output_tokens_details: null,
   },
 }: {
   content: BetaContentBlock[]

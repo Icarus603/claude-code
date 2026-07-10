@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { Command } from '@commander-js/extra-typings'
+import { createMainProgram } from '../../packages/cli/src/entry/commander.js'
 
 // Test Commander.js option parsing independently from main.tsx initialization.
 // main.tsx has heavy bootstrap dependencies; we test the CLI argument parsing
@@ -17,7 +18,9 @@ function createTestProgram(): Command {
     .option('--model <model>', 'model to use')
     .option('--system-prompt <prompt>', 'system prompt')
     .option('--allowedTools <tools...>', 'allowed tools')
-    .option('--max-turns <n>', 'max conversation turns', parseInt)
+    .option('--max-turns <n>', 'max conversation turns', value =>
+      parseInt(value, 10),
+    )
     .version('1.0.0', '-V, --version', 'display version')
   return program
 }
@@ -95,5 +98,26 @@ describe('CLI arguments: option parsing', () => {
   test('unknown flags throw CommanderError', () => {
     const program = createTestProgram()
     expect(() => program.parse(['node', 'test', '--nonexistent'])).toThrow()
+  })
+})
+
+describe('main CLI compatibility options', () => {
+  test('accepts xhigh effort', () => {
+    const program = createMainProgram()
+    program.parse(['--effort', 'xhigh'], { from: 'user' })
+
+    expect(program.opts().effort).toBe('xhigh')
+    expect(program.helpInformation()).toContain('low, medium, high, xhigh, max')
+  })
+
+  test.each([
+    ['--prompt-suggestions', true],
+    ['--prompt-suggestions=true', true],
+    ['--prompt-suggestions=off', false],
+  ])('parses %s', (flag, expected) => {
+    const program = createMainProgram()
+    program.parse([flag], { from: 'user' })
+
+    expect(program.opts().promptSuggestions).toBe(expected)
   })
 })

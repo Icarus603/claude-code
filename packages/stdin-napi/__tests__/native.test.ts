@@ -7,9 +7,14 @@
  */
 import { describe, expect, test } from 'bun:test'
 import { spawn } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 import { isReaderSupported, pinFd0Raw, unpinFd0Raw } from '../src/index.js'
 
@@ -99,21 +104,45 @@ while True:
     except ChildProcessError: break
     if t > ${timeoutMs / 1000.0}: break
 sys.stdout.write(out.decode('utf-8','replace'))
+if not out:
+    sys.stderr.write(f'pty produced no output: fed={i}/{len(seqs)} elapsed={time.time()-start:.3f}s')
 `
   return new Promise((resolve, reject) => {
-    const child = spawn('python3', ['-c', py], { stdio: ['ignore', 'pipe', 'pipe'] })
-    let out = ''
-    let err = ''
-    child.stdout.on('data', d => (out += d.toString()))
-    child.stderr.on('data', d => (err += d.toString()))
+    // The full Bun test worker can lose child-process pipe data after the CLI
+    // import chain is loaded. Redirect to files, matching the smoke-suite
+    // workaround in 3d2cb514.
+    const ioDir = mkdtempSync(join(tmpdir(), 'stdinnapi-pty-io-'))
+    const outPath = join(ioDir, 'stdout.txt')
+    const errPath = join(ioDir, 'stderr.txt')
+    const child = spawn(
+      'bash',
+      [
+        '-c',
+        'python3 -c "$1" >"$2" 2>"$3"',
+        'bash',
+        py,
+        outPath,
+        errPath,
+      ],
+      { stdio: ['ignore', 'ignore', 'ignore'] },
+    )
     child.on('error', reject)
-    child.on('close', () => {
-      if (err.trim()) {
-        // python harness diagnostics — surface but don't fail on them alone
-        // unless there's no output.
-        if (!out) reject(new Error(`pty harness error: ${err}`))
+    child.on('close', code => {
+      try {
+        const out = readFileSync(outPath, 'utf8')
+        const err = readFileSync(errPath, 'utf8')
+        if (err.trim() && !out) {
+          reject(new Error(`pty harness exited ${code}: ${err}`))
+          return
+        }
+        if (!out.includes('CHUNK ')) {
+          reject(new Error(`pty child produced no chunks; raw output: ${JSON.stringify(out)}`))
+          return
+        }
+        resolve(out)
+      } finally {
+        rmSync(ioDir, { recursive: true, force: true })
       }
-      resolve(out)
     })
   })
 }
@@ -162,7 +191,7 @@ function parseChunks(out: string): Buffer[] {
       const joined = Buffer.concat(chunks).toString('utf8')
       expect(joined).toBe('abcq')
     } finally {
-      rmSync(child, { recursive: true, force: true })
+      rmSync(dirname(child), { recursive: true, force: true })
     }
   }, 15000)
 
@@ -179,7 +208,7 @@ function parseChunks(out: string): Buffer[] {
       const idx = all.indexOf(Buffer.from([0x1b, 0x5b, 0x44]))
       expect(idx).toBeGreaterThanOrEqual(0)
     } finally {
-      rmSync(child, { recursive: true, force: true })
+      rmSync(dirname(child), { recursive: true, force: true })
     }
   }, 15000)
 
@@ -210,7 +239,7 @@ function parseChunks(out: string): Buffer[] {
         expect(Buffer.byteLength(c.toString('utf8'), 'utf8')).toBe(c.length)
       }
     } finally {
-      rmSync(child, { recursive: true, force: true })
+      rmSync(dirname(child), { recursive: true, force: true })
     }
   }, 15000)
 })
