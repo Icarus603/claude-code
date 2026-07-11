@@ -21,6 +21,7 @@ import {
   getDefaultEffortForModel,
   modelSupportsEffort,
   modelSupportsMaxEffort,
+  modelSupportsNoneEffort,
   modelSupportsXhighEffort,
   resolvePickerEffortPersistence,
   toPersistableEffort,
@@ -149,6 +150,9 @@ export function ModelPicker({
   const focusedSupportsMax = focusedModel
     ? modelSupportsMaxEffort(focusedModel)
     : false
+  const focusedSupportsNone = focusedModel
+    ? modelSupportsNoneEffort(focusedModel)
+    : false
   const focusedSupportsXhigh = focusedModel
     ? modelSupportsXhighEffort(focusedModel)
     : false
@@ -158,7 +162,9 @@ export function ModelPicker({
   // time, but the picker has to mirror the policy locally so the user
   // never sees a level they can't actually use.
   const displayEffort =
-    effort === 'max' && !focusedSupportsMax
+    effort === 'none' && !focusedSupportsNone
+      ? 'low'
+      : effort === 'max' && !focusedSupportsMax
       ? 'high'
       : effort === 'xhigh' && !focusedSupportsXhigh
       ? 'high'
@@ -182,6 +188,7 @@ export function ModelPicker({
         cycleEffortLevel(
           prev ?? focusedDefaultEffort,
           direction,
+          focusedSupportsNone,
           focusedSupportsXhigh,
           focusedSupportsMax,
         ),
@@ -190,6 +197,7 @@ export function ModelPicker({
     },
     [
       focusedSupportsEffort,
+      focusedSupportsNone,
       focusedSupportsXhigh,
       focusedSupportsMax,
       focusedDefaultEffort,
@@ -372,14 +380,16 @@ function EffortLevelIndicator({
 function cycleEffortLevel(
   current: EffortLevel,
   direction: 'left' | 'right',
+  includeNone: boolean,
   includeXhigh: boolean,
   includeMax: boolean,
 ): EffortLevel {
   // Keep the order aligned with EffortPicker so the two surfaces present
-  // identical ladders for the same model. Codex/gpt-* support xhigh
-  // natively (per /models supported_reasoning_levels) but not max;
-  // Sonnet 4.6 supports max but not xhigh; Opus 4.7 supports both.
-  const levels: EffortLevel[] = ['low', 'medium', 'high']
+  // identical ladders for the same model. Optional endpoints come from
+  // per-model capability metadata or the native Anthropic allowlists.
+  const levels: EffortLevel[] = []
+  if (includeNone) levels.push('none')
+  levels.push('low', 'medium', 'high')
   if (includeXhigh) levels.push('xhigh')
   if (includeMax) levels.push('max')
   // If the current level isn't in the cycle (e.g. 'max' after switching to

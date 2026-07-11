@@ -223,10 +223,10 @@ export type AuthProtocol = 'anthropic' | 'openai' | 'codex' | 'gemini'
  * Reasoning effort levels for /effort picker. Mirrored here (not imported
  * from @claude-code/agent/effort) because config must not depend on agent.
  * Keep in sync with EFFORT_LEVELS in packages/agent/effort.ts. Codex's
- * /models returns none/minimal/low/medium/high/xhigh; we map out none/minimal
- * before persisting (not surfaced in /effort).
+ * Keep in sync with provider metadata. `minimal` remains unsupported; `none`
+ * is surfaced only for models that explicitly advertise it.
  */
-export type ConnectionModelEffort = 'low' | 'medium' | 'high' | 'xhigh' | 'max'
+export type ConnectionModelEffort = 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max'
 
 export type ConnectionModelRecord = {
   id: string

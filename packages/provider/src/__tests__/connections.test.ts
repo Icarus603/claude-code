@@ -10,6 +10,7 @@ import {
   isFirstPartyAnthropicConnection,
   isWellKnownConnection,
   prettyModelLabel,
+  refreshCodexModelCatalog,
   unpackModelId,
 } from '../connections.js'
 
@@ -158,10 +159,16 @@ describe('getDefaultModelsForProtocol', () => {
     expect(models.map(m => m.id)).toContain('claude-sonnet-4-6')
     expect(models.map(m => m.id)).toContain('claude-haiku-4-5')
   })
-  test('codex returns the static GPT 5.x mirror list', () => {
+  test('codex returns GPT-5.6 first with max reasoning support', () => {
     const models = getDefaultModelsForProtocol('codex')
     expect(models.length).toBeGreaterThanOrEqual(3)
-    expect(models[0]!.id.startsWith('gpt-')).toBe(true)
+    expect(models.slice(0, 3).map(m => m.id)).toEqual([
+      'gpt-5.6-sol',
+      'gpt-5.6-terra',
+      'gpt-5.6-luna',
+    ])
+    expect(models[0]!.supportedEfforts).toContain('max')
+    expect(models[0]!.supportedEfforts).toContain('none')
     // Codex models all carry effort metadata
     for (const m of models) {
       expect(m.supportedEfforts).toBeDefined()
@@ -177,6 +184,32 @@ describe('getDefaultModelsForProtocol', () => {
     const ids = getDefaultModelsForProtocol('gemini').map(m => m.id)
     expect(ids).toContain('gemini-2.5-pro')
     expect(ids).toContain('gemini-2.5-flash')
+  })
+})
+
+describe('refreshCodexModelCatalog', () => {
+  test('refreshes GPT-5.6 metadata when the id exists but none is missing', () => {
+    const stale = getDefaultModelsForProtocol('codex').map(model =>
+      model.id === 'gpt-5.6-sol'
+        ? {
+            ...model,
+            supportedEfforts: model.supportedEfforts?.filter(
+              effort => effort !== 'none',
+            ),
+          }
+        : model,
+    )
+    const refreshed = refreshCodexModelCatalog(stale)
+    expect(refreshed.changed).toBe(true)
+    expect(refreshed.models[0]!.supportedEfforts).toContain('none')
+  })
+
+  test('preserves custom models and is idempotent once refreshed', () => {
+    const custom = { id: 'custom-codex', label: 'Custom Codex' }
+    const first = refreshCodexModelCatalog([custom])
+    expect(first.models).toContainEqual(custom)
+    expect(first.changed).toBe(true)
+    expect(refreshCodexModelCatalog(first.models).changed).toBe(false)
   })
 })
 

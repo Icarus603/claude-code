@@ -6,6 +6,7 @@ import {
   EFFORT_LEVELS,
   type EffortLevel,
   modelSupportsMaxEffort,
+  modelSupportsNoneEffort,
   modelSupportsXhighEffort,
 } from '@claude-code/agent/effort.js'
 
@@ -27,6 +28,7 @@ export type EffortPickerProps = {
 // Direct hex values (not theme tokens) so the rainbow on `max` reads as
 // a real rainbow instead of whatever the theme's accent palette ships.
 const LEVEL_COLOR: Record<Exclude<EffortLevel, 'max' | 'xhigh'>, string> = {
+  none: '#9aa0a6', // neutral grey
   low: '#ffd24d', // warm yellow
   medium: '#5cd66b', // fresh green
   high: '#4aa8ff', // cyan-blue
@@ -122,6 +124,7 @@ export function EffortPicker({
   const availableLevels = useMemo<EffortLevel[]>(
     () =>
       EFFORT_LEVELS.filter(level => {
+        if (level === 'none') return modelSupportsNoneEffort(model)
         if (level === 'xhigh') return modelSupportsXhighEffort(model)
         if (level === 'max') return modelSupportsMaxEffort(model)
         return true

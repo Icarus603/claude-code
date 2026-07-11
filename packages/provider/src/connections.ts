@@ -75,12 +75,13 @@ export function getDefaultModelsForProtocol(
         },
       ]
     case 'codex':
-      // Mirror of what `https://chatgpt.com/backend-api/codex/models` returns
-      // for ChatGPT-account auth as of 2026-04-27. We do not call /models
+      // Mirror of the GPT-5.6 family documented by OpenAI as of 2026-07-11,
+      // plus the still-supported models returned by the ChatGPT Codex backend.
+      // We do not call /models
       // at runtime: that endpoint requires us to impersonate the openai/codex
       // Rust CLI's own `client_version` (the only accepted version space is
       // sub-1.0.0, the codex CLI's), and the tier-filter behavior varies
-      // unpredictably across versions — it dropped `gpt-5.5` against
+      // unpredictably across versions — it previously dropped `gpt-5.5` against
       // `client_version=0.125.0` (the latest codex-rs release tag) but
       // returned it for an older value. Static-list-as-mirror is the
       // pragmatic answer: when OpenAI ships a new model we add the entry
@@ -94,6 +95,29 @@ export function getDefaultModelsForProtocol(
       // If the user's plan tier doesn't include one of these models the
       // /responses call returns a clear `model not available` error.
       return [
+        {
+          id: 'gpt-5.6-sol',
+          label: 'GPT-5.6 Sol',
+          description:
+            'Flagship GPT-5.6 model for the most demanding coding work.',
+          supportedEfforts: ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+          defaultEffort: 'medium',
+        },
+        {
+          id: 'gpt-5.6-terra',
+          label: 'GPT-5.6 Terra',
+          description:
+            'Strong GPT-5.6 performance with a better cost balance.',
+          supportedEfforts: ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+          defaultEffort: 'medium',
+        },
+        {
+          id: 'gpt-5.6-luna',
+          label: 'GPT-5.6 Luna',
+          description: 'Efficient GPT-5.6 model for high-volume coding work.',
+          supportedEfforts: ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+          defaultEffort: 'medium',
+        },
         {
           id: 'gpt-5.5',
           label: 'GPT-5.5',
@@ -160,6 +184,37 @@ export function getDefaultModelsForProtocol(
         },
       ]
   }
+}
+
+const STALE_CODEX_MODEL_IDS = new Set([
+  'gpt-5.2-codex',
+  'gpt-5.1-codex-max',
+  'gpt-5.1-codex-mini',
+])
+
+/**
+ * Refresh canonical Codex model metadata while preserving unknown models.
+ * Comparing full records matters: a model ID can already exist while a later
+ * release adds a reasoning level such as GPT-5.6's `none`.
+ */
+export function refreshCodexModelCatalog(
+  models: ConnectionModelRecord[],
+): { models: ConnectionModelRecord[]; changed: boolean } {
+  const defaults = getDefaultModelsForProtocol('codex')
+  const currentById = new Map(models.map(model => [model.id, model]))
+  const canonicalChanged = defaults.some(
+    model => JSON.stringify(currentById.get(model.id)) !== JSON.stringify(model),
+  )
+  const hasStaleModel = models.some(model => STALE_CODEX_MODEL_IDS.has(model.id))
+  if (!canonicalChanged && !hasStaleModel) {
+    return { models, changed: false }
+  }
+
+  const defaultIds = new Set(defaults.map(model => model.id))
+  const customModels = models.filter(
+    model => !defaultIds.has(model.id) && !STALE_CODEX_MODEL_IDS.has(model.id),
+  )
+  return { models: [...defaults, ...customModels], changed: true }
 }
 
 // ── Well-known connection IDs ───────────────────────────────────────────
@@ -310,7 +365,7 @@ export function inflateModelSetting(
  * (collapse-by-id leaves the prefix arbitrary).
  *
  * Strip the alias and show the wire id directly when we detect that
- * format. Native records (Claude Account "Opus 4.7", Codex "GPT-5.5")
+ * format. Native records (Claude Account "Opus 4.7", Codex "GPT-5.6 Sol")
  * have no parens and pass through verbatim.
  *
  * Single source of truth — picker, /model picker confirmation, and the

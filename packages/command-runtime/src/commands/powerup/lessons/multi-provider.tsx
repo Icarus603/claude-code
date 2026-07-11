@@ -39,7 +39,7 @@ export const lesson: Lesson = {
         frames={[
           '> [suggestion:/login]\n#add a new connection…',
           '#─ Connections ─\n#  [success:✓] claude-account   anthropic\n#  [success:✓] my-openai       openai',
-          '> [suggestion:/model]\n#  [claude:●] claude-opus-4-7\n#  ◯ gpt-5.5\n#  ◯ gemini-3-pro',
+          '> [suggestion:/model]\n#  [claude:●] claude-opus-4-7\n#  ◯ gpt-5.6-sol\n#  ◯ gemini-3-pro',
         ]}
       />
       <Text>

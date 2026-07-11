@@ -129,7 +129,7 @@ export function executeEffort(
 
   if (!isEffortLevel(normalized)) {
     return {
-      message: `Invalid argument: ${args}. Valid options are: low, medium, high, xhigh, max, auto, save`,
+      message: `Invalid argument: ${args}. Valid options are: none, low, medium, high, xhigh, max, auto, save`,
     }
   }
 
@@ -230,18 +230,19 @@ export async function call(
   if (COMMON_HELP_ARGS.includes(args)) {
     onDone(
       [
-        'Usage: /effort [low|medium|high|xhigh|max|auto|save|status]',
+        'Usage: /effort [none|low|medium|high|xhigh|max|auto|save|status]',
         '',
         'Run with no argument to open the interactive picker.',
         'Slash command changes affect the current session only — they do not',
         'modify settings.json. Run /effort save to persist the current value',
         'as the default for new sessions.',
         '',
-        'Effort levels (Anthropic docs: platform.claude.com/docs/en/build-with-claude/effort):',
+        'Effort levels (availability depends on the active model):',
+        '- none:   Disable reasoning for the lowest latency (GPT-5.6)',
         '- low:    Most efficient — significant token savings, best for simple tasks',
         '- medium: Balanced — moderate token savings with solid performance',
         '- high:   High capability — equivalent to not setting the parameter (default)',
-        '- xhigh:  Extended capability for long-horizon work (Opus 4.8/4.7 only)',
+        '- xhigh:  Extended reasoning for difficult, long-horizon work',
         '- max:    Absolute maximum capability with no constraints on token spending',
         '- auto:   Use the default effort level for your model',
         '- save:   Persist the current session effort as the default in settings.json',

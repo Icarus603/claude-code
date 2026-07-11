@@ -42,10 +42,16 @@ const {
 // ─── EFFORT_LEVELS constant ────────────────────────────────────────────
 
 describe('EFFORT_LEVELS', () => {
-  test('contains the five canonical levels in ascending order', () => {
+  test('contains the six canonical levels in ascending order', () => {
     // Order matters: ascending Speed→Intelligence, used by EffortPicker.
-    // 'xhigh' added 2026-04-27 per Anthropic docs (Opus 4.7 only).
-    expect(EFFORT_LEVELS).toEqual(['low', 'medium', 'high', 'xhigh', 'max'])
+    expect(EFFORT_LEVELS).toEqual([
+      'none',
+      'low',
+      'medium',
+      'high',
+      'xhigh',
+      'max',
+    ])
   })
 })
 
@@ -242,7 +248,7 @@ describe('getEffortLevelDescription', () => {
   test("returns description for 'xhigh'", () => {
     const desc = getEffortLevelDescription('xhigh')
     expect(desc).toContain('long-horizon')
-    expect(desc).toContain('Opus 4.8/4.7')
+    expect(desc).toContain('Extended reasoning')
   })
 
   test("returns description for 'max'", () => {

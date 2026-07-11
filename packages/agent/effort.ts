@@ -26,6 +26,7 @@ import {
 export type { EffortLevel }
 
 export const EFFORT_LEVELS = [
+  'none',
   'low',
   'medium',
   'high',
@@ -94,11 +95,14 @@ export function modelSupportsEffort(model: string): boolean {
   return getAPIProvider() === 'firstParty'
 }
 
+/** Whether the model explicitly supports disabling reasoning. */
+export function modelSupportsNoneEffort(model: string): boolean {
+  return getConnectionModelEntry(model)?.supportedEfforts?.includes('none') ?? false
+}
+
 // @[MODEL LAUNCH]: Add the new model to the allowlist if it supports 'max' effort.
 // Per API docs, 'max' is on Mythos / Opus 4.8/4.7 / Opus 4.6 / Sonnet 4.6.
-// 'max' is Anthropic-specific; gpt-* models reported via the connection
-// record max out at xhigh, so the connection check below returns false
-// for them and the request never carries an unsupported value.
+// GPT-5.6 also supports max through connection metadata.
 //
 // Native vs proxy asymmetry — same shape as `modelSupportsEffort` above.
 // On *native* api.anthropic.com (Claude Account / Console / api_key) the
@@ -198,7 +202,7 @@ export function parseEffortValue(value: unknown): EffortValue | undefined {
 
 /**
  * Numeric values are model-default only and not persisted.
- * String levels (low/medium/high/xhigh/max) are persistable. Persistence
+ * String levels (none/low/medium/high/xhigh/max) are persistable. Persistence
  * is the user's choice; the runtime (resolveAppliedEffort) clamps to
  * `high` when the active model doesn't support xhigh / max.
  * Write sites call this before saving to settings so the Zod schema
@@ -208,6 +212,7 @@ export function toPersistableEffort(
   value: EffortValue | undefined,
 ): EffortLevel | undefined {
   if (
+    value === 'none' ||
     value === 'low' ||
     value === 'medium' ||
     value === 'high' ||
@@ -281,6 +286,9 @@ export function resolveAppliedEffort(
   if (resolved === 'xhigh' && !modelSupportsXhighEffort(model)) {
     return 'high'
   }
+  if (resolved === 'none' && !modelSupportsNoneEffort(model)) {
+    return 'low'
+  }
   return resolved
 }
 
@@ -348,6 +356,8 @@ export function getEffortLevelDescription(level: EffortLevel): string {
   // Wording matches Anthropic's official docs at
   // platform.claude.com/docs/en/build-with-claude/effort
   switch (level) {
+    case 'none':
+      return 'No reasoning — lowest latency for straightforward tasks'
     case 'low':
       return 'Most efficient — significant token savings, best for simple tasks'
     case 'medium':
@@ -355,7 +365,7 @@ export function getEffortLevelDescription(level: EffortLevel): string {
     case 'high':
       return 'High capability — equivalent to not setting the parameter (default)'
     case 'xhigh':
-      return 'Extended capability for long-horizon work (Opus 4.8/4.7 only)'
+      return 'Extended reasoning for difficult, long-horizon work'
     case 'max':
       return 'Absolute maximum capability with no constraints on token spending'
   }

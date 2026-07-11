@@ -9,13 +9,20 @@ import {
 } from '../effort.js'
 
 describe('EFFORT_LEVELS', () => {
-  test('contains canonical 5-tier order low → max', () => {
-    expect([...EFFORT_LEVELS]).toEqual(['low', 'medium', 'high', 'xhigh', 'max'])
+  test('contains canonical 6-tier order none → max', () => {
+    expect([...EFFORT_LEVELS]).toEqual([
+      'none',
+      'low',
+      'medium',
+      'high',
+      'xhigh',
+      'max',
+    ])
   })
 })
 
 describe('isEffortLevel', () => {
-  test('all 5 canonical levels pass', () => {
+  test('all 6 canonical levels pass', () => {
     for (const lvl of EFFORT_LEVELS) {
       expect(isEffortLevel(lvl)).toBe(true)
     }
@@ -49,6 +56,7 @@ describe('parseEffortValue', () => {
     expect(parseEffortValue('')).toBeUndefined()
   })
   test('canonical level strings pass through', () => {
+    expect(parseEffortValue('none')).toBe('none')
     expect(parseEffortValue('low')).toBe('low')
     expect(parseEffortValue('medium')).toBe('medium')
     expect(parseEffortValue('high')).toBe('high')
@@ -82,6 +90,7 @@ describe('parseEffortValue', () => {
 
 describe('toPersistableEffort', () => {
   test('only string levels are persistable', () => {
+    expect(toPersistableEffort('none')).toBe('none')
     expect(toPersistableEffort('low')).toBe('low')
     expect(toPersistableEffort('medium')).toBe('medium')
     expect(toPersistableEffort('high')).toBe('high')

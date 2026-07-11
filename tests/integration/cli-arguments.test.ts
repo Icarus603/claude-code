@@ -107,7 +107,15 @@ describe('main CLI compatibility options', () => {
     program.parse(['--effort', 'xhigh'], { from: 'user' })
 
     expect(program.opts().effort).toBe('xhigh')
-    expect(program.helpInformation()).toContain('low, medium, high, xhigh, max')
+    expect(program.helpInformation()).toContain(
+      'none, low, medium, high, xhigh, max',
+    )
+  })
+
+  test('accepts none effort for models that disable reasoning', () => {
+    const program = createMainProgram()
+    program.parse(['--effort', 'none'], { from: 'user' })
+    expect(program.opts().effort).toBe('none')
   })
 
   test.each([

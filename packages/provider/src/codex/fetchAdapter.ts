@@ -35,20 +35,19 @@ const CODEX_BASE_URL = 'https://chatgpt.com/backend-api/codex/responses'
 
 /**
  * Map our user-facing EffortLevel to Codex's `ReasoningEffort` enum.
- * `xhigh` passes through (Codex supports it natively); `max` is
- * Anthropic-specific and clamps down to `xhigh` so the request still
- * goes out with the strongest reasoning the model offers.
+ * GPT-5.6 supports `max` natively. Older entries never expose `max` in their
+ * model metadata, so it only reaches this adapter for a compatible model.
  */
 function mapEffortToReasoningEffort(effort?: string): string | undefined {
   if (!effort) return undefined
   switch (effort) {
+    case 'none':
     case 'low':
     case 'medium':
     case 'high':
     case 'xhigh':
-      return effort
     case 'max':
-      return 'xhigh'
+      return effort
     default:
       return undefined
   }
@@ -205,7 +204,7 @@ function translateToCodexBody(
   // Codex slugs come from getDefaultModelsForProtocol('codex') already —
   // model id flows through queryModel's prefix-strip and into
   // options.model verbatim, so claudeModel here is the bare codex slug
-  // (e.g. 'gpt-5.5'). No further mapping needed.
+  // (e.g. 'gpt-5.6-sol'). No further mapping needed.
   const codexModel = claudeModel
 
   const reasoningEffort = mapEffortToReasoningEffort(
