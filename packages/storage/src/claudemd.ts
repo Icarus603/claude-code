@@ -26,7 +26,6 @@
  */
 
 import { feature } from 'bun:bundle'
-import ignore from 'ignore'
 import memoize from 'lodash-es/memoize.js'
 import { Lexer } from 'marked'
 import {
@@ -39,7 +38,7 @@ import {
   relative,
   sep,
 } from 'path'
-import picomatch from 'picomatch'
+import { safeIgnoreMatch, safePicomatch } from './safePatternMatch.js'
 import { logEvent } from '@claude-code/local-observability'
 import {
   getAdditionalDirectoriesForClaudeMd,
@@ -579,7 +578,7 @@ function isClaudeMdExcluded(filePath: string, type: MemoryType): boolean {
     return false
   }
 
-  return picomatch.isMatch(normalizedPath, expandedPatterns, matchOpts)
+  return safePicomatch(normalizedPath, expandedPatterns, matchOpts)
 }
 
 /**
@@ -1426,7 +1425,7 @@ export async function processConditionedMdRules(
     ) {
       return false
     }
-    return ignore().add(file.globs).ignores(relativePath)
+    return safeIgnoreMatch(file.globs, relativePath)
   })
 }
 

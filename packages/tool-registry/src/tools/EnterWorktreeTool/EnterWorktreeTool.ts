@@ -1,4 +1,5 @@
 import { z } from 'zod/v4'
+import { isAbsolute, relative, resolve } from 'node:path'
 import { getSessionId, setOriginalCwd } from '@claude-code/app-host/bootstrap/state.js'
 import { clearSystemPromptSections } from '@claude-code/provider/systemPromptSections'
 import { logEvent } from '@claude-code/local-observability'
@@ -83,6 +84,22 @@ export const EnterWorktreeTool: Tool<InputSchema, Output> = buildTool({
   shouldDefer: true,
   toAutoClassifierInput(input) {
     return input.name ?? ''
+  },
+  async checkPermissions(input) {
+    if (!input.path) return { behavior: 'allow', updatedInput: input }
+    const root = findCanonicalGitRoot(getCwd()) ?? getCwd()
+    const candidate = resolve(input.path)
+    const managedRoot = resolve(root, '.claude', 'worktrees')
+    const rel = relative(managedRoot, candidate)
+    const isManaged =
+      rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))
+    if (isManaged) return { behavior: 'allow', updatedInput: input }
+    return {
+      behavior: 'ask',
+      message:
+        `Enter existing worktree outside ${managedRoot}: ${candidate}. ` +
+        'This changes the session working directory and trust boundary.',
+    }
   },
   renderToolUseMessage,
   renderToolResultMessage,

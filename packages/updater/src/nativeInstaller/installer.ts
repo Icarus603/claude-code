@@ -93,6 +93,7 @@ export type SetupMessage = {
 }
 
 import { getBinaryName, getPlatform } from './platform.js'
+import { getLauncherOwnership } from './launcherOwnership.js'
 
 function getBaseDirectories() {
   const platform = getPlatform()
@@ -771,8 +772,7 @@ async function updateSymlink(
     }
   }
 
-  // For non-Windows platforms, use symlinks as before
-  // Ensure parent directory exists (same as Windows path above)
+  // Non-Windows installs use a launcher symlink.
   const parentDir = dirname(symlinkPath)
   try {
     await mkdir(parentDir, { recursive: true })
@@ -784,17 +784,18 @@ async function updateSymlink(
     return false
   }
 
-  // Check if symlink already exists and points to the correct target
   try {
     let symlinkExists = false
     try {
       await stat(symlinkPath)
       symlinkExists = true
-    } catch {
-      // symlinkPath doesn't exist
-    }
+    } catch {}
 
     if (symlinkExists) {
+      if ((await getLauncherOwnership(symlinkPath, targetPath)) === 'external') {
+        logForDebugging(`Preserving externally managed launcher at ${symlinkPath}`)
+        return false
+      }
       try {
         const currentTarget = await readlink(symlinkPath)
         const resolvedCurrentTarget = resolve(
@@ -817,9 +818,7 @@ async function updateSymlink(
     logError(new Error(`Failed to check/remove existing symlink: ${error}`))
   }
 
-  // Use atomic rename to avoid race conditions. Create symlink with temporary name
-  // then atomically rename to final name. This ensures the symlink always exists
-  // and is always valid, even with concurrent updates.
+  // Create then atomically rename so concurrent updates never expose a gap.
   const tempSymlink = `${symlinkPath}.tmp.${process.pid}.${Date.now()}`
   try {
     await symlink(targetPath, tempSymlink)

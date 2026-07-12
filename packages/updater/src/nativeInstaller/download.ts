@@ -8,19 +8,16 @@
 
 import { feature } from 'bun:bundle'
 import axios from 'axios'
-import { createHash } from 'crypto'
-import { chmod, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { logEvent } from '@claude-code/local-observability'
 import type { ReleaseChannel } from '@claude-code/config'
 import { logForDebugging } from '@claude-code/local-observability/debug.js'
-import { toError } from '@claude-code/local-observability/errorHelpers.js'
 import { execFileNoThrowWithCwd } from '@claude-code/shell/execFileNoThrow.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import { logError } from '@claude-code/local-observability/log.js'
-import { sleep } from '@claude-code/config/sleep'
 import { jsonStringify, writeFileSync } from '@claude-code/local-observability/slowOperations.js'
 import { getBinaryName, getPlatform } from './platform.js'
+import { streamBinaryDownload } from './streamBinaryDownload.js'
 
 const GCS_BUCKET_URL =
   'https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases'
@@ -237,20 +234,11 @@ async function downloadVersionFromArtifactory(
 
 // Stall timeout: abort if no bytes received for this duration
 const DEFAULT_STALL_TIMEOUT_MS = 60000 // 60 seconds
-const MAX_DOWNLOAD_RETRIES = 3
-
 function getStallTimeoutMs(): number {
   return (
     Number(process.env.CLAUDE_CODE_STALL_TIMEOUT_MS_FOR_TESTING) ||
     DEFAULT_STALL_TIMEOUT_MS
   )
-}
-
-class StallTimeoutError extends Error {
-  constructor() {
-    super('Download stalled: no data received for 60 seconds')
-    this.name = 'StallTimeoutError'
-  }
 }
 
 /**
@@ -264,90 +252,14 @@ async function downloadAndVerifyBinary(
   requestConfig: Record<string, unknown> = {},
   skipChecksum: boolean = false,
 ) {
-  let lastError: Error | undefined
-
-  for (let attempt = 1; attempt <= MAX_DOWNLOAD_RETRIES; attempt++) {
-    const controller = new AbortController()
-    let stallTimer: ReturnType<typeof setTimeout> | undefined
-
-    const clearStallTimer = () => {
-      if (stallTimer) {
-        clearTimeout(stallTimer)
-        stallTimer = undefined
-      }
-    }
-
-    const resetStallTimer = () => {
-      clearStallTimer()
-      stallTimer = setTimeout(c => c.abort(), getStallTimeoutMs(), controller)
-    }
-
-    try {
-      // Start the stall timer before the request
-      resetStallTimer()
-
-      const response = await axios.get(binaryUrl, {
-        timeout: 5 * 60000, // 5 minute total timeout
-        responseType: 'arraybuffer',
-        signal: controller.signal,
-        onDownloadProgress: () => {
-          // Reset stall timer on each chunk of data received
-          resetStallTimer()
-        },
-        ...requestConfig,
-      })
-
-      clearStallTimer()
-
-      // Verify checksum (skipped when caller couldn't fetch a sibling
-      // .sha256 — TLS still protected the wire, but content isn't pinned).
-      if (!skipChecksum) {
-        const hash = createHash('sha256')
-        hash.update(response.data)
-        const actualChecksum = hash.digest('hex')
-
-        if (actualChecksum !== expectedChecksum) {
-          throw new Error(
-            `Checksum mismatch: expected ${expectedChecksum}, got ${actualChecksum}`,
-          )
-        }
-      }
-
-      // Write binary to disk
-      await writeFile(binaryPath, Buffer.from(response.data))
-      await chmod(binaryPath, 0o755)
-
-      // Success - return early
-      return
-    } catch (error) {
-      clearStallTimer()
-
-      // Check if this was a stall timeout (axios wraps abort signals in CanceledError)
-      const isStallTimeout = axios.isCancel(error)
-
-      if (isStallTimeout) {
-        lastError = new StallTimeoutError()
-      } else {
-        lastError = toError(error)
-      }
-
-      // Only retry on stall timeouts
-      if (isStallTimeout && attempt < MAX_DOWNLOAD_RETRIES) {
-        logForDebugging(
-          `Download stalled on attempt ${attempt}/${MAX_DOWNLOAD_RETRIES}, retrying...`,
-        )
-        // Brief pause before retry to let network recover
-        await sleep(1000)
-        continue
-      }
-
-      // Don't retry other errors (HTTP errors, checksum mismatches, etc.)
-      throw lastError
-    }
-  }
-
-  // Should not reach here, but just in case
-  throw lastError ?? new Error('Download failed after all retries')
+  await streamBinaryDownload({
+    binaryUrl,
+    expectedChecksum,
+    binaryPath,
+    requestConfig,
+    skipChecksum,
+    stallTimeoutMs: getStallTimeoutMs(),
+  })
 }
 
 async function downloadVersionFromBinaryRepo(
@@ -576,4 +488,3 @@ async function downloadVersionFromGithubReleases(
     throw error
   }
 }
-

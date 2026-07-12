@@ -9,3 +9,4 @@ const addDir = {
 } satisfies Command
 
 export default addDir
+export { default as cd } from '../cd/index.js'

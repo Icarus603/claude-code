@@ -18,6 +18,7 @@ import {
   getSettings,
   updateSettingsForSource,
 } from '../settings/settings.js'
+import { getTrustedPluginConfig } from './trustedPluginConfig.js'
 import { jsonParse, jsonStringify } from './_deps.js'
 import { getSystemDirectories } from './_deps.js'
 import { classifyFetchError, logPluginFetch } from './fetchTelemetry.js'
@@ -143,16 +144,15 @@ export function loadMcpServerUserConfig(
   serverName: string,
 ): UserConfigValues | null {
   try {
-    const settings = getSettings()
-    const nonSensitive =
-      settings.pluginConfigs?.[pluginId]?.mcpServers?.[serverName]
+    const nonSensitive = {
+      ...getTrustedPluginConfig(pluginId).mcpServers?.[serverName],
+    }
 
     const sensitive =
       getSecureStorage().read()?.pluginSecrets?.[
         serverSecretsKey(pluginId, serverName)
       ]
-
-    if (!nonSensitive && !sensitive) {
+    if (Object.keys(nonSensitive).length === 0 && !sensitive) {
       return null
     }
 

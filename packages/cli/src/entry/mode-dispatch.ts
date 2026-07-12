@@ -78,6 +78,7 @@ import { getTools } from '@claude-code/tool-registry'
 import chalk from 'chalk'
 import { readFileSync } from 'fs'
 import mapValues from 'lodash-es/mapValues.js'
+import { applyCliOptionEnvironment } from './cliOptionEnvironment.js'
 import pickBy from 'lodash-es/pickBy.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import React from 'react'
@@ -104,6 +105,7 @@ import {
   getClaudeCodeMcpConfigs,
   getMcpServerSignature,
   getMcpToolsCommandsAndResources,
+  isReservedDesktopPaneMcpServer,
   parseMcpConfig,
   parseMcpConfigFromFilePath,
   prefetchAllMcpResources,
@@ -147,10 +149,7 @@ import {
   refreshRemoteManagedSettings,
 } from '../remoteManagedSettings.js'
 import type { ToolInputJSONSchema } from '@claude-code/tool-registry/Tool.js'
-import {
-  createSyntheticOutputTool,
-  isSyntheticOutputToolEnabled,
-} from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
+import { createSyntheticOutputTool } from '@claude-code/tool-registry/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import {
   canUserConfigureAdvisor,
   getInitialAdvisorSetting,
@@ -538,9 +537,7 @@ export async function runModeDispatch(
 			// --bare = one-switch minimal mode. Sets SIMPLE so all the existing
 			// gates fire (CLAUDE.md, skills, hooks inside executeHooks, agent
 			// dir-walk). Must be set before setup() / any of the gated work runs.
-			if ((options as { bare?: boolean }).bare) {
-				process.env.CLAUDE_CODE_SIMPLE = "1";
-			}
+			applyCliOptionEnvironment(options);
 
 			// Ignore "code" as a prompt - treat it the same as no prompt
 			if (prompt === "code") {
@@ -859,7 +856,6 @@ export async function runModeDispatch(
 				remoteControlOption.length > 0
 					? remoteControlOption
 					: undefined;
-
 			// Validate session ID if provided
 			if (sessionId) {
 				// Check for conflicting flags
@@ -1158,8 +1154,9 @@ export async function runModeDispatch(
 						.map(([name]) => name);
 
 					let reservedNameError: string | null = null;
-					if (nonSdkConfigNames.some(isClaudeInChromeMCPServer)) {
-						reservedNameError = `Invalid MCP configuration: "${CLAUDE_IN_CHROME_MCP_SERVER_NAME}" is a reserved MCP name.`;
+					const reservedPaneName = nonSdkConfigNames.find(isReservedDesktopPaneMcpServer);
+					if (nonSdkConfigNames.some(isClaudeInChromeMCPServer) || reservedPaneName) {
+						reservedNameError = `Invalid MCP configuration: "${reservedPaneName ?? CLAUDE_IN_CHROME_MCP_SERVER_NAME}" is a reserved MCP name.`;
 					} else if (feature("CHICAGO_MCP")) {
 						const {
 							isComputerUseMCPServer,
@@ -1682,10 +1679,7 @@ export async function runModeDispatch(
 			profileCheckpoint("action_tools_loaded");
 
 			let jsonSchema: ToolInputJSONSchema | undefined;
-			if (
-				isSyntheticOutputToolEnabled({ isNonInteractiveSession }) &&
-				options.jsonSchema
-			) {
+			if (options.jsonSchema) {
 				jsonSchema = jsonParse(
 					options.jsonSchema,
 				) as ToolInputJSONSchema;
@@ -1696,8 +1690,7 @@ export async function runModeDispatch(
 					createSyntheticOutputTool(jsonSchema);
 				if ("tool" in syntheticOutputResult) {
 					// Add SyntheticOutputTool to the tools array AFTER getTools() filtering.
-					// This tool is excluded from normal filtering (see tools.ts) because it's
-					// an implementation detail for structured output, not a user-controlled tool.
+					// This internal tool bypasses normal user-tool filtering.
 					tools = [...tools, syntheticOutputResult.tool];
 
 					logEvent("tengu_structured_output_enabled", {
@@ -1716,6 +1709,7 @@ export async function runModeDispatch(
 					logEvent("tengu_structured_output_failure", {
 						error: "Invalid JSON schema" as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
 					});
+					throw new Error(`Invalid --json-schema: ${syntheticOutputResult.error}`);
 				}
 			}
 

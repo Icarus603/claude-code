@@ -215,14 +215,14 @@ export function formatAPIError(error: APIError): string {
         case 'UNABLE_TO_VERIFY_LEAF_SIGNATURE':
         case 'UNABLE_TO_GET_ISSUER_CERT':
         case 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY':
-          return 'Unable to connect to API: SSL certificate verification failed. Check your proxy or corporate SSL certificates'
+          return 'Unable to connect to API: SSL certificate verification failed. Set NODE_EXTRA_CA_CERTS to your corporate CA bundle, then restart Claude Code'
         case 'CERT_HAS_EXPIRED':
           return 'Unable to connect to API: SSL certificate has expired'
         case 'CERT_REVOKED':
           return 'Unable to connect to API: SSL certificate has been revoked'
         case 'DEPTH_ZERO_SELF_SIGNED_CERT':
         case 'SELF_SIGNED_CERT_IN_CHAIN':
-          return 'Unable to connect to API: Self-signed certificate detected. Check your proxy or corporate SSL certificates'
+          return 'Unable to connect to API: Self-signed certificate detected. Set NODE_EXTRA_CA_CERTS to the trusted CA bundle, then restart Claude Code'
         case 'ERR_TLS_CERT_ALTNAME_INVALID':
         case 'HOSTNAME_MISMATCH':
           return 'Unable to connect to API: SSL certificate hostname mismatch'

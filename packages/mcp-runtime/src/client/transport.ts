@@ -26,7 +26,10 @@ export function getConnectionTimeoutMs(): number {
 	return Number.parseInt(process.env.MCP_TIMEOUT || "", 10) || 30000;
 }
 
-export function wrapFetchWithTimeout(baseFetch: FetchLike): FetchLike {
+export function wrapFetchWithTimeout(
+	baseFetch: FetchLike,
+	timeoutMs = MCP_REQUEST_TIMEOUT_MS,
+): FetchLike {
 	return async (url: string | URL, init?: RequestInit) => {
 		const method = (init?.method ?? "GET").toUpperCase();
 		if (method === "GET") {
@@ -44,7 +47,7 @@ export function wrapFetchWithTimeout(baseFetch: FetchLike): FetchLike {
 				abortController.abort(
 					new DOMException("The operation timed out.", "TimeoutError"),
 				),
-			MCP_REQUEST_TIMEOUT_MS,
+			timeoutMs,
 			controller,
 		);
 		timer.unref?.();

@@ -29,6 +29,7 @@ import { expandPath } from '@claude-code/storage/path.js'
 import { ripGrep } from '@claude-code/tool-registry/ripgrep.js'
 import { getInitialSettings } from '@claude-code/config/settings'
 import { createSignal } from '@claude-code/config/signal'
+import { addIgnorePatterns, safelyFilterIgnored } from './safeIgnore.js'
 
 // Lazily constructed singleton
 let fileIndex: FileIndex | null = null
@@ -194,11 +195,7 @@ async function mergeUntrackedIntoNormalizedCache(
   )
 }
 
-/**
- * Load ripgrep-specific ignore patterns from .ignore or .rgignore files
- * Returns an ignore instance if patterns were found, null otherwise
- * Results are cached per repoRoot:cwd combination
- */
+/** Load cached .ignore/.rgignore patterns for file suggestions. */
 async function loadRipgrepIgnorePatterns(
   repoRoot: string,
   cwd: string,
@@ -225,7 +222,7 @@ async function loadRipgrepIgnorePatterns(
   )
   for (const [i, content] of contents.entries()) {
     if (content === null) continue
-    ig.add(content)
+    if (!addIgnorePatterns(ig, content)) continue
     hasPatterns = true
     logForDebugging(`[FileIndex] loaded ignore patterns from ${paths[i]}`)
   }
@@ -289,7 +286,7 @@ async function getFilesUsingGit(
     const ignorePatterns = await loadRipgrepIgnorePatterns(repoRoot, cwd)
     if (ignorePatterns) {
       const beforeCount = normalizedTracked.length
-      normalizedTracked = ignorePatterns.filter(normalizedTracked)
+      normalizedTracked = safelyFilterIgnored(ignorePatterns, normalizedTracked)
       logForDebugging(
         `[FileIndex] applied ignore patterns: ${beforeCount} -> ${normalizedTracked.length} files`,
       )
@@ -351,7 +348,10 @@ async function getFilesUsingGit(
             )
             if (ignorePatterns && normalizedUntracked.length > 0) {
               const beforeCount = normalizedUntracked.length
-              normalizedUntracked = ignorePatterns.filter(normalizedUntracked)
+              normalizedUntracked = safelyFilterIgnored(
+                ignorePatterns,
+                normalizedUntracked,
+              )
               logForDebugging(
                 `[FileIndex] applied ignore patterns to untracked: ${beforeCount} -> ${normalizedUntracked.length} files`,
               )

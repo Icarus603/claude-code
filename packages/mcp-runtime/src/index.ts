@@ -26,3 +26,4 @@ export {
 } from './api.js'
 export * from './compat.js'
 export { toScopedConfig } from './config.js'
+export { isReservedDesktopPaneMcpServer } from './reservedNames.js'

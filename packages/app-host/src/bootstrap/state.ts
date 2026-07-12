@@ -21,7 +21,8 @@ import type { ModelStrings } from '@claude-code/provider/modelStrings.js'
 import { resetSettingsCache } from '@claude-code/config/settings/settingsCache'
 import type { PluginHookMatcher } from '@claude-code/config/types'
 import { createSignal } from '@claude-code/config/signal'
-
+import { notifyAdditionalDirectories } from './additionalDirectories.js'
+export { subscribeAdditionalDirectories } from './additionalDirectories.js'
 // Union type for registered hooks - can be SDK callbacks or native plugin hooks
 type RegisteredHookMatcher = HookCallbackMatcher | PluginHookMatcher
 
@@ -1772,13 +1773,12 @@ export function setLastEmittedDate(date: string | null): void {
 export function getAdditionalDirectoriesForClaudeMd(): string[] {
   return STATE.additionalDirectoriesForClaudeMd
 }
-
 export function setAdditionalDirectoriesForClaudeMd(
   directories: string[],
 ): void {
   STATE.additionalDirectoriesForClaudeMd = directories
+  notifyAdditionalDirectories(directories)
 }
-
 export function getAllowedChannels(): ChannelEntry[] {
   return STATE.allowedChannels
 }

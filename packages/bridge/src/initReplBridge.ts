@@ -14,6 +14,7 @@
  */
 
 import { feature } from 'bun:bundle'
+import { readEnv } from '@claude-code/config/env/utils'
 import { hostname } from 'os'
 import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
 import type { SDKMessage } from '@claude-code/headless-sdk/agentSdkTypes.js'
@@ -255,7 +256,10 @@ export async function initReplBridge(
   // The slug fallback (e.g. "remote-control-graceful-unicorn") makes
   // auto-started sessions distinguishable in the claude.ai list before the
   // first prompt.
-  let title = `remote-control-${generateShortWordSlug()}`
+  const titlePrefix =
+    readEnv('CLAUDE_CODE_REMOTE_CONTROL_SESSION_NAME_PREFIX')?.trim() ||
+    'remote-control'
+  let title = `${titlePrefix}-${generateShortWordSlug()}`
   let hasTitle = false
   let hasExplicitTitle = false
   if (initialName) {

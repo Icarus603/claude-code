@@ -340,6 +340,21 @@ async function main(): Promise<void> {
     process.argv = [process.argv[0]!, process.argv[1]!, 'update']
   }
 
+  // --safe-mode is the public spelling of the existing bare bootstrap path.
+  if (args.includes('--safe-mode')) {
+    process.argv = process.argv.map(arg =>
+      arg === '--safe-mode' ? '--bare' : arg,
+    )
+    args.splice(0, args.length, ...process.argv.slice(2))
+  }
+
+  if (args.includes('--ax-screen-reader')) {
+    process.env.CLAUDE_CODE_AX_SCREEN_READER = '1'
+    process.env.CLAUDE_CODE_ACCESSIBILITY = '1'
+    process.argv = process.argv.filter(arg => arg !== '--ax-screen-reader')
+    args.splice(0, args.length, ...process.argv.slice(2))
+  }
+
   // --bare: set SIMPLE early so gates fire during module eval / commander
   // option building (not just inside the action handler).
   if (args.includes('--bare')) {

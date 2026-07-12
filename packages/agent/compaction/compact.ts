@@ -1306,7 +1306,7 @@ async function streamCompactSummary({
           context.options.tools,
         ),
         systemPrompt: cacheSafeParams.systemPrompt,
-        thinkingConfig: { type: 'disabled' as const },
+        thinkingConfig: context.options.thinkingConfig,
         tools,
         signal: context.abortController.signal,
         options: {

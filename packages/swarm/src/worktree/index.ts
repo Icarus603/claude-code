@@ -12,6 +12,9 @@ import {
 } from 'fs/promises'
 import ignore from 'ignore'
 import { basename, dirname, join } from 'path'
+import { unlinkWindowsReparsePoints } from './safeRemoval.js'
+import { cleanupSparseWorktreeConfig } from './sparseConfigCleanup.js'
+import { safelyIgnored } from './safeIgnore.js'
 import { saveCurrentProjectConfig } from '../adapters/appRuntime.js'
 import { getCwd } from '../adapters/appRuntime.js'
 import { logForDebugging } from '../adapters/appRuntime.js'
@@ -407,9 +410,7 @@ export async function copyWorktreeIncludeFiles(
     return []
   }
 
-  // Single pass with --directory: collapses fully-gitignored dirs (node_modules/,
-  // .turbo/, etc.) into single entries instead of listing every file inside.
-  // In a large repo this cuts ~500k entries/~7s down to ~hundreds of entries/~100ms.
+  // Collapse fully ignored directories so large repos stay cheap to scan.
   const gitignored = await execFileNoThrowWithCwd(
     gitExe(),
     ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory'],
@@ -420,19 +421,17 @@ export async function copyWorktreeIncludeFiles(
   }
 
   const entries = gitignored.stdout.trim().split('\n').filter(Boolean)
-  const matcher = ignore().add(includeContent)
+  const matcher = ignore()
+  try {
+    matcher.add(includeContent)
+  } catch {
+    return []
+  }
 
-  // --directory emits collapsed dirs with a trailing slash; everything else is
-  // an individual file.
   const collapsedDirs = entries.filter(e => e.endsWith('/'))
-  const files = entries.filter(e => !e.endsWith('/') && matcher.ignores(e))
+  const files = entries.filter(e => !e.endsWith('/') && safelyIgnored(matcher, e))
 
-  // Edge case: a .worktreeinclude pattern targets a path inside a collapsed dir
-  // (e.g. pattern `config/secrets/api.key` when all of `config/secrets/` is
-  // gitignored with no tracked siblings). Expand only dirs where a pattern has
-  // that dir as its explicit path prefix (stripping redundant leading `/`), the
-  // dir falls under an anchored glob's literal prefix (e.g. `config/**/*.key`
-  // expands `config/secrets/`), or the dir itself matches a pattern. We don't
+  // Expand collapsed directories only when a pattern can target their contents.
   // expand for `**/` or anchorless patterns -- those match files in tracked dirs
   // (already listed individually) and expanding every collapsed dir for them
   // would defeat the perf win.
@@ -453,7 +452,7 @@ export async function copyWorktreeIncludeFiles(
       })
     )
       return true
-    if (matcher.ignores(dir.slice(0, -1))) return true
+    if (safelyIgnored(matcher, dir.slice(0, -1))) return true
     return false
   })
   if (dirsToExpand.length > 0) {
@@ -471,7 +470,7 @@ export async function copyWorktreeIncludeFiles(
     )
     if (expanded.code === 0 && expanded.stdout.trim()) {
       for (const f of expanded.stdout.trim().split('\n').filter(Boolean)) {
-        if (matcher.ignores(f)) {
+        if (safelyIgnored(matcher, f)) {
           files.push(f)
         }
       }
@@ -816,7 +815,7 @@ export async function cleanupWorktree(): Promise<void> {
   }
 
   try {
-    const { worktreePath, originalCwd, worktreeBranch, hookBased } =
+    const { worktreePath, originalCwd, worktreeBranch, hookBased, usedSparsePaths } =
       currentWorktreeSession
 
     // Change back to original directory first
@@ -834,10 +833,8 @@ export async function cleanupWorktree(): Promise<void> {
         )
       }
     } else {
-      // Git-based worktree: use git worktree remove.
-      // Explicit cwd: process.chdir above does NOT update getCwd() (the state
-      // CWD that execFileNoThrow defaults to). If the model cd'd to a non-repo
-      // dir, the bare execFileNoThrow variant would fail silently here.
+      await unlinkWindowsReparsePoints(worktreePath)
+      // Use an explicit original cwd because process.chdir does not update getCwd().
       const { code: removeCode, stderr: removeError } =
         await execFileNoThrowWithCwd(
           gitExe(),
@@ -851,13 +848,12 @@ export async function cleanupWorktree(): Promise<void> {
         })
       } else {
         logForDebugging(`Removed linked worktree at: ${worktreePath}`)
+        if (usedSparsePaths) await cleanupSparseWorktreeConfig(originalCwd)
       }
     }
 
-    // Clear the session
     currentWorktreeSession = null
 
-    // Update config
     saveCurrentProjectConfig(current => ({
       ...current,
       activeWorktreeSession: undefined,
@@ -984,7 +980,8 @@ export async function removeAgentWorktree(
     return false
   }
 
-  // Run from the main repo root, not the worktree (which we're about to delete)
+  // Run from the main root because the worktree is about to disappear.
+  await unlinkWindowsReparsePoints(worktreePath)
   const { code: removeCode, stderr: removeError } =
     await execFileNoThrowWithCwd(
       gitExe(),
@@ -999,6 +996,9 @@ export async function removeAgentWorktree(
     return false
   }
   logForDebugging(`Removed agent worktree at: ${worktreePath}`)
+  if (getInitialSettings().worktree?.sparsePaths?.length) {
+    await cleanupSparseWorktreeConfig(gitRoot)
+  }
 
   if (!worktreeBranch) {
     return true

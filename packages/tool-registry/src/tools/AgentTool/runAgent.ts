@@ -661,12 +661,8 @@ export async function* runAgent({
     debug: toolUseContext.options.debug,
     verbose: toolUseContext.options.verbose,
     mainLoopModel: resolvedAgentModel,
-    // For fork children (useExactTools), inherit thinking config to match the
-    // parent's API request prefix for prompt cache hits. For regular
-    // sub-agents, disable thinking to control output token costs.
-    thinkingConfig: useExactTools
-      ? toolUseContext.options.thinkingConfig
-      : { type: 'disabled' as const },
+    // Delegated work follows the session's extended-thinking configuration.
+    thinkingConfig: toolUseContext.options.thinkingConfig,
     mcpClients: mergedMcpClients,
     mcpResources: toolUseContext.options.mcpResources,
     agentDefinitions: toolUseContext.options.agentDefinitions,

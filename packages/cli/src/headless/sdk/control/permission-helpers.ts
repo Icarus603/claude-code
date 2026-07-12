@@ -175,7 +175,18 @@ export function getCanUseToolFn(
     forceDecision,
   ) => {
     if (!resolved) {
-      const mcpTools = getMcpTools()
+      let mcpTools = getMcpTools()
+      if (
+        permissionPromptToolName.startsWith('mcp__') &&
+        !mcpTools.some(tool => toolMatchesName(tool, permissionPromptToolName))
+      ) {
+        const deadline = Date.now() + 10_000
+        while (Date.now() < deadline) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+          mcpTools = getMcpTools()
+          if (mcpTools.some(tool => toolMatchesName(tool, permissionPromptToolName))) break
+        }
+      }
       const permissionPromptTool = mcpTools.find(t =>
         toolMatchesName(t, permissionPromptToolName),
       ) as PermissionPromptTool | undefined

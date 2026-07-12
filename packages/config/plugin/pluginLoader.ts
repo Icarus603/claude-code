@@ -45,6 +45,7 @@ import {
   symlink,
 } from 'fs/promises'
 import memoize from 'lodash-es/memoize.js'
+import { resolveSessionPluginPath } from './remotePluginArchive.js'
 import { basename, dirname, join, relative, resolve, sep } from 'path'
 import { getInlinePlugins } from './_deps.js'
 import {
@@ -2925,15 +2926,7 @@ async function finishLoadingPluginFromPath(
   return plugin
 }
 
-/**
- * Load session-only plugins from --plugin-dir CLI flag.
- *
- * These plugins are loaded directly without going through the marketplace system.
- * They appear with source='plugin-name@inline' and are always enabled for the current session.
- *
- * @param sessionPluginPaths - Array of plugin directory paths from CLI
- * @returns LoadedPlugin objects and any errors encountered
- */
+/** Load CLI-provided plugin directories or remote archives for this session. */
 async function loadSessionOnlyPlugins(
   sessionPluginPaths: Array<string>,
 ): Promise<{ plugins: LoadedPlugin[]; errors: PluginError[] }> {
@@ -2946,7 +2939,12 @@ async function loadSessionOnlyPlugins(
 
   for (const [index, pluginPath] of sessionPluginPaths.entries()) {
     try {
-      const resolvedPath = resolve(pluginPath)
+      const resolvedPath = await resolveSessionPluginPath(
+        pluginPath,
+        index,
+        await getSessionPluginCachePath(),
+        extractZipToDirectory,
+      )
 
       if (!(await pathExists(resolvedPath))) {
         logForDebugging(

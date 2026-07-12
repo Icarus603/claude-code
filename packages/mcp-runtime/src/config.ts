@@ -6,7 +6,7 @@ import { dirname, join, parse } from 'path'
 import { getPlatform } from '@claude-code/config/platform'
 import type { PluginError } from '@claude-code/config/plugin/types'
 import { getPluginErrorMessage } from '@claude-code/config/plugin/types'
-import { isClaudeInChromeMCPServer } from '@claude-code/agent/claudeInChromeCommon.js'
+import { isReservedMcpServerName } from './reservedNames.js'
 import {
   getCurrentProjectConfig,
   getGlobalConfig,
@@ -633,7 +633,7 @@ export async function addMcpConfig(
   }
 
   // Block reserved server name "claude-in-chrome"
-  if (isClaudeInChromeMCPServer(name)) {
+  if (isReservedMcpServerName(name)) {
     throw new Error(`Cannot add MCP server "${name}": this name is reserved.`)
   }
 

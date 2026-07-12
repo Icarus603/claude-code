@@ -16,6 +16,10 @@
 import { z } from 'zod/v4'
 import { lazySchema } from './internal/lazySchema.js'
 
+const requestTimeoutField = {
+  request_timeout_ms: z.number().int().positive().optional(),
+}
+
 // Configuration schemas and types
 export const ConfigScopeSchema = lazySchema(() =>
   z.enum([
@@ -41,6 +45,7 @@ export const McpStdioServerConfigSchema = lazySchema(() =>
     command: z.string().min(1, 'Command cannot be empty'),
     args: z.array(z.string()).default([]),
     env: z.record(z.string(), z.string()).optional(),
+    ...requestTimeoutField,
   }),
 )
 
@@ -72,6 +77,7 @@ export const McpSSEServerConfigSchema = lazySchema(() =>
     headers: z.record(z.string(), z.string()).optional(),
     headersHelper: z.string().optional(),
     oauth: McpOAuthConfigSchema().optional(),
+    ...requestTimeoutField,
   }),
 )
 
@@ -103,6 +109,7 @@ export const McpHTTPServerConfigSchema = lazySchema(() =>
     headers: z.record(z.string(), z.string()).optional(),
     headersHelper: z.string().optional(),
     oauth: McpOAuthConfigSchema().optional(),
+    ...requestTimeoutField,
   }),
 )
 
@@ -112,6 +119,7 @@ export const McpWebSocketServerConfigSchema = lazySchema(() =>
     url: z.string(),
     headers: z.record(z.string(), z.string()).optional(),
     headersHelper: z.string().optional(),
+    ...requestTimeoutField,
   }),
 )
 
@@ -119,6 +127,7 @@ export const McpSdkServerConfigSchema = lazySchema(() =>
   z.object({
     type: z.literal('sdk'),
     name: z.string(),
+    ...requestTimeoutField,
   }),
 )
 
@@ -128,6 +137,7 @@ export const McpClaudeAIProxyServerConfigSchema = lazySchema(() =>
     type: z.literal('claudeai-proxy'),
     url: z.string(),
     id: z.string(),
+    ...requestTimeoutField,
   }),
 )
 

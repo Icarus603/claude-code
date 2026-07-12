@@ -3,6 +3,7 @@ import { readFile, realpath } from 'fs/promises'
 import { homedir } from 'os'
 import { delimiter, join, posix, win32 } from 'path'
 import { checkGlobalInstallPermissions } from '@claude-code/updater/autoUpdater.js'
+import { getExternalLauncherPath } from '@claude-code/updater'
 import { isInBundledMode } from '@claude-code/config/bundledMode'
 import {
   formatAutoUpdaterDisabledReason,
@@ -12,7 +13,10 @@ import {
 } from '@claude-code/config'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { isEnvTruthy } from '@claude-code/config/env/utils'
-import { execFileNoThrow } from '@claude-code/shell/execFileNoThrow.js'
+import {
+  execFileNoThrow,
+  execFileNoThrowWithCwd,
+} from '@claude-code/shell/execFileNoThrow.js'
 import { getFsImplementation } from '@claude-code/storage/fsOperations.js'
 import {
   getShellType,
@@ -519,6 +523,13 @@ export async function getDoctorDiagnostic(): Promise<DiagnosticInfo> {
   const invokedBinary = getInvokedBinary()
   const multipleInstallations = await detectMultipleInstallations()
   const warnings = await detectConfigurationIssues(installationType)
+  const externalLauncher = await getExternalLauncherPath()
+  if (externalLauncher) {
+    warnings.push({
+      issue: `Launcher is externally managed: ${externalLauncher}`,
+      fix: 'Updates preserve this launcher; update its target through the tool that created it.',
+    })
+  }
 
   // Add glob pattern warnings for Linux sandboxing
   warnings.push(...detectLinuxGlobPatternWarnings())
@@ -583,6 +594,38 @@ export async function getDoctorDiagnostic(): Promise<DiagnosticInfo> {
         fix: 'Do one of: (1) Re-install node without sudo, or (2) Use `claude install` for native installation',
       })
     }
+  }
+
+  const projectInstructions = join(getCwd(), 'CLAUDE.md')
+  try {
+    const [content, tracked] = await Promise.all([
+      readFile(projectInstructions, 'utf8'),
+      execFileNoThrowWithCwd(
+        'git',
+        ['ls-files', '--error-unmatch', 'CLAUDE.md'],
+        { cwd: getCwd() },
+      ),
+    ])
+    const derivableLines = content
+      .split('\n')
+      .filter(line =>
+        /(?:directory structure|project structure|run (?:the )?tests|npm (?:run|test)|bun (?:run|test)|source files? (?:are|live)|package\.json)/i.test(
+          line,
+        ),
+      ).length
+    if (
+      tracked.code === 0 &&
+      (content.length > 8_000 || derivableLines >= 8)
+    ) {
+      warnings.push({
+        issue:
+          'Checked-in CLAUDE.md contains substantial instructions that appear derivable from the repository',
+        fix:
+          'Trim commands, directory listings, and facts visible in package manifests or source; keep only durable constraints and non-obvious decisions.',
+      })
+    }
+  } catch {
+    // Missing/unreadable CLAUDE.md is not a health failure.
   }
 
   // Get ripgrep status and configuration

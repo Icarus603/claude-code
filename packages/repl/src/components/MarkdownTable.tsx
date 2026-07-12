@@ -5,6 +5,7 @@ import { useTerminalSize } from '@anthropic/ink'
 import { Ansi, stringWidth, useTheme, wrapAnsi } from '@anthropic/ink'
 import type { CliHighlight } from '@claude-code/output/utils/cliHighlight.js'
 import { formatToken, padAligned } from '@claude-code/output/markdown.js'
+import { isScreenReaderMode } from '../accessibility.js'
 
 /** Accounts for parent indentation (e.g. message dot prefix) and terminal
  *  resize races. Without enough margin the table overflows its layout box
@@ -91,6 +92,18 @@ export function MarkdownTable({
   // Get plain text (stripped of ANSI codes)
   function getPlainText(tokens: Token[] | undefined): string {
     return stripAnsi(formatCell(tokens))
+  }
+
+  if (isScreenReaderMode()) {
+    const headers = token.header.map(header => getPlainText(header.tokens))
+    const lines = token.rows.flatMap(row =>
+      row.map((cell, index) => {
+        const header = headers[index] || `Column ${index + 1}`
+        const value = getPlainText(cell.tokens).replace(/\s+/g, ' ').trim()
+        return `${header}: ${value}.`
+      }),
+    )
+    return <Ansi>{lines.join('\n')}</Ansi>
   }
 
   // Get the longest word width in a cell (minimum width to avoid breaking words)

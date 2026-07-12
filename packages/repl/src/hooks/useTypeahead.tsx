@@ -838,7 +838,7 @@ export function useTypeahead({
 
         if (
           parsedCommand &&
-          parsedCommand.commandName === 'add-dir' &&
+          ['add-dir', 'cd'].includes(parsedCommand.commandName) &&
           parsedCommand.args
         ) {
           const { args } = parsedCommand

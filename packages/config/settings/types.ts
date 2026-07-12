@@ -2,22 +2,16 @@ import { feature } from 'bun:bundle'
 import { z } from 'zod/v4'
 import { SandboxSettingsSchema } from './schemas/sandbox.js'
 import { lazySchema } from '../internal/lazySchema.js'
+import { isEnvTruthy } from '../env/utils.js'
 
-// V7 §11.4 — inlined tiny utilities to avoid src/ imports.
-function isEnvTruthy(envVar: string | boolean | undefined): boolean {
-  if (!envVar) return false
-  if (typeof envVar === 'boolean') return envVar
-  const normalizedValue = envVar.toLowerCase().trim()
-  return ['1', 'true', 'yes', 'on'].includes(normalizedValue)
-}
-// V7 §11.4 — inlined from permission to avoid Wave 2 dependency.
-// Config only needs these for Zod schema validation; the canonical
-// source remains @claude-code/permission/PermissionMode.
+// Inlined permission modes keep config independent of the permission package.
 const EXTERNAL_PERMISSION_MODES = ['acceptEdits', 'bypassPermissions', 'default', 'dontAsk', 'plan'] as const
 const PERMISSION_MODES = [...EXTERNAL_PERMISSION_MODES, 'auto'] as const
 import { MarketplaceSourceSchema } from './schemas/marketplace.js'
 import { CLAUDE_CODE_SETTINGS_SCHEMA_URL } from './constants.js'
 import { PermissionRuleSchema } from './permissionValidation.js'
+import { DynamicWorkflowSizeSchema } from './dynamicWorkflowSize.js'
+import { AskUserQuestionTimeoutSchema } from './askUserQuestionTimeout.js'
 
 // Re-export hook schemas and types from config-owned location for backward compat
 export {
@@ -69,14 +63,16 @@ export const PermissionsSchema = lazySchema(() =>
         .describe(
           'List of permission rules that should always prompt for confirmation',
         ),
-      defaultMode: z
-        .enum(
-          feature('TRANSCRIPT_CLASSIFIER')
-            ? PERMISSION_MODES
-            : EXTERNAL_PERMISSION_MODES,
-        )
-        .optional()
-        .describe('Default permission mode when Claude Code needs access'),
+      defaultMode: z.preprocess(
+        value => (value === 'manual' ? 'default' : value),
+        z
+          .enum(
+            feature('TRANSCRIPT_CLASSIFIER')
+              ? PERMISSION_MODES
+              : EXTERNAL_PERMISSION_MODES,
+          )
+          .optional(),
+      ).describe('Default permission mode (manual is an alias for default)'),
       disableBypassPermissionsMode: z
         .enum(['disable'])
         .optional()
@@ -382,6 +378,10 @@ export const SettingsSchema = lazySchema(() =>
         .describe(
           "Include built-in commit and PR workflow instructions in Claude's system prompt (default: true)",
         ),
+      dynamicWorkflowSize: DynamicWorkflowSizeSchema,
+      askUserQuestionTimeout: AskUserQuestionTimeoutSchema.describe(
+        'Idle time before questions auto-continue; defaults to never',
+      ),
       permissions: PermissionsSchema()
         .optional()
         .describe('Tool usage permissions configuration'),

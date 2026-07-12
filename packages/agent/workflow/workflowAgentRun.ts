@@ -20,6 +20,7 @@ import type {
   AgentHookOpts,
   WorkflowProgressEvent,
 } from './types.js'
+import { logOTelEvent } from '@claude-code/local-observability/telemetry'
 
 // The slice of createWorkflowHooks' closure a single attempt needs. Passed once
 // per attempt rather than recaptured — keeps the function pure-ish + testable.
@@ -28,6 +29,7 @@ export type AgentRunContext = {
   canUseTool: CanUseToolFn
   onProgress: (e: WorkflowProgressEvent) => void
   workflowRunId: string
+  workflowName: string
   abortSignal: AbortSignal | undefined
   onAgentController?: (
     agentId: string,
@@ -76,6 +78,7 @@ export async function runAgentAttempt(
     canUseTool,
     onProgress,
     workflowRunId,
+    workflowName,
     abortSignal,
     onAgentController,
   } = ctx
@@ -263,6 +266,13 @@ export async function runAgentAttempt(
   }
 
   const durationMs = Date.now() - startTime
+  void logOTelEvent('workflow_agent_completed', {
+    'workflow.run_id': workflowRunId,
+    'workflow.name': workflowName,
+    duration_ms: String(durationMs),
+    total_tokens: String(tokens),
+    total_tool_uses: String(toolCalls),
+  })
   emit('done', { tokens, toolCalls, durationMs: priorDurationMs + durationMs })
   return {
     structured,

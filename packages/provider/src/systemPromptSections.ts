@@ -42,7 +42,11 @@ export function DANGEROUS_uncachedSystemPromptSection(
  */
 export async function resolveSystemPromptSections(
   sections: SystemPromptSection[],
+  excludeDynamicSections = false,
 ): Promise<(string | null)[]> {
+  if (excludeDynamicSections) {
+    return sections.map(() => null)
+  }
   const cache = getSystemPromptSectionCache()
 
   return Promise.all(

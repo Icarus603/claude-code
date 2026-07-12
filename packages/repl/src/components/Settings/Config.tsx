@@ -86,6 +86,7 @@ import { unpackModelId } from '@claude-code/provider/connections.js'
 import { getUserMsgOptIn, setUserMsgOptIn } from '@claude-code/app-host/bootstrap/state.js'
 import { DEFAULT_OUTPUT_STYLE_NAME } from '@claude-code/config/outputStyles.js'
 import { isEnvTruthy, isRunningOnHomespace } from '@claude-code/config/env/utils'
+import { questionTimeoutSetting } from './questionTimeoutSetting.js'
 import type {
   LocalJSXCommandContext,
   CommandResultDisplay,
@@ -576,6 +577,9 @@ export function Config({
         })
       },
     },
+    questionTimeoutSetting(settingsData?.askUserQuestionTimeout, timeout =>
+      setSettingsData(prev => ({ ...prev, askUserQuestionTimeout: timeout })),
+    ),
     {
       id: 'defaultPermissionMode',
       label: 'Default permission mode',
@@ -617,10 +621,7 @@ export function Config({
           return
         }
 
-        // Update local state to reflect the change immediately.
-        // validatedMode is typed as the wide PermissionMode union but at
-        // runtime is always a PERMISSION_MODES member (the options dropdown
-        // is built from that array above), so this narrowing is sound.
+        // Keep the picker in sync immediately; the dropdown guarantees validity.
         setSettingsData(prev => ({
           ...prev,
           permissions: {
@@ -628,7 +629,6 @@ export function Config({
             defaultMode: validatedMode as (typeof PERMISSION_MODES)[number],
           },
         }))
-        // Track changes
         setChanges(prev => ({ ...prev, defaultPermissionMode: mode }))
         logEvent('tengu_config_changed', {
           setting:

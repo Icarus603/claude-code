@@ -1,5 +1,5 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import addDir from '@claude-code/repl/commands/add-dir/index.js'
+import addDir, { cd } from '@claude-code/repl/commands/add-dir/index.js'
 import { installCommandRegistryHostBindings } from '@claude-code/command-runtime'
 import autofixPr from '@claude-code/command-runtime/stubs/stubCommand.js'
 import backfillSessions from '@claude-code/command-runtime/stubs/stubCommand.js'
@@ -260,6 +260,7 @@ export const INTERNAL_ONLY_COMMANDS = [
 // since underlying functions read from config, which can't be read at module initialization time
 const COMMANDS = memoize((): Command[] => [
   addDir,
+  cd,
   advisor,
   provider,
   agents,

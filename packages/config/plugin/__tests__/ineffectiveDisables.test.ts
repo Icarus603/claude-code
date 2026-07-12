@@ -22,6 +22,9 @@ const layers: Partial<Record<LayerName, EnabledMap | undefined>> = {}
 let enabledSources: LayerName[] = []
 
 mock.module('../../settings/settings.js', () => ({
+  getSettings() {
+    return {}
+  },
   getSettingsForSource(src: LayerName) {
     if (!(src in layers)) return null
     const ep = layers[src]

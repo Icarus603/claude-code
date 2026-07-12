@@ -1,4 +1,5 @@
 import figures from 'figures'
+import { isScreenReaderMode } from '../../accessibility.js'
 import * as React from 'react'
 import { useContext } from 'react'
 import { useQueuedMessage } from '@claude-code/app-host/context/QueuedMessageContext.js'
@@ -48,7 +49,9 @@ export function HighlightedThinkingText({
   if (triggers.length === 0) {
     return (
       <Text>
-        <Text color={pointerColor}>{figures.pointer} </Text>
+        <Text color={pointerColor}>
+          {isScreenReaderMode() ? 'User: ' : `${figures.pointer} `}
+        </Text>
         <Text color="text">{text}</Text>
       </Text>
     )
@@ -84,7 +87,9 @@ export function HighlightedThinkingText({
 
   return (
     <Text>
-      <Text color={pointerColor}>{figures.pointer} </Text>
+      <Text color={pointerColor}>
+        {isScreenReaderMode() ? 'User: ' : `${figures.pointer} `}
+      </Text>
       {parts}
     </Text>
   )

@@ -93,13 +93,23 @@ function attachPreActionHook(program: CommanderCommand): void {
     // builds the type as options are added. Narrow with a runtime guard;
     // the collect accumulator + [] default guarantee string[] in practice.
     const pluginDir = thisCommand.getOptionValue('pluginDir')
+    const pluginUrl = thisCommand.getOptionValue('pluginUrl')
     if (
-      Array.isArray(pluginDir) &&
-      pluginDir.length > 0 &&
-      pluginDir.every((p: unknown) => typeof p === 'string')
+      Array.isArray(pluginUrl) &&
+      pluginUrl.some(url => typeof url !== 'string' || !url.startsWith('https://'))
     ) {
-      setInlinePlugins(pluginDir as string[])
-      clearPluginCache('preAction: --plugin-dir inline plugins')
+      throw new Error('--plugin-url requires an HTTPS URL')
+    }
+    const inlinePlugins = [
+      ...(Array.isArray(pluginDir) ? pluginDir : []),
+      ...(Array.isArray(pluginUrl) ? pluginUrl : []),
+    ]
+    if (
+      inlinePlugins.length > 0 &&
+      inlinePlugins.every((p: unknown) => typeof p === 'string')
+    ) {
+      setInlinePlugins(inlinePlugins as string[])
+      clearPluginCache('preAction: inline plugins')
     }
 
     runMigrations()
@@ -309,6 +319,12 @@ function attachSecondaryOptions(program: CommanderCommand): void {
       'Create a remote session with the given description',
     ).hideHelp(),
   )
+  program.addOption(
+    new Option('--safe-mode', 'Start without project instructions, skills, hooks, or plugins'),
+  )
+  program.addOption(
+    new Option('--ax-screen-reader', 'Optimize terminal output for screen readers'),
+  )
   if (feature('BRIDGE_MODE')) {
     program.addOption(
       new Option(
@@ -320,6 +336,12 @@ function attachSecondaryOptions(program: CommanderCommand): void {
       new Option('--rc [name]', 'Alias for --remote-control')
         .argParser(value => value || true)
         .hideHelp(),
+    )
+    program.addOption(
+      new Option(
+        '--remote-control-session-name-prefix <prefix>',
+        'Prefix generated Remote Control session names',
+      ),
     )
   }
 

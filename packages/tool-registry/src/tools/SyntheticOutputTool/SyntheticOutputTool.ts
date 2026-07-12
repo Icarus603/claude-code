@@ -128,7 +128,11 @@ function buildSyntheticOutputTool(
   jsonSchema: Record<string, unknown>,
 ): CreateResult {
   try {
-    const ajv = new Ajv({ allErrors: true })
+    const ajv = new Ajv({
+      allErrors: true,
+      strict: false,
+      validateFormats: false,
+    })
     const isValidSchema = ajv.validateSchema(jsonSchema)
     if (!isValidSchema) {
       return { error: ajv.errorsText(ajv.errors) }

@@ -14,6 +14,7 @@ import { registerLoopSkill } from './loop.js'
 import { registerDreamSkill } from './dream.js'
 import { registerUpdateConfigSkill } from './updateConfig.js'
 import { registerVerifySkill } from './verify.js'
+import { registerDatavizSkill } from './dataviz.js'
 
 /**
  * Initialize all bundled skills.
@@ -28,6 +29,7 @@ export function initBundledSkills(): void {
   registerUpdateConfigSkill()
   registerKeybindingsSkill()
   registerVerifySkill()
+  registerDatavizSkill()
   registerDebugSkill()
   registerLoremIpsumSkill()
   registerSkillifySkill()

@@ -66,6 +66,18 @@ export const SUPPORTED_SETTINGS: Record<string, SettingConfig> = {
     type: 'boolean',
     description: 'Enable background memory consolidation',
   },
+  dynamicWorkflowSize: {
+    source: 'settings',
+    type: 'string',
+    description: 'Advisory size for dynamically generated workflows',
+    options: ['small', 'medium', 'large'],
+  },
+  askUserQuestionTimeout: {
+    source: 'settings',
+    type: 'string',
+    options: ['60s', '5m', '10m', 'never'],
+    description: 'Auto-continue timeout for unanswered questions',
+  },
   fileCheckpointingEnabled: {
     source: 'global',
     type: 'boolean',

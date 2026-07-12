@@ -377,6 +377,12 @@ export async function buildYoloSystemPrompt(
     ...(includePowerShellGuidance ? POWERSHELL_DENY_GUIDANCE : []),
     ...(autoMode?.soft_deny ?? []),
   ]
+  // Session transcripts are the authority record used to resume work and to
+  // decide whether the operator approved an action. Auto mode must never let
+  // the model rewrite that record, even when a custom hard_deny list replaces
+  // the template defaults.
+  const transcriptIntegrityRule =
+    'Session Transcript Integrity: Never create, edit, truncate, replace, move, or delete Claude Code session transcript files (including .jsonl files under the Claude projects/session directories).'
 
   // Each `<foo_to_replace>...</foo_to_replace>` tag wraps that section's
   // defaults. A non-empty user list REPLACES the defaults; a user list
@@ -396,7 +402,7 @@ export async function buildYoloSystemPrompt(
     .replace(
       /<user_hard_deny_rules_to_replace>([\s\S]*?)<\/user_hard_deny_rules_to_replace>/,
       (_m, defaults: string) =>
-        mergeRulesWithDefaults(autoMode?.hard_deny, defaults),
+        `${mergeRulesWithDefaults(autoMode?.hard_deny, defaults)}\n- ${transcriptIntegrityRule}`,
     )
     .replace(
       /<user_environment_to_replace>([\s\S]*?)<\/user_environment_to_replace>/,

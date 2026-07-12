@@ -19,7 +19,7 @@ export const EXTERNAL_PERMISSION_MODES = [
   'default',
   'dontAsk',
   'plan',
-] as const
+] as const satisfies readonly PermissionMode[]
 
 export type ExternalPermissionMode = (typeof EXTERNAL_PERMISSION_MODES)[number]
 
@@ -33,7 +33,7 @@ export type PermissionMode = InternalPermissionMode
 export const PERMISSION_MODES = [
   ...EXTERNAL_PERMISSION_MODES,
   ...(feature('TRANSCRIPT_CLASSIFIER') ? (['auto'] as const) : ([] as const)),
-] as const satisfies readonly PermissionMode[]
+] as const
 
 // ============================================================================
 // Permission Behaviors

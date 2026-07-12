@@ -155,6 +155,7 @@ export function createWorkflowHooks(
   canUseTool: CanUseToolFn,
   onProgress: (e: WorkflowProgressEvent) => void,
   workflowRunId: string,
+  workflowName: string,
   onAgentController:
     | ((agentId: string, controller: AbortController | null) => void)
     | undefined,
@@ -417,6 +418,7 @@ export function createWorkflowHooks(
             canUseTool,
             onProgress,
             workflowRunId,
+            workflowName,
             abortSignal,
             onAgentController,
           },

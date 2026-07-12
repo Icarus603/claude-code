@@ -8,6 +8,31 @@ export type ParsedSlashCommand = {
   isMcp: boolean
 }
 
+export type ParsedStackedSlashCommands = {
+  commandNames: string[]
+  args: string
+}
+
+/** Parse two to five leading `/skill` tokens. A single command stays on the
+ * normal slash-command path, and the first non-command token begins the task. */
+export function parseStackedSlashCommands(
+  input: string,
+): ParsedStackedSlashCommands | null {
+  const words = input.trim().split(/\s+/)
+  const commandNames: string[] = []
+  let index = 0
+  while (
+    index < words.length &&
+    commandNames.length < 5 &&
+    /^\/[A-Za-z0-9_.:@-]+$/.test(words[index] ?? '')
+  ) {
+    commandNames.push(words[index]!.slice(1))
+    index++
+  }
+  if (commandNames.length < 2) return null
+  return { commandNames, args: words.slice(index).join(' ') }
+}
+
 /**
  * Parses a slash command input string into its component parts
  *

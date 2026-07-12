@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseSlashCommand } from "../slashCommandParsing";
+import { parseSlashCommand, parseStackedSlashCommands } from "../slashCommandParsing";
 
 describe("parseSlashCommand", () => {
   test("parses simple command", () => {
@@ -54,5 +54,25 @@ describe("parseSlashCommand", () => {
     const result = parseSlashCommand("  /search foo  ");
     expect(result!.commandName).toBe("search");
     expect(result!.args).toBe("foo");
+  });
+});
+
+describe("parseStackedSlashCommands", () => {
+  test("loads leading skills and keeps the remaining task", () => {
+    expect(parseStackedSlashCommands("/review /test fix the parser")).toEqual({
+      commandNames: ["review", "test"],
+      args: "fix the parser",
+    });
+  });
+
+  test("single slash command stays on the normal parser path", () => {
+    expect(parseStackedSlashCommands("/review this")).toBeNull();
+  });
+
+  test("caps stacked skills at five", () => {
+    expect(parseStackedSlashCommands("/a /b /c /d /e /f task")).toEqual({
+      commandNames: ["a", "b", "c", "d", "e"],
+      args: "/f task",
+    });
   });
 });

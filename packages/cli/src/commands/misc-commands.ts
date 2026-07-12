@@ -299,7 +299,7 @@ export function registerMiscCommands(program: Command): void {
   // claude agents
   program
     .command('agents')
-    .description('List configured agents')
+    .description('Manage background agents and sessions')
     .option(
       '--setting-sources <sources>',
       'Comma-separated list of setting sources to load (user, project, local).',
@@ -392,7 +392,7 @@ export function registerMiscCommands(program: Command): void {
   program
     .command('doctor')
     .description(
-      'Check the health of your Claude Code auto-updater. Note: The workspace trust dialog is skipped and stdio servers from .mcp.json are spawned for health checks. Only use this command in directories you trust.',
+      'Run a full setup checkup for installation, settings, plugins, MCP, and updater health. Note: workspace trust is skipped and configured stdio MCP servers may be spawned.',
     )
     .action(async () => {
       const [{ doctorHandler }, { createRoot }] = await Promise.all([

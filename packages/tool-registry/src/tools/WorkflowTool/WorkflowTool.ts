@@ -44,6 +44,13 @@ import {
 // is eager ESM, so we replicate that deferral: the task helpers (all call-only)
 // are dynamically imported inside call(), keeping the message graph off boot.
 import type { WorkflowProgress } from '@claude-code/agent/workflow/types.js'
+import { getSettings } from '@claude-code/config/settings'
+
+function workflowSizeGuidance(): string {
+  const size = getSettings().dynamicWorkflowSize ?? 'medium'
+  const range = { small: '2–4', medium: '5–10', large: '11–20' }[size]
+  return `\n\nDynamic workflow size preference: ${size} (${range} agents is a guideline, not a hard cap).`
+}
 
 // ant mJ3 — input schema.
 const inputSchema = lazySchema(() =>
@@ -162,10 +169,10 @@ export const WorkflowTool = buildTool({
     return false
   },
   async description(): Promise<string> {
-    return WORKFLOW_TOOL_DESCRIPTION
+    return WORKFLOW_TOOL_DESCRIPTION + workflowSizeGuidance()
   },
   async prompt(): Promise<string> {
-    return WORKFLOW_TOOL_DESCRIPTION
+    return WORKFLOW_TOOL_DESCRIPTION + workflowSizeGuidance()
   },
   get inputSchema(): InputSchema {
     return inputSchema()
@@ -420,6 +427,7 @@ export const WorkflowTool = buildTool({
         canUseTool,
         onProgress,
         workflowRunId: runId,
+        workflowName,
         onAgentController: (agentId, controller) => {
           if (controller) agentControllers.set(agentId, controller)
           else agentControllers.delete(agentId)
@@ -481,6 +489,7 @@ export const WorkflowTool = buildTool({
         durationMs: result.durationMs,
         scriptPath,
         workflowRunId: runId,
+        workflowName,
         args: input.args,
         transcriptDir,
         setAppState,

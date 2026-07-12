@@ -259,13 +259,18 @@ export function createMainProgram(): CommanderCommand {
         .argParser(String)
         .hideHelp(),
     )
+    .option(
+      '--exclude-dynamic-system-prompt-sections',
+      'Exclude dynamically assembled system prompt sections',
+      () => true,
+    )
     .addOption(
       new Option(
         '--permission-mode <mode>',
         'Permission mode to use for the session',
       )
         .argParser(String)
-        .choices(PERMISSION_MODES),
+        .choices([...PERMISSION_MODES, 'manual']),
     )
     .option(
       '-c, --continue',
@@ -403,6 +408,12 @@ export function createMainProgram(): CommanderCommand {
     .option(
       '--plugin-dir <path>',
       'Load plugins from a directory for this session only (repeatable: --plugin-dir A --plugin-dir B)',
+      (val: string, prev: string[]) => [...prev, val],
+      [] as string[],
+    )
+    .option(
+      '--plugin-url <url>',
+      'Fetch a plugin .zip from an HTTPS URL for this session (repeatable)',
       (val: string, prev: string[]) => [...prev, val],
       [] as string[],
     )

@@ -23,6 +23,7 @@ import {
 import type { BashTool } from './BashTool.js'
 import { stripSafeWrappers } from './bashPermissions.js'
 import { sedCommandIsAllowedByAllowlist } from './sedValidation.js'
+import { hasUnsafeRedirectWithCd } from './safeRedirects.js'
 
 export type PathCommand =
   | 'cd'
@@ -927,12 +928,8 @@ function validateOutputRedirections(
   toolPermissionContext: ToolPermissionContext,
   compoundCommandHasCd?: boolean,
 ): PermissionResult {
-  // SECURITY: Block output redirections in compound commands containing 'cd'
-  // This prevents bypassing path safety checks via directory changes before redirections.
-  // Example attack: cd .claude/ && echo "malicious" > settings.json
-  // The redirection target would be validated relative to the original CWD, but the
-  // actual write happens in the changed directory after 'cd' executes.
-  if (compoundCommandHasCd && redirections.length > 0) {
+  // A post-cd redirect is path-ambiguous; /dev/null is the safe exception.
+  if (hasUnsafeRedirectWithCd(compoundCommandHasCd, redirections)) {
     return {
       behavior: 'ask',
       message: `Commands that change directories and write via output redirection require explicit approval to ensure paths are evaluated correctly. For security, Claude Code cannot automatically determine the final working directory when 'cd' is used in compound commands.`,

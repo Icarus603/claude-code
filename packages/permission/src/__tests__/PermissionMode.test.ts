@@ -83,15 +83,15 @@ describe("permissionModeFromString", () => {
 
 describe("permissionModeTitle", () => {
   test("returns title for known modes", () => {
-    expect(permissionModeTitle("default")).toBe("Default");
+    expect(permissionModeTitle("default")).toBe("Manual");
     expect(permissionModeTitle("plan")).toBe("Plan Mode");
     expect(permissionModeTitle("acceptEdits")).toBe("Accept edits");
     expect(permissionModeTitle("bypassPermissions")).toBe("Bypass Permissions");
     expect(permissionModeTitle("dontAsk")).toBe("Don't Ask");
   });
 
-  test("falls back to Default for unknown mode", () => {
-    expect(permissionModeTitle("nonexistent" as any)).toBe("Default");
+  test("falls back to Manual for unknown mode", () => {
+    expect(permissionModeTitle("nonexistent" as any)).toBe("Manual");
   });
 });
 
@@ -99,7 +99,7 @@ describe("permissionModeTitle", () => {
 
 describe("permissionModeShortTitle", () => {
   test("returns short title for known modes", () => {
-    expect(permissionModeShortTitle("default")).toBe("Default");
+    expect(permissionModeShortTitle("default")).toBe("Manual");
     expect(permissionModeShortTitle("plan")).toBe("Plan");
     expect(permissionModeShortTitle("bypassPermissions")).toBe("Bypass");
     expect(permissionModeShortTitle("dontAsk")).toBe("DontAsk");
@@ -110,8 +110,8 @@ describe("permissionModeShortTitle", () => {
 // ─── permissionModeSymbol ──────────────────────────────────────────────
 
 describe("permissionModeSymbol", () => {
-  test("returns empty string for default", () => {
-    expect(permissionModeSymbol("default")).toBe("");
+  test("returns pause badge for default/manual", () => {
+    expect(permissionModeSymbol("default")).toBe("⏸");
   });
 
   test("returns non-empty for non-default modes", () => {

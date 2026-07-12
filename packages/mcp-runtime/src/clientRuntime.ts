@@ -40,7 +40,8 @@ import mapValues from 'lodash-es/mapValues.js'
 import memoize from 'lodash-es/memoize.js'
 import zipObject from 'lodash-es/zipObject.js'
 import pMap from 'p-map'
-import { getOriginalCwd, getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import { getSessionId } from '@claude-code/app-host/bootstrap/state.js'
+import { listMcpRoots, registerRootsClient } from './roots.js'
 import type { Command } from '@claude-code/command-runtime/runtime'
 import { getOauthConfig } from '@claude-code/provider/oauthConstants'
 import { PRODUCT_URL } from '@claude-code/config/product'
@@ -355,6 +356,7 @@ export const connectToServer = memoize(
           // SDK's handler calls auth() → tokens().
           fetch: wrapFetchWithTimeout(
             wrapFetchWithStepUpDetection(createFetchWithInit(), authProvider),
+            serverRef.request_timeout_ms,
           ),
           requestInit: {
             headers: {
@@ -549,6 +551,7 @@ export const connectToServer = memoize(
           // SDK's handler calls auth() → tokens().
           fetch: wrapFetchWithTimeout(
             wrapFetchWithStepUpDetection(createFetchWithInit(), authProvider),
+            serverRef.request_timeout_ms,
           ),
           requestInit: {
             ...proxyOptions,
@@ -611,7 +614,10 @@ export const connectToServer = memoize(
         const proxyOptions = getProxyFetchOptions()
         const transportOptions: StreamableHTTPClientTransportOptions = {
           // Wrap fetchWithAuth with fresh timeout per request
-          fetch: wrapFetchWithTimeout(fetchWithAuth),
+          fetch: wrapFetchWithTimeout(
+            fetchWithAuth,
+            serverRef.request_timeout_ms,
+          ),
           requestInit: {
             ...proxyOptions,
             headers: {
@@ -726,7 +732,6 @@ export const connectToServer = memoize(
         },
       )
 
-      // Add debug logging for client events if available
       if (serverRef.type === 'http') {
         logMCPDebug(name, `Client created, setting up request handler`)
       }
@@ -734,15 +739,11 @@ export const connectToServer = memoize(
       client.setRequestHandler(ListRootsRequestSchema, async () => {
         logMCPDebug(name, `Received ListRoots request from server`)
         return {
-          roots: [
-            {
-              uri: `file://${getOriginalCwd()}`,
-            },
-          ],
+          roots: listMcpRoots(),
         }
       })
+      registerRootsClient(client)
 
-      // Add a timeout to connection attempts to prevent tests from hanging indefinitely
       logMCPDebug(
         name,
         `Starting connection with timeout of ${getConnectionTimeoutMs()}ms`,
@@ -2895,11 +2896,10 @@ async function callMCPTool({
       tool,
     )
 
-    // Use Promise.race with our own timeout to handle cases where SDK's
-    // internal timeout doesn't work (e.g., SSE stream breaks mid-request)
-    const timeoutMs = getMcpToolTimeoutMs()
+    const timeoutMs =
+      (config as { request_timeout_ms?: number }).request_timeout_ms ??
+      getMcpToolTimeoutMs()
     let timeoutId: NodeJS.Timeout | undefined
-
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(
         (reject, name, tool, timeoutMs) => {

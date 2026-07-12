@@ -33,6 +33,7 @@ import { pinFd0Raw, unpinFd0Raw } from 'stdin-napi'
 import { stopCapturingEarlyInput } from '@claude-code/repl/earlyInput.js'
 
 import { agentsHandler as plainTextHandler } from './agents.js'
+import { appendFleetCompletionPolicy } from '../bg/fleetCompletionPolicy.js'
 
 type FleetAction =
   | { type: 'quit' }
@@ -196,6 +197,7 @@ async function runFleetLoop(): Promise<void> {
           return { short: slot.short }
         },
         onDispatch: info => {
+          const directive = appendFleetCompletionPolicy(info.intent)
           // Source: ant 5092.js Ot3 dispatch verbatim:
           //   let A7 = !!AP && AP.ready && !L9.matched && !L9.routine
           //            && NT === AP.cwd && $1
@@ -234,10 +236,10 @@ async function runFleetLoop(): Promise<void> {
                   try {
                     await sparePool.rewriteSpareState(
                       slot.short,
-                      info.intent,
+                      directive,
                       cwd,
                     )
-                    await sparePool.sendClaim(slot.socketPath, info.intent)
+                    await sparePool.sendClaim(slot.socketPath, directive)
                   } catch (err) {
                     process.stderr.write(
                       `spare claim failed: ${(err as Error).message}\n`,
@@ -259,7 +261,7 @@ async function runFleetLoop(): Promise<void> {
             : []
           void spawnBgPty({
             flags,
-            directive: info.intent,
+            directive,
             cwd,
             short: info.short,
             waitForSocketMs: 0,

@@ -1025,7 +1025,6 @@ export function getAutoModeConfig():
 
     for (const source of [
       'userSettings',
-      'localSettings',
       'flagSettings',
       'policySettings',
     ] as const) {

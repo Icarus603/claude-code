@@ -21,6 +21,7 @@ import {
   getSettings,
   updateSettingsForSource,
 } from '../settings/settings.js'
+import { getTrustedPluginConfig } from './trustedPluginConfig.js'
 import {
   type UserConfigSchema,
   type UserConfigValues,
@@ -55,9 +56,8 @@ export function getPluginStorageId(plugin: LoadedPlugin): string {
  */
 export const loadPluginOptions = memoize(
   (pluginId: string): PluginOptionValues => {
-    const settings = getSettings()
     const nonSensitive =
-      settings.pluginConfigs?.[pluginId]?.options ?? ({} as PluginOptionValues)
+      getTrustedPluginConfig(pluginId).options ?? ({} as PluginOptionValues)
 
     // NOTE: storage.read() spawns `security find-generic-password` on macOS
     // (~50-100ms, synchronous). Mitigated by the memoize above (per-pluginId,

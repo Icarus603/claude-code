@@ -48,6 +48,7 @@ import { generateJobName } from '@claude-code/agent/background/fleet/generateJob
 import { sendRv } from '@claude-code/agent/background/fleet/rvServer.js'
 import type { FleetJobState } from '@claude-code/agent/background/fleet/fleetTypes.js'
 import { basename } from 'node:path'
+import { fireBackgroundAgentNotification } from './backgroundAgentNotifications.js'
 
 /**
  * Mirror an already-persisted state.json write over the rv control channel
@@ -277,6 +278,11 @@ export function useBgFleetStateSync(
               detail: replyDetail || current.detail,
               needs: outcome.needs,
             })
+            fireBackgroundAgentNotification(
+              'agent_needs_input',
+              current.name || current.intent || 'Background agent',
+              outcome.needs,
+            )
           } else if (outcome.kind === 'failed') {
             await writeJobState(jobDir, {
               ...current,
@@ -298,6 +304,11 @@ export function useBgFleetStateSync(
               tempo: 'idle',
               detail: replyDetail || current.detail,
             })
+            fireBackgroundAgentNotification(
+              'agent_completed',
+              current.name || current.intent || 'Background agent',
+              `failed: ${replyDetail || current.detail || 'unknown error'}`,
+            )
           } else {
             await writeJobState(jobDir, {
               ...current,
@@ -323,6 +334,11 @@ export function useBgFleetStateSync(
               tempo: 'idle',
               detail: replyDetail || current.detail,
             })
+            fireBackgroundAgentNotification(
+              'agent_completed',
+              current.name || current.intent || 'Background agent',
+              replyDetail,
+            )
           }
           // Source: ant 3991.js Ja7 — fire namer once per worker after
           // the first turn's classify result resolves to a non-active

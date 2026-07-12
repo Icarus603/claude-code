@@ -747,6 +747,7 @@ export async function runAsyncAgentLifecycle({
       description,
       status: 'failed',
       error: msg,
+      finalMessage: extractPartialResult(agentMessages),
       setAppState: rootSetAppState,
       toolUseId: toolUseContext.toolUseId,
       ...worktreeResult,

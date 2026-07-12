@@ -88,11 +88,7 @@ function shouldRetry529(querySource: QuerySource | undefined): boolean {
   )
 }
 
-// CLAUDE_CODE_UNATTENDED_RETRY: for unattended sessions (ant-only). Retries 429/529
-// indefinitely with higher backoff and periodic keep-alive yields so the host
-// environment does not mark the session idle mid-wait.
-// TODO(ANT-344): the keep-alive via SystemAPIErrorMessage yields is a stopgap
-// until there's a dedicated keep-alive channel.
+// Unattended sessions retry capacity errors with periodic keep-alive yields.
 const PERSISTENT_MAX_BACKOFF_MS = 5 * 60 * 1000
 const PERSISTENT_RESET_CAP_MS = 6 * 60 * 60 * 1000
 const HEARTBEAT_INTERVAL_MS = 30_000
@@ -257,6 +253,9 @@ export async function* withRetry<T>(
         `API error (attempt ${attempt}/${maxRetries + 1}): ${error instanceof APIError ? `${error.status} ${error.message}` : errorMessage(error)}`,
         { level: 'error' },
       )
+      if (extractConnectionErrorDetails(error)?.isSSLError) {
+        throw new CannotRetryError(error, retryContext)
+      }
 
       // Fast mode fallback: on 429/529, either wait and retry (short delays)
       // or fall back to standard speed (long delays) to avoid cache thrashing.
@@ -796,6 +795,7 @@ export function getDefaultMaxRetries(): number {
   if (readEnv('CLAUDE_CODE_MAX_RETRIES')) {
     return parseInt(readEnv('CLAUDE_CODE_MAX_RETRIES'), 10)
   }
+  if (isEnvTruthy(readEnv('CLAUDE_CODE_RETRY_WATCHDOG'))) return 300
   return DEFAULT_MAX_RETRIES
 }
 function getMaxRetries(options: RetryOptions): number {

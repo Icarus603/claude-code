@@ -181,9 +181,9 @@ const baseInputSchema = lazySchema(() =>
       ),
     run_in_background: z
       .boolean()
-      .optional()
+      .default(true)
       .describe(
-        'Set to true to run this agent in the background. You will be notified when it completes.',
+        'Run this agent in the background (default). Set false only when the result is required before the current turn can continue.',
       ),
   }),
 )

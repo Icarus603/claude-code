@@ -336,14 +336,14 @@ export function enqueueAgentNotification({
     : ''
 
   const message = `<${TASK_NOTIFICATION_TAG}>
+<human_input_occurred>false</human_input_occurred>
 <${TASK_ID_TAG}>${taskId}</${TASK_ID_TAG}>${toolUseIdLine}
 <${OUTPUT_FILE_TAG}>${outputPath}</${OUTPUT_FILE_TAG}>
 <${STATUS_TAG}>${status}</${STATUS_TAG}>
 <${SUMMARY_TAG}>${summary}</${SUMMARY_TAG}>${resultSection}${usageSection}${worktreeSection}
 </${TASK_NOTIFICATION_TAG}>`
 
-  // Priority 'next' (not the default 'later') so the query-loop mid-turn
-  // drain (query.ts:1736) picks this up immediately and injects it as an
+  // Priority 'next' makes query.ts inject this immediately as an
   // attachment. Without this, notifications stack up until the parent query
   // ends or a Sleep tool flushes the 'later' tier.
   enqueuePendingNotification({

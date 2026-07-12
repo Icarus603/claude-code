@@ -86,6 +86,7 @@ export type AssembleContextOptions = {
   canUseTool: CanUseToolFn
   onProgress: (e: WorkflowProgressEvent) => void
   workflowRunId: string
+  workflowName?: string
   onAgentController?: (
     agentId: string,
     controller: AbortController | null,
@@ -115,6 +116,7 @@ export function assembleWorkflowContext(
     canUseTool,
     onProgress,
     workflowRunId,
+    workflowName = 'dynamic',
     onAgentController,
     seedPhaseTitles,
     tokenBudget,
@@ -141,6 +143,7 @@ export function assembleWorkflowContext(
     canUseTool,
     onProgress,
     workflowRunId,
+    workflowName,
     onAgentController,
     seedPhaseTitles,
     tokenBudget,

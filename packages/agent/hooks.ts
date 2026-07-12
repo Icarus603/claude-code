@@ -1,10 +1,6 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 /**
- * hooks.ts — user-defined shell commands executed at lifecycle events.
- * ~5200 LOC. The size reflects 18 distinct hook events × {pre, post,
- * notification} variations × {exec, race-with-timeout, mailbox-route,
- * structured-IO, sandbox-gate} concerns. Splitting attempted in V8 and
- * reverted — see `feedback_no_repl_loc_decomposition.md`.
+ * User-defined lifecycle hooks; dispatch order and timeout handling are load-bearing.
  *
  * **Architecture summary**:
  *
@@ -39,17 +35,8 @@
  *     in this file prevent infinite cascades. Don't remove without
  *     understanding the abort-signal interaction.
  *
- * **Common lookup paths** (CLAUDE.md "Where to Look" calls these out):
- *  - "Stop hook didn't fire" → executeStopHooks → hasHookForEvent →
- *    getRegisteredHooks (`packages/app-host/.../state/registeredHooks`).
- *  - "Plugin hooks not loading" → loadPluginHooks.ts (config/plugin)
- *    writes _deps.ts placeholders → installPluginBindings wires
- *    through to STATE.registeredHooks.
- *
- * **Memory of past bugs**:
- *  - V8 b78ffd16 envExpansion `:-` truncation surfaced via this file
- *    (hook env interpolation). Lesson: env-expansion regex changes
- *    here need parser-edge-input tests.
+ * Lookup: Stop hooks flow through executeStopHooks and registered hook state;
+ * plugin hooks enter through loadPluginHooks and the installed host binding.
  */
 import { basename } from 'path'
 import { spawn, type ChildProcessWithoutNullStreams } from 'child_process'
@@ -59,6 +46,11 @@ import { TaskOutput } from '@claude-code/tool-registry/task/TaskOutput.js'
 import { getCwd } from '@claude-code/app-host/bootstrap/cwd.js'
 import { randomUUID } from 'crypto'
 import { formatShellPrefixCommand } from '@claude-code/shell/bash/shellPrefix.js'
+import { quote } from '@claude-code/shell'
+import {
+  replaceExecArgTemplate,
+  replaceExecArgUserConfig,
+} from './hooks/hookExecArgs.js'
 import {
   getHookEnvFilePath,
   invalidateSessionEnvCache,
@@ -69,10 +61,7 @@ import { findGitBashPath, windowsPathToPosixPath } from '@claude-code/storage/wi
 import { getCachedPowerShellPath } from '@claude-code/shell/legacy/powershellDetection.js'
 import { DEFAULT_HOOK_SHELL } from '@claude-code/shell/legacy/shellProvider.js'
 import { buildPowerShellArgs } from '@claude-code/shell/legacy/powershellProvider.js'
-import {
-  loadPluginOptions,
-  substituteUserConfigVariables,
-} from '@claude-code/config/plugin/core/pluginOptionsStorage.js'
+import { loadPluginOptions } from '@claude-code/config/plugin/core/pluginOptionsStorage.js'
 import { getPluginDataDir } from '@claude-code/config/plugin/core/pluginDirectories.js'
 import {
   getSessionId,
@@ -1017,6 +1006,7 @@ async function execCommandHook(
   // entered value containing the literal text ${CLAUDE_PLUGIN_ROOT} is treated
   // as opaque — not re-interpreted as a template.
   let command = hook.command
+  let execArgs = hook.args ? [...hook.args] : undefined
   let pluginOpts: ReturnType<typeof loadPluginOptions> | undefined
   if (pluginRoot) {
     // Plugin directory gone (orphan GC race, concurrent session deleted it):
@@ -1040,16 +1030,21 @@ async function execCommandHook(
     // interpretation (rare but possible: \\server\c$\plugin).
     const rootPath = toHookPath(pluginRoot)
     command = command.replace(/\$\{CLAUDE_PLUGIN_ROOT\}/g, () => rootPath)
+    execArgs = replaceExecArgTemplate(execArgs, 'CLAUDE_PLUGIN_ROOT', rootPath)
     if (pluginId) {
       const dataPath = toHookPath(getPluginDataDir(pluginId))
       command = command.replace(/\$\{CLAUDE_PLUGIN_DATA\}/g, () => dataPath)
+      execArgs = replaceExecArgTemplate(execArgs, 'CLAUDE_PLUGIN_DATA', dataPath)
     }
     if (pluginId) {
       pluginOpts = loadPluginOptions(pluginId)
-      // Throws if a referenced key is missing — that means the hook uses a key
-      // that's either not declared in manifest.userConfig or not yet configured.
-      // Caught upstream like any other hook exec failure.
-      command = substituteUserConfigVariables(command, pluginOpts)
+      if (/\$\{user_config\.[^}]+\}/.test(command)) {
+        throw new Error(
+          `Plugin hook shell commands cannot interpolate \${user_config.*}. ` +
+            'Read CLAUDE_PLUGIN_OPTION_<KEY> from the hook environment instead.',
+        )
+      }
+      execArgs = replaceExecArgUserConfig(execArgs, pluginOpts)
     }
   }
 
@@ -1067,7 +1062,7 @@ async function execCommandHook(
   // PowerShell — see design §8.1. For now PS hooks ignore the prefix;
   // a CLAUDE_CODE_PS_SHELL_PREFIX (or shell-aware prefix) is a follow-up.
   const finalCommand =
-    !isPowerShell && readEnv('CLAUDE_CODE_SHELL_PREFIX')
+    !execArgs && !isPowerShell && readEnv('CLAUDE_CODE_SHELL_PREFIX')
       ? formatShellPrefixCommand(readEnv('CLAUDE_CODE_SHELL_PREFIX'), command)
       : command
 
@@ -1152,7 +1147,6 @@ async function execCommandHook(
     )
   }
 
-  // --
   // Spawn. Two completely separate paths:
   //
   //   Bash: spawn(cmd, [], { shell: <gitBashPath | true> }) — the shell
@@ -1177,7 +1171,7 @@ async function execCommandHook(
   if (!isPowerShell && SandboxManager.isSandboxingEnabled()) {
     try {
       sandboxedCommand = await SandboxManager.wrapWithSandbox(
-        finalCommand,
+        execArgs ? quote([finalCommand, ...execArgs]) : finalCommand,
         undefined, // use default shell
         {
           // Network: deny all outbound by default. Hooks that need network
@@ -1213,7 +1207,13 @@ async function execCommandHook(
   }
 
   let child: ChildProcessWithoutNullStreams
-  if (shellType === 'powershell') {
+  if (execArgs && !SandboxManager.isSandboxingEnabled()) {
+    child = spawn(finalCommand, execArgs, {
+      env: envVars,
+      cwd: safeCwd,
+      windowsHide: true,
+    }) as ChildProcessWithoutNullStreams
+  } else if (shellType === 'powershell') {
     const pwshPath = await getCachedPowerShellPath()
     if (!pwshPath) {
       throw new Error(

@@ -348,14 +348,12 @@ function checkBgPermissionGate(args: readonly string[]): string | null {
   return null
 }
 
-/**
- * Spawn a backgrounded `ccb -p "<directive>"` and return immediately.
- * Strips `--bg` / `--background` from argv before respawning so the
- * child doesn't recurse.
- *
- * @dynamicRequire
- */
+/** Spawn a background task after stripping recursive --bg flags. @dynamicRequire */
 export async function handleBgFlag(args: readonly string[]): Promise<void> {
+  if (args.includes('--print') || args.includes('-p')) {
+    process.stderr.write('Error: --bg cannot be combined with --print/-p\n')
+    process.exit(1)
+  }
   const gateError = checkBgPermissionGate(args)
   if (gateError) {
     process.stderr.write(`${gateError}\n`)

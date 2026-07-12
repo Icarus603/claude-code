@@ -21,11 +21,7 @@ import type {
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { Stream } from '@anthropic-ai/sdk/streaming.mjs'
 import { getProviderAdapter } from './index.js'
-// V7 §11.2: app-host/providerHostSetup imports THIS module to register
-// legacy bindings with the host. The reverse side-effect import we used
-// to do here closed a 2-file cycle. Callers reaching legacy runtime go
-// through the host (which is loaded by the entrypoint), so the host is
-// always set up by the time these functions run.
+// app-host installs legacy bindings before callers reach this runtime.
 import { randomUUID } from 'crypto'
 import {
   getAPIProvider,
@@ -95,6 +91,7 @@ import {
   stripInvalidThinkingBlocks,
   stripToolReferenceBlocksFromUserMessage,
 } from '@claude-code/agent/messages.js'
+import { PartialStreamRecovery } from './partialStreamRecovery.js'
 import {
   getDefaultOpusModel,
   getDefaultSonnetModel,
@@ -1979,6 +1976,7 @@ async function* queryModel(
   let ttftMs = 0
   let partialMessage: BetaMessage | undefined 
   const contentBlocks: (BetaContentBlock | ConnectorTextBlock)[] = []
+  const partialRecovery = new PartialStreamRecovery()
   let usage: NonNullableUsage = EMPTY_USAGE
   let costUSD = 0
   let stopReason: BetaStopReason | null = null
@@ -2119,6 +2117,7 @@ async function* queryModel(
     ttftMs = 0
     partialMessage = undefined
     contentBlocks.length = 0
+    partialRecovery.reset()
     usage = EMPTY_USAGE
     stopReason = null
     isAdvisorInProgress = false
@@ -2465,6 +2464,7 @@ async function* queryModel(
               ...(advisorModel && { advisorModel }),
             }
             newMessages.push(m)
+            partialRecovery.complete(part.index)
             yield m
             break
           }
@@ -2484,19 +2484,8 @@ async function* queryModel(
               }
             }
 
-            // Write final usage and stop_reason back to the last yielded
-            // message. Messages are created at content_block_stop from
-            // partialMessage, which was set at message_start before any tokens
-            // were generated (output_tokens: 0, stop_reason: null).
-            // message_delta arrives after content_block_stop with the real
-            // values.
-            //
-            // IMPORTANT: Use direct property mutation, not object replacement.
-            // The transcript write queue holds a reference to message.message
-            // and serializes it lazily (100ms flush interval). Object
-            // replacement ({ ...lastMsg.message, usage }) would disconnect
-            // the queued reference; direct mutation ensures the transcript
-            // captures the final values.
+            // Mutate the yielded message so the lazy transcript queue sees the
+            // final usage and stop reason from message_delta.
             stopReason = part.delta.stop_reason
 
             const lastMsg = newMessages.at(-1)
@@ -2717,6 +2706,17 @@ async function* queryModel(
           // Throw a more specific error for timeout
           throw new APIConnectionTimeoutError({ message: 'Request timed out' })
         }
+      }
+
+      const recovered = partialRecovery.recover(
+        partialMessage,
+        contentBlocks as BetaContentBlock[],
+        streamingError,
+      )
+      if (recovered) {
+        newMessages.push(recovered)
+        yield recovered
+        return
       }
 
       // When the flag is enabled, skip the non-streaming fallback and let the

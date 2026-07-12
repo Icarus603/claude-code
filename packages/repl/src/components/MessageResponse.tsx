@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useContext } from 'react'
 import { Box, NoSelect, Text, Ratchet } from '@anthropic/ink'
+import { isScreenReaderMode } from '../accessibility.js'
 
 type Props = {
   children: React.ReactNode
@@ -16,7 +17,9 @@ export function MessageResponse({ children, height }: Props): React.ReactNode {
     <MessageResponseProvider>
       <Box flexDirection="row" height={height} overflowY="hidden">
         <NoSelect fromLeftEdge flexShrink={0}>
-          <Text dimColor>{'  '}⎿ &nbsp;</Text>
+          <Text dimColor>
+            {isScreenReaderMode() ? 'Result: ' : <>{'  '}⎿ &nbsp;</>}
+          </Text>
         </NoSelect>
         <Box flexShrink={1} flexGrow={1}>
           {children}

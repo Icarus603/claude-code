@@ -588,9 +588,7 @@ ${CYBER_RISK_INSTRUCTION}`,
     ...(feature('KAIROS') || feature('KAIROS_BRIEF')
       ? [systemPromptSection('brief', () => getBriefSection())]
       : []),
-    // ant 4692.js:295 — focus_mode. Suppresses tool calls and intermediate
-    // text from the user's view; the model must put everything in the final
-    // message. ant's R23() guard skips this when proactive is active —
+    // ant 4692.js:295 — focus_mode suppresses intermediate text/tools; R23 skips this under proactive —
     // proactive already steers the model toward terse final messages.
     systemPromptSection('focus_mode', () => {
       if (proactiveModule?.isProactiveActive()) return null
@@ -600,8 +598,10 @@ ${CYBER_RISK_INSTRUCTION}`,
     }),
   ]
 
-  const resolvedDynamicSections =
-    await resolveSystemPromptSections(dynamicSections)
+  const resolvedDynamicSections = await resolveSystemPromptSections(
+    dynamicSections,
+    isEnvTruthy(readEnv('CLAUDE_CODE_EXCLUDE_DYNAMIC_SYSTEM_PROMPT_SECTIONS')),
+  )
 
   // Compact harness mode — drop the long-form Doing tasks / Executing
   // actions / Using your tools / System / Tone sections, keep the

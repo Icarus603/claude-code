@@ -97,14 +97,13 @@ import type {
   ProcessUserInputBaseResult,
   ProcessUserInputContext,
 } from './processUserInput.js'
-
+import { processStackedPromptCommands } from './stackedSlashCommands.js'
+import { looksLikeCommand } from './looksLikeCommand.js'
 type SlashCommandResult = ProcessUserInputBaseResult & {
   command: Command
 }
 
-// Poll interval and deadline for MCP settle before launching a background
-// forked subagent. MCP servers typically connect within 1-3s of startup;
-// 10s headroom covers slow SSE handshakes.
+// MCP settle deadline before launching a background forked subagent.
 const MCP_SETTLE_POLL_MS = 200
 const MCP_SETTLE_TIMEOUT_MS = 10_000
 
@@ -366,19 +365,6 @@ async function executeForkedSlashCommand(
   }
 }
 
-/**
- * Determines if a string looks like a valid command name.
- * Valid command names only contain letters, numbers, colons, hyphens, and underscores.
- *
- * @param commandName - The potential command name to check
- * @returns true if it looks like a command name, false if it contains non-command characters
- */
-export function looksLikeCommand(commandName: string): boolean {
-  // Command names should only contain [a-zA-Z0-9:_-]
-  // If it contains other characters, it's probably a file path or other input
-  return !/[^a-zA-Z0-9:\-_]/.test(commandName)
-}
-
 export async function processSlashCommand(
   inputString: string,
   precedingInputBlocks: ContentBlockParam[],
@@ -390,6 +376,20 @@ export async function processSlashCommand(
   isAlreadyProcessing?: boolean,
   canUseTool?: CanUseToolFn,
 ): Promise<ProcessUserInputBaseResult> {
+  const stackedResult = await processStackedPromptCommands(
+    inputString,
+    context.options.commands,
+    (command, args, isFirst) =>
+      getMessagesForPromptSlashCommand(
+        command,
+        args,
+        context,
+        isFirst ? precedingInputBlocks : [],
+        isFirst ? imageContentBlocks : [],
+        isFirst ? uuid : undefined,
+      ),
+  )
+  if (stackedResult) return stackedResult
   const parsed = parseSlashCommand(inputString)
   if (!parsed) {
     logEvent('tengu_input_slash_missing', {})

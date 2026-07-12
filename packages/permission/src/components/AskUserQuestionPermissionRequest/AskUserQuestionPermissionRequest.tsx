@@ -11,7 +11,7 @@ import React, {
   useState,
 } from 'react'
 import { useSettings } from '@claude-code/repl/hooks/useSettings.js'
-import { useTerminalSize } from '@anthropic/ink'
+import { Text, useTerminalSize } from '@anthropic/ink'
 import { stringWidth, useTheme } from '@anthropic/ink'
 import { useKeybindings } from '@anthropic/ink/keybindings'
 import {
@@ -21,6 +21,8 @@ import {
 import { useAppState } from '../../appStateHooks.js'
 import type { Question } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
 import { AskUserQuestionTool } from '@claude-code/tool-registry/tools/AskUserQuestionTool/AskUserQuestionTool.js'
+import { getInitialSettings } from '@claude-code/config/settings'
+import { useQuestionAutoContinue } from './useQuestionAutoContinue.js'
 import {
   type CliHighlight,
   getCliHighlightPromise,
@@ -425,6 +427,15 @@ Questions asked and answers provided:\n${questionsWithAnswers}`
       allImageAttachments,
     ],
   )
+  const remainingAutoContinueSeconds = useQuestionAutoContinue(
+    getQuestionTimeoutMs(getInitialSettings().askUserQuestionTimeout),
+    () => void submitAnswers(answers).catch(logError),
+  )
+  const autoContinueHint = remainingAutoContinueSeconds === null ? null : (
+    <Text dimColor>
+      auto-continue in {remainingAutoContinueSeconds}s · any key to stay
+    </Text>
+  )
 
   const handleQuestionAnswer = useCallback(
     (
@@ -558,6 +569,7 @@ Questions asked and answers provided:\n${questionsWithAnswers}`
           }
           onRemoveImage={id => onRemoveImage(currentQuestion.question, id)}
         />
+        {autoContinueHint}
       </>
     )
   }
@@ -574,6 +586,7 @@ Questions asked and answers provided:\n${questionsWithAnswers}`
           minContentHeight={globalContentHeight}
           onFinalResponse={handleFinalResponse}
         />
+        {autoContinueHint}
       </>
     )
   }
@@ -581,6 +594,15 @@ Questions asked and answers provided:\n${questionsWithAnswers}`
   // This should never be reached
   return null
 }
+
+function getQuestionTimeoutMs(value: AskUserQuestionTimeout | undefined): number {
+  if (value === '60s') return 60_000
+  if (value === '5m') return 300_000
+  if (value === '10m') return 600_000
+  return 0
+}
+
+type AskUserQuestionTimeout = '60s' | '5m' | '10m' | 'never'
 
 async function convertImagesToBlocks(
   images: PastedContent[],

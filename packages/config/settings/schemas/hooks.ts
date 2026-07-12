@@ -60,6 +60,7 @@ function buildHookSchemas() {
   const BashCommandHookSchema = z.object({
     type: z.literal('command').describe('Shell command hook type'),
     command: z.string().describe('Shell command to execute'),
+    args: z.array(z.string()).optional().describe('Arguments passed directly without shell parsing'),
     if: IfConditionSchema(),
     shell: z.enum(SHELL_TYPES).optional().describe("Shell interpreter. 'bash' uses your $SHELL; 'powershell' uses pwsh. Defaults to bash."),
     timeout: z.number().positive().optional().describe('Timeout in seconds'),

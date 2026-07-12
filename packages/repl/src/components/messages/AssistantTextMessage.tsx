@@ -33,6 +33,7 @@ import { Markdown } from '../Markdown.js'
 import { MessageResponse } from '../MessageResponse.js'
 import { MessageActionsSelectedContext } from '../messageActions.js'
 import { RateLimitMessage } from './RateLimitMessage.js'
+import { isScreenReaderMode } from '../../accessibility.js'
 
 const MAX_API_ERROR_CHARS = 1000
 
@@ -208,7 +209,7 @@ export function AssistantTextMessage({
             {shouldShowDot && (
               <NoSelect fromLeftEdge minWidth={2}>
                 <Text color={isSelected ? 'suggestion' : 'text'}>
-                  {BLACK_CIRCLE}
+                  {isScreenReaderMode() ? 'Assistant:' : BLACK_CIRCLE}
                 </Text>
               </NoSelect>
             )}
