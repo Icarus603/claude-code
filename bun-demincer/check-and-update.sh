@@ -31,6 +31,16 @@ notify() {
         2>/dev/null || true
 }
 
+run_analysis() {
+    if "$ROOT/analyze.sh" --all-pairs; then
+        return 0
+    fi
+    log "ERROR: semantic analysis incomplete — decoding artifacts were preserved; see runs.log"
+    notify "bun-demincer needs attention" \
+        "decoding completed, but semantic analysis failed; run ccb auth login and retry"
+    return 1
+}
+
 # ── single-instance lock ────────────────────────────────────────────────
 # launchd will not double-fire by itself, but a manual `./check-and-update.sh`
 # while a launchd run is mid-pipeline would interleave runs.log and corrupt
@@ -106,7 +116,7 @@ if [[ -n "$decoded_max" ]]; then
         # equal — caught up on decoding, but still run analyze to fill any
         # report gaps (idempotent — skips pairs that already have analysis.md).
         log "up to date (local=$local_max, decoded=$decoded_max)"
-        "$ROOT/analyze.sh" --all-pairs
+        run_analysis
         exit 0
     fi
     if [[ "$newest" == "$decoded_max" ]]; then
@@ -114,7 +124,7 @@ if [[ -n "$decoded_max" ]]; then
         # longer present in versions/ (auto-updater pruned older binaries).
         # Still run analyze to catch any missing reports.
         log "decoded ahead of local (local=$local_max, decoded=$decoded_max) — nothing to decode"
-        "$ROOT/analyze.sh" --all-pairs
+        run_analysis
         exit 0
     fi
 fi
@@ -135,8 +145,9 @@ log "update available: local=$local_max, decoded=${decoded_max:-<none>} — runn
 #   - generates the delta JSON if missing (filling in gaps that
 #     delta.sh --auto skipped because it only does the newest pair)
 #   - spawns ccb agent per pair to write analysis.md + metadata.json
-# Soft-fails: a single ccb error does NOT abort the catch-up loop.
-"$ROOT/analyze.sh" --all-pairs
+# Pair failures are isolated during the walk, then reported as a non-zero
+# aggregate result so launchd and notifications reflect the incomplete run.
+run_analysis
 
 # Re-read decoded_max post-pipeline so the notification reflects truth,
 # not what we hoped for. (decode.sh could have failed on one specific

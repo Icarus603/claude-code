@@ -3,17 +3,16 @@
  * of ant v2.1.131 4649.js (NJK) — daemon-less Phase B implementation.
  *
  * ant runs a long-lived daemon supervising jobs over a Unix socket;
- * ccb instead uses `spawn(detached:true) + unref() + stdio→file`, and
- * the verb commands (ps/logs/stop/etc.) read `~/.claude/jobs/<short>/`
- * directly. Daemon-managed PTY-attach is Phase C — the on-disk layout
- * here is forward-compatible.
+ * ccb supports both detached file-backed jobs and PTY jobs supervised over
+ * Unix sockets. The verb commands (ps/logs/stop/etc.) read
+ * `~/.claude/jobs/<short>/` directly; PTY attach uses attachClient.ts.
  *
  * Subcommand surface (verb names mirror ant for muscle memory):
  *   --bg "<directive>"        spawn a backgrounded -p run
  *   ps                        list active + recent sessions
  *   logs <short>              tail stdout/stderr (-f follow, --tail N)
  *   stop <short>              SIGTERM; --force / kill aliases SIGKILL
- *   attach <short>            alias for `logs --follow` (no PTY)
+ *   attach <short>            bidirectional for PTY jobs; logs for detached jobs
  *   rm <short>                remove a stopped job's dir
  *   respawn <short>|--all     re-launch with same directive + flags
  */

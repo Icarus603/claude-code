@@ -71,6 +71,7 @@ async function until(pred: () => boolean, ms = 2000): Promise<void> {
     if (pred()) return
     await new Promise(r => setTimeout(r, 10))
   }
+  throw new Error(`condition was not met within ${ms}ms`)
 }
 
 describe('rv channel — server start/stop', () => {
@@ -275,7 +276,14 @@ describe('rv channel — supervisor ↔ worker', () => {
     )
     await until(() => connected)
     client.send({ type: 'shutdown' })
-    await until(() => shutdownCalled)
+    // onShutdown runs synchronously after sendRv queues the ack, while the
+    // supervisor observes that ack on a later socket event. Wait for both
+    // independent effects instead of treating the callback as proof that the
+    // message has already crossed the Unix socket.
+    await until(
+      () =>
+        shutdownCalled && received.some(m => m.type === 'shutting-down'),
+    )
     expect(shutdownCalled).toBe(true)
     expect(received.some(m => m.type === 'shutting-down')).toBe(true)
     client.close()

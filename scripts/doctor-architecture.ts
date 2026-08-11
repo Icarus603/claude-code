@@ -115,6 +115,20 @@ const CHECKS: Check[] = [
     script: 'scripts/verify-optional-integration-slots.ts',
     doc: 'V7 §8.15–§8.18, §15',
   },
+  {
+    id: 'release-capabilities',
+    layer: 'Integrations',
+    subsystem: 'release feature surface',
+    script: 'scripts/verify-release-capabilities.ts',
+    doc: 'docs/capability-maturity.md',
+  },
+  {
+    id: 'workflow-action-pins',
+    layer: 'Cross-Cutting',
+    subsystem: 'release supply chain',
+    script: 'scripts/verify-workflow-action-pins.ts',
+    doc: 'docs/release-security.md',
+  },
 
   // ── App Hosts ─────────────────────────────────────────────────────────
   {

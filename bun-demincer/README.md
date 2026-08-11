@@ -248,6 +248,9 @@ docs/
   BUN.md                Bun bundler internals & deobfuscation strategies
 ```
 
-## License
+## License status
 
-MIT
+The upstream repository does not declare a license, and this vendored fork
+does not grant one independently. Public visibility should not be interpreted
+as permission to reproduce, redistribute, or create derivative works. See the
+monorepo `ATTRIBUTION.md`; obtain a rights review before downstream reuse.

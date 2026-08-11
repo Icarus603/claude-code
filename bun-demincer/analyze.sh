@@ -17,9 +17,9 @@
 # Idempotent: skips a pair when reports/<A>-to-<B>/analysis.md already
 # exists. Force re-run with --force.
 #
-# Soft failures: any single pair failing only logs the error and
-# returns 0, so a launchd-driven loop over many pairs continues even
-# if one ccb call hits a transient API error.
+# Pair isolation: --all-pairs continues after a single pair fails, then
+# returns non-zero after the walk if any pair failed. Callers therefore get
+# a truthful run status without losing diagnostics for later pairs.
 
 set -uo pipefail        # NOTE: no -e here — soft failures by design
 
@@ -28,6 +28,7 @@ WORK_DIR="$ROOT/work"
 DELTAS_DIR="$ROOT/deltas"
 REPORTS_DIR="$ROOT/reports"
 LOG_FILE="$ROOT/runs.log"
+AUTH_CHECK_STATE="unchecked"
 
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 log() { echo "[$(ts)] analyze: $*" | tee -a "$LOG_FILE" >&2; }
@@ -44,6 +45,47 @@ if [[ -z "$CCB_BIN" || ! -x "$CCB_BIN" ]]; then
     log "ERROR: ccb binary not found (tried \$HOME/.local/bin/ccb and \$PATH) — install ccb first"
     exit 1
 fi
+
+# ── authentication preflight ───────────────────────────────────────────
+# Run lazily: a fully analysed --all-pairs invocation should remain a clean
+# no-op even when the user is currently logged out. The result is cached so a
+# missing login produces one actionable diagnostic instead of one per pair.
+check_ccb_auth() {
+    if [[ "$AUTH_CHECK_STATE" == "ready" ]]; then
+        return 0
+    fi
+    if [[ "$AUTH_CHECK_STATE" == "failed" ]]; then
+        return 1
+    fi
+
+    if [[ "${CCB_SKIP_AUTH_CHECK:-0}" == "1" ]]; then
+        AUTH_CHECK_STATE="ready"
+        log "WARN: ccb authentication preflight bypassed by CCB_SKIP_AUTH_CHECK=1"
+        return 0
+    fi
+
+    local auth_output
+    local auth_exit=0
+    auth_output=$("$CCB_BIN" auth status 2>&1) || auth_exit=$?
+    if printf '%s' "$auth_output" | grep -Eq '"loggedIn"[[:space:]]*:[[:space:]]*false'; then
+        AUTH_CHECK_STATE="failed"
+        log "ERROR: ccb is not logged in — run '$CCB_BIN auth login' interactively before automated analysis"
+        return 1
+    fi
+    if (( auth_exit != 0 )); then
+        AUTH_CHECK_STATE="failed"
+        log "ERROR: ccb auth status failed (exit=$auth_exit) — run '$CCB_BIN auth login' interactively"
+        return 1
+    fi
+    if ! printf '%s' "$auth_output" | grep -Eq '"loggedIn"[[:space:]]*:[[:space:]]*true'; then
+        AUTH_CHECK_STATE="failed"
+        log "ERROR: ccb is not logged in — run '$CCB_BIN auth login' interactively before automated analysis"
+        return 1
+    fi
+
+    AUTH_CHECK_STATE="ready"
+    return 0
+}
 
 # ── core: analyse one pair ──────────────────────────────────────────────
 analyze_pair() {
@@ -67,7 +109,7 @@ analyze_pair() {
         log "delta missing for $A->$B — generating via delta.sh"
         if ! "$ROOT/delta.sh" "$A" "$B" >/dev/null; then
             log "ERROR: delta.sh $A $B failed — skipping analysis for this pair"
-            return 0
+            return 1
         fi
     fi
 
@@ -76,9 +118,13 @@ analyze_pair() {
         local d="$WORK_DIR/claude-code-$v/decoded"
         if [[ ! -d "$d" || -z "$(ls -A "$d" 2>/dev/null)" ]]; then
             log "ERROR: decoded tree missing/empty for $v -- skipping pair $A->$B"
-            return 0
+            return 1
         fi
     done
+
+    if ! check_ccb_auth; then
+        return 1
+    fi
 
     mkdir -p "$pair_dir"
 
@@ -107,19 +153,19 @@ analyze_pair() {
 EOF
 )
 
-    # ── invoke ccb. We capture both stdout (the model's narration) and
-    # ── exit code, but don't propagate failure — if ccb dies we still
-    # ── want to write metadata and continue to the next pair.
+    # ── invoke ccb. Capture both stdout (the model's narration) and the
+    # ── real exit code. Metadata is still written on failure so the run
+    # ── remains auditable; --all-pairs decides whether to continue.
     local ccb_log="$pair_dir/.ccb.log"
     local ccb_exit=0
-    if ! "$CCB_BIN" -p \
+    "$CCB_BIN" -p \
             --model claude-opus-4-7 \
             --permission-mode bypassPermissions \
             --no-session-persistence \
             --output-format text \
             "$prompt" \
-            > "$ccb_log" 2>&1; then
-        ccb_exit=$?
+            > "$ccb_log" 2>&1 || ccb_exit=$?
+    if (( ccb_exit != 0 )); then
         log "WARN: ccb exited non-zero ($ccb_exit) for $A->$B -- see $ccb_log"
     fi
 
@@ -154,11 +200,16 @@ EOF
 
     if [[ "$analysis_present" == false ]]; then
         log "WARN: $A->$B finished but analysis.md missing -- wrote stub metadata.json only"
-        return 0
+        return 1
     fi
 
     if [[ "$analysis_size" -lt 500 ]]; then
         log "WARN: $A->$B analysis.md exists but only $analysis_size bytes -- likely incomplete"
+        return 1
+    fi
+
+    if (( ccb_exit != 0 )); then
+        return 1
     fi
 
     log "ccb agent done:  $A -> $B (${wall_seconds}s, $analysis_size bytes) -> $analysis_md"
@@ -194,9 +245,16 @@ analyze_all_pairs() {
 
     log "--all-pairs: walking $((n-1)) adjacent pair(s) across $n versions"
     local i
+    local failed=0
     for (( i = 0; i < n - 1; i++ )); do
-        analyze_pair "${versions[i]}" "${versions[i+1]}" "$force"
+        if ! analyze_pair "${versions[i]}" "${versions[i+1]}" "$force"; then
+            failed=$((failed + 1))
+        fi
     done
+    if (( failed > 0 )); then
+        log "ERROR: --all-pairs completed with $failed failed pair(s)"
+        return 1
+    fi
 }
 
 main() {
@@ -208,15 +266,20 @@ main() {
         --all-pairs)
             analyze_all_pairs "$arg2"
             ;;
+        --check-auth)
+            check_ccb_auth
+            ;;
         --help|-h|"")
             cat <<EOF
 Usage:
   $0 <versionA> <versionB> [--force]   analyse one pair
   $0 --all-pairs [--force]             analyse every adjacent decoded pair
+  $0 --check-auth                       validate non-interactive ccb authentication
 
 Outputs reports/<A>-to-<B>/analysis.md and metadata.json.
 Idempotent: skips pairs whose analysis.md already exists.
-Soft failures: per-pair errors are logged but don't abort the suite.
+Pair failures don't abort --all-pairs, but the final process status is non-zero.
+Set CCB_SKIP_AUTH_CHECK=1 only for a deliberately configured non-Anthropic provider.
 EOF
             ;;
         *)
