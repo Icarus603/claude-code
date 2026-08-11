@@ -55,6 +55,9 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install ripgrep
+        run: brew install ripgrep
+
       - name: Resolve and validate tag
         id: tag
         run: |
