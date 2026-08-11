@@ -188,7 +188,7 @@
     "turndown": "^7.2.2",
     "type-fest": "^5.5.0",
     "typescript": "^6.0.2",
-    "undici": "^7.28.0",
+    "undici": "^8.10.0",
     "url-handler-napi": "workspace:*",
     "usehooks-ts": "^3.1.1",
     "vscode-jsonrpc": "^8.2.1",
