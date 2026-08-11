@@ -6,8 +6,9 @@ name: Nightly Drift Check
 # on pre-push. Drift can accumulate between full-suite runs.
 #
 # This workflow runs the FULL doctor:arch + smoke on origin/main daily.
-# On failure, posts a sticky issue (one issue, updated each run) with the
-# failing verifier output so the developer sees it next session.
+# On failure, updates one sticky issue and fails the workflow. On recovery,
+# closes that issue so GitHub reflects the current state rather than retaining
+# an ambiguous false-green run or a stale alert.
 #
 # See feedback_pre_commit_fast_subset_gap.md.
 
@@ -26,11 +27,11 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: main
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: latest
 
@@ -76,12 +77,50 @@ jobs:
             echo "set isn't run. Investigate which verifier dropped, decide"
             echo "whether to fix-or-bump-baseline, then commit on main."
           } > /tmp/drift-body.md
-          echo "drift_body=/tmp/drift-body.md" >> $GITHUB_OUTPUT
 
       - name: Open or update issue
         if: steps.doctor.outcome == 'failure' || steps.smoke.outcome == 'failure' || steps.tests.outcome == 'failure'
-        uses: peter-evans/create-issue-from-file@v6
-        with:
-          title: 'Nightly drift detected on origin/main'
-          content-filepath: /tmp/drift-body.md
-          labels: 'drift,automated'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title='Nightly drift detected on origin/main'
+          issue_number=$(gh issue list \
+            --state open \
+            --label automated \
+            --json number,title \
+            --jq ".[] | select(.title == \"$title\") | .number" \
+            | head -1)
+          if [[ -n "$issue_number" ]]; then
+            gh issue edit "$issue_number" --body-file /tmp/drift-body.md
+            gh issue comment "$issue_number" \
+              --body "Updated from workflow run ${{ github.run_id }}."
+          else
+            gh issue create \
+              --title "$title" \
+              --body-file /tmp/drift-body.md \
+              --label drift \
+              --label automated
+          fi
+
+      - name: Close recovered drift issue
+        if: steps.doctor.outcome == 'success' && steps.smoke.outcome == 'success' && steps.tests.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title='Nightly drift detected on origin/main'
+          gh issue list \
+            --state open \
+            --label automated \
+            --json number,title \
+            --jq ".[] | select(.title == \"$title\") | .number" \
+            | while read -r issue_number; do
+                [[ -n "$issue_number" ]] || continue
+                gh issue close "$issue_number" \
+                  --comment "Recovered in workflow run ${{ github.run_id }}; all nightly checks passed."
+              done
+
+      - name: Fail when drift was detected
+        if: steps.doctor.outcome == 'failure' || steps.smoke.outcome == 'failure' || steps.tests.outcome == 'failure'
+        run: |
+          echo "One or more nightly checks failed; the drift issue was updated."
+          exit 1

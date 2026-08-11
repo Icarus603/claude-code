@@ -50,6 +50,7 @@
     "prepare": "git config core.hooksPath .githooks",
     "test": "bun test",
     "smoke": "bun test tests/smoke/",
+    "sbom": "bun run scripts/generate-sbom.ts",
     "check:unused": "knip-bun",
     "health": "bun run scripts/health-check.ts",
     "check:transition-stubs": "bun run scripts/check-transition-stubs.ts",

@@ -6,10 +6,9 @@
 #      run on fb1ee05b (2026-05-04T14:34Z) shipped 10 assets cleanly.
 #      `build:platforms` cross-compiles all 5 platforms regardless of
 #      runner OS, so user-facing binaries are unaffected by runner choice.
-#   2. No test/doctor:arch/smoke here. ci.yml + pre-push hook already
-#      gate every merge to main on macos. Tags are cut from main HEAD.
-#      Adding gates here = duplicate work + new platform exposure that
-#      blocks releases without benefit.
+#   2. Release repeats the core gates before signing provenance. CI normally
+#      catches failures earlier, but a tag or manual dispatch is a distinct
+#      trust event and must prove the exact release checkout passed.
 # See `feedback_release_pipeline_chase_root_causes.md` for the v26.5.18
 # series cautionary tale.
 
@@ -27,6 +26,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   build:
@@ -46,17 +47,47 @@ jobs:
     # only affects publish pipeline reliability, not user-facing binary.
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: latest
+
+      - name: Resolve and validate tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ github.event.inputs.tag }}"
+          else
+            tag="${GITHUB_REF#refs/tags/}"
+          fi
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            tagged_commit=$(git rev-list -n 1 "$tag")
+            if [ "$tagged_commit" != "$GITHUB_SHA" ]; then
+              echo "::error::tag $tag points to $tagged_commit, but this run checked out $GITHUB_SHA"
+              exit 1
+            fi
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Install deps
         run: bun install --frozen-lockfile
 
+      - name: Verify release source
+        run: |
+          bun test
+          bun run doctor:arch
+          bun run smoke
+
       - name: Build all platform binaries
         run: bun run build:platforms
+
+      - name: Generate CycloneDX SBOM
+        env:
+          CCB_RELEASE_VERSION: ${{ steps.tag.outputs.tag }}
+        run: bun run sbom dist/binaries/ccb-sbom.cdx.json
 
       - name: Generate SHA256 checksums
         # Sibling .sha256 files alongside each binary. The auto-updater
@@ -68,17 +99,29 @@ jobs:
           done
           ls -la
 
-      - name: Resolve tag
-        id: tag
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Attest release binary provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            dist/binaries/ccb-darwin-arm64
+            dist/binaries/ccb-darwin-x64
+            dist/binaries/ccb-linux-arm64
+            dist/binaries/ccb-linux-x64
+            dist/binaries/ccb-windows-x64.exe
+
+      - name: Attest release SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            dist/binaries/ccb-darwin-arm64
+            dist/binaries/ccb-darwin-x64
+            dist/binaries/ccb-linux-arm64
+            dist/binaries/ccb-linux-x64
+            dist/binaries/ccb-windows-x64.exe
+          sbom-path: dist/binaries/ccb-sbom.cdx.json
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: ${{ steps.tag.outputs.tag }}
@@ -94,3 +137,4 @@ jobs:
             dist/binaries/ccb-linux-x64.sha256
             dist/binaries/ccb-windows-x64.exe
             dist/binaries/ccb-windows-x64.exe.sha256
+            dist/binaries/ccb-sbom.cdx.json

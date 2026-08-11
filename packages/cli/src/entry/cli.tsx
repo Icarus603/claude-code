@@ -223,8 +223,8 @@ async function main(): Promise<void> {
   // Fast-path for `claude ps|logs|attach|kill|rm` and `--bg`/`--background`.
   // OS-level background sessions backed by `~/.claude/jobs/<short>/`.
   // Detached spawn — child outlives the parent terminal closing.
-  // Daemon-managed `attach` (PTY reconnect) is Phase C, not yet wired;
-  // the handler prints "not implemented" + a logs-as-fallback hint.
+  // PTY-mode jobs support bidirectional attach; detached jobs fall back to
+  // read-only log streaming because they do not own a reconnectable PTY.
   if (
     feature('BG_SESSIONS') &&
     (args[0] === 'ps' ||
