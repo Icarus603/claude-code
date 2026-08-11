@@ -2,6 +2,7 @@
 /** Generate a CycloneDX 1.6 SBOM directly from Bun's text lockfile. */
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
 import { dirname, resolve } from 'node:path'
 import { parse } from 'jsonc-parser'
 
@@ -16,8 +17,9 @@ type BunLock = {
   packages?: Record<string, LockPackage>
 }
 
-function splitLocator(locator: string): { name: string; version: string } {
-  const separator = locator.lastIndexOf('@')
+export function splitLocator(locator: string): { name: string; version: string } {
+  const searchFrom = locator.startsWith('@') ? locator.indexOf('/') + 1 : 1
+  const separator = locator.indexOf('@', searchFrom)
   if (separator <= 0 || separator === locator.length - 1) {
     throw new Error(`unsupported Bun lock locator: ${locator}`)
   }
@@ -27,8 +29,13 @@ function splitLocator(locator: string): { name: string; version: string } {
   }
 }
 
-function npmPurl(name: string, version: string): string {
-  return `pkg:npm/${encodeURIComponent(name)}@${encodeURIComponent(version)}`
+export function npmPurl(name: string, version: string): string {
+  const slash = name.startsWith('@') ? name.indexOf('/') : -1
+  const encodedName =
+    slash > 1
+      ? `${encodeURIComponent(name.slice(0, slash))}/${encodeURIComponent(name.slice(slash + 1))}`
+      : encodeURIComponent(name)
+  return `pkg:npm/${encodedName}@${encodeURIComponent(version)}`
 }
 
 function integrityHash(integrity?: string): { alg: string; content: string }[] {
@@ -50,6 +57,16 @@ async function main(): Promise<void> {
   for (const entry of Object.values(lock.packages ?? {})) {
     const [locator, tarball, , integrity] = entry
     const { name, version } = splitLocator(locator)
+    if (version.startsWith('workspace:')) {
+      const bomRef = `urn:ccb:workspace:${encodeURIComponent(name)}`
+      componentByPurl.set(bomRef, {
+        type: 'library',
+        'bom-ref': bomRef,
+        name,
+        properties: [{ name: 'ccb:workspacePath', value: version.slice('workspace:'.length) }],
+      })
+      continue
+    }
     const purl = npmPurl(name, version)
     // Bun may store several resolution keys for the same concrete package
     // version (for example, peers resolved through different parents). An
@@ -73,12 +90,13 @@ async function main(): Promise<void> {
   }
 
   const components = [...componentByPurl.values()].sort((a, b) =>
-    String(a.purl).localeCompare(String(b.purl)),
+    String(a['bom-ref']).localeCompare(String(b['bom-ref'])),
   )
   const version = process.env.CCB_RELEASE_VERSION ?? process.env.GITHUB_REF_NAME ?? 'source'
   const document = {
     bomFormat: 'CycloneDX',
     specVersion: '1.6',
+    serialNumber: `urn:uuid:${randomUUID()}`,
     version: 1,
     metadata: {
       timestamp: new Date().toISOString(),
@@ -106,4 +124,4 @@ async function main(): Promise<void> {
   console.log(`SBOM: ${components.length} components -> ${output}`)
 }
 
-await main()
+if (import.meta.main) await main()
