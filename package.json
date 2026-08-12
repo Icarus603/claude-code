@@ -191,7 +191,7 @@
     "undici": "^7.28.0",
     "url-handler-napi": "workspace:*",
     "usehooks-ts": "^3.1.1",
-    "vscode-jsonrpc": "^8.2.1",
+    "vscode-jsonrpc": "^9.0.1",
     "vscode-languageserver-protocol": "^3.17.5",
     "vscode-languageserver-types": "^3.17.5",
     "wrap-ansi": "^10.0.0",
